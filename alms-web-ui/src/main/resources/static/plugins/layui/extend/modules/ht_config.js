@@ -24,7 +24,7 @@ layui.define(function (exports) {
         ,defaultUser:"test_area_hd_leader"   //贷后中心清算一部主管
         // ,defaultUser:"test_leader"  //区域贷后主管
         ,localBasePath:"http://localhost:30606/"
-        ,openBasePath:"http://localhost:2001/"
+        ,openBasePath:"http://localhost:30616/"
         //--------------   切换是否使用网关 --------------
     });
 });

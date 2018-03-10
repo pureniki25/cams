@@ -1,5 +1,5 @@
 server:
-  port: 30607
+  port: 30611
 spring:
   application:
     name: alms-scheduled-service
