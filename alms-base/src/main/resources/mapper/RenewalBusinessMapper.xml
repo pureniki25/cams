@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.RenewalBusinessMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.RenewalBusiness">
+        <id column="renewal_business_id" property="renewalBusinessId" />
+        <result column="original_business_id" property="originalBusinessId" />
+        <result column="last_business_id" property="lastBusinessId" />
+        <result column="remark" property="remark" />
+        <result column="other_cost_remark" property="otherCostRemark" />
+        <result column="is_deduce_overdue" property="isDeduceOverdue" />
+        <result column="deduce_overdue_remark" property="deduceOverdueRemark" />
+        <result column="deduce_after_overdue_money" property="deduceAfterOverdueMoney" />
+        <result column="contract_confirm" property="contractConfirm" />
+        <result column="current_process_name" property="currentProcessName" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="update_time" property="updateTime" />
+        <result column="update_user" property="updateUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        renewal_business_id AS renewalBusinessId, original_business_id AS originalBusinessId, last_business_id AS lastBusinessId, remark, other_cost_remark AS otherCostRemark, is_deduce_overdue AS isDeduceOverdue, deduce_overdue_remark AS deduceOverdueRemark, deduce_after_overdue_money AS deduceAfterOverdueMoney, contract_confirm AS contractConfirm, current_process_name AS currentProcessName, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
+    </sql>
+
+	<select id="listLoanExt" resultType="com.hongte.alms.base.vo.module.LoanExtListVO"
+	parameterType="com.hongte.alms.base.vo.module.LoanExtListReq">
+	SELECT
+		trb.renewal_business_id as id,
+		tbb.customer_name as customer,
+		tbb.original_name as salesman,
+		tbb.borrow_money as loanAmount,
+		CONCAT(tbb.borrow_limit,(if(tbb.borrow_limit_unit="1","个月","天"))) as loanTerm ,
+		tbbt.business_type_name as businessType,
+		trb.renewal_business_id as extensionId,
+		trb.current_process_name as status,
+		CONCAT(tbba.last_review_limit,(if(tbba.last_review_limit_unit="1","个月","天"))) as extensionTerm ,
+    	IFNULL(tbba.last_review_money,"0") as extensionAmount,
+		 IFNULL(SUM(trbpld.fact_amount), '0') AS repayAmount
+	FROM
+	    tb_renewal_business trb
+	        LEFT JOIN
+	    tb_basic_business tbb ON tbb.business_id = trb.original_business_id
+	        LEFT JOIN
+	    tb_basic_business_type tbbt ON tbbt.business_type_id = tbb.business_type
+	        LEFT JOIN
+	    tb_basic_business_approve tbba ON tbba.business_id = trb.renewal_business_id
+	        LEFT JOIN
+	    tb_repayment_biz_plan_list trbpl ON trbpl.business_id = tbb.business_id
+	        LEFT JOIN
+	    tb_repayment_biz_plan_list_detail trbpld ON trbpld.plan_list_id = trbpl.plan_list_id
+	<where>
+		1=1
+		<if test="loanExtReq.dateStart !=null and loanExtReq.dateStart !=''">
+        	AND trb.create_time &gt;= #{loanExtReq.dataStart}
+        </if>
+        <if test="loanExtReq.dateEnd !=null and loanExtReq.dateEnd !=''">
+        	AND trb.create_time &lt;= #{loanExtReq.dateEnd}
+        </if>
+        <if test="loanExtReq.deptId !=null and loanExtReq.deptId !=''">
+        	AND tbb.company_id = #{loanExtReq.deptId}
+        </if>
+        <if test="loanExtReq.businessId !=null and loanExtReq.businessId !=''">
+        	AND trb.original_business_id = #{loanExtReq.businessId}
+        </if>
+        <if test="loanExtReq.salesman !=null and loanExtReq.salesman !=''">
+        	AND tbb.original_name = #{loanExtReq.salesman}
+        </if>
+        <if test="loanExtReq.customer !=null and loanExtReq.customer !=''">
+        	AND tbb.customer_name = #{loanExtReq.customer}
+        </if>
+        <if test="loanExtReq.businessType !=null and loanExtReq.businessType !=''">
+        	AND tbb.business_type = #{loanExtReq.businessType}
+        </if>
+        <if test="loanExtReq.extensionId !=null and loanExtReq.extensionId !=''">
+        	AND trb.renewal_business_id = #{loanExtReq.extensionId}
+        </if>
+    </where>
+	GROUP BY original_business_id
+	ORDER BY trb.create_time desc
+	LIMIT ${(loanExtReq.page-1) * loanExtReq.limit}, #{loanExtReq.limit,jdbcType=DECIMAL}
+	</select>
+	
+	<select id="listLoanExtCount" resultType="com.hongte.alms.base.vo.module.LoanExtListVO"
+	parameterType="com.hongte.alms.base.vo.module.LoanExtListReq">
+	SELECT
+		trb.renewal_business_id as id
+	FROM
+		tb_renewal_business trb
+	LEFT JOIN
+		tb_basic_business tbb ON tbb.business_id = trb.original_business_id
+	LEFT JOIN
+		tb_basic_business_type tbbt ON tbbt.business_type_id = tbb.business_type
+	<where>
+		1=1
+		<if test="loanExtReq.dateStart !=null and loanExtReq.dateStart !=''">
+        	AND trb.create_time &gt;= #{loanExtReq.dataStart}
+        </if>
+        <if test="loanExtReq.dateEnd !=null and loanExtReq.dateEnd !=''">
+        	AND trb.create_time &lt;= #{loanExtReq.dateEnd}
+        </if>
+        <if test="loanExtReq.deptId !=null and loanExtReq.deptId !=''">
+        	AND tbb.company_id = #{loanExtReq.deptId}
+        </if>
+        <if test="loanExtReq.businessId !=null and loanExtReq.businessId !=''">
+        	AND trb.original_business_id = #{loanExtReq.businessId}
+        </if>
+        <if test="loanExtReq.salesman !=null and loanExtReq.salesman !=''">
+        	AND tbb.original_name = #{loanExtReq.salesman}
+        </if>
+        <if test="loanExtReq.customer !=null and loanExtReq.customer !=''">
+        	tbb.customer_name = #{loanExtReq.customer}
+        </if>
+        <if test="loanExtReq.businessType !=null and loanExtReq.businessType !=''">
+        	AND tbb.business_type = #{loanExtReq.businessType}
+        </if>
+        <if test="loanExtReq.extensionId !=null and loanExtReq.extensionId !=''">
+        	AND trb.renewal_business_id = #{loanExtReq.extensionId}
+        </if>
+    </where>
+	GROUP BY trb.original_business_id
+	</select>
+</mapper>

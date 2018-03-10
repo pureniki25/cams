@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.SysUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.SysUser">
+        <id column="user_id" property="userId" />
+        <result column="user_name" property="userName" />
+        <result column="org_code" property="orgCode" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        user_id AS userId, user_name AS userName, org_code AS orgCode
+    </sql>
+
+
+    <select id="selectUsersByRoleAndEare" resultType="String">
+
+        SELECT uRole.user_id AS UserId FROM tb_sys_user_role  uRole LEFT JOIN tb_sys_user_area uArea  
+        on uRole.user_id=uArea.user_id
+        WHERE 1=1
+        <if test="roleCode !=null">
+            and uRole.role_code = #{roleCode}
+        </if>
+
+        <if test="areaCodes !=null">
+            and uArea.org_code  IN
+            <foreach collection="areaCodes" item="orgCode" index="index"
+                     open="(" close=")" separator=",">
+                #{orgCode}
+            </foreach>
+
+        </if>
+
+        GROUP  By UserId
+
+    </select>
+
+
+</mapper>

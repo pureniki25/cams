@@ -1,0 +1,30 @@
+server:
+  port: 30616
+spring:
+  application:
+    name: alms-timer-service
+  cloud:
+    config:
+      #仓库中的配置文件会被转换成web接口，访问可以参照以下的规则：
+      #/{application}/{profile}[/{label}]
+      #/{application}-{profile}.yml
+      #/{label}/{application}-{profile}.yml
+      #/{application}-{profile}.properties
+      #/{label}/{application}-{profile}.properties
+
+      uri: http://localhost:30688
+      # profile对应config server所获取的配置文件中的{profile}
+      profile: dev
+      #label: config
+eureka:
+  client:
+    serviceUrl:
+#      defaultZone: http://10.110.1.240:30101/eureka/
+      defaultZone: http://172.16.200.110:30101/eureka/
+
+oss:
+  accessKeyID: 111
+  accessKeySecret: 111
+  upLoadUrl: 111
+  ossBucketName: 111
+  readUrl: 111

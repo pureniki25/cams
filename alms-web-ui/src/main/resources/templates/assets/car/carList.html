@@ -1,0 +1,153 @@
+
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+    <title >贷后管理</title>
+
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
+    <!-- iview样式 -->
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
+    <!--@import url("//unpkg.com/iview/dist/styles/iview.css");-->
+    <!--<link rel="stylesheet" type="text/css" href="//unpkg.com/iview/dist/styles/iview.css"/>-->
+    <!-- 引入layui样式 -->
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all"/>
+  	<link rel="stylesheet" href="/plugins/popover/popover.css">
+    <!--   <script src="//unpkg.com/vue/dist/vue.js"></script>
+       <script src="//unpkg.com/iview/dist/iview.min.js"></script>-->
+    <!-- 引入vue -->
+    <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+    <!-- iview js -->
+    <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+    <!--引入layui.js-->
+    <script src="/plugins/layui/layui.js"></script>
+    <!--引入axios.js 用于ajax调用-->
+    <script src="/plugins/axios/axios.min.js"></script>
+    <script type="text/javascript" src="/plugins/jquery-1.9.1.min.js"></script>
+    <script src="/build/js/jquery-3.3.1.min.js"></script>
+    <!-- 设置全局请求头:app、Authorization -->
+    <script src="/build/js/appToken.js"></script>
+    <script src="/plugins/popover/popover.js"></script>
+
+
+</head>
+<body>
+<!--隐藏元素-->
+<!--<p id="staffType"  th:attr="value=${staffType}"  hidden />-->
+<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+<div id="app" v-cloak>
+
+    <!-- 搜索工具框 开始-->
+    <row style="padding: 10px">
+        <i-col span="24">
+            <Card>
+                <p slot="title">
+                    <Icon type="ios-search"></Icon>
+                    搜索条件
+                </p>
+                <!--右上侧按钮列表-->
+                <i-button slot="extra" type="info" :loading="loading" icon="ios-search" @click="toLoading" style="margin-right:10px">
+                    <span v-if="!loading">查询</span>
+                    <span v-else>查询中...</span>
+                </i-button>
+                <i-button slot="extra"  @click="handleReset('searchForm')" style="margin-right:10px">
+                    <span>重置</span>
+                </i-button>
+                <i-button slot="extra" type="info" :loading="exporting" @click="clickExport" style="margin-right:10px">
+                    <span v-if="!exporting">导出</span>
+                    <span v-else>导出中...</span>
+
+                </i-button>
+
+                <!--查询表单内容-->
+                <row :gutter="16">
+                    <i-form ref="searchForm"  :model="searchForm"   :rules="ruleValidate" label-position="right" :label-width="100">
+                       <i-col span="6">
+                            <form-item label="业务编号："  prop="businessId">
+                                <i-input v-model="searchForm.businessId"></i-input>
+                            </form-item>
+                        </i-col>
+                        <i-col span="6">
+                            <form-item label="客户姓名："  prop="customerName">
+                                <i-input v-model="searchForm.customerName"></i-input>
+                            </form-item>
+                        </i-col>
+                        <i-col span="6">
+                            <form-item label="车牌号："  prop="licensePlateNumber">
+                                <i-input v-model="searchForm.licensePlateNumber"></i-input>
+                            </form-item>
+                        </i-col>
+                        <i-col span="6">
+                            <form-item label="车辆型号："  prop="model">
+                                <i-input v-model="searchForm.model"></i-input>
+                            </form-item>
+                        </i-col>
+                        <i-col span="6">
+                            <form-item label="区域：" prop="areaId">
+                                <i-select v-model="searchForm.areaId" clearable  filterable >
+                                    <i-option v-for="item in areaList" :value="item.areaId" :key="item.areaId">{{ item.areaName }}</i-option>
+                                </i-select>
+                            </form-item>
+                        </i-col>
+                        <!--companyId:'',     style="width:200px" //公司ID-->
+                        <i-col span="6">
+                            <form-item label="分公司：" prop="companyId">
+                                <i-select v-model="searchForm.companyId" clearable filterable >
+                                    <i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{ item.areaName }}</i-option>
+                                </i-select>
+                            </form-item>
+                        </i-col>
+                        <i-col span="6">
+                            <form-item label="拖车日期："   prop="trailerStartDate" >
+                                <date-picker   v-model="searchForm.trailerStartDate" placement="bottom-end" placeholder="选择日期" style="width: 120px" ></date-picker>
+								 至<date-picker   v-model="searchForm.trailerEndDate" placement="bottom-end" placeholder="选择日期" style="width: 120px;position:absolute;right:20;"  ></date-picker>
+								
+                                <!--<date-picker  v-model="searchForm.showRepayDateBegin" type="date" placeholder="Select date"   style="width: 200px"></date-picker>-->
+                            </form-item>
+                    
+                        </i-col>
+                        <!--businessStatus:'',          //业务状态-->
+                        <i-col span="6">
+                            <form-item label="状态：" prop="businessStatus">
+                                <i-select v-model="searchForm.businessStatus" clearable filterable  style="width:200px">
+                                    <i-option v-for="item in businessStatusList" :value="item.paramValue" :key="item.paramValue">{{ item.paramName }}</i-option>
+                                </i-select>
+                            </form-item>
+                        </i-col>
+                    </i-form>
+                </row>
+            </Card>
+        </i-col>
+    </row>
+    <!-- 搜索工具框 结束-->
+    <!-- 表单Grid，使用layerUI的表格组件 开始 -->
+    <row style="padding: 10px">
+        <i-col span="24">
+            <!-- 使用方法渲染模式 -->
+            <table id="listTable" lay-filter="listTable" class="layui-hide"> </table>
+            <script type="text/html" id="barTools">
+                <!--layui-btn layui-btn-xs-->
+                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="operate" id="operate">操作</a>
+                <a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="info">详情</a>
+            </script>
+        </i-col>
+    </row>
+    <!-- 表单Grid，使用layerUI的表格组件 结束 -->
+        <!--导出Excel隐藏表单-->
+    <iframe id="frame" name="iframe" style="display:none;"></iframe>
+    <!--导出Excel隐藏表单-->
+
+
+
+</div>
+<script src="/src/js/comm.js" ></script>
+<script src="/src/js/assets/car/carList.js" ></script>
+<script>
+
+</script>
+</body>
+</html>

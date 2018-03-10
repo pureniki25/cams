@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.SysModuleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.SysModule">
+        <id column="module_id" property="moduleId" />
+        <result column="module_name" property="moduleName" />
+        <result column="module_url" property="moduleUrl" />
+        <result column="module_pid" property="modulePid" />
+        <result column="module_level" property="moduleLevel" />
+        <result column="module_desc" property="moduleDesc" />
+        <result column="module_status" property="moduleStatus" />
+        <result column="device_type" property="deviceType" />
+        <result column="module_order" property="moduleOrder" />
+        <result column="module_icon" property="moduleIcon" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="update_time" property="updateTime" />
+        <result column="update_user" property="updateUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        module_id AS moduleId, module_name AS moduleName, module_url AS moduleUrl, module_pid AS modulePid, module_level AS moduleLevel, module_desc AS moduleDesc, module_status AS moduleStatus, device_type AS deviceType, module_order AS moduleOrder, module_icon AS moduleIcon, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
+    </sql>
+
+    <select id="selectModulePage" resultType="com.hongte.alms.base.vo.module.moduleManageVO" parameterType="com.hongte.alms.base.vo.module.ModulePageReq">
+        select a.module_id AS moduleId,a.module_name as moduleName,a.module_pid as modulePid,
+        ifnull(b.module_name,'root') as moduleParentName, a.module_url as moduleUrl,
+        a.module_level as moduleLevel,a.module_desc as moduleDesc,
+        case when a.module_status = 1 then '启用' else '关闭' end `moduleStatus`,
+        a.create_user as createUser,a.create_time as createTime
+        from tb_sys_module a
+        left join tb_sys_module b on a.module_pid = b.module_id
+        <where>
+            <if test="moduleName !=null and moduleName !=''">
+                and a.module_name like CONCAT('%',#{moduleName},'%')
+            </if>
+            <if test="moduleLevel !=null">
+                and a.module_level = #{moduleLevel}
+            </if>
+        </where>
+        order by a.create_time desc
+
+    </select>
+
+</mapper>

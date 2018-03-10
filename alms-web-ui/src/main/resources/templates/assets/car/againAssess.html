@@ -1,0 +1,448 @@
+
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+    <title >贷后管理</title>
+
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
+    <!-- iview样式 -->
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
+    <!--@import url("//unpkg.com/iview/dist/styles/iview.css");-->
+    <!--<link rel="stylesheet" type="text/css" href="//unpkg.com/iview/dist/styles/iview.css"/>-->
+    <!-- 引入layui样式 -->
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all"/>
+  	<link rel="stylesheet" href="/plugins/popover/popover.css">
+    <!--   <script src="//unpkg.com/vue/dist/vue.js"></script>
+       <script src="//unpkg.com/iview/dist/iview.min.js"></script>-->
+    <!-- 引入vue -->
+    <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+    <!-- iview js -->
+    <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+    <!--引入layui.js-->
+    <script src="/plugins/layui/layui.js"></script>
+    <!--引入axios.js 用于ajax调用-->
+    <script src="/plugins/axios/axios.min.js"></script>
+    <script type="text/javascript" src="/plugins/jquery-1.9.1.min.js"></script>
+	<script src="/build/js/jquery-3.3.1.min.js"></script>
+	<!-- 设置全局请求头:app、Authorization -->
+	<script src="/build/js/appToken.js"></script>
+
+<style type="text/css">
+.layui-form-item{
+border-bottom:  2px  solid #DBDBDB;    /*下边框线*/
+}
+.layui-form-item .layui-form-label{
+width: 30%
+}
+.layui-form-item .layui-input-block{
+margin-left: 35%;
+width: 60%;
+ , basePath:  "http://localhost:30677/"
+}
+.input-border-none {
+	border: none;
+	font-size: 14px;
+}
+
+.layui-row .grid-demo {
+	margin-left: 5%;
+	width: 90%;
+}
+
+.td_label {
+	font-weight: bolder;
+}
+.input-border-input {
+	width: 90%
+}
+</style>
+</head>
+<body>
+<!--隐藏元素-->
+<p id="businessId"  th:attr="value=${businessId}"  hidden />
+<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+<div id="app" >
+
+  <div class="layui-row">
+    <div class="layui-col-xs6">
+      <div class="grid-demo layui-bg-gray">
+   		<div class="grid-demo layui-bg-gray">车辆基本情况：</div>
+      		<div class="grid-demo layui-bg-gray">
+			<table class="layui-table">
+			<tr>
+				<td class="td_label">车架号</td>
+				<td ><input type="text" name="lname"
+					class="input-border-none" v-bind:value="carBasic.vin" readonly="readonly">
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">发动机号</td>
+				<td ><input type="text" name="lname"
+					class="input-border-none" v-bind:value="carBasic.engineModel" readonly="readonly">
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">排量</td>
+				<td ><input type="text" name="lname"
+					class="input-border-none" v-bind:value="carBasic.displacement" readonly="readonly">
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">发票价</td>
+				<td ><input type="text" name="lname"
+					class="input-border-none" v-bind:value="carBasic.invoiceCost" readonly="readonly">
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">违章情况</td>
+				<td ><input type="text" name="trafficViolationSituation"
+					 v-model="carBasic.trafficViolationSituation" class="input-border-input" >
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">违章费用</td>
+				<td ><input type="text" name="trafficViolationFee"
+					 v-model="carBasic.trafficViolationFee" class="input-border-input" >元
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">车船税费用</td>
+				<td ><input type="text" name="vehicleVesselTax"
+					 v-model="carBasic.vehicleVesselTax" class="input-border-input" >元
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">统缴费用</td>
+				<td ><input type="text" name="carBasic.annualTicketFee"
+					 v-model="carBasic.annualTicketFee" class="input-border-input" >元
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">核实行驶资料</td>
+				<td ><input type="checkbox" name="drivingLicenseConsistent"
+					 v-model="carBasic.drivingLicenseConsistent" >相符&nbsp;
+					 <input type="checkbox" 
+					 value="有差异" v-model="drivingLicenseInconsistentDescription" >有差异&nbsp;
+					 <input type="checkbox" 
+					 value="有改装" v-model="drivingLicenseInconsistentDescription">有改装&nbsp;
+					 <input type="checkbox" 
+					 value="有改色" v-model="drivingLicenseInconsistentDescription">有改色&nbsp;
+					 <input type="checkbox" 
+					 value="有翻新" v-model="drivingLicenseInconsistentDescription">有翻新&nbsp;
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">燃油形式</td>
+				<td >     <input value="0"  type="radio" v-model="carBasic.fuelType"><label>汽油</label>&nbsp;&nbsp;
+      							  <input  value="1"  type="radio" v-model="carBasic.fuelType"><label>柴油</label>
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">汽车注册日期</td>
+				<td ><input type="text" id="vehicleLicenseRegistrationDate" placeholder="yyyy-MM-dd"
+					 v-model="carBasic.vehicleLicenseRegistrationDate" >
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">年审到期日</td>
+				<td ><input type="text" id="annualVerificationExpirationDate" placeholder="yyyy-MM-dd"
+					 v-model="carBasic.annualVerificationExpirationDate" >
+				</td>
+			</tr>
+						<tr>
+				<td class="td_label">车辆抵押状态</td>
+				<td >     <input  value="true"  type="radio" v-model="carBasic.mortgage"><label>已抵押</label>&nbsp;&nbsp;
+      							  <input  value="false"  type="radio" v-model="carBasic.mortgage"><label>未抵押</label>
+				</td>
+			</tr>
+			</table>
+			</div>
+      </div>
+    </div>
+    <div class="layui-col-xs6">
+      <div class="grid-demo layui-bg-gray">
+     <div class="grid-demo layui-bg-gray">车辆外观情况：</div>
+      		<div class="grid-demo layui-bg-gray">
+			<table class="layui-table">
+			<tr>
+				<td class="td_label">里程表读数：</td>
+				<td ><input type="text" name="odometer"
+					 v-model="carBasic.odometer" >
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">燃油量（约余）：</td>
+				<td><select v-model="carBasic.fuelLeft" name="fuelLeft">
+									<option >--请选择--</option>
+									<option value="4">满</option>
+									<option value="3">3/4量</option>
+									<option value="2">1/2量</option>
+									<option value="1">1/4量</option>
+									<option value="0">空</option>
+									
+							</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">中控台</td>
+				<td ><input type="checkbox" v-model="carDetection.centerPanelNormal" >无异常&nbsp;
+					 <input type="checkbox" 
+					 v-model="centerPanelAbnormalDescription" value="有破损">有破损&nbsp;
+					 <input type="checkbox"  v-model="centerPanelAbnormalDescription" value="松动" >松动&nbsp;
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">空调：</td>
+				<td ><input type="checkbox" 
+					 	v-model="carDetection.ventilatorNormal" >无异常&nbsp;
+					 <input type="checkbox" 
+					 	v-model="ventilatorAbnormalDescription" value="有制冷">有制冷&nbsp;
+					 <input type="checkbox" 
+						v-model="ventilatorAbnormalDescription" value="制冷不明显">制冷不明显&nbsp;
+					  <input type="checkbox" 
+					 	v-model="ventilatorAbnormalDescription" value="无制冷">无制冷&nbsp;
+					   <input type="checkbox" 
+					 	v-model="ventilatorAbnormalDescription" value="异响">异响&nbsp;
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">车厢内饰：</td>
+				<td ><input type="checkbox" name="lname"
+					 v-model="carDetection.interiorNormal" >无异常&nbsp;
+					 <input type="checkbox" 
+					 v-model="interiorAbnormalDescription" value="有破损">有破损&nbsp;
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">玻璃：</td>
+				<td ><input type="checkbox" name="lname"
+					 v-model="carDetection.windowGlassNormal">无异常&nbsp;
+					 <input type="checkbox" 
+					  v-model="windowGlassAbnormalDescription" value="破裂">破裂&nbsp;
+					 <input type="checkbox" 
+					  v-model="windowGlassAbnormalDescription" value="气泡">气泡&nbsp;
+					 <input type="checkbox" 
+					 v-model="windowGlassAbnormalDescription" value="渗水">渗水&nbsp;
+					 <input type="checkbox" 
+					  v-model="windowGlassAbnormalDescription" value="升降不正常">升降不正常&nbsp;
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">水箱：</td>
+				<td ><input type="checkbox" name="lname"
+					 v-model="carDetection.radiatorNormal" >无异常&nbsp;
+					 <input type="checkbox" 
+					 v-model="radiatorAbnormalDescription" value="修补">修补&nbsp;
+					 <input type="checkbox" 
+					  v-model="radiatorAbnormalDescription" value="变形">变形&nbsp;
+					
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">发动机：</td>
+				<td ><input type="checkbox" name="lname"
+					 v-model="carDetection.engineNormal" >无异常&nbsp;
+					 <input type="checkbox" 
+					 v-model="engineAbnormalDescription" value="抖动明显">抖动明显&nbsp;
+					 <input type="checkbox" 
+					 v-model="engineAbnormalDescription" value="异响">异响&nbsp;
+					<input type="checkbox" 
+					 v-model="engineAbnormalDescription" value="渗漏油">渗漏油&nbsp;
+					<input type="checkbox" 
+					 v-model="engineAbnormalDescription" value="有硬伤">有硬伤&nbsp;
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">车大梁：</td>
+				<td ><input type="checkbox" name="lname"
+					v-model="carDetection.frameNormal" >无异常&nbsp;
+					 <input type="checkbox" 
+					 v-model="frameAbnormalDescription" value="有损伤痕迹">有损伤痕迹&nbsp;
+					 <input type="checkbox" name="lname"
+					 v-model="frameAbnormalDescription" value="严重撞击">严重撞击&nbsp;
+				
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">轮胎：</td>
+				<td ><input type="checkbox" name="lname"
+					 v-model="carDetection.tireNormal" >无异常&nbsp;
+					 <input type="checkbox" name="lname"
+					 v-model="tireAbnormalDescription" value="破损">破损&nbsp;
+					 <input type="checkbox" 
+					 v-model="tireAbnormalDescription" value="开裂">开裂&nbsp;
+					 <input type="checkbox" name="lname"
+					 v-model="tireAbnormalDescription" value="破损严重">破损严重&nbsp;
+				
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">备用胎：</td>
+				<td ><input type="checkbox" name="lname"
+					 v-model="carDetection.spareTireNormal" >无异常&nbsp;
+					 <input type="checkbox" 
+					 v-model="spareTireAbnormalDescrioption" value="没有配备">没有配备&nbsp;
+				
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">车门：</td>
+				<td ><input type="checkbox" name="lname"
+					 v-model="carDetection.doorNormal" >无异常&nbsp;
+					 <input type="checkbox" 
+					v-model="doorAbnormalDescription" value="密封性差">密封性差&nbsp;
+					  <input type="checkbox" 
+					 v-model="doorAbnormalDescription" value="封条松动">封条松动&nbsp;
+				
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">变速箱：</td>
+				<td ><input value="0"  type="radio"
+					v-model="carBasic.gearBox" >自动&nbsp;
+					 <input value="1"  type="radio"
+					 v-model="carBasic.gearBox" >手动&nbsp;
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label" rowspan="2">车辆版本配置说明：</td>
+				<td rowspan="2"><textarea rows="" cols=""
+					style="width: 100%" maxlength="1000"> 15年3月马自达3昂克赛拉1.5L自动舒适型</textarea>
+				</td>
+			</tr>
+			</table>
+			</div>
+      
+      </div>
+    </div>
+  </div>
+    <div class="layui-row">
+    <div class="layui-col-xs6">
+      <div class="grid-demo layui-bg-gray">
+   		<div class="grid-demo layui-bg-gray">车辆行驶情况：</div>
+      		<div class="grid-demo layui-bg-gray">
+			<table class="layui-table">
+			<tr>
+				<td class="td_label">评估金额：</td>
+				<td ><input type="text" v-model="carBasic.evaluationAmount" >
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">使用权转移价：</td>
+				<td ><input type="text" name="lname"
+					 value="未抵押" >
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">动力性能：</td>
+				<td ><input type="checkbox" v-model="carDetection.accelerationPerformanceNormal" >无异常&nbsp;
+					 <input type="checkbox" v-model="accelerationPerformanceAbnormalDescription" value="抖动明显" >抖动明显&nbsp;
+					  <input type="checkbox" v-model="accelerationPerformanceAbnormalDescription" value="异响" >异响&nbsp;
+					 <input type="checkbox" v-model="accelerationPerformanceAbnormalDescription" value="渗漏油" >渗漏油&nbsp;
+					 <input type="checkbox" v-model="accelerationPerformanceAbnormalDescription" value="有硬伤" >有硬伤&nbsp;
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">刹车性能：</td>
+				<td ><input type="checkbox" v-model="carDetection.brakingPerformanceNormal" >无异常&nbsp;
+					 <input type="checkbox" v-model="brakingPerformanceAbnormalDescription" value="有损伤痕迹" >有损伤痕迹&nbsp;
+					  <input type="checkbox" v-model="brakingPerformanceAbnormalDescription" value="严重撞击" >严重撞击&nbsp;
+				
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">刹车平衡性能：</td>
+				<td ><input type="checkbox" v-model="carDetection.brakingBalancePerformanceNormal" >无异常&nbsp;
+					 <input type="checkbox" v-model="brakingBalancePerformanceAbnormalDescription" value="破损" >破损&nbsp;
+					  <input type="checkbox" v-model="brakingBalancePerformanceAbnormalDescription" value="开裂" >开裂&nbsp;
+					 <input type="checkbox" v-model="brakingBalancePerformanceAbnormalDescription" value="破损严重" >破损严重&nbsp;
+				
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">方向性能：</td>
+				<td ><input type="checkbox" v-model="carDetection.steerPerformanceNormal" >无异常&nbsp;
+					 <input type="checkbox" v-model="steerPerformanceAbnormalDescription" value="没有配备">没有配备&nbsp;
+				
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">挂档性能：</td>
+				<td ><input type="checkbox" v-model="carDetection.gearPerformanceNormal" >无异常&nbsp;
+					 <input type="checkbox" v-model="gearPerformanceAbnormalDescription" value="密封性差" >密封性差&nbsp;
+					 <input type="checkbox" v-model="gearPerformanceAbnormalDescription" value="封条松动" >封条松动&nbsp;
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label" rowspan="2">其他情况说明：</td>
+				<td rowspan="2"><textarea rows="" cols="" v-model="carDetection.otherDriveDescription"
+					style="width: 100%" maxlength="1000"> </textarea>
+				</td>
+			</tr>
+			</table>
+			</div>
+      </div>
+    </div>
+    <div class="layui-col-xs6">
+      <div class="grid-demo layui-bg-gray">
+     <div class="grid-demo layui-bg-gray">现场核查：</div>
+      		<div class="grid-demo layui-bg-gray">
+			<table class="layui-table">
+			<tr>
+				<td class="td_label">车架号是否一致：</td>
+				<td >     <input  value="true" v-model="carDetection.vinConsistent" type="radio"><label>是</label>&nbsp;&nbsp;
+      							  <input  value="false" v-model="carDetection.vinConsistent" type="radio"><label>否</label>
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">发动机号是否一致：</td>
+				<td >     <input value="true" v-model="carDetection.engineModelConsistent" type="radio"><label>是</label>&nbsp;&nbsp;
+      							  <input value="false" v-model="carDetection.engineModelConsistent" type="radio"><label>否</label>
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label">是否有事故痕迹：</td>
+				<td >     <input value="true" v-model="carDetection.accident" type="radio"><label>是</label>&nbsp;&nbsp;
+      							  <input value="false" v-model="carDetection.accident" type="radio"><label>否</label>
+				</td>
+			</tr>
+					<tr>
+				<td class="td_label">是否有其他问题：</td>
+				<td >     <input value="true" v-model="carDetection.otherTrouble" type="radio"><label>是</label>&nbsp;&nbsp;
+      							  <input value="false" v-model="carDetection.otherTrouble" type="radio"><label>否</label>
+				</td>
+			</tr>
+			<tr>
+				<td class="td_label" rowspan="2">车况及事故说明：</td>
+				<td rowspan="2"><textarea rows="" cols="" v-model="carDetection.otherTroubleDescription"
+					style="width: 100%" maxlength="1000"> </textarea>
+				</td>
+			</tr>
+			</table>
+			</div>
+      
+      </div>
+    </div>
+        <div class="layui-row">
+    <div class="layui-col-xs6">
+      <div class="grid-demo layui-bg-gray">
+     <div class="grid-demo layui-bg-gray">
+      <button class="layui-btn" v-on:click="againAsses()">保存</button>
+      <button class="layui-btn layui-btn-warm" v-on:click="againAssesClose()">撤销</button>
+     </div>
+     </div>
+     </div>
+     </div>
+  </div>
+</div>
+<script src="/src/js/assets/car/againAssess.js" ></script>
+<script>
+
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+.kit-theme .kit-layout-admin .layui-header {
+    border-bottom: 2px solid #23262E;
+}
+
+.bg-default{
+    background:#f8f8f9
+}
+
+/*使用v-cloak，在vue未渲染完成时，隐藏页面元素
+* 参考：https://cn.vuejs.org/v2/api/#v-cloak
+*/
+[v-cloak] {
+    display: none;
+}

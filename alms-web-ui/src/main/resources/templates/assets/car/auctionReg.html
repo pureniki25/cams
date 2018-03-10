@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<head>
+<meta charset="utf-8" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+<title>贷后管理</title>
+
+<link rel="stylesheet" type="text/css"
+	href="/src/css/themes/default.css" />
+<!-- iview样式 -->
+<link rel="stylesheet" type="text/css"
+	href="/plugins/iview/css/iview.css" />
+<!--@import url("//unpkg.com/iview/dist/styles/iview.css");-->
+<!--<link rel="stylesheet" type="text/css" href="//unpkg.com/iview/dist/styles/iview.css"/>-->
+<!-- 引入layui样式 -->
+<link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all" />
+<link rel="stylesheet" href="/plugins/popover/popover.css">
+
+<script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+<!-- iview js -->
+<script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+<!--引入layui.js-->
+<script src="/plugins/layui/layui.js"></script>
+<!--引入axios.js 用于ajax调用-->
+<script src="/plugins/axios/axios.min.js"></script>
+<script type="text/javascript" src="/plugins/jquery-1.9.1.min.js"></script>
+<script src="/plugins/popover/popover.js"></script>
+	<script src="/build/js/jquery-3.3.1.min.js"></script>
+	<!-- 设置全局请求头:app、Authorization -->
+	<script src="/build/js/appToken.js"></script>
+<style type="text/css">
+.layui-form-item {
+	border-bottom: 2px solid #DBDBDB; /*下边框线*/
+}
+
+.layui-form-item .layui-form-label {
+	width: 30%
+}
+
+.layui-form-item .layui-input-block {
+	margin-left: 35%;
+	width: 60%;
+}
+
+.input-border-none {
+	border: none;
+	font-size: 14px;
+}
+
+.layui-row .grid-demo {
+	margin-left: 5%;
+	width: 90%;
+}
+
+.td_label {
+	font-weight: bolder;
+}
+</style>
+</head>
+<body>
+	<!--隐藏元素-->
+	<p id="businessId" th:attr="value=${businessId}" hidden />
+	<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+	<div id="app">
+		<div class="layui-row">
+			<div class="layui-col-xs6 layui-col-md12">
+				<div class="grid-demo layui-bg-gray">拍卖登记</div>
+				<div class="grid-demo layui-bg-gray">
+					<table class="layui-table">
+						<tr>
+							<td class="td_label">业务编号</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" value="TDC5012017051701"></td>
+							<td class="td_label">客户姓名</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" value="张三"></td>
+							<td class="td_label">借款金额</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" value="5,000.00"></td>
+						</tr>
+						<tr>
+							<td class="td_label">借款期限</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" value="12个月"></td>
+							<td class="td_label">还款方式</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" value="先息后本"></td>
+							<td class="td_label">年利率</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" value="13.8%"></td>
+						</tr>
+						<tr>
+							<td class="td_label">车牌号</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" value="桂A8S211"></td>
+							<td class="td_label">品牌型号</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" value="沃尔沃S80"></td>
+							<td class="td_label">车架号 </td>
+							<td><input type="text" name="lname"
+								class="input-border-none" value="LVSHGFDC3CF037215"></td>
+						</tr>
+						<tr>
+							<td class="td_label">车辆评估价格</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" value="2018.02.02"></td>
+							<td class="td_label">车辆评估时间</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" value="0.00"></td>
+							<td class="td_label">起拍价格</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" value="8000.00"></td>
+						</tr>
+						<tr>
+							<td class="td_label">保证金</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" value="剩余本金"></td>
+							<td class="td_label">加价幅度</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" value="2017.12.15"></td>
+							<td class="td_label">拍卖开始时间</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" value="48"></td>
+						</tr>
+					</table>
+
+
+				</div>
+			</div>
+		</div>
+		<div class="layui-row">
+			<div class="layui-col-xs6 layui-col-md12">
+				<div class="grid-demo layui-bg-gray">拍卖信息登记</div>
+				<div class="grid-demo layui-bg-gray">
+					<table class="layui-table">
+						<tr>
+							<td class="td_label">拍卖成交价格</td>
+							<td><input type="text" name="lname"value="LVRHDFAL7FN380750"></td>
+							<td class="td_label">最终获取人姓名</td>
+							<td><input type="text" name="lname" value="3160062" readonly="readonly"></td>
+						</tr>
+						<tr>
+							<td class="td_label">身份证号码</td>
+							<td><input type="text" name="lname" value="丰田卡罗拉" >
+							</td>
+							<td class="td_label">联系方式</td>
+							<td><input type="text" name="lname" value="赣A87B35" >
+							</td>
+						</tr>
+						<tr>
+							<td rowspan="3" class="td_label">备注</td>
+							<td colspan="3"><textarea rows="" cols=""
+									style="width: 100%"> 15年3月马自达3昂克赛拉1.5L自动舒适型</textarea></td>
+						</tr>
+					</table>
+
+
+
+
+				</div>
+			</div>
+		</div>
+		
+		<div class="layui-row">
+			<div class="layui-col-xs6 layui-col-md12">
+			<div class="grid-demo layui-bg-gray">
+			   <button class="layui-btn">保存</button>
+			   <button class="layui-btn layui-btn-warm">取消</button>
+			</div>
+			</div>
+		</div>
+</div>
+		<script src="/src/js/assets/car/carDetail.js"></script>
+		<script>
+			
+		</script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+//是否使用网关的标志位
+// var useGateWayflage=false;
+// var useGateWayflage=true;
+// var localBasePath = "http://localhost:30606/";
+var _loadBtnAndTabUrl="";
+
+var htConfig;
+
+window.layinit = function (cb) {
+    layui.config({
+        base : '/plugins/layui/extend/modules/',
+        version : '1.0.11'
+    }).use(['layer', 'table','ht_ajax', 'ht_auth', 'ht_config','laydate','upload'], function () {
+        htConfig = layui.ht_config;
+        _loadBtnAndTabUrl =  htConfig.loadBtnAndTabUrl;
+
+        if(!htConfig.useGateWayflage){
+            htConfig.basePath = htConfig.localBasePath;
+            htConfig.coreBasePath = htConfig.localBasePath;
+            axios.defaults.headers.common['userId'] = htConfig.defaultUser;
+        }else{
+            // htConfig.basePath =  htConfig.basePath +"core/"
+            htConfig.coreBasePath = htConfig.basePath +"core/";
+            htConfig.openBasePath = htConfig.basePath +"open/";
+        }
+        cb(htConfig)
+    });
+}
+
+
+var getCookieValue = function(name) {
+	var name = escape(name);
+	// 读cookie属性，这将返回文档的所有cookie
+	var allcookies = document.cookie;
+	// 查找名为name的cookie的开始位置
+	name += "=";
+	var pos = allcookies.indexOf(name);
+	// 如果找到了具有该名字的cookie，那么提取并使用它的值
+	// 如果pos值为-1则说明搜索"version="失败
+	if (pos != -1) {
+		// cookie值开始的位置
+		var start = pos + name.length;
+		// 从cookie值开始的位置起搜索第一个";"的位置,即cookie值结尾的位置
+		var end = allcookies.indexOf(";", start);
+		// 如果end值为-1说明cookie列表里只有一个cookie
+		if (end == -1)
+			end = allcookies.length;
+		// 提取cookie的值
+		var value = allcookies.substring(start, end);
+		// 对它解码
+		return unescape(value);
+	} else
+		return "";
+}
+
+var getToken = function() {
+	return getCookieValue("token");
+}
+
+axios.defaults.headers.common['app'] = 'ALMS';
+axios.defaults.headers.common['Authorization'] = 'Bearer ' + getToken()
+var allAuth;
+
+var authValid = function(param) {
+	if(!htConfig.useGateWayflage){
+
+	}
+
+
+	getAuth();
+	for (var i = 0; i < allAuth.length; i++) {
+		if (allAuth[i].resContent == param) {
+			return true;
+		}
+	}
+	return false;
+}
+
+var getAuth = function() {
+
+	$.ajax({
+		type : 'GET',
+		async : false,
+		// url : "http://10.110.1.240:30111/uc/auth/loadBtnAndTab",
+		// url : "http://localhost:30111/uc/auth/loadBtnAndTab",
+		url : _loadBtnAndTabUrl,
+		headers : {
+			app : 'ALMS',
+			Authorization : "Bearer " + getToken()
+		},
+		success : function(data) {
+			allAuth = data;
+		},
+		error : function() {
+			layer.confirm('Navbar error:AJAX请求出错!', function(index) {
+				top.location.href = loginUrl;
+				layer.close(index);
+			});
+			return false;
+		}
+	});
+}

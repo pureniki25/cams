@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.collection.mapper.PhoneUrgeMapper">
+    <!--
+        &lt;!&ndash; 通用查询映射结果 &ndash;&gt;
+        <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.SysModule">
+            <id column="module_id" property="moduleId" />
+            <result column="module_name" property="moduleName" />
+            <result column="module_url" property="moduleUrl" />
+            <result column="module_pid" property="modulePid" />
+            <result column="module_level" property="moduleLevel" />
+            <result column="module_desc" property="moduleDesc" />
+            <result column="module_status" property="moduleStatus" />
+            <result column="device_type" property="deviceType" />
+            <result column="module_order" property="moduleOrder" />
+            <result column="module_icon" property="moduleIcon" />
+            <result column="create_time" property="createTime" />
+            <result column="create_user" property="createUser" />
+            <result column="update_time" property="updateTime" />
+            <result column="update_user" property="updateUser" />
+        </resultMap>-->
+
+    <!--    &lt;!&ndash; 通用查询结果列 &ndash;&gt;
+        <sql id="Base_Column_List">
+            module_id AS moduleId, module_name AS moduleName, module_url AS moduleUrl, module_pid AS modulePid, module_level AS moduleLevel, module_desc AS moduleDesc, module_status AS moduleStatus, device_type AS deviceType, module_order AS moduleOrder, module_icon AS moduleIcon, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
+        </sql>-->
+
+    <select id="selectAfterLoadStanding" resultType="com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo"
+            parameterType="com.hongte.alms.base.collection.vo.AfterLoanStandingBookReq">
+
+        select
+        business.business_id AS businessId,
+        pList.period as  periods,
+        pList.after_id as  afterId,
+
+        company.district_id as districtId,
+        -- districtAreaName
+        business.company_id as companyId,
+        company.area_name AS companyName,
+        business.operator_id AS operatorId,
+        business.operator_name AS operatorName,
+        business.customer_id AS customerId,
+        business.customer_name AS customerName,
+        business.business_type AS businessTypeId,
+        b_type.business_type_name AS businessTypeName,
+        business.borrow_money AS borrowMoney,
+        pList.total_borrow_amount as totalBorrowAmount,
+        pList.overdue_days as delayDays,
+        pList.due_date as dueDate,
+        pList.fact_repay_date AS repaymentDate,
+        col_status.phone_staff AS phoneStaffId,
+        --  phoneStaffName
+        col_status.visit_staff AS  visitStaffId,
+        --  visitStaffName
+        pList.plan_list_id AS  crpId,
+        pList.current_status as statusName
+
+
+        from tb_repayment_biz_plan_list  as pList
+        LEFT JOIN tb_repayment_biz_plan as plan ON pList.plan_id = plan.plan_id
+        LEFT JOIN tb_basic_business as business ON plan.original_business_id = business.business_id
+        LEFT JOIN tb_basic_company as company ON business.company_id = company.area_id
+        LEFT JOIN tb_basic_business_type as  b_type ON business.business_type = b_type.business_type_id
+        LEFT JOIN tb_collection_status as  col_status ON pList.plan_list_id = col_status.crp_id
+
+
+        <where>
+            <if test="areaId !=null and areaId !=''">
+                and business.company_id IN (SELECT area_id FROM tb_basic_company WHERE district_id = #{areaId})
+            </if>
+            <if test="companyId !=null and companyId !=''">
+                and business.company_id = #{companyId}
+            </if>
+            <!--          /*应还日期 开始*/ -->
+            <if test="showRepayDateBegin !=null ">
+                <![CDATA[ and pList.due_date >= #{showRepayDateBegin,jdbcType=TIMESTAMP}]]>
+            </if>
+            <!--            /*应还日期 结束*/ -->
+            <if test="showRepayDateEnd !=null ">
+                <![CDATA[ and pList.due_date <= #{showRepayDateEnd,jdbcType=TIMESTAMP}]]>
+            </if>
+            <!--          /*实还日期 开始*/  -->
+            <if test="realRepayDateBegin !=null ">
+                <![CDATA[ and pList.fact_repay_date >= #{realRepayDateBegin,jdbcType=TIMESTAMP}]]>
+
+            </if>
+            <!--            /*实还日期 结束*/ -->
+            <if test="realRepayDateEnd !=null ">
+                <![CDATA[ and pList.fact_repay_date <= #{realRepayDateEnd,jdbcType=TIMESTAMP}]]>
+            </if>
+            <!--             /*逾期天数 开始*/-->
+            <if test="delayDaysBegin !=null ">
+                <![CDATA[ and pList.overdue_days >= #{delayDaysBegin}]]>
+            </if>
+            <!--       /*逾期天数 结束*/ -->
+            <if test="delayDaysEnd !=null ">
+                <![CDATA[ and pList.overdue_days <= #{delayDaysEnd}]]>
+            </if>
+            <!--          /*//业务获取*/ -->
+            <if test="operatorName !=null and operatorName !='' ">
+                and business.operator_name LIKE '%${operatorName}%'
+            </if>
+            <!--         /*//业务编号*/ -->
+            <if test="businessId !=null and businessId !='' ">
+                and business.business_id  LIKE '%${businessId}%'
+            </if>
+            <!--   /*//业务类型*/ -->
+            <if test="businessType !=null ">
+                and business.business_type = #{businessType}
+            </if>
+            <!--   /*//清算一*/ -->
+            <if test="liquidationOne !=null and liquidationOne !=''  ">
+                and col_status.phone_staff LIKE '%${liquidationOne}%'
+            </if>
+            <!--    /*//清算二*/ -->
+            <if test="liquidationTow !=null and liquidationTow !=''  ">
+                and col_status.visit_staff LIKE '%${liquidationTow}%'
+            </if>
+            <!--   /*//用户ID列表*/ -->
+            <if test="customerIds !=null ">
+                and business.customer_id IN
+                <foreach collection="customerIds" item="customerId" index="index"
+                         open="(" close=")" separator=",">
+                    #{customerId}
+                </foreach>
+            </if>
+            <!--   /*//客户名称*/ -->
+            <if test="customerName !=null  and customerName !=''  ">
+                and business.customer_name  LIKE '%${customerName}%'
+            </if>
+            <!--   /*//还款计划ID数组*/ -->
+            <if test="crpIdsArray !=null">
+                and pList.plan_list_id  IN
+                <foreach collection="crpIdsArray" item="crpId" index="index"
+                         open="(" close=")" separator=",">
+                    #{crpId}
+                </foreach>
+
+            </if>
+
+        </where>
+
+        order BY  pList.due_date DESC
+
+    </select>
+
+</mapper>

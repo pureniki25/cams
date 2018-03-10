@@ -1,0 +1,89 @@
+
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <title>短信详情</title>
+    <!-- 默认主题样式 -->
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
+    <!-- iview样式 -->
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
+    <!--<link rel="stylesheet" type="//unpkg.com/iview/dist/styles/iview.css"/>-->
+    <!-- 引入layui样式 -->
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all"/>
+
+    <!-- 引入vue -->
+    <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+    <!--iview js -->
+    <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+    <!--    <script src="//unpkg.com/vue/dist/vue.js"></script>
+        <script src="//unpkg.com/iview/dist/iview.min.js"></script>-->
+
+    <!--引入layui.js-->
+    <script src="/plugins/layui/layui.js"></script>
+    <!--引入axios.js 用于ajax调用-->
+    <script src="/plugins/axios/axios.min.js"></script>
+
+    <!-- 流程组件的  -->
+    <link rel="stylesheet" href="/Components/ProcessLine/ProcessLine.css">
+    <script src="/Components/ProcessLine/ProcessLine.js"></script>
+
+    <!--表格样式-->
+    <link rel="stylesheet" href="/Components/Table/Table.css">
+
+    <!-- 引入jQuery，必须在appToken.js 之前引入 -->
+    <script src="/build/js/jquery-3.3.1.min.js"></script>
+    <!-- 设置全局请求头:app、Authorization -->
+    <script src="/build/js/appToken.js"></script>
+
+    <!--引入公共的一些方法-->
+    <script src="/src/js/comm.js"></script>
+
+
+</head>
+<body>
+<!--隐藏元素-->
+<p id="platformName"  th:attr="value=${platformName}"  hidden />
+<p id="thirdOrderId"  th:attr="value=${thirdOrderId}"  hidden />
+<p id="merchOrderId"  th:attr="value=${merchOrderId}"  hidden />
+<p id="currentAmount"  th:attr="value=${currentAmount}"  hidden />
+<p id="repayStatus"  th:attr="value=${repayStatus}"  hidden /> 
+<p id="createTime"  th:attr="value=${createTime}"  hidden /> 
+<p id="remark"  th:attr="value=${remark}"  hidden /> 
+<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+<div id="app" v-cloak>
+
+    <row type="flex" justify="end" class="code-row-bg">
+        <i-col span="18"><font size="16px" color="#464c5b"></font></i-col>
+
+    </row>
+
+  
+
+
+
+
+           <row>
+           		<i-col span="24">
+           			<i-table border :show-header="false" :columns="columns1" :data="data1"></i-table>
+           		</i-col>
+           </row>
+        
+</div>
+
+
+
+
+     
+
+        
+
+<script src="/src/js/collection/repayLogDetail.js" ></script> 
+
+
+
+</body>
+</html>

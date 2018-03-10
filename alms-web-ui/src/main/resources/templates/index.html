@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<!--<html xmlns:th="http://www.thymeleaf.org"-->
+      <!--xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">-->
+
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <title>贷后管理系统</title>
+    <link rel="stylesheet" href="/plugins/bootstrap/css/bootstrap.min.css" media="all"/>
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="/plugins/font-awesome/css/font-awesome.min.css" media="all" />
+    <link rel="stylesheet" href="/css/ztree/metro/ztree.css" media="all"/>
+    <link rel="stylesheet" href="/css/app.css" media="all" />
+    <link rel="stylesheet" href="/css/themes/default.css" media="all" id="skin" kit-skin="default" />
+</head>
+
+<body class="kit-theme">
+<div class="layui-layout layui-layout-admin kit-layout-admin">
+    <div class="layui-header">
+        <div class="layui-logo">ALMS v1.0</div>
+        <div class="layui-logo kit-logo-mobile">K</div>
+        <ul class="layui-nav layui-layout-right kit-nav">
+            <li class="layui-nav-item"><a href="javascript:;"> <i
+                    class="layui-icon">&#xe63f;</i> 皮肤
+            </a>
+                <dl class="layui-nav-child skin">
+                    <dd>
+                        <a href="javascript:;" data-skin="default"
+                           style="color: #393D49;"><i class="layui-icon">&#xe658;</i>
+                            默认</a>
+                    </dd>
+                    <dd>
+                        <a href="javascript:;" data-skin="orange" style="color: #ff6700;"><i
+                                class="layui-icon">&#xe658;</i> 橘子橙</a>
+                    </dd>
+                    <dd>
+                        <a href="javascript:;" data-skin="green" style="color: #00a65a;"><i
+                                class="layui-icon">&#xe658;</i> 原谅绿</a>
+                    </dd>
+                    <dd>
+                        <a href="javascript:;" data-skin="pink" style="color: #FA6086;"><i
+                                class="layui-icon">&#xe658;</i> 少女粉</a>
+                    </dd>
+                    <dd>
+                        <a href="javascript:;" data-skin="blue.1" style="color: #00c0ef;"><i
+                                class="layui-icon">&#xe658;</i> 天空蓝</a>
+                    </dd>
+                    <dd>
+                        <a href="javascript:;" data-skin="red" style="color: #dd4b39;"><i
+                                class="layui-icon">&#xe658;</i> 枫叶红</a>
+                    </dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item">
+                <a href="javascript:;" id="userName">
+                    <!-- <img src="http://m.zhengjinfan.cn/images/0.jpg" class="layui-nav-img">-->
+                </a>
+                <dl class="layui-nav-child">
+                    <dd>
+                        <a href="javascript:;" kit-target
+                           data-options="{url:'/html/user/userInfo.html',icon:'&#xe658;',title:'基本资料',id:'966'}"><span>基本资料</span></a>
+                    </dd>
+                    <dd>
+                        <a href="javascript:;" kit-target
+                           data-options="{url:'/html/user/changePwd.html',icon:'&#xe658;',title:'修改密码',id:'967'}"><span>修改密码</span></a>
+                    </dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item">
+                <a href="javascript:;" id="login_out">
+                    <i class="fa fa-sign-out" aria-hidden="true"></i>
+                    注销
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="layui-side layui-bg-black kit-side">
+        <div class="layui-side-scroll">
+            <div class="kit-side-fold"><i class="fa fa-navicon" aria-hidden="true"></i></div>
+            <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+            <ul class="layui-nav layui-nav-tree" lay-filter="kitNavbar" kit-navbar="">
+            </ul>
+        </div>
+    </div>
+    <div class="layui-body bg-default" id="container">
+        <!-- 内容主体区域 -->
+        <div style="padding: 15px;"><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i> 请稍等...</div>
+    </div>
+
+    <div class="layui-footer">
+        <!-- 底部固定区域 -->
+        2018 &copy; 广东鸿特信息咨询有限公司
+    </div>
+</div>
+
+<script src="/plugins/layui/layui.js" ></script>
+<script>
+    var message;
+    layui.config({
+        base: './plugins/layui/extend/modules/',
+        version: '1.0.11'
+    }).use(['app','message','ht_ajax','ht_auth','layer','ht_cookie',"ht_config"], function() {
+        var app = layui.app,
+            $ = layui.jquery,
+            layer = layui.layer,
+            ht_auth = layui.ht_auth,
+            cookie = layui.ht_cookie,
+            config = layui.ht_config;
+        //将message设置为全局以便子页面调用
+        message = layui.message;
+        
+        // 如果refreshToken失效，则直接跳转到登录页面
+        var refreshToken = cookie.getRefreshToken();
+        if (refreshToken == null || refreshToken == "") {
+            layer.confirm("登录超时，请重新登录。", function (index) {
+                top.location.href = config.loginPath;
+                layer.close(index);
+            });
+            return false;
+        }
+        
+        //主入口
+        app.set({
+            type: 'iframe'
+        }).init();
+        $('dl.skin > dd').on('click', function() {
+            var $that = $(this);
+            var skin = $that.children('a').data('skin');
+            switchSkin(skin);
+        });
+        var setSkin = function(value) {
+                layui.data('kit_skin', {
+                    key: 'skin',
+                    value: value
+                });
+            },
+            getSkinName = function() {
+                return layui.data('kit_skin').skin;
+            },
+            switchSkin = function(value) {
+                var _target = $('link[kit-skin]')[0];
+                _target.href = _target.href.substring(0, _target.href.lastIndexOf('/') + 1) + value + _target.href.substring(_target.href.lastIndexOf('.'));
+                setSkin(value);
+            },
+            initSkin = function() {
+                var skin = getSkinName();
+                switchSkin(skin === undefined ? 'default' : skin);
+            }();
+         $("#login_out").on("click", function () {
+             cookie.deleteToken();
+             cookie.deleteRefreshToken();
+             top.location.href = config.loginPath;
+         });
+         //初始化权限资源
+         // ht_auth.load();
+         /* $.get(config.baseInfo, null, function (result) {
+             //表单数据填充
+             $.each(result.result, function (name, value) {
+                 if ("userName" == name) {
+                     $("#userName").html(value);
+                 }
+             });
+         }); */
+    });
+</script>
+</body>
+
+</html>

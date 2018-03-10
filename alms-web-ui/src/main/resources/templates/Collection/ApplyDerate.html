@@ -1,0 +1,333 @@
+
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <title>申请减免</title>
+    <!-- 默认主题样式 -->
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
+    <!-- iview样式 -->
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
+    <!--<link rel="stylesheet" type="//unpkg.com/iview/dist/styles/iview.css"/>-->
+    <!-- 引入layui样式 -->
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all"/>
+
+    <!-- 引入vue -->
+    <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+    <!--iview js -->
+    <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+    <!--    <script src="//unpkg.com/vue/dist/vue.js"></script>
+        <script src="//unpkg.com/iview/dist/iview.min.js"></script>-->
+
+    <!--引入layui.js-->
+    <script src="/plugins/layui/layui.js"></script>
+    <!--引入axios.js 用于ajax调用-->
+    <script src="/plugins/axios/axios.min.js"></script>
+
+    <!-- 流程组件的  -->
+    <link rel="stylesheet" href="/Components/ProcessLine/ProcessLine.css">
+    <script src="/Components/ProcessLine/ProcessLine.js"></script>
+
+    <!--表格样式-->
+    <link rel="stylesheet" href="/Components/Table/Table.css">
+
+    <!-- 引入jQuery，必须在appToken.js 之前引入 -->
+    <script src="/build/js/jquery-3.3.1.min.js"></script>
+    <!-- 设置全局请求头:app、Authorization -->
+    <script src="/build/js/appToken.js"></script>
+
+    <!--引入公共的一些方法-->
+    <script src="/src/js/comm.js"></script>
+    <script src="/src/js/comm.js"></script>
+
+
+
+</head>
+<body>
+<!--隐藏元素-->
+<p id="businessId"  th:attr="value=${businessId}"  hidden />
+<p id="crpId"  th:attr="value=${crpId}"  hidden />
+<p id="processStatus"  th:attr="value=${processStatus}"  hidden />
+<p id="processId"  th:attr="value=${processId}"  hidden />
+<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+<div id="app" v-cloak>
+
+    <row type="flex" justify="end" class="code-row-bg">
+        <i-col span="18"><font size="16px" color="#464c5b">{{ applyInfoForm.title }}</font></i-col>
+
+    </row>
+    <!--    <row text-align="center" justify="center">
+
+            &lt;!&ndash;<Col span="24"> 张三违逾期违约金减免申请</Col>&ndash;&gt;
+
+
+
+        </row>-->
+    <br>
+    <Card>
+        <p slot="title">
+            审批流程
+        </p>
+        <div class="ProcessWarp">
+            <ProcessLine :data='myProcess'></ProcessLine>
+        </div>
+    </Card>
+    <br>
+    <row>
+
+        <!--<i-col span="20">-->
+        <Card>
+            <p slot="title">
+                一、基本信息
+            </p>
+
+            <!--基本信息表单内容-->
+            <row :gutter="16">
+                <i-form ref="baseInfoForm"  :model="baseInfoForm"   label-position="right" :label-width="100">
+                    <div class="table">
+                        <div class="tr">
+                            <div class="td"> <div class="td-box">业务编号：</div><div class="td-box">{{ baseInfoForm.businessId }} </div> </div>
+                            <div class="td"> <div class="td-box">客户名称：</div><div class="td-box">{{ baseInfoForm.customerName }} </div> </div>
+                            <div class="td"> <div class="td-box">所属分公司：</div><div class="td-box">{{ baseInfoForm.companyName }} </div> </div>
+                        </div>
+                        <div class="tr">
+                            <div class="td"> <div class="td-box">业务类型：</div><div class="td-box">{{ baseInfoForm.businessTypeName }} </div> </div>
+                            <div class="td"> <div class="td-box">借款期限：</div><div class="td-box">{{ baseInfoForm.borrowLimit }} </div> </div>
+                            <div class="td"> <div class="td-box">还款方式：</div><div class="td-box">{{ baseInfoForm.repaymentTypeName }} </div> </div>
+                        </div>
+                        <div class="tr">
+                            <div class="td"> <div class="td-box">{{baseInfoForm.borrowRateName}}</div><div class="td-box"> {{ baseInfoForm.borrowRateStr }} </div> </div>
+                            <div class="td"> <div class="td-box">借款金额：</div><div class="td-box">{{ baseInfoForm.borrowMoney }} </div> </div>
+                            <div class="td"> <div class="td-box">出款金额：</div><div class="td-box">{{ baseInfoForm.getMoney }} </div> </div>
+                        </div>
+                        <div class="tr">
+                            <div class="td"> <div class="td-box">剩余本金：</div><div class="td-box">{{ baseInfoForm.remianderPrincipal }} </div> </div>
+                            <div class="td"> <div class="td-box">当前还款期数：</div><div class="td-box">{{ baseInfoForm.periods }} </div> </div>
+                            <div class="td"> <div class="td-box">逾期天数：</div><div class="td-box">{{ baseInfoForm.delayDays }} </div> </div>
+                        </div>
+                        <div class="tr">
+                            <div class="td"> <div class="td-box">应付利息：</div><div class="td-box">{{ baseInfoForm.needPayInterest }} </div> </div>
+                            <div class="td"> <div class="td-box">应付本金：</div><div class="td-box">{{ baseInfoForm.needPayPrincipal }} </div> </div>
+                            <div class="td"> <div class="td-box">应付违约金：</div><div class="td-box">{{ baseInfoForm.needPayPrincipal }} </div> </div>
+                        </div>
+                        <div class="tr">
+                            <div class="td"> <div class="td-box">应付其他费用：</div><div class="td-box">{{ baseInfoForm.otherPayAmount }} </div> </div>
+                            <div class="td"> <div class="td-box">应付总额：</div><div class="td-box">{{ baseInfoForm.totalBorrowAmount }} </div> </div>
+                            <div class="td"> <div class="td-box">        </div><div class="td-box">              </div> </div>
+                        </div>
+                    </div>
+
+                </i-form>
+            </row>
+        </Card>
+
+
+        <Card>
+            <p slot="title">
+                二、申请信息
+            </p>
+            <!--申请信息表单内容-->
+            <row :gutter="16">
+                <i-form ref="applyInfoForm"  :model="applyInfoForm"  :rules = "validApplyInfoForm"  label-position="right" :label-width="100">
+                    <row :gutter="16">
+                        <i-col span="10">
+                            <form-item v-if="applyInfoFormEditFlage == true"  label="申请减免费用项：" prop="derateType" >
+                                <i-select v-model="applyInfoForm.derateType" @on-change="derateTypeChange()" clearable filterable  >
+                                    <i-option v-for="item in derateTypeList" :value="item.paramValue" :key="item.paramValue">{{ item.paramName }}</i-option>
+                                </i-select>
+                            </form-item>
+                            <form-item v-else   label="申请减免费用项：" prop="derateType"  disabled>
+                                <i-select v-model="applyInfoForm.derateType" clearable filterable disabled >
+                                    <i-option v-for="item in derateTypeList" :value="item.paramValue" :key="item.paramValue">{{ item.paramName }}</i-option>
+                                </i-select>
+                            </form-item>
+                        </i-col>
+                        <i-col span="10">
+                            <form-item v-if="applyInfoFormEditFlage == true" label="是否结清申请：" prop="isSettleFlage"  >
+                                <radio-group v-model="applyInfoForm.isSettleFlage" >
+                                    <radio label="是" ></radio>
+                                    <radio label="否" ></radio>
+                                </radio-group>
+                            </form-item>
+                            <form-item v-else label="是否结清申请：" prop="isSettleFlage" disabled  >
+                                <radio-group v-model="applyInfoForm.isSettleFlage" disabled>
+                                    <radio label="是" disabled></radio>
+                                    <radio label="否" disabled></radio>
+                                </radio-group>
+                            </form-item>
+                        </i-col>
+                    </row>
+                    <row :gutter="16">
+                        <i-col span="10">
+                            <form-item v-if="applyInfoFormEditFlage" label="申请减免金额："   prop="derateMoney">
+                                <i-input v-model="applyInfoForm.derateMoney" ></i-input>
+                            </form-item>
+                            <form-item v-else label="申请减免金额："   disabled>
+                                <i-input v-model="applyInfoForm.derateMoney" disabled ></i-input>
+                            </form-item>
+                        </i-col>
+                        <i-col span="10">
+                            <form-item v-if="realReceiveMoneyEditFlage" label="减免后实收总额："   prop="realReceiveMoney">
+                                <i-input v-model="applyInfoForm.realReceiveMoney" ></i-input>
+                            </form-item>
+                            <form-item v-else label="减免后实收总额："  prop="realReceiveMoney"   >
+                                <i-input v-model="applyInfoForm.realReceiveMoney" disabled ></i-input>
+                            </form-item>
+                        </i-col>
+                    </row>
+                    <row :gutter="16">
+                        <i-col v-if="applyInfoFormEditFlage" span="22">
+                            <form-item    label="减免原因："   prop="derateReson" >
+                                <i-input v-model="applyInfoForm.derateReson" type="textarea" :rows="4" placeholder="请填写减免原因"></i-input>
+                            </form-item>
+                        </i-col>
+                        <i-col v-else span="22">
+                            <form-item   label="减免原因："   prop="derateReson" disabled >
+                                <i-input v-model="applyInfoForm.derateReson" type="textarea" :rows="4" placeholder="请填写减免原因" disabled></i-input>
+                            </form-item>
+                        </i-col>
+                    </row>
+                </i-form>
+            </row>
+        </Card>
+
+
+
+        <Card v-if="approvalInfoFormShowFlage">
+            <p slot="title">
+                三、审批信息
+            </p>
+            <!--审批信息表单内容-->
+            <row :gutter="16">
+                <i-form ref="approvalInfoForm"  :model="approvalInfoForm"   :rules = "approvalInfoFormValidate"  label-position="right" :label-width="100">
+
+                    <row :gutter="16" v-for="(approvalInfo) in approvalInfoList"   :value="approvalInfo.processLogId" :key="approvalInfo.processLogId">
+                        <i-col span="4" >
+                            <font size="3px" color="#464c5b">{{approvalInfo.stepName}}</font>
+                        </i-col>
+                        <i-col span="20">
+                            <row :gutter="16">
+                                <i-col span="20" >
+                                    <form-item label="是否同意审批："   >
+                                        <radio-group v-model="approvalInfo.isPassFlage" disabled>
+                                            <radio label="是" disabled></radio>
+                                            <radio label="否" disabled></radio>
+                                        </radio-group>
+                                    </form-item>
+                                </i-col>
+                            </row>
+                            <row :gutter="16">
+                                <i-col span="22">
+                                    <i-input v-model="approvalInfo.remark" type="textarea" :autosize="{minRows: 3,maxRows: 5}" disabled  placeholder="请填写审批记录"></i-input>
+                                </i-col>
+                            </row>
+                            <row >
+                                <i-col span="8"  offset="16">
+                                    <form-item label="审批人：" >{{ approvalInfo.approveUserName }} </form-item>
+                                </i-col>
+                                <i-col span="8"  offset="16">
+                                    <form-item label="审批日期：" >{{ approvalInfo.createTime }} </form-item>
+                                </i-col>
+                            </row>
+                        </i-col>
+                    </row>
+                    <!--当前审批人操作信息  开始-->
+                    <row  v-if = "applyOprShowFlage"  :gutter="16"  >
+                        <i-col span="4" >
+                            <font size="3px" color="#464c5b">{{approvalInfoForm.approvalUserInfo}}</font>
+                        </i-col>
+                        <i-col span="20">
+                            <row :gutter="16">
+                                <i-col span="6" >
+                                    <form-item label="是否同意审批："  prop="isPassFlage">
+                                        <radio-group v-model="approvalInfoForm.isPassFlage" @click="isPassClick()" >
+                                            <span @click="isPassClick(true)"> <radio label="是" ></radio> </span>
+                                            <span @click="isPassClick(false)"> <radio label="否" ></radio> </span>
+                                            <!--<radio label="是" ></radio>-->
+                                            <!--<radio label="否" ></radio>-->
+                                        </radio-group>
+                                    </form-item>
+                                </i-col>
+                                <i-col v-if="rockBackShowFlage" span="6" >
+                                    <form-item label="是否回退："  prop="isDirectBack">
+                                        <radio-group v-model="approvalInfoForm.isDirectBackFlage" >
+                                            <span @click="isRockBackClick(true)"> <radio label="是" ></radio> </span>
+                                            <span @click="isRockBackClick(false)"> <radio label="否" ></radio> </span>
+                                        </radio-group>
+                                    </form-item>
+                                </i-col>
+                               <i-col v-if="rockBackStepShowFlage" span="10" >
+                                   <form-item label="回退步骤：" prop="areaId">
+                                       <i-select v-model="approvalInfoForm.nextStep" clearable  filterable >
+                                           <i-option v-for="item in rockBackStepList" :value="item.step" :key="item.stepName">{{ item.stepName }}</i-option>
+                                       </i-select>
+                                   </form-item>
+                                </i-col>
+                            </row>
+                            <row :gutter="16">
+                                <i-col span="22">
+                                    <i-input v-model="approvalInfoForm.remark" type="textarea" :autosize="{minRows: 3,maxRows: 5}"   placeholder="请填写审批记录"></i-input>
+                                </i-col>
+                            </row>
+                            <row >
+                                <i-col span="8"  offset="16">
+                                    <form-item label="审批人：" >{{ approvalInfoForm.approveUserName }} </form-item>
+                                </i-col>
+                                <i-col span="8"  offset="16">
+                                    <form-item label="审批日期：" >{{ approvalInfoForm.approveDate }} </form-item>
+                                </i-col>
+                            </row>
+                        </i-col>
+                    </row>
+                    <!--当前审批人操作信息  结束-->
+
+                    <!--抄送信息  开始-->
+                    <row  v-if = "applyOprShowFlage"  :gutter="16" >
+                        <i-col span="4" >
+                            <font size="3px" color="#464c5b">添加抄送</font>
+                        </i-col>
+                        <i-col span="20">
+                            <row :gutter="16">
+                                <form-item label="选择抄送人员：" >
+                                    <i-select v-model="approvalInfoForm.sendUserIds"  multiple >
+                                        <i-option v-for="item in canSendUserList" :value="item.userId" :key="item.userName">{{ item.userName }}</i-option>
+                                    </i-select>
+                                </form-item>
+                            </row>
+                            <row :gutter="16">
+                                <i-col span="22">
+                                    <i-input v-model="approvalInfoForm.copySendInfo" type="textarea" :autosize="{minRows: 3,maxRows: 5}"   placeholder="请填写抄送备注"></i-input>
+                                </i-col>
+                            </row>
+
+                        </i-col>
+                    </row>
+                    <!--抄送信息  结束-->
+
+                </i-form>
+            </row>
+        </Card>
+
+        <row style="padding: 10px">  <!--@click="showCollectionStackLog()"-->
+            <i-col span="24">
+                <i-button v-if = "buttonShowFlage"  type="success"  @click="saveAppply()" >提交审批</i-button>
+                <i-button v-if ="saveDraftShowFlage" type="info"  @click="saveDeraf()" >保存草稿</i-button>
+                <i-button v-if = "buttonShowFlage"  type="success"  @click="resetEdit()"  >撤销</i-button>
+            </i-col>
+        </row>
+
+
+    </row>
+    <br>
+
+</div>
+
+<script src="/src/js/collection/ApplyDerate.js" ></script>
+<script>
+
+</script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.DepartmentBankMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.DepartmentBank">
+        <id column="account_id" property="accountId" />
+        <result column="xd_bank_id" property="xdBankId" />
+        <result column="dept_id" property="deptId" />
+        <result column="repayment_name" property="repaymentName" />
+        <result column="repayment_id" property="repaymentId" />
+        <result column="repayment_bank" property="repaymentBank" />
+        <result column="repayment_sub_bank" property="repaymentSubBank" />
+        <result column="lender" property="lender" />
+        <result column="finance_name" property="financeName" />
+        <result column="main_id" property="mainId" />
+        <result column="main_type" property="mainType" />
+        <result column="bank_province" property="bankProvince" />
+        <result column="bank_city" property="bankCity" />
+        <result column="phone_number" property="phoneNumber" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="update_time" property="updateTime" />
+        <result column="update_user" property="updateUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        account_id AS accountId, xd_bank_id AS xdBankId, dept_id AS deptId, repayment_name AS repaymentName, repayment_id AS repaymentId, repayment_bank AS repaymentBank, repayment_sub_bank AS repaymentSubBank, lender, finance_name AS financeName, main_id AS mainId, main_type AS mainType, bank_province AS bankProvince, bank_city AS bankCity, phone_number AS phoneNumber, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
+    </sql>
+
+</mapper>

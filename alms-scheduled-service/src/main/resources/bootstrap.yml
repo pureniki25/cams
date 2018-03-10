@@ -1,0 +1,30 @@
+server:
+  port: 30607
+spring:
+  application:
+    name: alms-scheduled-service
+  cloud:
+    config:
+      #仓库中的配置文件会被转换成web接口，访问可以参照以下的规则：
+      #/{application}/{profile}[/{label}]
+      #/{application}-{profile}.yml
+      #/{label}/{application}-{profile}.yml
+      #/{application}-{profile}.properties
+      #/{label}/{application}-{profile}.properties
+      uri: http://172.16.200.110:30106
+#      uri: http://localhost:30688
+      # profile对应config server所获取的配置文件中的{profile}
+      profile: dev
+      #label: config
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://172.16.200.110:30101/eureka/
+#      defaultZone: http://localhost:30101/eureka/
+  instance:
+    prefer-ip-address: true
+
+ht.config.uc.api:
+  synch: true #是否同步API资源到用户权限中心
+  packages: com.hongte.alms.scheduledduled #API资源扫描的包
+  app: ALMS

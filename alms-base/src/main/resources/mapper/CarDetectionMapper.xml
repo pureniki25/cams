@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.CarDetectionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.CarDetection">
+        <id column="business_id" property="businessId" />
+        <result column="evaluation_amount" property="evaluationAmount" />
+        <result column="is_center_panel_normal" property="isCenterPanelNormal" />
+        <result column="center_panel_abnormal_description" property="centerPanelAbnormalDescription" />
+        <result column="is_ventilator_normal" property="isVentilatorNormal" />
+        <result column="ventilator_abnormal_description" property="ventilatorAbnormalDescription" />
+        <result column="is_interior_normal" property="isInteriorNormal" />
+        <result column="interior_abnormal_description" property="interiorAbnormalDescription" />
+        <result column="is_window_glass_normal" property="isWindowGlassNormal" />
+        <result column="window_glass_abnormal_description" property="windowGlassAbnormalDescription" />
+        <result column="is_radiator_normal" property="isRadiatorNormal" />
+        <result column="radiator_abnormal_description" property="radiatorAbnormalDescription" />
+        <result column="is_engine_normal" property="isEngineNormal" />
+        <result column="engine_abnormal_description" property="engineAbnormalDescription" />
+        <result column="is_frame_normal" property="isFrameNormal" />
+        <result column="frame_abnormal_description" property="frameAbnormalDescription" />
+        <result column="is_tire_normal" property="isTireNormal" />
+        <result column="tire_abnormal_description" property="tireAbnormalDescription" />
+        <result column="is_spare_tire_normal" property="isSpareTireNormal" />
+        <result column="spare_tire_abnormal_descrioption" property="spareTireAbnormalDescrioption" />
+        <result column="is_door_normal" property="isDoorNormal" />
+        <result column="door_abnormal_description" property="doorAbnormalDescription" />
+        <result column="is_vin_consistent" property="isVinConsistent" />
+        <result column="is_engine_model_consistent" property="isEngineModelConsistent" />
+        <result column="is_accident" property="isAccident" />
+        <result column="accident_description" property="accidentDescription" />
+        <result column="is_overhaul" property="isOverhaul" />
+        <result column="is_other_trouble" property="isOtherTrouble" />
+        <result column="other_trouble_description" property="otherTroubleDescription" />
+        <result column="spare_key_status" property="spareKeyStatus" />
+        <result column="is_acceleration_performance_normal" property="isAccelerationPerformanceNormal" />
+        <result column="acceleration_performance_abnormal_description" property="accelerationPerformanceAbnormalDescription" />
+        <result column="is_braking_performance_normal" property="isBrakingPerformanceNormal" />
+        <result column="braking_performance_abnormal_description" property="brakingPerformanceAbnormalDescription" />
+        <result column="is_braking_balance_performance_normal" property="isBrakingBalancePerformanceNormal" />
+        <result column="braking_balance_performance_abnormal_description" property="brakingBalancePerformanceAbnormalDescription" />
+        <result column="is_steer_performance_normal" property="isSteerPerformanceNormal" />
+        <result column="steer_performance_abnormal_description" property="steerPerformanceAbnormalDescription" />
+        <result column="is_gear_performance_normal" property="isGearPerformanceNormal" />
+        <result column="gear_performance_abnormal_description" property="gearPerformanceAbnormalDescription" />
+        <result column="other_drive_description" property="otherDriveDescription" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        business_id AS businessId, evaluation_amount AS evaluationAmount, is_center_panel_normal AS isCenterPanelNormal, center_panel_abnormal_description AS centerPanelAbnormalDescription, is_ventilator_normal AS isVentilatorNormal, ventilator_abnormal_description AS ventilatorAbnormalDescription, is_interior_normal AS isInteriorNormal, interior_abnormal_description AS interiorAbnormalDescription, is_window_glass_normal AS isWindowGlassNormal, window_glass_abnormal_description AS windowGlassAbnormalDescription, is_radiator_normal AS isRadiatorNormal, radiator_abnormal_description AS radiatorAbnormalDescription, is_engine_normal AS isEngineNormal, engine_abnormal_description AS engineAbnormalDescription, is_frame_normal AS isFrameNormal, frame_abnormal_description AS frameAbnormalDescription, is_tire_normal AS isTireNormal, tire_abnormal_description AS tireAbnormalDescription, is_spare_tire_normal AS isSpareTireNormal, spare_tire_abnormal_descrioption AS spareTireAbnormalDescrioption, is_door_normal AS isDoorNormal, door_abnormal_description AS doorAbnormalDescription, is_vin_consistent AS isVinConsistent, is_engine_model_consistent AS isEngineModelConsistent, is_accident AS isAccident, accident_description AS accidentDescription, is_overhaul AS isOverhaul, is_other_trouble AS isOtherTrouble, other_trouble_description AS otherTroubleDescription, spare_key_status AS spareKeyStatus, is_acceleration_performance_normal AS isAccelerationPerformanceNormal, acceleration_performance_abnormal_description AS accelerationPerformanceAbnormalDescription, is_braking_performance_normal AS isBrakingPerformanceNormal, braking_performance_abnormal_description AS brakingPerformanceAbnormalDescription, is_braking_balance_performance_normal AS isBrakingBalancePerformanceNormal, braking_balance_performance_abnormal_description AS brakingBalancePerformanceAbnormalDescription, is_steer_performance_normal AS isSteerPerformanceNormal, steer_performance_abnormal_description AS steerPerformanceAbnormalDescription, is_gear_performance_normal AS isGearPerformanceNormal, gear_performance_abnormal_description AS gearPerformanceAbnormalDescription, other_drive_description AS otherDriveDescription, create_time AS createTime, create_user AS createUser
+    </sql>
+
+</mapper>

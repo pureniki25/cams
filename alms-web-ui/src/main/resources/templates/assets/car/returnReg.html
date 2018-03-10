@@ -1,0 +1,256 @@
+
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<head>
+<meta charset="utf-8" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+<title>贷后管理</title>
+
+<link rel="stylesheet" type="text/css"
+	href="/src/css/themes/default.css" />
+<!-- iview样式 -->
+<link rel="stylesheet" type="text/css"
+	href="/plugins/iview/css/iview.css" />
+<!--@import url("//unpkg.com/iview/dist/styles/iview.css");-->
+<!--<link rel="stylesheet" type="text/css" href="//unpkg.com/iview/dist/styles/iview.css"/>-->
+<!-- 引入layui样式 -->
+<link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all" />
+<link rel="stylesheet" href="/plugins/popover/popover.css">
+
+<script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+<!-- iview js -->
+<script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+<!--引入layui.js-->
+<script src="/plugins/layui/layui.js"></script>
+<!--引入axios.js 用于ajax调用-->
+<script src="/plugins/axios/axios.min.js"></script>
+<script type="text/javascript" src="/plugins/jquery-1.9.1.min.js"></script>
+<script src="http://blueimp.github.io/jQuery-File-Upload/js/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/plugins/fileUpload/jquery.iframe-transport.js"></script>
+<script type="text/javascript" src="/plugins/fileUpload/jquery.fileupload.js"></script>
+	<script src="/build/js/jquery-3.3.1.min.js"></script>
+	<!-- 设置全局请求头:app、Authorization -->
+	<script src="/build/js/appToken.js"></script>
+
+<style type="text/css">
+.layui-form-item {
+	border-bottom: 2px solid #DBDBDB; /*下边框线*/
+}
+
+.layui-form-item .layui-form-label {
+	width: 30%
+}
+
+.layui-form-item .layui-input-block {
+	margin-left: 35%;
+	width: 60%;
+}
+
+.input-border-none {
+	border: none;
+	font-size: 14px;
+	width: 100%;
+}
+
+.layui-row .grid-demo {
+	margin-left: 5%;
+	width: 90%;
+}
+
+.td_label {
+	font-weight: bolder;
+}
+.td_select{
+height: 100%;
+}
+.input-border-input {
+	height: 100%;
+	width: 100%;
+}
+</style>
+</head>
+<body>
+	<!--隐藏元素-->
+	<p id="businessId" th:attr="value=${businessId}" hidden />
+	<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+	<div id="app">
+		<div class="layui-row">
+			<div class="layui-col-xs6 layui-col-md12">
+				<div class="grid-demo layui-bg-gray">拍卖登记</div>
+				<div class="grid-demo layui-bg-gray">
+					<table class="layui-table">
+						<tr>
+							<td class="td_label">业务编号</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="business.businessId" /></td>
+							<td class="td_label">客户姓名</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="business.customerName" /></td>
+							<td class="td_label">借款金额</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="business.borrowMoney" /></td>
+						</tr>
+						<tr>
+							<td class="td_label">借款期限</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="business.borrowLimit" /></td>
+							<td class="td_label">还款方式</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" value="到期还本息" v-if="business.repaymentTypeId==1" />
+								<input type="text" name="lname"
+								class="input-border-none" value="每月付息到期还本" v-if="business.repaymentTypeId==2" />
+								<input type="text" name="lname"
+								class="input-border-none" value="等本等息" v-if="business.repaymentTypeId==4" />
+								<input type="text" name="lname"
+								class="input-border-none" value="等额本息" v-if="business.repaymentTypeId==5" />
+								<input type="text" name="lname"
+								class="input-border-none" value="分期还本付息" v-if="business.repaymentTypeId==9" /></td>
+							<td class="td_label">年利率</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="business.borrowRate+'%'" /></td>
+						</tr>
+						<tr>
+							<td class="td_label">车牌号</td>
+							<td><input type="text" name="lname"
+								class="input-border-none"  v-bind:value="carBasic.licensePlateNumber" /></td>
+							<td class="td_label">品牌型号</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="carBasic.model" /></td>
+							<td class="td_label">车架号 </td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="carBasic.vin" /></td>
+						</tr>
+						<tr>
+							<td class="td_label">拖车时间</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="drag.dragDate" /></td>
+							<td class="td_label">拖车经办人</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="drag.dragHandler" /></td>
+							<td class="td_label">拖车费用</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="drag.fee" /></td>
+						</tr>
+						<tr>
+							<td class="td_label">其他费用</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="drag.otherFee" /></td>
+							<td class="td_label">拖车地点</td>
+							<td colspan="3"><input type="text" 
+								class="input-border-none" v-bind:value="dragAddr" /></td>
+						
+						</tr>
+					</table>
+
+
+				</div>
+			</div>
+		</div>
+		
+		
+		<div class="layui-row">
+			<div class="layui-col-xs6 layui-col-md12">
+				<div class="grid-demo layui-bg-gray">登记信息</div>
+				<div class="grid-demo layui-bg-gray">
+					<table class="layui-table">
+						<tr>
+							<td class="td_label">归还日期</td>
+							<td><input type="text" id="returnDate" placeholder="yyyy-MM-dd" v-model="returnReg.returnDate" /></td>
+							<td class="td_label">归还经办人</td>
+							<td><input type="text" name="lname" value=""  v-model="returnReg.returnOperator" /></td>
+						</tr>
+						<tr>
+							<td class="td_label">归还地点</td>
+							<td colspan="3">      
+							<select name="quiz1" v-model="returnReg.returnProId" class="td_select" v-on:change="selectPro">	
+							      <option v-for="item in provs" :value="item.id" style="width: 150px">
+								       {{item.name}}
+								  </option>
+      						</select>
+							
+							   <select name="quiz2" v-model="returnReg.returnCityId" class="td_select" v-on:change="selectCity" >
+						         <option v-for="item in citys" :value="item.id" style="width: 190px">
+								       {{item.name}}
+								  </option>
+						      </select>
+
+
+							   <select name="quiz3" v-model="returnReg.returnCountyId" class="td_select">
+						       <option v-for="item in countys" :value="item.id" style="width: 150px">
+								       {{item.name}}
+								  </option>
+						      </select>
+						      <input type="text" name="lname" v-model="returnReg.returnAddr"  style="width: 50%" class="input-border-input" />
+							</td>
+						</tr>
+			
+						<tr>
+						<td class="td_label" >是否缴纳拖车费用：</td>
+							<td colspan="3">
+							      <input value="true" v-model="returnReg.isPayTrailerCost" type="radio" /><label>是</label>&nbsp;&nbsp;
+      							  <input value="false" v-model="returnReg.isPayTrailerCost" type="radio" /><label>否</label>
+							</td>
+						</tr>
+						<tr>
+							<td class="td_label">已缴纳的拖车费用</td>
+							<td><input type="text" v-model="returnReg.payTrailerCost" /></td>
+							<td class="td_label">已缴纳的拖车其他费用</td>
+							<td><input type="text" v-model="returnReg.payTrailerOtherCost" /></td>
+						</tr>
+						<tr>
+							<td rowspan="3" class="td_label">备注</td>
+							<td colspan="3"><textarea rows="" cols="" v-model="returnReg.note"
+									style="width: 100%"> 15年3月马自达3昂克赛拉1.5L自动舒适型</textarea></td>
+						</tr>
+					</table>
+
+
+
+
+				</div>
+			</div>
+		</div>
+		<div class="layui-row">
+			<div class="layui-col-xs6 layui-col-md12">
+				<div class="grid-demo layui-bg-gray">附件信息：</div>
+				<div class="grid-demo layui-bg-gray">
+					<table class="layui-table" id="fTab">
+						<tr v-for="(info, index) in returnRegFiles">
+							<td class="td_label" >附件{{index+1}}<input type="text" hidden="" v-model="info.oldDocId" :id="'docId'+index" /></td>
+							<td><input type="file" title="请选择" v-model="info.file" :id="'uploadfile'+index" v-on:click="uploadFile($event,index)" /></td>
+							<td class="td_label">重命名文件名称</td>
+							<td><input type="text" name="lname" v-model="info.originalName"
+								style="width: 100%" maxlength="100" :id="'uploadfileName'+index" /></td>
+							<td>
+							  <div class="layui-btn-group">
+							    <button class="layui-btn layui-btn-primary layui-btn-sm" v-on:click="addTabTr($event)"><i class="layui-icon"></i></button>
+							    <span v-if="index>0">
+							    <button class="layui-btn layui-btn-primary layui-btn-sm"  v-on:click="removeTabTr($event, index)"><i class="layui-icon"></i></button>
+							    </span>
+							  </div>
+							
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="layui-row">
+			<div class="layui-col-xs6 layui-col-md12">
+			<div class="grid-demo layui-bg-gray">
+			   <button class="layui-btn" v-on:click="carReturnReg($event)">保存</button>
+			   <button class="layui-btn layui-btn-warm" v-on:click="carReturnRegClose()">撤销</button>
+			</div>
+			</div>
+		</div>
+</div>
+		<script src="/src/js/assets/car/returnReg.js"></script>
+		<script>
+			
+		</script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.FsdHouseMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.FsdHouse">
+        <id column="house_id" property="houseId" />
+        <result column="business_id" property="businessId" />
+        <result column="xd_house_id" property="xdHouseId" />
+        <result column="house_value" property="houseValue" />
+        <result column="house_name" property="houseName" />
+        <result column="house_address" property="houseAddress" />
+        <result column="house_no" property="houseNo" />
+        <result column="house_area" property="houseArea" />
+        <result column="house_price" property="housePrice" />
+        <result column="house_total" property="houseTotal" />
+        <result column="buy_time" property="buyTime" />
+        <result column="register_time" property="registerTime" />
+        <result column="house_belong" property="houseBelong" />
+        <result column="open_time" property="openTime" />
+        <result column="borrow_time" property="borrowTime" />
+        <result column="borrow_type" property="borrowType" />
+        <result column="borrow_total" property="borrowTotal" />
+        <result column="borrow_balance" property="borrowBalance" />
+        <result column="remark" property="remark" />
+        <result column="buy_price" property="buyPrice" />
+        <result column="other_website" property="otherWebsite" />
+        <result column="other_website_price" property="otherWebsitePrice" />
+        <result column="soufan_price" property="soufanPrice" />
+        <result column="house_type" property="houseType" />
+        <result column="house_sheng" property="houseSheng" />
+        <result column="house_city" property="houseCity" />
+        <result column="house_xian" property="houseXian" />
+        <result column="house_pledged_bank" property="housePledgedBank" />
+        <result column="agent_name" property="agentName" />
+        <result column="agent_phone" property="agentPhone" />
+        <result column="approved_rate" property="approvedRate" />
+        <result column="house_remaining_space" property="houseRemainingSpace" />
+        <result column="house_apartment" property="houseApartment" />
+        <result column="house_face" property="houseFace" />
+        <result column="house_status" property="houseStatus" />
+        <result column="community_name" property="communityName" />
+        <result column="website_1" property="website1" />
+        <result column="pledge_type_detail" property="pledgeTypeDetail" />
+        <result column="debt_ratio_region" property="debtRatioRegion" />
+        <result column="debt_ratio" property="debtRatio" />
+        <result column="house_year" property="houseYear" />
+        <result column="loan_year" property="loanYear" />
+        <result column="pledge_start_time" property="pledgeStartTime" />
+        <result column="pledge_end_time" property="pledgeEndTime" />
+        <result column="notarization_start_time" property="notarizationStartTime" />
+        <result column="notarization_end_time" property="notarizationEndTime" />
+        <result column="borrow_intoseveral" property="borrowIntoseveral" />
+        <result column="second_mortgage_time" property="secondMortgageTime" />
+        <result column="second_mortgage_year" property="secondMortgageYear" />
+        <result column="second_mortgage_type" property="secondMortgageType" />
+        <result column="second_mortgage_bank" property="secondMortgageBank" />
+        <result column="second_mortgage_total" property="secondMortgageTotal" />
+        <result column="second_mortgage_balance" property="secondMortgageBalance" />
+        <result column="third_mortgage_time" property="thirdMortgageTime" />
+        <result column="third_mortgage_year" property="thirdMortgageYear" />
+        <result column="third_mortgage_type" property="thirdMortgageType" />
+        <result column="third_mortgage_bank" property="thirdMortgageBank" />
+        <result column="third_mortgage_total" property="thirdMortgageTotal" />
+        <result column="third_mortgage_balance" property="thirdMortgageBalance" />
+        <result column="fourth_mortgage_time" property="fourthMortgageTime" />
+        <result column="fourth_mortgage_year" property="fourthMortgageYear" />
+        <result column="fourth_mortgage_type" property="fourthMortgageType" />
+        <result column="fourth_mortgage_bank" property="fourthMortgageBank" />
+        <result column="fourth_mortgage_total" property="fourthMortgageTotal" />
+        <result column="fourth_mortgage_balance" property="fourthMortgageBalance" />
+        <result column="providentfund_loan_time" property="providentfundLoanTime" />
+        <result column="loan_amount" property="loanAmount" />
+        <result column="loan_balance" property="loanBalance" />
+        <result column="house_ower_idnum" property="houseOwerIdnum" />
+        <result column="hidden_ower" property="hiddenOwer" />
+        <result column="hidden_ower_idnum" property="hiddenOwerIdnum" />
+        <result column="house_ower_phone" property="houseOwerPhone" />
+        <result column="house_ower_address" property="houseOwerAddress" />
+        <result column="house_prov_address" property="houseProvAddress" />
+        <result column="land_age_limit" property="landAgeLimit" />
+        <result column="is_single_sign" property="isSingleSign" />
+        <result column="second_mortgage_isNeedAdvance" property="secondMortgageIsNeedAdvance" />
+        <result column="third_mortgage_isNeedAdvance" property="thirdMortgageIsNeedAdvance" />
+        <result column="fourth_mortgage_isNeedAdvance" property="fourthMortgageIsNeedAdvance" />
+        <result column="check_house_price" property="checkHousePrice" />
+        <result column="check_house_amount" property="checkHouseAmount" />
+        <result column="house_remaining_space_money" property="houseRemainingSpaceMoney" />
+        <result column="renovation_status" property="renovationStatus" />
+        <result column="house_position" property="housePosition" />
+        <result column="house_provisional_price" property="houseProvisionalPrice" />
+        <result column="is_marriage_inner_house" property="isMarriageInnerHouse" />
+        <result column="house_situation" property="houseSituation" />
+        <result column="ower_identity_card" property="owerIdentityCard" />
+        <result column="ower_phone" property="owerPhone" />
+        <result column="ower_address" property="owerAddress" />
+        <result column="ower_email" property="owerEmail" />
+        <result column="hidden_name" property="hiddenName" />
+        <result column="hidden_ower_identity_card" property="hiddenOwerIdentityCard" />
+        <result column="hidden_ower_phone" property="hiddenOwerPhone" />
+        <result column="hidden_ower_address" property="hiddenOwerAddress" />
+        <result column="hidden_ower_email" property="hiddenOwerEmail" />
+        <result column="house_belong_type" property="houseBelongType" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="update_time" property="updateTime" />
+        <result column="update_user" property="updateUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        house_id AS houseId, business_id AS businessId, xd_house_id AS xdHouseId, house_value AS houseValue, house_name AS houseName, house_address AS houseAddress, house_no AS houseNo, house_area AS houseArea, house_price AS housePrice, house_total AS houseTotal, buy_time AS buyTime, register_time AS registerTime, house_belong AS houseBelong, open_time AS openTime, borrow_time AS borrowTime, borrow_type AS borrowType, borrow_total AS borrowTotal, borrow_balance AS borrowBalance, remark, buy_price AS buyPrice, other_website AS otherWebsite, other_website_price AS otherWebsitePrice, soufan_price AS soufanPrice, house_type AS houseType, house_sheng AS houseSheng, house_city AS houseCity, house_xian AS houseXian, house_pledged_bank AS housePledgedBank, agent_name AS agentName, agent_phone AS agentPhone, approved_rate AS approvedRate, house_remaining_space AS houseRemainingSpace, house_apartment AS houseApartment, house_face AS houseFace, house_status AS houseStatus, community_name AS communityName, website_1 AS website1, pledge_type_detail AS pledgeTypeDetail, debt_ratio_region AS debtRatioRegion, debt_ratio AS debtRatio, house_year AS houseYear, loan_year AS loanYear, pledge_start_time AS pledgeStartTime, pledge_end_time AS pledgeEndTime, notarization_start_time AS notarizationStartTime, notarization_end_time AS notarizationEndTime, borrow_intoseveral AS borrowIntoseveral, second_mortgage_time AS secondMortgageTime, second_mortgage_year AS secondMortgageYear, second_mortgage_type AS secondMortgageType, second_mortgage_bank AS secondMortgageBank, second_mortgage_total AS secondMortgageTotal, second_mortgage_balance AS secondMortgageBalance, third_mortgage_time AS thirdMortgageTime, third_mortgage_year AS thirdMortgageYear, third_mortgage_type AS thirdMortgageType, third_mortgage_bank AS thirdMortgageBank, third_mortgage_total AS thirdMortgageTotal, third_mortgage_balance AS thirdMortgageBalance, fourth_mortgage_time AS fourthMortgageTime, fourth_mortgage_year AS fourthMortgageYear, fourth_mortgage_type AS fourthMortgageType, fourth_mortgage_bank AS fourthMortgageBank, fourth_mortgage_total AS fourthMortgageTotal, fourth_mortgage_balance AS fourthMortgageBalance, providentfund_loan_time AS providentfundLoanTime, loan_amount AS loanAmount, loan_balance AS loanBalance, house_ower_idnum AS houseOwerIdnum, hidden_ower AS hiddenOwer, hidden_ower_idnum AS hiddenOwerIdnum, house_ower_phone AS houseOwerPhone, house_ower_address AS houseOwerAddress, house_prov_address AS houseProvAddress, land_age_limit AS landAgeLimit, is_single_sign AS isSingleSign, second_mortgage_isNeedAdvance AS secondMortgageIsNeedAdvance, third_mortgage_isNeedAdvance AS thirdMortgageIsNeedAdvance, fourth_mortgage_isNeedAdvance AS fourthMortgageIsNeedAdvance, check_house_price AS checkHousePrice, check_house_amount AS checkHouseAmount, house_remaining_space_money AS houseRemainingSpaceMoney, renovation_status AS renovationStatus, house_position AS housePosition, house_provisional_price AS houseProvisionalPrice, is_marriage_inner_house AS isMarriageInnerHouse, house_situation AS houseSituation, ower_identity_card AS owerIdentityCard, ower_phone AS owerPhone, ower_address AS owerAddress, ower_email AS owerEmail, hidden_name AS hiddenName, hidden_ower_identity_card AS hiddenOwerIdentityCard, hidden_ower_phone AS hiddenOwerPhone, hidden_ower_address AS hiddenOwerAddress, hidden_ower_email AS hiddenOwerEmail, house_belong_type AS houseBelongType, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
+    </sql>
+
+</mapper>

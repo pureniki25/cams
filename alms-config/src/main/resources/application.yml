@@ -1,0 +1,40 @@
+#server:
+#  port: 8888
+#spring:
+#  application:
+#    name: alms-config
+#  profiles:
+#    active: subversion
+#  cloud:
+#    config:
+#      server:
+#        svn:
+#          # 配置文件所在的svn地址
+#          uri: https://10.110.1.251:8443/svn/BM/Development2
+#          # 访问svn的用户名
+#          username: tanrongqiao
+#          # 访问svn的密码，可以通过POST请求http://localhost:8888/encrypt进行密码加密
+#          password: tanrongqiao
+
+server:
+  port: 30688
+spring:
+  application:
+    name: alms-config
+  cloud:
+    config:
+      server:
+        git:
+
+#http://172.16.200.102/config-dev/config.git
+          uri: http://172.16.200.102/AfterLoanDevGroup/AfterLoanManagementSystem.git     # 配置git仓库的地址
+          search-paths: config                             # git仓库地址下的相对地址，可以配置多个，用,分割。
+          username: config-dev #huangyongkang@hongte.info                                            # git仓库的账号
+          password: hongteconfig #huangyongkang                                            # git仓库的密码
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://172.16.200.110:30101/eureka/
+#      defaultZone: http://localhost:30101/eureka/
+  instance:
+    prefer-ip-address: true

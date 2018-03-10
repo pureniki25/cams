@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.CarBasicMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.CarBasic">
+        <id column="business_id" property="businessId" />
+        <result column="owner_name" property="ownerName" />
+        <result column="license_plate_number" property="licensePlateNumber" />
+        <result column="evaluation_amount" property="evaluationAmount" />
+        <result column="color" property="color" />
+        <result column="brand_name" property="brandName" />
+        <result column="model" property="model" />
+        <result column="edition" property="edition" />
+        <result column="is_mortgage" property="isMortgage" />
+        <result column="transfer_times" property="transferTimes" />
+        <result column="origin_place" property="originPlace" />
+        <result column="license_location" property="licenseLocation" />
+        <result column="emission_standard" property="emissionStandard" />
+        <result column="vin" property="vin" />
+        <result column="engine_model" property="engineModel" />
+        <result column="gear_box" property="gearBox" />
+        <result column="odometer" property="odometer" />
+        <result column="displacement" property="displacement" />
+        <result column="displacement_unit" property="displacementUnit" />
+        <result column="is_driving_license_consistent" property="isDrivingLicenseConsistent" />
+        <result column="driving_license_inconsistent_description" property="drivingLicenseInconsistentDescription" />
+        <result column="invoice_cost" property="invoiceCost" />
+        <result column="fuel_left" property="fuelLeft" />
+        <result column="fuel_type" property="fuelType" />
+        <result column="vehicle_license_registration_date" property="vehicleLicenseRegistrationDate" />
+        <result column="traffic_violation_situation" property="trafficViolationSituation" />
+        <result column="insurance_expiration_date" property="insuranceExpirationDate" />
+        <result column="insurance_beneficiary" property="insuranceBeneficiary" />
+        <result column="insurance_company" property="insuranceCompany" />
+        <result column="is_renewal" property="isRenewal" />
+        <result column="annual_verification_expiration_date" property="annualVerificationExpirationDate" />
+        <result column="traffic_violation_fee" property="trafficViolationFee" />
+        <result column="vehicle_vessel_tax" property="vehicleVesselTax" />
+        <result column="annual_ticket_fee" property="annualTicketFee" />
+        <result column="total_fee" property="totalFee" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        business_id AS businessId, owner_name AS ownerName, license_plate_number AS licensePlateNumber, evaluation_amount AS evaluationAmount, color, brand_name AS brandName, model, edition, is_mortgage AS isMortgage, transfer_times AS transferTimes, origin_place AS originPlace, license_location AS licenseLocation, emission_standard AS emissionStandard, vin, engine_model AS engineModel, gear_box AS gearBox, odometer, displacement, displacement_unit AS displacementUnit, is_driving_license_consistent AS isDrivingLicenseConsistent, driving_license_inconsistent_description AS drivingLicenseInconsistentDescription, invoice_cost AS invoiceCost, fuel_left AS fuelLeft, fuel_type AS fuelType, vehicle_license_registration_date AS vehicleLicenseRegistrationDate, traffic_violation_situation AS trafficViolationSituation, insurance_expiration_date AS insuranceExpirationDate, insurance_beneficiary AS insuranceBeneficiary, insurance_company AS insuranceCompany, is_renewal AS isRenewal, annual_verification_expiration_date AS annualVerificationExpirationDate, traffic_violation_fee AS trafficViolationFee, vehicle_vessel_tax AS vehicleVesselTax, annual_ticket_fee AS annualTicketFee, total_fee AS totalFee, create_time AS createTime, create_user AS createUser
+    </sql>
+
+</mapper>

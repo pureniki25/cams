@@ -1,0 +1,214 @@
+
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <!--<title>分配电催</title>-->
+    <title th:if="${staffType=='phoneStaff'}">分配电催</title>
+    <title th:if="${staffType=='visitStaff'}">移交催收</title>
+    <!-- 默认主题样式 -->
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
+    <!-- iview样式 -->
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
+    <!-- 引入layui样式 -->
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all"/>
+
+    <!-- 引入vue -->
+    <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+    <!-- iview js -->
+    <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+    <!--引入layui.js-->
+    <script src="/plugins/layui/layui.js"></script>
+    <!--引入axios.js 用于ajax调用-->
+    <script src="/plugins/axios/axios.min.js"></script>
+    <!-- 引入jQuery，必须在appToken.js 之前引入 -->
+    <script src="/build/js/jquery-3.3.1.min.js"></script>
+    <!-- 设置全局请求头:app、Authorization -->
+    <script src="/build/js/appToken.js"></script>
+</head>
+<body>
+<!--隐藏元素-->
+<p id="staffType"  th:attr="value=${staffType}"  hidden />
+<p id="crpIds"  th:attr="value=${crpIds}"  hidden />
+<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+<div id="app" v-cloak>
+
+
+
+    <!-- 搜索工具框 开始-->
+<!--    <row style="padding: 10px">
+        <i-col span="24">
+            <Card>
+                <p slot="title">
+                    <Icon type="ios-search"></Icon>
+                    搜索条件
+                </p>
+                &lt;!&ndash;右上侧按钮列表&ndash;&gt;
+&lt;!&ndash;                <i-button slot="extra" type="error" :loading="delLoading" @click="clickDeleteModule"
+                          style="margin-right:10px">
+                    <span v-if="!loading">删除</span>
+                    <span v-else>处理中...</span>
+                </i-button>
+                <i-button slot="extra" type="success" @click="clickAddModule" style="margin-right:10px">新增</i-button>&ndash;&gt;
+                <i-button slot="extra" type="ghost" :loading="loading" icon="ios-search" @click="toLoading">
+                    <span v-if="!loading">查询</span>
+                    <span v-else>读取中...</span>
+                </i-button>
+                &lt;!&ndash;查询表单内容&ndash;&gt;
+                <row :gutter="16">
+                    <i-form ref="searchForm" :model="searchForm" label-position="right" :label-width="100">
+
+                        &lt;!&ndash;returnStatus: '', //退回状态&ndash;&gt;
+&lt;!&ndash;                        <i-col span="6">
+                            <form-item label="退回状态">
+                                <i-select v-model="searchForm.returnStatus" clearable filterable style="width:200px">
+                                    <i-option v-for="item in returnStatusList" :value="item.value" :key="item.value">
+                                        {{ item.label }}
+                                    </i-option>
+                                </i-select>
+                            </form-item>
+                        </i-col>&ndash;&gt;
+                        &lt;!&ndash;areaId: '',    filterable  clearable   style="width:200px"//区域ID&ndash;&gt;
+                        <i-col span="6">
+                            <form-item label="区域">
+&lt;!&ndash;                                <Select  v-model="searchForm.areaId" clearable  filterable >
+                                    <Option  v-for="item in areaList" :value="item.areaId" :key="item.areaId">
+                                        {{ item.areaName }}
+                                    <Option >
+                                <Select >&ndash;&gt;
+                               <i-select v-model="searchForm.areaId" clearable  filterable >
+                                    <i-option v-for="item in areaList" :value="item.areaId" :key="item.areaId">{{ item.areaName }}</i-option>
+                                </i-select>
+                            </form-item>
+                        </i-col>
+                        &lt;!&ndash;companyId:'',     style="width:200px" //公司ID&ndash;&gt;
+                        <i-col span="6">
+                            <form-item label="公司">
+                                <i-select v-model="searchForm.companyId" clearable filterable >
+                                    <i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{ item.areaName }}</i-option>
+                                </i-select>
+                            </form-item>
+                        </i-col>
+                        &lt;!&ndash;businessType:'', style="width:200px"    //业务类型&ndash;&gt;
+                        <i-col span="6">
+                            <form-item label="业务类型">
+                                <i-select v-model="searchForm.businessType" clearable filterable >
+                                    <i-option v-for="item in businessTypeList" :value="item.businessTypeId" :key="item.businessTypeId">{{ item.businessTypeName }}</i-option>
+                                </i-select>
+                            </form-item>
+                        </i-col>
+                        &lt;!&ndash;businessId:'',      //业务编号&ndash;&gt;
+                        <i-col span="6">
+                            <form-item label="业务编号">
+                                <i-input v-model="searchForm.businessId"></i-input>
+                            </form-item>
+                        </i-col>
+                        &lt;!&ndash;overDueDays:'',     //逾期天数&ndash;&gt;
+                        <i-col span="6">
+                            <form-item label="逾期天数">
+                                <i-input v-model="searchForm.overDueDays"></i-input>
+                            </form-item>
+                        </i-col>
+                        &lt;!&ndash;status:'',          //状态&ndash;&gt;
+&lt;!&ndash;                        <i-col span="6">
+                            <form-item label="状态">
+                                <i-select v-model="searchForm.status" clearable filterable style="width:200px">
+                                    <i-option v-for="item in statusList" :value="item.value" :key="item.value">
+                                        {{ item.label }}
+                                    </i-option>
+                                </i-select>
+                            </form-item>
+                        </i-col>&ndash;&gt;
+                        &lt;!&ndash;customerName:'',     //客户名字&ndash;&gt;
+                        <i-col span="6">
+                            <form-item label="客户名称">
+                                <i-input v-model="searchForm.customerName"></i-input>
+                            </form-item>
+                        </i-col>
+                        &lt;!&ndash;operatorName:'',     //业务获取人名字&ndash;&gt;
+                        <i-col span="6">
+                            <form-item label="业务获取">
+                                <i-input v-model="searchForm.operatorName"></i-input>
+                            </form-item>
+                        </i-col>
+                    </i-form>
+                </row>
+            </Card>
+        </i-col>
+    </row>-->
+    <!-- 搜索工具框 结束-->
+
+    <!-- 表单Grid，使用layerUI的表格组件 开始 -->
+    <row style="padding: 10px">
+        <i-col span="24">
+            <!-- 使用方法渲染模式 -->
+            <table id="listTable" lay-filter="listTable"></table>
+            <script type="text/html" id="barTools">
+                <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+            </script>
+        </i-col>
+    </row>
+    <!-- 表单Grid，使用layerUI的表格组件 结束 -->
+
+    <!-- 分配电催 开始-->
+    <row style="padding: 10px">
+        <i-col span="24">
+            <Card>
+                <p  th:if="${staffType=='phoneStaff'}" slot="title">
+                    <Icon type="ios-star"></Icon>
+                    分配电催
+                </p>
+                    <p  th:if="${staffType=='visitStaff'}"  slot="title">
+                    <Icon type="ios-star"></Icon>
+                    移交催收
+                </p>
+                <row :gutter="16">
+                    <i-form ref="setPhoneUrgeForm" :model="setPhoneUrgeForm" :rules="ruleValidate" label-position="right" :label-width="100">
+                        <!--followOprId: '', //选择清算跟进人员-->
+                        <row style="padding: 10px">
+
+                            <form-item th:if="${staffType=='phoneStaff'}" label="选择清算一跟进人员：" prop="followOprId" >
+                                <i-select v-model="setPhoneUrgeForm.followOprId" clearable filterable style="width:400px">
+                                    <i-option v-for="item in followOprList" :value="item.userId" :key="item.userId">{{ item.userName }}</i-option>
+                                </i-select>
+                            </form-item>
+                            <form-item th:if="${staffType=='visitStaff'}" label="选择清算二跟进人员：" prop="followOprId" >
+                                <i-select v-model="setPhoneUrgeForm.followOprId" clearable filterable style="width:400px">
+                                    <i-option v-for="item in followOprList" :value="item.userId" :key="item.userId">{{ item.userName }}</i-option>
+                                </i-select>
+                            </form-item>
+                        </row>
+                        <row style="padding: 10px">
+                            <form-item label="分配说明："   prop="discript">
+                                <i-input v-model="setPhoneUrgeForm.discript" type="textarea" :rows="4" placeholder="请填写分配说明"></i-input>
+                            </form-item>
+                        </row>
+
+
+                    </i-form>
+                </row>
+                <row style="padding: 10px">
+                    <!--<form-item>-->
+                    <i-button type="primary" :loading="saving" @click="submit()">
+                        <span v-if="!saving">保存</span>
+                        <span v-else>保存中...</span>
+                    </i-button>
+                    <i-button type="ghost" style="margin-left: 10px"  @click="handleReset('setPhoneUrgeForm')">撤销</i-button>
+                    <!--</form-item>-->
+                </row>
+            </Card>
+        </i-col>
+    </row>
+    <!-- 分配电催 结束-->
+
+</div>
+
+<script src="/src/js/collection/setPhoneStaff.js" ></script>
+<script>
+
+</script>
+</body>
+</html>

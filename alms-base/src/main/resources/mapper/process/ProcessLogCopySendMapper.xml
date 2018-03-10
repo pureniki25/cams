@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.process.mapper.ProcessLogCopySendMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.process.entity.ProcessLogCopySend">
+        <id column="process_send_id" property="processSendId" />
+        <result column="process_log_id" property="processLogId" />
+        <result column="receive_user_id" property="receiveUserId" />
+        <result column="receive_user_name" property="receiveUserName" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        process_send_id AS processSendId, process_log_id AS processLogId, receive_user_id AS receiveUserId, receive_user_name AS receiveUserName
+    </sql>
+
+</mapper>

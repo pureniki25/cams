@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.assets.car.mapper.CarMapper">
+
+	<select id="selectCarPage" resultType="com.hongte.alms.base.assets.car.vo.CarVo"
+		parameterType="com.hongte.alms.base.assets.car.vo.CarReq">
+		select
+		car.business_id,<!--业务编号 -->
+		'',<!-- 地区 -->
+		bus.company_name,<!-- 分公司名称-->
+		bus.customer_name,<!-- 客户姓名-->
+		pl.borrow_money,<!-- 借款金额-->
+
+		(select sum(ifnull(li.total_borrow_amount,0)+ifnull(li.overdue_amount,0)) from
+		tb_repayment_biz_plan_list li where li.current_status='已还款' and
+		li.plan_id=pl.plan_id) repaid_amount, <!-- 已还金额-->
+		car.license_plate_number,<!-- 车牌号-->
+		car.model,<!-- 车辆型号-->
+		det.evaluation_amount,<!-- 评估金额-->
+		det.create_time    evaluation_date,<!-- 评估日期-->
+		drag.drag_date trailer_date,<!-- 拖车日期-->
+		car.status<!-- 状态-->
+		from tb_car_basic car
+		join tb_basic_business bus on car.business_id=bus.business_id
+		<!-- join tb_basic_company com on bus.asset_id=com.asset_side_id -->
+		join tb_repayment_biz_plan pl on pl.business_id=bus.business_id
+		left join tb_car_detection det on det.business_id=bus.business_id
+		left join tb_car_drag drag on drag.business_id=bus.business_id
+       <where>
+         <if test="businessId !=null and businessId !=''">
+               and bus.business_id  LIKE #{businessId}
+         </if>
+         <if test="areaId !=null and areaId !=''">
+               and com.area_id  = #{areaId}
+         </if>
+         <if test="companyId !=null and companyId !=''">
+               and com.company_id = #{companyId}
+         </if>
+          <if test="customerName !=null and customerName !=''">
+               and bus.customer_name  LIKE #{customerName}
+         </if>
+         <if test="licensePlateNumber !=null and licensePlateNumber !=''">
+               and car.license_plate_number  LIKE #{customer_name}
+         </if>
+          <if test="licensePlateNumber !=null and licensePlateNumber !=''">
+               and car.license_plate_number  LIKE #{customer_name}
+         </if>
+         <if test="model !=null and model !=''">
+               and car.model  LIKE #{model}
+         </if>
+         <if test="status !=null and status !=''">
+               and car.status= #{status}
+         </if>
+         <if test="trailerStartDate != null and  trailerStartDate != ''">
+            <![CDATA[ and car.trailer_date >= to_date(#{trailerStartDate,jdbcType=DATE},'yyyy-MM-dd hh24:mi:ss')]]>
+        </if>
+        <if test="trailerEndDate != null and  trailerEndDate != ''">
+            <![CDATA[ and car.trailer_date <= to_date(#{trailerEndDate,jdbcType=DATE},'yyyy-MM-dd hh24:mi:ss')]]>
+        </if>
+       </where>
+       order by bus.update_time desc
+        limit ${(page-1) * limit}, #{limit,jdbcType=DECIMAL}
+	</select>
+
+<select id="selectCarPageCount" resultType="int"
+		parameterType="com.hongte.alms.base.assets.car.vo.CarReq">
+		select
+		count(1)
+		from tb_car_basic car
+		join tb_basic_business bus on car.business_id=bus.business_id
+		<!-- join tb_basic_company com on bus.asset_id=com.asset_side_id -->
+		join tb_repayment_biz_plan pl on pl.business_id=bus.business_id
+		left join tb_car_detection det on det.business_id=bus.business_id
+		left join tb_car_drag drag on drag.business_id=bus.business_id
+       <where>
+         <if test="businessId !=null and businessId !=''">
+               and bus.business_id  LIKE #{businessId}
+         </if>
+         <if test="areaId !=null and areaId !=''">
+               and com.area_id  = #{areaId}
+         </if>
+         <if test="companyId !=null and companyId !=''">
+               and com.company_id = #{companyId}
+         </if>
+          <if test="customerName !=null and customerName !=''">
+               and bus.customer_name  LIKE #{customerName}
+         </if>
+         <if test="licensePlateNumber !=null and licensePlateNumber !=''">
+               and car.license_plate_number  LIKE #{customer_name}
+         </if>
+          <if test="licensePlateNumber !=null and licensePlateNumber !=''">
+               and car.license_plate_number  LIKE #{customer_name}
+         </if>
+         <if test="model !=null and model !=''">
+               and car.model  LIKE #{model}
+         </if>
+         <if test="status !=null and status !=''">
+               and car.status= #{status}
+         </if>
+         <if test="trailerStartDate != null and  trailerStartDate != ''">
+            <![CDATA[ and car.trailer_date >= to_date(#{trailerStartDate,jdbcType=DATE},'yyyy-MM-dd hh24:mi:ss')]]>
+        </if>
+        <if test="trailerEndDate != null and  trailerEndDate != ''">
+            <![CDATA[ and car.trailer_date <= to_date(#{trailerEndDate,jdbcType=DATE},'yyyy-MM-dd hh24:mi:ss')]]>
+        </if>
+       </where>
+	</select>
+</mapper>

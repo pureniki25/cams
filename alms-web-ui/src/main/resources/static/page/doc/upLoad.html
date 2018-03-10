@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- html 4 的编码设置方式 -->
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <!-- html 5 的编码设置方式 -->
+    <meta charset="UTF-8">
+    <title>附件上传</title>
+    <link rel="stylesheet" href="../../plugins/fileUpload/css/jquery.fileupload-ui.css" media="all">
+    <link rel="stylesheet" href="../../plugins/fileUpload/css/jquery.fileupload.css" media="all">
+    <link rel="stylesheet" href="../../plugins/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="css/main.css">
+    <link href="theme/default/layer.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../../plugins/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../plugins/font-awesome/css/font-awesome.min.css" media="all" />
+    <script src="../../plugins/jquery-1.9.1.min.js"></script>
+    <script src="../../plugins/layui/layui.js"></script>
+    <script src="../../plugins/upLoadTree/layer.js"></script>
+    <script type="text/javascript" src="../../plugins/upLoadTree/upLoadTree.js"></script>
+    <!--引入axios.js 用于ajax调用-->
+    <script src="/plugins/axios/axios.min.js"></script>
+    <script src="http://blueimp.github.io/jQuery-File-Upload/js/vendor/jquery.ui.widget.js"></script>
+    <script type="text/javascript" src="../../plugins/fileUpload/jquery.iframe-transport.js"></script>
+    <script type="text/javascript" src="../../plugins/fileUpload/jquery.fileupload.js"></script>
+    <!--<script type="text/javascript" src="../../plugins/fileUpload/jquery.fileupload-jquery-ui.js"></script>-->
+    <script type="text/javascript" src="../../plugins/fileUpload/jquery.fileupload-process.js"></script>
+    <script type="text/javascript" src="../../plugins/fileUpload/jquery.fileupload-validate.js"></script>
+    <script src="../../js/common.js"></script>
+    <!-- 设置全局请求头:app、Authorization -->
+    <script src="/build/js/appToken.js"></script>
+    <script src="../../js/doc/upLoad.js"></script>
+</head>
+
+<div id="file-wrap">
+    <div class="navbox">
+        <span>所有文档</span>
+        <ul class="tree" id="tree">
+        </ul>
+    </div>
+</div>
+<div class="pic-fail" id="pic-fail">
+    文件过大
+</div>
+
+
+</html>

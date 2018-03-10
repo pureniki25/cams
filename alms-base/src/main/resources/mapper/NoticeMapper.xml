@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.NoticeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.Notice">
+        <id column="notice_id" property="noticeId" />
+        <result column="notice_title" property="noticeTitle" />
+        <result column="notice_content" property="noticeContent" />
+        <result column="has_read" property="hasRead" />
+        <result column="has_read_time" property="hasReadTime" />
+        <result column="has_read_time_unit" property="hasReadTimeUnit" />
+        <result column="org_code" property="orgCode" />
+        <result column="publish_channel" property="publishChannel" />
+        <result column="is_send" property="isSend" />
+        <result column="create_user_id" property="createUserId" />
+        <result column="publish_user_id" property="publishUserId" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="is_deleted" property="isDeleted" />
+        <result column="delete_user_id" property="deleteUserId" />
+        <result column="delete_time" property="deleteTime" />
+        <result column="publish_time" property="publishTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        notice_id AS noticeId, notice_title AS noticeTitle, notice_content AS noticeContent, has_read AS hasRead, has_read_time AS hasReadTime, has_read_time_unit AS hasReadTimeUnit, org_code AS orgCode, publish_channel AS publishChannel, is_send AS isSend, create_user_id AS createUserId, publish_user_id AS publishUserId, create_time AS createTime, update_time AS updateTime, is_deleted AS isDeleted, delete_user_id AS deleteUserId, delete_time AS deleteTime, publish_time AS publishTime
+    </sql>
+
+</mapper>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.ApplyDerateProcessMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.ApplyDerateProcess">
+        <id column="apply_derate_process_id" property="applyDerateProcessId" />
+        <result column="process_id" property="processId" />
+        <result column="business_id" property="businessId" />
+        <result column="crp_id" property="crpId" />
+        <result column="derate_type" property="derateType" />
+        <result column="derate_money" property="derateMoney" />
+        <result column="real_receive_money" property="realReceiveMoney" />
+        <result column="derate_reson" property="derateReson" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="update_time" property="updateTime" />
+        <result column="update_user" property="updateUser" />
+        <result column="title" property="title" />
+        <result column="is_settle" property="isSettle" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        apply_derate_process_id AS applyDerateProcessId, process_id AS processId, business_id AS businessId, crp_id AS crpId, derate_type AS derateType, derate_money AS derateMoney, real_receive_money AS realReceiveMoney, derate_reson AS derateReson, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser, title, is_settle AS isSettle
+    </sql>
+
+
+    <select id="selectApplyDerateList" resultType="com.hongte.alms.base.vo.module.ApplyDerateVo"
+            parameterType="com.hongte.alms.base.vo.module.ApplyDerateListSearchReq">
+
+        select
+        business.business_id AS businessId,
+        pList.period as  periods,
+        business.customer_name AS customerName,
+        b_type.business_type_name AS businessTypeName,
+
+        company.district_id as districtId,
+        -- districtAreaName
+        business.company_id as companyId,
+        company.area_name AS companyName,
+
+        derate.create_user as createrId,
+        derate.derate_type as derateTypeId ,
+
+        derate.derate_money as derateMoney,
+        derate.real_receive_money as realPayMoney,
+        derate.create_time as derateTime
+
+
+        from tb_apply_derate_process  as derate
+        LEFT JOIN tb_repayment_biz_plan_list  as pList ON   derate.crp_id = pList.plan_list_id
+        LEFT  JOIN  tb_repayment_biz_plan as plan ON  pList.plan_id = plan.plan_id
+        LEFT JOIN tb_basic_business as business ON plan.business_id = business.business_id
+        LEFT JOIN tb_basic_business_type as  b_type ON business.business_type = b_type.business_type_id
+        LEFT JOIN tb_basic_company as company ON business.company_id = company.area_id
+        LEFT JOIN tb_process as process ON derate.process_id = process.process_id
+
+        <where>
+            process.status = 2 and process.process_result = 1
+
+            <if test="BidOrCName !=null and BidOrCName !=''">
+                and ((business.business_id  LIKE '%${BidOrCName}%') or (business.customer_name  LIKE '%${BidOrCName}%') )
+            </if>
+            <if test="areaId !=null and areaId !=''">
+                and business.company_id IN (SELECT area_id FROM tb_basic_company WHERE district_id = #{areaId})
+            </if>
+            <if test="companyId !=null and companyId !=''">
+                and business.company_id = #{companyId}
+            </if>
+            <!--   /*//业务类型*/ -->
+            <if test="businessType !=null ">
+                and business.business_type = #{businessType}
+            </if>
+            <!--          /*减免时间 开始*/ -->
+            <if test="derateDateBegin !=null ">
+                <![CDATA[ and derate.create_time >= #{derateDateBegin,jdbcType=TIMESTAMP}]]>
+            </if>
+            <!--            /*减免时间 结束*/ -->
+            <if test="derateDateEnd !=null ">
+                <![CDATA[ and derate.create_time <= #{derateDateEnd,jdbcType=TIMESTAMP}]]>
+            </if>
+            <!--             /*减免金额 开始*/-->
+            <if test="derateMoneyBegin !=null ">
+                <![CDATA[ and derate.derate_money >= #{derateMoneyBegin}]]>
+            </if>
+            <!--       /*减免金额 结束*/ -->
+            <if test="derateMoneyEnd !=null ">
+                <![CDATA[ and derate.derate_money <= #{derateMoneyEnd}]]>
+            </if>
+
+
+        </where>
+        order BY  derate.create_time DESC
+
+
+    </select>
+
+
+</mapper>

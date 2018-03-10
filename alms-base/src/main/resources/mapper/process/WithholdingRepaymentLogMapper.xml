@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.WithholdingRepaymentLogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.WithholdingRepaymentLog">
+        <id column="log_id" property="logId" />
+        <result column="original_business_id" property="originalBusinessId" />
+        <result column="after_id" property="afterId" />
+        <result column="merch_order_id" property="merchOrderId" />
+        <result column="third_order_id" property="thirdOrderId" />
+        <result column="current_amount" property="currentAmount" />
+        <result column="identity_card" property="identityCard" />
+        <result column="customer_name" property="customerName" />
+        <result column="phone_number" property="phoneNumber" />
+        <result column="bank_card" property="bankCard" />
+        <result column="remark" property="remark" />
+        <result column="merchant_account" property="merchantAccount" />
+        <result column="repay_status" property="repayStatus" />
+        <result column="settlement_type" property="settlementType" />
+        <result column="bind_platform_id" property="bindPlatformId" />
+        <result column="bool_part_repay" property="boolPartRepay" />
+        <result column="bool_last_repay" property="boolLastRepay" />
+        <result column="plan_total_repay_money" property="planTotalRepayMoney" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="update_time" property="updateTime" />
+        <result column="update_user" property="updateUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        log_id AS logId, original_business_id AS originalBusinessId, after_id AS afterId, merch_order_id AS merchOrderId, third_order_id AS thirdOrderId, current_amount AS currentAmount, identity_card AS identityCard, customer_name AS customerName, phone_number AS phoneNumber, bank_card AS bankCard, remark, merchant_account AS merchantAccount, repay_status AS repayStatus, settlement_type AS settlementType, bind_platform_id AS bindPlatformId, bool_part_repay AS boolPartRepay, bool_last_repay AS boolLastRepay, plan_total_repay_money AS planTotalRepayMoney, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
+    </sql>
+    
+    
+    
+    
+    <select id="selectRepaymentLogList" resultType="com.hongte.alms.base.vo.module.RepaymentLogVO"
+            parameterType="com.hongte.alms.base.vo.module.RepaymentLogReq">
+
+      
+ 
+select repay.log_id as logId,repay.original_business_id as originalBusinessId ,repay.after_id as afterId,
+   b_type.business_type_name AS businessTypeName,  b_type.business_type_id AS businessTypeId,
+    company.district_id as districtId,      business.company_id as companyId,
+
+	business.operator_name as operatorName,repay.customer_name as customerName,
+	
+	platform.platform_name as platformName,repay.current_amount as currentAmount,
+	repay.create_time as createTime,
+	repay.repay_status as repayStatus,
+	repay.remark,
+	user.user_name as userName
+	
+	
+
+ from tb_withholding_repayment_log  repay 
+
+
+ 
+	 LEFT JOIN tb_basic_business  business  on repay.original_business_id=business.business_id
+	 LEFT JOIN tb_basic_company as company ON business.company_id = company.area_id
+  LEFT JOIN tb_basic_business_type as  b_type ON business.business_type = b_type.business_type_id
+	  left JOIN  tb_sys_user_permission user_permission on user_permission.business_id=repay.original_business_id
+	  left join tb_sys_user user on user.user_id=user_permission.user_id 
+	  left join tb_withholding_platform as platform on platform.platform_id=repay.bind_platform_id
+
+
+        <where>
+               1=1
+            <if test="keyName !=null and keyName !=''">
+                and ((business.operator_name  LIKE '%${keyName}%') or (repay.customer_name  LIKE '%${keyName}%') or (repay.original_business_id LIKE '%${keyName}%') )
+            </if>
+            <if test="platfromId !=null and platfromId !=''">
+                and repay.bind_platform_id = #{platfromId}
+            </if>
+
+            <if test="repayStatus !=null and repayStatus !=''">
+                and repay.repay_status = #{repayStatus}
+            </if>
+            <!--          /*代扣时间 开始*/ -->
+            <if test="dateBegin !=null and dateBegin !=''">
+                <![CDATA[ and repay.create_time >= #{dateBegin,jdbcType=TIMESTAMP}]]>
+            </if>
+            <!--            /*代扣时间 结束*/ -->
+            <if test="dateEnd !=null and dateEnd !='' ">
+                <![CDATA[ and repay.create_time <= #{dateEnd,jdbcType=TIMESTAMP}]]>
+            </if>
+            <if test="companyId !=null and companyId !=''">
+                and business.company_id = #{companyId}
+            </if>
+            
+             <if test="businessTypeId !=null and businessTypeId !=''">
+                and b_type.business_type_id = #{businessTypeId}
+            </if>
+                and user.user_id=#{userId}
+
+        </where>
+      
+        order BY  repay.create_time DESC
+
+
+    </select>
+
+</mapper>

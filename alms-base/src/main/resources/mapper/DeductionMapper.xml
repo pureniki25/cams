@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.DeductionMapper">
+
+
+
+
+
+	<select id="selectDeductionInfoByPlanListId" resultType="com.hongte.alms.base.collection.vo.DeductionVo">
+
+
+
+		select
+
+		pList.plan_list_id as planListId,
+		plan.business_id as businessId,
+		plan.original_business_id as originalBusinessId,
+		plan.borrow_limit as borrowLimit,
+		plan.borrow_limit_unit as borrowLimitUnit,
+		customer.customer_name as customerName,
+		customer.identify_card as identifyCard,
+		c.plan_principal as planPrincipal,
+		plan_platform_charge as platformCharge,
+		pList.after_id as afterId,
+		bindcard.bank_card as bankCard,
+		bindcard.bank_name as bankName,
+		plan_accrual as planAccrual,
+		plan_guarantee_charge as planGuaranteeCharge,
+		c.plan_liquidated_damages+c.plan_agency_fee+c.plan_deposit_fee+c.plan_reducing_debtors
+		as otherFee,
+		c.plan_liquidated_damages+c.plan_agency_fee+c.plan_deposit_fee+c.plan_reducing_debtors+
+		c.plan_principal+c.plan_accrual+c.plan_service_charge+c.plan_guarantee_charge+c.plan_platform_charge+c.plan_overdue_money
+		as total,
+		business.borrow_money as borrowMoney,
+		platform.platform_name as platformName,
+		c.plan_service_charge as planServiceCharge,
+		c.plan_overdue_money as planOverDueMoney,
+		(select current_date()) as nowdate,
+		repayment.repayment_type_name as repaymentTypeName,
+		business.operator_name as operatorName,
+		customer.phone_number as phoneNumber,
+		pList.current_status  as currentStatus
+
+
+
+		from tb_repayment_biz_plan_list as pList
+
+		JOIN tb_repayment_biz_plan as plan on pList.plan_id = plan.plan_id
+
+
+		JOIN tb_basic_business as business ON plan.original_business_id =
+		business.business_id
+
+
+		JOIN tb_basic_business_customer as customer on
+		plan.original_business_id=customer.business_id
+
+
+		join tb_customer_bind_card as bindcard on
+		bindcard.customer_id=customer.customer_id
+
+		join tb_customer_bind_platform as bindPlatform on bindPlatform.bind_id=
+		bindcard.bind_id
+
+		join tb_withholding_platform as platform on
+		platform.platform_id=bindPlatform.platform_id
+		join tb_basic_repayment_type as repayment on
+		repayment.repayment_type_id=business.repayment_type_id
+
+		join(
+		select t1.plan_list_id,
+		-- 应还本金总额
+		sum(case when t1.plan_item_type =10 then t1.plan_amount else 0 end)
+		`plan_principal`,
+		-- 实还本金总额
+		sum(case when t1.plan_item_type =10 then t1.fact_amount else 0 end)
+		`fact_principal`,
+		-- 应还利息总额
+		sum(case when t1.plan_item_type =20 then t1.plan_amount else 0 end)
+		`plan_accrual`,
+		-- 实还利息总额
+		sum(case when t1.plan_item_type =20 then t1.fact_amount else 0 end)
+		`fact_accrual`,
+		-- 应还资产端分公司服务费总额
+		sum(case when t1.plan_item_type =30 then t1.plan_amount else 0 end)
+		`plan_service_charge`,
+		-- 实还资产端分公司服务费总额
+		sum(case when t1.plan_item_type =30 then t1.fact_amount else 0 end)
+		`fact_service_charge`,
+		-- 应还担保公司费用总额
+		sum(case when t1.plan_item_type =40 then t1.plan_amount else 0 end)
+		`plan_guarantee_charge`,
+		-- 实还担保公司费用总额
+		sum(case when t1.plan_item_type =40 then t1.fact_amount else 0 end)
+		`fact_guarantee_charge`,
+		-- 应还资金端平台费总额
+		sum(case when t1.plan_item_type =50 then t1.plan_amount else 0 end)
+		`plan_platform_charge`,
+		-- 实还资金端平台费总额
+		sum(case when t1.plan_item_type =50 then t1.fact_amount else 0 end)
+		`fact_platform_charge`,
+		-- 应还逾期费用总额
+		sum(case when t1.plan_item_type =60 then t1.plan_amount else 0 end)
+		`plan_overdue_money`,
+		-- 实还逾期费用总额
+		sum(case when t1.plan_item_type =60 then t1.fact_amount else 0 end)
+		`fact_overdue_money`,
+		-- 应还违约金总额
+		sum(case when t1.plan_item_type =70 then t1.plan_amount else 0 end)
+		`plan_liquidated_damages`,
+		-- 实还违约金总额
+		sum(case when t1.plan_item_type =70 then t1.fact_amount else 0 end)
+		`fact_liquidated_damages`,
+		-- 应还中介费总额
+		sum(case when t1.plan_item_type =80 then t1.plan_amount else 0 end)
+		`plan_agency_fee`,
+		-- 实还中介费总额
+		sum(case when t1.plan_item_type =80 then t1.fact_amount else 0 end)
+		`fact_agency_fee`,
+		-- 应还押金总额
+		sum(case when t1.plan_item_type =90 then t1.plan_amount else 0 end)
+		`plan_deposit_fee`,
+		-- 实还押金总额
+		sum(case when t1.plan_item_type =90 then t1.fact_amount else 0 end)
+		`fact_deposit_fee`,
+		-- 应还冲应收总额
+		sum(case when t1.plan_item_type =100 then t1.plan_amount else 0 end)
+		`plan_reducing_debtors`,
+		-- 实还冲应收总额
+		sum(case when t1.plan_item_type =100 then t1.fact_amount else 0 end)
+		`fact_reducing_debtors`
+		from tb_repayment_biz_plan_list_detail t1
+		group by t1.plan_list_id
+
+		) c on pList.plan_list_id=c.plan_list_id 
+
+
+		<where>
+			1=1 and 
+		bindcard.is_maincard=1
+		and pList.plan_list_id=#{planListId} limit 1
+
+		</where>
+
+
+	</select>
+
+
+
+
+
+
+</mapper>

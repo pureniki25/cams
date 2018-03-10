@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.collection.mapper.CollectionTimeSetMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.collection.entity.CollectionTimeSet">
+        <id column="col_time_id" property="colTimeId" />
+        <result column="col_type" property="colType" />
+        <result column="over_due_days" property="overDueDays" />
+        <result column="start_time" property="startTime" />
+        <result column="creat_time" property="creatTime" />
+        <result column="creat_user" property="creatUser" />
+        <result column="update_time" property="updateTime" />
+        <result column="update_user" property="updateUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        col_time_id AS colTimeId, col_type AS colType, over_due_days AS overDueDays, start_time AS startTime, creat_time AS creatTime, creat_user AS creatUser, update_time AS updateTime, update_user AS updateUser
+    </sql>
+
+</mapper>

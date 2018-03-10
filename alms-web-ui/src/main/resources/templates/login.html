@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <title>系统登录</title>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
+    <meta content="yes" name="apple-mobile-web-app-capable" />
+    <meta content="black" name="apple-mobile-web-app-status-bar-style" />
+    <meta content="telephone=no" name="format-detection" />
+    <meta content="yes" name="apple-touch-fullscreen">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <script>
+        if (window != window.top)
+            top.location.href = self.location.href;
+    </script>
+    
+    <link rel="stylesheet" type="text/css" href="/css/login.css" />
+
+    <style class="cp-pen-styles">
+        #canvas {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+	<canvas class="wave-xp" id="canvas"></canvas>
+    <div class="wrapper">
+        <div class="login_box">
+            <div class="login_title">
+                <h2>贷后管理系统</h2>
+            </div>
+            <div class="login_form">
+            	<form class="layui-form" method="post" lay-filter="login">
+	                <div class="form-group">
+						<input type="text" name="userName" lay-verify="required" placeholder="用户名" autocomplete="off">
+	                </div>
+	                <div class="form-group">
+						<input type="password" name="password" lay-verify="required" placeholder="密码" autocomplete="off">
+	                </div>
+		            <button class="login_btn" id="btnLogin" lay-submit lay-filter="login">登录</button>
+	             </form>
+            </div>
+            <div class="tips">如出现无法登录,请使用 <a href=" http://rj.baidu.com/soft/detail/14744.html" target="_blank">< 谷歌浏览器 ></a></div>
+        </div>
+        <div class="fromtd">2017 - 2018 © 广东鸿特信息咨询有限公司</div>
+    </div>
+
+<script type="text/javascript" src="/build/js/stopExecutionOnTimeout.js"></script>
+<script type="text/javascript" src="/build/js/TweenMax.min.js"></script>
+<script src="/plugins/layui/layui.js"></script>
+<script>
+    layui.config({
+        base: '/plugins/layui/extend/modules/',
+        version: false
+    }).use(['layer','form','ht_cookie','ht_config'], function () {
+        var $ = layui.jquery, 
+        form = layui.form, 
+        cookie = layui.ht_cookie, 
+        config = layui.ht_config;
+
+        //系统编码统一通过头信息传入后台
+        //清理左侧菜单缓存
+        var index = layer.load(2, {shade: [0.3, '#333']});
+        layer.close(index);
+        form.on('submit(login)', function (data) {
+            $.ajax({
+                type: "POST",
+                url: config.loginUrl,
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(data.field),
+                async: false,
+                dataType: "json",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+                    xhr.setRequestHeader("app", config.app);
+                },
+                success: function (data) {
+                    if (data && data["token"] != null & data["token"] != "") {
+                        cookie.setToken(data["token"]);
+                        cookie.setRefreshToken(data["refreshToken"]);
+                        top.location.href = config.indexPath;
+                    } else {
+                        layer.alert("登录失败，请联系管理员");
+                    }
+                },
+                error: function (xhr, exception, errorThrown) {
+                    if (xhr.status == '401' || xhr.status == '403') {
+                        layer.alert("用户名或密码错误，请重新登录");
+                    }
+                    if (xhr.status == '500') {
+                        layer.alert("服务器错误，请联系管理员");
+                    }
+                    if (xhr.status == '0') {
+                        layer.alert("网络错误，请检查网络")
+                    }
+                    $(':input', '#loginForm').not(':button,:submit,:reset,:hidden').val('').removeAttr('checked').removeAttr('checked');
+                }
+            });
+            return false;
+
+        });
+    });
+</script>
+<script type="text/javascript">
+        var canvas = document.getElementById("canvas");
+        var context = canvas.getContext("2d");
+        var resolution = window.devicePixelRatio || 1;
+
+        var waves = [];
+        var resized = false;
+
+        var vw, vh;
+        resizeCanvas();
+
+        var wave1 = createWave(context, {
+            amplitude: 50,
+            duration: 4,
+            fillStyle: "rgba(103,95,204,0.8)",
+            frequency: 2.5,
+            width: vw,
+            height: vh,
+            segments: 100,
+            waveHeight: vh * 0.5
+        });
+
+        var wave2 = createWave(context, {
+            amplitude: 100,
+            duration: 2,
+            fillStyle: "rgba(43,53,202,0.7)",
+            frequency: 1.5,
+            width: vw,
+            height: vh,
+            segments: 100,
+            waveHeight: vh * 0.5
+        });
+
+        waves.push(wave1, wave2);
+
+        TweenMax.to(waves, 10, {
+            waveHeight: vh / 2,
+            ease: Sine.easeInOut,
+            repeat: -1,
+            repeatDelay: 1,
+            yoyo: true
+        });
+
+        TweenMax.to(wave1, 6, {
+            amplitude: 10,
+            ease: Sine.easeInOut,
+            repeat: -1,
+            yoyo: true
+        });
+
+        TweenMax.to(wave2, 7, {
+            amplitude: 25,
+            ease: Sine.easeInOut,
+            repeat: -1,
+            yoyo: true
+        });
+
+        window.addEventListener("resize", function () {
+            resized = true;
+        });
+
+        TweenLite.ticker.addEventListener("tick", update);
+
+        function update() {
+
+            var len = waves.length;
+
+            if (resized) {
+
+                resizeCanvas();
+
+                for (var i = 0; i < len; i++) {
+                    waves[i].resize(vw, vh);
+                }
+
+                resized = false;
+            }
+
+            context.clearRect(0, 0, vw, vh);
+            context.globalCompositeOperation = "soft-light";
+
+            for (var i = 0; i < len; i++) {
+                waves[i].draw();
+            }
+        }
+
+        function createWave(context, options) {
+
+            options = options || {};
+
+            // API
+            var wave = {
+
+                // Properties
+                amplitude: options.amplitude || 200,
+                context: context,
+                curviness: options.curviness || 0.75,
+                duration: options.duration || 2,
+                fillStyle: options.fillStyle || "rgba(33,150,243,1)",
+                frequency: options.frequency || 4,
+                height: options.height || 600,
+                points: [],
+                segments: options.segments || 100,
+                tweens: [],
+                waveHeight: options.waveHeight || 300,
+                width: options.width || 800,
+                x: options.x || 0,
+                y: options.y || 0,
+
+                // Methods
+                init: init,
+                resize: resize,
+                draw: draw,
+                kill: kill
+            };
+
+            init();
+
+            function kill() {
+
+                var tweens = wave.tweens;
+                var len = tweens.length;
+
+                for (var i = 0; i < len; i++) {
+                    tweens[i].kill();
+                }
+
+                tweens.length = 0;
+                wave.points.length = 0;
+            }
+
+            function init() {
+
+                kill();
+
+                var segments = wave.segments;
+                var interval = wave.width / segments;
+
+                for (var i = 0; i <= segments; i++) {
+
+                    var norm = i / segments;
+                    var point = {
+                        x: wave.x + i * interval,
+                        y: 1
+                    };
+
+                    var tween = TweenMax.to(point, wave.duration, {
+                        y: -1,
+                        repeat: -1,
+                        yoyo: true,
+                        ease: Sine.easeInOut
+                    }).progress(norm * wave.frequency)
+
+                    wave.tweens.push(tween);
+                    wave.points.push(point);
+                }
+            }
+
+            function draw() {
+
+                var points = wave.points;
+                var len = points.length;
+
+                var startY = wave.waveHeight;
+                var height = wave.amplitude / 2;
+                context.beginPath();
+                context.moveTo(points[0].x, startY + points[0].y * height);
+
+                for (var i = 1; i < len; i++) {
+
+                    var point = points[i];
+                    context.lineTo(point.x, startY + point.y * height);
+                }
+
+                context.lineTo(wave.x + wave.width, wave.y + wave.height);
+                context.lineTo(wave.x, wave.y + wave.height);
+                context.closePath();
+                context.fillStyle = wave.fillStyle;
+                context.fill();
+            }
+
+            function resize(width, height) {
+
+                wave.width = width;
+                wave.height = height;
+
+                var points = wave.points;
+                var len = points.length;
+                var interval = wave.width / wave.segments;
+
+                for (var i = 0; i < len; i++) {
+
+                    var point = points[i];
+                    point.x = wave.x + i * interval;
+                }
+            }
+
+            return wave;
+        }
+
+        function resizeCanvas() {
+
+            vw = window.innerWidth;
+            // vh = window.innerHeight;
+            vh = 150;
+
+            canvas.width = vw * resolution;
+            canvas.height = vh * resolution;
+
+            canvas.style.width = vw + "px";
+            canvas.style.height = vh + "px";
+
+            context.scale(resolution, resolution);
+        }
+    </script>
+</body>

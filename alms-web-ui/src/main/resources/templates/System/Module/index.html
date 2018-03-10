@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <title>菜单管理</title>
+    <!-- 默认主题样式 -->
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
+    <!-- iview样式 -->
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
+    <!-- 引入layui样式 -->
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all"/>
+
+    <!-- 引入vue -->
+    <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+    <!-- iview js -->
+    <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+    <!--引入layui.js-->
+    <script src="/plugins/layui/layui.js"></script>
+    <!--引入axios.js 用于ajax调用-->
+    <script src="/plugins/axios/axios.min.js"></script>
+    <!-- 引入jQuery，必须在appToken.js 之前引入 -->
+    <script src="/build/js/jquery-3.3.1.min.js"></script>
+    <!-- 设置全局请求头:app、Authorization -->
+    <script src="/build/js/appToken.js"></script>
+</head>
+<body>
+<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+<div id="app" v-cloak>
+    <!-- 搜索工具框 开始-->
+    <row style="padding: 10px">
+        <i-col span="24">
+            <Card>
+                <p slot="title">
+                    <Icon type="ios-search"></Icon>
+                    搜索条件
+                </p>
+                <!--右上侧按钮列表-->
+                <i-button v-if="authValid('delete')" slot="extra" type="error" :loading="delLoading" @click="clickDeleteModule"
+                          style="margin-right:10px"  ht-auth="delete">
+                    <span v-if="!loading">删除</span>
+                    <span v-else>处理中...</span>
+                </i-button>
+                <i-button v-if="authValid('add')" slot="extra" type="success" @click="clickAddModule" style="margin-right:10px"
+                	ht-auth="add">新增</i-button>
+                <i-button v-if="authValid('query')" slot="extra" type="ghost" :loading="loading" icon="ios-search" @click="toLoading"
+                	ht-auth="query">
+                    <span v-if="!loading">查询</span>
+                    <span v-else>读取中...</span>
+                </i-button>
+                <!--查询表单内容-->
+                <row :gutter="16">
+                    <i-form :model="myForm" label-position="right" :label-width="100">
+                        <i-col span="6">
+                            <form-item label="菜单名称">
+                                <i-input v-model="myForm.moduleName"></i-input>
+                            </form-item>
+                        </i-col>
+                        <i-col span="6">
+                            <form-item label="菜单级别">
+                                <i-select v-model="myForm.moduleLevel" clearable style="width:200px">
+                                    <i-option v-for="item in moduleLevelList" :value="item.value" :key="item.value">
+                                        {{ item.label }}
+                                    </i-option>
+                                </i-select>
+                            </form-item>
+                        </i-col>
+                    </i-form>
+                </row>
+            </Card>
+        </i-col>
+    </row>
+    <!-- 搜索工具框 结束-->
+
+    <!-- 表单Grid，使用layerUI的表格组件 开始 -->
+    <row style="padding: 10px">
+        <i-col span="24">
+            <!-- 使用方法渲染模式 -->
+            <table id="moduleTable" lay-filter="moduleTable"></table>
+            <script type="text/html" id="barTools">
+                <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+            </script>
+        </i-col>
+    </row>
+    <!-- 表单Grid，使用layerUI的表格组件 结束 -->
+
+
+    <!--新增/编辑菜单Modal-->
+    <Modal v-model="add_modal" title="菜单管理"
+           :styles="{left:'0px',top:'10px',width:'1000px'}">
+        <row>
+            <i-col span="22">
+                <i-form ref="editForm" :model="editForm" :rules="ruleValidate" label-position="right"
+                        :label-width="100">
+                    <form-item label="菜单名称" prop="moduleId" style="display:none">
+                        <i-input v-model="editForm.moduleId"></i-input>
+                    </form-item>
+                    <form-item label="菜单名称" prop="moduleName">
+                        <i-input v-model="editForm.moduleName"></i-input>
+                    </form-item>
+                    <form-item label="菜单级别" prop="moduleLevel">
+                        <i-select v-model="editForm.moduleLevel" clearable style="width:200px"
+                                  @on-change="queryVaildParentModule">
+                            <i-option v-for="item in moduleLevelList" :value="item.value" :key="item.value">
+                                {{ item.label }}
+                            </i-option>
+                        </i-select>
+                    </form-item>
+
+                    <form-item v-if="editForm.moduleLevel!='1'" label="父级菜单" prop="parentModuleName">
+                        <i-select v-model="editForm.parentModuleName" clearable style="width:200px">
+                            <i-option v-for="item in parentModuleList" :value="item.value" :key="item.value">
+                                {{ item.label }}
+                            </i-option>
+                        </i-select>
+                    </form-item>
+                    <form-item label="菜单地址" prop="moduleUrl">
+                        <i-input v-model="editForm.moduleUrl"></i-input>
+                    </form-item>
+                    <form-item label="菜单所属设备" prop="deviceType">
+                        <i-select v-model="editForm.deviceType" clearable style="width:200px">
+                            <i-option v-for="item in deviceList" :value="item.value" :key="item.value">
+                                {{ item.label }}
+                            </i-option>
+                        </i-select>
+                    </form-item>
+                    <form-item label="是否启用" prop="moduleStatus" true-value="1" false-value="0">
+                        <i-switch v-model="editForm.moduleStatus" size="large">
+                            <span slot="open">开启</span>
+                            <span slot="close">关闭</span>
+                        </i-switch>
+                    </form-item>
+                    <form-item label="菜单排序" prop="moduleOrder">
+                        <i-input v-model="editForm.moduleOrder"></i-input>
+                    </form-item>
+                    <form-item label="菜单图标" prop="moduleIcon">
+                        <i-input v-model="editForm.moduleIcon"></i-input>
+                    </form-item>
+                    <form-item label="菜单描述" prop="moduleDesc">
+                        <i-input v-model="editForm.moduleDesc" type="textarea" :autosize="{minRows: 2,maxRows: 5}"
+                                 placeholder="请输入菜单描述"></i-input>
+                    </form-item>
+                </i-form>
+            </i-col>
+        </row>
+        <div slot="footer">
+            <i-button type="primary" :loading="submitLoading" @click="submit()">
+                <span v-if="!submitLoading">提交</span>
+                <span v-else>处理中...</span>
+            </i-button>
+            <i-button type="ghost" v-if="editForm.moduleId==''" @click="resetEditForm()" style="margin-left: 8px">重置
+            </i-button>
+            <i-button type="ghost" @click="hideEditForm()" style="margin-left: 8px">关闭</i-button>
+        </div>
+    </Modal>
+</div>
+
+<script>
+    var layer;
+    var table;
+    var basePath;
+    var vm;
+
+    window.layinit(function (htConfig) {
+        var _htConfig = htConfig;
+        basePath = _htConfig.coreBasePath;
+
+
+        vm = new Vue({
+            el: '#app',
+            data: {
+                loading: false,
+                submitLoading: false,
+                myForm: {
+                    moduleName: '',
+                    moduleLevel: ''
+                },
+                editForm: {
+                    moduleId: '',
+                    moduleName: '',
+                    moduleLevel: '3',
+                    parentModuleName: '',
+                    moduleUrl: '',
+                    deviceType: 'PC',
+                    moduleStatus: true,
+                    moduleOrder: "999",
+                    moduleIcon: '',
+                    moduleDesc: ''
+                },
+                moduleLevelList: array_module,
+                deviceList: array_device_type,
+                add_modal: false,
+                ruleValidate: validateOpt,
+                parentModuleList: [],
+                delLoading: false
+            },
+            methods: {
+                toLoading() {
+                    if (table == null) return;
+                    this.loading = true;
+                    console.log(vm.myForm);
+                    table.reload('moduleTable', {
+                        where: {moduleName: vm.myForm.moduleName, moduleLevel: vm.myForm.moduleLevel}
+                        , page: {
+                            curr: 1 //重新从第 1 页开始
+                        }
+                    });
+                },
+                clickAddModule() {
+                    this.add_modal = true;
+                    this.$refs['editForm'].resetFields();
+                    queryVaildParentModule();
+                },
+                clickDeleteModule() {
+                    var checkStatus = table.checkStatus('moduleTable');
+                    var data = checkStatus.data;
+                    var delArray = new Array();
+                    if (data.length > 0) {
+                        for (var i = 0; i < data.length; i++) {
+                            delArray.push(data[i].moduleId);
+                        }
+                    }
+                    layer.confirm('确认删除勾选的菜单？', {
+                        btn: ['确定', '取消'] //按钮
+                    }, function (index) {
+                        layer.close(index);
+                        axios.delete(basePath + 'core/modules/DelModule?moduleIdList=' + delArray.join(','))
+                            .then(function (res) {
+                                if (res.data.code == "1") {
+                                    vm.$Modal.success({
+                                        title: '',
+                                        content: '删除成功'
+                                    });
+                                    vm.toLoading();
+                                } else {
+                                    vm.$Message.error('删除失败，消息：' + res.data.msg);
+                                }
+                            })
+                            .catch(function (error) {
+                                vm.$Message.error('接口调用异常!');
+                            });
+                    });
+                },
+                resetEditForm() {
+                    this.$refs['editForm'].resetFields();
+                },
+                hideEditForm() {
+                    this.add_modal = false;
+                    this.$refs['editForm'].resetFields();
+                },
+                submit() {
+                    editFormSubmit();
+                },
+                changeModuleLevel: queryVaildParentModule
+            },
+            mounted:function(){}
+        });
+
+
+        //使用layerUI的表格组件
+        layui.config({
+            base : '/plugins/layui/extend/modules/',
+            version : '1.0.11'
+        }).use(['layer', 'table','ht_ajax', 'ht_auth', 'ht_config'], function () {
+            layer = layui.layer;
+            table = layui.table;
+//        var config = layui.ht_config;
+//        basePath = config.basePath;
+            //执行渲染
+            table.render({
+                elem: '#moduleTable' //指定原始表格元素选择器（推荐id选择器）
+                , id: 'moduleTable'
+                , height: 550 //容器高度
+                , cols: [[
+                    {
+                        type: 'checkbox',
+                        fixed: 'left'
+                    },
+                    {
+                        field: 'moduleId',
+                        title: '菜单ID'
+                    }, {
+                        field: 'moduleName',
+                        title: '菜单名称'
+                    }, {
+                        field: 'moduleParentName',
+                        title: '上级菜单'
+                    }, {
+                        align: 'right',
+                        field: 'moduleUrl',
+                        title: '菜单地址'
+                    }, {
+                        align: 'right',
+                        field: 'moduleLevel',
+                        title: '菜单级别'
+                    }, {
+                        field: 'moduleStatus',
+                        title: '当前状态'
+                    }, {
+                        field: 'moduleDesc',
+                        title: '菜单描述'
+                    }, {
+                        field: 'createUser',
+                        title: '创建用户'
+                    }, {
+                        field: 'createTime',
+                        title: '创建时间'
+                    }, {
+                        fixed: 'right',
+                        title: '操作',
+                        width: 178,
+                        align: 'left',
+                        toolbar: '#barTools'
+                    }]], //设置表头
+                url:basePath + 'modules/queryModuleList',
+                //method: 'post' //如果无需自定义HTTP类型，可不加该参数
+                //request: {} //如果无需自定义请求参数，可不加该参数
+                //response: {} //如果无需自定义数据响应名称，可不加该参数
+                page: true,
+                done: function (res, curr, count) {
+                    //数据渲染完的回调。你可以借此做一些其它的操作
+                    //如果是异步请求数据方式，res即为你接口返回的信息。
+                    //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
+                    vm.loading = false;
+                }
+            });
+
+            //监听工具条
+            table.on('tool(moduleTable)', function (obj) {
+                var data = obj.data;
+                if (obj.event === 'edit') {
+                    queryEditModule(data.moduleId)
+                }
+            });
+        });
+
+
+    })
+
+
+
+
+
+    //菜单级别数组
+    var array_module = [{
+        value: '1',
+        label: '一级模块'
+    }, {
+        value: '2',
+        label: '二级模块'
+    }, {
+        value: '3',
+        label: '三级模块'
+    }];
+
+    var array_device_type = [{value: 'PC', label: 'PC'}, {value: 'APP', label: 'APP'}];
+
+    //表单验证配置参数
+    var validateOpt = {
+        moduleName: [
+            {required: true, message: '请输入菜单名称', trigger: 'blur'}
+        ],
+        moduleLevel: [
+            {required: true, message: '请选择菜单级别', trigger: 'change'}
+        ],
+        parentModuleName: [
+            {required: true, message: '请选择父级菜单', trigger: 'change'},
+            {
+                validator: function (rule, value, callback, source, options) {
+                    if (value != '1' && value == '') {
+                        callback(new Error('请选择父级菜单'));
+                    } else {
+                        callback();//校验通过
+                    }
+
+                }, trigger: 'blur'
+            }
+        ],
+        moduleUrl: [
+            {required: true, message: '请输入菜单地址', trigger: 'blur'}
+        ],
+        deviceType: [
+            {required: true, message: '请选择设备类型', trigger: 'blur'}
+        ],
+        moduleOrder: [
+            {required: true, message: '请设定菜单序号', trigger: 'blur'}
+        ],
+        moduleIcon: [
+            {required: true, message: '请设定菜单图标', trigger: 'blur'}
+        ],
+        moduleDesc: [
+            {required: true, message: '请设定菜单描述', trigger: 'blur'}
+        ]
+
+    };
+
+
+    //提交保存
+    var editFormSubmit = function () {
+        vm.$refs['editForm'].validate((valid) => {
+            if (valid) {
+                //vm.$Message.success('表单校验成功!');
+                /*
+                * axios的post方法，传送的content-type为"application/json"，
+                * 传输参数放在http请求的body内，后台需使用@RequestBody进行参数匹配
+                * */
+                axios.post(basePath + 'modules/addOrUpdateModule', vm.editForm)
+                    .then(function (res) {
+                        if (res.data.code == "1") {
+                            vm.hideEditForm();
+                            vm.$Modal.success({
+                                title: '',
+                                content: '操作成功'
+                            });
+                            vm.toLoading();
+                        } else {
+                            vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
+                        }
+                    })
+                    .catch(function (error) {
+                        vm.$Modal.error({content: '接口调用异常!'});
+                    });
+            } else {
+                vm.$Message.error({content: '表单校验失败!'});
+            }
+        });
+    }
+
+    var queryEditModule = function (moduleId) {
+        axios.get(basePath + 'modules/getModuleById', {params: {moduleId: moduleId}})
+            .then(function (res) {
+                if (res.data.code == "1") {
+                    vm.editForm.moduleId = res.data.data.moduleId;
+                    vm.editForm.moduleLevel = res.data.data.moduleLevel;
+                    vm.editForm.moduleName = res.data.data.moduleName;
+                    vm.editForm.moduleDesc = res.data.data.moduleDesc;
+                    vm.editForm.moduleIcon = res.data.data.moduleIcon;
+                    vm.editForm.moduleOrder = res.data.data.moduleOrder;
+                    vm.editForm.moduleStatus = res.data.data.moduleStatus;
+                    vm.editForm.moduleUrl = res.data.data.moduleUrl;
+                    vm.editForm.parentModuleName = res.data.data.parentModuleName;
+                    vm.editForm.deviceType = res.data.data.deviceType;
+                    queryVaildParentModule();
+                    vm.add_modal = true;
+                } else {
+                    vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
+                }
+            })
+            .catch(function (error) {
+                vm.$Modal.error({content: '接口调用异常!'});
+            });
+    }
+
+    //根据菜单级别查询可选父级菜单
+    var queryVaildParentModule = function () {
+        if (vm.editForm.moduleLevel == 1) {
+            //级别1，隐藏父级菜单选择框
+
+        } else {
+            if (vm.editForm.moduleLevel == null || vm.editForm.moduleLevel == '') {
+                return;
+            }
+            axios.get(basePath + 'modules/queryVaildParentModule', {
+                params: {
+                    moduleLevel: vm.editForm.moduleLevel
+                }
+            })
+                .then(function (res) {
+                    if (res.data.code == "1") {
+                        vm.parentModuleList = res.data.data;
+                    } else {
+                        vm.parentModuleList = [];
+                        vm.$Message.error('加载父级菜单失败!');
+                    }
+                })
+                .catch(function (error) {
+                    vm.$Message.error('接口调用异常!');
+                });
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.process.mapper.ProcessMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.process.entity.Process">
+        <id column="process_id" property="processId" />
+        <result column="process_name" property="processName" />
+        <result column="process_desc" property="processDesc" />
+        <result column="process_typeid" property="processTypeid" />
+        <result column="status" property="status" />
+        <result column="start_user_id" property="startUserId" />
+        <result column="start_time" property="startTime" />
+        <result column="approve_user_id" property="approveUserId" />
+        <result column="current_step" property="currentStep" />
+        <result column="back_step" property="backStep" />
+        <result column="is_direct_back" property="isDirectBack" />
+        <result column="create_user" property="createUser" />
+        <result column="create_time" property="createTime" />
+        <result column="update_user" property="updateUser" />
+        <result column="update_time" property="updateTime" />
+        <result column="process_result" property="processResult" />
+        <result column="business_id" property="businessId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        process_id AS processId, process_name AS processName, process_desc AS processDesc, process_typeid AS processTypeid, status, start_user_id AS startUserId, start_time AS startTime, approve_user_id AS approveUserId, current_step AS currentStep, back_step AS backStep, is_direct_back AS isDirectBack, create_user AS createUser, create_time AS createTime, update_user AS updateUser, update_time AS updateTime, process_engine_flage AS processEngineFlage, process_result AS processResult, business_id AS businessId
+    </sql>
+
+
+<!--    <select id="selectPage4Me" resultType="com.ht.litigation.service.vo.ProcessLitigationVo">
+        SELECT r.business_id,r.litigation_process_id,p.*
+        FROM `tb_process`  p
+        LEFT JOIN tb_litigation_process r
+        on r.process_id = p.process_id
+        WHERE  1=1
+        <if test="key != null and key != '' "  >
+            AND process_name LIKE  CONCAT('%', #{key}, '%')
+        </if>
+        <if test="key != null and key != '' "  >
+            AND process_name = #{key}
+        </if>
+
+
+    </select>-->
+
+    <select id="GetList" resultType="com.hongte.alms.base.process.vo.ProcessVo">
+        SELECT p.*
+        FROM `tb_process`  p
+        WHERE  1=1
+        <if test="key != null and key != '' "  >
+            AND p.process_name LIKE  CONCAT('%', #{key}, '%')
+        </if>
+
+        order by p.update_time desc
+    </select>
+
+
+    <select id="getRelatedProcess" resultType="com.hongte.alms.base.process.entity.Process">
+        select p.* from tb_litigation_process lp
+        left join tb_process p on lp.process_id=p.process_id
+        where lp.business_id=#{businessId} and p.process_typeid=#{processTypeID}
+    </select>
+    <update id="updateProcessStep">
+        UPDATE tb_process set approve_user_id=#{approveUserID},current_step=#{currentStep}
+        where process_id=#{processID}
+    </update>
+    <update id="updateProcessBack">
+        UPDATE tb_process set back_step=#{backStep},is_direct_back=#{isDirectBack}
+        where process_id=#{processID}
+    </update>
+    <select id="getProcessManagerList" resultType="java.util.Map">
+        set @num := 0, @partitionByKey := '';
+
+        SELECT
+
+        l.business_id,
+        l.final_borrow_money,
+        l.repayment_principa,
+        l.repayment_periods,
+        l.total_periods,
+        l.original_name,
+        CONCAT(l.repayment_periods,'/',l.total_periods) as repaymentResult,
+        l.customer_name,
+        bt.param_name as business_type_name,
+        c.dept_name as company_name,
+        t.type_name as process_type_name,
+        date_format(p.create_time, '%Y-%m-%d') as apply_time,
+        lp.process_id,
+        ifnull(cn.approve_user_id,'') as approve_user_id,
+        ifnull(rt.return_user_id,'') as return_user_id,
+        p.current_step,
+        lp.process_id
+        FROM tb_litigation_process lp
+        INNER JOIN tb_litigation l ON lp.business_id=l.business_id
+        INNER JOIN tb_process p ON lp.process_id=p.process_id
+        left join (
+        select p.process_id,p.approve_user_id  from tb_process p where p.status=0
+        )cn on lp.process_id=cn.process_id
+        left join (
+        select a.process_id,a.create_user as return_user_id from(
+        SELECT case when @partitionByKey = l.process_id then @num:=@num+1 else @num:=1 end rownum, @partitionByKey:=l.process_id partitionByKey ,l.*
+        FROM tb_process_log l
+        where l.current_step is not null
+        order by l.process_id,l.create_time desc)a
+        left join tb_process p on a.process_id=p.process_id
+        where a.rownum=1 and p.status=0 and a.is_pass=1 and a.is_send_from_start=0
+        )rt on lp.process_id=rt.process_id
+        left join (select p.param_value,p.param_name from tb_parameter p where p.param_type='businessType')bt on l.business_type=bt.param_value
+        left join tb_dept c on l.business_company_id=c.dept_id
+        left join tb_process_type t on p.process_typeid=t.type_id
+
+        WHERE  1=1
+        <if test="requestInfo.processStartTime != null "  >
+            AND p.create_time >= #{requestInfo.processStartTime}
+        </if>
+        <if test="requestInfo.processEndTime != null "  >
+            AND  p.create_time <![CDATA[ <= ]]>   #{requestInfo.processEndTime}
+        </if>
+        <if test="requestInfo.businessId != null and requestInfo.businessId != ''"  >
+            AND lp.business_id= #{requestInfo.businessId}
+        </if>
+        <if test="requestInfo.businessType != null and requestInfo.businessType != '' "  >
+            AND l.business_type = #{requestInfo.businessType}
+        </if>
+        <if test="requestInfo.flowStatus != null"  >
+            AND p.status = #{requestInfo.flowStatus}
+        </if>
+        <if test="requestInfo.customerName != null and requestInfo.customerName != ''"  >
+            AND customer_name LIKE  CONCAT('%', #{requestInfo.customerName}, '%')
+        </if>
+        <if test="requestInfo.companyId != null  and requestInfo.companyId != ''"  >
+            AND l.business_company_id = #{requestInfo.companyId}
+        </if>
+        <if test="requestInfo.process_typeid != null  and requestInfo.process_typeid != ''"  >
+            AND p.process_typeid = #{requestInfo.process_typeid}
+        </if>
+        order by l.business_id desc
+    </select>
+    <select id="querySql"  parameterType="String" resultType="java.util.Map">
+        ${sql}
+    </select>
+    <select id="getLastProcess" resultType="com.hongte.alms.base.process.entity.Process">
+        select p.* from tb_litigation_process lp
+     inner join tb_process p on p.process_id=lp.process_id
+     where lp.business_id=#{processId} and p.process_typeid=#{typeId}
+         order by p.create_time desc limit 0,1
+    </select>
+    <select id="getProcessStartList" resultType="java.util.Map">
+
+        set @num := 0, @partitionByKey := '';
+
+        select   l.business_id,
+        l.final_borrow_money,
+        l.repayment_principa,
+        l.repayment_periods,
+        l.total_periods,
+        l.original_name,
+        CONCAT(l.repayment_periods,'/',l.total_periods) as repaymentResult,
+        l.customer_name,
+        date_format(l.accreditation_time, '%Y-%m-%d') as accreditation_time,/*立案时间，冗余字段*/
+        date_format(l.execution_time, '%Y-%m-%d') as   execution_time,/*执行立案时间，冗余字段*/
+        l.lawsuit_status,/*诉讼状态*/
+        ls.param_name as lawsuit_status_name,/*诉讼名称状态*/
+        l.arbitration_status,/*诉讼仲裁状态*/
+        ass.param_name as arbitration_status_name,/*诉讼仲裁状态名称*/
+
+        bt.param_name as business_type_name,
+        c.dept_name as company_name,
+        t.type_name as process_type_name,
+        date_format(p.create_time, '%Y-%m-%d') as apply_time,
+        ifnull(cn.approve_user_id,'') as approve_user_id,
+        ifnull(acu.user_name,cn.cn.approve_user_id) as approve_user_name,/*当前接收人，待审人*/
+        date_format(p.update_time, '%Y-%m-%d')    as approve_user_update_time,/*接收时间，上次节点的变更时间*/
+        date_format(p.create_time , '%Y-%m-%d')    as process_start_time,/*流程发起时间*/
+        ifnull(rt.return_user_id,'') as return_user_id,
+        p.current_step,
+        l.last_process_id
+        from tb_litigation l
+        left JOIN tb_process p ON l.last_process_id=p.process_id
+        left join (
+        select p.process_id,p.approve_user_id  from tb_process p where p.status=0
+        )cn on l.last_process_id=cn.process_id
+        left join (
+        select a.process_id,a.create_user as return_user_id from(
+        SELECT case when @partitionByKey = l.process_id then @num:=@num+1 else @num:=1 end rownum, @partitionByKey:=l.process_id partitionByKey ,l.*
+        FROM tb_process_log l
+        where l.current_step is not null
+        order by l.process_id,l.create_time desc)a
+        left join tb_process p on a.process_id=p.process_id
+        where a.rownum=1 and p.status=0 and a.is_pass=1 and a.is_send_from_start=0
+        )rt on l.last_process_id=rt.process_id
+        left join (select p.param_value,p.param_name from tb_parameter p where p.param_type='businessType')bt on l.business_type=bt.param_value
+        left join tb_dept c on l.business_company_id=c.dept_id
+        left join tb_user acu on cn.approve_user_id=acu.user_id
+        left join tb_process_type t on p.process_typeid=t.type_id
+        left join (
+        select p.param_int_value,p.param_name from tb_parameter p where p.param_type='lawsuitStatus'
+        )ls on l.lawsuit_status=ls.param_int_value
+        left join (
+        select p.param_int_value,p.param_name from tb_parameter p where p.param_type in ('arbitrationStatus','arbitrationStatus_law')
+        )ass on l.arbitration_status=ass.param_int_value
+
+        WHERE  1=1
+        <if test="requestInfo.processStartTime != null "  >
+            AND p.create_time >= #{requestInfo.processStartTime}
+        </if>
+        <if test="requestInfo.processEndTime != null "  >
+            AND p.create_time <![CDATA[ <= ]]>  #{requestInfo.processEndTime}
+        </if>
+        <if test="requestInfo.businessType != null and requestInfo.businessType != '' "  >
+            AND l.business_type = #{requestInfo.businessType}
+        </if>
+        <if test="requestInfo.customerName != null and requestInfo.customerName != ''"  >
+            AND customer_name LIKE  CONCAT('%', #{requestInfo.customerName}, '%')
+        </if>
+        <if test="requestInfo.companyId != null  and requestInfo.companyId != ''"  >
+            AND l.business_company_id = #{requestInfo.companyId}
+        </if>
+        <if test="requestInfo.accreditationBeginTime != null "  >
+            AND p.create_time >= #{requestInfo.accreditationBeginTime}
+        </if>
+        <if test="requestInfo.accreditationEndTime != null "  >
+            AND l.accreditation_time >= #{requestInfo.accreditationEndTime}
+        </if>
+
+        <if test="requestInfo.lawsuitStatus != null  and requestInfo.lawsuitStatus != ''"  >
+            AND l.lawsuit_status = #{requestInfo.lawsuitStatus}
+        </if>
+        <if test="requestInfo.businessId != null and requestInfo.businessId != ''"  >
+            AND l.accreditation_time= #{requestInfo.businessId}
+        </if>
+        <if test="requestInfo.process_typeid != null  and requestInfo.process_typeid != ''"  >
+            AND p.process_typeid = #{requestInfo.process_typeid}
+        </if>
+        <if test="requestInfo.executionBeginTime != null "  >
+            AND l.execution_time >= #{requestInfo.executionBeginTime}
+        </if>
+        <if test="requestInfo.executionEndTime != null "  >
+            AND l.execution_time >= #{requestInfo.executionEndTime}
+        </if>
+        <if test="requestInfo.breakStatus != null  and requestInfo.breakStatus != ''"  >
+            AND l.break_status = #{requestInfo.breakStatus}
+        </if>
+        <if test="requestInfo.closeStatus != null  and requestInfo.closeStatus != ''"  >
+            AND l.close_status = #{requestInfo.closeStatus}
+        </if>
+        order by l.business_id desc
+    </select>
+
+
+    <select id="selectProcessVoList" resultType="com.hongte.alms.base.process.vo.ProcessVo"
+            parameterType="com.hongte.alms.base.process.vo.ProcessReq">
+
+        select
+        process.process_id as processId,
+        process.process_name as processName,
+        business.business_id as businessId,
+        business.customer_name as customerName,
+        process.create_time as createTime,
+        process.process_typeid as processTypeId,
+        p_type.type_name as processTypeName,
+        p_type.type_code as processTypeCode,
+        process.status as status,
+        process.approve_user_id as approveUserId,
+        process.create_user as createUser,
+		business.company_id as companyId
+        from tb_process as process
+        LEFT JOIN tb_basic_business as business ON process.business_id = business.business_id
+        LEFT JOIN tb_process_type as p_type ON process.process_typeid = p_type.type_id
+
+        <!--            我已审批的 -->
+        <if test="reqPageeType == 'Approved' ">
+            JOIN (SELECT * FROM tb_process_log AS log WHERE log.approve_user_id = #{currentUserId}  GROUP BY log.process_id) as slog ON  process.process_id = slog.process_id
+        </if>
+
+        <!--            抄送我的 -->
+        <if test="reqPageeType == 'CopySendToMe' ">
+            LEFT JOIN   tb_process_log AS log  ON process.process_id = log.process_id
+            JOIN (
+            SELECT log1.process_log_id FROM tb_process_log_copy_send as lSend
+
+            LEFT JOIN tb_process_log AS log1 ON lSend.process_log_id = log1.process_log_id
+            WHERE lSend.receive_user_id = #{currentUserId}
+            GROUP BY log1.process_id
+            ) as _lSend ON  log.process_log_id = _lSend.process_log_id
+         </if>
+
+
+
+
+
+       <where>
+           <!--          /*关键字*/ -->
+            <if test="keyWord !=null and keyWord !=''">
+                and (
+                (business.business_id  LIKE '%${keyWord}%')
+                or (business.customer_name  LIKE '%${keyWord}%')
+                or (process.process_name LIKE '%${keyWord}%')
+                or (process.create_user LIKE	 '%${keyWord}%'))
+            </if>
+
+            <!--          /*发起时间 开始*/ -->
+            <if test="createTimeBegin !=null ">
+                <![CDATA[ and process.create_time >= #{createTimeBegin,jdbcType=TIMESTAMP}]]>
+            </if>
+            <!--            /*发起时间 结束*/ -->
+            <if test="createTimeEnd !=null ">
+                <![CDATA[ and process.create_time <= #{createTimeEnd,jdbcType=TIMESTAMP}]]>
+            </if>
+            <!--            /*流程类型*/ -->
+            <if test="processTypeId !=null  and processTypeId != '' ">
+                and process.process_typeid = #{processTypeId}
+            </if>
+            <!--          /*结束时间  开始  只查询已结束的 */ -->
+            <if test="finishTimeBegin !=null ">
+                <![CDATA[ and process.status = 2 AND process.update_time >= #{createTimeBegin,jdbcType=TIMESTAMP}]]>
+            </if>
+            <!--            /*结束时间   结束   只查询已结束的*/ -->
+            <if test="finishTimeEnd !=null ">
+                <![CDATA[ and process.status = 2  and process.update_time <= #{createTimeEnd,jdbcType=TIMESTAMP}]]>
+            </if>
+            <!--            /*审批状态*/ -->
+            <if test="processStatus !=null">
+                and process.status = #{processStatus}
+            </if>
+           <!--            /*分公司*/ -->
+            <if test="companyId !=null and processTypeId != ''">
+                and business.company_id = #{companyId}
+            </if>
+
+             <!--            需要我审批的 -->
+            <if test="reqPageeType == 'waitToApprove' ">
+                and  FIND_IN_SET (#{currentUserId},process.approve_user_id)  and process.status = 0
+            </if>
+
+             <!--            我发起的 -->
+            <if test="reqPageeType == 'SelfStart' ">
+                AND  process.start_user_id = #{currentUserId}
+            </if>
+
+          <!--            审批查询 -->
+            <!--  <if test="reqPageeType == Search ">
+                AND  copySend.receive_user_id = #{currentUserId}
+            </if>-->
+
+
+
+           </where>
+           order BY  process.create_time DESC
+       </select>
+
+   </mapper>

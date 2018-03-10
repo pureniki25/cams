@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.BasicBusinessMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.BasicBusiness">
+        <id column="business_id" property="businessId" />
+        <result column="input_time" property="inputTime" />
+        <result column="business_type" property="businessType" />
+        <result column="business_ctype" property="businessCtype" />
+        <result column="business_stype" property="businessStype" />
+        <result column="customer_id" property="customerId" />
+        <result column="customer_name" property="customerName" />
+        <result column="repayment_type_id" property="repaymentTypeId" />
+        <result column="borrow_money" property="borrowMoney" />
+        <result column="borrow_limit" property="borrowLimit" />
+        <result column="borrow_limit_unit" property="borrowLimitUnit" />
+        <result column="borrow_rate" property="borrowRate" />
+        <result column="borrow_rate_unit" property="borrowRateUnit" />
+        <result column="operator_id" property="operatorId" />
+        <result column="operator_name" property="operatorName" />
+        <result column="asset_id" property="assetId" />
+        <result column="company_id" property="companyId" />
+        <result column="output_platform_id" property="outputPlatformId" />
+        <result column="issue_split_type" property="issueSplitType" />
+        <result column="source_type" property="sourceType" />
+        <result column="source_business_id" property="sourceBusinessId" />
+        <result column="is_tuandai_repay" property="isTuandaiRepay" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="update_time" property="updateTime" />
+        <result column="update_user" property="updateUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        business_id AS businessId, input_time AS inputTime, business_type AS businessType, business_ctype AS businessCtype, business_stype AS businessStype, customer_id AS customerId, customer_name AS customerName, repayment_type_id AS repaymentTypeId, borrow_money AS borrowMoney, borrow_limit AS borrowLimit, borrow_limit_unit AS borrowLimitUnit, borrow_rate AS borrowRate, borrow_rate_unit AS borrowRateUnit, operator_id AS operatorId, operator_name AS operatorName, asset_id AS assetId, company_id AS companyId, output_platform_id AS outputPlatformId, issue_split_type AS issueSplitType, source_type AS sourceType, source_business_id AS sourceBusinessId, is_tuandai_repay AS isTuandaiRepay, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
+    </sql>
+
+    <!-- 查询申请减免界面业务基本信息内容 -->
+    <select id="selectBusinessInfoForApplyDerateVo" resultType="com.hongte.alms.base.vo.module.BusinessInfoForApplyDerateVo">
+
+        select
+        business.business_id AS businessId,
+        business.customer_name AS customerName,
+        business.company_id as companyId,
+        company.area_name AS companyName,
+        business.business_type AS businessType,
+        b_type.business_type_name AS businessTypeName,
+        business.borrow_limit AS borrowLimit,
+        business.repayment_type_id AS repaymentTypeId,
+        sys_param.param_name AS repaymentTypeName,
+        business.borrow_rate AS borrowRate,
+        business.borrow_rate_unit AS borrowRateUnit,
+        business.borrow_money AS borrowMoney,
+
+        pList.period as  periods,
+        pList.overdue_days as delayDays,
+        pList.total_borrow_amount as totalBorrowAmount,
+
+        c.needPayPrincipal as needPayPrincipal,
+        c.needPayInterest as needPayInterest,
+        c.needPayPenalty as needPayPenalty,
+        c.otherPayAmount as otherPayAmount
+
+
+        from tb_repayment_biz_plan_list  as pList
+        LEFT JOIN tb_repayment_biz_plan as plan ON pList.plan_id = plan.plan_id
+        LEFT JOIN tb_basic_business as business ON plan.original_business_id = business.business_id
+        LEFT JOIN tb_basic_company as company ON business.company_id = company.area_id
+        LEFT JOIN tb_basic_business_type as  b_type ON business.business_type = b_type.business_type_id
+        LEFT JOIN tb_sys_parameter as  sys_param ON business.repayment_type_id = sys_param.param_value
+        LEFT JOIN (
+        select t1.plan_list_id,
+        <!--   应还本金总额（应付本金 ）-->
+        sum(case when t1.plan_item_type =10 then t1.plan_amount else 0 end) AS `needPayPrincipal`,
+        <!--   应还利息总额（应付利息）-->
+        sum(case when t1.plan_item_type =20 then t1.plan_amount else 0 end) `needPayInterest`,
+        <!--   应还违约金总额（应付违约金）-->
+        sum(case when t1.plan_item_type =70 then t1.plan_amount else 0 end) `needPayPenalty`,
+        <!--   应还其他费用-->
+        sum(case when (t1.plan_item_type !=70 and t1.plan_item_type !=20 and t1.plan_item_type !=10)  then t1.plan_amount else 0 end) `otherPayAmount`,
+
+        <!--   应还总额-->
+        sum( t1.plan_amount ) `totalBorrowAmount`
+
+        from tb_repayment_biz_plan_list_detail t1
+        group by t1.plan_list_id
+        ) c on pList.plan_list_id = c.plan_list_id
+        <where>
+            sys_param.param_type = 6
+            and pList.plan_list_id = #{crpId}
+
+        </where>
+
+
+    </select>
+
+    <!-- 查询用户可访问的业务几个字段信息  -->
+    <select id="selectUserPermissionBusinessDtos" resultType="com.hongte.alms.base.dto.UserPermissionBusinessDto">
+        select company_id as CompanyId,
+        business_id as businessId
+        FROM  tb_basic_business WHERE
+        1=1
+        <if test="companyIds !=null">
+            AND  company_id IN
+            <foreach collection="companyIds" item="companyId" index="index"
+                     open="(" close=")" separator=",">
+                #{companyId}
+            </foreach>
+        </if>
+
+
+    </select>
+    
+</mapper>

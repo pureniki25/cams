@@ -1,0 +1,79 @@
+
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+    <title >查看款项池</title>
+
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
+    <!-- iview样式 -->
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
+    <!--@import url("//unpkg.com/iview/dist/styles/iview.css");-->
+    <!--<link rel="stylesheet" type="text/css" href="//unpkg.com/iview/dist/styles/iview.css"/>-->
+    <!-- 引入layui样式 -->
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all"/>
+
+    <!--   <script src="//unpkg.com/vue/dist/vue.js"></script>
+       <script src="//unpkg.com/iview/dist/iview.min.js"></script>-->
+    <!-- 引入vue -->
+    <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+    <!-- iview js -->
+    <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+    <!--引入layui.js-->
+    <script src="/plugins/layui/layui.js"></script>
+    <!--引入axios.js 用于ajax调用-->
+    <script src="/plugins/axios/axios.min.js"></script>
+    <!-- 引入jQuery，必须在appToken.js 之前引入 -->
+    <script src="/build/js/jquery-3.3.1.min.js"></script>
+    <!-- 设置全局请求头:app、Authorization -->
+    <script src="/build/js/appToken.js"></script>
+    <!--引入公共的一些方法-->
+    <script src="/src/js/comm.js"></script>
+    <style>
+        td.FONTCOLOR0099CC{
+            color:#0099CC
+        }
+    </style>
+</head>
+<body>
+<!--隐藏元素-->
+<!--<p id="staffType"  th:attr="value=${staffType}"  hidden />-->
+<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+<div id="t1" v-cloak>
+    <Row>
+        <i-col span="24">
+            <Card>
+                <p slot="title">款项池登记信息</p>
+                <i-table :content="self" :columns="columns1" :data="data1"></i-table>
+            </Card>
+        </i-col>
+    </Row>
+    <Modal v-model="cert_modal" title="查看凭证"  :styles="{left:'0px',top:'10px',width:'960px'}" scrollable=true>
+            <Row>
+                <i-col span="24">
+                    <img :src="cert_modal_url" style="max-width: 100%" />
+                </i-col>
+            </Row>
+            <div slot="footer" style="text-align:left"></div>
+        </Modal>
+</div>
+<div id="t2" v-cloak>
+    <Row>
+        <i-col span="24">
+            <Card>
+                <p slot="title">匹配的款项池银行流水</p>
+                <i-table :content="self" :columns="columns1" :data="data1"></i-table>
+            </Card>
+        </i-col>
+    </Row>
+</div>
+<script src="/src/js/collection/checkFundPool.js" ></script>
+<script>
+
+</script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: alms-gateway
+  cloud:
+    config:
+      #uri: http://localhost:8888
+      # profile对应config server所获取的配置文件中的{profile}
+      profile: dev
+      label: config
+server:
+    port: 30677 #启动端口
+
+zuul:
+  #prefix: /techouse #为zuul设置一个公共的前缀
+  #ignoredServices: '*'
+  routes:
+    alms-ui:
+      path: /** #匹配/techouse/usersystem/** 均路由到cloud-client
+    alms-core-service:
+      path: /core/**
+    alms-timer-service:
+      path: /timer/**
+  host:
+    connect-timeout-millis: 6000
+ribbon:
+  eureka:
+    enabled: false #配置zuul路由时用将此属性设置为false
+
+alms-ui:
+  ribbon:
+    listOfServers: 127.0.0.1:30601 #为cloud-client服务指定一组服务地址，应该是用于负载均衡
+alms-core-service:
+  ribbon:
+    listOfServers: 127.0.0.1:30606 #为cloud-client服务指定一组服务地址，应该是用于负载均衡
+alms-timer-service:
+  ribbon:
+    listOfServers: 127.0.0.1:30616 #为cloud-client服务指定一组服务地址，应该是用于负载均衡
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:30600/eureka/
+http:
+    multipart:
+      max-file-size: 2Mb      # Max file size，默认1M
+      max-request-size: 20Mb   # Max request size，默认10M

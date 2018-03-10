@@ -1,0 +1,129 @@
+
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <title>贷后跟踪记录</title>
+    <!-- 默认主题样式 -->
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
+    <!-- iview样式 -->
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
+    <!-- 引入layui样式 -->
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all"/>
+
+    <!-- 引入vue -->
+    <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+    <!-- iview js -->
+    <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+    <!--引入layui.js-->
+    <script src="/plugins/layui/layui.js"></script>
+    <!--引入axios.js 用于ajax调用-->
+    <script src="/plugins/axios/axios.min.js"></script>
+    <!-- 引入jQuery，必须在appToken.js 之前引入 -->
+    <script src="/build/js/jquery-3.3.1.min.js"></script>
+    <!-- 设置全局请求头:app、Authorization -->
+    <script src="/build/js/appToken.js"></script>
+</head>
+<body>
+<!--隐藏元素-->
+<p id="businessId"  th:attr="value=${businessId}"  hidden />
+<p id="crpId"  th:attr="value=${crpId}"  hidden />
+<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+<div id="app" v-cloak>
+
+    <Card>
+        <p slot="title">
+            贷后跟踪记录
+        </p>
+        <!--右上侧按钮列表-->
+        <i-button slot="extra" type="success"  @click="toShowEditModal" style="margin-right:10px">
+            <span>增加</span>
+        </i-button>
+
+
+        <!--查询表单内容-->
+        <row :gutter="16">
+            <i-form ref="businessInfForm"  :model="businessInfForm"   label-position="right" :label-width="100">
+                <i-col span="6">
+                    <form-item label="业务编号：" >{{ businessInfForm.businessId }} </form-item>
+                </i-col>
+                <i-col span="4">
+                    <form-item label="客户姓名：" >{{ businessInfForm.customerName }} </form-item>
+                </i-col>
+                <i-col span="4">
+                    <form-item label="贷款金额：" >{{ businessInfForm.borrowMoney }} </form-item>
+                </i-col>
+                <i-col span="4">
+                    <form-item label="还款方式：" >{{ businessInfForm.repaymentType }} </form-item>
+                </i-col>
+                <i-col span="4">
+                    <form-item label="借款期限：" >{{ businessInfForm.borrowLimit }} </form-item>
+                </i-col>
+            </i-form>
+        </row>
+    </Card>
+
+
+    <!-- 表单Grid，使用layerUI的表格组件 开始 -->
+    <row style="padding: 10px">
+        <i-col span="24">
+            <!-- 使用方法渲染模式 -->
+            <table id="listTable" lay-filter="listTable"></table>
+            <script type="text/html" id="barTools">
+                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">编辑</a>
+                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="del">删除</a>
+            </script>
+        </i-col>
+    </row>
+    <!-- 表单Grid，使用layerUI的表格组件 结束 -->
+
+
+    <!--新增/编辑贷后跟踪记录Modal-->
+    <Modal  ref="addLogModal" v-model="addLogModal" title="添加/修改贷后跟踪信息" @on-cancel="hideEditForm">
+        <row>
+            <i-col span="22">
+                <i-form ref="editLogForm" :model="editLogForm" :rules="ruleValidate" label-position="right"
+                        :label-width="100">
+                    <row style="padding: 10px">
+                            <form-item label="状态：" prop="status">
+                                <i-select v-model="editLogForm.status" clearable  filterable >
+                                    <!--<i-option v-for="item in statusList" :value="item" :key="item">{{ item.paramName }}</i-option>-->
+                                    <i-option v-for="item in statusList" :value="item.paramValue" :key="item.paramName">{{ item.paramName }}</i-option>
+                                </i-select>
+                            </form-item>
+                    </row>
+                    <row style="padding: 10px">
+                        <form-item label="是否传输平台：" prop="ifSendToPlat" >
+                            <radio-group v-model="editLogForm.ifSendToPlat">
+                                <radio label="是"></radio>
+                                <radio label="否"></radio>
+                            </radio-group>
+                        </form-item>
+                    </row>
+                    <row style="padding: 10px">
+                        <form-item label="跟踪记录："   prop="content">
+                            <i-input v-model="editLogForm.content" type="textarea" :rows="4" placeholder="请填写跟踪记录"></i-input>
+                        </form-item>
+                    </row>
+                </i-form>
+            </i-col>
+        </row>
+        <div slot="footer">
+            <i-button type="primary" :loading="submitLoading" @click="submit()">
+                <span v-if="!submitLoading">保存</span>
+                <span v-else>保存中...</span>
+            </i-button>
+            <i-button type="ghost" @click="hideEditForm()" style="margin-left: 8px">撤销</i-button>
+        </div>
+    </Modal>
+</div>
+
+<script src="/src/js/collection/staffFollowRecord.js" ></script>
+<script>
+
+</script>
+</body>
+</html>

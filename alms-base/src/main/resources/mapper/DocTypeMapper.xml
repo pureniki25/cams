@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.DocTypeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.DocType">
+        <id column="doc_type_id" property="docTypeId" />
+        <result column="type_code" property="typeCode" />
+        <result column="doc_type_name" property="docTypeName" />
+        <result column="node_type" property="nodeType" />
+        <result column="row_index" property="rowIndex" />
+        <result column="parent_type_id" property="parentTypeId" />
+        <result column="create_user" property="createUser" />
+        <result column="create_time" property="createTime" />
+        <result column="update_user" property="updateUser" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        doc_type_id AS docTypeId, type_code AS typeCode, doc_type_name AS docTypeName, node_type AS nodeType, row_index AS rowIndex, parent_type_id AS parentTypeId, create_user AS createUser, create_time AS createTime, update_user AS updateUser, update_time AS updateTime
+    </sql>
+    <select id="getDocTypeItemList" resultType="com.hongte.alms.base.vo.module.doc.DocTypeItem">
+        select * from (
+select  t.doc_type_name as 'text',t.type_code as 'value', t.doc_type_id as 'docTypeID',t.type_code as 'typeCode', t.node_type as 'nodeType',t.row_index as 'rowIndex' ,null as parentID  from tb_doc_type t where t.parent_type_id in (select doc_type_id from tb_doc_type  where parent_type_id is null and type_code=#{typeCode} )
+union all
+select t.doc_type_name as 'text',t.type_code as 'value', t.doc_type_id as 'docTypeID',t.type_code as 'typeCode', t.node_type as 'nodeType',t.row_index as 'rowIndex' ,t.parent_type_id as parentID from tb_doc_type t where t.parent_type_id in (
+select t.doc_type_id from tb_doc_type t where t.parent_type_id in (select doc_type_id from tb_doc_type  where parent_type_id is null and type_code=#{typeCode} )))
+a order by a.parentID,a.rowIndex
+    </select>
+    <select id="getDocItemList" resultType="com.hongte.alms.base.vo.module.doc.DocItem">
+
+  select d.doc_name as 'title',d.doc_url as 'url',d.doc_id as 'docID',d.business_id as 'businessID',d.doc_type_id as 'docTypeID',lower(d.file_type) as 'ext' from tb_doc d
+  where d.business_id=#{businessID} and d.doc_type_id in (
+
+  select doc_type_id from (
+select  t.doc_type_id   from tb_doc_type t where t.parent_type_id in (select doc_type_id from tb_doc_type  where parent_type_id is null and type_code=#{typeCode} )
+union all
+select t.doc_type_id  from tb_doc_type t where t.parent_type_id in (
+select t.doc_type_id from tb_doc_type t where t.parent_type_id in (select doc_type_id from tb_doc_type  where parent_type_id is null and type_code=#{typeCode})))a)
+    </select>
+
+    <select id="getDocTypeByTypeCode" resultType="com.hongte.alms.base.vo.module.doc.DocTypeItem">
+
+select  t.doc_type_name as 'text',t.type_code as 'value', t.doc_type_id as 'docTypeID',t.type_code as 'typeCode', t.node_type as 'nodeType',t.row_index as 'rowIndex' ,null as parentID  from tb_doc_type t where t. type_code=#{typeCode} 
+ order by t.row_index
+    </select>
+</mapper>

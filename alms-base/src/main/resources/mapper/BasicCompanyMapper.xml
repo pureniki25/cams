@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.BasicCompanyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.BasicCompany">
+        <id column="area_id" property="areaId" />
+        <result column="asset_side_id" property="assetSideId" />
+        <result column="area_name" property="areaName" />
+        <result column="area_short_name" property="areaShortName" />
+        <result column="area_level" property="areaLevel" />
+        <result column="area_pid" property="areaPid" />
+        <result column="district_id" property="districtId" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="update_time" property="updateTime" />
+        <result column="update_user" property="updateUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        area_id AS areaId, asset_side_id AS assetSideId, area_name AS areaName, area_short_name AS areaShortName, area_level AS areaLevel, area_pid AS areaPid, district_id AS districtId, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
+    </sql>
+
+</mapper>

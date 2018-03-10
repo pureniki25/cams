@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <title>拖车登记</title>
+    <!-- 默认主题样式 -->
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
+    <!-- iview样式 -->
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
+
+
+    <!--表格样式-->
+    <link rel="stylesheet" href="/Components/Table/Table.css">
+
+    <!-- 引入vue -->
+    <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+    <!--iview js -->
+    <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+
+    <!--引入layui.js-->
+    <script src="/plugins/layui/layui.js"></script>
+    <!--引入axios.js 用于ajax调用-->
+    <script src="/plugins/axios/axios.min.js"></script>
+
+    <!-- 引入jQuery，必须在appToken.js 之前引入 -->
+    <script src="/build/js/jquery-3.3.1.min.js"></script>
+    <!-- 设置全局请求头:app、Authorization -->
+    <script src="/build/js/appToken.js"></script>
+
+</head>
+<body>
+
+<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+<div id="app" v-cloak>
+    <Card>
+        <p slot="title">
+            业务基本信息
+        </p>
+
+        <!--业务基本信息-->
+        <row :gutter="16">
+            <i-form ref="baseInfoForm" :model="baseInfoForm" label-position="right" :label-width="100">
+                <div class="table">
+                    <div class="tr">
+                        <div class="td">
+                            <div class="td-box">业务编号</div>
+                            <div class="td-box">{{ baseInfoForm.businessId }}</div>
+                        </div>
+                        <div class="td">
+                            <div class="td-box">客户姓名</div>
+                            <div class="td-box">{{ baseInfoForm.customerName }}</div>
+                        </div>
+                        <div class="td">
+                            <div class="td-box">借款金额</div>
+                            <div class="td-box">{{ baseInfoForm.borrowMoney }}</div>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="td">
+                            <div class="td-box">借款期限</div>
+                            <div class="td-box">{{ baseInfoForm.borrowLimit }}{{ borrowLimitUnitHuman }}</div>
+                        </div>
+                        <div class="td">
+                            <div class="td-box">还款方式</div>
+                            <div class="td-box">{{ repaymentTypeHuman }}</div>
+                        </div>
+                        <div class="td">
+                            <div class="td-box">{{borrowRateUnitHuman}}</div>
+                            <div class="td-box">{{ baseInfoForm.borrowRate }}%</div>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="td">
+                            <div class="td-box">车牌号</div>
+                            <div class="td-box"> {{ baseInfoForm.licensePlateNumber }}</div>
+                        </div>
+                        <div class="td">
+                            <div class="td-box">品牌型号</div>
+                            <div class="td-box">{{ baseInfoForm.model }}</div>
+                        </div>
+                        <div class="td">
+                            <div class="td-box">车架号</div>
+                            <div class="td-box">{{ baseInfoForm.vin }}</div>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="td">
+                            <div class="td-box">评估时间</div>
+                            <div class="td-box">{{ baseInfoForm.evaluationTime }}</div>
+                        </div>
+                        <div class="td">
+                            <div class="td-box">车辆评估价值</div>
+                            <div class="td-box">{{ baseInfoForm.evaluationAmount }}</div>
+                        </div>
+                        <div class="td">
+                            <div class="td-box">评估人</div>
+                            <div class="td-box">{{ baseInfoForm.evaluationUser }}</div>
+                        </div>
+                    </div>
+                </div>
+            </i-form>
+        </row>
+    </Card>
+    <Card>
+        <p slot="title">
+            登记信息
+        </p>
+        <!--登记信息表单内容-->
+        <row :gutter="16">
+            <i-form ref="registrationInfoForm"  :model="registrationInfoForm"  :rules="validateRegistrationInfoForm" label-position="right" :label-width="100">
+                <row :gutter="16">
+                    <i-col span="10">
+                        <form-item label="拖车日期：" prop="dragDate" >
+                            <date-picker type="date" :value='registrationInfoForm.dragDate' format="yyyy-MM-dd" :options="componentOption.dragDatePicker" placeholder="Select date"></date-picker>
+                        </form-item>
+                    </i-col>
+
+                </row>
+                <row :gutter="16">
+                    <i-col span="10">
+                        <form-item label="拖车经办人："   prop="dragHandler">
+                            <i-input v-model="registrationInfoForm.dragHandler" ></i-input>
+                        </form-item>
+                    </i-col>
+                </row>
+                <form-item label="拖车地点：">
+                    <row :gutter="9">
+                        <i-col span="4">
+                            <form-item  prop="dragArea">
+                                <cascader :data="componentOption.areaData" v-model="registrationInfoForm.dragArea"></cascader>
+                            </form-item>
+                        </i-col>
+                        <i-col span="5">
+                            <form-item  prop="detailAddress">
+                                <i-input v-model="registrationInfoForm.detailAddress" placeholder="详细地址" ></i-input>
+                            </form-item>
+                        </i-col>
+                    </row>
+                </form-item>
+
+                <row :gutter="16">
+                    <i-col span="10">
+                        <form-item label="拖车费用："   prop="fee">
+                            <i-input v-model="registrationInfoForm.fee" ></i-input>
+                        </form-item>
+                    </i-col>
+                </row>
+                <row :gutter="16">
+                    <i-col span="10">
+                        <form-item label="其他费用："   prop="otherFee">
+                            <i-input v-model="registrationInfoForm.otherFee" ></i-input>
+                        </form-item>
+                    </i-col>
+                </row>
+                <row :gutter="16">
+
+                    <i-col span="10">
+                        <form-item   label="备注："   prop="remark"  >
+                            <i-input v-model="registrationInfoForm.remark" type="textarea" :rows="4" placeholder="" ></i-input>
+                        </form-item>
+                    </i-col>
+                </row>
+            </i-form>
+        </row>
+    </Card>
+    <Card>
+        <p slot="title">
+            附件信息
+        </p>
+    </Card>
+    <row style="padding: 10px">
+        <i-col span="10">
+            <i-button type="success"  @click="saveRegistrationInfo('registrationInfoForm')" >保存</i-button>
+            <i-button type="warning"  @click="resetEdit()"  >撤销</i-button>
+        </i-col>
+    </row>
+</div>
+<script>
+    window.layinit(function (htConfig) {
+        var _htConfig = htConfig;
+        var basePath = _htConfig.coreBasePath;
+
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                baseInfoForm:
+                    {
+                        businessId: '',
+                        customerName: '',
+                        borrowMoney: 0,
+                        borrowLimit: 0,
+                        borrowLimitUnit: 0,
+                        repaymentTypeId: 0,
+                        borrowRate: 0,
+                        borrowRateUnit: 0,
+                        licensePlateNumber: '',
+                        model: '',
+                        vin: '',
+                        evaluationTime: '',
+                        evaluationAmount: 0,
+                        evaluationUser: ''
+                    },
+                registrationInfoForm:
+                    {
+                        dragDate: new Date().getFullYear() + "-" + new Date().getMonth() + "-" + new Date().getDate(),
+                        dragHandler: '',
+                        dragArea: [],
+                        province: '',
+                        city: '',
+                        county: '',
+                        detailAddress: '',
+                        fee: '',
+                        otherFee: '',
+                        remark: '',
+
+                    },
+                validateRegistrationInfoForm:
+                    {
+                        dragDate: [{required: true, message: '请填写拖车日期', trigger: 'blur'}],
+                        dragHandler: [{required: true, message: '请填写拖车经办人', trigger: 'blur'}, {
+                            min: 1,
+                            max: 20,
+                            message: '拖车经办人需要在20汉字以内',
+                            trigger: 'blur'
+                        }],
+                        dragArea: [{required: true, message: '请选择拖车地点'}],
+                        detailAddress: [{required: true, message: '请填写详细地址', trigger: 'blur'}, {
+                            min: 1,
+                            max: 100,
+                            message: '详细地址需要在100汉字以内',
+                            trigger: 'blur'
+                        }],
+                        fee: [{required: true, message: '请填写拖车费用', trigger: 'blur'}, {
+                            pattern: "^[0-9]+(.[0-9]{1,2})?$",
+                            message: '请填写不超过两位小数的数字',
+                            trigger: 'blur'
+                        }],
+                        otherFee: [{pattern: "^[0-9]+(.[0-9]{1,2})?$", message: '请填写不超过两位小数的数字', trigger: 'blur'}],
+                        remark: [{
+
+                            validator: function (rule, value, callback, source, options) {
+                                if (vm.registrationInfoForm.otherFee.length > 1000) {
+                                    callback(new Error('备注字数不能多于1000'));
+                                } else {
+                                    callback();//校验通过
+                                }
+
+                            }, trigger: 'blur'
+                        }]
+
+                    },
+                componentOption: {
+                    dragDatePicker:
+                        {
+                            disabledDate: function (date) {
+                                return date > new Date();
+                            },
+
+                        },
+                    areaData: []
+                }
+
+            },
+            computed: {
+
+                borrowLimitUnitHuman: function () {
+                    switch (this.baseInfoForm.borrowLimitUnit) {
+                        case 1:
+                            return '个月';
+                        case 2:
+                            return '天';
+                        default:
+                            return '';
+                    }
+                },
+                repaymentTypeHuman: function () {
+                    switch (this.baseInfoForm.repaymentTypeId) {
+                        case 1:
+                            return '到期本息';
+                        case 2:
+                            return '先息后本';
+                        case 5:
+                            return '等额本息';
+                        default:
+                            return '不等额本息';
+
+                    }
+                },
+                borrowRateUnitHuman: function () {
+                    switch (this.baseInfoForm.borrowRateUnit) {
+                        case 1:
+                            return '年利率';
+                        case 2:
+                            return '月利率';
+                        case 4:
+                            return '日利率';
+                        default:
+                            return ''
+                    }
+                }
+            },
+            methods: {
+                getQueryString: function (name) {
+                    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); // 匹配目标参数
+                    var result = window.location.search.substr(1).match(reg); // 对querystring匹配目标参数
+                    if (result != null) {
+                        return decodeURIComponent(result[2]);
+                    } else {
+                        return null;
+                    }
+                },
+                getCarDragRegistrationBusinessInfo: function (businessId) {
+                    var self = this;
+                    var reqStr = basePath + "car/getCarDragRegistrationBusinessInfo?businessId=" + businessId
+                    axios.get(reqStr)
+                        .then(function (result) {
+                            if (result.data.code == "1") {
+                                self.baseInfoForm = result.data.data;
+                            } else {
+                                self.$Modal.error({content: '获取数据失败，消息：' + result.data.msg});
+                            }
+                        })
+                },
+                getArea: function () {
+                    var self = this;
+                    var reqStr = basePath + "area/getArea";
+                    axios.get(reqStr)
+                        .then(function (result) {
+                            if (result.data.code == "1") {
+                                self.componentOption.areaData = result.data.data;
+                            }
+                        })
+
+                },
+                saveRegistrationInfo: function (name) {
+                    var self = this;
+                    this.$refs[name].validate(function (isValid) {
+                        if (isValid) {
+                            self.registrationInfoForm.province = self.registrationInfoForm.dragArea.length > 0 ? self.registrationInfoForm.dragArea[0] : '';
+                            self.registrationInfoForm.city = self.registrationInfoForm.dragArea.length > 1 ? self.registrationInfoForm.dragArea[1] : '';
+                            self.registrationInfoForm.county = self.registrationInfoForm.dragArea.length > 2 ? self.registrationInfoForm.dragArea[2] : '';
+                            axios.post(basePath + 'car/saveDragRegistrationInfo', self.registrationInfoForm)
+                                .then(function (result) {
+                                    if (result.data.code == "1") {
+                                        self.$Modal.success({
+                                            // title: title,
+                                            content: "保存成功"
+                                        });
+                                    } else {
+                                        self.$Modal.error({content: '操作失败，消息：' + result.data.msg});
+                                    }
+                                })
+                        }
+                    })
+                }
+            },
+            created: function () {
+                var businessId = this.getQueryString("businessId");
+                this.getCarDragRegistrationBusinessInfo(businessId);
+                this.getArea();
+            }
+
+        })
+    })
+</script>
+
+</body>
+</html>

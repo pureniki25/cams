@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.SysParameterMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.SysParameter">
+        <id column="param_id" property="paramId" />
+        <result column="param_name" property="paramName" />
+        <result column="param_type" property="paramType" />
+        <result column="param_type_name" property="paramTypeName" />
+        <result column="param_value" property="paramValue" />
+        <result column="parent_paramId" property="parentParamId" />
+        <result column="remark" property="remark" />
+        <result column="status" property="status" />
+        <result column="row_Index" property="rowIndex" />
+        <result column="create_user" property="createUser" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        param_id AS paramId, param_name AS paramName, param_type AS paramType, param_type_name AS paramTypeName, param_value AS paramValue, parent_paramId AS parentParamId, remark, status, row_Index AS rowIndex, create_user AS createUser, create_time AS createTime
+    </sql>
+
+</mapper>

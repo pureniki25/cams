@@ -1,0 +1,114 @@
+
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+    <title >首页</title>
+
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
+    <!-- iview样式 -->
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
+    <!--@import url("//unpkg.com/iview/dist/styles/iview.css");-->
+    <!--<link rel="stylesheet" type="text/css" href="//unpkg.com/iview/dist/styles/iview.css"/>-->
+    <!-- 引入layui样式 -->
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all"/>
+
+    <!--   <script src="//unpkg.com/vue/dist/vue.js"></script>
+       <script src="//unpkg.com/iview/dist/iview.min.js"></script>-->
+    <!-- 引入vue -->
+    <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+    <!-- iview js -->
+    <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+    <!--引入layui.js-->
+    <script src="/plugins/layui/layui.js"></script>
+    <!--引入axios.js 用于ajax调用-->
+    <script src="/plugins/axios/axios.min.js"></script>
+    <!-- 引入jQuery，必须在appToken.js 之前引入 -->
+    <script src="/build/js/jquery-3.3.1.min.js"></script>
+    <!-- 设置全局请求头:app、Authorization -->
+    <script src="/build/js/appToken.js"></script>
+    <!--引入公共的一些方法-->
+    <script src="/src/js/comm.js"></script>
+</head>
+<body>
+<!--隐藏元素-->
+<!--<p id="staffType"  th:attr="value=${staffType}"  hidden />-->
+<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+<div id="main">
+    <Row>
+        <i-col span="12" style="padding:1em">
+                <Card   >
+                    <p slot="title">需我审批<span style="float:right;color:#169BD5" @click="openMore('/ProcessUI/ProcessWaitToApproveUI/waitToApprove','需要我审批的')">More</span></p>
+                    <table id="approvalTable" lay-filter="approvalTable"></table>
+                    <script type="text/html" id="approvalTable_tool_bar">
+                        <a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="info">详情</a>
+                    </script>
+                </Card>
+        </i-col>
+        <i-col span="12" style="padding:1em">
+                
+                <Card  >
+                    <p slot="title">我跟进的业务<span style="float:right;color:#169BD5" @click="openMore('/collectionUI/index','贷后管理')" >More</span></p>
+                    <table id="businessTable" lay-filter="businessTable"></table>
+                    <script type="text/html" id="businessTable_tool_bar">
+                        <a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="info">详情</a>
+                    </script>
+                </Card>
+        </i-col>
+    </Row>
+    <Row>
+        <i-col span="12" style="padding:1em">
+                <Card  >
+                    <p slot="title">通知公告<span style="float:right;color:#169BD5;display:none;">More</span></p>
+                    <p v-for="item in notices" @click="openNoticeModal(item.noticeId)" style="border-bottom:1px solid rgba(242, 242, 242, 1);margin-top:10px">
+                        <span>{{item.noticeTitle}}</span>
+                        <span style="float:right">{{item.publishTime||item.updateTime}}</span>
+                    </p>
+                    <p v-if="notices.length==0">
+                        <span>无</span>
+                    </p>
+                </Card>
+        </i-col>
+        <i-col span="12" style="padding:1em">
+                <Card  >
+                    <p slot="title">关于系统<span style="float:right;color:#169BD5;display:none;">More</span></p>
+                    <p v-for="item in aboutSyss" @click="checkNotice(item.noticeId)" style="border-bottom:1px solid rgba(242, 242, 242, 1);margin-top:10px">
+                            <span>{{item.title}}</span>
+                            <span style="float:right">{{item.date}}</span>
+                        </p>
+                </Card>
+        </i-col>
+    </Row>
+
+    <Modal v-model="noticeModal.show" width="90%">
+        <Card>
+            <p solt="title" >
+                <h2 style="text-align:center">{{noticeModal.notice.noticeTitle||'标题'}}</h2>
+            </p>
+            <p style="margin:1rem 0;text-align:right">
+                <span style="margin-right: 10px">作者:{{noticeModal.notice.createUserId||'abc'}}</span>
+                <span>发布时间:{{noticeModal.notice.publishTime||'2018-03-07'}}</span>
+            </p>
+            <div v-html="noticeModal.notice.noticeContent"></div>
+            <p style="margin:1rem 0;">
+                <span>相关附件:</span>
+                <p v-for="i in noticeModal.fileList">
+                    <a :href="('http://xiaodaioa.oss-cn-beijing.aliyuncs.com'+i.fileUrl)" target="_blank">{{i.fileName}}</a>
+                </p>
+                <p v-if="noticeModal.fileList.length==0">无</p>
+            </p>
+        </Card>
+    </Modal>
+
+    <Modal v-model="approvalModal.show" width="90%" :style="{top: '20px'}" >
+        <iframe id="show-iframe" style="width: 100%;height:50rem"  frameborder=0 name="showHere" scrolling=auto :src="approvalModal.url"></iframe>
+        <div slot="footer"></div>
+    </Modal>
+</div>
+<script src="/src/js/home/main.js" ></script>
+</body>
+</html>

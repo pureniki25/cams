@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.MoneyPoolRepaymentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.MoneyPoolRepayment">
+        <id column="id" property="id" />
+        <result column="money_pool_id" property="moneyPoolId" />
+        <result column="xd_pool_id" property="xdPoolId" />
+        <result column="plan_list_id" property="planListId" />
+        <result column="operate_id" property="operateId" />
+        <result column="operate_name" property="operateName" />
+        <result column="claim_date" property="claimDate" />
+        <result column="state" property="state" />
+        <result column="income_type" property="incomeType" />
+        <result column="bank_account" property="bankAccount" />
+        <result column="trade_type" property="tradeType" />
+        <result column="trade_place" property="tradePlace" />
+        <result column="fact_transfer_name" property="factTransferName" />
+        <result column="remark" property="remark" />
+        <result column="pool_list" property="poolList" />
+        <result column="certificate_picture_url" property="certificatePictureUrl" />
+        <result column="is_finance_match" property="isFinanceMatch" />
+        <result column="create_user" property="createUser" />
+        <result column="create_time" property="createTime" />
+        <result column="update_user" property="updateUser" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, money_pool_id AS moneyPoolId, xd_pool_id AS xdPoolId, plan_list_id AS planListId, operate_id AS operateId, operate_name AS operateName, claim_date AS claimDate, state, income_type AS incomeType, bank_account AS bankAccount, trade_type AS tradeType, trade_place AS tradePlace, fact_transfer_name AS factTransferName, remark, pool_list AS poolList, certificate_picture_url AS certificatePictureUrl, is_finance_match AS isFinanceMatch, create_user AS createUser, create_time AS createTime, update_user AS updateUser, update_time AS updateTime
+    </sql>
+	
+	<select id="listMatchedMoneyPool" resultType="com.hongte.alms.base.vo.module.MatchedMoneyPoolVO">
+		SELECT 
+		    tmpr.money_pool_id AS id,
+		    tmp.pay_code AS repaymentCode,
+		    tmpr.bank_account AS acceptBank,
+		    tmp.trade_date AS tradeDate,
+		    tmpr.trade_type AS tradeType,
+		    tmpr.trade_place AS tradePlace,
+		    tmp.account_money AS repaymentMoney,
+		    tmpr.remark AS remark,
+		    tmp.summary AS summary,
+		    tmp.status AS status
+		FROM
+		    tb_money_pool_repayment tmpr
+		        LEFT JOIN
+		    tb_repayment_biz_plan_list trbpl ON trbpl.plan_list_id = tmpr.plan_list_id
+		        LEFT JOIN
+		    tb_money_pool tmp ON tmp.money_pool_id = tmpr.money_pool_id
+		WHERE
+		    trbpl.business_id = #{businessId}
+		        AND trbpl.after_id = #{afterId}
+		        AND tmpr.is_finance_match = 1
+		        AND ( tmpr.is_deleted = 0 || tmpr.is_deleted is null )
+		ORDER BY tmp.trade_date desc
+	</select>
+</mapper>

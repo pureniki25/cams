@@ -1,0 +1,296 @@
+package com.hongte.alms.base.entity;
+
+import java.io.Serializable;
+
+import com.baomidou.mybatisplus.enums.IdType;
+import java.math.BigDecimal;
+import java.util.Date;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.annotations.TableField;
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableName;
+import java.io.Serializable;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+/**
+ * <p>
+ * 业务实际出款记录表
+ * </p>
+ *
+ * @author 王继光
+ * @since 2018-03-06
+ */
+@ApiModel
+@TableName("tb_biz_output_record")
+public class BizOutputRecord extends Model<BizOutputRecord> {
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * 主键
+     */
+	@TableId(value="id", type= IdType.AUTO)
+	@ApiModelProperty(required= true,value = "主键")
+	private Integer id;
+    /**
+     * 业务编号
+     */
+	@TableField("business_id")
+	@ApiModelProperty(required= true,value = "业务编号")
+	private String businessId;
+    /**
+     * 上标编号，若线下出款则为空
+     */
+	@TableField("project_id")
+	@ApiModelProperty(required= true,value = "上标编号，若线下出款则为空")
+	private String projectId;
+    /**
+     * 实际出款金额
+     */
+	@TableField("fact_output_money")
+	@ApiModelProperty(required= true,value = "实际出款金额")
+	private BigDecimal factOutputMoney;
+    /**
+     * 实际出款时间
+     */
+	@TableField("fact_output_date")
+	@ApiModelProperty(required= true,value = "实际出款时间")
+	private Date factOutputDate;
+    /**
+     * 出款经手人ID
+     */
+	@TableField("output_user_id")
+	@ApiModelProperty(required= true,value = "出款经手人ID")
+	private String outputUserId;
+    /**
+     * 出款经手人姓名
+     */
+	@TableField("output_user_name")
+	@ApiModelProperty(required= true,value = "出款经手人姓名")
+	private String outputUserName;
+    /**
+     * 银行卡号
+     */
+	@TableField("bank_card")
+	@ApiModelProperty(required= true,value = "银行卡号")
+	private String bankCard;
+    /**
+     * 银行名称
+     */
+	@TableField("bank_name")
+	@ApiModelProperty(required= true,value = "银行名称")
+	private String bankName;
+    /**
+     * 0：线下出款，1：借款人提现，2：保证金提现，3：押金提现，4：期初收费
+     */
+	@TableField("withdraw_type")
+	@ApiModelProperty(required= true,value = "0：线下出款，1：借款人提现，2：保证金提现，3：押金提现，4：期初收费")
+	private Integer withdrawType;
+    /**
+     * 放款去处(线下出款均为1)，1:提到银行卡  2：转到可用金额
+     */
+	@TableField("withdraw_place")
+	@ApiModelProperty(required= true,value = "放款去处(线下出款均为1)，1:提到银行卡  2：转到可用金额")
+	private Integer withdrawPlace;
+    /**
+     * 提现状态说明
+     */
+	@TableField("withdraw_strStatus")
+	@ApiModelProperty(required= true,value = "提现状态说明")
+	private Integer withdrawStrStatus;
+    /**
+     * 提现流水号，若线下出款则为空
+     */
+	@ApiModelProperty(required= true,value = "提现流水号，若线下出款则为空")
+	@TableField("XDWithDrawId")
+	private String XDWithDrawId;
+    /**
+     * 创建时间
+     */
+	@TableField("create_time")
+	@ApiModelProperty(required= true,value = "创建时间")
+	private Date createTime;
+    /**
+     * 创建人
+     */
+	@TableField("create_user")
+	@ApiModelProperty(required= true,value = "创建人")
+	private String createUser;
+    /**
+     * 更新时间
+     */
+	@TableField("update_time")
+	@ApiModelProperty(required= true,value = "更新时间")
+	private Date updateTime;
+    /**
+     * 更新人
+     */
+	@TableField("update_user")
+	@ApiModelProperty(required= true,value = "更新人")
+	private String updateUser;
+
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getBusinessId() {
+		return businessId;
+	}
+
+	public void setBusinessId(String businessId) {
+		this.businessId = businessId;
+	}
+
+	public String getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(String projectId) {
+		this.projectId = projectId;
+	}
+
+	public BigDecimal getFactOutputMoney() {
+		return factOutputMoney;
+	}
+
+	public void setFactOutputMoney(BigDecimal factOutputMoney) {
+		this.factOutputMoney = factOutputMoney;
+	}
+
+	public Date getFactOutputDate() {
+		return factOutputDate;
+	}
+
+	public void setFactOutputDate(Date factOutputDate) {
+		this.factOutputDate = factOutputDate;
+	}
+
+	public String getOutputUserId() {
+		return outputUserId;
+	}
+
+	public void setOutputUserId(String outputUserId) {
+		this.outputUserId = outputUserId;
+	}
+
+	public String getOutputUserName() {
+		return outputUserName;
+	}
+
+	public void setOutputUserName(String outputUserName) {
+		this.outputUserName = outputUserName;
+	}
+
+	public String getBankCard() {
+		return bankCard;
+	}
+
+	public void setBankCard(String bankCard) {
+		this.bankCard = bankCard;
+	}
+
+	public String getBankName() {
+		return bankName;
+	}
+
+	public void setBankName(String bankName) {
+		this.bankName = bankName;
+	}
+
+	public Integer getWithdrawType() {
+		return withdrawType;
+	}
+
+	public void setWithdrawType(Integer withdrawType) {
+		this.withdrawType = withdrawType;
+	}
+
+	public Integer getWithdrawPlace() {
+		return withdrawPlace;
+	}
+
+	public void setWithdrawPlace(Integer withdrawPlace) {
+		this.withdrawPlace = withdrawPlace;
+	}
+
+	public Integer getWithdrawStrStatus() {
+		return withdrawStrStatus;
+	}
+
+	public void setWithdrawStrStatus(Integer withdrawStrStatus) {
+		this.withdrawStrStatus = withdrawStrStatus;
+	}
+
+	public String getXDWithDrawId() {
+		return XDWithDrawId;
+	}
+
+	public void setXDWithDrawId(String XDWithDrawId) {
+		this.XDWithDrawId = XDWithDrawId;
+	}
+
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+
+	public String getCreateUser() {
+		return createUser;
+	}
+
+	public void setCreateUser(String createUser) {
+		this.createUser = createUser;
+	}
+
+	public Date getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
+	}
+
+	public String getUpdateUser() {
+		return updateUser;
+	}
+
+	public void setUpdateUser(String updateUser) {
+		this.updateUser = updateUser;
+	}
+
+	@Override
+	protected Serializable pkVal() {
+		return this.id;
+	}
+
+	@Override
+	public String toString() {
+		return "BizOutputRecord{" +
+			", id=" + id +
+			", businessId=" + businessId +
+			", projectId=" + projectId +
+			", factOutputMoney=" + factOutputMoney +
+			", factOutputDate=" + factOutputDate +
+			", outputUserId=" + outputUserId +
+			", outputUserName=" + outputUserName +
+			", bankCard=" + bankCard +
+			", bankName=" + bankName +
+			", withdrawType=" + withdrawType +
+			", withdrawPlace=" + withdrawPlace +
+			", withdrawStrStatus=" + withdrawStrStatus +
+			", XDWithDrawId=" + XDWithDrawId +
+			", createTime=" + createTime +
+			", createUser=" + createUser +
+			", updateTime=" + updateTime +
+			", updateUser=" + updateUser +
+			"}";
+	}
+}

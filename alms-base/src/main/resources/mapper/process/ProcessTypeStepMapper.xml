@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.process.mapper.ProcessTypeStepMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.process.entity.ProcessTypeStep">
+        <id column="type_step_id" property="typeStepId" />
+        <result column="type_id" property="typeId" />
+        <result column="step_name" property="stepName" />
+        <result column="approve_user_id" property="approveUserId" />
+        <result column="approve_user_type" property="approveUserType" />
+        <result column="approve_user_id_select_sql" property="approveUserIdSelectSql" />
+        <result column="is_can_edit" property="isCanEdit" />
+        <result column="step" property="step" />
+        <result column="next_step" property="nextStep" />
+        <result column="next_step_select_sql" property="nextStepSelectSql" />
+        <result column="step_type" property="stepType" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        type_step_id AS typeStepId, type_id AS typeId, step_name AS stepName, approve_user_id AS approveUserId, approve_user_type AS approveUserType, approve_user_id_select_sql AS approveUserIdSelectSql, is_can_edit AS isCanEdit, step, next_step AS nextStep, next_step_select_sql AS nextStepSelectSql, step_type AS stepType
+    </sql>
+
+</mapper>

@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.TransferOfLitigationMapper">
+	
+	<resultMap id="TransferOfLitigationMap" type="com.hongte.alms.base.vo.litigation.TransferOfLitigationVO" >  
+	    	<result property="businessId" column="businessId"/> 
+   			<result property="businessType" column="businessTypeName"/>
+   			<result property="businessTypeName" column="businessTypeName"/>
+   			<result property="customerName" column="customerName"/>
+   			<result property="customerType" column="customerType"/>
+   			<result property="customerIdentifyCard" column="customerIdentifyCard"/>
+   			<result property="finalBorrowMoney" column="finalBorrowMoney"/>
+   			<result property="borrowLimit" column="borrowLimit"/>
+   			<result property="repaymentTypeId" column="repaymentTypeId"/>
+   			<result property="repaymentPrincipa" column="repaymentPrincipa"/>
+   			<result property="repaymentPeriods" column="repaymentPeriods"/>
+   			<result property="totalPeriods" column="totalPeriods"/>
+   			<result property="accountStatus" column="accountStatus"/>
+   			<result property="sourceSystem" column="sourceSystem"/>
+   			<result property="createUserId" column="create_user"/>
+	    <association property="businessCompany" javaType="com.hongte.alms.base.vo.litigation.BusinessCompany">  
+	    	<result property="deptId" column="deptId"/> 
+   			<result property="deptName" column="deptName"/>
+	    </association>
+	    <association property="originalUser" javaType="com.hongte.alms.base.vo.litigation.BusinessUser">  
+	    	<result property="userId" column="original_userid"/> 
+   			<result property="name" column="original_name"/>
+	    </association>
+	    <!-- <collection property="houseList" ofType="com.hongte.alms.base.vo.litigation.BusinessHouse">  
+	    	<result property="xiaodaiHouseId" column="xiaodaiHouseId"/> 
+	    	<result property="businessId" column="business_id"/> 
+	    	<result property="houseValue" column="houseValue"/> 
+	    	<result property="houseName" column="houseName"/> 
+	    	<result property="houseAddress" column="houseAddress"/> 
+	    	<result property="houseNo" column="houseNo"/> 
+	    	<result property="houseArea" column="houseArea"/> 
+	    	<result property="housePrice" column="housePrice"/> 
+	    	<result property="houseTotal" column="houseTotal"/> 
+	    	<result property="butTime" column="butTime"/> 
+   			<result property="registerTime" column="nregisterTimeame"/>
+   			<result property="houseBelong" column="houseBelong"/>
+   			<result property="openTime" column="openTime"/>
+   			<result property="borrowTime" column="borrowTime"/>
+   			<result property="borrowType" column="borrowType"/>
+   			<result property="borrowTotal" column="borrowTotal"/>
+   			<result property="borrowBalance" column="borrowBalance"/>
+   			<result property="fsdBankName" column="fsdBankName"/>
+   			<result property="debtRegion" column="debtRegion"/>
+   			<result property="remark" column="remark"/>
+   			<result property="updateUser" column="updateUser"/>
+   			<result property="updateTime" column="updateTime"/>
+   			<result property="secondMortgageTime" column="secondMortgageTime"/>
+   			<result property="secondMortgageYear" column="secondMortgageYear"/>
+   			<result property="secondMortgageType" column="secondMortgageType"/>
+   			<result property="secondMortgageBank" column="secondMortgageBank"/>
+   			<result property="secondMortgageOtherBank" column="secondMortgageOtherBank"/>
+   			<result property="secondMortgageTotal" column="secondMortgageTotal"/>
+   			<result property="secondMortgageBalance" column="secondMortgageBalance"/>
+   			<result property="thirdMortgageTime" column="thirdMortgageTime"/>
+   			<result property="thirdMortgageYear" column="thirdMortgageYear"/>
+   			<result property="thirdMortgageType" column="thirdMortgageType"/>
+   			<result property="thirdMortgageBank" column="thirdMortgageBank"/>
+   			<result property="thirdMortgageOtherBank" column="thirdMortgageOtherBank"/>
+   			<result property="thirdMortgageTotal" column="thirdMortgageTotal"/>
+   			<result property="thirdMortgageBalance" column="thirdMortgageBalance"/>
+   			<result property="fourthMortgageTime" column="fourthMortgageTime"/>
+   			<result property="fourthMortgageYear" column="fourthMortgageYear"/>
+   			<result property="fourthMortgageType" column="fourthMortgageType"/>
+   			<result property="fourthMortgageBank" column="fourthMortgageBank"/>
+   			<result property="fourthMortgageOtherBank" column="fourthMortgageOtherBank"/>
+   			<result property="fourthMortgageTotal" column="fourthMortgageTotal"/>
+   			<result property="fourthMortgageBalance" column="fourthMortgageBalance"/>
+   			<result property="propertyType" column="propertyType"/>
+	    </collection> -->
+	    <collection property="paymentList" ofType="com.hongte.alms.base.vo.litigation.BusinessPayment">  
+	    	<result property="businessId" column="businessId"/> 
+   			<result property="businessAfterId" column="businessAfterId"/>
+   			<result property="oddcorpus" column="surplus_principal"/>
+	    </collection>
+	</resultMap>  
+	
+	<resultMap id="HouseLoanMap" type="com.hongte.alms.base.vo.litigation.house.HouseLoanVO" >  
+	    	<result property="businessId" column="business_id"/> 
+   			<result property="customerName" column="customer_name"/>
+   			<result property="phoneNumber" column="phone_number"/>
+   			<result property="businessTypeName" column="business_type_name"/>
+   			<result property="borrowMoney" column="borrow_money"/>
+   			<result property="factOutputMoney" column="fact_output_money"/>
+   			<result property="operatorName" column="operator_name"/>
+   			<result property="originalName" column="original_name"/>
+   			<result property="lastReviewUserName" column="last_review_user_name"/>
+   			<result property="borrowRate" column="borrow_rate"/>
+   			<result property="borrowLimit" column="borrow_limit"/>
+   			<result property="notarizationType" column="notarization_type"/>
+   			<result property="companyName" column="company_name"/>
+	</resultMap>  
+
+	<select id="queryCarLoanData" resultType="map">
+		SELECT 
+		  t1.`business_id` businessId,
+		  t1.`customer_name` customerName,
+		  t1.`borrow_money` borrowMoney,
+		  t1.`borrow_limit` borrowLimit,
+		  t1.`repayment_type_id` repaymentTypeId,
+		  t1.`borrow_rate` borrowRate,
+		  t1.`company_name` companyName,
+		  CONCAT(t2.`brand_name`, t2.`model`) model,
+		  t3.`create_time` createTime,
+		  t3.`evaluation_amount` evaluationAmount,
+		  t4.`drag_date` dragDate,
+		  t1.`operator_name` operatorName,
+		  t5.fact_principal factPrincipal,
+		  t5.fact_accrual factAccrual,
+		  t5.surplus_principal surplusPrincipal,
+		  t5.due_date dueDate,
+		  IFNULL(t5.overdue_days, 0) overdueDays,
+		  t6.output_user_name outputUserName,
+		  t6.fact_output_date factOutputDate,
+		  (SELECT 
+		    fact_output_money 
+		  FROM
+		    (SELECT 
+		      a.business_id,
+		      SUM(IFNULL(a.fact_output_money, 0)) fact_output_money 
+		    FROM
+		      tb_biz_output_record a 
+		    WHERE a.withdraw_type IN (0, 1, 4) 
+		    GROUP BY a.business_id) tab 
+		  WHERE tab.business_id = bb.business_id) factOutputMoney
+		FROM
+		  tb_basic_business t1,
+		  tb_car_basic t2,
+		  tb_car_detection t3,
+		  tb_car_drag t4,
+		  tb_biz_output_record t6,
+		  (SELECT 
+		    a.overdue_days,
+		    c.fact_principal,
+		    c.fact_accrual,
+		    b.original_business_id business_id,
+		    a.due_date,
+		    (
+		      c.plan_principal - c.fact_principal
+		    ) surplus_principal 
+		  FROM
+		    tb_repayment_biz_plan_list a 
+		    JOIN tb_repayment_biz_plan b 
+		      ON a.plan_id = b.plan_id 
+		    JOIN 
+		      (SELECT 
+		        t1.plan_list_id,
+		        t1.`create_date`,
+		        -- 应还本金总额
+		        SUM(
+		          CASE
+		            WHEN t1.plan_item_type = 10 
+		            THEN t1.plan_amount 
+		            ELSE 0 
+		          END
+		        ) `plan_principal`,
+		        -- 实还本金总额
+		        SUM(
+		          CASE
+		            WHEN t1.plan_item_type = 10 
+		            THEN t1.fact_amount 
+		            ELSE 0 
+		          END
+		        ) `fact_principal`,
+		        -- 实还利息总额
+		        SUM(
+		          CASE
+		            WHEN t1.plan_item_type = 20 
+		            THEN t1.fact_amount 
+		            ELSE 0 
+		          END
+		        ) `fact_accrual` 
+		      FROM
+		        tb_repayment_biz_plan_list_detail t1 
+		      GROUP BY t1.business_id) c 
+		      ON a.plan_list_id = c.plan_list_id 
+		  WHERE IFNULL(a.repay_flag, 0) != 6) t5
+		WHERE t1.`business_id` = t2.`business_id` 
+		  AND t1.`business_id` = t3.`business_id` 
+		  AND t1.`business_id` = t4.`business_id` 
+		  AND t1.`business_id` = t5.`business_id`
+		  AND t1.`business_id` = t6.`business_id`
+		  AND t1.`business_id` = #{businessId,jdbcType=VARCHAR}
+		  LIMIT 1
+	</select>
+	
+	<select id="queryTransferLitigationCarData" resultType="com.hongte.alms.base.vo.litigation.BusinessCar">
+		SELECT 
+		  cd.`business_id` carBusinessId,
+		  cb.`annual_verification_expiration_date` annualDueDate,
+		  cb.`color` carBodyColor,
+		  cb.`brand_name` carBrand,
+		  cd.`evaluation_amount` carEvaluateMoney,
+		  cb.`model` carModelNumber,
+		  cb.`traffic_violation_fee` carViolations,
+		  cb.`vin` chassisNumber,
+		  cb.`engine_model` engineNumber,
+		  cb.`license_plate_number` licensePlateNumber,
+		  cb.`owner_name` ownerName 
+		FROM
+		  tb_car_basic cb,
+		  tb_car_detection cd 
+		WHERE cd.`business_id` = cb.`business_id` AND cd.`business_id` = #{businessId,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="queryTransferLitigationData" resultMap="TransferOfLitigationMap" >
+		SELECT 
+		  bb.`borrow_limit` borrowLimit,
+		  (SELECT 
+		    IFNULL(
+		      b.original_business_id,
+		      a.business_id
+		    ) 
+		  FROM
+		    tb_basic_business a 
+		    LEFT JOIN tb_renewal_business b 
+		      ON a.business_id = b.renewal_business_id 
+		  WHERE a.business_id = bb.`business_id`) businessId,
+		  bbt.`business_type_name` businessTypeName,
+		  bbc.`identify_card` customerIdentifyCard,
+		  bbc.`customer_name` customerName,
+		  CASE
+		    bbc.customer_type 
+		    WHEN '个人' 
+		    THEN '0' 
+		    WHEN '企业' 
+		    THEN '1' 
+		    ELSE '其他' 
+		  END customerType,
+		  bb.`borrow_money` finalBorrowMoney,
+		  bb.`original_name`,
+		  bb.create_user,
+		  bb.original_userid,
+		  bb.`repayment_type_id` repaymentTypeId,
+		  1 sourceSystem,
+		  bb.`company_id` deptId,
+		  bb.`company_name` deptName,
+		  bb.`business_id` carBusinessId,
+		  cc.fact_principal repaymentPrincipa,
+		  (SELECT tbr.period FROM tb_repayment_biz_plan_list tbr WHERE tbr.plan_list_id = #{crpId,jdbcType=VARCHAR}) businessAfterId ,
+		  cc.surplus_principal,
+		  (SELECT 
+		    COUNT(1) 
+		  FROM
+		    tb_repayment_biz_plan_list lst,
+		    tb_repayment_biz_plan p 
+		  WHERE lst.`plan_id` = p.`plan_id` 
+		    AND bb.`business_id` = p.original_business_id) totalPeriods 
+		FROM
+		  tb_basic_business bb,
+		  tb_basic_business_customer bbc,
+		  tb_basic_business_type bbt,
+		  (SELECT 
+		    c.fact_principal,
+		    b.`original_business_id`, 
+		    c.plan_list_id,
+		    (c.plan_principal - c.fact_principal) surplus_principal
+		  FROM
+		    tb_repayment_biz_plan_list a 
+		    JOIN tb_repayment_biz_plan b 
+		      ON a.plan_id = b.plan_id 
+		    JOIN 
+		      (SELECT 
+		        t1.plan_list_id,
+		        SUM(
+		          CASE
+		            WHEN t1.plan_item_type = 10 
+		            THEN t1.fact_amount 
+		            ELSE 0 
+		          END
+		        ) `fact_principal`,
+		        -- 应还本金总额
+			SUM(CASE WHEN t1.plan_item_type =10 THEN t1.plan_amount ELSE 0 END) `plan_principal`
+			 
+		      FROM
+		        tb_repayment_biz_plan_list_detail t1 
+		      GROUP BY t1.business_id) c 
+		      ON a.plan_list_id = c.plan_list_id 
+		  WHERE IFNULL(a.repay_flag, 0) != 6) cc 
+		WHERE bb.`business_id` = bbc.`business_id` 
+		  AND bb.`business_type` = bbt.`business_type_id` 
+		  AND bb.business_id = cc.original_business_id 
+		  AND bbc.`ismainland_resident` = 1 
+		  AND bb.`business_id` = #{businessId,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="queryRepaymentPlanHouse" resultType="com.hongte.alms.base.vo.litigation.house.HousePlanInfo">
+		SELECT 
+		  (plan_principal - fact_principal) surplusPrincipal,
+		  fact_principal factPrincipal,
+		  overdue_days overdueDays,
+		  due_date dueDate 
+		FROM
+		  (SELECT 
+		    a.plan_list_id,
+		    a.plan_id,
+		    MIN(a.`due_date`) AS `min_due_date`,
+		    SUM(t3.plan_principal) plan_principal,
+		    SUM(t3.fact_principal) fact_principal,
+		    IFNULL(a.overdue_days, 0) overdue_days,
+		    b.original_business_id business_id,
+		    a.due_date 
+		  FROM
+		    `tb_repayment_biz_plan_list` a,
+		    `tb_repayment_biz_plan` b,
+		    (SELECT 
+		      plan_list_id,
+		      SUM(
+		        CASE
+		          WHEN plan_item_type = 10 
+		          THEN plan_amount 
+		          ELSE 0 
+		        END
+		      ) `plan_principal`,
+		      SUM(
+		        CASE
+		          WHEN plan_item_type = 10 
+		          THEN fact_amount 
+		          ELSE 0 
+		        END
+		      ) `fact_principal` 
+		    FROM
+		      tb_repayment_biz_plan_list_detail 
+		    GROUP BY plan_list_id) t3 
+		  WHERE a.plan_list_id = t3.plan_list_id 
+		    AND a.plan_id = b.plan_id 
+		    AND IFNULL(a.repay_flag, 0) != 6 
+		  GROUP BY a.plan_id) tt 
+		WHERE tt.business_id = #{businessId,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="queryHouseLoanData" resultMap="HouseLoanMap">
+		SELECT 
+		  (SELECT 
+		    IFNULL(
+		      b.original_business_id,
+		      a.business_id
+		    ) 
+		  FROM
+		    tb_basic_business a 
+		    LEFT JOIN tb_renewal_business b 
+		      ON a.business_id = b.renewal_business_id 
+		  WHERE a.business_id = bb.`business_id`) business_id,
+		  bb.`customer_name`,
+		  (SELECT 
+		    a.phone_number 
+		  FROM
+		    tb_basic_business_customer a 
+		  WHERE a.ismain_customer = 1 
+		    AND a.business_id = bb.`business_id`) phone_number,
+		  (SELECT 
+		    a.business_type_name 
+		  FROM
+		    tb_basic_business_type a 
+		  WHERE a.business_type_id = bb.`business_type`) business_type_name,
+		  bb.`borrow_money`,
+		  (SELECT 
+		    fact_output_money 
+		  FROM
+		    (SELECT 
+		      a.business_id,
+		      SUM(IFNULL(a.fact_output_money, 0)) fact_output_money 
+		    FROM
+		      tb_biz_output_record a 
+		    WHERE a.withdraw_type IN (0, 1, 4) 
+		    GROUP BY a.business_id) tab 
+		  WHERE tab.business_id = bb.business_id) fact_output_money,
+		  bb.`operator_name`,
+		  bb.`original_name`,
+		  bba.`last_review_user_name`,
+		  bb.`borrow_rate`,
+		  bb.`borrow_limit`,
+		  CASE
+		    fsd.notarization_type 
+		    WHEN '1' 
+		    THEN '办理委托公证' 
+		    WHEN '2' 
+		    THEN '强制执行公证' 
+		    WHEN '5' 
+		    THEN '办理声明公证' 
+		    WHEN '6' 
+		    THEN '办理证件公证' 
+		    WHEN '7' 
+		    THEN '核实原公证书' 
+		    ELSE '其他' 
+		  END notarization_type,
+		  bb.company_name
+		FROM
+		  tb_basic_business bb,
+		  tb_basic_business_approve bba,
+		  tb_fsd_non_standard_measure fsd
+		WHERE bb.business_id = bba.business_id 
+		  AND bb.business_id = fsd.business_id
+		  AND bb.business_id = #{businessId,jdbcType=VARCHAR}
+	</select>
+
+	<select id="queryMortgageInfoByBusinessId" resultType="com.hongte.alms.base.vo.litigation.house.MortgageInfo">
+		SELECT 
+		  fh.house_address,
+		  fh.house_name,
+		  boc.lender,
+		  boc.pledee,
+		  '抵押债权' mortgageSecurities,
+		  fh.house_area,
+		  fh.house_price,
+		  fh.house_total,
+		  fh.house_pledged_bank,
+		  fh.borrow_total,
+		  fh.borrow_balance,
+		  fh.second_mortgage_bank,
+		  fh.second_mortgage_total,
+		  fh.second_mortgage_balance,
+		  fh.third_mortgage_bank,
+		  fh.third_mortgage_total,
+		  fh.third_mortgage_balance,
+		  fh.fourth_mortgage_bank,
+		  fh.fourth_mortgage_total,
+		  fh.fourth_mortgage_balance 
+		FROM
+		  tb_fsd_house fh,
+		  tb_biz_output_contract boc 
+		WHERE fh.business_id = boc.`business_id` 
+		AND fh.`business_id` = #{businessId,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="queryBusinessType" resultType="java.lang.Integer">
+		SELECT bb.`business_type` FROM `tb_basic_business` bb, `tb_basic_business_type` bbt 
+		WHERE bb.`business_type` = bbt.`business_type_id` AND bb.`business_id` = #{businessId,jdbcType=VARCHAR}
+	</select>
+</mapper>

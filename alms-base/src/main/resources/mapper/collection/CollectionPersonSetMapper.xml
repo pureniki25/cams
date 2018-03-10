@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.collection.mapper.CollectionPersonSetMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.collection.entity.CollectionPersonSet">
+        <id column="col_person_id" property="colPersonId" />
+        <result column="area_code" property="areaCode" />
+        <result column="company_code" property="companyCode" />
+        <result column="create_time" property="createTime" />
+        <result column="creat_user" property="creatUser" />
+        <result column="update_time" property="updateTime" />
+        <result column="update_user" property="updateUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        col_person_id AS colPersonId, area_code AS areaCode, company_code AS companyCode, create_time AS createTime, creat_user AS creatUser, update_time AS updateTime, update_user AS updateUser
+    </sql>
+
+    <select id="getCollectionPersonSettingList" resultType="com.hongte.alms.base.vo.module.CollectionStrategyPersonSettingVo" parameterType="com.hongte.alms.base.vo.module.CollectionStrategyPersonSettingReq">
+        SELECT
+        tb_collection_person_set.col_person_id AS id,
+        corp.areaId,
+        corp.areaName,
+        corp.companyId,
+        corp.companyName,
+        collect1_person AS collect1Person,
+        collect2_person AS collect2Person
+        FROM
+        (
+        SELECT
+        area.areaId,
+        areaName,
+        company.companyId,
+        company.companyName
+        FROM
+        (
+        (
+        SELECT
+        area_id AS areaId,
+        area_name AS areaName
+        FROM
+        tb_basic_company
+        WHERE
+        area_level = 40
+        ) area
+        INNER JOIN (
+        SELECT
+        area_id AS companyId,
+        area_name AS companyName,
+        area_pid AS companyParentId
+        FROM
+        tb_basic_company
+        WHERE
+        area_level = 60
+        ) company ON area.areaId = company.companyParentId
+        )
+        ) corp
+        LEFT JOIN tb_collection_person_set ON corp.areaId = tb_collection_person_set.area_code
+        AND corp.companyId = tb_collection_person_set.company_code
+
+        <where>
+            <if test="areaId !=null and areaId !=''">
+                and  corp.areaId =#{areaId}
+            </if>
+            <if test="companyId !=null and companyId !='' ">
+                and  corp.companyId = #{companyId}
+            </if>
+        </where>
+        ORDER BY
+        corp.areaId,
+        corp.companyId
+
+    </select>
+
+
+</mapper>
