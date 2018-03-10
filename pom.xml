@@ -31,12 +31,20 @@
 
 
 
+    <!--<parent>-->
+        <!--<groupId>org.springframework.boot</groupId>-->
+        <!--<artifactId>spring-boot-starter-parent</artifactId>-->
+        <!--<version>1.5.8.RELEASE</version>-->
+        <!--<relativePath /> &lt;!&ndash; lookup parent from repository &ndash;&gt;-->
+    <!--</parent>-->
+
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.5.8.RELEASE</version>
+        <groupId>com.ht.cloud</groupId>
+        <artifactId>ht-cloud-release</artifactId>
+        <version>dev-20180308-01</version>
         <relativePath /> <!-- lookup parent from repository -->
     </parent>
+
 
     <dependencyManagement>
         <dependencies>

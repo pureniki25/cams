@@ -24,6 +24,7 @@
         <mapper.version>3.3.6</mapper.version>
         <start-class>com.hongte.alms.scheduled.ScheduledServiceApplication</start-class>
         <quartz.version>2.2.0</quartz.version>
+        <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
     <dependencies>
         <dependency>
@@ -241,6 +242,15 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+            </plugin>
+
         </plugins>
     </build>
 

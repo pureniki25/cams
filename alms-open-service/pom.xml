@@ -25,6 +25,7 @@
 		<spring-cloud.version>Edgware.RELEASE</spring-cloud.version>
 		<!-- 依赖版本 -->
 		<mapper.version>3.3.6</mapper.version>
+		<maven.deploy.skip>true</maven.deploy.skip>
 	</properties>
 
 	<dependencies>
@@ -194,6 +195,15 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>pl.project13.maven</groupId>
+				<artifactId>git-commit-id-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+			</plugin>
+
 		</plugins>
 	</build>
 
