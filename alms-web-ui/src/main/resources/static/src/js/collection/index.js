@@ -416,11 +416,31 @@ window.layinit(function(htConfig){
                             {"name": "结清试算", click: function (e, currentItem) {
                                 // var url = '/collectionUI/checkFundPool?businessId='+currentItem.businessId+'&afterId='+currentItem.afterId
                                 // showOneLineOprLayer(url,"结清试算")
+                            }},
+                            {"name": "移交诉讼系统", click: function (e, currentItem) {
+//                            	 var url = '/transferOfLitigation/carLoan?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+"&processStatus=-1"
+                            	 var url = ''
+                        		 if(currentItem.businessTypeId == 1 || currentItem.businessTypeId == 9){
+                        			 url = '/transferOfLitigation/carLoan?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+"&processStatus=-1";
+                                 }else if(currentItem.businessTypeId == 2 || currentItem.businessTypeId == 11){
+                                	 url = '/transferOfLitigation/houseLoan?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+"&processStatus=-1";
+                                 }
+                            	 showOneLineOprLayer(url,"移交诉讼系统")
                             }}
                         ],
                     })
             }
         });
+        
+//        var getTransferLitigationUrl = function(obj) {
+//        	var url = '';
+//        	if(obj.data.businessTypeId == 1 || obj.data.businessTypeId == 9){
+//        		 url = '/transferOfLitigation/carLoan?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+"&processStatus=-1";
+//             }else if(obj.data.businessTypeId == 2 || obj.data.businessTypeId == 11){
+//            	 url = '/transferOfLitigation/houseLoan?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+"&processStatus=-1";
+//             }
+//        	return url;
+//        }
 
         //监听工具条
         table.on('tool(listTable)', function (obj) {
@@ -466,11 +486,6 @@ window.layinit(function(htConfig){
     });
 
 })
-
-
-
-
-
 
 function getMousePos(event) {
     var e =  window.event;

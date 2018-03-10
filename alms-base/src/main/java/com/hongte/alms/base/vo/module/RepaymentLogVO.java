@@ -47,7 +47,7 @@ public class RepaymentLogVO {
     @Excel(name = "代扣金额", orderNum = "8",  isImportField = "true_st")
 	private String currentAmount;
     @Excel(name = "代扣时间", orderNum = "10", databaseFormat = "yyyyMMddHHmmss", format = "yyyy-MM-dd", isImportField = "true_st", width = 20)
-	private String createTime;
+	private Date createTime;
     
     @Excel(name = "代扣结果", orderNum = "11",  isImportField = "true_st")
 	private String repayStatus;
@@ -135,11 +135,11 @@ public class RepaymentLogVO {
 		this.currentAmount = currentAmount;
 	}
 
-	public String getCreateTime() {
+	public Date getCreateTime() {
 		return createTime;
 	}
 
-	public void setCreateTime(String createTime) {
+	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
 	}
 

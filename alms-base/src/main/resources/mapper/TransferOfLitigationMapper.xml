@@ -126,7 +126,7 @@
 		      tb_biz_output_record a 
 		    WHERE a.withdraw_type IN (0, 1, 4) 
 		    GROUP BY a.business_id) tab 
-		  WHERE tab.business_id = bb.business_id) factOutputMoney
+		  WHERE tab.business_id = t1.business_id) factOutputMoney
 		FROM
 		  tb_basic_business t1,
 		  tb_car_basic t2,
