@@ -56,6 +56,16 @@ public class ApiController {
     private String afterLoanSecret;
 
 
+    @Value(value="${ht.test.txt}")
+    private  String txt;
+
+    @RequestMapping("txt")
+    @ApiOperation(value = "获取小贷的图片查看")
+    public String getXindaiThumbnailView(){
+            return txt;
+    }
+
+
     @RequestMapping("getXindaiThumbnailView")
     @ApiOperation(value = "获取小贷的图片查看")
     public Result<String> getXindaiThumbnailView(String businessId) throws Exception {
