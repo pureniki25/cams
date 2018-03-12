@@ -139,7 +139,11 @@ layui.define(["ht_cookie", "ht_config"], function (exports) {
                         );
                         if (!config.isLocal) {
                             var headers = {
-                                app: config.app /*系统编码统一通过http headers进行传输*/
+                                app: config.app ,/*系统编码统一通过http headers进行传输*/
+                            }
+                            //指定访问core的访问路径
+                            if(coreInstancedId!=null&& coreInstancedId!=""){
+                                headers.instanceId = coreInstancedId;
                             }
                             //是否通过网关,如果不通过网关则设置默认用户
                             if(!config.useGateWayflage){

@@ -26,6 +26,12 @@ public class PropertiesController {
 
     @Value("${ht.config.ui.gatewayUrl}")
     private String gatewayUrl;  //配置的网关
+    @Value("${ht.config.ui.coreInstancedId}")
+    private String coreInstancedId;  //core服务标识的访问实例
+    @Value("${ht.config.ui.openInstancedId}")
+    private String openInstancedId;  //open服务标识的访问实例
+
+
 
     @Value("${ht.config.ui.useGateWayflage}")
     private Boolean useGateWayflage;//是否使用网关的标志位
@@ -43,7 +49,7 @@ public class PropertiesController {
 //    ht.config.ui.OpenBasePath="http://localhost:30616/"
 
     @GetMapping(value = "config.js",produces = "application/javascript")
-    public Result<Map<String,Object>> config (){
+    public String config (){
 
         Map<String ,Object> mapper = new HashMap<String,Object>();
         mapper.put("gatewayUrl",gatewayUrl);
@@ -69,7 +75,19 @@ public class PropertiesController {
         mapper.put("refreshTokenUrl",gatewayUrl + "uaa/auth/token");
 
 
-        return Result.success(mapper); //String.format(JSONObject.toJSONString(mapper));
+//        return String.format("var ht_properties=%s;",JSONObject.toJSONString(mapper));
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(String.format("var gateWayUrl='%s';",gatewayUrl));
+        stringBuilder.append("\r");
+        stringBuilder.append(String.format("var coreInstancedId='%s';",coreInstancedId));
+        stringBuilder.append("\r");
+        stringBuilder.append(String.format("var openInstancedId='%s';",openInstancedId));
+        stringBuilder.append("\r");
+        stringBuilder.append(String.format("var useGateWayflage=%s;",useGateWayflage));
+        stringBuilder.append("\r");
+
+        return stringBuilder.toString();
+//        return String.format("var gateWayUrl='%s';",gatewayUrl);
 //        return
     }
 
