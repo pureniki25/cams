@@ -52,7 +52,7 @@ window.layinit = function (cb) {
             htConfig.coreBasePath = htConfig.localBasePath;
             axios.defaults.headers.common['userId'] = htConfig.defaultUser;
         }else{
-            htConfig.basePath =  htConfig.basePath +"core/"
+            // htConfig.basePath =  htConfig.basePath +"core/"
             htConfig.coreBasePath = htConfig.basePath +"core/";
             htConfig.openBasePath = htConfig.basePath +"open/";
         }
