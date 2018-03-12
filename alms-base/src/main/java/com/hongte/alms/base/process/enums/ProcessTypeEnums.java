@@ -63,32 +63,24 @@ public enum ProcessTypeEnums {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
+
 
 	public String getKey() {
 		return key;
 	}
 
-	public void setKey(String key) {
-		this.key = key;
-	}
+
 
 
 	public Integer getBeginStep() {
 		return beginStep;
 	}
 
-	public void setBeginStep(Integer beginStep) {
-		this.beginStep = beginStep;
-	}
+
 
 	public Integer getEndStep() {
 		return endStep;
 	}
 
-	public void setEndStep(Integer endStep) {
-		this.endStep = endStep;
-	}
+
 }
