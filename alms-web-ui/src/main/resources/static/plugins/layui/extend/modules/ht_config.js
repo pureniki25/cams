@@ -18,7 +18,7 @@ layui.define(function (exports) {
 
         //--------------   切换是否使用网关 --------------
         //是否使用网关的标志位
-        ,useGateWayflage:false
+        ,useGateWayflage:true
         // ,useGateWayflage:true
         // ,defaultUser:"admin-alms"
         ,defaultUser:"test_area_hd_leader"   //贷后中心清算一部主管
