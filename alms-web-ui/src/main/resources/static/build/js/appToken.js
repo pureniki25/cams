@@ -9,7 +9,7 @@ var htConfig;
 window.layinit = function (cb) {
     axios.defaults.headers.common['app'] = 'ALMS';
     axios.defaults.headers.common['Authorization'] = 'Bearer ' + getToken();
-    axios.defaults.headers.common['instanceId'] = coreInstancedId;
+    // axios.defaults.headers.common['instanceId'] = coreInstancedId;
     // if()
 
     // axios.defaults.headers.common['instanceId'] = 'Bearer ' + getToken();
