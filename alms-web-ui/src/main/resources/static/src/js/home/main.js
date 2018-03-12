@@ -101,7 +101,7 @@ window.layinit(function (htConfig) {
                 toolbar: '#approvalTable_tool_bar'
             }
         ]], //设置表头
-        url: basePath +'processController/selectProcessWaitToApproveVoPage/waitToApprove',
+        url: basePath +'processController/selectProcessWaitToApproveVoPage?reqPageeType=waitToApprove',
         //method: 'post' //如果无需自定义HTTP类型，可不加该参数
         //如果无需自定义请求参数，可不加该参数
         //response: {} //如果无需自定义数据响应名称，可不加该参数
