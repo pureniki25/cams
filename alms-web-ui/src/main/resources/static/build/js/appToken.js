@@ -111,7 +111,7 @@ var authValid = function(param) {
  * 取得头部的需要添加的信息（ajax）
  * @param serviceFlage
  */
-var getAjaxHead = function(serviceFlage){
+/*var getAjaxHead = function(serviceFlage){
 	var heads = {
         app : 'ALMS',
         Authorization : "Bearer " + getToken()
@@ -121,20 +121,20 @@ var getAjaxHead = function(serviceFlage){
 	}else{
         headers.instanceId = coreInstancedId;
 	}
-}
+}*/
 /**
  * 如果axios请求的不是默认的服务类型就在这
  * @param xhr
  * @param serviceFlage
  */
-var setXiosReqHead =  function (xhr,serviceFlage) {
+/*var setXiosReqHead =  function (xhr,serviceFlage) {
     xhr.setRequestHeader("app", config.app);
     if(serviceFlage=="open"){
         xhr.setRequestHeader("instanceId", openInstancedId);
     }else{
         xhr.setRequestHeader("instanceId", coreInstancedId);
 	}
-}
+}*/
 
 var getAuth = function() {
 

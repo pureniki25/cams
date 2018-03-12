@@ -21,27 +21,27 @@ import java.util.Map;
 @RequestMapping("/properties")
 public class PropertiesController {
 
-    @Resource
-    LoginUserInfoHelper loginUserInfoHelper;
+//    @Resource
+//    LoginUserInfoHelper loginUserInfoHelper;
 
     @Value("${ht.config.ui.gatewayUrl}")
     private String gatewayUrl;  //配置的网关
-    @Value("${ht.config.ui.coreInstancedId}")
-    private String coreInstancedId;  //core服务标识的访问实例
-    @Value("${ht.config.ui.openInstancedId}")
-    private String openInstancedId;  //open服务标识的访问实例
+//    @Value("${ht.config.ui.coreInstancedId}")
+//    private String coreInstancedId;  //core服务标识的访问实例
+/*    @Value("${ht.config.ui.openInstancedId}")
+    private String openInstancedId;  //open服务标识的访问实例*/
 
 
 
     @Value("${ht.config.ui.useGateWayflage}")
     private Boolean useGateWayflage;//是否使用网关的标志位
 
-    @Value("${ht.config.ui.defaultUser}")
-    private String defaultUser;//不使用网关的默认用户
-    @Value("${ht.config.ui.localCoreBasePath}")
-    private String coreBasePath;//不使用网关时core的链接地址
-    @Value("${ht.config.ui.localOpenBasePath}")
-    private String OpenBasePath;//不使用网关时open的链接地址
+//    @Value("${ht.config.ui.defaultUser}")
+//    private String defaultUser;//不使用网关的默认用户
+//    @Value("${ht.config.ui.localCoreBasePath}")
+//    private String coreBasePath;//不使用网关时core的链接地址
+//    @Value("${ht.config.ui.localOpenBasePath}")
+//    private String OpenBasePath;//不使用网关时open的链接地址
 
 //    ht.config.ui.useGateWayflage=false
 //    ht.config.ui.defaultUser="admin-alms"
@@ -51,38 +51,39 @@ public class PropertiesController {
     @GetMapping(value = "config.js",produces = "application/javascript")
     public String config (){
 
-        Map<String ,Object> mapper = new HashMap<String,Object>();
-        mapper.put("gatewayUrl",gatewayUrl);
-        String basePath = gatewayUrl+"alms/";
-        if(!useGateWayflage){
+//        Map<String ,Object> mapper = new HashMap<String,Object>();
+//        mapper.put("gatewayUrl",gatewayUrl);
+//        String basePath = gatewayUrl+"alms/";
+//        if(!useGateWayflage){
+//
+////            mapper.put("loginUserId",defaultUser);
+//            mapper.put("loginUserId",loginUserInfoHelper.getUserId());
+//            mapper.put("coreBasePath",coreBasePath);
+//            mapper.put("OpenBasePath",OpenBasePath);
+//        }else{
+//            mapper.put("coreBasePath",basePath+"core/");
+//            mapper.put("OpenBasePath",basePath+"open/");
+//        }
 
-//            mapper.put("loginUserId",defaultUser);
-            mapper.put("loginUserId",loginUserInfoHelper.getUserId());
-            mapper.put("coreBasePath",coreBasePath);
-            mapper.put("OpenBasePath",OpenBasePath);
-        }else{
-            mapper.put("coreBasePath",basePath+"core/");
-            mapper.put("OpenBasePath",basePath+"open/");
-        }
-
-        mapper.put("useGateWayflage",useGateWayflage);
-        mapper.put("basePath",basePath);
-        mapper.put("app","ALMS");
-        mapper.put("loginPath","/login");
-        mapper.put("indexPath","/index");
-        mapper.put("loadMenuUrl",gatewayUrl + "uc/auth/loadMenu");
-        mapper.put("loadBtnAndTabUrl",gatewayUrl + "uc/auth/loadBtnAndTab");
-        mapper.put("refreshTokenUrl",gatewayUrl + "uaa/auth/token");
+//        mapper.put("useGateWayflage",useGateWayflage);
+//        mapper.put("basePath",basePath);
+//        mapper.put("app","ALMS");
+//        mapper.put("loginPath","/login");
+//        mapper.put("indexPath","/index");
+//        mapper.put("loadMenuUrl",gatewayUrl + "uc/auth/loadMenu");
+//        mapper.put("loadBtnAndTabUrl",gatewayUrl + "uc/auth/loadBtnAndTab");
+//        mapper.put("refreshTokenUrl",gatewayUrl + "uaa/auth/token");
 
 
 //        return String.format("var ht_properties=%s;",JSONObject.toJSONString(mapper));
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(String.format("var gateWayUrl='%s';",gatewayUrl));
         stringBuilder.append("\r");
-        stringBuilder.append(String.format("var coreInstancedId='%s';",coreInstancedId));
+
+/*        stringBuilder.append(String.format("var coreInstancedId='%s';",coreInstancedId));
         stringBuilder.append("\r");
         stringBuilder.append(String.format("var openInstancedId='%s';",openInstancedId));
-        stringBuilder.append("\r");
+        stringBuilder.append("\r");*/
         stringBuilder.append(String.format("var useGateWayflage=%s;",useGateWayflage));
         stringBuilder.append("\r");
 
