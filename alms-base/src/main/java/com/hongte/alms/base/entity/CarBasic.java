@@ -43,7 +43,12 @@ public class CarBasic extends Model<CarBasic> {
 	@TableField("license_plate_number")
 	@ApiModelProperty(required= true,value = "车牌号 ")
 	private String licensePlateNumber;
-
+    /**
+     * 评估金额
+     */
+	@TableField("evaluation_amount")
+	@ApiModelProperty(required= true,value = "评估金额 ")
+	private BigDecimal evaluationAmount;
     /**
      * 车身颜色 
      */
@@ -262,6 +267,13 @@ public class CarBasic extends Model<CarBasic> {
 		this.licensePlateNumber = licensePlateNumber;
 	}
 
+	public BigDecimal getEvaluationAmount() {
+		return evaluationAmount;
+	}
+
+	public void setEvaluationAmount(BigDecimal evaluationAmount) {
+		this.evaluationAmount = evaluationAmount;
+	}
 
 	public String getColor() {
 		return color;
@@ -538,6 +550,7 @@ public class CarBasic extends Model<CarBasic> {
 			" businessId=" + businessId +
 			", ownerName=" + ownerName +
 			", licensePlateNumber=" + licensePlateNumber +
+			", evaluationAmount=" + evaluationAmount +
 			", color=" + color +
 			", brandName=" + brandName +
 			", model=" + model +
