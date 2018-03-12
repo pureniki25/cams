@@ -2,6 +2,8 @@ package com.hongte.alms.base.mapper;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.hongte.alms.base.entity.WithholdingRepaymentLog;
@@ -33,5 +35,24 @@ public interface WithholdingRepaymentLogMapper extends SuperMapper<WithholdingRe
      * @return
      */
     List<RepaymentLogVO> selectRepaymentLogList(RepaymentLogReq key);
+    
+    
+    
+    
+    /**
+     * 根据业务ID查找代扣业务条数
+     * @param key
+     * @return
+     */
+    RepaymentLogVO selectSumByBusinessId(@Param("repayStatus")String repayStatus,@Param("userId")String userId);
+    
+    
+    /**
+     * 根据业务ID查找代扣成功流水条数
+     * @param key
+     * @return
+     */
+    RepaymentLogVO selectSumByLogId(@Param("userId")String userId);
+
 
 }
