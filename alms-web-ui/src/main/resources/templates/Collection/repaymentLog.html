@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
     <title >代扣查询</title>
-    <script src="/properties/config.js"></script>
+
     <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
     <!-- iview样式 -->
     <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
@@ -63,7 +63,8 @@
                     <span v-else>导出中...</span>
 
                 </i-button>
-
+    
+         
                 <row :gutter="16">
                     <i-form ref="searchForm"  :model="searchForm"   :rules="ruleValidate" label-position="right" :label-width="100">
                         <i-col span="6">
@@ -119,7 +120,11 @@
 
 
 
-
+   <div style="background-color:rgba(204, 235, 248, 1);height:30px;padding:5px 0px">
+                <span style="color:#169BD5">
+                   代扣信息查询合计,代扣成功流水总数:{{countbyLogId}},代扣成功业务总数:{{countByBusinessIdSucess}},代扣成功金额总数(元):{{SumRepayAmount}}，代扣总业务数:{{countByBusinessId}}
+                </span>
+            </div>
     <!-- 表单Grid，使用layerUI的表格组件 开始 -->
     <row style="padding: 10px">
         <i-col span="24">

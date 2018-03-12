@@ -54,7 +54,57 @@ public class RepaymentLogVO {
     @Excel(name = "备注", orderNum = "12",  isImportField = "true_st")
 	private String remark;
     
+    
+    private String countByBusinessIdAndSuccess;
+    
+    /**
+     * 
+     */
+    private String countByBusinessId;
+    
+    private String countbyLogId;
+    
+    
+    
+    private String sumRepayAmount;
+    
+    
+    
 	
+
+
+	public String getCountByBusinessIdAndSuccess() {
+		return countByBusinessIdAndSuccess;
+	}
+
+	public void setCountByBusinessIdAndSuccess(String countByBusinessIdAndSuccess) {
+		this.countByBusinessIdAndSuccess = countByBusinessIdAndSuccess;
+	}
+
+	public String getCountByBusinessId() {
+		return countByBusinessId;
+	}
+
+	public void setCountByBusinessId(String countByBusinessId) {
+		this.countByBusinessId = countByBusinessId;
+	}
+
+	public String getCountbyLogId() {
+		return countbyLogId;
+	}
+
+	public void setCountbyLogId(String countbyLogId) {
+		this.countbyLogId = countbyLogId;
+	}
+
+	public String getSumRepayAmount() {
+		return sumRepayAmount;
+	}
+
+	public void setSumRepayAmount(String sumRepayAmount) {
+		this.sumRepayAmount = sumRepayAmount;
+	}
+
 	public String getOriginalBusinessId() {
 		return originalBusinessId;
 	}
