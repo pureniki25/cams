@@ -44,7 +44,7 @@ public class CarBasic extends Model<CarBasic> {
 	@ApiModelProperty(required= true,value = "车牌号 ")
 	private String licensePlateNumber;
     /**
-     * 评估金额 
+     * 评估金额
      */
 	@TableField("evaluation_amount")
 	@ApiModelProperty(required= true,value = "评估金额 ")
