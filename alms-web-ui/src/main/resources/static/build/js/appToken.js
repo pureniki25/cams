@@ -7,10 +7,38 @@ var _loadBtnAndTabUrl="";
 var htConfig;
 
 window.layinit = function (cb) {
+
+    $.ajax({
+        type : 'GET',
+        async : false,
+        // url : "http://10.110.1.240:30111/uc/auth/loadBtnAndTab",
+        // url : "http://localhost:30111/uc/auth/loadBtnAndTab",
+        url : "/properties/config.js",
+        headers : {
+            app : 'ALMS',
+            Authorization : "Bearer " + getToken()
+        },
+        success : function(data) {
+            htConfig = JSON.parse(str)
+            // allAuth = data;
+        },
+        error : function() {
+/*            layer.confirm('Navbar error:AJAX请求出错!', function(index) {
+                top.location.href = loginUrl;
+                layer.close(index);
+            });*/
+            return false;
+        }
+    });
+
     layui.config({
         base : '/plugins/layui/extend/modules/',
         version : '1.0.11'
     }).use(['layer', 'table','ht_ajax', 'ht_auth', 'ht_config','laydate','upload'], function () {
+        // htConfig = window.properties.config;
+		// if(!(window.properties.config.useGateWayflage)){
+         //    axios.defaults.headers.common['userId'] = window.properties.config.loginUserId;
+		// }
         htConfig = layui.ht_config;
         _loadBtnAndTabUrl =  htConfig.loadBtnAndTabUrl;
 

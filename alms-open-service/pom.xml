@@ -32,6 +32,7 @@
 		<!-- 依赖版本 -->
 		<mapper.version>3.3.6</mapper.version>
 		<maven.deploy.skip>true</maven.deploy.skip>
+		<start-class>com.hongte.alms.open.OpenServiceApplication</start-class>
 	</properties>
 
 	<dependencies>

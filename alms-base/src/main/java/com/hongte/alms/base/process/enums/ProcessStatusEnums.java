@@ -74,17 +74,17 @@ public enum ProcessStatusEnums {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
+//	public void setName(String name) {
+//		this.name = name;
+//	}
 
 	public int getKey() {
 		return key;
 	}
 
-	public void setKey(int key) {
-		this.key = key;
-	}
+//	public void setKey(int key) {
+//		this.key = key;
+//	}
 
 
 
