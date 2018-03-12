@@ -7,7 +7,6 @@
         <id column="business_id" property="businessId" />
         <result column="owner_name" property="ownerName" />
         <result column="license_plate_number" property="licensePlateNumber" />
-        <result column="evaluation_amount" property="evaluationAmount" />
         <result column="color" property="color" />
         <result column="brand_name" property="brandName" />
         <result column="model" property="model" />
@@ -45,7 +44,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        business_id AS businessId, owner_name AS ownerName, license_plate_number AS licensePlateNumber, evaluation_amount AS evaluationAmount, color, brand_name AS brandName, model, edition, is_mortgage AS isMortgage, transfer_times AS transferTimes, origin_place AS originPlace, license_location AS licenseLocation, emission_standard AS emissionStandard, vin, engine_model AS engineModel, gear_box AS gearBox, odometer, displacement, displacement_unit AS displacementUnit, is_driving_license_consistent AS isDrivingLicenseConsistent, driving_license_inconsistent_description AS drivingLicenseInconsistentDescription, invoice_cost AS invoiceCost, fuel_left AS fuelLeft, fuel_type AS fuelType, vehicle_license_registration_date AS vehicleLicenseRegistrationDate, traffic_violation_situation AS trafficViolationSituation, insurance_expiration_date AS insuranceExpirationDate, insurance_beneficiary AS insuranceBeneficiary, insurance_company AS insuranceCompany, is_renewal AS isRenewal, annual_verification_expiration_date AS annualVerificationExpirationDate, traffic_violation_fee AS trafficViolationFee, vehicle_vessel_tax AS vehicleVesselTax, annual_ticket_fee AS annualTicketFee, total_fee AS totalFee, create_time AS createTime, create_user AS createUser
+        business_id AS businessId, owner_name AS ownerName, license_plate_number AS licensePlateNumber,  color, brand_name AS brandName, model, edition, is_mortgage AS isMortgage, transfer_times AS transferTimes, origin_place AS originPlace, license_location AS licenseLocation, emission_standard AS emissionStandard, vin, engine_model AS engineModel, gear_box AS gearBox, odometer, displacement, displacement_unit AS displacementUnit, is_driving_license_consistent AS isDrivingLicenseConsistent, driving_license_inconsistent_description AS drivingLicenseInconsistentDescription, invoice_cost AS invoiceCost, fuel_left AS fuelLeft, fuel_type AS fuelType, vehicle_license_registration_date AS vehicleLicenseRegistrationDate, traffic_violation_situation AS trafficViolationSituation, insurance_expiration_date AS insuranceExpirationDate, insurance_beneficiary AS insuranceBeneficiary, insurance_company AS insuranceCompany, is_renewal AS isRenewal, annual_verification_expiration_date AS annualVerificationExpirationDate, traffic_violation_fee AS trafficViolationFee, vehicle_vessel_tax AS vehicleVesselTax, annual_ticket_fee AS annualTicketFee, total_fee AS totalFee, create_time AS createTime, create_user AS createUser
     </sql>
 
 </mapper>
