@@ -32,7 +32,14 @@ public class DeductionVo {
     
     private String repaymentTypeName;//还款方式
     private String  operatorName;//业务主办人
-    public String getCurrentStatus() {
+    private Integer platformId;
+    public Integer getPlatformId() {
+ 		return platformId;
+ 	}
+ 	public void setPlatformId(Integer platformId) {
+ 		this.platformId = platformId;
+ 	}
+	public String getCurrentStatus() {
 		return currentStatus;
 	}
 	public void setCurrentStatus(String currentStatus) {

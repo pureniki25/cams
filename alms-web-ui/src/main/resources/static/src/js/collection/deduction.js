@@ -47,20 +47,21 @@ var layer;
                     nowdate:"",               
                     operatorName:"",          
                     repaymentTypeName:"",
-                    currentStatus:"",
-                    platform:'3'
+                    currentStatus:""
+                   
 
                 },
                 platformList:[],
+                platformId:1
                 
          
         	},
-            methods: {
-            	deductionLimit(){
-                	getLastSms();
+            methods: {  
+            	bankLimit(){
+                	getBankLimit();
                 	
                 },
-                withHolding(){debugger
+                withHolding(){
                 	
                 	if(ajax_data.currentStatus!='已还款'){
                 		withHoldingRecord();
@@ -76,71 +77,24 @@ var layer;
             }
         });
         
-        //使用layerUI的表格组件
-        layui.use(['layer', 'table','ht_ajax', 'ht_auth', 'ht_config'], function () {
-            layer = layui.layer;
-            table = layui.table;
-            // var config = layui.ht_config;
-            // basePath = config.basePath;
-            //执行渲染
-            table.render({
-                elem: '#listTable' //指定原始表格元素选择器（推荐id选择器）
-                , id: 'listTable'
-                , height: 550 //容器高度
-                , cols: [[
-
-
-                    {
-                        field: 'originalBusinessId',
-                        title: '序号'
-                    }, {
-                        field: 'afterId',
-                        title: '代扣时间'
-                    },{
-                        field: 'recipient',
-                        title: '代扣金额'
-                    }, {
-                        field: 'phoneNumber',
-                        title: '代扣人'
-                    }, {
-                        field: 'smsType',
-                        title: '代扣银行卡'
-                    },{
-                        field: 'sendDate',
-                        title: '代扣公司'
-                    },
-                    {
-                        field: 'companyId',
-                        title: '代扣结果'
-                    },
-                    {
-                        field: 'status',
-                        title: '备注'
-                    }
-                    
-              
-                ]], //设置表头
-                url: basePath +'InfoController/selectInfoSmsVoPage',
-                //method: 'post' //如果无需自定义HTTP类型，可不加该参数
-                //request: {} //如果无需自定义请求参数，可不加该参数
-                //response: {} //如果无需自定义数据响应名称，可不加该参数
-                page: false,
-                done: function (res, curr, count) {
-                    //数据渲染完的回调。你可以借此做一些其它的操作
-                    //如果是异步请求数据方式，res即为你接口返回的信息。
-                    //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
-                    vm.loading = false;
-                }
-            });
-
-        
-
-
-        });
+     
 
 	});
 
-	
+	//从后台获取下拉框数据
+	var getBankLimit = function () {
+
+		
+	    layer.open({
+	        type: 2,
+	        title: "各支付平台代扣限额列表",
+	        maxmin: true,
+	        area: ['1150px', '700px'],
+	        content:'/collectionUI/bankLimitUI'
+	    });
+
+	}
+
 	
 	var withHoldingRecord=function(){
 		
@@ -194,6 +148,29 @@ var layer;
    
 	}
 
+	
+	var searchRepayLog=function(){
+		
+		
+        var self = this;
+        var reqStr =openPath+ "WithHoldingController/searchRepayLog?originalBusinessId=" +vm.ajax_data.originalBusinessId;
+        axios.get(reqStr)
+            .then(function (result) {debugger
+                if (result.data.code == "1") {
+                	
+                	result.data.data;
+                
+                } else {
+                    self.$Modal.error({content: '获取数据失败：' + result.data.msg});
+                }
+            })
+   
+        .catch(function (error) {
+            vm.$Modal.error({content: '接口调用异常!'});
+        });
+		
+   
+	}
 	var getDeductionInfo=function(){
 		
 		
@@ -201,11 +178,74 @@ var layer;
         var reqStr =basePath+ "DeductionController/selectDeductionInfoByPlayListId?planListId=" + planListId
         axios.get(reqStr)
             .then(function (result) {
-                if (result.data.code == "1") {
+                if (result.data.code == "1") {debugger
                 	
           
                     vm.ajax_data=result.data.data;
-           
+                    vm.platformId=result.data.data.platformId;
+//                    searchRepayLog();
+                    
+                    //使用layerUI的表格组件
+                    layui.use(['layer', 'table','ht_ajax', 'ht_auth', 'ht_config'], function () {
+                        layer = layui.layer;
+                        table = layui.table;
+                        // var config = layui.ht_config;
+                        // basePath = config.basePath;
+                        //执行渲染
+                        table.render({
+                            elem: '#listTable' //指定原始表格元素选择器（推荐id选择器）
+                            , id: 'listTable'
+                            , height: 550 //容器高度
+                            , cols: [[
+
+
+                                {
+                                    field: 'listId',
+                                    title: '序号'
+                                }, {
+                                    field: 'createTime',
+                                    title: '代扣时间'
+                                },{
+                                    field: 'repayMoney',
+                                    title: '代扣金额'
+                                }, {
+                                    field: 'customerName',
+                                    title: '代扣人'
+                                }, {
+                                    field: 'bankCard',
+                                    title: '代扣银行卡'
+                                },{
+                                    field: 'BindPlatform',
+                                    title: '代扣公司'
+                                },
+                                {
+                                    field: 'repayStatus',
+                                    title: '代扣结果'
+                                },
+                                {
+                                    field: 'remark',
+                                    title: '备注'
+                                }
+                                
+                          
+                            ]], //设置表头
+                            url: openPath+ "WithHoldingController/searchRepayLog?originalBusinessId=" +vm.ajax_data.originalBusinessId,
+                            //method: 'post' //如果无需自定义HTTP类型，可不加该参数
+                            //request: {} //如果无需自定义请求参数，可不加该参数
+                            //response: {} //如果无需自定义数据响应名称，可不加该参数
+                            page: false,
+                            done: function (res, curr, count) {
+                                //数据渲染完的回调。你可以借此做一些其它的操作
+                                //如果是异步请求数据方式，res即为你接口返回的信息。
+                                //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
+                                vm.loading = false;
+                            }
+                        });
+
+                    
+
+
+                    });
                     
                 } else {
                     self.$Modal.error({content: '获取数据失败：' + result.data.msg});
@@ -236,6 +276,7 @@ var layer;
                 	
           
                     vm.platformList = result.data.data.platformList;
+               
            
                     
                 } else {

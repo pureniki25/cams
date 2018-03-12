@@ -12,5 +12,10 @@ import feign.RequestLine;
 public interface WithHoldingXinDaiService {
     @RequestLine("POST /api/ltgproject/dod ")
     @Headers("Content-Type: application/json")
-    String doold(String content);
+    String withholding(String content);
+    
+    
+    @RequestLine("POST /api/ltgproject/dod ")
+    @Headers("Content-Type: application/json")
+    String searchRepayRecord(String content);
 }

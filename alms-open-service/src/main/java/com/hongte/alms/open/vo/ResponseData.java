@@ -8,8 +8,15 @@ public class ResponseData {
   private String returnMessage;
   private String date;
   private String now;
+  private String data;
 public String getToken() {
 	return token;
+}
+public String getData() {
+	return data;
+}
+public void setData(String data) {
+	this.data = data;
 }
 public void setToken(String token) {
 	this.token = token;

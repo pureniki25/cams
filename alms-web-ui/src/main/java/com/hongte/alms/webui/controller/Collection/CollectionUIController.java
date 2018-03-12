@@ -156,4 +156,10 @@ public class CollectionUIController {
         map.addAttribute("remark",remark);
         return "/Collection/repayLogDetail";
     }
+   
+   //执行代扣界面
+   @RequestMapping("bankLimitUI")
+   public String bankLimit(){
+       return "/Collection/bankLimit";
+   }
 }

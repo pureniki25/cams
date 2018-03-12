@@ -390,7 +390,7 @@ window.layinit(function(htConfig){
                             {"name": "执行代扣", click: function (e, currentItem) {
                                 var url = getDeductionUrl(currentItem);
                                 // var url = '/collectionUI/applyDerateUI?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+"&processStatus=-1"
-                                showOneLineOprLayer(url,"执行代扣")
+                                showOneLineOprLayer(url,"")
                             }},
                             {"name": "拖车登记", click: function (e, currentItem) {
                                 // url = getDeductionUrl(currentItem);

@@ -38,17 +38,15 @@
 
         <where>
                1=1
-            <if test="bankCode !=null and bankCode !=''">
+            <if test="bankName !=null and bankName !=''">
                 and (bank.bank_code  LIKE '%${bankCode}%' )
             </if>
-            <if test="platformId !=null and platformId !=''">
-                and p.platform_id = #{platformId}
+            <if test="platfromId !=null and platfromId !=''">
+                and p.platform_id = #{platfromId}
             </if>
 
 
-             and bLimit.status='1'
-             
-             order by p.platform_id 
+             where bLimit.`status`='1'
         </where>
       
     
