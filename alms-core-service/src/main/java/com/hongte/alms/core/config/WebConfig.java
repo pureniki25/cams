@@ -2,6 +2,7 @@ package com.hongte.alms.core.config;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -20,6 +21,9 @@ import java.util.List;
 //@EnableWebMvc
 @Configuration
 public class WebConfig extends WebMvcConfigurerAdapter {
+
+    @Value("${ht.config.ui.useGateWayflage}")
+    private Boolean useGateWayflage;
 
     //定义时间格式转换器
     @Bean
@@ -43,11 +47,15 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     //调用本地service，需要解开注释
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("*")
-                .allowCredentials(true)
-                .allowedMethods("GET", "POST", "DELETE", "PUT")
-                .maxAge(3600);
+        //使用配置中心的标志位为false时才设置这个配置
+        if(!useGateWayflage){
+            registry.addMapping("/**")
+                    .allowedOrigins("*")
+                    .allowCredentials(true)
+                    .allowedMethods("GET", "POST", "DELETE", "PUT")
+                    .maxAge(3600);
+        }
+
     }
 
 }

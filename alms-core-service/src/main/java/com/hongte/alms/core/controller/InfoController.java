@@ -43,6 +43,8 @@ import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.core.storage.StorageService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.LoginInfoDto;
+
+import feign.Request;
 import io.swagger.annotations.ApiOperation;
 import org.apache.poi.ss.usermodel.Workbook;
 
@@ -93,6 +95,8 @@ public class InfoController {
     BasicBusinessTypeService basicBusinessTypeService;
  
 
+    @Autowired
+    LoginUserInfoHelper loginUserInfoHelper;
 
 
     /**
@@ -138,7 +142,13 @@ public class InfoController {
     public PageResult<List<InfoSmsListSearchVO>> selectInfoSmsVoPage(@ModelAttribute InfoSmsListSearchReq  req){
 
         try{
+           	req.setUserId(loginUserInfoHelper.getUserId());
             Page<InfoSmsListSearchVO> pages = infoSmsService.selectInfoSmsPage(req);
+            List<InfoSmsListSearchVO> list=pages.getRecords();
+            List<String> logIdList=new ArrayList();
+            for(int i=0;i<list.size();i++) {
+            	logIdList.add(list.get(0).getLogId());
+            }
             return PageResult.success(pages.getRecords(),pages.getTotal());
         }catch (Exception ex){
             ex.printStackTrace();
@@ -146,7 +156,32 @@ public class InfoController {
             return PageResult.error(500, "数据库访问异常");
         }
     }
+    @ApiOperation(value="取得查询后的logId集合")
+//  @CrossOrigin(allowCredentials="true", allowedHeaders="*", origins="*")
+  @GetMapping("getLogIdList")
+  public Result<Map<String,JSONArray>> getLogIdList(@ModelAttribute InfoSmsListSearchReq  req) {
 
+      Map<String,JSONArray> retMap = new HashMap<String,JSONArray>();
+
+     
+      //业务状态(贷后状态)
+      List<SysParameter> businessStatusList = sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterTypeEnums.SMS_TYPE.getKey()).orderBy("row_Index"));
+      retMap.put("smsType",(JSONArray) JSON.toJSON(businessStatusList, JsonUtil.getMapping()));
+
+      //区域
+      List<BasicCompany> area_list = basicCompanyService.selectList(new EntityWrapper<BasicCompany>().eq("area_level", AreaLevel.AREA_LEVEL.getKey()));
+      retMap.put("area", (JSONArray) JSON.toJSON(area_list,JsonUtil.getMapping()));
+      //公司
+      List<BasicCompany> company_list = basicCompanyService.selectList(new EntityWrapper<BasicCompany>().eq("area_level",AreaLevel.COMPANY_LEVEL.getKey()));
+      retMap.put("company",(JSONArray) JSON.toJSON(company_list,JsonUtil.getMapping()));
+      //业务类型
+      List<BasicBusinessType> btype_list =  basicBusinessTypeService.selectList(new EntityWrapper<BasicBusinessType>().orderBy("business_type_id"));
+      retMap.put("businessType",(JSONArray) JSON.toJSON(btype_list, JsonUtil.getMapping()));
+
+
+      return Result.success(retMap);
+  }
+    /**
     /**
      * 获取短信详情
      * @param req 分页请求数据

@@ -1,6 +1,7 @@
 package com.hongte.alms.core.controller;
 
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -24,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.collection.vo.AfterLoanStandingBookReq;
@@ -38,6 +41,7 @@ import com.hongte.alms.base.vo.module.RepaymentLogReq;
 import com.hongte.alms.base.vo.module.RepaymentLogVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.EasyPoiExcelExportUtil;
+import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.core.storage.StorageService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
@@ -80,7 +84,7 @@ public class WithholdingRepaymentLogController {
 	    public PageResult<List<RepaymentLogVO>> selectRepaymentLogList(@ModelAttribute RepaymentLogReq  req){
 
 	        try{
-	            req.setUserId(loginUserInfoHelper.getUserId());
+	        	req.setUserId(loginUserInfoHelper.getUserId());
 	            Page<RepaymentLogVO> pages = withholdingRepaymentlogService.selectRepaymentLogPage(req);
 	       
 	            return PageResult.success(pages.getRecords(),pages.getTotal());
@@ -113,6 +117,41 @@ public class WithholdingRepaymentLogController {
 	        
 	    }
 	    
+	    /**
+	     * 获取代扣业务条数，成功代扣流水数，成功代扣总额，成功代扣业务条数
+	     * @author chenzs
+	     * @date 2018年3月12日
+	     * @return 详情
+	     */
+	    @ApiOperation(value = "获取代扣业务条数，成功代扣流水数，成功代扣总额，成功代扣业务条数")
+	    @GetMapping("/getCountInfo")
+	    @ResponseBody
+	    public Result<Map<String,String>>getCountInfo(
+	    ){
+	    	   Map<String,String> retMap = new HashMap<String,String>();
+	    	String userId=loginUserInfoHelper.getUserId();
+	    	//查找代扣业务成功总条数
+	        RepaymentLogVO  repaymentLogVO = withholdingRepaymentlogService.selectSumByBusinessId("1", userId);
+	        String countByBusinessIdSucess=repaymentLogVO.getCountByBusinessId();
+	    	//查找代扣业务总条数
+	        repaymentLogVO=withholdingRepaymentlogService.selectSumByBusinessId(null, userId);
+	        String countByBusinessId=repaymentLogVO.getCountByBusinessId();
+	        
+	      //查找代扣成功流水总条数
+	        repaymentLogVO=withholdingRepaymentlogService.selectSumByLogId(userId);
+	        String countbyLogId=repaymentLogVO.getCountbyLogId();
+	        
+	        //查找代扣成功总额
+	        String SumRepayAmount=repaymentLogVO.getSumRepayAmount();
+	        retMap.put("countByBusinessIdSucess",countByBusinessIdSucess);
+	        retMap.put("countByBusinessId",countByBusinessId);
+	        retMap.put("countbyLogId",countbyLogId);
+	        retMap.put("SumRepayAmount",SumRepayAmount);
+
+	        
+	        return Result.success(retMap);
+	        
+	    }
 	    
 	    
 	    @Value("${ht.excel.file.save.path}")

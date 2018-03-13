@@ -79,11 +79,8 @@ var layer;
                 }
           
             
-            },
-            created: function () {
-                this.getLast();
-                this.getNext();
             }
+       
         });
 	});
 	

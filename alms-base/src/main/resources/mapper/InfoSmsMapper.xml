@@ -40,7 +40,9 @@
 	 LEFT JOIN tb_basic_business  business  on sms.original_business_id=business.business_id
 	 LEFT JOIN tb_basic_company as company ON business.company_id = company.area_id
   LEFT JOIN tb_basic_business_type as  b_type ON business.business_type = b_type.business_type_id
-	  JOIN  tb_sys_user_permission user on user.business_id=sms.original_business_id
+	  JOIN  tb_sys_user_permission user_permission on user_permission.business_id=sms.original_business_id
+	  
+	  left join tb_sys_user user on user.user_id=user_permission.user_id 
      
 
         <where>
@@ -69,7 +71,7 @@
             <if test="companyId !=null and companyId !=''">
                 and business.company_id = #{companyId}
             </if>
-
+            and user.user_id=#{userId}
 
         </where>
         order BY  sms.create_time DESC
@@ -100,7 +102,7 @@
         <where>
                1=1
                and 
-      sms.log_id  &lt;  (select log_id from tb_sms_log where log_id = #{logId}) 
+      sms.create_time  &lt;  (select create_time from tb_sms_log where log_id = #{logId}) 
       
 
         </where>
@@ -132,7 +134,7 @@
         <where>
                1=1
                and
-      sms.log_id  &gt;  (select log_id from tb_sms_log where log_id = #{logId}) 
+      sms.create_time  &gt;  (select create_time from tb_sms_log where log_id = #{logId}) 
       
 
         </where>

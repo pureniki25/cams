@@ -21,6 +21,12 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://172.16.200.110:30101/eureka/  # 配置注册中心url
+ht:
+  config:
+    ui:
+      gatewayUrl: http://172.16.200.110:30111/  #网关地址
+      useGateWayflage: false   #是否使用网关的标志位
+
 
 ---
 spring:
@@ -47,6 +53,11 @@ eureka:
       ip-address: 172.16.200.110
       status-page-url: http://${eureka.instance.ip-address:${spring.cloud.client.ipAddress}}:${server.port}${status-page-url-path:/info}
       health-check-url: http://${eureka.instance.ip-address:${spring.cloud.client.ipAddress}}:${server.port}${health-check-url-path:/health}
+ht:
+  config:
+    ui:
+      gatewayUrl: http://172.16.200.110:30111/  #网关地址
+      useGateWayflage: true   #是否使用网关的标志位
 
 ---
 spring:
@@ -73,7 +84,11 @@ eureka:
       ip-address: 172.16.200.112
       status-page-url: http://${eureka.instance.ip-address:${spring.cloud.client.ipAddress}}:${server.port}${status-page-url-path:/info}
       health-check-url: http://${eureka.instance.ip-address:${spring.cloud.client.ipAddress}}:${server.port}${health-check-url-path:/health}
-
+ht:
+  config:
+    ui:
+      gatewayUrl: http://172.16.200.112:30111/  #网关地址
+      useGateWayflage: true   #是否使用网关的标志位
 
 
 ---
@@ -93,6 +108,11 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://10.100.5.193:30101/eureka/,http://10.100.5.195:30102/eureka/ # 配置注册中心url
+ht:
+  config:
+    ui:
+      gatewayUrl: http://10.100.5.193:30111/  #网关地址
+      useGateWayflage: true   #是否使用网关的标志位
 
 ---
 spring:
@@ -113,5 +133,10 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://eureka.didispace.com/eureka/ # 配置注册中心url
+ht:
+  config:
+    ui:
+      gatewayUrl: http://eureka.didispace.com:30111/  #网关地址
+      useGateWayflage: true   #是否使用网关的标志位
 
 

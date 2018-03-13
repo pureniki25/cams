@@ -80,11 +80,11 @@ select repay.log_id as logId,repay.original_business_id as originalBusinessId ,r
                 and repay.repay_status = #{repayStatus}
             </if>
             <!--          /*代扣时间 开始*/ -->
-            <if test="dateBegin !=null and dateBegin !=''">
+            <if test="dateBegin !=null ">
                 <![CDATA[ and repay.create_time >= #{dateBegin,jdbcType=TIMESTAMP}]]>
             </if>
             <!--            /*代扣时间 结束*/ -->
-            <if test="dateEnd !=null and dateEnd !='' ">
+            <if test="dateEnd !=null ">
                 <![CDATA[ and repay.create_time <= #{dateEnd,jdbcType=TIMESTAMP}]]>
             </if>
             <if test="companyId !=null and companyId !=''">
@@ -99,6 +99,81 @@ select repay.log_id as logId,repay.original_business_id as originalBusinessId ,r
         </where>
       
         order BY  repay.create_time DESC
+
+
+    </select>
+    
+    
+    
+    
+        
+    <select id="selectSumByBusinessId" resultType="com.hongte.alms.base.vo.module.RepaymentLogVO">
+
+      
+ select count(1) as countByBusinessId from 
+
+(
+select repay.*  from tb_withholding_repayment_log  repay 
+
+
+ 
+	 LEFT JOIN tb_basic_business  business  on repay.original_business_id=business.business_id
+	 LEFT JOIN tb_basic_company as company ON business.company_id = company.area_id
+  LEFT JOIN tb_basic_business_type as  b_type ON business.business_type = b_type.business_type_id
+	  left JOIN  tb_sys_user_permission user_permission on user_permission.business_id=repay.original_business_id
+	  left join tb_sys_user user on user.user_id=user_permission.user_id 
+	  left join tb_withholding_platform as platform on platform.platform_id=repay.bind_platform_id
+	  
+	  
+	        and user.user_id=#{userId} group by repay.original_business_id,repay.after_id,repay.repay_status  ) as a
+
+
+
+        <where>
+               1=1
+    
+
+            <if test="repayStatus !=null and repayStatus !=''">
+                and repay_status = #{repayStatus}
+            </if>
+       
+        
+        </where>
+      
+
+
+    </select>
+    
+    
+    
+     <select id="selectSumByLogId" resultType="com.hongte.alms.base.vo.module.RepaymentLogVO">
+
+      
+      
+	        select count(1) as countbyLogId,sum(repay.current_amount) as sumRepayAmount  from tb_withholding_repayment_log  repay 
+
+
+ 
+	 LEFT JOIN tb_basic_business  business  on repay.original_business_id=business.business_id
+	 LEFT JOIN tb_basic_company as company ON business.company_id = company.area_id
+  LEFT JOIN tb_basic_business_type as  b_type ON business.business_type = b_type.business_type_id
+	  left JOIN  tb_sys_user_permission user_permission on user_permission.business_id=repay.original_business_id
+	  left join tb_sys_user user on user.user_id=user_permission.user_id 
+	  left join tb_withholding_platform as platform on platform.platform_id=repay.bind_platform_id
+	  
+	  
+	        and user.user_id=#{userId} 
+
+
+        <where>
+               1=1
+    
+
+                and repay.repay_status =1
+       
+        
+        </where>
+      
 
 
     </select>
