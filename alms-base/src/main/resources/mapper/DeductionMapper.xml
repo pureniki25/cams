@@ -39,7 +39,8 @@
 		repayment.repayment_type_name as repaymentTypeName,
 		business.operator_name as operatorName,
 		customer.phone_number as phoneNumber,
-		pList.current_status  as currentStatus
+		pList.current_status  as currentStatus,
+		platform.platform_id as platformId
 
 
 

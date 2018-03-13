@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.hongte.alms.base.entity.SysBank;
+import com.hongte.alms.base.vo.module.BankLimitReq;
 import com.hongte.alms.base.vo.module.BankLimitVO;
 import com.hongte.alms.common.mapper.SuperMapper;
 import com.hongte.alms.common.vo.PageRequest;
@@ -20,5 +21,5 @@ import com.hongte.alms.common.vo.PageRequest;
  */
 public interface SysBankMapper extends SuperMapper<SysBank> {
 
-	    List<BankLimitVO> selectBankLimitList(Pagination pages,PageRequest key,@Param("bankName")String bankName,@Param("platformId") Integer platformId);
+	    List<BankLimitVO> selectBankLimitList(Pagination pages,BankLimitReq key,@Param("bankCode")String bankCode,@Param("platformId") String platformId );
 }

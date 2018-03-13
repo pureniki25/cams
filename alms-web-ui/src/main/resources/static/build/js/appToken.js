@@ -7,10 +7,43 @@ var _loadBtnAndTabUrl="";
 var htConfig;
 
 window.layinit = function (cb) {
+    axios.defaults.headers.common['app'] = 'ALMS';
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + getToken();
+    // axios.defaults.headers.common['instanceId'] = coreInstancedId;
+    // if()
+
+    // axios.defaults.headers.common['instanceId'] = 'Bearer ' + getToken();
+ /*   $.ajax({
+        type : 'GET',
+        async : false,
+        // url : "http://10.110.1.240:30111/uc/auth/loadBtnAndTab",
+        // url : "http://localhost:30111/uc/auth/loadBtnAndTab",
+        url : "/properties/config.js",
+        headers : {
+            app : 'ALMS',
+            Authorization : "Bearer " + getToken()
+        },
+        success : function(data) {
+            htConfig = JSON.parse(str)
+            // allAuth = data;
+        },
+        error : function() {
+/!*            layer.confirm('Navbar error:AJAX请求出错!', function(index) {
+                top.location.href = loginUrl;
+                layer.close(index);
+            });*!/
+            return false;
+        }
+    });*/
+
     layui.config({
         base : '/plugins/layui/extend/modules/',
         version : '1.0.11'
     }).use(['layer', 'table','ht_ajax', 'ht_auth', 'ht_config','laydate','upload'], function () {
+        // htConfig = window.properties.config;
+		// if(!(window.properties.config.useGateWayflage)){
+         //    axios.defaults.headers.common['userId'] = window.properties.config.loginUserId;
+		// }
         htConfig = layui.ht_config;
         _loadBtnAndTabUrl =  htConfig.loadBtnAndTabUrl;
 
@@ -57,8 +90,7 @@ var getToken = function() {
 	return getCookieValue("token");
 }
 
-axios.defaults.headers.common['app'] = 'ALMS';
-axios.defaults.headers.common['Authorization'] = 'Bearer ' + getToken()
+
 var allAuth;
 
 var authValid = function(param) {
@@ -75,6 +107,34 @@ var authValid = function(param) {
 	}
 	return false;
 }
+/**
+ * 取得头部的需要添加的信息（ajax）
+ * @param serviceFlage
+ */
+/*var getAjaxHead = function(serviceFlage){
+	var heads = {
+        app : 'ALMS',
+        Authorization : "Bearer " + getToken()
+	}
+	if(serviceFlage=="open"){
+        headers.instanceId = openInstancedId;
+	}else{
+        headers.instanceId = coreInstancedId;
+	}
+}*/
+/**
+ * 如果axios请求的不是默认的服务类型就在这
+ * @param xhr
+ * @param serviceFlage
+ */
+/*var setXiosReqHead =  function (xhr,serviceFlage) {
+    xhr.setRequestHeader("app", config.app);
+    if(serviceFlage=="open"){
+        xhr.setRequestHeader("instanceId", openInstancedId);
+    }else{
+        xhr.setRequestHeader("instanceId", coreInstancedId);
+	}
+}*/
 
 var getAuth = function() {
 

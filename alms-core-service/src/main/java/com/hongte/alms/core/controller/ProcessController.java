@@ -57,10 +57,10 @@ public class ProcessController {
     BasicCompanyService basicCompanyService;
 
     @ApiOperation(value = "获得待我审批的流程分页数据")
-    @GetMapping("/selectProcessWaitToApproveVoPage/{reqPageeType}")
+    @GetMapping("/selectProcessWaitToApproveVoPage")
     @ResponseBody
     public PageResult<List<ProcessVo>> selectProcessWaitToApproveVoPage(
-            @PathVariable String reqPageeType,
+            @ModelAttribute String reqPageeType,
             @ModelAttribute ProcessReq req){
 
         try {

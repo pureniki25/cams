@@ -3,9 +3,9 @@ package com.hongte.alms.base.service;
 
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.entity.SysBank;
+import com.hongte.alms.base.vo.module.BankLimitReq;
 import com.hongte.alms.base.vo.module.BankLimitVO;
 import com.hongte.alms.common.service.BaseService;
-import com.hongte.alms.common.vo.PageRequest;
 
 /**
  * <p>
@@ -17,6 +17,6 @@ import com.hongte.alms.common.vo.PageRequest;
  */
 public interface SysBankService extends BaseService<SysBank> {
 	
-	Page<BankLimitVO> selectBankLimitList(String bankName,Integer platformId,PageRequest req);
+	Page<BankLimitVO> selectBankLimitList(String bankCode,String platformId,BankLimitReq req);
 
 }

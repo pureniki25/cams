@@ -25,6 +25,11 @@ public class InfoSmsListSearchReq extends PageRequest{
     private String   status		; //状态
     @ApiModelProperty(value="发送时间",name="sendDateBegin",example="test" ,dataType = "java.util.Date")
     private Date sendDateBegin	; 	//发送时间 开始
+    
+    
+ 
+	@ApiModelProperty(value="用户ID",name="status",example="test" ,dataType = "String")
+    private String   userId		; //用户ID
     public String getKeyName() {
 		return keyName;
 	}
@@ -63,6 +68,11 @@ public class InfoSmsListSearchReq extends PageRequest{
 	}
 	@ApiModelProperty(value="发送时间",name="sendDateEnd",example="test" ,dataType = "java.util.Date")
     private Date    sendDateEnd		; //发送时间 结束
-
+	   public String getUserId() {
+			return userId;
+		}
+		public void setUserId(String userId) {
+			this.userId = userId;
+		}
  
 }

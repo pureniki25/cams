@@ -21,11 +21,12 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://172.16.200.110:30101/eureka/  # 配置注册中心url
-
 ht:
   config:
     ui:
+      gatewayUrl: http://172.16.200.110:30111/  #网关地址
       useGateWayflage: false   #是否使用网关的标志位
+
 
 ---
 spring:
@@ -55,6 +56,7 @@ eureka:
 ht:
   config:
     ui:
+      gatewayUrl: http://172.16.200.110:30111/  #网关地址
       useGateWayflage: true   #是否使用网关的标志位
 
 ---
@@ -85,6 +87,7 @@ eureka:
 ht:
   config:
     ui:
+      gatewayUrl: http://172.16.200.112:30111/  #网关地址
       useGateWayflage: true   #是否使用网关的标志位
 
 
@@ -108,7 +111,9 @@ eureka:
 ht:
   config:
     ui:
+      gatewayUrl: http://10.100.5.193:30111/  #网关地址
       useGateWayflage: true   #是否使用网关的标志位
+
 ---
 spring:
   profiles: prd
@@ -131,5 +136,7 @@ eureka:
 ht:
   config:
     ui:
+      gatewayUrl: http://eureka.didispace.com:30111/  #网关地址
       useGateWayflage: true   #是否使用网关的标志位
+
 

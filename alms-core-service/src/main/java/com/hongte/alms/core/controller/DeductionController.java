@@ -16,6 +16,7 @@ import com.hongte.alms.base.entity.ApplyDerateProcess;
 import com.hongte.alms.base.entity.BasicBusinessType;
 import com.hongte.alms.base.entity.BasicCompany;
 import com.hongte.alms.base.entity.InfoSms;
+import com.hongte.alms.base.entity.SysBank;
 import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.entity.WithholdingPlatform;
 import com.hongte.alms.base.enums.AreaLevel;
@@ -34,12 +35,17 @@ import com.hongte.alms.base.process.vo.ProcessLogVo;
 import com.hongte.alms.base.service.*;
 import com.hongte.alms.base.vo.module.ApplyDerateListSearchReq;
 import com.hongte.alms.base.vo.module.ApplyDerateVo;
+import com.hongte.alms.base.vo.module.BankLimitReq;
+import com.hongte.alms.base.vo.module.BankLimitVO;
 import com.hongte.alms.base.vo.module.BusinessInfoForApplyDerateVo;
+import com.hongte.alms.base.vo.module.InfoSmsListSearchReq;
+import com.hongte.alms.base.vo.module.InfoSmsListSearchVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.ClassCopyUtil;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.EasyPoiExcelExportUtil;
 import com.hongte.alms.common.util.JsonUtil;
+import com.hongte.alms.common.vo.PageRequest;
 import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.core.storage.StorageService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
@@ -82,6 +88,9 @@ public class DeductionController {
     @Qualifier("WithholdingPlatformService")
     WithholdingPlatformService withholdingplatformService;
 
+    @Autowired
+    @Qualifier("SysBankService")
+    SysBankService sysBankService;
     @ApiOperation(value = "根据Plan_list_id查找代扣信息")
     @GetMapping("/selectDeductionInfoByPlayListId")
     @ResponseBody
@@ -128,8 +137,46 @@ public class DeductionController {
     	    return Result.success(retMap);
        }
    
+   /*
+    * 获取银行信息
+    * @author chenzs
+    * @date 2018年3月10日
+    * @return 银行信息
+    */
+   @ApiOperation(value = "获取银行信息")
+   @GetMapping("/getBank")
+   @ResponseBody
+   public Result<Map<String,Object>> getBank(
+   ){
+	      List<SysBank>  bankList = sysBankService.selectList(new EntityWrapper<SysBank>());
+
+	      Map<String,Object> retMap = new HashMap<>();
+    	   retMap.put("bankList",(JSONArray) JSON.toJSON(bankList, JsonUtil.getMapping()));
+    	    return Result.success(retMap);
+       }
+   /*
+    * 获取平台信息
+    * @author chenzs
+    * @date 2018年3月10日
+    * @return 代扣平台信息
+    */
+   @ApiOperation(value = "获取银行额度列表信息")
+   @GetMapping("/getBankLimit")
+   @ResponseBody
+
    
-   
+   public PageResult<List<BankLimitVO>> getBankLimit(@ModelAttribute BankLimitReq  req){
+
+       try{
+           Page<BankLimitVO> pages = sysBankService.selectBankLimitList(req.getBankCode(),req.getPlatformId(),  req);
+           return PageResult.success(pages.getRecords(),pages.getTotal());
+       }catch (Exception ex){
+           ex.printStackTrace();
+           logger.error(ex.getMessage());
+           return PageResult.error(500, "数据库访问异常");
+       }
+   }
+
    
 
    }

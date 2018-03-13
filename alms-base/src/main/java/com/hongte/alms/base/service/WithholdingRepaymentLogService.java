@@ -2,6 +2,8 @@ package com.hongte.alms.base.service;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.entity.WithholdingRepaymentLog;
 import com.hongte.alms.base.vo.module.RepaymentLogReq;
@@ -29,5 +31,20 @@ public interface WithholdingRepaymentLogService extends BaseService<WithholdingR
     
      List<RepaymentLogVO> selectRepaymentLogExcel(RepaymentLogReq key);
 
-	  
+     
+     /**
+      * 根据业务ID查找代扣业务条数
+      * @param key
+      * @return
+      */
+     RepaymentLogVO selectSumByBusinessId(String repayStatus,String userId);
+     
+     
+     /**
+      * 根据业务ID查找代扣成功流水条数
+      * @param key
+      * @return
+      */
+     RepaymentLogVO selectSumByLogId(String userId);
+
 }

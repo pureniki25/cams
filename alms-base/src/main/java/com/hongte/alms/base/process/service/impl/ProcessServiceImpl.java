@@ -19,6 +19,8 @@ import com.hongte.alms.common.util.ClassCopyUtil;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.JsonUtil;
 import com.ht.ussp.bean.LoginUserInfoHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -36,6 +38,9 @@ import java.util.*;
  */
 @Service("ProcessService")
 public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> implements ProcessService {
+
+    Logger logger = LoggerFactory.getLogger(ProcessServiceImpl.class);
+
     @Autowired
     private ProcessMapper processMapper;
 
@@ -100,19 +105,22 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
 //            throw  new RuntimeException("流程状态应为新建或起始");
 //        }
         if(processSaveReq.getBusinessId() == null){
-            throw new RuntimeException("业务ID不能为空");
+            logger.error("业务ID不能为空  "+processTypeEnums.getName());
+            throw new RuntimeException("业务ID不能为空  "+processTypeEnums.getName());
         }
 
         ProcessType processType = processTypeService.getProcessTypeByCode(processTypeEnums.getKey());
         if(processType == null){
-            throw new RuntimeException("流程类型未定义");
+            logger.error("流程类型未定义  "+processTypeEnums.getName());
+            throw new RuntimeException("流程类型未定义"  +processTypeEnums.getName());
         }
 
 
         //取得 流程的起始步骤
         ProcessTypeStep beginStep = processTypeStepService.getProcessTypeBeginStep(processType.getTypeId());
         if(beginStep==null){
-            throw  new RuntimeException("流程未设置起始节点");
+            logger.error("流程未设置起始节点  "+processTypeEnums.getName());
+            throw  new RuntimeException("流程未设置起始节点"+ processTypeEnums.getName());
         }
         ProcessTypeStep step = processTypeStepService.getProcessTypeStep(processType.getTypeId(),beginStep.getNextStep());
 //        if (step.getStepType().equals(ProcessStepTypeEnums.BEGIN_STEP.getKey())) {//如果是起始节点，则跳过到下一个节点
@@ -125,7 +133,8 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
 
 
         if(step == null){
-            throw new RuntimeException("流程起始步骤未定义");
+            logger.error("流程起始步骤的下一步未定义  "+ processTypeEnums.getName());
+            throw new RuntimeException("流程起始步骤的下一步未定义" + processTypeEnums.getName());
         }
 
 
