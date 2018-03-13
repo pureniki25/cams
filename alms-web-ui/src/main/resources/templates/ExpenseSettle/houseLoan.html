@@ -1,19 +1,19 @@
-
 <!DOCTYPE html>
 <!--suppress ALL -->
 <html lang="zh-cn">
 <!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-    <title>短信详情</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>结清试算</title>
     <!-- 默认主题样式 -->
-    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css" />
     <!-- iview样式 -->
-    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css" />
     <!--<link rel="stylesheet" type="//unpkg.com/iview/dist/styles/iview.css"/>-->
     <!-- 引入layui样式 -->
-    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all"/>
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all" />
 
     <!-- 引入vue -->
     <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
@@ -42,82 +42,145 @@
     <!--引入公共的一些方法-->
     <script src="/src/js/comm.js"></script>
 
-
+    <style>
+    .ivu-row {
+        padding: 0.5rem 0px
+    }
+    /* .ivu-col {
+        border-right: 0.1px solid black
+    }  */
+    </style>
 </head>
+
 <body>
-<!--隐藏元素-->
-<p id="logId"  th:attr="value=${logId}"  hidden />
-<p id="originalBusinessId"  th:attr="value=${originalBusinessId}"  hidden />
-<p id="afterId"  th:attr="value=${afterId}"  hidden />
-<p id="recipient"  th:attr="value=${recipient}"  hidden />
-<p id="phoneNumber"  th:attr="value=${phoneNumber}"  hidden /> 
-<p id="sendDate"  th:attr="value=${sendDate}"  hidden /> 
-<p id="status"  th:attr="value=${status}"  hidden /> 
-<p id="phoneNumber"  th:attr="value=${phoneNumber}"  hidden /> 
-<p id="content"  th:attr="value=${content}"  hidden /> 
-<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
-<div id="app" v-cloak>
-    <card>
-        <span slot="title">结清试算</span>
-        
+    <!--隐藏元素-->
+    <p id="logId" th:attr="value=${logId}" hidden />
+    <p id="originalBusinessId" th:attr="value=${originalBusinessId}" hidden />
+    <p id="afterId" th:attr="value=${afterId}" hidden />
+    <p id="recipient" th:attr="value=${recipient}" hidden />
+    <p id="phoneNumber" th:attr="value=${phoneNumber}" hidden />
+    <p id="sendDate" th:attr="value=${sendDate}" hidden />
+    <p id="status" th:attr="value=${status}" hidden />
+    <p id="phoneNumber" th:attr="value=${phoneNumber}" hidden />
+    <p id="content" th:attr="value=${content}" hidden />
+    <!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+    <div id="app" v-cloak>
         <card>
-            <span slot="title">业务结清试算</span>
-            <row>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-            </row>
-            <row>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-            </row>
-            <row>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-            </row>
-        </card>
+            <span slot="title">结清试算</span>
 
-        <card>
-            <span slot="title">结清试算信息</span>
-            <row>
-                <i-col span="4"></i-col>
-                <i-col span="8"></i-col>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-            </row>
-            <row>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-            </row>
-            <row>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-                <i-col span="4"></i-col>
-            </row>
-        </card>
+            <card>
+                <span slot="title">业务结清试算</span>
+                <row >
+                    <i-col span="4">业务编号</i-col>
+                    <i-col span="4">{{business.info.businessId}}</i-col>
+                    <i-col span="4">客户姓名</i-col>
+                    <i-col span="4">{{business.info.customerName}}</i-col>
+                    <i-col span="4">借款金额</i-col>
+                    <i-col span="4">{{business.info.borrowMoney}}</i-col>
+                </row>
+                <row>
+                    <i-col span="4">借款期限</i-col>
+                    <i-col span="4">{{business.info.borrowLimit}}{{business.info.borrowLimitUnit==1?'个月':'天'}}</i-col>
+                    <!--   `repayment_type_id` int(11) NOT NULL COMMENT '还款方式ID，1：到期还本息，2：每月付息到期还本，4：等本等息，5：等额本息，9：分期还本付息',
+ -->
+                    <i-col span="4">还款方式</i-col>
+                    <i-col span="4">{{business.repaymentType}}</i-col>
+                    <i-col span="4">费率</i-col>
+                    <i-col span="4">{{business.info.borrowRate}}%</i-col>
+                </row>
+                <row>
+                    <i-col span="4">出款日期</i-col>
+                    <i-col span="4">{{business.output.date}}</i-col>
+                    <i-col span="4">出款金额</i-col>
+                    <i-col span="4">{{business.output.money}}</i-col>
+                    <i-col span="4">出款人</i-col>
+                    <i-col span="4">{{business.output.user}}</i-col>
+                </row>
+            </card>
 
-    </card>
-</div>
-<script src="/src/js/ExpenseSettle/houseLoan.js" ></script> 
+            <card>
+                <span slot="title">结清试算信息</span>
+                <row>
+                    <i-col span="4">预计结清日期</i-col>
+                    <i-col span="8"><date-picker type="date" v-model="preSettleDate.date" :options="preSettleDate.disabledDate" @on-change="onPreSettleDateChange"></date-picker></i-col>
+                    <i-col span="12"></i-col>
+                </row>
+                <row>
+                    <i-col span="4">本金</i-col>
+                    <i-col span="4">{{business.output.money-business.repay.money}}</i-col>
+                    <i-col span="4">利息</i-col>
+                    <i-col span="4"></i-col>
+                    <i-col span="4">服务费</i-col>
+                    <i-col span="4"></i-col>
+                </row>
+                <row>
+                    <i-col span="4">担保公司费用</i-col>
+                    <i-col span="4"></i-col>
+                    <i-col span="4">平台费</i-col>
+                    <i-col span="4"></i-col>
+                    <i-col span="4">期内滞纳金</i-col>
+                    <i-col span="4"></i-col>
+                </row>
+                <row>
+                    <i-col span="4">期外逾期费</i-col>
+                    <i-col span="4"></i-col>
+                    <i-col span="4">提前还款违约金</i-col>
+                    <i-col span="4">
+                        <i-select style="width:50%">
+                            <i-option value=''>一个月利息</i-option>
+                        </i-select>
+                        <span>{{business.output.money-business.repay.money}}</span>
+                    </i-col>
+                    <i-col span="4">往期少交费用（含滞纳金）</i-col>
+                    <i-col span="4"></i-col>
+                </row>
+            </card>
+            <card>
+                <span slot="title">往期少缴费用</span>
+                <row>
+                    <i-col span="4">期数</i-col>
+                    <i-col span="4">服务费</i-col>
+                    <i-col span="4">滞纳金</i-col>
+                </row>
+                <row>
+                    <i-col span="4"></i-col>
+                    <i-col span="4"></i-col>
+                    <i-col span="4"></i-col>
+                </row>
+            </card>
+            <card>
+                <span slot="title">其他费用输入项</span>
+                <row>
+                    <i-col span="6">上门费</i-col>
+                    <i-col span="6"></i-col>
+                    <i-col span="6">律师费</i-col>
+                    <i-col span="6"></i-col>
+                </row>
+                <row>
+                    <i-col span="6">诉讼费</i-col>
+                    <i-col span="6"></i-col>
+                    <i-col span="6">其他费用</i-col>
+                    <i-col span="6"></i-col>
+                </row>
+                <row>
+                    <i-col span="6">应收合计</i-col>
+                    <i-col span="6"></i-col>
+                    <i-col span="12"></i-col>
+                </row>
+                <row>
+                    <i-col span="6">+结余</i-col>
+                    <i-col span="6"></i-col>
+                    <i-col span="6">+押金转还款金额</i-col>
+                    <i-col span="6"></i-col>
+                </row>
+                <row>
+                    <i-col span="6">最终结清金额</i-col>
+                    <i-col span="18"></i-col>
+                </row>
+            </card>
+        </card>
+    </div>
+    <script src="/src/js/ExpenseSettle/houseLoan.js"></script>
 </body>
+
 </html>
