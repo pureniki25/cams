@@ -41,7 +41,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     }
 
     //调用本地service，需要解开注释
-    /*@Override
+    @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins("*")
@@ -49,5 +49,5 @@ public class WebConfig extends WebMvcConfigurerAdapter {
                 .allowedMethods("GET", "POST", "DELETE", "PUT")
                 .maxAge(3600);
     }
-*/
+
 }

@@ -59,6 +59,7 @@ import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.EasyPoiExcelExportUtil;
 import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.vo.PageResult;
+import com.hongte.alms.core.vo.modules.car.CarDragDoc;
 import com.hongte.alms.core.vo.modules.car.CarDragRegistrationBusinessVo;
 import com.hongte.alms.core.vo.modules.car.CarDragRegistrationInfo;
 import com.ht.ussp.bean.LoginUserInfoHelper;
@@ -258,9 +259,27 @@ public class CarController {
 			carDrag.setFee(registrationInfo.getFee());
 			carDrag.setOtherFee(registrationInfo.getOtherFee());
 			carDrag.setRemark(registrationInfo.getRemark());
-			carDrag.setCreateUser(loginUserInfoHelper.getLoginInfo().getUserName());
+			//carDrag.setCreateUser(loginUserInfoHelper.getLoginInfo().getUserName());
 			carDrag.setCreateTime(new Date());
 			carDragService.insert(carDrag);
+			List<CarDragDoc> attachments=registrationInfo.getAttachments();
+			if(attachments!=null&&attachments.size()>0) {
+
+				for(CarDragDoc attachment:attachments) {
+					//将临时表保存的上传信息保存到主表中
+					DocTmp tmp=docTmpService.selectById(attachment.getDocId());
+					if(tmp!=null) {
+						Doc doc=new Doc();
+						BeanUtils.copyProperties(tmp, doc);
+						if(attachment.getNewName()!=null&&!attachment.getNewName().isEmpty()) {
+							String newNameWithExtension=attachment.getNewName()+"."+tmp.getFileType();
+							doc.setOriginalName(newNameWithExtension);
+						}
+						docService.insertOrUpdate(doc);
+					}
+
+				}
+			}
 			return Result.success();
 		}
 		catch(Exception ex)
