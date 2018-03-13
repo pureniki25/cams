@@ -20,6 +20,9 @@ zuul:
       path: /core/**
     alms-timer-service:
       path: /timer/**
+    alms-open-service:
+      path: /open/**
+
   host:
     connect-timeout-millis: 6000
 ribbon:
@@ -35,7 +38,10 @@ alms-core-service:
 alms-timer-service:
   ribbon:
     listOfServers: 127.0.0.1:30616 #为cloud-client服务指定一组服务地址，应该是用于负载均衡
-
+alms-open-service:
+  ribbon:
+    listOfServers: 127.0.0.1:30608 #为cloud-client服务指定一组服务地址，应该是用于负载均衡
+    
 eureka:
   client:
     serviceUrl:
@@ -44,3 +50,21 @@ http:
     multipart:
       max-file-size: 2Mb      # Max file size，默认1M
       max-request-size: 20Mb   # Max request size，默认10M
+feign:
+  hystrix:  
+    enabled: true
+hystrix:
+  threadpool: 
+    default:
+      coreSize: 2000
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 20000
+          strategy: THREAD
+      fallback: 
+         isolation:
+          semaphore:
+            maxConcurrentRequests: 1000

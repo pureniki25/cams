@@ -120,7 +120,10 @@ public class CollectionController {
         List<SysParameter> collectLevelList = sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterTypeEnums.COLLECTION_LEVERS.getKey()).orderBy("row_Index"));
         retMap.put("collectLevelList",(JSONArray) JSON.toJSON(collectLevelList, JsonUtil.getMapping()));
 
-
+        
+        List<SysParameter> carStatusList = sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterTypeEnums.CAR_STATUS.getKey()).orderBy("row_Index"));
+        retMap.put("carStatusList",(JSONArray) JSON.toJSON(carStatusList, JsonUtil.getMapping()));
+        
         return Result.success(retMap);
     }
 

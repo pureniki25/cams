@@ -16,23 +16,19 @@ import io.swagger.annotations.ApiModelProperty;
  * 车辆拍卖信息
  * </p>
  *
- * @author 王继光
- * @since 2018-03-06
+ * @author 曾坤
+ * @since 2018-03-10
  */
 @ApiModel
 @TableName("tb_car_auction")
 public class CarAuction extends Model<CarAuction> {
 
     private static final long serialVersionUID = 1L;
-    
-    @TableId("auction_id")
-	@ApiModelProperty(required= true,value = "资产端业务编号 ")
-	private String auctionId;
-    
+
     /**
      * 资产端业务编号 
      */
-    @TableId("business_id")
+	@TableField("business_id")
 	@ApiModelProperty(required= true,value = "资产端业务编号 ")
 	private String businessId;
     /**
@@ -51,7 +47,7 @@ public class CarAuction extends Model<CarAuction> {
      */
 	@TableField("fare_range")
 	@ApiModelProperty(required= true,value = "加价幅度")
-	private BigDecimal fareRange;
+	private Integer fareRange;
     /**
      * 保留价
      */
@@ -153,10 +149,76 @@ public class CarAuction extends Model<CarAuction> {
 	@TableField("create_user")
 	@ApiModelProperty(required= true,value = "创建人 ")
 	private String createUser;
-
-	@ApiModelProperty(required= true,value = "状态")
+    /**
+     * 申请状态：01 保存草稿，02 提交审核,03 撤销
+     */
+	@ApiModelProperty(required= true,value = "申请状态：01 保存草稿，02 提交审核,03 撤销")
 	private String status;
-	
+    @TableId("auction_id")
+	@ApiModelProperty(required= true,value = "")
+	private String auctionId;
+    /**
+     * 看样开始时间
+     */
+	@TableField("view_sample_start_time")
+	@ApiModelProperty(required= true,value = "看样开始时间")
+	private Date viewSampleStartTime;
+    /**
+     * 看样结束时间
+     */
+	@TableField("view_sample_end_time")
+	@ApiModelProperty(required= true,value = "看样结束时间")
+	private Date viewSampleEndTime;
+    /**
+     * 竞价规则
+     */
+	@TableField("auction_rules")
+	@ApiModelProperty(required= true,value = "竞价规则")
+	private String auctionRules;
+    /**
+     * 开户银行
+     */
+	@TableField("open_bank")
+	@ApiModelProperty(required= true,value = "开户银行")
+	private String openBank;
+    /**
+     * 缴款截止时间
+     */
+	@TableField("payment_end_time")
+	@ApiModelProperty(required= true,value = "缴款截止时间")
+	private Date paymentEndTime;
+    /**
+     * 咨询开始时间
+     */
+	@TableField("cons_start_time")
+	@ApiModelProperty(required= true,value = "咨询开始时间")
+	private Date consStartTime;
+    /**
+     * 咨询结束时间
+     */
+	@TableField("cons_end_time")
+	@ApiModelProperty(required= true,value = "咨询结束时间")
+	private Date consEndTime;
+    /**
+     * 看样地址
+     */
+	@TableField("view_sample_addr")
+	@ApiModelProperty(required= true,value = "看样地址")
+	private String viewSampleAddr;
+    /**
+     * 咨询地址
+     */
+	@TableField("consultant_addr")
+	@ApiModelProperty(required= true,value = "咨询地址")
+	private String consultantAddr;
+    /**
+     * 支付方式 01竞买成功后，尾款线下支付 02竞买成功后，尾款线上支付
+     */
+	@TableField("pay_way")
+	@ApiModelProperty(required= true,value = "支付方式 01竞买成功后，尾款线下支付 02竞买成功后，尾款线上支付")
+	private String payWay;
+
+
 	public String getBusinessId() {
 		return businessId;
 	}
@@ -181,11 +243,11 @@ public class CarAuction extends Model<CarAuction> {
 		this.deposit = deposit;
 	}
 
-	public BigDecimal getFareRange() {
+	public Integer getFareRange() {
 		return fareRange;
 	}
 
-	public void setFareRange(BigDecimal fareRange) {
+	public void setFareRange(Integer fareRange) {
 		this.fareRange = fareRange;
 	}
 
@@ -325,14 +387,6 @@ public class CarAuction extends Model<CarAuction> {
 		this.createUser = createUser;
 	}
 
-	public String getAuctionId() {
-		return auctionId;
-	}
-
-	public void setAuctionId(String auctionId) {
-		this.auctionId = auctionId;
-	}
-
 	public String getStatus() {
 		return status;
 	}
@@ -341,15 +395,102 @@ public class CarAuction extends Model<CarAuction> {
 		this.status = status;
 	}
 
+	public String getAuctionId() {
+		return auctionId;
+	}
+
+	public void setAuctionId(String auctionId) {
+		this.auctionId = auctionId;
+	}
+
+	public Date getViewSampleStartTime() {
+		return viewSampleStartTime;
+	}
+
+	public void setViewSampleStartTime(Date viewSampleStartTime) {
+		this.viewSampleStartTime = viewSampleStartTime;
+	}
+
+	public Date getViewSampleEndTime() {
+		return viewSampleEndTime;
+	}
+
+	public void setViewSampleEndTime(Date viewSampleEndTime) {
+		this.viewSampleEndTime = viewSampleEndTime;
+	}
+
+	public String getAuctionRules() {
+		return auctionRules;
+	}
+
+	public void setAuctionRules(String auctionRules) {
+		this.auctionRules = auctionRules;
+	}
+
+	public String getOpenBank() {
+		return openBank;
+	}
+
+	public void setOpenBank(String openBank) {
+		this.openBank = openBank;
+	}
+
+	public Date getPaymentEndTime() {
+		return paymentEndTime;
+	}
+
+	public void setPaymentEndTime(Date paymentEndTime) {
+		this.paymentEndTime = paymentEndTime;
+	}
+
+	public Date getConsStartTime() {
+		return consStartTime;
+	}
+
+	public void setConsStartTime(Date consStartTime) {
+		this.consStartTime = consStartTime;
+	}
+
+	public Date getConsEndTime() {
+		return consEndTime;
+	}
+
+	public void setConsEndTime(Date consEndTime) {
+		this.consEndTime = consEndTime;
+	}
+
+	public String getViewSampleAddr() {
+		return viewSampleAddr;
+	}
+
+	public void setViewSampleAddr(String viewSampleAddr) {
+		this.viewSampleAddr = viewSampleAddr;
+	}
+
+	public String getConsultantAddr() {
+		return consultantAddr;
+	}
+
+	public void setConsultantAddr(String consultantAddr) {
+		this.consultantAddr = consultantAddr;
+	}
+
+	public String getPayWay() {
+		return payWay;
+	}
+
+	public void setPayWay(String payWay) {
+		this.payWay = payWay;
+	}
+
 	@Override
 	protected Serializable pkVal() {
-		return this.businessId;
+		return this.auctionId;
 	}
 
 	@Override
 	public String toString() {
 		return "CarAuction{" +
-			"  auctionId=" + auctionId +
 			", businessId=" + businessId +
 			", startingPrice=" + startingPrice +
 			", deposit=" + deposit +
@@ -372,7 +513,17 @@ public class CarAuction extends Model<CarAuction> {
 			", createTime=" + createTime +
 			", createUser=" + createUser +
 			", status=" + status +
+			", auctionId=" + auctionId +
+			", viewSampleStartTime=" + viewSampleStartTime +
+			", viewSampleEndTime=" + viewSampleEndTime +
+			", auctionRules=" + auctionRules +
+			", openBank=" + openBank +
+			", paymentEndTime=" + paymentEndTime +
+			", consStartTime=" + consStartTime +
+			", consEndTime=" + consEndTime +
+			", viewSampleAddr=" + viewSampleAddr +
+			", consultantAddr=" + consultantAddr +
+			", payWay=" + payWay +
 			"}";
 	}
-	
 }

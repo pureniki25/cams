@@ -9,7 +9,7 @@
 	content="width=device-width, initial-scale=1, maximum-scale=1" />
 
 <title>贷后管理</title>
-	<script src="/properties/config.js"></script>
+
 <link rel="stylesheet" type="text/css"
 	href="/src/css/themes/default.css" />
 <!-- iview样式 -->
@@ -24,15 +24,14 @@
 <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
 <!-- iview js -->
 <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+        <script src="/properties/config.js"></script>
 <!--引入layui.js-->
 <script src="/plugins/layui/layui.js"></script>
 <!--引入axios.js 用于ajax调用-->
 <script src="/plugins/axios/axios.min.js"></script>
-	<script src="/build/js/jquery-3.3.1.min.js"></script>
-	<!-- 设置全局请求头:app、Authorization -->
-	<script src="/build/js/appToken.js"></script>
 <script type="text/javascript" src="/plugins/jquery-1.9.1.min.js"></script>
 <script src="/plugins/popover/popover.js"></script>
+    <script src="/build/js/appToken.js"></script>
 
 <style type="text/css">
 .layui-form-item {
@@ -60,6 +59,9 @@
 
 .td_label {
 	font-weight: bolder;
+}
+.input_label{
+color: #FF3030;
 }
 </style>
 </head>
@@ -263,7 +265,7 @@
 							</td>
 						</tr>
 						<tr>
-							<td rowspan="3" class="td_label">车型及版本配置</td>
+							<td rowspan="3" class="td_label">车型及版本配置<label class="input_label">*</label></td>
 							<td colspan="5"><textarea rows="" cols="" v-model="carBasic.carVersionConfig"
 									style="width: 100%"> </textarea></td>
 						</tr>
@@ -281,16 +283,16 @@
 				<div class="grid-demo layui-bg-gray">
 					<table class="layui-table">
 						<tr>
-							<td class="td_label">申请人</td>
+							<td class="td_label">申请人<label class="input_label">*</label></td>
 							<td><input type="text" name="lname" v-model="carConvBusAply.aplyUser">
 							</td>
-							<td class="td_label">申请时间</td>
+							<td class="td_label">申请时间<label class="input_label">*</label></td>
 							<td><input type="text" name="lname" id="aplyDate" v-model="carConvBusAply.aplyDate" placeholder="yyyy-MM-dd">
 							</td>
 						
 						</tr>
 						<tr>
-							<td rowspan="3" class="td_label">申请说明</td>
+							<td rowspan="3" class="td_label">申请说明<label class="input_label">*</label></td>
 							<td colspan="3"><textarea rows="" cols="" v-model="carConvBusAply.aplyExplain"
 									style="width: 100%" maxlength="1000"> </textarea>
 									<input type="text" name="lname" v-model="carConvBusAply.convBusId" hidden="">

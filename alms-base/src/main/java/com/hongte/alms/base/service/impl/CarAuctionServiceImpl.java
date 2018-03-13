@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
  * 车辆拍卖信息 服务实现类
  * </p>
  *
- * @author cj
- * @since 2018-03-06
+ * @author 曾坤
+ * @since 2018-03-10
  */
 @Service("CarAuctionService")
 public class CarAuctionServiceImpl extends BaseServiceImpl<CarAuctionMapper, CarAuction> implements CarAuctionService {
