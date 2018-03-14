@@ -1,5 +1,8 @@
 package com.hongte.alms.core.vo.modules.car;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -109,6 +112,7 @@ public class CarDragRegistrationInfo {
     /**
      * [拖车日期]
      */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date dragDate;
 
     /**
