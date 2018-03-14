@@ -158,6 +158,9 @@ window.layinit(function (htConfig) {
 						}else if (vm.selectedRowInfo.processTypeCode=="carLoanLitigation") {
                         	title ="车贷移交法务申请";
                             url = getCarLoanProcessUrl();
+						}else if(vm.selectedRowInfo.processTypeCode=="carAuctionAply"){
+							title ="车辆拍卖申请审核";
+                            url = '/assets/car/carAuctionAudit?businessId='+vm.selectedRowInfo.businessId+"&processStatus="+vm.selectedRowInfo.status+"&processId="+vm.selectedRowInfo.processId;
 						}
 
                         layer.open({
