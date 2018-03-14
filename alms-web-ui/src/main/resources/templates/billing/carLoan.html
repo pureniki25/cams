@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <title>车贷业务结清试算</title>
+    <!-- 默认主题样式 -->
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
+    <!-- iview样式 -->
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
+    <!--<link rel="stylesheet" type="//unpkg.com/iview/dist/styles/iview.css"/>-->
+    <!-- 引入layui样式 -->
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all"/>
+
+    <!-- 引入vue -->
+    <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+    <!--iview js -->
+    <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+    <!--    <script src="//unpkg.com/vue/dist/vue.js"></script>
+        <script src="//unpkg.com/iview/dist/iview.min.js"></script>-->
+
+    <!--引入layui.js-->
+    <script src="/plugins/layui/layui.js"></script>
+    <!--引入axios.js 用于ajax调用-->
+    <script src="/plugins/axios/axios.min.js"></script>
+
+    <!-- 流程组件的  -->
+    <link rel="stylesheet" href="/Components/ProcessLine/ProcessLine.css">
+    <script src="/Components/ProcessLine/ProcessLine.js"></script>
+
+    <!--表格样式-->
+    <link rel="stylesheet" href="/Components/Table/Table.css">
+
+    <!-- 引入jQuery，必须在appToken.js 之前引入 -->
+    <script type="text/javascript" src="/plugins/jquery-1.9.1.min.js"></script>
+    <!-- 设置全局请求头:app、Authorization -->
+    <script src="/build/js/appToken.js"></script>
+    <script src="http://blueimp.github.io/jQuery-File-Upload/js/vendor/jquery.ui.widget.js"></script>
+	<script type="text/javascript" src="/plugins/fileUpload/jquery.iframe-transport.js"></script>
+	<script type="text/javascript" src="/plugins/fileUpload/jquery.fileupload.js"></script>
+    <!--引入公共的一些方法-->
+    <script src="/src/js/comm.js"></script>
+	<script src="/properties/config.js"></script>
+	
+</head>
+<body>
+<!--隐藏元素-->
+<p id="businessId"  th:attr="value=${businessId}"  hidden />
+<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+<div id="app" v-cloak>
+
+    <row type="flex" justify="end" class="code-row-bg">
+        <i-col span="15"><font size="6px" color="#464c5b">车贷业务结清试算</font></i-col>
+    </row>
+    
+    <br>
+    <br>
+    
+	<!--基本信息表单内容-->
+		<Card>
+			<p slot="title">
+				业务结清试算
+			</p>
+			<row :gutter="16">
+		        <div class="table">
+		            <div class="tr">
+		                <div class="td"> <div class="td-box">业务编号</div><div class="td-box">{{ baseInfoForm.businessId }} </div> </div>
+		                <div class="td"> <div class="td-box">客户名称</div><div class="td-box">{{ baseInfoForm.customerName }} </div> </div>
+		                <div class="td"> <div class="td-box">借款金额</div><div class="td-box">{{ baseInfoForm.borrowMoney }} </div> </div>
+		            </div>
+		            <div class="tr">
+		                <div class="td"> <div class="td-box">借款期限</div><div class="td-box">{{ baseInfoForm.borrowLimit }} </div> </div>
+		                <div class="td"> <div class="td-box">还款方式</div><div class="td-box">{{ baseInfoForm.repaymentTypeId }} </div> </div>
+		                <div class="td"> <div class="td-box">费率</div><div class="td-box">{{ baseInfoForm.borrowRate }} {{ baseInfoForm.monthBorrowRate }} </div> </div>
+		            </div>
+		            <div class="tr">
+		                <div class="td"> <div class="td-box">出款日期</div><div class="td-box">{{ baseInfoForm.factOutputDate }} </div> </div>
+		                <div class="td"> <div class="td-box">出款金额</div><div class="td-box">{{ baseInfoForm.factOutputMoney }} </div> </div>
+		                <div class="td"> <div class="td-box">出款人</div><div class="td-box">{{ baseInfoForm.outputUserName }} </div> </div>
+		            </div>
+		        </div>
+			</row>
+		</Card>
+		
+		<i-form ref="commitInfoForm" :model="commitInfoForm" label-position="right" :label-width="100" >
+		<Card>
+			<p slot="title">
+				结清试算信息
+			</p>
+			<row>
+                <i-col span="4">预计结清日期</i-col>
+                <i-col span="8">
+                	<date-picker type="date" v-model="commitInfoForm.billDate || new Date()" :options="preSettleDate.disabledDate" :start-date="new Date()"/> 
+                	<i-button type="info" style="margin-left:1rem" @click="carLoanBilling">开始计算</i-button>
+                </i-col>
+                <i-col span="12"></i-col>
+            </row>
+        </Card>
+        <Card>
+			<row :gutter="16">
+		        <div class="table">
+		            <div class="tr">
+		                <div class="td"> <div class="td-box">本金</div><div class="td-box">{{ baseInfoForm.borrowMoney }} </div> </div>
+		                <div class="td"> <div class="td-box">利息</div><div class="td-box">{{ baseInfoForm.planAccrual }} </div> </div>
+		                <div class="td"> <div class="td-box">服务费</div><div class="td-box">{{ baseInfoForm.planServiceCharge }} </div> </div>
+		            </div>
+		            <div class="tr">
+		                <div class="td"> <div class="td-box">担保公司费用</div><div class="td-box">{{ baseInfoForm.planGuaranteeCharge }} </div> </div>
+		                <div class="td"> <div class="td-box">平台费</div><div class="td-box">{{ baseInfoForm.planPlatformCharge }} </div> </div>
+		                <div class="td"> 
+		                	<div class="td-box">期内滞纳金</div>
+		                	<div class="td-box">
+		                		<i-select v-model="commitInfoForm.innerLateFees" clearable  filterable style="width:100px">
+                                    <i-option value="0.001">0.1%/天</i-option>
+                                    <i-option value="0.002">0.2%/天</i-option>
+                                    <i-option value="0.003">0.3%/天</i-option>
+                                    <i-option value="0.004">0.4%/天</i-option>
+                                    <i-option value="0.005">0.5%/天</i-option>
+                                    <i-option value="0.006">0.6%/天</i-option>
+                                    <i-option value="0.008">0.8%/天</i-option>
+                                </i-select>
+		                		{{baseInfoForm.innerLateFees}}
+		                	</div> 
+		                </div>
+		            </div>
+		            <div class="tr">
+		                <div class="td"> 
+		                	<div class="td-box">期外逾期利息</div>
+		                	<div class="td-box">
+		                		<i-select v-model="commitInfoForm.outsideInterest" clearable  filterable style="width:100px">
+                                    <i-option value="0.03334">3.334%</i-option>
+                                    <i-option value="0.03">3%</i-option>
+                                    <i-option value="0.028334">2.8334%</i-option>
+                                    <i-option value="0.025">2.5%</i-option>
+                                    <i-option value="0.023334">2.3334%</i-option>
+                                    <i-option value="0.018">1.8%</i-option>
+                                    <i-option value="0.016">1.6%</i-option>
+                                    <i-option value="0.015">1.5%</i-option>
+                                </i-select>
+		                		<span>{{ baseInfoForm.outsideInterest }} </span>
+		                	</div> 
+		                </div>
+		                <div class="td"> 
+		                	<div class="td-box">提前还款违约金</div>
+		                	<div class="td-box">
+		                		<i-select v-model="commitInfoForm.preLateFees" clearable  filterable style="width:165px">
+                                    <i-option value="1">一个月利息</i-option>
+                                    <i-option value="2">借款本金*3%</i-option>
+                                    <i-option value="3">剩余本金*0.5%*剩余期数</i-option>
+                                </i-select>
+		                		{{ baseInfoForm.preLateFees }}
+		                	</div>
+		                </div>
+		                <div class="td"> <div class="td-box">往期少交费用（含滞纳金）</div><div class="td-box">{{ baseInfoForm.balanceDue }} </div> </div>
+		            </div>
+		            <div class="tr">
+		                <div class="td"> <div class="td-box">逾期违约金</div><div class="td-box">{{ baseInfoForm.overdueDefault }} </div> </div>
+		                <div class="td"> <div class="td-box"></div><div class="td-box"></div> </div>
+		                <div class="td"> <div class="td-box"></div><div class="td-box"></div> </div>
+		            </div>
+		        </div>
+			</row>
+		</Card>
+		
+		<Card>
+			<p slot="title">
+				往期少缴费用
+			</p>
+			<row :gutter="16">
+                <i-table border :columns="arrearageDetailTitle" :data="arrearageDetailData"></i-table>
+			</row>
+		</Card>
+		
+		<Card>
+			<p slot="title">
+				其他费用输入项
+			</p>
+			<row>
+                <i-col span="6">停车费</i-col>
+                <i-col span="6"><i-input v-model="commitInfoForm.parkingFees" /></i-col>
+                <i-col span="6">GPS费</i-col>
+                <i-col span="6"><i-input v-model="commitInfoForm.gpsFees" /></i-col>
+            </row>
+            <row>
+                <i-col span="6">拖车费</i-col>
+                <i-col span="6"><i-input v-model="commitInfoForm.dragFees" /></i-col>
+                <i-col span="6">其他费用</i-col>
+                <i-col span="6"><i-input v-model="commitInfoForm.otherFees" /></i-col>
+            </row>
+            <row>
+            	<i-col span="6">律师费</i-col>
+                <i-col span="6"><i-input v-model="commitInfoForm.attorneyFees" /></i-col>
+                <i-col span="6">应收合计</i-col>
+                <i-col span="6">{{baseInfoForm.receivableTotal}}</i-col>
+            </row>
+            <row>
+                <i-col span="6">+结余</i-col>
+                <i-col span="6">{{baseInfoForm.balance}}</i-col>
+                <i-col span="6">+押金转还款金额</i-col>
+                <i-col span="6">{{baseInfoForm.cash}}</i-col>
+            </row>
+            <row>
+                <i-col span="6">最终结清金额</i-col>
+                <i-col span="18">{{baseInfoForm.squaredUp}}</i-col>
+            </row>
+		</Card>
+		</i-form>
+</div>
+<script src="/src/js/billling/carLoan.js" ></script>
+</body>
+</html>

@@ -414,8 +414,14 @@ window.layinit(function(htConfig){
                                 // showOneLineOprLayer(url,"上传附件")
                             }},
                             {"name": "结清试算", click: function (e, currentItem) {
-                                // var url = '/collectionUI/checkFundPool?businessId='+currentItem.businessId+'&afterId='+currentItem.afterId
-                                // showOneLineOprLayer(url,"结清试算")
+	                           	 var url = '/transferOfLitigation/carLoanBilling?businessId='+currentItem.businessId
+//	                           	 var url = ''
+//	                       		 if(currentItem.businessTypeId == 1 || currentItem.businessTypeId == 9){
+//	                       			 url = '/transferOfLitigation/carLoanBilling?businessId='+currentItem.businessId;
+//	                                }else if(currentItem.businessTypeId == 2 || currentItem.businessTypeId == 11){
+//	                               	 url = '/transferOfLitigation/houseLoan?businessId='+currentItem.businessId;
+//	                             }
+                                 showOneLineOprLayer(url,"结清试算")
                             }},
                             {"name": "移交诉讼系统", click: function (e, currentItem) {
 //                            	 var url = '/transferOfLitigation/carLoan?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+"&processStatus=-1"

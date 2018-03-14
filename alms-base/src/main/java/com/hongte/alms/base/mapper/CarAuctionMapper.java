@@ -8,8 +8,8 @@ import com.hongte.alms.common.mapper.SuperMapper;
  * 车辆拍卖信息 Mapper 接口
  * </p>
  *
- * @author 王继光
- * @since 2018-03-06
+ * @author 曾坤
+ * @since 2018-03-10
  */
 public interface CarAuctionMapper extends SuperMapper<CarAuction> {
 

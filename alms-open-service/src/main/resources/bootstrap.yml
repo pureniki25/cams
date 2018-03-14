@@ -1,23 +1,134 @@
-server:
-  port: 30616
 spring:
-  application:
-    name: alms-open-service
+  profiles.active: local
+
+---
+spring:
+  profiles: local
   cloud:
     config:
-      #仓库中的配置文件会被转换成web接口，访问可以参照以下的规则：
-      #/{application}/{profile}[/{label}]
-      #/{application}-{profile}.yml
-      #/{label}/{application}-{profile}.yml
-      #/{application}-{profile}.properties
-      #/{label}/{application}-{profile}.properties
+      enabled: false
+    bus:
+      enabled: false
 
-      uri: http://localhost:30688
-      # profile对应config server所获取的配置文件中的{profile}
-      profile: dev
-      #label: config
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration,org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration.RabbitAnnotationDrivenConfiguration,org.springframework.cloud.config.client.ConfigClientAutoConfiguration
+management:
+  security:
+    enabled: false
 eureka:
+  instance:
+    prefer-ip-address: true
   client:
     serviceUrl:
-#      defaultZone: http://10.110.1.240:30101/eureka/
-      defaultZone: http://172.16.200.110:30101/eureka/
+      defaultZone: http://172.16.200.110:30101/eureka/  # 配置注册中心url
+ht:
+  config:
+    ui:
+      useGateWayflage: false   #是否使用网关的标志位
+
+---
+spring:
+  profiles: dev
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        service-id: alms-open-service
+      profile: dev
+      username: root
+      password: 123456
+    bus:
+      trace:
+        enabled: true
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    serviceUrl:
+      defaultZone: http://172.16.200.110:30101/eureka/ # 配置注册中心url
+    instance:
+      ip-address: 172.16.200.110
+      status-page-url: http://${eureka.instance.ip-address:${spring.cloud.client.ipAddress}}:${server.port}${status-page-url-path:/info}
+      health-check-url: http://${eureka.instance.ip-address:${spring.cloud.client.ipAddress}}:${server.port}${health-check-url-path:/health}
+ht:
+  config:
+    ui:
+      useGateWayflage: true   #是否使用网关的标志位
+
+---
+spring:
+  profiles: sit
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        service-id: alms-open-service
+      username: root
+      password: 123456
+
+    bus:
+      trace:
+        enabled: true
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    serviceUrl:
+      defaultZone: http://172.16.200.112:30101/eureka/  # 配置注册中心url
+    instance:
+      ip-address: 172.16.200.112
+      status-page-url: http://${eureka.instance.ip-address:${spring.cloud.client.ipAddress}}:${server.port}${status-page-url-path:/info}
+      health-check-url: http://${eureka.instance.ip-address:${spring.cloud.client.ipAddress}}:${server.port}${health-check-url-path:/health}
+ht:
+  config:
+    ui:
+      useGateWayflage: true   #是否使用网关的标志位
+
+
+---
+spring:
+  profiles: uat
+  cloud:
+    config:
+      discovery:
+        enabled: false
+        service-id: alms-open-service
+      username: root
+      password: 123456
+      uri: http://10.100.5.195:30106
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    serviceUrl:
+      defaultZone: http://10.100.5.193:30101/eureka/,http://10.100.5.195:30102/eureka/ # 配置注册中心url
+ht:
+  config:
+    ui:
+      useGateWayflage: true   #是否使用网关的标志位
+---
+spring:
+  profiles: prd
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        service-id: alms-open-service
+      username: root
+      password: 123456
+    bus:
+      trace:
+        enabled: true
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    serviceUrl:
+      defaultZone: http://eureka.didispace.com/eureka/ # 配置注册中心url
+ht:
+  config:
+    ui:
+      useGateWayflage: true   #是否使用网关的标志位
+

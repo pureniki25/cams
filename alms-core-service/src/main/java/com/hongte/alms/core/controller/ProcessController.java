@@ -60,7 +60,7 @@ public class ProcessController {
     @GetMapping("/selectProcessWaitToApproveVoPage")
     @ResponseBody
     public PageResult<List<ProcessVo>> selectProcessWaitToApproveVoPage(
-            @ModelAttribute String reqPageeType,
+            @ModelAttribute("reqPageeType") String reqPageeType,
             @ModelAttribute ProcessReq req){
 
         try {

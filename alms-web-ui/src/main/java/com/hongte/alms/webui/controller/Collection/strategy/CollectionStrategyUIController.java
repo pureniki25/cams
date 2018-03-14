@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/collectionStrategyUI")
 public class CollectionStrategyUIController {
     //催收策略首页
+
     @RequestMapping("index")
     public String index(){
 //        map.addAttribute("staffType","phoneStaff");

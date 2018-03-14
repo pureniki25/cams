@@ -9,7 +9,7 @@
 	content="width=device-width, initial-scale=1, maximum-scale=1" />
 
 <title>贷后管理</title>
-	<script src="/properties/config.js"></script>
+
 <link rel="stylesheet" type="text/css"
 	href="/src/css/themes/default.css" />
 <!-- iview样式 -->
@@ -26,15 +26,14 @@
 <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
 <!-- iview js -->
 <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+        <script src="/properties/config.js"></script>
 <!--引入layui.js-->
 <script src="/plugins/layui/layui.js"></script>
 <!--引入axios.js 用于ajax调用-->
 <script src="/plugins/axios/axios.min.js"></script>
 <script type="text/javascript" src="/plugins/jquery-1.9.1.min.js"></script>
-	<script src="/build/js/jquery-3.3.1.min.js"></script>
-	<!-- 设置全局请求头:app、Authorization -->
-	<script src="/build/js/appToken.js"></script>
 <script src="/plugins/popover/popover.js"></script>
+<script src="/build/js/appToken.js"></script>
 
 <style type="text/css">
 .layui-form-item {
@@ -386,74 +385,74 @@
 										<tr>
 											<td class="td_label">拍卖申请人：</td>
 											<td><input type="text" name="lname"
-												class="input-border-none" value="未抵押" readonly="readonly"
-												v-model="carBasic.vin"></td>
+												class="input-border-none" v-bind:value="carAuction.createUser" readonly="readonly"
+												></td>
 										</tr>
 										<tr>
 											<td class="td_label">起拍价：</td>
 											<td><input type="text" name="lname"
-												class="input-border-none" value="未抵押" readonly="readonly"
-												v-model="carBasic.vin"></td>
+												class="input-border-none" v-bind:value="carAuction.startingPrice" readonly="readonly"
+												></td>
 										</tr>
 										<tr>
 											<td class="td_label">保证金：</td>
 											<td><input type="text" name="lname"
-												class="input-border-none" value="未抵押" readonly="readonly"
-												v-model="carBasic.vin"></td>
+												class="input-border-none" v-bind:value="carAuction.deposit" readonly="readonly"
+												></td>
 										</tr>
 										<tr>
 											<td class="td_label">加价幅度：</td>
 											<td><input type="text" name="lname"
-												class="input-border-none" value="未抵押" readonly="readonly"
-												v-model="carBasic.vin"></td>
+												class="input-border-none" v-bind:value="carAuction.fareRange" readonly="readonly"
+												></td>
 										</tr>
 										<tr>
 											<td class="td_label">保留价：</td>
 											<td><input type="text" name="lname"
-												class="input-border-none" value="未抵押" readonly="readonly"
-												v-model="carBasic.vin"></td>
+												class="input-border-none" v-bind:value="carAuction.reservePrice" readonly="readonly"
+												></td>
 										</tr>
 										<tr>
 											<td class="td_label">拍卖开始时间：</td>
 											<td><input type="text" name="lname"
-												class="input-border-none" value="未抵押" readonly="readonly"
-												v-model="carBasic.vin"></td>
+												class="input-border-none" v-bind:value="carAuction.auctionStartTime" readonly="readonly"
+												></td>
 										</tr>
 										<tr>
 											<td class="td_label">截止时间：</td>
 											<td><input type="text" name="lname"
-												class="input-border-none" value="未抵押" readonly="readonly"
-												v-model="carBasic.vin"></td>
+												class="input-border-none" v-bind:value="carAuction.auctionEndTime" readonly="readonly"
+												></td>
 										</tr>
 										<tr>
 											<td class="td_label">处置单位：</td>
 											<td><input type="text" name="lname"
-												class="input-border-none" value="未抵押" readonly="readonly"
-												v-model="carBasic.vin"></td>
+												class="input-border-none" v-bind:value="carAuction.handleUnit" readonly="readonly"
+												></td>
 										</tr>
 										<tr>
 											<td class="td_label">拍卖成交价格：</td>
 											<td><input type="text" name="lname"
-												class="input-border-none" value="未抵押" readonly="readonly"
-												v-model="carBasic.vin"></td>
+												class="input-border-none" v-bind:value="carAuctionReg.transPrice" readonly="readonly"
+												></td>
 										</tr>
 										<tr>
 											<td class="td_label">最终获取人姓名：</td>
 											<td><input type="text" name="lname"
-												class="input-border-none" value="未抵押" readonly="readonly"
-												v-model="carBasic.vin"></td>
+												class="input-border-none" v-bind:value="carAuctionBidder.bidderName" readonly="readonly"
+												></td>
 										</tr>
 										<tr>
 											<td class="td_label">联系方式：</td>
 											<td><input type="text" name="lname"
-												class="input-border-none" value="未抵押" readonly="readonly"
-												v-model="carBasic.vin"></td>
+												class="input-border-none" v-bind:value="carAuctionReg.regTel" readonly="readonly"
+												></td>
 										</tr>
 										<tr>
 											<td class="td_label">身份证号码：</td>
 											<td><input type="text" name="lname"
-												class="input-border-none" value="未抵押" readonly="readonly"
-												v-model="carBasic.vin"></td>
+												class="input-border-none" v-bind:value="carAuctionBidder.bidderCertId" readonly="readonly"
+												></td>
 										</tr>
 									</table>
 								</div>

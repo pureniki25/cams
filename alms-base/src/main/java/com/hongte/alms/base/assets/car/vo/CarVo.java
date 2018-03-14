@@ -33,9 +33,9 @@ public class CarVo implements Serializable{
     @Excel(name = "评估金额", orderNum = "9",   isImportField = "true_st")
     private BigDecimal evaluationAmount;
     @Excel(name = "评估日期", orderNum = "10",   isImportField = "true_st")
-    private Date evaluationDate;
+    private String evaluationDate;
     @Excel(name = "拖车日期", orderNum = "11",   isImportField = "true_st")
-    private Date trailerDate;
+    private String trailerDate;
     @Excel(name = "状态", orderNum = "12",   isImportField = "true_st")
     private String status;
 	public String getBusinessId() {
@@ -88,16 +88,17 @@ public class CarVo implements Serializable{
 	public void setEvaluationAmount(BigDecimal evaluationAmount) {
 		this.evaluationAmount = evaluationAmount;
 	}
-	public Date getEvaluationDate() {
+
+	public String getEvaluationDate() {
 		return evaluationDate;
 	}
-	public void setEvaluationDate(Date evaluationDate) {
+	public void setEvaluationDate(String evaluationDate) {
 		this.evaluationDate = evaluationDate;
 	}
-	public Date getTrailerDate() {
+	public String getTrailerDate() {
 		return trailerDate;
 	}
-	public void setTrailerDate(Date trailerDate) {
+	public void setTrailerDate(String trailerDate) {
 		this.trailerDate = trailerDate;
 	}
 	public BigDecimal getRepaidAmount() {

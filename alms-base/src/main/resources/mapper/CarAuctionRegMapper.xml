@@ -6,20 +6,21 @@
     <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.CarAuctionReg">
         <id column="reg_id" property="regId" />
         <result column="business_id" property="businessId" />
-        <result column="reg_name" property="regName" />
-        <result column="reg_cert_id" property="regCertId" />
         <result column="reg_tel" property="regTel" />
         <result column="is_pay_deposit" property="isPayDeposit" />
         <result column="offer_amount" property="offerAmount" />
         <result column="is_auction_success" property="isAuctionSuccess" />
         <result column="trans_price" property="transPrice" />
         <result column="create_time" property="createTime" />
+        <result column="auction_id" property="auctionId" />
+        <result column="update_user" property="updateUser" />
+        <result column="update_time" property="updateTime" />
         <result column="create_user" property="createUser" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        reg_id AS regId, business_id AS businessId, reg_name AS regName, reg_cert_id AS regCertId, reg_tel AS regTel, is_pay_deposit AS isPayDeposit, offer_amount AS offerAmount, is_auction_success AS isAuctionSuccess, trans_price AS transPrice, create_time AS createTime, create_user AS createUser
+        reg_id AS regId, business_id AS businessId, reg_tel AS regTel, is_pay_deposit AS isPayDeposit, offer_amount AS offerAmount, is_auction_success AS isAuctionSuccess, trans_price AS transPrice, create_time AS createTime, auction_id AS auctionId, update_user AS updateUser, update_time AS updateTime, create_user AS createUser
     </sql>
 
 </mapper>

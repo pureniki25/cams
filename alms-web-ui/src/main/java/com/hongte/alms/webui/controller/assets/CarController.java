@@ -27,11 +27,7 @@ public class CarController {
 	    	 map.addAttribute("businessId",businessId);
 	        return "/assets/car/convBusAply";
 	    }
-	    @RequestMapping("auctionReg")
-	    public String auctionReg(ModelMap map,@RequestParam("businessId") String businessId) {
-	    	 map.addAttribute("businessId",businessId);
-	        return "/assets/car/auctionReg";
-	    }
+
 	    @RequestMapping("returnReg")
 	    public String returnReg(ModelMap map,@RequestParam("businessId") String businessId) {
 	    	 map.addAttribute("businessId",businessId);
@@ -51,5 +47,22 @@ public class CarController {
 	    public String uploadAttachment(ModelMap map,@RequestParam("businessId") String businessId) {
 	    	 map.addAttribute("businessId",businessId);
 	        return "/assets/car/uploadAttachment";
+	    }
+	    @RequestMapping("auctionRegList")
+	    public String auctionRegList(ModelMap map,@RequestParam("businessId") String businessId) {
+	    	 map.addAttribute("businessId",businessId);
+	        return "/assets/car/auctionRegList";
+	    }
+	    @RequestMapping("auctionReg")
+	    public String auctionReg(ModelMap map,@RequestParam("regId") String regId) {
+	    	 map.addAttribute("regId",regId);
+	        return "/assets/car/auctionReg";
+	    }
+	    @RequestMapping("carAuctionAudit")
+	    public String carAuctionAudit(ModelMap map,@RequestParam("businessId") String businessId,@RequestParam("processStatus") String processStatus,@RequestParam("processId") String processId) {
+	    	 map.addAttribute("businessId",businessId);
+	    	 map.addAttribute("processStatus",processStatus);
+	    	 map.addAttribute("processId",processId);
+	        return "/assets/car/carAuctionAudit";
 	    }
 }

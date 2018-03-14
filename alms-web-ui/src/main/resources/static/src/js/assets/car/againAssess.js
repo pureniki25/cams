@@ -1,12 +1,9 @@
 var businessId = document.getElementById("businessId").getAttribute("value");
 
 window.layinit(function (htConfig) {
-    var config = layui.ht_config;
-    var baseCorePath = config.coreBasePath;
-    layui.config({
-        base: '/plugins/layui/extend/modules/',
-        version: false
-    }).use(['laydate','element', 'ht_config', 'ht_auth'], function () {
+    var _htConfig = htConfig;
+    basePath = _htConfig.coreBasePath;
+    layui.use(['laydate','element', 'ht_config', 'ht_auth'], function () {
         // var element = layui.element;
         // var config = layui.ht_config;
         var laydate = layui.laydate;
@@ -124,7 +121,7 @@ window.layinit(function (htConfig) {
                                   });*/
                     $.ajax({
                         type: "POST",
-                        url: baseCorePath+'car/carDetail',
+                        url: basePath+'car/carDetail',
                         data: {"businessId":businessId},
                         //contentType: "application/json; charset=utf-8",
                         success: function (data) {
@@ -181,7 +178,7 @@ window.layinit(function (htConfig) {
                                     var config = layui.ht_config;*/
                     $.ajax({
                         type: "POST",
-                        url: baseCorePath+'car/againAssess',
+                        url: basePath+'car/againAssess',
                         contentType: "application/json; charset=utf-8",
                         data: JSON.stringify({"carBasic":v.carBasic,"carDetection":v.carDetection}),
                         success: function (res) {

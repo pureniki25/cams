@@ -2,107 +2,305 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.hongte.alms.base.assets.car.mapper.CarMapper">
 
+	<resultMap id="getMaxOfferPriceResult" type="HashMap">
+		<result property="regTel" column="reg_tel" />
+		<result property="offerAmount" column="offer_amount" />
+
+	</resultMap>
 	<select id="selectCarPage" resultType="com.hongte.alms.base.assets.car.vo.CarVo"
 		parameterType="com.hongte.alms.base.assets.car.vo.CarReq">
 		select
 		car.business_id,<!--业务编号 -->
-		'',<!-- 地区 -->
-		bus.company_name,<!-- 分公司名称-->
-		bus.customer_name,<!-- 客户姓名-->
-		pl.borrow_money,<!-- 借款金额-->
+		bus.district_name,<!-- 地区 -->
+		bus.company_name,<!-- 分公司名称 -->
+		bus.customer_name,<!-- 客户姓名 -->
+		pl.borrow_money,<!-- 借款金额 -->
 
-		(select sum(ifnull(li.total_borrow_amount,0)+ifnull(li.overdue_amount,0)) from
+		(select
+		sum(ifnull(li.total_borrow_amount,0)+ifnull(li.overdue_amount,0)) from
 		tb_repayment_biz_plan_list li where li.current_status='已还款' and
-		li.plan_id=pl.plan_id) repaid_amount, <!-- 已还金额-->
-		car.license_plate_number,<!-- 车牌号-->
-		car.model,<!-- 车辆型号-->
-		det.evaluation_amount,<!-- 评估金额-->
-		det.create_time    evaluation_date,<!-- 评估日期-->
-		drag.drag_date trailer_date,<!-- 拖车日期-->
-		car.status<!-- 状态-->
+		li.plan_id=pl.plan_id) repaid_amount, <!-- 已还金额 -->
+		car.license_plate_number,<!-- 车牌号 -->
+		car.model,<!-- 车辆型号 -->
+		det.evaluation_amount,<!-- 评估金额 -->
+		date_format(det.create_time,'%Y-%m-%d') evaluation_date,<!-- 评估日期 -->
+		date_format(drag.drag_date,'%Y-%m-%d') trailer_date,<!-- 拖车日期 -->
+		case
+		when car.status='02' then '拍卖中'<!-- 状态 -->
+		when car.status='03' then '已拍卖'
+		when car.status='04' then '已结清'
+		when
+		car.status='05' then '已转公车'
+		when car.status='06' then '已移交法务'
+		when
+		car.status='07' then '已撤销'
+		when car.status='08' then '转公车申请中'
+		else '待处置'
+		end status
 		from tb_car_basic car
-		join tb_basic_business bus on car.business_id=bus.business_id
+		join tb_basic_business bus on
+		car.business_id=bus.business_id
 		<!-- join tb_basic_company com on bus.asset_id=com.asset_side_id -->
 		join tb_repayment_biz_plan pl on pl.business_id=bus.business_id
-		left join tb_car_detection det on det.business_id=bus.business_id
-		left join tb_car_drag drag on drag.business_id=bus.business_id
-       <where>
-         <if test="businessId !=null and businessId !=''">
-               and bus.business_id  LIKE #{businessId}
-         </if>
-         <if test="areaId !=null and areaId !=''">
-               and com.area_id  = #{areaId}
-         </if>
-         <if test="companyId !=null and companyId !=''">
-               and com.company_id = #{companyId}
-         </if>
-          <if test="customerName !=null and customerName !=''">
-               and bus.customer_name  LIKE #{customerName}
-         </if>
-         <if test="licensePlateNumber !=null and licensePlateNumber !=''">
-               and car.license_plate_number  LIKE #{customer_name}
-         </if>
-          <if test="licensePlateNumber !=null and licensePlateNumber !=''">
-               and car.license_plate_number  LIKE #{customer_name}
-         </if>
-         <if test="model !=null and model !=''">
-               and car.model  LIKE #{model}
-         </if>
-         <if test="status !=null and status !=''">
-               and car.status= #{status}
-         </if>
-         <if test="trailerStartDate != null and  trailerStartDate != ''">
-            <![CDATA[ and car.trailer_date >= to_date(#{trailerStartDate,jdbcType=DATE},'yyyy-MM-dd hh24:mi:ss')]]>
-        </if>
-        <if test="trailerEndDate != null and  trailerEndDate != ''">
-            <![CDATA[ and car.trailer_date <= to_date(#{trailerEndDate,jdbcType=DATE},'yyyy-MM-dd hh24:mi:ss')]]>
-        </if>
-       </where>
-       order by bus.update_time desc
-        limit ${(page-1) * limit}, #{limit,jdbcType=DECIMAL}
+		left
+		join tb_car_detection det on det.business_id=bus.business_id
+		left join
+		tb_car_drag drag on drag.business_id=bus.business_id
+		<where>
+			<if test="businessId !=null and businessId !=''">
+				and bus.business_id LIKE #{businessId}
+			</if>
+			<if test="areaId !=null and areaId !=''">
+				and com.area_id = #{areaId}
+			</if>
+			<if test="companyId !=null and companyId !=''">
+				and com.company_id = #{companyId}
+			</if>
+			<if test="customerName !=null and customerName !=''">
+				and bus.customer_name LIKE #{customerName}
+			</if>
+			<if test="licensePlateNumber !=null and licensePlateNumber !=''">
+				and car.license_plate_number LIKE #{licensePlateNumber}
+			</if>
+		
+			<if test="model !=null and model !=''">
+				and car.model LIKE #{model}
+			</if>
+			<if test="status !=null and status !=''">
+				and car.status= #{status}
+			</if>
+			<if test="trailerStartDate != null">
+            and drag.drag_date &gt;=#{trailerStartDate}
+			</if>
+			<if test="trailerEndDate != null ">
+            and drag.drag_date &lt;=#{trailerEndDate}
+			</if>
+		</where>
+		order by bus.update_time desc
+		limit ${(page-1) * limit},
+		#{limit,jdbcType=DECIMAL}
 	</select>
 
-<select id="selectCarPageCount" resultType="int"
+	<select id="selectCarPageCount" resultType="int"
 		parameterType="com.hongte.alms.base.assets.car.vo.CarReq">
 		select
 		count(1)
 		from tb_car_basic car
-		join tb_basic_business bus on car.business_id=bus.business_id
+		join tb_basic_business bus on
+		car.business_id=bus.business_id
 		<!-- join tb_basic_company com on bus.asset_id=com.asset_side_id -->
 		join tb_repayment_biz_plan pl on pl.business_id=bus.business_id
-		left join tb_car_detection det on det.business_id=bus.business_id
-		left join tb_car_drag drag on drag.business_id=bus.business_id
-       <where>
-         <if test="businessId !=null and businessId !=''">
-               and bus.business_id  LIKE #{businessId}
-         </if>
-         <if test="areaId !=null and areaId !=''">
-               and com.area_id  = #{areaId}
-         </if>
-         <if test="companyId !=null and companyId !=''">
-               and com.company_id = #{companyId}
-         </if>
-          <if test="customerName !=null and customerName !=''">
-               and bus.customer_name  LIKE #{customerName}
-         </if>
-         <if test="licensePlateNumber !=null and licensePlateNumber !=''">
-               and car.license_plate_number  LIKE #{customer_name}
-         </if>
-          <if test="licensePlateNumber !=null and licensePlateNumber !=''">
-               and car.license_plate_number  LIKE #{customer_name}
-         </if>
-         <if test="model !=null and model !=''">
-               and car.model  LIKE #{model}
-         </if>
-         <if test="status !=null and status !=''">
-               and car.status= #{status}
-         </if>
-         <if test="trailerStartDate != null and  trailerStartDate != ''">
-            <![CDATA[ and car.trailer_date >= to_date(#{trailerStartDate,jdbcType=DATE},'yyyy-MM-dd hh24:mi:ss')]]>
-        </if>
-        <if test="trailerEndDate != null and  trailerEndDate != ''">
-            <![CDATA[ and car.trailer_date <= to_date(#{trailerEndDate,jdbcType=DATE},'yyyy-MM-dd hh24:mi:ss')]]>
-        </if>
-       </where>
+		left
+		join tb_car_detection det on det.business_id=bus.business_id
+		left join
+		tb_car_drag drag on drag.business_id=bus.business_id
+		<where>
+			<if test="businessId !=null and businessId !=''">
+				and bus.business_id LIKE #{businessId}
+			</if>
+			<if test="areaId !=null and areaId !=''">
+				and com.area_id = #{areaId}
+			</if>
+			<if test="companyId !=null and companyId !=''">
+				and com.company_id = #{companyId}
+			</if>
+			<if test="customerName !=null and customerName !=''">
+				and bus.customer_name LIKE #{customerName}
+			</if>
+			<if test="licensePlateNumber !=null and licensePlateNumber !=''">
+				and car.license_plate_number LIKE #{customer_name}
+			</if>
+			<if test="licensePlateNumber !=null and licensePlateNumber !=''">
+				and car.license_plate_number LIKE #{customer_name}
+			</if>
+			<if test="model !=null and model !=''">
+				and car.model LIKE #{model}
+			</if>
+			<if test="status !=null and status !=''">
+				and car.status= #{status}
+			</if>
+			<if test="trailerStartDate != null ">
+            and drag.drag_date &gt;=#{trailerStartDate}
+			</if>
+			<if test="trailerEndDate != null ">
+            and drag.drag_date &lt;=#{trailerEndDate}
+			</if>
+		</where>
+	</select>
+
+	<!-- 查询车辆拍卖信息返回app端 -->
+
+	<select id="selectAuctionsPageForApp" resultType="com.hongte.alms.base.assets.car.vo.AuctionRespVo">
+
+		select
+		tca.auction_id priceID,					<!-- 拍卖ID -->
+		tca.starting_price startPrice,					<!-- 起拍价 -->
+		tca.deposit bond,					<!-- 保证金 -->
+		tca.fare_range priceincrease,							<!-- 加价幅度 -->
+		tca.auction_start_time startPriceDate,							<!-- 拍卖开始时间 -->
+		tca.auction_end_time etartPriceDate,						<!-- 拍卖截止时间 -->
+		tca.buy_start_time starBidTime,				<!-- 竞买开始时间 -->
+		tca.buy_end_time endBidTime,								<!-- 竞买结束时间 -->
+		tca.cons_start_time conStartDate,							<!-- 咨询开始时间 -->
+		tca.cons_end_time conEndDate,				<!-- 咨询结束时间 -->
+		tca.view_sample_start_time vieStartDate,							<!-- 看样开始时间 -->
+		tca.view_sample_end_time vieEndDate,								<!-- 看样结束时间 -->
+		tca.view_sample_addr vie,									<!-- 看样地点 -->
+		tca.consultant_addr contact,								<!-- 联系地点 -->
+		tca.payment_end_time paymentTime,							<!-- 缴款截止时间 -->
+		case
+		when tca.trans_type='01' then '债权转让'
+		when tca.trans_type='02' then
+		'交易过户'
+		else ''
+		end tranType,								<!-- 交易类型 -->
+		case
+		when tca.take_way='01' then '门店自提'
+		when tca.take_way='02' then
+		'运费自付'
+		else ''
+		end pickupMethod,							<!-- 取货方式 -->
+		case
+		when tca.pay_way='01' then '竞买成功后，尾款线下支付'
+		when tca.pay_way='02'
+		then '竞买成功后，尾款线上支付'
+		else ''
+		end paymentMethod,<!-- 支付方式 -->
+		tca.auction_rules bidRule,								<!-- 竞价规则 -->
+		tca.handle_unit disposalUnit,				<!-- 处置单位 -->
+		tca.consultant contacts,				<!-- 咨询联系人 -->
+		tca.consultant_tel telephone,					<!-- 咨询联系人 -->
+		tca.acount_name account,				<!-- 账户名称 -->
+		tca.open_bank bank,				<!-- 开户银行 -->
+		tca.acount_num cardNo,					<!-- 银行卡号 -->
+
+
+		tcb.brand_name vehicleBrand ,		<!--车辆品牌 -->
+		case
+		when tcb.origin_place=0 then '国产'
+		when tcb.origin_place=1 then '进口'
+		else ''
+		end carproduction ,					<!--汽车产地 -->
+		tcb.color carColour ,<!--车辆颜色 -->
+		tcb.model carModel ,<!--车辆型号 -->
+		concat(tcb.displacement,tcb.displacement_unit) displacement ,	<!--排量 -->
+		tcb.engine_model engineNumber ,<!--发动机号 -->
+		tcb.vin frameNumber ,<!--车架号 -->
+		tcb.license_location vehicleTerritory ,<!--车辆属地 -->
+		-- UseProperty ,														<!--使用性质 -->
+		tcb.insurance_expiration_date insuranceDate ,<!--保险到期日 -->
+		tcb.annual_verification_expiration_date inspectionDate ,         <!--年检到期日 -->
+		tcb.odometer mileage ,<!--车显里程 -->
+		tcb.vehicle_license_registration_date registerDate ,             <!--首次登记年月 -->
+		case
+		when tcb.is_mortgage=false then '未抵押'
+		when tcb.is_mortgage=true
+		then '抵押'
+		else ''
+		end mortgageState ,<!--车辆抵押状态 -->
+		tcb.traffic_violation_situation lllegal ,<!--违章未处理记录 -->
+		tcb.tool_with_car tools ,<!--随车工具 -->
+		<!-- Taxation , 交易税费 -->
+		<!-- TransactionMode , 交易方式 -->
+		<!-- Position , 车辆位置 -->
+		tcb.related_docs files   <!--提供文件 -->
+		<!-- Remarks , -->														<!--备注 -->
+
+		from tb_car_auction tca
+		join tb_car_basic tcb on
+		tca.business_id=tcb.business_id
+		join tb_process tp on
+		tcb.business_id=tp.business_id and
+		tp.process_result=1
+		join
+		tb_process_type tpt on tpt.type_id=tp.process_typeid and
+		tpt.type_code='carAuctionAply'
+		order BY tca.create_time DESC
+		limit ${(page-1) * limit},
+		#{limit,jdbcType=DECIMAL}
+	</select>
+
+	<select id="selectAuctionsCountForApp" resultType="int">
+
+		select
+		count(*)
+
+		from tb_car_auction tca
+		join tb_car_basic tcb on
+		tca.business_id=tcb.business_id
+		join tb_process tp on
+		tcb.business_id=tp.business_id and
+		tp.process_result=1
+		join
+		tb_process_type tpt on tpt.type_id=tp.process_typeid and
+		tpt.type_code='carAuctionAply'
+
+	</select>
+	<select id="selectBiddersPageForApp" resultType="com.hongte.alms.base.assets.car.vo.AuctionBidderVo">
+		select
+		tcab.bidder_name bidderName,  <!-- 用户姓名 -->
+		tcab.bidder_cert_id bidderCertId, <!-- 身份证号码 -->
+		tcab.bidder_tel bidderTel, <!-- 联系方式 -->
+		tcab.trans_account_name transAccountName, <!-- 转账账户 -->
+		tcab.trans_account_num transAccountNum,  <!-- 转账卡号 -->
+		tcab.trans_account_num transAccountNum,  <!-- 转账银行 -->
+		tcar.reg_id regId,   <!-- 拍卖登记id -->
+		tcar.business_id businessId,  <!-- 资产端业务编号 -->
+		tcar.is_pay_deposit isPayDeposit,  <!-- 是否缴纳保证金 -->
+		tcar.offer_amount offerAmount,  <!-- 出价金额 -->
+		tcar.is_auction_success isAuctionSuccess,  <!-- 是否竞拍成功 -->
+		tcar.trans_price transPrice,   <!-- 成交价格 -->
+		tcar.auction_id auctionId,  <!-- 竞拍id -->
+		tcar.update_user updateUser,  <!-- 更新人 -->
+		tcar.update_time updateTime  <!-- 更新人 -->
+		from
+		tb_car_auction_bidder tcab
+		join tb_car_auction_reg tcar on
+		tcar.reg_tel=tcab.bidder_tel
+		join tb_car_auction tca on
+		tca.auction_id=tcar.auction_id
+		<where>
+			<if test="isPayDeposit !=null and isPayDeposit !=''">
+				and tcar.is_pay_deposit= #{isPayDeposit}
+			</if>
+			<if test="auctionId !=null and auctionId !=''">
+				and tca.auction_id= #{auctionId}
+			</if>
+	
+		</where>
+		order BY tcar.update_time
+		limit ${(page-1) * limit},
+		#{limit,jdbcType=DECIMAL}
+
+	</select>
+	<select id="selectBiddersCountForApp" resultType="int">
+		select count(*)
+		from
+		tb_car_auction_bidder tcab
+		join tb_car_auction_reg tcar on
+		tcar.reg_tel=tcab.bidder_tel
+		join tb_car_auction tca on
+		tca.auction_id=tcar.auction_id
+		where is_pay_deposit=true
+		<if test="isPayDeposit !=null and isPayDeposit !=''">
+				and tcar.is_pay_deposit= #{isPayDeposit}
+			</if>
+			<if test="auctionId !=null and auctionId !=''">
+				and tca.auction_id= #{auctionId}
+			</if>
+
+	</select>
+	<select id="selectMaxOfferPriceByAuctionId" resultMap="getMaxOfferPriceResult">
+
+		select tcar.reg_tel,max(tcar.offer_amount) offer_amount FROM
+		tb_car_auction_reg tcar
+		join tb_car_auction tca on
+		tca.auction_id=tcar.auction_id
+		<where>
+
+			<if test="auctionId !=null and auctionId !=''">
+				and tca.auction_id= #{auctionId}
+			</if>
+		</where>
 	</select>
 </mapper>

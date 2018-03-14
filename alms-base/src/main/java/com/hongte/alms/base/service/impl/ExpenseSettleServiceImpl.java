@@ -18,10 +18,12 @@ import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.mapper.BasicBusinessMapper;
 import com.hongte.alms.base.mapper.BizOutputRecordMapper;
+import com.hongte.alms.base.mapper.ExpenseSettleMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListDetailMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanMapper;
 import com.hongte.alms.base.service.ExpenseSettleService;
+import com.hongte.alms.base.vo.module.ExpenseSettleLackFeeVO;
 import com.hongte.alms.base.vo.module.ExpenseSettleVO;
 import com.hongte.alms.common.util.DateUtil;
 
@@ -39,9 +41,11 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 	RepaymentBizPlanListMapper repaymentBizPlanListMapper;
 	@Autowired
 	RepaymentBizPlanListDetailMapper repaymentBizPlanListDetailMapper;
-	
+
 	@Autowired
-	BizOutputRecordMapper bizOutputRecordMapper ;
+	BizOutputRecordMapper bizOutputRecordMapper;
+	@Autowired
+	ExpenseSettleMapper expenseSettleMapper ;
 
 	@Override
 	public ExpenseSettleVO cal(String preSettleDate, String businessId) {
@@ -49,31 +53,30 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		if (business == null) {
 			throw new RuntimeException("业务不存在");
 		}
-		
-		List<BizOutputRecord> bizOutputRecords = bizOutputRecordMapper.selectList(new EntityWrapper<BizOutputRecord>().eq("business_id", businessId).orderBy("fact_output_date",false));
-		
-		if (bizOutputRecords==null) {
+
+		List<BizOutputRecord> bizOutputRecords = bizOutputRecordMapper.selectList(
+				new EntityWrapper<BizOutputRecord>().eq("business_id", businessId).orderBy("fact_output_date", false));
+
+		if (bizOutputRecords == null) {
 			throw new RuntimeException("业务尚未出款");
 		}
-		
-		Date outPutDate = bizOutputRecords.get(0).getFactOutputDate();
-		
-		/*2017.3.22前出款或展期不收取；
-		2017.3.22-2017.6.5之间出款或展期的前置收取；
-		2017.6.5之后出款或展期的后置收取；*/
 
-		String serviceChargeRule = "" ;
+		Date outPutDate = bizOutputRecords.get(0).getFactOutputDate();
+
+		/*
+		 * 2017.3.22前出款或展期不收取； 2017.3.22-2017.6.5之间出款或展期的前置收取； 2017.6.5之后出款或展期的后置收取；
+		 */
+
+		String serviceChargeRule = "";
 		if (outPutDate.before(DateUtil.getDate("2017-03-22", "yyyy-MM-dd"))) {
-			serviceChargeRule = "" ;
-		}else if (outPutDate.after(DateUtil.getDate("2017-03-22","yyyy-MM-dd"))&&outPutDate.before(DateUtil.getDate("2017-06-05","yyyy-MM-dd"))) {
-			serviceChargeRule = "pre" ;
-		}else {
-			serviceChargeRule = "next" ;
+			serviceChargeRule = "";
+		} else if (outPutDate.after(DateUtil.getDate("2017-03-22", "yyyy-MM-dd"))
+				&& outPutDate.before(DateUtil.getDate("2017-06-05", "yyyy-MM-dd"))) {
+			serviceChargeRule = "pre";
+		} else {
+			serviceChargeRule = "next";
 		}
-		
-		
-		
-		
+
 		BigDecimal businessRate = business.getBorrowRate();
 		int rateUnit = business.getBorrowRateUnit();
 
@@ -88,7 +91,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		List<RepaymentBizPlanList> residualRepaymentBizPlanLists = repaymentBizPlanListMapper
 				.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId)
 						.gt("due_date", preSettleDate).orderBy("due_date", false));
-		
+
 		if (repaymentBizPlanLists == null) {
 			throw new RuntimeException("业务不存在还款计划");
 		}
@@ -121,16 +124,17 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		 * 1 到期还本息 2 每月付息到期还本 5 等额本息 9 分期还本付息 500 分期还本付息5年 1000 分期还本付息10年
 		 */
 		if (business.getRepaymentTypeId() == 2) {
-			/*2017.6.5之前出款的不收取；
-			2017.6.5—至今，收取标准：剩余本金*0.5%*剩余还款期数。(注：实际中如有业务与上述一般情况非一致的，以实际为准）*/
-			boolean penaltyRule = false ;
+			/*
+			 * 2017.6.5之前出款的不收取；
+			 * 2017.6.5—至今，收取标准：剩余本金*0.5%*剩余还款期数。(注：实际中如有业务与上述一般情况非一致的，以实际为准）
+			 */
+			boolean penaltyRule = false;
 			if (outPutDate.before(DateUtil.getDate("2017-06-05", "yyyy-MM-dd"))) {
-				
-			}else {
-				penaltyRule = true ;
+
+			} else {
+				penaltyRule = true;
 			}
-			
-			
+
 			for (RepaymentBizPlanListDetail repaymentBizPlanListDetail : repaymentBizPlanListDetails) {
 				if (repaymentBizPlanListDetail.getPlanItemName().equals("利息")) {
 					interest = interest.add(repaymentBizPlanListDetail.getPlanAmount()
@@ -146,7 +150,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 					servicecharge = servicecharge.add(repaymentBizPlanListDetail.getPlanAmount()
 							.subtract(repaymentBizPlanListDetail.getFactAmount()));
 				}
-				
+
 				if (repaymentBizPlanListDetail.getPlanItemName().equals("滞纳金")) {
 					lateFee = lateFee.add(repaymentBizPlanListDetail.getPlanAmount()
 							.subtract(repaymentBizPlanListDetail.getFactAmount()));
@@ -162,11 +166,11 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 			}
 
 			if (serviceChargeRule.equals("")) {
-				
-			}else if (serviceChargeRule.equals("pre")) {
-				
-			}else {
-				
+
+			} else if (serviceChargeRule.equals("pre")) {
+
+			} else {
+
 			}
 			BigDecimal calByMonth = businessRate.divide(new BigDecimal(100), 10).multiply(principal);
 			BigDecimal calByDay = new BigDecimal(0.001).multiply(new BigDecimal(differ)).multiply(principal);
@@ -181,23 +185,100 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 				}
 
 			}
-			
+
 			if (penaltyRule) {
-				penalty = principal.multiply(new BigDecimal(0.005)).multiply(new BigDecimal(residualRepaymentBizPlanLists.size()));
+				penalty = principal.multiply(new BigDecimal(0.005))
+						.multiply(new BigDecimal(residualRepaymentBizPlanLists.size()));
 			}
 
 		} else if (business.getRepaymentTypeId() == 5) {
-			/*2017.3之前不收取
-			2017.3—2017.12.4，收取标准：剩余借款本金 * 分公司服务费率 * 服务费的剩余还款期数，但不超过剩余本金的6%；超过6% 按6% 收取*/
-			boolean penaltyRule = false ;
+			/*
+			 * 2017.3之前不收取 2017.3—2017.12.4，收取标准：剩余借款本金 * 分公司服务费率 *
+			 * 服务费的剩余还款期数，但不超过剩余本金的6%；超过6% 按6% 收取
+			 */
+			boolean penaltyRule = false;
 			if (outPutDate.before(DateUtil.getDate("2017-06-05", "yyyy-MM-dd"))) {
-				
-			}else {
-				penaltyRule = true ;
+
+			} else {
+				penaltyRule = true;
 			}
 		}
 
 		return null;
+	}
+
+	@Override
+	public ExpenseSettleVO sum( String businessId) {
+		BasicBusiness business = basicBusinessMapper.selectById(businessId);
+		if (business == null) {
+			throw new RuntimeException("业务不存在");
+		}
+
+		List<BizOutputRecord> bizOutputRecords = bizOutputRecordMapper.selectList(
+				new EntityWrapper<BizOutputRecord>().eq("business_id", businessId).orderBy("fact_output_date", true));
+
+		if (bizOutputRecords == null) {
+			throw new RuntimeException("业务尚未出款");
+		}
+		List<ExpenseSettleLackFeeVO> list = new ArrayList<>();
+		BigDecimal principal = new BigDecimal(0);
+		BigDecimal interest = new BigDecimal(0);
+		BigDecimal servicecharge = new BigDecimal(0);
+		BigDecimal guaranteeFee = new BigDecimal(0);
+		BigDecimal platformFee = new BigDecimal(0);
+		BigDecimal lateFee = new BigDecimal(0);
+		BigDecimal demurrage = new BigDecimal(0);
+		BigDecimal penalty = new BigDecimal(0);
+		BigDecimal lackFee = new BigDecimal(0);
+		BigDecimal balance = new BigDecimal(0);
+		List<RepaymentBizPlanListDetail> repaymentBizPlanListDetails = repaymentBizPlanListDetailMapper
+				.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("business_id", businessId)
+						.orderBy("period").orderBy("plan_item_type"));
+
+		for (RepaymentBizPlanListDetail repaymentBizPlanListDetail : repaymentBizPlanListDetails) {
+			if (repaymentBizPlanListDetail.getPlanItemName().equals("本金")
+					&& repaymentBizPlanListDetail.getPlanItemType() == 10) {
+				principal = principal.add(repaymentBizPlanListDetail.getPlanAmount());
+			}
+
+			if (repaymentBizPlanListDetail.getPlanItemName().equals("利息")
+					&& repaymentBizPlanListDetail.getPlanItemType() == 20) {
+				interest = interest.add(repaymentBizPlanListDetail.getPlanAmount());
+			}
+
+			if (repaymentBizPlanListDetail.getPlanItemName().indexOf("服务费") > -1) {
+				servicecharge = servicecharge.add(repaymentBizPlanListDetail.getPlanAmount());
+			}
+
+			if (repaymentBizPlanListDetail.getPlanItemName().equals("滞纳金")
+					&& repaymentBizPlanListDetail.getPlanItemType() == 60) {
+				lateFee = lateFee.add(repaymentBizPlanListDetail.getPlanAmount());
+			}
+			if (repaymentBizPlanListDetail.getPlanItemName().indexOf("平台费") > -1) {
+				platformFee = platformFee.add(repaymentBizPlanListDetail.getPlanAmount());
+			}
+			if (repaymentBizPlanListDetail.getPlanItemName().equals("担保费")
+					&& repaymentBizPlanListDetail.getPlanItemType() == 40) {
+				guaranteeFee = guaranteeFee.add(repaymentBizPlanListDetail.getPlanAmount());
+			}
+			
+			balance = balance.add(repaymentBizPlanListDetail.getFactAmount()==null?new BigDecimal(0):repaymentBizPlanListDetail.getFactAmount());
+		}
+		list = expenseSettleMapper.listLackFee(businessId);
+		ExpenseSettleVO expenseSettleVO = new ExpenseSettleVO() ;
+		expenseSettleVO.setPrincipal(principal);
+		expenseSettleVO.setInterest(interest);
+		expenseSettleVO.setLateFee(lateFee);
+		expenseSettleVO.setServicecharge(servicecharge);
+		expenseSettleVO.setGuaranteeFee(guaranteeFee);
+		expenseSettleVO.setPlatformFee(platformFee);
+		expenseSettleVO.setList(list);
+		expenseSettleVO.setBalance(balance);
+		for (ExpenseSettleLackFeeVO e : list) {
+			lackFee = lackFee.add(e.getServicecharge()).add(e.getLateFee());
+		}
+		expenseSettleVO.setLackFee(lackFee);
+		return expenseSettleVO;
 	}
 
 }

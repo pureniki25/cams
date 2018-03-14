@@ -32,4 +32,10 @@ public class TransferOfLitigationController {
 		modelMap.put("crpId", crpId);
 		return "/Litigation/houseLoan";
 	}
+	
+	@RequestMapping("/carLoanBilling")
+	public String carLoanBilling(@RequestParam String businessId, ModelMap modelMap) {
+		modelMap.put("businessId", businessId);
+		return "/billing/carLoan";
+	}
 }

@@ -6,7 +6,6 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
     <title>房贷移交诉讼</title>
-    <script src="/properties/config.js"></script>
     <!-- 默认主题样式 -->
     <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
     <!-- iview样式 -->
@@ -41,6 +40,7 @@
 
     <!--引入公共的一些方法-->
     <script src="/src/js/comm.js"></script>
+    <script src="/properties/config.js"></script>
 
 
 
@@ -111,7 +111,7 @@
 			<row :gutter="16">
                 <i-table border :columns="repaymentPlanTitle" :data="repaymentPlanTitleData"></i-table>
 			</row>
-			<row :gutter="16">
+			<row :gutter="16" style="margin-top:10px">
 				<i-col v-if="applyInfoFormEditFlage" span="22">
                     <form-item label="客户逾期情况描述：" prop="overdueDesc" >
                         <i-input v-model="commitInfoForm.overdueDesc" type="textarea" :rows="4" placeholder="申请人员填写，必填。限1000字"></i-input>
@@ -129,7 +129,53 @@
 			<p>
 				三、抵押物情况
 			</p>
-			<row :gutter="16">
+			<row :gutter="16" v-for="(info, index) in baseInfoForm.mortgageInfos">
+				<i-lable>抵押物{{index+1}}</i-lable>
+				 <div class="table">
+				 	<div class="tr">
+				 		<div class="td"> <div class="td-box">抵押物位置</div><div class="td-box">{{ info.houseAddress }} </div> </div>
+				 		<div class="td"> <div class="td-box"></div><div class="td-box"> </div> </div>
+				 		<div class="td"> <div class="td-box"></div><div class="td-box"> </div> </div>
+				 	</div>
+		            <div class="tr">
+		                <div class="td"> <div class="td-box">权属人</div><div class="td-box">{{ info.houseName }} </div> </div>
+		                <div class="td"> <div class="td-box">我方抵押顺位</div><div class="td-box">{{ info.ourMortgage }} </div> </div>
+		                <div class="td"> <div class="td-box">债权人</div><div class="td-box">{{ info.lender }} </div> </div>
+		            </div>
+		            <div class="tr">
+		                <div class="td"> <div class="td-box">抵押权人</div><div class="td-box">{{ info.pledee }} </div> </div>
+		                <div class="td"> <div class="td-box">抵押债权</div><div class="td-box">{{ info.mortgageSecurities }} </div> </div>
+		                <div class="td"> <div class="td-box">抵押物面积</div><div class="td-box">{{ info.houseArea }} </div> </div>
+		            </div>
+		            <div class="tr">
+		                <div class="td"> <div class="td-box">评估单价</div><div class="td-box">{{ info.housePrice }} </div> </div>
+		                <div class="td"> <div class="td-box">评估总价</div><div class="td-box">{{ info.houseTotal }} </div> </div>
+		                <div class="td"> <div class="td-box">第一顺位抵押权人</div><div class="td-box">{{ info.housePledgedBank }} </div> </div>
+		            </div>
+		            <div class="tr">
+		                <div class="td"> <div class="td-box">一抵债权金额</div><div class="td-box">{{ info.borrowTotal }}</div> </div>
+		                <div class="td"> <div class="td-box">一抵债权余额</div><div class="td-box">{{ info.borrowBalance }} </div> </div>
+		                <div class="td"> <div class="td-box">第二顺位抵押权人</div><div class="td-box">{{ info.secondMortgageBank }} </div> </div>
+		            </div>
+		            <div class="tr">
+		                <div class="td"> <div class="td-box">二抵债权金额</div><div class="td-box">{{ info.secondMortgageTotal }} </div> </div>
+		                <div class="td"> <div class="td-box">二抵债权余额</div><div class="td-box">{{ info.secondMortgageBalance }} </div> </div>
+		                <div class="td"> <div class="td-box">第三顺位抵押权人</div><div class="td-box">{{ info.thirdMortgageBank }} </div> </div>
+		            </div>
+		            <div class="tr">
+		                <div class="td"> <div class="td-box">三抵债权金额</div><div class="td-box">{{ info.thirdMortgageTotal }} </div> </div>
+		                <div class="td"> <div class="td-box">三抵债权余额</div><div class="td-box">{{ info.thirdMortgageBalance }} </div> </div>
+		                <div class="td"> <div class="td-box">第四顺位抵押权人</div><div class="td-box">{{ info.fourthMortgageBank }} </div> </div>
+		            </div>
+		            <div class="tr">
+		                <div class="td"> <div class="td-box">四抵债权金额</div><div class="td-box">{{ info.fourthMortgageTotal }}</div> </div>
+		                <div class="td"> <div class="td-box">四抵债权余额</div><div class="td-box">{{ info.fourthMortgageBalance }} </div> </div>
+		                <div class="td"> <div class="td-box">房产剩余空间</div><div class="td-box">{{ info.surplusValue }} </div> </div>
+		            </div>
+		        </div>
+		    </row>   
+		    
+		    <row :gutter="16">
 				<i-col v-if="applyInfoFormEditFlage" span="22">
                     <form-item label="未能覆盖的风险口：" prop="riskDesc" >
                         <i-input v-model="commitInfoForm.riskDesc" type="textarea" :rows="4" placeholder="申请人员填写，必填，限500字"></i-input>
@@ -231,20 +277,37 @@
                 </i-col>
            	</row>
            	
-           	<row :gutter="16">
-		         <i-form ref="baseInfoForm"  :model="baseInfoForm"  label-position="right" :label-width="100">
-		         	<div class="table">
-			            <div class="tr">
-			                <div class="td"> <div class="td-box">业务编号</div><div class="td-box" v-for="item in mortgageInfoList">{{ item.houseAddress }} </div> </div>
-			            </div>
-			            <div class="tr">
-			                <div class="td"> <div class="td-box">权属人</div><div class="td-box" v-for="item in mortgageInfoList">{{ item.houseName }} </div> </div>
-			                <div class="td"> <div class="td-box">我方抵押顺位</div><div class="td-box" v-for="item in mortgageInfoList">{{ item.ourMortgage }} </div> </div>
-			                <div class="td"> <div class="td-box">债权人</div><div class="td-box" v-for="item in mortgageInfoList">{{ item.lender }} </div> </div>
-			            </div>
-			        </div>
-	             </i-form>
-	        </row>
+	        <row :gutter="16">
+                <table v-for="(info, index) in baseInfoForm.mortgageInfos" width="91%" border="1">
+					<tr>
+						<td>序号</td>
+						<td>抵押物地址号</td>
+						<td>面积（M2）</td>
+						<td>风控审批单价</td>
+						<td>额定单价</td>
+						<td>是否易变现</td>
+					</tr>
+					<tr>
+						<td>{{index+1}}</td>
+						<td>{{info.houseAddress}}</td>
+						<td>{{info.houseArea}}</td>
+						<td>{{info.housePrice}}</td>
+						<td>
+							<form-item prop="ratedPrice" >
+								<i-input type="text" v-model="commitInfoForm.ratedPrice"/>
+							</form-item>
+						</td>
+						<td>
+							<i-select v-model="commitInfoForm.liquidate" clearable  filterable prop="liquidate">
+                                <i-option  value="1">易变现</i-option>
+                                <i-option  value="2">不易变现</i-option>
+                                <i-option  value="3">一般</i-option>
+                            </i-select>
+                        </td>
+					</tr>
+				</table>
+			</row>
+	        
            	<row :gutter="16">
            		<i-col v-if="applyInfoFormEditFlage" span="22">
                     <form-item label="其他财务情况：" prop="firstPecuniaryCondition" >

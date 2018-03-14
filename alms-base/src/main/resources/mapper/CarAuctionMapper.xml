@@ -4,7 +4,8 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.CarAuction">
-        <id column="business_id" property="businessId" />
+        <id column="auction_id" property="auctionId" />
+        <result column="business_id" property="businessId" />
         <result column="starting_price" property="startingPrice" />
         <result column="deposit" property="deposit" />
         <result column="fare_range" property="fareRange" />
@@ -25,11 +26,22 @@
         <result column="acount_num" property="acountNum" />
         <result column="create_time" property="createTime" />
         <result column="create_user" property="createUser" />
+        <result column="status" property="status" />
+        <result column="view_sample_start_time" property="viewSampleStartTime" />
+        <result column="view_sample_end_time" property="viewSampleEndTime" />
+        <result column="auction_rules" property="auctionRules" />
+        <result column="open_bank" property="openBank" />
+        <result column="payment_end_time" property="paymentEndTime" />
+        <result column="cons_start_time" property="consStartTime" />
+        <result column="cons_end_time" property="consEndTime" />
+        <result column="view_sample_addr" property="viewSampleAddr" />
+        <result column="consultant_addr" property="consultantAddr" />
+        <result column="pay_way" property="payWay" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        business_id AS businessId, starting_price AS startingPrice, deposit, fare_range AS fareRange, reserve_price AS reservePrice, auction_start_time AS auctionStartTime, auction_end_time AS auctionEndTime, trans_type AS transType, priority_purchaser AS priorityPurchaser, take_way AS takeWay, buy_start_time AS buyStartTime, buy_end_time AS buyEndTime, auction_position AS auctionPosition, handle_unit AS handleUnit, unit_addr AS unitAddr, consultant, consultant_tel AS consultantTel, acount_name AS acountName, acount_num AS acountNum, create_time AS createTime, create_user AS createUser
+        business_id AS businessId, starting_price AS startingPrice, deposit, fare_range AS fareRange, reserve_price AS reservePrice, auction_start_time AS auctionStartTime, auction_end_time AS auctionEndTime, trans_type AS transType, priority_purchaser AS priorityPurchaser, take_way AS takeWay, buy_start_time AS buyStartTime, buy_end_time AS buyEndTime, auction_position AS auctionPosition, handle_unit AS handleUnit, unit_addr AS unitAddr, consultant, consultant_tel AS consultantTel, acount_name AS acountName, acount_num AS acountNum, create_time AS createTime, create_user AS createUser, status, auction_id AS auctionId, view_sample_start_time AS viewSampleStartTime, view_sample_end_time AS viewSampleEndTime, auction_rules AS auctionRules, open_bank AS openBank, payment_end_time AS paymentEndTime, cons_start_time AS consStartTime, cons_end_time AS consEndTime, view_sample_addr AS viewSampleAddr, consultant_addr AS consultantAddr, pay_way AS payWay
     </sql>
 
 </mapper>

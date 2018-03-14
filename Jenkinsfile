@@ -8,6 +8,12 @@ pipeline {
       }
     }
   }
+  post {
+        failure { 
+            emailext attachLog: true, body: '$DEFAULT_CONTENT',  recipientProviders: [[$class: 'RequesterRecipientProvider'], [$class: 'DevelopersRecipientProvider']], subject: '$DEFAULT_SUBJECT'
+             }
+      }
+
   tools {
     maven 'M3'
   }
