@@ -486,7 +486,6 @@
                     }
                     if(!self.files[index].uploadResult.isSuccess)
                     {
-                        self.$set(self.files[index],'status',0);
                         return ;
                     }
                     var reqStr = basePath +'doc/delOneDoc?docId='+self.files[index].uploadResult.docId;

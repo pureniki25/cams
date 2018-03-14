@@ -7,22 +7,18 @@ import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
-import com.hongte.alms.base.collection.enums.StaffPersonType;
 import com.hongte.alms.base.collection.service.CollectionLogService;
 import com.hongte.alms.base.collection.service.CollectionStatusService;
 import com.hongte.alms.base.collection.vo.*;
 import com.hongte.alms.base.entity.BasicBusinessType;
 import com.hongte.alms.base.entity.BasicCompany;
 import com.hongte.alms.base.entity.SysParameter;
-import com.hongte.alms.base.entity.SysUser;
 import com.hongte.alms.base.enums.AreaLevel;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
-import com.hongte.alms.base.enums.SysRoleEnums;
 import com.hongte.alms.base.service.BasicBusinessTypeService;
 import com.hongte.alms.base.service.BasicCompanyService;
 import com.hongte.alms.base.collection.service.PhoneUrgeService;
 import com.hongte.alms.base.service.SysParameterService;
-import com.hongte.alms.base.service.SysUserService;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.EasyPoiExcelExportUtil;
 import com.hongte.alms.common.util.JsonUtil;
@@ -86,10 +82,6 @@ public class CollectionController {
     @Autowired
 //    @Qualifier("storageService")
     StorageService storageService;
-
-    @Autowired
-    @Qualifier("SysUserService")
-    SysUserService  sysUserService;
 
 //    private final StorageService storageService;
 //
@@ -242,9 +234,7 @@ public class CollectionController {
      */
     @ApiOperation(value="取得分配电催界面下拉选项框数据")
     @GetMapping("getPhoneUrgeSelectsData")
-    public Result<Map<String,JSONArray>> getPhoneUrgeSelectsData(
-            @RequestParam("staffType")  String staffType
-    ) {
+    public Result<Map<String,JSONArray>> getPhoneUrgeSelectsData() {
 
         Map<String,JSONArray> retMap = new HashMap<String,JSONArray>();
 
@@ -257,26 +247,16 @@ public class CollectionController {
         //业务类型
         List<BasicBusinessType> btype_list =  basicBusinessTypeService.selectList(new EntityWrapper<BasicBusinessType>().orderBy("business_type_id"));
         retMap.put("businessType",(JSONArray) JSON.toJSON(btype_list, JsonUtil.getMapping()));
-
-
+        //跟进人员
         List<Map<String,String>> opr_list = new LinkedList<Map<String,String>>();
-        List<SysUser> oprList =new LinkedList<>();
-        if(staffType.equals(StaffPersonType.PHONE_STAFF.getKey())){
-            //跟进人员
-            oprList =  sysUserService.selectUsersByRole(SysRoleEnums.HD_LIQ_COMMISSIONER.getKey());
-
-        }else{
-            oprList =  sysUserService.selectUsersByRole(SysRoleEnums.HD_ASSET_COMMISSIONE.getKey());
-
-        }
-        for(SysUser user:oprList){
-            Map<String,String> opr1 = new HashMap<String, String>();
-            opr1.put("userId",user.getUserId());
-            opr1.put("userName",user.getUserName());
-            opr_list.add(opr1);
-        }
-
-
+        Map<String,String> opr1 = new HashMap<String, String>();
+        opr1.put("userId","testUser1");
+        opr1.put("userName","模拟用户一");
+        opr_list.add(opr1);
+        Map<String,String> opr2 = new HashMap<String, String>();
+        opr2.put("userId","testUser2");
+        opr2.put("userName","模拟用户二");
+        opr_list.add(opr2);
         retMap.put("operators",(JSONArray) JSON.toJSON(opr_list));
 
         return Result.success(retMap);

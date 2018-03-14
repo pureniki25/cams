@@ -17,7 +17,6 @@ window.layinit(function (htConfig) {
     var _htConfig = htConfig;
     basePath = _htConfig.coreBasePath;
 
-    getSelectsData();
 
     vm = new Vue({
         el: '#app',
@@ -81,7 +80,7 @@ window.layinit(function (htConfig) {
         }
     });
 
-
+    getSelectsData();
 
     //使用layerUI的表格组件
     layui.use(['layer', 'table','ht_ajax', 'ht_auth', 'ht_config'], function () {
@@ -190,7 +189,7 @@ window.layinit(function (htConfig) {
 var getSelectsData = function () {
 
     //取区域列表
-    axios.get(basePath + 'collection/getPhoneUrgeSelectsData?staffType='+staffType)
+    axios.get(basePath + 'collection/getPhoneUrgeSelectsData')
         .then(function (res) {
             if (res.data.code == "1") {
                 vm.areaList = res.data.data.area;

@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -93,6 +95,7 @@ public class TransferLitigationHouse extends Model<TransferLitigationHouse> {
     /**
      * 意向还款计划
      */
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
 	@TableField("repayment_intention_date")
 	@ApiModelProperty(required= true,value = "意向还款计划")
 	private Date repaymentIntentionDate;
@@ -128,6 +131,7 @@ public class TransferLitigationHouse extends Model<TransferLitigationHouse> {
     /**
      * 移交时间
      */
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
 	@TableField("operate_date")
 	@ApiModelProperty(required= true,value = "移交时间")
 	private Date operateDate;

@@ -71,7 +71,7 @@ var setFormValidate = {
     		}
     	}
     ],
-    firstRelatedPersonnel: [
+    /*firstRelatedPersonnel: [
     	{required: true, message: '必填', trigger: 'blur'}  ,  
     	{
     		validator: function (rule, value, callback, source, options) {
@@ -82,7 +82,7 @@ var setFormValidate = {
     			}
     		}
     	}
-    ],
+    ],*/
     secondPecuniaryCondition: [
     	{required: true, message: '必填', trigger: 'blur'}  ,  
     	{
@@ -95,7 +95,7 @@ var setFormValidate = {
     		}
     	}
     ],
-    secondRelatedPersonnel: [
+    /*secondRelatedPersonnel: [
     	{required: true, message: '必填', trigger: 'blur'}  ,  
     	{
     		validator: function (rule, value, callback, source, options) {
@@ -106,15 +106,15 @@ var setFormValidate = {
     			}
     		}
     	}
-    ],
+    ],*/
 	transferReceiptCount: [
-        {pattern:"^\\d{1,8}?$", message: '请填写整数', trigger: 'blur'}    
+        {pattern:"^\\d{0,9}?$", message: '请填写整数', trigger: 'blur'}    
     ],
 	cashReceiptCount: [
-		{pattern:"^\\d{1,8}?$", message: '请填写整数', trigger: 'blur'}    
+		{pattern:"^\\d{0,9}?$", message: '请填写整数', trigger: 'blur'}    
 	],
 	ratedPrice: [
-		{pattern:"^\\d{1,8}(\\.\\d{1,2})?$", required: true,  message: '请填写整数位数不大于8位，小数位数不超过两位的数字', trigger: 'blur'}  
+		{pattern:"^\\d{0,9}(\\.\\d{1,2})?$", required: true,  message: '请填写整数位数不大于9位，小数位数不超过两位的数字', trigger: 'blur'}  
 	],
 	liquidate: [
 		{required: true, message: '必填', trigger: 'blur'}   

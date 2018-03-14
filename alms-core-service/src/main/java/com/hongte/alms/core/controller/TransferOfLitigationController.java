@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -63,6 +64,9 @@ public class TransferOfLitigationController {
 	@Autowired
 	@Qualifier("ProcessService")
 	private ProcessService processService;
+	
+	@Value("${ht.litigation.url}")
+	private String sendUrl;
 
 	/**
 	 * 获取车贷诉讼相关数据
@@ -159,7 +163,7 @@ public class TransferOfLitigationController {
 	@ResponseBody
 	public Result<String> saveTransferLitigationHouse(@RequestBody TransferLitigationHouse req) {
 		try {
-			transferOfLitigationService.saveTransferLitigationHouse(req);
+			transferOfLitigationService.saveTransferLitigationHouse(req, sendUrl);
 			return Result.success();
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
@@ -195,7 +199,7 @@ public class TransferOfLitigationController {
 			
 			car.setHouseAddress(houseAddress.toString());
 			
-			transferOfLitigationService.saveTransferLitigationCar(car);
+			transferOfLitigationService.saveTransferLitigationCar(car, sendUrl);
 			return Result.success();
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
@@ -264,7 +268,7 @@ public class TransferOfLitigationController {
 			@RequestParam String crpId) {
 		try {
 			TransferOfLitigationVO litigationData = transferOfLitigationService.sendTransferLitigationData(businessId,
-					crpId);
+					crpId, sendUrl);
 			if (litigationData != null) {
 				return Result.success(litigationData);
 			} else {

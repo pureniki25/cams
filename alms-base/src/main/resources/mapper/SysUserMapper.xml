@@ -13,10 +13,6 @@
     <sql id="Base_Column_List">
         user_id AS userId, user_name AS userName, org_code AS orgCode
     </sql>
-    <!-- 查询结果列 -->
-    <sql id="Table_Column_List">
-        u.user_id AS userId, u.user_name AS userName, u.org_code AS orgCode
-    </sql>
 
 
     <select id="selectUsersByRoleAndEare" resultType="String">
@@ -41,14 +37,5 @@
 
     </select>
 
-    
-    <select id="selectUsersByRole" resultType="com.hongte.alms.base.entity.SysUser">
-      SELECT 
-      <include refid="Table_Column_List"></include>
-        FROM  tb_sys_user u
-        JOIN tb_sys_user_role urole
-        ON urole.user_id = u.user_id WHERE urole.role_code = #{roleCode}
-        GROUP BY  u.user_id
-    </select>
 
 </mapper>
