@@ -136,14 +136,16 @@ window.layinit(function (htConfig) {
                         Authorization : "Bearer " + getToken()
                     },
                     success : function(data) {
-                        var applyDerateProcess = data.data;
-                        url =  '/collectionUI/applyDerateUI?businessId='+obj.data.businessId+'&crpId='+applyDerateProcess.crpId+"&processStatus="+obj.data.processStatus+"&processId="+obj.data.processId
+                        if(data.code=='1'){
+                            var applyDerateProcess = data.data;
+                            url =  '/collectionUI/applyDerateUI?businessId='+obj.data.businessId+'&crpId='+applyDerateProcess.crpId+"&processStatus="+obj.data.processStatus+"&processId="+obj.data.processId
+                            main.approvalModal.show = true ;
+                        }else{
+                            main.$Modal.error({ content: '接口调用异常!'+data.msg });
+                        }
                     },
                     error : function() {
-                        layer.confirm('Navbar error:AJAX请求出错!', function(index) {
-                            top.location.href = loginUrl;
-                            layer.close(index);
-                        });
+                        main.$Modal.error({ content: '接口调用异常!'});
                         return false;
                     }
                 });
@@ -153,7 +155,7 @@ window.layinit(function (htConfig) {
         }
 
         main.approvalModal.url = getDerateProcessUrl() ;
-        main.approvalModal.show = true ;
+        
     });
 
     table.render({
