@@ -114,36 +114,97 @@ window.layinit(function (htConfig) {
     });
 
     table.on('tool(approvalTable)', function (obj) {
-        if(obj.event ==='info'){
-            //设置申请减免的url路径
-            function getDerateProcessUrl(){
-                var url
-                $.ajax({
-                    type : 'GET',
-                    async : false,
-                    url : basePath +'ApplyDerateController/getApplyDerateInfoByProcessId?processId='+obj.data.processId,
-                    headers : {
-                        app : 'ALMS',
-                        Authorization : "Bearer " + getToken()
-                    },
-                    success : function(data) {
-                        var applyDerateProcess = data.data;
-                        url =  '/collectionUI/applyDerateUI?businessId='+obj.data.businessId+'&crpId='+applyDerateProcess.crpId+"&processStatus="+obj.data.processStatus+"&processId="+obj.data.processId
-                    },
-                    error : function() {
-                        layer.confirm('Navbar error:AJAX请求出错!', function(index) {
-                            top.location.href = loginUrl;
-                            layer.close(index);
-                        });
-                        return false;
-                    }
-                });
-
-                return url;
-            }
+        
+        //设置申请减免的url路径
+    	var getDerateProcessUrl = function(){
+	  	      var url
+	  	      $.ajax({
+	  	          type : 'GET',
+	  	          async : false,
+	  	          url : basePath +'ApplyDerateController/getApplyDerateInfoByProcessId?processId='+obj.data.processId,
+			  	  headers : {
+			  	      app : 'ALMS',
+			  	      Authorization : "Bearer " + getToken()
+			  	  },
+			  	  success : function(data) {
+			  	      var applyDerateProcess = data.data;
+			  	      url =  '/collectionUI/applyDerateUI?businessId='+obj.data.businessId+'&crpId='+applyDerateProcess.crpId+"&processStatus="+obj.data.processStatus+"&processId="+obj.data.processId
+			  	  },
+			  	  error : function() {
+			  	      layer.confirm('Navbar error:AJAX请求出错!', function(index) {
+			  	                  top.location.href = loginUrl;
+			  	                  layer.close(index);
+			  	              });
+			  	              return false;
+			  	          }
+			  	      });
+	  	
+	  	      return url;
+	  	}	 
+         
+    	//设置车贷移交法务申请的url路径
+        var getCarLoanProcessUrl = function(){
+        	var url
+        	$.ajax({
+        		type : 'GET',
+        		async : false,
+        		url : basePath +'transferOfLitigation/getTransferLitigationCarByProcessId?processId='+obj.data.processId,
+        		headers : {
+        			app : 'ALMS',
+        			Authorization : "Bearer " + getToken()
+        		},
+        		success : function(data) {
+        			url =  '/transferOfLitigation/carLoan?businessId='+obj.data.businessId+"&processStatus="+obj.data.status+"&processId="+obj.data.processId
+        		},
+        		error : function() {
+        			layer.confirm('Navbar error:AJAX请求出错!', function(index) {
+        				top.location.href = loginUrl;
+        				layer.close(index);
+        			});
+        			return false;
+        		}
+        	});
+        	
+        	return url;
         }
 
-        main.approvalModal.url = getDerateProcessUrl() ;
+        //设置房贷移交法务申请的url路径
+        var getHouseLoanProcessUrl = function(){
+        	var url
+        	$.ajax({
+        		type : 'GET',
+        		async : false,
+        		url : basePath +'transferOfLitigation/getTransferLitigationHouseByProcessId?processId='+obj.data.processId,
+        		headers : {
+        			app : 'ALMS',
+        			Authorization : "Bearer " + getToken()
+        		},
+        		success : function(data) {
+        			url =  '/transferOfLitigation/houseLoan?businessId='+obj.data.businessId+"&processStatus="+obj.data.processStatus+"&processId="+obj.data.processId
+        		},
+        		error : function() {
+        			layer.confirm('Navbar error:AJAX请求出错!', function(index) {
+        				top.location.href = loginUrl;
+        				layer.close(index);
+        			});
+        			return false;
+        		}
+        	});
+        	
+        	return url;
+        }
+    	
+        if(obj.event ==='info'){
+            //设置申请减免的url路径
+        	if(obj.data.processTypeCode=="derate"){
+                main.approvalModal.url = getDerateProcessUrl() ;
+            }else if (obj.data.processTypeCode =="houseLoanLitigation") {
+            	main.approvalModal.url = getHouseLoanProcessUrl();
+			}else if (obj.data.processTypeCode =="carLoanLitigation") {
+            	main.approvalModal.url = getCarLoanProcessUrl();
+			}
+        }
+
         main.approvalModal.show = true ;
     });
 
@@ -200,4 +261,5 @@ window.layinit(function (htConfig) {
             console.log(obj)
         }
     });
+    
 });
