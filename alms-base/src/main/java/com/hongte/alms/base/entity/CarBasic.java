@@ -16,8 +16,8 @@ import io.swagger.annotations.ApiModelProperty;
  * 车辆基本信息
  * </p>
  *
- * @author cj
- * @since 2018-02-28
+ * @author 曾坤
+ * @since 2018-03-12
  */
 @ApiModel
 @TableName("tb_car_basic")
@@ -32,6 +32,12 @@ public class CarBasic extends Model<CarBasic> {
 	@ApiModelProperty(required= true,value = "资产端业务编号 ")
 	private String businessId;
     /**
+     * 评估金额
+     */
+	@TableField("evaluation_amount")
+	@ApiModelProperty(required= true,value = "评估金额")
+	private BigDecimal evaluationAmount;
+    /**
      * 所属人 
      */
 	@TableField("owner_name")
@@ -43,12 +49,6 @@ public class CarBasic extends Model<CarBasic> {
 	@TableField("license_plate_number")
 	@ApiModelProperty(required= true,value = "车牌号 ")
 	private String licensePlateNumber;
-    /**
-     * 评估金额
-     */
-	@TableField("evaluation_amount")
-	@ApiModelProperty(required= true,value = "评估金额 ")
-	private BigDecimal evaluationAmount;
     /**
      * 车身颜色 
      */
@@ -241,6 +241,88 @@ public class CarBasic extends Model<CarBasic> {
 	@TableField("create_user")
 	@ApiModelProperty(required= true,value = "创建人 ")
 	private String createUser;
+    /**
+     * 更新时间
+     */
+	@TableField("update_time")
+	@ApiModelProperty(required= true,value = "更新时间")
+	private Date updateTime;
+    /**
+     * 更新人
+     */
+	@TableField("update_user")
+	@ApiModelProperty(required= true,value = "更新人")
+	private String updateUser;
+    /**
+     * 状态:01  待处置，02拍卖中、03已拍卖、04已结清、05已转公车、06已移交法务、07已撤销、08转公车申请中
+     */
+	@ApiModelProperty(required= true,value = "状态:01  待处置，02拍卖中、03已拍卖、04已结清、05已转公车、06已移交法务、07已撤销、08转公车申请中")
+	private String status;
+    /**
+     * 最新评估金额
+     */
+	@TableField("last_evaluation_amount")
+	@ApiModelProperty(required= true,value = "最新评估金额")
+	private BigDecimal lastEvaluationAmount;
+    /**
+     * 最新评估时间
+     */
+	@TableField("last_evaluation_time")
+	@ApiModelProperty(required= true,value = "最新评估时间")
+	private Date lastEvaluationTime;
+    /**
+     * 使用权转移价
+     */
+	@TableField("borrowing_money")
+	@ApiModelProperty(required= true,value = "使用权转移价")
+	private BigDecimal borrowingMoney;
+    /**
+     * 车辆使用性质
+     */
+	@TableField("user_nature")
+	@ApiModelProperty(required= true,value = "车辆使用性质")
+	private String userNature;
+    /**
+     * 随车工具
+     */
+	@TableField("tool_with_car")
+	@ApiModelProperty(required= true,value = "随车工具")
+	private String toolWithCar;
+    /**
+     * 最后一次过户时间
+     */
+	@TableField("last_transfer_date")
+	@ApiModelProperty(required= true,value = "最后一次过户时间")
+	private Date lastTransferDate;
+    /**
+     * 提供文件
+     */
+	@TableField("related_docs")
+	@ApiModelProperty(required= true,value = "提供文件")
+	private String relatedDocs;
+    /**
+     * 车型及版本配置
+     */
+	@TableField("car_version_config")
+	@ApiModelProperty(required= true,value = "车型及版本配置")
+	private String carVersionConfig;
+    /**
+     * 交易方式
+     */
+	@TableField("transaction_mode")
+	@ApiModelProperty(required= true,value = "交易方式")
+	private String transactionMode;
+    /**
+     * 车辆位置
+     */
+	@TableField("car_position")
+	@ApiModelProperty(required= true,value = "车辆位置")
+	private String carPosition;
+    /**
+     * 备注
+     */
+	@ApiModelProperty(required= true,value = "备注")
+	private String remark;
 
 
 	public String getBusinessId() {
@@ -249,6 +331,14 @@ public class CarBasic extends Model<CarBasic> {
 
 	public void setBusinessId(String businessId) {
 		this.businessId = businessId;
+	}
+
+	public BigDecimal getEvaluationAmount() {
+		return evaluationAmount;
+	}
+
+	public void setEvaluationAmount(BigDecimal evaluationAmount) {
+		this.evaluationAmount = evaluationAmount;
 	}
 
 	public String getOwnerName() {
@@ -265,14 +355,6 @@ public class CarBasic extends Model<CarBasic> {
 
 	public void setLicensePlateNumber(String licensePlateNumber) {
 		this.licensePlateNumber = licensePlateNumber;
-	}
-
-	public BigDecimal getEvaluationAmount() {
-		return evaluationAmount;
-	}
-
-	public void setEvaluationAmount(BigDecimal evaluationAmount) {
-		this.evaluationAmount = evaluationAmount;
 	}
 
 	public String getColor() {
@@ -539,6 +621,118 @@ public class CarBasic extends Model<CarBasic> {
 		this.createUser = createUser;
 	}
 
+	public Date getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
+	}
+
+	public String getUpdateUser() {
+		return updateUser;
+	}
+
+	public void setUpdateUser(String updateUser) {
+		this.updateUser = updateUser;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public BigDecimal getLastEvaluationAmount() {
+		return lastEvaluationAmount;
+	}
+
+	public void setLastEvaluationAmount(BigDecimal lastEvaluationAmount) {
+		this.lastEvaluationAmount = lastEvaluationAmount;
+	}
+
+	public Date getLastEvaluationTime() {
+		return lastEvaluationTime;
+	}
+
+	public void setLastEvaluationTime(Date lastEvaluationTime) {
+		this.lastEvaluationTime = lastEvaluationTime;
+	}
+
+	public BigDecimal getBorrowingMoney() {
+		return borrowingMoney;
+	}
+
+	public void setBorrowingMoney(BigDecimal borrowingMoney) {
+		this.borrowingMoney = borrowingMoney;
+	}
+
+	public String getUserNature() {
+		return userNature;
+	}
+
+	public void setUserNature(String userNature) {
+		this.userNature = userNature;
+	}
+
+	public String getToolWithCar() {
+		return toolWithCar;
+	}
+
+	public void setToolWithCar(String toolWithCar) {
+		this.toolWithCar = toolWithCar;
+	}
+
+	public Date getLastTransferDate() {
+		return lastTransferDate;
+	}
+
+	public void setLastTransferDate(Date lastTransferDate) {
+		this.lastTransferDate = lastTransferDate;
+	}
+
+	public String getRelatedDocs() {
+		return relatedDocs;
+	}
+
+	public void setRelatedDocs(String relatedDocs) {
+		this.relatedDocs = relatedDocs;
+	}
+
+	public String getCarVersionConfig() {
+		return carVersionConfig;
+	}
+
+	public void setCarVersionConfig(String carVersionConfig) {
+		this.carVersionConfig = carVersionConfig;
+	}
+
+	public String getTransactionMode() {
+		return transactionMode;
+	}
+
+	public void setTransactionMode(String transactionMode) {
+		this.transactionMode = transactionMode;
+	}
+
+	public String getCarPosition() {
+		return carPosition;
+	}
+
+	public void setCarPosition(String carPosition) {
+		this.carPosition = carPosition;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
 	@Override
 	protected Serializable pkVal() {
 		return this.businessId;
@@ -547,10 +741,10 @@ public class CarBasic extends Model<CarBasic> {
 	@Override
 	public String toString() {
 		return "CarBasic{" +
-			" businessId=" + businessId +
+			", businessId=" + businessId +
+			", evaluationAmount=" + evaluationAmount +
 			", ownerName=" + ownerName +
 			", licensePlateNumber=" + licensePlateNumber +
-			", evaluationAmount=" + evaluationAmount +
 			", color=" + color +
 			", brandName=" + brandName +
 			", model=" + model +
@@ -584,6 +778,20 @@ public class CarBasic extends Model<CarBasic> {
 			", totalFee=" + totalFee +
 			", createTime=" + createTime +
 			", createUser=" + createUser +
+			", updateTime=" + updateTime +
+			", updateUser=" + updateUser +
+			", status=" + status +
+			", lastEvaluationAmount=" + lastEvaluationAmount +
+			", lastEvaluationTime=" + lastEvaluationTime +
+			", borrowingMoney=" + borrowingMoney +
+			", userNature=" + userNature +
+			", toolWithCar=" + toolWithCar +
+			", lastTransferDate=" + lastTransferDate +
+			", relatedDocs=" + relatedDocs +
+			", carVersionConfig=" + carVersionConfig +
+			", transactionMode=" + transactionMode +
+			", carPosition=" + carPosition +
+			", remark=" + remark +
 			"}";
 	}
 }

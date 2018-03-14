@@ -20,13 +20,15 @@ layui.define(function (exports) {
 
         //--------------   切换是否使用网关 --------------
         //是否使用网关的标志位
-        ,useGateWayflage:useGateWayflage
+        ,useGateWayflage:false
         // ,useGateWayflage:true
         // ,defaultUser:"admin-alms"
         ,defaultUser:"admin-alms"   //贷后中心清算一部主管
         // ,defaultUser:"test_leader"  //区域贷后主管
         ,localBasePath:"http://localhost:30606/"
         ,openBasePath:"http://localhost:30616/"
+        ,uiBasePath:"http://localhost:30601/"
+
         //--------------   切换是否使用网关 --------------
     });
 });

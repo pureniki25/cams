@@ -50,11 +50,13 @@ window.layinit = function (cb) {
         if(!htConfig.useGateWayflage){
             htConfig.basePath = htConfig.localBasePath;
             htConfig.coreBasePath = htConfig.localBasePath;
+            htConfig.uiBasePath = htConfig.uiBasePath;
             axios.defaults.headers.common['userId'] = htConfig.defaultUser;
         }else{
             // htConfig.basePath =  htConfig.basePath +"core/"
             htConfig.coreBasePath = htConfig.basePath +"core/";
             htConfig.openBasePath = htConfig.basePath +"open/";
+            htConfig.uiBasePath = htConfig.uiBasePath;
         }
         cb(htConfig)
     });

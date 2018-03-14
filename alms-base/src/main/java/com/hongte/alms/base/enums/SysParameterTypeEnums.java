@@ -17,8 +17,8 @@ public enum SysParameterTypeEnums {
 	DERATE_TYPE(8,"申请减免费用项"),
 	BORROW_RATE_UNIT(9,"借款利率类型"),
 	COL_TYPE(10,"移交催收类型"),
-	SMS_TYPE(11,"短信类型");
-
+	SMS_TYPE(11,"短信类型"),
+	CAR_STATUS(12,"车辆状态");
 
 //	borrowLimitUnit
 

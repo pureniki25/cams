@@ -1,18 +1,12 @@
 var businessId = document.getElementById("businessId").getAttribute("value");
-
 window.layinit(function (htConfig) {
     var config = layui.ht_config;
     var baseCorePath = config.coreBasePath;
-
-})
-layui.config({
-    base: '/plugins/layui/extend/modules/',
-    version: false
-}).use(['form','laydate','element', 'ht_config', 'ht_auth'], function () {
+layui.use(['form','laydate','element', 'ht_config', 'ht_auth'], function () {
 		
 	var element = layui.element;
 	var form = layui.form;
-	// var config = layui.ht_config;
+	var config = layui.ht_config;
 	var laydate = layui.laydate;
 	var vm = new Vue({
 	    el: '#app',
@@ -22,6 +16,10 @@ layui.config({
 	        countys:'',
 	    	returnRegFiles:[{
 	    		file: '',
+	    		originalName: '',
+	    		oldDocId:''
+	    	}],
+	    	reqRegFiles:[{
 	    		originalName: '',
 	    		oldDocId:''
 	    	}],
@@ -164,7 +162,7 @@ layui.config({
 		            });
 	    		}
 	            if(deled==true){
-	            this.returnRegFiles.splice(index, 1);
+	            	this.returnRegFiles.splice(index, 1);
 	            }
 	    	},
 	    	addTabTr :function(event){
@@ -232,11 +230,16 @@ layui.config({
 	    		vm.returnReg.businessId=businessId;
 	    		// form.verify({});
 	    		//alert(JSON.stringify({"returnReg":vm.returnReg,"returnRegFiles":vm.returnRegFiles}));
+	    		for(var i=0;i<vm.returnRegFiles.length;i++){
+	    			vm.returnRegFiles[i].file='';
+	    			vm.reqRegFiles[i]=vm.returnRegFiles[i];
+
+	    		}
 		          $.ajax({
 		               type: "POST",
 		               url: baseCorePath+'car/addReturnReg',
 		               contentType: "application/json; charset=utf-8",
-		               data: JSON.stringify({"returnReg":vm.returnReg,"returnRegFiles":vm.returnRegFiles}),
+		               data: JSON.stringify({"returnReg":vm.returnReg,"returnRegFiles":vm.reqRegFiles}),
 		               success: function (res) {
 		            	   if (res.code == "0000"){
 		            		   layer.msg("保存成功。"); 
@@ -253,7 +256,7 @@ layui.config({
 	});
 	vm.viewData();
 });
-
+});
 
 
 

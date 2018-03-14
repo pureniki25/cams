@@ -8,7 +8,9 @@ package com.hongte.alms.base.enums;
 public enum AuctionStatusEnums {
 	AUDIT ("02","提交审核"),
 	DRAFT ("01"	,"保存草稿"/*,false*/)      ,
-	CANCEL 	 ("03"	,"撤销")          ;
+	CANCEL 	 ("03"	,"撤销") ,
+	AUDITED("04","审核完成"),
+	AUCTION("05","拍卖结束");
 	
 
 
@@ -58,8 +60,15 @@ public enum AuctionStatusEnums {
 		return name;
 	}
 
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	public String getKey() {
 		return key;
 	}
 
+	public void setKey(String key) {
+		this.key = key;
+	}
 }

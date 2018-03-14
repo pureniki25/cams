@@ -1,14 +1,12 @@
 var businessId = document.getElementById("businessId").getAttribute("value");
 
+
 window.layinit(function (htConfig) {
     var config = layui.ht_config;
     var baseCorePath = config.coreBasePath;
 
 
-    layui.config({
-        base: '/plugins/layui/extend/modules/',
-        version: false
-    }).use(['form','laydate','element', 'ht_config', 'ht_auth'], function () {
+   layui.use(['form','laydate','element', 'ht_config', 'ht_auth'], function () {
 
         var element = layui.element;
         var form = layui.form;

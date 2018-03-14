@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
     <title >贷后管理</title>
-    <script src="/properties/config.js"></script>
+
     <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
     <!-- iview样式 -->
     <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
@@ -23,17 +23,40 @@
     <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
     <!-- iview js -->
     <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+        <script src="/properties/config.js"></script>
     <!--引入layui.js-->
     <script src="/plugins/layui/layui.js"></script>
     <!--引入axios.js 用于ajax调用-->
     <script src="/plugins/axios/axios.min.js"></script>
     <script type="text/javascript" src="/plugins/jquery-1.9.1.min.js"></script>
-    <script src="/build/js/jquery-3.3.1.min.js"></script>
-    <!-- 设置全局请求头:app、Authorization -->
-    <script src="/build/js/appToken.js"></script>
+     <script src="/build/js/appToken.js"></script>
     <script src="/plugins/popover/popover.js"></script>
 
+<style>
 
+
+.input-border-hover {
+	
+display: inline-block;
+height: 32px;
+line-height: 1.5;
+padding: 4px 7px;
+    padding-right: 7px;
+font-size: 12px;
+border: 1px solid #dddee1;
+    border-top-color: rgb(221, 222, 225);
+    border-right-color: rgb(221, 222, 225);
+    border-bottom-color: rgb(221, 222, 225);
+    border-left-color: rgb(221, 222, 225);
+border-radius: 4px;
+color: #495060;
+background-color: #fff;
+background-image: none;
+position: relative;
+cursor: text;
+transition: border .2s ease-in-out,background .2s ease-in-out,box-shadow .2s ease-in-out;
+}
+</style>
 </head>
 <body>
 <!--隐藏元素-->
@@ -102,9 +125,14 @@
                             </form-item>
                         </i-col>
                         <i-col span="6">
-                            <form-item label="拖车日期："   prop="trailerStartDate" >
-                                <date-picker   v-model="searchForm.trailerStartDate" placement="bottom-end" placeholder="选择日期" style="width: 120px" ></date-picker>
-								 至<date-picker   v-model="searchForm.trailerEndDate" placement="bottom-end" placeholder="选择日期" style="width: 120px;position:absolute;right:20;"  ></date-picker>
+                            <form-item label="拖车日期："   >
+                            <input type="text" name="lname"  v-model="searchForm.trailerStartDate"
+							id="trailerStartDate" placeholder="yyyy-MM-dd" class="input-border-hover">
+                            <!--     <date-picker    v-model="searchForm.trailerStartDate" placement="bottom-end" placeholder="选择日期" style="width: 120px" ></date-picker> -->
+								 至
+								       <input type="text" name="lname"  v-model="searchForm.trailerEndDate"
+							id="trailerEndDate" placeholder="yyyy-MM-dd" class="input-border-hover" style="width: 120px;position:absolute;right:20;">
+							<!-- 	 <date-picker    v-model="searchForm.trailerEndDate" placement="bottom-end" placeholder="选择日期" style="width: 120px;position:absolute;right:20;"  ></date-picker> -->
 								
                                 <!--<date-picker  v-model="searchForm.showRepayDateBegin" type="date" placeholder="Select date"   style="width: 200px"></date-picker>-->
                             </form-item>
@@ -113,8 +141,8 @@
                         <!--businessStatus:'',          //业务状态-->
                         <i-col span="6">
                             <form-item label="状态：" prop="businessStatus">
-                                <i-select v-model="searchForm.businessStatus" clearable filterable  style="width:200px">
-                                    <i-option v-for="item in businessStatusList" :value="item.paramValue" :key="item.paramValue">{{ item.paramName }}</i-option>
+                                <i-select v-model="searchForm.status" clearable filterable  style="width:200px">
+                                    <i-option v-for="item in carStatusList" :value="item.paramValue" :key="item.paramValue">{{ item.paramName }}</i-option>
                                 </i-select>
                             </form-item>
                         </i-col>
@@ -134,20 +162,16 @@
                 <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="operate" id="operate">操作</a>
                 <a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="info">详情</a>
             </script>
+
         </i-col>
     </row>
     <!-- 表单Grid，使用layerUI的表格组件 结束 -->
         <!--导出Excel隐藏表单-->
     <iframe id="frame" name="iframe" style="display:none;"></iframe>
     <!--导出Excel隐藏表单-->
-
-
-
 </div>
 <script src="/src/js/comm.js" ></script>
 <script src="/src/js/assets/car/carList.js" ></script>
-<script>
 
-</script>
 </body>
 </html>
