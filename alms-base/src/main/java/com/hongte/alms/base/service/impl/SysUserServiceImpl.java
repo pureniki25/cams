@@ -60,6 +60,14 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserMapper, SysUser> 
     }
 
     @Override
+    public List<SysUser> selectUsersByRole(String roleCode){
+        return  sysUserMapper.selectUsersByRole(roleCode);
+    }
+
+
+
+
+    @Override
     public Map<String,SysOrg> selectCompanyByUserId(String userId){
 
         //查出用户权限列表

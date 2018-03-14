@@ -6,7 +6,7 @@ let aboutSys
 window.layinit(function (htConfig) {
     var _htConfig = htConfig;
     basePath = htConfig.coreBasePath;
-    let table = layui.table 
+    let table = layui.table
     let element = layui.element
     main = new Vue({
         el:"#main",
@@ -32,6 +32,20 @@ window.layinit(function (htConfig) {
                 show:false,
                 url:''
             }
+        },
+        mounted: function () {
+            console.log("开始调用用户信息接口");
+            console.log(htConfig);
+            $.ajax({
+                type: "POST",
+                url: "http://localhost:30606/"+"login/saveloginInfo",
+                contentType: "application/json; charset=utf-8",
+                async: false,
+                dataType: "json",
+                success: function () {
+                    console.log("success");
+                }
+            });
         },
         created:function(){
             axios.get(basePath+'notice/list').then(function(res){
