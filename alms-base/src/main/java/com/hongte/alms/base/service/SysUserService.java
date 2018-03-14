@@ -20,6 +20,8 @@ public interface SysUserService extends BaseService<SysUser> {
     public List<String> selectUsersByRoleAndEare(String roleCode, List<String> areaCodes);
 
 
+    public List<SysUser> selectUsersByRole(String roleCode);
+
     /**
      * 根据用户ID查找出用户拥有权限的公司列表
      * @param userId
