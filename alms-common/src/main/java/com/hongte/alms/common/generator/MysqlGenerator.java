@@ -47,11 +47,11 @@ public class MysqlGenerator {
         String dburl = "jdbc:mysql://172.16.200.111 :3306/hongte_alms?characterEncoding=utf8";
 //        String tableName="tb_basic_company";//本次需要生成的表名
 //        String tableName="tb_collection_status";//本次需要生成的表名
-        String tableName="tb_repayment_biz_plan_list";//本次需要生成的表名
+        String tableName="tb_basic_business";//本次需要生成的表名
         //1 设定生成配置
         GeneratorConfig inputConfig = new GeneratorConfig(
 //                "黄咏康",
-                "黄咏康",
+                "胡伟骞",
                 //{自定义}包模块名
                 "com.hongte.alms.",
                 //父类包路径(指SuperMapper，BaseService的包路径)

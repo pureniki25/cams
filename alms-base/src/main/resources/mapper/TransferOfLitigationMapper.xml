@@ -26,52 +26,6 @@
 	    	<result property="userId" column="original_userid"/> 
    			<result property="name" column="original_name"/>
 	    </association>
-	    <!-- <collection property="houseList" ofType="com.hongte.alms.base.vo.litigation.BusinessHouse">  
-	    	<result property="xiaodaiHouseId" column="xiaodaiHouseId"/> 
-	    	<result property="businessId" column="business_id"/> 
-	    	<result property="houseValue" column="houseValue"/> 
-	    	<result property="houseName" column="houseName"/> 
-	    	<result property="houseAddress" column="houseAddress"/> 
-	    	<result property="houseNo" column="houseNo"/> 
-	    	<result property="houseArea" column="houseArea"/> 
-	    	<result property="housePrice" column="housePrice"/> 
-	    	<result property="houseTotal" column="houseTotal"/> 
-	    	<result property="butTime" column="butTime"/> 
-   			<result property="registerTime" column="nregisterTimeame"/>
-   			<result property="houseBelong" column="houseBelong"/>
-   			<result property="openTime" column="openTime"/>
-   			<result property="borrowTime" column="borrowTime"/>
-   			<result property="borrowType" column="borrowType"/>
-   			<result property="borrowTotal" column="borrowTotal"/>
-   			<result property="borrowBalance" column="borrowBalance"/>
-   			<result property="fsdBankName" column="fsdBankName"/>
-   			<result property="debtRegion" column="debtRegion"/>
-   			<result property="remark" column="remark"/>
-   			<result property="updateUser" column="updateUser"/>
-   			<result property="updateTime" column="updateTime"/>
-   			<result property="secondMortgageTime" column="secondMortgageTime"/>
-   			<result property="secondMortgageYear" column="secondMortgageYear"/>
-   			<result property="secondMortgageType" column="secondMortgageType"/>
-   			<result property="secondMortgageBank" column="secondMortgageBank"/>
-   			<result property="secondMortgageOtherBank" column="secondMortgageOtherBank"/>
-   			<result property="secondMortgageTotal" column="secondMortgageTotal"/>
-   			<result property="secondMortgageBalance" column="secondMortgageBalance"/>
-   			<result property="thirdMortgageTime" column="thirdMortgageTime"/>
-   			<result property="thirdMortgageYear" column="thirdMortgageYear"/>
-   			<result property="thirdMortgageType" column="thirdMortgageType"/>
-   			<result property="thirdMortgageBank" column="thirdMortgageBank"/>
-   			<result property="thirdMortgageOtherBank" column="thirdMortgageOtherBank"/>
-   			<result property="thirdMortgageTotal" column="thirdMortgageTotal"/>
-   			<result property="thirdMortgageBalance" column="thirdMortgageBalance"/>
-   			<result property="fourthMortgageTime" column="fourthMortgageTime"/>
-   			<result property="fourthMortgageYear" column="fourthMortgageYear"/>
-   			<result property="fourthMortgageType" column="fourthMortgageType"/>
-   			<result property="fourthMortgageBank" column="fourthMortgageBank"/>
-   			<result property="fourthMortgageOtherBank" column="fourthMortgageOtherBank"/>
-   			<result property="fourthMortgageTotal" column="fourthMortgageTotal"/>
-   			<result property="fourthMortgageBalance" column="fourthMortgageBalance"/>
-   			<result property="propertyType" column="propertyType"/>
-	    </collection> -->
 	    <collection property="paymentList" ofType="com.hongte.alms.base.vo.litigation.BusinessPayment">  
 	    	<result property="businessId" column="businessId"/> 
    			<result property="businessAfterId" column="businessAfterId"/>
@@ -100,6 +54,7 @@
 		  t1.`business_id` businessId,
 		  t1.`customer_name` customerName,
 		  t1.`borrow_money` borrowMoney,
+		  t1.`output_platform_id` outputPlatformId,
 		  t1.`borrow_limit` borrowLimit,
 		  t1.`repayment_type_id` repaymentTypeId,
 		  t1.`borrow_rate` borrowRate,
@@ -112,10 +67,18 @@
 		  t5.fact_principal factPrincipal,
 		  t5.fact_accrual factAccrual,
 		  t5.surplus_principal surplusPrincipal,
+		  t5.surplusServiceCharge,
 		  t5.due_date dueDate,
 		  IFNULL(t5.overdue_days, 0) overdueDays,
 		  t6.output_user_name outputUserName,
-		  t6.fact_output_date factOutputDate,
+		  (select min(fact_output_date) `第一次出款日期` 
+			from (
+				select tt1.business_id,tt1.fact_output_date
+				from tb_biz_output_record tt1
+				where ifnull(tt1.withdraw_type,0) = 0 or ifnull(tt1.withdraw_type,0) = 1
+			) tab
+			where tab.business_id = t1.`business_id`
+			group by tab.business_id) factOutputDate,
 		  (SELECT 
 		    fact_output_money 
 		  FROM
@@ -126,7 +89,7 @@
 		      tb_biz_output_record a 
 		    WHERE a.withdraw_type IN (0, 1, 4) 
 		    GROUP BY a.business_id) tab 
-		  WHERE tab.business_id = t1.business_id) factOutputMoney
+		  WHERE tab.business_id = t1.business_id) factOutputMoney 
 		FROM
 		  tb_basic_business t1,
 		  tb_car_basic t2,
@@ -141,49 +104,68 @@
 		    a.due_date,
 		    (
 		      c.plan_principal - c.fact_principal
-		    ) surplus_principal 
+		    ) surplus_principal,
+		    (
+		      c.plan_service_charge - c.fact_service_charge
+		    ) surplusServiceCharge
 		  FROM
 		    tb_repayment_biz_plan_list a 
 		    JOIN tb_repayment_biz_plan b 
 		      ON a.plan_id = b.plan_id 
 		    JOIN 
 		      (SELECT 
-		        t1.plan_list_id,
-		        t1.`create_date`,
+		        detail1.plan_list_id,
+		        detail1.`create_date`,
 		        -- 应还本金总额
 		        SUM(
 		          CASE
-		            WHEN t1.plan_item_type = 10 
-		            THEN t1.plan_amount 
+		            WHEN detail1.plan_item_type = 10 
+		            THEN detail1.plan_amount 
 		            ELSE 0 
 		          END
 		        ) `plan_principal`,
 		        -- 实还本金总额
 		        SUM(
 		          CASE
-		            WHEN t1.plan_item_type = 10 
-		            THEN t1.fact_amount 
+		            WHEN detail1.plan_item_type = 10 
+		            THEN detail1.fact_amount 
 		            ELSE 0 
 		          END
 		        ) `fact_principal`,
 		        -- 实还利息总额
 		        SUM(
 		          CASE
-		            WHEN t1.plan_item_type = 20 
-		            THEN t1.fact_amount 
+		            WHEN detail1.plan_item_type = 20 
+		            THEN detail1.fact_amount 
 		            ELSE 0 
 		          END
-		        ) `fact_accrual` 
+		        ) `fact_accrual`,
+		        -- 应还资产端分公司服务费总额
+		        SUM(
+		          CASE
+		            WHEN detail1.plan_item_type = 30 
+		            THEN detail1.plan_amount 
+		            ELSE 0 
+		          END
+		        ) `plan_service_charge`,
+		        -- 实还资产端分公司服务费总额
+		        SUM(
+		          CASE
+		            WHEN detail1.plan_item_type = 30 
+		            THEN detail1.fact_amount 
+		            ELSE 0 
+		          END
+		        ) `fact_service_charge` 
 		      FROM
-		        tb_repayment_biz_plan_list_detail t1 
-		      GROUP BY t1.business_id) c 
+		        tb_repayment_biz_plan_list_detail detail1 
+		      GROUP BY detail1.business_id) c 
 		      ON a.plan_list_id = c.plan_list_id 
-		  WHERE IFNULL(a.repay_flag, 0) != 6) t5
+		  WHERE IFNULL(a.repay_flag, 0) != 6) t5 
 		WHERE t1.`business_id` = t2.`business_id` 
 		  AND t1.`business_id` = t3.`business_id` 
 		  AND t1.`business_id` = t4.`business_id` 
-		  AND t1.`business_id` = t5.`business_id`
-		  AND t1.`business_id` = t6.`business_id`
+		  AND t1.`business_id` = t5.`business_id` 
+		  AND t1.`business_id` = t6.`business_id` 
 		  AND t1.`business_id` = #{businessId,jdbcType=VARCHAR}
 		  LIMIT 1
 	</select>
@@ -430,5 +412,74 @@
 	<select id="queryBusinessType" resultType="java.lang.Integer">
 		SELECT bb.`business_type` FROM `tb_basic_business` bb, `tb_basic_business_type` bbt 
 		WHERE bb.`business_type` = bbt.`business_type_id` AND bb.`business_id` = #{businessId,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="queryCarLoanFees" resultType="map">
+		SELECT 
+		  a.`due_date` dueDate,
+		  a.`period` curPeriod, 
+		  c.plan_accrual planAccrual,
+		  c.plan_service_charge planServiceCharge,
+		  c.plan_guarantee_charge planGuaranteeCharge,
+		  c.plan_platform_charge planPlatformCharge,
+		  (SELECT 
+		    CASE
+		      WHEN SUM(`plan_amount`) > 0 
+		      THEN 1 
+		      ELSE 0 
+		    END `是否分公司服务费前置收取` 
+		  FROM
+		    (SELECT 
+		      t2.original_business_id,
+		      t1.`after_id`,
+		      t3.`plan_item_name`,
+		      t3.`plan_amount` 
+		    FROM
+		      tb_repayment_biz_plan_list t1,
+		      tb_repayment_biz_plan t2,
+		      tb_repayment_biz_plan_list_detail t3 
+		    WHERE t1.plan_id = t2.plan_id 
+		      AND t1.plan_list_id = t3.plan_list_id 
+		      AND t2.original_business_id = #{businessId,jdbcType=VARCHAR} 
+		      AND IFNULL(t3.plan_item_type, 0) = 30 
+		      AND IFNULL(t1.repay_flag, 0) != 6 
+		      AND IFNULL(t1.`period`, 0) != 0) tab) isPreCharge,
+		   (
+		   	SELECT COUNT(1) FROM `tb_repayment_biz_plan_list` WHERE business_id = b.original_business_id
+		   ) totalPeriod
+		FROM
+		  tb_repayment_biz_plan_list a,
+		  tb_repayment_biz_plan b,
+		  (SELECT 
+		    t1.plan_list_id,
+		      CASE
+		        WHEN t1.plan_item_type = 40 
+		        THEN t1.plan_amount 
+		        ELSE 0 
+		      END as `plan_guarantee_charge`,
+		      CASE
+		        WHEN t1.plan_item_type = 50 
+		        THEN t1.plan_amount 
+		        ELSE 0 
+		      END as `plan_platform_charge`,
+		      CASE
+		        WHEN t1.plan_item_type = 20 
+		        THEN t1.plan_amount 
+		        ELSE 0 
+		      END as `plan_accrual`,
+		      CASE
+		        WHEN t1.plan_item_type = 30 
+		        THEN t1.plan_amount 
+		        ELSE 0 
+		      END as `plan_service_charge` 
+		  FROM
+		    tb_repayment_biz_plan_list_detail t1) c
+		WHERE a.plan_id = b.plan_id 
+		  AND a.plan_list_id = c.plan_list_id 
+		  AND b.original_business_id = #{businessId,jdbcType=VARCHAR}  
+		  AND a.`due_date` >= #{billDate,jdbcType=DATE}
+		  AND IFNULL(a.repay_flag, 0) != 6 
+		ORDER BY a.due_date 
+		LIMIT 1 
 	</select>
 </mapper>

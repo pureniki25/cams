@@ -9,8 +9,8 @@ public enum ProcessTypeEnums {
 	Aply_CarAuction("carAuctionAply","车辆拍卖申请",200,400),
 	Aply_ConvBus("convBusAply","转公车申请",200,600),
 	Apply_Derate("derate","减免流程",100,400),
-	CAR_LOAN_LITIGATION("carLoanLitigation", "车贷移交诉讼审批流程", 0, 400), 
-	HOUSE_LOAN_LITIGATION("houseLoanLitigation", "房贷移交诉讼审批流程", 0, 400);
+	CAR_LOAN_LITIGATION("carLoanLitigation", "车贷移交诉讼审批流程", 0, 500), 
+	HOUSE_LOAN_LITIGATION("houseLoanLitigation", "房贷移交诉讼审批流程", 0, 500);
 	
 
 //	(0:运行中,1:开始,2:结束,3:注销)
