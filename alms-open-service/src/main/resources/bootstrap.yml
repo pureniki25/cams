@@ -1,5 +1,5 @@
 server:
-  port: 30616
+  port: 30608
 spring:
   application:
     name: alms-open-service
@@ -19,5 +19,7 @@ spring:
 eureka:
   client:
     serviceUrl:
-#      defaultZone: http://10.110.1.240:30101/eureka/
-      defaultZone: http://172.16.200.110:30101/eureka/
+       defaultZone: http://localhost:30600/eureka/
+ #     defaultZone: http://172.16.200.110:30101/eureka/
+  instance:
+    prefer-ip-address: true

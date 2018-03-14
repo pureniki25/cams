@@ -13,4 +13,5 @@ import com.hongte.alms.base.vo.module.ExpenseSettleVO;
 public interface ExpenseSettleService {
 	
 	public ExpenseSettleVO cal(String preSettleDate,String businessId);
+	public ExpenseSettleVO sum(String businessId);
 }

@@ -26,6 +26,7 @@
     <script src="/plugins/layui/layui.js"></script>
     <!--引入axios.js 用于ajax调用-->
     <script src="/plugins/axios/axios.min.js"></script>
+    <script src="/properties/config.js"></script>
 
     <!-- 流程组件的  -->
     <link rel="stylesheet" href="/Components/ProcessLine/ProcessLine.css">
@@ -102,37 +103,32 @@
                 <span slot="title">结清试算信息</span>
                 <row>
                     <i-col span="4">预计结清日期</i-col>
-                    <i-col span="8"><date-picker type="date" v-model="preSettleDate.date" :options="preSettleDate.disabledDate" @on-change="onPreSettleDateChange"></date-picker></i-col>
+                    <i-col span="8"><date-picker type="date" v-model="preSettleDate.date||new Date()"  :options="preSettleDate.disabledDate" @on-change="onPreSettleDateChange"></date-picker>
                     <i-col span="12"></i-col>
                 </row>
                 <row>
                     <i-col span="4">本金</i-col>
-                    <i-col span="4">{{business.output.money-business.repay.money}}</i-col>
+                    <i-col span="4">{{business.info.principal}}</i-col>
                     <i-col span="4">利息</i-col>
-                    <i-col span="4"></i-col>
+                    <i-col span="4">{{business.info.interest}}</i-col>
                     <i-col span="4">服务费</i-col>
-                    <i-col span="4"></i-col>
+                    <i-col span="4">{{business.info.servicecharge}}</i-col>
                 </row>
                 <row>
                     <i-col span="4">担保公司费用</i-col>
-                    <i-col span="4"></i-col>
+                    <i-col span="4">{{business.info.guaranteeFee}}</i-col>
                     <i-col span="4">平台费</i-col>
-                    <i-col span="4"></i-col>
+                    <i-col span="4">{{business.info.platformFee}}</i-col>
                     <i-col span="4">期内滞纳金</i-col>
-                    <i-col span="4"></i-col>
+                    <i-col span="4">{{business.info.lateFee}}</i-col>
                 </row>
                 <row>
                     <i-col span="4">期外逾期费</i-col>
                     <i-col span="4"></i-col>
                     <i-col span="4">提前还款违约金</i-col>
-                    <i-col span="4">
-                        <i-select style="width:50%">
-                            <i-option value=''>一个月利息</i-option>
-                        </i-select>
-                        <span>{{business.output.money-business.repay.money}}</span>
-                    </i-col>
-                    <i-col span="4">往期少交费用（含滞纳金）</i-col>
                     <i-col span="4"></i-col>
+                    <i-col span="4">往期少交费用（含滞纳金）</i-col>
+                    <i-col span="4">{{business.info.lackFee}}</i-col>
                 </row>
             </card>
             <card>
@@ -142,40 +138,40 @@
                     <i-col span="4">服务费</i-col>
                     <i-col span="4">滞纳金</i-col>
                 </row>
-                <row>
-                    <i-col span="4"></i-col>
-                    <i-col span="4"></i-col>
-                    <i-col span="4"></i-col>
+                <row v-for="item in business.info.list" >
+                    <i-col span="4">{{item.period}}</i-col>
+                    <i-col span="4">{{item.servicecharge}}</i-col>
+                    <i-col span="4">{{item.lateFee}}</i-col>
                 </row>
             </card>
             <card>
                 <span slot="title">其他费用输入项</span>
                 <row>
                     <i-col span="6">上门费</i-col>
-                    <i-col span="6"></i-col>
+                    <i-col span="6"><i-input style="width:50%" v-model="business.doorToDoorFee" type="number" number></i-input></i-col>
                     <i-col span="6">律师费</i-col>
-                    <i-col span="6"></i-col>
+                    <i-col span="6"><i-input style="width:50%" v-model="business.lawyerFee" type="number" number></i-input></i-col>
                 </row>
                 <row>
                     <i-col span="6">诉讼费</i-col>
-                    <i-col span="6"></i-col>
+                    <i-col span="6"><i-input style="width:50%" v-model="business.legalFee" type="number" number></i-input></i-col>
                     <i-col span="6">其他费用</i-col>
-                    <i-col span="6"></i-col>
+                    <i-col span="6"><i-input style="width:50%" v-model="business.otherFee" type="number" number></i-input></i-col>
                 </row>
                 <row>
                     <i-col span="6">应收合计</i-col>
-                    <i-col span="6"></i-col>
+                    <i-col span="6">{{sumIncome()}}</i-col>
                     <i-col span="12"></i-col>
                 </row>
                 <row>
                     <i-col span="6">+结余</i-col>
-                    <i-col span="6"></i-col>
+                    <i-col span="6">{{business.info.balance}}</i-col>
                     <i-col span="6">+押金转还款金额</i-col>
-                    <i-col span="6"></i-col>
+                    <i-col span="6">{{business.deposit}}</i-col>
                 </row>
                 <row>
                     <i-col span="6">最终结清金额</i-col>
-                    <i-col span="18"></i-col>
+                    <i-col span="18">{{sum()}}</i-col>
                 </row>
             </card>
         </card>

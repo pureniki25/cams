@@ -9,7 +9,7 @@
 	content="width=device-width, initial-scale=1, maximum-scale=1" />
 
 <title>贷后管理</title>
-	<script src="/properties/config.js"></script>
+
 <link rel="stylesheet" type="text/css"
 	href="/src/css/themes/default.css" />
 <!-- iview样式 -->
@@ -24,6 +24,7 @@
 <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
 <!-- iview js -->
 <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+        <script src="/properties/config.js"></script>
 <!--引入layui.js-->
 <script src="/plugins/layui/layui.js"></script>
 <!--引入axios.js 用于ajax调用-->
@@ -32,9 +33,7 @@
 <script src="http://blueimp.github.io/jQuery-File-Upload/js/vendor/jquery.ui.widget.js"></script>
 <script type="text/javascript" src="/plugins/fileUpload/jquery.iframe-transport.js"></script>
 <script type="text/javascript" src="/plugins/fileUpload/jquery.fileupload.js"></script>
-	<script src="/build/js/jquery-3.3.1.min.js"></script>
-	<!-- 设置全局请求头:app、Authorization -->
-	<script src="/build/js/appToken.js"></script>
+    <script src="/build/js/appToken.js"></script>
 
 <style type="text/css">
 .layui-form-item {
@@ -70,6 +69,9 @@ height: 100%;
 .input-border-input {
 	height: 100%;
 	width: 100%;
+}
+.input_label{
+color: #FF3030;
 }
 </style>
 </head>
@@ -158,13 +160,13 @@ height: 100%;
 				<div class="grid-demo layui-bg-gray">
 					<table class="layui-table">
 						<tr>
-							<td class="td_label">归还日期</td>
+							<td class="td_label">归还日期<label class="input_label">*</label></td>
 							<td><input type="text" id="returnDate" placeholder="yyyy-MM-dd" v-model="returnReg.returnDate" /></td>
-							<td class="td_label">归还经办人</td>
+							<td class="td_label">归还经办人<label class="input_label">*</label></td>
 							<td><input type="text" name="lname" value=""  v-model="returnReg.returnOperator" /></td>
 						</tr>
 						<tr>
-							<td class="td_label">归还地点</td>
+							<td class="td_label">归还地点<label class="input_label">*</label></td>
 							<td colspan="3">      
 							<select name="quiz1" v-model="returnReg.returnProId" class="td_select" v-on:change="selectPro">	
 							      <option v-for="item in provs" :value="item.id" style="width: 150px">
@@ -189,7 +191,7 @@ height: 100%;
 						</tr>
 			
 						<tr>
-						<td class="td_label" >是否缴纳拖车费用：</td>
+						<td class="td_label" >是否缴纳拖车费用<label class="input_label">*</label></td>
 							<td colspan="3">
 							      <input value="true" v-model="returnReg.isPayTrailerCost" type="radio" /><label>是</label>&nbsp;&nbsp;
       							  <input value="false" v-model="returnReg.isPayTrailerCost" type="radio" /><label>否</label>

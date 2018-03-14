@@ -24,10 +24,16 @@
     <!--引入axios.js 用于ajax调用-->
     <script src="/plugins/axios/axios.min.js"></script>
 
+
+
     <!-- 引入jQuery，必须在appToken.js 之前引入 -->
     <script src="/build/js/jquery-3.3.1.min.js"></script>
     <!-- 设置全局请求头:app、Authorization -->
     <script src="/build/js/appToken.js"></script>
+    <script src="http://blueimp.github.io/jQuery-File-Upload/js/vendor/jquery.ui.widget.js"></script>
+    <script type="text/javascript" src="/plugins/fileUpload/jquery.iframe-transport.js"></script>
+    <script type="text/javascript" src="/plugins/fileUpload/jquery.fileupload.js"></script>
+
 
 </head>
 <body>
@@ -169,6 +175,27 @@
         <p slot="title">
             附件信息
         </p>
+        <i-form label-position="left" :label-width="100">
+            <row  :gutter="10" v-for="(item, index) in files" v-if="item.status">
+                <i-col span="3">
+                    <form-item :label="'附件' +(index+1)" label-width="60" >
+                        <input  type="file" title="请选择" v-model="item.file" :id="'uploadfile'+index" @click="uploadFile($event,index)" />
+                        <template v-if="item.uploadResult.isSuccess"><span style="margin-right:10px">{{item.uploadResult.originalName}}</span><icon type="checkmark-circled" color="green"></icon></template>
+                    </form-item>
+                </i-col>
+                <i-col span="6"> <form-item label="重命名文件名称"> <i-input v-model="item.uploadRequest.newName" placeholder="" ></i-input></form-item></i-col>
+                <i-col span="1"><i-button type="ghost" icon="minus-circled" @click="removeUploadItem(index)">删除</i-button></i-col>
+            </row>
+
+            <row>
+                <i-col span="10">
+                    <form-item>
+                        <i-button  type="ghost" style="width: 200px;margin-left:150px;" @click="addUploadItem" icon="plus-round">添加</i-button>
+                    </form-item>
+                </i-col >
+            </row>
+
+        </i-form>
     </Card>
     <row style="padding: 10px">
         <i-col span="10">
@@ -204,7 +231,8 @@
                     },
                 registrationInfoForm:
                     {
-                        dragDate: new Date().getFullYear() + "-" + new Date().getMonth() + "-" + new Date().getDate(),
+                        businessId:"",
+                        dragDate: new Date().getFullYear() + "-" + (new Date().getMonth()+1) + "-" + new Date().getDate(),
                         dragHandler: '',
                         dragArea: [],
                         province: '',
@@ -214,6 +242,7 @@
                         fee: '',
                         otherFee: '',
                         remark: '',
+                        attachments:[]
 
                     },
                 validateRegistrationInfoForm:
@@ -260,7 +289,25 @@
 
                         },
                     areaData: []
-                }
+                },
+                files:[
+                    {
+                        status:1,
+
+                        uploadRequest:
+                            {
+                                newName:""
+                            },
+                        uploadResult:
+                            {
+                                isSuccess:false,
+                                docId:"",
+                                originalName:""
+                            }
+                    }
+
+                ]
+
 
             },
             computed: {
@@ -338,6 +385,20 @@
                     var self = this;
                     this.$refs[name].validate(function (isValid) {
                         if (isValid) {
+                            for(var i=0;i<self.files.length;i++)
+                            {
+                               var item=self.files[i];
+                               if(item.status===1&&item.uploadResult.isSuccess)
+                               {
+                                   self.registrationInfoForm.attachments.push(
+                                       {
+                                           docId:item.uploadResult.docId,
+                                           newName:item.uploadRequest.newName
+                                       }
+                                   )
+                               }
+                            }
+                            self.registrationInfoForm.businessId=self.getQueryString("businessId");
                             self.registrationInfoForm.province = self.registrationInfoForm.dragArea.length > 0 ? self.registrationInfoForm.dragArea[0] : '';
                             self.registrationInfoForm.city = self.registrationInfoForm.dragArea.length > 1 ? self.registrationInfoForm.dragArea[1] : '';
                             self.registrationInfoForm.county = self.registrationInfoForm.dragArea.length > 2 ? self.registrationInfoForm.dragArea[2] : '';
@@ -354,6 +415,87 @@
                                 })
                         }
                     })
+                },
+
+                uploadFile:function(event,index){
+                    var self=this;
+                    var fileId=event.currentTarget.id;
+                    $('#'+fileId).fileupload({
+                        dataType: 'json',
+                        singleFileUploads: true,
+                        acceptFileTypes: '', // Allowed file types
+                        url: basePath+'doc/singleUpload',// 文件的后台接受地址
+                        // 设置进度条
+                        // 上传完成之后的操作，显示在img里面
+                        done: function (e, data){
+                            if(data._response.result.uploaded)
+                            {
+                                var doc=JSON.parse(data._response.result.docItemListJson);
+
+                                self.files[index].uploadResult.docId=doc.docId;
+                                self.files[index].uploadResult.originalName=doc.originalName;
+                                self.$set(self.files[index].uploadResult,'isSuccess',true);
+                            }
+                            else
+                            {
+                                self.files[index].isSuccess=false;
+                                self.files[index].uploadResult.docId="";
+                                self.$Modal.error({content: '上传失败，消息：' + data._response.result.message});
+                            }
+
+
+                        }
+                    });
+                    $('#'+fileId).bind('fileuploadsubmit', function (e, data) {
+                        if (data && data.originalFiles && data.originalFiles.length > 0) {
+                            data.formData = {fileName: data.originalFiles[0].name};
+                            data.formData.businessId = self.getQueryString("businessId");
+                            data.formData.busType='AfterLoan_Material_CarDrag';
+                            data.formData.file=data.originalFiles[0];
+                        }
+                    });
+                },
+                addUploadItem:function()
+                {
+                this.files.push(
+                    {
+                        status:1,
+
+                        uploadRequest:
+                            {
+                                newName:""
+
+                            },
+                        uploadResult:
+                            {
+                                isSuccess:false,
+                                docId:"",
+                                originalName:""
+                            }
+                    }
+
+                )
+                },
+                removeUploadItem:function(index)
+                {
+
+                    var self = this;
+                    if(self.files[index]===undefined)
+                    {
+                        return ;
+                    }
+                    if(!self.files[index].uploadResult.isSuccess)
+                    {
+                        return ;
+                    }
+                    var reqStr = basePath +'doc/delOneDoc?docId='+self.files[index].uploadResult.docId;
+                    axios.get(reqStr)
+                        .then(function (result) {
+                                self.$set(self.files[index],'status',0);
+                        }).catch(function (error) {
+                        self.$Modal.error({content: '删除失败' });
+                    });
+
                 }
             },
             created: function () {

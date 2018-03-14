@@ -16,13 +16,22 @@ window.layinit(function (htConfig) {
                 },
                 repay:{
                     money:''
-                }
+                },
+                doorToDoorFee:0,
+                lawyerFee:0,
+                legalFee:0,
+                otherFee:0,
+                deposit:0
             },
             preSettleDate:{
                 date:'',
                 disabledDate:{
                     disabledDate(date) {
-                        return date.getTime() < new Date().getTime() 
+                        var DATE = new Date();
+                        var year = DATE.getFullYear();
+                        var month = DATE.getMonth()+1;
+                        var day = DATE.getDate();
+                        return date.getTime() < new Date(year+"-"+month+"-"+day+" 00:00:00").getTime() || (new Date(year+"-"+month+"-"+day+" 00:00:00").getTime() + 1000*60*60*24*15 ) <= date.getTime()
                     }
                 }
             }
@@ -37,7 +46,7 @@ window.layinit(function (htConfig) {
                 if(res.data.code=='1'){
                     console.log(res.data.data)
                     baseData = res.data.data
-                    app.business.info = res.data.data.business
+                    app.business.info = Object.assign(res.data.data.business,res.data.data.detail) 
                     app.business.repaymentType = res.data.data.repaymentType
                     let outPutCount = 0 
                     $.each(res.data.data.output,function(i,o){
@@ -82,6 +91,26 @@ window.layinit(function (htConfig) {
                 }).catch(function(error){
                     app.$Modal.error({content:'接口调用失败'})
                 })
+            },
+            sumIncome: function () {
+                return (this.business.info.principal
+                    + this.business.info.interest
+                    + this.business.info.servicecharge
+                    + this.business.info.guaranteeFee
+                    + this.business.info.platformFee
+                    + this.business.doorToDoorFee
+                    + this.business.lawyerFee
+                    + this.business.legalFee
+                    + this.business.otherFee).toFixed(2)
+            },
+            sum: function () {
+                /* doorToDoorFee:0,
+                lawyerFee:0,
+                legalFee:0,
+                otherFee:0 */
+                return (this.sumIncome()
+                    - (this.business.info.balance
+                        + this.business.deposit)).toFixed(2)
             }
         }
 

@@ -20,6 +20,13 @@ public class ExpenseSettleLackFeeVO{
 		this.servicecharge = servicecharge ;
 	}
 	/**
+	 * 
+	 */
+	public ExpenseSettleLackFeeVO() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	/**
 	 * 期数
 	 */
 	private String period ;

@@ -9,7 +9,7 @@
 	content="width=device-width, initial-scale=1, maximum-scale=1" />
 
 <title>贷后管理</title>
-	<script src="/properties/config.js"></script>
+
 <link rel="stylesheet" type="text/css"
 	href="/src/css/themes/default.css" />
 <!-- iview样式 -->
@@ -27,6 +27,7 @@
 <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
 <!-- iview js -->
 <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+        <script src="/properties/config.js"></script>
 <!--引入layui.js-->
 <script src="/plugins/layui/layui.js"></script>
 <!--引入axios.js 用于ajax调用-->
@@ -37,11 +38,7 @@
 <script type="text/javascript" src="/plugins/fileUpload/jquery.fileupload.js"></script>	
 
 <script type="text/javascript" src="/plugins/selectSearch/select-vue-component.js"></script>
-
-	<script src="/build/js/jquery-3.3.1.min.js"></script>
-	<!-- 设置全局请求头:app、Authorization -->
-	<script src="/build/js/appToken.js"></script>
-
+<script src="/build/js/appToken.js"></script>
 <style type="text/css">
 .layui-form-item {
 	border-bottom: 2px solid #DBDBDB; /*下边框线*/
@@ -61,7 +58,10 @@
 	font-size: 14px;
 	width: 100%;
 }
-
+.input-border-input {
+	font-size: 14px;
+	width: 100%;
+}
 .layui-row .grid-demo {
 	margin-left: 5%;
 	width: 90%;
@@ -69,6 +69,9 @@
 
 .td_label {
 	font-weight: bolder;
+}
+.input_label{
+color: #FF3030;
 }
 </style>
 </head>
@@ -219,7 +222,7 @@
 							</td>
 							<td class="td_label">最新车辆评估价值</td>
 							<td><input type="text" name="lname"
-								class="input-border-none" v-bind:value="carBasic.lastEvaluationAmount"
+								class="input-border-none" v-bind:value="carBasic.viewLastEvaluationAmount"
 								readonly="readonly"></td>
 							<td class="td_label">最新车辆评估时间</td>
 							<td><input type="text" name="lname"
@@ -231,18 +234,18 @@
 							<td class="td_label">违章费用</td>
 							<td><input type="text" name="lname" v-model="carBasic.trafficViolationFee">
 							</td>
-							<td class="td_label">年审到期日期</td>
+							<td class="td_label">年审到期日期<label class="input_label">*</label></td>
 							<td><input type="text" name="lname" v-model="carBasic.annualVerificationExpirationDate" 
-							id="annualVerificationExpirationDate" placeholder="yyyy-MM-dd">
+							id="annualVerificationExpirationDate" placeholder="yyyy-MM-dd" >
 							</td>
-							<td class="td_label">里程表读数</td>
-							<td><input type="text" name="lname" v-model="carBasic.odometer">
+							<td class="td_label">里程表读数<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carBasic.odometer" id="odometer">
 							</td>
 						</tr>
 
 						<tr>
 							<td class="td_label">燃油量（约余）</td>
-							<td><select v-model="carBasic.fuelLeft" name="fuelLeft">
+							<td><select v-model="carBasic.fuelLeft" name="fuelLeft" id="fuelLeft">
 									<option >--请选择--</option>
 									<option value="4">满</option>
 									<option value="3">3/4量</option>
@@ -252,29 +255,59 @@
 									
 							</select></td>
 							<td class="td_label">过户次数</td>
-							<td><input type="text" name="lname" v-model="carBasic.transferTimes"></td>
+							<td><input type="text" name="lname" v-model="carBasic.transferTimes" id="transferTimes"></td>
 							<td class="td_label">最后一次过户时间</td>
 							<td><input type="text" name="lname" v-model="carBasic.lastTransferDate"
-								id="lastTransferDate" placeholder="yyyy-MM-dd">
+								id="lastTransferDate" placeholder="yyyy-MM-dd" id="lastTransferDate">
 							</td>
 						</tr>
 						<tr>
-							<td class="td_label">车辆评估价值</td>
-							<td><input type="text" name="lname" v-model="carBasic.lastEvaluationAmount==null?carBasic.evaluationAmount:carBasic.lastEvaluationAmount"
-							v-on:blur="getDifferAmount($event)">
+							<td class="td_label">车辆评估价值<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carBasic.lastEvaluationAmount"
+							 id="lastEvaluationAmount">
 							</td>
 							<td class="td_label">价值差额</td>
 							<td><input type="text" name="lname" v-model="carBasic.differAmount"
 								readonly="readonly" id="differAmount"></td>
-							<td class="td_label">保险到期日</td>
+							<td class="td_label">保险到期日<label class="input_label">*</label></td>
 							<td><input type="text" name="lname" v-model="carBasic.insuranceExpirationDate"
-								id="insuranceExpirationDate" placeholder="yyyy-MM-dd" >
+								id="insuranceExpirationDate" placeholder="yyyy-MM-dd" id="insuranceExpirationDate">
 							</td>
 						</tr>
 						<tr>
-							<td rowspan="3" class="td_label">车型及版本配置</td>
-							<td colspan="5"><textarea rows="" cols="" v-model="carBasic.carVersionConfig"
-									style="width: 100%"> </textarea></td>
+							<td  class="td_label">车辆使用性质<label class="input_label">*</label></td>
+							<td colspan="5"><input type="text" name="lname" v-model="carBasic.userNature" class="input-border-input"
+							id="userNature" maxlength="400"></td>
+						</tr>
+						<tr>
+							<td  class="td_label">随车工具<label class="input_label">*</label></td>
+							<td colspan="5"><input type="text" name="lname" v-model="carBasic.toolWithCar" class="input-border-input"
+							id="toolWithCar" maxlength="400"></td>
+						</tr>
+						<tr>
+							<td  class="td_label">提供文件<label class="input_label">*</label></td>
+							<td colspan="5"><input type="text" name="lname" v-model="carBasic.relatedDocs" class="input-border-input"
+							id="relatedDocs" maxlength="400"></td>
+						</tr>
+						<tr>
+							<td  class="td_label">违章未处理记录<label class="input_label">*</label></td>
+							<td colspan="5"><input type="text" name="lname" v-model="carBasic.trafficViolationSituation" class="input-border-input"
+							id="trafficViolationSituation" maxlength="400"></td>
+						</tr>
+						<tr>
+							<td  class="td_label">交易方式<label class="input_label">*</label></td>
+							<td colspan="5"><input type="text" name="lname" v-model="carBasic.transactionMode" class="input-border-input"
+							id="transactionMode" maxlength="400"></td>
+						</tr>
+						<tr>
+							<td  class="td_label">车辆位置<label class="input_label">*</label></td>
+							<td colspan="5"><input type="text" name="lname" v-model="carBasic.carPosition" class="input-border-input"
+							id="carPosition" max="400"></td>
+						</tr>
+						 <tr>
+							<td  class="td_label" rowspan="3">备注</td>
+							<td colspan="5" rowspan="3"> <textarea rows="" cols="" v-model="carBasic.remark"
+									style="width: 100%;border:1px solid #ccc" maxlength="1000" > </textarea></td>
 						</tr>
 					</table>
 
@@ -290,14 +323,16 @@
 				<div class="grid-demo layui-bg-gray">
 					<table class="layui-table">
 					<tr>
-							<td class="td_label">起拍价</td>
-							<td><input type="text" name="lname" v-model="carAuction.startingPrice">
+							<td class="td_label">起拍价<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carAuction.startingPrice" 
+							 id="startingPrice" maxlength="10">
 							</td>
-							<td class="td_label">保证金</td>
-							<td><input type="text" name="lname" v-model="carAuction.deposit">
+							<td class="td_label">保证金<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carAuction.deposit" 
+							id="deposit" max="10">
 							</td>
-							<td class="td_label">加价幅度</td>
-							<td><select v-model="carAuction.fareRange" name="fuelLeft">
+							<td class="td_label">加价幅度<label class="input_label">*</label></td>
+							<td><select v-model="carAuction.fareRange" name="fuelLeft" id="fareRange">
 									<option value="">--请选择--</option>
 									<option value="500">500</option>
 									<option value="1000">1000</option>
@@ -307,85 +342,121 @@
 							</td>
 						</tr>
 						<tr>
-							<td class="td_label">保留价</td>
-							<td><input type="text" name="lname" v-model="carAuction.reservePrice">
+							<td class="td_label">保留价<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carAuction.reservePrice" id="reservePrice" maxlength="10">
 							</td>
-							<td class="td_label">拍卖开始时间</td>
+							<td class="td_label">拍卖开始时间<label class="input_label">*</label></td>
 							<td><input type="text" name="lname" v-model="carAuction.auctionStartTime"
 								id="auctionStartTime" placeholder="yyyy-MM-dd">
 							</td>
-							<td class="td_label">截止时间</td>
+							<td class="td_label">拍卖截止时间<label class="input_label">*</label></td>
 							<td><input type="text" name="lname" v-model="carAuction.auctionEndTime"
 									id="auctionEndTime" placeholder="yyyy-MM-dd">
 							</td>
 						</tr>
 
 						<tr>
-							<td class="td_label">交易类型</td>
-							<td><select v-model="carAuction.transType">
+							<td class="td_label">交易类型<label class="input_label">*</label></td>
+							<td><select v-model="carAuction.transType" id="transType">
 									<option selected="selected" value="">--请选择--</option>
 									<option value="01">债权转让</option>
 									<option value="02">交易过户</option>
 							</select></td>
-							<td class="td_label">优先购权人</td>
-							<td><input type="text" name="lname" v-model="carAuction.priorityPurchaser"></td>
-							<td class="td_label">取货方式</td>
-							<td><select v-model="carAuction.takeWay">
+							<td class="td_label">优先购权人<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carAuction.priorityPurchaser" 
+								id="priorityPurchaser"></td>
+							<td class="td_label">取货方式<label class="input_label">*</label></td>
+							<td><select v-model="carAuction.takeWay" id="takeWay">
 									<option selected="selected" value="">--请选择--</option>
-									<option value="0">门店自提</option>
+									<option value="01">门店自提</option>
 									<option value="02">运费自付</option>
 							</select></td>
 						</tr>
 						<tr>
 							
-							<td class="td_label">竞买开始时间</td>
+							<td class="td_label">竞买开始时间<label class="input_label">*</label></td>
 							<td><input type="text" name="lname" v-model="carAuction.buyStartTime"
-									id="buyStartTime" placeholder="yyyy-MM-dd">
+									id="buyStartTime" placeholder="yyyy-MM-dd" >
 							</td>
-							<td class="td_label">竞买结束时间</td>
+							<td class="td_label">竞买结束时间<label class="input_label">*</label></td>
 							<td><input type="text" name="lname" v-model="carAuction.buyEndTime"
 								id="buyEndTime" placeholder="yyyy-MM-dd">
 							</td>
-							<td class="td_label"></td>
-							<td>
-							</td>
+							<td class="td_label">支付方式<label class="input_label">*</label></td>
+							<td><select v-model="carAuction.payWay" id="payWay">
+									<option selected="selected" value="">--请选择--</option>
+									<option value="01">线下支付</option>
+									<option value="02">线上支付</option>
+							</select></td>
 						</tr>
 						<tr>
-							<td class="td_label">咨询人</td>
-							<td><input type="text" name="lname"  v-model="carAuction.consultant"></td>
-							<td class="td_label">咨询电话</td>
-							<td><input type="text" name="lname" v-model="carAuction.consultantTel">
+							
+							<td class="td_label">咨询开始时间<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carAuction.consStartTime"
+									id="consStartTime" placeholder="yyyy-MM-dd">
 							</td>
-							<td class="td_label"></td>
-							<td></td>
+							<td class="td_label">咨询结束时间<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carAuction.consEndTime"
+								id="consEndTime" placeholder="yyyy-MM-dd">
+							</td>
+							<td class="td_label">咨询人<label class="input_label">*</label></td>
+							<td><input type="text" name="lname"  v-model="carAuction.consultant" id="consultant"></td>
 						</tr>
-						<tr>
+					<tr>
+							
+							<td class="td_label">看样开始时间<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carAuction.viewSampleStartTime"
+									id="viewSampleStartTime" placeholder="yyyy-MM-dd">
+							</td>
+							<td class="td_label">看样结束时间<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carAuction.viewSampleEndTime"
+								id="viewSampleEndTime" placeholder="yyyy-MM-dd">
+							</td>
+							<td class="td_label">咨询人联系方式<label class="input_label">*</label></td>
+							<td><input type="text" name="lname"  v-model="carAuction.consultantTel"
+								id="consultantTel"></td>
+						</tr>
+			<!-- 			<tr>
 							<td class="td_label">拍卖物所在位置</td>
 							<td colspan="5"><input type="text" name="lname"
 								v-model="carAuction.auctionPosition" style="width: 100%" maxlength="200">
 							</td>
-						</tr>
+						</tr> -->
 						<tr>
 							<td class="td_label">处置单位</td>
 							<td colspan="5"><input type="text" name="lname"
-								v-model="carAuction.handleUnit" style="width: 100%" maxlength="100">
+								v-model="carAuction.handleUnit" style="width: 100%" maxlength="100" id="handleUnit">
 							</td>
 						</tr>
 						<tr>
-							<td class="td_label">单位地址</td>
+							<td class="td_label">联系地点</td>
 							<td colspan="5"><input type="text" name="lname"
-								v-model="carAuction.unitAddr" style="width: 100%" maxlength="200">
+								v-model="carAuction.unitAddr" style="width: 100%" maxlength="400" id="unitAddr">
 							</td>
 						</tr>
 						<tr>
 							<td class="td_label">账户姓名</td>
-							<td colspan="2"><input type="text" name="lname" v-model="carAuction.acountName" style="width: 100%">
+							<td ><input type="text" name="lname" v-model="carAuction.acountName" style="width: 100%"
+							 id="acountName" maxlength="100">
+							</td>
+							<td class="td_label">开户银行</td>
+							<td ><input type="text" name="lname" v-model="carAuction.openBank" style="width: 100%"
+								id="openBank" maxlength="100">
+							
 							</td>
 							<td class="td_label">银行卡号</td>
-							<td colspan="2"><input type="text" name="lname" v-model="carAuction.acountNum" style="width: 100%">
+							<td ><input type="text" name="lname" v-model="carAuction.acountNum" style="width: 100%"
+								id="acountNum" maxlength="20">
 							<input type="text" name="lname" v-model="carAuction.auctionId" hidden="">
 							</td>
-							
+						</tr>
+						<tr>
+							<td class="td_label">缴款截止时间<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carAuction.paymentEndTime"
+									id="paymentEndTime" placeholder="yyyy-MM-dd">
+							</td>
+							<td class="td_label"></td><td></td>
+							<td class="td_label"></td><td></td>
 						</tr>
 					</table>
 				</div>

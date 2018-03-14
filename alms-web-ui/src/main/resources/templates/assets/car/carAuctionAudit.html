@@ -1,0 +1,732 @@
+
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<head>
+<meta charset="utf-8" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+<title>贷后管理</title>
+
+<link rel="stylesheet" type="text/css"
+	href="/src/css/themes/default.css" />
+<!-- iview样式 -->
+<link rel="stylesheet" type="text/css"
+	href="/plugins/iview/css/iview.css" />
+<!--@import url("//unpkg.com/iview/dist/styles/iview.css");-->
+<!--<link rel="stylesheet" type="text/css" href="//unpkg.com/iview/dist/styles/iview.css"/>-->
+<!-- 引入layui样式 -->
+<link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all" />
+<link rel="stylesheet" href="/plugins/popover/popover.css">
+<link rel="stylesheet" type="text/css"href="/plugins/selectSearch/select-vue-component.css" />
+<!--   <script src="//unpkg.com/vue/dist/vue.js"></script>
+       <script src="//unpkg.com/iview/dist/iview.min.js"></script>-->
+<!-- 引入vue -->
+<script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+<!-- iview js -->
+<script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+        <script src="/properties/config.js"></script>
+<!--引入layui.js-->
+<script src="/plugins/layui/layui.js"></script>
+<!--引入axios.js 用于ajax调用-->
+<script src="/plugins/axios/axios.min.js"></script>
+<script type="text/javascript" src="/plugins/jquery-1.9.1.min.js"></script>
+<script src="http://blueimp.github.io/jQuery-File-Upload/js/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/plugins/fileUpload/jquery.iframe-transport.js"></script>
+<script type="text/javascript" src="/plugins/fileUpload/jquery.fileupload.js"></script>	
+    <!-- 流程组件的  -->
+<link rel="stylesheet" href="/Components/ProcessLine/ProcessLine.css">
+<script src="/Components/ProcessLine/ProcessLine.js"></script>
+
+<script type="text/javascript" src="/plugins/selectSearch/select-vue-component.js"></script>
+<script src="/build/js/appToken.js"></script>
+<style type="text/css">
+.layui-form-item {
+	border-bottom: 2px solid #DBDBDB; /*下边框线*/
+}
+
+.layui-form-item .layui-form-label {
+	width: 30%
+}
+
+.layui-form-item .layui-input-block {
+	margin-left: 35%;
+	width: 60%;
+}
+
+.input-border-none {
+	border: none;
+	font-size: 14px;
+	width: 100%;
+}
+.input-border-input {
+	font-size: 14px;
+	width: 100%;
+}
+.layui-row .grid-demo {
+	margin-left: 5%;
+	width: 90%;
+}
+
+.td_label {
+	font-weight: bolder;
+}
+.input_label{
+color: #FF3030;
+}
+</style>
+</head>
+<body>
+	<!--隐藏元素-->
+	<p id="businessId" th:attr="value=${businessId}" hidden />
+	<p id="processStatus" th:attr="value=${processStatus}" hidden />
+	<p id="processId" th:attr="value=${processId}" hidden />
+	<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+	<div id="app">
+	    <Card>
+        <p slot="title">
+            审批流程
+        </p>
+        <div class="ProcessWarp">
+            <ProcessLine :data='myProcess'></ProcessLine>
+        </div>
+   	 </Card>
+		<div class="layui-row">
+			<div class="layui-col-xs6 layui-col-md12">
+				<div class="grid-demo layui-bg-gray">一、业务基本信息</div>
+				<div class="grid-demo layui-bg-gray">
+					<table class="layui-table">
+						<tr>
+							<td class="td_label">业务编号</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="business.businessId"></td>
+							<td class="td_label">客户姓名</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="business.customerName"></td>
+							<td class="td_label">借款金额</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="business.borrowMoney"></td>
+						</tr>
+						<tr>
+							<td class="td_label">借款期限</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="business.borrowLimit"></td>
+							<td class="td_label">还款方式</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" value="到期还本息" v-if="business.repaymentTypeId==1" />
+								<input type="text" name="lname"
+								class="input-border-none" value="每月付息到期还本" v-if="business.repaymentTypeId==2" />
+								<input type="text" name="lname"
+								class="input-border-none" value="等本等息" v-if="business.repaymentTypeId==4" />
+								<input type="text" name="lname"
+								class="input-border-none" value="等额本息" v-if="business.repaymentTypeId==5" />
+								<input type="text" name="lname"
+								class="input-border-none" value="分期还本付息" v-if="business.repaymentTypeId==9" />
+							<td class="td_label">费率</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="business.borrowRate+'%'" />
+						</tr>
+						<tr>
+							<td class="td_label">拖车时间</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="drag.dragDate"></td>
+							<td class="td_label">业务主办</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="business.operatorName"></td>
+							<td class="td_label">出款人</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="outputRecord.outputUserName"></td>
+						</tr>
+						<tr>
+							<td class="td_label">出款日期</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="outputRecord.factOutputDate"></td>
+							<td class="td_label">已还本金</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="repayPlan.payedPrincipal"></td>
+							<td class="td_label">已还利息</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="repayPlan.payedInterest"></td>
+						</tr>
+						<tr>
+							<td class="td_label">剩余本金</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="business.borrowMoney-repayPlan.payedPrincipal"></td>
+							<td class="td_label">利息交至日期</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="repayPlan.lastPayDate"></td>
+							<td class="td_label">逾期天数</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="repayPlan.overdueDays"></td>
+						</tr>
+					</table>
+
+
+				</div>
+			</div>
+		</div>
+		<div class="layui-row">
+			<div class="layui-col-xs6 layui-col-md12">
+				<div class="grid-demo layui-bg-gray">二、车辆信息</div>
+				<div class="grid-demo layui-bg-gray">
+					<table class="layui-table">
+						<tr>
+							<td class="td_label">车架号</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="carBasic.vin"
+								readonly="readonly"></td>
+							<td class="td_label">发动机号</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="carBasic.engineModel" readonly="readonly">
+							</td>
+							<td class="td_label">排量</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="carBasic.displacement+carBasic.displacementUnit" readonly="readonly">
+							</td>
+						</tr>
+						<tr>
+							<td class="td_label">汽车品牌</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="carBasic.brandName" readonly="readonly">
+							</td>
+							<td class="td_label">车牌号</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="carBasic.licensePlateNumber" readonly="readonly">
+							</td>
+							<td class="td_label">品牌型号</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="carBasic.model"
+								readonly="readonly"></td>
+						</tr>
+						<tr>
+							<td class="td_label">汽车产地</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="carBasic.originPlace==0?'国产':'进口'"  readonly="readonly">
+							</td>
+							<td class="td_label">车辆属地</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="carBasic.licenseLocation" readonly="readonly">
+							</td>
+							<td class="td_label">颜色</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="carBasic.color" readonly="readonly">
+							</td>
+						</tr>
+						<tr>
+							<td class="td_label">汽车注册日期</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="carBasic.vehicleLicenseRegistrationDate" readonly="readonly">
+							</td>
+							<td class="td_label">车辆抵押状态</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="carBasic.mortgage==true?'抵押':'未抵押'" readonly="readonly">
+							</td>
+							<td class="td_label">抵押时车辆评估价值</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="carBasic.evaluationAmount"
+								readonly="readonly"></td>
+						</tr>
+						<tr>
+							<td class="td_label">抵押时车辆评估时间</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="carBasic.createTime" readonly="readonly">
+							</td>
+							<td class="td_label">最新车辆评估价值</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="carBasic.viewLastEvaluationAmount"
+								readonly="readonly"></td>
+							<td class="td_label">最新车辆评估时间</td>
+							<td><input type="text" name="lname"
+								class="input-border-none" v-bind:value="carBasic.lastEvaluationTime" readonly="readonly">
+							</td>
+						</tr>
+
+						<tr>
+							<td class="td_label">违章费用</td>
+							<td><input type="text" name="lname" v-model="carBasic.trafficViolationFee">
+							</td>
+							<td class="td_label">年审到期日期<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carBasic.annualVerificationExpirationDate" 
+							id="annualVerificationExpirationDate" placeholder="yyyy-MM-dd" >
+							</td>
+							<td class="td_label">里程表读数<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carBasic.odometer" id="odometer">
+							</td>
+						</tr>
+
+						<tr>
+							<td class="td_label">燃油量（约余）</td>
+							<td><select v-model="carBasic.fuelLeft" name="fuelLeft" id="fuelLeft">
+									<option >--请选择--</option>
+									<option value="4">满</option>
+									<option value="3">3/4量</option>
+									<option value="2">1/2量</option>
+									<option value="1">1/4量</option>
+									<option value="0">空</option>
+									
+							</select></td>
+							<td class="td_label">过户次数</td>
+							<td><input type="text" name="lname" v-model="carBasic.transferTimes" id="transferTimes"></td>
+							<td class="td_label">最后一次过户时间</td>
+							<td><input type="text" name="lname" v-model="carBasic.lastTransferDate"
+								id="lastTransferDate" placeholder="yyyy-MM-dd" id="lastTransferDate">
+							</td>
+						</tr>
+						<tr>
+							<td class="td_label">车辆评估价值<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carBasic.lastEvaluationAmount"
+							 id="lastEvaluationAmount">
+							</td>
+							<td class="td_label">价值差额</td>
+							<td><input type="text" name="lname" v-model="carBasic.differAmount"
+								readonly="readonly" id="differAmount"></td>
+							<td class="td_label">保险到期日<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carBasic.insuranceExpirationDate"
+								id="insuranceExpirationDate" placeholder="yyyy-MM-dd" id="insuranceExpirationDate">
+							</td>
+						</tr>
+						<tr>
+							<td  class="td_label">车辆使用性质<label class="input_label">*</label></td>
+							<td colspan="5"><input type="text" name="lname" v-model="carBasic.userNature" class="input-border-input"
+							id="userNature" maxlength="400"></td>
+						</tr>
+						<tr>
+							<td  class="td_label">随车工具<label class="input_label">*</label></td>
+							<td colspan="5"><input type="text" name="lname" v-model="carBasic.toolWithCar" class="input-border-input"
+							id="toolWithCar" maxlength="400"></td>
+						</tr>
+						<tr>
+							<td  class="td_label">提供文件<label class="input_label">*</label></td>
+							<td colspan="5"><input type="text" name="lname" v-model="carBasic.relatedDocs" class="input-border-input"
+							id="relatedDocs" maxlength="400"></td>
+						</tr>
+						<tr>
+							<td  class="td_label">违章未处理记录<label class="input_label">*</label></td>
+							<td colspan="5"><input type="text" name="lname" v-model="carBasic.trafficViolationSituation" class="input-border-input"
+							id="trafficViolationSituation" maxlength="400"></td>
+						</tr>
+						<tr>
+							<td  class="td_label">交易方式<label class="input_label">*</label></td>
+							<td colspan="5"><input type="text" name="lname" v-model="carBasic.transactionMode" class="input-border-input"
+							id="transactionMode" maxlength="400"></td>
+						</tr>
+						<tr>
+							<td  class="td_label">车辆位置<label class="input_label">*</label></td>
+							<td colspan="5"><input type="text" name="lname" v-model="carBasic.carPosition" class="input-border-input"
+							id="carPosition" max="400"></td>
+						</tr>
+						 <tr>
+							<td  class="td_label" rowspan="3">备注</td>
+							<td colspan="5" rowspan="3"> <textarea rows="" cols="" v-model="carBasic.remark"
+									style="width: 100%;border:1px solid #ccc" maxlength="1000" > </textarea></td>
+						</tr>
+					</table>
+
+
+
+
+				</div>
+			</div>
+		</div>
+		<div class="layui-row">
+			<div class="layui-col-xs6 layui-col-md12">
+				<div class="grid-demo layui-bg-gray">三、拍卖信息</div>
+				<div class="grid-demo layui-bg-gray">
+					<table class="layui-table">
+					<tr>
+							<td class="td_label">起拍价<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carAuction.startingPrice" 
+							 id="startingPrice" maxlength="10">
+							</td>
+							<td class="td_label">保证金<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carAuction.deposit" 
+							id="deposit" max="10">
+							</td>
+							<td class="td_label">加价幅度<label class="input_label">*</label></td>
+							<td><select v-model="carAuction.fareRange" name="fuelLeft" id="fareRange">
+									<option value="">--请选择--</option>
+									<option value="500">500</option>
+									<option value="1000">1000</option>
+									<option value="1500">1500</option>
+									<option value="2000">2000</option>
+							</select>
+							</td>
+						</tr>
+						<tr>
+							<td class="td_label">保留价<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carAuction.reservePrice" id="reservePrice" maxlength="10">
+							</td>
+							<td class="td_label">拍卖开始时间<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carAuction.auctionStartTime"
+								id="auctionStartTime" placeholder="yyyy-MM-dd">
+							</td>
+							<td class="td_label">拍卖截止时间<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carAuction.auctionEndTime"
+									id="auctionEndTime" placeholder="yyyy-MM-dd">
+							</td>
+						</tr>
+
+						<tr>
+							<td class="td_label">交易类型<label class="input_label">*</label></td>
+							<td><select v-model="carAuction.transType" id="transType">
+									<option selected="selected" value="">--请选择--</option>
+									<option value="01">债权转让</option>
+									<option value="02">交易过户</option>
+							</select></td>
+							<td class="td_label">优先购权人<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carAuction.priorityPurchaser" 
+								id="priorityPurchaser"></td>
+							<td class="td_label">取货方式<label class="input_label">*</label></td>
+							<td><select v-model="carAuction.takeWay" id="takeWay">
+									<option selected="selected" value="">--请选择--</option>
+									<option value="01">门店自提</option>
+									<option value="02">运费自付</option>
+							</select></td>
+						</tr>
+						<tr>
+							
+							<td class="td_label">竞买开始时间<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carAuction.buyStartTime"
+									id="buyStartTime" placeholder="yyyy-MM-dd" >
+							</td>
+							<td class="td_label">竞买结束时间<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carAuction.buyEndTime"
+								id="buyEndTime" placeholder="yyyy-MM-dd">
+							</td>
+							<td class="td_label">支付方式<label class="input_label">*</label></td>
+							<td><select v-model="carAuction.payWay" id="payWay">
+									<option selected="selected" value="">--请选择--</option>
+									<option value="01">线下支付</option>
+									<option value="02">线上支付</option>
+							</select></td>
+						</tr>
+						<tr>
+							
+							<td class="td_label">咨询开始时间<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carAuction.consStartTime"
+									id="consStartTime" placeholder="yyyy-MM-dd">
+							</td>
+							<td class="td_label">咨询结束时间<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carAuction.consEndTime"
+								id="consEndTime" placeholder="yyyy-MM-dd">
+							</td>
+							<td class="td_label">咨询人<label class="input_label">*</label></td>
+							<td><input type="text" name="lname"  v-model="carAuction.consultant" id="consultant"></td>
+						</tr>
+					<tr>
+							
+							<td class="td_label">看样开始时间<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carAuction.viewSampleStartTime"
+									id="viewSampleStartTime" placeholder="yyyy-MM-dd">
+							</td>
+							<td class="td_label">看样结束时间<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carAuction.viewSampleEndTime"
+								id="viewSampleEndTime" placeholder="yyyy-MM-dd">
+							</td>
+							<td class="td_label">咨询人联系方式<label class="input_label">*</label></td>
+							<td><input type="text" name="lname"  v-model="carAuction.consultantTel"
+								id="consultantTel"></td>
+						</tr>
+			<!-- 			<tr>
+							<td class="td_label">拍卖物所在位置</td>
+							<td colspan="5"><input type="text" name="lname"
+								v-model="carAuction.auctionPosition" style="width: 100%" maxlength="200">
+							</td>
+						</tr> -->
+						<tr>
+							<td class="td_label">处置单位</td>
+							<td colspan="5"><input type="text" name="lname"
+								v-model="carAuction.handleUnit" style="width: 100%" maxlength="100" id="handleUnit">
+							</td>
+						</tr>
+						<tr>
+							<td class="td_label">联系地点</td>
+							<td colspan="5"><input type="text" name="lname"
+								v-model="carAuction.unitAddr" style="width: 100%" maxlength="400" id="unitAddr">
+							</td>
+						</tr>
+						<tr>
+							<td class="td_label">账户姓名</td>
+							<td ><input type="text" name="lname" v-model="carAuction.acountName" style="width: 100%"
+							 id="acountName" maxlength="100">
+							</td>
+							<td class="td_label">开户银行</td>
+							<td ><input type="text" name="lname" v-model="carAuction.openBank" style="width: 100%"
+								id="openBank" maxlength="100">
+							
+							</td>
+							<td class="td_label">银行卡号</td>
+							<td ><input type="text" name="lname" v-model="carAuction.acountNum" style="width: 100%"
+								id="acountNum" maxlength="20">
+							<input type="text" name="lname" v-model="carAuction.auctionId" hidden="">
+							</td>
+						</tr>
+						<tr>
+							<td class="td_label">缴款截止时间<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carAuction.paymentEndTime"
+									id="paymentEndTime" placeholder="yyyy-MM-dd">
+							</td>
+							<td class="td_label"></td><td></td>
+							<td class="td_label"></td><td></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="layui-row">
+			<div class="layui-col-xs6 layui-col-md12">
+				<div class="grid-demo layui-bg-gray">展示图片及相关附件:</div>
+				<div class="grid-demo layui-bg-gray">
+						<table class="layui-table" id="fTab">
+						<tr v-for="(info, index) in returnRegFiles">
+							<td class="td_label" >附件{{index+1}}<input type="text" hidden="" v-model="info.oldDocId" :id="'docId'+index" /></td>
+							<td><input type="file" title="请选择" v-model="info.file" :id="'uploadfile'+index" v-on:click="uploadFile($event,index)" /></td>
+							<td class="td_label">重命名文件名称</td>
+							<td><input type="text" name="lname" v-model="info.originalName"
+								style="width: 100%" maxlength="100" :id="'uploadfileName'+index" /></td>
+							<td>
+							  <div class="layui-btn-group">
+							    <button class="layui-btn layui-btn-primary layui-btn-sm" v-on:click="addTabTr($event)"><i class="layui-icon"></i></button>
+							    <span v-if="index>0">
+							    <button class="layui-btn layui-btn-primary layui-btn-sm"  v-on:click="removeTabTr($event, index)"><i class="layui-icon"></i></button>
+							    </span>
+							  </div>
+							
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+		
+		<!-- <div class="layui-row">
+			<div class="layui-col-xs6 layui-col-md12">
+				<div class="grid-demo layui-bg-gray">相关附件：</div>
+				<div class="grid-demo layui-bg-gray">
+					<table class="layui-table">
+						<tr>
+							<td class="td_label">附件1</td>
+							<td><input type="file" title="请选择"></td>
+							<td class="td_label">重命名文件名称</td>
+							<td><input type="text" name="lname" value="15013210014"
+								style="width: 100%" maxlength="100"></td>
+							<td>
+							  <div class="layui-btn-group">
+							    <button class="layui-btn layui-btn-primary layui-btn-sm"><i class="layui-icon"></i></button>
+							  
+							    <button class="layui-btn layui-btn-primary layui-btn-sm"><i class="layui-icon"></i></button>
+							  </div>
+							
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div> 
+	    <div class="layui-row">
+			<div class="layui-col-xs6 layui-col-md12">
+				<div class="grid-demo layui-bg-gray">四、审批信息</div>
+				<div class="grid-demo layui-bg-gray">
+					<table class="layui-table">
+						<tr >
+							<td class="td_label" rowspan="5">车辆评估师审批：</td>
+							<td class="td_label" >是否同意审批：</td>
+							<td colspan="4">
+							      <input name="sex" value="是" title="是" checked="checked" type="radio"><label>是</label>&nbsp;&nbsp;
+      							  <input name="sex" value="否" title="是" type="radio"><label>否</label>
+							</td>
+						</tr>
+						<tr>
+							<td  rowspan="2" colspan="5">
+							     <textarea rows="" cols=""
+									style="width: 100%" maxlength="1000"> 信息填写有误</textarea>
+							</td>
+						</tr>
+						<tr></tr>
+						<tr>
+							<td colspan="3"></td>
+							<td class="td_label" >审批人员姓名</td>
+							<td>
+							<input type="text" name="lname"
+								class="input-border-none" value="李四" readonly="readonly">
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3"></td>
+							<td class="td_label" >审批日期</td>
+							<td>
+							<input type="text" name="lname"
+								class="input-border-none" value="李四" readonly="readonly">
+							</td>
+						</tr>
+						
+						<tr >
+							<td class="td_label" rowspan="5">区域贷后主管审批：</td>
+							<td class="td_label" >是否同意审批：</td>
+							<td colspan="4">
+							      <input name="sex" value="是" title="是" checked="checked" type="radio"><label>是</label>&nbsp;&nbsp;
+      								<input name="sex" value="否" title="是" type="radio"><label>否</label>
+							</td>
+						</tr>
+						<tr>
+							<td  rowspan="2" colspan="5">
+							     <textarea rows="" cols=""
+									style="width: 100%" maxlength="1000"> 信息填写有误</textarea>
+							</td>
+						</tr>
+						<tr></tr>
+						<tr>
+							<td colspan="3"></td>
+							<td class="td_label" >审批人员姓名</td>
+							<td>
+							<input type="text" name="lname"
+								class="input-border-none" value="李四" readonly="readonly">
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3"></td>
+							<td class="td_label" >审批日期</td>
+							<td>
+							<input type="text" name="lname"
+								class="input-border-none" value="李四" readonly="readonly">
+							</td>
+						</tr>
+						
+						
+						<tr >
+							<td class="td_label" rowspan="5">贷后清算主管审批：</td>
+							<td class="td_label" >是否同意审批：</td>
+							<td colspan="4">
+							      <input name="sex" value="是" title="是" checked="checked" type="radio"><label>是</label>&nbsp;&nbsp;
+      								<input name="sex" value="否" title="是" type="radio"><label>否</label>
+							</td>
+						</tr>
+						<tr>
+							<td  rowspan="2" colspan="5">
+							     <textarea rows="" cols=""
+									style="width: 100%" maxlength="1000"> 信息填写有误</textarea>
+							</td>
+						</tr>
+						<tr></tr>
+						<tr>
+							<td colspan="3"></td>
+							<td class="td_label" >审批人员姓名</td>
+							<td>
+							<input type="text" name="lname"
+								class="input-border-none" value="李四" readonly="readonly">
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3"></td>
+							<td class="td_label" >审批日期</td>
+							<td>
+							<input type="text" name="lname"
+								class="input-border-none" value="李四" readonly="readonly">
+							</td>
+						</tr>
+						
+						<tr >
+							<td class="td_label" rowspan="5">总部综合岗审批：</td>
+							<td class="td_label" >是否同意审批：</td>
+							<td colspan="4">
+							      <input name="sex" value="是" title="是" checked="checked" type="radio"><label>是</label>&nbsp;&nbsp;
+      								<input name="sex" value="否" title="是" type="radio"><label>否</label>
+							</td>
+						</tr>
+						<tr>
+							<td  rowspan="2" colspan="5">
+							     <textarea rows="" cols=""
+									style="width: 100%" maxlength="1000"> 信息填写有误</textarea>
+							</td>
+						</tr>
+						<tr></tr>
+						<tr>
+							<td colspan="3"></td>
+							<td class="td_label" >审批人员姓名</td>
+							<td>
+							<input type="text" name="lname"
+								class="input-border-none" value="李四" readonly="readonly">
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3"></td>
+							<td class="td_label" >审批日期</td>
+							<td>
+							<input type="text" name="lname"
+								class="input-border-none" value="李四" readonly="readonly">
+							</td>
+						</tr>
+						
+						<tr >
+							<td class="td_label" rowspan="5">贷后中心总监审批：</td>
+							<td class="td_label" >是否同意审批：</td>
+							<td colspan="4">
+							      <input name="sex" value="是" title="是" checked="checked" type="radio"><label>是</label>&nbsp;&nbsp;
+      								<input name="sex" value="否" title="是" type="radio"><label>否</label>
+							</td>
+						</tr>
+						<tr>
+							<td  rowspan="2" colspan="5">
+							     <textarea rows="" cols=""
+									style="width: 100%" maxlength="1000"> 信息填写有误</textarea>
+							</td>
+						</tr>
+						<tr></tr>
+						<tr>
+							<td colspan="3"></td>
+							<td class="td_label" >审批人员姓名</td>
+							<td>
+							<input type="text" name="lname"
+								class="input-border-none" value="李四" readonly="readonly">
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3"></td>
+							<td class="td_label" >审批日期</td>
+							<td>
+							<input type="text" name="lname"
+								class="input-border-none" value="李四" readonly="readonly">
+							</td>
+						</tr>
+						
+						<tr >
+							<td class="td_label" rowspan="5">添加抄送：</td>
+							<td colspan="5">
+						    <div class="wrapper">
+						        <multiple-select v-bind:optionsdata="originOptions" v-bind:selecteddata="selectedList" v-on:selected="multipleCallback"></multiple-select>
+						
+						    </div> 
+							</td>
+						</tr>
+						<tr>
+							<td  rowspan="4" colspan="5">
+							     <textarea rows="" cols=""
+									style="width: 100%" maxlength="1000"> 信息填写有误</textarea>
+							</td>
+						</tr>
+						<tr></tr>
+						<tr></tr>
+						<tr></tr>
+					</table>
+				</div>
+			</div>
+		</div>-->
+		<div class="layui-row">
+			<div class="layui-col-xs6 layui-col-md12">
+			<div class="grid-demo layui-bg-gray">
+			   <button class="layui-btn" v-on:click="carAuctionAply($event,'audit')">提交审批</button>
+			   <button class="layui-btn layui-btn-normal" v-on:click="carAuctionAply($event,'draft')">保存草稿</button>
+			   <button class="layui-btn layui-btn-warm" v-on:click="carAuctionAplyClose()">撤销</button>
+			   <button class="layui-btn layui-btn-danger" style="float: right;">拍卖页面预览</button>
+			</div>
+			</div>
+		</div>
+</div>
+		<script src="/src/js/assets/car/carAuctionAudit.js"></script>
+		<script>
+			
+		</script>
+</body>
+</html>

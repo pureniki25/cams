@@ -25,8 +25,8 @@
         corp.areaName,
         corp.companyId,
         corp.companyName,
-        collect1_person AS collect1Person,
-        collect2_person AS collect2Person
+        detail.group1Users AS collect1Person,
+        detail.group2Users AS collect2Person
         FROM
         (
         SELECT
@@ -59,6 +59,52 @@
         ) corp
         LEFT JOIN tb_collection_person_set ON corp.areaId = tb_collection_person_set.area_code
         AND corp.companyId = tb_collection_person_set.company_code
+        LEFT JOIN (
+        SELECT
+        col_person_id,
+        max(
+        CASE team
+        WHEN 1 THEN
+        users
+        ELSE
+        ''
+        END
+        ) group1Users,
+        max(
+        CASE team
+        WHEN 2 THEN
+        users
+        ELSE
+        ''
+        END
+        ) group2Users
+        FROM
+        (
+        SELECT
+        tb_collection_person_set_detail.col_person_id,
+        tb_collection_person_set_detail.team,
+        group_concat(
+        tb_sys_user.user_name
+        ORDER BY
+        tb_sys_user.user_name
+        ) AS users
+        FROM
+        tb_collection_person_set_detail
+        INNER JOIN tb_sys_user ON tb_collection_person_set_detail.user_id = tb_sys_user.user_id
+        <where>
+            <foreach collection="userNames" item="item" index="index" separator=" OR ">
+                tb_sys_user.user_name like '%${item}%'
+            </foreach>
+        </where>
+        GROUP BY
+        tb_collection_person_set_detail.col_person_id,
+        tb_collection_person_set_detail.team
+        ) AS a
+        GROUP BY
+        a.col_person_id
+        ) AS detail ON tb_collection_person_set.col_person_id = detail.col_person_id
+
+
 
         <where>
             <if test="areaId !=null and areaId !=''">

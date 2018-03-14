@@ -2,6 +2,7 @@ package com.hongte.alms.core.vo.modules.car;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author dengzhiming
@@ -88,6 +89,16 @@ public class CarDragRegistrationInfo {
     public void setBusinessId(String businessId) {
         this.businessId = businessId;
     }
+
+    public List<CarDragDoc> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<CarDragDoc> attachments) {
+        this.attachments = attachments;
+    }
+
+    private List<CarDragDoc> attachments;
 
     /**
      * [业务单号]

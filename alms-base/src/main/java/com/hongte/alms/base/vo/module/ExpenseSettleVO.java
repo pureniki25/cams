@@ -55,6 +55,11 @@ public class ExpenseSettleVO implements Serializable{
 	 */
 	private BigDecimal lackFee ;
 	
+	/**
+	 * 结余
+	 */
+	private BigDecimal balance ;
+	
 	private List<ExpenseSettleLackFeeVO> list ;
 
 	/**
@@ -202,5 +207,19 @@ public class ExpenseSettleVO implements Serializable{
 	 */
 	public static long getSerialversionuid() {
 		return serialVersionUID;
+	}
+
+	/**
+	 * @return the balance
+	 */
+	public BigDecimal getBalance() {
+		return balance;
+	}
+
+	/**
+	 * @param balance the balance to set
+	 */
+	public void setBalance(BigDecimal balance) {
+		this.balance = balance;
 	}
 }

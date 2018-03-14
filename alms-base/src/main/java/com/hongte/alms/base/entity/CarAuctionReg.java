@@ -16,8 +16,8 @@ import io.swagger.annotations.ApiModelProperty;
  * 车辆拍卖信息登记
  * </p>
  *
- * @author 王继光
- * @since 2018-03-06
+ * @author 曾坤
+ * @since 2018-03-10
  */
 @ApiModel
 @TableName("tb_car_auction_reg")
@@ -37,18 +37,6 @@ public class CarAuctionReg extends Model<CarAuctionReg> {
 	@TableField("business_id")
 	@ApiModelProperty(required= true,value = "资产端业务编号 ")
 	private String businessId;
-    /**
-     * 用户姓名 
-     */
-	@TableField("reg_name")
-	@ApiModelProperty(required= true,value = "用户姓名 ")
-	private String regName;
-    /**
-     * 身份证号码 
-     */
-	@TableField("reg_cert_id")
-	@ApiModelProperty(required= true,value = "身份证号码 ")
-	private String regCertId;
     /**
      * 联系方式 
      */
@@ -86,6 +74,24 @@ public class CarAuctionReg extends Model<CarAuctionReg> {
 	@ApiModelProperty(required= true,value = "创建时间 ")
 	private Date createTime;
     /**
+     * 竞拍id
+     */
+	@TableField("auction_id")
+	@ApiModelProperty(required= true,value = "竞拍id")
+	private String auctionId;
+    /**
+     * 更新人
+     */
+	@TableField("update_user")
+	@ApiModelProperty(required= true,value = "更新人")
+	private String updateUser;
+    /**
+     * 更新时间
+     */
+	@TableField("update_time")
+	@ApiModelProperty(required= true,value = "更新时间")
+	private Date updateTime;
+    /**
      * 创建人 
      */
 	@TableField("create_user")
@@ -107,22 +113,6 @@ public class CarAuctionReg extends Model<CarAuctionReg> {
 
 	public void setBusinessId(String businessId) {
 		this.businessId = businessId;
-	}
-
-	public String getRegName() {
-		return regName;
-	}
-
-	public void setRegName(String regName) {
-		this.regName = regName;
-	}
-
-	public String getRegCertId() {
-		return regCertId;
-	}
-
-	public void setRegCertId(String regCertId) {
-		this.regCertId = regCertId;
 	}
 
 	public String getRegTel() {
@@ -173,6 +163,30 @@ public class CarAuctionReg extends Model<CarAuctionReg> {
 		this.createTime = createTime;
 	}
 
+	public String getAuctionId() {
+		return auctionId;
+	}
+
+	public void setAuctionId(String auctionId) {
+		this.auctionId = auctionId;
+	}
+
+	public String getUpdateUser() {
+		return updateUser;
+	}
+
+	public void setUpdateUser(String updateUser) {
+		this.updateUser = updateUser;
+	}
+
+	public Date getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
+	}
+
 	public String getCreateUser() {
 		return createUser;
 	}
@@ -191,14 +205,15 @@ public class CarAuctionReg extends Model<CarAuctionReg> {
 		return "CarAuctionReg{" +
 			", regId=" + regId +
 			", businessId=" + businessId +
-			", regName=" + regName +
-			", regCertId=" + regCertId +
 			", regTel=" + regTel +
 			", isPayDeposit=" + isPayDeposit +
 			", offerAmount=" + offerAmount +
 			", isAuctionSuccess=" + isAuctionSuccess +
 			", transPrice=" + transPrice +
 			", createTime=" + createTime +
+			", auctionId=" + auctionId +
+			", updateUser=" + updateUser +
+			", updateTime=" + updateTime +
 			", createUser=" + createUser +
 			"}";
 	}
