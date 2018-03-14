@@ -24,9 +24,6 @@ window.layinit(function (htConfig) {
             noticeModal:{
                 show:false,
                 fileList:[
-                    {
-                        fileName:'贷后系统操作手册',url:'http://www.baidu.com'
-                    }
                 ],notice:{
 
                 }
@@ -37,13 +34,11 @@ window.layinit(function (htConfig) {
             }
         },
         created:function(){
-            axios.get(basePath+'notice/list',{
-                headers: {'userId': 'admin-alms'},
-            }).then(function(res){
+            axios.get(basePath+'notice/list').then(function(res){
                 if(res.data.code=='1'){
                     main.notices = res.data.data;
                 }else{
-                    main.$Modal.error({content: '接口调用异常!'});
+                    main.$Modal.error({content: '接口调用异常!'+res.data.result_msg||res.data.msg});
                 }
             }).catch(function(e){
                 main.$Modal.error({content: '接口调用异常!'});
@@ -197,7 +192,47 @@ window.layinit(function (htConfig) {
 
     table.on('tool(businessTable)', function (obj) {
         if(obj.event ==='info'){
-            console.log(obj)
+
+            //单行操作弹框显示
+            var showOneLineOprLayer = function (url, title) {
+                // vm.edit_modal = false;
+                var openIndex = layer.open({
+                    type: 2,
+                    area: ['95%', '95%'],
+                    fixed: false,
+                    maxmin: true,
+                    title: title,
+                    content: url
+                });
+            }
+
+            if (obj.data.businessTypeId == 9) {
+                //车贷
+                axios.get(basePath + 'api/getXindaiCarView?businessId =' + obj.data.businessId)
+                    .then(function (res) {
+                        if (res.data.code == "1") {
+                            showOneLineOprLayer(res.data.data, "车贷详情");
+                        } else {
+                            main.$Modal.error({ content: '操作失败，消息：' + res.data.msg });
+                        }
+                    })
+                    .catch(function (error) {
+                        main.$Modal.error({ content: '接口调用异常!' });
+                    });
+            } else if (obj.data.businessTypeId == 11) {
+                //房贷
+                axios.get(basePath + 'api/getXindaiHouseView?businessId =' + obj.data.businessId)
+                    .then(function (res) {
+                        if (res.data.code == "1") {
+                            showOneLineOprLayer(res.data.data, "房贷详情");
+                        } else {
+                            main.$Modal.error({ content: '操作失败，消息：' + res.data.msg });
+                        }
+                    })
+                    .catch(function (error) {
+                        main.$Modal.error({ content: '接口调用异常!' });
+                    });
+            }
         }
     });
 });
