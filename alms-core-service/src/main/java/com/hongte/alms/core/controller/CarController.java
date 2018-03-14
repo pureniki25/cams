@@ -99,7 +99,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @RestController
 @RequestMapping("/car")
-@CrossOrigin(allowCredentials="true", allowedHeaders="*", origins="*")
+//@CrossOrigin(allowCredentials="true", allowedHeaders="*", origins="*")
 @Api(tags = "CarController", description = "资产管理-车辆管理", hidden = true)
 public class CarController {
     private Logger logger = LoggerFactory.getLogger(CarController.class);

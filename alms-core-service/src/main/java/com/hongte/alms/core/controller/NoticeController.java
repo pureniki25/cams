@@ -71,6 +71,7 @@ public class NoticeController {
 	public Result<List<Notice>> listNotice(){
 		try {
 			String userId = loginUserInfoHelper.getUserId();
+			logger.info("userId:"+userId);
 			String orgCode = sysUserService.selectById(userId).getOrgCode();
 			List<String> orgCodes = sysOrgService.getParentsOrgs(orgCode);
 			if (orgCodes==null) {
