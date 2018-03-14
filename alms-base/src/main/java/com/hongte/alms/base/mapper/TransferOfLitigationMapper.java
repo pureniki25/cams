@@ -1,5 +1,6 @@
 package com.hongte.alms.base.mapper;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -7,7 +8,6 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import com.hongte.alms.base.vo.litigation.BusinessCar;
-import com.hongte.alms.base.vo.litigation.BusinessHouse;
 import com.hongte.alms.base.vo.litigation.TransferOfLitigationVO;
 import com.hongte.alms.base.vo.litigation.house.HouseLoanVO;
 import com.hongte.alms.base.vo.litigation.house.HousePlanInfo;
@@ -63,4 +63,11 @@ public interface TransferOfLitigationMapper {
 	 * @return
 	 */
 	List<MortgageInfo> queryMortgageInfoByBusinessId(@Param(value="businessId") String businessId);
+	
+	/**
+	 * 查询车贷相关利息及服务费
+	 * @param businessId
+	 * @return
+	 */
+	Map<String, Object> queryCarLoanFees(@Param(value="businessId") String businessId, @Param(value="billDate") Date billDate);
 }

@@ -20,9 +20,7 @@ eureka:
     prefer-ip-address: true
   client:
     serviceUrl:
-      #defaultZone: http://172.16.200.110:30101/eureka/  # 配置注册中心url
-      defaultZone: http://localhost:30600/eureka/  # 配置注册中心url
-
+      defaultZone: http://172.16.200.110:30101/eureka/  # 配置注册中心url
 ht:
   config:
     ui:

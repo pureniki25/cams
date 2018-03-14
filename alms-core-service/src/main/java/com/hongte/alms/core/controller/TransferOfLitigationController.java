@@ -1,6 +1,9 @@
 package com.hongte.alms.core.controller;
 
+import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -29,6 +32,7 @@ import com.hongte.alms.base.process.vo.ProcessLogReq;
 import com.hongte.alms.base.service.TransferLitigationCarService;
 import com.hongte.alms.base.service.TransferLitigationHouseService;
 import com.hongte.alms.base.service.TransferOfLitigationService;
+import com.hongte.alms.base.vo.billing.CarLoanBilVO;
 import com.hongte.alms.base.vo.litigation.TransferOfLitigationVO;
 import com.hongte.alms.base.vo.litigation.house.HouseLoanVO;
 import com.hongte.alms.common.result.Result;
@@ -81,6 +85,26 @@ public class TransferOfLitigationController {
 				if (processId != null) {
 					List<TransferLitigationCar> applyList = transferLitigationCarService
 							.selectList(new EntityWrapper<TransferLitigationCar>().eq("process_id", processId));
+					
+					String houseAddr = applyList.get(0).getHouseAddress();
+					StringBuilder builder = new StringBuilder();
+					String[] houseArr = houseAddr.split("#");
+					
+					int count = 1;
+					for (String hArr : houseArr) {
+						String[] split = hArr.split("\\^");
+						String area = split[0];
+						String area2 = area.replace("[", "");
+						String area3 = area2.replace("]", "");
+						List<String> areaList = Arrays.asList(area3.split(","));
+						if (count < houseArr.length) {
+							builder.append("房产地址" + count++ + "：").append(areaList.get(0)).append(areaList.get(1)).append(areaList.get(2)).append(" " + split[1]).append("；房产抵押情况：").append(split[2]).append("#");
+						}else {
+							builder.append("房产地址" + count++ + "：").append(areaList.get(0)).append(areaList.get(1)).append(areaList.get(2)).append(" " + split[1]).append("；房产抵押情况：").append(split[2]);
+						}
+					}
+					
+					carLoanData.put("houseAddress", builder.toString());
 					carLoanData.put("carList", (JSONArray) JSON.toJSON(applyList, JsonUtil.getMapping()));
 				}
 
@@ -143,12 +167,35 @@ public class TransferOfLitigationController {
 		}
 	}
 
+	@SuppressWarnings({ "unchecked" })
 	@ApiOperation(value = "存储车贷移交诉讼信息")
 	@PostMapping("/saveTransferLitigationCar")
 	@ResponseBody
-	public Result<String> saveTransferLitigationCar(@RequestBody TransferLitigationCar req) {
+	public Result<String> saveTransferLitigationCar(@RequestBody Map<String, Object> req) {
 		try {
-			transferOfLitigationService.saveTransferLitigationCar(req);
+			TransferLitigationCar car = new TransferLitigationCar();
+			car.setAlmsOpinion((String)req.get("almsOpinion"));
+			car.setBusinessId((String)req.get("businessId"));
+			car.setCarCondition((String)req.get("carCondition"));
+			car.setCrpId((String)req.get("crpId"));
+			car.setDelayHandover((String)req.get("delayHandover"));
+			car.setDelayHandoverDesc((String)req.get("delayHandoverDesc"));
+			car.setEstates((String)req.get("estates"));
+			car.setProcessStatus((String)req.get("processStatus"));
+			
+			StringBuilder houseAddress = new StringBuilder();
+			List<LinkedHashMap<String, Object>> componentOptions = (List<LinkedHashMap<String, Object>>) req.get("componentOption");
+			for (LinkedHashMap<String, Object> componentOption : componentOptions) {
+				LinkedHashMap<String, Object> registrationInfoForm = (LinkedHashMap<String, Object>) componentOption.get("registrationInfoForm");
+				List<String> houseAreas = (List<String>) registrationInfoForm.get("houseArea");
+				String detailAddress = (String) registrationInfoForm.get("detailAddress");
+				String mortgageSituation = (String) registrationInfoForm.get("mortgageSituation");
+				houseAddress.append(houseAreas).append("^").append(detailAddress).append("^").append(mortgageSituation).append("#");
+			}
+			
+			car.setHouseAddress(houseAddress.toString());
+			
+			transferOfLitigationService.saveTransferLitigationCar(car);
 			return Result.success();
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
@@ -225,6 +272,54 @@ public class TransferOfLitigationController {
 			}
 		} catch (Exception e) {
 			LOG.error("-- queryTransferLitigationData -- 移交诉讼失败！！！", e);
+			return Result.error("500", "系统异常");
+		}
+	}
+	
+	/**
+	 * 查询车贷结清试算明细
+	 * 
+	 * @author huweiqian
+	 * @date 2018/03/13
+	 * @return 
+	 */
+	@ApiOperation(value = "查询车贷结清试算明细")
+	@GetMapping("/queryCarLoanBilDetail")
+	@ResponseBody
+	public Result<Map<String, Object>> queryCarLoanBilDetail(@RequestParam String businessId, @RequestParam Date billDate) {
+		try {
+			Map<String, Object> resultMap = transferOfLitigationService.queryCarLoanBilDetail(businessId, billDate);
+			if (resultMap != null && !resultMap.isEmpty()) {
+				return Result.success(resultMap);
+			} else {
+				return Result.error("0", "没有数据");
+			}
+		} catch (Exception e) {
+			LOG.error("-- queryCarLoanBilDetail -- 查询车贷结清试算明细！！！", e);
+			return Result.error("500", "系统异常");
+		}
+	}
+	
+	/**
+	 * 车贷结清试算
+	 * 
+	 * @author huweiqian
+	 * @date 2018/03/13
+	 * @return 
+	 */
+	@ApiOperation(value = "车贷结清试算")
+	@PostMapping("/carLoanBilling")
+	@ResponseBody
+	public Result<Map<String, Object>> carLoanBilling(@RequestBody CarLoanBilVO carLoanBilVO) {
+		try {
+			Map<String, Object> resultMap = transferOfLitigationService.carLoanBilling(carLoanBilVO);
+			if (resultMap != null && !resultMap.isEmpty()) {
+				return Result.success(resultMap);
+			} else {
+				return Result.error("0", "没有数据");
+			}
+		} catch (Exception e) {
+			LOG.error("-- carLoanBilling -- 车贷结清试算失败！！！", e);
 			return Result.error("500", "系统异常");
 		}
 	}

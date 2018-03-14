@@ -22,7 +22,7 @@ import java.util.List;
 @Configuration
 public class WebConfig extends WebMvcConfigurerAdapter {
 
-    @Value("ht.config.ui.useGateWayflage")
+    @Value("${ht.config.ui.useGateWayflage:true}")
     private Boolean useGateWayflage;
 
 

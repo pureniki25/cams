@@ -112,6 +112,12 @@ var setFormValidate = {
     ],
 	cashReceiptCount: [
 		{pattern:"^\\d{1,8}?$", message: '请填写整数', trigger: 'blur'}    
+	],
+	ratedPrice: [
+		{pattern:"^\\d{1,8}(\\.\\d{1,2})?$", required: true,  message: '请填写整数位数不大于8位，小数位数不超过两位的数字', trigger: 'blur'}  
+	],
+	liquidate: [
+		{required: true, message: '必填', trigger: 'blur'}   
 	]
 };
 
@@ -215,6 +221,25 @@ window.layinit(function (htConfig) {
 	        
 	        mortgageInfoList: [],
 	        
+	        mortgageInfoTitle:[
+	        	{
+					title: '序号',
+					key: 'repaymentNum'
+				},
+				{
+					title: '抵押物地址',
+					key: 'factPrincipal'
+				},
+				{
+					title: '面积（M2）',
+					key: 'surplusPrincipal'
+				},
+				{
+					title: '风控审批单价',
+					key: 'surplusPrincipal'
+				}
+	        ],
+	        
 	        repaymentPlanTitle: [
 				{
 					title: '还款计划',
@@ -257,6 +282,8 @@ window.layinit(function (htConfig) {
 				secondPecuniaryCondition: '',	// 其他财务情况（分公司/区域贷后跟进结果）
 				operator: '',	// 移交人
 				operateDate: '',	// 移交时间
+				ratedPrice: '',	// 额定单价
+				liquidate: '',	// 是否易变现
 				processStatus: '',
 				crpId: ''
 			},

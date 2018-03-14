@@ -6,7 +6,6 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
     <title>车贷移交诉讼</title>
-	<script src="/properties/config.js"></script>
     <!-- 默认主题样式 -->
     <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
     <!-- iview样式 -->
@@ -41,7 +40,8 @@
     <script src="http://blueimp.github.io/jQuery-File-Upload/js/vendor/jquery.ui.widget.js"></script>
 	<script type="text/javascript" src="/plugins/fileUpload/jquery.iframe-transport.js"></script>
 	<script type="text/javascript" src="/plugins/fileUpload/jquery.fileupload.js"></script>
-    
+	
+	<script src="/properties/config.js"></script>    
 
     <!--引入公共的一些方法-->
     <script src="/src/js/comm.js"></script>
@@ -168,52 +168,45 @@ height: 100%;
 			<div class="layui-col-xs6 layui-col-md12">
 				<div class="grid-demo layui-bg-gray">
 					<table class="layui-table">
-						<tr>
-							<td class="td_label">房产地址</td>
-							<td colspan="4"> 
-							<i-col>    
-							<select v-if="applyInfoFormEditFlage" name="quiz1" v-model="returnReg.returnProId" class="td_select" v-on:change="selectPro">	
-							      <option v-for="item in provs" :value="item.id" style="width: 150px">
-								       {{item.name}}
-								  </option>
-      						</select>
-							<select v-else name="quiz1" v-model="returnReg.returnProId" class="td_select" v-on:change="selectPro" disabled>	
-							      <option v-for="item in provs" :value="item.id" style="width: 150px" disabled>
-								       {{item.name}}
-								  </option>
-      						</select>
+						<tr v-for="(info, index) in commitInfoForm.componentOption">
+							<td class="td_label">房产地址{{index + 1}}</td>
+							<td  v-if="applyInfoFormEditFlage"> 
+							      <cascader :data="commitInfoForm.componentOption[0].areaData" v-model="commitInfoForm.componentOption[index].registrationInfoForm.houseArea" filterable></cascader>
+							</td>
+							<!-- <td v-else > 
+							      <cascader :data="commitInfoForm.componentOption[0].areaData" v-model="commitInfoForm.componentOption[index].registrationInfoForm.houseArea" disabled></cascader>
+							</td> -->
+							<td  v-if="applyInfoFormEditFlage"> 
+							      <i-input v-model="commitInfoForm.componentOption[index].registrationInfoForm.detailAddress" placeholder="详细地址" ></i-input>
+							</td>
+							<!-- <td v-else> 
+							      <i-input v-model="commitInfoForm.componentOption[index].registrationInfoForm.detailAddress" placeholder="详细地址" disabled></i-input>
+							</td> -->
+							<td  v-if="applyInfoFormEditFlage"> 
+							      <i-input v-model="commitInfoForm.componentOption[index].registrationInfoForm.mortgageSituation" placeholder="房产抵押情况" ></i-input>
+							</td>
+							<!-- <td v-else> 
+							      <i-input v-model="commitInfoForm.componentOption[index].registrationInfoForm.mortgageSituation" placeholder="房产抵押情况" disabled></i-input>
+							</td> -->
+							<td  v-if="applyInfoFormEditFlage">
+							  <div class="layui-btn-group">
+							    <button class="layui-btn layui-btn-primary layui-btn-sm" v-on:click="addHouseTabTr($event)"><i class="layui-icon"></i></button>
+							    <button v-if="index != 0" class="layui-btn layui-btn-primary layui-btn-sm"  v-on:click="removeHouseTabTr($event, index)"><i class="layui-icon"></i></button>
+							  </div>
+							  
+							 <!--  <div v-else class="layui-btn-group" disabled>
+							    <button disabled class="layui-btn layui-btn-primary layui-btn-sm" v-on:click="addHouseTabTr($event)"><i class="layui-icon"></i></button>
+							    <button disabled class="layui-btn layui-btn-primary layui-btn-sm"  v-on:click="removeHouseTabTr($event, index)"><i class="layui-icon"></i></button>
+							  </div> -->
 							
-							   <select v-if="applyInfoFormEditFlage" name="quiz2" v-model="returnReg.returnCityId" class="td_select" v-on:change="selectCity" >
-						         <option v-for="item in citys" :value="item.id" style="width: 190px">
-								       {{item.name}}
-								  </option>
-						      </select>
-							   <select v-else name="quiz2" v-model="returnReg.returnCityId" class="td_select" v-on:change="selectCity" disabled>
-						         <option v-for="item in citys" :value="item.id" style="width: 190px" disabled>
-								       {{item.name}}
-								  </option>
-						      </select>
-
-							   <select v-if="applyInfoFormEditFlage" name="quiz3" v-model="returnReg.returnCountyId" class="td_select">
-						       <option v-for="item in countys" :value="item.id" style="width: 150px">
-								       {{item.name}}
-								  </option>
-						      </select>
-							   <select v-else name="quiz3" v-model="returnReg.returnCountyId" class="td_select" disabled>
-						       <option v-for="item in countys" :value="item.id" style="width: 150px" disabled>
-								       {{item.name}}
-								  </option>
-						      </select>
-						      
-						      <input v-if="applyInfoFormEditFlage" type="text" name="lname" v-model="returnReg.returnAddr"  style="width: 50%" class="input-border-input">
-						      </i-col>
 							</td>
 							
 						</tr>
+						<tr v-for="(item,index) in commitInfoForm.houseAddress"><td>{{item}}</td></tr>
 					</table>
 				</div>
 			</div>
-		</div>			
+		</div>		
 			
 		<div class="layui-row">
 			<div class="layui-col-xs6 layui-col-md12">

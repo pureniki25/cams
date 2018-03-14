@@ -1,9 +1,13 @@
 package com.hongte.alms.base.service;
 
+import java.util.Date;
 import java.util.Map;
+
+import org.apache.ibatis.annotations.Param;
 
 import com.hongte.alms.base.entity.TransferLitigationCar;
 import com.hongte.alms.base.entity.TransferLitigationHouse;
+import com.hongte.alms.base.vo.billing.CarLoanBilVO;
 import com.hongte.alms.base.vo.litigation.TransferOfLitigationVO;
 import com.hongte.alms.base.vo.litigation.house.HouseLoanVO;
 
@@ -41,4 +45,15 @@ public interface TransferOfLitigationService {
      * @param req
      */
     void saveTransferLitigationCar(TransferLitigationCar req);
+    
+    /**
+     * 车贷业务结清试算明细查询
+     */
+    Map<String, Object> queryCarLoanBilDetail(String businessId, Date billDate);
+    
+    /**
+     * 车贷业务结清试算
+     */
+    Map<String, Object> carLoanBilling(CarLoanBilVO carLoanBilVO);
+    
 }

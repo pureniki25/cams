@@ -120,13 +120,29 @@ window.layinit(function (htConfig) {
 	        	overdueDays:""  	, // 逾期天数
 	        	outputUserName:""   	, // 出款人
 	        	factOutputDate:"" 		, // 出款日期
+	        	houseAddress:"",
 	        },
 	        
 	        commitInfoForm: {
+	        	
+	        	componentOption: [
+	            	{
+	            		areaData: [],
+	            		registrationInfoForm:{
+	    	            	houseArea: [],
+	    	                province: '',
+	    	                city: '',
+	    	                county: '',
+	    	                detailAddress: '',
+	    	                mortgageSituation: '',// 房产抵押情况
+		            	}
+	            	}
+	                 
+				],
+	        	
 				businessId:""		   	, // 业务编号
 				estates: '',	// 是否有房产
-				houseAddress: '',	// 房产地址
-				mortgageSituation: '',	// 房产抵押情况
+				houseAddress: [],	// 房产地址
 				carCondition: '',	// 客户车辆目前情况
 				almsOpinion: '',	// 贷后意见
 				delayHandover: '',	// 是否推迟移交
@@ -135,6 +151,7 @@ window.layinit(function (htConfig) {
 				processStatus: '',
 				crpId:''
 			},
+			
 // ////////////------------- 申请减免信息 开始
    
 	   // 后台返回的初始的减免信息
@@ -218,32 +235,12 @@ window.layinit(function (htConfig) {
        approvalInfoFormValidate:approvalInfoFormValidate1,
 // ////////////------------- 审批流程信息 结束
        
-       provs:'',
-       
-       citys:'',
-       
-       countys:'',
-       
 		returnRegFiles:[{
 			file: '',
 			originalName: '',
 			oldDocId:''
 		}],
 		
-		returnReg:{
-    	   returnDate:'',
-    	   returnOperator:'',
-    	   returnProId:'',
-    	   returnCityId:'',
-    	   returnCountyId:'',
-    	   returnAddr:'',
-    	   isPayTrailerCost:'',
-    	   payTrailerCost:'',
-    	   payTrailerOtherCost:'',
-    	   note:''
-	    },
-       
-       
 // --------------------//////////////////////
    },
 	   methods: {
@@ -305,44 +302,23 @@ window.layinit(function (htConfig) {
 	                 if (data && data.originalFiles && data.originalFiles.length > 0) {
 	                     data.formData = {fileName: data.originalFiles[0].name};
 	                     data.formData.businessId = businessId;
-	                     //alert(data.originalFiles);
 	                     data.formData.busType='AfterLoan_Material_Litigation';
 	                     data.formData.file=data.originalFiles[0];
 	                 }
 	             });
 	    	},
-	    	selectPro:function(el){
-	    		var currProId=this.returnReg.returnProId;
-	            $.ajax({
-	                type: "POST",
-	                url: basePath+'car/getCitysByProId',
-	                data: {"proId":currProId},
-	                //contentType: "application/json; charset=utf-8",
-	                success: function (data) {
-	                	vm.citys=data.data.citys;
-	                },
-	                error: function (message) {
-	                    layer.msg("查询城市信息发生异常，请联系管理员。");
-	                    console.error(message);
-	                }
-	            });
-	    	},
-	    	selectCity:function(el){
-	    		var currCityId=this.returnReg.returnCityId;
-	            $.ajax({
-	                type: "POST",
-	                url: basePath+'car/getCountysByCityId',
-	                data: {"cityId":currCityId},
-	                //contentType: "application/json; charset=utf-8",
-	                success: function (data) {
-	                	vm.countys=data.data.countys;
-	                },
-	                error: function (message) {
-	                    layer.msg("查询县区信息发生异常，请联系管理员。");
-	                    console.error(message);
-	                }
-	            });
-	    	},
+	    	
+	    	getArea: function (index) {
+                var self = this;
+                var reqStr = basePath + "area/getArea";
+                axios.get(reqStr)
+                    .then(function (result) {
+                        if (result.data.code == "1") {
+                            self.commitInfoForm.componentOption[index].areaData = result.data.data;
+                        }
+                })
+            },
+	    	
 	    	removeTabTr: function (event, index) {
 	    		var docId=$('#docId'+index).val();
 	    		var deled=false;
@@ -373,8 +349,26 @@ window.layinit(function (htConfig) {
 	    			 oldDocId:''
 	    		 })
 	    	},
-	   }			
-	    
+	    	addHouseTabTr :function(event){
+	    		this.commitInfoForm.componentOption.push({
+	    			areaData: [],
+            		registrationInfoForm:{
+    	            	houseArea: [],
+    	                province: '',
+    	                city: '',
+    	                county: '',
+    	                detailAddress: '',
+	            	}
+	    		})
+	 	    },
+	 	    removeHouseTabTr :function(event, index){
+	 	    	this.commitInfoForm.componentOption.splice(index, 1);
+	 	    },
+	 	   
+	   },		
+	   created: function () {
+	       this.getArea(0);
+	   }
 	});
     
 });
@@ -414,10 +408,26 @@ var getShowInfo = function () {
             		vm.initalApplyInfo = res.data.data.carList[0];
             	} 
             	vm.commitInfoForm.businessId = res.data.data.baseInfo.businessId;
+            	vm.commitInfoForm.houseAddress = res.data.data.houseAddress.split('#');
             	
-            	vm.provs = res.data.data.provs;
-            	vm.citys = res.data.data.citys;
-            	vm.countys = res.data.data.countys;
+            	var docFiles=res.data.data.returnRegFiles;
+            	
+            	if(docFiles!=null&&docFiles.length>0){
+            		vm.returnRegFiles[docFiles.length];
+                	for (var i=0;i<docFiles.length;i++){
+                		if(i>0){
+                			vm.returnRegFiles.push({
+   	               			 file: '',
+   	               			 originalName: docFiles[i].originalName,
+   	               			 oldDocId:docFiles[i].docId
+   	               		 });
+                		}else{
+	                		vm.returnRegFiles[i].oldDocId=docFiles[i].docId;
+	                		vm.returnRegFiles[i].originalName=docFiles[i].originalName;
+                		}
+                		// i++;
+                	}
+            	}
             	
      ////////// --------------  减免信息  赋值  结束---------------//////////
 
