@@ -25,6 +25,7 @@ window.layinit(function (htConfig) {
 	        countys:'',
 	    	returnRegFiles:[{
 	    		file: '',
+	    		name:'',
 	    		originalName: '',
 	    		oldDocId:''
 	    	}],
@@ -498,6 +499,7 @@ window.layinit(function (htConfig) {
 	    		        	//alert(JSON.stringify(reFiles));
 	    		        	vm.returnRegFiles[index].oldDocId=reFiles.docId;
 	    		        	vm.returnRegFiles[index].originalName=reFiles.originalName;
+	    		        	vm.returnRegFiles[index].name=reFiles.originalName;
 	    		        	
 	    		        }
 	    		    });
@@ -511,33 +513,32 @@ window.layinit(function (htConfig) {
 	             });
 	    	},
 	    	removeTabTr: function (event, index) {
-	    		var docId=$('#docId'+index).val();
-	    	
-	    		var deled=false;
-	    		if(docId==null||docId==""){
-	    			deled=true;
-	    		}
-	    		else{
-		            $.ajax({
+	    		var docId=$('#docId'+index).val();  
+	    		var that = this;
+	    		// 如果文档id存在，那么进行ajax
+	    		if (docId) {
+	    			$.ajax({
 		                type: "GET",
 		                url: basePath+'doc/delOneDoc?docId='+docId,
-		                // data: {"businessId":businessId},
-		                // contentType: "application/json; charset=utf-8",
 		                success: function (data) {
-		                	deled=true;
-		                	
+		                	console.log(data, that);
+		                	that.returnRegFiles.splice(index, 1);
+		    	            if(that.returnRegFiles == ""){
+		    	            	that.addTabTr(event);
+		    	            }
 		                },
 		                error: function (message) {
 		                    layer.msg("删除文件失败。");
 		                    console.error(message);
 		                }
 		            });
+	    		// 否则直接删除
+	    		} else {
+	    			that.returnRegFiles.splice(index, 1);
+    	            if(that.returnRegFiles==""){
+    	            	that.addTabTr(event);
+    	            }
 	    		}
-	    		//alert("bbb");
-	            if(deled){
-	            //	alert("aaaa");
-	            this.returnRegFiles.splice(index, 1);
-	            }
 	    	},
 	    	addTabTr :function(event){
 	    		 this.returnRegFiles.push({
@@ -588,12 +589,14 @@ window.layinit(function (htConfig) {
 		                		if(i>0){
 		                			vm.returnRegFiles.push({
 		   	               			 file: '',
+		   	               			 name:docFiles[i].originalName,
 		   	               			 originalName: docFiles[i].originalName,
 		   	               			 oldDocId:docFiles[i].docId
 		   	               		 });
 		                		}else{
 			                		vm.returnRegFiles[i].oldDocId=docFiles[i].docId;
 			                		vm.returnRegFiles[i].originalName=docFiles[i].originalName;
+			                		vm.returnRegFiles[i].name=docFiles[i].originalName;
 		                		}
 		                		// i++;
 		                	}
