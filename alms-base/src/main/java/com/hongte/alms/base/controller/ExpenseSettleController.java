@@ -38,8 +38,12 @@ import com.hongte.alms.base.vo.module.ExpenseSettleVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.DateUtil;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
 @Controller
 @RequestMapping("/expenseSettle")
+@Api(tags = "ExpenseSettleControllerApi", description = "房贷结清试算API", hidden = true)
 public class ExpenseSettleController {
 
 	@Autowired
@@ -84,6 +88,7 @@ public class ExpenseSettleController {
 	private BigDecimal deposit = new BigDecimal(0);
 
 	@GetMapping("/business")
+	@ApiOperation(value = "获取房贷结清试算基础数据")
 	@ResponseBody
 	public Result getBusiness(String businessId) {
 		BasicBusiness business = basicBusinessService
@@ -105,6 +110,7 @@ public class ExpenseSettleController {
 	}
 
 	@GetMapping("/calByPreSettleDate")
+	@ApiOperation(value = "根据清算日期获取房贷结清试算数据")
 	@ResponseBody
 	public Result<ExpenseSettleVO> calByPreSettleDate(String preSettleDate, String businessId, String afterId) {
 		ExpenseSettleVO expenseSettleVO = expenseSettleService.sum(businessId);
