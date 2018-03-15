@@ -1,7 +1,4 @@
-//是否使用网关的标志位
-// var useGateWayflage=false;
-// var useGateWayflage=true;
-// var localBasePath = "http://localhost:30606/";
+
 var _loadBtnAndTabUrl="";
 
 var htConfig;
@@ -47,11 +44,28 @@ window.layinit = function (cb) {
         htConfig = layui.ht_config;
         _loadBtnAndTabUrl =  htConfig.loadBtnAndTabUrl;
 
-        if(!htConfig.useGateWayflage){
+       if(!htConfig.useGateWayflage){
+           /*  $.ajax({
+                type : 'GET',
+                async : false,
+                // url : "http://10.110.1.240:30111/uc/auth/loadBtnAndTab",
+                // url : "http://localhost:30111/uc/auth/loadBtnAndTab",
+                url : htConfig.basePath +"core/" +"SysUser/getUserIdByToken",
+                headers : {
+                    app : 'ALMS',
+                    Authorization : "Bearer " + getToken()
+                },
+                success : function(data) {
+                    axios.defaults.headers.common['userId'] = data;
+                },
+                error : function() {
+                    axios.defaults.headers.common['userId'] = htConfig.defaultUser;
+                }
+            });*/
             htConfig.basePath = htConfig.localBasePath;
             htConfig.coreBasePath = htConfig.localBasePath;
             htConfig.uiBasePath = htConfig.uiBasePath;
-            axios.defaults.headers.common['userId'] = htConfig.defaultUser;
+        axios.defaults.headers.common['userId'] = htConfig.defaultUser;
         }else{
             // htConfig.basePath =  htConfig.basePath +"core/"
             htConfig.coreBasePath = htConfig.basePath +"core/";
