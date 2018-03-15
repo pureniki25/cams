@@ -42,13 +42,14 @@ Configuration:
           modulate: true
   Loggers:
     Root:
-      level: info
+      level: debug
       AppenderRef:
         - ref: CONSOLE
         - ref: ROLLING_FILE #开发环境无需产生日志文件
     Logger: # 为com.xjj包配置特殊的Log级别，方便调试
-      - name: com.xjj
+      - name: com.baomidou.mybatisplus.plugins.pagination.optimize.JsqlParserCountOptimize
         additivity: false
-        level: info
+        level: DEBUG
         AppenderRef:
           - ref: CONSOLE
+          - ref: ROLLING_FILE
