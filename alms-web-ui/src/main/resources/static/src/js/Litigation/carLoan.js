@@ -491,7 +491,7 @@ var getShowInfo = function () {
 	//////////--------------  界面显示控制   结束---------------//////////
 	          }
             } else {
-                vm.$Modal.error({content: '执行失败，没有数据返回！' });
+                vm.$Modal.error({content: '执行失败，没有找到数据！' });
             }
         })
         .catch(function (error) {

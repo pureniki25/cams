@@ -64,15 +64,15 @@ window.layinit(function (htConfig) {
 				},
 				{
 					title: '服务费',
-					key: 'factPrincipal'
+					key: 'previousPlanServiceCharge'
 				},
 				{
 					title: '滞纳金',
-					key: 'surplusPrincipal'
+					key: 'previousLateFees'
 				},
 				{
 					title: '利息',
-					key: 'overdueDays'
+					key: 'previousPlanAccrual'
 				}
 			],
 			
@@ -97,6 +97,7 @@ window.layinit(function (htConfig) {
 		        .then(function (res) {
 		            if (res.data.data != null && res.data.code == 1) {
 		            	vm.baseInfoForm = res.data.data;
+		            	vm.arrearageDetailData = res.data.data.previousFees;
 		            } else {
 		                vm.$Modal.error({content: '执行失败，没有数据返回！' });
 		            }
@@ -113,14 +114,14 @@ window.layinit(function (htConfig) {
 			   this.commitInfoForm.billDate = formatDate(new Date());
 		   }
 		   
-			var reqUrl = basePath + '/transferOfLitigation/queryCarLoanBilDetail?businessId=' + businessId + "&billDate=" + this.commitInfoForm.billDate
+			var reqUrl = basePath + '/transferOfLitigation/queryCarLoanBilDetail?businessId=' + businessId
 			
 			axios.get(reqUrl).then(function(res){
 				if(res.data.code=='1'){
 					console.log(res.data.data)
-					vm.baseInfoForm = res.data.data
+					vm.baseInfoForm = res.data.data;
 				}else{
-					app.$Modal.error({content:'接口调用失败'})
+					vm.$Modal.error({content: '执行失败，没有找到数据！' });
 				}
 			}).catch(function(error){
 				app.$Modal.error({content:'接口调用失败'})

@@ -75,10 +75,10 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
         pages.setCurrent(req.getPage());
         pages.setSize(req.getLimit());
 
-        if(req.getLiquidationOne()!=null){
+        if(req.getLiquidationOne()!=null&&!req.getLiquidationOne().equals("")){
             req.setLiquidationOneUIds(sysUserService.selectUseIdsByName(req.getLiquidationOne()));
         }
-        if(req.getLiquidationTow()!=null){
+        if(req.getLiquidationTow()!=null&&!req.getLiquidationTow().equals("")){
             req.setLiquidationTowUIds(sysUserService.selectUseIdsByName(req.getLiquidationTow()));
         }
 

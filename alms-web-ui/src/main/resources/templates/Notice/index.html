@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+    <title>通知公告</title>
+    <script src="/properties/config.js"></script>
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css" />
+    <!-- iview样式 -->
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css" />
+    <!--@import url("//unpkg.com/iview/dist/styles/iview.css");-->
+    <!--<link rel="stylesheet" type="text/css" href="//unpkg.com/iview/dist/styles/iview.css"/>-->
+    <!-- 引入layui样式 -->
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all" />
+
+    <!--   <script src="//unpkg.com/vue/dist/vue.js"></script>
+       <script src="//unpkg.com/iview/dist/iview.min.js"></script>-->
+    <!-- 引入vue -->
+    <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+    <!-- iview js -->
+    <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+    <!--引入layui.js-->
+    <script src="/plugins/layui/layui.js"></script>
+    <!--引入axios.js 用于ajax调用-->
+    <script src="/plugins/axios/axios.min.js"></script>
+    <!-- 引入jQuery，必须在appToken.js 之前引入 -->
+    <script src="/build/js/jquery-3.3.1.min.js"></script>
+    <!-- 设置全局请求头:app、Authorization -->
+    <script src="/build/js/appToken.js"></script>
+    <!--引入公共的一些方法-->
+    <script src="/src/js/comm.js"></script>
+</head>
+
+<body>
+    <!--隐藏元素-->
+    <!--<p id="staffType"  th:attr="value=${staffType}"  hidden />-->
+    <!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+    <div id="app" v-cloak>
+        <card dis-hover :bordered="false">
+            <span slot="title">通知公告</span>
+            <row>
+                <i-col span="24" style="text-align:right">
+                    <i-form ref="schForm" :model="schForm" label-position="right" autocomplete="off" label-width="100" inline>
+                        <form-item label="标题">
+                            <i-input></i-input>
+                        </form-item>
+                        <form-item label="发布时间">
+                            <Date-picker type="date" placeholder="开始时间" :value.sync="schForm.dateStart" v-model="schForm.dateStart" @on-change="onDateStartChange"
+                                :options="dateStartOption"></Date-picker>
+                            <span>至</span>
+                            <Date-picker type="date" placeholder="结束时间" :value.sync="schForm.dateEnd" v-model="schForm.dateEnd" @on-change="onDateEndChange"
+                                :options="dateEndOption"></Date-picker>
+                        </form-item>
+                        <i-button>查询</i-button>
+                    </i-form>
+                </i-col>
+            </row>
+            <row>
+                <i-col>
+                    <i-button>新增</i-button>
+                </i-col>
+            </row>
+
+            <Row>
+                <i-col span="24">
+                    <table id="notice" lay-filter="notice"></table>
+                    <script type="text/html" id="toolbar">
+                            <a class="layui-btn layui-btn-xs" lay-event="check">查阅记录</a>
+                            <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                            <a class="layui-btn layui-btn-xs" lay-event="delete">删除</a>
+                          </script>
+                </i-col>
+            </Row>
+        </card>
+
+        <Modal title="新增/编辑公告" v-model="editModal.show" width="90%">
+            <i-form ref="editForm" :model="editForm" label-position="right" autocomplete="off" label-width="100" inline>
+                <row>
+                    <i-col span="24">
+                        <form-item label="标题" prop="title">
+                            <i-input :value.sync="editForm.title"></i-input>
+                        </form-item>
+                    </i-col>
+                </row>
+                <row>
+                    <i-col span="8">
+                        <form-item label="公告类型" prop="title">
+                            <i-select :model.sync="editForm.type">
+                                <i-option value="0">选读</i-option>
+                                <i-option value="1">必读</i-option>
+                            </i-select>
+                        </form-item>
+                    </i-col>
+                    <i-col span="8">
+                        <form-item label="时长" prop="title">
+                            <i-select :model.sync="editForm.readTime">
+                                <i-option value="10">10秒</i-option>
+                                <i-option value="15">15秒</i-option>
+                                <i-option value="20">20秒</i-option>
+                                <i-option value="30">30秒</i-option>
+                                <i-option value="45">45秒</i-option>
+                                <i-option value="60">60秒</i-option>
+                            </i-select>
+                        </form-item>
+                    </i-col>
+                </row>
+                <row>
+                    <i-col span="8">
+                        <form-item label="公告范围" prop="title">
+                            <i-select :model.sync="editForm.type">
+                                <i-option value="1">必读</i-option>
+                            </i-select>
+                        </form-item>
+                    </i-col>
+                    <i-col span="8">
+                        <form-item label="发布渠道" prop="title">
+                            <i-select :model.sync="editForm.readTime">
+                                <i-option value="PC端">PC端</i-option>
+                                <i-option value="移动端">移动端</i-option>
+                            </i-select>
+                        </form-item>
+                    </i-col>
+                </row>
+                <row>
+                    <i-col span="8">
+                        <form-item label="公告发布时间" prop="title">
+                            <date-picker></date-picker>
+                        </form-item>
+                    </i-col>
+                </row>
+                <row>
+                    <i-col span="24">
+                        <form-item label="内容" prop="title" style="width:100%">
+                            <i-input type="textarea" :rows="4" placeholder="请输入..." ></i-input>
+                        </form-item>
+                    </i-col>
+                </row>
+            </i-form>
+        </Modal>
+    </div>
+    <script src="/src/js/Notice/index.js"></script>
+    <script>
+
+    </script>
+</body>
+
+</html>
