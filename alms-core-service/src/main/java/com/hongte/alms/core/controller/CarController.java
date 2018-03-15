@@ -65,6 +65,9 @@ import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.EasyPoiExcelExportUtil;
 import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.vo.PageResult;
+import com.hongte.alms.core.vo.modules.car.CarDragDoc;
+import com.hongte.alms.core.vo.modules.car.CarDragRegistrationBusinessVo;
+import com.hongte.alms.core.vo.modules.car.CarDragRegistrationInfo;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.BoaInRoleInfoDto;
 import com.ht.ussp.util.BeanUtils;
@@ -204,7 +207,100 @@ public class CarController {
     @Qualifier("CarAuctionBidderService")
     private CarAuctionBidderService carAuctionBidderService;
 
-    
+
+
+	@ApiOperation(value="获取拖车登记业务基本信息")
+	@GetMapping("getCarDragRegistrationBusinessInfo")
+	public Result<CarDragRegistrationBusinessVo> getCarDragRegistrationBusinessInfo(@RequestParam("businessId") String businessId)
+	{
+		try {
+			BasicBusiness basicBusiness = basicBusinessService.selectOne(new EntityWrapper().eq("business_id", businessId));
+			if(basicBusiness==null)
+			{
+				return Result.error("500","业务信息不存在");
+			}
+			CarBasic carBasic = carBasicService.selectOne(new EntityWrapper().eq("business_id", businessId));
+			if(carBasic==null)
+			{
+				return Result.error("500","车辆信息不存在");
+			}
+			CarDetection carDetection = carDetectionService.selectOne(new EntityWrapper().eq("business_id", businessId));
+			if(carDetection==null)
+			{
+				return Result.error("500","车辆评估信息不存在");
+			}
+			CarDragRegistrationBusinessVo carDragRegistrationBusinessVo = new CarDragRegistrationBusinessVo();
+			carDragRegistrationBusinessVo.setBusinessId(basicBusiness.getBusinessId());
+			carDragRegistrationBusinessVo.setCustomerName(basicBusiness.getCustomerName());
+			carDragRegistrationBusinessVo.setBorrowMoney(basicBusiness.getBorrowMoney());
+			carDragRegistrationBusinessVo.setBorrowLimit(basicBusiness.getBorrowLimit());
+			carDragRegistrationBusinessVo.setBorrowLimitUnit(basicBusiness.getBorrowLimitUnit());
+			carDragRegistrationBusinessVo.setRepaymentTypeId(basicBusiness.getRepaymentTypeId());
+			carDragRegistrationBusinessVo.setBorrowRate(basicBusiness.getBorrowRate());
+			carDragRegistrationBusinessVo.setBorrowRateUnit(basicBusiness.getBorrowRateUnit());
+			carDragRegistrationBusinessVo.setLicensePlateNumber(carBasic.getLicensePlateNumber());
+			carDragRegistrationBusinessVo.setModel(carBasic.getModel());
+			carDragRegistrationBusinessVo.setVin(carBasic.getVin());
+			carDragRegistrationBusinessVo.setEvaluationTime(carDetection.getCreateTime());
+			carDragRegistrationBusinessVo.setEvaluationAmount(carDetection.getEvaluationAmount());
+			carDragRegistrationBusinessVo.setEvaluationUser(carDetection.getCreateUser());
+			return Result.success(carDragRegistrationBusinessVo);
+
+		}
+		catch(Exception ex)
+		{
+			logger.error(ex.getMessage());
+			return Result.error("500",ex.getMessage());
+		}
+	}
+
+	@ApiOperation(value="保存拖车登记")
+	@PostMapping("saveDragRegistrationInfo")
+	public Result<CarDragRegistrationBusinessVo> saveDragRegistrationInfo(@RequestBody CarDragRegistrationInfo registrationInfo)
+	{
+		try {
+			CarDrag carDrag=new CarDrag();
+			carDrag.setId(UUID.randomUUID().toString() );
+			carDrag.setBusinessId(registrationInfo.getBusinessId());
+			carDrag.setDragDate(registrationInfo.getDragDate());
+			carDrag.setDragHandler(registrationInfo.getDragHandler());
+			carDrag.setProvince(registrationInfo.getProvince());
+			carDrag.setCity(registrationInfo.getCity());
+			carDrag.setCounty(registrationInfo.getCounty());
+			carDrag.setDetailAddress(registrationInfo.getDetailAddress());
+			carDrag.setFee(registrationInfo.getFee());
+			carDrag.setOtherFee(registrationInfo.getOtherFee());
+			carDrag.setRemark(registrationInfo.getRemark());
+			//carDrag.setCreateUser(loginUserInfoHelper.getLoginInfo().getUserName());
+			carDrag.setCreateTime(new Date());
+			carDragService.insert(carDrag);
+			List<CarDragDoc> attachments=registrationInfo.getAttachments();
+			if(attachments!=null&&attachments.size()>0) {
+
+				for(CarDragDoc attachment:attachments) {
+					//将临时表保存的上传信息保存到主表中
+					DocTmp tmp=docTmpService.selectById(attachment.getDocId());
+					if(tmp!=null) {
+						Doc doc=new Doc();
+						BeanUtils.copyProperties(tmp, doc);
+						if(attachment.getNewName()!=null&&!attachment.getNewName().isEmpty()) {
+							String newNameWithExtension=attachment.getNewName()+"."+tmp.getFileType();
+							doc.setOriginalName(newNameWithExtension);
+						}
+						docService.insertOrUpdate(doc);
+					}
+
+				}
+			}
+			return Result.success();
+		}
+		catch(Exception ex)
+		{
+			logger.error(ex.getMessage());
+			return Result.error("500",ex.getMessage());
+		}
+	}
+
     @ApiOperation(value = "获取车辆管理信息列表")
     @GetMapping("/carList")
     @ResponseBody
