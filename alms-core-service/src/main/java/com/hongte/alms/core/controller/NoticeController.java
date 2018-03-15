@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.entity.Notice;
 import com.hongte.alms.base.entity.NoticeFile;
 import com.hongte.alms.base.entity.SysOrg;
@@ -24,6 +25,7 @@ import com.hongte.alms.base.service.NoticeService;
 import com.hongte.alms.base.service.SysOrgService;
 import com.hongte.alms.base.service.SysUserService;
 import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.vo.PageResult;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 
 import io.swagger.annotations.ApiOperation;
@@ -104,6 +106,23 @@ public class NoticeController {
 		map.put("fileList", noticeFiles);
 		return Result.success(map);
 
+	}
+	
+	@GetMapping("/page")
+	@ApiOperation(value = "分页获取通知公告")
+	@ResponseBody
+	public PageResult<List<Notice>> page(Integer page,Integer limit){
+		String userId = loginUserInfoHelper.getUserId();
+		logger.info("userId:"+userId);
+		String orgCode = sysUserService.selectById(userId).getOrgCode();
+		List<String> orgCodes = sysOrgService.getParentsOrgs(orgCode);
+		if (orgCodes==null) {
+			orgCodes = new ArrayList<>();
+		}
+		orgCodes.add(orgCode);
+		Page<Notice> page2 = noticeService.selectPage(new Page<Notice>(page, limit), new EntityWrapper<Notice>().in("org_code", orgCodes));
+		return PageResult.success(page2.getRecords(), page2.getTotal());
+		
 	}
 }
 
