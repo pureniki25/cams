@@ -10,7 +10,6 @@
     <!-- iview样式 -->
     <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
 
-
     <!--表格样式-->
     <link rel="stylesheet" href="/Components/Table/Table.css">
 
@@ -119,7 +118,7 @@
                 <row :gutter="16">
                     <i-col span="10">
                         <form-item label="拖车日期：" prop="dragDate" >
-                            <date-picker type="date" :value='registrationInfoForm.dragDate' format="yyyy-MM-dd" :options="componentOption.dragDatePicker" placeholder="Select date"></date-picker>
+                            <date-picker type="date" editable="false" v-model='registrationInfoForm.dragDate' format="yyyy-MM-dd" :options="componentOption.dragDatePicker" placeholder="Select date"></date-picker>
                         </form-item>
                     </i-col>
 
@@ -175,16 +174,16 @@
         <p slot="title">
             附件信息
         </p>
-        <i-form label-position="left" :label-width="100">
+        <i-form label-position="left" :label-width="100" inline >
             <row  :gutter="10" v-for="(item, index) in files" v-if="item.status">
-                <i-col span="3">
-                    <form-item :label="'附件' +(index+1)" label-width="60" >
-                        <input  type="file" title="请选择" v-model="item.file" :id="'uploadfile'+index" @click="uploadFile($event,index)" />
+                <i-col  >
+                    <form-item :label="'附件' +(index+1)" label-width="50" >
+                        <input  style="line-height:18px" type="file" title="请选择" v-model="item.file" :id="'uploadfile'+index" @click="uploadFile($event,index)" />
                         <template v-if="item.uploadResult.isSuccess"><span style="margin-right:10px">{{item.uploadResult.originalName}}</span><icon type="checkmark-circled" color="green"></icon></template>
                     </form-item>
+                    <form-item label="重命名文件名称"> <i-input style="width:280px" v-model="item.uploadRequest.newName" placeholder="" ></i-input><i-button style="margin-left:10px" type="ghost" icon="minus-circled" @click="removeUploadItem(index)">删除</i-button></form-item>
+
                 </i-col>
-                <i-col span="6"> <form-item label="重命名文件名称"> <i-input v-model="item.uploadRequest.newName" placeholder="" ></i-input></form-item></i-col>
-                <i-col span="1"><i-button type="ghost" icon="minus-circled" @click="removeUploadItem(index)">删除</i-button></i-col>
             </row>
 
             <row>
@@ -232,9 +231,9 @@
                 registrationInfoForm:
                     {
                         businessId:"",
-                        dragDate: new Date().getFullYear() + "-" + (new Date().getMonth()+1) + "-" + new Date().getDate(),
+                        dragDate:new Date(),
                         dragHandler: '',
-                        dragArea: [],
+                        dragArea: '',
                         province: '',
                         city: '',
                         county: '',
@@ -247,7 +246,7 @@
                     },
                 validateRegistrationInfoForm:
                     {
-                        dragDate: [{required: true, message: '请填写拖车日期', trigger: 'blur'}],
+                        dragDate: [{required: true, message: '请填写拖车日期', trigger: 'blur', type: 'date'}],
                         dragHandler: [{required: true, message: '请填写拖车经办人', trigger: 'blur'}, {
                             min: 1,
                             max: 20,

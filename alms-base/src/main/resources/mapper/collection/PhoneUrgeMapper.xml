@@ -111,20 +111,12 @@
             </if>
             <!--   /*//业务状态（贷后状态）*/ -->
             <if test="businessStatus !=null">
-                and col_status.collection_status LIKE '%${businessStatus}%'
+                and col_status.collection_status = #{businessStatus}
             </if>
            <!--   /*//还款状态*/ -->
             <if test="repayStatus !=null and repayStatus !='' ">
                 and pList.current_status = #{repayStatus}
             </if>
- <!--           &lt;!&ndash;   /*//清算一*/ &ndash;&gt;
-            <if test="liquidationOne !=null and liquidationOne !=''  ">
-                and col_status.phone_staff LIKE '%${liquidationOne}%'
-            </if>
-            &lt;!&ndash;    /*//清算二*/ &ndash;&gt;
-            <if test="liquidationTow !=null and liquidationTow !=''  ">
-                and col_status.visit_staff LIKE '%${liquidationTow}%'
-            </if>-->
 
             <!--   /*//清算一用户ID列表*/ -->
             <if test="liquidationOneUIds !=null ">

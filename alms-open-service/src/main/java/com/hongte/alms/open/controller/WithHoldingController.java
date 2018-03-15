@@ -9,10 +9,10 @@ import com.hongte.alms.base.service.RepaymentBizPlanService;
 import com.hongte.alms.base.service.WithholdingRecordLogService;
 import com.hongte.alms.base.vo.module.api.RepayLogResp;
 import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.util.DESC;
+import com.hongte.alms.common.util.EncryptionResult;
 import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.open.service.WithHoldingXinDaiService;
-import com.hongte.alms.open.util.DESC;
-import com.hongte.alms.open.util.EncryptionResult;
 import com.hongte.alms.open.vo.RequestData;
 import com.hongte.alms.open.vo.ResponseData;
 import com.hongte.alms.open.vo.ResponseEncryptData;
@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -64,6 +65,8 @@ public class WithHoldingController {
 	@Qualifier("CollectionStatusService")
 	CollectionStatusService collectionStatusService;
 	
+	  @Value(value="${bmApi.apiUrl}")
+	private String apiUrl;
 	
 	@ApiOperation(value = "执行代扣")
 	@GetMapping("/withholding")
@@ -74,7 +77,7 @@ public class WithHoldingController {
 
 	) {
 		try {
-
+          
 			WithHoldingInfo info = new WithHoldingInfo();
 			RequestData requestData = new RequestData();
 			info.setBusinessId(originalBusinessId);
@@ -128,7 +131,7 @@ public class WithHoldingController {
 			// 请求数据加密
 			encryptStr = encryptPostData(encryptStr);
 			WithHoldingXinDaiService withholdingxindaiService = Feign.builder().target(WithHoldingXinDaiService.class,
-					"http://172.16.200.104:8084/apitest");
+					getUrl());
 			
 			String respStr = withholdingxindaiService.searchRepayRecord(encryptStr);
 			// 返回数据解密
@@ -203,6 +206,14 @@ public class WithHoldingController {
 		DESC desc = new DESC();
 		String str = desc.Decode(data.getA(), data.getUUId());
 		return str;
+	}
+	
+	private String getUrl() {
+		
+		int i=apiUrl.indexOf("api/");
+		String url=apiUrl.substring(0,i-1);
+		return url;
+		
 	}
 
 }
