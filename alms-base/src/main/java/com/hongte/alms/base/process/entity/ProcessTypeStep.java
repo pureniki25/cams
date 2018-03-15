@@ -100,6 +100,13 @@ public class ProcessTypeStep extends Model<ProcessTypeStep> {
 	@ApiModelProperty(required= true,value = "步骤类型：1，起始节点；2，中间节点，3，结束节点")
 	private Integer stepType;
 
+	/**
+	 * 审批者角色定义（通过角色定义来获取审批人 当approve_user_type 为5时使用）
+	 */
+	@TableField("approve_user_role")
+	@ApiModelProperty(required= true,value = "审批者角色定义（通过角色定义来获取审批人 当approve_user_type 为5时使用）")
+	private String approveUserRole;
+
 
 	public String getTypeStepId() {
 		return typeStepId;
@@ -201,6 +208,7 @@ public class ProcessTypeStep extends Model<ProcessTypeStep> {
 			", nextStep=" + nextStep +
 			", nextStepSelectSql=" + nextStepSelectSql +
 			",stepType="+stepType+
+			", approveUserRole=" + approveUserRole +
 			"}";
 	}
 
@@ -210,5 +218,13 @@ public class ProcessTypeStep extends Model<ProcessTypeStep> {
 
 	public void setStepType(Integer stepType) {
 		this.stepType = stepType;
+	}
+
+	public void setApproveUserRole(String approveUserRole) {
+		this.approveUserRole = approveUserRole;
+	}
+
+	public String getApproveUserRole(){
+		return this.approveUserRole;
 	}
 }

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.process.entity.ProcessTypeStep;
 import com.hongte.alms.base.process.enums.ProcessTypeEnums;
 import com.hongte.alms.base.process.vo.*;
+import com.hongte.alms.base.assets.car.vo.AuditVo;
 import com.hongte.alms.base.process.entity.Process;
 import com.hongte.alms.base.vo.module.ApplyDerateListSearchReq;
 import com.hongte.alms.base.vo.module.ApplyDerateVo;
@@ -119,5 +120,6 @@ public interface ProcessService extends BaseService<Process> {
      * @return
      */
     List<ProcessVo> selectProcessVoList(ProcessReq key);
+    public void saveProcessApprovalResult(AuditVo req ,ProcessTypeEnums processTypeEnums) throws IllegalAccessException, InstantiationException;
 
 }

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.assets.car.enums.CarStatusEnums;
 import com.hongte.alms.base.assets.car.service.CarService;
 import com.hongte.alms.base.assets.car.vo.AuctionBidderVo;
+import com.hongte.alms.base.assets.car.vo.AuditVo;
 import com.hongte.alms.base.assets.car.vo.CarReq;
 import com.hongte.alms.base.assets.car.vo.CarVo;
 import com.hongte.alms.base.assets.car.vo.FileVo;
@@ -488,7 +489,7 @@ public class CarController {
     	return Result.build("0000", "操作成功", "");
     }
     @ApiOperation(value="查询拍卖登记信息")
-    @PostMapping("/AuctionDetail")
+    @PostMapping("/auctionDetail")
     public Result<Object> AuctionDetail(@ModelAttribute("businessId") String businessId){
      	BasicBusiness business=basicBusinessService.selectById(businessId);
     	CarBasic carBasic=carBasicService.selectById(businessId);
@@ -963,6 +964,153 @@ public class CarController {
     	carAuctionRegService.updateById(reg);
         return Result.build("0000", "操作成功", "");
       
+    }
+    @ApiOperation(value="拍卖审核信息")
+    @PostMapping("/auctionAuditDetail")
+    public Result<Object> auctionAuditDetail(@ModelAttribute("businessId") String businessId,@ModelAttribute("processId") String processId){
+     	BasicBusiness business=basicBusinessService.selectById(businessId);
+    	CarBasic carBasic=carBasicService.selectById(businessId);
+    	//拖车信息
+    	List<CarDrag> drag=carDragService.selectList(
+    	        new EntityWrapper<CarDrag>().eq("business_id", businessId)); 
+    	//还款信息
+    	List<RepaymentBizPlan> plans=repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id", businessId));
+    	if(plans==null||plans.size()!=1) {
+    		logger.error("该业务编号下还款计划不存在或存在多条", plans==null?null:com.ht.ussp.util.JsonUtil.obj2Str(plans));
+    		return Result.error("9999", "还款信息有误");
+    	}
+    	String planId=plans.get(0).getPlanId();
+    	//还款计划列表
+    	List<RepaymentBizPlanList> planLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("plan_id", planId).eq("current_status", "已还款").orderBy("fact_repay_date", false));
+    	if(planLists==null||planLists.size()<=0) {
+    		logger.error("该业务编号下还款计划列表不存在");
+    		return Result.error("9999", "还款信息有误");
+    	}
+    	Set<String> set=new HashSet<String>();
+    	Date lastPayDate=planLists.get(0).getFactRepayDate();//按还款日期降序取第一个还款日期
+    	for(RepaymentBizPlanList planList:planLists) {
+  
+    		set.add(planList.getPlanListId());
+    	}
+    	List<RepaymentBizPlanListDetail> planListDetails=repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().in("plan_list_id",set).eq("business_id", businessId));
+       	if(planListDetails==null) {
+    		logger.error("该业务编号下还款计划列表明细不存在");
+    		return Result.error("9999", "还款信息有误");
+    	}
+       	BigDecimal payedPrincipal=new BigDecimal(0);
+       	BigDecimal payedInterest=new BigDecimal(0);
+       	for(RepaymentBizPlanListDetail detail:planListDetails) {
+       		if(10==detail.getPlanItemType()) {
+       			payedPrincipal=payedPrincipal.add((detail.getFactAmount()==null?new BigDecimal(0):detail.getFactAmount()));
+       		}
+       		if(20==detail.getPlanItemType()) {
+       			payedInterest=payedInterest.add((detail.getFactAmount()==null?new BigDecimal(0):detail.getFactAmount()));
+       		}
+       	}
+       	Map<String,Object> plan=new HashMap<String,Object>();
+       	plan.put("payedPrincipal", payedPrincipal);
+       	plan.put("payedInterest", payedInterest);
+       	plan.put("lastPayDate", lastPayDate);
+       	int overdueDays=DateUtil.getDiffDays(lastPayDate, new Date());//逾期天数
+     	plan.put("overdueDays", overdueDays);
+     	//出款信息
+     	Set<Integer> outTypes=new HashSet<Integer>();
+     	outTypes.add(0);
+     	outTypes.add(1);
+     	List<BizOutputRecord> outputRecords=bizOutputRecordService.selectList(new EntityWrapper<BizOutputRecord>().eq("business_id", businessId).in("withdraw_type", outTypes).orderBy("fact_output_date", true));
+    	Map<String,Object> outputRecord=new HashMap<String,Object>();
+    	if(outputRecords!=null&&outputRecords.size()>0) {
+    		outputRecord.put("factOutputDate", outputRecords.get(0).getFactOutputDate());
+    		outputRecord.put("outputUserName", outputRecords.get(0).getOutputUserName());
+    	}
+    	
+    	List<CarAuction> carAuctions=carAuctionService.selectList(new EntityWrapper<CarAuction>().eq("business_id", businessId));
+    	CarAuction carAuction=new CarAuction();
+    	if(carAuctions!=null&&carAuctions.size()==1) {
+    		carAuction=carAuctions.get(0);
+    	}
+    	Map<String, Object> map=new HashMap<String,Object>();
+    	//拍卖登记附件
+    	List<DocType> docTypes=docTypeService.selectList(new EntityWrapper<DocType>().eq("type_code", "AfterLoan_Material_CarAuction"));
+    	if(docTypes!=null&&docTypes.size()==1) {
+    	List<Doc> fileList=docService.selectList(new EntityWrapper<Doc>().eq("doc_type_id",docTypes.get(0).getDocTypeId()).eq("business_id", businessId).orderBy("doc_id"));
+    	map.put("returnRegFiles", fileList);
+    	}
+    	processService.getProcessShowInfo(map, processId, ProcessTypeEnums.Aply_CarAuction);
+    	map.put("carBasic", carBasic==null?new CarBasic():carBasic);
+    	map.put("business", business==null?new BasicBusiness():business);
+    	map.put("drag", (drag==null||drag.size()<=0)?new CarDrag():drag.get(0));
+    	map.put("repayPlan", plan);
+    	map.put("outputRecord", outputRecord);
+    	map.put("carAuction", carAuction);
+    
+    
+    	return Result.build("0000", "操作成功", map);
+    }
+    @SuppressWarnings("unchecked")
+	@ApiOperation(value = "拍卖审核")
+    @PostMapping("/auctionAudit")
+    public Result<Object> auctionAudit( @RequestBody Map<String,Object> params){
+    try {
+    	CarBasic carBase=JsonUtil.map2obj((Map<String,Object>)params.get("carBasic"), CarBasic.class);
+    	CarAuction carAuction=JsonUtil.map2obj((Map<String,Object>)params.get("carAuction"), CarAuction.class);
+    	List<FileVo> files=JsonUtil.map2objList(params.get("returnRegFiles"), FileVo.class);
+    	AuditVo auditVo=JsonUtil.map2obj((Map<String,Object>)params.get("auditVo"), AuditVo.class);
+    	CarBasic retCarBasic=carBasicService.selectById(carAuction.getBusinessId());
+    	
+    	if(retCarBasic==null) {
+    		logger.error("该业务记录不存在");
+    		return Result.error("9999", "无效业务");
+    	}
+    	if(!CarStatusEnums.PENDING.getStatusCode().equals(retCarBasic.getStatus())) {
+    		logger.error("非待处置状态的车辆不能进行拍卖");
+    		return Result.error("9999", "非待处置状态的车辆不能进行拍卖");
+    	}
+    	carBase.setBusinessId(retCarBasic.getBusinessId());
+   
+    	List<CarAuction> carAuctions=carAuctionService.selectList(new EntityWrapper<CarAuction>().eq("business_id", carAuction.getBusinessId()).ne("status", AuctionStatusEnums.DRAFT.getKey()));
+    	if(carAuctions!=null&&carAuctions.size()>0) {
+    		for(CarAuction carAuc:carAuctions) {
+    			if(AuctionStatusEnums.AUDIT.getKey().equals(carAuc.getStatus())) {
+    				logger.error("该申请已提交审核，business_id="+carAuction.getBusinessId());
+    	    		return Result.error("9999", "该申请已提交审核,请勿重复提交");
+    			}else {
+    				carAuction.setAuctionId(carAuc.getAuctionId());
+    				
+    				
+    			}
+    		}
+    	}else {
+    		if(StringUtils.isEmpty(carAuction.getAuctionId())) {
+    		carAuction.setAuctionId(UUID.randomUUID().toString());
+    		carAuction.setCreateTime(new Date());
+    		carAuction.setCreateUser("admin");
+    		}
+    	}
+    	if(files!=null&&files.size()>0) {
+    		for(FileVo file:files) {
+    			DocTmp tmp=docTmpService.selectById(file.getOldDocId());//将临时表保存的上传信息保存到主表中
+    			if(tmp!=null) {
+    				Doc doc=new Doc();
+    				BeanUtils.copyProperties(tmp, doc);
+    				doc.setOriginalName(file.getOriginalName());
+    				docService.insertOrUpdate(doc);
+    			}
+    			
+    		}
+    	}
+    	processService.saveProcessApprovalResult(auditVo, ProcessTypeEnums.HOUSE_LOAN_LITIGATION);
+    	carAuction.setStatus(AuctionStatusEnums.AUDITED.getKey());
+    	carAuctionService.insertOrUpdate(carAuction);
+    	
+    	carBase.setStatus(CarStatusEnums.AUCTION.getStatusCode());
+    	carBase.setUpdateTime(new Date());
+     	carBasicService.updateById(carBase);
+    	return Result.build("0000", "操作成功", "");
+    }catch (Exception e) {
+    	logger.error(e.getMessage());
+    	return Result.error("9999", "操作成功");
+	}
     }
 }
 

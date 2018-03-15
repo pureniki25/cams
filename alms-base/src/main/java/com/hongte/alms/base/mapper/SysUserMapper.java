@@ -19,4 +19,6 @@ public interface SysUserMapper extends SuperMapper<SysUser> {
 
 	List<String> selectUsersByRoleAndEare(@Param("roleCode") String roleCode, @Param("areaCodes") List<String> areaCodes);
 
+
+	List<SysUser> selectUsersByRole(@Param("roleCode") String roleCode);
 }

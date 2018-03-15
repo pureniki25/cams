@@ -53,14 +53,21 @@ public class AfterLoanStandingBookReq extends PageRequest {
     @ApiModelProperty(value="清算一",name="liquidationOne",dataType = "String")
     private String  liquidationOne; //清算一
 
+    private List<String> liquidationOneUIds;//清算一用户ID列表
+
     @ApiModelProperty(value="清算二",name="liquidationTow",dataType = "String")
     private String  liquidationTow;  //清算二
 
+    private List<String> liquidationTowUIds;//清算二用户ID列表
+
     @ApiModelProperty(value="业务状态",name="businessStatus",dataType = "int")
-    private Integer businessStatus;   //业务状态
+    private Integer businessStatus;   //业务状态（贷后状态）
+
+//    @ApiModelProperty(value="还款状态",name="repayStatus",dataType = "int")
+//    private Integer repayStatus;      //还款状态
 
     @ApiModelProperty(value="还款状态",name="repayStatus",dataType = "int")
-    private Integer repayStatus;      //还款状态
+    private String repayStatus;      //还款状态
 
     @ApiModelProperty(value="客户名称",name="customerName",dataType = "String")
     private String  customerName;  //客户名称
@@ -194,11 +201,11 @@ public class AfterLoanStandingBookReq extends PageRequest {
         this.businessStatus = businessStatus;
     }
 
-    public Integer getRepayStatus() {
+    public String getRepayStatus() {
         return repayStatus;
     }
 
-    public void setRepayStatus(Integer repayStatus) {
+    public void setRepayStatus(String repayStatus) {
         this.repayStatus = repayStatus;
     }
 
@@ -233,5 +240,21 @@ public class AfterLoanStandingBookReq extends PageRequest {
 
     public void setCrpIdsArray(String[] crpIdsArray) {
         this.crpIdsArray = crpIdsArray;
+    }
+
+    public List<String> getLiquidationOneUIds() {
+        return liquidationOneUIds;
+    }
+
+    public void setLiquidationOneUIds(List<String> liquidationOneUIds) {
+        this.liquidationOneUIds = liquidationOneUIds;
+    }
+
+    public List<String> getLiquidationTowUIds() {
+        return liquidationTowUIds;
+    }
+
+    public void setLiquidationTowUIds(List<String> liquidationTowUIds) {
+        this.liquidationTowUIds = liquidationTowUIds;
     }
 }

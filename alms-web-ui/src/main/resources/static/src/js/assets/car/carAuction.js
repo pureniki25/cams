@@ -84,6 +84,7 @@ window.layinit(function (htConfig) {
 	    		,carPosition:''//车辆位置
 	    		,remark:''//备注
 	    		,viewLastEvaluationAmount:''//只展示的最新评估值
+	    		,viewInsuranceExpirationDate:''//只为展示最近评估的保险到期日期
 	    	}
 	       ,drag:{
 	    	   dragDate:''// 拖车日期
@@ -236,6 +237,9 @@ window.layinit(function (htConfig) {
 	    		});
 	      	$("#viewSampleEndTime").focus(function(){
 	    		  $("#viewSampleEndTime").css("border","1px solid #ccc");
+	    		});
+	      	$("#consultantTel").focus(function(){
+	    		  $("#consultantTel").css("border","1px solid #ccc");
 	    		});
 	      	$("#handleUnit").focus(function(){
 	    		  $("#handleUnit").css("border","1px solid #ccc");
@@ -436,7 +440,7 @@ window.layinit(function (htConfig) {
 	
 	            $.ajax({
 	                type: "POST",
-	                url: basePath+'car/AuctionDetail',
+	                url: basePath+'car/auctionDetail',
 	                data: {"businessId":businessId},
 	                // contentType: "application/json; charset=utf-8",
 	                success: function (data) {
@@ -453,6 +457,7 @@ window.layinit(function (htConfig) {
 	                		vm.carBasic.differAmount=data.data.carBasic.lastEvaluationAmount-data.data.carBasic.evaluationAmount;
 	                	}
 	                	vm.carBasic.assessOdometer=vm.carBasic.odometer;//为页面验证用
+	                	vm.carBasic.viewInsuranceExpirationDate=vm.carBasic.insuranceExpirationDate;
 	                	vm.carAuction=data.data.carAuction;
 	                	if(vm.carAuction.fareRange==null){
 	                		vm.carAuction.fareRange='';
@@ -520,15 +525,17 @@ window.layinit(function (htConfig) {
 	    	
 	    		vm.carAuction.businessId=businessId;
 	    		//页面信息验证
+	    		
 	    		if(vm.carBasic.annualVerificationExpirationDate==''||vm.carBasic.annualVerificationExpirationDate==null){
 	    			$("#annualVerificationExpirationDate").css("border","1px solid #FF3030");
 	    			return ;
 	    		}
+	    		
 	    		if(vm.carBasic.odometer==''||vm.carBasic.odometer==null){
 	    			$("#odometer").css("border","1px solid #FF3030");
 	    			return ;
 	    		}
-
+	     	
 	    		if (!ex.test(vm.carBasic.odometer)) {  
 	    			$("#odometer").css("border","1px solid #FF3030");
 	    			layer.msg("请输入整整数！",{icon:5,shade: [0.8, '#393D49']});
@@ -551,8 +558,8 @@ window.layinit(function (htConfig) {
 		    		}
 	    		}
 	    		if(vm.carBasic.lastTransferDate !=null&&vm.carBasic.lastTransferDate!=''){
-	    			
-	    			var inputDate=new Date(vm.carBasic.lastTransferDate.replace("-", "/").replace("-", "/")).toLocaleDateString();  
+	    			var inputDate=new Date(vm.carBasic.lastTransferDate.replace("-", "/").replace("-", "/"));  
+	    		
 	    			if(inputDate>currentDate){
 	    				$("#lastTransferDate").css("border","1px solid #FF3030");
 	    				layer.msg("不能大于当前日期！",{icon:5,shade: [0.8, '#393D49']});
@@ -560,12 +567,18 @@ window.layinit(function (htConfig) {
 	    			}
 	    			
 	    		}
+	      		if(vm.carBasic.lastEvaluationAmount==''||vm.carBasic.lastEvaluationAmount==null){
+	    			$("#lastEvaluationAmount").css("border","1px solid #FF3030");
+	    			return ;
+	    		}
+	
 	    		if(vm.carBasic.insuranceExpirationDate !=null&&vm.carBasic.insuranceExpirationDate!=''){
 	    			
-	    			var inputDate=new Date(vm.carBasic.insuranceExpirationDate.replace("-", "/").replace("-", "/")).toLocaleDateString();  
-	    			if(inputDate>currentDate){
+	    			var inputDate=new Date(vm.carBasic.insuranceExpirationDate.replace("-", "/").replace("-", "/")); 
+	    			var lastDate=new Date(vm.carBasic.viewInsuranceExpirationDate.replace("-", "/").replace("-", "/"));
+	    			if(inputDate<lastDate){
 	    				$("#insuranceExpirationDate").css("border","1px solid #FF3030");
-	    				layer.msg("不能大于当前日期！",{icon:5,shade: [0.8, '#393D49']});
+	    				layer.msg("不能小于最后评估时保险到期日期！",{icon:5,shade: [0.8, '#393D49']});
 	    				return ;
 	    			}
 	    			
@@ -633,7 +646,7 @@ window.layinit(function (htConfig) {
 	    			return ;
 	    		}else{
 	    	
-	    			var inputDate=new Date(vm.carAuction.auctionStartTime.replace("-", "/").replace("-", "/")).toLocaleDateString();  
+	    			var inputDate=new Date(vm.carAuction.auctionStartTime.replace("-", "/").replace("-", "/"));  
 	    			if(inputDate>currentDate){
 	    				$("#auctionStartTime").css("border","1px solid #FF3030");
 	    				layer.msg("不能大于当前日期！",{icon:5,shade: [0.8, '#393D49']});
@@ -645,8 +658,8 @@ window.layinit(function (htConfig) {
 	    			$("#auctionEndTime").css("border","1px solid #FF3030");
 	    			return ;
 	    		}else{
-	    			var startDate=new Date(vm.carAuction.auctionStartTime.replace("-", "/").replace("-", "/")).toLocaleString();
-	    			var inputDate=new Date(vm.carAuction.auctionEndTime.replace("-", "/").replace("-", "/")).toLocaleString();  
+	    			var startDate=new Date(vm.carAuction.auctionStartTime.replace("-", "/").replace("-", "/"));
+	    			var inputDate=new Date(vm.carAuction.auctionEndTime.replace("-", "/").replace("-", "/"));  
 	    			if(inputDate<=startDate){
 	    				$("#auctionEndTime").css("border","1px solid #FF3030");
 	    				layer.msg("结束时间不能小于等于开始时间！",{icon:5,shade: [0.8, '#393D49']});
@@ -670,7 +683,7 @@ window.layinit(function (htConfig) {
 	    			$("#buyStartTime").css("border","1px solid #FF3030");
 	    			return ;
 	    		}else{
-	    			var inputDate=new Date(vm.carAuction.buyStartTime.replace("-", "/").replace("-", "/")).toLocaleDateString();  
+	    			var inputDate=new Date(vm.carAuction.buyStartTime.replace("-", "/").replace("-", "/"));  
 	    		
 	    			if(inputDate>currentDate){
 	    				$("#buyStartTime").css("border","1px solid #FF3030");
@@ -680,11 +693,11 @@ window.layinit(function (htConfig) {
 	    			
 	    		}
 	    		if(vm.carAuction.buyEndTime==''||vm.carAuction.buyEndTime==null){
-	    			$("#auctionEndTime").css("border","1px solid #FF3030");
+	    			$("#buyEndTime").css("border","1px solid #FF3030");
 	    			return ;
 	    		}else{
-	    			var startDate=new Date(vm.carAuction.buyStartTime.replace("-", "/").replace("-", "/")).toLocaleString();
-	    			var inputDate=new Date(vm.carAuction.buyEndTime.replace("-", "/").replace("-", "/")).toLocaleString();  
+	    			var startDate=new Date(vm.carAuction.buyStartTime.replace("-", "/").replace("-", "/"));
+	    			var inputDate=new Date(vm.carAuction.buyEndTime.replace("-", "/").replace("-", "/"));  
 	    			if(inputDate<=startDate){
 	    				$("#buyEndTime").css("border","1px solid #FF3030");
 	    				layer.msg("结束时间不能小于等于开始时间！",{icon:5,shade: [0.8, '#393D49']});
@@ -700,7 +713,7 @@ window.layinit(function (htConfig) {
 	    			$("#consStartTime").css("border","1px solid #FF3030");
 	    			return ;
 	    		}else{
-	    			var inputDate=new Date(vm.carAuction.consStartTime.replace("-", "/").replace("-", "/")).toLocaleDateString();  
+	    			var inputDate=new Date(vm.carAuction.consStartTime.replace("-", "/").replace("-", "/"));  
 	    			if(inputDate>currentDate){
 	    				$("#consStartTime").css("border","1px solid #FF3030");
 	    				layer.msg("不能大于当前日期！",{icon:5,shade: [0.8, '#393D49']});
@@ -712,8 +725,8 @@ window.layinit(function (htConfig) {
 	    			$("#consEndTime").css("border","1px solid #FF3030");
 	    			return ;
 	    		}else{
-	    			var startDate=new Date(vm.carAuction.consStartTime.replace("-", "/").replace("-", "/")).toLocaleString();
-	    			var inputDate=new Date(vm.carAuction.consEndTime.replace("-", "/").replace("-", "/")).toLocaleString();  
+	    			var startDate=new Date(vm.carAuction.consStartTime.replace("-", "/").replace("-", "/"));
+	    			var inputDate=new Date(vm.carAuction.consEndTime.replace("-", "/").replace("-", "/"));  
 	    			if(inputDate<=startDate){
 	    				$("#consEndTime").css("border","1px solid #FF3030");
 	    				layer.msg("结束时间不能小于等于开始时间！",{icon:5,shade: [0.8, '#393D49']});
@@ -729,7 +742,7 @@ window.layinit(function (htConfig) {
 	    			$("#viewSampleStartTime").css("border","1px solid #FF3030");
 	    			return ;
 	    		}else{
-	    			var inputDate=new Date(vm.carAuction.viewSampleStartTime.replace("-", "/").replace("-", "/")).toLocaleDateString();  
+	    			var inputDate=new Date(vm.carAuction.viewSampleStartTime.replace("-", "/").replace("-", "/"));  
 	    			if(inputDate>currentDate){
 	    				$("#viewSampleStartTime").css("border","1px solid #FF3030");
 	    				layer.msg("不能大于当前日期！",{icon:5,shade: [0.8, '#393D49']});
@@ -741,8 +754,8 @@ window.layinit(function (htConfig) {
 	    			$("#viewSampleEndTime").css("border","1px solid #FF3030");
 	    			return ;
 	    		}else{
-	    			var startDate=new Date(vm.carAuction.viewSampleStartTime.replace("-", "/").replace("-", "/")).toLocaleString();
-	    			var inputDate=new Date(vm.carAuction.viewSampleEndTime.replace("-", "/").replace("-", "/")).toLocaleString();  
+	    			var startDate=new Date(vm.carAuction.viewSampleStartTime.replace("-", "/").replace("-", "/"));
+	    			var inputDate=new Date(vm.carAuction.viewSampleEndTime.replace("-", "/").replace("-", "/"));  
 	    			if(inputDate<=startDate){
 	    				$("#viewSampleEndTime").css("border","1px solid #FF3030");
 	    				layer.msg("结束时间不能小于等于开始时间！",{icon:5,shade: [0.8, '#393D49']});
@@ -789,7 +802,7 @@ window.layinit(function (htConfig) {
 	    			$("#paymentEndTime").css("border","1px solid #FF3030");
 	    			return ;
 	    		}else{
-	    			var inputDate=new Date(vm.carAuction.paymentEndTime.replace("-", "/").replace("-", "/")).toLocaleDateString();  
+	    			var inputDate=new Date(vm.carAuction.paymentEndTime.replace("-", "/").replace("-", "/"));  
 	    			if(inputDate>currentDate){
 	    				$("#paymentEndTime").css("border","1px solid #FF3030");
 	    				layer.msg("不能大于当前日期！",{icon:5,shade: [0.8, '#393D49']});
@@ -797,16 +810,14 @@ window.layinit(function (htConfig) {
 	    			}
 	    			
 	    		}
-	    		 //form.verify({});
-	    		//alert(JSON.stringify({"returnReg":vm.returnReg,"returnRegFiles":vm.returnRegFiles}));
-	    		//alert(subType);
-	    		//vm.reqRegFiles=vm.returnRegFiles;
+	    		
+	    		
 	    		for(var i=0;i<vm.returnRegFiles.length;i++){
 	    			vm.returnRegFiles[i].file='';
 	    			vm.reqRegFiles[i]=vm.returnRegFiles[i];
 
 	    		}
-	    	
+
 		          $.ajax({
 		               type: "POST",
 		               url: basePath+'car/auctionAply',
@@ -816,6 +827,9 @@ window.layinit(function (htConfig) {
 		            	   if (res.code == "0000"){
 		            		   vm.carAuction=res.data.carAuction;
 		            		   layer.msg("保存成功。"); 
+		            		   
+		            	   }else{
+		            		   layer.msg(res.msg);
 		            		   
 		            	   }
 		               },

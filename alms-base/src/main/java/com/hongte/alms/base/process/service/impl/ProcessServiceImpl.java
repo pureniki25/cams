@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
+import com.hongte.alms.base.assets.car.vo.AuditVo;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.ProcessEngineFlageEnums;
 import com.hongte.alms.base.enums.SysRoleAreaTypeEnums;
@@ -686,7 +687,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
             }
             return sb.toString();
         }else if(step.getApproveUserType()== ProcessApproveUserType.BY_ROLE.getKey()){
-            String roleCode = step.getApproveUserIdSelectSql();
+            String roleCode = step.getApproveUserRole();
             SysRole role =  sysRoleService.selectById(roleCode.trim());
             StringBuilder sb = new StringBuilder();
             int i=0;
@@ -781,5 +782,127 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
         }
         return list;
     }
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void saveProcessApprovalResult(AuditVo req ,ProcessTypeEnums processTypeEnums) throws IllegalAccessException, InstantiationException{
 
+
+//        ProcessLog log =  ClassCopyUtil.copyObject(req,ProcessLog.class);
+        //流程信息
+        Process process = selectById(req.getProcessId());
+
+        if(!process.getCurrentStep().equals(req.getCurrentStep())){
+            throw  new RuntimeException("当前流程状态与界面流程状态不一致，请刷新后重新提交!");
+        }
+
+        //判断登录用户是否是当前步骤的审批人之一
+//        if(!canApprove(process)){  调试暂时屏蔽
+//            throw  new RuntimeException("您不是流程的当前审批人!");
+//        }
+
+        //流程类型
+        ProcessType processType = processTypeService.getProcessTypeByCode(processTypeEnums.getKey());
+        if(processType == null){
+            throw new RuntimeException("流程类型未定义");
+        }
+
+        //当前节点定义
+        ProcessTypeStep currentStep = processTypeStepService.getProcessTypeStep(processType.getTypeId(),req.getCurrentStep());
+        if(currentStep == null){
+            throw new  RuntimeException("找不到 当前流程节点定义！");
+        }
+
+        //后一个节点定义
+        ProcessTypeStep nextStep = null;
+
+        //如果回退则取回退的步骤
+        if(req.getIsPass().equals(ProcessApproveResult.REFUSE.getKey())&&req.getIsDirectBack().equals(ProcessIsDerateBackEnums.YES.getKey())){
+            if(req.getNextStep()==null){
+                throw new  RuntimeException("应该设置回退到第几步！");
+            }
+            nextStep = processTypeStepService.getProcessTypeStep(processType.getTypeId(),req.getNextStep());
+            process.setIsDirectBack(ProcessIsDerateBackEnums.YES.getKey());//标识回退
+            process.setBackStep(currentStep.getStep());//记录回退的步骤
+        }else{
+           if(process.getIsDirectBack().equals(ProcessIsDerateBackEnums.YES.getKey())) {
+                //如果流程的是上一步回退的,则取流程中存储的应该跳转的节点
+                nextStep = processTypeStepService.getProcessTypeStep(processType.getTypeId(),process.getBackStep());
+            }else{//否则直接取后一个
+                if(currentStep.getNextStep()!=null){
+                    nextStep = processTypeStepService.getProcessTypeStep(processType.getTypeId(),currentStep.getNextStep());
+                }
+            }
+            process.setIsDirectBack(ProcessIsDerateBackEnums.NO.getKey());//取消回退标志
+            process.setBackStep(null);//清除回退步骤
+
+        }
+
+
+
+        //1.添加log记录
+        ProcessLog log=new ProcessLog();
+        log.setProcessLogId(UUID.randomUUID().toString());
+        log.setProcessId(req.getProcessId());
+        log.setProcessName(req.getProcessName());
+        log.setTypeId(processType.getTypeId());
+        log.setTypeStepId(currentStep.getTypeStepId());
+        log.setStepName(currentStep.getStepName());
+        log.setApproveUserId(loginUserInfoHelper.getUserId());
+        log.setCurrentStep(process.getCurrentStep());
+        log.setNextStep(currentStep.getNextStep());
+        log.setCreateUser(Constant.DEV_DEFAULT_USER);
+        log.setCreateTime(new Date());
+        log.setActionDesc(req.getRemark());
+        log.setIsPass(req.getIsPass());
+        processLogService.insert(log);
+
+        //添加抄送记录
+        for(int i=0;i<req.getSendUserIds().length;i++){
+            ProcessLogCopySend copySend = new ProcessLogCopySend();
+            copySend.setProcessLogId(log.getProcessLogId());
+            copySend.setProcessSendId(UUID.randomUUID().toString());
+            copySend.setReceiveUserId(req.getSendUserIds()[i]);
+            copySend.setReceiveUserName(Constant.DEV_DEFAULT_USER);
+            processLogCopySendService.insert(copySend);
+        }
+
+
+        //更新状态
+        //如果审批不通过且未定向打回则结束流程
+        if(log.getIsPass().equals(ProcessApproveResult.REFUSE.getKey())&&!log.getIsDirectBack().equals(ProcessIsDerateBackEnums.YES.getKey())){
+            process.setCurrentStep(null);
+            process.setApproveUserId(null);
+            process.setStatus(ProcessStatusEnums.END.getKey());
+            process.setProcessResult(ProcessApproveResult.REFUSE.getKey());
+        }else{
+            if(log.getIsDirectBack()!=null&&!log.getIsDirectBack().equals(ProcessIsDerateBackEnums.YES.getKey())){//定向打回
+                if(currentStep.getStepType().equals(ProcessStepTypeEnums.END_STEP.getKey())//节点类型为结束节点则结束流程
+                        || currentStep.getNextStep()== null){//没有下一步节点
+                    process.setCurrentStep(null);
+                    process.setApproveUserId(null);
+                    process.setStatus(ProcessStatusEnums.END.getKey());
+                    process.setProcessResult(ProcessApproveResult.PASS.getKey());
+                }
+            }
+        }
+        //更新当前审核人 和当前审核步骤
+        if(nextStep !=null){//如果还有下一步
+            process.setCurrentStep(nextStep.getStep());
+            process.setApproveUserId(getApproveUserId(nextStep,process.getCreateUser(),process));
+        }
+        /*else{
+            process.setCurrentStep(null);
+            process.setApproveUserId(null);
+            process.setStatus(ProcessStatusEnums.END.getKey());
+        }*/
+
+        //更新操作人和操作时间
+        process.setUpdateTime(new Date());
+        process.setUpdateUser(loginUserInfoHelper.getUserId());
+
+        updateAllColumnProcess(process);
+
+        //updateProcess(process);
+
+    }
 }

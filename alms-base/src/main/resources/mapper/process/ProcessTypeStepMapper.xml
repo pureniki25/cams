@@ -15,11 +15,12 @@
         <result column="next_step" property="nextStep" />
         <result column="next_step_select_sql" property="nextStepSelectSql" />
         <result column="step_type" property="stepType" />
+        <result column="approve_user_role" property="approveUserRole" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        type_step_id AS typeStepId, type_id AS typeId, step_name AS stepName, approve_user_id AS approveUserId, approve_user_type AS approveUserType, approve_user_id_select_sql AS approveUserIdSelectSql, is_can_edit AS isCanEdit, step, next_step AS nextStep, next_step_select_sql AS nextStepSelectSql, step_type AS stepType
+        type_step_id AS typeStepId, type_id AS typeId, step_name AS stepName, approve_user_id AS approveUserId, approve_user_type AS approveUserType, approve_user_id_select_sql AS approveUserIdSelectSql, is_can_edit AS isCanEdit, step, next_step AS nextStep, next_step_select_sql AS nextStepSelectSql, step_type AS stepType, approve_user_role AS approveUserRole
     </sql>
 
 </mapper>
