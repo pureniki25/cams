@@ -189,7 +189,7 @@ window.layinit(function (htConfig) {
 var getSelectsData = function () {
 
     //取区域列表
-    axios.get(basePath + 'collection/getPhoneUrgeSelectsData')
+    axios.get(basePath + 'collection/getPhoneUrgeSelectsData?staffType='+staffType)
         .then(function (res) {
             if (res.data.code == "1") {
                 vm.areaList = res.data.data.area;
