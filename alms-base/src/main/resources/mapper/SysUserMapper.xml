@@ -41,9 +41,9 @@
 
     </select>
 
-    
+
     <select id="selectUsersByRole" resultType="com.hongte.alms.base.entity.SysUser">
-      SELECT 
+      SELECT
       <include refid="Table_Column_List"></include>
         FROM  tb_sys_user u
         JOIN tb_sys_user_role urole

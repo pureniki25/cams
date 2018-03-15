@@ -32,19 +32,19 @@ public interface TransferOfLitigationService {
 	 * @param crpId 还款计划ID
 	 * @return
 	 */
-	TransferOfLitigationVO sendTransferLitigationData(String businessId, String crpId);
+	TransferOfLitigationVO sendTransferLitigationData(String businessId, String crpId, String sendUrl);
 	
 	/**
      * 保存房贷移交法务信息
      * @param req
      */
-    void saveTransferLitigationHouse(TransferLitigationHouse req);
+    void saveTransferLitigationHouse(TransferLitigationHouse req, String sendUrl);
     
     /**
      * 保存车贷移交法务信息
      * @param req
      */
-    void saveTransferLitigationCar(TransferLitigationCar req);
+    void saveTransferLitigationCar(TransferLitigationCar req, String sendUrl);
     
     /**
      * 车贷业务结清试算明细查询

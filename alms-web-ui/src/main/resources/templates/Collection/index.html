@@ -156,7 +156,7 @@
                         <i-col span="6">
                             <form-item label="还款状态：" prop="repayStatus">
                                 <i-select v-model="searchForm.repayStatus" clearable filterable style="width:200px">
-                                    <i-option v-for="item in repayStatusList" :value="item.paramValue" :key="item.paramValue">{{ item.paramName }}</i-option>
+                                    <i-option v-for="item in repayStatusList" :value="item.paramName" :key="item.paramName">{{ item.paramName }}</i-option>
                                 </i-select>
                             </form-item>
                         </i-col>

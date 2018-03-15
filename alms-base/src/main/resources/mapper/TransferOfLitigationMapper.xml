@@ -62,7 +62,7 @@
 		  CONCAT(t2.`brand_name`, t2.`model`) model,
 		  t3.`create_time` createTime,
 		  t3.`evaluation_amount` evaluationAmount,
-		  t4.`drag_date` dragDate,
+		  (select t4.`drag_date` from tb_car_drag t4 where t1.`business_id` = t4.`business_id`) dragDate,
 		  t1.`operator_name` operatorName,
 		  t5.fact_principal factPrincipal,
 		  t5.fact_accrual factAccrual,
@@ -163,7 +163,6 @@
 		  WHERE IFNULL(a.repay_flag, 0) != 6) t5 
 		WHERE t1.`business_id` = t2.`business_id` 
 		  AND t1.`business_id` = t3.`business_id` 
-		  AND t1.`business_id` = t4.`business_id` 
 		  AND t1.`business_id` = t5.`business_id` 
 		  AND t1.`business_id` = t6.`business_id` 
 		  AND t1.`business_id` = #{businessId,jdbcType=VARCHAR}
@@ -225,6 +224,14 @@
 		  cc.fact_principal repaymentPrincipa,
 		  (SELECT tbr.period FROM tb_repayment_biz_plan_list tbr WHERE tbr.plan_list_id = #{crpId,jdbcType=VARCHAR}) businessAfterId ,
 		  cc.surplus_principal,
+		  (SELECT 
+		    COUNT(1) 
+		  FROM
+		    tb_repayment_biz_plan_list lst,
+		    tb_repayment_biz_plan p 
+		  WHERE lst.`plan_id` = p.`plan_id` 
+		    AND bb.`business_id` = p.original_business_id
+		    AND lst.current_status = '已还款') repaymentPeriods ,
 		  (SELECT 
 		    COUNT(1) 
 		  FROM
@@ -416,12 +423,12 @@
 	
 	<select id="queryCarLoanFees" resultType="map">
 		SELECT 
-		  a.`due_date` dueDate,
-		  a.`period` curPeriod, 
-		  c.plan_accrual planAccrual,
-		  c.plan_service_charge planServiceCharge,
-		  c.plan_guarantee_charge planGuaranteeCharge,
-		  c.plan_platform_charge planPlatformCharge,
+		  a.`due_date` dueDate,	-- 应还日期
+		  a.`period` curPeriod, 	-- 当前应还期数
+		  c.plan_accrual planAccrual,	-- 当期应还利息
+		  c.plan_service_charge planServiceCharge,	-- 本期应还服务费
+		  c.plan_guarantee_charge planGuaranteeCharge, -- 本期应还担保公司费用
+		  c.plan_platform_charge planPlatformCharge,	-- 本期应还平台费
 		  (SELECT 
 		    CASE
 		      WHEN SUM(`plan_amount`) > 0 
@@ -443,10 +450,10 @@
 		      AND t2.original_business_id = #{businessId,jdbcType=VARCHAR} 
 		      AND IFNULL(t3.plan_item_type, 0) = 30 
 		      AND IFNULL(t1.repay_flag, 0) != 6 
-		      AND IFNULL(t1.`period`, 0) != 0) tab) isPreCharge,
+		      AND IFNULL(t1.`period`, 0) != 0) tab) isPreCharge,	-- 是否分公司服务费前置收取
 		   (
 		   	SELECT COUNT(1) FROM `tb_repayment_biz_plan_list` WHERE business_id = b.original_business_id
-		   ) totalPeriod
+		   ) totalPeriod	-- 总期数
 		FROM
 		  tb_repayment_biz_plan_list a,
 		  tb_repayment_biz_plan b,

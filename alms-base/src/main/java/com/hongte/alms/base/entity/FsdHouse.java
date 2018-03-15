@@ -17,7 +17,7 @@ import io.swagger.annotations.ApiModelProperty;
  * </p>
  *
  * @author 胡伟骞
- * @since 2018-03-09
+ * @since 2018-03-14
  */
 @ApiModel
 @TableName("tb_fsd_house")
@@ -546,66 +546,6 @@ public class FsdHouse extends Model<FsdHouse> {
 	@TableField("house_situation")
 	@ApiModelProperty(required= true,value = "房产情况，0：全款房，1：按揭房")
 	private Integer houseSituation;
-    /**
-     * 房产权所属人身份证号码
-     */
-	@TableField("ower_identity_card")
-	@ApiModelProperty(required= true,value = "房产权所属人身份证号码")
-	private String owerIdentityCard;
-    /**
-     * 房产权所属人联系电话
-     */
-	@TableField("ower_phone")
-	@ApiModelProperty(required= true,value = "房产权所属人联系电话")
-	private String owerPhone;
-    /**
-     * 房产权所属人联系地址
-     */
-	@TableField("ower_address")
-	@ApiModelProperty(required= true,value = "房产权所属人联系地址")
-	private String owerAddress;
-    /**
-     * 房产权所属人邮箱
-     */
-	@TableField("ower_email")
-	@ApiModelProperty(required= true,value = "房产权所属人邮箱")
-	private String owerEmail;
-    /**
-     * 隐形共有人所属人
-     */
-	@TableField("hidden_name")
-	@ApiModelProperty(required= true,value = "隐形共有人所属人")
-	private String hiddenName;
-    /**
-     * 隐形共有人身份证号码
-     */
-	@TableField("hidden_ower_identity_card")
-	@ApiModelProperty(required= true,value = "隐形共有人身份证号码")
-	private String hiddenOwerIdentityCard;
-    /**
-     * 隐形共有人联系电话
-     */
-	@TableField("hidden_ower_phone")
-	@ApiModelProperty(required= true,value = "隐形共有人联系电话")
-	private String hiddenOwerPhone;
-    /**
-     * 隐形共有人联系地址
-     */
-	@TableField("hidden_ower_address")
-	@ApiModelProperty(required= true,value = "隐形共有人联系地址")
-	private String hiddenOwerAddress;
-    /**
-     * 隐形共有人邮箱
-     */
-	@TableField("hidden_ower_email")
-	@ApiModelProperty(required= true,value = "隐形共有人邮箱")
-	private String hiddenOwerEmail;
-    /**
-     * 房产类型，0：企业，1：个人
-     */
-	@TableField("house_belong_type")
-	@ApiModelProperty(required= true,value = "房产类型，0：企业，1：个人")
-	private Integer houseBelongType;
     /**
      * 创建时间
      */
@@ -1328,86 +1268,6 @@ public class FsdHouse extends Model<FsdHouse> {
 		this.houseSituation = houseSituation;
 	}
 
-	public String getOwerIdentityCard() {
-		return owerIdentityCard;
-	}
-
-	public void setOwerIdentityCard(String owerIdentityCard) {
-		this.owerIdentityCard = owerIdentityCard;
-	}
-
-	public String getOwerPhone() {
-		return owerPhone;
-	}
-
-	public void setOwerPhone(String owerPhone) {
-		this.owerPhone = owerPhone;
-	}
-
-	public String getOwerAddress() {
-		return owerAddress;
-	}
-
-	public void setOwerAddress(String owerAddress) {
-		this.owerAddress = owerAddress;
-	}
-
-	public String getOwerEmail() {
-		return owerEmail;
-	}
-
-	public void setOwerEmail(String owerEmail) {
-		this.owerEmail = owerEmail;
-	}
-
-	public String getHiddenName() {
-		return hiddenName;
-	}
-
-	public void setHiddenName(String hiddenName) {
-		this.hiddenName = hiddenName;
-	}
-
-	public String getHiddenOwerIdentityCard() {
-		return hiddenOwerIdentityCard;
-	}
-
-	public void setHiddenOwerIdentityCard(String hiddenOwerIdentityCard) {
-		this.hiddenOwerIdentityCard = hiddenOwerIdentityCard;
-	}
-
-	public String getHiddenOwerPhone() {
-		return hiddenOwerPhone;
-	}
-
-	public void setHiddenOwerPhone(String hiddenOwerPhone) {
-		this.hiddenOwerPhone = hiddenOwerPhone;
-	}
-
-	public String getHiddenOwerAddress() {
-		return hiddenOwerAddress;
-	}
-
-	public void setHiddenOwerAddress(String hiddenOwerAddress) {
-		this.hiddenOwerAddress = hiddenOwerAddress;
-	}
-
-	public String getHiddenOwerEmail() {
-		return hiddenOwerEmail;
-	}
-
-	public void setHiddenOwerEmail(String hiddenOwerEmail) {
-		this.hiddenOwerEmail = hiddenOwerEmail;
-	}
-
-	public Integer getHouseBelongType() {
-		return houseBelongType;
-	}
-
-	public void setHouseBelongType(Integer houseBelongType) {
-		this.houseBelongType = houseBelongType;
-	}
-
 	public Date getCreateTime() {
 		return createTime;
 	}
@@ -1535,16 +1395,6 @@ public class FsdHouse extends Model<FsdHouse> {
 			", houseProvisionalPrice=" + houseProvisionalPrice +
 			", isMarriageInnerHouse=" + isMarriageInnerHouse +
 			", houseSituation=" + houseSituation +
-			", owerIdentityCard=" + owerIdentityCard +
-			", owerPhone=" + owerPhone +
-			", owerAddress=" + owerAddress +
-			", owerEmail=" + owerEmail +
-			", hiddenName=" + hiddenName +
-			", hiddenOwerIdentityCard=" + hiddenOwerIdentityCard +
-			", hiddenOwerPhone=" + hiddenOwerPhone +
-			", hiddenOwerAddress=" + hiddenOwerAddress +
-			", hiddenOwerEmail=" + hiddenOwerEmail +
-			", houseBelongType=" + houseBelongType +
 			", createTime=" + createTime +
 			", createUser=" + createUser +
 			", updateTime=" + updateTime +

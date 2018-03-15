@@ -258,7 +258,7 @@ public class CollectionController {
         List<BasicBusinessType> btype_list =  basicBusinessTypeService.selectList(new EntityWrapper<BasicBusinessType>().orderBy("business_type_id"));
         retMap.put("businessType",(JSONArray) JSON.toJSON(btype_list, JsonUtil.getMapping()));
 
-
+        //跟进人员
         List<Map<String,String>> opr_list = new LinkedList<Map<String,String>>();
         List<SysUser> oprList =new LinkedList<>();
         if(staffType.equals(StaffPersonType.PHONE_STAFF.getKey())){
@@ -275,7 +275,6 @@ public class CollectionController {
             opr1.put("userName",user.getUserName());
             opr_list.add(opr1);
         }
-
 
         retMap.put("operators",(JSONArray) JSON.toJSON(opr_list));
 

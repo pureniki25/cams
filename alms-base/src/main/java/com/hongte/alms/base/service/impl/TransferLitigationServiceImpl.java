@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -63,9 +64,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 	private static final String XIAO_DAI_CAR = "xiaodai_car";
 	private static final String XIAO_DAI_HOUSE = "xiaodai_house";
-	private static final String TRANSFER_LITIGATION_HOST = "http://10.110.1.24:30903";
-	private static final String TRANSFER_LITIGATION_URI = "/api/importLitigation";
-
+	
 	@Autowired
 	private TransferOfLitigationMapper transferOfLitigationMapper;
 
@@ -186,7 +185,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	}
 
 	@Override
-	public TransferOfLitigationVO sendTransferLitigationData(String businessId, String crpId) {
+	public TransferOfLitigationVO sendTransferLitigationData(String businessId, String crpId, String sendUrl) {
 		TransferOfLitigationVO transferLitigationData = null;
 		if (StringUtil.isEmpty(crpId) || StringUtil.isEmpty(businessId)) {
 			return transferLitigationData;
@@ -210,7 +209,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 					transferLitigationData.setHouseList(assembleBusinessHouse(businessId));
 				}
-				sendLitigation(transferLitigationData);
+				sendLitigation(transferLitigationData, sendUrl);
 			}
 		} catch (Exception e) {
 			LOG.error("发送诉讼系统失败！！！", e);
@@ -252,7 +251,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			businessHouse.setHouseTotal(fsdHouse.getHouseTotal());
 			businessHouse.setHouseValue(fsdHouse.getHouseValue());
 			businessHouse.setOpenTime(fsdHouse.getOpenTime());
-			businessHouse.setPropertyType(String.valueOf(fsdHouse.getHouseBelongType()));
+			businessHouse.setPropertyType(String.valueOf(fsdHouse.getHouseType()));
 			businessHouse.setRegisterTime(fsdHouse.getRegisterTime());
 			businessHouse.setRemark(fsdHouse.getRemark());
 			businessHouse.setSecondMortgageBalance(fsdHouse.getSecondMortgageBalance());
@@ -283,7 +282,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		return Long.valueOf(StringUtil.isInteger(str) ? str : "0");
 	}
 
-	private void sendLitigation(TransferOfLitigationVO transferOfLitigationVo) {
+	private void sendLitigation(TransferOfLitigationVO transferOfLitigationVo, String sendUrl) throws ClientProtocolException, IOException {
 
 		CloseableHttpClient httpClient = null;
 		CloseableHttpResponse response = null;
@@ -292,7 +291,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			httpClient = HttpClients.createDefault();
 
 			// 创建post方式请求对象
-			HttpPost post = new HttpPost(TRANSFER_LITIGATION_HOST + TRANSFER_LITIGATION_URI);
+			HttpPost post = new HttpPost(sendUrl);
 			// 构造消息头
 			post.addHeader("Content-Type", "application/json");
 
@@ -308,12 +307,11 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 			// 检验返回码
 			int statusCode = response.getStatusLine().getStatusCode();
-			if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-				LOG.info("--sendLitigation-- 请求失败: " + statusCode);
+			if (statusCode == HttpStatus.SC_OK) {
+				LOG.info("--sendLitigation-- 请求成功: " + statusCode);
+			}else {
+				throw new ServiceRuntimeException("--sendLitigation-- 诉讼数据发送失败！！！" + statusCode);
 			}
-		} catch (Exception e) {
-			LOG.error("--sendLitigation-- 诉讼数据发送失败！！！", e);
-			throw new ServiceRuntimeException("--sendLitigation-- 诉讼数据发送失败！！！", e);
 		} finally {
 			if (httpClient != null) {
 				try {
@@ -335,7 +333,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 	@Transactional(rollbackFor = Exception.class)
 	@Override
-	public void saveTransferLitigationHouse(TransferLitigationHouse req) {
+	public void saveTransferLitigationHouse(TransferLitigationHouse req, String sendUrl) {
 
 		if (req == null || StringUtil.isEmpty(req.getBusinessId())) {
 			throw new ServiceRuntimeException("参数不能空！");
@@ -368,13 +366,13 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				new EntityWrapper<ProcessTypeStep>().eq("type_id", process.getProcessTypeid()).orderBy("step"));
 		if (!CollectionUtils.isEmpty(processTypeSteps)
 				&& process.getCurrentStep() == processTypeSteps.get(processTypeSteps.size() - 1).getStep()) {
-			sendTransferLitigationData(req.getBusinessId(), req.getCrpId());
+			sendTransferLitigationData(req.getBusinessId(), req.getCrpId(), sendUrl);
 		}
 	}
 
 	@Transactional(rollbackFor = Exception.class)
 	@Override
-	public void saveTransferLitigationCar(TransferLitigationCar req) {
+	public void saveTransferLitigationCar(TransferLitigationCar req, String sendUrl) {
 
 		if (req == null || StringUtil.isEmpty(req.getBusinessId())) {
 			throw new ServiceRuntimeException("参数不能空！");
@@ -407,7 +405,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				new EntityWrapper<ProcessTypeStep>().eq("type_id", process.getProcessTypeid()).orderBy("step"));
 		if (!CollectionUtils.isEmpty(processTypeSteps)
 				&& process.getCurrentStep() == processTypeSteps.get(processTypeSteps.size() - 1).getStep()) {
-			sendTransferLitigationData(req.getBusinessId(), req.getCrpId());
+			sendTransferLitigationData(req.getBusinessId(), req.getCrpId(), sendUrl);
 		}
 	}
 	
@@ -423,7 +421,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		}
 		// 根据还款计划ID找当期的 利息、服务费、担保公司费用、平台费
 		Map<String, Object> carLoanFees = transferOfLitigationMapper.queryCarLoanFees(businessId, billDate);
-		carLoanFees.remove("preLateFees");
+		carLoanFees.remove("planAccrual");
 		
 		resultMap.putAll(carLoanFees);
 		return resultMap;

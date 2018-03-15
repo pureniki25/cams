@@ -33,10 +33,12 @@
         pList.period as  periods,
         pList.after_id as  afterId,
 
-        company.district_id as districtId,
+        business.district_id as districtId,
+        business.district_name AS  districtAreaName,
         -- districtAreaName
         business.company_id as companyId,
-        company.area_name AS companyName,
+        business.company_name as companyName,
+--         company.area_name AS companyName,
         business.operator_id AS operatorId,
         business.operator_name AS operatorName,
         business.customer_id AS customerId,
@@ -62,7 +64,6 @@
         LEFT JOIN tb_basic_company as company ON business.company_id = company.area_id
         LEFT JOIN tb_basic_business_type as  b_type ON business.business_type = b_type.business_type_id
         LEFT JOIN tb_collection_status as  col_status ON pList.plan_list_id = col_status.crp_id
-
 
         <where>
             <if test="areaId !=null and areaId !=''">
@@ -108,13 +109,38 @@
             <if test="businessType !=null ">
                 and business.business_type = #{businessType}
             </if>
-            <!--   /*//清算一*/ -->
+            <!--   /*//业务状态（贷后状态）*/ -->
+            <if test="businessStatus !=null">
+                and col_status.collection_status LIKE '%${businessStatus}%'
+            </if>
+           <!--   /*//还款状态*/ -->
+            <if test="repayStatus !=null and repayStatus !='' ">
+                and pList.current_status = #{repayStatus}
+            </if>
+ <!--           &lt;!&ndash;   /*//清算一*/ &ndash;&gt;
             <if test="liquidationOne !=null and liquidationOne !=''  ">
                 and col_status.phone_staff LIKE '%${liquidationOne}%'
             </if>
-            <!--    /*//清算二*/ -->
+            &lt;!&ndash;    /*//清算二*/ &ndash;&gt;
             <if test="liquidationTow !=null and liquidationTow !=''  ">
                 and col_status.visit_staff LIKE '%${liquidationTow}%'
+            </if>-->
+
+            <!--   /*//清算一用户ID列表*/ -->
+            <if test="liquidationOneUIds !=null ">
+                and col_status.phone_staff  IN
+                <foreach collection="liquidationOneUIds" item="userId" index="index"
+                         open="(" close=")" separator=",">
+                    #{userId}
+                </foreach>
+            </if>
+            <!--   /*//清算二用户ID列表*/ -->
+            <if test="liquidationTowUIds !=null ">
+                and col_status.visit_staff  IN
+                <foreach collection="liquidationTowUIds" item="userId" index="index"
+                         open="(" close=")" separator=",">
+                    #{userId}
+                </foreach>
             </if>
             <!--   /*//用户ID列表*/ -->
             <if test="customerIds !=null ">
