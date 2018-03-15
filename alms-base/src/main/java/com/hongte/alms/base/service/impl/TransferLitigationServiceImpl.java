@@ -64,7 +64,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 	private static final String XIAO_DAI_CAR = "xiaodai_car";
 	private static final String XIAO_DAI_HOUSE = "xiaodai_house";
-	
+
 	@Autowired
 	private TransferOfLitigationMapper transferOfLitigationMapper;
 
@@ -237,7 +237,8 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			businessHouse.setDebtRegion(String.valueOf(fsdHouse.getDebtRatio()));
 			businessHouse.setFourthMortgageBalance(fsdHouse.getFourthMortgageBalance());
 			businessHouse.setFourthMortgageBank(fsdHouse.getFourthMortgageBank());
-			businessHouse.setFourthMortgageTime(DateUtil.stringToDate("yyyy-MM-dd HH:mm:ss", fsdHouse.getFourthMortgageTime()));
+			businessHouse.setFourthMortgageTime(
+					DateUtil.stringToDate("yyyy-MM-dd HH:mm:ss", fsdHouse.getFourthMortgageTime()));
 			businessHouse.setFourthMortgageTotal(fsdHouse.getFourthMortgageTotal());
 			businessHouse.setFourthMortgageType(fsdHouse.getFourthMortgageType());
 			businessHouse.setFourthMortgageYear(str2Integer(fsdHouse.getFourthMortgageYear()));
@@ -282,7 +283,8 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		return Long.valueOf(StringUtil.isInteger(str) ? str : "0");
 	}
 
-	private void sendLitigation(TransferOfLitigationVO transferOfLitigationVo, String sendUrl) throws ClientProtocolException, IOException {
+	private void sendLitigation(TransferOfLitigationVO transferOfLitigationVo, String sendUrl)
+			throws ClientProtocolException, IOException {
 
 		CloseableHttpClient httpClient = null;
 		CloseableHttpResponse response = null;
@@ -309,7 +311,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			int statusCode = response.getStatusLine().getStatusCode();
 			if (statusCode == HttpStatus.SC_OK) {
 				LOG.info("--sendLitigation-- 请求成功: " + statusCode);
-			}else {
+			} else {
 				throw new ServiceRuntimeException("--sendLitigation-- 诉讼数据发送失败！！！" + statusCode);
 			}
 		} finally {
@@ -408,36 +410,51 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			sendTransferLitigationData(req.getBusinessId(), req.getCrpId(), sendUrl);
 		}
 	}
-	
+
 	@Override
 	public Map<String, Object> carLoanBilling(CarLoanBilVO carLoanBilVO) {
 
-		if (carLoanBilVO == null || StringUtil.isEmpty(carLoanBilVO.getBusinessId())) {
+		if (carLoanBilVO == null || StringUtil.isEmpty(carLoanBilVO.getBusinessId())
+				|| carLoanBilVO.getBillDate() == null) {
 			return null;
 		}
 		// 获取车贷基础信息
 		String businessId = carLoanBilVO.getBusinessId();
 		Date billDate = carLoanBilVO.getBillDate(); // 预计结清日期
 		Map<String, Object> resultMap = queryCarLoanData(businessId);
-		
+
 		double innerLateFees = 0; // 期内滞纳金
 		double outsideInterest = 0; // 期外逾期利息
 		double preLateFees = 0; // 提前还款违约金
+		double squaredUp = 0; // 最终结清金额
+		double receivableTotal = 0; // 应收合计
 
 		if (resultMap != null && !resultMap.isEmpty()) {
-			
+
 			// 查询往期少交费用明细
 			resultMap.put("previousFees", transferOfLitigationMapper.queryPreviousFees(businessId, billDate));
-			
+
 			// 当期的 利息、服务费、担保公司费用、平台费
 			resultMap.putAll(transferOfLitigationMapper.queryCarLoanFees(businessId, billDate));
-			
+
 			Date minDueDate = (Date) resultMap.get("minDueDate"); // 状态为'逾期', '还款中'的最早应还日期
 			int overdueDays = differentDays(minDueDate, billDate); // 逾期天数
-			long isPreCharge = (long) resultMap.get("isPreCharge");	// 是否分公司服务费前置收取
-			double planAccrual = ((BigDecimal) resultMap.get("planAccrual")).doubleValue();	// 本期应还利息
-			int curPeriod = (int) resultMap.get("curPeriod");	// // 当前期数
-			long totalPeriod = (long) resultMap.get("totalPeriod");	// 总还款期数
+			long isPreCharge = (long) resultMap.get("isPreCharge"); // 是否分公司服务费前置收取
+			double planAccrual = ((BigDecimal) resultMap.get("planAccrual")).doubleValue(); // 本期应还利息
+			double planServiceCharge = ((BigDecimal) resultMap.get("planServiceCharge")).doubleValue(); // 本期应还服务费
+			double planPlatformCharge = ((BigDecimal) resultMap.get("planPlatformCharge")).doubleValue(); // 本期应还平台费
+			double planGuaranteeCharge = ((BigDecimal) resultMap.get("planGuaranteeCharge")).doubleValue(); // 本期应还担保公司费用
+			double balanceDue = ((BigDecimal) resultMap.get("balanceDue")).doubleValue(); // 往期少交费用合计
+			double parkingFees = carLoanBilVO.getParkingFees(); // 停车费
+			double gpsFees = carLoanBilVO.getGpsFees(); // GPS费
+			double dragFees = carLoanBilVO.getDragFees(); // 拖车费
+			double otherFees = carLoanBilVO.getOtherFees(); // 其他费用
+			double attorneyFees = carLoanBilVO.getAttorneyFees(); // 律师
+			double balance = 0; // 结余
+			double cash = 0; // 押金转还款金额
+
+			int curPeriod = (int) resultMap.get("curPeriod"); // // 当前期数
+			long totalPeriod = (long) resultMap.get("totalPeriod"); // 总还款期数
 
 			String repaymentTypeId = (String) resultMap.get("repaymentTypeId"); // 还款类型
 
@@ -451,13 +468,12 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 			// 还款类型：先息后本
 
-			double innerLate = carLoanBilVO.getInnerLateFees();	// 期内滞纳金计算费率
-			double outside = carLoanBilVO.getOutsideInterest();	// 期外逾期利息计算费率
+			double innerLate = carLoanBilVO.getInnerLateFees(); // 期内滞纳金计算费率
+			double outside = carLoanBilVO.getOutsideInterest(); // 期外逾期利息计算费率
 			int preLateFeeType = carLoanBilVO.getPreLateFees(); // 提前还款违约金类型
-			
+
 			innerLateFees = borrowMoney * innerLate * overdueDays;
-			outsideInterest = (overdueDays < 15)
-					? surplusPrincipal * outside / 30 * overdueDays
+			outsideInterest = (overdueDays < 15) ? surplusPrincipal * outside / 30 * overdueDays
 					: surplusPrincipal * outside;
 
 			// 判断是否上标业务： outputPlatformId == 1 是， outputPlatformId == 0 否
@@ -470,8 +486,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			} else if ("等额本息".equals(repaymentTypeId)) {
 				planAccrual = surplusPrincipal * borrowRate / 12;
 				if (outputPlatformId == 0) {
-					outsideInterest = (overdueDays < 15)
-							? borrowMoney * outside / 30 * overdueDays
+					outsideInterest = (overdueDays < 15) ? borrowMoney * outside / 30 * overdueDays
 							: borrowMoney * outside;
 				}
 				if (outputPlatformId == 1 && isPreCharge == 0) {
@@ -488,18 +503,26 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 						// 剩余本金 * 0.005 * 剩余期数
 						preLateFees = surplusPrincipal * 0.005 * (totalPeriod - curPeriod);
 						break;
-
 					default:
 						break;
 					}
 				}
+				receivableTotal = borrowMoney + planAccrual + planServiceCharge + planPlatformCharge
+						+ planGuaranteeCharge + innerLateFees + outsideInterest + preLateFees + balanceDue + parkingFees
+						+ gpsFees + dragFees + otherFees + attorneyFees;
+				squaredUp = receivableTotal - cash - balance;
 			} else {
 				return null;
 			}
+
 			resultMap.put("innerLateFees", Math.round(innerLateFees * 100) * 0.01);
 			resultMap.put("outsideInterest", Math.round(outsideInterest * 100) * 0.01);
 			resultMap.put("preLateFees", Math.round(preLateFees * 100) * 0.01);
 			resultMap.put("planAccrual", Math.round(planAccrual * 100) * 0.01);
+			resultMap.put("receivableTotal", Math.round(receivableTotal * 100) * 0.01);
+			resultMap.put("squaredUp", Math.round(squaredUp * 100) * 0.01);
+			resultMap.put("cash", Math.round(cash * 100) * 0.01);
+			resultMap.put("balance", Math.round(balance * 100) * 0.01);
 		}
 
 		return resultMap;
