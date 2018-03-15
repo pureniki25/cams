@@ -32,7 +32,7 @@ window.layinit(function (htConfig) {
     var _htConfig = htConfig;
     basePath = _htConfig.coreBasePath;
     getDeductionPlatformInfo();
-
+    getCountInfo();
     getSelectsData();
     vm = new Vue({
         el: '#app',
@@ -58,6 +58,10 @@ window.layinit(function (htConfig) {
             smsTypeList:[],
             businessTypeList:[],
             platformList:[],
+            countByBusinessIdSucess:[],
+            countByBusinessId:[],
+            countbyLogId:[],
+            SumRepayAmount:[],
             repayStatusList: [
                 {name: '成功', id:'1'},
                 {name: '失败', id:'0'},
@@ -261,6 +265,63 @@ function getDetailUrl(){
 
     return url;
 }
+
+//获取代扣业务条数，成功代扣流水数，成功代扣总额，成功代扣业务条数
+var getCountInfo=function(){debugger
+	
+	
+    var self = this;  
+    var reqStr =basePath+ "RepaymentLogController/getCountInfo"
+    axios.get(reqStr)
+        .then(function (result) {debugger
+            if (result.data.code == "1") {
+            	
+      
+                vm.countByBusinessIdSucess = result.data.data.countByBusinessIdSucess;
+                vm.countByBusinessId = result.data.data.countByBusinessId;
+                vm.countbyLogId = result.data.data.countbyLogId;
+                vm.SumRepayAmount = result.data.data.SumRepayAmount;
+       
+                
+            } else {
+                self.$Modal.error({content: '获取数据失败：' + result.data.msg});
+            }
+        })
+
+    .catch(function (error) {
+        vm.$Modal.error({content: '接口调用异常!'});
+    });
+	
+
+}
+
+//获取详情的URL路径
+function getDetailUrl(){
+    var url
+    $.ajax({
+        type : 'GET',
+        async : false,
+        url : basePath +'RepaymentLogController/getRepayLogDetailById?logId='+vm.selectedRowInfo.logId,
+        headers : {
+            app : 'ALMS',
+            Authorization : "Bearer " + getToken()
+        },
+        success : function(data) {
+            var repayLogDetail = data.data;
+            url =  '/collectionUI/repaymentLogDetailUI?platformName='+vm.selectedRowInfo.platformName+'&thirdOrderId='+repayLogDetail.thirdOrderId+"&merchOrderId="+repayLogDetail.merchOrderId+"&currentAmount="+repayLogDetail.currentAmount+"&repayStatus="+repayLogDetail.repayStatus+"&createTime="+repayLogDetail.createTime+"&remark="+repayLogDetail.remark
+        },
+        error : function() {
+            layer.confirm('Navbar error:AJAX请求出错!', function(index) {
+                top.location.href = loginUrl;
+                layer.close(index);
+            });
+            return false;
+        }
+    });
+
+    return url;
+}
+
 function getMousePos(event) {
     var e =  window.event;
     return {'x':e.clientX,'y':e.clientY}
@@ -288,7 +349,7 @@ var getDeductionPlatformInfo=function(){
     var self = this;  
     var reqStr =basePath+ "DeductionController/getDeductionPlatformInfo"
     axios.get(reqStr)
-        .then(function (result) {debugger
+        .then(function (result) {
             if (result.data.code == "1") {
             	
       
