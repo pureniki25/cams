@@ -265,10 +265,12 @@
         process.status as status,
         process.approve_user_id as approveUserId,
         process.create_user as createUser,
+        s_user.user_name as createUserName,
 		business.company_id as companyId
         from tb_process as process
         LEFT JOIN tb_basic_business as business ON process.business_id = business.business_id
         LEFT JOIN tb_process_type as p_type ON process.process_typeid = p_type.type_id
+        LEFT JOIN tb_sys_user  as s_user  ON  process.create_user = s_user.user_id
 
         <!--            我已审批的 -->
         <if test="reqPageeType == 'Approved' ">
