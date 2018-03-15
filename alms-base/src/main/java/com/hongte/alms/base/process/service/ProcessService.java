@@ -121,5 +121,6 @@ public interface ProcessService extends BaseService<Process> {
      */
     List<ProcessVo> selectProcessVoList(ProcessReq key);
     public void saveProcessApprovalResult(AuditVo req ,ProcessTypeEnums processTypeEnums) throws IllegalAccessException, InstantiationException;
+    public Process insertOrUpdateProcess(ProcessSaveReq  processSaveReq, ProcessTypeEnums processTypeEnums);
 
 }

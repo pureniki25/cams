@@ -25,6 +25,7 @@ window.layinit(function (htConfig) {
 	        countys:'',
 	    	returnRegFiles:[{
 	    		file: '',
+	    		name:'',
 	    		originalName: '',
 	    		oldDocId:''
 	    	}],
@@ -198,6 +199,7 @@ window.layinit(function (htConfig) {
                   approveContent	:'柔柔弱弱若若若若若若若若若',// 审批意见
                   approveUserName	:'test11',// 审批人员姓名
                   approveDate		:'2018-2-3'// 审批日期
+                  ,actionDesc:''
               },
               {
                   id:'2', // id
@@ -497,6 +499,7 @@ window.layinit(function (htConfig) {
 	    		        	//alert(JSON.stringify(reFiles));
 	    		        	vm.returnRegFiles[index].oldDocId=reFiles.docId;
 	    		        	vm.returnRegFiles[index].originalName=reFiles.originalName;
+	    		        	vm.returnRegFiles[index].name=reFiles.originalName;
 	    		        	
 	    		        }
 	    		    });
@@ -510,33 +513,32 @@ window.layinit(function (htConfig) {
 	             });
 	    	},
 	    	removeTabTr: function (event, index) {
-	    		var docId=$('#docId'+index).val();
-	    	
-	    		var deled=false;
-	    		if(docId==null||docId==""){
-	    			deled=true;
-	    		}
-	    		else{
-		            $.ajax({
+	    		var docId=$('#docId'+index).val();  
+	    		var that = this;
+	    		// 如果文档id存在，那么进行ajax
+	    		if (docId) {
+	    			$.ajax({
 		                type: "GET",
 		                url: basePath+'doc/delOneDoc?docId='+docId,
-		                // data: {"businessId":businessId},
-		                // contentType: "application/json; charset=utf-8",
 		                success: function (data) {
-		                	deled=true;
-		                	
+		                	console.log(data, that);
+		                	that.returnRegFiles.splice(index, 1);
+		    	            if(that.returnRegFiles == ""){
+		    	            	that.addTabTr(event);
+		    	            }
 		                },
 		                error: function (message) {
 		                    layer.msg("删除文件失败。");
 		                    console.error(message);
 		                }
 		            });
+	    		// 否则直接删除
+	    		} else {
+	    			that.returnRegFiles.splice(index, 1);
+    	            if(that.returnRegFiles==""){
+    	            	that.addTabTr(event);
+    	            }
 	    		}
-	    		//alert("bbb");
-	            if(deled){
-	            //	alert("aaaa");
-	            this.returnRegFiles.splice(index, 1);
-	            }
 	    	},
 	    	addTabTr :function(event){
 	    		 this.returnRegFiles.push({
@@ -587,12 +589,14 @@ window.layinit(function (htConfig) {
 		                		if(i>0){
 		                			vm.returnRegFiles.push({
 		   	               			 file: '',
+		   	               			 name:docFiles[i].originalName,
 		   	               			 originalName: docFiles[i].originalName,
 		   	               			 oldDocId:docFiles[i].docId
 		   	               		 });
 		                		}else{
 			                		vm.returnRegFiles[i].oldDocId=docFiles[i].docId;
 			                		vm.returnRegFiles[i].originalName=docFiles[i].originalName;
+			                		vm.returnRegFiles[i].name=docFiles[i].originalName;
 		                		}
 		                		// i++;
 		                	}
@@ -618,7 +622,7 @@ window.layinit(function (htConfig) {
 	                     //赋值流程信息
 	                     var p = data.data.process;
 	                     if(p!=null&& p.length>0){
-	                        // vm.approvalInfoForm.process = p[0];
+	                         vm.approvalInfoForm.process = p[0];
 	                    	 vm.audit=p[0];
 	                         vm.approvalInfoFormShowFlage = true;
 	                         vm.approvalInfoList = data.data.processLogs;
@@ -957,6 +961,11 @@ window.layinit(function (htConfig) {
 	    			}
 	    			
 	    		}
+	    		if((vm.approvalInfoForm.isPass==''||vm.approvalInfoForm.isPass==null)&&vm.approvalInfoForm.process.status!=-1){
+	    			alert(processStatus);
+	    			layer.msg("请输入是否同意审批",{icon:5,shade: [0.8, '#393D49']});
+	    			return ;
+	    		}
 
 	    		for(var i=0;i<vm.returnRegFiles.length;i++){
 	    			vm.returnRegFiles[i].file='';
@@ -980,7 +989,7 @@ window.layinit(function (htConfig) {
                   	 }
                    }
 	    	
-	    		alert(JSON.stringify(vm.audit));
+	    		//alert(JSON.stringify(vm.audit));
 		          $.ajax({
 		               type: "POST",
 		               url: basePath+'car/auctionAudit',
@@ -991,6 +1000,8 @@ window.layinit(function (htConfig) {
 		            		   vm.carAuction=res.data.carAuction;
 		            		   layer.msg("保存成功。"); 
 		            		   
+		            	   }else{
+		            		   layer.msg("提交失败:"+res.msg);  
 		            	   }
 		               },
 		               error: function (message) {

@@ -36,6 +36,8 @@
 		when
 		car.status='07' then '已撤销'
 		when car.status='08' then '转公车申请中'
+		when car.status='09' then '拍卖审核中'
+		when car.status='10' then '拍卖审核中'
 		else ''
 		end status
 		from tb_car_basic car
@@ -43,10 +45,11 @@
 		car.business_id=bus.business_id
 		<!-- join tb_basic_company com on bus.asset_id=com.asset_side_id -->
 		join tb_repayment_biz_plan pl on pl.business_id=bus.business_id
+		 join
+		tb_car_drag drag on drag.business_id=bus.business_id
 		left
 		join tb_car_detection det on det.business_id=bus.business_id
-		left join
-		tb_car_drag drag on drag.business_id=bus.business_id
+
 		<where>
 			<if test="businessId !=null and businessId !=''">
 				and bus.business_id LIKE #{businessId}
