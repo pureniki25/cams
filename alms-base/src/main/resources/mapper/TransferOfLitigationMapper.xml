@@ -62,7 +62,13 @@
 		  CONCAT(t2.`brand_name`, t2.`model`) model,
 		  t3.`create_time` createTime,
 		  t3.`evaluation_amount` evaluationAmount,
-		  (select t4.`drag_date` from tb_car_drag t4 where t1.`business_id` = t4.`business_id`) dragDate,
+		  (SELECT 
+		    t4.`drag_date` 
+		  FROM
+		    tb_car_drag t4 
+		  WHERE t1.`business_id` = t4.`business_id`
+		  ORDER BY t4.`drag_date` DESC
+		  LIMIT 1) dragDate,
 		  t1.`operator_name` operatorName,
 		  t5.fact_principal factPrincipal,
 		  t5.fact_accrual factAccrual,
@@ -71,14 +77,18 @@
 		  t5.due_date dueDate,
 		  IFNULL(t5.overdue_days, 0) overdueDays,
 		  t6.output_user_name outputUserName,
-		  (select min(fact_output_date) `第一次出款日期` 
-			from (
-				select tt1.business_id,tt1.fact_output_date
-				from tb_biz_output_record tt1
-				where ifnull(tt1.withdraw_type,0) = 0 or ifnull(tt1.withdraw_type,0) = 1
-			) tab
-			where tab.business_id = t1.`business_id`
-			group by tab.business_id) factOutputDate,
+		  (SELECT 
+		    MIN(fact_output_date) `第一次出款日期` 
+		  FROM
+		    (SELECT 
+		      tt1.business_id,
+		      tt1.fact_output_date 
+		    FROM
+		      tb_biz_output_record tt1 
+		    WHERE IFNULL(tt1.withdraw_type, 0) = 0 
+		      OR IFNULL(tt1.withdraw_type, 0) = 1) tab 
+		  WHERE tab.business_id = t1.`business_id` 
+		  GROUP BY tab.business_id) factOutputDate,
 		  (SELECT 
 		    fact_output_money 
 		  FROM
@@ -107,7 +117,7 @@
 		    ) surplus_principal,
 		    (
 		      c.plan_service_charge - c.fact_service_charge
-		    ) surplusServiceCharge
+		    ) surplusServiceCharge 
 		  FROM
 		    tb_repayment_biz_plan_list a 
 		    JOIN tb_repayment_biz_plan b 
