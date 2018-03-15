@@ -290,9 +290,9 @@ public class TransferOfLitigationController {
 	@ApiOperation(value = "查询车贷结清试算明细")
 	@GetMapping("/queryCarLoanBilDetail")
 	@ResponseBody
-	public Result<Map<String, Object>> queryCarLoanBilDetail(@RequestParam String businessId, @RequestParam Date billDate) {
+	public Result<Map<String, Object>> queryCarLoanBilDetail(@RequestParam String businessId) {
 		try {
-			Map<String, Object> resultMap = transferOfLitigationService.queryCarLoanBilDetail(businessId, billDate);
+			Map<String, Object> resultMap = transferOfLitigationService.queryCarLoanData(businessId);
 			if (resultMap != null && !resultMap.isEmpty()) {
 				return Result.success(resultMap);
 			} else {

@@ -251,7 +251,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			businessHouse.setHouseTotal(fsdHouse.getHouseTotal());
 			businessHouse.setHouseValue(fsdHouse.getHouseValue());
 			businessHouse.setOpenTime(fsdHouse.getOpenTime());
-			businessHouse.setPropertyType(String.valueOf(fsdHouse.getHouseType()));
+			businessHouse.setPropertyType(fsdHouse.getHouseType());
 			businessHouse.setRegisterTime(fsdHouse.getRegisterTime());
 			businessHouse.setRemark(fsdHouse.getRemark());
 			businessHouse.setSecondMortgageBalance(fsdHouse.getSecondMortgageBalance());
@@ -410,24 +410,6 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	}
 	
 	@Override
-	public Map<String, Object> queryCarLoanBilDetail(String businessId, Date billDate) {
-		if (StringUtil.isEmpty(businessId)) {
-			return null;
-		}
-		// 车贷明细
-		Map<String, Object> resultMap = queryCarLoanData(businessId);
-		if (resultMap == null || resultMap.isEmpty()) {
-			return null;
-		}
-		// 根据还款计划ID找当期的 利息、服务费、担保公司费用、平台费
-		Map<String, Object> carLoanFees = transferOfLitigationMapper.queryCarLoanFees(businessId, billDate);
-		carLoanFees.remove("planAccrual");
-		
-		resultMap.putAll(carLoanFees);
-		return resultMap;
-	}
-
-	@Override
 	public Map<String, Object> carLoanBilling(CarLoanBilVO carLoanBilVO) {
 
 		if (carLoanBilVO == null || StringUtil.isEmpty(carLoanBilVO.getBusinessId())) {
@@ -436,34 +418,26 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		// 获取车贷基础信息
 		String businessId = carLoanBilVO.getBusinessId();
 		Date billDate = carLoanBilVO.getBillDate(); // 预计结清日期
+		Map<String, Object> resultMap = queryCarLoanData(businessId);
 		
-		int preLateFeeType = carLoanBilVO.getPreLateFees(); // 提前还款违约金类型
 		double innerLateFees = 0; // 期内滞纳金
 		double outsideInterest = 0; // 期外逾期利息
 		double preLateFees = 0; // 提前还款违约金
 
-		Map<String, Object> resultMap = queryCarLoanData(businessId);
-
-		// 根据还款计划ID找当期的 利息、服务费、担保公司费用、平台费
-		Map<String, Object> carLoanFees = transferOfLitigationMapper.queryCarLoanFees(businessId, billDate);
-
-		int overdueDays = 0; // 逾期天数
-		long isPreCharge = 0; // 是否分公司服务费前置收取
-		double planAccrual = 0; // 本期利息
-		int curPeriod = 0;	// 当前期数
-		long totalPeriod = 0;
-
-		if (carLoanFees != null && !carLoanFees.isEmpty()) {
-			Date dueDate = (Date) carLoanFees.get("dueDate"); // 当前期数应还日期
-			overdueDays = differentDays(dueDate, billDate);
-			resultMap.putAll(carLoanFees);
-			isPreCharge = (long) carLoanFees.get("isPreCharge");
-			planAccrual = ((BigDecimal) carLoanFees.get("planAccrual")).doubleValue();
-			curPeriod = (int) carLoanFees.get("curPeriod");
-			totalPeriod = (long) carLoanFees.get("totalPeriod");
-		}
-
 		if (resultMap != null && !resultMap.isEmpty()) {
+			
+			// 查询往期少交费用明细
+			resultMap.put("previousFees", transferOfLitigationMapper.queryPreviousFees(businessId, billDate));
+			
+			// 当期的 利息、服务费、担保公司费用、平台费
+			resultMap.putAll(transferOfLitigationMapper.queryCarLoanFees(businessId, billDate));
+			
+			Date minDueDate = (Date) resultMap.get("minDueDate"); // 状态为'逾期', '还款中'的最早应还日期
+			int overdueDays = differentDays(minDueDate, billDate); // 逾期天数
+			long isPreCharge = (long) resultMap.get("isPreCharge");	// 是否分公司服务费前置收取
+			double planAccrual = ((BigDecimal) resultMap.get("planAccrual")).doubleValue();	// 本期应还利息
+			int curPeriod = (int) resultMap.get("curPeriod");	// // 当前期数
+			long totalPeriod = (long) resultMap.get("totalPeriod");	// 总还款期数
 
 			String repaymentTypeId = (String) resultMap.get("repaymentTypeId"); // 还款类型
 
@@ -473,14 +447,18 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 			double surplusPrincipal = ((BigDecimal) resultMap.get("surplusPrincipal")).doubleValue(); // 剩余本金
 
-			double borrowRate = ((BigDecimal) resultMap.get("borrowRate")).doubleValue() * 0.01; // 利率
+			double borrowRate = ((BigDecimal) resultMap.get("borrowRate")).doubleValue() * 0.01; // 年利率
 
 			// 还款类型：先息后本
 
-			innerLateFees = borrowMoney * carLoanBilVO.getInnerLateFees() * overdueDays;
+			double innerLate = carLoanBilVO.getInnerLateFees();	// 期内滞纳金计算费率
+			double outside = carLoanBilVO.getOutsideInterest();	// 期外逾期利息计算费率
+			int preLateFeeType = carLoanBilVO.getPreLateFees(); // 提前还款违约金类型
+			
+			innerLateFees = borrowMoney * innerLate * overdueDays;
 			outsideInterest = (overdueDays < 15)
-					? surplusPrincipal * carLoanBilVO.getOutsideInterest() / 30 * overdueDays
-					: surplusPrincipal * carLoanBilVO.getOutsideInterest();
+					? surplusPrincipal * outside / 30 * overdueDays
+					: surplusPrincipal * outside;
 
 			// 判断是否上标业务： outputPlatformId == 1 是， outputPlatformId == 0 否
 			// 判断是否分公司服务费前置收取 isPreCharge == 1， 是 isPreCharge == 0 否
@@ -493,20 +471,22 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				planAccrual = surplusPrincipal * borrowRate / 12;
 				if (outputPlatformId == 0) {
 					outsideInterest = (overdueDays < 15)
-							? borrowMoney * carLoanBilVO.getOutsideInterest() / 30 * overdueDays
-							: borrowMoney * carLoanBilVO.getOutsideInterest();
+							? borrowMoney * outside / 30 * overdueDays
+							: borrowMoney * outside;
 				}
 				if (outputPlatformId == 1 && isPreCharge == 0) {
 					switch (preLateFeeType) {
 					case 1:
+						// 一个月利息
 						preLateFees = borrowMoney * borrowRate / 12;
 						break;
 					case 2:
+						// 借款本金 * 0.03
 						preLateFees = borrowMoney * 0.03;
 						break;
 					case 3:
-						// TODO 剩余期数
-						preLateFees = borrowMoney * borrowRate / 12;
+						// 剩余本金 * 0.005 * 剩余期数
+						preLateFees = surplusPrincipal * 0.005 * (totalPeriod - curPeriod);
 						break;
 
 					default:
@@ -532,34 +512,17 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	 * @param date2
 	 * @return
 	 */
-	private int differentDays(Date date1, Date date2) {
-		Calendar cal1 = Calendar.getInstance();
-		cal1.setTime(date1);
-
-		Calendar cal2 = Calendar.getInstance();
-		cal2.setTime(date2);
-		int day1 = cal1.get(Calendar.DAY_OF_YEAR);
-		int day2 = cal2.get(Calendar.DAY_OF_YEAR);
-
-		int year1 = cal1.get(Calendar.YEAR);
-		int year2 = cal2.get(Calendar.YEAR);
-		if (year1 != year2) {
-			// 同一年
-			int timeDistance = 0;
-			for (int i = year1; i < year2; i++) {
-				if (i % 4 == 0 && i % 100 != 0 || i % 400 == 0) // 闰年
-				{
-					timeDistance += 366;
-				} else {
-					// 不是闰年
-					timeDistance += 365;
-				}
-			}
-
-			return timeDistance + (day2 - day1);
-		} else {
-			// 不同年
-			return day2 - day1;
+	private int differentDays(Date first, Date second) {
+		if (first.after(second)) {
+			return 0;
 		}
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(first);
+		int cnt = 0;
+		while (calendar.getTime().compareTo(second) != 0) {
+			calendar.add(Calendar.DATE, 1);
+			cnt++;
+		}
+		return cnt;
 	}
 }
