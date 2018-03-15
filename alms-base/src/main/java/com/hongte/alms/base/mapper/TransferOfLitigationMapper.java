@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import com.hongte.alms.base.vo.billing.PreviousFeesVO;
 import com.hongte.alms.base.vo.litigation.BusinessCar;
 import com.hongte.alms.base.vo.litigation.TransferOfLitigationVO;
 import com.hongte.alms.base.vo.litigation.house.HouseLoanVO;
@@ -67,7 +68,16 @@ public interface TransferOfLitigationMapper {
 	/**
 	 * 查询车贷相关利息及服务费
 	 * @param businessId
+	 * @param billDate
 	 * @return
 	 */
 	Map<String, Object> queryCarLoanFees(@Param(value="businessId") String businessId, @Param(value="billDate") Date billDate);
+	
+	/**
+	 * 结清试算功能查询往期少交费用
+	 * @param businessId
+	 * @param billDate
+	 * @return
+	 */
+	List<PreviousFeesVO> queryPreviousFees(@Param(value="businessId") String businessId, @Param(value="billDate") Date billDate);
 }
