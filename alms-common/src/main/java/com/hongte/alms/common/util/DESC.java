@@ -15,7 +15,9 @@ import java.util.UUID;
  */
 @Component
 public class DESC {
+	  @Value(value="${bmApi.sign}")
     private String sign = "67902e2fd52504f3859065f8c58d654b";//请求签名
+	  @Value(value="${bmApi.disturbKey}")
     private String disturbKey = "YInLLGcrVnv"; //MD5干扰码
 
     private static final String UTF_8 = "UTF-8";
