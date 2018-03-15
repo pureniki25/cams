@@ -42,6 +42,7 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping("/notice")
 public class NoticeController {
 	private Logger logger = LoggerFactory.getLogger(NoticeController.class);
+	
 	@Qualifier("NoticeService")
 	@Autowired
 	NoticeService noticeService ;
