@@ -281,4 +281,12 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		return expenseSettleVO;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.hongte.alms.base.service.ExpenseSettleService#listLackFee(java.lang.String)
+	 */
+	@Override
+	public List<ExpenseSettleLackFeeVO> listLackFee(String businessId) {
+		return  expenseSettleMapper.listLackFee(businessId);
+	}
+
 }

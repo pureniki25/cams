@@ -60,6 +60,11 @@ public class ExpenseSettleVO implements Serializable{
 	 */
 	private BigDecimal balance ;
 	
+	/**
+	 * 押金
+	 */
+	private BigDecimal deposit ;
+	
 	private List<ExpenseSettleLackFeeVO> list ;
 
 	/**
@@ -221,5 +226,19 @@ public class ExpenseSettleVO implements Serializable{
 	 */
 	public void setBalance(BigDecimal balance) {
 		this.balance = balance;
+	}
+
+	/**
+	 * @return the deposit
+	 */
+	public BigDecimal getDeposit() {
+		return deposit;
+	}
+
+	/**
+	 * @param deposit the deposit to set
+	 */
+	public void setDeposit(BigDecimal deposit) {
+		this.deposit = deposit;
 	}
 }

@@ -408,7 +408,9 @@ var getShowInfo = function () {
             		vm.initalApplyInfo = res.data.data.carList[0];
             	} 
             	vm.commitInfoForm.businessId = res.data.data.baseInfo.businessId;
-            	vm.commitInfoForm.houseAddress = res.data.data.houseAddress.split('#');
+            	if (res.data.data.houseAddress != null && res.data.data.houseAddress.length > 0) {
+            		vm.commitInfoForm.houseAddress = res.data.data.houseAddress.split('#');
+				}
             	
             	var docFiles=res.data.data.returnRegFiles;
             	
@@ -491,7 +493,7 @@ var getShowInfo = function () {
 	//////////--------------  界面显示控制   结束---------------//////////
 	          }
             } else {
-                vm.$Modal.error({content: '执行失败，没有数据返回！' });
+                vm.$Modal.error({content: '执行失败，没有找到数据！' });
             }
         })
         .catch(function (error) {

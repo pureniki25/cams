@@ -7,6 +7,7 @@ window.layinit(function (htConfig) {
         el:"#app",
         data:{
             business:{
+                base:{},
                 info:{},
                 repaymentType:'',
                 output:{
@@ -46,7 +47,7 @@ window.layinit(function (htConfig) {
                 if(res.data.code=='1'){
                     console.log(res.data.data)
                     baseData = res.data.data
-                    app.business.info = Object.assign(res.data.data.business,res.data.data.detail) 
+                    app.business.base = Object.assign(res.data.data.business,res.data.data.detail) 
                     app.business.repaymentType = res.data.data.repaymentType
                     let outPutCount = 0 
                     $.each(res.data.data.output,function(i,o){
@@ -84,7 +85,7 @@ window.layinit(function (htConfig) {
                 }
                 ).then(function(res){
                     if(res.data.code=='1'){
-                        console.log(res.data.data)
+                        app.business.info = res.data.data
                     }else{
                         app.$Modal.error({content:'接口调用失败'})
                     }
@@ -98,6 +99,10 @@ window.layinit(function (htConfig) {
                     + this.business.info.servicecharge
                     + this.business.info.guaranteeFee
                     + this.business.info.platformFee
+                    + this.business.info.demurrage
+                    + this.business.info.penalty
+                    + this.business.info.lackFee
+                    + this.business.info.lateFee
                     + this.business.doorToDoorFee
                     + this.business.lawyerFee
                     + this.business.legalFee

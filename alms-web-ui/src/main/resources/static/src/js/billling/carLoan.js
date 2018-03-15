@@ -33,9 +33,9 @@ window.layinit(function (htConfig) {
 	        	planServiceCharge:"" 	, // 服务费
 	        	planGuaranteeCharge:""  , // 担保公司费用
 	        	planPlatformCharge:""   , // 平台费
-	        	innerLateFees:"0.0"  	, // 期内滞纳金
-	        	outsideInterest:"0.0"  	, // 期外逾期利息
-	        	preLateFees:"0.0"  	, // 提前还款违约金
+	        	innerLateFees:""  	, // 期内滞纳金
+	        	outsideInterest:""  	, // 期外逾期利息
+	        	preLateFees:""  	, // 提前还款违约金
 	        	balanceDue:""  	, // 往期少交费用（含滞纳金）
 	        	overdueDefault:""  	, // 逾期违约金
 	        	receivableTotal: '',//	应收合计
@@ -60,19 +60,19 @@ window.layinit(function (htConfig) {
 			arrearageDetailTitle: [
 				{
 					title: '期数',
-					key: 'repaymentNum'
+					key: 'period'
 				},
 				{
 					title: '服务费',
-					key: 'factPrincipal'
+					key: 'previousPlanServiceCharge'
 				},
 				{
 					title: '滞纳金',
-					key: 'surplusPrincipal'
+					key: 'previousLateFees'
 				},
 				{
 					title: '利息',
-					key: 'overdueDays'
+					key: 'previousPlanAccrual'
 				}
 			],
 			
@@ -97,6 +97,7 @@ window.layinit(function (htConfig) {
 		        .then(function (res) {
 		            if (res.data.data != null && res.data.code == 1) {
 		            	vm.baseInfoForm = res.data.data;
+		            	vm.arrearageDetailData = res.data.data.previousFees;
 		            } else {
 		                vm.$Modal.error({content: '执行失败，没有数据返回！' });
 		            }
@@ -109,18 +110,15 @@ window.layinit(function (htConfig) {
 	   },
 	   
 	   created:function(){
-		   if (this.commitInfoForm.billDate == null || this.commitInfoForm.billDate == '') {
-			   this.commitInfoForm.billDate = formatDate(new Date());
-		   }
 		   
-			var reqUrl = basePath + '/transferOfLitigation/queryCarLoanBilDetail?businessId=' + businessId + "&billDate=" + this.commitInfoForm.billDate
+			var reqUrl = basePath + '/transferOfLitigation/queryCarLoanBilDetail?businessId=' + businessId
 			
 			axios.get(reqUrl).then(function(res){
 				if(res.data.code=='1'){
 					console.log(res.data.data)
-					vm.baseInfoForm = res.data.data
+					vm.baseInfoForm = res.data.data;
 				}else{
-					app.$Modal.error({content:'接口调用失败'})
+					vm.$Modal.error({content: '执行失败，没有找到数据！' });
 				}
 			}).catch(function(error){
 				app.$Modal.error({content:'接口调用失败'})

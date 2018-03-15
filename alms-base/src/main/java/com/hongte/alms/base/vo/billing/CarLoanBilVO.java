@@ -2,10 +2,13 @@ package com.hongte.alms.base.vo.billing;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 public class CarLoanBilVO {
 	/**
 	 * 预计结清日期
 	 */
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
 	private Date billDate;
 	/**
 	 * 期内滞纳金
