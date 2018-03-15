@@ -777,7 +777,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
                 statusStr = ProcessStatusEnums.nameOf(vo.getStatus());
             }
             vo.setProcessStatus(statusStr);
-            vo.setCreateUserName(vo.getCreateUser());
+//            vo.setCreateUserName(vo.getCreateUser());
 
         }
         return list;
