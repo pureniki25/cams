@@ -537,14 +537,14 @@ color: #FF3030;
 							<td class="td_label" rowspan="5">{{approvalInfo.stepName}}：</td>
 							<td class="td_label" >是否同意审批：</td>
 							<td colspan="4">
-							      <input name="sex" v-model="approvalInfo.isPassFlage" disabled type="radio"><label>是</label>&nbsp;&nbsp;
-      							  <input name="sex" v-model="approvalInfo.isPassFlage" disabled type="radio"><label>否</label>
+							      <input name="sex" v-model="approvalInfo.isPass" disabled type="radio" value="1"><label>是</label>&nbsp;&nbsp;
+      							  <input name="sex" v-model="approvalInfo.isPass" disabled type="radio" value="0"><label>否</label>
 							</td>
 						</tr>
 						<tr>
 							<td  rowspan="2" colspan="5">
 							     <textarea rows="" cols=""
-									style="width: 100%" maxlength="1000" v-model="approvalInfo.remark" disabled  placeholder="请填写审批记录"> </textarea>
+									style="width: 100%" maxlength="1000" v-model="approvalInfo.actionDesc" disabled  placeholder="请填写审批记录"> </textarea>
 							</td>
 						</tr>
 						<tr></tr>
