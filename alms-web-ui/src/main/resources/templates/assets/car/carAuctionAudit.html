@@ -271,7 +271,7 @@ color: #FF3030;
 							<td><input type="text" name="lname" v-model="carBasic.transferTimes" id="transferTimes"></td>
 							<td class="td_label">最后一次过户时间</td>
 							<td><input type="text" name="lname" v-model="carBasic.lastTransferDate"
-								id="lastTransferDate" placeholder="yyyy-MM-dd" id="lastTransferDate">
+								id="lastTransferDate" placeholder="yyyy-MM-dd">
 							</td>
 						</tr>
 						<tr>
@@ -284,7 +284,7 @@ color: #FF3030;
 								readonly="readonly" id="differAmount"></td>
 							<td class="td_label">保险到期日<label class="input_label">*</label></td>
 							<td><input type="text" name="lname" v-model="carBasic.insuranceExpirationDate"
-								id="insuranceExpirationDate" placeholder="yyyy-MM-dd" id="insuranceExpirationDate">
+								id="insuranceExpirationDate" placeholder="yyyy-MM-dd" >
 							</td>
 						</tr>
 						<tr>
@@ -524,24 +524,27 @@ color: #FF3030;
 					</table>
 				</div>
 			</div>
-		</div> 
+		</div> -->
 	    <div class="layui-row">
 			<div class="layui-col-xs6 layui-col-md12">
 				<div class="grid-demo layui-bg-gray">四、审批信息</div>
 				<div class="grid-demo layui-bg-gray">
+				<!-- 历史审批信息 -->
+					<table style="width: 100%">
+					<tr v-for="(approvalInfo) in approvalInfoList" ><td>
 					<table class="layui-table">
 						<tr >
-							<td class="td_label" rowspan="5">车辆评估师审批：</td>
+							<td class="td_label" rowspan="5">{{approvalInfo.stepName}}：</td>
 							<td class="td_label" >是否同意审批：</td>
 							<td colspan="4">
-							      <input name="sex" value="是" title="是" checked="checked" type="radio"><label>是</label>&nbsp;&nbsp;
-      							  <input name="sex" value="否" title="是" type="radio"><label>否</label>
+							      <input name="sex" v-model="approvalInfo.isPassFlage" disabled type="radio"><label>是</label>&nbsp;&nbsp;
+      							  <input name="sex" v-model="approvalInfo.isPassFlage" disabled type="radio"><label>否</label>
 							</td>
 						</tr>
 						<tr>
 							<td  rowspan="2" colspan="5">
 							     <textarea rows="" cols=""
-									style="width: 100%" maxlength="1000"> 信息填写有误</textarea>
+									style="width: 100%" maxlength="1000" v-model="approvalInfo.remark" disabled  placeholder="请填写审批记录"> </textarea>
 							</td>
 						</tr>
 						<tr></tr>
@@ -550,7 +553,7 @@ color: #FF3030;
 							<td class="td_label" >审批人员姓名</td>
 							<td>
 							<input type="text" name="lname"
-								class="input-border-none" value="李四" readonly="readonly">
+								class="input-border-none" v-model="approvalInfo.approveUserName"  readonly="readonly">
 							</td>
 						</tr>
 						<tr>
@@ -558,10 +561,48 @@ color: #FF3030;
 							<td class="td_label" >审批日期</td>
 							<td>
 							<input type="text" name="lname"
-								class="input-border-none" value="李四" readonly="readonly">
+								class="input-border-none" v-model="approvalInfo.createTime" readonly="readonly">
 							</td>
 						</tr>
-						
+						</table>
+						</td></tr></table>
+									
+						<!-- 当前审批人 -->			
+						<table class="layui-table" v-if = "applyOprShowFlage">
+						<tr >
+							<td class="td_label" rowspan="5">{{approvalInfoForm.approvalUserInfo}}：</td>
+							<td class="td_label" >是否同意审批：</td>
+							<td colspan="4">
+							      <input name="sex" v-model="approvalInfoForm.isPass"  type="radio" value="1"><label>是</label>&nbsp;&nbsp;
+      							  <input name="sex" v-model="approvalInfoForm.isPass"  type="radio" value="0"><label>否</label>
+							</td>
+						</tr>
+						<tr>
+							<td  rowspan="2" colspan="5">
+							     <textarea rows="" cols=""
+									style="width: 100%" maxlength="1000" v-model="approvalInfoForm.remark"   placeholder="请填写审批记录"> </textarea>
+							</td>
+						</tr>
+						<tr></tr>
+						<tr>
+							<td colspan="3"></td>
+							<td class="td_label" >审批人员姓名</td>
+							<td>
+							<input type="text" name="lname"
+								class="input-border-none" v-model="approvalInfoForm.approveUserName"  readonly="readonly">
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3"></td>
+							<td class="td_label" >审批日期</td>
+							<td>
+							<input type="text" name="lname"
+								class="input-border-none" v-model="approvalInfoForm.approveDate" readonly="readonly">
+							</td>
+						</tr>
+						</table>
+						<!--  
+						<table>
 						<tr >
 							<td class="td_label" rowspan="5">区域贷后主管审批：</td>
 							<td class="td_label" >是否同意审批：</td>
@@ -690,7 +731,9 @@ color: #FF3030;
 								class="input-border-none" value="李四" readonly="readonly">
 							</td>
 						</tr>
-						
+						</table>
+						-->
+						<table class="layui-table" >
 						<tr >
 							<td class="td_label" rowspan="5">添加抄送：</td>
 							<td colspan="5">
@@ -710,16 +753,16 @@ color: #FF3030;
 						<tr></tr>
 						<tr></tr>
 					</table>
+					
 				</div>
 			</div>
-		</div>-->
+		</div>
 		<div class="layui-row">
 			<div class="layui-col-xs6 layui-col-md12">
 			<div class="grid-demo layui-bg-gray">
-			   <button class="layui-btn" v-on:click="carAuctionAply($event,'audit')">提交审批</button>
-			   <button class="layui-btn layui-btn-normal" v-on:click="carAuctionAply($event,'draft')">保存草稿</button>
-			   <button class="layui-btn layui-btn-warm" v-on:click="carAuctionAplyClose()">撤销</button>
-			   <button class="layui-btn layui-btn-danger" style="float: right;">拍卖页面预览</button>
+			   <button class="layui-btn" v-on:click="carAuctionAudit()">提交审批</button>
+			   <button class="layui-btn layui-btn-warm" v-on:click="carAuctionAuditClose()">撤销</button>
+			 <!--   <button class="layui-btn layui-btn-danger" style="float: right;">拍卖页面预览</button> -->
 			</div>
 			</div>
 		</div>

@@ -24,7 +24,6 @@ public interface SysUserService extends BaseService<SysUser> {
 
     public List<String> selectUseIdsByName(String userName);
 
-
     /**
      * 根据用户ID查找出用户拥有权限的公司列表
      * @param userId

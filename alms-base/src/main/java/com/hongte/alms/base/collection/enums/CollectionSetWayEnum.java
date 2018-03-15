@@ -8,8 +8,7 @@ package com.hongte.alms.base.collection.enums;
 public enum CollectionSetWayEnum {
 
 	MANUAL_SET(1,"界面手动设置"),
-	AUTO_SET(2,"定时器自动设置"),
-	XINDAI_CALL(3,"信贷回调")
+	AUTO_SET(2,"定时器自动设置")
 	;
 
 	private Integer key; // 数据保存的值

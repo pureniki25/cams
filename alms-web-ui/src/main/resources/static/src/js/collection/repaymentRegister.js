@@ -15,11 +15,9 @@ window.layinit(function (htConfig) {
         ],
         repaymentMoney:[
             {type:'string',required:true,message:'还款金额不能为空',trigger:'blur'},
-            {pattern:"^\\d{1,8}(\\.\\d{1,2})?$", message: '请填写整数位数不大于8位，小数位数不超过两位的数字', trigger: 'blur'} 
         ],
         realRepaymentUser:[
-            {required:true,message:'实际还款人不能为空',trigger:'blur'},
-            {pattern:"^[\u4e00-\u9fa5]{1,20}$",message:"请输入长度20以内的汉字",trigger:'blur'}
+            {required:true,message:'实际还款人不能为空',trigger:'blur'}
         ],
         tradeType:[
             {required:true,message:'交易类型不能为空',trigger:'blur'}
