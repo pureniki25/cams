@@ -42,6 +42,16 @@
     </select>
 
 
+    <select id="selectUserByRoleAndComm" resultType="String">
+        SELECT uRole.user_id AS UserId FROM tb_sys_user_role  uRole LEFT JOIN tb_sys_user_area uArea
+        on uRole.user_id=uArea.user_id
+        WHERE 1=1
+        AND uArea.org_code = #{commId}
+        AND  uRole.role_code = #{roleCode}
+    </select>
+
+
+
     <select id="selectUsersByRole" resultType="com.hongte.alms.base.entity.SysUser">
       SELECT
       <include refid="Table_Column_List"></include>
