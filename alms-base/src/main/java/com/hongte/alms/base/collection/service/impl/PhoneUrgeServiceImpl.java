@@ -10,9 +10,11 @@ import com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo;
 import com.hongte.alms.base.collection.vo.StaffBusinessReq;
 import com.hongte.alms.base.collection.vo.StaffBusinessVo;
 import com.hongte.alms.base.entity.SysParameter;
+import com.hongte.alms.base.entity.SysUser;
 import com.hongte.alms.base.enums.RepayPlanStatus;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
 import com.hongte.alms.base.service.SysParameterService;
+import com.hongte.alms.base.service.SysUserService;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +39,15 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
     @Autowired
     PhoneUrgeMapper phoneUrgeMapper;
 
-    @Autowired()
+
+
+    @Autowired
     @Qualifier("SysParameterService")
     SysParameterService sysParameterService;
+
+    @Autowired
+    @Qualifier("SysUserService")
+    SysUserService sysUserService;
 
 //    @Override
 //    public Page<StaffBusinessVo> selectPhoneUrgePage(Page<StaffBusinessVo> pages, StaffBusinessReq key) {
@@ -67,7 +75,25 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
         pages.setCurrent(req.getPage());
         pages.setSize(req.getLimit());
 
+        if(req.getLiquidationOne()!=null){
+            req.setLiquidationOneUIds(sysUserService.selectUseIdsByName(req.getLiquidationOne()));
+        }
+        if(req.getLiquidationTow()!=null){
+            req.setLiquidationTowUIds(sysUserService.selectUseIdsByName(req.getLiquidationTow()));
+        }
+
         List<AfterLoanStandingBookVo> list = phoneUrgeMapper.selectAfterLoadStanding(pages,req);
+
+        for(AfterLoanStandingBookVo vo: list){
+            SysUser user = sysUserService.selectById(vo.getPhoneStaffId());
+            if(user!=null){
+                vo.setPhoneStaffName(user.getUserName());
+            }
+            user = sysUserService.selectById(vo.getVisitStaffId());
+            if(user!=null){
+                vo.setVisitStaffName(user.getUserName());
+            }
+        }
 
 //        pages.setRecords(setInfoForAfterLoanStandingBookVo(list));
         pages.setRecords(list);

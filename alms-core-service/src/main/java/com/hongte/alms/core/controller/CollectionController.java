@@ -122,7 +122,7 @@ public class CollectionController {
         List<SysParameter> businessStatusList = sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterTypeEnums.COLLECTION_STATUS.getKey()).orderBy("row_Index"));
         retMap.put("businessStatusList",(JSONArray) JSON.toJSON(businessStatusList, JsonUtil.getMapping()));
         //还款状态
-        List<SysParameter> repayStatusList =  sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterTypeEnums.REPAY_STATUS.getKey()).orderBy("row_Index"));
+        List<SysParameter> repayStatusList =  sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterTypeEnums.REPAY_STATUS.getKey()).eq("status",1).orderBy("row_Index"));
         retMap.put("repayStatusList",(JSONArray) JSON.toJSON(repayStatusList, JsonUtil.getMapping()));
         //催收级别
         List<SysParameter> collectLevelList = sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterTypeEnums.COLLECTION_LEVERS.getKey()).orderBy("row_Index"));
@@ -150,6 +150,7 @@ public class CollectionController {
 
         try{
             System.out.println(JSON.toJSONString(req));
+            if(req.getRepayStatus()!=null&&req.getRepayStatus().equals(""))req.setRepayStatus(null);
             Page<AfterLoanStandingBookVo> pages = phoneUrgeService.selectAfterLoanStandingBookPage(req);
 //            System.out.println(JSON.toJSONString(pages));
             return PageResult.success(pages.getRecords(),pages.getTotal());
@@ -258,7 +259,7 @@ public class CollectionController {
         List<BasicBusinessType> btype_list =  basicBusinessTypeService.selectList(new EntityWrapper<BasicBusinessType>().orderBy("business_type_id"));
         retMap.put("businessType",(JSONArray) JSON.toJSON(btype_list, JsonUtil.getMapping()));
 
-
+        //跟进人员
         List<Map<String,String>> opr_list = new LinkedList<Map<String,String>>();
         List<SysUser> oprList =new LinkedList<>();
         if(staffType.equals(StaffPersonType.PHONE_STAFF.getKey())){
@@ -275,7 +276,6 @@ public class CollectionController {
             opr1.put("userName",user.getUserName());
             opr_list.add(opr1);
         }
-
 
         retMap.put("operators",(JSONArray) JSON.toJSON(opr_list));
 

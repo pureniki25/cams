@@ -686,7 +686,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
             }
             return sb.toString();
         }else if(step.getApproveUserType()== ProcessApproveUserType.BY_ROLE.getKey()){
-            String roleCode = step.getApproveUserIdSelectSql();
+            String roleCode = step.getApproveUserRole();
             SysRole role =  sysRoleService.selectById(roleCode.trim());
             StringBuilder sb = new StringBuilder();
             int i=0;
