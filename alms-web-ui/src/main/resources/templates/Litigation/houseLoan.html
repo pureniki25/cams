@@ -261,7 +261,7 @@
 			</p>
 			<row :gutter="16">
 				<i-col span="12">
-                    <form-item v-if="applyInfoFormEditFlage" label="是否有意向还款："   prop="repaymentIntention">
+                    <form-item v-if="applyInfoFormEditFlage" label="客户是否有意向还款："   prop="repaymentIntention">
                         <i-input v-model="commitInfoForm.repaymentIntention" ></i-input>
                     </form-item>
                     <form-item v-else label="是否有意向还款："  disabled>
@@ -270,7 +270,7 @@
                 </i-col>
                 
 				<i-col span="12">
-                    <form-item v-if="applyInfoFormEditFlage" label="意向还款计划："   prop="repaymentIntentionDate">
+                    <form-item v-if="applyInfoFormEditFlage" label="客户意向还款计划："   prop="repaymentIntentionDate">
                     	<date-picker type="date" v-model="commitInfoForm.repaymentIntentionDate"/>
                     </form-item>
                     <form-item v-else label="意向还款计划："  disabled>
