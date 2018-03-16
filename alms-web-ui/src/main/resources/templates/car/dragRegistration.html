@@ -226,7 +226,8 @@
                         vin: '',
                         evaluationTime: '',
                         evaluationAmount: 0,
-                        evaluationUser: ''
+                        evaluationUser: '',
+                        currentUserName:''
                     },
                 registrationInfoForm:
                     {
@@ -364,6 +365,7 @@
                         .then(function (result) {
                             if (result.data.code == "1") {
                                 self.baseInfoForm = result.data.data;
+                                self.registrationInfoForm.dragHandler=self.baseInfoForm.currentUserName;
                             } else {
                                 self.$Modal.error({content: '获取数据失败，消息：' + result.data.msg});
                             }
@@ -433,6 +435,7 @@
 
                                 self.files[index].uploadResult.docId=doc.docId;
                                 self.files[index].uploadResult.originalName=doc.originalName;
+                                self.files[index].uploadRequest.newName=doc.originalName.slice(0,doc.originalName.lastIndexOf(".")-1)
                                 self.$set(self.files[index].uploadResult,'isSuccess',true);
                             }
                             else
@@ -499,6 +502,7 @@
                 }
             },
             created: function () {
+
                 var businessId = this.getQueryString("businessId");
                 this.getCarDragRegistrationBusinessInfo(businessId);
                 this.getArea();
