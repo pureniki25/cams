@@ -26,16 +26,16 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     private Boolean useGateWayflage;
 
 
-//    //定义时间格式转换器
-//    @Bean
-//    public MappingJackson2HttpMessageConverter jackson2HttpMessageConverter() {
-//        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-//        ObjectMapper mapper = new ObjectMapper();
-//        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-//        mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd"));
-//        converter.setObjectMapper(mapper);
-//        return converter;
-//    }
+    //定义时间格式转换器
+    @Bean
+    public MappingJackson2HttpMessageConverter jackson2HttpMessageConverter() {
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd"));
+        converter.setObjectMapper(mapper);
+        return converter;
+    }
 
 //    //添加转换器
 //    @Override
