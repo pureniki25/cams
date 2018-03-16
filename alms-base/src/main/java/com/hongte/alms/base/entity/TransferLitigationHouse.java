@@ -1,15 +1,15 @@
 package com.hongte.alms.base.entity;
 
 import java.io.Serializable;
-
+import java.math.BigDecimal;
 import java.util.Date;
-import com.baomidou.mybatisplus.annotations.TableId;
-import com.baomidou.mybatisplus.annotations.TableField;
+
 import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableField;
+import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
@@ -18,7 +18,7 @@ import io.swagger.annotations.ApiModelProperty;
  * </p>
  *
  * @author 胡伟骞
- * @since 2018-03-09
+ * @since 2018-03-16
  */
 @ApiModel
 @TableName("tb_transfer_litigation_house")
@@ -123,6 +123,17 @@ public class TransferLitigationHouse extends Model<TransferLitigationHouse> {
 	@TableField("second_pecuniary_condition")
 	@ApiModelProperty(required= true,value = "其他财务情况（分公司/区域贷后跟进结果）")
 	private String secondPecuniaryCondition;
+    /**
+     * 额定单价
+     */
+	@TableField("rated_price")
+	@ApiModelProperty(required= true,value = "额定单价")
+	private BigDecimal ratedPrice;
+    /**
+     * 是否易变现
+     */
+	@ApiModelProperty(required= true,value = "是否易变现")
+	private String liquidate;
     /**
      * 移交人
      */
@@ -295,6 +306,22 @@ public class TransferLitigationHouse extends Model<TransferLitigationHouse> {
 		this.secondPecuniaryCondition = secondPecuniaryCondition;
 	}
 
+	public BigDecimal getRatedPrice() {
+		return ratedPrice;
+	}
+
+	public void setRatedPrice(BigDecimal ratedPrice) {
+		this.ratedPrice = ratedPrice;
+	}
+
+	public String getLiquidate() {
+		return liquidate;
+	}
+
+	public void setLiquidate(String liquidate) {
+		this.liquidate = liquidate;
+	}
+
 	public String getOperator() {
 		return operator;
 	}
@@ -375,6 +402,8 @@ public class TransferLitigationHouse extends Model<TransferLitigationHouse> {
 			", secondRelatedPersonnel=" + secondRelatedPersonnel +
 			", firstPecuniaryCondition=" + firstPecuniaryCondition +
 			", secondPecuniaryCondition=" + secondPecuniaryCondition +
+			", ratedPrice=" + ratedPrice +
+			", liquidate=" + liquidate +
 			", operator=" + operator +
 			", operateDate=" + operateDate +
 			", processStatus=" + processStatus +
