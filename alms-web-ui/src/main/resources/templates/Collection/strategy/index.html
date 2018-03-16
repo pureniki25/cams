@@ -46,7 +46,7 @@
             <!--查询表单内容-->
             <row :gutter="16">
                 <i-col span="3">
-                    <i-button type="success" style="margin-left:15px" @click="assignSet" >分配设置</i-button>
+                    <i-button type="success" style="margin-left:15px" @click="assignSet"  ht-auth="assignSet">分配设置</i-button>
                 </i-col>
                 <i-col  span="16">
                 <i-form ref="searchForm"  :model="searchForm"    label-position="right" :label-width="100" inline>
@@ -73,7 +73,7 @@
                 </i-form>
                 </i-col>
                 <i-col span="5">
-                    <i-button type="info" :loading="loading" icon="ios-search" @click="toLoading" style="margin-right:10px">
+                    <i-button type="info" :loading="loading" icon="ios-search" @click="toLoading" style="margin-right:10px" ht-auth="personQuery">
                         <span v-if="!loading">查询</span>
                         <span v-else>查询中...</span>
                     </i-button>
@@ -88,7 +88,7 @@
                     <table id="listTable" lay-filter="listTable"></table>
                     <div style="display:none" id="barTools">
                         <!--layui-btn layui-btn-xs-->
-                        <i-button style="width:80px" type="success" lay-event="userSet" >设置</i-button>
+                        <i-button style="width:80px" type="success" lay-event="userSet" ht-auth="singleSet" >设置</i-button>
                     </div>
                 </i-col>
             </row>
@@ -197,7 +197,7 @@
                     <table id="timeListTable" lay-filter="timeListTable"></table>
                     <div style="display:none" id="timeListBarTools">
                         <!--layui-btn layui-btn-xs-->
-                        <i-button style="width:80px" type="success" lay-event="timeSet" >设置</i-button>
+                        <i-button style="width:80px" type="success" lay-event="timeSet" ht-auth="timeSingleSet" >设置</i-button>
                     </div>
                 </i-col>
             </row>
