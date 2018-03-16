@@ -1,7 +1,5 @@
 package com.hongte.alms.core.controller;
 
-import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,8 +25,12 @@ import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.TransferLitigationCar;
 import com.hongte.alms.base.entity.TransferLitigationHouse;
+import com.hongte.alms.base.process.entity.Process;
+import com.hongte.alms.base.process.entity.ProcessTypeStep;
 import com.hongte.alms.base.process.enums.ProcessTypeEnums;
 import com.hongte.alms.base.process.service.ProcessService;
+import com.hongte.alms.base.process.service.ProcessTypeService;
+import com.hongte.alms.base.process.service.ProcessTypeStepService;
 import com.hongte.alms.base.process.vo.ProcessLogReq;
 import com.hongte.alms.base.service.TransferLitigationCarService;
 import com.hongte.alms.base.service.TransferLitigationHouseService;
@@ -66,6 +68,14 @@ public class TransferOfLitigationController {
 	@Qualifier("ProcessService")
 	private ProcessService processService;
 	
+	@Autowired
+    @Qualifier("ProcessTypeService")
+    private ProcessTypeService processTypeService;
+	
+	@Autowired
+	@Qualifier("ProcessTypeStepService")
+	private ProcessTypeStepService processTypeStepService;
+	
 	@Value("${ht.litigation.url:http://172.16.200.110:30906/api/importLitigation}")
 	private String sendUrl;
 
@@ -93,20 +103,15 @@ public class TransferOfLitigationController {
 					
 					String houseAddr = applyList.get(0).getHouseAddress();
 					StringBuilder builder = new StringBuilder();
-					String[] houseArr = houseAddr.split("#");
+					String[] houseArr = houseAddr.split("--#separator#--");
 					
 					int count = 1;
 					if (houseAddr.length() > 0) {
 						for (String hArr : houseArr) {
-							String[] split = hArr.split("\\^");
-							String area = split[0];
-							String area2 = area.replace("[", "");
-							String area3 = area2.replace("]", "");
-							List<String> areaList = Arrays.asList(area3.split(","));
 							if (count < houseArr.length) {
-								builder.append("房产地址" + count++ + "：").append(areaList.get(0)).append(areaList.get(1)).append(areaList.get(2)).append(" " + split[1]).append("；房产抵押情况：").append(split[2]).append("#");
+								builder.append("房产地址" + count++ + "：").append(hArr).append("--#separator#--");
 							}else {
-								builder.append("房产地址" + count++ + "：").append(areaList.get(0)).append(areaList.get(1)).append(areaList.get(2)).append(" " + split[1]).append("；房产抵押情况：").append(split[2]);
+								builder.append("房产地址" + count++ + "：").append(hArr);
 							}
 						}
 					}
@@ -197,8 +202,10 @@ public class TransferOfLitigationController {
 				List<String> houseAreas = (List<String>) registrationInfoForm.get("houseArea");
 				String detailAddress = (String) registrationInfoForm.get("detailAddress");
 				String mortgageSituation = (String) registrationInfoForm.get("mortgageSituation");
+				
 				if (!CollectionUtils.isEmpty(houseAreas) && !StringUtil.isEmpty(detailAddress) && !StringUtil.isEmpty(mortgageSituation)) {
-					houseAddress.append(houseAreas).append("^").append(detailAddress).append("^").append(mortgageSituation).append("#");
+					String houseAreasStr = houseAreas.toString().replace("[", "").replace("]", "").replace(",", "");
+					houseAddress.append(houseAreasStr).append(" ").append(detailAddress).append("，房产抵押情况：").append(mortgageSituation).append("--#separator#--");
 				}
 			}
 			
@@ -212,19 +219,50 @@ public class TransferOfLitigationController {
 		}
 	}
 
-	@ApiOperation(value = "存储移交诉讼审批信息")
-	@PostMapping("/saveApprovalLogInfo")
+	@ApiOperation(value = "存储房贷移交诉讼审批信息")
+	@PostMapping("/saveHouseApprovalLogInfo")
 	@ResponseBody
-	public Result<String> saveApprovalLogInfo(@RequestBody ProcessLogReq req) {
+	public Result<String> saveHouseApprovalLogInfo(@RequestBody ProcessLogReq req) {
 		try {
 			// 存储审批结果信息
 			processService.saveProcessApprovalResult(req, ProcessTypeEnums.HOUSE_LOAN_LITIGATION);
+			Process process = processService.selectById(req.getProcess().getProcessId());
+			
+			List<ProcessTypeStep> processTypeSteps = processTypeStepService.selectList(
+					new EntityWrapper<ProcessTypeStep>().eq("type_id", process.getProcessTypeid()).orderBy("step"));
+			if (!CollectionUtils.isEmpty(processTypeSteps)
+					&& process.getCurrentStep() == processTypeSteps.get(processTypeSteps.size() - 1).getStep()) {
+				transferOfLitigationService.sendTransferLitigationData(req.getBusinessId(), req.getCrpId(), sendUrl);
+			}
 			return Result.success();
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
 			return Result.error("500", ex.getMessage());
 		}
 
+	}
+	
+	@ApiOperation(value = "存储车贷移交诉讼审批信息")
+	@PostMapping("/saveCarApprovalLogInfo")
+	@ResponseBody
+	public Result<String> saveCarApprovalLogInfo(@RequestBody ProcessLogReq req) {
+		try {
+			// 存储审批结果信息
+			processService.saveProcessApprovalResult(req, ProcessTypeEnums.CAR_LOAN_LITIGATION);
+			Process process = processService.selectById(req.getProcess().getProcessId());
+			
+			List<ProcessTypeStep> processTypeSteps = processTypeStepService.selectList(
+					new EntityWrapper<ProcessTypeStep>().eq("type_id", process.getProcessTypeid()).orderBy("step"));
+			if (!CollectionUtils.isEmpty(processTypeSteps)
+					&& process.getCurrentStep() == processTypeSteps.get(processTypeSteps.size() - 1).getStep()) {
+				transferOfLitigationService.sendTransferLitigationData(req.getBusinessId(), req.getCrpId(), sendUrl);
+			}
+			return Result.success();
+		} catch (Exception ex) {
+			LOG.error(ex.getMessage());
+			return Result.error("500", ex.getMessage());
+		}
+		
 	}
 
 	@ApiOperation(value = "根据流程ID查找房贷移交法务申请信息")

@@ -365,12 +365,6 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 					.eq("business_id", req.getBusinessId()).eq("process_id", req.getProcessId()));
 		}
 
-		List<ProcessTypeStep> processTypeSteps = processTypeStepService.selectList(
-				new EntityWrapper<ProcessTypeStep>().eq("type_id", process.getProcessTypeid()).orderBy("step"));
-		if (!CollectionUtils.isEmpty(processTypeSteps)
-				&& process.getCurrentStep() == processTypeSteps.get(processTypeSteps.size() - 1).getStep()) {
-			sendTransferLitigationData(req.getBusinessId(), req.getCrpId(), sendUrl);
-		}
 	}
 
 	@Transactional(rollbackFor = Exception.class)
@@ -405,12 +399,6 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 					.eq("business_id", req.getBusinessId()).eq("process_id", req.getProcessId()));
 		}
 
-		List<ProcessTypeStep> processTypeSteps = processTypeStepService.selectList(
-				new EntityWrapper<ProcessTypeStep>().eq("type_id", process.getProcessTypeid()).orderBy("step"));
-		if (!CollectionUtils.isEmpty(processTypeSteps)
-				&& process.getCurrentStep() == processTypeSteps.get(processTypeSteps.size() - 1).getStep()) {
-			sendTransferLitigationData(req.getBusinessId(), req.getCrpId(), sendUrl);
-		}
 	}
 
 	@Override
