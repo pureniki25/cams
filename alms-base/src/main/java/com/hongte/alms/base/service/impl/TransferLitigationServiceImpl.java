@@ -345,6 +345,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		processSaveReq.setBusinessId(req.getBusinessId());
 		processSaveReq.setProcessStatus(Integer.valueOf(req.getProcessStatus()));
 		processSaveReq.setTitle("房贷移交诉讼审批流程");
+        processSaveReq.setProcessId(req.getProcessId());
 
 		Process process = processService.saveProcess(processSaveReq, ProcessTypeEnums.HOUSE_LOAN_LITIGATION);
 
@@ -384,6 +385,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		processSaveReq.setBusinessId(req.getBusinessId());
 		processSaveReq.setProcessStatus(Integer.valueOf(req.getProcessStatus()));
 		processSaveReq.setTitle("车贷移交诉讼审批流程");
+        processSaveReq.setProcessId(req.getProcessId());
 
 		Process process = processService.saveProcess(processSaveReq, ProcessTypeEnums.CAR_LOAN_LITIGATION);
 

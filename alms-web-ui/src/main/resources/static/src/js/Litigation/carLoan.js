@@ -549,7 +549,7 @@ var saveApprovalInfo = function(){
     vm.approvalInfoForm.isPass = vm.approvalInfoForm.isPassFlage=="是"?"1":"2";   // 是否审批通过
     vm.approvalInfoForm.isDirectBack = vm.approvalInfoForm.isDirectBackFlage=="是"?"1":"0";  // 是否回退
     // ////////// --------------- 审批流程 标志位转换 ------------------///////////////
-
+    
     axios.post(basePath +'transferOfLitigation/saveApprovalLogInfo', vm.approvalInfoForm )
         .then(function (res) {
             if (res.data.code == "1") {
@@ -581,6 +581,10 @@ var saveapplyInfo = function(pStatus){
 	                }
 	                if(vm.commitInfoForm.crpId == null){
 	                    vm.commitInfoForm.crpId = crpId;
+	                }
+	              //赋值 processId 
+	                if(vm.approvalInfoForm.process!=null){
+	                    vm.commitInfoForm.processId = vm.approvalInfoForm.process.processId;
 	                }
 	            	
 			    	vm.commitInfoForm.processStatus = pStatus;
