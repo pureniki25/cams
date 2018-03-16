@@ -48,6 +48,7 @@
         WHERE 1=1
         AND uArea.org_code = #{commId}
         AND  uRole.role_code = #{roleCode}
+        GROUP  BY   uRole.user_id
     </select>
 
 

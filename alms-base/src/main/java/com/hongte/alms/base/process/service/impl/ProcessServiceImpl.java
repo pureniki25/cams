@@ -695,8 +695,10 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
             StringBuilder sb = new StringBuilder();
             int i=0;
             if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.OVERALL.getKey())){//如果角色是全局的
-                List<SysUserRole> userRoles  = sysUserRoleService.selectList(new EntityWrapper<SysUserRole>().eq("role_code",roleCode));
+                List<SysUserRole> userRoles  = sysUserRoleService.selectList(new EntityWrapper<SysUserRole>().eq("role_code",roleCode).groupBy("user_id"));
                 if(userRoles.size()==0){
+                    logger.error("流程审批角色对应的用户找不到"+"       roleCode:"+roleCode + "" +
+                            "    processTypeId: " + step.getTypeId()+  "         step "+step.getStep());
                     throw new RuntimeException("流程审批角色对应的用户找不到");
                 }
                 for(SysUserRole userRole:userRoles){
@@ -710,11 +712,15 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
                 String  businessId = process.getBusinessId();
                 BasicBusiness business = basicBusinessService.selectById(businessId);
 
-                List<String> areas = sysOrgService.getParentsOrgs(business.getCompanyId());
+               // List<String> areas = sysOrgService.getParentsOrgs(business.getCompanyId());
 
 //                List<String> users = sysUserService.selectUsersByRoleAndEare(roleCode,areas);
                 List<String> users = sysUserService.selectUserByRoleAndComm(business.getCompanyId(),roleCode);
-
+                if(users.size()==0){
+                    logger.error("流程审批角色对应的用户找不到:companyId:"+business.getCompanyId()+"       roleCode:"+roleCode + "" +
+                            "    processTypeId: " + step.getTypeId()+  "         step "+step.getStep());
+                    throw new RuntimeException("流程审批角色对应的用户找不到");
+                }
                 for(String  map: users){
                     if(i>0){
                         sb.append(",");
@@ -772,8 +778,23 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
         for(ProcessVo vo: list){
 
 //            String statusStr = ProcessStatusEnums.nameOf(vo.getStatus())+"("+ Constant.DEV_DEFAULT_USER+")";
+            String[]  userIds = vo.getApproveUserId().split(",");
+            StringBuilder usb = new StringBuilder();
+            if(userIds.length>0){
+                int i = 0;
+                for(String userId:userIds){
+                    SysUser sysUser = sysUserService.selectById(userId);
+                    if(sysUser!=null){
+                        if(i>0){
+                            usb.append(",");
+                        }
+                        usb.append(sysUser.getUserName());
+                        i++;
+                    }
+                }
+            }
             SysUser sysUser = sysUserService.selectById(vo.getApproveUserId());
-            String name = sysUser!=null?sysUser.getUserName():vo.getApproveUserId();
+            String name = usb.length()>0?usb.toString():vo.getApproveUserId();
             String statusStr;
             if(vo.getStatus().equals(ProcessStatusEnums.RUNNING.getKey())){
                 statusStr = ProcessStatusEnums.nameOf(vo.getStatus())+"("+name +")";

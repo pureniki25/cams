@@ -66,7 +66,7 @@ public class TransferOfLitigationController {
 	@Qualifier("ProcessService")
 	private ProcessService processService;
 	
-	@Value("${ht.litigation.url}")
+	@Value("${ht.litigation.url:http://172.16.200.110:30906/api/importLitigation}")
 	private String sendUrl;
 
 	/**

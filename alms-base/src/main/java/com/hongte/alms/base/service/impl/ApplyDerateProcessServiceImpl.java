@@ -95,6 +95,7 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
         processSaveReq.setBusinessId(req.getBusinessId());
         processSaveReq.setProcessStatus(req.getProcessStatus());
         processSaveReq.setTitle(req.getTitle());
+        processSaveReq.setProcessId(req.getProcessId());
 
         Process process = processService.saveProcess(processSaveReq,ProcessTypeEnums.Apply_Derate);
 
