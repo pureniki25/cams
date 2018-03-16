@@ -55,6 +55,10 @@ public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
 	@TableField("xd_pool_id")
 	@ApiModelProperty(required= true,value = "原信贷款项池ID")
 	private Integer xdPoolId;
+	
+	@TableField("xd_matching_id")
+	@ApiModelProperty(required= true,value = "原信贷业务款项池关联表主键ID，对应tb_money_pool_carbusiness.id")
+	private Integer xdMatchingId ;
     /**
      * 原业务编号
      */
@@ -436,5 +440,19 @@ public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
 			", deleteUser=" + deleteUser +
 			", deleteTime=" + deleteTime +
 			"}";
+	}
+
+	/**
+	 * @return the xdMatchingId
+	 */
+	public Integer getXdMatchingId() {
+		return xdMatchingId;
+	}
+
+	/**
+	 * @param xdMatchingId the xdMatchingId to set
+	 */
+	public void setXdMatchingId(Integer xdMatchingId) {
+		this.xdMatchingId = xdMatchingId;
 	}
 }

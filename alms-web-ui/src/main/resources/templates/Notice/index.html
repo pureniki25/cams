@@ -61,7 +61,7 @@
             </row>
             <row>
                 <i-col>
-                    <i-button>新增</i-button>
+                    <i-button @click="openEditorModal('add')">新增</i-button>
                 </i-col>
             </row>
 
@@ -77,27 +77,28 @@
             </Row>
         </card>
 
-        <Modal title="新增/编辑公告" v-model="editModal.show" width="90%">
-            <i-form ref="editForm" :model="editForm" label-position="right" autocomplete="off" label-width="100" inline>
+        <Modal :title="editModal.title" v-model="editModal.show" width="90%">
+            <i-form ref="editForm" :model="editForm" :rules="ruleValidate" label-position="right" autocomplete="off" label-width="100"
+                inline>
                 <row>
                     <i-col span="24">
                         <form-item label="标题" prop="title">
-                            <i-input :value.sync="editForm.title"></i-input>
+                            <i-input :value.sync="editForm.title" v-model="editForm.title"></i-input>
                         </form-item>
                     </i-col>
                 </row>
                 <row>
                     <i-col span="8">
-                        <form-item label="公告类型" prop="title">
-                            <i-select :model.sync="editForm.type">
+                        <form-item label="公告类型" prop="type">
+                            <i-select :model.sync="editForm.type" v-model="editForm.type">
                                 <i-option value="0">选读</i-option>
                                 <i-option value="1">必读</i-option>
                             </i-select>
                         </form-item>
                     </i-col>
                     <i-col span="8">
-                        <form-item label="时长" prop="title">
-                            <i-select :model.sync="editForm.readTime">
+                        <form-item label="时长" prop="readTime" :class="readTimeRequired">
+                            <i-select :model.sync="editForm.readTime" v-model="editForm.readTime">
                                 <i-option value="10">10秒</i-option>
                                 <i-option value="15">15秒</i-option>
                                 <i-option value="20">20秒</i-option>
@@ -109,16 +110,16 @@
                     </i-col>
                 </row>
                 <row>
-                    <i-col span="8">
-                        <form-item label="公告范围" prop="title">
-                            <i-select :model.sync="editForm.type">
-                                <i-option value="1">必读</i-option>
+                    <i-col span="16">
+                        <form-item label="公告范围" prop="orgCode">
+                            <i-select :model.sync="editForm.orgCode" v-model="editForm.orgCode" style="width:10rem" multiple filterable>
+                                <i-option v-for="item in deptIds" :value="item.value">{{item.label}}</i-option>
                             </i-select>
                         </form-item>
                     </i-col>
                     <i-col span="8">
-                        <form-item label="发布渠道" prop="title">
-                            <i-select :model.sync="editForm.readTime">
+                        <form-item label="发布渠道" prop="publishChannel">
+                            <i-select :model.sync="editForm.publishChannel" v-model="editForm.publishChannel">
                                 <i-option value="PC端">PC端</i-option>
                                 <i-option value="移动端">移动端</i-option>
                             </i-select>
@@ -127,19 +128,50 @@
                 </row>
                 <row>
                     <i-col span="8">
-                        <form-item label="公告发布时间" prop="title">
-                            <date-picker></date-picker>
+                        <form-item label="公告发布时间" prop="publishDate">
+                            <date-picker type="date" :value.sync="editForm.publishDate" v-model="editForm.publishDate" @on-change="onDateChange"></date-picker>
                         </form-item>
                     </i-col>
                 </row>
                 <row>
                     <i-col span="24">
-                        <form-item label="内容" prop="title" style="width:100%">
-                            <i-input type="textarea" :rows="4" placeholder="请输入..." ></i-input>
+                        <form-item label="内容" prop="content" style="width:100%">
+                            <i-input type="textarea" :rows="4" placeholder="请输入..." :value.sync="editForm.content" v-model="editForm.content"></i-input>
                         </form-item>
                     </i-col>
                 </row>
             </i-form>
+
+            <row>
+                <card>
+                    <p slot="title" style="height:2rem;line-height:2rem">
+                        <span>附件信息</span>
+                        <i-button style="float:right" size="small" @click="addUploadItem">新增附件</i-button>
+                    </p>
+                    <row v-for="item in editForm.attachment">
+                        <i-col span="4">附件{{item.id}}</i-col>
+                        <i-col span="8">
+                            <!--  :max-size="upload.maxSize" -->
+                            <Upload :action="upload.url" :headers="upload.headers" :data="{businessId:'通知公告',uploadItemId:item.id}" :before-upload="beforeUpload" :on-success="onUploadSuccess"
+                                :on-error="onUploadError" :on-format-error="onFormatError" :on-exceeded-size="onExceededSize">
+                                <i-button type="ghost" icon="ios-cloud-upload-outline">上传附件</i-button>
+                            </Upload>
+                        </i-col>
+                        <i-col span="4">重命名文件名</i-col>
+                        <i-col span="4">
+                            <i-input :value.sync="item.noticeFileNewName" v-model="item.noticeFileNewName"></i-input>
+                        </i-col>
+                        <i-col span="4" style="text-align:center">
+                            <i-button type="ghost" @click="delUploadItem(item.id)">删除</i-button>
+                        </i-col>
+                    </row>
+                </card>
+            </row>
+            <row slot="footer">
+                <i-button @click="onSaveNotice">保存</i-button>
+                <i-button @click="closeEditModal">撤销</i-button>
+                <i-button @click="openReviewModal">公告预览</i-button>
+            </row>
         </Modal>
     </div>
     <script src="/src/js/Notice/index.js"></script>

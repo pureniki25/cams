@@ -1,6 +1,8 @@
 package com.hongte.alms.base.service;
 
+import com.hongte.alms.base.assets.car.vo.FileVo;
 import com.hongte.alms.base.entity.NoticeFile;
+import com.hongte.alms.base.vo.module.doc.UpLoadResult;
 import com.hongte.alms.common.service.BaseService;
 
 /**
@@ -12,5 +14,5 @@ import com.hongte.alms.common.service.BaseService;
  * @since 2018-03-07
  */
 public interface NoticeFileService extends BaseService<NoticeFile> {
-
+	public UpLoadResult upload(FileVo fileVo, String userId) ;
 }
