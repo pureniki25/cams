@@ -963,7 +963,7 @@ try {
     				,@ModelAttribute("isPayDeposit") String isPayDeposit){
 
         try{
-        	Boolean isPayDepositBoolean=null;
+        	Integer isPayDepositBoolean=null;
         	if(StringUtils.isEmpty(isPayDeposit)) {
         		isPayDepositBoolean=null;
         	}
@@ -1169,8 +1169,8 @@ try {
       	if(carAuctions!=null&&carAuctions.size()>0) {
       		for(CarAuction carAuc:carAuctions) {
       			if(AuctionStatusEnums.AUDIT.getKey().equals(carAuc.getStatus())) {
-      				logger.error("该申请已提交审核，business_id="+carAuction.getBusinessId());
-      	    		return Result.error("9999", "该申请已提交审核,请勿重复提交");
+//      				logger.error("该申请已提交审核，business_id="+carAuction.getBusinessId());
+//      	    		return Result.error("9999", "该申请已提交审核,请勿重复提交");
       			}else {
       				carAuction.setAuctionId(carAuc.getAuctionId());
       				
