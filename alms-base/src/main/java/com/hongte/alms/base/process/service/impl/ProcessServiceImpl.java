@@ -695,7 +695,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
             StringBuilder sb = new StringBuilder();
             int i=0;
             if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.OVERALL.getKey())){//如果角色是全局的
-                List<SysUserRole> userRoles  = sysUserRoleService.selectList(new EntityWrapper<SysUserRole>().eq("role_code",roleCode));
+                List<SysUserRole> userRoles  = sysUserRoleService.selectList(new EntityWrapper<SysUserRole>().eq("role_code",roleCode).groupBy("user_id"));
                 if(userRoles.size()==0){
                     logger.error("流程审批角色对应的用户找不到"+"       roleCode:"+roleCode + "" +
                             "    processTypeId: " + step.getTypeId()+  "         step "+step.getStep());
@@ -778,25 +778,28 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
         for(ProcessVo vo: list){
 
 //            String statusStr = ProcessStatusEnums.nameOf(vo.getStatus())+"("+ Constant.DEV_DEFAULT_USER+")";
-            String[]  userIds = vo.getApproveUserId().split(",");
-            StringBuilder usb = new StringBuilder();
-            if(userIds.length>0){
-                int i = 0;
-                for(String userId:userIds){
-                    SysUser sysUser = sysUserService.selectById(userId);
-                    if(sysUser!=null){
-                        if(i>0){
-                            usb.append(",");
-                        }
-                        usb.append(sysUser.getUserName());
-                        i++;
-                    }
-                }
-            }
-            SysUser sysUser = sysUserService.selectById(vo.getApproveUserId());
-            String name = sysUser!=null?sysUser.getUserName():vo.getApproveUserId();
+
             String statusStr;
             if(vo.getStatus().equals(ProcessStatusEnums.RUNNING.getKey())){
+                StringBuilder usb = new StringBuilder();
+                if(vo.getApproveUserId()!=null){
+                    String[]  userIds = vo.getApproveUserId().split(",");
+
+                    if(userIds.length>0){
+                        int i = 0;
+                        for(String userId:userIds){
+                            SysUser sysUser = sysUserService.selectById(userId);
+                            if(sysUser!=null){
+                                if(i>0){
+                                    usb.append(",");
+                                }
+                                usb.append(sysUser.getUserName());
+                                i++;
+                            }
+                        }
+                    }
+                }
+                String name = usb.length()>0?usb.toString():vo.getApproveUserId();
                 statusStr = ProcessStatusEnums.nameOf(vo.getStatus())+"("+name +")";
             }else{
                 statusStr = ProcessStatusEnums.nameOf(vo.getStatus());
