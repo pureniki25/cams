@@ -979,8 +979,11 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
             process.setProcessId(UUID.randomUUID().toString());
             process.setCreateTime(new Date());
             process.setCreateUser(loginUserInfoHelper.getUserId());
+            if(ProcessStatusEnums.RUNNING.getKey()==processSaveReq.getProcessStatus()) {//直接提交审核
+            	process.setCurrentStep(beginStep.getStep());
+            }else {
             process.setCurrentStep(-1);//保存草稿设置当前步骤为-1
-
+            }
             process.setProcessEngineFlage(ProcessEngineFlageEnums.LOCAL_SIMPLE_ENGINE.getKey());
             process.setProcessDesc(processSaveReq.getDesc());
 
