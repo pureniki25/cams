@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -141,7 +142,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
 
         Process process = null;
 
-        if(processSaveReq.getProcessId() == null){
+        if(StringUtils.isEmpty(processSaveReq.getProcessId()) ){
             process = new Process();
             process.setProcessId(UUID.randomUUID().toString());
             process.setCreateTime(new Date());
@@ -159,6 +160,8 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
             //设置审核人
             process.setApproveUserId(getApproveUserId(step,process.getCreateUser(),process));
             process.setIsDirectBack(ProcessIsDerateBackEnums.NO.getKey());
+            process.setStartTime( new Date());
+            process.setStartUserId(loginUserInfoHelper.getUserId());
 //            if(processSaveReq.getProcessStatus() == ProcessStatusEnums.RUNNING.getKey()){
 //                process.setStartTime( new Date());
 //                process.setStartUserId(Constant.DEV_DEFAULT_USER);
@@ -175,13 +178,13 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
             }
         }
         //开始 则设置起始时间
-        if(processSaveReq.getProcessStatus() == ProcessStatusEnums.RUNNING.getKey()){
-            process.setStartTime( new Date());
-            process.setStartUserId(loginUserInfoHelper.getUserId());
-        }else{
-            process.setStartTime( null);
-            process.setStartUserId(null);
-        }
+//        if(processSaveReq.getProcessStatus() == ProcessStatusEnums.RUNNING.getKey()){
+//            process.setStartTime( new Date());
+//            process.setStartUserId(loginUserInfoHelper.getUserId());
+//        }else{
+//            process.setStartTime( null);
+//            process.setStartUserId(null);
+//        }
         //更新或插入
         insertOrUpdateAllColumn(process);
         return process;
@@ -709,7 +712,8 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
 
                 List<String> areas = sysOrgService.getParentsOrgs(business.getCompanyId());
 
-                List<String> users = sysUserService.selectUsersByRoleAndEare(roleCode,areas);
+//                List<String> users = sysUserService.selectUsersByRoleAndEare(roleCode,areas);
+                List<String> users = sysUserService.selectUserByRoleAndComm(business.getCompanyId(),roleCode);
 
                 for(String  map: users){
                     if(i>0){
@@ -777,7 +781,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
                 statusStr = ProcessStatusEnums.nameOf(vo.getStatus());
             }
             vo.setProcessStatus(statusStr);
-            vo.setCreateUserName(vo.getCreateUser());
+//            vo.setCreateUserName(vo.getCreateUser());
 
         }
         return list;
@@ -805,16 +809,17 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
         if(processType == null){
             throw new RuntimeException("流程类型未定义");
         }
+        //后一个节点定义
+        ProcessTypeStep nextStep = null;
 
+        if(req.getCurrentStep()!=-1) {
         //当前节点定义
         ProcessTypeStep currentStep = processTypeStepService.getProcessTypeStep(processType.getTypeId(),req.getCurrentStep());
         if(currentStep == null){
             throw new  RuntimeException("找不到 当前流程节点定义！");
         }
 
-        //后一个节点定义
-        ProcessTypeStep nextStep = null;
-
+     
         //如果回退则取回退的步骤
         if(req.getIsPass().equals(ProcessApproveResult.REFUSE.getKey())&&req.getIsDirectBack().equals(ProcessIsDerateBackEnums.YES.getKey())){
             if(req.getNextStep()==null){
@@ -885,10 +890,18 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
                 }
             }
         }
+        }else {
+        	process.setStatus(ProcessStatusEnums.RUNNING.getKey());
+        	process.setUpdateTime(new Date());
+        	process.setUpdateUser(loginUserInfoHelper.getUserId());
+        	nextStep = processTypeStepService.getProcessTypeStep(processType.getTypeId(),ProcessTypeEnums.Aply_CarAuction.getBeginStep());
+        }
         //更新当前审核人 和当前审核步骤
         if(nextStep !=null){//如果还有下一步
             process.setCurrentStep(nextStep.getStep());
             process.setApproveUserId(getApproveUserId(nextStep,process.getCreateUser(),process));
+        }else {
+        	process.setStatus(ProcessStatusEnums.END.getKey());
         }
         /*else{
             process.setCurrentStep(null);
@@ -904,5 +917,80 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
 
         //updateProcess(process);
 
+    }
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Process insertOrUpdateProcess(ProcessSaveReq  processSaveReq, ProcessTypeEnums processTypeEnums){
+
+//        if(!processSaveReq.getProcessStatus().equals(ProcessStatusEnums.NEW.getKey())&&!processSaveReq.getProcessStatus().equals(ProcessStatusEnums.BEGIN.getKey())){
+//            throw  new RuntimeException("流程状态应为新建或起始");
+//        }
+        if(processSaveReq.getBusinessId() == null){
+            logger.error("业务ID不能为空  "+processTypeEnums.getName());
+            throw new RuntimeException("业务ID不能为空  "+processTypeEnums.getName());
+        }
+
+        ProcessType processType = processTypeService.getProcessTypeByCode(processTypeEnums.getKey());
+        if(processType == null){
+            logger.error("流程类型未定义  "+processTypeEnums.getName());
+            throw new RuntimeException("流程类型未定义"  +processTypeEnums.getName());
+        }
+
+
+        //取得 流程的起始步骤
+        ProcessTypeStep beginStep = processTypeStepService.getProcessTypeBeginStep(processType.getTypeId());
+        if(beginStep==null){
+            logger.error("流程未设置起始节点  "+processTypeEnums.getName());
+            throw  new RuntimeException("流程未设置起始节点"+ processTypeEnums.getName());
+        }
+//        ProcessTypeStep step = processTypeStepService.getProcessTypeStep(processType.getTypeId(),beginStep.getNextStep());
+//
+//        if(step == null){
+//            logger.error("流程起始步骤的下一步未定义  "+ processTypeEnums.getName());
+//            throw new RuntimeException("流程起始步骤的下一步未定义" + processTypeEnums.getName());
+//        }
+
+
+        Process process = null;
+
+        if(StringUtils.isEmpty(processSaveReq.getProcessId()) ){//保存草稿
+            process = new Process();
+            process.setProcessId(UUID.randomUUID().toString());
+            process.setCreateTime(new Date());
+            process.setCreateUser(loginUserInfoHelper.getUserId());
+            process.setCurrentStep(-1);//保存草稿设置当前步骤为-1
+
+            process.setProcessEngineFlage(ProcessEngineFlageEnums.LOCAL_SIMPLE_ENGINE.getKey());
+            process.setProcessDesc(processSaveReq.getDesc());
+
+
+            process.setProcessName(processSaveReq.getTitle());
+            process.setProcessTypeid(processType.getTypeId());
+            process.setStatus(processSaveReq.getProcessStatus());
+            process.setBusinessId(processSaveReq.getBusinessId());
+            process.setStartTime( new Date());
+            process.setStartUserId(loginUserInfoHelper.getUserId());
+            //设置审核人
+            process.setApproveUserId(getApproveUserId(beginStep,process.getCreateUser(),process));
+            process.setIsDirectBack(ProcessIsDerateBackEnums.NO.getKey());
+        }else{//提交审核
+            process = selectById(processSaveReq.getProcessId());
+            if(process==null) {
+            	logger.error("该流程在系统中不存在  "+ processSaveReq.getProcessId());
+                throw new RuntimeException("该流程在系统中不存在" + processSaveReq.getProcessId());
+            }
+            if(process.getCurrentStep()==-1) {
+            	process.setCurrentStep(beginStep.getStep());
+            }
+            if(processSaveReq.getProcessStatus()!= process.getStatus()){
+                process.setStatus(processSaveReq.getProcessStatus());
+
+
+            }
+        }
+
+        //更新或插入
+        insertOrUpdateAllColumn(process);
+        return process;
     }
 }

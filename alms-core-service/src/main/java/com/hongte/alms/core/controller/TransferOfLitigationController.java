@@ -38,6 +38,7 @@ import com.hongte.alms.base.vo.litigation.TransferOfLitigationVO;
 import com.hongte.alms.base.vo.litigation.house.HouseLoanVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.JsonUtil;
+import com.hongte.alms.common.util.StringUtil;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -95,16 +96,18 @@ public class TransferOfLitigationController {
 					String[] houseArr = houseAddr.split("#");
 					
 					int count = 1;
-					for (String hArr : houseArr) {
-						String[] split = hArr.split("\\^");
-						String area = split[0];
-						String area2 = area.replace("[", "");
-						String area3 = area2.replace("]", "");
-						List<String> areaList = Arrays.asList(area3.split(","));
-						if (count < houseArr.length) {
-							builder.append("房产地址" + count++ + "：").append(areaList.get(0)).append(areaList.get(1)).append(areaList.get(2)).append(" " + split[1]).append("；房产抵押情况：").append(split[2]).append("#");
-						}else {
-							builder.append("房产地址" + count++ + "：").append(areaList.get(0)).append(areaList.get(1)).append(areaList.get(2)).append(" " + split[1]).append("；房产抵押情况：").append(split[2]);
+					if (houseAddr.length() > 0) {
+						for (String hArr : houseArr) {
+							String[] split = hArr.split("\\^");
+							String area = split[0];
+							String area2 = area.replace("[", "");
+							String area3 = area2.replace("]", "");
+							List<String> areaList = Arrays.asList(area3.split(","));
+							if (count < houseArr.length) {
+								builder.append("房产地址" + count++ + "：").append(areaList.get(0)).append(areaList.get(1)).append(areaList.get(2)).append(" " + split[1]).append("；房产抵押情况：").append(split[2]).append("#");
+							}else {
+								builder.append("房产地址" + count++ + "：").append(areaList.get(0)).append(areaList.get(1)).append(areaList.get(2)).append(" " + split[1]).append("；房产抵押情况：").append(split[2]);
+							}
 						}
 					}
 					
@@ -194,7 +197,9 @@ public class TransferOfLitigationController {
 				List<String> houseAreas = (List<String>) registrationInfoForm.get("houseArea");
 				String detailAddress = (String) registrationInfoForm.get("detailAddress");
 				String mortgageSituation = (String) registrationInfoForm.get("mortgageSituation");
-				houseAddress.append(houseAreas).append("^").append(detailAddress).append("^").append(mortgageSituation).append("#");
+				if (!CollectionUtils.isEmpty(houseAreas) && !StringUtil.isEmpty(detailAddress) && !StringUtil.isEmpty(mortgageSituation)) {
+					houseAddress.append(houseAreas).append("^").append(detailAddress).append("^").append(mortgageSituation).append("#");
+				}
 			}
 			
 			car.setHouseAddress(houseAddress.toString());

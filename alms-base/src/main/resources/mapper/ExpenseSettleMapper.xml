@@ -12,14 +12,14 @@
 		                    tb_repayment_biz_plan_list_detail
 		                WHERE
 		                    plan_list_id = a.plan_list_id
-		                        AND plan_item_name = '滞纳金') AS lateFee,
+		                        AND plan_item_type = 60) AS lateFee,
 		            (SELECT 
 		                    IFNULL(SUM(IFNULL(plan_amount, 0) - IFNULL(fact_amount, 0)), 0)
 		                FROM
 		                    tb_repayment_biz_plan_list_detail
 		                WHERE
 		                    plan_list_id = a.plan_list_id
-		                        AND plan_item_name LIKE '%服务费%') AS servicecharge,
+		                        AND plan_item_type = 30) AS servicecharge,
 		            a.after_id as period
 		    FROM
 		        tb_repayment_biz_plan_list a

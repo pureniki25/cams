@@ -100,13 +100,11 @@ public class MoneyPoolController {
 		Result<List<MatchedMoneyPoolVO>> result = new Result<>() ;
 		try {
 			List<MatchedMoneyPoolVO> moneyPoolVOs = moneyPoolService.listMatchedMoneyPool(businessId, afterId);
-			result.setData(moneyPoolVOs);
+			return Result.success(moneyPoolVOs);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-            result.error("500", e.getMessage());
-		} finally {
-			return result ;
-		}
+			return Result.error("500", e.getMessage());
+		} 
 	}
 	
 	@ApiOperation(value = "新增/编辑 还款登记(若参数有moneyPoolId，则为编辑，否则为新增)")

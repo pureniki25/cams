@@ -73,21 +73,21 @@
                 <span slot="title">业务结清试算</span>
                 <row >
                     <i-col span="4">业务编号</i-col>
-                    <i-col span="4">{{business.info.businessId}}</i-col>
+                    <i-col span="4">{{business.base.businessId}}</i-col>
                     <i-col span="4">客户姓名</i-col>
-                    <i-col span="4">{{business.info.customerName}}</i-col>
+                    <i-col span="4">{{business.base.customerName}}</i-col>
                     <i-col span="4">借款金额</i-col>
-                    <i-col span="4">{{business.info.borrowMoney}}</i-col>
+                    <i-col span="4">{{business.base.borrowMoney}}</i-col>
                 </row>
                 <row>
                     <i-col span="4">借款期限</i-col>
-                    <i-col span="4">{{business.info.borrowLimit}}{{business.info.borrowLimitUnit==1?'个月':'天'}}</i-col>
+                    <i-col span="4">{{business.base.borrowLimit}}{{business.base.borrowLimitUnit==1?'个月':'天'}}</i-col>
                     <!--   `repayment_type_id` int(11) NOT NULL COMMENT '还款方式ID，1：到期还本息，2：每月付息到期还本，4：等本等息，5：等额本息，9：分期还本付息',
  -->
                     <i-col span="4">还款方式</i-col>
                     <i-col span="4">{{business.repaymentType}}</i-col>
                     <i-col span="4">费率</i-col>
-                    <i-col span="4">{{business.info.borrowRate}}%</i-col>
+                    <i-col span="4">{{business.base.borrowRate}}%</i-col>
                 </row>
                 <row>
                     <i-col span="4">出款日期</i-col>
@@ -103,7 +103,7 @@
                 <span slot="title">结清试算信息</span>
                 <row>
                     <i-col span="4">预计结清日期</i-col>
-                    <i-col span="8"><date-picker type="date" v-model="preSettleDate.date||new Date()"  :options="preSettleDate.disabledDate" @on-change="onPreSettleDateChange"></date-picker>
+                    <i-col span="8"><date-picker type="date" v-model="preSettleDate.date"  :options="preSettleDate.disabledDate" @on-change="onPreSettleDateChange"></date-picker>
                     <i-col span="12"></i-col>
                 </row>
                 <row>
@@ -124,9 +124,9 @@
                 </row>
                 <row>
                     <i-col span="4">期外逾期费</i-col>
-                    <i-col span="4"></i-col>
+                    <i-col span="4">{{business.info.demurrage}}</i-col>
                     <i-col span="4">提前还款违约金</i-col>
-                    <i-col span="4"></i-col>
+                    <i-col span="4">{{business.info.penalty}}</i-col>
                     <i-col span="4">往期少交费用（含滞纳金）</i-col>
                     <i-col span="4">{{business.info.lackFee}}</i-col>
                 </row>

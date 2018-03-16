@@ -23,7 +23,7 @@ layui.define(function (exports) {
         ,useGateWayflage:useGateWayflage
         // ,useGateWayflage:true
         // ,defaultUser:"admin-alms"
-        ,defaultUser:"admin-alms"   //贷后中心清算一部主管
+        ,defaultUser:"0101240315"   //贷后中心清算一部主管
         // ,defaultUser:"test_leader"  //区域贷后主管
         ,localBasePath:"http://localhost:30606/"
         ,openBasePath:"http://localhost:30616/"

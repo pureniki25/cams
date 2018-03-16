@@ -14,7 +14,7 @@ import com.hongte.alms.common.mapper.SuperMapper;
  * </p>
  *
  * @author 王继光
- * @since 2018-03-01
+ * @since 2018-03-15
  */
 public interface MoneyPoolRepaymentMapper extends SuperMapper<MoneyPoolRepayment> {
 	List<MatchedMoneyPoolVO> listMatchedMoneyPool(@Param("businessId")String businessId , @Param("afterId")String afterId);

@@ -92,7 +92,7 @@
 			<row>
                 <i-col span="4">预计结清日期</i-col>
                 <i-col span="8">
-                	<date-picker type="date" v-model="commitInfoForm.billDate || new Date()" :options="preSettleDate.disabledDate" :start-date="new Date()"/> 
+                	<date-picker type="date" v-model="commitInfoForm.billDate" :options="preSettleDate.disabledDate"/> 
                 	<i-button type="info" style="margin-left:1rem" @click="carLoanBilling">开始计算</i-button>
                 </i-col>
                 <i-col span="12"></i-col>
@@ -179,31 +179,31 @@
 			</p>
 			<row>
                 <i-col span="6">停车费</i-col>
-                <i-col span="6"><i-input v-model="commitInfoForm.parkingFees" /></i-col>
+                <i-col span="6"><i-input style="width:50%" v-model="commitInfoForm.parkingFees" type="number" number/></i-col>
                 <i-col span="6">GPS费</i-col>
-                <i-col span="6"><i-input v-model="commitInfoForm.gpsFees" /></i-col>
+                <i-col span="6"><i-input style="width:50%" v-model="commitInfoForm.gpsFees"  type="number" number/></i-col>
             </row>
-            <row>
+            <row style="margin-top:1rem">
                 <i-col span="6">拖车费</i-col>
-                <i-col span="6"><i-input v-model="commitInfoForm.dragFees" /></i-col>
+                <i-col span="6"><i-input style="width:50%" v-model="commitInfoForm.dragFees"  type="number" number/></i-col>
                 <i-col span="6">其他费用</i-col>
-                <i-col span="6"><i-input v-model="commitInfoForm.otherFees" /></i-col>
+                <i-col span="6"><i-input style="width:50%" v-model="commitInfoForm.otherFees"  type="number" number/></i-col>
             </row>
-            <row>
+            <row style="margin-top:1rem">
             	<i-col span="6">律师费</i-col>
-                <i-col span="6"><i-input v-model="commitInfoForm.attorneyFees" /></i-col>
+                <i-col span="6"><i-input style="width:50%" v-model="commitInfoForm.attorneyFees"  type="number" number/></i-col>
                 <i-col span="6">应收合计</i-col>
                 <i-col span="6">{{baseInfoForm.receivableTotal}}</i-col>
             </row>
-            <row>
+            <row style="margin-top:1rem">
                 <i-col span="6">+结余</i-col>
-                <i-col span="6">{{baseInfoForm.balance}}</i-col>
+                <i-col span="6">= &nbsp {{baseInfoForm.balance}}</i-col>
                 <i-col span="6">+押金转还款金额</i-col>
-                <i-col span="6">{{baseInfoForm.cash}}</i-col>
+                <i-col span="6">= &nbsp {{baseInfoForm.cash}}</i-col>
             </row>
-            <row>
+            <row style="margin-top:1rem">
                 <i-col span="6">最终结清金额</i-col>
-                <i-col span="18">{{baseInfoForm.squaredUp}}</i-col>
+                <i-col span="18">= &nbsp {{baseInfoForm.squaredUp}}</i-col>
             </row>
 		</Card>
 		</i-form>

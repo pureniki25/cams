@@ -33,9 +33,9 @@ window.layinit(function (htConfig) {
 	        	planServiceCharge:"" 	, // 服务费
 	        	planGuaranteeCharge:""  , // 担保公司费用
 	        	planPlatformCharge:""   , // 平台费
-	        	innerLateFees:"0.0"  	, // 期内滞纳金
-	        	outsideInterest:"0.0"  	, // 期外逾期利息
-	        	preLateFees:"0.0"  	, // 提前还款违约金
+	        	innerLateFees:""  	, // 期内滞纳金
+	        	outsideInterest:""  	, // 期外逾期利息
+	        	preLateFees:""  	, // 提前还款违约金
 	        	balanceDue:""  	, // 往期少交费用（含滞纳金）
 	        	overdueDefault:""  	, // 逾期违约金
 	        	receivableTotal: '',//	应收合计
@@ -60,7 +60,7 @@ window.layinit(function (htConfig) {
 			arrearageDetailTitle: [
 				{
 					title: '期数',
-					key: 'repaymentNum'
+					key: 'period'
 				},
 				{
 					title: '服务费',
@@ -110,9 +110,6 @@ window.layinit(function (htConfig) {
 	   },
 	   
 	   created:function(){
-		   if (this.commitInfoForm.billDate == null || this.commitInfoForm.billDate == '') {
-			   this.commitInfoForm.billDate = formatDate(new Date());
-		   }
 		   
 			var reqUrl = basePath + '/transferOfLitigation/queryCarLoanBilDetail?businessId=' + businessId
 			

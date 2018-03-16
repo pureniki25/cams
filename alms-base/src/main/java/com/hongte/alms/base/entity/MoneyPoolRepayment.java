@@ -17,18 +17,25 @@ import io.swagger.annotations.ApiModelProperty;
  * </p>
  *
  * @author 王继光
- * @since 2018-03-02
+ * @since 2018-03-15
  */
 @ApiModel
 @TableName("tb_money_pool_repayment")
 public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
+	public MoneyPoolRepayment(String moneyPoolId) {
+		super();
+		if (moneyPoolId == null) {
+			throw new RuntimeException("moneyPoolId can't be null");
+		}
+		this.moneyPoolId = moneyPoolId;
+	}
 
-    public MoneyPoolRepayment() {
+	public MoneyPoolRepayment() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-
-	private static final long serialVersionUID = 1L;
+	 
+    private static final long serialVersionUID = 1L;
 
     /**
      * 自增主键
@@ -48,6 +55,18 @@ public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
 	@TableField("xd_pool_id")
 	@ApiModelProperty(required= true,value = "原信贷款项池ID")
 	private Integer xdPoolId;
+    /**
+     * 原业务编号
+     */
+	@TableField("original_business_id")
+	@ApiModelProperty(required= true,value = "原业务编号")
+	private String originalBusinessId;
+    /**
+     * 期数
+     */
+	@TableField("after_id")
+	@ApiModelProperty(required= true,value = "期数")
+	private String afterId;
     /**
      * 还款计划期数ID，外键，对应tb_repayment_biz_plan_list表的plan_list_id
      */
@@ -196,6 +215,22 @@ public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
 
 	public void setXdPoolId(Integer xdPoolId) {
 		this.xdPoolId = xdPoolId;
+	}
+
+	public String getOriginalBusinessId() {
+		return originalBusinessId;
+	}
+
+	public void setOriginalBusinessId(String originalBusinessId) {
+		this.originalBusinessId = originalBusinessId;
+	}
+
+	public String getAfterId() {
+		return afterId;
+	}
+
+	public void setAfterId(String afterId) {
+		this.afterId = afterId;
 	}
 
 	public String getPlanListId() {
@@ -377,6 +412,8 @@ public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
 			", id=" + id +
 			", moneyPoolId=" + moneyPoolId +
 			", xdPoolId=" + xdPoolId +
+			", originalBusinessId=" + originalBusinessId +
+			", afterId=" + afterId +
 			", planListId=" + planListId +
 			", operateId=" + operateId +
 			", operateName=" + operateName +
@@ -400,13 +437,4 @@ public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
 			", deleteTime=" + deleteTime +
 			"}";
 	}
-
-	public MoneyPoolRepayment(String moneyPoolId) {
-		super();
-		if (moneyPoolId==null) {
-			throw new RuntimeException("moneyPoolId can't be null");
-		}
-		this.moneyPoolId = moneyPoolId ;
-	}
-	
 }

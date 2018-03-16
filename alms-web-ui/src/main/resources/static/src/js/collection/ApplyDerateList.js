@@ -281,10 +281,40 @@ var btype_array = [{
 //查询表单验证
 var setSearchFormValidate = {
     derateMoneyBegin: [
-        {pattern:"^[0-9]+(.[0-9]{1,2})?$",   message: '请填写不超过两位小数的数字', trigger: 'blur'}
+        {pattern:"^[0-9]+(.[0-9]{1,2})?$",   message: '请填写不超过两位小数的数字', trigger: 'blur'},
+        {
+            validator: function (rule, value, callback, source, options) {
+                if(vm.searchForm.derateMoneyBegin!=""&& vm.searchForm.derateMoneyEnd!=""){
+                    if (parseInt(vm.searchForm.derateMoneyBegin) > parseInt(vm.searchForm.derateMoneyEnd)) {
+                        callback(new Error('起始值大于结束值'));
+                    } else {
+                        vm.searchForm.derateMoneyEnd = vm.searchForm.derateMoneyEnd;
+                        callback();//校验通过
+                    }
+                }else{
+                    vm.searchForm.derateMoneyEnd =vm.searchForm.derateMoneyEnd;
+                    callback();
+                }
+
+            }, trigger: 'blur'
+        }
     ],
     derateMoneyEnd: [
-        {pattern:"^[0-9]+(.[0-9]{1,2})?$",   message: '请填写不超过两位小数的数字', trigger: 'blur'}
+        {pattern:"^[0-9]+(.[0-9]{1,2})?$",   message: '请填写不超过两位小数的数字', trigger: 'blur'},
+        {
+            validator: function (rule, value, callback, source, options) {
+                if(vm.searchForm.derateMoneyBegin!=""&& vm.searchForm.derateMoneyEnd!=""){
+                    if (parseInt(vm.searchForm.derateMoneyBegin) > parseInt(vm.searchForm.derateMoneyEnd)) {
+                        callback(new Error('起始值大于结束值'));
+                    } else {
+                        callback();//校验通过
+                    }
+                }else{
+                    callback();
+                }
+
+            }, trigger: 'blur'
+        }
     ]
 };
 
