@@ -3,6 +3,7 @@ var ex = /^[1-9]\d*$/;
 var amt=/^(([1-9]\d*)|\d)(\.\d{1,2})?$/;
 var mobi= /^(((13[0-9]{1})|(14[0-9]{1})|(17[0]{1})|(15[0-3]{1})|(15[5-9]{1})|(18[0-9]{1}))+\d{8})$/; 
 var tel = /^\d{3,4}-?\d{7,9}$/;
+var carNum=/^\d{19}$/;
 var currentDate=new Date().toLocaleDateString();
 var basePath;
 var vm;
@@ -18,11 +19,14 @@ window.layinit(function (htConfig) {
 	var vm = new Vue({
 	    el: '#app',
 	    data: {
+	    	
+	    	processId:'',//流程id
 	    	provs:'',
 	    	citys:'',
 	        countys:'',
 	    	returnRegFiles:[{
 	    		file: '',
+	    		name:'',
 	    		originalName: '',
 	    		oldDocId:''
 	    	}],
@@ -371,7 +375,7 @@ window.layinit(function (htConfig) {
 	 
 	    	uploadFile:function(event,index){
 	    		var fileId=event.currentTarget.id;
-	    		//alert(fileId);
+	    		//alert(JSON.stringify($('#'+fileId)));
 	    		// \alert(event.currentTarget);
 	    		 $('#'+fileId).fileupload({
 	    			    dataType: 'json',
@@ -387,6 +391,9 @@ window.layinit(function (htConfig) {
 	    		        	//alert(JSON.stringify(reFiles));
 	    		        	vm.returnRegFiles[index].oldDocId=reFiles.docId;
 	    		        	vm.returnRegFiles[index].originalName=reFiles.originalName;
+	    		        	vm.returnRegFiles[index].name=reFiles.originalName;
+	    		        	//alert(JSON.stringify(vm.returnRegFiles[0]));
+	    		        	//$('#'+fileId).val(vm.returnRegFiles[0].file);
 	    		        	
 	    		        }
 	    		    });
@@ -400,33 +407,33 @@ window.layinit(function (htConfig) {
 	             });
 	    	},
 	    	removeTabTr: function (event, index) {
-	    		var docId=$('#docId'+index).val();
-	    	
-	    		var deled=false;
-	    		if(docId==null||docId==""){
-	    			deled=true;
-	    		}
-	    		else{
-		            $.ajax({
+	    		var docId=$('#docId'+index).val();  
+	    		var that = this;
+	    		// 如果文档id存在，那么进行ajax
+	    		if (docId) {
+	    			$.ajax({
 		                type: "GET",
 		                url: basePath+'doc/delOneDoc?docId='+docId,
-		                // data: {"businessId":businessId},
-		                // contentType: "application/json; charset=utf-8",
 		                success: function (data) {
-		                	deled=true;
-		                	
+		                	console.log(data, that);
+		                	that.returnRegFiles.splice(index, 1);
+		    	            if(that.returnRegFiles == ""){
+		    	            	that.addTabTr(event);
+		    	            }
 		                },
 		                error: function (message) {
 		                    layer.msg("删除文件失败。");
 		                    console.error(message);
 		                }
 		            });
+	    		// 否则直接删除
+	    		} else {
+	    			that.returnRegFiles.splice(index, 1);
+    	            if(that.returnRegFiles==""){
+    	            	that.addTabTr(event);
+    	            }
 	    		}
-	    		//alert("bbb");
-	            if(deled){
-	            //	alert("aaaa");
-	            this.returnRegFiles.splice(index, 1);
-	            }
+	    		
 	    	},
 	    	addTabTr :function(event){
 	    		 this.returnRegFiles.push({
@@ -444,6 +451,7 @@ window.layinit(function (htConfig) {
 	                data: {"businessId":businessId},
 	                // contentType: "application/json; charset=utf-8",
 	                success: function (data) {
+	                	if (data.code == "0000"){
 	                	// alert(JSON.stringify(data));
 	                	vm.carBasic=data.data.carBasic;
 	                	vm.business=data.data.business;
@@ -477,15 +485,20 @@ window.layinit(function (htConfig) {
 		                		if(i>0){
 		                			vm.returnRegFiles.push({
 		   	               			 file: '',
+		   	               			 name:docFiles[i].originalName,
 		   	               			 originalName: docFiles[i].originalName,
 		   	               			 oldDocId:docFiles[i].docId
 		   	               		 });
 		                		}else{
 			                		vm.returnRegFiles[i].oldDocId=docFiles[i].docId;
 			                		vm.returnRegFiles[i].originalName=docFiles[i].originalName;
+			                		vm.returnRegFiles[i].name=docFiles[i].originalName;
 		                		}
 		                		// i++;
 		                	}
+	                	}
+	                	}else{
+	                		layer.msg("查看失败:"+data.msg);
 	                	}
 	                },
 	                error: function (message) {
@@ -810,7 +823,16 @@ window.layinit(function (htConfig) {
 	    			}
 	    			
 	    		}
-	    		
+	    		if(vm.carAuction.acountNum==''||vm.carAuction.acountNum==null){
+	    			$("#acountNum").css("border","1px solid #FF3030");
+	    			return ;
+	    		}else{
+	    			if(!carNum.test(vm.carAuction.acountNum)){
+	    				$("#acountNum").css("border","1px solid #FF3030");
+	    				layer.msg("卡号格式有误！",{icon:5,shade: [0.8, '#393D49']});
+	    				return ;
+	    			}
+	    		}
 	    		
 	    		for(var i=0;i<vm.returnRegFiles.length;i++){
 	    			vm.returnRegFiles[i].file='';
@@ -822,10 +844,12 @@ window.layinit(function (htConfig) {
 		               type: "POST",
 		               url: basePath+'car/auctionAply',
 		               contentType: "application/json; charset=utf-8",
-		               data: JSON.stringify({"carBasic":vm.carBasic,"carAuction":vm.carAuction,"returnRegFiles":vm.reqRegFiles,"subType":subType}),
+		               data: JSON.stringify({"carBasic":vm.carBasic,"carAuction":vm.carAuction,"returnRegFiles":vm.reqRegFiles,"subType":subType,"processId":vm.processId}),
 		               success: function (res) {
 		            	   if (res.code == "0000"){
 		            		   vm.carAuction=res.data.carAuction;
+		            		   vm.processId=res.data.processId;
+		            		   //console.log(message);
 		            		   layer.msg("保存成功。"); 
 		            		   
 		            	   }else{

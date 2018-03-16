@@ -38,7 +38,7 @@ public interface ProcessService extends BaseService<Process> {
 
 
     /**
-     * 存储审批记录并并修改流程审批信息
+     * 存储审批记录并修改流程审批信息
      * @param req
      * @throws IllegalAccessException
      * @throws InstantiationException
@@ -121,5 +121,6 @@ public interface ProcessService extends BaseService<Process> {
      */
     List<ProcessVo> selectProcessVoList(ProcessReq key);
     public void saveProcessApprovalResult(AuditVo req ,ProcessTypeEnums processTypeEnums) throws IllegalAccessException, InstantiationException;
+    public Process insertOrUpdateProcess(ProcessSaveReq  processSaveReq, ProcessTypeEnums processTypeEnums);
 
 }

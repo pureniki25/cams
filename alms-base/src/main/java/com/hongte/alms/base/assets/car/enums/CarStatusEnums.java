@@ -8,7 +8,9 @@ public enum CarStatusEnums {
 	TRANSFERRED_BUS("05","已转公车"),
 	TRANSFERRED_LEGAL("06","已移交法务"),
 	REVOKED("07","已撤销"),
-	TRANSFER_BUS("08","转公车申请中");
+	AUCTION_BUS("08","转公车申请中"),
+	AUCTION_AUDIT("09","拍卖审核中"),
+	TRANSFERRED_AUDIT("10","转公车审核中");
 	private String statusCode;
 	private String statusName;
 	private CarStatusEnums(String statusCode,String statusName) {

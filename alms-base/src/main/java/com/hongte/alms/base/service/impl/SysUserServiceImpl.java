@@ -60,6 +60,11 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserMapper, SysUser> 
     }
 
     @Override
+    public List<String> selectUserByRoleAndComm(String commId,String roleCode){
+        return  sysUserMapper.selectUserByRoleAndComm(commId,roleCode);
+    }
+
+    @Override
     public List<SysUser> selectUsersByRole(String roleCode){
         return  sysUserMapper.selectUsersByRole(roleCode);
     }

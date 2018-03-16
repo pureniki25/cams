@@ -438,6 +438,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			resultMap.putAll(transferOfLitigationMapper.queryCarLoanFees(businessId, billDate));
 
 			Date minDueDate = (Date) resultMap.get("minDueDate"); // 状态为'逾期', '还款中'的最早应还日期
+			Date maxDueDate = (Date) resultMap.get("maxDueDate"); // 合同到期日
 			int overdueDays = differentDays(minDueDate, billDate); // 逾期天数
 			long isPreCharge = (long) resultMap.get("isPreCharge"); // 是否分公司服务费前置收取
 			double planAccrual = ((BigDecimal) resultMap.get("planAccrual")).doubleValue(); // 本期应还利息
@@ -472,49 +473,67 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			double outside = carLoanBilVO.getOutsideInterest(); // 期外逾期利息计算费率
 			int preLateFeeType = carLoanBilVO.getPreLateFees(); // 提前还款违约金类型
 
-			innerLateFees = borrowMoney * innerLate * overdueDays;
-			outsideInterest = (overdueDays < 15) ? surplusPrincipal * outside / 30 * overdueDays
-					: surplusPrincipal * outside;
-
-			// 判断是否上标业务： outputPlatformId == 1 是， outputPlatformId == 0 否
-			// 判断是否分公司服务费前置收取 isPreCharge == 1， 是 isPreCharge == 0 否
-			if ("到期还本息".equals(repaymentTypeId) || "每月付息到期还本".equals(repaymentTypeId)) {
-				if (outputPlatformId == 1 && isPreCharge == 0) {
-					outsideInterest = 0;
-					preLateFees = ((BigDecimal) resultMap.get("surplusServiceCharge")).doubleValue();
-				}
-			} else if ("等额本息".equals(repaymentTypeId)) {
-				planAccrual = surplusPrincipal * borrowRate / 12;
-				if (outputPlatformId == 0) {
-					outsideInterest = (overdueDays < 15) ? borrowMoney * outside / 30 * overdueDays
-							: borrowMoney * outside;
-				}
-				if (outputPlatformId == 1 && isPreCharge == 0) {
-					switch (preLateFeeType) {
-					case 1:
-						// 一个月利息
-						preLateFees = borrowMoney * borrowRate / 12;
-						break;
-					case 2:
-						// 借款本金 * 0.03
-						preLateFees = borrowMoney * 0.03;
-						break;
-					case 3:
-						// 剩余本金 * 0.005 * 剩余期数
-						preLateFees = surplusPrincipal * 0.005 * (totalPeriod - curPeriod);
-						break;
-					default:
-						break;
+			// 判断预计结算日期是否超过合同日期
+			if (billDate.after(maxDueDate)) {
+				
+				// 判断是否上标业务： outputPlatformId == 1 是， outputPlatformId == 0 否
+				// 判断是否分公司服务费前置收取 isPreCharge == 1， 是 isPreCharge == 0 否
+				if ("到期还本息".equals(repaymentTypeId) || "每月付息到期还本".equals(repaymentTypeId)) {
+					
+					if (overdueDays < 15) {
+						outsideInterest = surplusPrincipal * outside / 30 * overdueDays;
+					} else if (15 <= overdueDays && overdueDays < 30) {
+						outsideInterest = surplusPrincipal * outside;
+					} else {
+						int i = (overdueDays / 30) <= 1 ? 1 : (overdueDays / 30);
+						int j = overdueDays % 30;
+						if (i > 1) { // 若 i 大于 1，说明超过30天, 期外逾期费 = 剩余本金 * 费率 * i + 剩余本金 * 费率 / 30 * j
+							outsideInterest = surplusPrincipal * outside * i;
+							outsideInterest += surplusPrincipal * outside / 30 * j;
+						}
 					}
+					
+					if (outputPlatformId == 1 && isPreCharge == 0) {
+						outsideInterest = 0;
+						preLateFees = ((BigDecimal) resultMap.get("surplusServiceCharge")).doubleValue();
+					}
+				} else if ("等额本息".equals(repaymentTypeId)) {
+					planAccrual = surplusPrincipal * borrowRate / 12;
+					if (outputPlatformId == 0) {
+						outsideInterest = (overdueDays < 15) ? borrowMoney * outside / 30 * overdueDays
+								: borrowMoney * outside;
+					}
+					if (outputPlatformId == 1 && isPreCharge == 0) {
+						switch (preLateFeeType) {
+						case 1:
+							// 一个月利息
+							preLateFees = borrowMoney * borrowRate / 12;
+							break;
+						case 2:
+							// 借款本金 * 0.03
+							preLateFees = borrowMoney * 0.03;
+							break;
+						case 3:
+							// 剩余本金 * 0.005 * 剩余期数
+							preLateFees = surplusPrincipal * 0.005 * (totalPeriod - curPeriod);
+							break;
+						default:
+							break;
+						}
+					}
+				} else {
+					return null;
 				}
-				receivableTotal = borrowMoney + planAccrual + planServiceCharge + planPlatformCharge
-						+ planGuaranteeCharge + innerLateFees + outsideInterest + preLateFees + balanceDue + parkingFees
-						+ gpsFees + dragFees + otherFees + attorneyFees;
-				squaredUp = receivableTotal - cash - balance;
+
 			} else {
-				return null;
+
+				innerLateFees = borrowMoney * innerLate * overdueDays;
 			}
 
+			receivableTotal = borrowMoney + planAccrual + planServiceCharge + planPlatformCharge + planGuaranteeCharge
+					+ innerLateFees + outsideInterest + preLateFees + balanceDue + parkingFees + gpsFees + dragFees
+					+ otherFees + attorneyFees;
+			squaredUp = receivableTotal - cash - balance;
 			resultMap.put("innerLateFees", Math.round(innerLateFees * 100) * 0.01);
 			resultMap.put("outsideInterest", Math.round(outsideInterest * 100) * 0.01);
 			resultMap.put("preLateFees", Math.round(preLateFees * 100) * 0.01);
@@ -547,5 +566,12 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			cnt++;
 		}
 		return cnt;
+	}
+
+	public static void main(String[] args) {
+		int i = 61 / 30;
+		int j = 20 % 30;
+		System.out.println(i);
+		System.out.println(j);
 	}
 }
