@@ -320,19 +320,25 @@ public class CarController {
 //  @RequestMapping("/download")
   @PostMapping("/download")
   public void download(HttpServletRequest request, HttpServletResponse response,@ModelAttribute CarReq  req) throws Exception {
-      EasyPoiExcelExportUtil.setResponseHead(response,"car.xls");
+    try {
+    	EasyPoiExcelExportUtil.setResponseHead(response,"car.xls");
       req.setPage(1);
       req.setLimit(5000);
       List<CarVo> list = carService.selectCarList(req);
       Workbook workbook = ExcelExportUtil.exportExcel(new ExportParams("车辆信息报表","车辆信息"), CarVo.class, list);
 
       workbook.write(response.getOutputStream());
+	}catch (Exception e) {
+      	logger.error(e.getMessage());
+      	throw e;
+  	}
   }
+  
     
     @ApiOperation(value = "获取车辆管理信息详情")
     @PostMapping("/carDetail")
     public Result<Object> getCarDetail(@ModelAttribute("businessId") String businessId){
-
+    	try {
     	CarBasic carBasic=carBasicService.selectById(businessId);
     	CarDetection carDetection=carDetectionService.selectById(businessId);
     	List<CarAuction>		 carAuctions=carAuctionService.selectList(new EntityWrapper<CarAuction>().eq("business_id", businessId));	
@@ -358,11 +364,17 @@ public class CarController {
         	//carDragService.selectById(id)
     	//Page<CarVo>  page=carService.selectCarPage(req);
         return Result.build("0000", "操作成功", map);
+	}catch (Exception e) {
+      	logger.error(e.getMessage());
+      	return Result.error("9999", "操作异常");
+  	}
+  }
       
-    }
+    
     @ApiOperation(value = "重新审核")
     @PostMapping("/againAssess")
     public Result<Object> againAssess(@RequestBody Map<String,Object> params){
+    	try {
     	CarBasic carBasic=JsonUtil.map2obj((Map<String,Object>)params.get("carBasic"), CarBasic.class);
     	CarDetection carDetection=JsonUtil.map2obj((Map<String,Object>)params.get("carDetection"), CarDetection.class);
     	CarBasic rCarBasic=carBasicService.selectById(carBasic.getBusinessId());
@@ -373,11 +385,16 @@ public class CarController {
     	carDetectionService.updateById(rCarDetection);
     	
         return Result.build("0000", "操作成功", "");
-      
-    }  
+	}catch (Exception e) {
+      	logger.error(e.getMessage());
+      	return Result.error("9999", "操作异常");
+  	}
+  }
+    
     @ApiOperation(value = "获取车辆归还信息")
     @PostMapping("/getReturnReg")
     public Result<Object> getReturnReg(@ModelAttribute("businessId") String businessId){
+    	try {
     	BasicBusiness business=basicBusinessService.selectById(businessId);
     	CarBasic carBasic=carBasicService.selectById(businessId);
     	List<CarDrag> drag=carDragService.selectList(
@@ -420,11 +437,15 @@ public class CarController {
     	//Page<CarVo>  page=carService.selectCarPage(req);
         return Result.build("0000", "操作成功", map);
       
-    }
+	}catch (Exception e) {
+      	logger.error(e.getMessage());
+      	return Result.error("9999", "操作异常");
+  	}
+  }
     @ApiOperation(value = "通过省份id查询其下所有城市")
     @PostMapping("/getCitysByProId")
     public Result<Object> getCitysByProId(@ModelAttribute("proId") String proId){
-    
+    try {
     	Map<String, Object> map=new HashMap<String,Object>();
     	List<SysCity> citys=new ArrayList<SysCity>();
     	SysCity c=new SysCity();
@@ -435,12 +456,16 @@ public class CarController {
         citys.addAll(cityList);
     	map.put("citys", citys);
         return Result.build("0000", "操作成功", map);
-      
-    }
+	}catch (Exception e) {
+      	logger.error(e.getMessage());
+      	return Result.error("9999", "操作异常");
+  	}
+  }
+    
     @ApiOperation(value = "通过城市id查询其下所有县区")
     @PostMapping("/getCountysByCityId")
     public Result<Object> getCountysByCityId(@ModelAttribute("cityId") String cityId){
-
+try {
     	Map<String, Object> map=new HashMap<String,Object>();
     	List<SysCounty> countys=new ArrayList<SysCounty>();
     	SysCounty c=new SysCounty();
@@ -453,13 +478,19 @@ public class CarController {
         	//carDragService.selectById(id)
     	//Page<CarVo>  page=carService.selectCarPage(req);
         return Result.build("0000", "操作成功", map);
+	}catch (Exception e) {
+      	logger.error(e.getMessage());
+      	return Result.error("9999", "操作异常");
+  	}
+  }
       
-    }
+    
 
     @SuppressWarnings("unchecked")
 	@ApiOperation(value = "归还登记")
     @PostMapping("/addReturnReg")
     public Result<Object> addReturnReg( @RequestBody Map<String,Object> params){
+    	try {
     	CarReturnReg returnReg=JsonUtil.map2obj((Map<String,Object>)params.get("returnReg"), CarReturnReg.class);
     	List<FileVo> files=JsonUtil.map2objList(params.get("returnRegFiles"), FileVo.class);
     	CarReturnReg carReturnReg=carReturnRegService.selectById(returnReg.getBusinessId());
@@ -486,11 +517,17 @@ public class CarController {
     	}
 
     	return Result.build("0000", "操作成功", "");
-    }
+	}catch (Exception e) {
+      	logger.error(e.getMessage());
+      	return Result.error("9999", "操作异常");
+  	}
+  }
+    
     @ApiOperation(value="查询拍卖登记信息")
     @PostMapping("/auctionDetail")
     public Result<Object> AuctionDetail(@ModelAttribute("businessId") String businessId){
-     	BasicBusiness business=basicBusinessService.selectById(businessId);
+     	try {
+    	BasicBusiness business=basicBusinessService.selectById(businessId);
     	CarBasic carBasic=carBasicService.selectById(businessId);
     	//拖车信息
     	List<CarDrag> drag=carDragService.selectList(
@@ -568,12 +605,18 @@ public class CarController {
     
     	
     	return Result.build("0000", "操作成功", map);
-    }
+	}catch (Exception e) {
+      	logger.error(e.getMessage());
+      	return Result.error("9999", "操作异常");
+  	}
+  }
+    
     @SuppressWarnings("unchecked")
   	@ApiOperation(value = "拍卖申请")
       @PostMapping("/auctionAply")
       public Result<Object> auctionAply( @RequestBody Map<String,Object> params){
-      	CarBasic carBase=JsonUtil.map2obj((Map<String,Object>)params.get("carBasic"), CarBasic.class);
+      	try {
+    	CarBasic carBase=JsonUtil.map2obj((Map<String,Object>)params.get("carBasic"), CarBasic.class);
       	CarAuction carAuction=JsonUtil.map2obj((Map<String,Object>)params.get("carAuction"), CarAuction.class);
       	List<FileVo> files=JsonUtil.map2objList(params.get("returnRegFiles"), FileVo.class);
       	CarBasic retCarBasic=carBasicService.selectById(carAuction.getBusinessId());
@@ -643,11 +686,17 @@ public class CarController {
       		}
       	}
       	return Result.build("0000", "操作成功", map);
-      }
+ 	}catch (Exception e) {
+      	logger.error(e.getMessage());
+      	return Result.error("9999", "操作异常");
+  	}
+  }
+      
     @SuppressWarnings("unchecked")
 	@ApiOperation(value = "拍卖撤销")
     @PostMapping("/auctionCancel")
     public Result<Object> auctionAplyCancel( @RequestBody Map<String,Object> params){
+    try {
     	String businessId=(String) params.get("businessId");
     	String auctionId=(String) params.get("auctionId");
     	String processId=(String) params.get("processId");
@@ -700,11 +749,17 @@ public class CarController {
     		}
     	}
     	return Result.build("0000", "操作成功", "");
-    }
+ 	}catch (Exception e) {
+      	logger.error(e.getMessage());
+      	return Result.error("9999", "操作异常");
+  	}
+  }
+    
     @SuppressWarnings("unchecked")
 	@ApiOperation(value = "转公车申请")
     @PostMapping("/convBusAply")
     public Result<Object> convBusAply( @RequestBody Map<String,Object> params){
+    	try {
     	CarBasic carBase=JsonUtil.map2obj((Map<String,Object>)params.get("carBasic"), CarBasic.class);
     	CarConvBusAply carConvBusAply=JsonUtil.map2obj((Map<String,Object>)params.get("carConvBusAply"), CarConvBusAply.class);
     	CarBasic retCarBasic=carBasicService.selectById(carConvBusAply.getBusinessId());
@@ -753,11 +808,17 @@ public class CarController {
     	map.put("carConvBusAply", carConvBusAply);
 
     	return Result.build("0000", "操作成功", map);
-    }
+ 	}catch (Exception e) {
+      	logger.error(e.getMessage());
+      	return Result.error("9999", "操作异常");
+  	}
+  }
+    
     @SuppressWarnings("unchecked")
 	@ApiOperation(value = "转公车撤销")
     @PostMapping("/convBusCancel")
     public Result<Object> convBusCancel( @RequestBody Map<String,Object> params){
+    try {
     	String businessId=(String) params.get("businessId");
     	String convBusId=(String) params.get("convBusId");
     	String processId=(String) params.get("processId");
@@ -805,11 +866,17 @@ public class CarController {
     	carConvBusAply.setStatus(AuctionStatusEnums.CANCEL.getKey());
     	carConvBusAplyService.updateById(carConvBusAply);	
     	return Result.build("0000", "操作成功", "");
-    }
+ 	}catch (Exception e) {
+      	logger.error(e.getMessage());
+      	return Result.error("9999", "操作异常");
+  	}
+  }
+    
     @ApiOperation(value="查询转公车申请信息")
     @PostMapping("/convBusAplyDetail")
     public Result<Object> convBusAplyDetail(@ModelAttribute("businessId") String businessId){
-     	BasicBusiness business=basicBusinessService.selectById(businessId);
+     try {
+    	BasicBusiness business=basicBusinessService.selectById(businessId);
     	CarBasic carBasic=carBasicService.selectById(businessId);
     	//拖车信息
     	List<CarDrag> drag=carDragService.selectList(
@@ -882,7 +949,12 @@ public class CarController {
     
     	
     	return Result.build("0000", "操作成功", map);
-    }
+ 	}catch (Exception e) {
+      	logger.error(e.getMessage());
+      	return Result.error("9999", "操作异常");
+  	}
+  }
+    
     @ApiOperation(value = "获取竞价信息")
     @GetMapping("/auctionRegList")
     @ResponseBody
@@ -911,7 +983,7 @@ public class CarController {
     @ApiOperation(value = "获取车辆拍卖信息")
     @PostMapping("/getAuctionReg")
     public Result<Object> getAuctionReg(@ModelAttribute("regId") String regId){
-    	CarAuctionReg reg=carAuctionRegService.selectById(regId);
+    	try{CarAuctionReg reg=carAuctionRegService.selectById(regId);
     	if(reg==null) {
     		logger.error("拍卖登记信息不存在，regId="+regId);
     		return Result.error("9999", "拍卖登记信息不存在");
@@ -929,11 +1001,17 @@ public class CarController {
     	map.put("auctionReg", reg);
     	map.put("bidder", bidder);
         return Result.build("0000", "操作成功", map);
+ 	}catch (Exception e) {
+      	logger.error(e.getMessage());
+      	return Result.error("9999", "操作异常");
+  	}
+  }
       
-    }
+    
     @ApiOperation(value = "获取车辆拍卖信息")
     @PostMapping("/updateAuctionReg")
     public Result<Object> updateAuctionReg(@RequestBody Map<String,Object> params){
+    	try {
     	@SuppressWarnings("unchecked")
 		CarAuctionReg auctionReg=JsonUtil.map2obj((Map<String,Object>)params.get("auctionReg"), CarAuctionReg.class);
       	CarAuctionReg reg=carAuctionRegService.selectById(auctionReg.getRegId());
@@ -968,12 +1046,17 @@ public class CarController {
 		reg.setUpdateUser("admin");
     	carAuctionRegService.updateById(reg);
         return Result.build("0000", "操作成功", "");
+ 	}catch (Exception e) {
+      	logger.error(e.getMessage());
+      	return Result.error("9999", "操作异常");
+  	}
+  }
       
-    }
+    
     @ApiOperation(value="拍卖审核信息")
     @PostMapping("/auctionAuditDetail")
     public Result<Object> auctionAuditDetail(@ModelAttribute("businessId") String businessId,@ModelAttribute("processId") String processId){
-     	BasicBusiness business=basicBusinessService.selectById(businessId);
+     	try{BasicBusiness business=basicBusinessService.selectById(businessId);
     	CarBasic carBasic=carBasicService.selectById(businessId);
     	//拖车信息
     	List<CarDrag> drag=carDragService.selectList(
@@ -1051,7 +1134,11 @@ public class CarController {
     
     
     	return Result.build("0000", "操作成功", map);
-    }
+     	}catch (Exception e) {
+          	logger.error(e.getMessage());
+          	return Result.error("9999", "操作异常");
+      	}
+      }
     @SuppressWarnings("unchecked")
   	@ApiOperation(value = "拍卖审核")
       @PostMapping("/auctionAudit")
