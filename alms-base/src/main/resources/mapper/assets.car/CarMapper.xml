@@ -55,10 +55,10 @@
 				and bus.business_id LIKE #{businessId}
 			</if>
 			<if test="areaId !=null and areaId !=''">
-				and com.area_id = #{areaId}
+				and bus.district_id = #{areaId}
 			</if>
 			<if test="companyId !=null and companyId !=''">
-				and com.company_id = #{companyId}
+				and bus.company_id = #{companyId}
 			</if>
 			<if test="customerName !=null and customerName !=''">
 				and bus.customer_name LIKE #{customerName}
