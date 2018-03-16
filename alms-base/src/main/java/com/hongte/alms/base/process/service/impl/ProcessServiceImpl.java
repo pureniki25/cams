@@ -712,7 +712,8 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
 
                 List<String> areas = sysOrgService.getParentsOrgs(business.getCompanyId());
 
-                List<String> users = sysUserService.selectUsersByRoleAndEare(roleCode,areas);
+//                List<String> users = sysUserService.selectUsersByRoleAndEare(roleCode,areas);
+                List<String> users = sysUserService.selectUserByRoleAndComm(business.getCompanyId(),roleCode);
 
                 for(String  map: users){
                     if(i>0){

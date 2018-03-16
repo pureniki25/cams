@@ -19,6 +19,8 @@ public interface SysUserService extends BaseService<SysUser> {
 
     public List<String> selectUsersByRoleAndEare(String roleCode, List<String> areaCodes);
 
+    public List<String> selectUserByRoleAndComm(String CommId,String roleCode);
+
 
     public List<SysUser> selectUsersByRole(String roleCode);
 

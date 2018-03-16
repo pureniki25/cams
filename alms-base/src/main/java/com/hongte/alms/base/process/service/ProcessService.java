@@ -38,7 +38,7 @@ public interface ProcessService extends BaseService<Process> {
 
 
     /**
-     * 存储审批记录并并修改流程审批信息
+     * 存储审批记录并修改流程审批信息
      * @param req
      * @throws IllegalAccessException
      * @throws InstantiationException
