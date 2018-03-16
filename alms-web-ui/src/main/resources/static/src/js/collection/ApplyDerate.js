@@ -16,12 +16,11 @@ var processId = document.getElementById("processId").getAttribute("value");
 
 //设置表单验证
 var setFormValidate = {
-
     derateMoney: [
-        {required: true, message: '请填写申请减免金额', trigger: 'blur'},
+        {required: true, message: '请填写申请减免金额'},
         // {pattern:"^^[0-9]{8}$",   message: '请填写不超过两位小数的数字', trigger: 'blur'}
         // {pattern:"^([0-9]{1,2})+(.[0-9]{1,2})?$",   message: '请填写不超过两位小数的数字', trigger: 'blur'}
-        {pattern:"^\\d{1,8}(\\.\\d{1,2})?$",   message: '请填写整数位数不大于8位，小数位数不超过两位的数字', trigger: 'blur'}
+        {pattern:"^\\d{1,8}(\\.\\d{1,2})?$",   message: '请填写整数位数不大于8位，小数位数不超过两位的数字'}
     ],
     derateType: [
         {required: true, message: '请填写申请减免费用项', trigger: 'change'}
@@ -247,6 +246,7 @@ window.layinit(function (htConfig) {
                 saveapplyInfo(PROCESS_STATUS_NEW);
             },
             saveAppply(){//提交审批按钮的响应函数
+                console.log(this)
                 Submit();
             },
             //减免类型变化响应事件
@@ -319,6 +319,7 @@ var getShowInfo = function () {
                 if(res.data.data.applyList !=null && res.data.data.applyList.length>0){
                     //赋值申请信息
                     vm.applyInfoForm = res.data.data.applyList[0];
+
                     vm.applyInfoForm.isSettleFlage = vm.applyInfoForm.isSettle=="1"?"是":"否";
                     //赋值审批信息初始信息
                     vm.initalApplyInfo.isSettleFlage = vm.initalApplyInfo.isSettle=="1"?"是":"否";
@@ -434,7 +435,7 @@ var getShowInfo = function () {
 
 /**
  * 只校验 实收金额
- * @type {{realReceiveMoney: [null,null], derateMoney: [null], derateType: [null], isSettleFlage: [null]}}
+ * @type {{realReceiveMoney: [null,null],  : [null], derateType: [null], isSettleFlage: [null]}}
  */
 var setFormValidate1 = {
     realReceiveMoney: [
@@ -553,6 +554,7 @@ var saveapplyInfo = function(pStatus){
                 }
                 // 0 不结清， 1结清
                 vm.applyInfoForm.isSettle = vm.applyInfoForm.isSettleFlage=="是"?1:0;
+                //赋值 processId
                 if(vm.approvalInfoForm.process!=null){
                     vm.applyInfoForm.processId = vm.approvalInfoForm.process.processId;
                 }

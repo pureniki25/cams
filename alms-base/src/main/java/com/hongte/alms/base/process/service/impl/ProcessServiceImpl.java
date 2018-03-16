@@ -20,6 +20,7 @@ import com.hongte.alms.common.util.ClassCopyUtil;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.JsonUtil;
 import com.ht.ussp.bean.LoginUserInfoHelper;
+import com.ht.ussp.client.dto.LoginInfoDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -389,9 +390,22 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
 
         //当前审核信息
         if(process!=null){
-            SysUser sysUser =  sysUserService.selectById(process.getApproveUserId());
+//            SysUser sysUser =  sysUserService.selectById(process.getApproveUserId());
 //            retMap.put("approveUserName",sysUser==null?process.getApproveUserId():sysUser.getUserName());
-            String approvalUesrName = loginUserInfoHelper.getLoginInfo()!=null?loginUserInfoHelper.getLoginInfo().getUserName():loginUserInfoHelper.getUserId();
+
+            LoginInfoDto loginInfoDto = loginUserInfoHelper.getLoginInfo();
+            String approvalUesrName = "";
+            if(loginInfoDto==null){
+                SysUser sysUser =  sysUserService.selectById(loginUserInfoHelper.getUserId());
+                if(sysUser != null){
+                    approvalUesrName =sysUser.getUserName();
+                }else{
+                    approvalUesrName = loginUserInfoHelper.getUserId();
+                }
+            }else{
+                approvalUesrName = loginInfoDto.getUserName();
+            }
+//            String approvalUesrName = loginUserInfoHelper.getLoginInfo()!=null?loginUserInfoHelper.getLoginInfo().getUserName():loginUserInfoHelper.getUserId();
             retMap.put("approveUserName",approvalUesrName);
             ProcessTypeStep currentStepInfo  =  processTypeStepService.findCurrentStepInfo(stepList,process);
             retMap.put("currentStepName",currentStepInfo!=null?currentStepInfo.getStepName():"");

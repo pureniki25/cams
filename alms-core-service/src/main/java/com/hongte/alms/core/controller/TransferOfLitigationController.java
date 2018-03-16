@@ -122,6 +122,7 @@ public class TransferOfLitigationController {
 				return Result.error("0", "没有数据");
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			LOG.error("获取车贷诉讼相关数据异常!!!", e);
 			return Result.error("500", "系统异常");
 		}
@@ -192,21 +193,24 @@ public class TransferOfLitigationController {
 			
 			StringBuilder houseAddress = new StringBuilder();
 			List<LinkedHashMap<String, Object>> componentOptions = (List<LinkedHashMap<String, Object>>) req.get("componentOption");
-			for (LinkedHashMap<String, Object> componentOption : componentOptions) {
-				LinkedHashMap<String, Object> registrationInfoForm = (LinkedHashMap<String, Object>) componentOption.get("registrationInfoForm");
-				List<String> houseAreas = (List<String>) registrationInfoForm.get("houseArea");
-				String detailAddress = (String) registrationInfoForm.get("detailAddress");
-				String mortgageSituation = (String) registrationInfoForm.get("mortgageSituation");
-				if (!CollectionUtils.isEmpty(houseAreas) && !StringUtil.isEmpty(detailAddress) && !StringUtil.isEmpty(mortgageSituation)) {
-					houseAddress.append(houseAreas).append("^").append(detailAddress).append("^").append(mortgageSituation).append("#");
+			if(componentOptions!=null){
+				for (LinkedHashMap<String, Object> componentOption : componentOptions) {
+					LinkedHashMap<String, Object> registrationInfoForm = (LinkedHashMap<String, Object>) componentOption.get("registrationInfoForm");
+					List<String> houseAreas = (List<String>) registrationInfoForm.get("houseArea");
+					String detailAddress = (String) registrationInfoForm.get("detailAddress");
+					String mortgageSituation = (String) registrationInfoForm.get("mortgageSituation");
+					if (!CollectionUtils.isEmpty(houseAreas) && !StringUtil.isEmpty(detailAddress) && !StringUtil.isEmpty(mortgageSituation)) {
+						houseAddress.append(houseAreas).append("^").append(detailAddress).append("^").append(mortgageSituation).append("#");
+					}
 				}
 			}
-			
+
 			car.setHouseAddress(houseAddress.toString());
 			
 			transferOfLitigationService.saveTransferLitigationCar(car, sendUrl);
 			return Result.success();
 		} catch (Exception ex) {
+			ex.printStackTrace();
 			LOG.error(ex.getMessage());
 			return Result.error("500", ex.getMessage());
 		}
