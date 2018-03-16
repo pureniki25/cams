@@ -50,7 +50,7 @@ public class CarServiceImpl  implements CarService {
 		   pages.setRecords(list);
 		return pages;
 	}
-	public Page<AuctionBidderVo> selectBiddersPageForApp(int page, int limit,Boolean isPayDeposit,String auctionId,String bidderName,String retTel){
+	public Page<AuctionBidderVo> selectBiddersPageForApp(int page, int limit,Integer isPayDeposit,String auctionId,String bidderName,String retTel){
 		Page<AuctionBidderVo>  pages=new Page<AuctionBidderVo> ();
 		int count=carMapper.selectBiddersCountForApp(isPayDeposit, auctionId, bidderName,retTel);
 		  if(count<=0) {

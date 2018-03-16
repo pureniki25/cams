@@ -205,6 +205,17 @@ window.layinit(function (htConfig) {
                 main.approvalModal.url = getHouseLoanProcessUrl();
             } else if (obj.data.processTypeCode == "carLoanLitigation") {
                 main.approvalModal.url = getCarLoanProcessUrl();
+            }else if(obj.data.processTypeCode=="carAuctionAply"){
+				var title ="车辆拍卖申请审核";
+				var url = '/assets/car/carAuctionAudit?businessId='+obj.data.businessId+"&processStatus="+obj.data.processStatus+"&processId="+obj.data.processId;
+				layer.open({
+                    type: 2,
+                    area: ['95%', '95%'],
+                    fixed: false,
+                    maxmin: true,
+                    title: title,
+                    content: url
+                });
             }
         }
 
