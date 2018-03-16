@@ -227,12 +227,17 @@ public class TransferOfLitigationController {
 			// 存储审批结果信息
 			processService.saveProcessApprovalResult(req, ProcessTypeEnums.HOUSE_LOAN_LITIGATION);
 			Process process = processService.selectById(req.getProcess().getProcessId());
-			
+			String businessId = process.getBusinessId();
+			String processId = process.getProcessId();
+			List<TransferLitigationHouse> houses = transferLitigationHouseService.selectList(new EntityWrapper<TransferLitigationHouse>().eq("business_id", businessId).eq("process_id", processId));
+			if (CollectionUtils.isEmpty(houses)) {
+				return Result.error("500", "没有找到相关流程数据！");
+			}
 			List<ProcessTypeStep> processTypeSteps = processTypeStepService.selectList(
 					new EntityWrapper<ProcessTypeStep>().eq("type_id", process.getProcessTypeid()).orderBy("step"));
 			if (!CollectionUtils.isEmpty(processTypeSteps)
 					&& process.getCurrentStep() == processTypeSteps.get(processTypeSteps.size() - 1).getStep()) {
-				transferOfLitigationService.sendTransferLitigationData(req.getBusinessId(), req.getCrpId(), sendUrl);
+				transferOfLitigationService.sendTransferLitigationData(businessId, houses.get(0).getCrpId(), sendUrl);
 			}
 			return Result.success();
 		} catch (Exception ex) {
@@ -250,12 +255,17 @@ public class TransferOfLitigationController {
 			// 存储审批结果信息
 			processService.saveProcessApprovalResult(req, ProcessTypeEnums.CAR_LOAN_LITIGATION);
 			Process process = processService.selectById(req.getProcess().getProcessId());
-			
+			String businessId = process.getBusinessId();
+			String processId = process.getProcessId();
+			List<TransferLitigationCar> cars = transferLitigationCarService.selectList(new EntityWrapper<TransferLitigationCar>().eq("business_id", businessId).eq("process_id", processId));
+			if (CollectionUtils.isEmpty(cars)) {
+				return Result.error("500", "没有找到相关流程数据！");
+			}
 			List<ProcessTypeStep> processTypeSteps = processTypeStepService.selectList(
 					new EntityWrapper<ProcessTypeStep>().eq("type_id", process.getProcessTypeid()).orderBy("step"));
 			if (!CollectionUtils.isEmpty(processTypeSteps)
 					&& process.getCurrentStep() == processTypeSteps.get(processTypeSteps.size() - 1).getStep()) {
-				transferOfLitigationService.sendTransferLitigationData(req.getBusinessId(), req.getCrpId(), sendUrl);
+				transferOfLitigationService.sendTransferLitigationData(businessId, cars.get(0).getCrpId(), sendUrl);
 			}
 			return Result.success();
 		} catch (Exception ex) {
