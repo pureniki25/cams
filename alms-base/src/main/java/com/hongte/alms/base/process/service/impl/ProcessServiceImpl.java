@@ -697,6 +697,8 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
             if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.OVERALL.getKey())){//如果角色是全局的
                 List<SysUserRole> userRoles  = sysUserRoleService.selectList(new EntityWrapper<SysUserRole>().eq("role_code",roleCode));
                 if(userRoles.size()==0){
+                    logger.error("流程审批角色对应的用户找不到"+"       roleCode:"+roleCode + "" +
+                            "    processTypeId: " + step.getTypeId()+  "         step "+step.getStep());
                     throw new RuntimeException("流程审批角色对应的用户找不到");
                 }
                 for(SysUserRole userRole:userRoles){
@@ -710,11 +712,15 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
                 String  businessId = process.getBusinessId();
                 BasicBusiness business = basicBusinessService.selectById(businessId);
 
-                List<String> areas = sysOrgService.getParentsOrgs(business.getCompanyId());
+               // List<String> areas = sysOrgService.getParentsOrgs(business.getCompanyId());
 
 //                List<String> users = sysUserService.selectUsersByRoleAndEare(roleCode,areas);
                 List<String> users = sysUserService.selectUserByRoleAndComm(business.getCompanyId(),roleCode);
-
+                if(users.size()==0){
+                    logger.error("流程审批角色对应的用户找不到:companyId:"+business.getCompanyId()+"       roleCode:"+roleCode + "" +
+                            "    processTypeId: " + step.getTypeId()+  "         step "+step.getStep());
+                    throw new RuntimeException("流程审批角色对应的用户找不到");
+                }
                 for(String  map: users){
                     if(i>0){
                         sb.append(",");
@@ -772,6 +778,21 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
         for(ProcessVo vo: list){
 
 //            String statusStr = ProcessStatusEnums.nameOf(vo.getStatus())+"("+ Constant.DEV_DEFAULT_USER+")";
+            String[]  userIds = vo.getApproveUserId().split(",");
+            StringBuilder usb = new StringBuilder();
+            if(userIds.length>0){
+                int i = 0;
+                for(String userId:userIds){
+                    SysUser sysUser = sysUserService.selectById(userId);
+                    if(sysUser!=null){
+                        if(i>0){
+                            usb.append(",");
+                        }
+                        usb.append(sysUser.getUserName());
+                        i++;
+                    }
+                }
+            }
             SysUser sysUser = sysUserService.selectById(vo.getApproveUserId());
             String name = sysUser!=null?sysUser.getUserName():vo.getApproveUserId();
             String statusStr;
@@ -958,8 +979,11 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
             process.setProcessId(UUID.randomUUID().toString());
             process.setCreateTime(new Date());
             process.setCreateUser(loginUserInfoHelper.getUserId());
+            if(ProcessStatusEnums.RUNNING.getKey()==processSaveReq.getProcessStatus()) {//直接提交审核
+            	process.setCurrentStep(beginStep.getStep());
+            }else {
             process.setCurrentStep(-1);//保存草稿设置当前步骤为-1
-
+            }
             process.setProcessEngineFlage(ProcessEngineFlageEnums.LOCAL_SIMPLE_ENGINE.getKey());
             process.setProcessDesc(processSaveReq.getDesc());
 

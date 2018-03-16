@@ -11,11 +11,11 @@ import java.util.*;
  */
 public enum ProcessStatusEnums {
 
-	NEW(-1,"新建"),
-	RUNNING(0,"运行中"),
+	NEW(-1,"草稿"),
+	RUNNING(0,"审批中"),//运行中
 	BEGIN(1,"开始"),
-	END(2,"结束"),
-	CNACL(3,"注销");
+	END(2,"审批结束"),//结束
+	CNACL(3,"撤销");
 
 //	(0:运行中,1:开始,2:结束,3:注销)
 
