@@ -449,7 +449,7 @@ window.layinit(function(htConfig){
                          if(currentItem.businessTypeId == 1 || currentItem.businessTypeId == 9){
                              url = '/transferOfLitigation/carLoanBilling?businessId='+currentItem.businessId;
                             }else if(currentItem.businessTypeId == 2 || currentItem.businessTypeId == 11){
-                             url = '/transferOfLitigation/houseLoan?businessId='+currentItem.businessId;
+                             url = '/expenseSettle/houseLoan?businessId='+currentItem.businessId;
                          }
                         showOneLineOprLayer(url,"结清试算")
                     }}

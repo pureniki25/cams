@@ -23,6 +23,7 @@ window.layinit(function (htConfig) {
 	        baseInfoForm:{
 	        	customerName:""        , // 客户名称
 	        	borrowMoney:""           , // 借款金额
+	        	surplusPrincipal:""           , // 剩余本金
 	        	borrowLimit:""  		, // 借款期限
 	        	repaymentTypeId:""        , // 还款方式
 	        	borrowRate:""	, 		// 年费率
@@ -97,6 +98,7 @@ window.layinit(function (htConfig) {
 		        .then(function (res) {
 		            if (res.data.data != null && res.data.code == 1) {
 		            	vm.baseInfoForm = res.data.data;
+		            	vm.baseInfoForm.borrowRate = res.data.data.borrowRate + '%/年';
 		            	vm.arrearageDetailData = res.data.data.previousFees;
 		            } else {
 		                vm.$Modal.error({content: '执行失败，没有数据返回！' });
@@ -115,8 +117,8 @@ window.layinit(function (htConfig) {
 			
 			axios.get(reqUrl).then(function(res){
 				if(res.data.code=='1'){
-					console.log(res.data.data)
 					vm.baseInfoForm = res.data.data;
+					vm.baseInfoForm.borrowRate = res.data.data.borrowRate + '%/年';
 				}else{
 					vm.$Modal.error({content: '执行失败，没有找到数据！' });
 				}
