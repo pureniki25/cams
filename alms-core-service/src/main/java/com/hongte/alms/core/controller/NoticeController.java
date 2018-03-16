@@ -1,11 +1,9 @@
 package com.hongte.alms.core.controller;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import com.hongte.alms.base.entity.SysUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,16 +71,21 @@ public class NoticeController {
 	public Result<List<Notice>> listNotice(){
 		try {
 			String userId = loginUserInfoHelper.getUserId();
-			String orgCode = sysUserService.selectById(userId).getOrgCode();
-			List<String> orgCodes = sysOrgService.getParentsOrgs(orgCode);
-			if (orgCodes==null) {
-				orgCodes = new ArrayList<>();
+			SysUser  user = sysUserService.selectById(userId);
+			List<Notice> list = new LinkedList<>();
+			if(user!=null){
+				String orgCode = sysUserService.selectById(userId).getOrgCode();
+				List<String> orgCodes = sysOrgService.getParentsOrgs(orgCode);
+				if (orgCodes==null) {
+					orgCodes = new ArrayList<>();
+				}
+				orgCodes.add(orgCode);
+				EntityWrapper<Notice> ew = new EntityWrapper<Notice>();
+				ew.isNull("is_deleted").eq("is_send", 1).in("org_code", orgCodes);
+				ew.orderBy("publish_time", false);
+				list = noticeService.selectList(ew);
 			}
-			orgCodes.add(orgCode);
-			EntityWrapper<Notice> ew = new EntityWrapper<Notice>();
-			ew.isNull("is_deleted").eq("is_send", 1).in("org_code", orgCodes);
-			ew.orderBy("publish_time", false);
-			List<Notice> list = noticeService.selectList(ew);
+
 			return Result.success(list);
 		} catch (Exception e) {
 			return Result.error("500", e.getMessage());
