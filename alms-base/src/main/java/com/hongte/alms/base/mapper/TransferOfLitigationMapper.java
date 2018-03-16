@@ -80,4 +80,11 @@ public interface TransferOfLitigationMapper {
 	 * @return
 	 */
 	List<PreviousFeesVO> queryPreviousFees(@Param(value="businessId") String businessId, @Param(value="billDate") Date billDate);
+	
+	/**
+	 * 查询最后一期的应还日期
+	 * @param businessId
+	 * @return
+	 */
+	Map<String, Object> queryMaxDueDateByBusinessId(@Param(value="businessId") String businessId);
 }
