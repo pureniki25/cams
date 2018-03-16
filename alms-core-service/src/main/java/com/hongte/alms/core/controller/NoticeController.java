@@ -123,7 +123,7 @@ public class NoticeController {
 	@GetMapping("/page")
 	@ApiOperation(value = "分页获取通知公告")
 	@ResponseBody
-	public PageResult<List<Notice>> page(Integer page,Integer limit){
+	public PageResult<List<Notice>> page(Integer page,Integer limit,String title,Date startDate,Date endDate){
 		String userId = loginUserInfoHelper.getUserId();
 		logger.info("userId:"+userId);
 		String orgCode = sysUserService.selectById(userId).getOrgCode();
@@ -132,7 +132,20 @@ public class NoticeController {
 			orgCodes = new ArrayList<>();
 		}
 		orgCodes.add(orgCode);
-		Page<Notice> page2 = noticeService.selectPage(new Page<Notice>(page, limit), new EntityWrapper<Notice>().like("org_code", orgCode));
+		EntityWrapper<Notice> ew = new EntityWrapper<Notice>();
+		ew.eq("create_user_id", userId) ;
+		ew.isNull("is_deleted");
+		if (title!=null) {
+			ew.like("notice_title", title);
+		}
+		
+		if (startDate!=null) {
+			ew.gt("publish_time", startDate);
+		}
+		if (endDate!=null) {
+			ew.lt("publish_time", endDate);
+		}
+		Page<Notice> page2 = noticeService.selectPage(new Page<Notice>(page, limit), ew);
 		return PageResult.success(page2.getRecords(), page2.getTotal());
 		
 	}
@@ -203,5 +216,18 @@ public class NoticeController {
 		upLoadResult.setMessage(uploadItemId);
         return upLoadResult;
     }
+	@ApiOperation(value = "上传凭证")
+	@GetMapping("/del")
+	public Result del(String noticeId) {
+		Notice notice = noticeService.selectById(noticeId);
+		if (notice==null) {
+			return Result.error("500", "notice 不存在");
+		}
+		notice.setDeleteTime(new Date());
+		notice.setDeleteUserId(loginUserInfoHelper.getUserId());
+		notice.setIsDeleted(1);
+		notice.updateById();
+		return Result.success(true);
+	}
 }
 
