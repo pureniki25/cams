@@ -163,7 +163,7 @@ window.layinit(function (htConfig) {
           let event = o.event ;
           console.log(o)
           if(event=='check'){
-                axios.get(basePath+'/api/getXindaiDeferView',{params:{businessId:data.id}})
+                axios.get(basePath+'api/getXindaiDeferView',{params:{businessId:data.id}})
                 .then(function(res){
                     if(res.data.code=='1'){
                         app.loanDetailModal.url = res.data
