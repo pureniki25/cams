@@ -1,0 +1,170 @@
+
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+    <title >催收策略</title>
+    <script src="/properties/config.js"></script>
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
+    <!-- iview样式 -->
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
+    <!--@import url("//unpkg.com/iview/dist/styles/iview.css");-->
+    <!--<link rel="stylesheet" type="text/css" href="//unpkg.com/iview/dist/styles/iview.css"/>-->
+    <!-- 引入layui样式 -->
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all"/>
+
+    <!--   <script src="//unpkg.com/vue/dist/vue.js"></script>
+       <script src="//unpkg.com/iview/dist/iview.min.js"></script>-->
+    <!-- 引入vue -->
+    <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+    <!-- iview js -->
+    <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+    <!--引入layui.js-->
+    <script src="/plugins/layui/layui.js"></script>
+    <!--引入axios.js 用于ajax调用-->
+    <script src="/plugins/axios/axios.min.js"></script>
+    <!-- 引入jQuery，必须在appToken.js 之前引入 -->
+    <script src="/build/js/jquery-3.3.1.min.js"></script>
+    <!-- 设置全局请求头:app、Authorization -->
+    <script src="/build/js/appToken.js"></script>
+    <!--引入公共的一些方法-->
+    <script src="/src/js/comm.js"></script>
+
+</head>
+<body class="layui-layout-body">
+<!--隐藏元素-->
+<!--<p id="staffType"  th:attr="value=${staffType}"  hidden />-->
+<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+<div id="app">
+    <div class="layui-side ">
+        <!--<Tree :data="data1" :load-data="loadData"  show-checkbox ></Tree>-->
+        <Tree :data="data1"  @on-check-change="myclick" show-checkbox  ref="tree" ></Tree>
+    </div>
+
+    <div class="layui-body">
+        <!-- 内容主体区域 -->
+        <div style="border-bottom: 1px solid #e9e9e9;padding-bottom:6px;margin-bottom:6px;">
+            <Checkbox
+                    :indeterminate="indeterminate"
+                    :value="checkAll"
+                    @click.prevent.native="handleCheckAll">全选</Checkbox>
+        </div>
+        <checkbox-group v-model="checkAllGroup" @on-change="checkAllGroupChange">
+            <Checkbox v-for="item in checkAllGroup" :label="item.areaName"  @on-change="singleCheck"></Checkbox>
+        </checkbox-group>
+        <i-button type="primary" @click="confirmForm">Primary</i-button>
+        <i-button type="ghost">Ghost</i-button>
+
+    </div>
+
+
+</div>
+
+<script>
+
+
+    window.layinit(function (htConfig) {
+        var _htConfig = htConfig;
+        basePath = _htConfig.coreBasePath;
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                data1: [
+                    {
+                        title: '鸿特信息咨询有限公司',
+                        loading: false,
+                        children: []
+                    }
+                ],
+                checkAllGroup:[],
+                checkAll: false,
+                indeterminate: true,
+                checkAreas:[],
+                checkCitys:[]
+
+            },
+            computed: {},
+            methods: {
+                myclick: function (data) {
+                    var self = this;
+                    var index = (function () {
+                        if (event.target.className === "ivu-checkbox-input") return $(event.target).parents('li').find('ul').index($(event.target).parents('ul')[0]);
+                    })();
+                    //保存已选中的区域,清除取消勾选的区域
+                    self.checkAreas = self.$refs.tree.getCheckedNodes();
+                    this.getCompany(this.data1[0].children[index].areaId);
+                },
+                init: function () {
+                    var self = this;
+                },
+                getArea:function () {
+                    var self = this;
+                    var url = basePath + "collectionStrategy/getAreaList";
+                    $.ajax({
+                        type: "GET",
+                        url: url,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (data) {
+                            self.data1[0].children = data.data
+                        }
+
+                    });
+                },
+                getCompany: function (areaPid) {
+                    var self = this;
+                    var url = basePath + "collectionStrategy/getCompanyList?areaPid="+areaPid;
+                    $.ajax({
+                        type: "GET",
+                        url: url,
+                        contentType: "application/json; charset=utf-8",
+//                        async: true,
+                        dataType: "json",
+                        success: function (data) {
+                            self.checkAllGroup = data.data;
+                        }
+
+                    });
+                },
+                checkAllGroupChange:function (data) {
+                    console.log(this);
+                },
+                handleCheckAll:function () {
+                    if (this.indeterminate) {
+                        this.checkAll = false;
+                    } else {
+                        this.checkAll = !this.checkAll;
+                    }
+                    this.indeterminate = false;
+
+                },
+                confirmForm:function () {
+                    var self = this;
+                    alert(123);
+                    var cityList = self.checkAllGroup;
+                    var areaList = self.data1[0].children;
+                },
+                singleCheck:function () {
+                    alert(123);
+                }
+            },
+            mounted: function () {
+                this.init();
+
+                this.getArea();
+
+
+            }
+            
+
+        })
+    });
+
+</script>
+
+</body>
+</html>
