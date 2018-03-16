@@ -327,6 +327,8 @@ window.layinit(function (htConfig) {
            sendUserIds		:[],// 抄送人ID,以逗号间隔
            // sendUserNames :'',//抄送人名字,以逗号间隔
            copySendInfo		:'',// 抄送内容
+           businessId		:'',// 业务编号
+           crpId		:'',// 抄送内容
        },
 
 
@@ -568,8 +570,14 @@ var saveApprovalInfo = function(){
     vm.approvalInfoForm.isPass = vm.approvalInfoForm.isPassFlage=="是"?"1":"2";   // 是否审批通过
     vm.approvalInfoForm.isDirectBack = vm.approvalInfoForm.isDirectBackFlage=="是"?"1":"0";  // 是否回退
     // ////////// --------------- 审批流程 标志位转换 ------------------///////////////
+    if (vm.approvalInfoForm.businessId == null || vm.approvalInfoForm.businessId == '') {
+    	vm.approvalInfoForm.businessId = businessId;
+	}
+    if (vm.approvalInfoForm.crpId == null || vm.approvalInfoForm.crpId == '') {
+    	vm.approvalInfoForm.crpId = crpId;
+    }
 
-    axios.post(basePath +'transferOfLitigation/saveApprovalLogInfo', vm.approvalInfoForm )
+    axios.post(basePath +'transferOfLitigation/saveHouseApprovalLogInfo', vm.approvalInfoForm )
         .then(function (res) {
             if (res.data.code == "1") {
                 vm.$Modal.success({
@@ -601,6 +609,11 @@ var saveapplyInfo = function(pStatus){
                     vm.commitInfoForm.crpId = crpId;
                 }
             	
+              //赋值 processId 
+                if(vm.approvalInfoForm.process!=null){
+                    vm.commitInfoForm.processId = vm.approvalInfoForm.process.processId;
+                }
+                
 		    	vm.commitInfoForm.processStatus = pStatus;
                 axios.post(basePath+ 'transferOfLitigation/saveTransferLitigationHouse', vm.commitInfoForm)
                     .then(function (res) {

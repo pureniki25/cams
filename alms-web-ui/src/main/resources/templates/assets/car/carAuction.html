@@ -104,65 +104,65 @@ color: #FF3030;
 						<tr>
 							<td class="td_label">业务编号</td>
 							<td><input type="text" name="lname"
-								class="input-border-none" v-bind:value="business.businessId"></td>
+								class="input-border-none" v-bind:value="business.businessId" readonly="readonly"></td>
 							<td class="td_label">客户姓名</td>
 							<td><input type="text" name="lname"
-								class="input-border-none" v-bind:value="business.customerName"></td>
+								class="input-border-none" v-bind:value="business.customerName" readonly="readonly"></td>
 							<td class="td_label">借款金额</td>
 							<td><input type="text" name="lname"
-								class="input-border-none" v-bind:value="business.borrowMoney"></td>
+								class="input-border-none" v-bind:value="business.borrowMoney" readonly="readonly"></td>
 						</tr>
 						<tr>
 							<td class="td_label">借款期限</td>
 							<td><input type="text" name="lname"
-								class="input-border-none" v-bind:value="business.borrowLimit"></td>
+								class="input-border-none" v-bind:value="business.borrowLimit" readonly="readonly"></td>
 							<td class="td_label">还款方式</td>
 							<td><input type="text" name="lname"
-								class="input-border-none" value="到期还本息" v-if="business.repaymentTypeId==1" />
+								class="input-border-none" value="到期还本息" v-if="business.repaymentTypeId==1" readonly="readonly"/>
 								<input type="text" name="lname"
-								class="input-border-none" value="每月付息到期还本" v-if="business.repaymentTypeId==2" />
+								class="input-border-none" value="每月付息到期还本" v-if="business.repaymentTypeId==2" readonly="readonly"/>
 								<input type="text" name="lname"
-								class="input-border-none" value="等本等息" v-if="business.repaymentTypeId==4" />
+								class="input-border-none" value="等本等息" v-if="business.repaymentTypeId==4" readonly="readonly"/>
 								<input type="text" name="lname"
-								class="input-border-none" value="等额本息" v-if="business.repaymentTypeId==5" />
+								class="input-border-none" value="等额本息" v-if="business.repaymentTypeId==5" readonly="readonly"/>
 								<input type="text" name="lname"
-								class="input-border-none" value="分期还本付息" v-if="business.repaymentTypeId==9" />
+								class="input-border-none" value="分期还本付息" v-if="business.repaymentTypeId==9" readonly="readonly"/>
 							<td class="td_label">费率</td>
 							<td><input type="text" name="lname"
-								class="input-border-none" v-bind:value="business.borrowRate+'%'" />
+								class="input-border-none" v-bind:value="business.borrowRate+'%'" readonly="readonly"/>
 						</tr>
 						<tr>
 							<td class="td_label">拖车时间</td>
 							<td><input type="text" name="lname"
-								class="input-border-none" v-bind:value="drag.dragDate"></td>
+								class="input-border-none" v-bind:value="drag.dragDate" readonly="readonly"></td>
 							<td class="td_label">业务主办</td>
 							<td><input type="text" name="lname"
-								class="input-border-none" v-bind:value="business.operatorName"></td>
+								class="input-border-none" v-bind:value="business.operatorName" readonly="readonly"></td>
 							<td class="td_label">出款人</td>
 							<td><input type="text" name="lname"
-								class="input-border-none" v-bind:value="outputRecord.outputUserName"></td>
+								class="input-border-none" v-bind:value="outputRecord.outputUserName" readonly="readonly"></td>
 						</tr>
 						<tr>
 							<td class="td_label">出款日期</td>
 							<td><input type="text" name="lname"
-								class="input-border-none" v-bind:value="outputRecord.factOutputDate"></td>
+								class="input-border-none" v-bind:value="outputRecord.factOutputDate" readonly="readonly"></td>
 							<td class="td_label">已还本金</td>
 							<td><input type="text" name="lname"
-								class="input-border-none" v-bind:value="repayPlan.payedPrincipal"></td>
+								class="input-border-none" v-bind:value="repayPlan.payedPrincipal" readonly="readonly"></td>
 							<td class="td_label">已还利息</td>
 							<td><input type="text" name="lname"
-								class="input-border-none" v-bind:value="repayPlan.payedInterest"></td>
+								class="input-border-none" v-bind:value="repayPlan.payedInterest" readonly="readonly"></td>
 						</tr>
 						<tr>
 							<td class="td_label">剩余本金</td>
 							<td><input type="text" name="lname"
-								class="input-border-none" v-bind:value="business.borrowMoney-repayPlan.payedPrincipal"></td>
+								class="input-border-none" v-bind:value="business.borrowMoney-repayPlan.payedPrincipal" readonly="readonly"></td>
 							<td class="td_label">利息交至日期</td>
 							<td><input type="text" name="lname"
-								class="input-border-none" v-bind:value="repayPlan.lastPayDate"></td>
+								class="input-border-none" v-bind:value="repayPlan.lastPayDate" readonly="readonly"></td>
 							<td class="td_label">逾期天数</td>
 							<td><input type="text" name="lname"
-								class="input-border-none" v-bind:value="repayPlan.overdueDays"></td>
+								class="input-border-none" v-bind:value="repayPlan.overdueDays" readonly="readonly"></td>
 						</tr>
 					</table>
 
@@ -432,12 +432,12 @@ color: #FF3030;
 							<td><input type="text" name="lname"  v-model="carAuction.consultantTel"
 								id="consultantTel"></td>
 						</tr>
-			<!-- 			<tr>
-							<td class="td_label">拍卖物所在位置</td>
+						<tr>
+							<td class="td_label">竞价规则</td>
 							<td colspan="5"><input type="text" name="lname"
-								v-model="carAuction.auctionPosition" style="width: 100%" maxlength="200">
+								v-model="carAuction.auctionRules" style="width: 100%" maxlength="200" readonly="readonly" >
 							</td>
-						</tr> -->
+						</tr> 
 						<tr>
 							<td class="td_label">处置单位<label class="input_label">*</label></td>
 							<td colspan="5"><input type="text" name="lname"

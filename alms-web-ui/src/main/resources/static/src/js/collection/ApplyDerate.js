@@ -553,6 +553,10 @@ var saveapplyInfo = function(pStatus){
                 }
                 // 0 不结清， 1结清
                 vm.applyInfoForm.isSettle = vm.applyInfoForm.isSettleFlage=="是"?1:0;
+                if(vm.approvalInfoForm.process!=null){
+                    vm.applyInfoForm.processId = vm.approvalInfoForm.process.processId;
+                }
+
                 // var str = JSON.stringify(vm.applyInfoForm).toString();
                 axios.post(basePath+ 'ApplyDerateController/saveApplyDerateInfo',vm.applyInfoForm )
                     .then(function (res) {

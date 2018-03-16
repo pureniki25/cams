@@ -55,10 +55,10 @@
 				and bus.business_id LIKE #{businessId}
 			</if>
 			<if test="areaId !=null and areaId !=''">
-				and com.area_id = #{areaId}
+				and bus.district_id = #{areaId}
 			</if>
 			<if test="companyId !=null and companyId !=''">
-				and com.company_id = #{companyId}
+				and bus.company_id = #{companyId}
 			</if>
 			<if test="customerName !=null and customerName !=''">
 				and bus.customer_name LIKE #{customerName}
@@ -187,6 +187,7 @@
 		end carproduction ,					<!--汽车产地 -->
 		tcb.color carColour ,<!--车辆颜色 -->
 		tcb.model carModel ,<!--车辆型号 -->
+		tcb.license_location vehicleTerritory,<!-- 汽车属地 -->
 		concat(tcb.displacement,tcb.displacement_unit) displacement ,	<!--排量 -->
 		tcb.engine_model engineNumber ,<!--发动机号 -->
 		tcb.vin frameNumber ,<!--车架号 -->

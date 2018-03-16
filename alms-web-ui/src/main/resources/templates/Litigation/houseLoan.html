@@ -62,7 +62,7 @@
     
     <Card>
         <p slot="title">
-            审批流程
+            <h3>审批流程</h3>
         </p>
         <div class="ProcessWarp">
             <ProcessLine :data='myProcess'></ProcessLine>
@@ -74,10 +74,10 @@
 		<!--基本信息表单内容-->
 		<i-form ref="commitInfoForm" :model="commitInfoForm" label-position="right" :label-width="100" :rules="validCommitInfoForm">
 		<Card>
-			<p>
-				一、业务基本信息
+			<p slot="title">
+				<h3>一、业务基本信息</h3>
 			</p>
-			<row :gutter="16">
+			<row :gutter="16" style="margin-top:1rem">
 		        <div class="table">
 		            <div class="tr">
 		                <div class="td"> <div class="td-box">业务编号</div><div class="td-box">{{ baseInfoForm.businessId }} </div> </div>
@@ -105,13 +105,13 @@
 		</Card>
 		
 		<Card>
-			<p>
-				二、还款计划信息
+			<p slot="title">
+				<h3>二、还款计划信息</h3>
 			</p>
-			<row :gutter="16">
+			<row :gutter="16" style="margin-top:1rem">
                 <i-table border :columns="repaymentPlanTitle" :data="repaymentPlanTitleData"></i-table>
 			</row>
-			<row :gutter="16" style="margin-top:10px">
+			<row :gutter="16" style="margin-top:1rem">
 				<i-col v-if="applyInfoFormEditFlage" span="22">
                     <form-item label="客户逾期情况描述：" prop="overdueDesc" >
                         <i-input v-model="commitInfoForm.overdueDesc" type="textarea" :rows="4" placeholder="申请人员填写，必填。限1000字"></i-input>
@@ -126,12 +126,13 @@
 		</Card>
 		
 		<Card>
-			<p>
-				三、抵押物情况
+			<p slot="title">
+				<h3>三、抵押物情况</h3>
 			</p>
-			<row :gutter="16" v-for="(info, index) in baseInfoForm.mortgageInfos">
-				<i-lable>抵押物{{index+1}}</i-lable>
-				 <div class="table">
+			<row :gutter="16" v-for="(info, index) in baseInfoForm.mortgageInfos" style="margin-top:1rem">
+			
+				<i-lable ><h3>抵押物 {{index+1}}：</h3></i-lable>
+				 <div class="table"  style="margin-top:1rem">
 				 	<div class="tr">
 				 		<div class="td"> <div class="td-box">抵押物位置</div><div class="td-box">{{ info.houseAddress }} </div> </div>
 				 		<div class="td"> <div class="td-box"></div><div class="td-box"> </div> </div>
@@ -175,7 +176,7 @@
 		        </div>
 		    </row>   
 		    
-		    <row :gutter="16">
+		    <row :gutter="16" style="margin-top:1rem">
 				<i-col v-if="applyInfoFormEditFlage" span="22">
                     <form-item label="未能覆盖的风险口：" prop="riskDesc" >
                         <i-input v-model="commitInfoForm.riskDesc" type="textarea" :rows="4" placeholder="申请人员填写，必填，限500字"></i-input>
@@ -201,12 +202,12 @@
 		</Card>
 		
 		<Card>
-			<p>
-				四、合同信息
+			<p slot="title">
+				<h3>四、合同信息</h3>
 			</p>
-			<row :gutter="16">
-				<i-col span="5">
-                    <form-item v-if="applyInfoFormEditFlage" label="转账收据张数："   prop="transferReceiptCount">
+			<row :gutter="16" style="margin-top:1rem">
+				<i-col span="7">
+                    <form-item v-if="applyInfoFormEditFlage" label="转账收据张数：" prop="transferReceiptCount">
                         <i-input v-model="commitInfoForm.transferReceiptCount" ></i-input>
                     </form-item>
                     <form-item v-else label="转账收据张数："  disabled>
@@ -214,8 +215,8 @@
                     </form-item>
                 </i-col>
                 
-				<i-col span="5">
-                    <form-item v-if="applyInfoFormEditFlage" label="现金收据张数："   prop="cashReceiptCount">
+				<i-col span="7">
+                    <form-item v-if="applyInfoFormEditFlage" label="现金收据张数：" prop="cashReceiptCount">
                         <i-input v-model="commitInfoForm.cashReceiptCount" ></i-input>
                     </form-item>
                     <form-item v-else label="现金收据张数："  disabled>
@@ -223,14 +224,16 @@
                     </form-item>
                 </i-col>
                 
-                <i-col span="5">
-                    <form-item v-if="applyInfoFormEditFlage == true" label="还款收据第二联是否在客户手上：" prop="receiptStatus"  >
+                <i-col span="10">
+                    <form-item v-if="applyInfoFormEditFlage == true" prop="receiptStatus"  >
+                    	<i-lable>还款收据第二联是否在客户手上：</i-lable>
                         <radio-group v-model="commitInfoForm.receiptStatus" >
                             <radio label="是" ></radio>
                             <radio label="否" ></radio>
                         </radio-group>
                     </form-item>
-                    <form-item v-else label="还款收据第二联是否在客户手上：" prop="receiptStatus" disabled  >
+                    <form-item v-else prop="receiptStatus" disabled  >
+                    	<i-lable>还款收据第二联是否在客户手上：</i-lable>
                         <radio-group v-model="commitInfoForm.receiptStatus" disabled>
                             <radio label="是" disabled></radio>
                             <radio label="否" disabled></radio>
@@ -254,61 +257,66 @@
 		</Card>
 		
 		<Card>
-			<p>
-				五、业务经办调查结果
+			<p slot="title">
+				<h3>五、业务经办调查结果</h3>
 			</p>
-			<row :gutter="16">
-				<i-col span="10">
+			<row :gutter="16" style="margin-top:1rem">
+				<i-col span="12">
                     <form-item v-if="applyInfoFormEditFlage" label="客户是否有意向还款："   prop="repaymentIntention">
                         <i-input v-model="commitInfoForm.repaymentIntention" ></i-input>
                     </form-item>
-                    <form-item v-else label="客户是否有意向还款："  disabled>
+                    <form-item v-else label="是否有意向还款："  disabled>
                         <i-input v-model="commitInfoForm.repaymentIntention" disabled ></i-input>
                     </form-item>
                 </i-col>
                 
-				<i-col span="10">
-                    <form-item v-if="applyInfoFormEditFlage" label="意向还款计划："   prop="repaymentIntentionDate">
-                        <i-input v-model="commitInfoForm.repaymentIntentionDate" type="date"></i-input>
+				<i-col span="12">
+                    <form-item v-if="applyInfoFormEditFlage" label="客户意向还款计划："   prop="repaymentIntentionDate">
+                    	<date-picker type="date" v-model="commitInfoForm.repaymentIntentionDate"/>
                     </form-item>
                     <form-item v-else label="意向还款计划："  disabled>
-                        <i-input v-model="commitInfoForm.repaymentIntentionDate" type="date" disabled ></i-input>
+                        <date-picker type="date" v-model="commitInfoForm.repaymentIntentionDate"/>
                     </form-item>
                 </i-col>
            	</row>
            	
-	        <row :gutter="16">
-                <table v-for="(info, index) in baseInfoForm.mortgageInfos" width="91%" border="1">
-					<tr>
-						<td>序号</td>
-						<td>抵押物地址号</td>
-						<td>面积（M2）</td>
-						<td>风控审批单价</td>
-						<td>额定单价</td>
-						<td>是否易变现</td>
-					</tr>
-					<tr>
-						<td>{{index+1}}</td>
-						<td>{{info.houseAddress}}</td>
-						<td>{{info.houseArea}}</td>
-						<td>{{info.housePrice}}</td>
-						<td>
-							<form-item prop="ratedPrice" >
-								<i-input type="text" v-model="commitInfoForm.ratedPrice"/>
-							</form-item>
-						</td>
-						<td>
-							<i-select v-model="commitInfoForm.liquidate" clearable  filterable prop="liquidate">
-                                <i-option  value="1">易变现</i-option>
-                                <i-option  value="2">不易变现</i-option>
-                                <i-option  value="3">一般</i-option>
-                            </i-select>
-                        </td>
-					</tr>
-				</table>
-			</row>
+           	<row :gutter="16" v-for="(info, index) in baseInfoForm.mortgageInfos">
+				 <div class="table">
+				 	<div class="tr">
+				 		<div class="td"> <div class="td-box">序号</div><div class="td-box">抵押物地址号</div> </div>
+				 		<div class="td"> <div class="td-box">面积（M2）</div><div class="td-box">风控审批单价</div> </div>
+				 		<div class="td"> <div class="td-box">额定单价</div><div class="td-box">是否易变现</div> </div>
+				 	</div>
+				 	<div class="tr">
+				 		<div class="td"> <div class="td-box">{{index+1}}</div><div class="td-box">{{info.houseAddress}}</div> </div>
+				 		<div class="td"> <div class="td-box">{{info.houseArea}}</div><div class="td-box">{{info.housePrice}}</div> </div>
+				 		<div class="td"> 
+				 			<div class="td-box" v-if="applyInfoFormEditFlage">
+				 				<i-input style="width:50%" v-model="commitInfoForm.ratedPrice" type="number" number/>
+				 			</div>
+				 			<div class="td-box" v-else disabled>
+				 				<i-input style="width:50%" v-model="commitInfoForm.ratedPrice" type="number" number disabled/>
+				 			</div>
+				 			<div class="td-box" v-if="applyInfoFormEditFlage">
+				 				<i-select v-model="commitInfoForm.liquidate" clearable  filterable prop="liquidate">
+	                                <i-option  value="1">易变现</i-option>
+	                                <i-option  value="2">不易变现</i-option>
+	                                <i-option  value="3">一般</i-option>
+                            	</i-select>
+				 			</div> 
+				 			<div class="td-box" v-else disabled>
+				 				<i-select v-model="commitInfoForm.liquidate" clearable  filterable prop="liquidate" disabled>
+	                                <i-option  value="1" disabled>易变现</i-option>
+	                                <i-option  value="2" disabled>不易变现</i-option>
+	                                <i-option  value="3" disabled>一般</i-option>
+                            	</i-select>
+				 			</div> 
+				 		</div>
+				 	</div>
+		        </div>
+		    </row> 
 	        
-           	<row :gutter="16">
+           	<row :gutter="16" style="margin-top:1rem">
            		<i-col v-if="applyInfoFormEditFlage" span="22">
                     <form-item label="其他财务情况：" prop="firstPecuniaryCondition" >
                         <i-input v-model="commitInfoForm.firstPecuniaryCondition" type="textarea" :rows="4" placeholder="请写明房产具体地址、房产证号、车牌号码，以及是否有抵押给他人的情况（必填，限500字）"></i-input>
@@ -336,10 +344,10 @@
 		</Card>
 		
 		<Card>
-			<p>
-				六、分公司/区域贷后跟进结果
+			<p slot="title">
+				<h3>六、分公司/区域贷后跟进结果</h3>
 			</p>
-			<row :gutter="16">
+			<row :gutter="16" style="margin-top:1rem">
 				<i-col span="10">
                     <form-item v-if="applyInfoFormEditFlage" label="移交人："   prop="operator">
                         <i-input v-model="commitInfoForm.operator" ></i-input>
@@ -351,10 +359,10 @@
                 
 				<i-col span="10">
                     <form-item v-if="applyInfoFormEditFlage" label="移交时间："   prop="operateDate">
-                        <i-input v-model="commitInfoForm.operateDate" type="date"></i-input>
+                    	<date-picker type="date" v-model="commitInfoForm.operateDate"/>
                     </form-item>
                     <form-item v-else label="移交时间："  disabled>
-                        <i-input v-model="commitInfoForm.operateDate" type="date" disabled ></i-input>
+                    	<date-picker type="date" v-model="commitInfoForm.operateDate"/>
                     </form-item>
                 </i-col>
 			</row>
@@ -388,10 +396,10 @@
 		
 		<Card v-if="approvalInfoFormShowFlage">
             <p slot="title">
-              	 七、审批
+              	 <h3>七、审批</h3>
             </p>
             <!--审批信息表单内容-->
-            <row :gutter="16">
+            <row :gutter="16" style="margin-top:1rem">
                 <i-form ref="approvalInfoForm"  :model="approvalInfoForm"   :rules = "approvalInfoFormValidate"  label-position="right" :label-width="100">
 
                     <row :gutter="16" v-for="(approvalInfo) in approvalInfoList"   :value="approvalInfo.processLogId" :key="approvalInfo.processLogId">

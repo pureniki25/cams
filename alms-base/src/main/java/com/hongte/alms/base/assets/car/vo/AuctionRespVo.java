@@ -112,7 +112,7 @@ public class AuctionRespVo implements Serializable{
 	    private String frameNumber ; 
 	    
 	    @ApiModelProperty(value="车辆属地",name="vehicleTerritory ")
-	    private String cehicleTerritory ; 
+	    private String vcehicleTerritory ; 
 	    
 	    @ApiModelProperty(value="使用性质",name="useProperty ")
 	    private String useProperty ; 
@@ -408,12 +408,14 @@ public class AuctionRespVo implements Serializable{
 			this.frameNumber = frameNumber;
 		}
 
-		public String getCehicleTerritory() {
-			return cehicleTerritory;
+
+
+		public String getVcehicleTerritory() {
+			return vcehicleTerritory;
 		}
 
-		public void setCehicleTerritory(String cehicleTerritory) {
-			this.cehicleTerritory = cehicleTerritory;
+		public void setVcehicleTerritory(String vcehicleTerritory) {
+			this.vcehicleTerritory = vcehicleTerritory;
 		}
 
 		public String getUseProperty() {

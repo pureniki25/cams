@@ -23,8 +23,8 @@ public interface CarMapper  {
 	List<AuctionRespVo> selectAuctionsPageForApp(@Param("page") int page,@Param("limit") int limit);
 	int selectAuctionsCountForApp();
 	//查询此次拍卖的最高竞价
-	Map<String,BigDecimal> selectMaxOfferPriceByAuctionId(String auctionId);
+	Map<String,BigDecimal> selectMaxOfferPriceByAuctionId(@Param("auctionId") String auctionId);
 	//查询拍卖信息
-	List<AuctionBidderVo> selectBiddersPageForApp(@Param("page") int page,@Param("limit") int limit ,@Param("isPayDeposit")Boolean isPayDeposit,@Param("auctionId")String auctionId,@Param("bidderName") String bidderName,@Param("regTel") String regTel);
-	int selectBiddersCountForApp(@Param("isPayDeposit")Boolean isPayDeposit,@Param("auctionId")String auctionId,@Param("bidderName") String bidderName,@Param("regTel") String regTel);
+	List<AuctionBidderVo> selectBiddersPageForApp(@Param("page") int page,@Param("limit") int limit ,@Param("isPayDeposit")Integer isPayDeposit,@Param("auctionId")String auctionId,@Param("bidderName") String bidderName,@Param("regTel") String regTel);
+	int selectBiddersCountForApp(@Param("isPayDeposit")Integer isPayDeposit,@Param("auctionId")String auctionId,@Param("bidderName") String bidderName,@Param("regTel") String regTel);
 }

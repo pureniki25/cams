@@ -95,7 +95,7 @@ public class CarAuctionController {
 				logger.error("参数为空,page="+page+",limit="+limit+",priceId="+priceID+",telephone="+telephone);
 				return PageResult.error(9999, "参数为空,page="+page+",limit="+limit+",priceId="+priceID+",telephone="+telephone); 
 			}
-			Boolean isPayDeposit=true;
+			Integer isPayDeposit=1;
 			Page<AuctionBidderVo> pages=carService.selectBiddersPageForApp(page, limit, isPayDeposit, priceID, null, telephone);
 			return PageResult.success(pages.getRecords(),pages.getTotal());
 		}catch (Exception e) {

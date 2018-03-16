@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,7 +43,9 @@ import io.swagger.annotations.Api;
 @RequestMapping(value = "/collection", method = RequestMethod.POST)
 @Api(value = "collection", description = "贷后系统  催收 对外接口")
 public class CollectionController {
-
+	
+	private Logger logger = LoggerFactory.getLogger(CollectionController.class);
+	
 	@Autowired
 	@Qualifier("CollectionStatusService")
 	CollectionStatusService collectionStatusService ;
@@ -52,18 +56,27 @@ public class CollectionController {
 	
 	@PostMapping("/update")
     @ResponseBody
-	public Result update(String jsonData) {
-		ResponseEncryptData resp = JSON.parseObject(jsonData, ResponseEncryptData.class);
+	public Result update(String businessId) {
+		/*ResponseEncryptData resp = JSON.parseObject(jsonData, ResponseEncryptData.class);
 		String decryptStr = new DESC().Decode(resp.getA(), resp.getUUId());
 		EncryptionResult res = JSON.parseObject(decryptStr, EncryptionResult.class);
 		ResponseData respData = JSON.parseObject(res.getParam(), ResponseData.class);
-		JSONObject jsonObject = JSON.parseObject(respData.getData());
-		String businessId = jsonObject.getString("businessId");
-		
-		List<CollectionStatus> list = collectionStatusService.selectList(new EntityWrapper<CollectionStatus>().eq("business_id", businessId)) ;
-		if (list==null) {
-			return Result.success(null);
+		JSONObject jsonObject = JSON.parseObject(respData.getData());*/
+		/*logger.info("jsonData:"+jsonData);
+		if (jsonData==null) {
+			return Result.error("500", "jsonData 不能为空");
 		}
+		JSONObject jsonObject = JSON.parseObject(jsonData);
+		String businessId = jsonObject.getString("businessId");*/
+		if (businessId==null||businessId.equals("")) {
+			return Result.error("500", "businessId 不能为空");
+		}
+		logger.info("businessId:"+businessId);
+		List<CollectionStatus> list = collectionStatusService.selectList(new EntityWrapper<CollectionStatus>().eq("business_id", businessId)) ;
+		if (list==null||list.size()==0) {
+			return Result.success(businessId);
+		}
+		logger.info("list:"+JSON.toJSONString(list));
 		
 		List<CollectionLog> logs = new ArrayList<>() ;
 		for (CollectionStatus collectionStatus : list) {
@@ -79,10 +92,12 @@ public class CollectionController {
 			log.setSetWay(CollectionSetWayEnum.XINDAI_CALL.getKey());
 			logs.add(log);
 		}
-		collectionStatusService.updateBatchById(list);
-		collectionLogService.insertBatch(logs);
-		
-		System.out.println(JSON.toJSONString(respData));
-		return Result.success(jsonData);
+		boolean statusUpdateResult = collectionStatusService.updateBatchById(list);
+		boolean logInsertResult = collectionLogService.insertBatch(logs);
+		if (statusUpdateResult&&logInsertResult) {
+			return Result.success(businessId);
+		}else {
+			return Result.error("500", "数据更新失败");
+		}
 	}
 }

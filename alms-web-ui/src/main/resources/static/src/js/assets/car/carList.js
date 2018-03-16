@@ -77,45 +77,6 @@ var repay_status_array = [{
 
 
 
-
-//催收级别定义
-var  collect_level_array= [{
-    paramValue: '1',
-    paramName: 'M1(<31天)'
-}, {
-    paramValue: '2',
-    paramName: 'M2(<31-60天)'
-}, {
-    paramValue: '3',
-    paramName: 'M3(<61-90天)'
-}];
-
-//查询表单验证
-var setSearchFormValidate = {
-/**
-    delayDaysBegin: [
-        {pattern: '^[0-9]*$', message: '请输入数字',trigger: 'blur'  },
-    ],
-    delayDaysEnd: [
-        {pattern: '^[0-9]*$', message: '请输入数字',trigger: 'blur'  }
-    ],
-    operatorName: [
-        {type: 'string', message: '请输入文字', trigger: 'blur'}
-    ],
-    businessId: [
-        {type: 'string', message: '请输入文字', trigger: 'blur'}
-    ],
-    liquidationOne: [
-        {type: 'string', message: '请输入文字', trigger: 'blur'}
-    ],
-    liquidationTow: [
-        {type: 'string', message: '请输入文字', trigger: 'blur'}
-    ],
-    customerName: [
-        {type: 'string', message: '请输入文字', trigger: 'blur'}
-    ]**/
-};
-
 var basePath;
 var vm;
 window.layinit(function (htConfig) {
@@ -132,7 +93,7 @@ window.layinit(function (htConfig) {
         submitLoading: false,
         searchForm: {
         	businessId:'',
-        	regName:'',  //客户名称
+        	customerName:'',  //客户名称
         	licensePlateNumber:'',
         	model:'',
             areaId:'',  //区域ID
@@ -149,14 +110,12 @@ window.layinit(function (htConfig) {
         businessTypeList:'',//btype_array,   //业务类型列表
         carStatusList:'',//business_status_array,        //业务状态列表
         repayStatusList:'',//repay_status_array,        //还款状态列表
-        collectLevelList:'',//collect_level_array, //催收级别列表
+        //collectLevelList:'',//collect_level_array, //催收级别列表
 
 
         selectedRowInfo:'',//存储当前选中行信息
         edit_modal:false,//控制编辑项选择modal显示的标志位
-        menu_modal:false,
-        ruleValidate:setSearchFormValidate //表单验证
-
+        menu_modal:false
     },
 
     methods: {
@@ -388,7 +347,7 @@ window.layinit(function (htConfig) {
         	    });
           };
           fileUp=function(currentItem,reqTypeName){
-         	var url=uiBasePath+"page/doc/upLoad.html?businessId="+currentItem.businessId;
+         	var url="/page/doc/upLoad.html?businessId="+currentItem.businessId;
       	    var openIndex= layer.open({
       	        type: 2,
                   area: ['95%', '95%'],
@@ -399,7 +358,7 @@ window.layinit(function (htConfig) {
       	    }); 
           };
           viewFile=function(currentItem,reqTypeName){
-        	  alert("aaaa");
+        	  //alert("aaaa");
               $.ajax({
 	                type: "GET",
 	                url: basePath+'api/getXindaiThumbnailView?businessId='+currentItem.businessId,

@@ -119,7 +119,8 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 					if (data!=null) {
 						JSONObject json = JSONObject.parseObject(data);
 						String moneyPoolId = json.getString("moneyPoolId");
-//						String moneyPoolRepaymentId = json.getString("moneyPoolRepaymentId");
+						String moneyPoolRepaymentId = json.getString("moneyPoolRepaymentId");
+						moneyPoolRepayment.setXdMatchingId(moneyPoolRepaymentRows);
 						nMoneyPool.setXdPoolId(Integer.valueOf(moneyPoolId));
 						moneyPoolRepayment.setXdPoolId(Integer.valueOf(moneyPoolId));
 						moneyPoolMapper.updateById(nMoneyPool);
@@ -192,7 +193,8 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 					if (data!=null) {
 						JSONObject json = JSONObject.parseObject(data);
 						String moneyPoolId = json.getString("moneyPoolId");
-//						String moneyPoolRepaymentId = json.getString("moneyPoolRepaymentId");
+						String moneyPoolRepaymentId = json.getString("moneyPoolRepaymentId");
+						moneyPoolRepayment.setXdMatchingId(moneyPoolRepaymentRows);
 						moneyPool.setXdPoolId(Integer.valueOf(moneyPoolId));
 						moneyPoolRepayment.setXdPoolId(Integer.valueOf(moneyPoolId));
 						moneyPoolMapper.updateById(moneyPool);
