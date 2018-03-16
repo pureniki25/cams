@@ -22,8 +22,10 @@ layui.define(function (exports) {
         //是否使用网关的标志位
         ,useGateWayflage:useGateWayflage
         // ,useGateWayflage:true
-        // ,defaultUser:"admin-alms"
+//         ,defaultUser:"admin-alms"
+//        	 ,defaultUser:"lijinpei"
         ,defaultUser:"0101240315"   //贷后中心清算一部主管
+//        	,defaultUser:"0101203201"   //陈晓敏
         // ,defaultUser:"test_leader"  //区域贷后主管
         ,localBasePath:"http://localhost:30606/"
         ,openBasePath:"http://localhost:30616/"

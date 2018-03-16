@@ -91,11 +91,11 @@
         FROM
         tb_collection_person_set_detail
         INNER JOIN tb_sys_user ON tb_collection_person_set_detail.user_id = tb_sys_user.user_id
-        <where>
-            <foreach collection="userNames" item="item" index="index" separator=" OR ">
-                tb_sys_user.user_name like '%${item}%'
-            </foreach>
-        </where>
+        <!--<where>-->
+            <!--<foreach collection="userNames" item="item" index="index" separator=" OR ">-->
+                <!--tb_sys_user.user_name like '%${item}%'-->
+            <!--</foreach>-->
+        <!--</where>-->
         GROUP BY
         tb_collection_person_set_detail.col_person_id,
         tb_collection_person_set_detail.team
@@ -119,6 +119,7 @@
         corp.companyId
 
     </select>
+
 
 
 </mapper>

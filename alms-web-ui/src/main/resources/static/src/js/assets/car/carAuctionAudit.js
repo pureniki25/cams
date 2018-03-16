@@ -954,15 +954,15 @@ window.layinit(function (htConfig) {
 	    			return ;
 	    		}else{
 	    			var inputDate=new Date(vm.carAuction.paymentEndTime.replace("-", "/").replace("-", "/"));  
-	    			if(inputDate>currentDate){
+	    			if(inputDate<currentDate){
 	    				$("#paymentEndTime").css("border","1px solid #FF3030");
-	    				layer.msg("不能大于当前日期！",{icon:5,shade: [0.8, '#393D49']});
+	    				layer.msg("不能小于于当前日期！",{icon:5,shade: [0.8, '#393D49']});
 	    				return ;
 	    			}
 	    			
 	    		}
 	    		if((vm.approvalInfoForm.isPass==''||vm.approvalInfoForm.isPass==null)&&vm.approvalInfoForm.process.status!=-1){
-	    			alert(processStatus);
+	    			//alert(processStatus);
 	    			layer.msg("请输入是否同意审批",{icon:5,shade: [0.8, '#393D49']});
 	    			return ;
 	    		}

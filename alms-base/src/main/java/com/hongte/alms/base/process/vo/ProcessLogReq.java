@@ -26,6 +26,9 @@ public class ProcessLogReq extends ProcessLog{
 
     //当前审批者是否是创建者的标志位
     private Boolean isCreaterFlage;
+    
+    private String businessId;
+    private String crpId;
 
 //    isPass			:'',//是否同意
 //    isPassFlage			:'',//是否同意界面显示标志位
@@ -38,7 +41,23 @@ public class ProcessLogReq extends ProcessLog{
         return process;
     }
 
-    public void setProcess(Process process) {
+    public String getBusinessId() {
+		return businessId;
+	}
+
+	public void setBusinessId(String businessId) {
+		this.businessId = businessId;
+	}
+
+	public String getCrpId() {
+		return crpId;
+	}
+
+	public void setCrpId(String crpId) {
+		this.crpId = crpId;
+	}
+
+	public void setProcess(Process process) {
         this.process = process;
     }
 

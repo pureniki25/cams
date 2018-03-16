@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
 import java.io.Serializable;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
@@ -44,6 +46,7 @@ public class CollectionTimeSet extends Model<CollectionTimeSet> {
 	private Integer overDueDays;
 	@TableField("start_time")
 	@ApiModelProperty(required= true,value = "")
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
 	private Date startTime;
     /**
      * 创建时间

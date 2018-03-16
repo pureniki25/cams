@@ -20,6 +20,8 @@
         <result column="second_related_personnel" property="secondRelatedPersonnel" />
         <result column="first_pecuniary_condition" property="firstPecuniaryCondition" />
         <result column="second_pecuniary_condition" property="secondPecuniaryCondition" />
+        <result column="rated_price" property="ratedPrice" />
+        <result column="liquidate" property="liquidate" />
         <result column="operator" property="operator" />
         <result column="operate_date" property="operateDate" />
         <result column="process_status" property="processStatus" />
@@ -31,7 +33,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        business_id AS businessId, process_id AS processId, crp_id AS crpId, overdue_desc AS overdueDesc, risk_desc AS riskDesc, other_pledge_desc AS otherPledgeDesc, transfer_receipt_count AS transferReceiptCount, cash_receipt_count AS cashReceiptCount, receipt_status AS receiptStatus, contract_desc AS contractDesc, repayment_intention AS repaymentIntention, repayment_intention_date AS repaymentIntentionDate, first_related_personnel AS firstRelatedPersonnel, second_related_personnel AS secondRelatedPersonnel, first_pecuniary_condition AS firstPecuniaryCondition, second_pecuniary_condition AS secondPecuniaryCondition, operator, operate_date AS operateDate, process_status AS processStatus, update_time AS updateTime, update_user AS updateUser, create_user AS createUser, create_time AS createTime
+        business_id AS businessId, process_id AS processId, crp_id AS crpId, overdue_desc AS overdueDesc, risk_desc AS riskDesc, other_pledge_desc AS otherPledgeDesc, transfer_receipt_count AS transferReceiptCount, cash_receipt_count AS cashReceiptCount, receipt_status AS receiptStatus, contract_desc AS contractDesc, repayment_intention AS repaymentIntention, repayment_intention_date AS repaymentIntentionDate, first_related_personnel AS firstRelatedPersonnel, second_related_personnel AS secondRelatedPersonnel, first_pecuniary_condition AS firstPecuniaryCondition, second_pecuniary_condition AS secondPecuniaryCondition, rated_price AS ratedPrice, liquidate, operator, operate_date AS operateDate, process_status AS processStatus, update_time AS updateTime, update_user AS updateUser, create_user AS createUser, create_time AS createTime
     </sql>
 
 </mapper>

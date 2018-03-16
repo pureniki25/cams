@@ -190,6 +190,8 @@ window.layinit(function (htConfig) {
            sendUserIds		:[],// 抄送人ID,以逗号间隔
            // sendUserNames :'',//抄送人名字,以逗号间隔
            copySendInfo		:'',// 抄送内容
+           businessId		:'',// 业务编号
+           crpId		:'',// 抄送内容
        },
 
 
@@ -409,7 +411,7 @@ var getShowInfo = function () {
             	} 
             	vm.commitInfoForm.businessId = res.data.data.baseInfo.businessId;
             	if (res.data.data.houseAddress != null && res.data.data.houseAddress.length > 0) {
-            		vm.commitInfoForm.houseAddress = res.data.data.houseAddress.split('#');
+            		vm.commitInfoForm.houseAddress = res.data.data.houseAddress.split('--#separator#--');
 				}
             	
             	var docFiles=res.data.data.returnRegFiles;
@@ -550,7 +552,14 @@ var saveApprovalInfo = function(){
     vm.approvalInfoForm.isDirectBack = vm.approvalInfoForm.isDirectBackFlage=="是"?"1":"0";  // 是否回退
     // ////////// --------------- 审批流程 标志位转换 ------------------///////////////
     
-    axios.post(basePath +'transferOfLitigation/saveApprovalLogInfo', vm.approvalInfoForm )
+    if (vm.approvalInfoForm.businessId == null || vm.approvalInfoForm.businessId == '') {
+    	vm.approvalInfoForm.businessId = businessId;
+	}
+    if (vm.approvalInfoForm.crpId == null || vm.approvalInfoForm.crpId == '') {
+    	vm.approvalInfoForm.crpId = crpId;
+    }
+    
+    axios.post(basePath +'transferOfLitigation/saveCarApprovalLogInfo', vm.approvalInfoForm )
         .then(function (res) {
             if (res.data.code == "1") {
                 vm.$Modal.success({

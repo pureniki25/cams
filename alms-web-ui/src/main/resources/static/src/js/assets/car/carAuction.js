@@ -476,6 +476,10 @@ window.layinit(function (htConfig) {
 	                	if(vm.carAuction.transType==null){
 	                		vm.carAuction.transType='';
 	                	}
+	                	
+	                	if(vm.carAuction.auctionRules==null||vm.carAuction.auctionRules==''){
+	                		vm.carAuction.auctionRules='至少一人报名且出价不低于起拍价，方可成交';
+	                	}
 	                	//alert(JSON.stringify(vm.carAuction));
 	                	var docFiles=data.data.returnRegFiles;
 	                	
@@ -816,9 +820,9 @@ window.layinit(function (htConfig) {
 	    			return ;
 	    		}else{
 	    			var inputDate=new Date(vm.carAuction.paymentEndTime.replace("-", "/").replace("-", "/"));  
-	    			if(inputDate>currentDate){
+	    			if(inputDate<currentDate){
 	    				$("#paymentEndTime").css("border","1px solid #FF3030");
-	    				layer.msg("不能大于当前日期！",{icon:5,shade: [0.8, '#393D49']});
+	    				layer.msg("不能小于当前日期！",{icon:5,shade: [0.8, '#393D49']});
 	    				return ;
 	    			}
 	    			

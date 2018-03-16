@@ -347,7 +347,7 @@ window.layinit(function (htConfig) {
         	    });
           };
           fileUp=function(currentItem,reqTypeName){
-         	var url=uiBasePath+"page/doc/upLoad.html?businessId="+currentItem.businessId;
+         	var url="/page/doc/upLoad.html?businessId="+currentItem.businessId;
       	    var openIndex= layer.open({
       	        type: 2,
                   area: ['95%', '95%'],

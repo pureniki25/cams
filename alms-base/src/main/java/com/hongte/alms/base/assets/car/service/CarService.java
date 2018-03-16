@@ -15,6 +15,6 @@ public interface CarService {
 	public Page<CarVo> selectCarPage(CarReq carReq);
 	public List<CarVo> selectCarList(CarReq carReq);
 	Page<AuctionRespVo> selectAuctionsPageForApp( int page, int limit);
-	Page<AuctionBidderVo> selectBiddersPageForApp(int page, int limit,Boolean isPayDeposit,String auctionId,String bidderName,String regTel);
+	Page<AuctionBidderVo> selectBiddersPageForApp(int page, int limit,Integer isPayDeposit,String auctionId,String bidderName,String regTel);
 	Map<String,BigDecimal> selectMaxOfferPriceByAuctionId(String auctionId);
 }
