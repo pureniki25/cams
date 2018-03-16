@@ -601,6 +601,11 @@ var saveapplyInfo = function(pStatus){
                     vm.commitInfoForm.crpId = crpId;
                 }
             	
+              //赋值 processId 
+                if(vm.approvalInfoForm.process!=null){
+                    vm.commitInfoForm.processId = vm.approvalInfoForm.process.processId;
+                }
+                
 		    	vm.commitInfoForm.processStatus = pStatus;
                 axios.post(basePath+ 'transferOfLitigation/saveTransferLitigationHouse', vm.commitInfoForm)
                     .then(function (res) {
