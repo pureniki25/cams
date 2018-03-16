@@ -714,6 +714,10 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
 
 //                List<String> users = sysUserService.selectUsersByRoleAndEare(roleCode,areas);
                 List<String> users = sysUserService.selectUserByRoleAndComm(business.getCompanyId(),roleCode);
+                if(users==null||users.size()<=0) {
+                	logger.error("当前用户没有操作改公司业务的权限，companyId="+business.getCompanyId()+"roleCode="+roleCode);
+                	 throw new RuntimeException("当前用户没有操作改公司业务的权限");
+                }
 
                 for(String  map: users){
                     if(i>0){
