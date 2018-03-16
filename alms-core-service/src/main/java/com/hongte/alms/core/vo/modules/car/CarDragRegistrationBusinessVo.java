@@ -77,12 +77,17 @@ public class CarDragRegistrationBusinessVo {
      */
     private BigDecimal evaluationAmount;
 
+
     /**
      * 评估人
      */
     private String evaluationUser;
 
 
+    /**
+     * 当前登录用户名
+     */
+    private String currentUserName;
 
     public String getBusinessId() {
         return businessId;
@@ -194,6 +199,14 @@ public class CarDragRegistrationBusinessVo {
 
     public void setEvaluationUser(String evaluationUser) {
         this.evaluationUser = evaluationUser;
+    }
+
+    public String getCurrentUserName() {
+        return currentUserName;
+    }
+
+    public void setCurrentUserName(String currentUserName) {
+        this.currentUserName = currentUserName;
     }
 
 

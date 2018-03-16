@@ -13,11 +13,11 @@ import java.util.List;
  */
 public class CarDragRegistrationInfo {
 
-    public Date getDragDate() {
+    public String getDragDate() {
         return dragDate;
     }
 
-    public void setDragDate(Date dragDate) {
+    public void setDragDate(String dragDate) {
         this.dragDate = dragDate;
     }
 
@@ -112,8 +112,7 @@ public class CarDragRegistrationInfo {
     /**
      * [拖车日期]
      */
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date dragDate;
+    private String dragDate;
 
     /**
      * [拖车经办人]

@@ -90,6 +90,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -106,8 +107,10 @@ import javax.servlet.http.HttpServletResponse;
 @Api(tags = "CarController", description = "资产管理-车辆管理", hidden = true)
 public class CarController {
     private Logger logger = LoggerFactory.getLogger(CarController.class);
-    
-    
+
+    @Autowired
+    private LoginUserInfoHelper loginUserInfoHelper;
+
     @Autowired
     @Qualifier("CarService")
     private CarService carService;
@@ -244,6 +247,7 @@ public class CarController {
 			carDragRegistrationBusinessVo.setEvaluationTime(carDetection.getCreateTime());
 			carDragRegistrationBusinessVo.setEvaluationAmount(carDetection.getEvaluationAmount());
 			carDragRegistrationBusinessVo.setEvaluationUser(carDetection.getCreateUser());
+			carDragRegistrationBusinessVo.setCurrentUserName(loginUserInfoHelper.getLoginInfo().getUserName());
 			return Result.success(carDragRegistrationBusinessVo);
 
 		}
@@ -256,13 +260,15 @@ public class CarController {
 
 	@ApiOperation(value="保存拖车登记")
 	@PostMapping("saveDragRegistrationInfo")
-	public Result<CarDragRegistrationBusinessVo> saveDragRegistrationInfo(@RequestBody CarDragRegistrationInfo registrationInfo)
+	public Result<Object> saveDragRegistrationInfo(@RequestBody CarDragRegistrationInfo registrationInfo)
 	{
 		try {
+			SimpleDateFormat dragDateFormat=new SimpleDateFormat("yyyy-MM-dd");
+			Date dragDate=dragDateFormat.parse(registrationInfo.getDragDate());
 			CarDrag carDrag=new CarDrag();
 			carDrag.setId(UUID.randomUUID().toString() );
 			carDrag.setBusinessId(registrationInfo.getBusinessId());
-			carDrag.setDragDate(registrationInfo.getDragDate());
+			carDrag.setDragDate( dragDate);
 			carDrag.setDragHandler(registrationInfo.getDragHandler());
 			carDrag.setProvince(registrationInfo.getProvince());
 			carDrag.setCity(registrationInfo.getCity());
@@ -271,9 +277,12 @@ public class CarController {
 			carDrag.setFee(registrationInfo.getFee());
 			carDrag.setOtherFee(registrationInfo.getOtherFee());
 			carDrag.setRemark(registrationInfo.getRemark());
-			//carDrag.setCreateUser(loginUserInfoHelper.getLoginInfo().getUserName());
+			carDrag.setCreateUser(loginUserInfoHelper.getLoginInfo().getUserName());
 			carDrag.setCreateTime(new Date());
 			carDragService.insert(carDrag);
+			CarBasic originCarBasic= carBasicService.selectOne(new EntityWrapper<CarBasic>().eq("business_id",registrationInfo.getBusinessId()));
+            originCarBasic.setStatus("01");
+            carBasicService.updateAllColumnById(originCarBasic);
 			List<CarDragDoc> attachments=registrationInfo.getAttachments();
 			if(attachments!=null&&attachments.size()>0) {
 
