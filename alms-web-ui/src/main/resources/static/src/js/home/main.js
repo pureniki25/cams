@@ -285,7 +285,7 @@ window.layinit(function (htConfig) {
 
             if (obj.data.businessTypeId == 9) {
                 //车贷
-                axios.get(basePath + 'api/getXindaiCarView?businessId =' + obj.data.businessId)
+                axios.get(basePath + 'api/getXindaiCarView?businessId=' + obj.data.businessId)
                     .then(function (res) {
                         if (res.data.code == "1") {
                             showOneLineOprLayer(res.data.data, "车贷详情");
@@ -298,7 +298,7 @@ window.layinit(function (htConfig) {
                     });
             } else if (obj.data.businessTypeId == 11) {
                 //房贷
-                axios.get(basePath + 'api/getXindaiHouseView?businessId =' + obj.data.businessId)
+                axios.get(basePath + 'api/getXindaiHouseView?businessId=' + obj.data.businessId)
                     .then(function (res) {
                         if (res.data.code == "1") {
                             showOneLineOprLayer(res.data.data, "房贷详情");
