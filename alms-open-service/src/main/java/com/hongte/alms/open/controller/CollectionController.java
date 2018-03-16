@@ -56,22 +56,25 @@ public class CollectionController {
 	
 	@PostMapping("/update")
     @ResponseBody
-	public Result update(String jsonData) {
+	public Result update(String businessId) {
 		/*ResponseEncryptData resp = JSON.parseObject(jsonData, ResponseEncryptData.class);
 		String decryptStr = new DESC().Decode(resp.getA(), resp.getUUId());
 		EncryptionResult res = JSON.parseObject(decryptStr, EncryptionResult.class);
 		ResponseData respData = JSON.parseObject(res.getParam(), ResponseData.class);
 		JSONObject jsonObject = JSON.parseObject(respData.getData());*/
-		logger.info("jsonData:"+jsonData);
+		/*logger.info("jsonData:"+jsonData);
 		if (jsonData==null) {
 			return Result.error("500", "jsonData 不能为空");
 		}
 		JSONObject jsonObject = JSON.parseObject(jsonData);
-		String businessId = jsonObject.getString("businessId");
+		String businessId = jsonObject.getString("businessId");*/
+		if (businessId==null||businessId.equals("")) {
+			return Result.error("500", "businessId 不能为空");
+		}
 		logger.info("businessId:"+businessId);
 		List<CollectionStatus> list = collectionStatusService.selectList(new EntityWrapper<CollectionStatus>().eq("business_id", businessId)) ;
-		if (list==null) {
-			return Result.success(null);
+		if (list==null||list.size()==0) {
+			return Result.success(businessId);
 		}
 		logger.info("list:"+JSON.toJSONString(list));
 		
@@ -92,7 +95,7 @@ public class CollectionController {
 		boolean statusUpdateResult = collectionStatusService.updateBatchById(list);
 		boolean logInsertResult = collectionLogService.insertBatch(logs);
 		if (statusUpdateResult&&logInsertResult) {
-			return Result.success(jsonData);
+			return Result.success(businessId);
 		}else {
 			return Result.error("500", "数据更新失败");
 		}
