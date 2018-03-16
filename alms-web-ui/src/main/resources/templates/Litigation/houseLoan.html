@@ -271,10 +271,10 @@
                 
 				<i-col span="12">
                     <form-item v-if="applyInfoFormEditFlage" label="意向还款计划："   prop="repaymentIntentionDate">
-                        <i-input v-model="commitInfoForm.repaymentIntentionDate" type="date"></i-input>
+                    	<date-picker type="date" v-model="commitInfoForm.repaymentIntentionDate"/>
                     </form-item>
                     <form-item v-else label="意向还款计划："  disabled>
-                        <i-input v-model="commitInfoForm.repaymentIntentionDate" type="date" disabled ></i-input>
+                        <date-picker type="date" v-model="commitInfoForm.repaymentIntentionDate"/>
                     </form-item>
                 </i-col>
            	</row>
@@ -358,10 +358,10 @@
                 
 				<i-col span="10">
                     <form-item v-if="applyInfoFormEditFlage" label="移交时间："   prop="operateDate">
-                        <i-input v-model="commitInfoForm.operateDate" type="date"></i-input>
+                    	<date-picker type="date" v-model="commitInfoForm.operateDate"/>
                     </form-item>
                     <form-item v-else label="移交时间："  disabled>
-                        <i-input v-model="commitInfoForm.operateDate" type="date" disabled ></i-input>
+                    	<date-picker type="date" v-model="commitInfoForm.operateDate"/>
                     </form-item>
                 </i-col>
 			</row>
