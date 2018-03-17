@@ -57,7 +57,7 @@ import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 
-@Service("transferLitigationService")
+@Service("TransferOfLitigationService")
 public class TransferLitigationServiceImpl implements TransferOfLitigationService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TransferLitigationServiceImpl.class);
@@ -212,7 +212,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				sendLitigation(transferLitigationData, sendUrl);
 			}
 		} catch (Exception e) {
-			LOG.error("发送诉讼系统失败！！！", e);
+			LOG.error("发送诉讼系统失败！！！   businessId:"+ businessId+"  crpId:"+crpId, e);
 			throw new ServiceRuntimeException("发送诉讼系统失败！！！", e);
 		}
 

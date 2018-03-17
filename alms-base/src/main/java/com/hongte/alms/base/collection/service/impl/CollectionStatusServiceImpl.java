@@ -10,8 +10,12 @@ import com.hongte.alms.base.collection.enums.StaffPersonType;
 import com.hongte.alms.base.collection.mapper.CollectionStatusMapper;
 import com.hongte.alms.base.collection.service.*;
 import com.hongte.alms.base.collection.vo.StaffBusinessVo;
+import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.service.RepaymentBizPlanListDetailService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
+import com.hongte.alms.base.service.RepaymentBizPlanService;
+import com.hongte.alms.base.service.TransferOfLitigationService;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.RandomUtil;
@@ -20,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,6 +72,15 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
     @Qualifier("RepaymentBizPlanListService")
     RepaymentBizPlanListService repaymentBizPlanListService;
 
+    @Autowired
+    @Qualifier("RepaymentBizPlanService")
+    RepaymentBizPlanService repaymentBizPlanService;
+
+
+    @Autowired
+    @Qualifier("TransferOfLitigationService")
+    TransferOfLitigationService transferLitigationService;
+
     /**
      * 设置电催/人员(界面手动设置)
      * @param voList 业务信息列表
@@ -90,17 +104,62 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
         }
 //        String  userId= "programer_zk";
 
-        Integer collectionStatus ;
-        if(staffType.equals(StaffPersonType.PHONE_STAFF.getKey())){
-            collectionStatus = CollectionStatusEnum.PHONE_STAFF.getKey();
-        }else if (staffType.equals(StaffPersonType.VISIT_STAFF.getKey())){
-            collectionStatus =CollectionStatusEnum.COLLECTING.getKey();
-        }else if(staffType.equals(StaffPersonType.LAW.getKey())){
-            collectionStatus =CollectionStatusEnum.TO_LAW_WORK.getKey();
-        }else{
-            collectionStatus =CollectionStatusEnum.COLSED.getKey();
+
+
+//        if(staffType.equals(StaffPersonType.PHONE_STAFF.getKey())){
+//            collectionStatus = CollectionStatusEnum.PHONE_STAFF.getKey();
+//        }else if (staffType.equals(StaffPersonType.VISIT_STAFF.getKey())){
+//            collectionStatus =CollectionStatusEnum.COLLECTING.getKey();
+//        }else if(staffType.equals(StaffPersonType.LAW.getKey())){
+//            collectionStatus =CollectionStatusEnum.TO_LAW_WORK.getKey();
+//        }else{
+//            collectionStatus =CollectionStatusEnum.CLOSED.getKey();
+//        }
+
+        //如果是移交法务、关闭、拖车登记
+        //需要更新此业务所有的历史记录为移交法务/关闭 /拖车登记
+        if(staffType.equals(CollectionStatusEnum.TO_LAW_WORK.getPageStr())
+                || staffType.equals(CollectionStatusEnum.CLOSED.getPageStr())
+                || staffType.equals(CollectionStatusEnum.TRAILER_REG.getPageStr())){
+            //1、更新历史记录为移交法务 /关闭  /拖车登记
+            for(StaffBusinessVo vo:voList){
+                List<CollectionStatus> list = selectList(new EntityWrapper<CollectionStatus>().eq("business_id",vo.getBusinessId()));
+                for(CollectionStatus status:list){
+                    status.setCollectionStatus(CollectionStatusEnum.getByPageStr(staffType).getKey());
+                    status.setSetWay(setWayEnum.getKey());
+                    status.setUpdateTime(new Date());
+                    switch (setWayEnum){
+                        case XINDAI_CALL:
+                        case AUTO_SET:
+                            status.setUpdateUser(Constant.DEFAULT_SYS_USER);
+                            break;
+                        case MANUAL_SET:
+                            status.setUpdateUser(loginUserInfoHelper.getUserId()==null?Constant.SYS_DEFAULT_USER:loginUserInfoHelper.getUserId());
+                            break;
+                    }
+                }
+                if(list.size()>0){
+                    updateBatchById(list);
+                }
+            }
+        }else if(staffType.equals(CollectionStatusEnum.PHONE_STAFF.getPageStr())
+                || staffType.equals(CollectionStatusEnum.COLLECTING.getPageStr())){
+            //如果是设置电催或者催收 判断业务是否已经拖车登记/关闭/移交法务
+            for(StaffBusinessVo vo:voList){
+                List<CollectionStatus> list = selectList(new EntityWrapper<CollectionStatus>().eq("business_id",vo.getBusinessId()));
+                for(CollectionStatus status:list) {
+                    if (status.getCollectionStatus().equals(CollectionStatusEnum.TO_LAW_WORK.getKey())
+                    ||status.getCollectionStatus().equals(CollectionStatusEnum.CLOSED.getKey())
+                    ||status.getCollectionStatus().equals(CollectionStatusEnum.TRAILER_REG.getKey())){
+                        String statStr = CollectionStatusEnum.getByKey(status.getCollectionStatus()).getName();
+                        logger.error("此业务已"+statStr+"，不能再设置催收或者电催！  businessId:"+ status.getBusinessId()+"     crpId:"+status.getCrpId());
+                        throw  new  RuntimeException("此业务已"+statStr+"，不能再设置催收或者电催！");
+                    }
+                }
+            }
         }
 
+        Integer collectionStatus = CollectionStatusEnum.getByPageStr(staffType).getKey();
         for(StaffBusinessVo vo:voList){
             CollectionStatus status = new CollectionStatus();
             //1、插入或更新催收状态表
@@ -149,11 +208,70 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
             log.setUpdateTime(new Date());
             log.setSetWay(setWayEnum.getKey());
             collectionLogService.insert(log);
-            //3、更新关联的业务信息表和还款计划表状态（待实现）
+
 
         }
         return true;
     }
+
+    /**
+     * 设置业务的贷后状态（移交法务、拖车登记、关闭 调用此方法）
+     * @param businessId
+     * @param crpId
+     * @param describe
+     * @param setWayEnum
+     * @return
+     */
+    public boolean setBussinessAfterStatus(
+            String businessId,
+            String crpId,
+            String describe,
+            CollectionStatusEnum  satusEnum,
+            CollectionSetWayEnum setWayEnum){
+
+        List<StaffBusinessVo> voList = new LinkedList<>();
+        StaffBusinessVo vo  = new StaffBusinessVo();
+        vo.setCrpId(crpId);
+        vo.setBusinessId(businessId);
+        voList.add(vo);
+
+        if(satusEnum!=CollectionStatusEnum.TO_LAW_WORK
+                &&satusEnum!=CollectionStatusEnum.TRAILER_REG
+                &&satusEnum!=CollectionStatusEnum.CLOSED){
+            return false;
+        }
+
+        return  setBusinessStaff(voList,"",describe,satusEnum.getPageStr(),setWayEnum);
+
+    }
+
+
+/*    public boolean setClosed(String businessId,String crpId,CollectionSetWayEnum setWayEnum){
+        List<StaffBusinessVo> voList = new LinkedList<>();
+        StaffBusinessVo vo  = new StaffBusinessVo();
+        vo.setCrpId(crpId);
+        vo.setBusinessId(businessId);
+        voList.add(vo);
+
+
+        return  setBusinessStaff(voList,"","",CollectionStatusEnum.CLOSED.getPageStr(),setWayEnum);
+
+    }*/
+
+
+/*
+    private CollectionStatus creatStatus(
+            String businessId,
+            String crpId,
+            String setWay,
+            String staffType,
+            CollectionSetWayEnum setWayEnum){
+        CollectionStatus status  = new CollectionStatus();
+
+        status.setCollectionStatus();
+
+        return status;
+    }*/
 
     public  boolean setAutoBusinessStaff(String busnessId,
                                          String planListId,
@@ -206,7 +324,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
         //自动移交法务
 
-
+        setBusinessToLaw();
 
 
     }
@@ -242,9 +360,9 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
         //一般业务
         List<RepaymentBizPlanList> planLists = repaymentBizPlanListService.selectNeedPhoneUrgNorBiz(companyId,daysBeforeOverDue);
-        //展期业务
-        List<RepaymentBizPlanList> renewPlanLists = repaymentBizPlanListService.selectNeedPhoneUrgRenewBiz(companyId,daysBeforeOverDue);
-        planLists.addAll(renewPlanLists);
+//        //展期业务
+//        List<RepaymentBizPlanList> renewPlanLists = repaymentBizPlanListService.selectNeedPhoneUrgRenewBiz(companyId,daysBeforeOverDue);
+//        planLists.addAll(renewPlanLists);
         for(RepaymentBizPlanList planList:planLists){
 
             CollectionStatus collectionStatus =  selectOne(new EntityWrapper<CollectionStatus>().eq("business_id",planList.getBusinessId()));
@@ -311,9 +429,9 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
         //一般业务
         List<RepaymentBizPlanList> visitPlanLists = repaymentBizPlanListService.selectNeedVisitNorBiz(companyId,visitDaysAfterOverDue);
-        //展期业务
-        List<RepaymentBizPlanList> visitRnewPlanLists = repaymentBizPlanListService.selectNeedVisitRenewBiz(companyId,visitDaysAfterOverDue);
-        visitPlanLists.addAll(visitRnewPlanLists);
+//        //展期业务
+//        List<RepaymentBizPlanList> visitRnewPlanLists = repaymentBizPlanListService.selectNeedVisitRenewBiz(companyId,visitDaysAfterOverDue);
+//        visitPlanLists.addAll(visitRnewPlanLists);
         for(RepaymentBizPlanList planList:visitPlanLists){
 
             CollectionStatus collectionStatus =  selectOne(new EntityWrapper<CollectionStatus>().eq("business_id",planList.getBusinessId()));
@@ -355,6 +473,8 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
      * 自动移交法务
      * @param
      */
+    @Value("${ht.litigation.url:http://172.16.200.110:30906/api/importLitigation}")
+    private String sendUrl;
     public void setBusinessToLaw() {
         CollectionTimeSet lawTimeSet = collectionTimeSetService.selectOne(new EntityWrapper<CollectionTimeSet>().eq("col_type",CollectionStatusEnum.TO_LAW_WORK.getKey()));
 
@@ -362,13 +482,32 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
         //一般业务
         List<RepaymentBizPlanList> planLists = repaymentBizPlanListService.selectNeedLawNorBiz(lawDaysAfterOverDue);
-        //展期业务
-        List<RepaymentBizPlanList> renewPlanLists = repaymentBizPlanListService.selectNeedLawRenewBiz(lawDaysAfterOverDue);
-        planLists.addAll(renewPlanLists);
+//        //展期业务
+//        List<RepaymentBizPlanList> renewPlanLists = repaymentBizPlanListService.selectNeedLawRenewBiz(lawDaysAfterOverDue);
+//        planLists.addAll(renewPlanLists);
         for(RepaymentBizPlanList planList:planLists) {
-            //调用移交诉讼接口   等胡伟骞调好相关代码 调用
+            RepaymentBizPlan repaymentBizPlan =  repaymentBizPlanService.selectById(planList.getPlanId());
 
-            setAutoBusinessStaff(planList.getBusinessId(),planList.getPlanListId(),
+            try{
+                //调用移交诉讼接口
+                transferLitigationService.sendTransferLitigationData(
+                        repaymentBizPlan.getOriginalBusinessId(),
+                        planList.getPlanListId(),sendUrl);
+                //修改状态
+                setBussinessAfterStatus(
+                        repaymentBizPlan.getOriginalBusinessId(),
+                        planList.getPlanListId(),
+                        "自动移交法务",
+                        CollectionStatusEnum.TO_LAW_WORK,
+                        CollectionSetWayEnum.AUTO_SET);
+            }catch (Exception e){
+                logger.error("自動移交法务异常",e);
+                e.printStackTrace();
+            }
+
+
+
+           /* setAutoBusinessStaff(planList.getBusinessId(),planList.getPlanListId(),
                     null,
                     StaffPersonType.VISIT_STAFF.getKey());
             List<Integer> l = new LinkedList<>();
@@ -383,7 +522,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                             null,
                             StaffPersonType.VISIT_STAFF.getKey());
                 }
-            }
+            }*/
                             //[CollectionStatusEnum.PHONE_STAFF.getKey(),CollectionStatusEnum.COLLECTING.getKey()])
 
         }

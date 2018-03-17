@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
+import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
+import com.hongte.alms.base.collection.service.CollectionStatusService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +56,7 @@ public class TransferOfLitigationController {
 	private static final Logger LOG = LoggerFactory.getLogger(TransferOfLitigationController.class);
 
 	@Autowired
-	@Qualifier("transferLitigationService")
+	@Qualifier("TransferOfLitigationService")
 	private TransferOfLitigationService transferOfLitigationService;
 
 	@Autowired
@@ -78,6 +81,10 @@ public class TransferOfLitigationController {
 	
 	@Value("${ht.litigation.url:http://172.16.200.110:30906/api/importLitigation}")
 	private String sendUrl;
+
+	@Autowired
+	@Qualifier("CollectionStatusService")
+	private CollectionStatusService collectionStatusService;
 
 	/**
 	 * 获取车贷诉讼相关数据
@@ -197,15 +204,17 @@ public class TransferOfLitigationController {
 			
 			StringBuilder houseAddress = new StringBuilder();
 			List<LinkedHashMap<String, Object>> componentOptions = (List<LinkedHashMap<String, Object>>) req.get("componentOption");
-			for (LinkedHashMap<String, Object> componentOption : componentOptions) {
-				LinkedHashMap<String, Object> registrationInfoForm = (LinkedHashMap<String, Object>) componentOption.get("registrationInfoForm");
-				List<String> houseAreas = (List<String>) registrationInfoForm.get("houseArea");
-				String detailAddress = (String) registrationInfoForm.get("detailAddress");
-				String mortgageSituation = (String) registrationInfoForm.get("mortgageSituation");
-				
-				if (!CollectionUtils.isEmpty(houseAreas) && !StringUtil.isEmpty(detailAddress) && !StringUtil.isEmpty(mortgageSituation)) {
-					String houseAreasStr = houseAreas.toString().replace("[", "").replace("]", "").replace(",", "");
-					houseAddress.append(houseAreasStr).append(" ").append(detailAddress).append("，房产抵押情况：").append(mortgageSituation).append("--#separator#--");
+			if(componentOptions!=null) {
+				for (LinkedHashMap<String, Object> componentOption : componentOptions) {
+					LinkedHashMap<String, Object> registrationInfoForm = (LinkedHashMap<String, Object>) componentOption.get("registrationInfoForm");
+					List<String> houseAreas = (List<String>) registrationInfoForm.get("houseArea");
+					String detailAddress = (String) registrationInfoForm.get("detailAddress");
+					String mortgageSituation = (String) registrationInfoForm.get("mortgageSituation");
+
+					if (!CollectionUtils.isEmpty(houseAreas) && !StringUtil.isEmpty(detailAddress) && !StringUtil.isEmpty(mortgageSituation)) {
+						String houseAreasStr = houseAreas.toString().replace("[", "").replace("]", "").replace(",", "");
+						houseAddress.append(houseAreasStr).append(" ").append(detailAddress).append("，房产抵押情况：").append(mortgageSituation).append("--#separator#--");
+					}
 				}
 			}
 			
@@ -233,6 +242,13 @@ public class TransferOfLitigationController {
 			if (!CollectionUtils.isEmpty(processTypeSteps)
 					&& process.getCurrentStep() == processTypeSteps.get(processTypeSteps.size() - 1).getStep()) {
 				transferOfLitigationService.sendTransferLitigationData(req.getBusinessId(), req.getCrpId(), sendUrl);
+				//更新贷后状态为移交诉讼
+				collectionStatusService.setBussinessAfterStatus(
+						req.getBusinessId(),
+						req.getCrpId(),
+						"",
+						CollectionStatusEnum.TO_LAW_WORK,
+						CollectionSetWayEnum.MANUAL_SET);
 			}
 			return Result.success();
 		} catch (Exception ex) {

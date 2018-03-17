@@ -32,6 +32,24 @@ public interface CollectionStatusService extends BaseService<CollectionStatus> {
                                     String staffType,
                                     CollectionSetWayEnum setWayEnum);
 
+
+    /**
+     * 设置业务的贷后状态（移交法务、拖车登记、关闭 调用此方法）
+     * @param businessId  业务ID
+     * @param crpId    还款计划列表ID
+     * @param describe    描述
+     * @param setWayEnum  设置方式枚举
+     * @return
+     */
+    public boolean setBussinessAfterStatus(
+            String businessId,
+            String crpId,
+            String describe,
+            CollectionStatusEnum  satusEnum,
+            CollectionSetWayEnum setWayEnum);
+
+
+
     /**
      *
      * 自动移交：

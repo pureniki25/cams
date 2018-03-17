@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.collection.entity.CollectionLog;
 import com.hongte.alms.base.collection.entity.CollectionStatus;
@@ -28,10 +27,6 @@ import com.hongte.alms.base.collection.service.CollectionLogService;
 import com.hongte.alms.base.collection.service.CollectionStatusService;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.Constant;
-import com.hongte.alms.common.util.DESC;
-import com.hongte.alms.common.util.EncryptionResult;
-import com.hongte.alms.common.vo.ResponseData;
-import com.hongte.alms.common.vo.ResponseEncryptData;
 
 import io.swagger.annotations.Api;
 
@@ -81,10 +76,10 @@ public class CollectionController {
 		List<CollectionLog> logs = new ArrayList<>() ;
 		for (CollectionStatus collectionStatus : list) {
 			CollectionLog log = new CollectionLog();
-			collectionStatus.setCollectionStatus(CollectionStatusEnum.COLSED.getKey());
+			collectionStatus.setCollectionStatus(CollectionStatusEnum.CLOSED.getKey());
 			log.setBusinessId(collectionStatus.getBusinessId());
 			log.setCrpId(collectionStatus.getCrpId());
-			log.setAfterStatus(CollectionStatusEnum.COLSED.getKey());
+			log.setAfterStatus(CollectionStatusEnum.CLOSED.getKey());
 			log.setCollectionUser(Constant.DEFAULT_SYS_USER);
 			log.setCreateTime(new Date());
 			log.setCreateUser(Constant.DEFAULT_SYS_USER);
