@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.assets.car.enums.CarStatusEnums;
 import com.hongte.alms.base.assets.car.service.CarService;
 import com.hongte.alms.base.assets.car.vo.AuctionBidderVo;
+import com.hongte.alms.base.assets.car.vo.AuctionsReqVo;
 import com.hongte.alms.base.assets.car.vo.AuditVo;
 import com.hongte.alms.base.assets.car.vo.CarReq;
 import com.hongte.alms.base.assets.car.vo.CarVo;
@@ -979,21 +980,19 @@ try {
     @ApiOperation(value = "获取竞价信息")
     @GetMapping("/auctionRegList")
     @ResponseBody
-    public PageResult<List<AuctionBidderVo>> selectBiddersPageForApp(@ModelAttribute("businessId") String businessId
-    		,@ModelAttribute("page") int page,@ModelAttribute("limit") int limit,@ModelAttribute("bidderName") String bidderName
-    				,@ModelAttribute("isPayDeposit") String isPayDeposit){
+    public PageResult<List<AuctionBidderVo>> selectBiddersPageForApp(@ModelAttribute AuctionsReqVo req){
 
         try{
         	Integer isPayDepositBoolean=null;
-        	if(StringUtils.isEmpty(isPayDeposit)) {
+        	if(StringUtils.isEmpty(req.getIsPayDeposit())) {
         		isPayDepositBoolean=null;
         	}
-        	List<CarAuction> carAuctions=carAuctionService.selectList(new EntityWrapper<CarAuction>().eq("business_id", businessId));
+        	List<CarAuction> carAuctions=carAuctionService.selectList(new EntityWrapper<CarAuction>().eq("business_id", req.getBusinessId()));
         	CarAuction carAuction=new CarAuction();
         	if(carAuctions!=null&&carAuctions.size()==1) {
         		carAuction=carAuctions.get(0);
         	}
-        	Page<AuctionBidderVo>  pages=carService.selectBiddersPageForApp(page, limit, isPayDepositBoolean, carAuction.getAuctionId(), bidderName, null);
+        	Page<AuctionBidderVo>  pages=carService.selectBiddersPageForApp(req);
             return PageResult.success(pages.getRecords(),pages.getTotal());
         }catch (Exception ex){
             logger.error(ex.getMessage());

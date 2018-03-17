@@ -3,6 +3,10 @@ package com.hongte.alms.base.assets.car.vo;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
+
+import com.hongte.alms.base.entity.Doc;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -12,7 +16,10 @@ public class AuctionRespVo implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
+		
+	   @ApiModelProperty(value="业务编号id",name="businessId")
+	    private String businessId;  //拍卖ID
+	   
 	   @ApiModelProperty(value="区域ID",name="priceID")
 	    private String priceID;  //拍卖ID
 
@@ -88,6 +95,9 @@ public class AuctionRespVo implements Serializable{
 	    @ApiModelProperty(value="账户银行卡卡号",name="cardNo")
 	    private String cardNo;  
 	    
+	    @ApiModelProperty(value="缴款截止时间",name="paymentEndTime")
+	    private String paymentEndTime;  
+	    
 	    @ApiModelProperty(value="车辆品牌",name="vehicleBrand")
 	    private String vehicleBrand; 
 	    
@@ -141,6 +151,9 @@ public class AuctionRespVo implements Serializable{
 	    @ApiModelProperty(value="交易税费",name="taxation ")
 	    private String taxation ; 
 	    
+	    @ApiModelProperty(value="车牌号",name="licensePlateNumber ")
+	    private String licensePlateNumber ; 
+	    
 
 	    @ApiModelProperty(value="交易方式",name="transactionMode ")
 	    private String transactionMode ; 
@@ -151,6 +164,76 @@ public class AuctionRespVo implements Serializable{
 	    
 	    @ApiModelProperty(value="备注",name="remarks  ")
 	    private String remarks  ;
+	    
+	    private  List<Doc> docs;
+	    
+		@ApiModelProperty(required= true,value = "用户姓名 ")
+		private String bidderName;
+	    /**
+	     * 身份证号码 
+	     */
+		@ApiModelProperty(required= true,value = "身份证号码 ")
+		private String bidderCertId;
+	    /**
+	     * 联系方式 
+	     */
+		@ApiModelProperty(required= true,value = "联系方式 ")
+		private String bidderTel;
+	    /**
+	     * 转账账户 
+	     */
+		@ApiModelProperty(required= true,value = "转账账户 ")
+		private String transAccountName;
+	    /**
+	     * 转账卡号
+	     */
+		@ApiModelProperty(required= true,value = "转账卡号")
+		private String transAccountNum;
+	    /**
+	     * 转账银行
+	     */
+		@ApiModelProperty(required= true,value = "转账银行")
+		private String transBank;
+		
+	    /**
+	     * 拍卖登记id
+	     */
+		@ApiModelProperty(required= true,value = "拍卖登记id")
+		private String regId;
+
+	    /**
+	     * 是否缴纳保证金 
+	     */
+		@ApiModelProperty(required= true,value = "是否缴纳保证金 ")
+		private Boolean isPayDeposit;
+	    /**
+	     * 出价金额
+	     */
+		@ApiModelProperty(required= true,value = "出价金额")
+		private BigDecimal offerAmount;
+	    /**
+	     * 是否竞拍成功 
+	     */
+		@ApiModelProperty(required= true,value = "是否竞拍成功 ")
+		private Boolean isAuctionSuccess;
+	    /**
+	     * 成交价格
+	     */
+		@ApiModelProperty(required= true,value = "成交价格")
+		private BigDecimal transPrice;
+	    /**
+	     * 竞拍id
+	     */
+		@ApiModelProperty(required= true,value = "竞拍id")
+		private String auctionId;
+
+		public List<Doc> getDocs() {
+			return docs;
+		}
+
+		public void setDocs(List<Doc> docs) {
+			this.docs = docs;
+		}
 
 		public String getPriceID() {
 			return priceID;
@@ -520,6 +603,126 @@ public class AuctionRespVo implements Serializable{
 
 		public void setRemarks(String remarks) {
 			this.remarks = remarks;
+		}
+
+		public String getPaymentEndTime() {
+			return paymentEndTime;
+		}
+
+		public void setPaymentEndTime(String paymentEndTime) {
+			this.paymentEndTime = paymentEndTime;
+		}
+
+		public String getBusinessId() {
+			return businessId;
+		}
+
+		public void setBusinessId(String businessId) {
+			this.businessId = businessId;
+		}
+
+		public String getLicensePlateNumber() {
+			return licensePlateNumber;
+		}
+
+		public void setLicensePlateNumber(String licensePlateNumber) {
+			this.licensePlateNumber = licensePlateNumber;
+		}
+
+		public String getBidderName() {
+			return bidderName;
+		}
+
+		public void setBidderName(String bidderName) {
+			this.bidderName = bidderName;
+		}
+
+		public String getBidderCertId() {
+			return bidderCertId;
+		}
+
+		public void setBidderCertId(String bidderCertId) {
+			this.bidderCertId = bidderCertId;
+		}
+
+		public String getBidderTel() {
+			return bidderTel;
+		}
+
+		public void setBidderTel(String bidderTel) {
+			this.bidderTel = bidderTel;
+		}
+
+		public String getTransAccountName() {
+			return transAccountName;
+		}
+
+		public void setTransAccountName(String transAccountName) {
+			this.transAccountName = transAccountName;
+		}
+
+		public String getTransAccountNum() {
+			return transAccountNum;
+		}
+
+		public void setTransAccountNum(String transAccountNum) {
+			this.transAccountNum = transAccountNum;
+		}
+
+		public String getTransBank() {
+			return transBank;
+		}
+
+		public void setTransBank(String transBank) {
+			this.transBank = transBank;
+		}
+
+		public String getRegId() {
+			return regId;
+		}
+
+		public void setRegId(String regId) {
+			this.regId = regId;
+		}
+
+		public Boolean getIsPayDeposit() {
+			return isPayDeposit;
+		}
+
+		public void setIsPayDeposit(Boolean isPayDeposit) {
+			this.isPayDeposit = isPayDeposit;
+		}
+
+		public BigDecimal getOfferAmount() {
+			return offerAmount;
+		}
+
+		public void setOfferAmount(BigDecimal offerAmount) {
+			this.offerAmount = offerAmount;
+		}
+
+		public Boolean getIsAuctionSuccess() {
+			return isAuctionSuccess;
+		}
+
+		public void setIsAuctionSuccess(Boolean isAuctionSuccess) {
+			this.isAuctionSuccess = isAuctionSuccess;
+		}
+
+		public BigDecimal getTransPrice() {
+			return transPrice;
+		}
+
+		public void setTransPrice(BigDecimal transPrice) {
+			this.transPrice = transPrice;
+		}
+
+		public String getAuctionId() {
+			return auctionId;
+		}
+
+		public void setAuctionId(String auctionId) {
+			this.auctionId = auctionId;
 		} 
 	    
 	 
