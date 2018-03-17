@@ -202,7 +202,7 @@ public class NoticeController {
 	/**
      * 文件上传具体实现方法（单文件上传）
      */
-	@ApiOperation(value = "上传凭证")
+	@ApiOperation(value = "上传附件")
 	@PostMapping("/uploadAttachment")
     public UpLoadResult upload(FileVo fileVo,String uploadItemId) throws FileNotFoundException {
 		String userId = loginUserInfoHelper.getUserId() ;
@@ -216,7 +216,7 @@ public class NoticeController {
 		upLoadResult.setMessage(uploadItemId);
         return upLoadResult;
     }
-	@ApiOperation(value = "上传凭证")
+	@ApiOperation(value = "(逻辑)删除公告")
 	@GetMapping("/del")
 	@ResponseBody
 	public Result del(String noticeId) {

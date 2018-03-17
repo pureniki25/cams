@@ -174,6 +174,7 @@ window.layinit(function (htConfig) {
             openEditorModal: function (action, noticeId) {
                 if (action == 'add') {
                     this.$refs['editForm'].resetFields();
+                    this.editForm.attachment = []
                     this.editModal.show = true
                     this.editModal.title = '新增公告'
                 } else if (action == 'update') {
@@ -366,7 +367,9 @@ window.layinit(function (htConfig) {
             onUploadError: function () { },
             onFormatError: function () { },
             onExceededSize: function () { },
-            closeEditModal: function () { },
+            closeEditModal: function () { 
+                this.editModal.show = false
+            },
             openReviewModal: function () {
                 let form = app.editForm
 
