@@ -38,6 +38,7 @@ import com.hongte.alms.base.process.entity.ProcessTypeStep;
 import com.hongte.alms.base.process.enums.ProcessTypeEnums;
 import com.hongte.alms.base.process.service.ProcessService;
 import com.hongte.alms.base.process.service.ProcessTypeStepService;
+import com.hongte.alms.base.process.vo.ProcessLogReq;
 import com.hongte.alms.base.process.vo.ProcessSaveReq;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.DocService;
@@ -312,7 +313,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			if (statusCode == HttpStatus.SC_OK) {
 				LOG.info("--sendLitigation-- 请求成功: " + statusCode);
 			} else {
-				throw new ServiceRuntimeException("--sendLitigation-- 诉讼数据发送失败！！！" + statusCode);
+				throw new ServiceRuntimeException("--sendLitigation-- 诉讼数据发送失败！！！状态码：" + statusCode);
 			}
 		} finally {
 			if (httpClient != null) {
@@ -345,7 +346,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		processSaveReq.setBusinessId(req.getBusinessId());
 		processSaveReq.setProcessStatus(Integer.valueOf(req.getProcessStatus()));
 		processSaveReq.setTitle("房贷移交诉讼审批流程");
-        processSaveReq.setProcessId(req.getProcessId());
+		processSaveReq.setProcessId(req.getProcessId());
 
 		Process process = processService.saveProcess(processSaveReq, ProcessTypeEnums.HOUSE_LOAN_LITIGATION);
 
@@ -379,7 +380,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		processSaveReq.setBusinessId(req.getBusinessId());
 		processSaveReq.setProcessStatus(Integer.valueOf(req.getProcessStatus()));
 		processSaveReq.setTitle("车贷移交诉讼审批流程");
-        processSaveReq.setProcessId(req.getProcessId());
+		processSaveReq.setProcessId(req.getProcessId());
 
 		Process process = processService.saveProcess(processSaveReq, ProcessTypeEnums.CAR_LOAN_LITIGATION);
 
@@ -430,10 +431,10 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			Date minDueDate = (Date) resultMap.get("minDueDate"); // 状态为'逾期', '还款中'的最早应还日期
 			Map<String, Object> maxPeriodMap = transferOfLitigationMapper.queryMaxDueDateByBusinessId(businessId); // 合同到期日
 			Date maxDueDate = (Date) maxPeriodMap.get("maxDueDate");
-			double lastPlanAccrual = ((BigDecimal) maxPeriodMap.get("planAccrual")).doubleValue();	// 最后一期应还利息
-			double lastPlanServiceCharge = ((BigDecimal) maxPeriodMap.get("planServiceCharge")).doubleValue();	// 最后一期应还服务费
-			double lastGuaranteeCharge = ((BigDecimal) maxPeriodMap.get("plan_guarantee_charge")).doubleValue();	// 最后一期担保公司费用
-			double lastPlatformCharge = ((BigDecimal) maxPeriodMap.get("plan_platform_charge")).doubleValue();	// 最后一期平台费
+			double lastPlanAccrual = ((BigDecimal) maxPeriodMap.get("planAccrual")).doubleValue(); // 最后一期应还利息
+			double lastPlanServiceCharge = ((BigDecimal) maxPeriodMap.get("planServiceCharge")).doubleValue(); // 最后一期应还服务费
+			double lastGuaranteeCharge = ((BigDecimal) maxPeriodMap.get("plan_guarantee_charge")).doubleValue(); // 最后一期担保公司费用
+			double lastPlatformCharge = ((BigDecimal) maxPeriodMap.get("plan_platform_charge")).doubleValue(); // 最后一期平台费
 			int overdueDays = differentDays(minDueDate, billDate); // 逾期天数
 			long isPreCharge = (long) resultMap.get("isPreCharge"); // 是否分公司服务费前置收取
 			double planAccrual = ((BigDecimal) resultMap.get("planAccrual")).doubleValue(); // 本期应还利息
@@ -469,14 +470,14 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			int preLateFeeType = carLoanBilVO.getPreLateFees(); // 提前还款违约金类型
 
 			innerLateFees = borrowMoney * innerLate * overdueDays;
-			
+
 			// 判断预计结算日期是否超过合同日期
 			if (billDate.after(maxDueDate)) {
-				planAccrual = lastPlanAccrual;	// 预算日期大于最后一期应还日期时，应还利息取最后一期的应还利息
+				planAccrual = lastPlanAccrual; // 预算日期大于最后一期应还日期时，应还利息取最后一期的应还利息
 				planServiceCharge = lastPlanServiceCharge;
 				planGuaranteeCharge = lastGuaranteeCharge;
 				planPlatformCharge = lastPlatformCharge;
-				
+
 				if (overdueDays < 15) {
 					outsideInterest = surplusPrincipal * outside / 30 * overdueDays;
 				} else if (15 <= overdueDays && overdueDays < 30) {
@@ -489,16 +490,16 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 						outsideInterest += surplusPrincipal * outside / 30 * j;
 					}
 				}
-				
+
 				// 判断是否上标业务： outputPlatformId == 1 是， outputPlatformId == 0 否
 				// 判断是否分公司服务费前置收取 isPreCharge == 1， 是 isPreCharge == 0 否
 				if ("到期还本息".equals(repaymentTypeId) || "每月付息到期还本".equals(repaymentTypeId)) {
-					
+
 					if (outputPlatformId == 1 && isPreCharge == 0) {
 						outsideInterest = 0;
 					}
 				} else if ("等额本息".equals(repaymentTypeId)) {
-					
+
 					if (outputPlatformId == 0) {
 						if (overdueDays < 15) {
 							outsideInterest = borrowMoney * outside / 30 * overdueDays;
@@ -512,7 +513,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 								outsideInterest += borrowMoney * outside / 30 * j;
 							}
 						}
-						
+
 					}
 				} else {
 					return null;
@@ -520,7 +521,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 			} else {
 				if ("到期还本息".equals(repaymentTypeId) || "每月付息到期还本".equals(repaymentTypeId)) {
-					
+
 					if (outputPlatformId == 1 && isPreCharge == 0) {
 						preLateFees = ((BigDecimal) resultMap.get("surplusServiceCharge")).doubleValue();
 						outsideInterest = 0;
@@ -543,7 +544,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 						default:
 							break;
 						}
-					}else if (outputPlatformId == 1 && isPreCharge == 1) {
+					} else if (outputPlatformId == 1 && isPreCharge == 1) {
 						preLateFees = ((BigDecimal) resultMap.get("surplusServiceCharge")).doubleValue();
 					}
 				}
@@ -564,6 +565,53 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		}
 
 		return resultMap;
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public void saveCarProcessApprovalResult(ProcessLogReq req, String sendUrl) {
+		try {
+			// 存储审批结果信息
+			Process process = processService.saveProcessApprovalResult(req, ProcessTypeEnums.CAR_LOAN_LITIGATION);
+			String businessId = process.getBusinessId();
+			String processId = process.getProcessId();
+			List<TransferLitigationCar> cars = transferLitigationCarService
+					.selectList(new EntityWrapper<TransferLitigationCar>().eq("business_id", businessId)
+							.eq("process_id", processId));
+			List<ProcessTypeStep> processTypeSteps = processTypeStepService.selectList(
+					new EntityWrapper<ProcessTypeStep>().eq("type_id", process.getProcessTypeid()).orderBy("step"));
+			if (!CollectionUtils.isEmpty(processTypeSteps)
+					&& process.getCurrentStep() == processTypeSteps.get(processTypeSteps.size() - 1).getStep()) {
+				sendTransferLitigationData(businessId, cars.get(0).getCrpId(), sendUrl);
+			}
+		} catch (Exception e) {
+			LOG.error("---saveCarProcessApprovalResult--- 存储房贷审批结果信息失败！", e);
+			throw new ServiceRuntimeException("---saveCarProcessApprovalResult--- 存储审批结果信息失败！", e);
+		}
+
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public void saveHouseProcessApprovalResult(ProcessLogReq req, String sendUrl) {
+		try {
+			// 存储审批结果信息
+			Process process = processService.saveProcessApprovalResult(req, ProcessTypeEnums.HOUSE_LOAN_LITIGATION);
+			String businessId = process.getBusinessId();
+			String processId = process.getProcessId();
+			List<TransferLitigationHouse> houses = transferLitigationHouseService
+					.selectList(new EntityWrapper<TransferLitigationHouse>().eq("business_id", businessId)
+							.eq("process_id", processId));
+			List<ProcessTypeStep> processTypeSteps = processTypeStepService.selectList(
+					new EntityWrapper<ProcessTypeStep>().eq("type_id", process.getProcessTypeid()).orderBy("step"));
+			if (!CollectionUtils.isEmpty(processTypeSteps) && process.getCurrentStep().intValue() == processTypeSteps
+					.get(processTypeSteps.size() - 1).getStep().intValue()) {
+				sendTransferLitigationData(businessId, houses.get(0).getCrpId(), sendUrl);
+			}
+		} catch (Exception e) {
+			LOG.error("---saveCarProcessApprovalResult--- 存储车贷审批结果信息失败！", e);
+			throw new ServiceRuntimeException("---saveCarProcessApprovalResult--- 存储审批结果信息失败！", e);
+		}
 	}
 
 	/**

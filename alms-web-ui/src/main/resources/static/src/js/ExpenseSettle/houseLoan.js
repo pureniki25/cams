@@ -38,7 +38,7 @@ window.layinit(function (htConfig) {
             }
         },
         created:function(){
-            axios.get(basePath + '/expenseSettle/business', {
+            axios.get(basePath + 'expenseSettle/business', {
                 params: {
                     businessId: getQueryStr('businessId')
                 }

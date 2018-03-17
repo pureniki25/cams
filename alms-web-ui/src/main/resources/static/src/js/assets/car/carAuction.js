@@ -476,6 +476,10 @@ window.layinit(function (htConfig) {
 	                	if(vm.carAuction.transType==null){
 	                		vm.carAuction.transType='';
 	                	}
+	                	
+	                	if(vm.carAuction.auctionRules==null||vm.carAuction.auctionRules==''){
+	                		vm.carAuction.auctionRules='至少一人报名且出价不低于起拍价，方可成交';
+	                	}
 	                	//alert(JSON.stringify(vm.carAuction));
 	                	var docFiles=data.data.returnRegFiles;
 	                	

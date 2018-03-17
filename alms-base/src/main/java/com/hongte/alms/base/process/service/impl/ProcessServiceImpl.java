@@ -199,7 +199,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void saveProcessApprovalResult(ProcessLogReq req ,ProcessTypeEnums processTypeEnums) throws IllegalAccessException, InstantiationException{
+    public Process saveProcessApprovalResult(ProcessLogReq req ,ProcessTypeEnums processTypeEnums) throws IllegalAccessException, InstantiationException{
 
 
         ProcessLog log =  ClassCopyUtil.copyObject(req,ProcessLog.class);
@@ -314,6 +314,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
 
         updateAllColumnProcess(process);
 
+        return process;
         //updateProcess(process);
 
     }

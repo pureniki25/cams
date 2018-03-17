@@ -113,7 +113,7 @@ window.layinit(function (htConfig) {
 	   
 	   created:function(){
 		   
-			var reqUrl = basePath + '/transferOfLitigation/queryCarLoanBilDetail?businessId=' + businessId
+			var reqUrl = basePath + 'transferOfLitigation/queryCarLoanBilDetail?businessId=' + businessId
 			
 			axios.get(reqUrl).then(function(res){
 				if(res.data.code=='1'){

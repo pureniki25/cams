@@ -233,23 +233,7 @@ public class TransferOfLitigationController {
 	@ResponseBody
 	public Result<String> saveHouseApprovalLogInfo(@RequestBody ProcessLogReq req) {
 		try {
-			// 存储审批结果信息
-			processService.saveProcessApprovalResult(req, ProcessTypeEnums.HOUSE_LOAN_LITIGATION);
-			Process process = processService.selectById(req.getProcess().getProcessId());
-			
-			List<ProcessTypeStep> processTypeSteps = processTypeStepService.selectList(
-					new EntityWrapper<ProcessTypeStep>().eq("type_id", process.getProcessTypeid()).orderBy("step"));
-			if (!CollectionUtils.isEmpty(processTypeSteps)
-					&& process.getCurrentStep() == processTypeSteps.get(processTypeSteps.size() - 1).getStep()) {
-				transferOfLitigationService.sendTransferLitigationData(req.getBusinessId(), req.getCrpId(), sendUrl);
-				//更新贷后状态为移交诉讼
-				collectionStatusService.setBussinessAfterStatus(
-						req.getBusinessId(),
-						req.getCrpId(),
-						"",
-						CollectionStatusEnum.TO_LAW_WORK,
-						CollectionSetWayEnum.MANUAL_SET);
-			}
+			transferOfLitigationService.saveHouseProcessApprovalResult(req, sendUrl);
 			return Result.success();
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
@@ -263,16 +247,7 @@ public class TransferOfLitigationController {
 	@ResponseBody
 	public Result<String> saveCarApprovalLogInfo(@RequestBody ProcessLogReq req) {
 		try {
-			// 存储审批结果信息
-			processService.saveProcessApprovalResult(req, ProcessTypeEnums.CAR_LOAN_LITIGATION);
-			Process process = processService.selectById(req.getProcess().getProcessId());
-			
-			List<ProcessTypeStep> processTypeSteps = processTypeStepService.selectList(
-					new EntityWrapper<ProcessTypeStep>().eq("type_id", process.getProcessTypeid()).orderBy("step"));
-			if (!CollectionUtils.isEmpty(processTypeSteps)
-					&& process.getCurrentStep() == processTypeSteps.get(processTypeSteps.size() - 1).getStep()) {
-				transferOfLitigationService.sendTransferLitigationData(req.getBusinessId(), req.getCrpId(), sendUrl);
-			}
+			transferOfLitigationService.saveCarProcessApprovalResult(req, sendUrl);
 			return Result.success();
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
@@ -362,7 +337,7 @@ public class TransferOfLitigationController {
 			return Result.error("500", "系统异常");
 		}
 	}
-	
+
 	/**
 	 * 车贷结清试算
 	 * 
