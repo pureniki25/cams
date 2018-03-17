@@ -76,7 +76,7 @@ window.layinit(function (htConfig) {
         },
         methods:{
             onPreSettleDateChange:function(date){
-                axios.get(basePath + '/expenseSettle/calByPreSettleDate', {
+                axios.get(basePath + 'expenseSettle/calByPreSettleDate', {
                     params: {
                         businessId: getQueryStr('businessId'),
                         afterId: getQueryStr('afterId'),

@@ -43,7 +43,6 @@ import io.swagger.annotations.ApiOperation;
 
 @Controller
 @RequestMapping("/expenseSettle")
-@Api(tags = "ExpenseSettleControllerApi", description = "房贷结清试算API", hidden = true)
 public class ExpenseSettleController {
 
 	@Autowired
@@ -222,7 +221,7 @@ public class ExpenseSettleController {
 	 * @author 王继光 2018年3月15日 下午2:39:35
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		class MapKeyComparator implements Comparator<Integer> {
 			@Override
 			public int compare(Integer str1, Integer str2) {
@@ -244,7 +243,7 @@ public class ExpenseSettleController {
 			int diff = DateUtil.getDiffDays(settleDate, date);
 			System.out.println(diff);
 		}
-	}
+	}*/
 
 	class MapKeyComparator implements Comparator<Integer> {
 		@Override
