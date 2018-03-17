@@ -63,7 +63,7 @@ import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 
-@Service("transferLitigationService")
+@Service("TransferOfLitigationService")
 public class TransferLitigationServiceImpl implements TransferOfLitigationService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TransferLitigationServiceImpl.class);

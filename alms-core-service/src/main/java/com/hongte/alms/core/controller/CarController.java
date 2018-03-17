@@ -10,6 +10,9 @@ import com.hongte.alms.base.assets.car.vo.AuditVo;
 import com.hongte.alms.base.assets.car.vo.CarReq;
 import com.hongte.alms.base.assets.car.vo.CarVo;
 import com.hongte.alms.base.assets.car.vo.FileVo;
+import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
+import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
+import com.hongte.alms.base.collection.service.CollectionStatusService;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.BizOutputRecord;
 import com.hongte.alms.base.entity.CarAuction;
@@ -211,6 +214,9 @@ public class CarController {
     private CarAuctionBidderService carAuctionBidderService;
 
 
+    @Autowired
+	@Qualifier("CollectionStatusService")
+    private CollectionStatusService collectionStatusService;
 
 	@ApiOperation(value="获取拖车登记业务基本信息")
 	@GetMapping("getCarDragRegistrationBusinessInfo")
@@ -301,6 +307,12 @@ public class CarController {
 
 				}
 			}
+
+			//在贷后状态里面 设置拖车登记状态
+			collectionStatusService.setBussinessAfterStatus(
+					registrationInfo.getBusinessId(),null,"",
+					CollectionStatusEnum.TRAILER_REG,
+					CollectionSetWayEnum.MANUAL_SET);
 			return Result.success();
 		}
 		catch(Exception ex)

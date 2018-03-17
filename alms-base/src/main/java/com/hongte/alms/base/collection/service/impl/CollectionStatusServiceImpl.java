@@ -159,7 +159,8 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
             }
         }
 
-        Integer collectionStatus = CollectionStatusEnum.getByPageStr(staffType).getKey();
+
+        Integer setTypeStatus = CollectionStatusEnum.getByPageStr(staffType).getKey();
         for(StaffBusinessVo vo:voList){
             CollectionStatus status = new CollectionStatus();
             //1、插入或更新催收状态表
@@ -167,13 +168,14 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
             if(list.size()>0){
                 status = list.get(0);
             }
-
+            Integer beforeStatus = status.getCollectionStatus();
+            Integer afterStatus = getCurrentColStatu(status,setTypeStatus);
             status.setBusinessId(vo.getBusinessId());
-            status.setCollectionStatus(collectionStatus);
+            status.setCollectionStatus(afterStatus);
             status.setCrpId(vo.getCrpId());
-            if(staffType.equals(StaffPersonType.PHONE_STAFF.getKey())){
+            if(staffType.equals(CollectionStatusEnum.PHONE_STAFF.getPageStr())){
                 status.setPhoneStaff(staffUserId);
-            }else if (staffType.equals(StaffPersonType.VISIT_STAFF.getKey())){
+            }else if (staffType.equals(CollectionStatusEnum.COLLECTING.getPageStr())){
                 status.setVisitStaff(staffUserId);
             }
             status.setUpdateUser(userId);
@@ -197,9 +199,9 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 //            insertOrUpdate(status);
             //2、记录移交记录表
             CollectionLog log = new CollectionLog();
-            log.setAfterStatus(collectionStatus);
+            log.setAfterStatus(afterStatus);
             log.setBusinessId(vo.getBusinessId());
-            log.setCollectionUser(staffUserId);
+            log.setCollectionUser(staffUserId.equals("")?Constant.SYS_DEFAULT_USER:staffUserId);
             log.setCrpId(vo.getCrpId());
             log.setUpdateUser(userId);
             log.setCreateUser(userId);
@@ -207,12 +209,62 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
             log.setCreateTime(new Date());
             log.setUpdateTime(new Date());
             log.setSetWay(setWayEnum.getKey());
+            log.setBeforeStatus(beforeStatus);
+            log.setSetTypeStatus(setTypeStatus);
             collectionLogService.insert(log);
 
 
         }
         return true;
     }
+
+    /**
+     * 根据业务逻辑取得当前应该设置的催收状态
+     * @param status
+     * @param setTypeStatus
+     * @return
+     */
+    public Integer getCurrentColStatu(CollectionStatus status,Integer setTypeStatus){
+//        Integer collectionStatus = CollectionStatusEnum.getByPageStr(staffType).getKey();
+
+        if(status.getCollectionStatus()==null){
+            return setTypeStatus;
+        }else if(status.getCollectionStatus().equals(CollectionStatusEnum.CLOSED.getKey())){
+            //当前状态已经是已关闭的，则不刷新状态
+            return  status.getCollectionStatus();
+        }else if(status.getCollectionStatus().equals(CollectionStatusEnum.TO_LAW_WORK.getKey())){
+            //当前状态是已移交诉讼
+            if(setTypeStatus.equals(CollectionStatusEnum.CLOSED.getKey())){
+                //设置的状态为 关闭 才刷新状态
+                return setTypeStatus;
+            }else{
+                return status.getCollectionStatus();
+            }
+        }else if (status.getCollectionStatus().equals(CollectionStatusEnum.TRAILER_REG.getKey())){
+            //当前状态为已拖车登记
+            if(setTypeStatus.equals(CollectionStatusEnum.CLOSED.getKey())
+                    || setTypeStatus.equals(CollectionStatusEnum.TO_LAW_WORK.getKey())){
+                //设置的状态为 关闭  移交法务 才刷新状态
+                return setTypeStatus;
+            }else{
+                return status.getCollectionStatus();
+            }
+        }else if (status.getCollectionStatus().equals(CollectionStatusEnum.COLLECTING.getKey())){
+            //当前状态为已拖车登记
+            if(setTypeStatus.equals(CollectionStatusEnum.CLOSED.getKey())
+                    || setTypeStatus.equals(CollectionStatusEnum.TO_LAW_WORK.getKey())
+                    ||setTypeStatus.equals(CollectionStatusEnum.TRAILER_REG.getKey()) ){
+                //设置的状态为 关闭  移交法务  拖车登记 才刷新状态
+                return setTypeStatus;
+            }else{
+                return status.getCollectionStatus();
+            }
+        }else{
+            //当前状态为电催 则随便设置
+            return setTypeStatus;
+        }
+    }
+
 
     /**
      * 设置业务的贷后状态（移交法务、拖车登记、关闭 调用此方法）
@@ -228,6 +280,17 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
             String describe,
             CollectionStatusEnum  satusEnum,
             CollectionSetWayEnum setWayEnum){
+
+        if(crpId==null){
+            List<RepaymentBizPlan> plans = repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("original_business_id",businessId).orderBy("create_time desc"));
+            if(plans.size()>0){
+                RepaymentBizPlan plan = plans.get(0);
+                List<RepaymentBizPlanList> planLists = repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id",plan.getPlanId()).orderBy("create_time desc"));
+                if(planLists.size()>0){
+                    crpId = planLists.get(0).getPlanListId();
+                }
+            }
+        }
 
         List<StaffBusinessVo> voList = new LinkedList<>();
         StaffBusinessVo vo  = new StaffBusinessVo();
