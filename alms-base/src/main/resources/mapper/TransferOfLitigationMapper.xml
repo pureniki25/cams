@@ -199,92 +199,120 @@
 	</select>
 	
 	<select id="queryTransferLitigationData" resultMap="TransferOfLitigationMap" >
-		SELECT 
-		  bb.`borrow_limit` borrowLimit,
-		  (SELECT 
-		    IFNULL(
-		      b.original_business_id,
-		      a.business_id
-		    ) 
-		  FROM
-		    tb_basic_business a 
-		    LEFT JOIN tb_renewal_business b 
-		      ON a.business_id = b.renewal_business_id 
-		  WHERE a.business_id = bb.`business_id`) businessId,
-		  bbt.`business_type_name` businessTypeName,
-		  bbc.`identify_card` customerIdentifyCard,
-		  bbc.`customer_name` customerName,
-		  CASE
-		    bbc.customer_type 
-		    WHEN '个人' 
-		    THEN '0' 
-		    WHEN '企业' 
-		    THEN '1' 
-		    ELSE '其他' 
-		  END customerType,
-		  bb.`borrow_money` finalBorrowMoney,
-		  bb.`original_name`,
-		  bb.create_user,
-		  bb.original_userid,
-		  bb.`repayment_type_id` repaymentTypeId,
-		  1 sourceSystem,
-		  bb.`company_id` deptId,
-		  bb.`company_name` deptName,
-		  bb.`business_id` carBusinessId,
-		  cc.fact_principal repaymentPrincipa,
-		  (SELECT tbr.period FROM tb_repayment_biz_plan_list tbr WHERE tbr.plan_list_id = #{crpId,jdbcType=VARCHAR}) businessAfterId ,
-		  cc.surplus_principal,
-		  (SELECT 
-		    COUNT(1) 
-		  FROM
-		    tb_repayment_biz_plan_list lst,
-		    tb_repayment_biz_plan p 
-		  WHERE lst.`plan_id` = p.`plan_id` 
-		    AND bb.`business_id` = p.original_business_id
-		    AND lst.current_status = '已还款') repaymentPeriods ,
-		  (SELECT 
-		    COUNT(1) 
-		  FROM
-		    tb_repayment_biz_plan_list lst,
-		    tb_repayment_biz_plan p 
-		  WHERE lst.`plan_id` = p.`plan_id` 
-		    AND bb.`business_id` = p.original_business_id) totalPeriods 
-		FROM
-		  tb_basic_business bb,
-		  tb_basic_business_customer bbc,
-		  tb_basic_business_type bbt,
-		  (SELECT 
-		    c.fact_principal,
-		    b.`original_business_id`, 
-		    c.plan_list_id,
-		    (c.plan_principal - c.fact_principal) surplus_principal
-		  FROM
-		    tb_repayment_biz_plan_list a 
-		    JOIN tb_repayment_biz_plan b 
-		      ON a.plan_id = b.plan_id 
-		    JOIN 
-		      (SELECT 
-		        t1.plan_list_id,
-		        SUM(
-		          CASE
-		            WHEN t1.plan_item_type = 10 
-		            THEN t1.fact_amount 
-		            ELSE 0 
-		          END
-		        ) `fact_principal`,
-		        -- 应还本金总额
-			SUM(CASE WHEN t1.plan_item_type =10 THEN t1.plan_amount ELSE 0 END) `plan_principal`
-			 
-		      FROM
-		        tb_repayment_biz_plan_list_detail t1 
-		      GROUP BY t1.business_id) c 
-		      ON a.plan_list_id = c.plan_list_id 
-		  WHERE IFNULL(a.repay_flag, 0) != 6) cc 
-		WHERE bb.`business_id` = bbc.`business_id` 
-		  AND bb.`business_type` = bbt.`business_type_id` 
-		  AND bb.business_id = cc.original_business_id 
-		  AND bbc.`ismainland_resident` = 1 
-		  AND bb.`business_id` = #{businessId,jdbcType=VARCHAR}
+			SELECT 
+			  cc.plan_list_id,
+			  bb.`borrow_limit` borrowLimit,
+			  (SELECT 
+			    IFNULL(
+			      b.original_business_id,
+			      a.business_id
+			    ) 
+			  FROM
+			    tb_basic_business a 
+			    LEFT JOIN tb_renewal_business b 
+			      ON a.business_id = b.renewal_business_id 
+			  WHERE a.business_id = bb.`business_id`) businessId,
+			  bbt.`business_type_name` businessTypeName,
+			  bbc.`identify_card` customerIdentifyCard,
+			  bbc.`customer_name` customerName,
+			  CASE
+			    bbc.customer_type 
+			    WHEN '个人' 
+			    THEN '0' 
+			    WHEN '企业' 
+			    THEN '1' 
+			    ELSE '其他' 
+			  END customerType,
+			  bb.`borrow_money` finalBorrowMoney,
+			  bb.`original_name`,
+			  bb.create_user,
+			  bb.original_userid,
+			  bb.`repayment_type_id` repaymentTypeId,
+			  1 sourceSystem,
+			  bb.`company_id` deptId,
+			  bb.`company_name` deptName,
+			  bb.`business_id` carBusinessId,
+			  (SELECT 
+			    SUM(
+			      CASE
+			        c.plan_item_type 
+			        WHEN 10 
+			        THEN c.fact_amount 
+			        ELSE 0 
+			      END
+			    ) `fact_principal` 
+			  FROM
+			    tb_repayment_biz_plan_list a,
+			    tb_repayment_biz_plan b,
+			    tb_repayment_biz_plan_list_detail c 
+			  WHERE a.plan_id = b.plan_id 
+			    AND a.plan_list_id = c.plan_list_id 
+			    AND IFNULL(a.repay_flag, 0) != 6 
+			    AND b.`original_business_id` = bb.business_id 
+			  GROUP BY b.`original_business_id`) AS repaymentPrincipa,
+			  (SELECT 
+			    tbr.period 
+			  FROM
+			    tb_repayment_biz_plan_list tbr 
+			  WHERE tbr.plan_list_id = #{crpId,jdbcType=VARCHAR}) businessAfterId,
+			  cc.surplus_principal,
+			  (SELECT 
+			    COUNT(1) 
+			  FROM
+			    tb_repayment_biz_plan_list lst,
+			    tb_repayment_biz_plan p 
+			  WHERE lst.`plan_id` = p.`plan_id` 
+			    AND bb.`business_id` = p.original_business_id 
+			    AND lst.current_status = '已还款') repaymentPeriods,
+			  (SELECT 
+			    COUNT(1) 
+			  FROM
+			    tb_repayment_biz_plan_list lst,
+			    tb_repayment_biz_plan p 
+			  WHERE lst.`plan_id` = p.`plan_id` 
+			    AND bb.`business_id` = p.original_business_id) totalPeriods 
+			FROM
+			  tb_basic_business bb,
+			  tb_basic_business_customer bbc,
+			  tb_basic_business_type bbt,
+			  (SELECT 
+			    c.fact_principal,
+			    b.`original_business_id`,
+			    c.plan_list_id,
+			    (
+			      c.plan_principal - c.fact_principal
+			    ) surplus_principal 
+			  FROM
+			    tb_repayment_biz_plan_list a 
+			    JOIN tb_repayment_biz_plan b 
+			      ON a.plan_id = b.plan_id 
+			    JOIN 
+			      (SELECT 
+			        t1.plan_list_id,
+			        SUM(
+			          CASE
+			            WHEN t1.plan_item_type = 10 
+			            THEN t1.fact_amount 
+			            ELSE 0 
+			          END
+			        ) `fact_principal`,
+			        SUM(
+			          CASE
+			            WHEN t1.plan_item_type = 10 
+			            THEN t1.plan_amount 
+			            ELSE 0 
+			          END
+			        ) `plan_principal` 
+			      FROM
+			        tb_repayment_biz_plan_list_detail t1 
+			      GROUP BY t1.plan_list_id) c 
+			      ON a.plan_list_id = c.plan_list_id 
+			  WHERE IFNULL(a.repay_flag, 0) != 6) cc 
+			WHERE bb.`business_id` = bbc.`business_id` 
+			  AND bb.`business_type` = bbt.`business_type_id` 
+			  AND bb.business_id = cc.original_business_id 
+			  AND bbc.`ismainland_resident` = 1 
+		 	  AND bb.`business_id` = #{businessId,jdbcType=VARCHAR} 
 	</select>
 	
 	<select id="queryRepaymentPlanHouse" resultType="com.hongte.alms.base.vo.litigation.house.HousePlanInfo">
