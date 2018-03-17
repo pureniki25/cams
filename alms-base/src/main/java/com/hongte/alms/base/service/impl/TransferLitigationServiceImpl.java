@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -309,7 +308,6 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			entity.setContentType("application/json");
 			post.setEntity(entity);
 			response = httpClient.execute(post);
-			HttpEntity entity2 = response.getEntity();
 
 			// 检验返回码
 			int statusCode = response.getStatusLine().getStatusCode();
@@ -635,13 +633,15 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			// 1).getStep()) {
 			// sendTransferLitigationData(businessId, cars.get(0).getCrpId(), sendUrl);
 			// }
-			if (!CollectionUtils.isEmpty(cars) && (process.getStatus().equals(ProcessStatusEnums.END.getKey())
-					|| process.getProcessResult().equals(ProcessApproveResult.PASS.getKey()))) {
+			Integer status = process.getStatus();
+			Integer processResult = process.getProcessResult();
+			if (!CollectionUtils.isEmpty(cars) && status == ProcessStatusEnums.END.getKey()
+					&& processResult == ProcessApproveResult.PASS.getKey()) {
 				sendTransferLitigationData(businessId, cars.get(0).getCrpId(), sendUrl);
 			}
 		} catch (Exception e) {
 			LOG.error("---saveCarProcessApprovalResult--- 存储房贷审批结果信息失败！", e);
-			throw new ServiceRuntimeException("---saveCarProcessApprovalResult--- 存储审批结果信息失败！", e);
+			throw new ServiceRuntimeException(e.getMessage(), e);
 		}
 
 	}
@@ -665,13 +665,15 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			// .get(processTypeSteps.size() - 1).getStep().intValue()) {
 			// sendTransferLitigationData(businessId, houses.get(0).getCrpId(), sendUrl);
 			// }
-			if (!CollectionUtils.isEmpty(houses) && (process.getStatus().equals(ProcessStatusEnums.END.getKey())
-					|| process.getProcessResult().equals(ProcessApproveResult.PASS.getKey()))) {
+			Integer status = process.getStatus();
+			Integer processResult = process.getProcessResult();
+			if (!CollectionUtils.isEmpty(houses) && status == ProcessStatusEnums.END.getKey()
+					&& processResult == ProcessApproveResult.PASS.getKey()) {
 				sendTransferLitigationData(businessId, houses.get(0).getCrpId(), sendUrl);
 			}
 		} catch (Exception e) {
 			LOG.error("---saveCarProcessApprovalResult--- 存储车贷审批结果信息失败！", e);
-			throw new ServiceRuntimeException("---saveCarProcessApprovalResult--- 存储审批结果信息失败！", e);
+			throw new ServiceRuntimeException(e.getMessage(), e);
 		}
 	}
 
