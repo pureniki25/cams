@@ -107,7 +107,7 @@ select repay.log_id as logId,repay.original_business_id as originalBusinessId ,r
     
     
         
-    <select id="selectSumByBusinessId" resultType="com.hongte.alms.base.vo.module.RepaymentLogVO">
+    <select id="selectSumByBusinessId" resultType="com.hongte.alms.base.vo.module.RepaymentLogVO"  parameterType="com.hongte.alms.base.vo.module.RepaymentLogReq">
 
       
  select count(1) as countByBusinessId from 
@@ -125,20 +125,48 @@ select repay.*  from tb_withholding_repayment_log  repay
 	  left join tb_withholding_platform as platform on platform.platform_id=repay.bind_platform_id
 	  
 	  
-	        and user.user_id=#{userId} group by repay.original_business_id,repay.after_id,repay.repay_status  ) as a
-
-
-
+	       
+	        
+	        
+	        
         <where>
                1=1
-    
+            <if test="keyName !=null and keyName !=''">
+                and ((business.operator_name  LIKE '%${keyName}%') or (repay.customer_name  LIKE '%${keyName}%') or (repay.original_business_id LIKE '%${keyName}%') )
+            </if>
+            <if test="platfromId !=null and platfromId !=''">
+                and repay.bind_platform_id = #{platfromId}
+            </if>
 
             <if test="repayStatus !=null and repayStatus !=''">
-                and repay_status = #{repayStatus}
+                and repay.repay_status = #{repayStatus}
             </if>
+            <!--          /*代扣时间 开始*/ -->
+            <if test="dateBegin !=null ">
+                <![CDATA[ and repay.create_time >= #{dateBegin,jdbcType=TIMESTAMP}]]>
+            </if>
+            <!--            /*代扣时间 结束*/ -->
+            <if test="dateEnd !=null ">
+                <![CDATA[ and repay.create_time <= #{dateEnd,jdbcType=TIMESTAMP}]]>
+            </if>
+            <if test="companyId !=null and companyId !=''">
+                and business.company_id = #{companyId}
+            </if>
+            
+             <if test="businessTypeId !=null and businessTypeId !=''">
+                and b_type.business_type_id = #{businessTypeId}
+            </if>
+                and user.user_id=#{userId}
+
+        </where>
+      
+	        group by repay.original_business_id,repay.after_id,repay.repay_status  ) as a
+ 
+
+
+      
        
         
-        </where>
       
 
 
@@ -146,7 +174,7 @@ select repay.*  from tb_withholding_repayment_log  repay
     
     
     
-     <select id="selectSumByLogId" resultType="com.hongte.alms.base.vo.module.RepaymentLogVO">
+     <select id="selectSumByLogId" resultType="com.hongte.alms.base.vo.module.RepaymentLogVO"  parameterType="com.hongte.alms.base.vo.module.RepaymentLogReq">
 
       
       
@@ -162,16 +190,35 @@ select repay.*  from tb_withholding_repayment_log  repay
 	  left join tb_withholding_platform as platform on platform.platform_id=repay.bind_platform_id
 	  
 	  
-	        and user.user_id=#{userId} 
 
 
         <where>
                1=1
-    
+            <if test="keyName !=null and keyName !=''">
+                and ((business.operator_name  LIKE '%${keyName}%') or (repay.customer_name  LIKE '%${keyName}%') or (repay.original_business_id LIKE '%${keyName}%') )
+            </if>
+            <if test="platfromId !=null and platfromId !=''">
+                and repay.bind_platform_id = #{platfromId}
+            </if>
 
+             
+            <!--          /*代扣时间 开始*/ -->
+            <if test="dateBegin !=null ">
+                <![CDATA[ and repay.create_time >= #{dateBegin,jdbcType=TIMESTAMP}]]>
+            </if>
+            <!--            /*代扣时间 结束*/ -->
+            <if test="dateEnd !=null ">
+                <![CDATA[ and repay.create_time <= #{dateEnd,jdbcType=TIMESTAMP}]]>
+            </if>
+            <if test="companyId !=null and companyId !=''">
+                and business.company_id = #{companyId}
+            </if>
+            
+             <if test="businessTypeId !=null and businessTypeId !=''">
+                and b_type.business_type_id = #{businessTypeId}
+            </if>
+                and user.user_id=#{userId}
                 and repay.repay_status =1
-       
-        
         </where>
       
 

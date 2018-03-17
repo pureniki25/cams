@@ -44,7 +44,7 @@ public interface WithholdingRepaymentLogMapper extends SuperMapper<WithholdingRe
      * @param key
      * @return
      */
-    RepaymentLogVO selectSumByBusinessId(@Param("repayStatus")String repayStatus,@Param("userId")String userId);
+    RepaymentLogVO selectSumByBusinessId(RepaymentLogReq key);
     
     
     /**
@@ -52,7 +52,7 @@ public interface WithholdingRepaymentLogMapper extends SuperMapper<WithholdingRe
      * @param key
      * @return
      */
-    RepaymentLogVO selectSumByLogId(@Param("userId")String userId);
+    RepaymentLogVO selectSumByLogId(RepaymentLogReq key);
 
 
 }

@@ -45,6 +45,7 @@ import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.core.storage.StorageService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
+import com.ht.ussp.util.DateUtil;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -126,21 +127,32 @@ public class WithholdingRepaymentLogController {
 	    @ApiOperation(value = "获取代扣业务条数，成功代扣流水数，成功代扣总额，成功代扣业务条数")
 	    @GetMapping("/getCountInfo")
 	    @ResponseBody
-	    public Result<Map<String,String>>getCountInfo(
-	    ){
+	    public Result<Map<String,String>>getCountInfo( @RequestParam("companyId") String companyId,@RequestParam("keyName")String keyName,@RequestParam("platformId")String platformId,
+	    		
+	    		@RequestParam("dateBegin")String dateBegin,@RequestParam("dateEnd")String dateEnd,@RequestParam("repayStatus")String repayStatus,@RequestParam("businessTypeId")String businessTypeId){
 	    	   Map<String,String> retMap = new HashMap<String,String>();
-	    	String userId=loginUserInfoHelper.getUserId();
-	    	//查找代扣业务成功总条数
-	        RepaymentLogVO  repaymentLogVO = withholdingRepaymentlogService.selectSumByBusinessId("1", userId);
-	        String countByBusinessIdSucess=repaymentLogVO.getCountByBusinessId();
+	    	   RepaymentLogReq req=new RepaymentLogReq();
+	    	   req.setBusinessTypeId(businessTypeId);
+	    	   req.setCompanyId(companyId);
+	    	   req.setDateBegin(DateUtil.getDate(dateBegin));
+	    	   req.setDateEnd(DateUtil.getDate(dateEnd));
+	    	   req.setRepayStatus(repayStatus);
+	    	   req.setPlatfromId(platformId);
+	       	String userId=loginUserInfoHelper.getUserId();
+	    	   req.setUserId(userId);
+	    	   RepaymentLogVO  repaymentLogVO=null;
+	 
 	    	//查找代扣业务总条数
-	        repaymentLogVO=withholdingRepaymentlogService.selectSumByBusinessId(null, userId);
+	        repaymentLogVO=withholdingRepaymentlogService.selectSumByBusinessId(req);
 	        String countByBusinessId=repaymentLogVO.getCountByBusinessId();
 	        
 	      //查找代扣成功流水总条数
-	        repaymentLogVO=withholdingRepaymentlogService.selectSumByLogId(userId);
+	        repaymentLogVO=withholdingRepaymentlogService.selectSumByLogId(req);
 	        String countbyLogId=repaymentLogVO.getCountbyLogId();
-	        
+                  req.setRepayStatus("1");
+	    	//查找代扣业务成功总条数
+            repaymentLogVO= withholdingRepaymentlogService.selectSumByBusinessId(req);
+            String countByBusinessIdSucess=repaymentLogVO.getCountByBusinessId();
 	        //查找代扣成功总额
 	        String SumRepayAmount=repaymentLogVO.getSumRepayAmount();
 	        retMap.put("countByBusinessIdSucess",countByBusinessIdSucess);
