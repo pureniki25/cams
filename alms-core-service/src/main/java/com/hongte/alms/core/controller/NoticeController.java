@@ -218,6 +218,7 @@ public class NoticeController {
     }
 	@ApiOperation(value = "上传凭证")
 	@GetMapping("/del")
+	@ResponseBody
 	public Result del(String noticeId) {
 		Notice notice = noticeService.selectById(noticeId);
 		if (notice==null) {
