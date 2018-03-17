@@ -1,7 +1,12 @@
 package com.hongte.alms.base.service.impl;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -10,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -35,6 +41,8 @@ import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.mapper.TransferOfLitigationMapper;
 import com.hongte.alms.base.process.entity.Process;
 import com.hongte.alms.base.process.entity.ProcessTypeStep;
+import com.hongte.alms.base.process.enums.ProcessApproveResult;
+import com.hongte.alms.base.process.enums.ProcessStatusEnums;
 import com.hongte.alms.base.process.enums.ProcessTypeEnums;
 import com.hongte.alms.base.process.service.ProcessService;
 import com.hongte.alms.base.process.service.ProcessTypeStepService;
@@ -57,6 +65,8 @@ import com.hongte.alms.base.vo.litigation.house.MortgageInfo;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.ht.ussp.bean.LoginUserInfoHelper;
+
+import io.netty.handler.codec.http.HttpMethod;
 
 @Service("transferLitigationService")
 public class TransferLitigationServiceImpl implements TransferOfLitigationService {
@@ -307,6 +317,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			entity.setContentType("application/json");
 			post.setEntity(entity);
 			response = httpClient.execute(post);
+			HttpEntity entity2 = response.getEntity();
 
 			// 检验返回码
 			int statusCode = response.getStatusLine().getStatusCode();
@@ -333,6 +344,52 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		}
 
 	}
+	// private void sendLitigation(TransferOfLitigationVO transferOfLitigationVo,
+	// String sendUrl)
+	// throws ClientProtocolException, IOException {
+	//
+	// JSONObject jsonObject = null;
+	// StringBuilder builder = null;
+	// BufferedReader reader = null;
+	// HttpURLConnection httpUrlConn = null;
+	// try {
+	//
+	// final URL url = new URL(sendUrl);
+	// // http协议传输
+	// httpUrlConn = (HttpURLConnection) url.openConnection();
+	//
+	// httpUrlConn.setDoOutput(true);
+	// httpUrlConn.setDoInput(true);
+	// httpUrlConn.setUseCaches(false);
+	// // 设置请求方式（GET/POST）
+	// httpUrlConn.setRequestMethod("POST");
+	// httpUrlConn.setRequestProperty("Content-Type",
+	// "application/json;charset=utf-8");
+	//
+	// String reqJsonStr = JSONObject.toJSONString(transferOfLitigationVo);
+	//
+	// if (!StringUtil.isEmpty(reqJsonStr)) {
+	// OutputStream outputStream = httpUrlConn.getOutputStream();
+	// outputStream.write(reqJsonStr.getBytes("UTF-8"));
+	// outputStream.close();
+	// }
+	//
+	// reader = new BufferedReader(new
+	// InputStreamReader(httpUrlConn.getInputStream(), "UTF-8"));
+	//
+	// String str = null;
+	// while ((str = reader.readLine()) != null) {
+	// builder.append(str);
+	// }
+	//
+	// reader.close();
+	// jsonObject = JSONObject.parseObject(builder.toString());
+	// } catch (Exception e) {
+	// e.printStackTrace();
+	// }
+	// return jsonObject;
+	//
+	// }
 
 	@Transactional(rollbackFor = Exception.class)
 	@Override
@@ -578,10 +635,16 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			List<TransferLitigationCar> cars = transferLitigationCarService
 					.selectList(new EntityWrapper<TransferLitigationCar>().eq("business_id", businessId)
 							.eq("process_id", processId));
-			List<ProcessTypeStep> processTypeSteps = processTypeStepService.selectList(
-					new EntityWrapper<ProcessTypeStep>().eq("type_id", process.getProcessTypeid()).orderBy("step"));
-			if (!CollectionUtils.isEmpty(processTypeSteps)
-					&& process.getCurrentStep() == processTypeSteps.get(processTypeSteps.size() - 1).getStep()) {
+			// List<ProcessTypeStep> processTypeSteps = processTypeStepService.selectList(
+			// new EntityWrapper<ProcessTypeStep>().eq("type_id",
+			// process.getProcessTypeid()).orderBy("step"));
+			// if (!CollectionUtils.isEmpty(processTypeSteps)
+			// && process.getCurrentStep() == processTypeSteps.get(processTypeSteps.size() -
+			// 1).getStep()) {
+			// sendTransferLitigationData(businessId, cars.get(0).getCrpId(), sendUrl);
+			// }
+			if (!CollectionUtils.isEmpty(cars) && (process.getStatus().equals(ProcessStatusEnums.END.getKey())
+					|| process.getProcessResult().equals(ProcessApproveResult.PASS.getKey()))) {
 				sendTransferLitigationData(businessId, cars.get(0).getCrpId(), sendUrl);
 			}
 		} catch (Exception e) {
@@ -602,10 +665,16 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			List<TransferLitigationHouse> houses = transferLitigationHouseService
 					.selectList(new EntityWrapper<TransferLitigationHouse>().eq("business_id", businessId)
 							.eq("process_id", processId));
-			List<ProcessTypeStep> processTypeSteps = processTypeStepService.selectList(
-					new EntityWrapper<ProcessTypeStep>().eq("type_id", process.getProcessTypeid()).orderBy("step"));
-			if (!CollectionUtils.isEmpty(processTypeSteps) && process.getCurrentStep().intValue() == processTypeSteps
-					.get(processTypeSteps.size() - 1).getStep().intValue()) {
+			// List<ProcessTypeStep> processTypeSteps = processTypeStepService.selectList(
+			// new EntityWrapper<ProcessTypeStep>().eq("type_id",
+			// process.getProcessTypeid()).orderBy("step"));
+			// if (!CollectionUtils.isEmpty(processTypeSteps) &&
+			// process.getCurrentStep().intValue() == processTypeSteps
+			// .get(processTypeSteps.size() - 1).getStep().intValue()) {
+			// sendTransferLitigationData(businessId, houses.get(0).getCrpId(), sendUrl);
+			// }
+			if (!CollectionUtils.isEmpty(houses) && (process.getStatus().equals(ProcessStatusEnums.END.getKey())
+					|| process.getProcessResult().equals(ProcessApproveResult.PASS.getKey()))) {
 				sendTransferLitigationData(businessId, houses.get(0).getCrpId(), sendUrl);
 			}
 		} catch (Exception e) {
