@@ -8,17 +8,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.assets.car.service.CarService;
 import com.hongte.alms.base.assets.car.vo.AuctionBidderVo;
 import com.hongte.alms.base.assets.car.vo.AuctionRespVo;
+import com.hongte.alms.base.assets.car.vo.AuctionsReqVo;
 import com.hongte.alms.base.entity.CarAuction;
 import com.hongte.alms.base.entity.CarAuctionBidder;
 import com.hongte.alms.base.entity.CarAuctionPriceLog;
@@ -29,6 +30,7 @@ import com.hongte.alms.base.service.CarAuctionRegService;
 import com.hongte.alms.base.service.CarAuctionService;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.vo.PageResult;
+
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -66,16 +68,15 @@ public class CarAuctionController {
 	
 	@ApiOperation(value = "分页查询审核信息对外接口")
     @PostMapping("/selectAuctionsPage")
-    public PageResult<List<AuctionRespVo>> selectAuctionsPage (@RequestBody Map<String,Object> params) {
+    public PageResult<List<AuctionRespVo>> selectAuctionsPage (@RequestBody AuctionsReqVo req) {
 			 
 		try {
-			Integer page=(Integer) params.get("page");
-			Integer limit=(Integer) params.get("limit");
-			if(page==null||limit==null) {
-				logger.error("参数为空,page="+page+",limit="+limit);
-				return PageResult.error(9999, "参数为空,page="+page+",limit="+limit); 
+
+			if(req==null||StringUtils.isEmpty(req.getType())) {
+				logger.error("参数为空,type="+req.getType());
+				return PageResult.error(9999, "参数为空,type="+req.getType()); 
 			}
-			Page<AuctionRespVo> pages=carService.selectAuctionsPageForApp(page, limit);
+			Page<AuctionRespVo> pages=carService.selectAuctionsPageForApp(req);
 			return PageResult.success(pages.getRecords(),pages.getTotal());
 		}catch (Exception e) {
 			logger.error(e.getMessage());
@@ -84,19 +85,15 @@ public class CarAuctionController {
     }
 	@ApiOperation(value = "分页查询竞价信息对外接口")
     @PostMapping("/selectBiddersPage")
-    public PageResult<List<AuctionBidderVo>> selectBiddersPage (@RequestBody Map<String,Object> params) {
+    public PageResult<List<AuctionBidderVo>> selectBiddersPage (@RequestBody AuctionsReqVo req) {
 			 
 		try {
-			Integer page=(Integer) params.get("page");
-			Integer limit=(Integer) params.get("limit");
-			String priceID=(String) params.get("priceID");
-			String telephone=(String) params.get("telephone");
-			if(page==null||limit==null||StringUtils.isEmpty(priceID)||StringUtils.isEmpty(telephone)) {
-				logger.error("参数为空,page="+page+",limit="+limit+",priceId="+priceID+",telephone="+telephone);
-				return PageResult.error(9999, "参数为空,page="+page+",limit="+limit+",priceId="+priceID+",telephone="+telephone); 
+	
+			if(req==null||StringUtils.isEmpty(req.getPriceID())||StringUtils.isEmpty(req.getTelephone())) {
+				logger.error("参数为空,priceId="+req.getPriceID()+",telephone="+req.getTelephone());
+				return PageResult.error(9999, "参数为空,priceId="+req.getPriceID()+",telephone="+req.getTelephone()); 
 			}
-			Integer isPayDeposit=1;
-			Page<AuctionBidderVo> pages=carService.selectBiddersPageForApp(page, limit, isPayDeposit, priceID, null, telephone);
+			Page<AuctionBidderVo> pages=carService.selectBiddersPageForApp(req);
 			return PageResult.success(pages.getRecords(),pages.getTotal());
 		}catch (Exception e) {
 			logger.error(e.getMessage());
@@ -240,4 +237,21 @@ public class CarAuctionController {
 		return Result.error("9999", "报名失败"); 
 	}
 	}
+	@ApiOperation(value = "分页查询竞拍记录")
+    @PostMapping("/selectAuctionReg")
+    public PageResult<List<AuctionRespVo>> selectAuctionReg (@RequestBody AuctionsReqVo req) {
+			 
+		try {
+
+			if(req==null||StringUtils.isEmpty(req.getType())) {
+				logger.error("参数为空,type="+req.getType());
+				return PageResult.error(9999, "参数为空,type="+req.getType()); 
+			}
+			Page<AuctionRespVo> pages=carService.selectAuctionsRegPageForApp(req);
+			return PageResult.success(pages.getRecords(),pages.getTotal());
+		}catch (Exception e) {
+			logger.error(e.getMessage());
+			return PageResult.error(9999, "系统异常"); 
+		}
+    }
 }
