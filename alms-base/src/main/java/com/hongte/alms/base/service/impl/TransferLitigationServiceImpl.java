@@ -9,6 +9,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
+import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
+import com.hongte.alms.base.collection.service.CollectionStatusService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
@@ -107,6 +110,11 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	@Autowired
 	@Qualifier("DocService")
 	private DocService docService;
+
+
+	@Autowired
+	@Qualifier("CollectionStatusService")
+	private CollectionStatusService collectionStatusService;
 
 	@Override
 	public Map<String, Object> queryCarLoanData(String businessId) {
@@ -583,6 +591,13 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			if (!CollectionUtils.isEmpty(processTypeSteps)
 					&& process.getCurrentStep() == processTypeSteps.get(processTypeSteps.size() - 1).getStep()) {
 				sendTransferLitigationData(businessId, cars.get(0).getCrpId(), sendUrl);
+				//更新贷后状态为  移交诉讼
+				collectionStatusService.setBussinessAfterStatus(
+						req.getBusinessId(),
+						req.getCrpId(),
+						"",
+						CollectionStatusEnum.TO_LAW_WORK,
+						CollectionSetWayEnum.MANUAL_SET);
 			}
 		} catch (Exception e) {
 			LOG.error("---saveCarProcessApprovalResult--- 存储房贷审批结果信息失败！", e);
@@ -607,6 +622,13 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			if (!CollectionUtils.isEmpty(processTypeSteps) && process.getCurrentStep().intValue() == processTypeSteps
 					.get(processTypeSteps.size() - 1).getStep().intValue()) {
 				sendTransferLitigationData(businessId, houses.get(0).getCrpId(), sendUrl);
+				//更新贷后状态为  移交诉讼
+				collectionStatusService.setBussinessAfterStatus(
+						req.getBusinessId(),
+						req.getCrpId(),
+						"",
+						CollectionStatusEnum.TO_LAW_WORK,
+						CollectionSetWayEnum.MANUAL_SET);
 			}
 		} catch (Exception e) {
 			LOG.error("---saveCarProcessApprovalResult--- 存储车贷审批结果信息失败！", e);

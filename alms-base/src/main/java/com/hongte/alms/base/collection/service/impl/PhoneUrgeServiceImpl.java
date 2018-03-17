@@ -93,6 +93,12 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
             if(user!=null){
                 vo.setVisitStaffName(user.getUserName());
             }
+            List<SysParameter> pList = sysParameterService.selectList(new EntityWrapper<SysParameter>().
+                    eq("param_type",SysParameterTypeEnums.COLLECTION_STATUS.getKey())
+            .eq("param_value",vo.getColStatus()));
+            if(pList.size()>0){
+                vo.setAfterColStatusName(pList.get(0).getParamName());
+            }
         }
 
 //        pages.setRecords(setInfoForAfterLoanStandingBookVo(list));

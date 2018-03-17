@@ -76,6 +76,9 @@ public class AfterLoanStandingBookVo implements java.io.Serializable  {
     @Excel(name = "还款状态", orderNum = "15",   isImportField = "true_st")
     private String statusName; //还款状态 名称
 
+    @Excel(name = "业务状态", orderNum = "16",   isImportField = "true_st")
+    private String afterColStatusName;//贷后状态 名称
+    private Integer  colStatus;  //贷后状态 数据库值
 
     public String getBusinessId() {
         return businessId;
@@ -276,5 +279,21 @@ public class AfterLoanStandingBookVo implements java.io.Serializable  {
 
     public void setAfterId(String afterId) {
         this.afterId = afterId;
+    }
+
+    public String getAfterColStatusName() {
+        return afterColStatusName;
+    }
+
+    public void setAfterColStatusName(String afterColStatusName) {
+        this.afterColStatusName = afterColStatusName;
+    }
+
+    public Integer getColStatus() {
+        return colStatus;
+    }
+
+    public void setColStatus(Integer colStatus) {
+        this.colStatus = colStatus;
     }
 }

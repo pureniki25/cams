@@ -348,8 +348,12 @@ window.layinit(function(htConfig){
                 }, {
 
                     field: 'statusName',
-                    title: '状态'
-                }, {
+                    title: '还款状态'
+                },{
+
+                    field: 'afterColStatusName',
+                    title: '业务状态'
+                },{
                     fixed: 'right',
                     title: '操作',
                     width: 178,
