@@ -1,12 +1,7 @@
 package com.hongte.alms.base.service.impl;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -43,7 +38,6 @@ import com.hongte.alms.base.entity.TransferLitigationHouse;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.mapper.TransferOfLitigationMapper;
 import com.hongte.alms.base.process.entity.Process;
-import com.hongte.alms.base.process.entity.ProcessTypeStep;
 import com.hongte.alms.base.process.enums.ProcessApproveResult;
 import com.hongte.alms.base.process.enums.ProcessStatusEnums;
 import com.hongte.alms.base.process.enums.ProcessTypeEnums;
@@ -68,8 +62,6 @@ import com.hongte.alms.base.vo.litigation.house.MortgageInfo;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.ht.ussp.bean.LoginUserInfoHelper;
-
-import io.netty.handler.codec.http.HttpMethod;
 
 @Service("transferLitigationService")
 public class TransferLitigationServiceImpl implements TransferOfLitigationService {
