@@ -4,6 +4,7 @@ import java.util.Map;
 
 import com.hongte.alms.base.entity.TransferLitigationCar;
 import com.hongte.alms.base.entity.TransferLitigationHouse;
+import com.hongte.alms.base.process.vo.ProcessLogReq;
 import com.hongte.alms.base.vo.billing.CarLoanBilVO;
 import com.hongte.alms.base.vo.litigation.TransferOfLitigationVO;
 import com.hongte.alms.base.vo.litigation.house.HouseLoanVO;
@@ -47,5 +48,8 @@ public interface TransferOfLitigationService {
      * 车贷业务结清试算
      */
     Map<String, Object> carLoanBilling(CarLoanBilVO carLoanBilVO);
+    
+    void saveHouseProcessApprovalResult(ProcessLogReq req, String sendUrl);
+    void saveCarProcessApprovalResult(ProcessLogReq req, String sendUrl);
     
 }

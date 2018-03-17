@@ -43,7 +43,7 @@ public interface ProcessService extends BaseService<Process> {
      * @throws IllegalAccessException
      * @throws InstantiationException
      */
-    public void saveProcessApprovalResult(ProcessLogReq req ,ProcessTypeEnums processTypeEnums) throws IllegalAccessException, InstantiationException ;
+    public Process saveProcessApprovalResult(ProcessLogReq req ,ProcessTypeEnums processTypeEnums) throws IllegalAccessException, InstantiationException ;
 
 
     /**
