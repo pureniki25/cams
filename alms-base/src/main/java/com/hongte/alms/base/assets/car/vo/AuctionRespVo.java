@@ -226,7 +226,14 @@ public class AuctionRespVo implements Serializable{
 	     */
 		@ApiModelProperty(required= true,value = "竞拍id")
 		private String auctionId;
-
+		
+	    /**
+	     *评估金额
+	     */
+		@ApiModelProperty(required= true,value = "评估金额")
+		private BigDecimal lastEvaluationAmount;
+		
+		
 		public List<Doc> getDocs() {
 			return docs;
 		}
@@ -723,6 +730,14 @@ public class AuctionRespVo implements Serializable{
 
 		public void setAuctionId(String auctionId) {
 			this.auctionId = auctionId;
+		}
+
+		public BigDecimal getLastEvaluationAmount() {
+			return lastEvaluationAmount;
+		}
+
+		public void setLastEvaluationAmount(BigDecimal lastEvaluationAmount) {
+			this.lastEvaluationAmount = lastEvaluationAmount;
 		} 
 	    
 	 
