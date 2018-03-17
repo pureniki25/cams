@@ -305,7 +305,7 @@ public class TransferOfLitigationController {
 			}
 		} catch (Exception e) {
 			LOG.error("-- queryTransferLitigationData -- 移交诉讼失败！！！", e);
-			return Result.error("500", "系统异常");
+			return Result.error("500", e.getMessage());
 		}
 	}
 
@@ -329,7 +329,7 @@ public class TransferOfLitigationController {
 			}
 		} catch (Exception e) {
 			LOG.error("-- queryCarLoanBilDetail -- 查询车贷结清试算明细！！！", e);
-			return Result.error("500", "系统异常");
+			return Result.error("500", e.getMessage());
 		}
 	}
 
@@ -353,7 +353,7 @@ public class TransferOfLitigationController {
 			}
 		} catch (Exception e) {
 			LOG.error("-- carLoanBilling -- 车贷结清试算失败！！！", e);
-			return Result.error("500", "系统异常");
+			return Result.error("500", e.getMessage());
 		}
 	}
 
