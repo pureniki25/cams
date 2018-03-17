@@ -70,15 +70,15 @@ public class TransferOfLitigationController {
 	@Autowired
 	@Qualifier("ProcessService")
 	private ProcessService processService;
-	
+
 	@Autowired
     @Qualifier("ProcessTypeService")
     private ProcessTypeService processTypeService;
-	
+
 	@Autowired
 	@Qualifier("ProcessTypeStepService")
 	private ProcessTypeStepService processTypeStepService;
-	
+
 	@Value("${ht.litigation.url:http://172.16.200.110:30906/api/importLitigation}")
 	private String sendUrl;
 
@@ -107,11 +107,11 @@ public class TransferOfLitigationController {
 				if (processId != null) {
 					List<TransferLitigationCar> applyList = transferLitigationCarService
 							.selectList(new EntityWrapper<TransferLitigationCar>().eq("process_id", processId));
-					
+
 					String houseAddr = applyList.get(0).getHouseAddress();
 					StringBuilder builder = new StringBuilder();
 					String[] houseArr = houseAddr.split("--#separator#--");
-					
+
 					int count = 1;
 					if (houseAddr.length() > 0) {
 						for (String hArr : houseArr) {
@@ -122,7 +122,7 @@ public class TransferOfLitigationController {
 							}
 						}
 					}
-					
+
 					carLoanData.put("houseAddress", builder.toString());
 					carLoanData.put("carList", (JSONArray) JSON.toJSON(applyList, JsonUtil.getMapping()));
 				}
@@ -193,33 +193,37 @@ public class TransferOfLitigationController {
 	public Result<String> saveTransferLitigationCar(@RequestBody Map<String, Object> req) {
 		try {
 			TransferLitigationCar car = new TransferLitigationCar();
-			car.setAlmsOpinion((String)req.get("almsOpinion"));
-			car.setBusinessId((String)req.get("businessId"));
-			car.setCarCondition((String)req.get("carCondition"));
-			car.setCrpId((String)req.get("crpId"));
-			car.setDelayHandover((String)req.get("delayHandover"));
-			car.setDelayHandoverDesc((String)req.get("delayHandoverDesc"));
-			car.setEstates((String)req.get("estates"));
-			car.setProcessStatus((String)req.get("processStatus"));
-			
-			StringBuilder houseAddress = new StringBuilder();
-			List<LinkedHashMap<String, Object>> componentOptions = (List<LinkedHashMap<String, Object>>) req.get("componentOption");
-			if(componentOptions!=null) {
-				for (LinkedHashMap<String, Object> componentOption : componentOptions) {
-					LinkedHashMap<String, Object> registrationInfoForm = (LinkedHashMap<String, Object>) componentOption.get("registrationInfoForm");
-					List<String> houseAreas = (List<String>) registrationInfoForm.get("houseArea");
-					String detailAddress = (String) registrationInfoForm.get("detailAddress");
-					String mortgageSituation = (String) registrationInfoForm.get("mortgageSituation");
+			car.setAlmsOpinion((String) req.get("almsOpinion"));
+			car.setBusinessId((String) req.get("businessId"));
+			car.setCarCondition((String) req.get("carCondition"));
+			car.setCrpId((String) req.get("crpId"));
+			car.setDelayHandover((String) req.get("delayHandover"));
+			car.setDelayHandoverDesc((String) req.get("delayHandoverDesc"));
+			car.setEstates((String) req.get("estates"));
+			car.setProcessStatus((String) req.get("processStatus"));
 
-					if (!CollectionUtils.isEmpty(houseAreas) && !StringUtil.isEmpty(detailAddress) && !StringUtil.isEmpty(mortgageSituation)) {
-						String houseAreasStr = houseAreas.toString().replace("[", "").replace("]", "").replace(",", "");
-						houseAddress.append(houseAreasStr).append(" ").append(detailAddress).append("，房产抵押情况：").append(mortgageSituation).append("--#separator#--");
-					}
-				}
+			StringBuilder houseAddress = new StringBuilder();
+			List<LinkedHashMap<String, Object>> componentOptions = (List<LinkedHashMap<String, Object>>) req
+					.get("componentOption");
+            if(componentOptions!=null) {
+                for (LinkedHashMap<String, Object> componentOption : componentOptions) {
+                    LinkedHashMap<String, Object> registrationInfoForm = (LinkedHashMap<String, Object>) componentOption
+                            .get("registrationInfoForm");
+                    List<String> houseAreas = (List<String>) registrationInfoForm.get("houseArea");
+                    String detailAddress = (String) registrationInfoForm.get("detailAddress");
+                    String mortgageSituation = (String) registrationInfoForm.get("mortgageSituation");
+
+                    if (!CollectionUtils.isEmpty(houseAreas) && !StringUtil.isEmpty(detailAddress)
+                            && !StringUtil.isEmpty(mortgageSituation)) {
+                        String houseAreasStr = houseAreas.toString().replace("[", "").replace("]", "").replace(",", "");
+                        houseAddress.append(houseAreasStr).append(" ").append(detailAddress).append("，房产抵押情况：")
+                                .append(mortgageSituation).append("--#separator#--");
+                    }
+                }
 			}
-			
+
 			car.setHouseAddress(houseAddress.toString());
-			
+
 			transferOfLitigationService.saveTransferLitigationCar(car, sendUrl);
 			return Result.success();
 		} catch (Exception ex) {
@@ -241,7 +245,7 @@ public class TransferOfLitigationController {
 		}
 
 	}
-	
+
 	@ApiOperation(value = "存储车贷移交诉讼审批信息")
 	@PostMapping("/saveCarApprovalLogInfo")
 	@ResponseBody
@@ -253,7 +257,7 @@ public class TransferOfLitigationController {
 			LOG.error(ex.getMessage());
 			return Result.error("500", ex.getMessage());
 		}
-		
+
 	}
 
 	@ApiOperation(value = "根据流程ID查找房贷移交法务申请信息")
@@ -313,13 +317,13 @@ public class TransferOfLitigationController {
 			return Result.error("500", "系统异常");
 		}
 	}
-	
+
 	/**
 	 * 查询车贷结清试算明细
 	 * 
 	 * @author huweiqian
 	 * @date 2018/03/13
-	 * @return 
+	 * @return
 	 */
 	@ApiOperation(value = "查询车贷结清试算明细")
 	@GetMapping("/queryCarLoanBilDetail")
@@ -343,7 +347,7 @@ public class TransferOfLitigationController {
 	 * 
 	 * @author huweiqian
 	 * @date 2018/03/13
-	 * @return 
+	 * @return
 	 */
 	@ApiOperation(value = "车贷结清试算")
 	@PostMapping("/carLoanBilling")
