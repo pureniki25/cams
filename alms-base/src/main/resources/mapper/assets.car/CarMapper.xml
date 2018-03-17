@@ -137,6 +137,7 @@
 	<select id="selectAuctionsPageForApp" resultType="com.hongte.alms.base.assets.car.vo.AuctionRespVo">
 
 		select
+		tca.business_id,<!-- 业务编号id -->
 		tca.auction_id priceID,					<!-- 拍卖ID -->
 		tca.starting_price startPrice,					<!-- 起拍价 -->
 		tca.deposit bond,					<!-- 保证金 -->
@@ -177,7 +178,7 @@
 		tca.acount_name account,				<!-- 账户名称 -->
 		tca.open_bank bank,				<!-- 开户银行 -->
 		tca.acount_num cardNo,					<!-- 银行卡号 -->
-
+		tca.payment_end_time,<!-- 缴款截止时间 -->
 
 		tcb.brand_name vehicleBrand ,		<!--车辆品牌 -->
 		case
@@ -191,7 +192,7 @@
 		concat(tcb.displacement,tcb.displacement_unit) displacement ,	<!--排量 -->
 		tcb.engine_model engineNumber ,<!--发动机号 -->
 		tcb.vin frameNumber ,<!--车架号 -->
-		tcb.license_location vehicleTerritory ,<!--车辆属地 -->
+	    ifnull(tcb.last_evaluation_amount,tcb.evaluation_amount) lastEvaluationAmount, <!-- 评估价 --> 
 		-- UseProperty ,														<!--使用性质 -->
 		tcb.insurance_expiration_date insuranceDate ,<!--保险到期日 -->
 		tcb.annual_verification_expiration_date inspectionDate ,         <!--年检到期日 -->
@@ -205,9 +206,10 @@
 		end mortgageState ,<!--车辆抵押状态 -->
 		tcb.traffic_violation_situation lllegal ,<!--违章未处理记录 -->
 		tcb.tool_with_car tools ,<!--随车工具 -->
+		tcb.license_plate_number,<!-- 车牌号 -->
 		<!-- Taxation , 交易税费 -->
 		<!-- TransactionMode , 交易方式 -->
-		<!-- Position , 车辆位置 -->
+		tcb.car_position Position , <!-- 车辆位置 -->
 		tcb.related_docs files   <!--提供文件 -->
 		<!-- Remarks , -->														<!--备注 -->
 
@@ -220,9 +222,30 @@
 		join
 		tb_process_type tpt on tpt.type_id=tp.process_typeid and
 		tpt.type_code='carAuctionAply'
+		<where>
+			<if test="currentDate !=null  and type=='1'.toString()">
+				and tca.auction_start_time  &gt;=#{currentDate}
+			</if>
+			<if test="currentDate !=null  and type=='2'.toString()">
+				and tca.auction_start_time  &lt;=#{currentDate}
+			</if>
+			<if test="currentDate !=null  and type=='2'.toString()">
+				and tca.auction_end_time  &gt;=#{currentDate}
+			</if>
+			<if test="currentDate !=null  and type=='3'.toString()">
+				and tca.auction_end_time  &lt;=#{currentDate}
+			</if>
+			<if test="vehicleBrand !=null and vehicleBrand !=''">
+			
+			    and tcb.brand_name=#{vehicleBrand}
+			</if>
+			<if test="carModel !=null and carModel !=''">
+			
+			    and tcb.model=#{vehicleBrand}
+			</if>
+		</where>
 		order BY tca.create_time DESC
-		limit ${(page-1) * limit},
-		#{limit,jdbcType=DECIMAL}
+		limit ${(page-1) * limit},   #{limit}
 	</select>
 
 	<select id="selectAuctionsCountForApp" resultType="int">
@@ -239,7 +262,29 @@
 		join
 		tb_process_type tpt on tpt.type_id=tp.process_typeid and
 		tpt.type_code='carAuctionAply'
-
+		<where>
+			<if test="currentDate !=null  and type=='1'.toString()">
+				and tca.auction_start_time  &gt;=#{currentDate}
+			</if>
+			<if test="currentDate !=null  and type=='2'.toString()">
+				and tca.auction_start_time  &lt;=#{currentDate}
+			</if>
+			<if test="currentDate !=null  and type=='2'.toString()">
+				and tca.auction_end_time  &gt;=#{currentDate}
+			</if>
+			<if test="currentDate !=null  and type=='3'.toString()">
+				and tca.auction_end_time  &lt;=#{currentDate}
+			</if>
+			<if test="vehicleBrand !=null and vehicleBrand !=''">
+			
+			    and tcb.brand_name=#{vehicleBrand}
+			</if>
+			<if test="carModel !=null and carModel !=''">
+			
+			    and tcb.model=#{vehicleBrand}
+			</if>
+		</where>
+		order BY tca.create_time DESC
 	</select>
 	<select id="selectBiddersPageForApp" resultType="com.hongte.alms.base.assets.car.vo.AuctionBidderVo">
 		select
@@ -265,17 +310,22 @@
 		join tb_car_auction tca on
 		tca.auction_id=tcar.auction_id
 		<where>
-			<if test="isPayDeposit !=null and isPayDeposit !=''">
+			<!--<if test="type=='1'.toString()"> 
 				and tcar.is_pay_deposit= #{isPayDeposit}
+			</if>已报名 -->
+			<if test="type=='2'.toString()"><!-- 已竞买 -->
+				and tcar.is_auction_success= ${1}
 			</if>
-			<if test="auctionId !=null and auctionId !=''">
-				and tca.auction_id= #{auctionId}
+			<if test="priceID !=null and priceID !=''">
+				and tcar.auction_id= #{priceID}
 			</if>
-	
+			<if test="telephone !=null and telephone !=''">
+				and tcar.reg_tel= #{telephone}
+			</if>
 		</where>
 		order BY tcar.update_time
 		limit ${(page-1) * limit},
-		#{limit,jdbcType=DECIMAL}
+		#{limit}
 
 	</select>
 	<select id="selectBiddersCountForApp" resultType="int">
@@ -286,12 +336,14 @@
 		tcar.reg_tel=tcab.bidder_tel
 		join tb_car_auction tca on
 		tca.auction_id=tcar.auction_id
-		where is_pay_deposit=true
-		<if test="isPayDeposit !=null and isPayDeposit !=''">
-				and tcar.is_pay_deposit= #{isPayDeposit}
+			<if test="type=='2'.toString()"><!-- 已竞买 -->
+				and tcar.is_auction_success= ${1}
 			</if>
-			<if test="auctionId !=null and auctionId !=''">
-				and tca.auction_id= #{auctionId}
+			<if test="priceID !=null and priceID !=''">
+				and tcar.auction_id= #{priceID}
+			</if>
+			<if test="telephone !=null and telephone !=''">
+				and tcar.reg_tel= #{telephone}
 			</if>
 
 	</select>
@@ -307,5 +359,159 @@
 				and tca.auction_id= #{auctionId}
 			</if>
 		</where>
+	</select>
+	
+		<select id="selectAuctionsRegPageForApp" resultType="com.hongte.alms.base.assets.car.vo.AuctionRespVo">
+
+		select
+		tca.business_id,<!-- 业务编号id -->
+		tca.auction_id priceID,					<!-- 拍卖ID -->
+		tca.starting_price startPrice,					<!-- 起拍价 -->
+		tca.deposit bond,					<!-- 保证金 -->
+		tca.fare_range priceincrease,							<!-- 加价幅度 -->
+		tca.auction_start_time startPriceDate,							<!-- 拍卖开始时间 -->
+		tca.auction_end_time etartPriceDate,						<!-- 拍卖截止时间 -->
+		tca.buy_start_time starBidTime,				<!-- 竞买开始时间 -->
+		tca.buy_end_time endBidTime,								<!-- 竞买结束时间 -->
+		tca.cons_start_time conStartDate,							<!-- 咨询开始时间 -->
+		tca.cons_end_time conEndDate,				<!-- 咨询结束时间 -->
+		tca.view_sample_start_time vieStartDate,							<!-- 看样开始时间 -->
+		tca.view_sample_end_time vieEndDate,								<!-- 看样结束时间 -->
+		tca.view_sample_addr vie,									<!-- 看样地点 -->
+		tca.consultant_addr contact,								<!-- 联系地点 -->
+		tca.payment_end_time paymentTime,							<!-- 缴款截止时间 -->
+		case
+		when tca.trans_type='01' then '债权转让'
+		when tca.trans_type='02' then
+		'交易过户'
+		else ''
+		end tranType,								<!-- 交易类型 -->
+		case
+		when tca.take_way='01' then '门店自提'
+		when tca.take_way='02' then
+		'运费自付'
+		else ''
+		end pickupMethod,							<!-- 取货方式 -->
+		case
+		when tca.pay_way='01' then '竞买成功后，尾款线下支付'
+		when tca.pay_way='02'
+		then '竞买成功后，尾款线上支付'
+		else ''
+		end paymentMethod,<!-- 支付方式 -->
+		tca.auction_rules bidRule,								<!-- 竞价规则 -->
+		tca.handle_unit disposalUnit,				<!-- 处置单位 -->
+		tca.consultant contacts,				<!-- 咨询联系人 -->
+		tca.consultant_tel telephone,					<!-- 咨询联系人 -->
+		tca.acount_name account,				<!-- 账户名称 -->
+		tca.open_bank bank,				<!-- 开户银行 -->
+		tca.acount_num cardNo,					<!-- 银行卡号 -->
+		tca.payment_end_time,<!-- 缴款截止时间 -->
+
+		tcb.brand_name vehicleBrand ,		<!--车辆品牌 -->
+		case
+		when tcb.origin_place=0 then '国产'
+		when tcb.origin_place=1 then '进口'
+		else ''
+		end carproduction ,					<!--汽车产地 -->
+		tcb.color carColour ,<!--车辆颜色 -->
+		tcb.model carModel ,<!--车辆型号 -->
+		tcb.license_location vehicleTerritory,<!-- 汽车属地 -->
+		concat(tcb.displacement,tcb.displacement_unit) displacement ,	<!--排量 -->
+		tcb.engine_model engineNumber ,<!--发动机号 -->
+		tcb.vin frameNumber ,<!--车架号 -->
+
+		-- UseProperty ,														<!--使用性质 -->
+		tcb.insurance_expiration_date insuranceDate ,<!--保险到期日 -->
+		tcb.annual_verification_expiration_date inspectionDate ,         <!--年检到期日 -->
+		tcb.odometer mileage ,<!--车显里程 -->
+		tcb.vehicle_license_registration_date registerDate ,             <!--首次登记年月 -->
+		case
+		when tcb.is_mortgage=false then '未抵押'
+		when tcb.is_mortgage=true
+		then '抵押'
+		else ''
+		end mortgageState ,<!--车辆抵押状态 -->
+		tcb.traffic_violation_situation lllegal ,<!--违章未处理记录 -->
+		tcb.tool_with_car tools ,<!--随车工具 -->
+		tcb.license_plate_number,<!-- 车牌号 -->
+		<!-- Taxation , 交易税费 -->
+		<!-- TransactionMode , 交易方式 -->
+		tcb.car_position Position , <!-- 车辆位置 -->
+		tcb.related_docs files,   <!--提供文件 -->
+		<!-- Remarks , -->														<!--备注 -->
+		tcab.bidder_name bidderName,  <!-- 用户姓名 -->
+		tcab.bidder_cert_id bidderCertId, <!-- 身份证号码 -->
+		tcab.bidder_tel bidderTel, <!-- 联系方式 -->
+		tcab.trans_account_name transAccountName, <!-- 转账账户 -->
+		tcab.trans_account_num transAccountNum,  <!-- 转账卡号 -->
+		tcab.trans_account_num transAccountNum,  <!-- 转账银行 -->
+		tcar.reg_id regId,   <!-- 拍卖登记id -->
+		tcar.is_pay_deposit isPayDeposit,  <!-- 是否缴纳保证金 -->
+		tcar.offer_amount offerAmount,  <!-- 出价金额 -->
+		tcar.is_auction_success isAuctionSuccess,  <!-- 是否竞拍成功 -->
+		tcar.trans_price transPrice,   <!-- 成交价格 -->
+		tcar.auction_id auctionId  <!-- 竞拍id -->
+		
+		from tb_car_auction tca
+		join tb_car_basic tcb on
+		tca.business_id=tcb.business_id
+		join tb_process tp on
+		tcb.business_id=tp.business_id and
+		tp.process_result=1
+		join
+		tb_process_type tpt on tpt.type_id=tp.process_typeid and
+		tpt.type_code='carAuctionAply'
+		join tb_car_auction_reg tcar on	tca.auction_id=tcar.auction_id
+		join tb_car_auction_bidder tcab on tcar.reg_tel=tcab.bidder_tel
+		<where>
+			<!--<if test="type=='1'.toString()"> 
+				and tcar.is_pay_deposit= #{isPayDeposit}
+			</if>已报名 -->
+			<if test="type=='2'.toString()"><!-- 已竞买 -->
+				and tcar.is_auction_success= ${1}
+			</if>
+			<if test="priceID !=null and priceID !=''">
+				and tcar.auction_id= #{priceID}
+			</if>
+			<if test="telephone !=null and telephone !=''">
+				and tcar.reg_tel= #{telephone}
+			</if>
+		</where>
+		order BY tcar.update_time desc
+		limit ${(page-1) * limit},
+		#{limit}
+		
+		</select>
+		
+		<select id="selectAuctionsRegCountForApp" resultType="int">
+
+		select
+		count(*)
+		
+		from tb_car_auction tca
+		join tb_car_basic tcb on
+		tca.business_id=tcb.business_id
+		join tb_process tp on
+		tcb.business_id=tp.business_id and
+		tp.process_result=1
+		join
+		tb_process_type tpt on tpt.type_id=tp.process_typeid and
+		tpt.type_code='carAuctionAply'
+		join tb_car_auction_reg tcar on	tca.auction_id=tcar.auction_id
+		join tb_car_auction_bidder tcab on tcar.reg_tel=tcab.bidder_tel
+		<where>
+			<!--<if test="type=='1'.toString()"> 
+				and tcar.is_pay_deposit= #{isPayDeposit}
+			</if>已报名 -->
+			<if test="type=='2'.toString()"><!-- 已竞买 -->
+				and tcar.is_auction_success= ${1}
+			</if>
+			<if test="priceID !=null and priceID !=''">
+				and tcar.auction_id= #{priceID}
+			</if>
+			<if test="telephone !=null and telephone !=''">
+				and tcar.reg_tel= #{telephone}
+			</if>
+		</where>	
 	</select>
 </mapper>
