@@ -196,18 +196,20 @@ public class TransferOfLitigationController {
 			StringBuilder houseAddress = new StringBuilder();
 			List<LinkedHashMap<String, Object>> componentOptions = (List<LinkedHashMap<String, Object>>) req
 					.get("componentOption");
-			for (LinkedHashMap<String, Object> componentOption : componentOptions) {
-				LinkedHashMap<String, Object> registrationInfoForm = (LinkedHashMap<String, Object>) componentOption
-						.get("registrationInfoForm");
-				List<String> houseAreas = (List<String>) registrationInfoForm.get("houseArea");
-				String detailAddress = (String) registrationInfoForm.get("detailAddress");
-				String mortgageSituation = (String) registrationInfoForm.get("mortgageSituation");
-
-				if (!CollectionUtils.isEmpty(houseAreas) && !StringUtil.isEmpty(detailAddress)
-						&& !StringUtil.isEmpty(mortgageSituation)) {
-					String houseAreasStr = houseAreas.toString().replace("[", "").replace("]", "").replace(",", "");
-					houseAddress.append(houseAreasStr).append(" ").append(detailAddress).append("，房产抵押情况：")
-							.append(mortgageSituation).append("--#separator#--");
+			if (!CollectionUtils.isEmpty(componentOptions)) {
+				for (LinkedHashMap<String, Object> componentOption : componentOptions) {
+					LinkedHashMap<String, Object> registrationInfoForm = (LinkedHashMap<String, Object>) componentOption
+							.get("registrationInfoForm");
+					List<String> houseAreas = (List<String>) registrationInfoForm.get("houseArea");
+					String detailAddress = (String) registrationInfoForm.get("detailAddress");
+					String mortgageSituation = (String) registrationInfoForm.get("mortgageSituation");
+					
+					if (!CollectionUtils.isEmpty(houseAreas) && !StringUtil.isEmpty(detailAddress)
+							&& !StringUtil.isEmpty(mortgageSituation)) {
+						String houseAreasStr = houseAreas.toString().replace("[", "").replace("]", "").replace(",", "");
+						houseAddress.append(houseAreasStr).append(" ").append(detailAddress).append("，房产抵押情况：")
+						.append(mortgageSituation).append("--#separator#--");
+					}
 				}
 			}
 
