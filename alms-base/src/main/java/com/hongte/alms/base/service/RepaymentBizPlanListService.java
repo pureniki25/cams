@@ -35,26 +35,26 @@ public interface RepaymentBizPlanListService extends BaseService<RepaymentBizPla
      */
     public List<RepaymentBizPlanList> selectNeedLawNorBiz(Integer overDueDays );
 
-    /**
-     * 查出需要移交电催的展期业务还款计划列表
-     * @param companyId
-     * @return
-     */
-    public List<RepaymentBizPlanList> selectNeedPhoneUrgRenewBiz(String companyId,Integer beforeDueDays);
-
-    /**
-     * 查出需要移交上门催收的正常业务还款计划列表
-     * @param companyId
-     * @return
-     */
-    public List<RepaymentBizPlanList> selectNeedVisitRenewBiz(String companyId,Integer overDueDays );
-
-    /**
-     * 查出需要移交法务的正常业务还款计划列表
-     * @return
-     */
-    public List<RepaymentBizPlanList> selectNeedLawRenewBiz(Integer overDueDays );
-
+//    /**
+//     * 查出需要移交电催的展期业务还款计划列表
+//     * @param companyId
+//     * @return
+//     */
+//    public List<RepaymentBizPlanList> selectNeedPhoneUrgRenewBiz(String companyId,Integer beforeDueDays);
+//
+//    /**
+//     * 查出需要移交上门催收的正常业务还款计划列表
+//     * @param companyId
+//     * @return
+//     */
+//    public List<RepaymentBizPlanList> selectNeedVisitRenewBiz(String companyId,Integer overDueDays );
+//
+//    /**
+//     * 查出需要移交法务的正常业务还款计划列表
+//     * @return
+//     */
+//    public List<RepaymentBizPlanList> selectNeedLawRenewBiz(Integer overDueDays );
+//
 
 
 

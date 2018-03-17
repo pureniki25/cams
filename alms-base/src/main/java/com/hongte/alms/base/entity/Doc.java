@@ -96,6 +96,10 @@ public class Doc extends Model<Doc> {
 	@TableField("update_time")
 	@ApiModelProperty(required= true,value = "更新时间")
 	private Date updateTime;
+	
+	@TableField("doc_attr")
+	@ApiModelProperty(required= true,value = "文件属性")
+	private String docAttr;
 
 
 	public String getDocId() {
@@ -199,6 +203,14 @@ public class Doc extends Model<Doc> {
 		return this.docId;
 	}
 
+	public String getDocAttr() {
+		return docAttr;
+	}
+
+	public void setDocAttr(String docAttr) {
+		this.docAttr = docAttr;
+	}
+
 	@Override
 	public String toString() {
 		return "Doc{" +
@@ -214,6 +226,7 @@ public class Doc extends Model<Doc> {
 			", createTime=" + createTime +
 			", updateUser=" + updateUser +
 			", updateTime=" + updateTime +
+			", docAttr=" + docAttr +
 			"}";
 	}
 }

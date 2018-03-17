@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
+import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
+import com.hongte.alms.base.collection.service.CollectionStatusService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +28,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.TransferLitigationCar;
 import com.hongte.alms.base.entity.TransferLitigationHouse;
+import com.hongte.alms.base.process.entity.Process;
+import com.hongte.alms.base.process.entity.ProcessTypeStep;
 import com.hongte.alms.base.process.enums.ProcessTypeEnums;
 import com.hongte.alms.base.process.service.ProcessService;
 import com.hongte.alms.base.process.service.ProcessTypeService;
@@ -51,7 +56,7 @@ public class TransferOfLitigationController {
 	private static final Logger LOG = LoggerFactory.getLogger(TransferOfLitigationController.class);
 
 	@Autowired
-	@Qualifier("transferLitigationService")
+	@Qualifier("TransferOfLitigationService")
 	private TransferOfLitigationService transferOfLitigationService;
 
 	@Autowired
@@ -67,8 +72,8 @@ public class TransferOfLitigationController {
 	private ProcessService processService;
 
 	@Autowired
-	@Qualifier("ProcessTypeService")
-	private ProcessTypeService processTypeService;
+    @Qualifier("ProcessTypeService")
+    private ProcessTypeService processTypeService;
 
 	@Autowired
 	@Qualifier("ProcessTypeStepService")
@@ -76,6 +81,10 @@ public class TransferOfLitigationController {
 
 	@Value("${ht.litigation.url:http://172.16.200.110:30906/api/importLitigation}")
 	private String sendUrl;
+
+	@Autowired
+	@Qualifier("CollectionStatusService")
+	private CollectionStatusService collectionStatusService;
 
 	/**
 	 * 获取车贷诉讼相关数据
@@ -108,7 +117,7 @@ public class TransferOfLitigationController {
 						for (String hArr : houseArr) {
 							if (count < houseArr.length) {
 								builder.append("房产地址" + count++ + "：").append(hArr).append("--#separator#--");
-							} else {
+							}else {
 								builder.append("房产地址" + count++ + "：").append(hArr);
 							}
 						}
@@ -196,21 +205,21 @@ public class TransferOfLitigationController {
 			StringBuilder houseAddress = new StringBuilder();
 			List<LinkedHashMap<String, Object>> componentOptions = (List<LinkedHashMap<String, Object>>) req
 					.get("componentOption");
-			if (!CollectionUtils.isEmpty(componentOptions)) {
-				for (LinkedHashMap<String, Object> componentOption : componentOptions) {
-					LinkedHashMap<String, Object> registrationInfoForm = (LinkedHashMap<String, Object>) componentOption
-							.get("registrationInfoForm");
-					List<String> houseAreas = (List<String>) registrationInfoForm.get("houseArea");
-					String detailAddress = (String) registrationInfoForm.get("detailAddress");
-					String mortgageSituation = (String) registrationInfoForm.get("mortgageSituation");
-					
-					if (!CollectionUtils.isEmpty(houseAreas) && !StringUtil.isEmpty(detailAddress)
-							&& !StringUtil.isEmpty(mortgageSituation)) {
-						String houseAreasStr = houseAreas.toString().replace("[", "").replace("]", "").replace(",", "");
-						houseAddress.append(houseAreasStr).append(" ").append(detailAddress).append("，房产抵押情况：")
-						.append(mortgageSituation).append("--#separator#--");
-					}
-				}
+            if(componentOptions!=null) {
+                for (LinkedHashMap<String, Object> componentOption : componentOptions) {
+                    LinkedHashMap<String, Object> registrationInfoForm = (LinkedHashMap<String, Object>) componentOption
+                            .get("registrationInfoForm");
+                    List<String> houseAreas = (List<String>) registrationInfoForm.get("houseArea");
+                    String detailAddress = (String) registrationInfoForm.get("detailAddress");
+                    String mortgageSituation = (String) registrationInfoForm.get("mortgageSituation");
+
+                    if (!CollectionUtils.isEmpty(houseAreas) && !StringUtil.isEmpty(detailAddress)
+                            && !StringUtil.isEmpty(mortgageSituation)) {
+                        String houseAreasStr = houseAreas.toString().replace("[", "").replace("]", "").replace(",", "");
+                        houseAddress.append(houseAreasStr).append(" ").append(detailAddress).append("，房产抵押情况：")
+                                .append(mortgageSituation).append("--#separator#--");
+                    }
+                }
 			}
 
 			car.setHouseAddress(houseAddress.toString());

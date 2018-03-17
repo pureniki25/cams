@@ -1,22 +1,22 @@
 package com.hongte.alms.base.service.impl;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
+import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
+import com.hongte.alms.base.collection.service.CollectionStatusService;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +51,8 @@ import com.hongte.alms.base.service.TransferLitigationHouseService;
 import com.hongte.alms.base.service.TransferOfLitigationService;
 import com.hongte.alms.base.vo.billing.CarLoanBilVO;
 import com.hongte.alms.base.vo.litigation.BusinessHouse;
+import com.hongte.alms.base.vo.litigation.LitigationResponse;
+import com.hongte.alms.base.vo.litigation.LitigationResponseData;
 import com.hongte.alms.base.vo.litigation.TransferOfLitigationVO;
 import com.hongte.alms.base.vo.litigation.house.HouseLoanVO;
 import com.hongte.alms.base.vo.litigation.house.HousePlanInfo;
@@ -59,7 +61,7 @@ import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 
-@Service("transferLitigationService")
+@Service("TransferOfLitigationService")
 public class TransferLitigationServiceImpl implements TransferOfLitigationService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TransferLitigationServiceImpl.class);
@@ -108,6 +110,11 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	@Autowired
 	@Qualifier("DocService")
 	private DocService docService;
+
+
+	@Autowired
+	@Qualifier("CollectionStatusService")
+	private CollectionStatusService collectionStatusService;
 
 	@Override
 	public Map<String, Object> queryCarLoanData(String businessId) {
@@ -211,11 +218,17 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 					transferLitigationData.setHouseList(assembleBusinessHouse(businessId));
 				}
-				sendLitigation(transferLitigationData, sendUrl);
+				LitigationResponse litigationResponse = sendLitigation(transferLitigationData, sendUrl);
+				if (litigationResponse != null && litigationResponse.getCode() == 1) {
+					LitigationResponseData data = litigationResponse.getData();
+					if (!data.isImportSuccess()) {
+						throw new ServiceRuntimeException(data.getMessage());
+					}
+				}
 			}
 		} catch (Exception e) {
 			LOG.error("发送诉讼系统失败！！！", e);
-			throw new ServiceRuntimeException("发送诉讼系统失败！！！", e);
+			throw new ServiceRuntimeException(e.getMessage(), e);
 		}
 
 		return transferLitigationData;
@@ -285,101 +298,100 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		return Long.valueOf(StringUtil.isInteger(str) ? str : "0");
 	}
 
-	private void sendLitigation(TransferOfLitigationVO transferOfLitigationVo, String sendUrl)
-			throws ClientProtocolException, IOException {
-
-		CloseableHttpClient httpClient = null;
-		CloseableHttpResponse response = null;
+//	private void sendLitigation(TransferOfLitigationVO transferOfLitigationVo, String sendUrl)
+//			throws ClientProtocolException, IOException {
+//
+//		CloseableHttpClient httpClient = null;
+//		CloseableHttpResponse response = null;
+//		try {
+//			// 创建httpclient对象
+//			httpClient = HttpClients.createDefault();
+//
+//			// 创建post方式请求对象
+//			HttpPost post = new HttpPost(sendUrl);
+//			// 构造消息头
+//			post.addHeader("Content-Type", "application/json");
+//
+//			// 构建消息实体
+//			StringEntity entity = new StringEntity(JSONObject.toJSONString(transferOfLitigationVo),
+//					Charset.forName("UTF-8"));
+//			entity.setContentEncoding("UTF-8");
+//
+//			// 发送Json格式的数据请求
+//			entity.setContentType("application/json");
+//			post.setEntity(entity);
+//			response = httpClient.execute(post);
+//
+//			// 检验返回码
+//			int statusCode = response.getStatusLine().getStatusCode();
+//			if (statusCode == HttpStatus.SC_OK) {
+//				LOG.info("--sendLitigation-- 请求成功: " + statusCode);
+//			} else {
+//				throw new ServiceRuntimeException("--sendLitigation-- 诉讼数据发送失败！！！状态码：" + statusCode);
+//			}
+//		} finally {
+//			if (httpClient != null) {
+//				try {
+//					httpClient.close();
+//				} catch (IOException e) {
+//					LOG.error("--sendLitigation-- httpClient.close() 失败！！！", e);
+//				}
+//			}
+//			if (response != null) {
+//				try {
+//					response.close();
+//				} catch (IOException e) {
+//					LOG.error("--sendLitigation-- response.close() 失败！！！", e);
+//				}
+//			}
+//		}
+//
+//	}
+	private LitigationResponse sendLitigation(TransferOfLitigationVO transferOfLitigationVo, String sendUrl) throws IOException {
+		BufferedReader reader = null;
+		HttpURLConnection httpUrlConn = null;
+		LitigationResponse litigationResponse = new LitigationResponse();
 		try {
-			// 创建httpclient对象
-			httpClient = HttpClients.createDefault();
 
-			// 创建post方式请求对象
-			HttpPost post = new HttpPost(sendUrl);
-			// 构造消息头
-			post.addHeader("Content-Type", "application/json");
+			final URL url = new URL(sendUrl);
+			// http协议传输
+			httpUrlConn = (HttpURLConnection) url.openConnection();
 
-			// 构建消息实体
-			StringEntity entity = new StringEntity(JSONObject.toJSONString(transferOfLitigationVo),
-					Charset.forName("UTF-8"));
-			entity.setContentEncoding("UTF-8");
+			httpUrlConn.setDoOutput(true);
+			httpUrlConn.setDoInput(true);
+			httpUrlConn.setUseCaches(false);
+			// 设置请求方式（GET/POST）
+			httpUrlConn.setRequestMethod("POST");
+			httpUrlConn.setRequestProperty("Content-Type", "application/json;charset=utf-8");
 
-			// 发送Json格式的数据请求
-			entity.setContentType("application/json");
-			post.setEntity(entity);
-			response = httpClient.execute(post);
+			String reqJsonStr = JSONObject.toJSONString(transferOfLitigationVo);
 
-			// 检验返回码
-			int statusCode = response.getStatusLine().getStatusCode();
-			if (statusCode == HttpStatus.SC_OK) {
-				LOG.info("--sendLitigation-- 请求成功: " + statusCode);
-			} else {
-				throw new ServiceRuntimeException("--sendLitigation-- 诉讼数据发送失败！！！状态码：" + statusCode);
+			if (!StringUtil.isEmpty(reqJsonStr)) {
+				OutputStream outputStream = httpUrlConn.getOutputStream();
+				outputStream.write(reqJsonStr.getBytes("UTF-8"));
+				outputStream.close();
 			}
-		} finally {
-			if (httpClient != null) {
-				try {
-					httpClient.close();
-				} catch (IOException e) {
-					LOG.error("--sendLitigation-- httpClient.close() 失败！！！", e);
-				}
+
+			reader = new BufferedReader(new InputStreamReader(httpUrlConn.getInputStream(), "UTF-8"));
+
+			String str = null;
+			StringBuilder builder = new StringBuilder();
+			while ((str = reader.readLine()) != null) {
+				builder.append(str);
 			}
-			if (response != null) {
-				try {
-					response.close();
-				} catch (IOException e) {
-					LOG.error("--sendLitigation-- response.close() 失败！！！", e);
-				}
+
+			litigationResponse = (LitigationResponse) JSONObject.parseObject(builder.toString(), LitigationResponse.class);
+		}finally {
+			if (reader != null) {
+				reader.close();
+			}
+			if (httpUrlConn != null) {
+				httpUrlConn.disconnect();
 			}
 		}
+		return litigationResponse;
 
 	}
-	// private void sendLitigation(TransferOfLitigationVO transferOfLitigationVo,
-	// String sendUrl)
-	// throws ClientProtocolException, IOException {
-	//
-	// JSONObject jsonObject = null;
-	// StringBuilder builder = null;
-	// BufferedReader reader = null;
-	// HttpURLConnection httpUrlConn = null;
-	// try {
-	//
-	// final URL url = new URL(sendUrl);
-	// // http协议传输
-	// httpUrlConn = (HttpURLConnection) url.openConnection();
-	//
-	// httpUrlConn.setDoOutput(true);
-	// httpUrlConn.setDoInput(true);
-	// httpUrlConn.setUseCaches(false);
-	// // 设置请求方式（GET/POST）
-	// httpUrlConn.setRequestMethod("POST");
-	// httpUrlConn.setRequestProperty("Content-Type",
-	// "application/json;charset=utf-8");
-	//
-	// String reqJsonStr = JSONObject.toJSONString(transferOfLitigationVo);
-	//
-	// if (!StringUtil.isEmpty(reqJsonStr)) {
-	// OutputStream outputStream = httpUrlConn.getOutputStream();
-	// outputStream.write(reqJsonStr.getBytes("UTF-8"));
-	// outputStream.close();
-	// }
-	//
-	// reader = new BufferedReader(new
-	// InputStreamReader(httpUrlConn.getInputStream(), "UTF-8"));
-	//
-	// String str = null;
-	// while ((str = reader.readLine()) != null) {
-	// builder.append(str);
-	// }
-	//
-	// reader.close();
-	// jsonObject = JSONObject.parseObject(builder.toString());
-	// } catch (Exception e) {
-	// e.printStackTrace();
-	// }
-	// return jsonObject;
-	//
-	// }
 
 	@Transactional(rollbackFor = Exception.class)
 	@Override
@@ -625,19 +637,18 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			List<TransferLitigationCar> cars = transferLitigationCarService
 					.selectList(new EntityWrapper<TransferLitigationCar>().eq("business_id", businessId)
 							.eq("process_id", processId));
-			// List<ProcessTypeStep> processTypeSteps = processTypeStepService.selectList(
-			// new EntityWrapper<ProcessTypeStep>().eq("type_id",
-			// process.getProcessTypeid()).orderBy("step"));
-			// if (!CollectionUtils.isEmpty(processTypeSteps)
-			// && process.getCurrentStep() == processTypeSteps.get(processTypeSteps.size() -
-			// 1).getStep()) {
-			// sendTransferLitigationData(businessId, cars.get(0).getCrpId(), sendUrl);
-			// }
 			Integer status = process.getStatus();
 			Integer processResult = process.getProcessResult();
 			if (!CollectionUtils.isEmpty(cars) && status == ProcessStatusEnums.END.getKey()
 					&& processResult == ProcessApproveResult.PASS.getKey()) {
 				sendTransferLitigationData(businessId, cars.get(0).getCrpId(), sendUrl);
+				//更新贷后状态为  移交诉讼
+				collectionStatusService.setBussinessAfterStatus(
+						req.getBusinessId(),
+						req.getCrpId(),
+						"",
+						CollectionStatusEnum.TO_LAW_WORK,
+						CollectionSetWayEnum.MANUAL_SET);
 			}
 		} catch (Exception e) {
 			LOG.error("---saveCarProcessApprovalResult--- 存储房贷审批结果信息失败！", e);
@@ -657,19 +668,18 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			List<TransferLitigationHouse> houses = transferLitigationHouseService
 					.selectList(new EntityWrapper<TransferLitigationHouse>().eq("business_id", businessId)
 							.eq("process_id", processId));
-			// List<ProcessTypeStep> processTypeSteps = processTypeStepService.selectList(
-			// new EntityWrapper<ProcessTypeStep>().eq("type_id",
-			// process.getProcessTypeid()).orderBy("step"));
-			// if (!CollectionUtils.isEmpty(processTypeSteps) &&
-			// process.getCurrentStep().intValue() == processTypeSteps
-			// .get(processTypeSteps.size() - 1).getStep().intValue()) {
-			// sendTransferLitigationData(businessId, houses.get(0).getCrpId(), sendUrl);
-			// }
 			Integer status = process.getStatus();
 			Integer processResult = process.getProcessResult();
 			if (!CollectionUtils.isEmpty(houses) && status == ProcessStatusEnums.END.getKey()
 					&& processResult == ProcessApproveResult.PASS.getKey()) {
 				sendTransferLitigationData(businessId, houses.get(0).getCrpId(), sendUrl);
+				//更新贷后状态为  移交诉讼
+				collectionStatusService.setBussinessAfterStatus(
+						req.getBusinessId(),
+						req.getCrpId(),
+						"",
+						CollectionStatusEnum.TO_LAW_WORK,
+						CollectionSetWayEnum.MANUAL_SET);
 			}
 		} catch (Exception e) {
 			LOG.error("---saveCarProcessApprovalResult--- 存储车贷审批结果信息失败！", e);
