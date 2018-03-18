@@ -38,7 +38,7 @@ window.layinit(function (htConfig) {
             }
         },
         created:function(){
-            axios.get(basePath + '/expenseSettle/business', {
+            axios.get(basePath + 'expenseSettle/business', {
                 params: {
                     businessId: getQueryStr('businessId')
                 }
@@ -76,7 +76,7 @@ window.layinit(function (htConfig) {
         },
         methods:{
             onPreSettleDateChange:function(date){
-                axios.get(basePath + '/expenseSettle/calByPreSettleDate', {
+                axios.get(basePath + 'expenseSettle/calByPreSettleDate', {
                     params: {
                         businessId: getQueryStr('businessId'),
                         afterId: getQueryStr('afterId'),

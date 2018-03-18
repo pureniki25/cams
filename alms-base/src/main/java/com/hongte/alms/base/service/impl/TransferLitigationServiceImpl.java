@@ -1,22 +1,22 @@
 package com.hongte.alms.base.service.impl;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
+import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
+import com.hongte.alms.base.collection.service.CollectionStatusService;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +34,12 @@ import com.hongte.alms.base.entity.TransferLitigationHouse;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.mapper.TransferOfLitigationMapper;
 import com.hongte.alms.base.process.entity.Process;
-import com.hongte.alms.base.process.entity.ProcessTypeStep;
+import com.hongte.alms.base.process.enums.ProcessApproveResult;
+import com.hongte.alms.base.process.enums.ProcessStatusEnums;
 import com.hongte.alms.base.process.enums.ProcessTypeEnums;
 import com.hongte.alms.base.process.service.ProcessService;
 import com.hongte.alms.base.process.service.ProcessTypeStepService;
+import com.hongte.alms.base.process.vo.ProcessLogReq;
 import com.hongte.alms.base.process.vo.ProcessSaveReq;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.DocService;
@@ -49,6 +51,8 @@ import com.hongte.alms.base.service.TransferLitigationHouseService;
 import com.hongte.alms.base.service.TransferOfLitigationService;
 import com.hongte.alms.base.vo.billing.CarLoanBilVO;
 import com.hongte.alms.base.vo.litigation.BusinessHouse;
+import com.hongte.alms.base.vo.litigation.LitigationResponse;
+import com.hongte.alms.base.vo.litigation.LitigationResponseData;
 import com.hongte.alms.base.vo.litigation.TransferOfLitigationVO;
 import com.hongte.alms.base.vo.litigation.house.HouseLoanVO;
 import com.hongte.alms.base.vo.litigation.house.HousePlanInfo;
@@ -57,7 +61,7 @@ import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 
-@Service("transferLitigationService")
+@Service("TransferOfLitigationService")
 public class TransferLitigationServiceImpl implements TransferOfLitigationService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TransferLitigationServiceImpl.class);
@@ -106,6 +110,11 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	@Autowired
 	@Qualifier("DocService")
 	private DocService docService;
+
+
+	@Autowired
+	@Qualifier("CollectionStatusService")
+	private CollectionStatusService collectionStatusService;
 
 	@Override
 	public Map<String, Object> queryCarLoanData(String businessId) {
@@ -209,11 +218,17 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 					transferLitigationData.setHouseList(assembleBusinessHouse(businessId));
 				}
-				sendLitigation(transferLitigationData, sendUrl);
+				LitigationResponse litigationResponse = sendLitigation(transferLitigationData, sendUrl);
+				if (litigationResponse != null && litigationResponse.getCode() == 1) {
+					LitigationResponseData data = litigationResponse.getData();
+					if (!data.isImportSuccess()) {
+						throw new ServiceRuntimeException(data.getMessage());
+					}
+				}
 			}
 		} catch (Exception e) {
 			LOG.error("发送诉讼系统失败！！！", e);
-			throw new ServiceRuntimeException("发送诉讼系统失败！！！", e);
+			throw new ServiceRuntimeException(e.getMessage(), e);
 		}
 
 		return transferLitigationData;
@@ -283,53 +298,98 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		return Long.valueOf(StringUtil.isInteger(str) ? str : "0");
 	}
 
-	private void sendLitigation(TransferOfLitigationVO transferOfLitigationVo, String sendUrl)
-			throws ClientProtocolException, IOException {
-
-		CloseableHttpClient httpClient = null;
-		CloseableHttpResponse response = null;
+//	private void sendLitigation(TransferOfLitigationVO transferOfLitigationVo, String sendUrl)
+//			throws ClientProtocolException, IOException {
+//
+//		CloseableHttpClient httpClient = null;
+//		CloseableHttpResponse response = null;
+//		try {
+//			// 创建httpclient对象
+//			httpClient = HttpClients.createDefault();
+//
+//			// 创建post方式请求对象
+//			HttpPost post = new HttpPost(sendUrl);
+//			// 构造消息头
+//			post.addHeader("Content-Type", "application/json");
+//
+//			// 构建消息实体
+//			StringEntity entity = new StringEntity(JSONObject.toJSONString(transferOfLitigationVo),
+//					Charset.forName("UTF-8"));
+//			entity.setContentEncoding("UTF-8");
+//
+//			// 发送Json格式的数据请求
+//			entity.setContentType("application/json");
+//			post.setEntity(entity);
+//			response = httpClient.execute(post);
+//
+//			// 检验返回码
+//			int statusCode = response.getStatusLine().getStatusCode();
+//			if (statusCode == HttpStatus.SC_OK) {
+//				LOG.info("--sendLitigation-- 请求成功: " + statusCode);
+//			} else {
+//				throw new ServiceRuntimeException("--sendLitigation-- 诉讼数据发送失败！！！状态码：" + statusCode);
+//			}
+//		} finally {
+//			if (httpClient != null) {
+//				try {
+//					httpClient.close();
+//				} catch (IOException e) {
+//					LOG.error("--sendLitigation-- httpClient.close() 失败！！！", e);
+//				}
+//			}
+//			if (response != null) {
+//				try {
+//					response.close();
+//				} catch (IOException e) {
+//					LOG.error("--sendLitigation-- response.close() 失败！！！", e);
+//				}
+//			}
+//		}
+//
+//	}
+	private LitigationResponse sendLitigation(TransferOfLitigationVO transferOfLitigationVo, String sendUrl) throws IOException {
+		BufferedReader reader = null;
+		HttpURLConnection httpUrlConn = null;
+		LitigationResponse litigationResponse = new LitigationResponse();
 		try {
-			// 创建httpclient对象
-			httpClient = HttpClients.createDefault();
 
-			// 创建post方式请求对象
-			HttpPost post = new HttpPost(sendUrl);
-			// 构造消息头
-			post.addHeader("Content-Type", "application/json");
+			final URL url = new URL(sendUrl);
+			// http协议传输
+			httpUrlConn = (HttpURLConnection) url.openConnection();
 
-			// 构建消息实体
-			StringEntity entity = new StringEntity(JSONObject.toJSONString(transferOfLitigationVo),
-					Charset.forName("UTF-8"));
-			entity.setContentEncoding("UTF-8");
+			httpUrlConn.setDoOutput(true);
+			httpUrlConn.setDoInput(true);
+			httpUrlConn.setUseCaches(false);
+			// 设置请求方式（GET/POST）
+			httpUrlConn.setRequestMethod("POST");
+			httpUrlConn.setRequestProperty("Content-Type", "application/json;charset=utf-8");
 
-			// 发送Json格式的数据请求
-			entity.setContentType("application/json");
-			post.setEntity(entity);
-			response = httpClient.execute(post);
+			String reqJsonStr = JSONObject.toJSONString(transferOfLitigationVo);
 
-			// 检验返回码
-			int statusCode = response.getStatusLine().getStatusCode();
-			if (statusCode == HttpStatus.SC_OK) {
-				LOG.info("--sendLitigation-- 请求成功: " + statusCode);
-			} else {
-				throw new ServiceRuntimeException("--sendLitigation-- 诉讼数据发送失败！！！" + statusCode);
+			if (!StringUtil.isEmpty(reqJsonStr)) {
+				OutputStream outputStream = httpUrlConn.getOutputStream();
+				outputStream.write(reqJsonStr.getBytes("UTF-8"));
+				outputStream.close();
 			}
-		} finally {
-			if (httpClient != null) {
-				try {
-					httpClient.close();
-				} catch (IOException e) {
-					LOG.error("--sendLitigation-- httpClient.close() 失败！！！", e);
-				}
+
+			reader = new BufferedReader(new InputStreamReader(httpUrlConn.getInputStream(), "UTF-8"));
+
+			String str = null;
+			StringBuilder builder = new StringBuilder();
+			while ((str = reader.readLine()) != null) {
+				builder.append(str);
 			}
-			if (response != null) {
-				try {
-					response.close();
-				} catch (IOException e) {
-					LOG.error("--sendLitigation-- response.close() 失败！！！", e);
-				}
+
+			litigationResponse = (LitigationResponse) JSONObject.parseObject(builder.toString(), LitigationResponse.class);
+		}finally {
+			if (reader != null) {
+				reader.close();
+			}
+			if (httpUrlConn != null) {
+				httpUrlConn.disconnect();
 			}
 		}
+		return litigationResponse;
 
 	}
 
@@ -345,7 +405,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		processSaveReq.setBusinessId(req.getBusinessId());
 		processSaveReq.setProcessStatus(Integer.valueOf(req.getProcessStatus()));
 		processSaveReq.setTitle("房贷移交诉讼审批流程");
-        processSaveReq.setProcessId(req.getProcessId());
+		processSaveReq.setProcessId(req.getProcessId());
 
 		Process process = processService.saveProcess(processSaveReq, ProcessTypeEnums.HOUSE_LOAN_LITIGATION);
 
@@ -379,7 +439,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		processSaveReq.setBusinessId(req.getBusinessId());
 		processSaveReq.setProcessStatus(Integer.valueOf(req.getProcessStatus()));
 		processSaveReq.setTitle("车贷移交诉讼审批流程");
-        processSaveReq.setProcessId(req.getProcessId());
+		processSaveReq.setProcessId(req.getProcessId());
 
 		Process process = processService.saveProcess(processSaveReq, ProcessTypeEnums.CAR_LOAN_LITIGATION);
 
@@ -430,10 +490,10 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			Date minDueDate = (Date) resultMap.get("minDueDate"); // 状态为'逾期', '还款中'的最早应还日期
 			Map<String, Object> maxPeriodMap = transferOfLitigationMapper.queryMaxDueDateByBusinessId(businessId); // 合同到期日
 			Date maxDueDate = (Date) maxPeriodMap.get("maxDueDate");
-			double lastPlanAccrual = ((BigDecimal) maxPeriodMap.get("planAccrual")).doubleValue();	// 最后一期应还利息
-			double lastPlanServiceCharge = ((BigDecimal) maxPeriodMap.get("planServiceCharge")).doubleValue();	// 最后一期应还服务费
-			double lastGuaranteeCharge = ((BigDecimal) maxPeriodMap.get("plan_guarantee_charge")).doubleValue();	// 最后一期担保公司费用
-			double lastPlatformCharge = ((BigDecimal) maxPeriodMap.get("plan_platform_charge")).doubleValue();	// 最后一期平台费
+			double lastPlanAccrual = ((BigDecimal) maxPeriodMap.get("planAccrual")).doubleValue(); // 最后一期应还利息
+			double lastPlanServiceCharge = ((BigDecimal) maxPeriodMap.get("planServiceCharge")).doubleValue(); // 最后一期应还服务费
+			double lastGuaranteeCharge = ((BigDecimal) maxPeriodMap.get("plan_guarantee_charge")).doubleValue(); // 最后一期担保公司费用
+			double lastPlatformCharge = ((BigDecimal) maxPeriodMap.get("plan_platform_charge")).doubleValue(); // 最后一期平台费
 			int overdueDays = differentDays(minDueDate, billDate); // 逾期天数
 			long isPreCharge = (long) resultMap.get("isPreCharge"); // 是否分公司服务费前置收取
 			double planAccrual = ((BigDecimal) resultMap.get("planAccrual")).doubleValue(); // 本期应还利息
@@ -469,14 +529,14 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			int preLateFeeType = carLoanBilVO.getPreLateFees(); // 提前还款违约金类型
 
 			innerLateFees = borrowMoney * innerLate * overdueDays;
-			
+
 			// 判断预计结算日期是否超过合同日期
 			if (billDate.after(maxDueDate)) {
-				planAccrual = lastPlanAccrual;	// 预算日期大于最后一期应还日期时，应还利息取最后一期的应还利息
+				planAccrual = lastPlanAccrual; // 预算日期大于最后一期应还日期时，应还利息取最后一期的应还利息
 				planServiceCharge = lastPlanServiceCharge;
 				planGuaranteeCharge = lastGuaranteeCharge;
 				planPlatformCharge = lastPlatformCharge;
-				
+
 				if (overdueDays < 15) {
 					outsideInterest = surplusPrincipal * outside / 30 * overdueDays;
 				} else if (15 <= overdueDays && overdueDays < 30) {
@@ -489,16 +549,16 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 						outsideInterest += surplusPrincipal * outside / 30 * j;
 					}
 				}
-				
+
 				// 判断是否上标业务： outputPlatformId == 1 是， outputPlatformId == 0 否
 				// 判断是否分公司服务费前置收取 isPreCharge == 1， 是 isPreCharge == 0 否
 				if ("到期还本息".equals(repaymentTypeId) || "每月付息到期还本".equals(repaymentTypeId)) {
-					
+
 					if (outputPlatformId == 1 && isPreCharge == 0) {
 						outsideInterest = 0;
 					}
 				} else if ("等额本息".equals(repaymentTypeId)) {
-					
+
 					if (outputPlatformId == 0) {
 						if (overdueDays < 15) {
 							outsideInterest = borrowMoney * outside / 30 * overdueDays;
@@ -512,7 +572,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 								outsideInterest += borrowMoney * outside / 30 * j;
 							}
 						}
-						
+
 					}
 				} else {
 					return null;
@@ -520,7 +580,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 			} else {
 				if ("到期还本息".equals(repaymentTypeId) || "每月付息到期还本".equals(repaymentTypeId)) {
-					
+
 					if (outputPlatformId == 1 && isPreCharge == 0) {
 						preLateFees = ((BigDecimal) resultMap.get("surplusServiceCharge")).doubleValue();
 						outsideInterest = 0;
@@ -543,7 +603,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 						default:
 							break;
 						}
-					}else if (outputPlatformId == 1 && isPreCharge == 1) {
+					} else if (outputPlatformId == 1 && isPreCharge == 1) {
 						preLateFees = ((BigDecimal) resultMap.get("surplusServiceCharge")).doubleValue();
 					}
 				}
@@ -564,6 +624,67 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		}
 
 		return resultMap;
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public void saveCarProcessApprovalResult(ProcessLogReq req, String sendUrl) {
+		try {
+			// 存储审批结果信息
+			Process process = processService.saveProcessApprovalResult(req, ProcessTypeEnums.CAR_LOAN_LITIGATION);
+			String businessId = process.getBusinessId();
+			String processId = process.getProcessId();
+			List<TransferLitigationCar> cars = transferLitigationCarService
+					.selectList(new EntityWrapper<TransferLitigationCar>().eq("business_id", businessId)
+							.eq("process_id", processId));
+			Integer status = process.getStatus();
+			Integer processResult = process.getProcessResult();
+			if (!CollectionUtils.isEmpty(cars) && status == ProcessStatusEnums.END.getKey()
+					&& processResult == ProcessApproveResult.PASS.getKey()) {
+				sendTransferLitigationData(businessId, cars.get(0).getCrpId(), sendUrl);
+				//更新贷后状态为  移交诉讼
+				collectionStatusService.setBussinessAfterStatus(
+						req.getBusinessId(),
+						req.getCrpId(),
+						"",
+						CollectionStatusEnum.TO_LAW_WORK,
+						CollectionSetWayEnum.MANUAL_SET);
+			}
+		} catch (Exception e) {
+			LOG.error("---saveCarProcessApprovalResult--- 存储房贷审批结果信息失败！", e);
+			throw new ServiceRuntimeException(e.getMessage(), e);
+		}
+
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public void saveHouseProcessApprovalResult(ProcessLogReq req, String sendUrl) {
+		try {
+			// 存储审批结果信息
+			Process process = processService.saveProcessApprovalResult(req, ProcessTypeEnums.HOUSE_LOAN_LITIGATION);
+			String businessId = process.getBusinessId();
+			String processId = process.getProcessId();
+			List<TransferLitigationHouse> houses = transferLitigationHouseService
+					.selectList(new EntityWrapper<TransferLitigationHouse>().eq("business_id", businessId)
+							.eq("process_id", processId));
+			Integer status = process.getStatus();
+			Integer processResult = process.getProcessResult();
+			if (!CollectionUtils.isEmpty(houses) && status == ProcessStatusEnums.END.getKey()
+					&& processResult == ProcessApproveResult.PASS.getKey()) {
+				sendTransferLitigationData(businessId, houses.get(0).getCrpId(), sendUrl);
+				//更新贷后状态为  移交诉讼
+				collectionStatusService.setBussinessAfterStatus(
+						req.getBusinessId(),
+						req.getCrpId(),
+						"",
+						CollectionStatusEnum.TO_LAW_WORK,
+						CollectionSetWayEnum.MANUAL_SET);
+			}
+		} catch (Exception e) {
+			LOG.error("---saveCarProcessApprovalResult--- 存储车贷审批结果信息失败！", e);
+			throw new ServiceRuntimeException(e.getMessage(), e);
+		}
 	}
 
 	/**

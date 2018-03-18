@@ -12,6 +12,7 @@ public class Constant {
 
     public  static  final  String DEV_DEFAULT_USER="devDefaultUser";
     public  static  final  String DEFAULT_SYS_USER="sysAutoSet";
+    public  static  final  String SYS_DEFAULT_USER="sysDefaultUser";
 
 
 
@@ -23,5 +24,8 @@ public class Constant {
     public static final Integer APPLY_DERATE_PROCEEE_BEGIN_STEP =100;
 
 
-
+    /**
+     * 新增参数时,用于占位的参数值
+     */
+    public static final Integer SYS_PARAMETER_PLACEHOLDER = -Integer.MAX_VALUE ;
 }

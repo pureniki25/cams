@@ -2,12 +2,9 @@ package com.hongte.alms.core.controller;
 
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import com.hongte.alms.base.entity.SysUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,16 +84,34 @@ public class NoticeController {
 	public Result<List<Notice>> listNotice(){
 		try {
 			String userId = loginUserInfoHelper.getUserId();
-			String orgCode = sysUserService.selectById(userId).getOrgCode();
-			List<String> orgCodes = sysOrgService.getParentsOrgs(orgCode);
-			if (orgCodes==null) {
-				orgCodes = new ArrayList<>();
+//			String orgCode = sysUserService.selectById(userId).getOrgCode();
+
+			SysUser user = sysUserService.selectById(userId);
+			List<Notice> list = new LinkedList<>();
+			if(user!=null){
+				String orgCode = sysUserService.selectById(userId).getOrgCode();
+				List<String> orgCodes = sysOrgService.getParentsOrgs(orgCode);
+				if (orgCodes==null) {
+					orgCodes = new ArrayList<>();
+				}
+				orgCodes.add(orgCode);
+				EntityWrapper<Notice> ew = new EntityWrapper<Notice>();
+				ew.isNull("is_deleted").eq("is_send", 1).in("org_code", orgCodes);
+				ew.orderBy("publish_time", false);
+				list = noticeService.selectList(ew);
 			}
-			orgCodes.add(orgCode);
-			EntityWrapper<Notice> ew = new EntityWrapper<Notice>();
-			ew.isNull("is_deleted").eq("is_send", 1).in("org_code", orgCodes);
-			ew.orderBy("publish_time", false);
-			List<Notice> list = noticeService.selectList(ew);
+
+
+
+//			List<String> orgCodes = sysOrgService.getParentsOrgs(orgCode);
+//			if (orgCodes==null) {
+//				orgCodes = new ArrayList<>();
+//			}
+//			orgCodes.add(orgCode);
+//			EntityWrapper<Notice> ew = new EntityWrapper<Notice>();
+//			ew.isNull("is_deleted").eq("is_send", 1).in("org_code", orgCodes);
+//			ew.orderBy("publish_time", false);
+//			List<Notice> list = noticeService.selectList(ew);
 			return Result.success(list);
 		} catch (Exception e) {
 			return Result.error("500", e.getMessage());
@@ -123,7 +138,7 @@ public class NoticeController {
 	@GetMapping("/page")
 	@ApiOperation(value = "分页获取通知公告")
 	@ResponseBody
-	public PageResult<List<Notice>> page(Integer page,Integer limit){
+	public PageResult<List<Notice>> page(Integer page,Integer limit,String title,Date startDate,Date endDate){
 		String userId = loginUserInfoHelper.getUserId();
 		logger.info("userId:"+userId);
 		String orgCode = sysUserService.selectById(userId).getOrgCode();
@@ -132,7 +147,20 @@ public class NoticeController {
 			orgCodes = new ArrayList<>();
 		}
 		orgCodes.add(orgCode);
-		Page<Notice> page2 = noticeService.selectPage(new Page<Notice>(page, limit), new EntityWrapper<Notice>().like("org_code", orgCode));
+		EntityWrapper<Notice> ew = new EntityWrapper<Notice>();
+		ew.eq("create_user_id", userId) ;
+		ew.isNull("is_deleted");
+		if (title!=null) {
+			ew.like("notice_title", title);
+		}
+		
+		if (startDate!=null) {
+			ew.gt("publish_time", startDate);
+		}
+		if (endDate!=null) {
+			ew.lt("publish_time", endDate);
+		}
+		Page<Notice> page2 = noticeService.selectPage(new Page<Notice>(page, limit), ew);
 		return PageResult.success(page2.getRecords(), page2.getTotal());
 		
 	}
@@ -189,7 +217,7 @@ public class NoticeController {
 	/**
      * 文件上传具体实现方法（单文件上传）
      */
-	@ApiOperation(value = "上传凭证")
+	@ApiOperation(value = "上传附件")
 	@PostMapping("/uploadAttachment")
     public UpLoadResult upload(FileVo fileVo,String uploadItemId) throws FileNotFoundException {
 		String userId = loginUserInfoHelper.getUserId() ;
@@ -203,5 +231,19 @@ public class NoticeController {
 		upLoadResult.setMessage(uploadItemId);
         return upLoadResult;
     }
+	@ApiOperation(value = "(逻辑)删除公告")
+	@GetMapping("/del")
+	@ResponseBody
+	public Result del(String noticeId) {
+		Notice notice = noticeService.selectById(noticeId);
+		if (notice==null) {
+			return Result.error("500", "notice 不存在");
+		}
+		notice.setDeleteTime(new Date());
+		notice.setDeleteUserId(loginUserInfoHelper.getUserId());
+		notice.setIsDeleted(1);
+		notice.updateById();
+		return Result.success(true);
+	}
 }
 

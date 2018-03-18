@@ -43,7 +43,7 @@
         planList.plan_list_id AS planListId, planList.plan_id AS planId, planList.business_id AS businessId, planList.period as period, planList.after_id AS afterId, planList.due_date AS dueDate, planList.total_borrow_amount AS totalBorrowAmount, planList.overdue_amount AS overdueAmount, planList.overdue_days AS overdueDays, planList.current_status AS currentStatus, planList.repay_flag AS repayFlag, planList.fact_repay_date AS factRepayDate, planList.finance_comfirm_date AS financeComfirmDate, planList.finance_confirm_user AS financeConfirmUser, planList.finance_confirm_user_name AS financeConfirmUserName, planList.confirm_flag AS confirmFlag, planList.auto_withholding_confirmed_date AS autoWithholdingConfirmedDate, planList.auto_withholding_confirmed_user AS autoWithholdingConfirmedUser, planList.accountant_confirm_status AS accountantConfirmStatus, planList.accountant_confirm_user AS accountantConfirmUser, planList.accountant_confirm_user_name AS accountantConfirmUserName, planList.accountant_confirm_date AS accountantConfirmDate, planList.remark AS  remark, planList.create_time AS createTime, planList.create_user AS createUser, planList.update_time AS updateTime, planList.update_user AS updateUser
     </sql>
 
-    <!-- 选择需要 自动移交的一般业务还款计划列表 -->
+    <!-- 选择需要 自动移交的一般业务还款计划列表(包括展期业务) -->
     <select id="selectNeedSetColInfoNormalBizPlansBycomId"
             resultType="com.hongte.alms.base.entity.RepaymentBizPlanList">
         SELECT
@@ -51,23 +51,21 @@
 
         FROM tb_repayment_biz_plan_list planList
         LEFT JOIN tb_repayment_biz_plan plan ON plan.plan_id = planList.plan_id
-        LEFT JOIN tb_basic_business business ON plan.business_id = business.business_id
-
+        LEFT JOIN tb_basic_business business ON plan.orig_business_id = business.business_id
 
         WHERE
-
         <![CDATA[ TO_DAYS(NOW()) - TO_DAYS(planList.due_date) > #{overDueDays}  ]]>
         <if test = "companyId != null and companyId!='' ">
             and business.company_id = #{companyId}
         </if>
         AND planList.current_status IN ("还款中","逾期")
         AND (
-        SELECT COUNT(1) as num  FROM tb_collection_status  cStatus
-        WHERE cStatus.collection_status  = 100
+        SELECT COUNT(1) as num1  FROM tb_collection_status  cStatus
+        WHERE (cStatus.collection_status  = 100 OR cStatus.collection_status = 150)
         AND cStatus.business_id = business.business_id
         ) = 0
         AND (
-        SELECT COUNT(1) as num  FROM tb_collection_status  cStatus
+        SELECT COUNT(1) as num2  FROM tb_collection_status  cStatus
         WHERE cStatus.collection_status = #{colStatus}
         AND cStatus.business_id = business.business_id
         AND cStatus.crp_id = planList.plan_list_id
@@ -77,7 +75,7 @@
     </select>
     <!--AND cStatus.crp_id = planList.plan_list_id  -->
 
-    <!-- 需要自动移交的展期业务的还款计划 -->
+   <!-- &lt;!&ndash; 需要自动移交的展期业务的还款计划 &ndash;&gt;
     <select id="selectNeedSetColInfoRenewBizPlansBycomId" resultType="com.hongte.alms.base.entity.RepaymentBizPlanList">
 
     SELECT <include refid="TableName_Column_List"/>
@@ -106,6 +104,6 @@
         AND cStatus.crp_id = planList.plan_list_id
         ) = 0
 
-    </select>
+    </select>-->
     <!-- AND cStatus.crp_id = planList.plan_list_id -->
 </mapper>

@@ -8,6 +8,7 @@
         <result column="business_id" property="businessId" />
         <result column="crp_id" property="crpId" />
         <result column="after_status" property="afterStatus" />
+        <result column="after_status" property="afterStatus" />
         <result column="collection_user" property="collectionUser" />
         <result column="create_time" property="createTime" />
         <result column="create_user" property="createUser" />
@@ -15,11 +16,13 @@
         <result column="update_user" property="updateUser" />
         <result column="describe" property="describe" />
         <result column="set_way" property="setWay" />
+        <result column="before_status" property="beforeStatus" />
+        <result column="set_type_status" property="setTypeStatus" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-     id, business_id AS businessId, crp_id AS crpId, after_status AS afterStatus, collection_user AS collectionUser, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser, describe, set_way AS setWay
+      id, business_id AS businessId, crp_id AS crpId, after_status AS afterStatus, collection_user AS collectionUser, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser, describe, set_way AS setWay, before_status AS beforeStatus, set_type_status AS setTypeStatus
     </sql>
 
 </mapper>

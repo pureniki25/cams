@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -38,6 +39,8 @@ public class DocServiceImpl extends BaseServiceImpl<DocMapper, Doc> implements D
     
     @Autowired
     private DocTypeMapper docTypeMapper;
+    
+    private static final String[] PICTURE=new String[] {"bmp","jpg","png","tiff","gif","pcx","tga","exif","fpx","svg","psd","cdr","pcd","dxf","ufo","eps","ai","raw","wmf"};
 
     /**
      * TODO<一句话功能描述><br>
@@ -122,6 +125,9 @@ public class DocServiceImpl extends BaseServiceImpl<DocMapper, Doc> implements D
                         doc.setDocUrl(docUrl);
                         doc.setOriginalName(request.getFileName());
                         doc.setFileSize((long) content.length);
+                        if(Arrays.asList(PICTURE).contains(fileType)) {
+                        	doc.setDocAttr("01");//如果要区分doc/excel 可在后面继续进行判别
+                        }
                         doc.setFileType(fileType);
                         doc.setUpdateUser(userId);
                         doc.setUpdateTime(new Date());

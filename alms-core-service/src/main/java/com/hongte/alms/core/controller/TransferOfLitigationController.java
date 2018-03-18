@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
+import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
+import com.hongte.alms.base.collection.service.CollectionStatusService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +56,7 @@ public class TransferOfLitigationController {
 	private static final Logger LOG = LoggerFactory.getLogger(TransferOfLitigationController.class);
 
 	@Autowired
-	@Qualifier("transferLitigationService")
+	@Qualifier("TransferOfLitigationService")
 	private TransferOfLitigationService transferOfLitigationService;
 
 	@Autowired
@@ -67,17 +70,21 @@ public class TransferOfLitigationController {
 	@Autowired
 	@Qualifier("ProcessService")
 	private ProcessService processService;
-	
+
 	@Autowired
     @Qualifier("ProcessTypeService")
     private ProcessTypeService processTypeService;
-	
+
 	@Autowired
 	@Qualifier("ProcessTypeStepService")
 	private ProcessTypeStepService processTypeStepService;
-	
+
 	@Value("${ht.litigation.url:http://172.16.200.110:30906/api/importLitigation}")
 	private String sendUrl;
+
+	@Autowired
+	@Qualifier("CollectionStatusService")
+	private CollectionStatusService collectionStatusService;
 
 	/**
 	 * 获取车贷诉讼相关数据
@@ -100,11 +107,11 @@ public class TransferOfLitigationController {
 				if (processId != null) {
 					List<TransferLitigationCar> applyList = transferLitigationCarService
 							.selectList(new EntityWrapper<TransferLitigationCar>().eq("process_id", processId));
-					
+
 					String houseAddr = applyList.get(0).getHouseAddress();
 					StringBuilder builder = new StringBuilder();
 					String[] houseArr = houseAddr.split("--#separator#--");
-					
+
 					int count = 1;
 					if (houseAddr.length() > 0) {
 						for (String hArr : houseArr) {
@@ -115,7 +122,7 @@ public class TransferOfLitigationController {
 							}
 						}
 					}
-					
+
 					carLoanData.put("houseAddress", builder.toString());
 					carLoanData.put("carList", (JSONArray) JSON.toJSON(applyList, JsonUtil.getMapping()));
 				}
@@ -186,31 +193,37 @@ public class TransferOfLitigationController {
 	public Result<String> saveTransferLitigationCar(@RequestBody Map<String, Object> req) {
 		try {
 			TransferLitigationCar car = new TransferLitigationCar();
-			car.setAlmsOpinion((String)req.get("almsOpinion"));
-			car.setBusinessId((String)req.get("businessId"));
-			car.setCarCondition((String)req.get("carCondition"));
-			car.setCrpId((String)req.get("crpId"));
-			car.setDelayHandover((String)req.get("delayHandover"));
-			car.setDelayHandoverDesc((String)req.get("delayHandoverDesc"));
-			car.setEstates((String)req.get("estates"));
-			car.setProcessStatus((String)req.get("processStatus"));
-			
+			car.setAlmsOpinion((String) req.get("almsOpinion"));
+			car.setBusinessId((String) req.get("businessId"));
+			car.setCarCondition((String) req.get("carCondition"));
+			car.setCrpId((String) req.get("crpId"));
+			car.setDelayHandover((String) req.get("delayHandover"));
+			car.setDelayHandoverDesc((String) req.get("delayHandoverDesc"));
+			car.setEstates((String) req.get("estates"));
+			car.setProcessStatus((String) req.get("processStatus"));
+
 			StringBuilder houseAddress = new StringBuilder();
-			List<LinkedHashMap<String, Object>> componentOptions = (List<LinkedHashMap<String, Object>>) req.get("componentOption");
-			for (LinkedHashMap<String, Object> componentOption : componentOptions) {
-				LinkedHashMap<String, Object> registrationInfoForm = (LinkedHashMap<String, Object>) componentOption.get("registrationInfoForm");
-				List<String> houseAreas = (List<String>) registrationInfoForm.get("houseArea");
-				String detailAddress = (String) registrationInfoForm.get("detailAddress");
-				String mortgageSituation = (String) registrationInfoForm.get("mortgageSituation");
-				
-				if (!CollectionUtils.isEmpty(houseAreas) && !StringUtil.isEmpty(detailAddress) && !StringUtil.isEmpty(mortgageSituation)) {
-					String houseAreasStr = houseAreas.toString().replace("[", "").replace("]", "").replace(",", "");
-					houseAddress.append(houseAreasStr).append(" ").append(detailAddress).append("，房产抵押情况：").append(mortgageSituation).append("--#separator#--");
-				}
+			List<LinkedHashMap<String, Object>> componentOptions = (List<LinkedHashMap<String, Object>>) req
+					.get("componentOption");
+            if(componentOptions!=null) {
+                for (LinkedHashMap<String, Object> componentOption : componentOptions) {
+                    LinkedHashMap<String, Object> registrationInfoForm = (LinkedHashMap<String, Object>) componentOption
+                            .get("registrationInfoForm");
+                    List<String> houseAreas = (List<String>) registrationInfoForm.get("houseArea");
+                    String detailAddress = (String) registrationInfoForm.get("detailAddress");
+                    String mortgageSituation = (String) registrationInfoForm.get("mortgageSituation");
+
+                    if (!CollectionUtils.isEmpty(houseAreas) && !StringUtil.isEmpty(detailAddress)
+                            && !StringUtil.isEmpty(mortgageSituation)) {
+                        String houseAreasStr = houseAreas.toString().replace("[", "").replace("]", "").replace(",", "");
+                        houseAddress.append(houseAreasStr).append(" ").append(detailAddress).append("，房产抵押情况：")
+                                .append(mortgageSituation).append("--#separator#--");
+                    }
+                }
 			}
-			
+
 			car.setHouseAddress(houseAddress.toString());
-			
+
 			transferOfLitigationService.saveTransferLitigationCar(car, sendUrl);
 			return Result.success();
 		} catch (Exception ex) {
@@ -224,21 +237,7 @@ public class TransferOfLitigationController {
 	@ResponseBody
 	public Result<String> saveHouseApprovalLogInfo(@RequestBody ProcessLogReq req) {
 		try {
-			// 存储审批结果信息
-			processService.saveProcessApprovalResult(req, ProcessTypeEnums.HOUSE_LOAN_LITIGATION);
-			Process process = processService.selectById(req.getProcess().getProcessId());
-			String businessId = process.getBusinessId();
-			String processId = process.getProcessId();
-			List<TransferLitigationHouse> houses = transferLitigationHouseService.selectList(new EntityWrapper<TransferLitigationHouse>().eq("business_id", businessId).eq("process_id", processId));
-			if (CollectionUtils.isEmpty(houses)) {
-				return Result.error("500", "没有找到相关流程数据！");
-			}
-			List<ProcessTypeStep> processTypeSteps = processTypeStepService.selectList(
-					new EntityWrapper<ProcessTypeStep>().eq("type_id", process.getProcessTypeid()).orderBy("step"));
-			if (!CollectionUtils.isEmpty(processTypeSteps)
-					&& process.getCurrentStep() == processTypeSteps.get(processTypeSteps.size() - 1).getStep()) {
-				transferOfLitigationService.sendTransferLitigationData(businessId, houses.get(0).getCrpId(), sendUrl);
-			}
+			transferOfLitigationService.saveHouseProcessApprovalResult(req, sendUrl);
 			return Result.success();
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
@@ -246,33 +245,19 @@ public class TransferOfLitigationController {
 		}
 
 	}
-	
+
 	@ApiOperation(value = "存储车贷移交诉讼审批信息")
 	@PostMapping("/saveCarApprovalLogInfo")
 	@ResponseBody
 	public Result<String> saveCarApprovalLogInfo(@RequestBody ProcessLogReq req) {
 		try {
-			// 存储审批结果信息
-			processService.saveProcessApprovalResult(req, ProcessTypeEnums.CAR_LOAN_LITIGATION);
-			Process process = processService.selectById(req.getProcess().getProcessId());
-			String businessId = process.getBusinessId();
-			String processId = process.getProcessId();
-			List<TransferLitigationCar> cars = transferLitigationCarService.selectList(new EntityWrapper<TransferLitigationCar>().eq("business_id", businessId).eq("process_id", processId));
-			if (CollectionUtils.isEmpty(cars)) {
-				return Result.error("500", "没有找到相关流程数据！");
-			}
-			List<ProcessTypeStep> processTypeSteps = processTypeStepService.selectList(
-					new EntityWrapper<ProcessTypeStep>().eq("type_id", process.getProcessTypeid()).orderBy("step"));
-			if (!CollectionUtils.isEmpty(processTypeSteps)
-					&& process.getCurrentStep() == processTypeSteps.get(processTypeSteps.size() - 1).getStep()) {
-				transferOfLitigationService.sendTransferLitigationData(businessId, cars.get(0).getCrpId(), sendUrl);
-			}
+			transferOfLitigationService.saveCarProcessApprovalResult(req, sendUrl);
 			return Result.success();
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
 			return Result.error("500", ex.getMessage());
 		}
-		
+
 	}
 
 	@ApiOperation(value = "根据流程ID查找房贷移交法务申请信息")
@@ -332,13 +317,13 @@ public class TransferOfLitigationController {
 			return Result.error("500", "系统异常");
 		}
 	}
-	
+
 	/**
 	 * 查询车贷结清试算明细
 	 * 
 	 * @author huweiqian
 	 * @date 2018/03/13
-	 * @return 
+	 * @return
 	 */
 	@ApiOperation(value = "查询车贷结清试算明细")
 	@GetMapping("/queryCarLoanBilDetail")
@@ -356,13 +341,13 @@ public class TransferOfLitigationController {
 			return Result.error("500", "系统异常");
 		}
 	}
-	
+
 	/**
 	 * 车贷结清试算
 	 * 
 	 * @author huweiqian
 	 * @date 2018/03/13
-	 * @return 
+	 * @return
 	 */
 	@ApiOperation(value = "车贷结清试算")
 	@PostMapping("/carLoanBilling")

@@ -25,6 +25,7 @@ import com.hongte.alms.base.vo.module.doc.BasicCompanyVo;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.vo.PageResult;
+import com.hongte.alms.core.service.CollectionStrategyPersonService;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -46,6 +47,9 @@ import java.util.*;
 @RequestMapping("/collectionStrategy")
 public class CollectionStrategyController {
     private Logger logger = LoggerFactory.getLogger(CollectionStrategyController.class);
+
+    @Autowired
+    private CollectionStrategyPersonService collectionStrategyPersonService;
 
     @Autowired
     @Qualifier("CollectionPersonSetService")
@@ -87,33 +91,6 @@ public class CollectionStrategyController {
         }
     }
 
-//    @ApiOperation(value="通过公司id获取清算人员")
-//    @GetMapping("getSingleCompanyCollectionUserSettingByComopanyId")
-//   public Result<SingleCompanyCollectionPersonSettingVo> getSingleCompanyCollectionUserSettingByComopanyId(String companyId)
-//   {
-//       try {
-//           SingleCompanyCollectionPersonSettingVo settingVo = new SingleCompanyCollectionPersonSettingVo();
-//           settingVo.setCompanyId(companyId);
-//           CollectionPersonSet setting = collectionPersonSettingService.selectOne(new EntityWrapper<CollectionPersonSet>().eq("company_code", companyId));
-//           if (setting.getCollect1Person() != null && setting.getCollect1Person() != "") {
-//               settingVo.setCollection1UserIds(Arrays.asList(setting.getCollect1Person().split(",")));
-//           } else {
-//               settingVo.setCollection1UserIds(new ArrayList<String>());
-//           }
-//           if (setting.getCollect2Person() != null && setting.getCollect2Person() != "") {
-//               settingVo.setCollection2UserIds(Arrays.asList(setting.getCollect1Person().split(",")));
-//           } else {
-//               settingVo.setCollection2UserIds(new ArrayList<String>());
-//           }
-//           return Result.success(settingVo);
-//       }
-//       catch(Exception ex)
-//       {
-//           logger.error(ex.getMessage());
-//           return Result.error("500",ex.getMessage());
-//       }
-//   }
-
     @ApiOperation(value="获取区域信息")
     @GetMapping("/company/getCompanyAreaList")
     @ResponseBody
@@ -153,69 +130,9 @@ public class CollectionStrategyController {
     @PostMapping("/saveSingleCompanyCollectionUserSetting")
     @ResponseBody
     public Result saveSingleCompanyCollectionUserSetting(@RequestBody CollectionStrategySinglePersonSettingReq req, @RequestHeader HttpHeaders headers){
-        System.out.println(req.getCollectionGroup1Users());
-        List<String> collectionGroup1Users = new ArrayList<>();
-        List<String> collectionGroup2Users = new ArrayList<>();
-        List<String> companyList = new ArrayList<>();
-        collectionGroup1Users = req.getCollectionGroup1Users();
-        collectionGroup2Users = req.getCollectionGroup2Users();
-        companyList = req.getCompanyId();
 
+        return collectionStrategyPersonService.saveStrategyPerson(req,headers);
 
-        for (String com:companyList) {
-            CollectionPersonSet personSet = collectionPersonSettingService.selectOne(new EntityWrapper<CollectionPersonSet>().eq("company_code",req.getCompanyId()));
-            if(personSet !=null){
-                personSet.setUpdateTime(new Date());
-                personSet.setUpdateUser("admin");
-                personSet.setCreatUser("admin");
-                collectionPersonSettingService.update(personSet,new EntityWrapper<CollectionPersonSet>().eq("col_person_id",personSet.getColPersonId()));
-            }else {
-                BasicCompany basicCompany = basicCompanyService.selectOne(new EntityWrapper<BasicCompany>().eq("area_id",com).eq("area_level",AreaLevel.COMPANY_LEVEL.getKey()));
-                personSet = new CollectionPersonSet();
-                personSet.setAreaCode(basicCompany.getAreaPid());
-                personSet.setCompanyCode(com);
-                personSet.setCreateTime(new Date());
-                personSet.setCreatUser("admin");
-                collectionPersonSettingService.insert(personSet);
-            }
-
-            String colPersonId = personSet.getColPersonId();
-
-            List<CollectionPersonSetDetail> personSetDetails = new ArrayList<>();
-
-        /*
-        构建第一组人员详情设置
-         */
-            for (String firstGroup:collectionGroup1Users ) {
-                CollectionPersonSetDetail personSetDetail = new CollectionPersonSetDetail();
-                personSetDetail.setColPersonId(colPersonId);
-                personSetDetail.setTeam(1);
-                personSetDetail.setUserId(firstGroup);
-                personSetDetail.setCreateUser("admin");
-                personSetDetail.setCreateTime(new Date());
-                personSetDetails.add(personSetDetail);
-            }
-
-        /*
-        构建第二组人员详情设置
-         */
-            for (String secendGroup:collectionGroup2Users ) {
-
-                CollectionPersonSetDetail personSetDetail = new CollectionPersonSetDetail();
-                personSetDetail.setColPersonId(colPersonId);
-                personSetDetail.setTeam(2);
-                personSetDetail.setUserId(secendGroup);
-                personSetDetail.setCreateUser("admin");
-                personSetDetail.setCreateTime(new Date());
-                personSetDetails.add(personSetDetail);
-            }
-
-            collectionPersonSetDetailService.delete(new EntityWrapper<CollectionPersonSetDetail>().eq("col_person_id",colPersonId));
-            collectionPersonSetDetailService.insertBatch(personSetDetails);
-        }
-
-
-        return Result.success();
     }
 
 
