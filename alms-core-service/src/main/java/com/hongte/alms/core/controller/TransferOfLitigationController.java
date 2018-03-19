@@ -201,6 +201,7 @@ public class TransferOfLitigationController {
 			car.setDelayHandoverDesc((String) req.get("delayHandoverDesc"));
 			car.setEstates((String) req.get("estates"));
 			car.setProcessStatus((String) req.get("processStatus"));
+			car.setProcessId((String) req.get("processId"));
 
 			StringBuilder houseAddress = new StringBuilder();
 			List<LinkedHashMap<String, Object>> componentOptions = (List<LinkedHashMap<String, Object>>) req

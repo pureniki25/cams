@@ -25,7 +25,7 @@ public interface CollectionTrackLogMapper extends SuperMapper<CollectionTrackLog
      * @return
      */
     List<CollectionTrackLogVo> selectCollectionTrackLogByRbpId(@Param("rbpId") String rbpId);
-    List<CollectionTrackLogVo> selectCollectionTrackLogByRbpId(Pagination pages, @Param("rbpId") String rbpId);
+    List<CollectionTrackLogVo> selectCollectionTrackLogByRbpId(Pagination pages, @Param("rbpId") String rbpId,@Param("businessId") String businessId);
 
     List<String> selectProjectIdByRbpId(String rbpId);
 

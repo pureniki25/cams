@@ -400,6 +400,14 @@ public class CarController {
     	CarBasic carBasic=JsonUtil.map2obj((Map<String,Object>)params.get("carBasic"), CarBasic.class);
     	CarDetection carDetection=JsonUtil.map2obj((Map<String,Object>)params.get("carDetection"), CarDetection.class);
     	CarBasic rCarBasic=carBasicService.selectById(carBasic.getBusinessId());
+    	if(rCarBasic==null) {
+    		logger.error("车辆信息不存在,businessId="+carBasic.getBusinessId());
+      		return Result.error("9999", "非待处置状态的车辆不能重新评估");
+    	}
+      	if(!CarStatusEnums.PENDING.getStatusCode().equals(rCarBasic.getStatus())) {
+      		logger.error("非待处置状态的车辆不能进行拍卖,businessId="+carBasic.getBusinessId());
+      		return Result.error("9999", "非待处置状态的车辆不能重新评估");
+      	}
     	CarDetection rCarDetection=carDetectionService.selectById(carDetection.getBusinessId());
     	BeanUtils.copyProperties(carBasic, rCarBasic);
     	BeanUtils.copyProperties(carDetection, rCarDetection);

@@ -46,7 +46,7 @@
             <!--查询表单内容-->
             <row :gutter="16">
                 <i-col span="3">
-                    <i-button type="success" style="margin-left:15px" @click="assignSet"  ht-auth="assignSet">分配设置</i-button>
+                    <i-button v-if="authValid('assignSet')" type="success" style="margin-left:15px" @click="assignSet"  ht-auth="assignSet">分配设置</i-button>
                 </i-col>
                 <i-col  span="16">
                 <i-form ref="searchForm"  :model="searchForm"    label-position="right" :label-width="100" inline>
@@ -67,13 +67,13 @@
 
 
                         <form-item label="人员：" prop="userName">
-                            <i-input v-model="searchForm.userName" ></i-input>
+                            <i-input v-model="searchForm.userName" placeholder="多个搜索用“/”隔开" ></i-input>
                         </form-item>
 
                 </i-form>
                 </i-col>
                 <i-col span="5">
-                    <i-button type="info" :loading="loading" icon="ios-search" @click="toLoading" style="margin-right:10px" ht-auth="personQuery">
+                    <i-button  v-if="authValid('search')" type="info" :loading="loading" icon="ios-search" @click="toLoading" style="margin-right:10px" ht-auth="personQuery">
                         <span v-if="!loading">查询</span>
                         <span v-else>查询中...</span>
                     </i-button>
@@ -88,7 +88,7 @@
                     <table id="listTable" lay-filter="listTable"></table>
                     <div style="display:none" id="barTools">
                         <!--layui-btn layui-btn-xs-->
-                        <i-button style="width:80px" type="success" lay-event="userSet" ht-auth="singleSet" >设置</i-button>
+                        <i-button v-if="authValid('singleSet')" style="width:80px" type="success" lay-event="userSet" ht-auth="singleSet" >设置</i-button>
                     </div>
                 </i-col>
             </row>
@@ -125,13 +125,12 @@
                     title="设置"
                     @on-ok="saveTimeSet"
                     @on-cancel="toLoadingTime">
-                <i-form ref="editCompanyCollectionTime.editCompanyCollectionForm" :model="editCompanyCollectionTime.editCompanyCollectionForm"  :label-width="80">
-                    <form-item label="逾期天数：" prop="collectionOverDueDays" :rules="{required:true}">
+                <i-form ref="editCompanyCollectionTime.editCompanyCollectionForm" :model="editCompanyCollectionTime.editCompanyCollectionForm"  :label-width="80" :rules="ruleValidate">
+                    <form-item label="逾期天数：" prop="overDueDays">
                         <i-input v-model="editCompanyCollectionTime.editCompanyCollectionForm.overDueDays" maxlength="10" style="width: 200px"></i-input>
                     </form-item>
 
-                    <form-item label="开始时间："  prop="collectionStartTime" :rules="{required:true}">
-                        <!--<i-input v-model="editCompanyCollectionTime.editCompanyCollectionForm.startTime" type="date"></i-input>-->
+                    <form-item label="开始时间："  prop="startTime" >
 
                         <date-picker type="date" :options="options3" placeholder="Select date" style="width: 200px" v-model="editCompanyCollectionTime.editCompanyCollectionForm.startTime"></date-picker>
 
@@ -144,7 +143,6 @@
                     <form-item label="序号："  prop="colTimeId" style="display: none">
                         <i-input v-model="editCompanyCollectionTime.editCompanyCollectionForm.colTimeId" ></i-input>
                     </form-item>
-
                 </i-form>
             </Modal>
 
@@ -156,16 +154,16 @@
                     title="设置"
                     @on-ok="saveBatchPerson"
                     @on-cancel="toLoading">
-                <i-form ref="editCompanyCollectionAssignSet.editCompanyCollectionForm" :model="editCompanyCollectionAssignSet.editCompanyCollectionForm"  :label-width="80">
+                <i-form ref="editCompanyCollectionAssignSet.editCompanyCollectionForm" :model="editCompanyCollectionAssignSet.editCompanyCollectionForm"  :label-width="80"  >
                     <form-item label="区域：" prop="areaName">
-                        <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.areaName" multiple clearable filterable >
+                        <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.areaName"  multiple clearable filterable style="width: 80%">
                             <i-option v-for="item in editCompanyCollectionAssignSet.areaList" :value="item.areaId" :key="item.areaId">{{ item.areaName }}</i-option>
                         </i-select>
-                        <!--<i-span @click="selectArea">选择</i-span>-->
+                        <i-span @click="selectArea">选择</i-span>
                     </form-item>
 
                     <form-item label="分公司："  prop="companyName">
-                        <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId" multiple clearable filterable >
+                        <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId"  multiple clearable filterable style="width: 80%" >
                             <i-option v-for="item in editCompanyCollectionAssignSet.companyId" :value="item.areaId" :key="item.areaId">{{ item.areaName }}</i-option>
                         </i-select>
                     </form-item>
@@ -177,12 +175,38 @@
                     </form-item>
 
                     <form-item label="清算2："  prop="collectionGroup2Users">
-                        <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.collectionGroup2Users" multiple clearable filterable style="width: 80%" >
+                        <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.collectionGroup2Users" multiple clearable filterable style="width: 80%">
                             <i-option v-for="item in editCompanyCollectionAssignSet.collectionGroup2AllUsers" :value="item.userId" :key="item.userId">{{ item.userName }}</i-option>
                         </i-select>
                     </form-item>
 
                 </i-form>
+            </Modal>
+
+            <!--
+            区域城市选择模块
+            -->
+            <Modal
+                    v-model="selectAreaAndCity"
+                    title="选择分公司"
+                    @on-ok="confirmSelect"
+                    @on-cancel="">
+                <div class="layui-row layui-col-space20">
+                    <div class="layui-col-md4">
+                        <tree :data="areaAndCity.allAreas"  @on-check-change="showCitys" @on-select-change="selectChild" show-checkbox  ref="tree" ></tree>
+                    </div>
+                    <div class="layui-col-md4">
+                        <checkbox-group v-model="areaAndCity.currentSelectedCitys" @on-change="getAllSelectedCitys">
+                            <checkbox v-for="item in areaAndCity.allCitys" :label="item.areaId"  @on-change="">{{item.areaName}}</checkbox>
+                        </checkbox-group>
+                        <!--<checkbox-group v-model="checkAllGroup" @on-change="checkAllGroupChange">-->
+                            <!--<checkbox label="香蕉"></checkbox>-->
+                            <!--<checkbox label="苹果"></checkbox>-->
+                            <!--<checkbox label="西瓜"></checkbox>-->
+                        <!--</checkbox-group>-->
+                    </div>
+                </div>
+
             </Modal>
 
         </tab-pane>
@@ -197,7 +221,7 @@
                     <table id="timeListTable" lay-filter="timeListTable"></table>
                     <div style="display:none" id="timeListBarTools">
                         <!--layui-btn layui-btn-xs-->
-                        <i-button style="width:80px" type="success" lay-event="timeSet" ht-auth="timeSingleSet" >设置</i-button>
+                        <i-button v-if="authValid('singleSet')" style="width:80px" type="success" lay-event="timeSet" ht-auth="timeSingleSet" >设置</i-button>
                     </div>
                 </i-col>
             </row>
@@ -240,6 +264,7 @@
                 editSingleCompanyCollectionUserSettingModal: false,
                 editSingleCompanyCollectionTimeSettingModal: false,
                 assignSetModal:false,
+                selectAreaAndCity:false,
                 editCompanyCollectionUser:
                    {
                        editCompanyCollectionForm:
@@ -275,11 +300,35 @@
                         collectionGroup2AllUsers: [],
                         areaList: [],
                         companyId: []
-                    }
-
+                    },
+                areaAndCity:
+                    {
+                        allAreas:[{
+                            title: '鸿特信息咨询有限公司',
+                            loading: false,
+                            children: []
+                        }],
+                        allCitys:[],
+                        allSelectedAreas:[],
+                        allSelectedCitys:[],
+                        selectedCitys:[],
+                        currentSelectedCitys:[],
+                        allSelectedCityGroup:[],
+                        currentCitys1:[],
+                        currentCitys2:[],
+                        currentCitys3:[],
+                        currentCitys4:[],
+                        currentCitys5:[],
+                        currentCitys6:[],
+                        currentCitys7:[],
+                        currentAreaId:""
+                    },
+                index:'',
+                ruleValidate:validateOpt
             },
             computed: {},
             methods: {
+
                 init: function () {
                     var self = this;
                     self.getCompanyAreaList();
@@ -395,17 +444,18 @@
 
                             }
                             if(obj.event === 'userSet'){
-                                console.log(JSON.stringify(obj.data));
                                 self.editSingleCompanyCollectionUserSettingModal = true;
+                                self.editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup1Users=[];
+                                self.editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup2Users=[];
                                 var url = basePath + "collectionStrategy/company/getClearingPersons";
                                 axios.get(url)
                                     .then(function (result) {
                                         if (result.data.code == "1") {
-                                            console.log(result.data.data.sysUser);
                                             self.editCompanyCollectionUser.collectionGroup1AllUsers = result.data.data.sysUser;
                                             self.editCompanyCollectionUser.collectionGroup2AllUsers = result.data.data.sysUser;
                                             self.editCompanyCollectionUser.editCompanyCollectionForm.areaId = obj.data.areaId;
                                             self.editCompanyCollectionUser.editCompanyCollectionForm.companyId[0] = obj.data.companyId;
+
                                         }
                                     })
                             }
@@ -419,9 +469,7 @@
                         table.on('tool(timeListTable)', function (obj) {
                             self.selectedRowInfo = obj.data;
                             if (obj.event === 'timeSet') {
-                                console.log("succes===========>>>>>>>>>>>>");
                                 self.editSingleCompanyCollectionTimeSettingModal = true;
-                                console.log(JSON.stringify(obj.data))
                                 self.editCompanyCollectionTime.editCompanyCollectionForm.colTimeId = obj.data.colTimeId;
                             }
                         });
@@ -506,9 +554,6 @@
                 {
                     var self=this;
                     var url = basePath + "collectionStrategy/saveSingleCompanyCollectionUserSetting";
-                    console.log("=============================");
-                    console.log(JSON.stringify(self.editCompanyCollectionUser.editCompanyCollectionForm));
-                    console.log("=============================");
                     $.ajax({
                         type: "POST",
                         url: url,
@@ -525,9 +570,6 @@
                 saveTimeSet:function () {
                     var self=this;
                     var url = basePath + "collectionStrategy/saveTimeSet";
-                    console.log("=============================");
-                    console.log(JSON.stringify(self.editCompanyCollectionTime.editCompanyCollectionForm));
-                    console.log("=============================");
                     $.ajax({
                         type: "POST",
                         url: url,
@@ -564,7 +606,6 @@
                     axios.get(url)
                         .then(function (result) {
                             if (result.data.code == "1") {
-                                console.log(result.data.data.sysUser);
                                 self.editCompanyCollectionAssignSet.collectionGroup1AllUsers = result.data.data.sysUser;
                                 self.editCompanyCollectionAssignSet.collectionGroup2AllUsers = result.data.data.sysUser;
                                 self.editCompanyCollectionAssignSet.areaList = result.data.data.areaList;
@@ -573,30 +614,12 @@
                         })
                 },
                 selectArea:function () {
-
-                    layui.use(['layer', 'table', 'ht_ajax', 'ht_auth', 'ht_config'], function () {
-                        //弹出流程配置
-                        showLitigationSettle = function () {
-                            var url = "../page/doc/test.html";
-                            var openIndex = layer.open({
-                                type: 2,
-                                area: ['90%', '90%'],
-                                full: true,
-                                fixed: false,
-                                maxmin: true,
-                                title: '选择分公司',
-                                content: url,
-                                //btn: ['保存', '取消'],
-                                yes: function (index, layero) {
-
-                                }
-                            });
-                        };
-                    })
-                    showLitigationSettle();
-                    console.log("===================.》》》》》》》》》》》》》》》》》》》》》》");
+                    var self = this;
+                    self.selectAreaAndCity = true;
+                    self.getArea();
                 },
                 saveBatchPerson:function () {
+                    var self = this;
                     var self = this;
                     var url = basePath + "collectionStrategy/saveSingleCompanyCollectionUserSetting";
                     $.ajax({
@@ -611,16 +634,235 @@
                         }
 
                     });
+                },
+                getArea:function () {
+                    var self = this;
+                    var url = basePath + "collectionStrategy/getAreaList";
+                    $.ajax({
+                        type: "GET",
+                        url: url,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (data) {
+                            self.areaAndCity.allAreas[0].children = data.data
+                        }
+
+                    });
+                },
+                getCompany: function (areaPid) {
+                    var self = this;
+                    var url = basePath + "collectionStrategy/getCompanyList?areaPid="+areaPid;
+                    $.ajax({
+                        type: "GET",
+                        url: url,
+                        contentType: "application/json; charset=utf-8",
+//                        async: true,
+                        dataType: "json",
+                        success: function (data) {
+                            self.areaAndCity.allCitys = data.data;
+                        }
+
+                    });
+                },
+                showCitys:function (data) {
+
+                    var self = this;
+
+
+
+                    var index = (function () {
+                        if (event.target.className === "ivu-checkbox-input") return $(event.target).parents('li').find('ul').index($(event.target).parents('ul')[0]);
+                    })();
+                    //保存已选中的区域,清除取消勾选的区域
+                    var selectedData = self.$refs.tree.getCheckedNodes();
+
+                    self.areaAndCity.allSelectedAreas = [];
+                    for (var i = 0; i < selectedData.length ; i++) {
+                        self.areaAndCity.allSelectedAreas.push(selectedData[i].areaId);
+                    }
+                    this.getCompany(this.areaAndCity.allAreas[0].children[index].areaId);
+                    self.index = index;
+
+                    if(selectedData.length > 0){
+                        for(var i=0;i < selectedData.length;i++){
+                            var areaId = selectedData[i].areaId;
+                            //判断当前树节点是否被选中
+                            if(self.areaAndCity.allAreas[0].children[index].areaId == areaId){//当前点击的节点id在已被选中的树节点id中，则为已选中
+                                //已被选中
+                                if(index == 0){
+                                    self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys1;
+                                }else if(index == 1){
+                                    self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys2;
+                                }else if(index == 2){
+                                    self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys3;
+                                }else if(index == 3){
+                                    self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys4;
+                                }else if(index == 4){
+                                    self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys5;
+                                }else if(index == 5){
+                                    self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys6;
+                                }else if(index == 6){
+                                    self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys7;
+                                }
+                            }else {
+                                if(index == 0){
+                                    self.areaAndCity.currentSelectedCitys = [];
+                                    self.areaAndCity.currentCitys1 = [];
+                                }else if(index == 1){
+                                    self.areaAndCity.currentSelectedCitys = [];
+                                    self.areaAndCity.currentCitys2 = [];
+                                }else if(index == 2){
+                                    self.areaAndCity.currentSelectedCitys = [];
+                                    self.areaAndCity.currentCitys3 = [];
+                                }else if(index == 3){
+                                    self.areaAndCity.currentSelectedCitys = [];
+                                    self.areaAndCity.currentCitys4 = [];
+                                }else if(index == 4){
+                                    self.areaAndCity.currentSelectedCitys = [];
+                                    self.areaAndCity.currentCitys5 = [];
+                                }else if(index == 5){
+                                    self.areaAndCity.currentSelectedCitys = [];
+                                    self.areaAndCity.currentCitys6 = [];
+                                }else if(index == 6){
+                                    self.areaAndCity.currentSelectedCitys = [];
+                                    self.areaAndCity.currentCitys7 = [];
+                                }
+                            }
+                        }
+                    }else {
+                        self.areaAndCity.currentSelectedCitys = [];
+                        self.areaAndCity.currentCitys1 = [];
+                        self.areaAndCity.currentCitys2 = [];
+                        self.areaAndCity.currentCitys3 = [];
+                        self.areaAndCity.currentCitys4 = [];
+                        self.areaAndCity.currentCitys5 = [];
+                        self.areaAndCity.currentCitys6 = [];
+                        self.areaAndCity.currentCitys7 = [];
+                    }
+
+                },
+                getAllSelectedCitys:function (data) {
+                    var self = this;
+                    var index = self.index;
+
+
+                    if(data.length > 0){
+                        self.areaAndCity.allAreas[0].children[index].checked = true;
+                        var exit = self.areaAndCity.allSelectedAreas.indexOf(self.areaAndCity.allAreas[0].children[index].areaId) != -1;
+                        if(!exit){
+                            self.areaAndCity.allSelectedAreas.push(self.areaAndCity.allAreas[0].children[index].areaId);
+                        }
+
+                    }else {
+                        self.areaAndCity.allAreas[0].children[index].checked = false;
+                    }
+
+
+
+                    if(index == 0){
+                        self.areaAndCity.currentCitys1 = [];
+                        self.areaAndCity.currentCitys1 = data;
+
+                    }else if(index == 1){
+                        self.areaAndCity.currentCitys2 = [];
+                        self.areaAndCity.currentCitys2 = data;
+                    }else if(index == 2){
+                        self.areaAndCity.currentCitys3 = [];
+                        self.areaAndCity.currentCitys3 = data;
+                    }else if(index == 3){
+                        self.areaAndCity.currentCitys4 = [];
+                        self.areaAndCity.currentCitys4 = data;
+                    }else if(index == 4){
+                        self.areaAndCity.currentCitys5 = [];
+                        self.areaAndCity.currentCitys5 = data;
+                    }else if(index == 5){
+                        self.areaAndCity.currentCitys6 = [];
+                        self.areaAndCity.currentCitys6 = data;
+                    }else if(index == 6){
+                        self.areaAndCity.currentCitys7 = [];
+                        self.areaAndCity.currentCitys7 = data;
+                    }
+
+
+                },
+                confirmSelect:function () {
+                    var self = this;
+                    self.editCompanyCollectionAssignSet.editCompanyCollectionForm.areaName = self.areaAndCity.allSelectedAreas;
+                    for(var i=0;i<self.areaAndCity.currentCitys1.length;i++){
+                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys1[i]);
+                    }
+                    for(var i=0;i<self.areaAndCity.currentCitys2.length;i++){
+                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys2[i]);
+                    }
+                    for(var i=0;i<self.areaAndCity.currentCitys3.length;i++){
+                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys3[i]);
+                    }
+                    for(var i=0;i<self.areaAndCity.currentCitys4.length;i++){
+                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys4[i]);
+                    }
+                    for(var i=0;i<self.areaAndCity.currentCitys5.length;i++){
+                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys5[i]);
+                    }
+                    for(var i=0;i<self.areaAndCity.currentCitys6.length;i++){
+                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys6[i]);
+                    }
+                    for(var i=0;i<self.areaAndCity.currentCitys7.length;i++){
+                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys7[i]);
+                    }
+
+                },
+                selectChild:function (data) {
+                    var self = this;
+                    var indexqj = self.index;
+                    var num = self.areaAndCity.allAreas[0].children.indexOf(data[0]);
+
+                    if(data.length>0){
+                        this.getCompany(data[0].areaId);
+
+                        self.index = num;
+                        if(num == 0){
+                            self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys1;
+                        }else if(num == 1){
+                            self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys2;
+                        }else if(num == 2){
+                            self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys3;
+                        }else if(num == 3){
+                            self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys4;
+                        }else if(num == 4){
+                            self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys5;
+                        }else if(num == 5){
+                            self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys6;
+                        }else if(num == 6){
+                            self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys7;
+                        }
+                    }
+
+
+                },
+                test:function () {
+                    var self = this;
+                    self.selectAreaAndCity = true;
                 }
 
 
             },
             mounted: function () {
                 this.init();
+
             }
 
         })
     });
+
+    //表单验证配置参数
+    var validateOpt = {
+        overDueDays: [
+            {required: true, message: '请输入逾期天数', trigger: 'blur'}
+        ],
+        startTime: [
+            {required: true, message: '请选开始时间', trigger: 'blur'}
+        ]
+    };
 </script>
 </body>
 </html>

@@ -170,8 +170,35 @@ window.layinit(function (htConfig) {
         //监听工具条
         table.on('tool(listTable)', function (obj) {
             vm.selectedRowInfo = obj.data;
-            if (obj.event === 'edit') {
-                // vm.edit_modal = true;
+            if (obj.event === 'business') {debugger
+                if(obj.data.businessTypeId == 9 || obj.data.businessTypeId == 1){
+                    //车贷  车贷展期
+                     axios.get(basePath + 'api/getXindaiCarView?businessId ='+obj.data.originalBusinessId)
+                         .then(function (res) {
+                             if (res.data.code == "1") {
+                                 showOneLineOprLayer(res.data.data,"车贷详情");
+                             } else {
+                                 vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
+                             }
+                         })
+                         .catch(function (error) {
+                             vm.$Modal.error({content: '接口调用异常!'});
+                         });
+                 }else if(obj.data.businessTypeId == 11 || obj.data.businessTypeId == 2){
+                     //房贷
+                     axios.get(basePath + 'api/getXindaiHouseView?businessId ='+obj.data.originalBusinessId)
+                         .then(function (res) {
+                             if (res.data.code == "1") {
+                                 showOneLineOprLayer(res.data.data,"房贷详情");
+                             } else {
+                                 vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
+                             }
+                         })
+                         .catch(function (error) {
+                             vm.$Modal.error({content: '接口调用异常!'});
+                         });
+                 }
+
             }else  if(obj.event ==='info'){
                     title ="短信详情";
                     url = getInfoSmsDetailUrl();

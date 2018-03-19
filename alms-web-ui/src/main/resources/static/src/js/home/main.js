@@ -74,6 +74,21 @@ window.layinit(function (htConfig) {
                 }
             }
 
+        },
+        mounted: function () {
+            console.log("开始调用用户信息接口");
+            console.log(htConfig);
+            $.ajax({
+                type: "POST",
+                url: "http://localhost:30606/"+"login/saveloginInfo",
+                contentType: "application/json; charset=utf-8",
+                async: false,
+                dataType: "json",
+                success: function () {
+                    console.log("success");
+                }
+            });
+
         }
     })
 

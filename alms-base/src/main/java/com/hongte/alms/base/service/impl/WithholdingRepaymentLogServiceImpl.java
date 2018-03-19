@@ -52,13 +52,13 @@ public class WithholdingRepaymentLogServiceImpl extends BaseServiceImpl<Withhold
 	}
 
 	@Override
-	public RepaymentLogVO selectSumByBusinessId(String repayStatus, String userId) {
-		return withholdingRepaymentLogmapper.selectSumByBusinessId(repayStatus, userId);
+	public RepaymentLogVO selectSumByBusinessId(RepaymentLogReq key) {
+		return withholdingRepaymentLogmapper.selectSumByBusinessId(key);
 	}
 
 	@Override
-	public RepaymentLogVO selectSumByLogId(String userId) {
-		return withholdingRepaymentLogmapper.selectSumByLogId(userId);
+	public RepaymentLogVO selectSumByLogId(RepaymentLogReq key) {
+		return withholdingRepaymentLogmapper.selectSumByLogId(key);
 	}
 
 }

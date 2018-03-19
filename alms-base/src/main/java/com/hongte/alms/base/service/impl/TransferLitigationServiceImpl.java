@@ -686,7 +686,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 						CollectionSetWayEnum.MANUAL_SET);
 			}
 		} catch (Exception e) {
-			LOG.error("---saveCarProcessApprovalResult--- 存储车贷审批结果信息失败！", e);
+			LOG.error("---saveHouseProcessApprovalResult--- 存储房贷审批结果信息失败！", e);
 			throw new ServiceRuntimeException(e.getMessage(), e);
 		}
 	}

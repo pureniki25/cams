@@ -79,6 +79,23 @@ public class InfoSmsListSearchVO {
      * 短信接收人
      */
 	private String recipient;
+	
+	 /**
+    * businessTypeId
+    */
+	private Integer businessTypeId;
+
+
+
+	public Integer getBusinessTypeId() {
+		return businessTypeId;
+	}
+
+
+	public void setBusinessTypeId(Integer businessTypeId) {
+		this.businessTypeId = businessTypeId;
+	}
+
 
 	public String getDistrictId() {
 		return districtId;
