@@ -18,9 +18,9 @@ var processId = document.getElementById("processId").getAttribute("value");
 var setFormValidate = {
     derateMoney: [
         {required: true, message: '请填写申请减免金额'},
-        // {pattern:"^^[0-9]{8}$",   message: '请填写不超过两位小数的数字', trigger: 'blur'}
-        // {pattern:"^([0-9]{1,2})+(.[0-9]{1,2})?$",   message: '请填写不超过两位小数的数字', trigger: 'blur'}
-        {pattern:"^\\d{1,8}(\\.\\d{1,2})?$",   message: '请填写整数位数不大于8位，小数位数不超过两位的数字'}
+        // {pattern:/^^[0-9]{8}$/,   message: '请填写不超过两位小数的数字', trigger: 'blur'}
+        // {pattern:/^([0-9]{1,2})+(.[0-9]{1,2})?$/,   message: '请填写不超过两位小数的数字', trigger: 'blur'}
+        {pattern:/^\d{1,8}(\.\d{1,2})?$/,   message: '请填写整数位数不大于8位，小数位数不超过两位的数字', trigger: 'change'}
     ],
     derateType: [
         {required: true, message: '请填写申请减免费用项', trigger: 'change'}
@@ -29,7 +29,7 @@ var setFormValidate = {
         {required: true, message: '请填选择是否结清', trigger: 'change'}
     ],
     realReceiveMoney: [
-        {pattern:"^[0-9]+(.[0-9]{1,2})?$",   message: '请填写不超过两位小数的数字', trigger: 'blur'}
+        {pattern:/^[0-9]+(.[0-9]{1,2})?$/,   message: '请填写不超过两位小数的数字', trigger: 'blur'}
     ]
 };
 
@@ -440,7 +440,7 @@ var getShowInfo = function () {
 var setFormValidate1 = {
     realReceiveMoney: [
         {required: true, message: '请填写实收金额', trigger: 'blur'},
-        {pattern:"^[0-9]+(.[0-9]{1,2})?$",   message: '请填写不超过两位小数的数字', trigger: 'blur'}
+        {pattern:/^[0-9]+(.[0-9]{1,2})?$/,   message: '请填写不超过两位小数的数字', trigger: 'blur'}
     ]
     // derateMoney: [
     //     {required: false, message: '', trigger: 'blur'},
@@ -453,8 +453,8 @@ var setFormValidate1 = {
     // ]
 };
 
-// {pattern:"^[0-9]+(\\.[0-9]{1,2})?$",  message: '请填写不超过两位小数的数字', trigger: 'blur'}
-// {pattern:"/^(([1-9][0-9]*)|(([0]\\.\\d{1,2}|[1-9][0-9]*\\.\\d{1,2})))$/",  message: '请填写不超过两位小数的数字', trigger: 'blur'}
+// {pattern:/^[0-9]+(\\.[0-9]{1,2})?$/,  message: '请填写不超过两位小数的数字', trigger: 'blur'}
+// {pattern:/^(([1-9][0-9]*)|(([0]\\.\\d{1,2}|[1-9][0-9]*\\.\\d{1,2})))$/,  message: '请填写不超过两位小数的数字', trigger: 'blur'}
 var setFormValidate2 = {};
 
 var approvalInfoFormValidate = {};
