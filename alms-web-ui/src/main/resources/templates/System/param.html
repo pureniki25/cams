@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+    <title>通知公告</title>
+    <script src="/properties/config.js"></script>
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css" />
+    <!-- iview样式 -->
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css" />
+    <!--@import url("//unpkg.com/iview/dist/styles/iview.css");-->
+    <!--<link rel="stylesheet" type="text/css" href="//unpkg.com/iview/dist/styles/iview.css"/>-->
+    <!-- 引入layui样式 -->
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all" />
+
+    <!--   <script src="//unpkg.com/vue/dist/vue.js"></script>
+       <script src="//unpkg.com/iview/dist/iview.min.js"></script>-->
+    <!-- 引入vue -->
+    <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+    <!-- iview js -->
+    <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+    <!--引入layui.js-->
+    <script src="/plugins/layui/layui.js"></script>
+    <!--引入axios.js 用于ajax调用-->
+    <script src="/plugins/axios/axios.min.js"></script>
+    <!-- 引入jQuery，必须在appToken.js 之前引入 -->
+    <script src="/build/js/jquery-3.3.1.min.js"></script>
+    <!-- 设置全局请求头:app、Authorization -->
+    <script src="/build/js/appToken.js"></script>
+    <!--引入公共的一些方法-->
+    <script src="/src/js/comm.js"></script>
+</head>
+
+<body>
+    <!--隐藏元素-->
+    <!--<p id="staffType"  th:attr="value=${staffType}"  hidden />-->
+    <!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+    <div id="app" v-cloak>
+        <Card>
+            <p slot="title">参数类型</p>
+            <Row>
+                <i-col span="24" style="line-height:2rem">
+                    <i-button style="float: right;">查询</i-button>
+                    <i-input id="key" style="width:15%;float: right;" placeholder="请输入参数名称或参数编号"></i-input>
+                    <label for="key" style="float: right;">关键字:</label>
+                </i-col>
+            </Row>
+
+            <Row>
+                <i-col>
+                    <i-button @click="openEidtTypeModal({},true)">新增</i-button>
+                </i-col>
+            </Row>
+
+            <Row>
+                <i-col span="24">
+                    <table id="param" lay-filter="param"></table>
+                    <script type="text/html" id="toolbar">
+                        <!-- <a class="layui-btn layui-btn-xs" lay-event="check">查阅记录</a> -->
+                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                        <a class="layui-btn layui-btn-xs" lay-event="delete">删除</a>
+                        <a class="layui-btn layui-btn-xs" lay-event="list">参数列表</a>
+                    </script>
+                </i-col>
+            </Row>
+
+        </Card>
+        <Modal v-model="editTypeModal.show" :title="editTypeModal.title">
+            <i-form ref="editTypeForm" :model="editTypeForm" :rules="ruleValidate" label-position="right" autocomplete="off" label-width="100"
+                inline>
+                <row>
+                    <i-col span="24">
+                        <form-item label="参数类型编号" prop="paramType">
+                            <i-input :value.sync="editTypeForm.paramType" :disabled="!editTypeModal.add" v-model="editTypeForm.paramType"></i-input>
+                        </form-item>
+                    </i-col>
+                </row>
+                <row>
+                    <i-col span="24">
+                        <form-item label="参数类型名称" prop="paramTypeName">
+                            <i-input :value.sync="editTypeForm.paramTypeName" v-model="editTypeForm.paramTypeName"></i-input>
+                        </form-item>
+                    </i-col>
+                </row>
+                <row>
+                    <i-col span="24">
+                        <form-item label="参数状态" prop="status">
+                            <Radio-group v-model="editTypeForm.status">
+                                <Radio label="1" true-value="1">
+                                    <span>启用</span>
+                                </Radio>
+                                <Radio label="0" true-value="0">
+                                    <span>禁用</span>
+                                </Radio>
+                            </Radio-group>
+                        </form-item>
+                    </i-col>
+                </row>
+                <row>
+                    <i-col span="24">
+                        <form-item label="参数类型说明" prop="remark">
+                            <i-input type="textarea" :value.sync="editTypeForm.remark" v-model="editTypeForm.remark"></i-input>
+                        </form-item>
+                    </i-col>
+                </row>
+            </i-form>
+            <row slot="footer">
+                <i-button @click="saveParamType">
+                    保存
+                </i-button>
+                <i-button @click="app.editTypeModal.show=false">
+                    取消
+                </i-button>
+            </row>
+        </Modal>
+
+        <Modal v-model="paramListModal.show" title="参数列表">
+            <row>
+                <i-col span='4'>
+                    <i-button @click="openEditParamModal()">增加</i-button>
+                </i-col>
+                <i-col span='4'>
+                    <i-button @click="openBatchAddParmModal()">批量增加</i-button>
+                </i-col>
+            </row>
+            <row style="margin-bottom:0.5rem;margin-top:0.5rem">
+                <i-col span="6">序号</i-col>
+                <i-col span="6">名称</i-col>
+                <i-col span="6">备注</i-col>
+                <i-col span="6">操作</i-col>
+            </row>
+            <row v-for="item in paramListModal.list" style="margin-bottom:0.5rem">
+                <i-col span="6">{{item.paramId}}</i-col>
+                <i-col span="6">{{item.paramName}}</i-col>
+                <i-col span="6">{{item.remark||'&nbsp;'}}</i-col>
+                <i-col span="6">
+                    <i-button @click="openEditParamModal(item)">编辑</i-button>
+                    <i-button @click="deleteParam(item)">删除</i-button>
+                </i-col>
+            </row>
+        </Modal>
+
+        <Modal v-model="editParamModal.show" :title="editParamModal.title">
+            <i-form ref="editParamForm" :model="editParamForm" :rules="ruleValidate" label-position="right" autocomplete="off" label-width="100"
+                inline>
+                <row>
+                    <i-col span="24">
+                        <form-item label="参数编号" prop="paramId">
+                            <i-input :value.sync="editParamForm.param.paramId" v-model="editParamForm.param.paramId"></i-input>
+                        </form-item>
+                    </i-col>
+                </row>
+                <row>
+                    <i-col span="24">
+                        <form-item label="参数名称" prop="paramName">
+                            <i-input :value.sync="editParamForm.param.paramName" v-model="editParamForm.param.paramName"></i-input>
+                        </form-item>
+                    </i-col>
+                </row>
+                <row>
+                    <i-col span="24">
+                        <form-item label="参数类型说明" prop="remark">
+                            <i-input type="textarea" :value.sync="editParamForm.param.remark" v-model="editParamForm.param.remark"></i-input>
+                        </form-item>
+                    </i-col>
+                </row>
+                <row>
+                    <i-col span="24">
+                        <form-item label="参数值" prop="paramValue">
+                            <i-input type="text" :value.sync="editParamForm.param.paramValue" v-model="editParamForm.param.paramValue"></i-input>
+                        </form-item>
+                    </i-col>
+                </row>
+                <row>
+                    <i-col span="24">
+                        <form-item label="参数值2" prop="paramValue2">
+                            <i-input type="text" :value.sync="editParamForm.param.paramValue2" v-model="editParamForm.param.paramValue2"></i-input>
+                        </form-item>
+                    </i-col>
+                </row>
+                <row>
+                    <i-col span="24">
+                        <form-item label="参数值3" prop="paramValue3">
+                            <i-input type="text" :value.sync="editParamForm.param.paramValue3" v-model="editParamForm.param.paramValue3"></i-input>
+                        </form-item>
+                    </i-col>
+                </row>
+                <row>
+                    <i-col span="24">
+                        <form-item label="参数值4" prop="paramValue4">
+                            <i-input type="text" :value.sync="editParamForm.param.paramValue4" v-model="editParamForm.param.paramValue4"></i-input>
+                        </form-item>
+                    </i-col>
+                </row>
+                <row>
+                    <i-col span="24">
+                        <form-item label="参数值5" prop="paramValue5">
+                            <i-input type="text" :value.sync="editParamForm.param.paramValue5" v-model="editParamForm.param.paramValue5"></i-input>
+                        </form-item>
+                    </i-col>
+                </row>
+            </i-form>
+            <row slot="footer">
+                <i-button @click="saveParm">
+                    保存
+                </i-button>
+                <i-button @click="app.editParamModal.show=false">
+                    取消
+                </i-button>
+            </row>
+        </Modal>
+
+        <Modal v-model="batchAddParmModal.show" title="批量增加">
+            <i-input type="textarea" :value.sync="batchAddParmModal.param" v-model="batchAddParmModal.param"></i-input>
+            <row slot="footer">
+                <i-button @click="batchSaveParam">
+                    保存
+                </i-button>
+                <i-button @click="app.batchAddParmModal.show=false">
+                    取消
+                </i-button>
+            </row>
+        </Modal>
+    </div>
+    <script src="/src/js/System/param.js"></script>
+    <script>
+    </script>
+</body>
+
+</html>
