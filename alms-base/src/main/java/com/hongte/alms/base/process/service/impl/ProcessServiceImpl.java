@@ -119,6 +119,25 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
         }
 
 
+        //判断流程是否有进行中的  流程运行运行几次，是否超出了运行次数
+        //1.查询出此业务运行中的流程有几条
+        List<Process> pList =  selectList(new EntityWrapper<Process>()
+                .eq("business_id",processSaveReq.getBusinessId())
+                .eq("status",ProcessStatusEnums.RUNNING.getKey()));
+        if(pList.size()>=processType.getCanItemRunningCount()){
+            throw new RuntimeException("此业务已有"+pList.size()+"个"+processType.getTypeName()+"流程在审批中，请已有流程完成后再试！！");
+        }
+
+        //2.查出此业务已运行并执行结果为成功的流程有几条
+        List<Process> sucPList = selectList(new EntityWrapper<Process>()
+        .eq("business_id",processSaveReq.getBusinessId())
+        .eq("status",ProcessStatusEnums.END.getKey())
+        .eq("process_result",ProcessResultEnums.PASS.getKey()));
+        if(sucPList.size()>=processType.getCanItemTotalCount()){
+            throw new RuntimeException("此业务已有"+pList.size()+"个"+processType.getTypeName()+"流程通过审批，不能再申请！！");
+        }
+
+
         //取得 流程的起始步骤
         ProcessTypeStep beginStep = processTypeStepService.getProcessTypeBeginStep(processType.getTypeId());
         if(beginStep==null){
@@ -816,7 +835,9 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
                 }
                 String name = usb.length()>0?usb.toString():vo.getApproveUserId();
                 statusStr = ProcessStatusEnums.nameOf(vo.getStatus())+"("+name +")";
-            }else{
+            }else if(vo.getStatus().equals(ProcessStatusEnums.END.getKey())){
+                statusStr = ProcessStatusEnums.nameOf(vo.getStatus())+"("+ ProcessResultEnums.nameOf(vo.getpResult())+")";
+            }else {
                 statusStr = ProcessStatusEnums.nameOf(vo.getStatus());
             }
             vo.setProcessStatus(statusStr);

@@ -818,7 +818,7 @@ try {
     		//创建审核流程
     		ProcessSaveReq processSaveReq=new ProcessSaveReq();
     		processSaveReq.setBusinessId(carConvBusAply.getBusinessId());
-    		processSaveReq.setProcessStatus(ProcessStatusEnums.BEGIN.getKey());
+    		processSaveReq.setProcessStatus(ProcessStatusEnums.NEW.getKey());
     		processSaveReq.setTitle(ProcessTypeEnums.Aply_CarAuction.getName());
     		com.hongte.alms.base.process.entity.Process process=processService.saveProcess(processSaveReq, ProcessTypeEnums.Aply_ConvBus);
     		map.put("processId", process.getProcessId());

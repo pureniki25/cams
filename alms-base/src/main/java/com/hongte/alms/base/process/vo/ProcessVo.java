@@ -48,6 +48,12 @@ public class ProcessVo {
      */
     private Integer status;
     private  String processStatus;  //流程状态
+
+    /**
+     * 审批结果
+     */
+    private Integer pResult;
+
     /**
      * 发起时间
      */
@@ -232,4 +238,12 @@ public class ProcessVo {
 	public void setCompanyId(String companyId) {
 		this.companyId = companyId;
 	}
+
+    public Integer getpResult() {
+        return pResult;
+    }
+
+    public void setpResult(Integer pResult) {
+        this.pResult = pResult;
+    }
 }

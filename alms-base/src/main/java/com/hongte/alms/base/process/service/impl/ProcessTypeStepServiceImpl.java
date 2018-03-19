@@ -134,7 +134,9 @@ public class ProcessTypeStepServiceImpl extends BaseServiceImpl<ProcessTypeStepM
                         }
                     }
                 }
-            }else if(process.getStatus().equals(ProcessStatusEnums.END.getKey())||process.getStatus().equals(ProcessStatusEnums.CNACL.getKey())){
+            }else if(process.getStatus().equals(ProcessStatusEnums.END.getKey())
+//                    ||process.getStatus().equals(ProcessStatusEnums.CNACL.getKey())
+                    ){
                 nextStepIndex = stepList.size();
             }
         }
