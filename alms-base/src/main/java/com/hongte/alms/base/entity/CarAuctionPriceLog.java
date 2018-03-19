@@ -14,8 +14,8 @@ import io.swagger.annotations.ApiModelProperty;
  * 竞价记录表
  * </p>
  *
- * @author 曾坤
- * @since 2018-03-10
+ * @author 胡伟骞
+ * @since 2018-03-19
  */
 @ApiModel
 @TableName("tb_car_auction_price_log")
@@ -51,6 +51,12 @@ public class CarAuctionPriceLog extends Model<CarAuctionPriceLog> {
 	@TableField("create_time")
 	@ApiModelProperty(required= true,value = "创建时间 ")
 	private Date createTime;
+    /**
+     * 身份证号码
+     */
+	@TableField("bidder_cert_id")
+	@ApiModelProperty(required= true,value = "身份证号码")
+	private String bidderCertId;
 
 
 	public String getId() {
@@ -93,6 +99,14 @@ public class CarAuctionPriceLog extends Model<CarAuctionPriceLog> {
 		this.createTime = createTime;
 	}
 
+	public String getBidderCertId() {
+		return bidderCertId;
+	}
+
+	public void setBidderCertId(String bidderCertId) {
+		this.bidderCertId = bidderCertId;
+	}
+
 	@Override
 	protected Serializable pkVal() {
 		return this.id;
@@ -106,6 +120,7 @@ public class CarAuctionPriceLog extends Model<CarAuctionPriceLog> {
 			", bidderTel=" + bidderTel +
 			", price=" + price +
 			", createTime=" + createTime +
+			", bidderCertId=" + bidderCertId +
 			"}";
 	}
 }

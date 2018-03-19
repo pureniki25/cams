@@ -16,8 +16,8 @@ import io.swagger.annotations.ApiModelProperty;
  * 车辆拍卖信息登记
  * </p>
  *
- * @author 曾坤
- * @since 2018-03-10
+ * @author 胡伟骞
+ * @since 2018-03-19
  */
 @ApiModel
 @TableName("tb_car_auction_reg")
@@ -55,6 +55,12 @@ public class CarAuctionReg extends Model<CarAuctionReg> {
 	@TableField("offer_amount")
 	@ApiModelProperty(required= true,value = "出价金额")
 	private BigDecimal offerAmount;
+    /**
+     * 身份证号码（关联竞价人信息）
+     */
+	@TableField("reg_cert_id")
+	@ApiModelProperty(required= true,value = "身份证号码（关联竞价人信息）")
+	private String regCertId;
     /**
      * 是否竞拍成功 
      */
@@ -139,6 +145,14 @@ public class CarAuctionReg extends Model<CarAuctionReg> {
 		this.offerAmount = offerAmount;
 	}
 
+	public String getRegCertId() {
+		return regCertId;
+	}
+
+	public void setRegCertId(String regCertId) {
+		this.regCertId = regCertId;
+	}
+
 	public Boolean getAuctionSuccess() {
 		return isAuctionSuccess;
 	}
@@ -208,6 +222,7 @@ public class CarAuctionReg extends Model<CarAuctionReg> {
 			", regTel=" + regTel +
 			", isPayDeposit=" + isPayDeposit +
 			", offerAmount=" + offerAmount +
+			", regCertId=" + regCertId +
 			", isAuctionSuccess=" + isAuctionSuccess +
 			", transPrice=" + transPrice +
 			", createTime=" + createTime +

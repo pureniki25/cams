@@ -15,6 +15,7 @@ Vue.component('multiple-select', {
 		return data
 	},
 	computed:{
+	
 		// selectedFocus:function(){
 		// 	return {
 		// 		"single-selected-focus": this.show
@@ -27,7 +28,8 @@ Vue.component('multiple-select', {
 		// }
 	},
 	ready: function(){
-		window.addEventListener('click',this.blur)
+		window.addEventListener('click',this.blur);
+
 	},
     watch: {
         optionsdata: function (val, oldVal) {
@@ -49,6 +51,7 @@ Vue.component('multiple-select', {
         }
 
     },
+   
 	// events: {
 	// 	// ajax获取originOptions后 初始化
 	// 	initMultiple: function(originOptions,selectedList){
@@ -209,5 +212,11 @@ Vue.component('multiple-select', {
                     '<li v-for="item in displayOptions" v-on:click.stop.prevent="multipleSelect(item.id)" v-bind:class=" selectedIdList.indexOf(item.id)!=-1?\'selected\':\'\' ">{{ item.name }}</li>' +
                 '</ul>' +
             '</div>' +
-        '</div>'
+        '</div>',
+     beforeMount: function () {
+    	 var that = this
+    	 $(document).on("click", function(e){ 
+    		 that.blur();
+		 });
+     }
 })

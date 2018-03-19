@@ -106,6 +106,16 @@ public class CarServiceImpl  implements CarService {
 		if(list==null||list.size()<=0) {
 			return pages;
 		}
+		List<DocType> docTypes=docTypeMapper.selectList(new EntityWrapper<DocType>().eq("type_code", "AfterLoan_Material_CarAuction"));
+		if(docTypes==null||docTypes.size()!=1) {
+			logger.error("文件类型不存在或存在多条记录,docTypeCode=AfterLoan_Material_CarAuction");
+			new RuntimeException("文件类型不存在或存在多条记录");
+		}
+		DocType docType=docTypes.get(0);
+		for(AuctionRespVo res:list) {
+		List<Doc> docs=docMapper.selectPage(new RowBounds(0,3), new EntityWrapper<Doc>().eq("doc_type_id", docType.getDocTypeId()).eq("doc_attr", "01").eq("business_id", res.getBusinessId()).orderBy("create_time", true));
+		res.setDocs(docs);
+		}
 		pages.setTotal(count);
 		pages.setRecords(list);
 		return pages;

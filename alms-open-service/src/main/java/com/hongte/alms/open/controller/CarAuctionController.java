@@ -2,12 +2,11 @@ package com.hongte.alms.open.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -122,10 +121,10 @@ public class CarAuctionController {
 		try {
 			String priceID=(String) params.get("priceID");
 			String userName=(String) params.get("userName");
-			String userId=(String) params.get("UserID");
+			String userId=(String) params.get("userID");
 			String telephone=(String) params.get("telephone");
-			String amount =(String) params.get("amount ");
-			List<CarAuction> auctions=carAuctionService.selectList( new EntityWrapper<CarAuction>().eq("auction_id", priceID).eq("status", "05"));
+			double amount =(double) params.get("amount");
+			List<CarAuction> auctions=carAuctionService.selectList( new EntityWrapper<CarAuction>().eq("auction_id", priceID).eq("status", "04"));
 			if(auctions==null||auctions.size()!=1) {
 				logger.error("参数为空,auction_id="+priceID);
 				return Result.error("9999", "无效的拍卖"); 
@@ -159,8 +158,9 @@ public class CarAuctionController {
 			pLog.setId(UUID.randomUUID().toString());
 			pLog.setAuctionId(auctReg.getAuctionId());
 			pLog.setBidderTel(auctReg.getRegTel());
-			pLog.setPrice(amount);
+			pLog.setPrice(amount+"");
 			pLog.setCreateTime(new Date());
+			pLog.setBidderCertId(userId);
 			carAuctionPriceLogService.insert(pLog);
 			auctReg.setOfferAmount(new BigDecimal(amount));
 			auctReg.setUpdateTime(new Date());
@@ -177,21 +177,21 @@ public class CarAuctionController {
 	try {
 		String priceID=(String) params.get("priceID");
 		String userName=(String) params.get("userName");
-		String userID=(String) params.get("userID");
-		String telephone=(String) params.get("telephone");
+		String userID=(String) params.get("userId");  
+		String telephone=(String) params.get("telePhone");
 		String bank =(String) params.get("bank");
-		String cardNo=(String) params.get("cardNo");
-		Boolean isPayBood=(Boolean) params.get("isPayBood");
+		String cardNo=(String) params.get("carNO");
+		//Boolean isPayBood=(Boolean) params.get("isPayBood");
 		if(StringUtils.isEmpty(priceID)||StringUtils.isEmpty(userName)
 			||StringUtils.isEmpty(userID)||StringUtils.isEmpty(telephone)
 			||StringUtils.isEmpty(bank)||StringUtils.isEmpty(cardNo)
-			||isPayBood==null) {
+			) {
 			logger.error("参数为空,auction_id="+priceID+",userName="+userName+
 					",userID="+userID+",telephone="+telephone+",bank="+bank
-					+",cardNo="+cardNo+",isPayBood="+isPayBood);
+					+",cardNo="+cardNo);
 			return Result.error("9999", "参数为空"); 
 		}
-		List<CarAuction> auctions=carAuctionService.selectList( new EntityWrapper<CarAuction>().eq("auction_id", priceID).eq("status", "05"));
+		List<CarAuction> auctions=carAuctionService.selectList( new EntityWrapper<CarAuction>().eq("auction_id", priceID).eq("status", "04"));
 		if(auctions==null||auctions.size()!=1) {
 			logger.error("无效的拍卖,auction_id="+priceID);
 			return Result.error("9999", "无效的拍卖"); 
@@ -209,28 +209,39 @@ public class CarAuctionController {
 			logger.error("不在竞拍时间内,auctionStartTime="+carAuction.getAuctionStartTime()+",auctionEndTime"+carAuction.getAuctionEndTime());
 			return Result.error("9999", "该拍卖正在进行中或已完成不允许报名"); 
 		}
+		List<CarAuctionReg> rCarAuctionRegs=carAuctionRegService.selectList(new EntityWrapper<CarAuctionReg>().eq("auction_id", priceID).eq("reg_tel", telephone));
+		if(rCarAuctionRegs!=null&&rCarAuctionRegs.size()>0) {
+			logger.error("已报名登记，不允许重复登记,auctionStartTime="+carAuction.getAuctionStartTime()+",auctionEndTime"+carAuction.getAuctionEndTime());
+			return Result.error("9999", "该拍卖正在进行中或已完成不允许报名"); 
+		}
 		CarAuctionReg auctReg=new CarAuctionReg();
-		CarAuctionBidder bidder=new CarAuctionBidder();
-		bidder.setBidderCertId(userID);
-		bidder.setBidderName(userName);
-		bidder.setBidderTel(telephone);
-		bidder.setCreateTime(new Date());
-		bidder.setCreateUser("");
-		bidder.setTransAccountName(userName);
-		bidder.setTransAccountNum(cardNo);
-		bidder.setTransBank(bank);
-		bidder.setUpdateTime(new Date());
+		CarAuctionBidder rBidder=carAuctionBidderService.selectById(userID);
+		
+		if(rBidder==null) {
+			rBidder=new CarAuctionBidder();
+			rBidder.setCreateTime(new Date());
+			rBidder.setCreateUser("");
+		}
+		rBidder.setBidderCertId(userID);
+		rBidder.setBidderName(userName);
+		rBidder.setBidderTel(telephone);
+		
+		rBidder.setTransAccountName(userName);
+		rBidder.setTransAccountNum(cardNo);
+		rBidder.setTransBank(bank);
+		rBidder.setUpdateTime(new Date());
 		
 		auctReg.setAuctionId(priceID);
 		auctReg.setBusinessId(carAuction.getBusinessId());
 		auctReg.setCreateTime(new Date());
 		auctReg.setCreateUser(userName);
-		auctReg.setPayDeposit(isPayBood);
+		auctReg.setRegCertId(userID);
+		//auctReg.setPayDeposit(isPayBood);
 		auctReg.setRegId(UUID.randomUUID().toString());
 		auctReg.setRegTel(telephone);
 		auctReg.setUpdateTime(new Date());
 		carAuctionRegService.insert(auctReg);
-		carAuctionBidderService.insert(bidder);
+		carAuctionBidderService.insertOrUpdate(rBidder);
 		return Result.error("0000", "报名成功"); 
 	}catch (Exception e) {
 		logger.error(e.getMessage());
