@@ -48,7 +48,7 @@
                     搜索条件
                 </p>
                 <!--右上侧按钮列表-->
-                <i-button slot="extra" type="info" :loading="loading" icon="ios-search" @click="toLoading" style="margin-right:10px">
+                <i-button v-if="authValid('search')" slot="extra" type="info" :loading="loading" icon="ios-search" @click="toLoading" style="margin-right:10px">
                     <span v-if="!loading">查询</span>
                     <span v-else>查询中...</span>
                 </i-button>

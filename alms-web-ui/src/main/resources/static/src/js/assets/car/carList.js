@@ -290,29 +290,68 @@ window.layinit(function (htConfig) {
                         id:'operate',
                         tableid: 'listTable',
                         contents: [
+                        	
                         	{"name": "发起拍卖", click: function (e, currentItem) {
-                        	 	
+                                if(authValid('carAuction')){
                         		 showNewTab(currentItem,"carAuction","车牌号-车辆型号 拍卖申请");
+                                }else{
+                                	   layer.msg("对不起，你没有权限");
+                                	
+                                }
                             }},
                             {"name": "转公车申请", click: function (e, currentItem) {
-                            	 showNewTab(currentItem,"convBusAply","车牌号-车辆型号 转公车申请（"+currentItem.companyName+"）");
+                            	
+                                if(authValid('convBusAply')){
+                                 	 showNewTab(currentItem,"convBusAply","车牌号-车辆型号 转公车申请（"+currentItem.companyName+"）");
+                                   }else{
+                                   	   layer.msg("对不起，你没有权限");
+                                   	
+                                   }
+                          
                             }},
                             {"name": "拍卖记录", click: function (e, currentItem) {
-                            	showNewTab(currentItem,"auctionRegList","拍卖记录");
+                            	
+                            	   if(authValid('auctionRegList')){
+                            	     	showNewTab(currentItem,"auctionRegList","拍卖记录");
+                                     }else{
+                                     	   layer.msg("对不起，你没有权限");
+                                     	
+                                     }
+                            
+                       
                             }},
                             {"name": "车辆归还登记", click: function (e, currentItem) {
-                            	showNewTab(currentItem,"returnReg","车辆归还登记");
+                        	   if(authValid('returnReg')){
+                        			showNewTab(currentItem,"returnReg","车辆归还登记");
+                                }else{
+                                	   layer.msg("对不起，你没有权限");
+                                }
                             }},
                             {"name": "重新评估", click: function (e, currentItem) {
-                            	showNewTab(currentItem,"againAssess","车辆评估");
+                            	 if(authValid('againAssess')){
+                            		 	showNewTab(currentItem,"againAssess","车辆评估");
+                                 }else{
+                                 	   layer.msg("对不起，你没有权限");
+                                 }
+                           
                             }},
                             {"name": "上传附件", click: function (e, currentItem) {
-                            	fileUp(currentItem,"上传附件");
+                            	
+                           	  if(authValid('fileUp')){
+	                           	  	fileUp(currentItem,"上传附件");
+	                          }else{
+	                          	   layer.msg("对不起，你没有权限");
+	                          }
                             }},
                             {"name": "查看附件", click: function (e, currentItem) {
                             	//aler("bbb");
-                    
-                            	viewFile(currentItem,"查看附件");
+                            	
+                             	  if(authValid('viewFile')){
+                             		viewFile(currentItem,"查看附件");
+	  	                          }else{
+	  	                          	   layer.msg("对不起，你没有权限");
+	  	                          }
+                          
                             }}
                         ],
                     });

@@ -187,8 +187,8 @@
     <row style="padding: 10px">
         <i-col span="24">
             <!--:loading="saving"-->
-            <i-button type="info" @click="showSetPhoneStaff()"> 分配电催</i-button>
-            <i-button type="info" @click="showSetVisitStaff()"> 移交催收</i-button>
+            <i-button v-if="authValid('setPhone')" type="info" @click="showSetPhoneStaff()"> 分配电催</i-button>
+            <i-button v-if="authValid('setVisit')" type="info" @click="showSetVisitStaff()"> 移交催收</i-button>
 <!--            <i-button type="info" @click="showSetOutsideCommission()"> 委外受理</i-button>
             <i-button type="info" @click="showTestCalculation()"> 结清试算</i-button>-->
 
@@ -205,7 +205,7 @@
             <script type="text/html" id="barTools">
                 <!--layui-btn layui-btn-xs-->
                 <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="operate" id="operate">操作</a>
-                <a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="info">详情</a>
+                <a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="info"   ht-auth="detail">详情</a>
             </script>
         </i-col>
     </row>
