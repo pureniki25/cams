@@ -204,28 +204,32 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			transferLitigationData = transferOfLitigationMapper.queryTransferLitigationData(businessId, crpId);
 
 			Integer businessType = transferOfLitigationMapper.queryBusinessType(businessId);
+			
+			if (transferLitigationData == null || businessType == null) {
+				throw new ServiceRuntimeException("没有找到相关数据，发送诉讼系统失败！");
+			}
 
-			if (transferLitigationData != null && businessType != null) {
-				transferLitigationData.setCreateUserId(loginUserInfoHelper.getUserId());
-				// 判断业务类型，根据业务类型查询对应的房贷或车贷数据
-				if (businessType == 1 || businessType == 9) {
-					transferLitigationData.setBusinessTypeGroup(XIAO_DAI_CAR);
-					transferLitigationData
-							.setCarList(transferOfLitigationMapper.queryTransferLitigationCarData(businessId));
-				}
-				if (businessType == 2 || businessType == 11) {
-					transferLitigationData.setBusinessTypeGroup(XIAO_DAI_HOUSE);
+			transferLitigationData.setCreateUserId(loginUserInfoHelper.getUserId());
+			// 判断业务类型，根据业务类型查询对应的房贷或车贷数据
+			if (businessType == 1 || businessType == 9) {
+				transferLitigationData.setBusinessTypeGroup(XIAO_DAI_CAR);
+				transferLitigationData
+						.setCarList(transferOfLitigationMapper.queryTransferLitigationCarData(businessId));
+			}
+			if (businessType == 2 || businessType == 11) {
+				transferLitigationData.setBusinessTypeGroup(XIAO_DAI_HOUSE);
 
-					transferLitigationData.setHouseList(assembleBusinessHouse(businessId));
-				}
-				LitigationResponse litigationResponse = sendLitigation(transferLitigationData, sendUrl);
-				if (litigationResponse != null && litigationResponse.getCode() == 1) {
-					LitigationResponseData data = litigationResponse.getData();
-					if (!data.isImportSuccess()) {
-						throw new ServiceRuntimeException(data.getMessage());
-					}
+				transferLitigationData.setHouseList(assembleBusinessHouse(businessId));
+			}
+			LitigationResponse litigationResponse = sendLitigation(transferLitigationData, sendUrl);
+			if (litigationResponse != null && litigationResponse.getCode() == 1) {
+				LitigationResponseData data = litigationResponse.getData();
+				LOG.info("---sendTransferLitigationData--- 诉讼系统返回信息：" + data.toString());
+				if (!data.isImportSuccess()) {
+					throw new ServiceRuntimeException(data.getMessage());
 				}
 			}
+			LOG.info("发送诉讼系统成功！！！");
 		} catch (Exception e) {
 			LOG.error("发送诉讼系统失败！！！", e);
 			throw new ServiceRuntimeException(e.getMessage(), e);
@@ -682,7 +686,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 						CollectionSetWayEnum.MANUAL_SET);
 			}
 		} catch (Exception e) {
-			LOG.error("---saveCarProcessApprovalResult--- 存储车贷审批结果信息失败！", e);
+			LOG.error("---saveHouseProcessApprovalResult--- 存储房贷审批结果信息失败！", e);
 			throw new ServiceRuntimeException(e.getMessage(), e);
 		}
 	}

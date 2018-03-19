@@ -51,14 +51,14 @@
                     搜索条件
                 </p>
                 <!--右上侧按钮列表-->
-                <i-button slot="extra" type="info" :loading="loading" icon="ios-search" @click="toLoading" style="margin-right:10px">
+                <i-button v-if="authValid('search')" slot="extra" type="info" :loading="loading" icon="ios-search" @click="toLoading" style="margin-right:10px">
                     <span v-if="!loading">查询</span>
                     <span v-else>查询中...</span>
                 </i-button>
                <i-button slot="extra"  @click="handleReset('searchForm')" style="margin-right:10px">
                     <span>重置</span>
                 </i-button>
-                <i-button id="exportBtn" v-if="authValid('export')" slot="extra" @click="clickExport" type="info" :loading="exporting" style="margin-right:10px">
+                <i-button v-if="authValid('export')" id="exportBtn" v-if="authValid('export')" slot="extra" @click="clickExport" type="info" :loading="exporting" style="margin-right:10px">
                     <span v-if="!exporting">导出</span>
                     <span v-else>导出中...</span>
 

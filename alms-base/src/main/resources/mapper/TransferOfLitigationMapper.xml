@@ -200,7 +200,6 @@
 	
 	<select id="queryTransferLitigationData" resultMap="TransferOfLitigationMap" >
 			SELECT 
-			  cc.plan_list_id,
 			  bb.`borrow_limit` borrowLimit,
 			  (SELECT 
 			    IFNULL(
@@ -212,7 +211,7 @@
 			    LEFT JOIN tb_renewal_business b 
 			      ON a.business_id = b.renewal_business_id 
 			  WHERE a.business_id = bb.`business_id`) businessId,
-			  bbt.`business_type_name` businessTypeName,
+			  IFNULL(bb.business_ctype, bb.business_stype) businessTypeName,
 			  bbc.`identify_card` customerIdentifyCard,
 			  bbc.`customer_name` customerName,
 			  CASE
@@ -274,7 +273,6 @@
 			FROM
 			  tb_basic_business bb,
 			  tb_basic_business_customer bbc,
-			  tb_basic_business_type bbt,
 			  (SELECT 
 			    c.fact_principal,
 			    b.`original_business_id`,
@@ -309,9 +307,8 @@
 			      ON a.plan_list_id = c.plan_list_id 
 			  WHERE IFNULL(a.repay_flag, 0) != 6) cc 
 			WHERE bb.`business_id` = bbc.`business_id` 
-			  AND bb.`business_type` = bbt.`business_type_id` 
 			  AND bb.business_id = cc.original_business_id 
-			  AND bbc.`ismainland_resident` = 1 
+			  AND bbc.ismain_customer = 1 
 		 	  AND bb.`business_id` = #{businessId,jdbcType=VARCHAR} 
 	</select>
 	

@@ -37,7 +37,7 @@ public interface WithholdingRepaymentLogService extends BaseService<WithholdingR
       * @param key
       * @return
       */
-     RepaymentLogVO selectSumByBusinessId(String repayStatus,String userId);
+     RepaymentLogVO selectSumByBusinessId(RepaymentLogReq key);
      
      
      /**
@@ -45,6 +45,6 @@ public interface WithholdingRepaymentLogService extends BaseService<WithholdingR
       * @param key
       * @return
       */
-     RepaymentLogVO selectSumByLogId(String userId);
+     RepaymentLogVO selectSumByLogId(RepaymentLogReq key);
 
 }

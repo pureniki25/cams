@@ -281,7 +281,7 @@ var btype_array = [{
 //查询表单验证
 var setSearchFormValidate = {
     derateMoneyBegin: [
-        {pattern:"^[0-9]+(.[0-9]{1,2})?$",   message: '请填写不超过两位小数的数字', trigger: 'blur'},
+        {pattern:/^[0-9]+(.[0-9]{1,2})?$/,   message: '请填写不超过两位小数的数字', trigger: 'blur'},
         {
             validator: function (rule, value, callback, source, options) {
                 if(vm.searchForm.derateMoneyBegin!=""&& vm.searchForm.derateMoneyEnd!=""){
@@ -300,7 +300,7 @@ var setSearchFormValidate = {
         }
     ],
     derateMoneyEnd: [
-        {pattern:"^[0-9]+(.[0-9]{1,2})?$",   message: '请填写不超过两位小数的数字', trigger: 'blur'},
+        {pattern:/^[0-9]+(.[0-9]{1,2})?$/,   message: '请填写不超过两位小数的数字', trigger: 'blur'},
         {
             validator: function (rule, value, callback, source, options) {
                 if(vm.searchForm.derateMoneyBegin!=""&& vm.searchForm.derateMoneyEnd!=""){

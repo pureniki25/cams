@@ -113,7 +113,7 @@
 	      <td colspan="2">{{ajax_data.bankName}}({{ajax_data.bankCard}})</td>
 	      <td class="column">代扣平台</td>
 	      <td colspan="2">
-	      	<i-select  ref="foo" v-model="platformId" style="width:200px">
+	      	<i-select   v-model="platformId" style="width:200px">
 		        <i-option v-for="item in platformList" :value="item.platformId" :key="item.platformId" >{{ item.platformName }}</i-option>
 		    </i-select>
 		  </td>
@@ -185,10 +185,8 @@
 
 <script src="/src/js/collection/deduction.js" ></script> 
 <script>
-giveBarToSelect(){
-    this.$refs.foo.setQuery('bar')
-}
-..
+
+
 </script>
 </body>
 </html>

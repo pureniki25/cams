@@ -51,7 +51,7 @@
                     搜索条件
                 </p>
                 <!--右上侧按钮列表-->
-                <i-button slot="extra" type="info" :loading="loading" icon="ios-search" @click="toLoading" style="margin-right:10px">
+                <i-button v-if="authValid('search')" slot="extra" type="info" :loading="loading" icon="ios-search" @click="toLoading" style="margin-right:10px">
                     <span v-if="!loading">查询</span>
                     <span v-else>查询中...</span>
                 </i-button>
@@ -114,7 +114,7 @@
             <table id="listTable" lay-filter="listTable"></table>
             <script type="text/html" id="barTools">
                 <!--layui-btn layui-btn-xs-->
-                <a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="info">短信详情</a>
+                <a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="info" ht-auth="detail">短信详情</a>
             </script>
         </i-col>
     </row>
