@@ -25,6 +25,11 @@ ht:
   config:
     ui:
       useGateWayflage: false   #是否使用网关的标志位
+    uc.api:
+      synch: false #是否同步API资源到用户权限中心
+      isDeleteOld: false #是否删除旧资源，删除旧资源的同时，关联关系也将被删除
+      packages: com.hongte.alms.core #API资源扫描的包，可用多个，多个使用“,”分隔
+      app: ALMS
 
 ---
 spring:
@@ -55,6 +60,11 @@ ht:
   config:
     ui:
       useGateWayflage: true   #是否使用网关的标志位
+    uc.api:
+      synch: true #是否同步API资源到用户权限中心
+      isDeleteOld: false #是否删除旧资源，删除旧资源的同时，关联关系也将被删除
+      packages: com.hongte.alms.core #API资源扫描的包，可用多个，多个使用“,”分隔
+      app: ALMS
 
 ---
 spring:
@@ -85,7 +95,11 @@ ht:
   config:
     ui:
       useGateWayflage: true   #是否使用网关的标志位
-
+    uc.api:
+      synch: true #是否同步API资源到用户权限中心
+      isDeleteOld: false #是否删除旧资源，删除旧资源的同时，关联关系也将被删除
+      packages: com.hongte.alms.core #API资源扫描的包，可用多个，多个使用“,”分隔
+      app: ALMS
 
 ---
 spring:
@@ -108,6 +122,12 @@ ht:
   config:
     ui:
       useGateWayflage: true   #是否使用网关的标志位
+    uc.api:
+      synch: true #是否同步API资源到用户权限中心
+      isDeleteOld: false #是否删除旧资源，删除旧资源的同时，关联关系也将被删除
+      packages: com.hongte.alms.core #API资源扫描的包，可用多个，多个使用“,”分隔
+      app: ALMS
+
 ---
 spring:
   profiles: prd
@@ -131,4 +151,8 @@ ht:
   config:
     ui:
       useGateWayflage: true   #是否使用网关的标志位
-
+    uc.api:
+      synch: true #是否同步API资源到用户权限中心
+      isDeleteOld: false #是否删除旧资源，删除旧资源的同时，关联关系也将被删除
+      packages: com.hongte.alms.core #API资源扫描的包，可用多个，多个使用“,”分隔
+      app: ALMS

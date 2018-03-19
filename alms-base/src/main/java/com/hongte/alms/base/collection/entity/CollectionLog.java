@@ -91,6 +91,19 @@ public class CollectionLog extends Model<CollectionLog> {
 	@ApiModelProperty(required= true,value = "设置催收的方式：1，界面手动设置；2，定时器自动设置")
 	private Integer setWay;
 
+	/**
+	 * 修改前的贷后状态，1：电催，50：催收中，100：已移交法务,150已拖车登记,200:已关闭
+	 */
+	@TableField("before_status")
+	@ApiModelProperty(required= true,value = "修改前的贷后状态，1：电催，50：催收中，100：已移交法务,150已拖车登记,200:已关闭")
+	private Integer beforeStatus;
+	/**
+	 * 发起这次修改的状态：1：电催，50：催收中，100：已移交法务,150已拖车登记， 200:已关闭
+	 */
+	@TableField("set_type_status")
+	@ApiModelProperty(required= true,value = "发起这次修改的状态：1：电催，50：催收中，100：已移交法务,150已拖车登记， 200:已关闭")
+	private Integer setTypeStatus;
+
 
 	public Integer getId() {
 		return id;
@@ -199,5 +212,21 @@ public class CollectionLog extends Model<CollectionLog> {
 
 	public void setSetWay(Integer setWay) {
 		this.setWay = setWay;
+	}
+
+	public Integer getBeforeStatus() {
+		return beforeStatus;
+	}
+
+	public void setBeforeStatus(Integer beforeStatus) {
+		this.beforeStatus = beforeStatus;
+	}
+
+	public Integer getSetTypeStatus() {
+		return setTypeStatus;
+	}
+
+	public void setSetTypeStatus(Integer setTypeStatus) {
+		this.setTypeStatus = setTypeStatus;
 	}
 }

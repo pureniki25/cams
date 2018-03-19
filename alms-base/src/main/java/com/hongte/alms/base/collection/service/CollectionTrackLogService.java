@@ -24,4 +24,11 @@ public interface CollectionTrackLogService extends BaseService<CollectionTrackLo
      * @return
      */
     Page<CollectionTrackLogVo>  selectCollectionTrackLogByRbpId(CollectionTrckLogReq req);
+
+    /**
+     * 根据还款计划编号 查询标的id
+     * @param rbpId
+     * @return
+     */
+    List<String> selectProjectIdByRbpId(String rbpId);
 }

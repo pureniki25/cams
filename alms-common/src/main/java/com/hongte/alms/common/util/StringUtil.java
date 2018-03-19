@@ -193,5 +193,9 @@ public class StringUtil {
 		Matcher m = p.matcher(str);
 		return m.matches();
 	}
+	
+	public static String nullToStr(String str) {
+		return str == null ? "" : str;
+	}
 
 }

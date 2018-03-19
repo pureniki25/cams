@@ -136,7 +136,11 @@ window.layinit(function(htConfig){
             },
             showSetPhoneStaff (name) {//显示分配电催人员 界面
 
-
+                var alarmStr = canOpenLayer();
+                if(alarmStr!=null){
+                    vm.$Modal.error({content:alarmStr});
+                    return ;
+                }
 
                 layer.open({
                     type: 2,
@@ -144,13 +148,15 @@ window.layinit(function(htConfig){
                     area: ['1250px', '800px'],
                     content: '/collectionUI/setPhoneStaffUI?crpIds='+getSelectedcrpIds()
                 });
-                /*
-                            var tt =this.$refs[name];
-                            tt.resetFields();
-                */
             },
             //显示移交催收人员 界面
             showSetVisitStaff (name) {
+                var alarmStr = canOpenLayer();
+                if(alarmStr!=null){
+                    vm.$Modal.error({content:alarmStr});
+                    return ;
+                }
+
                 layer.open({
                     type: 2,
                     title: '移交催收',
@@ -159,89 +165,6 @@ window.layinit(function(htConfig){
                 });
 
             },
-            //显示委外受理 界面
-/*            showSetOutsideCommission (name) {
-                /!*          var tt =this.$refs[name];
-                          tt.resetFields();*!/
-            },*/
-            //显示结清试算 界面
-/*            showTestCalculation (name) {
-                /!*            var tt =this.$refs[name];
-                            tt.resetFields();*!/
-            },*/
-            ////  ----   单行操作界面显示  开始 -----------------
-            /*//显示 催收跟踪记录界面
-            showCollectionStackLog(){
-                vm.edit_modal = false;
-                layer.open({
-                    type: 2,
-                    title: '催收跟踪记录',
-                    area: ['1250px', '800px'],
-                    content: '/collectionUI/staffTrackRecordUI?businessId='+vm.selectedRowInfo.businessId+'&crpId='+vm.selectedRowInfo.crpId
-                });
-            },
-            //显示 催收跟踪记录界面
-            showApplyDerate(){
-                vm.edit_modal = false;
-                layer.open({
-                    type: 2,
-                    title: '减免申请',
-                    maxmin: true,
-                    area: ['1250px', '800px'],
-                    content: '/collectionUI/applyDerateUI?businessId='+vm.selectedRowInfo.businessId+'&crpId='+vm.selectedRowInfo.crpId+"&processStatus=-1"
-                });
-            },
-        showCarLoanData(){
-            vm.edit_modal = false;
-            layer.open({
-                type: 2,
-                title: '车贷移交诉讼',
-                maxmin: true,
-                area: ['1250px', '800px'],
-                content: '/transferOfLitigation/carLoan?businessId=' + vm.selectedRowInfo.businessId + "&processStatus=-1"+'&crpId='+vm.selectedRowInfo.crpId
-            });
-        },
-        showHouseLoanData(){
-        	vm.edit_modal = false;
-        	layer.open({
-        		type: 2,
-        		title: '房贷移交诉讼',
-        		maxmin: true,
-        		area: ['1250px', '800px'],
-        		content: '/transferOfLitigation/houseLoan?businessId=' + vm.selectedRowInfo.businessId + "&processStatus=-1"+'&crpId='+vm.selectedRowInfo.crpId
-        	});
-        },
-
-            showDeduction(){
-                vm.edit_modal = false;
-                url = getDeductionUrl();
-                layer.open({
-                    type: 2,
-                    title: '执行代扣',
-                    maxmin: true,
-                    area: ['1450px', '800px'],
-                    content:url
-                });
-            },
-
-            //显示 拖车登记界面
-            showdragRegistration(){
-                var title = "拖车登记"
-                var url = '/carUI/dragRegistration?businessId='+vm.selectedRowInfo.businessId
-                showOneLineOprLayer(title,url)
-            },
-            //显示 还款登记界面
-            showRepaymentRegister(){
-                var title = "还款登记"
-                var url = '/collectionUI/repaymentRegister?businessId='+vm.selectedRowInfo.businessId+'&afterId='+vm.selectedRowInfo.afterId
-                showOneLineOprLayer(title,url)
-            },
-            //显示 查看款项池界面
-            showCheckFundPool(){
-                var title = "查看款项池"
-                var url = '/collectionUI/checkFundPool?businessId='+vm.selectedRowInfo.businessId+'&afterId='+vm.selectedRowInfo.afterId
-                showOneLineOprLayer(title,url)
-            },*/
 
             ////  ----   单行操作界面显示  结束 -----------------
             clickExport() {//导出Excel表格
@@ -348,8 +271,12 @@ window.layinit(function(htConfig){
                 }, {
 
                     field: 'statusName',
-                    title: '状态'
-                }, {
+                    title: '还款状态'
+                },{
+
+                    field: 'afterColStatusName',
+                    title: '业务状态'
+                },{
                     fixed: 'right',
                     title: '操作',
                     width: 178,
@@ -428,7 +355,7 @@ window.layinit(function(htConfig){
                                 Authorization : "Bearer " + getToken()
                             },
                             success : function(data) {
-                                showOneLineOprLayer(data,"查看附件");
+                                showOneLineOprLayer(data.data,"查看附件");
                             },
                             error : function() {
                                 vm.$Modal.error({content: '接口调用异常!'});
@@ -700,6 +627,23 @@ var getSelectedcrpIds = function(){
         crpIds +=checkStatus.data[i].crpId;
     }
     return crpIds;
+}
+
+var canOpenLayer = function () {
+    var checkStatus = table.checkStatus('listTable');
+    if(checkStatus.data.length == 0){
+        return "请选择一行设置数据！"
+    }
+    var haveLowData;
+    for(var i=0;i<checkStatus.data.length;i++){
+        if(checkStatus.data[i].afterColStatusName=='已移交法务'){
+            return "已移交法务的业务不能设置电催/催收！";
+        }
+        if(checkStatus.data[i].afterColStatusName=='已拖车登记'){
+            return "已拖车登记的业务不能设置电催/催收！"
+        }
+    }
+    return null;
 }
 
 //为表单添加输入

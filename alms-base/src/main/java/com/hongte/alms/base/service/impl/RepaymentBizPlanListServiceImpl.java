@@ -53,33 +53,33 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
                 CollectionStatusEnum.TO_LAW_WORK.getKey());
     }
 
-    @Override
-    public List<RepaymentBizPlanList> selectNeedPhoneUrgRenewBiz(String companyId,Integer beforeDueDays) {
-        if(beforeDueDays.equals(0)){
-            beforeDueDays = 1000;
-        }
-       return repaymentBizPlanListMapper.selectNeedSetColInfoRenewBizPlansBycomId(
-               companyId,
-               0-beforeDueDays,
-               CollectionStatusEnum.PHONE_STAFF.getKey()
-       );
-    }
-
-    @Override
-    public List<RepaymentBizPlanList> selectNeedVisitRenewBiz(String companyId,Integer overDueDays) {
-        return repaymentBizPlanListMapper.selectNeedSetColInfoRenewBizPlansBycomId(
-                companyId,
-                overDueDays,
-                CollectionStatusEnum.COLLECTING.getKey()
-        );
-    }
-
-    @Override
-    public List<RepaymentBizPlanList> selectNeedLawRenewBiz(Integer overDueDays) {
-        return repaymentBizPlanListMapper.selectNeedSetColInfoRenewBizPlansBycomId(
-                null,
-                overDueDays,
-                CollectionStatusEnum.TO_LAW_WORK.getKey()
-        );
-    }
+//    @Override
+//    public List<RepaymentBizPlanList> selectNeedPhoneUrgRenewBiz(String companyId,Integer beforeDueDays) {
+//        if(beforeDueDays.equals(0)){
+//            beforeDueDays = 1000;
+//        }
+//       return repaymentBizPlanListMapper.selectNeedSetColInfoRenewBizPlansBycomId(
+//               companyId,
+//               0-beforeDueDays,
+//               CollectionStatusEnum.PHONE_STAFF.getKey()
+//       );
+//    }
+//
+//    @Override
+//    public List<RepaymentBizPlanList> selectNeedVisitRenewBiz(String companyId,Integer overDueDays) {
+//        return repaymentBizPlanListMapper.selectNeedSetColInfoRenewBizPlansBycomId(
+//                companyId,
+//                overDueDays,
+//                CollectionStatusEnum.COLLECTING.getKey()
+//        );
+//    }
+//
+//    @Override
+//    public List<RepaymentBizPlanList> selectNeedLawRenewBiz(Integer overDueDays) {
+//        return repaymentBizPlanListMapper.selectNeedSetColInfoRenewBizPlansBycomId(
+//                null,
+//                overDueDays,
+//                CollectionStatusEnum.TO_LAW_WORK.getKey()
+//        );
+//    }
 }
