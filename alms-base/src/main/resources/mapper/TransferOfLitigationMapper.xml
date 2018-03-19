@@ -200,7 +200,6 @@
 	
 	<select id="queryTransferLitigationData" resultMap="TransferOfLitigationMap" >
 			SELECT 
-			  cc.plan_list_id,
 			  bb.`borrow_limit` borrowLimit,
 			  (SELECT 
 			    IFNULL(
@@ -311,7 +310,7 @@
 			WHERE bb.`business_id` = bbc.`business_id` 
 			  AND bb.`business_type` = bbt.`business_type_id` 
 			  AND bb.business_id = cc.original_business_id 
-			  AND bbc.`ismainland_resident` = 1 
+			  AND bbc.ismain_customer = 1 
 		 	  AND bb.`business_id` = #{businessId,jdbcType=VARCHAR} 
 	</select>
 	
