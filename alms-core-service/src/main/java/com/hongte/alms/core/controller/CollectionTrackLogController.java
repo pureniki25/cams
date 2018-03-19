@@ -6,6 +6,7 @@ import com.hongte.alms.base.collection.entity.CollectionTrackLog;
 import com.hongte.alms.base.collection.service.CollectionTrackLogService;
 import com.hongte.alms.base.collection.vo.CollectionTrackLogVo;
 import com.hongte.alms.base.collection.vo.CollectionTrckLogReq;
+import com.hongte.alms.base.feignClient.service.EipOperateService;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.vo.PageResult;
 import com.ht.ussp.bean.LoginUserInfoHelper;
@@ -39,6 +40,9 @@ public class CollectionTrackLogController {
     @Autowired
     LoginUserInfoHelper loginUserInfoHelper;
 
+    @Autowired
+    @Qualifier("eipOperateServiceImpl")
+    private EipOperateService eipOperateService;
 
 
     @ApiOperation(value = "获取分页贷后跟踪记录 分页")
@@ -108,6 +112,10 @@ public class CollectionTrackLogController {
     @PostMapping("/addOrUpdateLog")
     public Result<Integer> addOrUpdateLog(@RequestBody CollectionTrackLog log){
 
+        com.ht.ussp.core.Result result = new com.ht.ussp.core.Result();
+
+        result = eipOperateService.addProjectTract(log);
+
         try{
             if(log.getTrackLogId() != null){
                 CollectionTrackLog logOld =  collectionTrackLogService.selectById(log.getTrackLogId());
@@ -123,15 +131,17 @@ public class CollectionTrackLogController {
 //            vo.s;
             collectionTrackLogService.insertOrUpdate(log);
 //            collectionTrackLogService.insertOrUpdateAllColumn(vo);
-            return Result.success(1);
         }catch (Exception ex){
             logger.error(ex.getMessage());
             return Result.error("500", ex.getMessage());
         }
+
+        if(!"0000".equals(result.getReturnCode())){
+            return Result.error("400","推送平台未成功");
+        }
+
+        return Result.success(1);
     }
-
-
-
 
 }
 

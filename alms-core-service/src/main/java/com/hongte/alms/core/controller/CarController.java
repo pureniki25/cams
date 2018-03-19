@@ -983,15 +983,12 @@ try {
     public PageResult<List<AuctionBidderVo>> selectBiddersPageForApp(@ModelAttribute AuctionsReqVo req){
 
         try{
-        	Integer isPayDepositBoolean=null;
-        	if(StringUtils.isEmpty(req.getIsPayDeposit())) {
-        		isPayDepositBoolean=null;
-        	}
         	List<CarAuction> carAuctions=carAuctionService.selectList(new EntityWrapper<CarAuction>().eq("business_id", req.getBusinessId()));
         	CarAuction carAuction=new CarAuction();
         	if(carAuctions!=null&&carAuctions.size()==1) {
         		carAuction=carAuctions.get(0);
         	}
+        	req.setPriceID(carAuction.getAuctionId());
         	Page<AuctionBidderVo>  pages=carService.selectBiddersPageForApp(req);
             return PageResult.success(pages.getRecords(),pages.getTotal());
         }catch (Exception ex){

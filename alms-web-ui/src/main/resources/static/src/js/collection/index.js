@@ -355,7 +355,7 @@ window.layinit(function(htConfig){
                                 Authorization : "Bearer " + getToken()
                             },
                             success : function(data) {
-                                showOneLineOprLayer(data,"查看附件");
+                                showOneLineOprLayer(data.data,"查看附件");
                             },
                             error : function() {
                                 vm.$Modal.error({content: '接口调用异常!'});

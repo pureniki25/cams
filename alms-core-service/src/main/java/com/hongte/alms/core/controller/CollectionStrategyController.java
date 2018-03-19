@@ -180,6 +180,14 @@ public class CollectionStrategyController {
     public Result getCompanyList(@RequestParam("areaPid") String areaPid){
         //分公司
         List<BasicCompany> companyList = basicCompanyService.selectList(new EntityWrapper<BasicCompany>().eq("area_level", AreaLevel.COMPANY_LEVEL.getKey()).eq("area_pid",areaPid));
+        List<String> companyNames = new ArrayList<>();
+        for (BasicCompany basicCompany:companyList) {
+            companyNames.add(basicCompany.getAreaName());
+        }
+        Map<String,Object> map = new HashMap<>();
+        map.put("allcompanys",companyList);
+        map.put("allcompanyNames",companyNames);
+
         return Result.success(companyList);
     }
 

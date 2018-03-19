@@ -83,17 +83,18 @@ public class SysParameterController {
 		if (sysParameter == null) {
 			return Result.error("500", "参数类型不存在");
 		}
-		JSONObject res = new JSONObject() ;
+		JSONObject res = new JSONObject();
 		res.put("param_type", sysParameter.getParamType());
 		res.put("param_type_name", sysParameter.getParamTypeName());
 		res.put("remark", sysParameter.getRemark());
 		res.put("status", sysParameter.getStatus());
-		
+
 		return Result.success(res);
 	}
 
 	@PostMapping("/addParamType")
 	@ResponseBody
+	@ApiOperation(value = "新增参数类型信息")
 	public Result addParamType(@RequestBody JSONObject map) {
 		String paramType = map.getString("param_type");
 		String paramTypeName = map.getString("param_type_name");
@@ -114,9 +115,10 @@ public class SysParameterController {
 		sysParameter.insert();
 		return Result.success();
 	}
-	
+
 	@PostMapping("/updateParamType")
 	@ResponseBody
+	@ApiOperation(value = "更新参数类型信息")
 	public Result updateParamType(@RequestBody JSONObject map) {
 		String paramType = map.getString("param_type");
 		String paramTypeName = map.getString("param_type_name");
@@ -127,21 +129,22 @@ public class SysParameterController {
 		if (list == null || list.size() == 0) {
 			return Result.error("500", "不存在的参数类型编号:" + paramType);
 		}
-		
+
 		for (SysParameter sysParameter : list) {
 			sysParameter.setParamTypeName(paramTypeName);
 			sysParameter.setRemark(remark);
 			sysParameter.setStatus(status);
 		}
-		
+
 		sysParameterService.updateBatchById(list);
 		return Result.success();
 	}
 
 	@DeleteMapping("/delParamType")
 	@ResponseBody
+	@ApiOperation(value = "删除参数类型信息")
 	public Result del(String paramType) {
-		boolean result = sysParameterService.delete(new EntityWrapper<SysParameter>().eq("param_type",paramType));
+		boolean result = sysParameterService.delete(new EntityWrapper<SysParameter>().eq("param_type", paramType));
 		if (result) {
 			return Result.success();
 		} else {
@@ -151,11 +154,14 @@ public class SysParameterController {
 
 	@GetMapping("/listParam")
 	@ResponseBody
+	@ApiOperation(value = "list参数类型信息")
 	public Result list(String paramType) {
-		List<SysParameter> list = sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", paramType).ne("param_value", Constant.SYS_PARAMETER_PLACEHOLDER).orderBy("row_Index"));
-		List<JSONObject> res = new ArrayList<>() ;
+		List<SysParameter> list = sysParameterService
+				.selectList(new EntityWrapper<SysParameter>().eq("param_type", paramType)
+						.ne("param_value", Constant.SYS_PARAMETER_PLACEHOLDER).orderBy("row_Index"));
+		List<JSONObject> res = new ArrayList<>();
 		for (SysParameter s : list) {
-			JSONObject j = new JSONObject() ;
+			JSONObject j = new JSONObject();
 			j.put("param_id", s.getParamId());
 			j.put("param_name", s.getParamName());
 			j.put("param_type", s.getParamType());
@@ -170,7 +176,7 @@ public class SysParameterController {
 		}
 		return Result.success(res);
 	}
-	
+
 	@GetMapping("/get")
 	@ResponseBody
 	public Result get(String paramId) {
@@ -180,27 +186,29 @@ public class SysParameterController {
 		}
 		return Result.success(sysParameter);
 	}
-	
+
 	@PostMapping("/addParm")
 	@ResponseBody
+	@ApiOperation(value = "新增参数")
 	public Result addParm(@RequestBody List<JSONObject> params) {
-		if (params==null||params.size()==0) {
+		if (params == null || params.size() == 0) {
 			return Result.error("500", "params不能为空");
 		}
-		List<SysParameter> sysParameters = new ArrayList<>() ;
+		List<SysParameter> sysParameters = new ArrayList<>();
 		String paramType = params.get(0).getString("param_type");
 		String paramTypeName = params.get(0).getString("param_type_name");
 		String userId = loginUserInfoHelper.getUserId();
-		List<SysParameter> list = sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", paramType).eq("param_type_name", paramTypeName).orderBy("create_time")) ;
-		
-		if (list==null||list.size()==0) {
-			return Result.error("500", "找不到param_type:"+paramType+"&param_type_name:"+paramTypeName);
+		List<SysParameter> list = sysParameterService.selectList(new EntityWrapper<SysParameter>()
+				.eq("param_type", paramType).eq("param_type_name", paramTypeName).orderBy("create_time"));
+
+		if (list == null || list.size() == 0) {
+			return Result.error("500", "找不到param_type:" + paramType + "&param_type_name:" + paramTypeName);
 		}
-		
+
 		SysParameter sysParameter = list.get(0);
-		
+
 		for (JSONObject j : params) {
-			SysParameter s = new SysParameter() ;
+			SysParameter s = new SysParameter();
 			s.setParamName(j.getString("param_name"));
 			s.setParamType(j.getString("param_type"));
 			s.setParamTypeName(j.getString("param_type_name"));
@@ -216,19 +224,81 @@ public class SysParameterController {
 			s.setStatus(sysParameter.getStatus());
 			sysParameters.add(s);
 		}
-		
+
 		for (SysParameter s : list) {
 			if (s.getParamValue().equals(Constant.SYS_PARAMETER_PLACEHOLDER.toString())) {
 				s.deleteById();
 				break;
 			}
 		}
-		
+
 		boolean result = sysParameterService.insertBatch(sysParameters);
 		if (result) {
 			return Result.success();
-		}else {
+		} else {
 			return Result.error("500", "数据新增失败");
+		}
+	}
+
+	@PostMapping("/updateParm")
+	@ResponseBody
+	@ApiOperation(value = "更新参数")
+	public Result updateParm(@RequestBody JSONObject param) {
+		if (param == null || param.keySet().size() == 0) {
+			return Result.error("500", "param不能为空");
+		}
+		String paramId = param.getString("param_id");
+		String paramType = param.getString("param_type");
+		String paramTypeName = param.getString("param_type_name");
+		String userId = loginUserInfoHelper.getUserId();
+		SysParameter sysParameter = sysParameterService.selectById(paramId);
+		if (sysParameter == null) {
+			return Result.error("500", "找不到param_id:" + paramId + "的参数");
+		}
+
+		String paramValue = param.getString("param_value");
+		String paramValue2 = param.getString("param_value2");
+		String paramValue3 = param.getString("param_value3");
+		String paramValue4 = param.getString("param_value4");
+		String paramValue5 = param.getString("param_value5");
+		String remark = param.getString("remark");
+		String paramName = param.getString("param_name");
+
+		sysParameter.setUpdateTime(new Date());
+		sysParameter.setUpdateUser(loginUserInfoHelper.getUserId());
+		sysParameter.setParamName(paramName);
+		sysParameter.setParamValue(paramValue);
+		sysParameter.setParamValue2(paramValue2);
+		sysParameter.setParamValue3(paramValue3);
+		sysParameter.setParamValue4(paramValue4);
+		sysParameter.setParamValue5(paramValue5);
+		sysParameter.setRemark(remark);
+
+		boolean result = sysParameter.updateById();
+		if (result) {
+			return Result.success();
+		} else {
+			return Result.error("500", "数据更新失败");
+		}
+	}
+	
+	@DeleteMapping("/delParm")
+	@ResponseBody
+	@ApiOperation(value = "删除参数")
+	public Result delParm(String paramId) {
+		if (paramId == null || paramId.equals("")) {
+			return Result.error("500", "paramId不能为空");
+		}
+		SysParameter sysParameter = sysParameterService.selectById(paramId);
+		if (sysParameter == null) {
+			return Result.error("500", "找不到param_id:" + paramId + "的参数");
+		}
+
+		boolean result = sysParameter.deleteById();
+		if (result) {
+			return Result.success();
+		} else {
+			return Result.error("500", "数据删除失败");
 		}
 	}
 }

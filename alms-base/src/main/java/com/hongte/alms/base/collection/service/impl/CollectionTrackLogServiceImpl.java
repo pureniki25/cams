@@ -1,11 +1,9 @@
 package com.hongte.alms.base.collection.service.impl;
 
 import com.baomidou.mybatisplus.plugins.Page;
-import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.hongte.alms.base.collection.entity.CollectionTrackLog;
 import com.hongte.alms.base.collection.mapper.CollectionTrackLogMapper;
 import com.hongte.alms.base.collection.service.CollectionTrackLogService;
-import com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo;
 import com.hongte.alms.base.collection.vo.CollectionTrackLogVo;
 import com.hongte.alms.base.collection.vo.CollectionTrckLogReq;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
@@ -39,6 +37,11 @@ public class CollectionTrackLogServiceImpl extends BaseServiceImpl<CollectionTra
 
         return pages;
 
+    }
+
+    @Override
+    public List<String> selectProjectIdByRbpId(String rbpId) {
+        return collectionTrackLogMapper.selectProjectIdByRbpId(rbpId);
     }
 
 
