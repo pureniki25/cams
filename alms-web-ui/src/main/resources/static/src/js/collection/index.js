@@ -560,7 +560,7 @@ var  collect_level_array= [{
 //查询表单验证
 var setSearchFormValidate = {
     delayDaysBegin: [
-        {pattern: '^[0-9]*$', message: '请输入数字',trigger: 'blur'  },
+        {pattern: /^[0-9]*$/, message: '请输入数字',trigger: 'blur'  },
         {
             validator: function (rule, value, callback, source, options) {
                 if(vm.searchForm.delayDaysBegin!=""&& vm.searchForm.delayDaysEnd!=""){

@@ -310,10 +310,10 @@ var getSelectsData = function () {
 //查询表单验证
 var setSearchFormValidate = {
 /*    delayDaysBegin: [
-        {pattern: '^[0-9]*$', message: '请输入数字',trigger: 'blur'  },
+        {pattern: /^[0-9]*$/, message: '请输入数字',trigger: 'blur'  },
     ],
     delayDaysEnd: [
-        {pattern: '^[0-9]*$', message: '请输入数字',trigger: 'blur'  }
+        {pattern: /^[0-9]*$/, message: '请输入数字',trigger: 'blur'  }
     ],
     operatorName: [
         {type: 'string', message: '请输入文字', trigger: 'blur'}

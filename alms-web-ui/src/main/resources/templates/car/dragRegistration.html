@@ -262,11 +262,11 @@
                             trigger: 'blur'
                         }],
                         fee: [{required: true, message: '请填写拖车费用', trigger: 'blur'}, {
-                            pattern: "^[0-9]+(.[0-9]{1,2})?$",
+                            pattern: /^[0-9]+(.[0-9]{1,2})?$/,
                             message: '请填写不超过两位小数的数字',
                             trigger: 'blur'
                         }],
-                        otherFee: [{pattern: "^[0-9]+(.[0-9]{1,2})?$", message: '请填写不超过两位小数的数字', trigger: 'blur'}],
+                        otherFee: [{pattern: /^[0-9]+(.[0-9]{1,2})?$/, message: '请填写不超过两位小数的数字', trigger: 'blur'}],
                         remark: [{
 
                             validator: function (rule, value, callback, source, options) {
