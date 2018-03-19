@@ -33,7 +33,7 @@ public class CollectionTrackLogServiceImpl extends BaseServiceImpl<CollectionTra
         pages.setCurrent(req.getPage());
         pages.setSize(req.getLimit());
 
-        pages.setRecords(collectionTrackLogMapper.selectCollectionTrackLogByRbpId(pages,req.getRbpId()));
+        pages.setRecords(collectionTrackLogMapper.selectCollectionTrackLogByRbpId(pages,req.getRbpId(),req.getBusinessId()));
 
         return pages;
 

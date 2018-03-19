@@ -11,6 +11,7 @@ public class TreeTitle {
     private String title;
     private boolean loading = false;
     private List<Object> children;
+    private boolean checked ;
 
     public String getTitle() {
         return title;
@@ -34,5 +35,13 @@ public class TreeTitle {
 
     public void setChildren(List<Object> children) {
         this.children = children;
+    }
+
+    public boolean isChecked() {
+        return checked;
+    }
+
+    public void setChecked(boolean checked) {
+        this.checked = checked;
     }
 }

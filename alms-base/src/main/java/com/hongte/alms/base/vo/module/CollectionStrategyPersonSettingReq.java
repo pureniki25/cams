@@ -3,6 +3,9 @@ package com.hongte.alms.base.vo.module;
 import com.hongte.alms.common.vo.PageRequest;
 import io.swagger.annotations.ApiModel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 催收策略人员设置查询请求对象
  * @author dengzhiming
@@ -13,6 +16,16 @@ public class CollectionStrategyPersonSettingReq extends PageRequest {
     private String areaId;
     private String companyId;
     private String userName;
+    private String[] userNames = new String[]{};
+
+    public String[] getUserNames() {
+        return userNames;
+    }
+
+    public void setUserNames(String[] userNames) {
+        this.userNames = userNames;
+    }
+
     public String getAreaId() {
         return areaId;
     }

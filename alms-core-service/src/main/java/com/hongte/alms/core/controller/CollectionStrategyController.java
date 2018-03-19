@@ -26,6 +26,7 @@ import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.core.service.CollectionStrategyPersonService;
+import com.ht.ussp.util.DateUtil;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -78,8 +79,7 @@ public class CollectionStrategyController {
     {
         try {
             if(StringUtils.isNotBlank(req.getUserName())){
-               List<String> names =  Arrays.asList(req.getUserName().split(","));
-//               req.setUserNames(names);
+               req.setUserNames(req.getUserName().split("/"));
             }
             Page<CollectionStrategyPersonSettingVo> personSettingPages=collectionPersonSettingService.getCollectionPersonSettingList(req);
             return PageResult.success(personSettingPages.getRecords(),personSettingPages.getTotal());
@@ -152,7 +152,7 @@ public class CollectionStrategyController {
     @ResponseBody
     public Result saveTimeSet(@RequestBody CollectionTimeSet set,@RequestHeader HttpHeaders headers){
         System.out.println(set);
-
+        System.out.println(DateUtil.formatDate("yyyy-MM-dd",set.getStartTime()));
         collectionTimeSetService.updateById(set);
         return Result.success();
     }
