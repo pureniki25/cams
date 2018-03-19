@@ -1,6 +1,5 @@
 package com.hongte.alms.base.collection.mapper;
 
-import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.hongte.alms.base.collection.entity.CollectionTrackLog;
 import com.hongte.alms.base.collection.vo.CollectionTrackLogVo;
@@ -25,7 +24,9 @@ public interface CollectionTrackLogMapper extends SuperMapper<CollectionTrackLog
      * @param rbpId
      * @return
      */
-    List<CollectionTrackLogVo> selectCollectionTrackLogByRbpId(@Param("rbpId")String rbpId );
-    List<CollectionTrackLogVo> selectCollectionTrackLogByRbpId(Pagination pages,@Param("rbpId")String rbpId );
+    List<CollectionTrackLogVo> selectCollectionTrackLogByRbpId(@Param("rbpId") String rbpId);
+    List<CollectionTrackLogVo> selectCollectionTrackLogByRbpId(Pagination pages, @Param("rbpId") String rbpId);
+
+    List<String> selectProjectIdByRbpId(String rbpId);
 
 }

@@ -1,16 +1,16 @@
 package com.hongte.alms.base.collection.entity;
 
-import java.io.Serializable;
-
-import com.baomidou.mybatisplus.enums.IdType;
-import java.util.Date;
-import com.baomidou.mybatisplus.annotations.TableId;
-import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableField;
+import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
-import java.io.Serializable;
+import com.baomidou.mybatisplus.enums.IdType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
+import java.io.Serializable;
+import java.util.Date;
+
 /**
  * <p>
  * 贷后跟踪记录表
@@ -102,6 +102,25 @@ public class CollectionTrackLog extends Model<CollectionTrackLog> {
 	@TableField("update_user")
 	@ApiModelProperty(required= true,value = "更新人用户ID")
 	private String updateUser;
+	/**
+	 * 成功的标的id
+	 */
+	@TableField("success_project_id")
+	@ApiModelProperty(required= true,value = "成功的标的id")
+	private String successProjectId;
+	/**
+	 * 失败的标的id
+	 */
+	@TableField("fail_project_id")
+	@ApiModelProperty(required= true,value = "失败的标的id")
+	private String failProjectId;
+
+	/**
+	 * 是否重发
+	 */
+	@TableField("is_resend")
+	@ApiModelProperty(required= true,value = "是否重发（推平台）")
+	private String isResend;
 
 
 	public Integer getTrackLogId() {
@@ -208,6 +227,30 @@ public class CollectionTrackLog extends Model<CollectionTrackLog> {
 		this.updateUser = updateUser;
 	}
 
+	public String getSuccessProjectId() {
+		return successProjectId;
+	}
+
+	public void setSuccessProjectId(String successProjectId) {
+		this.successProjectId = successProjectId;
+	}
+
+	public String getFailProjectId() {
+		return failProjectId;
+	}
+
+	public void setFailProjectId(String failProjectId) {
+		this.failProjectId = failProjectId;
+	}
+
+	public String getIsResend() {
+		return isResend;
+	}
+
+	public void setIsResend(String isResend) {
+		this.isResend = isResend;
+	}
+
 	@Override
 	protected Serializable pkVal() {
 		return this.trackLogId;
@@ -229,6 +272,9 @@ public class CollectionTrackLog extends Model<CollectionTrackLog> {
 			", createUser=" + createUser +
 			", updateTime=" + updateTime +
 			", updateUser=" + updateUser +
+			", failProjectId=" + failProjectId +
+			", successProjectId=" + successProjectId +
+			", isResend=" + isResend +
 			"}";
 	}
 }
