@@ -46,7 +46,7 @@ public class CollectionTimeSet extends Model<CollectionTimeSet> {
 	private Integer overDueDays;
 	@TableField("start_time")
 	@ApiModelProperty(required= true,value = "")
-	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date startTime;
     /**
      * 创建时间
