@@ -205,7 +205,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 			Integer businessType = transferOfLitigationMapper.queryBusinessType(businessId);
 			
-			if (transferLitigationData != null && businessType != null) {
+			if (transferLitigationData != null || businessType != null) {
 				throw new ServiceRuntimeException("没有找到相关数据，发送诉讼系统失败！");
 			}
 
