@@ -204,26 +204,28 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			transferLitigationData = transferOfLitigationMapper.queryTransferLitigationData(businessId, crpId);
 
 			Integer businessType = transferOfLitigationMapper.queryBusinessType(businessId);
-
+			
 			if (transferLitigationData != null && businessType != null) {
-				transferLitigationData.setCreateUserId(loginUserInfoHelper.getUserId());
-				// 判断业务类型，根据业务类型查询对应的房贷或车贷数据
-				if (businessType == 1 || businessType == 9) {
-					transferLitigationData.setBusinessTypeGroup(XIAO_DAI_CAR);
-					transferLitigationData
-							.setCarList(transferOfLitigationMapper.queryTransferLitigationCarData(businessId));
-				}
-				if (businessType == 2 || businessType == 11) {
-					transferLitigationData.setBusinessTypeGroup(XIAO_DAI_HOUSE);
+				throw new ServiceRuntimeException("没有找到相关数据，发送诉讼系统失败！");
+			}
 
-					transferLitigationData.setHouseList(assembleBusinessHouse(businessId));
-				}
-				LitigationResponse litigationResponse = sendLitigation(transferLitigationData, sendUrl);
-				if (litigationResponse != null && litigationResponse.getCode() == 1) {
-					LitigationResponseData data = litigationResponse.getData();
-					if (!data.isImportSuccess()) {
-						throw new ServiceRuntimeException(data.getMessage());
-					}
+			transferLitigationData.setCreateUserId(loginUserInfoHelper.getUserId());
+			// 判断业务类型，根据业务类型查询对应的房贷或车贷数据
+			if (businessType == 1 || businessType == 9) {
+				transferLitigationData.setBusinessTypeGroup(XIAO_DAI_CAR);
+				transferLitigationData
+						.setCarList(transferOfLitigationMapper.queryTransferLitigationCarData(businessId));
+			}
+			if (businessType == 2 || businessType == 11) {
+				transferLitigationData.setBusinessTypeGroup(XIAO_DAI_HOUSE);
+
+				transferLitigationData.setHouseList(assembleBusinessHouse(businessId));
+			}
+			LitigationResponse litigationResponse = sendLitigation(transferLitigationData, sendUrl);
+			if (litigationResponse != null && litigationResponse.getCode() == 1) {
+				LitigationResponseData data = litigationResponse.getData();
+				if (!data.isImportSuccess()) {
+					throw new ServiceRuntimeException(data.getMessage());
 				}
 			}
 		} catch (Exception e) {
