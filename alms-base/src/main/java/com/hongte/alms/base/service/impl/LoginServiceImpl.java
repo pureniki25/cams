@@ -68,10 +68,11 @@ public class LoginServiceImpl implements LoginService {
                 sysRole.setRoleCode(boa.getRoleCode());
                 sysRole.setRoleName(boa.getRoleNameCn());
                 sysRoleList.add(sysRole);
-                SysRole sysRole1 = sysRoleService.selectOne(new EntityWrapper<SysRole>().eq("role_code",boa.getROrgCode()).eq("role_name",boa.getRoleNameCn()));
-                if(sysRole1 != null){
-                    sysRoleService.insert(sysRole);
-                }
+//                SysRole sysRole1 = sysRoleService.selectOne(new EntityWrapper<SysRole>().eq("role_code",boa.getROrgCode()).eq("role_name",boa.getRoleNameCn()));
+//                if(sysRole1 == null){
+//                    sysRoleService.insert(sysRole);
+//                }
+                sysRoleService.delete(new EntityWrapper<SysRole>().eq("role_code",boa.getROrgCode()));
 
 
                 SysUserRole sysUserRole = new SysUserRole();
@@ -79,11 +80,16 @@ public class LoginServiceImpl implements LoginService {
                 sysUserRole.setUserId(dto.getUserId());
                 sysUserRoleList.add(sysUserRole);
 
-                SysUserRole sysUserRole1 = sysUserRoleService.selectOne(new EntityWrapper<SysUserRole>().eq("role_code",boa.getROrgCode()).eq("user_id",boa.getRoleNameCn()));
-                if(sysUserRole1 != null){
-                    sysUserRoleService.insert(sysUserRole);
-                }
+                sysUserRoleService.delete(new EntityWrapper<SysUserRole>().eq("role_code",boa.getROrgCode()));
+//                SysUserRole sysUserRole1 = sysUserRoleService.selectOne(new EntityWrapper<SysUserRole>().eq("role_code",boa.getROrgCode()).eq("user_id",boa.getRoleNameCn()));
+//                if(sysUserRole1 == null){
+//                    sysUserRoleService.insert(sysUserRole);
+//                }
             }
+            sysRoleService.insertBatch(sysRoleList);
+            sysUserRoleService.insertBatch(sysUserRoleList);
+
+
         }
 
     }
