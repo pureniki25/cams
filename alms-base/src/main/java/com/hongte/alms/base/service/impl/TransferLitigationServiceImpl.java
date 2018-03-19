@@ -224,10 +224,12 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			LitigationResponse litigationResponse = sendLitigation(transferLitigationData, sendUrl);
 			if (litigationResponse != null && litigationResponse.getCode() == 1) {
 				LitigationResponseData data = litigationResponse.getData();
+				LOG.info("---sendTransferLitigationData--- 诉讼系统返回信息：" + data.toString());
 				if (!data.isImportSuccess()) {
 					throw new ServiceRuntimeException(data.getMessage());
 				}
 			}
+			LOG.info("发送诉讼系统成功！！！");
 		} catch (Exception e) {
 			LOG.error("发送诉讼系统失败！！！", e);
 			throw new ServiceRuntimeException(e.getMessage(), e);
