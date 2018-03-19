@@ -30,7 +30,7 @@
             parameterType="com.hongte.alms.base.vo.module.InfoSmsListSearchReq">
 
       
-  select  sms.log_id as logId,sms.plan_list_id as planListId,sms.original_business_id as originalBusinessId,sms.after_id as afterId,sms.phone_number as phoneNumber,
+  select  b_type.business_type_id as businessTypeId,sms.log_id as logId,sms.plan_list_id as planListId,sms.original_business_id as originalBusinessId,sms.after_id as afterId,sms.phone_number as phoneNumber,
      sms.sms_type as smsType,sms.send_date as sendDate,sms.content as content, sms.service_name as serviceName,sms.status as status,sms.service_status_code as serviceStatusCode,sms.create_time as createTime,sms.create_user as createUser,
      sms.update_time as UpdateTime,sms.update_user as updateUser,sms.recipient as recipient,  company.district_id as districtId,      business.company_id as companyId,
              b_type.business_type_name AS businessTypeName
