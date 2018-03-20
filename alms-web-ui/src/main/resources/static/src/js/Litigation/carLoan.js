@@ -514,7 +514,7 @@ var Submit = function () {
         vm.$refs['approvalInfoForm'].validate((valid) => {
             if(valid){
                 if(vm.approvalInfoForm.isCreaterFlage){
-                    vm.approvalInfoForm.applyInfo = '';
+                    vm.approvalInfoForm.applyInfo = null;
                     vm.$refs['estatesForm'].validate((valid) => { // 校验申请信息
                     	vm.$refs['commitInfoForm'].validate((valid) => { // 校验申请信息
 	                        if(valid){

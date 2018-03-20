@@ -9,14 +9,17 @@ import com.hongte.alms.base.collection.vo.AfterLoanStandingBookReq;
 import com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo;
 import com.hongte.alms.base.collection.vo.StaffBusinessReq;
 import com.hongte.alms.base.collection.vo.StaffBusinessVo;
+import com.hongte.alms.base.entity.BasicCompany;
 import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.entity.SysUser;
 import com.hongte.alms.base.enums.RepayPlanStatus;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
+import com.hongte.alms.base.service.BasicCompanyService;
 import com.hongte.alms.base.service.SysParameterService;
 import com.hongte.alms.base.service.SysUserService;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.DateUtil;
+import com.ht.ussp.bean.LoginUserInfoHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -40,6 +43,8 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
     PhoneUrgeMapper phoneUrgeMapper;
 
 
+    @Autowired
+    LoginUserInfoHelper loginUserInfoHelper;
 
     @Autowired
     @Qualifier("SysParameterService")
@@ -48,6 +53,11 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
     @Autowired
     @Qualifier("SysUserService")
     SysUserService sysUserService;
+
+    @Autowired
+    @Qualifier("BasicCompanyService")
+    BasicCompanyService basicCompanyService;
+
 
 //    @Override
 //    public Page<StaffBusinessVo> selectPhoneUrgePage(Page<StaffBusinessVo> pages, StaffBusinessReq key) {
@@ -82,6 +92,22 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
             req.setLiquidationTowUIds(sysUserService.selectUseIdsByName(req.getLiquidationTow()));
         }
 
+        //区域转换为公司列表
+        List<String> areas = new LinkedList<String>();
+        if(req.getAreaId()!= null && req.getAreaId()!=""){
+            areas.add(req.getAreaId());
+        }
+        List<String> coms = new LinkedList<>();
+        if(req.getCompanyId()!=null && req.getCompanyId()!=""){
+            coms.add(req.getCompanyId());
+        }
+        List<String> cIds = basicCompanyService.selectUserSearchComIds(loginUserInfoHelper.getUserId(),areas,coms);
+
+        if(cIds.size()>0){
+            req.setCommIds(cIds);
+        }
+
+
         List<AfterLoanStandingBookVo> list = phoneUrgeMapper.selectAfterLoadStanding(pages,req);
 
         for(AfterLoanStandingBookVo vo: list){
@@ -106,6 +132,24 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
         return pages;
 
     }
+
+
+    public  List<String> getUserSearchComIds(AfterLoanStandingBookReq req){
+
+        //取用户可访问的公司列表
+        //1.用户拥有全局数据范围的权限 则取所有公司
+
+        //2.用户拥有区域范围的权限
+        // 则1）取用户区域表的配置
+        // 如果没有 则从用户信息表中取原信贷的组织机构 查出公司ID  再没有就取现在UC上的组织机构ID查公司ID
+
+
+
+
+        return  null;
+
+    }
+
 
     @Override
     public List<AfterLoanStandingBookVo> selectAfterLoanStandingBookList(AfterLoanStandingBookReq req){

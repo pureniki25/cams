@@ -55,7 +55,7 @@ public class SetUserPermission implements   BaseJob {
     //运行的标志位
     private  static  boolean runningFlage = false;
 
-//    @Scheduled(cron = "0/1 * * * * ? ")
+    @Scheduled(cron = "0/5 * * * * ? ")
     public  void job(){
 
         if(runningFlage){
