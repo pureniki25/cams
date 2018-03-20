@@ -103,20 +103,23 @@ var layer;
         var reqStr =openPath+ "WithHoldingController/withholding?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId+"&total="+vm.ajax_data.total+"&planOverDueMoney="+vm.ajax_data.planOverDueMoney+"&platformId="+vm.ajax_data.platformId+"&type=1"+"&nowdate="+vm.ajax_data.nowdate
         axios.get(reqStr)
             .then(function (result) {
-                if (result.data.code == "1") {debugger
+                if (result.data.code == "1") {
                 	
           
                 	 vm.$Modal.success({
                          title: '',
-                         content: '代扣正在处理中,请稍后查看代扣结果'
+                         content:result.data.data
                      });
                 } else {
-                    self.$Modal.error({content: '获取数据失败：' + result.data.msg});
+                    self.$Modal.error({content:result.data.msg});
                 }
             })
    
         .catch(function (error) {
-            vm.$Modal.error({content: '接口调用异常!'});
+        
+        		   vm.$Modal.error({content: '接口调用异常!'});
+        
+        
         });
 		
    
@@ -129,7 +132,7 @@ var layer;
         var reqStr =openPath+ "WithHoldingController/withholding?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId+"&total="+vm.ajax_data.total+"&planOverDueMoney="+vm.ajax_data.planOverDueMoney+"&platformId="+vm.ajax_data.platformId+"&type=0"+"&nowdate="+vm.ajax_data.nowdate
         axios.get(reqStr)
             .then(function (result) {
-                if (result.data.code == "1") {debugger
+                if (result.data.code == "1") {
                 	
           
                 	 vm.$Modal.success({
@@ -155,7 +158,7 @@ var layer;
         var self = this;
         var reqStr =openPath+ "WithHoldingController/searchRepayLog?originalBusinessId=" +vm.ajax_data.originalBusinessId;
         axios.get(reqStr)
-            .then(function (result) {debugger
+            .then(function (result) {
                 if (result.data.code == "1") {
                 	
                 	result.data.data;
@@ -178,7 +181,7 @@ var layer;
         var reqStr =basePath+ "DeductionController/selectDeductionInfoByPlayListId?planListId=" + planListId
         axios.get(reqStr)
             .then(function (result) {
-                if (result.data.code == "1") {debugger
+                if (result.data.code == "1") {
                 	
           
                     vm.ajax_data=result.data.data;
@@ -271,7 +274,7 @@ var layer;
         var self = this;  
         var reqStr =basePath+ "DeductionController/getDeductionPlatformInfo"
         axios.get(reqStr)
-            .then(function (result) {debugger
+            .then(function (result) {
                 if (result.data.code == "1") {
                 	
           

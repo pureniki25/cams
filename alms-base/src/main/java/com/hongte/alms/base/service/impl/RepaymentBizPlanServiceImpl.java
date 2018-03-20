@@ -149,7 +149,8 @@ public class RepaymentBizPlanServiceImpl extends BaseServiceImpl<RepaymentBizPla
 				
 				repaymentBizPlanDetailListService.insert(detail);
 				
-				WithholdingRecordLog log=WithholdingRecordLogService.selectWithholdingRecordLog(data.getOriginalBusinessId(), data.getAfterId());
+				List<WithholdingRecordLog> loglist=WithholdingRecordLogService.selectWithholdingRecordLog(data.getOriginalBusinessId(), data.getAfterId());
+				WithholdingRecordLog log=loglist.get(0);
 				log.setRepayStatus(1);
 				WithholdingRecordLogService.updateById(log);
 				
