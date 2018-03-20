@@ -80,11 +80,15 @@ public class ProcessVo {
     private Date updateTime;
 
 
+
     /**
      * 所属分公司
      */
     private String companyId;
-
+    /**
+     * 所属分公司名称
+     */
+    private String companyName;
 
     public String getProcessName() {
         return processName;
@@ -245,5 +249,13 @@ public class ProcessVo {
 
     public void setpResult(Integer pResult) {
         this.pResult = pResult;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
 }

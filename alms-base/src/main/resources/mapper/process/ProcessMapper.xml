@@ -267,7 +267,8 @@
         process.create_user as createUser,
         process.process_result as pResult,
         s_user.user_name as createUserName,
-		business.company_id as companyId
+		business.company_id as companyId,
+		business.company_name as companyName
         from tb_process as process
         LEFT JOIN tb_basic_business as business ON process.business_id = business.business_id
         LEFT JOIN tb_process_type as p_type ON process.process_typeid = p_type.type_id
@@ -302,6 +303,14 @@
                 or (business.customer_name  LIKE '%${keyWord}%')
                 or (process.process_name LIKE '%${keyWord}%')
                 or (process.create_user LIKE	 '%${keyWord}%'))
+                <!--  发起人列表 -->
+                <if test="startUserIds !=null">
+                    OR process.create_user  IN
+                    <foreach collection="startUserIds" item="userId" index="index"
+                             open="(" close=")" separator=",">
+                        #{userId}
+                    </foreach>
+                </if>
             </if>
 
             <!--          /*发起时间 开始*/ -->
@@ -329,9 +338,10 @@
                 and process.status = #{processStatus}
             </if>
            <!--            /*分公司*/ -->
-            <if test="companyId !=null and processTypeId != ''">
+            <if test="companyId !=null and companyId != ''">
                 and business.company_id = #{companyId}
             </if>
+
 
              <!--            需要我审批的 -->
             <if test="reqPageeType == 'waitToApprove' ">
@@ -342,6 +352,8 @@
             <if test="reqPageeType == 'SelfStart' ">
                 AND  process.start_user_id = #{currentUserId}
             </if>
+
+
 
           <!--            审批查询 -->
             <!--  <if test="reqPageeType == Search ">

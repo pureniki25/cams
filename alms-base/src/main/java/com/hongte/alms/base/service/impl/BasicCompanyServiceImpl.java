@@ -59,8 +59,9 @@ public class BasicCompanyServiceImpl extends BaseServiceImpl<BasicCompanyMapper,
     public Map<String,BasicCompany>  selectCompanysMapByAreaId(List<String> areas){
         Integer count= 0;
         Map<String,BasicCompany> comMap = new HashMap<String,BasicCompany>();
-
-        getCompanysByAreaList(areas,count,comMap);
+        if(areas.size()>0){
+            getCompanysByAreaList(areas,count,comMap);
+        }
 
         return comMap;
 
@@ -116,8 +117,13 @@ public class BasicCompanyServiceImpl extends BaseServiceImpl<BasicCompanyMapper,
 
         //搜索选择的公司Map
         Map<String, BasicCompany>  searchMap = null;
-        if(areas.size()>0 || comIds.size()>0){
+        if(areas!=null && areas.size()>0){
             searchMap = selectCompanysMapByAreaId(areas);
+        }
+        if(comIds!=null&&comIds.size()>0){
+            if(searchMap == null){
+                searchMap = new HashMap<>();
+            }
             for(String comId:comIds){
                 BasicCompany c =  searchMap.get(comId);
                 if(c==null){

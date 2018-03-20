@@ -1,9 +1,11 @@
 package com.hongte.alms.base.process.vo;
 
+import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.vo.PageRequest;
 import net.sf.jsqlparser.expression.DateTimeLiteralExpression;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author zengkun
@@ -23,14 +25,21 @@ public class ProcessReq  extends PageRequest {
     private Integer	 processStatus	; 	//审批状态,
     private String companyId		;//分公司
 
+    private List<String> companyIds;//用户可查看的分公司列表
+
     //当前用户ID
     private String currentUserId;
+
+    //发起用户列表
+    private List<String> startUserIds;
 
     //需要我审批的数据查询标志位
     private boolean waitTpApproveFlage = false;
 
     //我的审批 界面类型
     private String reqPageeType; //waitToApprove 需要我审批的;    Approved 我已审批的;      SelfStart 我发起的;   CopySendToMe 抄送我的;  Search 审批查询;
+
+
 
 
     public String getKeyWord() {
@@ -46,7 +55,7 @@ public class ProcessReq  extends PageRequest {
     }
 
     public void setCreateTimeBegin(Date createTimeBegin) {
-        this.createTimeBegin = createTimeBegin;
+        this.createTimeBegin = DateUtil.getThatDayBegin(createTimeBegin);
     }
 
     public Date getCreateTimeEnd() {
@@ -54,7 +63,7 @@ public class ProcessReq  extends PageRequest {
     }
 
     public void setCreateTimeEnd(Date createTimeEnd) {
-        this.createTimeEnd = createTimeEnd;
+        this.createTimeEnd = DateUtil.getDayEnd(createTimeEnd);
     }
 
     public String getProcessTypeId() {
@@ -94,7 +103,7 @@ public class ProcessReq  extends PageRequest {
     }
 
     public void setFinishTimeBegin(Date finishTimeBegin) {
-        this.finishTimeBegin = finishTimeBegin;
+        this.finishTimeBegin = DateUtil.getThatDayBegin(finishTimeBegin);
     }
 
     public Date getFinishTimeEnd() {
@@ -102,7 +111,7 @@ public class ProcessReq  extends PageRequest {
     }
 
     public void setFinishTimeEnd(Date finishTimeEnd) {
-        this.finishTimeEnd = finishTimeEnd;
+        this.finishTimeEnd = DateUtil.getThatDayEnd(finishTimeEnd);
     }
 
     public Date getFinishTimeRange() {
@@ -127,5 +136,21 @@ public class ProcessReq  extends PageRequest {
 
     public void setCompanyId(String companyId) {
         this.companyId = companyId;
+    }
+
+    public List<String> getStartUserIds() {
+        return startUserIds;
+    }
+
+    public void setStartUserIds(List<String> startUserIds) {
+        this.startUserIds = startUserIds;
+    }
+
+    public List<String> getCompanyIds() {
+        return companyIds;
+    }
+
+    public void setCompanyIds(List<String> companyIds) {
+        this.companyIds = companyIds;
     }
 }
