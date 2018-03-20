@@ -166,8 +166,8 @@ window.layinit(function (htConfig) {
                 axios.get(basePath+'api/getXindaiDeferView',{params:{businessId:data.id}})
                 .then(function(res){
                     if(res.data.code=='1'){
-                        app.loanDetailModal.url = res.data
-                        app.loanDetailModal.show = true 
+                        app.loanDetailModal.url = res.data.data;
+                        app.loanDetailModal.show = true ;
                     }else{
                         app.$Modal.error({content: res.msg||'接口调用异常!'});
                     }
