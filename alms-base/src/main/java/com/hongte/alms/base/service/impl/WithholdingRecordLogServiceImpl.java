@@ -5,6 +5,8 @@ import com.hongte.alms.base.mapper.WithholdingRecordLogMapper;
 import com.hongte.alms.base.service.WithholdingRecordLogService;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,9 +25,9 @@ public class WithholdingRecordLogServiceImpl extends BaseServiceImpl<Withholding
 	@Autowired
 	WithholdingRecordLogMapper withholdingRecordLogMapper;
 	@Override
-	public WithholdingRecordLog selectWithholdingRecordLog(String originalBusinessId, String afterId) {
-		WithholdingRecordLog log=withholdingRecordLogMapper.selectWithholdingRecordLog(originalBusinessId, afterId);
-		return log;
+	public List<WithholdingRecordLog> selectWithholdingRecordLog(String originalBusinessId, String afterId) {
+		List<WithholdingRecordLog> loglist=withholdingRecordLogMapper.selectWithholdingRecordLog(originalBusinessId, afterId);
+		return loglist;
 	}
 
 }

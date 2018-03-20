@@ -21,7 +21,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author dengzhiming
@@ -51,13 +53,15 @@ public class AreaController {
     {
         try {
             List<AreaProvinceItemVo> provinceItemList = new ArrayList<AreaProvinceItemVo>();
-            List<SysProvince> provinceList = provinceService.selectList(new EntityWrapper<SysProvince>().orderBy("id"));
-            for (SysProvince province : provinceList) {
+            List<SysProvince> allProvinceList = provinceService.selectList(new EntityWrapper<SysProvince>().orderBy("id"));
+            List<SysCity> allCityList = cityService.selectList(new EntityWrapper<SysCity>().orderBy("id"));
+            List<SysCounty> allCountyList = countyService.selectList(new EntityWrapper<SysCounty> ().orderBy("id"));
+            for (SysProvince province : allProvinceList) {
                 List<AreaCityItemVo> cityItemList = new ArrayList<AreaCityItemVo>();
-                List<SysCity> cityList = cityService.selectList(new EntityWrapper<SysCity>().eq("province_id", province.getId()).orderBy("id"));
+                List<SysCity> cityList=allCityList.stream().filter(p->p.getProvinceId().equals(province.getId())).sorted(Comparator.comparing(SysCity::getId)).collect(Collectors.toList());
                 for (SysCity city : cityList) {
                     List<AreaCountyItemVo> countyItemList = new ArrayList<AreaCountyItemVo>();
-                    List<SysCounty> countyList = countyService.selectList(new EntityWrapper().eq("city_id", city.getId()).orderBy("id"));
+                    List<SysCounty> countyList = allCountyList.stream().filter(p->p.getCityId().equals(city.getId())).sorted(Comparator.comparing(SysCounty::getId)).collect(Collectors.toList());
                     for (SysCounty county : countyList) {
                         AreaCountyItemVo countyItem = new AreaCountyItemVo();
                         countyItem.setValue(county.getName());

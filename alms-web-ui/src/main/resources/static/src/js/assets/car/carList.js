@@ -309,10 +309,10 @@ window.layinit(function (htConfig) {
                                    }
                           
                             }},
-                            {"name": "拍卖记录", click: function (e, currentItem) {
+                            {"name": "拍卖记录查看", click: function (e, currentItem) {
                             	
                             	   if(authValid('auctionRegList')){
-                            	     	showNewTab(currentItem,"auctionRegList","拍卖记录");
+                            	     	showNewTab(currentItem,"auctionRegList","拍卖记录查看");
                                      }else{
                                      	   layer.msg("对不起，你没有权限");
                                      	

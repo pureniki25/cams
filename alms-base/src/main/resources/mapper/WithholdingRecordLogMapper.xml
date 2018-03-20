@@ -43,9 +43,8 @@
 		tb_withholding_record_log
 
 
-		<where>
-
-			where
+		<where> 
+           1=1 and 
 			original_business_id=#{originalBusinessId} and
 			after_id=#{afterId}
 		</where>

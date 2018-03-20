@@ -145,7 +145,7 @@ height: 100%;
 		</Card>
 		
 		<Card>
-		<i-form ref="estatesForm" :model="commitInfoForm" label-position="right" :label-width="100" :rules="validEstatesForm">
+		<i-form ref="estatesForm" :model="commitInfoForm" label-position="right" :label-width="100">
 			<row :gutter="16">
 				<i-col span="22">
 	                <form-item v-if="applyInfoFormEditFlage" label="客户是否有房产：" prop="estates"  >
@@ -168,41 +168,38 @@ height: 100%;
 			<div class="layui-col-xs6 layui-col-md12">
 				<div class="grid-demo layui-bg-gray">
 					<table class="layui-table">
-						<tr v-for="(info, index) in commitInfoForm.componentOption">
+						<tr track-by="$index" v-for="(info, index) in componentOption" v-if="applyInfoFormEditFlage">
 							<td class="td_label">房产地址{{index + 1}}</td>
-							<td  v-if="applyInfoFormEditFlage"> 
-							      <cascader :data="commitInfoForm.componentOption[0].areaData" v-model="commitInfoForm.componentOption[index].registrationInfoForm.houseArea" filterable></cascader>
+							<td  > 
+							      <cascader :data="areaData" v-model="componentOption[index].houseArea" filterable></cascader>
 							</td>
-							<!-- <td v-else > 
-							      <cascader :data="commitInfoForm.componentOption[0].areaData" v-model="commitInfoForm.componentOption[index].registrationInfoForm.houseArea" disabled></cascader>
-							</td> -->
-							<td  v-if="applyInfoFormEditFlage"> 
-							      <i-input v-model="commitInfoForm.componentOption[index].registrationInfoForm.detailAddress" placeholder="详细地址" ></i-input>
+							<td  > 
+							      <i-input v-model="componentOption[index].detailAddress" placeholder="详细地址" ></i-input>
 							</td>
-							<!-- <td v-else> 
-							      <i-input v-model="commitInfoForm.componentOption[index].registrationInfoForm.detailAddress" placeholder="详细地址" disabled></i-input>
-							</td> -->
-							<td  v-if="applyInfoFormEditFlage"> 
-							      <i-input v-model="commitInfoForm.componentOption[index].registrationInfoForm.mortgageSituation" placeholder="房产抵押情况" ></i-input>
+							<td  > 
+							      <i-input v-model="componentOption[index].mortgageSituation" placeholder="房产抵押情况" ></i-input>
 							</td>
-							<!-- <td v-else> 
-							      <i-input v-model="commitInfoForm.componentOption[index].registrationInfoForm.mortgageSituation" placeholder="房产抵押情况" disabled></i-input>
-							</td> -->
-							<td  v-if="applyInfoFormEditFlage">
+							<td  >
 							  <div class="layui-btn-group">
 							    <button class="layui-btn layui-btn-primary layui-btn-sm" v-on:click="addHouseTabTr($event)"><i class="layui-icon"></i></button>
 							    <button v-if="index != 0" class="layui-btn layui-btn-primary layui-btn-sm"  v-on:click="removeHouseTabTr($event, index)"><i class="layui-icon"></i></button>
 							  </div>
 							  
-							 <!--  <div v-else class="layui-btn-group" disabled>
-							    <button disabled class="layui-btn layui-btn-primary layui-btn-sm" v-on:click="addHouseTabTr($event)"><i class="layui-icon"></i></button>
-							    <button disabled class="layui-btn layui-btn-primary layui-btn-sm"  v-on:click="removeHouseTabTr($event, index)"><i class="layui-icon"></i></button>
-							  </div> -->
-							
 							</td>
 							
 						</tr>
-						<tr v-for="(item,index) in commitInfoForm.houseAddress"><td>{{item}}</td></tr>
+						<tr v-for="(info, index) in commitInfoForm.componentOption" v-else disabled>
+							<td class="td_label">房产地址{{index + 1}}</td>
+							<td  disabled> 
+							      <cascader :data="areaData" v-model="componentOption[index].houseArea" filterable disabled></cascader>
+							</td>
+							<td  disabled> 
+							      <i-input  disabled v-model="componentOption[index].detailAddress" placeholder="详细地址" ></i-input>
+							</td>
+							<td  disabled> 
+							      <i-input disabled v-model="componentOption[index].mortgageSituation" placeholder="房产抵押情况" ></i-input>
+							</td>
+						</tr>
 					</table>
 				</div>
 			</div>

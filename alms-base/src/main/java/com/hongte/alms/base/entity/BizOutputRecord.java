@@ -97,7 +97,7 @@ public class BizOutputRecord extends Model<BizOutputRecord> {
      */
 	@TableField("withdraw_strStatus")
 	@ApiModelProperty(required= true,value = "提现状态说明")
-	private Integer withdrawStrStatus;
+	private String withdrawStrStatus;
     /**
      * 提现流水号，若线下出款则为空
      */
@@ -218,11 +218,11 @@ public class BizOutputRecord extends Model<BizOutputRecord> {
 		this.withdrawPlace = withdrawPlace;
 	}
 
-	public Integer getWithdrawStrStatus() {
+	public String getWithdrawStrStatus() {
 		return withdrawStrStatus;
 	}
 
-	public void setWithdrawStrStatus(Integer withdrawStrStatus) {
+	public void setWithdrawStrStatus(String withdrawStrStatus) {
 		this.withdrawStrStatus = withdrawStrStatus;
 	}
 

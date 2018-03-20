@@ -153,11 +153,13 @@ public class ApiController {
             params.put("extensionId", businessId);
             params.put("timestamp", timestamp);
             String sign = SignUtil.signTopRequest(params, appSecret, "MD5");
-            if (business.getBusinessType() == 1) {
+            int carType=9;
+            int houseType=11;
+            if (business.getBusinessType() == carType) {
                 String xindaiCarDeferUrl = xindaiDomain + "Operation/OpenDeferTrace/DetailDefer?" + "businessId=" + renewalBusiness.getOriginalBusinessId() + "&extensionId=" + businessId + "&appKey=" + appKey + "&timestamp=" + timestamp + "&sign=" + sign;
                 return Result.success(xindaiCarDeferUrl);
             }
-            if (business.getBusinessType() == 2) {
+            if (business.getBusinessType() == houseType) {
                 String xindaiHouseDeferUrl = xindaiDomain + "Operation/OpenDeferTrace/DetailHouseDefer?" + "businessId=" + renewalBusiness.getOriginalBusinessId() + "&extensionId=" + businessId + "&appKey=" + appKey + "&timestamp=" + timestamp + "&sign=" + sign;
                 return Result.success(xindaiHouseDeferUrl);
             }
