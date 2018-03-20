@@ -118,7 +118,7 @@ window.layinit(function (htConfig) {
 	        },
 	        
 	        commitInfoForm: {
-	        	areaData: [],
+//	        	areaData: [],
 	        	componentOption: [
 	            	{
     	            	houseArea: [],
@@ -407,9 +407,9 @@ var getShowInfo = function () {
         			vm.commitInfoForm.componentOption = res.data.data.houseAddress;
 				}
             	
-            	if (!vm.commitInfoForm.areaData || vm.commitInfoForm.areaData.length == 0) {
-            		vm.commitInfoForm.areaData = vm.areaData;
-				}
+//            	if (!vm.commitInfoForm.areaData || vm.commitInfoForm.areaData.length == 0) {
+//            		vm.commitInfoForm.areaData = vm.areaData;
+//				}
             	
             	var docFiles=res.data.data.returnRegFiles;
             	
