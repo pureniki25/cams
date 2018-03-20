@@ -504,7 +504,7 @@
 		  ORDER BY t2.`due_date` 
 		  LIMIT 1) minDueDate, -- 状态为'逾期', '还款中'的最早应还日期
 		  (SELECT 	  
-			  SUM(t.plan_amount)
+			  ifnull(SUM(t.plan_amount),0)
 			FROM
 			  tb_repayment_biz_plan_list_detail t,
 			  tb_repayment_biz_plan_list t2,
