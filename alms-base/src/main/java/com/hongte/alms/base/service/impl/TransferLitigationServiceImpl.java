@@ -13,9 +13,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
-import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
-import com.hongte.alms.base.collection.service.CollectionStatusService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
+import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
+import com.hongte.alms.base.collection.service.CollectionStatusService;
 import com.hongte.alms.base.entity.Doc;
 import com.hongte.alms.base.entity.DocType;
 import com.hongte.alms.base.entity.FsdHouse;
@@ -111,7 +111,6 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	@Qualifier("DocService")
 	private DocService docService;
 
-
 	@Autowired
 	@Qualifier("CollectionStatusService")
 	private CollectionStatusService collectionStatusService;
@@ -121,7 +120,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		if (StringUtil.isEmpty(businessId)) {
 			return null;
 		}
-
+		
 		Map<String, Object> resultMap = transferOfLitigationMapper.queryCarLoanData(businessId);
 
 		if (resultMap == null) {
@@ -178,6 +177,11 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 	@Override
 	public HouseLoanVO queryHouseLoanData(String businessId) {
+		
+		if (StringUtil.isEmpty(businessId)) {
+			return null;
+		}
+		
 		HouseLoanVO houseLoanData = transferOfLitigationMapper.queryHouseLoanData(businessId);
 		if (houseLoanData != null) {
 			List<HousePlanInfo> housePlanInfos = transferOfLitigationMapper.queryRepaymentPlanHouse(businessId);
@@ -204,7 +208,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			transferLitigationData = transferOfLitigationMapper.queryTransferLitigationData(businessId, crpId);
 
 			Integer businessType = transferOfLitigationMapper.queryBusinessType(businessId);
-			
+
 			if (transferLitigationData == null || businessType == null) {
 				throw new ServiceRuntimeException("没有找到相关数据，发送诉讼系统失败！");
 			}
@@ -302,56 +306,8 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		return Long.valueOf(StringUtil.isInteger(str) ? str : "0");
 	}
 
-//	private void sendLitigation(TransferOfLitigationVO transferOfLitigationVo, String sendUrl)
-//			throws ClientProtocolException, IOException {
-//
-//		CloseableHttpClient httpClient = null;
-//		CloseableHttpResponse response = null;
-//		try {
-//			// 创建httpclient对象
-//			httpClient = HttpClients.createDefault();
-//
-//			// 创建post方式请求对象
-//			HttpPost post = new HttpPost(sendUrl);
-//			// 构造消息头
-//			post.addHeader("Content-Type", "application/json");
-//
-//			// 构建消息实体
-//			StringEntity entity = new StringEntity(JSONObject.toJSONString(transferOfLitigationVo),
-//					Charset.forName("UTF-8"));
-//			entity.setContentEncoding("UTF-8");
-//
-//			// 发送Json格式的数据请求
-//			entity.setContentType("application/json");
-//			post.setEntity(entity);
-//			response = httpClient.execute(post);
-//
-//			// 检验返回码
-//			int statusCode = response.getStatusLine().getStatusCode();
-//			if (statusCode == HttpStatus.SC_OK) {
-//				LOG.info("--sendLitigation-- 请求成功: " + statusCode);
-//			} else {
-//				throw new ServiceRuntimeException("--sendLitigation-- 诉讼数据发送失败！！！状态码：" + statusCode);
-//			}
-//		} finally {
-//			if (httpClient != null) {
-//				try {
-//					httpClient.close();
-//				} catch (IOException e) {
-//					LOG.error("--sendLitigation-- httpClient.close() 失败！！！", e);
-//				}
-//			}
-//			if (response != null) {
-//				try {
-//					response.close();
-//				} catch (IOException e) {
-//					LOG.error("--sendLitigation-- response.close() 失败！！！", e);
-//				}
-//			}
-//		}
-//
-//	}
-	private LitigationResponse sendLitigation(TransferOfLitigationVO transferOfLitigationVo, String sendUrl) throws IOException {
+	private LitigationResponse sendLitigation(TransferOfLitigationVO transferOfLitigationVo, String sendUrl)
+			throws IOException {
 		BufferedReader reader = null;
 		HttpURLConnection httpUrlConn = null;
 		LitigationResponse litigationResponse = new LitigationResponse();
@@ -384,8 +340,9 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				builder.append(str);
 			}
 
-			litigationResponse = (LitigationResponse) JSONObject.parseObject(builder.toString(), LitigationResponse.class);
-		}finally {
+			litigationResponse = (LitigationResponse) JSONObject.parseObject(builder.toString(),
+					LitigationResponse.class);
+		} finally {
 			if (reader != null) {
 				reader.close();
 			}
@@ -408,7 +365,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		ProcessSaveReq processSaveReq = new ProcessSaveReq();
 		processSaveReq.setBusinessId(req.getBusinessId());
 		processSaveReq.setProcessStatus(Integer.valueOf(req.getProcessStatus()));
-		processSaveReq.setTitle("房贷移交诉讼审批流程");
+		processSaveReq.setTitle(ProcessTypeEnums.HOUSE_LOAN_LITIGATION.getName());
 		processSaveReq.setProcessId(req.getProcessId());
 
 		Process process = processService.saveProcess(processSaveReq, ProcessTypeEnums.HOUSE_LOAN_LITIGATION);
@@ -439,16 +396,18 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			throw new ServiceRuntimeException("参数不能空！");
 		}
 
+		String businessId = req.getBusinessId();
+
 		ProcessSaveReq processSaveReq = new ProcessSaveReq();
-		processSaveReq.setBusinessId(req.getBusinessId());
+		processSaveReq.setBusinessId(businessId);
 		processSaveReq.setProcessStatus(Integer.valueOf(req.getProcessStatus()));
-		processSaveReq.setTitle("车贷移交诉讼审批流程");
+		processSaveReq.setTitle(ProcessTypeEnums.CAR_LOAN_LITIGATION.getName());
 		processSaveReq.setProcessId(req.getProcessId());
 
 		Process process = processService.saveProcess(processSaveReq, ProcessTypeEnums.CAR_LOAN_LITIGATION);
 
 		List<TransferLitigationCar> litigationCars = transferLitigationCarService
-				.selectList(new EntityWrapper<TransferLitigationCar>().eq("business_id", req.getBusinessId())
+				.selectList(new EntityWrapper<TransferLitigationCar>().eq("business_id", businessId)
 						.eq("process_id", process.getProcessId()));
 
 		if (CollectionUtils.isEmpty(litigationCars)) {
@@ -460,7 +419,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			req.setUpdateTime(new Date());
 			req.setCreateUser(process.getCreateUser());
 			transferLitigationCarService.update(req, new EntityWrapper<TransferLitigationCar>()
-					.eq("business_id", req.getBusinessId()).eq("process_id", req.getProcessId()));
+					.eq("business_id", businessId).eq("process_id", req.getProcessId()));
 		}
 
 	}
@@ -646,13 +605,9 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			if (!CollectionUtils.isEmpty(cars) && status == ProcessStatusEnums.END.getKey()
 					&& processResult == ProcessApproveResult.PASS.getKey()) {
 				sendTransferLitigationData(businessId, cars.get(0).getCrpId(), sendUrl);
-				//更新贷后状态为  移交诉讼
-				collectionStatusService.setBussinessAfterStatus(
-						req.getBusinessId(),
-						req.getCrpId(),
-						"",
-						CollectionStatusEnum.TO_LAW_WORK,
-						CollectionSetWayEnum.MANUAL_SET);
+				// 更新贷后状态为 移交诉讼
+				collectionStatusService.setBussinessAfterStatus(req.getBusinessId(), req.getCrpId(), "",
+						CollectionStatusEnum.TO_LAW_WORK, CollectionSetWayEnum.MANUAL_SET);
 			}
 		} catch (Exception e) {
 			LOG.error("---saveCarProcessApprovalResult--- 存储房贷审批结果信息失败！", e);
@@ -677,13 +632,9 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			if (!CollectionUtils.isEmpty(houses) && status == ProcessStatusEnums.END.getKey()
 					&& processResult == ProcessApproveResult.PASS.getKey()) {
 				sendTransferLitigationData(businessId, houses.get(0).getCrpId(), sendUrl);
-				//更新贷后状态为  移交诉讼
-				collectionStatusService.setBussinessAfterStatus(
-						req.getBusinessId(),
-						req.getCrpId(),
-						"",
-						CollectionStatusEnum.TO_LAW_WORK,
-						CollectionSetWayEnum.MANUAL_SET);
+				// 更新贷后状态为 移交诉讼
+				collectionStatusService.setBussinessAfterStatus(req.getBusinessId(), req.getCrpId(), "",
+						CollectionStatusEnum.TO_LAW_WORK, CollectionSetWayEnum.MANUAL_SET);
 			}
 		} catch (Exception e) {
 			LOG.error("---saveHouseProcessApprovalResult--- 存储房贷审批结果信息失败！", e);
