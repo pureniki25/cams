@@ -1,5 +1,6 @@
 package com.hongte.alms.base.service;
 
+import com.hongte.alms.base.entity.BasicCompany;
 import com.hongte.alms.base.entity.SysOrg;
 import com.hongte.alms.base.entity.SysUser;
 import com.hongte.alms.common.service.BaseService;
@@ -32,5 +33,7 @@ public interface SysUserService extends BaseService<SysUser> {
      * @return  SysOrg 为区域信息对象  orgCode 对应为公司ID， orgName 对应为公司名字
      */
     public Map<String,SysOrg> selectCompanyByUserId(String userId);
+
+
 
 }

@@ -69,13 +69,13 @@
 
         <where>
             1=1
---             sys_param.param_type = 2
+            <!--   改用列表 IN查询 这两个先屏蔽
             <if test="areaId !=null and areaId !=''">
                 and business.company_id IN (SELECT area_id FROM tb_basic_company WHERE district_id = #{areaId})
             </if>
             <if test="companyId !=null and companyId !=''">
                 and business.company_id = #{companyId}
-            </if>
+            </if>-->
             <!--          /*应还日期 开始*/ -->
             <if test="showRepayDateBegin !=null ">
                 <![CDATA[ and pList.due_date >= #{showRepayDateBegin,jdbcType=TIMESTAMP}]]>
@@ -144,6 +144,14 @@
                 <foreach collection="customerIds" item="customerId" index="index"
                          open="(" close=")" separator=",">
                     #{customerId}
+                </foreach>
+            </if>
+            <!--   /*//分公司列表*/ -->
+            <if test="commIds !=null ">
+                and business.company_id IN
+                <foreach collection="commIds" item="commId" index="index"
+                         open="(" close=")" separator=",">
+                    #{commId}
                 </foreach>
             </if>
             <!--   /*//客户名称*/ -->
