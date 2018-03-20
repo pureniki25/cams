@@ -1,5 +1,7 @@
 package com.hongte.alms.base.service;
 
+import java.util.List;
+
 import com.hongte.alms.base.entity.WithholdingRecordLog;
 import com.hongte.alms.common.service.BaseService;
 
@@ -13,6 +15,6 @@ import com.hongte.alms.common.service.BaseService;
  */
 public interface WithholdingRecordLogService extends BaseService<WithholdingRecordLog> {
 
-	WithholdingRecordLog selectWithholdingRecordLog(String originalBusinessId,String afterId);
+	List<WithholdingRecordLog> selectWithholdingRecordLog(String originalBusinessId,String afterId);
 	
 }
