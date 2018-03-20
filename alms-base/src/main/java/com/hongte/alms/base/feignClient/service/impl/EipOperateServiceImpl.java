@@ -87,6 +87,8 @@ public class EipOperateServiceImpl implements EipOperateService {
                 log.setSendStatus(1);// 成功
                 result = Result.buildSuccess();
             }
+        }else {
+            result = Result.buildSuccess();
         }
 
         return result;

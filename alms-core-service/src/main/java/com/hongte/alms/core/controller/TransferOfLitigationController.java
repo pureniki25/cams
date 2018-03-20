@@ -1,14 +1,13 @@
 package com.hongte.alms.core.controller;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
-import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
-import com.hongte.alms.base.collection.service.CollectionStatusService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,10 +25,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.hongte.alms.base.collection.service.CollectionStatusService;
 import com.hongte.alms.base.entity.TransferLitigationCar;
 import com.hongte.alms.base.entity.TransferLitigationHouse;
-import com.hongte.alms.base.process.entity.Process;
-import com.hongte.alms.base.process.entity.ProcessTypeStep;
 import com.hongte.alms.base.process.enums.ProcessTypeEnums;
 import com.hongte.alms.base.process.service.ProcessService;
 import com.hongte.alms.base.process.service.ProcessTypeService;
@@ -39,6 +37,7 @@ import com.hongte.alms.base.service.TransferLitigationCarService;
 import com.hongte.alms.base.service.TransferLitigationHouseService;
 import com.hongte.alms.base.service.TransferOfLitigationService;
 import com.hongte.alms.base.vo.billing.CarLoanBilVO;
+import com.hongte.alms.base.vo.litigation.HouseAdressVO;
 import com.hongte.alms.base.vo.litigation.TransferOfLitigationVO;
 import com.hongte.alms.base.vo.litigation.house.HouseLoanVO;
 import com.hongte.alms.common.result.Result;
@@ -106,24 +105,33 @@ public class TransferOfLitigationController {
 
 				if (processId != null) {
 					List<TransferLitigationCar> applyList = transferLitigationCarService
-							.selectList(new EntityWrapper<TransferLitigationCar>().eq("process_id", processId));
+							.selectList(new EntityWrapper<TransferLitigationCar>().eq("process_id", processId).eq("business_id", businessId));
 
 					String houseAddr = applyList.get(0).getHouseAddress();
-					StringBuilder builder = new StringBuilder();
-					String[] houseArr = houseAddr.split("--#separator#--");
-
-					int count = 1;
-					if (houseAddr.length() > 0) {
-						for (String hArr : houseArr) {
-							if (count < houseArr.length) {
-								builder.append("房产地址" + count++ + "：").append(hArr).append("--#separator#--");
-							}else {
-								builder.append("房产地址" + count++ + "：").append(hArr);
+					if (StringUtil.notEmpty(houseAddr)) {
+						String[] houseArrs = houseAddr.split("--\\[#separator#\\]--");
+						
+						if (houseArrs != null && houseArrs.length > 0) {
+							
+							List<HouseAdressVO> houseAdressVOs = new ArrayList<>();
+							
+							for (String houseArr : houseArrs) {
+								
+								String[] subHouseArrs = houseArr.split("--#separator#--");
+								
+								if (subHouseArrs != null && subHouseArrs.length > 0) {
+									HouseAdressVO vo = new HouseAdressVO();
+									String replace1 = subHouseArrs[0].replace("[", "").replaceAll("]", "").replaceAll(" ","");
+									vo.setHouseArea(Arrays.asList(replace1.split(",")));
+									vo.setDetailAddress(subHouseArrs[1]);
+									vo.setMortgageSituation(subHouseArrs[2]);
+									houseAdressVOs.add(vo);
+								}
 							}
+							carLoanData.put("houseAddress", houseAdressVOs);
 						}
 					}
 
-					carLoanData.put("houseAddress", builder.toString());
 					carLoanData.put("carList", (JSONArray) JSON.toJSON(applyList, JsonUtil.getMapping()));
 				}
 
@@ -206,21 +214,20 @@ public class TransferOfLitigationController {
 			StringBuilder houseAddress = new StringBuilder();
 			List<LinkedHashMap<String, Object>> componentOptions = (List<LinkedHashMap<String, Object>>) req
 					.get("componentOption");
-            if(componentOptions!=null) {
-                for (LinkedHashMap<String, Object> componentOption : componentOptions) {
-                    LinkedHashMap<String, Object> registrationInfoForm = (LinkedHashMap<String, Object>) componentOption
-                            .get("registrationInfoForm");
-                    List<String> houseAreas = (List<String>) registrationInfoForm.get("houseArea");
-                    String detailAddress = (String) registrationInfoForm.get("detailAddress");
-                    String mortgageSituation = (String) registrationInfoForm.get("mortgageSituation");
-
-                    if (!CollectionUtils.isEmpty(houseAreas) && !StringUtil.isEmpty(detailAddress)
-                            && !StringUtil.isEmpty(mortgageSituation)) {
-                        String houseAreasStr = houseAreas.toString().replace("[", "").replace("]", "").replace(",", "");
-                        houseAddress.append(houseAreasStr).append(" ").append(detailAddress).append("，房产抵押情况：")
-                                .append(mortgageSituation).append("--#separator#--");
-                    }
-                }
+			if (!CollectionUtils.isEmpty(componentOptions)) {
+				for (LinkedHashMap<String, Object> componentOption : componentOptions) {
+					List<String> houseAreas = (List<String>) componentOption.get("houseArea");
+					String detailAddress = (String) componentOption.get("detailAddress");
+					String mortgageSituation = (String) componentOption.get("mortgageSituation");
+					
+					if (componentOptions.indexOf(componentOption) < (componentOptions.size() - 1)) {
+						houseAddress.append(houseAreas).append("--#separator#--").append(detailAddress).append("--#separator#--")
+						.append(mortgageSituation).append("--[#separator#]--");
+					}else {
+						houseAddress.append(houseAreas).append("--#separator#--").append(detailAddress).append("--#separator#--")
+						.append(mortgageSituation);
+					}
+				}
 			}
 
 			car.setHouseAddress(houseAddress.toString());
@@ -315,7 +322,7 @@ public class TransferOfLitigationController {
 			}
 		} catch (Exception e) {
 			LOG.error("-- queryTransferLitigationData -- 移交诉讼失败！！！", e);
-			return Result.error("500", "系统异常");
+			return Result.error("500", e.getMessage());
 		}
 	}
 
@@ -339,7 +346,7 @@ public class TransferOfLitigationController {
 			}
 		} catch (Exception e) {
 			LOG.error("-- queryCarLoanBilDetail -- 查询车贷结清试算明细！！！", e);
-			return Result.error("500", "系统异常");
+			return Result.error("500", e.getMessage());
 		}
 	}
 
@@ -363,7 +370,7 @@ public class TransferOfLitigationController {
 			}
 		} catch (Exception e) {
 			LOG.error("-- carLoanBilling -- 车贷结清试算失败！！！", e);
-			return Result.error("500", "系统异常");
+			return Result.error("500", e.getMessage());
 		}
 	}
 
