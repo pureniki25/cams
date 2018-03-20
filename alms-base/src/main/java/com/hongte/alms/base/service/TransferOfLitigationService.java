@@ -1,7 +1,9 @@
 package com.hongte.alms.base.service;
 
+import java.util.List;
 import java.util.Map;
 
+import com.hongte.alms.base.assets.car.vo.FileVo;
 import com.hongte.alms.base.entity.TransferLitigationCar;
 import com.hongte.alms.base.entity.TransferLitigationHouse;
 import com.hongte.alms.base.process.vo.ProcessLogReq;
@@ -36,13 +38,13 @@ public interface TransferOfLitigationService {
      * 保存房贷移交法务信息
      * @param req
      */
-    void saveTransferLitigationHouse(TransferLitigationHouse req, String sendUrl);
+    void saveTransferLitigationHouse(TransferLitigationHouse req, String sendUrl, List<FileVo> files);
     
     /**
      * 保存车贷移交法务信息
      * @param req
      */
-    void saveTransferLitigationCar(TransferLitigationCar req, String sendUrl);
+    void saveTransferLitigationCar(TransferLitigationCar req, String sendUrl, List<FileVo> files);
     
     /**
      * 车贷业务结清试算
