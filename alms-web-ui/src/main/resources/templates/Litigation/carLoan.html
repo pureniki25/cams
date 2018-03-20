@@ -188,16 +188,11 @@ height: 100%;
 							</td>
 							
 						</tr>
-						<tr v-for="(info, index) in commitInfoForm.componentOption" v-else disabled>
+						
+						<tr v-else>
 							<td class="td_label">房产地址{{index + 1}}</td>
-							<td  disabled> 
-							      <cascader :data="areaData" v-model="componentOption[index].houseArea" filterable disabled></cascader>
-							</td>
-							<td  disabled> 
-							      <i-input  disabled v-model="componentOption[index].detailAddress" placeholder="详细地址" ></i-input>
-							</td>
-							<td  disabled> 
-							      <i-input disabled v-model="componentOption[index].mortgageSituation" placeholder="房产抵押情况" ></i-input>
+							<td  > 
+							     
 							</td>
 						</tr>
 					</table>
