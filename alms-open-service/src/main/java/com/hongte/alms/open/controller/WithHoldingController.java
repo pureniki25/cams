@@ -101,8 +101,15 @@ public class WithHoldingController {
 		
 			
 			if ("1".equals(respData.getReturnCode())) {// 处理中
-				withHoldingInsertRecord(WithholdingRecordLogService, afterId, originalBusinessId, planOverDueMoney);
-				return Result.success("success");
+				
+				Boolean flag=withHoldingInsertRecord(WithholdingRecordLogService, afterId, originalBusinessId, planOverDueMoney);
+				if(flag) {
+					return Result.success("success");
+				}else {
+					return Result.error("error", "代扣正在处理中,请稍后查看代扣结果");
+					
+				}
+		
 			} else {
 				return Result.error("error", "代扣出错");
 			}
@@ -174,16 +181,23 @@ public class WithHoldingController {
 	
 
 	// 代扣记录日志入库
-	private void withHoldingInsertRecord(WithholdingRecordLogService service, String afterId, String originalBusinessId,
+	private Boolean withHoldingInsertRecord(WithholdingRecordLogService service, String afterId, String originalBusinessId,
 			String planOverDueMoney) {
-		WithholdingRecordLog log = new WithholdingRecordLog();
-		log.setOriginalBusinessId(originalBusinessId);
-		log.setAfterId(afterId);
-		log.setCreateTime(new Date());
-		log.setCurrentAmount(BigDecimal.valueOf(Double.valueOf(planOverDueMoney)));
-		log.setRepayStatus(2);
-		log.setUpdateTime(new Date());
-		service.insert(log);
+		WithholdingRecordLog logExist=service.selectWithholdingRecordLog(originalBusinessId, afterId);
+		//已经存在记录
+		if(logExist!=null) {
+			return false;
+		}else {
+			WithholdingRecordLog log = new WithholdingRecordLog();
+			log.setOriginalBusinessId(originalBusinessId);
+			log.setAfterId(afterId);
+			log.setCreateTime(new Date());
+			log.setCurrentAmount(BigDecimal.valueOf(Double.valueOf(planOverDueMoney)));
+			log.setRepayStatus(2);
+			log.setUpdateTime(new Date());
+			service.insert(log);
+			return true;
+		}
 	}
 
 
