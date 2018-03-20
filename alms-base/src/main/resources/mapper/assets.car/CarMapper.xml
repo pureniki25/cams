@@ -52,7 +52,7 @@
 
 		<where>
 			<if test="businessId !=null and businessId !=''">
-				and bus.business_id LIKE #{businessId}
+				and bus.business_id LIKE "%"#{businessId}"%"
 			</if>
 			<if test="areaId !=null and areaId !=''">
 				and bus.district_id = #{areaId}
@@ -61,14 +61,14 @@
 				and bus.company_id = #{companyId}
 			</if>
 			<if test="customerName !=null and customerName !=''">
-				and bus.customer_name LIKE #{customerName}
+				and bus.customer_name LIKE "%"#{customerName}"%"
 			</if>
 			<if test="licensePlateNumber !=null and licensePlateNumber !=''">
-				and car.license_plate_number LIKE #{licensePlateNumber}
+				and car.license_plate_number LIKE "%"#{licensePlateNumber}"%"
 			</if>
 		
 			<if test="model !=null and model !=''">
-				and car.model LIKE #{model}
+				and car.model LIKE "%"#{model}"%"
 			</if>
 			<if test="status !=null and status !=''">
 				and car.status= #{status}
@@ -100,7 +100,7 @@
 		tb_car_drag drag on drag.business_id=bus.business_id
 		<where>
 			<if test="businessId !=null and businessId !=''">
-				and bus.business_id LIKE #{businessId}
+				and bus.business_id LIKE "%"#{businessId}"%"
 			</if>
 			<if test="areaId !=null and areaId !=''">
 				and com.area_id = #{areaId}
@@ -109,16 +109,13 @@
 				and com.company_id = #{companyId}
 			</if>
 			<if test="customerName !=null and customerName !=''">
-				and bus.customer_name LIKE #{customerName}
+				and bus.customer_name LIKE "%"#{customerName}"%"
 			</if>
 			<if test="licensePlateNumber !=null and licensePlateNumber !=''">
-				and car.license_plate_number LIKE #{customer_name}
-			</if>
-			<if test="licensePlateNumber !=null and licensePlateNumber !=''">
-				and car.license_plate_number LIKE #{customer_name}
+				and car.license_plate_number LIKE "%"#{licensePlateNumber}"%"
 			</if>
 			<if test="model !=null and model !=''">
-				and car.model LIKE #{model}
+				and car.model LIKE "%"#{model}"%"
 			</if>
 			<if test="status !=null and status !=''">
 				and car.status= #{status}
