@@ -249,11 +249,6 @@
 			    AND IFNULL(a.repay_flag, 0) != 6 
 			    AND b.`original_business_id` = bb.business_id 
 			  GROUP BY b.`original_business_id`) AS repaymentPrincipa,
-			  (SELECT 
-			    tbr.period 
-			  FROM
-			    tb_repayment_biz_plan_list tbr 
-			  WHERE tbr.plan_list_id = #{crpId,jdbcType=VARCHAR}) businessAfterId,
 			  cc.surplus_principal,
 			  (SELECT 
 			    COUNT(1) 
@@ -277,6 +272,7 @@
 			    c.fact_principal,
 			    b.`original_business_id`,
 			    c.plan_list_id,
+			    a.after_id businessAfterId,
 			    (
 			      c.plan_principal - c.fact_principal
 			    ) surplus_principal 
@@ -305,7 +301,8 @@
 			        tb_repayment_biz_plan_list_detail t1 
 			      GROUP BY t1.plan_list_id) c 
 			      ON a.plan_list_id = c.plan_list_id 
-			  WHERE IFNULL(a.repay_flag, 0) != 6) cc 
+			  WHERE IFNULL(a.repay_flag, 0) != 6 
+			  ORDER BY a.due_date DESC) cc 
 			WHERE bb.`business_id` = bbc.`business_id` 
 			  AND bb.business_id = cc.original_business_id 
 			  AND bbc.ismain_customer = 1 
