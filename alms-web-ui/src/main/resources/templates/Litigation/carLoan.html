@@ -171,7 +171,7 @@ height: 100%;
 						<tr v-for="(info, index) in commitInfoForm.componentOption" v-if="applyInfoFormEditFlage">
 							<td class="td_label">房产地址{{index + 1}}</td>
 							<td  > 
-							      <cascader :data="commitInfoForm.areaData" v-model="commitInfoForm.componentOption[index].houseArea" filterable></cascader>
+							      <cascader :data="areaData" v-model="commitInfoForm.componentOption[index].houseArea" filterable></cascader>
 							</td>
 							<td  > 
 							      <i-input v-model="commitInfoForm.componentOption[index].detailAddress" placeholder="详细地址" ></i-input>

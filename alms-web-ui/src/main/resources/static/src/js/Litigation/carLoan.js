@@ -317,13 +317,6 @@ window.layinit(function (htConfig) {
 	                }
 	            });
             	
-//            	axios.get(reqStr)
-//                .then(function (result) {
-//                    if (result.data.code == "1") {
-//                        self.areaData = result.data.data;
-//                    }
-//                });
-            	
             },
 	    	
 	    	removeTabTr: function (event, index) {
