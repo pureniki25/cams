@@ -46,6 +46,7 @@ window.layinit(function (htConfig) {
                 followOprId:'',     //跟进人员ID
                 discript:''        //分配说明
             },
+
             ruleValidate:setPhoneUrgeFormValidate
         },
         methods: {
@@ -209,37 +210,6 @@ var getSelectsData = function () {
 
 }
 
-//表单验证配置参数
-var validateOpt = {
-    moduleName: [
-        {required: true, message: '请输入菜单名称', trigger: 'blur'}
-    ],
-    moduleLevel: [
-        {required: true, message: '请选择菜单级别', trigger: 'change'}
-    ],
-    parentModuleName: [
-        {required: true, message: '请选择父级菜单', trigger: 'change'},
-        {
-            validator: function (rule, value, callback, source, options) {
-                if (value != '1' && value == '') {
-                    callback(new Error('请选择父级菜单'));
-                } else {
-                    callback();//校验通过
-                }
-
-            }, trigger: 'blur'
-        }
-    ],
-    moduleUrl: [
-        {required: true, message: '请输入菜单地址', trigger: 'blur'}
-    ],
-    deviceType: [
-        {required: true, message: '请选择设备类型', trigger: 'blur'}
-    ],
-    moduleOrder: [
-        {required: true, message: '请设定菜单排序', trigger: 'blur'}
-    ]
-};
 
 //区域列表数组
 var area_array = [{
@@ -317,7 +287,16 @@ var setPhoneUrgeFormValidate = {
         {required: true, message: '请选择清算-跟进人员', trigger: 'change'}
     ],
     discript: [
-        {required: true, message: '请填写分配说明', trigger: 'blur'}
+        {
+            validator: function (rule, value, callback, source, options) {
+                if (vm.setPhoneUrgeForm.discript.length>1000) {
+                    callback(new Error('分配说明不多于1000字'));
+                } else {
+                    callback();//校验通过
+                }
+
+            }, trigger: 'blur'
+        }
     ]
 };
 
