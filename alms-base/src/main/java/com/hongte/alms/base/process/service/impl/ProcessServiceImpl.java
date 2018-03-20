@@ -726,6 +726,10 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
         }else if(step.getApproveUserType()== ProcessApproveUserType.BY_ROLE.getKey()){
             String roleCode = step.getApproveUserRole();
             SysRole role =  sysRoleService.selectById(roleCode.trim());
+            if(role==null) {
+            	logger.error("找不到该角色,role="+roleCode.trim());
+            	 throw new RuntimeException("该角色在系统中不存在");
+            }
             StringBuilder sb = new StringBuilder();
             int i=0;
             if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.OVERALL.getKey())){//如果角色是全局的

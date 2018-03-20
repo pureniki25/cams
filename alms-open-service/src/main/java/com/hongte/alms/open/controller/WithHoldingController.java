@@ -94,15 +94,22 @@ public class WithHoldingController {
 			encryptStr = encryptPostData(encryptStr);
 			/* http://172.16.200.104:8084/apites是信贷接口域名，这里本机配置的，需要配置成自己的 */
 			WithHoldingXinDaiService withholdingxindaiService = Feign.builder().target(WithHoldingXinDaiService.class,
-					"http://172.16.200.104:8084/apitest");
+					getUrl());
 			String respStr = withholdingxindaiService.withholding(encryptStr);
 			// 返回数据解密
 			ResponseData respData = getRespData(respStr);
 		
 			
 			if ("1".equals(respData.getReturnCode())) {// 处理中
-				withHoldingInsertRecord(WithholdingRecordLogService, afterId, originalBusinessId, planOverDueMoney);
-				return Result.success("success");
+				
+				Boolean flag=withHoldingInsertRecord(WithholdingRecordLogService, afterId, originalBusinessId, planOverDueMoney);
+				if(flag) {
+					return Result.success("代扣正在处理中,请稍后查看代扣结果");
+				}else {
+					return Result.success("代扣正在处理中,请稍后查看代扣结果");
+					
+				}
+		
 			} else {
 				return Result.error("error", "代扣出错");
 			}
@@ -174,16 +181,23 @@ public class WithHoldingController {
 	
 
 	// 代扣记录日志入库
-	private void withHoldingInsertRecord(WithholdingRecordLogService service, String afterId, String originalBusinessId,
+	private Boolean withHoldingInsertRecord(WithholdingRecordLogService service, String afterId, String originalBusinessId,
 			String planOverDueMoney) {
-		WithholdingRecordLog log = new WithholdingRecordLog();
-		log.setOriginalBusinessId(originalBusinessId);
-		log.setAfterId(afterId);
-		log.setCreateTime(new Date());
-		log.setCurrentAmount(BigDecimal.valueOf(Double.valueOf(planOverDueMoney)));
-		log.setRepayStatus(2);
-		log.setUpdateTime(new Date());
-		service.insert(log);
+		List<WithholdingRecordLog> loglist=service.selectWithholdingRecordLog(originalBusinessId, afterId);
+		//已经存在记录
+		if(loglist.size()>0) {
+			return false;
+		}else {
+			WithholdingRecordLog log = new WithholdingRecordLog();
+			log.setOriginalBusinessId(originalBusinessId);
+			log.setAfterId(afterId);
+			log.setCreateTime(new Date());
+			log.setCurrentAmount(BigDecimal.valueOf(Double.valueOf(planOverDueMoney)));
+			log.setRepayStatus(2);
+			log.setUpdateTime(new Date());
+			service.insert(log);
+			return true;
+		}
 	}
 
 
