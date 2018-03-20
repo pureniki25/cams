@@ -14,6 +14,7 @@ import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.AliyunHelper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -37,6 +38,9 @@ public class DocTmpServiceImpl extends BaseServiceImpl<DocTmpMapper, DocTmp> imp
     
     @Autowired
     private AliyunHelper ossClient;
+    
+    private static final String[] PICTURE=new String[] {"bmp","jpg","png","tiff","gif","pcx","tga","exif","fpx","svg","psd","cdr","pcd","dxf","ufo","eps","ai","raw","wmf"};
+
     /**
      * 支持业务操作中批量单个文件上传
      * @param fileVo
@@ -100,6 +104,7 @@ public class DocTmpServiceImpl extends BaseServiceImpl<DocTmpMapper, DocTmp> imp
                             doc.setBusinessId(businessId);
                             doc.setCreateUser(userId);
                             doc.setCreateTime(new Date());
+                           
                         }
                         //查询文件类型
                         List<DocTypeItem> docTypes=docTypeMapper.getDocTypeByTypeCode(fileVo.getBusType());
@@ -120,6 +125,9 @@ public class DocTmpServiceImpl extends BaseServiceImpl<DocTmpMapper, DocTmp> imp
                         doc.setUpdateUser(userId);
                         doc.setUpdateTime(new Date());
                         doc.setDocTypeId(docType.getDocTypeID());
+                        if(Arrays.asList(PICTURE).contains(fileType)) {
+                        	doc.setDocAttr("01");//如果要区分doc/excel 可在后面继续进行判别
+                        }
                         //step1 先写入OSS
                         ossClient.putObject(docUrl, content);
                         //step2 记录文档记录
