@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+    <title >客户还款登记</title>
+    <script src="/properties/config.js"></script>
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
+    <!-- iview样式 -->
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
+    <!--@import url("//unpkg.com/iview/dist/styles/iview.css");-->
+    <!--<link rel="stylesheet" type="text/css" href="//unpkg.com/iview/dist/styles/iview.css"/>-->
+    <!-- 引入layui样式 -->
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all"/>
+
+    <!--   <script src="//unpkg.com/vue/dist/vue.js"></script>
+       <script src="//unpkg.com/iview/dist/iview.min.js"></script>-->
+    <!-- 引入vue -->
+    <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+    <!-- iview js -->
+    <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+    <!--引入layui.js-->
+    <script src="/plugins/layui/layui.js"></script>
+    <!--引入axios.js 用于ajax调用-->
+    <script src="/plugins/axios/axios.min.js"></script>
+    <!-- 引入jQuery，必须在appToken.js 之前引入 -->
+    <script src="/build/js/jquery-3.3.1.min.js"></script>
+    <!-- 设置全局请求头:app、Authorization -->
+    <script src="/build/js/appToken.js"></script>
+    <!--引入公共的一些方法-->
+    <script src="/src/js/comm.js"></script>
+    <style>
+        div a{
+            margin-right: 15px
+        }
+    </style>
+</head>
+<body>
+<!--隐藏元素-->
+<!--<p id="staffType"  th:attr="value=${staffType}"  hidden />-->
+<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+<div id="app" v-cloak>
+  
+    
+      <row style="padding: 20px">
+        <i-col span="24">
+          
+           <i-button type="success" style="position: absolute;left:0px;top:3px;width:90px" size="small" @click="openAddModal">新增</i-button>
+         
+            
+        </i-col>
+    </row>
+    <Row>
+        <Col span="24">
+            <table id="processType" lay-filter="processType"></table>
+            <script type="text/html" id="toolbar">
+                <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                <a class="layui-btn layui-btn-xs" lay-event="del">删除</a>
+              </script>
+        </Col>
+    </Row>
+    <!--新增/编辑菜单Modal-->
+    <Modal v-model="add_modal" title="流程类型"  :styles="{left:'0px',top:'10px',width:'960px'}">
+        <row>
+            <i-col span="22">
+                <i-form ref='editForm' :model="editForm" :rules='validateRules'  label-position="right" autocomplete="off"
+                        :label-width="100">
+                        
+                            <form-item label="typeId" prop="typeId"  class="layui-hide"  >
+                        <input type="text" class="layui-hide"   v-model="editForm.typeId" style="width:50%">
+                    </form-item>
+                    <form-item label="流程类别编码" prop="typeCode"    >
+                        <i-input type="text"    v-model="editForm.typeCode" style="width:50%">
+                    </form-item>
+                    <form-item label="类别名称" prop="typeName"  >
+                        <i-input type="text" v-model="editForm.typeName" style="width:50%;display:inline-block;" ></i-input>
+                        <span style="color:#FF0000"></span>
+                    </form-item>
+                    <form-item label="单个业务该流程支持同时发起次数" prop="canItemRunningCount"  >
+                        <i-input type="text"  v-model="editForm.canItemRunningCount" style="width:50%;display:inline-block;" ></i-input>
+                        <span style="color:#FF0000"></span>
+                    </form-item>
+                    <form-item label="单个业务该流程支持发起总次" prop="canItemTotalCount"  >
+                        <i-input type="text"  v-model="editForm.canItemTotalCount" maxlength="40" style="width:50%;" ></i-input>
+                    </form-item>
+                   
+                </i-form>
+            </i-col>
+        </row>
+        
+           <div slot="footer" style="text-align:left">
+            <i-button type="primary" :loading="submitLoading" @click="saveRepayment()">
+                <span v-if="!submitLoading">保存</span>
+                <span v-else>处理中...</span>
+            </i-button>
+            <i-button type="ghost" @click="closeModal()" style="margin-left: 8px;background-color:rgba(255, 153, 0, 1);color:#ffffff">撤销</i-button>
+        </div>
+    </Modal>
+
+  
+</div>
+<script src="/src/js/collection/processType.js" ></script>
+<script>
+
+</script>
+</body>
+</html>
