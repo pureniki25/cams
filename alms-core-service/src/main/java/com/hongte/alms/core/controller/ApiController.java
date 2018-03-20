@@ -144,7 +144,7 @@ public class ApiController {
         }
         try {
             RenewalBusiness renewalBusiness = renewalBusinessService.selectOne(new EntityWrapper<RenewalBusiness>().eq("renewal_business_id",businessId));
-            BasicBusiness business = basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id",businessId));
+            BasicBusiness business = basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id",renewalBusiness.getOriginalBusinessId()));
             String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
             String appKey = this.afterLoanKey;
             String appSecret = this.afterLoanSecret;
@@ -153,11 +153,13 @@ public class ApiController {
             params.put("extensionId", businessId);
             params.put("timestamp", timestamp);
             String sign = SignUtil.signTopRequest(params, appSecret, "MD5");
-            if (business.getBusinessType() == 1) {
+            int carType=9;
+            int houseType=11;
+            if (business.getBusinessType() == carType) {
                 String xindaiCarDeferUrl = xindaiDomain + "Operation/OpenDeferTrace/DetailDefer?" + "businessId=" + renewalBusiness.getOriginalBusinessId() + "&extensionId=" + businessId + "&appKey=" + appKey + "&timestamp=" + timestamp + "&sign=" + sign;
                 return Result.success(xindaiCarDeferUrl);
             }
-            if (business.getBusinessType() == 2) {
+            if (business.getBusinessType() == houseType) {
                 String xindaiHouseDeferUrl = xindaiDomain + "Operation/OpenDeferTrace/DetailHouseDefer?" + "businessId=" + renewalBusiness.getOriginalBusinessId() + "&extensionId=" + businessId + "&appKey=" + appKey + "&timestamp=" + timestamp + "&sign=" + sign;
                 return Result.success(xindaiHouseDeferUrl);
             }

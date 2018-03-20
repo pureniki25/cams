@@ -77,9 +77,9 @@ public class AfterLoanStandingBookReq extends PageRequest {
     private String  crpIds;  //还款计划ID字符串  用于接收界面传参
     private String[]  crpIdsArray;  //还款计划ID数组  用于数据库查询
 
-
-
     private List<String> customerIds; //客户ID列表
+
+    private List<String> commIds;//公司ID列表
 
     public String getAreaId() {
         return areaId;
@@ -256,5 +256,13 @@ public class AfterLoanStandingBookReq extends PageRequest {
 
     public void setLiquidationTowUIds(List<String> liquidationTowUIds) {
         this.liquidationTowUIds = liquidationTowUIds;
+    }
+
+    public List<String> getCommIds() {
+        return commIds;
+    }
+
+    public void setCommIds(List<String> commIds) {
+        this.commIds = commIds;
     }
 }

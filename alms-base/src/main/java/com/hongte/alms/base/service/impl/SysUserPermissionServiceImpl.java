@@ -55,6 +55,10 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
     @Qualifier("SysUserRoleService")
     SysUserRoleService sysUserRoleService;
 
+    @Autowired
+    @Qualifier("BasicCompanyService")
+    BasicCompanyService basicCompanyService;
+
     /**
      *根据用户ID设置用户可访问的区域信息
      * @param userId
@@ -85,30 +89,14 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
         }
 
 
-
-        Map<String,SysOrg> companyIds = sysUserService.selectCompanyByUserId(userId);
+            //根据统一用户平台的树来找
+//        Map<String,SysOrg> companyIds = sysUserService.selectCompanyByUserId(userId);
+        //根据信贷的树来找
+       Map<String,BasicCompany> companyIds  =  basicCompanyService.selectUserCanSeeCompany(userId);
         List<String>  businessIds = basicBusinessService.selectCompanysBusinessIds(new LinkedList<>(companyIds.keySet()));
-//        switch (userAreaTypeEnums){
-//            case OVERALL:
-//                businessIds = basicBusinessService.selectCompanysBusinessIds(null);
-//                break;
-//            case AREA:
-//                List<String> userAreas = sysUserAreaService.selectUserAreas(userId);
-//                //根据用户区域信息 整理出排重的公司列表
-//                Map<String,String> companyIds  = sysOrgService.getCompanysByAreaList(userAreas);
-//
-//                String orgCode = sysUserService.selectById(userId).getOrgCode();
-//                String orgCompany = sysOrgService.getCompanyByOrgCode(orgCode);
-//                if(orgCompany!=null && companyIds.get(orgCompany)==null){
-//                    companyIds.put(orgCompany,orgCompany);
-//                }
-//                if(companyIds.size()>0){
-//                    businessIds = basicBusinessService.selectCompanysBusinessIds(new LinkedList<>(companyIds.keySet()));
-//                }
-//                break;
-//        }
 
-        //删除原来用户的可看公司信息
+
+        //删除原来用户的可看业务信息
         sysUserPermissionService.delete(new EntityWrapper<SysUserPermission>().eq("user_id",userId));
 
         List<SysUserPermission> permissions = new LinkedList<>();

@@ -51,7 +51,7 @@
 
         FROM tb_repayment_biz_plan_list planList
         LEFT JOIN tb_repayment_biz_plan plan ON plan.plan_id = planList.plan_id
-        LEFT JOIN tb_basic_business business ON plan.orig_business_id = business.business_id
+        LEFT JOIN tb_basic_business business ON plan.original_business_id = business.business_id
 
         WHERE
         <![CDATA[ TO_DAYS(NOW()) - TO_DAYS(planList.due_date) > #{overDueDays}  ]]>

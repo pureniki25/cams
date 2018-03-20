@@ -67,7 +67,18 @@ public class WithHoldingController {
 	
 	  @Value(value="${bmApi.apiUrl}")
 	private String apiUrl;
-	
+
+	@Value(value="${ht.test.txt}")
+	private  String txt;
+
+	@RequestMapping("txt")
+	@ApiOperation(value = "测试properties获取")
+	public String getXindaiThumbnailView(){
+		return txt;
+	}
+
+
+
 	@ApiOperation(value = "执行代扣")
 	@GetMapping("/withholding")
 	public Result<String> withholding(@RequestParam("originalBusinessId") String originalBusinessId,
