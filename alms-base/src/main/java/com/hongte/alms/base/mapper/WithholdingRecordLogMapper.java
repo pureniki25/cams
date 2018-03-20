@@ -1,5 +1,7 @@
 package com.hongte.alms.base.mapper;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Param;
 
 import com.hongte.alms.base.entity.WithholdingRecordLog;
@@ -15,7 +17,7 @@ import com.hongte.alms.common.mapper.SuperMapper;
  */
 public interface WithholdingRecordLogMapper extends SuperMapper<WithholdingRecordLog> {
 	
-	 WithholdingRecordLog selectWithholdingRecordLog(@Param("originalBusinessId")String originalBusinessId,@Param("afterId") String afterId);
+	 List<WithholdingRecordLog> selectWithholdingRecordLog(@Param("originalBusinessId")String originalBusinessId,@Param("afterId") String afterId);
 		 
 	 
 

@@ -10,11 +10,6 @@ var processStatus = document.getElementById("processStatus").getAttribute("value
 var processId = document.getElementById("processId").getAttribute("value");
 
 //设置表单验证
-var setEstatesFormValidate = {
-	estates: [
-        {required: true, message: '必填', trigger: 'blur'}
-    ]
-};
 var setCommitInfoFormValidate = {
 		delayHandover: [
 	        {required: true, message: '必填', trigger: 'blur'}
@@ -60,7 +55,7 @@ var setCommitInfoFormValidate = {
 window.layinit(function (htConfig) {
     var _htConfig = htConfig;
     basePath = htConfig.coreBasePath;
-	getShowInfo();
+	
     
 	vm = new Vue({
 	    el: '#app',
@@ -86,7 +81,6 @@ window.layinit(function (htConfig) {
             // 回退步骤选择框标志位
             rockBackStepShowFlage:false,
             
-            validEstatesForm: setEstatesFormValidate,
             validCommitInfoForm: setCommitInfoFormValidate,
             
          // 流程显示
@@ -125,21 +119,6 @@ window.layinit(function (htConfig) {
 	        
 	        commitInfoForm: {
 	        	
-	        	componentOption: [
-	            	{
-	            		areaData: [],
-	            		registrationInfoForm:{
-	    	            	houseArea: [],
-	    	                province: '',
-	    	                city: '',
-	    	                county: '',
-	    	                detailAddress: '',
-	    	                mortgageSituation: '',// 房产抵押情况
-		            	}
-	            	}
-	                 
-				],
-	        	
 				businessId:""		   	, // 业务编号
 				estates: '',	// 是否有房产
 				houseAddress: [],	// 房产地址
@@ -151,6 +130,17 @@ window.layinit(function (htConfig) {
 				processStatus: '',
 				crpId:''
 			},
+			
+			componentOption: [
+            	{
+	            	houseArea: [],
+	                detailAddress: '',
+	                mortgageSituation: '',// 房产抵押情况
+            	}
+                 
+			],
+			
+			areaData: [],
 			
 // ////////////------------- 申请减免信息 开始
    
@@ -310,15 +300,23 @@ window.layinit(function (htConfig) {
 	             });
 	    	},
 	    	
-	    	getArea: function (index) {
-                var self = this;
-                var reqStr = basePath + "area/getArea";
-                axios.get(reqStr)
-                    .then(function (result) {
-                        if (result.data.code == "1") {
-                            self.commitInfoForm.componentOption[index].areaData = result.data.data;
-                        }
-                })
+            getArea: function () {
+            	var self = this;
+            	var reqStr = basePath + "area/getArea";
+            	
+            	$.ajax({
+	                type: "GET",
+	                url: reqStr,
+	                async:false,
+	                success: function (data) {
+	                	self.areaData = data.data;
+	                },
+	                error: function (message) {
+	                    layer.msg("获取区域信息失败");
+	                    console.error(message);
+	                }
+	            });
+            	
             },
 	    	
 	    	removeTabTr: function (event, index) {
@@ -352,27 +350,22 @@ window.layinit(function (htConfig) {
 	    		 })
 	    	},
 	    	addHouseTabTr :function(event){
-	    		this.commitInfoForm.componentOption.push({
-	    			areaData: [],
-            		registrationInfoForm:{
-    	            	houseArea: [],
-    	                province: '',
-    	                city: '',
-    	                county: '',
-    	                detailAddress: '',
-	            	}
-	    		})
+	    		this.componentOption.push({
+	    			houseArea: [],
+	                detailAddress: '',
+	                mortgageSituation: ''
+	    		});
 	 	    },
 	 	    removeHouseTabTr :function(event, index){
-	 	    	this.commitInfoForm.componentOption.splice(index, 1);
+	 	    	this.componentOption.splice(index, 1);
 	 	    },
 	 	   
 	   },		
 	   created: function () {
-	       this.getArea(0);
+		   this.getArea();
+	       getShowInfo();
 	   }
 	});
-    
 });
 
 ///////////// 流程审批相关函数 开始 ///////////////
@@ -411,7 +404,7 @@ var getShowInfo = function () {
             	} 
             	vm.commitInfoForm.businessId = res.data.data.baseInfo.businessId;
             	if (res.data.data.houseAddress != null && res.data.data.houseAddress.length > 0) {
-            		vm.commitInfoForm.houseAddress = res.data.data.houseAddress.split('--#separator#--');
+        			vm.componentOption = res.data.data.houseAddress;
 				}
             	
             	var docFiles=res.data.data.returnRegFiles;
