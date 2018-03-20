@@ -55,13 +55,13 @@ public class SetUserPermission implements   BaseJob {
     //运行的标志位
     private  static  boolean runningFlage = false;
 
-    @Scheduled(cron = "0/5 * * * * ? ")
+    //每5分钟执行一次
+    @Scheduled(cron = "0 0/5 * * * ? ")
     public  void job(){
 
         if(runningFlage){
             return;
         }
-        logger.info("进入定时任务");
         runningFlage = true;
 
         SetUserPermission();
