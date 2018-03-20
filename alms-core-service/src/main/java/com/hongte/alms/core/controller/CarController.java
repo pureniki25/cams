@@ -570,7 +570,7 @@ try {
     	}
     	String planId=plans.get(0).getPlanId();
     	//还款计划列表
-    	List<RepaymentBizPlanList> planLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("plan_id", planId).eq("current_status", "已还款").orderBy("fact_repay_date", false));
+    	List<RepaymentBizPlanList> planLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("plan_id", planId).orderBy("fact_repay_date", false));
     	if(planLists==null||planLists.size()<=0) {
     		logger.error("该业务编号下还款计划列表不存在");
     		return Result.error("9999", "还款信息有误");
@@ -919,7 +919,7 @@ try {
     	}
     	String planId=plans.get(0).getPlanId();
     	//还款计划列表
-    	List<RepaymentBizPlanList> planLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("plan_id", planId).eq("current_status", "已还款").orderBy("fact_repay_date", false));
+    	List<RepaymentBizPlanList> planLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("plan_id", planId).orderBy("fact_repay_date", false));
     	if(planLists==null||planLists.size()<=0) {
     		logger.error("该业务编号下还款计划列表不存在");
     		return Result.error("9999", "还款信息有误");
@@ -1094,7 +1094,7 @@ try {
     	}
     	String planId=plans.get(0).getPlanId();
     	//还款计划列表
-    	List<RepaymentBizPlanList> planLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("plan_id", planId).eq("current_status", "已还款").orderBy("fact_repay_date", false));
+    	List<RepaymentBizPlanList> planLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("plan_id", planId).orderBy("fact_repay_date", false));
     	if(planLists==null||planLists.size()<=0) {
     		logger.error("该业务编号下还款计划列表不存在");
     		return Result.error("9999", "还款信息有误");
