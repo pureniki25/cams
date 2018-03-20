@@ -168,16 +168,16 @@ height: 100%;
 			<div class="layui-col-xs6 layui-col-md12">
 				<div class="grid-demo layui-bg-gray">
 					<table class="layui-table">
-						<tr v-for="(info, index) in commitInfoForm.componentOption" v-if="applyInfoFormEditFlage">
+						<tr track-by="$index" v-for="(info, index) in componentOption" v-if="applyInfoFormEditFlage">
 							<td class="td_label">房产地址{{index + 1}}</td>
 							<td  > 
-							      <cascader :data="areaData" v-model="commitInfoForm.componentOption[index].houseArea" filterable></cascader>
+							      <cascader :data="areaData" v-model="componentOption[index].houseArea" filterable></cascader>
 							</td>
 							<td  > 
-							      <i-input v-model="commitInfoForm.componentOption[index].detailAddress" placeholder="详细地址" ></i-input>
+							      <i-input v-model="componentOption[index].detailAddress" placeholder="详细地址" ></i-input>
 							</td>
 							<td  > 
-							      <i-input v-model="commitInfoForm.componentOption[index].mortgageSituation" placeholder="房产抵押情况" ></i-input>
+							      <i-input v-model="componentOption[index].mortgageSituation" placeholder="房产抵押情况" ></i-input>
 							</td>
 							<td  >
 							  <div class="layui-btn-group">
@@ -191,13 +191,13 @@ height: 100%;
 						<tr v-for="(info, index) in commitInfoForm.componentOption" v-else disabled>
 							<td class="td_label">房产地址{{index + 1}}</td>
 							<td  disabled> 
-							      <cascader :data="commitInfoForm.areaData" v-model="commitInfoForm.componentOption[index].houseArea" filterable disabled></cascader>
+							      <cascader :data="areaData" v-model="componentOption[index].houseArea" filterable disabled></cascader>
 							</td>
 							<td  disabled> 
-							      <i-input  disabled v-model="commitInfoForm.componentOption[index].detailAddress" placeholder="详细地址" ></i-input>
+							      <i-input  disabled v-model="componentOption[index].detailAddress" placeholder="详细地址" ></i-input>
 							</td>
 							<td  disabled> 
-							      <i-input disabled v-model="commitInfoForm.componentOption[index].mortgageSituation" placeholder="房产抵押情况" ></i-input>
+							      <i-input disabled v-model="componentOption[index].mortgageSituation" placeholder="房产抵押情况" ></i-input>
 							</td>
 						</tr>
 					</table>
