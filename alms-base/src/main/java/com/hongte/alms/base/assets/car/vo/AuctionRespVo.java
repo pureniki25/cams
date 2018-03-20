@@ -165,6 +165,9 @@ public class AuctionRespVo implements Serializable{
 	    @ApiModelProperty(value="备注",name="remarks  ")
 	    private String remarks  ;
 	    
+	    @ApiModelProperty(value="审核通过时间",name="auditTime")
+	    private Date auditTime;
+	    
 	    private  List<Doc> docs;
 	    
 		@ApiModelProperty(required= true,value = "用户姓名 ")
@@ -738,6 +741,14 @@ public class AuctionRespVo implements Serializable{
 
 		public void setLastEvaluationAmount(BigDecimal lastEvaluationAmount) {
 			this.lastEvaluationAmount = lastEvaluationAmount;
+		}
+
+		public Date getAuditTime() {
+			return auditTime;
+		}
+
+		public void setAuditTime(Date auditTime) {
+			this.auditTime = auditTime;
 		} 
 	    
 	 

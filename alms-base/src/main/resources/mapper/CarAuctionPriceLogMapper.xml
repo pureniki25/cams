@@ -9,11 +9,12 @@
         <result column="bidder_tel" property="bidderTel" />
         <result column="price" property="price" />
         <result column="create_time" property="createTime" />
+        <result column="bidder_cert_id" property="bidderCertId" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, auction_id AS auctionId, bidder_tel AS bidderTel, price, create_time AS createTime
+        id, auction_id AS auctionId, bidder_tel AS bidderTel, price, create_time AS createTime, bidder_cert_id AS bidderCertId
     </sql>
 
 </mapper>

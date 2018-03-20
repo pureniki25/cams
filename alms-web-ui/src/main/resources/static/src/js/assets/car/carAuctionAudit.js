@@ -985,7 +985,7 @@ window.layinit(function (htConfig) {
                   		u.userId=vm.selectedList[k].id;
  
                   		u.userName=vm.selectedList[k].name;
-                  		vm.audit.sendUserIds.push(u)
+                  		vm.audit.sendUserIds.push(u.userId);
                   	 }
                    }
 	    	

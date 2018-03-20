@@ -962,6 +962,12 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
             process.setApproveUserId(getApproveUserId(nextStep,process.getCreateUser(),process));
         }else {
         	process.setStatus(ProcessStatusEnums.END.getKey());
+        	//更新流程状态
+	        if(ProcessApproveResult.PASS.getKey()==req.getIsPass()) {//如果最后节点通过则整个流程审核通过
+	        	process.setProcessResult(ProcessResultEnums.PASS.getKey());
+	        }else {
+	        	process.setProcessResult(ProcessResultEnums.REFUSE.getKey());
+	        }	
         }
         /*else{
             process.setCurrentStep(null);

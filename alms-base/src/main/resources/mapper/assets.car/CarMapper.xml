@@ -52,7 +52,7 @@
 
 		<where>
 			<if test="businessId !=null and businessId !=''">
-				and bus.business_id LIKE #{businessId}
+				and bus.business_id LIKE "%"#{businessId}"%"
 			</if>
 			<if test="areaId !=null and areaId !=''">
 				and bus.district_id = #{areaId}
@@ -61,14 +61,14 @@
 				and bus.company_id = #{companyId}
 			</if>
 			<if test="customerName !=null and customerName !=''">
-				and bus.customer_name LIKE #{customerName}
+				and bus.customer_name LIKE "%"#{customerName}"%"
 			</if>
 			<if test="licensePlateNumber !=null and licensePlateNumber !=''">
-				and car.license_plate_number LIKE #{licensePlateNumber}
+				and car.license_plate_number LIKE "%"#{licensePlateNumber}"%"
 			</if>
 		
 			<if test="model !=null and model !=''">
-				and car.model LIKE #{model}
+				and car.model LIKE "%"#{model}"%"
 			</if>
 			<if test="status !=null and status !=''">
 				and car.status= #{status}
@@ -96,11 +96,11 @@
 		join tb_repayment_biz_plan pl on pl.business_id=bus.business_id
 		left
 		join tb_car_detection det on det.business_id=bus.business_id
-		left join
+		 join
 		tb_car_drag drag on drag.business_id=bus.business_id
 		<where>
 			<if test="businessId !=null and businessId !=''">
-				and bus.business_id LIKE #{businessId}
+				and bus.business_id LIKE "%"#{businessId}"%"
 			</if>
 			<if test="areaId !=null and areaId !=''">
 				and com.area_id = #{areaId}
@@ -109,16 +109,13 @@
 				and com.company_id = #{companyId}
 			</if>
 			<if test="customerName !=null and customerName !=''">
-				and bus.customer_name LIKE #{customerName}
+				and bus.customer_name LIKE "%"#{customerName}"%"
 			</if>
 			<if test="licensePlateNumber !=null and licensePlateNumber !=''">
-				and car.license_plate_number LIKE #{customer_name}
-			</if>
-			<if test="licensePlateNumber !=null and licensePlateNumber !=''">
-				and car.license_plate_number LIKE #{customer_name}
+				and car.license_plate_number LIKE "%"#{licensePlateNumber}"%"
 			</if>
 			<if test="model !=null and model !=''">
-				and car.model LIKE #{model}
+				and car.model LIKE "%"#{model}"%"
 			</if>
 			<if test="status !=null and status !=''">
 				and car.status= #{status}
@@ -210,6 +207,7 @@
 		<!-- Taxation , 交易税费 -->
 		<!-- TransactionMode , 交易方式 -->
 		tcb.car_position Position , <!-- 车辆位置 -->
+		tp.update_time auditTime,<!-- 审核通过时间 -->
 		tcb.related_docs files   <!--提供文件 -->
 		<!-- Remarks , -->														<!--备注 -->
 
@@ -313,9 +311,7 @@
 			<!--<if test="type=='1'.toString()"> 
 				and tcar.is_pay_deposit= #{isPayDeposit}
 			</if>已报名 -->
-			<if test="type=='2'.toString()"><!-- 已竞买 -->
-				and tcar.is_auction_success= ${1}
-			</if>
+
 			<if test="priceID !=null and priceID !=''">
 				and tcar.auction_id= #{priceID}
 			</if>
@@ -333,12 +329,10 @@
 		from
 		tb_car_auction_bidder tcab
 		join tb_car_auction_reg tcar on
-		tcar.reg_tel=tcab.bidder_tel
+		tcar.reg_cert_id=tcab.bidder_cert_id
 		join tb_car_auction tca on
 		tca.auction_id=tcar.auction_id
-			<if test="type=='2'.toString()"><!-- 已竞买 -->
-				and tcar.is_auction_success= ${1}
-			</if>
+
 			<if test="priceID !=null and priceID !=''">
 				and tcar.auction_id= #{priceID}
 			</if>
@@ -476,6 +470,14 @@
 			<if test="telephone !=null and telephone !=''">
 				and tcar.reg_tel= #{telephone}
 			</if>
+			<if test="vehicleBrand !=null and vehicleBrand !=''">
+			
+			    and tcb.brand_name=#{vehicleBrand}
+			</if>
+			<if test="carModel !=null and carModel !=''">
+			
+			    and tcb.model=#{vehicleBrand}
+			</if>
 		</where>
 		order BY tcar.update_time desc
 		limit ${(page-1) * limit},
@@ -511,6 +513,14 @@
 			</if>
 			<if test="telephone !=null and telephone !=''">
 				and tcar.reg_tel= #{telephone}
+			</if>
+			<if test="vehicleBrand !=null and vehicleBrand !=''">
+			
+			    and tcb.brand_name=#{vehicleBrand}
+			</if>
+			<if test="carModel !=null and carModel !=''">
+			
+			    and tcb.model=#{vehicleBrand}
 			</if>
 		</where>	
 	</select>

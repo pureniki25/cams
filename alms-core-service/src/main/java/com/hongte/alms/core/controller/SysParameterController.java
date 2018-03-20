@@ -96,8 +96,8 @@ public class SysParameterController {
 	@ResponseBody
 	@ApiOperation(value = "新增参数类型信息")
 	public Result addParamType(@RequestBody JSONObject map) {
-		String paramType = map.getString("param_type");
-		String paramTypeName = map.getString("param_type_name");
+		String paramType = map.getString("paramType");
+		String paramTypeName = map.getString("paramTypeName");
 		String remark = map.getString("remark");
 		Integer status = map.getInteger("status");
 		List<SysParameter> list = sysParameterService
@@ -120,8 +120,8 @@ public class SysParameterController {
 	@ResponseBody
 	@ApiOperation(value = "更新参数类型信息")
 	public Result updateParamType(@RequestBody JSONObject map) {
-		String paramType = map.getString("param_type");
-		String paramTypeName = map.getString("param_type_name");
+		String paramType = map.getString("paramType");
+		String paramTypeName = map.getString("paramTypeName");
 		String remark = map.getString("remark");
 		Integer status = map.getInteger("status");
 		List<SysParameter> list = sysParameterService
@@ -140,11 +140,12 @@ public class SysParameterController {
 		return Result.success();
 	}
 
-	@DeleteMapping("/delParamType")
+	@PostMapping("/delParamType")
 	@ResponseBody
 	@ApiOperation(value = "删除参数类型信息")
-	public Result del(String paramType) {
-		boolean result = sysParameterService.delete(new EntityWrapper<SysParameter>().eq("param_type", paramType));
+	public Result del(@RequestBody JSONObject jsonObject) {
+		boolean result = sysParameterService
+				.delete(new EntityWrapper<SysParameter>().eq("param_type", jsonObject.get("paramType")));
 		if (result) {
 			return Result.success();
 		} else {
@@ -156,22 +157,22 @@ public class SysParameterController {
 	@ResponseBody
 	@ApiOperation(value = "list参数类型信息")
 	public Result list(String paramType) {
-		List<SysParameter> list = sysParameterService
-				.selectList(new EntityWrapper<SysParameter>().eq("param_type", paramType)
-						.ne("param_value", Constant.SYS_PARAMETER_PLACEHOLDER).orderBy("row_Index"));
+		List<SysParameter> list = sysParameterService.selectList(new EntityWrapper<SysParameter>()
+				.eq("param_type", paramType).andNew().ne("param_value", Constant.SYS_PARAMETER_PLACEHOLDER)
+				.orderBy("row_Index").or().isNull("param_value"));
 		List<JSONObject> res = new ArrayList<>();
 		for (SysParameter s : list) {
 			JSONObject j = new JSONObject();
-			j.put("param_id", s.getParamId());
-			j.put("param_name", s.getParamName());
-			j.put("param_type", s.getParamType());
-			j.put("param_type_name", s.getParamTypeName());
+			j.put("paramId", s.getParamId());
+			j.put("paramName", s.getParamName());
+			j.put("paramType", s.getParamType());
+			j.put("paramTypeName", s.getParamTypeName());
 			j.put("remark", s.getRemark());
-			j.put("param_value", s.getParamValue());
-			j.put("param_value2", s.getParamValue2());
-			j.put("param_value3", s.getParamValue3());
-			j.put("param_value4", s.getParamValue4());
-			j.put("param_value5", s.getParamValue5());
+			j.put("paramValue", s.getParamValue());
+			j.put("paramValue2", s.getParamValue2());
+			j.put("paramValue3", s.getParamValue3());
+			j.put("paramValue4", s.getParamValue4());
+			j.put("paramValue5", s.getParamValue5());
 			res.add(j);
 		}
 		return Result.success(res);
@@ -195,29 +196,29 @@ public class SysParameterController {
 			return Result.error("500", "params不能为空");
 		}
 		List<SysParameter> sysParameters = new ArrayList<>();
-		String paramType = params.get(0).getString("param_type");
-		String paramTypeName = params.get(0).getString("param_type_name");
+		String paramType = params.get(0).getString("paramType");
+		String paramTypeName = params.get(0).getString("paramTypeName");
 		String userId = loginUserInfoHelper.getUserId();
 		List<SysParameter> list = sysParameterService.selectList(new EntityWrapper<SysParameter>()
 				.eq("param_type", paramType).eq("param_type_name", paramTypeName).orderBy("create_time"));
 
 		if (list == null || list.size() == 0) {
-			return Result.error("500", "找不到param_type:" + paramType + "&param_type_name:" + paramTypeName);
+			return Result.error("500", "找不到paramType:" + paramType + "&paramTypeName:" + paramTypeName);
 		}
 
 		SysParameter sysParameter = list.get(0);
 
 		for (JSONObject j : params) {
 			SysParameter s = new SysParameter();
-			s.setParamName(j.getString("param_name"));
-			s.setParamType(j.getString("param_type"));
-			s.setParamTypeName(j.getString("param_type_name"));
+			s.setParamName(j.getString("paramName"));
+			s.setParamType(j.getString("paramType"));
+			s.setParamTypeName(j.getString("paramTypeName"));
 			s.setRemark(j.getString("remark"));
-			s.setParamValue(j.getString("param_value"));
-			s.setParamValue2(j.getString("param_value2"));
-			s.setParamValue3(j.getString("param_value3"));
-			s.setParamValue4(j.getString("param_value4"));
-			s.setParamValue5(j.getString("param_value5"));
+			s.setParamValue(j.getString("paramValue"));
+			s.setParamValue2(j.getString("paramValue2"));
+			s.setParamValue3(j.getString("paramValue3"));
+			s.setParamValue4(j.getString("paramValue4"));
+			s.setParamValue5(j.getString("paramValue5"));
 			s.setParamId(UUID.randomUUID().toString());
 			s.setCreateTime(new Date());
 			s.setCreateUser(userId);
@@ -226,7 +227,7 @@ public class SysParameterController {
 		}
 
 		for (SysParameter s : list) {
-			if (s.getParamValue().equals(Constant.SYS_PARAMETER_PLACEHOLDER.toString())) {
+			if (s.getParamValue() != null && s.getParamValue().equals(Constant.SYS_PARAMETER_PLACEHOLDER.toString())) {
 				s.deleteById();
 				break;
 			}
@@ -247,22 +248,22 @@ public class SysParameterController {
 		if (param == null || param.keySet().size() == 0) {
 			return Result.error("500", "param不能为空");
 		}
-		String paramId = param.getString("param_id");
-		String paramType = param.getString("param_type");
-		String paramTypeName = param.getString("param_type_name");
+		String paramId = param.getString("paramId");
+		String paramType = param.getString("paramType");
+		String paramTypeName = param.getString("paramTypeName");
 		String userId = loginUserInfoHelper.getUserId();
 		SysParameter sysParameter = sysParameterService.selectById(paramId);
 		if (sysParameter == null) {
 			return Result.error("500", "找不到param_id:" + paramId + "的参数");
 		}
 
-		String paramValue = param.getString("param_value");
-		String paramValue2 = param.getString("param_value2");
-		String paramValue3 = param.getString("param_value3");
-		String paramValue4 = param.getString("param_value4");
-		String paramValue5 = param.getString("param_value5");
+		String paramValue = param.getString("paramValue");
+		String paramValue2 = param.getString("paramValue2");
+		String paramValue3 = param.getString("paramValue3");
+		String paramValue4 = param.getString("paramValue4");
+		String paramValue5 = param.getString("paramValue5");
 		String remark = param.getString("remark");
-		String paramName = param.getString("param_name");
+		String paramName = param.getString("paramName");
 
 		sysParameter.setUpdateTime(new Date());
 		sysParameter.setUpdateUser(loginUserInfoHelper.getUserId());
@@ -281,21 +282,29 @@ public class SysParameterController {
 			return Result.error("500", "数据更新失败");
 		}
 	}
-	
-	@DeleteMapping("/delParm")
+
+	@PostMapping("/delParm")
 	@ResponseBody
 	@ApiOperation(value = "删除参数")
-	public Result delParm(String paramId) {
-		if (paramId == null || paramId.equals("")) {
+	public Result delParm(@RequestBody JSONObject jsonObject) {
+		if (jsonObject == null || jsonObject.getString("paramId").equals("")) {
 			return Result.error("500", "paramId不能为空");
 		}
-		SysParameter sysParameter = sysParameterService.selectById(paramId);
+		SysParameter sysParameter = sysParameterService.selectById(jsonObject.getString("paramId"));
 		if (sysParameter == null) {
-			return Result.error("500", "找不到param_id:" + paramId + "的参数");
+			return Result.error("500", "找不到param_id:" + jsonObject.getString("paramId") + "的参数");
 		}
 
 		boolean result = sysParameter.deleteById();
 		if (result) {
+			int count = sysParameterService
+					.selectCount(new EntityWrapper<SysParameter>().eq("param_type", jsonObject.getString("paramType"))
+							.eq("param_type_name", jsonObject.getString("paramTypeName")));
+			if (count == 0) {
+				sysParameter.setParamValue(Constant.SYS_PARAMETER_PLACEHOLDER.toString());
+				sysParameter.setParamId(null);
+				sysParameter.insert();
+			}
 			return Result.success();
 		} else {
 			return Result.error("500", "数据删除失败");
