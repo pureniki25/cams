@@ -1,16 +1,14 @@
 package com.hongte.alms.base.service.impl;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.hongte.alms.base.entity.BasicCompany;
 import com.hongte.alms.base.entity.SysOrg;
 import com.hongte.alms.base.entity.SysRole;
 import com.hongte.alms.base.entity.SysUser;
 import com.hongte.alms.base.enums.AreaLevel;
 import com.hongte.alms.base.enums.SysRoleAreaTypeEnums;
 import com.hongte.alms.base.mapper.SysUserMapper;
-import com.hongte.alms.base.service.SysOrgService;
-import com.hongte.alms.base.service.SysRoleService;
-import com.hongte.alms.base.service.SysUserAreaService;
-import com.hongte.alms.base.service.SysUserService;
+import com.hongte.alms.base.service.*;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -46,6 +44,10 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserMapper, SysUser> 
     @Autowired
     @Qualifier("SysUserAreaService")
     SysUserAreaService sysUserAreaService;
+
+    @Autowired
+    @Qualifier("BasicCompanyService")
+    BasicCompanyService  basicCompanyService;
 
     /**
      * 根据角色和区域列表获取用户
@@ -121,6 +123,7 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserMapper, SysUser> 
 
         return companys;
     }
+
 
 
 
