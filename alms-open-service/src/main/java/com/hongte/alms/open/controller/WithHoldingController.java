@@ -67,18 +67,7 @@ public class WithHoldingController {
 	
 	  @Value(value="${bmApi.apiUrl}")
 	private String apiUrl;
-
-	@Value(value="${ht.test.txt}")
-	private  String txt;
-
-	@RequestMapping("txt")
-	@ApiOperation(value = "测试properties获取")
-	public String getXindaiThumbnailView(){
-		return txt;
-	}
-
-
-
+	
 	@ApiOperation(value = "执行代扣")
 	@GetMapping("/withholding")
 	public Result<String> withholding(@RequestParam("originalBusinessId") String originalBusinessId,
@@ -113,8 +102,14 @@ public class WithHoldingController {
 			
 			if ("1".equals(respData.getReturnCode())) {// 处理中
 				
-				withHoldingInsertRecord(WithholdingRecordLogService, afterId, originalBusinessId, planOverDueMoney);
-					return Result.success(respData.getReturnMessage());
+				Boolean flag=withHoldingInsertRecord(WithholdingRecordLogService, afterId, originalBusinessId, planOverDueMoney);
+				if(flag) {
+					return Result.success("代扣正在处理中,请稍后查看代扣结果");
+				}else {
+					return Result.success("代扣正在处理中,请稍后查看代扣结果");
+					
+				}
+		
 			} else {
 				return Result.success(respData.getReturnMessage());
 			}
