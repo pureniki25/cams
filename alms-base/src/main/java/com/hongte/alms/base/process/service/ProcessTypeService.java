@@ -2,7 +2,9 @@ package com.hongte.alms.base.process.service;
 
 
 
+import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.process.entity.ProcessType;
+import com.hongte.alms.base.vo.module.ProcessTypeReq;
 import com.hongte.alms.common.service.BaseService;
 
 import java.util.List;
@@ -24,4 +26,6 @@ public interface ProcessTypeService extends BaseService<ProcessType> {
      *返回流程类型列表
      */
     List<ProcessType> getProcessTypeList();
+    
+    public Page<ProcessType> getProcessTypeListByPage(ProcessTypeReq req);
 }

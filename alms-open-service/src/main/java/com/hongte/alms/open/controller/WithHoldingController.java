@@ -102,16 +102,10 @@ public class WithHoldingController {
 			
 			if ("1".equals(respData.getReturnCode())) {// 处理中
 				
-				Boolean flag=withHoldingInsertRecord(WithholdingRecordLogService, afterId, originalBusinessId, planOverDueMoney);
-				if(flag) {
-					return Result.success("代扣正在处理中,请稍后查看代扣结果");
-				}else {
-					return Result.success("代扣正在处理中,请稍后查看代扣结果");
-					
-				}
-		
+				withHoldingInsertRecord(WithholdingRecordLogService, afterId, originalBusinessId, planOverDueMoney);
+					return Result.success(respData.getReturnMessage());
 			} else {
-				return Result.error("error", "代扣出错");
+				return Result.success(respData.getReturnMessage());
 			}
 
 		} catch (Exception ex) {
