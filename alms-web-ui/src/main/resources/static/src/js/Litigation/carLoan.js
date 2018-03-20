@@ -118,15 +118,6 @@ window.layinit(function (htConfig) {
 	        },
 	        
 	        commitInfoForm: {
-//	        	areaData: [],
-	        	componentOption: [
-	            	{
-    	            	houseArea: [],
-    	                detailAddress: '',
-    	                mortgageSituation: '',// 房产抵押情况
-	            	}
-	                 
-				],
 	        	
 				businessId:""		   	, // 业务编号
 				estates: '',	// 是否有房产
@@ -139,6 +130,15 @@ window.layinit(function (htConfig) {
 				processStatus: '',
 				crpId:''
 			},
+			
+			componentOption: [
+            	{
+	            	houseArea: [],
+	                detailAddress: '',
+	                mortgageSituation: '',// 房产抵押情况
+            	}
+                 
+			],
 			
 			areaData: [],
 			
@@ -350,14 +350,14 @@ window.layinit(function (htConfig) {
 	    		 })
 	    	},
 	    	addHouseTabTr :function(event){
-	    		this.commitInfoForm.componentOption.push({
+	    		this.componentOption.push({
 	    			houseArea: [],
 	                detailAddress: '',
 	                mortgageSituation: ''
 	    		});
 	 	    },
 	 	    removeHouseTabTr :function(event, index){
-	 	    	this.commitInfoForm.componentOption.splice(index, 1);
+	 	    	this.componentOption.splice(index, 1);
 	 	    },
 	 	   
 	   },		
@@ -404,12 +404,8 @@ var getShowInfo = function () {
             	} 
             	vm.commitInfoForm.businessId = res.data.data.baseInfo.businessId;
             	if (res.data.data.houseAddress != null && res.data.data.houseAddress.length > 0) {
-        			vm.commitInfoForm.componentOption = res.data.data.houseAddress;
+        			vm.componentOption = res.data.data.houseAddress;
 				}
-            	
-//            	if (!vm.commitInfoForm.areaData || vm.commitInfoForm.areaData.length == 0) {
-//            		vm.commitInfoForm.areaData = vm.areaData;
-//				}
             	
             	var docFiles=res.data.data.returnRegFiles;
             	
