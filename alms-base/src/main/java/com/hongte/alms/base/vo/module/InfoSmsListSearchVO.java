@@ -190,7 +190,78 @@ public class InfoSmsListSearchVO {
 
 
 	public void setSmsType(String smsType) {
-		this.smsType = smsType;
+		switch(smsType){
+		case "200115":
+			this.smsType="还款提前15天发短信给客户";
+			break;
+		case "200201":
+			this.smsType="还款提前1天发短信给业务获取人";
+			break;
+		case "20001":
+			this.smsType="借款成功";
+			break;
+		case "20002":
+			this.smsType="借款审核失败";
+			break;
+		case "20005":
+			this.smsType="放款异常";
+			break;
+		case "1":
+			this.smsType="扣款成功";
+			break;
+		case "2":
+			this.smsType="扣款失败";
+			break;
+		case "5":
+			this.smsType="贷款还款日当天发短信给业务获取人";
+			break;
+		case "6":
+			this.smsType="贷款还款日逾期三天发短信给业务获取人";
+			break;
+		case "0":
+			this.smsType="贷款还款提醒提前3天";
+			break;
+		case "3":
+			this.smsType="贷款还款提醒发给业务员的";
+			break;
+		case "200107":
+			this.smsType="还款提前7天发短信给客户";
+			break;
+		case "4":
+			this.smsType="贷款还款日提前3天发短信给业务获取人";
+			break;
+		case "100":
+			this.smsType="结清申请";
+			break;
+		case "101":
+			this.smsType="展期申请";
+			break;
+		case "103":
+			this.smsType="代扣主卡变更通知";
+			break;
+		case "1000":
+			this.smsType="普通短信";
+			break;
+		case "200101":
+			this.smsType="还款提前1天发短信给客户";
+			break;
+		case "-1":
+			this.smsType="还款逾期1天发短信给客户";
+			break;
+		case "-15":
+			this.smsType="还款逾期15天发短信给客户";
+			break;
+		case "-16":
+			this.smsType="还款逾期16天发短信给客户";
+			break;
+		case "200215":
+			this.smsType="还款提前15天发短信给业务获取人";
+			break;
+		case "200207":
+			this.smsType="还款提前7天发短信给业务获取人";
+			break;
+			
+	}
 	}
 
 

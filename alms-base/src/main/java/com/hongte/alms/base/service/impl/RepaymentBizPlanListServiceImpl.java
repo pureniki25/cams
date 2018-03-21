@@ -27,9 +27,9 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
 
     @Override
     public List<RepaymentBizPlanList> selectNeedPhoneUrgNorBiz(String companyId,Integer overDueDays) {
-        if(overDueDays.equals(0)){
-            overDueDays = 1000;
-        }
+//        if(overDueDays.equals(0)){
+//            overDueDays = 1000;
+//        }
        return repaymentBizPlanListMapper.selectNeedSetColInfoNormalBizPlansBycomId(
                 companyId,
                 overDueDays,
