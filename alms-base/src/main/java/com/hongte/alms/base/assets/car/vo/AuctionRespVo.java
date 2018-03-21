@@ -146,8 +146,7 @@ public class AuctionRespVo implements Serializable{
 	    private Date insuranceDate ; 
 	    
 	    @ApiModelProperty(value="年检到期日",name="inspectionDate ")
-	    @JsonFormat( pattern = "yyyy-MM-dd ")
-	    private Date inspectionDate ; 
+	    private String inspectionDate ; 
 	    
 	    @ApiModelProperty(value="车显里程",name="mileage ")
 	    private int mileage ; 
@@ -549,11 +548,13 @@ public class AuctionRespVo implements Serializable{
 			this.insuranceDate = insuranceDate;
 		}
 
-		public Date getInspectionDate() {
+
+
+		public String getInspectionDate() {
 			return inspectionDate;
 		}
 
-		public void setInspectionDate(Date inspectionDate) {
+		public void setInspectionDate(String inspectionDate) {
 			this.inspectionDate = inspectionDate;
 		}
 

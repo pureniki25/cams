@@ -122,6 +122,7 @@ window.layinit(function (htConfig) {
     		   ,openBank:''//开户银行
     		   ,paymentEndTime:''//缴款截止时间
     		   ,assessOdometer:''//评估时的里程数，只针对页面的验证
+    		   ,viewSampleAddr:''//看样地址
 	       }
 	       
 	       ,  //可发送审批信息的用户列表
@@ -369,6 +370,9 @@ window.layinit(function (htConfig) {
 	    		});
 	       	$("#paymentEndTime").focus(function(){
 	    		  $("#paymentEndTime").css("border","1px solid #ccc");
+	    		});
+	       	$("#viewSampleAddr").focus(function(){
+	    		  $("#viewSampleAddr").css("border","1px solid #ccc");
 	    		});
 	    	this.queryData();
 	   	    laydate.render({
@@ -962,6 +966,10 @@ window.layinit(function (htConfig) {
 	    				return ;
 	    			}
 	    			
+	    		}
+	    		if(vm.carAuction.viewSampleAddr==''||vm.carAuction.viewSampleAddr==null){
+	    			$("#viewSampleAddr").css("border","1px solid #FF3030");
+	    			return ;
 	    		}
 	    		if((vm.approvalInfoForm.isPass==''||vm.approvalInfoForm.isPass==null)&&vm.approvalInfoForm.process.status!=-1){
 	    			//alert(processStatus);
