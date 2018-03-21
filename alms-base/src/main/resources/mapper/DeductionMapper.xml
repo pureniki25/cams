@@ -17,7 +17,7 @@
 		plan.original_business_id as originalBusinessId,
 		plan.borrow_limit as borrowLimit,
 		plan.borrow_limit_unit as borrowLimitUnit,
-		customer.customer_name as customerName,
+		business.customer_name as customerName,
 		customer.identify_card as identifyCard,
 		c.plan_principal as planPrincipal,
 		plan_platform_charge as platformCharge,
