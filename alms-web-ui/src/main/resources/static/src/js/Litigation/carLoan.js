@@ -245,12 +245,7 @@ window.layinit(function (htConfig) {
 	           // closePareantLayer();
 	       },
 	       resetEdit(){  // 撤销操作
-	           if(processStatus == PROCESS_STATUS_NEW || processStatus == PROCESS_STATUS_START) {
-	               this.handleReset("commitInfoForm");
-	           }else{
-	               vm.commitInfoForm =  vm.initalApplyInfo;
-	           }
-	           restProcessApprovalInfo();
+	    	   closePareantLayer();
 	       },
 	       saveDeraf(){// 保存草稿
 	           saveapplyInfo(PROCESS_STATUS_NEW);
