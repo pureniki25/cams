@@ -373,7 +373,7 @@ window.layinit(function (htConfig) {
 	    	this.queryData();
 	   	    laydate.render({
 		        elem: '#annualVerificationExpirationDate',
-		        type:'date',
+		        type:'month',
 		        done: (value) => {
 		          this.carBasic.annualVerificationExpirationDate = value
 		        }

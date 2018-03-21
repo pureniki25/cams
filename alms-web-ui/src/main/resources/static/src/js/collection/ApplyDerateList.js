@@ -336,7 +336,9 @@ var getData = function(){
     	}
     	
       	if(vm.searchForm.derateDateRange[1]!=null){
-      		 dataObject.derateDateEnd = vm.searchForm.derateDateRange[1].getTime();
+      	   var date =vm.searchForm.derateDateRange[1];
+           date.setDate(date.getDate() + 1);
+           dataObject.derateDateEnd=date.getTime();
   	}
   	
     }

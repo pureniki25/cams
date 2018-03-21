@@ -52,8 +52,8 @@ public class AuctionRespVo implements Serializable{
 	    @ApiModelProperty(value="看样开始时间",name="vieStartDate")
 	    private Date vieStartDate;  //咨询结束时间
 	    
-	    @ApiModelProperty(value="看样结束时间",name="vieEndDatee")
-	    private Date vieEndDatee;  //咨询结束时间
+	    @ApiModelProperty(value="看样结束时间",name="vieEndDate")
+	    private Date vieEndDate;  //咨询结束时间
 
 	    @ApiModelProperty(value="看样地点",name="vie ")
 	    private String  vie ;  //看样地点
@@ -121,8 +121,8 @@ public class AuctionRespVo implements Serializable{
 	    @ApiModelProperty(value="车架号",name="frameNumber ")
 	    private String frameNumber ; 
 	    
-	    @ApiModelProperty(value="车辆属地",name="vcehicleTerritory ")
-	    private String vcehicleTerritory ; 
+	    @ApiModelProperty(value="车辆属地",name="vehicleTerritory ")
+	    private String vehicleTerritory ; 
 	    
 	    @ApiModelProperty(value="使用性质",name="useProperty ")
 	    private String useProperty ; 
@@ -333,12 +333,13 @@ public class AuctionRespVo implements Serializable{
 			this.vieStartDate = vieStartDate;
 		}
 
-		public Date getVieEndDatee() {
-			return vieEndDatee;
+	
+		public Date getVieEndDate() {
+			return vieEndDate;
 		}
 
-		public void setVieEndDatee(Date vieEndDatee) {
-			this.vieEndDatee = vieEndDatee;
+		public void setVieEndDate(Date vieEndDate) {
+			this.vieEndDate = vieEndDate;
 		}
 
 		public String getVie() {
@@ -503,12 +504,14 @@ public class AuctionRespVo implements Serializable{
 
 
 
-		public String getVcehicleTerritory() {
-			return vcehicleTerritory;
+
+
+		public String getVehicleTerritory() {
+			return vehicleTerritory;
 		}
 
-		public void setVcehicleTerritory(String vcehicleTerritory) {
-			this.vcehicleTerritory = vcehicleTerritory;
+		public void setVehicleTerritory(String vehicleTerritory) {
+			this.vehicleTerritory = vehicleTerritory;
 		}
 
 		public String getUseProperty() {

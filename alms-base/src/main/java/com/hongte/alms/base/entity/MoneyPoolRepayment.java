@@ -62,15 +62,15 @@ public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
     /**
      * 原业务编号
      */
-	@TableField("original_business_id")
+	/*@TableField("original_business_id")
 	@ApiModelProperty(required= true,value = "原业务编号")
-	private String originalBusinessId;
+	private String originalBusinessId;*/
     /**
      * 期数
      */
-	@TableField("after_id")
+	/*@TableField("after_id")
 	@ApiModelProperty(required= true,value = "期数")
-	private String afterId;
+	private String afterId;*/
     /**
      * 还款计划期数ID，外键，对应tb_repayment_biz_plan_list表的plan_list_id
      */
@@ -221,7 +221,7 @@ public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
 		this.xdPoolId = xdPoolId;
 	}
 
-	public String getOriginalBusinessId() {
+	/*public String getOriginalBusinessId() {
 		return originalBusinessId;
 	}
 
@@ -236,7 +236,7 @@ public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
 	public void setAfterId(String afterId) {
 		this.afterId = afterId;
 	}
-
+*/
 	public String getPlanListId() {
 		return planListId;
 	}
@@ -416,8 +416,6 @@ public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
 			", id=" + id +
 			", moneyPoolId=" + moneyPoolId +
 			", xdPoolId=" + xdPoolId +
-			", originalBusinessId=" + originalBusinessId +
-			", afterId=" + afterId +
 			", planListId=" + planListId +
 			", operateId=" + operateId +
 			", operateName=" + operateName +

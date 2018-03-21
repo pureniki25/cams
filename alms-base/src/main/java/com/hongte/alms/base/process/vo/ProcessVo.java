@@ -84,9 +84,18 @@ public class ProcessVo {
      * 所属分公司
      */
     private String companyId;
+    private String companyName;
+    
 
+    public String getCompanyName() {
+		return companyName;
+	}
 
-    public String getProcessName() {
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
+	}
+
+	public String getProcessName() {
         return processName;
     }
 
