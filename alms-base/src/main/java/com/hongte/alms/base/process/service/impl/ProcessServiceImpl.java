@@ -821,10 +821,13 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
             comids = new LinkedList<>();
             comids.add(key.getCompanyId());
         }
-        List<String> comIds =  basicCompanyService.selectUserSearchComIds(loginUserInfoHelper.getUserId(),null,comids);
+//        List<String> comIds =  basicCompanyService.selectUserSearchComIds(loginUserInfoHelper.getUserId(),null,comids);
+        List<String> comIds =  basicCompanyService.selectSearchComids(null,comids);
         if(comIds!=null&&comIds.size()>0){
             key.setCompanyIds(comIds);
         }
+
+        key.setUserId(loginUserInfoHelper.getUserId());
     }
 
     @Override

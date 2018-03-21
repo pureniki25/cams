@@ -39,7 +39,8 @@ public class ProcessReq  extends PageRequest {
     //我的审批 界面类型
     private String reqPageeType; //waitToApprove 需要我审批的;    Approved 我已审批的;      SelfStart 我发起的;   CopySendToMe 抄送我的;  Search 审批查询;
 
-
+    //当前登录的用户ID
+    private String userId;
 
 
     public String getKeyWord() {
@@ -156,5 +157,13 @@ public class ProcessReq  extends PageRequest {
 
     public void setCompanyIds(List<String> companyIds) {
         this.companyIds = companyIds;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

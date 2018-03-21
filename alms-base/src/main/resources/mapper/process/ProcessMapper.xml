@@ -274,6 +274,7 @@
         LEFT JOIN tb_process_type as p_type ON process.process_typeid = p_type.type_id
         LEFT JOIN tb_sys_user  as s_user  ON  process.create_user = s_user.user_id
         LEFT JOIN tb_basic_company as company ON business.company_id = company.area_id
+        LEFT JOIN  tb_sys_user_permission as  p ON  p.business_id = business.business_id
 
         <!--            我已审批的 -->
         <if test="reqPageeType == 'Approved' ">
@@ -354,6 +355,10 @@
                 AND  process.start_user_id = #{currentUserId}
             </if>
 
+           <!--            /*用户ID*/ -->
+           <if test="userId !=null  and userId != '' ">
+               and p.user_id = #{userId}
+           </if>
 
 
           <!--            审批查询 -->

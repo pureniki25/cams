@@ -70,9 +70,9 @@ public class BasicCompanyServiceImpl extends BaseServiceImpl<BasicCompanyMapper,
             if(company.getAreaLevel().equals(AreaLevel.COMPANY_LEVEL.getKey())){
                 if(comMap.get(a)==null){
                     comMap.put(a,company);
-                }else{
-                    aas.add(a);
                 }
+            }else{
+                aas.add(a);
             }
         }
 
@@ -171,6 +171,45 @@ public class BasicCompanyServiceImpl extends BaseServiceImpl<BasicCompanyMapper,
 
         return comRetIds;
     }
+
+    @Override
+    public List<String> selectSearchComids(List<String> areas, List<String> comIds){
+        //搜索选择的公司Map
+        Map<String, BasicCompany>  searchMap = null;
+        //取区域对应的公司Map
+        if(areas!=null && areas.size()>0){
+            searchMap = selectCompanysMapByAreaId(areas);
+        }
+        if(comIds!=null&&comIds.size()>0){
+            if(searchMap == null){
+                searchMap = new HashMap<>();
+                for(String comId:comIds){
+                    BasicCompany c =  searchMap.get(comId);
+                    if(c==null){
+                        searchMap.put(comId,null);
+                    }
+                }
+            }
+/*            else {//同时搜索公司和区域，取交集
+                Map<String, BasicCompany> s1Map = new HashMap<>();
+                for(String comId:comIds){
+                    BasicCompany c =  searchMap.get(comId);
+                    if(c!=null){
+                        s1Map.put(comId,null);
+                    }
+                }
+                searchMap =s1Map;
+            }*/
+
+        }
+        List<String> ll = new LinkedList<>();
+        if(searchMap!=null){
+            ll = new LinkedList<>(searchMap.keySet());
+        }
+        return ll;
+    }
+
+
 
 //    @Override
     public Map<String, BasicCompany> selectUserCanSeeCompany(String userId) {
