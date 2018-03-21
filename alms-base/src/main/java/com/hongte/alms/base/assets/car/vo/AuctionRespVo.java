@@ -158,8 +158,8 @@ public class AuctionRespVo implements Serializable{
 	    @ApiModelProperty(value="车辆抵押状态",name="mortgageState ")
 	    private String mortgageState ; 
 	    
-	    @ApiModelProperty(value="违章未处理记录",name="lllegal ")
-	    private String Illegal ; 
+	    @ApiModelProperty(value="违章未处理记录",name="illegal ")
+	    private String illegal ; 
 	    
 	    @ApiModelProperty(value="随车工具",name="tools ")
 	    private String tools ; 
@@ -175,8 +175,8 @@ public class AuctionRespVo implements Serializable{
 	    private String transactionMode ; 
 	    @ApiModelProperty(value="车辆位置",name="position ")
 	    private String position ; 
-	    @ApiModelProperty(value="提供文件",name="files ")
-	    private String files ; 
+	    @ApiModelProperty(value="提供文件",name="file ")
+	    private String file ; 
 	    
 	    @ApiModelProperty(value="备注",name="remarks  ")
 	    private String remarks  ;
@@ -582,13 +582,7 @@ public class AuctionRespVo implements Serializable{
 			this.mortgageState = mortgageState;
 		}
 
-		public String getIllegal() {
-			return Illegal;
-		}
 
-		public void setIllegal(String illegal) {
-			Illegal = illegal;
-		}
 
 		public String getTools() {
 			return tools;
@@ -622,13 +616,6 @@ public class AuctionRespVo implements Serializable{
 			this.position = position;
 		}
 
-		public String getFiles() {
-			return files;
-		}
-
-		public void setFiles(String files) {
-			this.files = files;
-		}
 
 		public String getRemarks() {
 			return remarks;
@@ -772,6 +759,22 @@ public class AuctionRespVo implements Serializable{
 
 		public void setAuditTime(Date auditTime) {
 			this.auditTime = auditTime;
+		}
+
+		public String getIllegal() {
+			return illegal;
+		}
+
+		public void setIllegal(String illegal) {
+			this.illegal = illegal;
+		}
+
+		public String getFile() {
+			return file;
+		}
+
+		public void setFile(String file) {
+			this.file = file;
 		} 
 	    
 	 
