@@ -718,6 +718,7 @@ try {
       	return Result.build("0000", "操作成功", map);
  	}catch (Exception e) {
       	logger.error(e.getMessage());
+      	e.printStackTrace();
       	return Result.error("9999", "操作异常");
   	}
   }
