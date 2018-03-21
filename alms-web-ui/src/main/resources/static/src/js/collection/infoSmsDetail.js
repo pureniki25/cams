@@ -11,6 +11,7 @@ var layer;
 	var sendDate = document.getElementById("sendDate").getAttribute("value");
 	var status = document.getElementById("status").getAttribute("value");
 	var content = document.getElementById("content").getAttribute("value");
+	var businessTypeName = document.getElementById("businessTypeName").getAttribute("value");
 	window.layinit(function (htConfig) {
 		var _htConfig = htConfig;
         basePath = _htConfig.coreBasePath;
@@ -23,6 +24,7 @@ var layer;
         		sendDate:sendDate,
         		status:status,
         		content:content,
+        		businessTypeName:businessTypeName
         };
         
         vm = new Vue({
@@ -49,6 +51,10 @@ var layer;
                     	value: ajax_data.afterId
                     },
                     {
+                    	key: '业务类型',
+                    	value: ajax_data.businessTypeName
+                    },
+                    {
                     	key: '短信接收人',
                     	value: ajax_data.recipient
                     },
@@ -59,6 +65,10 @@ var layer;
                     {
                     	key: '发送时间',
                     	value: ajax_data.sendDate
+                    },
+                    {
+                    	key: '状态',
+                    	value: ajax_data.status
                     },
                     {
                     	key: '短信内容',
@@ -98,10 +108,12 @@ var layer;
                     ajax_data=result.data.data;
                     vm.data1[0].value=ajax_data.originalBusinessId
                     vm.data1[1].value=ajax_data.afterId
-                    vm.data1[2].value=ajax_data.recipient
-                    vm.data1[3].value=ajax_data.phoneNumber
-                    vm.data1[4].value=ajax_data.sendDate
-                    vm.data1[5].value=ajax_data.content
+                    vm.data1[2].value=ajax_data.businessTypeName
+                    vm.data1[3].value=ajax_data.recipient
+                    vm.data1[4].value=ajax_data.phoneNumber
+                    vm.data1[5].value=ajax_data.sendDate
+                    vm.data1[6].value=ajax_data.status
+                    vm.data1[7].value=ajax_data.content
                 } else {
                     self.$Modal.error({content: '获取数据失败：' + result.data.msg});
                 }
@@ -128,10 +140,12 @@ var layer;
                     ajax_data=result.data.data;
                     vm.data1[0].value=ajax_data.originalBusinessId
                     vm.data1[1].value=ajax_data.afterId
-                    vm.data1[2].value=ajax_data.recipient
-                    vm.data1[3].value=ajax_data.phoneNumber
-                    vm.data1[4].value=ajax_data.sendDate
-                    vm.data1[5].value=ajax_data.content
+                    vm.data1[2].value=ajax_data.businessTypeName
+                    vm.data1[3].value=ajax_data.recipient
+                    vm.data1[4].value=ajax_data.phoneNumber
+                    vm.data1[5].value=ajax_data.sendDate
+                    vm.data1[6].value=ajax_data.status
+                    vm.data1[7].value=ajax_data.content
                 } else {
                     self.$Modal.error({content: '获取数据失败：' + result.data.msg});
                 }

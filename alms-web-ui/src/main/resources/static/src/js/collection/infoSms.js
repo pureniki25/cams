@@ -242,9 +242,9 @@ function getInfoSmsDetailUrl(){
             app : 'ALMS',
             Authorization : "Bearer " + getToken()
         },
-        success : function(data) {
+        success : function(data) {debugger
             var infoSmsDetail = data.data;
-            url =  '/infoUI/infoSmsDetailUI?originalBusinessId='+vm.selectedRowInfo.originalBusinessId+'&afterId='+infoSmsDetail.afterId+"&recipient="+vm.selectedRowInfo.recipient+"&phoneNumber="+vm.selectedRowInfo.phoneNumber+"&sendDate="+vm.selectedRowInfo.sendDate+"&status="+vm.selectedRowInfo.status+"&content="+infoSmsDetail.content+"&logId="+vm.selectedRowInfo.logId
+            url =  '/infoUI/infoSmsDetailUI?originalBusinessId='+vm.selectedRowInfo.originalBusinessId+'&afterId='+infoSmsDetail.afterId+"&recipient="+vm.selectedRowInfo.recipient+"&phoneNumber="+vm.selectedRowInfo.phoneNumber+"&sendDate="+vm.selectedRowInfo.sendDate+"&status="+vm.selectedRowInfo.status+"&content="+infoSmsDetail.content+"&logId="+vm.selectedRowInfo.logId+"&businessTypeName="+infoSmsDetail.businessTypeName
         },
         error : function() {
             layer.confirm('Navbar error:AJAX请求出错!', function(index) {
