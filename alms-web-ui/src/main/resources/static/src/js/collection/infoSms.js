@@ -26,7 +26,18 @@ var getSelectsData = function () {
             vm.$Modal.error({content: '接口调用异常!'});
         });
 }
-
+//单行操作弹框显示
+var showOneLineOprLayer = function(url,title){
+    // vm.edit_modal = false;
+    var openIndex= layer.open({
+        type: 2,
+        area: ['95%', '95%'],
+        fixed: false,
+        maxmin: true,
+        title:title,
+        content: url
+    });
+}
 
 window.layinit(function (htConfig) {
     var _htConfig = htConfig;
