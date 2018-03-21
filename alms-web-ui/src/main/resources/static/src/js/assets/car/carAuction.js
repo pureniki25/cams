@@ -461,7 +461,7 @@ window.layinit(function (htConfig) {
 	                	vm.business=data.data.business;
 	                	vm.drag=data.data.drag;
 	                	
-	                	if(repayPlan!=null&&repayPlan!=''){
+	                	if(data.data.repayPlan!=null&&data.data.repayPlan!=''){
 	                		vm.repayPlan=data.data.repayPlan;
 	                	}
 	                	vm.outputRecord=data.data.outputRecord;
