@@ -402,7 +402,9 @@ var getData = function(){debugger
     		 dataObject.dateBegin = vm.searchForm.dateRange[0].getTime();
     	}
      	if(vm.searchForm.dateRange[1]!=null){
-            dataObject.dateEnd = vm.searchForm.dateRange[1].getTime();
+            var date =vm.searchForm.dateRange[1];
+            date.setDate(date.getDate() + 1);
+            dataObject.dateEnd=date.getTime();
    	}
 
     }

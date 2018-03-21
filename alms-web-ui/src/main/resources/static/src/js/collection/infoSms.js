@@ -173,7 +173,7 @@ window.layinit(function (htConfig) {
             if (obj.event === 'business') {debugger
                 if(obj.data.businessTypeId == 9 || obj.data.businessTypeId == 1){
                     //车贷  车贷展期
-                     axios.get(basePath + 'api/getXindaiCarView?businessId ='+obj.data.originalBusinessId)
+                     axios.get(basePath + 'api/getXindaiCarView?businessId='+obj.data.originalBusinessId)
                          .then(function (res) {
                              if (res.data.code == "1") {
                                  showOneLineOprLayer(res.data.data,"车贷详情");
@@ -186,7 +186,7 @@ window.layinit(function (htConfig) {
                          });
                  }else if(obj.data.businessTypeId == 11 || obj.data.businessTypeId == 2){
                      //房贷
-                     axios.get(basePath + 'api/getXindaiHouseView?businessId ='+obj.data.originalBusinessId)
+                     axios.get(basePath + 'api/getXindaiHouseView?businessId='+obj.data.originalBusinessId)
                          .then(function (res) {
                              if (res.data.code == "1") {
                                  showOneLineOprLayer(res.data.data,"房贷详情");
@@ -317,7 +317,9 @@ var getData = function(){debugger
     		   dataObject.sendDateBegin = vm.searchForm.sendDateRange[0].getTime();
     	}
     	if(vm.searchForm.sendDateRange[1]!=null){
-            dataObject.sendDateEnd = vm.searchForm.sendDateRange[1].getTime();
+      	   var date =vm.searchForm.sendDateRange[1];
+           date.setDate(date.getDate() + 1);
+           dataObject.sendDateEnd=date.getTime();
     	}
 
     }

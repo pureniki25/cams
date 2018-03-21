@@ -170,32 +170,31 @@ height: 100%;
 					<table class="layui-table">
 						<tr track-by="$index" v-for="(info, index) in componentOption" >
 							<td class="td_label">房产地址{{index + 1}}</td>
-							<td v-if="applyInfoFormEditFlage" > 
+							<td v-if="applyInfoFormEditFlage && commitInfoForm.estates == '是'" > 
 							      <cascader :data="areaData" v-model="componentOption[index].houseArea" filterable></cascader>
 							</td>
 							<td v-else disabled > 
 							      <cascader :data="areaData" v-model="componentOption[index].houseArea" filterable disabled></cascader>
 							</td>
-							<td  v-if="applyInfoFormEditFlage"> 
+							<td  v-if="applyInfoFormEditFlage && commitInfoForm.estates == '是'"> 
 							      <i-input v-model="componentOption[index].detailAddress" placeholder="详细地址" ></i-input>
 							</td>
 							<td v-else disabled > 
 							      <i-input v-model="componentOption[index].detailAddress" placeholder="详细地址" disabled></i-input>
 							</td>
-							<td v-if="applyInfoFormEditFlage"> 
+							<td v-if="applyInfoFormEditFlage && commitInfoForm.estates == '是'"> 
 							      <i-input v-model="componentOption[index].mortgageSituation" placeholder="房产抵押情况" ></i-input>
 							</td>
 							<td v-else disabled> 
 							      <i-input v-model="componentOption[index].mortgageSituation" placeholder="房产抵押情况" disabled></i-input>
 							</td>
-							<td v-if="applyInfoFormEditFlage">
+							<td v-if="applyInfoFormEditFlage && commitInfoForm.estates == '是'">
 							  <div class="layui-btn-group">
 							    <button class="layui-btn layui-btn-primary layui-btn-sm" v-on:click="addHouseTabTr($event)"><i class="layui-icon"></i></button>
 							    <button v-if="index != 0" class="layui-btn layui-btn-primary layui-btn-sm"  v-on:click="removeHouseTabTr($event, index)"><i class="layui-icon"></i></button>
 							  </div>
 							  
-							</td>
-							
+							</td>						
 						</tr>
 						
 					</table>
