@@ -18,13 +18,15 @@ window.layinit(function (htConfig) {
             {pattern:/(^[1-9](\d+)?(\.\d{1,2})?$)|(^(0){1}$)|(^\d\.\d{1,2}?$)/,message:'还款金额格式不正确',trigger:'blur'},
         ],
         realRepaymentUser:[
-            {required:true,message:'实际还款人不能为空',trigger:'blur'}
+            {required:true,message:'实际还款人不能为空',trigger:'blur'},
+            {pattern:/^[\u4e00-\u9fa5]{1,20}$/,message:'实际还款人应为最长20个汉字',trigger:'blur'}
         ],
         tradeType:[
             {required:true,message:'交易类型不能为空',trigger:'blur'}
         ],
         acceptBankU:[
-            {required:true,message:'收款人不能为空',trigger:'blur'}
+            {required:true,message:'收款人不能为空',trigger:'blur'},
+            {pattern:/^[\u4e00-\u9fa5]{1,20}$/,message:'收款人应为最长20个汉字',trigger:'blur'}
         ],
         acceptBank:[
             {required:true,message:'转入账号不能为空',trigger:'blur'}
@@ -77,6 +79,7 @@ window.layinit(function (htConfig) {
             openAddModal:function(){
                 this.add_modal = true 
                 this.$refs['editForm'].resetFields()
+                this.$refs['upload'].clearFiles()
                 console.log(this.editForm)
             },
             beforeUpload:function(file){
@@ -281,7 +284,8 @@ window.layinit(function (htConfig) {
                 title:'编号'
             },{
                 field:'repaymentDate',
-                title:'还款日期'
+                title:'还款日期',
+                width:110
             },{
                 field:'repaymentMoney',
                 title:'还款金额'
@@ -293,16 +297,19 @@ window.layinit(function (htConfig) {
                 title:'交易类型'
             },{
                 field:'tradePlace',
-                title:'交易场所'
+                title:'交易场所',
+                width:150
             },{
                 field:'acceptBank',
                 title:'转入账号'
             },{
                 field:'status',
-                title:'状态'
+                title:'状态',
+                width:150
             },{
                 title:'操作',
-                toolbar:'#toolbar'
+                toolbar:'#toolbar',
+                fixed:"right"
             }
         ]], //设置表头
         url: basePath + 'moneyPool/page',
