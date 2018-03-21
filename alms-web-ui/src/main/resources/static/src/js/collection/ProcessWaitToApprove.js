@@ -99,7 +99,7 @@ window.layinit(function (htConfig) {
 
                     }
 
-                     this.loading = false;
+                    // this.loading = false;
                 })
             },
             handleReset(name) { // 重置表单
@@ -114,6 +114,14 @@ window.layinit(function (htConfig) {
             layui.use(['layer', 'table','ht_ajax', 'ht_auth', 'ht_config'], function () {
                 layer = layui.layer;
                 table = layui.table;
+                // var config = layui.ht_config;
+                // basePath = config.basePath;
+                //执行渲染
+                table.render({
+                    elem: '#listTable' //指定原始表格元素选择器（推荐id选择器）
+                    , id: 'listTable'
+                    , height: 550 //容器高度
+                    , cols: [[
 
                 var  cols = [
                     {

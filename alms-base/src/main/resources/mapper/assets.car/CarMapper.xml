@@ -146,9 +146,9 @@
 		tca.cons_start_time conStartDate,							<!-- 咨询开始时间 -->
 		tca.cons_end_time conEndDate,				<!-- 咨询结束时间 -->
 		tca.view_sample_start_time vieStartDate,							<!-- 看样开始时间 -->
-		tca.view_sample_end_time vieEndDate,								<!-- 看样结束时间 -->
+		tca.view_sample_end_time vieEndDatee,								<!-- 看样结束时间 -->
 		tca.view_sample_addr vie,									<!-- 看样地点 -->
-		tca.consultant_addr contact,								<!-- 联系地点 -->
+		tca.unit_addr contact,								<!-- 联系地点 -->
 		tca.payment_end_time paymentTime,							<!-- 缴款截止时间 -->
 		case
 		when tca.trans_type='01' then '债权转让'
@@ -185,7 +185,7 @@
 		end carproduction ,					<!--汽车产地 -->
 		tcb.color carColour ,<!--车辆颜色 -->
 		tcb.model carModel ,<!--车辆型号 -->
-		tcb.license_location vehicleTerritory,<!-- 汽车属地 -->
+		tcb.license_location vcehicleTerritory,<!-- 汽车属地 -->
 		concat(tcb.displacement,tcb.displacement_unit) displacement ,	<!--排量 -->
 		tcb.engine_model engineNumber ,<!--发动机号 -->
 		tcb.vin frameNumber ,<!--车架号 -->
@@ -238,11 +238,11 @@
 			</if>
 			<if test="vehicleBrand !=null and vehicleBrand !=''">
 			
-			    and tcb.brand_name=#{vehicleBrand}
+			    and tcb.brand_name LIKE "%"#{vehicleBrand}"%"
 			</if>
 			<if test="carModel !=null and carModel !=''">
 			
-			    and tcb.model=#{vehicleBrand}
+			    and tcb.model LIKE "%"#{carModel}"%"
 			</if>
 		</where>
 		order BY tca.create_time DESC
@@ -282,11 +282,11 @@
 			</if>
 			<if test="vehicleBrand !=null and vehicleBrand !=''">
 			
-			    and tcb.brand_name=#{vehicleBrand}
+			    and tcb.brand_name LIKE "%"#{vehicleBrand}"%"
 			</if>
 			<if test="carModel !=null and carModel !=''">
 			
-			    and tcb.model=#{vehicleBrand}
+			    and tcb.model LIKE "%"#{carModel}"%"
 			</if>
 		</where>
 		order BY tca.create_time DESC
@@ -377,9 +377,9 @@
 		tca.cons_start_time conStartDate,							<!-- 咨询开始时间 -->
 		tca.cons_end_time conEndDate,				<!-- 咨询结束时间 -->
 		tca.view_sample_start_time vieStartDate,							<!-- 看样开始时间 -->
-		tca.view_sample_end_time vieEndDate,								<!-- 看样结束时间 -->
+		tca.view_sample_end_time vieEndDatee,								<!-- 看样结束时间 -->
 		tca.view_sample_addr vie,									<!-- 看样地点 -->
-		tca.consultant_addr contact,								<!-- 联系地点 -->
+		tca.unit_addr contact,								<!-- 联系地点 -->
 		tca.payment_end_time paymentTime,							<!-- 缴款截止时间 -->
 		case
 		when tca.trans_type='01' then '债权转让'
@@ -416,7 +416,7 @@
 		end carproduction ,					<!--汽车产地 -->
 		tcb.color carColour ,<!--车辆颜色 -->
 		tcb.model carModel ,<!--车辆型号 -->
-		tcb.license_location vehicleTerritory,<!-- 汽车属地 -->
+		tcb.license_location vcehicleTerritory,<!-- 汽车属地 -->
 		concat(tcb.displacement,tcb.displacement_unit) displacement ,	<!--排量 -->
 		tcb.engine_model engineNumber ,<!--发动机号 -->
 		tcb.vin frameNumber ,<!--车架号 -->
@@ -479,11 +479,11 @@
 			</if>
 			<if test="vehicleBrand !=null and vehicleBrand !=''">
 			
-			    and tcb.brand_name=#{vehicleBrand}
+			    and tcb.brand_name LIKE "%"#{vehicleBrand}"%"
 			</if>
 			<if test="carModel !=null and carModel !=''">
 			
-			    and tcb.model=#{vehicleBrand}
+			    and tcb.model LIKE "%"#{carModel}"%"
 			</if>
 		</where>
 		order BY tcar.update_time desc
@@ -523,11 +523,11 @@
 			</if>
 			<if test="vehicleBrand !=null and vehicleBrand !=''">
 			
-			    and tcb.brand_name=#{vehicleBrand}
+			    and tcb.brand_name LIKE "%"#{vehicleBrand}"%"
 			</if>
 			<if test="carModel !=null and carModel !=''">
 			
-			    and tcb.model=#{vehicleBrand}
+			    and tcb.model LIKE "%"#{carModel}"%"
 			</if>
 		</where>	
 	</select>

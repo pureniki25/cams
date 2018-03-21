@@ -142,13 +142,23 @@ public class InfoController {
     public PageResult<List<InfoSmsListSearchVO>> selectInfoSmsVoPage(@ModelAttribute InfoSmsListSearchReq  req){
 
         try{
-           	req.setUserId(loginUserInfoHelper.getUserId());
-            Page<InfoSmsListSearchVO> pages = infoSmsService.selectInfoSmsPage(req);
-            List<InfoSmsListSearchVO> list=pages.getRecords();
-            List<String> logIdList=new ArrayList();
-            for(int i=0;i<list.size();i++) {
-            	logIdList.add(list.get(0).getLogId());
+        	
+        	Map<String,BasicCompany> companyIds  =  basicCompanyService.selectUserCanSeeCompany(loginUserInfoHelper.getUserId());
+        	List companys=new ArrayList();
+            if (companyIds != null) {
+                for (String key : companyIds.keySet()) {
+                	companys.add(key);
+                }
             }
+            req.setCompanyIds(companys);
+           	req.setUserId(loginUserInfoHelper.getUserId());
+           	
+            Page<InfoSmsListSearchVO> pages = infoSmsService.selectInfoSmsPage(req);
+            
+            List<InfoSmsListSearchVO> list=pages.getRecords();
+            
+     
+          
             return PageResult.success(pages.getRecords(),pages.getTotal());
         }catch (Exception ex){
             ex.printStackTrace();
