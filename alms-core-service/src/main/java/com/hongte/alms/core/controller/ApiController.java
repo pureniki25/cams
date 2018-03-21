@@ -144,7 +144,7 @@ public class ApiController {
         }
         try {
             RenewalBusiness renewalBusiness = renewalBusinessService.selectOne(new EntityWrapper<RenewalBusiness>().eq("renewal_business_id",businessId));
-            BasicBusiness business = basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id",businessId));
+            BasicBusiness business = basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id",renewalBusiness.getOriginalBusinessId()));
             String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
             String appKey = this.afterLoanKey;
             String appSecret = this.afterLoanSecret;

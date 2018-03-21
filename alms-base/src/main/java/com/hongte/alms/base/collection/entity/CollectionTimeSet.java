@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.annotations.TableName;
 import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.hongte.alms.base.enums.ColTypeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
@@ -37,7 +38,7 @@ public class CollectionTimeSet extends Model<CollectionTimeSet> {
      */
 	@TableField("col_type")
 	@ApiModelProperty(required= true,value = "移交类型（1：移交清算一（电催），2：移交清算二（上门催收），3：移交法务诉讼）")
-	private String colType;
+	private ColTypeEnum colType;
     /**
      * 逾期天数
      */
@@ -79,11 +80,11 @@ public class CollectionTimeSet extends Model<CollectionTimeSet> {
 		this.colTimeId = colTimeId;
 	}
 
-	public String getColType() {
+	public ColTypeEnum getColType() {
 		return colType;
 	}
 
-	public void setColType(String colType) {
+	public void setColType(ColTypeEnum colType) {
 		this.colType = colType;
 	}
 

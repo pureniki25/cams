@@ -111,7 +111,7 @@ public class WithHoldingController {
 				}
 		
 			} else {
-				return Result.error("error", "代扣出错");
+				return Result.success(respData.getReturnMessage());
 			}
 
 		} catch (Exception ex) {

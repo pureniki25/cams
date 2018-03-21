@@ -1,10 +1,12 @@
 package com.hongte.alms.base.process.service.impl;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-
+import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.process.entity.ProcessType;
 import com.hongte.alms.base.process.mapper.ProcessTypeMapper;
 import com.hongte.alms.base.process.service.ProcessTypeService;
+import com.hongte.alms.base.vo.module.ProcessTypeReq;
+import com.hongte.alms.base.vo.module.RepaymentLogVO;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -79,4 +81,25 @@ public class ProcessTypeServiceImpl extends BaseServiceImpl<ProcessTypeMapper, P
         processTypeList=processTypeMapper.selectList(new EntityWrapper<ProcessType>().orderBy("create_user"));
         return processTypeList;
     }
+    
+    
+    /**分页
+     *返回所有流程类型列表
+     * @author 陈泽圣
+     * @Date 2018/3/20 
+     */
+    @Override
+    public Page<ProcessType> getProcessTypeListByPage(ProcessTypeReq req) {
+    	
+        Page<ProcessType> pages = new Page<>();
+	      pages.setSize(req.getLimit());
+	      pages.setCurrent(req.getPage());
+
+        List<ProcessType> processTypeList=null;
+        processTypeList=processTypeMapper.selectList(new EntityWrapper<ProcessType>().orderBy("create_user"));
+        pages.setRecords(processTypeList);
+        return pages;
+    }
+    
+    
 }

@@ -23,10 +23,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.hongte.alms.base.assets.car.vo.FileVo;
 import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
 import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
 import com.hongte.alms.base.collection.service.CollectionStatusService;
 import com.hongte.alms.base.entity.Doc;
+import com.hongte.alms.base.entity.DocTmp;
 import com.hongte.alms.base.entity.DocType;
 import com.hongte.alms.base.entity.FsdHouse;
 import com.hongte.alms.base.entity.TransferLitigationCar;
@@ -43,6 +45,7 @@ import com.hongte.alms.base.process.vo.ProcessLogReq;
 import com.hongte.alms.base.process.vo.ProcessSaveReq;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.DocService;
+import com.hongte.alms.base.service.DocTmpService;
 import com.hongte.alms.base.service.DocTypeService;
 import com.hongte.alms.base.service.FsdHouseService;
 import com.hongte.alms.base.service.SysProvinceService;
@@ -60,6 +63,7 @@ import com.hongte.alms.base.vo.litigation.house.MortgageInfo;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.ht.ussp.bean.LoginUserInfoHelper;
+import com.ht.ussp.util.BeanUtils;
 
 @Service("TransferOfLitigationService")
 public class TransferLitigationServiceImpl implements TransferOfLitigationService {
@@ -112,6 +116,10 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	private DocService docService;
 
 	@Autowired
+	@Qualifier("DocTmpService")
+	private DocTmpService docTmpService;
+
+	@Autowired
 	@Qualifier("CollectionStatusService")
 	private CollectionStatusService collectionStatusService;
 
@@ -120,7 +128,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		if (StringUtil.isEmpty(businessId)) {
 			return null;
 		}
-		
+
 		Map<String, Object> resultMap = transferOfLitigationMapper.queryCarLoanData(businessId);
 
 		if (resultMap == null) {
@@ -177,11 +185,11 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 	@Override
 	public HouseLoanVO queryHouseLoanData(String businessId) {
-		
+
 		if (StringUtil.isEmpty(businessId)) {
 			return null;
 		}
-		
+
 		HouseLoanVO houseLoanData = transferOfLitigationMapper.queryHouseLoanData(businessId);
 		if (houseLoanData != null) {
 			List<HousePlanInfo> housePlanInfos = transferOfLitigationMapper.queryRepaymentPlanHouse(businessId);
@@ -233,7 +241,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 					throw new ServiceRuntimeException(data.getMessage());
 				}
 				LOG.error("businessId：" + businessId + "，发送诉讼系统成功！诉讼系统返回信息：" + data.toString());
-			}else {
+			} else {
 				throw new ServiceRuntimeException("businessId：" + businessId + "，发送诉讼系统失败！！没有数据返回");
 			}
 		} catch (Exception e) {
@@ -358,10 +366,18 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 	@Transactional(rollbackFor = Exception.class)
 	@Override
-	public void saveTransferLitigationHouse(TransferLitigationHouse req, String sendUrl) {
+	public void saveTransferLitigationHouse(TransferLitigationHouse req, String sendUrl, List<FileVo> files) {
 
-		if (req == null || StringUtil.isEmpty(req.getBusinessId())) {
-			throw new ServiceRuntimeException("参数不能空！");
+		if (!CollectionUtils.isEmpty(files)) {
+			for (FileVo file : files) {
+				DocTmp tmp = docTmpService.selectById(file.getOldDocId());// 将临时表保存的上传信息保存到主表中
+				if (tmp != null) {
+					Doc doc = new Doc();
+					BeanUtils.copyProperties(tmp, doc);
+					doc.setOriginalName(file.getOriginalName());
+					docService.insertOrUpdate(doc);
+				}
+			}
 		}
 
 		ProcessSaveReq processSaveReq = new ProcessSaveReq();
@@ -392,10 +408,22 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 	@Transactional(rollbackFor = Exception.class)
 	@Override
-	public void saveTransferLitigationCar(TransferLitigationCar req, String sendUrl) {
+	public void saveTransferLitigationCar(TransferLitigationCar req, String sendUrl, List<FileVo> files) {
 
 		if (req == null || StringUtil.isEmpty(req.getBusinessId())) {
 			throw new ServiceRuntimeException("参数不能空！");
+		}
+
+		if (!CollectionUtils.isEmpty(files)) {
+			for (FileVo file : files) {
+				DocTmp tmp = docTmpService.selectById(file.getOldDocId());// 将临时表保存的上传信息保存到主表中
+				if (tmp != null) {
+					Doc doc = new Doc();
+					BeanUtils.copyProperties(tmp, doc);
+					doc.setOriginalName(file.getOriginalName());
+					docService.insertOrUpdate(doc);
+				}
+			}
 		}
 
 		String businessId = req.getBusinessId();
@@ -409,8 +437,8 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		Process process = processService.saveProcess(processSaveReq, ProcessTypeEnums.CAR_LOAN_LITIGATION);
 
 		List<TransferLitigationCar> litigationCars = transferLitigationCarService
-				.selectList(new EntityWrapper<TransferLitigationCar>().eq("business_id", businessId)
-						.eq("process_id", process.getProcessId()));
+				.selectList(new EntityWrapper<TransferLitigationCar>().eq("business_id", businessId).eq("process_id",
+						process.getProcessId()));
 
 		if (CollectionUtils.isEmpty(litigationCars)) {
 			req.setProcessId(process.getProcessId());

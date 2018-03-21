@@ -25,7 +25,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.hongte.alms.base.assets.car.vo.FileVo;
 import com.hongte.alms.base.collection.service.CollectionStatusService;
+import com.hongte.alms.base.entity.Doc;
+import com.hongte.alms.base.entity.DocType;
 import com.hongte.alms.base.entity.TransferLitigationCar;
 import com.hongte.alms.base.entity.TransferLitigationHouse;
 import com.hongte.alms.base.process.enums.ProcessTypeEnums;
@@ -33,6 +36,8 @@ import com.hongte.alms.base.process.service.ProcessService;
 import com.hongte.alms.base.process.service.ProcessTypeService;
 import com.hongte.alms.base.process.service.ProcessTypeStepService;
 import com.hongte.alms.base.process.vo.ProcessLogReq;
+import com.hongte.alms.base.service.DocService;
+import com.hongte.alms.base.service.DocTypeService;
 import com.hongte.alms.base.service.TransferLitigationCarService;
 import com.hongte.alms.base.service.TransferLitigationHouseService;
 import com.hongte.alms.base.service.TransferOfLitigationService;
@@ -84,6 +89,14 @@ public class TransferOfLitigationController {
 	@Autowired
 	@Qualifier("CollectionStatusService")
 	private CollectionStatusService collectionStatusService;
+	
+	@Autowired
+	@Qualifier("DocTypeService")
+	private DocTypeService docTypeService;
+
+	@Autowired
+	@Qualifier("DocService")
+	private DocService docService;
 
 	/**
 	 * 获取车贷诉讼相关数据
@@ -173,7 +186,16 @@ public class TransferOfLitigationController {
 			}
 			resultMap.put("baseInfo", JSON.toJSON(houseLoanData, JsonUtil.getMapping()));
 			processService.getProcessShowInfo(resultMap, processId, ProcessTypeEnums.HOUSE_LOAN_LITIGATION);
-
+			
+			// 查询附件
+			List<DocType> docTypes = docTypeService
+					.selectList(new EntityWrapper<DocType>().eq("type_code", "AfterLoan_Material_Litigation"));
+			if (docTypes != null && docTypes.size() == 1) {
+				List<Doc> fileList = docService.selectList(new EntityWrapper<Doc>()
+						.eq("doc_type_id", docTypes.get(0).getDocTypeId()).eq("business_id", businessId).orderBy("doc_id"));
+				resultMap.put("returnRegFiles", fileList);
+			}
+			
 			return Result.success(resultMap);
 		} catch (Exception e) {
 			LOG.error("-- queryTransferLitigationData -- 获取房贷诉讼相关数据异常！！！", e);
@@ -184,9 +206,15 @@ public class TransferOfLitigationController {
 	@ApiOperation(value = "存储房贷移交诉讼信息")
 	@PostMapping("/saveTransferLitigationHouse")
 	@ResponseBody
-	public Result<String> saveTransferLitigationHouse(@RequestBody TransferLitigationHouse req) {
+	public Result<String> saveTransferLitigationHouse(@RequestBody  Map<String, Object> req) {
 		try {
-			transferOfLitigationService.saveTransferLitigationHouse(req, sendUrl);
+			List<FileVo> files = JsonUtil.map2objList(req.get("reqRegFiles"), FileVo.class);
+			List<TransferLitigationHouse> house = JsonUtil.map2objList(req.get("houseData"), TransferLitigationHouse.class);
+			if (CollectionUtils.isEmpty(house)) {
+				Result.error("500", "参数不能为空");
+			}
+			
+			transferOfLitigationService.saveTransferLitigationHouse(house.get(0), sendUrl, files);
 			return Result.success();
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());
@@ -200,17 +228,12 @@ public class TransferOfLitigationController {
 	@ResponseBody
 	public Result<String> saveTransferLitigationCar(@RequestBody Map<String, Object> req) {
 		try {
-			TransferLitigationCar car = new TransferLitigationCar();
-			car.setAlmsOpinion((String) req.get("almsOpinion"));
-			car.setBusinessId((String) req.get("businessId"));
-			car.setCarCondition((String) req.get("carCondition"));
-			car.setCrpId((String) req.get("crpId"));
-			car.setDelayHandover((String) req.get("delayHandover"));
-			car.setDelayHandoverDesc((String) req.get("delayHandoverDesc"));
-			car.setEstates((String) req.get("estates"));
-			car.setProcessStatus((String) req.get("processStatus"));
-			car.setProcessId((String) req.get("processId"));
-
+			List<FileVo> files = JsonUtil.map2objList(req.get("reqRegFiles"), FileVo.class);
+			List<TransferLitigationCar> cars = JsonUtil.map2objList(req.get("houseData"), TransferLitigationCar.class);
+			if (CollectionUtils.isEmpty(cars)) {
+				Result.error("500", "参数不能为空");
+			}
+			TransferLitigationCar transferLitigationCar = cars.get(0);
 			StringBuilder houseAddress = new StringBuilder();
 			List<LinkedHashMap<String, Object>> componentOptions = (List<LinkedHashMap<String, Object>>) req
 					.get("componentOption");
@@ -230,9 +253,9 @@ public class TransferOfLitigationController {
 				}
 			}
 
-			car.setHouseAddress(houseAddress.toString());
+			transferLitigationCar.setHouseAddress(houseAddress.toString());
 
-			transferOfLitigationService.saveTransferLitigationCar(car, sendUrl);
+			transferOfLitigationService.saveTransferLitigationCar(transferLitigationCar, sendUrl, files);
 			return Result.success();
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage());

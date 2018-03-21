@@ -287,6 +287,17 @@ window.layinit(function (htConfig) {
 				processStatus: '',
 				crpId: ''
 			},
+			
+			returnRegFiles:[{
+	    		file: '',
+	    		name:'',
+	    		originalName: '',
+	    		oldDocId:''
+	    	}],
+	    	reqRegFiles:[{
+	    		originalName: '',
+	    		oldDocId:''
+	    	}],
 // ////////////------------- 基础信息 结束 --------------------//////////////////////
 
 // ////////////------------- 申请减免信息 开始
@@ -409,8 +420,78 @@ window.layinit(function (htConfig) {
 	           this.approvalInfoForm.isDirectBackBoolean = flage;  // 是否回退Boolean标志位
 	           this.rockBackStepShowFlage = !vm.approvalInfoForm.isPassBoolean&&flage
 	
-	       }
+	       },
 	// //////------------------ 流程审批 响应函数 结束 --------------------////////////
+	       
+	       uploadFile:function(event,index){
+	    		var fileId=event.currentTarget.id;
+	    		//alert(JSON.stringify($('#'+fileId)));
+	    		// \alert(event.currentTarget);
+	    		 $('#'+fileId).fileupload({
+	    			    dataType: 'json',
+	                    singleFileUploads: true,
+	                    acceptFileTypes: '', // Allowed file types
+	    		        url: basePath+'doc/singleUpload',// 文件的后台接受地址
+	    		        // 设置进度条
+	    		        // 上传完成之后的操作，显示在img里面
+	    		        done: function (e, data){
+	    		        	//alert("bbb");
+	    		        	var reFile=data._response.result.docItemListJson;
+	    		        	var reFiles=eval("("+reFile+")"); 
+	    		        	//alert(JSON.stringify(reFiles));
+	    		        	vm.returnRegFiles[index].oldDocId=reFiles.docId;
+	    		        	vm.returnRegFiles[index].originalName=reFiles.originalName;
+	    		        	vm.returnRegFiles[index].name=reFiles.originalName;
+	    		        	//alert(JSON.stringify(vm.returnRegFiles[0]));
+	    		        	//$('#'+fileId).val(vm.returnRegFiles[0].file);
+	    		        	
+	    		        }
+	    		    });
+	             $('#'+fileId).bind('fileuploadsubmit', function (e, data) {
+	                 if (data && data.originalFiles && data.originalFiles.length > 0) {
+	                     data.formData = {fileName: data.originalFiles[0].name};
+	                     data.formData.businessId = businessId;
+	                     data.formData.busType='AfterLoan_Material_Litigation';
+	                     data.formData.file=data.originalFiles[0];
+	                 }
+	             });
+	    	},
+	    	removeTabTr: function (event, index) {
+	    		var docId=$('#docId'+index).val();  
+	    		var that = this;
+	    		// 如果文档id存在，那么进行ajax
+	    		if (docId) {
+	    			$.ajax({
+		                type: "GET",
+		                url: basePath+'doc/delOneDoc?docId='+docId,
+		                success: function (data) {
+		                	console.log(data, that);
+		                	that.returnRegFiles.splice(index, 1);
+		    	            if(that.returnRegFiles == ""){
+		    	            	that.addTabTr(event);
+		    	            }
+		                },
+		                error: function (message) {
+		                    layer.msg("删除文件失败。");
+		                    console.error(message);
+		                }
+		            });
+	    		// 否则直接删除
+	    		} else {
+	    			that.returnRegFiles.splice(index, 1);
+	   	            if(that.returnRegFiles==""){
+	   	            	that.addTabTr(event);
+	   	            }
+	    		}
+	    		
+	    	},
+	    	addTabTr :function(event){
+	    		 this.returnRegFiles.push({
+	    			 file: '',
+	    			 originalName: '',
+	    			 oldDocId:''
+	    		 })
+	    	}
 	   }
 	});
     
@@ -490,6 +571,27 @@ var getShowInfo = function () {
 
 
 ////////////////////  ---------------  流程审批信息 赋初始值 结束 -------------------////////////
+                    
+                    var docFiles=res.data.data.returnRegFiles;
+                	
+                	if(docFiles != null && docFiles.length > 0){
+                		vm.returnRegFiles[docFiles.length];
+	                	for (var i = 0; i < docFiles.length; i++){
+	                		if(i > 0){
+	                			vm.returnRegFiles.push({
+	   	               			 file: '',
+	   	               			 name:docFiles[i].originalName,
+	   	               			 originalName: docFiles[i].originalName,
+	   	               			 oldDocId:docFiles[i].docId
+	   	               		 });
+	                		}else{
+		                		vm.returnRegFiles[i].oldDocId = docFiles[i].docId;
+		                		vm.returnRegFiles[i].originalName = docFiles[i].originalName;
+		                		vm.returnRegFiles[i].name = docFiles[i].originalName;
+	                		}
+	                		// i++;
+	                	}
+                	}
 
  ////////// --------------  界面显示控制   结束---------------//////////
 
@@ -542,7 +644,7 @@ var Submit = function () {
         vm.$refs['approvalInfoForm'].validate((valid) => {
             if(valid){
                 if(vm.approvalInfoForm.isCreaterFlage){
-                    vm.approvalInfoForm.applyInfo = '';
+                    vm.approvalInfoForm.applyInfo = null;
                     vm.$refs['commitInfoForm'].validate((valid) => { // 校验申请信息
                         if(valid){
                             saveApprovalInfo();
@@ -615,7 +717,38 @@ var saveapplyInfo = function(pStatus){
                 }
                 
 		    	vm.commitInfoForm.processStatus = pStatus;
-                axios.post(basePath+ 'transferOfLitigation/saveTransferLitigationHouse', vm.commitInfoForm)
+		    	
+		    	for(var i=0;i<vm.returnRegFiles.length;i++){
+	    			vm.returnRegFiles[i].file='';
+	    			vm.reqRegFiles[i]=vm.returnRegFiles[i];
+
+	    		}
+		    	
+		    	$.ajax({
+		               type: "POST",
+		               url: basePath+'transferOfLitigation/saveTransferLitigationHouse',
+		               contentType: "application/json; charset=utf-8",
+		               data: JSON.stringify({"houseData":[vm.commitInfoForm],"reqRegFiles":vm.reqRegFiles}),
+		               success: function (res) {
+		            	   if (res.code == "1"){
+		            		   vm.$Modal.success({
+	                                // title: title,
+	                                content: "保存成功",
+	                                onOk: () => {
+	                                    closePareantLayer()
+	                                },
+	                            });
+		            	   }else{
+		            		   vm.$Modal.error({content: '操作失败，消息：' + res.msg});
+		            	   }
+		               },
+		               error: function (message) {
+		            	   vm.$Modal.error({content: '接口调用异常!'});
+		                   console.error(message);
+		               }
+		           });
+		    	
+                /*axios.post(basePath+ 'transferOfLitigation/saveTransferLitigationHouse', vm.commitInfoForm)
                     .then(function (res) {
                         if (res.data.code == "1") {
                             vm.$Modal.success({
@@ -631,7 +764,7 @@ var saveapplyInfo = function(pStatus){
                     })
                     .catch(function (error) {
                         vm.$Modal.error({content: '接口调用异常!'});
-                    });
+                    });*/
             }else{
                 vm.$Message.error({content: '表单校验失败!'});
             }

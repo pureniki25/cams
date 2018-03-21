@@ -97,6 +97,9 @@ public class DocTmp extends Model<DocTmp> {
 	@ApiModelProperty(required= true,value = "更新时间")
 	private Date updateTime;
 
+	@TableField("doc_attr")
+	@ApiModelProperty(required= true,value = "文件属性")
+	private String docAttr;
 
 	public String getDocId() {
 		return docId;
@@ -197,6 +200,14 @@ public class DocTmp extends Model<DocTmp> {
 	@Override
 	protected Serializable pkVal() {
 		return this.docId;
+	}
+
+	public String getDocAttr() {
+		return docAttr;
+	}
+
+	public void setDocAttr(String docAttr) {
+		this.docAttr = docAttr;
 	}
 
 	@Override
