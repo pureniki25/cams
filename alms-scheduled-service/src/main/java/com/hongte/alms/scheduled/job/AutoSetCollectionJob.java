@@ -1,9 +1,7 @@
 package com.hongte.alms.scheduled.job;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.collection.service.CollectionStatusService;
 import com.hongte.alms.base.entity.SysJobConfig;
-import com.hongte.alms.base.entity.SysUser;
 import com.hongte.alms.base.enums.JobConfigEnums;
 import com.hongte.alms.base.service.SysJobConfigService;
 import org.slf4j.Logger;
@@ -14,7 +12,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author zengkun
