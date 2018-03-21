@@ -37,6 +37,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 
 
 
+
     public List<BusinessInfoForApplyDerateVo> selectBusinessInfoForApplyDerateVo(String crpId){
         List<BusinessInfoForApplyDerateVo> List  =  basicBusinessMapper.selectBusinessInfoForApplyDerateVo(crpId);
 
@@ -87,6 +88,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
         }
         return sList;
     }
+
 
 
 

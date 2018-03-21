@@ -73,26 +73,26 @@
                                 <date-picker type="daterange"  v-model="searchForm.createTimeRange" placement="bottom-end" placeholder="选择日期" style="width: 200px"></date-picker>
                             </form-item>
                         </i-col>
-                        <i-col v-if="showPType()" span="6">
+                        <i-col   v-if="showFinishTime()"  span="6">
+                            <form-item  label="完成时间："   prop="finishTimeRange">
+                                <date-picker type="daterange"  v-model="searchForm.finishTimeRange" placement="bottom-end" placeholder="选择日期" style="width: 200px"></date-picker>
+                            </form-item>
+                        </i-col>
+                        <i-col  span="6">
                             <form-item label="审批类型：" prop="processTypeId">
                                 <i-select v-model="searchForm.processTypeId" clearable filterable >
                                     <i-option v-for="item in processTypeList" :value="item.typeId" :key="item.typeId">{{ item.typeName }}</i-option>
                                 </i-select>
                             </form-item>
                         </i-col>
-                                 <i-col   v-if="showFinishTime()"  span="6">
-                        <form-item  label="完成时间："   prop="finishTimeRange">
-                                <date-picker type="daterange"  v-model="searchForm.finishTimeRange" placement="bottom-end" placeholder="选择日期" style="width: 200px"></date-picker>
-                            </form-item>
-                        </i-col>
-                        <i-col span="6">
+                        <i-col v-if="showPType()"  span="6">
                             <form-item label="审批状态：" prop="processStatus">
                                 <i-select v-model="searchForm.processStatus" clearable filterable >
                                     <i-option v-for="item in processStatusList" :value="item.statusKey" :key="item.statusName">{{ item.statusName }}</i-option>
                                 </i-select>
                             </form-item>
                             </i-col>
-               
+
                         <i-col v-if="showCompany()" span="6">
                             <form-item label="分公司：" prop="companyId">
                                 <i-select v-model="searchForm.companyId" clearable filterable >

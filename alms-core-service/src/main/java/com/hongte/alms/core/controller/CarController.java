@@ -554,18 +554,19 @@ try {
     		return Result.error("9999", "还款信息有误");
     	}
     	String planId=plans.get(0).getPlanId();
+    	Map<String,Object> plan=new HashMap<String,Object>();
     	//还款计划列表
-    	List<RepaymentBizPlanList> planLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("plan_id", planId).orderBy("fact_repay_date", false));
-    	if(planLists==null||planLists.size()<=0) {
-    		logger.error("该业务编号下还款计划列表不存在");
-    		return Result.error("9999", "还款信息有误");
-    	}
+    	List<RepaymentBizPlanList> planLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("plan_id", planId).eq("current_status", "已还款").orderBy("fact_repay_date", false));
+    	if(planLists!=null&&planLists.size()>0) {
+
+    	
     	Set<String> set=new HashSet<String>();
     	Date lastPayDate=planLists.get(0).getFactRepayDate();//按还款日期降序取第一个还款日期
     	for(RepaymentBizPlanList planList:planLists) {
   
     		set.add(planList.getPlanListId());
     	}
+    	
     	List<RepaymentBizPlanListDetail> planListDetails=repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().in("plan_list_id",set).eq("business_id", businessId));
        	if(planListDetails==null) {
     		logger.error("该业务编号下还款计划列表明细不存在");
@@ -581,12 +582,15 @@ try {
        			payedInterest=payedInterest.add((detail.getFactAmount()==null?new BigDecimal(0):detail.getFactAmount()));
        		}
        	}
-       	Map<String,Object> plan=new HashMap<String,Object>();
+    	
+       	
        	plan.put("payedPrincipal", payedPrincipal);
        	plan.put("payedInterest", payedInterest);
        	plan.put("lastPayDate", lastPayDate);
        	int overdueDays=DateUtil.getDiffDays(lastPayDate, new Date());//逾期天数
+    
      	plan.put("overdueDays", overdueDays);
+    	}
      	//出款信息
      	Set<Integer> outTypes=new HashSet<Integer>();
      	outTypes.add(0);
@@ -1079,12 +1083,12 @@ try {
     		return Result.error("9999", "还款信息有误");
     	}
     	String planId=plans.get(0).getPlanId();
+     	Map<String,Object> plan=new HashMap<String,Object>();
     	//还款计划列表
-    	List<RepaymentBizPlanList> planLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("plan_id", planId).orderBy("fact_repay_date", false));
-    	if(planLists==null||planLists.size()<=0) {
-    		logger.error("该业务编号下还款计划列表不存在");
-    		return Result.error("9999", "还款信息有误");
-    	}
+    	List<RepaymentBizPlanList> planLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("plan_id", planId).eq("current_status", "已还款").orderBy("fact_repay_date", false));
+    	if(planLists!=null&&planLists.size()>0) {
+
+ 
     	Set<String> set=new HashSet<String>();
     	Date lastPayDate=planLists.get(0).getFactRepayDate();//按还款日期降序取第一个还款日期
     	for(RepaymentBizPlanList planList:planLists) {
@@ -1106,13 +1110,13 @@ try {
        			payedInterest=payedInterest.add((detail.getFactAmount()==null?new BigDecimal(0):detail.getFactAmount()));
        		}
        	}
-       	Map<String,Object> plan=new HashMap<String,Object>();
+  
        	plan.put("payedPrincipal", payedPrincipal);
        	plan.put("payedInterest", payedInterest);
        	plan.put("lastPayDate", lastPayDate);
        	int overdueDays=DateUtil.getDiffDays(lastPayDate, new Date());//逾期天数
      	plan.put("overdueDays", overdueDays);
-     	//出款信息
+       	}//出款信息
      	Set<Integer> outTypes=new HashSet<Integer>();
      	outTypes.add(0);
      	outTypes.add(1);

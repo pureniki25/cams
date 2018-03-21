@@ -748,6 +748,24 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
     }
 
 
+    @Override
+    public List<String> selectFollowBusinessIds(String userId){
+        List<CollectionStatus> statuses1 = selectList(new EntityWrapper<CollectionStatus>().eq("phone_staff",userId));
+        List<CollectionStatus> statuse2 = selectList(new EntityWrapper<CollectionStatus>().eq("visit_staff",userId));
+
+
+        List<String> businessIds = new LinkedList<>();
+
+        for(CollectionStatus status:statuses1){
+            businessIds.add(status.getBusinessId());
+        }
+        for(CollectionStatus status:statuse2){
+            businessIds.add(status.getBusinessId());
+        }
+
+        return businessIds;
+    }
+
 
 
 

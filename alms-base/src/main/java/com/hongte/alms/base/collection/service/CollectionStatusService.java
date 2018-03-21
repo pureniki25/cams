@@ -78,5 +78,8 @@ public interface CollectionStatusService extends BaseService<CollectionStatus> {
     public void autoSetBusinessStaff();
 
 
+    //根据用户ID查找出用户跟进的业务列表
+    public List<String> selectFollowBusinessIds(String userId);
+
 
 }

@@ -76,7 +76,6 @@ public class AddProjectTractJob {
         if(runningFlage){
             return;
         }
-        logger.info("进入定时任务");
         runningFlage = true;
 
         autoAddProjectTract();

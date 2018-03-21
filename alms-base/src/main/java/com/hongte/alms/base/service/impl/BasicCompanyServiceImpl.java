@@ -12,6 +12,8 @@ import com.hongte.alms.base.service.BasicCompanyService;
 import com.hongte.alms.base.service.SysRoleService;
 import com.hongte.alms.base.service.SysUserAreaService;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
+import com.ht.ussp.bean.LoginUserInfoHelper;
+import com.ht.ussp.client.dto.LoginInfoDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -39,6 +41,9 @@ public class BasicCompanyServiceImpl extends BaseServiceImpl<BasicCompanyMapper,
     @Qualifier("SysUserAreaService")
     SysUserAreaService sysUserAreaService;
 
+    @Autowired
+    LoginUserInfoHelper loginUserInfoHelper;
+
     @Override
     public List<BasicCompany> selectCompanysByAreaId(List<String> areas) {
 
@@ -59,8 +64,21 @@ public class BasicCompanyServiceImpl extends BaseServiceImpl<BasicCompanyMapper,
     public Map<String,BasicCompany>  selectCompanysMapByAreaId(List<String> areas){
         Integer count= 0;
         Map<String,BasicCompany> comMap = new HashMap<String,BasicCompany>();
+        List<String>  aas = new LinkedList<>();
+        for(String a:areas){
+            BasicCompany company = selectById(a);
+            if(company.getAreaLevel().equals(AreaLevel.COMPANY_LEVEL.getKey())){
+                if(comMap.get(a)==null){
+                    comMap.put(a,company);
+                }else{
+                    aas.add(a);
+                }
+            }
+        }
 
-        getCompanysByAreaList(areas,count,comMap);
+        if(aas.size()>0){
+            getCompanysByAreaList(aas,count,comMap);
+        }
 
         return comMap;
 
@@ -116,8 +134,13 @@ public class BasicCompanyServiceImpl extends BaseServiceImpl<BasicCompanyMapper,
 
         //搜索选择的公司Map
         Map<String, BasicCompany>  searchMap = null;
-        if(areas.size()>0 || comIds.size()>0){
+        if(areas!=null && areas.size()>0){
             searchMap = selectCompanysMapByAreaId(areas);
+        }
+        if(comIds!=null&&comIds.size()>0){
+            if(searchMap == null){
+                searchMap = new HashMap<>();
+            }
             for(String comId:comIds){
                 BasicCompany c =  searchMap.get(comId);
                 if(c==null){
@@ -157,11 +180,24 @@ public class BasicCompanyServiceImpl extends BaseServiceImpl<BasicCompanyMapper,
         List<SysRole> roles = sysRoleService.getUserRoles(userId);
 
         //确认用户拥有的权限访问数据的区域类型
-        SysRoleAreaTypeEnums userAreaTypeEnums = SysRoleAreaTypeEnums.AREA;
+        SysRoleAreaTypeEnums userAreaTypeEnums = SysRoleAreaTypeEnums.ONLY_SELF;
+        //用户拥有的只访问自己跟进业务的角色Map
+//        List<SysRole> onlySelfRoleList = new LinkedList<>();
+        Map<String,SysRole> onlySelfRoleMap = new HashMap<>();
         for(SysRole role: roles){
             if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.OVERALL.getKey())){
                 userAreaTypeEnums = SysRoleAreaTypeEnums.OVERALL;
-                break;
+//                break;
+            }
+            if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.AREA.getKey())){
+                if(userAreaTypeEnums ==SysRoleAreaTypeEnums.ONLY_SELF){
+                    userAreaTypeEnums = SysRoleAreaTypeEnums.AREA;
+                }
+            }
+            if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.ONLY_SELF.getKey())){
+                if(onlySelfRoleMap.get(role.getRoleCode())==null){
+                    onlySelfRoleMap.put(role.getRoleCode(),role);
+                }
             }
         }
 
@@ -176,6 +212,14 @@ public class BasicCompanyServiceImpl extends BaseServiceImpl<BasicCompanyMapper,
                 break;
             case AREA:
                 List<String> userAreas = sysUserAreaService.selectUserAreas(userId);
+                //没有配置的区域
+                if(userAreas.size()==0){
+                    LoginInfoDto  loginInfoDto = loginUserInfoHelper.getLoginInfo();
+                    if(loginInfoDto!=null){
+                        String OrgCode = loginInfoDto.getDdOrgCode();
+                    }
+//                    if(loginUserInfoHelper.getLoginInfo())
+                }
                 //根据用户区域信息 整理出排重的公司列表
                 companys  = selectCompanysMapByAreaId(userAreas);
 
@@ -190,6 +234,9 @@ public class BasicCompanyServiceImpl extends BaseServiceImpl<BasicCompanyMapper,
 
         return companys;
     }
+
+
+
 
 
 }

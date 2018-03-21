@@ -1,6 +1,8 @@
 package com.hongte.alms.base.service.impl;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.hongte.alms.base.collection.entity.CollectionStatus;
+import com.hongte.alms.base.collection.service.CollectionStatusService;
 import com.hongte.alms.base.dto.UserPermissionBusinessDto;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.SysRoleAreaTypeEnums;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.beans.Transient;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +62,10 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
     @Qualifier("BasicCompanyService")
     BasicCompanyService basicCompanyService;
 
+    @Autowired
+    @Qualifier("CollectionStatusService")
+    CollectionStatusService collectionStatusService;
+
     /**
      *根据用户ID设置用户可访问的区域信息
      * @param userId
@@ -80,42 +87,49 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
         List<SysRole> roles = sysRoleService.getUserRoles(userId);
 
         //确认用户拥有的权限访问数据的区域类型
-        SysRoleAreaTypeEnums  userAreaTypeEnums = SysRoleAreaTypeEnums.AREA;
+        SysRoleAreaTypeEnums  userAreaTypeEnums = SysRoleAreaTypeEnums.ONLY_SELF;
         for(SysRole role: roles){
             if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.OVERALL.getKey())){
                 userAreaTypeEnums = SysRoleAreaTypeEnums.OVERALL;
-                break;
+//                break;
+            }
+            if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.AREA.getKey())){
+                if(userAreaTypeEnums == SysRoleAreaTypeEnums.ONLY_SELF){
+                    userAreaTypeEnums = SysRoleAreaTypeEnums.AREA;
+                }
             }
         }
-
 
             //根据统一用户平台的树来找
 //        Map<String,SysOrg> companyIds = sysUserService.selectCompanyByUserId(userId);
         //根据信贷的树来找
        Map<String,BasicCompany> companyIds  =  basicCompanyService.selectUserCanSeeCompany(userId);
         List<String>  businessIds = basicBusinessService.selectCompanysBusinessIds(new LinkedList<>(companyIds.keySet()));
+        //查找用户跟进的业务ID
+        List<String> followBids =  collectionStatusService.selectFollowBusinessIds(userId);
 
+        businessIds.addAll(followBids);
 
         //删除原来用户的可看业务信息
         sysUserPermissionService.delete(new EntityWrapper<SysUserPermission>().eq("user_id",userId));
 
         List<SysUserPermission> permissions = new LinkedList<>();
+        Map<String,String> tempMap = new HashMap<>();
         if(businessIds!=null&& businessIds.size()>0){
             for(String businessId:businessIds){
-                SysUserPermission permission = new SysUserPermission();
-                permission.setBusinessId(businessId);
-                permission.setUserId(userId);
-                permissions.add(permission);
+                if(tempMap.get(businessId)==null){
+                    tempMap.put(businessId,userId);
+                    SysUserPermission permission = new SysUserPermission();
+                    permission.setBusinessId(businessId);
+                    permission.setUserId(userId);
+                    permissions.add(permission);
+                }
             }
-            //新增对应关系
+        }
+        //新增对应关系
+        if(permissions.size()>0){
             sysUserPermissionService.insertBatch(permissions);
         }
-
-
-
-
-        //1.查出用户可看公司列表
-
     }
 
 }

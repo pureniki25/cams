@@ -93,19 +93,23 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
         }
 
         //区域转换为公司列表
-        List<String> areas = new LinkedList<String>();
-        if(req.getAreaId()!= null && req.getAreaId()!=""){
-            areas.add(req.getAreaId());
-        }
-        List<String> coms = new LinkedList<>();
-        if(req.getCompanyId()!=null && req.getCompanyId()!=""){
-            coms.add(req.getCompanyId());
-        }
-        List<String> cIds = basicCompanyService.selectUserSearchComIds(loginUserInfoHelper.getUserId(),areas,coms);
+//        List<String> areas = new LinkedList<String>();
+//        if(req.getAreaId()!= null && req.getAreaId()!=""){
+//            areas.add(req.getAreaId());
+//        }
+//        List<String> coms = new LinkedList<>();
+//        if(req.getCompanyId()!=null && req.getCompanyId()!=""){
+//            coms.add(req.getCompanyId());
+//        }
+//        List<String> cIds = basicCompanyService.selectUserSearchComIds(loginUserInfoHelper.getUserId(),areas,coms);
+//
+//        if(cIds.size()>0){
+//            req.setCommIds(cIds);
+//        }
 
-        if(cIds.size()>0){
-            req.setCommIds(cIds);
-        }
+
+
+        req.setUserId(loginUserInfoHelper.getUserId());
 
 
         List<AfterLoanStandingBookVo> list = phoneUrgeMapper.selectAfterLoadStanding(pages,req);
