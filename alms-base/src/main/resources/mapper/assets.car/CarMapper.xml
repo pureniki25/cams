@@ -148,7 +148,7 @@
 		tca.view_sample_start_time vieStartDate,							<!-- 看样开始时间 -->
 		tca.view_sample_end_time vieEndDate,								<!-- 看样结束时间 -->
 		tca.view_sample_addr vie,									<!-- 看样地点 -->
-		tca.consultant_addr contact,								<!-- 联系地点 -->
+		tca.unit_addr contact,								<!-- 联系地点 -->
 		tca.payment_end_time paymentTime,							<!-- 缴款截止时间 -->
 		case
 		when tca.trans_type='01' then '债权转让'
@@ -379,7 +379,7 @@
 		tca.view_sample_start_time vieStartDate,							<!-- 看样开始时间 -->
 		tca.view_sample_end_time vieEndDate,								<!-- 看样结束时间 -->
 		tca.view_sample_addr vie,									<!-- 看样地点 -->
-		tca.consultant_addr contact,								<!-- 联系地点 -->
+		tca.unit_addr contact,								<!-- 联系地点 -->
 		tca.payment_end_time paymentTime,							<!-- 缴款截止时间 -->
 		case
 		when tca.trans_type='01' then '债权转让'
@@ -420,7 +420,7 @@
 		concat(tcb.displacement,tcb.displacement_unit) displacement ,	<!--排量 -->
 		tcb.engine_model engineNumber ,<!--发动机号 -->
 		tcb.vin frameNumber ,<!--车架号 -->
-
+	    ifnull(tcb.last_evaluation_amount,tcb.evaluation_amount) lastEvaluationAmount, <!-- 评估价 --> 
 		-- UseProperty ,														<!--使用性质 -->
 		tcb.insurance_expiration_date insuranceDate ,<!--保险到期日 -->
 		tcb.annual_verification_expiration_date inspectionDate ,         <!--年检到期日 -->

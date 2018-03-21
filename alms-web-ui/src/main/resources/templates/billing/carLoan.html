@@ -145,11 +145,11 @@
 		                <div class="td"> 
 		                	<div class="td-box">提前还款违约金</div>
 		                	<div class="td-box">
-		                		<i-select v-model="commitInfoForm.preLateFees" clearable  filterable style="width:165px">
+		                		<i-select v-model="commitInfoForm.preLateFees" clearable  filterable style="width:165px" v-if="preLateFeesFlag">
                                     <i-option value="1">一个月利息</i-option>
                                     <i-option value="2">借款本金*3%</i-option>
                                     <i-option value="3">剩余本金*0.5%*剩余期数</i-option>
-                                </i-select>
+                                </i-select >
 		                		{{ baseInfoForm.preLateFees }}
 		                	</div>
 		                </div>
