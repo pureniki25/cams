@@ -2,6 +2,7 @@ var businessId = document.getElementById("businessId").getAttribute("value");
 window.layinit(function (htConfig) {
     var _htConfig = htConfig;
     basePath = _htConfig.coreBasePath;
+    
 var vm = new Vue({
     el: '#app',
     data: {
@@ -69,6 +70,7 @@ var vm = new Vue({
     },
     methods: {
     	viewData: function(){
+    		var that = this;
     	   layui.use(['element', 'ht_config', 'ht_auth'], function () {
     		var element = layui.element;
     		var config = layui.ht_config;
@@ -78,12 +80,11 @@ var vm = new Vue({
                 data: {"businessId":businessId},
                 //contentType: "application/json; charset=utf-8",
                 success: function (data) {
-                	//alert(JSON.stringify(data));
-                	vm.carBasic=data.data.carBasic;
-                	vm.carDetection=data.data.carDetection;
-                	vm.carAuction=data.data.carAuction;
-                	vm.carAuctionReg=data.data.carAuctionReg;
-                	vm.carAuctionBidder=data.data.carAuctionBidder;
+                	that.carBasic = data.data.carBasic;
+                	that.carDetection=data.data.carDetection || {};
+                	that.carAuction=data.data.carAuction || {};
+                	that.carAuctionReg=data.data.carAuctionReg || {};
+            		that.carAuctionBidder=data.data.carAuctionBidder || {};
                 },
                 error: function (message) {
                     layer.msg("查询车辆信息发生异常，请联系管理员。");
@@ -92,10 +93,12 @@ var vm = new Vue({
             });
     	});
     	}
+    },
+    beforeMount: function () {
+    	this.viewData();
     }
 
 });
-vm.viewData();
 });
 
 
