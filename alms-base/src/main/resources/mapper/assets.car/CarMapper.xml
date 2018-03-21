@@ -205,7 +205,12 @@
 		tcb.tool_with_car tools ,<!--随车工具 -->
 		tcb.license_plate_number,<!-- 车牌号 -->
 		<!-- Taxation , 交易税费 -->
-		<!-- TransactionMode , 交易方式 -->
+		case
+		 	when tca.pay_way='01' then '线下支付'
+		 	when tca.pay_way='02' then '线上支付'
+		 else ''
+		 end transactionMode ,<!--  交易方式 -->
+		
 		tcb.car_position Position , <!-- 车辆位置 -->
 		tp.update_time auditTime,<!-- 审核通过时间 -->
 		tcb.related_docs file   <!--提供文件 -->
@@ -436,7 +441,12 @@
 		tcb.tool_with_car tools ,<!--随车工具 -->
 		tcb.license_plate_number,<!-- 车牌号 -->
 		<!-- Taxation , 交易税费 -->
-		<!-- TransactionMode , 交易方式 -->
+		case
+		 	when tca.pay_way='01' then '线下支付'
+		 	when tca.pay_way='02' then '线上支付'
+		 else ''
+		 end transactionMode ,<!-- 交易方式 -->
+		
 		tcb.car_position Position , <!-- 车辆位置 -->
 		tcb.related_docs file,   <!--提供文件 -->
 		tp.update_time auditTime,<!-- 审核通过时间 -->
