@@ -14,25 +14,7 @@ import com.hongte.alms.base.assets.car.vo.FileVo;
 import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
 import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
 import com.hongte.alms.base.collection.service.CollectionStatusService;
-import com.hongte.alms.base.entity.BasicBusiness;
-import com.hongte.alms.base.entity.BizOutputRecord;
-import com.hongte.alms.base.entity.CarAuction;
-import com.hongte.alms.base.entity.CarAuctionBidder;
-import com.hongte.alms.base.entity.CarAuctionReg;
-import com.hongte.alms.base.entity.CarBasic;
-import com.hongte.alms.base.entity.CarConvBusAply;
-import com.hongte.alms.base.entity.CarDetection;
-import com.hongte.alms.base.entity.CarDrag;
-import com.hongte.alms.base.entity.CarReturnReg;
-import com.hongte.alms.base.entity.Doc;
-import com.hongte.alms.base.entity.DocTmp;
-import com.hongte.alms.base.entity.DocType;
-import com.hongte.alms.base.entity.RepaymentBizPlan;
-import com.hongte.alms.base.entity.RepaymentBizPlanList;
-import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
-import com.hongte.alms.base.entity.SysCity;
-import com.hongte.alms.base.entity.SysCounty;
-import com.hongte.alms.base.entity.SysProvince;
+import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.AuctionStatusEnums;
 import com.hongte.alms.base.process.entity.ProcessLog;
 import com.hongte.alms.base.process.entity.ProcessType;
@@ -75,6 +57,7 @@ import com.hongte.alms.core.vo.modules.car.CarDragRegistrationBusinessVo;
 import com.hongte.alms.core.vo.modules.car.CarDragRegistrationInfo;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.BoaInRoleInfoDto;
+import com.ht.ussp.client.dto.LoginInfoDto;
 import com.ht.ussp.util.BeanUtils;
 import com.ht.ussp.util.DateUtil;
 
@@ -239,6 +222,8 @@ public class CarController {
 			{
 				return Result.error("500","车辆评估信息不存在");
 			}
+			LoginInfoDto detectionUser=loginUserInfoHelper.getUserInfoByUserId("",carBasic.getCreateUser());
+            String detectionUsername=detectionUser!=null?detectionUser.getUserName():"";
 			CarDragRegistrationBusinessVo carDragRegistrationBusinessVo = new CarDragRegistrationBusinessVo();
 			carDragRegistrationBusinessVo.setBusinessId(basicBusiness.getBusinessId());
 			carDragRegistrationBusinessVo.setCustomerName(basicBusiness.getCustomerName());
@@ -253,7 +238,7 @@ public class CarController {
 			carDragRegistrationBusinessVo.setVin(carBasic.getVin());
 			carDragRegistrationBusinessVo.setEvaluationTime(carDetection.getCreateTime());
 			carDragRegistrationBusinessVo.setEvaluationAmount(carDetection.getEvaluationAmount());
-			carDragRegistrationBusinessVo.setEvaluationUser(carDetection.getCreateUser());
+			carDragRegistrationBusinessVo.setEvaluationUser(detectionUsername);
 			carDragRegistrationBusinessVo.setCurrentUserName(loginUserInfoHelper.getLoginInfo().getUserName());
 			return Result.success(carDragRegistrationBusinessVo);
 
@@ -284,7 +269,7 @@ public class CarController {
 			carDrag.setFee(registrationInfo.getFee());
 			carDrag.setOtherFee(registrationInfo.getOtherFee());
 			carDrag.setRemark(registrationInfo.getRemark());
-			carDrag.setCreateUser(loginUserInfoHelper.getLoginInfo().getUserName());
+			carDrag.setCreateUser(loginUserInfoHelper.getLoginInfo().getUserId());
 			carDrag.setCreateTime(new Date());
 			carDragService.insert(carDrag);
 			CarBasic originCarBasic= carBasicService.selectOne(new EntityWrapper<CarBasic>().eq("business_id",registrationInfo.getBusinessId()));
