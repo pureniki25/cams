@@ -201,14 +201,14 @@
 		then '抵押'
 		else ''
 		end mortgageState ,<!--车辆抵押状态 -->
-		tcb.traffic_violation_situation lllegal ,<!--违章未处理记录 -->
+		tcb.traffic_violation_situation illegal ,<!--违章未处理记录 -->
 		tcb.tool_with_car tools ,<!--随车工具 -->
 		tcb.license_plate_number,<!-- 车牌号 -->
 		<!-- Taxation , 交易税费 -->
 		<!-- TransactionMode , 交易方式 -->
 		tcb.car_position Position , <!-- 车辆位置 -->
 		tp.update_time auditTime,<!-- 审核通过时间 -->
-		tcb.related_docs files   <!--提供文件 -->
+		tcb.related_docs file   <!--提供文件 -->
 		<!-- Remarks , -->														<!--备注 -->
 
 		from tb_car_auction tca
@@ -421,7 +421,7 @@
 		tcb.engine_model engineNumber ,<!--发动机号 -->
 		tcb.vin frameNumber ,<!--车架号 -->
 	    ifnull(tcb.last_evaluation_amount,tcb.evaluation_amount) lastEvaluationAmount, <!-- 评估价 --> 
-		-- UseProperty ,														<!--使用性质 -->
+		tcb.user_nature useProperty ,														<!--使用性质 -->
 		tcb.insurance_expiration_date insuranceDate ,<!--保险到期日 -->
 		date_format(tcb.annual_verification_expiration_date,'%Y-%m') inspectionDate ,         <!--年检到期日 -->
 		tcb.odometer mileage ,<!--车显里程 -->
@@ -432,13 +432,13 @@
 		then '抵押'
 		else ''
 		end mortgageState ,<!--车辆抵押状态 -->
-		tcb.traffic_violation_situation lllegal ,<!--违章未处理记录 -->
+		tcb.traffic_violation_situation illegal ,<!--违章未处理记录 -->
 		tcb.tool_with_car tools ,<!--随车工具 -->
 		tcb.license_plate_number,<!-- 车牌号 -->
 		<!-- Taxation , 交易税费 -->
 		<!-- TransactionMode , 交易方式 -->
 		tcb.car_position Position , <!-- 车辆位置 -->
-		tcb.related_docs files,   <!--提供文件 -->
+		tcb.related_docs file,   <!--提供文件 -->
 		tp.update_time auditTime,<!-- 审核通过时间 -->
 		<!-- Remarks , -->														<!--备注 -->
 		tcab.bidder_name bidderName,  <!-- 用户姓名 -->
