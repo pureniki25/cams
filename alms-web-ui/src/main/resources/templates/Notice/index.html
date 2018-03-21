@@ -113,6 +113,7 @@
                     <i-col span="16">
                         <form-item label="公告范围" prop="orgCode">
                             <i-select :model.sync="editForm.orgCode" v-model="editForm.orgCode" style="width:10rem" multiple filterable>
+                                <i-option value="鸿特信息">鸿特信息</i-option>
                                 <i-option v-for="item in deptIds" :value="item.value">{{item.label}}</i-option>
                             </i-select>
                         </form-item>

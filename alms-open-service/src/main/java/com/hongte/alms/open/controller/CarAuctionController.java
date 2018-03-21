@@ -202,7 +202,7 @@ public class CarAuctionController {
 			return Result.error("9999", "无效的拍卖"); 
 		}
 		//判断当前是否还在拍卖时间
-		long startTime=carAuction.getAuctionStartTime().getTime();
+		long startTime=carAuction.getBuyStartTime().getTime();
 		//long endtTime=carAuction.getAuctionEndTime().getTime();
 		long currentTime=new Date().getTime();
 		if(currentTime>startTime) {

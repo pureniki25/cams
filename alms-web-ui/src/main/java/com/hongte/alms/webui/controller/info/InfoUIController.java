@@ -25,6 +25,7 @@ public class InfoUIController {
             @RequestParam(value="status") String status,
             @RequestParam(value="content") String content,
             @RequestParam(value="logId") String logId,
+            @RequestParam(value="businessTypeName") String businessTypeName,
            ModelMap map
             )
    {
@@ -36,6 +37,7 @@ public class InfoUIController {
         map.addAttribute("status",status);
         map.addAttribute("content",content);
         map.addAttribute("logId",logId);
+        map.addAttribute("businessTypeName",businessTypeName);
         return "/info/smsDetail";
     }
    

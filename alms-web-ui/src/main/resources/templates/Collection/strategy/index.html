@@ -125,7 +125,7 @@
                     title="设置"
                     @on-ok="saveTimeSet"
                     @on-cancel="toLoadingTime">
-                <i-form ref="editCompanyCollectionTime.editCompanyCollectionForm" :model="editCompanyCollectionTime.editCompanyCollectionForm"  :label-width="80" :rules="ruleValidate">
+                <i-form ref="editCompanyCollectionTime.editCompanyCollectionForm" :model="editCompanyCollectionTime.editCompanyCollectionForm" :rules="ruleValidate" :label-width="80" >
                     <form-item label="逾期天数：" prop="overDueDays">
                         <i-input v-model="editCompanyCollectionTime.editCompanyCollectionForm.overDueDays" maxlength="20" style="width: 200px"></i-input>
                     </form-item>
@@ -192,10 +192,10 @@
                     @on-ok="confirmSelect"
                     @on-cancel="">
                 <div class="layui-row layui-col-space20">
-                    <div class="layui-col-md4">
+                    <div class="layui-col-md5">
                         <tree :data="areaAndCity.allAreas"  @on-check-change="showCitys" @on-select-change="selectChild" show-checkbox  ref="tree" ></tree>
                     </div>
-                    <div class="layui-col-md4">
+                    <div class="layui-col-md6">
                         <checkbox-group v-model="areaAndCity.currentSelectedCitys" @on-change="getAllSelectedCitys">
                             <checkbox v-for="item in areaAndCity.allCitys" :label="item.areaId"  @on-change="">{{item.areaName}}</checkbox>
                         </checkbox-group>
@@ -570,18 +570,28 @@
                 saveTimeSet:function () {
                     var self=this;
                     var url = basePath + "collectionStrategy/saveTimeSet";
-                    $.ajax({
-                        type: "POST",
-                        url: url,
-                        contentType: "application/json; charset=utf-8",
-                        data: JSON.stringify(self.editCompanyCollectionTime.editCompanyCollectionForm),
-                        async: false,
-                        dataType: "json",
-                        success: function (data) {
-                            self.toLoadingTime();
-                        }
 
-                    });
+                    vm.$refs['editCompanyCollectionTime.editCompanyCollectionForm'].validate((valid) =>{
+                        if(valid){
+                            alert(valid);
+                            $.ajax({
+                                type: "POST",
+                                url: url,
+                                contentType: "application/json; charset=utf-8",
+                                data: JSON.stringify(self.editCompanyCollectionTime.editCompanyCollectionForm),
+                                async: false,
+                                dataType: "json",
+                                success: function (data) {
+                                    self.toLoadingTime();
+                                }
+
+                            });
+                        }else{
+                            vm.$Message.error({content: '表单校验失败!'});
+                        }
+                    })
+
+
                 },
                 showSingleCompanyCollectionUserSetting:function(companyId)
                 {

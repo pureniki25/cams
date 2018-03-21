@@ -267,11 +267,13 @@
         process.create_user as createUser,
         process.process_result as pResult,
         s_user.user_name as createUserName,
-		business.company_id as companyId
+		business.company_id as companyId,
+		company.area_name as companyName
         from tb_process as process
         LEFT JOIN tb_basic_business as business ON process.business_id = business.business_id
         LEFT JOIN tb_process_type as p_type ON process.process_typeid = p_type.type_id
         LEFT JOIN tb_sys_user  as s_user  ON  process.create_user = s_user.user_id
+        LEFT JOIN tb_basic_company as company ON business.company_id = company.area_id
 
         <!--            我已审批的 -->
         <if test="reqPageeType == 'Approved' ">

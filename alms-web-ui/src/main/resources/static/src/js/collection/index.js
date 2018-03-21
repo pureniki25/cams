@@ -317,9 +317,13 @@ window.layinit(function(htConfig){
                 if(authValid('deduction')){
 	                buttons.push(
 	                    {"name": "执行代扣", click: function (e, currentItem) {
-	                        var url = getDeductionUrl(currentItem);
-	                        // var url = '/collectionUI/applyDerateUI?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+"&processStatus=-1"
-	                        showOneLineOprLayer(url,"")
+	                    	if(currentItem.statusName!='已还款'){
+	                    	    var url = getDeductionUrl(currentItem);
+		                        // var url = '/collectionUI/applyDerateUI?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+"&processStatus=-1"
+		                        showOneLineOprLayer(url,"")
+	                    	}else{
+                  	      vm.$Modal.error({content: '已还款的不能执行代扣'});
+                  	}
 	                    }}
 	                )
                 }
@@ -686,12 +690,27 @@ var getData = function(){
         realRepayDateEnd:''
     }
     if(vm.searchForm.showRepayDateRange.length>0){
-        dataObject.showRepayDateBegin = vm.searchForm.showRepayDateRange[0].getTime();
-        dataObject.showRepayDateEnd = vm.searchForm.showRepayDateRange[1].getTime();
+      	if(vm.searchForm.showRepayDateRange[0]!=null){
+      	   dataObject.showRepayDateBegin = vm.searchForm.showRepayDateRange[0].getTime();
+      	}
+      	
+    	if(vm.searchForm.showRepayDateRange[1]!=null){
+       	   
+       	   var date =vm.searchForm.showRepayDateRange[1];
+           date.setDate(date.getDate() + 1);
+           dataObject.showRepayDateEnd=date.getTime();
+       	}
+     
     }
     if(vm.searchForm.realRepayDateRange.length>0){
-        dataObject.realRepayDateBegin = vm.searchForm.realRepayDateRange[0].getTime();
-        dataObject.realRepayDateEnd = vm.searchForm.realRepayDateRange[1].getTime();
+      	if(vm.searchForm.realRepayDateRange[0]!=null){
+      	  dataObject.realRepayDateBegin = vm.searchForm.realRepayDateRange[0].getTime();
+      	}
+      	if(vm.searchForm.realRepayDateRange[1]!=null){
+          	   var date =vm.searchForm.realRepayDateRange[1];
+              date.setDate(date.getDate() + 1);
+              dataObject.realRepayDateEnd=date.getTime();
+        	}
     }
     return dataObject;
 }

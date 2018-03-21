@@ -331,8 +331,16 @@ var getData = function(){
         derateDateEnd:'',
     }
     if(vm.searchForm.derateDateRange.length>0){
-        dataObject.derateDateBegin = vm.searchForm.derateDateRange[0].getTime();
-        dataObject.derateDateEnd = vm.searchForm.derateDateRange[1].getTime();
+    	if(vm.searchForm.derateDateRange[0]!=null){
+    	      dataObject.derateDateBegin = vm.searchForm.derateDateRange[0].getTime();
+    	}
+    	
+      	if(vm.searchForm.derateDateRange[1]!=null){
+      	   var date =vm.searchForm.derateDateRange[1];
+           date.setDate(date.getDate() + 1);
+           dataObject.derateDateEnd=date.getTime();
+  	}
+  	
     }
     return dataObject;
 }

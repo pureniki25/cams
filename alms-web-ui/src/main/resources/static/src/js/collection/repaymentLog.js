@@ -7,8 +7,14 @@ var layer;
 var table;
 var basePath;
 var vm;
-
+var dateBegin;
+var dateEnd;
 var dateObj;
+
+var dataObject ={
+        dateBegin:'',
+        dateEnd:'',
+    }
 //从后台获取下拉框数据
 var getSelectsData = function () {
 
@@ -276,7 +282,7 @@ var getCountInfo=function(){debugger
 $.ajax({
     type : 'GET',
     async : false,
-    url : basePath+ "RepaymentLogController/getCountInfo?companyId="+vm.searchForm.companyId+"&keyName="+vm.searchForm.keyName+"&platformId="+vm.searchForm.platformId+"&dateBegin="+dateObj.dateBegin+"&dateEnd="+dateObj.dateEnd+"&repayStatus="+vm.searchForm.repayStatus+"&businessTypeId="+vm.searchForm.businessTypeId,
+    url : basePath+ "RepaymentLogController/getCountInfo?companyId="+vm.searchForm.companyId+"&keyName="+vm.searchForm.keyName+"&platformId="+vm.searchForm.platformId+"&dateBegin="+dataObject.dateBegin+"&dateEnd="+dataObject.dateEnd+"&repayStatus="+vm.searchForm.repayStatus+"&businessTypeId="+vm.searchForm.businessTypeId,
 
     headers : {
         app : 'ALMS',
@@ -385,15 +391,22 @@ var getDeductionPlatformInfo=function(){
 
 
 //取查询的时间间隔
-var getData = function(){
+var getData = function(){debugger
 
-    var dataObject ={
+     dataObject ={
         dateBegin:'',
         dateEnd:'',
     }
     if(vm.searchForm.dateRange.length>0){
-        dataObject.dateBegin = vm.searchForm.dateRange[0].getTime();
-        dataObject.dateEnd = vm.searchForm.dateRange[1].getTime();
+    	if(vm.searchForm.dateRange[0]!=null){
+    		 dataObject.dateBegin = vm.searchForm.dateRange[0].getTime();
+    	}
+     	if(vm.searchForm.dateRange[1]!=null){
+            var date =vm.searchForm.dateRange[1];
+            date.setDate(date.getDate() + 1);
+            dataObject.dateEnd=date.getTime();
+   	}
+
     }
     return dataObject;
 }

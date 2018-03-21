@@ -201,7 +201,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
             CollectionLog log = new CollectionLog();
             log.setAfterStatus(afterStatus);
             log.setBusinessId(vo.getBusinessId());
-            log.setCollectionUser(staffUserId.equals("")?Constant.SYS_DEFAULT_USER:staffUserId);
+            log.setCollectionUser("".equals(staffUserId)?Constant.SYS_DEFAULT_USER:staffUserId);
             log.setCrpId(vo.getCrpId());
             log.setUpdateUser(userId);
             log.setCreateUser(userId);
@@ -344,6 +344,8 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
         StaffBusinessVo vo = new StaffBusinessVo();
         vo.setBusinessId(busnessId);
         vo.setCrpId(planListId);
+        // 将StaffBusinessVo 放入list
+        voList.add(vo);
         return setBusinessStaff(
                 voList,
                 staffUserId,
@@ -359,8 +361,8 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
     public void autoSetBusinessStaff(){
         //查找分配了电催人员的分公司列表
         List<CollectionPersonSet> list = collectionPersonSetService.selectList(new EntityWrapper<CollectionPersonSet>());
-        CollectionTimeSet phoneTimeSet = collectionTimeSetService.selectOne(new EntityWrapper<CollectionTimeSet>().eq("col_type",CollectionStatusEnum.PHONE_STAFF.getKey()));
-        CollectionTimeSet visitTimeSet = collectionTimeSetService.selectOne(new EntityWrapper<CollectionTimeSet>().eq("col_type",CollectionStatusEnum.COLLECTING.getKey()));
+        CollectionTimeSet phoneTimeSet = collectionTimeSetService.selectOne(new EntityWrapper<CollectionTimeSet>().eq("col_type",CollectionStatusEnum.PHONE_STAFF.getKey()).and("start_time <= NOW()"));
+        CollectionTimeSet visitTimeSet = collectionTimeSetService.selectOne(new EntityWrapper<CollectionTimeSet>().eq("col_type",CollectionStatusEnum.COLLECTING.getKey()).and("start_time <= NOW()"));
          Integer daysBeforeOverDue = phoneTimeSet!=null?phoneTimeSet.getOverDueDays():0;
         Integer visitDaysAfterOverDue = visitTimeSet!=null?visitTimeSet.getOverDueDays():31;
 
@@ -399,7 +401,8 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                         .eq("team",pType.getIntKey()));
         List<String>  persons = new LinkedList<String>();
         for(CollectionPersonSetDetail detail:phoneDetails){
-                persons.add(detail.getColPersonId());
+            //yzl 修改获取催收人员id
+                persons.add(detail.getUserId());
             }
 
 
@@ -428,7 +431,8 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 //        planLists.addAll(renewPlanLists);
         for(RepaymentBizPlanList planList:planLists){
 
-            CollectionStatus collectionStatus =  selectOne(new EntityWrapper<CollectionStatus>().eq("business_id",planList.getBusinessId()));
+            // yzl  判断是否分配过催收时，需要按催收方式分类判断
+            CollectionStatus collectionStatus =  selectOne(new EntityWrapper<CollectionStatus>().eq("business_id",planList.getBusinessId()).eq("collection_status",CollectionStatusEnum.PHONE_STAFF.getKey()));
             if(collectionStatus!=null){
                 try{
                     setAutoBusinessStaff(planList.getBusinessId(),planList.getPlanListId(),
@@ -459,7 +463,8 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                 try{
                     Integer minIndex = getLimitCountIndex(monthPlanPFPersonlist);
                     setAutoBusinessStaff(planList.getBusinessId(),planList.getPlanListId(),
-                            lastPlanPFPersonlist.get(minIndex).getPhoneStaff(),
+                            // yzl 月还逾期 取monthPlanPFPersonlist
+                            monthPlanPFPersonlist.get(minIndex).getPhoneStaff(),
                             StaffPersonType.PHONE_STAFF.getKey());
                     monthPlanPFPersonlist.get(minIndex).setCounts(monthPlanPFPersonlist.get(minIndex).getCounts()+1);
                 }catch (Exception e){
@@ -497,11 +502,13 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 //        visitPlanLists.addAll(visitRnewPlanLists);
         for(RepaymentBizPlanList planList:visitPlanLists){
 
-            CollectionStatus collectionStatus =  selectOne(new EntityWrapper<CollectionStatus>().eq("business_id",planList.getBusinessId()));
+            // yzl  判断是否分配过催收时，需要按催收方式分类判断
+            CollectionStatus collectionStatus =  selectOne(new EntityWrapper<CollectionStatus>().eq("business_id",planList.getBusinessId()).eq("collection_status",CollectionStatusEnum.COLLECTING.getKey()));
             if(collectionStatus!=null){
                 try{
                     setAutoBusinessStaff(planList.getBusinessId(),planList.getPlanListId(),
-                            collectionStatus.getPhoneStaff(),StaffPersonType.VISIT_STAFF.getKey());
+                            // yzl 取上门催收人员
+                            collectionStatus.getVisitStaff(),StaffPersonType.VISIT_STAFF.getKey());
                 }catch (Exception e){
                     e.printStackTrace();
                     logger.error("自动分配电催 月还逾期 第一次分配  数据存储异常 businessID:"+planList.getBusinessId()+
@@ -514,14 +521,16 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
             if(ifPlanListIsLast(planList)){//是末期逾期
                 Integer minIndex = getLimitCountIndex(lastPlanVisitPersonlist);
                 setAutoBusinessStaff(planList.getBusinessId(),planList.getPlanListId(),
-                        lastPlanVisitPersonlist.get(minIndex).getPhoneStaff(),
+                        // yzl 取上门催收人员
+                        lastPlanVisitPersonlist.get(minIndex).getVisitStaff(),
                         StaffPersonType.VISIT_STAFF.getKey());
                 lastPlanVisitPersonlist.get(minIndex).setCounts(lastPlanVisitPersonlist.get(minIndex).getCounts()+1);
 
             }else{//是月还逾期
                 Integer minIndex = getLimitCountIndex(monthPlanVisitersonlist);
                 setAutoBusinessStaff(planList.getBusinessId(),planList.getPlanListId(),
-                        monthPlanVisitersonlist.get(minIndex).getPhoneStaff(),
+                        // yzl 取上门催收人员
+                        monthPlanVisitersonlist.get(minIndex).getVisitStaff(),
                         StaffPersonType.VISIT_STAFF.getKey());
                 monthPlanVisitersonlist.get(minIndex).setCounts(monthPlanVisitersonlist.get(minIndex).getCounts()+1);
             }
@@ -539,7 +548,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
     @Value("${ht.litigation.url:http://172.16.200.110:30906/api/importLitigation}")
     private String sendUrl;
     public void setBusinessToLaw() {
-        CollectionTimeSet lawTimeSet = collectionTimeSetService.selectOne(new EntityWrapper<CollectionTimeSet>().eq("col_type",CollectionStatusEnum.TO_LAW_WORK.getKey()));
+        CollectionTimeSet lawTimeSet = collectionTimeSetService.selectOne(new EntityWrapper<CollectionTimeSet>().eq("col_type",CollectionStatusEnum.TO_LAW_WORK.getKey()).and("start_time <= NOW()"));
 
         Integer lawDaysAfterOverDue = lawTimeSet!=null?lawTimeSet.getOverDueDays():91;
 
@@ -620,7 +629,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                 StaffPersonType.PHONE_STAFF.getKey()
                 ,phonePersons
                 ,CollectionStatusEnum.PHONE_STAFF.getKey()
-                ,CollectionCrpTypeEnum.LAST.getKey()
+                ,CollectionCrpTypeEnum.NORMAL.getKey()
         );
 
         addNoFollowPersons(phonePersons,phoneFollowPersonlist,StaffPersonType.PHONE_STAFF);
@@ -662,6 +671,13 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
         return  phoneFollowPersonlist;
     }
 
+    /**
+     * 添加没有跟进任务的人员，与已分配任务的统一分配任务
+     * @param phonePersons
+     * @param list
+     * @param pType
+     * @return
+     */
     public List<CollectionStatusCountDto> addNoFollowPersons(List<String> phonePersons,List<CollectionStatusCountDto> list,StaffPersonType pType){
         List<CollectionStatusCountDto> neverFollowPlanPersons = new LinkedList<>();
         for(int i=0;i<phonePersons.size();i++){

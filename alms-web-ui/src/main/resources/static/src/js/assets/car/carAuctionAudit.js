@@ -373,7 +373,7 @@ window.layinit(function (htConfig) {
 	    	this.queryData();
 	   	    laydate.render({
 		        elem: '#annualVerificationExpirationDate',
-		        type:'date',
+		        type:'month',
 		        done: (value) => {
 		          this.carBasic.annualVerificationExpirationDate = value
 		        }
@@ -798,9 +798,9 @@ window.layinit(function (htConfig) {
 	    		}else{
 	    	
 	    			var inputDate=new Date(vm.carAuction.auctionStartTime.replace("-", "/").replace("-", "/"));  
-	    			if(inputDate>currentDate){
+	    			if(inputDate<currentDate){
 	    				$("#auctionStartTime").css("border","1px solid #FF3030");
-	    				layer.msg("不能大于当前日期！",{icon:5,shade: [0.8, '#393D49']});
+	    				layer.msg("不能小于当前日期！",{icon:5,shade: [0.8, '#393D49']});
 	    				return ;
 	    			}
 	    			
@@ -836,9 +836,11 @@ window.layinit(function (htConfig) {
 	    		}else{
 	    			var inputDate=new Date(vm.carAuction.buyStartTime.replace("-", "/").replace("-", "/"));  
 	    		
-	    			if(inputDate>currentDate){
+	    			var auctionStartDate=new Date(vm.carAuction.auctionStartTime.replace("-", "/").replace("-", "/"));
+	    			var auctionEndTime=new Date(vm.carAuction.auctionEndTime.replace("-", "/").replace("-", "/"));
+	    			if(inputDate<auctionStartDate||inputDate>auctionEndTime){
 	    				$("#buyStartTime").css("border","1px solid #FF3030");
-	    				layer.msg("不能大于当前日期！",{icon:5,shade: [0.8, '#393D49']});
+	    				layer.msg("不能小于拍卖开始时间和大于拍卖结束时间！",{icon:5,shade: [0.8, '#393D49']});
 	    				return ;
 	    			}
 	    			
@@ -865,9 +867,9 @@ window.layinit(function (htConfig) {
 	    			return ;
 	    		}else{
 	    			var inputDate=new Date(vm.carAuction.consStartTime.replace("-", "/").replace("-", "/"));  
-	    			if(inputDate>currentDate){
+	    			if(inputDate<currentDate){
 	    				$("#consStartTime").css("border","1px solid #FF3030");
-	    				layer.msg("不能大于当前日期！",{icon:5,shade: [0.8, '#393D49']});
+	    				layer.msg("不能小于当前日期！",{icon:5,shade: [0.8, '#393D49']});
 	    				return ;
 	    			}
 	    			
@@ -894,9 +896,9 @@ window.layinit(function (htConfig) {
 	    			return ;
 	    		}else{
 	    			var inputDate=new Date(vm.carAuction.viewSampleStartTime.replace("-", "/").replace("-", "/"));  
-	    			if(inputDate>currentDate){
+	    			if(inputDate<currentDate){
 	    				$("#viewSampleStartTime").css("border","1px solid #FF3030");
-	    				layer.msg("不能大于当前日期！",{icon:5,shade: [0.8, '#393D49']});
+	    				layer.msg("不能小于当前日期！",{icon:5,shade: [0.8, '#393D49']});
 	    				return ;
 	    			}
 	    			
@@ -956,7 +958,7 @@ window.layinit(function (htConfig) {
 	    			var inputDate=new Date(vm.carAuction.paymentEndTime.replace("-", "/").replace("-", "/"));  
 	    			if(inputDate<currentDate){
 	    				$("#paymentEndTime").css("border","1px solid #FF3030");
-	    				layer.msg("不能小于于当前日期！",{icon:5,shade: [0.8, '#393D49']});
+	    				layer.msg("不能小于当前日期！",{icon:5,shade: [0.8, '#393D49']});
 	    				return ;
 	    			}
 	    			

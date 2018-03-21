@@ -68,6 +68,7 @@ window.layinit(function (htConfig) {
                                 createTimeBegin: dateObj.createTimeBegin,	//发起时间  开始
                                 createTimeEnd: dateObj.createTimeEnd,	//发起时间   结束
                                 processTypeId: vm.searchForm.processTypeId,	//流程类型
+                                companyId: vm.searchForm.companyId,	//公司Id
 
                             }
                             , page: {
@@ -95,53 +96,108 @@ window.layinit(function (htConfig) {
                 // var config = layui.ht_config;
                 // basePath = config.basePath;
                 //执行渲染
-                table.render({
-                    elem: '#listTable' //指定原始表格元素选择器（推荐id选择器）
-                    , id: 'listTable'
-                    , height: 550 //容器高度
-                    , cols: [[
+                if(showCompany()){
+                	 table.render({
+                         elem: '#listTable' //指定原始表格元素选择器（推荐id选择器）
+                         , id: 'listTable'
+                         , height: 550 //容器高度
+                         , cols: [[
 
-                        {
-                            field: 'processName',
-                            title: '流程名称'
-                        },{
-                            field: 'businessId',
-                            title: '业务编号'
-                        }, {
-                            field: 'customerName',
-                            title: '客户名称'
-                        }, {
-                            field: 'createUserName',
-                            title: '发起人'
-                        }, {
-                            field: 'createTime',
-                            title: '发起时间'
-                        }, {
-                            field: 'processTypeName',
-                            title: '审批类型'
-                        }, {
-                            field: 'processStatus',
-                            title: '审批状态'
-                        }, {
-                            fixed: 'right',
-                            title: '操作',
-                            width: 178,
-                            align: 'left',
-                            toolbar: '#barTools'
-                        }
-                    ]], //设置表头
-                    url: basePath +'processController/selectProcessWaitToApproveVoPage?reqPageeType='+reqPageeType,
-                    //method: 'post' //如果无需自定义HTTP类型，可不加该参数
-                    request: {}, //如果无需自定义请求参数，可不加该参数
-                    //response: {} //如果无需自定义数据响应名称，可不加该参数
-                    page: true,
-                    done: function (res, curr, count) {
-                        //数据渲染完的回调。你可以借此做一些其它的操作
-                        //如果是异步请求数据方式，res即为你接口返回的信息。
-                        //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
-                        vm.loading = false;
-                    }
-                });
+                             {
+                                 field: 'processName',
+                                 title: '流程名称'
+                             },{
+                                 field: 'businessId',
+                                 title: '业务编号'
+                             }, {
+                                 field: 'customerName',
+                                 title: '客户名称'
+                             }, {
+                                 field: 'createUserName',
+                                 title: '发起人'
+                             }, {
+                                 field: 'createTime',
+                                 title: '发起时间'
+                             },  
+                             {
+                                 field: 'companyName',
+                                 title: '公司名称'
+                             }, {
+                                 field: 'processTypeName',
+                                 title: '审批类型'
+                             }, {
+                                 field: 'processStatus',
+                                 title: '审批状态'
+                             }, {
+                                 fixed: 'right',
+                                 title: '操作',
+                                 width: 178,
+                                 align: 'left',
+                                 toolbar: '#barTools'
+                             }
+                         ]], //设置表头
+                         url: basePath +'processController/selectProcessWaitToApproveVoPage?reqPageeType='+reqPageeType,
+                         //method: 'post' //如果无需自定义HTTP类型，可不加该参数
+                         request: {}, //如果无需自定义请求参数，可不加该参数
+                         //response: {} //如果无需自定义数据响应名称，可不加该参数
+                         page: true,
+                         done: function (res, curr, count) {
+                             //数据渲染完的回调。你可以借此做一些其它的操作
+                             //如果是异步请求数据方式，res即为你接口返回的信息。
+                             //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
+                             vm.loading = false;
+                         }
+                     });
+                }else{
+                	 table.render({
+                         elem: '#listTable' //指定原始表格元素选择器（推荐id选择器）
+                         , id: 'listTable'
+                         , height: 550 //容器高度
+                         , cols: [[
+
+                             {
+                                 field: 'processName',
+                                 title: '流程名称'
+                             },{
+                                 field: 'businessId',
+                                 title: '业务编号'
+                             }, {
+                                 field: 'customerName',
+                                 title: '客户名称'
+                             }, {
+                                 field: 'createUserName',
+                                 title: '发起人'
+                             }, {
+                                 field: 'createTime',
+                                 title: '发起时间'
+                             }, {
+                                 field: 'processTypeName',
+                                 title: '审批类型'
+                             }, {
+                                 field: 'processStatus',
+                                 title: '审批状态'
+                             }, {
+                                 fixed: 'right',
+                                 title: '操作',
+                                 width: 178,
+                                 align: 'left',
+                                 toolbar: '#barTools'
+                             }
+                         ]], //设置表头
+                         url: basePath +'processController/selectProcessWaitToApproveVoPage?reqPageeType='+reqPageeType,
+                         //method: 'post' //如果无需自定义HTTP类型，可不加该参数
+                         request: {}, //如果无需自定义请求参数，可不加该参数
+                         //response: {} //如果无需自定义数据响应名称，可不加该参数
+                         page: true,
+                         done: function (res, curr, count) {
+                             //数据渲染完的回调。你可以借此做一些其它的操作
+                             //如果是异步请求数据方式，res即为你接口返回的信息。
+                             //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
+                             vm.loading = false;
+                         }
+                     });
+                }
+               
 
                 //监听工具条
                 table.on('tool(listTable)', function (obj) {
@@ -367,8 +423,15 @@ var getData = function(){
         createTimeEnd:'',
     }
     if(vm.searchForm.createTimeRange.length>0){
-        dataObject.createTimeBegin = vm.searchForm.createTimeRange[0].getTime();
-        dataObject.createTimeEnd = vm.searchForm.createTimeRange[1].getTime();
+    	if(vm.searchForm.createTimeRange[0]!=null){debugger
+    		 dataObject.createTimeBegin = vm.searchForm.createTimeRange[0].getTime();
+    	}
+    	if(vm.searchForm.createTimeRange[1]!=null){
+//   		 dataObject.createTimeEnd = vm.searchForm.createTimeRange[1].getTime();
+   	   var date =vm.searchForm.createTimeRange[1];
+       date.setDate(date.getDate() + 1);
+       dataObject.createTimeEnd=date.getTime();
+   	}
     }
 
     return dataObject;

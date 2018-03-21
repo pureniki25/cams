@@ -40,15 +40,15 @@
 	 LEFT JOIN tb_basic_business  business  on sms.original_business_id=business.business_id
 	 LEFT JOIN tb_basic_company as company ON business.company_id = company.area_id
   LEFT JOIN tb_basic_business_type as  b_type ON business.business_type = b_type.business_type_id
-	  JOIN  tb_sys_user_permission user_permission on user_permission.business_id=sms.original_business_id
+<!-- 	  JOIN  tb_sys_user_permission user_permission on user_permission.business_id=sms.original_business_id -->
 	  
-	  left join tb_sys_user user on user.user_id=user_permission.user_id 
+<!-- 	  left join tb_sys_user user on user.user_id=user_permission.user_id  -->
      
 
         <where>
                1=1
             <if test="keyName !=null and keyName !=''">
-                and ((sms.phone_number  LIKE '%${keyName}%') or (sms.service_name  LIKE '%${keyName}%') or (sms.original_business_id LIKE '%${keyName}%') )
+                and ((sms.phone_number  LIKE '%${keyName}%') or (sms.recipient  LIKE '%${keyName}%') or (sms.original_business_id LIKE '%${keyName}%') )
             </if>
             <if test="smsType !=null and smsType !=''">
                 and sms.sms_type = #{smsType}
@@ -61,17 +61,22 @@
                 and sms.status = #{status}
             </if>
             <!--          /*发送时间 开始*/ -->
-            <if test="sendDateBegin !=null and sendDateBegin !=''">
+            <if test="sendDateBegin !=null">
                 <![CDATA[ and sms.send_date >= #{sendDateBegin,jdbcType=TIMESTAMP}]]>
             </if>
             <!--            /*发送时间 结束*/ -->
-            <if test="sendDateEnd !=null and sendDateEnd !='' ">
+            <if test="sendDateEnd !=null">
                 <![CDATA[ and sms.send_date <= #{sendDateEnd,jdbcType=TIMESTAMP}]]>
             </if>
             <if test="companyId !=null and companyId !=''">
                 and business.company_id = #{companyId}
             </if>
-            and user.user_id=#{userId}
+            
+                <if test="companyIds !=null and companyIds.size()>0"> AND company.area_id IN
+            <foreach item="item" index="index" collection="companyIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
 
         </where>
         order BY  sms.create_time DESC
@@ -96,7 +101,7 @@
 	 LEFT JOIN tb_basic_business  business  on sms.original_business_id=business.business_id
 	 LEFT JOIN tb_basic_company as company ON business.company_id = company.area_id
   LEFT JOIN tb_basic_business_type as  b_type ON business.business_type = b_type.business_type_id
-	  JOIN  tb_sys_user_permission user on user.business_id=sms.original_business_id
+<!-- 	  JOIN  tb_sys_user_permission user on user.business_id=sms.original_business_id -->
      
 
         <where>
