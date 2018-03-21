@@ -59,18 +59,34 @@ window.layinit(function (htConfig) {
                         this.loading = true;
                         console.log(vm.searchForm);
 
-                        var dateObj = getData();
+
+
+                        var condition = {
+                            keyWord: vm.searchForm.keyWord,   //关键字  (标题、业务编号、客户名称、发起人)
+
+                            processTypeId: vm.searchForm.processTypeId,	//流程类型
+
+                            // createTimeBegin: dateObj.createTimeBegin,	//发起时间  开始
+                            // createTimeEnd: dateObj.createTimeEnd,	//发起时间   结束
+                            // finishTimeBegin:dateObj.finishTimeBegin,  //结束时间 开始
+                            // finishTimeEnd:dateObj.finishTimeEnd,   //结束时间   结束
+
+                            processStatus:vm.searchForm.processStatus,  //审批状态,
+                            companyId:vm.searchForm.companyId  //分公司
+                        };
+                         getData(condition);
+                        if(vm.searchForm.keyWord)
 
                         table.reload('listTable', {
                             where: {
 
                                 keyWord: vm.searchForm.keyWord,   //关键字  (标题、业务编号、客户名称、发起人)
-                                createTimeBegin: dateObj.createTimeBegin,	//发起时间  开始
-                                createTimeEnd: dateObj.createTimeEnd,	//发起时间   结束
+                                // createTimeBegin: dateObj.createTimeBegin,	//发起时间  开始
+                                // createTimeEnd: dateObj.createTimeEnd,	//发起时间   结束
                                 processTypeId: vm.searchForm.processTypeId,	//流程类型
 
-                                finishTimeBegin:dateObj.finishTimeBegin,  //结束时间 开始
-                                finishTimeEnd:dateObj.finishTimeEnd,   //结束时间   结束
+                                // finishTimeBegin:dateObj.finishTimeBegin,  //结束时间 开始
+                                // finishTimeEnd:dateObj.finishTimeEnd,   //结束时间   结束
 
                                 processStatus:vm.searchForm.processStatus,  //审批状态,
                                 companyId:vm.searchForm.companyId,  //分公司
@@ -389,13 +405,13 @@ var addInput = function(form, type,name,value){
 }
 
 //取查询的时间间隔
-var getData = function(){
+var getData = function(condition){
 
     var dataObject ={
-        createTimeBegin:'',
-        createTimeEnd:'',
-        finishTimeBegin:'',
-        finishTimeEnd:'',
+        createTimeBegin:null,
+        createTimeEnd:null,
+        finishTimeBegin:null,
+        finishTimeEnd:null,
     }
     if(vm.searchForm.createTimeRange.length>0){
         if(vm.searchForm.createTimeRange[0]!=null){

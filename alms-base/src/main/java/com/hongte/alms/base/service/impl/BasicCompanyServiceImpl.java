@@ -12,6 +12,8 @@ import com.hongte.alms.base.service.BasicCompanyService;
 import com.hongte.alms.base.service.SysRoleService;
 import com.hongte.alms.base.service.SysUserAreaService;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
+import com.ht.ussp.bean.LoginUserInfoHelper;
+import com.ht.ussp.client.dto.LoginInfoDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -39,6 +41,9 @@ public class BasicCompanyServiceImpl extends BaseServiceImpl<BasicCompanyMapper,
     @Qualifier("SysUserAreaService")
     SysUserAreaService sysUserAreaService;
 
+    @Autowired
+    LoginUserInfoHelper loginUserInfoHelper;
+
     @Override
     public List<BasicCompany> selectCompanysByAreaId(List<String> areas) {
 
@@ -59,8 +64,20 @@ public class BasicCompanyServiceImpl extends BaseServiceImpl<BasicCompanyMapper,
     public Map<String,BasicCompany>  selectCompanysMapByAreaId(List<String> areas){
         Integer count= 0;
         Map<String,BasicCompany> comMap = new HashMap<String,BasicCompany>();
-        if(areas.size()>0){
-            getCompanysByAreaList(areas,count,comMap);
+        List<String>  aas = new LinkedList<>();
+        for(String a:areas){
+            BasicCompany company = selectById(a);
+            if(company.getAreaLevel().equals(AreaLevel.COMPANY_LEVEL.getKey())){
+                if(comMap.get(a)==null){
+                    comMap.put(a,company);
+                }else{
+                    aas.add(a);
+                }
+            }
+        }
+
+        if(aas.size()>0){
+            getCompanysByAreaList(aas,count,comMap);
         }
 
         return comMap;
@@ -182,6 +199,14 @@ public class BasicCompanyServiceImpl extends BaseServiceImpl<BasicCompanyMapper,
                 break;
             case AREA:
                 List<String> userAreas = sysUserAreaService.selectUserAreas(userId);
+                //没有配置的区域
+                if(userAreas.size()==0){
+                    LoginInfoDto  loginInfoDto = loginUserInfoHelper.getLoginInfo();
+                    if(loginInfoDto!=null){
+                        String OrgCode = loginInfoDto.getDdOrgCode();
+                    }
+//                    if(loginUserInfoHelper.getLoginInfo())
+                }
                 //根据用户区域信息 整理出排重的公司列表
                 companys  = selectCompanysMapByAreaId(userAreas);
 
