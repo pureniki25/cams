@@ -238,7 +238,7 @@ public class CarController {
 			carDragRegistrationBusinessVo.setVin(carBasic.getVin());
 			carDragRegistrationBusinessVo.setEvaluationTime(carDetection.getCreateTime());
 			carDragRegistrationBusinessVo.setEvaluationAmount(carDetection.getEvaluationAmount());
-			carDragRegistrationBusinessVo.setEvaluationUser("1111111");
+			carDragRegistrationBusinessVo.setEvaluationUser(detectionUsername);
 			carDragRegistrationBusinessVo.setCurrentUserName(loginUserInfoHelper.getLoginInfo().getUserName());
 			return Result.success(carDragRegistrationBusinessVo);
 
