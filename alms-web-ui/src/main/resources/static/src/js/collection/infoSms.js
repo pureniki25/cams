@@ -45,6 +45,7 @@ window.layinit(function (htConfig) {
             	smsType  			:'',  //短信类型
                 sendDateRange		:'',	//发送时间范围
                 status	:'',    //状态
+                recipient:''//短信接收人
             },
             ruleValidate:setSearchFormValidate, //表单验证
 
@@ -80,8 +81,8 @@ window.layinit(function (htConfig) {
                                 smsType:vm.searchForm.smsType,  //类型ID
                                 status:vm.searchForm.status,
                                 sendDateBegin:dateObj.sendDateBegin, //发送时间  开始
-                                sendDateEnd:dateObj.sendDateEnd //发送时间 结束
-                                 
+                                sendDateEnd:dateObj.sendDateEnd, //发送时间 结束
+                                recipient:vm.searchForm.recipient//短信接收人
 
                             }
                             , page: {
