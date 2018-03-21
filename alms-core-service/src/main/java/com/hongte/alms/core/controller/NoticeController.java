@@ -96,7 +96,7 @@ public class NoticeController {
 				}
 				orgCodes.add(orgCode);
 				EntityWrapper<Notice> ew = new EntityWrapper<Notice>();
-				ew.isNull("is_deleted").eq("is_send", 1).in("org_code", orgCodes);
+				ew.isNull("is_deleted").eq("is_send", 1).andNew().in("org_code", orgCodes).or().like("org_code", "鸿特信息");
 				ew.orderBy("publish_time", false);
 				list = noticeService.selectList(ew);
 			}
@@ -149,7 +149,8 @@ public class NoticeController {
 		orgCodes.add(orgCode);
 		EntityWrapper<Notice> ew = new EntityWrapper<Notice>();
 		ew.eq("create_user_id", userId) ;
-		ew.isNull("is_deleted");
+		ew.or().like("org_code", "鸿特信息");
+		ew.andNew().isNull("is_deleted");
 		if (title!=null) {
 			ew.like("notice_title", title);
 		}
