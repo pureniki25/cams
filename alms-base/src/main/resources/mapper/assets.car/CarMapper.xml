@@ -345,9 +345,9 @@
 	</select>
 	<select id="selectMaxOfferPriceByAuctionId" resultMap="getMaxOfferPriceResult">
 
-		select tcar.reg_tel,max(tcar.offer_amount) offer_amount FROM
-		tb_car_auction_reg tcar
-		join tb_car_auction tca on
+		select tcar.reg_tel,ifnull(max(tcar.offer_amount),tca.starting_price) offer_amount FROM
+		tb_car_auction tca 
+		left join  tb_car_auction_reg tcar on
 		tca.auction_id=tcar.auction_id
 		<where>
 
