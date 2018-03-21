@@ -116,13 +116,6 @@ window.layinit(function (htConfig) {
                 table = layui.table;
                 // var config = layui.ht_config;
                 // basePath = config.basePath;
-                //执行渲染
-                table.render({
-                    elem: '#listTable' //指定原始表格元素选择器（推荐id选择器）
-                    , id: 'listTable'
-                    , height: 550 //容器高度
-                    , cols: [[
-
                 var  cols = [
                     {
                         field: 'processName',
@@ -137,7 +130,7 @@ window.layinit(function (htConfig) {
                 ];
                 if(reqPageeType == "Search" ){
                     cols.push(
-                       {
+                        {
                             field: 'companyName',
                             title: '所属分公司'
                         }
@@ -167,16 +160,25 @@ window.layinit(function (htConfig) {
                         title: '审批状态'
                     }
                 )
-               cols.push(
-                   {
-                       fixed: 'right',
-                       title: '操作',
-                       width: 178,
-                       align: 'left',
-                       toolbar: '#barTools'
-                   }
+                cols.push(
+                    {
+                        fixed: 'right',
+                        title: '操作',
+                        width: 178,
+                        align: 'left',
+                        toolbar: '#barTools'
+                    }
                 )
                 var cols1 = [cols];
+
+                //执行渲染
+                table.render({
+                    elem: '#listTable' //指定原始表格元素选择器（推荐id选择器）
+                    , id: 'listTable'
+                    , height: 550 //容器高度
+                    , cols: cols1,
+
+
                 //执行渲染
                 table.render({
                     elem: '#listTable' //指定原始表格元素选择器（推荐id选择器）

@@ -180,11 +180,24 @@ public class BasicCompanyServiceImpl extends BaseServiceImpl<BasicCompanyMapper,
         List<SysRole> roles = sysRoleService.getUserRoles(userId);
 
         //确认用户拥有的权限访问数据的区域类型
-        SysRoleAreaTypeEnums userAreaTypeEnums = SysRoleAreaTypeEnums.AREA;
+        SysRoleAreaTypeEnums userAreaTypeEnums = SysRoleAreaTypeEnums.ONLY_SELF;
+        //用户拥有的只访问自己跟进业务的角色Map
+//        List<SysRole> onlySelfRoleList = new LinkedList<>();
+        Map<String,SysRole> onlySelfRoleMap = new HashMap<>();
         for(SysRole role: roles){
             if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.OVERALL.getKey())){
                 userAreaTypeEnums = SysRoleAreaTypeEnums.OVERALL;
-                break;
+//                break;
+            }
+            if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.AREA.getKey())){
+                if(userAreaTypeEnums ==SysRoleAreaTypeEnums.ONLY_SELF){
+                    userAreaTypeEnums = SysRoleAreaTypeEnums.AREA;
+                }
+            }
+            if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.ONLY_SELF.getKey())){
+                if(onlySelfRoleMap.get(role.getRoleCode())==null){
+                    onlySelfRoleMap.put(role.getRoleCode(),role);
+                }
             }
         }
 
@@ -221,6 +234,9 @@ public class BasicCompanyServiceImpl extends BaseServiceImpl<BasicCompanyMapper,
 
         return companys;
     }
+
+
+
 
 
 }

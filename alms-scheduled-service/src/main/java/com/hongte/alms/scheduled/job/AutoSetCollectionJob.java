@@ -55,7 +55,7 @@ public class AutoSetCollectionJob {
 
         }catch (Exception e){
             e.printStackTrace();
-            logger.error("定时任务 设置用户可访问业务对照关系  更新执行时间 异常："+e.getMessage());
+            logger.error("定时任务 业务自动移交  更新执行时间 异常："+e.getMessage());
         }
 
     }
@@ -64,7 +64,7 @@ public class AutoSetCollectionJob {
     private  static  boolean runningFlage = false;
 
     //每5分钟执行一次
-    @Scheduled(cron = "0 0/5 * * * ? ")
+//    @Scheduled(cron = "0 0/5 * * * ? ")
     public  void job(){
 
         if(runningFlage){

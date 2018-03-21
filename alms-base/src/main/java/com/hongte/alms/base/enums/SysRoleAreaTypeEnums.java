@@ -9,6 +9,7 @@ public enum SysRoleAreaTypeEnums {
 
 	OVERALL(1,"全局的角色")
 	,AREA(2,"区域的角色")
+	,ONLY_SELF(3,"只查看自己跟进的")
 	;
 
 

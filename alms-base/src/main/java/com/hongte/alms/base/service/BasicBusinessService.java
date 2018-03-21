@@ -4,6 +4,7 @@ import com.hongte.alms.base.dto.UserPermissionBusinessDto;
 import com.hongte.alms.base.vo.module.BusinessInfoForApplyDerateVo;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.common.service.BaseService;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -34,5 +35,7 @@ public interface BasicBusinessService extends BaseService<BasicBusiness> {
     List<UserPermissionBusinessDto> selectUserPermissionBusinessDtos(List<String> companyIds);
 
     List<String> selectCompanysBusinessIds(List<String> companyIds);
+
+
 
 }

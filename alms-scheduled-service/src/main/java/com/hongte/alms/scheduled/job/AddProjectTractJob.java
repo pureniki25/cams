@@ -70,13 +70,12 @@ public class AddProjectTractJob {
     //运行的标志位
     private  static  boolean runningFlage = false;
 
-    @Scheduled(cron = "0/1 0 0 1/1 * ? ")
+//    @Scheduled(cron = "0/1 0 0 1/1 * ? ")
     public  void job(){
 
         if(runningFlage){
             return;
         }
-        logger.info("进入定时任务");
         runningFlage = true;
 
         autoAddProjectTract();
