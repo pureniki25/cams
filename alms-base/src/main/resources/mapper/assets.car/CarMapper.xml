@@ -190,7 +190,7 @@
 		tcb.engine_model engineNumber ,<!--发动机号 -->
 		tcb.vin frameNumber ,<!--车架号 -->
 	    ifnull(tcb.last_evaluation_amount,tcb.evaluation_amount) lastEvaluationAmount, <!-- 评估价 --> 
-		-- UseProperty ,														<!--使用性质 -->
+		tcb.user_nature useProperty ,														<!--使用性质 -->										
 		tcb.insurance_expiration_date insuranceDate ,<!--保险到期日 -->
 		date_format(tcb.annual_verification_expiration_date,'%Y-%m') inspectionDate ,         <!--年检到期日 -->
 		tcb.odometer mileage ,<!--车显里程 -->
