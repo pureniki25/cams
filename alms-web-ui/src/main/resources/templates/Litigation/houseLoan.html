@@ -460,16 +460,26 @@ color: #FF3030;
 						<table class="layui-table" id="fTab">
 							<tr v-for="(info, index) in returnRegFiles">
 								<td class="td_label" >附件{{index+1}}<input type="text" hidden="" v-model="info.oldDocId" :id="'docId'+index" /></td>
+								<td v-if="applyInfoFormEditFlage">
+									<a href="javascript:;" class="selectFile">请选择
+									<input type="file" title="请选择" v-model="info.file" :id="'uploadfile'+index" v-on:click="uploadFile($event,index)" width="100px"
+										class="uploadFile"/>
+										
+									</a>{{info.name}}
+								</td>
+								<td v-else disabled>
+									<a href="javascript:;" class="selectFile" disabled>请选择
+									<input type="file" title="请选择" v-model="info.file" :id="'uploadfile'+index" v-on:click="uploadFile($event,index)" width="100px"
+										class="uploadFile" disabled/>
+										
+									</a>{{info.name}}
+								</td>
+								<td class="td_label" v-if="applyInfoFormEditFlage">重命名文件名称</td>
+								<td v-if="applyInfoFormEditFlage">
+									<input type="text" name="lname" v-model="info.originalName" style="width: 100%" maxlength="100" :id="'uploadfileName'+index" />
+								</td>
 								<td>
-								<a href="javascript:;" class="selectFile">请选择
-								<input type="file" title="请选择" v-model="info.file" :id="'uploadfile'+index" v-on:click="uploadFile($event,index)" width="100px"
-									class="uploadFile"/>
-									
-								</a>{{info.name}}</td>
-								<td class="td_label">重命名文件名称</td>
-								<td><input type="text" name="lname" v-model="info.originalName"
-									style="width: 100%" maxlength="100" :id="'uploadfileName'+index" /></td>
-								<td>
+								<td v-if="applyInfoFormEditFlage">
 								  <div class="layui-btn-group">
 								    <button class="layui-btn layui-btn-primary layui-btn-sm" v-on:click="addTabTr($event)"><i class="layui-icon"></i></button>
 								    
