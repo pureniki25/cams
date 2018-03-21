@@ -66,11 +66,11 @@
 				and u.user_name = #{userName}
 			</if>
 			<if test="areaId != null ">
-				and (c.area_id = #{areaId} || c.area_name = #{areaId} )
+				and (c.area_id = #{areaId} || c.area_name = #{areaId} || c.area_name like concat("%",#{areaId},"%") )
 			</if>
-			<if test="areaLevel != null ">
+			<!-- <if test="areaLevel != null ">
 				and c.area_level = #{areaLevel}
-			</if>
+			</if> -->
 		</where>
 		order by u.org_code,ua.user_id , c.area_level 
 		<if test="page != null and limit != null">
