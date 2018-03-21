@@ -1043,7 +1043,7 @@ try {
     		logger.error("该拍卖进行中或已结束，auctionId="+reg.getAuctionId()+",auctionStartTime="+carAuction.getAuctionStartTime());
     		return Result.error("9999", "该拍卖进行中或已结束");
     	}
-    	if(true==auctionReg.getAuctionSuccess()) {
+    	if(auctionReg.getAuctionSuccess()!=null&&true==auctionReg.getAuctionSuccess()) {
     		List<CarAuctionReg> auctionRegs=	carAuctionRegService.selectList(new EntityWrapper<CarAuctionReg>().eq("auctionId", reg.getAuctionId()).eq("is_auction_success", auctionReg.getAuctionSuccess()));
     		if(auctionRegs!=null&&auctionRegs.size()>0) {
     			logger.error("该拍卖已竞拍成功，auctionId="+reg.getAuctionId());
