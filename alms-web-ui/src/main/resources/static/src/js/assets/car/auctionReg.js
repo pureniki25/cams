@@ -15,9 +15,9 @@ window.layinit(function (htConfig) {
 	    	auctionReg:{
 	    		 businessId:''// 业务编号
 	    		,auctionId:''// 拍卖id
-	    		,payDeposit:''// 是否缴纳保证金
+	    		,isPayDeposit:''// 是否缴纳保证金
 	    		,offerAmount:''// 出价金额
-	    		,auctionSuccess:''// 是否竞拍成功
+	    		,isAuctionSuccess:''// 是否竞拍成功
 	    		,transPrice:''//成交价格
 	    	},
 	    	bidder:{
