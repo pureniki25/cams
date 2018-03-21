@@ -48,7 +48,7 @@
         <where>
                1=1
             <if test="keyName !=null and keyName !=''">
-                and ((sms.phone_number  LIKE '%${keyName}%') or (sms.service_name  LIKE '%${keyName}%') or (sms.original_business_id LIKE '%${keyName}%') )
+                and ((sms.phone_number  LIKE '%${keyName}%') or (sms.recipient  LIKE '%${keyName}%') or (sms.original_business_id LIKE '%${keyName}%') )
             </if>
             <if test="smsType !=null and smsType !=''">
                 and sms.sms_type = #{smsType}

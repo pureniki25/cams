@@ -3,15 +3,6 @@ var vm;
 // 业务ID
 var businessId = document.getElementById("businessId").getAttribute("value");
 
-var formatDate = function (date) {  
-    var y = date.getFullYear();  
-    var m = date.getMonth() + 1;  
-    m = m < 10 ? '0' + m : m;  
-    var d = date.getDate();  
-    d = d < 10 ? ('0' + d) : d;  
-    return y + '-' + m + '-' + d;  
-};  
-
 //设置表单验证
 
 window.layinit(function (htConfig) {
@@ -20,6 +11,9 @@ window.layinit(function (htConfig) {
 	vm = new Vue({
 	    el: '#app',
 	    data: {
+	    	
+	    	preLateFeesFlag:false,	//提前还款违约金标识，非上标业务，等额本息为true
+	    	
 	        baseInfoForm:{
 	        	customerName:""        , // 客户名称
 	        	borrowMoney:""           , // 借款金额
@@ -119,6 +113,8 @@ window.layinit(function (htConfig) {
 				if(res.data.code=='1'){
 					vm.baseInfoForm = res.data.data;
 					vm.baseInfoForm.borrowRate = res.data.data.borrowRate + '%/年';
+					
+					vm.preLateFeesFlag = res.data.data.preLateFeesFlag;
 				}else{
 					vm.$Modal.error({content: '执行失败，没有找到数据！' });
 				}

@@ -202,13 +202,12 @@ public class InfoController {
     @ApiOperation(value = "根据LogId获取短信详情")
     @GetMapping("/getInfoSmsDetailById")
     @ResponseBody
-    public Result<InfoSms> getInfoSmsDetailById(
+    public Result<InfoSmsListSearchVO> getInfoSmsDetailById(
             @RequestParam("logId") String logId
     ){
-        List<InfoSms>  pList = infoSmsService.selectList(new EntityWrapper<InfoSms>().eq("log_id",logId));
-
-        if(pList.size()>0){
-            return Result.success(pList.get(0));
+    	InfoSmsListSearchVO  vo = infoSmsService.selectLastInfoSmsDetail(logId);
+        if(vo!=null){
+            return Result.success(vo);
         }else{
             return Result.error("500","无数据");
         }

@@ -26,7 +26,18 @@ var getSelectsData = function () {
             vm.$Modal.error({content: '接口调用异常!'});
         });
 }
-
+//单行操作弹框显示
+var showOneLineOprLayer = function(url,title){
+    // vm.edit_modal = false;
+    var openIndex= layer.open({
+        type: 2,
+        area: ['95%', '95%'],
+        fixed: false,
+        maxmin: true,
+        title:title,
+        content: url
+    });
+}
 
 window.layinit(function (htConfig) {
     var _htConfig = htConfig;
@@ -45,6 +56,7 @@ window.layinit(function (htConfig) {
             	smsType  			:'',  //短信类型
                 sendDateRange		:'',	//发送时间范围
                 status	:'',    //状态
+                recipient:''//短信接收人
             },
             ruleValidate:setSearchFormValidate, //表单验证
 
@@ -80,8 +92,8 @@ window.layinit(function (htConfig) {
                                 smsType:vm.searchForm.smsType,  //类型ID
                                 status:vm.searchForm.status,
                                 sendDateBegin:dateObj.sendDateBegin, //发送时间  开始
-                                sendDateEnd:dateObj.sendDateEnd //发送时间 结束
-                                 
+                                sendDateEnd:dateObj.sendDateEnd, //发送时间 结束
+                                recipient:vm.searchForm.recipient//短信接收人
 
                             }
                             , page: {
@@ -173,7 +185,7 @@ window.layinit(function (htConfig) {
             if (obj.event === 'business') {debugger
                 if(obj.data.businessTypeId == 9 || obj.data.businessTypeId == 1){
                     //车贷  车贷展期
-                     axios.get(basePath + 'api/getXindaiCarView?businessId ='+obj.data.originalBusinessId)
+                     axios.get(basePath + 'api/getXindaiCarView?businessId='+obj.data.originalBusinessId)
                          .then(function (res) {
                              if (res.data.code == "1") {
                                  showOneLineOprLayer(res.data.data,"车贷详情");
@@ -186,7 +198,7 @@ window.layinit(function (htConfig) {
                          });
                  }else if(obj.data.businessTypeId == 11 || obj.data.businessTypeId == 2){
                      //房贷
-                     axios.get(basePath + 'api/getXindaiHouseView?businessId ='+obj.data.originalBusinessId)
+                     axios.get(basePath + 'api/getXindaiHouseView?businessId='+obj.data.originalBusinessId)
                          .then(function (res) {
                              if (res.data.code == "1") {
                                  showOneLineOprLayer(res.data.data,"房贷详情");
@@ -230,9 +242,9 @@ function getInfoSmsDetailUrl(){
             app : 'ALMS',
             Authorization : "Bearer " + getToken()
         },
-        success : function(data) {
+        success : function(data) {debugger
             var infoSmsDetail = data.data;
-            url =  '/infoUI/infoSmsDetailUI?originalBusinessId='+vm.selectedRowInfo.originalBusinessId+'&afterId='+infoSmsDetail.afterId+"&recipient="+vm.selectedRowInfo.recipient+"&phoneNumber="+vm.selectedRowInfo.phoneNumber+"&sendDate="+vm.selectedRowInfo.sendDate+"&status="+vm.selectedRowInfo.status+"&content="+infoSmsDetail.content+"&logId="+vm.selectedRowInfo.logId
+            url =  '/infoUI/infoSmsDetailUI?originalBusinessId='+vm.selectedRowInfo.originalBusinessId+'&afterId='+infoSmsDetail.afterId+"&recipient="+vm.selectedRowInfo.recipient+"&phoneNumber="+vm.selectedRowInfo.phoneNumber+"&sendDate="+vm.selectedRowInfo.sendDate+"&status="+vm.selectedRowInfo.status+"&content="+infoSmsDetail.content+"&logId="+vm.selectedRowInfo.logId+"&businessTypeName="+infoSmsDetail.businessTypeName
         },
         error : function() {
             layer.confirm('Navbar error:AJAX请求出错!', function(index) {
@@ -317,7 +329,9 @@ var getData = function(){debugger
     		   dataObject.sendDateBegin = vm.searchForm.sendDateRange[0].getTime();
     	}
     	if(vm.searchForm.sendDateRange[1]!=null){
-            dataObject.sendDateEnd = vm.searchForm.sendDateRange[1].getTime();
+      	   var date =vm.searchForm.sendDateRange[1];
+           date.setDate(date.getDate() + 1);
+           dataObject.sendDateEnd=date.getTime();
     	}
 
     }

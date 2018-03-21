@@ -55,7 +55,8 @@ public class ProcessReq  extends PageRequest {
     }
 
     public void setCreateTimeBegin(Date createTimeBegin) {
-        this.createTimeBegin = DateUtil.getThatDayBegin(createTimeBegin);
+        this.createTimeBegin = createTimeBegin;
+//        this.createTimeBegin = DateUtil.getThatDayBegin(createTimeBegin);
     }
 
     public Date getCreateTimeEnd() {
@@ -63,7 +64,8 @@ public class ProcessReq  extends PageRequest {
     }
 
     public void setCreateTimeEnd(Date createTimeEnd) {
-        this.createTimeEnd = DateUtil.getDayEnd(createTimeEnd);
+        this.createTimeEnd = createTimeEnd;
+//        this.createTimeEnd = DateUtil.getDayEnd(createTimeEnd);
     }
 
     public String getProcessTypeId() {
@@ -103,7 +105,8 @@ public class ProcessReq  extends PageRequest {
     }
 
     public void setFinishTimeBegin(Date finishTimeBegin) {
-        this.finishTimeBegin = DateUtil.getThatDayBegin(finishTimeBegin);
+        this.finishTimeBegin =finishTimeBegin;
+//        this.finishTimeBegin = DateUtil.getThatDayBegin(finishTimeBegin);
     }
 
     public Date getFinishTimeEnd() {
@@ -111,7 +114,8 @@ public class ProcessReq  extends PageRequest {
     }
 
     public void setFinishTimeEnd(Date finishTimeEnd) {
-        this.finishTimeEnd = DateUtil.getThatDayEnd(finishTimeEnd);
+        this.finishTimeEnd = finishTimeEnd;
+//        this.finishTimeEnd = DateUtil.getThatDayEnd(finishTimeEnd);
     }
 
     public Date getFinishTimeRange() {

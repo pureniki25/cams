@@ -85,6 +85,17 @@ public class InfoSmsListSearchVO {
     */
 	private Integer businessTypeId;
 
+    private String businessTypeName;
+    
+
+	public String getBusinessTypeName() {
+		return businessTypeName;
+	}
+
+
+	public void setBusinessTypeName(String businessTypeName) {
+		this.businessTypeName = businessTypeName;
+	}
 
 
 	public Integer getBusinessTypeId() {
