@@ -121,7 +121,7 @@ public class AuctionRespVo implements Serializable{
 	    @ApiModelProperty(value="车架号",name="frameNumber ")
 	    private String frameNumber ; 
 	    
-	    @ApiModelProperty(value="车辆属地",name="vehicleTerritory ")
+	    @ApiModelProperty(value="车辆属地",name="vcehicleTerritory ")
 	    private String vcehicleTerritory ; 
 	    
 	    @ApiModelProperty(value="使用性质",name="useProperty ")

@@ -471,6 +471,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		double preLateFees = 0; // 提前还款违约金
 		double squaredUp = 0; // 最终结清金额
 		double receivableTotal = 0; // 应收合计
+		boolean preLateFeesFlag = false;
 
 		if (resultMap != null && !resultMap.isEmpty()) {
 
@@ -580,6 +581,9 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 					}
 				} else if ("等额本息".equals(repaymentTypeId)) {
 					if (outputPlatformId == 0) {
+						
+						preLateFeesFlag = true;	// 提前还款违约金标识，非上标业务，等额本息为true
+						
 						switch (preLateFeeType) {
 						case 1:
 							// 一个月利息
@@ -614,6 +618,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			resultMap.put("squaredUp", Math.round(squaredUp * 100) * 0.01);
 			resultMap.put("cash", Math.round(cash * 100) * 0.01);
 			resultMap.put("balance", Math.round(balance * 100) * 0.01);
+			resultMap.put("preLateFeesFlag", preLateFeesFlag);
 		}
 
 		return resultMap;
