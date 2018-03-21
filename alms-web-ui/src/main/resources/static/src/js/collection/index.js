@@ -686,12 +686,22 @@ var getData = function(){
         realRepayDateEnd:''
     }
     if(vm.searchForm.showRepayDateRange.length>0){
-        dataObject.showRepayDateBegin = vm.searchForm.showRepayDateRange[0].getTime();
-        dataObject.showRepayDateEnd = vm.searchForm.showRepayDateRange[1].getTime();
+      	if(vm.searchForm.showRepayDateRange[0]!=null){
+      	   dataObject.showRepayDateBegin = vm.searchForm.showRepayDateRange[0].getTime();
+      	}
+      	
+    	if(vm.searchForm.showRepayDateRange[1]!=null){
+       	   dataObject.showRepayDateEnd = vm.searchForm.showRepayDateRange[1].getTime();
+       	}
+     
     }
     if(vm.searchForm.realRepayDateRange.length>0){
-        dataObject.realRepayDateBegin = vm.searchForm.realRepayDateRange[0].getTime();
-        dataObject.realRepayDateEnd = vm.searchForm.realRepayDateRange[1].getTime();
+      	if(vm.searchForm.realRepayDateRange[0]!=null){
+      	  dataObject.realRepayDateBegin = vm.searchForm.realRepayDateRange[0].getTime();
+      	}
+      	if(vm.searchForm.realRepayDateRange[1]!=null){
+        	  dataObject.realRepayDateEnd = vm.searchForm.realRepayDateRange[1].getTime();
+        	}
     }
     return dataObject;
 }
