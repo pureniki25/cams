@@ -439,6 +439,7 @@
 		<!-- TransactionMode , 交易方式 -->
 		tcb.car_position Position , <!-- 车辆位置 -->
 		tcb.related_docs files,   <!--提供文件 -->
+		tp.update_time auditTime,<!-- 审核通过时间 -->
 		<!-- Remarks , -->														<!--备注 -->
 		tcab.bidder_name bidderName,  <!-- 用户姓名 -->
 		tcab.bidder_cert_id bidderCertId, <!-- 身份证号码 -->
