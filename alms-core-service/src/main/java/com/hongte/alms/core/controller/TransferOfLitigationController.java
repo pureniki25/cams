@@ -127,15 +127,13 @@ public class TransferOfLitigationController {
 						if (houseArrs != null && houseArrs.length > 0) {
 							
 							List<HouseAdressVO> houseAdressVOs = new ArrayList<>();
-							
 							for (String houseArr : houseArrs) {
-								
 								String[] subHouseArrs = houseArr.split("--#separator#--");
 								
-								if (subHouseArrs != null && subHouseArrs.length > 0) {
+								if (subHouseArrs != null && subHouseArrs.length == 3) {
 									HouseAdressVO vo = new HouseAdressVO();
-									String replace1 = subHouseArrs[0].replace("[", "").replaceAll("]", "").replaceAll(" ","");
-									vo.setHouseArea(Arrays.asList(replace1.split(",")));
+									String replace = subHouseArrs[0].replace("[", "").replace("]", "").replaceAll(" ","");
+									vo.setHouseArea(Arrays.asList(replace.split(",")));
 									vo.setDetailAddress(subHouseArrs[1]);
 									vo.setMortgageSituation(subHouseArrs[2]);
 									houseAdressVOs.add(vo);

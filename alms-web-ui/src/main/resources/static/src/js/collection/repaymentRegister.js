@@ -15,6 +15,7 @@ window.layinit(function (htConfig) {
         ],
         repaymentMoney:[
             {type:'string',required:true,message:'还款金额不能为空',trigger:'blur'},
+            {pattern:/(^[1-9](\d+)?(\.\d{1,2})?$)|(^(0){1}$)|(^\d\.\d{1,2}?$)/,message:'还款金额格式不正确',trigger:'blur'},
         ],
         realRepaymentUser:[
             {required:true,message:'实际还款人不能为空',trigger:'blur'}

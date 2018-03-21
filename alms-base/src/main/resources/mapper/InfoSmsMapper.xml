@@ -61,11 +61,11 @@
                 and sms.status = #{status}
             </if>
             <!--          /*发送时间 开始*/ -->
-            <if test="sendDateBegin !=null and sendDateBegin !=''">
+            <if test="sendDateBegin !=null">
                 <![CDATA[ and sms.send_date >= #{sendDateBegin,jdbcType=TIMESTAMP}]]>
             </if>
             <!--            /*发送时间 结束*/ -->
-            <if test="sendDateEnd !=null and sendDateEnd !='' ">
+            <if test="sendDateEnd !=null">
                 <![CDATA[ and sms.send_date <= #{sendDateEnd,jdbcType=TIMESTAMP}]]>
             </if>
             <if test="companyId !=null and companyId !=''">

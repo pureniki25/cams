@@ -367,8 +367,12 @@ var getData = function(){
         createTimeEnd:'',
     }
     if(vm.searchForm.createTimeRange.length>0){
-        dataObject.createTimeBegin = vm.searchForm.createTimeRange[0].getTime();
-        dataObject.createTimeEnd = vm.searchForm.createTimeRange[1].getTime();
+    	if(vm.searchForm.createTimeRange[0]!=null){
+    		 dataObject.createTimeBegin = vm.searchForm.createTimeRange[0].getTime();
+    	}
+    	if(vm.searchForm.createTimeRange[1]!=null){
+   		 dataObject.createTimeEnd = vm.searchForm.createTimeRange[1].getTime();
+   	}
     }
 
     return dataObject;

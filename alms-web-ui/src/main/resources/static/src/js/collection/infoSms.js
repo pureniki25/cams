@@ -306,15 +306,20 @@ var setSearchFormValidate = {
 
 
 //取查询的时间间隔
-var getData = function(){
+var getData = function(){debugger
 
     var dataObject ={
         derateDateBegin:'',
         derateDateEnd:'',
     }
     if(vm.searchForm.sendDateRange.length>0){
-        dataObject.sendDateBegin = vm.searchForm.sendDateRange[0].getTime();
-        dataObject.sendDateEnd = vm.searchForm.sendDateRange[1].getTime();
+    	if(vm.searchForm.sendDateRange[0]!=null){
+    		   dataObject.sendDateBegin = vm.searchForm.sendDateRange[0].getTime();
+    	}
+    	if(vm.searchForm.sendDateRange[1]!=null){
+            dataObject.sendDateEnd = vm.searchForm.sendDateRange[1].getTime();
+    	}
+
     }
     return dataObject;
 }

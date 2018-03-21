@@ -1,6 +1,7 @@
 package com.hongte.alms.core.controller;
 
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -129,13 +130,13 @@ public class WithholdingRepaymentLogController {
 	    @ResponseBody
 	    public Result<Map<String,String>>getCountInfo( @RequestParam("companyId") String companyId,@RequestParam("keyName")String keyName,@RequestParam("platformId")String platformId,
 	    		
-	    		@RequestParam("dateBegin")String dateBegin,@RequestParam("dateEnd")String dateEnd,@RequestParam("repayStatus")String repayStatus,@RequestParam("businessTypeId")String businessTypeId){
+	    		@RequestParam("dateBegin")Date dateBegin,@RequestParam("dateEnd")Date dateEnd,@RequestParam("repayStatus")String repayStatus,@RequestParam("businessTypeId")String businessTypeId){
 	    	   Map<String,String> retMap = new HashMap<String,String>();
 	    	   RepaymentLogReq req=new RepaymentLogReq();
 	    	   req.setBusinessTypeId(businessTypeId);
 	    	   req.setCompanyId(companyId);
-	    	   req.setDateBegin(DateUtil.getDate(dateBegin));
-	    	   req.setDateEnd(DateUtil.getDate(dateEnd));
+	    	   req.setDateBegin(dateBegin);
+	    	   req.setDateEnd(dateEnd);
 	    	   req.setRepayStatus(repayStatus);
 	    	   req.setPlatfromId(platformId);
 	       	String userId=loginUserInfoHelper.getUserId();
