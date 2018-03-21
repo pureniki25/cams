@@ -89,14 +89,10 @@ public class NoticeController {
 			SysUser user = sysUserService.selectById(userId);
 			List<Notice> list = new LinkedList<>();
 			if(user!=null){
-				String orgCode = sysUserService.selectById(userId).getOrgCode();
-				List<String> orgCodes = sysOrgService.getParentsOrgs(orgCode);
-				if (orgCodes==null) {
-					orgCodes = new ArrayList<>();
-				}
-				orgCodes.add(orgCode);
+				String orgCode = user.getOrgCode();
+				
 				EntityWrapper<Notice> ew = new EntityWrapper<Notice>();
-				ew.isNull("is_deleted").eq("is_send", 1).andNew().in("org_code", orgCodes).or().like("org_code", "鸿特信息");
+				ew.isNull("is_deleted").eq("is_send", 1).andNew().like("org_code", orgCode).or().like("org_code", "鸿特信息");
 				ew.orderBy("publish_time", false);
 				list = noticeService.selectList(ew);
 			}
