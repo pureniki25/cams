@@ -35,7 +35,7 @@
 		platform.platform_name as platformName,
 		c.plan_service_charge as planServiceCharge,
 		c.plan_overdue_money as planOverDueMoney,
-		(select current_date()) as nowdate,
+		pList.due_date as nowdate,
 		repayment.repayment_type_name as repaymentTypeName,
 		business.operator_name as operatorName,
 		customer.phone_number as phoneNumber,
