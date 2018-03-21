@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
-    <title>通知公告</title>
+    <title>用户区域设置</title>
     <script src="/properties/config.js"></script>
     <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css" />
     <!-- iview样式 -->
@@ -53,12 +53,12 @@
                         <form-item label="管理区域/公司名">
                             <i-input v-model="schForm.areaId"></i-input>
                         </form-item>
-                        <form-item label="管理区域/公司名">
+                        <!-- <form-item label="管理区域/公司名">
                             <i-select v-model="schForm.areaLevel">
                                 <i-option value="60">公司</i-option>
                                 <i-option value="40">区域</i-option>
                             </i-select>
-                        </form-item>
+                        </form-item> -->
                         <i-button @click="search">查询</i-button>
                         <i-button @click="app.addSysUserAreaModal.show=true">新增</i-button>
                     </i-form>
