@@ -114,14 +114,12 @@ window.layinit(function (htConfig) {
 	        	overdueDays:""  	, // 逾期天数
 	        	outputUserName:""   	, // 出款人
 	        	factOutputDate:"" 		, // 出款日期
-	        	houseAddress:"",
 	        },
 	        
 	        commitInfoForm: {
 	        	
 				businessId:""		   	, // 业务编号
 				estates: '',	// 是否有房产
-				houseAddress: [],	// 房产地址
 				carCondition: '',	// 客户车辆目前情况
 				almsOpinion: '',	// 贷后意见
 				delayHandover: '',	// 是否推迟移交
@@ -247,12 +245,7 @@ window.layinit(function (htConfig) {
 	           // closePareantLayer();
 	       },
 	       resetEdit(){  // 撤销操作
-	           if(processStatus == PROCESS_STATUS_NEW || processStatus == PROCESS_STATUS_START) {
-	               this.handleReset("commitInfoForm");
-	           }else{
-	               vm.commitInfoForm =  vm.initalApplyInfo;
-	           }
-	           restProcessApprovalInfo();
+	    	   closePareantLayer();
 	       },
 	       saveDeraf(){// 保存草稿
 	           saveapplyInfo(PROCESS_STATUS_NEW);
@@ -620,7 +613,7 @@ var saveapplyInfo = function(pStatus){
 			               type: "POST",
 			               url: basePath+'transferOfLitigation/saveTransferLitigationCar',
 			               contentType: "application/json; charset=utf-8",
-			               data: JSON.stringify({"houseData":[vm.commitInfoForm],"reqRegFiles":vm.reqRegFiles}),
+			               data: JSON.stringify({"houseData":[vm.commitInfoForm],"reqRegFiles":vm.reqRegFiles,"componentOption":vm.componentOption}),
 			               success: function (res) {
 			            	   if (res.code == "1"){
 			            		   vm.$Modal.success({

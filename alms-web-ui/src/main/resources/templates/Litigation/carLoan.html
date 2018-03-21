@@ -164,22 +164,31 @@ height: 100%;
 			</row>
 		</i-form>		
 			
-		<div class="layui-row">
+		<div class="layui-row" >
 			<div class="layui-col-xs6 layui-col-md12">
 				<div class="grid-demo layui-bg-gray">
 					<table class="layui-table">
-						<tr track-by="$index" v-for="(info, index) in componentOption" v-if="applyInfoFormEditFlage">
+						<tr track-by="$index" v-for="(info, index) in componentOption" >
 							<td class="td_label">房产地址{{index + 1}}</td>
-							<td  > 
+							<td v-if="applyInfoFormEditFlage" > 
 							      <cascader :data="areaData" v-model="componentOption[index].houseArea" filterable></cascader>
 							</td>
-							<td  > 
+							<td v-else disabled > 
+							      <cascader :data="areaData" v-model="componentOption[index].houseArea" filterable disabled></cascader>
+							</td>
+							<td  v-if="applyInfoFormEditFlage"> 
 							      <i-input v-model="componentOption[index].detailAddress" placeholder="详细地址" ></i-input>
 							</td>
-							<td  > 
+							<td v-else disabled > 
+							      <i-input v-model="componentOption[index].detailAddress" placeholder="详细地址" disabled></i-input>
+							</td>
+							<td v-if="applyInfoFormEditFlage"> 
 							      <i-input v-model="componentOption[index].mortgageSituation" placeholder="房产抵押情况" ></i-input>
 							</td>
-							<td  >
+							<td v-else disabled> 
+							      <i-input v-model="componentOption[index].mortgageSituation" placeholder="房产抵押情况" disabled></i-input>
+							</td>
+							<td v-if="applyInfoFormEditFlage">
 							  <div class="layui-btn-group">
 							    <button class="layui-btn layui-btn-primary layui-btn-sm" v-on:click="addHouseTabTr($event)"><i class="layui-icon"></i></button>
 							    <button v-if="index != 0" class="layui-btn layui-btn-primary layui-btn-sm"  v-on:click="removeHouseTabTr($event, index)"><i class="layui-icon"></i></button>
@@ -189,12 +198,6 @@ height: 100%;
 							
 						</tr>
 						
-						<tr v-else>
-							<td class="td_label">房产地址{{index + 1}}</td>
-							<td  > 
-							     
-							</td>
-						</tr>
 					</table>
 				</div>
 			</div>
@@ -206,16 +209,26 @@ height: 100%;
 					<table class="layui-table" id="fTab">
 						<tr v-for="(info, index) in returnRegFiles">
 								<td class="td_label" >附件{{index+1}}<input type="text" hidden="" v-model="info.oldDocId" :id="'docId'+index" /></td>
+								<td v-if="applyInfoFormEditFlage">
+									<a href="javascript:;" class="selectFile">请选择
+									<input type="file" title="请选择" v-model="info.file" :id="'uploadfile'+index" v-on:click="uploadFile($event,index)" width="100px"
+										class="uploadFile"/>
+										
+									</a>{{info.name}}
+								</td>
+								<td v-else disabled>
+									<a href="javascript:;" class="selectFile" disabled>请选择
+									<input type="file" title="请选择" v-model="info.file" :id="'uploadfile'+index" v-on:click="uploadFile($event,index)" width="100px"
+										class="uploadFile" disabled/>
+										
+									</a>{{info.name}}
+								</td>
+								<td class="td_label" v-if="applyInfoFormEditFlage">重命名文件名称</td>
+								<td v-if="applyInfoFormEditFlage">
+									<input type="text" name="lname" v-model="info.originalName" style="width: 100%" maxlength="100" :id="'uploadfileName'+index" />
+								</td>
 								<td>
-								<a href="javascript:;" class="selectFile">请选择
-								<input type="file" title="请选择" v-model="info.file" :id="'uploadfile'+index" v-on:click="uploadFile($event,index)" width="100px"
-									class="uploadFile"/>
-									
-								</a>{{info.name}}</td>
-								<td class="td_label">重命名文件名称</td>
-								<td><input type="text" name="lname" v-model="info.originalName"
-									style="width: 100%" maxlength="100" :id="'uploadfileName'+index" /></td>
-								<td>
+								<td v-if="applyInfoFormEditFlage">
 								  <div class="layui-btn-group">
 								    <button class="layui-btn layui-btn-primary layui-btn-sm" v-on:click="addTabTr($event)"><i class="layui-icon"></i></button>
 								    
