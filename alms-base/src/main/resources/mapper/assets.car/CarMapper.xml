@@ -214,6 +214,8 @@
 		from tb_car_auction tca
 		join tb_car_basic tcb on
 		tca.business_id=tcb.business_id
+		join tb_basic_business bus on
+		tcb.business_id=bus.business_id
 		join tb_process tp on
 		tcb.business_id=tp.business_id and
 		tp.process_result=1
@@ -236,11 +238,11 @@
 			</if>
 			<if test="vehicleBrand !=null and vehicleBrand !=''">
 			
-			    and tcb.brand_name=#{vehicleBrand}
+			    and tcb.brand_name LIKE "%"#{vehicleBrand}"%"
 			</if>
 			<if test="carModel !=null and carModel !=''">
 			
-			    and tcb.model=#{vehicleBrand}
+			    and tcb.model LIKE "%"#{carModel}"%"
 			</if>
 		</where>
 		order BY tca.create_time DESC
@@ -255,6 +257,9 @@
 		from tb_car_auction tca
 		join tb_car_basic tcb on
 		tca.business_id=tcb.business_id
+		join tb_basic_business bus on
+		tcb.business_id=bus.business_id
+		
 		join tb_process tp on
 		tcb.business_id=tp.business_id and
 		tp.process_result=1
@@ -277,11 +282,11 @@
 			</if>
 			<if test="vehicleBrand !=null and vehicleBrand !=''">
 			
-			    and tcb.brand_name=#{vehicleBrand}
+			    and tcb.brand_name LIKE "%"#{vehicleBrand}"%"
 			</if>
 			<if test="carModel !=null and carModel !=''">
 			
-			    and tcb.model=#{vehicleBrand}
+			    and tcb.model LIKE "%"#{carModel}"%"
 			</if>
 		</where>
 		order BY tca.create_time DESC
@@ -474,11 +479,11 @@
 			</if>
 			<if test="vehicleBrand !=null and vehicleBrand !=''">
 			
-			    and tcb.brand_name=#{vehicleBrand}
+			    and tcb.brand_name LIKE "%"#{vehicleBrand}"%"
 			</if>
 			<if test="carModel !=null and carModel !=''">
 			
-			    and tcb.model=#{vehicleBrand}
+			    and tcb.model LIKE "%"#{carModel}"%"
 			</if>
 		</where>
 		order BY tcar.update_time desc
@@ -518,11 +523,11 @@
 			</if>
 			<if test="vehicleBrand !=null and vehicleBrand !=''">
 			
-			    and tcb.brand_name=#{vehicleBrand}
+			    and tcb.brand_name LIKE "%"#{vehicleBrand}"%"
 			</if>
 			<if test="carModel !=null and carModel !=''">
 			
-			    and tcb.model=#{vehicleBrand}
+			    and tcb.model LIKE "%"#{carModel}"%"
 			</if>
 		</where>	
 	</select>
