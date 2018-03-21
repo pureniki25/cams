@@ -49,7 +49,7 @@ Configuration:
     Logger: # 为com.xjj包配置特殊的Log级别，方便调试
       - name: com.baomidou.mybatisplus.plugins.pagination.optimize
         additivity: false
-        level: INFO
+        level: ERROR
         AppenderRef:
           - ref: CONSOLE
           - ref: ROLLING_FILE
