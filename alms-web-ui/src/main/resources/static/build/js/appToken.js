@@ -6,6 +6,10 @@ var htConfig;
 window.layinit = function (cb) {
     axios.defaults.headers.common['app'] = 'ALMS';
     axios.defaults.headers.common['Authorization'] = 'Bearer ' + getToken();
+
+    
+
+
     // axios.defaults.headers.common['instanceId'] = coreInstancedId;
     // if()
 
@@ -72,6 +76,14 @@ window.layinit = function (cb) {
             htConfig.openBasePath = htConfig.basePath +"open/";
             htConfig.uiBasePath = htConfig.uiBasePath;
         }
+        axios.interceptors.request.use(function (config) {
+            debugger
+            layui.ht_ajax.validationAndRefreshToken()
+            return config;
+        }, function (error) {
+            // 对请求错误做些什么
+            return Promise.reject(error);
+        });
         cb(htConfig)
     });
 }

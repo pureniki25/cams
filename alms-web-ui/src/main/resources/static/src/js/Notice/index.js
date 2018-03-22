@@ -10,16 +10,9 @@ window.layinit(function (htConfig) {
     basePath = htConfig.coreBasePath
     let table = layui.table
     let laydate = layui.laydate
-
-    axios.interceptors.request.use(function (config) {
-        console.log(config)
-        console.log("axios.interceptors.request")
-        return config;
-      }, function (error) {
-        // 对请求错误做些什么
-        return Promise.reject(error);
-      });
-
+    
+    
+    
     app = new Vue({
         el: "#app",
         data: {
@@ -36,7 +29,7 @@ window.layinit(function (htConfig) {
                 notice: {
                     noticeTitle: '',
                     publishTime: '',
-                    createUserId: 'xxxxx',
+                    createUserId: '',
                     noticeContent: '',
                     fileList: ''
                 }
