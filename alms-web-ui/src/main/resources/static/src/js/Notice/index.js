@@ -155,8 +155,8 @@ window.layinit(function (htConfig) {
             },
             schForm:{
                 handler(c,o){
-                    c.dateStart = c.date[0]
-                    c.dateEnd = c.date[1]
+                    c.startDate = formatDate(c.date[0])
+                    c.endDate = formatDate(c.date[1])
                 },deep:true
             }
         },
