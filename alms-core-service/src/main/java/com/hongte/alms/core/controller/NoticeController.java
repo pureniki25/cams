@@ -150,10 +150,10 @@ public class NoticeController {
 		}
 		
 		if (startDate!=null) {
-			ew.gt("publish_time", startDate);
+			ew.ge("DATE_FORMAT(publish_time,'%Y-%m-%d')", DateUtil.formatDate(startDate));
 		}
 		if (endDate!=null) {
-			ew.lt("publish_time", endDate);
+			ew.le("DATE_FORMAT(publish_time,'%Y-%m-%d')", DateUtil.formatDate(endDate));
 		}
 		Page<Notice> page2 = noticeService.selectPage(new Page<Notice>(page, limit), ew);
 		return PageResult.success(page2.getRecords(), page2.getTotal());
@@ -226,6 +226,20 @@ public class NoticeController {
 		upLoadResult.setMessage(uploadItemId);
         return upLoadResult;
     }
+	
+	@ApiOperation(value = "删除公告附件")
+	@PostMapping("/delAttachment")
+	@ResponseBody
+	public Result deleteAttachment(@RequestBody JSONObject file) {
+		
+		boolean res = noticeFileService.deleteById(file.getInteger("noticeFileId"));
+		if (res) {
+			return Result.success();
+		}else {
+			return Result.error("500", "删除附件失败");
+		}
+		
+	}
 	@ApiOperation(value = "(逻辑)删除公告")
 	@GetMapping("/del")
 	@ResponseBody

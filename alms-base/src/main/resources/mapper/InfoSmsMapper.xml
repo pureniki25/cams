@@ -78,6 +78,8 @@
 <!--             </foreach> -->
 <!--         </if> -->
 
+     and user.user_id=#{userId}
+
         </where>
         order BY  sms.create_time DESC
 

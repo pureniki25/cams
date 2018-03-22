@@ -30,8 +30,13 @@ window.layinit(function (htConfig) {
         ],
         acceptBank: [
             { required: true, message: '转入账号不能为空', trigger: 'blur' }
+        ],
+        remark:[
+            {max: 500,message:'备注不能超过500字', trigger: 'blur'}
+        ],
+        tradePlace:[
+            {max: 50,message:'交易场所不能超过50字', trigger: 'blur'}
         ]
-
     }
 
     app = new Vue({
@@ -75,6 +80,13 @@ window.layinit(function (htConfig) {
                 accept: 'image/*'
             }
         },
+        watch:{
+            editForm:{
+                handler(c,o){
+                },
+                deep:true
+            }
+        },
         methods: {
             openAddModal: function () {
                 this.add_modal = true
@@ -113,7 +125,8 @@ window.layinit(function (htConfig) {
                                 _this.editForm.acceptBank = data.acceptBank
                                 $.each(_this.bank_account_list, function (i, o) {
                                     if (o.financeName == data.acceptBank) {
-                                        $("#acceptBankAccount input").attr('disabled', false).val(o.repaymentId).attr('disabled', true)
+                                        _this.editForm.acceptBankAccount = o.repaymentId
+                                        // $("#acceptBankAccount input").attr('disabled', false).val(o.repaymentId).attr('disabled', true)
                                         return false
                                     }
                                 })
@@ -255,13 +268,13 @@ window.layinit(function (htConfig) {
                     })
             },
             onDepartmentBankChange: function (cb) {
-                let _this = this
+                 let _this = this
                 $.each(_this.bank_account_list, function (i, o) {
                     if (o.financeName == cb) {
                         _this.editForm.acceptBankAccount = o.repaymentId
                         return false
                     }
-                })
+                }) 
                 console.log(cb)
             },
             onTradeTypeChange: function (cb) {
