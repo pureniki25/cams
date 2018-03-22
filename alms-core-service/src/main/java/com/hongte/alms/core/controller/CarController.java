@@ -223,6 +223,16 @@ public class CarController {
 				return Result.error("500","车辆评估信息不存在");
 			}
 			LoginInfoDto detectionUser=loginUserInfoHelper.getUserInfoByUserId("",carBasic.getCreateUser());
+			if(detectionUser==null)
+			{
+				return Result.error("500","获取车辆评估人失败");
+
+			}
+			LoginInfoDto loginUser=loginUserInfoHelper.getLoginInfo();
+			if(loginUser==null)
+			{
+				return Result.error("500","获取登录用户失败");
+			}
             String detectionUsername=detectionUser!=null?detectionUser.getUserName():"";
 			CarDragRegistrationBusinessVo carDragRegistrationBusinessVo = new CarDragRegistrationBusinessVo();
 			carDragRegistrationBusinessVo.setBusinessId(basicBusiness.getBusinessId());
@@ -239,7 +249,7 @@ public class CarController {
 			carDragRegistrationBusinessVo.setEvaluationTime(carDetection.getCreateTime());
 			carDragRegistrationBusinessVo.setEvaluationAmount(carDetection.getEvaluationAmount());
 			carDragRegistrationBusinessVo.setEvaluationUser(detectionUsername);
-			carDragRegistrationBusinessVo.setCurrentUserName(loginUserInfoHelper.getLoginInfo().getUserName());
+			carDragRegistrationBusinessVo.setCurrentUserName(loginUser.getUserName());
 			return Result.success(carDragRegistrationBusinessVo);
 
 		}
