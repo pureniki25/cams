@@ -36,7 +36,7 @@ public class AutoSetCollectionJob {
         SysJobConfig config = null;
         try {
             //判断定时任务是否可执行
-            config =  sysJobConfigService.getCanExecuteConfig(JobConfigEnums.JobConfigType.SET_USER_PSERMISION.getValue());
+            config =  sysJobConfigService.getCanExecuteConfig(JobConfigEnums.JobConfigType.SET_BUSINESS_COL.getValue());
             if(config ==null)
                 return;
             try {
@@ -64,7 +64,7 @@ public class AutoSetCollectionJob {
     private  static  boolean runningFlage = false;
 
     //每5分钟执行一次
-    @Scheduled(cron = "0 0/5 * * * ? ")
+    @Scheduled(cron = "0 0/1 * * * ? ")
     public  void job(){
 
         if(runningFlage){
