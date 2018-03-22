@@ -84,7 +84,12 @@ public class DocController {
 	 */
 	@RequestMapping(value = "/delOneDoc", method = RequestMethod.GET)
 	public void delOneDoc(String docId) {
+		try {
 		docService.delOneDoc(docId);
+		}catch (Exception e) {
+			LOG.error(e.getMessage());
+			e.printStackTrace();
+		}
 	}
 
 	/**

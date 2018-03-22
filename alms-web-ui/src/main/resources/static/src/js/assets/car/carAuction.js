@@ -124,6 +124,9 @@ window.layinit(function (htConfig) {
     		   ,paymentEndTime:''//缴款截止时间
     		   ,assessOdometer:''//评估时的里程数，只针对页面的验证
     		   ,viewSampleAddr:''//看样地址
+    		   ,delayPeriod:''//延时周期
+    		   ,remark:''//备注
+    		   ,transFree:''//交易税费
 	       }
 	       
 	       ,  //可发送审批信息的用户列表
@@ -267,6 +270,18 @@ window.layinit(function (htConfig) {
 	      	$("#viewSampleAddr").focus(function(){
 	    		  $("#viewSampleAddr").css("border","1px solid #ccc");
 	    		});
+	    	$("#transFree").blur(function(){
+	    		var transFree=$("#transFree").val();
+	    		if (!amt.test(transFree)) {  
+	    			$("#transFree").css("border","1px solid #FF3030");
+	    			layer.msg("请输入有效金额！",{icon:5,shade: [0.8, '#393D49']});
+	    			return;
+	    		}
+	    	});
+	       	$("#transFree").focus(function(){
+	    		  $("#transFree").css("border","1px solid #ccc");
+	    		});
+
 	    	this.queryData();
 	   	    laydate.render({
 		        elem: '#annualVerificationExpirationDate',
@@ -849,6 +864,12 @@ window.layinit(function (htConfig) {
 	    			$("#viewSampleAddr").css("border","1px solid #FF3030");
 	    			return ;
 	    		}
+	    		if(vm.carAuction.transFree==''||vm.carAuction.transFree==null){
+	    			$("#transFree").css("border","1px solid #FF3030");
+	    			return ;
+	    		}
+
+
 	    		for(var i=0;i<vm.returnRegFiles.length;i++){
 	    			vm.returnRegFiles[i].file='';
 	    			vm.reqRegFiles[i]=vm.returnRegFiles[i];
