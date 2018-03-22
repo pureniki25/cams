@@ -137,7 +137,7 @@
                     </form-item>
 
                     <form-item label="备注："  prop="collectionNote">
-                        <i-input v-model="editCompanyCollectionTime.editCompanyCollectionForm.note" type="textarea" :rows="4" placeholder="Enter something..."></i-input>
+                        <i-input v-model="editCompanyCollectionTime.editCompanyCollectionForm.note" type="textarea" :rows="4" maxlength="500" placeholder="Enter something..."></i-input>
                     </form-item>
 
                     <form-item label="序号："  prop="colTimeId" style="display: none">
@@ -238,11 +238,11 @@
 
 
 <script>
-
+    var vm;
     window.layinit(function (htConfig) {
         var _htConfig = htConfig;
         basePath = _htConfig.coreBasePath;
-        var vm = new Vue({
+        vm = new Vue({
             el: '#app',
             data: {
                 options3:{
@@ -868,7 +868,17 @@
     var validateOpt = {
         overDueDays: [
             {required: true, message: '请输入逾期天数', trigger: 'blur'},
-            { type: 'number', max: 20, message: '不能超过20个字符', trigger: 'blur' }
+            {
+                validator: function (rule, value, callback, source, options) {
+                    var reg = /^\+?[1-9]\d*$/;
+                    if (!reg.test(vm.editCompanyCollectionTime.editCompanyCollectionForm.overDueDays)) {
+                        callback(new Error('逾期天数只能输入正整数'));
+                    } else {
+                        callback();//校验通过
+                    }
+
+                }, trigger: 'blur'
+            }
         ],
         startTime: [
             { required: true, type: 'date', message: '请选择开始时间', trigger: 'change' }

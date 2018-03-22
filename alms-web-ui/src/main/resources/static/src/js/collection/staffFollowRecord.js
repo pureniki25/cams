@@ -210,7 +210,7 @@ var setFormValidate = {
         {required: true, message: '请选择是否传输平台', trigger: 'change'}
     ],
     content: [
-        {required: true, message: '请填写跟踪记录', trigger: 'blur'}
+        {required: true, message: '请填写跟踪记录',max:'200', trigger: 'blur'}
     ]
 };
 
