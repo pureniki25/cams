@@ -95,7 +95,7 @@ public class WithHoldingController {
 			/* http://172.16.200.104:8084/apites是信贷接口域名，这里本机配置的，需要配置成自己的 */
 			logger.info(getUrl());
 			WithHoldingXinDaiService withholdingxindaiService = Feign.builder().target(WithHoldingXinDaiService.class,
-					"http://10.110.1.21:8018");
+					"http://172.16.200.106:8084/apitest2");
 			String respStr = withholdingxindaiService.withholding(encryptStr);
 			// 返回数据解密
 			ResponseData respData = getRespData(respStr);
@@ -139,7 +139,7 @@ public class WithHoldingController {
 			// 请求数据加密
 			encryptStr = encryptPostData(encryptStr);
 			WithHoldingXinDaiService withholdingxindaiService = Feign.builder().target(WithHoldingXinDaiService.class,
-					"http://10.110.1.21:8018");
+					"http://172.16.200.106:8084/apitest2");
 			
 			String respStr = withholdingxindaiService.searchRepayRecord(encryptStr);
 			// 返回数据解密
