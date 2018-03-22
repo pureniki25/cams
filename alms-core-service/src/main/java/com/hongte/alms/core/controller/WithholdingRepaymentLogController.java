@@ -164,7 +164,7 @@ public class WithholdingRepaymentLogController {
 	    	   req.setDateBegin(dateBegin);
 	    	   req.setDateEnd(dateEnd);
 	    	   req.setRepayStatus(repayStatus);
-	    	   req.setPlatfromId(platformId);
+	    	   req.setPlatformId(platformId);
 	       	String userId=loginUserInfoHelper.getUserId();
 	    	   req.setUserId(userId);
 	    	   RepaymentLogVO  repaymentLogVO=null;

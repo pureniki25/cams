@@ -13,12 +13,12 @@ import java.util.Date;
  */
 @ApiModel(value="还款计划日志查询请求对象",description="还款计划日志查询请求对象")
 public class RepaymentLogReq extends PageRequest{
-	
-	
+	  
+	 
     @ApiModelProperty(value="关键字",name="keyName",example="test" ,dataType = "String")
     private String keyName      	;     //关键字
     @ApiModelProperty(value="平台ID",name="smsType",example="test" ,dataType = "String")
-    private String platfromId  			; //区域ID
+    private String platformId  			; //区域ID
     @ApiModelProperty(value="分公司ID",name="companyId",example="test" ,dataType = "String")
     private String companyId			; //分公司ID
     @ApiModelProperty(value="状态",name="repayStatus",example="test" ,dataType = "String")
@@ -33,6 +33,8 @@ public class RepaymentLogReq extends PageRequest{
     
     @ApiModelProperty(value="用户ID",name="userId",example="test" ,dataType = "String")
     private String   userId; //用户Id
+    
+    
 	public String getBusinessTypeId() {
 		return businessTypeId;
 	}
@@ -62,13 +64,17 @@ public class RepaymentLogReq extends PageRequest{
 		this.keyName = keyName;
 	}
 
-	public String getPlatfromId() {
-		return platfromId;
+
+
+	public String getPlatformId() {
+		return platformId;
 	}
 
-	public void setPlatfromId(String platfromId) {
-		this.platfromId = platfromId;
+
+	public void setPlatformId(String platformId) {
+		this.platformId = platformId;
 	}
+
 
 	public String getCompanyId() {
 		return companyId;
