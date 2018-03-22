@@ -54,7 +54,7 @@ public class SysUserController {
 
    @GetMapping("/getUserIdByToken")
     @ApiOperation(value = "根据token取得用户的id")
-   @CrossOrigin(allowCredentials="false", allowedHeaders="*", origins="*")
+//   @CrossOrigin(allowCredentials="false", allowedHeaders="*", origins="*")
     public Result getUserIdByToken(){
         if(loginUserInfoHelper == null){
             return Result.error("500","找不到用户信息");
