@@ -150,10 +150,10 @@ public class NoticeController {
 		}
 		
 		if (startDate!=null) {
-			ew.gt("publish_time", startDate);
+			ew.ge("DATE_FORMAT(publish_time,'%Y-%m-%d')", DateUtil.formatDate(startDate));
 		}
 		if (endDate!=null) {
-			ew.lt("publish_time", endDate);
+			ew.le("DATE_FORMAT(publish_time,'%Y-%m-%d')", DateUtil.formatDate(endDate));
 		}
 		Page<Notice> page2 = noticeService.selectPage(new Page<Notice>(page, limit), ew);
 		return PageResult.success(page2.getRecords(), page2.getTotal());
