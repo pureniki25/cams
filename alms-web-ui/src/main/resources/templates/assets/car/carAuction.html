@@ -471,14 +471,26 @@ color: #FF3030;
 							<td><input type="text" name="lname" v-model="carAuction.paymentEndTime"
 									id="paymentEndTime" placeholder="yyyy-MM-dd">
 							</td>
-							<td class="td_label"></td><td><input type="text" name="lname" v-model="processId" hidden=""><!-- 提交审核的processId --></td>
-							<td class="td_label"></td><td></td>
+							<td class="td_label">交易税费<label class="input_label">*</label></td>
+							<td>
+							<input type="text" name="lname" v-model="carAuction.transFree" id="transFree" maxlength="10">
+							
+							<td class="td_label"></td><td>
+							</td>
 						</tr>
 						<tr>
 							<td class="td_label">看样地点<label class="input_label">*</label></td>
 							<td colspan="5"><input type="text" name="lname"
 								v-model="carAuction.viewSampleAddr" style="width: 100%" maxlength="400" id="viewSampleAddr">
 							</td>
+						</tr>
+						 <tr>
+							<td  class="td_label" rowspan="3">备注</td>
+							<td colspan="5" rowspan="3"> <textarea rows="" cols="" v-model="carAuction.remark"
+									style="width: 100%;border:1px solid #ccc" maxlength="1000" > </textarea>
+							
+							<input type="text" name="lname" v-model="processId" hidden=""><!-- 提交审核的processId --></td>		
+							
 						</tr>
 					</table>
 				</div>
