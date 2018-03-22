@@ -30,6 +30,9 @@ window.layinit(function (htConfig) {
         ],
         acceptBank: [
             { required: true, message: '转入账号不能为空', trigger: 'blur' }
+        ],
+        remark:[
+            {max: 500,message:'备注不能超过500字', trigger: 'blur'}
         ]
 
     }
