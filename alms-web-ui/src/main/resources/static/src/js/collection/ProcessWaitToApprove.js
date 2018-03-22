@@ -416,7 +416,10 @@ var getData = function(condition){
             dataObject.finishTimeBegin = vm.searchForm.finishTimeRange[0].getTime();
         }
         if(vm.searchForm.finishTimeRange[1]!=null){
-            dataObject.finishTimeEnd = vm.searchForm.finishTimeRange[1].getTime();
+            
+            var date =vm.searchForm.finishTimeRange[1];
+            date.setDate(date.getDate() + 1);
+            dataObject.finishTimeEnd=date.getTime();
         }
 
     }

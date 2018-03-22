@@ -148,14 +148,15 @@ public class WithholdingRepaymentLogController {
 	        String countByBusinessId=repaymentLogVO.getCountByBusinessId();
 	        
 	      //查找代扣成功流水总条数
+	        req.setRepayStatus("1");
 	        repaymentLogVO=withholdingRepaymentlogService.selectSumByLogId(req);
 	        String countbyLogId=repaymentLogVO.getCountbyLogId();
-                  req.setRepayStatus("1");
+	        //查找代扣成功总额
+	        String SumRepayAmount=repaymentLogVO.getSumRepayAmount();
 	    	//查找代扣业务成功总条数
             repaymentLogVO= withholdingRepaymentlogService.selectSumByBusinessId(req);
             String countByBusinessIdSucess=repaymentLogVO.getCountByBusinessId();
-	        //查找代扣成功总额
-	        String SumRepayAmount=repaymentLogVO.getSumRepayAmount();
+	
 	        retMap.put("countByBusinessIdSucess",countByBusinessIdSucess);
 	        retMap.put("countByBusinessId",countByBusinessId);
 	        retMap.put("countbyLogId",countbyLogId);
@@ -172,28 +173,17 @@ public class WithholdingRepaymentLogController {
 
 	    @ApiOperation(value = "还款计划日志表导出Excel  ")
 	    @PostMapping("/saveExcel")
-	    public Result<String> saveExcel(HttpServletRequest request, HttpServletResponse response,@ModelAttribute RepaymentLogReq req) throws Exception {
-	        EasyPoiExcelExportUtil.setResponseHead(response,"AfterLoanStandingBook.xls");
+	    public void saveExcel(HttpServletRequest request, HttpServletResponse response,@ModelAttribute RepaymentLogReq req) throws Exception {
+	        EasyPoiExcelExportUtil.setResponseHead(response,"repaylogmengt.xls");
 	        req.setUserId(loginUserInfoHelper.getUserId());
 	        List<RepaymentLogVO> list = withholdingRepaymentlogService.selectRepaymentLogExcel(req);
 
 	        Workbook workbook = ExcelExportUtil.exportExcel(new ExportParams(), RepaymentLogVO.class, list);
 
-	        String fileName =  UUID.randomUUID().toString()+".xls";
-	        System.out.println(fileName);
 
 
-	        Map<String,String> retMap = storageService.storageExcelWorkBook(workbook,fileName);
 
-//	        retMap.put("errorInfo","");
-//	        retMap.put("sucFlage","true");
-
-	        if(retMap.get("sucFlage").equals("true")){
-	            return  Result.success(fileName);
-	        }else{
-	            return Result.error("500", retMap.get("errorInfo"));
-	        }
-//	        workbook.write(response.getOutputStream());
+	        workbook.write(response.getOutputStream());
 
 
 	    }
