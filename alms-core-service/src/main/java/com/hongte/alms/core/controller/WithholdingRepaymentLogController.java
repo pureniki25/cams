@@ -96,6 +96,32 @@ public class WithholdingRepaymentLogController {
 	            return PageResult.error(500, "数据库访问异常");
 	        }
 	    }
+	    
+	    
+	    /**
+	     * 获取用户Id
+	     * @param req 分页请求数据
+	     * @author chenzs
+	     * @date 2018年3月22日
+	     * @return 菜单分页数据
+	     */
+
+	    @ApiOperation(value = "获取用户Id")
+	    @GetMapping("/getUserId")
+	    @ResponseBody
+	    public Result<String> getUserId(
+	    ){
+	    	String userId=loginUserInfoHelper.getUserId();
+
+	        if(userId!=null&&!userId.equals("")){
+	            return Result.success(userId);
+	        }else{
+	            return Result.error("500","无数据");
+	        }
+
+	        
+	    }
+	    
 	    /**
 	     * 获取详情
 	     * @author chenzs
@@ -138,7 +164,7 @@ public class WithholdingRepaymentLogController {
 	    	   req.setDateBegin(dateBegin);
 	    	   req.setDateEnd(dateEnd);
 	    	   req.setRepayStatus(repayStatus);
-	    	   req.setPlatfromId(platformId);
+	    	   req.setPlatformId(platformId);
 	       	String userId=loginUserInfoHelper.getUserId();
 	    	   req.setUserId(userId);
 	    	   RepaymentLogVO  repaymentLogVO=null;
@@ -175,9 +201,8 @@ public class WithholdingRepaymentLogController {
 	    @PostMapping("/saveExcel")
 	    public void saveExcel(HttpServletRequest request, HttpServletResponse response,@ModelAttribute RepaymentLogReq req) throws Exception {
 	        EasyPoiExcelExportUtil.setResponseHead(response,"repaylogmengt.xls");
-	        req.setUserId(loginUserInfoHelper.getUserId());
 	        List<RepaymentLogVO> list = withholdingRepaymentlogService.selectRepaymentLogExcel(req);
-
+ 
 	        Workbook workbook = ExcelExportUtil.exportExcel(new ExportParams(), RepaymentLogVO.class, list);
 
 

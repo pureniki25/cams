@@ -230,9 +230,14 @@ height: 100%;
 								<td v-if="applyInfoFormEditFlage">
 								  <div class="layui-btn-group">
 								    <button class="layui-btn layui-btn-primary layui-btn-sm" v-on:click="addTabTr($event)"><i class="layui-icon"></i></button>
-								    
 								    <button class="layui-btn layui-btn-primary layui-btn-sm"  v-on:click="removeTabTr($event, index)"><i class="layui-icon"></i></button>
-								  
+								    <a  class="layui-btn layui-btn-primary layui-btn-sm"  :href="downloadFile(info)" >下载</a>
+								  </div>
+								
+								</td>
+								<td v-else>
+								  <div class="layui-btn-group">
+								    <a  class="layui-btn layui-btn-primary layui-btn-sm"  :href="downloadFile(info)" >下载</a>
 								  </div>
 								
 								</td>
