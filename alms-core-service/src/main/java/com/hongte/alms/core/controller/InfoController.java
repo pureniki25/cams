@@ -143,14 +143,14 @@ public class InfoController {
 
         try{
         	
-        	Map<String,BasicCompany> companyIds  =  basicCompanyService.selectUserCanSeeCompany(loginUserInfoHelper.getUserId());
-        	List companys=new ArrayList();
-            if (companyIds != null) {
-                for (String key : companyIds.keySet()) {
-                	companys.add(key);
-                }
-            }
-            req.setCompanyIds(companys);
+//        	Map<String,BasicCompany> companyIds  =  basicCompanyService.selectUserCanSeeCompany(loginUserInfoHelper.getUserId());
+//        	List companys=new ArrayList();
+//            if (companyIds != null) {
+//                for (String key : companyIds.keySet()) {
+//                	companys.add(key);
+//                }
+//            }
+//            req.setCompanyIds(companys);
            	req.setUserId(loginUserInfoHelper.getUserId());
            	
             Page<InfoSmsListSearchVO> pages = infoSmsService.selectInfoSmsPage(req);
