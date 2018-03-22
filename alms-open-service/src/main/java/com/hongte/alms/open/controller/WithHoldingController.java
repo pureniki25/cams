@@ -93,6 +93,7 @@ public class WithHoldingController {
 			// 请求数据加密
 			encryptStr = encryptPostData(encryptStr);
 			/* http://172.16.200.104:8084/apites是信贷接口域名，这里本机配置的，需要配置成自己的 */
+			logger.info(getUrl());
 			WithHoldingXinDaiService withholdingxindaiService = Feign.builder().target(WithHoldingXinDaiService.class,
 					getUrl());
 			String respStr = withholdingxindaiService.withholding(encryptStr);
@@ -223,9 +224,9 @@ public class WithHoldingController {
 	}
 	
 	private String getUrl() {
-		
-		int i=apiUrl.indexOf("api/");
-		String url=apiUrl.substring(0,i-1);
+		String apiUrl2="http://10.110.1.21:8085/api/ltgproject/dod/";
+		int i=apiUrl2.indexOf("api/");
+		String url=apiUrl2.substring(0,i-1);
 		return url;
 		
 	}

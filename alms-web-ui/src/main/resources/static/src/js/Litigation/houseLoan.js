@@ -292,7 +292,9 @@ window.layinit(function (htConfig) {
 	    		file: '',
 	    		name:'',
 	    		originalName: '',
-	    		oldDocId:''
+	    		oldDocId:'',
+	    		downloadFileName:'',
+	   			docUrl:''
 	    	}],
 	    	reqRegFiles:[{
 	    		originalName: '',
@@ -451,6 +453,10 @@ window.layinit(function (htConfig) {
 	                 }
 	             });
 	    	},
+	    	downloadFile: function(info){
+	    		// 如果文档id存在，那么进行ajax
+	    			return basePath+'doc/download?downloadFile='+info.downloadFileName + '&docUrl=' + info.docUrl
+	    	},
 	    	removeTabTr: function (event, index) {
 	    		var docId=$('#docId'+index).val();  
 	    		var that = this;
@@ -574,15 +580,19 @@ var getShowInfo = function () {
 	                	for (var i = 0; i < docFiles.length; i++){
 	                		if(i > 0){
 	                			vm.returnRegFiles.push({
-	   	               			 file: '',
-	   	               			 name:docFiles[i].originalName,
-	   	               			 originalName: docFiles[i].originalName,
-	   	               			 oldDocId:docFiles[i].docId
-	   	               		 });
+		   	               			 file: '',
+		   	               			 name:docFiles[i].originalName,
+		   	               			 originalName: docFiles[i].originalName,
+		   	               			 oldDocId:docFiles[i].docId,
+		   	               			 downloadFileName:docFiles[i].originalName,
+		   	               			 docUrl:docFiles[i].docUrl
+	   	               		 	});
 	                		}else{
-		                		vm.returnRegFiles[i].oldDocId = docFiles[i].docId;
+	                			vm.returnRegFiles[i].oldDocId = docFiles[i].docId;
 		                		vm.returnRegFiles[i].originalName = docFiles[i].originalName;
 		                		vm.returnRegFiles[i].name = docFiles[i].originalName;
+		                		vm.returnRegFiles[i].downloadFileName = docFiles[i].originalName;
+		                		vm.returnRegFiles[i].docUrl = docFiles[i].docUrl;
 	                		}
 	                		// i++;
 	                	}

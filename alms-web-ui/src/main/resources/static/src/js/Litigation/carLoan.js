@@ -308,24 +308,6 @@ window.layinit(function (htConfig) {
 	                 }
 	             });
 	    	},
-	    	/*downloadFile: function(index){
-	    		var docId=$('#docId'+index).val();
-	    		var that = this;
-	    		// 如果文档id存在，那么进行ajax
-	    		if (docId) {
-	    			$.ajax({
-		                type: "GET",
-		                url: basePath+'doc/download?downloadFile='+vm.returnRegFiles[index].downloadFile + '&docUrl=' + vm.returnRegFiles[index].docUrl,
-		                success: function (data) {
-		                	console.log(data, that);
-		                },
-		                error: function (message) {
-		                    layer.msg("删除文件失败。");
-		                    console.error(message);
-		                }
-		            });
-	    		} 
-	    	},*/
 	    	downloadFile: function(info){
 	    		// 如果文档id存在，那么进行ajax
 	    			return basePath+'doc/download?downloadFile='+info.downloadFileName + '&docUrl=' + info.docUrl
