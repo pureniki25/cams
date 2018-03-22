@@ -101,7 +101,7 @@
                             <i-option  v-for="item in bank_account_list" :value="item.financeName"  >{{item.financeName}}</i-option>
                         </i-select>
                     </form-item>
-                    <form-item label="转入银行卡号"  v-show="editForm.tradeType=='转账'||editForm.tradeType=='刷卡'">
+                    <form-item label="转入银行卡号" prop="acceptBankAccount" v-show="editForm.tradeType=='转账'||editForm.tradeType=='刷卡'">
                         <input type="text"   v-model="editForm.acceptBankAccount" disabled="disabled" class="layui-input" style="width:50%;text-align:center;font-size:20px"></input>
                     </form-item>
                     <form-item label="上传凭证" prop="certUrl" >

@@ -147,3 +147,14 @@ var clickNavByUrl = function (url) {
        }
     })
 }
+
+let formatDate = function (DATE) {
+    var year = DATE.getFullYear();
+    var month = DATE.getMonth() + 1;
+    var day = DATE.getDate();
+    return year + "-" + month + "-" + day
+}
+
+let parseDate = function(str){
+    
+}

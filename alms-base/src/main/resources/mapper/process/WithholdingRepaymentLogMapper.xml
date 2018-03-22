@@ -72,8 +72,8 @@ select repay.log_id as logId,repay.original_business_id as originalBusinessId ,r
             <if test="keyName !=null and keyName !=''">
                 and ((business.operator_name  LIKE '%${keyName}%') or (repay.customer_name  LIKE '%${keyName}%') or (repay.original_business_id LIKE '%${keyName}%') )
             </if>
-            <if test="platfromId !=null and platfromId !=''">
-                and repay.bind_platform_id = #{platfromId}
+            <if test="platformId !=null and platformId !=''">
+                and repay.bind_platform_id = #{platformId}
             </if>
 
             <if test="repayStatus !=null and repayStatus !=''">
@@ -134,8 +134,8 @@ select repay.*  from tb_withholding_repayment_log  repay
             <if test="keyName !=null and keyName !=''">
                 and ((business.operator_name  LIKE '%${keyName}%') or (repay.customer_name  LIKE '%${keyName}%') or (repay.original_business_id LIKE '%${keyName}%') )
             </if>
-            <if test="platfromId !=null and platfromId !=''">
-                and repay.bind_platform_id = #{platfromId}
+            <if test="platformId !=null and platformId !=''">
+                and repay.bind_platform_id = #{platformId}
             </if>
 
             <if test="repayStatus !=null and repayStatus !=''">
@@ -197,8 +197,8 @@ select repay.*  from tb_withholding_repayment_log  repay
             <if test="keyName !=null and keyName !=''">
                 and ((business.operator_name  LIKE '%${keyName}%') or (repay.customer_name  LIKE '%${keyName}%') or (repay.original_business_id LIKE '%${keyName}%') )
             </if>
-            <if test="platfromId !=null and platfromId !=''">
-                and repay.bind_platform_id = #{platfromId}
+            <if test="platformId !=null and platformId !=''">
+                and repay.bind_platform_id = #{platformId}
             </if>
 
              
