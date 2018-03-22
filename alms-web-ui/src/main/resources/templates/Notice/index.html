@@ -49,11 +49,7 @@
                             <i-input :value.sync="schForm.title" v-model="schForm.title"></i-input>
                         </form-item>
                         <form-item label="发布时间">
-                            <Date-picker type="date" placeholder="开始时间" :value.sync="schForm.dateStart" v-model="schForm.dateStart" @on-change="onDateStartChange"
-                                :options="dateStartOption"></Date-picker>
-                            <span>至</span>
-                            <Date-picker type="date" placeholder="结束时间" :value.sync="schForm.dateEnd" v-model="schForm.dateEnd" @on-change="onDateEndChange"
-                                :options="dateEndOption"></Date-picker>
+                            <Date-picker type="daterange" placeholder="时间范围" :value.sync="schForm.date" v-model="schForm.date"  ></Date-picker>
                         </form-item>
                         <i-button @click="search">查询</i-button>
                     </i-form>

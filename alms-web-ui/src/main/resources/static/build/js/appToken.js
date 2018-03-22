@@ -77,7 +77,6 @@ window.layinit = function (cb) {
             htConfig.uiBasePath = htConfig.uiBasePath;
         }
         axios.interceptors.request.use(function (config) {
-            debugger
             layui.ht_ajax.validationAndRefreshToken()
             return config;
         }, function (error) {

@@ -37,8 +37,8 @@ window.layinit(function (htConfig) {
             schForm: {
                 title: '',
                 dateStart: '',
-                dateEnd: ''
-
+                dateEnd: '',
+                date:[]
             },
             editForm: {
                 noticeId: '',
@@ -53,6 +53,11 @@ window.layinit(function (htConfig) {
                 attachment: [
 
                 ]
+            },
+            dateOption:{
+                disabledDate(date){
+                    return date < new Date()
+                }
             },
             dateEndOption: {
                 disabledDate(date) {
@@ -148,6 +153,12 @@ window.layinit(function (htConfig) {
                 },
                 deep: true
             },
+            schForm:{
+                handler(c,o){
+                    c.dateStart = c.date[0]
+                    c.dateEnd = c.date[1]
+                },deep:true
+            }
         },
         created: function () {
             let arry = []
@@ -183,6 +194,8 @@ window.layinit(function (htConfig) {
             },
             onDateEndChange: function (date) {
                 dateEnd = date
+            },onDateChange:function(date){
+                console.log(date)
             },
             openEditorModal: function (action, noticeId) {
                 if (action == 'add') {
