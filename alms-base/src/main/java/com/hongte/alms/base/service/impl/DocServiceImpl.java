@@ -1,5 +1,17 @@
 package com.hongte.alms.base.service.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.assets.car.vo.FileVo;
@@ -13,15 +25,6 @@ import com.hongte.alms.base.vo.module.doc.DocUploadRequest;
 import com.hongte.alms.base.vo.module.doc.UpLoadResult;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.AliyunHelper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
 
 /**
  * <p>
@@ -313,5 +316,10 @@ public class DocServiceImpl extends BaseServiceImpl<DocMapper, Doc> implements D
   
         return upLoadResult;
     }
+    
+    @Override
+    public void download(String downloadFile, String key, HttpServletResponse response) {
+    	ossClient.downObject(downloadFile, key, response);
+	}
 
 }
