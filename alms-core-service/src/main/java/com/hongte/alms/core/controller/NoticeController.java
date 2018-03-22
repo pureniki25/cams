@@ -226,6 +226,20 @@ public class NoticeController {
 		upLoadResult.setMessage(uploadItemId);
         return upLoadResult;
     }
+	
+	@ApiOperation(value = "删除公告附件")
+	@PostMapping("/delAttachment")
+	@ResponseBody
+	public Result deleteAttachment(@RequestBody JSONObject file) {
+		
+		boolean res = noticeFileService.deleteById(file.getInteger("noticeFileId"));
+		if (res) {
+			return Result.success();
+		}else {
+			return Result.error("500", "删除附件失败");
+		}
+		
+	}
 	@ApiOperation(value = "(逻辑)删除公告")
 	@GetMapping("/del")
 	@ResponseBody

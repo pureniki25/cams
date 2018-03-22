@@ -374,14 +374,40 @@ window.layinit(function (htConfig) {
                 }
                 this.editForm.attachment.push(uploadItem);
             },
-            delUploadItem: function (id) {
-                this.editForm.attachment = this.editForm.attachment.filter(function (item) {
-                    return item.id != id
-                })
+            delUploadItem: function (o) {
 
-                this.editForm.attachment.forEach(function (item, i) {
-                    item.id = i + 1
-                })
+
+                console.log(o)
+
+                if(o.noticeFileId){
+                    axios.post(basePath+'notice/delAttachment',o)
+                    .then(function(res){
+                        if(res.data.code=='1'){
+                            app.editForm.attachment = app.editForm.attachment.filter(function (item) {
+                                return item.id != o.id
+                            })
+            
+                            app.editForm.attachment.forEach(function (item, i) {
+                                item.id = i + 1
+                            })
+                        }else{
+                            app.$Modal.error({content:'调用接口失败'})
+                        }
+                    })
+                    .catch(function(err){
+                        app.$Modal.error({content:'调用接口失败'})
+                    })
+                }else{
+                    this.editForm.attachment = this.editForm.attachment.filter(function (item) {
+                        return item.id != o.id
+                    })
+    
+                    this.editForm.attachment.forEach(function (item, i) {
+                        item.id = i + 1
+                    })
+                }
+
+                
             },
             beforeUpload: function (file) {
                 this.upload.data.fileName = file.name
