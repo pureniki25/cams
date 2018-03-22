@@ -94,6 +94,11 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
     @Qualifier("SysUserRoleService")
     private SysUserRoleService sysUserRoleService;
 
+    @Autowired
+    @Qualifier("BasicCompanyService")
+    private  BasicCompanyService basicCompanyService;
+
+
     /**
      * 存储流程信息，所有异常都回滚
      * @param processSaveReq
@@ -790,7 +795,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
         Page<ProcessVo> pages = new Page<>();
         pages.setSize(key.getLimit());
         pages.setCurrent(key.getPage());
-
+        serReqInfo(key);
         List<ProcessVo> list = processMapper.selectProcessVoList(pages,key);
 
         pages.setRecords(setProcessVoListInfo(list));
@@ -799,11 +804,35 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
         return pages;
     }
 
+    private  void  serReqInfo(ProcessReq key){
+        if(key.getKeyWord()!=null){
+           List<SysUser> list =  sysUserService.selectList(new EntityWrapper<SysUser>().like("user_name",key.getKeyWord()));
+           if(list.size()>0){
+               List<String> creatUserIds = new LinkedList<>();
+               for(SysUser user: list){
+                   creatUserIds.add(user.getUserId());
+               }
+               key.setStartUserIds(creatUserIds);
+           }
+        }
 
+        List<String> comids = null;
+        if(key.getCompanyId()!=null && key.getCompanyId()!=""){
+            comids = new LinkedList<>();
+            comids.add(key.getCompanyId());
+        }
+//        List<String> comIds =  basicCompanyService.selectUserSearchComIds(loginUserInfoHelper.getUserId(),null,comids);
+        List<String> comIds =  basicCompanyService.selectSearchComids(null,comids);
+        if(comIds!=null&&comIds.size()>0){
+            key.setCompanyIds(comIds);
+        }
+
+        key.setUserId(loginUserInfoHelper.getUserId());
+    }
 
     @Override
     public List<ProcessVo> selectProcessVoList(ProcessReq key){
-
+        serReqInfo(key);
         List<ProcessVo> list = processMapper.selectProcessVoList(key);
 
         setProcessVoListInfo(list);

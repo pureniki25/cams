@@ -57,6 +57,7 @@ public class SetUserPermission implements   BaseJob {
 
     //每5分钟执行一次
     @Scheduled(cron = "0 0/5 * * * ? ")
+//    @Scheduled(cron = "0/1 * * * * ? ")
     public  void job(){
 
         if(runningFlage){
@@ -87,6 +88,9 @@ public class SetUserPermission implements   BaseJob {
                 for(SysUser user:list){
                     sysUserPermissionService.setUserPermissons(user.getUserId());
                 }
+//                sysUserPermissionService.setUserPermissons("0101255141");
+
+
                 logger.info("完成一次用户对照关系设置");
                 config.setLastRunTime(new Date());
                 sysJobConfigService.updateById(config);

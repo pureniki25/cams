@@ -14,25 +14,7 @@ import com.hongte.alms.base.assets.car.vo.FileVo;
 import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
 import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
 import com.hongte.alms.base.collection.service.CollectionStatusService;
-import com.hongte.alms.base.entity.BasicBusiness;
-import com.hongte.alms.base.entity.BizOutputRecord;
-import com.hongte.alms.base.entity.CarAuction;
-import com.hongte.alms.base.entity.CarAuctionBidder;
-import com.hongte.alms.base.entity.CarAuctionReg;
-import com.hongte.alms.base.entity.CarBasic;
-import com.hongte.alms.base.entity.CarConvBusAply;
-import com.hongte.alms.base.entity.CarDetection;
-import com.hongte.alms.base.entity.CarDrag;
-import com.hongte.alms.base.entity.CarReturnReg;
-import com.hongte.alms.base.entity.Doc;
-import com.hongte.alms.base.entity.DocTmp;
-import com.hongte.alms.base.entity.DocType;
-import com.hongte.alms.base.entity.RepaymentBizPlan;
-import com.hongte.alms.base.entity.RepaymentBizPlanList;
-import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
-import com.hongte.alms.base.entity.SysCity;
-import com.hongte.alms.base.entity.SysCounty;
-import com.hongte.alms.base.entity.SysProvince;
+import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.AuctionStatusEnums;
 import com.hongte.alms.base.process.entity.ProcessLog;
 import com.hongte.alms.base.process.entity.ProcessType;
@@ -75,6 +57,7 @@ import com.hongte.alms.core.vo.modules.car.CarDragRegistrationBusinessVo;
 import com.hongte.alms.core.vo.modules.car.CarDragRegistrationInfo;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.BoaInRoleInfoDto;
+import com.ht.ussp.client.dto.LoginInfoDto;
 import com.ht.ussp.util.BeanUtils;
 import com.ht.ussp.util.DateUtil;
 
@@ -239,6 +222,8 @@ public class CarController {
 			{
 				return Result.error("500","车辆评估信息不存在");
 			}
+			LoginInfoDto detectionUser=loginUserInfoHelper.getUserInfoByUserId("",carBasic.getCreateUser());
+            String detectionUsername=detectionUser!=null?detectionUser.getUserName():"";
 			CarDragRegistrationBusinessVo carDragRegistrationBusinessVo = new CarDragRegistrationBusinessVo();
 			carDragRegistrationBusinessVo.setBusinessId(basicBusiness.getBusinessId());
 			carDragRegistrationBusinessVo.setCustomerName(basicBusiness.getCustomerName());
@@ -253,7 +238,7 @@ public class CarController {
 			carDragRegistrationBusinessVo.setVin(carBasic.getVin());
 			carDragRegistrationBusinessVo.setEvaluationTime(carDetection.getCreateTime());
 			carDragRegistrationBusinessVo.setEvaluationAmount(carDetection.getEvaluationAmount());
-			carDragRegistrationBusinessVo.setEvaluationUser(carDetection.getCreateUser());
+			carDragRegistrationBusinessVo.setEvaluationUser(detectionUsername);
 			carDragRegistrationBusinessVo.setCurrentUserName(loginUserInfoHelper.getLoginInfo().getUserName());
 			return Result.success(carDragRegistrationBusinessVo);
 
@@ -284,7 +269,7 @@ public class CarController {
 			carDrag.setFee(registrationInfo.getFee());
 			carDrag.setOtherFee(registrationInfo.getOtherFee());
 			carDrag.setRemark(registrationInfo.getRemark());
-			carDrag.setCreateUser(loginUserInfoHelper.getLoginInfo().getUserName());
+			carDrag.setCreateUser(loginUserInfoHelper.getLoginInfo().getUserId());
 			carDrag.setCreateTime(new Date());
 			carDragService.insert(carDrag);
 			CarBasic originCarBasic= carBasicService.selectOne(new EntityWrapper<CarBasic>().eq("business_id",registrationInfo.getBusinessId()));
@@ -569,18 +554,19 @@ try {
     		return Result.error("9999", "还款信息有误");
     	}
     	String planId=plans.get(0).getPlanId();
+    	Map<String,Object> plan=new HashMap<String,Object>();
     	//还款计划列表
-    	List<RepaymentBizPlanList> planLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("plan_id", planId).orderBy("fact_repay_date", false));
-    	if(planLists==null||planLists.size()<=0) {
-    		logger.error("该业务编号下还款计划列表不存在");
-    		return Result.error("9999", "还款信息有误");
-    	}
+    	List<RepaymentBizPlanList> planLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("plan_id", planId).eq("current_status", "已还款").orderBy("fact_repay_date", false));
+    	if(planLists!=null&&planLists.size()>0) {
+
+    	
     	Set<String> set=new HashSet<String>();
     	Date lastPayDate=planLists.get(0).getFactRepayDate();//按还款日期降序取第一个还款日期
     	for(RepaymentBizPlanList planList:planLists) {
   
     		set.add(planList.getPlanListId());
     	}
+    	
     	List<RepaymentBizPlanListDetail> planListDetails=repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().in("plan_list_id",set).eq("business_id", businessId));
        	if(planListDetails==null) {
     		logger.error("该业务编号下还款计划列表明细不存在");
@@ -596,12 +582,15 @@ try {
        			payedInterest=payedInterest.add((detail.getFactAmount()==null?new BigDecimal(0):detail.getFactAmount()));
        		}
        	}
-       	Map<String,Object> plan=new HashMap<String,Object>();
+    	
+       	
        	plan.put("payedPrincipal", payedPrincipal);
        	plan.put("payedInterest", payedInterest);
        	plan.put("lastPayDate", lastPayDate);
        	int overdueDays=DateUtil.getDiffDays(lastPayDate, new Date());//逾期天数
+    
      	plan.put("overdueDays", overdueDays);
+    	}
      	//出款信息
      	Set<Integer> outTypes=new HashSet<Integer>();
      	outTypes.add(0);
@@ -718,6 +707,7 @@ try {
       	return Result.build("0000", "操作成功", map);
  	}catch (Exception e) {
       	logger.error(e.getMessage());
+      	e.printStackTrace();
       	return Result.error("9999", "操作异常");
   	}
   }
@@ -1053,7 +1043,7 @@ try {
     		logger.error("该拍卖进行中或已结束，auctionId="+reg.getAuctionId()+",auctionStartTime="+carAuction.getAuctionStartTime());
     		return Result.error("9999", "该拍卖进行中或已结束");
     	}
-    	if(true==auctionReg.getAuctionSuccess()) {
+    	if(auctionReg.getAuctionSuccess()!=null&&true==auctionReg.getAuctionSuccess()) {
     		List<CarAuctionReg> auctionRegs=	carAuctionRegService.selectList(new EntityWrapper<CarAuctionReg>().eq("auctionId", reg.getAuctionId()).eq("is_auction_success", auctionReg.getAuctionSuccess()));
     		if(auctionRegs!=null&&auctionRegs.size()>0) {
     			logger.error("该拍卖已竞拍成功，auctionId="+reg.getAuctionId());
@@ -1093,12 +1083,12 @@ try {
     		return Result.error("9999", "还款信息有误");
     	}
     	String planId=plans.get(0).getPlanId();
+     	Map<String,Object> plan=new HashMap<String,Object>();
     	//还款计划列表
-    	List<RepaymentBizPlanList> planLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("plan_id", planId).orderBy("fact_repay_date", false));
-    	if(planLists==null||planLists.size()<=0) {
-    		logger.error("该业务编号下还款计划列表不存在");
-    		return Result.error("9999", "还款信息有误");
-    	}
+    	List<RepaymentBizPlanList> planLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("plan_id", planId).eq("current_status", "已还款").orderBy("fact_repay_date", false));
+    	if(planLists!=null&&planLists.size()>0) {
+
+ 
     	Set<String> set=new HashSet<String>();
     	Date lastPayDate=planLists.get(0).getFactRepayDate();//按还款日期降序取第一个还款日期
     	for(RepaymentBizPlanList planList:planLists) {
@@ -1120,13 +1110,13 @@ try {
        			payedInterest=payedInterest.add((detail.getFactAmount()==null?new BigDecimal(0):detail.getFactAmount()));
        		}
        	}
-       	Map<String,Object> plan=new HashMap<String,Object>();
+  
        	plan.put("payedPrincipal", payedPrincipal);
        	plan.put("payedInterest", payedInterest);
        	plan.put("lastPayDate", lastPayDate);
        	int overdueDays=DateUtil.getDiffDays(lastPayDate, new Date());//逾期天数
      	plan.put("overdueDays", overdueDays);
-     	//出款信息
+       	}//出款信息
      	Set<Integer> outTypes=new HashSet<Integer>();
      	outTypes.add(0);
      	outTypes.add(1);

@@ -118,7 +118,7 @@ eureka:
     prefer-ip-address: true
   client:
     serviceUrl:
-      defaultZone: http://10.100.5.193:30101/eureka/,http://10.100.5.195:30102/eureka/ # 配置注册中心url
+      defaultZone: ${EUREKA_SERVER_ADDRESS} # 配置注册中心url
 ht:
   config:
     ui:
@@ -136,18 +136,13 @@ spring:
     config:
       discovery:
         enabled: true
-        service-id: ussp-config-app
-      username: root
-      password: 123456
     bus:
-      trace:
-        enabled: true
+      enabled: true
+
 eureka:
-  instance:
-    prefer-ip-address: true
   client:
     serviceUrl:
-      defaultZone: http://eureka.didispace.com/eureka/ # 配置注册中心url
+      defaultZone: ${EUREKA_SERVER_ADDRESS}
 ht:
   config:
     ui:

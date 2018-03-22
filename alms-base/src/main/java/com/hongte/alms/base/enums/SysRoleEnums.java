@@ -8,8 +8,8 @@ package com.hongte.alms.base.enums;
 public enum SysRoleEnums {
 	DH_LOAN_COMMISSIONER ("DH_LOAN_COMMISSIONER","车辆拍卖申请专员"),
 	HD_GENERAL_COMMISSIO ("HD_GENERAL_COMMISSIO"	,"综合管理专员"/*,false*/)      ,//HD_GENERAL_COMMISSIO
-	HD_ASSET_COMMISSIONE ("HD_ASSET_COMMISSIONE"	,"资产管理专员"/*,true*/)      ,
-	HD_LIQ_COMMISSIONER	 ("HD_LIQ_COMMISSIONER"	,"电催专员")              ,
+	HD_ASSET_COMMISSIONE ("HD_ASSET_COMMISSIONE"	,"资产管理专员"/*,true*/)      ,  //清算二
+	HD_LIQ_COMMISSIONER	 ("HD_LIQ_COMMISSIONER"	,"电催专员")              ,			//清算一
 	HD_EARE_ASSET_MANAGE ("HD_EARE_ASSET_MANAGE"	,"区域资产管理主管")  ,//HD_EARE_ASSET_MANAGE
 	HD_VISIT_LEADER		 ("HD_VISIT_LEADER"	,"贷后回访组长")              ,
 	DH_PHONE_URG_LEADER	 ("DH_PHONE_URG_LEADER"	,"电催组长")              ,

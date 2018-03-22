@@ -289,8 +289,8 @@ var setPhoneUrgeFormValidate = {
     discript: [
         {
             validator: function (rule, value, callback, source, options) {
-                if (vm.setPhoneUrgeForm.discript.length>1000) {
-                    callback(new Error('分配说明不多于1000字'));
+                if (vm.setPhoneUrgeForm.discript.length>500) {
+                    callback(new Error('分配说明不多于500字'));
                 } else {
                     callback();//校验通过
                 }

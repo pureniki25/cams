@@ -101,11 +101,16 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
         if(req.getCompanyId()!=null && req.getCompanyId()!=""){
             coms.add(req.getCompanyId());
         }
-        List<String> cIds = basicCompanyService.selectUserSearchComIds(loginUserInfoHelper.getUserId(),areas,coms);
+//        List<String> cIds = basicCompanyService.selectUserSearchComIds(loginUserInfoHelper.getUserId(),areas,coms);
+        List<String> cIds = basicCompanyService.selectSearchComids(areas,coms);
 
         if(cIds.size()>0){
             req.setCommIds(cIds);
         }
+
+
+
+        req.setUserId(loginUserInfoHelper.getUserId());
 
 
         List<AfterLoanStandingBookVo> list = phoneUrgeMapper.selectAfterLoadStanding(pages,req);

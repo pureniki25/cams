@@ -40,5 +40,7 @@ public interface BasicCompanyService extends BaseService<BasicCompany> {
      */
     public List<String> selectUserSearchComIds(String userId, List<String> areas, List<String> comIds);
 
+    public List<String> selectSearchComids(List<String> areas, List<String> comIds);
+
     public Map<String, BasicCompany> selectUserCanSeeCompany(String userId);
 }

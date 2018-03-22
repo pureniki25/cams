@@ -172,7 +172,7 @@
 	</dependencyManagement>
 
 	<build>
-		<finalName>alms-core-service</finalName>
+		<finalName>alms-open-service</finalName>
 		<plugins>
 			<!-- 此插件用来生成通用mapper的代码 -->
 			<plugin>

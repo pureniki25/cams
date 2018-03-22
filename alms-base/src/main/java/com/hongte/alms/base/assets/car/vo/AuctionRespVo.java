@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hongte.alms.base.entity.Doc;
 
 import io.swagger.annotations.ApiModel;
@@ -33,26 +34,37 @@ public class AuctionRespVo implements Serializable{
 	    private BigDecimal priceincrease; //加价幅度
 
 	    @ApiModelProperty(value="拍卖开始时间",name="startPriceDate")
+	    @JsonFormat( pattern = "yyyy-MM-dd HH:mm")
 	    private Date startPriceDate; //拍卖开始时间
+	    
 	    @ApiModelProperty(value="拍卖结束时间",name="etartPriceDate")
-	    private Date EtartPriceDate;  //拍卖结束时间
+	    @JsonFormat( pattern = "yyyy-MM-dd HH:mm")
+	    private Date etartPriceDate;  //拍卖结束时间
 	    
 	    
 	    @ApiModelProperty(value="竞价开始时间",name="starBidTime")
+	    @JsonFormat( pattern = "yyyy-MM-dd HH:mm")
 	    private Date starBidTime; //拍卖开始时间
+	    
 	    @ApiModelProperty(value="竞价结束时间",name="endBidTime")
+	    @JsonFormat( pattern = "yyyy-MM-dd HH:mm")
 	    private Date endBidTime;  //拍卖结束时间
 	    
 	    
 	    @ApiModelProperty(value="咨询开始时间",name="conStartDate")
+	    @JsonFormat( pattern = "yyyy-MM-dd HH:mm")
 	    private Date conStartDate; //咨询开始时间
+	    
 	    @ApiModelProperty(value="咨询结束时间",name="conEndDate")
+	    @JsonFormat( pattern = "yyyy-MM-dd HH:mm")
 	    private Date conEndDate;  //咨询结束时间
 	    
 	    @ApiModelProperty(value="看样开始时间",name="vieStartDate")
+	    @JsonFormat( pattern = "yyyy-MM-dd HH:mm")
 	    private Date vieStartDate;  //咨询结束时间
 	    
 	    @ApiModelProperty(value="看样结束时间",name="vieEndDate")
+	    @JsonFormat( pattern = "yyyy-MM-dd HH:mm")
 	    private Date vieEndDate;  //咨询结束时间
 
 	    @ApiModelProperty(value="看样地点",name="vie ")
@@ -63,6 +75,7 @@ public class AuctionRespVo implements Serializable{
 	    private String contact;   //联系地点
 
 	    @ApiModelProperty(value="交款时间",name="paymentTime")
+	    @JsonFormat( pattern = "yyyy-MM-dd HH:mm")
 	    private Date paymentTime;  //咨询结束时间
 
 	    @ApiModelProperty(value="交易类型",name="tranType")
@@ -96,6 +109,7 @@ public class AuctionRespVo implements Serializable{
 	    private String cardNo;  
 	    
 	    @ApiModelProperty(value="缴款截止时间",name="paymentEndTime")
+	    @JsonFormat( pattern = "yyyy-MM-dd HH:mm")
 	    private String paymentEndTime;  
 	    
 	    @ApiModelProperty(value="车辆品牌",name="vehicleBrand")
@@ -128,22 +142,24 @@ public class AuctionRespVo implements Serializable{
 	    private String useProperty ; 
 	    
 	    @ApiModelProperty(value="保险到期日",name="insuranceDate ")
+	    @JsonFormat( pattern = "yyyy-MM-dd ")
 	    private Date insuranceDate ; 
 	    
 	    @ApiModelProperty(value="年检到期日",name="inspectionDate ")
-	    private Date inspectionDate ; 
+	    private String inspectionDate ; 
 	    
 	    @ApiModelProperty(value="车显里程",name="mileage ")
 	    private int mileage ; 
 	    
 	    
 	    @ApiModelProperty(value="首次登记年月",name="registerDate ")
+	    @JsonFormat( pattern = "yyyy-MM-dd ")
 	    private Date registerDate ; 
 	    @ApiModelProperty(value="车辆抵押状态",name="mortgageState ")
 	    private String mortgageState ; 
 	    
-	    @ApiModelProperty(value="违章未处理记录",name="lllegal ")
-	    private String Illegal ; 
+	    @ApiModelProperty(value="违章未处理记录",name="illegal ")
+	    private String illegal ; 
 	    
 	    @ApiModelProperty(value="随车工具",name="tools ")
 	    private String tools ; 
@@ -159,13 +175,14 @@ public class AuctionRespVo implements Serializable{
 	    private String transactionMode ; 
 	    @ApiModelProperty(value="车辆位置",name="position ")
 	    private String position ; 
-	    @ApiModelProperty(value="提供文件",name="files ")
-	    private String files ; 
+	    @ApiModelProperty(value="提供文件",name="file ")
+	    private String file ; 
 	    
 	    @ApiModelProperty(value="备注",name="remarks  ")
 	    private String remarks  ;
 	    
 	    @ApiModelProperty(value="审核通过时间",name="auditTime")
+	    @JsonFormat( pattern = "yyyy-MM-dd HH:mm")
 	    private Date auditTime;
 	    
 	    private  List<Doc> docs;
@@ -285,12 +302,13 @@ public class AuctionRespVo implements Serializable{
 			this.startPriceDate = startPriceDate;
 		}
 
+
 		public Date getEtartPriceDate() {
-			return EtartPriceDate;
+			return etartPriceDate;
 		}
 
 		public void setEtartPriceDate(Date etartPriceDate) {
-			EtartPriceDate = etartPriceDate;
+			this.etartPriceDate = etartPriceDate;
 		}
 
 		public Date getStarBidTime() {
@@ -530,11 +548,13 @@ public class AuctionRespVo implements Serializable{
 			this.insuranceDate = insuranceDate;
 		}
 
-		public Date getInspectionDate() {
+
+
+		public String getInspectionDate() {
 			return inspectionDate;
 		}
 
-		public void setInspectionDate(Date inspectionDate) {
+		public void setInspectionDate(String inspectionDate) {
 			this.inspectionDate = inspectionDate;
 		}
 
@@ -562,13 +582,7 @@ public class AuctionRespVo implements Serializable{
 			this.mortgageState = mortgageState;
 		}
 
-		public String getIllegal() {
-			return Illegal;
-		}
 
-		public void setIllegal(String illegal) {
-			Illegal = illegal;
-		}
 
 		public String getTools() {
 			return tools;
@@ -602,13 +616,6 @@ public class AuctionRespVo implements Serializable{
 			this.position = position;
 		}
 
-		public String getFiles() {
-			return files;
-		}
-
-		public void setFiles(String files) {
-			this.files = files;
-		}
 
 		public String getRemarks() {
 			return remarks;
@@ -752,6 +759,22 @@ public class AuctionRespVo implements Serializable{
 
 		public void setAuditTime(Date auditTime) {
 			this.auditTime = auditTime;
+		}
+
+		public String getIllegal() {
+			return illegal;
+		}
+
+		public void setIllegal(String illegal) {
+			this.illegal = illegal;
+		}
+
+		public String getFile() {
+			return file;
+		}
+
+		public void setFile(String file) {
+			this.file = file;
 		} 
 	    
 	 

@@ -81,6 +81,10 @@ public class AfterLoanStandingBookReq extends PageRequest {
 
     private List<String> commIds;//公司ID列表
 
+    private List<String>  businessIds;//业务ID列表
+
+    private String userId;//用户ID
+
     public String getAreaId() {
         return areaId;
     }
@@ -264,5 +268,21 @@ public class AfterLoanStandingBookReq extends PageRequest {
 
     public void setCommIds(List<String> commIds) {
         this.commIds = commIds;
+    }
+
+    public List<String> getBusinessIds() {
+        return businessIds;
+    }
+
+    public void setBusinessIds(List<String> businessIds) {
+        this.businessIds = businessIds;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

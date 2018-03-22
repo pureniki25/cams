@@ -84,15 +84,13 @@ public class NoticeController {
 	public Result<List<Notice>> listNotice(){
 		try {
 			String userId = loginUserInfoHelper.getUserId();
-//			String orgCode = sysUserService.selectById(userId).getOrgCode();
-
+			logger.info("userId:"+userId);
 			SysUser user = sysUserService.selectById(userId);
 			List<Notice> list = new LinkedList<>();
 			if(user!=null){
 				String orgCode = user.getOrgCode();
-				
-				EntityWrapper<Notice> ew = new EntityWrapper<Notice>();
-				ew.isNull("is_deleted").eq("is_send", 1).andNew().like("org_code", orgCode).or().like("org_code", "鸿特信息");
+ 				EntityWrapper<Notice> ew = new EntityWrapper<Notice>();
+				ew.isNull("is_deleted").eq("is_send", 1).andNew().like("org_code", "%"+orgCode+"%").or().like("org_code", "%"+"鸿特信息"+"%");
 				ew.orderBy("publish_time", false);
 				list = noticeService.selectList(ew);
 			}
@@ -186,7 +184,7 @@ public class NoticeController {
 		if (notice2.getNoticeId()==null) {
 			notice2.setCreateTime(new Date());
 			notice2.setCreateUserId(userId);
-			notice2.setIsSend(0);
+			notice2.setIsSend(1);
 			notice2.insert();
 		}else {
 			notice2.setUpdateTime(new Date());
