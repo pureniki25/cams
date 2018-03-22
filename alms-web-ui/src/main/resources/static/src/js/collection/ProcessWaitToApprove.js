@@ -69,6 +69,12 @@ window.layinit(function (htConfig) {
                                 createTimeEnd: dateObj.createTimeEnd,	//发起时间   结束
                                 processTypeId: vm.searchForm.processTypeId,	//流程类型
 
+                                finishTimeBegin:dateObj.finishTimeBegin,  //结束时间 开始
+                                finishTimeEnd:dateObj.finishTimeEnd,   //结束时间   结束
+
+                                processStatus:vm.searchForm.processStatus,  //审批状态,
+                                companyId:vm.searchForm.companyId,  //分公司
+
                             }
                             , page: {
                                 curr: 1 //重新从第 1 页开始
@@ -94,42 +100,68 @@ window.layinit(function (htConfig) {
                 table = layui.table;
                 // var config = layui.ht_config;
                 // basePath = config.basePath;
+
+                var  cols = [
+                    {
+                        field: 'processName',
+                        title: '流程名称'
+                    },{
+                        field: 'businessId',
+                        title: '业务编号'
+                    }, {
+                        field: 'customerName',
+                        title: '客户名称'
+                    }
+                ];
+                if(reqPageeType == "Search" ){
+                    cols.push(
+                        {
+                            field: 'companyName',
+                            title: '所属分公司'
+                        }
+                    )
+                }
+                cols.push(
+                    {
+                        field: 'createUserName',
+                        title: '发起人'
+                    }
+                )
+                cols.push(
+                    {
+                        field: 'createTime',
+                        title: '发起时间'
+                    }
+                )
+                cols.push(
+                    {
+                        field: 'processTypeName',
+                        title: '审批类型'
+                    }
+                )
+                cols.push(
+                    {
+                        field: 'processStatus',
+                        title: '审批状态'
+                    }
+                )
+                cols.push(
+                    {
+                        fixed: 'right',
+                        title: '操作',
+                        width: 178,
+                        align: 'left',
+                        toolbar: '#barTools'
+                    }
+                )
+                var cols1 = [cols];
+
                 //执行渲染
                 table.render({
                     elem: '#listTable' //指定原始表格元素选择器（推荐id选择器）
                     , id: 'listTable'
                     , height: 550 //容器高度
-                    , cols: [[
-
-                        {
-                            field: 'processName',
-                            title: '流程名称'
-                        },{
-                            field: 'businessId',
-                            title: '业务编号'
-                        }, {
-                            field: 'customerName',
-                            title: '客户名称'
-                        }, {
-                            field: 'createUserName',
-                            title: '发起人'
-                        }, {
-                            field: 'createTime',
-                            title: '发起时间'
-                        }, {
-                            field: 'processTypeName',
-                            title: '审批类型'
-                        }, {
-                            field: 'processStatus',
-                            title: '审批状态'
-                        }, {
-                            fixed: 'right',
-                            title: '操作',
-                            width: 178,
-                            align: 'left',
-                            toolbar: '#barTools'
-                        }
-                    ]], //设置表头
+                    , cols:cols1, //设置表头
                     url: basePath +'processController/selectProcessWaitToApproveVoPage?reqPageeType='+reqPageeType,
                     //method: 'post' //如果无需自定义HTTP类型，可不加该参数
                     request: {}, //如果无需自定义请求参数，可不加该参数
@@ -360,19 +392,33 @@ var addInput = function(form, type,name,value){
 }
 
 //取查询的时间间隔
-var getData = function(){
+var getData = function(condition){
 
     var dataObject ={
-        createTimeBegin:'',
-        createTimeEnd:'',
+        createTimeBegin:null,
+        createTimeEnd:null,
+        finishTimeBegin:null,
+        finishTimeEnd:null,
     }
     if(vm.searchForm.createTimeRange.length>0){
-    	if(vm.searchForm.createTimeRange[0]!=null){
+    	if(vm.searchForm.createTimeRange[0]!=null){debugger
     		 dataObject.createTimeBegin = vm.searchForm.createTimeRange[0].getTime();
     	}
     	if(vm.searchForm.createTimeRange[1]!=null){
-   		 dataObject.createTimeEnd = vm.searchForm.createTimeRange[1].getTime();
+//   		 dataObject.createTimeEnd = vm.searchForm.createTimeRange[1].getTime();
+   	   var date =vm.searchForm.createTimeRange[1];
+       date.setDate(date.getDate() + 1);
+       dataObject.createTimeEnd=date.getTime();
    	}
+    }
+    if(vm.searchForm.finishTimeRange.length>0){
+        if(vm.searchForm.finishTimeRange[0]!=null){
+            dataObject.finishTimeBegin = vm.searchForm.finishTimeRange[0].getTime();
+        }
+        if(vm.searchForm.finishTimeRange[1]!=null){
+            dataObject.finishTimeEnd = vm.searchForm.finishTimeRange[1].getTime();
+        }
+
     }
 
     return dataObject;

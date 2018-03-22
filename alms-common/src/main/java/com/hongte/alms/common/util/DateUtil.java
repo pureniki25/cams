@@ -984,6 +984,46 @@ public class DateUtil
 		int day =cal.get(Calendar.DAY_OF_MONTH);
 		return month+"月"+day+"日";
 	}
+
+	/**
+	 * 将给定日期转换为日期字符串
+	 * @param date
+	 * @param format
+	 * @return
+	 */
+	public static String toDateString(Date date,String format) {
+		SimpleDateFormat sf = new SimpleDateFormat(format);
+		if(date == null){
+			return "";
+		}
+		return sf.format(date);
+	}
+	public static final String DEFAULT_FORMAT_DATE = "yyyy-MM-dd";
+	/**
+	 * 指定日期的0点
+	 * @param that
+	 * @return
+	 */
+	public static Date getThatDayBegin(Date that){
+		String day = toDateString(that,DEFAULT_FORMAT_DATE);
+		String dayB = day+ " 00:00:00";
+		Date dayTimeBegin = getDateTime(dayB);
+		return dayTimeBegin;
+	}
+
+
+	/**
+	 * 指定日期的23点59分59秒
+	 * @param that
+	 * @return
+	 */
+	public static Date getThatDayEnd(Date that){
+		String day = toDateString(that,DEFAULT_FORMAT_DATE);
+		String dayEnd = day+" 23:59:59";
+		Date dayTimeEnd = getDateTime(dayEnd);
+		return dayTimeEnd;
+	}
+
 	public static void main(String[] args) {
 		System.out.println(getMonthBegin("yyyy-MM"));
 	}

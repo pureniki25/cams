@@ -44,8 +44,8 @@ window.layinit(function (htConfig) {
 	    		,operatorName:''//业务主办人
 	    	}
 		    ,repayPlan:{
-		    	payedPrincipal:''//已还本金
-		    	,payedInterest:''//已还利
+		    	payedPrincipal:0//已还本金
+		    	,payedInterest:0//已还利
 		    	,lastPayDate:''//利息交至日期
 		    	,overdueDays:''//逾期天数
 		    }
@@ -123,6 +123,7 @@ window.layinit(function (htConfig) {
     		   ,openBank:''//开户银行
     		   ,paymentEndTime:''//缴款截止时间
     		   ,assessOdometer:''//评估时的里程数，只针对页面的验证
+    		   ,viewSampleAddr:''//看样地址
 	       }
 	       
 	       ,  //可发送审批信息的用户列表
@@ -262,6 +263,9 @@ window.layinit(function (htConfig) {
 	    		});
 	       	$("#paymentEndTime").focus(function(){
 	    		  $("#paymentEndTime").css("border","1px solid #ccc");
+	    		});
+	      	$("#viewSampleAddr").focus(function(){
+	    		  $("#viewSampleAddr").css("border","1px solid #ccc");
 	    		});
 	    	this.queryData();
 	   	    laydate.render({
@@ -456,7 +460,10 @@ window.layinit(function (htConfig) {
 	                	vm.carBasic=data.data.carBasic;
 	                	vm.business=data.data.business;
 	                	vm.drag=data.data.drag;
-	                	vm.repayPlan=data.data.repayPlan;
+	                	
+	                	if(data.data.repayPlan!=null&&data.data.repayPlan!=''){
+	                		vm.repayPlan=data.data.repayPlan;
+	                	}
 	                	vm.outputRecord=data.data.outputRecord;
 	                	if(data.data.carBasic.lastEvaluationAmount==null||data.data.carBasic.lastEvaluationAmount==''){
 	                		vm.carBasic.differAmount=0;
@@ -838,7 +845,10 @@ window.layinit(function (htConfig) {
 	    				return ;
 	    			}
 	    		}
-	    		
+	      		if(vm.carAuction.viewSampleAddr==''||vm.carAuction.viewSampleAddr==null){
+	    			$("#viewSampleAddr").css("border","1px solid #FF3030");
+	    			return ;
+	    		}
 	    		for(var i=0;i<vm.returnRegFiles.length;i++){
 	    			vm.returnRegFiles[i].file='';
 	    			vm.reqRegFiles[i]=vm.returnRegFiles[i];

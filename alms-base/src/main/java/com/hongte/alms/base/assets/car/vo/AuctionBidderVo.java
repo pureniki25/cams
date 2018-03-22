@@ -9,6 +9,7 @@ import org.jeecgframework.poi.excel.annotation.ExcelTarget;
 
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import io.swagger.annotations.ApiModelProperty;
 
@@ -96,6 +97,7 @@ public class AuctionBidderVo implements Serializable{
      * 更新时间
      */
 	@ApiModelProperty(required= true,value = "更新时间")
+	@JsonFormat( pattern = "yyyy-MM-dd HH:mm")
 	private Date updateTime;
 	public String getBidderName() {
 		return bidderName;

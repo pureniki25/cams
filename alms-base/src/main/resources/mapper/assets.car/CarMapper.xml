@@ -146,7 +146,7 @@
 		tca.cons_start_time conStartDate,							<!-- 咨询开始时间 -->
 		tca.cons_end_time conEndDate,				<!-- 咨询结束时间 -->
 		tca.view_sample_start_time vieStartDate,							<!-- 看样开始时间 -->
-		tca.view_sample_end_time vieEndDatee,								<!-- 看样结束时间 -->
+		tca.view_sample_end_time vieEndDate,								<!-- 看样结束时间 -->
 		tca.view_sample_addr vie,									<!-- 看样地点 -->
 		tca.unit_addr contact,								<!-- 联系地点 -->
 		tca.payment_end_time paymentTime,							<!-- 缴款截止时间 -->
@@ -185,14 +185,14 @@
 		end carproduction ,					<!--汽车产地 -->
 		tcb.color carColour ,<!--车辆颜色 -->
 		tcb.model carModel ,<!--车辆型号 -->
-		tcb.license_location vcehicleTerritory,<!-- 汽车属地 -->
+		tcb.license_location vehicleTerritory,<!-- 汽车属地 -->
 		concat(tcb.displacement,tcb.displacement_unit) displacement ,	<!--排量 -->
 		tcb.engine_model engineNumber ,<!--发动机号 -->
 		tcb.vin frameNumber ,<!--车架号 -->
 	    ifnull(tcb.last_evaluation_amount,tcb.evaluation_amount) lastEvaluationAmount, <!-- 评估价 --> 
-		-- UseProperty ,														<!--使用性质 -->
+		tcb.user_nature useProperty ,														<!--使用性质 -->										
 		tcb.insurance_expiration_date insuranceDate ,<!--保险到期日 -->
-		tcb.annual_verification_expiration_date inspectionDate ,         <!--年检到期日 -->
+		date_format(tcb.annual_verification_expiration_date,'%Y-%m') inspectionDate ,         <!--年检到期日 -->
 		tcb.odometer mileage ,<!--车显里程 -->
 		tcb.vehicle_license_registration_date registerDate ,             <!--首次登记年月 -->
 		case
@@ -201,14 +201,19 @@
 		then '抵押'
 		else ''
 		end mortgageState ,<!--车辆抵押状态 -->
-		tcb.traffic_violation_situation lllegal ,<!--违章未处理记录 -->
+		tcb.traffic_violation_situation illegal ,<!--违章未处理记录 -->
 		tcb.tool_with_car tools ,<!--随车工具 -->
 		tcb.license_plate_number,<!-- 车牌号 -->
 		<!-- Taxation , 交易税费 -->
-		<!-- TransactionMode , 交易方式 -->
+		case
+		 	when tca.pay_way='01' then '线下支付'
+		 	when tca.pay_way='02' then '线上支付'
+		 else ''
+		 end transactionMode ,<!--  交易方式 -->
+		
 		tcb.car_position Position , <!-- 车辆位置 -->
 		tp.update_time auditTime,<!-- 审核通过时间 -->
-		tcb.related_docs files   <!--提供文件 -->
+		tcb.related_docs file   <!--提供文件 -->
 		<!-- Remarks , -->														<!--备注 -->
 
 		from tb_car_auction tca
@@ -377,7 +382,7 @@
 		tca.cons_start_time conStartDate,							<!-- 咨询开始时间 -->
 		tca.cons_end_time conEndDate,				<!-- 咨询结束时间 -->
 		tca.view_sample_start_time vieStartDate,							<!-- 看样开始时间 -->
-		tca.view_sample_end_time vieEndDatee,								<!-- 看样结束时间 -->
+		tca.view_sample_end_time vieEndDate,								<!-- 看样结束时间 -->
 		tca.view_sample_addr vie,									<!-- 看样地点 -->
 		tca.unit_addr contact,								<!-- 联系地点 -->
 		tca.payment_end_time paymentTime,							<!-- 缴款截止时间 -->
@@ -416,14 +421,14 @@
 		end carproduction ,					<!--汽车产地 -->
 		tcb.color carColour ,<!--车辆颜色 -->
 		tcb.model carModel ,<!--车辆型号 -->
-		tcb.license_location vcehicleTerritory,<!-- 汽车属地 -->
+		tcb.license_location vehicleTerritory,<!-- 汽车属地 -->
 		concat(tcb.displacement,tcb.displacement_unit) displacement ,	<!--排量 -->
 		tcb.engine_model engineNumber ,<!--发动机号 -->
 		tcb.vin frameNumber ,<!--车架号 -->
-
-		-- UseProperty ,														<!--使用性质 -->
+	    ifnull(tcb.last_evaluation_amount,tcb.evaluation_amount) lastEvaluationAmount, <!-- 评估价 --> 
+		tcb.user_nature useProperty ,														<!--使用性质 -->
 		tcb.insurance_expiration_date insuranceDate ,<!--保险到期日 -->
-		tcb.annual_verification_expiration_date inspectionDate ,         <!--年检到期日 -->
+		date_format(tcb.annual_verification_expiration_date,'%Y-%m') inspectionDate ,         <!--年检到期日 -->
 		tcb.odometer mileage ,<!--车显里程 -->
 		tcb.vehicle_license_registration_date registerDate ,             <!--首次登记年月 -->
 		case
@@ -432,13 +437,19 @@
 		then '抵押'
 		else ''
 		end mortgageState ,<!--车辆抵押状态 -->
-		tcb.traffic_violation_situation lllegal ,<!--违章未处理记录 -->
+		tcb.traffic_violation_situation illegal ,<!--违章未处理记录 -->
 		tcb.tool_with_car tools ,<!--随车工具 -->
 		tcb.license_plate_number,<!-- 车牌号 -->
 		<!-- Taxation , 交易税费 -->
-		<!-- TransactionMode , 交易方式 -->
+		case
+		 	when tca.pay_way='01' then '线下支付'
+		 	when tca.pay_way='02' then '线上支付'
+		 else ''
+		 end transactionMode ,<!-- 交易方式 -->
+		
 		tcb.car_position Position , <!-- 车辆位置 -->
-		tcb.related_docs files,   <!--提供文件 -->
+		tcb.related_docs file,   <!--提供文件 -->
+		tp.update_time auditTime,<!-- 审核通过时间 -->
 		<!-- Remarks , -->														<!--备注 -->
 		tcab.bidder_name bidderName,  <!-- 用户姓名 -->
 		tcab.bidder_cert_id bidderCertId, <!-- 身份证号码 -->
