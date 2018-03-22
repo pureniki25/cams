@@ -11,6 +11,14 @@ window.layinit(function (htConfig) {
     let table = layui.table
     let laydate = layui.laydate
 
+    axios.interceptors.request.use(function (config) {
+        console.log(config)
+        console.log("axios.interceptors.request")
+        return config;
+      }, function (error) {
+        // 对请求错误做些什么
+        return Promise.reject(error);
+      });
 
     app = new Vue({
         el: "#app",
@@ -163,6 +171,18 @@ window.layinit(function (htConfig) {
             }).catch(function (error) {
 
             })
+
+            axios.get(basePath+'SysUser/getUserIdByToken')
+            .then(function(res){
+                if(res.data.code=='1'){
+                    app.userId = res.data.data 
+                }else{
+                    app.$Modal.error({content:'接口调用失败'})
+                }
+            })
+            .catch(function(err){
+                app.$Modal.error({content:'接口调用失败'})
+            })
         },
         methods: {
             onDateStartChange: function (date) {
@@ -301,7 +321,8 @@ window.layinit(function (htConfig) {
                             hasReadTimeUnit: 1,
                             orgCode: oc,
                             publishChannel: app.editForm.publishChannel,
-                            publishTime: dateFormat(app.editForm.publishDate),
+                            publishTime: dateFormat(new Date()),
+                            // publishTime: dateFormat(app.editForm.publishDate),
                             files: files
                         }
                         $.ajax({
@@ -383,7 +404,7 @@ window.layinit(function (htConfig) {
                 let notice = {
                     noticeTitle: form.title,
                     publishTime: form.publishDate,
-                    createUserId: 'xxxxx',
+                    createUserId: app.userId,
                     noticeContent: form.content,
                     fileList: fileList
                 }
