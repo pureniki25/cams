@@ -3,17 +3,11 @@ package com.hongte.alms.base.entity;
 import java.io.Serializable;
 
 import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
-import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
-import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
-import com.hongte.alms.base.enums.RepayRegisterState;
-
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -23,7 +17,7 @@ import io.swagger.annotations.ApiModelProperty;
  * </p>
  *
  * @author 王继光
- * @since 2018-03-01
+ * @since 2018-03-23
  */
 @ApiModel
 @TableName("tb_money_pool")
@@ -103,15 +97,15 @@ public class MoneyPool extends Model<MoneyPool> {
 	@ApiModelProperty(required= true,value = "领取人")
 	private String gainerName;
     /**
-     * 财务状态
+     * 财务状态，"财务确认已还款"、"未关联银行流水"
      */
 	@TableField("finance_status")
-	@ApiModelProperty(required= true,value = "财务状态")
+	@ApiModelProperty(required= true,value = "财务状态/财务确认已还款/未关联银行流水")
 	private String financeStatus;
     /**
      * 流水状态，"完成"，"已领取","待领取"
      */
-	@ApiModelProperty(required= true,value = "流水状态，完成，已领取,待领取")
+	@ApiModelProperty(required= true,value = "流水状态/完成/已领取/待领取")
 	private String status;
     /**
      * 导入人ID
@@ -173,6 +167,12 @@ public class MoneyPool extends Model<MoneyPool> {
 	@TableField("update_user")
 	@ApiModelProperty(required= true,value = "更新用户")
 	private String updateUser;
+    /**
+     * 创建人的角色(客户/财务)
+     */
+	@TableField("create_user_role")
+	@ApiModelProperty(required= true,value = "创建人的角色(客户/财务)")
+	private String createUserRole;
 
 
 	public String getMoneyPoolId() {
@@ -367,6 +367,14 @@ public class MoneyPool extends Model<MoneyPool> {
 		this.updateUser = updateUser;
 	}
 
+	public String getCreateUserRole() {
+		return createUserRole;
+	}
+
+	public void setCreateUserRole(String createUserRole) {
+		this.createUserRole = createUserRole;
+	}
+
 	@Override
 	protected Serializable pkVal() {
 		return this.moneyPoolId;
@@ -399,36 +407,7 @@ public class MoneyPool extends Model<MoneyPool> {
 			", createUser=" + createUser +
 			", updateTime=" + updateTime +
 			", updateUser=" + updateUser +
+			", createUserRole=" + createUserRole +
 			"}";
-	}
-
-	public MoneyPool(RepaymentRegisterInfoDTO registerInfoDTO) throws ParseException {
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-		this.remitBank = registerInfoDTO.getFactRepaymentUser();
-		this.acceptBank = registerInfoDTO.getAcceptBank() ;
-		BigDecimal accountMoney = new BigDecimal(registerInfoDTO.getRepaymentMoney());
-		this.accountMoney = accountMoney ;
-		this.financeStatus = RepayRegisterFinanceStatus.未关联银行流水.toString() ;
-		this.status = RepayRegisterState.待领取.toString();
-		this.tradeDate = format.parse(registerInfoDTO.getRepaymentDate());
-		this.tradePlace = registerInfoDTO.getTradePlace() ;
-		this.tradeType = registerInfoDTO.getTradeType() ;
-		this.createUser = registerInfoDTO.getUserId();
-		this.updateUser = registerInfoDTO.getUserId();
-		Date now = new Date() ;
-		this.createTime = now ;
-		this.updateTime = now ;
-	}
-
-	public MoneyPool() {
-		super();
-	}
-	
-	public MoneyPool(String moneyPoolId) {
-		super();
-		if (moneyPoolId==null) {
-			throw new RuntimeException("moneyPoolId can't be null");
-		}
-		this.moneyPoolId = moneyPoolId ;
 	}
 }

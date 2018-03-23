@@ -406,7 +406,8 @@ public class CarController {
     	CarDetection rCarDetection=carDetectionService.selectById(carDetection.getBusinessId());
     	carBasic.setLastEvaluationAmount(carBasic.getEvaluationAmount());
     	carBasic.setLastEvaluationTime(new Date());
-    	carBasic.setEvaluationAmount(rCarBasic.getEvaluationAmount());
+    	carBasic.setEvaluationAmount(carBasic.getEvaluationAmount());
+    	carDetection.setEvaluationAmount(carBasic.getEvaluationAmount());
     	BeanUtils.copyProperties(carBasic, rCarBasic);
     	BeanUtils.copyProperties(carDetection, rCarDetection);
 

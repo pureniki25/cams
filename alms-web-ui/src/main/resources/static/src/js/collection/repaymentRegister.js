@@ -14,7 +14,7 @@ window.layinit(function (htConfig) {
             { required: true, type: 'date', pattern: /^([\d]{4})-([\d]{2})-([\d]{2})$/, message: '还款日期格式错误', trigger: 'change' }
         ],
         repaymentMoney: [
-            { type: 'string', required: true, message: '还款金额不能为空', trigger: 'blur' },
+            // {  required: true, message: '还款金额不能为空', trigger: 'blur' },
             { pattern: /(^[1-9](\d+)?(\.\d{1,2})?$)|(^(0){1}$)|(^\d\.\d{1,2}?$)/, message: '还款金额格式不正确', trigger: 'blur' },
         ],
         realRepaymentUser: [
@@ -55,7 +55,7 @@ window.layinit(function (htConfig) {
             editForm: {
                 moneyPoolId: '',
                 repaymentDate: '',
-                repaymentMoney: '',
+                repaymentMoney: 0,
                 realRepaymentUser: '',
                 acceptBank: '',
                 acceptBankU: '',
@@ -90,8 +90,22 @@ window.layinit(function (htConfig) {
         methods: {
             openAddModal: function () {
                 this.add_modal = true
+                this.addmodel = true 
                 this.$refs['editForm'].resetFields()
                 this.$refs['upload'].clearFiles()
+                this.editForm =  {
+                    moneyPoolId: '',
+                    repaymentDate: '',
+                    repaymentMoney: 0,
+                    realRepaymentUser: '',
+                    acceptBank: '',
+                    acceptBankU: '',
+                    acceptBankAccount: '',
+                    tradeType: '',
+                    tradePlace: '',
+                    certUrl: '',
+                    remark: ''
+                }
                 console.log(this.editForm)
             },
             beforeUpload: function (file) {
@@ -108,23 +122,24 @@ window.layinit(function (htConfig) {
             },
             openEditModal: function (mpid) {
                 let _this = this
-                axios.get(basePath + 'moneyPool/get', { params: { moneyPoolId: mpid } })
+                if(mpid){
+                    app.addmodel = false 
+                    axios.get(basePath + 'moneyPool/getCustomerRepayment', { params: { id: mpid } })
                     .then(function (res) {
                         if (res.data.code == "1") {
                             console.log(res)
                             data = res.data.data
                             _this.editForm.moneyPoolId = data.id
-                            _this.editForm.repaymentDate = data.repaymentDate
-                            _this.editForm.repaymentMoney = data.repaymentMoney
-                            _this.editForm.realRepaymentUser = data.realRepaymentUser
-                            _this.editForm.acceptBank = data.acceptBank
+                            _this.editForm.repaymentDate = data.tradeDate
+                            _this.editForm.repaymentMoney = data.accountMoney
+                            _this.editForm.realRepaymentUser = data.factTransferName
                             _this.editForm.tradeType = data.tradeType
                             if (data.tradeType == '现金') {
-                                _this.editForm.acceptBankU = data.acceptBank
+                                _this.editForm.acceptBankU = data.bankAccount
                             } else {
-                                _this.editForm.acceptBank = data.acceptBank
+                                _this.editForm.acceptBank = data.bankAccount
                                 $.each(_this.bank_account_list, function (i, o) {
-                                    if (o.financeName == data.acceptBank) {
+                                    if (o.financeName == data.bankAccount) {
                                         _this.editForm.acceptBankAccount = o.repaymentId
                                         // $("#acceptBankAccount input").attr('disabled', false).val(o.repaymentId).attr('disabled', true)
                                         return false
@@ -132,7 +147,7 @@ window.layinit(function (htConfig) {
                                 })
                             }
                             _this.editForm.tradePlace = data.tradePlace
-                            _this.editForm.certUrl = data.certUrl
+                            _this.editForm.certUrl = data.certificatePictureUrl
                             _this.editForm.remark = data.remark
 
                             _this.add_modal = true
@@ -143,12 +158,17 @@ window.layinit(function (htConfig) {
                     .catch(function (error) {
                         app.$Modal.error({ content: '接口调用异常!' });
                     });
+                }else{
+                    app.addmodel = true 
+                }
+                
             },
             openCertModal: function (url) {
                 if (url && url.length > 0) {
                     this.cert_modal = true
                     this.cert_modal_url = 'http://xiaodaioa.oss-cn-beijing.aliyuncs.com/' + url
                 } else {
+                    this.$Modal.warning({content:'此登记没有上传凭证'})
                     this.cert_modal = false
                     this.cert_modal_url = ''
                 }
@@ -202,7 +222,10 @@ window.layinit(function (htConfig) {
                 this.$refs['editForm'].validate((valid) => {
                     if (valid) {
                         _this.submitLoading = true
-                        axios.get(basePath + 'moneyPool/save', { params: _this.handleParams() })
+
+
+                        if(_this.addmodel){
+                            axios.post(basePath + 'moneyPool/addCustomerRepayment', _this.handleParams())
                             .then(function (res) {
                                 if (res.data.code == "1") {
                                     console.log(res)
@@ -221,21 +244,12 @@ window.layinit(function (htConfig) {
                             .catch(function (error) {
                                 app.$Modal.error({ content: '接口调用异常!' });
                             });
-                    } else {
-                        _this.$Message.error({ content: '表单校验失败!' });
-                    }
-                })
-
-
-            },
-            deleteRepayment: function (mpid) {
-                this.$Modal.confirm({
-                    content: '是否确认删除本条还款记录', loading: true, onOk: function () {
-                        let _this = this
-                        axios.get(basePath + 'moneyPool/del', { params: { moneyPoolId: mpid } })
+                        }else{
+                            axios.post(basePath + 'moneyPool/updateCustomerRepayment', _this.handleParams())
                             .then(function (res) {
                                 if (res.data.code == "1") {
                                     console.log(res)
+                                    _this.add_modal = false
                                     table.reload('moneyPool', {
                                         where: {
                                             businessId: businessId,
@@ -250,7 +264,37 @@ window.layinit(function (htConfig) {
                             .catch(function (error) {
                                 app.$Modal.error({ content: '接口调用异常!' });
                             });
-                        this.$Modal.remove()
+                        }
+                        
+                    } else {
+                        _this.$Message.error({ content: '表单校验失败!' });
+                    }
+                })
+
+
+            },
+            deleteRepayment: function (mpid) {
+                this.$Modal.confirm({
+                    content: '是否确认删除本条还款记录', onOk: function () {
+                        let _this = this
+                        axios.post(basePath + 'moneyPool/deleteCustomerRepayment', { moneyPoolId: mpid })
+                            .then(function (res) {
+                                if (res.data.code == "1") {
+                                    console.log(res)
+                                    
+                                } else {
+                                    app.$Message.error({ content: '操作失败，消息：' + res.data.msg ,duration:0,closable:true});
+                                }
+                                table.reload('moneyPool', {
+                                    where: {
+                                        businessId: businessId,
+                                        afterId: afterId
+                                    }
+                                })
+                            })
+                            .catch(function (error) {
+                                app.$Message.error({ content: '接口调用异常!',duration:0,closable:true });
+                            });
                     }
                 });
             },
@@ -285,6 +329,8 @@ window.layinit(function (htConfig) {
                 } else {
                     this.editForm.acceptBankU = ''
                 }
+            },
+            addCustomerRepayment:function(){
             }
         },
         created: function () {
@@ -300,14 +346,14 @@ window.layinit(function (htConfig) {
                 field: 'id',
                 title: '编号'
             }, {
-                field: 'repaymentDate',
+                field: 'tradeDate',
                 title: '还款日期',
                 width: 110
             }, {
-                field: 'repaymentMoney',
+                field: 'accountMoney',
                 title: '还款金额'
             }, {
-                field: 'realRepaymentUser',
+                field: 'factTransferName',
                 title: '实际转款人'
             }, {
                 field: 'tradeType',
@@ -317,10 +363,10 @@ window.layinit(function (htConfig) {
                 title: '交易场所',
                 width: 150
             }, {
-                field: 'acceptBank',
+                field: 'bankAccount',
                 title: '转入账号'
             }, {
-                field: 'status',
+                field: 'state',
                 title: '状态',
                 width: 150
             }, {
@@ -329,7 +375,7 @@ window.layinit(function (htConfig) {
                 fixed: "right"
             }
         ]], //设置表头
-        url: basePath + 'moneyPool/page',
+        url: basePath + 'moneyPool/pageCustomerRepayment',
         where: {
             businessId: businessId,
             afterId: afterId

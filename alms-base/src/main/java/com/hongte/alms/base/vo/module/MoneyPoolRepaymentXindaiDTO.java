@@ -186,12 +186,10 @@ public class MoneyPoolRepaymentXindaiDTO implements Serializable{
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
-	public MoneyPoolRepaymentXindaiDTO(MoneyPoolRepayment repayment,MoneyPool moneyPool,String businessId,String afterId) {
+	public MoneyPoolRepaymentXindaiDTO(MoneyPoolRepayment repayment,String businessId,String afterId) {
 		super();
 		SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
-		this.id = null;
+		this.id = repayment.getXdMatchingId()==null?null:repayment.getXdMatchingId();
 		this.moneyPoolId = repayment.getXdPoolId();
 		this.business_id = businessId;
 		this.afterbusiness_id = afterId;
@@ -199,7 +197,7 @@ public class MoneyPoolRepaymentXindaiDTO implements Serializable{
 		this.operate_name = repayment.getOperateName();
 		this.claimDate = repayment.getClaimDate() == null ? null : dateTimeFormat.format(repayment.getClaimDate());
 		this.state = repayment.getState();
-		this.reserve_1 = moneyPool.getAccountMoney() == null ? null : moneyPool.getAccountMoney().toString();
+		this.reserve_1 = repayment.getAccountMoney() == null ? null : repayment.getAccountMoney().toString();
 		this.income_type = repayment.getIncomeType();
 		this.reserve_2 = repayment.getBankAccount();
 		this.reserve_3 = repayment.getTradeType();

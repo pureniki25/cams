@@ -36,7 +36,10 @@
     <link rel="stylesheet" href="/Components/Table/Table.css">
 
     <!-- 引入jQuery，必须在appToken.js 之前引入 -->
-    <script src="/build/js/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="/plugins/jquery-1.9.1.min.js"></script>
+    <script src="http://blueimp.github.io/jQuery-File-Upload/js/vendor/jquery.ui.widget.js"></script>
+	<script type="text/javascript" src="/plugins/fileUpload/jquery.iframe-transport.js"></script>
+	<script type="text/javascript" src="/plugins/fileUpload/jquery.fileupload.js"></script>
     <!-- 设置全局请求头:app、Authorization -->
     <script src="/build/js/appToken.js"></script>
 
@@ -44,7 +47,57 @@
     <script src="/src/js/comm.js"></script>
     <script src="/src/js/comm.js"></script>
 
+<style type="text/css">
+.layui-form-item {
+	border-bottom: 2px solid #DBDBDB; /*下边框线*/
+}
 
+.layui-form-item .layui-form-label {
+	width: 30%
+}
+
+.layui-form-item .layui-input-block {
+	margin-left: 35%;
+	width: 60%;
+}
+
+.input-border-none {
+	border: none;
+	font-size: 14px;
+	width: 100%;
+}
+.input-border-input {
+	font-size: 14px;
+	width: 100%;
+}
+.layui-row .grid-demo {
+	margin-left: 1%;
+	width: 90%;
+}
+
+.td_label {
+	font-weight: bolder;
+}
+.input_label{
+color: #FF3030;
+}
+.selectFile{
+    padding: 4px 10px;
+    height: 20px;
+    line-height: 20px;
+    position: relative;
+    border: 1px solid #999;
+    text-decoration: none;
+    color: #666;
+}
+.uploadFile{
+    position: absolute;
+    overflow: hidden;
+    right: 0;
+    top: 0;
+    opacity: 0;
+}
+</style>
 
 </head>
 <body>
@@ -195,11 +248,61 @@
             </row>
         </Card>
 
-
+		<Card>
+			<p slot="title" >
+			三、附件信息
+			</p>
+			<div class="layui-row">
+				<div class="layui-col-xs6 layui-col-md12">
+					<div class="grid-demo layui-bg-gray">
+						<table class="layui-table" id="fTab">
+							<tr v-for="(info, index) in returnRegFiles">
+								<td class="td_label" >附件{{index+1}}<input type="text" hidden="" v-model="info.oldDocId" :id="'docId'+index" /></td>
+								<td v-if="applyInfoFormEditFlage">
+									<a href="javascript:;" class="selectFile">请选择
+									<input type="file" title="请选择" v-model="info.file" :id="'uploadfile'+index" v-on:click="uploadFile($event,index)" width="100px"
+										class="uploadFile"/>
+										
+									</a>{{info.name}}
+								</td>
+								<td v-else disabled>
+									<a href="javascript:;" class="selectFile" disabled>请选择
+									<input type="file" title="请选择" v-model="info.file" :id="'uploadfile'+index" v-on:click="uploadFile($event,index)" width="100px"
+										class="uploadFile" disabled/>
+										
+									</a>{{info.name}}
+								</td>
+								<td class="td_label" v-if="applyInfoFormEditFlage">重命名文件名称</td>
+								<td v-if="applyInfoFormEditFlage">
+									<input type="text" name="lname" v-model="info.originalName" style="width: 100%" maxlength="100" :id="'uploadfileName'+index" />
+								</td>
+								<td>
+								<td v-if="applyInfoFormEditFlage">
+								  <div class="layui-btn-group">
+								    <button class="layui-btn layui-btn-primary layui-btn-sm" v-on:click="addTabTr($event)"><i class="layui-icon"></i></button>
+								    
+								    <button class="layui-btn layui-btn-primary layui-btn-sm"  v-on:click="removeTabTr($event, index)"><i class="layui-icon"></i></button>
+								    <a  class="layui-btn layui-btn-primary layui-btn-sm"  :href="downloadFile(info)" >下载</a>
+								  
+								  </div>
+								
+								</td>
+								<td v-else>
+								  <div class="layui-btn-group">
+								    <a  class="layui-btn layui-btn-primary layui-btn-sm"  :href="downloadFile(info)" >下载</a>
+								  </div>
+								
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</Card>
 
         <Card v-if="approvalInfoFormShowFlage">
             <p slot="title">
-                三、审批信息
+                四、审批信息
             </p>
             <!--审批信息表单内容-->
             <row :gutter="16">

@@ -7,6 +7,7 @@ import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.entity.MoneyPool;
 import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
 import com.hongte.alms.base.vo.module.MoneyPoolVO;
+import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.service.BaseService;
 
 /**
@@ -24,4 +25,7 @@ public interface MoneyPoolService extends BaseService<MoneyPool> {
 	Boolean saveRepaymentRegisterInfo(RepaymentRegisterInfoDTO registerInfoDTO);
 	Boolean deleteRepaymentRegeisterInfo(String moneyPoolId,String userId);
 	MoneyPoolVO getMoneyPool(String moneyPoolId);
+	Result addCustomerRepayment(RepaymentRegisterInfoDTO registerInfoDTO);
+	Result updateCustomerRepayment(RepaymentRegisterInfoDTO registerInfoDTO);
+	Result deleteCustermerRepayment(RepaymentRegisterInfoDTO registerInfoDTO);
 }
