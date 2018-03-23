@@ -86,44 +86,12 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
         pages.setCurrent(req.getPage());
         pages.setSize(req.getLimit());
 
-        if(req.getLiquidationOne()!=null&&!req.getLiquidationOne().equals("")){
-            req.setLiquidationOneUIds(sysUserService.selectUseIdsByName(req.getLiquidationOne()));
-        }
-        if(req.getLiquidationTow()!=null&&!req.getLiquidationTow().equals("")){
-            req.setLiquidationTowUIds(sysUserService.selectUseIdsByName(req.getLiquidationTow()));
-        }
-
-        //区域转换为公司列表
-        List<String> areas = new LinkedList<String>();
-        if(req.getAreaId()!= null && req.getAreaId()!=""){
-            areas.add(req.getAreaId());
-        }
-        List<String> coms = new LinkedList<>();
-        if(req.getCompanyId()!=null && req.getCompanyId()!=""){
-            coms.add(req.getCompanyId());
-        }
-//        List<String> cIds = basicCompanyService.selectUserSearchComIds(loginUserInfoHelper.getUserId(),areas,coms);
-        List<String> cIds = basicCompanyService.selectSearchComids(areas,coms);
-
-        if(cIds.size()>0){
-            req.setCommIds(cIds);
-        }
 
 
-        String userId = loginUserInfoHelper.getUserId();
-        req.setUserId(userId);
-
-        //设置只能查询已分配的任务
-        //查找用户跟进的业务ID
-        List<String> followBids =  collectionStatusService.selectFollowBusinessIds(userId);
-
-        if(followBids != null && followBids.size()>0){
-            req.setBusinessIds(followBids);
-        }
 
         List<AfterLoanStandingBookVo> list = phoneUrgeMapper.selectAfterLoadStanding(pages,req);
 
-//        setExtInfo(list);
+        setExtInfo(list);
 
 //        pages.setRecords(setInfoForAfterLoanStandingBookVo(list));
         pages.setRecords(list);
@@ -194,7 +162,7 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
     public List<AfterLoanStandingBookVo> selectAfterLoanStandingBookList(AfterLoanStandingBookReq req){
         setAfterLoanStandingBookReqInfo(req);
 //        return  setInfoForAfterLoanStandingBookVo(phoneUrgeMapper.selectAfterLoadStanding(req));
-        return phoneUrgeMapper.selectAfterLoadStanding(req);
+        return setExtInfo(phoneUrgeMapper.selectAfterLoadStanding(req));
 //        return setExtInfo(phoneUrgeMapper.selectAfterLoadStanding(req));
 //        return  phoneUrgeMapper.selectAfterLoadStanding(req);
     }
@@ -231,6 +199,40 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
                 }
 
             }
+        }
+
+        if(req.getLiquidationOne()!=null&&!req.getLiquidationOne().equals("")){
+            req.setLiquidationOneUIds(sysUserService.selectUseIdsByName(req.getLiquidationOne()));
+        }
+        if(req.getLiquidationTow()!=null&&!req.getLiquidationTow().equals("")){
+            req.setLiquidationTowUIds(sysUserService.selectUseIdsByName(req.getLiquidationTow()));
+        }
+
+        //区域转换为公司列表
+        List<String> areas = new LinkedList<String>();
+        if(req.getAreaId()!= null && req.getAreaId()!=""){
+            areas.add(req.getAreaId());
+        }
+        List<String> coms = new LinkedList<>();
+        if(req.getCompanyId()!=null && req.getCompanyId()!=""){
+            coms.add(req.getCompanyId());
+        }
+//        List<String> cIds = basicCompanyService.selectUserSearchComIds(loginUserInfoHelper.getUserId(),areas,coms);
+        List<String> cIds = basicCompanyService.selectSearchComids(areas,coms);
+
+        if(cIds.size()>0){
+            req.setCommIds(cIds);
+        }
+
+
+        String userId = loginUserInfoHelper.getUserId();
+        req.setUserId(userId);
+        //设置只能查询已分配的任务
+        //查找用户跟进的业务ID
+        List<String> followBids =  collectionStatusService.selectFollowBusinessIds(userId);
+
+        if(followBids != null && followBids.size()>0){
+            req.setBusinessIds(followBids);
         }
 
 

@@ -67,7 +67,7 @@
         LEFT JOIN tb_basic_company as company ON business.company_id = company.area_id
         LEFT JOIN tb_basic_business_type as  b_type ON business.business_type = b_type.business_type_id
         LEFT JOIN tb_collection_status as  col_status ON pList.plan_list_id = col_status.crp_id
-        JOIN tb_sys_user_permission as permission  ON  permission.business_id = business.business_id
+          JOIN tb_sys_user_permission as permission  ON  permission.business_id = business.business_id
 --         LEFT JOIN tb_sys_user as phoneUser ON  col_status.phone_staff = phoneUser.user_id
 --         LEFT JOIN tb_sys_user as visitUser ON  col_status.visit_staff = visitUser.user_id
 --         LEFT JOIN tb_sys_parameter as sys_param  ON  col_status.collection_status = sys_param.param_value
