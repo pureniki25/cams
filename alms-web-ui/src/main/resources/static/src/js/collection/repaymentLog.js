@@ -148,7 +148,6 @@ window.layinit(function (htConfig) {
                 layui.use(['layer', 'table','ht_config'], function () {
 	                vm.$refs['searchForm'].validate((valid) => {debugger
 	                    if (valid) {
-	                        var dateObj = getData();
 	                        vm.exporting = true;
 	//                        expoertExcel(basePath + "RepaymentLogController/saveExcel",vm.searchForm);
 	                        var ExportForm = document.createElement("FORM");
@@ -162,7 +161,6 @@ window.layinit(function (htConfig) {
 	                        addInput(ExportForm, "text", "repayStatus", vm.searchForm.repayStatus); 
 	                        addInput(ExportForm, "text", "dateBegin", dateObj.dateBegin);   
 	                        addInput(ExportForm, "text", "dateEnd", dateObj.dateEnd);
-	                        addInput(ExportForm, "text", "userId", userId);     
 	                        addInput(ExportForm, "text", "businessTypeId", vm.searchForm.businessTypeId);     
 	                        ExportForm.submit();
 	                        document.body.removeChild(ExportForm);
