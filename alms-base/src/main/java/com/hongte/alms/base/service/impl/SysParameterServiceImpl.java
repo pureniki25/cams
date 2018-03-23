@@ -9,7 +9,9 @@ import com.hongte.alms.base.service.SysParameterService;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -46,6 +48,16 @@ public class SysParameterServiceImpl extends BaseServiceImpl<SysParameterMapper,
         }else{
             throw  new RuntimeException("指定类型的系统配置参数值不存在");
         }
+    }
+
+    @Override
+    public Map<String,SysParameter> selectParameterMap(SysParameterTypeEnums enums){
+        List<SysParameter> parameterList =  selectList(new EntityWrapper<SysParameter>().eq("param_type",enums));
+        Map<String ,SysParameter> parameterMap = new HashMap<>();
+        for(SysParameter parameter: parameterList){
+            parameterMap.put(parameter.getParamValue(),parameter);
+        }
+        return parameterMap;
     }
 
 }

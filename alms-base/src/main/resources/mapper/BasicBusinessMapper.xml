@@ -49,7 +49,7 @@
         b_type.business_type_name AS businessTypeName,
         business.borrow_limit AS borrowLimit,
         business.repayment_type_id AS repaymentTypeId,
-        sys_param.param_name AS repaymentTypeName,
+        -- sys_param.param_name AS repaymentTypeName,
         business.borrow_rate AS borrowRate,
         business.borrow_rate_unit AS borrowRateUnit,
         business.borrow_money AS borrowMoney,
@@ -69,7 +69,7 @@
         LEFT JOIN tb_basic_business as business ON plan.original_business_id = business.business_id
         LEFT JOIN tb_basic_company as company ON business.company_id = company.area_id
         LEFT JOIN tb_basic_business_type as  b_type ON business.business_type = b_type.business_type_id
-        LEFT JOIN tb_sys_parameter as  sys_param ON business.repayment_type_id = sys_param.param_value
+       -- LEFT JOIN tb_sys_parameter as  sys_param ON business.repayment_type_id = sys_param.param_value
         LEFT JOIN (
         select t1.plan_list_id,
         <!--   应还本金总额（应付本金 ）-->
@@ -88,8 +88,8 @@
         group by t1.plan_list_id
         ) c on pList.plan_list_id = c.plan_list_id
         <where>
-            sys_param.param_type = 6
-            and pList.plan_list_id = #{crpId}
+            -- sys_param.param_type = 6  and
+             pList.plan_list_id = #{crpId}
 
         </where>
 

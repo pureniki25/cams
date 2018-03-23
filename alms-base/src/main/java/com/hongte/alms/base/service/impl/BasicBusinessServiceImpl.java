@@ -14,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -44,9 +46,17 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
         //申请类型列表
         List<SysParameter> borrowRateUnitlist =  sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterTypeEnums.BORROW_RATE_UNIT.getKey()).orderBy("row_Index"));
 
+        Map<String,SysParameter> sysParameterMap = sysParameterService.selectParameterMap(SysParameterTypeEnums.BORROW_RATE_UNIT);
         for(BusinessInfoForApplyDerateVo vo : List){
-            if(vo.getBorrowRate()!=null){
 
+            SysParameter  parameter =  sysParameterMap.get(vo.getRepaymentTypeId());
+            if(parameter!=null){
+                vo.setRepaymentTypeName(parameter.getParamValue());
+            }else{
+                vo.setRepaymentTypeName(vo.getRepaymentTypeId().toString());
+            }
+
+            if(vo.getBorrowRate()!=null){
                 vo.setBorrowRateStr(String.format("%.2f",vo.getBorrowRate())+"%");
             }
             for(SysParameter rateUnit: borrowRateUnitlist){

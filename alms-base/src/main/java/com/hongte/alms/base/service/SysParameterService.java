@@ -5,6 +5,7 @@ import com.hongte.alms.base.enums.SysParameterTypeEnums;
 import com.hongte.alms.common.service.BaseService;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -36,5 +37,7 @@ public interface SysParameterService extends BaseService<SysParameter> {
 
     SysParameter seleByParamTypeAndvalue(SysParameterTypeEnums enums,String paramVal);
 
+
+    Map<String,SysParameter> selectParameterMap(SysParameterTypeEnums enums);
 
 }
