@@ -272,7 +272,7 @@
 		
 			(CASE process.status
          WHEN 2 THEN process.update_time 
-         ELSE '' END)  as finishTime
+         ELSE NULL END)  as finishTime
         from tb_process as process
         LEFT JOIN tb_basic_business as business ON process.business_id = business.business_id
         LEFT JOIN tb_process_type as p_type ON process.process_typeid = p_type.type_id
