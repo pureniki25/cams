@@ -7,7 +7,7 @@ public class RepayLogResp {
       private String listId;                //流水号
       private String merchOrderId;         //商户订单号
       private String ybOrderId;            //易宝付交易流水号
-      private String repayMoney;           //还款金额
+      private String currentAmount;           //还款金额
       private String identityCard;         //身份证号码
       private String customerName;         //客户姓名
       private String phoneNumber;          //电话号码
@@ -50,11 +50,12 @@ public class RepayLogResp {
 	public void setYbOrderId(String ybOrderId) {
 		this.ybOrderId = ybOrderId;
 	}
-	public String getRepayMoney() {
-		return repayMoney;
+    
+	public String getCurrentAmount() {
+		return currentAmount;
 	}
-	public void setRepayMoney(String repayMoney) {
-		this.repayMoney = repayMoney;
+	public void setCurrentAmount(String currentAmount) {
+		this.currentAmount = currentAmount;
 	}
 	public String getIdentityCard() {
 		return identityCard;
