@@ -563,8 +563,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
             try{
                 //调用移交诉讼接口
                 transferLitigationService.sendTransferLitigationData(
-                        repaymentBizPlan.getOriginalBusinessId(),
-                        planList.getPlanListId(),sendUrl);
+                        repaymentBizPlan.getOriginalBusinessId(),sendUrl);
                 //修改状态
                 setBussinessAfterStatus(
                         repaymentBizPlan.getOriginalBusinessId(),

@@ -213,15 +213,15 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	}
 
 	@Override
-	public TransferOfLitigationVO sendTransferLitigationData(String businessId, String crpId, String sendUrl) {
+	public TransferOfLitigationVO sendTransferLitigationData(String businessId, String sendUrl) {
 		TransferOfLitigationVO transferLitigationData = null;
 		LitigationResponse litigationResponse = null;
-		if (StringUtil.isEmpty(crpId) || StringUtil.isEmpty(businessId)) {
+		if (StringUtil.isEmpty(businessId)) {
 			return transferLitigationData;
 		}
 		try {
 			// 查询基础信息
-			transferLitigationData = transferOfLitigationMapper.queryTransferLitigationData(businessId, crpId);
+			transferLitigationData = transferOfLitigationMapper.queryTransferLitigationData(businessId);
 
 			Integer businessType = transferOfLitigationMapper.queryBusinessType(businessId);
 
@@ -664,7 +664,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			Integer processResult = process.getProcessResult();
 			if (!CollectionUtils.isEmpty(cars) && status == ProcessStatusEnums.END.getKey()
 					&& processResult == ProcessApproveResult.PASS.getKey()) {
-				sendTransferLitigationData(businessId, cars.get(0).getCrpId(), sendUrl);
+				sendTransferLitigationData(businessId, sendUrl);
 				// 更新贷后状态为 移交诉讼
 				collectionStatusService.setBussinessAfterStatus(req.getBusinessId(), req.getCrpId(), "",
 						CollectionStatusEnum.TO_LAW_WORK, CollectionSetWayEnum.MANUAL_SET);
@@ -691,7 +691,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			Integer processResult = process.getProcessResult();
 			if (!CollectionUtils.isEmpty(houses) && status == ProcessStatusEnums.END.getKey()
 					&& processResult == ProcessApproveResult.PASS.getKey()) {
-				sendTransferLitigationData(businessId, houses.get(0).getCrpId(), sendUrl);
+				sendTransferLitigationData(businessId, sendUrl);
 				// 更新贷后状态为 移交诉讼
 				collectionStatusService.setBussinessAfterStatus(req.getBusinessId(), req.getCrpId(), "",
 						CollectionStatusEnum.TO_LAW_WORK, CollectionSetWayEnum.MANUAL_SET);

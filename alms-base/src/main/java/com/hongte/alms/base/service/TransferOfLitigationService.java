@@ -29,10 +29,9 @@ public interface TransferOfLitigationService {
 	/**
 	 * 发送移交诉讼相关数据
 	 * @param businessId 业务编号
-	 * @param crpId 还款计划ID
 	 * @return
 	 */
-	TransferOfLitigationVO sendTransferLitigationData(String businessId, String crpId, String sendUrl);
+	TransferOfLitigationVO sendTransferLitigationData(String businessId, String sendUrl);
 	
 	/**
      * 保存房贷移交法务信息
