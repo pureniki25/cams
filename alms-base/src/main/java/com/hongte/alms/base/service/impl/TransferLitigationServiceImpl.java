@@ -215,6 +215,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	@Override
 	public TransferOfLitigationVO sendTransferLitigationData(String businessId, String crpId, String sendUrl) {
 		TransferOfLitigationVO transferLitigationData = null;
+		LitigationResponse litigationResponse = null;
 		if (StringUtil.isEmpty(crpId) || StringUtil.isEmpty(businessId)) {
 			return transferLitigationData;
 		}
@@ -241,12 +242,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				transferLitigationData.setHouseList(assembleBusinessHouse(businessId));
 			}
 			
-			LitigationResponse litigationResponse = sendLitigation(transferLitigationData, sendUrl);
-			TransferLitigationLog transferLitigationLog = new TransferLitigationLog();
-			transferLitigationLog.setBusinessId(businessId);
-			transferLitigationLog.setCreateTime(new Date());
-			transferLitigationLog.setCreateUser(transferLitigationData.getCreateUserId());
-			transferLitigationLog.setSendJson(JSON.toJSONString(transferLitigationData));
+			litigationResponse = sendLitigation(transferLitigationData, sendUrl);
 			if (litigationResponse != null) {
 				if (litigationResponse.getCode() == 1) {
 					LitigationResponseData data = litigationResponse.getData();
@@ -256,17 +252,31 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 					}
 					LOG.error("businessId：" + businessId + "，发送诉讼系统成功！诉讼系统返回信息：" + data.toString());
 				}
-				transferLitigationLog.setResultCode(litigationResponse.getCode());
-				transferLitigationLog.setResultMsg(litigationResponse.getMsg());
-				transferLitigationLog.setResultJson(JSON.toJSONString(litigationResponse));
-				transferLitigationLogService.insert(transferLitigationLog);
 			} else {
-				LOG.error("businessId：" + businessId + "，发送诉讼系统失败！！没有数据返回");
-				throw new ServiceRuntimeException("businessId：" + businessId + "，发送诉讼系统失败！！没有数据返回");
+				LOG.error("businessId：" + businessId + "，发送诉讼系统失败！！没有消息返回");
+				throw new ServiceRuntimeException("businessId：" + businessId + "，发送诉讼系统失败！！没有消息返回");
 			}
 		} catch (Exception e) {
 			LOG.error("发送诉讼系统失败！！！", e);
 			throw new ServiceRuntimeException(e.getMessage(), e);
+		}finally {
+			TransferLitigationLog transferLitigationLog = new TransferLitigationLog();
+			transferLitigationLog.setBusinessId(businessId);
+			transferLitigationLog.setCreateTime(new Date());
+			if (transferLitigationData != null) {
+				transferLitigationLog.setCreateUser(transferLitigationData.getCreateUserId());
+				transferLitigationLog.setSendJson(JSON.toJSONString(transferLitigationData));
+			}else {
+				transferLitigationLog.setSendJson("没有找到相关诉讼数据！");
+			}
+			if (litigationResponse != null) {
+				transferLitigationLog.setResultCode(litigationResponse.getCode());
+				transferLitigationLog.setResultMsg(litigationResponse.getMsg());
+				transferLitigationLog.setResultJson(JSON.toJSONString(litigationResponse));
+			}else {
+				transferLitigationLog.setResultMsg("诉讼系统没有消息返回！");
+			}
+			transferLitigationLogService.insert(transferLitigationLog);
 		}
 
 		return transferLitigationData;
