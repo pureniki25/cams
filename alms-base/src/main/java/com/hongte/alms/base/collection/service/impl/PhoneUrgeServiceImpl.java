@@ -115,6 +115,15 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
 
         List<AfterLoanStandingBookVo> list = phoneUrgeMapper.selectAfterLoadStanding(pages,req);
 
+        setExtInfo(list);
+
+//        pages.setRecords(setInfoForAfterLoanStandingBookVo(list));
+        pages.setRecords(list);
+        return pages;
+
+    }
+
+    public List<AfterLoanStandingBookVo>  setExtInfo(List<AfterLoanStandingBookVo> list){
         for(AfterLoanStandingBookVo vo: list){
             SysUser user = sysUserService.selectById(vo.getPhoneStaffId());
             if(user!=null){
@@ -126,17 +135,14 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
             }
             List<SysParameter> pList = sysParameterService.selectList(new EntityWrapper<SysParameter>().
                     eq("param_type",SysParameterTypeEnums.COLLECTION_STATUS.getKey())
-            .eq("param_value",vo.getColStatus()));
+                    .eq("param_value",vo.getColStatus()));
             if(pList.size()>0){
                 vo.setAfterColStatusName(pList.get(0).getParamName());
             }
         }
-
-//        pages.setRecords(setInfoForAfterLoanStandingBookVo(list));
-        pages.setRecords(list);
-        return pages;
-
+        return list;
     }
+
 
 
     public  List<String> getUserSearchComIds(AfterLoanStandingBookReq req){
@@ -160,7 +166,8 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
     public List<AfterLoanStandingBookVo> selectAfterLoanStandingBookList(AfterLoanStandingBookReq req){
         setAfterLoanStandingBookReqInfo(req);
 //        return  setInfoForAfterLoanStandingBookVo(phoneUrgeMapper.selectAfterLoadStanding(req));
-        return  phoneUrgeMapper.selectAfterLoadStanding(req);
+        return setExtInfo(phoneUrgeMapper.selectAfterLoadStanding(req));
+//        return  phoneUrgeMapper.selectAfterLoadStanding(req);
     }
 
     /**
