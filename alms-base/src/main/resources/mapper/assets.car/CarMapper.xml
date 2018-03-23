@@ -195,7 +195,7 @@
 	    ifnull(tcb.last_evaluation_amount,tcb.evaluation_amount) lastEvaluationAmount, <!-- 评估价 --> 
 		tcb.user_nature useProperty ,														<!--使用性质 -->										
 		tcb.insurance_expiration_date insuranceDate ,<!--保险到期日 -->
-		date_format(tcb.annual_verification_expiration_date,'%Y-%m') inspectionDate ,         <!--年检到期日 -->
+		tcb.annual_verification_expiration_date inspectionDate ,         <!--年检到期日 -->
 		tcb.odometer mileage ,<!--车显里程 -->
 		tcb.vehicle_license_registration_date registerDate ,             <!--首次登记年月 -->
 		case
@@ -305,8 +305,19 @@
 		tcar.reg_id regId,   <!-- 拍卖登记id -->
 		tcar.business_id businessId,  <!-- 资产端业务编号 -->
 		tcar.is_pay_deposit isPayDeposit,  <!-- 是否缴纳保证金 -->
+		case
+		  when tcar.is_pay_deposit=0 then '否'
+		   when tcar.is_pay_deposit=1 then '是'
+		else ''
+		end payDepositStr,
+		
 		tcar.offer_amount offerAmount,  <!-- 出价金额 -->
 		tcar.is_auction_success isAuctionSuccess,  <!-- 是否竞拍成功 -->
+		case 
+			when tcar.is_auction_success=0 then '否'
+			when tcar.is_auction_success=1 then '是'
+		else ''
+		end auctionSuccessStr,
 		tcar.trans_price transPrice,   <!-- 成交价格 -->
 		tcar.auction_id auctionId,  <!-- 竞拍id -->
 		tcar.update_user updateUser,  <!-- 更新人 -->
@@ -427,7 +438,7 @@
 	    ifnull(tcb.last_evaluation_amount,tcb.evaluation_amount) lastEvaluationAmount, <!-- 评估价 --> 
 		tcb.user_nature useProperty ,														<!--使用性质 -->
 		tcb.insurance_expiration_date insuranceDate ,<!--保险到期日 -->
-		date_format(tcb.annual_verification_expiration_date,'%Y-%m') inspectionDate ,         <!--年检到期日 -->
+		tcb.annual_verification_expiration_date, inspectionDate ,         <!--年检到期日 -->
 		tcb.odometer mileage ,<!--车显里程 -->
 		tcb.vehicle_license_registration_date registerDate ,             <!--首次登记年月 -->
 		case

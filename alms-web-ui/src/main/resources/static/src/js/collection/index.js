@@ -334,8 +334,13 @@ window.layinit(function(htConfig){
                 if(authValid('trackRecord')){
 	                buttons.push(
 	                    {"name": "贷后跟踪记录", click: function (e, currentItem) {
-	                    var url = "/collectionUI/staffTrackRecordUI?businessId="+currentItem.businessId+"&crpId="+currentItem.crpId
-	                    showOneLineOprLayer(url,"贷后跟踪记录");
+	                        if(currentItem.statusName == '逾期'){
+                                var url = "/collectionUI/staffTrackRecordUI?businessId="+currentItem.businessId+"&crpId="+currentItem.crpId
+                                showOneLineOprLayer(url,"贷后跟踪记录");
+                            }else{
+	                            vm.$Modal.error({content:"逾期的业务才能添加贷后跟踪记录！"})
+                            }
+
 	                    }}
 	                )
                 }
@@ -356,7 +361,7 @@ window.layinit(function(htConfig){
 		                        // var url = '/collectionUI/applyDerateUI?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+"&processStatus=-1"
 		                        showOneLineOprLayer(url,"")
 	                    	}else{
-                  	      vm.$Modal.error({content: '已还款的不能执行代扣'});
+                  	      vm.$Modal.error({content: '已还款的不能执行代扣！'});
                   	}
 	                    }}
 	                )

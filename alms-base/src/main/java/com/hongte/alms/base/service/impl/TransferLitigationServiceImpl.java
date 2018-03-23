@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.assets.car.vo.FileVo;
@@ -33,6 +34,7 @@ import com.hongte.alms.base.entity.DocType;
 import com.hongte.alms.base.entity.FsdHouse;
 import com.hongte.alms.base.entity.TransferLitigationCar;
 import com.hongte.alms.base.entity.TransferLitigationHouse;
+import com.hongte.alms.base.entity.TransferLitigationLog;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.mapper.TransferOfLitigationMapper;
 import com.hongte.alms.base.process.entity.Process;
@@ -51,6 +53,7 @@ import com.hongte.alms.base.service.FsdHouseService;
 import com.hongte.alms.base.service.SysProvinceService;
 import com.hongte.alms.base.service.TransferLitigationCarService;
 import com.hongte.alms.base.service.TransferLitigationHouseService;
+import com.hongte.alms.base.service.TransferLitigationLogService;
 import com.hongte.alms.base.service.TransferOfLitigationService;
 import com.hongte.alms.base.vo.billing.CarLoanBilVO;
 import com.hongte.alms.base.vo.litigation.BusinessHouse;
@@ -122,6 +125,10 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	@Autowired
 	@Qualifier("CollectionStatusService")
 	private CollectionStatusService collectionStatusService;
+	
+	@Autowired
+	@Qualifier("TransferLitigationLogService")
+	private TransferLitigationLogService transferLitigationLogService;
 
 	@Override
 	public Map<String, Object> queryCarLoanData(String businessId) {
@@ -208,6 +215,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	@Override
 	public TransferOfLitigationVO sendTransferLitigationData(String businessId, String crpId, String sendUrl) {
 		TransferOfLitigationVO transferLitigationData = null;
+		LitigationResponse litigationResponse = null;
 		if (StringUtil.isEmpty(crpId) || StringUtil.isEmpty(businessId)) {
 			return transferLitigationData;
 		}
@@ -233,20 +241,42 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 				transferLitigationData.setHouseList(assembleBusinessHouse(businessId));
 			}
-			LitigationResponse litigationResponse = sendLitigation(transferLitigationData, sendUrl);
-			if (litigationResponse != null && litigationResponse.getCode() == 1) {
-				LitigationResponseData data = litigationResponse.getData();
-				if (!data.isImportSuccess()) {
-					LOG.error("businessId：" + businessId + "，发送诉讼系统失败！！诉讼系统返回信息：" + data.toString());
-					throw new ServiceRuntimeException(data.getMessage());
+			
+			litigationResponse = sendLitigation(transferLitigationData, sendUrl);
+			if (litigationResponse != null) {
+				if (litigationResponse.getCode() == 1) {
+					LitigationResponseData data = litigationResponse.getData();
+					if (!data.isImportSuccess()) {
+						LOG.error("businessId：" + businessId + "，发送诉讼系统失败！！诉讼系统返回信息：" + data.toString());
+						throw new ServiceRuntimeException(data.getMessage());
+					}
+					LOG.error("businessId：" + businessId + "，发送诉讼系统成功！诉讼系统返回信息：" + data.toString());
 				}
-				LOG.error("businessId：" + businessId + "，发送诉讼系统成功！诉讼系统返回信息：" + data.toString());
 			} else {
-				throw new ServiceRuntimeException("businessId：" + businessId + "，发送诉讼系统失败！！没有数据返回");
+				LOG.error("businessId：" + businessId + "，发送诉讼系统失败！！没有消息返回");
+				throw new ServiceRuntimeException("businessId：" + businessId + "，发送诉讼系统失败！！没有消息返回");
 			}
 		} catch (Exception e) {
 			LOG.error("发送诉讼系统失败！！！", e);
 			throw new ServiceRuntimeException(e.getMessage(), e);
+		}finally {
+			TransferLitigationLog transferLitigationLog = new TransferLitigationLog();
+			transferLitigationLog.setBusinessId(businessId);
+			transferLitigationLog.setCreateTime(new Date());
+			if (transferLitigationData != null) {
+				transferLitigationLog.setCreateUser(transferLitigationData.getCreateUserId());
+				transferLitigationLog.setSendJson(JSON.toJSONString(transferLitigationData));
+			}else {
+				transferLitigationLog.setSendJson("没有找到相关诉讼数据！");
+			}
+			if (litigationResponse != null) {
+				transferLitigationLog.setResultCode(litigationResponse.getCode());
+				transferLitigationLog.setResultMsg(litigationResponse.getMsg());
+				transferLitigationLog.setResultJson(JSON.toJSONString(litigationResponse));
+			}else {
+				transferLitigationLog.setResultMsg("诉讼系统没有消息返回！");
+			}
+			transferLitigationLogService.insert(transferLitigationLog);
 		}
 
 		return transferLitigationData;

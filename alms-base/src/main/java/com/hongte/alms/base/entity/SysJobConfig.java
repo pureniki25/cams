@@ -3,6 +3,9 @@ package com.hongte.alms.base.entity;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.hongte.alms.base.enums.ActivateEnum;
+import com.hongte.alms.base.enums.FlagLockEnum;
+import com.hongte.alms.base.enums.TimeTypeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -39,13 +42,13 @@ public class SysJobConfig extends Model<SysJobConfig> {
      */
 	@TableField("flag_lock")
 	@ApiModelProperty(required= true,value = "开关：0：开，1：关")
-	private Integer flagLock;
+	private FlagLockEnum flagLock;
     /**
      * 时间类型：0：按小时算，1：按分钟算，2：按秒算
      */
 	@TableField("time_type")
 	@ApiModelProperty(required= true,value = "时间类型：0：按小时算，1：按分钟算，2：按秒算")
-	private Integer timeType;
+	private TimeTypeEnum timeType;
     /**
      * 时间间隔
      */
@@ -81,7 +84,7 @@ public class SysJobConfig extends Model<SysJobConfig> {
 	@ApiModelProperty(required= true,value = "最后一次成功执行时间")
 	private Date lastRunTime;
 	@ApiModelProperty(required= true,value = "")
-	private Boolean activate;
+	private ActivateEnum activate;
 
 
 	public String getId() {
@@ -100,21 +103,6 @@ public class SysJobConfig extends Model<SysJobConfig> {
 		this.jobName = jobName;
 	}
 
-	public Integer getFlagLock() {
-		return flagLock;
-	}
-
-	public void setFlagLock(Integer flagLock) {
-		this.flagLock = flagLock;
-	}
-
-	public Integer getTimeType() {
-		return timeType;
-	}
-
-	public void setTimeType(Integer timeType) {
-		this.timeType = timeType;
-	}
 
 	public Integer getTimeInterval() {
 		return timeInterval;
@@ -164,11 +152,27 @@ public class SysJobConfig extends Model<SysJobConfig> {
 		this.lastRunTime = lastRunTime;
 	}
 
-	public Boolean getActivate() {
+	public FlagLockEnum getFlagLock() {
+		return flagLock;
+	}
+
+	public void setFlagLock(FlagLockEnum flagLock) {
+		this.flagLock = flagLock;
+	}
+
+	public TimeTypeEnum getTimeType() {
+		return timeType;
+	}
+
+	public void setTimeType(TimeTypeEnum timeType) {
+		this.timeType = timeType;
+	}
+
+	public ActivateEnum getActivate() {
 		return activate;
 	}
 
-	public void setActivate(Boolean activate) {
+	public void setActivate(ActivateEnum activate) {
 		this.activate = activate;
 	}
 
@@ -180,17 +184,17 @@ public class SysJobConfig extends Model<SysJobConfig> {
 	@Override
 	public String toString() {
 		return "SysJobConfig{" +
-			", id=" + id +
-			", jobName=" + jobName +
-			", flagLock=" + flagLock +
-			", timeType=" + timeType +
-			", timeInterval=" + timeInterval +
-			", creator=" + creator +
-			", createTime=" + createTime +
-			", updater=" + updater +
-			", updateTime=" + updateTime +
-			", lastRunTime=" + lastRunTime +
-			", activate=" + activate +
-			"}";
+				"id='" + id + '\'' +
+				", jobName='" + jobName + '\'' +
+				", flagLock=" + flagLock +
+				", timeType=" + timeType +
+				", timeInterval=" + timeInterval +
+				", creator='" + creator + '\'' +
+				", createTime=" + createTime +
+				", updater='" + updater + '\'' +
+				", updateTime=" + updateTime +
+				", lastRunTime=" + lastRunTime +
+				", activate=" + activate +
+				'}';
 	}
 }
