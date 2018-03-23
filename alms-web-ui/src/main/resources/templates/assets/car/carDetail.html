@@ -426,9 +426,11 @@
 										</tr>
 										<tr>
 											<td class="td_label">处置单位：</td>
-											<td><input type="text" name="lname"
-												class="input-border-none" v-bind:value="carAuction.handleUnit" readonly="readonly"
-												></td>
+											<td>
+												<textarea v-bind:value="carAuction.handleUnit" readonly="readonly" rows="2" class="input-border-none" >
+
+												</textarea>
+											</td>
 										</tr>
 										<tr>
 											<td class="td_label">拍卖成交价格：</td>
