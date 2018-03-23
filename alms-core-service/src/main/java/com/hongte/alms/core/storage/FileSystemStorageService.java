@@ -5,6 +5,8 @@ import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.hongte.alms.common.util.FileUtil;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -75,6 +77,8 @@ public class FileSystemStorageService implements StorageService {
             response.setHeader("Content-Disposition", "attachment; filename="+file.getName());
             IOUtils.copy(fis,response.getOutputStream());
             response.flushBuffer();
+            
+        
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -83,6 +87,7 @@ public class FileSystemStorageService implements StorageService {
             if (fis != null) {
                 try {
                     fis.close();
+                    FileUtil.deleteFile(excelSavePath+filename);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
