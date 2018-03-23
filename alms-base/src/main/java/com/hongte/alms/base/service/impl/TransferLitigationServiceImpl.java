@@ -247,13 +247,13 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				if (litigationResponse.getCode() == 1) {
 					LitigationResponseData data = litigationResponse.getData();
 					if (!data.isImportSuccess()) {
-						LOG.error("businessId：" + businessId + "，发送诉讼系统失败！！诉讼系统返回信息：" + data.toString());
+						LOG.info("businessId：" + businessId + "，发送诉讼系统失败！！诉讼系统返回信息：" + data.toString());
 						throw new ServiceRuntimeException(data.getMessage());
 					}
-					LOG.error("businessId：" + businessId + "，发送诉讼系统成功！诉讼系统返回信息：" + data.toString());
+					LOG.info("businessId：" + businessId + "，发送诉讼系统成功！诉讼系统返回信息：" + data.toString());
 				}
 			} else {
-				LOG.error("businessId：" + businessId + "，发送诉讼系统失败！！没有消息返回");
+				LOG.info("businessId：" + businessId + "，发送诉讼系统失败！！没有消息返回");
 				throw new ServiceRuntimeException("businessId：" + businessId + "，发送诉讼系统失败！！没有消息返回");
 			}
 		} catch (Exception e) {
