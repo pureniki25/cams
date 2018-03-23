@@ -84,15 +84,13 @@ public class NoticeController {
 	public Result<List<Notice>> listNotice(){
 		try {
 			String userId = loginUserInfoHelper.getUserId();
-//			String orgCode = sysUserService.selectById(userId).getOrgCode();
-
+			logger.info("userId:"+userId);
 			SysUser user = sysUserService.selectById(userId);
 			List<Notice> list = new LinkedList<>();
 			if(user!=null){
 				String orgCode = user.getOrgCode();
-				
-				EntityWrapper<Notice> ew = new EntityWrapper<Notice>();
-				ew.isNull("is_deleted").eq("is_send", 1).andNew().like("org_code", orgCode).or().like("org_code", "鸿特信息");
+ 				EntityWrapper<Notice> ew = new EntityWrapper<Notice>();
+				ew.isNull("is_deleted").eq("is_send", 1).andNew().like("org_code", "%"+orgCode+"%").or().like("org_code", "%"+"鸿特信息"+"%");
 				ew.orderBy("publish_time", false);
 				list = noticeService.selectList(ew);
 			}
@@ -152,10 +150,10 @@ public class NoticeController {
 		}
 		
 		if (startDate!=null) {
-			ew.gt("publish_time", startDate);
+			ew.ge("DATE_FORMAT(publish_time,'%Y-%m-%d')", DateUtil.formatDate(startDate));
 		}
 		if (endDate!=null) {
-			ew.lt("publish_time", endDate);
+			ew.le("DATE_FORMAT(publish_time,'%Y-%m-%d')", DateUtil.formatDate(endDate));
 		}
 		Page<Notice> page2 = noticeService.selectPage(new Page<Notice>(page, limit), ew);
 		return PageResult.success(page2.getRecords(), page2.getTotal());
@@ -186,7 +184,7 @@ public class NoticeController {
 		if (notice2.getNoticeId()==null) {
 			notice2.setCreateTime(new Date());
 			notice2.setCreateUserId(userId);
-			notice2.setIsSend(0);
+			notice2.setIsSend(1);
 			notice2.insert();
 		}else {
 			notice2.setUpdateTime(new Date());
@@ -228,6 +226,20 @@ public class NoticeController {
 		upLoadResult.setMessage(uploadItemId);
         return upLoadResult;
     }
+	
+	@ApiOperation(value = "删除公告附件")
+	@PostMapping("/delAttachment")
+	@ResponseBody
+	public Result deleteAttachment(@RequestBody JSONObject file) {
+		
+		boolean res = noticeFileService.deleteById(file.getInteger("noticeFileId"));
+		if (res) {
+			return Result.success();
+		}else {
+			return Result.error("500", "删除附件失败");
+		}
+		
+	}
 	@ApiOperation(value = "(逻辑)删除公告")
 	@GetMapping("/del")
 	@ResponseBody

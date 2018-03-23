@@ -53,7 +53,7 @@
 		    	LEFT JOIN
 		    tb_repayment_biz_plan_list trbpl on trbpl.plan_list_id = tmpr.plan_list_id
 		WHERE
-		    trbpl.original_business_id = #{businessId}
+		    trbpl.orig_business_id = #{businessId}
 		        AND trbpl.after_id = #{afterId}
 		        AND tmpr.is_finance_match = 1
 		        AND ( tmpr.is_deleted = 0 || tmpr.is_deleted is null )

@@ -106,7 +106,7 @@
                              <i-col span="6">
                             <form-item label="代扣状态:" prop="repayStatus">
                                 <i-select v-model="searchForm.repayStatus" clearable filterable >
-                                        <i-option  v-for="item in repayStatusList" value="item.id" :key="item.id">{{ item.name }}</i-option>
+                                        <i-option  v-for="item in repayStatusList" value="item.repayStatus" :key="item.repayStatus">{{ item.name }}</i-option>
                                 </i-select>
                             </form-item>
                         </i-col>

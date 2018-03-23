@@ -10,11 +10,20 @@ var vm;
 var dateBegin;
 var dateEnd;
 var dateObj;
-
+var userId;
 var dataObject ={
         dateBegin:'',
         dateEnd:'',
     }
+
+//为表单添加输入
+var addInput = function(form, type,name,value){
+    var input=document.createElement("input");
+    input.type=type;
+    input.name=name;
+    input.value = value;
+    form.appendChild(input);
+}
 //从后台获取下拉框数据
 var getSelectsData = function () {
 
@@ -35,6 +44,22 @@ var getSelectsData = function () {
         });
 }
 
+
+var getUserId = function () {
+
+    //取区域列表
+    axios.get(basePath +'RepaymentLogController/getUserId')
+        .then(function (res) {debugger
+            if (res.data.code == "1") {
+                userId=res.data.data;
+            } else {
+                vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
+            }
+        })
+        .catch(function (error) {
+            vm.$Modal.error({content: '接口调用异常!'});
+        });
+}
 
 window.layinit(function (htConfig) {
     var _htConfig = htConfig;
@@ -71,9 +96,9 @@ window.layinit(function (htConfig) {
             countbyLogId:[],
             SumRepayAmount:[],
             repayStatusList: [
-                {name: '成功', id:'1'},
-                {name: '失败', id:'0'},
-                {name: '处理中', id:'2'},
+                {name: '成功', repayStatus:'1'},
+                {name: '失败', repayStatus:'0'},
+                {name: '处理中', repayStatus:'2'},
             ],
             selectedRowInfo:'',//存储当前选中行信息
             edit_modal:false,//控制编辑项选择modal显示的标志位
@@ -95,7 +120,7 @@ window.layinit(function (htConfig) {
                         this.loading = true;
                         console.log(vm.searchForm);
 
-                         dateObj = getData();
+                       var  dateObj = getData();
 
                         table.reload('listTable', {
                             where: {
@@ -120,17 +145,34 @@ window.layinit(function (htConfig) {
             },
             ////  ----   单行操作界面显示  结束 -----------------
             clickExport() {//导出Excel表格
-                vm.$refs['searchForm'].validate((valid) => {
+                vm.$refs['searchForm'].validate((valid) => {debugger
                     if (valid) {
-
+                        var dateObj = getData();
                         vm.exporting = true;
-                        expoertExcel(basePath + "RepaymentLogController/saveExcel",vm.searchForm);
-
+//                        expoertExcel(basePath + "RepaymentLogController/saveExcel",vm.searchForm);
+                        var ExportForm = document.createElement("FORM");
+//                        document.body.appendChild(ExportForm);
+//                        ExportForm.method = "POST";
+//                        ExportForm.action = basePath+"RepaymentLogController/saveExcel";
+//                        ExportForm.target = "iframe";
+//                        addInput(ExportForm, "text", "companyId", vm.searchForm.companyId);
+//                        addInput(ExportForm, "text", "keyName", vm.searchForm.keyName); 
+//                        addInput(ExportForm, "text", "platformId", vm.searchForm.platformId); 
+//                        addInput(ExportForm, "text", "repayStatus", vm.searchForm.repayStatus); 
+//                        addInput(ExportForm, "text", "dateBegin", dateObj.dateBegin);   
+//                        addInput(ExportForm, "text", "dateEnd", dateObj.dateEnd);
+//                        addInput(ExportForm, "text", "userId", userId);     
+//                        addInput(ExportForm, "text", "businessTypeId", vm.searchForm.businessTypeId);     
+//                        ExportForm.submit();
+//                        document.body.removeChild(ExportForm);
+                 	   	window.open(basePath + 'RepaymentLogController/saveExcel','_blank'); 
                         vm.exporting = false;
 
                     }
                 })
             }
+            
+            
         
         },
         mounted:function(){
@@ -215,6 +257,7 @@ window.layinit(function (htConfig) {
             //response: {} //如果无需自定义数据响应名称，可不加该参数
             page: true,
             done: function (res, curr, count) {
+            	getUserId();
                 getCountInfo();
                 //数据渲染完的回调。你可以借此做一些其它的操作
                 //如果是异步请求数据方式，res即为你接口返回的信息。
@@ -288,14 +331,14 @@ $.ajax({
         app : 'ALMS',
         Authorization : "Bearer " + getToken()
     },
-    success : function(result) {
-        if (result.data.code == "1") {
+    success : function(result) {debugger
+        if (result.code == "1") {
         	
             
-            vm.countByBusinessIdSucess = result.data.data.countByBusinessIdSucess;
-            vm.countByBusinessId = result.data.data.countByBusinessId;
-            vm.countbyLogId = result.data.data.countbyLogId;
-            vm.SumRepayAmount = result.data.data.SumRepayAmount;
+            vm.countByBusinessIdSucess = result.data.countByBusinessIdSucess;
+            vm.countByBusinessId = result.data.countByBusinessId;
+            vm.countbyLogId = result.data.countbyLogId;
+            vm.SumRepayAmount = result.data.SumRepayAmount;
    
             
         } else {

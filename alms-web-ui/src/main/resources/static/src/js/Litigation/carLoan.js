@@ -60,6 +60,7 @@ window.layinit(function (htConfig) {
 	vm = new Vue({
 	    el: '#app',
 	    data: {
+	    	basePath:basePath,
 	    	// 流程状态标志位
             step:300,
             // 实收金额是否可编辑的标志位
@@ -225,16 +226,20 @@ window.layinit(function (htConfig) {
        approvalInfoFormValidate:approvalInfoFormValidate1,
 // ////////////------------- 审批流程信息 结束
        
+       // 文件上传下载与回显
        returnRegFiles:[{
-   		file: '',
-   		name:'',
-   		originalName: '',
-   		oldDocId:''
+	   		file: '',
+	   		name:'',
+	   		originalName: '',
+	   		oldDocId:'',
+   			downloadFileName:'',
+   			docUrl:''
 	   	}],
 	   	reqRegFiles:[{
 	   		originalName: '',
 	   		oldDocId:''
 	   	}],
+	   	
 		
 // --------------------//////////////////////
    },
@@ -302,6 +307,10 @@ window.layinit(function (htConfig) {
 	                     data.formData.file=data.originalFiles[0];
 	                 }
 	             });
+	    	},
+	    	downloadFile: function(info){
+	    		// 如果文档id存在，那么进行ajax
+	    			return basePath+'doc/download?downloadFile='+info.downloadFileName + '&docUrl=' + info.docUrl
 	    	},
 	    	removeTabTr: function (event, index) {
 	    		var docId=$('#docId'+index).val();  
@@ -424,15 +433,19 @@ var getShowInfo = function () {
                 	for (var i = 0; i < docFiles.length; i++){
                 		if(i > 0){
                 			vm.returnRegFiles.push({
-   	               			 file: '',
-   	               			 name:docFiles[i].originalName,
-   	               			 originalName: docFiles[i].originalName,
-   	               			 oldDocId:docFiles[i].docId
-   	               		 });
+	   	               			 file: '',
+	   	               			 name:docFiles[i].originalName,
+	   	               			 originalName: docFiles[i].originalName,
+	   	               			 oldDocId:docFiles[i].docId,
+	   	               			 downloadFileName:docFiles[i].originalName,
+	   	               			 docUrl:docFiles[i].docUrl
+   	               		 	});
                 		}else{
 	                		vm.returnRegFiles[i].oldDocId = docFiles[i].docId;
 	                		vm.returnRegFiles[i].originalName = docFiles[i].originalName;
 	                		vm.returnRegFiles[i].name = docFiles[i].originalName;
+	                		vm.returnRegFiles[i].downloadFileName = docFiles[i].originalName;
+	                		vm.returnRegFiles[i].docUrl = docFiles[i].docUrl;
                 		}
                 		// i++;
                 	}
@@ -632,24 +645,6 @@ var saveapplyInfo = function(pStatus){
 			                   console.error(message);
 			               }
 			           });
-			    	
-	                /*axios.post(basePath+ 'transferOfLitigation/saveTransferLitigationCar', vm.commitInfoForm)
-	                    .then(function (res) {
-	                        if (res.data.code == "1") {
-	                            vm.$Modal.success({
-	                                // title: title,
-	                                content: "保存成功",
-	                                onOk: () => {
-	                                    closePareantLayer()
-	                                },
-	                            });
-	                        } else {
-	                            vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
-	                        }
-	                    })
-	                    .catch(function (error) {
-	                        vm.$Modal.error({content: '接口调用异常!'});
-	                    });*/
 	            }else{
 	                vm.$Message.error({content: '表单校验失败!'});
 	            }

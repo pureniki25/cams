@@ -176,7 +176,10 @@
 		tca.open_bank bank,				<!-- 开户银行 -->
 		tca.acount_num cardNo,					<!-- 银行卡号 -->
 		tca.payment_end_time,<!-- 缴款截止时间 -->
-
+		tca.trans_free  taxation,<!-- Taxation , 交易税费 -->
+		tca.remark   remarks,<!-- 备注-->	
+			
+			
 		tcb.brand_name vehicleBrand ,		<!--车辆品牌 -->
 		case
 		when tcb.origin_place=0 then '国产'
@@ -204,17 +207,12 @@
 		tcb.traffic_violation_situation illegal ,<!--违章未处理记录 -->
 		tcb.tool_with_car tools ,<!--随车工具 -->
 		tcb.license_plate_number,<!-- 车牌号 -->
-		<!-- Taxation , 交易税费 -->
-		case
-		 	when tca.pay_way='01' then '线下支付'
-		 	when tca.pay_way='02' then '线上支付'
-		 else ''
-		 end transactionMode ,<!--  交易方式 -->
+		tcb.transaction_mode transactionMode ,<!-- 交易方式 -->
 		
-		tcb.car_position Position , <!-- 车辆位置 -->
+		tcb.car_position position , <!-- 车辆位置 -->
 		tp.update_time auditTime,<!-- 审核通过时间 -->
 		tcb.related_docs file   <!--提供文件 -->
-		<!-- Remarks , -->														<!--备注 -->
+														<!--备注 -->
 
 		from tb_car_auction tca
 		join tb_car_basic tcb on
@@ -412,7 +410,8 @@
 		tca.open_bank bank,				<!-- 开户银行 -->
 		tca.acount_num cardNo,					<!-- 银行卡号 -->
 		tca.payment_end_time,<!-- 缴款截止时间 -->
-
+		tca.trans_free  taxation,<!-- Taxation , 交易税费 -->
+		tca.remark   remarks,<!-- 备注-->	
 		tcb.brand_name vehicleBrand ,		<!--车辆品牌 -->
 		case
 		when tcb.origin_place=0 then '国产'
@@ -440,17 +439,13 @@
 		tcb.traffic_violation_situation illegal ,<!--违章未处理记录 -->
 		tcb.tool_with_car tools ,<!--随车工具 -->
 		tcb.license_plate_number,<!-- 车牌号 -->
-		<!-- Taxation , 交易税费 -->
-		case
-		 	when tca.pay_way='01' then '线下支付'
-		 	when tca.pay_way='02' then '线上支付'
-		 else ''
-		 end transactionMode ,<!-- 交易方式 -->
 		
-		tcb.car_position Position , <!-- 车辆位置 -->
+		tcb.transaction_mode transactionMode ,<!-- 交易方式 -->
+		
+		tcb.car_position position , <!-- 车辆位置 -->
 		tcb.related_docs file,   <!--提供文件 -->
 		tp.update_time auditTime,<!-- 审核通过时间 -->
-		<!-- Remarks , -->														<!--备注 -->
+															<!--备注 -->
 		tcab.bidder_name bidderName,  <!-- 用户姓名 -->
 		tcab.bidder_cert_id bidderCertId, <!-- 身份证号码 -->
 		tcab.bidder_tel bidderTel, <!-- 联系方式 -->

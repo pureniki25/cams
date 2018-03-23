@@ -93,6 +93,9 @@ var APPLY_DERATE_LAST_STATUS = "400"
  */
 function ArabicToChinese(n) {
 
+    if(n==''){
+        return n
+    }
     if (!/^(0|[1-9]\d*)(\.\d+)?$/.test(n)){
         return "数据非法";  //判断数据是否大于0
     }
@@ -143,4 +146,15 @@ var clickNavByUrl = function (url) {
 
        }
     })
+}
+
+let formatDate = function (DATE) {
+    var year = DATE.getFullYear();
+    var month = DATE.getMonth() + 1;
+    var day = DATE.getDate();
+    return year + "-" + month + "-" + day
+}
+
+let parseDate = function(str){
+    
 }

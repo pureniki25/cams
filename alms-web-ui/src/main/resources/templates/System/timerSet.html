@@ -41,185 +41,13 @@
 <!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
 <div id="app" v-cloak>
     <tabs value="personSetter">
-        <tab-pane label="催收人员设置" name="personSetter">
-
-            <!--查询表单内容-->
-            <row :gutter="16">
-                <i-col span="3">
-                    <i-button v-if="authValid('assignSet')" type="success" style="margin-left:15px" @click="assignSet"  ht-auth="assignSet">分配设置</i-button>
-                </i-col>
-                <i-col  span="16">
-                <i-form ref="searchForm"  :model="searchForm"    label-position="right" :label-width="100" inline>
-
-                        <form-item label="区域：" prop="areaId">
-                            <i-select v-model="searchForm.areaId" clearable  filterable >
-                                <i-option v-for="item in areaList" :value="item.areaId" :key="item.areaId" >{{ item.areaName }}</i-option>
-                            </i-select>
-                        </form-item>
-
-
-                        <form-item label="分公司：" prop="companyId">
-                            <i-select v-model="searchForm.companyId" clearable filterable >
-                                <i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{ item.areaName }}</i-option>
-                            </i-select>
-                        </form-item>
-
-
-
-                        <form-item label="人员：" prop="userName">
-                            <i-input v-model="searchForm.userName" placeholder="多个搜索用“/”隔开" ></i-input>
-                        </form-item>
-
-                </i-form>
-                </i-col>
-                <i-col span="5">
-                    <i-button  v-if="authValid('search')" type="info" :loading="loading" icon="ios-search" @click="toLoading" style="margin-right:10px" ht-auth="personQuery">
-                        <span v-if="!loading">查询</span>
-                        <span v-else>查询中...</span>
-                    </i-button>
-                </i-col>
-
-            </row>
-
-            <!-- 表单Grid，使用layerUI的表格组件 开始 -->
-            <row style="padding: 10px">
-                <i-col span="24">
-                    <!-- 使用方法渲染模式 -->
-                    <table id="listTable" lay-filter="listTable"></table>
-                    <div style="display:none" id="barTools">
-                        <!--layui-btn layui-btn-xs-->
-                        <i-button v-if="authValid('singleSet')" style="width:80px" type="success" lay-event="userSet" ht-auth="singleSet" >设置</i-button>
-                    </div>
-                </i-col>
-            </row>
-            <!-- 表单Grid，使用layerUI的表格组件 结束 -->
-
-            <Modal
-                    v-model="editSingleCompanyCollectionUserSettingModal"
-                    title="设置"
-                    @on-ok="saveSingleCompanyCollectionUserSetting"
-                    @on-cancel="toLoading">
-                <i-form ref="editCompanyCollectionUser.editCompanyCollectionForm" :model="editCompanyCollectionUser.editCompanyCollectionForm"  :label-width="80">
-                    <form-item label="清算1：" prop="collectionGroup1Users">
-                        <i-select v-model="editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup1Users" multiple clearable filterable >
-                            <i-option v-for="item in editCompanyCollectionUser.collectionGroup1AllUsers" :value="item.userId" :key="item.userId">{{ item.userName }}</i-option>
-                        </i-select>
-                    </form-item>
-
-                    <form-item label="清算2："  prop="collectionGroup2Users">
-                        <i-select v-model="editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup2Users" multiple clearable filterable >
-                            <i-option v-for="item in editCompanyCollectionUser.collectionGroup2AllUsers" :value="item.userId" :key="item.userId">{{ item.userName }}</i-option>
-                        </i-select>
-                    </form-item>
-
-                </i-form>
-            </Modal>
-
-            <!--
-                    时间设置标签页
-
-            -->
-
-            <Modal
-                    v-model="editSingleCompanyCollectionTimeSettingModal"
-                    title="设置"
-                    @on-ok="saveTimeSet"
-                    @on-cancel="toLoadingTime">
-                <i-form ref="editCompanyCollectionTime.editCompanyCollectionForm" :model="editCompanyCollectionTime.editCompanyCollectionForm" :rules="ruleValidate" :label-width="80" >
-                    <form-item label="逾期天数：" prop="overDueDays">
-                        <i-input v-model="editCompanyCollectionTime.editCompanyCollectionForm.overDueDays" maxlength="20" style="width: 200px"></i-input>
-                    </form-item>
-
-                    <form-item label="开始时间："  prop="startTime" >
-
-                        <date-picker type="date" :options="options3" placeholder="Select date" style="width: 200px" v-model="editCompanyCollectionTime.editCompanyCollectionForm.startTime"></date-picker>
-
-                    </form-item>
-
-                    <form-item label="备注："  prop="collectionNote">
-                        <i-input v-model="editCompanyCollectionTime.editCompanyCollectionForm.note" type="textarea" :rows="4" maxlength="500" placeholder="Enter something..."></i-input>
-                    </form-item>
-
-                    <form-item label="序号："  prop="colTimeId" style="display: none">
-                        <i-input v-model="editCompanyCollectionTime.editCompanyCollectionForm.colTimeId" ></i-input>
-                    </form-item>
-                </i-form>
-            </Modal>
-
-            <!--
-                分配设置
-            -->
-            <Modal
-                    v-model="assignSetModal"
-                    title="设置"
-                    @on-ok="saveBatchPerson"
-                    @on-cancel="toLoading">
-                <i-form ref="editCompanyCollectionAssignSet.editCompanyCollectionForm" :model="editCompanyCollectionAssignSet.editCompanyCollectionForm"  :label-width="80"  >
-                    <form-item label="区域：" prop="areaName">
-                        <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.areaName" disabled multiple clearable filterable style="width: 80%">
-                            <i-option v-for="item in editCompanyCollectionAssignSet.areaList" :value="item.areaId" :key="item.areaId">{{ item.areaName }}</i-option>
-                        </i-select>
-                        <i-span @click="selectArea">选择</i-span>
-                    </form-item>
-
-                    <form-item label="分公司："  prop="companyName">
-                        <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId" disabled multiple clearable filterable style="width: 80%" >
-                            <i-option v-for="item in editCompanyCollectionAssignSet.companyId" :value="item.areaId" :key="item.areaId">{{ item.areaName }}</i-option>
-                        </i-select>
-                    </form-item>
-
-                    <form-item label="清算1：" prop="collectionGroup1Users">
-                        <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.collectionGroup1Users" multiple clearable filterable  style="width: 80%">
-                            <i-option v-for="item in editCompanyCollectionAssignSet.collectionGroup1AllUsers" :value="item.userId" :key="item.userId">{{ item.userName }}</i-option>
-                        </i-select>
-                    </form-item>
-
-                    <form-item label="清算2："  prop="collectionGroup2Users">
-                        <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.collectionGroup2Users" multiple clearable filterable style="width: 80%">
-                            <i-option v-for="item in editCompanyCollectionAssignSet.collectionGroup2AllUsers" :value="item.userId" :key="item.userId">{{ item.userName }}</i-option>
-                        </i-select>
-                    </form-item>
-
-                </i-form>
-            </Modal>
-
-            <!--
-            区域城市选择模块
-            -->
-            <Modal
-                    v-model="selectAreaAndCity"
-                    title="选择分公司"
-                    @on-ok="confirmSelect"
-                    @on-cancel="">
-                <div class="layui-row layui-col-space20">
-                    <div class="layui-col-md5">
-                        <tree :data="areaAndCity.allAreas"  @on-check-change="showCitys" @on-select-change="selectChild" show-checkbox  ref="tree" ></tree>
-                    </div>
-                    <div class="layui-col-md6">
-                        <checkbox-group v-model="areaAndCity.currentSelectedCitys" @on-change="getAllSelectedCitys">
-                            <checkbox v-for="item in areaAndCity.allCitys" :label="item.areaId"  @on-change="">{{item.areaName}}</checkbox>
-                        </checkbox-group>
-                        <!--<checkbox-group v-model="checkAllGroup" @on-change="checkAllGroupChange">-->
-                            <!--<checkbox label="香蕉"></checkbox>-->
-                            <!--<checkbox label="苹果"></checkbox>-->
-                            <!--<checkbox label="西瓜"></checkbox>-->
-                        <!--</checkbox-group>-->
-                    </div>
-                </div>
-
-            </Modal>
-
-        </tab-pane>
-
-
-
 
         <tab-pane label="催收时间设置" name="timeSetter">
             <row style="padding: 10px">
                 <i-col span="24">
                     <!-- 使用方法渲染模式 -->
-                    <table id="timeListTable" lay-filter="timeListTable"></table>
-                    <div style="display:none" id="timeListBarTools">
+                    <table id="listTable" lay-filter="listTable"></table>
+                    <div style="display:none" id="listBarTools">
                         <!--layui-btn layui-btn-xs-->
                         <i-button v-if="authValid('singleSet')" style="width:80px" type="success" lay-event="timeSet" ht-auth="timeSingleSet" >设置</i-button>
                     </div>
@@ -233,98 +61,17 @@
 </div>
 
 
-
-
-
-
 <script>
-    var vm;
+
     window.layinit(function (htConfig) {
         var _htConfig = htConfig;
         basePath = _htConfig.coreBasePath;
-        vm = new Vue({
+        var vm = new Vue({
             el: '#app',
             data: {
-                options3:{
-                    disabledDate (date) {
-                        return date && date.valueOf() < Date.now() - 86400000;
-                    }
-                },
-                searchForm:
-                    {
-                        areaId: '',
-                        companyId: '',
-                        userName: '',
 
-                    },
-                loading: false,
-                areaList: [],
-                companyList: [],
-                selectedRowInfo: [],
-                editSingleCompanyCollectionUserSettingModal: false,
-                editSingleCompanyCollectionTimeSettingModal: false,
-                assignSetModal:false,
-                selectAreaAndCity:false,
-                editCompanyCollectionUser:
-                   {
-                       editCompanyCollectionForm:
-                           {
-                               collectionGroup1Users: [],
-                               collectionGroup2Users: [],
-                               companyId: [],
-                               areaId:''
-                           },
-                       collectionGroup1AllUsers: [],
-                       collectionGroup2AllUsers: []
-                   },
-                editCompanyCollectionTime:
-                   {
-                       editCompanyCollectionForm:
-                           {
-                               overDueDays:'',
-                               startTime:'',
-                               note:'',
-                               colTimeId:''
-                           }
-                   },
-                editCompanyCollectionAssignSet:
-                    {
-                        editCompanyCollectionForm:
-                            {
-                                areaName:[],
-                                companyId:[],
-                                collectionGroup1Users:[],
-                                collectionGroup2Users:[]
-                            },
-                        collectionGroup1AllUsers: [],
-                        collectionGroup2AllUsers: [],
-                        areaList: [],
-                        companyId: []
-                    },
-                areaAndCity:
-                    {
-                        allAreas:[{
-                            title: '鸿特信息咨询有限公司',
-                            loading: false,
-                            children: []
-                        }],
-                        allCitys:[],
-                        allSelectedAreas:[],
-                        allSelectedCitys:[],
-                        selectedCitys:[],
-                        currentSelectedCitys:[],
-                        allSelectedCityGroup:[],
-                        currentCitys1:[],
-                        currentCitys2:[],
-                        currentCitys3:[],
-                        currentCitys4:[],
-                        currentCitys5:[],
-                        currentCitys6:[],
-                        currentCitys7:[],
-                        currentAreaId:""
-                    },
-                index:'',
-                ruleValidate:validateOpt
+                loading: false
+
             },
             computed: {},
             methods: {
@@ -344,29 +91,35 @@
 
                             , cols: [[
                                 {
-                                    field: 'companyId',
-                                    title: '分公司Id',
+                                    field: 'id',
+                                    title: 'id',
                                     align:'center',
                                 },
 
                                 {
-                                    field: 'areaName',
-                                    title: '区域',
+                                    field: 'jobName',
+                                    title: '定时器名称',
                                     align:'center'
                                 }, {
-                                    field: 'companyName',
-                                    title: '分公司',
+                                    field: 'flagLock',
+                                    title: '开关',
                                     align:'center'
                                 }, {
-                                    field: 'collect1Person',
-                                    title: '清算一',
+                                    field: 'timeType',
+                                    title: '时间类型',
                                     align:'center'
                                 }, {
-                                    field: 'collect2Person',
-                                    title: '清算二',
+                                    field: 'timeInterval',
+                                    title: '时间间隔',
                                     align:'center'
                                 }, {
+                                    field: 'activate',
+                                    title: '是否有效',
+                                    align:'center'
+                                },
+                                {
                                     fixed: 'right',
+                                    title: '操作',
                                     title: '操作',
                                     width: 100,
                                     align: 'center',
@@ -374,56 +127,7 @@
                                 }
 
                             ]], //设置表头
-                            url: basePath + 'collectionStrategy/getCollectionUserSettingList',
-
-                            page: true,
-                            done: function (res, curr, count) {
-                                //数据渲染完的回调。你可以借此做一些其它的操作
-                                //如果是异步请求数据方式，res即为你接口返回的信息。
-                                //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
-                                self.loading = false;
-                            }
-                        });
-
-                        ///////////////////////////////////////////////////////////////////////////
-                        //   时间设置页面参数
-                        ///////////////////////////////////////////////////////////////////////////
-
-
-                        table.render({
-                            elem: '#timeListTable' //指定原始表格元素选择器（推荐id选择器）
-                            , id: 'timeListTable'
-
-                            , cols: [[
-                                {
-                                    field: 'colTimeId',
-                                    title: '序号',
-                                    align:'center',
-                                },
-
-                                {
-                                    field: 'colType',
-                                    title: '移交类型',
-                                    align:'center'
-                                }, {
-                                    field: 'overDueDays',
-                                    title: '逾期天数',
-                                    align:'center'
-                                }, {
-                                    field: 'startTime',
-                                    title: '开始执行时间',
-                                    align:'center',
-
-                                }, {
-                                    fixed: 'right',
-                                    title: '操作',
-                                    width: 100,
-                                    align: 'center',
-                                    toolbar: '#timeListBarTools'
-                                }
-
-                            ]], //设置表头
-                            url: basePath + 'collectionStrategy/getCollectionTimeSettingList',
+                            url: basePath + 'timerSet/getTimetSetList',
 
                             page: true,
                             done: function (res, curr, count) {
@@ -438,40 +142,9 @@
 
                         //监听工具条
                         table.on('tool(listTable)', function (obj) {
-                            self.selectedRowInfo = obj.data;
-                            if (obj.event === 'edit') {
-                                showSingleCompanyCollectionUserSetting(companyCode)
 
-                            }
-                            if(obj.event === 'userSet'){
-                                self.editSingleCompanyCollectionUserSettingModal = true;
-                                self.editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup1Users=[];
-                                self.editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup2Users=[];
-                                var url = basePath + "collectionStrategy/company/getClearingPersons";
-                                axios.get(url)
-                                    .then(function (result) {
-                                        if (result.data.code == "1") {
-                                            self.editCompanyCollectionUser.collectionGroup1AllUsers = result.data.data.sysUser;
-                                            self.editCompanyCollectionUser.collectionGroup2AllUsers = result.data.data.sysUser;
-                                            self.editCompanyCollectionUser.editCompanyCollectionForm.areaId = obj.data.areaId;
-                                            self.editCompanyCollectionUser.editCompanyCollectionForm.companyId[0] = obj.data.companyId;
 
-                                        }
-                                    })
-                            }
-                        });
 
-                        ////////////////////////////////////////////////////////////////////////////////////
-
-                        ///////////////////////////////////////////////////////////////////////////////////
-
-                        //监听工具条
-                        table.on('tool(timeListTable)', function (obj) {
-                            self.selectedRowInfo = obj.data;
-                            if (obj.event === 'timeSet') {
-                                self.editSingleCompanyCollectionTimeSettingModal = true;
-                                self.editCompanyCollectionTime.editCompanyCollectionForm.colTimeId = obj.data.colTimeId;
-                            }
                         });
 
                     });
@@ -588,8 +261,8 @@
                             });
                         }else{
                             vm.$Message.error({content: '表单校验失败!'});
-                        }
-                    })
+                }
+                })
 
 
                 },
@@ -868,17 +541,7 @@
     var validateOpt = {
         overDueDays: [
             {required: true, message: '请输入逾期天数', trigger: 'blur'},
-            {
-                validator: function (rule, value, callback, source, options) {
-                    var reg = /^\+?[1-9]\d*$/;
-                    if (!reg.test(vm.editCompanyCollectionTime.editCompanyCollectionForm.overDueDays)) {
-                        callback(new Error('逾期天数只能输入正整数'));
-                    } else {
-                        callback();//校验通过
-                    }
-
-                }, trigger: 'blur'
-            }
+            { type: 'number', max: 20, message: '不能超过20个字符', trigger: 'blur' }
         ],
         startTime: [
             { required: true, type: 'date', message: '请选择开始时间', trigger: 'change' }

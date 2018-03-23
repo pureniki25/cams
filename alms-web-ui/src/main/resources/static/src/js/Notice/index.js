@@ -10,8 +10,9 @@ window.layinit(function (htConfig) {
     basePath = htConfig.coreBasePath
     let table = layui.table
     let laydate = layui.laydate
-
-
+    
+    
+    
     app = new Vue({
         el: "#app",
         data: {
@@ -28,7 +29,7 @@ window.layinit(function (htConfig) {
                 notice: {
                     noticeTitle: '',
                     publishTime: '',
-                    createUserId: 'xxxxx',
+                    createUserId: '',
                     noticeContent: '',
                     fileList: ''
                 }
@@ -36,8 +37,8 @@ window.layinit(function (htConfig) {
             schForm: {
                 title: '',
                 dateStart: '',
-                dateEnd: ''
-
+                dateEnd: '',
+                date:[]
             },
             editForm: {
                 noticeId: '',
@@ -52,6 +53,11 @@ window.layinit(function (htConfig) {
                 attachment: [
 
                 ]
+            },
+            dateOption:{
+                disabledDate(date){
+                    return date < new Date()
+                }
             },
             dateEndOption: {
                 disabledDate(date) {
@@ -147,6 +153,18 @@ window.layinit(function (htConfig) {
                 },
                 deep: true
             },
+            schForm:{
+                handler(c,o){
+                    console.log(c.date)
+                    if(c.date[0]&&c.date[1]){
+                        c.startDate = formatDate(c.date[0])
+                        c.endDate = formatDate(c.date[1])
+                    }else{
+                        c.startDate = ''
+                        c.endDate = ''
+                    }
+                },deep:true
+            }
         },
         created: function () {
             let arry = []
@@ -163,6 +181,18 @@ window.layinit(function (htConfig) {
             }).catch(function (error) {
 
             })
+
+            axios.get(basePath+'SysUser/getUserIdByToken')
+            .then(function(res){
+                if(res.data.code=='1'){
+                    app.userId = res.data.data 
+                }else{
+                    app.$Modal.error({content:'接口调用失败'})
+                }
+            })
+            .catch(function(err){
+                app.$Modal.error({content:'接口调用失败'})
+            })
         },
         methods: {
             onDateStartChange: function (date) {
@@ -170,6 +200,8 @@ window.layinit(function (htConfig) {
             },
             onDateEndChange: function (date) {
                 dateEnd = date
+            },onDateChange:function(date){
+                console.log(date)
             },
             openEditorModal: function (action, noticeId) {
                 if (action == 'add') {
@@ -301,7 +333,8 @@ window.layinit(function (htConfig) {
                             hasReadTimeUnit: 1,
                             orgCode: oc,
                             publishChannel: app.editForm.publishChannel,
-                            publishTime: dateFormat(app.editForm.publishDate),
+                            publishTime: dateFormat(new Date()),
+                            // publishTime: dateFormat(app.editForm.publishDate),
                             files: files
                         }
                         $.ajax({
@@ -341,14 +374,40 @@ window.layinit(function (htConfig) {
                 }
                 this.editForm.attachment.push(uploadItem);
             },
-            delUploadItem: function (id) {
-                this.editForm.attachment = this.editForm.attachment.filter(function (item) {
-                    return item.id != id
-                })
+            delUploadItem: function (o) {
 
-                this.editForm.attachment.forEach(function (item, i) {
-                    item.id = i + 1
-                })
+
+                console.log(o)
+
+                if(o.noticeFileId){
+                    axios.post(basePath+'notice/delAttachment',o)
+                    .then(function(res){
+                        if(res.data.code=='1'){
+                            app.editForm.attachment = app.editForm.attachment.filter(function (item) {
+                                return item.id != o.id
+                            })
+            
+                            app.editForm.attachment.forEach(function (item, i) {
+                                item.id = i + 1
+                            })
+                        }else{
+                            app.$Modal.error({content:'调用接口失败'})
+                        }
+                    })
+                    .catch(function(err){
+                        app.$Modal.error({content:'调用接口失败'})
+                    })
+                }else{
+                    this.editForm.attachment = this.editForm.attachment.filter(function (item) {
+                        return item.id != o.id
+                    })
+    
+                    this.editForm.attachment.forEach(function (item, i) {
+                        item.id = i + 1
+                    })
+                }
+
+                
             },
             beforeUpload: function (file) {
                 this.upload.data.fileName = file.name
@@ -383,7 +442,7 @@ window.layinit(function (htConfig) {
                 let notice = {
                     noticeTitle: form.title,
                     publishTime: form.publishDate,
-                    createUserId: 'xxxxx',
+                    createUserId: app.userId,
                     noticeContent: form.content,
                     fileList: fileList
                 }

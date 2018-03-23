@@ -217,7 +217,19 @@ public class CarAuction extends Model<CarAuction> {
 	@TableField("pay_way")
 	@ApiModelProperty(required= true,value = "支付方式 01竞买成功后，尾款线下支付 02竞买成功后，尾款线上支付")
 	private String payWay;
-
+	
+	@TableField("delay_period")
+	@ApiModelProperty(required= true,value = "延时周期")
+	private String delayPeriod;
+	
+	@TableField("trans_free")
+	@ApiModelProperty(required= true,value = "交易税费")
+	private BigDecimal transFree;
+	
+	
+	@TableField("remark")
+	@ApiModelProperty(required= true,value = "备注")
+	private String remark;
 
 	public String getBusinessId() {
 		return businessId;
@@ -483,6 +495,30 @@ public class CarAuction extends Model<CarAuction> {
 		this.payWay = payWay;
 	}
 
+	public String getDelayPeriod() {
+		return delayPeriod;
+	}
+
+	public void setDelayPeriod(String delayPeriod) {
+		this.delayPeriod = delayPeriod;
+	}
+
+	public BigDecimal getTransFree() {
+		return transFree;
+	}
+
+	public void setTransFree(BigDecimal transFree) {
+		this.transFree = transFree;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
 	@Override
 	protected Serializable pkVal() {
 		return this.auctionId;
@@ -523,7 +559,9 @@ public class CarAuction extends Model<CarAuction> {
 			", consEndTime=" + consEndTime +
 			", viewSampleAddr=" + viewSampleAddr +
 			", consultantAddr=" + consultantAddr +
-			", payWay=" + payWay +
+			", delayPeriod=" + delayPeriod +
+			", transFree=" + transFree +
+			", remark=" + remark +
 			"}";
 	}
 }

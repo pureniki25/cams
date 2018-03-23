@@ -96,6 +96,32 @@ public class WithholdingRepaymentLogController {
 	            return PageResult.error(500, "数据库访问异常");
 	        }
 	    }
+	    
+	    
+	    /**
+	     * 获取用户Id
+	     * @param req 分页请求数据
+	     * @author chenzs
+	     * @date 2018年3月22日
+	     * @return 菜单分页数据
+	     */
+
+	    @ApiOperation(value = "获取用户Id")
+	    @GetMapping("/getUserId")
+	    @ResponseBody
+	    public Result<String> getUserId(
+	    ){
+	    	String userId=loginUserInfoHelper.getUserId();
+
+	        if(userId!=null&&!userId.equals("")){
+	            return Result.success(userId);
+	        }else{
+	            return Result.error("500","无数据");
+	        }
+
+	        
+	    }
+	    
 	    /**
 	     * 获取详情
 	     * @author chenzs
@@ -138,7 +164,7 @@ public class WithholdingRepaymentLogController {
 	    	   req.setDateBegin(dateBegin);
 	    	   req.setDateEnd(dateEnd);
 	    	   req.setRepayStatus(repayStatus);
-	    	   req.setPlatfromId(platformId);
+	    	   req.setPlatformId(platformId);
 	       	String userId=loginUserInfoHelper.getUserId();
 	    	   req.setUserId(userId);
 	    	   RepaymentLogVO  repaymentLogVO=null;
@@ -148,14 +174,15 @@ public class WithholdingRepaymentLogController {
 	        String countByBusinessId=repaymentLogVO.getCountByBusinessId();
 	        
 	      //查找代扣成功流水总条数
+	        req.setRepayStatus("1");
 	        repaymentLogVO=withholdingRepaymentlogService.selectSumByLogId(req);
 	        String countbyLogId=repaymentLogVO.getCountbyLogId();
-                  req.setRepayStatus("1");
+	        //查找代扣成功总额
+	        String SumRepayAmount=repaymentLogVO.getSumRepayAmount();
 	    	//查找代扣业务成功总条数
             repaymentLogVO= withholdingRepaymentlogService.selectSumByBusinessId(req);
             String countByBusinessIdSucess=repaymentLogVO.getCountByBusinessId();
-	        //查找代扣成功总额
-	        String SumRepayAmount=repaymentLogVO.getSumRepayAmount();
+	
 	        retMap.put("countByBusinessIdSucess",countByBusinessIdSucess);
 	        retMap.put("countByBusinessId",countByBusinessId);
 	        retMap.put("countbyLogId",countbyLogId);
@@ -171,29 +198,17 @@ public class WithholdingRepaymentLogController {
 	    private  String excelSavePath;
 
 	    @ApiOperation(value = "还款计划日志表导出Excel  ")
-	    @PostMapping("/saveExcel")
-	    public Result<String> saveExcel(HttpServletRequest request, HttpServletResponse response,@ModelAttribute RepaymentLogReq req) throws Exception {
-	        EasyPoiExcelExportUtil.setResponseHead(response,"AfterLoanStandingBook.xls");
-	        req.setUserId(loginUserInfoHelper.getUserId());
+	    @GetMapping("/saveExcel")
+	    public void saveExcel(HttpServletRequest request, HttpServletResponse response,@ModelAttribute RepaymentLogReq req) throws Exception {
+	        EasyPoiExcelExportUtil.setResponseHead(response,"repaylogmengt.xls");
 	        List<RepaymentLogVO> list = withholdingRepaymentlogService.selectRepaymentLogExcel(req);
-
+ 
 	        Workbook workbook = ExcelExportUtil.exportExcel(new ExportParams(), RepaymentLogVO.class, list);
 
-	        String fileName =  UUID.randomUUID().toString()+".xls";
-	        System.out.println(fileName);
 
 
-	        Map<String,String> retMap = storageService.storageExcelWorkBook(workbook,fileName);
 
-//	        retMap.put("errorInfo","");
-//	        retMap.put("sucFlage","true");
-
-	        if(retMap.get("sucFlage").equals("true")){
-	            return  Result.success(fileName);
-	        }else{
-	            return Result.error("500", retMap.get("errorInfo"));
-	        }
-//	        workbook.write(response.getOutputStream());
+	        workbook.write(response.getOutputStream());
 
 
 	    }

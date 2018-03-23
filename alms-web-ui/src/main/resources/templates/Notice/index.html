@@ -49,11 +49,7 @@
                             <i-input :value.sync="schForm.title" v-model="schForm.title"></i-input>
                         </form-item>
                         <form-item label="发布时间">
-                            <Date-picker type="date" placeholder="开始时间" :value.sync="schForm.dateStart" v-model="schForm.dateStart" @on-change="onDateStartChange"
-                                :options="dateStartOption"></Date-picker>
-                            <span>至</span>
-                            <Date-picker type="date" placeholder="结束时间" :value.sync="schForm.dateEnd" v-model="schForm.dateEnd" @on-change="onDateEndChange"
-                                :options="dateEndOption"></Date-picker>
+                            <Date-picker type="daterange" placeholder="时间范围" :value.sync="schForm.date" v-model="schForm.date"  ></Date-picker>
                         </form-item>
                         <i-button @click="search">查询</i-button>
                     </i-form>
@@ -127,13 +123,13 @@
                         </form-item>
                     </i-col>
                 </row>
-                <row>
+                <!-- <row>
                     <i-col span="8">
                         <form-item label="公告发布时间" prop="publishDate">
                             <date-picker type="date" :value.sync="editForm.publishDate" v-model="editForm.publishDate" @on-change="onDateChange"></date-picker>
                         </form-item>
                     </i-col>
-                </row>
+                </row> -->
                 <row>
                     <i-col span="24">
                         <form-item label="内容" prop="content" style="width:100%">
@@ -163,7 +159,7 @@
                             <i-input :value.sync="item.noticeFileNewName" v-model="item.noticeFileNewName"></i-input>
                         </i-col>
                         <i-col span="4" style="text-align:center">
-                            <i-button type="ghost" @click="delUploadItem(item.id)">删除</i-button>
+                            <i-button type="ghost" @click="delUploadItem(item)">删除</i-button>
                         </i-col>
                     </row>
                 </card>
