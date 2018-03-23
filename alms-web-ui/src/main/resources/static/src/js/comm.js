@@ -36,7 +36,7 @@ var expoertExcel = function (url,data) {
                 var ExportForm = document.createElement("FORM");
                 document.body.appendChild(ExportForm);
                 ExportForm.method = "GET";
-                ExportForm.action = basePath + "core/downLoadController/excelFiles";
+                ExportForm.action = basePath + "downLoadController/excelFiles";
                 addInput(ExportForm, "text", "filename", fileName);//区域ID
                 // http://localhost:30111/alms/core/collection/saveExcel?files=64eda1f0-8f76-4833-94f2-3407380ab37b.xls
                 ExportForm.submit();

@@ -127,7 +127,8 @@ eureka:
     prefer-ip-address: true
   client:
     serviceUrl:
-      defaultZone: ${EUREKA_SERVER_ADDRESS} # 配置注册中心url
+      defaultZone: http://10.100.1.74:30101/eureka/,http://10.100.1.75:30102/eureka/,http://10.100.1.76:30103/eureka/
+#       ${EUREKA_SERVER_ADDRESS} # 配置注册中心url
 ht:
   config:
     ui:
