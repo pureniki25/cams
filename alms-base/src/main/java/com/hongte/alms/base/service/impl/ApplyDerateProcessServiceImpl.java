@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.entity.ApplyDerateProcess;
 import com.hongte.alms.base.entity.BasicCompany;
+import com.hongte.alms.base.entity.SysUser;
 import com.hongte.alms.base.enums.ProcessEngineFlageEnums;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
 import com.hongte.alms.base.mapper.ApplyDerateProcessMapper;
@@ -15,6 +16,7 @@ import com.hongte.alms.base.process.enums.ProcessStepTypeEnums;
 import com.hongte.alms.base.process.enums.ProcessTypeEnums;
 import com.hongte.alms.base.process.service.*;
 import com.hongte.alms.base.process.vo.ProcessSaveReq;
+import com.hongte.alms.base.service.SysUserService;
 import com.hongte.alms.base.vo.module.ApplyDerateProcessReq;
 import com.hongte.alms.base.process.vo.ProcessLogReq;
 import com.hongte.alms.base.service.ApplyDerateProcessService;
@@ -83,6 +85,11 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
     @Autowired
 //    @Qualifier("loginUserInfoHelper")
     LoginUserInfoHelper loginUserInfoHelper;
+
+
+    @Autowired
+    @Qualifier("SysUserService")
+    SysUserService sysUserService;
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -190,11 +197,16 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
                 vo.setDistrictAreaName(arealist.get(0).getAreaName());
 
             }
-            LoginInfoDto uInfo = loginUserInfoHelper.getLoginInfo();
-            String userName = uInfo!=null?uInfo.getUserName():loginUserInfoHelper.getUserId();
+
+            SysUser sysUser = sysUserService.selectById(vo.getCreaterId());
+            String userName = sysUser!=null?sysUser.getUserName():vo.getCreaterId();
             vo.setCreaterName(userName);
+
+
+
+//            LoginInfoDto uInfo = loginUserInfoHelper.getLoginInfo();
             vo.setDerateTypeName(sysParameterService.seleByParamTypeAndvalue(SysParameterTypeEnums.DERATE_TYPE, vo.getDerateTypeId()).getParamName());
-            vo.setShowPayMoney("100");     //后续计算
+//            vo.setShowPayMoney("100");     //后续计算
         }
         return list;
     }
