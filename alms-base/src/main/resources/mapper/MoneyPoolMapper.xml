@@ -28,55 +28,12 @@
         <result column="create_user" property="createUser" />
         <result column="update_time" property="updateTime" />
         <result column="update_user" property="updateUser" />
+        <result column="create_user_role" property="createUserRole" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        money_pool_id AS moneyPoolId, xd_pool_id AS xdPoolId, pay_code AS payCode, remit_bank AS remitBank, trade_date AS tradeDate, trade_type AS tradeType, abstract, trade_place AS tradePlace, account_money AS accountMoney, income_type AS incomeType, trade_remark AS tradeRemark, gainer_name AS gainerName, finance_status AS financeStatus, status, import_user AS importUser, import_user_name AS importUserName, import_time AS importTime, accept_bank AS acceptBank, is_manual_create AS isManualCreate, is_temporary AS isTemporary, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
+        money_pool_id AS moneyPoolId, xd_pool_id AS xdPoolId, pay_code AS payCode, remit_bank AS remitBank, trade_date AS tradeDate, trade_type AS tradeType, summary, trade_place AS tradePlace, account_money AS accountMoney, income_type AS incomeType, trade_remark AS tradeRemark, gainer_name AS gainerName, finance_status AS financeStatus, status, import_user AS importUser, import_user_name AS importUserName, import_time AS importTime, accept_bank AS acceptBank, is_manual_create AS isManualCreate, is_temporary AS isTemporary, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser, create_user_role AS createUserRole
     </sql>
 
-	<select id="listMoneyPool" resultType="com.hongte.alms.base.vo.module.MoneyPoolVO">
-		SELECT 
-		    tmp.money_pool_id as id,
-		    tmp.trade_date as repaymentDate,
-		    tmp.account_money as repaymentMoney,
-		    tmp.remit_bank as realRepaymentUser,
-		    tmp.accept_bank as acceptBank,
-		    tmp.trade_type as tradeType,
-		    tmp.trade_place as tradePlace,
-		    tmp.finance_status as status,
-		    tmp.update_user as updateUser,
-		    tmp.update_time as updateTime,
-		    tmpr.certificate_picture_url as certUrl
-		FROM
-		    tb_money_pool_repayment tmpr
-		        LEFT JOIN
-		    tb_repayment_biz_plan_list trbpl ON trbpl.plan_list_id = tmpr.plan_list_id
-		        LEFT JOIN
-		    tb_money_pool tmp ON tmp.money_pool_id = tmpr.money_pool_id
-		WHERE
-		    trbpl.business_id = #{businessId}
-		        AND trbpl.after_id = #{afterId}
-		        AND (tmpr.is_deleted = 0 || tmpr.is_deleted is null )
-		ORDER BY 
-			tmp.update_time desc,
-			tmp.trade_date desc
-		<if test="page != null and limit != null">
-			LIMIT ${(page-1) * limit}, #{limit,jdbcType=DECIMAL}
-		</if>
-	</select>
-	<select id="listMoneyPoolCount" resultType="int">
-		SELECT 
-		    COUNT(1)
-		FROM
-		    tb_money_pool_repayment tmpr
-		        LEFT JOIN
-		    tb_repayment_biz_plan_list trbpl ON trbpl.plan_list_id = tmpr.plan_list_id
-		        LEFT JOIN
-		    tb_money_pool tmp ON tmp.money_pool_id = tmpr.money_pool_id
-		WHERE
-		    trbpl.business_id = #{businessId}
-		        AND trbpl.after_id = #{afterId}
-		        AND (tmpr.is_deleted = 0 || tmpr.is_deleted is null )
-	</select>    
 </mapper>

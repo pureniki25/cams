@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
+import com.hongte.alms.base.assets.car.vo.FileVo;
 import com.hongte.alms.base.collection.service.CollectionLogService;
 import com.hongte.alms.base.collection.service.CollectionStatusService;
 import com.hongte.alms.base.collection.service.PhoneUrgeService;
@@ -14,6 +15,9 @@ import com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo;
 import com.hongte.alms.base.entity.ApplyDerateProcess;
 import com.hongte.alms.base.entity.BasicBusinessType;
 import com.hongte.alms.base.entity.BasicCompany;
+import com.hongte.alms.base.entity.Doc;
+import com.hongte.alms.base.entity.DocTmp;
+import com.hongte.alms.base.entity.DocType;
 import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.enums.AreaLevel;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
@@ -41,7 +45,11 @@ import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.core.storage.StorageService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.LoginInfoDto;
+import com.ht.ussp.util.BeanUtils;
+
 import io.swagger.annotations.ApiOperation;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import org.jeecgframework.poi.excel.ExcelExportUtil;
@@ -119,6 +127,18 @@ public class ApplyDerateController {
     @Autowired
     @Qualifier("SysParameterService")
     SysParameterService sysParameterService;
+    
+    @Autowired
+	@Qualifier("DocTypeService")
+	private DocTypeService docTypeService;
+
+    @Autowired
+	@Qualifier("DocService")
+	private DocService docService;
+
+	@Autowired
+	@Qualifier("DocTmpService")
+	private DocTmpService docTmpService;
 
     @Autowired
 //    @Qualifier("storageService")
@@ -157,6 +177,20 @@ public class ApplyDerateController {
             }
 
             processService.getProcessShowInfo(retMap,processId, ProcessTypeEnums.Apply_Derate);
+            
+            String businessId = "";
+            
+            if (!CollectionUtils.isEmpty(businessVoList)) {
+            	businessId = businessVoList.get(0).getBusinessId();
+			}
+         // 查询附件
+			List<DocType> docTypes = docTypeService
+					.selectList(new EntityWrapper<DocType>().eq("type_code", "AfterLoan_Material_Litigation"));
+			if (docTypes != null && docTypes.size() == 1) {
+				List<Doc> fileList = docService.selectList(new EntityWrapper<Doc>()
+						.eq("doc_type_id", docTypes.get(0).getDocTypeId()).eq("business_id", businessId).orderBy("doc_id"));
+				retMap.put("returnRegFiles", fileList);
+			}
 
 /*
 
@@ -241,10 +275,27 @@ public class ApplyDerateController {
     @PostMapping("/saveApplyDerateInfo")
     @ResponseBody
     public Result<String> saveApplyDerateInfo(
-            @RequestBody ApplyDerateProcessReq req){
+            @RequestBody Map<String, Object> reqMap){
+    	
         Result result = new Result();
         try{
-            applyDerateProcessService.saveApplyDerateProcess(req);
+        	List<FileVo> files = JsonUtil.map2objList(reqMap.get("reqRegFiles"), FileVo.class);
+        	List<ApplyDerateProcessReq> req = JsonUtil.map2objList(reqMap.get("applyData"), ApplyDerateProcessReq.class);
+        	if (!CollectionUtils.isEmpty(req)) {
+        		applyDerateProcessService.saveApplyDerateProcess(req.get(0));
+			}
+        	if (!CollectionUtils.isEmpty(files)) {
+    			for (FileVo file : files) {
+    				DocTmp tmp = docTmpService.selectById(file.getOldDocId());// 将临时表保存的上传信息保存到主表中
+    				if (tmp != null) {
+    					Doc doc = new Doc();
+    					BeanUtils.copyProperties(tmp, doc);
+    					doc.setOriginalName(file.getOriginalName());
+    					docService.insertOrUpdate(doc);
+    				}
+    			}
+    		}
+            
             return Result.success();
         }catch (Exception ex){
             logger.error(ex.getMessage());

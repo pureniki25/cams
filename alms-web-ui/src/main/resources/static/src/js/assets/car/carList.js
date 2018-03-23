@@ -245,7 +245,7 @@ window.layinit(function (htConfig) {
                     }, {
 
                         field: 'repaidAmount',
-                        title: '应还金额'
+                        title: '已还金额'
                     }, {
 
                         field: 'licensePlateNumber',

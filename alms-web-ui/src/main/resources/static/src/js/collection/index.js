@@ -174,31 +174,31 @@ window.layinit(function(htConfig){
 		                    if (valid) {debugger
 		                        var dateObj = getData();
 		                        vm.exporting = true;
-		//                        expoertExcel(basePath + "collection/saveExcel",vm.searchForm);
-		                        var ExportForm = document.createElement("FORM");
-		                        document.body.appendChild(ExportForm);
-		                        ExportForm.method = "POST";
-		                        ExportForm.action = basePath+"collection/saveExcel";
-		                        ExportForm.target = "iframe";
-		                        addInput(ExportForm, "text", "areaId", vm.searchForm.areaId);//区域ID
-		                        addInput(ExportForm, "text", "companyId", vm.searchForm.companyId); //分公司ID
-		                        addInput(ExportForm, "text", "showRepayDateBegin", dateObj.showRepayDateBegin); 
-		                        addInput(ExportForm, "text", "showRepayDateEnd",dateObj.showRepayDateEnd); 
-		                        addInput(ExportForm, "text", "realRepayDateBegin", dateObj.realRepayDateBegin);    
-		                        addInput(ExportForm, "text", "realRepayDateEnd", dateObj.realRepayDateEnd);    
-		                        addInput(ExportForm, "text", "delayDaysBegin", vm.searchForm.delayDaysBegin);    
-		                        addInput(ExportForm, "text", "delayDaysEnd", vm.searchForm.delayDaysEnd);    
-		                        addInput(ExportForm, "text", "collectLevel", vm.searchForm.collectLevel);     
-		                        addInput(ExportForm, "text", "operatorName", vm.searchForm.operatorName);    
-		                        addInput(ExportForm, "text", "businessId", vm.searchForm.businessId);     
-		                        addInput(ExportForm, "text", "businessType", vm.searchForm.businessType);    
-		                        addInput(ExportForm, "text", "liquidationOne", vm.searchForm.liquidationOne);    
-		                        addInput(ExportForm, "text", "liquidationTow", vm.searchForm.liquidationTow);     
-		                        addInput(ExportForm, "text", "businessStatus", vm.searchForm.businessStatus);    
-		                        addInput(ExportForm, "text", "repayStatus", vm.searchForm.repayStatus);    
-		                        addInput(ExportForm, "text", "customerName", vm.searchForm.customerName);    
-		                        ExportForm.submit();
-		                        document.body.removeChild(ExportForm);
+		                        expoertExcel(basePath + "collection/saveExcel",vm.searchForm);
+		//                         var ExportForm = document.createElement("FORM");
+		//                         document.body.appendChild(ExportForm);
+		//                         ExportForm.method = "POST";
+		//                         ExportForm.action = basePath+"collection/saveExcel";
+		//                         ExportForm.target = "iframe";
+		//                         addInput(ExportForm, "text", "areaId", vm.searchForm.areaId);//区域ID
+		//                         addInput(ExportForm, "text", "companyId", vm.searchForm.companyId); //分公司ID
+		//                         addInput(ExportForm, "text", "showRepayDateBegin", dateObj.showRepayDateBegin);
+		//                         addInput(ExportForm, "text", "showRepayDateEnd",dateObj.showRepayDateEnd);
+		//                         addInput(ExportForm, "text", "realRepayDateBegin", dateObj.realRepayDateBegin);
+		//                         addInput(ExportForm, "text", "realRepayDateEnd", dateObj.realRepayDateEnd);
+		//                         addInput(ExportForm, "text", "delayDaysBegin", vm.searchForm.delayDaysBegin);
+		//                         addInput(ExportForm, "text", "delayDaysEnd", vm.searchForm.delayDaysEnd);
+		//                         addInput(ExportForm, "text", "collectLevel", vm.searchForm.collectLevel);
+		//                         addInput(ExportForm, "text", "operatorName", vm.searchForm.operatorName);
+		//                         addInput(ExportForm, "text", "businessId", vm.searchForm.businessId);
+		//                         addInput(ExportForm, "text", "businessType", vm.searchForm.businessType);
+		//                         addInput(ExportForm, "text", "liquidationOne", vm.searchForm.liquidationOne);
+		//                         addInput(ExportForm, "text", "liquidationTow", vm.searchForm.liquidationTow);
+		//                         addInput(ExportForm, "text", "businessStatus", vm.searchForm.businessStatus);
+		//                         addInput(ExportForm, "text", "repayStatus", vm.searchForm.repayStatus);
+		//                         addInput(ExportForm, "text", "customerName", vm.searchForm.customerName);
+		//                         ExportForm.submit();
+		//                         document.body.removeChild(ExportForm);
 		                        vm.exporting = false;
 		
 		                    }

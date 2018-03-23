@@ -20,8 +20,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -121,7 +123,7 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
 
         List<AfterLoanStandingBookVo> list = phoneUrgeMapper.selectAfterLoadStanding(pages,req);
 
-        setExtInfo(list);
+//        setExtInfo(list);
 
 //        pages.setRecords(setInfoForAfterLoanStandingBookVo(list));
         pages.setRecords(list);
@@ -130,21 +132,41 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
     }
 
     public List<AfterLoanStandingBookVo>  setExtInfo(List<AfterLoanStandingBookVo> list){
+        List<SysUser> users = sysUserService.selectList(new EntityWrapper<SysUser>());
+        Map<String,SysUser> userMap = new HashMap<>();
+        for(SysUser user:users){
+            userMap.put(user.getUserId(),user);
+        }
+
+        List<SysParameter> parameters = sysParameterService.selectList(new EntityWrapper<SysParameter>().
+                eq("param_type",SysParameterTypeEnums.COLLECTION_STATUS.getKey()));
+        Map<String,SysParameter> parameterMap = new HashMap<>();
+        for(SysParameter sysParameter:parameters){
+            parameterMap.put(sysParameter.getParamValue(),sysParameter);
+        }
+
         for(AfterLoanStandingBookVo vo: list){
-            SysUser user = sysUserService.selectById(vo.getPhoneStaffId());
+
+            SysUser user = userMap.get(vo.getPhoneStaffId());
+//            SysUser user = sysUserService.selectById(vo.getPhoneStaffId());
             if(user!=null){
                 vo.setPhoneStaffName(user.getUserName());
             }
-            user = sysUserService.selectById(vo.getVisitStaffId());
+            user = userMap.get(vo.getVisitStaffId());
+//            user = sysUserService.selectById(vo.getVisitStaffId());
             if(user!=null){
                 vo.setVisitStaffName(user.getUserName());
             }
-            List<SysParameter> pList = sysParameterService.selectList(new EntityWrapper<SysParameter>().
-                    eq("param_type",SysParameterTypeEnums.COLLECTION_STATUS.getKey())
-                    .eq("param_value",vo.getColStatus()));
-            if(pList.size()>0){
-                vo.setAfterColStatusName(pList.get(0).getParamName());
+//            List<SysParameter> pList = sysParameterService.selectList(new EntityWrapper<SysParameter>().
+//                    eq("param_type",SysParameterTypeEnums.COLLECTION_STATUS.getKey())
+//                    .eq("param_value",vo.getColStatus()));
+            SysParameter  parameter =parameterMap.get(vo.getColStatus());
+            if(parameter!=null){
+                vo.setAfterColStatusName(parameter.getParamName());
             }
+//            if(pList.size()>0){
+//                vo.setAfterColStatusName(pList.get(0).getParamName());
+//            }
         }
         return list;
     }
@@ -172,7 +194,8 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
     public List<AfterLoanStandingBookVo> selectAfterLoanStandingBookList(AfterLoanStandingBookReq req){
         setAfterLoanStandingBookReqInfo(req);
 //        return  setInfoForAfterLoanStandingBookVo(phoneUrgeMapper.selectAfterLoadStanding(req));
-        return setExtInfo(phoneUrgeMapper.selectAfterLoadStanding(req));
+        return phoneUrgeMapper.selectAfterLoadStanding(req);
+//        return setExtInfo(phoneUrgeMapper.selectAfterLoadStanding(req));
 //        return  phoneUrgeMapper.selectAfterLoadStanding(req);
     }
 

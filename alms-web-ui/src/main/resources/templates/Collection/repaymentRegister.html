@@ -77,7 +77,8 @@
                         <date-picker type="date" :value.sync="editForm.repaymentDate" v-model="editForm.repaymentDate" @on-change="editForm.repaymentDate=$event" :options="DateOptions" placement="bottom-end" placeholder="选择日期" style="width: 50%"></date-picker>
                     </form-item>
                     <form-item label="还款金额" prop="repaymentMoney"  >
-                        <i-input type="text" :value.sync="editForm.repaymentMoney" v-model="editForm.repaymentMoney" style="width:50%;display:inline-block;" ></i-input>
+                        <input-number   :step="0.01"  v-model="editForm.repaymentMoney" style="width:50%;display:inline-block;" ></input-number>
+                        <!-- <i-input type="text" :value.sync="editForm.repaymentMoney" v-model="editForm.repaymentMoney" style="width:50%;display:inline-block;" ></i-input> -->
                         <span style="color:#FF0000">{{ArabicToChinese(editForm.repaymentMoney)}}</span>
                     </form-item>
                     <form-item label="实际还款人" prop="realRepaymentUser"  >
@@ -118,7 +119,7 @@
                             :on-format-error="onFormatError"
                             :on-exceeded-size="onExceededSize"
                             >
-                                <i-button type="ghost" icon="ios-cloud-upload-outline">上传凭证</i-button>
+                                <i-button type="ghost" icon="ios-cloud-upload-outline">{{editForm.certUrl&&editForm.certUrl.length?'重新上传凭证':'上传凭证'}}</i-button>
                             </Upload>
                     </form-item>
                     <form-item label="备注" prop="remark"  >

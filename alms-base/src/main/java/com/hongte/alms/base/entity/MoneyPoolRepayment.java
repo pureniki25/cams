@@ -3,6 +3,12 @@ package com.hongte.alms.base.entity;
 import java.io.Serializable;
 
 import com.baomidou.mybatisplus.enums.IdType;
+import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
+import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
+import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.util.DateUtil;
+
+import java.math.BigDecimal;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
@@ -17,24 +23,12 @@ import io.swagger.annotations.ApiModelProperty;
  * </p>
  *
  * @author 王继光
- * @since 2018-03-15
+ * @since 2018-03-23
  */
 @ApiModel
 @TableName("tb_money_pool_repayment")
 public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
-	public MoneyPoolRepayment(String moneyPoolId) {
-		super();
-		if (moneyPoolId == null) {
-			throw new RuntimeException("moneyPoolId can't be null");
-		}
-		this.moneyPoolId = moneyPoolId;
-	}
 
-	public MoneyPoolRepayment() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-	 
     private static final long serialVersionUID = 1L;
 
     /**
@@ -55,22 +49,12 @@ public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
 	@TableField("xd_pool_id")
 	@ApiModelProperty(required= true,value = "原信贷款项池ID")
 	private Integer xdPoolId;
-	
+    /**
+     * 原信贷业务款项池关联表主键ID，对应tb_money_pool_carbusiness.id
+     */
 	@TableField("xd_matching_id")
 	@ApiModelProperty(required= true,value = "原信贷业务款项池关联表主键ID，对应tb_money_pool_carbusiness.id")
-	private Integer xdMatchingId ;
-    /**
-     * 原业务编号
-     */
-	/*@TableField("original_business_id")
-	@ApiModelProperty(required= true,value = "原业务编号")
-	private String originalBusinessId;*/
-    /**
-     * 期数
-     */
-	/*@TableField("after_id")
-	@ApiModelProperty(required= true,value = "期数")
-	private String afterId;*/
+	private Integer xdMatchingId;
     /**
      * 还款计划期数ID，外键，对应tb_repayment_biz_plan_list表的plan_list_id
      */
@@ -195,7 +179,114 @@ public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
 	@TableField("delete_time")
 	@ApiModelProperty(required= true,value = "删除时间")
 	private Date deleteTime;
+    /**
+     * 记账金额(元)
+     */
+	@TableField("account_money")
+	@ApiModelProperty(required= true,value = "记账金额(元)")
+	private BigDecimal accountMoney;
+    /**
+     * 转入时间
+     */
+	@TableField("trade_date")
+	@ApiModelProperty(required= true,value = "转入时间")
+	private Date tradeDate;
+    /**
+     * 创建人角色,客户/财务
+     */
+	@TableField("create_user_role")
+	@ApiModelProperty(required= true,value = "创建人角色,客户/财务")
+	private String createUserRole;
 
+
+	/**
+	 * @param repayInfo
+	 */
+	public MoneyPoolRepayment(RepaymentRegisterInfoDTO repayInfo) {
+		super();
+		if (repayInfo==null) {
+			throw new RuntimeException("repayInfo is null!!!");
+		}
+		if (repayInfo.getAcceptBank()!=null&&!repayInfo.getAcceptBank().equals("")) {
+			this.bankAccount = repayInfo.getAcceptBank();
+		}
+		if (repayInfo.getCert()!=null&&!repayInfo.getCert().equals("")) {
+			this.certificatePictureUrl = repayInfo.getCert();
+		}
+		if(repayInfo.getFactRepaymentUser()!=null&&!repayInfo.getFactRepaymentUser().equals("")) {
+			this.factTransferName = repayInfo.getFactRepaymentUser();
+		}
+		if(repayInfo.getRemark()!=null&&!repayInfo.getRemark().equals("")) {
+			this.remark = repayInfo.getRemark() ;
+		}
+		if (repayInfo.getRepaymentDate()!=null&&!repayInfo.getRepaymentDate().equals("")) {
+			this.tradeDate = DateUtil.getDate(repayInfo.getRepaymentDate());
+		}
+		if (repayInfo.getRepaymentMoney()!=null&&!repayInfo.getRepaymentMoney().equals("")) {
+			this.accountMoney = new BigDecimal(repayInfo.getRepaymentMoney());
+		}
+		if (repayInfo.getTradePlace()!=null&&!repayInfo.getTradePlace().equals("")) {
+			this.tradePlace = repayInfo.getTradePlace();
+		}
+		if (repayInfo.getUserId()!=null&&!repayInfo.getUserId().equals("")) {
+			this.createUser = repayInfo.getUserId();
+		}
+		if (repayInfo.getTradeType()!=null&&!repayInfo.getTradeType().equals("")) {
+			this.tradeType = repayInfo.getTradeType();
+		}
+	}
+	
+	public void update(RepaymentRegisterInfoDTO repayInfo) {
+		if (repayInfo==null) {
+			throw new RuntimeException("repayInfo is null!!!");
+		}
+		if (this.state.equals(RepayRegisterFinanceStatus.财务确认已还款.toString())) {
+			throw new RuntimeException( "财务确认已还款,不可以再编辑"); 
+		}
+		if (this.state.equals(RepayRegisterFinanceStatus.财务指定银行流水.toString())) {
+			throw new RuntimeException("财务指定银行流水,不可以再编辑"); 
+		}
+		
+		if (repayInfo.getAcceptBank()!=null&&!repayInfo.getAcceptBank().equals("")) {
+			this.bankAccount = repayInfo.getAcceptBank();
+		}
+		if (repayInfo.getCert()!=null&&!repayInfo.getCert().equals("")) {
+			this.certificatePictureUrl = repayInfo.getCert();
+		}
+		if(repayInfo.getFactRepaymentUser()!=null&&!repayInfo.getFactRepaymentUser().equals("")) {
+			this.factTransferName = repayInfo.getFactRepaymentUser();
+		}
+		if(repayInfo.getRemark()!=null) {
+			this.remark = repayInfo.getRemark() ;
+		}
+		if (repayInfo.getRepaymentDate()!=null&&!repayInfo.getRepaymentDate().equals("")) {
+			this.tradeDate = DateUtil.getDate(repayInfo.getRepaymentDate());
+		}
+		if (repayInfo.getRepaymentMoney()!=null&&!repayInfo.getRepaymentMoney().equals("")) {
+			this.accountMoney = new BigDecimal(repayInfo.getRepaymentMoney());
+		}
+		if (repayInfo.getTradePlace()!=null&&!repayInfo.getTradePlace().equals("")) {
+			this.tradePlace = repayInfo.getTradePlace();
+		}
+		if (repayInfo.getUserId()!=null&&!repayInfo.getUserId().equals("")) {
+			this.createUser = repayInfo.getUserId();
+		}
+		if (repayInfo.getTradeType()!=null&&!repayInfo.getTradeType().equals("")) {
+			this.tradeType = repayInfo.getTradeType();
+		}
+		
+		if (this.state.equals(RepayRegisterFinanceStatus.还款登记被拒绝.toString())
+				||this.state.equals(RepayRegisterFinanceStatus.还款待确认.toString())) {
+			this.state = RepayRegisterFinanceStatus.未关联银行流水.toString();
+		}
+	}
+
+	/**
+	 * 
+	 */
+	public MoneyPoolRepayment() {
+		// TODO Auto-generated constructor stub
+	}
 
 	public Integer getId() {
 		return id;
@@ -221,22 +312,14 @@ public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
 		this.xdPoolId = xdPoolId;
 	}
 
-	/*public String getOriginalBusinessId() {
-		return originalBusinessId;
+	public Integer getXdMatchingId() {
+		return xdMatchingId;
 	}
 
-	public void setOriginalBusinessId(String originalBusinessId) {
-		this.originalBusinessId = originalBusinessId;
+	public void setXdMatchingId(Integer xdMatchingId) {
+		this.xdMatchingId = xdMatchingId;
 	}
 
-	public String getAfterId() {
-		return afterId;
-	}
-
-	public void setAfterId(String afterId) {
-		this.afterId = afterId;
-	}
-*/
 	public String getPlanListId() {
 		return planListId;
 	}
@@ -405,6 +488,30 @@ public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
 		this.deleteTime = deleteTime;
 	}
 
+	public BigDecimal getAccountMoney() {
+		return accountMoney;
+	}
+
+	public void setAccountMoney(BigDecimal accountMoney) {
+		this.accountMoney = accountMoney;
+	}
+
+	public Date getTradeDate() {
+		return tradeDate;
+	}
+
+	public void setTradeDate(Date tradeDate) {
+		this.tradeDate = tradeDate;
+	}
+
+	public String getCreateUserRole() {
+		return createUserRole;
+	}
+
+	public void setCreateUserRole(String createUserRole) {
+		this.createUserRole = createUserRole;
+	}
+
 	@Override
 	protected Serializable pkVal() {
 		return this.id;
@@ -416,6 +523,7 @@ public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
 			", id=" + id +
 			", moneyPoolId=" + moneyPoolId +
 			", xdPoolId=" + xdPoolId +
+			", xdMatchingId=" + xdMatchingId +
 			", planListId=" + planListId +
 			", operateId=" + operateId +
 			", operateName=" + operateName +
@@ -437,20 +545,9 @@ public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
 			", isDeleted=" + isDeleted +
 			", deleteUser=" + deleteUser +
 			", deleteTime=" + deleteTime +
+			", accountMoney=" + accountMoney +
+			", tradeDate=" + tradeDate +
+			", createUserRole=" + createUserRole +
 			"}";
-	}
-
-	/**
-	 * @return the xdMatchingId
-	 */
-	public Integer getXdMatchingId() {
-		return xdMatchingId;
-	}
-
-	/**
-	 * @param xdMatchingId the xdMatchingId to set
-	 */
-	public void setXdMatchingId(Integer xdMatchingId) {
-		this.xdMatchingId = xdMatchingId;
 	}
 }

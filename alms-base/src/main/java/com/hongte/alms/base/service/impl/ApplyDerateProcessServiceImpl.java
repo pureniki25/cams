@@ -195,13 +195,11 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
             List<BasicCompany> arealist =  basicCompanyService.selectList(new EntityWrapper<BasicCompany>().eq("area_id",vo.getDistrictId()));
             if(arealist.size()>0){
                 vo.setDistrictAreaName(arealist.get(0).getAreaName());
-
             }
 
             SysUser sysUser = sysUserService.selectById(vo.getCreaterId());
             String userName = sysUser!=null?sysUser.getUserName():vo.getCreaterId();
             vo.setCreaterName(userName);
-
 
 
 //            LoginInfoDto uInfo = loginUserInfoHelper.getLoginInfo();
