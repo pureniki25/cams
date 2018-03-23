@@ -392,7 +392,7 @@ window.layinit(function (htConfig) {
         } else if (data.event == 'edit') {
             app.openEditModal(data.data.id);
         } else if (data.event == 'checkCert') {
-            app.openCertModal(data.data.certUrl)
+            app.openCertModal(data.data.certificatePictureUrl)
         }
     });
 

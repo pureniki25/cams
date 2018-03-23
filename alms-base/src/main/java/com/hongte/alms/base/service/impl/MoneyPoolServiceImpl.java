@@ -79,8 +79,8 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 	}
 
 	@Override
-	public List<MatchedMoneyPoolVO> listMatchedMoneyPool(String businessId, String afterId) {
-		return null;
+	public List<MatchedMoneyPoolVO> listMatchedMoneyPool(String planListId) {
+		return moneyPoolMapper.listMatchedMoneyPool(planListId);
 	}
 
 	@Override

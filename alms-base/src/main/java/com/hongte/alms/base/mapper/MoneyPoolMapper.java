@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import com.hongte.alms.base.entity.MoneyPool;
+import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
 import com.hongte.alms.base.vo.module.MoneyPoolVO;
 import com.hongte.alms.common.mapper.SuperMapper;
 
@@ -17,4 +18,5 @@ import com.hongte.alms.common.mapper.SuperMapper;
  * @since 2018-03-23
  */
 public interface MoneyPoolMapper extends SuperMapper<MoneyPool> {
+	List<MatchedMoneyPoolVO> listMatchedMoneyPool(@Param("planListId") String planListId);
 }

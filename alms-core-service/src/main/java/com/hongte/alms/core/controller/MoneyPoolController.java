@@ -2,6 +2,7 @@ package com.hongte.alms.core.controller;
 
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -25,6 +26,7 @@ import com.hongte.alms.base.assets.car.vo.FileVo;
 import com.hongte.alms.base.collection.service.CollectionTrackLogService;
 import com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
+import com.hongte.alms.base.entity.MoneyPool;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
 import com.hongte.alms.base.entity.RenewalBusiness;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
@@ -116,7 +118,7 @@ public class MoneyPoolController {
 	}
 
 	
-	@ApiOperation(value = "获取匹配的款项池")
+	/*@ApiOperation(value = "获取匹配的款项池")
 	@GetMapping("/listMatched")
 	@ResponseBody
 	public Result<List<MatchedMoneyPoolVO>> listMatchedMoneyPool(@RequestParam("businessId") String businessId,
@@ -129,7 +131,7 @@ public class MoneyPoolController {
 			logger.error(e.getMessage());
 			return Result.error("500", e.getMessage());
 		}
-	}
+	}*/
 
 	@ApiOperation(value = "新增/编辑 还款登记(若参数有moneyPoolId，则为编辑，否则为新增)")
 	@GetMapping("/save")
@@ -296,4 +298,25 @@ public class MoneyPoolController {
 		return docService.upload(fileVo, userId);
 	}
 	
+	@ApiOperation(value = "款项池登记信息")
+	@GetMapping("/checkMoneyPool")
+	@ResponseBody
+	public Result checkMoneyPool(String businessId,String afterId,boolean isMatched) {
+		RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId));
+		if (repaymentBizPlanList==null) {
+			return Result.error("500", "查找还款计划失败");
+		}
+		
+		if (isMatched) {
+			List<MatchedMoneyPoolVO> list = moneyPoolService.listMatchedMoneyPool(repaymentBizPlanList.getPlanListId());
+			return Result.success(list);
+		}else {
+			EntityWrapper<MoneyPoolRepayment> ew = new EntityWrapper<MoneyPoolRepayment>();
+			ew.eq("plan_list_id", repaymentBizPlanList.getPlanListId()).orderBy("id");
+			ew.eq("is_finance_match", 0);
+			List<MoneyPoolRepayment> list = moneyPoolRepaymentService.selectList(ew);
+			return Result.success(list);
+		}
+		
+	}
 }

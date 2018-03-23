@@ -3,6 +3,7 @@ package com.hongte.alms.base.entity;
 import java.io.Serializable;
 
 import com.baomidou.mybatisplus.enums.IdType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.common.result.Result;
@@ -190,6 +191,7 @@ public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
      */
 	@TableField("trade_date")
 	@ApiModelProperty(required= true,value = "转入时间")
+	@JsonFormat( pattern = "yyyy-MM-dd" ,timezone="GMT+8")
 	private Date tradeDate;
     /**
      * 创建人角色,客户/财务
