@@ -242,6 +242,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				}
 				LOG.error("businessId：" + businessId + "，发送诉讼系统成功！诉讼系统返回信息：" + data.toString());
 			} else {
+				LOG.error("businessId：" + businessId + ",litigationResponse:" + litigationResponse.toString());
 				throw new ServiceRuntimeException("businessId：" + businessId + "，发送诉讼系统失败！！没有数据返回");
 			}
 		} catch (Exception e) {
