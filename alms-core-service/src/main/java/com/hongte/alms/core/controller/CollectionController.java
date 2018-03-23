@@ -186,8 +186,8 @@ public class CollectionController {
 
     @ApiOperation(value = "贷后首页台账 存储Excel  ")
     @PostMapping("/saveExcel")
-    public Result saveExcel(HttpServletRequest request, HttpServletResponse response,@ModelAttribute AfterLoanStandingBookReq req) throws Exception {
-//    	req.setUserId(loginUserInfoHelper.getUserId());
+    public Result saveExcel(HttpServletRequest request, HttpServletResponse response,@RequestBody AfterLoanStandingBookReq req) throws Exception {
+    	req.setUserId(loginUserInfoHelper.getUserId());
         EasyPoiExcelExportUtil.setResponseHead(response,"AfterLoanStandingBook.xls");
         List<AfterLoanStandingBookVo> list = phoneUrgeService.selectAfterLoanStandingBookList(req);
 

@@ -213,15 +213,15 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	}
 
 	@Override
-	public TransferOfLitigationVO sendTransferLitigationData(String businessId, String crpId, String sendUrl) {
+	public TransferOfLitigationVO sendTransferLitigationData(String businessId, String sendUrl) {
 		TransferOfLitigationVO transferLitigationData = null;
 		LitigationResponse litigationResponse = null;
-		if (StringUtil.isEmpty(crpId) || StringUtil.isEmpty(businessId)) {
+		if (StringUtil.isEmpty(businessId)) {
 			return transferLitigationData;
 		}
 		try {
 			// 查询基础信息
-			transferLitigationData = transferOfLitigationMapper.queryTransferLitigationData(businessId, crpId);
+			transferLitigationData = transferOfLitigationMapper.queryTransferLitigationData(businessId);
 
 			Integer businessType = transferOfLitigationMapper.queryBusinessType(businessId);
 
@@ -247,36 +247,27 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				if (litigationResponse.getCode() == 1) {
 					LitigationResponseData data = litigationResponse.getData();
 					if (!data.isImportSuccess()) {
-						LOG.error("businessId：" + businessId + "，发送诉讼系统失败！！诉讼系统返回信息：" + data.toString());
+						LOG.info("businessId：" + businessId + "，发送诉讼系统失败！！诉讼系统返回信息：" + data.toString());
 						throw new ServiceRuntimeException(data.getMessage());
 					}
-					LOG.error("businessId：" + businessId + "，发送诉讼系统成功！诉讼系统返回信息：" + data.toString());
+					LOG.info("businessId：" + businessId + "，发送诉讼系统成功！诉讼系统返回信息：" + data.toString());
 				}
 			} else {
-				LOG.error("businessId：" + businessId + "，发送诉讼系统失败！！没有消息返回");
+				LOG.info("businessId：" + businessId + "，发送诉讼系统失败！！没有消息返回");
 				throw new ServiceRuntimeException("businessId：" + businessId + "，发送诉讼系统失败！！没有消息返回");
 			}
-		} catch (Exception e) {
-			LOG.error("发送诉讼系统失败！！！", e);
-			throw new ServiceRuntimeException(e.getMessage(), e);
-		}finally {
 			TransferLitigationLog transferLitigationLog = new TransferLitigationLog();
 			transferLitigationLog.setBusinessId(businessId);
 			transferLitigationLog.setCreateTime(new Date());
-			if (transferLitigationData != null) {
-				transferLitigationLog.setCreateUser(transferLitigationData.getCreateUserId());
-				transferLitigationLog.setSendJson(JSON.toJSONString(transferLitigationData));
-			}else {
-				transferLitigationLog.setSendJson("没有找到相关诉讼数据！");
-			}
-			if (litigationResponse != null) {
-				transferLitigationLog.setResultCode(litigationResponse.getCode());
-				transferLitigationLog.setResultMsg(litigationResponse.getMsg());
-				transferLitigationLog.setResultJson(JSON.toJSONString(litigationResponse));
-			}else {
-				transferLitigationLog.setResultMsg("诉讼系统没有消息返回！");
-			}
+			transferLitigationLog.setCreateUser(transferLitigationData.getCreateUserId());
+			transferLitigationLog.setSendJson(JSON.toJSONString(transferLitigationData));
+			transferLitigationLog.setResultCode(litigationResponse.getCode());
+			transferLitigationLog.setResultMsg(litigationResponse.getMsg());
+			transferLitigationLog.setResultJson(JSON.toJSONString(litigationResponse));
 			transferLitigationLogService.insert(transferLitigationLog);
+		} catch (Exception e) {
+			LOG.error("发送诉讼系统失败！！！", e);
+			throw new ServiceRuntimeException(e.getMessage(), e);
 		}
 
 		return transferLitigationData;
@@ -671,7 +662,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			Integer processResult = process.getProcessResult();
 			if (!CollectionUtils.isEmpty(cars) && status == ProcessStatusEnums.END.getKey()
 					&& processResult == ProcessApproveResult.PASS.getKey()) {
-				sendTransferLitigationData(businessId, cars.get(0).getCrpId(), sendUrl);
+				sendTransferLitigationData(businessId, sendUrl);
 				// 更新贷后状态为 移交诉讼
 				collectionStatusService.setBussinessAfterStatus(req.getBusinessId(), req.getCrpId(), "",
 						CollectionStatusEnum.TO_LAW_WORK, CollectionSetWayEnum.MANUAL_SET);
@@ -698,7 +689,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			Integer processResult = process.getProcessResult();
 			if (!CollectionUtils.isEmpty(houses) && status == ProcessStatusEnums.END.getKey()
 					&& processResult == ProcessApproveResult.PASS.getKey()) {
-				sendTransferLitigationData(businessId, houses.get(0).getCrpId(), sendUrl);
+				sendTransferLitigationData(businessId, sendUrl);
 				// 更新贷后状态为 移交诉讼
 				collectionStatusService.setBussinessAfterStatus(req.getBusinessId(), req.getCrpId(), "",
 						CollectionStatusEnum.TO_LAW_WORK, CollectionSetWayEnum.MANUAL_SET);

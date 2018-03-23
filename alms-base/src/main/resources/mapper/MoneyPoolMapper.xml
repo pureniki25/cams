@@ -36,4 +36,26 @@
         money_pool_id AS moneyPoolId, xd_pool_id AS xdPoolId, pay_code AS payCode, remit_bank AS remitBank, trade_date AS tradeDate, trade_type AS tradeType, summary, trade_place AS tradePlace, account_money AS accountMoney, income_type AS incomeType, trade_remark AS tradeRemark, gainer_name AS gainerName, finance_status AS financeStatus, status, import_user AS importUser, import_user_name AS importUserName, import_time AS importTime, accept_bank AS acceptBank, is_manual_create AS isManualCreate, is_temporary AS isTemporary, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser, create_user_role AS createUserRole
     </sql>
 
+	<select id="listMatchedMoneyPool" resultType="com.hongte.alms.base.vo.module.MatchedMoneyPoolVO" >
+		SELECT 
+		    mpr.money_pool_id AS moneyPoolId,
+		    mp.pay_code AS repaymentCode,
+		    mp.trade_date AS tradeDate,
+		    mp.trade_type AS tradeType,
+		    mp.summary AS summary,
+		    mp.trade_place AS tradePlace,
+		    mp.account_money AS accountMoney,
+		    mp.trade_remark AS remark,
+		    mp.status AS status,
+		    mp.accept_bank AS bankAccount
+		FROM
+		    tb_money_pool_repayment mpr
+		        LEFT JOIN
+		    tb_money_pool mp ON mp.money_pool_id = mpr.money_pool_id
+		WHERE
+		    mpr.plan_list_id = #{planListId}
+		    AND
+		    mpr.is_finance_match = 1
+		ORDER BY mpr.id
+	</select>
 </mapper>
