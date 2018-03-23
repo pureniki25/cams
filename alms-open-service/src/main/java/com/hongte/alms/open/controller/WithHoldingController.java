@@ -112,7 +112,10 @@ public class WithHoldingController {
 				}
 		
 			} else {
-				return Result.success(respData.getReturnMessage());
+				Result result=new Result();
+				result.setCode("-2");
+				result.setData(respData.getReturnMessage());
+				return result;
 			}
 
 		} catch (Exception ex) {
@@ -145,7 +148,11 @@ public class WithHoldingController {
 			// 返回数据解密
 			ResponseData respData = getRespData(respStr);
 			List<RepayLogResp> list=JSON.parseArray(respData.getData(), RepayLogResp.class);
-			
+			RepayLogResp repayLogResp=null;
+			   for(int i=0;i< list.size();i++) {
+				   repayLogResp=list.get(i);
+				   repayLogResp.setListId(String.valueOf(i+1));
+			   }
 		      return PageResult.success(list, list.size());
 		} catch (Exception ex) {
 			logger.error(ex.getMessage());
