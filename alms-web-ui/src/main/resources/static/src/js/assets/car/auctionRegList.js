@@ -230,14 +230,14 @@ window.layinit(function (htConfig) {
                         field: 'bidderTel',
                         title: '联系方式'
                     },  {
-                        field: 'isPayDeposit',
+                        field: 'payDepositStr',
                         title: '是否缴纳保证金'
                     }, {
                         field: 'offerAmount',
                         title: '出价金额'
                     }, {
 
-                        field: 'isAuctionSuccess',
+                        field: 'auctionSuccessStr',
                         title: '是否竞拍成功'
                     }, {
                         fixed: 'right',

@@ -49,6 +49,7 @@ public class CarAuctionReg extends Model<CarAuctionReg> {
 	@TableField("is_pay_deposit")
 	@ApiModelProperty(required= true,value = "是否缴纳保证金 ")
 	private Boolean isPayDeposit;
+
     /**
      * 出价金额
      */
