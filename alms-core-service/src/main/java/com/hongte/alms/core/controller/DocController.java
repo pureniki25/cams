@@ -4,8 +4,6 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +11,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.aliyun.oss.ServiceException;
 import com.hongte.alms.base.assets.car.vo.FileVo;
 import com.hongte.alms.base.service.DocService;
 import com.hongte.alms.base.service.DocTmpService;
@@ -27,7 +21,6 @@ import com.hongte.alms.base.vo.module.doc.DocPageInfo;
 import com.hongte.alms.base.vo.module.doc.DocUploadRequest;
 import com.hongte.alms.base.vo.module.doc.UpLoadResult;
 import com.hongte.alms.common.result.Result;
-import com.hongte.alms.common.util.StringUtil;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -115,22 +108,4 @@ public class DocController {
 		return docTmpService.upload(fileVo, "admin");
 	}
 
-	@RequestMapping(value = "/download", method = RequestMethod.GET)
-	public void download(@RequestParam("downloadFile") String downloadFile, @RequestParam("docUrl") String docUrl) {
-		if (StringUtil.isEmpty(downloadFile) || StringUtil.isEmpty(docUrl)) {
-			LOG.error("非法参数！downloadFile：" + downloadFile + "，docUrl：" + docUrl);
-			throw new ServiceException("参数不能为空值！");
-		}
-
-		try {
-			ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder
-					.getRequestAttributes();
-			HttpServletResponse response = requestAttributes.getResponse();
-			docService.download(downloadFile, docUrl, response);
-			LOG.info("附件下载成功！");
-		} catch (Exception e) {
-			LOG.error("文件下载失败：" + e.getMessage());
-			throw new ServiceException("文件下载失败：" + e.getMessage());
-		}
-	}
 }

@@ -454,9 +454,7 @@ window.layinit(function (htConfig) {
 	             });
 	    	},
 	    	downloadFile: function(info){
-    			layui.use(['layer', 'ht_config'], function () {
-    				return basePath+'doc/download?downloadFile='+info.downloadFileName + '&docUrl=' + info.docUrl
-                });
+				return basePath+'downLoadController/download?downloadFile='+info.downloadFileName + '&docUrl=' + info.docUrl
 	    	},
 	    	removeTabTr: function (event, index) {
 	    		var docId=$('#docId'+index).val();  
