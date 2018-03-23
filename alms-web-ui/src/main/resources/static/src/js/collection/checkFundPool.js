@@ -64,8 +64,8 @@ window.layinit(function (htConfig) {
                             },
                             on: {
                                 click: () => {
-                                    if (params.row.certUrl && params.row.certUrl.length) {
-                                        t1.cert_modal_url = 'http://xiaodaioa.oss-cn-beijing.aliyuncs.com/' + params.row.certUrl
+                                    if (params.row.certificatePictureUrl && params.row.certificatePictureUrl.length) {
+                                        t1.cert_modal_url = 'http://xiaodaioa.oss-cn-beijing.aliyuncs.com/' + params.row.certificatePictureUrl
                                         t1.cert_modal = true
                                     } else {
                                         t1.$Modal.warning({ content: '此登记暂无凭证' })
