@@ -366,7 +366,7 @@ public class CarController {
     	CarAuctionReg carAuctionReg=new CarAuctionReg();
     	CarAuctionBidder carAuctionBidder=new CarAuctionBidder();
     	if(!StringUtils.isEmpty(carAuction.getAuctionId())) {
-    		List<CarAuctionReg>	carAuctionRegs=carAuctionRegService.selectList(new EntityWrapper<CarAuctionReg>().eq("auction_id", carAuction.getAuctionId()));
+    		List<CarAuctionReg>	carAuctionRegs=carAuctionRegService.selectList(new EntityWrapper<CarAuctionReg>().eq("auction_id", carAuction.getAuctionId()).eq("is_auction_success", true));
     		if(carAuctionRegs!=null&&carAuctionRegs.size()>0) {
     			carAuctionReg=carAuctionRegs.get(0);
     			carAuctionBidder=carAuctionBidderService.selectById(carAuctionReg.getRegTel());
