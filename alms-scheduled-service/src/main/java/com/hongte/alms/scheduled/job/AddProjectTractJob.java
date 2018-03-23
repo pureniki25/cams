@@ -62,7 +62,7 @@ public class AddProjectTractJob {
 
         }catch (Exception e){
             e.printStackTrace();
-            logger.error("定时任务 设置用户可访问业务对照关系  更新执行时间 异常："+e.getMessage());
+            logger.error("定时任务 自动推送贷后跟踪记录  更新执行时间 异常："+e.getMessage());
         }
 
     }

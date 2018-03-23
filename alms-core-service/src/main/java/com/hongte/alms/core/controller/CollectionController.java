@@ -28,6 +28,8 @@ import com.hongte.alms.common.util.EasyPoiExcelExportUtil;
 import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.core.storage.StorageService;
+import com.ht.ussp.bean.LoginUserInfoHelper;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -90,6 +92,9 @@ public class CollectionController {
     @Autowired
     @Qualifier("SysUserService")
     SysUserService  sysUserService;
+
+    @Autowired
+    LoginUserInfoHelper loginUserInfoHelper;
 
 //    private final StorageService storageService;
 //
@@ -181,27 +186,28 @@ public class CollectionController {
 
     @ApiOperation(value = "贷后首页台账 存储Excel  ")
     @PostMapping("/saveExcel")
-    public Result<String> saveExcel(HttpServletRequest request, HttpServletResponse response,@ModelAttribute AfterLoanStandingBookReq req) throws Exception {
+    public void saveExcel(HttpServletRequest request, HttpServletResponse response,@ModelAttribute AfterLoanStandingBookReq req) throws Exception {
+    	req.setUserId(loginUserInfoHelper.getUserId());
         EasyPoiExcelExportUtil.setResponseHead(response,"AfterLoanStandingBook.xls");
         List<AfterLoanStandingBookVo> list = phoneUrgeService.selectAfterLoanStandingBookList(req);
 
         Workbook workbook = ExcelExportUtil.exportExcel(new ExportParams(), AfterLoanStandingBookVo.class, list);
 
-        String fileName =  UUID.randomUUID().toString()+".xls";
-        System.out.println(fileName);
-
-
-        Map<String,String> retMap = storageService.storageExcelWorkBook(workbook,fileName);
+//        String fileName =  UUID.randomUUID().toString()+".xls";
+//        System.out.println(fileName);
+//
+//
+//        Map<String,String> retMap = storageService.storageExcelWorkBook(workbook,fileName);
 
 //        retMap.put("errorInfo","");
 //        retMap.put("sucFlage","true");
 
-        if(retMap.get("sucFlage").equals("true")){
-            return  Result.success(fileName);
-        }else{
-            return Result.error("500", retMap.get("errorInfo"));
-        }
-//        workbook.write(response.getOutputStream());
+//        if(retMap.get("sucFlage").equals("true")){
+//            return  Result.success(fileName);
+//        }else{
+//            return Result.error("500", retMap.get("errorInfo"));
+//        }
+        workbook.write(response.getOutputStream());
 
 
     }

@@ -37,15 +37,15 @@ alms-core-service:
     listOfServers: 127.0.0.1:30606 #为cloud-client服务指定一组服务地址，应该是用于负载均衡
 alms-timer-service:
   ribbon:
-    listOfServers: 127.0.0.1:30616 #为cloud-client服务指定一组服务地址，应该是用于负载均衡
+    listOfServers: 127.0.0.1:30611 #为cloud-client服务指定一组服务地址，应该是用于负载均衡
 alms-open-service:
   ribbon:
-    listOfServers: 127.0.0.1:30608 #为cloud-client服务指定一组服务地址，应该是用于负载均衡
+    listOfServers: 127.0.0.1:30616 #为cloud-client服务指定一组服务地址，应该是用于负载均衡
     
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:30600/eureka/
+      defaultZone: http://localhost:30101/eureka/
 http:
     multipart:
       max-file-size: 2Mb      # Max file size，默认1M

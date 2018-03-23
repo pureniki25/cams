@@ -168,16 +168,42 @@ window.layinit(function(htConfig){
 
             ////  ----   单行操作界面显示  结束 -----------------
             clickExport() {//导出Excel表格
+            	
+                layui.use(['layer', 'table','ht_config'], function () {debugger
                 vm.$refs['searchForm'].validate((valid) => {
-                    if (valid) {
-
-                        vm.exporting = true;
-                        expoertExcel(basePath + "collection/saveExcel",vm.searchForm);
-
-                        vm.exporting = false;
-
-                    }
-                })
+		                    if (valid) {debugger
+		                        var dateObj = getData();
+		                        vm.exporting = true;
+		//                        expoertExcel(basePath + "collection/saveExcel",vm.searchForm);
+		                        var ExportForm = document.createElement("FORM");
+		                        document.body.appendChild(ExportForm);
+		                        ExportForm.method = "POST";
+		                        ExportForm.action = basePath+"collection/saveExcel";
+		                        ExportForm.target = "iframe";
+		                        addInput(ExportForm, "text", "areaId", vm.searchForm.areaId);//区域ID
+		                        addInput(ExportForm, "text", "companyId", vm.searchForm.companyId); //分公司ID
+		                        addInput(ExportForm, "text", "showRepayDateBegin", dateObj.showRepayDateBegin); 
+		                        addInput(ExportForm, "text", "showRepayDateEnd",dateObj.showRepayDateEnd); 
+		                        addInput(ExportForm, "text", "realRepayDateBegin", dateObj.realRepayDateBegin);    
+		                        addInput(ExportForm, "text", "realRepayDateEnd", dateObj.realRepayDateEnd);    
+		                        addInput(ExportForm, "text", "delayDaysBegin", vm.searchForm.delayDaysBegin);    
+		                        addInput(ExportForm, "text", "delayDaysEnd", vm.searchForm.delayDaysEnd);    
+		                        addInput(ExportForm, "text", "collectLevel", vm.searchForm.collectLevel);     
+		                        addInput(ExportForm, "text", "operatorName", vm.searchForm.operatorName);    
+		                        addInput(ExportForm, "text", "businessId", vm.searchForm.businessId);     
+		                        addInput(ExportForm, "text", "businessType", vm.searchForm.businessType);    
+		                        addInput(ExportForm, "text", "liquidationOne", vm.searchForm.liquidationOne);    
+		                        addInput(ExportForm, "text", "liquidationTow", vm.searchForm.liquidationTow);     
+		                        addInput(ExportForm, "text", "businessStatus", vm.searchForm.businessStatus);    
+		                        addInput(ExportForm, "text", "repayStatus", vm.searchForm.repayStatus);    
+		                        addInput(ExportForm, "text", "customerName", vm.searchForm.customerName);    
+		                        ExportForm.submit();
+		                        document.body.removeChild(ExportForm);
+		                        vm.exporting = false;
+		
+		                    }
+		                })
+                });
             }
         },
         mounted:function(){
@@ -185,6 +211,14 @@ window.layinit(function(htConfig){
 
         }
     });
+  //为表单添加输入
+    var addInput = function(form, type,name,value){
+        var input=document.createElement("input");
+        input.type=type;
+        input.name=name;
+        input.value = value;
+        form.appendChild(input);
+    }
 
     //单行操作弹框显示
     var showOneLineOprLayer = function(url,title){
