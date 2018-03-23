@@ -13,7 +13,7 @@ public class RepayLogResp {
       private String phoneNumber;          //电话号码
       private String bankCard;             //银行卡号
       private String businessId;          //业务单号
-      private String businessAfterId;     //还款期数
+      private String afterId;     //还款期数
       private String remark;              //备注
       private String updateUser;
       private String updateTime;
@@ -87,11 +87,12 @@ public class RepayLogResp {
 	public void setBusinessId(String businessId) {
 		this.businessId = businessId;
 	}
-	public String getBusinessAfterId() {
-		return businessAfterId;
+
+	public String getAfterId() {
+		return afterId;
 	}
-	public void setBusinessAfterId(String businessAfterId) {
-		this.businessAfterId = businessAfterId;
+	public void setAfterId(String afterId) {
+		this.afterId = afterId;
 	}
 	public String getRemark() {
 		return remark;
