@@ -1,5 +1,5 @@
 server:
-  port: 30616
+  port: 30601
 spring:
   application:
     name: alms-web-ui
