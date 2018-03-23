@@ -51,13 +51,15 @@
         pList.due_date as dueDate,
         pList.fact_repay_date AS repaymentDate,
         col_status.phone_staff AS phoneStaffId,
-        --  phoneStaffName
+--         phoneUser.user_name AS  phoneStaffName,
+
         col_status.visit_staff AS  visitStaffId,
-        --  visitStaffName
+--         visitUser.user_name AS  visitStaffName,
+
         pList.plan_list_id AS  crpId,
         pList.current_status as statusName,
         col_status.collection_status as colStatus
---         sys_param.param_name as afterColStatusName
+--          sys_param.param_name as afterColStatusName
 
         from tb_repayment_biz_plan_list  as pList
         LEFT JOIN tb_repayment_biz_plan as plan ON pList.plan_id = plan.plan_id
@@ -66,10 +68,15 @@
         LEFT JOIN tb_basic_business_type as  b_type ON business.business_type = b_type.business_type_id
         LEFT JOIN tb_collection_status as  col_status ON pList.plan_list_id = col_status.crp_id
         JOIN tb_sys_user_permission as permission  ON  permission.business_id = business.business_id
+--         LEFT JOIN tb_sys_user as phoneUser ON  col_status.phone_staff = phoneUser.user_id
+--         LEFT JOIN tb_sys_user as visitUser ON  col_status.visit_staff = visitUser.user_id
+--         LEFT JOIN tb_sys_parameter as sys_param  ON  col_status.collection_status = sys_param.param_value
+
 --         LEFT JOIN tb_sys_parameter  as sys_param ON  col_status.collection_status = sys_param.param_value
 
         <where>
             1=1
+--             sys_param.param_type = 2
             <!--   改用列表 IN查询 这两个先屏蔽
             <if test="areaId !=null and areaId !=''">
                 and business.company_id IN (SELECT area_id FROM tb_basic_company WHERE district_id = #{areaId})

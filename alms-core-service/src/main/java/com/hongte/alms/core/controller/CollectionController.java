@@ -186,28 +186,28 @@ public class CollectionController {
 
     @ApiOperation(value = "贷后首页台账 存储Excel  ")
     @PostMapping("/saveExcel")
-    public void saveExcel(HttpServletRequest request, HttpServletResponse response,@ModelAttribute AfterLoanStandingBookReq req) throws Exception {
-    	req.setUserId(loginUserInfoHelper.getUserId());
+    public Result saveExcel(HttpServletRequest request, HttpServletResponse response,@ModelAttribute AfterLoanStandingBookReq req) throws Exception {
+//    	req.setUserId(loginUserInfoHelper.getUserId());
         EasyPoiExcelExportUtil.setResponseHead(response,"AfterLoanStandingBook.xls");
         List<AfterLoanStandingBookVo> list = phoneUrgeService.selectAfterLoanStandingBookList(req);
 
         Workbook workbook = ExcelExportUtil.exportExcel(new ExportParams(), AfterLoanStandingBookVo.class, list);
 
-//        String fileName =  UUID.randomUUID().toString()+".xls";
-//        System.out.println(fileName);
-//
-//
-//        Map<String,String> retMap = storageService.storageExcelWorkBook(workbook,fileName);
+        String fileName =  UUID.randomUUID().toString()+".xls";
+        System.out.println(fileName);
 
-//        retMap.put("errorInfo","");
-//        retMap.put("sucFlage","true");
 
-//        if(retMap.get("sucFlage").equals("true")){
-//            return  Result.success(fileName);
-//        }else{
-//            return Result.error("500", retMap.get("errorInfo"));
-//        }
-        workbook.write(response.getOutputStream());
+        Map<String,String> retMap = storageService.storageExcelWorkBook(workbook,fileName);
+
+        retMap.put("errorInfo","");
+        retMap.put("sucFlage","true");
+
+        if(retMap.get("sucFlage").equals("true")){
+            return  Result.success(fileName);
+        }else{
+            return Result.error("500", retMap.get("errorInfo"));
+        }
+//        workbook.write(response.getOutputStream());
 
 
     }

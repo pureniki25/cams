@@ -231,6 +231,11 @@
             <plugin>
                 <groupId>com.spotify</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
+                <configuration>
+                    <volumes>
+                        <volume>/data/temp:/temp</volume>
+                    </volumes>
+                </configuration>
             </plugin>
         </plugins>
     </build>
