@@ -78,7 +78,11 @@ public class ProcessVo {
      */
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
-
+    /**
+     * 完成时间
+     */
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date finishTime;
 
 
     /**
@@ -90,7 +94,18 @@ public class ProcessVo {
      */
     private String companyName;
 
-    public String getProcessName() {
+    
+    
+    
+    public Date getFinishTime() {
+		return finishTime;
+	}
+
+	public void setFinishTime(Date finishTime) {
+		this.finishTime = finishTime;
+	}
+
+	public String getProcessName() {
         return processName;
     }
 

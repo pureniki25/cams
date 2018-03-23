@@ -106,7 +106,7 @@
 				and com.area_id = #{areaId}
 			</if>
 			<if test="companyId !=null and companyId !=''">
-				and com.company_id = #{companyId}
+				and bus.company_id = #{companyId}
 			</if>
 			<if test="customerName !=null and customerName !=''">
 				and bus.customer_name LIKE "%"#{customerName}"%"
@@ -438,7 +438,7 @@
 	    ifnull(tcb.last_evaluation_amount,tcb.evaluation_amount) lastEvaluationAmount, <!-- 评估价 --> 
 		tcb.user_nature useProperty ,														<!--使用性质 -->
 		tcb.insurance_expiration_date insuranceDate ,<!--保险到期日 -->
-		tcb.annual_verification_expiration_date, inspectionDate ,         <!--年检到期日 -->
+		tcb.annual_verification_expiration_date inspectionDate ,         <!--年检到期日 -->
 		tcb.odometer mileage ,<!--车显里程 -->
 		tcb.vehicle_license_registration_date registerDate ,             <!--首次登记年月 -->
 		case
