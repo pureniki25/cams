@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.TransferLitigationLogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.TransferLitigationLog">
+        <id column="id" property="id" />
+        <result column="business_id" property="businessId" />
+        <result column="process_id" property="processId" />
+        <result column="send_json" property="sendJson" />
+        <result column="result_json" property="resultJson" />
+        <result column="result_code" property="resultCode" />
+        <result column="result_msg" property="resultMsg" />
+        <result column="create_user" property="createUser" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, business_id AS businessId, process_id AS processId, send_json AS sendJson, result_json AS resultJson, result_code AS resultCode, result_msg AS resultMsg, create_user AS createUser, create_time AS createTime
+    </sql>
+
+</mapper>
