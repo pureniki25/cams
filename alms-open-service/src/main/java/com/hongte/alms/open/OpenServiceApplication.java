@@ -20,5 +20,7 @@ public class OpenServiceApplication {
 
 	public static void main(String[] args) {  
 		SpringApplication.run(OpenServiceApplication.class, args);
+
+		System.err.println("ヾ(◍°∇°◍)ﾉﾞ    open-service启动成功      ヾ(◍°∇°◍)ﾉﾞ\n");
 	}
 }
