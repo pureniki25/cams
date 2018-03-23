@@ -155,21 +155,9 @@ window.layinit(function (htConfig) {
                 	//config = layui.ht_config;
                 vm.$refs['searchForm'].validate((valid) => {
                
-                    if (valid) {
                         vm.exporting = true;
-                        //var dateObj = getData();
-                        var ExportForm = document.createElement("FORM");
-                        document.body.appendChild(ExportForm);
-                        ExportForm.method = "POST";
-                        ExportForm.action = basePath+"RepaymentLogController/saveExcel";
-                        ExportForm.target = "iframe";
-
-                   
-                        ExportForm.submit();
-                        document.body.removeChild(ExportForm);
-
+                        expoertExcel(basePath + "RepaymentLogController/saveExcel",vm.searchForm);
                         vm.exporting = false;
-                    }
                 })
                 });
             }
@@ -257,7 +245,6 @@ window.layinit(function (htConfig) {
             //response: {} //如果无需自定义数据响应名称，可不加该参数
             page: true,
             done: function (res, curr, count) {
-            	getUserId();
                 getCountInfo();
                 //数据渲染完的回调。你可以借此做一些其它的操作
                 //如果是异步请求数据方式，res即为你接口返回的信息。
