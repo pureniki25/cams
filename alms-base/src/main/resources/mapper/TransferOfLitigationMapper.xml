@@ -257,6 +257,7 @@
 			    AND b.`original_business_id` = bb.business_id 
 			  GROUP BY b.`original_business_id`) AS repaymentPrincipa,
 			  cc.surplus_principal,
+			  cc.businessAfterId,
 			  (SELECT 
 			    COUNT(1) 
 			  FROM
