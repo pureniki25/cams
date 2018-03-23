@@ -61,7 +61,7 @@ public class RepaymentRegisterInfoDTO implements Serializable{
 	 */
 	private String userId ;
 	/**
-	 * 款项池id/还款记录id/whatever
+	 * moneypool id / moneypool repayment id/ whatever
 	 */
 	private String moneyPoolId ;
 	public String getRepaymentDate() {

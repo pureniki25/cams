@@ -1,7 +1,9 @@
 package com.hongte.alms.core.controller;
 
+import static org.hamcrest.CoreMatchers.endsWith;
 
 import java.io.FileNotFoundException;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -10,20 +12,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.baomidou.mybatisplus.entity.Columns;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.assets.car.vo.FileVo;
 import com.hongte.alms.base.collection.service.CollectionTrackLogService;
 import com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
+import com.hongte.alms.base.entity.MoneyPoolRepayment;
+import com.hongte.alms.base.entity.RenewalBusiness;
+import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.service.DepartmentBankService;
 import com.hongte.alms.base.service.DocService;
+import com.hongte.alms.base.service.MoneyPoolRepaymentService;
 import com.hongte.alms.base.service.MoneyPoolService;
+import com.hongte.alms.base.service.RenewalBusinessService;
+import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.vo.module.DepartmentBankVO;
 import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
 import com.hongte.alms.base.vo.module.MoneyPoolVO;
@@ -48,73 +60,86 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping("/moneyPool")
 public class MoneyPoolController {
 	private Logger logger = LoggerFactory.getLogger(MoneyPoolController.class);
-	
+
 	@Autowired
-    @Qualifier("MoneyPoolService")
-    MoneyPoolService moneyPoolService;
-	
+	@Qualifier("MoneyPoolService")
+	MoneyPoolService moneyPoolService;
 	@Autowired
-    @Qualifier("DepartmentBankService")
-	DepartmentBankService departmentBankService ;
-	
+	@Qualifier("MoneyPoolRepaymentService")
+	MoneyPoolRepaymentService moneyPoolRepaymentService ;
 	@Autowired
-    LoginUserInfoHelper loginUserInfoHelper;
-	
+	@Qualifier("RenewalBusinessService")
+	RenewalBusinessService renewalBusinessService;
+
+	@Autowired
+	@Qualifier("DepartmentBankService")
+	DepartmentBankService departmentBankService;
+
+	@Autowired
+	LoginUserInfoHelper loginUserInfoHelper;
+
+	@Autowired
+	@Qualifier("RepaymentBizPlanListService")
+	RepaymentBizPlanListService repaymentBizPlanListService;
 	@Autowired
 	@Qualifier("DocService")
-	DocService docService ;
-	
+	DocService docService;
+
 	@ApiOperation(value = "获取款项池")
-    @GetMapping("/list")
-    @ResponseBody
-	public Result<List<MoneyPoolVO>> listMoneyPool(@RequestParam("businessId")String businessId , @RequestParam("afterId")String afterId ) {
-		Result<List<MoneyPoolVO>> result = new Result<>() ;
+	@GetMapping("/list")
+	@ResponseBody
+	public Result<List<MoneyPoolVO>> listMoneyPool(@RequestParam("businessId") String businessId,
+			@RequestParam("afterId") String afterId) {
+		Result<List<MoneyPoolVO>> result = new Result<>();
 		try {
 			List<MoneyPoolVO> moneyPoolVOs = moneyPoolService.listMoneyPool(businessId, afterId);
 			result.setData(moneyPoolVOs);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-            result.error("500", e.getMessage());
+			result.error("500", e.getMessage());
 		} finally {
-			return result ;
+			return result;
 		}
 	}
-	
+
 	@ApiOperation(value = "分页获取款项池")
-    @GetMapping("/page")
-    @ResponseBody
-	public PageResult<List<MoneyPoolVO>> listMoneyPoolByPage(@RequestParam("businessId")String businessId , @RequestParam("afterId")String afterId , Integer page , Integer limit) {
+	@GetMapping("/page")
+	@ResponseBody
+	public PageResult<List<MoneyPoolVO>> listMoneyPoolByPage(@RequestParam("businessId") String businessId,
+			@RequestParam("afterId") String afterId, Integer page, Integer limit) {
 		try {
-			Page<MoneyPoolVO> pages = moneyPoolService.listMoneyPoolByPage(businessId, afterId,page,limit);
+			Page<MoneyPoolVO> pages = moneyPoolService.listMoneyPoolByPage(businessId, afterId, page, limit);
 			return PageResult.success(pages.getRecords(), pages.getTotal());
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-            return PageResult.error(500, e.getMessage());
-		} 
+			return PageResult.error(500, e.getMessage());
+		}
 	}
+
 	
 	@ApiOperation(value = "获取匹配的款项池")
-    @GetMapping("/listMatched")
-    @ResponseBody
-	public Result<List<MatchedMoneyPoolVO>> listMatchedMoneyPool(@RequestParam("businessId")String businessId , @RequestParam("afterId")String afterId) {
-		Result<List<MatchedMoneyPoolVO>> result = new Result<>() ;
+	@GetMapping("/listMatched")
+	@ResponseBody
+	public Result<List<MatchedMoneyPoolVO>> listMatchedMoneyPool(@RequestParam("businessId") String businessId,
+			@RequestParam("afterId") String afterId) {
+		Result<List<MatchedMoneyPoolVO>> result = new Result<>();
 		try {
 			List<MatchedMoneyPoolVO> moneyPoolVOs = moneyPoolService.listMatchedMoneyPool(businessId, afterId);
 			return Result.success(moneyPoolVOs);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return Result.error("500", e.getMessage());
-		} 
+		}
 	}
-	
+
 	@ApiOperation(value = "新增/编辑 还款登记(若参数有moneyPoolId，则为编辑，否则为新增)")
-    @GetMapping("/save")
-    @ResponseBody
+	@GetMapping("/save")
+	@ResponseBody
 	public Result saveRepaymentRegisterInfo(RepaymentRegisterInfoDTO repayInfo) {
-		Result result = null ;
+		Result result = null;
 		LoginInfoDto loginInfoDto = loginUserInfoHelper.getLoginInfo();
-		String userId = loginUserInfoHelper.getUserId() ;
-		if (userId==null) {
+		String userId = loginUserInfoHelper.getUserId();
+		if (userId == null) {
 			return Result.error("500", "userId can't be null");
 		}
 		try {
@@ -124,19 +149,90 @@ public class MoneyPoolController {
 		} catch (Exception e) {
 			result = Result.error("500", e.getMessage());
 		} finally {
-			return result ;
+			return result;
 		}
+	}
+
+	@ApiOperation(value = "新增 还款登记")
+	@PostMapping("/addCustomerRepayment")
+	@ResponseBody
+	public Result addCustomerRepayment(@RequestBody RepaymentRegisterInfoDTO repayInfo) {
+		try {
+			if (repayInfo == null) {
+				return Result.error("500", "参数不能为空");
+			}
+			repayInfo.setUserId(loginUserInfoHelper.getUserId());
+			return moneyPoolService.addCustomerRepayment(repayInfo);
+		} catch (Exception e) {
+			return Result.error("500", e.getMessage());
+		}
+	}
+	
+	@ApiOperation(value = "获取 还款登记")
+	@GetMapping("/getCustomerRepayment")
+	@ResponseBody
+	public Result getCustomerRepayment(String id) {
+		if (id==null) {
+			return Result.error("500", "参数不能为空");
+		}
+		MoneyPoolRepayment moneyPoolRepayment = moneyPoolRepaymentService.selectById(id);
+		if (moneyPoolRepayment==null) {
+			return Result.error("500", "查不到此还款登记");
+		}
+		return Result.success(moneyPoolRepayment) ;
+	}
+	
+	@ApiOperation(value = "编辑 还款登记")
+	@PostMapping("/updateCustomerRepayment")
+	@ResponseBody
+	public Result updateCustomerRepayment(@RequestBody RepaymentRegisterInfoDTO repayInfo) {
+		try {
+			if (repayInfo == null) {
+				return Result.error("500", "参数不能为空");
+			}
+			repayInfo.setUserId(loginUserInfoHelper.getUserId());
+			return moneyPoolService.updateCustomerRepayment(repayInfo);
+		} catch (Exception e) {
+			return Result.error("500", e.getMessage());
+		}
+	}
+	
+	@ApiOperation(value = "删除 还款登记")
+	@PostMapping("/deleteCustomerRepayment")
+	@ResponseBody
+	public Result deleteCustomerRepayment(@RequestBody RepaymentRegisterInfoDTO repayInfo) {
+		try {
+			if (repayInfo == null) {
+				return Result.error("500", "参数不能为空");
+			}
+			repayInfo.setUserId(loginUserInfoHelper.getUserId());
+			return moneyPoolService.deleteCustermerRepayment(repayInfo);
+		} catch (Exception e) {
+			return Result.error("500", e.getMessage());
+		}
+	}
+
+	@ApiOperation(value = "分页列出还款登记")
+	@GetMapping("/pageCustomerRepayment")
+	@ResponseBody
+	public PageResult<List<MoneyPoolRepayment>> pageCustomerRepayment(String businessId,String afterId,Integer page,Integer limit) {
+		Page<MoneyPoolRepayment> page2 = new Page(page, limit);
+		RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService.selectOne(
+				new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId));
+		Page<MoneyPoolRepayment> result = moneyPoolRepaymentService.selectPage(page2,
+				new EntityWrapper<MoneyPoolRepayment>().eq("plan_list_id", repaymentBizPlanList.getPlanListId()));
+		return PageResult.success(result.getRecords(), result.getTotal());
 	}
 	
 	@ApiOperation(value = "删除 还款登记")
 	@GetMapping("/del")
 	@ResponseBody
 	public Result deleteRepaymentRegisterInfo(String moneyPoolId) {
-		if (moneyPoolId==null) {
+		if (moneyPoolId == null) {
 			return Result.error("500", "moneyPoolId can't be null");
 		}
-		String userId = loginUserInfoHelper.getUserId() ;
-		if (userId==null) {
+		String userId = loginUserInfoHelper.getUserId();
+		if (userId == null) {
 			return Result.error("500", "userId can't be null");
 		}
 		try {
@@ -146,16 +242,16 @@ public class MoneyPoolController {
 			return Result.error("500", e.getMessage());
 		}
 	}
-	
+
 	@ApiOperation(value = "查询 1条还款登记")
 	@GetMapping("/get")
 	@ResponseBody
-	public Result<MoneyPoolVO> getMoneyPool(String moneyPoolId){
-		if (moneyPoolId==null) {
+	public Result<MoneyPoolVO> getMoneyPool(String moneyPoolId) {
+		if (moneyPoolId == null) {
 			return Result.error("500", "moneyPoolId can't be null");
 		}
-		String userId = loginUserInfoHelper.getUserId() ;
-		if (userId==null) {
+		String userId = loginUserInfoHelper.getUserId();
+		if (userId == null) {
 			return Result.error("500", "userId can't be null");
 		}
 		try {
@@ -165,16 +261,16 @@ public class MoneyPoolController {
 			return Result.error("500", e.getMessage());
 		}
 	}
-	
+
 	@ApiOperation(value = "获取当前业务的线下还款账户")
 	@GetMapping("/listDepartmentBank")
 	@ResponseBody
-	public Result<List<DepartmentBankVO>> listDepartmentBank(String businessId){
-		if (businessId==null) {
+	public Result<List<DepartmentBankVO>> listDepartmentBank(String businessId) {
+		if (businessId == null) {
 			return Result.error("500", "businessId can't be null");
 		}
-		String userId = loginUserInfoHelper.getUserId() ;
-		if (userId==null) {
+		String userId = loginUserInfoHelper.getUserId();
+		if (userId == null) {
 			return Result.error("500", "userId can't be null");
 		}
 		try {
@@ -184,21 +280,20 @@ public class MoneyPoolController {
 			return Result.error("500", e.getMessage());
 		}
 	}
-	
+
 	/**
-     * 文件上传具体实现方法（单文件上传）
-     */
+	 * 文件上传具体实现方法（单文件上传）
+	 */
 	@ApiOperation(value = "上传凭证")
 	@PostMapping("/uploadCert")
-    public UpLoadResult upload(FileVo fileVo) throws FileNotFoundException {
-		String userId = loginUserInfoHelper.getUserId() ;
-		UpLoadResult upLoadResult = new UpLoadResult() ;
-		if (userId==null) {
+	public UpLoadResult upload(FileVo fileVo) throws FileNotFoundException {
+		String userId = loginUserInfoHelper.getUserId();
+		UpLoadResult upLoadResult = new UpLoadResult();
+		if (userId == null) {
 			upLoadResult.setUploaded(false);
 			upLoadResult.setMessage("userId can't be null");
 			return upLoadResult;
 		}
-        return docService.upload(fileVo,userId);
-    }
+		return docService.upload(fileVo, userId);
+	}
 }
-

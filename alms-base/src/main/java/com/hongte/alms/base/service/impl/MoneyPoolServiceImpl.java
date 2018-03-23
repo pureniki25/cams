@@ -2,6 +2,7 @@ package com.hongte.alms.base.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
@@ -19,8 +20,10 @@ import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
 import com.hongte.alms.base.vo.module.MoneyPoolRepaymentXindaiDTO;
 import com.hongte.alms.base.vo.module.MoneyPoolVO;
 import com.hongte.alms.base.vo.module.MoneyPoolXindaiDTO;
+import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.DESC;
+import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.EncryptionResult;
 import com.hongte.alms.common.vo.RequestData;
 import com.hongte.alms.common.vo.ResponseData;
@@ -36,6 +39,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.javassist.runtime.Desc;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
@@ -52,9 +57,15 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service("MoneyPoolService")
 public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, MoneyPool> implements MoneyPoolService {
+	private Logger logger = LoggerFactory.getLogger(MoneyPoolServiceImpl.class);
+	
 	final String URLPREFIX = "http://172.16.200.104:8084/apitest" ;
 	final String XINDAI_ADDORUPDATE = "AfterLoanRepayment_AddOrUpdateRepayment" ;
 	final String XINDAI_DEL = "AfterLoanRepayment_delRepayment" ;
+	
+	@Value("${bmApi.apiUrl}")
+	String xindaiAplUrlUrl ;
+	
 	@Autowired
 	MoneyPoolMapper moneyPoolMapper ;
 	@Autowired
@@ -64,12 +75,12 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 
 	@Override
 	public List<MoneyPoolVO> listMoneyPool(String businessId, String afterId) {
-		return moneyPoolMapper.listMoneyPool(businessId, afterId,null,null);
+		return null;
 	}
 
 	@Override
 	public List<MatchedMoneyPoolVO> listMatchedMoneyPool(String businessId, String afterId) {
-		return moneyPoolRepaymentMapper.listMatchedMoneyPool(businessId, afterId);
+		return null;
 	}
 
 	@Override
@@ -78,7 +89,7 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 		Boolean result = false ;
 		try {
 			if (registerInfoDTO.getMoneyPoolId()==null||registerInfoDTO.getMoneyPoolId().equals("")) {
-				MoneyPool nMoneyPool = new MoneyPool(registerInfoDTO);
+				MoneyPool nMoneyPool = new MoneyPool();
 				
 				Integer moneyPoolRows = moneyPoolMapper.insert(nMoneyPool);
 				RepaymentBizPlanList repaymentBizPlanList = new RepaymentBizPlanList() ;
@@ -105,10 +116,7 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 				if (moneyPoolRows==1&&moneyPoolRepaymentRows==1) {
 					
 					
-					JSONObject jsonObject = new JSONObject() ;
-					jsonObject.put("MoneyPool", new MoneyPoolXindaiDTO(nMoneyPool));
-					jsonObject.put("PoolRepayment", new MoneyPoolRepaymentXindaiDTO(moneyPoolRepayment, nMoneyPool, registerInfoDTO.getBusinessId(), registerInfoDTO.getAfterId()));
-					ResponseData responseData = callRemoteService(jsonObject, XINDAI_ADDORUPDATE, URLPREFIX);
+					ResponseData responseData = callRemoteService(new MoneyPoolRepaymentXindaiDTO(moneyPoolRepayment,registerInfoDTO.getBusinessId(),registerInfoDTO.getAfterId()), XINDAI_ADDORUPDATE);
 					if (responseData==null) {
 						throw new RuntimeException();
 					}
@@ -131,10 +139,10 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 					throw new RuntimeException("添加数据失败");
 				}
 			}else {
-				MoneyPool moneyPool = new MoneyPool(registerInfoDTO.getMoneyPoolId());
+				MoneyPool moneyPool = new MoneyPool();
 				moneyPool = moneyPoolMapper.selectOne(moneyPool);
 
-				MoneyPoolRepayment moneyPoolRepayment = new MoneyPoolRepayment(moneyPool.getMoneyPoolId()) ;
+				MoneyPoolRepayment moneyPoolRepayment = new MoneyPoolRepayment() ;
 				moneyPoolRepayment = moneyPoolRepaymentMapper.selectOne(moneyPoolRepayment);
 				
 				if (moneyPoolRepayment==null) {
@@ -179,27 +187,6 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 				Integer moneyPoolRepaymentRows = moneyPoolRepaymentMapper.updateById(moneyPoolRepayment);
 				if (moneyPoolRows==1&&moneyPoolRepaymentRows==1) {
 					
-					JSONObject jsonObject = new JSONObject() ;
-					jsonObject.put("MoneyPool", new MoneyPoolXindaiDTO(moneyPool));
-					jsonObject.put("PoolRepayment", new MoneyPoolRepaymentXindaiDTO(moneyPoolRepayment, moneyPool, registerInfoDTO.getBusinessId(), registerInfoDTO.getAfterId()));
-					ResponseData responseData = callRemoteService(jsonObject, XINDAI_ADDORUPDATE, URLPREFIX);
-					if (responseData==null) {
-						throw new RuntimeException();
-					}
-					if (!responseData.getReturnCode().equals("1")) {
-						throw new RuntimeException();
-					}
-					String  data = responseData.getData();
-					if (data!=null) {
-						JSONObject json = JSONObject.parseObject(data);
-						String moneyPoolId = json.getString("moneyPoolId");
-						String moneyPoolRepaymentId = json.getString("moneyPoolRepaymentId");
-						moneyPoolRepayment.setXdMatchingId(moneyPoolRepaymentRows);
-						moneyPool.setXdPoolId(Integer.valueOf(moneyPoolId));
-						moneyPoolRepayment.setXdPoolId(Integer.valueOf(moneyPoolId));
-						moneyPoolMapper.updateById(moneyPool);
-						moneyPoolRepaymentMapper.updateById(moneyPoolRepayment);
-					}
 				}else {
 					throw new RuntimeException("编辑数据失败");
 				}
@@ -220,7 +207,7 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 		if (moneyPoolId==null) {
 			throw new RuntimeException("moneyPoolId can't be null");
 		}
-		MoneyPoolRepayment moneyPoolRepayment = new MoneyPoolRepayment(moneyPoolId) ;
+		MoneyPoolRepayment moneyPoolRepayment = new MoneyPoolRepayment() ;
 		moneyPoolRepayment = moneyPoolRepaymentMapper.selectOne(moneyPoolRepayment);
 		if (moneyPoolRepayment==null) {
 			throw new RuntimeException("moneyPoolRepayment was not found");
@@ -228,14 +215,6 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 		moneyPoolRepayment.setIsDeleted(1);
 		moneyPoolRepayment.setDeleteTime(new Date());
 		moneyPoolRepayment.setDeleteUser(userId);
-		
-		JSONObject jsonObject = new JSONObject() ;
-		jsonObject.put("MoneyPoolId", moneyPoolRepayment.getXdPoolId());
-		ResponseData responseData = callRemoteService(jsonObject, XINDAI_DEL, URLPREFIX);
-		if (!responseData.getReturnCode().equals("1")) {
-			throw new RuntimeException(responseData.getReturnMessage()) ;
-		}
-		
 		Integer rows = moneyPoolRepaymentMapper.updateById(moneyPoolRepayment);
 		if (rows==1) {
 			result = true ;
@@ -247,10 +226,10 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 
 	@Override
 	public MoneyPoolVO getMoneyPool(String moneyPoolId) {
-		MoneyPoolRepayment moneyPoolRepayment = new MoneyPoolRepayment(moneyPoolId);
+		MoneyPoolRepayment moneyPoolRepayment = new MoneyPoolRepayment();
 		moneyPoolRepayment = moneyPoolRepaymentMapper.selectOne(moneyPoolRepayment);
 		
-		MoneyPool moneyPool = new MoneyPool(moneyPoolId) ;
+		MoneyPool moneyPool = new MoneyPool() ;
 		moneyPool = moneyPoolMapper.selectOne(moneyPool);
 		if (moneyPool==null) {
 			throw new RuntimeException("moneyPool was not found");
@@ -276,23 +255,31 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 		Page<MoneyPoolVO> pages = new Page<>();
         pages.setCurrent(page);
         pages.setSize(limit);
-        int count = moneyPoolMapper.listMoneyPoolCount(businessId, afterId);
+        int count = 0;
         pages.setTotal(count);
-        List<MoneyPoolVO> list = moneyPoolMapper.listMoneyPool(businessId, afterId,page,limit);
+        List<MoneyPoolVO> list = null;
         pages.setRecords(list);
         return pages ;
 	}
 	
-	public ResponseData callRemoteService(JSONObject jsonObject,String methodName,String urlPrefix) throws RuntimeException {
+	public ResponseData callRemoteService(MoneyPoolRepaymentXindaiDTO moneyPoolRepaymentXindaiDTO,String methodName) throws RuntimeException {
+		if (xindaiAplUrlUrl==null) {
+			logger.error("没有配置xindaiAplUrlUrlPreFix");
+			throw new RuntimeException("没有配置xindaiAplUrlUrlPreFix");
+		}
 		DESC desc = new DESC();
 		RequestData requestData = new RequestData();
-		requestData.setData(jsonObject.toJSONString());
 		requestData.setMethodName(methodName);
+		if (methodName.equals(XINDAI_DEL)) {
+			requestData.setData(moneyPoolRepaymentXindaiDTO.getId().toString());
+		}else if (methodName.equals(XINDAI_ADDORUPDATE)) {
+			requestData.setData(JSONObject.toJSONString(moneyPoolRepaymentXindaiDTO));
+		}
 		String encryptStr = JSON.toJSONString(requestData);
 		// 请求数据加密
 		encryptStr = desc.Encryption(encryptStr);
 
-		XindaiService xindaiService = Feign.builder().target(XindaiService.class, urlPrefix);
+		XindaiService xindaiService = Feign.builder().target(XindaiService.class, xindaiAplUrlUrl);
 		String response = xindaiService.dod(encryptStr);
 
 		// 返回数据解密
@@ -300,7 +287,133 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 		String decryptStr = desc.Decode(resp.getA(), resp.getUUId());
 		EncryptionResult res = JSON.parseObject(decryptStr, EncryptionResult.class);
 		ResponseData respData = JSON.parseObject(res.getParam(), ResponseData.class);
-		System.out.println(JSON.toJSONString(respData));
+		
+		logger.info("信贷返回数据解密-开始");
+		logger.info(JSON.toJSONString(respData));
+		logger.info("信贷返回数据解密-结束");
 		return respData ;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.hongte.alms.base.service.MoneyPoolService#addCustomerRepayment(com.hongte.alms.base.dto.RepaymentRegisterInfoDTO)
+	 */
+	@Override
+	public Result addCustomerRepayment(RepaymentRegisterInfoDTO registerInfoDTO) {
+		RepaymentBizPlanList repaymentBizPlanList = new RepaymentBizPlanList() ;
+		repaymentBizPlanList.setBusinessId(registerInfoDTO.getBusinessId());
+		repaymentBizPlanList.setAfterId(registerInfoDTO.getAfterId());
+		 repaymentBizPlanList = repaymentBizPlanListMapper.selectOne(repaymentBizPlanList);
+
+		if (repaymentBizPlanList==null) {
+			return Result.error("500", "找不到对应的还款计划");
+		}
+		MoneyPoolRepayment moneyPoolRepayment = new MoneyPoolRepayment(registerInfoDTO);
+		moneyPoolRepayment.setPlanListId(repaymentBizPlanList.getPlanListId());
+		moneyPoolRepayment.setCreateTime(new Date());
+		moneyPoolRepayment.setCreateUser(registerInfoDTO.getUserId());
+		moneyPoolRepayment.setCreateUserRole("客户");
+		moneyPoolRepayment.setIsFinanceMatch(0);
+		moneyPoolRepayment.setState(RepayRegisterFinanceStatus.未关联银行流水.toString());	
+		boolean result = moneyPoolRepayment.insert();
+		if (result) {
+			ResponseData responseData = callRemoteService(new MoneyPoolRepaymentXindaiDTO(moneyPoolRepayment, registerInfoDTO.getBusinessId(), registerInfoDTO.getAfterId()), XINDAI_ADDORUPDATE);
+			if (responseData==null) {
+				throw new RuntimeException();
+			}
+			if (!responseData.getReturnCode().equals("1")) {
+				throw new RuntimeException();
+			}
+			String  data = responseData.getData();
+			if (data!=null) {
+				moneyPoolRepayment.setXdMatchingId(Integer.valueOf(data));
+				moneyPoolRepaymentMapper.updateById(moneyPoolRepayment);
+				return Result.success();
+			}else {
+				throw new RuntimeException("信贷解密数据为null");
+			}
+		}else {
+			return Result.error("500", "数据新增失败");
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see com.hongte.alms.base.service.MoneyPoolService#updateCustomerRepayment(com.hongte.alms.base.dto.RepaymentRegisterInfoDTO)
+	 */
+	@Override
+	public Result updateCustomerRepayment(RepaymentRegisterInfoDTO registerInfoDTO) {
+		if (registerInfoDTO==null) {
+			return Result.error("500", "参数不能为空");
+		}
+		if (registerInfoDTO.getMoneyPoolId()==null) {
+			return Result.error("500", "id未知"); 
+		}
+		MoneyPoolRepayment moneyPoolRepayment = moneyPoolRepaymentMapper.selectById(registerInfoDTO.getMoneyPoolId());
+		if (moneyPoolRepayment==null) {
+			return Result.error("500", "查不到此还款登记"); 
+		}
+		moneyPoolRepayment.update(registerInfoDTO);
+		boolean result = moneyPoolRepayment.updateAllColumnById();
+		
+		if (result) {
+			ResponseData responseData = callRemoteService(new MoneyPoolRepaymentXindaiDTO(moneyPoolRepayment, registerInfoDTO.getBusinessId(), registerInfoDTO.getAfterId()), XINDAI_ADDORUPDATE);
+			if (responseData==null) {
+				throw new RuntimeException();
+			}
+			if (!responseData.getReturnCode().equals("1")) {
+				throw new RuntimeException();
+			}
+			String  data = responseData.getData();
+			if (data!=null) {
+				moneyPoolRepayment.setXdMatchingId(Integer.valueOf(data));
+				moneyPoolRepaymentMapper.updateById(moneyPoolRepayment);
+				return Result.success();
+			}else {
+				throw new RuntimeException("信贷解密数据为null");
+			}
+		}else {
+			return Result.error("500", "数据更新失败");
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see com.hongte.alms.base.service.MoneyPoolService#deleteCustermerRepayment(com.hongte.alms.base.dto.RepaymentRegisterInfoDTO)
+	 */
+	@Override
+	public Result deleteCustermerRepayment(RepaymentRegisterInfoDTO registerInfoDTO) {
+		if (registerInfoDTO == null) {
+			return Result.error("500", "参数不能为空");
+		}
+		if (registerInfoDTO.getMoneyPoolId() == null) {
+			return Result.error("500", "id未知");
+		}
+		MoneyPoolRepayment moneyPoolRepayment = moneyPoolRepaymentMapper.selectById(registerInfoDTO.getMoneyPoolId());
+		if (moneyPoolRepayment == null) {
+			return Result.error("500", "查不到此还款登记");
+		}
+		if (moneyPoolRepayment.getState().equals(RepayRegisterFinanceStatus.财务指定银行流水.toString())) {
+			return Result.error("500", "财务指定银行流水,不能删除");
+		}
+		if (moneyPoolRepayment.getState().equals(RepayRegisterFinanceStatus.财务确认已还款.toString())) {
+			return Result.error("500", "财务确认已还款,不能删除");
+		}
+
+		boolean result = moneyPoolRepayment.deleteById();
+		if (result) {
+			ResponseData responseData = callRemoteService(new MoneyPoolRepaymentXindaiDTO(moneyPoolRepayment, registerInfoDTO.getBusinessId(), registerInfoDTO.getAfterId()), XINDAI_DEL);
+			if (responseData==null) {
+				throw new RuntimeException();
+			}
+			if (!responseData.getReturnCode().equals("1")) {
+				throw new RuntimeException(responseData.getReturnMessage());
+			}
+			String  data = responseData.getData();
+			if (data!=null) {
+				return Result.success();
+			}else {
+				throw new RuntimeException("信贷解密数据为null");
+			}
+		}else {
+			return Result.error("500", "数据删除失败");
+		}
 	}
 }
