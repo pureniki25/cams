@@ -1,30 +1,25 @@
 package com.hongte.alms.base.collection.service.impl;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.collection.mapper.PhoneUrgeMapper;
+import com.hongte.alms.base.collection.service.CollectionStatusService;
 import com.hongte.alms.base.collection.service.PhoneUrgeService;
 import com.hongte.alms.base.collection.vo.AfterLoanStandingBookReq;
 import com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo;
-import com.hongte.alms.base.collection.vo.StaffBusinessReq;
 import com.hongte.alms.base.collection.vo.StaffBusinessVo;
-import com.hongte.alms.base.entity.BasicCompany;
 import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.entity.SysUser;
-import com.hongte.alms.base.enums.RepayPlanStatus;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
 import com.hongte.alms.base.service.BasicCompanyService;
 import com.hongte.alms.base.service.SysParameterService;
 import com.hongte.alms.base.service.SysUserService;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
-import com.hongte.alms.common.util.DateUtil;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -57,6 +52,10 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
     @Autowired
     @Qualifier("BasicCompanyService")
     BasicCompanyService basicCompanyService;
+
+    @Autowired
+    @Qualifier("CollectionStatusService")
+    private CollectionStatusService collectionStatusService;
 
 
 //    @Override
@@ -109,9 +108,16 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
         }
 
 
+        String userId = loginUserInfoHelper.getUserId();
+        req.setUserId(userId);
 
-        req.setUserId(loginUserInfoHelper.getUserId());
+        //设置只能查询已分配的任务
+        //查找用户跟进的业务ID
+        List<String> followBids =  collectionStatusService.selectFollowBusinessIds(userId);
 
+        if(followBids != null && followBids.size()>0){
+            req.setBusinessIds(followBids);
+        }
 
         List<AfterLoanStandingBookVo> list = phoneUrgeMapper.selectAfterLoadStanding(pages,req);
 

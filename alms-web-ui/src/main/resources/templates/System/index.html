@@ -42,25 +42,80 @@
 <div id="app" v-cloak>
     <tabs value="personSetter">
 
-        <tab-pane label="催收时间设置" name="timeSetter">
+
+
+
+        <tab-pane label="定时器任务设置" name="timeSetter">
+            <div class="demoTable">
+                定时器名称：
+                <div class="layui-inline">
+                    <input v-model="jobName" class="layui-input" name="id" id="jobName" autocomplete="off">
+                </div>
+                <button class="layui-btn" data-type="reload" @click="toLoading">搜索</button>
+                <button class="layui-btn" data-type="" @click="addNewTimer">新增</button>
+            </div>
             <row style="padding: 10px">
                 <i-col span="24">
                     <!-- 使用方法渲染模式 -->
                     <table id="listTable" lay-filter="listTable"></table>
-                    <div style="display:none" id="listBarTools">
-                        <!--layui-btn layui-btn-xs-->
-                        <i-button v-if="authValid('singleSet')" style="width:80px" type="success" lay-event="timeSet" ht-auth="timeSingleSet" >设置</i-button>
-                    </div>
                 </i-col>
             </row>
 
+
+            <Modal
+                    v-model="timerSetModel"
+                    title="定时任务设置"
+                    @on-ok="confirmSelect"
+                    @on-cancel="">
+                <i-form ref="timerSetForm" :model="timerSetForm"  :label-width="150"  >
+
+                    <form-item label="id：" prop="id">
+                        <i-input v-model="timerSetForm.id" placeholder="Enter something..." style="width: 300px"></i-input>
+                    </form-item>
+
+                    <form-item label="定时器你名称：" prop="jobName">
+                        <i-input v-model="timerSetForm.jobName" placeholder="Enter something..." style="width: 300px"></i-input>
+                    </form-item>
+
+                    <form-item label="时间类型："  prop="timeType">
+                        <i-select v-model="timerSetForm.timeType"  clearable filterable  style="width: 80%">
+                            <i-option v-for="item in timeTypeList" :value="item.name" :key="item.name">{{ item.name }}</i-option>
+                        </i-select>
+                    </form-item>
+
+                    <form-item label="时间间隔：" prop="timeInterval">
+                        <i-input v-model="timerSetForm.timeInterval" placeholder="Enter something..." style="width: 300px"></i-input>
+                    </form-item>
+
+                    <form-item label="是否有效：" prop="activate">
+                        <radio-group v-model="timerSetForm.activate">
+                            <radio label="有效" ></radio>
+                            <radio label="无效"></radio>
+                        </radio-group>
+                    </form-item>
+
+                    <form-item label="是否开启：" prop="flagLock">
+                        <radio-group v-model="timerSetForm.flagLock">
+                            <radio label="开"></radio>
+                            <radio label="关"></radio>
+                        </radio-group>
+                    </form-item>
+
+
+
+                </i-form>
+
+            </Modal>
+
+
         </tab-pane>
     </tabs>
-
-
 </div>
 
-
+<script type="text/html" id="barTools">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
 <script>
 
     window.layinit(function (htConfig) {
@@ -69,8 +124,24 @@
         var vm = new Vue({
             el: '#app',
             data: {
-
-                loading: false
+                timerSetModel:false,
+                loading: false,
+                jobName:'',
+                timerSetForm:{
+                    id:'',
+                    jobName:'',
+                    timeType:'',
+                    timeInterval:'',
+                    activate:'',
+                    flagLock:''
+                },
+                timeTypeList:[
+                                {name:'按小时',key:'0',value:'HOUR'},
+                                {name:'按分钟',key:'1',value:'MINUTE'},
+                                {name:'按秒',key:'2',value:'SECOND'},
+                                {name:'按天',key:'3',value:'DAY'},
+                                {name:'无限制',key:'4',value:'NONE'},
+                            ]
 
             },
             computed: {},
@@ -78,8 +149,6 @@
 
                 init: function () {
                     var self = this;
-                    self.getCompanyAreaList();
-                    self.getCompanyList();
                     //使用layerUI的表格组件
                     layui.use(['layer', 'table', 'ht_ajax', 'ht_auth', 'ht_config'], function () {
                         layer = layui.layer;
@@ -93,9 +162,8 @@
                                 {
                                     field: 'id',
                                     title: 'id',
-                                    align:'center',
+                                    align:'center'
                                 },
-
                                 {
                                     field: 'jobName',
                                     title: '定时器名称',
@@ -120,14 +188,13 @@
                                 {
                                     fixed: 'right',
                                     title: '操作',
-                                    title: '操作',
-                                    width: 100,
+                                    width: 200,
                                     align: 'center',
                                     toolbar: '#barTools'
                                 }
 
                             ]], //设置表头
-                            url: basePath + 'timerSet/getTimetSetList',
+                            url: basePath + 'timerSet/getTimetSetList?jobName='+self.jobName,
 
                             page: true,
                             done: function (res, curr, count) {
@@ -143,6 +210,23 @@
                         //监听工具条
                         table.on('tool(listTable)', function (obj) {
 
+                            if(obj.event === 'edit'){
+                                console.log("------",obj.data)
+                                self.timerSetModel = true;
+                                self.timerSetForm.jobName = obj.data.jobName;
+                                self.timerSetForm.timeType = obj.data.timeType;
+                                self.timerSetForm.timeInterval = obj.data.timeInterval;
+                                self.timerSetForm.activate = obj.data.activate;
+                                self.timerSetForm.flagLock = obj.data.flagLock;
+                                self.timerSetForm.id = obj.data.id;
+                            }
+                            if(obj.event === 'del'){
+                                layer.confirm('真的删除行么', function(index){
+                                    var id = obj.data.id;
+                                    self.deleteTimer(id);
+                                    layer.close(index);
+                                });
+                            }
 
 
                         });
@@ -151,17 +235,17 @@
 
                 },
                 toLoading: function () {
+                    var self = this;
                     if (table == null) {
                         return;
                     }
-                    var self = this;
+
                     self.loading = true;
                     table.reload('listTable', {
                         where: {
 
-                            areaId: self.searchForm.areaId,  //区域ID
-                            companyId: self.searchForm.companyId, //分公司ID
-                            userName: self.searchForm.userName,  //业务类型
+                            jobName: self.jobName,  //定时器任务名称
+
                         }
                         , page: {
                             curr: 1 //重新从第 1 页开始
@@ -174,360 +258,75 @@
                     }
                     var self = this;
                     self.loading = true;
-                    table.reload('timeListTable');
-                },
-                getCompanyAreaList: function () {
-                    var self = this;
-                    var url = basePath + "collectionStrategy/company/getCompanyAreaList?id=1";
-                    axios.get(url)
-                        .then(function (result) {
-                            if (result.data.code == "1") {
-                                self.areaList = result.data.data.area;
-                            }
-                        })
-                },
-                getCompanyList:function () {
-                    var self = this;
-                    var url = basePath + "collectionStrategy/company/getCompanyAreaList?id=2";
-                    axios.get(url)
-                        .then(function (result) {
-                            if (result.data.code == "1") {
-                                self.companyList = result.data.data.area;
-                            }
-                        })
-                },
-                getCollectionGroup1AllUsers: function () {
-                    if (this.editCompanyCollectionUser.collectionGroup1AllUsers.length > 0) {
-                        return;
-                    }
-
-                    var url = basePath + "users/getUsers";
-                    axios.get(url)
-                        .then(function (result) {
-                            if (result.data.code == "1") {
-                                self.collectionGroup1AllUsers = result.data.data;
-                            }
-                        })
-
-                },
-                getCollectionGroup2AllUsers: function () {
-                    if (this.editCompanyCollectionUser.collectionGroup2AllUsers.length > 0) {
-                        return;
-                    }
-                    var url = basePath + "users/getUsers";
-
-                    axios.get(url)
-                        .then(function (result) {
-                            if (result.data.code == "1") {
-                                self.collectionGroup2AllUsers = result.data.data;
-                            }
-                        })
-                },
-                saveSingleCompanyCollectionUserSetting:function()
-                {
-                    var self=this;
-                    var url = basePath + "collectionStrategy/saveSingleCompanyCollectionUserSetting";
-                    $.ajax({
-                        type: "POST",
-                        url: url,
-                        contentType: "application/json; charset=utf-8",
-                        data: JSON.stringify(self.editCompanyCollectionUser.editCompanyCollectionForm),
-                        async: false,
-                        dataType: "json",
-                        success: function (data) {
-                            self.toLoading();
-                        }
-
-                    });
-                },
-                saveTimeSet:function () {
-                    var self=this;
-                    var url = basePath + "collectionStrategy/saveTimeSet";
-
-                    vm.$refs['editCompanyCollectionTime.editCompanyCollectionForm'].validate((valid) =>{
-                        if(valid){
-                            alert(valid);
-                            $.ajax({
-                                type: "POST",
-                                url: url,
-                                contentType: "application/json; charset=utf-8",
-                                data: JSON.stringify(self.editCompanyCollectionTime.editCompanyCollectionForm),
-                                async: false,
-                                dataType: "json",
-                                success: function (data) {
-                                    self.toLoadingTime();
-                                }
-
-                            });
-                        }else{
-                            vm.$Message.error({content: '表单校验失败!'});
-                        }
-                    })
-
-
-                },
-                showSingleCompanyCollectionUserSetting:function(companyId)
-                {
-                    this.editCompanyCollectionUser.editCompanyCollectionForm.companyId=companyId;
-                    this.getCollectionGroup1AllUsers();
-                    this.getCollectionGroup2AllUsers();
-                    var url = basePath + "collectionStrategy/getSingleCompanyCollectionUserSetting";
-
-                    axios.get(url)
-                        .then(function (result) {
-                            if (result.data.code == "1") {
-                                self.collectionGroup2AllUsers = result.data.data;
-                            }
-                        })
-                    this.editSingleCompanyCollectionUserSettingModal=true;
-
-                },
-                assignSet:function () {
-                    var self = this;
-                    self.assignSetModal = true;
-                    var url = basePath + "collectionStrategy/company/getClearingPersons";
-                    axios.get(url)
-                        .then(function (result) {
-                            if (result.data.code == "1") {
-                                self.editCompanyCollectionAssignSet.collectionGroup1AllUsers = result.data.data.sysUser;
-                                self.editCompanyCollectionAssignSet.collectionGroup2AllUsers = result.data.data.sysUser;
-                                self.editCompanyCollectionAssignSet.areaList = result.data.data.areaList;
-                                self.editCompanyCollectionAssignSet.companyId = result.data.data.companyList;
-                            }
-                        })
-                },
-                selectArea:function () {
-                    var self = this;
-                    self.selectAreaAndCity = true;
-                    self.getArea();
-                },
-                saveBatchPerson:function () {
-                    var self = this;
-                    var self = this;
-                    var url = basePath + "collectionStrategy/saveSingleCompanyCollectionUserSetting";
-                    $.ajax({
-                        type: "POST",
-                        url: url,
-                        contentType: "application/json; charset=utf-8",
-                        data: JSON.stringify(self.editCompanyCollectionAssignSet.editCompanyCollectionForm),
-                        async: false,
-                        dataType: "json",
-                        success: function (data) {
-                            self.toLoading();
-                        }
-
-                    });
-                },
-                getArea:function () {
-                    var self = this;
-                    var url = basePath + "collectionStrategy/getAreaList";
-                    $.ajax({
-                        type: "GET",
-                        url: url,
-                        contentType: "application/json; charset=utf-8",
-                        dataType: "json",
-                        success: function (data) {
-                            self.areaAndCity.allAreas[0].children = data.data
-                        }
-
-                    });
-                },
-                getCompany: function (areaPid) {
-                    var self = this;
-                    var url = basePath + "collectionStrategy/getCompanyList?areaPid="+areaPid;
-                    $.ajax({
-                        type: "GET",
-                        url: url,
-                        contentType: "application/json; charset=utf-8",
-//                        async: true,
-                        dataType: "json",
-                        success: function (data) {
-                            self.areaAndCity.allCitys = data.data;
-                        }
-
-                    });
-                },
-                showCitys:function (data) {
-
-                    var self = this;
-
-
-
-                    var index = (function () {
-                        if (event.target.className === "ivu-checkbox-input") return $(event.target).parents('li').find('ul').index($(event.target).parents('ul')[0]);
-                    })();
-                    //保存已选中的区域,清除取消勾选的区域
-                    var selectedData = self.$refs.tree.getCheckedNodes();
-
-                    self.areaAndCity.allSelectedAreas = [];
-                    for (var i = 0; i < selectedData.length ; i++) {
-                        self.areaAndCity.allSelectedAreas.push(selectedData[i].areaId);
-                    }
-                    this.getCompany(this.areaAndCity.allAreas[0].children[index].areaId);
-                    self.index = index;
-
-                    if(selectedData.length > 0){
-                        for(var i=0;i < selectedData.length;i++){
-                            var areaId = selectedData[i].areaId;
-                            //判断当前树节点是否被选中
-                            if(self.areaAndCity.allAreas[0].children[index].areaId == areaId){//当前点击的节点id在已被选中的树节点id中，则为已选中
-                                //已被选中
-                                if(index == 0){
-                                    self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys1;
-                                }else if(index == 1){
-                                    self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys2;
-                                }else if(index == 2){
-                                    self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys3;
-                                }else if(index == 3){
-                                    self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys4;
-                                }else if(index == 4){
-                                    self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys5;
-                                }else if(index == 5){
-                                    self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys6;
-                                }else if(index == 6){
-                                    self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys7;
-                                }
-                            }else {
-                                if(index == 0){
-                                    self.areaAndCity.currentSelectedCitys = [];
-                                    self.areaAndCity.currentCitys1 = [];
-                                }else if(index == 1){
-                                    self.areaAndCity.currentSelectedCitys = [];
-                                    self.areaAndCity.currentCitys2 = [];
-                                }else if(index == 2){
-                                    self.areaAndCity.currentSelectedCitys = [];
-                                    self.areaAndCity.currentCitys3 = [];
-                                }else if(index == 3){
-                                    self.areaAndCity.currentSelectedCitys = [];
-                                    self.areaAndCity.currentCitys4 = [];
-                                }else if(index == 4){
-                                    self.areaAndCity.currentSelectedCitys = [];
-                                    self.areaAndCity.currentCitys5 = [];
-                                }else if(index == 5){
-                                    self.areaAndCity.currentSelectedCitys = [];
-                                    self.areaAndCity.currentCitys6 = [];
-                                }else if(index == 6){
-                                    self.areaAndCity.currentSelectedCitys = [];
-                                    self.areaAndCity.currentCitys7 = [];
-                                }
-                            }
-                        }
-                    }else {
-                        self.areaAndCity.currentSelectedCitys = [];
-                        self.areaAndCity.currentCitys1 = [];
-                        self.areaAndCity.currentCitys2 = [];
-                        self.areaAndCity.currentCitys3 = [];
-                        self.areaAndCity.currentCitys4 = [];
-                        self.areaAndCity.currentCitys5 = [];
-                        self.areaAndCity.currentCitys6 = [];
-                        self.areaAndCity.currentCitys7 = [];
-                    }
-
-                },
-                getAllSelectedCitys:function (data) {
-                    var self = this;
-                    var index = self.index;
-
-
-                    if(data.length > 0){
-                        self.areaAndCity.allAreas[0].children[index].checked = true;
-                        var exit = self.areaAndCity.allSelectedAreas.indexOf(self.areaAndCity.allAreas[0].children[index].areaId) != -1;
-                        if(!exit){
-                            self.areaAndCity.allSelectedAreas.push(self.areaAndCity.allAreas[0].children[index].areaId);
-                        }
-
-                    }else {
-                        self.areaAndCity.allAreas[0].children[index].checked = false;
-                    }
-
-
-
-                    if(index == 0){
-                        self.areaAndCity.currentCitys1 = [];
-                        self.areaAndCity.currentCitys1 = data;
-
-                    }else if(index == 1){
-                        self.areaAndCity.currentCitys2 = [];
-                        self.areaAndCity.currentCitys2 = data;
-                    }else if(index == 2){
-                        self.areaAndCity.currentCitys3 = [];
-                        self.areaAndCity.currentCitys3 = data;
-                    }else if(index == 3){
-                        self.areaAndCity.currentCitys4 = [];
-                        self.areaAndCity.currentCitys4 = data;
-                    }else if(index == 4){
-                        self.areaAndCity.currentCitys5 = [];
-                        self.areaAndCity.currentCitys5 = data;
-                    }else if(index == 5){
-                        self.areaAndCity.currentCitys6 = [];
-                        self.areaAndCity.currentCitys6 = data;
-                    }else if(index == 6){
-                        self.areaAndCity.currentCitys7 = [];
-                        self.areaAndCity.currentCitys7 = data;
-                    }
-
-
+                    table.reload('listTable');
                 },
                 confirmSelect:function () {
                     var self = this;
-                    self.editCompanyCollectionAssignSet.editCompanyCollectionForm.areaName = self.areaAndCity.allSelectedAreas;
-                    for(var i=0;i<self.areaAndCity.currentCitys1.length;i++){
-                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys1[i]);
-                    }
-                    for(var i=0;i<self.areaAndCity.currentCitys2.length;i++){
-                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys2[i]);
-                    }
-                    for(var i=0;i<self.areaAndCity.currentCitys3.length;i++){
-                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys3[i]);
-                    }
-                    for(var i=0;i<self.areaAndCity.currentCitys4.length;i++){
-                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys4[i]);
-                    }
-                    for(var i=0;i<self.areaAndCity.currentCitys5.length;i++){
-                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys5[i]);
-                    }
-                    for(var i=0;i<self.areaAndCity.currentCitys6.length;i++){
-                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys6[i]);
-                    }
-                    for(var i=0;i<self.areaAndCity.currentCitys7.length;i++){
-                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys7[i]);
-                    }
-
-                },
-                selectChild:function (data) {
-                    var self = this;
-                    var indexqj = self.index;
-                    var num = self.areaAndCity.allAreas[0].children.indexOf(data[0]);
-
-                    if(data.length>0){
-                        this.getCompany(data[0].areaId);
-
-                        self.index = num;
-                        if(num == 0){
-                            self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys1;
-                        }else if(num == 1){
-                            self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys2;
-                        }else if(num == 2){
-                            self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys3;
-                        }else if(num == 3){
-                            self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys4;
-                        }else if(num == 4){
-                            self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys5;
-                        }else if(num == 5){
-                            self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys6;
-                        }else if(num == 6){
-                            self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys7;
+                    console.log(self.timerSetForm);
+                    var url = basePath + "timerSet/saveTimetSetList";
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(self.timerSetForm),
+                        async: false,
+                        dataType: "json",
+                        success: function (data) {
+                            console.log("fanhuicanshu ===========",data);
+                            if (data.code == "1") {
+                                self.timerSetModel = false;
+                                self.$Modal.success({
+                                    title: '',
+                                    content: '操作成功'
+                                });
+                            }else {
+                                self.$Modal.error({content: '操作失败，消息：' + data.msg});
+                            }
+                            self.toLoadingTime();
+                        },
+                        error:function (data) {
+                            self.$Modal.error({content: '操作失败，消息：' + data});
+                            self.toLoadingTime();
                         }
-                    }
-
-
+                    });
                 },
-                test:function () {
+                addNewTimer:function () {
                     var self = this;
-                    self.selectAreaAndCity = true;
+                    self.timerSetModel = true;
+                    self.timerSetForm.jobName = [];
+                    self.timerSetForm.timeType = [];
+                    self.timerSetForm.timeInterval = [];
+                    self.timerSetForm.activate = [];
+                    self.timerSetForm.flagLock = [];
+                    self.timerSetForm.id = [];
+                },
+                deleteTimer:function (id) {
+                    var self = this;
+                    var url = basePath + "timerSet/deleteTimer?id="+id;
+                    $.ajax({
+                        type: "GET",
+                        url: url,
+                        contentType: "application/json; charset=utf-8",
+                        async: false,
+                        dataType: "json",
+                        success: function (data) {
+                            if (data.code == "1") {
+                                self.timerSetModel = false;
+                                self.$Modal.success({
+                                    title: '',
+                                    content: '操作成功'
+                                });
+                            }else {
+                                self.$Modal.error({content: '操作失败，消息：' + data.msg});
+                            }
+                            self.toLoadingTime();
+                        },
+                        error:function (data) {
+                            self.$Modal.error({content: '操作失败，消息：' + data});
+                            self.toLoadingTime();
+                        }
+                    });
                 }
-
-
             },
             mounted: function () {
                 this.init();
@@ -536,17 +335,8 @@
 
         })
     });
-
-    //表单验证配置参数
-    var validateOpt = {
-        overDueDays: [
-            {required: true, message: '请输入逾期天数', trigger: 'blur'},
-            { type: 'number', max: 20, message: '不能超过20个字符', trigger: 'blur' }
-        ],
-        startTime: [
-            { required: true, type: 'date', message: '请选择开始时间', trigger: 'change' }
-        ]
-    };
 </script>
+
+
 </body>
 </html>

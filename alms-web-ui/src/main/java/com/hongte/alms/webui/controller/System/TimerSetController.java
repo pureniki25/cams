@@ -14,6 +14,6 @@ public class TimerSetController {
 
     @RequestMapping("/index")
     public String index() {
-        return "/System/timerSet" ;
+        return "/System/index" ;
     }
 }
