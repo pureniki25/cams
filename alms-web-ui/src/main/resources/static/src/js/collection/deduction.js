@@ -206,10 +206,10 @@ var layer;
                                     field: 'listId',
                                     title: '序号'
                                 }, {
-                                    field: 'createTime',
+                                    field: 'updateTime',
                                     title: '代扣时间'
                                 },{
-                                    field: 'repayMoney',
+                                    field: 'currentAmount',
                                     title: '代扣金额'
                                 }, {
                                     field: 'customerName',
