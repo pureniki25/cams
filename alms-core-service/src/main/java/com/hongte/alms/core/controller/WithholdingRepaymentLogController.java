@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -196,20 +197,31 @@ public class WithholdingRepaymentLogController {
 	    
 	    @Value("${ht.excel.file.save.path}")
 	    private  String excelSavePath;
-
+ 
 	    @ApiOperation(value = "还款计划日志表导出Excel  ")
-	    @PostMapping("/saveExcel")
-	    public void saveExcel(HttpServletRequest request, HttpServletResponse response,@ModelAttribute RepaymentLogReq req) throws Exception {
+	    @PostMapping("/saveExcel")  
+	    public Result saveExcel(HttpServletRequest request, HttpServletResponse response,@RequestBody RepaymentLogReq req) throws Exception {
+	    	req.setUserId(loginUserInfoHelper.getUserId());
 	        EasyPoiExcelExportUtil.setResponseHead(response,"repaylogmengt.xls");
 	        List<RepaymentLogVO> list = withholdingRepaymentlogService.selectRepaymentLogExcel(req);
  
 	        Workbook workbook = ExcelExportUtil.exportExcel(new ExportParams(), RepaymentLogVO.class, list);
 
 
+	        String fileName =  UUID.randomUUID().toString()+".xls";
+	        System.out.println(fileName);
 
 
-	        workbook.write(response.getOutputStream());
+	        Map<String,String> retMap = storageService.storageExcelWorkBook(workbook,fileName);
 
+	        retMap.put("errorInfo","");
+	        retMap.put("sucFlage","true");
+
+	        if(retMap.get("sucFlage").equals("true")){
+	            return  Result.success(fileName);
+	        }else{
+	            return Result.error("500", retMap.get("errorInfo"));
+	        }
 
 	    }
 

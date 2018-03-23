@@ -35,7 +35,7 @@ public interface TransferOfLitigationMapper {
 	 * @param businessId 业务编号
 	 * @return
 	 */
-	TransferOfLitigationVO queryTransferLitigationData(@Param(value="businessId") String businessId, @Param(value="crpId")  String crpId);
+	TransferOfLitigationVO queryTransferLitigationData(@Param(value="businessId") String businessId);
 	
 	/**
 	 * 判断业务类型

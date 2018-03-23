@@ -30,6 +30,18 @@ var setFormValidate = {
     ],
     realReceiveMoney: [
         {pattern:/^[0-9]+(.[0-9]{1,2})?$/,   message: '请填写不超过两位小数的数字', trigger: 'blur'}
+    ],
+    derateReson: [
+    	{required: true, message: '必填', trigger: 'blur'}  ,
+    	{
+        	validator: function (rule, value, callback, source, options) {
+	        	if (value.length > 1000 ) {
+	        		callback(new Error('字数长度不能超过500'));
+	        	} else {
+	        	callback();//校验通过
+	        	}
+        	}
+        }
     ]
 };
 
@@ -322,9 +334,7 @@ window.layinit(function (htConfig) {
 	             });
 	    	},
 	    	downloadFile: function(info){
-//    			layui.use(['layer', 'ht_config'], function () {
-    				return basePath+'doc/download?downloadFile='+info.downloadFileName + '&docUrl=' + info.docUrl
-//                });
+				return basePath+'downLoadController/download?downloadFile='+info.downloadFileName + '&docUrl=' + info.docUrl
 	    	},
 	    	removeTabTr: function (event, index) {
 	    		var docId=$('#docId'+index).val();  

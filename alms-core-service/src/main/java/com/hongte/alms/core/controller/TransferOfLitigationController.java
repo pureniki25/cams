@@ -331,11 +331,9 @@ public class TransferOfLitigationController {
 	@ApiOperation(value = "移交诉讼API")
 	@GetMapping("/queryTransferLitigationData")
 	@ResponseBody
-	public Result<TransferOfLitigationVO> queryTransferLitigationData(@RequestParam String businessId,
-			@RequestParam String crpId) {
+	public Result<TransferOfLitigationVO> queryTransferLitigationData(@RequestParam String businessId) {
 		try {
-			TransferOfLitigationVO litigationData = transferOfLitigationService.sendTransferLitigationData(businessId,
-					crpId, sendUrl);
+			TransferOfLitigationVO litigationData = transferOfLitigationService.sendTransferLitigationData(businessId, sendUrl);
 			if (litigationData != null) {
 				return Result.success(litigationData);
 			} else {

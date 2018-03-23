@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiOperation;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -112,7 +113,10 @@ public class WithHoldingController {
 				}
 		
 			} else {
-				return Result.success(respData.getReturnMessage());
+				Result result=new Result();
+				result.setCode("-2");
+				result.setData(respData.getReturnMessage());
+				return result;
 			}
 
 		} catch (Exception ex) {
@@ -127,7 +131,7 @@ public class WithHoldingController {
 	
 	@ApiOperation(value = "查询代扣记录")
 	@GetMapping("/searchRepayLog")
-	public PageResult<List<RepayLogResp>>searchRepayLog(@RequestParam("originalBusinessId") String originalBusinessId) {
+	public PageResult<List<RepayLogResp>>searchRepayLog(@RequestParam("originalBusinessId") String originalBusinessId,@RequestParam("afterId") String afterId) {
 		try {
 
 			RequestData requestData = new RequestData();
@@ -145,7 +149,17 @@ public class WithHoldingController {
 			// 返回数据解密
 			ResponseData respData = getRespData(respStr);
 			List<RepayLogResp> list=JSON.parseArray(respData.getData(), RepayLogResp.class);
-			
+			for(Iterator<RepayLogResp> it = list.iterator();it.hasNext();) {
+				RepayLogResp resp=it.next();
+				if(!resp.getAfterId().equals(afterId)) {
+					it.remove();
+				}
+			}
+			RepayLogResp repayLogResp=null;
+			   for(int i=0;i< list.size();i++) {
+				   repayLogResp=list.get(i);
+				   repayLogResp.setListId(String.valueOf(i+1));
+			   }
 		      return PageResult.success(list, list.size());
 		} catch (Exception ex) {
 			logger.error(ex.getMessage());
