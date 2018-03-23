@@ -33,7 +33,7 @@ spring:
     config:
       discovery:
         enabled: true
-        service-id: alms-scheduled-service
+        service-id: ussp-config-app
       profile: dev
       username: root
       password: 123456
@@ -63,7 +63,7 @@ spring:
     config:
       discovery:
         enabled: true
-        service-id: alms-scheduled-service
+        service-id: ussp-config-app
       username: root
       password: 123456
 
@@ -94,7 +94,7 @@ spring:
     config:
       discovery:
         enabled: false
-        service-id: alms-scheduled-service
+        service-id: ussp-config-app
       username: root
       password: 123456
       uri: http://10.100.5.195:30106
@@ -108,6 +108,7 @@ ht:
   config:
     ui:
       useGateWayflage: true   #是否使用网关的标志位
+
 ---
 spring:
   profiles: prd
@@ -115,7 +116,7 @@ spring:
     config:
       discovery:
         enabled: true
-        service-id: alms-scheduled-service
+        service-id: ussp-config-app
       username: root
       password: 123456
     bus:
@@ -126,7 +127,8 @@ eureka:
     prefer-ip-address: true
   client:
     serviceUrl:
-      defaultZone: ${EUREKA_SERVER_ADDRESS} # 配置注册中心url
+      defaultZone: http://10.100.1.74:30101/eureka/,http://10.100.1.75:30102/eureka/,http://10.100.1.76:30103/eureka/
+#       ${EUREKA_SERVER_ADDRESS} # 配置注册中心url
 ht:
   config:
     ui:
