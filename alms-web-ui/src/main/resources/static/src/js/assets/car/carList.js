@@ -136,7 +136,7 @@ window.layinit(function (htConfig) {
                         	businessId:vm.searchForm.businessId,//业务编号
                         	customerName:vm.searchForm.customerName,  //客户名称
                         	licensePlateNumber:vm.searchForm.licensePlateNumber,  //车牌号
-                        	edition:vm.searchForm.model,  //车辆型号
+                        	model:vm.searchForm.model,  //车辆型号
                             areaId:vm.searchForm.areaId,  //区域ID
                             companyId:vm.searchForm.companyId, //分公司ID
                             trailerStartDate:$("#trailerStartDate").val(),//vm.searchForm.trailerStartDate,//拖车开始时间
@@ -149,6 +149,8 @@ window.layinit(function (htConfig) {
                         }
                     });
                     this.loading = false;
+                    vm.searchForm.trailerStartDate=$("#trailerStartDate").val();
+                    vm.searchForm.trailerEndDate=$("#trailerEndDate").val();
                 }
 
                 // this.loading = false;
@@ -211,12 +213,12 @@ window.layinit(function (htConfig) {
         	 laydate = layui.laydate;
        	    laydate.render({
     	        elem: '#trailerStartDate',
-    	        type:'datetime',
+    	        type:'date',
     	    
     	    });
       	    laydate.render({
     	        elem: '#trailerEndDate',
-    	        type:'datetime',
+    	        type:'date',
     	     
     	    });
             //执行渲染
@@ -243,7 +245,7 @@ window.layinit(function (htConfig) {
                     }, {
 
                         field: 'repaidAmount',
-                        title: '应还金额'
+                        title: '已还金额'
                     }, {
 
                         field: 'licensePlateNumber',
