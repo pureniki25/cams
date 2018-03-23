@@ -121,6 +121,8 @@ window.layinit(function (htConfig) {
                         }
                     )
                 }
+                
+                
                 cols.push(
                     {
                         field: 'createUserName',
@@ -133,6 +135,15 @@ window.layinit(function (htConfig) {
                         title: '发起时间'
                     }
                 )
+                
+                if(reqPageeType == "Approved"||reqPageeType == "SelfStart"||reqPageeType =="CopySendToMe" ){
+                    cols.push(
+                            {
+                                field: 'finishTime',
+                                title: '完成时间'
+                            }
+                        )
+                }
                 cols.push(
                     {
                         field: 'processTypeName',

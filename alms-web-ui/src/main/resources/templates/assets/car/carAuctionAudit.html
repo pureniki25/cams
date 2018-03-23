@@ -571,8 +571,8 @@ color: #FF3030;
 							<td class="td_label" rowspan="5">{{approvalInfo.stepName}}：</td>
 							<td class="td_label" >是否同意审批：</td>
 							<td colspan="4">
-							      <input name="sex" v-model="approvalInfo.isPass" disabled type="radio" value="1"><label>是</label>&nbsp;&nbsp;
-      							  <input name="sex" v-model="approvalInfo.isPass" disabled type="radio" value="0"><label>否</label>
+							      <input  v-model="approvalInfo.isPass" disabled type="radio" value="1"><label>是</label>&nbsp;&nbsp;
+      							  <input  v-model="approvalInfo.isPass" disabled type="radio" value="0"><label>否</label>
 							</td>
 						</tr>
 						<tr>
@@ -607,8 +607,8 @@ color: #FF3030;
 							<td class="td_label" rowspan="5">{{approvalInfoForm.approvalUserInfo}}：</td>
 							<td class="td_label" >是否同意审批：</td>
 							<td colspan="4">
-							      <input name="sex" v-model="approvalInfoForm.isPass"  type="radio" value="1"><label>是</label>&nbsp;&nbsp;
-      							  <input name="sex" v-model="approvalInfoForm.isPass"  type="radio" value="0"><label>否</label>
+							      <input  v-model="approvalInfoForm.isPass"  type="radio" value="1"><label>是</label>&nbsp;&nbsp;
+      							  <input  v-model="approvalInfoForm.isPass"  type="radio" value="0"><label>否</label>
 							</td>
 						</tr>
 						<tr>

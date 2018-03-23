@@ -99,6 +99,12 @@ public class AuctionBidderVo implements Serializable{
 	@ApiModelProperty(required= true,value = "更新时间")
 	@JsonFormat( pattern = "yyyy-MM-dd HH:mm")
 	private Date updateTime;
+	
+	
+	private String payDepositStr;
+	
+	private String auctionSuccessStr;
+	
 	public String getBidderName() {
 		return bidderName;
 	}
@@ -189,6 +195,17 @@ public class AuctionBidderVo implements Serializable{
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
 	}
-
+	public String getPayDepositStr() {
+		return payDepositStr;
+	}
+	public void setPayDepositStr(String payDepositStr) {
+		this.payDepositStr = payDepositStr;
+	}
+	public String getAuctionSuccessStr() {
+		return auctionSuccessStr;
+	}
+	public void setAuctionSuccessStr(String auctionSuccessStr) {
+		this.auctionSuccessStr = auctionSuccessStr;
+	}
 	
 }

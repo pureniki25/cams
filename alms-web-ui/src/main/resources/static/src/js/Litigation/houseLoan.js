@@ -454,8 +454,9 @@ window.layinit(function (htConfig) {
 	             });
 	    	},
 	    	downloadFile: function(info){
-	    		// 如果文档id存在，那么进行ajax
-	    			return basePath+'doc/download?downloadFile='+info.downloadFileName + '&docUrl=' + info.docUrl
+    			layui.use(['layer', 'ht_config'], function () {
+    				return basePath+'doc/download?downloadFile='+info.downloadFileName + '&docUrl=' + info.docUrl
+                });
 	    	},
 	    	removeTabTr: function (event, index) {
 	    		var docId=$('#docId'+index).val();  

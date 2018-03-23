@@ -173,6 +173,16 @@
                 and permission.user_id = #{userId}
             </if>
 
+            <!--  设置跟进业务组 -->
+            <if test="businessIds !=null">
+                and business.business_id  IN
+                <foreach collection="businessIds" item="bizId" index="index"
+                         open="(" close=")" separator=",">
+                    #{bizId}
+                </foreach>
+
+            </if>
+
         </where>
 
         order BY  pList.due_date DESC

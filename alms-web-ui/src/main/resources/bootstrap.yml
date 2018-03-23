@@ -1,5 +1,30 @@
+server:
+  port: 30601
 spring:
-  profiles.active: local
+  application:
+    name: alms-web-ui
+  cloud:
+    config:
+      discovery:
+        service-id: ussp-config-app
+    bus:
+      enabled: false
+  profiles:
+    active: local
+eureka:
+  instance:
+    prefer-ip-address: true
+
+ht:
+#  config:
+#    ui:
+#      useGateWayflage: true   #是否使用网关的标志位
+    uc.api:
+      synch: true #是否同步API资源到用户权限中心
+      isDeleteOld: false #是否删除旧资源，删除旧资源的同时，关联关系也将被删除
+      packages: com.hongte.alms.core #API资源扫描的包，可用多个，多个使用“,”分隔
+      app: ALMS
+
 
 ---
 spring:
@@ -9,18 +34,10 @@ spring:
       enabled: false
     bus:
       enabled: false
-
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration,org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration.RabbitAnnotationDrivenConfiguration,org.springframework.cloud.config.client.ConfigClientAutoConfiguration
-management:
-  security:
-    enabled: false
 eureka:
-  instance:
-    prefer-ip-address: true
   client:
     serviceUrl:
-      defaultZone: http://172.16.200.110:30101/eureka/  # 配置注册中心url
+      defaultZone: http://172.16.200.110:30101/eureka/
 ht:
   config:
     ui:
@@ -35,24 +52,16 @@ spring:
     config:
       discovery:
         enabled: true
-        service-id: ussp-config-app
-      profile: dev
-      username: root
-      password: 123456
     bus:
-      trace:
-        enabled: true
-
+      enabled: true
 eureka:
   instance:
-    prefer-ip-address: true
+    ip-address: 172.16.200.110
+    status-page-url: http://${eureka.instance.ip-address}:${server.port}${status-page-url-path:/info}
+    health-check-url: http://${eureka.instance.ip-address}:${server.port}${health-check-url-path:/health}
   client:
     serviceUrl:
-      defaultZone: http://172.16.200.110:30101/eureka/ # 配置注册中心url
-    instance:
-      ip-address: 172.16.200.110
-      status-page-url: http://${eureka.instance.ip-address:${spring.cloud.client.ipAddress}}:${server.port}${status-page-url-path:/info}
-      health-check-url: http://${eureka.instance.ip-address:${spring.cloud.client.ipAddress}}:${server.port}${health-check-url-path:/health}
+      defaultZone: http://172.16.200.110:30101/eureka/
 ht:
   config:
     ui:
@@ -66,30 +75,21 @@ spring:
     config:
       discovery:
         enabled: true
-        service-id: ussp-config-app
-      username: root
-      password: 123456
-
     bus:
-      trace:
-        enabled: true
-
+      enabled: true
 eureka:
   instance:
-    prefer-ip-address: true
+    ip-address: 172.16.200.112
+    status-page-url: http://${eureka.instance.ip-address}:${server.port}${status-page-url-path:/info}
+    health-check-url: http://${eureka.instance.ip-address}:${server.port}${health-check-url-path:/health}
   client:
     serviceUrl:
-      defaultZone: http://172.16.200.112:30101/eureka/  # 配置注册中心url
-    instance:
-      ip-address: 172.16.200.112
-      status-page-url: http://${eureka.instance.ip-address:${spring.cloud.client.ipAddress}}:${server.port}${status-page-url-path:/info}
-      health-check-url: http://${eureka.instance.ip-address:${spring.cloud.client.ipAddress}}:${server.port}${health-check-url-path:/health}
+      defaultZone: http://172.16.200.112:30101/eureka/
 ht:
   config:
     ui:
       gatewayUrl: http://172.16.200.112:30111/  #网关地址
       useGateWayflage: true   #是否使用网关的标志位
-
 
 ---
 spring:
@@ -97,17 +97,14 @@ spring:
   cloud:
     config:
       discovery:
-        enabled: false
-        service-id: ussp-config-app
-      username: root
-      password: 123456
-      uri: http://10.100.5.195:30106
+        enabled: true
+    bus:
+      enabled: true
+
 eureka:
-  instance:
-    prefer-ip-address: true
   client:
     serviceUrl:
-      defaultZone: ${EUREKA_SERVER_ADDRESS} # 配置注册中心url
+      defaultZone: ${EUREKA_SERVER_ADDRESS}
 ht:
   config:
     ui:
@@ -133,5 +130,3 @@ ht:
     ui:
       gatewayUrl: http://120.78.25.128:30111/  #网关地址
       useGateWayflage: true   #是否使用网关的标志位
-
-

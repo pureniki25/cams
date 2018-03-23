@@ -605,7 +605,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
      * @param phonePersons
      * @return
      */
-    public List<CollectionStatusCountDto> selecLastPlanPhoneFollwPList(List<String> phonePersons){
+    public List<CollectionStatusCountDto>  selecLastPlanPhoneFollwPList(List<String> phonePersons){
         //末期逾期  跟进人员列表
         List<CollectionStatusCountDto> phoneFollowPersonlist = collectionStatusMapper.selectAllPersons(
                 StaffPersonType.PHONE_STAFF.getKey()

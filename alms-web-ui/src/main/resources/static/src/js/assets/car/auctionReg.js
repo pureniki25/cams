@@ -15,9 +15,9 @@ window.layinit(function (htConfig) {
 	    	auctionReg:{
 	    		 businessId:''// 业务编号
 	    		,auctionId:''// 拍卖id
-	    		,isPayDeposit:''// 是否缴纳保证金
+	    		,payDeposit:''// 是否缴纳保证金
 	    		,offerAmount:''// 出价金额
-	    		,isAuctionSuccess:''// 是否竞拍成功
+	    		,auctionSuccess:''// 是否竞拍成功
 	    		,transPrice:''//成交价格
 	    	},
 	    	bidder:{
@@ -36,6 +36,7 @@ window.layinit(function (htConfig) {
 	                success: function (data) {
 	                	vm.auctionReg=data.data.auctionReg;
 	                	vm.bidder=data.data.bidder;
+	                	//alert(JSON.stringify(vm.auctionReg));
 	                },
 	                error: function (message) {
 	                    layer.msg("查询拍卖信息发生异常，请联系管理员。");

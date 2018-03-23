@@ -268,7 +268,11 @@
         process.process_result as pResult,
         s_user.user_name as createUserName,
 		business.company_id as companyId,
-		company.area_name as companyName
+		company.area_name as companyName,
+		
+			(CASE process.status
+         WHEN 2 THEN process.update_time 
+         ELSE NULL END)  as finishTime
         from tb_process as process
         LEFT JOIN tb_basic_business as business ON process.business_id = business.business_id
         LEFT JOIN tb_process_type as p_type ON process.process_typeid = p_type.type_id
@@ -329,11 +333,11 @@
             </if>
             <!--          /*结束时间  开始  只查询已结束的 */ -->
             <if test="finishTimeBegin !=null ">
-                <![CDATA[ and process.status = 2 AND process.update_time >= #{createTimeBegin,jdbcType=TIMESTAMP}]]>
+                <![CDATA[ and process.status = 2 AND process.update_time >= #{finishTimeBegin,jdbcType=TIMESTAMP}]]>
             </if>
             <!--            /*结束时间   结束   只查询已结束的*/ -->
             <if test="finishTimeEnd !=null ">
-                <![CDATA[ and process.status = 2  and process.update_time <= #{createTimeEnd,jdbcType=TIMESTAMP}]]>
+                <![CDATA[ and process.status = 2  and process.update_time <= #{finishTimeEnd,jdbcType=TIMESTAMP}]]>
             </if>
             <!--            /*审批状态*/ -->
             <if test="processStatus !=null">

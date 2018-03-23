@@ -366,7 +366,7 @@ public class CarController {
     	CarAuctionReg carAuctionReg=new CarAuctionReg();
     	CarAuctionBidder carAuctionBidder=new CarAuctionBidder();
     	if(!StringUtils.isEmpty(carAuction.getAuctionId())) {
-    		List<CarAuctionReg>	carAuctionRegs=carAuctionRegService.selectList(new EntityWrapper<CarAuctionReg>().eq("auction_id", carAuction.getAuctionId()));
+    		List<CarAuctionReg>	carAuctionRegs=carAuctionRegService.selectList(new EntityWrapper<CarAuctionReg>().eq("auction_id", carAuction.getAuctionId()).eq("is_auction_success", true));
     		if(carAuctionRegs!=null&&carAuctionRegs.size()>0) {
     			carAuctionReg=carAuctionRegs.get(0);
     			carAuctionBidder=carAuctionBidderService.selectById(carAuctionReg.getRegTel());
@@ -388,7 +388,7 @@ public class CarController {
   }
       
     
-    @ApiOperation(value = "重新审核")
+    @ApiOperation(value = "重新评估")
     @PostMapping("/againAssess")
     public Result<Object> againAssess(@RequestBody Map<String,Object> params){
     	try {
@@ -400,12 +400,16 @@ public class CarController {
       		return Result.error("9999", "非待处置状态的车辆不能重新评估");
     	}
       	if(!CarStatusEnums.PENDING.getStatusCode().equals(rCarBasic.getStatus())) {
-      		logger.error("非待处置状态的车辆不能进行拍卖,businessId="+carBasic.getBusinessId());
+      		logger.error("非待处置状态的车辆不能重新评估,businessId="+carBasic.getBusinessId());
       		return Result.error("9999", "非待处置状态的车辆不能重新评估");
       	}
     	CarDetection rCarDetection=carDetectionService.selectById(carDetection.getBusinessId());
+    	carBasic.setLastEvaluationAmount(carBasic.getEvaluationAmount());
+    	carBasic.setLastEvaluationTime(new Date());
+    	carBasic.setEvaluationAmount(rCarBasic.getEvaluationAmount());
     	BeanUtils.copyProperties(carBasic, rCarBasic);
     	BeanUtils.copyProperties(carDetection, rCarDetection);
+
     	carBasicService.updateById(rCarBasic);
     	carDetectionService.updateById(rCarDetection);
     	
@@ -1008,7 +1012,8 @@ try {
     @ApiOperation(value = "获取车辆拍卖信息")
     @PostMapping("/getAuctionReg")
     public Result<Object> getAuctionReg(@ModelAttribute("regId") String regId){
-    	try{CarAuctionReg reg=carAuctionRegService.selectById(regId);
+    	try{
+    		CarAuctionReg reg=carAuctionRegService.selectById(regId);
     	if(reg==null) {
     		logger.error("拍卖登记信息不存在，regId="+regId);
     		return Result.error("9999", "拍卖登记信息不存在");
@@ -1054,7 +1059,7 @@ try {
     		return Result.error("9999", "该拍卖进行中或已结束");
     	}
     	if(auctionReg.getAuctionSuccess()!=null&&true==auctionReg.getAuctionSuccess()) {
-    		List<CarAuctionReg> auctionRegs=	carAuctionRegService.selectList(new EntityWrapper<CarAuctionReg>().eq("auctionId", reg.getAuctionId()).eq("is_auction_success", auctionReg.getAuctionSuccess()));
+    		List<CarAuctionReg> auctionRegs=	carAuctionRegService.selectList(new EntityWrapper<CarAuctionReg>().eq("auction_id", reg.getAuctionId()).eq("is_auction_success", auctionReg.getAuctionSuccess()));
     		if(auctionRegs!=null&&auctionRegs.size()>0) {
     			logger.error("该拍卖已竞拍成功，auctionId="+reg.getAuctionId());
         		return Result.error("9999", "该拍卖已竞拍成功");
