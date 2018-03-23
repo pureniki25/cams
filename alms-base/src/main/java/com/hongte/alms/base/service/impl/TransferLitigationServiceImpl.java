@@ -247,36 +247,29 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				if (litigationResponse.getCode() == 1) {
 					LitigationResponseData data = litigationResponse.getData();
 					if (!data.isImportSuccess()) {
-						LOG.error("businessId：" + businessId + "，发送诉讼系统失败！！诉讼系统返回信息：" + data.toString());
+						LOG.info("businessId：" + businessId + "，发送诉讼系统失败！！诉讼系统返回信息：" + data.toString());
 						throw new ServiceRuntimeException(data.getMessage());
 					}
-					LOG.error("businessId：" + businessId + "，发送诉讼系统成功！诉讼系统返回信息：" + data.toString());
+					LOG.info("businessId：" + businessId + "，发送诉讼系统成功！诉讼系统返回信息：" + data.toString());
 				}
 			} else {
-				LOG.error("businessId：" + businessId + "，发送诉讼系统失败！！没有消息返回");
+				LOG.info("businessId：" + businessId + "，发送诉讼系统失败！！没有消息返回");
 				throw new ServiceRuntimeException("businessId：" + businessId + "，发送诉讼系统失败！！没有消息返回");
 			}
-		} catch (Exception e) {
-			LOG.error("发送诉讼系统失败！！！", e);
-			throw new ServiceRuntimeException(e.getMessage(), e);
-		}finally {
 			TransferLitigationLog transferLitigationLog = new TransferLitigationLog();
 			transferLitigationLog.setBusinessId(businessId);
 			transferLitigationLog.setCreateTime(new Date());
-			if (transferLitigationData != null) {
-				transferLitigationLog.setCreateUser(transferLitigationData.getCreateUserId());
-				transferLitigationLog.setSendJson(JSON.toJSONString(transferLitigationData));
-			}else {
-				transferLitigationLog.setSendJson("没有找到相关诉讼数据！");
-			}
-			if (litigationResponse != null) {
-				transferLitigationLog.setResultCode(litigationResponse.getCode());
-				transferLitigationLog.setResultMsg(litigationResponse.getMsg());
-				transferLitigationLog.setResultJson(JSON.toJSONString(litigationResponse));
-			}else {
-				transferLitigationLog.setResultMsg("诉讼系统没有消息返回！");
-			}
+			transferLitigationLog.setCreateUser(transferLitigationData.getCreateUserId());
+			transferLitigationLog.setSendJson(JSON.toJSONString(transferLitigationData));
+			transferLitigationLog.setSendJson("没有找到相关诉讼数据！");
+			transferLitigationLog.setResultCode(litigationResponse.getCode());
+			transferLitigationLog.setResultMsg(litigationResponse.getMsg());
+			transferLitigationLog.setResultJson(JSON.toJSONString(litigationResponse));
+			transferLitigationLog.setResultMsg("诉讼系统没有消息返回！");
 			transferLitigationLogService.insert(transferLitigationLog);
+		} catch (Exception e) {
+			LOG.error("发送诉讼系统失败！！！", e);
+			throw new ServiceRuntimeException(e.getMessage(), e);
 		}
 
 		return transferLitigationData;
