@@ -144,35 +144,35 @@ window.layinit(function (htConfig) {
                 })
             },
             ////  ----   单行操作界面显示  结束 -----------------
+         
+            
             clickExport() {//导出Excel表格
+                /**layui.config({
+                    base: '/plugins/layui/extend/modules/',
+                    version: false
+                })**/
                 layui.use(['layer', 'table','ht_config'], function () {
-	                vm.$refs['searchForm'].validate((valid) => {debugger
-	                    if (valid) {
-	                        vm.exporting = true;
-	//                        expoertExcel(basePath + "RepaymentLogController/saveExcel",vm.searchForm);
-	                        var ExportForm = document.createElement("FORM");
-	                        document.body.appendChild(ExportForm);
-	                        ExportForm.method = "POST";
-	                        ExportForm.action = basePath+"RepaymentLogController/saveExcel";
-	                        ExportForm.target = "iframe";
-	                        addInput(ExportForm, "text", "companyId", vm.searchForm.companyId);
-	                        addInput(ExportForm, "text", "keyName", vm.searchForm.keyName); 
-	                        addInput(ExportForm, "text", "platformId", vm.searchForm.platformId); 
-	                        addInput(ExportForm, "text", "repayStatus", vm.searchForm.repayStatus); 
-	                        addInput(ExportForm, "text", "dateBegin", dateObj.dateBegin);   
-	                        addInput(ExportForm, "text", "dateEnd", dateObj.dateEnd);
-	                        addInput(ExportForm, "text", "businessTypeId", vm.searchForm.businessTypeId);     
-	                        ExportForm.submit();
-	                        document.body.removeChild(ExportForm);
-	
-	                        vm.exporting = false;
-	
-	                    }
-	                })
+                	//config = layui.ht_config;
+                vm.$refs['searchForm'].validate((valid) => {
+               
+                    if (valid) {
+                        vm.exporting = true;
+                        //var dateObj = getData();
+                        var ExportForm = document.createElement("FORM");
+                        document.body.appendChild(ExportForm);
+                        ExportForm.method = "POST";
+                        ExportForm.action = basePath+"RepaymentLogController/saveExcel";
+                        ExportForm.target = "iframe";
+
+                   
+                        ExportForm.submit();
+                        document.body.removeChild(ExportForm);
+
+                        vm.exporting = false;
+                    }
+                })
                 });
             }
-            
-            
         
         },
         mounted:function(){
