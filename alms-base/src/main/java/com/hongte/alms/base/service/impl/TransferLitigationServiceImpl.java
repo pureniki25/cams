@@ -261,11 +261,9 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			transferLitigationLog.setCreateTime(new Date());
 			transferLitigationLog.setCreateUser(transferLitigationData.getCreateUserId());
 			transferLitigationLog.setSendJson(JSON.toJSONString(transferLitigationData));
-			transferLitigationLog.setSendJson("没有找到相关诉讼数据！");
 			transferLitigationLog.setResultCode(litigationResponse.getCode());
 			transferLitigationLog.setResultMsg(litigationResponse.getMsg());
 			transferLitigationLog.setResultJson(JSON.toJSONString(litigationResponse));
-			transferLitigationLog.setResultMsg("诉讼系统没有消息返回！");
 			transferLitigationLogService.insert(transferLitigationLog);
 		} catch (Exception e) {
 			LOG.error("发送诉讼系统失败！！！", e);
