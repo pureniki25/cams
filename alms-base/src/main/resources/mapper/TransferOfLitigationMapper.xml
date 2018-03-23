@@ -479,7 +479,7 @@
 		      WHEN SUM(`plan_amount`) > 0 
 		      THEN 1 
 		      ELSE 0 
-		    END `是否分公司服务费前置收取` 
+		    END `是否服务费一次性收取的业务` 
 		  FROM
 		    (SELECT 
 		      t3.`plan_amount` 
@@ -492,8 +492,28 @@
 		      AND t2.original_business_id = #{businessId,jdbcType=VARCHAR} 
 		      AND IFNULL(t3.plan_item_type, 0) = 30 
 		      AND IFNULL(t1.repay_flag, 0) != 6 
-		      AND IFNULL(t1.`period`, 0) != 0) tab) isPreCharge,
-		  -- 是否分公司服务费前置收取
+		      AND IFNULL(t1.`period`, 0) != 0) tab) isPreCharge, -- 是否服务费一次性收取的业务
+		  (SELECT 
+			  CASE
+			    WHEN plan_amount > 0 
+			    THEN 0 
+			    ELSE 1 
+			  END  
+			FROM
+			  (SELECT 
+			    t3.`plan_amount` 
+			  FROM
+			    tb_repayment_biz_plan_list t1,
+			    tb_repayment_biz_plan t2,
+			    tb_repayment_biz_plan_list_detail t3 
+			  WHERE t1.plan_id = t2.plan_id 
+			    AND t1.plan_list_id = t3.plan_list_id 
+			    AND t2.original_business_id = #{businessId,jdbcType=VARCHAR} 
+			    AND IFNULL(t3.plan_item_type, 0) = 30 
+			    AND IFNULL(t1.repay_flag, 0) != 6
+			    GROUP BY t1.plan_list_id
+			    ORDER BY t1.due_date DESC
+			    LIMIT 1) tab) isPreServiceFees,	-- 是否服务费前置收取
 		  (SELECT 
 		    COUNT(1) 
 		  FROM
