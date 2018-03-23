@@ -198,7 +198,7 @@ public class WithholdingRepaymentLogController {
 	    private  String excelSavePath;
 
 	    @ApiOperation(value = "还款计划日志表导出Excel  ")
-	    @PostMapping("/saveExcel")
+	    @GetMapping("/saveExcel")
 	    public void saveExcel(HttpServletRequest request, HttpServletResponse response,@ModelAttribute RepaymentLogReq req) throws Exception {
 	        EasyPoiExcelExportUtil.setResponseHead(response,"repaylogmengt.xls");
 	        List<RepaymentLogVO> list = withholdingRepaymentlogService.selectRepaymentLogExcel(req);

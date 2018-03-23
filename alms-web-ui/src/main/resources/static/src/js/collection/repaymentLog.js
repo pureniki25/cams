@@ -96,9 +96,9 @@ window.layinit(function (htConfig) {
             countbyLogId:[],
             SumRepayAmount:[],
             repayStatusList: [
-                {name: '成功', id:'1'},
-                {name: '失败', id:'0'},
-                {name: '处理中', id:'2'},
+                {name: '成功', repayStatus:'1'},
+                {name: '失败', repayStatus:'0'},
+                {name: '处理中', repayStatus:'2'},
             ],
             selectedRowInfo:'',//存储当前选中行信息
             edit_modal:false,//控制编辑项选择modal显示的标志位
@@ -151,21 +151,21 @@ window.layinit(function (htConfig) {
                         vm.exporting = true;
 //                        expoertExcel(basePath + "RepaymentLogController/saveExcel",vm.searchForm);
                         var ExportForm = document.createElement("FORM");
-                        document.body.appendChild(ExportForm);
-                        ExportForm.method = "POST";
-                        ExportForm.action = basePath+"RepaymentLogController/saveExcel";
-                        ExportForm.target = "iframe";
-                        addInput(ExportForm, "text", "companyId", vm.searchForm.companyId);
-                        addInput(ExportForm, "text", "keyName", vm.searchForm.keyName); 
-                        addInput(ExportForm, "text", "platformId", vm.searchForm.platformId); 
-                        addInput(ExportForm, "text", "repayStatus", vm.searchForm.repayStatus); 
-                        addInput(ExportForm, "text", "dateBegin", dateObj.dateBegin);   
-                        addInput(ExportForm, "text", "dateEnd", dateObj.dateEnd);
-                        addInput(ExportForm, "text", "userId", userId);     
-                        addInput(ExportForm, "text", "businessTypeId", vm.searchForm.businessTypeId);     
-                        ExportForm.submit();
-                        document.body.removeChild(ExportForm);
-
+//                        document.body.appendChild(ExportForm);
+//                        ExportForm.method = "POST";
+//                        ExportForm.action = basePath+"RepaymentLogController/saveExcel";
+//                        ExportForm.target = "iframe";
+//                        addInput(ExportForm, "text", "companyId", vm.searchForm.companyId);
+//                        addInput(ExportForm, "text", "keyName", vm.searchForm.keyName); 
+//                        addInput(ExportForm, "text", "platformId", vm.searchForm.platformId); 
+//                        addInput(ExportForm, "text", "repayStatus", vm.searchForm.repayStatus); 
+//                        addInput(ExportForm, "text", "dateBegin", dateObj.dateBegin);   
+//                        addInput(ExportForm, "text", "dateEnd", dateObj.dateEnd);
+//                        addInput(ExportForm, "text", "userId", userId);     
+//                        addInput(ExportForm, "text", "businessTypeId", vm.searchForm.businessTypeId);     
+//                        ExportForm.submit();
+//                        document.body.removeChild(ExportForm);
+                 	   	window.open(basePath + 'RepaymentLogController/saveExcel','_blank'); 
                         vm.exporting = false;
 
                     }
