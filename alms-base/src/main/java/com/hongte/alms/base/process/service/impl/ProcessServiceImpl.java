@@ -130,7 +130,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
                 .eq("business_id",processSaveReq.getBusinessId())
                 .eq("status",ProcessStatusEnums.RUNNING.getKey()).eq("process_typeid", processType.getTypeId()));
         if(pList.size()>=processType.getCanItemRunningCount()){
-            throw new RuntimeException("此业务已有"+pList.size()+"个"+processType.getTypeName()+"流程在审批中，请已有流程完成后再试！！");
+            throw new RuntimeException("此业务已有"+pList.size()+"个"+processType.getTypeName()+"在审批中，请已有流程完成后再试！！");
         }
 
         //2.查出此业务已运行并执行结果为成功的流程有几条
@@ -140,7 +140,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
         .eq("process_result",ProcessResultEnums.PASS.getKey())
         .eq("process_typeid", processType.getTypeId()));
         if(sucPList.size()>=processType.getCanItemTotalCount()){
-            throw new RuntimeException("此业务已有"+sucPList.size()+"个"+processType.getTypeName()+"流程通过审批，不能再申请！！");
+            throw new RuntimeException("此业务已有"+sucPList.size()+"个"+processType.getTypeName()+"通过审批，不能再申请！！");
         }
 
 
