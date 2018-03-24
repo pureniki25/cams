@@ -475,25 +475,6 @@ window.layinit(function (htConfig) {
 	    	        	console.error(error);
 	    	        });
 	    			
-	    			/*$.ajax({
-		                type: "GET",
-		                url: basePath+'doc/delOneDoc?docId='+docId,
-		                headers: {
-		                	'app': 'ALMS',
-		                	'Authorization': 'Bearer ' + getToken()
-		                },
-		                success: function (data) {
-		                	console.log(data, that);
-		                	that.returnRegFiles.splice(index, 1);
-		    	            if(that.returnRegFiles == ""){
-		    	            	that.addTabTr(event);
-		    	            }
-		                },
-		                error: function (message) {
-		                    layer.msg("删除文件失败。");
-		                    console.error(message);
-		                }
-		            });*/
 	    		// 否则直接删除
 	    		} else {
 	    			that.returnRegFiles.splice(index, 1);
