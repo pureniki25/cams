@@ -464,6 +464,10 @@ window.layinit(function (htConfig) {
 	    			$.ajax({
 		                type: "GET",
 		                url: basePath+'doc/delOneDoc?docId='+docId,
+		                headers: {
+		                	'app': 'ALMS',
+		                	'Authorization': 'Bearer ' + getToken()
+		                },
 		                success: function (data) {
 		                	console.log(data, that);
 		                	that.returnRegFiles.splice(index, 1);
