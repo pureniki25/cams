@@ -461,7 +461,21 @@ window.layinit(function (htConfig) {
 	    		var that = this;
 	    		// 如果文档id存在，那么进行ajax
 	    		if (docId) {
-	    			$.ajax({
+	    			var url = basePath+'doc/delOneDoc?docId='+docId;
+	    			axios.get(url)
+	    	        .then(function (res) {
+	    	        	console.log(res, that);
+	                	that.returnRegFiles.splice(index, 1);
+	    	            if(that.returnRegFiles == ""){
+	    	            	that.addTabTr(event);
+	    	            }
+	    	        })
+	    	        .catch(function (error) {
+	    	        	layer.msg("删除文件失败。");
+	    	        	console.error(error);
+	    	        });
+	    			
+	    			/*$.ajax({
 		                type: "GET",
 		                url: basePath+'doc/delOneDoc?docId='+docId,
 		                headers: {
@@ -479,7 +493,7 @@ window.layinit(function (htConfig) {
 		                    layer.msg("删除文件失败。");
 		                    console.error(message);
 		                }
-		            });
+		            });*/
 	    		// 否则直接删除
 	    		} else {
 	    			that.returnRegFiles.splice(index, 1);
