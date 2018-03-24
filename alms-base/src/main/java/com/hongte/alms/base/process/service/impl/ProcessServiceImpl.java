@@ -140,7 +140,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
         .eq("process_result",ProcessResultEnums.PASS.getKey())
         .eq("process_typeid", processType.getTypeId()));
         if(sucPList.size()>=processType.getCanItemTotalCount()){
-            throw new RuntimeException("此业务已有"+pList.size()+"个"+processType.getTypeName()+"流程通过审批，不能再申请！！");
+            throw new RuntimeException("此业务已有"+sucPList.size()+"个"+processType.getTypeName()+"流程通过审批，不能再申请！！");
         }
 
 
