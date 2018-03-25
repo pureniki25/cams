@@ -100,7 +100,7 @@ var layer;
 		
 		
         var self = this;
-        var reqStr =openPath+ "WithHoldingController/withholding?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId+"&total="+vm.ajax_data.total+"&planOverDueMoney="+vm.ajax_data.planOverDueMoney+"&platformId="+vm.ajax_data.platformId+"&type=1"+"&nowdate="+vm.ajax_data.nowdate
+        var reqStr =openPath+ "WithHoldingController/withholding?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId+"&total="+vm.ajax_data.total+"&planOverDueMoney="+vm.ajax_data.planOverDueMoney+"&platformId="+vm.platformId+"&type=1"+"&nowdate="+vm.ajax_data.nowdate
         axios.get(reqStr)
             .then(function (result) {
                 if (result.data.code == "1") {
@@ -125,11 +125,11 @@ var layer;
    
 	}
 	
-	var withHoldingRecordWithoutOverMoeny=function(){
+	var withHoldingRecordWithoutOverMoeny=function(){ 
 		
 		
         var self = this;
-        var reqStr =openPath+ "WithHoldingController/withholding?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId+"&total="+vm.ajax_data.total+"&planOverDueMoney="+vm.ajax_data.planOverDueMoney+"&platformId="+vm.ajax_data.platformId+"&type=0"+"&nowdate="+vm.ajax_data.nowdate
+        var reqStr =openPath+ "WithHoldingController/withholding?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId+"&total="+vm.ajax_data.total+"&planOverDueMoney="+vm.ajax_data.planOverDueMoney+"&platformId="+vm.platformId+"&type=0"+"&nowdate="+vm.ajax_data.nowdate
         axios.get(reqStr)
             .then(function (result) {
                 if (result.data.code == "1") {
