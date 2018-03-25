@@ -385,7 +385,7 @@ public class ApplyDerateController {
 
     @ApiOperation(value = "减免管理 存储Excel  ")
     @PostMapping("/saveExcel")
-    public Result<String> saveExcel(HttpServletRequest request, HttpServletResponse response,@ModelAttribute ApplyDerateListSearchReq req) throws Exception {
+    public Result<String> saveExcel(HttpServletRequest request, HttpServletResponse response,@RequestBody ApplyDerateListSearchReq req) throws Exception {
         EasyPoiExcelExportUtil.setResponseHead(response,"AfterLoanStandingBook.xls");
         List<ApplyDerateVo> list = applyDerateProcessService.selectApplyDerateList(req);
 
