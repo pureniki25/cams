@@ -11,18 +11,8 @@ var vm = new Vue({
     		,engineModel:''//发动机号
     		,displacement:''	//排量
     		,invoiceCost:''//发票价
-    		,trafficViolationSituation:''//违章情况
-    		,trafficViolationFee:''//违章费用
-    		,vehicleVesselTax:''	//车船税费用
-    		,annualTicketFee:''//统缴费用
-	    	,drivingLicenseConsistent:''//核对行驶资料
-	    	,renewal:''//借款期内是否续保
-	    	,fuelType:''//燃油形式
-	    	,vehicleLicenseRegistrationDate:''//汽车注册日期
-	    	,annualVerificationExpirationDate:''//年审到期日
-	    	,mortgage:''//车辆抵押状态
-	    	,odometer:''//里程表读数
-	    	,fuelLeft:''//燃油量（约余）
+    		,lastTransferDate:''//过户日期
+
     	},
     	carDetection:{
     		centerPanelNormal:''//中控台
@@ -48,6 +38,19 @@ var vm = new Vue({
     		,accident:''//是否有事故痕迹
     		,otherTrouble:''//是否有其他问题
     		,otherTroubleDescription:''//其他情况说明
+    		
+    		,trafficViolationSituation:''//违章情况
+    		,trafficViolationFee:''//违章费用
+    		,vehicleVesselTax:''	//车船税费用
+    		,annualTicketFee:''//统缴费用
+	    	,drivingLicenseConsistent:''//核对行驶资料
+	    	,renewal:''//借款期内是否续保
+	    	,fuelType:''//燃油形式
+	    	,vehicleLicenseRegistrationDate:''//汽车注册日期
+	    	,annualVerificationExpirationDate:''//年审到期日
+	    	,mortgage:''//车辆抵押状态
+	    	,odometer:''//里程表读数
+	    	,fuelLeft:''//燃油量（约余）
     	}
     	,carAuction:{
     		createUser:''//申请人

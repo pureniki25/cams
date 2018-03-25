@@ -113,68 +113,68 @@
 										<tr>
 											<td class="td_label">购车日期：</td>
 											<td><input type="text" name="lname"
-												class="input-border-none" value="未抵押" readonly="readonly"
-												v-model="carBasic.vin"></td>
+												class="input-border-none"  readonly="readonly"
+												v-model="carBasic.lastTransferDate"></td>
 										</tr>
 										<tr>
 											<td class="td_label">违章情况：</td>
 											<td><input type="text" name="lname"
 												class="input-border-none" value="未抵押" readonly="readonly"
-												v-model="carBasic.trafficViolationSituation"></td>
+												v-model="carDetection.trafficViolationSituation"></td>
 										</tr>
 										<tr>
 											<td class="td_label">违章费用：</td>
 											<td><input type="text" name="lname"
 												class="input-border-none" value="未抵押" readonly="readonly"
-												v-model="carBasic.trafficViolationFee"></td>
+												v-model="carDetection.trafficViolationFee"></td>
 										</tr>
 										<tr>
 											<td class="td_label">车船税费用：</td>
 											<td><input type="text" name="lname"
 												class="input-border-none" value="未抵押" readonly="readonly"
-												v-model="carBasic.vehicleVesselTax"></td>
+												v-model="carDetection.vehicleVesselTax"></td>
 										</tr>
 										<tr>
 											<td class="td_label">统缴费用</td>
 											<td><input type="text" name="lname"
 												class="input-border-none" value="未抵押" readonly="readonly"
-												v-model="carBasic.annualTicketFee"></td>
+												v-model="carDetection.annualTicketFee"></td>
 										</tr>
 										<tr>
 											<td class="td_label">核对行驶资料：</td>
 											<td><input type="text" name="lname"
-												class="input-border-none" v-bind:value="carBasic.drivingLicenseConsistent==true?'相符':'不符'" readonly="readonly"
+												class="input-border-none" v-bind:value="carDetection.drivingLicenseConsistent==true?'相符':'不符'" readonly="readonly"
 												></td>
 										</tr>
 										<tr>
 											<td class="td_label">借款期内是否续保：</td>
 											<td><input type="text" name="lname"
-												class="input-border-none" v-bind:value="carBasic.renewal==true?'是':'否'" readonly="readonly"
+												class="input-border-none" v-bind:value="carDetection.renewal==true?'是':'否'" readonly="readonly"
 												></td>
 										</tr>
 										<tr>
 											<td class="td_label">燃油形式：</td>
 											<td><input type="text" name="lname"
-												class="input-border-none" v-bind:value="carBasic.fuelType==0?'汽油':'柴油'" readonly="readonly"
+												class="input-border-none" v-bind:value="carDetection.fuelType==0?'汽油':'柴油'" readonly="readonly"
 												></td>
 										</tr>
 										<tr>
 											<td class="td_label">汽车注册日期：</td>
 											<td><input type="text" name="lname"
 												class="input-border-none" value="未抵押" readonly="readonly"
-												v-model="carBasic.vehicleLicenseRegistrationDate"></td>
+												v-model="carDetection.vehicleLicenseRegistrationDate"></td>
 										</tr>
 
 										<tr>
 											<td class="td_label">年审到期日：</td>
 											<td><input type="text" name="lname"
 												class="input-border-none" value="未抵押" readonly="readonly"
-												v-model="carBasic.annualVerificationExpirationDate"></td>
+												v-model="carDetection.annualVerificationExpirationDate"></td>
 										</tr>
 										<tr>
 											<td class="td_label">车辆抵押状态：</td>
 											<td><input type="text" name="lname"
-												class="input-border-none" v-bind:value="carBasic.mortgage==true?'已抵押':'未抵押'" readonly="readonly"
+												class="input-border-none" v-bind:value="carDetection.mortgage==true?'已抵押':'未抵押'" readonly="readonly"
 												></td>
 										</tr>
 									</table>
@@ -190,13 +190,13 @@
 											<td class="td_label">里程表读数：</td>
 											<td><input type="text" name="lname"
 												class="input-border-none"   readonly="readonly"
-												v-model="carBasic.odometer"></td>
+												v-model="carDetection.odometer"></td>
 										</tr>
 										<tr>
 											<td class="td_label">燃油量（约余）：</td>
 											<td><input type="text" name="lname"
 												class="input-border-none" value="未抵押" readonly="readonly"
-												v-model="carBasic.fuelLeft"></td>
+												v-model="carDetection.fuelLeft"></td>
 										</tr>
 										<tr>
 											<td class="td_label">中控台：</td>
@@ -427,7 +427,7 @@
 										<tr>
 											<td class="td_label">处置单位：</td>
 											<td>
-												<textarea v-bind:value="carAuction.handleUnit" readonly="readonly" rows="2" class="input-border-none" >
+												<textarea v-bind:value="carAuction.handleUnit" readonly="readonly" rows="2" class="input-border-none" style="width: 250px;height: 100px">
 
 												</textarea>
 											</td>
