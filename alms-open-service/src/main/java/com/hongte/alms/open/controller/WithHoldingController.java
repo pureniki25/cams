@@ -100,7 +100,7 @@ public class WithHoldingController {
 			String respStr = withholdingxindaiService.withholding(encryptStr);
 			// 返回数据解密
 			ResponseData respData = getRespData(respStr);
-		
+			logger.debug("执行代扣接口返回数据:"+respData.getData());
 			
 			if ("1".equals(respData.getReturnCode())) {// 处理中
 				
@@ -148,6 +148,7 @@ public class WithHoldingController {
 			String respStr = withholdingxindaiService.searchRepayRecord(encryptStr);
 			// 返回数据解密
 			ResponseData respData = getRespData(respStr);
+			logger.debug("代扣查询接口返回数据:"+respData.getData());
 			List<RepayLogResp> list=JSON.parseArray(respData.getData(), RepayLogResp.class);
 			for(Iterator<RepayLogResp> it = list.iterator();it.hasNext();) {
 				RepayLogResp resp=it.next();
