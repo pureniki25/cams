@@ -100,7 +100,7 @@ public class WithHoldingController {
 			String respStr = withholdingxindaiService.withholding(encryptStr);
 			// 返回数据解密
 			ResponseData respData = getRespData(respStr);
-			logger.debug("执行代扣接口返回数据:"+respData.getData());
+			logger.info("执行代扣接口返回数据:"+respData.getData());
 			
 			if ("1".equals(respData.getReturnCode())) {// 处理中
 				
@@ -148,8 +148,9 @@ public class WithHoldingController {
 			String respStr = withholdingxindaiService.searchRepayRecord(encryptStr);
 			// 返回数据解密
 			ResponseData respData = getRespData(respStr);
-			logger.debug("代扣查询接口返回数据:"+respData.getData());
+			logger.info("代扣查询接口返回数据:"+respData.getData());
 			List<RepayLogResp> list=JSON.parseArray(respData.getData(), RepayLogResp.class);
+			//筛选对应本期的代扣记录
 			for(Iterator<RepayLogResp> it = list.iterator();it.hasNext();) {
 				RepayLogResp resp=it.next();
 				if(!resp.getAfterId().equals(afterId)) {
@@ -160,6 +161,11 @@ public class WithHoldingController {
 			   for(int i=0;i< list.size();i++) {
 				   repayLogResp=list.get(i);
 				   repayLogResp.setListId(String.valueOf(i+1));
+				   if(repayLogResp.getRepayStatus().equals("1")) {
+					   repayLogResp.setRepayStatus("成功");
+				   }else {
+					   repayLogResp.setRepayStatus("失败");
+				   }
 			   }
 		      return PageResult.success(list, list.size());
 		} catch (Exception ex) {
