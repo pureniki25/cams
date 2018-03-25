@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.assets.car.vo.AuditVo;
+import com.hongte.alms.base.baseException.AlmsBaseExcepiton;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.ProcessEngineFlageEnums;
 import com.hongte.alms.base.enums.SysRoleAreaTypeEnums;
@@ -130,7 +131,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
                 .eq("business_id",processSaveReq.getBusinessId())
                 .eq("status",ProcessStatusEnums.RUNNING.getKey()).eq("process_typeid", processType.getTypeId()));
         if(pList.size()>=processType.getCanItemRunningCount()){
-            throw new RuntimeException("此业务已有"+pList.size()+"个"+processType.getTypeName()+"在审批中，请已有流程完成后再试！！");
+            throw new RuntimeException("此业务已有"+pList.size()+"个"+processType.getTypeName()+"流程在审批中，请已有流程完成后再试！！");
         }
 
         //2.查出此业务已运行并执行结果为成功的流程有几条
@@ -140,7 +141,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
         .eq("process_result",ProcessResultEnums.PASS.getKey())
         .eq("process_typeid", processType.getTypeId()));
         if(sucPList.size()>=processType.getCanItemTotalCount()){
-            throw new RuntimeException("此业务已有"+sucPList.size()+"个"+processType.getTypeName()+"通过审批，不能再申请！！");
+            throw new RuntimeException("此业务已有"+pList.size()+"个"+processType.getTypeName()+"流程通过审批，不能再申请！！");
         }
 
 
@@ -890,7 +891,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
         Process process = selectById(req.getProcessId());
 
         if(!process.getCurrentStep().equals(req.getCurrentStep())){
-            throw  new RuntimeException("当前流程状态与界面流程状态不一致，请刷新后重新提交!");
+            throw  new AlmsBaseExcepiton("当前流程状态与界面流程状态不一致，请刷新后重新提交!");
         }
 
         //判断登录用户是否是当前步骤的审批人之一
@@ -901,7 +902,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
         //流程类型
         ProcessType processType = processTypeService.getProcessTypeByCode(processTypeEnums.getKey());
         if(processType == null){
-            throw new RuntimeException("流程类型未定义");
+            throw new AlmsBaseExcepiton("流程类型未定义");
         }
         //后一个节点定义
         ProcessTypeStep nextStep = null;
@@ -910,14 +911,14 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
         //当前节点定义
         ProcessTypeStep currentStep = processTypeStepService.getProcessTypeStep(processType.getTypeId(),req.getCurrentStep());
         if(currentStep == null){
-            throw new  RuntimeException("找不到 当前流程节点定义！");
+            throw new  AlmsBaseExcepiton("找不到 当前流程节点定义！");
         }
 
      
         //如果回退则取回退的步骤
-        if(req.getIsPass().equals(ProcessApproveResult.REFUSE.getKey())&&req.getIsDirectBack().equals(ProcessIsDerateBackEnums.YES.getKey())){
+        if(Integer.valueOf(req.getIsPass()).equals(ProcessApproveResult.REFUSE.getKey())&&Integer.valueOf(req.getIsDirectBack()).equals(ProcessIsDerateBackEnums.YES.getKey())){
             if(req.getNextStep()==null){
-                throw new  RuntimeException("应该设置回退到第几步！");
+                throw new  AlmsBaseExcepiton("应该设置回退到第几步！");
             }
             nextStep = processTypeStepService.getProcessTypeStep(processType.getTypeId(),req.getNextStep());
             process.setIsDirectBack(ProcessIsDerateBackEnums.YES.getKey());//标识回退
@@ -953,6 +954,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
         log.setCreateTime(new Date());
         log.setActionDesc(req.getRemark());
         log.setIsPass(req.getIsPass());
+        log.setIsDirectBack(req.getIsDirectBack());
         processLogService.insert(log);
 
         //添加抄送记录
@@ -968,7 +970,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
 
         //更新状态
         //如果审批不通过且未定向打回则结束流程
-        if(log.getIsPass().equals(ProcessApproveResult.REFUSE.getKey())&&!log.getIsDirectBack().equals(ProcessIsDerateBackEnums.YES.getKey())){
+        if(Integer.valueOf(ProcessApproveResult.REFUSE.getKey()).equals(log.getIsPass())&&!Integer.valueOf(ProcessIsDerateBackEnums.YES.getKey()).equals(log.getIsDirectBack())){
             process.setCurrentStep(null);
             process.setApproveUserId(null);
             process.setStatus(ProcessStatusEnums.END.getKey());

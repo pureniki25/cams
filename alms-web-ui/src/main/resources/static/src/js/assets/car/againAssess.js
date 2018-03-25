@@ -1,5 +1,6 @@
 var businessId = document.getElementById("businessId").getAttribute("value");
-
+var amt=/^(([1-9]\d*)|\d)(\.\d{1,2})?$/;
+var ex = /^[1-9]\d*$/; 
 window.layinit(function (htConfig) {
     var _htConfig = htConfig;
     basePath = _htConfig.coreBasePath;
@@ -12,16 +13,43 @@ window.layinit(function (htConfig) {
             el: '#app',
             data: {
                 carBasic:{
-                    vin:''//车架号
+                	businessId:''//业务编号
+                    ,vin:''//车架号
                     ,engineModel:''//发动机号
                     ,displacement:''	//排量
                     ,invoiceCost:''//发票价
+              
+                }
+                ,drivingLicenseInconsistentDescription:''//["有差异","有改装","有改色","有翻新"]
+                ,carDetection:{
+                	id:''//评估id
+                    ,centerPanelNormal:''//中控台
+                    ,centerPanelAbnormalDescription:''//中控台描述
+                    ,ventilatorNormal:''//空调
+                    ,ventilatorAbnormalDescription:''//空调描述
+                    ,interiorNormal:''//车厢内饰
+                    ,interiorAbnormalDescription:''//车厢内饰异常说明
+                    ,windowGlassNormal:''//玻璃
+                    ,windowGlassAbnormalDescription:''//玻璃说明
+                    ,radiatorNormal:''//水箱
+                    ,radiatorAbnormalDescription:''//水箱说明
+                    ,engineNormal:''//发动机
+                    ,engineAbnormalDescription:''//发动机说明
+                    ,frameNormal:''//车大梁
+                    ,frameAbnormalDescription:''//车大梁说明
+                    ,tireNormal:''//轮胎
+                    ,tireAbnormalDescription:''//轮胎说明
+                    ,spareTireNormal:''//备用胎
+                    ,spareTireAbnormalDescrioption:''//备用胎说明
+                    ,doorNormal:''//车门
+                    ,doorAbnormalDescription:''//车门说明
+                    //----------
                     ,trafficViolationSituation:''//违章情况
                     ,trafficViolationFee:''//违章费用
                     ,vehicleVesselTax:''	//车船税费用
                     ,annualTicketFee:''//统缴费用
-                    ,drivingLicenseConsistent:''//核对行驶资料
-
+                    ,drivingLicenseConsistent:''//是否核对行驶资料
+                    ,drivingLicenseInconsistentDescription:''//行驶资料
                     ,renewal:''//借款期内是否续保
                     ,fuelType:''//燃油形式
                     ,vehicleLicenseRegistrationDate:''//汽车注册日期
@@ -29,52 +57,30 @@ window.layinit(function (htConfig) {
                     ,mortgage:''//车辆抵押状态
                     ,odometer:''//里程表读数
                     ,fuelLeft:'' //燃油量（约余）
-                    ,gearBox:''//变速箱
-                    ,drivingLicenseInconsistentDescription:''
-
-                }
-                ,drivingLicenseInconsistentDescription:''//["有差异","有改装","有改色","有翻新"]
-                ,carDetection:{
-                    centerPanelNormal:''//中控台
-
-                    ,ventilatorNormal:''//空调
-                    ,interiorNormal:''//车厢内饰
-                    ,windowGlassNormal:''//玻璃
-                    ,radiatorNormal:''//水箱
-                    ,engineNormal:''//发动机
-                    ,frameNormal:''//车大梁
-                    ,tireNormal:''//轮胎
-                    ,spareTireNormal:''//备用胎
-                    ,doorNormal:''//车门
-
+                    ,gearBox:''//变速箱       	
                     //,  :''其他情况说明
                     ,evaluationAmount:''//评估金额
                     ,accelerationPerformanceNormal:''//发动机性能
+                    ,accelerationPerformanceAbnormalDescription:''//发动机性能说明
                     ,brakingPerformanceNormal:''//刹车性能
+                    ,brakingPerformanceAbnormalDescription:''//刹车性能说明
                     ,brakingBalancePerformanceNormal:''//刹车平衡性能
+                    ,brakingBalancePerformanceAbnormalDescription:''//刹车平衡性能
                     ,steerPerformanceNormal:''//方向性能
+                    ,steerPerformanceAbnormalDescription:''//方向性能说明
                     ,gearPerformanceNormal:''//挂档性能
+                    ,gearPerformanceAbnormalDescription:''//挂档性能说明
                     ,otherDriveDescription:''//其他情况说明
                     ,vinConsistent:''//车架号是否一致
                     ,engineModelConsistent:''//发动机号是否一致
                     ,accident:''//是否有事故痕迹
                     ,otherTrouble:''//是否有其他问题
                     ,otherTroubleDescription:''//其他情况说明
-                    ,centerPanelAbnormalDescription:''
-                    ,ventilatorAbnormalDescription:''
-                    ,interiorAbnormalDescription:''
-                    ,windowGlassAbnormalDescription:''
-                    ,radiatorAbnormalDescription:''
-                    ,engineAbnormalDescription:''
-                    ,frameAbnormalDescription:''
-                    ,tireAbnormalDescription:''
-                    ,spareTireAbnormalDescrioption:''
-                    ,doorAbnormalDescription:''
-                    ,accelerationPerformanceAbnormalDescription:''
-                    ,brakingPerformanceAbnormalDescription:''
-                    ,brakingBalancePerformanceAbnormalDescription:''
-                    ,steerPerformanceAbnormalDescription:''
-                    ,gearPerformanceAbnormalDescription:''
+                    ,transferFee:''//使用权转移价,转让费
+                    ,edition:''//车型及版本配置
+                    
+                    
+                    
 
                 }
                 ,centerPanelAbnormalDescription:''//["有破损","松动"]
@@ -94,6 +100,78 @@ window.layinit(function (htConfig) {
                 ,gearPerformanceAbnormalDescription:''//["密封性差","封条松动"]
             },
             mounted: function () {
+    	    	$("#trafficViolationFee").focus(function(){
+  	    		  $("#trafficViolationFee").css("border","1px solid #ccc");
+  	    		});
+    	    	$("#trafficViolationFee").blur(function(){
+    	    		var trafficViolationFee=$("#trafficViolationFee").val();
+    	    		if (trafficViolationFee !=null&&trafficViolationFee !=''&&!amt.test(trafficViolationFee)) {  
+    	    			$("#trafficViolationFee").css("border","1px solid #FF3030");
+    	    			layer.msg("请输入有效金额！",{icon:5,shade: [0.8, '#393D49']});
+    	    			return;
+    	    		}
+    	    		
+    	    	});
+    	    	$("#vehicleVesselTax").focus(function(){
+    	    		  $("#vehicleVesselTax").css("border","1px solid #ccc");
+    	    		});
+    	    	$("#vehicleVesselTax").blur(function(){
+    	    		var vehicleVesselTax=$("#vehicleVesselTax").val();
+    	    		if (vehicleVesselTax !=null&&vehicleVesselTax !=''&&!amt.test(vehicleVesselTax)) {  
+    	    			$("#vehicleVesselTax").css("border","1px solid #FF3030");
+    	    			layer.msg("请输入有效金额！",{icon:5,shade: [0.8, '#393D49']});
+    	    			return;
+    	    		}
+    	    		
+    	    	});
+    	    	$("#annualTicketFee").focus(function(){
+  	    		  $("#annualTicketFee").css("border","1px solid #ccc");
+  	    		});
+     	    	$("#annualTicketFee").blur(function(){
+    	    		var annualTicketFee=$("#annualTicketFee").val();
+    	    		if (annualTicketFee !=null&&annualTicketFee !=''&&!amt.test(annualTicketFee)) {  
+    	    			$("#vehicleVesselTax").css("border","1px solid #FF3030");
+    	    			layer.msg("请输入有效金额！",{icon:5,shade: [0.8, '#393D49']});
+    	    			return;
+    	    		}
+    	    		
+    	    	});
+    	       	$("#odometer").focus(function(){
+    	    		  $("#odometer").css("border","1px solid #ccc");
+    	    		});
+       	    	$("#odometer").blur(function(){
+    	    		var odometer=$("#odometer").val();
+    	    		if (odometer !=null&&odometer !=''&&!ex.test(odometer)) {  
+    	    			$("#odometer").css("border","1px solid #FF3030");
+    	    			layer.msg("请输入正整数！",{icon:5,shade: [0.8, '#393D49']});
+    	    			return;
+    	    		}
+    	    		
+    	    	});
+    	       	$("#evaluationAmount").focus(function(){
+  	    		  $("#evaluationAmount").css("border","1px solid #ccc");
+  	    		});
+       	    	$("#evaluationAmount").blur(function(){
+    	    		var evaluationAmount=$("#evaluationAmount").val();
+    	    		if (!amt.test(evaluationAmount)) {  
+    	    			$("#evaluationAmount").css("border","1px solid #FF3030");
+    	    			layer.msg("请输入有效金额！",{icon:5,shade: [0.8, '#393D49']});
+    	    			return;
+    	    		}
+    	    		
+    	    	});
+    	     	$("#transferFee").focus(function(){
+    	    		  $("#transferFee").css("border","1px solid #ccc");
+    	    		});
+    	     	$("#transferFee").blur(function(){
+    	    		var transferFee=$("#transferFee").val();
+    	    		if (transferFee !=null&&transferFee !=''&&!amt.test(transferFee)) {  
+    	    			$("#transferFee").css("border","1px solid #FF3030");
+    	    			layer.msg("请输入有效金额！",{icon:5,shade: [0.8, '#393D49']});
+    	    			return;
+    	    		}
+    	    		
+    	    	});
                 laydate.render({
                     elem: '#vehicleLicenseRegistrationDate',
                     type:'date',
@@ -108,9 +186,10 @@ window.layinit(function (htConfig) {
                         this.carBasic.annualVerificationExpirationDate = value
                     }
                 });
-            },
-            methods: {
-
+            }
+            
+            
+            ,methods: {
                 viewData: function(){
 
                     /*    	    laydate.render({
@@ -130,7 +209,7 @@ window.layinit(function (htConfig) {
                             vm.carDetection=data.data.carDetection;
                             //因数组在对象中不能渲染故提出来
                             if(data.data.carDetection!=null){
-                                vm.drivingLicenseInconsistentDescription=StrToArr(data.data.carBasic.drivingLicenseInconsistentDescription);
+                                vm.drivingLicenseInconsistentDescription=StrToArr(data.data.carDetection.drivingLicenseInconsistentDescription);
                                 vm.centerPanelAbnormalDescription=StrToArr(data.data.carDetection.centerPanelAbnormalDescription);
 
                                 vm.ventilatorAbnormalDescription=StrToArr(data.data.carDetection.ventilatorAbnormalDescription);
@@ -169,13 +248,26 @@ window.layinit(function (htConfig) {
                     parent.layer.close(index);
                 },
                 againAsses(){
+    	      		if(vm.carDetection.evaluationAmount==''||vm.carDetection.evaluationAmount==null){
+    	    			$("#evaluationAmount").css("border","1px solid #FF3030");
+    	    			return ;
+    	    		}else{
+    		    		if (!amt.test(vm.carDetection.evaluationAmount)) {  
+    		    			$("#evaluationAmount").css("border","1px solid #FF3030");
+    		    			layer.msg("请输入有效金额！",{icon:5,shade: [0.8, '#393D49']});
+    		    			return;
+    		    		}
+    	    		}
                     var v=getAgainAssessData(vm);
+                 
                     /*
                                 layui.config({
                                     base: '/plugins/layui/extend/modules/',
                                     version: false
                                 }).use(['laydate','element', 'ht_config', 'ht_auth'], function () {
                                     var config = layui.ht_config;*/
+                    v.carBasic.businessId=businessId;
+                 
                     $.ajax({
                         type: "POST",
                         url: basePath+'car/againAssess',
@@ -184,6 +276,8 @@ window.layinit(function (htConfig) {
                         success: function (res) {
                             if (res.code == "0000"){
                                 layer.msg("保存成功。");
+                            }else{
+                            	layer.msg(res.msg,{icon:5,shade: [0.8, '#393D49'],time:3000});
                             }
                         },
                         error: function (message) {
@@ -207,7 +301,7 @@ window.layinit(function (htConfig) {
 //将多选择框封装到对象属性里面
         function getAgainAssessData(vm){
             if(vm.drivingLicenseInconsistentDescription!=null){
-                vm.carBasic.drivingLicenseInconsistentDescription=vm.drivingLicenseInconsistentDescription.toString();
+                vm.carDetection.drivingLicenseInconsistentDescription=vm.drivingLicenseInconsistentDescription.toString();
             }
             if(vm.centerPanelAbnormalDescription!==null){
                 vm.carDetection.centerPanelAbnormalDescription=vm.centerPanelAbnormalDescription.toString();

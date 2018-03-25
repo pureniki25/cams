@@ -1,7 +1,8 @@
 var businessId = document.getElementById("businessId").getAttribute("value");
 window.layinit(function (htConfig) {
-    var config = layui.ht_config;
-    var baseCorePath = config.coreBasePath;
+    var _htConfig = layui.ht_config;
+    var baseCorePath = _htConfig.coreBasePath;
+    //basePath = _htConfig.coreBasePath;
 layui.use(['form','laydate','element', 'ht_config', 'ht_auth'], function () {
 		
 	var element = layui.element;
@@ -16,6 +17,7 @@ layui.use(['form','laydate','element', 'ht_config', 'ht_auth'], function () {
 	        countys:'',
 	    	returnRegFiles:[{
 	    		file: '',
+	    		name:'',
 	    		originalName: '',
 	    		oldDocId:''
 	    	}],
@@ -92,6 +94,7 @@ layui.use(['form','laydate','element', 'ht_config', 'ht_auth'], function () {
 	    		        	var reFiles=eval("("+reFile+")"); 
 	    		        	vm.returnRegFiles[index].oldDocId=reFiles.docId;
 	    		        	vm.returnRegFiles[index].originalName=reFiles.originalName;
+	    		        	vm.returnRegFiles[index].name=reFiles.originalName;
 	
 	    		        }
 	    		    });
@@ -139,31 +142,35 @@ layui.use(['form','laydate','element', 'ht_config', 'ht_auth'], function () {
 	                }
 	            });
 	    	},
-	    	removeTabTr: function (event, index) {
-	    		var docId=$('#docId'+index).val();
-	    		var deled=false;
-				//alert(docId);
-	    		if(docId==null||docId==""){
-	    			deled=true;
-	    		}
-	    		else{
-		            $.ajax({
+	       	removeTabTr: function (event, index) {
+	       		
+	    		var docId=$('#docId'+index).val();  
+	    		var that = this;
+	    		
+	    		// 如果文档id存在，那么进行ajax
+	    		if (docId) {
+	    			$.ajax({
 		                type: "GET",
 		                url: baseCorePath+'doc/delOneDoc?docId='+docId,
-		                // data: {"businessId":businessId},
-		                // contentType: "application/json; charset=utf-8",
 		                success: function (data) {
-		                	deled=true;
+		                	console.log(data, that);
+		                	that.returnRegFiles.splice(index, 1);
+		    	            if(that.returnRegFiles == ""){
+		    	            	that.addTabTr(event);
+		    	            }
 		                },
 		                error: function (message) {
 		                    layer.msg("删除文件失败。");
 		                    console.error(message);
 		                }
 		            });
+	    		// 否则直接删除
+	    		} else {
+	    			that.returnRegFiles.splice(index, 1);
+    	            if(that.returnRegFiles==""){
+    	            	that.addTabTr(event);
+    	            }
 	    		}
-	            if(deled==true){
-	            	this.returnRegFiles.splice(index, 1);
-	            }
 	    	},
 	    	addTabTr :function(event){
 	    		 this.returnRegFiles.push({
@@ -204,12 +211,14 @@ layui.use(['form','laydate','element', 'ht_config', 'ht_auth'], function () {
 		                		if(i>0){
 		                			vm.returnRegFiles.push({
 		   	               			 file: '',
+		   	               			 name:docFiles[i].originalName,
 		   	               			 originalName: docFiles[i].originalName,
 		   	               			 oldDocId:docFiles[i].docId
 		   	               		 });
 		                		}else{
 			                		vm.returnRegFiles[i].oldDocId=docFiles[i].docId;
 			                		vm.returnRegFiles[i].originalName=docFiles[i].originalName;
+			                		vm.returnRegFiles[i].name=docFiles[i].originalName;
 		                		}
 		                		// i++;
 		                	}
