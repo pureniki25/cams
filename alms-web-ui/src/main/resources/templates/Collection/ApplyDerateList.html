@@ -66,8 +66,8 @@
                 <row :gutter="16">
                     <i-form ref="searchForm"  :model="searchForm"   :rules="ruleValidate" label-position="right" :label-width="100">
                         <i-col span="6">
-                            <form-item label="关键字："   prop="BidOrCName">
-                                <i-input v-model="searchForm.BidOrCName"  placeholder="业务编号或客户名称"></i-input>
+                            <form-item label="关键字："   prop="keyName">
+                                <i-input v-model="searchForm.keyName"  placeholder="业务编号或客户名称"></i-input>
                             </form-item>
                         </i-col>
                         <i-col span="6">

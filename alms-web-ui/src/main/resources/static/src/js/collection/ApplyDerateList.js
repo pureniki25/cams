@@ -23,7 +23,7 @@ window.layinit(function (htConfig) {
             loading: false, //查询标志位
             exporting:false,//导出标志位
             searchForm:{
-                BidOrCName      	:'',      //业务编号 或客户名称
+                keyName      	:'',      //业务编号 或客户名称
                 areaId  			:'',  //区域ID
                 companyId			:'',  //分公司ID
                 businessType		:'',  //业务类型
@@ -87,7 +87,7 @@ window.layinit(function (htConfig) {
                         table.reload('listTable', {
                             where: {
 
-                                BidOrCName:vm.searchForm.BidOrCName,   //业务编号 或客户名称
+                                keyName:vm.searchForm.keyName,   //业务编号 或客户名称
                                 areaId:vm.searchForm.areaId,  //区域ID
                                 companyId:vm.searchForm.companyId, //分公司ID
                                 businessType:vm.searchForm.businessType,  //业务类型
@@ -110,14 +110,19 @@ window.layinit(function (htConfig) {
                 })
             },
             clickExport() {//导出Excel表格
-                vm.$refs['searchForm'].validate((valid) => {
-                    if (valid) {
-                        vm.exporting = true;
+     
+                
+                layui.use(['layer', 'table','ht_config'], function () {debugger
+                    vm.$refs['searchForm'].validate((valid) => {
+    		                    if (valid) {debugger
+    		                        vm.exporting = true;
+    		                        expoertExcel(basePath + "ApplyDerateController/saveExcel",vm.searchForm);
 
-                        expoertExcel(basePath + "ApplyDerateController/saveExcel",vm.searchForm);
-                        vm.exporting = false;
-                    }
-                })
+    		                        vm.exporting = false;
+    		
+    		                    }
+    		                })
+                    });
             }
         },
         mounted:function(){
