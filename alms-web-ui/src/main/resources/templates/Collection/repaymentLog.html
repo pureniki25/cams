@@ -74,15 +74,15 @@
                         </i-col>
                 
                         <i-col span="6">
-                            <form-item label="代扣平台:" prop="platformId">
-                                	<i-select v-model="searchForm.platformId" style="width:200px">
+                            <form-item label="代扣平台:" prop="platformId" >
+                                	<i-select v-model="searchForm.platformId" clearable filterable style="width:200px">
 		                                 <i-option v-for="item in platformList" :value="item.platformId" :key="item.platformId" >{{ item.platformName }}</i-option>
 		                              </i-select>
                             </form-item>
                         </i-col>
                         
                                <i-col span="6">
-                            <form-item label="代扣时间："   prop="dateRange">
+                            <form-item label="代扣时间："   prop="dateRange" >
                                 <date-picker type="daterange"  v-model="searchForm.dateRange" placement="bottom-end" placeholder="选择日期" style="width: 200px"></date-picker>
                             </form-item>
                         </i-col>
@@ -105,10 +105,16 @@
                         
                              <i-col span="6">
                             <form-item label="代扣状态:" prop="repayStatus">
-                                <i-select v-model="searchForm.repayStatus" clearable filterable >
-                                        <i-option  v-for="item in repayStatusList" value="item.repayStatus" :key="item.repayStatus">{{ item.name }}</i-option>
+                             <i-select v-model="searchForm.repayStatus" clearable filterable >
+                                    <i-option value="1" :key="1">成功</i-option>
+                                       <i-option value="0" :key="0">失败</i-option>
+                                             <i-option value="2" :key="2">处理中</i-option>
                                 </i-select>
+                                
+                    
                             </form-item>
+                            
+                       
                         </i-col>
 
                     </i-form>
