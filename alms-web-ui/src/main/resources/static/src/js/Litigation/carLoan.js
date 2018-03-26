@@ -111,7 +111,7 @@ window.layinit(function (htConfig) {
 	        	factPrincipal:"" 			, // 已还本金
 	        	factAccrual:"" 	, // 已还利息
 	        	surplusPrincipal:""             , // 剩余本金
-	        	dueDate:""           , // 利息交至日期
+	        	factRepayDate:""           , // 利息交至日期
 	        	overdueDays:""  	, // 逾期天数
 	        	outputUserName:""   	, // 出款人
 	        	factOutputDate:"" 		, // 出款日期
