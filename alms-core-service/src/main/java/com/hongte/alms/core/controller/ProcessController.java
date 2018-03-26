@@ -14,6 +14,7 @@ import com.hongte.alms.base.process.vo.ProcessReq;
 import com.hongte.alms.base.process.vo.ProcessStatusVo;
 import com.hongte.alms.base.process.vo.ProcessVo;
 import com.hongte.alms.base.service.BasicCompanyService;
+import com.hongte.alms.base.util.CompanySortByPINYINUtil;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.vo.PageResult;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,6 +102,7 @@ public class ProcessController {
 
         //公司
         List<BasicCompany> company_list = basicCompanyService.selectList(new EntityWrapper<BasicCompany>().eq("area_level",AreaLevel.COMPANY_LEVEL.getKey()));
+        CompanySortByPINYINUtil.sortByPINYIN(company_list);
         retMap.put("companyList",(JSONArray) JSON.toJSON(company_list,JsonUtil.getMapping()));
 
         //流程状态
