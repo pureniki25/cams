@@ -179,6 +179,8 @@ public class WithHoldingController {
 					   repayLogResp.setBindPlatform(PlatformEnum.YB_FORM.getName());
 				   }else if(repayLogResp.getBindPlatformId()==PlatformEnum.YS_FORM.getValue()) {
 					   repayLogResp.setBindPlatform(PlatformEnum.YS_FORM.getName());
+				   }else if(repayLogResp.getBindPlatformId()==PlatformEnum.YH_FORM.getValue()) {
+					   repayLogResp.setBindPlatform(PlatformEnum.YH_FORM.getName());
 				   }
 			   }
 		      return PageResult.success(list, list.size());
