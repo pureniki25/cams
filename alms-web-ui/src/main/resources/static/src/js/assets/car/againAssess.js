@@ -25,7 +25,7 @@ window.layinit(function (htConfig) {
                 	id:''//评估id
                     ,centerPanelNormal:''//中控台
                     ,centerPanelAbnormalDescription:''//中控台描述
-                    ,ventilatorNormal:''//空调
+                    ,ventilatorNormal: false//空调
                     ,ventilatorAbnormalDescription:''//空调描述
                     ,interiorNormal:''//车厢内饰
                     ,interiorAbnormalDescription:''//车厢内饰异常说明
@@ -84,7 +84,7 @@ window.layinit(function (htConfig) {
 
                 }
                 ,centerPanelAbnormalDescription:''//["有破损","松动"]
-                ,ventilatorAbnormalDescription:''//["有制冷","制冷不明显","无制冷","异响"]
+                ,ventilatorAbnormalDescription:[]//["有制冷","制冷不明显","无制冷","异响"]
                 ,interiorAbnormalDescription:''//["有破损"]
                 ,windowGlassAbnormalDescription:''//["破裂","气泡","升降不正常","渗水"]
                 ,radiatorAbnormalDescription:''//["修补","变形"]
@@ -99,7 +99,195 @@ window.layinit(function (htConfig) {
                 ,steerPerformanceAbnormalDescription:''//["没有配备"]
                 ,gearPerformanceAbnormalDescription:''//["密封性差","封条松动"]
             },
+            watch: {
+            	//carDetection.drivingLicenseConsistent
+
+            	//正反选择
+            	carDetection: {
+	        		　handler(newValue, oldValue) {
+	        			if(newValue.drivingLicenseConsistent){//核实行驶资料
+	        				this.drivingLicenseInconsistentDescription =[];
+	        			}
+	        			if(newValue.ventilatorNormal){//空调
+	        				this.ventilatorAbnormalDescription =[];
+	        			}
+	        			if(newValue.centerPanelNormal){//中控台
+	        				this.centerPanelAbnormalDescription =[];
+	        			}
+	        			if(newValue.interiorNormal){//内饰
+	        				this.interiorAbnormalDescription =[];
+	        			}
+	        			if(newValue.windowGlassNormal){//玻璃
+	        				this.windowGlassAbnormalDescription =[];
+	        			}
+	        			if(newValue.radiatorNormal){//水箱
+	        				this.radiatorAbnormalDescription =[];
+	        			}
+	        			if(newValue.engineNormal){//发动机
+	        				this.engineAbnormalDescription =[];
+	        			}
+	        			if(newValue.frameNormal){//车大梁
+	        				this.frameAbnormalDescription =[];
+	        			}
+	        			if(newValue.tireNormal){//轮胎
+	        				this.tireAbnormalDescription =[];
+	        			}
+	        			if(newValue.spareTireNormal){//备用胎
+	        				this.spareTireAbnormalDescrioption =[];
+	        			}
+	        			if(newValue.doorNormal){//车门
+	        				this.doorAbnormalDescription =[];
+	        			}
+	        			if(newValue.accelerationPerformanceNormal){//动力性能
+	        				this.accelerationPerformanceAbnormalDescription =[];
+	        			}
+	        			if(newValue.brakingPerformanceNormal){//刹车性能
+	        				this.brakingPerformanceAbnormalDescription =[];
+	        			}
+	        			if(newValue.brakingBalancePerformanceNormal){//刹车平衡性能
+	        				this.brakingBalancePerformanceAbnormalDescription =[];
+	        			}
+	        			if(newValue.steerPerformanceNormal){//方向性能
+	        				this.steerPerformanceAbnormalDescription =[];
+	        			}
+	        			if(newValue.steerPerformanceNormal){//挂档性能
+	        				this.steerPerformanceAbnormalDescription =[];
+	        			}
+	        			
+	    		　　　 },
+	    		　　　deep: true
+            	}
+            	,drivingLicenseInconsistentDescription:{//核实行驶资料异常列表
+              		　handler(newValue, oldValue) {
+       		　　　	 if(this.drivingLicenseInconsistentDescription!=null&&this.drivingLicenseInconsistentDescription.length>0){
+       		　　　		 this.carDetection.drivingLicenseConsistent=false;
+       		　　　	 }
+       		　　　 },
+       		　　　deep: true
+               	}
+            	,ventilatorAbnormalDescription:{//空调异常列表
+              		　handler(newValue, oldValue) {
+       		　　　	 if(this.ventilatorAbnormalDescription!=null&&this.ventilatorAbnormalDescription.length>0){
+       		　　　		 this.carDetection.ventilatorNormal=false;
+       		　　　	 }
+       		　　　 },
+       		　　　deep: true
+               	}
+               	,centerPanelAbnormalDescription:{//中控台异常列表
+             		　handler(newValue, oldValue) {
+      		　　　	 if(this.centerPanelAbnormalDescription!=null&&this.centerPanelAbnormalDescription.length>0){
+      		　　　		 this.carDetection.centerPanelNormal=false;
+      		　　　	 }
+      		　　　 },
+      		　　　deep: true
+              	}
+               	,interiorAbnormalDescription:{//内饰异常列表
+             		　handler(newValue, oldValue) {
+      		　　　	 if(this.interiorAbnormalDescription!=null&&this.interiorAbnormalDescription.length>0){
+      		　　　		 this.carDetection.interiorNormal=false;
+      		　　　	 }
+      		　　　 },
+      		　　　deep: true
+              	}
+               	,windowGlassAbnormalDescription:{//玻璃异常列表
+            		　handler(newValue, oldValue) {
+     		　　　	 if(this.windowGlassAbnormalDescription!=null&&this.windowGlassAbnormalDescription.length>0){
+     		　　　		 this.carDetection.windowGlassNormal=false;
+     		　　　	 }
+     		　　　 },
+     		　　　deep: true
+             	}
+               	,radiatorAbnormalDescription:{//水箱异常列表
+           		　handler(newValue, oldValue) {
+    		　　　	 if(this.radiatorAbnormalDescription!=null&&this.radiatorAbnormalDescription.length>0){
+    		　　　		 this.carDetection.radiatorNormal=false;
+    		　　　	 }
+    		　　　 },
+    		　　　deep: true
+            	}
+              	,engineAbnormalDescription:{//发动机异常列表
+              		　handler(newValue, oldValue) {
+       		　　　	 if(this.engineAbnormalDescription!=null&&this.engineAbnormalDescription.length>0){
+       		　　　		 this.carDetection.engineNormal=false;
+       		　　　	 }
+       		　　　 },
+       		　　　deep: true
+               	}
+               	,frameAbnormalDescription:{//车大梁异常列表
+             		　handler(newValue, oldValue) {
+      		　　　	 if(this.frameAbnormalDescription!=null&&this.frameAbnormalDescription.length>0){
+      		　　　		 this.carDetection.frameNormal=false;
+      		　　　	 }
+      		　　　 },
+      		　　　deep: true
+              	}
+              	,tireAbnormalDescription:{//轮胎异常列表
+            		　handler(newValue, oldValue) {
+     		　　　	 if(this.tireAbnormalDescription!=null&&this.tireAbnormalDescription.length>0){
+     		　　　		 this.carDetection.tireNormal=false;
+     		　　　	 }
+     		　　　 },
+     		　　　deep: true
+             	}
+               	,spareTireAbnormalDescrioption:{//备用胎异常列表
+           		　handler(newValue, oldValue) {
+    		　　　	 if(this.spareTireAbnormalDescrioption!=null&&this.spareTireAbnormalDescrioption.length>0){
+    		　　　		 this.carDetection.spareTireNormal=false;
+    		　　　	 }
+    		　　　 },
+    		　　　deep: true
+            	}
+            	,doorAbnormalDescription:{//车门异常列表
+              		　handler(newValue, oldValue) {
+       		　　　	 if(this.doorAbnormalDescription!=null&&this.doorAbnormalDescription.length>0){
+       		　　　		 this.carDetection.doorNormal=false;
+       		　　　	 }
+       		　　　 },
+       		　　　deep: true
+               	}
+               	,accelerationPerformanceAbnormalDescription:{//动力性能异常列表
+             		　handler(newValue, oldValue) {
+      		　　　	 if(this.accelerationPerformanceAbnormalDescription!=null&&this.accelerationPerformanceAbnormalDescription.length>0){
+      		　　　		 this.carDetection.accelerationPerformanceNormal=false;
+      		　　　	 }
+      		　　　 },
+      		　　　deep: true
+              	}
+             	,brakingPerformanceAbnormalDescription:{//刹车性能异常列表
+            		　handler(newValue, oldValue) {
+     		　　　	 if(this.brakingPerformanceAbnormalDescription!=null&&this.brakingPerformanceAbnormalDescription.length>0){
+     		　　　		 this.carDetection.brakingPerformanceNormal=false;
+     		　　　	 }
+     		　　　 },
+     		　　　deep: true
+             	}
+            	,brakingBalancePerformanceAbnormalDescription:{//刹车平衡性能异常列表
+           		　handler(newValue, oldValue) {
+    		　　　	 if(this.brakingBalancePerformanceAbnormalDescription!=null&&this.brakingBalancePerformanceAbnormalDescription.length>0){
+    		　　　		 this.carDetection.brakingBalancePerformanceNormal=false;
+    		　　　	 }
+    		　　　 },
+    		　　　deep: true
+            	}
+               	,steerPerformanceAbnormalDescription:{//方向性能异常列表
+              		　handler(newValue, oldValue) {
+       		　　　	 if(this.steerPerformanceAbnormalDescription!=null&&this.steerPerformanceAbnormalDescription.length>0){
+       		　　　		 this.carDetection.steerPerformanceNormal=false;
+       		　　　	 }
+       		　　　 },
+       		　　　deep: true
+               	}
+              	,gearPerformanceAbnormalDescription:{//挂档性能异常列表
+             		　handler(newValue, oldValue) {
+      		　　　	 if(this.gearPerformanceAbnormalDescription!=null&&this.gearPerformanceAbnormalDescription.length>0){
+      		　　　		 this.carDetection.gearPerformanceNormal=false;
+      		　　　	 }
+      		　　　 },
+      		　　　deep: true
+              	}
+            },
             mounted: function () {
+
     	    	$("#trafficViolationFee").focus(function(){
   	    		  $("#trafficViolationFee").css("border","1px solid #ccc");
   	    		});
@@ -294,8 +482,9 @@ window.layinit(function (htConfig) {
         vm.viewData();
         function StrToArr(str){
             if(str==null||str==""){
-                return [""];
+                return [];
             }
+            console.log("str-----"+str);
             return str.split(",");
         }
 //将多选择框封装到对象属性里面

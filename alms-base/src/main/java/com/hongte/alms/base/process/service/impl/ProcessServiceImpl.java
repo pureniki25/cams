@@ -141,7 +141,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
         .eq("process_result",ProcessResultEnums.PASS.getKey())
         .eq("process_typeid", processType.getTypeId()));
         if(sucPList.size()>=processType.getCanItemTotalCount()){
-            throw new RuntimeException("此业务已有"+pList.size()+"个"+processType.getTypeName()+"流程通过审批，不能再申请！！");
+            throw new RuntimeException("此业务已有"+sucPList.size()+"个"+processType.getTypeName()+"流程通过审批，不能再申请！！");
         }
 
 
@@ -300,7 +300,12 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
             copySend.setProcessLogId(log.getProcessLogId());
             copySend.setProcessSendId(UUID.randomUUID().toString());
             copySend.setReceiveUserId(req.getSendUserIds()[i]);
-            copySend.setReceiveUserName(Constant.DEV_DEFAULT_USER);
+            SysUser sysUser = sysUserService.selectById(req.getSendUserIds()[i]);
+            if(sysUser!=null){
+                copySend.setReceiveUserName(sysUser.getUserName());
+            }else{
+                copySend.setReceiveUserName(Constant.DEV_DEFAULT_USER);
+            }
             processLogCopySendService.insert(copySend);
         }
 

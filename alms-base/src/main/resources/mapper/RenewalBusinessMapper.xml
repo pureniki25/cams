@@ -66,7 +66,7 @@
         	AND trb.original_business_id = #{loanExtReq.businessId}
         </if>
         <if test="loanExtReq.salesman !=null and loanExtReq.salesman !=''">
-        	AND tbb.original_name = #{loanExtReq.salesman}
+        	AND tbb.original_name like '%${loanExtReq.salesman}%'
         </if>
         <if test="loanExtReq.customer !=null and loanExtReq.customer !=''">
         	AND tbb.customer_name = #{loanExtReq.customer}
@@ -82,17 +82,17 @@
 	ORDER BY trb.create_time desc
 	LIMIT ${(loanExtReq.page-1) * loanExtReq.limit}, #{loanExtReq.limit,jdbcType=DECIMAL}
 	</select>
-	
 	<select id="listLoanExtCount" resultType="com.hongte.alms.base.vo.module.LoanExtListVO"
 	parameterType="com.hongte.alms.base.vo.module.LoanExtListReq">
 	SELECT
 		trb.renewal_business_id as id
 	FROM
-		tb_renewal_business trb
-	LEFT JOIN
-		tb_basic_business tbb ON tbb.business_id = trb.original_business_id
-	LEFT JOIN
-		tb_basic_business_type tbbt ON tbbt.business_type_id = tbb.business_type
+			    tb_renewal_business trb
+	        LEFT JOIN
+	    tb_basic_business tbb ON tbb.business_id = trb.original_business_id
+	        LEFT JOIN
+	    tb_basic_business_type tbbt ON tbbt.business_type_id = tbb.business_type
+
 	<where>
 		1=1
 		<if test="loanExtReq.dateStart !=null and loanExtReq.dateStart !=''">
@@ -108,7 +108,7 @@
         	AND trb.original_business_id = #{loanExtReq.businessId}
         </if>
         <if test="loanExtReq.salesman !=null and loanExtReq.salesman !=''">
-        	AND tbb.original_name = #{loanExtReq.salesman}
+        	AND tbb.original_name like '%${loanExtReq.salesman}%'
         </if>
         <if test="loanExtReq.customer !=null and loanExtReq.customer !=''">
         	tbb.customer_name = #{loanExtReq.customer}
@@ -117,7 +117,7 @@
         	AND tbb.business_type = #{loanExtReq.businessType}
         </if>
         <if test="loanExtReq.extensionId !=null and loanExtReq.extensionId !=''">
-        	AND trb.renewal_business_id = #{loanExtReq.extensionId}
+        	AND trb.renewal_business_id = #{loanExtReq.extensionId} 
         </if>
     </where>
 	GROUP BY trb.original_business_id
