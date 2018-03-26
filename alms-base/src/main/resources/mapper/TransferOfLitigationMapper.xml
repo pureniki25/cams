@@ -184,13 +184,13 @@
 	
 	<select id="queryTransferLitigationCarData" resultType="com.hongte.alms.base.vo.litigation.BusinessCar">
 		SELECT 
-		  cd.`business_id` carBusinessId,
-		  cb.`annual_verification_expiration_date` annualDueDate,
+		  cb.`business_id` carBusinessId,
+		  cd.`annual_verification_expiration_date` annualDueDate,
 		  cb.`color` carBodyColor,
 		  cb.`brand_name` carBrand,
 		  cd.`evaluation_amount` carEvaluateMoney,
 		  cb.`model` carModelNumber,
-		  cb.`traffic_violation_fee` carViolations,
+		  cd.`traffic_violation_fee` carViolations,
 		  cb.`vin` chassisNumber,
 		  cb.`engine_model` engineNumber,
 		  cb.`license_plate_number` licensePlateNumber,
@@ -198,7 +198,7 @@
 		FROM
 		  tb_car_basic cb,
 		  tb_car_detection cd 
-		WHERE cd.`business_id` = cb.`business_id` AND cd.`business_id` = #{businessId,jdbcType=VARCHAR}
+		WHERE cd.`business_id` = cb.`business_id` AND cb.`business_id` = #{businessId,jdbcType=VARCHAR}
 	</select>
 	
 	<select id="queryTransferLitigationData" resultMap="TransferOfLitigationMap" >
