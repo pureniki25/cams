@@ -26,6 +26,9 @@ public interface RepaymentBizPlanListMapper extends SuperMapper<RepaymentBizPlan
             @Param("companyId") String companyId,
             @Param("overDueDays") Integer overDueDays,
             @Param("colStatus") Integer colStatus);
+    
+    RepaymentBizPlanList queryRepaymentBizPlanListByConditions(@Param(value="businessId") String businessId, @Param(value="afterId") String afterId);
+
 
 /*    *//**
      * 选择需要设置催收信息的展期业务还款计划列表
