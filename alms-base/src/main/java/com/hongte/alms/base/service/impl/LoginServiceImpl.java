@@ -62,6 +62,7 @@ public class LoginServiceImpl implements LoginService {
         //角色信息
         List<BoaInRoleInfoDto> boaInRoleInfoDtoList = loginUserInfoHelper.getUserRole();
         List<SysUserRole> sysUserRoleList = new ArrayList<>();
+        List<SysRole> sysRoleList = new ArrayList<>();
         if(boaInRoleInfoDtoList != null && boaInRoleInfoDtoList.size()>0){
             for (BoaInRoleInfoDto boa:boaInRoleInfoDtoList) {
 
@@ -70,9 +71,18 @@ public class LoginServiceImpl implements LoginService {
                 sysUserRole.setUserId(dto.getUserId());
                 sysUserRoleList.add(sysUserRole);
 
+                SysRole role = new SysRole();
+                role.setRoleName(boa.getRoleNameCn());
+                role.setRoleCode(boa.getRoleCode());
+                role.setRoleAreaType(1);
+                if(sysRoleService.selectOne(new EntityWrapper<SysRole>().eq("role_code",boa.getRoleCode()).eq("role_name",boa.getRoleNameCn())) == null){
+                    sysRoleList.add(role);
+                }
+
                 sysUserRoleService.delete(new EntityWrapper<SysUserRole>().eq("user_id",dto.getUserId()));
             }
             sysUserRoleService.insertBatch(sysUserRoleList);
+            sysRoleService.insertBatch(sysRoleList);
 
 
         }
