@@ -94,17 +94,18 @@
             bplan.original_business_id as `original_business_id`
             from tb_repayment_biz_plan   bplan
             group by bplan.original_business_id
-        ) b  ON  business.business_id = c.original_business_id
+        ) b  ON  business.business_id = b.original_business_id
         LEFT JOIN (
-          SELECT
+
+        SELECT
         <!--   已还本金-->
-          sum(case when pdetail.plan_item_type =10 then pdetail.plan_amount else 0 end) AS `payedPrincipal`,
-          l.original_business_id as `original_business_id`
-          from tb_repayment_biz_plan_list_detail pdetail
-          LEFT  JOIN   tb_repayment_biz_plan_list  l
-          ON pdetail.plan_list_id = l.plan_list_id
-          group by l.original_business_id
-          WHERE  pdetail.fact_repay_date != NULL
+        sum(case when pdetail.plan_item_type =10 then pdetail.plan_amount else 0 end) AS `payedPrincipal`,
+        rp.original_business_id as `original_business_id`
+        from tb_repayment_biz_plan_list_detail pdetail
+        LEFT  JOIN   tb_repayment_biz_plan_list  l  ON pdetail.plan_list_id = l.plan_list_id
+        LEFT JOIN tb_repayment_biz_plan  rp ON rp.plan_id = l.plan_id
+        where isnull(pdetail.fact_repay_date) is false
+        group by rp.original_business_id
         )a ON business.business_id = a.original_business_id
 
         <where>

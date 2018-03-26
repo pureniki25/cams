@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.entity.SysJobConfig;
 import com.hongte.alms.base.service.SysJobConfigService;
+import com.hongte.alms.base.vo.module.TimerSetReq;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.vo.PageResult;
 import io.swagger.annotations.ApiOperation;
@@ -35,17 +36,15 @@ public class TimerSetController {
     @ApiOperation(value="获取定时器任务列表")
     @GetMapping("/getTimetSetList")
     @ResponseBody
-    public PageResult<List<SysJobConfig>> getTimetSetList(@RequestParam("jobName") String jobName,
-                                                          @RequestParam("page") int page,
-                                                          @RequestParam("limit") int limit){
+    public PageResult<List<SysJobConfig>> getTimetSetList(TimerSetReq req){
         Page<SysJobConfig> pages = new Page<>();
 
         Wrapper<SysJobConfig> wrapper = new EntityWrapper<>();
-        if(StringUtils.isNotBlank(jobName)){
-            wrapper.eq("job_name",jobName);
+        if(StringUtils.isNotBlank(req.getJobName())){
+            wrapper.like("job_name",req.getJobName());
         }
-        pages.setCurrent(page);
-        pages.setSize(limit);
+        pages.setCurrent(req.getPage());
+        pages.setSize(req.getLimit());
 
         pages = jobConfigService.selectPage(pages,wrapper);
 
