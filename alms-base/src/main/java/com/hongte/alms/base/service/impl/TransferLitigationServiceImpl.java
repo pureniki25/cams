@@ -142,10 +142,9 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			return resultMap;
 		}
 
-		Object overdueDays = resultMap.get("overdueDays");
-		if (overdueDays != null) {
-			resultMap.put("overdueDays", (int) Math.ceil(((BigDecimal) overdueDays).doubleValue()));
-		}
+		Date factRepayDate = (Date) resultMap.get("factRepayDate");
+		int overdueDays = differentDays(factRepayDate, new Date());
+		resultMap.put("overdueDays", overdueDays);
 
 		Object repaymentTypeId = resultMap.get("repaymentTypeId");
 		String repaymentType = "";
@@ -708,6 +707,9 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	 * @return
 	 */
 	private int differentDays(Date first, Date second) {
+		if (first == null || second == null) {
+			return 0;
+		}
 		if (first.after(second)) {
 			return 0;
 		}

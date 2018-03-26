@@ -1,7 +1,9 @@
 package com.hongte.alms.base.collection.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.jeecgframework.poi.excel.annotation.Excel;
 import org.jeecgframework.poi.excel.annotation.ExcelTarget;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -55,9 +57,11 @@ public class AfterLoanStandingBookVo implements java.io.Serializable  {
 
 
 
+    @DateTimeFormat(pattern="yyyy-MM-dd")
     @Excel(name = "应还日期", orderNum = "11", databaseFormat = "yyyyMMddHHmmss", format = "yyyy-MM-dd", isImportField = "true_st", width = 20)
     private Date dueDate;   //应还日期  对应 tb_repayment_biz_plan_list 表中 应还日期
 
+    @DateTimeFormat(pattern="yyyy-MM-dd")
     @Excel(name = "实还日期", orderNum = "12", databaseFormat = "yyyyMMddHHmmss", format = "yyyy-MM-dd", isImportField = "true_st", width = 20)
     private Date repaymentDate;   //实还日期
 
@@ -200,6 +204,7 @@ public class AfterLoanStandingBookVo implements java.io.Serializable  {
         this.delayDays = delayDays;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd")
     public Date getRepaymentDate() {
         return repaymentDate;
     }
@@ -244,6 +249,7 @@ public class AfterLoanStandingBookVo implements java.io.Serializable  {
         return crpId;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd")
     public Date getDueDate() {
         return dueDate;
     }

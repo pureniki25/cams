@@ -229,6 +229,7 @@ window.layinit(function (htConfig) {
                 , cols: [[
                     {
                         field: 'businessId',
+                        width:165,
                         title: '业务编号'
                     }, {
                         field: 'districtAreaName',
@@ -323,9 +324,14 @@ window.layinit(function (htConfig) {
                        
                             }},
                             {"name": "车辆归还登记", click: function (e, currentItem) {
-                        	   if(authValid('returnReg')){
+                            	//alert(JSON.stringify(currentItem));
+                        	   if(authValid('returnReg')&&"已结清"==currentItem.status){
                         			showNewTab(currentItem,"returnReg","车辆归还登记");
-                                }else{
+                                }
+                        	   else if(authValid('returnReg')&&"已结清"!=currentItem.status){
+                        		   layer.msg("该车处于未结清状态，不允许归还登记");
+                        	   }
+                        	   else{
                                 	   layer.msg("对不起，你没有权限");
                                 }
                             }},

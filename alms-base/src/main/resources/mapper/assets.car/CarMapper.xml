@@ -17,8 +17,9 @@
 		pl.borrow_money,<!-- 借款金额 -->
 
 		(select
-		sum(ifnull(li.total_borrow_amount,0)+ifnull(li.overdue_amount,0)) from
-		tb_repayment_biz_plan_list li where li.current_status='已还款' and
+		ifnull(sum(ifnull(detail.fact_amount,0)),0) from
+		tb_repayment_biz_plan_list li join tb_repayment_biz_plan_list_detail detail on li.plan_list_id=detail.plan_list_id
+		where li.current_status='已还款' and
 		li.plan_id=pl.plan_id) repaid_amount, <!-- 已还金额 -->
 		car.license_plate_number,<!-- 车牌号 -->
 		car.model,<!-- 车辆型号 -->
@@ -48,7 +49,7 @@
 		 join
 		tb_car_drag drag on drag.business_id=bus.business_id
 		left
-		join tb_car_detection det on det.business_id=bus.business_id
+		join tb_car_detection det on car.last_detection_id=det.id
 
 		<where>
 			<if test="businessId !=null and businessId !=''">

@@ -5,12 +5,14 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.assets.car.enums.CarStatusEnums;
 import com.hongte.alms.base.assets.car.service.CarService;
+import com.hongte.alms.base.assets.car.vo.AuctionAplyVo;
 import com.hongte.alms.base.assets.car.vo.AuctionBidderVo;
 import com.hongte.alms.base.assets.car.vo.AuctionsReqVo;
 import com.hongte.alms.base.assets.car.vo.AuditVo;
 import com.hongte.alms.base.assets.car.vo.CarReq;
 import com.hongte.alms.base.assets.car.vo.CarVo;
 import com.hongte.alms.base.assets.car.vo.FileVo;
+import com.hongte.alms.base.baseException.AlmsBaseExcepiton;
 import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
 import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
 import com.hongte.alms.base.collection.service.CollectionStatusService;
@@ -357,7 +359,7 @@ public class CarController {
     public Result<Object> getCarDetail(@ModelAttribute("businessId") String businessId){
     	try {
     	CarBasic carBasic=carBasicService.selectById(businessId);
-    	CarDetection carDetection=carDetectionService.selectById(businessId);
+    	CarDetection carDetection=carDetectionService.selectById(carBasic.getLastDetectionId());
     	List<CarAuction>		 carAuctions=carAuctionService.selectList(new EntityWrapper<CarAuction>().eq("business_id", businessId));	
     	CarAuction carAuction=new CarAuction();
     	if(carAuctions!=null&&carAuctions.size()>0) {
@@ -394,27 +396,18 @@ public class CarController {
     	try {
     	CarBasic carBasic=JsonUtil.map2obj((Map<String,Object>)params.get("carBasic"), CarBasic.class);
     	CarDetection carDetection=JsonUtil.map2obj((Map<String,Object>)params.get("carDetection"), CarDetection.class);
-    	CarBasic rCarBasic=carBasicService.selectById(carBasic.getBusinessId());
-    	if(rCarBasic==null) {
-    		logger.error("车辆信息不存在,businessId="+carBasic.getBusinessId());
-      		return Result.error("9999", "非待处置状态的车辆不能重新评估");
-    	}
-      	if(!CarStatusEnums.PENDING.getStatusCode().equals(rCarBasic.getStatus())) {
-      		logger.error("非待处置状态的车辆不能重新评估,businessId="+carBasic.getBusinessId());
-      		return Result.error("9999", "非待处置状态的车辆不能重新评估");
-      	}
-    	CarDetection rCarDetection=carDetectionService.selectById(carDetection.getBusinessId());
-    	carBasic.setLastEvaluationAmount(carBasic.getEvaluationAmount());
-    	carBasic.setLastEvaluationTime(new Date());
-    	carBasic.setEvaluationAmount(carBasic.getEvaluationAmount());
-    	carDetection.setEvaluationAmount(carBasic.getEvaluationAmount());
-    	BeanUtils.copyProperties(carBasic, rCarBasic);
-    	BeanUtils.copyProperties(carDetection, rCarDetection);
-
-    	carBasicService.updateById(rCarBasic);
-    	carDetectionService.updateById(rCarDetection);
-    	
+    	AuctionAplyVo auctionAplyVo=new AuctionAplyVo();
+    	//carBasic.setLastEvaluationAmount(carBasic.getEvaluationAmount());
+    	//carBasic.setLastEvaluationTime(new Date());
+    	//carBasic.setEvaluationAmount(carBasic.getEvaluationAmount());
+    	//carDetection.setEvaluationAmount(carBasic.getEvaluationAmount());
+    	auctionAplyVo.setCarBase(carBasic);
+    	auctionAplyVo.setCarDetection(carDetection);
+    	carService.againAssess(auctionAplyVo);
         return Result.build("0000", "操作成功", "");
+	}catch (AlmsBaseExcepiton e) {
+		logger.error(e.getMsg());
+		return Result.error(e.getCode(),e.getMsg());
 	}catch (Exception e) {
       	logger.error(e.getMessage());
       	return Result.error("9999", "操作异常");
@@ -427,6 +420,10 @@ public class CarController {
     	try {
     	BasicBusiness business=basicBusinessService.selectById(businessId);
     	CarBasic carBasic=carBasicService.selectById(businessId);
+    	if(!CarStatusEnums.SETTLED.getStatusCode().equals(carBasic.getStatus())) {
+    		logger.error("该车处于未结清状态不允许归还操作,businessId="+businessId);
+    		return Result.error("9999", "该车处于未结清状态不允许归还操作");
+    	}
     	List<CarDrag> drag=carDragService.selectList(
     	        new EntityWrapper<CarDrag>().eq("business_id", businessId)); 
     	List<SysProvince> provs=new ArrayList<SysProvince>();
@@ -562,6 +559,10 @@ try {
     	//拖车信息
     	List<CarDrag> drag=carDragService.selectList(
     	        new EntityWrapper<CarDrag>().eq("business_id", businessId)); 
+    	//获取最新评估信息
+    	CarDetection detection=carDetectionService.selectById(carBasic.getLastDetectionId());
+    	//获取抵押时的评估信息
+    	List<CarDetection> carDetections= carDetectionService.selectList(new EntityWrapper<CarDetection>().eq("business_id", businessId).eq("is_origin", true));
     	//还款信息
     	List<RepaymentBizPlan> plans=repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id", businessId));
     	if(plans==null||plans.size()!=1) {
@@ -633,10 +634,26 @@ try {
     	map.put("carBasic", carBasic==null?new CarBasic():carBasic);
     	map.put("business", business==null?new BasicBusiness():business);
     	map.put("drag", (drag==null||drag.size()<=0)?new CarDrag():drag.get(0));
+    	map.put("detection", detection);
+    	map.put("mortgageDetection",(carDetections==null||carDetections.size()<=0)?new CarDetection():carDetections.get(0) );
     	map.put("repayPlan", plan);
     	map.put("outputRecord", outputRecord);
     	map.put("carAuction", carAuction);
-    
+    	  ProcessType processType = processTypeService.getProcessTypeByCode(ProcessTypeEnums.Aply_CarAuction.getKey());
+          if(processType == null){
+          	logger.error("流程类型未定义 type_code="+ProcessTypeEnums.Aply_CarAuction.getKey());
+      		return Result.error("9999", "流程类型未定义");
+             
+          }
+          List<com.hongte.alms.base.process.entity.Process> pross=processService.selectList(new EntityWrapper<com.hongte.alms.base.process.entity.Process>().eq("business_id", businessId).eq("process_typeid", processType.getTypeId()));
+          if(pross!=null&&pross.size()>1) {
+        	  logger.error("该业务存在多条拍卖流程,businessId"+businessId);
+        	  return Result.error("9999", "该业务存在多条拍卖流程");
+          }
+          if(pross!=null&&pross.size()>0) {
+          com.hongte.alms.base.process.entity.Process p=pross.get(0);
+          map.put("processId", p.getProcessId());
+          }
     	
     	return Result.build("0000", "操作成功", map);
 	}catch (Exception e) {
@@ -653,78 +670,29 @@ try {
     	CarBasic carBase=JsonUtil.map2obj((Map<String,Object>)params.get("carBasic"), CarBasic.class);
       	CarAuction carAuction=JsonUtil.map2obj((Map<String,Object>)params.get("carAuction"), CarAuction.class);
       	List<FileVo> files=JsonUtil.map2objList(params.get("returnRegFiles"), FileVo.class);
-      	CarBasic retCarBasic=carBasicService.selectById(carAuction.getBusinessId());
-      	
+      //	CarBasic retCarBasic=carBasicService.selectById(carAuction.getBusinessId());
+      	CarDetection carDetection=JsonUtil.map2obj((Map<String,Object>)params.get("detection"), CarDetection.class);
       	String submitType=(String) params.get("subType");
       	String processId=(String) params.get("processId");
-      	if(retCarBasic==null) {
-      		logger.error("该业务记录不存在");
-      		return Result.error("9999", "无效业务");
-      	}
-      	if(!CarStatusEnums.PENDING.getStatusCode().equals(retCarBasic.getStatus())) {
-      		logger.error("非待处置状态的车辆不能进行拍卖");
-      		return Result.error("9999", "非待处置状态的车辆不能进行拍卖");
-      	}
-      	carBase.setBusinessId(retCarBasic.getBusinessId());
-      	
-      	List<CarAuction> carAuctions=carAuctionService.selectList(new EntityWrapper<CarAuction>().eq("business_id", carAuction.getBusinessId()).ne("status", AuctionStatusEnums.DRAFT.getKey()));
-      	if(carAuctions!=null&&carAuctions.size()>0) {
-      		for(CarAuction carAuc:carAuctions) {
-      			if(AuctionStatusEnums.AUDIT.getKey().equals(carAuc.getStatus())) {
-      				logger.error("该申请已提交审核，business_id="+carAuction.getBusinessId());
-      	    		return Result.error("9999", "该申请已提交审核,请勿重复提交");
-      			}else {
-      				carAuction.setAuctionId(carAuc.getAuctionId());
-      				
-      				
-      			}
-      		}
-      	}else {
-      		if(StringUtils.isEmpty(carAuction.getAuctionId())) {
-      		carAuction.setAuctionId(UUID.randomUUID().toString());
-      		carAuction.setCreateTime(new Date());
-      		carAuction.setCreateUser("admin");
-      		}
-      	}
+      	AuctionAplyVo vo=new AuctionAplyVo();
+      	vo.setCarBase(carBase);
+      	vo.setCarAuction(carAuction);
+      	vo.setFiles(files);
+      	vo.setSubmitType(submitType);
+      	vo.setProcessId(processId);
+      	vo.setCarDetection(carDetection);
+      	String pId=carService.auctionAply(vo);
       	Map<String, Object> map=new HashMap<String,Object>();
-      	ProcessSaveReq processSaveReq=new ProcessSaveReq();
-      	processSaveReq.setProcessId(processId);
-      	if("audit".equals(submitType)) {
-      		carAuction.setStatus(AuctionStatusEnums.AUDIT.getKey());
-      	
-      		//创建审核流程
-      		processSaveReq.setProcessStatus(ProcessStatusEnums.RUNNING.getKey());
-      		carBase.setStatus(CarStatusEnums.AUCTION_AUDIT.getStatusCode());
-      	}else {
-      		processSaveReq.setProcessStatus(ProcessStatusEnums.NEW.getKey());
-      		carAuction.setStatus(AuctionStatusEnums.DRAFT.getKey());
-      	}
-      	processSaveReq.setTitle(ProcessTypeEnums.Aply_CarAuction.getName());
-      	processSaveReq.setBusinessId(carAuction.getBusinessId());
-      	com.hongte.alms.base.process.entity.Process process=processService.insertOrUpdateProcess(processSaveReq, ProcessTypeEnums.Aply_CarAuction);
-  		map.put("processId", process.getProcessId());
-      	carAuctionService.insertOrUpdate(carAuction);
-      	
-      	carBasicService.updateById(carBase);
-      	map.put("carAuction", carAuction);
-      	if(files!=null&&files.size()>0) {
-      		for(FileVo file:files) {
-      			DocTmp tmp=docTmpService.selectById(file.getOldDocId());//将临时表保存的上传信息保存到主表中
-      			if(tmp!=null) {
-      				Doc doc=new Doc();
-      				BeanUtils.copyProperties(tmp, doc);
-      				doc.setOriginalName(file.getOriginalName());
-      				docService.insertOrUpdate(doc);
-      			}
-      			
-      		}
-      	}
+      	map.put("processId",pId);
       	return Result.build("0000", "操作成功", map);
- 	}catch (Exception e) {
+ 	}catch (AlmsBaseExcepiton e) {
       	logger.error(e.getMessage());
-      	e.printStackTrace();
-      	return Result.error("9999", "操作异常");
-  	}
+      	
+      	return Result.error(e.getCode(), e.getMsg());
+  	}catch (Exception e) {
+  		logger.error(e.getMessage());
+  		return Result.error("9999", "系统异常");
+	}
   }
       
     @SuppressWarnings("unchecked")
@@ -1092,6 +1060,11 @@ try {
     	//拖车信息
     	List<CarDrag> drag=carDragService.selectList(
     	        new EntityWrapper<CarDrag>().eq("business_id", businessId)); 
+    	//获取最新评估信息
+    	CarDetection detection=carDetectionService.selectById(carBasic.getLastDetectionId());
+    	//获取抵押时的评估信息
+    	List<CarDetection> carDetections= carDetectionService.selectList(new EntityWrapper<CarDetection>().eq("business_id", businessId).eq("is_origin", true));
+    	
     	//还款信息
     	List<RepaymentBizPlan> plans=repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id", businessId));
     	if(plans==null||plans.size()!=1) {
@@ -1159,6 +1132,9 @@ try {
     	map.put("carBasic", carBasic==null?new CarBasic():carBasic);
     	map.put("business", business==null?new BasicBusiness():business);
     	map.put("drag", (drag==null||drag.size()<=0)?new CarDrag():drag.get(0));
+    	map.put("detection", detection);
+    	map.put("mortgageDetection",(carDetections==null||carDetections.size()<=0)?new CarDetection():carDetections.get(0) );
+    	
     	map.put("repayPlan", plan);
     	map.put("outputRecord", outputRecord);
     	map.put("carAuction", carAuction);
@@ -1179,66 +1155,19 @@ try {
       	CarAuction carAuction=JsonUtil.map2obj((Map<String,Object>)params.get("carAuction"), CarAuction.class);
       	List<FileVo> files=JsonUtil.map2objList(params.get("returnRegFiles"), FileVo.class);
       	AuditVo auditVo=JsonUtil.map2obj((Map<String,Object>)params.get("auditVo"), AuditVo.class);
-      	CarBasic retCarBasic=carBasicService.selectById(carAuction.getBusinessId());
-      	
-      	if(retCarBasic==null) {
-      		logger.error("该业务记录不存在");
-      		return Result.error("9999", "无效业务");
-      	}
-      	com.hongte.alms.base.process.entity.Process p=processService.selectById(auditVo.getProcessId());
-      	if(p==null) {
-      		logger.error("未创建流程，ProcessId="+auditVo.getProcessId());
-      		return Result.error("9999", "未创建流程");
-      	}
-      	if(CarStatusEnums.PENDING.getStatusCode().equals(retCarBasic.getStatus())&&p.getCurrentStep()!=-1) {//不为草稿状态
-      		logger.error("非待处置状态的车辆不能进行拍卖");
-      		return Result.error("9999", "非待处置状态的车辆不能进行拍卖");
-      	}
-      	carBase.setBusinessId(retCarBasic.getBusinessId());
-     
-      	List<CarAuction> carAuctions=carAuctionService.selectList(new EntityWrapper<CarAuction>().eq("business_id", carAuction.getBusinessId()).ne("status", AuctionStatusEnums.DRAFT.getKey()));
-      	if(carAuctions!=null&&carAuctions.size()>0) {
-      		for(CarAuction carAuc:carAuctions) {
-      			if(AuctionStatusEnums.AUDIT.getKey().equals(carAuc.getStatus())) {
-//      				logger.error("该申请已提交审核，business_id="+carAuction.getBusinessId());
-//      	    		return Result.error("9999", "该申请已提交审核,请勿重复提交");
-      			}else {
-      				carAuction.setAuctionId(carAuc.getAuctionId());
-      				
-      				
-      			}
-      		}
-      	}else {
-      		if(StringUtils.isEmpty(carAuction.getAuctionId())) {
-      		carAuction.setAuctionId(UUID.randomUUID().toString());
-      		carAuction.setCreateTime(new Date());
-      		carAuction.setCreateUser("admin");
-      		}
-      	}
-      	if(files!=null&&files.size()>0) {
-      		for(FileVo file:files) {
-      			DocTmp tmp=docTmpService.selectById(file.getOldDocId());//将临时表保存的上传信息保存到主表中
-      			if(tmp!=null) {
-      				Doc doc=new Doc();
-      				BeanUtils.copyProperties(tmp, doc);
-      				doc.setOriginalName(file.getOriginalName());
-      				docService.insertOrUpdate(doc);
-      			}
-      			
-      		}
-      	}
-      	processService.saveProcessApprovalResult(auditVo, ProcessTypeEnums.Aply_CarAuction);
-      	carAuction.setStatus(AuctionStatusEnums.AUDITED.getKey());
-      	carAuctionService.insertOrUpdate(carAuction);
-      	if(ProcessTypeEnums.Aply_CarAuction.getEndStep().equals(p.getCurrentStep())) {
-      		carBase.setStatus(CarStatusEnums.AUCTION.getStatusCode());
-      	}else {
-      	carBase.setStatus(CarStatusEnums.AUCTION_AUDIT.getStatusCode());
-      	}
-      	carBase.setUpdateTime(new Date());
-       	carBasicService.updateById(carBase);
+      	CarDetection carDetection=JsonUtil.map2obj((Map<String,Object>)params.get("detection"), CarDetection.class);
+      	AuctionAplyVo vo=new AuctionAplyVo();
+      	vo.setCarBase(carBase);
+      	vo.setCarAuction(carAuction);
+      	vo.setFiles(files);
+      	vo.setAuditVo(auditVo);
+      	vo.setCarDetection(carDetection);
+      	carService.auctionAudit(vo);
       	return Result.build("0000", "操作成功", "");
-      }catch (Exception e) {
+      }catch (AlmsBaseExcepiton e) {
+    	  logger.error(e.getMsg());
+    	  return Result.error(e.getCode(), e.getMsg());
+	}catch (Exception e) {
       	logger.error(e.getMessage());
       	return Result.error("9999", "操作异常");
   	}
