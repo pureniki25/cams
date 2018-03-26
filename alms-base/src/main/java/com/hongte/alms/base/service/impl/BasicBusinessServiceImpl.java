@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -65,7 +66,20 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
                 }
             }
             //剩余本金
-            vo.setRemianderPrincipal(vo.getGetMoney().subtract(vo.getPayedPrincipal()));
+            if(vo.getPayedPrincipal()==null){
+                if(vo.getGetMoney()!=null){
+                    vo.setRemianderPrincipal(vo.getGetMoney());
+                }else{
+                    vo.setRemianderPrincipal(new BigDecimal(0.00));
+                }
+            }else{
+                if(vo.getGetMoney()!=null){
+                    vo.setRemianderPrincipal(vo.getGetMoney().subtract(vo.getPayedPrincipal()));
+                }else{
+                    vo.setRemianderPrincipal(new BigDecimal(0.00));
+                }
+            }
+
         }
 
         return List;
