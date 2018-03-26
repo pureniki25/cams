@@ -164,6 +164,8 @@ public class WithHoldingController {
 				   repayLogResp.setListId(String.valueOf(i+1));
 				   if(repayLogResp.getRepayStatus().equals("1")) {
 					   repayLogResp.setRepayStatus("成功");
+				   }else if(repayLogResp.getRepayStatus().equals("2")){
+					   repayLogResp.setRepayStatus("处理中");
 				   }else {
 					   repayLogResp.setRepayStatus("失败");
 				   }
