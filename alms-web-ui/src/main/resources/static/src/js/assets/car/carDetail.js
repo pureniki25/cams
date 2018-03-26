@@ -44,6 +44,7 @@ var vm = new Vue({
     		,vehicleVesselTax:''	//车船税费用
     		,annualTicketFee:''//统缴费用
 	    	,drivingLicenseConsistent:''//核对行驶资料
+	    	,drivingLicenseInconsistentDescription:''
 	    	,renewal:''//借款期内是否续保
 	    	,fuelType:''//燃油形式
 	    	,vehicleLicenseRegistrationDate:''//汽车注册日期
@@ -51,6 +52,22 @@ var vm = new Vue({
 	    	,mortgage:''//车辆抵押状态
 	    	,odometer:''//里程表读数
 	    	,fuelLeft:''//燃油量（约余）
+    		,ventilatorAbnormalDescription:'' //空调
+    		,centerPanelAbnormalDescription:''//中控台
+    		,interiorAbnormalDescription:''//内饰
+    		,windowGlassAbnormalDescription:''//玻璃;
+    		,radiatorAbnormalDescription:''//水箱
+    		,engineAbnormalDescription:''//发动机
+    		,frameAbnormalDescription:''//车大梁
+    		,tireAbnormalDescription:''//轮胎
+    		,spareTireAbnormalDescrioption:'' //备用胎
+    		,doorAbnormalDescription:'' //车门
+    		,accelerationPerformanceAbnormalDescription:'' //动力性能
+    		,brakingPerformanceAbnormalDescription:'' //刹车性能
+    		,brakingBalancePerformanceAbnormalDescription:'' //刹车平衡性能
+    		,steerPerformanceAbnormalDescription:'' //方向性能;
+    		,steerPerformanceAbnormalDescription:'' //挂档性能;
+    		,edition:''//版本配置说明
     	}
     	,carAuction:{
     		createUser:''//申请人

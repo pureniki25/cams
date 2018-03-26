@@ -62,25 +62,25 @@
 		      ON a.business_id = b.renewal_business_id 
 		  WHERE a.business_id = t1.`business_id`) businessId,
 		  t1.`customer_name` customerName,
-		  t1.`borrow_money` borrowMoney,
+		  IFNULL(t1.`borrow_money`, 0) borrowMoney,
 		  t1.`output_platform_id` outputPlatformId,
 		  t1.`borrow_limit` borrowLimit,
 		  t1.`repayment_type_id` repaymentTypeId,
-		  t1.`borrow_rate` borrowRate,
+		  IFNULL(t1.`borrow_rate`, 0) borrowRate,
 		  t1.`company_name` companyName,
 		  CONCAT(t2.`brand_name`, t2.`model`) model,
 		  t3.`create_time` createTime,
-		  t3.`evaluation_amount` evaluationAmount,
+		  IFNULL(t3.`evaluation_amount`, 0) evaluationAmount,
 		  (SELECT 
 		    MAX(t4.`drag_date`) 
 		  FROM
 		    tb_car_drag t4 
 		  WHERE t1.`business_id` = t4.`business_id`) dragDate,
 		  t1.`operator_name` operatorName,
-		  t5.fact_principal factPrincipal,
-		  t5.fact_accrual factAccrual,
-		  t5.surplus_principal surplusPrincipal,
-		  t5.surplusServiceCharge,
+		  IFNULL(t5.fact_principal, 0) factPrincipal,
+		  IFNULL(t5.fact_accrual, 0) factAccrual,
+		  IFNULL(t5.surplus_principal, 0) surplusPrincipal,
+		  IFNULL(t5.surplusServiceCharge, 0) surplusServiceCharge,
 		  t5.fact_repay_date factRepayDate,
 		  t6.output_user_name outputUserName,
 		  t6.fact_output_date factOutputDate,
@@ -100,72 +100,67 @@
 		  tb_car_basic t2,
 		  tb_car_detection t3,
 		  (SELECT 
-			  tab.fact_principal,
-			  tab.fact_accrual,
-			  tab.business_id,
-			  tab.fact_repay_date,
-			  (
-			    tab.plan_principal - tab.fact_principal
-			  ) surplus_principal,
-			  (
-			    tab.plan_service_charge - tab.fact_service_charge
-			  ) surplusServiceCharge 
-			FROM
-			  (SELECT 
-			    tab2.`original_business_id` business_id,
-			    MAX(tab1.fact_repay_date) fact_repay_date,
-			    -- 应还本金总额
-			    SUM(
-			      CASE
-			        WHEN tab3.plan_item_type = 10 
-			        THEN tab3.plan_amount 
-			        ELSE 0 
-			      END
-			    ) `plan_principal`,
-			    -- 实还本金总额
-			    SUM(
-			      CASE
-			        WHEN tab3.plan_item_type = 10 
-			        THEN tab3.fact_amount 
-			        ELSE 0 
-			      END
-			    ) `fact_principal`,
-			    -- 实还利息总额
-			    SUM(
-			      CASE
-			        WHEN tab3.plan_item_type = 20 
-			        THEN tab3.fact_amount 
-			        ELSE 0 
-			      END
-			    ) `fact_accrual`,
-			    -- 应还资产端分公司服务费总额
-			    SUM(
-			      CASE
-			        WHEN tab3.plan_item_type = 30 
-			        THEN tab3.plan_amount 
-			        ELSE 0 
-			      END
-			    ) `plan_service_charge`,
-			    -- 实还资产端分公司服务费总额
-			    SUM(
-			      CASE
-			        WHEN tab3.plan_item_type = 30 
-			        THEN tab3.fact_amount 
-			        ELSE 0 
-			      END
-			    ) `fact_service_charge` 
-			  FROM
-			    `tb_repayment_biz_plan_list` tab1,
-			    tb_repayment_biz_plan tab2,
-			    tb_repayment_biz_plan_list_detail tab3 
-			  WHERE tab1.`current_status` = '已还款' 
-			    AND tab1.`plan_id` = tab2.`plan_id` 
-			    AND tab1.`plan_list_id` = tab3.`plan_list_id`
-			    AND tab2.`original_business_id` = #{businessId,jdbcType=VARCHAR}) tab ) t5,
+		    tab.fact_principal,
+		    tab.fact_accrual,
+		    tab.business_id,
+		    tab.fact_repay_date,
+		    (
+		      tab.plan_principal - tab.fact_principal
+		    ) surplus_principal,
+		    (
+		      tab.plan_service_charge - tab.fact_service_charge
+		    ) surplusServiceCharge 
+		  FROM
+		    (SELECT 
+		      tab2.`original_business_id` business_id,
+		      MAX(tab1.fact_repay_date) fact_repay_date,
+		      SUM(
+		        CASE
+		          WHEN tab3.plan_item_type = 10 
+		          THEN tab3.plan_amount 
+		          ELSE 0 
+		        END
+		      ) `plan_principal`,
+		      SUM(
+		        CASE
+		          WHEN tab3.plan_item_type = 10 
+		          THEN tab3.fact_amount 
+		          ELSE 0 
+		        END
+		      ) `fact_principal`,
+		      SUM(
+		        CASE
+		          WHEN tab3.plan_item_type = 20 
+		          THEN tab3.fact_amount 
+		          ELSE 0 
+		        END
+		      ) `fact_accrual`,
+		      SUM(
+		        CASE
+		          WHEN tab3.plan_item_type = 30 
+		          THEN tab3.plan_amount 
+		          ELSE 0 
+		        END
+		      ) `plan_service_charge`,
+		      SUM(
+		        CASE
+		          WHEN tab3.plan_item_type = 30 
+		          THEN tab3.fact_amount 
+		          ELSE 0 
+		        END
+		      ) `fact_service_charge` 
+		    FROM
+		      `tb_repayment_biz_plan_list` tab1,
+		      tb_repayment_biz_plan tab2,
+		      tb_repayment_biz_plan_list_detail tab3 
+		    WHERE tab1.`current_status` = '已还款' 
+		      AND tab1.`plan_id` = tab2.`plan_id` 
+		      AND tab1.`plan_list_id` = tab3.`plan_list_id` 
+		      AND tab2.`original_business_id` = #{businessId,jdbcType=VARCHAR}) tab) t5,
 		  (SELECT 
-		    MIN(fact_output_date) fact_output_date ,
+		    MIN(fact_output_date) fact_output_date,
 		    tab.output_user_name,
-		    tab.business_id
+		    tab.business_id 
 		  FROM
 		    (SELECT 
 		      tt1.business_id,
@@ -174,12 +169,14 @@
 		    FROM
 		      tb_biz_output_record tt1 
 		    WHERE IFNULL(tt1.withdraw_type, 0) = 0 
-		      OR IFNULL(tt1.withdraw_type, 0) = 1) tab  
-		  GROUP BY tab.business_id, tab.output_user_name) t6
+		      OR IFNULL(tt1.withdraw_type, 0) = 1) tab 
+		  GROUP BY tab.business_id,
+		    tab.output_user_name) t6 
 		WHERE t1.`business_id` = t2.`business_id` 
 		  AND t1.`business_id` = t3.`business_id` 
 		  AND t1.`business_id` = t6.`business_id` 
-		  AND t1.`business_id` = #{businessId,jdbcType=VARCHAR}
+		  AND t2.`last_detection_id` = t3.`id` 
+		  AND t1.`business_id` = #{businessId,jdbcType=VARCHAR} 	
 	</select>
 	
 	<select id="queryTransferLitigationCarData" resultType="com.hongte.alms.base.vo.litigation.BusinessCar">
@@ -198,7 +195,9 @@
 		FROM
 		  tb_car_basic cb,
 		  tb_car_detection cd 
-		WHERE cd.`business_id` = cb.`business_id` AND cb.`business_id` = #{businessId,jdbcType=VARCHAR}
+		WHERE cd.`business_id` = cb.`business_id` 
+		  AND cb.last_detection_id = cd.id
+		  AND cb.`business_id` = #{businessId,jdbcType=VARCHAR}
 	</select>
 	
 	<select id="queryTransferLitigationData" resultMap="TransferOfLitigationMap" >

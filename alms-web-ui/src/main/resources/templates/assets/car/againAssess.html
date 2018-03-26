@@ -201,7 +201,7 @@ color: #FF3030;
 			<tr>
 				<td class="td_label">空调：</td>
 				<td ><input type="checkbox" 
-					 	v-model="carDetection.ventilatorNormal" >无异常&nbsp;
+					 	v-model="carDetection.ventilatorNormal" >无异常&nbsp; 
 					 <input type="checkbox" 
 					 	v-model="ventilatorAbnormalDescription" value="有制冷">有制冷&nbsp;
 					 <input type="checkbox" 
@@ -308,13 +308,13 @@ color: #FF3030;
 				<td ><input value="0"  type="radio"
 					v-model="carDetection.gearBox" >自动&nbsp;
 					 <input value="1"  type="radio"
-					 v-model="carBasic.gearBox" >手动&nbsp;
+					 v-model="carDetection.gearBox" >手动&nbsp;
 				</td>
 			</tr>
 			<tr>
 				<td class="td_label" rowspan="2">车辆版本配置说明：</td>
 				<td rowspan="2"><textarea rows="" cols="" v-model="carDetection.edition"
-					style="width: 100%" maxlength="1000"></textarea>
+					style="width: 100%" maxlength="500"></textarea>
 				</td>
 			</tr>
 			</table>
@@ -383,7 +383,7 @@ color: #FF3030;
 			<tr>
 				<td class="td_label" rowspan="2">其他情况说明：</td>
 				<td rowspan="2"><textarea rows="" cols="" v-model="carDetection.otherDriveDescription"
-					style="width: 100%" maxlength="1000"> </textarea>
+					style="width: 100%" maxlength="250"> </textarea>
 				</td>
 			</tr>
 			</table>
