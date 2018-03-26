@@ -128,7 +128,7 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
 //            List<SysParameter> pList = sysParameterService.selectList(new EntityWrapper<SysParameter>().
 //                    eq("param_type",SysParameterTypeEnums.COLLECTION_STATUS.getKey())
 //                    .eq("param_value",vo.getColStatus()));
-            SysParameter  parameter =parameterMap.get(vo.getColStatus());
+            SysParameter  parameter =parameterMap.get(vo.getColStatus()==null?vo.getColStatus():vo.getColStatus().toString());
             if(parameter!=null){
                 vo.setAfterColStatusName(parameter.getParamName());
             }

@@ -509,8 +509,8 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			double lastGuaranteeCharge = ((BigDecimal) maxPeriodMap.get("plan_guarantee_charge")).doubleValue(); // 最后一期担保公司费用
 			double lastPlatformCharge = ((BigDecimal) maxPeriodMap.get("plan_platform_charge")).doubleValue(); // 最后一期平台费
 			int overdueDays = differentDays(minDueDate, billDate); // 逾期天数
-//			long isPreCharge = (long) resultMap.get("isPreCharge"); // 是否服务费一次性收取业务
-			long isPreServiceFees = (long) resultMap.get("isPreServiceFees"); // 是否分公司服务费前置收取
+			long isPreCharge = (long) resultMap.get("isPreCharge"); // 是否服务费一次性收取业务
+//			long isPreServiceFees = (long) resultMap.get("isPreServiceFees"); // 是否分公司服务费前置收取
 			double planAccrual = ((BigDecimal) resultMap.get("planAccrual")).doubleValue(); // 本期应还利息
 			double planServiceCharge = ((BigDecimal) resultMap.get("planServiceCharge")).doubleValue(); // 本期应还服务费
 			double planPlatformCharge = ((BigDecimal) resultMap.get("planPlatformCharge")).doubleValue(); // 本期应还平台费
@@ -569,9 +569,8 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				// 判断是否服务费一次性收取业务 isPreCharge == 1， 是 isPreCharge == 0 否
 				// 判断是否分公司服务费前置收取 isPreServiceFees == 1， 是 isPreServiceFees == 0 否
 				if ("到期还本息".equals(repaymentTypeId) || "每月付息到期还本".equals(repaymentTypeId)) {
-
-					if (outputPlatformId == 1 && isPreServiceFees == 0) {
-						outsideInterest = 0;
+					if (outputPlatformId == 1 && isPreCharge == 0) {
+						preLateFees = 0;
 					}
 				} else if ("等额本息".equals(repaymentTypeId)) {
 
@@ -597,9 +596,8 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			} else {
 				if ("到期还本息".equals(repaymentTypeId) || "每月付息到期还本".equals(repaymentTypeId)) {
 
-					if (outputPlatformId == 1 && isPreServiceFees == 0) {
+					if (outputPlatformId == 1 && isPreCharge == 0) {
 						preLateFees = ((BigDecimal) resultMap.get("surplusServiceCharge")).doubleValue();
-						outsideInterest = 0;
 					}
 				} else if ("等额本息".equals(repaymentTypeId)) {
 					if (outputPlatformId == 0) {
@@ -622,7 +620,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 						default:
 							break;
 						}
-					} else if (outputPlatformId == 1 && isPreServiceFees == 1) {
+					} else if (outputPlatformId == 1 && isPreCharge == 0) {
 						preLateFees = ((BigDecimal) resultMap.get("surplusServiceCharge")).doubleValue();
 					}
 				}
