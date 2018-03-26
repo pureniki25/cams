@@ -31,18 +31,18 @@ var setFormValidate = {
     realReceiveMoney: [
         {pattern:/^[0-9]+(.[0-9]{1,2})?$/,   message: '请填写不超过两位小数的数字', trigger: 'blur'}
     ],
-    derateReson: [
-    	{required: true, message: '必填', trigger: 'blur'}  ,
+	derateReson: [
+		{required: true, message: '必填', trigger: 'change'}  ,  
     	{
-        	validator: function (rule, value, callback, source, options) {
-	        	if (value.length > 1000 ) {
-	        		callback(new Error('字数长度不能超过500'));
-	        	} else {
-	        	callback();//校验通过
-	        	}
-        	}
-        }
-    ]
+    		validator: function (rule, value, callback, source, options) {
+    			if (value.length > 500 ) {
+    				callback(new Error('字数长度不能超过500'));
+    			} else {
+    				callback();//校验通过
+    			}
+    		}
+    	}
+	]
 };
 
 
@@ -260,12 +260,7 @@ window.layinit(function (htConfig) {
                 // closePareantLayer();
             },
             resetEdit(){  //撤销操作
-                if(processStatus == PROCESS_STATUS_NEW || processStatus == PROCESS_STATUS_START) {
-                    this.handleReset("applyInfoForm");
-                }else{
-                    vm.applyInfoForm =  vm.initalApplyInfo;
-                }
-                restProcessApprovalInfo();
+            	closePareantLayer();
             },
             saveDeraf(){//保存草稿
                 saveapplyInfo(PROCESS_STATUS_NEW);
@@ -341,21 +336,19 @@ window.layinit(function (htConfig) {
 	    		var that = this;
 	    		// 如果文档id存在，那么进行ajax
 	    		if (docId) {
-	    			$.ajax({
-		                type: "GET",
-		                url: basePath+'doc/delOneDoc?docId='+docId,
-		                success: function (data) {
-		                	console.log(data, that);
-		                	that.returnRegFiles.splice(index, 1);
-		    	            if(that.returnRegFiles == ""){
-		    	            	that.addTabTr(event);
-		    	            }
-		                },
-		                error: function (message) {
-		                    layer.msg("删除文件失败。");
-		                    console.error(message);
-		                }
-		            });
+	    			var url = basePath+'doc/delOneDoc?docId='+docId;
+	    			axios.get(url)
+	    	        .then(function (res) {
+	    	        	console.log(res, that);
+	                	that.returnRegFiles.splice(index, 1);
+	    	            if(that.returnRegFiles == ""){
+	    	            	that.addTabTr(event);
+	    	            }
+	    	        })
+	    	        .catch(function (error) {
+	    	        	layer.msg("删除文件失败。");
+	    	        	console.error(error);
+	    	        });
 	    		// 否则直接删除
 	    		} else {
 	    			that.returnRegFiles.splice(index, 1);

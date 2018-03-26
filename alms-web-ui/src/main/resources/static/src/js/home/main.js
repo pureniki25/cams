@@ -148,8 +148,12 @@ window.layinit(function (htConfig) {
                 success: function (data) {
                     if(data.code=='1'){
                         var applyDerateProcess = data.data;
-                        url = '/collectionUI/applyDerateUI?businessId=' + obj.data.businessId + '&crpId=' + applyDerateProcess.crpId + "&processStatus=" + obj.data.processStatus + "&processId=" + obj.data.processId
-                        main.approvalModal.show = true;
+                        layer.open({
+                            type: 2,
+                            title: '减免申请',
+                            area: ['1250px', '800px'],
+                            content: '/collectionUI/applyDerateUI?businessId=' + obj.data.businessId + '&crpId=' + applyDerateProcess.crpId + "&processStatus=" + obj.data.processStatus + "&processId=" + obj.data.processId
+                        });
                     }else{
                         main.$Modal.error({ content: '接口调用异常!'+(data.msg||'') });
                     }
@@ -175,8 +179,12 @@ window.layinit(function (htConfig) {
                 },
                 success: function (data) {
                     if(data.code=='1'){
-                        url = '/transferOfLitigation/carLoan?businessId=' + obj.data.businessId + "&processStatus=" + obj.data.status + "&processId=" + obj.data.processId
-                        main.approvalModal.show = true;
+                        layer.open({
+                            type: 2,
+                            title: '车贷移交诉讼',
+                            area: ['1250px', '800px'],
+                            content: '/transferOfLitigation/carLoan?businessId=' + obj.data.businessId + "&processStatus=" + obj.data.status + "&processId=" + obj.data.processId
+                        });
                     }else{
                         main.$Modal.error({ content: '接口调用异常!'+(data.msg||'') });
                     }
@@ -202,8 +210,12 @@ window.layinit(function (htConfig) {
                 },
                 success: function (data) {
                     if(data.code=='1'){
-                        url = '/transferOfLitigation/houseLoan?businessId=' + obj.data.businessId + "&processStatus=" + obj.data.processStatus + "&processId=" + obj.data.processId
-                        main.approvalModal.show = true;
+                        layer.open({
+                            type: 2,
+                            title: '房贷移交诉讼',
+                            area: ['1250px', '800px'],
+                            content: '/transferOfLitigation/houseLoan?businessId=' + obj.data.businessId + "&processStatus=" + obj.data.processStatus + "&processId=" + obj.data.processId
+                        });
                     }else{
                         main.$Modal.error({ content: '接口调用异常!'+(data.msg||'') });
                     }

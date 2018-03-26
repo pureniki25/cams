@@ -103,31 +103,31 @@ color: #FF3030;
 			<tr>
 				<td class="td_label">违章情况</td>
 				<td ><input type="text" name="trafficViolationSituation"
-					 v-model="carBasic.trafficViolationSituation" class="input-border-input" >
+					 v-model="carDetection.trafficViolationSituation" class="input-border-input" >
 				</td>
 			</tr>
 			<tr>
 				<td class="td_label">违章费用</td>
-				<td ><input type="text" name="trafficViolationFee"
-					 v-model="carBasic.trafficViolationFee" class="input-border-input" >元
+				<td ><input type="text" name="trafficViolationFee" id="trafficViolationFee"
+					 v-model="carDetection.trafficViolationFee" class="input-border-input" >元
 				</td>
 			</tr>
 			<tr>
 				<td class="td_label">车船税费用</td>
-				<td ><input type="text" name="vehicleVesselTax"
-					 v-model="carBasic.vehicleVesselTax" class="input-border-input" >元
+				<td ><input type="text" name="vehicleVesselTax" id="vehicleVesselTax"
+					 v-model="carDetection.vehicleVesselTax" class="input-border-input" >元
 				</td>
 			</tr>
 			<tr>
 				<td class="td_label">统缴费用</td>
-				<td ><input type="text" name="carBasic.annualTicketFee"
-					 v-model="carBasic.annualTicketFee" class="input-border-input" >元
+				<td ><input type="text" name="annualTicketFee" id="annualTicketFee"
+					 v-model="carDetection.annualTicketFee" class="input-border-input" >元
 				</td>
 			</tr>
 			<tr>
 				<td class="td_label">核实行驶资料</td>
 				<td ><input type="checkbox" name="drivingLicenseConsistent"
-					 v-model="carBasic.drivingLicenseConsistent" >相符&nbsp;
+					 v-model="carDetection.drivingLicenseConsistent" >相符&nbsp;
 					 <input type="checkbox" 
 					 value="有差异" v-model="drivingLicenseInconsistentDescription" >有差异&nbsp;
 					 <input type="checkbox" 
@@ -140,26 +140,26 @@ color: #FF3030;
 			</tr>
 			<tr>
 				<td class="td_label">燃油形式</td>
-				<td >     <input value="0"  type="radio" v-model="carBasic.fuelType"><label>汽油</label>&nbsp;&nbsp;
-      							  <input  value="1"  type="radio" v-model="carBasic.fuelType"><label>柴油</label>
+				<td >     <input value="0"  type="radio" v-model="carDetection.fuelType"><label>汽油</label>&nbsp;&nbsp;
+      							  <input  value="1"  type="radio" v-model="carDetection.fuelType"><label>柴油</label>
 				</td>
 			</tr>
 			<tr>
 				<td class="td_label">汽车注册日期</td>
 				<td ><input type="text" id="vehicleLicenseRegistrationDate" placeholder="yyyy-MM-dd"
-					 v-model="carBasic.vehicleLicenseRegistrationDate" >
+					 v-model="carDetection.vehicleLicenseRegistrationDate" >
 				</td>
 			</tr>
 			<tr>
 				<td class="td_label">年审到期日</td>
 				<td ><input type="text" id="annualVerificationExpirationDate" placeholder="yyyy-MM-dd"
-					 v-model="carBasic.annualVerificationExpirationDate" >
+					 v-model="carDetection.annualVerificationExpirationDate" >
 				</td>
 			</tr>
 						<tr>
 				<td class="td_label">车辆抵押状态</td>
-				<td >     <input  value="true"  type="radio" v-model="carBasic.mortgage"><label>已抵押</label>&nbsp;&nbsp;
-      							  <input  value="false"  type="radio" v-model="carBasic.mortgage"><label>未抵押</label>
+				<td >     <input  value="true"  type="radio" v-model="carDetection.mortgage"><label>已抵押</label>&nbsp;&nbsp;
+      							  <input  value="false"  type="radio" v-model="carDetection.mortgage"><label>未抵押</label>
 				</td>
 			</tr>
 			</table>
@@ -173,13 +173,13 @@ color: #FF3030;
 			<table class="layui-table">
 			<tr>
 				<td class="td_label">里程表读数：</td>
-				<td ><input type="text" name="odometer"
-					 v-model="carBasic.odometer" >
+				<td ><input type="text" name="odometer" id="odometer"
+					 v-model="carDetection.odometer" >
 				</td>
 			</tr>
 			<tr>
 				<td class="td_label">燃油量（约余）：</td>
-				<td><select v-model="carBasic.fuelLeft" name="fuelLeft">
+				<td><select v-model="carDetection.fuelLeft" name="fuelLeft">
 									<option >--请选择--</option>
 									<option value="4">满</option>
 									<option value="3">3/4量</option>
@@ -306,15 +306,15 @@ color: #FF3030;
 			<tr>
 				<td class="td_label">变速箱：</td>
 				<td ><input value="0"  type="radio"
-					v-model="carBasic.gearBox" >自动&nbsp;
+					v-model="carDetection.gearBox" >自动&nbsp;
 					 <input value="1"  type="radio"
 					 v-model="carBasic.gearBox" >手动&nbsp;
 				</td>
 			</tr>
 			<tr>
 				<td class="td_label" rowspan="2">车辆版本配置说明：</td>
-				<td rowspan="2"><textarea rows="" cols=""
-					style="width: 100%" maxlength="1000"> 15年3月马自达3昂克赛拉1.5L自动舒适型</textarea>
+				<td rowspan="2"><textarea rows="" cols="" v-model="carDetection.edition"
+					style="width: 100%" maxlength="1000"></textarea>
 				</td>
 			</tr>
 			</table>
@@ -331,22 +331,22 @@ color: #FF3030;
 			<table class="layui-table">
 			<tr>
 				<td class="td_label">评估金额<label class="input_label">*</label>：</td>
-				<td ><input type="text" v-model="carBasic.evaluationAmount" >
+				<td ><input type="text" v-model="carDetection.evaluationAmount" id="evaluationAmount">
 				</td>
 			</tr>
 			<tr>
 				<td class="td_label">使用权转移价：</td>
-				<td ><input type="text" name="lname"
-					 value="未抵押" >
+				<td ><input type="text" id="transferFee"
+					 v-model="carDetection.transferFee" >
 				</td>
 			</tr>
 			<tr>
 				<td class="td_label">动力性能：</td>
-				<td ><input type="checkbox" v-model="carDetection.accelerationPerformanceNormal" >无异常&nbsp;
-					 <input type="checkbox" v-model="accelerationPerformanceAbnormalDescription" value="抖动明显" >抖动明显&nbsp;
-					  <input type="checkbox" v-model="accelerationPerformanceAbnormalDescription" value="异响" >异响&nbsp;
-					 <input type="checkbox" v-model="accelerationPerformanceAbnormalDescription" value="渗漏油" >渗漏油&nbsp;
-					 <input type="checkbox" v-model="accelerationPerformanceAbnormalDescription" value="有硬伤" >有硬伤&nbsp;
+				<td ><input type="checkbox" v-model="carDetection.accelerationPerformanceNormal" id="accelerationPerformanceNormal">无异常&nbsp;
+					 <input type="checkbox" v-model="accelerationPerformanceAbnormalDescription" value="抖动明显" v-on:click="valiClick()">抖动明显&nbsp;
+					  <input type="checkbox" v-model="accelerationPerformanceAbnormalDescription" value="异响" id="accelerationPerformanceAbnormalDescription">异响&nbsp;
+					 <input type="checkbox" v-model="accelerationPerformanceAbnormalDescription" value="渗漏油" id="accelerationPerformanceAbnormalDescription">渗漏油&nbsp;
+					 <input type="checkbox" v-model="accelerationPerformanceAbnormalDescription" value="有硬伤" id="accelerationPerformanceAbnormalDescription">有硬伤&nbsp;
 				</td>
 			</tr>
 			<tr>
@@ -423,6 +423,7 @@ color: #FF3030;
 				<td class="td_label" rowspan="2">车况及事故说明：</td>
 				<td rowspan="2"><textarea rows="" cols="" v-model="carDetection.otherTroubleDescription"
 					style="width: 100%" maxlength="1000"> </textarea>
+				  <input  v-model="carDetection.id" type="input" hidden="">
 				</td>
 			</tr>
 			</table>

@@ -4,7 +4,7 @@ var amt=/^(([1-9]\d*)|\d)(\.\d{1,2})?$/;
 var mobi= /^(((13[0-9]{1})|(14[0-9]{1})|(17[0]{1})|(15[0-3]{1})|(15[5-9]{1})|(18[0-9]{1}))+\d{8})$/; 
 var tel = /^\d{3,4}-?\d{7,9}$/;
 var carNum=/^\d{19}$/;
-var currentDate=new Date().toLocaleDateString();
+var currentDate=new Date();
 var basePath;
 var vm;
 window.layinit(function (htConfig) {
@@ -64,32 +64,59 @@ window.layinit(function (htConfig) {
 	    		,originPlace:''//汽车产地
 	    		,licenseLocation:''//车辆属地
 	    		,color:''//颜色
-	    		,vehicleLicenseRegistrationDate:''//汽车注册日期
-	    		,mortgage:''//车辆抵押状态
-	    		,evaluationAmount:''//抵押时车辆评估价值
-	    		,createTime:''//抵押时车辆评估时间
-	    		,lastEvaluationAmount:''//最新车辆评估价值
-	    		,lastEvaluationTime:''//最新车辆评估时间
-	    		,trafficViolationFee:''//违章费用
-	    		,annualVerificationExpirationDate:''//年审到期日期
-	    		,odometer:''//里程表读数
-	    		,fuelLeft:''//燃油量（约余）
+	    		//,vehicleLicenseRegistrationDate:''//汽车注册日期
+	    		//,mortgage:''//车辆抵押状态
+	    		//,evaluationAmount:''//抵押时车辆评估价值
+	    		//,createTime:''//抵押时车辆评估时间
+	    		//,lastEvaluationAmount:''//最新车辆评估价值
+	    		//,lastEvaluationTime:''//最新车辆评估时间
+	    		//,trafficViolationFee:''//违章费用
+	    		//,annualVerificationExpirationDate:''//年审到期日期
+	    		//,odometer:''//里程表读数
+	    		//,fuelLeft:''//燃油量（约余）
 	    		,transferTimes:''//过户次数
 	    		,lastTransferDate:''//最后一次过户时间
 	    		//,:''//车辆评估价值
-	    		,differAmount:''//价值差额
-	    		,insuranceExpirationDate:''//保险到期日
-	    		,carVersionConfig:''//车型及版本配置
-	    		,userNature:''//车辆使用性质
-	    		,toolWithCar:''//随车工具
-	    		,relatedDocs:''//提供文件
-	    		,trafficViolationSituation:''//违章情况
-	    		,transactionMode:''//交易方式
-	    		,carPosition:''//车辆位置
-	    		,remark:''//备注
-	    		,viewLastEvaluationAmount:''//只展示的最新评估值
-	    		,viewInsuranceExpirationDate:''//只为展示最近评估的保险到期日期
+	    		//,differAmount:''//价值差额
+	    		//,insuranceExpirationDate:''//保险到期日
+	    		//,carVersionConfig:''//车型及版本配置
+	    		//,userNature:''//车辆使用性质
+	    		//,toolWithCar:''//随车工具
+	    		//,relatedDocs:''//提供文件
+	    		//,trafficViolationSituation:''//违章情况
+	    		//,transactionMode:''//交易方式
+	    		//,carPosition:''//车辆位置
+	    		//,remark:''//备注
+	    		//,viewLastEvaluationAmount:''//只展示的最新评估值
+	    		//,viewInsuranceExpirationDate:''//只为展示最近评估的保险到期日期
 	    	}
+	       ,detection:{
+	    	id:''//评估id
+	   		,vehicleLicenseRegistrationDate:''//汽车注册日期
+	    	,mortgage:''//车辆抵押状态
+	    	,evaluationAmount:''//最新车辆评估价值
+	    	,createTime:''//最新车辆评估时间 
+	    	,trafficViolationFee:''//违章费用
+	    	,annualVerificationExpirationDate:''//年审到期日期
+	    	,odometer:''//里程表读数
+	    	,fuelLeft:''//燃油量（约余）
+	    	,insuranceExpirationDate:''//保险到期日
+	    	,userNature:''//车辆使用性质
+		    ,toolWithCar:''//随车工具
+		    ,relatedDocs:''//提供文件
+		    ,trafficViolationSituation:''//违章情况
+		    ,transactionMode:''//交易方式
+		    ,carPosition:''//车辆位置
+		    ,remark:''//备注
+		    ,differAmount:''//价值差额
+		    ,viewEvaluationAmount:''//展示
+		    ,assessOdometer:''//评估时的里程数，只针对页面的验证
+		    ,viewInsuranceExpirationDate:''//只为展示最近评估的保险到期日期
+	       }
+	       ,mortgageDetection:{
+	    	evaluationAmount:''//抵押时车辆评估价值
+		    ,createTime:''//抵押时车辆评估时间 
+	       }
 	       ,drag:{
 	    	   dragDate:''// 拖车日期
 	       }
@@ -122,7 +149,7 @@ window.layinit(function (htConfig) {
     		   ,auctionRules:''//竞价规则
     		   ,openBank:''//开户银行
     		   ,paymentEndTime:''//缴款截止时间
-    		   ,assessOdometer:''//评估时的里程数，只针对页面的验证
+    		   //,assessOdometer:''//评估时的里程数，只针对页面的验证
     		   ,viewSampleAddr:''//看样地址
     		   ,delayPeriod:''//延时周期
     		   ,remark:''//备注
@@ -167,7 +194,7 @@ window.layinit(function (htConfig) {
 	    			layer.msg("请输入有效金额！",{icon:5,shade: [0.8, '#393D49']});
 	    			return;
 	    		}
-	    		var differAmount=vm.carBasic.evaluationAmount-evaluationAmount;
+	    		var differAmount=Math.abs(vm.detection.viewEvaluationAmount-evaluationAmount);
 	    		$("#differAmount").val(differAmount);
 	    	});
 
@@ -475,19 +502,20 @@ window.layinit(function (htConfig) {
 	                	vm.carBasic=data.data.carBasic;
 	                	vm.business=data.data.business;
 	                	vm.drag=data.data.drag;
-	                	
+	                	vm.detection=data.data.detection;
+	                	vm.mortgageDetection=data.data.mortgageDetection;
 	                	if(data.data.repayPlan!=null&&data.data.repayPlan!=''){
 	                		vm.repayPlan=data.data.repayPlan;
 	                	}
 	                	vm.outputRecord=data.data.outputRecord;
-	                	if(data.data.carBasic.lastEvaluationAmount==null||data.data.carBasic.lastEvaluationAmount==''){
+	                	if(data.data.detection.evaluationAmount==null||data.data.detection.evaluationAmount==''){
 	                		vm.carBasic.differAmount=0;
 	                	}else{
-	                		vm.carBasic.viewLastEvaluationAmount=data.data.carBasic.lastEvaluationAmount;
-	                		vm.carBasic.differAmount=data.data.carBasic.lastEvaluationAmount-data.data.carBasic.evaluationAmount;
+	                		vm.detection.viewEvaluationAmount=data.data.detection.evaluationAmount;
+	                		vm.detection.differAmount=Math.abs(data.data.detection.evaluationAmount-data.data.mortgageDetection.evaluationAmount);
 	                	}
-	                	vm.carBasic.assessOdometer=vm.carBasic.odometer;//为页面验证用
-	                	vm.carBasic.viewInsuranceExpirationDate=vm.carBasic.insuranceExpirationDate;
+	                	vm.detection.assessOdometer=vm.detection.odometer;//为页面验证用
+	                	vm.detection.viewInsuranceExpirationDate=vm.detection.insuranceExpirationDate;
 	                	vm.carAuction=data.data.carAuction;
 	                	if(vm.carAuction.fareRange==null){
 	                		vm.carAuction.fareRange='';
@@ -561,31 +589,31 @@ window.layinit(function (htConfig) {
 	    		parent.layer.close(index);
 	    	},
 	    	carAuctionAply:function (event,subType){
-	    	
-	    		vm.carAuction.businessId=businessId;
+	    		var that = this;
+	    		that.businessId=that.carAuction.businessId;
 	    		//页面信息验证
 	    		
-	    		if(vm.carBasic.annualVerificationExpirationDate==''||vm.carBasic.annualVerificationExpirationDate==null){
+	    		if(vm.detection.annualVerificationExpirationDate==''||vm.detection.annualVerificationExpirationDate==null){
 	    			$("#annualVerificationExpirationDate").css("border","1px solid #FF3030");
 	    			return ;
 	    		}
 	    		
-	    		if(vm.carBasic.odometer==''||vm.carBasic.odometer==null){
+	    		if(vm.detection.odometer==''||vm.detection.odometer==null){
 	    			$("#odometer").css("border","1px solid #FF3030");
 	    			return ;
 	    		}
 	     	
-	    		if (!ex.test(vm.carBasic.odometer)) {  
+	    		if (!ex.test(vm.detection.odometer)) {  
 	    			$("#odometer").css("border","1px solid #FF3030");
 	    			layer.msg("请输入整整数！",{icon:5,shade: [0.8, '#393D49']});
 	    			return;
 	    		}
-	    		if(vm.carBasic.odometer<vm.carBasic.assessOdometer){
+	    		if(vm.detection.odometer<vm.detection.assessOdometer){
 	    			$("#odometer").css("border","1px solid #FF3030");
 	    			layer.msg("里程数小于评估时里程数！",{icon:5,shade: [0.8, '#393D49']});
 	    			return;
 	    		}
-	    		if(vm.carBasic.fuelLeft==''||vm.carBasic.fuelLeft==null){
+	    		if(vm.detection.fuelLeft==''||vm.detection.fuelLeft==null){
 	    			$("#fuelLeft").css("border","1px solid #FF3030");
 	    			return ;
 	    		}
@@ -606,15 +634,15 @@ window.layinit(function (htConfig) {
 	    			}
 	    			
 	    		}
-	      		if(vm.carBasic.lastEvaluationAmount==''||vm.carBasic.lastEvaluationAmount==null){
+	      		if(vm.detection.evaluationAmount==''||vm.detection.evaluationAmount==null){
 	    			$("#lastEvaluationAmount").css("border","1px solid #FF3030");
 	    			return ;
 	    		}
 	
-	    		if(vm.carBasic.insuranceExpirationDate !=null&&vm.carBasic.insuranceExpirationDate!=''){
+	    		if(vm.detection.insuranceExpirationDate !=null&&vm.detection.insuranceExpirationDate!=''){
 	    			
-	    			var inputDate=new Date(vm.carBasic.insuranceExpirationDate.replace("-", "/").replace("-", "/")); 
-	    			var lastDate=new Date(vm.carBasic.viewInsuranceExpirationDate.replace("-", "/").replace("-", "/"));
+	    			var inputDate=new Date(vm.detection.insuranceExpirationDate.replace("-", "/").replace("-", "/")); 
+	    			var lastDate=new Date(vm.detection.viewInsuranceExpirationDate.replace("-", "/").replace("-", "/"));
 	    			if(inputDate<lastDate){
 	    				$("#insuranceExpirationDate").css("border","1px solid #FF3030");
 	    				layer.msg("不能小于最后评估时保险到期日期！",{icon:5,shade: [0.8, '#393D49']});
@@ -622,30 +650,31 @@ window.layinit(function (htConfig) {
 	    			}
 	    			
 	    		}
-	    		if(vm.carBasic.userNature==''||vm.carBasic.userNature==null){
+	    		if(vm.detection.userNature==''||vm.detection.userNature==null){
 	    			$("#userNature").css("border","1px solid #FF3030");
 	    			return ;
 	    		}
-	    		if(vm.carBasic.toolWithCar==''||vm.carBasic.toolWithCar==null){
+	    		if(vm.detection.toolWithCar==''||vm.detection.toolWithCar==null){
 	    			$("#toolWithCar").css("border","1px solid #FF3030");
 	    			return ;
 	    		}
-	       		if(vm.carBasic.relatedDocs==''||vm.carBasic.relatedDocs==null){
+	       		if(vm.detection.relatedDocs==''||vm.detection.relatedDocs==null){
 	    			$("#relatedDocs").css("border","1px solid #FF3030");
 	    			return ;
 	    		}
-	       		if(vm.carBasic.trafficViolationSituation==''||vm.carBasic.trafficViolationSituation==null){
+	       		if(vm.detection.trafficViolationSituation==''||vm.detection.trafficViolationSituation==null){
 	    			$("#trafficViolationSituation").css("border","1px solid #FF3030");
 	    			return ;
 	    		}
-	       		if(vm.carBasic.transactionMode==''||vm.carBasic.transactionMode==null){
+	       		if(vm.detection.transactionMode==''||vm.detection.transactionMode==null){
 	    			$("#transactionMode").css("border","1px solid #FF3030");
 	    			return ;
 	    		}
-	       		if(vm.carBasic.carPosition==''||vm.carBasic.carPosition==null){
+	       		if(vm.detection.carPosition==''||vm.detection.carPosition==null){
 	    			$("#carPosition").css("border","1px solid #FF3030");
 	    			return ;
 	    		}
+	       		//拍卖信息
 	      		if(vm.carAuction.startingPrice==''||vm.carAuction.startingPrice==null){
 	    			$("#startingPrice").css("border","1px solid #FF3030");
 	    			return ;
@@ -680,12 +709,15 @@ window.layinit(function (htConfig) {
 		    			return;
 		    		}
 	    		}
+	
 	     		if(vm.carAuction.auctionStartTime==''||vm.carAuction.auctionStartTime==null){
+
 	    			$("#auctionStartTime").css("border","1px solid #FF3030");
 	    			return ;
 	    		}else{
-	    	
+	    			
 	    			var inputDate=new Date(vm.carAuction.auctionStartTime.replace("-", "/").replace("-", "/"));  
+
 	    			if(inputDate<currentDate){
 	    				$("#auctionStartTime").css("border","1px solid #FF3030");
 	    				layer.msg("不能小于当前日期！",{icon:5,shade: [0.8, '#393D49']});
@@ -880,16 +912,16 @@ window.layinit(function (htConfig) {
 		               type: "POST",
 		               url: basePath+'car/auctionAply',
 		               contentType: "application/json; charset=utf-8",
-		               data: JSON.stringify({"carBasic":vm.carBasic,"carAuction":vm.carAuction,"returnRegFiles":vm.reqRegFiles,"subType":subType,"processId":vm.processId}),
+		               data: JSON.stringify({"carBasic":vm.carBasic,"detection":vm.detection,"carAuction":vm.carAuction,"returnRegFiles":vm.reqRegFiles,"subType":subType,"processId":vm.processId}),
 		               success: function (res) {
 		            	   if (res.code == "0000"){
-		            		   vm.carAuction=res.data.carAuction;
-		            		   vm.processId=res.data.processId;
-		            		   //console.log(message);
-		            		   layer.msg("保存成功。"); 
+		            		   that.processId=res.data.processId;
+		            		   that.carAuction.businessId=businessId;
+		            		   layer.msg("保存成功。");
+		      
 		            		   
 		            	   }else{
-		            		   layer.msg(res.msg);
+		            		   layer.msg(res.msg,{icon:5,shade: [0.8, '#393D49'],time:3000});
 		            		   
 		            	   }
 		               },

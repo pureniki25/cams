@@ -111,7 +111,7 @@ window.layinit(function (htConfig) {
 	        	factPrincipal:"" 			, // 已还本金
 	        	factAccrual:"" 	, // 已还利息
 	        	surplusPrincipal:""             , // 剩余本金
-	        	dueDate:""           , // 利息交至日期
+	        	factRepayDate:""           , // 利息交至日期
 	        	overdueDays:""  	, // 逾期天数
 	        	outputUserName:""   	, // 出款人
 	        	factOutputDate:"" 		, // 出款日期
@@ -316,21 +316,19 @@ window.layinit(function (htConfig) {
 	    		var that = this;
 	    		// 如果文档id存在，那么进行ajax
 	    		if (docId) {
-	    			$.ajax({
-		                type: "GET",
-		                url: basePath+'doc/delOneDoc?docId='+docId,
-		                success: function (data) {
-		                	console.log(data, that);
-		                	that.returnRegFiles.splice(index, 1);
-		    	            if(that.returnRegFiles == ""){
-		    	            	that.addTabTr(event);
-		    	            }
-		                },
-		                error: function (message) {
-		                    layer.msg("删除文件失败。");
-		                    console.error(message);
-		                }
-		            });
+	    			var url = basePath+'doc/delOneDoc?docId='+docId;
+	    			axios.get(url)
+	    	        .then(function (res) {
+	    	        	console.log(res, that);
+	                	that.returnRegFiles.splice(index, 1);
+	    	            if(that.returnRegFiles == ""){
+	    	            	that.addTabTr(event);
+	    	            }
+	    	        })
+	    	        .catch(function (error) {
+	    	        	layer.msg("删除文件失败。");
+	    	        	console.error(error);
+	    	        });
 	    		// 否则直接删除
 	    		} else {
 	    			that.returnRegFiles.splice(index, 1);

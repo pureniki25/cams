@@ -13,8 +13,8 @@ import java.util.Date;
  */
 @ApiModel(value="贷后台账查询请求对象",description="贷后台账查询请求对象")
 public class ApplyDerateListSearchReq extends PageRequest{
-    @ApiModelProperty(value="业务编号",name="BidOrCName",example="test" ,dataType = "String")
-    private String BidOrCName      	;     //业务编号 或客户名称
+    @ApiModelProperty(value="业务编号",name="keyName",example="test" ,dataType = "String")
+    private String keyName      	;     //业务编号 或客户名称
     @ApiModelProperty(value="区域ID",name="areaId",example="test" ,dataType = "String")
     private String areaId  			; //区域ID
     @ApiModelProperty(value="分公司ID",name="companyId",example="test" ,dataType = "String")
@@ -34,19 +34,29 @@ public class ApplyDerateListSearchReq extends PageRequest{
 //    @ApiModelProperty(value="减免金额",name="derateMoneyEndStr",example="test" ,dataType = "String")
 //    private String   derateMoneyEndStr	;  //减免金额 结束
 
-    public String getBidOrCName() {
-        return BidOrCName;
-    }
-
-    public void setBidOrCName(String bidOrCName) {
-        BidOrCName = bidOrCName;
-    }
 
     public String getAreaId() {
         return areaId;
     }
 
-    public void setAreaId(String areaId) {
+
+
+
+	public String getKeyName() {
+		return keyName;
+	}
+
+
+
+
+	public void setKeyName(String keyName) {
+		this.keyName = keyName;
+	}
+
+
+
+
+	public void setAreaId(String areaId) {
         this.areaId = areaId;
     }
 

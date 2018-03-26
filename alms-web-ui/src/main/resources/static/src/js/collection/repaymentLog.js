@@ -45,6 +45,7 @@ var getSelectsData = function () {
 }
 
 
+
 var getUserId = function () {
 
     //取区域列表
@@ -65,7 +66,6 @@ window.layinit(function (htConfig) {
     var _htConfig = htConfig;
     basePath = _htConfig.coreBasePath;
     getDeductionPlatformInfo();
-
     getSelectsData();
     vm = new Vue({
         el: '#app',
@@ -95,11 +95,7 @@ window.layinit(function (htConfig) {
             countByBusinessId:[],
             countbyLogId:[],
             SumRepayAmount:[],
-            repayStatusList: [
-                {name: '成功', repayStatus:'1'},
-                {name: '失败', repayStatus:'0'},
-                {name: '处理中', repayStatus:'2'},
-            ],
+            repayStatusList: [],
             selectedRowInfo:'',//存储当前选中行信息
             edit_modal:false,//控制编辑项选择modal显示的标志位
             menu_modal:false,
@@ -153,7 +149,7 @@ window.layinit(function (htConfig) {
                 })**/
                 layui.use(['layer', 'table','ht_config'], function () {
                 	//config = layui.ht_config;
-                vm.$refs['searchForm'].validate((valid) => {
+                vm.$refs['searchForm'].validate((valid) => {debugger
                
                         vm.exporting = true;
                         expoertExcel(basePath + "RepaymentLogController/saveExcel",vm.searchForm);

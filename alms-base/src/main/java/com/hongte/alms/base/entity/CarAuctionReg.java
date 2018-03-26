@@ -68,6 +68,8 @@ public class CarAuctionReg extends Model<CarAuctionReg> {
 	@TableField("is_auction_success")
 	@ApiModelProperty(required= true,value = "是否竞拍成功 ")
 	private Boolean isAuctionSuccess;
+	
+
     /**
      * 成交价格
      */
@@ -214,6 +216,10 @@ public class CarAuctionReg extends Model<CarAuctionReg> {
 	protected Serializable pkVal() {
 		return this.regId;
 	}
+
+
+
+
 
 	@Override
 	public String toString() {

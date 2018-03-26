@@ -60,8 +60,8 @@
         <where>
             process.status = 2 and process.process_result = 1
 
-            <if test="BidOrCName !=null and BidOrCName !=''">
-                and ((business.business_id  LIKE '%${BidOrCName}%') or (business.customer_name  LIKE '%${BidOrCName}%') )
+            <if test="keyName !=null and keyName !=''">
+                and ((business.business_id  LIKE '%${keyName}%') or (business.customer_name  LIKE '%${keyName}%') )
             </if>
             <if test="areaId !=null and areaId !=''">
                 and business.company_id IN (SELECT area_id FROM tb_basic_company WHERE district_id = #{areaId})
