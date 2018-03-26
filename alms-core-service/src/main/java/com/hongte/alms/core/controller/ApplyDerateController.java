@@ -33,6 +33,7 @@ import com.hongte.alms.base.vo.module.ApplyDerateProcessReq;
 import com.hongte.alms.base.process.vo.ProcessLogReq;
 import com.hongte.alms.base.process.vo.ProcessLogVo;
 import com.hongte.alms.base.service.*;
+import com.hongte.alms.base.util.CompanySortByPINYINUtil;
 import com.hongte.alms.base.vo.module.ApplyDerateListSearchReq;
 import com.hongte.alms.base.vo.module.ApplyDerateVo;
 import com.hongte.alms.base.vo.module.BusinessInfoForApplyDerateVo;
@@ -339,6 +340,7 @@ public class ApplyDerateController {
         retMap.put("area", (JSONArray) JSON.toJSON(area_list,JsonUtil.getMapping()));
         //公司
         List<BasicCompany> company_list = basicCompanyService.selectList(new EntityWrapper<BasicCompany>().eq("area_level",AreaLevel.COMPANY_LEVEL.getKey()));
+        CompanySortByPINYINUtil.sortByPINYIN(company_list);
         retMap.put("company",(JSONArray) JSON.toJSON(company_list,JsonUtil.getMapping()));
         //业务类型
         List<BasicBusinessType> btype_list =  basicBusinessTypeService.selectList(new EntityWrapper<BasicBusinessType>().orderBy("business_type_id"));
