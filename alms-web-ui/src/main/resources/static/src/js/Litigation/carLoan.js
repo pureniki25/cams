@@ -506,7 +506,8 @@ var getShowInfo = function () {
 	                  vm.buttonShowFlage = false;
 	              }
 	              //申请信息是否可编辑  标志位设置
-	              vm.applyInfoFormEditFlage = vm.approvalInfoForm.isCreaterFlage;
+//	              vm.applyInfoFormEditFlage = vm.approvalInfoForm.isCreaterFlage;
+	              vm.applyInfoFormEditFlage = false;
 	//////////--------------  界面显示控制   结束---------------//////////
 	          }
             } else {
