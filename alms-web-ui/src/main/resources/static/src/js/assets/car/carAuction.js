@@ -28,6 +28,8 @@ window.layinit(function (htConfig) {
 	    		file: '',
 	    		name:'',
 	    		originalName: '',
+	   			downloadFileName:'',
+	   			docUrl:'',
 	    		oldDocId:''
 	    	}],
 	    	reqRegFiles:[{
@@ -437,6 +439,9 @@ window.layinit(function (htConfig) {
 	    		        	vm.returnRegFiles[index].oldDocId=reFiles.docId;
 	    		        	vm.returnRegFiles[index].originalName=reFiles.originalName;
 	    		        	vm.returnRegFiles[index].name=reFiles.originalName;
+	    		        	vm.returnRegFiles[index].name=reFiles.originalName;
+	    		        	vm.returnRegFiles[index].downloadFileName =reFiles.originalName;
+	                		vm.returnRegFiles[index].docUrl = reFiles.docUrl;
 	    		        	//alert(JSON.stringify(vm.returnRegFiles[0]));
 	    		        	//$('#'+fileId).val(vm.returnRegFiles[0].file);
 	    		        	
@@ -450,6 +455,15 @@ window.layinit(function (htConfig) {
 	                     data.formData.file=data.originalFiles[0];
 	                 }
 	             });
+	    	},
+	    	downloadFile: function(info){
+	    		if(info==null||info.downloadFileName==null||info.downloadFileName==''
+	    			||info.docUrl==null||info.docUrl==''){
+	    			 layer.msg("文件不存在",{icon:5,shade: [0.8, '#393D49'],time:3000});
+	    			 return;
+	    		}
+				var url = basePath+'downLoadController/download?downloadFile='+info.downloadFileName + '&docUrl=' + info.docUrl;
+				window.open(url);
 	    	},
 	    	removeTabTr: function (event, index) {
 	    		var docId=$('#docId'+index).val();  
@@ -543,12 +557,16 @@ window.layinit(function (htConfig) {
 		   	               			 file: '',
 		   	               			 name:docFiles[i].originalName,
 		   	               			 originalName: docFiles[i].originalName,
-		   	               			 oldDocId:docFiles[i].docId
+		   	               			 oldDocId:docFiles[i].docId,
+				   	               	 downloadFileName:docFiles[i].originalName,
+				   	               	 docUrl:docFiles[i].docUrl
 		   	               		 });
 		                		}else{
 			                		vm.returnRegFiles[i].oldDocId=docFiles[i].docId;
 			                		vm.returnRegFiles[i].originalName=docFiles[i].originalName;
+			                		vm.returnRegFiles[i].downloadFileName = docFiles[i].originalName;
 			                		vm.returnRegFiles[i].name=docFiles[i].originalName;
+			                		vm.returnRegFiles[i].docUrl = docFiles[i].docUrl;
 		                		}
 		                		// i++;
 		                	}
