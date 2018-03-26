@@ -138,7 +138,7 @@ window.layinit(function (htConfig) {
                     width:100
                 }, {
 
-                    field: 'totalBorrowAmount',
+                    field: 'delayDays',
                     title: '逾期',
                     width:100
                 }, {

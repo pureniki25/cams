@@ -229,6 +229,7 @@ window.layinit(function (htConfig) {
                 , cols: [[
                     {
                         field: 'businessId',
+                        width:165,
                         title: '业务编号'
                     }, {
                         field: 'districtAreaName',

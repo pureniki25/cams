@@ -100,15 +100,19 @@ window.layinit(function (htConfig) {
 
             {
                 field: 'businessId',
+                width:180,
                 title: '业务编号'
             }, {
                 field: 'customerName',
+                width:120,
                 title: '客户名称'
             }, {
                 field: 'companyId',
+                width:120,
                 title: '所属分公司'
             }, {
                 field: 'processTypeName',
+                width:210,
                 title: '流程类型'
             }, {
                 fixed: 'right',
@@ -257,7 +261,7 @@ window.layinit(function (htConfig) {
             {
                 field: 'businessId',
                 title: '业务编号',
-                width: 100
+                width: 165
             }, {
                 field: 'customerName',
                 title: '客户名称',
@@ -265,7 +269,7 @@ window.layinit(function (htConfig) {
             }, {
                 field: 'periods',
                 title: '期数',
-                width: 80
+                width: 60
             }, {
                 field: 'companyId',
                 title: '所属分公司',
@@ -274,7 +278,7 @@ window.layinit(function (htConfig) {
 
                 field: 'totalBorrowAmount',
                 title: '本期应还金额',
-                width: 100
+                width: 120
             }, {
 
                 field: 'delayDays',

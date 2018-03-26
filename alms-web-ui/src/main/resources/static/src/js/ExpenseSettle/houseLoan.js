@@ -87,10 +87,10 @@ window.layinit(function (htConfig) {
                     if(res.data.code=='1'){
                         app.business.info = res.data.data
                     }else{
-                        app.$Modal.error({content:'接口调用失败'})
+                        app.$Modal.error({content:res.data.msg})
                     }
                 }).catch(function(error){
-                    app.$Modal.error({content:'接口调用失败'})
+                    app.$Modal.error({content:res.data.msg})
                 })
             },
             sumIncome: function () {
