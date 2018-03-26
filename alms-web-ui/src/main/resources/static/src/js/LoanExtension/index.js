@@ -119,6 +119,7 @@ window.layinit(function (htConfig) {
         ,cols: [[
             {
                 field:'id',
+                width:180,
                 title:'展期编号'
             },{
                 field:'customer',
