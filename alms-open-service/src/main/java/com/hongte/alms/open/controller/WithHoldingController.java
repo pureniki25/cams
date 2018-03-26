@@ -3,6 +3,7 @@ package com.hongte.alms.open.controller;
 import com.alibaba.fastjson.JSON;
 import com.hongte.alms.base.collection.service.CollectionStatusService;
 import com.hongte.alms.base.entity.WithholdingRecordLog;
+import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.service.RepaymentBizPlanListDetailService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.RepaymentBizPlanService;
@@ -165,6 +166,17 @@ public class WithHoldingController {
 					   repayLogResp.setRepayStatus("成功");
 				   }else {
 					   repayLogResp.setRepayStatus("失败");
+				   }
+				   if(repayLogResp.getBindPlatformId()==PlatformEnum.AN_FORM.getValue()) {
+					   repayLogResp.setBindPlatform(PlatformEnum.AN_FORM.getName());
+				   }else if(repayLogResp.getBindPlatformId()==PlatformEnum.BF_FORM.getValue()) {
+					   repayLogResp.setBindPlatform(PlatformEnum.BF_FORM.getName());
+				   }else if(repayLogResp.getBindPlatformId()==PlatformEnum.FY_FORM.getValue()) {
+					   repayLogResp.setBindPlatform(PlatformEnum.FY_FORM.getName());
+				   }else if(repayLogResp.getBindPlatformId()==PlatformEnum.YB_FORM.getValue()) {
+					   repayLogResp.setBindPlatform(PlatformEnum.YB_FORM.getName());
+				   }else if(repayLogResp.getBindPlatformId()==PlatformEnum.YS_FORM.getValue()) {
+					   repayLogResp.setBindPlatform(PlatformEnum.YS_FORM.getName());
 				   }
 			   }
 		      return PageResult.success(list, list.size());
