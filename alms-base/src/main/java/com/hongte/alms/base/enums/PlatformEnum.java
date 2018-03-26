@@ -15,7 +15,9 @@ public enum PlatformEnum implements IEnum {
     YS_FORM(1,"银盛绑卡"),
     FY_FORM(2,"富友绑卡"),
     BF_FORM(3,"宝付代扣"),
-    AN_FORM(4,"爱农代扣");
+    AN_FORM(4,"爱农代扣"),
+    YH_FORM(5,"银行代扣");
+
 
     private int value;
     private String name;
