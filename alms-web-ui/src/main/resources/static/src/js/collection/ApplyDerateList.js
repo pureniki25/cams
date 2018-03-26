@@ -148,6 +148,7 @@ window.layinit(function (htConfig) {
 
                 {
                     field: 'businessId',
+                    width:165,
                     title: '业务编号'
                 }, {
                     field: 'periods',
