@@ -178,7 +178,8 @@
 		  GROUP BY tab.business_id, tab.output_user_name) t6
 		WHERE t1.`business_id` = t2.`business_id` 
 		  AND t1.`business_id` = t3.`business_id` 
-		  AND t1.`business_id` = t6.`business_id` 
+		  AND t1.`business_id` = t6.`business_id`
+		  AND t2.`last_detection_id` = t3.`id`
 		  AND t1.`business_id` = #{businessId,jdbcType=VARCHAR}
 	</select>
 	
@@ -198,7 +199,9 @@
 		FROM
 		  tb_car_basic cb,
 		  tb_car_detection cd 
-		WHERE cd.`business_id` = cb.`business_id` AND cb.`business_id` = #{businessId,jdbcType=VARCHAR}
+		WHERE cd.`business_id` = cb.`business_id` 
+		  AND cb.last_detection_id = cd.id
+		  AND cb.`business_id` = #{businessId,jdbcType=VARCHAR}
 	</select>
 	
 	<select id="queryTransferLitigationData" resultMap="TransferOfLitigationMap" >
