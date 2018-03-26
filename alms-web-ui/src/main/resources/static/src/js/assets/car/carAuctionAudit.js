@@ -5,6 +5,7 @@ var ex = /^[1-9]\d*$/;
 var amt=/^(([1-9]\d*)|\d)(\.\d{1,2})?$/;
 var mobi= /^(((13[0-9]{1})|(14[0-9]{1})|(17[0]{1})|(15[0-3]{1})|(15[5-9]{1})|(18[0-9]{1}))+\d{8})$/; 
 var tel = /^\d{3,4}-?\d{7,9}$/;
+var carNum=/^([1-9]{1})(\d{15}|\d{16}|\d{17}|\d{18})$/;
 var currentDate=new Date();
 var basePath;
 var vm;
@@ -621,6 +622,9 @@ window.layinit(function (htConfig) {
 	                	if(data.data.repayPlan!=null&&data.data.repayPlan!=''){
 	                		vm.repayPlan=data.data.repayPlan;
 	                	}
+	                 	if(vm.repayPlan.payedPrincipal==null||vm.repayPlan.payedPrincipal==''){
+	                		vm.repayPlan.payedPrincipal=0;
+	                	}
 	                	vm.outputRecord=data.data.outputRecord;
 	                	if(data.data.detection.evaluationAmount==null||data.data.detection.evaluationAmount==''){
 	                		vm.carBasic.differAmount=0;
@@ -912,7 +916,8 @@ window.layinit(function (htConfig) {
 	    		}else{
 	    			var startDate=new Date(vm.carAuction.buyStartTime.replace("-", "/").replace("-", "/"));
 	    			var inputDate=new Date(vm.carAuction.buyEndTime.replace("-", "/").replace("-", "/"));  
-	    			if(inputDate<=startDate){
+	    			var auctionEndTime=new Date(vm.carAuction.auctionEndTime.replace("-", "/").replace("-", "/"));
+	    			if(inputDate<=startDate||inputDate>auctionEndTime){
 	    				$("#buyEndTime").css("border","1px solid #FF3030");
 	    				layer.msg("结束时间不能小于等于开始时间！",{icon:5,shade: [0.8, '#393D49']});
 	    				return ;
@@ -1010,6 +1015,12 @@ window.layinit(function (htConfig) {
 	    		if(vm.carAuction.acountNum==''||vm.carAuction.acountNum==null){
 	    			$("#acountNum").css("border","1px solid #FF3030");
 	    			return ;
+	    		}else{
+	    			if(!carNum.test(vm.carAuction.acountNum)){
+	    				$("#acountNum").css("border","1px solid #FF3030");
+	    				layer.msg("卡号格式有误！",{icon:5,shade: [0.8, '#393D49']});
+	    				return ;
+	    			}
 	    		}
 	    	
 	    		if(vm.carAuction.paymentEndTime==''||vm.carAuction.paymentEndTime==null){

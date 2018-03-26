@@ -76,12 +76,15 @@ public class DocController {
 	 * 单文件删除
 	 */
 	@RequestMapping(value = "/delOneDoc", method = RequestMethod.GET)
-	public void delOneDoc(String docId) {
+	public  Result<Object> delOneDoc(String docId) {
 		try {
-		docService.delOneDoc(docId);
+			LOG.debug("删除文件开始---------------");
+			docService.delOneDoc(docId);
+			LOG.debug("删除文件结束---------------");
+		   return Result.build("0000", "操作成功", "");
 		}catch (Exception e) {
 			LOG.error(e.getMessage());
-			e.printStackTrace();
+	      	return Result.error("9999", "操作异常");
 		}
 	}
 
