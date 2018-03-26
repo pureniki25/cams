@@ -707,6 +707,9 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	 * @return
 	 */
 	private int differentDays(Date first, Date second) {
+		if (first == null || second == null) {
+			return 0;
+		}
 		if (first.after(second)) {
 			return 0;
 		}
