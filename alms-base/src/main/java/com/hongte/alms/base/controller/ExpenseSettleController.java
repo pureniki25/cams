@@ -37,6 +37,7 @@ import com.hongte.alms.base.vo.module.ExpenseSettleLackFeeVO;
 import com.hongte.alms.base.vo.module.ExpenseSettleVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.DateUtil;
+import com.hongte.alms.common.util.StringUtil;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -112,6 +113,9 @@ public class ExpenseSettleController {
 	@ApiOperation(value = "根据清算日期获取房贷结清试算数据")
 	@ResponseBody
 	public Result<ExpenseSettleVO> calByPreSettleDate(String preSettleDate, String businessId, String afterId) {
+		if (StringUtil.isEmpty(businessId) || StringUtil.isEmpty(preSettleDate)) {
+			return Result.error("500", "参数不能为空！");
+		}
 		ExpenseSettleVO expenseSettleVO = expenseSettleService.sum(businessId);
 		Date settelDate = DateUtil.getDate(preSettleDate, "yyyy-MM-dd");
 		BasicBusiness basicBusiness = basicBusinessService.selectById(businessId);
@@ -197,7 +201,7 @@ public class ExpenseSettleController {
 						if (repaymentBizPlanListDetail.getFactAmount() == null || repaymentBizPlanListDetail
 								.getFactAmount().compareTo(repaymentBizPlanListDetail.getPlanAmount()) < 0) {
 							lackServiceCharge = lackServiceCharge.add(repaymentBizPlanListDetail.getPlanAmount()
-									.subtract(repaymentBizPlanListDetail.getFactAmount()));
+									.subtract(repaymentBizPlanListDetail.getFactAmount() != null ? repaymentBizPlanListDetail.getFactAmount() : new BigDecimal(0)));
 						}
 					}
 				}
