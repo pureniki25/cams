@@ -218,7 +218,7 @@ var layer;
                                     field: 'bankCard',
                                     title: '代扣银行卡'
                                 },{
-                                    field: 'BindPlatform',
+                                    field: 'bindPlatform',
                                     title: '代扣公司'
                                 },
                                 {

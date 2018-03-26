@@ -26,12 +26,19 @@ public class RepayLogResp {
       private String validateCode;
       private String repayStatus;           //代扣状态(1:成功,0:失败;2:处理中)
       private String settlementType;       //[还款类型，null或0：正常还款，1:提前结清]
-      private String BindPlatform;         //绑卡平台ID，每个ID对应的绑卡平台，0为易宝绑卡，1为银盛绑卡，2为富友绑卡,3为宝付代扣,4为爱农代扣，请看配置表(PARA_TYPE=代扣平台)
+      private String bindPlatform;         //绑卡平台ID，每个ID对应的绑卡平台，0为易宝绑卡，1为银盛绑卡，2为富友绑卡,3为宝付代扣,4为爱农代扣，请看配置表(PARA_TYPE=代扣平台)
       private String boolPartRepay;         //[表示本期是否分多笔代扣,0:一次性代扣，1:分多笔代扣]
       private String boolLastRepay;         //[表示本期是否分多笔代扣中的最后一笔代扣，若非多笔代扣，本字段存1。 0:非最后一笔代扣，1:最后一笔代扣]
       private String planTotalRepayMoney;  //[表示本期代扣总金额(若财务选择不含违约金代扣，则此字段不含违约金)，若本期为多笔代扣，此字段存本次多笔代扣的总金额，若非多笔代扣，则此字段存本次代扣总金额]
       private String createTime;            //代扣时间
       private String createUser;
+      private Integer bindPlatformId;
+	public Integer getBindPlatformId() {
+		return bindPlatformId;
+	}
+	public void setBindPlatformId(Integer bindPlatformId) {
+		this.bindPlatformId = bindPlatformId;
+	}
 	public String getListId() {
 		return listId;
 	}
@@ -166,11 +173,12 @@ public class RepayLogResp {
 	public void setSettlementType(String settlementType) {
 		this.settlementType = settlementType;
 	}
+   
 	public String getBindPlatform() {
-		return BindPlatform;
+		return bindPlatform;
 	}
 	public void setBindPlatform(String bindPlatform) {
-		BindPlatform = bindPlatform;
+		this.bindPlatform = bindPlatform;
 	}
 	public String getBoolPartRepay() {
 		return boolPartRepay;
