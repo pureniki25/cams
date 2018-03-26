@@ -193,31 +193,31 @@
 		concat(tcb.displacement,tcb.displacement_unit) displacement ,	<!--排量 -->
 		tcb.engine_model engineNumber ,<!--发动机号 -->
 		tcb.vin frameNumber ,<!--车架号 -->
-	    ifnull(tcb.last_evaluation_amount,tcb.evaluation_amount) lastEvaluationAmount, <!-- 评估价 --> 
-		tcb.user_nature useProperty ,														<!--使用性质 -->										
-		tcb.insurance_expiration_date insuranceDate ,<!--保险到期日 -->
-		tcb.annual_verification_expiration_date inspectionDate ,         <!--年检到期日 -->
-		tcb.odometer mileage ,<!--车显里程 -->
-		tcb.vehicle_license_registration_date registerDate ,             <!--首次登记年月 -->
+	    det.evaluation_amount lastEvaluationAmount, <!-- 评估价 --> 
+		det.user_nature useProperty ,														<!--使用性质 -->										
+		det.insurance_expiration_date insuranceDate ,<!--保险到期日 -->
+		det.annual_verification_expiration_date inspectionDate ,         <!--年检到期日 -->
+		det.odometer mileage ,<!--车显里程 -->
+		det.vehicle_license_registration_date registerDate ,             <!--首次登记年月 -->
 		case
-		when tcb.is_mortgage=false then '未抵押'
-		when tcb.is_mortgage=true
+		when det.is_mortgage=false then '未抵押'
+		when det.is_mortgage=true
 		then '抵押'
 		else ''
 		end mortgageState ,<!--车辆抵押状态 -->
-		tcb.traffic_violation_situation illegal ,<!--违章未处理记录 -->
-		tcb.tool_with_car tools ,<!--随车工具 -->
+		det.traffic_violation_situation illegal ,<!--违章未处理记录 -->
+		det.tool_with_car tools ,<!--随车工具 -->
 		tcb.license_plate_number,<!-- 车牌号 -->
-		tcb.transaction_mode transactionMode ,<!-- 交易方式 -->
+		det.transaction_mode transactionMode ,<!-- 交易方式 -->
 		
-		tcb.car_position position , <!-- 车辆位置 -->
+		det.car_position position , <!-- 车辆位置 -->
 		tp.update_time auditTime,<!-- 审核通过时间 -->
-		tcb.related_docs file   <!--提供文件 -->
+		det.related_docs file   <!--提供文件 -->
 														<!--备注 -->
 
 		from tb_car_auction tca
-		join tb_car_basic tcb on
-		tca.business_id=tcb.business_id
+		join tb_car_basic tcb on tca.business_id=tcb.business_id
+		join tb_car_detection det on tcb.last_detection_id=det.id
 		join tb_basic_business bus on
 		tcb.business_id=bus.business_id
 		join tb_process tp on
@@ -257,6 +257,7 @@
 		from tb_car_auction tca
 		join tb_car_basic tcb on
 		tca.business_id=tcb.business_id
+		join tb_car_detection det on tcb.last_detection_id=det.id
 		join tb_basic_business bus on
 		tcb.business_id=bus.business_id
 		
@@ -429,26 +430,26 @@
 		concat(tcb.displacement,tcb.displacement_unit) displacement ,	<!--排量 -->
 		tcb.engine_model engineNumber ,<!--发动机号 -->
 		tcb.vin frameNumber ,<!--车架号 -->
-	    ifnull(tcb.last_evaluation_amount,tcb.evaluation_amount) lastEvaluationAmount, <!-- 评估价 --> 
-		tcb.user_nature useProperty ,														<!--使用性质 -->
-		tcb.insurance_expiration_date insuranceDate ,<!--保险到期日 -->
-		tcb.annual_verification_expiration_date inspectionDate ,         <!--年检到期日 -->
-		tcb.odometer mileage ,<!--车显里程 -->
-		tcb.vehicle_license_registration_date registerDate ,             <!--首次登记年月 -->
+	    det.evaluation_amount lastEvaluationAmount, <!-- 评估价 --> 
+		det.user_nature useProperty ,														<!--使用性质 -->
+		det.insurance_expiration_date insuranceDate ,<!--保险到期日 -->
+		det.annual_verification_expiration_date inspectionDate ,         <!--年检到期日 -->
+		det.odometer mileage ,<!--车显里程 -->
+		det.vehicle_license_registration_date registerDate ,             <!--首次登记年月 -->
 		case
-		when tcb.is_mortgage=false then '未抵押'
-		when tcb.is_mortgage=true
+		when det.is_mortgage=false then '未抵押'
+		when det.is_mortgage=true
 		then '抵押'
 		else ''
 		end mortgageState ,<!--车辆抵押状态 -->
-		tcb.traffic_violation_situation illegal ,<!--违章未处理记录 -->
-		tcb.tool_with_car tools ,<!--随车工具 -->
+		det.traffic_violation_situation illegal ,<!--违章未处理记录 -->
+		det.tool_with_car tools ,<!--随车工具 -->
 		tcb.license_plate_number,<!-- 车牌号 -->
 		
-		tcb.transaction_mode transactionMode ,<!-- 交易方式 -->
+		det.transaction_mode transactionMode ,<!-- 交易方式 -->
 		
-		tcb.car_position position , <!-- 车辆位置 -->
-		tcb.related_docs file,   <!--提供文件 -->
+		det.car_position position , <!-- 车辆位置 -->
+		det.related_docs file,   <!--提供文件 -->
 		tp.update_time auditTime,<!-- 审核通过时间 -->
 															<!--备注 -->
 		tcab.bidder_name bidderName,  <!-- 用户姓名 -->
@@ -467,6 +468,7 @@
 		from tb_car_auction tca
 		join tb_car_basic tcb on
 		tca.business_id=tcb.business_id
+		join tb_car_detection det on tcb.last_detection_id=det.id
 		join tb_process tp on
 		tcb.business_id=tp.business_id and
 		tp.process_result=1
@@ -507,6 +509,7 @@
 		from tb_car_auction tca
 		join tb_car_basic tcb on
 		tca.business_id=tcb.business_id
+		join tb_car_detection det on tcb.last_detection_id=det.id
 		join tb_process tp on
 		tcb.business_id=tp.business_id and
 		tp.process_result=1
