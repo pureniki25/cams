@@ -34,6 +34,7 @@
     <!--引入公共的一些方法-->
     <script src="/src/js/comm.js"></script>
 </head>
+
 <body>
 <!--隐藏元素-->
 <!--<p id="staffType"  th:attr="value=${staffType}"  hidden />-->
@@ -42,7 +43,7 @@
     <Row>
         <i-col span="12" style="padding:1em">
                 <Card   >
-                    <p slot="title">需我审批<span style="float:right;color:#169BD5" @click="openMore('/ProcessUI/ProcessWaitToApproveUI/waitToApprove','需要我审批的')">More</span></p>
+                    <p slot="title">需我审批<span style="float:right;color:#169BD5;cursor:pointer" @click="openMore('/ProcessUI/ProcessWaitToApproveUI/waitToApprove','需要我审批的')">More</span></p>
                     <table id="approvalTable" lay-filter="approvalTable"></table>
                     <script type="text/html" id="approvalTable_tool_bar">
                         <a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="info">详情</a>
@@ -52,7 +53,7 @@
         <i-col span="12" style="padding:1em">
                 
                 <Card  >
-                    <p slot="title">我跟进的业务<span style="float:right;color:#169BD5" @click="openMore('/collectionUI/index','贷后管理')" >More</span></p>
+                    <p slot="title">我跟进的业务<span style="float:right;color:#169BD5;cursor:pointer" @click="openMore('/collectionUI/index','贷后管理')" >More</span></p>
                     <table id="businessTable" lay-filter="businessTable"></table>
                     <script type="text/html" id="businessTable_tool_bar">
                         <a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="info">详情</a>
@@ -63,7 +64,7 @@
     <Row>
         <i-col span="12" style="padding:1em">
                 <Card  >
-                    <p slot="title">通知公告<span style="float:right;color:#169BD5;display:none;">More</span></p>
+                    <p slot="title">通知公告<span style="float:right;color:#169BD5;display:none;;cursor:pointer">More</span></p>
                     <p v-for="item in notices" @click="openNoticeModal(item.noticeId)" style="border-bottom:1px solid rgba(242, 242, 242, 1);margin-top:10px">
                         <span>{{item.noticeTitle}}</span>
                         <span style="float:right">{{item.publishTime||item.updateTime}}</span>
@@ -75,7 +76,7 @@
         </i-col>
         <i-col span="12" style="padding:1em">
                 <Card  >
-                    <p slot="title">关于系统<span style="float:right;color:#169BD5;display:none;">More</span></p>
+                    <p slot="title">关于系统<span style="float:right;color:#169BD5;display:none;;cursor:pointer">More</span></p>
                     <p v-for="item in aboutSyss" @click="checkNotice(item.noticeId)" style="border-bottom:1px solid rgba(242, 242, 242, 1);margin-top:10px">
                             <span>{{item.title}}</span>
                             <span style="float:right">{{item.date}}</span>
