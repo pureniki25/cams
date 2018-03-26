@@ -61,8 +61,9 @@
         c.needPayPrincipal as needPayPrincipal,
         c.needPayInterest as needPayInterest,
         c.needPayPenalty as needPayPenalty,
-        c.otherPayAmount as otherPayAmount
-
+        c.otherPayAmount as otherPayAmount,
+        b.getMoney AS getMoney,
+        a.payedPrincipal AS  payedPrincipal
 
         from tb_repayment_biz_plan_list  as pList
         LEFT JOIN tb_repayment_biz_plan as plan ON pList.plan_id = plan.plan_id
@@ -71,22 +72,41 @@
         LEFT JOIN tb_basic_business_type as  b_type ON business.business_type = b_type.business_type_id
        -- LEFT JOIN tb_sys_parameter as  sys_param ON business.repayment_type_id = sys_param.param_value
         LEFT JOIN (
-        select t1.plan_list_id,
-        <!--   应还本金总额（应付本金 ）-->
-        sum(case when t1.plan_item_type =10 then t1.plan_amount else 0 end) AS `needPayPrincipal`,
-        <!--   应还利息总额（应付利息）-->
-        sum(case when t1.plan_item_type =20 then t1.plan_amount else 0 end) `needPayInterest`,
-        <!--   应还违约金总额（应付违约金）-->
-        sum(case when t1.plan_item_type =70 then t1.plan_amount else 0 end) `needPayPenalty`,
-        <!--   应还其他费用-->
-        sum(case when (t1.plan_item_type !=70 and t1.plan_item_type !=20 and t1.plan_item_type !=10)  then t1.plan_amount else 0 end) `otherPayAmount`,
+            select t1.plan_list_id,
+            <!--   应还本金总额（应付本金 ）-->
+            sum(case when t1.plan_item_type =10 then t1.plan_amount else 0 end) AS `needPayPrincipal`,
+            <!--   应还利息总额（应付利息）-->
+            sum(case when t1.plan_item_type =20 then t1.plan_amount else 0 end) `needPayInterest`,
+            <!--   应还违约金总额（应付违约金）-->
+            sum(case when t1.plan_item_type =70 then t1.plan_amount else 0 end) `needPayPenalty`,
+            <!--   应还其他费用-->
+            sum(case when (t1.plan_item_type !=70 and t1.plan_item_type !=20 and t1.plan_item_type !=10)  then t1.plan_amount else 0 end) `otherPayAmount`,
 
-        <!--   应还总额-->
-        sum( t1.plan_amount ) `totalBorrowAmount`
+            <!--   应还总额-->
+            sum( t1.plan_amount ) `totalBorrowAmount`
 
-        from tb_repayment_biz_plan_list_detail t1
-        group by t1.plan_list_id
+            from tb_repayment_biz_plan_list_detail t1
+            group by t1.plan_list_id
         ) c on pList.plan_list_id = c.plan_list_id
+        LEFT JOIN(
+            <!--   出款金额 -->
+            SELECT  sum(bplan.borrow_money) as `getMoney`,
+            bplan.original_business_id as `original_business_id`
+            from tb_repayment_biz_plan   bplan
+            group by bplan.original_business_id
+        ) b  ON  business.business_id = c.original_business_id
+        LEFT JOIN (
+          SELECT
+        <!--   已还本金-->
+          sum(case when pdetail.plan_item_type =10 then pdetail.plan_amount else 0 end) AS `payedPrincipal`,
+          l.original_business_id as `original_business_id`
+          from tb_repayment_biz_plan_list_detail pdetail
+          LEFT  JOIN   tb_repayment_biz_plan_list  l
+          ON pdetail.plan_list_id = l.plan_list_id
+          group by l.original_business_id
+          WHERE  pdetail.fact_repay_date != NULL
+        )a ON business.business_id = a.original_business_id
+
         <where>
             -- sys_param.param_type = 6  and
              pList.plan_list_id = #{crpId}

@@ -33,6 +33,7 @@ public class BusinessInfoForApplyDerateVo  {
     private BigDecimal otherPayAmount 		; //应付其他费用
     private BigDecimal totalBorrowAmount   ; //应付总额
 
+    private  BigDecimal payedPrincipal;//已还金额
 
      
     public String getBusinessId() {

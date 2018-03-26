@@ -260,55 +260,71 @@ window.layinit(function(htConfig){
                     fixed: 'left'
                 },{
                     field: 'businessId',
+                    width:165,
                     title: '业务编号'
                 }, {
                     field: 'afterId',
+                    width:60,
                     title: '期数'
                 }, {
                     field: 'districtAreaName',
+                    width:90,
                     title: '区域'
                 }, {
                     field: 'companyName',
+                    width:90,
                     title: '分公司'
                 }, {
                     field: 'operatorName',
+                    width:100,
                     title: '业务获取'
                 }, {
                     field: 'customerName',
+                    width:90,
                     title: '客户名称'
                 }, {
                     field: 'businessTypeName',
+                    width:90,
                     title: '业务类型'
                 }, {
                     field: 'borrowMoney',
+                    width:90,
                     title: '借款金额'
                 }, {
                     field: 'totalBorrowAmount',
+                    width:90,
                     title: '应还金额'
                 }, {
 
                     field: 'delayDays',
+                    width:60,
                     title: '逾期'
                 }, {
 
                     field: 'dueDate',
+                    width:110,
                     title: '应还日期'
                 }, {
                     field: 'repaymentDate',
+                    width:110,
                     title: '实还日期'
                 }, {
                     field: 'phoneStaffName',
+                    width:80,
                     title: '清算一'
                 }, {
                     field: 'visitStaffName',
+                    width:80,
                     title: '清算二'
                 }, {
 
                     field: 'statusName',
+                    width:90,
                     title: '还款状态'
                 },{
 
                     field: 'afterColStatusName',
+                    width:90,
                     title: '业务状态'
                 },{
                     fixed: 'right',
