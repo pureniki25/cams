@@ -420,9 +420,9 @@ public class CarController {
     	try {
     	BasicBusiness business=basicBusinessService.selectById(businessId);
     	CarBasic carBasic=carBasicService.selectById(businessId);
-    	if(!CarStatusEnums.SETTLED.getStatusCode().equals(carBasic.getStatus())) {
-    		logger.error("该车处于未结清状态不允许归还操作,businessId="+businessId);
-    		return Result.error("9999", "该车处于未结清状态不允许归还操作");
+    	if(!CarStatusEnums.PENDING.getStatusCode().equals(carBasic.getStatus())) {
+    		logger.error("该车处于非处置状态不允许归还操作,businessId="+businessId);
+    		return Result.error("9999", "该车处于非处置状态不允许归还操作");
     	}
     	List<CarDrag> drag=carDragService.selectList(
     	        new EntityWrapper<CarDrag>().eq("business_id", businessId)); 

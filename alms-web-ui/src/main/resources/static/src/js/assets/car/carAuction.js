@@ -457,6 +457,7 @@ window.layinit(function (htConfig) {
 	             });
 	    	},
 	    	downloadFile: function(info){
+
 	    		if(info==null||info.downloadFileName==null||info.downloadFileName==''
 	    			||info.docUrl==null||info.docUrl==''){
 	    			 layer.msg("文件不存在",{icon:5,shade: [0.8, '#393D49'],time:3000});
@@ -481,7 +482,7 @@ window.layinit(function (htConfig) {
 		    	            }
 		                },
 		                error: function (message) {
-		                    layer.msg("删除文件失败。");
+		                    layer.msg("删除文件失败。",{icon:5,shade: [0.8, '#393D49'],time:3000});
 		                    console.error(message);
 		                }
 		            });
@@ -512,6 +513,7 @@ window.layinit(function (htConfig) {
 	                success: function (data) {
 	                	if (data.code == "0000"){
 	                	// alert(JSON.stringify(data));
+	                	vm.processId=data.data.processId;
 	                	vm.carBasic=data.data.carBasic;
 	                	vm.business=data.data.business;
 	                	vm.drag=data.data.drag;
@@ -572,11 +574,11 @@ window.layinit(function (htConfig) {
 		                	}
 	                	}
 	                	}else{
-	                		layer.msg("查看失败:"+data.msg);
+	                		layer.msg("查看失败:"+data.msg,{icon:5,shade: [0.8, '#393D49'],time:3000});
 	                	}
 	                },
 	                error: function (message) {
-	                    layer.msg("查询车辆信息发生异常，请联系管理员。");
+	                    layer.msg("查询车辆信息发生异常，请联系管理员。",{icon:5,shade: [0.8, '#393D49'],time:3000});
 	                    console.error(message);
 	                }
 	            });
@@ -596,14 +598,14 @@ window.layinit(function (htConfig) {
 		               success: function (res) {
 		            	   if (res.code == "0000"){
 		            		   vm.carAuction=res.data.carAuction;
-		            		   layer.msg("保存成功。"); 
+		            		   layer.msg("保存成功。",{icon:1,shade: [0.8, '#393D49'],time:3000}); 
 		            	   }else{
 		            		   layer.msg(res.msg,{icon:5,shade: [0.8, '#393D49'],time:3000});
 		            		   
 		            	   }
 		               },
 		               error: function (message) {
-		                   layer.msg("异常，请联系管理员。");
+		                   layer.msg("异常，请联系管理员。",{icon:5,shade: [0.8, '#393D49'],time:3000});
 		                   console.error(message);
 		               }
 		           });
@@ -931,7 +933,7 @@ window.layinit(function (htConfig) {
 	    			vm.reqRegFiles[i]=vm.returnRegFiles[i];
 
 	    		}
-
+	    		console.log("-----"+vm.processId);
 		          $.ajax({
 		               type: "POST",
 		               url: basePath+'car/auctionAply',
@@ -941,8 +943,8 @@ window.layinit(function (htConfig) {
 		            	   if (res.code == "0000"){
 		            		   that.processId=res.data.processId;
 		            		   that.carAuction.businessId=businessId;
-		            		   layer.msg("保存成功。");
-		      
+		            		   layer.msg("保存成功。",{icon:1,shade: [0.8, '#393D49'],time:3000});
+		              
 		            		   
 		            	   }else{
 		            		   layer.msg(res.msg,{icon:5,shade: [0.8, '#393D49'],time:3000});
@@ -950,7 +952,7 @@ window.layinit(function (htConfig) {
 		            	   }
 		               },
 		               error: function (message) {
-		                   layer.msg("异常，请联系管理员。");
+		                   layer.msg("异常，请联系管理员。",{icon:5,shade: [0.8, '#393D49'],time:3000});
 		                   console.error(message);
 		               }
 		           });

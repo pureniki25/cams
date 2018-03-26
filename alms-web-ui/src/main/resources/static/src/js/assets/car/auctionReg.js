@@ -39,7 +39,7 @@ window.layinit(function (htConfig) {
 	                	//alert(JSON.stringify(vm.auctionReg));
 	                },
 	                error: function (message) {
-	                    layer.msg("查询拍卖信息发生异常，请联系管理员。");
+	                    layer.msg("查询拍卖信息发生异常，请联系管理员。",{icon:5,shade: [0.8, '#393D49'],time:3000});
 	                    console.error(message);
 	                }
 	            });
@@ -57,11 +57,11 @@ window.layinit(function (htConfig) {
 		               data: JSON.stringify({"auctionReg":vm.auctionReg}),
 		               success: function (res) {
 		            	   if (res.code == "0000"){
-		            		   layer.msg("保存成功。"); 
+		            		   layer.msg("保存成功。",{icon:1,shade: [0.8, '#393D49'],time:3000}); 
 		            	   }
 		               },
 		               error: function (message) {
-		                   layer.msg("异常，请联系管理员。");
+		                   layer.msg("异常，请联系管理员。",{icon:5,shade: [0.8, '#393D49'],time:3000});
 		                   console.error(message);
 		               }
 		           });
