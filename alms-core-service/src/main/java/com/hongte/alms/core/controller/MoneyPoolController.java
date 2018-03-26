@@ -291,7 +291,7 @@ public class MoneyPoolController {
 	@ApiOperation(value = "款项池登记信息")
 	@GetMapping("/checkMoneyPool")
 	@ResponseBody
-	public Result checkMoneyPool(String businessId,String afterId,boolean isMatched) {
+	public Result checkMoneyPool(String businessId,String afterId,Boolean isMatched) {
 //		RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId));
 		RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService.queryRepaymentBizPlanListByConditions(businessId, afterId);
 		if (repaymentBizPlanList==null) {
