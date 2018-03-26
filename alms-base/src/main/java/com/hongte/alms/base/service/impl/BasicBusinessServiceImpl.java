@@ -64,6 +64,8 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
                     vo.setBorrowRateName(rateUnit.getParamName());
                 }
             }
+            //剩余本金
+            vo.setRemianderPrincipal(vo.getGetMoney().subtract(vo.getPayedPrincipal()));
         }
 
         return List;

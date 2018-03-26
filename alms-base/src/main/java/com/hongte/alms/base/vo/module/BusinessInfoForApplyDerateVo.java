@@ -23,8 +23,8 @@ public class BusinessInfoForApplyDerateVo  {
     private Integer borrowRateUnit   			; //借款利率类型ID
     private String borrowRateName		; //借款利率名称 		需处理
     private BigDecimal borrowMoney         ; //借款金额
-    private BigDecimal getMoney 			; //出款金额   		待找
-    private BigDecimal remianderPrincipal 	; //剩余本金   		待计算
+    private BigDecimal             getMoney 			; //出款金额
+    private BigDecimal remianderPrincipal 	; //剩余本金
     private Integer periods             ; //当前还款期数
     private Integer delayDays           ; //逾期天数
     private BigDecimal needPayInterest  	; //应付利息
@@ -231,5 +231,13 @@ public class BusinessInfoForApplyDerateVo  {
 
     public void setBorrowRateStr(String borrowRateStr) {
         this.borrowRateStr = borrowRateStr;
+    }
+
+    public BigDecimal getPayedPrincipal() {
+        return payedPrincipal;
+    }
+
+    public void setPayedPrincipal(BigDecimal payedPrincipal) {
+        this.payedPrincipal = payedPrincipal;
     }
 }
