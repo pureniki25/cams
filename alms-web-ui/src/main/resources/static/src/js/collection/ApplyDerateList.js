@@ -92,8 +92,8 @@ window.layinit(function (htConfig) {
                                 companyId:vm.searchForm.companyId, //分公司ID
                                 businessType:vm.searchForm.businessType,  //业务类型
 
-                                derateDateBegin:vm.searchForm.derateDateBegin, //减免时间  开始
-                                derateDateEnd:vm.searchForm.derateDateEnd,  //减免时间 结束
+                                derateDateBegin:dateObj.derateDateBegin, //减免时间  开始
+                                derateDateEnd:dateObj.derateDateEnd,  //减免时间 结束
 
                                 derateMoneyBegin:vm.searchForm.derateMoneyBegin, //减免金额  开始
                                 derateMoneyEnd:vm.searchForm.derateMoneyEnd,  //减免金额 结束

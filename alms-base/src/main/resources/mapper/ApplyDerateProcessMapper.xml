@@ -65,7 +65,7 @@
                 and ((business.business_id  LIKE '%${keyName}%') or (business.customer_name  LIKE '%${keyName}%') )
             </if>
             <if test="areaId !=null and areaId !=''">
-                and business.company_id IN (SELECT area_id FROM tb_basic_company WHERE district_id = #{areaId})
+                and business.company_id IN (SELECT area_id FROM tb_basic_company WHERE area_pid = #{areaId})
             </if>
             <if test="companyId !=null and companyId !=''">
                 and business.company_id = #{companyId}
