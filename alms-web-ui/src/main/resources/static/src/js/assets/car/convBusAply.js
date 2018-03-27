@@ -180,7 +180,7 @@ window.layinit(function (htConfig) {
                             vm.carConvBusAply=data.data.carConvBusAply;
                         },
                         error: function (message) {
-                            layer.msg("查询车辆信息发生异常，请联系管理员。");
+                            layer.msg("查询车辆信息发生异常，请联系管理员。",{icon:5,shade: [0.8, '#393D49'],time:3000});
                             console.error(message);
                         }
                     });

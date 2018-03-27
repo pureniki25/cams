@@ -420,9 +420,9 @@ public class CarController {
     	try {
     	BasicBusiness business=basicBusinessService.selectById(businessId);
     	CarBasic carBasic=carBasicService.selectById(businessId);
-    	if(!CarStatusEnums.SETTLED.getStatusCode().equals(carBasic.getStatus())) {
-    		logger.error("该车处于未结清状态不允许归还操作,businessId="+businessId);
-    		return Result.error("9999", "该车处于未结清状态不允许归还操作");
+    	if(!CarStatusEnums.PENDING.getStatusCode().equals(carBasic.getStatus())) {
+    		logger.error("该车处于非处置状态不允许归还操作,businessId="+businessId);
+    		return Result.error("9999", "该车处于非处置状态不允许归还操作");
     	}
     	List<CarDrag> drag=carDragService.selectList(
     	        new EntityWrapper<CarDrag>().eq("business_id", businessId)); 
@@ -525,7 +525,7 @@ try {
   
     		carReturnReg=new CarReturnReg();
     		carReturnReg.setCreateTime(new Date());
-    		carReturnReg.setCreateUser("admin");
+    		carReturnReg.setCreateUser(loginUserInfoHelper.getUserId());
     	}
   		BeanUtils.copyProperties(returnReg, carReturnReg);
     	carReturnRegService.insertOrUpdate(carReturnReg);
@@ -737,7 +737,7 @@ try {
 		    	}
 		    	process.setStatus(ProcessStatusEnums.CNACL.getKey());
 		    	process.setUpdateTime(new Date());
-		    	process.setUpdateUser("admin");
+		    	process.setUpdateUser(loginUserInfoHelper.getUserId());
 		    	processService.updateById(process);
 	    	}
     	}else if(processList!=null&&processList.size()>1) {
@@ -790,7 +790,7 @@ try {
     		if(StringUtils.isEmpty(carConvBusAply.getConvBusId())) {
     			carConvBusAply.setConvBusId(UUID.randomUUID().toString());
     			carConvBusAply.setCreateTime(new Date());
-    			carConvBusAply.setCreateUser("admin");
+    			carConvBusAply.setCreateUser(loginUserInfoHelper.getUserId());
     		}
     	}
     	Map<String, Object> map=new HashMap<String,Object>();
@@ -859,7 +859,7 @@ try {
 		    	}
 		    	process.setStatus(ProcessStatusEnums.CNACL.getKey());
 		    	process.setUpdateTime(new Date());
-		    	process.setUpdateUser("admin");
+		    	process.setUpdateUser(loginUserInfoHelper.getUserId());
 		    	processService.updateById(process);
 	    	}
     	}else if(processList!=null&&processList.size()>1) {
@@ -1042,7 +1042,7 @@ try {
     	reg.setAuctionSuccess(auctionReg.getAuctionSuccess());
     	reg.setPayDeposit(auctionReg.getPayDeposit());
 		reg.setUpdateTime(new Date());
-		reg.setUpdateUser("admin");
+		reg.setUpdateUser(loginUserInfoHelper.getUserId());
     	carAuctionRegService.updateById(reg);
         return Result.build("0000", "操作成功", "");
  	}catch (Exception e) {

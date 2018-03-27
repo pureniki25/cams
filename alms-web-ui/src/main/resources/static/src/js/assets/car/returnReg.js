@@ -120,7 +120,7 @@ layui.use(['form','laydate','element', 'ht_config', 'ht_auth'], function () {
 	                	vm.citys=data.data.citys;
 	                },
 	                error: function (message) {
-	                    layer.msg("查询城市信息发生异常，请联系管理员。");
+	                    layer.msg("查询城市信息发生异常，请联系管理员。",{icon:5,shade: [0.8, '#393D49'],time:3000});
 	                    console.error(message);
 	                }
 	            });
@@ -137,7 +137,7 @@ layui.use(['form','laydate','element', 'ht_config', 'ht_auth'], function () {
 	                	vm.countys=data.data.countys;
 	                },
 	                error: function (message) {
-	                    layer.msg("查询县区信息发生异常，请联系管理员。");
+	                    layer.msg("查询县区信息发生异常，请联系管理员。",{icon:5,shade: [0.8, '#393D49'],time:3000});
 	                    console.error(message);
 	                }
 	            });
@@ -160,7 +160,7 @@ layui.use(['form','laydate','element', 'ht_config', 'ht_auth'], function () {
 		    	            }
 		                },
 		                error: function (message) {
-		                    layer.msg("删除文件失败。");
+		                    layer.msg("删除文件失败。",{icon:5,shade: [0.8, '#393D49'],time:3000});
 		                    console.error(message);
 		                }
 		            });
@@ -225,7 +225,7 @@ layui.use(['form','laydate','element', 'ht_config', 'ht_auth'], function () {
 	                	}
 	                },
 	                error: function (message) {
-	                    layer.msg("查询车辆信息发生异常，请联系管理员。");
+	                    layer.msg("查询车辆信息发生异常，请联系管理员。",{icon:5,shade: [0.8, '#393D49'],time:3000});
 	                    console.error(message);
 	                }
 	            });
@@ -251,11 +251,11 @@ layui.use(['form','laydate','element', 'ht_config', 'ht_auth'], function () {
 		               data: JSON.stringify({"returnReg":vm.returnReg,"returnRegFiles":vm.reqRegFiles}),
 		               success: function (res) {
 		            	   if (res.code == "0000"){
-		            		   layer.msg("保存成功。"); 
+		            		   layer.msg("保存成功。",{icon:1,shade: [0.8, '#393D49'],time:3000}); 
 		            	   }
 		               },
 		               error: function (message) {
-		                   layer.msg("异常，请联系管理员。");
+		                   layer.msg("异常，请联系管理员。",{icon:5,shade: [0.8, '#393D49'],time:3000});
 		                   console.error(message);
 		               }
 		           });

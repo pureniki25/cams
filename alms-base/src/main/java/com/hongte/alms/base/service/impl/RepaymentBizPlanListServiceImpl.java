@@ -52,6 +52,11 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
                 overDueDays,
                 CollectionStatusEnum.TO_LAW_WORK.getKey());
     }
+    
+    @Override
+    public String queryRepaymentBizPlanListByConditions(String businessId, String afterId) {
+    	return repaymentBizPlanListMapper.queryRepaymentBizPlanListByConditions(businessId, afterId);
+    }
 
 //    @Override
 //    public List<RepaymentBizPlanList> selectNeedPhoneUrgRenewBiz(String companyId,Integer beforeDueDays) {

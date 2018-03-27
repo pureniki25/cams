@@ -3,7 +3,7 @@ var ex = /^[1-9]\d*$/;
 var amt=/^(([1-9]\d*)|\d)(\.\d{1,2})?$/;
 var mobi= /^(((13[0-9]{1})|(14[0-9]{1})|(17[0]{1})|(15[0-3]{1})|(15[5-9]{1})|(18[0-9]{1}))+\d{8})$/; 
 var tel = /^\d{3,4}-?\d{7,9}$/;
-var carNum=/^\d{19}$/;
+var carNum=/^([1-9]{1})(\d{15}|\d{16}|\d{17}|\d{18})$/;
 var currentDate=new Date();
 var basePath;
 var vm;
@@ -28,6 +28,8 @@ window.layinit(function (htConfig) {
 	    		file: '',
 	    		name:'',
 	    		originalName: '',
+	   			downloadFileName:'',
+	   			docUrl:'',
 	    		oldDocId:''
 	    	}],
 	    	reqRegFiles:[{
@@ -170,7 +172,6 @@ window.layinit(function (htConfig) {
         	  {id:'3',name:'lara'}]
 	   
 	       },
-
 	    mounted: function () {
 	    	$("#annualVerificationExpirationDate").focus(function(){
 	    		  $("#annualVerificationExpirationDate").css("border","1px solid #ccc");
@@ -438,6 +439,9 @@ window.layinit(function (htConfig) {
 	    		        	vm.returnRegFiles[index].oldDocId=reFiles.docId;
 	    		        	vm.returnRegFiles[index].originalName=reFiles.originalName;
 	    		        	vm.returnRegFiles[index].name=reFiles.originalName;
+	    		        	vm.returnRegFiles[index].name=reFiles.originalName;
+	    		        	vm.returnRegFiles[index].downloadFileName =reFiles.originalName;
+	                		vm.returnRegFiles[index].docUrl = reFiles.docUrl;
 	    		        	//alert(JSON.stringify(vm.returnRegFiles[0]));
 	    		        	//$('#'+fileId).val(vm.returnRegFiles[0].file);
 	    		        	
@@ -451,6 +455,16 @@ window.layinit(function (htConfig) {
 	                     data.formData.file=data.originalFiles[0];
 	                 }
 	             });
+	    	},
+	    	downloadFile: function(info){
+
+	    		if(info==null||info.downloadFileName==null||info.downloadFileName==''
+	    			||info.docUrl==null||info.docUrl==''){
+	    			 layer.msg("文件不存在",{icon:5,shade: [0.8, '#393D49'],time:3000});
+	    			 return;
+	    		}
+				var url = basePath+'downLoadController/download?downloadFile='+info.downloadFileName + '&docUrl=' + info.docUrl;
+				window.open(url);
 	    	},
 	    	removeTabTr: function (event, index) {
 	    		var docId=$('#docId'+index).val();  
@@ -468,7 +482,7 @@ window.layinit(function (htConfig) {
 		    	            }
 		                },
 		                error: function (message) {
-		                    layer.msg("删除文件失败。");
+		                    layer.msg("删除文件失败。",{icon:5,shade: [0.8, '#393D49'],time:3000});
 		                    console.error(message);
 		                }
 		            });
@@ -499,6 +513,7 @@ window.layinit(function (htConfig) {
 	                success: function (data) {
 	                	if (data.code == "0000"){
 	                	// alert(JSON.stringify(data));
+	                	vm.processId=data.data.processId;
 	                	vm.carBasic=data.data.carBasic;
 	                	vm.business=data.data.business;
 	                	vm.drag=data.data.drag;
@@ -506,6 +521,9 @@ window.layinit(function (htConfig) {
 	                	vm.mortgageDetection=data.data.mortgageDetection;
 	                	if(data.data.repayPlan!=null&&data.data.repayPlan!=''){
 	                		vm.repayPlan=data.data.repayPlan;
+	                	}
+	                	if(vm.repayPlan.payedPrincipal==null||vm.repayPlan.payedPrincipal==''){
+	                		vm.repayPlan.payedPrincipal=0;
 	                	}
 	                	vm.outputRecord=data.data.outputRecord;
 	                	if(data.data.detection.evaluationAmount==null||data.data.detection.evaluationAmount==''){
@@ -541,22 +559,26 @@ window.layinit(function (htConfig) {
 		   	               			 file: '',
 		   	               			 name:docFiles[i].originalName,
 		   	               			 originalName: docFiles[i].originalName,
-		   	               			 oldDocId:docFiles[i].docId
+		   	               			 oldDocId:docFiles[i].docId,
+				   	               	 downloadFileName:docFiles[i].originalName,
+				   	               	 docUrl:docFiles[i].docUrl
 		   	               		 });
 		                		}else{
 			                		vm.returnRegFiles[i].oldDocId=docFiles[i].docId;
 			                		vm.returnRegFiles[i].originalName=docFiles[i].originalName;
+			                		vm.returnRegFiles[i].downloadFileName = docFiles[i].originalName;
 			                		vm.returnRegFiles[i].name=docFiles[i].originalName;
+			                		vm.returnRegFiles[i].docUrl = docFiles[i].docUrl;
 		                		}
 		                		// i++;
 		                	}
 	                	}
 	                	}else{
-	                		layer.msg("查看失败:"+data.msg);
+	                		layer.msg("查看失败:"+data.msg,{icon:5,shade: [0.8, '#393D49'],time:3000});
 	                	}
 	                },
 	                error: function (message) {
-	                    layer.msg("查询车辆信息发生异常，请联系管理员。");
+	                    layer.msg("查询车辆信息发生异常，请联系管理员。",{icon:5,shade: [0.8, '#393D49'],time:3000});
 	                    console.error(message);
 	                }
 	            });
@@ -576,11 +598,14 @@ window.layinit(function (htConfig) {
 		               success: function (res) {
 		            	   if (res.code == "0000"){
 		            		   vm.carAuction=res.data.carAuction;
-		            		   layer.msg("保存成功。"); 
+		            		   layer.msg("保存成功。",{icon:1,shade: [0.8, '#393D49'],time:3000}); 
+		            	   }else{
+		            		   layer.msg(res.msg,{icon:5,shade: [0.8, '#393D49'],time:3000});
+		            		   
 		            	   }
 		               },
 		               error: function (message) {
-		                   layer.msg("异常，请联系管理员。");
+		                   layer.msg("异常，请联系管理员。",{icon:5,shade: [0.8, '#393D49'],time:3000});
 		                   console.error(message);
 		               }
 		           });
@@ -769,10 +794,11 @@ window.layinit(function (htConfig) {
 	    			return ;
 	    		}else{
 	    			var startDate=new Date(vm.carAuction.buyStartTime.replace("-", "/").replace("-", "/"));
-	    			var inputDate=new Date(vm.carAuction.buyEndTime.replace("-", "/").replace("-", "/"));  
-	    			if(inputDate<=startDate){
+	    			var inputDate=new Date(vm.carAuction.buyEndTime.replace("-", "/").replace("-", "/")); 
+	    			var auctionEndTime=new Date(vm.carAuction.auctionEndTime.replace("-", "/").replace("-", "/"));
+	    			if(inputDate<=startDate||inputDate>auctionEndTime){
 	    				$("#buyEndTime").css("border","1px solid #FF3030");
-	    				layer.msg("结束时间不能小于等于开始时间！",{icon:5,shade: [0.8, '#393D49']});
+	    				layer.msg("结束时间不能小于等于开始时间或大于拍卖结束时间！",{icon:5,shade: [0.8, '#393D49']});
 	    				return ;
 	    			}
 	    			
@@ -907,7 +933,7 @@ window.layinit(function (htConfig) {
 	    			vm.reqRegFiles[i]=vm.returnRegFiles[i];
 
 	    		}
-
+	    		console.log("-----"+vm.processId);
 		          $.ajax({
 		               type: "POST",
 		               url: basePath+'car/auctionAply',
@@ -917,8 +943,8 @@ window.layinit(function (htConfig) {
 		            	   if (res.code == "0000"){
 		            		   that.processId=res.data.processId;
 		            		   that.carAuction.businessId=businessId;
-		            		   layer.msg("保存成功。");
-		      
+		            		   layer.msg("保存成功。",{icon:1,shade: [0.8, '#393D49'],time:3000});
+		              
 		            		   
 		            	   }else{
 		            		   layer.msg(res.msg,{icon:5,shade: [0.8, '#393D49'],time:3000});
@@ -926,7 +952,7 @@ window.layinit(function (htConfig) {
 		            	   }
 		               },
 		               error: function (message) {
-		                   layer.msg("异常，请联系管理员。");
+		                   layer.msg("异常，请联系管理员。",{icon:5,shade: [0.8, '#393D49'],time:3000});
 		                   console.error(message);
 		               }
 		           });
