@@ -388,13 +388,13 @@ window.layinit(function (htConfig) {
     table.on('tool(moneyPool)', function (data) {
         console.log(data)
         if (data.event == 'del') {
-            if(data.data.state!='财务确认已还款'||data.data.state!='财务指定还款流水'){
+            if(data.data.state!='财务确认已还款'&&data.data.state!='财务指定还款流水'){
                 app.deleteRepayment(data.data.id)
             }else{
                 app.$Modal.warning({content:'财务确认已还款/财务指定还款流水 无法删除该还款登记信息'})
             }
         } else if (data.event == 'edit') {
-            if(data.data.state!='财务确认已还款'||data.data.state!='财务指定还款流水'){
+            if(data.data.state!='财务确认已还款'&&data.data.state!='财务指定还款流水'){
                 app.openEditModal(data.data.id);
             }else{
                 app.$Modal.warning({content:'财务确认已还款/财务指定还款流水 无法再次编辑该还款登记信息'})
