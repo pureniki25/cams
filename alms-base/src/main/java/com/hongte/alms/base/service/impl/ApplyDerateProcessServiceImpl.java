@@ -167,6 +167,9 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
         pages.setSize(key.getLimit());
         pages.setCurrent(key.getPage());
 
+        String userId = loginUserInfoHelper.getUserId();
+        key.setUserId(userId);
+
         List<ApplyDerateVo> list = applyDerateProcessMap.selectApplyDerateList(pages,key);
 
         pages.setRecords(setApplyDerateVoListInfo(list));

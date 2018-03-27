@@ -34,6 +34,15 @@ public class ApplyDerateListSearchReq extends PageRequest{
 //    @ApiModelProperty(value="减免金额",name="derateMoneyEndStr",example="test" ,dataType = "String")
 //    private String   derateMoneyEndStr	;  //减免金额 结束
 
+    private String userId;
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     public String getAreaId() {
         return areaId;

@@ -81,6 +81,8 @@ public class CarServiceImpl  implements CarService {
 	
 	public Page<CarVo> selectCarPage(CarReq carReq) {
 			Page<CarVo> pages = new Page<CarVo>();
+			String userId = loginUserInfoHelper.getUserId();
+			carReq.setUserId(userId);
 		   int count=carMapper.selectCarPageCount(carReq);
 		   if(count<=0) {
 			   return pages;
