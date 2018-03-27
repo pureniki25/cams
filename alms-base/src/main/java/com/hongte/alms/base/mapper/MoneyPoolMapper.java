@@ -18,5 +18,5 @@ import com.hongte.alms.common.mapper.SuperMapper;
  * @since 2018-03-23
  */
 public interface MoneyPoolMapper extends SuperMapper<MoneyPool> {
-	List<MatchedMoneyPoolVO> listMatchedMoneyPool(@Param("planListId") String planListId);
+	List<MatchedMoneyPoolVO> listMatchedMoneyPool(@Param("businessId") String businessId,@Param("afterId") String afterId);
 }

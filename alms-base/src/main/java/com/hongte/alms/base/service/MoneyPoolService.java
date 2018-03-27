@@ -21,7 +21,7 @@ import com.hongte.alms.common.service.BaseService;
 public interface MoneyPoolService extends BaseService<MoneyPool> {
 	List<MoneyPoolVO> listMoneyPool(String businessId , String afterId) ;
 	Page<MoneyPoolVO> listMoneyPoolByPage(String businessId,String afterId , Integer page,Integer limit);
-	List<MatchedMoneyPoolVO> listMatchedMoneyPool(String planListId);
+	List<MatchedMoneyPoolVO> listMatchedMoneyPool(String businessId , String afterId);
 	Boolean saveRepaymentRegisterInfo(RepaymentRegisterInfoDTO registerInfoDTO);
 	Boolean deleteRepaymentRegeisterInfo(String moneyPoolId,String userId);
 	MoneyPoolVO getMoneyPool(String moneyPoolId);

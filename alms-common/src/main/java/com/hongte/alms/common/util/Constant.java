@@ -13,6 +13,7 @@ public class Constant {
     public  static  final  String DEV_DEFAULT_USER="devDefaultUser";
     public  static  final  String DEFAULT_SYS_USER="sysAutoSet";
     public  static  final  String SYS_DEFAULT_USER="sysDefaultUser";
+    public  static  final  String ADMIN_ID="0111130000";
 
 
 

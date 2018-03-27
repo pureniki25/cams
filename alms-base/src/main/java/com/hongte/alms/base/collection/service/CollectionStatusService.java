@@ -82,4 +82,11 @@ public interface CollectionStatusService extends BaseService<CollectionStatus> {
     public List<String> selectFollowBusinessIds(String userId);
 
 
+    /**
+     * 回退已关闭的催收
+     * @param businessId
+     * @return
+     */
+    public boolean  revokeClosedStatus(String businessId);
+
 }

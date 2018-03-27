@@ -112,11 +112,12 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
             applyInfo.setApplyDerateProcessId(UUID.randomUUID().toString());
             applyInfo.setProcessId(process.getProcessId());
             applyInfo.setCreateTime(new Date());
-            applyInfo.setCreateUser(Constant.DEV_DEFAULT_USER);
+            applyInfo.setCreateUser(loginUserInfoHelper.getUserId());
+            
 
         }
         applyInfo.setUpdateTime(new Date());
-        applyInfo.setUpdateUser(Constant.DEV_DEFAULT_USER);
+        applyInfo.setUpdateUser(loginUserInfoHelper.getUserId());
 
         insertOrUpdate(applyInfo);
     }

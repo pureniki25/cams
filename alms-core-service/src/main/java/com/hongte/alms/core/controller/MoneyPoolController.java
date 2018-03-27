@@ -209,10 +209,8 @@ public class MoneyPoolController {
 	@ResponseBody
 	public PageResult<List<MoneyPoolRepayment>> pageCustomerRepayment(String businessId,String afterId,Integer page,Integer limit) {
 		Page<MoneyPoolRepayment> page2 = new Page(page, limit);
-		RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService.selectOne(
-				new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId));
 		Page<MoneyPoolRepayment> result = moneyPoolRepaymentService.selectPage(page2,
-				new EntityWrapper<MoneyPoolRepayment>().eq("plan_list_id", repaymentBizPlanList.getPlanListId()));
+				new EntityWrapper<MoneyPoolRepayment>().eq("original_business_id", businessId).eq("after_id", afterId));
 		return PageResult.success(result.getRecords(), result.getTotal());
 	}
 	
@@ -294,18 +292,13 @@ public class MoneyPoolController {
 	@ResponseBody
 	public Result checkMoneyPool(String businessId,String afterId,Boolean isMatched) {
 //		RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId));
-		String planListId = repaymentBizPlanListService.queryRepaymentBizPlanListByConditions(businessId, afterId);
-		if (StringUtil.isEmpty(planListId)) {
-			return Result.error("500", "查找还款计划失败");
-		}
 		
 		if (isMatched) {
-			List<MatchedMoneyPoolVO> list = moneyPoolService.listMatchedMoneyPool(planListId);
+			List<MatchedMoneyPoolVO> list = moneyPoolService.listMatchedMoneyPool(businessId,afterId);
 			return Result.success(list);
 		}else {
 			EntityWrapper<MoneyPoolRepayment> ew = new EntityWrapper<MoneyPoolRepayment>();
-			ew.eq("plan_list_id", planListId).orderBy("id");
-			ew.eq("is_finance_match", 0);
+			ew.eq("original_business_id", businessId).eq("after_id", afterId).orderBy("id");
 			List<MoneyPoolRepayment> list = moneyPoolRepaymentService.selectList(ew);
 			return Result.success(list);
 		}
