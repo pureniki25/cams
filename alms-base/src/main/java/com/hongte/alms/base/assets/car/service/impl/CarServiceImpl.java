@@ -217,7 +217,7 @@ public class CarServiceImpl  implements CarService {
       		if(StringUtils.isEmpty(auctionAplyVo.getCarAuction().getAuctionId())) {
       			auctionAplyVo.getCarAuction().setAuctionId(UUID.randomUUID().toString());
       			auctionAplyVo.getCarAuction().setCreateTime(new Date());
-      			auctionAplyVo.getCarAuction().setCreateUser("admin");
+      			auctionAplyVo.getCarAuction().setCreateUser(loginUserInfoHelper.getUserId());
       		}
       	}
       	ProcessSaveReq processSaveReq=new ProcessSaveReq();
