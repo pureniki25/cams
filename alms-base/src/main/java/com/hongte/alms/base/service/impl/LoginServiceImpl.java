@@ -5,12 +5,14 @@ import com.hongte.alms.base.entity.SysRole;
 import com.hongte.alms.base.entity.SysUser;
 import com.hongte.alms.base.entity.SysUserRole;
 import com.hongte.alms.base.service.*;
+import com.hongte.alms.common.util.Constant;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.BoaInRoleInfoDto;
 import com.ht.ussp.client.dto.LoginInfoDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,12 +45,18 @@ public class LoginServiceImpl implements LoginService {
 
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void saveloginInfo() {
         //用户信息
         LoginInfoDto dto = loginUserInfoHelper.getLoginInfo();
         if(dto == null){
             return;
         }
+        if(dto.getUserId().equals(Constant.ADMIN_ID)) {
+            sysUserPermissionService.setUserPermissons(dto.getUserId());
+            return;
+        }
+    
         boolean fresh = false;//判断是否刷新任务设置
         SysUser sysUser = sysUserService.selectOne(new EntityWrapper<SysUser>().eq("user_id",dto.getUserId()));
         if(sysUser == null){
