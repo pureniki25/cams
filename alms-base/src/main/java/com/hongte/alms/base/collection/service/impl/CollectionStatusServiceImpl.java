@@ -361,8 +361,8 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
     public void autoSetBusinessStaff(){
         //查找分配了电催人员的分公司列表
         List<CollectionPersonSet> list = collectionPersonSetService.selectList(new EntityWrapper<CollectionPersonSet>());
-        CollectionTimeSet phoneTimeSet = collectionTimeSetService.selectOne(new EntityWrapper<CollectionTimeSet>().eq("col_type",CollectionStatusEnum.PHONE_STAFF.getKey()));
-        CollectionTimeSet visitTimeSet = collectionTimeSetService.selectOne(new EntityWrapper<CollectionTimeSet>().eq("col_type",CollectionStatusEnum.COLLECTING.getKey()));
+        CollectionTimeSet phoneTimeSet = collectionTimeSetService.selectOne(new EntityWrapper<CollectionTimeSet>().eq("col_type",CollectionStatusEnum.PHONE_STAFF.getKey()).and("start_time<=NOW()"));
+        CollectionTimeSet visitTimeSet = collectionTimeSetService.selectOne(new EntityWrapper<CollectionTimeSet>().eq("col_type",CollectionStatusEnum.COLLECTING.getKey()).and("start_time<=NOW()"));
          Integer daysBeforeOverDue = phoneTimeSet!=null?phoneTimeSet.getOverDueDays():0;
         Integer visitDaysAfterOverDue = visitTimeSet!=null?visitTimeSet.getOverDueDays():31;
 
