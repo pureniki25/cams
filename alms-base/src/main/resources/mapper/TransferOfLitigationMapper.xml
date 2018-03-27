@@ -4,7 +4,7 @@
 	
 	<resultMap id="TransferOfLitigationMap" type="com.hongte.alms.base.vo.litigation.TransferOfLitigationVO" >  
 	    	<result property="businessId" column="businessId"/> 
-   			<result property="businessType" column="businessTypeName"/>
+   			<result property="businessType" column="businessType"/>
    			<result property="businessTypeName" column="businessTypeName"/>
    			<result property="customerName" column="customerName"/>
    			<result property="customerType" column="customerType"/>
@@ -203,6 +203,7 @@
 	<select id="queryTransferLitigationData" resultMap="TransferOfLitigationMap" >
 			SELECT 
 			  bb.`borrow_limit` borrowLimit,
+			  bb.borrow_rate loanRate,
 			  (SELECT 
 			    IFNULL(
 			      b.original_business_id,
@@ -213,6 +214,13 @@
 			    LEFT JOIN tb_renewal_business b 
 			      ON a.business_id = b.renewal_business_id 
 			  WHERE a.business_id = bb.`business_id`) businessId,
+			  (SELECT 
+				  b.`business_type_name`
+				FROM
+				  `tb_basic_business` a,
+				  `tb_basic_business_type` b 
+				WHERE a.`business_type` = b.`business_type_id` 
+				  AND a.`business_id` = bb.`business_id`) businessType,
 			  IFNULL(bb.business_ctype, bb.business_stype) businessTypeName,
 			  bbc.`identify_card` customerIdentifyCard,
 			  bbc.`customer_name` customerName,
@@ -312,12 +320,16 @@
 		 	  AND bb.`business_id` = #{businessId,jdbcType=VARCHAR} 
 	</select>
 	
+	<select id="queryLitigationBorrowerDetailed" resultType="com.hongte.alms.base.vo.litigation.LitigationBorrowerDetailed">
+	
+	</select>
+	
 	<select id="queryRepaymentPlanHouse" resultType="com.hongte.alms.base.vo.litigation.house.HousePlanInfo">
 		SELECT 
 		  (plan_principal - fact_principal) surplusPrincipal,
 		  fact_principal factPrincipal,
-		  DATEDIFF(SYSDATE(), dueDate) overdueDays,
-		  dueDate 
+		  DATEDIFF(SYSDATE(), fact_repay_date) overdueDays,
+		  fact_repay_date dueDate 
 		FROM
 		  (SELECT 
 		      b.plan_id,
@@ -336,7 +348,7 @@
 		          ELSE 0 
 		        END
 		      ) `fact_principal`,
-		      MAX(a.`due_date`) dueDate
+		      MAX(a.`fact_repay_date`) fact_repay_date
 		    FROM
 		      `tb_repayment_biz_plan_list` a,
 		      `tb_repayment_biz_plan` b,

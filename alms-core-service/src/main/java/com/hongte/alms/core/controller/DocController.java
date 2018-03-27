@@ -21,6 +21,7 @@ import com.hongte.alms.base.vo.module.doc.DocPageInfo;
 import com.hongte.alms.base.vo.module.doc.DocUploadRequest;
 import com.hongte.alms.base.vo.module.doc.UpLoadResult;
 import com.hongte.alms.common.result.Result;
+import com.ht.ussp.bean.LoginUserInfoHelper;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -37,7 +38,9 @@ import io.swagger.annotations.ApiOperation;
 public class DocController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DocController.class);
-
+    @Autowired
+    private LoginUserInfoHelper loginUserInfoHelper;
+    
 	@Autowired
 	@Qualifier("DocTypeService")
 	private DocTypeService docTypeService;
@@ -69,7 +72,7 @@ public class DocController {
 	 */
 	@RequestMapping(value = "/upload", method = RequestMethod.POST)
 	public UpLoadResult upload(DocUploadRequest request) throws FileNotFoundException {
-		return docService.upload(request, "admin");
+		return docService.upload(request, loginUserInfoHelper.getUserId());
 	}
 
 	/**
@@ -108,7 +111,7 @@ public class DocController {
 
 	@RequestMapping(value = "/singleUpload", method = RequestMethod.POST)
 	public UpLoadResult upload(FileVo fileVo) throws FileNotFoundException {
-		return docTmpService.upload(fileVo, "admin");
+		return docTmpService.upload(fileVo, loginUserInfoHelper.getUserId());
 	}
 
 }

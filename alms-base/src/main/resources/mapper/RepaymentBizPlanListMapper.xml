@@ -74,14 +74,12 @@
 
     </select>
     
-    <select id="queryRepaymentBizPlanListByConditions" resultMap="BaseResultMap">
-    	select <include refid="Base_Column_List"/>
-    	from (
-    		SELECT b.* FROM `tb_repayment_biz_plan` a, `tb_repayment_biz_plan_list` b
-			WHERE a.`plan_id` = b.`plan_id`
-			AND a.`original_business_id` = #{businessId,jdbcType=VARCHAR}
-			AND b.`after_id` = #{afterId,jdbcType=VARCHAR}
-    		) tab
+    <select id="queryRepaymentBizPlanListByConditions" resultType="java.lang.String">
+   		SELECT b.plan_list_id 
+   		  FROM `tb_repayment_biz_plan` a, `tb_repayment_biz_plan_list` b
+		WHERE a.`plan_id` = b.`plan_id`
+		  AND a.`original_business_id` = #{businessId,jdbcType=VARCHAR}
+		  AND b.`after_id` = #{afterId,jdbcType=VARCHAR}
     </select>
     <!--AND cStatus.crp_id = planList.plan_list_id  -->
 
