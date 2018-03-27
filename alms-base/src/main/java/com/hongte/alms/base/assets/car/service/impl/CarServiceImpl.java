@@ -2,8 +2,10 @@ package com.hongte.alms.base.assets.car.service.impl;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import org.apache.ibatis.session.RowBounds;
 import org.slf4j.Logger;
@@ -28,24 +30,37 @@ import com.hongte.alms.base.assets.car.vo.CarVo;
 import com.hongte.alms.base.assets.car.vo.FileVo;
 import com.hongte.alms.base.baseException.AlmsBaseExcepiton;
 import com.hongte.alms.base.entity.CarAuction;
+import com.hongte.alms.base.entity.CarAuctionBidder;
+import com.hongte.alms.base.entity.CarAuctionReg;
 import com.hongte.alms.base.entity.CarBasic;
 import com.hongte.alms.base.entity.CarDetection;
 import com.hongte.alms.base.entity.Doc;
 import com.hongte.alms.base.entity.DocTmp;
 import com.hongte.alms.base.entity.DocType;
+import com.hongte.alms.base.entity.MsgTemplate;
 import com.hongte.alms.base.enums.AuctionStatusEnums;
+import com.hongte.alms.base.enums.MsgTemplateEnableEnum;
+import com.hongte.alms.base.enums.MsgTemplateTypeEnum;
+import com.hongte.alms.base.enums.SmsTypeEnum;
+import com.hongte.alms.base.feignClient.EipRemote;
+import com.hongte.alms.base.mapper.CarAuctionBidderMapper;
 import com.hongte.alms.base.mapper.CarAuctionMapper;
+import com.hongte.alms.base.mapper.CarAuctionRegMapper;
 import com.hongte.alms.base.mapper.CarBasicMapper;
 import com.hongte.alms.base.mapper.CarDetectionMapper;
 import com.hongte.alms.base.mapper.DocMapper;
 import com.hongte.alms.base.mapper.DocTmpMapper;
 import com.hongte.alms.base.mapper.DocTypeMapper;
+import com.hongte.alms.base.mapper.MsgTemplateMapper;
 import com.hongte.alms.base.process.enums.ProcessApproveResult;
 import com.hongte.alms.base.process.enums.ProcessStatusEnums;
 import com.hongte.alms.base.process.enums.ProcessTypeEnums;
 import com.hongte.alms.base.process.service.ProcessService;
 import com.hongte.alms.base.process.vo.ProcessSaveReq;
+import com.hongte.alms.base.vo.comm.SmsVo;
+import com.hongte.alms.common.util.DateUtil;
 import com.ht.ussp.bean.LoginUserInfoHelper;
+import com.ht.ussp.core.Result;
 
 @Service("CarService")
 @Transactional(rollbackFor = Exception.class)
@@ -74,10 +89,21 @@ public class CarServiceImpl  implements CarService {
     @Autowired
     private CarDetectionMapper carDetectionMapper;
 	@Autowired
+	private CarAuctionRegMapper carAuctionRegMapper;
+	@Autowired
 	private CarBasicMapper carBasicMapper;
 	
-	   @Autowired
-	    private LoginUserInfoHelper loginUserInfoHelper;
+   @Autowired
+    private LoginUserInfoHelper loginUserInfoHelper;
+   
+   @Autowired
+   private CarAuctionBidderMapper carAuctionBidderMapper;
+   
+   @Autowired
+   private EipRemote eipRemote;
+   
+   @Autowired
+   private MsgTemplateMapper msgTemplateMapper;
 	
 	public Page<CarVo> selectCarPage(CarReq carReq) {
 			Page<CarVo> pages = new Page<CarVo>();
@@ -445,5 +471,103 @@ public class CarServiceImpl  implements CarService {
     	rCarBasic.setUpdateTime(new Date());
     	rCarBasic.setUpdateUser(loginUserInfoHelper.getUserId());
     	carBasicMapper.updateById(rCarBasic);
+	}
+	@Override
+	public void auctionSign(Map<String, Object> params) {
+		String priceID=(String) params.get("priceID");
+		String userName=(String) params.get("userName");
+		String userID=(String) params.get("userId");  
+		String telephone=(String) params.get("telePhone");
+		String bank =(String) params.get("bank");
+		String cardNo=(String) params.get("carNO");
+		//Boolean isPayBood=(Boolean) params.get("isPayBood");
+		if(StringUtils.isEmpty(priceID)||StringUtils.isEmpty(userName)
+			||StringUtils.isEmpty(userID)||StringUtils.isEmpty(telephone)
+			||StringUtils.isEmpty(bank)||StringUtils.isEmpty(cardNo)
+			) {
+			logger.error("参数为空,auction_id="+priceID+",userName="+userName+
+					",userID="+userID+",telephone="+telephone+",bank="+bank
+					+",cardNo="+cardNo);
+			throw new AlmsBaseExcepiton( "参数为空"); 
+		}
+		List<CarAuction> auctions=carAuctionMapper.selectList( new EntityWrapper<CarAuction>().eq("auction_id", priceID).eq("status", "04"));
+		if(auctions==null||auctions.size()!=1) {
+			logger.error("无效的拍卖,auction_id="+priceID);
+			throw new AlmsBaseExcepiton( "无效的拍卖"); 
+		}
+		CarAuction carAuction=auctions.get(0);
+		if(carAuction.getAuctionStartTime()==null||carAuction.getAuctionEndTime()==null) {
+			logger.error("不在竞拍时间内,auctionStartTime="+carAuction.getAuctionStartTime()+",auctionEndTime"+carAuction.getAuctionEndTime());
+			throw new AlmsBaseExcepiton("无效的拍卖"); 
+		}
+		//判断当前是否还在拍卖时间
+		long startTime=carAuction.getBuyStartTime().getTime();
+		//long endtTime=carAuction.getAuctionEndTime().getTime();
+		long currentTime=new Date().getTime();
+		if(currentTime>startTime) {
+			logger.error("不在竞拍时间内,auctionStartTime="+carAuction.getAuctionStartTime()+",auctionEndTime"+carAuction.getAuctionEndTime());
+			throw new AlmsBaseExcepiton( "该拍卖正在进行中或已完成不允许报名"); 
+		}
+		List<CarAuctionReg> rCarAuctionRegs=carAuctionRegMapper.selectList(new EntityWrapper<CarAuctionReg>().eq("auction_id", priceID).eq("reg_tel", telephone));
+		if(rCarAuctionRegs!=null&&rCarAuctionRegs.size()>0) {
+			logger.error("已报名登记，不允许重复登记,auctionStartTime="+carAuction.getAuctionStartTime()+",auctionEndTime"+carAuction.getAuctionEndTime());
+			throw new AlmsBaseExcepiton( "该拍卖正在进行中或已完成不允许报名"); 
+		}
+		CarAuctionReg auctReg=new CarAuctionReg();
+		CarAuctionBidder rBidder=carAuctionBidderMapper.selectById(telephone);
+		
+		if(rBidder==null) {
+			rBidder=new CarAuctionBidder();
+			rBidder.setCreateTime(new Date());
+			rBidder.setCreateUser("admin");
+			
+		}
+		rBidder.setBidderCertId(userID);
+		rBidder.setBidderName(userName);
+		rBidder.setBidderTel(telephone);
+		rBidder.setTransAccountName(userName);
+		rBidder.setTransAccountNum(cardNo);
+		rBidder.setTransBank(bank);
+		rBidder.setUpdateTime(new Date());
+		auctReg.setAuctionId(priceID);
+		auctReg.setBusinessId(carAuction.getBusinessId());
+		auctReg.setCreateTime(new Date());
+		auctReg.setCreateUser(userName);
+		auctReg.setRegCertId(userID);
+		//auctReg.setPayDeposit(isPayBood);
+		auctReg.setRegId(UUID.randomUUID().toString());
+		auctReg.setRegTel(telephone);
+		auctReg.setUpdateTime(new Date());
+		carAuctionRegMapper.insert(auctReg);
+		rBidder.insertOrUpdate();
+		//发送短信
+		List<MsgTemplate> msgTemplates=msgTemplateMapper.selectList(new EntityWrapper<MsgTemplate>().eq("template_type",MsgTemplateTypeEnum.SMS.getValue()).eq("template_code", "SMS0000001"));
+		if(msgTemplates==null||msgTemplates.size()!=1) {
+			logger.error("报名登记短信模板不存在,template_type="+MsgTemplateTypeEnum.SMS.getValue()+",template_code=SMS0000001");
+			throw new AlmsBaseExcepiton( "报名登记短信模板不存在"); 
+		}
+		MsgTemplate msgTemplate=msgTemplates.get(0);
+		if(MsgTemplateEnableEnum.ENABLE.getValue().equals(msgTemplate.getEnableFlag())
+			&&!StringUtils.isEmpty(msgTemplate.getMsg())) {
+			String msg=String.format(msgTemplate.getMsg(),userName,DateUtil.formatDate("yyyy-MM-dd HH:mm:ss", carAuction.getPaymentEndTime()),carAuction.getDeposit(),
+					carAuction.getAcountName(),carAuction.getOpenBank(),carAuction.getAcountNum());
+			Set<String> phones=new HashSet<String>();
+			phones.add(telephone);
+			SmsVo vo=new SmsVo();
+			vo.setPhones(phones);
+			vo.setContent(msg);
+			vo.setType(SmsTypeEnum.NOTICE.getValue());
+			try {
+				Result eipResult=eipRemote.sendSms(vo);
+				if(eipResult==null||!"0000".equals(eipResult.getReturnCode())) {
+					logger.error("调用EIP系统发送短信失败,eipResult="+eipResult==null?null:"调用EIP系统发送短信返回码："+eipResult.getReturnCode());
+					throw new AlmsBaseExcepiton( "调用EIP系统发送短信失败"); 
+				}
+			}catch (Exception e) {
+				logger.error(e.getMessage());
+				throw new AlmsBaseExcepiton( "调用EIP系统发送短信失败"); 
+			}
+			
+		}
 	}
 }
