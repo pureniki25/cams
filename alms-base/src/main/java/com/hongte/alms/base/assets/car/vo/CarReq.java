@@ -39,6 +39,16 @@ public class CarReq extends PageRequest {
     @ApiModelProperty(value="车辆型号",name="model",dataType = "String")
     private String  model;
 
+    private String userId;
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
 	public String getAreaId() {
 		return areaId;
 	}

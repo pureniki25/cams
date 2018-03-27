@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.SysRole;
 import com.hongte.alms.base.entity.SysUser;
 import com.hongte.alms.base.entity.SysUserRole;
-import com.hongte.alms.base.service.LoginService;
-import com.hongte.alms.base.service.SysRoleService;
-import com.hongte.alms.base.service.SysUserRoleService;
-import com.hongte.alms.base.service.SysUserService;
+import com.hongte.alms.base.service.*;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.BoaInRoleInfoDto;
 import com.ht.ussp.client.dto.LoginInfoDto;
@@ -40,6 +37,10 @@ public class LoginServiceImpl implements LoginService {
     @Qualifier("SysUserRoleService")
     private SysUserRoleService sysUserRoleService;
 
+    @Autowired
+    @Qualifier("SysUserPermissionService")
+    private SysUserPermissionService sysUserPermissionService;
+
 
     @Override
     public void saveloginInfo() {
@@ -48,6 +49,7 @@ public class LoginServiceImpl implements LoginService {
         if(dto == null){
             return;
         }
+        boolean fresh = false;//判断是否刷新任务设置
         SysUser sysUser = sysUserService.selectOne(new EntityWrapper<SysUser>().eq("user_id",dto.getUserId()));
         if(sysUser == null){
             System.out.println(dto.getOrgCode()+":"+dto.getUserId()+":"+dto.getUserName());
@@ -56,36 +58,64 @@ public class LoginServiceImpl implements LoginService {
             sysUser.setOrgCode(dto.getOrgCode());
             sysUser.setUserName(dto.getUserName());
             sysUserService.insert(sysUser);
+            sysUserPermissionService.setUserPermissons(dto.getUserId());
+            fresh = true;
         }
 
 
         //角色信息
-        List<BoaInRoleInfoDto> boaInRoleInfoDtoList = loginUserInfoHelper.getUserRole();
+        List<BoaInRoleInfoDto> boaInRoleInfoDtoList = new ArrayList<>();
+        boaInRoleInfoDtoList = loginUserInfoHelper.getUserRole();
+        List<SysUserRole> userRoles =  sysUserRoleService.selectList(new EntityWrapper<SysUserRole>().eq("user_id",dto.getUserId()));
+
+        List<String> newRole = new ArrayList<>();
+        List<String> oldRole = new ArrayList<>();
+
         List<SysUserRole> sysUserRoleList = new ArrayList<>();
         List<SysRole> sysRoleList = new ArrayList<>();
-        if(boaInRoleInfoDtoList != null && boaInRoleInfoDtoList.size()>0){
-            for (BoaInRoleInfoDto boa:boaInRoleInfoDtoList) {
+        if(boaInRoleInfoDtoList.size() == 0){
+            sysUserRoleService.delete(new EntityWrapper<SysUserRole>().eq("user_id",dto.getUserId()));
+        }
+        for (BoaInRoleInfoDto boa:boaInRoleInfoDtoList) {
+            newRole.add(boa.getRoleCode());
+            SysUserRole sysUserRole = new SysUserRole();
+            sysUserRole.setRoleCode(boa.getRoleCode());
+            sysUserRole.setUserId(dto.getUserId());
+            sysUserRoleList.add(sysUserRole);
 
-                SysUserRole sysUserRole = new SysUserRole();
-                sysUserRole.setRoleCode(boa.getRoleCode());
-                sysUserRole.setUserId(dto.getUserId());
-                sysUserRoleList.add(sysUserRole);
-
-                SysRole role = new SysRole();
-                role.setRoleName(boa.getRoleNameCn());
-                role.setRoleCode(boa.getRoleCode());
-                role.setRoleAreaType(1);
-                if(sysRoleService.selectOne(new EntityWrapper<SysRole>().eq("role_code",boa.getRoleCode()).eq("role_name",boa.getRoleNameCn())) == null){
-                    sysRoleList.add(role);
-                }
-
-                sysUserRoleService.delete(new EntityWrapper<SysUserRole>().eq("user_id",dto.getUserId()));
+            SysRole role = new SysRole();
+            role.setRoleName(boa.getRoleNameCn());
+            role.setRoleCode(boa.getRoleCode());
+            role.setRoleAreaType(1);
+            if(sysRoleService.selectOne(new EntityWrapper<SysRole>().eq("role_code",boa.getRoleCode()).eq("role_name",boa.getRoleNameCn())) == null){
+                sysRoleList.add(role);
             }
-            sysUserRoleService.insertBatch(sysUserRoleList);
-            sysRoleService.insertBatch(sysRoleList);
 
+            sysUserRoleService.delete(new EntityWrapper<SysUserRole>().eq("user_id",dto.getUserId()));
+        }
+        if(sysUserRoleList.size()>0){
+             sysUserRoleService.insertOrUpdateBatch(sysUserRoleList);
+        }
+        if(sysRoleList.size()>0){
+            sysRoleService.insertOrUpdateBatch(sysRoleList);
+        }
 
+        for (SysUserRole role:userRoles) {
+            oldRole.add(role.getRoleCode());
+        }
+
+        if(newRole.size() != oldRole.size() && !fresh){
+            sysUserPermissionService.setUserPermissons(dto.getUserId());
+            return;
+        }
+        for (String str:newRole) {
+            if(!oldRole.contains(str)){
+                sysUserPermissionService.setUserPermissons(dto.getUserId());
+                return;
+            }
         }
 
     }
+
+
 }
