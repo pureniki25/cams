@@ -656,9 +656,9 @@ var saveApprovalInfo = function(){
 // var setapplyInfoForm
 
 //保存申请信息
-var saveapplyInfo = function(pStatus){
+var saveapplyInfo = function(pStatus){debugger
     if(processStatus == PROCESS_STATUS_NEW || processStatus == PROCESS_STATUS_START){
-        vm.$refs['applyInfoForm'].validate((valid) => {
+        vm.$refs['applyInfoForm'].validate((valid) => {debugger
             if (valid) {
                 vm.applyInfoForm.processStatus = pStatus;
                 if(vm.applyInfoForm.businessId == null){
@@ -685,7 +685,7 @@ var saveapplyInfo = function(pStatus){
 		               url: basePath+'ApplyDerateController/saveApplyDerateInfo',
 		               contentType: "application/json; charset=utf-8",
 		               data: JSON.stringify({"applyData":[vm.applyInfoForm],"reqRegFiles":vm.reqRegFiles}),
-		               success: function (res) {
+		               success: function (res) {debugger
 		            	   if (res.code == "1"){
 		            		   vm.$Modal.success({
 	                                // title: title,

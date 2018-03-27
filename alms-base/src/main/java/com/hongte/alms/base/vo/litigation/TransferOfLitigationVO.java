@@ -17,6 +17,12 @@ public class TransferOfLitigationVO implements Serializable {
 	private String businessId;
 
 	/**
+	 * 借款利率
+	 */
+	@ApiModelProperty(required = true, value = "借款利率")
+	private double loanRate;
+
+	/**
 	 * 业务类型
 	 */
 	@ApiModelProperty(required = true, value = "业务类型")
@@ -129,6 +135,12 @@ public class TransferOfLitigationVO implements Serializable {
 	 */
 	@ApiModelProperty(required = true, value = "还款明细")
 	private List<BusinessPayment> paymentList;
+	
+	/**
+	 * 借款人明细
+	 */
+	@ApiModelProperty(required = true, value = "借款人明细")
+	private List<LitigationBorrowerDetailed> litigationBorrowerDetailedList;
 
 	/**
 	 * 创建人ID
@@ -142,6 +154,14 @@ public class TransferOfLitigationVO implements Serializable {
 
 	public void setBusinessId(String businessId) {
 		this.businessId = businessId;
+	}
+
+	public double getLoanRate() {
+		return loanRate;
+	}
+
+	public void setLoanRate(double loanRate) {
+		this.loanRate = loanRate;
 	}
 
 	public String getBusinessType() {
@@ -322,6 +342,11 @@ public class TransferOfLitigationVO implements Serializable {
 		result = prime * result + ((customerType == null) ? 0 : customerType.hashCode());
 		result = prime * result + ((finalBorrowMoney == null) ? 0 : finalBorrowMoney.hashCode());
 		result = prime * result + ((houseList == null) ? 0 : houseList.hashCode());
+		result = prime * result
+				+ ((litigationBorrowerDetailedList == null) ? 0 : litigationBorrowerDetailedList.hashCode());
+		long temp;
+		temp = Double.doubleToLongBits(loanRate);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
 		result = prime * result + ((originalUser == null) ? 0 : originalUser.hashCode());
 		result = prime * result + ((paymentList == null) ? 0 : paymentList.hashCode());
 		result = prime * result + ((repaymentPeriods == null) ? 0 : repaymentPeriods.hashCode());
@@ -411,6 +436,13 @@ public class TransferOfLitigationVO implements Serializable {
 				return false;
 		} else if (!houseList.equals(other.houseList))
 			return false;
+		if (litigationBorrowerDetailedList == null) {
+			if (other.litigationBorrowerDetailedList != null)
+				return false;
+		} else if (!litigationBorrowerDetailedList.equals(other.litigationBorrowerDetailedList))
+			return false;
+		if (Double.doubleToLongBits(loanRate) != Double.doubleToLongBits(other.loanRate))
+			return false;
 		if (originalUser == null) {
 			if (other.originalUser != null)
 				return false;
@@ -451,8 +483,8 @@ public class TransferOfLitigationVO implements Serializable {
 
 	@Override
 	public String toString() {
-		return "TransferOfLitigationVO [businessId=" + businessId + ", businessType=" + businessType
-				+ ", businessTypeName=" + businessTypeName + ", businessTypeGroup=" + businessTypeGroup
+		return "TransferOfLitigationVO [businessId=" + businessId + ", loanRate=" + loanRate + ", businessType="
+				+ businessType + ", businessTypeName=" + businessTypeName + ", businessTypeGroup=" + businessTypeGroup
 				+ ", businessCompany=" + businessCompany + ", customerName=" + customerName + ", customerType="
 				+ customerType + ", customerIdentifyCard=" + customerIdentifyCard + ", originalUser=" + originalUser
 				+ ", finalBorrowMoney=" + finalBorrowMoney + ", borrowLimit=" + borrowLimit + ", repaymentTypeId="

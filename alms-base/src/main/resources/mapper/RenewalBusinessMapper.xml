@@ -63,7 +63,7 @@
         	AND tbb.company_id = #{loanExtReq.deptId}
         </if>
         <if test="loanExtReq.businessId !=null and loanExtReq.businessId !=''">
-        	AND trb.original_business_id = #{loanExtReq.businessId}
+        	AND trb.original_business_id like '%${loanExtReq.businessId}%'
         </if>
         <if test="loanExtReq.salesman !=null and loanExtReq.salesman !=''">
         	AND tbb.original_name like '%${loanExtReq.salesman}%'
@@ -105,7 +105,7 @@
         	AND tbb.company_id = #{loanExtReq.deptId}
         </if>
         <if test="loanExtReq.businessId !=null and loanExtReq.businessId !=''">
-        	AND trb.original_business_id = #{loanExtReq.businessId}
+        	AND trb.original_business_id like '%${loanExtReq.businessId}%'
         </if>
         <if test="loanExtReq.salesman !=null and loanExtReq.salesman !=''">
         	AND tbb.original_name like '%${loanExtReq.salesman}%'
