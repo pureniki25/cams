@@ -52,8 +52,8 @@
                         <Date-picker type="date" placeholder="结束时间" :value.sync="schForm.dateEnd" v-model="schForm.dateEnd" @on-change="onDateEndChange" :options="dateEndOption"></Date-picker>
                     </form-item>
                     <form-item label="分公司">
-                        <i-select :model.sync="schForm.deptId" v-model="schForm.deptId" clearable=true placeholder="请选择分公司" style="width:200px">
-                            <i-option v-for="item in deptIds" :value="item.value" >{{item.label}}</i-option>
+                        <i-select :model.sync="schForm.deptId" v-model="schForm.deptId" filterable clearable=true placeholder="请选择分公司" style="width:200px">
+                            <i-option v-for="item in deptIds" :value="item.orgCode" >{{item.orgNameCn}}</i-option>
                         </i-select>
                     </form-item>
                     <form-item label="业务编号">

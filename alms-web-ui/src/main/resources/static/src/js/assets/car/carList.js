@@ -298,7 +298,7 @@ window.layinit(function (htConfig) {
                                 if(authValid('carAuction')){
                         		 showNewTab(currentItem,"carAuction","车牌号-车辆型号 拍卖申请");
                                 }else{
-                                	   layer.msg("对不起，你没有权限");
+                                	   layer.msg("对不起，你没有权限",{icon:5,shade: [0.8, '#393D49'],time:3000});
                                 	
                                 }
                             }},
@@ -307,7 +307,7 @@ window.layinit(function (htConfig) {
                                 if(authValid('convBusAply')){
                                  	 showNewTab(currentItem,"convBusAply","车牌号-车辆型号 转公车申请（"+currentItem.companyName+"）");
                                    }else{
-                                   	   layer.msg("对不起，你没有权限");
+                                   	   layer.msg("对不起，你没有权限",{icon:5,shade: [0.8, '#393D49'],time:3000});
                                    	
                                    }
                           
@@ -317,7 +317,7 @@ window.layinit(function (htConfig) {
                             	   if(authValid('auctionRegList')){
                             	     	showNewTab(currentItem,"auctionRegList","拍卖记录查看");
                                      }else{
-                                     	   layer.msg("对不起，你没有权限");
+                                     	   layer.msg("对不起，你没有权限",{icon:5,shade: [0.8, '#393D49'],time:3000});
                                      	
                                      }
                             
@@ -328,8 +328,8 @@ window.layinit(function (htConfig) {
                         	   if(authValid('returnReg')&&"已结清"==currentItem.status){
                         			showNewTab(currentItem,"returnReg","车辆归还登记");
                                 }
-                        	   else if(authValid('returnReg')&&"已结清"!=currentItem.status){
-                        		   layer.msg("该车处于未结清状态，不允许归还登记");
+                        	   else if(authValid('returnReg')&&"待处置"!=currentItem.status){
+                        		   layer.msg("该车处于非待处置状态，不允许归还登记",{icon:5,shade: [0.8, '#393D49'],time:3000});
                         	   }
                         	   else{
                                 	   layer.msg("对不起，你没有权限");
@@ -339,7 +339,7 @@ window.layinit(function (htConfig) {
                             	 if(authValid('againAssess')){
                             		 	showNewTab(currentItem,"againAssess","车辆评估");
                                  }else{
-                                 	   layer.msg("对不起，你没有权限");
+                                 	   layer.msg("对不起，你没有权限",{icon:5,shade: [0.8, '#393D49'],time:3000});
                                  }
                            
                             }},
@@ -348,7 +348,7 @@ window.layinit(function (htConfig) {
                            	  if(authValid('fileUp')){
 	                           	  	fileUp(currentItem,"上传附件");
 	                          }else{
-	                          	   layer.msg("对不起，你没有权限");
+	                          	   layer.msg("对不起，你没有权限",{icon:5,shade: [0.8, '#393D49'],time:3000});
 	                          }
                             }},
                             {"name": "查看附件", click: function (e, currentItem) {
@@ -357,7 +357,7 @@ window.layinit(function (htConfig) {
                              	  if(authValid('viewFile')){
                              		viewFile(currentItem,"查看附件");
 	  	                          }else{
-	  	                          	   layer.msg("对不起，你没有权限");
+	  	                          	   layer.msg("对不起，你没有权限",{icon:5,shade: [0.8, '#393D49'],time:3000});
 	  	                          }
                           
                             }}
@@ -423,7 +423,7 @@ window.layinit(function (htConfig) {
 	                	}
 	                },
 	                error: function (message) {
-	                    layer.msg("查询城市信息发生异常，请联系管理员。");
+	                    layer.msg("查询城市信息发生异常，请联系管理员。",{icon:5,shade: [0.8, '#393D49'],time:3000});
 	                    console.error(message);
 	                }
 	            });

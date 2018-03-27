@@ -50,6 +50,7 @@
 		tb_car_drag drag on drag.business_id=bus.business_id
 		left
 		join tb_car_detection det on car.last_detection_id=det.id
+		JOIN tb_sys_user_permission as permission  ON  permission.business_id = bus.business_id
 
 		<where>
 			<if test="businessId !=null and businessId !=''">
@@ -80,6 +81,9 @@
 			<if test="trailerEndDate != null ">
             and drag.drag_date &lt;=#{trailerEndDate}
 			</if>
+			<if test="userId !=null and userId !=''">
+				and permission.user_id = #{userId}
+			</if>
 		</where>
 		order by bus.update_time desc
 		limit ${(page-1) * limit},
@@ -99,6 +103,7 @@
 		join tb_car_detection det on det.business_id=bus.business_id
 		 join
 		tb_car_drag drag on drag.business_id=bus.business_id
+		JOIN tb_sys_user_permission as permission  ON  permission.business_id = bus.business_id
 		<where>
 			<if test="businessId !=null and businessId !=''">
 				and bus.business_id LIKE "%"#{businessId}"%"
@@ -126,6 +131,9 @@
 			</if>
 			<if test="trailerEndDate != null ">
             and drag.drag_date &lt;=#{trailerEndDate}
+			</if>
+			<if test="userId !=null and userId !=''">
+				and permission.user_id = #{userId}
 			</if>
 		</where>
 	</select>

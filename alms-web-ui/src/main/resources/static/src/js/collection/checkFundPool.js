@@ -79,27 +79,27 @@ window.layinit(function (htConfig) {
             ],
             data1: []
         },
-        created: () => {
-            console.log(this.businessId)
-            axios.get(basePath + 'moneyPool/checkMoneyPool', {
-                params: {
-                    businessId: getQueryStr("businessId"),
-                    afterId: getQueryStr("afterId"),
-                    isMatched: false
-                }
-            })
-                .then(function (res) {
-                    if (res.data.code == '1') {
-                        t1.data1 = res.data.data
-                    } else {
-                        t1.$Modal.error({ content: '接口调用失败' })
-                    }
-                })
-                .catch(function (error) {
-                    t1.$Modal.error({ content: '接口调用失败' })
-                    console.log(error);
-                });
-        },
+       created: () => {
+           console.log(this.businessId)
+           axios.get(basePath + 'moneyPool/checkMoneyPool', {
+               params: {
+                   businessId: getQueryStr("businessId"),
+                   afterId: getQueryStr("afterId"),
+                   isMatched: false
+               }
+           })
+               .then(function (res) {
+                   if (res.data.code == '1') {
+                       t1.data1 = res.data.data
+                   } else {
+                       t1.$Modal.error({ content: '接口调用失败' })
+                   }
+               })
+               .catch(function (error) {
+                   t1.$Modal.error({ content: '接口调用失败' })
+                   console.log(error);
+               });
+       },
         methods: {
 
         }

@@ -184,7 +184,8 @@ window.layinit(function (htConfig) {
 
                 {
                     field: 'originalBusinessId',
-                    title: '业务编号'
+                    title: '业务编号',
+                    width:165
                 }, {
                     field: 'afterId',
                     title: '期数'

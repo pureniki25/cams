@@ -5,6 +5,8 @@ import com.hongte.alms.common.service.BaseService;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 /**
  * <p>
  * 业务还款计划列表 服务类
@@ -34,6 +36,8 @@ public interface RepaymentBizPlanListService extends BaseService<RepaymentBizPla
      * @return
      */
     public List<RepaymentBizPlanList> selectNeedLawNorBiz(Integer overDueDays );
+     
+    String queryRepaymentBizPlanListByConditions(@Param(value="businessId") String businessId, @Param(value="afterId") String afterId);
 
 //    /**
 //     * 查出需要移交电催的展期业务还款计划列表

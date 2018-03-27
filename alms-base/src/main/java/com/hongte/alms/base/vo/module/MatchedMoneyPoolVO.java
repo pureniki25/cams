@@ -18,7 +18,7 @@ public class MatchedMoneyPoolVO {
 	/**
 	 * 流水号
 	 */
-	private String id ;
+	private String moneyPoolId ;
 	/**
 	 * 款项码
 	 */
@@ -26,7 +26,7 @@ public class MatchedMoneyPoolVO {
 	/**
 	 * 转入账户
 	 */
-	private String acceptBank ;
+	private String bankAccount ;
 	/**
 	 * 转入时间
 	 */
@@ -43,7 +43,7 @@ public class MatchedMoneyPoolVO {
 	/**
 	 * 记账金额
 	 */
-	private BigDecimal repaymentMoney ;
+	private BigDecimal accountMoney ;
 	/**
 	 * 交易备注
 	 */
@@ -56,23 +56,11 @@ public class MatchedMoneyPoolVO {
 	 * 状态
 	 */
 	private String status ;
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
 	public String getRepaymentCode() {
 		return repaymentCode;
 	}
 	public void setRepaymentCode(String repaymentCode) {
 		this.repaymentCode = repaymentCode;
-	}
-	public String getAcceptBank() {
-		return acceptBank;
-	}
-	public void setAcceptBank(String acceptBank) {
-		this.acceptBank = acceptBank;
 	}
 	public Date getTradeDate() {
 		return tradeDate;
@@ -92,12 +80,6 @@ public class MatchedMoneyPoolVO {
 	public void setTradePlace(String tradePlace) {
 		this.tradePlace = tradePlace;
 	}
-	public BigDecimal getRepaymentMoney() {
-		return repaymentMoney;
-	}
-	public void setRepaymentMoney(BigDecimal repaymentMoney) {
-		this.repaymentMoney = repaymentMoney;
-	}
 	public String getRemark() {
 		return remark;
 	}
@@ -115,5 +97,41 @@ public class MatchedMoneyPoolVO {
 	}
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	/**
+	 * @return the moneyPoolId
+	 */
+	public String getMoneyPoolId() {
+		return moneyPoolId;
+	}
+	/**
+	 * @param moneyPoolId the moneyPoolId to set
+	 */
+	public void setMoneyPoolId(String moneyPoolId) {
+		this.moneyPoolId = moneyPoolId;
+	}
+	/**
+	 * @return the accountMoney
+	 */
+	public BigDecimal getAccountMoney() {
+		return accountMoney;
+	}
+	/**
+	 * @param accountMoney the accountMoney to set
+	 */
+	public void setAccountMoney(BigDecimal accountMoney) {
+		this.accountMoney = accountMoney;
+	}
+	/**
+	 * @return the bankAccount
+	 */
+	public String getBankAccount() {
+		return bankAccount;
+	}
+	/**
+	 * @param bankAccount the bankAccount to set
+	 */
+	public void setBankAccount(String bankAccount) {
+		this.bankAccount = bankAccount;
 	}
 }

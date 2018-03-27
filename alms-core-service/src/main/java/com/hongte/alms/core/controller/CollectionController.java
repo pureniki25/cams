@@ -23,6 +23,7 @@ import com.hongte.alms.base.service.BasicCompanyService;
 import com.hongte.alms.base.collection.service.PhoneUrgeService;
 import com.hongte.alms.base.service.SysParameterService;
 import com.hongte.alms.base.service.SysUserService;
+import com.hongte.alms.base.util.CompanySortByPINYINUtil;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.EasyPoiExcelExportUtil;
 import com.hongte.alms.common.util.JsonUtil;
@@ -119,6 +120,7 @@ public class CollectionController {
         retMap.put("area", (JSONArray) JSON.toJSON(area_list,JsonUtil.getMapping()));
         //公司
         List<BasicCompany> company_list = basicCompanyService.selectList(new EntityWrapper<BasicCompany>().eq("area_level",AreaLevel.COMPANY_LEVEL.getKey()));
+        CompanySortByPINYINUtil.sortByPINYIN(company_list);
         retMap.put("company",(JSONArray) JSON.toJSON(company_list,JsonUtil.getMapping()));
         //业务类型
         List<BasicBusinessType> btype_list =  basicBusinessTypeService.selectList(new EntityWrapper<BasicBusinessType>().orderBy("business_type_id"));
@@ -260,6 +262,7 @@ public class CollectionController {
         retMap.put("area", (JSONArray) JSON.toJSON(area_list,JsonUtil.getMapping()));
         //公司
         List<BasicCompany> company_list = basicCompanyService.selectList(new EntityWrapper<BasicCompany>().eq("area_level",AreaLevel.COMPANY_LEVEL.getKey()));
+        CompanySortByPINYINUtil.sortByPINYIN(company_list);
         retMap.put("company",(JSONArray) JSON.toJSON(company_list,JsonUtil.getMapping()));
         //业务类型
         List<BasicBusinessType> btype_list =  basicBusinessTypeService.selectList(new EntityWrapper<BasicBusinessType>().orderBy("business_type_id"));

@@ -56,6 +56,7 @@
         LEFT JOIN tb_basic_business_type as  b_type ON business.business_type = b_type.business_type_id
         LEFT JOIN tb_basic_company as company ON business.company_id = company.area_id
         LEFT JOIN tb_process as process ON derate.process_id = process.process_id
+        JOIN tb_sys_user_permission as permission  ON  permission.business_id = business.business_id
 
         <where>
             process.status = 2 and process.process_result = 1
@@ -89,7 +90,9 @@
             <if test="derateMoneyEnd !=null ">
                 <![CDATA[ and derate.derate_money <= #{derateMoneyEnd}]]>
             </if>
-
+            <if test="userId !=null and userId !=''">
+                and permission.user_id = #{userId}
+            </if>
 
         </where>
         order BY  derate.create_time DESC

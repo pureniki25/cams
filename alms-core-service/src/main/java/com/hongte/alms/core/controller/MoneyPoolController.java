@@ -2,8 +2,6 @@ package com.hongte.alms.core.controller;
 
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -14,23 +12,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.baomidou.mybatisplus.entity.Columns;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.assets.car.vo.FileVo;
-import com.hongte.alms.base.collection.service.CollectionTrackLogService;
-import com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
-import com.hongte.alms.base.entity.MoneyPool;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
-import com.hongte.alms.base.entity.RenewalBusiness;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
-import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.service.DepartmentBankService;
 import com.hongte.alms.base.service.DocService;
 import com.hongte.alms.base.service.MoneyPoolRepaymentService;
@@ -40,9 +31,9 @@ import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.vo.module.DepartmentBankVO;
 import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
 import com.hongte.alms.base.vo.module.MoneyPoolVO;
-import com.hongte.alms.base.vo.module.doc.DocUploadRequest;
 import com.hongte.alms.base.vo.module.doc.UpLoadResult;
 import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.common.vo.PageResult;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.LoginInfoDto;
@@ -218,10 +209,8 @@ public class MoneyPoolController {
 	@ResponseBody
 	public PageResult<List<MoneyPoolRepayment>> pageCustomerRepayment(String businessId,String afterId,Integer page,Integer limit) {
 		Page<MoneyPoolRepayment> page2 = new Page(page, limit);
-		RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService.selectOne(
-				new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId));
 		Page<MoneyPoolRepayment> result = moneyPoolRepaymentService.selectPage(page2,
-				new EntityWrapper<MoneyPoolRepayment>().eq("plan_list_id", repaymentBizPlanList.getPlanListId()));
+				new EntityWrapper<MoneyPoolRepayment>().eq("original_business_id", businessId).eq("after_id", afterId));
 		return PageResult.success(result.getRecords(), result.getTotal());
 	}
 	
@@ -301,19 +290,15 @@ public class MoneyPoolController {
 	@ApiOperation(value = "款项池登记信息")
 	@GetMapping("/checkMoneyPool")
 	@ResponseBody
-	public Result checkMoneyPool(String businessId,String afterId,boolean isMatched) {
-		RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId));
-		if (repaymentBizPlanList==null) {
-			return Result.error("500", "查找还款计划失败");
-		}
+	public Result checkMoneyPool(String businessId,String afterId,Boolean isMatched) {
+//		RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId));
 		
 		if (isMatched) {
-			List<MatchedMoneyPoolVO> list = moneyPoolService.listMatchedMoneyPool(repaymentBizPlanList.getPlanListId());
+			List<MatchedMoneyPoolVO> list = moneyPoolService.listMatchedMoneyPool(businessId,afterId);
 			return Result.success(list);
 		}else {
 			EntityWrapper<MoneyPoolRepayment> ew = new EntityWrapper<MoneyPoolRepayment>();
-			ew.eq("plan_list_id", repaymentBizPlanList.getPlanListId()).orderBy("id");
-			ew.eq("is_finance_match", 0);
+			ew.eq("original_business_id", businessId).eq("after_id", afterId).orderBy("id");
 			List<MoneyPoolRepayment> list = moneyPoolRepaymentService.selectList(ew);
 			return Result.success(list);
 		}
