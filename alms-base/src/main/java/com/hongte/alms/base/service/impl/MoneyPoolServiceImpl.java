@@ -79,8 +79,8 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 	}
 
 	@Override
-	public List<MatchedMoneyPoolVO> listMatchedMoneyPool(String planListId) {
-		return moneyPoolMapper.listMatchedMoneyPool(planListId);
+	public List<MatchedMoneyPoolVO> listMatchedMoneyPool(String businessId, String afterId) {
+		return moneyPoolMapper.listMatchedMoneyPool( businessId,  afterId);
 	}
 
 	@Override
@@ -314,6 +314,8 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 		moneyPoolRepayment.setCreateUserRole("客户");
 		moneyPoolRepayment.setIsFinanceMatch(0);
 		moneyPoolRepayment.setState(RepayRegisterFinanceStatus.未关联银行流水.toString());	
+		moneyPoolRepayment.setOriginalBusinessId(registerInfoDTO.getBusinessId());
+		moneyPoolRepayment.setAfterId(registerInfoDTO.getAfterId());
 		boolean result = moneyPoolRepayment.insert();
 		if (result) {
 			ResponseData responseData = callRemoteService(new MoneyPoolRepaymentXindaiDTO(moneyPoolRepayment, registerInfoDTO.getBusinessId(), registerInfoDTO.getAfterId()), XINDAI_ADDORUPDATE);

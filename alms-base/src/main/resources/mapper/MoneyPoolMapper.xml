@@ -53,7 +53,9 @@
 		        LEFT JOIN
 		    tb_money_pool mp ON mp.money_pool_id = mpr.money_pool_id
 		WHERE
-		    mpr.plan_list_id = #{planListId}
+		    mpr.original_business_id = #{businessId}
+		    AND
+		    mpr.after_id = #{afterId}
 		    AND
 		    mpr.is_finance_match = 1
 		ORDER BY mpr.id
