@@ -56,7 +56,7 @@
                 <Card title="权限设置">
                     <i-form :model="editForm" ref="editForm" label-position="right" :label-width="100" >
                         <form-item label="角色编码" prop="roleCode">
-                            <i-input v-model="editForm.roleCode" :value.sync="editForm.roleCode" ></i-input>
+                            <i-input v-model="editForm.roleCode" :value.sync="editForm.roleCode" :disabled="editModal.type&&editModal.type=='update'" ></i-input>
                         </form-item>
                         <form-item label="角色名称" prop="roleName">
                             <i-input v-model="editForm.roleName" :value.sync="editForm.roleName" ></i-input>

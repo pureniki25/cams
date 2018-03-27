@@ -111,7 +111,7 @@
         	AND tbb.original_name like '%${loanExtReq.salesman}%'
         </if>
         <if test="loanExtReq.customer !=null and loanExtReq.customer !=''">
-        	tbb.customer_name = #{loanExtReq.customer}
+        	AND tbb.customer_name = #{loanExtReq.customer}
         </if>
         <if test="loanExtReq.businessType !=null and loanExtReq.businessType !=''">
         	AND tbb.business_type = #{loanExtReq.businessType}
