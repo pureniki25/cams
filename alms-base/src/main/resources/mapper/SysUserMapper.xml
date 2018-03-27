@@ -7,15 +7,16 @@
         <id column="user_id" property="userId" />
         <result column="user_name" property="userName" />
         <result column="org_code" property="orgCode" />
+        <result column="xd_org_code" property="xdOrgCode" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        user_id AS userId, user_name AS userName, org_code AS orgCode
+        user_id AS userId, user_name AS userName, org_code AS orgCode,xd_org_code AS xdOrgCode
     </sql>
     <!-- 查询结果列 -->
     <sql id="Table_Column_List">
-        u.user_id AS userId, u.user_name AS userName, u.org_code AS orgCode
+        u.user_id AS userId, u.user_name AS userName, u.org_code AS orgCode,xd_org_code AS xdOrgCode
     </sql>
 
 

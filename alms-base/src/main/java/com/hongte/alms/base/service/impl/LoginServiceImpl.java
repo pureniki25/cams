@@ -57,6 +57,7 @@ public class LoginServiceImpl implements LoginService {
             sysUser.setUserId(dto.getUserId());
             sysUser.setOrgCode(dto.getOrgCode());
             sysUser.setUserName(dto.getUserName());
+            sysUser.setXdOrgCode(dto.getBmOrgCode());
             sysUserService.insert(sysUser);
             sysUserPermissionService.setUserPermissons(dto.getUserId());
             fresh = true;
@@ -87,7 +88,7 @@ public class LoginServiceImpl implements LoginService {
             role.setRoleName(boa.getRoleNameCn());
             role.setRoleCode(boa.getRoleCode());
             role.setRoleAreaType(1);
-            if(sysRoleService.selectOne(new EntityWrapper<SysRole>().eq("role_code",boa.getRoleCode()).eq("role_name",boa.getRoleNameCn())) == null){
+            if(sysRoleService.selectOne(new EntityWrapper<SysRole>().eq("role_code",boa.getRoleCode())) == null){
                 sysRoleList.add(role);
             }
 

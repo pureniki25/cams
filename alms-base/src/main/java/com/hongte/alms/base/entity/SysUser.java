@@ -42,6 +42,20 @@ public class SysUser extends Model<SysUser> {
 	@ApiModelProperty(required= true,value = "所属机构编码")
 	private String orgCode;
 
+	/**
+	 * 信贷所属机构编码
+	 */
+	@TableField("xd_org_code")
+	@ApiModelProperty(required= true,value = "信贷所属机构编码")
+	private String xdOrgCode;
+
+	public String getXdOrgCode() {
+		return xdOrgCode;
+	}
+
+	public void setXdOrgCode(String xdOrgCode) {
+		this.xdOrgCode = xdOrgCode;
+	}
 
 	public String getUserId() {
 		return userId;

@@ -124,7 +124,12 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
             //1、更新历史记录为移交法务 /关闭  /拖车登记
             for(StaffBusinessVo vo:voList){
                 List<CollectionStatus> list = selectList(new EntityWrapper<CollectionStatus>().eq("business_id",vo.getBusinessId()));
+                List<CollectionLog> logs = new ArrayList<>() ;
                 for(CollectionStatus status:list){
+                    //跳过crpId一致的记录
+                    if(status.getCrpId().equals(vo.getCrpId())) {
+                        continue;
+                    }
                     status.setCollectionStatus(CollectionStatusEnum.getByPageStr(staffType).getKey());
                     status.setSetWay(setWayEnum.getKey());
                     status.setUpdateTime(new Date());
@@ -137,9 +142,22 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                             status.setUpdateUser(loginUserInfoHelper.getUserId()==null?Constant.SYS_DEFAULT_USER:loginUserInfoHelper.getUserId());
                             break;
                     }
+                    CollectionLog log = new CollectionLog();
+                    log.setBusinessId(status.getBusinessId());
+                    log.setCrpId(status.getCrpId());
+                    log.setAfterStatus(CollectionStatusEnum.getByPageStr(staffType).getKey());
+                    log.setCollectionUser("".equals(staffUserId)?Constant.SYS_DEFAULT_USER:staffUserId);
+                    log.setCreateTime(new Date());
+                    log.setCreateUser(status.getUpdateUser());
+                    log.setDescribe(setWayEnum.getName());
+                    log.setSetWay(setWayEnum.getKey());
+                    logs.add(log);
                 }
                 if(list.size()>0){
                     updateBatchById(list);
+                }
+                if(logs.size()>0){
+                    collectionLogService.insertBatch(logs);
                 }
             }
         }else if(staffType.equals(CollectionStatusEnum.PHONE_STAFF.getPageStr())
@@ -167,6 +185,11 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
             List<CollectionStatus> list = selectList(new EntityWrapper<CollectionStatus>().eq("business_id",vo.getBusinessId()).eq("crp_id",vo.getCrpId()));
             if(list.size()>0){
                 status = list.get(0);
+            }else{
+                //如果是设置关闭状态，又没有写过催收的状态记录则跳过，不增加催收状态记录
+                if(CollectionStatusEnum.getByPageStr(staffType).equals(CollectionStatusEnum.CLOSED)){
+                    continue;
+                }
             }
             Integer beforeStatus = status.getCollectionStatus();
             Integer afterStatus = getCurrentColStatu(status,setTypeStatus);
@@ -361,8 +384,8 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
     public void autoSetBusinessStaff(){
         //查找分配了电催人员的分公司列表
         List<CollectionPersonSet> list = collectionPersonSetService.selectList(new EntityWrapper<CollectionPersonSet>());
-        CollectionTimeSet phoneTimeSet = collectionTimeSetService.selectOne(new EntityWrapper<CollectionTimeSet>().eq("col_type",CollectionStatusEnum.PHONE_STAFF.getKey()));
-        CollectionTimeSet visitTimeSet = collectionTimeSetService.selectOne(new EntityWrapper<CollectionTimeSet>().eq("col_type",CollectionStatusEnum.COLLECTING.getKey()));
+        CollectionTimeSet phoneTimeSet = collectionTimeSetService.selectOne(new EntityWrapper<CollectionTimeSet>().eq("col_type",CollectionStatusEnum.PHONE_STAFF.getKey()).and("start_time<=NOW()"));
+        CollectionTimeSet visitTimeSet = collectionTimeSetService.selectOne(new EntityWrapper<CollectionTimeSet>().eq("col_type",CollectionStatusEnum.COLLECTING.getKey()).and("start_time<=NOW()"));
          Integer daysBeforeOverDue = phoneTimeSet!=null?phoneTimeSet.getOverDueDays():0;
         Integer visitDaysAfterOverDue = visitTimeSet!=null?visitTimeSet.getOverDueDays():31;
 
@@ -765,7 +788,64 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
         return businessIds;
     }
 
+    @Override
+    @Transactional
+    public boolean revokeClosedStatus(String businessId) {
 
+
+        List<CollectionStatus>  collectionStatuses = selectList(new EntityWrapper<CollectionStatus>()
+                .eq("business_id",businessId));
+        if(collectionStatuses.size()==0){
+            return true;
+        }
+
+        boolean retBoolean = true;
+        for(CollectionStatus status:collectionStatuses){
+            if(!status.getCollectionStatus().equals(CollectionStatusEnum.CLOSED.getKey())){
+                continue;
+            }
+            List<CollectionLog> logs = collectionLogService.selectList(new EntityWrapper<CollectionLog>()
+                .eq("business_id",status.getBusinessId())
+                .eq("crp_id",status.getCrpId())
+                .eq("after_status",CollectionStatusEnum.CLOSED.getKey())
+                .orderBy("create_time desc"));
+
+            if(logs.size()==0){
+                logger.error("撤销贷后跟进关闭状态 找不到状态变更历史记录 businessId:"+ businessId);
+                retBoolean = false;
+                continue;
+            }
+
+            CollectionLog  log  = logs.get(0);
+
+            CollectionLog  newLog = new CollectionLog();
+            newLog.setAfterStatus(log.getBeforeStatus());
+            newLog.setBusinessId(businessId);
+            newLog.setCollectionUser(Constant.ADMIN_ID);
+            newLog.setCrpId(status.getCrpId());
+            newLog.setUpdateUser(Constant.ADMIN_ID);
+            newLog.setCreateUser(Constant.ADMIN_ID);
+            newLog.setDescribe("信贷系统撤销结清 回退状态");
+            newLog.setCreateTime(new Date());
+            newLog.setUpdateTime(new Date());
+            newLog.setSetWay(CollectionSetWayEnum.XINDAI_CALL.getKey());
+            newLog.setBeforeStatus(CollectionStatusEnum.CLOSED.getKey());
+            newLog.setSetTypeStatus(CollectionStatusEnum.REVOKE.getKey());
+
+            collectionLogService.insert(newLog);
+
+            status.setUpdateUser(Constant.ADMIN_ID);
+            status.setUpdateTime(new Date());
+            status.setSetWay(CollectionSetWayEnum.XINDAI_CALL.getKey());
+            status.setDescribe("信贷系统撤销结清 回退状态");
+            status.setCollectionStatus(log.getBeforeStatus());
+            updateById(status);
+        }
+
+
+
+        return retBoolean;
+    }
 
 
     public  static  void main(String[] args){
