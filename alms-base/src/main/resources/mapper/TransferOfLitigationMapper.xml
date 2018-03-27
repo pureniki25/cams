@@ -153,8 +153,7 @@
 		      `tb_repayment_biz_plan_list` tab1,
 		      tb_repayment_biz_plan tab2,
 		      tb_repayment_biz_plan_list_detail tab3 
-		    WHERE tab1.`current_status` = '已还款' 
-		      AND tab1.`plan_id` = tab2.`plan_id` 
+		    WHERE tab1.`plan_id` = tab2.`plan_id` 
 		      AND tab1.`plan_list_id` = tab3.`plan_list_id` 
 		      AND tab2.`original_business_id` = #{businessId,jdbcType=VARCHAR}) tab) t5,
 		  (SELECT 
@@ -215,13 +214,29 @@
 			      ON a.business_id = b.renewal_business_id 
 			  WHERE a.business_id = bb.`business_id`) businessId,
 			  (SELECT 
-				  b.`business_type_name`
+				  CASE
+				    a.business_type 
+				    WHEN 11 
+				    THEN a.business_ctype 
+				    ELSE b.xd_business_type_id 
+				    END
 				FROM
 				  `tb_basic_business` a,
 				  `tb_basic_business_type` b 
 				WHERE a.`business_type` = b.`business_type_id` 
-				  AND a.`business_id` = bb.`business_id`) businessType,
-			  IFNULL(bb.business_ctype, bb.business_stype) businessTypeName,
+				  AND a.`business_id` = bb.`business_id`) businessType, -- 若type_id = 11 ，取子类型
+			  (SELECT 
+				  CASE
+				    a.business_type 
+				    WHEN 11 
+				    THEN a.business_ctype 
+				    ELSE b.business_type_name 
+				    END businessType
+				FROM
+				  `tb_basic_business` a,
+				  `tb_basic_business_type` b 
+				WHERE a.`business_type` = b.`business_type_id`
+				AND a.`business_id` = bb.`business_id`) businessTypeName,	-- 若type_id = 11 ，取子类型
 			  bbc.`identify_card` customerIdentifyCard,
 			  bbc.`customer_name` customerName,
 			  CASE
@@ -321,7 +336,7 @@
 	</select>
 	
 	<select id="queryLitigationBorrowerDetailed" resultType="com.hongte.alms.base.vo.litigation.LitigationBorrowerDetailed">
-	
+		
 	</select>
 	
 	<select id="queryRepaymentPlanHouse" resultType="com.hongte.alms.base.vo.litigation.house.HousePlanInfo">
