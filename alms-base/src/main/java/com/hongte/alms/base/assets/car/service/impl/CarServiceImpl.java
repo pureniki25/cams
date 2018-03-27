@@ -305,10 +305,10 @@ public class CarServiceImpl  implements CarService {
       		logger.error("未创建流程，ProcessId="+auctionAplyVo.getAuditVo().getProcessId());
       		throw new AlmsBaseExcepiton("未创建流程");
       	}
-      	if(CarStatusEnums.PENDING.getStatusCode().equals(retCarBasic.getStatus())&&p.getCurrentStep()!=-1) {//不为草稿状态
-      		logger.error("非待处置状态的车辆不能进行拍卖");
-      		throw new AlmsBaseExcepiton("非待处置状态的车辆不能进行拍卖");
-      	}
+//      	if(CarStatusEnums.PENDING.getStatusCode().equals(retCarBasic.getStatus())&&p.getCurrentStep()!=-1) {//不为草稿状态
+//      		logger.error("非待处置状态的车辆不能进行拍卖");
+//      		throw new AlmsBaseExcepiton("非待处置状态的车辆不能进行拍卖");
+//      	}
       	auctionAplyVo.getCarBase().setBusinessId(retCarBasic.getBusinessId());
      
       	List<CarAuction> carAuctions=carAuctionMapper.selectList(new EntityWrapper<CarAuction>().eq("business_id", auctionAplyVo.getCarAuction().getBusinessId()).ne("status", AuctionStatusEnums.DRAFT.getKey()));
