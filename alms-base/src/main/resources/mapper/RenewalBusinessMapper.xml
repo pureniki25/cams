@@ -69,13 +69,13 @@
         	AND tbb.original_name like '%${loanExtReq.salesman}%'
         </if>
         <if test="loanExtReq.customer !=null and loanExtReq.customer !=''">
-        	AND tbb.customer_name = #{loanExtReq.customer}
+        	AND tbb.customer_name like  '%${loanExtReq.customer}%'
         </if>
         <if test="loanExtReq.businessType !=null and loanExtReq.businessType !=''">
         	AND tbb.business_type = #{loanExtReq.businessType}
         </if>
         <if test="loanExtReq.extensionId !=null and loanExtReq.extensionId !=''">
-        	AND trb.renewal_business_id = #{loanExtReq.extensionId}
+        	AND trb.renewal_business_id like '%${loanExtReq.extensionId}%'
         </if>
     </where>
 	GROUP BY original_business_id
@@ -111,13 +111,13 @@
         	AND tbb.original_name like '%${loanExtReq.salesman}%'
         </if>
         <if test="loanExtReq.customer !=null and loanExtReq.customer !=''">
-        	AND tbb.customer_name = #{loanExtReq.customer}
+        	AND tbb.customer_name like  '%${loanExtReq.customer}%'
         </if>
         <if test="loanExtReq.businessType !=null and loanExtReq.businessType !=''">
         	AND tbb.business_type = #{loanExtReq.businessType}
         </if>
         <if test="loanExtReq.extensionId !=null and loanExtReq.extensionId !=''">
-        	AND trb.renewal_business_id = #{loanExtReq.extensionId} 
+              	AND trb.renewal_business_id like '%${loanExtReq.extensionId}%'
         </if>
     </where>
 	GROUP BY trb.original_business_id
