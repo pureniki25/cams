@@ -278,8 +278,9 @@
         LEFT JOIN tb_process_type as p_type ON process.process_typeid = p_type.type_id
         LEFT JOIN tb_sys_user  as s_user  ON  process.create_user = s_user.user_id
         LEFT JOIN tb_basic_company as company ON business.company_id = company.area_id
+         <if test="reqPageeType == 'Search'  ">
         LEFT JOIN  tb_sys_user_permission as  p ON  p.business_id = business.business_id
-
+       </if>
         <!--            我已审批的 -->
         <if test="reqPageeType == 'Approved' ">
             JOIN (SELECT * FROM tb_process_log AS log WHERE log.approve_user_id = #{currentUserId}  GROUP BY log.process_id) as slog ON  process.process_id = slog.process_id
@@ -358,12 +359,12 @@
             <if test="reqPageeType == 'SelfStart' ">
                 AND  process.start_user_id = #{currentUserId}
             </if>
-
+      <if test="reqPageeType == 'Search'  ">
            <!--            /*用户ID*/ -->
            <if test="userId !=null  and userId != '' ">
                and p.user_id = #{userId}
            </if>
-
+      </if>
 
           <!--            审批查询 -->
             <!--  <if test="reqPageeType == Search ">
