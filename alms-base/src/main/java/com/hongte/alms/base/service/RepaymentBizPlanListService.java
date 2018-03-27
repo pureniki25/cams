@@ -37,7 +37,7 @@ public interface RepaymentBizPlanListService extends BaseService<RepaymentBizPla
      */
     public List<RepaymentBizPlanList> selectNeedLawNorBiz(Integer overDueDays );
      
-    RepaymentBizPlanList queryRepaymentBizPlanListByConditions(@Param(value="businessId") String businessId, @Param(value="afterId") String afterId);
+    String queryRepaymentBizPlanListByConditions(@Param(value="businessId") String businessId, @Param(value="afterId") String afterId);
 
 //    /**
 //     * 查出需要移交电催的展期业务还款计划列表

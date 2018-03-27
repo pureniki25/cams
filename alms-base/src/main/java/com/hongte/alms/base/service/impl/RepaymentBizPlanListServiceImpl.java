@@ -54,7 +54,7 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
     }
     
     @Override
-    public RepaymentBizPlanList queryRepaymentBizPlanListByConditions(String businessId, String afterId) {
+    public String queryRepaymentBizPlanListByConditions(String businessId, String afterId) {
     	return repaymentBizPlanListMapper.queryRepaymentBizPlanListByConditions(businessId, afterId);
     }
 
