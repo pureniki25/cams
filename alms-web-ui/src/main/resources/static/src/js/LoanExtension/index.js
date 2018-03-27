@@ -101,10 +101,10 @@ window.layinit(function (htConfig) {
             let arry = []
             axios.get(basePath+"renewalBusiness/deptIds").then(function(res){
                 if(res.data.code=='1'){
-                    $.each(res.data.data,function(i,o){
-                        arry.push({value:o.orgNameCn,label:o.orgNameCn})
-                    });
-                    app.deptIds = arry
+//                    $.each(res.data.data,function(i,o){
+//                        arry.push({value:o.orgNameCn,label:o.orgNameCn})
+//                    });
+                    app.deptIds = res.data.data.company;
                 }
             }).catch(function(error){
 
