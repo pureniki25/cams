@@ -819,18 +819,18 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
             CollectionLog  log  = logs.get(0);
 
             CollectionLog  newLog = new CollectionLog();
-            log.setAfterStatus(log.getBeforeStatus());
-            log.setBusinessId(businessId);
-            log.setCollectionUser(Constant.ADMIN_ID);
-            log.setCrpId(status.getCrpId());
-            log.setUpdateUser(Constant.ADMIN_ID);
-            log.setCreateUser(Constant.ADMIN_ID);
-            log.setDescribe("信贷系统撤销结清 回退状态");
-            log.setCreateTime(new Date());
-            log.setUpdateTime(new Date());
-            log.setSetWay(CollectionSetWayEnum.XINDAI_CALL.getKey());
-            log.setBeforeStatus(CollectionStatusEnum.CLOSED.getKey());
-            log.setSetTypeStatus(CollectionStatusEnum.REVOKE.getKey());
+            newLog.setAfterStatus(log.getBeforeStatus());
+            newLog.setBusinessId(businessId);
+            newLog.setCollectionUser(Constant.ADMIN_ID);
+            newLog.setCrpId(status.getCrpId());
+            newLog.setUpdateUser(Constant.ADMIN_ID);
+            newLog.setCreateUser(Constant.ADMIN_ID);
+            newLog.setDescribe("信贷系统撤销结清 回退状态");
+            newLog.setCreateTime(new Date());
+            newLog.setUpdateTime(new Date());
+            newLog.setSetWay(CollectionSetWayEnum.XINDAI_CALL.getKey());
+            newLog.setBeforeStatus(CollectionStatusEnum.CLOSED.getKey());
+            newLog.setSetTypeStatus(CollectionStatusEnum.REVOKE.getKey());
 
             collectionLogService.insert(newLog);
 
