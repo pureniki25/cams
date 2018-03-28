@@ -263,9 +263,12 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 	}
 	
 	public ResponseData callRemoteService(MoneyPoolRepaymentXindaiDTO moneyPoolRepaymentXindaiDTO,String methodName) throws RuntimeException {
+		logger.info("调用callRemoteService");
 		if (xindaiAplUrlUrl==null) {
 			logger.error("没有配置xindaiAplUrlUrlPreFix");
 			throw new RuntimeException("没有配置xindaiAplUrlUrlPreFix");
+		}else {
+			logger.info("xindaiAplUrlUrl:"+xindaiAplUrlUrl);
 		}
 		DESC desc = new DESC();
 		RequestData requestData = new RequestData();
@@ -275,10 +278,15 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 		}else if (methodName.equals(XINDAI_ADDORUPDATE)) {
 			requestData.setData(JSONObject.toJSONString(moneyPoolRepaymentXindaiDTO));
 		}
+		logger.info("原始数据-开始");
+		logger.info(JSON.toJSONString(requestData));
+		logger.info("原始数据-结束");
 		String encryptStr = JSON.toJSONString(requestData);
 		// 请求数据加密
 		encryptStr = desc.Encryption(encryptStr);
-
+		logger.info("请求数据-开始");
+		logger.info(encryptStr);
+		logger.info("请求数据-结束");
 		XindaiService xindaiService = Feign.builder().target(XindaiService.class, xindaiAplUrlUrl);
 		String response = xindaiService.dod(encryptStr);
 
