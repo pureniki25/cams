@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import com.hongte.alms.base.vo.billing.PreviousFeesVO;
 import com.hongte.alms.base.vo.litigation.BusinessCar;
+import com.hongte.alms.base.vo.litigation.LitigationBorrowerDetailed;
 import com.hongte.alms.base.vo.litigation.TransferOfLitigationVO;
 import com.hongte.alms.base.vo.litigation.house.HouseLoanVO;
 import com.hongte.alms.base.vo.litigation.house.HousePlanInfo;
@@ -87,4 +88,11 @@ public interface TransferOfLitigationMapper {
 	 * @return
 	 */
 	Map<String, Object> queryMaxDueDateByBusinessId(@Param(value="businessId") String businessId);
+	
+	/**
+	 * 根据业务编号查询 借款人明细
+	 * @param businessId
+	 * @return
+	 */
+	List<LitigationBorrowerDetailed> queryLitigationBorrowerDetailed(@Param(value="businessId") String businessId);
 }

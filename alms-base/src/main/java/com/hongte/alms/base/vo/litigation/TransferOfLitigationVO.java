@@ -135,7 +135,7 @@ public class TransferOfLitigationVO implements Serializable {
 	 */
 	@ApiModelProperty(required = true, value = "还款明细")
 	private List<BusinessPayment> paymentList;
-	
+
 	/**
 	 * 借款人明细
 	 */
@@ -316,6 +316,14 @@ public class TransferOfLitigationVO implements Serializable {
 		this.paymentList = paymentList;
 	}
 
+	public List<LitigationBorrowerDetailed> getLitigationBorrowerDetailedList() {
+		return litigationBorrowerDetailedList;
+	}
+
+	public void setLitigationBorrowerDetailedList(List<LitigationBorrowerDetailed> litigationBorrowerDetailedList) {
+		this.litigationBorrowerDetailedList = litigationBorrowerDetailedList;
+	}
+
 	public String getCreateUserId() {
 		return createUserId;
 	}
@@ -491,7 +499,8 @@ public class TransferOfLitigationVO implements Serializable {
 				+ repaymentTypeId + ", repaymentPrincipa=" + repaymentPrincipa + ", repaymentPeriods="
 				+ repaymentPeriods + ", totalPeriods=" + totalPeriods + ", accountStatus=" + accountStatus
 				+ ", sourceSystem=" + sourceSystem + ", carList=" + carList + ", houseList=" + houseList
-				+ ", paymentList=" + paymentList + ", createUserId=" + createUserId + "]";
+				+ ", paymentList=" + paymentList + ", litigationBorrowerDetailedList=" + litigationBorrowerDetailedList
+				+ ", createUserId=" + createUserId + "]";
 	}
 
 }

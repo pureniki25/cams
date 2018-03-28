@@ -1,5 +1,6 @@
 package com.hongte.alms.base.collection.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.collection.dto.CollectionStatusCountDto;
 import com.hongte.alms.base.collection.entity.*;
@@ -130,13 +131,12 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                     if(status.getCrpId().equals(vo.getCrpId())) {
                         continue;
                     }
-                    status.setCollectionStatus(CollectionStatusEnum.getByPageStr(staffType).getKey());
                     status.setSetWay(setWayEnum.getKey());
                     status.setUpdateTime(new Date());
                     switch (setWayEnum){
                         case XINDAI_CALL:
                         case AUTO_SET:
-                            status.setUpdateUser(Constant.DEFAULT_SYS_USER);
+                            status.setUpdateUser(Constant.ADMIN_ID);
                             break;
                         case MANUAL_SET:
                             status.setUpdateUser(loginUserInfoHelper.getUserId()==null?Constant.SYS_DEFAULT_USER:loginUserInfoHelper.getUserId());
@@ -149,8 +149,12 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                     log.setCollectionUser("".equals(staffUserId)?Constant.SYS_DEFAULT_USER:staffUserId);
                     log.setCreateTime(new Date());
                     log.setCreateUser(status.getUpdateUser());
+                    log.setUpdateTime(new Date());
+                    log.setUpdateUser(status.getUpdateUser());
                     log.setDescribe(setWayEnum.getName());
                     log.setSetWay(setWayEnum.getKey());
+                    log.setBeforeStatus(status.getCollectionStatus());
+                    status.setCollectionStatus(CollectionStatusEnum.getByPageStr(staffType).getKey());
                     logs.add(log);
                 }
                 if(list.size()>0){
@@ -817,7 +821,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
             }
 
             CollectionLog  log  = logs.get(0);
-
+            logger.info("log:"+JSON.toJSONString(log));
             CollectionLog  newLog = new CollectionLog();
             newLog.setAfterStatus(log.getBeforeStatus());
             newLog.setBusinessId(businessId);
@@ -848,32 +852,5 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
     }
 
 
-    public  static  void main(String[] args){
-        for(int i=0;i<100;i++){
-//            Random rd = new Random();
-//            System.out.println(rd.nextInt());
-
-//            int v = (int)Math.random()*1000;
-//            System.out.println(v);
-            System.out.println(RandomUtil.generateRandomInt(0,4));
-
-//            int max=20;
-//            int min=0;
-//            Random random = new Random();
-//
-//            int s = random.nextInt(max)%(max-min+1) + min;
-//            System.out.println(s);
-        }
-
-//        public static void main(String[] args) {
-//            int max=20;
-//            int min=10;
-//            Random random = new Random();
-//
-//            int s = random.nextInt(max)%(max-min+1) + min;
-//            System.out.println(s);
-//        }
-
-    }
 
 }
