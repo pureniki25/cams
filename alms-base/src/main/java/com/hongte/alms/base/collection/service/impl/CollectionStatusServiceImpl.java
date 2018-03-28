@@ -847,7 +847,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
             status.setSetWay(CollectionSetWayEnum.XINDAI_CALL.getKey());
             status.setDescribe("信贷系统撤销结清 回退状态");
             status.setCollectionStatus(log.getBeforeStatus());
-            updateById(status);
+            update(status, new EntityWrapper<CollectionStatus>().eq("business_id", status.getBusinessId()).eq("crp_id", status.getCrpId()));
         }
 
 
