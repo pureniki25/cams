@@ -158,9 +158,10 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                     logs.add(log);
                 }
                 if(list.size()>0){
+//                	update(entity, wrapper)
 //                    updateBatchById(list);
                     for (CollectionStatus status : list) {
-						status.update("business_id={0} and crp_id={1}", status.getBusinessId(),status.getCrpId());
+                    	update(status, new EntityWrapper<CollectionStatus>().eq("business_id", status.getBusinessId()).eq("crp_id", status.getCrpId()));
 					}
                 }
                 if(logs.size()>0){
