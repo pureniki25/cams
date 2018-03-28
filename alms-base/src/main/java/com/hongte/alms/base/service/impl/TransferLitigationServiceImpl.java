@@ -144,7 +144,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		Date factRepayDate = (Date) resultMap.get("factRepayDate");
 		Date dueDate = (Date) resultMap.get("_dueDate");
 		int overdueDays = DateUtil.getDiffDays(factRepayDate == null ? dueDate : factRepayDate, new Date());
-		resultMap.put("overdueDays", overdueDays);
+		resultMap.put("overdueDays", overdueDays < 0 ? 0 : overdueDays);
 
 		Object repaymentTypeId = resultMap.get("repaymentTypeId");
 		String repaymentType = "";
@@ -511,6 +511,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			double lastGuaranteeCharge = ((BigDecimal) maxPeriodMap.get("plan_guarantee_charge")).doubleValue(); // 最后一期担保公司费用
 			double lastPlatformCharge = ((BigDecimal) maxPeriodMap.get("plan_platform_charge")).doubleValue(); // 最后一期平台费
 			int overdueDays = DateUtil.getDiffDays(minDueDate, billDate); // 逾期天数
+			overdueDays = overdueDays < 0 ? 0 : overdueDays;
 //			long isPreCharge = (long) resultMap.get("isPreCharge"); // 是否服务费一次性收取业务
 //			long isPreServiceFees = (long) resultMap.get("isPreServiceFees"); // 是否分公司服务费前置收取
 			double planAccrual = ((BigDecimal) resultMap.get("planAccrual")).doubleValue(); // 本期应还利息
