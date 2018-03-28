@@ -384,7 +384,7 @@ var restProcessApprovalInfo = function(){
 /////////////  流程审批相关函数 结束  ///////////////
 
 //从后台获取显示数据
-var getShowInfo = function () {
+var getShowInfo = function () {debugger
 
     //取显示需要的相关信息
     var reqStr = basePath +"ApplyDerateController/selectApplyDeratePageShowInfo?crpId="+crpId
@@ -628,7 +628,7 @@ var Submit = function () {
 var saveApprovalInfo = function(){
 
     ////////////  ---------------   审批流程 标志位转换 ------------------///////////////
-    vm.approvalInfoForm.isPass = vm.approvalInfoForm.isPassFlage=="是"?"1":"2";   //是否审批通过
+    vm.approvalInfoForm.isPass = vm.approvalInfoForm.isPassFlage=="是"?"1":"0";   //是否审批通过
     vm.approvalInfoForm.isDirectBack = vm.approvalInfoForm.isDirectBackFlage=="是"?"1":"0";  //是否回退
     ////////////  ---------------   审批流程 标志位转换 ------------------///////////////
 
