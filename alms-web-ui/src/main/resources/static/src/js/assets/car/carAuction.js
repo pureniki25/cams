@@ -172,6 +172,20 @@ window.layinit(function (htConfig) {
         	  {id:'3',name:'lara'}]
 	   
 	       },
+	       watch:{ 
+		    	'detection.evaluationAmount':function(val,oldval){
+		    		if(val==null||val==''){
+		    			$("#lastEvaluationAmount").css("border","1px solid #FF3030");
+		    			return;
+		    		}
+		    		if (!amt.test(val)) {  
+		    			$("#lastEvaluationAmount").css("border","1px solid #FF3030");
+		    			layer.msg("请输入有效金额！",{icon:5,shade: [0.8, '#393D49']});
+		    			return;
+		    		}
+		    		this.detection.differAmount=Math.abs(vm.detection.viewEvaluationAmount-val);
+		    	}
+	       },
 	    mounted: function () {
 	    	$("#annualVerificationExpirationDate").focus(function(){
 	    		  $("#annualVerificationExpirationDate").css("border","1px solid #ccc");
@@ -188,6 +202,7 @@ window.layinit(function (htConfig) {
 	    	$("#lastTransferDate").focus(function(){
 	    		  $("#lastTransferDate").css("border","1px solid #ccc");
 	    		});
+	    	/**
 	    	$("#lastEvaluationAmount").blur(function(){
 	    		var evaluationAmount=$("#lastEvaluationAmount").val();
 	    		if (!amt.test(evaluationAmount)) {  
@@ -198,7 +213,7 @@ window.layinit(function (htConfig) {
 	    		var differAmount=Math.abs(vm.detection.viewEvaluationAmount-evaluationAmount);
 	    		$("#differAmount").val(differAmount);
 	    	});
-
+			**/
 	    	$("#lastEvaluationAmount").focus(function(){
 	    		  $("#lastEvaluationAmount").css("border","1px solid #ccc");
 	    		});

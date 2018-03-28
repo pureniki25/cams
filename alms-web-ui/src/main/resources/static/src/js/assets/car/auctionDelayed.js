@@ -49,7 +49,7 @@ window.layinit(function (htConfig) {
             }//键路径必须加上引号  
 	    },
 	    mounted: function () {
-	      	$("#delayPeriod").blur(function(){
+	      	$("#delayPeriod").focus(function(){
 	    		  $("#delayPeriod").css("border","1px solid #ccc");
 	    		});
 	   	    laydate.render({
