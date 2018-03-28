@@ -636,7 +636,7 @@
 		    tb_repayment_biz_plan t1,
 		    tb_repayment_biz_plan_list t2 
 		  WHERE t1.`plan_id` = t2.`plan_id` 
-		    AND t1.`business_id` = b.original_business_id 
+		    AND t1.`original_business_id` = b.original_business_id 
 		    AND t2.`current_status` IN ('逾期', '还款中') 
 		  ORDER BY t2.`due_date` 
 		  LIMIT 1) minDueDate, -- 状态为'逾期', '还款中'的最早应还日期
