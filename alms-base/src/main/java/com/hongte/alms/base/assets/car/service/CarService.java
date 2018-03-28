@@ -25,4 +25,5 @@ public interface CarService {
 	String auctionAply(AuctionAplyVo auctionAplyVo);
 	void auctionAudit(AuctionAplyVo auctionAplyVo)throws Exception;
 	void againAssess(AuctionAplyVo auctionAplyVo);
+	void auctionSign(Map<String,Object> params);
 }

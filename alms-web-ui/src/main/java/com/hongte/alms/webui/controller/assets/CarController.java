@@ -65,4 +65,9 @@ public class CarController {
 	    	 map.addAttribute("processId",processId);
 	        return "/assets/car/carAuctionAudit";
 	    }
+	    @RequestMapping("delayed")
+	    public String delayed(ModelMap map,@RequestParam("businessId") String businessId) {
+	    	 map.addAttribute("businessId",businessId);
+	        return "/assets/car/auctionDelayed";
+	    }
 }

@@ -325,14 +325,14 @@ window.layinit(function (htConfig) {
                             }},
                             {"name": "车辆归还登记", click: function (e, currentItem) {
                             	//alert(JSON.stringify(currentItem));
-                        	   if(authValid('returnReg')&&"已结清"==currentItem.status){
+                        	   if(authValid('returnReg')&&"待处置"==currentItem.status){
                         			showNewTab(currentItem,"returnReg","车辆归还登记");
                                 }
                         	   else if(authValid('returnReg')&&"待处置"!=currentItem.status){
                         		   layer.msg("该车处于非待处置状态，不允许归还登记",{icon:5,shade: [0.8, '#393D49'],time:3000});
                         	   }
                         	   else{
-                                	   layer.msg("对不起，你没有权限");
+                                	   layer.msg("对不起，你没有权限",{icon:5,shade: [0.8, '#393D49'],time:3000});
                                 }
                             }},
                             {"name": "重新评估", click: function (e, currentItem) {
@@ -360,6 +360,18 @@ window.layinit(function (htConfig) {
 	  	                          	   layer.msg("对不起，你没有权限",{icon:5,shade: [0.8, '#393D49'],time:3000});
 	  	                          }
                           
+                            }},
+                            {"name": "拍卖延时", click: function (e, currentItem) {
+                            	//alert(JSON.stringify(currentItem));
+                        	   if(authValid('delayed')&&"拍卖中"==currentItem.status){
+                        		   delayed(currentItem,"delayed","拍卖延时");
+                                }
+                        	   else if(authValid('delayed')&&"拍卖中"!=currentItem.status){
+                        		   layer.msg("该车处于非拍卖中状态，不允许拍卖延时",{icon:5,shade: [0.8, '#393D49'],time:3000});
+                        	   }
+                        	   else{
+                                	   layer.msg("对不起，你没有权限",{icon:5,shade: [0.8, '#393D49'],time:3000});
+                                }
                             }}
                         ],
                     });
@@ -381,6 +393,18 @@ window.layinit(function (htConfig) {
                      });
                 }
             });
+            delayed=function(currentItem,reqType,reqTypeName){//拍卖延时
+            	
+          	  var url="/assets/car/"+reqType+"?businessId="+currentItem.businessId;
+          	    var openIndex= layer.open({
+          	        type: 2,
+                      area: ['55%', '55%'],
+                      fixed: false,
+                      maxmin: true,
+                      title:reqTypeName,
+                      content: url
+          	    });
+            };
           showNewTab=function(currentItem,reqType,reqTypeName){
         	
         	  var url="/assets/car/"+reqType+"?businessId="+currentItem.businessId;

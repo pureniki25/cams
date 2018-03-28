@@ -19,6 +19,7 @@ import com.hongte.alms.base.assets.car.service.CarService;
 import com.hongte.alms.base.assets.car.vo.AuctionBidderVo;
 import com.hongte.alms.base.assets.car.vo.AuctionRespVo;
 import com.hongte.alms.base.assets.car.vo.AuctionsReqVo;
+import com.hongte.alms.base.baseException.AlmsBaseExcepiton;
 import com.hongte.alms.base.entity.CarAuction;
 import com.hongte.alms.base.entity.CarAuctionBidder;
 import com.hongte.alms.base.entity.CarAuctionPriceLog;
@@ -175,74 +176,11 @@ public class CarAuctionController {
 	@PostMapping("/auctionSign")
 	public Result<Object>auctionSign(@RequestBody Map<String,Object> params){
 	try {
-		String priceID=(String) params.get("priceID");
-		String userName=(String) params.get("userName");
-		String userID=(String) params.get("userId");  
-		String telephone=(String) params.get("telePhone");
-		String bank =(String) params.get("bank");
-		String cardNo=(String) params.get("carNO");
-		//Boolean isPayBood=(Boolean) params.get("isPayBood");
-		if(StringUtils.isEmpty(priceID)||StringUtils.isEmpty(userName)
-			||StringUtils.isEmpty(userID)||StringUtils.isEmpty(telephone)
-			||StringUtils.isEmpty(bank)||StringUtils.isEmpty(cardNo)
-			) {
-			logger.error("参数为空,auction_id="+priceID+",userName="+userName+
-					",userID="+userID+",telephone="+telephone+",bank="+bank
-					+",cardNo="+cardNo);
-			return Result.error("9999", "参数为空"); 
-		}
-		List<CarAuction> auctions=carAuctionService.selectList( new EntityWrapper<CarAuction>().eq("auction_id", priceID).eq("status", "04"));
-		if(auctions==null||auctions.size()!=1) {
-			logger.error("无效的拍卖,auction_id="+priceID);
-			return Result.error("9999", "无效的拍卖"); 
-		}
-		CarAuction carAuction=auctions.get(0);
-		if(carAuction.getAuctionStartTime()==null||carAuction.getAuctionEndTime()==null) {
-			logger.error("不在竞拍时间内,auctionStartTime="+carAuction.getAuctionStartTime()+",auctionEndTime"+carAuction.getAuctionEndTime());
-			return Result.error("9999", "无效的拍卖"); 
-		}
-		//判断当前是否还在拍卖时间
-		long startTime=carAuction.getBuyStartTime().getTime();
-		//long endtTime=carAuction.getAuctionEndTime().getTime();
-		long currentTime=new Date().getTime();
-		if(currentTime>startTime) {
-			logger.error("不在竞拍时间内,auctionStartTime="+carAuction.getAuctionStartTime()+",auctionEndTime"+carAuction.getAuctionEndTime());
-			return Result.error("9999", "该拍卖正在进行中或已完成不允许报名"); 
-		}
-		List<CarAuctionReg> rCarAuctionRegs=carAuctionRegService.selectList(new EntityWrapper<CarAuctionReg>().eq("auction_id", priceID).eq("reg_tel", telephone));
-		if(rCarAuctionRegs!=null&&rCarAuctionRegs.size()>0) {
-			logger.error("已报名登记，不允许重复登记,auctionStartTime="+carAuction.getAuctionStartTime()+",auctionEndTime"+carAuction.getAuctionEndTime());
-			return Result.error("9999", "该拍卖正在进行中或已完成不允许报名"); 
-		}
-		CarAuctionReg auctReg=new CarAuctionReg();
-		CarAuctionBidder rBidder=carAuctionBidderService.selectById(userID);
-		
-		if(rBidder==null) {
-			rBidder=new CarAuctionBidder();
-			rBidder.setCreateTime(new Date());
-			rBidder.setCreateUser("");
-		}
-		rBidder.setBidderCertId(userID);
-		rBidder.setBidderName(userName);
-		rBidder.setBidderTel(telephone);
-		
-		rBidder.setTransAccountName(userName);
-		rBidder.setTransAccountNum(cardNo);
-		rBidder.setTransBank(bank);
-		rBidder.setUpdateTime(new Date());
-		
-		auctReg.setAuctionId(priceID);
-		auctReg.setBusinessId(carAuction.getBusinessId());
-		auctReg.setCreateTime(new Date());
-		auctReg.setCreateUser(userName);
-		auctReg.setRegCertId(userID);
-		//auctReg.setPayDeposit(isPayBood);
-		auctReg.setRegId(UUID.randomUUID().toString());
-		auctReg.setRegTel(telephone);
-		auctReg.setUpdateTime(new Date());
-		carAuctionRegService.insert(auctReg);
-		carAuctionBidderService.insertOrUpdate(rBidder);
+		carService.auctionSign(params);
 		return Result.error("0000", "报名成功"); 
+	}catch (AlmsBaseExcepiton e) {
+		logger.error(e.getMsg());
+		return Result.error(e.getCode(),e.getMsg()); 
 	}catch (Exception e) {
 		logger.error(e.getMessage());
 		return Result.error("9999", "报名失败"); 
