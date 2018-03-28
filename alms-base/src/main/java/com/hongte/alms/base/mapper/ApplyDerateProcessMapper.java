@@ -1,13 +1,14 @@
 package com.hongte.alms.base.mapper;
 
-import com.baomidou.mybatisplus.plugins.Page;
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.hongte.alms.base.entity.ApplyDerateProcess;
 import com.hongte.alms.base.vo.module.ApplyDerateListSearchReq;
 import com.hongte.alms.base.vo.module.ApplyDerateVo;
 import com.hongte.alms.common.mapper.SuperMapper;
-
-import java.util.List;
 
 /**
  * <p>
@@ -34,6 +35,8 @@ public interface ApplyDerateProcessMapper extends SuperMapper<ApplyDerateProcess
      * @return
      */
     List<ApplyDerateVo> selectApplyDerateList(ApplyDerateListSearchReq key);
+    
+    String queryCurrentStatusByCondition(@Param(value="businessId") String businessId, @Param(value="planListId") String planListId);
 
 
 }
