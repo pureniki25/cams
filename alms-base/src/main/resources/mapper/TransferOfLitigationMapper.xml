@@ -8,6 +8,7 @@
    			<result property="businessTypeName" column="businessTypeName"/>
    			<result property="customerName" column="customerName"/>
    			<result property="customerType" column="customerType"/>
+   			<result property="loanRate" column="loanRate"/>
    			<result property="customerIdentifyCard" column="customerIdentifyCard"/>
    			<result property="finalBorrowMoney" column="finalBorrowMoney"/>
    			<result property="borrowLimit" column="borrowLimit"/>
