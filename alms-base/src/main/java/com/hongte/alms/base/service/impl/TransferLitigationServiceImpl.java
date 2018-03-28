@@ -142,7 +142,8 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		}
 
 		Date factRepayDate = (Date) resultMap.get("factRepayDate");
-		int overdueDays = DateUtil.getDiffDays(factRepayDate, new Date());
+		Date dueDate = (Date) resultMap.get("_dueDate");
+		int overdueDays = DateUtil.getDiffDays(factRepayDate == null ? dueDate : factRepayDate, new Date());
 		resultMap.put("overdueDays", overdueDays);
 
 		Object repaymentTypeId = resultMap.get("repaymentTypeId");

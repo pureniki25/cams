@@ -1,5 +1,6 @@
 package com.hongte.alms.base.service.impl;
 
+import com.aliyun.oss.ServiceException;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.entity.ApplyDerateProcess;
@@ -27,6 +28,7 @@ import com.hongte.alms.base.vo.module.ApplyDerateVo;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.ClassCopyUtil;
 import com.hongte.alms.common.util.Constant;
+import com.hongte.alms.common.util.StringUtil;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.LoginInfoDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,9 +99,16 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
     public void saveApplyDerateProcess(ApplyDerateProcessReq req) throws IllegalAccessException, InstantiationException {
 
         ApplyDerateProcess applyInfo = null;
+        
+        String businessId = req.getBusinessId();
+        String crpId = req.getCrpId();
+        String currentStatus = applyDerateProcessMap.queryCurrentStatusByCondition(businessId, crpId);
+        if ("已还款".equals(currentStatus)) {
+			throw new ServiceException("当期已还款，不能发起减免申请！");
+		}
 
         ProcessSaveReq processSaveReq = new ProcessSaveReq();
-        processSaveReq.setBusinessId(req.getBusinessId());
+		processSaveReq.setBusinessId(businessId);
         processSaveReq.setProcessStatus(req.getProcessStatus());
         processSaveReq.setTitle(req.getTitle());
         processSaveReq.setProcessId(req.getProcessId());

@@ -82,6 +82,7 @@
 		  IFNULL(t5.surplus_principal, 0) surplusPrincipal,
 		  IFNULL(t5.surplusServiceCharge, 0) surplusServiceCharge,
 		  t5.fact_repay_date factRepayDate,
+		  t5.due_date _dueDate,
 		  t6.output_user_name outputUserName,
 		  t6.fact_output_date factOutputDate,
 		  (SELECT 
@@ -104,6 +105,7 @@
 		    tab.fact_accrual,
 		    tab.business_id,
 		    tab.fact_repay_date,
+		    tab.due_date,
 		    (
 		      tab.plan_principal - tab.fact_principal
 		    ) surplus_principal,
@@ -114,6 +116,7 @@
 		    (SELECT 
 		      tab2.`original_business_id` business_id,
 		      MAX(tab1.fact_repay_date) fact_repay_date,
+		      MIN(tab1.due_date) due_date,
 		      SUM(
 		        CASE
 		          WHEN tab3.plan_item_type = 10 
@@ -175,7 +178,7 @@
 		  AND t1.`business_id` = t3.`business_id` 
 		  AND t1.`business_id` = t6.`business_id` 
 		  AND t2.`last_detection_id` = t3.`id` 
-		  AND t1.`business_id` = #{businessId,jdbcType=VARCHAR} 	
+		  AND t1.`business_id` = #{businessId,jdbcType=VARCHAR}	
 	</select>
 	
 	<select id="queryTransferLitigationCarData" resultType="com.hongte.alms.base.vo.litigation.BusinessCar">
