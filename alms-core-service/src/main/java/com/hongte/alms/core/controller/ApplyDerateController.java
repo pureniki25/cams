@@ -164,6 +164,17 @@ public class ApplyDerateController {
         try{
             //基本信息
             List<BusinessInfoForApplyDerateVo> businessVoList =  basicBusinessService.selectBusinessInfoForApplyDerateVo(crpId);
+            //还款方式类型列表
+            List<SysParameter> repayTypeList =  sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterTypeEnums.REPAYMENT_TYPE.getKey()).orderBy("row_Index"));
+
+            if (!CollectionUtils.isEmpty(businessVoList)) {
+            	//赋值还款方式
+            	for(SysParameter sys:repayTypeList) {
+            		if(sys.getParamValue().equals(businessVoList.get(0).getRepaymentTypeId().toString())) {
+            			businessVoList.get(0).setRepaymentTypeName(sys.getParamName());
+            		}
+            	}
+			}
             retMap.put("baseInfo", (JSONArray) JSON.toJSON(businessVoList, JsonUtil.getMapping()));
 //            derateTypeList
             //申请类型列表
@@ -183,6 +194,7 @@ public class ApplyDerateController {
             
             if (!CollectionUtils.isEmpty(businessVoList)) {
             	businessId = businessVoList.get(0).getBusinessId();
+            		
 			}
          // 查询附件
 			List<DocType> docTypes = docTypeService
@@ -201,7 +213,7 @@ public class ApplyDerateController {
             if(processId !=null){
                 process =  processService.getProcess(processId);
                 if(process !=null){
-                    List<Process> l = new LinkedList<>();
+                    List<Process> l = new LinkedList<>(); 
                     l.add(process);
                     retMap.put("process",(JSONArray) JSON.toJSON(l, JsonUtil.getMapping()));
                 }
