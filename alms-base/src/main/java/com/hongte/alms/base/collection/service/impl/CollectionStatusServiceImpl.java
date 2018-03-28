@@ -149,6 +149,8 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                     log.setCollectionUser("".equals(staffUserId)?Constant.SYS_DEFAULT_USER:staffUserId);
                     log.setCreateTime(new Date());
                     log.setCreateUser(status.getUpdateUser());
+                    log.setUpdateTime(new Date());
+                    log.setUpdateUser(status.getUpdateUser());
                     log.setDescribe(setWayEnum.getName());
                     log.setSetWay(setWayEnum.getKey());
                     logs.add(log);
