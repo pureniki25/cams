@@ -1,0 +1,138 @@
+
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<head>
+<meta charset="utf-8" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+<title>拍卖延时</title>
+
+<link rel="stylesheet" type="text/css"
+	href="/src/css/themes/default.css" />
+<!-- iview样式 -->
+<link rel="stylesheet" type="text/css"
+	href="/plugins/iview/css/iview.css" />
+<!--@import url("//unpkg.com/iview/dist/styles/iview.css");-->
+<!--<link rel="stylesheet" type="text/css" href="//unpkg.com/iview/dist/styles/iview.css"/>-->
+<!-- 引入layui样式 -->
+<link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all" />
+
+<script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+<!-- iview js -->
+<script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+<script src="/properties/config.js"></script>
+<!--引入layui.js-->
+<script src="/plugins/layui/layui.js"></script>
+<!--引入axios.js 用于ajax调用-->
+<script src="/plugins/axios/axios.min.js"></script>
+<script type="text/javascript" src="/plugins/jquery-1.9.1.min.js"></script>
+    <script src="/build/js/appToken.js"></script>
+<style type="text/css">
+.layui-form-item {
+	border-bottom: 2px solid #DBDBDB; /*下边框线*/
+}
+
+.layui-form-item .layui-form-label {
+	width: 30%
+}
+
+.layui-form-item .layui-input-block {
+	margin-left: 35%;
+	width: 60%;
+}
+
+.input-border-none {
+	border: none;
+	font-size: 14px;
+}
+
+.layui-row .grid-demo {
+	margin-left: 5%;
+	width: 90%;
+}
+
+.td_label {
+	font-weight: bolder;
+	width: 200px;
+}
+.input_label{
+color: #FF3030;
+}
+</style>
+</head>
+<body>
+	<!--隐藏元素-->
+	<p id="businessId" th:attr="value=${businessId}" hidden />
+	<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+	<div id="app" >
+
+		<div class="layui-row">
+			<div class="layui-col-xs6 layui-col-md12" style="margin-left:15%;width: 80%;">
+		
+				<div class="grid-demo layui-bg-gray">
+					<table class="layui-table"  >
+						<tr>
+							<td class="td_label" colspan="2"><label class="input_label">只允许在竞买结束前五分钟内延长周期</label></td>
+							
+						</tr>
+						<tr>
+							<td class="td_label">业务编号</td>
+							<td><input type="text" name="lname" v-bind:value="carAuction.businessId"  disabled="disabled"></td>
+						</tr>
+						<tr>
+							<td class="td_label">拍卖开始时间</td>
+							<td><input type="text" id="auctionStartTime" placeholder="yyyy-MM-dd" v-bind:value="carAuction.auctionStartTime"  disabled="disabled"></td>
+						</tr>
+									<tr>
+							<td class="td_label">拍卖结束时间</td>
+							<td><input type="text" id="viewAuctionEndTime" placeholder="yyyy-MM-dd" v-bind:value="carAuction.viewAuctionEndTime"  disabled="disabled"></td>
+						</tr>
+									<tr>
+							<td class="td_label">竞买开始时间</td>
+							<td><input type="text" id="buyStartTime" placeholder="yyyy-MM-dd" v-bind:value="carAuction.buyStartTime"  disabled="disabled"></td>
+						</tr>
+									<tr>
+							<td class="td_label">竞买结束时间</td>
+							<td><input type="text" id="viewBuyEndTime" placeholder="yyyy-MM-dd" v-bind:value="carAuction.viewBuyEndTime"  disabled="disabled"></td>
+						</tr>
+						<tr>
+							<td class="td_label">延时周期<label class="input_label">*</label></td>
+							<td><input type="text" name="lname" v-model="carAuction.delayPeriod" id="delayPeriod">分钟</td>
+						</tr>
+						<tr>
+							<td class="td_label" >延长后拍卖结束时间</td>
+							<td><input type="text" id="auctionEndTime" placeholder="yyyy-MM-dd" v-model="carAuction.auctionEndTime"  disabled="disabled"></td>
+						</tr>
+															<tr>
+							<td class="td_label">延长后竞买结束时间</td>
+							<td><input type="text" id="buyEndTime" placeholder="yyyy-MM-dd" v-model="carAuction.buyEndTime"  disabled="disabled">
+							<input type="text"  v-model="carAuction.auctionId" hidden="">
+							</td>
+						</tr>
+					</table>
+
+
+
+
+				</div>
+			</div>
+		</div>
+		
+		<div class="layui-row">
+			<div class="layui-col-xs6 layui-col-md12">
+			<div class="grid-demo layui-bg-gray">
+		      <button class="layui-btn" v-on:click="carAuctionDelayed()">保存</button>
+		      <button class="layui-btn layui-btn-warm" v-on:click="auctionDelayedClose()">撤销</button>
+			</div>
+			</div>
+		</div>
+</div>
+		<script src="/src/js/assets/car/auctionDelayed.js"></script>
+		<script>
+			
+		</script>
+</body>
+</html>

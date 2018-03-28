@@ -73,6 +73,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -203,7 +204,10 @@ public class CarController {
     @Autowired
 	@Qualifier("CollectionStatusService")
     private CollectionStatusService collectionStatusService;
-
+    
+    @Value("${ht.auction.delayed.min}")
+    private Integer delayedMin;//延长时间(分钟)
+    
 	@ApiOperation(value="获取拖车登记业务基本信息")
 	@GetMapping("getCarDragRegistrationBusinessInfo")
 	public Result<CarDragRegistrationBusinessVo> getCarDragRegistrationBusinessInfo(@RequestParam("businessId") String businessId)
@@ -1172,5 +1176,59 @@ try {
       	return Result.error("9999", "操作异常");
   	}
       }
+    @ApiOperation(value = "获取车辆拍卖/竞价时间")
+    @PostMapping("/getAuction")
+    public Result<Object> getAuction(@ModelAttribute("businessId") String businessId){
+    	try{
+    	List<CarAuction>	carAuctions=carAuctionService.selectList(new EntityWrapper<CarAuction>().eq("business_id", businessId).eq("status", AuctionStatusEnums.AUDITED.getKey()));
+    	if(carAuctions==null||carAuctions.size()!=1) {
+    		logger.error("该车不存在或存在多条拍卖审核完成信息,businessId="+businessId+",status=04");
+    		return Result.error("9999", "该车不存在或存在多条拍卖审核完成信息");
+    	}
+    	Map<String, Object> map=new HashMap<String,Object>();
+    	map.put("carAuction", carAuctions.get(0));
+    	//map.put("bidder", bidder);
+        return Result.build("0000", "操作成功", map);
+ 	}catch (Exception e) {
+      	logger.error(e.getMessage());
+      	return Result.error("9999", "操作异常");
+  	}
+  }
+    @ApiOperation(value="延长竞买时间")
+    @PostMapping("/updateBuyEndTime")
+    public Result<Object> updateBuyEndTime( @RequestBody Map<String,Object> params){
+    	try{
+    		CarAuction carAuction=JsonUtil.map2obj((Map<String,Object>)params.get("carAuction"), CarAuction.class);
+    		if(carAuction==null||StringUtils.isEmpty(carAuction.getAuctionId())) {
+    			logger.error("参数为空,"+carAuction==null?"carAuction="+carAuction:"auctionId="+carAuction.getAuctionId());
+        		return Result.error("9999", "参数为空");
+    		}
+    		CarAuction rCarAuction=carAuctionService.selectById(carAuction.getAuctionId());
+    		if(rCarAuction==null) {
+    			logger.error("拍卖信息不存在,auctionId="+carAuction.getAuctionId());
+    			return Result.error("9999", "拍卖信息不存在");
+    		}
+    		
+    		long buyEndTime=rCarAuction.getBuyEndTime().getTime();
+    		long currTime=new Date().getTime();
+    		if(currTime>buyEndTime) {
+    			logger.error("竞买已结束，不允许延长,auctionId="+carAuction.getAuctionId());
+    			return Result.error("9999", "竞买已结束，不允许延长");
+    		}
+    		if(currTime+delayedMin*60*1000<buyEndTime) {
+    			logger.error("不在竞买结束前"+delayedMin+"分钟内，不允许延长,auctionId="+carAuction.getAuctionId());
+    			return Result.error("9999", "不在竞买结束前"+delayedMin+"分钟内，不允许延长");
+    		}
+    		rCarAuction.setBuyEndTime(carAuction.getBuyEndTime());
+    		rCarAuction.setAuctionEndTime(carAuction.getAuctionEndTime());
+    		//rCarAuction.set 增加更新人、时间
+    		rCarAuction.setDelayPeriod(carAuction.getDelayPeriod());
+    		carAuctionService.updateById(rCarAuction);
+    		return Result.build("0000", "操作成功", "");
+     	}catch (Exception e) {
+          	logger.error(e.getMessage());
+          	return Result.error("9999", "操作异常");
+      	}
+    }
 }
 

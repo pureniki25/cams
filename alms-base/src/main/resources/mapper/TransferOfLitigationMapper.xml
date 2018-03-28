@@ -336,7 +336,103 @@
 	</select>
 	
 	<select id="queryLitigationBorrowerDetailed" resultType="com.hongte.alms.base.vo.litigation.LitigationBorrowerDetailed">
-		
+		SELECT 
+		  a.business_id businessId,
+		  -- 主借款人
+		  a.real_name AS "name",
+		  a.identity_card identifyCard,
+		  CASE
+		    a.`user_type_id` 
+		    WHEN 1 
+		    THEN 0
+		    WHEN 2 
+		    THEN 1
+		    ELSE null 
+		  END borrowerType,
+		  1 AS "type" 
+		FROM
+		  tb_tuandai_project_info a 
+		WHERE IFNULL(a.master_issue_id, 0) = 1 
+		  AND a.begin_time IS NOT NULL 
+		  AND a.business_id = #{businessId,jdbcType=VARCHAR} 
+		UNION
+		ALL 
+		SELECT 
+		  a.business_id businessId,
+		  -- `共借款人`
+		  a.real_name AS "name",
+		  a.identity_card identifyCard,
+		  CASE
+		    a.`user_type_id` 
+		    WHEN 1 
+		    THEN 0 
+		    WHEN 2 
+		    THEN 1 
+		    ELSE null 
+		  END borrowerType,
+		  2 AS "type" 
+		FROM
+		  tb_tuandai_project_info a 
+		WHERE IFNULL(a.master_issue_id, 0) != 1 
+		  AND a.begin_time IS NOT NULL 
+		  AND a.business_id = #{businessId,jdbcType=VARCHAR}  
+		UNION
+		ALL 
+		SELECT 
+		  a.business_id businessId,
+		  -- `抵押权人/反担保人`
+		  a.pledee AS "name",
+		  b.lender_identity identifyCard,
+		  CASE
+		    b.creditor_type 
+		    WHEN 1 
+		    THEN 0
+		    WHEN 2 
+		    THEN 1 
+		    ELSE null 
+		  END borrowerType,
+		  3 AS "type" 
+		FROM
+		  tb_biz_output_contract a,
+		  tb_creditor b 
+		WHERE a.pledee_id = b.creditor_id 
+		  AND a.business_id = #{businessId,jdbcType=VARCHAR}  
+		UNION
+		ALL 
+		SELECT 
+		  a.business_id businessId,
+		  -- `担保主体/担保人`
+		  a.guarantee_main AS "name",
+		  b.identify_card identifyCard,
+		  b.guarante_main_type borrowerType,
+		  4 AS "type" 
+		FROM
+		  tb_fsd_non_standard_measure a,
+		  tb_fsd_guarantee_information b 
+		WHERE a.business_id = b.business_id 
+		  AND b.operator_type = 1 
+		  AND a.business_id = #{businessId,jdbcType=VARCHAR}  
+		UNION
+		ALL 
+		SELECT 
+		  a.business_id businessId,
+		  -- `出借人`
+		  a.lender AS "name",
+		  b.lender_identity identifyCard,
+		  CASE
+		    b.creditor_type 
+		    WHEN 1 
+		    THEN 0 
+		    WHEN 2 
+		    THEN 1
+		    ELSE null 
+		  END borrowerType,
+		  5 AS "type" 
+		FROM
+		  tb_biz_output_contract a,
+		  tb_creditor b 
+		WHERE a.lender_id = b.creditor_id 
+		  AND a.business_id = #{businessId,jdbcType=VARCHAR}  
 	</select>
 	
 	<select id="queryRepaymentPlanHouse" resultType="com.hongte.alms.base.vo.litigation.house.HousePlanInfo">

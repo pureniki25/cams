@@ -38,7 +38,7 @@
 		car.status='07' then '已撤销'
 		when car.status='08' then '转公车申请中'
 		when car.status='09' then '拍卖审核中'
-		when car.status='10' then '拍卖审核中'
+		when car.status='10' then '转公车审核中'
 		else ''
 		end status
 		from tb_car_basic car
