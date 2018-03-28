@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -143,7 +142,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		}
 
 		Date factRepayDate = (Date) resultMap.get("factRepayDate");
-		int overdueDays = differentDays(factRepayDate, new Date());
+		int overdueDays = DateUtil.getDiffDays(factRepayDate, new Date());
 		resultMap.put("overdueDays", overdueDays);
 
 		Object repaymentTypeId = resultMap.get("repaymentTypeId");
@@ -227,6 +226,8 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			if (transferLitigationData == null || businessType == null) {
 				throw new ServiceRuntimeException("没有找到相关数据，发送诉讼系统失败！");
 			}
+			
+			transferLitigationData.setLitigationBorrowerDetailedList(transferOfLitigationMapper.queryLitigationBorrowerDetailed(businessId));
 
 			transferLitigationData.setCreateUserId(loginUserInfoHelper.getUserId());
 			// 判断业务类型，根据业务类型查询对应的房贷或车贷数据
@@ -508,7 +509,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			double lastPlanServiceCharge = ((BigDecimal) maxPeriodMap.get("planServiceCharge")).doubleValue(); // 最后一期应还服务费
 			double lastGuaranteeCharge = ((BigDecimal) maxPeriodMap.get("plan_guarantee_charge")).doubleValue(); // 最后一期担保公司费用
 			double lastPlatformCharge = ((BigDecimal) maxPeriodMap.get("plan_platform_charge")).doubleValue(); // 最后一期平台费
-			int overdueDays = differentDays(minDueDate, billDate); // 逾期天数
+			int overdueDays = DateUtil.getDiffDays(minDueDate, billDate); // 逾期天数
 //			long isPreCharge = (long) resultMap.get("isPreCharge"); // 是否服务费一次性收取业务
 //			long isPreServiceFees = (long) resultMap.get("isPreServiceFees"); // 是否分公司服务费前置收取
 			double planAccrual = ((BigDecimal) resultMap.get("planAccrual")).doubleValue(); // 本期应还利息
@@ -698,34 +699,4 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		}
 	}
 
-	/**
-	 * date2比date1多的天数
-	 * 
-	 * @param date1
-	 * @param date2
-	 * @return
-	 */
-	private int differentDays(Date first, Date second) {
-		if (first == null || second == null) {
-			return 0;
-		}
-		if (first.after(second)) {
-			return 0;
-		}
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(first);
-		int cnt = 0;
-		while (calendar.getTime().compareTo(second) != 0) {
-			calendar.add(Calendar.DATE, 1);
-			cnt++;
-		}
-		return cnt;
-	}
-
-	public static void main(String[] args) {
-		int i = 61 / 30;
-		int j = 20 % 30;
-		System.out.println(i);
-		System.out.println(j);
-	}
 }
