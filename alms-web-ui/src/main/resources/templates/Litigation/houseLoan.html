@@ -330,7 +330,7 @@ color: #FF3030;
                     	<date-picker type="date" v-model="commitInfoForm.repaymentIntentionDate"/>
                     </form-item>
                     <form-item v-else label="意向还款计划："  disabled>
-                        <date-picker type="date" v-model="commitInfoForm.repaymentIntentionDate"/>
+                        <date-picker type="date" v-model="commitInfoForm.repaymentIntentionDate" disabled/>
                     </form-item>
                 </i-col>
            	</row>
@@ -417,7 +417,7 @@ color: #FF3030;
                     	<date-picker type="date" v-model="commitInfoForm.operateDate"/>
                     </form-item>
                     <form-item v-else label="移交时间："  disabled>
-                    	<date-picker type="date" v-model="commitInfoForm.operateDate"/>
+                    	<date-picker type="date" v-model="commitInfoForm.operateDate" disabled/>
                     </form-item>
                 </i-col>
 			</row>
