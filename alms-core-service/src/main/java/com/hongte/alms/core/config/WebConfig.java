@@ -1,18 +1,21 @@
 package com.hongte.alms.core.config;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.text.SimpleDateFormat;
+import java.util.List;
+
+import javax.servlet.MultipartConfigElement;
+
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import java.text.SimpleDateFormat;
-import java.util.List;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author zengkun
@@ -35,7 +38,15 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         converter.setObjectMapper(mapper);
         return converter;
     }
-
+    @Bean  
+    public MultipartConfigElement multipartConfigElement() {  
+        MultipartConfigFactory factory = new MultipartConfigFactory();  
+        //单个文件最大  
+        factory.setMaxFileSize("10240KB"); //KB,MB  
+        /// 设置总上传数据总大小  
+        factory.setMaxRequestSize("102400KB");  
+        return factory.createMultipartConfig();  
+    }  
     //添加转换器
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
