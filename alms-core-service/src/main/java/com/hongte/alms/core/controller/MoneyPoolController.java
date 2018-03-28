@@ -298,7 +298,7 @@ public class MoneyPoolController {
 			return Result.success(list);
 		}else {
 			EntityWrapper<MoneyPoolRepayment> ew = new EntityWrapper<MoneyPoolRepayment>();
-			ew.eq("original_business_id", businessId).eq("after_id", afterId).orderBy("id");
+			ew.eq("original_business_id", businessId).eq("after_id", afterId).orderBy("update_time",false).orderBy("trade_date",false);
 			List<MoneyPoolRepayment> list = moneyPoolRepaymentService.selectList(ew);
 			return Result.success(list);
 		}
