@@ -29,8 +29,9 @@ public class CarController {
 	    }
 
 	    @RequestMapping("returnReg")
-	    public String returnReg(ModelMap map,@RequestParam("businessId") String businessId) {
+	    public String returnReg(ModelMap map,@RequestParam("businessId") String businessId,@RequestParam("dragId") String dragId) {
 	    	 map.addAttribute("businessId",businessId);
+	    	 map.addAttribute("dragId",dragId);
 	        return "/assets/car/returnReg";
 	    }
 	    @RequestMapping("againAssess")

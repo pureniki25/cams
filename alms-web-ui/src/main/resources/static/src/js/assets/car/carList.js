@@ -269,7 +269,8 @@ window.layinit(function (htConfig) {
                         field: 'status',
                         title: '状态'//,
                         //templet: '#statusTpl'	
-                    }, {
+                    }
+                    , {
                         fixed: 'right',
                         title: '操作',
                         width: 178,
@@ -296,7 +297,7 @@ window.layinit(function (htConfig) {
                         	
                         	{"name": "发起拍卖", click: function (e, currentItem) {
                                 if(authValid('carAuction')){
-                        		 showNewTab(currentItem,"carAuction","车牌号-车辆型号 拍卖申请");
+                                	showNewTab2(currentItem,"carAuction","车牌号-车辆型号 拍卖申请");
                                 }else{
                                 	   layer.msg("对不起，你没有权限",{icon:5,shade: [0.8, '#393D49'],time:3000});
                                 	
@@ -326,7 +327,7 @@ window.layinit(function (htConfig) {
                             {"name": "车辆归还登记", click: function (e, currentItem) {
                             	//alert(JSON.stringify(currentItem));
                         	   if(authValid('returnReg')&&"待处置"==currentItem.status){
-                        			showNewTab(currentItem,"returnReg","车辆归还登记");
+                        		   showNewTab2(currentItem,"returnReg","车辆归还登记");
                                 }
                         	   else if(authValid('returnReg')&&"待处置"!=currentItem.status){
                         		   layer.msg("该车处于非待处置状态，不允许归还登记",{icon:5,shade: [0.8, '#393D49'],time:3000});
@@ -408,6 +409,18 @@ window.layinit(function (htConfig) {
           showNewTab=function(currentItem,reqType,reqTypeName){
         	
         	  var url="/assets/car/"+reqType+"?businessId="+currentItem.businessId;
+        	    var openIndex= layer.open({
+        	        type: 2,
+                    area: ['95%', '95%'],
+                    fixed: false,
+                    maxmin: true,
+                    title:reqTypeName,
+                    content: url
+        	    });
+          };
+          showNewTab2=function(currentItem,reqType,reqTypeName){
+       
+        	  var url="/assets/car/"+reqType+"?businessId="+currentItem.businessId+"&dragId="+currentItem.dragId;
         	    var openIndex= layer.open({
         	        type: 2,
                     area: ['95%', '95%'],

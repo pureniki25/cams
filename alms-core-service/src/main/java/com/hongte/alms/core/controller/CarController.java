@@ -271,6 +271,16 @@ public class CarController {
 	public Result<Object> saveDragRegistrationInfo(@RequestBody CarDragRegistrationInfo registrationInfo)
 	{
 		try {
+			//
+			CarBasic carBasic=carBasicService.selectById(registrationInfo.getBusinessId());
+			if(carBasic==null) {
+				logger.error("车辆信息不存在,businessId="+registrationInfo.getBusinessId());
+				return Result.error("500","车辆信息不存在");
+			}
+			if(!CarStatusEnums.RETURNED.getStatusCode().equals(carBasic.getStatus())||!StringUtils.isEmpty(carBasic.getStatus())) {
+				logger.error("车辆未归还或非默认状态不允许拖车,businessId="+registrationInfo.getBusinessId());
+				return Result.error("500","车辆未归还不允许拖车");
+			}
 			SimpleDateFormat dragDateFormat=new SimpleDateFormat("yyyy-MM-dd");
 			Date dragDate=dragDateFormat.parse(registrationInfo.getDragDate());
 			CarDrag carDrag=new CarDrag();
@@ -289,7 +299,7 @@ public class CarController {
 			carDrag.setCreateTime(new Date());
 			carDragService.insert(carDrag);
 			CarBasic originCarBasic= carBasicService.selectOne(new EntityWrapper<CarBasic>().eq("business_id",registrationInfo.getBusinessId()));
-            originCarBasic.setStatus("01");
+            originCarBasic.setStatus(CarStatusEnums.PENDING.getStatusCode());
             carBasicService.updateAllColumnById(originCarBasic);
 			List<CarDragDoc> attachments=registrationInfo.getAttachments();
 			if(attachments!=null&&attachments.size()>0) {
@@ -420,7 +430,7 @@ public class CarController {
     
     @ApiOperation(value = "获取车辆归还信息")
     @PostMapping("/getReturnReg")
-    public Result<Object> getReturnReg(@ModelAttribute("businessId") String businessId){
+    public Result<Object> getReturnReg(@ModelAttribute("businessId") String businessId,@ModelAttribute("dragId") String dragId){
     	try {
     	BasicBusiness business=basicBusinessService.selectById(businessId);
     	CarBasic carBasic=carBasicService.selectById(businessId);
@@ -429,7 +439,7 @@ public class CarController {
     		return Result.error("9999", "该车处于非处置状态不允许归还操作");
     	}
     	List<CarDrag> drag=carDragService.selectList(
-    	        new EntityWrapper<CarDrag>().eq("business_id", businessId)); 
+    	        new EntityWrapper<CarDrag>().eq("id", dragId)); 
     	List<SysProvince> provs=new ArrayList<SysProvince>();
     
     	Map<String, Object> map=new HashMap<String,Object>();
@@ -522,30 +532,7 @@ try {
     @PostMapping("/addReturnReg")
     public Result<Object> addReturnReg( @RequestBody Map<String,Object> params){
     	try {
-    	CarReturnReg returnReg=JsonUtil.map2obj((Map<String,Object>)params.get("returnReg"), CarReturnReg.class);
-    	List<FileVo> files=JsonUtil.map2objList(params.get("returnRegFiles"), FileVo.class);
-    	CarReturnReg carReturnReg=carReturnRegService.selectById(returnReg.getBusinessId());
-    	if(carReturnReg==null) {
-  
-    		carReturnReg=new CarReturnReg();
-    		carReturnReg.setCreateTime(new Date());
-    		carReturnReg.setCreateUser(loginUserInfoHelper.getUserId());
-    	}
-  		BeanUtils.copyProperties(returnReg, carReturnReg);
-    	carReturnRegService.insertOrUpdate(carReturnReg);
-    	if(files!=null&&files.size()>0) {
-    		for(FileVo file:files) {
-    			
-    			DocTmp tmp=docTmpService.selectById(file.getOldDocId());//将临时表保存的上传信息保存到主表中
-    			if(tmp!=null) {
-    				Doc doc=new Doc();
-    				BeanUtils.copyProperties(tmp, doc);
-    				doc.setOriginalName(file.getOriginalName());
-    				docService.insertOrUpdate(doc);
-    			}
-    			
-    		}
-    	}
+    	carService.addReturnReg(params);
 
     	return Result.build("0000", "操作成功", "");
 	}catch (Exception e) {
@@ -556,13 +543,13 @@ try {
     
     @ApiOperation(value="查询拍卖登记信息")
     @PostMapping("/auctionDetail")
-    public Result<Object> AuctionDetail(@ModelAttribute("businessId") String businessId){
+    public Result<Object> AuctionDetail(@ModelAttribute("businessId") String businessId,@ModelAttribute("dragId") String dragId){
      	try {
     	BasicBusiness business=basicBusinessService.selectById(businessId);
     	CarBasic carBasic=carBasicService.selectById(businessId);
     	//拖车信息
     	List<CarDrag> drag=carDragService.selectList(
-    	        new EntityWrapper<CarDrag>().eq("business_id", businessId)); 
+    	        new EntityWrapper<CarDrag>().eq("id", dragId)); 
     	//获取最新评估信息
     	CarDetection detection=carDetectionService.selectById(carBasic.getLastDetectionId());
     	//获取抵押时的评估信息

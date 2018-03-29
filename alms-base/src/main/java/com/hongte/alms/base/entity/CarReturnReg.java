@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
+import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
@@ -15,8 +16,8 @@ import io.swagger.annotations.ApiModelProperty;
  * 车辆归还登记
  * </p>
  *
- * @author cj
- * @since 2018-03-02
+ * @author 王继光
+ * @since 2018-03-29
  */
 @ApiModel
 @TableName("tb_car_return_reg")
@@ -27,7 +28,7 @@ public class CarReturnReg extends Model<CarReturnReg> {
     /**
      * 资产端业务编号 
      */
-    @TableId("business_id")
+	@TableField("business_id")
 	@ApiModelProperty(required= true,value = "资产端业务编号 ")
 	private String businessId;
     /**
@@ -101,6 +102,30 @@ public class CarReturnReg extends Model<CarReturnReg> {
 	@TableField("create_user")
 	@ApiModelProperty(required= true,value = "创建人 ")
 	private String createUser;
+    /**
+     * 归还登记id
+     */
+    @TableId("return_reg_id")
+	@ApiModelProperty(required= true,value = "归还登记id")
+	private String returnRegId;
+    /**
+     * 拖车id
+     */
+	@TableField("drag_id")
+	@ApiModelProperty(required= true,value = "拖车id")
+	private String dragId;
+    /**
+     * 更新时间
+     */
+	@TableField("update_time")
+	@ApiModelProperty(required= true,value = "更新时间")
+	private Date updateTime;
+    /**
+     * 更新人
+     */
+	@TableField("update_user")
+	@ApiModelProperty(required= true,value = "更新人")
+	private String updateUser;
 
 
 	public String getBusinessId() {
@@ -159,6 +184,8 @@ public class CarReturnReg extends Model<CarReturnReg> {
 		this.returnAddr = returnAddr;
 	}
 
+
+
 	public Boolean getIsPayTrailerCost() {
 		return isPayTrailerCost;
 	}
@@ -207,9 +234,41 @@ public class CarReturnReg extends Model<CarReturnReg> {
 		this.createUser = createUser;
 	}
 
+	public String getReturnRegId() {
+		return returnRegId;
+	}
+
+	public void setReturnRegId(String returnRegId) {
+		this.returnRegId = returnRegId;
+	}
+
+	public String getDragId() {
+		return dragId;
+	}
+
+	public void setDragId(String dragId) {
+		this.dragId = dragId;
+	}
+
+	public Date getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
+	}
+
+	public String getUpdateUser() {
+		return updateUser;
+	}
+
+	public void setUpdateUser(String updateUser) {
+		this.updateUser = updateUser;
+	}
+
 	@Override
 	protected Serializable pkVal() {
-		return this.businessId;
+		return this.returnRegId;
 	}
 
 	@Override
@@ -228,6 +287,10 @@ public class CarReturnReg extends Model<CarReturnReg> {
 			", note=" + note +
 			", createTime=" + createTime +
 			", createUser=" + createUser +
+			", returnRegId=" + returnRegId +
+			", dragId=" + dragId +
+			", updateTime=" + updateTime +
+			", updateUser=" + updateUser +
 			"}";
 	}
 }

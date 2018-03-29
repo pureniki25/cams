@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.web.bind.annotation.RequestBody;
+
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.assets.car.vo.AuctionAplyVo;
 import com.hongte.alms.base.assets.car.vo.AuctionBidderVo;
@@ -11,6 +13,7 @@ import com.hongte.alms.base.assets.car.vo.AuctionRespVo;
 import com.hongte.alms.base.assets.car.vo.AuctionsReqVo;
 import com.hongte.alms.base.assets.car.vo.CarReq;
 import com.hongte.alms.base.assets.car.vo.CarVo;
+import com.hongte.alms.common.result.Result;
 
 public interface CarService {
 
@@ -26,4 +29,5 @@ public interface CarService {
 	void auctionAudit(AuctionAplyVo auctionAplyVo)throws Exception;
 	void againAssess(AuctionAplyVo auctionAplyVo);
 	void auctionSign(Map<String,Object> params);
+	void addReturnReg( @RequestBody Map<String,Object> params);
 }
