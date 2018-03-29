@@ -221,8 +221,8 @@ public class ExpenseSettleController {
 
 	}
 
-	private ExpenseSettleVO calXXHB(Date settleDate, BasicBusiness basicBusiness, RepaymentBizPlan plan,
-			List<RepaymentBizPlanList> planLists, List<RepaymentBizPlanListDetail> details) {
+	private ExpenseSettleVO calXXHB(final Date settleDate,final BasicBusiness basicBusiness,final RepaymentBizPlan plan,
+			final List<RepaymentBizPlanList> planLists,final List<RepaymentBizPlanListDetail> details) {
 		callRemoteService(basicBusiness.getBusinessId());
 		RepaymentBizPlanList finalPeriod = planLists.get(planLists.size() - 1);
 //		RepaymentBizPlanList currentPeriod = findCurrentPeriod(settleDate, planLists);
@@ -506,14 +506,12 @@ public class ExpenseSettleController {
 			List<RepaymentBizPlanListDetail> planListDetails) {
 		BigDecimal tmp = new BigDecimal(0);
 		
-		for (RepaymentBizPlanList currentPlanList : currentPlanLists) {
 			for (RepaymentBizPlanListDetail repaymentBizPlanListDetail : planListDetails) {
-				if (repaymentBizPlanListDetail.getPeriod() > currentPlanList.getPeriod()
+				if (repaymentBizPlanListDetail.getPeriod() > currentPlanLists.get(0).getPeriod()
 						&& repaymentBizPlanListDetail.getPlanItemType() == 30) {
 					tmp = tmp.add(repaymentBizPlanListDetail.getPlanAmount());
 				}
 			}
-		}
 		
 		
 		
@@ -600,7 +598,8 @@ public class ExpenseSettleController {
 			String feeTypeName = j.getString("fee_type_name");
 			BigDecimal feeValue =  j.getBigDecimal("fee_value");
 			BigDecimal factFeeValue = j.getBigDecimal("fact_fee_value");
-			if (feeTypeName.equals("担保公司费用")) {
+			Integer isOneTimeCharge = j.getInteger("is_one_time_charge");
+			if (feeTypeName.equals("担保公司费用")&&isOneTimeCharge.equals(new Integer(1))) {
 				if (factFeeValue==null) {
 					guaranteeFee = feeValue ;
 				}else {
@@ -610,8 +609,8 @@ public class ExpenseSettleController {
 		}
 	}
 
-	private ExpenseSettleVO calDEBX(Date settleDate, BasicBusiness basicBusiness, RepaymentBizPlan plan,
-			List<RepaymentBizPlanList> planLists, List<RepaymentBizPlanListDetail> details) {
+	private ExpenseSettleVO calDEBX(final Date settleDate,final BasicBusiness basicBusiness,final RepaymentBizPlan plan,final
+			List<RepaymentBizPlanList> planLists,final List<RepaymentBizPlanListDetail> details) {
 		
 		RepaymentBizPlanList finalPeriod = planLists.get(planLists.size() - 1);
 //		RepaymentBizPlanList currentPeriod = findCurrentPeriod(settleDate, planLists);
