@@ -35,6 +35,18 @@ public class ExpenseSettleLackFeeVO{
 	 */
 	private BigDecimal servicecharge ;
 	/**
+	 * 少交的利息
+	 */
+	private BigDecimal interest ;
+	/**
+	 * 少交的平台费
+	 */
+	private BigDecimal platFormFee;
+	/**
+	 * 少交的本金
+	 */
+	private BigDecimal principal ;
+	/**
 	 * 少交的滞纳金
 	 */
 	private BigDecimal lateFee ;
@@ -73,5 +85,41 @@ public class ExpenseSettleLackFeeVO{
 	 */
 	public void setLateFee(BigDecimal lateFee) {
 		this.lateFee = lateFee;
+	}
+	/**
+	 * @return the principal
+	 */
+	public BigDecimal getPrincipal() {
+		return principal;
+	}
+	/**
+	 * @param principal the principal to set
+	 */
+	public void setPrincipal(BigDecimal principal) {
+		this.principal = principal;
+	}
+	/**
+	 * @return the platFormFee
+	 */
+	public BigDecimal getPlatFormFee() {
+		return platFormFee;
+	}
+	/**
+	 * @param platFormFee the platFormFee to set
+	 */
+	public void setPlatFormFee(BigDecimal platFormFee) {
+		this.platFormFee = platFormFee;
+	}
+	/**
+	 * @return the interest
+	 */
+	public BigDecimal getInterest() {
+		return interest;
+	}
+	/**
+	 * @param interest the interest to set
+	 */
+	public void setInterest(BigDecimal interest) {
+		this.interest = interest;
 	}
 }

@@ -707,66 +707,91 @@
 	</select>
 	
 	<select id="queryPreviousFees" resultType="com.hongte.alms.base.vo.billing.PreviousFeesVO">
-	  SELECT tab.period,	-- 期数
-	  		 (tab.planAccrual - tab.factAccrual) as previousPlanAccrual, -- 往期少交利息
-	  		 (tab.planServiceCharge - tab.factServiceCharge) as previousPlanServiceCharge, --  往期 少交服务费
-	  		 (tab.pateFees - tab.factLateFees) as previousLateFees --  往期少交滞纳金
-	  	FROM
-	   (
-		SELECT
-		  t2.`period`,		  
-		  SUM(
-		    CASE
-		      WHEN t.plan_item_type = 20 
-		      THEN t.plan_amount 
-		      ELSE 0 
-		    END
-		  ) AS `planAccrual`,-- 应交利息
-		  SUM(
-		    CASE
-		      WHEN t.plan_item_type = 30 
-		      THEN t.plan_amount 
-		      ELSE 0 
-		    END
-		  ) AS `planServiceCharge`,	-- 应交服务费
-		  SUM(
-		    CASE
-		      WHEN t.plan_item_type = 60 
-		      THEN t.fact_amount 
-		      ELSE 0 
-		    END
-		  ) AS `pateFees`, -- 应交滞纳金
-		  SUM(
-		    CASE
-		      WHEN t.plan_item_type = 20 
-		      THEN t.fact_amount 
-		      ELSE 0 
-		    END
-		  ) AS `factAccrual`,-- 实交利息 
-		  SUM(
-		    CASE
-		      WHEN t.plan_item_type = 30 
-		      THEN t.fact_amount 
-		      ELSE 0 
-		    END
-		  ) AS `factServiceCharge`,	-- 实缴服务费
-		  SUM(
-		    CASE
-		      WHEN t.plan_item_type = 60 
-		      THEN t.plan_amount 
-		      ELSE 0 
-		    END
-		  ) AS `factLateFees` -- 实缴滞纳金
+		SELECT 
+		  tab.period,
+		  -- 期数
+		  (
+		    tab.planAccrual - tab.factAccrual
+		  ) AS previousPlanAccrual,
+		  -- 往期少交利息
+		  (
+		    tab.planServiceCharge - tab.factServiceCharge
+		  ) AS previousPlanServiceCharge,
+		  --  往期 少交服务费
+		  (tab.pateFees - tab.factLateFees) AS previousLateFees 
+		  --  往期少交滞纳金
 		FROM
-		  tb_repayment_biz_plan_list_detail t,
-		  tb_repayment_biz_plan_list t2,
-		  tb_repayment_biz_plan t3 
-		WHERE t.plan_list_id = t2.plan_list_id 
-		  AND t2.plan_id = t3.plan_id 
+		  (SELECT 
+		    t2.`period`,
+		    SUM(
+		      CASE
+		        WHEN t.plan_item_type = 20 
+		        THEN t.plan_amount 
+		        ELSE 0 
+		      END
+		    ) AS `planAccrual`,
+		    -- 应交利息
+		    SUM(
+		      CASE
+		        WHEN t.plan_item_type = 30 
+		        THEN t.plan_amount 
+		        ELSE 0 
+		      END
+		    ) AS `planServiceCharge`,
+		    -- 应交服务费
+		    SUM(
+		      CASE
+		        WHEN t.plan_item_type = 60 
+		        THEN t.plan_amount 
+		        ELSE 0 
+		      END
+		    ) AS `pateFees`,
+		    -- 应交滞纳金
+		    SUM(
+		      CASE
+		        WHEN t.plan_item_type = 20 
+		        THEN t.fact_amount 
+		        ELSE 0 
+		      END
+		    ) AS `factAccrual`,
+		    -- 实交利息 
+		    SUM(
+		      CASE
+		        WHEN t.plan_item_type = 30 
+		        THEN t.fact_amount 
+		        ELSE 0 
+		      END
+		    ) AS `factServiceCharge`,
+		    -- 实缴服务费
+		    SUM(
+		      CASE
+		        WHEN t.plan_item_type = 60 
+		        THEN t.fact_amount 
+		        ELSE 0 
+		      END
+		    ) AS `factLateFees` -- 实缴滞纳金
+		  FROM
+		    tb_repayment_biz_plan_list_detail t,
+		    tb_repayment_biz_plan_list t2,
+		    tb_repayment_biz_plan t3 
+		  WHERE t.plan_list_id = t2.plan_list_id 
+		    AND t2.plan_id = t3.plan_id 
 		  AND t2.`due_date` <![CDATA[ < ]]> #{billDate,jdbcType=DATE}
 		  AND t3.original_business_id = #{businessId,jdbcType=VARCHAR} 
 		  AND IFNULL(t2.repay_flag, 0) != 6
 		GROUP BY t.`plan_list_id`) tab
+		ORDER BY tab.period
+	</select>
+	
+	<select id="countOverdueByBusinessId" resultType="java.lang.Integer">
+		SELECT 
+		  COUNT(1)
+		FROM
+		  tb_repayment_biz_plan t1,
+		  tb_repayment_biz_plan_list t2
+		  WHERE t1.`plan_id` = t2.`plan_id`
+		  AND t2.`current_status` = '逾期'
+		  AND t1.`original_business_id` = #{businessId,jdbcType=VARCHAR} 
 	</select>
 	
 	<select id="queryMaxDueDateByBusinessId" resultType="map">

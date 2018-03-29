@@ -78,7 +78,7 @@ public class ExpenseSettleVO implements Serializable{
 	 * @param principal the principal to set
 	 */
 	public void setPrincipal(BigDecimal principal) {
-		this.principal = principal;
+		this.principal = principal.setScale(2,BigDecimal.ROUND_HALF_UP);
 	}
 
 	/**
@@ -92,7 +92,7 @@ public class ExpenseSettleVO implements Serializable{
 	 * @param interest the interest to set
 	 */
 	public void setInterest(BigDecimal interest) {
-		this.interest = interest;
+		this.interest = interest.setScale(2,BigDecimal.ROUND_HALF_UP);;
 	}
 
 	/**
@@ -106,7 +106,7 @@ public class ExpenseSettleVO implements Serializable{
 	 * @param servicecharge the servicecharge to set
 	 */
 	public void setServicecharge(BigDecimal servicecharge) {
-		this.servicecharge = servicecharge;
+		this.servicecharge = servicecharge.setScale(2,BigDecimal.ROUND_HALF_UP);;
 	}
 
 	/**
@@ -120,7 +120,7 @@ public class ExpenseSettleVO implements Serializable{
 	 * @param guaranteeFee the guaranteeFee to set
 	 */
 	public void setGuaranteeFee(BigDecimal guaranteeFee) {
-		this.guaranteeFee = guaranteeFee;
+		this.guaranteeFee = guaranteeFee.setScale(2,BigDecimal.ROUND_HALF_UP);;
 	}
 
 	/**
@@ -134,7 +134,7 @@ public class ExpenseSettleVO implements Serializable{
 	 * @param platformFee the platformFee to set
 	 */
 	public void setPlatformFee(BigDecimal platformFee) {
-		this.platformFee = platformFee;
+		this.platformFee = platformFee.setScale(2,BigDecimal.ROUND_HALF_UP);;
 	}
 
 	/**
@@ -148,7 +148,7 @@ public class ExpenseSettleVO implements Serializable{
 	 * @param lateFee the lateFee to set
 	 */
 	public void setLateFee(BigDecimal lateFee) {
-		this.lateFee = lateFee;
+		this.lateFee = lateFee.setScale(2,BigDecimal.ROUND_HALF_UP);;
 	}
 
 	/**
@@ -162,7 +162,7 @@ public class ExpenseSettleVO implements Serializable{
 	 * @param demurrage the demurrage to set
 	 */
 	public void setDemurrage(BigDecimal demurrage) {
-		this.demurrage = demurrage;
+		this.demurrage = demurrage.setScale(2,BigDecimal.ROUND_HALF_UP);;
 	}
 
 	/**
@@ -176,7 +176,7 @@ public class ExpenseSettleVO implements Serializable{
 	 * @param penalty the penalty to set
 	 */
 	public void setPenalty(BigDecimal penalty) {
-		this.penalty = penalty;
+		this.penalty = penalty.setScale(2,BigDecimal.ROUND_HALF_UP);;
 	}
 
 	/**
@@ -190,7 +190,7 @@ public class ExpenseSettleVO implements Serializable{
 	 * @param lackFee the lackFee to set
 	 */
 	public void setLackFee(BigDecimal lackFee) {
-		this.lackFee = lackFee;
+		this.lackFee = lackFee.setScale(2,BigDecimal.ROUND_HALF_UP);;
 	}
 
 	/**
@@ -225,7 +225,7 @@ public class ExpenseSettleVO implements Serializable{
 	 * @param balance the balance to set
 	 */
 	public void setBalance(BigDecimal balance) {
-		this.balance = balance;
+		this.balance = balance.setScale(2,BigDecimal.ROUND_HALF_UP);;
 	}
 
 	/**
@@ -239,6 +239,6 @@ public class ExpenseSettleVO implements Serializable{
 	 * @param deposit the deposit to set
 	 */
 	public void setDeposit(BigDecimal deposit) {
-		this.deposit = deposit;
+		this.deposit = deposit.setScale(2,BigDecimal.ROUND_HALF_UP);;
 	}
 }

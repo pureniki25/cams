@@ -109,4 +109,11 @@ public interface TransferOfLitigationMapper {
 	 * @return
 	 */
 	Double queryBalanceDueByBillDate(@Param(value="businessId") String businessId, @Param(value="billDate") Date billDate);
+	
+	/**
+	 * 根据业务编号统计逾期次数
+	 * @param businessId
+	 * @return
+	 */
+	Integer countOverdueByBusinessId(@Param(value="businessId") String businessId);
 }

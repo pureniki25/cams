@@ -9,6 +9,7 @@ import java.math.RoundingMode;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,6 +71,7 @@ import com.hongte.alms.common.util.StringUtil;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.util.BeanUtils;
 
+@RefreshScope
 @Service("TransferOfLitigationService")
 public class TransferLitigationServiceImpl implements TransferOfLitigationService {
 
@@ -129,6 +133,9 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	@Autowired
 	@Qualifier("TransferLitigationLogService")
 	private TransferLitigationLogService transferLitigationLogService;
+	
+	@Value("${ht.billing.west.part.business}")
+	private String westPartBusiness;
 
 	@Override
 	public Map<String, Object> queryCarLoanData(String businessId) {
@@ -488,9 +495,12 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		String businessId = carLoanBilVO.getBusinessId();
 		Date billDate = carLoanBilVO.getBillDate(); // 预计结清日期
 		Map<String, Object> resultMap = queryCarLoanData(businessId);
+		
+		List<String> lstWestPartBusiness = Arrays.asList(westPartBusiness.split(","));
 
 		double innerLateFees = 0; // 期内滞纳金
 		double outsideInterest = 0; // 期外逾期利息
+		double overdueDefault = 0; // 逾期违约金
 		double preLateFees = 0; // 提前还款违约金
 		double squaredUp = 0; // 最终结清金额
 		double receivableTotal = 0; // 应收合计
@@ -501,6 +511,9 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 			Map<String, Object> maxPeriodMap = transferOfLitigationMapper.queryMaxDueDateByBusinessId(businessId); // 合同到期日
 			Date maxDueDate = (Date) maxPeriodMap.get("maxDueDate");
+			String companyName = (String) resultMap.get("companyName");
+			
+			int countOverdue = transferOfLitigationMapper.countOverdueByBusinessId(businessId);
 			
 			if (!billDate.after(maxDueDate)) {	// 若 billDate 早于 maxDueDate  取dueDate比billDate大的最近的一期
 				// 当期的 利息、服务费、担保公司费用、平台费
@@ -563,6 +576,10 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			int preLateFeeType = carLoanBilVO.getPreLateFees(); // 提前还款违约金类型
 
 			innerLateFees = borrowMoney * innerLate * overdueDays;
+			
+			if (outputPlatformId == 1 && countOverdue > 0 && CollectionUtils.isNotEmpty(lstWestPartBusiness) && lstWestPartBusiness.contains(companyName)) {
+				overdueDefault = borrowMoney * 0.2;
+			}
 
 			// 判断预计结算日期是否超过合同日期
 			if (billDate.after(maxDueDate)) {
@@ -589,6 +606,9 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				// 判断是否分公司服务费前置收取 isPreServiceFees == 1， 是 isPreServiceFees == 0 否
 				if ("到期还本息".equals(repaymentTypeId) || "每月付息到期还本".equals(repaymentTypeId)) {
 					if (outputPlatformId == 1) {
+						if (countOverdue > 0 && CollectionUtils.isNotEmpty(lstWestPartBusiness) && lstWestPartBusiness.contains(companyName)) {
+							overdueDefault = borrowMoney * 0.2;
+						}
 						preLateFees = 0;
 					}
 				} else if ("等额本息".equals(repaymentTypeId)) {
@@ -649,7 +669,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 			receivableTotal = borrowMoney + planAccrual + planServiceCharge + planPlatformCharge + planGuaranteeCharge
 					+ innerLateFees + outsideInterest + preLateFees + balanceDue + parkingFees + gpsFees + dragFees
-					+ otherFees + attorneyFees;
+					+ otherFees + attorneyFees + overdueDefault;
 			squaredUp = receivableTotal - cash - balance;
 			resultMap.put("innerLateFees", BigDecimal.valueOf(innerLateFees).setScale(2, RoundingMode.HALF_UP).doubleValue());
 			resultMap.put("outsideInterest", BigDecimal.valueOf(outsideInterest).setScale(2, RoundingMode.HALF_UP).doubleValue());
@@ -659,6 +679,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			resultMap.put("squaredUp", BigDecimal.valueOf(squaredUp).setScale(2, RoundingMode.HALF_UP).doubleValue());
 			resultMap.put("cash", BigDecimal.valueOf(cash).setScale(2, RoundingMode.HALF_UP).doubleValue());
 			resultMap.put("balance", BigDecimal.valueOf(balance).setScale(2, RoundingMode.HALF_UP).doubleValue());
+			resultMap.put("overdueDefault", BigDecimal.valueOf(overdueDefault).setScale(2, RoundingMode.HALF_UP).doubleValue());
 			resultMap.put("preLateFeesFlag", preLateFeesFlag);
 		}
 
