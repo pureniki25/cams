@@ -907,28 +907,26 @@
 	
 	<select id="queryOverRepayMoneyByBusinessId" resultType="java.lang.Double">
 		SELECT 
-		  IFNULL((
+		  (
 		    t1.over_repay_money_1 - t2.over_repay_money_0
-		  ),0) over_repay_money 
+		  ) over_repay_money 
 		FROM
 		  (SELECT 
 		    t.business_id,
-		    SUM(t.over_repay_money) over_repay_money_1 
+		    IFNULL(SUM(t.over_repay_money),0) over_repay_money_1 
 		  FROM
 		    `tb_accountant_over_repay_log` t 
 		  WHERE t.freeze_status != 1 
-		    AND t.money_type = 1 
-		  GROUP BY t.business_id) t1,
+		    AND t.money_type = 1
+		    AND t.business_id = #{businessId,jdbcType=VARCHAR}) t1,
 		  (SELECT 
 		    t.business_id,
-		    SUM(t.over_repay_money) over_repay_money_0 
+		    IFNULL(SUM(t.over_repay_money), 0) over_repay_money_0 
 		  FROM
 		    `tb_accountant_over_repay_log` t 
 		  WHERE t.freeze_status != 1 
-		    AND t.money_type = 0 
-		  GROUP BY t.business_id) t2 
-		WHERE t1.business_id = t2.business_id 
-		  AND t1.business_id = #{businessId,jdbcType=VARCHAR} 
+		    AND t.money_type = 0
+		    AND t.business_id = #{businessId,jdbcType=VARCHAR}) t2   
 	</select>
 	
 	<select id="queryRefundMoneyByBusinessId" resultType="java.lang.Double">
