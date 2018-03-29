@@ -8,7 +8,7 @@ public class CarLoanBilVO {
 	/**
 	 * 预计结清日期
 	 */
-	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
+	@JsonFormat(pattern="yyyy-MM-dd",timezone="GMT-16")
 	private Date billDate;
 	/**
 	 * 期内滞纳金
@@ -20,7 +20,7 @@ public class CarLoanBilVO {
 	private double outsideInterest;
 	/**
 	 * 提前还款违约金
-	 */
+	 */	
 	private int preLateFees;
 	/**
 	 * 停车费
