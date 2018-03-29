@@ -116,4 +116,32 @@ public interface TransferOfLitigationMapper {
 	 * @return
 	 */
 	Integer countOverdueByBusinessId(@Param(value="businessId") String businessId);
+	
+	/**
+	 * 根据业务编号查询还款方式
+	 * @param businessId
+	 * @return
+	 */
+	String queryRepaymentTypeByBusinessId(@Param(value="businessId") String businessId);
+	
+	/**
+	 * 根据业务编号查找等额本息还款状态为逾期的最早一期时的剩余本金
+	 * @param businessId
+	 * @return
+	 */
+	Double queryMatchingRepaymentPlanAccrualSurplusPrincipal(@Param(value="businessId") String businessId);
+	
+	/**
+	 * 根据业务编号查找结余金额
+	 * @param businessId
+	 * @return
+	 */
+	Double queryOverRepayMoneyByBusinessId(@Param(value="businessId") String businessId);
+	
+	/**
+	 * 根据业务编号查找押金转还款金额
+	 * @param businessId
+	 * @return
+	 */
+	Double queryRefundMoneyByBusinessId(@Param(value="businessId") String businessId);
 }
