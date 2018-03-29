@@ -440,7 +440,7 @@ window.layinit(function(htConfig){
                 if(authValid('upLoad')){
 	                buttons.push(
 	                    {"name": "上传附件", click: function (e, currentItem) {
-	                        var url = '/page/doc/upLoad.html?businessId'+currentItem.businessId
+	                        var url = '/page/doc/upLoad.html?businessId='+currentItem.businessId
 	                        showOneLineOprLayer(url,"上传附件")
 	                    }}
 	                )
