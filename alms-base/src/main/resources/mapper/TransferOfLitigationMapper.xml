@@ -8,6 +8,7 @@
    			<result property="businessTypeName" column="businessTypeName"/>
    			<result property="customerName" column="customerName"/>
    			<result property="customerType" column="customerType"/>
+   			<result property="loanRate" column="loanRate"/>
    			<result property="customerIdentifyCard" column="customerIdentifyCard"/>
    			<result property="finalBorrowMoney" column="finalBorrowMoney"/>
    			<result property="borrowLimit" column="borrowLimit"/>
@@ -82,6 +83,7 @@
 		  IFNULL(t5.surplus_principal, 0) surplusPrincipal,
 		  IFNULL(t5.surplusServiceCharge, 0) surplusServiceCharge,
 		  t5.fact_repay_date factRepayDate,
+		  t5.due_date _dueDate,
 		  t6.output_user_name outputUserName,
 		  t6.fact_output_date factOutputDate,
 		  (SELECT 
@@ -104,6 +106,7 @@
 		    tab.fact_accrual,
 		    tab.business_id,
 		    tab.fact_repay_date,
+		    tab.due_date,
 		    (
 		      tab.plan_principal - tab.fact_principal
 		    ) surplus_principal,
@@ -114,6 +117,7 @@
 		    (SELECT 
 		      tab2.`original_business_id` business_id,
 		      MAX(tab1.fact_repay_date) fact_repay_date,
+		      MIN(tab1.due_date) due_date,	-- 最小应还日期
 		      SUM(
 		        CASE
 		          WHEN tab3.plan_item_type = 10 
@@ -175,7 +179,7 @@
 		  AND t1.`business_id` = t3.`business_id` 
 		  AND t1.`business_id` = t6.`business_id` 
 		  AND t2.`last_detection_id` = t3.`id` 
-		  AND t1.`business_id` = #{businessId,jdbcType=VARCHAR} 	
+		  AND t1.`business_id` = #{businessId,jdbcType=VARCHAR}	
 	</select>
 	
 	<select id="queryTransferLitigationCarData" resultType="com.hongte.alms.base.vo.litigation.BusinessCar">
@@ -336,7 +340,103 @@
 	</select>
 	
 	<select id="queryLitigationBorrowerDetailed" resultType="com.hongte.alms.base.vo.litigation.LitigationBorrowerDetailed">
-		
+		SELECT 
+		  a.business_id businessId,
+		  -- 主借款人
+		  a.real_name AS "name",
+		  a.identity_card identifyCard,
+		  CASE
+		    a.`user_type_id` 
+		    WHEN 1 
+		    THEN 0
+		    WHEN 2 
+		    THEN 1
+		    ELSE null 
+		  END borrowerType,
+		  1 AS "type" 
+		FROM
+		  tb_tuandai_project_info a 
+		WHERE IFNULL(a.master_issue_id, 0) = 1 
+		  AND a.begin_time IS NOT NULL 
+		  AND a.business_id = #{businessId,jdbcType=VARCHAR} 
+		UNION
+		ALL 
+		SELECT 
+		  a.business_id businessId,
+		  -- `共借款人`
+		  a.real_name AS "name",
+		  a.identity_card identifyCard,
+		  CASE
+		    a.`user_type_id` 
+		    WHEN 1 
+		    THEN 0 
+		    WHEN 2 
+		    THEN 1 
+		    ELSE null 
+		  END borrowerType,
+		  2 AS "type" 
+		FROM
+		  tb_tuandai_project_info a 
+		WHERE IFNULL(a.master_issue_id, 0) != 1 
+		  AND a.begin_time IS NOT NULL 
+		  AND a.business_id = #{businessId,jdbcType=VARCHAR}  
+		UNION
+		ALL 
+		SELECT 
+		  a.business_id businessId,
+		  -- `抵押权人/反担保人`
+		  a.pledee AS "name",
+		  b.lender_identity identifyCard,
+		  CASE
+		    b.creditor_type 
+		    WHEN 1 
+		    THEN 0
+		    WHEN 2 
+		    THEN 1 
+		    ELSE null 
+		  END borrowerType,
+		  3 AS "type" 
+		FROM
+		  tb_biz_output_contract a,
+		  tb_creditor b 
+		WHERE a.pledee_id = b.creditor_id 
+		  AND a.business_id = #{businessId,jdbcType=VARCHAR}  
+		UNION
+		ALL 
+		SELECT 
+		  a.business_id businessId,
+		  -- `担保主体/担保人`
+		  a.guarantee_main AS "name",
+		  b.identify_card identifyCard,
+		  b.guarante_main_type borrowerType,
+		  4 AS "type" 
+		FROM
+		  tb_fsd_non_standard_measure a,
+		  tb_fsd_guarantee_information b 
+		WHERE a.business_id = b.business_id 
+		  AND b.operator_type = 1 
+		  AND a.business_id = #{businessId,jdbcType=VARCHAR}  
+		UNION
+		ALL 
+		SELECT 
+		  a.business_id businessId,
+		  -- `出借人`
+		  a.lender AS "name",
+		  b.lender_identity identifyCard,
+		  CASE
+		    b.creditor_type 
+		    WHEN 1 
+		    THEN 0 
+		    WHEN 2 
+		    THEN 1
+		    ELSE null 
+		  END borrowerType,
+		  5 AS "type" 
+		FROM
+		  tb_biz_output_contract a,
+		  tb_creditor b 
+		WHERE a.lender_id = b.creditor_id 
+		  AND a.business_id = #{businessId,jdbcType=VARCHAR}  
 	</select>
 	
 	<select id="queryRepaymentPlanHouse" resultType="com.hongte.alms.base.vo.litigation.house.HousePlanInfo">
@@ -532,30 +632,8 @@
 		    COUNT(1) 
 		  FROM
 		    `tb_repayment_biz_plan_list` 
-		  WHERE business_id = b.original_business_id) totalPeriod,
+		  WHERE business_id = b.original_business_id) totalPeriod
 		  -- 总期数
-		  (SELECT 
-		    t2.`due_date` 
-		  FROM
-		    tb_repayment_biz_plan t1,
-		    tb_repayment_biz_plan_list t2 
-		  WHERE t1.`plan_id` = t2.`plan_id` 
-		    AND t1.`business_id` = b.original_business_id 
-		    AND t2.`current_status` IN ('逾期', '还款中') 
-		  ORDER BY t2.`due_date` 
-		  LIMIT 1) minDueDate, -- 状态为'逾期', '还款中'的最早应还日期
-		  (SELECT 	  
-			  ifnull(SUM(t.plan_amount),0)
-			FROM
-			  tb_repayment_biz_plan_list_detail t,
-			  tb_repayment_biz_plan_list t2,
-			  tb_repayment_biz_plan t3 
-			WHERE t.plan_list_id = t2.plan_list_id 
-			  AND t2.plan_id = t3.plan_id 
-			  AND t2.`current_status` = '已还款'
-			  AND t.`plan_item_type` IN (20,30,60) 
-			  AND t2.`due_date` <![CDATA[ < ]]> #{billDate,jdbcType=DATE}
-			  AND t3.original_business_id = b.original_business_id ) balanceDue -- 往期少交费用
 		FROM
 		  tb_repayment_biz_plan_list a,
 		  tb_repayment_biz_plan b,
@@ -599,6 +677,33 @@
 		  AND IFNULL(a.repay_flag, 0) != 6 
 		ORDER BY a.due_date 
 		LIMIT 1 
+	</select>
+	
+	<select id="queryBalanceDueByBillDate" resultType="java.lang.Double">
+		SELECT 	  
+		  ifnull(SUM(t.plan_amount),0)
+		FROM
+		  tb_repayment_biz_plan_list_detail t,
+		  tb_repayment_biz_plan_list t2,
+		  tb_repayment_biz_plan t3 
+		WHERE t.plan_list_id = t2.plan_list_id 
+		  AND t2.plan_id = t3.plan_id 
+		  AND t.`plan_item_type` IN (20,30,60) 
+		  AND t2.`due_date` <![CDATA[ < ]]> #{billDate,jdbcType=DATE}
+		  AND t3.original_business_id = #{businessId,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="queryMinNoRepaymentDueDateByBusinessId" resultType="java.util.Date">
+		SELECT 
+		    t2.`due_date` -- 状态为'逾期'的最早应还日期
+		  FROM
+		    tb_repayment_biz_plan t1,
+		    tb_repayment_biz_plan_list t2 
+		  WHERE t1.`plan_id` = t2.`plan_id` 
+		    AND t1.`original_business_id` = #{businessId,jdbcType=VARCHAR}
+		    AND t2.`current_status` = '逾期' 
+		  ORDER BY t2.`due_date` 
+		  LIMIT 1
 	</select>
 	
 	<select id="queryPreviousFees" resultType="com.hongte.alms.base.vo.billing.PreviousFeesVO">
@@ -658,7 +763,6 @@
 		  tb_repayment_biz_plan t3 
 		WHERE t.plan_list_id = t2.plan_list_id 
 		  AND t2.plan_id = t3.plan_id 
-		  AND t2.`current_status` = '已还款' 
 		  AND t2.`due_date` <![CDATA[ < ]]> #{billDate,jdbcType=DATE}
 		  AND t3.original_business_id = #{businessId,jdbcType=VARCHAR} 
 		  AND IFNULL(t2.repay_flag, 0) != 6

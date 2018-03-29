@@ -38,7 +38,7 @@
 		car.status='07' then '已撤销'
 		when car.status='08' then '转公车申请中'
 		when car.status='09' then '拍卖审核中'
-		when car.status='10' then '拍卖审核中'
+		when car.status='10' then '转公车审核中'
 		else ''
 		end status
 		from tb_car_basic car
@@ -250,7 +250,7 @@
 			</if>
 			<if test="vehicleBrand !=null and vehicleBrand !='' and  carModel !=null and carModel !=''">
 			
-			    and tcb.brand_name LIKE "%"#{vehicleBrand}"%" or tcb.model LIKE "%"#{carModel}"%"
+			    and (tcb.brand_name LIKE "%"#{vehicleBrand}"%" or tcb.model LIKE "%"#{carModel}"%")
 			</if>
 		</where>
 		order BY tca.create_time DESC
@@ -291,7 +291,7 @@
 			</if>
 			<if test="vehicleBrand !=null and vehicleBrand !='' and  carModel !=null and carModel !=''">
 			
-			    and tcb.brand_name LIKE "%"#{vehicleBrand}"%" or tcb.model LIKE "%"#{carModel}"%"
+			    and (tcb.brand_name LIKE "%"#{vehicleBrand}"%" or tcb.model LIKE "%"#{carModel}"%")
 			</if>
 
 		</where>
@@ -500,7 +500,7 @@
 			</if>
 			<if test="vehicleBrand !=null and vehicleBrand !='' and carModel !=null and carModel !=''">
 			
-			    and tcb.brand_name LIKE "%"#{vehicleBrand}"%" or tcb.model LIKE "%"#{carModel}"%"
+			    and (tcb.brand_name LIKE "%"#{vehicleBrand}"%" or tcb.model LIKE "%"#{carModel}"%")
 			</if>
 		</where>
 		order BY tcar.update_time desc
@@ -541,7 +541,7 @@
 			</if>
 			<if test="vehicleBrand !=null and vehicleBrand !='' and carModel !=null and carModel !=''">
 			
-			    and tcb.brand_name LIKE "%"#{vehicleBrand}"%" or tcb.model LIKE "%"#{carModel}"%"
+			    and (tcb.brand_name LIKE "%"#{vehicleBrand}"%" or tcb.model LIKE "%"#{carModel}"%")
 			</if>
 
 		</where>	

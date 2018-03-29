@@ -238,8 +238,8 @@ public class TransferOfLitigationController {
 			if (!CollectionUtils.isEmpty(componentOptions)) {
 				for (LinkedHashMap<String, Object> componentOption : componentOptions) {
 					List<String> houseAreas = (List<String>) componentOption.get("houseArea");
-					String detailAddress = (String) componentOption.get("detailAddress");
-					String mortgageSituation = (String) componentOption.get("mortgageSituation");
+					String detailAddress = StringUtil.isEmpty((String) componentOption.get("detailAddress")) ? " " : (String) componentOption.get("detailAddress");
+					String mortgageSituation = StringUtil.isEmpty((String) componentOption.get("mortgageSituation")) ? " " : (String) componentOption.get("mortgageSituation");
 					
 					if (componentOptions.indexOf(componentOption) < (componentOptions.size() - 1)) {
 						houseAddress.append(houseAreas).append("--#separator#--").append(detailAddress).append("--#separator#--")

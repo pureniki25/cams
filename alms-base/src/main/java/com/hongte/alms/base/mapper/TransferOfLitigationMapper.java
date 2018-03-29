@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import com.hongte.alms.base.vo.billing.PreviousFeesVO;
 import com.hongte.alms.base.vo.litigation.BusinessCar;
+import com.hongte.alms.base.vo.litigation.LitigationBorrowerDetailed;
 import com.hongte.alms.base.vo.litigation.TransferOfLitigationVO;
 import com.hongte.alms.base.vo.litigation.house.HouseLoanVO;
 import com.hongte.alms.base.vo.litigation.house.HousePlanInfo;
@@ -74,7 +75,7 @@ public interface TransferOfLitigationMapper {
 	Map<String, Object> queryCarLoanFees(@Param(value="businessId") String businessId, @Param(value="billDate") Date billDate);
 	
 	/**
-	 * 结清试算功能查询往期少交费用
+	 * 结清试算功能查询往期少交费用明细
 	 * @param businessId
 	 * @param billDate
 	 * @return
@@ -87,4 +88,25 @@ public interface TransferOfLitigationMapper {
 	 * @return
 	 */
 	Map<String, Object> queryMaxDueDateByBusinessId(@Param(value="businessId") String businessId);
+	
+	/**
+	 * 根据业务编号查询 借款人明细
+	 * @param businessId
+	 * @return
+	 */
+	List<LitigationBorrowerDetailed> queryLitigationBorrowerDetailed(@Param(value="businessId") String businessId);
+	
+	/**
+	 * 查询状态为'逾期', '还款中'的最早应还日期
+	 * @param businessId
+	 * @return
+	 */
+	Date queryMinNoRepaymentDueDateByBusinessId(@Param(value="businessId") String businessId);
+	
+	/**
+	 * 查询往期少交费用总和
+	 * @param billDate
+	 * @return
+	 */
+	Double queryBalanceDueByBillDate(@Param(value="businessId") String businessId, @Param(value="billDate") Date billDate);
 }

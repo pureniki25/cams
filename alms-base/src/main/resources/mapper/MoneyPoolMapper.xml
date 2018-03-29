@@ -58,6 +58,6 @@
 		    mpr.after_id = #{afterId}
 		    AND
 		    mpr.is_finance_match = 1
-		ORDER BY mpr.id
+		ORDER BY  mp.trade_date desc
 	</select>
 </mapper>

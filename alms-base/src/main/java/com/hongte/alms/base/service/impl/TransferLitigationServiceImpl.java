@@ -5,10 +5,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -143,8 +143,9 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		}
 
 		Date factRepayDate = (Date) resultMap.get("factRepayDate");
-		int overdueDays = differentDays(factRepayDate, new Date());
-		resultMap.put("overdueDays", overdueDays);
+		Date dueDate = (Date) resultMap.get("_dueDate"); // 第一期应还日期
+		int overdueDays = DateUtil.getDiffDays(factRepayDate == null ? dueDate : factRepayDate, new Date());
+		resultMap.put("overdueDays", overdueDays < 0 ? 0 : overdueDays);
 
 		Object repaymentTypeId = resultMap.get("repaymentTypeId");
 		String repaymentType = "";
@@ -227,6 +228,8 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			if (transferLitigationData == null || businessType == null) {
 				throw new ServiceRuntimeException("没有找到相关数据，发送诉讼系统失败！");
 			}
+			
+			transferLitigationData.setLitigationBorrowerDetailedList(transferOfLitigationMapper.queryLitigationBorrowerDetailed(businessId));
 
 			transferLitigationData.setCreateUserId(loginUserInfoHelper.getUserId());
 			// 判断业务类型，根据业务类型查询对应的房贷或车贷数据
@@ -495,27 +498,43 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 		if (resultMap != null && !resultMap.isEmpty()) {
 
-			// 查询往期少交费用明细
-			resultMap.put("previousFees", transferOfLitigationMapper.queryPreviousFees(businessId, billDate));
 
-			// 当期的 利息、服务费、担保公司费用、平台费
-			resultMap.putAll(transferOfLitigationMapper.queryCarLoanFees(businessId, billDate));
-
-			Date minDueDate = (Date) resultMap.get("minDueDate"); // 状态为'逾期', '还款中'的最早应还日期
 			Map<String, Object> maxPeriodMap = transferOfLitigationMapper.queryMaxDueDateByBusinessId(businessId); // 合同到期日
 			Date maxDueDate = (Date) maxPeriodMap.get("maxDueDate");
+			
+			if (!billDate.after(maxDueDate)) {	// 若 billDate 早于 maxDueDate  取dueDate比billDate大的最近的一期
+				// 当期的 利息、服务费、担保公司费用、平台费
+				resultMap.putAll(transferOfLitigationMapper.queryCarLoanFees(businessId, billDate)); 
+				// 查询往期少交费用明细
+				resultMap.put("previousFees", transferOfLitigationMapper.queryPreviousFees(businessId, billDate));
+				// 往期少交费用合计
+				resultMap.put("balanceDue", transferOfLitigationMapper.queryBalanceDueByBillDate(businessId, billDate));
+			}else {// 若 billDate 晚于 maxDueDate
+				// 当期的 利息、服务费、担保公司费用、平台费 取最后一期
+				resultMap.putAll(transferOfLitigationMapper.queryCarLoanFees(businessId, maxDueDate)); 
+				// 查询往期少交费用明细
+				resultMap.put("previousFees", transferOfLitigationMapper.queryPreviousFees(businessId, maxDueDate));
+				// 往期少交费用合计
+				resultMap.put("balanceDue", transferOfLitigationMapper.queryBalanceDueByBillDate(businessId, maxDueDate));
+			}
+
+			Date minDueDate = transferOfLitigationMapper.queryMinNoRepaymentDueDateByBusinessId(businessId); // 状态为'逾期'的最早应还日期
 			double lastPlanAccrual = ((BigDecimal) maxPeriodMap.get("planAccrual")).doubleValue(); // 最后一期应还利息
 			double lastPlanServiceCharge = ((BigDecimal) maxPeriodMap.get("planServiceCharge")).doubleValue(); // 最后一期应还服务费
 			double lastGuaranteeCharge = ((BigDecimal) maxPeriodMap.get("plan_guarantee_charge")).doubleValue(); // 最后一期担保公司费用
 			double lastPlatformCharge = ((BigDecimal) maxPeriodMap.get("plan_platform_charge")).doubleValue(); // 最后一期平台费
-			int overdueDays = differentDays(minDueDate, billDate); // 逾期天数
+			int overdueDays = 0; // 逾期天数
+			if (minDueDate != null) {
+				overdueDays = DateUtil.getDiffDays(minDueDate, billDate); 
+			}
+			overdueDays = overdueDays < 0 ? 0 : overdueDays;
 //			long isPreCharge = (long) resultMap.get("isPreCharge"); // 是否服务费一次性收取业务
 //			long isPreServiceFees = (long) resultMap.get("isPreServiceFees"); // 是否分公司服务费前置收取
 			double planAccrual = ((BigDecimal) resultMap.get("planAccrual")).doubleValue(); // 本期应还利息
 			double planServiceCharge = ((BigDecimal) resultMap.get("planServiceCharge")).doubleValue(); // 本期应还服务费
 			double planPlatformCharge = ((BigDecimal) resultMap.get("planPlatformCharge")).doubleValue(); // 本期应还平台费
 			double planGuaranteeCharge = ((BigDecimal) resultMap.get("planGuaranteeCharge")).doubleValue(); // 本期应还担保公司费用
-			double balanceDue = ((BigDecimal) resultMap.get("balanceDue")).doubleValue(); // 往期少交费用合计
+			double balanceDue = (double) resultMap.get("balanceDue"); // 往期少交费用合计
 			double parkingFees = carLoanBilVO.getParkingFees(); // 停车费
 			double gpsFees = carLoanBilVO.getGpsFees(); // GPS费
 			double dragFees = carLoanBilVO.getDragFees(); // 拖车费
@@ -573,7 +592,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 						preLateFees = 0;
 					}
 				} else if ("等额本息".equals(repaymentTypeId)) {
-
+					planAccrual = surplusPrincipal * borrowRate / 12;
 					if (outputPlatformId == 0) {
 						if (overdueDays < 15) {
 							outsideInterest = borrowMoney * outside / 30 * overdueDays;
@@ -600,6 +619,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 						preLateFees = ((BigDecimal) resultMap.get("surplusServiceCharge")).doubleValue();
 					}
 				} else if ("等额本息".equals(repaymentTypeId)) {
+					planAccrual = surplusPrincipal * borrowRate / 12;
 					if (outputPlatformId == 0) {
 						
 						preLateFeesFlag = true;	// 提前还款违约金标识，非上标业务，等额本息为true
@@ -631,14 +651,14 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 					+ innerLateFees + outsideInterest + preLateFees + balanceDue + parkingFees + gpsFees + dragFees
 					+ otherFees + attorneyFees;
 			squaredUp = receivableTotal - cash - balance;
-			resultMap.put("innerLateFees", Math.round(innerLateFees * 100) * 0.01);
-			resultMap.put("outsideInterest", Math.round(outsideInterest * 100) * 0.01);
-			resultMap.put("preLateFees", Math.round(preLateFees * 100) * 0.01);
-			resultMap.put("planAccrual", Math.round(planAccrual * 100) * 0.01);
-			resultMap.put("receivableTotal", Math.round(receivableTotal * 100) * 0.01);
-			resultMap.put("squaredUp", Math.round(squaredUp * 100) * 0.01);
-			resultMap.put("cash", Math.round(cash * 100) * 0.01);
-			resultMap.put("balance", Math.round(balance * 100) * 0.01);
+			resultMap.put("innerLateFees", BigDecimal.valueOf(innerLateFees).setScale(2, RoundingMode.HALF_UP).doubleValue());
+			resultMap.put("outsideInterest", BigDecimal.valueOf(outsideInterest).setScale(2, RoundingMode.HALF_UP).doubleValue());
+			resultMap.put("preLateFees", BigDecimal.valueOf(preLateFees).setScale(2, RoundingMode.HALF_UP).doubleValue());
+			resultMap.put("planAccrual", BigDecimal.valueOf(planAccrual).setScale(2, RoundingMode.HALF_UP).doubleValue());
+			resultMap.put("receivableTotal", BigDecimal.valueOf(receivableTotal).setScale(2, RoundingMode.HALF_UP).doubleValue());
+			resultMap.put("squaredUp", BigDecimal.valueOf(squaredUp).setScale(2, RoundingMode.HALF_UP).doubleValue());
+			resultMap.put("cash", BigDecimal.valueOf(cash).setScale(2, RoundingMode.HALF_UP).doubleValue());
+			resultMap.put("balance", BigDecimal.valueOf(balance).setScale(2, RoundingMode.HALF_UP).doubleValue());
 			resultMap.put("preLateFeesFlag", preLateFeesFlag);
 		}
 
@@ -698,34 +718,4 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		}
 	}
 
-	/**
-	 * date2比date1多的天数
-	 * 
-	 * @param date1
-	 * @param date2
-	 * @return
-	 */
-	private int differentDays(Date first, Date second) {
-		if (first == null || second == null) {
-			return 0;
-		}
-		if (first.after(second)) {
-			return 0;
-		}
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(first);
-		int cnt = 0;
-		while (calendar.getTime().compareTo(second) != 0) {
-			calendar.add(Calendar.DATE, 1);
-			cnt++;
-		}
-		return cnt;
-	}
-
-	public static void main(String[] args) {
-		int i = 61 / 30;
-		int j = 20 % 30;
-		System.out.println(i);
-		System.out.println(j);
-	}
 }
