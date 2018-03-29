@@ -250,7 +250,7 @@
 			</if>
 			<if test="vehicleBrand !=null and vehicleBrand !='' and  carModel !=null and carModel !=''">
 			
-			    and tcb.brand_name LIKE "%"#{vehicleBrand}"%" or tcb.model LIKE "%"#{carModel}"%"
+			    and (tcb.brand_name LIKE "%"#{vehicleBrand}"%" or tcb.model LIKE "%"#{carModel}"%")
 			</if>
 		</where>
 		order BY tca.create_time DESC
@@ -291,7 +291,7 @@
 			</if>
 			<if test="vehicleBrand !=null and vehicleBrand !='' and  carModel !=null and carModel !=''">
 			
-			    and tcb.brand_name LIKE "%"#{vehicleBrand}"%" or tcb.model LIKE "%"#{carModel}"%"
+			    and (tcb.brand_name LIKE "%"#{vehicleBrand}"%" or tcb.model LIKE "%"#{carModel}"%")
 			</if>
 
 		</where>
@@ -500,7 +500,7 @@
 			</if>
 			<if test="vehicleBrand !=null and vehicleBrand !='' and carModel !=null and carModel !=''">
 			
-			    and tcb.brand_name LIKE "%"#{vehicleBrand}"%" or tcb.model LIKE "%"#{carModel}"%"
+			    and (tcb.brand_name LIKE "%"#{vehicleBrand}"%" or tcb.model LIKE "%"#{carModel}"%")
 			</if>
 		</where>
 		order BY tcar.update_time desc
@@ -541,7 +541,7 @@
 			</if>
 			<if test="vehicleBrand !=null and vehicleBrand !='' and carModel !=null and carModel !=''">
 			
-			    and tcb.brand_name LIKE "%"#{vehicleBrand}"%" or tcb.model LIKE "%"#{carModel}"%"
+			    and (tcb.brand_name LIKE "%"#{vehicleBrand}"%" or tcb.model LIKE "%"#{carModel}"%")
 			</if>
 
 		</where>	

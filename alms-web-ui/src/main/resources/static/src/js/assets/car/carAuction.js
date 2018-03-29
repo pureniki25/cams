@@ -20,7 +20,7 @@ window.layinit(function (htConfig) {
 	    el: '#app',
 	    data: {
 	    	
-	    	processId:'',//流程id
+	    	processId:'',// 流程id
 	    	provs:'',
 	    	citys:'',
 	        countys:'',
@@ -43,122 +43,122 @@ window.layinit(function (htConfig) {
 	    		,borrowLimit:''// 借款期限
 	    		,repaymentTypeId:''// 还款方式
 	    		,borrowRate:''// 借款利率
-	    		,operatorName:''//业务主办人
+	    		,operatorName:''// 业务主办人
 	    	}
 		    ,repayPlan:{
-		    	payedPrincipal:0//已还本金
-		    	,payedInterest:0//已还利
-		    	,lastPayDate:''//利息交至日期
-		    	,overdueDays:''//逾期天数
+		    	payedPrincipal:0// 已还本金
+		    	,payedInterest:0// 已还利
+		    	,lastPayDate:''// 利息交至日期
+		    	,overdueDays:''// 逾期天数
 		    }
-	    	,outputRecord:{//出款
-	    		 outputUserName:''//出款人
-	    		,factOutputDate:''//出款日期
+	    	,outputRecord:{// 出款
+	    		 outputUserName:''// 出款人
+	    		,factOutputDate:''// 出款日期
 	    	}
 	    	,carBasic:{
 	    		vin:''// 车架号
-	    		,engineModel:''//发动机号
-	    		,displacement:''//排量
-	    		,displacementUnit:''//排量单位
-	    		,brandName:''//汽车品牌
+	    		,engineModel:''// 发动机号
+	    		,displacement:''// 排量
+	    		,displacementUnit:''// 排量单位
+	    		,brandName:''// 汽车品牌
 	    		,licensePlateNumber:''// 车牌号
 	    		,model:''// 品牌型号
-	    		,originPlace:''//汽车产地
-	    		,licenseLocation:''//车辆属地
-	    		,color:''//颜色
-	    		//,vehicleLicenseRegistrationDate:''//汽车注册日期
-	    		//,mortgage:''//车辆抵押状态
-	    		//,evaluationAmount:''//抵押时车辆评估价值
-	    		//,createTime:''//抵押时车辆评估时间
-	    		//,lastEvaluationAmount:''//最新车辆评估价值
-	    		//,lastEvaluationTime:''//最新车辆评估时间
-	    		//,trafficViolationFee:''//违章费用
-	    		//,annualVerificationExpirationDate:''//年审到期日期
-	    		//,odometer:''//里程表读数
-	    		//,fuelLeft:''//燃油量（约余）
-	    		,transferTimes:''//过户次数
-	    		,lastTransferDate:''//最后一次过户时间
-	    		//,:''//车辆评估价值
-	    		//,differAmount:''//价值差额
-	    		//,insuranceExpirationDate:''//保险到期日
-	    		//,carVersionConfig:''//车型及版本配置
-	    		//,userNature:''//车辆使用性质
-	    		//,toolWithCar:''//随车工具
-	    		//,relatedDocs:''//提供文件
-	    		//,trafficViolationSituation:''//违章情况
-	    		//,transactionMode:''//交易方式
-	    		//,carPosition:''//车辆位置
-	    		//,remark:''//备注
-	    		//,viewLastEvaluationAmount:''//只展示的最新评估值
-	    		//,viewInsuranceExpirationDate:''//只为展示最近评估的保险到期日期
+	    		,originPlace:''// 汽车产地
+	    		,licenseLocation:''// 车辆属地
+	    		,color:''// 颜色
+	    		// ,vehicleLicenseRegistrationDate:''//汽车注册日期
+	    		// ,mortgage:''//车辆抵押状态
+	    		// ,evaluationAmount:''//抵押时车辆评估价值
+	    		// ,createTime:''//抵押时车辆评估时间
+	    		// ,lastEvaluationAmount:''//最新车辆评估价值
+	    		// ,lastEvaluationTime:''//最新车辆评估时间
+	    		// ,trafficViolationFee:''//违章费用
+	    		// ,annualVerificationExpirationDate:''//年审到期日期
+	    		// ,odometer:''//里程表读数
+	    		// ,fuelLeft:''//燃油量（约余）
+	    		,transferTimes:''// 过户次数
+	    		,lastTransferDate:''// 最后一次过户时间
+	    		// ,:''//车辆评估价值
+	    		// ,differAmount:''//价值差额
+	    		// ,insuranceExpirationDate:''//保险到期日
+	    		// ,carVersionConfig:''//车型及版本配置
+	    		// ,userNature:''//车辆使用性质
+	    		// ,toolWithCar:''//随车工具
+	    		// ,relatedDocs:''//提供文件
+	    		// ,trafficViolationSituation:''//违章情况
+	    		// ,transactionMode:''//交易方式
+	    		// ,carPosition:''//车辆位置
+	    		// ,remark:''//备注
+	    		// ,viewLastEvaluationAmount:''//只展示的最新评估值
+	    		// ,viewInsuranceExpirationDate:''//只为展示最近评估的保险到期日期
 	    	}
 	       ,detection:{
-	    	id:''//评估id
-	   		,vehicleLicenseRegistrationDate:''//汽车注册日期
-	    	,mortgage:''//车辆抵押状态
-	    	,evaluationAmount:''//最新车辆评估价值
-	    	,createTime:''//最新车辆评估时间 
-	    	,trafficViolationFee:''//违章费用
-	    	,annualVerificationExpirationDate:''//年审到期日期
-	    	,odometer:''//里程表读数
-	    	,fuelLeft:''//燃油量（约余）
-	    	,insuranceExpirationDate:''//保险到期日
-	    	,userNature:''//车辆使用性质
-		    ,toolWithCar:''//随车工具
-		    ,relatedDocs:''//提供文件
-		    ,trafficViolationSituation:''//违章情况
-		    ,transactionMode:''//交易方式
-		    ,carPosition:''//车辆位置
-		    ,remark:''//备注
-		    ,differAmount:''//价值差额
-		    ,viewEvaluationAmount:''//展示
-		    ,assessOdometer:''//评估时的里程数，只针对页面的验证
-		    ,viewInsuranceExpirationDate:''//只为展示最近评估的保险到期日期
+	    	id:''// 评估id
+	   		,vehicleLicenseRegistrationDate:''// 汽车注册日期
+	    	,mortgage:''// 车辆抵押状态
+	    	,evaluationAmount:''// 最新车辆评估价值
+	    	,createTime:''// 最新车辆评估时间
+	    	,trafficViolationFee:''// 违章费用
+	    	,annualVerificationExpirationDate:''// 年审到期日期
+	    	,odometer:''// 里程表读数
+	    	,fuelLeft:''// 燃油量（约余）
+	    	,insuranceExpirationDate:''// 保险到期日
+	    	,userNature:''// 车辆使用性质
+		    ,toolWithCar:''// 随车工具
+		    ,relatedDocs:''// 提供文件
+		    ,trafficViolationSituation:''// 违章情况
+		    ,transactionMode:''// 交易方式
+		    ,carPosition:''// 车辆位置
+		    ,remark:''// 备注
+		    ,differAmount:''// 价值差额
+		    ,viewEvaluationAmount:''// 展示
+		    ,assessOdometer:''// 评估时的里程数，只针对页面的验证
+		    ,viewInsuranceExpirationDate:''// 只为展示最近评估的保险到期日期
 	       }
 	       ,mortgageDetection:{
-	    	evaluationAmount:''//抵押时车辆评估价值
-		    ,createTime:''//抵押时车辆评估时间 
+	    	evaluationAmount:''// 抵押时车辆评估价值
+		    ,createTime:''// 抵押时车辆评估时间
 	       }
 	       ,drag:{
 	    	   dragDate:''// 拖车日期
 	       }
 	       ,carAuction:{
-	    	   businessId:''//业务编号
-	    	   ,auctionId:''//拍卖id
-    	   	   ,startingPrice:''//起拍价
-    		   ,deposit:''//保证金
-    		   ,fareRange:''//加价幅度
-    		   ,reservePrice:''//保留价
-    		   ,auctionStartTime:''//拍卖开始时间
-    		   ,auctionEndTime:''//拍卖截止时间
-    		   ,transType:''//交易类型
-    		   ,priorityPurchaser:''//优先购权人
-    		   ,takeWay:''//取货方式
-    		   ,buyStartTime:''//竞买开始时间
-    		   ,buyEndTime:''//竞买结束时间
-    		   ,auctionPosition:''//拍卖物所在位置
-    		   ,handleUnit:''//处置单位
-    		   ,unitAddr:''//单位地址
-    		   ,consultant:''//咨询人
-    		   ,consultantTel:''//咨询电话
-    		   ,acountName:''//账户姓名
-    		   ,acountNum:''//银行卡号
-    		   ,payWay:''//支付方式
-    		   ,consStartTime:''//咨询开始时间
-    		   ,consStartTime:''//咨询结束时间
-    		   ,viewSampleStartTime:''//看样开始时间
-    		   ,viewSampleStartTime:''//看样结束时间
-    		   ,auctionRules:''//竞价规则
-    		   ,openBank:''//开户银行
-    		   ,paymentEndTime:''//缴款截止时间
-    		   //,assessOdometer:''//评估时的里程数，只针对页面的验证
-    		   ,viewSampleAddr:''//看样地址
-    		   ,delayPeriod:''//延时周期
-    		   ,remark:''//备注
-    		   ,transFree:''//交易税费
+	    	   businessId:''// 业务编号
+	    	   ,auctionId:''// 拍卖id
+    	   	   ,startingPrice:''// 起拍价
+    		   ,deposit:''// 保证金
+    		   ,fareRange:''// 加价幅度
+    		   ,reservePrice:''// 保留价
+    		   ,auctionStartTime:''// 拍卖开始时间
+    		   ,auctionEndTime:''// 拍卖截止时间
+    		   ,transType:''// 交易类型
+    		   ,priorityPurchaser:''// 优先购权人
+    		   ,takeWay:''// 取货方式
+    		   ,buyStartTime:''// 竞买开始时间
+    		   ,buyEndTime:''// 竞买结束时间
+    		   ,auctionPosition:''// 拍卖物所在位置
+    		   ,handleUnit:''// 处置单位
+    		   ,unitAddr:''// 单位地址
+    		   ,consultant:''// 咨询人
+    		   ,consultantTel:''// 咨询电话
+    		   ,acountName:''// 账户姓名
+    		   ,acountNum:''// 银行卡号
+    		   ,payWay:''// 支付方式
+    		   ,consStartTime:''// 咨询开始时间
+    		   ,consStartTime:''// 咨询结束时间
+    		   ,viewSampleStartTime:''// 看样开始时间
+    		   ,viewSampleStartTime:''// 看样结束时间
+    		   ,auctionRules:''// 竞价规则
+    		   ,openBank:''// 开户银行
+    		   ,paymentEndTime:''// 缴款截止时间
+    		   // ,assessOdometer:''//评估时的里程数，只针对页面的验证
+    		   ,viewSampleAddr:''// 看样地址
+    		   ,delayPeriod:''// 延时周期
+    		   ,remark:''// 备注
+    		   ,transFree:''// 交易税费
 	       }
 	       
-	       ,  //可发送审批信息的用户列表
+	       ,  // 可发送审批信息的用户列表
 	       originOptions : [
 	    	   {id:'1',name:'lemon'},
 	    	   {id:'2',name:'mike'},
@@ -203,17 +203,15 @@ window.layinit(function (htConfig) {
 	    		  $("#lastTransferDate").css("border","1px solid #ccc");
 	    		});
 	    	/**
-	    	$("#lastEvaluationAmount").blur(function(){
-	    		var evaluationAmount=$("#lastEvaluationAmount").val();
-	    		if (!amt.test(evaluationAmount)) {  
-	    			$("#lastEvaluationAmount").css("border","1px solid #FF3030");
-	    			layer.msg("请输入有效金额！",{icon:5,shade: [0.8, '#393D49']});
-	    			return;
-	    		}
-	    		var differAmount=Math.abs(vm.detection.viewEvaluationAmount-evaluationAmount);
-	    		$("#differAmount").val(differAmount);
-	    	});
-			**/
+			 * $("#lastEvaluationAmount").blur(function(){ var
+			 * evaluationAmount=$("#lastEvaluationAmount").val(); if
+			 * (!amt.test(evaluationAmount)) {
+			 * $("#lastEvaluationAmount").css("border","1px solid #FF3030");
+			 * layer.msg("请输入有效金额！",{icon:5,shade: [0.8, '#393D49']}); return; }
+			 * var
+			 * differAmount=Math.abs(vm.detection.viewEvaluationAmount-evaluationAmount);
+			 * $("#differAmount").val(differAmount); });
+			 */
 	    	$("#lastEvaluationAmount").focus(function(){
 	    		  $("#lastEvaluationAmount").css("border","1px solid #ccc");
 	    		});
@@ -330,7 +328,7 @@ window.layinit(function (htConfig) {
 		        elem: '#annualVerificationExpirationDate',
 		        type:'month',
 		        done: (value) => {
-		          this.carBasic.annualVerificationExpirationDate = value
+		          this.detection.annualVerificationExpirationDate = value
 		        }
 		    });
 	   	    laydate.render({
@@ -344,7 +342,7 @@ window.layinit(function (htConfig) {
 		        elem: '#insuranceExpirationDate',
 		        type:'date',
 		        done: (value) => {
-		          this.carBasic.insuranceExpirationDate = value
+		          this.detection.insuranceExpirationDate = value
 		        }
 		    });
 	   	    laydate.render({
@@ -416,9 +414,9 @@ window.layinit(function (htConfig) {
 
 			queryData: function(){
 	            var mySelf = this
-	            //do ajax here
-	            //mySelf.originOptions=vm.originOptions;
-	            //mySelf.selectedList=vm.selectedList;
+	            // do ajax here
+	            // mySelf.originOptions=vm.originOptions;
+	            // mySelf.selectedList=vm.selectedList;
 	            // 多选
 	            mySelf.originOptions = [{"id":"1","name":"lemon"},{"id":"2","name":"mike"},{"id":"3","name":"lara"},{"id":"4","name":"zoe"},{"id":"5","name":"steve"},{"id":"6","name":"nolan"}];
 	            mySelf.selectedList = [{"id":"1","name":"lemon"},{"id":"3","name":"lara"}]
@@ -437,39 +435,83 @@ window.layinit(function (htConfig) {
 	 
 	    	uploadFile:function(event,index){
 	    		var fileId=event.currentTarget.id;
-	    		//alert(JSON.stringify($('#'+fileId)));
-	    		// \alert(event.currentTarget);
+	    		// alert(JSON.stringify($('#'+fileId)));
+	    		 $('.progress .bar').css({'background-color':'#E8E8E8'});
+	    		 $('.progress .bar').text('0%');
 	    		 $('#'+fileId).fileupload({
 	    			    dataType: 'json',
 	                    singleFileUploads: true,
 	                    acceptFileTypes: '', // Allowed file types
 	    		        url: basePath+'doc/singleUpload',// 文件的后台接受地址
-	    		        // 设置进度条
-	    		        // 上传完成之后的操作，显示在img里面
+	    		        maxNumberOfFiles: 1,// 最大上传文件数目
+	    		        maxFileSize: 10485760,// 文件不超过5M
+	    		        sequentialUploads: true,// 是否队列上传
+	    		        dataType: 'json',// 期望从服务器得到json类型的返回数据
+	    		        /*******************************************************
+						 * 设置进度条 progressall: function (e, data) { var progress =
+						 * parseInt(data.loaded / data.total * 100);
+						 * $('#progress .bar').css( 'width', progress + '%' ); },
+						 ******************************************************/
+	    		        // 进度条
+	    		        progressall: function (e, data) {
+	    		        
+	                        var progress = parseInt(data.loaded / data.total * 100, 10);
+	                        $('.progress .bar').css(
+	                        		{'width':progress + '%',
+	                        			'background-color':'#7CCD7C',
+	                        		}
+	                            
+	                        );
+	                        $('.progress .bar').text(progress + '%');
+	                    },
 	    		        done: function (e, data){
-	    		        	//alert("bbb");
+	    		        	// alert("bbb");
 	    		        	var reFile=data._response.result.docItemListJson;
 	    		        	var reFiles=eval("("+reFile+")"); 
-	    		        	//alert(JSON.stringify(reFiles));
+	    		        	// alert(JSON.stringify(reFiles));
 	    		        	vm.returnRegFiles[index].oldDocId=reFiles.docId;
 	    		        	vm.returnRegFiles[index].originalName=reFiles.originalName;
 	    		        	vm.returnRegFiles[index].name=reFiles.originalName;
 	    		        	vm.returnRegFiles[index].name=reFiles.originalName;
 	    		        	vm.returnRegFiles[index].downloadFileName =reFiles.originalName;
 	                		vm.returnRegFiles[index].docUrl = reFiles.docUrl;
-	    		        	//alert(JSON.stringify(vm.returnRegFiles[0]));
-	    		        	//$('#'+fileId).val(vm.returnRegFiles[0].file);
-	    		        	
+	    		        	// alert(JSON.stringify(vm.returnRegFiles[0]));
+	    		        	// $('#'+fileId).val(vm.returnRegFiles[0].file);
+	                		 $('.progress .bar').text("100%");
+	    		        },
+	    		        fail: function (event, data) {
+	    		        	//alert(JSON.stringify(data));
+	    		        },
+	    		        add:function (event,data){
+	    		            if (data!=null && data.originalFiles!=null && data.originalFiles.length > 0) {
+	   	                     data.formData = {fileName: data.originalFiles[0].name};
+	   	                     data.formData.businessId = businessId;
+	   	                     data.formData.busType='AfterLoan_Material_CarAuction';
+	   	                     data.formData.file=data.originalFiles[0];
+		    		        	var size=data.originalFiles[0].size;
+		    		        	 if(size/1024/1024 > 10){
+			                    	 layer.msg("文件过大，超过10M不允许上传",{icon:5,shade: [0.8, '#393D49'],time:3000});
+			                    	 return;
+		                     }
+		    		        	 data.submit();
+
+	   	                 } else{
+	   	                	 layer.msg("文件不存在",{icon:5,shade: [0.8, '#393D49'],time:3000});
+	                    	 return;
+	    		            }
 	    		        }
 	    		    });
-	             $('#'+fileId).bind('fileuploadsubmit', function (e, data) {
-	                 if (data && data.originalFiles && data.originalFiles.length > 0) {
-	                     data.formData = {fileName: data.originalFiles[0].name};
-	                     data.formData.businessId = businessId;
-	                     data.formData.busType='AfterLoan_Material_CarAuction';
-	                     data.formData.file=data.originalFiles[0];
-	                 }
-	             });
+	           /***************************************************************
+				 * $('#'+fileId).bind('fileuploadsubmit', function (e, data) {
+				 * if (data && data.originalFiles && data.originalFiles.length >
+				 * 0) { data.formData = {fileName: data.originalFiles[0].name};
+				 * data.formData.businessId = businessId;
+				 * data.formData.busType='AfterLoan_Material_CarAuction';
+				 * data.formData.file=data.originalFiles[0];
+				 * 
+				 * /// alert(data.formData.file.size/1024/1024); } });
+				 **************************************************************/
+	
 	    	},
 	    	downloadFile: function(info){
 
@@ -547,7 +589,7 @@ window.layinit(function (htConfig) {
 	                		vm.detection.viewEvaluationAmount=data.data.detection.evaluationAmount;
 	                		vm.detection.differAmount=Math.abs(data.data.detection.evaluationAmount-data.data.mortgageDetection.evaluationAmount);
 	                	}
-	                	vm.detection.assessOdometer=vm.detection.odometer;//为页面验证用
+	                	vm.detection.assessOdometer=vm.detection.odometer;// 为页面验证用
 	                	vm.detection.viewInsuranceExpirationDate=vm.detection.insuranceExpirationDate;
 	                	vm.carAuction=data.data.carAuction;
 	                	if(vm.carAuction.fareRange==null){
@@ -563,7 +605,7 @@ window.layinit(function (htConfig) {
 	                	if(vm.carAuction.auctionRules==null||vm.carAuction.auctionRules==''){
 	                		vm.carAuction.auctionRules='至少一人报名且出价不低于起拍价，方可成交';
 	                	}
-	                	//alert(JSON.stringify(vm.carAuction));
+	                	// alert(JSON.stringify(vm.carAuction));
 	                	var docFiles=data.data.returnRegFiles;
 	                	
 	                	if(docFiles!=null&&docFiles.length>0){
@@ -602,8 +644,8 @@ window.layinit(function (htConfig) {
 	    	carAuctionAplyClose(){// 关闭窗口
 	    		
 	    		vm.carAuction.businessId=businessId;
-	    		 //form.verify({});
-	    		//alert(JSON.stringify({"returnReg":vm.returnReg,"returnRegFiles":vm.returnRegFiles}));
+	    		 // form.verify({});
+	    		// alert(JSON.stringify({"returnReg":vm.returnReg,"returnRegFiles":vm.returnRegFiles}));
 	    		
 		          $.ajax({
 		               type: "POST",
@@ -631,7 +673,7 @@ window.layinit(function (htConfig) {
 	    	carAuctionAply:function (event,subType){
 	    		var that = this;
 	    		that.businessId=that.carAuction.businessId;
-	    		//页面信息验证
+	    		// 页面信息验证
 	    		if(vm.detection.annualVerificationExpirationDate==''||vm.detection.annualVerificationExpirationDate==null){
 	    			$("#annualVerificationExpirationDate").css("border","1px solid #FF3030");
 	    			return ;
@@ -713,7 +755,7 @@ window.layinit(function (htConfig) {
 	    			$("#carPosition").css("border","1px solid #FF3030");
 	    			return ;
 	    		}
-	       		//拍卖信息
+	       		// 拍卖信息
 	      		if(vm.carAuction.startingPrice==''||vm.carAuction.startingPrice==null){
 	    			$("#startingPrice").css("border","1px solid #FF3030");
 	    			return ;

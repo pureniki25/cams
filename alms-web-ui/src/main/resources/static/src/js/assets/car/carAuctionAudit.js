@@ -437,7 +437,7 @@ window.layinit(function (htConfig) {
 		        elem: '#annualVerificationExpirationDate',
 		        type:'month',
 		        done: (value) => {
-		          this.carBasic.annualVerificationExpirationDate = value
+		          this.detection.annualVerificationExpirationDate = value
 		        }
 		    });
 	   	    laydate.render({
@@ -451,7 +451,7 @@ window.layinit(function (htConfig) {
 		        elem: '#insuranceExpirationDate',
 		        type:'date',
 		        done: (value) => {
-		          this.carBasic.insuranceExpirationDate = value
+		          this.detection.insuranceExpirationDate = value
 		        }
 		    });
 	   	    laydate.render({
@@ -555,36 +555,83 @@ window.layinit(function (htConfig) {
 	 
 	    	uploadFile:function(event,index){
 	    		var fileId=event.currentTarget.id;
-	    		//alert(fileId);
-	    		// \alert(event.currentTarget);
+	    		// alert(JSON.stringify($('#'+fileId)));
+	    		 $('.progress .bar').css({'background-color':'#E8E8E8'});
+	    		 $('.progress .bar').text('0%');
 	    		 $('#'+fileId).fileupload({
 	    			    dataType: 'json',
 	                    singleFileUploads: true,
 	                    acceptFileTypes: '', // Allowed file types
 	    		        url: basePath+'doc/singleUpload',// 文件的后台接受地址
-	    		        // 设置进度条
+	    		        maxNumberOfFiles: 1,// 最大上传文件数目
+	    		        maxFileSize: 10485760,// 文件不超过5M
+	    		        sequentialUploads: true,// 是否队列上传
+	    		        dataType: 'json',// 期望从服务器得到json类型的返回数据
+	    		        /*******************************************************
+						 * 设置进度条 progressall: function (e, data) { var progress =
+						 * parseInt(data.loaded / data.total * 100);
+						 * $('#progress .bar').css( 'width', progress + '%' ); },
+						 ******************************************************/
 	    		        // 上传完成之后的操作，显示在img里面
+	    		        progressall: function (e, data) {
+	    		        
+	                        var progress = parseInt(data.loaded / data.total * 100, 10);
+	                        $('.progress .bar').css(
+	                        		{'width':progress + '%',
+	                        			'background-color':'#7CCD7C',
+	                        		}
+	                            
+	                        );
+	                        $('.progress .bar').text(progress + '%');
+	                    },
 	    		        done: function (e, data){
-	    		        	//alert("bbb");
+	    		        	// alert("bbb");
 	    		        	var reFile=data._response.result.docItemListJson;
 	    		        	var reFiles=eval("("+reFile+")"); 
-	    		        	//alert(JSON.stringify(reFiles));
+	    		        	// alert(JSON.stringify(reFiles));
 	    		        	vm.returnRegFiles[index].oldDocId=reFiles.docId;
 	    		        	vm.returnRegFiles[index].originalName=reFiles.originalName;
 	    		        	vm.returnRegFiles[index].name=reFiles.originalName;
-	    		         	vm.returnRegFiles[index].downloadFileName =reFiles.originalName;
+	    		        	vm.returnRegFiles[index].name=reFiles.originalName;
+	    		        	vm.returnRegFiles[index].downloadFileName =reFiles.originalName;
 	                		vm.returnRegFiles[index].docUrl = reFiles.docUrl;
-	    		        	
+	    		        	// alert(JSON.stringify(vm.returnRegFiles[0]));
+	    		        	// $('#'+fileId).val(vm.returnRegFiles[0].file);
+	                		 $('.progress .bar').text("100%");
+	    		        },
+	    		        fail: function (event, data) {
+	    		        	//alert(JSON.stringify(data));
+	    		        },
+	    		        add:function (event,data){
+	    		            if (data!=null && data.originalFiles!=null && data.originalFiles.length > 0) {
+	   	                     data.formData = {fileName: data.originalFiles[0].name};
+	   	                     data.formData.businessId = businessId;
+	   	                     data.formData.busType='AfterLoan_Material_CarAuction';
+	   	                     data.formData.file=data.originalFiles[0];
+		    		        	var size=data.originalFiles[0].size;
+		    		        	 if(size/1024/1024 > 10){
+			                    	 layer.msg("文件过大，超过10M不允许上传",{icon:5,shade: [0.8, '#393D49'],time:3000});
+			                    	 return;
+		                     }
+		    		        	 data.submit();
+
+	   	                 } else{
+	   	                	 layer.msg("文件不存在",{icon:5,shade: [0.8, '#393D49'],time:3000});
+	                    	 return;
+	    		            }
 	    		        }
 	    		    });
-	             $('#'+fileId).bind('fileuploadsubmit', function (e, data) {
-	                 if (data && data.originalFiles && data.originalFiles.length > 0) {
-	                     data.formData = {fileName: data.originalFiles[0].name};
-	                     data.formData.businessId = businessId;
-	                     data.formData.busType='AfterLoan_Material_CarAuction';
-	                     data.formData.file=data.originalFiles[0];
-	                 }
-	             });
+	           /***************************************************************
+				 * $('#'+fileId).bind('fileuploadsubmit', function (e, data) {
+				 * if (data && data.originalFiles && data.originalFiles.length >
+				 * 0) { data.formData = {fileName: data.originalFiles[0].name};
+				 * data.formData.businessId = businessId;
+				 * data.formData.busType='AfterLoan_Material_CarAuction';
+				 * data.formData.file=data.originalFiles[0];
+				 * 
+				 * /// alert(data.formData.file.size/1024/1024); } });
+				 **************************************************************/
+	
 	    	},
 	    	downloadFile: function(info){
 	    		if(info==null||info.downloadFileName==null||info.downloadFileName==''

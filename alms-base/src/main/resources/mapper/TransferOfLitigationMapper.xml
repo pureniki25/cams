@@ -117,7 +117,7 @@
 		    (SELECT 
 		      tab2.`original_business_id` business_id,
 		      MAX(tab1.fact_repay_date) fact_repay_date,
-		      MIN(tab1.due_date) due_date,
+		      MIN(tab1.due_date) due_date,	-- 最小应还日期
 		      SUM(
 		        CASE
 		          WHEN tab3.plan_item_type = 10 
@@ -632,30 +632,8 @@
 		    COUNT(1) 
 		  FROM
 		    `tb_repayment_biz_plan_list` 
-		  WHERE business_id = b.original_business_id) totalPeriod,
+		  WHERE business_id = b.original_business_id) totalPeriod
 		  -- 总期数
-		  (SELECT 
-		    t2.`due_date` 
-		  FROM
-		    tb_repayment_biz_plan t1,
-		    tb_repayment_biz_plan_list t2 
-		  WHERE t1.`plan_id` = t2.`plan_id` 
-		    AND t1.`original_business_id` = b.original_business_id 
-		    AND t2.`current_status` IN ('逾期', '还款中') 
-		  ORDER BY t2.`due_date` 
-		  LIMIT 1) minDueDate, -- 状态为'逾期', '还款中'的最早应还日期
-		  (SELECT 	  
-			  ifnull(SUM(t.plan_amount),0)
-			FROM
-			  tb_repayment_biz_plan_list_detail t,
-			  tb_repayment_biz_plan_list t2,
-			  tb_repayment_biz_plan t3 
-			WHERE t.plan_list_id = t2.plan_list_id 
-			  AND t2.plan_id = t3.plan_id 
-			  AND t2.`current_status` = '已还款'
-			  AND t.`plan_item_type` IN (20,30,60) 
-			  AND t2.`due_date` <![CDATA[ < ]]> #{billDate,jdbcType=DATE}
-			  AND t3.original_business_id = b.original_business_id ) balanceDue -- 往期少交费用
 		FROM
 		  tb_repayment_biz_plan_list a,
 		  tb_repayment_biz_plan b,
@@ -699,6 +677,33 @@
 		  AND IFNULL(a.repay_flag, 0) != 6 
 		ORDER BY a.due_date 
 		LIMIT 1 
+	</select>
+	
+	<select id="queryBalanceDueByBillDate" resultType="java.lang.Double">
+		SELECT 	  
+		  ifnull(SUM(t.plan_amount),0)
+		FROM
+		  tb_repayment_biz_plan_list_detail t,
+		  tb_repayment_biz_plan_list t2,
+		  tb_repayment_biz_plan t3 
+		WHERE t.plan_list_id = t2.plan_list_id 
+		  AND t2.plan_id = t3.plan_id 
+		  AND t.`plan_item_type` IN (20,30,60) 
+		  AND t2.`due_date` <![CDATA[ < ]]> #{billDate,jdbcType=DATE}
+		  AND t3.original_business_id = #{businessId,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="queryMinNoRepaymentDueDateByBusinessId" resultType="java.util.Date">
+		SELECT 
+		    t2.`due_date` -- 状态为'逾期'的最早应还日期
+		  FROM
+		    tb_repayment_biz_plan t1,
+		    tb_repayment_biz_plan_list t2 
+		  WHERE t1.`plan_id` = t2.`plan_id` 
+		    AND t1.`original_business_id` = #{businessId,jdbcType=VARCHAR}
+		    AND t2.`current_status` = '逾期' 
+		  ORDER BY t2.`due_date` 
+		  LIMIT 1
 	</select>
 	
 	<select id="queryPreviousFees" resultType="com.hongte.alms.base.vo.billing.PreviousFeesVO">
@@ -758,11 +763,21 @@
 		  tb_repayment_biz_plan t3 
 		WHERE t.plan_list_id = t2.plan_list_id 
 		  AND t2.plan_id = t3.plan_id 
-		  AND t2.`current_status` = '已还款' 
 		  AND t2.`due_date` <![CDATA[ < ]]> #{billDate,jdbcType=DATE}
 		  AND t3.original_business_id = #{businessId,jdbcType=VARCHAR} 
 		  AND IFNULL(t2.repay_flag, 0) != 6
 		GROUP BY t.`plan_list_id`) tab
+	</select>
+	
+	<select id="countOverdueByBusinessId" resultType="java.lang.Integer">
+		SELECT 
+		  COUNT(1)
+		FROM
+		  tb_repayment_biz_plan t1,
+		  tb_repayment_biz_plan_list t2
+		  WHERE t1.`plan_id` = t2.`plan_id`
+		  AND t2.`current_status` = '逾期'
+		  AND t1.`original_business_id` = #{businessId,jdbcType=VARCHAR} 
 	</select>
 	
 	<select id="queryMaxDueDateByBusinessId" resultType="map">
