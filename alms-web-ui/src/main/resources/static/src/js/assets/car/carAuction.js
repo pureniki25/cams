@@ -1,4 +1,5 @@
 var businessId = document.getElementById("businessId").getAttribute("value");
+var dragId = document.getElementById("dragId").getAttribute("value");
 var ex = /^[1-9]\d*$/; 
 var amt=/^(([1-9]\d*)|\d)(\.\d{1,2})?$/;
 var mobi= /^(((13[0-9]{1})|(14[0-9]{1})|(17[0]{1})|(15[0-3]{1})|(15[5-9]{1})|(18[0-9]{1}))+\d{8})$/; 
@@ -446,7 +447,6 @@ window.layinit(function (htConfig) {
 	    		        maxNumberOfFiles: 1,// 最大上传文件数目
 	    		        maxFileSize: 10485760,// 文件不超过5M
 	    		        sequentialUploads: true,// 是否队列上传
-	    		        dataType: 'json',// 期望从服务器得到json类型的返回数据
 	    		        /*******************************************************
 						 * 设置进度条 progressall: function (e, data) { var progress =
 						 * parseInt(data.loaded / data.total * 100);
@@ -565,7 +565,7 @@ window.layinit(function (htConfig) {
 	            $.ajax({
 	                type: "POST",
 	                url: basePath+'car/auctionDetail',
-	                data: {"businessId":businessId},
+	                data: {"businessId":businessId,"dragId":dragId},
 	                // contentType: "application/json; charset=utf-8",
 	                success: function (data) {
 	                	if (data.code == "0000"){

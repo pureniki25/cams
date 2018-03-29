@@ -26,6 +26,7 @@
 		det.evaluation_amount,<!-- 评估金额 -->
 		date_format(det.create_time,'%Y-%m-%d') evaluation_date,<!-- 评估日期 -->
 		date_format(drag.drag_date,'%Y-%m-%d') trailer_date,<!-- 拖车日期 -->
+		drag.id  drag_id,<!-- 拖车id -->
 		case
 		when car.status='01' then '待处置'
 		when car.status='02' then '拍卖中'<!-- 状态 -->
@@ -39,6 +40,7 @@
 		when car.status='08' then '转公车申请中'
 		when car.status='09' then '拍卖审核中'
 		when car.status='10' then '转公车审核中'
+		when car.status='11' then '已归还'
 		else ''
 		end status
 		from tb_car_basic car
@@ -53,6 +55,7 @@
 		JOIN tb_sys_user_permission as permission  ON  permission.business_id = bus.business_id
 
 		<where>
+			not EXISTS (select * from tb_car_return_reg reg where drag.id=reg.drag_id)
 			<if test="businessId !=null and businessId !=''">
 				and bus.business_id LIKE "%"#{businessId}"%"
 			</if>

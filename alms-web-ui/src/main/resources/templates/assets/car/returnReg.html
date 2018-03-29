@@ -94,6 +94,7 @@ color: #FF3030;
 <body>
 	<!--隐藏元素-->
 	<p id="businessId" th:attr="value=${businessId}" hidden />
+	<p id="dragId" th:attr="value=${dragId}" hidden />
 	<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
 	<div id="app">
 		<div class="layui-row">
@@ -209,7 +210,7 @@ color: #FF3030;
 						<tr>
 						<td class="td_label" >是否缴纳拖车费用<label class="input_label">*</label></td>
 							<td colspan="3">
-							      <input value="true" v-model="returnReg.isPayTrailerCost" type="radio" /><label>是</label>&nbsp;&nbsp;
+							      <input value="true" v-model="returnReg.isPayTrailerCost" type="radio"  /><label>是</label>&nbsp;&nbsp;
       							  <input value="false" v-model="returnReg.isPayTrailerCost" type="radio" /><label>否</label>
 							</td>
 						</tr>
@@ -237,9 +238,13 @@ color: #FF3030;
 				<div class="grid-demo layui-bg-gray">附件信息：</div>
 				<div class="grid-demo layui-bg-gray">
 						<table class="layui-table" id="fTab">
+						<tr><td colspan="5"> <div class="progress" style="background-color: #E8E8E8">
+           				 <div class="bar"  style="width: 0%;">0%</div>
+        				</div>  </td></tr>
 						<tr v-for="(info, index) in returnRegFiles">
 							<td class="td_label" >附件{{index+1}}<input type="text" hidden="" v-model="info.oldDocId" :id="'docId'+index" /></td>
-							<td><a href="javascript:;" class="selectFile">请选择
+							<td>
+							<a href="javascript:;" class="selectFile">请选择
 							<input type="file" title="请选择" v-model="info.file" :id="'uploadfile'+index" v-on:click="uploadFile($event,index)" width="100px"
 								class="uploadFile"/>
 								
@@ -249,10 +254,10 @@ color: #FF3030;
 								style="width: 100%" maxlength="100" :id="'uploadfileName'+index" /></td>
 							<td>
 							  <div class="layui-btn-group">
-							    <button class="layui-btn layui-btn-primary layui-btn-sm" v-on:click="addTabTr($event)"><i class="layui-icon"></i></button>
-							
+							    <button class="layui-btn layui-btn-primary layui-btn-sm" v-on:click="addTabTr($event)" ><i class="layui-icon"></i></button>
+							    
 							    <button class="layui-btn layui-btn-primary layui-btn-sm"  v-on:click="removeTabTr($event, index)"><i class="layui-icon"></i></button>
-							   
+							  	<a class="layui-btn layui-btn-primary layui-btn-sm"  v-on:click="downloadFile(info)" >下载</a>
 							  </div>
 							
 							</td>
