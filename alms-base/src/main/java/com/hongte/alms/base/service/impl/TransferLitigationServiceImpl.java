@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.aliyun.oss.ServiceException;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.assets.car.vo.FileVo;
 import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
@@ -494,6 +495,12 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		}
 		// 获取车贷基础信息
 		String businessId = carLoanBilVO.getBusinessId();
+		
+		/*Integer countData = transferOfLitigationMapper.queryRepayFlagByBusinessId(businessId);
+		if (countData != null && countData.intValue() > 0) {
+			throw new ServiceException("该业务已申请展期，无需结清试算！");
+		}*/
+		
 		Date billDate = carLoanBilVO.getBillDate(); // 预计结清日期
 		Map<String, Object> resultMap = queryCarLoanData(businessId);
 		

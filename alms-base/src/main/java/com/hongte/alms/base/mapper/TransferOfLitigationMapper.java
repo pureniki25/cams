@@ -144,4 +144,11 @@ public interface TransferOfLitigationMapper {
 	 * @return
 	 */
 	Double queryRefundMoneyByBusinessId(@Param(value="businessId") String businessId);
+	
+	/**
+	 * 根据业务编号查询是否存在申请展期已还款数据
+	 * @param businessId
+	 * @return
+	 */
+	Integer queryRepayFlagByBusinessId(@Param(value="businessId") String businessId);
 }

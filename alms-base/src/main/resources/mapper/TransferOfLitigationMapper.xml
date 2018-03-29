@@ -159,6 +159,7 @@
 		      tb_repayment_biz_plan_list_detail tab3 
 		    WHERE tab1.`plan_id` = tab2.`plan_id` 
 		      AND tab1.`plan_list_id` = tab3.`plan_list_id` 
+		      AND tab1.repay_flag != 6
 		      AND tab2.`original_business_id` = #{businessId,jdbcType=VARCHAR}) tab) t5,
 		  (SELECT 
 		    MIN(fact_output_date) fact_output_date,
@@ -904,6 +905,17 @@
 		ORDER BY t2.`due_date` DESC
 		LIMIT 1
 	</select>
+	
+	<select id="queryRepayFlagByBusinessId" resultType="java.lang.Integer">
+		SELECT 
+		  COUNT(1)
+		FROM
+		  tb_repayment_biz_plan t1,
+		  tb_repayment_biz_plan_list t2
+		WHERE t1.`original_business_id` = 'TDC5012017072502'  
+		  AND t2.`plan_id` = t1.`plan_id`
+		  AND t2.repay_flag = 6 
+	</select> 
 	
 	<select id="queryOverRepayMoneyByBusinessId" resultType="java.lang.Double">
 		SELECT 
