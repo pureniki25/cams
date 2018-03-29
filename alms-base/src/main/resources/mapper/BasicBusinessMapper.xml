@@ -77,10 +77,10 @@
             sum(case when t1.plan_item_type =10 then t1.plan_amount else 0 end) AS `needPayPrincipal`,
             <!--   应还利息总额（应付利息）-->
             sum(case when t1.plan_item_type =20 then t1.plan_amount else 0 end) `needPayInterest`,
-            <!--   应还违约金总额（应付违约金）-->
-            sum(case when t1.plan_item_type =70 then t1.plan_amount else 0 end) `needPayPenalty`,
+            <!--   应还违约金总额（应付违约金 取应付的滞纳金）-->
+            sum(case when t1.plan_item_type =60 then t1.plan_amount else 0 end) `needPayPenalty`,
             <!--   应还其他费用-->
-            sum(case when (t1.plan_item_type !=70 and t1.plan_item_type !=20 and t1.plan_item_type !=10)  then t1.plan_amount else 0 end) `otherPayAmount`,
+            sum(case when (t1.plan_item_type !=60 and t1.plan_item_type !=20 and t1.plan_item_type !=10)  then t1.plan_amount else 0 end) `otherPayAmount`,
 
             <!--   应还总额-->
             sum( t1.plan_amount ) `totalBorrowAmount`

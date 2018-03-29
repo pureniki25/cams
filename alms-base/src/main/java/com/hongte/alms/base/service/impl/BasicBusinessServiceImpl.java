@@ -44,7 +44,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
     public List<BusinessInfoForApplyDerateVo> selectBusinessInfoForApplyDerateVo(String crpId){
         List<BusinessInfoForApplyDerateVo> List  =  basicBusinessMapper.selectBusinessInfoForApplyDerateVo(crpId);
 
-        //申请类型列表
+        //利息类型列表
         List<SysParameter> borrowRateUnitlist =  sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterTypeEnums.BORROW_RATE_UNIT.getKey()).orderBy("row_Index"));
 
         Map<String,SysParameter> sysParameterMap = sysParameterService.selectParameterMap(SysParameterTypeEnums.BORROW_RATE_UNIT);
