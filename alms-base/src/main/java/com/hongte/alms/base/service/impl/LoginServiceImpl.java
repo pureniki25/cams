@@ -52,10 +52,10 @@ public class LoginServiceImpl implements LoginService {
         if(dto == null){
             return;
         }
-        if(dto.getUserId().equals(Constant.ADMIN_ID)) {
-            sysUserPermissionService.setUserPermissons(dto.getUserId());
-            return;
-        }
+//        if(dto.getUserId().equals(Constant.ADMIN_ID)) {
+//            sysUserPermissionService.setUserPermissons(dto.getUserId());
+//            return;
+//        }
     
         boolean fresh = false;//判断是否刷新任务设置
         SysUser sysUser = sysUserService.selectOne(new EntityWrapper<SysUser>().eq("user_id",dto.getUserId()));
