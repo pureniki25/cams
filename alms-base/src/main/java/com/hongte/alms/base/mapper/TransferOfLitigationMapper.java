@@ -75,7 +75,7 @@ public interface TransferOfLitigationMapper {
 	Map<String, Object> queryCarLoanFees(@Param(value="businessId") String businessId, @Param(value="billDate") Date billDate);
 	
 	/**
-	 * 结清试算功能查询往期少交费用
+	 * 结清试算功能查询往期少交费用明细
 	 * @param businessId
 	 * @param billDate
 	 * @return
@@ -95,4 +95,18 @@ public interface TransferOfLitigationMapper {
 	 * @return
 	 */
 	List<LitigationBorrowerDetailed> queryLitigationBorrowerDetailed(@Param(value="businessId") String businessId);
+	
+	/**
+	 * 查询状态为'逾期', '还款中'的最早应还日期
+	 * @param businessId
+	 * @return
+	 */
+	Date queryMinNoRepaymentDueDateByBusinessId(@Param(value="businessId") String businessId);
+	
+	/**
+	 * 查询往期少交费用总和
+	 * @param billDate
+	 * @return
+	 */
+	Double queryBalanceDueByBillDate(@Param(value="businessId") String businessId, @Param(value="billDate") Date billDate);
 }
