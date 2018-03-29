@@ -769,6 +769,17 @@
 		GROUP BY t.`plan_list_id`) tab
 	</select>
 	
+	<select id="countOverdueByBusinessId" resultType="java.lang.Integer">
+		SELECT 
+		  COUNT(1)
+		FROM
+		  tb_repayment_biz_plan t1,
+		  tb_repayment_biz_plan_list t2
+		  WHERE t1.`plan_id` = t2.`plan_id`
+		  AND t2.`current_status` = '逾期'
+		  AND t1.`original_business_id` = #{businessId,jdbcType=VARCHAR} 
+	</select>
+	
 	<select id="queryMaxDueDateByBusinessId" resultType="map">
 		SELECT 
 		  t2.`due_date` maxDueDate,
