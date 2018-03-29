@@ -506,8 +506,8 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		double squaredUp = 0; // 最终结清金额
 		double receivableTotal = 0; // 应收合计
 		boolean preLateFeesFlag = false;
-		double overRepayMoney = transferOfLitigationMapper.queryOverRepayMoneyByBusinessId(businessId);
-		double refundMoney = transferOfLitigationMapper.queryRefundMoneyByBusinessId(businessId);
+		double overRepayMoney = transferOfLitigationMapper.queryOverRepayMoneyByBusinessId(businessId); // 结余
+		double refundMoney = transferOfLitigationMapper.queryRefundMoneyByBusinessId(businessId);	// 押金转还款金额
 
 		if (resultMap != null && !resultMap.isEmpty()) {
 
@@ -565,8 +565,6 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			double dragFees = carLoanBilVO.getDragFees(); // 拖车费
 			double otherFees = carLoanBilVO.getOtherFees(); // 其他费用
 			double attorneyFees = carLoanBilVO.getAttorneyFees(); // 律师
-			double balance = 0; // 结余
-			double cash = 0; // 押金转还款金额
 
 			int curPeriod = (int) resultMap.get("curPeriod"); // // 当前期数
 			long totalPeriod = (long) resultMap.get("totalPeriod"); // 总还款期数
@@ -677,16 +675,14 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 			receivableTotal = borrowMoney + planAccrual + planServiceCharge + planPlatformCharge + planGuaranteeCharge
 					+ innerLateFees + outsideInterest + preLateFees + balanceDue + parkingFees + gpsFees + dragFees
-					+ otherFees + attorneyFees + overdueDefault + overRepayMoney + refundMoney;
-			squaredUp = receivableTotal - cash - balance;
+					+ otherFees + attorneyFees + overdueDefault - overRepayMoney - refundMoney;
+			squaredUp = receivableTotal - overRepayMoney - refundMoney;
 			resultMap.put("innerLateFees", BigDecimal.valueOf(innerLateFees).setScale(2, RoundingMode.HALF_UP).doubleValue());
 			resultMap.put("outsideInterest", BigDecimal.valueOf(outsideInterest).setScale(2, RoundingMode.HALF_UP).doubleValue());
 			resultMap.put("preLateFees", BigDecimal.valueOf(preLateFees).setScale(2, RoundingMode.HALF_UP).doubleValue());
 			resultMap.put("planAccrual", BigDecimal.valueOf(planAccrual).setScale(2, RoundingMode.HALF_UP).doubleValue());
 			resultMap.put("receivableTotal", BigDecimal.valueOf(receivableTotal).setScale(2, RoundingMode.HALF_UP).doubleValue());
 			resultMap.put("squaredUp", BigDecimal.valueOf(squaredUp).setScale(2, RoundingMode.HALF_UP).doubleValue());
-			resultMap.put("cash", BigDecimal.valueOf(cash).setScale(2, RoundingMode.HALF_UP).doubleValue());
-			resultMap.put("balance", BigDecimal.valueOf(balance).setScale(2, RoundingMode.HALF_UP).doubleValue());
 			resultMap.put("overdueDefault", BigDecimal.valueOf(overdueDefault).setScale(2, RoundingMode.HALF_UP).doubleValue());
 			resultMap.put("overRepayMoney", BigDecimal.valueOf(overRepayMoney).setScale(2, RoundingMode.HALF_UP).doubleValue());
 			resultMap.put("refundMoney", BigDecimal.valueOf(refundMoney).setScale(2, RoundingMode.HALF_UP).doubleValue());
