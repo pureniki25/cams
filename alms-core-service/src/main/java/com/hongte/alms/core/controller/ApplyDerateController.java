@@ -198,7 +198,7 @@ public class ApplyDerateController {
 			}
          // 查询附件
 			List<DocType> docTypes = docTypeService
-					.selectList(new EntityWrapper<DocType>().eq("type_code", "AfterLoan_Material_Litigation"));
+					.selectList(new EntityWrapper<DocType>().eq("type_code", "AfterLoan_Material_Reduction"));
 			if (docTypes != null && docTypes.size() == 1) {
 				List<Doc> fileList = docService.selectList(new EntityWrapper<Doc>()
 						.eq("doc_type_id", docTypes.get(0).getDocTypeId()).eq("business_id", businessId).orderBy("doc_id"));
