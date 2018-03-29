@@ -527,6 +527,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				resultMap.putAll(transferOfLitigationMapper.queryCarLoanFees(businessId, billDate)); 
 				// 查询往期少交费用明细
 				List<PreviousFeesVO> previousFees = setMatchingRepaymentPlanAccrual("等额本息", setPreviosFees(businessId, billDate), monthBorrowRate);
+				resultMap.put("previousFees", previousFees);
 				// 往期少交费用合计
 				Double balanceDue = transferOfLitigationMapper.queryBalanceDueByBillDate(businessId, billDate);
 				balanceDue = setMatchingRepaymentPlanAccrualBalanceDue(resultMap, previousFees, balanceDue);
