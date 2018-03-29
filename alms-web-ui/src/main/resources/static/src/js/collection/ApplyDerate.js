@@ -348,7 +348,7 @@ window.layinit(function (htConfig) {
 	    		            if (data!=null && data.originalFiles!=null && data.originalFiles.length > 0) {
 	   	                     data.formData = {fileName: data.originalFiles[0].name};
 	   	                     data.formData.businessId = businessId;
-	   	                     data.formData.busType='AfterLoan_Material_CarAuction';
+	   	                     data.formData.busType='AfterLoan_Material_Reduction';
 	   	                     data.formData.file=data.originalFiles[0];
 		    		        	var size=data.originalFiles[0].size;
 		    		        	 if(size/1024/1024 > 10){
