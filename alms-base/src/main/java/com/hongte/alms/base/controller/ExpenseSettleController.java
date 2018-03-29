@@ -16,6 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,10 +60,14 @@ import io.swagger.annotations.ApiOperation;
 
 @Controller
 @RequestMapping("/expenseSettle")
+@RefreshScope
 public class ExpenseSettleController {
 
 	private Logger logger = LoggerFactory.getLogger(ExpenseSettleController.class);
 
+	@Value("${bmApi.apiUrl}")
+	String xindaiAplUrlUrl ;
+	
 	@Autowired
 	@Qualifier("BasicBusinessService")
 	BasicBusinessService basicBusinessService;
@@ -514,10 +520,12 @@ public class ExpenseSettleController {
 	private BigDecimal countPenalty(List<RepaymentBizPlanList> currentPlanLists,
 			List<RepaymentBizPlanListDetail> planListDetails) {
 		BigDecimal tmp = new BigDecimal(0);
-		
+		int count = 0 ;
 			for (RepaymentBizPlanListDetail repaymentBizPlanListDetail : planListDetails) {
 				if (repaymentBizPlanListDetail.getPeriod() > currentPlanLists.get(0).getPeriod()
 						&& repaymentBizPlanListDetail.getPlanItemType() == 30) {
+					logger.info(++count+"");
+					logger.info(repaymentBizPlanListDetail.getPlanAmount().toString());
 					tmp = tmp.add(repaymentBizPlanListDetail.getPlanAmount());
 				}
 			}
@@ -569,6 +577,11 @@ public class ExpenseSettleController {
 	
 	public ResponseData callRemoteService(String businessId) throws RuntimeException {
 		logger.info("调用callRemoteService");
+		if (xindaiAplUrlUrl==null) {
+			logger.error("xindaiAplUrlUrl==null!!!");
+			return null ;
+		}
+		logger.info("xindaiAplUrlUrl:"+xindaiAplUrlUrl);
 		DESC desc = new DESC();
 		RequestData requestData = new RequestData();
 		requestData.setMethodName("AfterLoanRepayment_GetFeeList");
@@ -584,7 +597,7 @@ public class ExpenseSettleController {
 		logger.info("请求数据-开始");
 		logger.info(encryptStr);
 		logger.info("请求数据-结束");
-		XindaiService xindaiService = Feign.builder().target(XindaiService.class, "http://192.168.14.153:8018");
+		XindaiService xindaiService = Feign.builder().target(XindaiService.class, xindaiAplUrlUrl);
 		String response = xindaiService.dod(encryptStr);
 
 		// 返回数据解密

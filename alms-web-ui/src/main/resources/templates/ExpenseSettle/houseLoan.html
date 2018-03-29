@@ -171,9 +171,9 @@
                 </row>
                 <row>
                     <i-col span="6">+结余</i-col>
-                    <i-col span="6">{{business.info.balance}}</i-col>
+                    <i-col span="6">{{business.info.balance||0}}</i-col>
                     <i-col span="6">+押金转还款金额</i-col>
-                    <i-col span="6">{{business.deposit}}</i-col>
+                    <i-col span="6">{{business.deposit||0}}</i-col>
                 </row>
                 <row>
                     <i-col span="6">最终结清金额</i-col>
