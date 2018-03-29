@@ -5,6 +5,8 @@ public class PreviousFeesVO {
 	private double previousPlanAccrual;
 	private double previousPlanServiceCharge;
 	private double previousLateFees;
+	private String currentStatus;
+	private String businessId;
 
 	public int getPeriod() {
 		return period;
@@ -38,11 +40,27 @@ public class PreviousFeesVO {
 		this.previousLateFees = previousLateFees;
 	}
 
+	public String getCurrentStatus() {
+		return currentStatus;
+	}
+
+	public void setCurrentStatus(String currentStatus) {
+		this.currentStatus = currentStatus;
+	}
+
+	public String getBusinessId() {
+		return businessId;
+	}
+
+	public void setBusinessId(String businessId) {
+		this.businessId = businessId;
+	}
+
 	@Override
 	public String toString() {
 		return "PreviousFeesVO [period=" + period + ", previousPlanAccrual=" + previousPlanAccrual
 				+ ", previousPlanServiceCharge=" + previousPlanServiceCharge + ", previousLateFees=" + previousLateFees
-				+ "]";
+				+ ", currentStatus=" + currentStatus + ", businessId=" + businessId + "]";
 	}
 
 }

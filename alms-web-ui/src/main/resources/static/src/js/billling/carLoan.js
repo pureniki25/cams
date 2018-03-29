@@ -34,8 +34,8 @@ window.layinit(function (htConfig) {
 	        	balanceDue:""  	, // 往期少交费用（含滞纳金）
 	        	overdueDefault:""  	, // 逾期违约金
 	        	receivableTotal: '',//	应收合计
-				balance: '',		//	结余
-				cash: '',		//	押金转还款金额
+	        	overRepayMoney: '',		//	结余
+	        	refundMoney: '',		//	押金转还款金额
 				squaredUp: ''		//	最终结清金额
 	        },
 	        
