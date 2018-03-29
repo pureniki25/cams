@@ -31,6 +31,7 @@ import com.hongte.alms.base.entity.BizOutputRecord;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
+import com.hongte.alms.base.mapper.TransferOfLitigationMapper;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.BasicRepaymentTypeService;
 import com.hongte.alms.base.service.BizOutputRecordService;
@@ -88,6 +89,9 @@ public class ExpenseSettleController {
 	@Autowired
 	@Qualifier("ExpenseSettleService")
 	ExpenseSettleService expenseSettleService;
+	
+	@Autowired
+	TransferOfLitigationMapper transferOfLitigationMapper ;
 
 	private List<ExpenseSettleLackFeeVO> lackFeeList = new ArrayList<>();
 	private BigDecimal principal = new BigDecimal(0).setScale(2);
@@ -274,6 +278,7 @@ public class ExpenseSettleController {
 		 * deposit = countFee(details, 90); balance = countBalance(currentDetails);
 		 */
 		lackFeeList = coutLackFee(pastPeriods, settleDate);
+		balance = new BigDecimal(transferOfLitigationMapper.queryOverRepayMoneyByBusinessId(basicBusiness.getBusinessId()));
 		return initExpenseSettleVO();
 
 	}
@@ -654,6 +659,7 @@ public class ExpenseSettleController {
 			penalty = countPenalty(currentPeriods, details);
 		}
 		lackFeeList = coutLackFee(pastPeriods,settleDate);
+		balance = new BigDecimal(transferOfLitigationMapper.queryOverRepayMoneyByBusinessId(basicBusiness.getBusinessId()));
 		return initExpenseSettleVO();
 
 	}
@@ -672,6 +678,7 @@ public class ExpenseSettleController {
 		expenseSettleVO.setDeposit(deposit);
 		expenseSettleVO.setPenalty(penalty);
 		expenseSettleVO.setDemurrage(demurrage);
+		expenseSettleVO.setBalance(balance);
 		return expenseSettleVO;
 	}
 
