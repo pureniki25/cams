@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -142,33 +143,34 @@ public class ExpenseSettleController {
 	private Map<RepaymentBizPlanList, List<RepaymentBizPlanListDetail>> getPastPeriod(
 			RepaymentBizPlanList currentPeriod, List<RepaymentBizPlanList> planLists,
 			List<RepaymentBizPlanListDetail> details) {
-		Map<RepaymentBizPlanList, List<RepaymentBizPlanListDetail>> map = new TreeMap<>();
+		Map<RepaymentBizPlanList, List<RepaymentBizPlanListDetail>> map = new LinkedHashMap<>();
 		for (RepaymentBizPlanList planList : planLists) {
-			if (planList.getPeriod()<currentPeriod.getPeriod()) {
+			if (planList.getPeriod() < currentPeriod.getPeriod()) {
 				List<RepaymentBizPlanListDetail> list = new ArrayList<>();
 				for (RepaymentBizPlanListDetail repaymentBizPlanListDetail : details) {
-					
+
 					if (repaymentBizPlanListDetail.getPlanListId().equals(planList.getPlanListId())) {
 						list.add(repaymentBizPlanListDetail);
 					}
 				}
-				
+
 				map.put(planList, list);
 			}
 		}
-		
+
 		return map;
 
 	}
-	
-	private RepaymentBizPlanList getFirstOverduePlanList(Map<RepaymentBizPlanList, List<RepaymentBizPlanListDetail>> map) {
-		for (Map.Entry<RepaymentBizPlanList, List<RepaymentBizPlanListDetail>> e :map.entrySet()) {
+
+	private RepaymentBizPlanList getFirstOverduePlanList(
+			Map<RepaymentBizPlanList, List<RepaymentBizPlanListDetail>> map) {
+		for (Map.Entry<RepaymentBizPlanList, List<RepaymentBizPlanListDetail>> e : map.entrySet()) {
 			if (e.getKey().getCurrentStatus().equals("逾期")) {
 				return e.getKey();
 			}
 		}
 		return null;
-		
+
 	}
 
 	private ExpenseSettleVO calXXHB(Date settleDate, BasicBusiness basicBusiness, List<RepaymentBizPlanList> planLists,
@@ -177,22 +179,22 @@ public class ExpenseSettleController {
 		RepaymentBizPlanList finalPeriod = planLists.get(planLists.size() - 1);
 		RepaymentBizPlanList currentPeriod = findCurrentPeriod(settleDate, planLists);
 		List<RepaymentBizPlanListDetail> currentDetails = findCurrentDetail(currentPeriod, details);
-		Map<RepaymentBizPlanList, List<RepaymentBizPlanListDetail>> pastPeriods = getPastPeriod(currentPeriod, planLists, currentDetails);
+		Map<RepaymentBizPlanList, List<RepaymentBizPlanListDetail>> pastPeriods = getPastPeriod(currentPeriod,
+				planLists, details);
 		RepaymentBizPlanList firstOverDuePeriod = getFirstOverduePlanList(pastPeriods);
-		
+
 		principal = countOutPutMoney(basicBusiness.getBusinessId());
 		interest = countFee(currentDetails, 20);
 		servicecharge = countFee(currentDetails, 30);
 		guaranteeFee = countFee(currentDetails, 40);
 		platformFee = countFee(currentDetails, 50);
-		
-		if (firstOverDuePeriod!=null) {
+
+		if (firstOverDuePeriod != null) {
 			int daysBeyoungDueDate = DateUtil.getDiffDays(firstOverDuePeriod.getDueDate(), settleDate);
 			if (daysBeyoungDueDate > 1) {
 				lateFee = principal.multiply(new BigDecimal(0.003)).multiply(new BigDecimal(daysBeyoungDueDate));
 			}
 		}
-		
 
 		int daysBeyoungFinalPeriod = DateUtil.getDiffDays(finalPeriod.getDueDate(), settleDate);
 		if (daysBeyoungFinalPeriod > 0) {
@@ -226,34 +228,70 @@ public class ExpenseSettleController {
 		}
 	}
 
-	private List<ExpenseSettleLackFeeVO> coutLackFee(Map<RepaymentBizPlanList, List<RepaymentBizPlanListDetail>> pastPeriods){
+	private List<ExpenseSettleLackFeeVO> coutLackFee(
+			Map<RepaymentBizPlanList, List<RepaymentBizPlanListDetail>> pastPeriods) {
 		List<ExpenseSettleLackFeeVO> list = new ArrayList<>();
-		ExpenseSettleLackFeeVO expenseSettleLackFeeVO = new ExpenseSettleLackFeeVO();
-		boolean hasCalLateFee = false ;
-		for (Map.Entry<RepaymentBizPlanList, List<RepaymentBizPlanListDetail>> e:pastPeriods.entrySet()) {
+		boolean hasCalLateFee = false;
+		BigDecimal firstInterest = null;
+		for (Map.Entry<RepaymentBizPlanList, List<RepaymentBizPlanListDetail>> e : pastPeriods.entrySet()) {
 			String afterId = e.getKey().getAfterId();
+			ExpenseSettleLackFeeVO expenseSettleLackFeeVO = new ExpenseSettleLackFeeVO();
 			expenseSettleLackFeeVO.setPeriod(afterId);
 			expenseSettleLackFeeVO.setLateFee(new BigDecimal(0));
 			expenseSettleLackFeeVO.setServicecharge(new BigDecimal(0));
+			expenseSettleLackFeeVO.setPlatFormFee(new BigDecimal(0));
+			expenseSettleLackFeeVO.setPrincipal(new BigDecimal(0));
+			expenseSettleLackFeeVO.setInterest(new BigDecimal(0));
 			for (RepaymentBizPlanListDetail d : e.getValue()) {
-				BigDecimal servicecharge = expenseSettleLackFeeVO.getServicecharge() ;
-				if (d.getPlanItemType().equals(new Integer(30))) {
-					servicecharge = servicecharge.add(d.getPlanAmount());
-				}else if (d.getPlanItemType().equals(new Integer(50))) {
-					servicecharge = servicecharge.add(d.getPlanAmount());
+				if (d.getPlanItemType().equals(new Integer(30)) && (d.getFactAmount() == null
+						|| d.getFactAmount().subtract(d.getPlanAmount()).compareTo(new BigDecimal(0)) < 0)) {
+					
+					expenseSettleLackFeeVO.setServicecharge(d.getPlanAmount().subtract(d.getFactAmount()==null?new BigDecimal(0):d.getFactAmount()));
+					
+				} else if (d.getPlanItemType().equals(new Integer(50)) && (d.getFactAmount() == null
+						|| d.getFactAmount().subtract(d.getPlanAmount()).compareTo(new BigDecimal(0)) < 0)) {
+					
+					expenseSettleLackFeeVO.setPlatFormFee(d.getPlanAmount().subtract(d.getFactAmount()==null?new BigDecimal(0):d.getFactAmount()));
+					
+				} else if (d.getPlanItemType().equals(new Integer(10))  && (d.getFactAmount() == null
+						|| d.getFactAmount().subtract(d.getPlanAmount()).compareTo(new BigDecimal(0)) < 0))  {
+					
+					expenseSettleLackFeeVO.setPrincipal(d.getPlanAmount().subtract(d.getFactAmount()==null?new BigDecimal(0):d.getFactAmount()));
+					
+				} else if (d.getPlanItemType().equals(new Integer(20))  && (d.getFactAmount() == null
+						|| d.getFactAmount().subtract(d.getPlanAmount()).compareTo(new BigDecimal(0)) < 0)) {
+					
+					if (firstInterest==null) {
+						firstInterest = d.getPlanAmount().subtract(d.getFactAmount()==null?new BigDecimal(0):d.getFactAmount()) ;
+					}
+					expenseSettleLackFeeVO.setInterest(firstInterest);
 				}
-				expenseSettleLackFeeVO.setServicecharge(servicecharge);
 			}
-			if (!hasCalLateFee&&lateFee!=null) {
-				expenseSettleLackFeeVO.setLateFee(lackFee);
-				hasCalLateFee=true;
+			if (!hasCalLateFee && lateFee != null) {
+				expenseSettleLackFeeVO.setLateFee(lateFee);
+				hasCalLateFee = true;
 			}
-			list.add(expenseSettleLackFeeVO);
+
+			if (expenseSettleLackFeeVO.getLateFee().compareTo(new BigDecimal(0)) > 0
+					|| expenseSettleLackFeeVO.getPlatFormFee().compareTo(new BigDecimal(0)) > 0
+					|| expenseSettleLackFeeVO.getPrincipal().compareTo(new BigDecimal(0)) > 0
+					|| expenseSettleLackFeeVO.getInterest().compareTo(new BigDecimal(0)) > 0 ) {
+
+				list.add(expenseSettleLackFeeVO);
+			}
+		}
+
+		lackFee = new BigDecimal(0);
+		for (ExpenseSettleLackFeeVO expenseSettleLackFeeVO : list) {
+			lackFee = lackFee.add(expenseSettleLackFeeVO.getLateFee())
+					.add(expenseSettleLackFeeVO.getServicecharge())
+					.add(expenseSettleLackFeeVO.getPrincipal())
+					.add(expenseSettleLackFeeVO.getPlatFormFee());
 		}
 		return list;
-		
+
 	}
-	
+
 	private void countLackFee(Date settleDate, List<RepaymentBizPlanList> planLists,
 			List<RepaymentBizPlanListDetail> details) {
 		boolean hasCalLateFee = false;
@@ -288,7 +326,6 @@ public class ExpenseSettleController {
 			lackFeeList.add(expenseSettleLackFeeVO);
 		}
 	}
-
 
 	class MapKeyComparator implements Comparator<Integer> {
 		@Override
@@ -401,9 +438,10 @@ public class ExpenseSettleController {
 		RepaymentBizPlanList finalPeriod = planLists.get(planLists.size() - 1);
 		RepaymentBizPlanList currentPeriod = findCurrentPeriod(settleDate, planLists);
 		List<RepaymentBizPlanListDetail> currentDetails = findCurrentDetail(currentPeriod, details);
-		Map<RepaymentBizPlanList, List<RepaymentBizPlanListDetail>> pastPeriods = getPastPeriod(currentPeriod, planLists, currentDetails);
+		Map<RepaymentBizPlanList, List<RepaymentBizPlanListDetail>> pastPeriods = getPastPeriod(currentPeriod,
+				planLists, details);
 		RepaymentBizPlanList firstOverDuePeriod = getFirstOverduePlanList(pastPeriods);
-		
+
 		principal = countOutPutMoney(basicBusiness.getBusinessId())
 				.subtract(countPaidPrincipal(planLists, currentDetails));
 		interest = countFee(currentDetails, 20);
@@ -411,7 +449,7 @@ public class ExpenseSettleController {
 		guaranteeFee = countFee(currentDetails, 40);
 		platformFee = countFee(currentDetails, 50);
 
-		if (firstOverDuePeriod!=null) {
+		if (firstOverDuePeriod != null) {
 			int daysBeyoungDueDate = DateUtil.getDiffDays(firstOverDuePeriod.getDueDate(), settleDate);
 			if (daysBeyoungDueDate > 1) {
 				lateFee = principal.multiply(new BigDecimal(0.003)).multiply(new BigDecimal(daysBeyoungDueDate));
@@ -441,7 +479,7 @@ public class ExpenseSettleController {
 		expenseSettleVO.setGuaranteeFee(guaranteeFee);
 		expenseSettleVO.setPlatformFee(platformFee);
 		expenseSettleVO.setList(lackFeeList);
-		expenseSettleVO.setLackFee(lackFee==null?new BigDecimal(0):lackFee);
+		expenseSettleVO.setLackFee(lackFee == null ? new BigDecimal(0) : lackFee);
 		expenseSettleVO.setBalance(balance);
 		expenseSettleVO.setDeposit(deposit);
 		expenseSettleVO.setPenalty(penalty);
