@@ -510,6 +510,9 @@ color: #FF3030;
 				<div class="grid-demo layui-bg-gray">展示图片及相关附件:</div>
 				<div class="grid-demo layui-bg-gray">
 						<table class="layui-table" id="fTab">
+						<tr><td colspan="5"> <div class="progress" style="background-color: #E8E8E8">
+           				 <div class="bar"  style="width: 0%;">0%</div>
+        				</div>  </td></tr>
 						<tr v-for="(info, index) in returnRegFiles">
 							<td class="td_label" >附件{{index+1}}<input type="text" hidden="" v-model="info.oldDocId" :id="'docId'+index" /></td>
 							<td><a href="javascript:;" class="selectFile">请选择

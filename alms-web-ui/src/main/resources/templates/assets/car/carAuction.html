@@ -12,9 +12,9 @@
 
 <link rel="stylesheet" type="text/css"
 	href="/src/css/themes/default.css" />
-<!-- iview样式 -->
+<!-- iview样式 
 <link rel="stylesheet" type="text/css"
-	href="/plugins/iview/css/iview.css" />
+	href="/plugins/iview/css/iview.css" />-->
 <!--@import url("//unpkg.com/iview/dist/styles/iview.css");-->
 <!--<link rel="stylesheet" type="text/css" href="//unpkg.com/iview/dist/styles/iview.css"/>-->
 <!-- 引入layui样式 -->
@@ -25,9 +25,10 @@
        <script src="//unpkg.com/iview/dist/iview.min.js"></script>-->
 <!-- 引入vue -->
 <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
-<!-- iview js -->
-<script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
-        <script src="/properties/config.js"></script>
+
+<!-- iview js 
+<script type="text/javascript" src="/plugins/iview/js/iview.js"></script>-->
+<script src="/properties/config.js"></script>
 <!--引入layui.js-->
 <script src="/plugins/layui/layui.js"></script>
 <!--引入axios.js 用于ajax调用-->
@@ -504,6 +505,9 @@ color: #FF3030;
 				<div class="grid-demo layui-bg-gray">展示图片及相关附件:</div>
 				<div class="grid-demo layui-bg-gray">
 						<table class="layui-table" id="fTab">
+						<tr><td colspan="5"> <div class="progress" style="background-color: #E8E8E8">
+           				 <div class="bar"  style="width: 0%;">0%</div>
+        				</div>  </td></tr>
 						<tr v-for="(info, index) in returnRegFiles">
 							<td class="td_label" >附件{{index+1}}<input type="text" hidden="" v-model="info.oldDocId" :id="'docId'+index" /></td>
 							<td>
