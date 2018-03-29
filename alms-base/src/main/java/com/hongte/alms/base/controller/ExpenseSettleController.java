@@ -81,14 +81,27 @@ public class ExpenseSettleController {
 	ExpenseSettleService expenseSettleService;
 
 	private List<ExpenseSettleLackFeeVO> lackFeeList = new ArrayList<>();
-	private BigDecimal principal = new BigDecimal(0);
-	private BigDecimal interest = new BigDecimal(0);
-	private BigDecimal servicecharge = new BigDecimal(0);
-	private BigDecimal guaranteeFee = new BigDecimal(0);
-	private BigDecimal platformFee = new BigDecimal(0);
+	private BigDecimal principal = new BigDecimal(0).setScale(2);
+	private BigDecimal interest = new BigDecimal(0).setScale(2);
+	private BigDecimal servicecharge = new BigDecimal(0).setScale(2);
+	private BigDecimal guaranteeFee = new BigDecimal(0).setScale(2);
+	private BigDecimal platformFee = new BigDecimal(0).setScale(2);
+	
+	/**
+	 * 期内滞纳金
+	 */
 	private BigDecimal lateFee = new BigDecimal(0);
+	/**
+	 * 期外逾期费
+	 */
 	private BigDecimal demurrage = new BigDecimal(0);
+	/**
+	 * 提前还款违约金
+	 */
 	private BigDecimal penalty = new BigDecimal(0);
+	/**
+	 * 往期少缴费用
+	 */
 	private BigDecimal lackFee = null;
 	private BigDecimal balance = new BigDecimal(0);
 	private BigDecimal deposit = new BigDecimal(0);
@@ -125,15 +138,16 @@ public class ExpenseSettleController {
 		ExpenseSettleVO expenseSettleVO = expenseSettleService.sum(businessId);
 		Date settelDate = DateUtil.getDate(preSettleDate, "yyyy-MM-dd");
 		BasicBusiness basicBusiness = basicBusinessService.selectById(businessId);
+		RepaymentBizPlan repaymentBizPlan = repaymentBizPlanService.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("business_id", businessId));
 		List<RepaymentBizPlanList> planLists = repaymentBizPlanListService.selectList(
 				new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).orderBy("due_date"));
 		List<RepaymentBizPlanListDetail> details = repaymentBizPlanListDetailService.selectList(
 				new EntityWrapper<RepaymentBizPlanListDetail>().eq("business_id", businessId).orderBy("period"));
 
 		if (basicBusiness.getRepaymentTypeId() == 2) {
-			expenseSettleVO = calXXHB(settelDate, basicBusiness, planLists, details);
+			expenseSettleVO = calXXHB(settelDate, basicBusiness, repaymentBizPlan,planLists, details);
 		} else if (basicBusiness.getRepaymentTypeId() == 5) {
-			expenseSettleVO = calDEBX(settelDate, basicBusiness, planLists, details);
+			expenseSettleVO = calDEBX(settelDate, basicBusiness, repaymentBizPlan,planLists, details);
 		}
 
 		return Result.success(expenseSettleVO);
@@ -173,7 +187,7 @@ public class ExpenseSettleController {
 
 	}
 
-	private ExpenseSettleVO calXXHB(Date settleDate, BasicBusiness basicBusiness, List<RepaymentBizPlanList> planLists,
+	private ExpenseSettleVO calXXHB(Date settleDate, BasicBusiness basicBusiness,RepaymentBizPlan plan, List<RepaymentBizPlanList> planLists,
 			List<RepaymentBizPlanListDetail> details) {
 
 		RepaymentBizPlanList finalPeriod = planLists.get(planLists.size() - 1);
@@ -183,7 +197,7 @@ public class ExpenseSettleController {
 				planLists, details);
 		RepaymentBizPlanList firstOverDuePeriod = getFirstOverduePlanList(pastPeriods);
 
-		principal = countOutPutMoney(basicBusiness.getBusinessId());
+		principal = plan.getBorrowMoney();
 		interest = countFee(currentDetails, 20);
 		servicecharge = countFee(currentDetails, 30);
 		guaranteeFee = countFee(currentDetails, 40);
@@ -433,7 +447,7 @@ public class ExpenseSettleController {
 		return tmp;
 	}
 
-	private ExpenseSettleVO calDEBX(Date settleDate, BasicBusiness basicBusiness, List<RepaymentBizPlanList> planLists,
+	private ExpenseSettleVO calDEBX(Date settleDate, BasicBusiness basicBusiness,RepaymentBizPlan plan, List<RepaymentBizPlanList> planLists,
 			List<RepaymentBizPlanListDetail> details) {
 		RepaymentBizPlanList finalPeriod = planLists.get(planLists.size() - 1);
 		RepaymentBizPlanList currentPeriod = findCurrentPeriod(settleDate, planLists);
@@ -442,7 +456,7 @@ public class ExpenseSettleController {
 				planLists, details);
 		RepaymentBizPlanList firstOverDuePeriod = getFirstOverduePlanList(pastPeriods);
 
-		principal = countOutPutMoney(basicBusiness.getBusinessId())
+		principal = plan.getBorrowMoney()
 				.subtract(countPaidPrincipal(planLists, currentDetails));
 		interest = countFee(currentDetails, 20);
 		servicecharge = countFee(currentDetails, 30);
