@@ -1050,7 +1050,7 @@ try {
     	CarBasic carBasic=carBasicService.selectById(businessId);
     	//拖车信息
     	List<CarDrag> drag=carDragService.selectList(
-    	        new EntityWrapper<CarDrag>().eq("business_id", businessId)); 
+    	        new EntityWrapper<CarDrag>().eq("business_id", businessId).orderBy("create_time", false)); 
     	//获取最新评估信息
     	CarDetection detection=carDetectionService.selectById(carBasic.getLastDetectionId());
     	//获取抵押时的评估信息
