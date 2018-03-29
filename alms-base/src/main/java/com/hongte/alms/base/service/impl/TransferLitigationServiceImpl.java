@@ -135,7 +135,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	@Qualifier("TransferLitigationLogService")
 	private TransferLitigationLogService transferLitigationLogService;
 	
-	@Value("${ht.billing.west.part.business}")
+	@Value("${ht.billing.west.part.business:''}")
 	private String westPartBusiness;
 
 	@Override
