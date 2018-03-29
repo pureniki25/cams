@@ -56,7 +56,7 @@
 
         pList.period as  periods,
         pList.overdue_days as delayDays,
-        pList.total_borrow_amount as totalBorrowAmount,
+        c.totalBorrowAmount as totalBorrowAmount,
 
         c.needPayPrincipal as needPayPrincipal,
         c.needPayInterest as needPayInterest,
