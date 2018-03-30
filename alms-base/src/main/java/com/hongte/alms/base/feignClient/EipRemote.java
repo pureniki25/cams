@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @FeignClient(value = "eip-out")
 public interface EipRemote {
 
-    @RequestMapping(value = "/eip/xiaodai/AddProjectTrack",headers = {"app=DH", "content-type=application/json"},method = RequestMethod.POST)
+    @RequestMapping(value = "/eip/xiaodai/AddProjectTrack",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
     Result addProjectTrack(@RequestBody AddProjectTrackReqDto dto);
     
 	/**
