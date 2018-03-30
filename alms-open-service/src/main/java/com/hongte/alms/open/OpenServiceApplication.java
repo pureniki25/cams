@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 /**
  * 第三方对外服务
  */
-@EnableFeignClients(basePackages = {"com.ht.ussp.client"})
+@EnableFeignClients(basePackages = {"com.ht.ussp.client","com.hongte.alms.base.feignClient"})
 @SpringCloudApplication
 @MapperScan(basePackages = {"com.hongte.alms.open.mapper","com.hongte.alms.base"})
 @EnableTransactionManagement
