@@ -25,6 +25,6 @@ public interface EipRemote {
 	 * @param emailVo
 	 * @return
 	 */
-    @RequestMapping(value = "/eip/common/sendSms", headers = { "app=ALMS", "content-type=application/json" })
+    @RequestMapping(value = "/eip/common/sendSms", headers = { "app=ALMS", "content-type=application/json" },method = RequestMethod.POST)
 	public Result sendSms(@RequestBody SmsVo smsVo);
 }
