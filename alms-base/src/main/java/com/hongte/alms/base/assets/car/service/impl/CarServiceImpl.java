@@ -554,8 +554,8 @@ public class CarServiceImpl  implements CarService {
 			throw new AlmsBaseExcepiton( "报名登记短信模板不存在"); 
 		}
 		MsgTemplate msgTemplate=msgTemplates.get(0);
-		if(MsgTemplateEnableEnum.ENABLE.getValue().equals(msgTemplate.getEnableFlag())
-			&&!StringUtils.isEmpty(msgTemplate.getMsg())) {
+		if(
+			!StringUtils.isEmpty(msgTemplate.getMsg())) {
 			String msg=String.format(msgTemplate.getMsg(),userName,DateUtil.formatDate("yyyy-MM-dd HH:mm:ss", carAuction.getPaymentEndTime()),carAuction.getDeposit(),
 					carAuction.getAcountName(),carAuction.getOpenBank(),carAuction.getAcountNum());
 			Set<String> phones=new HashSet<String>();
@@ -577,13 +577,17 @@ public class CarServiceImpl  implements CarService {
 			sms.setCreateTime(new Date());
 			sms.setCreateUser("admin");//系统触发自动发送
 			try {
-				Result eipResult=eipRemote.sendSms(vo);
-				if(eipResult==null||!"0000".equals(eipResult.getReturnCode())) {
-					logger.error("调用EIP系统发送短信失败,eipResult="+eipResult==null?null:"调用EIP系统发送短信返回码："+eipResult.getReturnCode());
-					throw new AlmsBaseExcepiton( "调用EIP系统发送短信失败"); 
-				}
+				if(MsgTemplateEnableEnum.ENABLE.getValue().equals(msgTemplate.getEnableFlag())) {//发送开关
+					Result eipResult=eipRemote.sendSms(vo);
+					if(eipResult==null||!"0000".equals(eipResult.getReturnCode())) {
+						logger.error("调用EIP系统发送短信失败,eipResult="+eipResult==null?null:"调用EIP系统发送短信返回码："+eipResult.getReturnCode());
+						throw new AlmsBaseExcepiton( "调用EIP系统发送短信失败"); 
+					}
 
-				sms.setStatus("已发送");
+					sms.setStatus("已发送");
+				}else {
+					sms.setStatus("未发送");	
+				}
 			}catch (Exception e) {
 				sms.setStatus("未发送");
 				logger.error(e.getMessage());
