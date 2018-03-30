@@ -332,13 +332,13 @@ public class ExpenseSettleController {
 					expenseSettleLackFeeVO.setPlatFormFee(d.getPlanAmount()
 							.subtract(d.getFactAmount() == null ? new BigDecimal(0) : d.getFactAmount()));
 
-				} else if (d.getPlanItemType().equals(new Integer(10)) && (d.getFactAmount() == null
+				} /*else if (d.getPlanItemType().equals(new Integer(10)) && (d.getFactAmount() == null
 						|| d.getFactAmount().subtract(d.getPlanAmount()).compareTo(new BigDecimal(0)) < 0)) {
 
 					expenseSettleLackFeeVO.setPrincipal(d.getPlanAmount()
 							.subtract(d.getFactAmount() == null ? new BigDecimal(0) : d.getFactAmount()));
 
-				} else if (d.getPlanItemType().equals(new Integer(20)) && (d.getFactAmount() == null
+				}*/ else if (d.getPlanItemType().equals(new Integer(20)) && (d.getFactAmount() == null
 						|| d.getFactAmount().subtract(d.getPlanAmount()).compareTo(new BigDecimal(0)) < 0)) {
 
 					if (firstInterest == null) {
@@ -364,7 +364,6 @@ public class ExpenseSettleController {
 
 			if (expenseSettleLackFeeVO.getLateFee().compareTo(new BigDecimal(0)) > 0
 					|| expenseSettleLackFeeVO.getPlatFormFee().compareTo(new BigDecimal(0)) > 0
-					|| expenseSettleLackFeeVO.getPrincipal().compareTo(new BigDecimal(0)) > 0
 					|| expenseSettleLackFeeVO.getInterest().compareTo(new BigDecimal(0)) > 0
 					|| expenseSettleLackFeeVO.getServicecharge().compareTo(new BigDecimal(0)) > 0) {
 
@@ -376,7 +375,6 @@ public class ExpenseSettleController {
 		for (ExpenseSettleLackFeeVO expenseSettleLackFeeVO : list) {
 			lackFee = lackFee.add(expenseSettleLackFeeVO.getLateFee())
 					.add(expenseSettleLackFeeVO.getServicecharge())
-					.add(expenseSettleLackFeeVO.getPrincipal())
 					.add(expenseSettleLackFeeVO.getPlatFormFee()
 					.add(expenseSettleLackFeeVO.getInterest()));
 		}
