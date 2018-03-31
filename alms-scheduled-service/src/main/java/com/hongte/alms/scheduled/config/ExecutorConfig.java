@@ -7,7 +7,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 
-@Configuration
+
 public class ExecutorConfig {
     /** Set the ThreadPoolExecutor's scheduled pool size.
      * 线程池维护线程的最小数量.
