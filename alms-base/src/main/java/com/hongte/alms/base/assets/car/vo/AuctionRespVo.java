@@ -185,7 +185,11 @@ public class AuctionRespVo implements Serializable{
 	    @JsonFormat( pattern = "yyyy-MM-dd HH:mm" ,timezone="GMT+8")
 	    private Date auditTime;
 	    
-	    private  List<Doc> docs;
+	    @ApiModelProperty(value="延长周期",name="deplayPeriod")
+	    private String deplayPeriod;
+
+
+		private  List<Doc> docs;
 	    
 		@ApiModelProperty(required= true,value = "用户姓名 ")
 		private String bidderName;
@@ -777,5 +781,12 @@ public class AuctionRespVo implements Serializable{
 			this.file = file;
 		} 
 	    
-	 
+	    
+	    public String getDeplayPeriod() {
+			return deplayPeriod;
+		}
+
+		public void setDeplayPeriod(String deplayPeriod) {
+			this.deplayPeriod = deplayPeriod;
+		} 
 }
