@@ -100,7 +100,7 @@ window.layinit(function (htConfig) {
                     field: 'recordDate',
                     title: '记录日期'
                 }, {
-                    field: 'recorderUser',
+                    field: 'userName',
                     title: '记录者'
                 }, {
                     field: 'fields',

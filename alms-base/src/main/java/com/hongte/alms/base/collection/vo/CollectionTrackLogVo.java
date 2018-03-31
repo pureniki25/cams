@@ -23,6 +23,16 @@ public class CollectionTrackLogVo extends CollectionTrackLog  {
     //排序ID
     private Integer sortId;
 
+    private String userName;
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
     public Integer getPeriods() {
         return periods;
     }

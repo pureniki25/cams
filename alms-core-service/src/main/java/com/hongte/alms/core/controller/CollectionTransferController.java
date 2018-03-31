@@ -149,7 +149,7 @@ public class CollectionTransferController {
             List<CollectionLog> logList = new ArrayList<>();
 
             Page<CollectionLogXd> pages = new Page<>();
-            pages.setCurrent(1);
+            pages.setCurrent(i);
             pages.setSize(100);
             pages = collectionLogXdService.selectPage(pages,new EntityWrapper<CollectionLogXd>().and("business_id not in (SELECT business_id from tb_collection)"));
 
