@@ -921,7 +921,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
 
      
         //如果回退则取回退的步骤
-        if(Integer.valueOf(req.getIsPass()).equals(ProcessApproveResult.REFUSE.getKey())&&Integer.valueOf(req.getIsDirectBack()).equals(ProcessIsDerateBackEnums.YES.getKey())){
+        if(Integer.valueOf(ProcessApproveResult.REFUSE.getKey()).equals(req.getIsPass())&&Integer.valueOf(ProcessIsDerateBackEnums.YES.getKey()).equals(req.getIsDirectBack())){
             if(req.getNextStep()==null){
                 throw new  AlmsBaseExcepiton("应该设置回退到第几步！");
             }
@@ -929,7 +929,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
             process.setIsDirectBack(ProcessIsDerateBackEnums.YES.getKey());//标识回退
             process.setBackStep(currentStep.getStep());//记录回退的步骤
         }else{
-           if(process.getIsDirectBack().equals(ProcessIsDerateBackEnums.YES.getKey())) {
+           if(Integer.valueOf(ProcessIsDerateBackEnums.YES.getKey()).equals(process.getIsDirectBack())) {
                 //如果流程的是上一步回退的,则取流程中存储的应该跳转的节点
                 nextStep = processTypeStepService.getProcessTypeStep(processType.getTypeId(),process.getBackStep());
             }else{//否则直接取后一个

@@ -1120,7 +1120,6 @@ window.layinit(function (htConfig) {
 	    			$("#transFree").css("border","1px solid #FF3030");
 	    			return ;
 	    		}
-
 	    		if((vm.approvalInfoForm.isPass==''||vm.approvalInfoForm.isPass==null)&&vm.approvalInfoForm.process.status!=-1){
 	    			//alert(processStatus);
 	    			layer.msg("请输入是否同意审批",{icon:5,shade: [0.8, '#393D49']});
@@ -1150,13 +1149,21 @@ window.layinit(function (htConfig) {
                   		vm.audit.sendUserIds.push(u.userId);
                   	 }
                    }
-	    	
+	    	     var param='';
+	    	     var reqUrl='';
+	    	     if(vm.approvalInfoForm.process.status!=-1){
+	    	    	 param={"carBasic":vm.carBasic,"detection":vm.detection,"carAuction":vm.carAuction,"returnRegFiles":vm.reqRegFiles,"auditVo":vm.audit};
+	    	    	 reqUrl=basePath+'car/auctionAudit';
+	    	     }else{
+	    	    	 reqUrl=basePath+'car/auctionAply';
+	    	    	 param={"carBasic":vm.carBasic,"detection":vm.detection,"carAuction":vm.carAuction,"returnRegFiles":vm.reqRegFiles,"subType":"audit","processId":processId}
+	    	     }
 	    		//alert(JSON.stringify(vm.audit));
 		          $.ajax({
 		               type: "POST",
-		               url: basePath+'car/auctionAudit',
+		               url: reqUrl,
 		               contentType: "application/json; charset=utf-8",
-		               data: JSON.stringify({"carBasic":vm.carBasic,"detection":vm.detection,"carAuction":vm.carAuction,"returnRegFiles":vm.reqRegFiles,"auditVo":vm.audit}),
+		               data: JSON.stringify(param),
 		               success: function (res) {
 		            	   if (res.code == "0000"){
 		            		   vm.carAuction=res.data.carAuction;
