@@ -154,7 +154,8 @@ public class ExpenseSettleController {
 		if (StringUtil.isEmpty(businessId) || StringUtil.isEmpty(preSettleDate)) {
 			return Result.error("500", "参数不能为空！");
 		}
-		ExpenseSettleVO expenseSettleVO = expenseSettleService.sum(businessId);
+		Date settleDate = DateUtil.getDate(preSettleDate, "yyyy-MM-dd");
+		ExpenseSettleVO expenseSettleVO = new ExpenseSettleVO();
 		Date settelDate = DateUtil.getDate(preSettleDate, "yyyy-MM-dd");
 		BasicBusiness basicBusiness = basicBusinessService.selectById(businessId);
 		RepaymentBizPlan repaymentBizPlan = repaymentBizPlanService
@@ -308,7 +309,7 @@ public class ExpenseSettleController {
 			Map<RepaymentBizPlanList, List<RepaymentBizPlanListDetail>> pastPeriods, Date settleDate) {
 		List<ExpenseSettleLackFeeVO> list = new ArrayList<>();
 		boolean hasCalLateFee = false;
-		BigDecimal firstInterest = null;
+		List<BigDecimal> instersets = new ArrayList<>() ;
 		BigDecimal firstLateFee = null;
 		for (Map.Entry<RepaymentBizPlanList, List<RepaymentBizPlanListDetail>> e : pastPeriods.entrySet()) {
 			String afterId = e.getKey().getAfterId();
@@ -341,11 +342,12 @@ public class ExpenseSettleController {
 				}*/ else if (d.getPlanItemType().equals(new Integer(20)) && (d.getFactAmount() == null
 						|| d.getFactAmount().subtract(d.getPlanAmount()).compareTo(new BigDecimal(0)) < 0)) {
 
-					if (firstInterest == null) {
-						firstInterest = d.getPlanAmount()
-								.subtract(d.getFactAmount() == null ? new BigDecimal(0) : d.getFactAmount());
+					String n = String.valueOf(e.getKey().getAfterId().charAt(0));
+					if (instersets.isEmpty()||instersets.size()<Integer.valueOf(n)) {
+						instersets.add(Integer.valueOf(n)-1, d.getPlanAmount()
+						.subtract(d.getFactAmount() == null ? new BigDecimal(0) : d.getFactAmount()));
 					}
-					expenseSettleLackFeeVO.setInterest(firstInterest);
+					expenseSettleLackFeeVO.setInterest(instersets.get(Integer.valueOf(n)-1));
 				} else if (d.getPlanItemType().equals(new Integer(60))) {
 					if (firstLateFee == null) {
 						if (e.getKey() != null) {
