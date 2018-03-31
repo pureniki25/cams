@@ -236,7 +236,7 @@ public class CarServiceImpl  implements CarService {
 		carDetection.setUpdateUser(loginUserInfoHelper.getUserId());
 		carDetectionMapper.updateById(carDetection);
 		//拍卖记录
-      	List<CarAuction> carAuctions=carAuctionMapper.selectList(new EntityWrapper<CarAuction>().eq("business_id", auctionAplyVo.getCarAuction().getBusinessId()).ne("status", AuctionStatusEnums.DRAFT.getKey()));
+      	List<CarAuction> carAuctions=carAuctionMapper.selectList(new EntityWrapper<CarAuction>().eq("business_id", auctionAplyVo.getCarAuction().getBusinessId()));
       	if(carAuctions!=null&&carAuctions.size()>0) {
       		for(CarAuction carAuc:carAuctions) {
       			if(AuctionStatusEnums.AUDIT.getKey().equals(carAuc.getStatus())) {
