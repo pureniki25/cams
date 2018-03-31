@@ -9,12 +9,19 @@ public enum CollectionStatusEnum {
 
 
 //	贷后状态，1：电催，50：催收中，100：已移交法务
-
+//二押已赎回 250
+//	已委外催收 300
+//	待分配 350
+//	推迟移交法务 400
 	PHONE_STAFF(1,"电催","phoneStaff"),
 	COLLECTING(50,"催收中","visitStaff")
 	,TO_LAW_WORK(100,"已移交法务","lawStaff")
 	,TRAILER_REG(150,"拖车登记","trailerReg")
 	, CLOSED(200,"已关闭","closed")
+	,REDEMPTION_REDEEMED(250,"二押已赎回","redemptionRedeemed")
+	, OUTSIDE_COLLECT(300,"已委外催收","outsideCollect")
+	, WAIT_TO_SET(350,"待分配","waitToSet")
+	, DELAY_TO_LAW(400,"推迟移交法务","delayToLaw")
 	, REVOKE(1000,"回退","revoke") ;
 	//用户已还款则这个催收关闭, 这个关闭催收的触发时机，需要思考
 

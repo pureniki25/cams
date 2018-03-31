@@ -63,7 +63,7 @@ public class AutoSetCollectionJob {
     //运行的标志位
     private  static  boolean runningFlage = false;
 
-    //每5分钟执行一次
+    //每10分钟执行一次
     @Scheduled(cron = "0 0/10 * * * ? ")
     public  void job(){
 
