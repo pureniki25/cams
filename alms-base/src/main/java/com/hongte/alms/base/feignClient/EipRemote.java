@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @author:喻尊龙
  * @date: 2018/3/12
  */
-@FeignClient(value = "eip-out",url ="http://172.16.200.112:30406")
+@FeignClient(value = "eip-out")
 public interface EipRemote {
 
     @RequestMapping(value = "/eip/xiaodai/AddProjectTrack",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
