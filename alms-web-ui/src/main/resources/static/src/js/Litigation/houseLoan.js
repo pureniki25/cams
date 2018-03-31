@@ -475,8 +475,8 @@ window.layinit(function (htConfig) {
 	   	                     data.formData.busType='AfterLoan_Material_Litigation';
 	   	                     data.formData.file=data.originalFiles[0];
 		    		        	var size=data.originalFiles[0].size;
-		    		        	 if(size/1024/1024 > 10){
-			                    	 layer.msg("文件过大，超过10M不允许上传",{icon:5,shade: [0.8, '#393D49'],time:3000});
+		    		        	 if(size/1024/1024 > 5){
+			                    	 layer.msg("文件过大，超过5M不允许上传",{icon:5,shade: [0.8, '#393D49'],time:3000});
 			                    	 return;
 		                     }
 		    		        	 data.submit();

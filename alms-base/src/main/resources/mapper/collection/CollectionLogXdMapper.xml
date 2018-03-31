@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.CollectionLogXdMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.CollectionLogXd">
+        <id column="id" property="id" />
+        <result column="business_id" property="businessId" />
+        <result column="after_id" property="afterId" />
+        <result column="create_user_id" property="createUserId" />
+        <result column="create_time" property="createTime" />
+        <result column="collection_user" property="collectionUser" />
+        <result column="collection_remark" property="collectionRemark" />
+        <result column="collection_type" property="collectionType" />
+        <result column="is_delete" property="isDelete" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, business_id AS businessId, after_id AS afterId, create_user_id AS createUserId, create_time AS createTime, collection_user AS collectionUser, collection_remark AS collectionRemark, collection_type AS collectionType, is_delete AS isDelete
+    </sql>
+
+</mapper>

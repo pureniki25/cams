@@ -489,8 +489,8 @@ window.layinit(function (htConfig) {
 	   	                     data.formData.busType='AfterLoan_Material_CarAuction';
 	   	                     data.formData.file=data.originalFiles[0];
 		    		        	var size=data.originalFiles[0].size;
-		    		        	 if(size/1024/1024 > 10){
-			                    	 layer.msg("文件过大，超过10M不允许上传",{icon:5,shade: [0.8, '#393D49'],time:3000});
+		    		        	 if(size/1024/1024 > 5){
+			                    	 layer.msg("文件过大，超过5M不允许上传",{icon:5,shade: [0.8, '#393D49'],time:3000});
 			                    	 return;
 		                     }
 		    		        	 data.submit();
@@ -672,7 +672,7 @@ window.layinit(function (htConfig) {
 	    	},
 	    	carAuctionAply:function (event,subType){
 	    		var that = this;
-	    		that.businessId=that.carAuction.businessId;
+	    		that.carAuction.businessId=businessId;
 	    		// 页面信息验证
 	    		if(vm.detection.annualVerificationExpirationDate==''||vm.detection.annualVerificationExpirationDate==null){
 	    			$("#annualVerificationExpirationDate").css("border","1px solid #FF3030");

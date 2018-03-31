@@ -22,5 +22,42 @@
     <sql id="Base_Column_List">
         type_step_id AS typeStepId, type_id AS typeId, step_name AS stepName, approve_user_id AS approveUserId, approve_user_type AS approveUserType, approve_user_id_select_sql AS approveUserIdSelectSql, is_can_edit AS isCanEdit, step, next_step AS nextStep, next_step_select_sql AS nextStepSelectSql, step_type AS stepType, approve_user_role AS approveUserRole
     </sql>
+       
+    <select id="getProcessTypeStepList" resultType="com.hongte.alms.base.vo.module.ProcessTypeStepVO"
+            parameterType="com.hongte.alms.base.vo.module.ProcessStepSearchReq">
 
+      
+		select  s.type_step_id as typeStepId,s.type_id as typeId,s.step_name as stepName,t.type_name as typeName,
+		
+		u.user_name as approveUserName, s.approve_user_type as approveUserType, s.approve_user_id_select_sql as approveUserIdSelectSql,s.is_can_edit as isCanEdit,
+		
+		s.step,s.next_step as nextStep ,s.step_type as stepType,s.approve_user_role as approveUserRole
+		
+		
+		 from 
+		
+		
+		tb_process_type_step s 
+		left join  tb_process_type t  on t.type_id=s.type_id 
+		
+		left join tb_sys_user u on  u.user_id=s.approve_user_id 
+
+        <where>
+               1=1
+            <if test="typeId !=null and typeId !=''">
+                and s.type_id=#{typeId} 
+            </if>
+            <if test="stepName !=null and stepName !=''">
+                and s.step_name = #{stepName}
+            </if>
+          <if test="typeStepId !=null and typeStepId !=''">
+                and s.type_step_id = #{typeStepId}
+            </if>
+
+        </where>
+
+
+
+    </select>
+    
 </mapper>

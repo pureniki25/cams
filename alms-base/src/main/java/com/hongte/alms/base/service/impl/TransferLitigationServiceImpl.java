@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.aliyun.oss.ServiceException;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.assets.car.vo.FileVo;
 import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
@@ -308,7 +307,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			businessHouse.setFourthMortgageType(fsdHouse.getFourthMortgageType());
 			businessHouse.setFourthMortgageYear(str2Integer(fsdHouse.getFourthMortgageYear()));
 			businessHouse.setFsdBankName(fsdHouse.getHousePledgedBank());
-			businessHouse.setHouseAddress(fsdHouse.getHouseAddress());
+			businessHouse.setHouseAddress(fsdHouse.getHouseSheng() + fsdHouse.getHouseCity() + fsdHouse.getHouseXian() + fsdHouse.getHouseAddress());
 			businessHouse.setHouseArea(fsdHouse.getHouseArea());
 			businessHouse.setHouseBelong(fsdHouse.getHouseBelong());
 			businessHouse.setHouseName(fsdHouse.getHouseName());
