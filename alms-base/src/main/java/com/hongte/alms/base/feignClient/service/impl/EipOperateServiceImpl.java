@@ -4,7 +4,6 @@ import com.hongte.alms.base.collection.entity.CollectionTrackLog;
 import com.hongte.alms.base.collection.service.CollectionTrackLogService;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.feignClient.dto.AddProjectTrackReqDto;
-import com.hongte.alms.base.feignClient.dto.ProjectTrackList;
 import com.hongte.alms.base.feignClient.service.EipOperateService;
 import com.hongte.alms.common.util.DateUtil;
 import com.ht.ussp.core.Result;
@@ -48,17 +47,10 @@ public class EipOperateServiceImpl implements EipOperateService {
 
         if(log.getIsSend() == 1){
             for (String projectId : projectIds) {
-
-                ProjectTrackList projectTrackList = new ProjectTrackList();
-                projectTrackList.setContent(log.getContent());
-                projectTrackList.setAddDate(DateUtil.formatDate("yyyy-MM-dd HH:mm:ss",new Date()));
-
-                List<ProjectTrackList> list = new ArrayList<>();
-                list.add(projectTrackList);
-
                 AddProjectTrackReqDto dto = new AddProjectTrackReqDto();
                 dto.setProjectId(projectId);
-                dto.setProjectTrackList(list);
+                dto.setContent(log.getContent());
+                dto.setAddDate(DateUtil.formatDate("yyyy-MM-dd HH:mm:ss",new Date()));
 
                 try{
                     result =  eipRemote.addProjectTrack(dto);
@@ -108,13 +100,9 @@ public class EipOperateServiceImpl implements EipOperateService {
             List<String> failProjectIds = Arrays.asList(log.getFailProjectId());
             for (String projectId:failProjectIds) {
                 AddProjectTrackReqDto dto = new AddProjectTrackReqDto();
-                ProjectTrackList projectTrackList = new ProjectTrackList();
-                projectTrackList.setAddDate(DateUtil.formatDate("",log.getCreateTime()));
-                projectTrackList.setContent(log.getContent());
-                List<ProjectTrackList> lists = new ArrayList<>();
-                lists.add(projectTrackList);
+                dto.setAddDate(DateUtil.formatDate("yyyy-MM-dd HH:mm:ss",log.getCreateTime()));
+                dto.setContent(log.getContent());
                 dto.setProjectId(projectId);
-                dto.setProjectTrackList(lists);
                 try{
                     result =  eipRemote.addProjectTrack(dto);
                 }catch (Exception e){

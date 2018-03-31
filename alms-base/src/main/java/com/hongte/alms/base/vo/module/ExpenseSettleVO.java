@@ -5,6 +5,7 @@ package com.hongte.alms.base.vo.module;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -19,35 +20,35 @@ public class ExpenseSettleVO implements Serializable{
 	private static final long serialVersionUID = -1312491103861263898L;
 
 	/**
-	 * 本金
+	 * 剩余未还本金
 	 */
 	private BigDecimal principal ;
 	/**
-	 * 利息
+	 * 本期利息
 	 */
 	private BigDecimal interest ;
 	/**
-	 * 服务费
+	 * 本期服务费
 	 */
 	private BigDecimal servicecharge ;
 	/**
-	 * 担保费
+	 * 本期担保费
 	 */
 	private BigDecimal guaranteeFee ;
 	/**
-	 * 平台费
+	 * 本期平台费
 	 */
 	private BigDecimal platformFee ;
 	/**
-	 * 滞纳金
+	 * 期内滞纳金
 	 */
 	private BigDecimal lateFee ;
 	/**
-	 * 逾期费
+	 * 期外逾期费
 	 */
 	private BigDecimal demurrage ;
 	/**
-	 * 违约金
+	 * 提前还款违约金
 	 */
 	private BigDecimal penalty ;
 	/**
@@ -241,4 +242,26 @@ public class ExpenseSettleVO implements Serializable{
 	public void setDeposit(BigDecimal deposit) {
 		this.deposit = deposit.setScale(2,BigDecimal.ROUND_HALF_UP);;
 	}
+
+	/**
+	 * 
+	 */
+	public ExpenseSettleVO() {
+		super();
+		setBalance(new BigDecimal(0));
+		setDemurrage(new BigDecimal(0));
+		setDeposit(new BigDecimal(0));
+		setGuaranteeFee(new BigDecimal(0));
+		setInterest(new BigDecimal(0));
+		setLackFee(new BigDecimal(0));
+		setLateFee(new BigDecimal(0));
+		setPenalty(new BigDecimal(0));
+		setPrincipal(new BigDecimal(0));
+		setPlatformFee(new BigDecimal(0));
+		setServicecharge(new BigDecimal(0));
+		setList(Collections.EMPTY_LIST);
+	}
+	
+	
+	
 }

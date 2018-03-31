@@ -38,10 +38,12 @@
         select
         <include refid="Base_Column_List_tabName"/>
         ,pList.period as periods
+        ,t.user_name AS userName
 
         FROM tb_collection_track_log as log
         LEFT JOIN tb_repayment_biz_plan_list as pList
         ON log.rbp_id = pList.plan_list_id
+        LEFT JOIN tb_sys_user t ON log.recorder_user = t.user_id
         WHERE 1 = 1
         <if test="rbpId !=null and rbpId !='' ">
             and  log.rbp_id = #{rbpId}

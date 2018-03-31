@@ -1,29 +1,27 @@
 package com.hongte.alms.base.feignClient.dto;
 
-import java.util.List;
+import java.io.Serializable;
 
 /**
  * @author:喻尊龙
  * @date: 2018/3/2
  */
-public class AddProjectTrackReqDto {
 
-    /**
-     *
-     */
-    private List<ProjectTrackList> projectTrackList;
+public class AddProjectTrackReqDto implements Serializable {
+    private static final long serialVersionUID = -4095682638492039883L;
+
     /**
      *
      */
     private String projectId;
-
-    public List<ProjectTrackList> getProjectTrackList() {
-        return projectTrackList;
-    }
-
-    public void setProjectTrackList(List<ProjectTrackList> projectTrackList) {
-        this.projectTrackList = projectTrackList;
-    }
+    /**
+     *
+     */
+    private String content;
+    /**
+     *
+     */
+    private String addDate;
 
     public String getProjectId() {
         return projectId;
@@ -32,4 +30,21 @@ public class AddProjectTrackReqDto {
     public void setProjectId(String projectId) {
         this.projectId = projectId;
     }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getAddDate() {
+        return addDate;
+    }
+
+    public void setAddDate(String addDate) {
+        this.addDate = addDate;
+    }
 }
+

@@ -31,7 +31,15 @@ window.layinit(function (htConfig) {
                 field: 'roleAreaType',
                 title: '角色区域控制类型',
                 templet: function (d) {
-                    return d.roleAreaType == 1 ? '全局性' : '区域性';
+                    if(d.roleAreaType == 1){
+                        return "全局性";
+                    }else  if(d.roleAreaType == 2){
+                        return "区域性";
+                    }else  if(d.roleAreaType == 3){
+                        return "只查看自己跟进";
+                    }else{
+                        return "未定义的类型";
+                    }
                 }
             },
             {

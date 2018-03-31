@@ -3,7 +3,7 @@ package com.hongte.alms.base.process.service.impl;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-
+import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.process.entity.Process;
 import com.hongte.alms.base.process.entity.ProcessLog;
 import com.hongte.alms.base.process.entity.ProcessTypeStep;
@@ -12,6 +12,9 @@ import com.hongte.alms.base.process.enums.ProcessStatusEnums;
 import com.hongte.alms.base.process.enums.ProcessStepTypeEnums;
 import com.hongte.alms.base.process.mapper.ProcessTypeStepMapper;
 import com.hongte.alms.base.process.service.ProcessTypeStepService;
+import com.hongte.alms.base.vo.module.InfoSmsListSearchVO;
+import com.hongte.alms.base.vo.module.ProcessStepSearchReq;
+import com.hongte.alms.base.vo.module.ProcessTypeStepVO;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -232,7 +235,20 @@ public class ProcessTypeStepServiceImpl extends BaseServiceImpl<ProcessTypeStepM
         return processTypeStep;
     }
 
+    @Override
+    public Page<ProcessTypeStepVO> getProcessTypeStepList(ProcessStepSearchReq req)
+    {
+    	
+        Page<ProcessTypeStepVO> pages = new Page<>();
+        pages.setSize(req.getLimit());
+        pages.setCurrent(req.getPage());
 
+        List<ProcessTypeStepVO> list = processTypeStepMapper.getProcessTypeStepList(req);
+        
+        pages.setRecords(list);
+     
+        return pages;
+    }
 
 
 
