@@ -190,7 +190,7 @@
 		tca.payment_end_time,<!-- 缴款截止时间 -->
 		tca.trans_free  taxation,<!-- Taxation , 交易税费 -->
 		tca.remark   remarks,<!-- 备注-->	
-		tca.deplay_period deplayPeriod,<!-- 延长周期 -->	
+		tca.delay_period delayPeriod,<!-- 延长周期 -->	
 			
 		tcb.brand_name vehicleBrand ,		<!--车辆品牌 -->
 		case
@@ -429,7 +429,7 @@
 		tca.payment_end_time,<!-- 缴款截止时间 -->
 		tca.trans_free  taxation,<!-- Taxation , 交易税费 -->
 		tca.remark   remarks,<!-- 备注-->	
-		tca.deplay_period deplayPeriod,<!-- 延长周期 -->	
+		tca.delay_period delayPeriod,<!-- 延长周期 -->	
 			
 		tcb.brand_name vehicleBrand ,		<!--车辆品牌 -->
 		case
