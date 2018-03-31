@@ -2,9 +2,12 @@ package com.hongte.alms.base.process.service;
 
 
 import com.alibaba.fastjson.JSONArray;
+import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.process.entity.Process;
 import com.hongte.alms.base.process.entity.ProcessLog;
 import com.hongte.alms.base.process.entity.ProcessTypeStep;
+import com.hongte.alms.base.vo.module.ProcessStepSearchReq;
+import com.hongte.alms.base.vo.module.ProcessTypeStepVO;
 import com.hongte.alms.common.service.BaseService;
 
 import java.util.List;
@@ -38,6 +41,7 @@ public interface ProcessTypeStepService extends BaseService<ProcessTypeStep> {
     ProcessTypeStep getProcessTypeStep(String typeID, Integer step);
 
     ProcessTypeStep getProcessTypeBeginStep(String typeID);
-
+    
+    Page<ProcessTypeStepVO> getProcessTypeStepList(ProcessStepSearchReq req);
 
 }

@@ -2,14 +2,22 @@ package com.hongte.alms.base.assets.car.vo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
+import java.io.Serializable;
+
 import org.springframework.web.multipart.MultipartFile;
 /**
  * @since 2018/1/30
  * 上传附件
  */
 @ApiModel(value="文件上传信息",description="文件上传信息")
-public class FileVo {
-    @ApiModelProperty(value="文件",name="file")
+public class FileVo implements Serializable{
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@ApiModelProperty(value="文件",name="file")
     private MultipartFile file;  //文件
 
     @ApiModelProperty(value="文件名",name="fileName")

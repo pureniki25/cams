@@ -57,7 +57,7 @@ window.layinit(function (htConfig) {
                         }
                         outPutCount += o.factOutputMoney
                     })
-                    app.business.output.money = outPutCount
+                    app.business.output.money = outPutCount.toFixed(2)
 
                     let factRepayCount = 0 
                     $.each(res.data.data.repaymentDetails,function(i,o){
