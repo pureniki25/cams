@@ -135,7 +135,6 @@
                 <span slot="title">往期少缴费用</span>
                 <row>
                     <i-col span="4">期数</i-col>
-                    <i-col span="4">本金</i-col>
                     <i-col span="4">利息</i-col>
                     <i-col span="4">平台费</i-col>
                     <i-col span="4">服务费</i-col>
@@ -143,7 +142,6 @@
                 </row>
                 <row v-for="item in business.info.list" >
                     <i-col span="4">{{item.period}}</i-col>
-                    <i-col span="4">{{item.principal}}</i-col>
                     <i-col span="4">{{item.interest}}</i-col>
                     <i-col span="4">{{item.platFormFee}}</i-col>
                     <i-col span="4">{{item.servicecharge}}</i-col>
@@ -171,9 +169,9 @@
                 </row>
                 <row>
                     <i-col span="6">+结余</i-col>
-                    <i-col span="6">{{business.info.balance}}</i-col>
+                    <i-col span="6">{{business.info.balance||0}}</i-col>
                     <i-col span="6">+押金转还款金额</i-col>
-                    <i-col span="6">{{business.deposit}}</i-col>
+                    <i-col span="6">{{business.deposit||0}}</i-col>
                 </row>
                 <row>
                     <i-col span="6">最终结清金额</i-col>

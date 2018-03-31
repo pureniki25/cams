@@ -38,6 +38,8 @@ public class CarVo implements Serializable{
     private String trailerDate;
     @Excel(name = "状态", orderNum = "12",   isImportField = "true_st")
     private String status;
+    
+    private String dragId;
 	public String getBusinessId() {
 		return businessId;
 	}
@@ -112,6 +114,12 @@ public class CarVo implements Serializable{
 	}
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	public String getDragId() {
+		return dragId;
+	}
+	public void setDragId(String dragId) {
+		this.dragId = dragId;
 	}
 	
 }

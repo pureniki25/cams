@@ -159,6 +159,7 @@
 		      tb_repayment_biz_plan_list_detail tab3 
 		    WHERE tab1.`plan_id` = tab2.`plan_id` 
 		      AND tab1.`plan_list_id` = tab3.`plan_list_id` 
+		      AND IFNULL(tab1.repay_flag,0) != 6
 		      AND tab2.`original_business_id` = #{businessId,jdbcType=VARCHAR}) tab) t5,
 		  (SELECT 
 		    MIN(fact_output_date) fact_output_date,
@@ -356,7 +357,7 @@
 		  1 AS "type" 
 		FROM
 		  tb_tuandai_project_info a 
-		WHERE IFNULL(a.master_issue_id, 0) = 1 
+		WHERE a.master_issue_id = a.project_id 
 		  AND a.begin_time IS NOT NULL 
 		  AND a.business_id = #{businessId,jdbcType=VARCHAR} 
 		UNION
@@ -377,7 +378,7 @@
 		  2 AS "type" 
 		FROM
 		  tb_tuandai_project_info a 
-		WHERE IFNULL(a.master_issue_id, 0) != 1 
+		WHERE a.master_issue_id != a.project_id 
 		  AND a.begin_time IS NOT NULL 
 		  AND a.business_id = #{businessId,jdbcType=VARCHAR}  
 		UNION
@@ -574,6 +575,27 @@
 		WHERE bb.`business_type` = bbt.`business_type_id` AND bb.`business_id` = #{businessId,jdbcType=VARCHAR}
 	</select>
 	
+	<select id="queryRepaymentTypeByBusinessId" resultType="java.lang.String">
+		SELECT 
+		  CASE
+		    t.`repayment_type_id` 
+		    WHEN 1 
+		    THEN '到期还本息' 
+		    WHEN 2 
+		    THEN '每月付息到期还本' 
+		    WHEN 4 
+		    THEN '等本等息' 
+		    WHEN 5 
+		    THEN '等额本息' 
+		    WHEN 9 
+		    THEN '分期还本付息' 
+		    ELSE '' 
+		  END repaymentType
+		FROM
+		  tb_basic_business t 
+		WHERE t.`business_id` = #{businessId,jdbcType=VARCHAR}
+	</select>
+	
 	<select id="queryCarLoanFees" resultType="map">
 		SELECT 
 		  a.`due_date` dueDate,
@@ -708,8 +730,11 @@
 	
 	<select id="queryPreviousFees" resultType="com.hongte.alms.base.vo.billing.PreviousFeesVO">
 		SELECT 
+		  tab.original_business_id businessId,
 		  tab.period,
 		  -- 期数
+		  tab.current_status currentStatus,
+		  -- 当期还款状态
 		  (
 		    tab.planAccrual - tab.factAccrual
 		  ) AS previousPlanAccrual,
@@ -723,6 +748,8 @@
 		FROM
 		  (SELECT 
 		    t2.`period`,
+		    t2.current_status,
+		    t3.original_business_id,
 		    SUM(
 		      CASE
 		        WHEN t.plan_item_type = 20 
@@ -783,6 +810,48 @@
 		ORDER BY tab.period
 	</select>
 	
+	<select id="queryMatchingRepaymentPlanAccrualSurplusPrincipal" resultType="java.lang.Double">
+		SELECT 
+		  (
+		    tt.plan_principal - tt.fact_principal
+		  ) surplusPrincipal 
+		FROM
+		  (SELECT 
+		    -- 应还本金总额
+		    SUM(
+		      CASE
+		        WHEN detail.plan_item_type = 10 
+		        THEN detail.plan_amount 
+		        ELSE 0 
+		      END
+		    ) `plan_principal`,
+		    -- 实还本金总额
+		    SUM(
+		      CASE
+		        WHEN detail.plan_item_type = 10 
+		        THEN detail.fact_amount 
+		        ELSE 0 
+		      END
+		    ) `fact_principal` 
+		  FROM
+		    `tb_repayment_biz_plan_list` lst,
+		    `tb_repayment_biz_plan_list_detail` detail,
+		    (SELECT 
+		      MIN(t2.`due_date`) min_due_date,
+		      t1.`plan_id` 
+		    FROM
+		      `tb_repayment_biz_plan` t1,
+		      `tb_repayment_biz_plan_list` t2,
+		      `tb_repayment_biz_plan_list_detail` t3 
+		    WHERE t1.`plan_id` = t2.`plan_id` 
+		      AND t2.`plan_list_id` = t3.`plan_list_id` 
+		      AND t2.`current_status` = '逾期' 
+		      AND t1.`original_business_id` = #{businessId,jdbcType=VARCHAR}) tab 
+		  WHERE lst.`due_date` <![CDATA[ <= ]]> tab.min_due_date 
+		    AND lst.`plan_list_id` = detail.`plan_list_id` 
+		    AND lst.`plan_id` = tab.plan_id) tt 
+	</select>
+	
 	<select id="countOverdueByBusinessId" resultType="java.lang.Integer">
 		SELECT 
 		  COUNT(1)
@@ -835,5 +904,48 @@
 		GROUP BY t2.`plan_list_id` 
 		ORDER BY t2.`due_date` DESC
 		LIMIT 1
+	</select>
+	
+	<select id="queryRepayFlagByBusinessId" resultType="java.lang.Integer">
+		SELECT 
+		  COUNT(1)
+		FROM
+		  tb_repayment_biz_plan t1,
+		  tb_repayment_biz_plan_list t2
+		WHERE t1.`original_business_id` = 'TDC5012017072502'  
+		  AND t2.`plan_id` = t1.`plan_id`
+		  AND IFNULL(t2.repay_flag,0) = 6 
+	</select> 
+	
+	<select id="queryOverRepayMoneyByBusinessId" resultType="java.lang.Double">
+		SELECT 
+		  (
+		    t1.over_repay_money_1 - t2.over_repay_money_0
+		  ) over_repay_money 
+		FROM
+		  (SELECT 
+		    t.business_id,
+		    IFNULL(SUM(t.over_repay_money),0) over_repay_money_1 
+		  FROM
+		    `tb_accountant_over_repay_log` t 
+		  WHERE t.freeze_status != 1 
+		    AND t.money_type = 1
+		    AND t.business_id = #{businessId,jdbcType=VARCHAR}) t1,
+		  (SELECT 
+		    t.business_id,
+		    IFNULL(SUM(t.over_repay_money), 0) over_repay_money_0 
+		  FROM
+		    `tb_accountant_over_repay_log` t 
+		  WHERE t.freeze_status != 1 
+		    AND t.money_type = 0
+		    AND t.business_id = #{businessId,jdbcType=VARCHAR}) t2   
+	</select>
+	
+	<select id="queryRefundMoneyByBusinessId" resultType="java.lang.Double">
+		SELECT 
+		  IFNULL(SUM(t.refund_money),0) 
+		FROM
+		  `tb_refund_detail` t 
+		WHERE t.business_id = #{businessId,jdbcType=VARCHAR} 
 	</select>
 </mapper>

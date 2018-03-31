@@ -18,8 +18,9 @@ public class CarController {
 	        return "/assets/car/carDetail";
 	    }
 	    @RequestMapping("carAuction")
-	    public String carAuction(ModelMap map,@RequestParam("businessId") String businessId) {
+	    public String carAuction(ModelMap map,@RequestParam("businessId") String businessId,@RequestParam("dragId") String dragId) {
 	    	 map.addAttribute("businessId",businessId);
+	    	 map.addAttribute("dragId",dragId);
 	        return "/assets/car/carAuction";
 	    }
 	    @RequestMapping("convBusAply")
@@ -29,8 +30,9 @@ public class CarController {
 	    }
 
 	    @RequestMapping("returnReg")
-	    public String returnReg(ModelMap map,@RequestParam("businessId") String businessId) {
+	    public String returnReg(ModelMap map,@RequestParam("businessId") String businessId,@RequestParam("dragId") String dragId) {
 	    	 map.addAttribute("businessId",businessId);
+	    	 map.addAttribute("dragId",dragId);
 	        return "/assets/car/returnReg";
 	    }
 	    @RequestMapping("againAssess")
@@ -63,6 +65,7 @@ public class CarController {
 	    	 map.addAttribute("businessId",businessId);
 	    	 map.addAttribute("processStatus",processStatus);
 	    	 map.addAttribute("processId",processId);
+	    	 
 	        return "/assets/car/carAuctionAudit";
 	    }
 	    @RequestMapping("delayed")

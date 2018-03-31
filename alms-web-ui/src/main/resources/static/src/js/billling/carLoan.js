@@ -34,8 +34,8 @@ window.layinit(function (htConfig) {
 	        	balanceDue:""  	, // 往期少交费用（含滞纳金）
 	        	overdueDefault:""  	, // 逾期违约金
 	        	receivableTotal: '',//	应收合计
-				balance: '',		//	结余
-				cash: '',		//	押金转还款金额
+	        	overRepayMoney: '',		//	结余
+	        	refundMoney: '',		//	押金转还款金额
 				squaredUp: ''		//	最终结清金额
 	        },
 	        
@@ -95,7 +95,7 @@ window.layinit(function (htConfig) {
 		            	vm.baseInfoForm.borrowRate = res.data.data.borrowRate + '%/年';
 		            	vm.arrearageDetailData = res.data.data.previousFees;
 		            } else {
-		                vm.$Modal.error({content: '执行失败，没有数据返回！' });
+		                vm.$Modal.error({content: res.data.msg });
 		            }
 		        })
 		        .catch(function (error) {
@@ -116,7 +116,7 @@ window.layinit(function (htConfig) {
 					
 					vm.preLateFeesFlag = res.data.data.preLateFeesFlag;
 				}else{
-					vm.$Modal.error({content: '执行失败，没有找到数据！' });
+					vm.$Modal.error({content: res.data.msg });
 				}
 			}).catch(function(error){
 				app.$Modal.error({content:'接口调用失败'})

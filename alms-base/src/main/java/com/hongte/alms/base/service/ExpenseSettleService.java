@@ -3,6 +3,7 @@
  */
 package com.hongte.alms.base.service;
 
+import java.util.Date;
 import java.util.List;
 
 import com.alibaba.fastjson.JSONObject;
@@ -16,6 +17,7 @@ import com.hongte.alms.base.vo.module.ExpenseSettleVO;
 public interface ExpenseSettleService {
 	
 	public ExpenseSettleVO cal(String preSettleDate,String businessId);
+	public ExpenseSettleVO cal(String businessId,Date preSettleDate);
 	public ExpenseSettleVO sum(String businessId);
 	public List<ExpenseSettleLackFeeVO> listLackFee(String businessId) ;
 }

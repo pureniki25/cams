@@ -57,7 +57,7 @@ window.layinit(function (htConfig) {
                         }
                         outPutCount += o.factOutputMoney
                     })
-                    app.business.output.money = outPutCount
+                    app.business.output.money = outPutCount.toFixed(2)
 
                     let factRepayCount = 0 
                     $.each(res.data.data.repaymentDetails,function(i,o){
@@ -94,7 +94,7 @@ window.layinit(function (htConfig) {
                 })
             },
             sumIncome: function () {
-                return (this.business.info.principal
+                let value = (this.business.info.principal
                     + this.business.info.interest
                     + this.business.info.servicecharge
                     + this.business.info.guaranteeFee
@@ -107,15 +107,21 @@ window.layinit(function (htConfig) {
                     + this.business.lawyerFee
                     + this.business.legalFee
                     + this.business.otherFee).toFixed(2)
+                if(isNaN(value)){
+                    return 0 
+                }else{
+                    return value
+                }
             },
             sum: function () {
-                /* doorToDoorFee:0,
-                lawyerFee:0,
-                legalFee:0,
-                otherFee:0 */
-                return (this.sumIncome()
-                    - (this.business.info.balance
-                        + this.business.deposit)).toFixed(2)
+                let value = (this.sumIncome()
+                - (this.business.info.balance
+                    + this.business.deposit)).toFixed(2)
+                if(isNaN(value))  {
+                    return 0 
+                }else{
+                    return value
+                }
             }
         }
 

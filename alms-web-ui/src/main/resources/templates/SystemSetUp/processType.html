@@ -45,61 +45,195 @@
 <!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
 <div id="app" v-cloak>
   
-    
-      <row style="padding: 20px">
-        <i-col span="24">
-          
-           <i-button type="success" style="position: absolute;left:0px;top:3px;width:90px" size="small" @click="openAddModal">新增</i-button>
-         
-            
-        </i-col>
-    </row>
-    <Row>
-        <Col span="24">
-            <table id="processType" lay-filter="processType"></table>
-            <script type="text/html" id="toolbar">
+      <tabs value="typeSetter">
+        <tab-pane label="流程类型设置" name="typeSetter">
+		      <row style="padding: 20px">
+		        <i-col span="24">
+		          
+		           <i-button type="success" style="position: absolute;left:0px;top:3px;width:90px" size="small" @click="openAddModal">新增</i-button>
+		         
+		            
+		        </i-col>
+		    </row>
+		    <Row>
+		        <Col span="24">
+		            <table id="processType" lay-filter="processType"></table>
+		            <script type="text/html" id="toolbar">
                 <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
                 <a class="layui-btn layui-btn-xs" lay-event="del">删除</a>
               </script>
-        </Col>
-    </Row>
-    <!--新增/编辑菜单Modal-->
-    <Modal v-model="add_modal" title="流程类型"  :styles="{left:'0px',top:'10px',width:'960px'}">
-        <row>
-            <i-col span="22">
-                <i-form ref='editForm' :model="editForm" :rules='validateRules'  label-position="right" autocomplete="off"
-                        :label-width="100">
-                        
-                            <form-item label="typeId" prop="typeId"  class="layui-hide"  >
-                        <input type="text" class="layui-hide"   v-model="editForm.typeId" style="width:50%">
-                    </form-item>
-                    <form-item label="流程类别编码" prop="typeCode"    >
-                        <i-input type="text"    v-model="editForm.typeCode" style="width:50%">
-                    </form-item>
-                    <form-item label="类别名称" prop="typeName"  >
-                        <i-input type="text" v-model="editForm.typeName" style="width:50%;display:inline-block;" ></i-input>
-                        <span style="color:#FF0000"></span>
-                    </form-item>
-                    <form-item label="单个业务该流程支持同时发起次数" prop="canItemRunningCount"  >
-                        <i-input type="text"  v-model="editForm.canItemRunningCount" style="width:50%;display:inline-block;" ></i-input>
-                        <span style="color:#FF0000"></span>
-                    </form-item>
-                    <form-item label="单个业务该流程支持发起总次" prop="canItemTotalCount"  >
-                        <i-input type="text"  v-model="editForm.canItemTotalCount" maxlength="40" style="width:50%;" ></i-input>
-                    </form-item>
-                   
-                </i-form>
-            </i-col>
-        </row>
+		        </Col>
+		    </Row>
+		    <!--新增/编辑菜单Modal-->
+		    <Modal v-model="add_modal" title="流程类型"  :styles="{left:'0px',top:'10px',width:'960px'}">
+		        <row>
+		            <i-col span="22">
+		                <i-form ref='editForm' :model="editForm" :rules='validateRules'  label-position="right" autocomplete="off"
+		                        :label-width="100">
+		                        
+		                            <form-item label="typeId" prop="typeId"  class="layui-hide"  >
+		                        <input type="text" class="layui-hide"   v-model="editForm.typeId" style="width:50%">
+		                    </form-item>
+		                    <form-item label="流程类别编码" prop="typeCode"    >
+		                        <i-input type="text"    v-model="editForm.typeCode" style="width:50%">
+		                    </form-item>
+		                    <form-item label="类别名称" prop="typeName"  >
+		                        <i-input type="text" v-model="editForm.typeName" style="width:50%;display:inline-block;" ></i-input>
+		                        <span style="color:#FF0000"></span>
+		                    </form-item>
+		                    <form-item label="单个业务该流程支持同时发起次数" prop="canItemRunningCount"  >
+		                        <i-input type="text"  v-model="editForm.canItemRunningCount" style="width:50%;display:inline-block;" ></i-input>
+		                        <span style="color:#FF0000"></span>
+		                    </form-item>
+		                    <form-item label="单个业务该流程支持发起总次" prop="canItemTotalCount"  >
+		                        <i-input type="text"  v-model="editForm.canItemTotalCount" maxlength="40" style="width:50%;" ></i-input>
+		                    </form-item>
+		                   
+		                </i-form>
+		            </i-col>
+		        </row>
+		        
+		           <div slot="footer" style="text-align:left">
+		            <i-button type="primary" :loading="submitLoading" @click="saveRepayment()">
+		                <span v-if="!submitLoading">保存</span>
+		                <span v-else>处理中...</span>
+		            </i-button>
+		            <i-button type="ghost" @click="closeModal()" style="margin-left: 8px;background-color:rgba(255, 153, 0, 1);color:#ffffff">撤销</i-button>
+		        </div>
+		    </Modal>
+        </tab-pane>
         
-           <div slot="footer" style="text-align:left">
-            <i-button type="primary" :loading="submitLoading" @click="saveRepayment()">
-                <span v-if="!submitLoading">保存</span>
-                <span v-else>处理中...</span>
-            </i-button>
-            <i-button type="ghost" @click="closeModal()" style="margin-left: 8px;background-color:rgba(255, 153, 0, 1);color:#ffffff">撤销</i-button>
-        </div>
-    </Modal>
+        
+          <tab-pane label="流程步骤设置" name="stepSetter">
+           
+		            <!--查询表单内容-->
+            <row :gutter="16">
+	                <i-col span="3">
+			          
+			           <i-button type="success" style="margin-left:15px" size="small" @click="openAddModalStep">新增</i-button>
+			         
+			            
+			        </i-col>
+                <i-col  span="16">
+                <i-form ref="searchForm"  :model="searchForm"    label-position="right" :label-width="100" inline>
+
+                        <form-item label="流程类型：" prop="typeId">
+                             <i-select v-model="searchForm.typeId" clearable filterable style="width: 100%" >
+		                            <i-option v-for="item in processTypeList" :value="item.typeId" :key="item.typeId">{{ item.typeName }}</i-option>
+		                        </i-select>
+                        </form-item>
+
+
+                        <form-item label="步骤名称：" prop="stepName">
+                                  <i-input type="text"    v-model="searchForm.stepName" style="width:80%">
+                        </form-item>
+
+
+                </i-form>
+                </i-col>
+                <i-col span="5">
+                    <i-button   type="info"  icon="ios-search" @click="toLoading" style="margin-right:10px" >
+                        <span >查询</span>
+                    </i-button>
+                </i-col>
+
+            </row>
+		    
+		    <Row>
+		        <Col span="24">
+		            <table id="processTypeStep" lay-filter="processTypeStep"></table>
+		            <script type="text/html" id="toolbar2">
+                <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                <a class="layui-btn layui-btn-xs" lay-event="del">删除</a>
+              </script>
+		        </Col>
+		    </Row>
+		    <!--新增/编辑菜单Modal-->
+		    <Modal v-model="add_modal_step" title="流程步骤类型"  :styles="{left:'0px',top:'10px',width:'960px'}">
+		   
+		    
+		        <row>
+		            <i-col span="10">
+		                <i-form ref='editStepForm' :model="editStepForm" :rules='validateRules'  label-position="right" autocomplete="off"
+		                        :label-width="100">
+		                              <form-item label="流程步骤ID" prop="typeStepId"  class="layui-hide"  >
+		                        <input type="text" class="layui-hide"   v-model="editStepForm.typeStepId" style="width:50%">
+		                    </form-item>
+		                     
+		                     <form-item label="流程类型" prop="typeId"  >
+				                <i-select v-model="editStepForm.typeId" clearable filterable style="width: 100%" >
+		                            <i-option v-for="item in processTypeList" :value="item.typeId" :key="item.typeId">{{ item.typeName }}</i-option>
+		                        </i-select>
+		                    </form-item>
+		                    <form-item label="步骤名称" prop="stepName"    >
+		                        <i-input type="text"    v-model="editStepForm.stepName" style="width:100%">
+		                    </form-item>
+		                   <form-item label="待审核人" prop="approveUserId" >
+				                <i-select v-model="editStepForm.approveUserId"  clearable filterable style="width: 80%" >
+		                            <i-option v-for="item in userList" :value="item.userId" :key="item.userId">{{ item.userName }}</i-option>
+		                        </i-select>
+		                    </form-item>
+		                    <form-item label="当前审核人类型" prop="approveUserType"  >
+		                            <i-select :model.sync="editStepForm.approveUserType"  v-model="editStepForm.approveUserType" clearable filterable @on-change="listUserType">
+                                    <i-option value="1" >固定审核人</i-option>
+                                    <i-option value="2" >发起人</i-option>
+                                    <i-option value="3" >动态SQL获取</i-option>
+                                    <i-option value="5" >通过角色配置获取</i-option>
+                                </i-select>
+		                    </form-item>
+		               
+		                 <i-col v-if="sqlShowFlage" span="60" >   
+		                    <form-item label="通过动态执行SQL来获取当前审核人ID" prop="approveUserIdSelectSql"  >
+		                        <i-input type="text"  v-model="editStepForm.approveUserIdSelectSql" ></i-input>
+		                    </form-item>
+		                </i-col>
+		                    <form-item label="是否允许编辑" prop="isCanEdit"  >
+		                        <i-select :model.sync="editStepForm.isCanEdit" v-model="editStepForm.isCanEdit" clearable filterable >
+                                    <i-option value="1" >允许</i-option>
+                                    <i-option value="0" >不允许</i-option>
+                                </i-select>
+		                    </form-item>
+		                    
+		                    
+		                   <form-item label="所在步骤" prop="step"  >
+		                        <i-input type="text"  v-model="editStepForm.step" maxlength="40" style="width:50%;" ></i-input>
+		                    </form-item>
+		                      <form-item label="下一步节点" prop="nextStep"  >
+		                        <i-input type="text"  v-model="editStepForm.nextStep" maxlength="40" style="width:50%;" ></i-input>
+		                    </form-item>
+		                     <form-item label="通过动态执行SQL来获取下一步处理节点" prop="nextStepSelectSql"  >
+		                        <i-input type="text"  v-model="editStepForm.nextStepSelectSql" ></i-input>
+		                    </form-item>
+		                     <form-item label="步骤类型" prop="stepType"  >
+		                        <i-select :model.sync="editStepForm.stepType" v-model="editStepForm.stepType" clearable filterable >
+                                    <i-option value="1" >起始节点</i-option>
+                                    <i-option value="2" >中间节点</i-option>
+                                    <i-option value="3" >结束节点</i-option>
+                                </i-select>
+		                    </form-item>
+		                  <i-col v-if="roleShowFlage"  >  
+			                    <form-item label="审批者角色定义" prop="approveUserRole" >
+			                    
+					                <i-select  :model.sync="editStepForm.approveUserRole" v-model="editStepForm.approveUserRole" clearable filterable >
+			                            <i-option v-for="item in roleList" :value="item.roleCode" :key="item.roleCode">{{ item.roleName }}</i-option>
+			                        </i-select>
+			                    </form-item>
+		                  </i-col>
+		                </i-form>
+		            </i-col>
+		        </row>
+		        
+		           <div slot="footer" style="text-align:left">
+		            <i-button type="primary" :loading="submitLoading" @click="saveStep()">
+		                <span v-if="!submitLoading">保存</span>
+		                <span v-else>处理中...</span>
+		            </i-button>
+		            <i-button type="ghost" @click="closeStepModal()" style="margin-left: 8px;background-color:rgba(255, 153, 0, 1);color:#ffffff">撤销</i-button>
+		        </div>
+		    </Modal>
+
+        </tab-pane>
+   </tabs>
 
   
 </div>

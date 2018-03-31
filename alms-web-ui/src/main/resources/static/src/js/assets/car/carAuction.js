@@ -1,4 +1,5 @@
 var businessId = document.getElementById("businessId").getAttribute("value");
+var dragId = document.getElementById("dragId").getAttribute("value");
 var ex = /^[1-9]\d*$/; 
 var amt=/^(([1-9]\d*)|\d)(\.\d{1,2})?$/;
 var mobi= /^(((13[0-9]{1})|(14[0-9]{1})|(17[0]{1})|(15[0-3]{1})|(15[5-9]{1})|(18[0-9]{1}))+\d{8})$/; 
@@ -446,7 +447,6 @@ window.layinit(function (htConfig) {
 	    		        maxNumberOfFiles: 1,// 最大上传文件数目
 	    		        maxFileSize: 10485760,// 文件不超过5M
 	    		        sequentialUploads: true,// 是否队列上传
-	    		        dataType: 'json',// 期望从服务器得到json类型的返回数据
 	    		        /*******************************************************
 						 * 设置进度条 progressall: function (e, data) { var progress =
 						 * parseInt(data.loaded / data.total * 100);
@@ -489,8 +489,8 @@ window.layinit(function (htConfig) {
 	   	                     data.formData.busType='AfterLoan_Material_CarAuction';
 	   	                     data.formData.file=data.originalFiles[0];
 		    		        	var size=data.originalFiles[0].size;
-		    		        	 if(size/1024/1024 > 10){
-			                    	 layer.msg("文件过大，超过10M不允许上传",{icon:5,shade: [0.8, '#393D49'],time:3000});
+		    		        	 if(size/1024/1024 > 5){
+			                    	 layer.msg("文件过大，超过5M不允许上传",{icon:5,shade: [0.8, '#393D49'],time:3000});
 			                    	 return;
 		                     }
 		    		        	 data.submit();
@@ -565,7 +565,7 @@ window.layinit(function (htConfig) {
 	            $.ajax({
 	                type: "POST",
 	                url: basePath+'car/auctionDetail',
-	                data: {"businessId":businessId},
+	                data: {"businessId":businessId,"dragId":dragId},
 	                // contentType: "application/json; charset=utf-8",
 	                success: function (data) {
 	                	if (data.code == "0000"){
@@ -672,7 +672,7 @@ window.layinit(function (htConfig) {
 	    	},
 	    	carAuctionAply:function (event,subType){
 	    		var that = this;
-	    		that.businessId=that.carAuction.businessId;
+	    		that.carAuction.businessId=businessId;
 	    		// 页面信息验证
 	    		if(vm.detection.annualVerificationExpirationDate==''||vm.detection.annualVerificationExpirationDate==null){
 	    			$("#annualVerificationExpirationDate").css("border","1px solid #FF3030");

@@ -34,9 +34,11 @@ import com.hongte.alms.base.entity.CarAuctionBidder;
 import com.hongte.alms.base.entity.CarAuctionReg;
 import com.hongte.alms.base.entity.CarBasic;
 import com.hongte.alms.base.entity.CarDetection;
+import com.hongte.alms.base.entity.CarReturnReg;
 import com.hongte.alms.base.entity.Doc;
 import com.hongte.alms.base.entity.DocTmp;
 import com.hongte.alms.base.entity.DocType;
+import com.hongte.alms.base.entity.InfoSms;
 import com.hongte.alms.base.entity.MsgTemplate;
 import com.hongte.alms.base.enums.AuctionStatusEnums;
 import com.hongte.alms.base.enums.MsgTemplateEnableEnum;
@@ -48,6 +50,7 @@ import com.hongte.alms.base.mapper.CarAuctionMapper;
 import com.hongte.alms.base.mapper.CarAuctionRegMapper;
 import com.hongte.alms.base.mapper.CarBasicMapper;
 import com.hongte.alms.base.mapper.CarDetectionMapper;
+import com.hongte.alms.base.mapper.CarReturnRegMapper;
 import com.hongte.alms.base.mapper.DocMapper;
 import com.hongte.alms.base.mapper.DocTmpMapper;
 import com.hongte.alms.base.mapper.DocTypeMapper;
@@ -59,6 +62,7 @@ import com.hongte.alms.base.process.service.ProcessService;
 import com.hongte.alms.base.process.vo.ProcessSaveReq;
 import com.hongte.alms.base.vo.comm.SmsVo;
 import com.hongte.alms.common.util.DateUtil;
+import com.hongte.alms.common.util.JsonUtil;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.core.Result;
 
@@ -104,6 +108,9 @@ public class CarServiceImpl  implements CarService {
    
    @Autowired
    private MsgTemplateMapper msgTemplateMapper;
+   
+   @Autowired
+   private CarReturnRegMapper carReturnRegMapper;
 	
 	public Page<CarVo> selectCarPage(CarReq carReq) {
 			Page<CarVo> pages = new Page<CarVo>();
@@ -547,8 +554,8 @@ public class CarServiceImpl  implements CarService {
 			throw new AlmsBaseExcepiton( "报名登记短信模板不存在"); 
 		}
 		MsgTemplate msgTemplate=msgTemplates.get(0);
-		if(MsgTemplateEnableEnum.ENABLE.getValue().equals(msgTemplate.getEnableFlag())
-			&&!StringUtils.isEmpty(msgTemplate.getMsg())) {
+		if(
+			!StringUtils.isEmpty(msgTemplate.getMsg())) {
 			String msg=String.format(msgTemplate.getMsg(),userName,DateUtil.formatDate("yyyy-MM-dd HH:mm:ss", carAuction.getPaymentEndTime()),carAuction.getDeposit(),
 					carAuction.getAcountName(),carAuction.getOpenBank(),carAuction.getAcountNum());
 			Set<String> phones=new HashSet<String>();
@@ -557,17 +564,84 @@ public class CarServiceImpl  implements CarService {
 			vo.setPhones(phones);
 			vo.setContent(msg);
 			vo.setType(SmsTypeEnum.NOTICE.getValue());
+			//记录短信日志
+			InfoSms sms=new InfoSms();
+			sms.setLogId(UUID.randomUUID().toString());
+			sms.setOriginalBusinessId(carAuction.getBusinessId());
+			sms.setPhoneNumber(telephone);
+			sms.setRecipient(userName);
+			sms.setSmsType("微信公众号竞拍报名登记短信通知");
+			sms.setSendDate(new Date());
+			sms.setContent(msg);
+			sms.setServiceName("调EIP发送短信");
+			sms.setCreateTime(new Date());
+			sms.setCreateUser("admin");//系统触发自动发送
 			try {
-				Result eipResult=eipRemote.sendSms(vo);
-				if(eipResult==null||!"0000".equals(eipResult.getReturnCode())) {
-					logger.error("调用EIP系统发送短信失败,eipResult="+eipResult==null?null:"调用EIP系统发送短信返回码："+eipResult.getReturnCode());
-					throw new AlmsBaseExcepiton( "调用EIP系统发送短信失败"); 
+				if(MsgTemplateEnableEnum.ENABLE.getValue().equals(msgTemplate.getEnableFlag())) {//发送开关
+					Result eipResult=eipRemote.sendSms(vo);
+					logger.debug("EIP返回信息,code="+eipResult.getReturnCode()+",msg="+eipResult.getMsg());
+					if(eipResult==null||!"0000".equals(eipResult.getReturnCode())) {
+						logger.error("调用EIP系统发送短信失败,eipResult="+eipResult==null?null:"调用EIP系统发送短信返回码："+eipResult.getReturnCode());
+						throw new AlmsBaseExcepiton( "调用EIP系统发送短信失败"); 
+					}
+
+					sms.setStatus("已发送");
+				}else {
+					sms.setStatus("未发送");	
 				}
 			}catch (Exception e) {
+				sms.setStatus("未发送");
 				logger.error(e.getMessage());
 				throw new AlmsBaseExcepiton( "调用EIP系统发送短信失败"); 
+				
+			}finally {
+				sms.insert();//插入短信日志
 			}
 			
 		}
+	}
+
+	@Override
+	public void addReturnReg(Map<String, Object> params) {
+		CarReturnReg returnReg=JsonUtil.map2obj((Map<String,Object>)params.get("returnReg"), CarReturnReg.class);
+    	List<FileVo> files=JsonUtil.map2objList(params.get("returnRegFiles"), FileVo.class);
+    	
+    	CarBasic carBasic=carBasicMapper.selectById(returnReg.getBusinessId());
+    	if(carBasic==null) {
+    		logger.error("车辆信息不存在,businessId="+returnReg.getBusinessId());
+    		throw new AlmsBaseExcepiton( "车辆信息不存在"); 
+    	}
+    	carBasic.setStatus(CarStatusEnums.RETURNED.getStatusCode());
+    	carBasic.setUpdateTime(new Date());
+    	carBasic.setUpdateUser(loginUserInfoHelper.getUserId());
+    	carBasicMapper.updateById(carBasic);
+    	
+    	List<CarReturnReg> carReturnRegs=carReturnRegMapper.selectList(new EntityWrapper<CarReturnReg>().eq("business_id", returnReg.getBusinessId()).eq("drag_id", returnReg.getDragId()));
+    	if(carReturnRegs!=null&&carReturnRegs.size()>0) {
+    		logger.error("该车辆拖车后存在多条归还记录,businessId="+returnReg.getBusinessId()+"dragId="+returnReg.getDragId());
+    		throw new AlmsBaseExcepiton( "该车辆拖车后存在多条归还记录"); 
+    	}
+    	//CarReturnReg carReturnReg=carReturnRegs.get(0);
+    	CarReturnReg carReturnReg=new CarReturnReg();
+    		carReturnReg.setReturnRegId(UUID.randomUUID().toString());
+    		carReturnReg.setCreateTime(new Date());
+    		carReturnReg.setCreateUser(loginUserInfoHelper.getUserId());
+    	
+  		BeanUtils.copyProperties(returnReg, carReturnReg);
+  		carReturnReg.insertOrUpdate();
+    	if(files!=null&&files.size()>0) {
+    		for(FileVo file:files) {
+    			
+    			DocTmp tmp=docTmpMapper.selectById(file.getOldDocId());//将临时表保存的上传信息保存到主表中
+    			if(tmp!=null) {
+    				Doc doc=new Doc();
+    				BeanUtils.copyProperties(tmp, doc);
+    				doc.setOriginalName(file.getOriginalName());
+    				doc.insertOrUpdate();
+    			}
+    			
+    		}
+    	}
+		//
 	}
 }

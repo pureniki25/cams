@@ -4,6 +4,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.SpringCloudApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -11,10 +12,11 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 /**
  * 第三方对外服务
  */
-@EnableFeignClients(basePackages = {"com.ht.ussp.client"})
+@EnableFeignClients(basePackages = {"com.ht.ussp.client","com.hongte.alms.base.feignClient"})
 @SpringCloudApplication
 @MapperScan(basePackages = {"com.hongte.alms.open.mapper","com.hongte.alms.base"})
 @EnableTransactionManagement
+@EnableDiscoveryClient
 @ComponentScan(basePackages= {"com.hongte.alms.open","com.hongte.alms.common","com.hongte.alms.base.*","com.ht.ussp.bean"})
 public class OpenServiceApplication {
 
