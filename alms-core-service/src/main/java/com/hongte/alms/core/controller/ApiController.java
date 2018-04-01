@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
@@ -34,6 +35,7 @@ import java.util.Map;
  * @since 2018-01-30
  */
 @RestController
+@RefreshScope
 @RequestMapping("/api")
 public class ApiController {
     private Logger logger = LoggerFactory.getLogger(ApiController.class);

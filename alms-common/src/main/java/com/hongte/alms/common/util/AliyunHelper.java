@@ -27,6 +27,7 @@ import com.aliyun.oss.model.OSSObject;
  * @author 伦惠峰
  * @Date 2018/1/26 20:43
  */
+@RefreshScope
 @Component
 public class AliyunHelper {
 

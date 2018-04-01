@@ -3,6 +3,7 @@ package com.hongte.alms.core.storage;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
 
 import com.hongte.alms.common.util.FileUtil;
@@ -14,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service("storageService")
+@RefreshScope
 public class FileSystemStorageService implements StorageService {
 
 

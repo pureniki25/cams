@@ -150,20 +150,19 @@ window.layinit(function (htConfig) {
                 .then(function (res) {debugger
                     if (res.data.code == "1") {
                         console.log(res)
-                        data = res.data.data 
-                        _this.editStepForm.typeId = data.typeId 
-                        _this.editStepForm.typeStepId = data.typeStepId 
-                        _this.editStepForm.stepName = data.stepName 
-                        _this.editStepForm.approveUserId = data.approveUserId 
-                        _this.editStepForm.approveUserIdSelectSql = data.approveUserIdSelectSql 
-                        _this.editStepForm.isCanEdit = data.isCanEdit 
-                        _this.editStepForm.step = data.step 
-                        _this.editStepForm.nextStep = data.nextStep 
-                        _this.editStepForm.nextStepSelectSql = data.nextStepSelectSql 
-                        _this.editStepForm.stepType = data.stepType 
-                        _this.editStepForm.approveUserRole = data.approveUserRole 
-                        _this.editStepForm.approveUserType = data.approveUserType  
-                        
+                        data = res.data.data, 
+                        _this.editStepForm.typeId = data.typeId, 
+                        _this.editStepForm.typeStepId = data.typeStepId, 
+                        _this.editStepForm.stepName = data.stepName, 
+                        _this.editStepForm.approveUserId = data.approveUserId+'', 
+                        _this.editStepForm.approveUserIdSelectSql = data.approveUserIdSelectSql, 
+                        _this.editStepForm.isCanEdit = data.isCanEdit+'', 
+                        _this.editStepForm.step = data.step, 
+                        _this.editStepForm.nextStep = data.nextStep, 
+                        _this.editStepForm.nextStepSelectSql = data.nextStepSelectSql, 
+                        _this.editStepForm.stepType = data.stepType+'', 
+                        _this.editStepForm.approveUserRole = data.approveUserRole, 
+                        _this.editStepForm.approveUserType = data.approveUserType+'',  
                         _this.add_modal_step = true 
                     } else {
                         app.$Modal.error({content: '操作失败，消息：' + res.data.msg});
@@ -239,9 +238,9 @@ window.layinit(function (htConfig) {
                                  content: '操作成功'
                              });
                                 table.reload('processType',{
-                                    where:{
-                                    	typeId:typeId
-                                    }
+                                	   page: {
+   	                                    curr: 1 //重新从第 1 页开始
+   	                                }
                                 })
                             } else {
                                 app.$Modal.error({content: '操作失败，消息：' + res.data.msg});
@@ -271,11 +270,11 @@ window.layinit(function (htConfig) {
                                     title: '',
                                     content: '操作成功'
                                 });
-                                table.reload('processTypeStep',{
-                                    where:{
-                                    	typeStepId:typeStepId
-                                    }
-                                })
+	                           table.reload('processTypeStep', {
+	                                page: {
+	                                    curr: 1 //重新从第 1 页开始
+	                                }
+	                            })
                             } else {
                                 app.$Modal.error({content: '操作失败，消息：' + res.data.msg});
                             }

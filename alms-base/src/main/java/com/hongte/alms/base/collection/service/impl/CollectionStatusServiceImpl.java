@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +41,7 @@ import java.util.*;
  * @since 2018-01-25
  */
 @Transactional  //事务声明
+@RefreshScope
 @Service("CollectionStatusService")
 public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatusMapper, CollectionStatus> implements CollectionStatusService {
 

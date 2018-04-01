@@ -27,7 +27,7 @@
             parameterType="com.hongte.alms.base.vo.module.ProcessStepSearchReq">
 
       
-		select  s.type_step_id as typeStepId,s.type_id as typeId,s.step_name as stepName,t.type_name as typeName,
+		select  s.approve_user_id  as approveUserId, s.type_step_id as typeStepId,s.type_id as typeId,s.step_name as stepName,t.type_name as typeName,
 		
 		u.user_name as approveUserName, s.approve_user_type as approveUserType, s.approve_user_id_select_sql as approveUserIdSelectSql,s.is_can_edit as isCanEdit,
 		

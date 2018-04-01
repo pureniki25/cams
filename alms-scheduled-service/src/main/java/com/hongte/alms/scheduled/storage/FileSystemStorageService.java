@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service("storageService")
+@RefreshScope
 public class FileSystemStorageService implements StorageService {
 
 
