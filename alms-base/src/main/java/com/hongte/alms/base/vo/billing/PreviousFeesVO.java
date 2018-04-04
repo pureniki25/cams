@@ -1,19 +1,19 @@
 package com.hongte.alms.base.vo.billing;
 
 public class PreviousFeesVO {
-	private int period;
+	private String afterId;
 	private double previousPlanAccrual;
 	private double previousPlanServiceCharge;
 	private double previousLateFees;
 	private String currentStatus;
 	private String businessId;
 
-	public int getPeriod() {
-		return period;
+	public String getAfterId() {
+		return afterId;
 	}
 
-	public void setPeriod(int period) {
-		this.period = period;
+	public void setAfterId(String afterId) {
+		this.afterId = afterId;
 	}
 
 	public double getPreviousPlanAccrual() {
@@ -58,7 +58,7 @@ public class PreviousFeesVO {
 
 	@Override
 	public String toString() {
-		return "PreviousFeesVO [period=" + period + ", previousPlanAccrual=" + previousPlanAccrual
+		return "PreviousFeesVO [afterId=" + afterId + ", previousPlanAccrual=" + previousPlanAccrual
 				+ ", previousPlanServiceCharge=" + previousPlanServiceCharge + ", previousLateFees=" + previousLateFees
 				+ ", currentStatus=" + currentStatus + ", businessId=" + businessId + "]";
 	}

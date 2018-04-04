@@ -55,7 +55,7 @@ window.layinit(function (htConfig) {
 			arrearageDetailTitle: [
 				{
 					title: '期数',
-					key: 'period'
+					key: 'afterId'
 				},
 				{
 					title: '服务费',
