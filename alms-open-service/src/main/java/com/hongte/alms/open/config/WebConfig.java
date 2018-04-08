@@ -3,6 +3,7 @@ package com.hongte.alms.open.config;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -20,6 +21,7 @@ import java.util.List;
  */
 //@EnableWebMvc
 @Configuration
+@RefreshScope
 public class WebConfig extends WebMvcConfigurerAdapter {
 
     @Value("${ht.config.ui.useGateWayflage:true}")
