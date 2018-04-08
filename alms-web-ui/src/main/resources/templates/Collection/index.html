@@ -152,6 +152,16 @@
                                 <i-input v-model="searchForm.liquidationTow"></i-input>
                             </form-item>
                         </i-col>
+                        <i-col span="6">
+                            <form-item label="期数状态" prop="peroidStatus">
+                                <i-select v-model="searchForm.peroidStatus" clearable filterable style="width:200px">
+                                    <i-option value="首期">首期</i-option>
+                                    <i-option value="本金期">本金期</i-option>
+                                    <i-option value="末期">末期</i-option>
+                                </i-select>
+                            </form-item>
+                        </i-col>
+
                         <!--repayStatus:'',          //还款状态-->
                         <i-col span="6">
                             <form-item label="还款状态：" prop="repayStatus">

@@ -190,7 +190,21 @@
                 </foreach>
 
             </if>
-
+			<!-- 期数状态 -->
+			<if test="peroidStatus != null and peroidStatus == '首期' " >
+				and plan.is_defer != 1 and pList.period = 1
+			</if>
+			
+			<!-- 期数状态 -->
+			<if test="peroidStatus != null and peroidStatus == '本金期' " >
+				<!-- and plan.is_defer != 1 -->
+				 and business.repayment_type_id = 2 and pList.plan_list_id = (select pl.plan_list_id from tb_repayment_biz_plan_list pl where pl.plan_id = pList.plan_id order by pl.due_date desc limit 1 ) 
+			</if>
+			
+			<!-- 期数状态 -->
+			<if test="peroidStatus != null and peroidStatus == '末期' " >
+				and business.repayment_type_id = 5 and pList.plan_list_id = (select pl.plan_list_id from tb_repayment_biz_plan_list pl where pl.plan_id = pList.plan_id order by pl.due_date desc limit 1 ) 
+			</if>
         </where>
 
         order BY  pList.due_date DESC

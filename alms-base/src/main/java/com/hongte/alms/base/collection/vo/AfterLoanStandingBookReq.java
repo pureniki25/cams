@@ -57,7 +57,10 @@ public class AfterLoanStandingBookReq extends PageRequest {
 
     @ApiModelProperty(value="清算二",name="liquidationTow",dataType = "String")
     private String  liquidationTow;  //清算二
-
+    
+    @ApiModelProperty(value="期数状态",name="peroidStatus",dataType = "String")
+    private String peroidStatus ;//期数状态,首期/本金期/末期
+    
     private List<String> liquidationTowUIds;//清算二用户ID列表
 
     @ApiModelProperty(value="业务状态",name="businessStatus",dataType = "int")
@@ -285,4 +288,18 @@ public class AfterLoanStandingBookReq extends PageRequest {
     public void setUserId(String userId) {
         this.userId = userId;
     }
+
+	/**
+	 * @return the peroidStatus
+	 */
+	public String getPeroidStatus() {
+		return peroidStatus;
+	}
+
+	/**
+	 * @param peroidStatus the peroidStatus to set
+	 */
+	public void setPeroidStatus(String peroidStatus) {
+		this.peroidStatus = peroidStatus;
+	}
 }

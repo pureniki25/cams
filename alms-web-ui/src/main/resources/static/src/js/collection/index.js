@@ -68,7 +68,8 @@ window.layinit(function(htConfig){
                 liquidationTow:'',  //清算二
                 businessStatus:'',   //业务状态
                 repayStatus:'',      //还款状态
-                customerName:''  //客户名称
+                customerName:'',  //客户名称
+                peroidStatus:'' //期数状态,首期/本金期/末期
             },
             areaList:'',//area_array,   //区域列表
             companyList: '',//company_array,  //公司列表
@@ -117,7 +118,8 @@ window.layinit(function(htConfig){
                                 liquidationTow:vm.searchForm.liquidationTow,  //清算二
                                 businessStatus:vm.searchForm.businessStatus,   //业务状态
                                 repayStatus:vm.searchForm.repayStatus,      //还款状态
-                                customerName:vm.searchForm.customerName  //客户名称
+                                customerName:vm.searchForm.customerName,  //客户名称
+                                peroidStatus:vm.searchForm.peroidStatus,  //期数状态
                             }
                             , page: {
                                 curr: 1 //重新从第 1 页开始
