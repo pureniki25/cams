@@ -6,6 +6,7 @@ import com.hongte.alms.base.entity.BasicCompany;
 import com.hongte.alms.base.enums.AreaLevel;
 import com.hongte.alms.base.service.BasicCompanyService;
 import com.hongte.alms.common.result.Result;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,6 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/basicCompany")
+@Api(tags = "BasicCompanyController", description = "公司区域信息相关接口")
 public class BasicCompanyController {
 
     @Autowired

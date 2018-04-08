@@ -4,6 +4,7 @@ package com.hongte.alms.core.controller;
 import java.io.FileNotFoundException;
 import java.util.List;
 
+import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,7 @@ import io.swagger.annotations.ApiOperation;
  */
 @RestController
 @RequestMapping("/moneyPool")
+@Api(tags = "MoneyPoolController", description = "财务款项池相关接口")
 public class MoneyPoolController {
 	private Logger logger = LoggerFactory.getLogger(MoneyPoolController.class);
 

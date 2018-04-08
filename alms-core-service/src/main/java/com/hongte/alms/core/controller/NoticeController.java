@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.util.*;
 
 import com.hongte.alms.base.entity.SysUser;
+import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,7 @@ import io.swagger.annotations.ApiOperation;
  */
 @RestController
 @RequestMapping("/notice")
+@Api(tags = "NoticeController", description = "通知公告相关接口")
 public class NoticeController {
 	private Logger logger = LoggerFactory.getLogger(NoticeController.class);
 	

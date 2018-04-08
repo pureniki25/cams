@@ -48,6 +48,7 @@ import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.LoginInfoDto;
 import com.ht.ussp.util.BeanUtils;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -75,6 +76,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping("/ApplyDerateController")
+@Api(tags = "ApplyDerateController", description = "申请减免相关接口")
 public class ApplyDerateController {
 
 

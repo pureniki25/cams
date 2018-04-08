@@ -542,7 +542,7 @@ window.layinit(function(htConfig){
             }else  if(obj.event ==='info'){
                 if(obj.data.businessTypeId == 9 || obj.data.businessTypeId == 1){
                    //车贷  车贷展期
-                    axios.get(basePath + 'api/getXindaiCarView?businessId='+obj.data.businessId)
+                    axios.get(basePath + 'api/getXindaiAfterView?businessId='+obj.data.businessId+"&businessAfterId="+obj.data.afterId)
                         .then(function (res) {
                             if (res.data.code == "1") {
                                 showOneLineOprLayer(res.data.data,"车贷详情");
@@ -555,7 +555,7 @@ window.layinit(function(htConfig){
                         });
                 }else if(obj.data.businessTypeId == 11 || obj.data.businessTypeId == 2){
                     //房贷
-                    axios.get(basePath + 'api/getXindaiHouseView?businessId='+obj.data.businessId)
+                    axios.get(basePath + 'api/getXindaiAfterView?businessId='+obj.data.businessId+"&businessAfterId="+obj.data.afterId)
                         .then(function (res) {
                             if (res.data.code == "1") {
                                 showOneLineOprLayer(res.data.data,"房贷详情");

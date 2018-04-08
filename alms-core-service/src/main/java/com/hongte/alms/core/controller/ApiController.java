@@ -171,4 +171,42 @@ public class ApiController {
             return Result.error("500", ex.getMessage());
         }
     }
+
+
+    @RequestMapping("getXindaiAfterView")
+    @ApiOperation(value = "获取信贷贷后详情")
+    public Result<String> getXindaiAfterView(String businessId,String businessAfterId) throws Exception {
+        if(businessId==null||businessId.isEmpty())
+        {
+            return Result.error("500", "业务信息不存在");
+        }
+        try {
+            BasicBusiness business = basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id",businessId));
+
+            String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+            String appKey = this.afterLoanKey;
+            String appSecret = this.afterLoanSecret;
+            Map<String, String> params = new HashMap<String, String>();
+            params.put("businessId", businessId);
+            params.put("businessAfterId", businessAfterId);
+            params.put("timestamp", timestamp);
+            String sign = SignUtil.signTopRequest(params, appSecret, "MD5");
+            int carType=9;
+            int houseType=11;
+            if (business.getBusinessType() == carType) {
+                String xindaiCarAfterViewUrl = xindaiDomain + "Operation/OpenAfterView/CarAfterDetails?" + "businessId=" + businessId + "&afterBusinessId=" + businessAfterId + "&appKey=" + appKey + "&timestamp=" + timestamp + "&sign=" + sign;
+                return Result.success(xindaiCarAfterViewUrl);
+            }
+            if (business.getBusinessType() == houseType) {
+                String xindaiHouseAfterViewUrl = xindaiDomain + "Operation/OpenAfterView/HouseAfterDetails?" + "businessId=" + businessId + "&afterBusinessId=" + businessAfterId + "&appKey=" + appKey + "&timestamp=" + timestamp + "&sign=" + sign;
+                return Result.success(xindaiHouseAfterViewUrl);
+            }
+            throw new UnsupportedOperationException();
+        } catch (Exception ex) {
+            logger.error(ex.getMessage());
+            return Result.error("500", ex.getMessage());
+        }
+    }
+
+
 }

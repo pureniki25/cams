@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,7 @@ import io.swagger.annotations.ApiOperation;
  */
 @RestController
 @RequestMapping("/doc")
+@Api(tags = "DocController", description = "文件上传相关接口")
 public class DocController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DocController.class);

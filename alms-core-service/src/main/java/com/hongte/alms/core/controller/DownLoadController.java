@@ -7,6 +7,7 @@ import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.core.storage.StorageService;
 
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ import java.io.*;
  */
 @RestController
 @RequestMapping("downLoadController")
-
+@Api(tags = "DownLoadController", description = "文件下载相关接口")
 public class DownLoadController  implements Serializable {
 	private static final Logger LOG = LoggerFactory.getLogger(DownLoadController.class);
 

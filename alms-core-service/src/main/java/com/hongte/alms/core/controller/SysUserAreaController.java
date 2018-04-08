@@ -2,6 +2,7 @@ package com.hongte.alms.core.controller;
 
 import java.util.List;
 
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +34,7 @@ import io.swagger.annotations.ApiOperation;
  */
 @RestController
 @RequestMapping("/sys/userarea")
+@Api(tags = "SysUserAreaController", description = "系统用户区域设置相关接口")
 public class SysUserAreaController {
 
 	@Autowired

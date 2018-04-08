@@ -46,6 +46,7 @@ import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.LoginInfoDto;
 
 import feign.Request;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.poi.ss.usermodel.Workbook;
 
@@ -72,6 +73,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping("/InfoController")
+@Api(tags = "InfoController", description = "短信模块相关接口")
 public class InfoController {
 
 
