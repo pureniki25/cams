@@ -294,8 +294,26 @@ window.layinit(function(htConfig){
                     title: '借款金额'
                 }, {
                     field: 'totalBorrowAmount',
-                    width:90,
-                    title: '应还金额'
+                    width:180,
+                    title: '应还金额',
+                    templet:function(d){
+                        let styel = 'background-color: #CCCC00;background-image: none !important;text-shadow: none !important;display: inline-block;padding: 2px 4px;font-size: 11.844px;font-weight: bold;line-height: 14px;color: #fff;text-shadow: 0 -1px 0 rgba(0,0,0,0.25);white-space: nowrap;vertical-align: baseline;'
+                        res = '' 
+                        let firstPeriod = '<span style="'+styel+'">首期</span>' 
+                        let benjinPeriod = '<span style="'+styel+'">本金期</span>' 
+                        let lastPeriod = '<span style="'+styel+'">末期</span>' 
+                        if(d.periods==1){
+                            res+=firstPeriod
+                        }
+                        if(d.repaymentTypeId==2&&d.borrowLimit==d.periods){
+                            res+=benjinPeriod
+                        }
+                        if(d.repaymentTypeId==5&&d.borrowLimit==d.periods){
+                            res+=lastPeriod
+                        }
+                        res += d.totalBorrowAmount 
+                        return res 
+                    }
                 }, {
 
                     field: 'delayDays',

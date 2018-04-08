@@ -58,9 +58,12 @@
 
         pList.plan_list_id AS  crpId,
         pList.current_status as statusName,
-        col_status.collection_status as colStatus
+        col_status.collection_status as colStatus,
 --          sys_param.param_name as afterColStatusName
 
+		plan.borrow_limit as borrowLimit ,
+		business.repayment_type_id as repaymentTypeId 
+		
         from tb_repayment_biz_plan_list  as pList
         LEFT JOIN tb_repayment_biz_plan as plan ON pList.plan_id = plan.plan_id
         LEFT JOIN tb_basic_business as business ON plan.original_business_id = business.business_id
@@ -195,16 +198,20 @@
 				and plan.is_defer != 1 and pList.period = 1
 			</if>
 			
+			<!-- <if test="peroidStatus != null and peroidStatus == '本金期' " >
+				 and business.repayment_type_id = 2 and pList.plan_list_id = (select pl.plan_list_id from tb_repayment_biz_plan_list pl where pl.plan_id = pList.plan_id order by pl.due_date desc limit 1 ) 
+			</if> -->
 			<!-- 期数状态 -->
 			<if test="peroidStatus != null and peroidStatus == '本金期' " >
-				<!-- and plan.is_defer != 1 -->
-				 and business.repayment_type_id = 2 and pList.plan_list_id = (select pl.plan_list_id from tb_repayment_biz_plan_list pl where pl.plan_id = pList.plan_id order by pl.due_date desc limit 1 ) 
+				 and business.repayment_type_id = 2 and plan.borrow_limit = pList.period
 			</if>
-			
 			<!-- 期数状态 -->
 			<if test="peroidStatus != null and peroidStatus == '末期' " >
-				and business.repayment_type_id = 5 and pList.plan_list_id = (select pl.plan_list_id from tb_repayment_biz_plan_list pl where pl.plan_id = pList.plan_id order by pl.due_date desc limit 1 ) 
+				and business.repayment_type_id = 5 and plan.borrow_limit = pList.period
 			</if>
+			<!-- <if test="peroidStatus != null and peroidStatus == '末期' " >
+				and business.repayment_type_id = 5 and pList.plan_list_id = (select pl.plan_list_id from tb_repayment_biz_plan_list pl where pl.plan_id = pList.plan_id order by pl.due_date desc limit 1 ) 
+			</if> -->
         </where>
 
         order BY  pList.due_date DESC
