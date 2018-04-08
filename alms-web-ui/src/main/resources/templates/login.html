@@ -79,6 +79,22 @@
                     xhr.setRequestHeader("app", config.app);
                 },
                 success: function (data) {
+                	
+                	if(data.code=='0009'){
+                        layer.confirm('您的密码过于简单，需要重新设置密码', {
+                            btn: ['确认']
+                        }, function(index, layero){
+                            if(config.changePwdPath == "") {
+                                layer.alert("重置密码路径配置失败，请联系管理员");
+                                return;
+                            }
+                            var loginUrl = top.location.protocol + "//" + top.location.host + config.loginPath;
+                            top.location.href = config.changePwdPath+"\?token="+data["token"]+"&urls="+loginUrl;
+                        });
+                        return;
+                    }
+
+                	
                     if (data && data["token"] != null & data["token"] != "") {
                         cookie.setToken(data["token"]);
                         cookie.setRefreshToken(data["refreshToken"]);

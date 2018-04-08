@@ -28,7 +28,13 @@ layui.define(function (exports) {
         ,localBasePath:"http://localhost:30606/"
         ,openBasePath:"http://localhost:30616/"
         ,uiBasePath:"http://localhost:30601/"
-
+    	/*
+    	Dev：http://172.16.200.110:30131/html/user/changePwdOther.html
+    	Sit: http://172.16.200.112:30131/html/user/changePwdOther.html
+    	UAT：http://120.79.154.198:30131/html/user/changePwdOther.html
+    	PRD：http://120.79.162.165:30131/html/user/changePwdOther.html
+    	*/
+        ,changePwdPath:"http://172.16.200.110:30131/html/user/changePwdOther.html"
         //--------------   切换是否使用网关 --------------
     });
 });
