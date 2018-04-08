@@ -78,7 +78,7 @@ public class CollectionTransferController {
 		for (int i = 0; i <= count / 100 + 1; i++) {
 
 			CollectionReq req = new CollectionReq();
-			req.setOffSet(i * 100 + 1);
+			req.setOffSet(i * 100);
 			req.setPageSize(100);
 
 			List<Collection> collectionList = collectionService.queryNotTransferCollection(req);
@@ -95,8 +95,16 @@ public class CollectionTransferController {
 				CollectionStatus collectionStatus = (CollectionStatus) map.get("status");
 				CollectionLog collectionLog = (CollectionLog) map.get("log");
 
-				collectionStatusService.insertOrUpdate(collectionStatus);
-				collectionLogService.insertOrUpdate(collectionLog);
+                CollectionStatus status = collectionStatusService.selectOne(new EntityWrapper<CollectionStatus>().eq("business_id",collectionStatus.getBusinessId()).eq("crp_id",collectionStatus.getCrpId()));
+                if(status == null){
+                    collectionStatusService.insertOrUpdate(collectionStatus);
+                    transferFailLogService.delete(new EntityWrapper<TransferFailLog>().eq("business_id",collection.getBusinessId()).eq("after_id",collection.getAfterId()));
+                }
+                CollectionLog log = collectionLogService.selectOne(new EntityWrapper<CollectionLog>().eq("business_id",collectionLog.getBusinessId()).eq("crp_id",collectionLog.getCrpId()));
+                if(log == null){
+                    collectionLogService.insertOrUpdate(collectionLog);
+                    transferFailLogService.delete(new EntityWrapper<TransferFailLog>().eq("business_id",collection.getBusinessId()).eq("after_id",collection.getAfterId()));
+                }
 
 			}
 		}
@@ -104,12 +112,8 @@ public class CollectionTransferController {
 		count = collectionLogXdService.queryNotTransferCollectionLogCount();
 		for (int i = 0; i <= count / 100 + 1; i++) {
 
-			Page<CollectionLogXd> pages = new Page<>();
-			pages.setCurrent(i);
-			pages.setSize(100);
-
 			CollectionReq req = new CollectionReq();
-			req.setOffSet(i * 100 + 1);
+			req.setOffSet(i * 100);
 			req.setPageSize(100);
 
 			List<CollectionLogXd> xdList = collectionLogXdService.queryNotTransferCollectionLog(req);
@@ -125,8 +129,17 @@ public class CollectionTransferController {
 				}
 				CollectionStatus collectionStatus = (CollectionStatus) map.get("status");
 				CollectionLog collectionLog = (CollectionLog) map.get("log");
-				collectionStatusService.insertOrUpdate(collectionStatus);
-				collectionLogService.insertOrUpdate(collectionLog);
+                CollectionStatus status = collectionStatusService.selectOne(new EntityWrapper<CollectionStatus>().eq("business_id",collectionStatus.getBusinessId()).eq("crp_id",collectionStatus.getCrpId()));
+                if(status == null){
+                    collectionStatusService.insertOrUpdate(collectionStatus);
+                    transferFailLogService.delete(new EntityWrapper<TransferFailLog>().eq("business_id",collectionLogXd.getBusinessId()).eq("after_id",collectionLogXd.getAfterId()));
+
+                }
+                CollectionLog log = collectionLogService.selectOne(new EntityWrapper<CollectionLog>().eq("business_id",collectionLog.getBusinessId()).eq("crp_id",collectionLog.getCrpId()));
+                if(log == null){
+                    collectionLogService.insertOrUpdate(collectionLog);
+                    transferFailLogService.delete(new EntityWrapper<TransferFailLog>().eq("business_id",collectionLogXd.getBusinessId()).eq("after_id",collectionLogXd.getAfterId()));
+                }
 			}
 
 		}
