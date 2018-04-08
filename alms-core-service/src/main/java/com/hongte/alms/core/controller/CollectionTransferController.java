@@ -21,6 +21,7 @@ import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.StringUtil;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.LoginInfoDto;
+import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping("/alms")
+@Api(tags = "CollectionTrackLogController", description = "信贷数据库历史催收数据导入相关接口")
 public class CollectionTransferController {
 
     private Logger logger = LoggerFactory.getLogger(CollectionTransferController.class);

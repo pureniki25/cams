@@ -10,6 +10,7 @@ import com.hongte.alms.base.feignClient.service.EipOperateService;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.vo.PageResult;
 import com.ht.ussp.bean.LoginUserInfoHelper;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/collectionTrackLog")
+@Api(tags = "CollectionTrackLogController", description = "贷后跟踪记录相关接口")
 public class CollectionTrackLogController {
 
     private Logger logger = LoggerFactory.getLogger(CollectionTrackLogController.class);

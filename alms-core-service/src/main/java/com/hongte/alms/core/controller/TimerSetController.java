@@ -8,6 +8,7 @@ import com.hongte.alms.base.service.SysJobConfigService;
 import com.hongte.alms.base.vo.module.TimerSetReq;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.vo.PageResult;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -25,6 +26,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/timerSet")
+@Api(tags = "TimerSetController", description = "定时任务设置相关接口")
 public class TimerSetController {
 
     private  static Logger logger = LoggerFactory.getLogger(TimerSetController.class);

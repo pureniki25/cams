@@ -27,6 +27,7 @@ import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.core.service.CollectionStrategyPersonService;
 import com.ht.ussp.util.DateUtil;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -46,6 +47,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping("/collectionStrategy")
+@Api(tags = "CollectionStrategyController", description = "催收设置相关接口")
 public class CollectionStrategyController {
     private Logger logger = LoggerFactory.getLogger(CollectionStrategyController.class);
 

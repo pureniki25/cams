@@ -4,6 +4,7 @@ import com.hongte.alms.base.service.SysUserPermissionService;
 import com.hongte.alms.base.service.SysUserService;
 import com.hongte.alms.common.result.Result;
 import com.ht.ussp.bean.LoginUserInfoHelper;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/SysUser")
+@Api(tags = "SysUserController", description = "系统用户信息相关接口")
 public class SysUserController {
 
    private  static     Logger logger = LoggerFactory.getLogger(SysUserController.class);
