@@ -1,6 +1,5 @@
 package com.hongte.alms.core.controller;
 
-
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.Page;
@@ -21,6 +20,8 @@ import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.StringUtil;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.LoginInfoDto;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,285 +41,285 @@ import java.util.*;
 @RequestMapping("/alms")
 public class CollectionTransferController {
 
-    private Logger logger = LoggerFactory.getLogger(CollectionTransferController.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CollectionTransferController.class);
 
-    @Autowired
-    @Qualifier("CollectionService")
-    private CollectionService collectionService;
+	@Autowired
+	@Qualifier("CollectionService")
+	private CollectionService collectionService;
 
-    @Autowired
-    @Qualifier("CollectionLogXdService")
-    private CollectionLogXdService collectionLogXdService;
+	@Autowired
+	@Qualifier("CollectionLogXdService")
+	private CollectionLogXdService collectionLogXdService;
 
-    @Autowired
-    private LoginUserInfoHelper loginUserInfoHelper;
+	@Autowired
+	private LoginUserInfoHelper loginUserInfoHelper;
 
-    @Autowired
-    @Qualifier("CollectionStatusService")
-    private CollectionStatusService collectionStatusService;
+	@Autowired
+	@Qualifier("CollectionStatusService")
+	private CollectionStatusService collectionStatusService;
 
-    @Autowired
-    @Qualifier("CollectionLogService")
-    private CollectionLogService collectionLogService;
+	@Autowired
+	@Qualifier("CollectionLogService")
+	private CollectionLogService collectionLogService;
 
-    @Autowired
-    @Qualifier("TransferFailLogService")
-    private TransferFailLogService transferFailLogService;
+	@Autowired
+	@Qualifier("TransferFailLogService")
+	private TransferFailLogService transferFailLogService;
 
+	@Autowired
+	@Qualifier("RepaymentBizPlanListService")
+	private RepaymentBizPlanListService repaymentBizPlanListService;
 
+	@GetMapping("/transfer")
+	@ResponseBody
+	public Result transferCollection() {
 
-    @Autowired
-    @Qualifier("RepaymentBizPlanListService")
-    private RepaymentBizPlanListService repaymentBizPlanListService;
+		int count = collectionService.queryNotTransferCollectionCount();
+		for (int i = 0; i <= count / 100 + 1; i++) {
 
-    @GetMapping("/transfer")
-    @ResponseBody
-    public Result transferCollection(){
+			CollectionReq req = new CollectionReq();
+			req.setOffSet(i * 100 + 1);
+			req.setPageSize(100);
 
-        List<Collection> collectionList = new ArrayList<>();
-        List<CollectionLogXd> xdList = new ArrayList<>();
+			List<Collection> collectionList = collectionService.queryNotTransferCollection(req);
+			
+			if (CollectionUtils.isEmpty(collectionList)) {
+				continue;
+			}
 
-        Wrapper<Collection> wrapper = new EntityWrapper<>();
+			for (Collection collection : collectionList) {
+				Map<String, Object> map = getStatus(collection);
+				if (map == null) {
+					continue;
+				}
+				CollectionStatus collectionStatus = (CollectionStatus) map.get("status");
+				CollectionLog collectionLog = (CollectionLog) map.get("log");
 
-        int count = collectionService.queryNotTransferCollectionCount();
-        for(int i = 0;i <= count/100+1;i++){
+				collectionStatusService.insertOrUpdate(collectionStatus);
+				collectionLogService.insertOrUpdate(collectionLog);
 
-            List<CollectionStatus> statusList = new ArrayList<>();
-            List<CollectionLog> logList = new ArrayList<>();
+			}
+		}
 
-            CollectionReq req = new CollectionReq();
-            req.setOffSet(i*100+1);
-            req.setPageSize(100);
+		count = collectionLogXdService.queryNotTransferCollectionLogCount();
+		for (int i = 0; i <= count / 100 + 1; i++) {
 
+			Page<CollectionLogXd> pages = new Page<>();
+			pages.setCurrent(i);
+			pages.setSize(100);
 
-            collectionList = collectionService.queryNotTransferCollection(req);
+			CollectionReq req = new CollectionReq();
+			req.setOffSet(i * 100 + 1);
+			req.setPageSize(100);
 
-            for (Collection collection:collectionList) {
-                Map<String,Object> map = getStatus(collection);
-                if(map == null){
-                    continue;
-                }
-                CollectionStatus collectionStatus = (CollectionStatus)map.get("status");
-                CollectionLog collectionLog = (CollectionLog)map.get("log");
+			List<CollectionLogXd> xdList = collectionLogXdService.queryNotTransferCollectionLog(req);
+			
+			if (CollectionUtils.isEmpty(xdList)) {
+				continue;
+			}
+			
+			for (CollectionLogXd collectionLogXd : xdList) {
+				Map<String, Object> map = getStatus(collectionLogXd);
+				if (map == null) {
+					continue;
+				}
+				CollectionStatus collectionStatus = (CollectionStatus) map.get("status");
+				CollectionLog collectionLog = (CollectionLog) map.get("log");
+				collectionStatusService.insertOrUpdate(collectionStatus);
+				collectionLogService.insertOrUpdate(collectionLog);
+			}
 
-                collectionStatusService.insertOrUpdate(collectionStatus);
-                collectionLogService.insertOrUpdate(collectionLog);
+		}
 
-            }
-        }
+		return Result.success();
+	}
 
-        count = collectionLogXdService.queryNotTransferCollectionLogCount();
-        for(int i=0;i<=count/100+1;i++){
+	private Map<String, Object> getStatus(Collection collection) {
 
-            List<CollectionStatus> statusList = new ArrayList<>();
-            List<CollectionLog> logList = new ArrayList<>();
+		Map<String, Object> map = new HashMap<>();
 
-            Page<CollectionLogXd> pages = new Page<>();
-            pages.setCurrent(i);
-            pages.setSize(100);
+		RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService
+				.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", collection.getBusinessId())
+						.eq("after_id", collection.getAfterId()));
+		if (repaymentBizPlanList == null) {
+			TransferFailLog failLog = new TransferFailLog();
+			failLog.setBusinessId(collection.getBusinessId());
+			failLog.setAfterId(collection.getAfterId());
+			failLog.setFailReason(1);
+			TransferFailLog transferFailLog = transferFailLogService.selectOne(new EntityWrapper<TransferFailLog>()
+					.eq("business_id", collection.getBusinessId()).eq("after_id", collection.getAfterId()));
+			if (transferFailLog == null) {
+				transferFailLogService.insert(failLog);
+			}
 
-            CollectionReq req = new CollectionReq();
-            req.setOffSet(i*100+1);
-            req.setPageSize(100);
+			return null;
+		}
 
-            xdList = collectionLogXdService.queryNotTransferCollectionLog(req);
-            for (CollectionLogXd collectionLogXd:xdList) {
-                Map<String,Object> map = getStatus(collectionLogXd);
-                if(map == null){
-                    continue;
-                }
-                CollectionStatus collectionStatus = (CollectionStatus)map.get("status");
-                CollectionLog collectionLog = (CollectionLog)map.get("log");
-                collectionStatusService.insertOrUpdate(collectionStatus);
-                collectionLogService.insertOrUpdate(collectionLog);
-            }
+		// 根据信贷userId 获取贷后userId
+		LoginInfoDto dto = loginUserInfoHelper.getUserInfoByUserId("", collection.getCollectionUser());
+		if (dto == null) {
+			dto = new LoginInfoDto();
+		}
+		CollectionStatus status = new CollectionStatus();
+		CollectionLog log = new CollectionLog();
 
-        }
+		status.setBusinessId(collection.getBusinessId());
+		status.setCrpId(repaymentBizPlanList.getPlanListId());
+		// 判断状态
+		int collectionStatus = 0;
+		if ("催收中".equals(collection.getStatus())) {
+			collectionStatus = 50;
+			status.setVisitStaff(dto.getUserId());
+			log.setCollectionUser(dto.getUserId());
+			if (StringUtil.isEmpty(dto.getUserId())) {
+				TransferFailLog failLog = new TransferFailLog();
+				failLog.setBusinessId(collection.getBusinessId());
+				failLog.setAfterId(collection.getAfterId());
+				failLog.setFailReason(2);
+				TransferFailLog transferFailLog = transferFailLogService.selectOne(new EntityWrapper<TransferFailLog>()
+						.eq("business_id", collection.getBusinessId()).eq("after_id", collection.getAfterId()));
+				if (transferFailLog == null) {
+					transferFailLogService.insert(failLog);
+				}
 
-        return Result.success();
-    }
+				return null;
+			}
+		} else if ("已移交法务".equals(collection.getStatus())) {
+			log.setCollectionUser("admin");
+			collectionStatus = 100;
+		} else if ("已完成".equals(collection.getStatus())) {
+			collectionStatus = 200;
+			log.setCollectionUser("admin");
+		} else if ("二押已赎回".equals(collection.getStatus())) {
+			log.setCollectionUser("admin");
+			collectionStatus = 250;
+		} else if ("已委外催收".equals(collection.getStatus())) {
+			log.setCollectionUser("admin");
+			collectionStatus = 300;
+		} else if ("待分配".equals(collection.getStatus())) {
+			log.setCollectionUser("admin");
+			collectionStatus = 350;
+		} else if ("推迟移交法务".equals(collection.getStatus())) {
+			log.setCollectionUser("admin");
+			collectionStatus = 400;
+		} else {
+			log.setCollectionUser("admin");
+		}
+		status.setCollectionStatus(collectionStatus);
+		status.setCreateTime(new Date());
+		status.setCreateUser("admin");
+		status.setUpdateTime(new Date());
+		status.setUpdateUser("admin");
+		status.setDescribe("信贷历史数据导入");
+		status.setSetWay(0);
+		status.setCrpType(ifPlanListIsLast(collection.getBusinessId(), repaymentBizPlanList.getPlanListId()) ? 2 : 1);
 
-    private Map<String,Object> getStatus(Collection collection){
+		log.setBusinessId(collection.getBusinessId());
+		log.setCrpId(repaymentBizPlanList.getPlanListId());
+		log.setAfterStatus(collectionStatus);
+		log.setCreateTime(new Date());
+		log.setCreateUser("admin");
+		log.setUpdateTime(new Date());
+		log.setUpdateUser("admin");
+		log.setDescribe("信贷历史数据导入");
+		log.setSetWay(0);
+		log.setBeforeStatus(null);
+		log.setSetTypeStatus(collectionStatus);
 
-        Map<String,Object> map = new HashMap<>();
+		map.put("status", status);
+		map.put("log", log);
 
-        RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id",collection.getBusinessId()).eq("after_id",collection.getAfterId()));
-        if(repaymentBizPlanList == null){
-            TransferFailLog failLog = new TransferFailLog();
-            failLog.setBusinessId(collection.getBusinessId());
-            failLog.setAfterId(collection.getAfterId());
-            failLog.setFailReason(1);
-            TransferFailLog transferFailLog =  transferFailLogService.selectOne(new EntityWrapper<TransferFailLog>().eq("business_id",collection.getBusinessId()).eq("after_id",collection.getAfterId()));
-            if(transferFailLog == null){
-                transferFailLogService.insert(failLog);
-            }
+		return map;
+	}
 
-            return null;
-        }
+	/**
+	 * 判断还款计划是否是最后一个
+	 * 
+	 * @param
+	 * @return
+	 */
+	public boolean ifPlanListIsLast(String businessId, String planListId) {
+		RepaymentBizPlanList pList = repaymentBizPlanListService.selectOne(
+				new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).orderBy("due_date desc"));
+		return pList.getPlanListId().equals(planListId);
+	}
 
-        //根据信贷userId 获取贷后userId
-        LoginInfoDto dto =loginUserInfoHelper.getUserInfoByUserId("",collection.getCollectionUser());
-        if(dto == null){
-            dto = new LoginInfoDto();
-        }
-        CollectionStatus status = new CollectionStatus();
-        CollectionLog log = new CollectionLog();
+	private Map<String, Object> getStatus(CollectionLogXd collectionLogXd) {
 
-        status.setBusinessId(collection.getBusinessId());
-        status.setCrpId(repaymentBizPlanList.getPlanListId());
-        //判断状态
-        int collectionStatus = 0;
-        if("催收中".equals(collection.getStatus())){
-            collectionStatus = 50;
-            status.setVisitStaff(dto.getUserId());
-            log.setCollectionUser(dto.getUserId());
-            if(StringUtil.isEmpty(dto.getUserId())){
-                TransferFailLog failLog = new TransferFailLog();
-                failLog.setBusinessId(collection.getBusinessId());
-                failLog.setAfterId(collection.getAfterId());
-                failLog.setFailReason(2);
-                TransferFailLog transferFailLog =  transferFailLogService.selectOne(new EntityWrapper<TransferFailLog>().eq("business_id",collection.getBusinessId()).eq("after_id",collection.getAfterId()));
-                if(transferFailLog == null){
-                    transferFailLogService.insert(failLog);
-                }
+		Map<String, Object> map = new HashMap<>();
 
-                return null;
-            }
-        }else if("已移交法务".equals(collection.getStatus())){
-            log.setCollectionUser("admin");
-            collectionStatus = 100;
-        }else if("已完成".equals(collection.getStatus())){
-            collectionStatus = 200;
-            log.setCollectionUser("admin");
-        }else if("二押已赎回".equals(collection.getStatus())) {
-            log.setCollectionUser("admin");
-            collectionStatus = 250;
-        }else if("已委外催收".equals(collection.getStatus())){
-            log.setCollectionUser("admin");
-            collectionStatus = 300;
-        }else if("待分配".equals(collection.getStatus())){
-            log.setCollectionUser("admin");
-            collectionStatus = 350;
-        }else if("推迟移交法务".equals(collection.getStatus())){
-            log.setCollectionUser("admin");
-            collectionStatus = 400;
-        }else {
-            log.setCollectionUser("admin");
-        }
-        status.setCollectionStatus(collectionStatus);
-        status.setCreateTime(new Date());
-        status.setCreateUser("admin");
-        status.setUpdateTime(new Date());
-        status.setUpdateUser("admin");
-        status.setDescribe("信贷历史数据导入");
-        status.setSetWay(0);
-        status.setCrpType(ifPlanListIsLast(collection.getBusinessId(),repaymentBizPlanList.getPlanListId())?2:1);
+		RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService
+				.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", collectionLogXd.getBusinessId())
+						.eq("after_id", collectionLogXd.getAfterId()));
 
+		if (repaymentBizPlanList == null) {
+			TransferFailLog failLog = new TransferFailLog();
+			failLog.setBusinessId(collectionLogXd.getBusinessId());
+			failLog.setAfterId(collectionLogXd.getAfterId());
+			failLog.setFailReason(1);
+			TransferFailLog transferFailLog = transferFailLogService.selectOne(
+					new EntityWrapper<TransferFailLog>().eq("business_id", collectionLogXd.getBusinessId())
+							.eq("after_id", collectionLogXd.getAfterId()));
+			if (transferFailLog == null) {
+				transferFailLogService.insert(failLog);
+			}
 
-        log.setBusinessId(collection.getBusinessId());
-        log.setCrpId(repaymentBizPlanList.getPlanListId());
-        log.setAfterStatus(collectionStatus);
-        log.setCreateTime(new Date());
-        log.setCreateUser("admin");
-        log.setUpdateTime(new Date());
-        log.setUpdateUser("admin");
-        log.setDescribe("信贷历史数据导入");
-        log.setSetWay(0);
-        log.setBeforeStatus(null);
-        log.setSetTypeStatus(collectionStatus);
+			return null;
+		}
 
-        map.put("status",status);
-        map.put("log",log);
+		// 根据信贷userId 获取贷后userId
+		LoginInfoDto dto = loginUserInfoHelper.getUserInfoByUserId("", collectionLogXd.getCollectionUser());
+		if (dto == null) {
+			dto = new LoginInfoDto();
+		}
+		CollectionStatus status = new CollectionStatus();
+		CollectionLog log = new CollectionLog();
 
-        return  map;
-    }
+		status.setBusinessId(collectionLogXd.getBusinessId());
+		status.setCrpId(repaymentBizPlanList.getPlanListId());
 
-    /**
-     * 判断还款计划是否是最后一个
-     * @param
-     * @return
-     */
-    public boolean ifPlanListIsLast( String businessId,String planListId){
-        RepaymentBizPlanList pList =  repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id",businessId).orderBy("due_date desc"));
-        if(pList.getPlanListId().equals(planListId)){
-            return true;
-        }
-        return false;
-    }
+		status.setCollectionStatus(1);
+		if (StringUtil.isEmpty(dto.getUserId())) {
+			TransferFailLog failLog = new TransferFailLog();
+			failLog.setBusinessId(collectionLogXd.getBusinessId());
+			failLog.setAfterId(collectionLogXd.getAfterId());
+			failLog.setFailReason(2);
+			TransferFailLog transferFailLog = transferFailLogService.selectOne(new EntityWrapper<TransferFailLog>()
+					.eq("business_id", collectionLogXd.getBusinessId()).eq("after_id", collectionLogXd.getAfterId()));
+			if (transferFailLog == null) {
+				transferFailLogService.insert(failLog);
+			}
 
-    private Map<String,Object> getStatus(CollectionLogXd collectionLogXd){
+			return null;
+		}
+		status.setPhoneStaff(dto.getUserId());
+		status.setCreateTime(new Date());
+		status.setCreateUser("admin");
+		status.setUpdateTime(new Date());
+		status.setUpdateUser("admin");
+		status.setDescribe("信贷历史数据导入");
+		status.setSetWay(0);
+		status.setCrpType(
+				ifPlanListIsLast(collectionLogXd.getBusinessId(), repaymentBizPlanList.getPlanListId()) ? 2 : 1);
 
-        Map<String,Object> map = new HashMap<>();
+		log.setBusinessId(collectionLogXd.getBusinessId());
+		log.setCrpId(repaymentBizPlanList.getPlanListId());
+		log.setAfterStatus(1);
+		log.setCollectionUser(dto.getUserId());
+		log.setCreateTime(new Date());
+		log.setCreateUser("admin");
+		log.setUpdateTime(new Date());
+		log.setUpdateUser("admin");
+		log.setDescribe("信贷历史数据导入");
+		log.setSetWay(0);
+		log.setBeforeStatus(null);
+		log.setSetTypeStatus(1);
 
-        RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id",collectionLogXd.getBusinessId()).eq("after_id",collectionLogXd.getAfterId()));
+		map.put("status", status);
+		map.put("log", log);
 
-        if(repaymentBizPlanList == null){
-            if(repaymentBizPlanList == null){
-                TransferFailLog failLog = new TransferFailLog();
-                failLog.setBusinessId(collectionLogXd.getBusinessId());
-                failLog.setAfterId(collectionLogXd.getAfterId());
-                failLog.setFailReason(1);
-                TransferFailLog transferFailLog =  transferFailLogService.selectOne(new EntityWrapper<TransferFailLog>().eq("business_id",collectionLogXd.getBusinessId()).eq("after_id",collectionLogXd.getAfterId()));
-                if(transferFailLog == null){
-                    transferFailLogService.insert(failLog);
-                }
+		return map;
 
-                return null;
-            }
-        }
-
-        //根据信贷userId 获取贷后userId
-        LoginInfoDto dto =loginUserInfoHelper.getUserInfoByUserId("",collectionLogXd.getCollectionUser());
-        if(dto == null){
-            dto = new LoginInfoDto();
-        }
-        CollectionStatus status = new CollectionStatus();
-        CollectionLog log = new CollectionLog();
-
-        status.setBusinessId(collectionLogXd.getBusinessId());
-        status.setCrpId(repaymentBizPlanList.getPlanListId());
-
-        status.setCollectionStatus(1);
-        if(StringUtil.isEmpty(dto.getUserId())){
-            TransferFailLog failLog = new TransferFailLog();
-            failLog.setBusinessId(collectionLogXd.getBusinessId());
-            failLog.setAfterId(collectionLogXd.getAfterId());
-            failLog.setFailReason(2);
-            TransferFailLog transferFailLog =  transferFailLogService.selectOne(new EntityWrapper<TransferFailLog>().eq("business_id",collectionLogXd.getBusinessId()).eq("after_id",collectionLogXd.getAfterId()));
-            if(transferFailLog == null){
-                transferFailLogService.insert(failLog);
-            }
-
-            return null;
-        }
-        status.setPhoneStaff(dto.getUserId());
-        status.setCreateTime(new Date());
-        status.setCreateUser("admin");
-        status.setUpdateTime(new Date());
-        status.setUpdateUser("admin");
-        status.setDescribe("信贷历史数据导入");
-        status.setSetWay(0);
-        status.setCrpType(ifPlanListIsLast(collectionLogXd.getBusinessId(),repaymentBizPlanList.getPlanListId())?2:1);
-
-
-        log.setBusinessId(collectionLogXd.getBusinessId());
-        log.setCrpId(repaymentBizPlanList.getPlanListId());
-        log.setAfterStatus(1);
-        log.setCollectionUser(dto.getUserId());
-        log.setCreateTime(new Date());
-        log.setCreateUser("admin");
-        log.setUpdateTime(new Date());
-        log.setUpdateUser("admin");
-        log.setDescribe("信贷历史数据导入");
-        log.setSetWay(0);
-        log.setBeforeStatus(null);
-        log.setSetTypeStatus(1);
-
-        map.put("status",status);
-        map.put("log",log);
-
-        return  map;
-
-    }
+	}
 
 }
