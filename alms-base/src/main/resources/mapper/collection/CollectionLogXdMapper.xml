@@ -20,4 +20,61 @@
         id, business_id AS businessId, after_id AS afterId, create_user_id AS createUserId, create_time AS createTime, collection_user AS collectionUser, collection_remark AS collectionRemark, collection_type AS collectionType, is_delete AS isDelete
     </sql>
 
+    <select id="queryNotTransferCollectionLog" resultType="com.hongte.alms.base.entity.CollectionLogXd" parameterType="com.hongte.alms.base.vo.module.CollectionReq">
+
+        SELECT
+        *
+        FROM
+        tb_collection_log_xd tt
+        WHERE
+        NOT EXISTS (
+        SELECT
+        *
+        FROM
+        (
+        SELECT
+        t1.business_id,
+        t1.after_id
+        FROM
+        tb_collection_log_xd t1
+        JOIN tb_collection_status t2 ON t1.business_id = t2.business_id
+        JOIN tb_repayment_biz_plan_list t3 ON t1.business_id = t3.business_id
+        AND t1.after_id = t3.after_id
+        AND t3.plan_list_id = t2.crp_id
+        ) tp
+        WHERE
+        tt.business_id = tp.business_id
+        AND tt.after_id = tp.after_id
+        )
+        limit #{offSet} , #{pageSize}
+
+    </select>
+
+    <select id="queryNotTransferCollectionLogCount" resultType="int">
+        SELECT
+        count(1)
+        FROM
+        tb_collection_log_xd tt
+        WHERE
+        NOT EXISTS (
+        SELECT
+        *
+        FROM
+        (
+        SELECT
+        t1.business_id,
+        t1.after_id
+        FROM
+        tb_collection_log_xd t1
+        JOIN tb_collection_status t2 ON t1.business_id = t2.business_id
+        JOIN tb_repayment_biz_plan_list t3 ON t1.business_id = t3.business_id
+        AND t1.after_id = t3.after_id
+        AND t3.plan_list_id = t2.crp_id
+        ) tp
+        WHERE
+        tt.business_id = tp.business_id
+        AND tt.after_id = tp.after_id
+        )
+    </select>
+
 </mapper>
