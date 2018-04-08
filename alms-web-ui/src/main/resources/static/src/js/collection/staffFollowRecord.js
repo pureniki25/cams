@@ -76,6 +76,7 @@ window.layinit(function (htConfig) {
             },
             toShowEditModal(){
                 this.addLogModal = true;
+                this.editLogForm.ifSendToPlat = '否'
             }
         }
     });
