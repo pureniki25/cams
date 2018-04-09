@@ -214,7 +214,7 @@
 			</if> -->
         </where>
 
-        order BY  pList.due_date DESC
+        order BY  pList.due_date 
 
     </select>
 

@@ -292,7 +292,9 @@ window.layinit(function (htConfig) {
         ]], //设置表头
         url: basePath + 'collection/selectALStandingBookVoPage',
         //method: 'post' //如果无需自定义HTTP类型，可不加该参数
-        request: {}, //如果无需自定义请求参数，可不加该参数
+        where: {
+            justCheckMine:true
+        }, //如果无需自定义请求参数，可不加该参数
         //response: {} //如果无需自定义数据响应名称，可不加该参数
         page: true,
         done: function (res, curr, count) {

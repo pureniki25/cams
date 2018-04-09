@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -86,6 +87,13 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
         pages.setCurrent(req.getPage());
         pages.setSize(req.getLimit());
 
+        if (req.getJustCheckMine()!=null && req.getJustCheckMine() ) {
+        	if (req.getBusinessIds()==null||req.getBusinessIds().size()==0) {
+        		pages.setRecords(new ArrayList<>()) ;
+        		pages.setTotal(0);
+        		return pages;
+			}
+		}
 
 
 
@@ -229,11 +237,14 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
         req.setUserId(userId);
         //设置只能查询已分配的任务
         //查找用户跟进的业务ID
-        List<String> followBids =  collectionStatusService.selectFollowBusinessIds(userId);
+        if(req.getJustCheckMine()!=null && req.getJustCheckMine()) {
+        	List<String> followBids =  collectionStatusService.selectFollowBusinessIds(userId);
 
-        if(followBids != null && followBids.size()>0){
-            req.setBusinessIds(followBids);
+            if(followBids != null && followBids.size()>0){
+                req.setBusinessIds(followBids);
+            }
         }
+        
 
 
         return req;

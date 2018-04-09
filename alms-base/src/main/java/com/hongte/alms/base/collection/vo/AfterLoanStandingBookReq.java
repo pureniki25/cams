@@ -79,7 +79,10 @@ public class AfterLoanStandingBookReq extends PageRequest {
     @ApiModelProperty(value="还款计划ID多个ID以逗号分隔",name="crpIds",dataType = "String")
     private String  crpIds;  //还款计划ID字符串  用于接收界面传参
     private String[]  crpIdsArray;  //还款计划ID数组  用于数据库查询
-
+    
+    @ApiModelProperty(value="只看我跟进的业务标志位",name="justCheckMine",dataType = "int")
+    private Boolean justCheckMine ;
+    
     private List<String> customerIds; //客户ID列表
 
     private List<String> commIds;//公司ID列表
@@ -302,4 +305,19 @@ public class AfterLoanStandingBookReq extends PageRequest {
 	public void setPeroidStatus(String peroidStatus) {
 		this.peroidStatus = peroidStatus;
 	}
+
+	/**
+	 * @return the justCheckMine
+	 */
+	public Boolean getJustCheckMine() {
+		return justCheckMine;
+	}
+
+	/**
+	 * @param justCheckMine the justCheckMine to set
+	 */
+	public void setJustCheckMine(Boolean justCheckMine) {
+		this.justCheckMine = justCheckMine;
+	}
+
 }
