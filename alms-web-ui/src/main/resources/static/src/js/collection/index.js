@@ -58,7 +58,7 @@ window.layinit(function(htConfig){
                 // realRepayDateBegin:'', //实还日期 开始
                 // realRepayDateEnd:'', //实还日期 结束
                 realRepayDateRange:'',//实还日期  区间 包含开始和结束时间
-                delayDaysBegin:'',    //逾期天数 开始
+                delayDaysBegin:0,    //逾期天数 开始
                 delayDaysEnd:'', //逾期天数 结束
                 collectLevel:'',  //催收级别
                 operatorName:'',  //业务获取
@@ -67,7 +67,7 @@ window.layinit(function(htConfig){
                 liquidationOne:'', //清算一
                 liquidationTow:'',  //清算二
                 businessStatus:'',   //业务状态
-                repayStatus:'',      //还款状态
+                repayStatus:'逾期',      //还款状态
                 customerName:'',  //客户名称
                 peroidStatus:'' //期数状态,首期/本金期/末期
             },
@@ -358,6 +358,22 @@ window.layinit(function(htConfig){
             //method: 'post' //如果无需自定义HTTP类型，可不加该参数
             //request: {} //如果无需自定义请求参数，可不加该参数
             //response: {} //如果无需自定义数据响应名称，可不加该参数
+            where: {
+                areaId:vm.searchForm.areaId,  //区域ID
+                companyId:vm.searchForm.companyId, //分公司ID
+                delayDaysBegin:vm.searchForm.delayDaysBegin,    //逾期天数 开始
+                delayDaysEnd:vm.searchForm.delayDaysEnd, //逾期天数 结束
+                collectLevel:vm.searchForm.collectLevel,  //催收级别
+                operatorName:vm.searchForm.operatorName,  //业务获取
+                businessId:vm.searchForm.businessId,  //业务编号
+                businessType:vm.searchForm.businessType,  //业务类型
+                liquidationOne:vm.searchForm.liquidationOne, //清算一
+                liquidationTow:vm.searchForm.liquidationTow,  //清算二
+                businessStatus:vm.searchForm.businessStatus,   //业务状态
+                repayStatus:vm.searchForm.repayStatus,      //还款状态
+                customerName:vm.searchForm.customerName,  //客户名称
+                peroidStatus:vm.searchForm.peroidStatus,  //期数状态
+            },
             page: true,
             done: function (res, curr, count) {
                 console.log(res);
