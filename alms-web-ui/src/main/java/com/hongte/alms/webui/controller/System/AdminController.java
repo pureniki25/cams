@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class AdminController {
 	@RequestMapping("/admin")
 	public String syncCollection() {
-		return "/system/admin";
+		return "/System/admin";
 	}
 }
