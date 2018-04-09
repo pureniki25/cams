@@ -108,7 +108,7 @@ public class SysParameterController {
 			return Result.error("500", "已存在的参数类型编号:" + paramType);
 		}
 		SysParameter sysParameter = new SysParameter();
-		sysParameter.setParamType(paramTypeName);
+		sysParameter.setParamType(paramType);
 		sysParameter.setParamTypeName(paramTypeName);
 		sysParameter.setRemark(remark);
 		sysParameter.setStatus(status);
