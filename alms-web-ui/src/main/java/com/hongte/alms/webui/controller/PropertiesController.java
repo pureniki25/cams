@@ -36,6 +36,9 @@ public class PropertiesController {
     @Value("${ht.config.ui.useGateWayflage}")
     private Boolean useGateWayflage;//是否使用网关的标志位
 
+    @Value("${ht.config.ui.changePwdPath}")
+    private String changePwdPath ;
+    
 //    @Value("${ht.config.ui.defaultUser}")
 //    private String defaultUser;//不使用网关的默认用户
 //    @Value("${ht.config.ui.localCoreBasePath}")
@@ -87,6 +90,9 @@ public class PropertiesController {
         stringBuilder.append(String.format("var useGateWayflage=%s;",useGateWayflage));
         stringBuilder.append("\r");
 
+        stringBuilder.append(String.format("var changePwdPath='%s';", changePwdPath));
+        stringBuilder.append("\r");
+        
         return stringBuilder.toString();
 //        return String.format("var gateWayUrl='%s';",gatewayUrl);
 //        return
