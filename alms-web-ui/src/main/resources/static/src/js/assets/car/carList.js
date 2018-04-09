@@ -232,7 +232,7 @@ window.layinit(function (htConfig) {
                         width:165,
                         title: '业务编号'
                     }, {
-                        field: 'districtAreaName',
+                        field: 'districtName',
                         title: '地区'
                     }, {
                         field: 'companyName',

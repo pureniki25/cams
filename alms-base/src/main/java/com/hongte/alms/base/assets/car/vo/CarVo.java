@@ -17,7 +17,7 @@ public class CarVo implements Serializable{
 	@Excel(name = "业务编号", orderNum = "1",  isImportField = "true_st")
 	private String businessId;
     @Excel(name = "分区", orderNum = "2",   isImportField = "true_st")
-	private String districtAreaName;
+	private String districtName;
     @Excel(name = "分公司", orderNum = "3",   isImportField = "true_st")
 	private String companyName;
     @Excel(name = "客户姓名", orderNum = "4",   isImportField = "true_st")
@@ -45,12 +45,6 @@ public class CarVo implements Serializable{
 	}
 	public void setBusinessId(String businessId) {
 		this.businessId = businessId;
-	}
-	public String getDistrictAreaName() {
-		return districtAreaName;
-	}
-	public void setDistrictAreaName(String districtAreaName) {
-		this.districtAreaName = districtAreaName;
 	}
 	public String getCompanyName() {
 		return companyName;
@@ -120,6 +114,18 @@ public class CarVo implements Serializable{
 	}
 	public void setDragId(String dragId) {
 		this.dragId = dragId;
+	}
+	/**
+	 * @return the districtName
+	 */
+	public String getDistrictName() {
+		return districtName;
+	}
+	/**
+	 * @param districtName the districtName to set
+	 */
+	public void setDistrictName(String districtName) {
+		this.districtName = districtName;
 	}
 	
 }
