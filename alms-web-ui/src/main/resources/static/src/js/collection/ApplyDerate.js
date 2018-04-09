@@ -465,7 +465,7 @@ var restProcessApprovalInfo = function(){
 /////////////  流程审批相关函数 结束  ///////////////
 
 //从后台获取显示数据
-var getShowInfo = function () {debugger
+var getShowInfo = function () {
 
     //取显示需要的相关信息
     var reqStr = basePath +"ApplyDerateController/selectApplyDeratePageShowInfo?crpId="+crpId

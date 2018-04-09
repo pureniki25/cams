@@ -1,24 +1,24 @@
 package com.hongte.alms.base.service.impl;
 
+import java.math.BigDecimal;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.dto.UserPermissionBusinessDto;
-import com.hongte.alms.base.vo.module.BusinessInfoForApplyDerateVo;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
 import com.hongte.alms.base.mapper.BasicBusinessMapper;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.SysParameterService;
+import com.hongte.alms.base.vo.module.BusinessInfoForApplyDerateVo;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * <p>
@@ -43,12 +43,15 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 
     public List<BusinessInfoForApplyDerateVo> selectBusinessInfoForApplyDerateVo(String crpId){
         List<BusinessInfoForApplyDerateVo> List  =  basicBusinessMapper.selectBusinessInfoForApplyDerateVo(crpId);
-
+        
+       
         //利息类型列表
         List<SysParameter> borrowRateUnitlist =  sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterTypeEnums.BORROW_RATE_UNIT.getKey()).orderBy("row_Index"));
 
         Map<String,SysParameter> sysParameterMap = sysParameterService.selectParameterMap(SysParameterTypeEnums.BORROW_RATE_UNIT);
         for(BusinessInfoForApplyDerateVo vo : List){
+        	
+        	vo.setPayedPrincipal(BigDecimal.valueOf(basicBusinessMapper.queryPayedPrincipal(vo.getBusinessId())));
 
             SysParameter  parameter =  sysParameterMap.get(vo.getRepaymentTypeId());
             if(parameter!=null){
