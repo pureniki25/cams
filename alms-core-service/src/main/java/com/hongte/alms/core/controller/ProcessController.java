@@ -19,6 +19,7 @@ import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.vo.PageResult;
 import com.ht.ussp.bean.LoginUserInfoHelper;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/processController")
+@Api(tags = "ProcessController", description = "流程相关接口")
 public class ProcessController {
 
     Logger logger = LoggerFactory.getLogger(ProcessController.class);

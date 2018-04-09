@@ -57,7 +57,10 @@ public class AfterLoanStandingBookReq extends PageRequest {
 
     @ApiModelProperty(value="清算二",name="liquidationTow",dataType = "String")
     private String  liquidationTow;  //清算二
-
+    
+    @ApiModelProperty(value="期数状态",name="peroidStatus",dataType = "String")
+    private String peroidStatus ;//期数状态,首期/本金期/末期
+    
     private List<String> liquidationTowUIds;//清算二用户ID列表
 
     @ApiModelProperty(value="业务状态",name="businessStatus",dataType = "int")
@@ -76,7 +79,10 @@ public class AfterLoanStandingBookReq extends PageRequest {
     @ApiModelProperty(value="还款计划ID多个ID以逗号分隔",name="crpIds",dataType = "String")
     private String  crpIds;  //还款计划ID字符串  用于接收界面传参
     private String[]  crpIdsArray;  //还款计划ID数组  用于数据库查询
-
+    
+    @ApiModelProperty(value="只看我跟进的业务标志位",name="justCheckMine",dataType = "int")
+    private Boolean justCheckMine ;
+    
     private List<String> customerIds; //客户ID列表
 
     private List<String> commIds;//公司ID列表
@@ -285,4 +291,33 @@ public class AfterLoanStandingBookReq extends PageRequest {
     public void setUserId(String userId) {
         this.userId = userId;
     }
+
+	/**
+	 * @return the peroidStatus
+	 */
+	public String getPeroidStatus() {
+		return peroidStatus;
+	}
+
+	/**
+	 * @param peroidStatus the peroidStatus to set
+	 */
+	public void setPeroidStatus(String peroidStatus) {
+		this.peroidStatus = peroidStatus;
+	}
+
+	/**
+	 * @return the justCheckMine
+	 */
+	public Boolean getJustCheckMine() {
+		return justCheckMine;
+	}
+
+	/**
+	 * @param justCheckMine the justCheckMine to set
+	 */
+	public void setJustCheckMine(Boolean justCheckMine) {
+		this.justCheckMine = justCheckMine;
+	}
+
 }

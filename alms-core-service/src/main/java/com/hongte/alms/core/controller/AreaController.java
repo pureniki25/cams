@@ -11,6 +11,7 @@ import com.hongte.alms.common.result.Result;
 import com.hongte.alms.core.vo.modules.AreaCityItemVo;
 import com.hongte.alms.core.vo.modules.AreaCountyItemVo;
 import com.hongte.alms.core.vo.modules.AreaProvinceItemVo;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/area")
+@Api(tags = "AreaController", description = "地理信息相关接口")
 public class AreaController {
 
     private Logger logger = LoggerFactory.getLogger(AreaController.class);

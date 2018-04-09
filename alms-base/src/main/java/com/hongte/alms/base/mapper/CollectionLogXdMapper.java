@@ -1,7 +1,10 @@
 package com.hongte.alms.base.mapper;
 
 import com.hongte.alms.base.entity.CollectionLogXd;
+import com.hongte.alms.base.vo.module.CollectionReq;
 import com.hongte.alms.common.mapper.SuperMapper;
+
+import java.util.List;
 
 /**
  * <p>
@@ -12,5 +15,9 @@ import com.hongte.alms.common.mapper.SuperMapper;
  * @since 2018-03-29
  */
 public interface CollectionLogXdMapper extends SuperMapper<CollectionLogXd> {
+
+    List<CollectionLogXd> queryNotTransferCollectionLog(CollectionReq req);
+
+    int queryNotTransferCollectionLogCount();
 
 }

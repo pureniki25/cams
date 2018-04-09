@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -60,6 +61,7 @@ import java.util.*;
 @RestController
 @RequestMapping("/collection")
 @Api(tags = "TbCollectionControllerApi", description = "贷后催收相关API", hidden = true)
+@RefreshScope
 public class CollectionController {
     private Logger logger = LoggerFactory.getLogger(CollectionController.class);
 
@@ -183,7 +185,7 @@ public class CollectionController {
 
 
 
-    @Value("${ht.excel.file.save.path}")
+    @Value("${ht.excel.file.save.path:/emp/}")
     private  String excelSavePath;
 
     @ApiOperation(value = "贷后首页台账 存储Excel  ")

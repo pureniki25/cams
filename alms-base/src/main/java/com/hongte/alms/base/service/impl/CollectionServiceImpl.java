@@ -1,10 +1,16 @@
 package com.hongte.alms.base.service.impl;
 
+import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.entity.Collection;
 import com.hongte.alms.base.mapper.CollectionMapper;
 import com.hongte.alms.base.service.CollectionService;
+import com.hongte.alms.base.vo.module.CollectionReq;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * <p>
@@ -17,4 +23,16 @@ import org.springframework.stereotype.Service;
 @Service("CollectionService")
 public class CollectionServiceImpl extends BaseServiceImpl<CollectionMapper, Collection> implements CollectionService {
 
+    @Autowired
+    private CollectionMapper collectionMapper;
+
+    @Override
+    public List<Collection> queryNotTransferCollection(CollectionReq req) {
+        return collectionMapper.queryNotTransferCollection(req);
+    }
+
+    @Override
+    public int queryNotTransferCollectionCount() {
+        return collectionMapper.queryNotTransferCollectionCount();
+    }
 }

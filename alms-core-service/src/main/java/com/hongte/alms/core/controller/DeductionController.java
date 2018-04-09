@@ -50,6 +50,7 @@ import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.core.storage.StorageService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.LoginInfoDto;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.poi.ss.usermodel.Workbook;
 
@@ -75,6 +76,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping("/DeductionController")
+@Api(tags = "CollectionTrackLogController", description = "执行代扣相关接口")
 public class DeductionController {
 
 

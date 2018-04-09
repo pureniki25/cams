@@ -9,6 +9,7 @@ import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.SysParameterService;
 import com.hongte.alms.base.vo.module.BasicBusinessVo;
 import com.hongte.alms.common.result.Result;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,7 @@ import java.util.List;
 
 /**
  * <p>
- * 业务类型表 前端控制器
+ * 业务基本信息 前端控制器
  * </p>
  *
  * @author 曾坤
@@ -28,6 +29,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/BasicBusinessController")
+@Api(tags = "BasicBusinessController", description = "业务信息相关接口")
 public class BasicBusinessController {
 
 

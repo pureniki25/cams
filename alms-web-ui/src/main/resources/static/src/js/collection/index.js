@@ -58,7 +58,7 @@ window.layinit(function(htConfig){
                 // realRepayDateBegin:'', //实还日期 开始
                 // realRepayDateEnd:'', //实还日期 结束
                 realRepayDateRange:'',//实还日期  区间 包含开始和结束时间
-                delayDaysBegin:'',    //逾期天数 开始
+                delayDaysBegin:0,    //逾期天数 开始
                 delayDaysEnd:'', //逾期天数 结束
                 collectLevel:'',  //催收级别
                 operatorName:'',  //业务获取
@@ -67,8 +67,9 @@ window.layinit(function(htConfig){
                 liquidationOne:'', //清算一
                 liquidationTow:'',  //清算二
                 businessStatus:'',   //业务状态
-                repayStatus:'',      //还款状态
-                customerName:''  //客户名称
+                repayStatus:'逾期',      //还款状态
+                customerName:'',  //客户名称
+                peroidStatus:'' //期数状态,首期/本金期/末期
             },
             areaList:'',//area_array,   //区域列表
             companyList: '',//company_array,  //公司列表
@@ -117,7 +118,8 @@ window.layinit(function(htConfig){
                                 liquidationTow:vm.searchForm.liquidationTow,  //清算二
                                 businessStatus:vm.searchForm.businessStatus,   //业务状态
                                 repayStatus:vm.searchForm.repayStatus,      //还款状态
-                                customerName:vm.searchForm.customerName  //客户名称
+                                customerName:vm.searchForm.customerName,  //客户名称
+                                peroidStatus:vm.searchForm.peroidStatus,  //期数状态
                             }
                             , page: {
                                 curr: 1 //重新从第 1 页开始
@@ -292,8 +294,26 @@ window.layinit(function(htConfig){
                     title: '借款金额'
                 }, {
                     field: 'totalBorrowAmount',
-                    width:90,
-                    title: '应还金额'
+                    width:180,
+                    title: '应还金额',
+                    templet:function(d){
+                        let styel = 'background-color: #CCCC00;background-image: none !important;text-shadow: none !important;display: inline-block;padding: 2px 4px;font-size: 11.844px;font-weight: bold;line-height: 14px;color: #fff;text-shadow: 0 -1px 0 rgba(0,0,0,0.25);white-space: nowrap;vertical-align: baseline;'
+                        res = '' 
+                        let firstPeriod = '<span style="'+styel+'">首期</span>' 
+                        let benjinPeriod = '<span style="'+styel+'">本金期</span>' 
+                        let lastPeriod = '<span style="'+styel+'">末期</span>' 
+                        if(d.periods==1){
+                            res+=firstPeriod
+                        }
+                        if(d.repaymentTypeId==2&&d.borrowLimit==d.periods){
+                            res+=benjinPeriod
+                        }
+                        if(d.repaymentTypeId==5&&d.borrowLimit==d.periods){
+                            res+=lastPeriod
+                        }
+                        res += d.totalBorrowAmount 
+                        return res 
+                    }
                 }, {
 
                     field: 'delayDays',
@@ -338,6 +358,22 @@ window.layinit(function(htConfig){
             //method: 'post' //如果无需自定义HTTP类型，可不加该参数
             //request: {} //如果无需自定义请求参数，可不加该参数
             //response: {} //如果无需自定义数据响应名称，可不加该参数
+            where: {
+                areaId:vm.searchForm.areaId,  //区域ID
+                companyId:vm.searchForm.companyId, //分公司ID
+                delayDaysBegin:vm.searchForm.delayDaysBegin,    //逾期天数 开始
+                delayDaysEnd:vm.searchForm.delayDaysEnd, //逾期天数 结束
+                collectLevel:vm.searchForm.collectLevel,  //催收级别
+                operatorName:vm.searchForm.operatorName,  //业务获取
+                businessId:vm.searchForm.businessId,  //业务编号
+                businessType:vm.searchForm.businessType,  //业务类型
+                liquidationOne:vm.searchForm.liquidationOne, //清算一
+                liquidationTow:vm.searchForm.liquidationTow,  //清算二
+                businessStatus:vm.searchForm.businessStatus,   //业务状态
+                repayStatus:vm.searchForm.repayStatus,      //还款状态
+                customerName:vm.searchForm.customerName,  //客户名称
+                peroidStatus:vm.searchForm.peroidStatus,  //期数状态
+            },
             page: true,
             done: function (res, curr, count) {
                 console.log(res);
@@ -522,7 +558,7 @@ window.layinit(function(htConfig){
             }else  if(obj.event ==='info'){
                 if(obj.data.businessTypeId == 9 || obj.data.businessTypeId == 1){
                    //车贷  车贷展期
-                    axios.get(basePath + 'api/getXindaiCarView?businessId='+obj.data.businessId)
+                    axios.get(basePath + 'api/getXindaiAfterView?businessId='+obj.data.businessId+"&businessAfterId="+obj.data.afterId)
                         .then(function (res) {
                             if (res.data.code == "1") {
                                 showOneLineOprLayer(res.data.data,"车贷详情");
@@ -535,7 +571,7 @@ window.layinit(function(htConfig){
                         });
                 }else if(obj.data.businessTypeId == 11 || obj.data.businessTypeId == 2){
                     //房贷
-                    axios.get(basePath + 'api/getXindaiHouseView?businessId='+obj.data.businessId)
+                    axios.get(basePath + 'api/getXindaiAfterView?businessId='+obj.data.businessId+"&businessAfterId="+obj.data.afterId)
                         .then(function (res) {
                             if (res.data.code == "1") {
                                 showOneLineOprLayer(res.data.data,"房贷详情");

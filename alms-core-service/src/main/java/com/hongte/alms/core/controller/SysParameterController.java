@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -36,6 +37,7 @@ import io.swagger.annotations.ApiOperation;
  */
 @Controller
 @RequestMapping(value = "/sys/param")
+@Api(tags = "RenewalBusinessController", description = "展期业务相关接口")
 public class SysParameterController {
 
 	@Autowired

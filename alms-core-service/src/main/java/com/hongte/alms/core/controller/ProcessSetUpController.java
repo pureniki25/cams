@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,7 @@ import io.swagger.annotations.ApiOperation;
  */
 @RestController
 @RequestMapping("/ProcessSetUpController")
+@Api(tags = "ProcessSetUpController", description = "流程设置相关接口")
 public class ProcessSetUpController {
 
     private Logger logger = LoggerFactory.getLogger(ProcessSetUpController.class);

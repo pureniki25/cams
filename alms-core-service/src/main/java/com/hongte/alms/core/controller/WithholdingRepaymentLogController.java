@@ -11,6 +11,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.swagger.annotations.Api;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.jeecgframework.poi.excel.ExcelExportUtil;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -62,6 +63,7 @@ import io.swagger.annotations.ApiOperation;
  */
 @RestController
 @RequestMapping("/RepaymentLogController")
+@Api(tags = "WithholdingRepaymentLogController", description = " 还款计划代扣日志流水表接口")
 public class WithholdingRepaymentLogController {
 
     private Logger logger = LoggerFactory.getLogger(WithholdingRepaymentLogController.class);

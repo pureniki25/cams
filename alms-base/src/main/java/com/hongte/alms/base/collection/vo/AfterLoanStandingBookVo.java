@@ -84,6 +84,9 @@ public class AfterLoanStandingBookVo implements java.io.Serializable  {
     private String afterColStatusName;//贷后状态 名称
     private Integer  colStatus;  //贷后状态 数据库值
 
+    private Integer borrowLimit ;//借款期限,用于判断是否最后一期
+    private Integer repaymentTypeId ;//还款方式
+    
     public String getBusinessId() {
         return businessId;
     }
@@ -302,4 +305,32 @@ public class AfterLoanStandingBookVo implements java.io.Serializable  {
     public void setColStatus(Integer colStatus) {
         this.colStatus = colStatus;
     }
+
+	/**
+	 * @return the borrowLimit
+	 */
+	public Integer getBorrowLimit() {
+		return borrowLimit;
+	}
+
+	/**
+	 * @param borrowLimit the borrowLimit to set
+	 */
+	public void setBorrowLimit(Integer borrowLimit) {
+		this.borrowLimit = borrowLimit;
+	}
+
+	/**
+	 * @return the repaymentTypeId
+	 */
+	public Integer getRepaymentTypeId() {
+		return repaymentTypeId;
+	}
+
+	/**
+	 * @param repaymentTypeId the repaymentTypeId to set
+	 */
+	public void setRepaymentTypeId(Integer repaymentTypeId) {
+		this.repaymentTypeId = repaymentTypeId;
+	}
 }
