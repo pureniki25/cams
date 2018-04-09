@@ -16,7 +16,7 @@ window.layinit(function (htConfig) {
 		   // 同步催收数据
 		   syncCollection:function(){
 			   this.syncCollectionLoading = true;
-			   axios.get(basePath +"alms/transfer")
+			   axios.get(basePath +"alms/transfer",{timeout: 0})
 		        .then(function (res) {
 		        	vm.syncCollectionLoading = false;
 		            if (res.data.data != null && res.data.code == 1) {
@@ -35,7 +35,7 @@ window.layinit(function (htConfig) {
 		   // 设置所有用户可访问业务对照关系
 		   setUserPermissons:function(){
 			   this.setUserPermissonsLoading = true;
-			   axios.get(basePath +"sys/admin/userPermission")
+			   axios.get(basePath +"sys/admin/userPermission",{timeout: 0})
 			   .then(function (res) {
 				   vm.setUserPermissonsLoading = false;
 				   if (res.data.data != null && res.data.code == 1) {
