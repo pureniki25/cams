@@ -1,6 +1,7 @@
 package com.hongte.alms.core.controller;
 
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -89,9 +90,24 @@ public class WithholdingRepaymentLogController {
 	    public PageResult<List<RepaymentLogVO>> selectRepaymentLogList(@ModelAttribute RepaymentLogReq  req){
 
 	        try{
+	            //取最近3天记录
+	        	if(req.getDateBegin()==null&&req.getDateEnd()==null) {
+		            Calendar calendar = Calendar.getInstance();
+		            calendar.setTime(new Date());
+	                calendar.set(Calendar.HOUR_OF_DAY, 24);
+	                calendar.set(Calendar.MINUTE, 0);
+	                calendar.set(Calendar.SECOND, 0);
+	                req.setDateBegin(calendar.getTime());
+	                calendar.set(Calendar.HOUR_OF_DAY, -48);
+	                calendar.set(Calendar.MINUTE, 0);
+	                calendar.set(Calendar.SECOND, 0);
+	                req.setDateEnd(calendar.getTime());
+	        	}
+
 	        	req.setUserId(loginUserInfoHelper.getUserId());
 	            Page<RepaymentLogVO> pages = withholdingRepaymentlogService.selectRepaymentLogPage(req);
-	       
+	            
+	
 	            return PageResult.success(pages.getRecords(),pages.getTotal());
 	        }catch (Exception ex){
 	            ex.printStackTrace();
@@ -227,7 +243,7 @@ public class WithholdingRepaymentLogController {
 
 	    }
 
-	  
+
 	  
 }
 
