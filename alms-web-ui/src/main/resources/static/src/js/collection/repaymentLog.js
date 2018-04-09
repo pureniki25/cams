@@ -67,6 +67,7 @@ window.layinit(function (htConfig) {
     basePath = _htConfig.coreBasePath;
     getDeductionPlatformInfo();
     getSelectsData();
+ 
     vm = new Vue({
         el: '#app',
         data: {
@@ -76,7 +77,13 @@ window.layinit(function (htConfig) {
 		        	companyId:'', //分公司ID
 		        	keyName :'',      //业务编号 或客户名称
 		            platformId :'',  //代扣平台
-		            dateRange:'',	//发送时间范围
+		            /*
+		            dateRange:[{
+		            	date1:new Date(),
+		            	date2:new Date()
+		            }],	//发送时间范围
+		            */
+		            dateRange:[new Date(new Date(new Date().toLocaleDateString()).getTime()-48*60*60*1000-1),new Date(new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1)],
 		            repayStatus	:'',    //状态
 		            businessTypeId:'',//业务类型
             },
@@ -111,13 +118,13 @@ window.layinit(function (htConfig) {
             //重载表格
             toLoading() {
                 if (table == null) return;
-                vm.$refs['searchForm'].validate((valid) =>{debugger
-                    if (valid) {
+                vm.$refs['searchForm'].validate((valid) =>{
+                    if (valid) {debugger
                         this.loading = true;
                         console.log(vm.searchForm);
-
+                             
                        var  dateObj = getData();
-
+                       getCountInfo();
                         table.reload('listTable', {
                             where: {
                                 companyId:vm.searchForm.companyId, //分公司ID
@@ -161,12 +168,15 @@ window.layinit(function (htConfig) {
         },
         mounted:function(){
 
-        }
+        },
+        created: function () {
+    
+        },
         
        
     });
 
-
+    getCountInfo();
 
     //使用layerUI的表格组件
     layui.use(['layer', 'table','ht_ajax', 'ht_auth', 'ht_config'], function () {
@@ -242,12 +252,14 @@ window.layinit(function (htConfig) {
             //response: {} //如果无需自定义数据响应名称，可不加该参数
             page: true,
             done: function (res, curr, count) {
-                getCountInfo();
+                
                 //数据渲染完的回调。你可以借此做一些其它的操作
                 //如果是异步请求数据方式，res即为你接口返回的信息。
                 //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
                 vm.loading = false;
             }
+          
+        
         });
 
         //监听工具条
@@ -304,8 +316,16 @@ function getDetailUrl(){
 
 //获取代扣业务条数，成功代扣流水数，成功代扣总额，成功代扣业务条数
 var getCountInfo=function(){debugger
-    var self = this;  
-
+    var self = this;   
+  if(dataObject.dateBegin==''){
+	  dataObject.dateBegin=new Date(new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1).getTime();
+		vm.searchForm.dateRange[0]=new Date(new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1);
+  }
+  
+  if(dataObject.dateEnd==''){
+	  dataObject.dateEnd=new Date(new Date(new Date().toLocaleDateString()).getTime()-48*60*60*1000-1).getTime();
+		vm.searchForm.dateRange[1]=new Date(new Date(new Date().toLocaleDateString()).getTime()-48*60*60*1000-1);
+  }
 $.ajax({
     type : 'GET',
     async : false,
@@ -427,12 +447,23 @@ var getData = function(){debugger
     if(vm.searchForm.dateRange.length>0){
     	if(vm.searchForm.dateRange[0]!=null){
     		 dataObject.dateBegin = vm.searchForm.dateRange[0].getTime();
+    	}else{
+    		var date1=new Date();
+    		vm.searchForm.dateRange[0]=date1;
+    		vm.searchForm.dateRange[0].setTime(new Date(new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1));
+    		 dataObject.dateBegin=vm.searchForm.dateRange[0].getTime();
     	}
      	if(vm.searchForm.dateRange[1]!=null){
             var date =vm.searchForm.dateRange[1];
             date.setDate(date.getDate() + 1);
             dataObject.dateEnd=date.getTime();
-   	}
+   	   }else{
+   		   var date2=new Date();
+   		vm.searchForm.dateRange[1]=date2;
+		vm.searchForm.dateRange[1].setTime(new Date(new Date(new Date().toLocaleDateString()).getTime()-48*60*60*1000-1));
+		 dataObject.dateBegin=vm.searchForm.dateRange[1].getTime();
+   		
+   	   }
 
     }
     return dataObject;

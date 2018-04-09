@@ -185,7 +185,7 @@ public class CollectionController {
 
 
 
-    @Value("${ht.excel.file.save.path:/emp/}")
+    @Value("${ht.excel.file.save.path:/tmp/}")
     private  String excelSavePath;
 
     @ApiOperation(value = "贷后首页台账 存储Excel  ")

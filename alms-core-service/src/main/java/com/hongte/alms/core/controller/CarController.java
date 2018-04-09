@@ -205,7 +205,7 @@ public class CarController {
 	@Qualifier("CollectionStatusService")
     private CollectionStatusService collectionStatusService;
     
-    @Value("${ht.auction.delayed.min}")
+    @Value("${ht.auction.delayed.min:10}")
     private Integer delayedMin;//延长时间(分钟)
     
 	@ApiOperation(value="获取拖车登记业务基本信息")
