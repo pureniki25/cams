@@ -107,7 +107,7 @@ window.layinit(function (htConfig) {
                 width:120,
                 title: '客户名称'
             }, {
-                field: 'companyId',
+                field: 'companyName',
                 width:120,
                 title: '所属分公司'
             }, {
@@ -271,7 +271,7 @@ window.layinit(function (htConfig) {
                 title: '期数',
                 width: 60
             }, {
-                field: 'companyId',
+                field: 'companyName',
                 title: '所属分公司',
                 width: 100
             }, {
