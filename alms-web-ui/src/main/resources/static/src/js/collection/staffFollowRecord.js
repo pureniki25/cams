@@ -36,6 +36,7 @@ window.layinit(function (htConfig) {
             statusList:status_array,        //状态列表
 
             addLogModal:false,//控制增加、修改框显示的标志位
+            modalAction:'',
             //编辑跟踪历史记录
             editLogForm:{
                 trackLogId:'',//跟踪记录ID
@@ -76,6 +77,7 @@ window.layinit(function (htConfig) {
             },
             toShowEditModal(){
                 this.addLogModal = true;
+                this.modalAction= '新增'
                 this.editLogForm.ifSendToPlat = '否'
             }
         }
@@ -293,6 +295,7 @@ var queryEditModule = function (trackLogId) {
     axios.get(basePath +'collectionTrackLog/selectById', {params: {trackLogId: trackLogId}})
         .then(function (res) {
             if (res.data.code == "1") {
+            	vm.modalAction = '编辑'
                 vm.editLogForm.trackLogId = res.data.data.trackLogId;
                 vm.editLogForm.trackStatusName = res.data.data.trackStatusName;
                 vm.editLogForm.trackStatusId = res.data.data.trackStatusId;

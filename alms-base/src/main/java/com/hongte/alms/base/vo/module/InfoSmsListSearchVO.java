@@ -130,6 +130,7 @@ public class InfoSmsListSearchVO {
 
 	private String districtId;
 	private String companyId;
+	private String companyName ;
 	
 	public String getRecipient() {
 		return recipient;
@@ -363,6 +364,22 @@ public class InfoSmsListSearchVO {
 
 	public void setUpdateUser(String updateUser) {
 		this.updateUser = updateUser;
+	}
+
+
+	/**
+	 * @return the companyName
+	 */
+	public String getCompanyName() {
+		return companyName;
+	}
+
+
+	/**
+	 * @param companyName the companyName to set
+	 */
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
 	}
 
 

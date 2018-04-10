@@ -41,7 +41,7 @@
         </p>
         <!--右上侧按钮列表-->
         <i-button slot="extra" type="success"  @click="toShowEditModal" style="margin-right:10px">
-            <span>增加</span>
+            <span>新增</span>
         </i-button>
 
 
@@ -83,7 +83,7 @@
 
 
     <!--新增/编辑贷后跟踪记录Modal-->
-    <Modal  ref="addLogModal" v-model="addLogModal" title="添加/修改贷后跟踪信息" @on-cancel="hideEditForm">
+    <Modal  ref="addLogModal" v-model="addLogModal" :title="modalAction+'贷后跟踪信息'" @on-cancel="hideEditForm">
         <row>
             <i-col span="22">
                 <i-form ref="editLogForm" :model="editLogForm" :rules="ruleValidate" label-position="right"

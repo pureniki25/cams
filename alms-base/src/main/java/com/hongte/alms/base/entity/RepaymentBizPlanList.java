@@ -43,6 +43,14 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 	@TableField("business_id")
 	@ApiModelProperty(required= true,value = "还款计划所属业务ID(若当前业务为展期，则存展期业务编号)")
 	private String businessId;
+	
+	/**
+     * 还款计划所属原业务编号
+     */
+	@TableField("orig_business_id")
+	@ApiModelProperty(required= true,value = "还款计划所属原业务编号")
+	private String origBusinessId;
+	
     /**
      * 当前还款计划期数，若期数为0，表示为展期还款计划第0期或者线下出款业务的第0期
      */
@@ -439,5 +447,19 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 			", updateTime=" + updateTime +
 			", updateUser=" + updateUser +
 			"}";
+	}
+
+	/**
+	 * @return the origBusinessId
+	 */
+	public String getOrigBusinessId() {
+		return origBusinessId;
+	}
+
+	/**
+	 * @param origBusinessId the origBusinessId to set
+	 */
+	public void setOrigBusinessId(String origBusinessId) {
+		this.origBusinessId = origBusinessId;
 	}
 }
