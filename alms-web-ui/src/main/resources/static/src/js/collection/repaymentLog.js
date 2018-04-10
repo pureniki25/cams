@@ -318,13 +318,13 @@ function getDetailUrl(){
 var getCountInfo=function(){debugger
     var self = this;   
   if(dataObject.dateBegin==''){
-	  dataObject.dateBegin=new Date(new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1).getTime();
-		vm.searchForm.dateRange[0]=new Date(new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1);
+	  dataObject.dateBegin=new Date(new Date(new Date().toLocaleDateString()).getTime()-48*60*60*1000-1).getTime();
+		vm.searchForm.dateRange[0]=new Date(new Date(new Date().toLocaleDateString()).getTime()-48*60*60*1000-1);
   }
   
   if(dataObject.dateEnd==''){
-	  dataObject.dateEnd=new Date(new Date(new Date().toLocaleDateString()).getTime()-48*60*60*1000-1).getTime();
-		vm.searchForm.dateRange[1]=new Date(new Date(new Date().toLocaleDateString()).getTime()-48*60*60*1000-1);
+	  dataObject.dateEnd=new Date(new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1).getTime();
+		vm.searchForm.dateRange[1]=new Date(new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1);
   }
 $.ajax({
     type : 'GET',
@@ -450,18 +450,17 @@ var getData = function(){debugger
     	}else{
     		var date1=new Date();
     		vm.searchForm.dateRange[0]=date1;
-    		vm.searchForm.dateRange[0].setTime(new Date(new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1));
+    		vm.searchForm.dateRange[0].setTime(new Date(new Date(new Date().toLocaleDateString()).getTime()-48*60*60*1000-1));
     		 dataObject.dateBegin=vm.searchForm.dateRange[0].getTime();
     	}
      	if(vm.searchForm.dateRange[1]!=null){
             var date =vm.searchForm.dateRange[1];
-            date.setDate(date.getDate() + 1);
             dataObject.dateEnd=date.getTime();
    	   }else{
    		   var date2=new Date();
    		vm.searchForm.dateRange[1]=date2;
-		vm.searchForm.dateRange[1].setTime(new Date(new Date(new Date().toLocaleDateString()).getTime()-48*60*60*1000-1));
-		 dataObject.dateBegin=vm.searchForm.dateRange[1].getTime();
+		vm.searchForm.dateRange[1].setTime(new Date(new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1));
+		 dataObject.dateEnd=vm.searchForm.dateRange[1].getTime();
    		
    	   }
 
