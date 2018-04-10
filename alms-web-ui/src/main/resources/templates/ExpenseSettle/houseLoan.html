@@ -103,8 +103,10 @@
                 <span slot="title">结清试算信息</span>
                 <row>
                     <i-col span="4">预计结清日期</i-col>
-                    <i-col span="8"><date-picker type="date" v-model="preSettleDate.date"  :options="preSettleDate.disabledDate" @on-change="onPreSettleDateChange"></date-picker>
-                    <i-col span="12"></i-col>
+                    <i-col span="8">
+                        <date-picker type="date" v-model="preSettleDate.date"  :options="preSettleDate.disabledDate" @on-change="onPreSettleDateChange"></date-picker>
+                        <i-button type="primary" @click="cal" >开始计算</i-button>
+                    </i-col>
                 </row>
                 <row>
                     <i-col span="4">本金</i-col>

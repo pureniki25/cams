@@ -35,7 +35,8 @@ window.layinit(function (htConfig) {
                         return date.getTime() < new Date(year+"-"+month+"-"+day+" 00:00:00").getTime() || (new Date(year+"-"+month+"-"+day+" 00:00:00").getTime() + 1000*60*60*24*15 ) <= date.getTime()
                     }
                 }
-            }
+            },
+            settleDate:''
         },
         created:function(){
             axios.get(basePath + 'expenseSettle/business', {
@@ -53,7 +54,8 @@ window.layinit(function (htConfig) {
                     $.each(res.data.data.output,function(i,o){
                         if(i==0){
                             app.business.output.user = o.outputUserName
-                            app.business.output.date = o.factOutputDate
+                            
+                            app.business.output.date = o.factOutputDate.substring(0,10)
                         }
                         outPutCount += o.factOutputMoney
                     })
@@ -76,11 +78,20 @@ window.layinit(function (htConfig) {
         },
         methods:{
             onPreSettleDateChange:function(date){
+                this.settleDate = date ;
+            },
+            cal:function(date){
+
+                if(!this.settleDate){
+                    app.$Modal.error({content:'请选择结清日期!'})
+                    return ;
+                }
+
                 axios.get(basePath + 'expenseSettle/calByPreSettleDate', {
                     params: {
                         businessId: getQueryStr('businessId'),
                         afterId: getQueryStr('afterId'),
-                        preSettleDate: date
+                        preSettleDate: this.settleDate
                     }
                 }
                 ).then(function(res){
