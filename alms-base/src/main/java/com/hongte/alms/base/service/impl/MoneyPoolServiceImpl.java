@@ -310,7 +310,7 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 	@Override
 	public Result addCustomerRepayment(RepaymentRegisterInfoDTO registerInfoDTO) {
 		RepaymentBizPlanList repaymentBizPlanList = new RepaymentBizPlanList() ;
-		repaymentBizPlanList.setBusinessId(registerInfoDTO.getBusinessId());
+		repaymentBizPlanList.setOrigBusinessId(registerInfoDTO.getBusinessId());
 		repaymentBizPlanList.setAfterId(registerInfoDTO.getAfterId());
 		 repaymentBizPlanList = repaymentBizPlanListMapper.selectOne(repaymentBizPlanList);
 
