@@ -295,7 +295,7 @@ window.layinit(function(htConfig){
                     align: 'right'
                 }, {
                     field: 'totalBorrowAmount',
-                    width:180,
+                    width:150,
                     title: '应还金额',
                     align: 'right',
                     templet:function(d){
