@@ -375,14 +375,14 @@
         });
         fileupLoad.cboxEffect();
         //删除所有选中文件
-        $(".del-file").on("click",function(){
+        $(".del-file").on("click",function(){debugger
             if($(".cbox:checked").length!==0){
                 var del_divList=$(".cbox:checked").parent().parent();
                 var del_fileList=[];
                 var del_docIDList=[];
                 for(var i=0;i<del_divList.length;i++){
-                    del_fileList.push(del_divList.data("item"));
-                    del_docIDList.push(del_divList.attr("data-id"));
+                    del_fileList.push(del_divList[i].data("item"));
+                    del_docIDList.push(del_divList.eq(i).data("id"));
                     var cutnum = parseInt(fileupLoad.options.getCurrentFileCount());
                     cutnum--;
                     fileupLoad.options.setCurrentFileCount(cutnum);
@@ -410,7 +410,7 @@
             }
         });
         //删除单个文件
-        $(".img_div").on("click",".removeBtn",function(){
+        $(".img_div").on("click",".removeBtn",function(){debugger
             var del_div=$(this).parent().parent();
             var ts=$(this);
             var del_fileList=[];
