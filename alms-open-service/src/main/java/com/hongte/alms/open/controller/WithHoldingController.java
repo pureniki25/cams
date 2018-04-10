@@ -68,7 +68,7 @@ public class WithHoldingController {
 	@Qualifier("CollectionStatusService")
 	CollectionStatusService collectionStatusService;
 	
-	  @Value(value="${bmApi.apiUrl}")
+	  @Value(value="${bmApi.apiUrl:http://127.0.0.1}")
 	private String apiUrl;
 	
 	@ApiOperation(value = "执行代扣")

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.AdminMapper">
+	
+	<select id="countAllUserInfo" resultType="java.lang.Integer"> 
+		SELECT 
+		  count(1) 
+		FROM
+		  `tb_sys_user` t1 
+		  LEFT JOIN `tb_sys_user_permission` t2 
+		    ON t1.`user_id` = t2.`user_id`
+	</select>
+	
+	<select id="queryAllUserInfo" resultType="com.hongte.alms.base.vo.module.AdminVO"> 
+		SELECT 
+		  t1.`user_id` userId,
+		  t1.`user_name` username,
+		  t2.`business_id` businessId 
+		FROM
+		  `tb_sys_user` t1 
+		  LEFT JOIN `tb_sys_user_permission` t2 
+		    ON t1.`user_id` = t2.`user_id` 
+		LIMIT ${(page-1) * limit}, #{limit,jdbcType=DECIMAL}
+	</select>
+	
+	<select id="queryUserInfoByUsername" resultType="com.hongte.alms.base.vo.module.AdminVO"> 
+		SELECT 
+		  t1.`user_id` userId,
+		  t1.`user_name` username,
+		  t2.`business_id` businessId 
+		FROM
+		  `tb_sys_user` t1 
+		  LEFT JOIN `tb_sys_user_permission` t2 
+		    ON t1.`user_id` = t2.`user_id` 
+		<where>
+			<if test="username != null">
+				t1.`user_name` LIKE CONCAT('%', #{username,jdbcType=VARCHAR}, '%')
+			</if>
+		</where>
+	</select>
+
+</mapper>

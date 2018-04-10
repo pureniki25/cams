@@ -32,4 +32,6 @@ public interface BasicBusinessMapper extends SuperMapper<BasicBusiness> {
      * @return
      */
     List<UserPermissionBusinessDto> selectUserPermissionBusinessDtos(@Param("companyIds") List<String> companyIds);
+    
+    Double queryPayedPrincipal(@Param("businessId") String businessId);
 }

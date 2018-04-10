@@ -43,7 +43,7 @@ ht:
     ui:
       gatewayUrl: http://172.16.200.110:30111/  #网关地址
       useGateWayflage: false   #是否使用网关的标志位
-      changePwdPath: http://172.16.200.110:30131/html/user/changePwdOther.html
+      changePwdPath: http://172.16.200.110:30131/html/user/changePwdOther.html  #首次登陆 修改密码 界面跳转地址
 
 ---
 spring:
@@ -67,7 +67,7 @@ ht:
     ui:
       gatewayUrl: http://172.16.200.110:30111/  #网关地址
       useGateWayflage: true   #是否使用网关的标志位
-
+      changePwdPath: http://172.16.200.110:30131/html/user/changePwdOther.html  #首次登陆 修改密码 界面跳转地址
 ---
 spring:
   profiles: sit
@@ -90,7 +90,7 @@ ht:
     ui:
       gatewayUrl: http://172.16.200.112:30111/  #网关地址
       useGateWayflage: true   #是否使用网关的标志位
-
+      changePwdPath: http://172.16.200.112:30131/html/user/changePwdOther.html  #首次登陆 修改密码 界面跳转地址
 ---
 spring:
   profiles: uat
@@ -110,7 +110,7 @@ ht:
     ui:
       gatewayUrl: http://47.106.46.65:30111/  #网关地址
       useGateWayflage: true   #是否使用网关的标志位
-
+      changePwdPath: http://47.106.46.65:30131/html/user/changePwdOther.html  #首次登陆 修改密码 界面跳转地址
 ---
 spring:
   profiles: prd
@@ -130,3 +130,4 @@ ht:
     ui:
       gatewayUrl: http://120.78.25.128:30111/  #网关地址
       useGateWayflage: true   #是否使用网关的标志位
+      changePwdPath: http://120.78.25.128:30131/html/user/changePwdOther.html  #首次登陆 修改密码 界面跳转地址

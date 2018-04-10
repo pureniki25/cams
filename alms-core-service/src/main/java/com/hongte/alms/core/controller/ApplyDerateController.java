@@ -2,6 +2,31 @@ package com.hongte.alms.core.controller;
 
 
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.jeecgframework.poi.excel.ExcelExportUtil;
+import org.jeecgframework.poi.excel.entity.ExportParams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
@@ -10,8 +35,6 @@ import com.hongte.alms.base.assets.car.vo.FileVo;
 import com.hongte.alms.base.collection.service.CollectionLogService;
 import com.hongte.alms.base.collection.service.CollectionStatusService;
 import com.hongte.alms.base.collection.service.PhoneUrgeService;
-import com.hongte.alms.base.collection.vo.AfterLoanStandingBookReq;
-import com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo;
 import com.hongte.alms.base.entity.ApplyDerateProcess;
 import com.hongte.alms.base.entity.BasicBusinessType;
 import com.hongte.alms.base.entity.BasicCompany;
@@ -21,50 +44,35 @@ import com.hongte.alms.base.entity.DocType;
 import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.enums.AreaLevel;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
-import com.hongte.alms.base.process.entity.Process;
-import com.hongte.alms.base.process.entity.ProcessLog;
-import com.hongte.alms.base.process.entity.ProcessTypeStep;
 import com.hongte.alms.base.process.enums.ProcessTypeEnums;
 import com.hongte.alms.base.process.service.ProcessLogService;
 import com.hongte.alms.base.process.service.ProcessService;
 import com.hongte.alms.base.process.service.ProcessTypeService;
 import com.hongte.alms.base.process.service.ProcessTypeStepService;
-import com.hongte.alms.base.vo.module.ApplyDerateProcessReq;
 import com.hongte.alms.base.process.vo.ProcessLogReq;
-import com.hongte.alms.base.process.vo.ProcessLogVo;
-import com.hongte.alms.base.service.*;
+import com.hongte.alms.base.service.ApplyDerateProcessService;
+import com.hongte.alms.base.service.BasicBusinessService;
+import com.hongte.alms.base.service.BasicBusinessTypeService;
+import com.hongte.alms.base.service.BasicCompanyService;
+import com.hongte.alms.base.service.DocService;
+import com.hongte.alms.base.service.DocTmpService;
+import com.hongte.alms.base.service.DocTypeService;
+import com.hongte.alms.base.service.SysParameterService;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
 import com.hongte.alms.base.vo.module.ApplyDerateListSearchReq;
+import com.hongte.alms.base.vo.module.ApplyDerateProcessReq;
 import com.hongte.alms.base.vo.module.ApplyDerateVo;
 import com.hongte.alms.base.vo.module.BusinessInfoForApplyDerateVo;
 import com.hongte.alms.common.result.Result;
-import com.hongte.alms.common.util.ClassCopyUtil;
-import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.EasyPoiExcelExportUtil;
 import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.core.storage.StorageService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
-import com.ht.ussp.client.dto.LoginInfoDto;
 import com.ht.ussp.util.BeanUtils;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.poi.ss.usermodel.Workbook;
-
-import org.jeecgframework.poi.excel.ExcelExportUtil;
-import org.jeecgframework.poi.excel.entity.ExportParams;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.*;
 
 /**
  * <p>

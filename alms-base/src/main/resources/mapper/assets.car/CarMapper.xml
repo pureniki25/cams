@@ -51,7 +51,7 @@
 		 join
 		tb_car_drag drag on drag.business_id=bus.business_id
 		left
-		join tb_car_detection det on car.last_detection_id=det.id
+		join tb_car_detection det on IFNULL(car.last_detection_id,0)=det.id
 		JOIN tb_sys_user_permission as permission  ON  permission.business_id = bus.business_id
 
 		<where>

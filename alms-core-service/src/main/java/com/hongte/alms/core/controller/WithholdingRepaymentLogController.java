@@ -215,7 +215,7 @@ public class WithholdingRepaymentLogController {
 	    }
 	    
 	    
-	    @Value("${ht.excel.file.save.path}")
+	    @Value("${ht.excel.file.save.path:/tmp/}")
 	    private  String excelSavePath;
  
 	    @ApiOperation(value = "还款计划日志表导出Excel  ")
