@@ -1,6 +1,7 @@
 package com.hongte.alms.base.controller;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -353,7 +354,7 @@ public class ExpenseSettleController {
 						if (e.getKey() != null) {
 							int daysBeyoungDueDate = DateUtil.getDiffDays(e.getKey().getDueDate(), settleDate);
 							BigDecimal lateFeeRate = d.getPlanAmount()
-									.divide(e.getKey().getOverdueDays().multiply(principal));
+									.divide(e.getKey().getOverdueDays().multiply(principal),2,RoundingMode.HALF_DOWN);
 							if (daysBeyoungDueDate > 1) {
 								firstLateFee = principal.multiply(lateFeeRate)
 										.multiply(new BigDecimal(daysBeyoungDueDate));
