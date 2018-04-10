@@ -150,7 +150,7 @@ window.layinit(function (htConfig) {
                     title: '发送时间'
                 },
                 {
-                    field: 'companyId',
+                    field: 'companyName',
                     title: '分公司'
                 },
                 {
