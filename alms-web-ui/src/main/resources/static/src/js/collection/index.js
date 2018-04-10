@@ -302,7 +302,8 @@ window.layinit(function(htConfig){
                         let firstPeriod = '<span style="'+styel+'">首期</span>' 
                         let benjinPeriod = '<span style="'+styel+'">本金期</span>' 
                         let lastPeriod = '<span style="'+styel+'">末期</span>' 
-                        if(d.periods==1){
+                        let isZQ = d.afterId.indexOf('ZQ')>-1?true:false;
+                        if(d.periods==1&&!isZQ){
                             res+=firstPeriod
                         }
                         if(d.repaymentTypeId==2&&d.borrowLimit==d.periods){
