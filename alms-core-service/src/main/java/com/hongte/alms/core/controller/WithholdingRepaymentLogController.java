@@ -94,11 +94,12 @@ public class WithholdingRepaymentLogController {
 	        	if(req.getDateBegin()==null&&req.getDateEnd()==null) {
 		            Calendar calendar = Calendar.getInstance();
 		            calendar.setTime(new Date());
-	                calendar.set(Calendar.HOUR_OF_DAY, 24);
+	                calendar.set(Calendar.HOUR_OF_DAY, -48);
 	                calendar.set(Calendar.MINUTE, 0);
 	                calendar.set(Calendar.SECOND, 0);
 	                req.setDateBegin(calendar.getTime());
-	                calendar.set(Calendar.HOUR_OF_DAY, -48);
+	                calendar.setTime(new Date());
+	                calendar.set(Calendar.HOUR_OF_DAY, 24);
 	                calendar.set(Calendar.MINUTE, 0);
 	                calendar.set(Calendar.SECOND, 0);
 	                req.setDateEnd(calendar.getTime());
@@ -184,6 +185,7 @@ public class WithholdingRepaymentLogController {
 	    	   req.setDateEnd(dateEnd);
 	    	   req.setRepayStatus(repayStatus);
 	    	   req.setPlatformId(platformId);
+	    	   req.setKeyName(keyName);
 	       	String userId=loginUserInfoHelper.getUserId();
 	    	   req.setUserId(userId);
 	    	   RepaymentLogVO  repaymentLogVO=null;
