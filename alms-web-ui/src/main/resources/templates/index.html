@@ -57,19 +57,17 @@
                 </dl>
             </li>
             <li class="layui-nav-item">
-                <a href="javascript:;" id="userName">
-                    <!-- <img src="http://m.zhengjinfan.cn/images/0.jpg" class="layui-nav-img">-->
+            	<a href="javascript:;" id="changePwd">
+                    <i class="fa fa-cog" aria-hidden="true"></i>
+                   修改密码
                 </a>
-                <dl class="layui-nav-child">
-                    <dd>
+                <!-- <a href="javascript:;" id="userName">
+                    <img src="http://m.zhengjinfan.cn/images/0.jpg" class="layui-nav-img">
+                </a>
                         <a href="javascript:;" kit-target
-                           data-options="{url:'/html/user/userInfo.html',icon:'&#xe658;',title:'基本资料',id:'966'}"><span>基本资料</span></a>
-                    </dd>
-                    <dd>
-                        <a href="javascript:;" kit-target
-                           data-options="{url:'/html/user/changePwd.html',icon:'&#xe658;',title:'修改密码',id:'967'}"><span>修改密码</span></a>
-                    </dd>
-                </dl>
+                           data-options="{url:'/html/user/userInfo.html',icon:'&#xe658;',title:'基本资料',id:'966'}"><span>基本资料</span></a> -->
+                       <!--  <a href="javascript:;" kit-target
+                           data-options="{url:'/html/user/changePwd.html',icon:'&#xe658;',title:'修改密码',id:'967'}"><span>修改密码</span></a> -->
             </li>
             <li class="layui-nav-item">
                 <a href="javascript:;" id="login_out">
@@ -157,6 +155,11 @@
              cookie.deleteRefreshToken();
              top.location.href = config.loginPath;
          });
+         
+         $("#changePwd").on("click", function () {
+             top.location.href = changePwdPath+"\?token="+cookie.getToken()+"&urls="+config.loginPath;
+         });
+         
          //初始化权限资源
          // ht_auth.load();
          /* $.get(config.baseInfo, null, function (result) {
