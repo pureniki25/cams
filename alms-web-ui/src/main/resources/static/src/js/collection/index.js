@@ -455,7 +455,7 @@ window.layinit(function(htConfig){
                 
                 if(authValid('checkDoc')){
                     buttons.push(
-                            {"name": "查看附件", click: function (e, currentItem) {
+                            {"name": "查看信贷附件", click: function (e, currentItem) {
                                 $.ajax({
                                     type : 'GET',
                                     async : false,
@@ -467,7 +467,7 @@ window.layinit(function(htConfig){
                                         Authorization : "Bearer " + getToken()
                                     },
                                     success : function(data) {
-                                        showOneLineOprLayer(data.data,"查看附件");
+                                        showOneLineOprLayer(data.data,"查看信贷附件");
                                     },
                                     error : function() {
                                         vm.$Modal.error({content: '接口调用异常!'});
@@ -478,9 +478,9 @@ window.layinit(function(htConfig){
                 }
                 if(authValid('upLoad')){
 	                buttons.push(
-	                    {"name": "上传附件", click: function (e, currentItem) {
+	                    {"name": "附件上传及查看", click: function (e, currentItem) {
 	                        var url = '/page/doc/upLoad.html?businessId='+currentItem.businessId
-	                        showOneLineOprLayer(url,"上传附件")
+	                        showOneLineOprLayer(url,"附件上传及查看")
 	                    }}
 	                )
                 }
