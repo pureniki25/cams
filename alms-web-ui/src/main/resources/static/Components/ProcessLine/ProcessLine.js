@@ -55,7 +55,7 @@
                            <a href="javascript:;" @click='prev' class="prev cd-timeline-navigation" :class="{inactive: currentPage == 1}">Prev</a>
                            <a href="javascript:;" @click='next' class="next cd-timeline-navigation" :class="{inactive: currentPage == this.PageCount}">Next</a>
                        </div>
-                       <div class="events-warp">
+                       <div class="events-warp" style="padding-top: 18px;">
                            <div class="events" :style="{ width: this.data.length * 250 + 'px', transform: 'translateX(' + X + 'px)' }">
                                 <processlineitem v-for='(d, i) in data'
                                                  :status='d.status' 
