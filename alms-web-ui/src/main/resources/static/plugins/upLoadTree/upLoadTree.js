@@ -298,7 +298,7 @@
             $(this).find("i").toggleClass("tri-top");
         });
         //文件选项卡
-        $(".file-nav").on("click","li",function(){
+        $(".file-nav").on("click","li",function(){debugger
             var idx = $(this).index();
             $("#s-all , .cbox").prop("checked",false);
             $(".icover").hide();
@@ -310,7 +310,7 @@
         $(".filebox:eq(0)").show();
         var firstv = $(".tree2:eq(0) li:eq(0)").attr("data-value");
         $(".filebox:eq(0)").find(".file-list").find(".upload-list").find(".isFile[data-value!="+ firstv +"]").hide();//显示第一个子栏目对应的附件
-        $(".tree li").on("click","li",function(){
+        $(".tree li").on("click","li",function(){debugger
             console.log(fileupLoad.options.getCurrentRow());
             if(fileupLoad.options)
             {
@@ -366,7 +366,7 @@
         //文件全选
         $(".s-all").on("click",function(){
             if($(this).is(':checked')){
-                $(this).parent().parent().siblings(".file-list").find("li:visible").find(".isFile:visible").find(".icover").show().find(".cbox").attr("checked","true");
+                $(this).parent().parent().siblings(".file-list").find("li:visible").find(".isFile:visible").find(".icover").show().find(".cbox").prop("checked",true);
                 $(this).parent().parent().siblings(".file-list").find("li:visible").find(".isFile,.isImg").css("border","5px solid #ffc4c4");
             }else{
                 $(this).parent().parent().siblings(".file-list").find("li:visible").find(".isFile:visible").find(".icover").hide().find(".cbox").removeAttr("checked");

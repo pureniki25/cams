@@ -242,11 +242,13 @@ window.layinit(function (htConfig) {
                         title: '客户名称'
                     }, {
                         field: 'borrowMoney',
-                        title: '借款金额'
+                        title: '借款金额',
+                        align: 'right'
                     }, {
 
                         field: 'repaidAmount',
-                        title: '已还金额'
+                        title: '已还金额',
+                        align: 'right'
                     }, {
 
                         field: 'licensePlateNumber',
@@ -257,7 +259,8 @@ window.layinit(function (htConfig) {
                         title: '车辆型号'
                     }, {
                         field: 'evaluationAmount',
-                        title: '评估价'
+                        title: '评估价',
+                        align: 'right'
                     }, {
                         field: 'evaluationDate',
                         title: '评估日期'

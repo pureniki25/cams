@@ -218,7 +218,8 @@ window.layinit(function (htConfig) {
                 },
                 {
                     field: 'currentAmount',
-                    title: '代扣金额'
+                    title: '代扣金额',
+                    align: 'right'
                 },
                 {
                     field: 'userName',

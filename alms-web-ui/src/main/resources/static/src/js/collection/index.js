@@ -291,11 +291,13 @@ window.layinit(function(htConfig){
                 }, {
                     field: 'borrowMoney',
                     width:90,
-                    title: '借款金额'
+                    title: '借款金额',
+                    align: 'right'
                 }, {
                     field: 'totalBorrowAmount',
                     width:180,
                     title: '应还金额',
+                    align: 'right',
                     templet:function(d){
                         let styel = 'background-color: #CCCC00;background-image: none !important;text-shadow: none !important;display: inline-block;padding: 2px 4px;font-size: 11.844px;font-weight: bold;line-height: 14px;color: #fff;text-shadow: 0 -1px 0 rgba(0,0,0,0.25);white-space: nowrap;vertical-align: baseline;'
                         res = '' 
