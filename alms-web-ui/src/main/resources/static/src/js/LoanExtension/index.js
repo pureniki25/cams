@@ -132,16 +132,19 @@ window.layinit(function (htConfig) {
                 title:'业务类型'
             },{
                 field:'loanAmount',
-                title:'借款金额'
+                title:'借款金额',
+                align: 'right'
             },{
                 field:'loanTerm',
                 title:'借款期限'
             },{
                 field:'repayAmount',
-                title:'已还本金'
+                title:'已还本金',
+                align: 'right'
             },{
                 field:'extensionAmount',
-                title:'展期金额'
+                title:'展期金额',
+                align: 'right'
             },{
                 field:'extensionTerm',
                 title:'展期期限'
