@@ -239,6 +239,7 @@
 
 <script>
     var vm;
+    var areaId;
     window.layinit(function (htConfig) {
         var _htConfig = htConfig;
         basePath = _htConfig.coreBasePath;
@@ -309,6 +310,7 @@
                             children: [],
                             expand:true
                         }],
+                        test:"",
                         allCitys:[],
                         allSelectedAreas:[],
                         allSelectedCitys:[],
@@ -639,6 +641,8 @@
                     var treeData = self.areaAndCity.allAreas[0].children;// 下拉区域
 
                     self.getArea();
+                    console.log("========>>>>>>>>>>>>",areaId )
+                    self.getCompany();
                 },
                 saveBatchPerson:function () {
                     var self = this;
@@ -666,13 +670,17 @@
                         contentType: "application/json; charset=utf-8",
                         dataType: "json",
                         success: function (data) {
-                            self.areaAndCity.allAreas[0].children = data.data
+                            self.areaAndCity.allAreas[0].children = data.data;
+                            areaId = self.areaAndCity.allAreas[0].children[0].areaId;
+                            self.getCompany(areaId);
                         }
 
                     });
                 },
                 getCompany: function (areaPid) {
+
                     var self = this;
+                    console.log("==========>>>>>>>>>>",self.areaAndCity.test);
                     var url = basePath + "collectionStrategy/getCompanyList?areaPid="+areaPid;
                     $.ajax({
                         type: "GET",
