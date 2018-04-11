@@ -402,7 +402,7 @@ window.layinit(function (htConfig) {
           	  var url="/assets/car/"+reqType+"?businessId="+currentItem.businessId;
           	    var openIndex= layer.open({
           	        type: 2,
-                      area: ['55%', '55%'],
+                      area: ['55%', '65%'],
                       fixed: false,
                       maxmin: true,
                       title:reqTypeName,
