@@ -12,7 +12,7 @@ var processId = document.getElementById("processId").getAttribute("value");
 //设置表单验证
 var setCommitInfoFormValidate = {
 		delayHandover: [
-	        {required: true, message: '必填', trigger: 'blur'}
+	        // {required: true, message: '必填', trigger: 'blur'}
 	    ],
 		carCondition: [
 			{required: true, message: '必填', trigger: 'blur'}  ,  
@@ -39,7 +39,7 @@ var setCommitInfoFormValidate = {
 			}
 		],
 		delayHandoverDesc: [
-			{required: true, message: '必填', trigger: 'blur'}  ,  
+			// {required: true, message: '必填', trigger: 'blur'}  ,  
 			{
 				validator: function (rule, value, callback, source, options) {
 					if (value.length > 500 ) {
@@ -487,7 +487,10 @@ var getShowInfo = function () {
             	vm.baseInfoForm.borrowRate += "%/年";
             	vm.baseInfoForm.monthBorrowRate = "(" + vm.baseInfoForm.monthBorrowRate + "%/月)";
             	vm.baseInfoForm.borrowLimit += "个月";
-            	
+            	vm.baseInfoForm.createTime = moment(vm.baseInfoForm.createTime).format("YYYY年MM月DD日")
+            	vm.baseInfoForm.dragDate = moment(vm.baseInfoForm.dragDate).format("YYYY年MM月DD日")
+            	vm.baseInfoForm.factOutputDate = moment(vm.baseInfoForm.factOutputDate).format("YYYY年MM月DD日")
+            	vm.baseInfoForm.factRepayDate = moment(vm.baseInfoForm.factRepayDate).format("YYYY年MM月DD日")
             	if(res.data.data.carList !=null && res.data.data.carList.length>0){
             		//赋值申请信息
             		vm.commitInfoForm = res.data.data.carList[0];

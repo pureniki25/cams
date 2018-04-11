@@ -98,28 +98,38 @@ window.layinit(function (htConfig) {
                 {field: 'sortId', title: '序号', width:80, sort: true, fixed: 'left'},
                 {
                     field: 'periods',
-                    title: '期数'
+                    title: '期数',
+                    align:'center'
                 }, {
                     field: 'recordDate',
-                    title: '记录日期'
+                    title: '记录日期',
+                    templet:function(d){
+                        return moment(d.recordDate).format("YYYY年MM月DD日")
+                    },
+                    align:'center'
                 }, {
                     field: 'userName',
-                    title: '记录者'
-                }, {
+                    title: '记录者',
+                    align:'center'
+                }, /* {
                     field: 'fields',
-                    title: '附件'
-                }, {
+                    title: '附件',
+                    align:'center'
+                }, */ {
                     field: 'trackStatusName',
-                    title: '状态'
+                    title: '状态',
+                    align:'center'
                 }, {
                     field: 'content',
-                    title: '记录内容'
+                    title: '记录内容',
+                    align:'center'
                 }, {
                     fixed: 'right',
                     title: '操作',
                     width: 178,
                     align: 'left',
-                    toolbar: '#barTools'
+                    toolbar: '#barTools',
+                    align:'center'
                 }
             ]], //设置表头
             url:basePath + 'collectionTrackLog/selectCollectionTrackLogPage?rbpId='+crpId,
@@ -139,7 +149,7 @@ window.layinit(function (htConfig) {
         table.on('tool(listTable)', function(obj){
             var data = obj.data;
             if(obj.event === 'del'){
-                layer.confirm('真的删除行么？', {
+                layer.confirm('确定删除本条跟踪记录？', {
                     btn: ['确定', '取消'] //按钮
                 }, function (index) {
                     layer.close(index);

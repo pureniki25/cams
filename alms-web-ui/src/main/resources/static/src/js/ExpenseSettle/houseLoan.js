@@ -36,7 +36,29 @@ window.layinit(function (htConfig) {
                     }
                 }
             },
-            settleDate:''
+            settleDate:'',
+            arrearageDetailTitle: [
+				{
+					title: '期数',
+					key: 'period'
+				},
+				{
+					title: '服务费',
+					key: 'servicecharge'
+                },
+                {
+					title: '平台费',
+					key: 'platFormFee'
+				},
+				{
+					title: '滞纳金',
+					key: 'lateFee'
+				},
+				{
+					title: '利息',
+					key: 'interest'
+				}
+			]
         },
         created:function(){
             axios.get(basePath + 'expenseSettle/business', {

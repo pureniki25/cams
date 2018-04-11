@@ -260,6 +260,7 @@ window.layinit(function (htConfig) {
 				{
 					title: '利息交至',
 					key: 'dueDate'
+					
 				}
 			],
 			repaymentPlanTitleData: [
@@ -603,7 +604,10 @@ var getShowInfo = function () {
             	
             	vm.baseInfoForm = res.data.data.baseInfo;
             	vm.baseInfoForm.borrowRate += "%/年";
-            	vm.baseInfoForm.borrowLimit += "个月";
+				vm.baseInfoForm.borrowLimit += "个月";
+				res.data.data.baseInfo.housePlanInfos.forEach((info,index)=>{
+					info.dueDate = moment(info.dueDate).format("YYYY年MM月DD日") ;
+				})
             	vm.repaymentPlanTitleData = res.data.data.baseInfo.housePlanInfos;
             	vm.mortgageInfoList = res.data.data.baseInfo.mortgageInfos;
             	

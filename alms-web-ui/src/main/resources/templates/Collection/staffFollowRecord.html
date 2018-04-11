@@ -40,10 +40,10 @@
             贷后跟踪记录
         </p>
         <!--右上侧按钮列表-->
-        <i-button slot="extra" type="success"  @click="toShowEditModal" style="margin-right:10px">
+        <!-- <i-button slot="extra" type="success"  @click="toShowEditModal" style="margin-right:10px">
             <span>新增</span>
-        </i-button>
-
+        </i-button> -->
+        <button class="layui-btn layui-btn-sm"  @click="toShowEditModal" style="margin-right:10px" >新增</button>
 
         <!--查询表单内容-->
         <row :gutter="16">
@@ -122,6 +122,7 @@
     </Modal>
 </div>
 
+<script src="/src/js/moment.min.js" ></script>
 <script src="/src/js/collection/staffFollowRecord.js" ></script>
 <script>
 

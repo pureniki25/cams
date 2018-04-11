@@ -298,11 +298,11 @@ height: 100%;
 				
 			<row :gutter="16">
 				<i-col span="22">
-	                <form-item v-if="applyInfoFormEditFlage" label="是否推迟移交诉讼（最长延期7天及说明理由）" prop="delayHandoverDesc"  >
-	                    <i-input v-model="commitInfoForm.delayHandoverDesc" type="textarea" :rows="4" placeholder="必填，限500字"></i-input>
+	                <form-item v-if="applyInfoFormEditFlage && commitInfoForm.delayHandover == '是'" label="是否推迟移交诉讼（最长延期7天及说明理由）">
+	                    <i-input v-model="commitInfoForm.delayHandoverDesc" type="textarea" :rows="4" placeholder="限500字"></i-input>
 	                </form-item>
-	                <form-item v-else disabled label="是否推迟移交诉讼（最长延期7天及说明理由）" prop="delayHandoverDesc"  >
-	                    <i-input disabled v-model="commitInfoForm.delayHandoverDesc" type="textarea" :rows="4" placeholder="必填，限500字"></i-input>
+	                <form-item v-else disabled label="是否推迟移交诉讼（最长延期7天及说明理由）" >
+	                    <i-input disabled v-model="commitInfoForm.delayHandoverDesc" type="textarea" :rows="4" placeholder="限500字"></i-input>
 	                </form-item>
 	            </i-col>
 			</row>			
@@ -430,6 +430,7 @@ height: 100%;
 	        </i-col>
 	    </row>
 </div>
+<script src="/src/js/moment.min.js" ></script>
 <script src="/src/js/Litigation/carLoan.js" ></script>
 </body>
 </html>

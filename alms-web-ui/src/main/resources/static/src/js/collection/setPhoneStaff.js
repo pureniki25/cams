@@ -46,7 +46,7 @@ window.layinit(function (htConfig) {
                 followOprId:'',     //跟进人员ID
                 discript:''        //分配说明
             },
-
+            staffType:staffType&&staffType=='visitStaff'?'移交':'分配',
             ruleValidate:setPhoneUrgeFormValidate
         },
         methods: {

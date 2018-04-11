@@ -325,9 +325,9 @@ window.layinit(function (htConfig) {
 	    		});
 
 	    	this.queryData();
-	   	    laydate.render({
+	   	    let annualVerificationExpirationDate = laydate.render({
 		        elem: '#annualVerificationExpirationDate',
-		        type:'month',
+				type:'month',
 		        done: (value) => {
 		          this.detection.annualVerificationExpirationDate = value
 		        }
@@ -571,18 +571,28 @@ window.layinit(function (htConfig) {
 	                	if (data.code == "0000"){
 	                	// alert(JSON.stringify(data));
 	                	vm.processId=data.data.processId;
-	                	vm.carBasic=data.data.carBasic;
+						vm.carBasic=data.data.carBasic;
+						// vm.carBasic.lastTransferDate = moment(vm.carBasic.lastTransferDate).format("YYYY-MM-DD")
 	                	vm.business=data.data.business;
-	                	vm.drag=data.data.drag;
-	                	vm.detection=data.data.detection;
-	                	vm.mortgageDetection=data.data.mortgageDetection;
+						vm.drag=data.data.drag;
+						vm.drag.dragDate = moment(vm.drag.dragDate).format("YYYY年MM月DD日")
+						vm.detection=data.data.detection;
+						vm.detection.createTime = moment(vm.detection.createTime).format("YYYY年MM月DD日")
+						vm.detection.vehicleLicenseRegistrationDate=moment(vm.detection.vehicleLicenseRegistrationDate).format("YYYY年MM月DD日")
+						// vm.detection.annualVerificationExpirationDate=moment(vm.detection.annualVerificationExpirationDate).format("YYYY年MM月DD日")
+						vm.detection.insuranceExpirationDate = moment(vm.detection.insuranceExpirationDate).format("YYYY-MM-DD")
+						vm.mortgageDetection=data.data.mortgageDetection;
+						vm.mortgageDetection.createTime = moment(vm.mortgageDetection.createTime).format("YYYY年MM月DD日")
 	                	if(data.data.repayPlan!=null&&data.data.repayPlan!=''){
-	                		vm.repayPlan=data.data.repayPlan;
+							vm.repayPlan=data.data.repayPlan;
+							
+							vm.repayPlan.lastPayDate = moment(vm.repayPlan.lastPayDate).format("YYYY年MM月DD日")
 	                	}
 	                	if(vm.repayPlan.payedPrincipal==null||vm.repayPlan.payedPrincipal==''){
-	                		vm.repayPlan.payedPrincipal=0;
+							vm.repayPlan.payedPrincipal=0;
 	                	}
 	                	vm.outputRecord=data.data.outputRecord;
+						vm.outputRecord.factOutputDate = moment(vm.outputRecord.factOutputDate).format("YYYY年MM月DD日")
 	                	if(data.data.detection.evaluationAmount==null||data.data.detection.evaluationAmount==''){
 	                		vm.carBasic.differAmount=0;
 	                	}else{
