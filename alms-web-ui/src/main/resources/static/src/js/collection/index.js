@@ -262,7 +262,7 @@ window.layinit(function(htConfig){
                     fixed: 'left'
                 },{
                     field: 'businessId',
-                    width:190,
+                    width:200,
                     title: '业务编号'
                 }, {
                     field: 'afterId',
