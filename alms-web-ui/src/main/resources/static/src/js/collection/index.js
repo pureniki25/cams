@@ -262,7 +262,7 @@ window.layinit(function(htConfig){
                     fixed: 'left'
                 },{
                     field: 'businessId',
-                    width:165,
+                    width:190,
                     title: '业务编号'
                 }, {
                     field: 'afterId',
@@ -274,11 +274,11 @@ window.layinit(function(htConfig){
                     title: '区域'
                 }, {
                     field: 'companyName',
-                    width:90,
+                    width:100,
                     title: '分公司'
                 }, {
                     field: 'operatorName',
-                    width:100,
+                    width:90,
                     title: '业务获取'
                 }, {
                     field: 'customerName',
@@ -295,7 +295,7 @@ window.layinit(function(htConfig){
                     align: 'right'
                 }, {
                     field: 'totalBorrowAmount',
-                    width:150,
+                    width:90,
                     title: '应还金额',
                     align: 'right',
                     templet:function(d){
@@ -320,16 +320,16 @@ window.layinit(function(htConfig){
                 }, {
 
                     field: 'delayDays',
-                    width:60,
+                    width:65,
                     title: '逾期'
                 }, {
 
                     field: 'dueDate',
-                    width:110,
+                    width:105,
                     title: '应还日期'
                 }, {
                     field: 'repaymentDate',
-                    width:110,
+                    width:105,
                     title: '实还日期'
                 }, {
                     field: 'phoneStaffName',
@@ -352,7 +352,7 @@ window.layinit(function(htConfig){
                 },{
                     fixed: 'right',
                     title: '操作',
-                    width: 178,
+                    width: 120,
                     align: 'left',
                     toolbar: '#barTools'
                 }
