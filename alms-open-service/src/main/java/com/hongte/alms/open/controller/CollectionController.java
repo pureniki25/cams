@@ -89,8 +89,10 @@ public class  CollectionController {
 		Boolean retBl = carBasicService.updateCarStatusToSettled(businessId);
 
 		if(bl && retBl){
+			logger.info("信贷确认结清调用  更新成功 ，businessId:"+businessId);
 			return Result.success(businessId);
 		}else{
+			logger.info("信贷确认结清调用  失败 ，businessId:"+businessId);
 			return Result.error("500", "数据更新失败");
 		}
 
