@@ -148,7 +148,7 @@ window.layinit(function (htConfig) {
 
                 {
                     field: 'businessId',
-                    width:165,
+                    width:200,
                     title: '业务编号',
                     align:'center'
                 }, {

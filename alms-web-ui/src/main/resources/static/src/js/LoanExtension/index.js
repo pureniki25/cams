@@ -119,7 +119,7 @@ window.layinit(function (htConfig) {
         ,cols: [[
             {
                 field:'id',
-                width:180,
+                width:200,
                 title:'展期编号'
             },{
                 field:'customer',
@@ -140,11 +140,17 @@ window.layinit(function (htConfig) {
             },{
                 field:'repayAmount',
                 title:'已还本金',
-                align: 'right'
+                align: 'right',
+                templet:function(d){
+                    return Number(d.repayAmount).toFixed(2)
+                }
             },{
                 field:'extensionAmount',
                 title:'展期金额',
-                align: 'right'
+                align: 'right',
+                templet:function(d){
+                    return Number(d.extensionAmount).toFixed(2)
+                }
             },{
                 field:'extensionTerm',
                 title:'展期期限'
