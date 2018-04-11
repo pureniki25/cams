@@ -149,43 +149,63 @@ window.layinit(function (htConfig) {
                 {
                     field: 'businessId',
                     width:165,
-                    title: '业务编号'
+                    title: '业务编号',
+                    align:'center'
                 }, {
                     field: 'periods',
-                    title: '期数'
+                    title: '期数',
+                    align:'center'
                 },{
                     field: 'customerName',
-                    title: '客户名称'
+                    title: '客户名称',
+                    align:'center'
                 }, {
                     field: 'businessTypeName',
-                    title: '业务类型'
+                    title: '业务类型',
+                    align:'center'
                 }, {
                     field: 'districtAreaName',
-                    title: '区域'
+                    title: '区域',
+                    align:'center'
                 }, {
                     field: 'companyName',
-                    title: '分公司'
+                    title: '分公司',
+                    align:'center'
                 },{
                     field: 'createrName',
-                    title: '发起减免人'
+                    title: '发起减免人',
+                    align:'center'
                 },{
                     field: 'derateTypeName',
-                    title: '减免费用项名称'
+                    title: '减免费用项名称',
+                    align:'center'
                 },{
                     field: 'showPayMoney',
                     title: '应收金额',
-                    align: 'right'
+                    align: 'right',
+                    templet:function(d){
+                        return Number(d.showPayMoney).toFixed(2)
+                    }
                 },{
                     field: 'derateMoney',
                     title: '减免金额',
-                    align: 'right'
+                    align: 'right',
+                    templet:function(d){
+                        return Number(d.derateMoney).toFixed(2)
+                    }
                 },{
                     field: 'realPayMoney',
                     title: '实收金额',
-                    align: 'right'
+                    align: 'right',
+                    templet:function(d){
+                        return Number(d.realPayMoney).toFixed(2)
+                    }
                 },{
                     field: 'derateTime',
-                    title: '减免时间'
+                    title: '减免时间',
+                    templet:function(d){
+                        return moment(d.derateTime).format("YYYY年MM月DD日")
+                    }
                 }/* {
                         fixed: 'right',
                         title: '操作',

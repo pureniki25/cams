@@ -267,7 +267,7 @@ window.layinit(function (htConfig) {
                 		 title:'车辆拍卖信息登记',
                          type: 2,
                          content: '/assets/car/auctionReg?regId='+obj.data.regId,
-                         area: ['40%', '100%']
+                         area: ['40%', '60%']
                      });
                 }
             });
