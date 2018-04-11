@@ -39,7 +39,7 @@ import io.swagger.annotations.Api;
 @RestController
 @RequestMapping(value = "/collection", method = RequestMethod.POST)
 @Api(value = "collection", description = "贷后系统  催收 对外接口")
-public class CollectionController {
+public class  CollectionController {
 	
 	private Logger logger = LoggerFactory.getLogger(CollectionController.class);
 	
@@ -68,7 +68,7 @@ public class CollectionController {
 		if (businessId==null||businessId.equals("")) {
 			return Result.error("500", "businessId 不能为空");
 		}
-		logger.info("businessId:"+businessId);
+		logger.info("信贷确认结清调用 ，businessId:"+businessId);
 
 //		String businessId,
 //		String crpId,
