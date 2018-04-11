@@ -87,8 +87,6 @@
 
     var methods = {
         _init: function(options, popover, e) {
-           
-
             //Theme modifiers
             if(typeof(options.backgroundColor) !== 'undefined'){
                 Popover.setBackgroundColor(options.backgroundColor);
@@ -152,29 +150,11 @@
                 var json = (tableid && layui.table && layui.table.cache && layui.table.cache[tableid][index]) || {};
                 var contents = options.onBefore(json);
                 if (contents) {
-                    //当前允许的权限按钮，如果非空，则做权限控制 ***lhf 20180306
-                    if(options.buttonCodeList&&$.isArray(options.buttonCodeList))
-                    {
-                        var passCodeInfo={};
-                        $(options.buttonCodeList).each(function (ind,item) {
-                            passCodeInfo[item]=1;
-                        });
-                        var newContenList=[];
-                        $(contents).each(function (ind,item) {
-                            if(passCodeInfo[item.code])
-                            {
-                                newContenList.add(item);
-                            }
-                        });
-                        contents=newContenList;
-                    }
                     options.contents = contents
                 }
             }
-            // 李钊鸿添加了data-id 和 Popover.__ID__，为每个绑定的元素添加唯一值。
-            e.attr("data-id", Popover.__ID__);
-            Popover.addMenu(Popover.__ID__, options.title, options.contents, options.tableid);
-            Popover.__ID__++;
+
+            Popover.addMenu(options.id, options.title, options.contents, options.tableid);
         },
         _popoverInit: function(options) {
             var popover = new Popover(this.selector);
@@ -262,11 +242,7 @@ function Popover(popoverListener) {
     var listenerElements = $(popoverListener);
     listenerElements.addClass(this.popoverListenerID);
     listenerElements.css("cursor", "pointer");
-    // Lee
-    listenerElements.unbind('click');
     listenerElements.click(function (e) {
-        console.log(popoverListener);
-        // debugger;
         thisPopover.toggleVisible(e, $(this));
         $(document).trigger("popover.listenerClicked");
     });
@@ -298,7 +274,6 @@ Popover.prototype.appendChild = function(){
     $("#popoverContent")[0].appendChild(child);
 };
 
-// main
 Popover.prototype.toggleVisible = function (e, clicked) {
     Popover.lastPopoverClicked = this;
     var clickedDiv = $(clicked);
@@ -318,17 +293,15 @@ Popover.prototype.toggleVisible = function (e, clicked) {
     }
 
     //TODO: In the future, add passed id to selected div's data-* or add specific class.
-    var id = clickedDiv.attr("data-id");
+    var id = clickedDiv.attr("id");
     var identifierList = clickedDiv.attr('class').split(/\s+/);
 
     //NOTE: identifierList contains the clicked element's id and class names. This is used to find its
     //      associated menu. The next version will have a specialized field to indicate this.
-    // 4444444444444444444
     identifierList.push(id);
     //console.log("List: "+identifierList);
 
     //TODO: Fix repetition.
-    // Lee TODO
     if ($("#popover").is(":visible") && Popover.lastElementClick) {
         if (clickedDiv.is("#" + Popover.lastElementClick)) {
             console.log("Clicked on same element!");
@@ -630,21 +603,14 @@ Popover.setTitle = function (t) {
 // Returns: Popover menu object if found, null if not.
 // Arguments:   id - id of menu to lookup
 Popover.getMenu = function (id) {
-
     //Searches for a popover data object by the id passed, returns data object if found.
     var i;
-    console.log(333333333333333, Popover.menus, id);
-    for (var i = Popover.menus.length - 1; i >= 0; i--) {
-         if (Popover.menus[i].id == id) {
+    for (i = 0; i < Popover.menus.length; i += 1) {
+        // console.log("LOG: getMenu - Popover.menus["+i+"]: "+Popover.menus[i].id);
+        if (Popover.menus[i].id === id) {
             return Popover.menus[i];
         }
     }
-    // for (i = 0; i < Popover.menus.length; i += 1) {
-    //     // console.log("LOG: getMenu - Popover.menus["+i+"]: "+Popover.menus[i].id);
-    //     if (Popover.menus[i].id === id) {
-    //         return Popover.menus[i];
-    //     }
-    // }
 
     //Null result returned if popover data object is not found.
     //console.log("LOG: getMenu - No data found, returning null.");
@@ -652,12 +618,10 @@ Popover.getMenu = function (id) {
 };
 
 Popover.addMenu = function (id, title, contents, tableid) {
-    // Popover.menus = []
     // 李钊鸿再此修改
     Popover.menus.push({'id': id, 'title': title, 'contents': contents, 'tableid': tableid});
 };
 
-// setData?
 Popover.prototype.populateByMenu = function(menu){
     $(document).trigger('popover.populating');
 
@@ -675,6 +639,7 @@ Popover.prototype.populateByMenu = function(menu){
     }
 
     var popoverDisplay = $("#popover").css("display");
+
     if(!this.isDataKept || !this.hasBeenOpened)this.setData(menu);
 
     this.currentContentHeight = Popover.getPopoverContentHeight();
@@ -695,19 +660,13 @@ Popover.prototype.populate = function(identifierList){
     //console.log(identifierList);
     var newMenu = null;
     var i=0;
-
-    // 李钊鸿修改为只用id·
-    var id = identifierList[identifierList.length - 1]
-    // console.log(22222222222222222,identifierList)
-    // for(i; i<identifierList.length; i++){
-    //     newMenu = Popover.getMenu(identifierList[i]);
-    //     if(newMenu){
-    //         //console.log("Found menu! id: "+identifierList[i]);
-    //         break;
-    //     }
-    // }
-    // newMenu = Popover.getMenu(identifierList[i]);
-    newMenu = Popover.getMenu(id);
+    for(i; i<identifierList.length; i++){
+        newMenu = Popover.getMenu(identifierList[i]);
+        if(newMenu){
+            //console.log("Found menu! id: "+identifierList[i]);
+            break;
+        }
+    }
 
     if (!newMenu) {
         console.log("ID not found.");
@@ -811,7 +770,6 @@ Popover.isLocked = false;
 Popover.above = false;
 Popover.caretLeftOffset = "50%";
 Popover.lastPopoverClicked = null;
-Popover.__ID__ = 0;
 
 /**     STATIC FUNCTIONS     **/
 Popover.setBackgroundColor = function(color){
@@ -864,13 +822,16 @@ OptionsPopover.hasRun = false;
 //Run-once function for listeners
 OptionsPopover.prototype.init = function(){
     $(document)
-        .on('touchstart mousedown', '#popover a', function () {
+        .on('touchstart mousedown', '#popover a',
+        function () {
             $(this).css({backgroundColor: "#488FCD"});
         })
-        .on('touchend mouseup mouseout', '#popover a', function () {
+        .on('touchend mouseup mouseout', '#popover a',
+        function () {
             $(this).css({backgroundColor: ""});
         })
-        .on('click', '.popoverContentRow', function () {
+        .on('click', '.popoverContentRow',
+        function () {
             var newId = [];
             newId.push($(this).attr('id'));
 
@@ -937,6 +898,7 @@ OptionsPopover.prototype.setData = function (data) {
 
         $mydom.append($a);
     }
+
     Popover.setAction(data.id);
     Popover.setTitle(data.title);
     Popover.setContent($mydom);
