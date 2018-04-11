@@ -49,7 +49,7 @@
                             <i-input :value.sync="schForm.title" v-model="schForm.title"></i-input>
                         </form-item>
                         <form-item label="发布时间">
-                            <Date-picker type="daterange" placeholder="时间范围" :value.sync="schForm.date" v-model="schForm.date"  ></Date-picker>
+                            <Date-picker type="daterange" placeholder="时间范围" :value.sync="schForm.date" v-model="schForm.date"></Date-picker>
                         </form-item>
                         <i-button @click="search">查询</i-button>
                     </i-form>
@@ -57,7 +57,8 @@
             </row>
             <row>
                 <i-col>
-                    <i-button @click="openEditorModal('add')">新增</i-button>
+                    <button class="layui-btn layui-btn-sm" @click="openEditorModal('add')">新增</button>
+                    <!-- <i-button @click="openEditorModal('add')">新增</i-button> -->
                 </i-col>
             </row>
 
@@ -110,7 +111,7 @@
                         <form-item label="公告范围" prop="orgCode">
                             <i-select :model.sync="editForm.orgCode" v-model="editForm.orgCode" style="width:10rem" multiple filterable>
                                 <i-option value="鸿特信息">鸿特信息</i-option>
-                              <i-option v-for="item in deptIds" :value="item.orgCode" >{{item.orgNameCn}}</i-option>
+                                <i-option v-for="item in deptIds" :value="item.orgCode">{{item.orgNameCn}}</i-option>
                             </i-select>
                         </form-item>
                     </i-col>
@@ -143,7 +144,8 @@
                 <card>
                     <p slot="title" style="height:2rem;line-height:2rem">
                         <span>附件信息</span>
-                        <i-button style="float:right" size="small" @click="addUploadItem">新增附件</i-button>
+                        <button class="layui-btn layui-btn-sm" style="float:right" @click="addUploadItem">新增附件</button>
+                        <!-- <i-button style="float:right" size="small" @click="addUploadItem">新增附件</i-button> -->
                     </p>
                     <row v-for="item in editForm.attachment">
                         <i-col span="4">附件{{item.id}}</i-col>

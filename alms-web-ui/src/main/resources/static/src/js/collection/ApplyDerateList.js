@@ -173,13 +173,16 @@ window.layinit(function (htConfig) {
                     title: '减免费用项名称'
                 },{
                     field: 'showPayMoney',
-                    title: '应收金额'
+                    title: '应收金额',
+                    align: 'right'
                 },{
                     field: 'derateMoney',
-                    title: '减免金额'
+                    title: '减免金额',
+                    align: 'right'
                 },{
                     field: 'realPayMoney',
-                    title: '实收金额'
+                    title: '实收金额',
+                    align: 'right'
                 },{
                     field: 'derateTime',
                     title: '减免时间'

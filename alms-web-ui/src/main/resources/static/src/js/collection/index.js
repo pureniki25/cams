@@ -45,7 +45,6 @@ window.layinit(function(htConfig){
     vm = new Vue({
         el: '#app',
         data: {
-            buttons:[],
             loading: false,
             saving:false, //存储标志位
             exporting:false,//导出标志位
@@ -246,7 +245,7 @@ window.layinit(function(htConfig){
         // });
     }
 
-    //var   buttons = [];
+
     layui.use(['layer', 'table','ht_ajax', 'ht_auth', 'ht_config'], function () {
         layer = layui.layer;
         table = layui.table;
@@ -292,18 +291,21 @@ window.layinit(function(htConfig){
                 }, {
                     field: 'borrowMoney',
                     width:90,
-                    title: '借款金额'
+                    title: '借款金额',
+                    align: 'right'
                 }, {
                     field: 'totalBorrowAmount',
-                    width:180,
+                    width:150,
                     title: '应还金额',
+                    align: 'right',
                     templet:function(d){
                         let styel = 'background-color: #CCCC00;background-image: none !important;text-shadow: none !important;display: inline-block;padding: 2px 4px;font-size: 11.844px;font-weight: bold;line-height: 14px;color: #fff;text-shadow: 0 -1px 0 rgba(0,0,0,0.25);white-space: nowrap;vertical-align: baseline;'
                         res = '' 
                         let firstPeriod = '<span style="'+styel+'">首期</span>' 
                         let benjinPeriod = '<span style="'+styel+'">本金期</span>' 
                         let lastPeriod = '<span style="'+styel+'">末期</span>' 
-                        if(d.periods==1){
+                        let isZQ = d.afterId.indexOf('ZQ')>-1?true:false;
+                        if(d.periods==1&&!isZQ){
                             res+=firstPeriod
                         }
                         if(d.repaymentTypeId==2&&d.borrowLimit==d.periods){
@@ -544,6 +546,17 @@ window.layinit(function(htConfig){
                         }
                         return buttons;
 
+                    {"name": "移交诉讼系统", click: function (e, currentItem) {
+//                            	 var url = '/transferOfLitigation/carLoan?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+"&processStatus=-1"
+                        var url = ''
+                        if(currentItem.businessTypeId == 1 || currentItem.businessTypeId == 9){
+                            url = '/transferOfLitigation/carLoan?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+"&processStatus=-1";
+                        }else if(currentItem.businessTypeId == 2 || currentItem.businessTypeId == 11){
+                            url = '/transferOfLitigation/houseLoan?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+"&processStatus=-1";
+                        }
+                        showOneLineOprLayer(url,"移交诉讼系统")
+                    }}
+                ];*/
 
                     },
                     // contents: buttons,

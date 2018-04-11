@@ -573,16 +573,20 @@ window.layinit(function (htConfig) {
 	                	vm.processId=data.data.processId;
 	                	vm.carBasic=data.data.carBasic;
 	                	vm.business=data.data.business;
-	                	vm.drag=data.data.drag;
+						vm.drag=data.data.drag;
+						vm.drag.dragDate = moment(vm.drag.dragDate).format("YYYY年MM月DD日")
 	                	vm.detection=data.data.detection;
 	                	vm.mortgageDetection=data.data.mortgageDetection;
 	                	if(data.data.repayPlan!=null&&data.data.repayPlan!=''){
-	                		vm.repayPlan=data.data.repayPlan;
+							vm.repayPlan=data.data.repayPlan;
+							
+							vm.repayPlan.lastPayDate = moment(vm.repayPlan.lastPayDate).format("YYYY年MM月DD日")
 	                	}
 	                	if(vm.repayPlan.payedPrincipal==null||vm.repayPlan.payedPrincipal==''){
-	                		vm.repayPlan.payedPrincipal=0;
+							vm.repayPlan.payedPrincipal=0;
 	                	}
 	                	vm.outputRecord=data.data.outputRecord;
+						vm.outputRecord.factOutputDate = moment(vm.outputRecord.factOutputDate).format("YYYY年MM月DD日")
 	                	if(data.data.detection.evaluationAmount==null||data.data.detection.evaluationAmount==''){
 	                		vm.carBasic.differAmount=0;
 	                	}else{
