@@ -2,6 +2,34 @@ package com.hongte.alms.core.controller;
 
 
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.poi.ss.usermodel.Workbook;
+import org.jeecgframework.poi.excel.ExcelExportUtil;
+import org.jeecgframework.poi.excel.entity.ExportParams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
@@ -10,7 +38,11 @@ import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
 import com.hongte.alms.base.collection.enums.StaffPersonType;
 import com.hongte.alms.base.collection.service.CollectionLogService;
 import com.hongte.alms.base.collection.service.CollectionStatusService;
-import com.hongte.alms.base.collection.vo.*;
+import com.hongte.alms.base.collection.service.PhoneUrgeService;
+import com.hongte.alms.base.collection.vo.AfterLoanStandingBookReq;
+import com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo;
+import com.hongte.alms.base.collection.vo.StaffBusinessReq;
+import com.hongte.alms.base.collection.vo.StaffBusinessVo;
 import com.hongte.alms.base.entity.BasicBusinessType;
 import com.hongte.alms.base.entity.BasicCompany;
 import com.hongte.alms.base.entity.SysParameter;
@@ -20,35 +52,20 @@ import com.hongte.alms.base.enums.SysParameterTypeEnums;
 import com.hongte.alms.base.enums.SysRoleEnums;
 import com.hongte.alms.base.service.BasicBusinessTypeService;
 import com.hongte.alms.base.service.BasicCompanyService;
-import com.hongte.alms.base.collection.service.PhoneUrgeService;
 import com.hongte.alms.base.service.SysParameterService;
 import com.hongte.alms.base.service.SysUserService;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
 import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.EasyPoiExcelExportUtil;
 import com.hongte.alms.common.util.JsonUtil;
+import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.core.storage.StorageService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.poi.ss.usermodel.Workbook;
-
-import org.jeecgframework.poi.excel.ExcelExportUtil;
-import org.jeecgframework.poi.excel.entity.ExportParams;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.util.*;
 
 /*
  * <p>
@@ -159,9 +176,29 @@ public class CollectionController {
 
         try{
             System.out.println(JSON.toJSONString(req));
+			if (req.getShowRepayDateBegin() == null && req.getShowRepayDateEnd() == null 
+					&& req.getDelayDaysEnd() == null
+					&& req.getRealRepayDateBegin() == null && req.getRealRepayDateEnd() == null
+					&& req.getCollectLevel() == null && StringUtil.isEmpty(req.getBusinessId())) {
+				Date nowDate = new Date();
+				req.setShowRepayDateBegin(DateUtil.addDay2Date(-93, nowDate));
+				req.setShowRepayDateEnd(nowDate);
+			}
+			if (req.getShowRepayDateBegin() != null && req.getShowRepayDateEnd() != null
+					&& DateUtil.getDiffDays(req.getShowRepayDateBegin(), req.getShowRepayDateEnd()) > 93) {
+				return PageResult.error(500, "应还日期选择范围不能超过93天！");
+			}
+			if (req.getRealRepayDateBegin() != null && req.getRealRepayDateEnd() != null
+					&& DateUtil.getDiffDays(req.getRealRepayDateBegin(), req.getRealRepayDateEnd()) > 93) {
+				return PageResult.error(500, "实还日期选择范围不能超过93天！");
+			}
             if(req.getRepayStatus()!=null&&req.getRepayStatus().equals(""))req.setRepayStatus(null);
+            
+            long startTime = System.currentTimeMillis();
             Page<AfterLoanStandingBookVo> pages = phoneUrgeService.selectAfterLoanStandingBookPage(req);
 //            System.out.println(JSON.toJSONString(pages));
+            long end = System.currentTimeMillis();
+            System.out.println(end - startTime);
             return PageResult.success(pages.getRecords(),pages.getTotal());
         }catch (Exception ex){
             logger.error(ex.getMessage());
