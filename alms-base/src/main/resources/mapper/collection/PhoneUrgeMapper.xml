@@ -67,7 +67,7 @@
         from tb_repayment_biz_plan_list  as pList
         LEFT JOIN tb_repayment_biz_plan as plan ON pList.plan_id = plan.plan_id
         LEFT JOIN tb_basic_business as business ON plan.original_business_id = business.business_id
-        LEFT JOIN tb_basic_company as company ON business.company_id = company.area_id
+--        LEFT JOIN tb_basic_company as company ON business.company_id = company.area_id
         LEFT JOIN tb_basic_business_type as  b_type ON business.business_type = b_type.business_type_id
         LEFT JOIN tb_collection_status as  col_status ON pList.plan_list_id = col_status.crp_id
           JOIN tb_sys_user_permission as permission  ON  permission.business_id = business.business_id
