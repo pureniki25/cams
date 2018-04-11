@@ -326,7 +326,7 @@
                         currentCitys7:[],
                         currentAreaId:""
                     },
-                index:'',
+                index:'0',
                 ruleValidate:validateOpt
             },
             computed: {},
@@ -497,6 +497,16 @@
                             curr: 1 //重新从第 1 页开始
                         }
                     });
+
+                    self.areaAndCity.currentSelectedCitys = [];
+                    self.areaAndCity.currentCitys1=[];
+                    self.areaAndCity.currentCitys2=[];
+                    self.areaAndCity.currentCitys3=[];
+                    self.areaAndCity.currentCitys4=[];
+                    self.areaAndCity.currentCitys5=[];
+                    self.areaAndCity.currentCitys6=[];
+                    self.areaAndCity.currentCitys7=[];
+
                 },
                 toLoadingTime: function () {
                     if (table == null) {
@@ -641,8 +651,6 @@
                     var treeData = self.areaAndCity.allAreas[0].children;// 下拉区域
 
                     self.getArea();
-                    console.log("========>>>>>>>>>>>>",areaId )
-                    self.getCompany();
                 },
                 saveBatchPerson:function () {
                     var self = this;
@@ -690,7 +698,13 @@
                         dataType: "json",
                         success: function (data) {
                             self.areaAndCity.allCitys = data.data;
-                            self.areaAndCity.currentSelectedCitys = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId
+                            var formDate = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId;
+                            for(var i=0;i<formDate.length;i++){
+                                var exit = self.areaAndCity.allCitys.indexOf(formDate[i]) != -1;
+                                if(exit){
+                                    self.areaAndCity.currentSelectedCitys.push(formDate[i]);
+                                }
+                            }
                         }
 
                     });
@@ -816,6 +830,13 @@
                         self.areaAndCity.currentCitys7 = [];
                         self.areaAndCity.currentCitys7 = data;
                     }
+                    console.log("第1组",self.areaAndCity.currentCitys1);
+                    console.log("第2组",self.areaAndCity.currentCitys2);
+                    console.log("第3组",self.areaAndCity.currentCitys3);
+                    console.log("第4组",self.areaAndCity.currentCitys4);
+                    console.log("第5组",self.areaAndCity.currentCitys5);
+                    console.log("第6组",self.areaAndCity.currentCitys6);
+                    console.log("第7组",self.areaAndCity.currentCitys7);
 
 
                 },
@@ -824,25 +845,47 @@
                     self.editCompanyCollectionAssignSet.editCompanyCollectionForm.areaName = self.areaAndCity.allSelectedAreas;
                     self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId=[];
                     for(var i=0;i<self.areaAndCity.currentCitys1.length;i++){
-                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys1[i]);
+                        var exit = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.indexOf(self.areaAndCity.currentCitys1[i]) != -1;
+                        if(!exit){
+                            self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys1[i]);
+                        }
+
                     }
                     for(var i=0;i<self.areaAndCity.currentCitys2.length;i++){
-                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys2[i]);
+                        var exit = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.indexOf(self.areaAndCity.currentCitys2[i]) != -1;
+                        if(!exit){
+                            self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys2[i]);
+                        }
                     }
                     for(var i=0;i<self.areaAndCity.currentCitys3.length;i++){
-                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys3[i]);
+                        var exit = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.indexOf(self.areaAndCity.currentCitys3[i]) != -1;
+                        if(!exit){
+                            self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys3[i]);
+                        }
                     }
                     for(var i=0;i<self.areaAndCity.currentCitys4.length;i++){
-                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys4[i]);
+                        var exit = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.indexOf(self.areaAndCity.currentCitys4[i]) != -1;
+                        if(!exit){
+                            self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys4[i]);
+                        }
                     }
                     for(var i=0;i<self.areaAndCity.currentCitys5.length;i++){
-                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys5[i]);
+                        var exit = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.indexOf(self.areaAndCity.currentCitys5[i]) != -1;
+                        if(!exit){
+                            self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys5[i]);
+                        }
                     }
                     for(var i=0;i<self.areaAndCity.currentCitys6.length;i++){
-                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys6[i]);
+                        var exit = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.indexOf(self.areaAndCity.currentCitys6[i]) != -1;
+                        if(!exit){
+                            self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys6[i]);
+                        }
                     }
                     for(var i=0;i<self.areaAndCity.currentCitys7.length;i++){
-                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys7[i]);
+                        var exit = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.indexOf(self.areaAndCity.currentCitys7[i]) != -1;
+                        if(!exit){
+                            self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys7[i]);
+                        }
                     }
 
                 },
