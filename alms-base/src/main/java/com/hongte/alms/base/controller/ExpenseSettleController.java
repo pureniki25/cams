@@ -160,9 +160,9 @@ public class ExpenseSettleController {
 		Date settelDate = DateUtil.getDate(preSettleDate, "yyyy-MM-dd");
 		BasicBusiness basicBusiness = basicBusinessService.selectById(businessId);
 		RepaymentBizPlan repaymentBizPlan = repaymentBizPlanService
-				.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("business_id", businessId));
+				.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("original_business_id", businessId));
 		List<RepaymentBizPlanList> planLists = repaymentBizPlanListService.selectList(
-				new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).orderBy("due_date"));
+				new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", businessId).orderBy("due_date"));
 		List<RepaymentBizPlanListDetail> details = repaymentBizPlanListDetailService.selectList(
 				new EntityWrapper<RepaymentBizPlanListDetail>().eq("business_id", businessId).orderBy("period"));
 
