@@ -156,14 +156,14 @@
                     @on-cancel="toLoading">
                 <i-form ref="editCompanyCollectionAssignSet.editCompanyCollectionForm" :model="editCompanyCollectionAssignSet.editCompanyCollectionForm"  :label-width="80"  >
                     <form-item label="区域：" prop="areaName">
-                        <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.areaName" disabled multiple clearable filterable style="width: 80%">
+                        <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.areaName"  multiple clearable filterable style="width: 80%">
                             <i-option v-for="item in editCompanyCollectionAssignSet.areaList" :value="item.areaId" :key="item.areaId">{{ item.areaName }}</i-option>
                         </i-select>
                         <i-span @click="selectArea">选择</i-span>
                     </form-item>
 
                     <form-item label="分公司："  prop="companyName">
-                        <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId" disabled multiple clearable filterable style="width: 80%" >
+                        <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId"  multiple clearable filterable style="width: 80%" >
                             <i-option v-for="item in editCompanyCollectionAssignSet.companyId" :value="item.areaId" :key="item.areaId">{{ item.areaName }}</i-option>
                         </i-select>
                     </form-item>
@@ -306,7 +306,8 @@
                         allAreas:[{
                             title: '鸿特信息咨询有限公司',
                             loading: false,
-                            children: []
+                            children: [],
+                            expand:true
                         }],
                         allCitys:[],
                         allSelectedAreas:[],

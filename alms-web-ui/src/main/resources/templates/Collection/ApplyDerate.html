@@ -184,7 +184,7 @@ color: #FF3030;
             </p>
             <!--申请信息表单内容-->
             <row :gutter="16">
-                <i-form ref="applyInfoForm"  :model="applyInfoForm"  :rules = "validApplyInfoForm"  label-position="right" :label-width="100">
+                <i-form ref="applyInfoForm"  :model="applyInfoForm"  :rules = "validApplyInfoForm"  label-position="right" :label-width="180">
                     <row :gutter="16">
                         <i-col span="10">
                             <form-item v-if="applyInfoFormEditFlage == true"  label="申请减免费用项：" prop="derateType" >

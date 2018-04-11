@@ -260,99 +260,99 @@ window.layinit(function(htConfig){
                 {
                     type: 'checkbox',
                     fixed: 'left'
-                }, {
+                },{
                     field: 'businessId',
-                    width: 165,
+                    width:190,
                     title: '业务编号'
                 }, {
                     field: 'afterId',
-                    width: 60,
+                    width:60,
                     title: '期数'
                 }, {
                     field: 'districtAreaName',
-                    width: 90,
+                    width:90,
                     title: '区域'
                 }, {
                     field: 'companyName',
-                    width: 90,
+                    width:100,
                     title: '分公司'
                 }, {
                     field: 'operatorName',
-                    width: 100,
+                    width:90,
                     title: '业务获取'
                 }, {
                     field: 'customerName',
-                    width: 90,
+                    width:90,
                     title: '客户名称'
                 }, {
                     field: 'businessTypeName',
-                    width: 90,
+                    width:90,
                     title: '业务类型'
                 }, {
                     field: 'borrowMoney',
-                    width: 90,
+                    width:90,
                     title: '借款金额',
                     align: 'right'
                 }, {
                     field: 'totalBorrowAmount',
-                    width: 150,
+                    width:90,
                     title: '应还金额',
                     align: 'right',
-                    templet: function (d) {
+                    templet:function(d){
                         let styel = 'background-color: #CCCC00;background-image: none !important;text-shadow: none !important;display: inline-block;padding: 2px 4px;font-size: 11.844px;font-weight: bold;line-height: 14px;color: #fff;text-shadow: 0 -1px 0 rgba(0,0,0,0.25);white-space: nowrap;vertical-align: baseline;'
-                        res = ''
-                        let firstPeriod = '<span style="' + styel + '">首期</span>'
-                        let benjinPeriod = '<span style="' + styel + '">本金期</span>'
-                        let lastPeriod = '<span style="' + styel + '">末期</span>'
-                        let isZQ = d.afterId.indexOf('ZQ') > -1 ? true : false;
-                        if (d.periods == 1 && !isZQ) {
-                            res += firstPeriod
+                        res = '' 
+                        let firstPeriod = '<span style="'+styel+'">首期</span>' 
+                        let benjinPeriod = '<span style="'+styel+'">本金期</span>' 
+                        let lastPeriod = '<span style="'+styel+'">末期</span>' 
+                        let isZQ = d.afterId.indexOf('ZQ')>-1?true:false;
+                        if(d.periods==1&&!isZQ){
+                            res+=firstPeriod
                         }
-                        if (d.repaymentTypeId == 2 && d.borrowLimit == d.periods) {
-                            res += benjinPeriod
+                        if(d.repaymentTypeId==2&&d.borrowLimit==d.periods){
+                            res+=benjinPeriod
                         }
-                        if (d.repaymentTypeId == 5 && d.borrowLimit == d.periods) {
-                            res += lastPeriod
+                        if(d.repaymentTypeId==5&&d.borrowLimit==d.periods){
+                            res+=lastPeriod
                         }
-                        res += d.totalBorrowAmount
-                        return res
+                        res += d.totalBorrowAmount 
+                        return res 
                     }
                 }, {
 
                     field: 'delayDays',
-                    width: 60,
+                    width:65,
                     title: '逾期'
                 }, {
 
                     field: 'dueDate',
-                    width: 110,
+                    width:105,
                     title: '应还日期'
                 }, {
                     field: 'repaymentDate',
-                    width: 110,
+                    width:105,
                     title: '实还日期'
                 }, {
                     field: 'phoneStaffName',
-                    width: 80,
+                    width:80,
                     title: '清算一'
                 }, {
                     field: 'visitStaffName',
-                    width: 80,
+                    width:80,
                     title: '清算二'
                 }, {
 
                     field: 'statusName',
-                    width: 90,
+                    width:90,
                     title: '还款状态'
-                }, {
+                },{
 
                     field: 'afterColStatusName',
-                    width: 90,
+                    width:90,
                     title: '业务状态'
-                }, {
+                },{
                     fixed: 'right',
                     title: '操作',
-                    width: 178,
+                    width: 120,
                     align: 'left',
                     toolbar: '#barTools'
                 }
@@ -362,20 +362,20 @@ window.layinit(function(htConfig){
             //request: {} //如果无需自定义请求参数，可不加该参数
             //response: {} //如果无需自定义数据响应名称，可不加该参数
             where: {
-                areaId: vm.searchForm.areaId,  //区域ID
-                companyId: vm.searchForm.companyId, //分公司ID
-                delayDaysBegin: vm.searchForm.delayDaysBegin,    //逾期天数 开始
-                delayDaysEnd: vm.searchForm.delayDaysEnd, //逾期天数 结束
-                collectLevel: vm.searchForm.collectLevel,  //催收级别
-                operatorName: vm.searchForm.operatorName,  //业务获取
-                businessId: vm.searchForm.businessId,  //业务编号
-                businessType: vm.searchForm.businessType,  //业务类型
-                liquidationOne: vm.searchForm.liquidationOne, //清算一
-                liquidationTow: vm.searchForm.liquidationTow,  //清算二
-                businessStatus: vm.searchForm.businessStatus,   //业务状态
-                repayStatus: vm.searchForm.repayStatus,      //还款状态
-                customerName: vm.searchForm.customerName,  //客户名称
-                peroidStatus: vm.searchForm.peroidStatus,  //期数状态
+                areaId:vm.searchForm.areaId,  //区域ID
+                companyId:vm.searchForm.companyId, //分公司ID
+                delayDaysBegin:vm.searchForm.delayDaysBegin,    //逾期天数 开始
+                delayDaysEnd:vm.searchForm.delayDaysEnd, //逾期天数 结束
+                collectLevel:vm.searchForm.collectLevel,  //催收级别
+                operatorName:vm.searchForm.operatorName,  //业务获取
+                businessId:vm.searchForm.businessId,  //业务编号
+                businessType:vm.searchForm.businessType,  //业务类型
+                liquidationOne:vm.searchForm.liquidationOne, //清算一
+                liquidationTow:vm.searchForm.liquidationTow,  //清算二
+                businessStatus:vm.searchForm.businessStatus,   //业务状态
+                repayStatus:vm.searchForm.repayStatus,      //还款状态
+                customerName:vm.searchForm.customerName,  //客户名称
+                peroidStatus:vm.searchForm.peroidStatus,  //期数状态
             },
             page: true,
             done: function (res, curr, count) {
