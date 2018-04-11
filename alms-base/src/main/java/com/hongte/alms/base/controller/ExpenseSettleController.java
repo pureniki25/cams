@@ -31,6 +31,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.BasicRepaymentType;
 import com.hongte.alms.base.entity.BizOutputRecord;
+import com.hongte.alms.base.entity.RenewalBusiness;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
@@ -39,6 +40,7 @@ import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.BasicRepaymentTypeService;
 import com.hongte.alms.base.service.BizOutputRecordService;
 import com.hongte.alms.base.service.ExpenseSettleService;
+import com.hongte.alms.base.service.RenewalBusinessService;
 import com.hongte.alms.base.service.RepaymentBizPlanListDetailService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.RepaymentBizPlanService;
@@ -73,6 +75,9 @@ public class ExpenseSettleController {
 	@Qualifier("BasicBusinessService")
 	BasicBusinessService basicBusinessService;
 
+	@Autowired
+	@Qualifier("RenewalBusinessService")
+	RenewalBusinessService renewalBusinessService ;
 	@Autowired
 	@Qualifier("BizOutputRecordService")
 	BizOutputRecordService bizOutputRecordService;
@@ -159,12 +164,17 @@ public class ExpenseSettleController {
 		ExpenseSettleVO expenseSettleVO = new ExpenseSettleVO();
 		Date settelDate = DateUtil.getDate(preSettleDate, "yyyy-MM-dd");
 		BasicBusiness basicBusiness = basicBusinessService.selectById(businessId);
+		List<Object> businessIds = renewalBusinessService.selectObjs(new EntityWrapper<RenewalBusiness>().eq("original_business_id", businessId).setSqlSelect("renewal_business_id")) ;
+		if (businessIds==null) {
+			businessIds = new ArrayList<>();
+		}
+		businessIds.add(businessId);
 		RepaymentBizPlan repaymentBizPlan = repaymentBizPlanService
-				.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("business_id", businessId));
+				.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("original_business_id", businessId));
 		List<RepaymentBizPlanList> planLists = repaymentBizPlanListService.selectList(
-				new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).orderBy("due_date"));
+				new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", businessId).orderBy("due_date"));
 		List<RepaymentBizPlanListDetail> details = repaymentBizPlanListDetailService.selectList(
-				new EntityWrapper<RepaymentBizPlanListDetail>().eq("business_id", businessId).orderBy("period"));
+				new EntityWrapper<RepaymentBizPlanListDetail>().in("business_id", businessIds).orderBy("period"));
 
 		if (basicBusiness.getRepaymentTypeId() == 2) {
 			expenseSettleVO = calXXHB(settelDate, basicBusiness, repaymentBizPlan, planLists, details);

@@ -153,22 +153,22 @@ color: #FF3030;
                         </div>
                         <div class="tr">
                             <div class="td"> <div class="td-box">{{baseInfoForm.borrowRateName}}</div><div class="td-box"> {{ baseInfoForm.borrowRateStr }} </div> </div>
-                            <div class="td"> <div class="td-box">借款金额：</div><div class="td-box">{{ baseInfoForm.borrowMoney }} </div> </div>
-                            <div class="td"> <div class="td-box">出款金额：</div><div class="td-box">{{ baseInfoForm.getMoney }} </div> </div>
+                            <div class="td"> <div class="td-box">借款金额：</div><div class="td-box">{{ Number(baseInfoForm.borrowMoney).toFixed(2) }} </div> </div>
+                            <div class="td"> <div class="td-box">出款金额：</div><div class="td-box">{{ Number(baseInfoForm.getMoney).toFixed(2)  }} </div> </div>
                         </div>
                         <div class="tr">
-                            <div class="td"> <div class="td-box">剩余本金：</div><div class="td-box">{{ baseInfoForm.remianderPrincipal }} </div> </div>
+                            <div class="td"> <div class="td-box">剩余本金：</div><div class="td-box">{{Number(baseInfoForm.remianderPrincipal).toFixed(2)  }} </div> </div>
                             <div class="td"> <div class="td-box">当前还款期数：</div><div class="td-box">{{ baseInfoForm.periods }} </div> </div>
                             <div class="td"> <div class="td-box">逾期天数：</div><div class="td-box">{{ baseInfoForm.delayDays }} </div> </div>
                         </div>
                         <div class="tr">
-                            <div class="td"> <div class="td-box">应付利息：</div><div class="td-box">{{ baseInfoForm.needPayInterest }} </div> </div>
-                            <div class="td"> <div class="td-box">应付本金：</div><div class="td-box">{{ baseInfoForm.needPayPrincipal }} </div> </div>
-                            <div class="td"> <div class="td-box">应付违约金：</div><div class="td-box">{{ baseInfoForm.needPayPenalty }} </div> </div>
+                            <div class="td"> <div class="td-box">应付利息：</div><div class="td-box">{{ Number(baseInfoForm.needPayInterest).toFixed(2)  }} </div> </div>
+                            <div class="td"> <div class="td-box">应付本金：</div><div class="td-box">{{ Number(baseInfoForm.needPayPrincipal).toFixed(2)  }} </div> </div>
+                            <div class="td"> <div class="td-box">应付违约金：</div><div class="td-box">{{ Number(baseInfoForm.needPayPenalty).toFixed(2) }} </div> </div>
                         </div>
                         <div class="tr">
-                            <div class="td"> <div class="td-box">应付其他费用：</div><div class="td-box">{{ baseInfoForm.otherPayAmount }} </div> </div>
-                            <div class="td"> <div class="td-box">应付总额：</div><div class="td-box">{{ baseInfoForm.totalBorrowAmount }} </div> </div>
+                            <div class="td"> <div class="td-box">应付其他费用：</div><div class="td-box">{{ Number(baseInfoForm.otherPayAmount).toFixed(2)}} </div> </div>
+                            <div class="td"> <div class="td-box">应付总额：</div><div class="td-box">{{ Number(baseInfoForm.totalBorrowAmount).toFixed(2)}} </div> </div>
                             <div class="td"> <div class="td-box">        </div><div class="td-box">              </div> </div>
                         </div>
                     </div>

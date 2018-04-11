@@ -183,8 +183,8 @@
                             </form-item>
                         </row>
                         <row style="padding: 10px">
-                            <form-item :label="staffType+'说明：'"   prop="discript">
-                                <i-input v-model="setPhoneUrgeForm.discript" type="textarea" :rows="4" placeholder="请填写分配说明"></i-input>
+                            <form-item :label="staffTypeLable+'说明：'"   prop="discript">
+                                <i-input v-model="setPhoneUrgeForm.discript" type="textarea" :rows="4" :placeholder="'请填写'+staffTypeLable+'说明'"></i-input>
                             </form-item>
                         </row>
 

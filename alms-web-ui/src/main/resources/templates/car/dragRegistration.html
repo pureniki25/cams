@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="zh-cn">
+
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <title>拖车登记</title>
     <script src="/properties/config.js"></script>
     <!-- 默认主题样式 -->
-    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css" />
     <!-- iview样式 -->
-    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
-
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css" />
+    <!-- 引入layui样式 -->
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all" />
     <!--表格样式-->
     <link rel="stylesheet" href="/Components/Table/Table.css">
 
@@ -33,148 +35,267 @@
     <script type="text/javascript" src="/plugins/fileUpload/jquery.iframe-transport.js"></script>
     <script type="text/javascript" src="/plugins/fileUpload/jquery.fileupload.js"></script>
 
+    <style type="text/css">
+        .layui-form-item {
+            border-bottom: 2px solid #DBDBDB;
+            /*下边框线*/
+        }
 
+        .layui-form-item .layui-form-label {
+            width: 30%
+        }
+
+        .layui-form-item .layui-input-block {
+            margin-left: 35%;
+            width: 60%;
+        }
+
+        .input-border-none {
+            border: none;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .input-border-input {
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .layui-row .grid-demo {
+            margin-left: 1%;
+            width: 90%;
+        }
+
+        .td_label {
+            font-weight: bolder;
+        }
+
+        .input_label {
+            color: #FF3030;
+        }
+
+        .selectFile {
+            padding: 4px 10px;
+            height: 20px;
+            line-height: 20px;
+            position: relative;
+            border: 1px solid #999;
+            text-decoration: none;
+            color: #666;
+        }
+
+        .uploadFile {
+            position: absolute;
+            overflow: hidden;
+            right: 0;
+            top: 0;
+            opacity: 0;
+        }
+    </style>
 </head>
+
 <body>
 
-<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
-<div id="app" v-cloak>
-    <Card>
-        <p slot="title">
-            业务基本信息
-        </p>
+    <!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+    <div id="app" v-cloak>
+        <Card>
+            <p slot="title">
+                业务基本信息
+            </p>
 
-        <!--业务基本信息-->
-        <row :gutter="16">
-            <i-form ref="baseInfoForm" :model="baseInfoForm" label-position="right" :label-width="100">
-                <div class="table">
-                    <div class="tr">
-                        <div class="td">
-                            <div class="td-box">业务编号</div>
-                            <div class="td-box">{{ baseInfoForm.businessId }}</div>
+            <!--业务基本信息-->
+            <row :gutter="16">
+                <i-form ref="baseInfoForm" :model="baseInfoForm" label-position="right" :label-width="100">
+                    <div class="table">
+                        <div class="tr">
+                            <div class="td">
+                                <div class="td-box">业务编号</div>
+                                <div class="td-box">{{ baseInfoForm.businessId }}</div>
+                            </div>
+                            <div class="td">
+                                <div class="td-box">客户姓名</div>
+                                <div class="td-box">{{ baseInfoForm.customerName }}</div>
+                            </div>
+                            <div class="td">
+                                <div class="td-box">借款金额</div>
+                                <div class="td-box">{{ baseInfoForm.borrowMoney }}</div>
+                            </div>
                         </div>
-                        <div class="td">
-                            <div class="td-box">客户姓名</div>
-                            <div class="td-box">{{ baseInfoForm.customerName }}</div>
+                        <div class="tr">
+                            <div class="td">
+                                <div class="td-box">借款期限</div>
+                                <div class="td-box">{{ baseInfoForm.borrowLimit }}{{ borrowLimitUnitHuman }}</div>
+                            </div>
+                            <div class="td">
+                                <div class="td-box">还款方式</div>
+                                <div class="td-box">{{ repaymentTypeHuman }}</div>
+                            </div>
+                            <div class="td">
+                                <div class="td-box">{{borrowRateUnitHuman}}</div>
+                                <div class="td-box">{{ baseInfoForm.borrowRate }}%</div>
+                            </div>
                         </div>
-                        <div class="td">
-                            <div class="td-box">借款金额</div>
-                            <div class="td-box">{{ baseInfoForm.borrowMoney }}</div>
+                        <div class="tr">
+                            <div class="td">
+                                <div class="td-box">车牌号</div>
+                                <div class="td-box"> {{ baseInfoForm.licensePlateNumber }}</div>
+                            </div>
+                            <div class="td">
+                                <div class="td-box">品牌型号</div>
+                                <div class="td-box">{{ baseInfoForm.model }}</div>
+                            </div>
+                            <div class="td">
+                                <div class="td-box">车架号</div>
+                                <div class="td-box">{{ baseInfoForm.vin }}</div>
+                            </div>
+                        </div>
+                        <div class="tr">
+                            <div class="td">
+                                <div class="td-box">评估时间</div>
+                                <div class="td-box">{{ baseInfoForm.evaluationTime }}</div>
+                            </div>
+                            <div class="td">
+                                <div class="td-box">车辆评估价值</div>
+                                <div class="td-box">{{ baseInfoForm.evaluationAmount }}</div>
+                            </div>
+                            <div class="td">
+                                <div class="td-box">评估人</div>
+                                <div class="td-box">{{ baseInfoForm.evaluationUser }}</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="tr">
-                        <div class="td">
-                            <div class="td-box">借款期限</div>
-                            <div class="td-box">{{ baseInfoForm.borrowLimit }}{{ borrowLimitUnitHuman }}</div>
-                        </div>
-                        <div class="td">
-                            <div class="td-box">还款方式</div>
-                            <div class="td-box">{{ repaymentTypeHuman }}</div>
-                        </div>
-                        <div class="td">
-                            <div class="td-box">{{borrowRateUnitHuman}}</div>
-                            <div class="td-box">{{ baseInfoForm.borrowRate }}%</div>
-                        </div>
-                    </div>
-                    <div class="tr">
-                        <div class="td">
-                            <div class="td-box">车牌号</div>
-                            <div class="td-box"> {{ baseInfoForm.licensePlateNumber }}</div>
-                        </div>
-                        <div class="td">
-                            <div class="td-box">品牌型号</div>
-                            <div class="td-box">{{ baseInfoForm.model }}</div>
-                        </div>
-                        <div class="td">
-                            <div class="td-box">车架号</div>
-                            <div class="td-box">{{ baseInfoForm.vin }}</div>
-                        </div>
-                    </div>
-                    <div class="tr">
-                        <div class="td">
-                            <div class="td-box">评估时间</div>
-                            <div class="td-box">{{ baseInfoForm.evaluationTime }}</div>
-                        </div>
-                        <div class="td">
-                            <div class="td-box">车辆评估价值</div>
-                            <div class="td-box">{{ baseInfoForm.evaluationAmount }}</div>
-                        </div>
-                        <div class="td">
-                            <div class="td-box">评估人</div>
-                            <div class="td-box">{{ baseInfoForm.evaluationUser }}</div>
-                        </div>
-                    </div>
-                </div>
-            </i-form>
-        </row>
-    </Card>
-    <Card>
-        <p slot="title">
-            登记信息
-        </p>
-        <!--登记信息表单内容-->
-        <row :gutter="16">
-            <i-form ref="registrationInfoForm"  :model="registrationInfoForm"  :rules="validateRegistrationInfoForm" label-position="right" :label-width="100">
-                <row :gutter="16">
-                    <i-col span="10">
-                        <form-item label="拖车日期：" prop="dragDate" >
-                            <date-picker type="date" editable="false" v-model='registrationInfoForm.dragDate' format="yyyy-MM-dd" :options="componentOption.dragDatePicker" placeholder="Select date"></date-picker>
-                        </form-item>
-                    </i-col>
-
-                </row>
-                <row :gutter="16">
-                    <i-col span="10">
-                        <form-item label="拖车经办人："   prop="dragHandler">
-                            <i-input v-model="registrationInfoForm.dragHandler" ></i-input>
-                        </form-item>
-                    </i-col>
-                </row>
-                <form-item label="拖车地点：">
-                    <row :gutter="9">
-                        <i-col span="4">
-                            <form-item  prop="dragArea">
-                                <cascader :data="componentOption.areaData" v-model="registrationInfoForm.dragArea"></cascader>
+                </i-form>
+            </row>
+        </Card>
+        <Card>
+            <p slot="title">
+                登记信息
+            </p>
+            <!--登记信息表单内容-->
+            <row :gutter="16">
+                <i-form ref="registrationInfoForm" :model="registrationInfoForm" :rules="validateRegistrationInfoForm" label-position="right"
+                    :label-width="100">
+                    <row :gutter="16">
+                        <i-col span="10">
+                            <form-item label="拖车日期：" prop="dragDate">
+                                <date-picker type="date" editable="false" v-model='registrationInfoForm.dragDate' format="yyyy-MM-dd" :options="componentOption.dragDatePicker"
+                                    placeholder="Select date"></date-picker>
                             </form-item>
                         </i-col>
-                        <i-col span="5">
-                            <form-item  prop="detailAddress">
-                                <i-input v-model="registrationInfoForm.detailAddress" placeholder="详细地址" ></i-input>
+
+                    </row>
+                    <row :gutter="16">
+                        <i-col span="10">
+                            <form-item label="拖车经办人：" prop="dragHandler">
+                                <i-input v-model="registrationInfoForm.dragHandler"></i-input>
                             </form-item>
                         </i-col>
                     </row>
-                </form-item>
+                    <form-item label="拖车地点：">
+                        <row :gutter="9">
+                            <i-col span="4">
+                                <form-item prop="dragArea">
+                                    <cascader :data="componentOption.areaData" v-model="registrationInfoForm.dragArea"></cascader>
+                                </form-item>
+                            </i-col>
+                            <i-col span="5">
+                                <form-item prop="detailAddress">
+                                    <i-input v-model="registrationInfoForm.detailAddress" placeholder="详细地址"></i-input>
+                                </form-item>
+                            </i-col>
+                        </row>
+                    </form-item>
 
-                <row :gutter="16">
-                    <i-col span="10">
-                        <form-item label="拖车费用："   prop="fee">
-                            <i-input v-model="registrationInfoForm.fee" ></i-input>
-                        </form-item>
-                    </i-col>
-                </row>
-                <row :gutter="16">
-                    <i-col span="10">
-                        <form-item label="其他费用："   prop="otherFee">
-                            <i-input v-model="registrationInfoForm.otherFee" ></i-input>
-                        </form-item>
-                    </i-col>
-                </row>
-                <row :gutter="16">
+                    <row :gutter="16">
+                        <i-col span="10">
+                            <form-item label="拖车费用：" prop="fee">
+                                <i-input v-model="registrationInfoForm.fee"></i-input>
+                            </form-item>
+                        </i-col>
+                    </row>
+                    <row :gutter="16">
+                        <i-col span="10">
+                            <form-item label="其他费用：" prop="otherFee">
+                                <i-input v-model="registrationInfoForm.otherFee"></i-input>
+                            </form-item>
+                        </i-col>
+                    </row>
+                    <row :gutter="16">
 
-                    <i-col span="10">
-                        <form-item   label="备注："   prop="remark"  >
-                            <i-input v-model="registrationInfoForm.remark" type="textarea" :rows="4" placeholder="" ></i-input>
-                        </form-item>
-                    </i-col>
-                </row>
-            </i-form>
-        </row>
-    </Card>
-    <Card>
-        <p slot="title">
-            附件信息
-        </p>
-        <i-form label-position="left" :label-width="100" inline >
+                        <i-col span="10">
+                            <form-item label="备注：" prop="remark">
+                                <i-input v-model="registrationInfoForm.remark" type="textarea" :rows="4" placeholder=""></i-input>
+                            </form-item>
+                        </i-col>
+                    </row>
+                </i-form>
+            </row>
+        </Card>
+        <Card>
+            <p slot="title">
+                附件信息
+            </p>
+            <div class="layui-row">
+                <div class="layui-col-xs6 layui-col-md12">
+                    <div class="grid-demo layui-bg-gray">
+                        <table class="layui-table" id="fTab">
+                            <tr>
+                                <td colspan="5">
+                                    <div class="progress" style="background-color: #E8E8E8">
+                                        <div class="bar" style="width: 0%;">0%</div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr v-for="(item, index) in files" v-if="item.status">
+                                <td class="td_label">附件{{index+1}}
+                                    <input type="text" hidden="" v-model="item.uploadResult.docId" :id="'docId'+index" />
+                                </td>
+                                <td>
+                                    <a href="javascript:;" class="selectFile">请选择
+                                        <input type="file" title="请选择" v-model="item.file" :id="'uploadfile'+index" v-on:click="uploadFile($event,index)" width="100px"
+                                            class="uploadFile" />
+
+                                    </a>{{item.name}}
+                                </td>
+                                <!-- <td v-else disabled>
+                                <a href="javascript:;" class="selectFile" disabled>请选择
+                                <input type="file" title="请选择" v-model="info.file" :id="'uploadfile'+index" v-on:click="uploadFile($event,index)" width="100px"
+                                    class="uploadFile" disabled/>
+                                    
+                                </a>{{info.name}}
+                            </td> -->
+                                <td class="td_label">重命名文件名称</td>
+                                <td>
+                                    <input type="text" name="lname" v-model="item.uploadRequest.newName" style="width: 100%" maxlength="100" :id="'uploadfileName'+index"
+                                    />
+                                </td>
+                                <td>
+                                    <td>
+                                        <div class="layui-btn-group">
+                                            <button class="layui-btn layui-btn-primary layui-btn-sm" v-on:click="addTabTr($event)">
+                                                <i class="layui-icon"></i>
+                                            </button>
+
+                                            <button class="layui-btn layui-btn-primary layui-btn-sm" v-on:click="removeTabTr($event, index)">
+                                                <i class="layui-icon"></i>
+                                            </button>
+                                            <!-- <a  class="layui-btn layui-btn-primary layui-btn-sm"  :href="downloadFile(info)" >下载</a> -->
+
+                                        </div>
+
+                                    </td>
+                                    <td v-else>
+                                        <div class="layui-btn-group">
+                                            <a class="layui-btn layui-btn-primary layui-btn-sm" :href="downloadFile(item)">下载</a>
+                                        </div>
+
+                                    </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- <i-form label-position="left" :label-width="100" inline >
             <row  :gutter="10" v-for="(item, index) in files" v-if="item.status">
                 <i-col  >
                     <form-item :label="'附件' +(index+1)" label-width="50" >
@@ -194,323 +315,451 @@
                 </i-col >
             </row>
 
-        </i-form>
-    </Card>
-    <row style="padding: 10px">
-        <i-col span="10">
-            <i-button type="success"  @click="saveRegistrationInfo('registrationInfoForm')" >保存</i-button>
-            <i-button type="warning"  @click="resetEdit()"  >撤销</i-button>
-        </i-col>
-    </row>
-</div>
-<script>
-    window.layinit(function (htConfig) {
-        var _htConfig = htConfig;
-        var basePath = _htConfig.coreBasePath;
+        </i-form> -->
+        </Card>
+        <row style="padding: 10px">
+            <i-col span="10">
+                <i-button type="success" @click="saveRegistrationInfo('registrationInfoForm')">保存</i-button>
+                <i-button type="warning" @click="resetEdit()">撤销</i-button>
+            </i-col>
+        </row>
+    </div>
+    <script>
+        window.layinit(function (htConfig) {
+            var _htConfig = htConfig;
+            var basePath = _htConfig.coreBasePath;
 
-        var vm = new Vue({
-            el: '#app',
-            data: {
-                baseInfoForm:
-                    {
-                        businessId: '',
-                        customerName: '',
-                        borrowMoney: 0,
-                        borrowLimit: 0,
-                        borrowLimitUnit: 0,
-                        repaymentTypeId: 0,
-                        borrowRate: 0,
-                        borrowRateUnit: 0,
-                        licensePlateNumber: '',
-                        model: '',
-                        vin: '',
-                        evaluationTime: '',
-                        evaluationAmount: 0,
-                        evaluationUser: '',
-                        currentUserName:''
-                    },
-                registrationInfoForm:
-                    {
-                        businessId:"",
-                        dragDate:new Date(),
-                        dragHandler: '',
-                        dragArea: '',
-                        province: '',
-                        city: '',
-                        county: '',
-                        detailAddress: '',
-                        fee: '',
-                        otherFee: '',
-                        remark: '',
-                        attachments:[]
-
-                    },
-                validateRegistrationInfoForm:
-                    {
-                        dragDate: [{required: true, message: '请填写拖车日期', trigger: 'blur', type: 'date'}],
-                        dragHandler: [{required: true, message: '请填写拖车经办人', trigger: 'blur'}, {
-                            min: 1,
-                            max: 20,
-                            message: '拖车经办人需要在20汉字以内',
-                            trigger: 'blur'
-                        }],
-                        dragArea: [{required: true, message: '请选择拖车地点'}],
-                        detailAddress: [{required: true, message: '请填写详细地址', trigger: 'blur'}, {
-                            min: 1,
-                            max: 100,
-                            message: '详细地址需要在100汉字以内',
-                            trigger: 'blur'
-                        }],
-                        fee: [{required: true, message: '请填写拖车费用', trigger: 'blur'}, {
-                            pattern: /^[0-9]+(.[0-9]{1,2})?$/,
-                            message: '请填写不超过两位小数的数字',
-                            trigger: 'blur'
-                        }],
-                        otherFee: [{pattern: /^[0-9]+(.[0-9]{1,2})?$/, message: '请填写不超过两位小数的数字', trigger: 'blur'}],
-                        remark: [{
-
-                            validator: function (rule, value, callback, source, options) {
-                                if (vm.registrationInfoForm.otherFee.length > 1000) {
-                                    callback(new Error('备注字数不能多于1000'));
-                                } else {
-                                    callback();//校验通过
-                                }
-
-                            }, trigger: 'blur'
-                        }]
-
-                    },
-                componentOption: {
-                    dragDatePicker:
+            var vm = new Vue({
+                el: '#app',
+                data: {
+                    baseInfoForm:
                         {
-                            disabledDate: function (date) {
-                                return date > new Date();
-                            },
+                            businessId: '',
+                            customerName: '',
+                            borrowMoney: 0,
+                            borrowLimit: 0,
+                            borrowLimitUnit: 0,
+                            repaymentTypeId: 0,
+                            borrowRate: 0,
+                            borrowRateUnit: 0,
+                            licensePlateNumber: '',
+                            model: '',
+                            vin: '',
+                            evaluationTime: '',
+                            evaluationAmount: 0,
+                            evaluationUser: '',
+                            currentUserName: ''
+                        },
+                    registrationInfoForm:
+                        {
+                            businessId: "",
+                            dragDate: new Date(),
+                            dragHandler: '',
+                            dragArea: '',
+                            province: '',
+                            city: '',
+                            county: '',
+                            detailAddress: '',
+                            fee: '',
+                            otherFee: '',
+                            remark: '',
+                            attachments: []
 
                         },
-                    areaData: []
-                },
-                files:[
-                    {
-                        status:1,
+                    validateRegistrationInfoForm:
+                        {
+                            dragDate: [{ required: true, message: '请填写拖车日期', trigger: 'blur', type: 'date' }],
+                            dragHandler: [{ required: true, message: '请填写拖车经办人', trigger: 'blur' }, {
+                                min: 1,
+                                max: 20,
+                                message: '拖车经办人需要在20汉字以内',
+                                trigger: 'blur'
+                            }],
+                            dragArea: [{ required: true, message: '请选择拖车地点' }],
+                            detailAddress: [{ required: true, message: '请填写详细地址', trigger: 'blur' }, {
+                                min: 1,
+                                max: 100,
+                                message: '详细地址需要在100汉字以内',
+                                trigger: 'blur'
+                            }],
+                            fee: [{ required: true, message: '请填写拖车费用', trigger: 'blur' }, {
+                                pattern: /^[0-9]+(.[0-9]{1,2})?$/,
+                                message: '请填写不超过两位小数的数字',
+                                trigger: 'blur'
+                            }],
+                            otherFee: [{ pattern: /^[0-9]+(.[0-9]{1,2})?$/, message: '请填写不超过两位小数的数字', trigger: 'blur' }],
+                            remark: [{
 
-                        uploadRequest:
-                            {
-                                newName:""
-                            },
-                        uploadResult:
-                            {
-                                isSuccess:false,
-                                docId:"",
-                                originalName:""
-                            }
-                    }
-
-                ]
-
-
-            },
-            computed: {
-
-                borrowLimitUnitHuman: function () {
-                    switch (this.baseInfoForm.borrowLimitUnit) {
-                        case 1:
-                            return '个月';
-                        case 2:
-                            return '天';
-                        default:
-                            return '';
-                    }
-                },
-                repaymentTypeHuman: function () {
-                    switch (this.baseInfoForm.repaymentTypeId) {
-                        case 1:
-                            return '到期本息';
-                        case 2:
-                            return '先息后本';
-                        case 5:
-                            return '等额本息';
-                        default:
-                            return '不等额本息';
-
-                    }
-                },
-                borrowRateUnitHuman: function () {
-                    switch (this.baseInfoForm.borrowRateUnit) {
-                        case 1:
-                            return '年利率';
-                        case 2:
-                            return '月利率';
-                        case 4:
-                            return '日利率';
-                        default:
-                            return ''
-                    }
-                }
-            },
-            methods: {
-                getQueryString: function (name) {
-                    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); // 匹配目标参数
-                    var result = window.location.search.substr(1).match(reg); // 对querystring匹配目标参数
-                    if (result != null) {
-                        return decodeURIComponent(result[2]);
-                    } else {
-                        return null;
-                    }
-                },
-                getCarDragRegistrationBusinessInfo: function (businessId) {
-                    var self = this;
-                    var reqStr = basePath + "car/getCarDragRegistrationBusinessInfo?businessId=" + businessId
-                    axios.get(reqStr)
-                        .then(function (result) {
-                            if (result.data.code == "1") {
-                                self.baseInfoForm = result.data.data;
-                                self.registrationInfoForm.dragHandler=self.baseInfoForm.currentUserName;
-                            } else {
-                                self.$Modal.error({content: '获取数据失败，消息：' + result.data.msg});
-                            }
-                        })
-                },
-                getArea: function () {
-                    var self = this;
-                    var reqStr = basePath + "area/getArea";
-                    axios.get(reqStr)
-                        .then(function (result) {
-                            if (result.data.code == "1") {
-                                self.componentOption.areaData = result.data.data;
-                            }
-                        })
-
-                },
-                saveRegistrationInfo: function (name) {
-                    var self = this;
-                    this.$refs[name].validate(function (isValid) {
-                        if (isValid) {
-                            for(var i=0;i<self.files.length;i++)
-                            {
-                               var item=self.files[i];
-                               if(item.status===1&&item.uploadResult.isSuccess)
-                               {
-                                   self.registrationInfoForm.attachments.push(
-                                       {
-                                           docId:item.uploadResult.docId,
-                                           newName:item.uploadRequest.newName
-                                       }
-                                   )
-                               }
-                            }
-                            self.registrationInfoForm.businessId=self.getQueryString("businessId");
-                            self.registrationInfoForm.province = self.registrationInfoForm.dragArea.length > 0 ? self.registrationInfoForm.dragArea[0] : '';
-                            self.registrationInfoForm.city = self.registrationInfoForm.dragArea.length > 1 ? self.registrationInfoForm.dragArea[1] : '';
-                            self.registrationInfoForm.county = self.registrationInfoForm.dragArea.length > 2 ? self.registrationInfoForm.dragArea[2] : '';
-                            axios.post(basePath + 'car/saveDragRegistrationInfo', self.registrationInfoForm)
-                                .then(function (result) {
-                                    if (result.data.code == "1") {
-                                        self.$Modal.success({
-                                            // title: title,
-                                            content: "保存成功"
-                                        });
+                                validator: function (rule, value, callback, source, options) {
+                                    if (vm.registrationInfoForm.otherFee.length > 1000) {
+                                        callback(new Error('备注字数不能多于1000'));
                                     } else {
-                                        self.$Modal.error({content: '操作失败，消息：' + result.data.msg});
+                                        callback();//校验通过
+                                    }
+
+                                }, trigger: 'blur'
+                            }]
+
+                        },
+                    componentOption: {
+                        dragDatePicker:
+                            {
+                                disabledDate: function (date) {
+                                    return date > new Date();
+                                },
+
+                            },
+                        areaData: []
+                    },
+                    files: [
+                        {
+                            status: 1,
+
+                            uploadRequest:
+                                {
+                                    newName: ""
+                                },
+                            uploadResult:
+                                {
+                                    isSuccess: false,
+                                    docId: "",
+                                    originalName: ""
+                                }
+                        }
+
+                    ]
+
+
+                },
+                computed: {
+
+                    borrowLimitUnitHuman: function () {
+                        switch (this.baseInfoForm.borrowLimitUnit) {
+                            case 1:
+                                return '个月';
+                            case 2:
+                                return '天';
+                            default:
+                                return '';
+                        }
+                    },
+                    repaymentTypeHuman: function () {
+                        switch (this.baseInfoForm.repaymentTypeId) {
+                            case 1:
+                                return '到期本息';
+                            case 2:
+                                return '先息后本';
+                            case 5:
+                                return '等额本息';
+                            default:
+                                return '不等额本息';
+
+                        }
+                    },
+                    borrowRateUnitHuman: function () {
+                        switch (this.baseInfoForm.borrowRateUnit) {
+                            case 1:
+                                return '年利率';
+                            case 2:
+                                return '月利率';
+                            case 4:
+                                return '日利率';
+                            default:
+                                return ''
+                        }
+                    }
+                },
+                methods: {
+                    getQueryString: function (name) {
+                        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); // 匹配目标参数
+                        var result = window.location.search.substr(1).match(reg); // 对querystring匹配目标参数
+                        if (result != null) {
+                            return decodeURIComponent(result[2]);
+                        } else {
+                            return null;
+                        }
+                    },
+                    getCarDragRegistrationBusinessInfo: function (businessId) {
+                        var self = this;
+                        var reqStr = basePath + "car/getCarDragRegistrationBusinessInfo?businessId=" + businessId
+                        axios.get(reqStr)
+                            .then(function (result) {
+                                if (result.data.code == "1") {
+                                    self.baseInfoForm = result.data.data;
+                                    self.registrationInfoForm.dragHandler = self.baseInfoForm.currentUserName;
+                                } else {
+                                    self.$Modal.error({ content: '获取数据失败，消息：' + result.data.msg });
+                                }
+                            })
+                    },
+                    getArea: function () {
+                        var self = this;
+                        var reqStr = basePath + "area/getArea";
+                        axios.get(reqStr)
+                            .then(function (result) {
+                                if (result.data.code == "1") {
+                                    self.componentOption.areaData = result.data.data;
+                                }
+                            })
+
+                    },
+                    saveRegistrationInfo: function (name) {
+                        var self = this;
+                        this.$refs[name].validate(function (isValid) {
+                            if (isValid) {
+                                for (var i = 0; i < self.files.length; i++) {
+                                    var item = self.files[i];
+                                    if (item.status === 1 && item.uploadResult.isSuccess) {
+                                        self.registrationInfoForm.attachments.push(
+                                            {
+                                                docId: item.uploadResult.docId,
+                                                newName: item.uploadRequest.newName
+                                            }
+                                        )
+                                    }
+                                }
+                                self.registrationInfoForm.businessId = self.getQueryString("businessId");
+                                self.registrationInfoForm.province = self.registrationInfoForm.dragArea.length > 0 ? self.registrationInfoForm.dragArea[0] : '';
+                                self.registrationInfoForm.city = self.registrationInfoForm.dragArea.length > 1 ? self.registrationInfoForm.dragArea[1] : '';
+                                self.registrationInfoForm.county = self.registrationInfoForm.dragArea.length > 2 ? self.registrationInfoForm.dragArea[2] : '';
+                                axios.post(basePath + 'car/saveDragRegistrationInfo', self.registrationInfoForm)
+                                    .then(function (result) {
+                                        if (result.data.code == "1") {
+                                            self.$Modal.success({
+                                                // title: title,
+                                                content: "保存成功"
+                                            });
+                                        } else {
+                                            self.$Modal.error({ content: '操作失败，消息：' + result.data.msg });
+                                        }
+                                    })
+                            }
+                        })
+                    },
+                    uploadFile: function (event, index) {
+                        var fileId = event.currentTarget.id;
+                        var self = this ;
+                        // alert(JSON.stringify($('#'+fileId)));
+                        $('.progress .bar').css({ 'background-color': '#E8E8E8' });
+                        $('.progress .bar').text('0%');
+                        $('#' + fileId).fileupload({
+                            dataType: 'json',
+                            singleFileUploads: true,
+                            acceptFileTypes: '', // Allowed file types
+                            url: basePath + 'doc/singleUpload',// 文件的后台接受地址
+                            maxNumberOfFiles: 1,// 最大上传文件数目
+                            maxFileSize: 10485760,// 文件不超过5M
+                            sequentialUploads: true,// 是否队列上传
+                            dataType: 'json',// 期望从服务器得到json类型的返回数据
+                            /*******************************************************
+                             * 设置进度条 progressall: function (e, data) { var progress =
+                             * parseInt(data.loaded / data.total * 100);
+                             * $('#progress .bar').css( 'width', progress + '%' ); },
+                             ******************************************************/
+                            // 进度条
+                            progressall: function (e, data) {
+
+                                var progress = parseInt(data.loaded / data.total * 100, 10);
+                                $('.progress .bar').css(
+                                    {
+                                        'width': progress + '%',
+                                        'background-color': '#7CCD7C',
+                                    }
+
+                                );
+                                $('.progress .bar').text(progress + '%');
+                            },
+                            done: function (e, data) {
+                                if (data._response.result.uploaded) {
+                                    var doc = JSON.parse(data._response.result.docItemListJson);
+
+                                    self.files[index].uploadResult.docId = doc.docId;
+                                    self.files[index].uploadResult.originalName = doc.originalName;
+                                    self.files[index].uploadRequest.newName = doc.originalName.slice(0, doc.originalName.lastIndexOf(".") - 1)
+                                    self.$set(self.files[index].uploadResult, 'isSuccess', true);
+                                }
+                                else {
+                                    self.files[index].isSuccess = false;
+                                    self.files[index].uploadResult.docId = "";
+                                    self.$Modal.error({ content: '上传失败，消息：' + data._response.result.message });
+                                }
+                                // alert(JSON.stringify(vm.returnRegFiles[0]));
+                                // $('#'+fileId).val(vm.returnRegFiles[0].file);
+                                $('.progress .bar').text("100%");
+                            },
+                            fail: function (event, data) {
+                                //alert(JSON.stringify(data));
+                            },
+                            add: function (event, data) {
+                                /* if (data != null && data.originalFiles != null && data.originalFiles.length > 0) {
+                                    data.formData = { fileName: data.originalFiles[0].name };
+                                    data.formData.businessId = businessId;
+                                    data.formData.busType = 'AfterLoan_Material_Reduction';
+                                    data.formData.file = data.originalFiles[0];
+                                    var size = data.originalFiles[0].size;
+                                    if (size / 1024 / 1024 > 5) {
+                                        layer.msg("文件过大，超过5M不允许上传", { icon: 5, shade: [0.8, '#393D49'], time: 3000 });
+                                        return;
+                                    }
+                                    data.submit();
+    
+                                } else {
+                                    layer.msg("文件不存在", { icon: 5, shade: [0.8, '#393D49'], time: 3000 });
+                                    return;
+                                } */
+                                if (data && data.originalFiles && data.originalFiles.length > 0) {
+                                    data.formData = { fileName: data.originalFiles[0].name };
+                                    data.formData.businessId = self.getQueryString("businessId");
+                                    data.formData.busType = 'AfterLoan_Material_CarDrag';
+                                    data.formData.file = data.originalFiles[0];
+                                    data.submit();
+                                }
+                            }
+                        });
+                        /***************************************************************
+                          * $('#'+fileId).bind('fileuploadsubmit', function (e, data) {
+                          * if (data && data.originalFiles && data.originalFiles.length >
+                          * 0) { data.formData = {fileName: data.originalFiles[0].name};
+                          * data.formData.businessId = businessId;
+                          * data.formData.busType='AfterLoan_Material_CarAuction';
+                          * data.formData.file=data.originalFiles[0];
+                          * 
+                          * /// alert(data.formData.file.size/1024/1024); } });
+                          **************************************************************/
+
+                    }/* ,
+                    uploadFile: function (event, index) {
+                        var self = this;
+                        var fileId = event.currentTarget.id;
+                        $('#' + fileId).fileupload({
+                            dataType: 'json',
+                            singleFileUploads: true,
+                            acceptFileTypes: '', // Allowed file types
+                            url: basePath + 'doc/singleUpload',// 文件的后台接受地址
+                            // 设置进度条
+                            // 上传完成之后的操作，显示在img里面
+                            done: function (e, data) {
+                                if (data._response.result.uploaded) {
+                                    var doc = JSON.parse(data._response.result.docItemListJson);
+
+                                    self.files[index].uploadResult.docId = doc.docId;
+                                    self.files[index].uploadResult.originalName = doc.originalName;
+                                    self.files[index].uploadRequest.newName = doc.originalName.slice(0, doc.originalName.lastIndexOf(".") - 1)
+                                    self.$set(self.files[index].uploadResult, 'isSuccess', true);
+                                }
+                                else {
+                                    self.files[index].isSuccess = false;
+                                    self.files[index].uploadResult.docId = "";
+                                    self.$Modal.error({ content: '上传失败，消息：' + data._response.result.message });
+                                }
+
+
+                            }
+                        });
+                        $('#' + fileId).bind('fileuploadsubmit', function (e, data) {
+                            if (data && data.originalFiles && data.originalFiles.length > 0) {
+                                data.formData = { fileName: data.originalFiles[0].name };
+                                data.formData.businessId = self.getQueryString("businessId");
+                                data.formData.busType = 'AfterLoan_Material_CarDrag';
+                                data.formData.file = data.originalFiles[0];
+                            }
+                        });
+                    } */,
+                    addUploadItem: function () {
+                        this.files.push(
+                            {
+                                status: 1,
+
+                                uploadRequest:
+                                    {
+                                        newName: ""
+
+                                    },
+                                uploadResult:
+                                    {
+                                        isSuccess: false,
+                                        docId: "",
+                                        originalName: ""
+                                    }
+                            }
+
+                        )
+                    },
+                    removeUploadItem: function (index) {
+
+                        var self = this;
+                        if (self.files[index] === undefined) {
+                            return;
+                        }
+                        if (!self.files[index].uploadResult.isSuccess) {
+                            self.$set(self.files[index], 'status', 0);
+                            return;
+                        }
+                         var reqStr = basePath +'doc/delOneDoc?docId='+self.files[index].uploadResult.docId;
+                        axios.get(reqStr)
+                            .then(function (result) {
+                                self.$set(self.files[index], 'status', 0);
+                            }).catch(function (error) {
+                                self.$Modal.error({ content: '删除失败' });
+                            });
+
+                    },
+                    removeTabTr: function (event, index) {
+                        var docId = $('#docId' + index).val();
+                        var self = this;
+                        // 如果文档id存在，那么进行ajax
+                        if (self.files[index].uploadResult.isSuccess) {
+                            var reqStr = basePath +'doc/delOneDoc?docId='+self.files[index].uploadResult.docId;
+                            axios.get(reqStr)
+                                .then(function (res) {
+                                    console.log(res, self);
+                                    self.files.splice(index, 1);
+                                    if (self.files == "") {
+                                        self.addTabTr(event);
                                     }
                                 })
-                        }
-                    })
-                },
-
-                uploadFile:function(event,index){
-                    var self=this;
-                    var fileId=event.currentTarget.id;
-                    $('#'+fileId).fileupload({
-                        dataType: 'json',
-                        singleFileUploads: true,
-                        acceptFileTypes: '', // Allowed file types
-                        url: basePath+'doc/singleUpload',// 文件的后台接受地址
-                        // 设置进度条
-                        // 上传完成之后的操作，显示在img里面
-                        done: function (e, data){
-                            if(data._response.result.uploaded)
-                            {
-                                var doc=JSON.parse(data._response.result.docItemListJson);
-
-                                self.files[index].uploadResult.docId=doc.docId;
-                                self.files[index].uploadResult.originalName=doc.originalName;
-                                self.files[index].uploadRequest.newName=doc.originalName.slice(0,doc.originalName.lastIndexOf(".")-1)
-                                self.$set(self.files[index].uploadResult,'isSuccess',true);
+                                .catch(function (error) {
+                                    layer.msg("删除文件失败。");
+                                    console.error(error);
+                                });
+                            // 否则直接删除
+                        } else {
+                            self.files.splice(index, 1);
+                            if (self.files == "") {
+                                self.addTabTr(event);
                             }
-                            else
-                            {
-                                self.files[index].isSuccess=false;
-                                self.files[index].uploadResult.docId="";
-                                self.$Modal.error({content: '上传失败，消息：' + data._response.result.message});
-                            }
-
-
                         }
-                    });
-                    $('#'+fileId).bind('fileuploadsubmit', function (e, data) {
-                        if (data && data.originalFiles && data.originalFiles.length > 0) {
-                            data.formData = {fileName: data.originalFiles[0].name};
-                            data.formData.businessId = self.getQueryString("businessId");
-                            data.formData.busType='AfterLoan_Material_CarDrag';
-                            data.formData.file=data.originalFiles[0];
-                        }
-                    });
+
+                    },
+                    addTabTr: function (event) {
+                        this.files.push({
+                            status: 1,
+
+                            uploadRequest:
+                                {
+                                    newName: ""
+
+                                },
+                            uploadResult:
+                                {
+                                    isSuccess: false,
+                                    docId: "",
+                                    originalName: ""
+                                }
+                        })
+                    }
                 },
-                addUploadItem:function()
-                {
-                this.files.push(
-                    {
-                        status:1,
+                created: function () {
 
-                        uploadRequest:
-                            {
-                                newName:""
-
-                            },
-                        uploadResult:
-                            {
-                                isSuccess:false,
-                                docId:"",
-                                originalName:""
-                            }
-                    }
-
-                )
-                },
-                removeUploadItem:function(index)
-                {
-
-                    var self = this;
-                    if(self.files[index]===undefined)
-                    {
-                        return ;
-                    }
-                    if(!self.files[index].uploadResult.isSuccess)
-                    {
-                        self.$set(self.files[index],'status',0);
-                        return ;
-                    }
-                    var reqStr = basePath +'doc/delOneDoc?docId='+self.files[index].uploadResult.docId;
-                    axios.get(reqStr)
-                        .then(function (result) {
-                                self.$set(self.files[index],'status',0);
-                        }).catch(function (error) {
-                        self.$Modal.error({content: '删除失败' });
-                    });
-
+                    var businessId = this.getQueryString("businessId");
+                    this.getCarDragRegistrationBusinessInfo(businessId);
+                    this.getArea();
                 }
-            },
-            created: function () {
 
-                var businessId = this.getQueryString("businessId");
-                this.getCarDragRegistrationBusinessInfo(businessId);
-                this.getArea();
-            }
-
+            })
         })
-    })
-</script>
+    </script>
 
 </body>
+
 </html>

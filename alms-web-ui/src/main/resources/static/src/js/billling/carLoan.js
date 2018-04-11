@@ -113,8 +113,9 @@ window.layinit(function (htConfig) {
 				if(res.data.code=='1'){
 					vm.baseInfoForm = res.data.data;
 					vm.baseInfoForm.borrowRate = res.data.data.borrowRate + '%/年';
-					
-					vm.preLateFeesFlag = res.data.data.preLateFeesFlag;
+					if (res.data.data.outputPlatformId == 0 && res.data.data.repaymentTypeId == '等额本息') {
+						vm.preLateFeesFlag = res.data.data.preLateFeesFlag;
+					}
 				}else{
 					vm.$Modal.error({content: res.data.msg });
 				}

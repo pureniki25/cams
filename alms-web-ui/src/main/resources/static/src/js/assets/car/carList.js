@@ -229,7 +229,7 @@ window.layinit(function (htConfig) {
                 , cols: [[
                     {
                         field: 'businessId',
-                        width:165,
+                        width:200,
                         title: '业务编号'
                     }, {
                         field: 'districtName',
@@ -248,7 +248,10 @@ window.layinit(function (htConfig) {
 
                         field: 'repaidAmount',
                         title: '已还金额',
-                        align: 'right'
+                        align: 'right',
+                        templet:function(d){
+                            return Number(d.repaidAmount).toFixed(2)
+                        }
                     }, {
 
                         field: 'licensePlateNumber',

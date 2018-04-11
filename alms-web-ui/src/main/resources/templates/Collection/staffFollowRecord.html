@@ -27,6 +27,11 @@
     <script src="/build/js/jquery-3.3.1.min.js"></script>
     <!-- 设置全局请求头:app、Authorization -->
     <script src="/build/js/appToken.js"></script>
+    <style>
+        .ivu-form-item{
+            margin-bottom: 0px;
+        }
+    </style>
 </head>
 <body>
 <!--隐藏元素-->
@@ -35,20 +40,19 @@
 <!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
 <div id="app" v-cloak>
 
-    <Card>
-        <p slot="title">
-            贷后跟踪记录
-        </p>
         <!--右上侧按钮列表-->
         <!-- <i-button slot="extra" type="success"  @click="toShowEditModal" style="margin-right:10px">
             <span>新增</span>
         </i-button> -->
-        <button class="layui-btn layui-btn-sm"  @click="toShowEditModal" style="margin-right:10px" >新增</button>
-
+        
         <!--查询表单内容-->
-        <row :gutter="16">
+        <row style="font-family: '微软雅黑';
+        font-weight: 400;
+        font-style: normal;
+        color: #169BD5;
+        text-align: left;background-color: rgba(204, 235, 248, 1);" >
             <i-form ref="businessInfForm"  :model="businessInfForm"   label-position="right" :label-width="100">
-                <i-col span="6">
+                <i-col span="6" >
                     <form-item label="业务编号：" >{{ businessInfForm.businessId }} </form-item>
                 </i-col>
                 <i-col span="4">
@@ -64,12 +68,13 @@
                     <form-item label="借款期限：" >{{ businessInfForm.borrowLimit }} </form-item>
                 </i-col>
             </i-form>
+            <button class="layui-btn layui-btn-sm ivu-form-item"  @click="toShowEditModal" style="margin-right:10px;float:right" >新增</button>
+            
         </row>
-    </Card>
 
 
     <!-- 表单Grid，使用layerUI的表格组件 开始 -->
-    <row style="padding: 10px">
+    <row >
         <i-col span="24">
             <!-- 使用方法渲染模式 -->
             <table id="listTable" lay-filter="listTable"></table>

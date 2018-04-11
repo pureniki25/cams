@@ -262,11 +262,11 @@ window.layinit(function(htConfig){
                     fixed: 'left'
                 },{
                     field: 'businessId',
-                    width:190,
+                    width:200,
                     title: '业务编号'
                 }, {
                     field: 'afterId',
-                    width:100,
+                    width:60,
                     title: '期数'
                 }, {
                     field: 'districtAreaName',
@@ -295,7 +295,7 @@ window.layinit(function(htConfig){
                     align: 'right'
                 }, {
                     field: 'totalBorrowAmount',
-                    width:160,
+                    width:90,
                     title: '应还金额',
                     align: 'right',
                     templet:function(d){
@@ -352,7 +352,7 @@ window.layinit(function(htConfig){
                 },{
                     fixed: 'right',
                     title: '操作',
-                    width: 120,
+                    width: 115,
                     align: 'left',
                     toolbar: '#barTools'
                 }
@@ -483,7 +483,7 @@ window.layinit(function(htConfig){
                             if (authValid('checkDoc')) {
                                 buttons.push(
                                     {
-                                        "name": "查看附件", click: function (e, currentItem) {
+                                        "name": "查看信贷附件", click: function (e, currentItem) {
                                         $.ajax({
                                             type: 'GET',
                                             async: false,
@@ -495,7 +495,7 @@ window.layinit(function(htConfig){
                                                 Authorization: "Bearer " + getToken()
                                             },
                                             success: function (data) {
-                                                showOneLineOprLayer(data.data, "查看附件");
+                                                showOneLineOprLayer(data.data, "查看信贷附件");
                                             },
                                             error: function () {
                                                 vm.$Modal.error({content: '接口调用异常!'});
@@ -508,9 +508,9 @@ window.layinit(function(htConfig){
                             if (authValid('upLoad')) {
                                 buttons.push(
                                     {
-                                        "name": "上传附件", click: function (e, currentItem) {
+                                        "name": "附件上传及查看", click: function (e, currentItem) {
                                         var url = '/page/doc/upLoad.html?businessId=' + currentItem.businessId
-                                        showOneLineOprLayer(url, "上传附件")
+                                        showOneLineOprLayer(url, "附件上传及查看")
                                     }
                                     }
                                 )
@@ -535,7 +535,7 @@ window.layinit(function(htConfig){
                             if (authValid('litigation')) {
                                 buttons.push(
                                     {
-                                        "name": "移交诉讼系统", click: function (e, currentItem) {
+                                        "name": "移交法务", click: function (e, currentItem) {
                                         //                            	 var url = '/transferOfLitigation/carLoan?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+"&processStatus=-1"
                                         var url = ''
                                         if (currentItem.businessTypeId == 1 || currentItem.businessTypeId == 9) {
@@ -543,7 +543,7 @@ window.layinit(function(htConfig){
                                         } else if (currentItem.businessTypeId == 2 || currentItem.businessTypeId == 11) {
                                             url = '/transferOfLitigation/houseLoan?businessId=' + currentItem.businessId + '&crpId=' + currentItem.crpId + "&processStatus=-1";
                                         }
-                                        showOneLineOprLayer(url, "移交诉讼系统")
+                                        showOneLineOprLayer(url, "移交法务")
                                     }
                                     }
                                 )

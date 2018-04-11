@@ -193,7 +193,7 @@
                     @on-cancel="">
                 <div class="layui-row layui-col-space20">
                     <div class="layui-col-md5">
-                        <tree :data="areaAndCity.allAreas"  @on-check-change="showCitys" @on-select-change="selectChild" show-checkbox  ref="tree" ></tree>
+                        <tree :data="areaAndCity.allAreas"  @on-check-change="showCitys" @on-select-change="selectChild"  ref="tree" ></tree>
                     </div>
                     <div class="layui-col-md6">
                         <checkbox-group v-model="areaAndCity.currentSelectedCitys" @on-change="getAllSelectedCitys">
@@ -239,6 +239,7 @@
 
 <script>
     var vm;
+    var areaId;
     window.layinit(function (htConfig) {
         var _htConfig = htConfig;
         basePath = _htConfig.coreBasePath;
@@ -309,6 +310,7 @@
                             children: [],
                             expand:true
                         }],
+                        test:"",
                         allCitys:[],
                         allSelectedAreas:[],
                         allSelectedCitys:[],
@@ -324,7 +326,7 @@
                         currentCitys7:[],
                         currentAreaId:""
                     },
-                index:'',
+                index:'0',
                 ruleValidate:validateOpt
             },
             computed: {},
@@ -495,6 +497,16 @@
                             curr: 1 //重新从第 1 页开始
                         }
                     });
+
+                    self.areaAndCity.currentSelectedCitys = [];
+                    self.areaAndCity.currentCitys1=[];
+                    self.areaAndCity.currentCitys2=[];
+                    self.areaAndCity.currentCitys3=[];
+                    self.areaAndCity.currentCitys4=[];
+                    self.areaAndCity.currentCitys5=[];
+                    self.areaAndCity.currentCitys6=[];
+                    self.areaAndCity.currentCitys7=[];
+
                 },
                 toLoadingTime: function () {
                     if (table == null) {
@@ -612,6 +624,12 @@
                 assignSet:function () {
                     var self = this;
                     self.assignSetModal = true;
+
+                    self.editCompanyCollectionAssignSet.editCompanyCollectionForm.areaName=[];
+                    self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId=[];
+                    self.editCompanyCollectionAssignSet.editCompanyCollectionForm.collectionGroup1Users=[];
+                    self.editCompanyCollectionAssignSet.editCompanyCollectionForm.collectionGroup2Users=[];
+
                     var url = basePath + "collectionStrategy/company/getClearingPersons";
                     axios.get(url)
                         .then(function (result) {
@@ -624,8 +642,14 @@
                         })
                 },
                 selectArea:function () {
+                    console.log("选择开始===========")
                     var self = this;
                     self.selectAreaAndCity = true;
+                    self.areaAndCity.allCitys=[];
+
+                    var formData = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.areaName;// 表单区域
+                    var treeData = self.areaAndCity.allAreas[0].children;// 下拉区域
+
                     self.getArea();
                 },
                 saveBatchPerson:function () {
@@ -654,13 +678,17 @@
                         contentType: "application/json; charset=utf-8",
                         dataType: "json",
                         success: function (data) {
-                            self.areaAndCity.allAreas[0].children = data.data
+                            self.areaAndCity.allAreas[0].children = data.data;
+                            areaId = self.areaAndCity.allAreas[0].children[0].areaId;
+                            self.getCompany(areaId);
                         }
 
                     });
                 },
                 getCompany: function (areaPid) {
+
                     var self = this;
+                    console.log("==========>>>>>>>>>>",self.areaAndCity.test);
                     var url = basePath + "collectionStrategy/getCompanyList?areaPid="+areaPid;
                     $.ajax({
                         type: "GET",
@@ -670,6 +698,13 @@
                         dataType: "json",
                         success: function (data) {
                             self.areaAndCity.allCitys = data.data;
+                            var formDate = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId;
+                            for(var i=0;i<formDate.length;i++){
+                                var exit = self.areaAndCity.allCitys.indexOf(formDate[i]) != -1;
+                                if(exit){
+                                    self.areaAndCity.currentSelectedCitys.push(formDate[i]);
+                                }
+                            }
                         }
 
                     });
@@ -765,7 +800,10 @@
 
                     }else {
                         self.areaAndCity.allAreas[0].children[index].checked = false;
+                        self.areaAndCity.allSelectedAreas.splice(index,1);
                     }
+
+                    console.log("所有被选中的区域：======",self.areaAndCity.allSelectedAreas);
 
 
 
@@ -792,32 +830,62 @@
                         self.areaAndCity.currentCitys7 = [];
                         self.areaAndCity.currentCitys7 = data;
                     }
+                    console.log("第1组",self.areaAndCity.currentCitys1);
+                    console.log("第2组",self.areaAndCity.currentCitys2);
+                    console.log("第3组",self.areaAndCity.currentCitys3);
+                    console.log("第4组",self.areaAndCity.currentCitys4);
+                    console.log("第5组",self.areaAndCity.currentCitys5);
+                    console.log("第6组",self.areaAndCity.currentCitys6);
+                    console.log("第7组",self.areaAndCity.currentCitys7);
 
 
                 },
                 confirmSelect:function () {
                     var self = this;
                     self.editCompanyCollectionAssignSet.editCompanyCollectionForm.areaName = self.areaAndCity.allSelectedAreas;
+                    self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId=[];
                     for(var i=0;i<self.areaAndCity.currentCitys1.length;i++){
-                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys1[i]);
+                        var exit = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.indexOf(self.areaAndCity.currentCitys1[i]) != -1;
+                        if(!exit){
+                            self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys1[i]);
+                        }
+
                     }
                     for(var i=0;i<self.areaAndCity.currentCitys2.length;i++){
-                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys2[i]);
+                        var exit = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.indexOf(self.areaAndCity.currentCitys2[i]) != -1;
+                        if(!exit){
+                            self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys2[i]);
+                        }
                     }
                     for(var i=0;i<self.areaAndCity.currentCitys3.length;i++){
-                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys3[i]);
+                        var exit = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.indexOf(self.areaAndCity.currentCitys3[i]) != -1;
+                        if(!exit){
+                            self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys3[i]);
+                        }
                     }
                     for(var i=0;i<self.areaAndCity.currentCitys4.length;i++){
-                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys4[i]);
+                        var exit = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.indexOf(self.areaAndCity.currentCitys4[i]) != -1;
+                        if(!exit){
+                            self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys4[i]);
+                        }
                     }
                     for(var i=0;i<self.areaAndCity.currentCitys5.length;i++){
-                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys5[i]);
+                        var exit = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.indexOf(self.areaAndCity.currentCitys5[i]) != -1;
+                        if(!exit){
+                            self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys5[i]);
+                        }
                     }
                     for(var i=0;i<self.areaAndCity.currentCitys6.length;i++){
-                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys6[i]);
+                        var exit = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.indexOf(self.areaAndCity.currentCitys6[i]) != -1;
+                        if(!exit){
+                            self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys6[i]);
+                        }
                     }
                     for(var i=0;i<self.areaAndCity.currentCitys7.length;i++){
-                        self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys7[i]);
+                        var exit = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.indexOf(self.areaAndCity.currentCitys7[i]) != -1;
+                        if(!exit){
+                            self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys7[i]);
+                        }
                     }
 
                 },
@@ -827,7 +895,7 @@
                     var num = self.areaAndCity.allAreas[0].children.indexOf(data[0]);
 
                     if(data.length>0){
-                        this.getCompany(data[0].areaId);
+
 
                         self.index = num;
                         if(num == 0){
@@ -845,6 +913,8 @@
                         }else if(num == 6){
                             self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys7;
                         }
+
+                        this.getCompany(data[0].areaId);
                     }
 
 

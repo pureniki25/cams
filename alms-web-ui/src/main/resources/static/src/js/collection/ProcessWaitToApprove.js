@@ -107,7 +107,8 @@ window.layinit(function (htConfig) {
                         title: '流程名称'
                     },{
                         field: 'businessId',
-                        title: '业务编号'
+                        title: '业务编号',
+                        width:200
                     }, {
                         field: 'customerName',
                         title: '客户名称'
