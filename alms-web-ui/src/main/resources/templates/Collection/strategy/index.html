@@ -156,14 +156,14 @@
                     @on-cancel="toLoading">
                 <i-form ref="editCompanyCollectionAssignSet.editCompanyCollectionForm" :model="editCompanyCollectionAssignSet.editCompanyCollectionForm"  :label-width="80"  >
                     <form-item label="区域：" prop="areaName">
-                        <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.areaName" disabled multiple clearable filterable style="width: 80%">
+                        <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.areaName"  multiple clearable filterable style="width: 80%">
                             <i-option v-for="item in editCompanyCollectionAssignSet.areaList" :value="item.areaId" :key="item.areaId">{{ item.areaName }}</i-option>
                         </i-select>
                         <i-span @click="selectArea">选择</i-span>
                     </form-item>
 
                     <form-item label="分公司："  prop="companyName">
-                        <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId" disabled multiple clearable filterable style="width: 80%" >
+                        <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId"  multiple clearable filterable style="width: 80%" >
                             <i-option v-for="item in editCompanyCollectionAssignSet.companyId" :value="item.areaId" :key="item.areaId">{{ item.areaName }}</i-option>
                         </i-select>
                     </form-item>
@@ -193,7 +193,7 @@
                     @on-cancel="">
                 <div class="layui-row layui-col-space20">
                     <div class="layui-col-md5">
-                        <tree :data="areaAndCity.allAreas"  @on-check-change="showCitys" @on-select-change="selectChild" show-checkbox  ref="tree" ></tree>
+                        <tree :data="areaAndCity.allAreas"  @on-check-change="showCitys" @on-select-change="selectChild"  ref="tree" ></tree>
                     </div>
                     <div class="layui-col-md6">
                         <checkbox-group v-model="areaAndCity.currentSelectedCitys" @on-change="getAllSelectedCitys">
@@ -611,6 +611,12 @@
                 assignSet:function () {
                     var self = this;
                     self.assignSetModal = true;
+
+                    self.editCompanyCollectionAssignSet.editCompanyCollectionForm.areaName=[];
+                    self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId=[];
+                    self.editCompanyCollectionAssignSet.editCompanyCollectionForm.collectionGroup1Users=[];
+                    self.editCompanyCollectionAssignSet.editCompanyCollectionForm.collectionGroup2Users=[];
+
                     var url = basePath + "collectionStrategy/company/getClearingPersons";
                     axios.get(url)
                         .then(function (result) {
@@ -623,8 +629,14 @@
                         })
                 },
                 selectArea:function () {
+                    console.log("选择开始===========")
                     var self = this;
                     self.selectAreaAndCity = true;
+                    self.areaAndCity.allCitys=[];
+
+                    var formData = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.areaName;// 表单区域
+                    var treeData = self.areaAndCity.allAreas[0].children;// 下拉区域
+
                     self.getArea();
                 },
                 saveBatchPerson:function () {
@@ -669,6 +681,7 @@
                         dataType: "json",
                         success: function (data) {
                             self.areaAndCity.allCitys = data.data;
+                            self.areaAndCity.currentSelectedCitys = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId
                         }
 
                     });
@@ -764,7 +777,10 @@
 
                     }else {
                         self.areaAndCity.allAreas[0].children[index].checked = false;
+                        self.areaAndCity.allSelectedAreas.splice(index,1);
                     }
+
+                    console.log("所有被选中的区域：======",self.areaAndCity.allSelectedAreas);
 
 
 
@@ -797,6 +813,7 @@
                 confirmSelect:function () {
                     var self = this;
                     self.editCompanyCollectionAssignSet.editCompanyCollectionForm.areaName = self.areaAndCity.allSelectedAreas;
+                    self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId=[];
                     for(var i=0;i<self.areaAndCity.currentCitys1.length;i++){
                         self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys1[i]);
                     }
@@ -826,7 +843,7 @@
                     var num = self.areaAndCity.allAreas[0].children.indexOf(data[0]);
 
                     if(data.length>0){
-                        this.getCompany(data[0].areaId);
+
 
                         self.index = num;
                         if(num == 0){
@@ -844,6 +861,8 @@
                         }else if(num == 6){
                             self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys7;
                         }
+
+                        this.getCompany(data[0].areaId);
                     }
 
 
