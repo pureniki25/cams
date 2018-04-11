@@ -320,7 +320,7 @@ window.layinit(function(htConfig){
                 }, {
 
                     field: 'delayDays',
-                    width:60,
+                    width:100,
                     title: '逾期'
                 }, {
 
@@ -352,7 +352,7 @@ window.layinit(function(htConfig){
                 },{
                     fixed: 'right',
                     title: '操作',
-                    width: 178,
+                    width: 110,
                     align: 'left',
                     toolbar: '#barTools'
                 }
