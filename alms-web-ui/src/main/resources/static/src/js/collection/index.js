@@ -535,7 +535,7 @@ window.layinit(function(htConfig){
                             if (authValid('litigation')) {
                                 buttons.push(
                                     {
-                                        "name": "移交诉讼系统", click: function (e, currentItem) {
+                                        "name": "移交法务", click: function (e, currentItem) {
                                         //                            	 var url = '/transferOfLitigation/carLoan?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+"&processStatus=-1"
                                         var url = ''
                                         if (currentItem.businessTypeId == 1 || currentItem.businessTypeId == 9) {
@@ -543,7 +543,7 @@ window.layinit(function(htConfig){
                                         } else if (currentItem.businessTypeId == 2 || currentItem.businessTypeId == 11) {
                                             url = '/transferOfLitigation/houseLoan?businessId=' + currentItem.businessId + '&crpId=' + currentItem.crpId + "&processStatus=-1";
                                         }
-                                        showOneLineOprLayer(url, "移交诉讼系统")
+                                        showOneLineOprLayer(url, "移交法务")
                                     }
                                     }
                                 )
