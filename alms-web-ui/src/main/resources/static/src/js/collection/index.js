@@ -266,7 +266,7 @@ window.layinit(function(htConfig){
                     title: '业务编号'
                 }, {
                     field: 'afterId',
-                    width:100,
+                    width:60,
                     title: '期数'
                 }, {
                     field: 'districtAreaName',
@@ -295,7 +295,7 @@ window.layinit(function(htConfig){
                     align: 'right'
                 }, {
                     field: 'totalBorrowAmount',
-                    width:160,
+                    width:90,
                     title: '应还金额',
                     align: 'right',
                     templet:function(d){
@@ -352,7 +352,7 @@ window.layinit(function(htConfig){
                 },{
                     fixed: 'right',
                     title: '操作',
-                    width: 120,
+                    width: 115,
                     align: 'left',
                     toolbar: '#barTools'
                 }
