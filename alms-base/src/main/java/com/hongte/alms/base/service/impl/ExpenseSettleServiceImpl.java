@@ -12,6 +12,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
@@ -22,12 +23,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.BizOutputRecord;
+import com.hongte.alms.base.entity.RenewalBusiness;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.mapper.BasicBusinessMapper;
 import com.hongte.alms.base.mapper.BizOutputRecordMapper;
 import com.hongte.alms.base.mapper.ExpenseSettleMapper;
+import com.hongte.alms.base.mapper.RenewalBusinessMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListDetailMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanMapper;
@@ -63,6 +66,9 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 	@Autowired
 	RepaymentBizPlanListDetailMapper repaymentBizPlanListDetailMapper;
 
+	@Autowired
+	@Qualifier("RenewalBusinessMapper")
+	RenewalBusinessMapper renewalBusinessMapper ;
 	@Autowired
 	BizOutputRecordMapper bizOutputRecordMapper;
 	@Autowired
@@ -321,10 +327,15 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		repaymentBizPlan.setBusinessId(businessId);
 		repaymentBizPlan = repaymentBizPlanMapper
 				.selectOne(repaymentBizPlan);
+		List<Object> businessIds = renewalBusinessMapper.selectObjs(new EntityWrapper<RenewalBusiness>().eq("original_business_id", businessId).setSqlSelect("renewal_business_id")) ;
+		if (businessIds==null) {
+			businessIds = new ArrayList<>();
+		}
+		businessIds.add(businessId);
 		final List<RepaymentBizPlanList> planLists = repaymentBizPlanListMapper.selectList(
-				new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).orderBy("due_date"));
+				new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", businessId).orderBy("due_date"));
 		final List<RepaymentBizPlanListDetail> details = repaymentBizPlanListDetailMapper.selectList(
-				new EntityWrapper<RepaymentBizPlanListDetail>().eq("business_id", businessId).orderBy("period"));
+				new EntityWrapper<RepaymentBizPlanListDetail>().in("business_id", businessIds).orderBy("period"));
 		final ExpenseSettleRepaymentPlanVO plan = new ExpenseSettleRepaymentPlanVO(repaymentBizPlan, planLists, details);
 		
 		ExpenseSettleVO expenseSettleVO = new ExpenseSettleVO() ;
