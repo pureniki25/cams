@@ -4,6 +4,7 @@
 package com.hongte.alms.base.service.impl;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -113,7 +114,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		int rateUnit = business.getBorrowRateUnit();
 
 		if (rateUnit == 1) {
-			businessRate = businessRate.divide(new BigDecimal(12), 10);
+			businessRate = businessRate.divide(new BigDecimal(12), 2,RoundingMode.HALF_UP);
 		}
 
 		List<RepaymentBizPlanList> repaymentBizPlanLists = repaymentBizPlanListMapper
@@ -204,7 +205,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 			} else {
 
 			}
-			BigDecimal calByMonth = businessRate.divide(new BigDecimal(100), 10).multiply(principal);
+			BigDecimal calByMonth = businessRate.divide(new BigDecimal(100), 2,RoundingMode.HALF_UP).multiply(principal);
 			BigDecimal calByDay = new BigDecimal(0.001).multiply(new BigDecimal(differ)).multiply(principal);
 
 			if (differ > 10) {
@@ -671,7 +672,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 						if (e.getRepaymentBizPlanList() != null) {
 							int daysBeyoungDueDate = DateUtil.getDiffDays(e.getRepaymentBizPlanList().getDueDate(), settleDate);
 							BigDecimal lateFeeRate = d.getPlanAmount()
-									.divide(e.getRepaymentBizPlanList().getOverdueDays().multiply(expenseSettleVO.getPrincipal()));
+									.divide(e.getRepaymentBizPlanList().getOverdueDays().multiply(expenseSettleVO.getPrincipal()),2,RoundingMode.HALF_UP);
 							if (daysBeyoungDueDate > 1) {
 								firstLateFee = expenseSettleVO.getPrincipal().multiply(lateFeeRate)
 										.multiply(new BigDecimal(daysBeyoungDueDate));
