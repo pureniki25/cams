@@ -190,7 +190,8 @@ window.layinit(function (htConfig) {
                         templet:function(d){
                             let sp = '<a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="info" @click="openModal" >审批</a>' 
                             let dt = '<a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="info" @click="openModal" >详情</a>' 
-                            if(d.myApprove){
+                            let url = window.location.href 
+                            if(url.indexOf('waitToApprove')>-1){
                                 return sp ;
                             }else{
                                 return dt ;
