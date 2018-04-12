@@ -4,6 +4,7 @@
 package com.hongte.alms.base.vo.module;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * @author 王继光
@@ -72,7 +73,7 @@ public class ExpenseSettleLackFeeVO{
 	 * @param servicecharge the servicecharge to set
 	 */
 	public void setServicecharge(BigDecimal servicecharge) {
-		this.servicecharge = servicecharge;
+		this.servicecharge = servicecharge.setScale(2, RoundingMode.HALF_UP);
 	}
 	/**
 	 * @return the lateFee
@@ -84,7 +85,7 @@ public class ExpenseSettleLackFeeVO{
 	 * @param lateFee the lateFee to set
 	 */
 	public void setLateFee(BigDecimal lateFee) {
-		this.lateFee = lateFee;
+		this.lateFee = lateFee.setScale(2, RoundingMode.HALF_UP);
 	}
 	/**
 	 * @return the principal
@@ -96,7 +97,7 @@ public class ExpenseSettleLackFeeVO{
 	 * @param principal the principal to set
 	 */
 	public void setPrincipal(BigDecimal principal) {
-		this.principal = principal;
+		this.principal = principal.setScale(2, RoundingMode.HALF_UP);
 	}
 	/**
 	 * @return the platFormFee
@@ -108,7 +109,7 @@ public class ExpenseSettleLackFeeVO{
 	 * @param platFormFee the platFormFee to set
 	 */
 	public void setPlatFormFee(BigDecimal platFormFee) {
-		this.platFormFee = platFormFee;
+		this.platFormFee = platFormFee.setScale(2, RoundingMode.HALF_UP);
 	}
 	/**
 	 * @return the interest
@@ -120,6 +121,6 @@ public class ExpenseSettleLackFeeVO{
 	 * @param interest the interest to set
 	 */
 	public void setInterest(BigDecimal interest) {
-		this.interest = interest;
+		this.interest = interest.setScale(2, RoundingMode.HALF_UP);
 	}
 }
