@@ -314,7 +314,7 @@ window.layinit(function(htConfig){
                         if(d.repaymentTypeId==5&&d.borrowLimit==d.periods){
                             res+=lastPeriod
                         }
-                        res += d.totalBorrowAmount 
+                        res += Number(d.totalBorrowAmount).toFixed(2)+'' 
                         return res 
                     }
                 }, {

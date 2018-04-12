@@ -804,6 +804,13 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
         serReqInfo(key);
         List<ProcessVo> list = processMapper.selectProcessVoList(pages,key);
 
+        for (ProcessVo processVo : list) {
+			if (processVo.getApproveUserId()!=null && processVo.getApproveUserId().equals(key.getCurrentUserId())) {
+				processVo.setMyApprove(true);
+			}else {
+				processVo.setMyApprove(false);
+			}
+		}
         pages.setRecords(setProcessVoListInfo(list));
 
 
