@@ -228,10 +228,14 @@ public class ExpenseSettleRepaymentPlanVO  {
 		List<ExpenseSettleRepaymentPlanListVO> pastPeriods = new ArrayList<>();
 		List<ExpenseSettleRepaymentPlanListVO> currentPeriods = findCurrentPeriods(settleDate);
 		Date currentPeriodDate = currentPeriods.get(0).getRepaymentBizPlanList().getDueDate() ;
+		int cyear = DateUtil.getYear(currentPeriodDate);
+		int cmonth = DateUtil.getMonth(currentPeriodDate);
 		for (ExpenseSettleRepaymentPlanListVO expenseSettleRepaymentPlanListVO : getRepaymentPlanListVOs()) {
-			int res = DateUtil.dateCompare(expenseSettleRepaymentPlanListVO.getRepaymentBizPlanList().getDueDate(), currentPeriodDate) ;
-			if (res<0) {
-				pastPeriods.add(expenseSettleRepaymentPlanListVO) ;
+			int year = DateUtil.getYear(expenseSettleRepaymentPlanListVO.getRepaymentBizPlanList().getDueDate());
+			int month = DateUtil.getMonth(expenseSettleRepaymentPlanListVO.getRepaymentBizPlanList().getDueDate());
+			
+			if (year<cyear||(year==cyear&&month<cmonth)) {
+				pastPeriods.add(expenseSettleRepaymentPlanListVO);
 			}
 		}
 		
