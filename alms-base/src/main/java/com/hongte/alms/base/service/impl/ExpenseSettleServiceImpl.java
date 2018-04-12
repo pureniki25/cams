@@ -67,8 +67,8 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 	RepaymentBizPlanListDetailMapper repaymentBizPlanListDetailMapper;
 
 	@Autowired
-	@Qualifier("RenewalBusinessMapper")
 	RenewalBusinessMapper renewalBusinessMapper ;
+	
 	@Autowired
 	BizOutputRecordMapper bizOutputRecordMapper;
 	@Autowired
