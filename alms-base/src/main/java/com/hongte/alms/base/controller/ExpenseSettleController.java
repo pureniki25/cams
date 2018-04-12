@@ -321,7 +321,7 @@ public class ExpenseSettleController {
 			Map<RepaymentBizPlanList, List<RepaymentBizPlanListDetail>> pastPeriods, Date settleDate) {
 		List<ExpenseSettleLackFeeVO> list = new ArrayList<>();
 		boolean hasCalLateFee = false;
-		List<BigDecimal> instersets = new ArrayList<>() ;
+		List<BigDecimal> instersets = new ArrayList<>(100) ;
 		BigDecimal firstLateFee = null;
 		for (Map.Entry<RepaymentBizPlanList, List<RepaymentBizPlanListDetail>> e : pastPeriods.entrySet()) {
 			String afterId = e.getKey().getAfterId();

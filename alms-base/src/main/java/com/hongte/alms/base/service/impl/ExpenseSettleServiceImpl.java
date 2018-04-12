@@ -6,6 +6,7 @@ package com.hongte.alms.base.service.impl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -628,7 +629,10 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 	private void calLackFee(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan){
 		/*往期滞纳金,取最大一期*/
 		BigDecimal firstLateFee = null ;
-		BigDecimal firstInterest = null ;
+		List<BigDecimal> instersets = new ArrayList<>() ;
+		for (int i = 0; i < 10; i++) {
+			instersets.add(new BigDecimal(0));
+		}
 		List<ExpenseSettleLackFeeVO> list = new ArrayList<>() ;
 		for (ExpenseSettleRepaymentPlanListVO e : plan.findPastPeriods(settleDate)) {
 			ExpenseSettleLackFeeVO expenseSettleLackFeeVO = new ExpenseSettleLackFeeVO();
@@ -660,11 +664,19 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 				}*/ else if (d.getPlanItemType().equals(new Integer(20)) && (d.getFactAmount() == null
 						|| d.getFactAmount().subtract(d.getPlanAmount()).compareTo(new BigDecimal(0)) < 0)) {
 
-					if (firstInterest == null) {
+					/*if (firstInterest == null) {
 						firstInterest = d.getPlanAmount()
 								.subtract(d.getFactAmount() == null ? new BigDecimal(0) : d.getFactAmount());
+					}*/
+					
+					String n = e.getRepaymentBizPlanList().getAfterId().substring(0,e.getRepaymentBizPlanList().getAfterId().indexOf("-"));
+					if (instersets.get(Integer.valueOf(n)-1).equals(new BigDecimal(0))) {
+						instersets.set(Integer.valueOf(n)-1, d.getPlanAmount()
+						.subtract(d.getFactAmount() == null ? new BigDecimal(0) : d.getFactAmount()));
 					}
-					expenseSettleLackFeeVO.setInterest(firstInterest);
+					expenseSettleLackFeeVO.setInterest(instersets.get(Integer.valueOf(n)-1));
+					
+					expenseSettleLackFeeVO.setInterest(instersets.get(Integer.valueOf(n)-1));
 				} else if (d.getPlanItemType().equals(new Integer(60))) {
 					if (firstLateFee == null) {
 						if (e.getRepaymentBizPlanList() != null) {
