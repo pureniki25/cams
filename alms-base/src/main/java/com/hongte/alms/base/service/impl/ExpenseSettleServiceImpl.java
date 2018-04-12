@@ -171,40 +171,33 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 			for (RepaymentBizPlanListDetail repaymentBizPlanListDetail : repaymentBizPlanListDetails) {
 				if (repaymentBizPlanListDetail.getPlanItemName().equals("利息")) {
 					interest = interest.add(repaymentBizPlanListDetail.getPlanAmount()
-							.subtract(repaymentBizPlanListDetail.getFactAmount()));
+							.subtract(repaymentBizPlanListDetail.getFactAmount()!=null?repaymentBizPlanListDetail.getFactAmount():new BigDecimal(0)));
 				}
 
 				if (repaymentBizPlanListDetail.getPlanItemName().equals("本金")) {
 					principal = principal.add(repaymentBizPlanListDetail.getPlanAmount()
-							.subtract(repaymentBizPlanListDetail.getFactAmount()));
+							.subtract(repaymentBizPlanListDetail.getFactAmount()!=null?repaymentBizPlanListDetail.getFactAmount():new BigDecimal(0)));
 				}
 
 				if (repaymentBizPlanListDetail.getPlanItemName().equals("服务费")) {
 					servicecharge = servicecharge.add(repaymentBizPlanListDetail.getPlanAmount()
-							.subtract(repaymentBizPlanListDetail.getFactAmount()));
+							.subtract(repaymentBizPlanListDetail.getFactAmount()!=null?repaymentBizPlanListDetail.getFactAmount():new BigDecimal(0)));
 				}
 
 				if (repaymentBizPlanListDetail.getPlanItemName().equals("滞纳金")) {
 					lateFee = lateFee.add(repaymentBizPlanListDetail.getPlanAmount()
-							.subtract(repaymentBizPlanListDetail.getFactAmount()));
+							.subtract(repaymentBizPlanListDetail.getFactAmount()!=null?repaymentBizPlanListDetail.getFactAmount():new BigDecimal(0)));
 				}
 				if (repaymentBizPlanListDetail.getPlanItemName().equals("平台费")) {
 					platformFee = platformFee.add(repaymentBizPlanListDetail.getPlanAmount()
-							.subtract(repaymentBizPlanListDetail.getFactAmount()));
+							.subtract(repaymentBizPlanListDetail.getFactAmount()!=null?repaymentBizPlanListDetail.getFactAmount():new BigDecimal(0)));
 				}
 				if (repaymentBizPlanListDetail.getPlanItemName().equals("担保费")) {
 					guaranteeFee = guaranteeFee.add(repaymentBizPlanListDetail.getPlanAmount()
-							.subtract(repaymentBizPlanListDetail.getFactAmount()));
+							.subtract(repaymentBizPlanListDetail.getFactAmount()!=null?repaymentBizPlanListDetail.getFactAmount():new BigDecimal(0)));
 				}
 			}
 
-			if (serviceChargeRule.equals("")) {
-
-			} else if (serviceChargeRule.equals("pre")) {
-
-			} else {
-
-			}
 			BigDecimal calByMonth = businessRate.divide(new BigDecimal(100), 2,RoundingMode.HALF_UP).multiply(principal);
 			BigDecimal calByDay = new BigDecimal(0.001).multiply(new BigDecimal(differ)).multiply(principal);
 

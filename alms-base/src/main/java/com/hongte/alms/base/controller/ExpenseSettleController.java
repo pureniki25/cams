@@ -182,7 +182,7 @@ public class ExpenseSettleController {
 			expenseSettleVO = calDEBX(settelDate, basicBusiness, repaymentBizPlan, planLists, details);
 		}*/
 
-		return Result.success(expenseSettleService.cal(preSettleDate, businessId));
+		return Result.success(expenseSettleService.cal(businessId, settleDate));
 
 	}
 
