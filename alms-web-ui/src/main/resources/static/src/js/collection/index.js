@@ -60,7 +60,7 @@ window.layinit(function(htConfig){
                 realRepayDateRange:'',//实还日期  区间 包含开始和结束时间
                 delayDaysBegin:0,    //逾期天数 开始
                 delayDaysEnd:'', //逾期天数 结束
-                collectLevel:'',  //催收级别
+                collectLevel:'1',  //催收级别
                 operatorName:'',  //业务获取
                 businessId:'',  //业务编号
                 businessType:'',  //业务类型
