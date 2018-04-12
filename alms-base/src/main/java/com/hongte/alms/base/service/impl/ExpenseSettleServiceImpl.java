@@ -331,9 +331,10 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		final List<RepaymentBizPlanListDetail> details = repaymentBizPlanListDetailMapper.selectList(
 				new EntityWrapper<RepaymentBizPlanListDetail>().in("business_id", businessIds).orderBy("period"));
 		final ExpenseSettleRepaymentPlanVO plan = new ExpenseSettleRepaymentPlanVO(repaymentBizPlan, planLists, details);
-		
+		final List<BizOutputRecord> bizOutputRecord = bizOutputRecordMapper.selectList(
+				new EntityWrapper<BizOutputRecord>().eq("business_id", businessId).orderBy("fact_output_date", true));
 		ExpenseSettleVO expenseSettleVO = new ExpenseSettleVO() ;
-		calPrincipal(settleDate, expenseSettleVO, basicBusiness, plan);
+		calPrincipal(settleDate, expenseSettleVO, basicBusiness, plan,bizOutputRecord);
 		calInterest(settleDate, expenseSettleVO, basicBusiness, plan);
 		calServicecharge(settleDate, expenseSettleVO, basicBusiness, plan);
 		calGuaranteeFee(expenseSettleVO, basicBusiness);
@@ -354,13 +355,17 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 	 * 2018年3月30日 下午2:35:29
 	 * @param expenseSettleVO
 	 */
-	private void calPrincipal(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan) {
+	private void calPrincipal(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan,List<BizOutputRecord> bizOutputRecords) {
+		BigDecimal outPutMoney = new BigDecimal(0);
+		for (BizOutputRecord bizOutputRecord : bizOutputRecords) {
+			outPutMoney = outPutMoney.add(bizOutputRecord.getFactOutputMoney());
+		}
 		switch (basicBusiness.getRepaymentTypeId()) {
 		case 2:
-			expenseSettleVO.setPrincipal(basicBusiness.getBorrowMoney());
+			expenseSettleVO.setPrincipal(outPutMoney);
 			break;
 		case 5:
-			expenseSettleVO.setPrincipal(basicBusiness.getBorrowMoney().subtract(plan.calCurrentDetails(settleDate, 10, true)));
+			expenseSettleVO.setPrincipal(outPutMoney.subtract(plan.calCurrentDetails(settleDate, 10, true)));
 			break;
 		default:
 			/*找不到还款方式233333333333*/
@@ -492,11 +497,11 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		switch (basicBusiness.getRepaymentTypeId()) {
 		case 2:
 		case 5:
-			expenseSettleVO.setServicecharge(plan.calCurrentDetails(settleDate, 50, false));
+			expenseSettleVO.setPlatformFee(plan.calCurrentDetails(settleDate, 50, false));
 			break;
 		default:
 			/*找不到还款方式233333333333*/
-			expenseSettleVO.setServicecharge(new BigDecimal(233333333));
+			expenseSettleVO.setPlatformFee(new BigDecimal(233333333));
 			break;
 		}
 	}

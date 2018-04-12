@@ -119,13 +119,12 @@ public class ExpenseSettleRepaymentPlanVO  {
 				}
 			}
 		}
-		expenseSettleRepaymentPlanListVOs.add(compare);
 		
 		logger.info("CurrentPeriod:"+compare.getRepaymentBizPlanList().getAfterId());
 		int compareYear = DateUtil.getYear(compare.getRepaymentBizPlanList().getDueDate());
 		int compareMonth = DateUtil.getMonth(compare.getRepaymentBizPlanList().getDueDate());
 		for (ExpenseSettleRepaymentPlanListVO expenseSettleRepaymentPlanListVO : this.getRepaymentPlanListVOs()) {
-			int year = DateUtil.getDay(expenseSettleRepaymentPlanListVO.getRepaymentBizPlanList().getDueDate());
+			int year = DateUtil.getYear(expenseSettleRepaymentPlanListVO.getRepaymentBizPlanList().getDueDate());
 			int month = DateUtil.getMonth(expenseSettleRepaymentPlanListVO.getRepaymentBizPlanList().getDueDate());
 			
 			if (compareYear==year&&compareMonth==month) {
