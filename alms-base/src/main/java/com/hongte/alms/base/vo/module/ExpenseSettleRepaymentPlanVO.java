@@ -123,6 +123,12 @@ public class ExpenseSettleRepaymentPlanVO  {
 		logger.info("CurrentPeriod:"+compare.getRepaymentBizPlanList().getAfterId());
 		int compareYear = DateUtil.getYear(compare.getRepaymentBizPlanList().getDueDate());
 		int compareMonth = DateUtil.getMonth(compare.getRepaymentBizPlanList().getDueDate());
+		if (compareMonth==12) {
+			compareYear = compareYear + 1 ;
+			compareMonth = 1 ;
+		}else {
+			compareMonth = compareMonth + 1 ;
+		}
 		for (ExpenseSettleRepaymentPlanListVO expenseSettleRepaymentPlanListVO : this.getRepaymentPlanListVOs()) {
 			int year = DateUtil.getYear(expenseSettleRepaymentPlanListVO.getRepaymentBizPlanList().getDueDate());
 			int month = DateUtil.getMonth(expenseSettleRepaymentPlanListVO.getRepaymentBizPlanList().getDueDate());
