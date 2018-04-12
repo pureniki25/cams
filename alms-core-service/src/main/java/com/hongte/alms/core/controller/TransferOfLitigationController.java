@@ -2,6 +2,7 @@ package com.hongte.alms.core.controller;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -46,6 +47,7 @@ import com.hongte.alms.base.vo.litigation.HouseAdressVO;
 import com.hongte.alms.base.vo.litigation.TransferOfLitigationVO;
 import com.hongte.alms.base.vo.litigation.house.HouseLoanVO;
 import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.util.StringUtil;
 
@@ -115,6 +117,23 @@ public class TransferOfLitigationController {
 			if (carLoanData != null && !carLoanData.isEmpty()) {
 
 				carLoanData.put("baseInfo", JSON.toJSON(carLoanData, JsonUtil.getMapping()));
+				
+				Object createTime = carLoanData.get("createTime");
+				if (createTime != null) {
+					carLoanData.put("createTime", DateUtil.formatDate((Date) createTime));
+				}
+				Object dragDate = carLoanData.get("dragDate");
+				if (dragDate != null) {
+					carLoanData.put("dragDate", DateUtil.formatDate((Date) dragDate));
+				}
+				Object factOutputDate = carLoanData.get("factOutputDate");
+				if (factOutputDate != null) {
+					carLoanData.put("factOutputDate", DateUtil.formatDate((Date) factOutputDate));
+				}
+				Object factRepayDate = carLoanData.get("factRepayDate");
+				if (factRepayDate != null) {
+					carLoanData.put("factRepayDate", DateUtil.formatDate((Date) factRepayDate));
+				}
 
 				if (processId != null) {
 					List<TransferLitigationCar> applyList = transferLitigationCarService
