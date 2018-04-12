@@ -4,6 +4,7 @@
 package com.hongte.alms.base.service.impl;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -12,6 +13,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
@@ -22,12 +24,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.BizOutputRecord;
+import com.hongte.alms.base.entity.RenewalBusiness;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.mapper.BasicBusinessMapper;
 import com.hongte.alms.base.mapper.BizOutputRecordMapper;
 import com.hongte.alms.base.mapper.ExpenseSettleMapper;
+import com.hongte.alms.base.mapper.RenewalBusinessMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListDetailMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanMapper;
@@ -63,6 +67,9 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 	@Autowired
 	RepaymentBizPlanListDetailMapper repaymentBizPlanListDetailMapper;
 
+	@Autowired
+	RenewalBusinessMapper renewalBusinessMapper ;
+	
 	@Autowired
 	BizOutputRecordMapper bizOutputRecordMapper;
 	@Autowired
@@ -107,7 +114,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		int rateUnit = business.getBorrowRateUnit();
 
 		if (rateUnit == 1) {
-			businessRate = businessRate.divide(new BigDecimal(12), 10);
+			businessRate = businessRate.divide(new BigDecimal(12), 2,RoundingMode.HALF_UP);
 		}
 
 		List<RepaymentBizPlanList> repaymentBizPlanLists = repaymentBizPlanListMapper
@@ -164,41 +171,34 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 			for (RepaymentBizPlanListDetail repaymentBizPlanListDetail : repaymentBizPlanListDetails) {
 				if (repaymentBizPlanListDetail.getPlanItemName().equals("利息")) {
 					interest = interest.add(repaymentBizPlanListDetail.getPlanAmount()
-							.subtract(repaymentBizPlanListDetail.getFactAmount()));
+							.subtract(repaymentBizPlanListDetail.getFactAmount()!=null?repaymentBizPlanListDetail.getFactAmount():new BigDecimal(0)));
 				}
 
 				if (repaymentBizPlanListDetail.getPlanItemName().equals("本金")) {
 					principal = principal.add(repaymentBizPlanListDetail.getPlanAmount()
-							.subtract(repaymentBizPlanListDetail.getFactAmount()));
+							.subtract(repaymentBizPlanListDetail.getFactAmount()!=null?repaymentBizPlanListDetail.getFactAmount():new BigDecimal(0)));
 				}
 
 				if (repaymentBizPlanListDetail.getPlanItemName().equals("服务费")) {
 					servicecharge = servicecharge.add(repaymentBizPlanListDetail.getPlanAmount()
-							.subtract(repaymentBizPlanListDetail.getFactAmount()));
+							.subtract(repaymentBizPlanListDetail.getFactAmount()!=null?repaymentBizPlanListDetail.getFactAmount():new BigDecimal(0)));
 				}
 
 				if (repaymentBizPlanListDetail.getPlanItemName().equals("滞纳金")) {
 					lateFee = lateFee.add(repaymentBizPlanListDetail.getPlanAmount()
-							.subtract(repaymentBizPlanListDetail.getFactAmount()));
+							.subtract(repaymentBizPlanListDetail.getFactAmount()!=null?repaymentBizPlanListDetail.getFactAmount():new BigDecimal(0)));
 				}
 				if (repaymentBizPlanListDetail.getPlanItemName().equals("平台费")) {
 					platformFee = platformFee.add(repaymentBizPlanListDetail.getPlanAmount()
-							.subtract(repaymentBizPlanListDetail.getFactAmount()));
+							.subtract(repaymentBizPlanListDetail.getFactAmount()!=null?repaymentBizPlanListDetail.getFactAmount():new BigDecimal(0)));
 				}
 				if (repaymentBizPlanListDetail.getPlanItemName().equals("担保费")) {
 					guaranteeFee = guaranteeFee.add(repaymentBizPlanListDetail.getPlanAmount()
-							.subtract(repaymentBizPlanListDetail.getFactAmount()));
+							.subtract(repaymentBizPlanListDetail.getFactAmount()!=null?repaymentBizPlanListDetail.getFactAmount():new BigDecimal(0)));
 				}
 			}
 
-			if (serviceChargeRule.equals("")) {
-
-			} else if (serviceChargeRule.equals("pre")) {
-
-			} else {
-
-			}
-			BigDecimal calByMonth = businessRate.divide(new BigDecimal(100), 10).multiply(principal);
+			BigDecimal calByMonth = businessRate.divide(new BigDecimal(100), 2,RoundingMode.HALF_UP).multiply(principal);
 			BigDecimal calByDay = new BigDecimal(0.001).multiply(new BigDecimal(differ)).multiply(principal);
 
 			if (differ > 10) {
@@ -321,14 +321,20 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		repaymentBizPlan.setBusinessId(businessId);
 		repaymentBizPlan = repaymentBizPlanMapper
 				.selectOne(repaymentBizPlan);
+		List<Object> businessIds = renewalBusinessMapper.selectObjs(new EntityWrapper<RenewalBusiness>().eq("original_business_id", businessId).setSqlSelect("renewal_business_id")) ;
+		if (businessIds==null) {
+			businessIds = new ArrayList<>();
+		}
+		businessIds.add(businessId);
 		final List<RepaymentBizPlanList> planLists = repaymentBizPlanListMapper.selectList(
-				new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).orderBy("due_date"));
+				new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", businessId).orderBy("due_date"));
 		final List<RepaymentBizPlanListDetail> details = repaymentBizPlanListDetailMapper.selectList(
-				new EntityWrapper<RepaymentBizPlanListDetail>().eq("business_id", businessId).orderBy("period"));
+				new EntityWrapper<RepaymentBizPlanListDetail>().in("business_id", businessIds).orderBy("period"));
 		final ExpenseSettleRepaymentPlanVO plan = new ExpenseSettleRepaymentPlanVO(repaymentBizPlan, planLists, details);
-		
+		final List<BizOutputRecord> bizOutputRecord = bizOutputRecordMapper.selectList(
+				new EntityWrapper<BizOutputRecord>().eq("business_id", businessId).orderBy("fact_output_date", true));
 		ExpenseSettleVO expenseSettleVO = new ExpenseSettleVO() ;
-		calPrincipal(settleDate, expenseSettleVO, basicBusiness, plan);
+		calPrincipal(settleDate, expenseSettleVO, basicBusiness, plan,bizOutputRecord);
 		calInterest(settleDate, expenseSettleVO, basicBusiness, plan);
 		calServicecharge(settleDate, expenseSettleVO, basicBusiness, plan);
 		calGuaranteeFee(expenseSettleVO, basicBusiness);
@@ -349,13 +355,17 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 	 * 2018年3月30日 下午2:35:29
 	 * @param expenseSettleVO
 	 */
-	private void calPrincipal(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan) {
+	private void calPrincipal(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan,List<BizOutputRecord> bizOutputRecords) {
+		BigDecimal outPutMoney = new BigDecimal(0);
+		for (BizOutputRecord bizOutputRecord : bizOutputRecords) {
+			outPutMoney = outPutMoney.add(bizOutputRecord.getFactOutputMoney());
+		}
 		switch (basicBusiness.getRepaymentTypeId()) {
 		case 2:
-			expenseSettleVO.setPrincipal(basicBusiness.getBorrowMoney());
+			expenseSettleVO.setPrincipal(outPutMoney);
 			break;
 		case 5:
-			expenseSettleVO.setPrincipal(basicBusiness.getBorrowMoney().subtract(plan.calCurrentDetails(settleDate, 10, true)));
+			expenseSettleVO.setPrincipal(outPutMoney.subtract(plan.calCurrentDetails(settleDate, 10, true)));
 			break;
 		default:
 			/*找不到还款方式233333333333*/
@@ -487,11 +497,11 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		switch (basicBusiness.getRepaymentTypeId()) {
 		case 2:
 		case 5:
-			expenseSettleVO.setServicecharge(plan.calCurrentDetails(settleDate, 50, false));
+			expenseSettleVO.setPlatformFee(plan.calCurrentDetails(settleDate, 50, false));
 			break;
 		default:
 			/*找不到还款方式233333333333*/
-			expenseSettleVO.setServicecharge(new BigDecimal(233333333));
+			expenseSettleVO.setPlatformFee(new BigDecimal(233333333));
 			break;
 		}
 	}
@@ -660,7 +670,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 						if (e.getRepaymentBizPlanList() != null) {
 							int daysBeyoungDueDate = DateUtil.getDiffDays(e.getRepaymentBizPlanList().getDueDate(), settleDate);
 							BigDecimal lateFeeRate = d.getPlanAmount()
-									.divide(e.getRepaymentBizPlanList().getOverdueDays().multiply(expenseSettleVO.getPrincipal()));
+									.divide(e.getRepaymentBizPlanList().getOverdueDays().multiply(expenseSettleVO.getPrincipal()),2,RoundingMode.HALF_UP);
 							if (daysBeyoungDueDate > 1) {
 								firstLateFee = expenseSettleVO.getPrincipal().multiply(lateFeeRate)
 										.multiply(new BigDecimal(daysBeyoungDueDate));

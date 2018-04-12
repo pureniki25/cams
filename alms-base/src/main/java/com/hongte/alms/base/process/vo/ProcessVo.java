@@ -94,7 +94,11 @@ public class ProcessVo {
      */
     private String companyName;
 
-    
+
+    /**
+     * 是否我的审批
+     */
+    private boolean isMyApprove ;
     
     
     public Date getFinishTime() {
@@ -273,4 +277,18 @@ public class ProcessVo {
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
     }
+
+	/**
+	 * @return the isMyApprove
+	 */
+	public boolean isMyApprove() {
+		return isMyApprove;
+	}
+
+	/**
+	 * @param isMyApprove the isMyApprove to set
+	 */
+	public void setMyApprove(boolean isMyApprove) {
+		this.isMyApprove = isMyApprove;
+	}
 }

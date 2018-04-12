@@ -91,6 +91,29 @@ window.layinit(function (htConfig) {
                 tt.resetFields();
                 vm.toLoading();
             },
+            openModal(){
+                if(vm.selectedRowInfo.processTypeCode=="derate"){
+                    title ="减免申请";
+                    url = getDerateProcessUrl();
+                }else if (vm.selectedRowInfo.processTypeCode=="houseLoanLitigation") {
+                    title ="房贷移交法务申请";
+                    url = getHouseLoanProcessUrl();
+                }else if (vm.selectedRowInfo.processTypeCode=="carLoanLitigation") {
+                    title ="车贷移交法务申请";
+                    url = getCarLoanProcessUrl();
+                }else if(vm.selectedRowInfo.processTypeCode=="carAuctionAply"){
+                    title ="车辆拍卖申请审核";
+                    url = '/assets/car/carAuctionAudit?businessId='+vm.selectedRowInfo.businessId+"&processStatus="+vm.selectedRowInfo.status+"&processId="+vm.selectedRowInfo.processId;
+                }
+
+                layer.open({
+                    type: 2,
+                    title: title,
+                    maxmin: true,
+                    area: ['1250px', '800px'],
+                    content:url
+                });
+            }
         },
 
         mounted:function(){
@@ -163,7 +186,18 @@ window.layinit(function (htConfig) {
                         title: '操作',
                         width: 178,
                         align: 'left',
-                        toolbar: '#barTools'
+                        // toolbar: '#barTools',
+                        templet:function(d){
+                            let sp = '<a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="info" @click="openModal" >审批</a>' 
+                            let dt = '<a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="info" @click="openModal" >详情</a>' 
+                            let url = window.location.href 
+                            if(url.indexOf('waitToApprove')>-1){
+                                return sp ;
+                            }else{
+                                return dt ;
+                            }
+                        }
+
                     }
                 )
                 var cols1 = [cols];

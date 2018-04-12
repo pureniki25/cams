@@ -161,7 +161,7 @@ public class ExpenseSettleController {
 			return Result.error("500", "参数不能为空！");
 		}
 		Date settleDate = DateUtil.getDate(preSettleDate, "yyyy-MM-dd");
-		ExpenseSettleVO expenseSettleVO = new ExpenseSettleVO();
+		/*ExpenseSettleVO expenseSettleVO = new ExpenseSettleVO();
 		Date settelDate = DateUtil.getDate(preSettleDate, "yyyy-MM-dd");
 		BasicBusiness basicBusiness = basicBusinessService.selectById(businessId);
 		List<Object> businessIds = renewalBusinessService.selectObjs(new EntityWrapper<RenewalBusiness>().eq("original_business_id", businessId).setSqlSelect("renewal_business_id")) ;
@@ -180,12 +180,13 @@ public class ExpenseSettleController {
 			expenseSettleVO = calXXHB(settelDate, basicBusiness, repaymentBizPlan, planLists, details);
 		} else if (basicBusiness.getRepaymentTypeId() == 5) {
 			expenseSettleVO = calDEBX(settelDate, basicBusiness, repaymentBizPlan, planLists, details);
-		}
+		}*/
 
-		return Result.success(expenseSettleVO);
+		return Result.success(expenseSettleService.cal(businessId, settleDate));
 
 	}
 
+	
 	private Map<RepaymentBizPlanList, List<RepaymentBizPlanListDetail>> getPastPeriod(
 			List<RepaymentBizPlanList > currentPeriods, List<RepaymentBizPlanList> planLists,
 			List<RepaymentBizPlanListDetail> details) {
