@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.CarBusinessAfterMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.CarBusinessAfter">
+        <id column="car_business_id" property="carBusinessId" />
+        <result column="car_business_after_id" property="carBusinessAfterId" />
+        <result column="paratype" property="paratype" />
+        <result column="Customer_Name" property="CustomerName" />
+        <result column="operator_name" property="operatorName" />
+        <result column="operator_dept" property="operatorDept" />
+        <result column="create_time" property="createTime" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="is_delete" property="isDelete" />
+        <result column="repayment_type" property="repaymentType" />
+        <result column="borrow_money" property="borrowMoney" />
+        <result column="oddcorpus" property="oddcorpus" />
+        <result column="installment_num_date" property="installmentNumDate" />
+        <result column="installment_num" property="installmentNum" />
+        <result column="current_Principa" property="currentPrincipa" />
+        <result column="current_accrual" property="currentAccrual" />
+        <result column="punitive_rate_should" property="punitiveRateShould" />
+        <result column="punitive_rate_fact" property="punitiveRateFact" />
+        <result column="overdueDays" property="overdueDays" />
+        <result column="borrow_date" property="borrowDate" />
+        <result column="car_business_after_type" property="carBusinessAfterType" />
+        <result column="car_business_after_defer" property="carBusinessAfterDefer" />
+        <result column="is_defer" property="isDefer" />
+        <result column="car_business_defer_id" property="carBusinessDeferId" />
+        <result column="other_money" property="otherMoney" />
+        <result column="fact_money" property="factMoney" />
+        <result column="lawyer_money" property="lawyerMoney" />
+        <result column="createdate" property="createdate" />
+        <result column="updateDate" property="updateDate" />
+        <result column="is_collection" property="isCollection" />
+        <result column="repayed_flag" property="repayedFlag" />
+        <result column="reserve_2" property="reserve2" />
+        <result column="reserve_3" property="reserve3" />
+        <result column="reserve_4" property="reserve4" />
+        <result column="reserve_5" property="reserve5" />
+        <result column="ModifyUser" property="ModifyUser" />
+        <result column="workflowstatus" property="workflowstatus" />
+        <result column="reserve_6" property="reserve6" />
+        <result column="reserve_7" property="reserve7" />
+        <result column="reserve_8" property="reserve8" />
+        <result column="reserve_9" property="reserve9" />
+        <result column="reserve_10" property="reserve10" />
+        <result column="TrackRecord" property="TrackRecord" />
+        <result column="collectionDate" property="collectionDate" />
+        <result column="bad_debt_mark" property="badDebtMark" />
+        <result column="settle_mark" property="settleMark" />
+        <result column="fact_replayMoney" property="factReplayMoney" />
+        <result column="fatct_replayDate" property="fatctReplayDate" />
+        <result column="fact_principa" property="factPrincipa" />
+        <result column="fact_accrual" property="factAccrual" />
+        <result column="overdue_money" property="overdueMoney" />
+        <result column="current_Breach" property="currentBreach" />
+        <result column="repay_service" property="repayService" />
+        <result column="fact_service" property="factService" />
+        <result column="remark" property="remark" />
+        <result column="payment_type" property="paymentType" />
+        <result column="current_other_money" property="currentOtherMoney" />
+        <result column="confirm_flag" property="confirmFlag" />
+        <result column="collection_user" property="collectionUser" />
+        <result column="collection_remark" property="collectionRemark" />
+        <result column="out_id" property="outId" />
+        <result column="is_loss_settle" property="isLossSettle" />
+        <result column="finance_confirmed_date" property="financeConfirmedDate" />
+        <result column="finance_confirmed_user" property="financeConfirmedUser" />
+        <result column="auto_withholding_confirmed_date" property="autoWithholdingConfirmedDate" />
+        <result column="auto_withholding_confirmed_user" property="autoWithholdingConfirmedUser" />
+        <result column="finance_bank_id" property="financeBankId" />
+        <result column="accountant_confirm_status" property="accountantConfirmStatus" />
+        <result column="accountant_confirm_user" property="accountantConfirmUser" />
+        <result column="accountant_confirm_date" property="accountantConfirmDate" />
+        <result column="tuandai_distribute_fund_status" property="tuandaiDistributeFundStatus" />
+        <result column="issue_after_type" property="issueAfterType" />
+        <result column="tuandai_advance_status" property="tuandaiAdvanceStatus" />
+        <result column="tuandai_profit_status" property="tuandaiProfitStatus" />
+        <result column="tuandai_distribute_fund_remark" property="tuandaiDistributeFundRemark" />
+        <result column="business_after_guid" property="businessAfterGuid" />
+        <result column="tracking_after_type" property="trackingAfterType" />
+        <result column="legal_return_status" property="legalReturnStatus" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        car_business_id AS carBusinessId, car_business_after_id AS carBusinessAfterId, paratype, Customer_Name AS CustomerName, operator_name AS operatorName, operator_dept AS operatorDept, create_time AS createTime, modify_time AS modifyTime, is_delete AS isDelete, repayment_type AS repaymentType, borrow_money AS borrowMoney, oddcorpus, installment_num_date AS installmentNumDate, installment_num AS installmentNum, current_Principa AS currentPrincipa, current_accrual AS currentAccrual, punitive_rate_should AS punitiveRateShould, punitive_rate_fact AS punitiveRateFact, overdueDays, borrow_date AS borrowDate, car_business_after_type AS carBusinessAfterType, car_business_after_defer AS carBusinessAfterDefer, is_defer AS isDefer, car_business_defer_id AS carBusinessDeferId, other_money AS otherMoney, fact_money AS factMoney, lawyer_money AS lawyerMoney, createdate, updateDate, is_collection AS isCollection, repayed_flag AS repayedFlag, reserve_2 AS reserve2, reserve_3 AS reserve3, reserve_4 AS reserve4, reserve_5 AS reserve5, ModifyUser, workflowstatus, reserve_6 AS reserve6, reserve_7 AS reserve7, reserve_8 AS reserve8, reserve_9 AS reserve9, reserve_10 AS reserve10, TrackRecord, collectionDate, bad_debt_mark AS badDebtMark, settle_mark AS settleMark, fact_replayMoney AS factReplayMoney, fatct_replayDate AS fatctReplayDate, fact_principa AS factPrincipa, fact_accrual AS factAccrual, overdue_money AS overdueMoney, current_Breach AS currentBreach, repay_service AS repayService, fact_service AS factService, remark, payment_type AS paymentType, current_other_money AS currentOtherMoney, confirm_flag AS confirmFlag, collection_user AS collectionUser, collection_remark AS collectionRemark, out_id AS outId, is_loss_settle AS isLossSettle, finance_confirmed_date AS financeConfirmedDate, finance_confirmed_user AS financeConfirmedUser, auto_withholding_confirmed_date AS autoWithholdingConfirmedDate, auto_withholding_confirmed_user AS autoWithholdingConfirmedUser, finance_bank_id AS financeBankId, accountant_confirm_status AS accountantConfirmStatus, accountant_confirm_user AS accountantConfirmUser, accountant_confirm_date AS accountantConfirmDate, tuandai_distribute_fund_status AS tuandaiDistributeFundStatus, issue_after_type AS issueAfterType, tuandai_advance_status AS tuandaiAdvanceStatus, tuandai_profit_status AS tuandaiProfitStatus, tuandai_distribute_fund_remark AS tuandaiDistributeFundRemark, business_after_guid AS businessAfterGuid, tracking_after_type AS trackingAfterType, legal_return_status AS legalReturnStatus
+    </sql>
+
+
+    <select id="queryNotTransferPhoneUser" resultType="com.hongte.alms.base.entity.CarBusinessAfter" parameterType="com.hongte.alms.base.vo.module.CollectionReq">
+
+        SELECT
+        *
+        FROM
+        tb_car_business_after tt
+        WHERE
+        NOT EXISTS (
+        SELECT
+        *
+        FROM
+        (
+        SELECT
+        t1.business_id,
+        t1.car_business_after_id
+        FROM
+        tb_collection_log_xd t1
+        JOIN tb_collection_status t2 ON t1.business_id = t2.business_id
+        JOIN tb_repayment_biz_plan_list t3 ON t1.business_id = t3.business_id
+        AND t1.after_id = t3.after_id
+        AND t3.plan_list_id = t2.crp_id
+        ) tp
+        WHERE
+        tt.business_id = tp.business_id
+        AND tt.after_id = tp.after_id
+        )
+        limit #{offSet} , #{pageSize}
+
+    </select>
+
+
+    <select id="queryNotTransferPhoneUserCount" resultType="int">
+        SELECT
+        count(1)
+        FROM
+        tb_car_business_after tt
+        WHERE
+        NOT EXISTS (
+        SELECT
+        *
+        FROM
+        (
+        SELECT
+        t1.business_id,
+        t1.car_business_after_id
+        FROM
+        tb_car_business_after t1
+        JOIN tb_collection_status t2 ON t1.business_id = t2.business_id
+        JOIN tb_repayment_biz_plan_list t3 ON t1.business_id = t3.business_id
+        AND t1.car_business_after_id = t3.after_id
+        AND t3.plan_list_id = t2.crp_id
+        ) tp
+        WHERE
+        tt.business_id = tp.business_id
+        AND tt.after_id = tp.after_id
+        )
+    </select>
+
+
+
+</mapper>
