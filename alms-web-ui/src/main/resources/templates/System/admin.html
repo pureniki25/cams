@@ -48,6 +48,21 @@
 		   	</i-button>
     	</div>
     	<div style="margin-top:10px; margin-left:10px">
+		   	<i-lable>同步指定还款计划催收数据：</i-lable>
+            业务ID：
+            <div class="layui-inline">
+                <input v-model="onePListCollogBId" class="layui-input" name="id" id="onePListCollogBId">
+            </div>
+            还款计划期数：
+            <div class="layui-inline">
+                <input v-model="onePListCollogAfterId" class="layui-input" name="id" id="onePListCollogAfterId">
+            </div>
+		   	<i-button :loading="synOneListColLoading" @click="syncCollection">
+		   		<i-span v-if="!synOneListColLoading">同步一个还款计划</i-span>
+		   		<i-span v-else>同步中...</i-span>
+		   	</i-button>
+    	</div>
+    	<div style="margin-top:10px; margin-left:10px">
 		   	<i-lable>设置所有用户可访问业务对照关系：</i-lable>
 		   	<i-button :loading="setUserPermissonsLoading" @click="setUserPermissons">
 		   		<i-span v-if="!setUserPermissonsLoading">执行</i-span>

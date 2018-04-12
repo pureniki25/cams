@@ -8,9 +8,15 @@ window.layinit(function (htConfig) {
 	   el: '#app',
 	   data: {
 		   // --- 按钮控制标识 start---
-		   syncCollectionLoading:false,				
-		   setUserPermissonsLoading:false,		
+		   syncCollectionLoading:false,
+           synOneListColLoading:false,
+           setUserPermissonsLoading:false,
 		   // --- 按钮控制标识 end---
+
+		   onePListCollogBId:"",
+           onePListCollogAfterId:"",
+
+
 	   },
 	   methods: {
 		   // 同步催收数据
@@ -29,6 +35,25 @@ window.layinit(function (htConfig) {
 		        })
 		        .catch(function (error) {
 		        	vm.syncCollectionLoading = false;
+		            vm.$Modal.error({content: '接口调用异常!'});
+		        });
+		   },
+		   // 同步指定还款计划催收数据
+		   syncCollection:function(){
+			   this.synOneListColLoading = true;
+			   axios.get(basePath +"alms/setCollectionStatus?businessId="+vm.onePListCollogBId+"&afterId="+vm.onePListCollogAfterId,{timeout: 0})
+		        .then(function (res) {
+		        	vm.synOneListColLoading = false;
+		            if (res.data.data != null && res.data.code == 1) {
+		            	vm.$Modal.success({
+		                    content: res.data.msg
+		                });
+		            } else {
+		                vm.$Modal.error({content: res.data.msg });
+		            }
+		        })
+		        .catch(function (error) {
+		        	vm.synOneListColLoading = false;
 		            vm.$Modal.error({content: '接口调用异常!'});
 		        });
 		   },
