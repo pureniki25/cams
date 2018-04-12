@@ -351,7 +351,7 @@ public class CollectionTransferController {
 
 
         if(businessAfter==null && collection == null){
-            return Result.error("113","找不到信贷的历史电催/催收数据");
+            return Result.error("113","找不到信贷的历史电催或催收数据");
         }
 
 
