@@ -131,7 +131,7 @@ public class ExpenseSettleRepaymentPlanVO  {
 				expenseSettleRepaymentPlanListVOs.add(expenseSettleRepaymentPlanListVO) ;
 			}
 		}
-		
+		Collections.sort(expenseSettleRepaymentPlanListVOs);
 		currentPeriodVOs = expenseSettleRepaymentPlanListVOs ;
 		return expenseSettleRepaymentPlanListVOs;
 		
@@ -238,7 +238,7 @@ public class ExpenseSettleRepaymentPlanVO  {
 				pastPeriods.add(expenseSettleRepaymentPlanListVO);
 			}
 		}
-		
+		Collections.sort(pastPeriods);
 		pastPeriodVOs = pastPeriods ;
 		return pastPeriods ;
 	}
