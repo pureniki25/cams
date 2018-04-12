@@ -28,6 +28,14 @@ public class ExpenseSettleRepaymentPlanVO  {
 	private RepaymentBizPlan repaymentBizPlan ;
 
 	private List<ExpenseSettleRepaymentPlanListVO> repaymentPlanListVOs ;
+	
+	private List<ExpenseSettleRepaymentPlanListVO> currentPeriodVOs ;
+	private List<RepaymentBizPlanListDetail> currentDetails ;
+	private List<RepaymentBizPlanListDetail> allDetails ;
+	private List<ExpenseSettleRepaymentPlanListVO> pastPeriodVOs ;
+	private ExpenseSettleRepaymentPlanListVO finalPeriod ;
+	
+	
 	class PlanListSortor implements Comparator<RepaymentBizPlanList> {
 
 		@Override
@@ -91,6 +99,10 @@ public class ExpenseSettleRepaymentPlanVO  {
 	 * @return
 	 */
 	public List<ExpenseSettleRepaymentPlanListVO> findCurrentPeriods(Date settleDate){
+		if (currentPeriodVOs!=null&&currentPeriodVOs.size()>0) {
+			return currentPeriodVOs ;
+		}
+		
 		List<ExpenseSettleRepaymentPlanListVO> expenseSettleRepaymentPlanListVOs = new ArrayList<>() ;
 		int diff = 0 ;
 		ExpenseSettleRepaymentPlanListVO compare = null ;
@@ -107,11 +119,12 @@ public class ExpenseSettleRepaymentPlanVO  {
 				}
 			}
 		}
+		expenseSettleRepaymentPlanListVOs.add(compare);
 		
 		logger.info("CurrentPeriod:"+compare.getRepaymentBizPlanList().getAfterId());
 		int compareYear = DateUtil.getYear(compare.getRepaymentBizPlanList().getDueDate());
 		int compareMonth = DateUtil.getMonth(compare.getRepaymentBizPlanList().getDueDate());
-		for (ExpenseSettleRepaymentPlanListVO expenseSettleRepaymentPlanListVO : expenseSettleRepaymentPlanListVOs) {
+		for (ExpenseSettleRepaymentPlanListVO expenseSettleRepaymentPlanListVO : this.getRepaymentPlanListVOs()) {
 			int year = DateUtil.getDay(expenseSettleRepaymentPlanListVO.getRepaymentBizPlanList().getDueDate());
 			int month = DateUtil.getMonth(expenseSettleRepaymentPlanListVO.getRepaymentBizPlanList().getDueDate());
 			
@@ -120,8 +133,8 @@ public class ExpenseSettleRepaymentPlanVO  {
 			}
 		}
 		
-		
-		return getRepaymentPlanListVOs();
+		currentPeriodVOs = expenseSettleRepaymentPlanListVOs ;
+		return expenseSettleRepaymentPlanListVOs;
 		
 	}
 	
@@ -134,11 +147,15 @@ public class ExpenseSettleRepaymentPlanVO  {
 	 * @return
 	 */
 	public List<RepaymentBizPlanListDetail> findCurrentDetails(Date settleDate){
+		if (currentDetails!=null&&currentDetails.size()>0) {
+			return currentDetails ;
+		}
 		List<RepaymentBizPlanListDetail> details = new ArrayList<>() ;
 		List<ExpenseSettleRepaymentPlanListVO>  currentPeriods = findCurrentPeriods(settleDate);
 		for (ExpenseSettleRepaymentPlanListVO expenseSettleRepaymentPlanListVO : currentPeriods) {
 			details.addAll(expenseSettleRepaymentPlanListVO.getRepaymentBizPlanListDetails());
 		}
+		currentDetails = details ;
 		return details;
 	}
 	
@@ -173,7 +190,11 @@ public class ExpenseSettleRepaymentPlanVO  {
 	 * @return
 	 */
 	public ExpenseSettleRepaymentPlanListVO findFinalPeriod() {
-		return this.getRepaymentPlanListVOs().get(this.getRepaymentPlanListVOs().size()-1);
+		if (finalPeriod!=null) {
+			return finalPeriod ;
+		}
+		finalPeriod = this.getRepaymentPlanListVOs().get(this.getRepaymentPlanListVOs().size()-1) ;
+		return finalPeriod ;
 	}
 	
 	/**
@@ -183,10 +204,14 @@ public class ExpenseSettleRepaymentPlanVO  {
 	 * @return
 	 */
 	public List<RepaymentBizPlanListDetail> allDetails(){
+		if (allDetails!=null&&allDetails.size()>0) {
+			return allDetails ;
+		}
 		List<RepaymentBizPlanListDetail> list = new ArrayList<>();new ArrayList<>();
 		for (ExpenseSettleRepaymentPlanListVO expenseSettleRepaymentPlanListVO : getRepaymentPlanListVOs()) {
 			list.addAll(expenseSettleRepaymentPlanListVO.getRepaymentBizPlanListDetails());
 		}
+		allDetails = list ;
 		return list ;
 	}
 	
@@ -198,6 +223,9 @@ public class ExpenseSettleRepaymentPlanVO  {
 	 * @return
 	 */
 	public List<ExpenseSettleRepaymentPlanListVO> findPastPeriods(Date settleDate){
+		if (pastPeriodVOs!=null&&pastPeriodVOs.size()>0) {
+			return pastPeriodVOs ;
+		}
 		List<ExpenseSettleRepaymentPlanListVO> pastPeriods = new ArrayList<>();
 		List<ExpenseSettleRepaymentPlanListVO> currentPeriods = findCurrentPeriods(settleDate);
 		Date currentPeriodDate = currentPeriods.get(0).getRepaymentBizPlanList().getDueDate() ;
@@ -208,7 +236,7 @@ public class ExpenseSettleRepaymentPlanVO  {
 			}
 		}
 		
-		
+		pastPeriodVOs = pastPeriods ;
 		return pastPeriods ;
 	}
 
