@@ -7,36 +7,6 @@ window.layinit = function (cb) {
     axios.defaults.headers.common['app'] = 'ALMS';
     axios.defaults.headers.common['Authorization'] = 'Bearer ' + getToken();
 
-    
-
-
-    // axios.defaults.headers.common['instanceId'] = coreInstancedId;
-    // if()
-
-    // axios.defaults.headers.common['instanceId'] = 'Bearer ' + getToken();
- /*   $.ajax({
-        type : 'GET',
-        async : false,
-        // url : "http://10.110.1.240:30111/uc/auth/loadBtnAndTab",
-        // url : "http://localhost:30111/uc/auth/loadBtnAndTab",
-        url : "/properties/config.js",
-        headers : {
-            app : 'ALMS',
-            Authorization : "Bearer " + getToken()
-        },
-        success : function(data) {
-            htConfig = JSON.parse(str)
-            // allAuth = data;
-        },
-        error : function() {
-/!*            layer.confirm('Navbar error:AJAX请求出错!', function(index) {
-                top.location.href = loginUrl;
-                layer.close(index);
-            });*!/
-            return false;
-        }
-    });*/
-
     layui.config({
         base : '/plugins/layui/extend/modules/',
         version : '1.0.11'
@@ -49,23 +19,6 @@ window.layinit = function (cb) {
         _loadBtnAndTabUrl =  htConfig.loadBtnAndTabUrl;
 
        if(!htConfig.useGateWayflage){
-           /*  $.ajax({
-                type : 'GET',
-                async : false,
-                // url : "http://10.110.1.240:30111/uc/auth/loadBtnAndTab",
-                // url : "http://localhost:30111/uc/auth/loadBtnAndTab",
-                url : htConfig.basePath +"core/" +"SysUser/getUserIdByToken",
-                headers : {
-                    app : 'ALMS',
-                    Authorization : "Bearer " + getToken()
-                },
-                success : function(data) {
-                    axios.defaults.headers.common['userId'] = data;
-                },
-                error : function() {
-                    axios.defaults.headers.common['userId'] = htConfig.defaultUser;
-                }
-            });*/
             htConfig.basePath = htConfig.localBasePath;
             htConfig.coreBasePath = htConfig.localBasePath;
             htConfig.uiBasePath = htConfig.uiBasePath;
@@ -76,6 +29,7 @@ window.layinit = function (cb) {
             htConfig.openBasePath = htConfig.basePath +"open/";
             htConfig.uiBasePath = htConfig.uiBasePath;
         }
+        //axios 访问前处理token问题
         axios.interceptors.request.use(function (config) {
             layui.ht_ajax.validationAndRefreshToken()
             return config;
@@ -83,6 +37,13 @@ window.layinit = function (cb) {
             // 对请求错误做些什么
             return Promise.reject(error);
         });
+
+       //jquery ajax 访问前处理token问题
+		if(typeof $ != "undefined"){
+            layui.ht_ajax.extendsAjax($);
+        }
+
+
         cb(htConfig)
     });
 }
@@ -134,6 +95,10 @@ var authValid = function(param) {
 	}
 	return false;
 }
+
+
+
+
 /**
  * 取得头部的需要添加的信息（ajax）
  * @param serviceFlage
