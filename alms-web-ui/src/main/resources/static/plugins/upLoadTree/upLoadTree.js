@@ -381,7 +381,7 @@
                 var del_fileList=[];
                 var del_docIDList=[];
                 for(var i=0;i<del_divList.length;i++){
-                    del_fileList.push(del_divList[i].data("item"));
+                    del_fileList.push(del_divList.data("item"));
                     del_docIDList.push(del_divList.eq(i).data("id"));
                     var cutnum = parseInt(fileupLoad.options.getCurrentFileCount());
                     cutnum--;
