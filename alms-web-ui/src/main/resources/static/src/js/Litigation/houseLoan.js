@@ -600,7 +600,7 @@ var getShowInfo = function () {
     }
     axios.get(reqStr)
         .then(function (res) {
-            if (res.data.data.baseInfo != null && res.data.code == 1) {
+            if (res.data.code == 1) {
             	
             	vm.baseInfoForm = res.data.data.baseInfo;
             	vm.baseInfoForm.borrowRate += "%/年";
@@ -706,7 +706,7 @@ var getShowInfo = function () {
 ////////// --------------  界面显示控制   结束---------------//////////
                 }
             } else {
-                vm.$Modal.error({content: '执行失败，没有找到数据！' });
+                vm.$Modal.error({content: res.data.msg });
             }
         })
         .catch(function (error) {
