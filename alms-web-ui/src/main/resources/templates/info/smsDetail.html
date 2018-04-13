@@ -77,9 +77,11 @@
            </row>
            
            <row style="padding: 10px">  <!--@click="showCollectionStackLog()"-->
-	      		<i-col span="24">
-	                <i-button  type="success"  @click="getLast()" >上一条</i-button>
-	                <i-button  type="info"  @click="getNext()"  >下一条</i-button>
+	      		<i-col span="24" style="text-align: right">
+                        <div class="layui-btn-group">
+                                <button class="layui-btn" @click="getLast()">上一条</button>
+                                <button class="layui-btn" @click="getNext()" >下一条</button>
+                              </div>
 	            </i-col> 
         	</row>
 </div>
