@@ -40,6 +40,8 @@
 <link rel="stylesheet" href="/Components/ProcessLine/ProcessLine.css">
 <script src="/Components/ProcessLine/ProcessLine.js"></script>
 
+<script src="/src/js/moment.min.js"></script>
+
 <script type="text/javascript" src="/plugins/selectSearch/select-vue-component.js"></script>
 <script src="/build/js/appToken.js"></script>
 <style type="text/css">
@@ -169,7 +171,7 @@ color: #FF3030;
 						<tr>
 							<td class="td_label">剩余本金</td>
 							<td><input type="text" 
-								class="input-border-none" v-bind:value="business.borrowMoney-repayPlan.payedPrincipal" readonly="readonly"></td>
+								class="input-border-none" v-bind:value="remainingPrincipal" readonly="readonly"></td>
 							<td class="td_label">利息交至日期</td>
 							<td><input type="text" 
 								class="input-border-none" v-bind:value="repayPlan.lastPayDate" readonly="readonly"></td>

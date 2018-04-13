@@ -136,8 +136,8 @@
 		      THEN pdetail.plan_amount 
 		      ELSE 0 
 		    END
-		  ) AS `payedPrincipal`,	--   已还本金
-		  rp.original_business_id AS `original_business_id` 
+		  ) AS `payedPrincipal`	--   已还本金
+		--  rp.original_business_id AS `original_business_id` 
 		FROM
 		  tb_repayment_biz_plan_list_detail pdetail 
 		  LEFT JOIN tb_repayment_biz_plan_list l 

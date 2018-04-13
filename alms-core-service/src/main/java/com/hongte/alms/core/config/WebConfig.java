@@ -38,15 +38,15 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         converter.setObjectMapper(mapper);
         return converter;
     }
-//    @Bean  
-//    public MultipartConfigElement multipartConfigElement() {  
-//        MultipartConfigFactory factory = new MultipartConfigFactory();  
-//        //单个文件最大  
-//        factory.setMaxFileSize("10240KB"); //KB,MB  
-//        /// 设置总上传数据总大小  
-//        factory.setMaxRequestSize("102400KB");  
-//        return factory.createMultipartConfig();  
-//    }  
+    @Bean  
+    public MultipartConfigElement multipartConfigElement() {  
+        MultipartConfigFactory factory = new MultipartConfigFactory();  
+        //单个文件最大  
+        factory.setMaxFileSize("10240KB"); //KB,MB  
+        /// 设置总上传数据总大小  
+        factory.setMaxRequestSize("102400KB");  
+        return factory.createMultipartConfig();  
+    }  
     //添加转换器
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {

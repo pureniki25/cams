@@ -578,7 +578,7 @@ window.layinit(function (htConfig) {
 						vm.drag.dragDate = moment(vm.drag.dragDate).format("YYYY年MM月DD日")
 						vm.detection=data.data.detection;
 						vm.detection.createTime = moment(vm.detection.createTime).format("YYYY年MM月DD日")
-						vm.detection.vehicleLicenseRegistrationDate=moment(vm.detection.vehicleLicenseRegistrationDate).format("YYYY年MM月DD日")
+						//vm.detection.vehicleLicenseRegistrationDate=moment(vm.detection.vehicleLicenseRegistrationDate).format("YYYY年MM月DD日")
 						// vm.detection.annualVerificationExpirationDate=moment(vm.detection.annualVerificationExpirationDate).format("YYYY年MM月DD日")
 						vm.detection.insuranceExpirationDate = moment(vm.detection.insuranceExpirationDate).format("YYYY-MM-DD")
 						vm.mortgageDetection=data.data.mortgageDetection;

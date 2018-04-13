@@ -7,6 +7,8 @@ import java.util.Date;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -319,6 +321,7 @@ public class CarDetection extends Model<CarDetection> {
     /**
      * 汽车注册日期 
      */
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy年MM月dd日")
 	@TableField("vehicle_license_registration_date")
 	@ApiModelProperty(required= true,value = "汽车注册日期 ")
 	private Date vehicleLicenseRegistrationDate;
