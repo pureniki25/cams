@@ -366,7 +366,13 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 			expenseSettleVO.setPrincipal(outPutMoney);
 			break;
 		case 5:
-			expenseSettleVO.setPrincipal(outPutMoney.subtract(plan.calCurrentDetails(settleDate, 10, true)));
+			BigDecimal paid = new BigDecimal(0);
+			for (RepaymentBizPlanListDetail detail : plan.allDetails()) {
+				if (detail.getPlanItemType().equals(new Integer(10))) {
+					paid=paid.add(detail.getFactAmount()==null?new BigDecimal(0):detail.getFactAmount());
+				}
+			}
+			expenseSettleVO.setPrincipal(outPutMoney.subtract(paid));
 			break;
 		default:
 			/*找不到还款方式233333333333*/
