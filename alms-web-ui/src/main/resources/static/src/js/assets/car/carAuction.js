@@ -37,6 +37,7 @@ window.layinit(function (htConfig) {
 	    		originalName: '',
 	    		oldDocId:''
 	    	}],
+	    	remainingPrincipal:'',//剩余金额
 	    	business:{
 	    		 businessId:''// 业务编号
 	    		,customerName:''// 主借款人的客户姓名
@@ -590,7 +591,20 @@ window.layinit(function (htConfig) {
 	                	}
 	                	if(vm.repayPlan.payedPrincipal==null||vm.repayPlan.payedPrincipal==''){
 							vm.repayPlan.payedPrincipal=0;
-	                	}
+	                	}else {
+	                		vm.repayPlan.payedPrincipal = Number(vm.repayPlan.payedPrincipal).toFixed(2);
+						}
+	                	if(vm.repayPlan.payedInterest==null||vm.repayPlan.payedInterest==''){
+	                 		vm.repayPlan.payedInterest=0;
+	                 	}else {
+	                 		vm.repayPlan.payedInterest = Number(vm.repayPlan.payedInterest).toFixed(2);
+	                 	}
+	                	vm.remainingPrincipal = vm.business.borrowMoney - vm.repayPlan.payedPrincipal;
+	                	if(vm.remainingPrincipal==null||vm.remainingPrincipal==''){
+	                 		vm.remainingPrincipal=0;
+	                 	}else {
+	                 		vm.remainingPrincipal = Number(vm.remainingPrincipal).toFixed(2);
+	                 	}
 	                	vm.outputRecord=data.data.outputRecord;
 						vm.outputRecord.factOutputDate = moment(vm.outputRecord.factOutputDate).format("YYYY年MM月DD日")
 	                	if(data.data.detection.evaluationAmount==null||data.data.detection.evaluationAmount==''){
@@ -598,7 +612,13 @@ window.layinit(function (htConfig) {
 	                	}else{
 	                		vm.detection.viewEvaluationAmount=data.data.detection.evaluationAmount;
 	                		vm.detection.differAmount=Math.abs(data.data.detection.evaluationAmount-data.data.mortgageDetection.evaluationAmount);
+	                		vm.repayPlan.differAmount = Number(vm.repayPlan.differAmount).toFixed(2);
+	                		vm.detection.evaluationAmount = Number(data.data.detection.evaluationAmount).toFixed(2);
+	                		vm.detection.viewEvaluationAmount = Number(vm.detection.viewEvaluationAmount).toFixed(2);
 	                	}
+						if (vm.mortgageDetection.evaluationAmount != null || vm.mortgageDetection.evaluationAmount != '') {
+							vm.mortgageDetection.evaluationAmount = Number(vm.mortgageDetection.evaluationAmount).toFixed(2);
+						}
 	                	vm.detection.assessOdometer=vm.detection.odometer;// 为页面验证用
 	                	vm.detection.viewInsuranceExpirationDate=vm.detection.insuranceExpirationDate;
 	                	vm.carAuction=data.data.carAuction;

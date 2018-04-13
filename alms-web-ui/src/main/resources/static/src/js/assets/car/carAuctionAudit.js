@@ -717,6 +717,9 @@ window.layinit(function (htConfig) {
 	                 	}else {
 	                 		vm.remainingPrincipal = Number(vm.remainingPrincipal).toFixed(2);
 	                 	}
+	                 	if (vm.mortgageDetection.evaluationAmount != null || vm.mortgageDetection.evaluationAmount != '') {
+							vm.mortgageDetection.evaluationAmount = Number(vm.mortgageDetection.evaluationAmount).toFixed(2);
+						}
 	                	vm.outputRecord=data.data.outputRecord;
 	                	vm.outputRecord.factOutputDate = moment(vm.outputRecord.factOutputDate).format("YYYY年MM月DD日")
 	                	if(data.data.detection.evaluationAmount==null||data.data.detection.evaluationAmount==''){
@@ -724,6 +727,9 @@ window.layinit(function (htConfig) {
 	                	}else{
 	                		vm.detection.viewEvaluationAmount=data.data.detection.evaluationAmount;
 	                		vm.detection.differAmount=Math.abs(data.data.detection.evaluationAmount-data.data.mortgageDetection.evaluationAmount);
+	                		vm.repayPlan.differAmount = Number(vm.repayPlan.differAmount).toFixed(2);
+	                		vm.detection.evaluationAmount = Number(data.data.detection.evaluationAmount).toFixed(2);
+	                		vm.detection.viewEvaluationAmount = Number(vm.detection.viewEvaluationAmount).toFixed(2);
 	                	}
 	                	vm.detection.assessOdometer=vm.detection.odometer;//为页面验证用
 	                	vm.detection.viewInsuranceExpirationDate=vm.detection.insuranceExpirationDate;
