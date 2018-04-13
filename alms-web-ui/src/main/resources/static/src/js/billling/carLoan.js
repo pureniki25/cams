@@ -59,15 +59,24 @@ window.layinit(function (htConfig) {
 				},
 				{
 					title: '服务费',
-					key: 'previousPlanServiceCharge'
+					key: 'previousPlanServiceCharge',
+					render:(h,params)=>{
+						return h('span',params.row.previousPlanServiceCharge?numeral(params.row.previousPlanServiceCharge).format('0,0.00'):0)
+					}
 				},
 				{
 					title: '滞纳金',
-					key: 'previousLateFees'
+					key: 'previousLateFees',
+					render:(h,params)=>{
+						return h('span',params.row.previousLateFees?numeral(params.row.previousLateFees).format('0,0.00'):0)
+					}
 				},
 				{
 					title: '利息',
-					key: 'previousPlanAccrual'
+					key: 'previousPlanAccrual',
+					render:(h,params)=>{
+						return h('span',params.row.previousPlanAccrual?numeral(params.row.previousPlanAccrual).format('0,0.00'):0)
+					}
 				}
 			],
 			

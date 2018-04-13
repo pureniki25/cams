@@ -40,23 +40,35 @@ window.layinit(function (htConfig) {
             arrearageDetailTitle: [
 				{
 					title: '期数',
-					key: 'period'
+                    key: 'period'
 				},
 				{
 					title: '服务费',
-					key: 'servicecharge'
+                    key: 'servicecharge',
+                    render:function(h,params){
+                        return h('span',params.row.servicecharge?numeral(params.row.servicecharge).format('0,0.00'):0)
+                    }
                 },
                 {
 					title: '平台费',
-					key: 'platFormFee'
+					key: 'platFormFee',
+                    render:function(h,params){
+                        return h('span',params.row.platFormFee?numeral(params.row.platFormFee).format('0,0.00'):0)
+                    }
 				},
 				{
 					title: '滞纳金',
-					key: 'lateFee'
+					key: 'lateFee',
+                    render:function(h,params){
+                        return h('span',params.row.lateFee?numeral(params.row.lateFee).format('0,0.00'):0)
+                    }
 				},
 				{
 					title: '利息',
-					key: 'interest'
+					key: 'interest',
+                    render:function(h,params){
+                        return h('span',params.row.interest?numeral(params.row.interest).format('0,0.00'):0)
+                    }
 				}
 			]
         },

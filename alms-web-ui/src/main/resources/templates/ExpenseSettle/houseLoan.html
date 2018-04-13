@@ -110,7 +110,7 @@
                             </div>
                             <div class="td">
                                 <div class="td-box">借款金额</div>
-                                <div class="td-box">{{business.base.borrowMoney}} </div>
+                                <div class="td-box">{{business.base.borrowMoney?numeral(business.base.borrowMoney).format('0,0.00'):0}} </div>
                             </div>
                         </div>
                         <div class="tr">
@@ -134,7 +134,7 @@
                             </div>
                             <div class="td">
                                 <div class="td-box">出款金额</div>
-                                <div class="td-box">{{business.output.money}} </div>
+                                <div class="td-box">{{business.output.money?numeral(business.output.money).format('0,0.00'):0}} </div>
                             </div>
                             <div class="td">
                                 <div class="td-box">出款人</div>
@@ -165,30 +165,30 @@
                         <div class="tr">
                             <div class="td">
                                 <div class="td-box">本金</div>
-                                <div class="td-box">{{business.info.principal}}</div>
+                                <div class="td-box">{{business.info.principal?numeral(business.info.principal).format('0,0.00'):0 }}</div>
                             </div>
                             <div class="td">
                                 <div class="td-box">利息</div>
-                                <div class="td-box">{{business.info.interest}}</div>
+                                <div class="td-box">{{business.info.interest?numeral(business.info.interest).format('0,0.00'):0 }}</div>
                             </div>
                             <div class="td">
                                 <div class="td-box">服务费</div>
-                                <div class="td-box">{{business.info.servicecharge}}</div>
+                                <div class="td-box">{{business.info.servicecharge?numeral(business.info.servicecharge).format('0,0.00'):0}}</div>
                             </div>
                         </div>
                         <div class="tr">
                             <div class="td">
                                 <div class="td-box">担保公司费用</div>
-                                <div class="td-box">{{business.info.guaranteeFee}}</div>
+                                <div class="td-box">{{business.info.guaranteeFee?numeral(business.info.guaranteeFee).format('0,0.00'):0}}</div>
                             </div>
                             <div class="td">
                                 <div class="td-box">平台费</div>
-                                <div class="td-box">{{business.info.platformFee}}</div>
+                                <div class="td-box">{{business.info.platformFee?numeral(business.info.platformFee).format('0,0.00'):0}}</div>
                             </div>
                             <div class="td">
                                 <div class="td-box">期内滞纳金</div>
                                 <div class="td-box">
-                                        {{business.info.lateFee}}
+                                        {{business.info.lateFee?numeral(business.info.lateFee).format('0,0.00'):0}}
                                 </div>
                             </div>
                         </div>
@@ -196,18 +196,18 @@
                             <div class="td">
                                 <div class="td-box">期外逾期费</div>
                                 <div class="td-box">
-                                        {{business.info.demurrage}}
+                                        {{business.info.demurrage?numeral(business.info.demurrage).format('0,0.00'):0 }}
                                 </div>
                             </div>
                             <div class="td">
                                 <div class="td-box">提前还款违约金</div>
                                 <div class="td-box">
-                                        {{business.info.penalty}}
+                                        {{business.info.penalty?numeral(business.info.penalty).format('0,0.00'):0 }}
                                 </div>
                             </div>
                             <div class="td">
                                 <div class="td-box">往期少交费用（含滞纳金）</div>
-                                <div class="td-box">{{business.info.lackFee}}</div>
+                                <div class="td-box">{{business.info.lackFee?numeral(business.info.lackFee).format('0,0.00'):0 }}</div>
                             </div>
                         </div>
                     </div>
@@ -329,17 +329,17 @@
                     </row>
                     <row style="margin-top:1rem">
                         <i-col span="6">应收合计</i-col>
-                        <i-col span="6">{{sumIncome()}}</i-col>
+                        <i-col span="6">{{sumIncome()?numeral(sumIncome()).format('0,0.00'):0}}</i-col>
                     </row>
                     <row style="margin-top:1rem">
                         <i-col span="6">+结余</i-col>
-                        <i-col span="6">= &nbsp {{business.info.balance||0}}</i-col>
+                        <i-col span="6">= &nbsp {{business.info.balance?numeral(business.info.balance).format('0,0.00'):0}}</i-col>
                         <i-col span="6">+押金转还款金额</i-col>
-                        <i-col span="6">= &nbsp {{business.deposit||0}}</i-col>
+                        <i-col span="6">= &nbsp {{business.deposit?numeral(business.deposit).format('0,0.00'):0}}</i-col>
                     </row>
                     <row style="margin-top:1rem">
                         <i-col span="6">最终结清金额</i-col>
-                        <i-col span="18">= &nbsp {{sum()}}</i-col>
+                        <i-col span="18">= &nbsp {{sum()?numeral(sum()).format('0,0.00'):0}}</i-col>
                     </row>
                 </Card>
         </card>

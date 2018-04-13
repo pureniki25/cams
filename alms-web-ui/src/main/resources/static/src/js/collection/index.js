@@ -323,10 +323,7 @@ window.layinit(function(htConfig){
 
                     field: 'delayDays',
                     width:65,
-                    title: '逾期',
-                    templet:function(d){
-                        return numeral(d.delayDays).format('0,0.00')
-                    }
+                    title: '逾期'
                 }, {
 
                     field: 'dueDate',
