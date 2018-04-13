@@ -232,7 +232,7 @@ public class ExpenseSettleRepaymentPlanVO  {
 		for (RepaymentBizPlanListDetail detail : findCurrentDetails(settleDate)) {
 			if (detail.getPlanItemType().equals(itemType)) {
 				if (factAmount) {
-					res=res.add(detail.getFactAmount());
+					res=res.add(detail.getFactAmount()==null?new BigDecimal(0):detail.getFactAmount());
 				}else {
 					res=res.add(detail.getPlanAmount()==null?new BigDecimal(0):detail.getPlanAmount());
 				}
