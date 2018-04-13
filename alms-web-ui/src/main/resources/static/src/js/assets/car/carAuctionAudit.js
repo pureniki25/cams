@@ -712,6 +712,7 @@ window.layinit(function (htConfig) {
 	                 		vm.repayPlan.payedInterest = Number(vm.repayPlan.payedInterest).toFixed(2);
 	                 	}
 	                 	vm.remainingPrincipal = vm.business.borrowMoney - vm.repayPlan.payedPrincipal;
+	                 	vm.business.borrowMoney = Number(vm.business.borrowMoney).toFixed(2);
 	                 	if(vm.remainingPrincipal==null||vm.remainingPrincipal==''){
 	                 		vm.remainingPrincipal=0;
 	                 	}else {
