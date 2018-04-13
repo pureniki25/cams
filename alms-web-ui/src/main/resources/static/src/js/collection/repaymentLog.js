@@ -219,7 +219,10 @@ window.layinit(function (htConfig) {
                 {
                     field: 'currentAmount',
                     title: '代扣金额',
-                    align: 'right'
+                    align: 'right',
+                    templet:function(d){
+                        return d.currentAmount?numeral(d.currentAmount).format("0,0.00"):''
+                    }
                 },
                 {
                     field: 'userName',
@@ -227,7 +230,10 @@ window.layinit(function (htConfig) {
                 },        
                 {
                     field: 'createTime',
-                    title: '代扣时间'
+                    title: '代扣时间',
+                    templet:function(d){
+                        return d.createTime?moment(d.createTime).format("YYYY年MM月DD日"):''
+                    }
                 },
                 {
                     field: 'repayStatus',

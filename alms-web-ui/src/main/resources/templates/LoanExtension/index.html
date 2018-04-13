@@ -40,9 +40,15 @@
     <!--<p id="staffType"  th:attr="value=${staffType}"  hidden />-->
     <!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
     <div id="app" v-cloak>
-        <card dis-hover :bordered="false">
+        <Card  >
             <span slot="title">展期管理</span>
-        
+                <!-- <i-button  v-if="authValid('search')" slot="extra" type="primary" icon="search" @click="search">搜索</i-button> -->
+                <button class="layui-btn layui-btn-sm" slot="extra" @click="search" v-if="authValid('search')">
+                    <span >
+                        <i class="layui-icon">&#xe615;</i>查询</span>
+                </button>
+
+
         <i-form ref="schForm" :model="schForm" label-position="right" autocomplete="off" label-width="100" inline>
             <Row>
                 <i-col span="24">
@@ -77,9 +83,7 @@
                     <i-input type="text" :value.sync="schForm.extensionId" v-model="schForm.extensionId" ></i-input>
                 </form-item>
                 <Form-item>
-                        <Tooltip content="搜索符合条件的展期业务">
-                            <i-button  v-if="authValid('search')" type="primary" icon="search" @click="search">搜索</i-button>
-                        </Tooltip>
+                        
                         <!-- <Tooltip content="重置搜索条件">
                             <i-button type="ghost" style="margin-left: 8px" icon="refresh" @click="resetForm" >重置</i-button>
                         </Tooltip> -->
@@ -91,7 +95,7 @@
             <i-col span="24">
                 <table id="loanExt" lay-filter="loanExt"></table>
                 <script type="text/html" id="toolbar">
-                    <a class="layui-btn layui-btn-xs" lay-event="check" ht-auth="viewDetail">查看</a>
+                    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="check" ht-auth="viewDetail">查看</a>
                   </script>
             </i-col>
         </Row>
@@ -100,8 +104,10 @@
             <iframe id="show-iframe" style="width: 100%;height:50rem"  frameborder=0 name="showHere" scrolling=auto :src="loanDetailModal.url"></iframe>
             <div slot="footer"></div>
         </Modal>
-    </card>
+    </Card>
     </div>
+    <script src="/src/js/numeral.min.js" ></script>
+    <script src="/src/js/moment.min.js" ></script>
     <script src="/src/js/LoanExtension/index.js"></script>
     <script>
 

@@ -184,27 +184,27 @@ window.layinit(function (htConfig) {
                     title: '应收金额',
                     align: 'right',
                     templet:function(d){
-                        return Number(d.showPayMoney).toFixed(2)
+                        return d.showPayMoney?numeral(d.showPayMoney).format('0,0.00'):''
                     }
                 },{
                     field: 'derateMoney',
                     title: '减免金额',
                     align: 'right',
                     templet:function(d){
-                        return Number(d.derateMoney).toFixed(2)
+                        return d.derateMoney?numeral(d.derateMoney).format('0,0.00'):''
                     }
                 },{
                     field: 'realPayMoney',
                     title: '实收金额',
                     align: 'right',
                     templet:function(d){
-                        return Number(d.realPayMoney).toFixed(2)
+                        return d.realPayMoney?numeral(d.realPayMoney).format('0,0.00'):''
                     }
                 },{
                     field: 'derateTime',
                     title: '减免时间',
                     templet:function(d){
-                        return moment(d.derateTime).format("YYYY年MM月DD日")
+                        return d.derateTime?moment(d.derateTime).format("YYYY年MM月DD日"):''
                     }
                 }/* {
                         fixed: 'right',
