@@ -321,7 +321,8 @@ window.layinit(function(htConfig){
 
                     field: 'delayDays',
                     width:65,
-                    title: '逾期'
+                    title: '逾期',
+                    align: 'center'
                 }, {
 
                     field: 'dueDate',
