@@ -44,7 +44,10 @@ window.layinit = function (cb) {
         // htConfig = window.properties.config;
 		// if(!(window.properties.config.useGateWayflage)){
          //    axios.defaults.headers.common['userId'] = window.properties.config.loginUserId;
-		// }
+        // }
+        
+        numeral.defaultFormat('0,0.00');
+        moment.locale('zh-cn');
         htConfig = layui.ht_config;
         _loadBtnAndTabUrl =  htConfig.loadBtnAndTabUrl;
 
