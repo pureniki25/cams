@@ -45,7 +45,7 @@ $(function () {
                     }
                     if (delDocs != "") {
                         var iindex = layer.msg('提交中..', {icon: 16, time: 8000});
-                        axios.get(basePath+"/doc/delDocs?docIds=" + delDocs).then( function (result) {
+                        axios.get(basePath+"doc/delDocs?docIds=" + delDocs).then( function (result) {
                             layer.close(iindex);
                             e.delFile();
                         });
