@@ -57,7 +57,7 @@
             <div class="layui-inline">
                 <input v-model="onePListCollogAfterId" class="layui-input" name="id" id="onePListCollogAfterId">
             </div>
-		   	<i-button :loading="synOneListColLoading" @click="syncCollection">
+		   	<i-button :loading="synOneListColLoading" @click="syncOneCollection">
 		   		<i-span v-if="!synOneListColLoading">同步一个还款计划</i-span>
 		   		<i-span v-else>同步中...</i-span>
 		   	</i-button>
