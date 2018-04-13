@@ -58,8 +58,6 @@ public class ExpenseSettleRepaymentPlanVO  {
 	public ExpenseSettleRepaymentPlanVO(RepaymentBizPlan plan,List<RepaymentBizPlanList> planLists,List<RepaymentBizPlanListDetail> details) {
 		super();
 		this.repaymentBizPlan = plan ;
-		planLists.sort(new PlanListSortor());
-		details.sort(new DetailSortor());
 		this.setRepaymentPlanListVOs(new ArrayList<>()) ;
 		
 		for (RepaymentBizPlanList planList : planLists) {
@@ -102,9 +100,51 @@ public class ExpenseSettleRepaymentPlanVO  {
 		if (currentPeriodVOs!=null&&currentPeriodVOs.size()>0) {
 			return currentPeriodVOs ;
 		}
+		ExpenseSettleRepaymentPlanListVO currentPeriod = null ;
+		ExpenseSettleRepaymentPlanListVO finalPeriod = findFinalPeriod();
+		//diff>0;应还日期大于结清日期
+		//diff=0;应还日期等于结清日期
+		//diff<0;应还日期小于结清日期;
+		int diff = DateUtil.getDiffDays(settleDate, finalPeriod.getRepaymentBizPlanList().getDueDate());
+		//提前结清
+		if (diff>0) {
+			for (ExpenseSettleRepaymentPlanListVO expenseSettleRepaymentPlanListVO : getRepaymentPlanListVOs()) {
+				diff = DateUtil.getDiffDays(settleDate,expenseSettleRepaymentPlanListVO.getRepaymentBizPlanList().getDueDate());
+				if (diff>=0) {
+					currentPeriod = expenseSettleRepaymentPlanListVO ;
+					break ;
+				}
+			}
+		}else {
+			//期外结清
+			currentPeriod = finalPeriod ;
+		}
+		
+		
 		
 		List<ExpenseSettleRepaymentPlanListVO> expenseSettleRepaymentPlanListVOs = new ArrayList<>() ;
-		int diff = 0 ;
+		
+		logger.info("CurrentPeriod:"+currentPeriod.getRepaymentBizPlanList().getAfterId());
+		int compareYear = DateUtil.getYear(currentPeriod.getRepaymentBizPlanList().getDueDate());
+		int compareMonth = DateUtil.getMonth(currentPeriod.getRepaymentBizPlanList().getDueDate());
+		for (ExpenseSettleRepaymentPlanListVO expenseSettleRepaymentPlanListVO : this.getRepaymentPlanListVOs()) {
+			int year = DateUtil.getYear(expenseSettleRepaymentPlanListVO.getRepaymentBizPlanList().getDueDate());
+			int month = DateUtil.getMonth(expenseSettleRepaymentPlanListVO.getRepaymentBizPlanList().getDueDate());
+			
+			if (compareYear==year&&compareMonth==month) {
+				expenseSettleRepaymentPlanListVOs.add(expenseSettleRepaymentPlanListVO) ;
+			}
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		/*int diff = 0 ;
 		ExpenseSettleRepaymentPlanListVO compare = null ;
 		for (ExpenseSettleRepaymentPlanListVO expenseSettleRepaymentPlanListVO : this.getRepaymentPlanListVOs()) {
 			int t = DateUtil.getDiffDays(settleDate,expenseSettleRepaymentPlanListVO.getRepaymentBizPlanList().getDueDate());
@@ -123,6 +163,12 @@ public class ExpenseSettleRepaymentPlanVO  {
 		logger.info("CurrentPeriod:"+compare.getRepaymentBizPlanList().getAfterId());
 		int compareYear = DateUtil.getYear(compare.getRepaymentBizPlanList().getDueDate());
 		int compareMonth = DateUtil.getMonth(compare.getRepaymentBizPlanList().getDueDate());
+		if (compareMonth==12) {
+			compareYear = compareYear + 1 ;
+			compareMonth = 1 ;
+		}else {
+			compareMonth = compareMonth + 1 ;
+		}
 		for (ExpenseSettleRepaymentPlanListVO expenseSettleRepaymentPlanListVO : this.getRepaymentPlanListVOs()) {
 			int year = DateUtil.getYear(expenseSettleRepaymentPlanListVO.getRepaymentBizPlanList().getDueDate());
 			int month = DateUtil.getMonth(expenseSettleRepaymentPlanListVO.getRepaymentBizPlanList().getDueDate());
@@ -131,6 +177,20 @@ public class ExpenseSettleRepaymentPlanVO  {
 				expenseSettleRepaymentPlanListVOs.add(expenseSettleRepaymentPlanListVO) ;
 			}
 		}
+		
+		if (expenseSettleRepaymentPlanListVOs.isEmpty()) {
+			compareYear = DateUtil.getYear(compare.getRepaymentBizPlanList().getDueDate());
+			compareMonth = DateUtil.getMonth(compare.getRepaymentBizPlanList().getDueDate());
+			for (ExpenseSettleRepaymentPlanListVO expenseSettleRepaymentPlanListVO : this.getRepaymentPlanListVOs()) {
+				int year = DateUtil.getYear(expenseSettleRepaymentPlanListVO.getRepaymentBizPlanList().getDueDate());
+				int month = DateUtil.getMonth(expenseSettleRepaymentPlanListVO.getRepaymentBizPlanList().getDueDate());
+				
+				if (compareYear==year&&compareMonth==month) {
+					expenseSettleRepaymentPlanListVOs.add(expenseSettleRepaymentPlanListVO) ;
+				}
+			}
+		}*/
+		
 		Collections.sort(expenseSettleRepaymentPlanListVOs);
 		currentPeriodVOs = expenseSettleRepaymentPlanListVOs ;
 		return expenseSettleRepaymentPlanListVOs;
