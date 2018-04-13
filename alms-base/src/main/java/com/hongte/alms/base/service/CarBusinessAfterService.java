@@ -18,4 +18,7 @@ public interface CarBusinessAfterService extends BaseService<CarBusinessAfter> {
     Integer queryNotTransferPhoneUserCount();
 
     List<CarBusinessAfter> queryNotTransferCollectionLog(CollectionReq req);
+
+
+    public List<CarBusinessAfter> queryNotTransferCollectionLog();
 }

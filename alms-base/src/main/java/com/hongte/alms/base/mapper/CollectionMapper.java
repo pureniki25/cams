@@ -18,6 +18,7 @@ import java.util.List;
 public interface CollectionMapper extends SuperMapper<Collection> {
 
     List<Collection> queryNotTransferCollection(CollectionReq req);
+    List<Collection> queryNotTransferCollection();
 
     int queryNotTransferCollectionCount();
 

@@ -19,6 +19,8 @@ public interface CollectionService extends BaseService<Collection> {
 
     List<Collection> queryNotTransferCollection(CollectionReq req);
 
+    List<Collection> queryNotTransferCollection();
+
     int queryNotTransferCollectionCount();
 
 }

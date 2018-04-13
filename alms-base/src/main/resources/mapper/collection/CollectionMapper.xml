@@ -25,7 +25,7 @@
     <select id="queryNotTransferCollection" resultType="com.hongte.alms.base.entity.Collection" parameterType="com.hongte.alms.base.vo.module.CollectionReq">
 
         SELECT
-            *
+          business_id,after_id,collection_user,status
         FROM
             tb_collection tt
         WHERE
@@ -48,7 +48,10 @@
                     tt.business_id = tp.business_id
                 AND tt.after_id = tp.after_id
             )
-        limit #{offSet} , #{pageSize}
+        <if test="offSet !=null  and pageSize!=null ">
+
+            limit #{offSet} , #{pageSize}
+        </if>
 
     </select>
 
@@ -69,9 +72,8 @@
                         FROM
                             tb_collection t1
                         JOIN tb_collection_status t2 ON t1.business_id = t2.business_id
-                        JOIN tb_repayment_biz_plan_list t3 ON t1.business_id = t3.business_id
+                        JOIN tb_repayment_biz_plan_list t3 ON t3.plan_list_id = t2.crp_id
                         AND t1.after_id = t3.after_id
-                        AND t3.plan_list_id = t2.crp_id
                     ) tp
                 WHERE
                     tt.business_id = tp.business_id
