@@ -90,7 +90,7 @@
 	      <td class="column">用户</td>
 	      <td>{{ajax_data.customerName}}</td>
 	      <td class="column">借款金额</td>
-	      <td>{{ajax_data.borrowMoney}}</td>
+	      <td>{{ajax_data.borrowMoney?numeral(ajax_data.borrowMoney).format('0,0.00'):0}}</td>
 	      <td class="column">还款方式</td>
 	      <td>{{ajax_data.repaymentTypeName}}</td>
 	    </tr>
@@ -121,21 +121,21 @@
 	    
 	     <tr>
 	      <td class="column">本金</td>
-	      <td>{{ajax_data.planPrincipal}}</td>
+	      <td>{{ajax_data.planPrincipal?numeral(ajax_data.planPrincipal).format('0,0.00'):0 }}</td>
 	      <td class="column">利息</td>
-	      <td colspan="2">{{ajax_data.planAccrual}}</td>
+	      <td colspan="2">{{ajax_data.planAccrual?numeral(ajax_data.planAccrual).format('0,0.00'):0 }}</td>
 	      <td class="column" >服务费</td>
-	      <td colspan="2">{{ajax_data.planServiceCharge}}</td>
+	      <td colspan="2">{{ajax_data.planServiceCharge?numeral(ajax_data.planServiceCharge).format('0,0.00'):0 }}</td>
 	     
 	    </tr>
 	    
 	     <tr>
 	      <td class="column">平台费</td>
-	      <td>{{ajax_data.platformCharge}}</td>
+	      <td>{{ajax_data.platformCharge?numeral(ajax_data.platformCharge).format('0,0.00'):0  }}</td>
 	      <td class="column">担保费</td>
-	      <td colspan="2">{{ajax_data.planGuaranteeCharge}}</td>
+	      <td colspan="2">{{ajax_data.planGuaranteeCharge?numeral(ajax_data.planGuaranteeCharge).format('0,0.00'):0 }}</td>
 	      <td class="column" >逾期费用</td>
-	      <td colspan="2">{{ajax_data.planOverDueMoney}}</td>
+	      <td colspan="2">{{ajax_data.planOverDueMoney?numeral(ajax_data.planOverDueMoney).format('0,0.00'):0 }}</td>
 	     
 	    </tr>
 	    
@@ -143,11 +143,11 @@
 	    
 	       <tr>
 	      <td class="column">其他费用</td>
-	      <td>{{ajax_data.otherFee}}</td>
+	      <td>{{ajax_data.otherFee?numeral(ajax_data.otherFee).format('0,0.00'):0 }}</td>
 	      <td style="color: red;" class="column">本期应还金额</td>
-	      <td colspan="2">{{ajax_data.total}}</td>
+	      <td colspan="2">{{ajax_data.total?numeral(ajax_data.total).format('0,0.00'):0 }}</td>
 	      <td class="column" >应还日期</td>
-	      <td colspan="2">{{ajax_data.nowdate}}</td>
+	      <td colspan="2">{{ajax_data.nowdate?moment(ajax_data.nowdate).format('YYYY年MM月DD日'):''}}</td>
 	     
 	    </tr>
 	  </tbody>

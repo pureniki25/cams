@@ -210,7 +210,11 @@ var layer;
                                     title: '代扣时间'
                                 },{
                                     field: 'currentAmount',
-                                    title: '代扣金额'
+                                    title: '代扣金额',
+                                    align:'right',
+                                    templet:function(d){
+                                        return d.currentAmount?numeral(d.currentAmount).format('0,0.00'):0
+                                    }
                                 }, {
                                     field: 'customerName',
                                     title: '代扣人'

@@ -442,7 +442,7 @@ window.layinit(function(htConfig){
                                         if (currentItem.statusName != '已还款') {
                                             var url = getDeductionUrl(currentItem);
                                             // var url = '/collectionUI/applyDerateUI?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+"&processStatus=-1"
-                                            showOneLineOprLayer(url, "")
+                                            showOneLineOprLayer(url, "执行代扣")
                                         } else {
                                             vm.$Modal.error({content: '已还款的不能执行代扣！'});
                                         }
