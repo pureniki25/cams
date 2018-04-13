@@ -39,7 +39,7 @@ window.layinit(function (htConfig) {
 		        });
 		   },
 		   // 同步指定还款计划催收数据
-		   syncCollection:function(){
+		   syncOneCollection:function(){
 			   this.synOneListColLoading = true;
 			   axios.get(basePath +"alms/setCollectionStatus?businessId="+vm.onePListCollogBId+"&afterId="+vm.onePListCollogAfterId,{timeout: 0})
 		        .then(function (res) {
