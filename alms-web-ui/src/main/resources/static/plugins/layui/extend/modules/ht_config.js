@@ -17,6 +17,7 @@ layui.define(function (exports) {
         , loadBtnAndTabUrl: base + "uc/auth/loadBtnAndTab"
         , loginUrl: base + "uaa/auth/login"
         , refreshTokenUrl: base + "uaa/auth/token"
+        ,instanceId:instanceId
 
         //--------------   切换是否使用网关 --------------
         //是否使用网关的标志位

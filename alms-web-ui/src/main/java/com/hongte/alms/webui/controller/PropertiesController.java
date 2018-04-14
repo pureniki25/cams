@@ -36,9 +36,15 @@ public class PropertiesController {
     @Value("${ht.config.ui.useGateWayflage}")
     private Boolean useGateWayflage;//是否使用网关的标志位
 
+    //修改密码的跳转地址
     @Value("${ht.config.ui.changePwdPath}")
     private String changePwdPath ;
-    
+
+
+    //路由跳转的地址
+    @Value("${ht.config.ui.instanceId:none}")
+    private String instanceId ;
+
 //    @Value("${ht.config.ui.defaultUser}")
 //    private String defaultUser;//不使用网关的默认用户
 //    @Value("${ht.config.ui.localCoreBasePath}")
@@ -92,7 +98,15 @@ public class PropertiesController {
 
         stringBuilder.append(String.format("var changePwdPath='%s';", changePwdPath));
         stringBuilder.append("\r");
-        
+
+        if("none".equals(instanceId)){
+            stringBuilder.append(String.format("var instanceId='%s';", "none"));
+        }else{
+            stringBuilder.append(String.format("var instanceId='%s';", instanceId));
+        }
+
+        stringBuilder.append("\r");
+
         return stringBuilder.toString();
 //        return String.format("var gateWayUrl='%s';",gatewayUrl);
 //        return
