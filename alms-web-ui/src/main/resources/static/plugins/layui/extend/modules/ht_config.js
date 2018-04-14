@@ -38,4 +38,6 @@ layui.define(function (exports) {
         ,changePwdPath:"http://172.16.200.110:30131/html/user/changePwdOther.html"
         //--------------   切换是否使用网关 --------------
     });
+    window.YYYYMMDD="YYYY年MM月DD日"
+    window.YYYYMM="YYYY年MM月"
 });

@@ -47,7 +47,9 @@ $(function () {
                         var iindex = layer.msg('提交中..', {icon: 16, time: 8000});
                         axios.get(basePath+"doc/delDocs?docIds=" + delDocs).then( function (result) {
                             layer.close(iindex);
-                            e.delFile();
+                           // e.delFile();
+                            location.reload();
+
                         });
                     }
                     else {
@@ -92,7 +94,9 @@ $(function () {
                                     if (docItemList) {
                                         $(docItemList).each(function (ind, item) {
                                             //上传成功
-                                            upLoadPage.upLoadView.addFile(item);
+                                            //upLoadPage.upLoadView.addFile(item);
+                                        	 location.reload();
+
                                         });
                                     }
                                 }
