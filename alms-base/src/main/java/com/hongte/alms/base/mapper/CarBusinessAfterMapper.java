@@ -23,6 +23,7 @@ public interface CarBusinessAfterMapper extends SuperMapper<CarBusinessAfter> {
      * @return
      */
     List<CarBusinessAfter> queryNotTransferCollectionLog(CollectionReq req);
+    List<CarBusinessAfter> queryNotTransferCollectionLog();
 
     /**
      * 

@@ -95,20 +95,28 @@
     <select id="queryNotTransferCollectionLog" resultType="com.hongte.alms.base.entity.CarBusinessAfter" parameterType="com.hongte.alms.base.vo.module.CollectionReq">
 
         SELECT
-        *
+          *
         FROM
-        tb_car_business_after tt
-        WHERE
-        NOT EXISTS (
-        SELECT * FROM(
-            SELECT t1.car_business_id, t1.car_business_after_id FROM tb_car_business_after t1
-            JOIN tb_collection_status t2 ON t1.car_business_id = t2.business_id
-             JOIN tb_repayment_biz_plan_list t3 ON t1.car_business_id = t3.business_id    AND t1.car_business_after_id = t3.after_id     AND t3.plan_list_id = t2.crp_id
-             ) tp
-        WHERE  tt.car_business_id = tp.car_business_id         AND tt.car_business_after_id = tp.car_business_after_id         )
-
-        limit #{offSet} , #{pageSize}
-
+          tb_car_business_after tt
+        WHERE NOT EXISTS
+          (SELECT
+            1
+          FROM
+            (SELECT
+              t1.car_business_id,
+              t1.car_business_after_id
+            FROM
+              tb_car_business_after t1
+              JOIN tb_collection_status t2
+                ON t1.car_business_id = t2.business_id
+              JOIN tb_repayment_biz_plan_list t3
+                ON t3.plan_list_id = t2.crp_id
+                AND t1.car_business_after_id = t3.after_id ) tp
+          WHERE tt.car_business_id = tp.car_business_id
+            AND tt.car_business_after_id = tp.car_business_after_id)
+        <if test="offSet !=null  and pageSize!=null ">
+          limit #{offSet} , #{pageSize}
+        </if>
     </select>
 
 
@@ -122,7 +130,7 @@
         SELECT * FROM(
             SELECT t1.car_business_id, t1.car_business_after_id FROM tb_car_business_after t1
             JOIN tb_collection_status t2 ON t1.car_business_id = t2.business_id
-             JOIN tb_repayment_biz_plan_list t3 ON t1.car_business_id = t3.business_id    AND t1.car_business_after_id = t3.after_id     AND t3.plan_list_id = t2.crp_id
+             JOIN tb_repayment_biz_plan_list t3 ON t3.plan_list_id = t2.crp_id    AND t1.car_business_after_id = t3.after_id
              ) tp
         WHERE  tt.car_business_id = tp.car_business_id         AND tt.car_business_after_id = tp.car_business_after_id         )
 

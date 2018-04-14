@@ -5,6 +5,7 @@
         removeImg:function (r){
             $("#myFile").val('');//清空input的值以避免下一次相同图片无法触发change事件
             $(r).parent().parent().remove();
+            $(r).offsetParent().children().children().children().children().children().eq(5).children().eq(1).remove();
         },
 
         //图片自适应

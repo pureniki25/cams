@@ -31,4 +31,8 @@ public class CarBusinessAfterServiceImpl extends BaseServiceImpl<CarBusinessAfte
     public List<CarBusinessAfter> queryNotTransferCollectionLog(CollectionReq req){
         return carBusinessAfterMapper.queryNotTransferCollectionLog(req);
     }
+
+    public List<CarBusinessAfter> queryNotTransferCollectionLog(){
+        return carBusinessAfterMapper.queryNotTransferCollectionLog();
+    }
 }

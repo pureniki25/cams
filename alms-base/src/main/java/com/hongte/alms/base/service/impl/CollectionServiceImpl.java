@@ -32,6 +32,11 @@ public class CollectionServiceImpl extends BaseServiceImpl<CollectionMapper, Col
     }
 
     @Override
+    public List<Collection> queryNotTransferCollection() {
+        return collectionMapper.queryNotTransferCollection();
+    }
+
+    @Override
     public int queryNotTransferCollectionCount() {
         return collectionMapper.queryNotTransferCollectionCount();
     }

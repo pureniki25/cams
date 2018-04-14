@@ -95,47 +95,77 @@ public class CollectionTransferController {
 
 			//1.历史电催数据同步
 			//1）.当前状态
-			int neverTransPhoneCount =  carBusinessAfterService.queryNotTransferPhoneUserCount();
-			for (int i = 0; i <= neverTransPhoneCount / 100 + 1; i++) {
-				CollectionReq req = new CollectionReq();
-				req.setOffSet(i * 100);
-				req.setPageSize(100);
-				List<CarBusinessAfter>  afterList =  carBusinessAfterService.queryNotTransferCollectionLog(req);
-				if (CollectionUtils.isEmpty(afterList)) {
-					continue;
-				}
+
+			List<CarBusinessAfter>  afterList = carBusinessAfterService.queryNotTransferCollectionLog();
+			if (!CollectionUtils.isEmpty(afterList)) {
 				for (CarBusinessAfter carBusinessAfter : afterList) {
 					transPhoneSet(carBusinessAfter);
 				}
-
+//				continue;
 			}
 
+//			int neverTransPhoneCount =  carBusinessAfterService.queryNotTransferPhoneUserCount();
+//			for (int i = 0; i <= neverTransPhoneCount / 5000 + 1; i++) {
+//				CollectionReq req = new CollectionReq();
+//				req.setOffSet(i * 5000);
+//				req.setPageSize(5000);
+//				List<CarBusinessAfter>  afterList =  carBusinessAfterService.queryNotTransferCollectionLog(req);
+//				if (CollectionUtils.isEmpty(afterList)) {
+//					continue;
+//				}
+//				for (CarBusinessAfter carBusinessAfter : afterList) {
+//					transPhoneSet(carBusinessAfter);
+//				}
+//
+//			}
+		}catch (Exception e){
 
+			e.printStackTrace();
+			LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
+			return Result.error("111111","同步历史电催数据异常"+e.getMessage());
+		}
+
+		try{
 			//2.历史催收数据同步
 
-			int neverTransColCount =  collectionService.queryNotTransferCollectionCount();
-			for (int i = 0; i <= neverTransColCount / 100 + 1; i++) {
-				CollectionReq req = new CollectionReq();
-				req.setOffSet(i * 100);
-				req.setPageSize(100);
+			List<Collection> collectionList = collectionService.queryNotTransferCollection();
 
-				List<Collection> collectionList = collectionService.queryNotTransferCollection(req);
-
-				if (CollectionUtils.isEmpty(collectionList)) {
-					continue;
-				}
+			if (!CollectionUtils.isEmpty(collectionList)) {
 				for (Collection collection : collectionList) {
 					transCollectSet(collection);
 				}
-
 			}
+
+
+//						int neverTransColCount =  collectionService.queryNotTransferCollectionCount();
+//			for (int i = 0; i <= neverTransColCount / 5000 + 1; i++) {
+//				CollectionReq req = new CollectionReq();
+//				req.setOffSet(i * 5000);
+//				req.setPageSize(5000);
+//
+//				List<Collection> collectionList = collectionService.queryNotTransferCollection(req);
+//
+//				if (CollectionUtils.isEmpty(collectionList)) {
+//					continue;
+//				}
+//				for (Collection collection : collectionList) {
+//					transCollectSet(collection);
+//				}
+//
+//			}
+
+
 
 		}catch (Exception e){
 
 			e.printStackTrace();
-			LOGGER.error("同步历史电催数据异常"+e.getMessage());
-			return Result.error("111111","同步历史电催数据异常"+e.getMessage());
+			LOGGER.error("同步历史催收数据异常,列表查询异常"+e.getMessage());
+			return Result.error("111111","同步历史催收数据异常"+e.getMessage());
 		}
+
+
+
+
 		LOGGER.error("完成一次数据同步");
 		runningFlage = false;
 		return Result.success();
@@ -431,7 +461,8 @@ public class CollectionTransferController {
 		failLog.setFailReason(reson);
 		TransferFailLog transferFailLog = transferFailLogService.selectOne(new EntityWrapper<TransferFailLog>()
 				.eq("business_id", businessId).eq("after_id", afterId));
-		LOGGER.error("信贷历史催收数据导入错误，"+failReson +"collectionLogXd   ， businessID:"+businessId+"     afterId:"+afterId);			if (transferFailLog == null) {
+		LOGGER.error("信贷历史催收数据导入错误，"+failReson +"  businessID:"+businessId+"     afterId:"+afterId+"   status:"+status);
+		if (transferFailLog == null) {
 			transferFailLogService.insert(failLog);
 		}
 	}
@@ -471,7 +502,7 @@ public class CollectionTransferController {
 		// 判断状态
 		String staffType ;
 		//催收中，电催需要 判断用户信息
-		if("电催".equals(status) ||"催收中".equals(status)){
+		if("电催".equals(status) ||"催收中".equals(status)||"催款中".equals(status)){
 			if (StringUtil.isEmpty(dto.getUserId())) {
 				recordErrorInfo(businessId ,afterId, NoUser,status,"没有用户信息");
 				return null;
@@ -481,8 +512,11 @@ public class CollectionTransferController {
 		if("电催".equals(status)){
 			staffType = CollectionStatusEnum.PHONE_STAFF.getPageStr();
 		}
-		else if ("催收中".equals(status)) {
+		else if ("催收中".equals(status)||"催款中".equals(status)) {
 			staffType = CollectionStatusEnum.COLLECTING.getPageStr();
+
+		}else if ("已拖车登记".equals(status)) {
+			staffType = CollectionStatusEnum.TRAILER_REG.getPageStr();
 
 		} else if ("已移交法务".equals(status)) {
 			staffType = CollectionStatusEnum.TO_LAW_WORK.getPageStr();
