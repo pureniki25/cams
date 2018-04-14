@@ -50,8 +50,8 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 
         Map<String,SysParameter> sysParameterMap = sysParameterService.selectParameterMap(SysParameterTypeEnums.BORROW_RATE_UNIT);
         for(BusinessInfoForApplyDerateVo vo : List){
-        	
-        	vo.setPayedPrincipal(BigDecimal.valueOf(basicBusinessMapper.queryPayedPrincipal(vo.getBusinessId())));
+        	Double principal = basicBusinessMapper.queryPayedPrincipal(vo.getBusinessId()) ; 
+        	vo.setPayedPrincipal(BigDecimal.valueOf(principal==null?0:principal));
 
             SysParameter  parameter =  sysParameterMap.get(vo.getRepaymentTypeId());
             if(parameter!=null){

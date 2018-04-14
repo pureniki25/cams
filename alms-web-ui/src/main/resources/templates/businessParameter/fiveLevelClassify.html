@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <!--suppress ALL -->
 <html lang="zh-cn">
@@ -6,8 +5,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-    <title>短信详情</title>
-    <script src="/properties/config.js"></script>
+    <title>五级分类设置</title>
     <!-- 默认主题样式 -->
     <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
     <!-- iview样式 -->
@@ -36,66 +34,27 @@
     <link rel="stylesheet" href="/Components/Table/Table.css">
 
     <!-- 引入jQuery，必须在appToken.js 之前引入 -->
-    <script src="/build/js/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="/plugins/jquery-1.9.1.min.js"></script>
     <!-- 设置全局请求头:app、Authorization -->
     <script src="/build/js/appToken.js"></script>
-
+    <script src="http://blueimp.github.io/jQuery-File-Upload/js/vendor/jquery.ui.widget.js"></script>
+	<script type="text/javascript" src="/plugins/fileUpload/jquery.iframe-transport.js"></script>
+	<script type="text/javascript" src="/plugins/fileUpload/jquery.fileupload.js"></script>
     <!--引入公共的一些方法-->
     <script src="/src/js/comm.js"></script>
-
-
+	<script src="/properties/config.js"></script>
+	
 </head>
 <body>
-<!--隐藏元素-->
-<p id="logId"  th:attr="value=${logId}"  hidden />
-<p id="originalBusinessId"  th:attr="value=${originalBusinessId}"  hidden />
-<p id="afterId"  th:attr="value=${afterId}"  hidden />
-<p id="recipient"  th:attr="value=${recipient}"  hidden />
-<p id="phoneNumber"  th:attr="value=${phoneNumber}"  hidden /> 
-<p id="sendDate"  th:attr="value=${sendDate}"  hidden /> 
-<p id="status"  th:attr="value=${status}"  hidden /> 
-<p id="phoneNumber"  th:attr="value=${phoneNumber}"  hidden /> 
-<p id="content"  th:attr="value=${content}"  hidden /> 
-<p id="businessTypeName"  th:attr="value=${businessTypeName}"  hidden /> 
 <!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
 <div id="app" v-cloak>
-
-    <row type="flex" justify="end" class="code-row-bg">
-        <i-col span="18"><font size="16px" color="#464c5b"></font></i-col>
-
-    </row>
-
-  
-
-
-
-
-           <row>
-           		<i-col span="24">
-           			<i-table border :show-header="false" :columns="columns1" :data="data1"></i-table>
-           		</i-col>
-           </row>
-           
-           <row style="padding: 10px">  <!--@click="showCollectionStackLog()"-->
-	      		<i-col span="24" style="text-align: right">
-                        <div class="layui-btn-group">
-                                <button class="layui-btn" @click="getLast()">上一条</button>
-                                <button class="layui-btn" @click="getNext()" >下一条</button>
-                              </div>
-	            </i-col> 
-        	</row>
+	<Card>
+        <p slot="title">
+			五级分类设置
+        </p>
+    </Card>
+    
 </div>
-
-
-
-
-     
-
-        
-
-<script src="/src/js/collection/infoSmsDetail.js" ></script> 
-
-
-
+<script src="/src/js/businessParameter/fiveLevelClassify.js" ></script>
 </body>
 </html>

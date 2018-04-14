@@ -44,7 +44,8 @@
             <p slot="title">参数类型</p>
             <Row>
                 <i-col span="24" style="line-height:2rem">
-                    <i-button style="float: right;">查询</i-button>
+                    <!-- <i-button style="float: right;">查询</i-button> -->
+                    <button class="layui-btn layui-btn-sm" style="float: right;" @click="tableReload">查询</button>
                     <i-input id="key" style="width:15%;float: right;" placeholder="请输入参数名称或参数编号"></i-input>
                     <label for="key" style="float: right;">关键字:</label>
                 </i-col>
@@ -63,7 +64,7 @@
                     <script type="text/html" id="toolbar">
                         <!-- <a class="layui-btn layui-btn-xs" lay-event="check">查阅记录</a> -->
                         <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
-                        <a class="layui-btn layui-btn-xs" lay-event="delete">删除</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
                         <a class="layui-btn layui-btn-xs" lay-event="list">参数列表</a>
                     </script>
                 </i-col>
@@ -110,12 +111,16 @@
                 </row>
             </i-form>
             <row slot="footer">
-                <i-button @click="saveParamType">
+                    <div class="layui-btn-group">
+                            <button class="layui-btn" @click="saveParamType">保存</button>
+                            <button class="layui-btn layui-btn-danger" @click="app.editTypeModal.show=false">取消</button>
+                        </div>
+                <!-- <i-button @click="saveParamType">
                     保存
                 </i-button>
                 <i-button @click="app.editTypeModal.show=false">
                     取消
-                </i-button>
+                </i-button> -->
             </row>
         </Modal>
 
@@ -139,10 +144,18 @@
                 <i-col span="6">{{item.paramName}}</i-col>
                 <i-col span="6">{{item.remark||'&nbsp;'}}</i-col>
                 <i-col span="6">
-                    <i-button @click="openEditParamModal(item)">编辑</i-button>
-                    <i-button @click="deleteParam(item)">删除</i-button>
+                        <div class="layui-btn-group">
+                                <button class="layui-btn layui-btn-sm" @click="openEditParamModal(item)">编辑</button>
+                                <button class="layui-btn layui-btn-sm layui-btn-danger" @click="deleteParam(item)">删除</button>
+                            </div>
+
+                    <!-- <i-button @click="openEditParamModal(item)">编辑</i-button>
+                    <i-button @click="deleteParam(item)">删除</i-button> -->
                 </i-col>
             </row>
+            <p slot="footer">
+                            <button class="layui-btn" @click="paramListModal.show=false">关闭</button>
+            </p>
         </Modal>
 
         <Modal v-model="editParamModal.show" :title="editParamModal.title">
@@ -206,24 +219,33 @@
                 </row>
             </i-form>
             <row slot="footer">
-                <i-button @click="saveParm">
+                <div class="layui-btn-group">
+                    <button class="layui-btn" @click="saveParm">保存</button>
+                    <button class="layui-btn layui-btn-danger" @click="app.editParamModal.show=false">取消</button>
+                </div>
+                <!-- <i-button @click="saveParm">
                     保存
                 </i-button>
                 <i-button @click="app.editParamModal.show=false">
                     取消
-                </i-button>
+                </i-button> -->
             </row>
         </Modal>
 
         <Modal v-model="batchAddParmModal.show" title="批量增加">
             <i-input type="textarea" :value.sync="batchAddParmModal.param" v-model="batchAddParmModal.param"></i-input>
             <row slot="footer">
-                <i-button @click="batchSaveParam">
+                    <div class="layui-btn-group">
+                            <button class="layui-btn" @click="batchSaveParam">保存</button>
+                            <button class="layui-btn layui-btn-danger" @click="app.batchAddParmModal.show=false">取消</button>
+                        </div>
+
+                <!-- <i-button @click="batchSaveParam">
                     保存
                 </i-button>
                 <i-button @click="app.batchAddParmModal.show=false">
                     取消
-                </i-button>
+                </i-button> -->
             </row>
         </Modal>
     </div>

@@ -51,10 +51,15 @@
                     搜索条件
                 </p>
                 <!--右上侧按钮列表-->
-                <i-button v-if="authValid('search')" slot="extra" type="info" :loading="loading" icon="ios-search" @click="toLoading" style="margin-right:10px">
+                <!-- <i-button v-if="authValid('search')" slot="extra" type="info" :loading="loading" icon="ios-search" @click="toLoading" style="margin-right:10px">
                     <span v-if="!loading">查询</span>
                     <span v-else>查询中...</span>
-                </i-button>
+                </i-button> -->
+
+                <button class="layui-btn layui-btn-sm" slot="extra" @click="toLoading" v-if="authValid('search')" >
+                    <span v-if="!loading"><i class="layui-icon">&#xe615;</i>查询</span>
+                    <span v-else><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
+                </button>
 <!--                <i-button slot="extra"  @click="handleReset('searchForm')" style="margin-right:10px">
                     <span>重置</span>
                 </i-button>-->

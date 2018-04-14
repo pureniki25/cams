@@ -104,7 +104,7 @@ window.layinit(function (htConfig) {
                     field: 'recordDate',
                     title: '记录日期',
                     templet:function(d){
-                        return moment(d.recordDate).format("YYYY年MM月DD日")
+                        return d.recordDate?moment(d.recordDate).format("YYYY年MM月DD日"):''
                     },
                     align:'center'
                 }, {

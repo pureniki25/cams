@@ -46,7 +46,11 @@
             <!--查询表单内容-->
             <row :gutter="16">
                 <i-col span="3">
-                    <i-button v-if="authValid('assignSet')" type="success" style="margin-left:15px" @click="assignSet"  ht-auth="assignSet">分配设置</i-button>
+                    <button class="layui-btn layui-btn-sm" @click="assignSet" v-if="authValid('assignSet')" style="margin-left:15px" ht-auth="assignSet">
+                        <span>
+                            分配设置</span>
+                    </button>
+                    <!-- <i-button v-if="authValid('assignSet')" type="success" style="margin-left:15px" @click="assignSet"  ht-auth="assignSet">分配设置</i-button> -->
                 </i-col>
                 <i-col  span="16">
                 <i-form ref="searchForm"  :model="searchForm"    label-position="right" :label-width="100" inline>
@@ -73,10 +77,16 @@
                 </i-form>
                 </i-col>
                 <i-col span="5">
-                    <i-button  v-if="authValid('search')" type="info" :loading="loading" icon="ios-search" @click="toLoading" style="margin-right:10px" ht-auth="personQuery">
+                    <button class="layui-btn layui-btn-sm" @click="toLoading" v-if="authValid('search')" style="margin-right:10px" ht-auth="personQuery" >
+                        <span v-if="!loading">
+                            <i class="layui-icon">&#xe615;</i>查询</span>
+                        <span v-else>
+                            <i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
+                    </button>
+                    <!-- <i-button  v-if="authValid('search')" type="info" :loading="loading" icon="ios-search" @click="toLoading" style="margin-right:10px" ht-auth="personQuery">
                         <span v-if="!loading">查询</span>
                         <span v-else>查询中...</span>
-                    </i-button>
+                    </i-button> -->
                 </i-col>
 
             </row>
@@ -88,7 +98,7 @@
                     <table id="listTable" lay-filter="listTable"></table>
                     <div style="display:none" id="barTools">
                         <!--layui-btn layui-btn-xs-->
-                        <i-button v-if="authValid('singleSet')" style="width:80px" type="success" lay-event="userSet" ht-auth="singleSet" >设置</i-button>
+                        <a class="layui-btn layui-btn-normal layui-btn-xs" v-if="authValid('singleSet')" lay-event="userSet" ht-auth="singleSet" >设置</a>
                     </div>
                 </i-col>
             </row>

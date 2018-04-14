@@ -68,7 +68,7 @@
 		            <div class="tr">
 		                <div class="td"> <div class="td-box">业务编号</div><div class="td-box">{{ baseInfoForm.businessId }} </div> </div>
 		                <div class="td"> <div class="td-box">客户名称</div><div class="td-box">{{ baseInfoForm.customerName }} </div> </div>
-		                <div class="td"> <div class="td-box">借款金额</div><div class="td-box">{{ baseInfoForm.borrowMoney }} </div> </div>
+		                <div class="td"> <div class="td-box">借款金额</div><div class="td-box">{{ baseInfoForm.borrowMoney?numeral(baseInfoForm.borrowMoney).format('0,0.00'):0 }} </div> </div>
 		            </div>
 		            <div class="tr">
 		                <div class="td"> <div class="td-box">借款期限</div><div class="td-box">{{ baseInfoForm.borrowLimit }} </div> </div>
@@ -77,7 +77,7 @@
 		            </div>
 		            <div class="tr">
 		                <div class="td"> <div class="td-box">出款日期</div><div class="td-box">{{ baseInfoForm.factOutputDate }} </div> </div>
-		                <div class="td"> <div class="td-box">出款金额</div><div class="td-box">{{ baseInfoForm.factOutputMoney }} </div> </div>
+		                <div class="td"> <div class="td-box">出款金额</div><div class="td-box">{{ baseInfoForm.factOutputMoney?numeral(baseInfoForm.factOutputMoney).format('0,0.00'):0  }} </div> </div>
 		                <div class="td"> <div class="td-box">出款人</div><div class="td-box">{{ baseInfoForm.outputUserName }} </div> </div>
 		            </div>
 		        </div>
@@ -102,13 +102,13 @@
 			<row :gutter="16">
 		        <div class="table">
 		            <div class="tr">
-		                <div class="td"> <div class="td-box">本金</div><div class="td-box">{{ baseInfoForm.surplusPrincipal }} </div> </div>
-		                <div class="td"> <div class="td-box">利息</div><div class="td-box">{{ baseInfoForm.planAccrual }} </div> </div>
-		                <div class="td"> <div class="td-box">服务费</div><div class="td-box">{{ baseInfoForm.planServiceCharge }} </div> </div>
+		                <div class="td"> <div class="td-box">本金</div><div class="td-box">{{ baseInfoForm.surplusPrincipal?numeral(baseInfoForm.surplusPrincipal).format('0,0.00'):0 }} </div> </div>
+		                <div class="td"> <div class="td-box">利息</div><div class="td-box">{{  baseInfoForm.planAccrual ?numeral( baseInfoForm.planAccrual ).format('0,0.00'):0 }} </div> </div>
+		                <div class="td"> <div class="td-box">服务费</div><div class="td-box">{{ baseInfoForm.planServiceCharge ?numeral( baseInfoForm.planServiceCharge ).format('0,0.00'):0 }} </div> </div>
 		            </div>
 		            <div class="tr">
-		                <div class="td"> <div class="td-box">担保公司费用</div><div class="td-box">{{ baseInfoForm.planGuaranteeCharge }} </div> </div>
-		                <div class="td"> <div class="td-box">平台费</div><div class="td-box">{{ baseInfoForm.planPlatformCharge }} </div> </div>
+		                <div class="td"> <div class="td-box">担保公司费用</div><div class="td-box">{{ baseInfoForm.planGuaranteeCharge ?numeral( baseInfoForm.planGuaranteeCharge ).format('0,0.00'):0 }} </div> </div>
+		                <div class="td"> <div class="td-box">平台费</div><div class="td-box">{{ baseInfoForm.planPlatformCharge ?numeral( baseInfoForm.planPlatformCharge ).format('0,0.00'):0  }} </div> </div>
 		                <div class="td"> 
 		                	<div class="td-box">期内滞纳金</div>
 		                	<div class="td-box">
@@ -121,7 +121,7 @@
                                     <i-option value="0.006">0.6%/天</i-option>
                                     <i-option value="0.008">0.8%/天</i-option>
                                 </i-select>
-		                		{{baseInfoForm.innerLateFees}}
+		                		{{baseInfoForm.innerLateFees?numeral(baseInfoForm.innerLateFees).format('0,0.00'):0}}
 		                	</div> 
 		                </div>
 		            </div>
@@ -139,7 +139,7 @@
                                     <i-option value="0.016">1.6%</i-option>
                                     <i-option value="0.015">1.5%</i-option>
                                 </i-select>
-		                		<span>{{ baseInfoForm.outsideInterest }} </span>
+		                		<span>{{baseInfoForm.outsideInterest?numeral(baseInfoForm.outsideInterest).format('0,0.00'):0}} </span>
 		                	</div> 
 		                </div>
 		                <div class="td"> 
@@ -150,13 +150,13 @@
                                     <i-option value="2">借款本金*3%</i-option>
                                     <i-option value="3">剩余本金*0.5%*剩余期数</i-option>
                                 </i-select >
-		                		{{ baseInfoForm.preLateFees }}
+		                		{{ baseInfoForm.preLateFees?numeral( baseInfoForm.preLateFees).format('0,0.00'):0 }}
 		                	</div>
 		                </div>
-		                <div class="td"> <div class="td-box">往期少交费用（含滞纳金）</div><div class="td-box">{{ baseInfoForm.balanceDue }} </div> </div>
+		                <div class="td"> <div class="td-box">往期少交费用（含滞纳金）</div><div class="td-box">{{baseInfoForm.balanceDue?numeral( baseInfoForm.balanceDue).format('0,0.00'):0   }} </div> </div>
 		            </div>
 		            <div class="tr">
-		                <div class="td"> <div class="td-box">逾期违约金</div><div class="td-box">{{ baseInfoForm.overdueDefault }} </div> </div>
+		                <div class="td"> <div class="td-box">逾期违约金</div><div class="td-box">{{baseInfoForm.overdueDefault?numeral( baseInfoForm.overdueDefault).format('0,0.00'):0  }} </div> </div>
 		                <div class="td"> <div class="td-box"></div><div class="td-box"></div> </div>
 		                <div class="td"> <div class="td-box"></div><div class="td-box"></div> </div>
 		            </div>
@@ -193,17 +193,17 @@
             	<i-col span="6">律师费</i-col>
                 <i-col span="6"><i-input style="width:50%" v-model="commitInfoForm.attorneyFees"  type="number" number/></i-col>
                 <i-col span="6">应收合计</i-col>
-                <i-col span="6">{{baseInfoForm.receivableTotal}}</i-col>
+                <i-col span="6">{{baseInfoForm.receivableTotal?numeral( baseInfoForm.receivableTotal).format('0,0.00'):0 }}</i-col>
             </row>
             <row style="margin-top:1rem">
                 <i-col span="6">+结余</i-col>
-                <i-col span="6">= &nbsp {{baseInfoForm.overRepayMoney}}</i-col>
+                <i-col span="6">= &nbsp {{baseInfoForm.overRepayMoney?numeral( baseInfoForm.overRepayMoney).format('0,0.00'):0 }}</i-col>
                 <i-col span="6">+押金转还款金额</i-col>
-                <i-col span="6">= &nbsp {{baseInfoForm.refundMoney}}</i-col>
+                <i-col span="6">= &nbsp {{baseInfoForm.refundMoney?numeral( baseInfoForm.refundMoney).format('0,0.00'):0 }}</i-col>
             </row>
             <row style="margin-top:1rem">
                 <i-col span="6">最终结清金额</i-col>
-                <i-col span="18">= &nbsp {{baseInfoForm.squaredUp}}</i-col>
+                <i-col span="18">= &nbsp {{baseInfoForm.squaredUp?numeral( baseInfoForm.squaredUp).format('0,0.00'):0}}</i-col>
             </row>
 		</Card>
 		</i-form>

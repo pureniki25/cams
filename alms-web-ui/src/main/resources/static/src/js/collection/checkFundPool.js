@@ -19,11 +19,18 @@ window.layinit(function (htConfig) {
                 },
                 {
                     title: '还款日期',
-                    key: 'tradeDate'
+                    key: 'tradeDate',
+                    render:function(h,o){
+                        return h('span',o.row.tradeDate?moment(o.row.tradeDate).format('YYYY年MM月DD日'):'')
+                    }
                 },
                 {
                     title: '还款金额',
-                    key: 'accountMoney'
+                    key: 'accountMoney',
+                    align:'right',
+                    render:function(h,o){
+                        return h('span',o.row.accountMoney?numeral(o.row.accountMoney).format('0,0.00'):'')
+                    }
                 },
                 {
                     title: '实际还款人',
@@ -51,16 +58,21 @@ window.layinit(function (htConfig) {
                 },
                 {
                     title: '更新时间',
-                    key: 'updateTime'
+                    key: 'updateTime',
+                    render:function(h,o){
+                        return h('span',o.row.updateTime?moment(o.row.updateTime).format('YYYY年MM月DD日'):'')
+                    }
                 },
                 {
                     title: '操作',
                     key: 'operate',
                     render: (h, params) => {
-                        return h('i-button', {
+                        return h('button', {
+                            class:[
+                                'layui-btn',
+                                'layui-btn-sm'
+                            ],
                             props: {
-                                type: 'success',
-                                size: 'small'
                             },
                             on: {
                                 click: () => {
@@ -124,7 +136,10 @@ window.layinit(function (htConfig) {
                 },
                 {
                     title: '转入时间',
-                    key: 'tradeDate'
+                    key: 'tradeDate',
+                    render:function(h,o){
+                        return h('span',o.row.tradeDate?moment(o.row.tradeDate).format('YYYY年MM月DD日'):'') ;
+                    }
                 },
                 {
                     title: '交易类型',
@@ -136,7 +151,11 @@ window.layinit(function (htConfig) {
                 },
                 {
                     title: '记账金额',
-                    key: 'accountMoney'
+                    key: 'accountMoney',
+                    align:'right',
+                    render:function(h,o){
+                        return h('span',o.row.accountMoney?numeral(o.row.accountMoney).format('0,0.00'):'')
+                    }
                 },
                 {
                     title: '交易备注',
@@ -165,6 +184,7 @@ window.layinit(function (htConfig) {
             .then(function (res) {
                 if (res.data.code == '1') {
                     t2.data1 = res.data.data
+
                 } else {
                     t2.$Modal.error({ content: '接口调用失败' })
                 }

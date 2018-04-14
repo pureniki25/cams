@@ -169,7 +169,7 @@ public class TransferOfLitigationController {
 
 				return Result.success(carLoanData);
 			} else {
-				return Result.error("0", "没有数据");
+				return Result.error("0", "没有找到数据");
 			}
 		} catch (Exception e) {
 			LOG.error("获取车贷诉讼相关数据异常!!!", e);
@@ -193,7 +193,7 @@ public class TransferOfLitigationController {
 		try {
 			HouseLoanVO houseLoanData = transferOfLitigationService.queryHouseLoanData(businessId);
 			if (houseLoanData == null) {
-				return Result.error("0", "没有数据");
+				return Result.error("0", "没有找到数据");
 			}
 
 			if (processId != null) {
@@ -356,7 +356,7 @@ public class TransferOfLitigationController {
 			if (litigationData != null) {
 				return Result.success(litigationData);
 			} else {
-				return Result.error("0", "没有数据");
+				return Result.error("0", "没有找到数据");
 			}
 		} catch (Exception e) {
 			LOG.error("-- queryTransferLitigationData -- 移交诉讼失败！！！", e);
@@ -380,7 +380,7 @@ public class TransferOfLitigationController {
 			if (resultMap != null && !resultMap.isEmpty()) {
 				return Result.success(resultMap);
 			} else {
-				return Result.error("0", "没有数据");
+				return Result.error("0", "没有找到数据");
 			}
 		} catch (Exception e) {
 			LOG.error("-- queryCarLoanBilDetail -- 查询车贷结清试算明细！！！", e);
@@ -404,7 +404,7 @@ public class TransferOfLitigationController {
 			if (resultMap != null && !resultMap.isEmpty()) {
 				return Result.success(resultMap);
 			} else {
-				return Result.error("0", "没有数据");
+				return Result.error("0", "没有找到数据");
 			}
 		} catch (Exception e) {
 			LOG.error("-- carLoanBilling -- 车贷结清试算失败！！！", e);

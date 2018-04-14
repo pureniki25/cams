@@ -133,7 +133,10 @@ window.layinit(function (htConfig) {
             },{
                 field:'loanAmount',
                 title:'借款金额',
-                align: 'right'
+                align: 'right',
+                templet:function(d){
+                    return d.loanAmount?numeral(d.loanAmount).format('0,0.00'):''
+                }
             },{
                 field:'loanTerm',
                 title:'借款期限'
@@ -142,14 +145,14 @@ window.layinit(function (htConfig) {
                 title:'已还本金',
                 align: 'right',
                 templet:function(d){
-                    return Number(d.repayAmount).toFixed(2)
+                    return d.repayAmount?numeral(d.repayAmount).format('0,0.00'):''
                 }
             },{
                 field:'extensionAmount',
                 title:'展期金额',
                 align: 'right',
                 templet:function(d){
-                    return Number(d.extensionAmount).toFixed(2)
+                    return d.extensionAmount?numeral(d.extensionAmount).format('0,0.00'):''
                 }
             },{
                 field:'extensionTerm',

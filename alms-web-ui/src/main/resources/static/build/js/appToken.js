@@ -10,11 +10,14 @@ window.layinit = function (cb) {
     layui.config({
         base : '/plugins/layui/extend/modules/',
         version : '1.0.11'
-    }).use(['layer', 'table','ht_ajax', 'ht_auth', 'ht_config','laydate','upload'], function () {
+    }).use(['layer', 'table','ht_ajax', 'ht_auth', 'ht_config','laydate','upload','numeral','moment'], function () {
         // htConfig = window.properties.config;
 		// if(!(window.properties.config.useGateWayflage)){
          //    axios.defaults.headers.common['userId'] = window.properties.config.loginUserId;
-		// }
+        // }
+        
+        numeral.defaultFormat('0,0.00');
+        moment.locale('zh-cn');
         htConfig = layui.ht_config;
         _loadBtnAndTabUrl =  htConfig.loadBtnAndTabUrl;
 
@@ -46,6 +49,8 @@ window.layinit = function (cb) {
 
         cb(htConfig)
     });
+
+
 }
 
 

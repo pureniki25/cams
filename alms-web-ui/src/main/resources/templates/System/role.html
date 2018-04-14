@@ -50,7 +50,7 @@
             <table id="role" lay-filter="role"></table>
             <script type="text/html" id="barTools">
                 <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
-                <a class="layui-btn layui-btn-xs" lay-event="delete">删除</a>
+                <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</a>
             </script>
 
             <Modal v-model="editModal.show">
@@ -72,8 +72,10 @@
                     </i-form>
                 </Card>
                 <row slot="footer">
-                    <i-button @click="save">保存</i-button>
-                    <i-button @click="closeModal">取消</i-button>
+                    <div class="layui-btn-group">
+                        <button class="layui-btn" @click="save">保存</button>
+                        <button class="layui-btn" @click="closeModal">关闭</button>
+                    </div>
                 </row>
             </Modal>
         </card>

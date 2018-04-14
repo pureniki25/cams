@@ -51,7 +51,8 @@
                         <form-item label="发布时间">
                             <Date-picker type="daterange" placeholder="时间范围" :value.sync="schForm.date" v-model="schForm.date"></Date-picker>
                         </form-item>
-                        <i-button @click="search">查询</i-button>
+                        <!-- <i-button @click="search">查询</i-button> -->
+                        <button class="layui-btn layui-btn-sm" @click="search">查询</button>
                     </i-form>
                 </i-col>
             </row>
@@ -67,8 +68,8 @@
                     <table id="notice" lay-filter="notice"></table>
                     <script type="text/html" id="toolbar">
                         <!-- <a class="layui-btn layui-btn-xs" lay-event="check">查阅记录</a> -->
-                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
-                        <a class="layui-btn layui-btn-xs" lay-event="delete">删除</a>
+                        <a class="layui-btn layui-btn-norma layui-btn-xs" lay-event="edit">编辑</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
                     </script>
                 </i-col>
             </Row>
@@ -167,9 +168,14 @@
                 </card>
             </row>
             <row slot="footer">
-                <i-button @click="onSaveNotice">保存</i-button>
+                    <div class="layui-btn-group">
+                            <button class="layui-btn" @click="onSaveNotice">保存</button>
+                            <button class="layui-btn layui-btn-danger" @click="closeEditModal">撤销</button>
+                            <button class="layui-btn" @click="openReviewModal">公告预览</button>
+                          </div>
+                <!-- <i-button @click="onSaveNotice">保存</i-button>
                 <i-button @click="closeEditModal">撤销</i-button>
-                <i-button @click="openReviewModal">公告预览</i-button>
+                <i-button @click="openReviewModal">公告预览</i-button> -->
             </row>
         </Modal>
 
@@ -191,7 +197,11 @@
                     </p>
                     <p v-if="previewModal.notice.fileList.length==0">无</p>
                 </p>
+                
             </Card>
+            <p slot="footer">
+                    <button class="layui-btn" @click="previewModal.show=false;">关闭</button>
+            </p>
         </Modal>
     </div>
     <script src="/src/js/Notice/index.js"></script>

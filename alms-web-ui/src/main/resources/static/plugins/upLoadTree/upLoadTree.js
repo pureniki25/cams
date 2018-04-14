@@ -375,13 +375,13 @@
         });
         fileupLoad.cboxEffect();
         //删除所有选中文件
-        $(".del-file").on("click",function(){debugger
+        $(".del-file").on("click",function(){
             if($(".cbox:checked").length!==0){
                 var del_divList=$(".cbox:checked").parent().parent();
                 var del_fileList=[];
                 var del_docIDList=[];
                 for(var i=0;i<del_divList.length;i++){
-                    del_fileList.push(del_divList[i].data("item"));
+                    del_fileList.push(del_divList.data("item"));
                     del_docIDList.push(del_divList.eq(i).data("id"));
                     var cutnum = parseInt(fileupLoad.options.getCurrentFileCount());
                     cutnum--;

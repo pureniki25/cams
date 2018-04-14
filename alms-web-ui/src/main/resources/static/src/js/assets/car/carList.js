@@ -350,7 +350,7 @@ window.layinit(function (htConfig) {
                                  }
                            
                             }},
-                            {"name": "上传附件", click: function (e, currentItem) {
+                            {"name": "附件上传及查看", click: function (e, currentItem) {
                             	
                            	  if(authValid('fileUp')){
 	                           	  	fileUp(currentItem,"上传附件");
@@ -358,7 +358,7 @@ window.layinit(function (htConfig) {
 	                          	   layer.msg("对不起，你没有权限",{icon:5,shade: [0.8, '#393D49'],time:3000});
 	                          }
                             }},
-                            {"name": "查看附件", click: function (e, currentItem) {
+                            {"name": "查看信贷附件", click: function (e, currentItem) {
                             	//aler("bbb");
                             	
                              	  if(authValid('viewFile')){

@@ -45,6 +45,7 @@ window.layinit(function (htConfig) {
 	    		,borrowRate:''// 借款利率
 	    		,operatorName:''//业务主办人
 	    	}
+			,remainingPrincipal:''//剩余本金
 		    ,repayPlan:{
 		    	payedPrincipal:''//已还本金
 		    	,payedInterest:''//已还利
@@ -690,20 +691,46 @@ window.layinit(function (htConfig) {
 	                	vm.carBasic=data.data.carBasic;
 	                	vm.business=data.data.business;
 	                	vm.drag=data.data.drag;
+						vm.drag.dragDate = moment(vm.drag.dragDate).format("YYYY年MM月DD日");
 	                 	vm.detection=data.data.detection;
+						vm.detection.createTime = moment(vm.detection.createTime).format("YYYY年MM月DD日");
+						vm.detection.insuranceExpirationDate = moment(vm.detection.insuranceExpirationDate).format("YYYY-MM-DD");
 	                	vm.mortgageDetection=data.data.mortgageDetection;
+	                	vm.mortgageDetection.createTime = moment(vm.mortgageDetection.createTime).format("YYYY年MM月DD日")
 	                	if(data.data.repayPlan!=null&&data.data.repayPlan!=''){
 	                		vm.repayPlan=data.data.repayPlan;
+	                		vm.repayPlan.lastPayDate = moment(vm.repayPlan.lastPayDate).format("YYYY年MM月DD日")
 	                	}
 	                 	if(vm.repayPlan.payedPrincipal==null||vm.repayPlan.payedPrincipal==''){
 	                		vm.repayPlan.payedPrincipal=0;
-	                	}
+	                	}else {
+	                		vm.repayPlan.payedPrincipal = Number(vm.repayPlan.payedPrincipal).toFixed(2);
+						}
+	                 	if(vm.repayPlan.payedInterest==null||vm.repayPlan.payedInterest==''){
+	                 		vm.repayPlan.payedInterest=0;
+	                 	}else {
+	                 		vm.repayPlan.payedInterest = Number(vm.repayPlan.payedInterest).toFixed(2);
+	                 	}
+	                 	vm.remainingPrincipal = vm.business.borrowMoney - vm.repayPlan.payedPrincipal;
+	                 	vm.business.borrowMoney = Number(vm.business.borrowMoney).toFixed(2);
+	                 	if(vm.remainingPrincipal==null||vm.remainingPrincipal==''){
+	                 		vm.remainingPrincipal=0;
+	                 	}else {
+	                 		vm.remainingPrincipal = Number(vm.remainingPrincipal).toFixed(2);
+	                 	}
+	                 	if (vm.mortgageDetection.evaluationAmount != null || vm.mortgageDetection.evaluationAmount != '') {
+							vm.mortgageDetection.evaluationAmount = Number(vm.mortgageDetection.evaluationAmount).toFixed(2);
+						}
 	                	vm.outputRecord=data.data.outputRecord;
+	                	vm.outputRecord.factOutputDate = moment(vm.outputRecord.factOutputDate).format("YYYY年MM月DD日")
 	                	if(data.data.detection.evaluationAmount==null||data.data.detection.evaluationAmount==''){
 	                		vm.carBasic.differAmount=0;
 	                	}else{
 	                		vm.detection.viewEvaluationAmount=data.data.detection.evaluationAmount;
 	                		vm.detection.differAmount=Math.abs(data.data.detection.evaluationAmount-data.data.mortgageDetection.evaluationAmount);
+	                		vm.repayPlan.differAmount = Number(vm.repayPlan.differAmount).toFixed(2);
+	                		vm.detection.evaluationAmount = Number(data.data.detection.evaluationAmount).toFixed(2);
+	                		vm.detection.viewEvaluationAmount = Number(vm.detection.viewEvaluationAmount).toFixed(2);
 	                	}
 	                	vm.detection.assessOdometer=vm.detection.odometer;//为页面验证用
 	                	vm.detection.viewInsuranceExpirationDate=vm.detection.insuranceExpirationDate;

@@ -39,7 +39,6 @@ var getSelectsData = function () {
 window.layinit(function(htConfig){
     var _htConfig = htConfig;
     basePath = _htConfig.coreBasePath;
-
     getSelectsData();
 
     vm = new Vue({
@@ -292,7 +291,10 @@ window.layinit(function(htConfig){
                     field: 'borrowMoney',
                     width:90,
                     title: '借款金额',
-                    align: 'right'
+                    align: 'right',
+                    templet:function(d){
+                        return numeral(d.borrowMoney).format('0,0.00')
+                    }
                 }, {
                     field: 'totalBorrowAmount',
                     width:90,
@@ -314,7 +316,7 @@ window.layinit(function(htConfig){
                         if(d.repaymentTypeId==5&&d.borrowLimit==d.periods){
                             res+=lastPeriod
                         }
-                        res += Number(d.totalBorrowAmount).toFixed(2)+'' 
+                        res += numeral(d.totalBorrowAmount).format('0,0.00')+'' 
                         return res 
                     }
                 }, {
@@ -326,11 +328,18 @@ window.layinit(function(htConfig){
 
                     field: 'dueDate',
                     width:105,
-                    title: '应还日期'
+                    title: '应还日期',
+                    templet:function(d){
+                        console.log(d)
+                        return d.dueDate?moment(d.dueDate).format("YYYY年MM月DD日"):''
+                    }
                 }, {
                     field: 'repaymentDate',
                     width:105,
-                    title: '实还日期'
+                    title: '实还日期',
+                    templet:function(d){
+                        return d.repaymentDate?moment(d.repaymentDate).format("YYYY年MM月DD日"):''
+                    }
                 }, {
                     field: 'phoneStaffName',
                     width:80,
@@ -430,7 +439,7 @@ window.layinit(function(htConfig){
                                         if (currentItem.statusName != '已还款') {
                                             var url = getDeductionUrl(currentItem);
                                             // var url = '/collectionUI/applyDerateUI?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+"&processStatus=-1"
-                                            showOneLineOprLayer(url, "")
+                                            showOneLineOprLayer(url, "执行代扣")
                                         } else {
                                             vm.$Modal.error({content: '已还款的不能执行代扣！'});
                                         }
@@ -863,3 +872,6 @@ function getDeductionUrl(currentItem){
     return url;
 }
 
+/* layui.use(['numeral'],function(){
+    console.log(numeral)
+}) */
