@@ -1,113 +1,118 @@
-
 <!DOCTYPE html>
 <!--suppress ALL -->
 <html lang="zh-cn">
 <!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+
 <head>
-<meta charset="utf-8" />
-<meta name="viewport"
-	content="width=device-width, initial-scale=1, maximum-scale=1" />
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
-<title>贷后管理</title>
+	<title>贷后管理</title>
 
-<link rel="stylesheet" type="text/css"
-	href="/src/css/themes/default.css" />
-<!-- iview样式 -->
-<link rel="stylesheet" type="text/css"
-	href="/plugins/iview/css/iview.css" />
-<!--@import url("//unpkg.com/iview/dist/styles/iview.css");-->
-<!--<link rel="stylesheet" type="text/css" href="//unpkg.com/iview/dist/styles/iview.css"/>-->
-<!-- 引入layui样式 -->
-<link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all" />
-<link rel="stylesheet" href="/plugins/popover/popover.css">
+	<link rel="stylesheet" type="text/css" href="/src/css/themes/default.css" />
+	<!-- iview样式 -->
+	<link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css" />
+	<!--@import url("//unpkg.com/iview/dist/styles/iview.css");-->
+	<!--<link rel="stylesheet" type="text/css" href="//unpkg.com/iview/dist/styles/iview.css"/>-->
+	<!-- 引入layui样式 -->
+	<link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all" />
+	<link rel="stylesheet" href="/plugins/popover/popover.css">
 
-<script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
-<!-- iview js -->
-<script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
-        <script src="/properties/config.js"></script>
-<!--引入layui.js-->
-<script src="/plugins/layui/layui.js"></script>
-<!--引入axios.js 用于ajax调用-->
-<script src="/plugins/axios/axios.min.js"></script>
-<script type="text/javascript" src="/plugins/jquery-1.9.1.min.js"></script>
-<script src="/plugins/popover/popover.js"></script>
-    <script src="/build/js/appToken.js"></script>
-<style type="text/css">
-.layui-form-item {
-	border-bottom: 2px solid #DBDBDB; /*下边框线*/
-}
+	<script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+	<!-- iview js -->
+	<script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+	<script src="/properties/config.js"></script>
+	<!--引入layui.js-->
+	<script src="/plugins/layui/layui.js"></script>
+	<!--引入axios.js 用于ajax调用-->
+	<script src="/plugins/axios/axios.min.js"></script>
+	<script type="text/javascript" src="/plugins/jquery-1.9.1.min.js"></script>
+	<script src="/plugins/popover/popover.js"></script>
+	<script src="/build/js/appToken.js"></script>
+	<style type="text/css">
+		.layui-form-item {
+			border-bottom: 2px solid #DBDBDB;
+			/*下边框线*/
+		}
 
-.layui-form-item .layui-form-label {
-	width: 30%
-}
+		.layui-form-item .layui-form-label {
+			width: 30%
+		}
 
-.layui-form-item .layui-input-block {
-	margin-left: 35%;
-	width: 60%;
-}
+		.layui-form-item .layui-input-block {
+			margin-left: 35%;
+			width: 60%;
+		}
 
-.input-border-none {
-	border: none;
-	font-size: 14px;
-}
+		.input-border-none {
+			border: none;
+			font-size: 14px;
+		}
 
-.layui-row .grid-demo {
-	margin-left: 5%;
-	width: 90%;
-}
+		.layui-row .grid-demo {
+			margin-left: 5%;
+			width: 90%;
+		}
 
-.td_label {
-	font-weight: bolder;
-	width: 150px;
-}
-</style>
+		.td_label {
+			font-weight: bolder;
+			width: 150px;
+		}
+	</style>
 </head>
+
 <body>
 	<!--隐藏元素-->
 	<p id="regId" th:attr="value=${regId}" hidden />
 	<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
-	<div id="app" >
+	<div id="app">
 
 		<div class="layui-row">
 			<div class="layui-col-xs6 layui-col-md12" style="margin-left:15%;width: 80%;">
-		
+
 				<div class="grid-demo layui-bg-gray">
-					<table class="layui-table"  >
+					<table class="layui-table">
 						<tr>
 							<td class="td_label">用户姓名</td>
-							<td><input type="text" name="lname" v-bind:value="bidder.bidderName"  disabled="disabled"></td>
+							<td>
+								<i-input type="text" name="lname" v-bind:value="bidder.bidderName" readonly></i-input>
+							</td>
 						</tr>
 						<tr>
 							<td class="td_label">身份证号码</td>
-							<td><input type="text" name="lname" v-bind:value="bidder.bidderCertId"  disabled="disabled">
+							<td>
+								<i-input type="text" name="lname" v-bind:value="bidder.bidderCertId" readonly></i-input>
 							</td>
-				
+
 						</tr>
 						<tr>
 							<td class="td_label">联系方式</td>
-							<td><input type="text" name="lname" v-bind:value="bidder.bidderTel"  disabled="disabled">
+							<td>
+								<i-input type="text" name="lname" v-bind:value="bidder.bidderTel" readonly></i-input>
 							</td>
 						</tr>
 						<tr>
 							<td class="td_label">是否缴纳保证金：</td>
-							<td><input value="false" type="radio" v-model="auctionReg.payDeposit"
-								>否&nbsp; <input value="true"
-								type="radio"  v-model="auctionReg.payDeposit" >是&nbsp;</td>
+							<td>
+								<input value="false" type="radio" v-model="auctionReg.payDeposit">否&nbsp;
+								<input value="true" type="radio" v-model="auctionReg.payDeposit">是&nbsp;</td>
 						</tr>
 						<tr>
 							<td class="td_label">出价金额</td>
-							<td><input type="text" name="lname" v-bind:value="auctionReg.offerAmount"  disabled="disabled">
+							<td>
+								<i-input type="text" name="lname" v-bind:value="numeral(auctionReg.offerAmount).format()" readonly></i-input>
 							</td>
 						</tr>
-							<tr>
+						<tr>
 							<td class="td_label">是否竞拍成功：</td>
-							<td><input value="false" type="radio" v-model="auctionReg.auctionSuccess"
-								>否&nbsp; <input value="true"
-								type="radio" v-model="auctionReg.auctionSuccess">是&nbsp;</td>
+							<td>
+								<input value="false" type="radio" v-model="auctionReg.auctionSuccess">否&nbsp;
+								<input value="true" type="radio" v-model="auctionReg.auctionSuccess">是&nbsp;</td>
 						</tr>
-							<tr>
+						<tr>
 							<td class="td_label">成交价格</td>
-							<td><input type="text" name="lname" v-model="auctionReg.transPrice" >
+							<td>
+								<i-input type="text" name="lname" v-model="numeral(auctionReg.transPrice).format()"></i-input>
 							</td>
 						</tr>
 					</table>
@@ -118,19 +123,18 @@
 				</div>
 			</div>
 		</div>
-		
+
 		<div class="layui-row">
-			<div class="layui-col-xs6 layui-col-md12">
-			<div class="grid-demo layui-bg-gray">
-		      <button class="layui-btn" v-on:click="carAuctionReg()">保存</button>
-		      <button class="layui-btn layui-btn-warm" v-on:click="auctionRegClose()">撤销</button>
-			</div>
+			<div class="layui-col-xs11 layui-col-md11" style="text-align: right">
+				<button class="layui-btn" v-on:click="carAuctionReg()">保存</button>
+				<button class="layui-btn layui-btn-warm" v-on:click="auctionRegClose()">撤销</button>
 			</div>
 		</div>
-</div>
-		<script src="/src/js/assets/car/auctionReg.js"></script>
-		<script>
-			
-		</script>
+	</div>
+	<script src="/src/js/assets/car/auctionReg.js"></script>
+	<script>
+
+	</script>
 </body>
+
 </html>

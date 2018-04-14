@@ -47,7 +47,6 @@ window.layinit = function (cb) {
         // }
         
         numeral.defaultFormat('0,0.00');
-        moment.locale('zh-cn');
         htConfig = layui.ht_config;
         _loadBtnAndTabUrl =  htConfig.loadBtnAndTabUrl;
 

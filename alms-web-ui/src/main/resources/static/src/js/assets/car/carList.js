@@ -243,14 +243,17 @@ window.layinit(function (htConfig) {
                     }, {
                         field: 'borrowMoney',
                         title: '借款金额',
-                        align: 'right'
+                        align: 'right',
+                        templet:function(d){
+                            return numeral(d.borrowMoney).format()
+                        }
                     }, {
 
                         field: 'repaidAmount',
                         title: '已还金额',
                         align: 'right',
                         templet:function(d){
-                            return Number(d.repaidAmount).toFixed(2)
+                            return numeral(d.repaidAmount).format()
                         }
                     }, {
 
@@ -263,13 +266,22 @@ window.layinit(function (htConfig) {
                     }, {
                         field: 'evaluationAmount',
                         title: '评估价',
-                        align: 'right'
+                        align: 'right',
+                        templet:function(d){
+                            return numeral(d.evaluationAmount).format()
+                        }
                     }, {
                         field: 'evaluationDate',
-                        title: '评估日期'
+                        title: '评估日期',
+                        templet:function(d){
+                            return moment(d.evaluationDate).format(YYYYMMDD)
+                        }
                     }, {
                         field: 'trailerDate',
-                        title: '拖车日期'
+                        title: '拖车日期',
+                        templet:function(d){
+                            return moment(d.evaluationDate).format(YYYYMMDD)
+                        }
                     }, {
 
                         field: 'status',
