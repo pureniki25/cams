@@ -9,6 +9,7 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>alms-core-service</module>
+        <module>alms-finance-service</module>
         <module>alms-open-service</module>
         <module>alms-common</module>
         <module>alms-web-ui</module>
@@ -16,7 +17,6 @@
         <module>alms-gateway</module>
         <module>alms-config</module>
         <module>alms-base</module>
-        <!--<module>alms-timer-service</module>-->
         <module>alms-scheduled-service</module>
 
     </modules>
