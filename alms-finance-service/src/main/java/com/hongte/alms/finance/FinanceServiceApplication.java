@@ -25,7 +25,7 @@ import org.springframework.web.client.RestTemplate;
  */
 @EnableFeignClients(basePackages = {"com.ht.ussp.client", "com.hongte.alms.base.feignClient"})
 @SpringCloudApplication
-@MapperScan(basePackages = {"com.hongte.alms.finance.mapper","com.hongte.alms.finanace"})
+@MapperScan(basePackages = {"com.hongte.alms.finance.mapper","com.hongte.alms.base"})
 @EnableTransactionManagement 
 @ComponentScan(basePackages= {"com.hongte.alms.finance","com.hongte.alms.common", "com.hongte.alms.base.*","com.ht.ussp.bean"})
 public class FinanceServiceApplication {
@@ -38,7 +38,7 @@ public class FinanceServiceApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(FinanceServiceApplication.class, args);
-		System.err.println("ヾ(◍°∇°◍)ﾉﾞ    core-service启动成功      ヾ(◍°∇°◍)ﾉﾞ\n");
+		System.err.println("ヾ(◍°∇°◍)ﾉﾞ    finance-service启动成功      ヾ(◍°∇°◍)ﾉﾞ\n");
 	}
 
 
