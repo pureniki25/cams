@@ -1,17 +1,16 @@
-package com.hongte.alms.core.vo.modules;
+package com.hongte.alms.base.vo.module;
 
 /**
  * @author dengzhiming
  * @date 2018/2/26 10:08
  */
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.Serializable;
 
 /**
  * 区域区县项
  */
-public class AreaCountyItemVo {
+public class AreaCountyItemVo implements Serializable {
     private String value;
     private String label;
 

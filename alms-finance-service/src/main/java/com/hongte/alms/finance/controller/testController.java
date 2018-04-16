@@ -4,7 +4,8 @@ package com.hongte.alms.finance.controller;
 import com.hongte.alms.base.service.SysCityService;
 import com.hongte.alms.base.service.SysCountyService;
 import com.hongte.alms.base.service.SysProvinceService;
-import com.hongte.alms.base.vo.AreaProvinceItemVo;
+
+import com.hongte.alms.base.vo.module.AreaProvinceItemVo;
 import com.hongte.alms.common.result.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -49,6 +50,9 @@ public class testController {
     @GetMapping("getArea")
     public Result<List<AreaProvinceItemVo>> getArea()
     {
+
+
+
         try {
             List<AreaProvinceItemVo> provinceItemList = provinceService.getAreaInfo();
 //            List<AreaProvinceItemVo> provinceItemList = new ArrayList<AreaProvinceItemVo>();

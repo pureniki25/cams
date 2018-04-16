@@ -1,26 +1,27 @@
-package com.hongte.alms.core.vo.modules;
+package com.hongte.alms.base.vo.module;
 
 /**
  * @author dengzhiming
  * @date 2018/2/26 10:08
  */
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 区域市项
+ * 区域省项
  */
-public class AreaCityItemVo {
+public class AreaProvinceItemVo implements Serializable {
 
-    public AreaCityItemVo()
+    public AreaProvinceItemVo()
     {
-      this.children=new ArrayList<AreaCountyItemVo>();
+      this.children=new ArrayList<AreaCityItemVo>();
     }
 
     private String value;
     private String label;
-    private List<AreaCountyItemVo> children;
+    private List<AreaCityItemVo> children;
 
     public String getValue() {
         return value;
@@ -38,11 +39,11 @@ public class AreaCityItemVo {
         this.label = label;
     }
 
-    public List<AreaCountyItemVo> getChildren() {
+    public List<AreaCityItemVo> getChildren() {
         return children;
     }
 
-    public void setChildren(List<AreaCountyItemVo> children) {
+    public void setChildren(List<AreaCityItemVo> children) {
         this.children = children;
     }
 
