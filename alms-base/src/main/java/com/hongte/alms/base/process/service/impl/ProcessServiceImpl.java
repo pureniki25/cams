@@ -7,8 +7,10 @@ import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.assets.car.vo.AuditVo;
 import com.hongte.alms.base.baseException.AlmsBaseExcepiton;
 import com.hongte.alms.base.entity.*;
+import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.enums.ProcessEngineFlageEnums;
 import com.hongte.alms.base.enums.SysRoleAreaTypeEnums;
+import com.hongte.alms.base.enums.SysRoleEnums;
 import com.hongte.alms.base.process.entity.*;
 import com.hongte.alms.base.process.entity.Process;
 import com.hongte.alms.base.process.enums.*;
@@ -16,6 +18,7 @@ import com.hongte.alms.base.process.mapper.ProcessMapper;
 import com.hongte.alms.base.process.service.*;
 import com.hongte.alms.base.process.vo.*;
 import com.hongte.alms.base.service.*;
+import com.hongte.alms.base.vo.module.ApplyTypeVo;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.ClassCopyUtil;
 import com.hongte.alms.common.util.Constant;
@@ -30,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -216,6 +220,189 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
         insertOrUpdateAllColumn(process);
         return process;
     }
+    
+    
+    /**
+     * 减免申请存储流程审批记录，所有异常都回滚
+     * @param req
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Process saveProcessApprovalResultDerate(ProcessLogReq req ,ProcessTypeEnums processTypeEnums,boolean isFinish,ApplyTypeVo vo) throws IllegalAccessException, InstantiationException{
+
+
+        ProcessLog log =  ClassCopyUtil.copyObject(req,ProcessLog.class);
+        //流程信息
+        Process process = selectById(req.getProcess().getProcessId());
+
+        if(!process.getCurrentStep().equals(req.getProcess().getCurrentStep())){
+            throw  new RuntimeException("当前流程状态与界面流程状态不一致，请刷新后重新提交!");
+        }
+
+        //判断登录用户是否是当前步骤的审批人之一
+//        if(!canApprove(process)){  调试暂时屏蔽
+//            throw  new RuntimeException("您不是流程的当前审批人!");
+//        }
+
+        //流程类型
+        ProcessType processType = processTypeService.getProcessTypeByCode(processTypeEnums.getKey());
+        if(processType == null){
+            throw new RuntimeException("流程类型未定义");
+        }
+
+        //当前节点定义
+        ProcessTypeStep currentStep = processTypeStepService.getProcessTypeStep(processType.getTypeId(),req.getProcess().getCurrentStep());
+        if(currentStep == null){
+            throw new  RuntimeException("找不到 当前流程节点定义！");
+        }
+
+        //后一个节点定义
+        ProcessTypeStep nextStep = null;
+
+        //如果回退则取回退的步骤
+        if(req.getIsPass().equals(ProcessApproveResult.REFUSE.getKey())&&req.getIsDirectBack().equals(ProcessIsDerateBackEnums.YES.getKey())){
+            if(req.getNextStep()==null){
+                throw new  RuntimeException("应该设置回退到第几步！");
+            }
+            nextStep = processTypeStepService.getProcessTypeStep(processType.getTypeId(),req.getNextStep());
+            process.setIsDirectBack(ProcessIsDerateBackEnums.YES.getKey());//标识回退
+            process.setBackStep(currentStep.getStep());//记录回退的步骤
+        }else{
+           if(process.getIsDirectBack().equals(ProcessIsDerateBackEnums.YES.getKey())) {
+                //如果流程的是上一步回退的,则取流程中存储的应该跳转的节点
+                nextStep = processTypeStepService.getProcessTypeStep(processType.getTypeId(),process.getBackStep());
+            }else{//否则直接取后一个
+                if(currentStep.getNextStep()!=null){
+                    nextStep = processTypeStepService.getProcessTypeStep(processType.getTypeId(),currentStep.getNextStep());
+                }
+            }
+            process.setIsDirectBack(ProcessIsDerateBackEnums.NO.getKey());//取消回退标志
+            process.setBackStep(null);//清除回退步骤
+
+        }
+        if(isFinish==true) {
+        	currentStep.setNextStep(null);
+        }
+
+
+
+        //1.添加log记录
+        log.setProcessLogId(UUID.randomUUID().toString());
+        log.setProcessId(req.getProcess().getProcessId());
+        log.setProcessName(req.getProcessName());
+        log.setTypeId(processType.getTypeId());
+        log.setTypeStepId(currentStep.getTypeStepId());
+        log.setStepName(currentStep.getStepName());
+        log.setApproveUserId(loginUserInfoHelper.getUserId());
+        log.setCurrentStep(process.getCurrentStep());
+        log.setNextStep(currentStep.getNextStep());
+        log.setCreateUser(Constant.DEV_DEFAULT_USER);
+        log.setCreateTime(new Date());
+        processLogService.insert(log);
+        
+        
+        List<SysUser> users=null;
+        if(isFinish==true) {
+        	  //车贷减免流程：减免金额<= 10000 要默认抄送贷后综合岗人员及车贷业务车贷出纳人员
+        	if((vo.getBusinessTypeId()==BusinessTypeEnum.CYD_TYPE.getValue()&&vo.getDerateMoney().compareTo(new BigDecimal("10000"))<=0)){
+        		users=sysUserService.selectUsersByRole(SysRoleEnums.DH_CAR_TELLER.getKey());
+        		users.forEach(item->{
+        			addElementToArray(req.getSendUserIds(), item.getUserId());
+        		});
+        		
+        		users=sysUserService.selectUsersByRole(SysRoleEnums.DH_GENERAL_APPROVE.getKey());
+        		users.forEach(item->{
+        			addElementToArray(req.getSendUserIds(), item.getUserId());
+        		});
+        	
+        	}else if((vo.getBusinessTypeId()==BusinessTypeEnum.CYD_TYPE.getValue()&&vo.getDerateMoney().compareTo(new BigDecimal("10000"))>0)){
+        		users=sysUserService.selectUsersByRole(SysRoleEnums.DH_CAR_TELLER.getKey());
+        		users.forEach(item->{
+        			addElementToArray(req.getSendUserIds(), item.getUserId());
+        		});
+        	}
+        	
+        	
+        	    //房贷，减免金额<= 20000 ，要默认抄送贷后综合岗人员及车贷业务车贷出纳人员
+        	if((vo.getBusinessTypeId()==BusinessTypeEnum.FSD_TYPE.getValue()&&vo.getDerateMoney().compareTo(new BigDecimal("20000"))<=0)){
+        		users=sysUserService.selectUsersByRole(SysRoleEnums.DH_HOUSE_TELLER.getKey());
+        		users.forEach(item->{
+        			addElementToArray(req.getSendUserIds(), item.getUserId());
+        		});
+        		users=sysUserService.selectUsersByRole(SysRoleEnums.DH_GENERAL_APPROVE.getKey());
+        		users.forEach(item->{
+        			addElementToArray(req.getSendUserIds(), item.getUserId());
+        		});
+        	}else if((vo.getBusinessTypeId()==BusinessTypeEnum.FSD_TYPE.getValue()&&vo.getDerateMoney().compareTo(new BigDecimal("20000"))>0)) {
+        		users=sysUserService.selectUsersByRole(SysRoleEnums.DH_HOUSE_TELLER.getKey());
+        		users.forEach(item->{
+        			addElementToArray(req.getSendUserIds(), item.getUserId());
+        		});
+        	
+        	}
+      
+        }
+        
+        //添加抄送记录
+        for(int i=0;i<req.getSendUserIds().length;i++){
+            ProcessLogCopySend copySend = new ProcessLogCopySend();
+            copySend.setProcessLogId(log.getProcessLogId());
+            copySend.setProcessSendId(UUID.randomUUID().toString());
+            copySend.setReceiveUserId(req.getSendUserIds()[i]);
+            SysUser sysUser = sysUserService.selectById(req.getSendUserIds()[i]);
+            if(sysUser!=null){
+                copySend.setReceiveUserName(sysUser.getUserName());
+            }else{
+                copySend.setReceiveUserName(Constant.DEV_DEFAULT_USER);
+            }
+            processLogCopySendService.insert(copySend);
+        }
+
+
+        //更新状态
+        //如果审批不通过且未定向打回则结束流程
+        if(log.getIsPass().equals(ProcessApproveResult.REFUSE.getKey())&&!log.getIsDirectBack().equals(ProcessIsDerateBackEnums.YES.getKey())){
+            process.setCurrentStep(null);
+            process.setApproveUserId(null);
+            process.setStatus(ProcessStatusEnums.END.getKey());
+            process.setProcessResult(ProcessApproveResult.REFUSE.getKey());
+        }else{
+            if(log.getIsDirectBack()!=null&&!log.getIsDirectBack().equals(ProcessIsDerateBackEnums.YES.getKey())){//定向打回
+                if(currentStep.getStepType().equals(ProcessStepTypeEnums.END_STEP.getKey())//节点类型为结束节点则结束流程
+                        || currentStep.getNextStep()== null||isFinish==true){//没有下一步节点
+                    process.setCurrentStep(null);
+                    process.setApproveUserId(null);
+                    process.setStatus(ProcessStatusEnums.END.getKey());
+                    process.setProcessResult(ProcessApproveResult.PASS.getKey());
+                }
+            }
+        }
+        //更新当前审核人 和当前审核步骤
+        if(nextStep !=null){//如果还有下一步
+            process.setCurrentStep(nextStep.getStep());
+            process.setApproveUserId(getApproveUserId(nextStep,process.getCreateUser(),process));
+        }
+        /*else{
+            process.setCurrentStep(null);
+            process.setApproveUserId(null);
+            process.setStatus(ProcessStatusEnums.END.getKey());
+        }*/
+
+        //更新操作人和操作时间
+        process.setUpdateTime(new Date());
+        process.setUpdateUser(loginUserInfoHelper.getUserId());
+
+        updateAllColumnProcess(process);
+
+        return process;
+        //updateProcess(process);
+
+    }
+
+    
+    
 
     /**
      * 存储流程审批记录，所有异常都回滚
@@ -1109,5 +1296,14 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
         //更新或插入
         insertOrUpdateAllColumn(process);
         return process;
+    }
+    
+    private String[] addElementToArray(String[] arr,String id) {
+    	String[] result=new String[arr.length+1];
+    	for(int i=0;i<arr.length;i++) {
+    		result[i]=arr[i];
+    	}
+    	result[result.length-1]=id;
+    	return result;
     }
 }
