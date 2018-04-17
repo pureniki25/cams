@@ -1,4 +1,4 @@
-package com.hongte.alms.base.collection.entity;
+﻿package com.hongte.alms.base.collection.entity;
 
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableField;
@@ -9,7 +9,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.util.Date; 
 /**
  * <p>
  * 贷后移交催收日志
