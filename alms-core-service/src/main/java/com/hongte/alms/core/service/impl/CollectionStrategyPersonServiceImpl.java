@@ -53,7 +53,6 @@ public class CollectionStrategyPersonServiceImpl implements CollectionStrategyPe
         collectionGroup1Users = req.getCollectionGroup1Users();
         collectionGroup2Users = req.getCollectionGroup2Users();
         companyList = req.getCompanyId();
-        Integer businessType=req.getBusinessType();
 
 
         for (String com:companyList) {
@@ -62,7 +61,6 @@ public class CollectionStrategyPersonServiceImpl implements CollectionStrategyPe
                 personSet.setUpdateTime(new Date());
                 personSet.setUpdateUser("admin");
                 personSet.setCreatUser("admin");
-                personSet.setBusinessType(businessType);
                 collectionPersonSettingService.update(personSet,new EntityWrapper<CollectionPersonSet>().eq("col_person_id",personSet.getColPersonId()));
             }else {
                 BasicCompany basicCompany = basicCompanyService.selectOne(new EntityWrapper<BasicCompany>().eq("area_id",com).eq("area_level", AreaLevel.COMPANY_LEVEL.getKey()));
@@ -71,16 +69,13 @@ public class CollectionStrategyPersonServiceImpl implements CollectionStrategyPe
                 personSet.setCompanyCode(com);
                 personSet.setCreateTime(new Date());
                 personSet.setCreatUser("admin");
-                personSet.setBusinessType(businessType);
                 collectionPersonSettingService.insert(personSet);
             }
 
             String colPersonId = personSet.getColPersonId();
 
             List<CollectionPersonSetDetail> personSetDetails = new ArrayList<>();
-            
-            
-                
+
         /*
         构建第一组人员详情设置
          */

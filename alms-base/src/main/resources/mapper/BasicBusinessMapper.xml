@@ -53,23 +53,13 @@
 		  business.borrow_rate_unit AS borrowRateUnit,
 		  business.borrow_money AS borrowMoney,
 		  pList.period AS periods,
-		  pList.after_Id AS afterId,
 		  pList.overdue_days AS delayDays,
 		  c.totalBorrowAmount AS totalBorrowAmount,
 		  c.needPayPrincipal AS needPayPrincipal,
 		  c.needPayInterest AS needPayInterest,
 		  c.needPayPenalty AS needPayPenalty,
 		  c.otherPayAmount AS otherPayAmount,
-		  c.sumFactAmount AS sumFactAmount,
-		  c.needPayService as needPayService,
-		  b.getMoney AS getMoney ,
-		  c.needPayGuarantee as needPayGuarantee,
-		  c.needPayPlatform as needPayPlatform,
-		  c.needPaydeposit as needPaydeposit,
-		  c.needPayRush as needPayRush,
-		  c.needPayAgency as needPayAgency
-		  
-		  
+		  b.getMoney AS getMoney 
 		FROM
 		  tb_repayment_biz_plan_list AS pList 
 		  LEFT JOIN tb_repayment_biz_plan AS plan 
@@ -119,88 +109,6 @@
 		          ELSE 0 
 		        END
 		      ) `otherPayAmount`,
-		      
-		             --   实收合计(不含本金部分)-->
-		      SUM(
-		        CASE
-		          WHEN (
-		            t1.plan_item_type != 10	         		       
-		          ) 
-		          THEN t1.fact_amount 
-		          ELSE 0 
-		        END
-		      ) `sumFactAmount`,
-		      	       	      --   应付平台费-->
-		      	      
-		      SUM(
-		        CASE
-		          WHEN (
-		            t1.plan_item_type =50	         		       
-		          ) 
-		          THEN t1.fact_amount 
-		          ELSE 0 
-		        END
-		      ) `needPayPlatform`,
-		 
-		      	           --   应付押金费-->
-		     	SUM(
-		        CASE
-		          WHEN (
-		            t1.plan_item_type =90	         		       
-		          ) 
-		          THEN t1.plan_amount 
-		          ELSE 0 
-		        END
-		      ) `needPaydeposit`,
-		      	 
-		      	         --   应付冲应收-->
-		       SUM(
-		        CASE
-		          WHEN (
-		            t1.plan_item_type =100	         		       
-		          ) 
-		          THEN t1.plan_amount 
-		          ELSE 0 
-		        END
-		      ) `needPayRush`,
-		      	   
-		      	            --   应付中介-->
-		      	       	      	       	      
-		      SUM(
-		        CASE
-		          WHEN (
-		            t1.plan_item_type =80	         		       
-		          ) 
-		          THEN t1.plan_amount 
-		          ELSE 0 
-		        END
-		      ) `needPayAgency`,
-		      	   
-		      	            --   应付担保费-->
-		      	          	      
-		      SUM(
-		        CASE
-		          WHEN (
-		            t1.plan_item_type = 40	         		       
-		          ) 
-		          THEN t1.plan_amount 
-		          ELSE 0 
-		        END
-		      ) `needPayGuarantee`,
-		      	
-		      	      
-		      	          --   应付月收服务费-->
-		      SUM(
-		        CASE
-		          WHEN (
-		            t1.plan_item_type = 30 
-		            or t1.plan_item_type = 50 
-		      
-		          ) 
-		          THEN t1.plan_amount 
-		          ELSE 0 
-		        END
-		      ) `needPayService`,
 		      --   应还总额-->
 		      SUM(t1.plan_amount) `totalBorrowAmount` 
 		    FROM
@@ -228,8 +136,8 @@
 		      THEN pdetail.plan_amount 
 		      ELSE 0 
 		    END
-		  ) AS `payedPrincipal`,	--   已还本金
-		  rp.original_business_id AS `original_business_id` 
+		  ) AS `payedPrincipal`	--   已还本金
+		--  rp.original_business_id AS `original_business_id` 
 		FROM
 		  tb_repayment_biz_plan_list_detail pdetail 
 		  LEFT JOIN tb_repayment_biz_plan_list l 
@@ -257,64 +165,5 @@
 
 
     </select>
-    
-    
-    
-    
-    <!-- 一次性收取的分公司费用 -->
-    <select id="getPreCharge" resultType="java.lang.Double">
-  select sum(fee+fee2+fee3) 
-  from (
-  	
-	  /* 线上出款业务一次性收取服务费*/
-	  select a.business_id,ifnull(sum(b.sub_company_charge),0) `fee`,ifnull(sum(b.guarantee_amount),0) `fee2`,ifnull(sum(b.tuandai_amount),0) `fee3`
-	  from tb_basic_business a 
-	  join tb_tuandai_project_info b on a.business_id = b.business_id
-	  left join tb_renewal_business c on a.business_id = c.renewal_business_id
-	  where a.business_id = #{original_business_id,jdbcType=VARCHAR} and a.output_platform_id=1 
-	  and c.renewal_business_id is null and b.begin_time is not null
-	  group by a.business_id
-	  union all
-
-	    /*线下出款业务一次性收取服务费*/
-	  select t1.orig_business_id,sum(t3.plan_amount) `fee`, 0 as 'fee2',0 as 'fee3'
-	  FROM tb_repayment_biz_plan_list t1
-	  join tb_repayment_biz_plan t2 on t1.plan_id = t2.plan_id
-	  join tb_repayment_biz_plan_list_detail t3 on t1.plan_list_id= t3.plan_list_id
-	  join tb_basic_business t4 on t1.orig_business_id = t4.business_id
-	  WHERE t1.orig_business_id = #{original_business_id,jdbcType=VARCHAR} 
-	  AND IFNULL(t3.plan_item_type, 0) = 30 AND IFNULL(t1.repay_flag, 0) != 6 
-	  AND ifnull(t1.period,0) =0 AND t2.is_defer=0 AND ifnull(t4.output_platform_id,0) = 0
-	  group by t1.orig_business_id
-  ) tab 
-  group by tab.business_id
-  
-    </select>
-    
-    
-    
-        <!-- 期初收取的月收分公司服务费-->
-    <select id="getPreFees" resultType="java.lang.Double">
-			 SELECT 
-  (case when t3.plan_amount>0
-    then 0 else sum(t3.plan_amount) end ) `plan_amount`
-  
- 
-        FROM
-          tb_repayment_biz_plan_list t1,
-          tb_repayment_biz_plan t2,
-          tb_repayment_biz_plan_list_detail t3 
-        WHERE t1.plan_id = t2.plan_id 
-          AND t1.plan_list_id = t3.plan_list_id 
-          AND t2.original_business_id = #{original_business_id,jdbcType=VARCHAR} 
-          AND IFNULL(t3.plan_item_type, 0) = 30 
-          AND IFNULL(t1.repay_flag, 0) != 6 
-          AND t1.period !=0
-          AND t2.is_defer=0
-        GROUP BY t1.period
-        ORDER BY t1.due_date
-		  limit 1;
-    </select>
-    
     
 </mapper>

@@ -26,174 +26,17 @@ public class BusinessInfoForApplyDerateVo  {
     private BigDecimal             getMoney 			; //出款金额
     private BigDecimal remianderPrincipal 	; //剩余本金
     private Integer periods             ; //当前还款期数
-    private String afterId;
     private Integer delayDays           ; //逾期天数
     private BigDecimal needPayInterest  	; //应付利息
     private BigDecimal needPayPrincipal   	; //应付本金
     private BigDecimal needPayPenalty 		; //应付违约金
-    private BigDecimal needPayPlatform 		; //应付平台费
-    private BigDecimal needPayGuarantee		; //应付担保费
-    private BigDecimal needPaydeposit		; //应付押金
-    private BigDecimal needPayRush		; //应付冲应收
     private BigDecimal otherPayAmount 		; //应付其他费用
     private BigDecimal totalBorrowAmount   ; //应付总额
+
     private  BigDecimal payedPrincipal;//已还金额
-    private  BigDecimal preFees;//前置费用
-    private BigDecimal sumFactAmount;//出款后已交月收等费用总额 :还款计划中的实收合计（不含本金部分）
-    private BigDecimal needPayService;//应付月收服务费
-    private int preLateFeesType;//提前还款违约金方式:
-    private double outsideInterestType;//合同期外逾期利息类型
-    private BigDecimal outsideInterest;//合同期外逾期利息
-    private String generalReturnRate;//综合收益率
-    private BigDecimal preLateFees;    //提前还款违约金:
-    private BigDecimal needPayAgency;//应收中介费
-    
-    
-    
+
      
-    public BigDecimal getNeedPaydeposit() {
-		return needPaydeposit;
-	}
-
-
-	public void setNeedPaydeposit(BigDecimal needPaydeposit) {
-		this.needPaydeposit = needPaydeposit;
-	}
-
-
-	public BigDecimal getNeedPayRush() {
-		return needPayRush;
-	}
-
-
-	public void setNeedPayRush(BigDecimal needPayRush) {
-		this.needPayRush = needPayRush;
-	}
-
-
-	public BigDecimal getNeedPayAgency() {
-		return needPayAgency;
-	}
-
-
-	public void setNeedPayAgency(BigDecimal needPayAgency) {
-		this.needPayAgency = needPayAgency;
-	}
-
-
-	public BigDecimal getNeedPayPlatform() {
-		return needPayPlatform;
-	}
-
-
-	public void setNeedPayPlatform(BigDecimal needPayPlatform) {
-		this.needPayPlatform = needPayPlatform;
-	}
-
-
-	public BigDecimal getNeedPayGuarantee() {
-		return needPayGuarantee;
-	}
-
-
-	public void setNeedPayGuarantee(BigDecimal needPayGuarantee) {
-		this.needPayGuarantee = needPayGuarantee;
-	}
-
-
-	public String getAfterId() {
-		return afterId;
-	}
-
-
-	public void setAfterId(String afterId) {
-		this.afterId = afterId;
-	}
-
-
-	public BigDecimal getOutsideInterest() {
-		return outsideInterest;
-	}
-
-
-	public void setOutsideInterest(BigDecimal outsideInterest) {
-		this.outsideInterest = outsideInterest;
-	}
-
-
-	public int getPreLateFeesType() {
-		return preLateFeesType;
-	}
-
-
-	public void setPreLateFeesType(int preLateFeesType) {
-		this.preLateFeesType = preLateFeesType;
-	}
-
-
-	public double getOutsideInterestType() {
-		return outsideInterestType;
-	}
-
-
-	public void setOutsideInterestType(double outsideInterestType) {
-		this.outsideInterestType = outsideInterestType;
-	}
-
-
-	
-
-	public String getGeneralReturnRate() {
-		return generalReturnRate;
-	}
-
-
-	public void setGeneralReturnRate(String generalReturnRate) {
-		this.generalReturnRate = generalReturnRate;
-	}
-
-
-	public BigDecimal getPreLateFees() {
-		return preLateFees;
-	}
-
-
-	public void setPreLateFees(BigDecimal preLateFees) {
-		this.preLateFees = preLateFees;
-	}
-
-
-	public BigDecimal getNeedPayService() {
-		return needPayService;
-	}
-
-
-	public void setNeedPayService(BigDecimal needPayService) {
-		this.needPayService = needPayService;
-	}
-
-
-	public BigDecimal getSumFactAmount() {
-		return sumFactAmount;
-	}
-
-
-	public void setSumFactAmount(BigDecimal sumFactAmount) {
-		this.sumFactAmount = sumFactAmount;
-	}
-
-
-	public BigDecimal getPreFees() {
-		return preFees;
-	}
-
-
-	public void setPreFees(BigDecimal preFees) {
-		this.preFees = preFees;
-	}
-
-
-	public String getBusinessId() {
+    public String getBusinessId() {
         return businessId;
     }
 

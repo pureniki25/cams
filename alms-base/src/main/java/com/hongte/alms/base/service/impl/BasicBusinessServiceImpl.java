@@ -50,8 +50,8 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 
         Map<String,SysParameter> sysParameterMap = sysParameterService.selectParameterMap(SysParameterTypeEnums.BORROW_RATE_UNIT);
         for(BusinessInfoForApplyDerateVo vo : List){
-        	
-        	vo.setPayedPrincipal(BigDecimal.valueOf(basicBusinessMapper.queryPayedPrincipal(vo.getBusinessId())==null?0:basicBusinessMapper.queryPayedPrincipal(vo.getBusinessId())));
+        	Double principal = basicBusinessMapper.queryPayedPrincipal(vo.getBusinessId()) ; 
+        	vo.setPayedPrincipal(BigDecimal.valueOf(principal==null?0:principal));
 
             SysParameter  parameter =  sysParameterMap.get(vo.getRepaymentTypeId());
             if(parameter!=null){
@@ -81,10 +81,6 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
                 }else{
                     vo.setRemianderPrincipal(new BigDecimal(0.00));
                 }
-            }
-            
-            if(vo.getSumFactAmount()==null) {
-            	vo.setSumFactAmount(new BigDecimal(0.00));
             }
 
         }
@@ -121,19 +117,6 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
         }
         return sList;
     }
-    
-    /**
-     * 一次性收取的分公司费用+期初收取的月收分公司服务费+平台费+担保费
-     * @param original_business_id
-     * @return
-     */
-	@Override
-	public BigDecimal getPreChargeAndPreFees(String original_business_id) {
-		BigDecimal preCharge=BigDecimal.valueOf(basicBusinessMapper.getPreCharge(original_business_id));
-		BigDecimal preFees=BigDecimal.valueOf(basicBusinessMapper.getPreFees(original_business_id));
-		BigDecimal sum=preCharge.add(preFees);
-		return sum;
-	}
 
 
 
