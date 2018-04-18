@@ -6,6 +6,7 @@ import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.common.service.BaseService;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -35,7 +36,16 @@ public interface BasicBusinessService extends BaseService<BasicBusiness> {
     List<UserPermissionBusinessDto> selectUserPermissionBusinessDtos(List<String> companyIds);
 
     List<String> selectCompanysBusinessIds(List<String> companyIds);
-
+    
+    /**
+     * 前置费用:一次性收取的分公司费用+ 期初收取的月收分公司服务费+平台费+担保费
+     * @param original_business_id
+     * @return
+     */
+     BigDecimal getPreChargeAndPreFees(String original_business_id);
+    
+    
+   
 
 
 }

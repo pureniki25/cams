@@ -8,9 +8,8 @@
         <result column="process_id" property="processId" />
         <result column="business_id" property="businessId" />
         <result column="crp_id" property="crpId" />
-        <result column="derate_type" property="derateType" />
-        <result column="derate_money" property="derateMoney" />
         <result column="real_receive_money" property="realReceiveMoney" />
+        <result column="should_receive_money" property="shouldReceiveMoney" />
         <result column="derate_reson" property="derateReson" />
         <result column="create_time" property="createTime" />
         <result column="create_user" property="createUser" />
@@ -22,7 +21,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        apply_derate_process_id AS applyDerateProcessId, process_id AS processId, business_id AS businessId, crp_id AS crpId, derate_type AS derateType, derate_money AS derateMoney, real_receive_money AS realReceiveMoney, derate_reson AS derateReson, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser, title, is_settle AS isSettle
+        apply_derate_process_id AS applyDerateProcessId, process_id AS processId, business_id AS businessId, crp_id AS crpId,real_receive_money AS realReceiveMoney, derate_reson AS derateReson, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser, title, is_settle AS isSettle
     </sql>
 
 
@@ -42,10 +41,11 @@
         business.company_name AS companyName,
 
         derate.create_user as createrId,
-        derate.derate_type as derateTypeId ,
+        type.derate_type as derateTypeId ,
 
-        derate.derate_money as derateMoney,
+        type.derate_money as derateMoney,
         derate.real_receive_money as realPayMoney,
+         derate.should_receive_money as shouldPayMoney,
         derate.create_time as derateTime
 
 
@@ -56,6 +56,7 @@
         LEFT JOIN tb_basic_business_type as  b_type ON business.business_type = b_type.business_type_id
         LEFT JOIN tb_basic_company as company ON business.company_id = company.area_id
         LEFT JOIN tb_process as process ON derate.process_id = process.process_id
+        LEFT JOIN tb_apply_derate_type  as type on type.apply_derate_process_id=derate.apply_derate_process_id
         JOIN tb_sys_user_permission as permission  ON  permission.business_id = business.business_id
 
         <where>

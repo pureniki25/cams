@@ -1,14 +1,24 @@
 package com.hongte.alms.base.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.aliyun.oss.ServiceException;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
+import com.hongte.alms.base.controller.ExpenseSettleController;
 import com.hongte.alms.base.entity.ApplyDerateProcess;
+import com.hongte.alms.base.entity.ApplyDerateProcessOtherFees;
+import com.hongte.alms.base.entity.ApplyDerateType;
+import com.hongte.alms.base.entity.BasicBusinessType;
 import com.hongte.alms.base.entity.BasicCompany;
+import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.SysUser;
+import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.enums.ProcessEngineFlageEnums;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
 import com.hongte.alms.base.mapper.ApplyDerateProcessMapper;
+import com.hongte.alms.base.mapper.ApplyDerateTypeMapper;
 import com.hongte.alms.base.process.entity.*;
 import com.hongte.alms.base.process.entity.Process;
 import com.hongte.alms.base.process.enums.ProcessStatusEnums;
@@ -18,28 +28,52 @@ import com.hongte.alms.base.process.enums.ProcessTypeEnums;
 import com.hongte.alms.base.process.service.*;
 import com.hongte.alms.base.process.vo.ProcessSaveReq;
 import com.hongte.alms.base.service.SysUserService;
+import com.hongte.alms.base.service.XindaiService;
 import com.hongte.alms.base.vo.module.ApplyDerateProcessReq;
 import com.hongte.alms.base.process.vo.ProcessLogReq;
+import com.hongte.alms.base.service.ApplyDerateProcessOtherFeesService;
 import com.hongte.alms.base.service.ApplyDerateProcessService;
+import com.hongte.alms.base.service.ApplyDerateTypeService;
+import com.hongte.alms.base.service.BasicBusinessTypeService;
 import com.hongte.alms.base.service.BasicCompanyService;
+import com.hongte.alms.base.service.RepaymentBizPlanListDetailService;
+import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.SysParameterService;
 import com.hongte.alms.base.vo.module.ApplyDerateListSearchReq;
 import com.hongte.alms.base.vo.module.ApplyDerateVo;
+import com.hongte.alms.base.vo.module.ApplyTypeVo;
+import com.hongte.alms.base.vo.module.BusinessInfoForApplyDerateVo;
+import com.hongte.alms.base.vo.module.api.AddFee;
+import com.hongte.alms.base.vo.module.api.DerateFee;
+import com.hongte.alms.base.vo.module.api.DerateReq;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.ClassCopyUtil;
 import com.hongte.alms.common.util.Constant;
+import com.hongte.alms.common.util.DESC;
+import com.hongte.alms.common.util.EncryptionResult;
 import com.hongte.alms.common.util.StringUtil;
+import com.hongte.alms.common.vo.RequestData;
+import com.hongte.alms.common.vo.ResponseData;
+import com.hongte.alms.common.vo.ResponseEncryptData;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.LoginInfoDto;
+
+import feign.Feign;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-
+import com.hongte.alms.base.entity.SysParameter;
 /**
  * <p>
  *  服务实现类
@@ -51,11 +85,21 @@ import java.util.UUID;
 @Service("ApplyDerateProcessService")
 @Transactional
 public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDerateProcessMapper, ApplyDerateProcess> implements ApplyDerateProcessService {
+	
+	private Logger logger = LoggerFactory.getLogger(ApplyDerateProcessServiceImpl.class);
 
+	@Value("${bmApi.apiUrl}")
+	String xindaiAplUrlUrl ;
     @Autowired
     @Qualifier("ProcessTypeService")
     ProcessTypeService processTypeService;
-
+    @Autowired
+    @Qualifier("ApplyDerateTypeService")
+    ApplyDerateTypeService applyDerateTypeService;
+    
+    @Autowired
+    @Qualifier("ApplyDerateProcessOtherFeesService")
+    ApplyDerateProcessOtherFeesService applyDerateProcessOtherFeesService;
 
     @Autowired
     @Qualifier("ProcessTypeStepService")
@@ -83,6 +127,17 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
     @Autowired
     @Qualifier("SysParameterService")
     SysParameterService sysParameterService;
+    
+    @Autowired
+    @Qualifier("RepaymentBizPlanListService")
+    RepaymentBizPlanListService repaymentBizPlanListService;
+    
+    @Autowired
+    @Qualifier("RepaymentBizPlanListDetailService")
+    RepaymentBizPlanListDetailService repaymentBizPlanListDetailService;
+    @Autowired
+    @Qualifier("ApplyDerateProcessService")
+    ApplyDerateProcessService applyDerateProcessService;
 
     @Autowired
 //    @Qualifier("loginUserInfoHelper")
@@ -91,13 +146,13 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
 
     @Autowired
     @Qualifier("SysUserService")
-    SysUserService sysUserService;
+    SysUserService sysUserService; 
 
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void saveApplyDerateProcess(ApplyDerateProcessReq req) throws IllegalAccessException, InstantiationException {
-
+    public void saveApplyDerateProcess(ApplyDerateProcessReq req,List<ApplyDerateType>  types,List<SysParameter> params,String outsideInterest,String generalReturnRate,String preLateFees) throws IllegalAccessException, InstantiationException {
+    
         ApplyDerateProcess applyInfo = null;
         
         String businessId = req.getBusinessId();
@@ -115,20 +170,72 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
 
         Process process = processService.saveProcess(processSaveReq,ProcessTypeEnums.Apply_Derate);
 
-        applyInfo = ClassCopyUtil.copyObject(req,ApplyDerateProcess.class);
+         applyInfo = ClassCopyUtil.copyObject(req,ApplyDerateProcess.class);
 
         if(req.getApplyDerateProcessId()==null){
             applyInfo.setApplyDerateProcessId(UUID.randomUUID().toString());
             applyInfo.setProcessId(process.getProcessId());
             applyInfo.setCreateTime(new Date());
             applyInfo.setCreateUser(loginUserInfoHelper.getUserId());
-            
-
+            applyInfo.setGeneralReturnRate(generalReturnRate);//综合收益率
+            applyInfo.setOutsideInterest(StringUtil.notEmpty(outsideInterest)?BigDecimal.valueOf(Double.valueOf(outsideInterest)):BigDecimal.valueOf(0.0));//应付逾期利息
+            applyInfo.setPreLateFees(StringUtil.notEmpty(preLateFees)?BigDecimal.valueOf(Double.valueOf(preLateFees)):BigDecimal.valueOf(0.0));//提前还款违约金
         }
         applyInfo.setUpdateTime(new Date());
         applyInfo.setUpdateUser(loginUserInfoHelper.getUserId());
 
         insertOrUpdate(applyInfo);
+        RepaymentBizPlanList pList= repaymentBizPlanListService.selectById(crpId);
+        //减免金额        
+        ApplyDerateType applyDerateType = null;
+        ArrayList<ApplyDerateType> newTypes=new ArrayList<ApplyDerateType>();
+        for(ApplyDerateType item:types) {
+        	applyDerateType = ClassCopyUtil.copyObject(item,ApplyDerateType.class);
+        	if(item.getApplyDerateTypeId()==null|"".equals(item.getApplyDerateTypeId())) {
+        		applyDerateType.setApplyDerateTypeId(UUID.randomUUID().toString());
+        		applyDerateType.setApplyDerateProcessId(applyInfo.getApplyDerateProcessId());
+        		RepaymentBizPlanListDetail detail=repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", req.getCrpId()).eq("business_id", pList.getBusinessId()).eq("fee_id", applyDerateType.getFeeId())).get(0);
+        		applyDerateType.setFeeId(applyDerateType.getFeeId());
+        		applyDerateType.setDerateType(detail.getPlanItemType().toString());
+        		applyDerateType.setCreateTime(new Date());
+        		applyDerateType.setBeforeDerateMoney(detail.getPlanAmount());
+        		applyDerateType.setCreateUser(loginUserInfoHelper.getUserId());
+        	}
+        
+        	applyDerateType.setUpdateTime(new Date());
+        	applyDerateType.setUpdateUser(loginUserInfoHelper.getUserId());
+        	
+        	newTypes.add(applyDerateType);
+        }
+  
+        applyDerateTypeService.insertOrUpdateBatch(newTypes);
+        //保存其他费用
+        List<ApplyDerateProcessOtherFees> fees=new ArrayList(); 
+
+        
+        params.forEach(item->{
+        	if(StringUtil.notEmpty(item.getParamValue2())) {
+        		  ApplyDerateProcessOtherFees fee=new ApplyDerateProcessOtherFees();
+        		  fee.setPlanDetailId(UUID.randomUUID().toString());
+        		  fee.setBusinessId(pList.getBusinessId());
+        		  fee.setPlanListId(pList.getPlanListId());
+        		  fee.setPeriod(pList.getPeriod());
+        		  fee.setPlanItemName(item.getParamName());
+        		  fee.setPlanItemType(Integer.valueOf(item.getParamValue3()));
+        		  fee.setFeeId(item.getParamValue());
+        		  fee.setPlanAmount(BigDecimal.valueOf(Double.valueOf(item.getParamValue2())));
+        		  fee.setAccountStatus(0);//0：不线上分账
+        		  fee.setCreateDate(new Date());
+        		  fee.setCreateUser(loginUserInfoHelper.getUserId());
+        		  fees.add(fee);
+        	}
+        	
+        });
+        if(fees.size()>0) {
+        	  applyDerateProcessOtherFeesService.insertBatch(fees);	
+        }
+        
+        
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -145,23 +252,83 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
             insertOrUpdate(derateInfo);
 
         }
-
-        //存储审批结果信息
-        processService.saveProcessApprovalResult(req ,ProcessTypeEnums.Apply_Derate);
-
+        boolean isFinish=false;
+        ApplyTypeVo vo=null;
         //当前节点定义
         ProcessTypeStep currentStep = processService.getStepByPTypeStepCode(ProcessTypeEnums.Apply_Derate,req.getProcess().getCurrentStep());
+        if(null!=currentStep.getNextStepSelectSql()&&(!"".equals(currentStep.getNextStepSelectSql().trim()))) {
+        	vo=applyDerateTypeService.getApplyTypeVo(req.getProcess().getProcessId());
+        	//车贷减免流程：减免金额<= 10000或者房贷减免流程：减免金额<= 20000 ，流程到区域贷后主管审批就结束
+        	if((vo.getBusinessTypeId()==BusinessTypeEnum.CYD_TYPE.getValue()&&vo.getDerateMoney().compareTo(new BigDecimal("10000"))<=0)
+        			||vo.getBusinessTypeId()==BusinessTypeEnum.FSD_TYPE.getValue()&&vo.getDerateMoney().compareTo(new BigDecimal("20000"))<=0) {
+        		currentStep.setStepType(ProcessStepTypeEnums.END_STEP.getKey());
+        		isFinish=true;
+        	}
 
+        }
+        if(currentStep.getStepType()==ProcessStepTypeEnums.END_STEP.getKey()) {
+        	isFinish=true;
+        }
+        
+
+        //存储审批结果信息
+        processService.saveProcessApprovalResultDerate(req ,ProcessTypeEnums.Apply_Derate,isFinish,vo);
+
+      
+     
         //存储减免后实收（最后一个步骤填写）
-        if(currentStep.getStepType().equals(ProcessStepTypeEnums.END_STEP)){
+        if(currentStep.getStepType()==ProcessStepTypeEnums.END_STEP.getKey()){
+        	  RepaymentBizPlanList pList=null;
+        	     List<ApplyDerateProcessOtherFees> otherFeesList=null;
             ApplyDerateProcess applyDerateProcess = selectList(new EntityWrapper<ApplyDerateProcess>().eq("process_id",req.getProcess().getProcessId())).get(0);
             if(req.getRealReceiveMoney() == null){
                 throw new RuntimeException("实收金额不能为空");
             }
             applyDerateProcess.setRealReceiveMoney(req.getRealReceiveMoney());
             updateById(applyDerateProcess);
+            
+            //把新增的费用项插入到还款计划detail表里
+            
+      
+            pList  =repaymentBizPlanListService.selectById(req.getCrpId());
+            if(pList!=null) {
+            otherFeesList=applyDerateProcessOtherFeesService.selectList(new EntityWrapper<ApplyDerateProcessOtherFees>().eq("business_id", pList.getBusinessId()).eq("plan_list_id", pList.getPlanListId()));
+            for(ApplyDerateProcessOtherFees fee:otherFeesList) {	
+            RepaymentBizPlanListDetail detail = ClassCopyUtil.copyObject(fee,RepaymentBizPlanListDetail.class);
+            repaymentBizPlanListDetailService.insert(detail);
+            }
+            //todo发接口给信贷
+            DerateReq reqParam=new DerateReq();
+            List<AddFee> addFeeList=new ArrayList();
+            List<DerateFee> derateFeeList=new ArrayList();
+            AddFee addFee=null;
+            DerateFee derateFee=null; 
+            for(ApplyDerateProcessOtherFees fee:otherFeesList) {
+            	  addFee=new AddFee();
+            	  addFee.setAmount(fee.getPlanAmount());
+            	  addFee.setFeeId(fee.getFeeId());
+            	  addFee.setFeeName(fee.getPlanItemName());
+            	  addFeeList.add(addFee);
+                }
+            
+         List<ApplyDerateProcess>  applyDerateProcessList=applyDerateProcessService.selectList(new EntityWrapper<ApplyDerateProcess>().eq("process_id", req.getProcess().getProcessId()));
+         List<ApplyDerateType>  applyDerateTypeList=applyDerateTypeService.selectList(new EntityWrapper<ApplyDerateType>().eq("apply_derate_process_id", applyDerateProcessList.get(0).getApplyDerateProcessId()));
+           for(ApplyDerateType applyDerateType: applyDerateTypeList) {
+        	   derateFee=new DerateFee();
+        	   derateFee.setAmount(applyDerateType.getBeforeDerateMoney().subtract(applyDerateType.getDerateMoney()));
+        	   derateFee.setFeeId(applyDerateType.getFeeId());
+        	   derateFeeList.add(derateFee);
+        	   //减免费用项如果是滞纳金，单独拿出来赋值
+        	   if(applyDerateType.getDerateType().equals("60")) {
+        		   reqParam.setPenaltyAmount(applyDerateType.getDerateMoney());
+        	   }
+           }
+            reqParam.setBusinessId(pList.getBusinessId());
+            reqParam.setAfterId(pList.getAfterId());
+            JSON.toJSONString(reqParam);
         }
-
+            
+        }
     }
 
     /**
@@ -222,5 +389,40 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
         return list;
     }
 
+	public ResponseData callRemoteService(String businessId) throws RuntimeException {
+		logger.info("调用callRemoteService");
+		if (xindaiAplUrlUrl==null) {
+			logger.error("xindaiAplUrlUrl==null!!!");
+			return null ;
+		}
+		logger.info("xindaiAplUrlUrl:"+xindaiAplUrlUrl);
+		DESC desc = new DESC();
+		RequestData requestData = new RequestData();
+		requestData.setMethodName("AfterLoanRepayment_GetFeeList");
+		JSONObject data = new JSONObject() ;
+		data.put("businessId", businessId);
+		requestData.setData(data.toJSONString());
+		logger.info("原始数据-开始");
+		logger.info(JSON.toJSONString(requestData));
+		logger.info("原始数据-结束");
+		String encryptStr = JSON.toJSONString(requestData);
+		// 请求数据加密
+		encryptStr = desc.Encryption(encryptStr);
+		logger.info("请求数据-开始");
+		logger.info(encryptStr);
+		logger.info("请求数据-结束");
+		XindaiService xindaiService = Feign.builder().target(XindaiService.class, xindaiAplUrlUrl);
+		String response = xindaiService.dod(encryptStr);
 
+		// 返回数据解密
+		ResponseEncryptData resp = JSON.parseObject(response, ResponseEncryptData.class);
+		String decryptStr = desc.Decode(resp.getA(), resp.getUUId());
+		EncryptionResult res = JSON.parseObject(decryptStr, EncryptionResult.class);
+		ResponseData respData = JSON.parseObject(res.getParam(), ResponseData.class);
+		
+		logger.info("信贷返回数据解密-开始");
+		logger.info(JSON.toJSONString(respData));
+		logger.info("信贷返回数据解密-结束");
+		return respData ;
+	}
 }

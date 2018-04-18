@@ -603,7 +603,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				} else {
 					int i = (overdueDays / 30) <= 1 ? 1 : (overdueDays / 30);
 					int j = overdueDays % 30;
-					if (i > 1) { // 若 i 大于 1，说明超过30天, 期外逾期费 = 剩余本金 * 费率 * i + 剩余本金 * 费率 / 30 * j
+					if (i >=1&&j> 0) { // 若 i 大于 1，说明超过30天, 期外逾期费 = 剩余本金 * 费率 * i + 剩余本金 * 费率 / 30 * j
 						outsideInterest = surplusPrincipal * outside * i;
 						outsideInterest += surplusPrincipal * outside / 30 * j;
 					}
