@@ -43,6 +43,9 @@ import com.hongte.alms.base.vo.module.ApplyDerateListSearchReq;
 import com.hongte.alms.base.vo.module.ApplyDerateVo;
 import com.hongte.alms.base.vo.module.ApplyTypeVo;
 import com.hongte.alms.base.vo.module.BusinessInfoForApplyDerateVo;
+import com.hongte.alms.base.vo.module.api.AddFee;
+import com.hongte.alms.base.vo.module.api.DerateFee;
+import com.hongte.alms.base.vo.module.api.DerateReq;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.ClassCopyUtil;
 import com.hongte.alms.common.util.Constant;
@@ -132,8 +135,9 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
     @Autowired
     @Qualifier("RepaymentBizPlanListDetailService")
     RepaymentBizPlanListDetailService repaymentBizPlanListDetailService;
-
-    
+    @Autowired
+    @Qualifier("ApplyDerateProcessService")
+    ApplyDerateProcessService applyDerateProcessService;
 
     @Autowired
 //    @Qualifier("loginUserInfoHelper")
@@ -271,9 +275,11 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
         processService.saveProcessApprovalResultDerate(req ,ProcessTypeEnums.Apply_Derate,isFinish,vo);
 
       
-
+     
         //存储减免后实收（最后一个步骤填写）
         if(currentStep.getStepType()==ProcessStepTypeEnums.END_STEP.getKey()){
+        	  RepaymentBizPlanList pList=null;
+        	     List<ApplyDerateProcessOtherFees> otherFeesList=null;
             ApplyDerateProcess applyDerateProcess = selectList(new EntityWrapper<ApplyDerateProcess>().eq("process_id",req.getProcess().getProcessId())).get(0);
             if(req.getRealReceiveMoney() == null){
                 throw new RuntimeException("实收金额不能为空");
@@ -282,16 +288,46 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
             updateById(applyDerateProcess);
             
             //把新增的费用项插入到还款计划detail表里
-            RepaymentBizPlanList pList=repaymentBizPlanListService.selectById(req.getCrpId());
+            
+      
+            pList  =repaymentBizPlanListService.selectById(req.getCrpId());
             if(pList!=null) {
-            List<ApplyDerateProcessOtherFees> otherFeesList=applyDerateProcessOtherFeesService.selectList(new EntityWrapper<ApplyDerateProcessOtherFees>().eq("business_id", pList.getBusinessId()).eq("plan_list_id", pList.getPlanListId()));
+            otherFeesList=applyDerateProcessOtherFeesService.selectList(new EntityWrapper<ApplyDerateProcessOtherFees>().eq("business_id", pList.getBusinessId()).eq("plan_list_id", pList.getPlanListId()));
             for(ApplyDerateProcessOtherFees fee:otherFeesList) {	
             RepaymentBizPlanListDetail detail = ClassCopyUtil.copyObject(fee,RepaymentBizPlanListDetail.class);
             repaymentBizPlanListDetailService.insert(detail);
-            
             }
+            //todo发接口给信贷
+            DerateReq reqParam=new DerateReq();
+            List<AddFee> addFeeList=new ArrayList();
+            List<DerateFee> derateFeeList=new ArrayList();
+            AddFee addFee=null;
+            DerateFee derateFee=null; 
+            for(ApplyDerateProcessOtherFees fee:otherFeesList) {
+            	  addFee=new AddFee();
+            	  addFee.setAmount(fee.getPlanAmount());
+            	  addFee.setFeeId(fee.getFeeId());
+            	  addFee.setFeeName(fee.getPlanItemName());
+            	  addFeeList.add(addFee);
+                }
             
+         List<ApplyDerateProcess>  applyDerateProcessList=applyDerateProcessService.selectList(new EntityWrapper<ApplyDerateProcess>().eq("process_id", req.getProcess().getProcessId()));
+         List<ApplyDerateType>  applyDerateTypeList=applyDerateTypeService.selectList(new EntityWrapper<ApplyDerateType>().eq("apply_derate_process_id", applyDerateProcessList.get(0).getApplyDerateProcessId()));
+           for(ApplyDerateType applyDerateType: applyDerateTypeList) {
+        	   derateFee=new DerateFee();
+        	   derateFee.setAmount(applyDerateType.getBeforeDerateMoney().subtract(applyDerateType.getDerateMoney()));
+        	   derateFee.setFeeId(applyDerateType.getFeeId());
+        	   derateFeeList.add(derateFee);
+        	   //减免费用项如果是滞纳金，单独拿出来赋值
+        	   if(applyDerateType.getDerateType().equals("60")) {
+        		   reqParam.setPenaltyAmount(applyDerateType.getDerateMoney());
+        	   }
+           }
+            reqParam.setBusinessId(pList.getBusinessId());
+            reqParam.setAfterId(pList.getAfterId());
+            JSON.toJSONString(reqParam);
         }
+            
         }
     }
 
