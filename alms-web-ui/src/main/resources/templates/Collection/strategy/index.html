@@ -68,7 +68,8 @@
                             </i-select>
                         </form-item>
 
-                     
+
+
                         <form-item label="人员：" prop="userName">
                             <i-input v-model="searchForm.userName" placeholder="多个搜索用“/”隔开" ></i-input>
                         </form-item>
@@ -109,13 +110,6 @@
                     @on-ok="saveSingleCompanyCollectionUserSetting"
                     @on-cancel="toLoading">
                 <i-form ref="editCompanyCollectionUser.editCompanyCollectionForm" :model="editCompanyCollectionUser.editCompanyCollectionForm"  :label-width="80">
-                
-                    <form-item label="业务类型：" prop="businessType">
-                            <i-select v-model="editCompanyCollectionUser.editCompanyCollectionForm.businessType"   clearable filterable  >
-                                      <i-option v-for="item in editCompanyCollectionAssignSet.businessTypes" :value="item.businessTypeId" :key="item.businessTypeId">{{ item.businessTypeName }}</i-option>
-                            </i-select>
-                        </form-item>
-                
                     <form-item label="清算1：" prop="collectionGroup1Users">
                         <i-select v-model="editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup1Users" multiple clearable filterable >
                             <i-option v-for="item in editCompanyCollectionUser.collectionGroup1AllUsers" :value="item.userId" :key="item.userId">{{ item.userName }}</i-option>
@@ -183,11 +177,6 @@
                             <i-option v-for="item in editCompanyCollectionAssignSet.companyId" :value="item.areaId" :key="item.areaId">{{ item.areaName }}</i-option>
                         </i-select>
                     </form-item>
-                      <form-item label="业务类型：" prop="businessType">
-                            <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.businessType"   clearable filterable  style="width: 80%">
-                                      <i-option v-for="item in editCompanyCollectionAssignSet.businessTypes" :value="item.businessTypeId" :key="item.businessTypeId">{{ item.businessTypeName }}</i-option>
-                            </i-select>
-                        </form-item>
 
                     <form-item label="清算1：" prop="collectionGroup1Users">
                         <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.collectionGroup1Users" multiple clearable filterable  style="width: 80%">
@@ -277,7 +266,7 @@
                         areaId: '',
                         companyId: '',
                         userName: '',
-                        businessTyps:''
+
                     },
                 loading: false,
                 areaList: [],
@@ -294,8 +283,7 @@
                                collectionGroup1Users: [],
                                collectionGroup2Users: [],
                                companyId: [],
-                               areaId:'',
-                               businessType:''
+                               areaId:''
                            },
                        collectionGroup1AllUsers: [],
                        collectionGroup2AllUsers: []
@@ -322,8 +310,7 @@
                         collectionGroup1AllUsers: [],
                         collectionGroup2AllUsers: [],
                         areaList: [],
-                        companyId: [],
-                        businessTypes:[]
+                        companyId: []
                     },
                 areaAndCity:
                     {
@@ -357,7 +344,6 @@
 
                 init: function () {
                     var self = this;
-                    self.getBusinessTypes();
                     self.getCompanyAreaList();
                     self.getCompanyList();
                     //使用layerUI的表格组件
@@ -676,7 +662,7 @@
 
                     self.getArea();
                 },
-                saveBatchPerson:function () {debugger
+                saveBatchPerson:function () {
                     var self = this;
                     var self = this;
                     var url = basePath + "collectionStrategy/saveSingleCompanyCollectionUserSetting";
@@ -942,25 +928,6 @@
                     }
 
 
-                },
-                getBusinessTypes:function(){
-                    var self = this;
-                	  //业务类型
-                    axios.get(basePath + 'collection/getALStandingBookVoPageSelectsData')
-                        .then(function (res) {
-                            if (res.data.code == "1") {debugger
-                   
-                                self.editCompanyCollectionAssignSet.businessTypes= res.data.data.businessType;
-
-
-                            } else {
-                                vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
-                            }
-                        })
-                        .catch(function (error) {
-                            vm.$Modal.error({content: '接口调用异常!'});
-                        });
-                	
                 },
                 test:function () {
                     var self = this;

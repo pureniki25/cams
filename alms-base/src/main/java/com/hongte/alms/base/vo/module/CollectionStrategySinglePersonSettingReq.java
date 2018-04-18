@@ -13,20 +13,10 @@ public class CollectionStrategySinglePersonSettingReq {
     private List<String> collectionGroup2Users;
 
     private List<String> companyId;
-    
-    private Integer businessType;
 
     private String areaId;
 
-    public Integer getBusinessType() {
-		return businessType;
-	}
-
-	public void setBusinessType(Integer businessType) {
-		this.businessType = businessType;
-	}
-
-	public List<String> getCollectionGroup1Users() {
+    public List<String> getCollectionGroup1Users() {
         return collectionGroup1Users;
     }
 
