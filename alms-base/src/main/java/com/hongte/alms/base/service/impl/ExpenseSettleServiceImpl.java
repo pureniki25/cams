@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.aliyun.oss.ServiceException;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.BizOutputRecord;
@@ -29,6 +30,7 @@ import com.hongte.alms.base.entity.RenewalBusiness;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
+import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.mapper.BasicBusinessMapper;
 import com.hongte.alms.base.mapper.BizOutputRecordMapper;
 import com.hongte.alms.base.mapper.ExpenseSettleMapper;
@@ -316,7 +318,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		return  expenseSettleMapper.listLackFee(businessId);
 	}
 
-	public ExpenseSettleVO cal(String businessId,Date settleDate) {
+	public ExpenseSettleVO cal(String businessId,Date settleDate) throws Exception {
 		final BasicBusiness basicBusiness = basicBusinessMapper.selectById(businessId);
 		RepaymentBizPlan repaymentBizPlan = new RepaymentBizPlan() ;
 		repaymentBizPlan.setBusinessId(businessId);
@@ -335,6 +337,9 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		final List<BizOutputRecord> bizOutputRecord = bizOutputRecordMapper.selectList(
 				new EntityWrapper<BizOutputRecord>().eq("business_id", businessId).orderBy("fact_output_date", true));
 		ExpenseSettleVO expenseSettleVO = new ExpenseSettleVO() ;
+		if (!basicBusiness.getRepaymentTypeId().equals(new Integer(2))&&!basicBusiness.getRepaymentTypeId().equals(new Integer(5))) {
+			throw new ServiceRuntimeException("暂时不支持这种还款方式的试算");
+		}
 		calPrincipal(settleDate, expenseSettleVO, basicBusiness, plan,bizOutputRecord);
 		calInterest(settleDate, expenseSettleVO, basicBusiness, plan);
 		calServicecharge(settleDate, expenseSettleVO, basicBusiness, plan);
