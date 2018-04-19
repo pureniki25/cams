@@ -1,6 +1,7 @@
 package com.hongte.alms.base.assets.car.enums;
 
 public enum CarStatusEnums {
+	DEFAULT("0","默认"),
 	PENDING("01","待处理"),
 	AUCTION("02","拍卖中"),
 	AUCTIONED("03","已拍卖"),
