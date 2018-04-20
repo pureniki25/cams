@@ -130,7 +130,19 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 		 return basicBusinessMapper.getSettleTotalFactSum(original_business_id);
 	 }
 
-
+    
+    /**
+     * 一次性收取的分公司费用+期初收取的月收分公司服务费+平台费+担保费
+     * @param original_business_id
+     * @return
+     */
+	@Override
+	public BigDecimal getPreChargeAndPreFees(String original_business_id) {
+		BigDecimal preCharge=BigDecimal.valueOf(basicBusinessMapper.getPreCharge(original_business_id));
+		BigDecimal preFees=BigDecimal.valueOf(basicBusinessMapper.getPreFees(original_business_id));
+		BigDecimal sum=preCharge.add(preFees);
+		return sum;
+	}
 //
 //    Public BusinessInfoForApplyDerateVo selectBusinessInfoForApplyDerateVo(String crpId){
 //

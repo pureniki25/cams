@@ -14,7 +14,7 @@ var processStatus = document.getElementById("processStatus").getAttribute("value
 var processId = document.getElementById("processId").getAttribute("value");
 
 //业务类型ID
-var businessTypeId = getQueryStr("businessTypeId")
+var businessTypeId = getQueryStr("businessTypeId");
 var isReceiveMoney=false;
 
 //设置表单验证
@@ -537,7 +537,7 @@ window.layinit(function (htConfig) {
 })
 
 ///////////判断是车贷还是房贷，对应不同类型获取提前结清违约金和逾期利息
-var showData=function(){
+var showData=function(){debugger
 	//车贷
     if(businessTypeId == 1 || businessTypeId == 9){debugger
     
