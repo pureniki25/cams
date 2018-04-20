@@ -389,7 +389,7 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
 
 
 //            LoginInfoDto uInfo = loginUserInfoHelper.getLoginInfo();
-            vo.setDerateTypeName(sysParameterService.seleByParamTypeAndvalue(SysParameterTypeEnums.DERATE_TYPE, vo.getDerateTypeId()).getParamName());
+            //vo.setDerateTypeName(sysParameterService.seleByParamTypeAndvalue(SysParameterTypeEnums.DERATE_TYPE, vo.getDerateTypeId()).getParamName());
 //            vo.setShowPayMoney("100");     //后续计算
         }
         return list;

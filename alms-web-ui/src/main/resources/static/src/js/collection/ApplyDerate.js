@@ -341,6 +341,7 @@ window.layinit(function (htConfig) {
               }
               if(flage==true){
             	  vm.applyInfoForm.realReceiveMoney=vm.baseInfoForm.settleTotalFactAmount;
+            	  showData();
               }
 
             },
