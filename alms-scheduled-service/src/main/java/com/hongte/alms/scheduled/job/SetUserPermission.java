@@ -56,8 +56,10 @@ public class SetUserPermission implements   BaseJob {
     private  static  boolean runningFlage = false;
 
     //每10分钟执行一次
-    @Scheduled(cron = "0 0/10 * * * ? ")
-//    @Scheduled(cron = "0/1 * * * * ? ")
+//    @Scheduled(cron = "0 0/10 * * * ? ")
+
+    //每天凌晨3点执行一次
+    @Scheduled(cron = "0 0 3 * * ?")
     public  void job(){
 
         if(runningFlage){

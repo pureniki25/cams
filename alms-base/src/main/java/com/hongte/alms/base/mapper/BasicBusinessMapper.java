@@ -6,7 +6,6 @@ import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.common.mapper.SuperMapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -35,21 +34,6 @@ public interface BasicBusinessMapper extends SuperMapper<BasicBusiness> {
     List<UserPermissionBusinessDto> selectUserPermissionBusinessDtos(@Param("companyIds") List<String> companyIds);
     
     Double queryPayedPrincipal(@Param("businessId") String businessId);
-    
-    /**
-     * 一次性收取的分公司费用
-     * @param original_business_id
-     * @return
-     */
-    Double getPreCharge(@Param("original_business_id") String original_business_id);
-    
-    
-    /**
-     * 期初收取的月收分公司服务费+平台费+担保费
-     * @param original_business_id
-     * @return
-     */
-    Double getPreFees(@Param("original_business_id") String original_business_id);
     
     
 

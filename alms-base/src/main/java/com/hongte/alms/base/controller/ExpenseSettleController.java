@@ -181,8 +181,13 @@ public class ExpenseSettleController {
 		} else if (basicBusiness.getRepaymentTypeId() == 5) {
 			expenseSettleVO = calDEBX(settelDate, basicBusiness, repaymentBizPlan, planLists, details);
 		}*/
-
-		return Result.success(expenseSettleService.cal(businessId, settleDate));
+		ExpenseSettleVO expenseSettleVO = null ;
+		try {
+			expenseSettleVO = expenseSettleService.cal(businessId, settleDate);
+			return Result.success(expenseSettleVO);
+		} catch (Exception e) {
+			return Result.error("500", e.getMessage()) ;
+		}
 
 	}
 

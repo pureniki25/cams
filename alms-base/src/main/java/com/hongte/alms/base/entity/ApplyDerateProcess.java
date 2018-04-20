@@ -51,55 +51,24 @@ public class ApplyDerateProcess extends Model<ApplyDerateProcess> {
 	@TableField("crp_id")
 	@ApiModelProperty(required= true,value = "用户还款计划ID")
 	private String crpId;
-//    /**
-//     * 申请减免类型
-//     */
-//	@TableField("derate_type")
-//	@ApiModelProperty(required= true,value = "申请减免类型")
-//	private String derateType;
-//    /**
-//     * 申请减免金额
-//     */
-//	@TableField("derate_money")
-//	@ApiModelProperty(required= true,value = "申请减免金额")
-//	private BigDecimal derateMoney;
-	
-	
     /**
-     * 应付逾期利息
+     * 申请减免类型
      */
-	@TableField("outside_interest")
-	@ApiModelProperty(required= true,value = "应付逾期利息")
-	private BigDecimal outsideInterest;
+	@TableField("derate_type")
+	@ApiModelProperty(required= true,value = "申请减免类型")
+	private String derateType;
     /**
-     * 提前还款违约金
+     * 申请减免金额
      */
-	@TableField("preLate_fees")
-	@ApiModelProperty(required= true,value = "提前还款违约金")
-	private BigDecimal preLateFees;
-	
-    /**
-    /**
-     * 综合收益率
-     */
-	@TableField("general_return_rate")
-	@ApiModelProperty(required= true,value = " 综合收益率")
-	private String generalReturnRate;
-	
+	@TableField("derate_money")
+	@ApiModelProperty(required= true,value = "申请减免金额")
+	private BigDecimal derateMoney;
     /**
      * 减免后实收总额
      */
 	@TableField("real_receive_money")
 	@ApiModelProperty(required= true,value = "减免后实收总额")
 	private BigDecimal realReceiveMoney;
-	
-	   /**
-     * 减免后应收总额
-     */
-	@TableField("should_receive_money")
-	@ApiModelProperty(required= true,value = "减免后应收总额")
-	private BigDecimal shouldReceiveMoney;
-    /**
     /**
      * 减免原因
      */
@@ -143,30 +112,6 @@ public class ApplyDerateProcess extends Model<ApplyDerateProcess> {
 	@ApiModelProperty(required= true,value = "是否结清标志位: 0 不结清， 1结清")
 	private Integer isSettle;
 
-	public BigDecimal getOutsideInterest() {
-		return outsideInterest;
-	}
-
-	public void setOutsideInterest(BigDecimal outsideInterest) {
-		this.outsideInterest = outsideInterest;
-	}
-
-	public BigDecimal getPreLateFees() {
-		return preLateFees;
-	}
-
-	public void setPreLateFees(BigDecimal preLateFees) {
-		this.preLateFees = preLateFees;
-	}
-
-	public String getGeneralReturnRate() {
-		return generalReturnRate;
-	}
-
-	public void setGeneralReturnRate(String generalReturnRate) {
-		this.generalReturnRate = generalReturnRate;
-	}
-
 	public String getApplyDerateProcessId() {
 		return applyDerateProcessId;
 	}
@@ -199,7 +144,21 @@ public class ApplyDerateProcess extends Model<ApplyDerateProcess> {
 		this.crpId = crpId;
 	}
 
+	public String getDerateType() {
+		return derateType;
+	}
 
+	public void setDerateType(String derateType) {
+		this.derateType = derateType;
+	}
+
+	public BigDecimal getDerateMoney() {
+		return derateMoney;
+	}
+
+	public void setDerateMoney(BigDecimal derateMoney) {
+		this.derateMoney = derateMoney;
+	}
 
 	public BigDecimal getRealReceiveMoney() {
 		return realReceiveMoney;
@@ -253,14 +212,6 @@ public class ApplyDerateProcess extends Model<ApplyDerateProcess> {
 	protected Serializable pkVal() {
 		return this.applyDerateProcessId;
 	}
-   
-	public BigDecimal getShouldReceiveMoney() {
-		return shouldReceiveMoney;
-	}
-
-	public void setShouldReceiveMoney(BigDecimal shouldReceiveMoney) {
-		this.shouldReceiveMoney = shouldReceiveMoney;
-	}
 
 	@Override
 	public String toString() {
@@ -269,7 +220,8 @@ public class ApplyDerateProcess extends Model<ApplyDerateProcess> {
 			", processId=" + processId +
 			", businessId=" + businessId +
 			", crpId=" + crpId +
-
+			", derateType=" + derateType +
+			", derateMoney=" + derateMoney +
 			", realReceiveMoney=" + realReceiveMoney +
 			", derateReson=" + derateReson +
 			", createTime=" + createTime +

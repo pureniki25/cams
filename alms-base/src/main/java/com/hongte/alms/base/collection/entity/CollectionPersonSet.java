@@ -42,13 +42,6 @@ public class CollectionPersonSet extends Model<CollectionPersonSet> {
 	@TableField("company_code")
 	@ApiModelProperty(required= true,value = "分公司编码")
 	private String companyCode;
-	
-	 /**
-     * 催收人员设置ID
-     */
-    @TableId("business_type")
-	@ApiModelProperty(required= true,value = "业务类型")
-	private Integer businessType;
     /**
      * 创建时间
      */
@@ -134,14 +127,6 @@ public class CollectionPersonSet extends Model<CollectionPersonSet> {
 	@Override
 	protected Serializable pkVal() {
 		return this.colPersonId;
-	}
-
-	public Integer getBusinessType() {
-		return businessType;
-	}
-
-	public void setBusinessType(Integer businessType) {
-		this.businessType = businessType;
 	}
 
 	@Override

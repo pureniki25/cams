@@ -277,7 +277,7 @@ public class CarController {
 				logger.error("车辆信息不存在,businessId="+registrationInfo.getBusinessId());
 				return Result.error("500","车辆信息不存在");
 			}
-			if(!CarStatusEnums.RETURNED.getStatusCode().equals(carBasic.getStatus())||!StringUtils.isEmpty(carBasic.getStatus())) {
+			if(!CarStatusEnums.RETURNED.getStatusCode().equals(carBasic.getStatus())&&!CarStatusEnums.DEFAULT.getStatusCode().equals(carBasic.getStatus())) {
 				logger.error("车辆未归还或非默认状态不允许拖车,businessId="+registrationInfo.getBusinessId());
 				return Result.error("500","车辆未归还不允许拖车");
 			}
