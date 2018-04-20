@@ -96,7 +96,7 @@ var layer;
 	}
 
 	
-	var withHoldingRecord=function(){
+	var withHoldingRecord=function(){debugger
 		
 		
         var self = this;
@@ -278,7 +278,7 @@ var layer;
         var self = this;  
         var reqStr =basePath+ "DeductionController/getDeductionPlatformInfo"
         axios.get(reqStr)
-            .then(function (result) {
+            .then(function (result) {debugger
                 if (result.data.code == "1") {
                 	
           

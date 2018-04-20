@@ -251,8 +251,8 @@ color: #FF3030;
                         <i-col span="10">
                             <form-item v-if="applyInfoFormEditFlage == true" label="是否结清申请：" prop="isSettleFlage"  >
                                 <radio-group v-model="applyInfoForm.isSettleFlage" >
-                                    <radio label="是" ></radio>
-                                    <radio label="否" ></radio>
+                                       <span @click="isClosedClick(true)"> <radio label="是" ></radio></span>
+                                       <span @click="isClosedClick(false)"> <radio label="否" ></radio></span>
                                 </radio-group>
                             </form-item>
                             <form-item v-else label="是否结清申请：" prop="isSettleFlage" disabled  >
@@ -265,7 +265,7 @@ color: #FF3030;
                         </i-col>
                     </row>
                     <row :gutter="16" v-for="(item, index) in applyTypes">
-                        <i-col span="10">
+                        <i-col span="7">
                             <form-item v-if="applyInfoFormEditFlage == true"  :label="'申请减免费用项' +(index+1)" prop="derateType" >
                                 <i-select v-model="item.feeId" clearable filterable  >
                                     <i-option v-for="item in derateTypeList" :value="item.feeId" :key="item.feeId" >{{ item.planItemName }}</i-option>
@@ -283,7 +283,7 @@ color: #FF3030;
                       
                         
                         </i-col>
-                         <i-col span="10">
+                         <i-col span="7">
                             <form-item v-if="applyInfoFormEditFlage"  label="申请减免金额："   prop="derateMoney">
                                 <i-input v-model="item.derateMoney" @on-blur="getSumMoney($event, index)" ></i-input>
                             </form-item>
@@ -291,22 +291,19 @@ color: #FF3030;
                                 <i-input v-model="item.derateMoney" disabled ></i-input>
                             </form-item>
                             
-                                <form-item v-if="applyInfoFormEditFlage">
-								    <i-button class="layui-btn layui-btn-primary layui-btn-sm"  v-on:click="removeTypesItem($event, index)"><i class="layui-icon"></i></i-button>
-					        </form-item>
                         </i-col>
-                        
-                        
+                         <i-col  span="1">
+                                     <i-button v-if="applyInfoFormEditFlage" class="layui-btn layui-btn-primary layui-btn-sm"  v-on:click="addTypeTr($event)"><Icon type="plus"></Icon></i-button>
+     
+								
+                        </i-col>
+                
+                             <i-col  span="1">
+                          		    <i-button v-if="applyInfoFormEditFlage" class="layui-btn layui-btn-primary layui-btn-sm"  v-on:click="removeTypesItem($event, index)"><Icon type="trash-a"></Icon></i-button>
+								
+                        </i-col>
                     </row>
-                      <row>
-                <i-col span="10">
-                    <form-item v-if="applyInfoFormEditFlage">
-                        <i-button  type="ghost" style="width: 200px;margin-left:150px;" @click="addTypeTr($event)" icon="plus-round">添加</i-button>
-                    </form-item>
-                </i-col >
-            </row>
-         
-            <row :gutter="16">
+     
                      <row :gutter="16">
                         <i-col span="10">
                          

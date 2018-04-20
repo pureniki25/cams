@@ -262,18 +262,22 @@ public class ApplyDerateController {
                 }else {
                 	  retMap.put("otherFeeEditFlage", JSON.toJSON("1", JsonUtil.getMapping()));
                 }
-                ProcessTypeStep currentStep = processService.getStepByPTypeStepCode(ProcessTypeEnums.Apply_Derate,process.getCurrentStep());
-                if(null!=currentStep.getNextStepSelectSql()&&(!"".equals(currentStep.getNextStepSelectSql().trim()))) {
-                	ApplyTypeVo vo=applyDerateTypeService.getApplyTypeVo(process.getProcessId());
-                	//车贷减免流程：减免金额<= 10000或者房贷减免流程：减免金额<= 20000 ，流程到区域贷后主管审批就结束
-                	if((vo.getBusinessTypeId()==BusinessTypeEnum.CYD_TYPE.getValue()&&vo.getDerateMoney().compareTo(new BigDecimal("10000"))<=0)
-                			||vo.getBusinessTypeId()==BusinessTypeEnum.FSD_TYPE.getValue()&&vo.getDerateMoney().compareTo(new BigDecimal("20000"))<=0) {
-                		   retMap.put("realReceiveMoneyEditFlage", JSON.toJSON("true", JsonUtil.getMapping()));
-                	}
+                //如果currentStep=null,说明流程已经结束
+                if(process.getCurrentStep()!=null) {
+                    ProcessTypeStep currentStep = processService.getStepByPTypeStepCode(ProcessTypeEnums.Apply_Derate,process.getCurrentStep());
+                    if(null!=currentStep.getNextStepSelectSql()&&(!"".equals(currentStep.getNextStepSelectSql().trim()))) {
+                    	ApplyTypeVo vo=applyDerateTypeService.getApplyTypeVo(process.getProcessId());
+                    	//车贷减免流程：减免金额<= 10000或者房贷减免流程：减免金额<= 20000 ，流程到区域贷后主管审批就结束
+                    	if((vo.getBusinessTypeId()==BusinessTypeEnum.CYD_TYPE.getValue()&&vo.getDerateMoney().compareTo(new BigDecimal("10000"))<=0)
+                    			||vo.getBusinessTypeId()==BusinessTypeEnum.FSD_TYPE.getValue()&&vo.getDerateMoney().compareTo(new BigDecimal("20000"))<=0) {
+                    		   retMap.put("realReceiveMoneyEditFlage", JSON.toJSON("true", JsonUtil.getMapping()));
+                    	}
 
+                    }
                 }
+           
                 //查询其他费用项
-                List<ApplyDerateProcessOtherFees> otherFees= applyDerateProcessOtherFeesService.selectList(new EntityWrapper<ApplyDerateProcessOtherFees>().eq("plan_list_id", crpId).eq("business_id", businessVoList.get(0).getBusinessId()));
+                List<ApplyDerateProcessOtherFees> otherFees= applyDerateProcessOtherFeesService.selectList(new EntityWrapper<ApplyDerateProcessOtherFees>().eq("plan_list_id", crpId).eq("business_id", pList.getBusinessId()).eq("apply_derate_process_id", applyList.get(0).getApplyDerateProcessId()));
                 if(otherFees!=null&&otherFees.size()%3>0) {
     		    	int length=otherFees.size()%3;
     		    	
@@ -493,7 +497,7 @@ public class ApplyDerateController {
         	List<ApplyDerateProcessReq> req = JsonUtil.map2objList(reqMap.get("applyData"), ApplyDerateProcessReq.class);
         	List<ApplyDerateType>  types=JsonUtil.map2objList(reqMap.get("applytTypes"), ApplyDerateType.class);
            	List<SysParameter>  otherDerateTypeList=JsonUtil.map2objList(reqMap.get("otherDerateTypeList"), SysParameter.class);
-          	String outsideInterest=reqMap.get("outsideInterest").toString();//合同期外逾期利息
+          	String outsideInterest=reqMap.get("outsideInterest")==null?"0":reqMap.get("outsideInterest").toString();//合同期外逾期利息
           	String generalReturnRate=reqMap.get("generalReturnRate").toString();//综合收益率
           	String preLateFees=reqMap.get("preLateFees").toString(); //提前还款违约金:
         	

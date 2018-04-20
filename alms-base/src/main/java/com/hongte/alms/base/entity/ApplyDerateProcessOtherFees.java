@@ -31,6 +31,14 @@ public class ApplyDerateProcessOtherFees extends Model<ApplyDerateProcessOtherFe
     @TableId("plan_detail_id")
 	@ApiModelProperty(required= true,value = "应还项目明细ID(主键)")
 	private String planDetailId;
+    
+
+    /**
+     * 减免申请l流程ID
+     */
+    @TableId("apply_derate_process_id")
+	@ApiModelProperty(required= true,value = "减免申请l流程ID")
+	private String applyDerateProcessId;
     /**
      * 所属还款计划列表ID(外键，对应tb_repayment_biz_plan_list.plan_list_id)
      */
@@ -127,6 +135,14 @@ public class ApplyDerateProcessOtherFees extends Model<ApplyDerateProcessOtherFe
 	@ApiModelProperty(required= true,value = "更新用户")
 	private String updateUser;
 
+   
+	public String getApplyDerateProcessId() {
+		return applyDerateProcessId;
+	}
+
+	public void setApplyDerateProcessId(String applyDerateProcessId) {
+		this.applyDerateProcessId = applyDerateProcessId;
+	}
 
 	public String getPlanDetailId() {
 		return planDetailId;

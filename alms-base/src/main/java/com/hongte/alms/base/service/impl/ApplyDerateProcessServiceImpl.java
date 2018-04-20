@@ -153,7 +153,6 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
     @Override
     public void saveApplyDerateProcess(ApplyDerateProcessReq req,List<ApplyDerateType>  types,List<SysParameter> params,String outsideInterest,String generalReturnRate,String preLateFees) throws IllegalAccessException, InstantiationException {
     
-        ApplyDerateProcess applyInfo = null;
         
         String businessId = req.getBusinessId();
         String crpId = req.getCrpId();
@@ -170,7 +169,7 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
 
         Process process = processService.saveProcess(processSaveReq,ProcessTypeEnums.Apply_Derate);
 
-         applyInfo = ClassCopyUtil.copyObject(req,ApplyDerateProcess.class);
+        ApplyDerateProcess  applyInfo = ClassCopyUtil.copyObject(req,ApplyDerateProcess.class);
 
         if(req.getApplyDerateProcessId()==null){
             applyInfo.setApplyDerateProcessId(UUID.randomUUID().toString());
@@ -212,7 +211,7 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
         //保存其他费用
         List<ApplyDerateProcessOtherFees> fees=new ArrayList(); 
 
-        
+       
         params.forEach(item->{
         	if(StringUtil.notEmpty(item.getParamValue2())) {
         		  ApplyDerateProcessOtherFees fee=new ApplyDerateProcessOtherFees();
@@ -227,6 +226,7 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
         		  fee.setAccountStatus(0);//0：不线上分账
         		  fee.setCreateDate(new Date());
         		  fee.setCreateUser(loginUserInfoHelper.getUserId());
+        		  fee.setApplyDerateProcessId(applyInfo.getApplyDerateProcessId());
         		  fees.add(fee);
         	}
         	
@@ -256,8 +256,8 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
         ApplyTypeVo vo=null;
         //当前节点定义
         ProcessTypeStep currentStep = processService.getStepByPTypeStepCode(ProcessTypeEnums.Apply_Derate,req.getProcess().getCurrentStep());
+    	vo=applyDerateTypeService.getApplyTypeVo(req.getProcess().getProcessId());
         if(null!=currentStep.getNextStepSelectSql()&&(!"".equals(currentStep.getNextStepSelectSql().trim()))) {
-        	vo=applyDerateTypeService.getApplyTypeVo(req.getProcess().getProcessId());
         	//车贷减免流程：减免金额<= 10000或者房贷减免流程：减免金额<= 20000 ，流程到区域贷后主管审批就结束
         	if((vo.getBusinessTypeId()==BusinessTypeEnum.CYD_TYPE.getValue()&&vo.getDerateMoney().compareTo(new BigDecimal("10000"))<=0)
         			||vo.getBusinessTypeId()==BusinessTypeEnum.FSD_TYPE.getValue()&&vo.getDerateMoney().compareTo(new BigDecimal("20000"))<=0) {
@@ -272,63 +272,69 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
         
 
         //存储审批结果信息
-        processService.saveProcessApprovalResultDerate(req ,ProcessTypeEnums.Apply_Derate,isFinish,vo);
+        Process process=processService.saveProcessApprovalResultDerate(req ,ProcessTypeEnums.Apply_Derate,isFinish,vo);
 
       
-     
-        //存储减免后实收（最后一个步骤填写）
-        if(currentStep.getStepType()==ProcessStepTypeEnums.END_STEP.getKey()){
-        	  RepaymentBizPlanList pList=null;
-        	     List<ApplyDerateProcessOtherFees> otherFeesList=null;
-            ApplyDerateProcess applyDerateProcess = selectList(new EntityWrapper<ApplyDerateProcess>().eq("process_id",req.getProcess().getProcessId())).get(0);
-            if(req.getRealReceiveMoney() == null){
-                throw new RuntimeException("实收金额不能为空");
-            }
-            applyDerateProcess.setRealReceiveMoney(req.getRealReceiveMoney());
-            updateById(applyDerateProcess);
-            
-            //把新增的费用项插入到还款计划detail表里
-            
-      
-            pList  =repaymentBizPlanListService.selectById(req.getCrpId());
-            if(pList!=null) {
-            otherFeesList=applyDerateProcessOtherFeesService.selectList(new EntityWrapper<ApplyDerateProcessOtherFees>().eq("business_id", pList.getBusinessId()).eq("plan_list_id", pList.getPlanListId()));
-            for(ApplyDerateProcessOtherFees fee:otherFeesList) {	
-            RepaymentBizPlanListDetail detail = ClassCopyUtil.copyObject(fee,RepaymentBizPlanListDetail.class);
-            repaymentBizPlanListDetailService.insert(detail);
-            }
-            //todo发接口给信贷
-            DerateReq reqParam=new DerateReq();
-            List<AddFee> addFeeList=new ArrayList();
-            List<DerateFee> derateFeeList=new ArrayList();
-            AddFee addFee=null;
-            DerateFee derateFee=null; 
-            for(ApplyDerateProcessOtherFees fee:otherFeesList) {
-            	  addFee=new AddFee();
-            	  addFee.setAmount(fee.getPlanAmount());
-            	  addFee.setFeeId(fee.getFeeId());
-            	  addFee.setFeeName(fee.getPlanItemName());
-            	  addFeeList.add(addFee);
-                }
-            
-         List<ApplyDerateProcess>  applyDerateProcessList=applyDerateProcessService.selectList(new EntityWrapper<ApplyDerateProcess>().eq("process_id", req.getProcess().getProcessId()));
-         List<ApplyDerateType>  applyDerateTypeList=applyDerateTypeService.selectList(new EntityWrapper<ApplyDerateType>().eq("apply_derate_process_id", applyDerateProcessList.get(0).getApplyDerateProcessId()));
-           for(ApplyDerateType applyDerateType: applyDerateTypeList) {
-        	   derateFee=new DerateFee();
-        	   derateFee.setAmount(applyDerateType.getBeforeDerateMoney().subtract(applyDerateType.getDerateMoney()));
-        	   derateFee.setFeeId(applyDerateType.getFeeId());
-        	   derateFeeList.add(derateFee);
-        	   //减免费用项如果是滞纳金，单独拿出来赋值
-        	   if(applyDerateType.getDerateType().equals("60")) {
-        		   reqParam.setPenaltyAmount(applyDerateType.getDerateMoney());
-        	   }
-           }
-            reqParam.setBusinessId(pList.getBusinessId());
-            reqParam.setAfterId(pList.getAfterId());
-            JSON.toJSONString(reqParam);
+       if(!req.getIsPass().equals(ProcessApproveResult.REFUSE.getKey()))  {
+		        //存储减免后实收（最后一个步骤填写）
+		        if(currentStep.getStepType()==ProcessStepTypeEnums.END_STEP.getKey()){
+		        	  RepaymentBizPlanList pList=null;
+		        	     List<ApplyDerateProcessOtherFees> otherFeesList=null;
+		            ApplyDerateProcess applyDerateProcess = selectList(new EntityWrapper<ApplyDerateProcess>().eq("process_id",req.getProcess().getProcessId())).get(0);
+		            if(req.getRealReceiveMoney() == null){
+		                throw new RuntimeException("实收金额不能为空");
+		            }
+		            applyDerateProcess.setRealReceiveMoney(req.getRealReceiveMoney());
+		            updateById(applyDerateProcess);
+		            
+		            //把新增的费用项插入到还款计划detail表里
+		            
+		      
+		            pList  =repaymentBizPlanListService.selectById(req.getCrpId());
+		            ApplyDerateProcess derateInfo = applyDerateProcessService.selectOne(new EntityWrapper<ApplyDerateProcess>().eq("process_id", process.getProcessId()));
+		            if(pList!=null&&derateInfo!=null) {
+		            otherFeesList=applyDerateProcessOtherFeesService.selectList(new EntityWrapper<ApplyDerateProcessOtherFees>().eq("business_id", pList.getBusinessId()).eq("plan_list_id", pList.getPlanListId()).eq("apply_derate_process_id", derateInfo.getApplyDerateProcessId()));
+		            for(ApplyDerateProcessOtherFees fee:otherFeesList) {	
+		            RepaymentBizPlanListDetail detail = ClassCopyUtil.copyObject(fee,RepaymentBizPlanListDetail.class);
+		            repaymentBizPlanListDetailService.insert(detail);
+		            }
+		       	 //todo发接口给信贷
+		            SycFee(otherFeesList, pList, derateInfo);
+		        }
+		       
+		        }
         }
-            
-        }
+    }
+	 //todo发接口给信贷
+    private void SycFee(List<ApplyDerateProcessOtherFees> otherFeesList ,RepaymentBizPlanList  pList, ApplyDerateProcess derateInfo) {
+    
+        DerateReq reqParam=new DerateReq();
+        List<AddFee> addFeeList=new ArrayList();
+        List<DerateFee> derateFeeList=new ArrayList();
+        AddFee addFee=null;
+        DerateFee derateFee=null; 
+        for(ApplyDerateProcessOtherFees fee:otherFeesList) {
+        	  addFee=new AddFee();
+        	  addFee.setAmount(fee.getPlanAmount());
+        	  addFee.setFeeId(fee.getFeeId());
+        	  addFee.setFeeName(fee.getPlanItemName());
+        	  addFeeList.add(addFee);
+            }
+        
+     List<ApplyDerateType>  applyDerateTypeList=applyDerateTypeService.selectList(new EntityWrapper<ApplyDerateType>().eq("apply_derate_process_id",derateInfo.getApplyDerateProcessId()));
+       for(ApplyDerateType applyDerateType: applyDerateTypeList) {
+    	   derateFee=new DerateFee();
+    	   derateFee.setAmount(applyDerateType.getDerateMoney());
+    	   derateFee.setFeeId(applyDerateType.getFeeId());
+    	   derateFeeList.add(derateFee);
+    	
+       }
+       reqParam.setDerateFeeList(derateFeeList);
+       reqParam.setAddFeeList(addFeeList);
+        reqParam.setBusinessId(pList.getBusinessId());
+        reqParam.setAfterId(pList.getAfterId());
+       
+        System.out.println( JSON.toJSONString(reqParam));
     }
 
     /**

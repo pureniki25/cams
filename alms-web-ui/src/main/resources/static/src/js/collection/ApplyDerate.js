@@ -328,6 +328,15 @@ window.layinit(function (htConfig) {
                 this.rockBackStepShowFlage = !vm.approvalInfoForm.isPassBoolean&&flage
 
             },
+            //是否结清
+            isClosedClick(flage){
+              if(flage==false){
+            	  vm.baseInfoForm.outsideInterest=0;
+            	  vm.baseInfoForm.preLateFees=0;
+            	  setOhterFeeZero();
+              }
+
+            },
 
 ////////  ------------------   流程审批 响应函数 结束 --------------------////////////
             
@@ -509,8 +518,7 @@ window.layinit(function (htConfig) {
    	            	that.addTypeTr(event);
    	            }
                
-   	            
-   	 
+   	         getGeneralReturnRate();
 
             }
        
@@ -633,7 +641,7 @@ var getPreLateFees = function () {debugger
     var reqStr = basePath +"ApplyDerateController/getPreLateFees?crpId="+crpId+"&preLateFeesType="+vm.baseInfoForm.preLateFeesType
   
     axios.get(reqStr)
-        .then(function (res) {
+        .then(function (res) {debugger
             if (res.data.code == "1") {
                
                     vm.baseInfoForm.preLateFees = res.data.data.preLateFees;
@@ -885,7 +893,7 @@ var getShowInfo = function () {
 }
 
 /**
- * 计算应收总减免金额
+ * 计算应收总减免后的金额
  * 
  */
 var getSumMoney= function (event,index) {
@@ -917,12 +925,26 @@ var getOtherFee= function (event,index) {
    return otherFee
 };
 
+
+
+/**
+ * 新增其他费用全部等于0
+ * 
+ */
+var setOhterFeeZero= function () {
+	   var otherList=vm.otherDerateTypeList;
+	if(otherList != null && otherList.length > 0){
+    	for (var i = 0; i < otherList.length; i++){
+    		otherList[i].paramValue2='';
+    	}
+	}
+};
 var dereteMoneySum= function () {
-	var dereteMoneySum;
+	var dereteMoneySum=0;
 	   var types=vm.applyTypes;
 	if(types != null && types.length > 0){debugger
     	for (var i = 0; i < types.length; i++){
-    		dereteMoneySum=Number(types[i].derateMoney);
+    		dereteMoneySum=dereteMoneySum+Number(types[i].derateMoney);
     	
     	}
 	}

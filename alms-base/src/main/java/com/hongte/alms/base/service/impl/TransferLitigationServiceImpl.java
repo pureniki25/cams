@@ -144,8 +144,8 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			return null;
 		}
 
-		Map<String, Object> resultMap = transferOfLitigationMapper.queryCarLoanData(businessId);
 
+		Map<String, Object> resultMap = transferOfLitigationMapper.queryCarLoanData(businessId);
 		if (resultMap == null) {
 			return resultMap;
 		}

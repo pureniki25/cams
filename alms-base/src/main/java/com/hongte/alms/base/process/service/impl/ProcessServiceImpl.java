@@ -304,23 +304,24 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
         
         
         List<SysUser> users=null;
+      if(!log.getIsPass().equals(ProcessApproveResult.REFUSE.getKey())) {
         if(isFinish==true) {
         	  //车贷减免流程：减免金额<= 10000 要默认抄送贷后综合岗人员及车贷业务车贷出纳人员
         	if((vo.getBusinessTypeId()==BusinessTypeEnum.CYD_TYPE.getValue()&&vo.getDerateMoney().compareTo(new BigDecimal("10000"))<=0)){
         		users=sysUserService.selectUsersByRole(SysRoleEnums.DH_CAR_TELLER.getKey());
         		users.forEach(item->{
-        			addElementToArray(req.getSendUserIds(), item.getUserId());
+        			req.setSendUserIds(addElementToArray(req.getSendUserIds(), item.getUserId()));
         		});
         		
         		users=sysUserService.selectUsersByRole(SysRoleEnums.DH_GENERAL_APPROVE.getKey());
         		users.forEach(item->{
-        			addElementToArray(req.getSendUserIds(), item.getUserId());
+        			req.setSendUserIds(addElementToArray(req.getSendUserIds(), item.getUserId()));
         		});
         	
         	}else if((vo.getBusinessTypeId()==BusinessTypeEnum.CYD_TYPE.getValue()&&vo.getDerateMoney().compareTo(new BigDecimal("10000"))>0)){
         		users=sysUserService.selectUsersByRole(SysRoleEnums.DH_CAR_TELLER.getKey());
         		users.forEach(item->{
-        			addElementToArray(req.getSendUserIds(), item.getUserId());
+        			req.setSendUserIds(addElementToArray(req.getSendUserIds(), item.getUserId()));
         		});
         	}
         	
@@ -329,21 +330,22 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
         	if((vo.getBusinessTypeId()==BusinessTypeEnum.FSD_TYPE.getValue()&&vo.getDerateMoney().compareTo(new BigDecimal("20000"))<=0)){
         		users=sysUserService.selectUsersByRole(SysRoleEnums.DH_HOUSE_TELLER.getKey());
         		users.forEach(item->{
-        			addElementToArray(req.getSendUserIds(), item.getUserId());
+        			req.setSendUserIds(addElementToArray(req.getSendUserIds(), item.getUserId()));
         		});
         		users=sysUserService.selectUsersByRole(SysRoleEnums.DH_GENERAL_APPROVE.getKey());
         		users.forEach(item->{
-        			addElementToArray(req.getSendUserIds(), item.getUserId());
+        			req.setSendUserIds(addElementToArray(req.getSendUserIds(), item.getUserId()));
         		});
         	}else if((vo.getBusinessTypeId()==BusinessTypeEnum.FSD_TYPE.getValue()&&vo.getDerateMoney().compareTo(new BigDecimal("20000"))>0)) {
         		users=sysUserService.selectUsersByRole(SysRoleEnums.DH_HOUSE_TELLER.getKey());
         		users.forEach(item->{
-        			addElementToArray(req.getSendUserIds(), item.getUserId());
+        			req.setSendUserIds(addElementToArray(req.getSendUserIds(), item.getUserId()));
         		});
         	
         	}
       
         }
+      }
         
         //添加抄送记录
         for(int i=0;i<req.getSendUserIds().length;i++){

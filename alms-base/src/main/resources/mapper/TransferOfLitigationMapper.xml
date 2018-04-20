@@ -180,7 +180,7 @@
 		  AND t1.`business_id` = t3.`business_id` 
 		  AND t1.`business_id` = t6.`business_id` 
 		  AND t2.`last_detection_id` = t3.`id` 
-		  AND t1.`business_id` = #{businessId,jdbcType=VARCHAR}	
+		  AND t1.`business_id` = #{businessId,jdbcType=VARCHAR}	limit 1
 	</select>
 	
 	<select id="queryTransferLitigationCarData" resultType="com.hongte.alms.base.vo.litigation.BusinessCar">
@@ -875,7 +875,7 @@
 		    END
 		  ) AS `planAccrual`,
 		  SUM(
-		    CASE
+		    CASE 
 		      WHEN t3.plan_item_type = 30 
 		      THEN t3.plan_amount 
 		      ELSE 0 
