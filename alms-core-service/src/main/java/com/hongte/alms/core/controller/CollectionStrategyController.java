@@ -21,8 +21,10 @@ import com.hongte.alms.base.vo.module.BatchSavePersonReq;
 import com.hongte.alms.base.vo.module.CollectionStrategyPersonSettingReq;
 import com.hongte.alms.base.vo.module.CollectionStrategyPersonSettingVo;
 import com.hongte.alms.base.vo.module.CollectionStrategySinglePersonSettingReq;
+import com.hongte.alms.base.vo.module.CollectionTimeSetVO;
 import com.hongte.alms.base.vo.module.doc.BasicCompanyVo;
 import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.util.ClassCopyUtil;
 import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.core.service.CollectionStrategyPersonService;
@@ -141,12 +143,28 @@ public class CollectionStrategyController {
     @ApiOperation(value="查询催收策略时间设置列表")
     @GetMapping("/getCollectionTimeSettingList")
     @ResponseBody
-    public PageResult<List<CollectionTimeSet>> getCollectionTimeSettingList(){
-
-        Page<CollectionTimeSet> page = new Page<>();
-
+    public PageResult<List<CollectionTimeSetVO>> getCollectionTimeSettingList(){
+    	   Page<CollectionTimeSet> page = new Page<>();
+           Page<CollectionTimeSetVO> pageVO = new Page<>();
+        try {
+     
         page = collectionTimeSetService.selectPage(page);
-        return PageResult.success(page.getRecords(),page.getTotal());
+        page.getRecords();
+        List<CollectionTimeSetVO> list=new ArrayList();
+        CollectionTimeSetVO vo=null;
+        for(int i=0;i<page.getRecords().size();i++) {
+       
+			vo =  ClassCopyUtil.copyObject(page.getRecords().get(i),CollectionTimeSetVO.class);
+		 	list.add(vo);
+	
+       
+        }
+        pageVO.setRecords(list);
+    	} catch (Exception e) {
+			logger.error("查询出错"+e.getMessage());
+		}
+		return PageResult.success(pageVO.getRecords(),pageVO.getTotal());
+ 
     }
 
     @ApiOperation(value="保存催收时间策略设置")

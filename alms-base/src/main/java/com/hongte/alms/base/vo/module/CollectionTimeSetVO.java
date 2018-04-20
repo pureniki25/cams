@@ -1,4 +1,4 @@
-package com.hongte.alms.base.collection.entity;
+package com.hongte.alms.base.vo.module;
 
 import java.io.Serializable;
 
@@ -18,57 +18,40 @@ import io.swagger.annotations.ApiModelProperty;
  * 清算时间设置表
  * </p>
  *
- * @author 曾坤
- * @since 2018-03-06
+ * @author czs
+ * @since 2018-04-20
  */
 @ApiModel
-@TableName("tb_collection_time_set")
-public class CollectionTimeSet extends Model<CollectionTimeSet> {
+public class CollectionTimeSetVO extends Model<CollectionTimeSetVO> {
 
     private static final long serialVersionUID = 1L;
 
     /**
      * 移交时间 配置ID
      */
-    @TableId("col_time_id")
-	@ApiModelProperty(required= true,value = "移交时间 配置ID")
 	private String colTimeId;
     /**
      * 移交类型（1：移交清算一（电催），2：移交清算二（上门催收），3：移交法务诉讼）
      */
-	@TableField("col_type")
-	@ApiModelProperty(required= true,value = "移交类型（1：移交清算一（电催），2：移交清算二（上门催收），3：移交法务诉讼）")
 	private ColTypeEnum colType;
     /**
      * 逾期天数
      */
-	@TableField("over_due_days")
-	@ApiModelProperty(required= true,value = "逾期天数")
 	private Integer overDueDays;
-	@TableField("start_time")
-	@ApiModelProperty(required= true,value = "")
-	@JsonFormat(pattern="yyyy-MM-dd",timezone="GMT-16")
+	@JsonFormat(pattern="yyyy-MM-dd",timezone="GMT+8")
 	private Date startTime;
     /**
      * 创建时间
      */
-	@TableField("creat_time")
-	@ApiModelProperty(required= true,value = "创建时间")
 	private Date creatTime;
-	@TableField("creat_user")
-	@ApiModelProperty(required= true,value = "")
 	private String creatUser;
     /**
      * 更新时间
      */
-	@TableField("update_time")
-	@ApiModelProperty(required= true,value = "更新时间")
 	private Date updateTime;
     /**
      * 更新用户
      */
-	@TableField("update_user")
-	@ApiModelProperty(required= true,value = "更新用户")
 	private String updateUser;
 
 
