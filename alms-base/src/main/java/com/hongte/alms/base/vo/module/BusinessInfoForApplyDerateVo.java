@@ -47,11 +47,31 @@ public class BusinessInfoForApplyDerateVo  {
     private String generalReturnRate;//综合收益率
     private BigDecimal preLateFees;    //提前还款违约金:
     private BigDecimal needPayAgency;//应收中介费
-    
-    
+    private BigDecimal totalFactAmount;//实还总额;
+    private BigDecimal settleTotalFactAmount;//结清时该业务实还总额;
     
      
-    public BigDecimal getNeedPaydeposit() {
+    public BigDecimal getSettleTotalFactAmount() {
+		return settleTotalFactAmount;
+	}
+
+
+	public void setSettleTotalFactAmount(BigDecimal settleTotalFactAmount) {
+		this.settleTotalFactAmount = settleTotalFactAmount;
+	}
+
+
+	public BigDecimal getTotalFactAmount() {
+		return totalFactAmount;
+	}
+
+
+	public void setTotalFactAmount(BigDecimal totalFactAmount) {
+		this.totalFactAmount = totalFactAmount;
+	}
+
+
+	public BigDecimal getNeedPaydeposit() {
 		return needPaydeposit;
 	}
 

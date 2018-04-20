@@ -50,4 +50,15 @@ public interface BasicBusinessMapper extends SuperMapper<BasicBusiness> {
      * @return
      */
     Double getPreFees(@Param("original_business_id") String original_business_id);
+    
+    
+
+	/**
+	 * 	结清最终缴纳的金额 
+	 * @param original_business_id
+	 * @return
+	 */
+	 Double getSettleTotalFactSum(@Param("original_business_id") String original_business_id);
 }
+
+

@@ -45,7 +45,15 @@ public interface BasicBusinessService extends BaseService<BasicBusiness> {
      BigDecimal getPreChargeAndPreFees(String original_business_id);
     
     
-   
+
+     
+
+ 	/**
+ 	 * 	结清最终缴纳的金额 
+ 	 * @param original_business_id
+ 	 * @return
+ 	 */
+ 	 Double getSettleTotalFactSum(@Param("original_business_id") String original_business_id);
 
 
 }

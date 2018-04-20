@@ -133,7 +133,10 @@ window.layinit(function (htConfig) {
                 needPayGuarantee:"",   //应付担保费
                 needPaydeposit:"",//应收押金
                 needPayRush:"",//应收冲应收
-                needPayAgency:""//应收中介费
+                needPayAgency:"",//应收中介费
+                needPayAgency:"",//应收中介费
+                totalFactAmount:"",//实还金额
+                settleTotalFactAmount:""//结清时该业务实还总额
             },
 
             
@@ -333,7 +336,11 @@ window.layinit(function (htConfig) {
               if(flage==false){
             	  vm.baseInfoForm.outsideInterest=0;
             	  vm.baseInfoForm.preLateFees=0;
+            	  vm.applyInfoForm.realReceiveMoney=vm.baseInfoForm.totalFactAmount;
             	  setOhterFeeZero();
+              }
+              if(flage==true){
+            	  vm.applyInfoForm.realReceiveMoney=vm.baseInfoForm.settleTotalFactAmount;
               }
 
             },

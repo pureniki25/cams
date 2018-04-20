@@ -67,7 +67,8 @@
 		  c.needPayPlatform as needPayPlatform,
 		  c.needPaydeposit as needPaydeposit,
 		  c.needPayRush as needPayRush,
-		  c.needPayAgency as needPayAgency
+		  c.needPayAgency as needPayAgency,
+		  c.totalFactAmount as totalFactAmount 
 		  
 		  
 		FROM
@@ -202,7 +203,9 @@
 		        END
 		      ) `needPayService`,
 		      --   应还总额-->
-		      SUM(t1.plan_amount) `totalBorrowAmount` 
+		      SUM(t1.plan_amount) `totalBorrowAmount` ,
+		          --   实还总额-->
+		      SUM(t1.fact_amount) `totalFactAmount` 
 		    FROM
 		      tb_repayment_biz_plan_list_detail t1 
 		    WHERE t1.plan_list_id = #{crpId,jdbcType=VARCHAR} 
@@ -317,4 +320,47 @@
     </select>
     
     
+        
+        <!-- 期初收取的月收分公司服务费-->
+    <select id="getPreFees" resultType="java.lang.Double">
+			 SELECT 
+  (case when t3.plan_amount>0
+    then 0 else sum(t3.plan_amount) end ) `plan_amount`
+  
+ 
+        FROM
+          tb_repayment_biz_plan_list t1,
+          tb_repayment_biz_plan t2,
+          tb_repayment_biz_plan_list_detail t3 
+        WHERE t1.plan_id = t2.plan_id 
+          AND t1.plan_list_id = t3.plan_list_id 
+          AND t2.original_business_id = #{original_business_id,jdbcType=VARCHAR} 
+          AND IFNULL(t3.plan_item_type, 0) = 30 
+          AND IFNULL(t1.repay_flag, 0) != 6 
+          AND t1.period !=0
+          AND t2.is_defer=0
+        GROUP BY t1.period
+        ORDER BY t1.due_date
+		  limit 1;
+    </select>
+
+
+
+
+
+	<!-- 结清最终缴纳的金额 -->
+	<select id="getSettleTotalFactSum" resultType="java.lang.Double">
+		select sum(pDetail.fact_amount) as totalFactSum from
+
+
+		tb_repayment_biz_plan_list_detail pDetail
+
+		left join tb_repayment_biz_plan_list pList on
+		pList.plan_list_id=pDetail.plan_list_id
+
+		left join tb_basic_business business on
+		business.business_id=pList.orig_business_id
+		where business.business_id=#{original_business_id}
+	</select>
+
 </mapper>

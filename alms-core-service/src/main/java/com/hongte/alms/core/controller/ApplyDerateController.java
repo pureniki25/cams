@@ -210,6 +210,8 @@ public class ApplyDerateController {
        		   //前置费用
         	    BigDecimal preFees=	preFees=basicBusinessService.getPreChargeAndPreFees(businessVoList.get(0).getBusinessId());
     		    businessVoList.get(0).setPreFees(preFees);
+    		    //提前结清该业务实还金额
+    		    businessVoList.get(0).setSettleTotalFactAmount(basicBusinessService.getSettleTotalFactSum(businessVoList.get(0).getBusinessId())==null?BigDecimal.valueOf(0):BigDecimal.valueOf(basicBusinessService.getSettleTotalFactSum(businessVoList.get(0).getBusinessId())));
     		    
     		    //判断是车贷还是房贷的减免费用项
     		    if(businessVoList.get(0).getBusinessType()==BusinessTypeEnum.CYD_TYPE.getValue()||businessVoList.get(0).getBusinessType()==BusinessTypeEnum.CYDZQ_TYPE.getValue()) {

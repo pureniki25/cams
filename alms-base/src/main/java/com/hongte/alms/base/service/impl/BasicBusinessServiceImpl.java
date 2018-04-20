@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -135,7 +136,16 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 		return sum;
 	}
 
-
+	/**
+	 * 	结清最终缴纳的金额 
+	 * @param original_business_id
+	 * @return
+	 */
+	@Override
+	 public Double getSettleTotalFactSum(@Param("original_business_id") String original_business_id) {
+		 
+		 return basicBusinessMapper.getSettleTotalFactSum(original_business_id);
+	 }
 
 
 //
