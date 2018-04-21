@@ -5,23 +5,17 @@ import com.alibaba.fastjson.JSONObject;
 import com.aliyun.oss.ServiceException;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
-import com.hongte.alms.base.controller.ExpenseSettleController;
 import com.hongte.alms.base.entity.ApplyDerateProcess;
 import com.hongte.alms.base.entity.ApplyDerateProcessOtherFees;
 import com.hongte.alms.base.entity.ApplyDerateType;
-import com.hongte.alms.base.entity.BasicBusinessType;
 import com.hongte.alms.base.entity.BasicCompany;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.SysUser;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
-import com.hongte.alms.base.enums.ProcessEngineFlageEnums;
-import com.hongte.alms.base.enums.SysParameterTypeEnums;
 import com.hongte.alms.base.mapper.ApplyDerateProcessMapper;
-import com.hongte.alms.base.mapper.ApplyDerateTypeMapper;
 import com.hongte.alms.base.process.entity.*;
 import com.hongte.alms.base.process.entity.Process;
-import com.hongte.alms.base.process.enums.ProcessStatusEnums;
 import com.hongte.alms.base.process.enums.ProcessApproveResult;
 import com.hongte.alms.base.process.enums.ProcessStepTypeEnums;
 import com.hongte.alms.base.process.enums.ProcessTypeEnums;
@@ -34,7 +28,6 @@ import com.hongte.alms.base.process.vo.ProcessLogReq;
 import com.hongte.alms.base.service.ApplyDerateProcessOtherFeesService;
 import com.hongte.alms.base.service.ApplyDerateProcessService;
 import com.hongte.alms.base.service.ApplyDerateTypeService;
-import com.hongte.alms.base.service.BasicBusinessTypeService;
 import com.hongte.alms.base.service.BasicCompanyService;
 import com.hongte.alms.base.service.RepaymentBizPlanListDetailService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
@@ -42,13 +35,11 @@ import com.hongte.alms.base.service.SysParameterService;
 import com.hongte.alms.base.vo.module.ApplyDerateListSearchReq;
 import com.hongte.alms.base.vo.module.ApplyDerateVo;
 import com.hongte.alms.base.vo.module.ApplyTypeVo;
-import com.hongte.alms.base.vo.module.BusinessInfoForApplyDerateVo;
 import com.hongte.alms.base.vo.module.api.AddFee;
 import com.hongte.alms.base.vo.module.api.DerateFee;
 import com.hongte.alms.base.vo.module.api.DerateReq;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.ClassCopyUtil;
-import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.DESC;
 import com.hongte.alms.common.util.EncryptionResult;
 import com.hongte.alms.common.util.StringUtil;
@@ -56,7 +47,6 @@ import com.hongte.alms.common.vo.RequestData;
 import com.hongte.alms.common.vo.ResponseData;
 import com.hongte.alms.common.vo.ResponseEncryptData;
 import com.ht.ussp.bean.LoginUserInfoHelper;
-import com.ht.ussp.client.dto.LoginInfoDto;
 
 import feign.Feign;
 
@@ -209,7 +199,7 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
   
         applyDerateTypeService.insertOrUpdateBatch(newTypes);
         //保存其他费用
-        List<ApplyDerateProcessOtherFees> fees=new ArrayList(); 
+        List<ApplyDerateProcessOtherFees> fees=new ArrayList<ApplyDerateProcessOtherFees>(); 
 
        
         params.forEach(item->{
@@ -309,8 +299,8 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
     private void SycFee(List<ApplyDerateProcessOtherFees> otherFeesList ,RepaymentBizPlanList  pList, ApplyDerateProcess derateInfo) {
     
         DerateReq reqParam=new DerateReq();
-        List<AddFee> addFeeList=new ArrayList();
-        List<DerateFee> derateFeeList=new ArrayList();
+        List<AddFee> addFeeList=new ArrayList<AddFee>();
+        List<DerateFee> derateFeeList=new ArrayList<DerateFee>();
         AddFee addFee=null;
         DerateFee derateFee=null; 
         for(ApplyDerateProcessOtherFees fee:otherFeesList) {
@@ -334,7 +324,24 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
         reqParam.setBusinessId(pList.getBusinessId());
         reqParam.setAfterId(pList.getAfterId());
        
-        System.out.println( JSON.toJSONString(reqParam));
+        
+		RequestData requestData = new RequestData();
+		requestData.setMethodName("BusinessDerate_BusinessDerateFee");
+		requestData.setData(JSON.toJSONString(reqParam));
+
+		try {
+		String encryptStr = JSON.toJSONString(requestData);
+		// 请求数据加密
+		encryptStr = encryptPostData(encryptStr);
+		//发送接口
+		XindaiService xindaiService = Feign.builder().target(XindaiService.class, xindaiAplUrlUrl);
+		String respStr = xindaiService.syc(encryptStr); 
+		// 返回数据解密
+		ResponseData respData = getRespData(respStr);
+		
+		} catch (Exception ex) {
+			logger.error("减免申请审批通过同步信贷出错"+ex.getMessage());
+		}
     }
 
     /**
@@ -430,5 +437,32 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
 		logger.info(JSON.toJSONString(respData));
 		logger.info("信贷返回数据解密-结束");
 		return respData ;
+	}
+	
+	// 加密
+	private String encryptPostData(String str) throws Exception {
+
+		DESC desc = new DESC();
+		str = desc.Encryption(str);
+
+		return str;
+	}
+
+	// 解密
+	private String decryptRespData(ResponseEncryptData data) throws Exception {
+
+		DESC desc = new DESC();
+		String str = desc.Decode(data.getA(), data.getUUId());
+		return str;
+	}
+	// 返回数据解密
+	private ResponseData getRespData(String str) throws Exception {
+		ResponseEncryptData resp = JSON.parseObject(str, ResponseEncryptData.class);
+		String decryptStr = decryptRespData(resp);
+		EncryptionResult result = JSON.parseObject(decryptStr, EncryptionResult.class);
+		ResponseData respData = JSON.parseObject(result.getParam(), ResponseData.class);
+		
+		return respData;
+		
 	}
 }

@@ -540,13 +540,14 @@ window.layinit(function (htConfig) {
 var showData=function(){debugger
 	//车贷
     if(businessTypeId == 1 || businessTypeId == 9){debugger
-    
+                    
                 //判断是否上标且是否等额本息
             	var reqUrl = basePath + 'transferOfLitigation/queryCarLoanBilDetail?businessId=' + businessId
                 
                 axios.get(reqUrl).then(function(res){
                 	vm.isCarFlag=true
                   if(res.data.code=='1'){
+                	  getPreviousLateFees();//获取整个业务的滞纳金
                 		vm.baseInfoForm.totalBorrowAmount="";
                     if (res.data.data.outputPlatformId == 0 && res.data.data.repaymentTypeId == '等额本息') {
                       vm.preLateFeesFlag = res.data.data.preLateFeesFlag;
@@ -576,6 +577,12 @@ var showData=function(){debugger
                 
              	//房贷业务：逾期天数×剩余本金×0.2%
             	vm.baseInfoForm.outsideInterest=vm.baseInfoForm.delayDays*vm.baseInfoForm.remianderPrincipal*0.002;
+            
+               //滞纳金:
+                vm.baseInfoForm.outsideInterest=vm.baseInfoForm.delayDays*vm.baseInfoForm.remianderPrincipal*0.002;
+                //滞纳金:
+                vm.baseInfoForm.needPayPenalty =res.data.data.list[0].lateFee
+               
             	//获取应付总额
             	getTotalShouldPay();
             }else{
@@ -662,6 +669,33 @@ var getPreLateFees = function () {debugger
             vm.$Modal.error({content: '接口调用异常!'});
         });
 }
+///////////车贷：获取整个业务的滞纳金
+var getPreviousLateFees = function () {
+
+    var reqStr = basePath +"ApplyDerateController/getPreLateFees?crpId="+crpId+"&preLateFeesType="+vm.baseInfoForm.preLateFeesType
+  
+    axios.get(reqStr)
+        .then(function (res) {debugger
+            if (res.data.code == "1") {
+               
+                    var fees=res.data.data.previousFees;
+                 	for (var i = 0; i < fees.length; i++){
+                 		if(fees[i].previousLateFees!=0&&fees[i].previousLateFees!=''){
+                 			vm.baseInfoForm.needPayPenalty=fees[i].previousLateFees;
+                 		}
+                	
+                	}
+                    getTotalShouldPay();
+            } else {
+                vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
+            }
+        })
+        .catch(function (error) {
+            vm.$Modal.error({content: '接口调用异常!'});
+        });
+}
+
+
 
 ///////////车贷:获取合同期外逾期利息
 var getOutsideInterest = function () {debugger
@@ -700,6 +734,7 @@ var getShowInfo = function () {
                 //基本信息
                 if(res.data.data.baseInfo.length>0){
                     vm.baseInfoForm = res.data.data.baseInfo[0];
+                    vm.baseInfoForm.needPayPenalty=0;
                 }
                 
                //获取提前还款违约金
@@ -914,6 +949,8 @@ var getSumMoney= function (event,index) {
            	}
        	}
        	vm.applyInfoForm.shouldReceiveMoney=vm.baseInfoForm.totalBorrowAmount-vm.applyInfoForm.shouldReceiveMoney
+    	vm.applyInfoForm.shouldReceiveMoney=vm.applyInfoForm.shouldReceiveMoney?numeral(vm.applyInfoForm.shouldReceiveMoney).format('0,0.00'):'' 
+       	
        	//获取综合效益率
        	getGeneralReturnRate();
 

@@ -235,7 +235,7 @@ public class ApplyDerateController {
             //申请类型列表
             RepaymentBizPlanList pList=repaymentBizPlanListService.selectById(crpId);
             if(pList!=null) {
-            List<RepaymentBizPlanListDetail> derateTypeList=repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("business_id", pList.getBusinessId()).eq("plan_list_id", crpId));
+            List<RepaymentBizPlanListDetail> derateTypeList=repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("business_id", pList.getBusinessId()).eq("plan_list_id", crpId).groupBy("fee_id"));
             //List<SysParameter> derateTypeList =  sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterTypeEnums.DERATE_TYPE.getKey()).orderBy("row_Index"));
             retMap.put("derateTypeList",(JSONArray) JSON.toJSON(derateTypeList, JsonUtil.getMapping()));
              
@@ -384,7 +384,7 @@ public class ApplyDerateController {
     
     
     
-    @ApiOperation(value = "车贷:获取提前结清违约金和应付逾期利息")
+    @ApiOperation(value = "车贷:获取提前结清违约金和滞纳金")
     @GetMapping("/getPreLateFees")
     @ResponseBody
     public Result<Map<String,Object>> getPreLateFees(
@@ -414,6 +414,10 @@ public class ApplyDerateController {
         	Map<String, Object> resultMap = transferOfLitigationService.carLoanBilling(carLoanBilVO);
         	if(resultMap!=null) {
         		   retMap.put("preLateFees", JSON.toJSON(resultMap.get("preLateFees"), JsonUtil.getMapping()));// 提前还款违约金
+        		   
+        		   
+         		    retMap.put("previousFees", (JSONArray) JSON.toJSON(resultMap.get("previousFees"), JsonUtil.getMapping()));
+                	
         	}else {
         		   retMap.put("preLateFees", JSON.toJSON(0, JsonUtil.getMapping()));// 提前还款违约金
         	}
