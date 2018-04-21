@@ -168,7 +168,7 @@ color: #FF3030;
                         <div class="tr">
                             <div class="td"> <div class="td-box">综合收益率：</div><div class="td-box">{{ baseInfoForm.generalReturnRate }} </div> </div>
                             <div class="td"> <div class="td-box">当前还款期数：</div><div class="td-box">{{ baseInfoForm.afterId }} </div> </div>
-                            <div class="td"> <div class="td-box">逾期天数：</div><div class="td-box">{{ baseInfoForm.delayDays?numeral(baseInfoForm.delayDays):0  }} </div> </div>
+                            <div class="td"> <div class="td-box">逾期天数：</div><div class="td-box">{{ baseInfoForm.delayDays}} </div> </div>
                         </div>
                         <div class="tr">
                             <div class="td"> <div class="td-box">应付利息：</div><div class="td-box">{{ baseInfoForm.needPayInterest }} </div> </div>
@@ -217,7 +217,7 @@ color: #FF3030;
         
         <card>
             <row :gutter="16">
-                <i-form ref="baseInfoForm"  :model="baseInfoForm"   label-position="right" :label-width="100">
+                <i-form v-if="otherFeeShowFlage" ref="baseInfoForm"  :model="baseInfoForm"   label-position="right" :label-width="100">
                     <div class="table">
                   
                         <div  v-if="otherFeeEditFlage == '0'" class="tr" v-for="(item, index) in otherDerateTypeList">

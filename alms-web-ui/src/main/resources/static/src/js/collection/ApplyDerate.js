@@ -90,7 +90,8 @@ window.layinit(function (htConfig) {
             buttonShowFlage:true,
             //车贷(是否上标且等额本息)标志
             preLateFeesFlag:false,
-          
+            //
+            otherFeeShowFlage:true,
             //是否为车贷:
             isCarFlag:false,
             //其他费用项是否可以编辑标志  0:新增 -1:草稿  1：修改
@@ -334,14 +335,17 @@ window.layinit(function (htConfig) {
             //是否结清
             isClosedClick(flage){
               if(flage==false){
+            	  vm.otherFeeShowFlage=false;
             	  vm.baseInfoForm.outsideInterest=0;
             	  vm.baseInfoForm.preLateFees=0;
             	  vm.applyInfoForm.realReceiveMoney=vm.baseInfoForm.totalFactAmount;
             	  setOhterFeeZero();
               }
               if(flage==true){
+            	  vm.otherFeeShowFlage=true;
             	  vm.applyInfoForm.realReceiveMoney=vm.baseInfoForm.settleTotalFactAmount;
             	  showData();
+            	
               }
 
             },
@@ -735,6 +739,9 @@ var getShowInfo = function () {
                 if(res.data.data.baseInfo.length>0){
                     vm.baseInfoForm = res.data.data.baseInfo[0];
                     vm.baseInfoForm.needPayPenalty=0;
+                    if(vm.baseInfoForm.delayDays==''||vm.baseInfoForm.delayDays==null){
+                    	vm.baseInfoForm.delayDays=0;
+                    }
                 }
                 
                //获取提前还款违约金
