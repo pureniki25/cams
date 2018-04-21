@@ -35,7 +35,7 @@ var setFormValidate = {
         {pattern:/^[0-9]+(.[0-9]{1,2})?$/,   message: '请填写不超过两位小数的数字', trigger: 'blur'}
     ],
 	derateReson: [
-		{required: true, message: '必填', trigger: 'change'}  ,  
+//		{required: true, message: '必填', trigger: 'change'}  ,  
     	{
     		validator: function (rule, value, callback, source, options) {
     			if (value.length > 500 ) {
