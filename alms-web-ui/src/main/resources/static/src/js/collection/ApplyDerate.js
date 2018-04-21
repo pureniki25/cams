@@ -336,6 +336,18 @@ window.layinit(function (htConfig) {
             isClosedClick(flage){
               if(flage==false){
             	  vm.otherFeeShowFlage=false;
+         		   var otherList=vm.otherDerateTypeList;
+           		if(otherList != null && otherList.length > 0){
+           	    	for (var i = 0; i < otherList.length; i++){
+           	    		otherList[i].paramValue2='';
+           	    	}
+           		}
+           		   var otherList=vm.otherFees;
+           			if(otherList != null && otherList.length > 0){
+               	    	for (var i = 0; i < otherList.length; i++){
+               	    		otherList[i].planAmount='';
+               	    	}
+               		}
             	  vm.baseInfoForm.outsideInterest=0;
             	  vm.baseInfoForm.preLateFees=0;
             	  vm.applyInfoForm.realReceiveMoney=vm.baseInfoForm.totalFactAmount;
@@ -946,17 +958,19 @@ var getShowInfo = function () {
  * 计算应收总减免后的金额
  * 
  */
-var getSumMoney= function (event,index) {
+var getSumMoney= function (event,index) {debugger
 		   var types=vm.applyTypes;
 		   vm.applyInfoForm.shouldReceiveMoney=0;
-       	if(types != null && types.length > 0){debugger
+       	if(types != null && types.length > 0){
            	for (var i = 0; i < types.length; i++){
            			vm.applyInfoForm.shouldReceiveMoney=Number(vm.applyInfoForm.shouldReceiveMoney)+Number(types[i].derateMoney);
            	
            	}
        	}
-       	vm.applyInfoForm.shouldReceiveMoney=vm.baseInfoForm.totalBorrowAmount-vm.applyInfoForm.shouldReceiveMoney
-    	vm.applyInfoForm.shouldReceiveMoney=vm.applyInfoForm.shouldReceiveMoney?numeral(vm.applyInfoForm.shouldReceiveMoney).format('0,0.00'):'' 
+       	vm.applyInfoForm.shouldReceiveMoney=vm.baseInfoForm.totalBorrowAmount-vm.applyInfoForm.shouldReceiveMoney;
+       	var money=numeral(vm.applyInfoForm.shouldReceiveMoney).format('0.00');
+       			
+    	vm.applyInfoForm.shouldReceiveMoney=Number(money);
        	
        	//获取综合效益率
        	getGeneralReturnRate();

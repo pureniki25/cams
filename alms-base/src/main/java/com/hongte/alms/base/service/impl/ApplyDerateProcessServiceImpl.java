@@ -183,7 +183,14 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
         	if(item.getApplyDerateTypeId()==null|"".equals(item.getApplyDerateTypeId())) {
         		applyDerateType.setApplyDerateTypeId(UUID.randomUUID().toString());
         		applyDerateType.setApplyDerateProcessId(applyInfo.getApplyDerateProcessId());
-        		RepaymentBizPlanListDetail detail=repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", req.getCrpId()).eq("business_id", pList.getBusinessId()).eq("fee_id", applyDerateType.getFeeId())).get(0);
+        		RepaymentBizPlanListDetail detail=null;
+        		if(applyDerateType.getFeeId()==null) {
+            		 detail=repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", req.getCrpId()).eq("business_id", pList.getBusinessId()).isNull("fee_id")).get(0);
+		
+        		}else {
+            		 detail=repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", req.getCrpId()).eq("business_id", pList.getBusinessId()).eq("fee_id", applyDerateType.getFeeId())).get(0);
+
+        		}
         		applyDerateType.setFeeId(applyDerateType.getFeeId());
         		applyDerateType.setDerateType(detail.getPlanItemType().toString());
         		applyDerateType.setCreateTime(new Date());
