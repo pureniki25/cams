@@ -149,6 +149,11 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 //        return null;
 //    }
 
+	@Override
+	public Double getMonthSumFactAmount(String original_business_id) {
+		 return basicBusinessMapper.getMonthSumFactAmount(original_business_id);
+	}
+
 //    Public List<BusinessInfoForApplyDerateVo> selectBusinessInfoForApplyDerateVo(String crpId){
 //       return  basicBusinessMapper.selectBusinessInfoForApplyDerateVo(crpId);
 //    }

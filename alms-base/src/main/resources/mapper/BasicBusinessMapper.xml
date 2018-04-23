@@ -347,10 +347,35 @@
 
 
 
-
 	<!-- 结清最终缴纳的金额 -->
 	<select id="getSettleTotalFactSum" resultType="java.lang.Double">
-		select sum(pDetail.fact_amount) as totalFactSum from
+	            	--    结清最终缴纳的金额-->
+		select sum(pDetail.fact_amount) as totalFactSum 
+		
+		from 
+
+		tb_repayment_biz_plan_list_detail pDetail
+
+		left join tb_repayment_biz_plan_list pList on
+		pList.plan_list_id=pDetail.plan_list_id
+
+		left join tb_basic_business business on
+		business.business_id=pList.orig_business_id
+		where business.business_id=#{original_business_id}
+	</select>
+	
+	
+		<!-- 月收等费用总额-->
+	<select id="getMonthSumFactAmount" resultType="java.lang.Double">
+		select 
+--   出款后已交月收等费用总额：还款计划中的实收合计（不含本金部分） -->
+		      SUM(
+		        CASE
+		          WHEN pDetail.plan_item_type != 10 
+		          THEN pDetail.fact_amount 
+		          ELSE 0 
+		        END
+		      ) AS `sumFactAmount` from
 
 
 		tb_repayment_biz_plan_list_detail pDetail

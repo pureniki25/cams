@@ -210,6 +210,8 @@ public class ApplyDerateController {
        		   //前置费用
         	    BigDecimal preFees=	preFees=basicBusinessService.getPreChargeAndPreFees(businessVoList.get(0).getBusinessId());
     		    businessVoList.get(0).setPreFees(preFees);
+    		    //出款后已交月收等费用总额:
+    		    businessVoList.get(0).setSumFactAmount(basicBusinessService.getMonthSumFactAmount(businessVoList.get(0).getBusinessId())==null?BigDecimal.valueOf(0):BigDecimal.valueOf(basicBusinessService.getMonthSumFactAmount(businessVoList.get(0).getBusinessId())));
     		    //提前结清该业务实还金额
     		    businessVoList.get(0).setSettleTotalFactAmount(basicBusinessService.getSettleTotalFactSum(businessVoList.get(0).getBusinessId())==null?BigDecimal.valueOf(0):BigDecimal.valueOf(basicBusinessService.getSettleTotalFactSum(businessVoList.get(0).getBusinessId())));
     		    
