@@ -19,7 +19,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @author 曾坤
  * @since 2018-04-23
  */
-@ApiModel
+@ApiModel("标的出款申请费用明细期限范围明细表")
 @TableName("tb_proj_output_fee_detail")
 public class ProjOutputFeeDetail extends Model<ProjOutputFeeDetail> {
 

@@ -19,98 +19,82 @@ public class BizOutPutRecordReq {
     /**
      * 业务编号
      */
-    @TableField("business_id")
     @ApiModelProperty(required= true,value = "业务编号")
     private String businessId;
     /**
      * 上标编号，若线下出款则为空
      */
-    @TableField("project_id")
     @ApiModelProperty(required= true,value = "上标编号，若线下出款则为空")
     private String projectId;
     /**
      * 实际出款金额
      */
-    @TableField("fact_output_money")
     @ApiModelProperty(required= true,value = "实际出款金额")
     private BigDecimal factOutputMoney;
     /**
      * 实际出款时间
      */
-    @TableField("fact_output_date")
     @ApiModelProperty(required= true,value = "实际出款时间")
     private Date factOutputDate;
     /**
      * 出款经手人ID
      */
-    @TableField("output_user_id")
     @ApiModelProperty(required= true,value = "出款经手人ID")
     private String outputUserId;
     /**
      * 出款经手人姓名
      */
-    @TableField("output_user_name")
     @ApiModelProperty(required= true,value = "出款经手人姓名")
     private String outputUserName;
     /**
      * 银行卡号
      */
-    @TableField("bank_card")
     @ApiModelProperty(required= true,value = "银行卡号")
     private String bankCard;
     /**
      * 银行名称
      */
-    @TableField("bank_name")
     @ApiModelProperty(required= true,value = "银行名称")
     private String bankName;
     /**
      * 0：线下出款，1：借款人提现，2：保证金提现，3：押金提现，4：期初收费
      */
-    @TableField("withdraw_type")
     @ApiModelProperty(required= true,value = "0：线下出款，1：借款人提现，2：保证金提现，3：押金提现，4：期初收费")
     private Integer withdrawType;
     /**
      * 放款去处(线下出款均为1)，1:提到银行卡  2：转到可用金额
      */
-    @TableField("withdraw_place")
     @ApiModelProperty(required= true,value = "放款去处(线下出款均为1)，1:提到银行卡  2：转到可用金额")
     private Integer withdrawPlace;
     /**
      * 提现状态说明
      */
-    @TableField("withdraw_strStatus")
     @ApiModelProperty(required= true,value = "提现状态说明")
     private String withdrawStrStatus;
     /**
      * 提现流水号，若线下出款则为空
      */
     @ApiModelProperty(required= true,value = "提现流水号，若线下出款则为空")
-    @TableField("XDWithDrawId")
     private String XDWithDrawId;
     /**
      * 创建时间
      */
-    @TableField("create_time")
     @ApiModelProperty(required= true,value = "创建时间")
     private Date createTime;
     /**
      * 创建人
      */
-    @TableField("create_user")
     @ApiModelProperty(required= true,value = "创建人")
     private String createUser;
     /**
      * 更新时间
      */
-    @TableField("update_time")
-    @ApiModelProperty(required= true,value = "更新时间")
+    @ApiModelProperty(value = "更新时间")
     private Date updateTime;
     /**
      * 更新人
      */
-    @TableField("update_user")
-    @ApiModelProperty(required= true,value = "更新人")
+    @ApiModelProperty(value = "更新人")
     private String updateUser;
 
 

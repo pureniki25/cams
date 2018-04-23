@@ -15,26 +15,26 @@ public class CreatRepayPlanReq {
 
 
     /**
-     * 创建还款计划，业务的基本信息
+     * 业务的基本信息
      */
     @ApiModelProperty(required= true,value = "业务基本信息")
     private BusinessBasicInfoReq businessBasicInfoReq;
 
     /**
-     *  创建还款计划，业务的出款计划信息
+     *  业务的出款计划信息
      */
     @ApiModelProperty(required= true,value = "业务出款计划信息")
     private List<BizOutPutPlanReq> outPutPlanList;
 
 
     /**
-     *  创建还款计划，业务的出款计划信息
+     *  业务的出款记录信息
      */
     @ApiModelProperty(required= true,value = "业务出款详情信息")
     private  List<BizOutPutRecordReq >  outPutRecordReqList;
 
     /**
-     *  创建还款计划，团贷上标信息
+     *  团贷上标信息
      */
     @ApiModelProperty(required= true,value = "业务出款详情信息")
     private  List<TuandaiProjInfoReq> tuandaiProjReqInfos;

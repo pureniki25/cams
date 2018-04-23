@@ -19,19 +19,16 @@ public class BizOutPutPlanReq {
     /**
      * 业务编号
      */
-    @TableField("business_id")
     @ApiModelProperty(required= true,value = "业务编号")
     private String businessId;
     /**
      * 计划出款时间
      */
-    @TableField("output_time")
     @ApiModelProperty(required= true,value = "计划出款时间")
     private Date outputTime;
     /**
      * 转账类型
      */
-    @TableField("output_type")
     @ApiModelProperty(required= true,value = "转账类型")
     private String outputType;
     /**
@@ -43,37 +40,31 @@ public class BizOutPutPlanReq {
     /**
      * 开户银行
      */
-    @TableField("bank_name")
     @ApiModelProperty(required= true,value = "开户银行")
     private String bankName;
     /**
      * 支行名称
      */
-    @TableField("bank_sub_name")
     @ApiModelProperty(required= true,value = "支行名称")
     private String bankSubName;
     /**
      * 开户名
      */
-    @TableField("customer_name")
     @ApiModelProperty(required= true,value = "开户名")
     private String customerName;
     /**
      * 银行卡号
      */
-    @TableField("bank_account")
     @ApiModelProperty(required= true,value = "银行卡号")
     private String bankAccount;
     /**
      * 银行卡归属地省
      */
-    @TableField("bank_province")
     @ApiModelProperty(required= true,value = "银行卡归属地省")
     private String bankProvince;
     /**
      * 银行卡归属地市
      */
-    @TableField("bank_city")
     @ApiModelProperty(required= true,value = "银行卡归属地市")
     private String bankCity;
     /**
@@ -84,38 +75,32 @@ public class BizOutPutPlanReq {
     /**
      * 委托收款人平台ID
      */
-    @TableField("creditorId_platformUserId")
     @ApiModelProperty(required= true,value = "委托收款人平台ID")
     private String creditorIdPlatformUserId;
     /**
      * 委托收款人姓名
      */
-    @TableField("creditor_name")
     @ApiModelProperty(required= true,value = "委托收款人姓名")
     private String creditorName;
     /**
      * 创建时间
      */
-    @TableField("create_time")
     @ApiModelProperty(required= true,value = "创建时间")
     private Date createTime;
     /**
      * 创建用户
      */
-    @TableField("create_user")
     @ApiModelProperty(required= true,value = "创建用户")
     private String createUser;
     /**
      * 更新时间
      */
-    @TableField("update_time")
-    @ApiModelProperty(required= true,value = "更新时间")
+    @ApiModelProperty(value = "更新时间")
     private Date updateTime;
     /**
      * 更新用户
      */
-    @TableField("update_user")
-    @ApiModelProperty(required= true,value = "更新用户")
+    @ApiModelProperty(value = "更新用户")
     private String updateUser;
 
 

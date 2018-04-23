@@ -48,104 +48,87 @@ public class BusinessBasicInfoReq {
     /**
      * 客户资产端唯一编号
      */
-    @TableField("customer_id")
     @ApiModelProperty(required= true,value = "客户资产端唯一编号")
     private String customerId;
     /**
      * 客户姓名
      */
-    @TableField("customer_name")
     @ApiModelProperty(required= true,value = "客户姓名")
     private String customerName;
     /**
      * 还款方式ID，1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息
      */
-    @TableField("repayment_type_id")
     @ApiModelProperty(required= true,value = "还款方式ID，1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息")
     private Integer repaymentTypeId;
     /**
      * 借款金额(元)
      */
-    @TableField("borrow_money")
     @ApiModelProperty(required= true,value = "借款金额(元)")
     private BigDecimal borrowMoney;
     /**
      * 借款期限
      */
-    @TableField("borrow_limit")
     @ApiModelProperty(required= true,value = "借款期限")
     private Integer borrowLimit;
     /**
      * 借款期限单位，1：月，2：天
      */
-    @TableField("borrow_limit_unit")
     @ApiModelProperty(required= true,value = "借款期限单位，1：月，2：天")
     private Integer borrowLimitUnit;
     /**
      * 借款利率(%)，如11%则存11.0
      */
-    @TableField("borrow_rate")
     @ApiModelProperty(required= true,value = "借款利率(%)，如11%则存11.0")
     private BigDecimal borrowRate;
     /**
      * 借款利率类型，1：年利率，2：月利率，3：日利率
      */
-    @TableField("borrow_rate_unit")
     @ApiModelProperty(required= true,value = "借款利率类型，1：年利率，2：月利率，3：日利率")
     private Integer borrowRateUnit;
     /**
      * 业务主办人ID
      */
-    @TableField("operator_id")
     @ApiModelProperty(required= true,value = "业务主办人ID")
     private String operatorId;
     /**
      * 业务主办人姓名
      */
-    @TableField("operator_name")
     @ApiModelProperty(required= true,value = "业务主办人姓名")
     private String operatorName;
     /**
      * 业务所属资产端编号(对应tb_basic_asset_side的asset_side_id)
      */
-    @TableField("asset_id")
     @ApiModelProperty(required= true,value = "业务所属资产端编号(对应tb_basic_asset_side的asset_side_id)")
     private String assetId;
     /**
      * 业务所属分公司编号
      */
-    @TableField("company_id")
     @ApiModelProperty(required= true,value = "业务所属分公司编号")
     private String companyId;
     /**
      * 出款平台ID，0：线下出款，1：团贷网P2P上标
      */
-    @TableField("output_platform_id")
     @ApiModelProperty(required= true,value = "出款平台ID，0：线下出款，1：团贷网P2P上标")
     private Integer outputPlatformId;
     /**
      * 标识是否P2P拆标业务，0：非P2P拆标业务，1：P2P拆标业务
      */
-    @TableField("issue_split_type")
     @ApiModelProperty(required= true,value = "标识是否P2P拆标业务，0：非P2P拆标业务，1：P2P拆标业务")
     private Integer issueSplitType;
     /**
      * 业务来源：0-常规录入 1-结清续贷新业务 2-结清续贷续贷业务 3-线下历史导入 4-扫码业务 5-优质车抵贷 6 -一点授信
      */
-    @TableField("source_type")
     @ApiModelProperty(required= true,value = "业务来源：0-常规录入 1-结清续贷新业务 2-结清续贷续贷业务 3-线下历史导入 4-扫码业务 5-优质车抵贷 6 -一点授信")
     private Integer sourceType;
     /**
      * 原始来源业务的业务编号(当业务来源为结清再贷时，必填)
      */
-    @TableField("source_business_id")
     @ApiModelProperty(required= true,value = "原始来源业务的业务编号(当业务来源为结清再贷时，必填)")
     private String sourceBusinessId;
 
     /**
      * 是否需要进行平台还款，1：是，0：否
      */
-    @TableField("is_tuandai_repay")
     @ApiModelProperty(required= true,value = "是否需要进行平台还款，1：是，0：否")
     private Integer isTuandaiRepay;
 

@@ -33,6 +33,14 @@ public class TuandaiProjInfoReq {
 
 
     /**
+     * 标的的出款费用信息列表
+     */
+    @ApiModelProperty(required= true,value = "标的的出款费用信息列表")
+    private List<ProjOutputFeeReq> projOutputFeeInfos;
+
+
+
+    /**
      * 项目编号
      */
     @ApiModelProperty(required= true,value = "项目编号")
@@ -489,5 +497,13 @@ public class TuandaiProjInfoReq {
 
     public void setProjHouseInfos(List<TuandaiProjectCarReq> projHouseInfos) {
         this.projHouseInfos = projHouseInfos;
+    }
+
+    public List<ProjOutputFeeReq> getProjOutputFeeInfos() {
+        return projOutputFeeInfos;
+    }
+
+    public void setProjOutputFeeInfos(List<ProjOutputFeeReq> projOutputFeeInfos) {
+        this.projOutputFeeInfos = projOutputFeeInfos;
     }
 }
