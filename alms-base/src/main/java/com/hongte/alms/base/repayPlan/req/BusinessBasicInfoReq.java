@@ -13,7 +13,7 @@ import java.util.Date;
  * 生成还款计划   业务的基本
  */
 @ApiModel("创建还款计划的请求信息")
-public class BusinessBasicReqInfo {
+public class BusinessBasicInfoReq {
 
 
 

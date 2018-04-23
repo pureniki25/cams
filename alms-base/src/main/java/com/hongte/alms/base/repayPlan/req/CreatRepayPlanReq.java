@@ -1,13 +1,8 @@
 package com.hongte.alms.base.repayPlan.req;
 
-import com.baomidou.mybatisplus.annotations.TableField;
-import com.baomidou.mybatisplus.annotations.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -23,7 +18,7 @@ public class CreatRepayPlanReq {
      * 创建还款计划，业务的基本信息
      */
     @ApiModelProperty(required= true,value = "业务基本信息")
-    private BusinessBasicReqInfo  businessBasicReqInfo;
+    private BusinessBasicInfoReq businessBasicInfoReq;
 
     /**
      *  创建还款计划，业务的出款计划信息
@@ -38,17 +33,21 @@ public class CreatRepayPlanReq {
     @ApiModelProperty(required= true,value = "业务出款详情信息")
     private  List<BizOutPutRecordReq >  outPutRecordReqList;
 
+    /**
+     *  创建还款计划，团贷上标信息
+     */
+    @ApiModelProperty(required= true,value = "业务出款详情信息")
+    private  List<TuandaiProjInfoReq> tuandaiProjReqInfos;
 
 
 
 
-
-    public BusinessBasicReqInfo getBusinessBasicReqInfo() {
-        return businessBasicReqInfo;
+    public BusinessBasicInfoReq getBusinessBasicInfoReq() {
+        return businessBasicInfoReq;
     }
 
-    public void setBusinessBasicReqInfo(BusinessBasicReqInfo businessBasicReqInfo) {
-        this.businessBasicReqInfo = businessBasicReqInfo;
+    public void setBusinessBasicInfoReq(BusinessBasicInfoReq businessBasicInfoReq) {
+        this.businessBasicInfoReq = businessBasicInfoReq;
     }
 
 
@@ -66,5 +65,13 @@ public class CreatRepayPlanReq {
 
     public void setOutPutRecordReqList(List<BizOutPutRecordReq> outPutRecordReqList) {
         this.outPutRecordReqList = outPutRecordReqList;
+    }
+
+    public List<TuandaiProjInfoReq> getTuandaiProjReqInfos() {
+        return tuandaiProjReqInfos;
+    }
+
+    public void setTuandaiProjReqInfos(List<TuandaiProjInfoReq> tuandaiProjReqInfos) {
+        this.tuandaiProjReqInfos = tuandaiProjReqInfos;
     }
 }
