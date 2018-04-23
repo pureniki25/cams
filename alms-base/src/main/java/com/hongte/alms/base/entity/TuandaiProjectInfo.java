@@ -16,7 +16,7 @@ import io.swagger.annotations.ApiModelProperty;
  * 团贷网平台业务上标信息
  * </p>
  *
- * @author 王继光
+ * @author 曾坤
  * @since 2018-04-23
  */
 @ApiModel
