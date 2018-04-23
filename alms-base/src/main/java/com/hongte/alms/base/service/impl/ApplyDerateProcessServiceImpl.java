@@ -329,7 +329,7 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
        }
        reqParam.setDerateFeeList(derateFeeList);
        reqParam.setAddFeeList(addFeeList);
-        reqParam.setBusinessId(pList.getBusinessId());
+        reqParam.setBusinessId(pList.getOrigBusinessId());
         reqParam.setAfterId(pList.getAfterId());
        
         
@@ -403,17 +403,18 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
             vo.setCreaterName(userName);
 
             List<ApplyDerateType> applyTypeVoList= applyDerateTypeService.selectList(new EntityWrapper<ApplyDerateType>().eq("apply_derate_process_id", vo.getApplyDerateProcessId()));
-            String applyTypeName=vo.getDerateTypeName();
+            //减免管理显示减免费用项名称,和计算减免金额
+            String applyTypeName="";
             BigDecimal derateMoney=BigDecimal.valueOf(0);	
             for(int i=0;i<applyTypeVoList.size();i++) {
             	if(i==0) {
             		applyTypeName=applyTypeVoList.get(i).getDerateTypeName();
             	}else {
-            		applyTypeName=","+applyTypeVoList.get(i).getDerateTypeName();
+            		applyTypeName=applyTypeName==null?"":applyTypeName+","+applyTypeVoList.get(i).getDerateTypeName();
             	}
             	derateMoney=derateMoney.add(applyTypeVoList.get(i).getDerateMoney());
             }
-            vo.setDerateTypeName(applyTypeName);
+            vo.setDerateTypeName(applyTypeName==null?"":applyTypeName.replace("：", ""));
             vo.setDerateMoney(derateMoney.toString());
           
             
