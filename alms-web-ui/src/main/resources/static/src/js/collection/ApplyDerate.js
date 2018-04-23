@@ -28,6 +28,14 @@ var setFormValidate = {
 //    derateType: [
 //        {required: true, message: '请填写申请减免费用项', trigger: 'change'}
 //    ],
+		
+	derateType:[
+        {required: true, message: '请选择减免费用项', trigger: 'change'}
+    ],
+	        
+    derateMoney:[
+        {required: true, message: '请填写减免金额', trigger: 'change'}
+    ],
     isSettleFlage: [
         {required: true, message: '请填选择是否结清', trigger: 'change'}
     ],
@@ -516,7 +524,7 @@ window.layinit(function (htConfig) {
 	    		 })
 	    	},
 	    	
-	     	addTypeTr :function(event){
+	     	addTypeTr :function(event){debugger
 	    		 this.applyTypes.push({
 	    			 derateTypeList: '',
 	    			 derateMoney: ''
@@ -1151,6 +1159,13 @@ var saveapplyInfo = function(pStatus){debugger
                 for(var i=0;i<vm.returnRegFiles.length;i++){
 	    			vm.returnRegFiles[i].file='';
 	    			vm.reqRegFiles[i]=vm.returnRegFiles[i];
+
+	    		}
+                for(var i=0;i<vm.applyTypes.length;i++){debugger
+	    			if(vm.applyTypes[i].derateMoney==''){
+	    				   vm.$Modal.error({content: '减免费用金额不能为空' });
+	    				   return;
+	    			}
 
 	    		}
             
