@@ -18,6 +18,7 @@ import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
 import com.hongte.alms.base.collection.service.CollectionStatusService;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.AuctionStatusEnums;
+import com.hongte.alms.base.process.entity.Process;
 import com.hongte.alms.base.process.entity.ProcessLog;
 import com.hongte.alms.base.process.entity.ProcessType;
 import com.hongte.alms.base.process.entity.ProcessTypeStep;
@@ -1048,6 +1049,7 @@ try {
     public Result<Object> auctionAuditDetail(@ModelAttribute("businessId") String businessId,@ModelAttribute("processId") String processId){
      	try{BasicBusiness business=basicBusinessService.selectById(businessId);
     	CarBasic carBasic=carBasicService.selectById(businessId);
+    	Process process = processService.selectOne(new EntityWrapper<Process>().eq("business_id", businessId).eq("process_name", "车辆拍卖申请")) ;
     	//拖车信息
     	List<CarDrag> drag=carDragService.selectList(
     	        new EntityWrapper<CarDrag>().eq("business_id", businessId).orderBy("create_time", false)); 
@@ -1129,7 +1131,7 @@ try {
     	map.put("repayPlan", plan);
     	map.put("outputRecord", outputRecord);
     	map.put("carAuction", carAuction);
-    
+    	map.put("canEdit", process.getStartUserId().equals(process.getApproveUserId()));
     
     	return Result.build("0000", "操作成功", map);
      	}catch (Exception e) {
