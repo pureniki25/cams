@@ -305,29 +305,29 @@
 							</td>
 							<td class="td_label">最新车辆评估时间</td>
 							<td>
-								<i-input :value="detection.createTime" readonly="readonly"></i-input>
-								<!-- <input type="text" class="input-border-none" v-bind:value="detection.createTime" readonly="readonly"> -->
+								<!-- <i-input :value="detection.createTime" readonly="readonly"></i-input> -->
+								<input type="text" class="input-border-none" v-bind:value="detection.createTime" readonly="readonly">
 							</td>
 						</tr>
 
 						<tr>
 							<td class="td_label">违章费用</td>
 							<td>
-								<i-input v-model="detection.trafficViolationFee"></i-input>
+								<i-input v-model="detection.trafficViolationFee" :readonly="!canEdit"></i-input>
 								<!-- <input type="text" v-model="detection.trafficViolationFee"> -->
 							</td>
 							<td class="td_label">年审到期日期
 								<label class="input_label">*</label>
 							</td>
 							<td>
-								<i-input v-model="detection.annualVerificationExpirationDate" id="annualVerificationExpirationDate" placeholder="yyyy-MM-dd"></i-input>
-								<!-- <input type="text" v-model="detection.annualVerificationExpirationDate" id="annualVerificationExpirationDate" placeholder="yyyy-MM-dd"> -->
+								<!-- <i-input v-model="detection.annualVerificationExpirationDate" id="annualVerificationExpirationDate" placeholder="yyyy-MM-dd" :readonly="!canEdit"></i-input> -->
+								<input type="text" v-model="detection.annualVerificationExpirationDate" id="annualVerificationExpirationDate" placeholder="yyyy-MM-dd" :disabled="!canEdit">
 							</td>
 							<td class="td_label">里程表读数
 								<label class="input_label">*</label>
 							</td>
 							<td>
-								<i-input v-model="detection.odometer" id="odometer"></i-input>
+								<i-input v-model="detection.odometer" id="odometer" :readonly="!canEdit"></i-input>
 								<!-- <input type="text" v-model="detection.odometer" id="odometer"> -->
 							</td>
 						</tr>
@@ -335,7 +335,7 @@
 						<tr>
 							<td class="td_label">燃油量（约余）</td>
 							<td>
-								<i-select v-model="detection.fuelLeft" name="fuelLeft" id="fuelLeft">
+								<i-select v-model="detection.fuelLeft+''" name="fuelLeft" id="fuelLeft" :disabled="!canEdit">
 									<i-option>--请选择--</i-option>
 									<i-option value="4">满</i-option>
 									<i-option value="3">3/4量</i-option>
@@ -347,13 +347,13 @@
 							</td>
 							<td class="td_label">过户次数</td>
 							<td>
-								<i-input v-model="carBasic.transferTimes" id="transferTimes"></i-input>
+								<i-input v-model="carBasic.transferTimes" id="transferTimes" :readonly="!canEdit"></i-input>
 								<!-- <input type="text" v-model="carBasic.transferTimes" id="transferTimes"> -->
 							</td>
 							<td class="td_label">最后一次过户时间</td>
 							<td>
-								<i-input v-model="carBasic.lastTransferDate" id="lastTransferDate" placeholder="yyyy-MM-dd"></i-input>
-								<!-- <input type="text" v-model="carBasic.lastTransferDate" id="lastTransferDate" placeholder="yyyy-MM-dd"> -->
+								<!-- <i-input v-model="carBasic.lastTransferDate" id="lastTransferDate" placeholder="yyyy-MM-dd" :readonly="!canEdit"></i-input> -->
+								<input type="text" v-model="carBasic.lastTransferDate" id="lastTransferDate" placeholder="yyyy-MM-dd" :disabled="!canEdit"/>
 							</td>
 						</tr>
 						<tr>
@@ -361,7 +361,7 @@
 								<label class="input_label">*</label>
 							</td>
 							<td>
-								<i-input v-model="detection.evaluationAmount" id="lastEvaluationAmount"></i-input>
+								<i-input v-model="detection.evaluationAmount" id="lastEvaluationAmount" :readonly="!canEdit"></i-input>
 								<!-- <input type="text" v-model="detection.evaluationAmount" id="lastEvaluationAmount"> -->
 							</td>
 							<td class="td_label">价值差额</td>
@@ -373,8 +373,8 @@
 								<label class="input_label">*</label>
 							</td>
 							<td>
-								<i-input v-model="carBasic.insuranceExpirationDate" id="insuranceExpirationDate" placeholder="yyyy-MM-dd"></i-input>
-								<!-- <input type="text" v-model="carBasic.insuranceExpirationDate" id="insuranceExpirationDate" placeholder="yyyy-MM-dd"> -->
+								<!-- <i-input v-model="carBasic.insuranceExpirationDate" id="insuranceExpirationDate" placeholder="yyyy-MM-dd"></i-input> -->
+								<input type="text" v-model="carBasic.insuranceExpirationDate" id="insuranceExpirationDate" placeholder="yyyy-MM-dd" :disabled="!canEdit">
 							</td>
 						</tr>
 						<tr>
@@ -382,7 +382,7 @@
 								<label class="input_label">*</label>
 							</td>
 							<td colspan="5">
-								<i-input v-model="detection.userNature"  id="userNature" maxlength="200"></i-input>
+								<i-input v-model="detection.userNature"  id="userNature" maxlength="200" :readonly="!canEdit"></i-input>
 								<!-- <input type="text" v-model="detection.userNature" class="input-border-input" id="userNature" maxlength="200"> -->
 							</td>
 						</tr>
@@ -391,7 +391,7 @@
 								<label class="input_label">*</label>
 							</td>
 							<td colspan="5">
-									<i-input v-model="detection.toolWithCar"  id="toolWithCar" maxlength="200"></i-input>
+									<i-input v-model="detection.toolWithCar"  id="toolWithCar" maxlength="200" :readonly="!canEdit"></i-input>
 								<!-- <input type="text" v-model="detection.toolWithCar" class="input-border-input" id="toolWithCar" maxlength="200"> -->
 							</td>
 						</tr>
@@ -400,7 +400,7 @@
 								<label class="input_label">*</label>
 							</td>
 							<td colspan="5">
-									<i-input v-model="detection.relatedDocs"  id="relatedDocs" maxlength="200"></i-input>
+									<i-input v-model="detection.relatedDocs"  id="relatedDocs" maxlength="200" :readonly="!canEdit"></i-input>
 								<!-- <input type="text" v-model="detection.relatedDocs" class="input-border-input" id="relatedDocs" maxlength="200"> -->
 							</td>
 						</tr>
@@ -409,7 +409,7 @@
 								<label class="input_label">*</label>
 							</td>
 							<td colspan="5">
-									<i-input v-model="detection.trafficViolationSituation"  id="trafficViolationSituation" maxlength="200"></i-input>
+									<i-input v-model="detection.trafficViolationSituation"  id="trafficViolationSituation" maxlength="200" :readonly="!canEdit"></i-input>
 								<!-- <input type="text" v-model="detection.trafficViolationSituation" class="input-border-input" id="trafficViolationSituation"
 								 maxlength="200"> -->
 							</td>
@@ -419,7 +419,7 @@
 								<label class="input_label">*</label>
 							</td>
 							<td colspan="5">
-									<i-input v-model="detection.transactionMode"  id="transactionMode" maxlength="200"></i-input>
+									<i-input v-model="detection.transactionMode"  id="transactionMode" maxlength="200" :readonly="!canEdit"></i-input>
 								<!-- <input type="text" v-model="detection.transactionMode" class="input-border-input" id="transactionMode" maxlength="200"> -->
 							</td>
 						</tr>
@@ -428,14 +428,14 @@
 								<label class="input_label">*</label>
 							</td>
 							<td colspan="5">
-									<i-input v-model="detection.carPosition"  id="carPosition" maxlength="200"></i-input>
+									<i-input v-model="detection.carPosition"  id="carPosition" maxlength="200" :readonly="!canEdit"></i-input>
 								<!-- <input type="text" v-model="detection.carPosition" class="input-border-input" id="carPosition" max="200"> -->
 							</td>
 						</tr>
 						<tr>
 							<td class="td_label" rowspan="3">备注</td>
 							<td colspan="5" rowspan="3">
-								<i-input type="textarea" v-model="detection.remark" style="width: 100%;border:1px solid #ccc" maxlength="500" ></i-input>
+								<i-input type="textarea" v-model="detection.remark" style="width: 100%;border:1px solid #ccc" maxlength="500" :readonly="!canEdit" ></i-input>
 								<!-- <textarea rows="" cols="" v-model="detection.remark" style="width: 100%;border:1px solid #ccc" maxlength="500"> </textarea> -->
 							</td>
 						</tr>
@@ -457,21 +457,21 @@
 								<label class="input_label">*</label>
 							</td>
 							<td>
-								<i-input v-model="carAuction.startingPrice" id="startingPrice" maxlength="10"></i-input>
+								<i-input v-model="carAuction.startingPrice" id="startingPrice" maxlength="10" :readonly="!canEdit"></i-input>
 								<!-- <input type="text" v-model="carAuction.startingPrice" id="startingPrice" maxlength="10"> -->
 							</td>
 							<td class="td_label">保证金
 								<label class="input_label">*</label>
 							</td>
 							<td>
-									<i-input v-model="carAuction.deposit" id="deposit" maxlength="10"></i-input>
+									<i-input v-model="carAuction.deposit" id="deposit" maxlength="10" :readonly="!canEdit"></i-input>
 								<!-- <input type="text" v-model="carAuction.deposit" id="deposit" max="10"> -->
 							</td>
 							<td class="td_label">加价幅度
 								<label class="input_label">*</label>
 							</td>
 							<td>
-								<i-select v-model="carAuction.fareRange" name="fuelLeft" id="fareRange">
+								<i-select v-model="carAuction.fareRange" name="fuelLeft" id="fareRange" :disabled="!canEdit">
 									<i-option value="">--请选择--</i-option>
 									<i-option value="500">500</i-option>
 									<i-option value="1000">1000</i-option>
@@ -485,22 +485,22 @@
 								<label class="input_label">*</label>
 							</td>
 							<td>
-									<i-input v-model="carAuction.reservePrice" id="reservePrice" maxlength="10"></i-input>
+									<i-input v-model="carAuction.reservePrice" id="reservePrice" maxlength="10" :readonly="!canEdit"></i-input>
 								<!-- <input type="text" v-model="carAuction.reservePrice" id="reservePrice" maxlength="10"> -->
 							</td>
 							<td class="td_label">拍卖开始时间
 								<label class="input_label">*</label>
 							</td>
 							<td>
-									<i-input v-model="carAuction.auctionStartTime" id="auctionStartTime" placeholder="yyyy-MM-dd"></i-input>
-								<!-- <input type="text" v-model="carAuction.auctionStartTime" id="auctionStartTime" placeholder="yyyy-MM-dd"> -->
+									<!-- <i-input v-model="carAuction.auctionStartTime" id="auctionStartTime" placeholder="yyyy-MM-dd"></i-input> -->
+								<input type="text" v-model="carAuction.auctionStartTime" id="auctionStartTime" placeholder="yyyy-MM-dd" :disabled="!canEdit">
 							</td>
 							<td class="td_label">拍卖截止时间
 								<label class="input_label">*</label>
 							</td>
 							<td>
-									<i-input v-model="carAuction.auctionEndTime" id="auctionEndTime" placeholder="yyyy-MM-dd"></i-input>
-								<!-- <input type="text" v-model="carAuction.auctionEndTime" id="auctionEndTime" placeholder="yyyy-MM-dd"> -->
+									<!-- <i-input v-model="carAuction.auctionEndTime" id="auctionEndTime" placeholder="yyyy-MM-dd"></i-input> -->
+								<input type="text" v-model="carAuction.auctionEndTime" id="auctionEndTime" placeholder="yyyy-MM-dd" :disabled="!canEdit">
 							</td>
 						</tr>
 
@@ -509,7 +509,7 @@
 								<label class="input_label">*</label>
 							</td>
 							<td>
-								<i-select v-model="carAuction.transType" id="transType">
+								<i-select v-model="carAuction.transType" id="transType" :disabled="!canEdit">
 									<i-option selected="selected" value="">--请选择--</i-option>
 									<i-option value="01">债权转让</i-option>
 									<i-option value="02">交易过户</i-option>
@@ -519,14 +519,14 @@
 								<label class="input_label">*</label>
 							</td>
 							<td>
-								<i-input v-model="carAuction.priorityPurchaser" id="priorityPurchaser"></i-input>
-								<!-- <input type="text" v-model="carAuction.priorityPurchaser" id="priorityPurchaser"> -->
+								<i-input v-model="carAuction.priorityPurchaser" id="priorityPurchaser" :readonly="!canEdit"></i-input>
+								<!-- <input type="text" v-model="carAuction.priorityPurchaser" id="priorityPurchaser" :disabled="!canEdit"> -->
 							</td>
 							<td class="td_label">取货方式
 								<label class="input_label">*</label>
 							</td>
 							<td>
-								<i-select v-model="carAuction.takeWay" id="takeWay">
+								<i-select v-model="carAuction.takeWay" id="takeWay" :disabled="!canEdit">
 									<i-option selected="selected" value="">--请选择--</i-option>
 									<i-option value="01">门店自提</i-option>
 									<i-option value="02">运费自付</i-option>
@@ -539,21 +539,21 @@
 								<label class="input_label">*</label>
 							</td>
 							<td>
-								<i-input v-model="carAuction.buyStartTime" id="buyStartTime" placeholder="yyyy-MM-dd"></i-input>
-								<!-- <input type="text" v-model="carAuction.buyStartTime" id="buyStartTime" placeholder="yyyy-MM-dd"> -->
+								<!-- <i-input v-model="carAuction.buyStartTime" id="buyStartTime" placeholder="yyyy-MM-dd"></i-input> -->
+								<input type="text" v-model="carAuction.buyStartTime" id="buyStartTime" placeholder="yyyy-MM-dd" :disabled="!canEdit">
 							</td>
 							<td class="td_label">竞买结束时间
 								<label class="input_label">*</label>
 							</td>
 							<td>
-									<i-input v-model="carAuction.buyEndTime" id="buyEndTime" placeholder="yyyy-MM-dd"></i-input>
-								<!-- <input type="text" v-model="carAuction.buyEndTime" id="buyEndTime" placeholder="yyyy-MM-dd"> -->
+									<!-- <i-input v-model="carAuction.buyEndTime" id="buyEndTime" placeholder="yyyy-MM-dd"></i-input> -->
+								<input type="text" v-model="carAuction.buyEndTime" id="buyEndTime" placeholder="yyyy-MM-dd" :disabled="!canEdit">
 							</td>
 							<td class="td_label">支付方式
 								<label class="input_label">*</label>
 							</td>
 							<td>
-								<i-select v-model="carAuction.payWay" id="payWay">
+								<i-select v-model="carAuction.payWay" id="payWay" :disabled="!canEdit">
 									<i-option selected="selected" value="">--请选择--</i-option>
 									<i-option value="01">线下支付</i-option>
 									<i-option value="02">线上支付</i-option>
@@ -566,21 +566,21 @@
 								<label class="input_label">*</label>
 							</td>
 							<td>
-									<i-input v-model="carAuction.consStartTime" id="consStartTime" placeholder="yyyy-MM-dd"></i-input>
-								<!-- <input type="text" v-model="carAuction.consStartTime" id="consStartTime" placeholder="yyyy-MM-dd"> -->
+									<!-- <i-input v-model="carAuction.consStartTime" id="consStartTime" placeholder="yyyy-MM-dd"></i-input> -->
+								<input type="text" v-model="carAuction.consStartTime" id="consStartTime" placeholder="yyyy-MM-dd" :disabled="!canEdit">
 							</td>
 							<td class="td_label">咨询结束时间
 								<label class="input_label">*</label>
 							</td>
 							<td>
-									<i-input v-model="carAuction.consEndTime" id="consEndTime" placeholder="yyyy-MM-dd"></i-input>
-								<!-- <input type="text" v-model="carAuction.consEndTime" id="consEndTime" placeholder="yyyy-MM-dd"> -->
+									<!-- <i-input v-model="carAuction.consEndTime" id="consEndTime" placeholder="yyyy-MM-dd"></i-input> -->
+								<input type="text" v-model="carAuction.consEndTime" id="consEndTime" placeholder="yyyy-MM-dd" :disabled="!canEdit">
 							</td>
 							<td class="td_label">咨询人
 								<label class="input_label">*</label>
 							</td>
 							<td>
-									<i-input v-model="carAuction.consultant" id="consultant"></i-input>
+									<i-input v-model="carAuction.consultant" id="consultant" :readonly="!canEdit"></i-input>
 								<!-- <input type="text" v-model="carAuction.consultant" id="consultant"> -->
 							</td>
 						</tr>
@@ -590,21 +590,21 @@
 								<label class="input_label">*</label>
 							</td>
 							<td>
-									<i-input v-model="carAuction.viewSampleStartTime" id="viewSampleStartTime" placeholder="yyyy-MM-dd"></i-input>
-								<!-- <input type="text" v-model="carAuction.viewSampleStartTime" id="viewSampleStartTime" placeholder="yyyy-MM-dd"> -->
+									<!-- <i-input v-model="carAuction.viewSampleStartTime" id="viewSampleStartTime" placeholder="yyyy-MM-dd"></i-input> -->
+								<input type="text" v-model="carAuction.viewSampleStartTime" id="viewSampleStartTime" placeholder="yyyy-MM-dd" :disabled="!canEdit">
 							</td>
 							<td class="td_label">看样结束时间
 								<label class="input_label">*</label>
 							</td>
 							<td>
-									<i-input v-model="carAuction.viewSampleEndTime" id="viewSampleEndTime" placeholder="yyyy-MM-dd"></i-input>
-								<!-- <input type="text" v-model="carAuction.viewSampleEndTime" id="viewSampleEndTime" placeholder="yyyy-MM-dd"> -->
+									<!-- <i-input v-model="carAuction.viewSampleEndTime" id="viewSampleEndTime" placeholder="yyyy-MM-dd"></i-input> -->
+								<input type="text" v-model="carAuction.viewSampleEndTime" id="viewSampleEndTime" placeholder="yyyy-MM-dd" :disabled="!canEdit">
 							</td>
 							<td class="td_label">咨询人联系方式
 								<label class="input_label">*</label>
 							</td>
 							<td>
-									<i-input v-model="carAuction.consultantTel" id="consultantTel"></i-input>
+									<i-input v-model="carAuction.consultantTel" id="consultantTel" :readonly="!canEdit"></i-input>
 								<!-- <input type="text" v-model="carAuction.consultantTel" id="consultantTel"> -->
 							</td>
 						</tr>
@@ -619,7 +619,7 @@
 								<label class="input_label">*</label>
 							</td>
 							<td colspan="5">
-									<i-input v-model="carAuction.handleUnit" style="width: 100%" maxlength="200" id="handleUnit"></i-input>
+									<i-input v-model="carAuction.handleUnit" style="width: 100%" maxlength="200" id="handleUnit" :readonly="!canEdit"></i-input>
 								<!-- <input type="text" v-model="carAuction.handleUnit" style="width: 100%" maxlength="200" id="handleUnit"> -->
 							</td>
 						</tr>
@@ -628,7 +628,7 @@
 								<label class="input_label">*</label>
 							</td>
 							<td colspan="5">
-									<i-input v-model="carAuction.unitAddr" style="width: 100%" maxlength="400" id="unitAddr"></i-input>
+									<i-input v-model="carAuction.unitAddr" style="width: 100%" maxlength="400" id="unitAddr" :readonly="!canEdit"></i-input>
 								<!-- <input type="text" v-model="carAuction.unitAddr" style="width: 100%" maxlength="400" id="unitAddr"> -->
 							</td>
 						</tr>
@@ -637,14 +637,14 @@
 								<label class="input_label">*</label>
 							</td>
 							<td>
-									<i-input v-model="carAuction.acountName" style="width: 100%" id="acountName" maxlength="100"></i-input>
+									<i-input v-model="carAuction.acountName" style="width: 100%" id="acountName" maxlength="100" :readonly="!canEdit"></i-input>
 								<!-- <input type="text" v-model="carAuction.acountName" style="width: 100%" id="acountName" maxlength="100"> -->
 							</td>
 							<td class="td_label">开户银行
 								<label class="input_label">*</label>
 							</td>
 							<td>
-									<i-input v-model="carAuction.openBank" style="width: 100%" id="openBank" maxlength="100"></i-input>
+									<i-input v-model="carAuction.openBank" style="width: 100%" id="openBank" maxlength="100" :readonly="!canEdit"></i-input>
 								<!-- <input type="text" v-model="carAuction.openBank" style="width: 100%" id="openBank" maxlength="100"> -->
 
 							</td>
@@ -652,7 +652,7 @@
 								<label class="input_label">*</label>
 							</td>
 							<td>
-									<i-input v-model="carAuction.acountNum" style="width: 100%" id="acountNum" maxlength="20"></i-input>
+									<i-input v-model="carAuction.acountNum" style="width: 100%" id="acountNum" maxlength="20" :readonly="!canEdit"></i-input>
 								<!-- <input type="text" v-model="carAuction.acountNum" style="width: 100%" id="acountNum" maxlength="20"> -->
 								<input type="text" v-model="carAuction.auctionId" hidden="">
 							</td>
@@ -662,14 +662,14 @@
 								<label class="input_label">*</label>
 							</td>
 							<td>
-									<i-input v-model="carAuction.paymentEndTime" id="paymentEndTime" placeholder="yyyy-MM-dd"></i-input>
-								<!-- <input type="text" v-model="carAuction.paymentEndTime" id="paymentEndTime" placeholder="yyyy-MM-dd"> -->
+									<!-- <i-input v-model="carAuction.paymentEndTime" id="paymentEndTime" placeholder="yyyy-MM-dd"></i-input> -->
+								<input type="text" v-model="carAuction.paymentEndTime" id="paymentEndTime" placeholder="yyyy-MM-dd" :disabled="!canEdit">
 							</td>
 							<td class="td_label">交易税费
 								<label class="input_label">*</label>
 							</td>
 							<td>
-									<i-input v-model="carAuction.transFree" id="transFree" maxlength="10"></i-input>
+									<i-input v-model="carAuction.transFree" id="transFree" maxlength="10" :readonly="!canEdit"></i-input>
 								<!-- <input type="text" v-model="carAuction.transFree" id="transFree" maxlength="10"> -->
 							</td>
 							<td class="td_label"></td>
@@ -680,14 +680,14 @@
 								<label class="input_label">*</label>
 							</td>
 							<td colspan="5">
-									<i-input v-model="carAuction.viewSampleAddr" style="width: 100%" maxlength="400" id="viewSampleAddr"></i-input>
+									<i-input v-model="carAuction.viewSampleAddr" style="width: 100%" maxlength="400" id="viewSampleAddr" :readonly="!canEdit"></i-input>
 								<!-- <input type="text" v-model="carAuction.viewSampleAddr" style="width: 100%" maxlength="400" id="viewSampleAddr"> -->
 							</td>
 						</tr>
 						<tr>
 							<td class="td_label" rowspan="3">备注</td>
 							<td colspan="5" rowspan="3">
-									<i-input type="textarea" v-model="carAuction.remark" style="width: 100%;border:1px solid #ccc" maxlength="1000"></i-input>
+									<i-input type="textarea" v-model="carAuction.remark" style="width: 100%;border:1px solid #ccc" maxlength="1000" :readonly="!canEdit"></i-input>
 								<!-- <textarea rows="" cols="" v-model="carAuction.remark" style="width: 100%;border:1px solid #ccc" maxlength="1000"> </textarea> -->
 
 								<input type="text" v-model="processId" hidden="">
@@ -716,7 +716,7 @@
 								<input type="text" hidden="" v-model="info.oldDocId" :id="'docId'+index" />
 							</td>
 							<td>
-								<a href="javascript:;" class="selectFile">请选择
+								<a href="javascript:;" class="selectFile" :disabled="!canEdit" >请选择
 									<input type="file" title="请选择" v-model="info.file" :id="'uploadfile'+index" v-on:click="uploadFile($event,index)" width="100px"
 									 class="uploadFile" />
 
@@ -726,7 +726,7 @@
 								<i-input type="text" v-model="info.originalName" style="width: 100%" maxlength="100" :id="'uploadfileName'+index" ></i-input>
 							</td>
 							<td>
-								<div class="layui-btn-group">
+								<div class="layui-btn-group" v-if="canEdit">
 									<button class="layui-btn layui-btn-primary layui-btn-sm" v-on:click="addTabTr($event)">
 										<i class="layui-icon"></i>
 									</button>

@@ -18,9 +18,10 @@ window.layinit(function (htConfig) {
 	var form = layui.form;
 	var config = layui.ht_config;
 	var laydate = layui.laydate;
-	var vm = new Vue({
+	 vm = new Vue({
 	    el: '#app',
 	    data: {
+	    	canEdit:true,
 	    	provs:'',
 	    	citys:'',
 	        countys:'',
@@ -691,12 +692,14 @@ window.layinit(function (htConfig) {
 	                	vm.carBasic=data.data.carBasic;
 	                	vm.business=data.data.business;
 	                	vm.drag=data.data.drag;
+	                	vm.canEdit = data.data.canEdit ;
 						vm.drag.dragDate = moment(vm.drag.dragDate).format("YYYY年MM月DD日");
 	                 	vm.detection=data.data.detection;
 						vm.detection.createTime = moment(vm.detection.createTime).format("YYYY年MM月DD日");
 						vm.detection.insuranceExpirationDate = moment(vm.detection.insuranceExpirationDate).format("YYYY-MM-DD");
 	                	vm.mortgageDetection=data.data.mortgageDetection;
 	                	vm.mortgageDetection.createTime = moment(vm.mortgageDetection.createTime).format("YYYY年MM月DD日")
+	                	
 	                	if(data.data.repayPlan!=null&&data.data.repayPlan!=''){
 	                		vm.repayPlan=data.data.repayPlan;
 	                		vm.repayPlan.lastPayDate = moment(vm.repayPlan.lastPayDate).format("YYYY年MM月DD日")
@@ -955,7 +958,7 @@ window.layinit(function (htConfig) {
 	    			$("#reservePrice").css("border","1px solid #FF3030");
 	    			return ;
 	    		}else{
-		    		if (!amt.test(vm.carAuction.reservePrice)) {  
+		    		if (!amt.test(vm.carAuction.reservePrice+'')) {  
 		    			$("#reservePrice").css("border","1px solid #FF3030");
 		    			layer.msg("请输入有效金额！",{icon:5,shade: [0.8, '#393D49']});
 		    			return;
