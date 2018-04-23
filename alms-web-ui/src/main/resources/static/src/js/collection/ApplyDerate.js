@@ -35,10 +35,10 @@ var setFormValidate = {
         {pattern:/^[0-9]+(.[0-9]{1,2})?$/,   message: '请填写不超过两位小数的数字', trigger: 'blur'}
     ],
 	derateReson: [
-//		{required: true, message: '必填', trigger: 'change'}  ,  
+		{message: '必填', trigger: 'change'}  ,  
     	{
     		validator: function (rule, value, callback, source, options) {
-    			if (value.length > 500 ) {
+    			if (value!=null&&value.length > 500 ) {
     				callback(new Error('字数长度不能超过500'));
     			} else {
     				callback();//校验通过

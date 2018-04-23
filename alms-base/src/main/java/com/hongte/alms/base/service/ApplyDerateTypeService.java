@@ -1,5 +1,7 @@
 package com.hongte.alms.base.service;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Param;
 
 import com.hongte.alms.base.entity.ApplyDerateType;
@@ -16,4 +18,5 @@ import com.hongte.alms.common.service.BaseService;
  */
 public interface ApplyDerateTypeService extends BaseService<ApplyDerateType> {
 	 ApplyTypeVo getApplyTypeVo(@Param(value="processId") String processId);
+	 
 }

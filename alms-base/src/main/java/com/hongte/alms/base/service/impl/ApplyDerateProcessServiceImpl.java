@@ -191,6 +191,7 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
             		 detail=repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", req.getCrpId()).eq("business_id", pList.getBusinessId()).eq("fee_id", applyDerateType.getFeeId())).get(0);
 
         		}
+        		applyDerateType.setDerateTypeName(detail.getPlanItemName());
         		applyDerateType.setFeeId(applyDerateType.getFeeId());
         		applyDerateType.setDerateType(detail.getPlanItemType().toString());
         		applyDerateType.setCreateTime(new Date());
@@ -401,7 +402,21 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
             String userName = sysUser!=null?sysUser.getUserName():vo.getCreaterId();
             vo.setCreaterName(userName);
 
-
+            List<ApplyDerateType> applyTypeVoList= applyDerateTypeService.selectList(new EntityWrapper<ApplyDerateType>().eq("apply_derate_process_id", vo.getApplyDerateProcessId()));
+            String applyTypeName=vo.getDerateTypeName();
+            BigDecimal derateMoney=BigDecimal.valueOf(0);	
+            for(int i=0;i<applyTypeVoList.size();i++) {
+            	if(i==0) {
+            		applyTypeName=applyTypeVoList.get(i).getDerateTypeName();
+            	}else {
+            		applyTypeName=","+applyTypeVoList.get(i).getDerateTypeName();
+            	}
+            	derateMoney=derateMoney.add(applyTypeVoList.get(i).getDerateMoney());
+            }
+            vo.setDerateTypeName(applyTypeName);
+            vo.setDerateMoney(derateMoney.toString());
+          
+            
 //            LoginInfoDto uInfo = loginUserInfoHelper.getLoginInfo();
             //vo.setDerateTypeName(sysParameterService.seleByParamTypeAndvalue(SysParameterTypeEnums.DERATE_TYPE, vo.getDerateTypeId()).getParamName());
 //            vo.setShowPayMoney("100");     //后续计算

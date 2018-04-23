@@ -51,6 +51,13 @@ public class ApplyDerateType extends Model<ApplyDerateType> {
 	@TableField("derate_type")
 	@ApiModelProperty(required= true,value = "申请减免类型")
 	private String derateType;
+	
+    /**
+     * 申请减免费用名称
+     */
+	@TableField("derate_type_name")
+	@ApiModelProperty(required= true,value = "申请减免费用名称")
+	private String derateTypeName;
     /**
      * 申请减免金额
      */
@@ -90,6 +97,14 @@ public class ApplyDerateType extends Model<ApplyDerateType> {
 	@ApiModelProperty(required= true,value = "更新人")
 	private String updateUser;
 
+
+	public String getDerateTypeName() {
+		return derateTypeName;
+	}
+
+	public void setDerateTypeName(String derateTypeName) {
+		this.derateTypeName = derateTypeName;
+	}
 
 	public BigDecimal getBeforeDerateMoney() {
 		return beforeDerateMoney;

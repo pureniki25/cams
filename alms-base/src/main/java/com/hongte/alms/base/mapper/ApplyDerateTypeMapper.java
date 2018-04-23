@@ -1,5 +1,7 @@
 package com.hongte.alms.base.mapper;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Param;
 
 import com.hongte.alms.base.entity.ApplyDerateType;
@@ -16,4 +18,5 @@ import com.hongte.alms.common.mapper.SuperMapper;
  */
 public interface ApplyDerateTypeMapper extends SuperMapper<ApplyDerateType> {
     ApplyTypeVo getApplyTypeVo(@Param(value="processId") String processId);
+    
 }
