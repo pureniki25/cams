@@ -139,8 +139,8 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 	@Override
 	public BigDecimal getPreChargeAndPreFees(String original_business_id) {
 		BigDecimal preCharge=BigDecimal.valueOf(basicBusinessMapper.getPreCharge(original_business_id)==null?0:basicBusinessMapper.getPreCharge(original_business_id));
-		BigDecimal preFees=BigDecimal.valueOf(basicBusinessMapper.getPreFees(original_business_id)==null?0:basicBusinessMapper.getPreFees(original_business_id));
-		BigDecimal sum=preCharge.add(preFees);
+//		BigDecimal preFees=BigDecimal.valueOf(basicBusinessMapper.getPreFees(original_business_id)==null?0:basicBusinessMapper.getPreFees(original_business_id));
+		BigDecimal sum=preCharge;
 		return sum;
 	}
 //
@@ -151,7 +151,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 
 	@Override
 	public Double getMonthSumFactAmount(String original_business_id) {
-		 return basicBusinessMapper.getMonthSumFactAmount(original_business_id);
+		 return basicBusinessMapper.getMonthSumFactAmount(original_business_id); 
 	}
 
 	@Override

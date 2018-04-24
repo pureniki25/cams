@@ -111,7 +111,7 @@
             </if>
             <!--       /*逾期天数 结束*/ -->
             <if test="delayDaysEnd !=null ">
-                <![CDATA[ and pList.overdue_days <= #{delayDaysEnd}]]>
+                <![CDATA[ and pList.overdue_days < #{delayDaysEnd}]]>
             </if>
             <!--          /*//业务获取*/ -->
             <if test="operatorName !=null and operatorName !='' ">
