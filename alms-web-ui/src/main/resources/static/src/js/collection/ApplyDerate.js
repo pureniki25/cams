@@ -1034,10 +1034,10 @@ var dereteMoneySum= function () {
  * @type {{realReceiveMoney: [null,null],  : [null], derateType: [null], isSettleFlage: [null]}}
  */
 var setFormValidate1 = {
-    realReceiveMoney: [
-        {required: true, message: '请填写实收金额', trigger: 'blur'},
-        {pattern:/^[0-9]+(.[0-9]{1,2})?$/,   message: '请填写不超过两位小数的数字', trigger: 'blur'}
-    ]
+//    realReceiveMoney: [
+//        {required: true, message: '请填写实收金额', trigger: 'blur'},
+//        {pattern:/^[0-9]+(.[0-9]{1,2})?$/,   message: '请填写不超过两位小数的数字', trigger: 'blur'}
+//    ]
     // derateMoney: [
     //     {required: false, message: '', trigger: 'blur'},
     // ],
@@ -1071,10 +1071,10 @@ var Submit = function () {
         saveapplyInfo(PROCESS_STATUS_RUNNING);
     }else if(processStatus == PROCESS_STATUS_RUNNING){
         if(vm.approvalInfoForm.process.currentStep == APPLY_DERATE_LAST_STATUS||isReceiveMoney==true){
-            if(vm.applyInfoForm.realReceiveMoney == ''){
-                vm.$Message.error({content: '请填写实收金额!'});
-                return ;
-            }
+//            if(vm.applyInfoForm.realReceiveMoney == ''){
+//                vm.$Message.error({content: '请填写实收金额!'});
+//                return ;
+//            }
             vm.approvalInfoForm.realReceiveMoney = vm.applyInfoForm.realReceiveMoney;
         }
 
