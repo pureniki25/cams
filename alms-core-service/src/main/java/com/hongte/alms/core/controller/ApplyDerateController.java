@@ -237,7 +237,7 @@ public class ApplyDerateController {
             //申请类型列表
             RepaymentBizPlanList pList=repaymentBizPlanListService.selectById(crpId);
             if(pList!=null) {
-            List<RepaymentBizPlanListDetail> derateTypeList=repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("business_id", pList.getBusinessId()).eq("plan_list_id", crpId).groupBy("fee_id"));
+            List<RepaymentBizPlanListDetail> derateTypeList=repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("business_id", pList.getBusinessId()).eq("plan_list_id", crpId).and().ne("plan_item_name","本金" ).groupBy("fee_id"));
             //List<SysParameter> derateTypeList =  sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterTypeEnums.DERATE_TYPE.getKey()).orderBy("row_Index"));
             retMap.put("derateTypeList",(JSONArray) JSON.toJSON(derateTypeList, JsonUtil.getMapping()));
              
