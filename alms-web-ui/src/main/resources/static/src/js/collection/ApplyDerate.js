@@ -40,9 +40,9 @@ var setFormValidate = {
         {required: true, message: '请填选择是否结清', trigger: 'change'}
     ],
     
-    realReceiveMoney: [
-        {pattern:/^[0-9]+(.[0-9]{1,2})?$/,   message: '请填写不超过两位小数的数字', trigger: 'blur'}
-    ],
+//    realReceiveMoney: [
+//        {pattern:/^[0-9]+(.[0-9]{1,2})?$/,   message: '请填写不超过两位小数的数字', trigger: 'blur'}
+//    ],
 	derateReson: [
 		{message: '必填', trigger: 'change'}  ,  
     	{
