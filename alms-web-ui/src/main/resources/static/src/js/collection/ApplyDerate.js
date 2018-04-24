@@ -359,12 +359,12 @@ window.layinit(function (htConfig) {
                		}
             	  vm.baseInfoForm.outsideInterest=0;
             	  vm.baseInfoForm.preLateFees=0;
-            	  vm.applyInfoForm.realReceiveMoney=vm.baseInfoForm.totalFactAmount;
+//            	  vm.applyInfoForm.realReceiveMoney=vm.baseInfoForm.totalFactAmount;
             	  setOhterFeeZero();
               }
               if(flage==true){
             	  vm.otherFeeShowFlage=true;
-            	  vm.applyInfoForm.realReceiveMoney=vm.baseInfoForm.settleTotalFactAmount;
+//            	  vm.applyInfoForm.realReceiveMoney=vm.baseInfoForm.settleTotalFactAmount;
             	  showData();
             	
               }
@@ -1075,7 +1075,7 @@ var Submit = function () {
 //                vm.$Message.error({content: '请填写实收金额!'});
 //                return ;
 //            }
-            vm.approvalInfoForm.realReceiveMoney = vm.applyInfoForm.realReceiveMoney;
+//            vm.approvalInfoForm.realReceiveMoney = vm.applyInfoForm.realReceiveMoney;
         }
 
         vm.$refs['approvalInfoForm'].validate((valid) => {
