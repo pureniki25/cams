@@ -13,23 +13,35 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
  * <p>
- * 还款计划应还项目明细表
+ * 标的还款计划应还项目明细表
  * </p>
  *
- * @author 王继光
- * @since 2018-03-06
+ * @author 曾坤
+ * @since 2018-04-24
  */
 @ApiModel
-@TableName("tb_repayment_biz_plan_list_detail")
-public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail> {
+@TableName("tb_repayment_proj_plan_list_detail")
+public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDetail> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 应还项目明细ID(主键)
+     * 标的应还项目明细ID(主键)
      */
-    @TableId("plan_detail_id")
-	@ApiModelProperty(required= true,value = "应还项目明细ID(主键)")
+    @TableId("proj_plan_detail_id")
+	@ApiModelProperty(required= true,value = "标的应还项目明细ID(主键)")
+	private String projPlanDetailId;
+    /**
+     * 所属标的还款计划列表ID(外键，对应tb_repayment_proj_plan_list.proj_plan_list_id)
+     */
+	@TableField("proj_plan_list_id")
+	@ApiModelProperty(required= true,value = "所属标的还款计划列表ID(外键，对应tb_repayment_proj_plan_list.proj_plan_list_id)")
+	private String projPlanListId;
+    /**
+     * 所属还款计划列表详情ID(外键，对应tb_repayment_biz_plan_list_detail.plan_detail_id)
+     */
+	@TableField("plan_detail_id")
+	@ApiModelProperty(required= true,value = "所属还款计划列表详情ID(外键，对应tb_repayment_biz_plan_list_detail.plan_detail_id)")
 	private String planDetailId;
     /**
      * 所属还款计划列表ID(外键，对应tb_repayment_biz_plan_list.plan_list_id)
@@ -102,12 +114,43 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 	@TableField("fact_repay_date")
 	@ApiModelProperty(required= true,value = "实还日期")
 	private Date factRepayDate;
+    /**
+     * 标的资产端计划还款金额(元)
+     */
+	@TableField("biz_plan_amount")
+	@ApiModelProperty(required= true,value = "标的资产端计划还款金额(元)")
+	private BigDecimal bizPlanAmount;
+    /**
+     * 标的资金端(平台)计划还款金额(元)
+     */
+	@TableField("proj_plan_amount")
+	@ApiModelProperty(required= true,value = "标的资金端(平台)计划还款金额(元)")
+	private BigDecimal projPlanAmount;
+    /**
+     * 标的资产端实还金额(元)
+     */
+	@TableField("biz_fact_amount")
+	@ApiModelProperty(required= true,value = "标的资产端实还金额(元)")
+	private BigDecimal bizFactAmount;
+    /**
+     * 标的资金端(平台)实还金额(元)
+     */
+	@TableField("proj_fact_amount")
+	@ApiModelProperty(required= true,value = "标的资金端(平台)实还金额(元)")
+	private BigDecimal projFactAmount;
+    /**
+     * 标的资金端(平台)实还日期
+     */
+	@TableField("proj_fact_repay_date")
+	@ApiModelProperty(required= true,value = "标的资金端(平台)实还日期")
+	private Date projFactRepayDate;
 
 	/**
 	 * 是否有效状态：1 有效 ，0 无效
 	 */
 	@ApiModelProperty(required= true,value = "是否有效状态：1 有效 ，0 无效")
 	private Integer active;
+
 
     /**
      * 创建日期
@@ -134,6 +177,22 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 	@ApiModelProperty(required= true,value = "更新用户")
 	private String updateUser;
 
+
+	public String getProjPlanDetailId() {
+		return projPlanDetailId;
+	}
+
+	public void setProjPlanDetailId(String projPlanDetailId) {
+		this.projPlanDetailId = projPlanDetailId;
+	}
+
+	public String getProjPlanListId() {
+		return projPlanListId;
+	}
+
+	public void setProjPlanListId(String projPlanListId) {
+		this.projPlanListId = projPlanListId;
+	}
 
 	public String getPlanDetailId() {
 		return planDetailId;
@@ -239,6 +298,46 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 		this.factRepayDate = factRepayDate;
 	}
 
+	public BigDecimal getBizPlanAmount() {
+		return bizPlanAmount;
+	}
+
+	public void setBizPlanAmount(BigDecimal bizPlanAmount) {
+		this.bizPlanAmount = bizPlanAmount;
+	}
+
+	public BigDecimal getProjPlanAmount() {
+		return projPlanAmount;
+	}
+
+	public void setProjPlanAmount(BigDecimal projPlanAmount) {
+		this.projPlanAmount = projPlanAmount;
+	}
+
+	public BigDecimal getBizFactAmount() {
+		return bizFactAmount;
+	}
+
+	public void setBizFactAmount(BigDecimal bizFactAmount) {
+		this.bizFactAmount = bizFactAmount;
+	}
+
+	public BigDecimal getProjFactAmount() {
+		return projFactAmount;
+	}
+
+	public void setProjFactAmount(BigDecimal projFactAmount) {
+		this.projFactAmount = projFactAmount;
+	}
+
+	public Date getProjFactRepayDate() {
+		return projFactRepayDate;
+	}
+
+	public void setProjFactRepayDate(Date projFactRepayDate) {
+		this.projFactRepayDate = projFactRepayDate;
+	}
+
 	public Date getCreateDate() {
 		return createDate;
 	}
@@ -273,12 +372,14 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 
 	@Override
 	protected Serializable pkVal() {
-		return this.planDetailId;
+		return this.projPlanDetailId;
 	}
 
 	@Override
 	public String toString() {
-		return "RepaymentBizPlanListDetail{" +
+		return "RepaymentProjPlanListDetail{" +
+			", projPlanDetailId=" + projPlanDetailId +
+			", projPlanListId=" + projPlanListId +
 			", planDetailId=" + planDetailId +
 			", planListId=" + planListId +
 			", businessId=" + businessId +
@@ -292,6 +393,11 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 			", factAmount=" + factAmount +
 			", repaySource=" + repaySource +
 			", factRepayDate=" + factRepayDate +
+			", bizPlanAmount=" + bizPlanAmount +
+			", projPlanAmount=" + projPlanAmount +
+			", bizFactAmount=" + bizFactAmount +
+			", projFactAmount=" + projFactAmount +
+			", projFactRepayDate=" + projFactRepayDate +
 			", createDate=" + createDate +
 			", createUser=" + createUser +
 			", updateDate=" + updateDate +

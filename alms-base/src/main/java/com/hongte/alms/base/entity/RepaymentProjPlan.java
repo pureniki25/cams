@@ -16,21 +16,27 @@ import io.swagger.annotations.ApiModelProperty;
  * 业务还款计划信息
  * </p>
  *
- * @author 王继光
- * @since 2018-03-06
+ * @author 曾坤
+ * @since 2018-04-24
  */
 @ApiModel
-@TableName("tb_repayment_biz_plan")
-public class RepaymentBizPlan extends Model<RepaymentBizPlan> {
+@TableName("tb_repayment_proj_plan")
+public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 还款计划编号(主键)
+     * 标的还款计划编号(主键)
      */
-    @TableId("plan_id")
-	@ApiModelProperty(required= true,value = "还款计划编号(主键)")
-	private String planId;
+    @TableId("proj_plan_id")
+	@ApiModelProperty(required= true,value = "标的还款计划编号(主键)")
+	private String projPlanId;
+    /**
+     * 上标项目编号
+     */
+	@TableField("project_id")
+	@ApiModelProperty(required= true,value = "上标项目编号")
+	private String projectId;
     /**
      * 业务编号(若当前业务为展期，则存展期业务编号)
      */
@@ -38,10 +44,10 @@ public class RepaymentBizPlan extends Model<RepaymentBizPlan> {
 	@ApiModelProperty(required= true,value = "业务编号(若当前业务为展期，则存展期业务编号)")
 	private String businessId;
     /**
-     * 当前还款计划对应的原业务编号（若为展期还款计划，则存展期业务对应的原业务编号，若是原业务，则为空。）
+     * 当前还款计划对应的原业务编号（若为展期还款计划，则存展期业务对应的原业务编号）
      */
 	@TableField("original_business_id")
-	@ApiModelProperty(required= true,value = "当前还款计划对应的原业务编号（若为展期还款计划，则存展期业务对应的原业务编号，若是原业务，则为空。）")
+	@ApiModelProperty(required= true,value = "当前还款计划对应的原业务编号（若为展期还款计划，则存展期业务对应的原业务编号）")
 	private String originalBusinessId;
     /**
      * 还款计划批次号(展期与原业务同属一个还款计划批次号，多次出款的还款计划批次号可能不同)
@@ -49,6 +55,12 @@ public class RepaymentBizPlan extends Model<RepaymentBizPlan> {
 	@TableField("repayment_batch_id")
 	@ApiModelProperty(required= true,value = "还款计划批次号(展期与原业务同属一个还款计划批次号，多次出款的还款计划批次号可能不同)")
 	private String repaymentBatchId;
+    /**
+     * 标所属业务还款计划编号(外键，对应tb_repayment_biz_plan.plan_id)
+     */
+	@TableField("plan_id")
+	@ApiModelProperty(required= true,value = "标所属业务还款计划编号(外键，对应tb_repayment_biz_plan.plan_id)")
+	private String planId;
     /**
      * 生成还款计划对应的借款总额(元)
      */
@@ -91,18 +103,6 @@ public class RepaymentBizPlan extends Model<RepaymentBizPlan> {
 	@TableField("is_defer")
 	@ApiModelProperty(required= true,value = "是否展期还款计划,0:否，1:是")
 	private Integer isDefer;
-    /**
-     * 对应原信贷的还款批次号(after_guid)，用作历史数据迁移的标记字段。若非原信贷系统生成的还款计划，则为空
-     */
-	@TableField("xd_after_guid")
-	@ApiModelProperty(required= true,value = "对应原信贷的还款批次号(after_guid)，用作历史数据迁移的标记字段。若非原信贷系统生成的还款计划，则为空")
-	private String xdAfterGuid;
-    /**
-     * 对应原信贷的出款计划ID(out_id)，用作历史数据迁移的标记字段。若非原信贷系统生成的还款计划，则为空
-     */
-	@TableField("xd_out_id")
-	@ApiModelProperty(required= true,value = "对应原信贷的出款计划ID(out_id)，用作历史数据迁移的标记字段。若非原信贷系统生成的还款计划，则为空")
-	private Integer xdOutId;
 
 	/**
 	 * 是否有效状态：1 有效 ，0 无效
@@ -136,12 +136,20 @@ public class RepaymentBizPlan extends Model<RepaymentBizPlan> {
 	private String updateUser;
 
 
-	public String getPlanId() {
-		return planId;
+	public String getProjPlanId() {
+		return projPlanId;
 	}
 
-	public void setPlanId(String planId) {
-		this.planId = planId;
+	public void setProjPlanId(String projPlanId) {
+		this.projPlanId = projPlanId;
+	}
+
+	public String getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(String projectId) {
+		this.projectId = projectId;
 	}
 
 	public String getBusinessId() {
@@ -166,6 +174,14 @@ public class RepaymentBizPlan extends Model<RepaymentBizPlan> {
 
 	public void setRepaymentBatchId(String repaymentBatchId) {
 		this.repaymentBatchId = repaymentBatchId;
+	}
+
+	public String getPlanId() {
+		return planId;
+	}
+
+	public void setPlanId(String planId) {
+		this.planId = planId;
 	}
 
 	public BigDecimal getBorrowMoney() {
@@ -224,22 +240,6 @@ public class RepaymentBizPlan extends Model<RepaymentBizPlan> {
 		this.isDefer = isDefer;
 	}
 
-	public String getXdAfterGuid() {
-		return xdAfterGuid;
-	}
-
-	public void setXdAfterGuid(String xdAfterGuid) {
-		this.xdAfterGuid = xdAfterGuid;
-	}
-
-	public Integer getXdOutId() {
-		return xdOutId;
-	}
-
-	public void setXdOutId(Integer xdOutId) {
-		this.xdOutId = xdOutId;
-	}
-
 	public Date getCreateTime() {
 		return createTime;
 	}
@@ -274,16 +274,18 @@ public class RepaymentBizPlan extends Model<RepaymentBizPlan> {
 
 	@Override
 	protected Serializable pkVal() {
-		return this.planId;
+		return this.projPlanId;
 	}
 
 	@Override
 	public String toString() {
-		return "RepaymentBizPlan{" +
-			", planId=" + planId +
+		return "RepaymentProjPlan{" +
+			", projPlanId=" + projPlanId +
+			", projectId=" + projectId +
 			", businessId=" + businessId +
 			", originalBusinessId=" + originalBusinessId +
 			", repaymentBatchId=" + repaymentBatchId +
+			", planId=" + planId +
 			", borrowMoney=" + borrowMoney +
 			", borrowRate=" + borrowRate +
 			", borrowRateUnit=" + borrowRateUnit +
@@ -291,8 +293,6 @@ public class RepaymentBizPlan extends Model<RepaymentBizPlan> {
 			", borrowLimitUnit=" + borrowLimitUnit +
 			", planStatus=" + planStatus +
 			", isDefer=" + isDefer +
-			", xdAfterGuid=" + xdAfterGuid +
-			", xdOutId=" + xdOutId +
 			", createTime=" + createTime +
 			", createUser=" + createUser +
 			", updateTime=" + updateTime +

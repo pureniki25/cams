@@ -506,4 +506,708 @@ public class TuandaiProjInfoReq {
     public void setProjOutputFeeInfos(List<ProjOutputFeeReq> projOutputFeeInfos) {
         this.projOutputFeeInfos = projOutputFeeInfos;
     }
+
+    public String getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
+    }
+
+    public String getBusinessId() {
+        return businessId;
+    }
+
+    public void setBusinessId(String businessId) {
+        this.businessId = businessId;
+    }
+
+    public String getStatusFlag() {
+        return statusFlag;
+    }
+
+    public void setStatusFlag(String statusFlag) {
+        this.statusFlag = statusFlag;
+    }
+
+    public Date getBeginTime() {
+        return beginTime;
+    }
+
+    public void setBeginTime(Date beginTime) {
+        this.beginTime = beginTime;
+    }
+
+    public BigDecimal getFullBorrowMoney() {
+        return fullBorrowMoney;
+    }
+
+    public void setFullBorrowMoney(BigDecimal fullBorrowMoney) {
+        this.fullBorrowMoney = fullBorrowMoney;
+    }
+
+    public Integer getBorrowLimit() {
+        return borrowLimit;
+    }
+
+    public void setBorrowLimit(Integer borrowLimit) {
+        this.borrowLimit = borrowLimit;
+    }
+
+    public String getAccounterConfirmUserId() {
+        return accounterConfirmUserId;
+    }
+
+    public void setAccounterConfirmUserId(String accounterConfirmUserId) {
+        this.accounterConfirmUserId = accounterConfirmUserId;
+    }
+
+    public String getAccounterConfirmUserName() {
+        return accounterConfirmUserName;
+    }
+
+    public void setAccounterConfirmUserName(String accounterConfirmUserName) {
+        this.accounterConfirmUserName = accounterConfirmUserName;
+    }
+
+    public Date getTdLoanTime() {
+        return tdLoanTime;
+    }
+
+    public void setTdLoanTime(Date tdLoanTime) {
+        this.tdLoanTime = tdLoanTime;
+    }
+
+    public BigDecimal getTdLoanMoney() {
+        return tdLoanMoney;
+    }
+
+    public void setTdLoanMoney(BigDecimal tdLoanMoney) {
+        this.tdLoanMoney = tdLoanMoney;
+    }
+
+    public Integer getExtendFlag() {
+        return extendFlag;
+    }
+
+    public void setExtendFlag(Integer extendFlag) {
+        this.extendFlag = extendFlag;
+    }
+
+    public BigDecimal getCatsedAmount() {
+        return catsedAmount;
+    }
+
+    public void setCatsedAmount(BigDecimal catsedAmount) {
+        this.catsedAmount = catsedAmount;
+    }
+
+    public String getOrgIssueId() {
+        return orgIssueId;
+    }
+
+    public void setOrgIssueId(String orgIssueId) {
+        this.orgIssueId = orgIssueId;
+    }
+
+    public String getMasterIssueId() {
+        return masterIssueId;
+    }
+
+    public void setMasterIssueId(String masterIssueId) {
+        this.masterIssueId = masterIssueId;
+    }
+
+    public Integer getIssueOrder() {
+        return issueOrder;
+    }
+
+    public void setIssueOrder(Integer issueOrder) {
+        this.issueOrder = issueOrder;
+    }
+
+    public String getBusinessAfterGuid() {
+        return businessAfterGuid;
+    }
+
+    public void setBusinessAfterGuid(String businessAfterGuid) {
+        this.businessAfterGuid = businessAfterGuid;
+    }
+
+    public Date getQueryFullsuccessDate() {
+        return queryFullsuccessDate;
+    }
+
+    public void setQueryFullsuccessDate(Date queryFullsuccessDate) {
+        this.queryFullsuccessDate = queryFullsuccessDate;
+    }
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
+    public String getTelNo() {
+        return TelNo;
+    }
+
+    public void setTelNo(String telNo) {
+        TelNo = telNo;
+    }
+
+    public String getEmail() {
+        return Email;
+    }
+
+    public void setEmail(String email) {
+        Email = email;
+    }
+
+    public String getIdentityCard() {
+        return identityCard;
+    }
+
+    public void setIdentityCard(String identityCard) {
+        this.identityCard = identityCard;
+    }
+
+    public String getRealName() {
+        return realName;
+    }
+
+    public void setRealName(String realName) {
+        this.realName = realName;
+    }
+
+    public String getBankAccountNo() {
+        return bankAccountNo;
+    }
+
+    public void setBankAccountNo(String bankAccountNo) {
+        this.bankAccountNo = bankAccountNo;
+    }
+
+    public Integer getBankType() {
+        return bankType;
+    }
+
+    public void setBankType(Integer bankType) {
+        this.bankType = bankType;
+    }
+
+    public String getBankProvice() {
+        return bankProvice;
+    }
+
+    public void setBankProvice(String bankProvice) {
+        this.bankProvice = bankProvice;
+    }
+
+    public String getBankCity() {
+        return bankCity;
+    }
+
+    public void setBankCity(String bankCity) {
+        this.bankCity = bankCity;
+    }
+
+    public String getOpenBankName() {
+        return openBankName;
+    }
+
+    public void setOpenBankName(String openBankName) {
+        this.openBankName = openBankName;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Integer getPeriodMonth() {
+        return periodMonth;
+    }
+
+    public void setPeriodMonth(Integer periodMonth) {
+        this.periodMonth = periodMonth;
+    }
+
+    public Integer getRepaymentType() {
+        return repaymentType;
+    }
+
+    public void setRepaymentType(Integer repaymentType) {
+        this.repaymentType = repaymentType;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public BigDecimal getLowerUnit() {
+        return lowerUnit;
+    }
+
+    public void setLowerUnit(BigDecimal lowerUnit) {
+        this.lowerUnit = lowerUnit;
+    }
+
+    public String getBranchCompanyId() {
+        return branchCompanyId;
+    }
+
+    public void setBranchCompanyId(String branchCompanyId) {
+        this.branchCompanyId = branchCompanyId;
+    }
+
+    public String getControlDesc() {
+        return controlDesc;
+    }
+
+    public void setControlDesc(String controlDesc) {
+        this.controlDesc = controlDesc;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getTitleImageId() {
+        return titleImageId;
+    }
+
+    public void setTitleImageId(String titleImageId) {
+        this.titleImageId = titleImageId;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public Integer getTdStatus() {
+        return tdStatus;
+    }
+
+    public void setTdStatus(Integer tdStatus) {
+        this.tdStatus = tdStatus;
+    }
+
+    public Integer getProjectType() {
+        return projectType;
+    }
+
+    public void setProjectType(Integer projectType) {
+        this.projectType = projectType;
+    }
+
+    public String getResultContent() {
+        return resultContent;
+    }
+
+    public void setResultContent(String resultContent) {
+        this.resultContent = resultContent;
+    }
+
+    public String getEnterpriseUserId() {
+        return enterpriseUserId;
+    }
+
+    public void setEnterpriseUserId(String enterpriseUserId) {
+        this.enterpriseUserId = enterpriseUserId;
+    }
+
+    public BigDecimal getAviCreditGrantingAmount() {
+        return aviCreditGrantingAmount;
+    }
+
+    public void setAviCreditGrantingAmount(BigDecimal aviCreditGrantingAmount) {
+        this.aviCreditGrantingAmount = aviCreditGrantingAmount;
+    }
+
+    public BigDecimal getInterestRate() {
+        return interestRate;
+    }
+
+    public void setInterestRate(BigDecimal interestRate) {
+        this.interestRate = interestRate;
+    }
+
+    public BigDecimal getOverRate() {
+        return overRate;
+    }
+
+    public void setOverRate(BigDecimal overRate) {
+        this.overRate = overRate;
+    }
+
+    public Integer getSex() {
+        return sex;
+    }
+
+    public void setSex(Integer sex) {
+        this.sex = sex;
+    }
+
+    public Integer getCredTypeId() {
+        return credTypeId;
+    }
+
+    public void setCredTypeId(Integer credTypeId) {
+        this.credTypeId = credTypeId;
+    }
+
+    public Date getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
+    }
+
+    public String getRiskAssessment() {
+        return riskAssessment;
+    }
+
+    public void setRiskAssessment(String riskAssessment) {
+        this.riskAssessment = riskAssessment;
+    }
+
+    public String getTdUserId() {
+        return tdUserId;
+    }
+
+    public void setTdUserId(String tdUserId) {
+        this.tdUserId = tdUserId;
+    }
+
+    public Integer getUserTypeId() {
+        return userTypeId;
+    }
+
+    public void setUserTypeId(Integer userTypeId) {
+        this.userTypeId = userTypeId;
+    }
+
+    public String getMarriage() {
+        return marriage;
+    }
+
+    public void setMarriage(String marriage) {
+        this.marriage = marriage;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public Integer getIsHaveHouse() {
+        return isHaveHouse;
+    }
+
+    public void setIsHaveHouse(Integer isHaveHouse) {
+        this.isHaveHouse = isHaveHouse;
+    }
+
+    public Integer getIsHaveCar() {
+        return isHaveCar;
+    }
+
+    public void setIsHaveCar(Integer isHaveCar) {
+        this.isHaveCar = isHaveCar;
+    }
+
+    public BigDecimal getTuandaiRate() {
+        return tuandaiRate;
+    }
+
+    public void setTuandaiRate(BigDecimal tuandaiRate) {
+        this.tuandaiRate = tuandaiRate;
+    }
+
+    public BigDecimal getTuandaiAmount() {
+        return tuandaiAmount;
+    }
+
+    public void setTuandaiAmount(BigDecimal tuandaiAmount) {
+        this.tuandaiAmount = tuandaiAmount;
+    }
+
+    public BigDecimal getGuaranteeRate() {
+        return guaranteeRate;
+    }
+
+    public void setGuaranteeRate(BigDecimal guaranteeRate) {
+        this.guaranteeRate = guaranteeRate;
+    }
+
+    public BigDecimal getGuaranteeAmount() {
+        return guaranteeAmount;
+    }
+
+    public void setGuaranteeAmount(BigDecimal guaranteeAmount) {
+        this.guaranteeAmount = guaranteeAmount;
+    }
+
+    public BigDecimal getSubCompanyRate() {
+        return subCompanyRate;
+    }
+
+    public void setSubCompanyRate(BigDecimal subCompanyRate) {
+        this.subCompanyRate = subCompanyRate;
+    }
+
+    public BigDecimal getSubCompanyCharge() {
+        return subCompanyCharge;
+    }
+
+    public void setSubCompanyCharge(BigDecimal subCompanyCharge) {
+        this.subCompanyCharge = subCompanyCharge;
+    }
+
+    public String getAgencyId() {
+        return agencyId;
+    }
+
+    public void setAgencyId(String agencyId) {
+        this.agencyId = agencyId;
+    }
+
+    public BigDecimal getAgencyRate() {
+        return agencyRate;
+    }
+
+    public void setAgencyRate(BigDecimal agencyRate) {
+        this.agencyRate = agencyRate;
+    }
+
+    public BigDecimal getAgencyAmount() {
+        return agencyAmount;
+    }
+
+    public void setAgencyAmount(BigDecimal agencyAmount) {
+        this.agencyAmount = agencyAmount;
+    }
+
+    public BigDecimal getDepositAmount() {
+        return depositAmount;
+    }
+
+    public void setDepositAmount(BigDecimal depositAmount) {
+        this.depositAmount = depositAmount;
+    }
+
+    public BigDecimal getFreedAmount() {
+        return freedAmount;
+    }
+
+    public void setFreedAmount(BigDecimal freedAmount) {
+        this.freedAmount = freedAmount;
+    }
+
+    public BigDecimal getFreedRate() {
+        return freedRate;
+    }
+
+    public void setFreedRate(BigDecimal freedRate) {
+        this.freedRate = freedRate;
+    }
+
+    public String getCooperativeTdComUserId() {
+        return cooperativeTdComUserId;
+    }
+
+    public void setCooperativeTdComUserId(String cooperativeTdComUserId) {
+        this.cooperativeTdComUserId = cooperativeTdComUserId;
+    }
+
+    public BigDecimal getCooperativeTdComRate() {
+        return cooperativeTdComRate;
+    }
+
+    public void setCooperativeTdComRate(BigDecimal cooperativeTdComRate) {
+        this.cooperativeTdComRate = cooperativeTdComRate;
+    }
+
+    public BigDecimal getCooperativeTdComAmount() {
+        return cooperativeTdComAmount;
+    }
+
+    public void setCooperativeTdComAmount(BigDecimal cooperativeTdComAmount) {
+        this.cooperativeTdComAmount = cooperativeTdComAmount;
+    }
+
+    public BigDecimal getBorrowerRate() {
+        return borrowerRate;
+    }
+
+    public void setBorrowerRate(BigDecimal borrowerRate) {
+        this.borrowerRate = borrowerRate;
+    }
+
+    public BigDecimal getBorrowAmount() {
+        return borrowAmount;
+    }
+
+    public void setBorrowAmount(BigDecimal borrowAmount) {
+        this.borrowAmount = borrowAmount;
+    }
+
+    public String getCreditorId() {
+        return creditorId;
+    }
+
+    public void setCreditorId(String creditorId) {
+        this.creditorId = creditorId;
+    }
+
+    public Boolean getBailorWithdraw() {
+        return isBailorWithdraw;
+    }
+
+    public void setBailorWithdraw(Boolean bailorWithdraw) {
+        isBailorWithdraw = bailorWithdraw;
+    }
+
+    public Integer getPayType() {
+        return payType;
+    }
+
+    public void setPayType(Integer payType) {
+        this.payType = payType;
+    }
+
+    public Integer getProjectFrom() {
+        return projectFrom;
+    }
+
+    public void setProjectFrom(Integer projectFrom) {
+        this.projectFrom = projectFrom;
+    }
+
+    public String getFundUse() {
+        return fundUse;
+    }
+
+    public void setFundUse(String fundUse) {
+        this.fundUse = fundUse;
+    }
+
+    public String getRepaymentAssure() {
+        return repaymentAssure;
+    }
+
+    public void setRepaymentAssure(String repaymentAssure) {
+        this.repaymentAssure = repaymentAssure;
+    }
+
+    public String getExt() {
+        return Ext;
+    }
+
+    public void setExt(String ext) {
+        Ext = ext;
+    }
+
+    public BigDecimal getMonthPrincipalAmount() {
+        return monthPrincipalAmount;
+    }
+
+    public void setMonthPrincipalAmount(BigDecimal monthPrincipalAmount) {
+        this.monthPrincipalAmount = monthPrincipalAmount;
+    }
+
+    public Integer getQueryProjectStatus() {
+        return queryProjectStatus;
+    }
+
+    public void setQueryProjectStatus(Integer queryProjectStatus) {
+        this.queryProjectStatus = queryProjectStatus;
+    }
+
+    public String getQueryStatusDesc() {
+        return queryStatusDesc;
+    }
+
+    public void setQueryStatusDesc(String queryStatusDesc) {
+        this.queryStatusDesc = queryStatusDesc;
+    }
+
+    public BigDecimal getQueryCastedAmount() {
+        return queryCastedAmount;
+    }
+
+    public void setQueryCastedAmount(BigDecimal queryCastedAmount) {
+        this.queryCastedAmount = queryCastedAmount;
+    }
+
+    public Date getQueryAuditDate() {
+        return queryAuditDate;
+    }
+
+    public void setQueryAuditDate(Date queryAuditDate) {
+        this.queryAuditDate = queryAuditDate;
+    }
+
+    public String getQueryResultContent() {
+        return queryResultContent;
+    }
+
+    public void setQueryResultContent(String queryResultContent) {
+        this.queryResultContent = queryResultContent;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public String getCreateUser() {
+        return createUser;
+    }
+
+    public void setCreateUser(String createUser) {
+        this.createUser = createUser;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    public String getUpdateUser() {
+        return updateUser;
+    }
+
+    public void setUpdateUser(String updateUser) {
+        this.updateUser = updateUser;
+    }
 }

@@ -40,8 +40,6 @@ public class CreatRepayPlanReq {
     private  List<TuandaiProjInfoReq> tuandaiProjReqInfos;
 
 
-
-
     public BusinessBasicInfoReq getBusinessBasicInfoReq() {
         return businessBasicInfoReq;
     }

@@ -13,23 +13,35 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
  * <p>
- * 业务还款计划列表
+ * 标的还款计划列表
  * </p>
  *
- * @author 王继光
- * @since 2018-03-06
+ * @author 曾坤
+ * @since 2018-04-24
  */
 @ApiModel
-@TableName("tb_repayment_biz_plan_list")
-public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
+@TableName("tb_repayment_proj_plan_list")
+public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 还款计划列表ID(主键)
+     * 标的还款计划列表ID(主键)
      */
-    @TableId("plan_list_id")
-	@ApiModelProperty(required= true,value = "还款计划列表ID(主键)")
+    @TableId("proj_plan_list_id")
+	@ApiModelProperty(required= true,value = "标的还款计划列表ID(主键)")
+	private String projPlanListId;
+    /**
+     * 所属标的还款计划编号(外键，对应tb_repayment_proj_plan.proj_plan_id)
+     */
+	@TableField("proj_plan_id")
+	@ApiModelProperty(required= true,value = "所属标的还款计划编号(外键，对应tb_repayment_proj_plan.proj_plan_id)")
+	private String projPlanId;
+    /**
+     * 对应业务还款计划列表编号(外键，对应tb_repayment_biz_plan_list.plan_list_id)
+     */
+	@TableField("plan_list_id")
+	@ApiModelProperty(required= true,value = "对应业务还款计划列表编号(外键，对应tb_repayment_biz_plan_list.plan_list_id)")
 	private String planListId;
     /**
      * 所属还款计划编号(外键，对应tb_repayment_biz_plan.plan_id)
@@ -38,19 +50,17 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 	@ApiModelProperty(required= true,value = "所属还款计划编号(外键，对应tb_repayment_biz_plan.plan_id)")
 	private String planId;
     /**
-     * 还款计划所属业务ID(若当前业务为展期，则存展期业务编号)
+     * 还款计划所属业务编号(若当前业务为展期，则存展期业务编号)
      */
 	@TableField("business_id")
-	@ApiModelProperty(required= true,value = "还款计划所属业务ID(若当前业务为展期，则存展期业务编号)")
+	@ApiModelProperty(required= true,value = "还款计划所属业务编号(若当前业务为展期，则存展期业务编号)")
 	private String businessId;
-	
-	/**
+    /**
      * 还款计划所属原业务编号
      */
 	@TableField("orig_business_id")
 	@ApiModelProperty(required= true,value = "还款计划所属原业务编号")
 	private String origBusinessId;
-	
     /**
      * 当前还款计划期数，若期数为0，表示为展期还款计划第0期或者线下出款业务的第0期
      */
@@ -90,7 +100,7 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
      * 当前还款状态，目前只有三种，分别为"还款中"，"逾期"，"已还款"
      */
 	@TableField("current_status")
-	@ApiModelProperty(required= true,value = "当前还款状态，目前只有三种，分别为还款中,逾期,已还款")
+	@ApiModelProperty(required= true,value = "当前还款状态，目前只有三种，分别为‘还款中’，‘逾期’，‘已还款’")
 	private String currentStatus;
     /**
      * 已还款类型标记，null或0：还款中，6：申请展期已还款，10：线下确认已还款，20：自动线下代扣已还款，21，人工线下代扣已还款，30：自动银行代扣已还款，31：人工银行代扣已还款，40：用户APP主动还款，50：线下财务确认全部结清，60：线下代扣全部结清，70：银行代扣全部结清
@@ -141,6 +151,12 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 	@ApiModelProperty(required= true,value = "确认自动代扣的确认者ID")
 	private String autoWithholdingConfirmedUser;
     /**
+     * 确认自动代扣的确认者姓名
+     */
+	@TableField("auto_withholding_confirmed_user_name")
+	@ApiModelProperty(required= true,value = "确认自动代扣的确认者姓名")
+	private String autoWithholdingConfirmedUserName;
+    /**
      * 会计确认状态，0或null:待审核;1:已审核;2:已退回;3:已返审核;4:导入;
      */
 	@TableField("accountant_confirm_status")
@@ -164,6 +180,36 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 	@TableField("accountant_confirm_date")
 	@ApiModelProperty(required= true,value = "会计确认日期")
 	private Date accountantConfirmDate;
+    /**
+     * 标的资金端(平台)应还日期
+     */
+	@TableField("proj_due_date")
+	@ApiModelProperty(required= true,value = "标的资金端(平台)应还日期")
+	private Date projDueDate;
+    /**
+     * 标的当前期资产端总应还金额(元)，不含滞纳金
+     */
+	@TableField("biz_amount")
+	@ApiModelProperty(required= true,value = "标的当前期资产端总应还金额(元)，不含滞纳金")
+	private BigDecimal bizAmount;
+    /**
+     * 标的当前期资产端总应还滞纳金(元)，每天零点由系统自动计算
+     */
+	@TableField("biz_overdue_amount")
+	@ApiModelProperty(required= true,value = "标的当前期资产端总应还滞纳金(元)，每天零点由系统自动计算")
+	private BigDecimal bizOverdueAmount;
+    /**
+     * 标的当前期资金端总应还金额(元)，不含滞纳金
+     */
+	@TableField("proj_amount")
+	@ApiModelProperty(required= true,value = "标的当前期资金端总应还金额(元)，不含滞纳金")
+	private BigDecimal projAmount;
+    /**
+     * 标的当前期资金端总应还滞纳金(元)
+     */
+	@TableField("proj_overdue_amount")
+	@ApiModelProperty(required= true,value = "标的当前期资金端总应还滞纳金(元)")
+	private BigDecimal projOverdueAmount;
     /**
      * 还款备注
      */
@@ -202,6 +248,22 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 	private String updateUser;
 
 
+	public String getProjPlanListId() {
+		return projPlanListId;
+	}
+
+	public void setProjPlanListId(String projPlanListId) {
+		this.projPlanListId = projPlanListId;
+	}
+
+	public String getProjPlanId() {
+		return projPlanId;
+	}
+
+	public void setProjPlanId(String projPlanId) {
+		this.projPlanId = projPlanId;
+	}
+
 	public String getPlanListId() {
 		return planListId;
 	}
@@ -224,6 +286,14 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 
 	public void setBusinessId(String businessId) {
 		this.businessId = businessId;
+	}
+
+	public String getOrigBusinessId() {
+		return origBusinessId;
+	}
+
+	public void setOrigBusinessId(String origBusinessId) {
+		this.origBusinessId = origBusinessId;
 	}
 
 	public Integer getPeriod() {
@@ -346,6 +416,14 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 		this.autoWithholdingConfirmedUser = autoWithholdingConfirmedUser;
 	}
 
+	public String getAutoWithholdingConfirmedUserName() {
+		return autoWithholdingConfirmedUserName;
+	}
+
+	public void setAutoWithholdingConfirmedUserName(String autoWithholdingConfirmedUserName) {
+		this.autoWithholdingConfirmedUserName = autoWithholdingConfirmedUserName;
+	}
+
 	public Integer getAccountantConfirmStatus() {
 		return accountantConfirmStatus;
 	}
@@ -376,6 +454,46 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 
 	public void setAccountantConfirmDate(Date accountantConfirmDate) {
 		this.accountantConfirmDate = accountantConfirmDate;
+	}
+
+	public Date getProjDueDate() {
+		return projDueDate;
+	}
+
+	public void setProjDueDate(Date projDueDate) {
+		this.projDueDate = projDueDate;
+	}
+
+	public BigDecimal getBizAmount() {
+		return bizAmount;
+	}
+
+	public void setBizAmount(BigDecimal bizAmount) {
+		this.bizAmount = bizAmount;
+	}
+
+	public BigDecimal getBizOverdueAmount() {
+		return bizOverdueAmount;
+	}
+
+	public void setBizOverdueAmount(BigDecimal bizOverdueAmount) {
+		this.bizOverdueAmount = bizOverdueAmount;
+	}
+
+	public BigDecimal getProjAmount() {
+		return projAmount;
+	}
+
+	public void setProjAmount(BigDecimal projAmount) {
+		this.projAmount = projAmount;
+	}
+
+	public BigDecimal getProjOverdueAmount() {
+		return projOverdueAmount;
+	}
+
+	public void setProjOverdueAmount(BigDecimal projOverdueAmount) {
+		this.projOverdueAmount = projOverdueAmount;
 	}
 
 	public String getRemark() {
@@ -420,15 +538,18 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 
 	@Override
 	protected Serializable pkVal() {
-		return this.planListId;
+		return this.projPlanListId;
 	}
 
 	@Override
 	public String toString() {
-		return "RepaymentBizPlanList{" +
+		return "RepaymentProjPlanList{" +
+			", projPlanListId=" + projPlanListId +
+			", projPlanId=" + projPlanId +
 			", planListId=" + planListId +
 			", planId=" + planId +
 			", businessId=" + businessId +
+			", origBusinessId=" + origBusinessId +
 			", period=" + period +
 			", afterId=" + afterId +
 			", dueDate=" + dueDate +
@@ -444,30 +565,22 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 			", confirmFlag=" + confirmFlag +
 			", autoWithholdingConfirmedDate=" + autoWithholdingConfirmedDate +
 			", autoWithholdingConfirmedUser=" + autoWithholdingConfirmedUser +
+			", autoWithholdingConfirmedUserName=" + autoWithholdingConfirmedUserName +
 			", accountantConfirmStatus=" + accountantConfirmStatus +
 			", accountantConfirmUser=" + accountantConfirmUser +
 			", accountantConfirmUserName=" + accountantConfirmUserName +
 			", accountantConfirmDate=" + accountantConfirmDate +
+			", projDueDate=" + projDueDate +
+			", bizAmount=" + bizAmount +
+			", bizOverdueAmount=" + bizOverdueAmount +
+			", projAmount=" + projAmount +
+			", projOverdueAmount=" + projOverdueAmount +
 			", remark=" + remark +
 			", createTime=" + createTime +
 			", createUser=" + createUser +
 			", updateTime=" + updateTime +
 			", updateUser=" + updateUser +
 			"}";
-	}
-
-	/**
-	 * @return the origBusinessId
-	 */
-	public String getOrigBusinessId() {
-		return origBusinessId;
-	}
-
-	/**
-	 * @param origBusinessId the origBusinessId to set
-	 */
-	public void setOrigBusinessId(String origBusinessId) {
-		this.origBusinessId = origBusinessId;
 	}
 
 	public Integer getActive() {
