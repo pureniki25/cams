@@ -279,9 +279,9 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
 		        	  RepaymentBizPlanList pList=null;
 		        	     List<ApplyDerateProcessOtherFees> otherFeesList=null;
 		            ApplyDerateProcess applyDerateProcess = selectList(new EntityWrapper<ApplyDerateProcess>().eq("process_id",req.getProcess().getProcessId())).get(0);
-		            if(req.getRealReceiveMoney() == null){
-		                throw new RuntimeException("实收金额不能为空");
-		            }
+//		            if(req.getRealReceiveMoney() == null){
+//		                throw new RuntimeException("实收金额不能为空");
+//		            }
 		            applyDerateProcess.setRealReceiveMoney(req.getRealReceiveMoney());
 		            updateById(applyDerateProcess);
 		            
