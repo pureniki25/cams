@@ -146,7 +146,12 @@ window.layinit(function (htConfig) {
                 needPayAgency:"",//应收中介费
                 needPayAgency:"",//应收中介费
                 totalFactAmount:"",//实还金额
-                settleTotalFactAmount:""//结清时该业务实还总额
+                settleTotalFactAmount:"",//结清时该业务实还总额
+                settleNeedPayInterest:"",//结清时该业应付利息;  
+                settleNeedPayService:"",//结清时该业应付月收服务费; 
+                noSettleNeedPayInterest:"",//不结清时该业应付利息;  
+                noSettleNeedPayService:"",//不结清时该业应付月收服务费; 
+                noSettleNeedPayPrincipal:""//不结清时应付本金;
             },
 
             
@@ -359,14 +364,42 @@ window.layinit(function (htConfig) {
                		}
             	  vm.baseInfoForm.outsideInterest=0;
             	  vm.baseInfoForm.preLateFees=0;
-//            	  vm.applyInfoForm.realReceiveMoney=vm.baseInfoForm.totalFactAmount;
+            	  vm.applyInfoForm.realReceiveMoney=vm.baseInfoForm.totalFactAmount;
+            	  if(vm.applyInfoForm.realReceiveMoney==0){
+            		  vm.applyInfoForm.realReceiveMoney=''
+            	  }
+            	  
+            	  //不结清时应付本金
+            	  vm.baseInfoForm.needPayPrincipal=vm.baseInfoForm.noSettleNeedPayPrincipal
+            	  //不结清时应付利息
+            	  vm.baseInfoForm.needPayInterest=vm.baseInfoForm.noSettleNeedPayInterest
+            	  //不结清时应付月收服务费
+            	  vm.baseInfoForm.needPayService=vm.baseInfoForm.noSettleNeedPayService
+            	  //不结清时，新增费用项全部为0
             	  setOhterFeeZero();
+            	  //重新计算应付总额
+            	  getTotalShouldPay();
+            	  
               }
-              if(flage==true){
+              if(flage==true){debugger
+            	  
             	  vm.otherFeeShowFlage=true;
-//            	  vm.applyInfoForm.realReceiveMoney=vm.baseInfoForm.settleTotalFactAmount;
+            	  vm.applyInfoForm.realReceiveMoney=vm.baseInfoForm.settleTotalFactAmount;
+            	  if(vm.applyInfoForm.realReceiveMoney==0){
+            		  vm.applyInfoForm.realReceiveMoney=''
+            	  }
             	  showData();
-            	
+            	  //结清时应付本金等于剩余本金
+            	  vm.baseInfoForm.needPayPrincipal=vm.baseInfoForm.remianderPrincipal
+            	  //结清时应付利息
+            	  vm.baseInfoForm.needPayInterest=vm.baseInfoForm.settleNeedPayInterest
+            	  //结清时应付月收服务费
+            	  vm.baseInfoForm.needPayService=vm.baseInfoForm.settleNeedPayService
+            	  
+            	  //重新计算应付总额
+            	  getTotalShouldPay();
+            	  
+            	  
               }
 
             },
@@ -764,7 +797,15 @@ var getShowInfo = function () {
                     	vm.baseInfoForm.delayDays=0;
                     }
                 }
-                
+                //默认加载结清的数据
+		            //结清时应付本金等于剩余本金
+		      	  vm.baseInfoForm.needPayPrincipal=vm.baseInfoForm.remianderPrincipal
+		      	  //结清时应付利息
+		      	  vm.baseInfoForm.needPayInterest=vm.baseInfoForm.settleNeedPayInterest
+		      	  //结清时应付月收服务费
+		      	  vm.baseInfoForm.needPayService=vm.baseInfoForm.settleNeedPayService
+            
+            
                //获取提前还款违约金
                 showData();
             
@@ -1075,7 +1116,7 @@ var Submit = function () {
 //                vm.$Message.error({content: '请填写实收金额!'});
 //                return ;
 //            }
-//            vm.approvalInfoForm.realReceiveMoney = vm.applyInfoForm.realReceiveMoney;
+            vm.approvalInfoForm.realReceiveMoney = vm.applyInfoForm.realReceiveMoney;
         }
 
         vm.$refs['approvalInfoForm'].validate((valid) => {

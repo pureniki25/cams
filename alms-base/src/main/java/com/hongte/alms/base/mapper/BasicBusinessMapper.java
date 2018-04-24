@@ -7,6 +7,7 @@ import com.hongte.alms.common.mapper.SuperMapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -65,8 +66,12 @@ public interface BasicBusinessMapper extends SuperMapper<BasicBusiness> {
 	 * @return
 	 */
 	 Double getMonthSumFactAmount(@Param("original_business_id") String original_business_id);
- 
-	 
+	 /**
+	 * 	 （所有还款计划中）的应还利息 和（所有还款计划中）的应还月收服务费
+	 * @param original_business_id
+	 * @return
+	 */
+	 Map<String, Object>  getNeedPay(@Param("original_business_id") String original_business_id);
 	 
 }
 

@@ -154,6 +154,11 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 		 return basicBusinessMapper.getMonthSumFactAmount(original_business_id);
 	}
 
+	@Override
+	public Map<String, Object> getNeedPay(String original_business_id) {
+		return basicBusinessMapper.getNeedPay(original_business_id);
+	}
+
 //    Public List<BusinessInfoForApplyDerateVo> selectBusinessInfoForApplyDerateVo(String crpId){
 //       return  basicBusinessMapper.selectBusinessInfoForApplyDerateVo(crpId);
 //    }

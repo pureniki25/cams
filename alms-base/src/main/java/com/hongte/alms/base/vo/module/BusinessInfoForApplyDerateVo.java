@@ -49,9 +49,64 @@ public class BusinessInfoForApplyDerateVo  {
     private BigDecimal needPayAgency;//应收中介费
     private BigDecimal totalFactAmount;//实还总额;
     private BigDecimal settleTotalFactAmount;//结清时该业务实还总额;
+    private BigDecimal settleNeedPayInterest;//结清时该业应付利息;  
+    private BigDecimal settleNeedPayService;//结清时该业应付月收服务费;   
+    private BigDecimal noSettleNeedPayInterest;//不结清时该业应付利息;  
+    private BigDecimal noSettleNeedPayService;//不结清时该业应付月收服务费; 
+    private BigDecimal noSettleNeedPayPrincipal;//不结清时应付本金;
     
-     
-    public BigDecimal getSettleTotalFactAmount() {
+    
+    public BigDecimal getNoSettleNeedPayInterest() {
+		return noSettleNeedPayInterest;
+	}
+
+
+	public void setNoSettleNeedPayInterest(BigDecimal noSettleNeedPayInterest) {
+		this.noSettleNeedPayInterest = noSettleNeedPayInterest;
+	}
+
+
+	public BigDecimal getNoSettleNeedPayService() {
+		return noSettleNeedPayService;
+	}
+
+
+	public void setNoSettleNeedPayService(BigDecimal noSettleNeedPayService) {
+		this.noSettleNeedPayService = noSettleNeedPayService;
+	}
+
+
+	public BigDecimal getNoSettleNeedPayPrincipal() {
+		return noSettleNeedPayPrincipal;
+	}
+
+
+	public void setNoSettleNeedPayPrincipal(BigDecimal noSettleneedPayPrincipal) {
+		this.noSettleNeedPayPrincipal = noSettleneedPayPrincipal;
+	}
+
+
+	public BigDecimal getSettleNeedPayInterest() {
+		return settleNeedPayInterest;
+	}
+
+
+	public void setSettleNeedPayInterest(BigDecimal settleNeedPayInterest) {
+		this.settleNeedPayInterest = settleNeedPayInterest;
+	}
+
+
+	public BigDecimal getSettleNeedPayService() {
+		return settleNeedPayService;
+	}
+
+
+	public void setSettleNeedPayService(BigDecimal settleNeedPayService) {
+		this.settleNeedPayService = settleNeedPayService;
+	}
+
+
+	public BigDecimal getSettleTotalFactAmount() {
 		return settleTotalFactAmount;
 	}
 

@@ -343,7 +343,43 @@
         ORDER BY t1.due_date
 		  limit 1;
     </select>
+	<!-- 结清最终缴纳的利息总额何应付月收服务费 -->
+	<select id="getNeedPay" resultType="map">
+	            
+		select 
+		
+		   --   应还利息总额（应付利息）-->
+		      SUM(
+		        CASE
+		          WHEN pDetail.plan_item_type = 20 
+		          THEN pDetail.plan_amount 
+		          ELSE 0 
+		        END
+		      ) `settleNeedPayInterest`,
+		      	          --   应付月收服务费-->
+		      SUM(
+		        CASE
+		          WHEN (
+		            pDetail.plan_item_type = 30 
+		            or pDetail.plan_item_type = 50 
+		      
+		          ) 
+		          THEN pDetail.plan_amount 
+		          ELSE 0 
+		        END
+		      ) `settleNeedPayService`
+		from 
 
+		tb_repayment_biz_plan_list_detail pDetail
+
+		left join tb_repayment_biz_plan_list pList on
+		pList.plan_list_id=pDetail.plan_list_id
+
+		left join tb_basic_business business on
+		business.business_id=pList.orig_business_id
+		where business.business_id=#{original_business_id} and pList.current_status!='已还款'
+	</select>
+	
 
 
 

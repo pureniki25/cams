@@ -214,6 +214,15 @@ public class ApplyDerateController {
     		    businessVoList.get(0).setSumFactAmount(basicBusinessService.getMonthSumFactAmount(businessVoList.get(0).getBusinessId())==null?BigDecimal.valueOf(0):BigDecimal.valueOf(basicBusinessService.getMonthSumFactAmount(businessVoList.get(0).getBusinessId())));
     		    //提前结清该业务实还金额
     		    businessVoList.get(0).setSettleTotalFactAmount(basicBusinessService.getSettleTotalFactSum(businessVoList.get(0).getBusinessId())==null?BigDecimal.valueOf(0):BigDecimal.valueOf(basicBusinessService.getSettleTotalFactSum(businessVoList.get(0).getBusinessId())));
+    		    //提前结清（所有还款计划中）的应还利息 ,（所有还款计划中）的应还月收服务费
+    		    Map<String,Object> map=basicBusinessService.getNeedPay(businessVoList.get(0).getBusinessId());
+    		    businessVoList.get(0).setSettleNeedPayInterest( StringUtil.notEmpty(map.get("settleNeedPayInterest").toString())?BigDecimal.valueOf(Double.valueOf(map.get("settleNeedPayInterest").toString())):BigDecimal.valueOf(0));
+    		    businessVoList.get(0).setSettleNeedPayService( StringUtil.notEmpty(map.get("settleNeedPayService").toString())?BigDecimal.valueOf(Double.valueOf(map.get("settleNeedPayService").toString())):BigDecimal.valueOf(0));
+    		    businessVoList.get(0).setNoSettleNeedPayInterest(businessVoList.get(0).getNeedPayInterest());
+    		    businessVoList.get(0).setNoSettleNeedPayPrincipal(businessVoList.get(0).getNeedPayPrincipal());
+    		    businessVoList.get(0).setNoSettleNeedPayService(businessVoList.get(0).getNeedPayService());
+    		    
+    		    
     		    
     		    //判断是车贷还是房贷的减免费用项
     		    if(businessVoList.get(0).getBusinessType()==BusinessTypeEnum.CYD_TYPE.getValue()||businessVoList.get(0).getBusinessType()==BusinessTypeEnum.CYDZQ_TYPE.getValue()) {
