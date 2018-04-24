@@ -203,6 +203,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
             process = selectById(processSaveReq.getProcessId());
             if(processSaveReq.getProcessStatus()!= process.getStatus()){
                 process.setStatus(processSaveReq.getProcessStatus());
+                process.setUpdateTime(new Date());
 //                process.setStartTime( new Date());
 //                process.setStartUserId(Constant.DEV_DEFAULT_USER);
 //                updateProcess(process);
