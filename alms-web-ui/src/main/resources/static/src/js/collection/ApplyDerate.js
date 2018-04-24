@@ -29,16 +29,17 @@ var setFormValidate = {
 //        {required: true, message: '请填写申请减免费用项', trigger: 'change'}
 //    ],
 		
-	derateType:[
-        {required: true, message: '请选择减免费用项', trigger: 'change'}
-    ],
-	        
-    derateMoney:[
-        {required: true, message: '请填写减免金额', trigger: 'change'}
-    ],
+//		feeId:[
+//        {required: true, message: '请选择减免费用项', trigger: 'change'}
+//    ],
+//	        
+//    derateMoney:[
+//        {required: true, message: '请填写减免金额', trigger: 'change'}
+//    ],
     isSettleFlage: [
         {required: true, message: '请填选择是否结清', trigger: 'change'}
     ],
+    
     realReceiveMoney: [
         {pattern:/^[0-9]+(.[0-9]{1,2})?$/,   message: '请填写不超过两位小数的数字', trigger: 'blur'}
     ],

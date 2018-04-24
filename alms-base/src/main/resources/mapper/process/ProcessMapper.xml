@@ -259,6 +259,7 @@
         business.business_id as businessId,
         business.customer_name as customerName,
         process.create_time as createTime,
+        process.update_time as update_time,
         process.process_typeid as processTypeId,
         p_type.type_name as processTypeName,
         p_type.type_code as processTypeCode,

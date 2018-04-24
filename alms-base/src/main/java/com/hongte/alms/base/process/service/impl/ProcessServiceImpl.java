@@ -177,6 +177,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
             process = new Process();
             process.setProcessId(UUID.randomUUID().toString());
             process.setCreateTime(new Date());
+            process.setUpdateTime(new Date());
             process.setCreateUser(loginUserInfoHelper.getUserId());
             process.setCurrentStep(step.getStep());
 
@@ -998,6 +999,9 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
 				processVo.setMyApprove(true);
 			}else {
 				processVo.setMyApprove(false);
+			}
+			if(processVo.getUpdateTime()!=null) {
+				processVo.setCreateTime(processVo.getUpdateTime());
 			}
 		}
         pages.setRecords(setProcessVoListInfo(list));

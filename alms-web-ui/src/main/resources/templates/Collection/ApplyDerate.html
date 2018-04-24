@@ -266,7 +266,7 @@ color: #FF3030;
                     </row>
                     <row :gutter="16" v-for="(item, index) in applyTypes">
                         <i-col span="7">
-                            <form-item v-if="applyInfoFormEditFlage == true"  :label="'申请减免费用项' +(index+1)" prop="derateType" >
+                            <form-item v-if="applyInfoFormEditFlage == true"  :label="'申请减免费用项' +(index+1)" prop="feeId" >
                                 <i-select v-model="item.feeId" clearable filterable  >
                                     <i-option v-for="item in derateTypeList" :value="item.feeId" :key="item.feeId" >{{ item.planItemName }}</i-option>
                                 </i-select>
