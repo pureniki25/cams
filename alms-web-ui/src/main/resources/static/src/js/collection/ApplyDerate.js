@@ -15,6 +15,8 @@ var processId = document.getElementById("processId").getAttribute("value");
 
 //业务类型ID
 var businessTypeId = getQueryStr("businessTypeId");
+//期数
+var afterId=getQueryStr("afterId");
 var isReceiveMoney=false;
 
 //设置表单验证
@@ -711,8 +713,8 @@ var getGeneralReturnRate= function () {debugger
 ///////////车贷:获取提前结清违约金
 var getPreLateFees = function () {debugger
 
-    var reqStr = basePath +"ApplyDerateController/getPreLateFees?crpId="+crpId+"&preLateFeesType="+vm.baseInfoForm.preLateFeesType
-  
+    var reqStr = basePath +"ApplyDerateController/getPreLateFees?crpId="+crpId+"&preLateFeesType="+vm.baseInfoForm.preLateFeesType+"&afterId="+afterId;
+   
     axios.get(reqStr)
         .then(function (res) {debugger
             if (res.data.code == "1") {
@@ -730,7 +732,7 @@ var getPreLateFees = function () {debugger
 ///////////车贷：获取整个业务的滞纳金
 var getPreviousLateFees = function () {
 
-    var reqStr = basePath +"ApplyDerateController/getPreLateFees?crpId="+crpId+"&preLateFeesType="+vm.baseInfoForm.preLateFeesType
+    var reqStr = basePath +"ApplyDerateController/getPreLateFees?crpId="+crpId+"&preLateFeesType="+vm.baseInfoForm.preLateFeesType+"&afterId="+afterId
   
     axios.get(reqStr)
         .then(function (res) {debugger
@@ -758,7 +760,7 @@ var getPreviousLateFees = function () {
 ///////////车贷:获取合同期外逾期利息
 var getOutsideInterest = function () {debugger
 
-    var reqStr = basePath +"ApplyDerateController/getOutsideInterest?crpId="+crpId+"&outsideInterestType="+vm.baseInfoForm.outsideInterestType
+    var reqStr = basePath +"ApplyDerateController/getOutsideInterest?crpId="+crpId+"&outsideInterestType="+vm.baseInfoForm.outsideInterestType+"&afterId="+afterId;
   
     axios.get(reqStr)
         .then(function (res) {
@@ -781,7 +783,7 @@ var getOutsideInterest = function () {debugger
 //从后台获取显示数据
 var getShowInfo = function () {
     //取显示需要的相关信息
-    var reqStr = basePath +"ApplyDerateController/selectApplyDeratePageShowInfo?crpId="+crpId
+    var reqStr = basePath +"ApplyDerateController/selectApplyDeratePageShowInfo?crpId="+crpId+"&afterId="+afterId;
     if(processId !=null){
         reqStr += "&processId="+processId;
     }

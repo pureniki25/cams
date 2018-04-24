@@ -217,7 +217,7 @@
 		      SUM(bplan.borrow_money) AS `getMoney`,
 		      bplan.original_business_id AS `original_business_id` 
 		    FROM
-		      tb_repayment_biz_plan bplan 
+		      tb_repayment_biz_plan bplan  where bplan.is_defer=#{isDefer}
 		    GROUP BY bplan.original_business_id) b 
 		    ON business.business_id = b.original_business_id 
 		WHERE pList.plan_list_id = #{crpId,jdbcType=VARCHAR}

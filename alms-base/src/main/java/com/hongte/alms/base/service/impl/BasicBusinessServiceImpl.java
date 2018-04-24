@@ -42,8 +42,8 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 
 
 
-    public List<BusinessInfoForApplyDerateVo> selectBusinessInfoForApplyDerateVo(String crpId){
-        List<BusinessInfoForApplyDerateVo> List  =  basicBusinessMapper.selectBusinessInfoForApplyDerateVo(crpId);
+    public List<BusinessInfoForApplyDerateVo> selectBusinessInfoForApplyDerateVo(String crpId,Integer isDefer){
+        List<BusinessInfoForApplyDerateVo> List  =  basicBusinessMapper.selectBusinessInfoForApplyDerateVo(crpId,isDefer);
         
        
         //利息类型列表
@@ -90,8 +90,8 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 
     }
 
-    public BusinessInfoForApplyDerateVo selectBusinessInfoForApplyDerateVoOne(String crpId){
-        List<BusinessInfoForApplyDerateVo> List  =selectBusinessInfoForApplyDerateVo(crpId);
+    public BusinessInfoForApplyDerateVo selectBusinessInfoForApplyDerateVoOne(String crpId,Integer isDefer){
+        List<BusinessInfoForApplyDerateVo> List  =selectBusinessInfoForApplyDerateVo(crpId,isDefer);
 
 
         if(List.size()>0){
@@ -156,6 +156,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 
 	@Override
 	public Map<String, Object> getNeedPay(String original_business_id) {
+		// TODO Auto-generated method stub
 		return basicBusinessMapper.getNeedPay(original_business_id);
 	}
 

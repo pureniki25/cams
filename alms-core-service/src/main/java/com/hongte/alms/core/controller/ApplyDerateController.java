@@ -184,16 +184,21 @@ public class ApplyDerateController {
     @ResponseBody
     public Result<Map<String,Object>> selectApplyDeratePageShowInfo(
             @RequestParam("crpId") String crpId,
+            @RequestParam("afterId") String afterId,
+            
             @RequestParam(value = "processId",required = false) String processId
     ){
         Map<String,Object> retMap = new HashMap<>();
 
 
 
-
+      Integer isDefer=0;
         try{
+        	if(afterId!=null&&afterId.startsWith("ZQ")) {
+        		isDefer=1;
+        	}
             //基本信息
-            List<BusinessInfoForApplyDerateVo> businessVoList =  basicBusinessService.selectBusinessInfoForApplyDerateVo(crpId);
+            List<BusinessInfoForApplyDerateVo> businessVoList =  basicBusinessService.selectBusinessInfoForApplyDerateVo(crpId,isDefer);
      
             //还款方式类型列表
             List<SysParameter> repayTypeList =  sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterTypeEnums.REPAYMENT_TYPE.getKey()).orderBy("row_Index"));
@@ -400,12 +405,19 @@ public class ApplyDerateController {
     @ResponseBody
     public Result<Map<String,Object>> getPreLateFees(
             @RequestParam("crpId") String crpId,
+            @RequestParam(value="afterId") String afterId,
             @RequestParam(value = "preLateFeesType") String preLateFeesType
     ){
+    	
+    	
         Map<String,Object> retMap = new HashMap<>();
         try{
+        	  Integer isDefer=0;
+              	if(afterId!=null&&afterId.startsWith("ZQ")) {
+              		isDefer=1;
+              	}
             //基本信息
-            List<BusinessInfoForApplyDerateVo> businessVoList =  basicBusinessService.selectBusinessInfoForApplyDerateVo(crpId);
+            List<BusinessInfoForApplyDerateVo> businessVoList =  basicBusinessService.selectBusinessInfoForApplyDerateVo(crpId,isDefer);
      
             String businessId="";
             if (!CollectionUtils.isEmpty(businessVoList)) {
@@ -449,12 +461,18 @@ public class ApplyDerateController {
     @ResponseBody
     public Result<Map<String,Object>> getOutsideInterest(
             @RequestParam("crpId") String crpId,
+            @RequestParam("afterId") String afterId,
             @RequestParam(value = "outsideInterestType") String outsideInterestType
     ){
         Map<String,Object> retMap = new HashMap<>();
         try{
+        	 Integer isDefer=0;
+           	if(afterId!=null&&afterId.startsWith("ZQ")) {
+           		isDefer=1;
+           	}
+        	
             //基本信息
-            List<BusinessInfoForApplyDerateVo> businessVoList =  basicBusinessService.selectBusinessInfoForApplyDerateVo(crpId);
+            List<BusinessInfoForApplyDerateVo> businessVoList =  basicBusinessService.selectBusinessInfoForApplyDerateVo(crpId,isDefer);
      
             String businessId="";
             if (!CollectionUtils.isEmpty(businessVoList)) {

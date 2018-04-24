@@ -25,8 +25,8 @@ public interface BasicBusinessService extends BaseService<BasicBusiness> {
      * @param crpId
      * @return
      */
-    List<BusinessInfoForApplyDerateVo> selectBusinessInfoForApplyDerateVo(String crpId);
-    BusinessInfoForApplyDerateVo selectBusinessInfoForApplyDerateVoOne(String crpId);
+    List<BusinessInfoForApplyDerateVo> selectBusinessInfoForApplyDerateVo(String crpId,Integer isDefer);
+    BusinessInfoForApplyDerateVo selectBusinessInfoForApplyDerateVoOne(String crpId,Integer isDefer);
 
 
     /**

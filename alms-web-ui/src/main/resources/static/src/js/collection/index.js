@@ -425,7 +425,7 @@ window.layinit(function(htConfig){
                                 buttons.push(
                                     {
                                         "name": "减免申请", click: function (e, currentItem) {
-                                        var url = '/collectionUI/applyDerateUI?businessId=' + currentItem.businessId + '&crpId=' + currentItem.crpId + "&processStatus=-1"+'&businessTypeId='+currentItem.businessTypeId
+                                        var url = '/collectionUI/applyDerateUI?businessId=' + currentItem.businessId + '&crpId=' + currentItem.crpId + "&processStatus=-1"+'&businessTypeId='+currentItem.businessTypeId+"&afterId="+currentItem.afterId
                                         showOneLineOprLayer(url, "减免申请")
                                     }
                                     }
