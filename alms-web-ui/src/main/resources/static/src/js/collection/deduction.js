@@ -177,13 +177,16 @@ var layer;
 	var getDeductionInfo=function(){
 		
 		
-        var self = this;   self.$Modal
+        var self = this;   
         var reqStr =basePath+ "DeductionController/selectDeductionInfoByPlayListId?planListId=" + planListId
         axios.get(reqStr)
             .then(function (result) {
-                if (result.data.code == "1") {
+                if (result.data.code == "1") {debugger
                 	
-          
+                      if(result.data.data==null){
+                          vm.$Modal.error({content: '没有找到数据'});
+                          return;
+                      }
                     vm.ajax_data=result.data.data;
                     vm.platformId=result.data.data.platformId;
 //                    searchRepayLog();

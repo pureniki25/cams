@@ -106,7 +106,7 @@ public class DeductionController {
         try{
             //执行代扣信息
             DeductionVo deductionVo=  deductionService.selectDeductionInfoByPlanListId(planListId);
-      
+        	   
             return Result.success(deductionVo);
 
         }catch (Exception ex){
