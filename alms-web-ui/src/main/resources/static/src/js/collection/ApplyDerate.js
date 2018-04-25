@@ -383,7 +383,7 @@ window.layinit(function (htConfig) {
             	  getTotalShouldPay();
             	  
               }
-              if(flage==true){debugger
+              if(flage==true){
             	  
             	  vm.otherFeeShowFlage=true;
             	  vm.applyInfoForm.realReceiveMoney=vm.baseInfoForm.settleTotalFactAmount;
@@ -560,7 +560,7 @@ window.layinit(function (htConfig) {
 	    		 })
 	    	},
 	    	
-	     	addTypeTr :function(event){debugger
+	     	addTypeTr :function(event){
 	    		 this.applyTypes.push({
 	    			 derateTypeList: '',
 	    			 derateMoney: ''
@@ -571,7 +571,7 @@ window.layinit(function (htConfig) {
             {
 
                 var types=vm.applyTypes;
-       	       	if(types != null && types.length > 0){debugger
+       	       	if(types != null && types.length > 0){
        	           	for (var i = 0; i < types.length; i++){
        	           		if(i==index){
        	           			vm.applyInfoForm.shouldReceiveMoney=Number(vm.applyInfoForm.shouldReceiveMoney)+Number(types[i].derateMoney);
@@ -675,7 +675,7 @@ var restProcessApprovalInfo = function(){
 /////////////  流程审批相关函数 结束  ///////////////
 
 ///////////应付总额：应付本金+应付利息+应付月收服务费+应付滞纳金+应付其他费用+应付提前结清违约金+应付逾期利息
-var getTotalShouldPay = function () {debugger
+var getTotalShouldPay = function () {
 	vm.baseInfoForm.totalBorrowAmount=0;
 	
 	vm.baseInfoForm.totalBorrowAmount=vm.baseInfoForm.needPayPrincipal+vm.baseInfoForm.needPayInterest+vm.baseInfoForm.needPayService+vm.baseInfoForm.needPayPenalty
@@ -693,7 +693,7 @@ var getTotalShouldPay = function () {debugger
 //综合收益率
 //：（前置费用+出款后已交月收等费用总额+应付利息+应付月收服务费+应付滞纳金+应付其他费用+应付提前结清违约金+应付逾期利息）-减免金额合计/借款金额/借款期限
 //（借款期限是客户实际的借款期限，不足一个月按月计算）若客户提前结清或正常结清则直接去结清期的 期限即可，若客户逾期结清 则需计算 真实的借款期限，合同期限+（逾期天数/30 进一
-var getGeneralReturnRate= function () {debugger
+var getGeneralReturnRate= function () {
 	var borrowLimit=vm.baseInfoForm.borrowLimit;
 	vm.baseInfoForm.generalReturnRate=0;
     //逾期天数如果大于0,说明逾期，否则直接取借款期限
@@ -918,7 +918,7 @@ var getShowInfo = function () {
 ////////////////////---------------  减免项目类型 赋初始值 开始 -------------------////////////               	
             var types=res.data.data.applyTypes;
                 	
-                	if(types != null && types.length > 0){debugger
+                	if(types != null && types.length > 0){
                 		vm.applyTypes[types.length];
 	                	for (var i = 0; i < types.length; i++){
 	                		if(i > 0){
@@ -989,7 +989,7 @@ var getShowInfo = function () {
 
                     //----------------判断减免流程节点是否为结束节点，如果是结束节点可以编辑实收金额-----开始--------
 
-                    if(res.data.data.realReceiveMoneyEditFlage=="true"){debugger
+                    if(res.data.data.realReceiveMoneyEditFlage=="true"){
                     	vm.realReceiveMoneyEditFlage=true;
                     	isReceiveMoney=true;
                     }
@@ -1015,7 +1015,7 @@ var getShowInfo = function () {
  * 计算应收总减免后的金额
  * 
  */
-var getSumMoney= function (event,index) {debugger
+var getSumMoney= function (event,index) {
 		   var types=vm.applyTypes;
 		   vm.applyInfoForm.shouldReceiveMoney=0;
        	if(types != null && types.length > 0){
@@ -1065,7 +1065,7 @@ var setOhterFeeZero= function () {
 var dereteMoneySum= function () {
 	var dereteMoneySum=0;
 	   var types=vm.applyTypes;
-	if(types != null && types.length > 0){debugger
+	if(types != null && types.length > 0){
     	for (var i = 0; i < types.length; i++){
     		dereteMoneySum=dereteMoneySum+Number(types[i].derateMoney);
     	
@@ -1210,7 +1210,7 @@ var saveapplyInfo = function(pStatus){debugger
 	    			vm.reqRegFiles[i]=vm.returnRegFiles[i];
 
 	    		}
-                for(var i=0;i<vm.applyTypes.length;i++){debugger
+                for(var i=0;i<vm.applyTypes.length;i++){
 	    			if(vm.applyTypes[i].derateMoney==''){
 	    				   vm.$Modal.error({content: '减免费用金额不能为空' });
 	    				   return;
@@ -1225,7 +1225,7 @@ var saveapplyInfo = function(pStatus){debugger
 		               contentType: "application/json; charset=utf-8",
 		               data: JSON.stringify({"applyData":[vm.applyInfoForm],"reqRegFiles":vm.reqRegFiles,"applytTypes":vm.applyTypes,"otherDerateTypeList":vm.otherDerateTypeList,
 		            	   "outsideInterest":vm.baseInfoForm.outsideInterest,"generalReturnRate":vm.baseInfoForm.generalReturnRate,"preLateFees":vm.baseInfoForm.preLateFees}),
-		               success: function (res) {debugger
+		               success: function (res) {
 		            	   if (res.code == "1"){
 		            		   vm.$Modal.success({
 	                                // title: title,

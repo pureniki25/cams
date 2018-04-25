@@ -296,11 +296,17 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
 		            pList  =repaymentBizPlanListService.selectById(req.getCrpId());
 		            ApplyDerateProcess derateInfo = applyDerateProcessService.selectOne(new EntityWrapper<ApplyDerateProcess>().eq("process_id", process.getProcessId()));
 		            if(pList!=null&&derateInfo!=null) {
+		            //查询本期新增的费用项
 		            otherFeesList=applyDerateProcessOtherFeesService.selectList(new EntityWrapper<ApplyDerateProcessOtherFees>().eq("business_id", pList.getBusinessId()).eq("plan_list_id", pList.getPlanListId()).eq("apply_derate_process_id", derateInfo.getApplyDerateProcessId()));
+		    		
 		            for(ApplyDerateProcessOtherFees fee:otherFeesList) {	
 		            RepaymentBizPlanListDetail detail = ClassCopyUtil.copyObject(fee,RepaymentBizPlanListDetail.class);
+		            //插入本期新增的费用项
 		            repaymentBizPlanListDetailService.insert(detail);
 		            }
+		            //查询本期全部的费用项
+		            otherFeesList=applyDerateProcessOtherFeesService.selectList(new EntityWrapper<ApplyDerateProcessOtherFees>().eq("business_id", pList.getBusinessId()).eq("plan_list_id", pList.getPlanListId()));
+		 		   
 		       	 //todo发接口给信贷
 		            SycFee(otherFeesList, pList, derateInfo);
 		        }
@@ -324,7 +330,8 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
         	  addFeeList.add(addFee);
             }
         
-     List<ApplyDerateType>  applyDerateTypeList=applyDerateTypeService.selectList(new EntityWrapper<ApplyDerateType>().eq("apply_derate_process_id",derateInfo.getApplyDerateProcessId()));
+    // List<ApplyDerateType>  applyDerateTypeList=applyDerateTypeService.selectList(new EntityWrapper<ApplyDerateType>().eq("apply_derate_process_id",derateInfo.getApplyDerateProcessId()));
+     List<ApplyDerateType>  applyDerateTypeList=applyDerateTypeService.getApplyTypeByBusinessIdAndCrpId(derateInfo.getBusinessId(), derateInfo.getCrpId());//这个方法查出如果同一期减免多次费用的总额
        for(ApplyDerateType applyDerateType: applyDerateTypeList) {
     	   derateFee=new DerateFee();
     	   derateFee.setAmount(applyDerateType.getDerateMoney());

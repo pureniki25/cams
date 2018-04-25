@@ -18,5 +18,6 @@ import com.hongte.alms.common.service.BaseService;
  */
 public interface ApplyDerateTypeService extends BaseService<ApplyDerateType> {
 	 ApplyTypeVo getApplyTypeVo(@Param(value="processId") String processId);
+	  List<ApplyDerateType> getApplyTypeByBusinessIdAndCrpId(@Param(value="businessId") String businessId,@Param(value="planListId") String planListId);
 	 
 }

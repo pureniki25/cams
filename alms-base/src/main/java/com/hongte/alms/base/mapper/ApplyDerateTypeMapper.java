@@ -18,5 +18,5 @@ import com.hongte.alms.common.mapper.SuperMapper;
  */
 public interface ApplyDerateTypeMapper extends SuperMapper<ApplyDerateType> {
     ApplyTypeVo getApplyTypeVo(@Param(value="processId") String processId);
-    
+   List<ApplyDerateType> getApplyTypeByBusinessIdAndCrpId(@Param(value="businessId") String businessId,@Param(value="planListId") String planListId);
 }

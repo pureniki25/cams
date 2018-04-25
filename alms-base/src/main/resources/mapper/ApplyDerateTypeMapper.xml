@@ -34,15 +34,34 @@
                 
                    LEFT JOIN tb_basic_business as business ON process.business_id = business.business_id
         LEFT JOIN tb_basic_business_type as  b_type ON business.business_type = b_type.business_type_id
-        
-        
-
-        
-
         <where>
       process.process_id=#{processId} 
-         
+        </where>
 
+    </select> 
+    
+    
+    
+      <select id="getApplyTypeByBusinessIdAndCrpId" resultType="com.hongte.alms.base.entity.ApplyDerateType">
+  select         
+  
+  type.apply_derate_type_id AS applyDerateTypeId,type.apply_derate_process_id AS applyDerateProcessId, type.derate_type AS derateType, type.derate_money AS derateMoney, 
+  
+  type.create_time AS createTime, type.create_user AS createUser, type.update_time AS updateTime, type.update_user AS updateUser,
+  
+  type.fee_id as feeId,type.derate_type_name as derateTypeName,type.before_derate_money as beforeDerateMoney
+
+  
+  
+  from tb_apply_derate_process process 
+
+
+left join tb_apply_derate_type type 
+
+on process.apply_derate_process_id=type.apply_derate_process_id
+
+        <where>
+              process.business_id=#{businessId}  and process.crp_id=#{planListId} 
         </where>
 
     </select> 

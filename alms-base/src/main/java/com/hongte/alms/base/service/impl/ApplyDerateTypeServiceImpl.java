@@ -30,7 +30,9 @@ public class ApplyDerateTypeServiceImpl extends BaseServiceImpl<ApplyDerateTypeM
 	 public ApplyTypeVo getApplyTypeVo(@Param(value="processId") String processId) {
 		 return applyDerateTypeMap.getApplyTypeVo(processId);
 	 }
-
+	 public List<ApplyDerateType> getApplyTypeByBusinessIdAndCrpId(@Param(value="businessId") String businessId,@Param(value="planListId") String planListId) {
+		 return applyDerateTypeMap.getApplyTypeByBusinessIdAndCrpId(businessId, planListId);
+	 }
 
 	 
 }
