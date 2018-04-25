@@ -191,12 +191,17 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
             		 detail=repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", req.getCrpId()).eq("business_id", pList.getBusinessId()).eq("fee_id", applyDerateType.getFeeId())).get(0);
 
         		}
-        		applyDerateType.setDerateTypeName(detail.getPlanItemName());
-        		applyDerateType.setFeeId(applyDerateType.getFeeId());
-        		applyDerateType.setDerateType(detail.getPlanItemType().toString());
-        		applyDerateType.setCreateTime(new Date());
-        		applyDerateType.setBeforeDerateMoney(detail.getPlanAmount());
-        		applyDerateType.setCreateUser(loginUserInfoHelper.getUserId());
+        		//减免金额不能大于费用项应还金额
+	        		if(applyDerateType.getDerateMoney().compareTo(detail.getPlanAmount())==1) {
+		                throw new RuntimeException("减免金额不能大于费用项应还金额");
+	        		}else {
+	        		applyDerateType.setDerateTypeName(detail.getPlanItemName());
+	        		applyDerateType.setFeeId(applyDerateType.getFeeId());
+	        		applyDerateType.setDerateType(detail.getPlanItemType().toString());
+	        		applyDerateType.setCreateTime(new Date());
+	        		applyDerateType.setBeforeDerateMoney(detail.getPlanAmount());
+	        		applyDerateType.setCreateUser(loginUserInfoHelper.getUserId());
+	        		}
         	}
         
         	applyDerateType.setUpdateTime(new Date());
