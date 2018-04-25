@@ -424,9 +424,15 @@ window.layinit(function(htConfig){
                             if (authValid('applyDerate')) {
                                 buttons.push(
                                     {
+                                    	
                                         "name": "减免申请", click: function (e, currentItem) {
+                                            if (currentItem.statusName != '已还款'||currentItem.afterColStatusName='已移交法务') {
                                         var url = '/collectionUI/applyDerateUI?businessId=' + currentItem.businessId + '&crpId=' + currentItem.crpId + "&processStatus=-1"+'&businessTypeId='+currentItem.businessTypeId+"&afterId="+currentItem.afterId
                                         showOneLineOprLayer(url, "减免申请")
+                                            }else{
+                                            	
+                                            	   vm.$Modal.error({content: '已还款或已移交法务的不能发起减免申请！'});
+                                            }
                                     }
                                     }
                                 )
