@@ -6,14 +6,8 @@ import com.hongte.alms.base.entity.RepaymentProjPlan;
 import com.hongte.alms.base.entity.RepaymentProjPlanList;
 import com.hongte.alms.base.entity.RepaymentProjPlanListDetail;
 import com.hongte.alms.base.enums.RepayPlanStatus;
-import com.hongte.alms.base.repayPlan.enums.RepayPlanBorrowLimitUnitEnum;
-import com.hongte.alms.base.repayPlan.enums.RepayPlanBorrowRateUnitEnum;
-import com.hongte.alms.base.repayPlan.enums.RepayPlanActiveEnum;
-import com.hongte.alms.base.repayPlan.enums.RepayPlanIsDeferEnum;
-import com.hongte.alms.base.repayPlan.req.BizOutPutPlanReq;
-import com.hongte.alms.base.repayPlan.req.BusinessBasicInfoReq;
-import com.hongte.alms.base.repayPlan.req.CreatRepayPlanReq;
-import com.hongte.alms.base.repayPlan.req.TuandaiProjInfoReq;
+import com.hongte.alms.base.repayPlan.enums.*;
+import com.hongte.alms.base.repayPlan.req.*;
 import com.hongte.alms.base.repayPlan.service.CreatRepayPlanService;
 import com.hongte.alms.base.service.RepaymentProjPlanService;
 import com.hongte.alms.common.util.Constant;
@@ -111,7 +105,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             repaymentProjPlan.setBorrowMoney(projInfoReq.getAmount());  //生成还款计划对应的借款总额
             repaymentProjPlan.setBorrowRate(projInfoReq.getInterestRate());  //生成还款计划对应的借款利率
             repaymentProjPlan.setBorrowRateUnit(RepayPlanBorrowRateUnitEnum.YEAR_RATE.getValue());//利率类型
-            repaymentProjPlan.setBorrowLimit(projInfoReq.getBorrowLimit());//借款期限
+            repaymentProjPlan.setBorrowLimit(projInfoReq.getPeriodMonth());//借款期限
             repaymentProjPlan.setBorrowLimitUnit(RepayPlanBorrowLimitUnitEnum.MONTH.getValue());//借款期限单位
             repaymentProjPlan.setPlanStatus(RepayPlanStatus.REPAYING.getKey());//还款计划状态
             repaymentProjPlan.setIsDefer(RepayPlanIsDeferEnum.NO.getValue());//是否展期还款计划
@@ -123,9 +117,11 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
 
             ///////  标的还款计划00期   一次性收取的费用信息
+            ////00期List 信息
             RepaymentProjPlanList  zeroList = new RepaymentProjPlanList();
             zeroList.setProjPlanListId(UUID.randomUUID().toString());
             zeroList.setProjPlanId(repaymentProjPlan.getProjPlanId());
+            zeroList.setPlanListId("");//对应业务还款计划列表编号(外键，对应tb_repayment_biz_plan_list.plan_list_id)
             zeroList.setPlanId(""); //所属还款计划编号(外键，对应tb_repayment_biz_plan.plan_id)
             zeroList.setBusinessId(repaymentProjPlan.getBusinessId());  //还款计划所属业务编号(若当前业务为展期，则存展期业务编号)
             zeroList.setOrigBusinessId(repaymentProjPlan.getOriginalBusinessId());  //还款计划所属原业务编号
@@ -136,178 +132,79 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             zeroList.setOverdueAmount(new BigDecimal(0)); //总应还滞纳金
             zeroList.setOverdueDays(new BigDecimal(0)); //逾期天数
             zeroList.setCurrentStatus(RepayPlanStatus.REPAYED.getName()); //当前还款状态  00期的直接置位为已还款
+            zeroList.setRepayFlag(RepayPlanPayedTypeEnum.GET_MONEY_PAY.getValue()); //已还款类型标记
+            zeroList.setConfirmFlag(RepayPlanConfirmFlageEnum.NEVER_CHECK.getValue()); //财务确认状态
+            zeroList.setAccountantConfirmStatus(RepayPlanAccountConfirmStautsEnum.WAIT.getValue());//会计确认状态
+            zeroList.setProjDueDate(new Date());//标的资金端（平台）应还日期
+//            zeroList.setBizAmount(new BigDecimal(0));//标的当前期资产端总应还金额  （这个金额是业务这一期需要还的金额吗）  需要根据明细计算出来
+//            zeroList.setBizOverdueAmount(new BigDecimal(0));//标的当前期资产端总应还滞纳金(元)   00期没有滞纳金
+            zeroList.setProjOverdueAmount(new BigDecimal(0));//标的当前期资金端总应还滞纳金(元)
+            zeroList.setProjAmount(new BigDecimal(0));//标的当前期资金端总应还金额(元)，不含滞纳金
+            zeroList.setActive(RepayPlanActiveEnum.ACTIVE.getValue());//设置是否有效标志位
+            zeroList.setCreateTime(new Date());//设置创建时间
+            zeroList.setCreateUser(Constant.SYS_DEFAULT_USER);//设置创建用户
 
 
+            List<ProjOutputFeeReq> projOutputFeeReqs =  projInfoReq.getProjOutputFeeInfos();
 
+            List<RepaymentProjPlanListDetail>  zeroListDetails = new LinkedList<>();
 
+            if(projOutputFeeReqs!=null && projOutputFeeReqs.size()>0){
+                for(ProjOutputFeeReq feeReq:projOutputFeeReqs){
+                    //如果费用是一次性收取
+                    if(feeReq.getIsOneTimeCharge().equals(RepayPlanIsOneTimeChargeEnum.ONE_TIME.getKey())){
+                        RepaymentProjPlanListDetail   zeroListDetail = creatProjListDetail(zeroList);
+                        zeroListDetail.setPlanAmount(feeReq.getFeeValue());//项目计划应还总金额(元)
+                        zeroListDetail.setPlanRate(new BigDecimal(0));//项目计划应还比例(%)，如0.5%则存0.5，可空
+                        zeroListDetail.setFeeId(feeReq.getFeeItemId());//资产端费用项ID，用于资产端区分同名的项目，若不存在同名费用项，可为空
+                        zeroListDetail.setPlanItemName(feeReq.getFeeTypeName());//应还项目名称
+//                        zeroListDetail.setPlanItemType(feeReq.getFeeTypeId());//应还项目所属分类
+                        zeroListDetail.setAccountStatus(null);//分账标记
 
-;
-//            /**
-//             * 当前还款状态，目前只有三种，分别为"还款中"，"逾期"，"已还款"
-//             */
-//            @TableField("current_status")
-//            @ApiModelProperty(required= true,value = "当前还款状态，目前只有三种，分别为‘还款中’，‘逾期’，‘已还款’")
-//            private String currentStatus;
-//            /**
-//             * 已还款类型标记，null或0：还款中，6：申请展期已还款，10：线下确认已还款，20：自动线下代扣已还款，21，人工线下代扣已还款，30：自动银行代扣已还款，31：人工银行代扣已还款，40：用户APP主动还款，50：线下财务确认全部结清，60：线下代扣全部结清，70：银行代扣全部结清
-//             */
-//            @TableField("repay_flag")
-//            @ApiModelProperty(required= true,value = "已还款类型标记，null或0：还款中，6：申请展期已还款，10：线下确认已还款，20：自动线下代扣已还款，21，人工线下代扣已还款，30：自动银行代扣已还款，31：人工银行代扣已还款，40：用户APP主动还款，50：线下财务确认全部结清，60：线下代扣全部结清，70：银行代扣全部结清")
-//            private Integer repayFlag;
-//            /**
-//             * 客户实还日期
-//             */
-//            @TableField("fact_repay_date")
-//            @ApiModelProperty(required= true,value = "客户实还日期")
-//            private Date factRepayDate;
-//            /**
-//             * 财务确认还款操作日期
-//             */
-//            @TableField("finance_comfirm_date")
-//            @ApiModelProperty(required= true,value = "财务确认还款操作日期")
-//            private Date financeComfirmDate;
-//            /**
-//             * 财务还款确认人ID
-//             */
-//            @TableField("finance_confirm_user")
-//            @ApiModelProperty(required= true,value = "财务还款确认人ID")
-//            private String financeConfirmUser;
-//            /**
-//             * 财务还款确认人名称
-//             */
-//            @TableField("finance_confirm_user_name")
-//            @ApiModelProperty(required= true,value = "财务还款确认人名称")
-//            private String financeConfirmUserName;
-//            /**
-//             * 财务还款金额确认(1:已确认,0:未确认)
-//             */
-//            @TableField("confirm_flag")
-//            @ApiModelProperty(required= true,value = "财务还款金额确认(1:已确认,0:未确认)")
-//            private Integer confirmFlag;
-//            /**
-//             * 财务确认自动代扣日期
-//             */
-//            @TableField("auto_withholding_confirmed_date")
-//            @ApiModelProperty(required= true,value = "财务确认自动代扣日期")
-//            private Date autoWithholdingConfirmedDate;
-//            /**
-//             * 确认自动代扣的确认者ID
-//             */
-//            @TableField("auto_withholding_confirmed_user")
-//            @ApiModelProperty(required= true,value = "确认自动代扣的确认者ID")
-//            private String autoWithholdingConfirmedUser;
-//            /**
-//             * 确认自动代扣的确认者姓名
-//             */
-//            @TableField("auto_withholding_confirmed_user_name")
-//            @ApiModelProperty(required= true,value = "确认自动代扣的确认者姓名")
-//            private String autoWithholdingConfirmedUserName;
-//            /**
-//             * 会计确认状态，0或null:待审核;1:已审核;2:已退回;3:已返审核;4:导入;
-//             */
-//            @TableField("accountant_confirm_status")
-//            @ApiModelProperty(required= true,value = "会计确认状态，0或null:待审核;1:已审核;2:已退回;3:已返审核;4:导入;")
-//            private Integer accountantConfirmStatus;
-//            /**
-//             * 会计确认人ID
-//             */
-//            @TableField("accountant_confirm_user")
-//            @ApiModelProperty(required= true,value = "会计确认人ID")
-//            private String accountantConfirmUser;
-//            /**
-//             * 会计确认人姓名
-//             */
-//            @TableField("accountant_confirm_user_name")
-//            @ApiModelProperty(required= true,value = "会计确认人姓名")
-//            private String accountantConfirmUserName;
-//            /**
-//             * 会计确认日期
-//             */
-//            @TableField("accountant_confirm_date")
-//            @ApiModelProperty(required= true,value = "会计确认日期")
-//            private Date accountantConfirmDate;
-//            /**
-//             * 标的资金端(平台)应还日期
-//             */
-//            @TableField("proj_due_date")
-//            @ApiModelProperty(required= true,value = "标的资金端(平台)应还日期")
-//            private Date projDueDate;
-//            /**
-//             * 标的当前期资产端总应还金额(元)，不含滞纳金
-//             */
-//            @TableField("biz_amount")
-//            @ApiModelProperty(required= true,value = "标的当前期资产端总应还金额(元)，不含滞纳金")
-//            private BigDecimal bizAmount;
-//            /**
-//             * 标的当前期资产端总应还滞纳金(元)，每天零点由系统自动计算
-//             */
-//            @TableField("biz_overdue_amount")
-//            @ApiModelProperty(required= true,value = "标的当前期资产端总应还滞纳金(元)，每天零点由系统自动计算")
-//            private BigDecimal bizOverdueAmount;
-//            /**
-//             * 标的当前期资金端总应还金额(元)，不含滞纳金
-//             */
-//            @TableField("proj_amount")
-//            @ApiModelProperty(required= true,value = "标的当前期资金端总应还金额(元)，不含滞纳金")
-//            private BigDecimal projAmount;
-//            /**
-//             * 标的当前期资金端总应还滞纳金(元)
-//             */
-//            @TableField("proj_overdue_amount")
-//            @ApiModelProperty(required= true,value = "标的当前期资金端总应还滞纳金(元)")
-//            private BigDecimal projOverdueAmount;
-//            /**
-//             * 还款备注
-//             */
-//            @ApiModelProperty(required= true,value = "还款备注")
-//            private String remark;
-//
-//            /**
-//             * 是否有效状态：1 有效 ，0 无效
-//             */
-//            @ApiModelProperty(required= true,value = "是否有效状态：1 有效 ，0 无效")
-//            private Integer active;
-//
-//            /**
-//             * 创建日期
-//             */
-//            @TableField("create_time")
-//            @ApiModelProperty(required= true,value = "创建日期")
-//            private Date createTime;
-//            /**
-//             * 创建用户
-//             */
-//            @TableField("create_user")
-//            @ApiModelProperty(required= true,value = "创建用户")
-//            private String createUser;
-//            /**
-//             * 更新日期
-//             */
-//            @TableField("update_time")
-//            @ApiModelProperty(required= true,value = "更新日期")
-//            private Date updateTime;
-//            /**
-//             * 更新用户
-//             */
-//            @TableField("update_user")
-//            @ApiModelProperty(required= true,value = "更新用户")
-//            private String updateUser;
+                    }
+                }
+            }
 
+//            for()
 
+            /// 00 期 detail 信息
+            RepaymentProjPlanListDetail   zeroListDetail = creatProjListDetail(zeroList);
+//            projInfoReq;
+
+            zeroListDetail.setPlanAmount(new BigDecimal(0));//项目计划应还总金额(元)
+            zeroListDetail.setPlanRate(new BigDecimal(0));//项目计划应还比例(%)，如0.5%则存0.5，可空
+            zeroListDetail.setFeeId("");//资产端费用项ID，用于资产端区分同名的项目，若不存在同名费用项，可为空
+            zeroListDetail.setPlanItemName("");//应还项目名称
+            zeroListDetail.setPlanItemType(null);//应还项目所属分类
+            zeroListDetail.setAccountStatus(null);//分账标记
 
 
         }
 
-
-
-
-
-
-
         return null;
     }
 
+
+    private RepaymentProjPlanListDetail creatProjListDetail(RepaymentProjPlanList projPlanList){
+        RepaymentProjPlanListDetail   projPlanListDetail = new RepaymentProjPlanListDetail();
+        projPlanListDetail.setProjPlanDetailId(UUID.randomUUID().toString());
+        projPlanListDetail.setProjPlanListId(projPlanList.getProjPlanListId());
+        projPlanListDetail.setPlanDetailId("");//  所属还款计划列表详情ID(外键，对应tb_repayment_biz_plan_list.plan_list_id)
+        projPlanListDetail.setPlanListId("");//  所属还款计划列表详情ID(外键，对应tb_repayment_biz_plan_list.plan_list_id)
+        projPlanListDetail.setBusinessId(projPlanList.getBusinessId());//  所属还款计划列表详情ID(外键，对应tb_repayment_biz_plan_list.plan_list_id)
+        projPlanListDetail.setPeriod(projPlanList.getPeriod()); //所属期数
+        projPlanListDetail.setActive(RepayPlanActiveEnum.ACTIVE.getValue());
+        projPlanListDetail.setCreateDate(new Date());
+        projPlanListDetail.setCreateUser(Constant.SYS_DEFAULT_USER);
+
+        return projPlanListDetail;
+    }
+
+
+
     public static void main(String[] args) {
+
+        System.out.println(UUID.randomUUID().toString());
 
         BigDecimal big1 = new BigDecimal(100);
         BigDecimal big2 = new BigDecimal(50);

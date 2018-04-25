@@ -65,11 +65,7 @@ public class TuandaiProjInfoReq {
      */
     @ApiModelProperty(required= true,value = "满标金额(元)")
     private BigDecimal fullBorrowMoney;
-    /**
-     * 借款期限
-     */
-    @ApiModelProperty(required= true,value = "借款期限")
-    private Integer borrowLimit;
+
     /**
      * 财务确认放款用户编号
      */
@@ -310,83 +306,83 @@ public class TuandaiProjInfoReq {
      */
     @ApiModelProperty(required= true,value = "是否有车产")
     private Integer isHaveCar;
-    /**
-     * 团贷比例(期初收取平台费上标比例)
-     */
-    @ApiModelProperty(required= true,value = "团贷比例(期初收取平台费上标比例)")
-    private BigDecimal tuandaiRate;
-    /**
-     * 团贷预计佣金(期初收取平台费总金额)
-     */
-    @ApiModelProperty(required= true,value = "团贷预计佣金(期初收取平台费总金额)")
-    private BigDecimal tuandaiAmount;
-    /**
-     * 担保比例(期初收取担保公司费比例)
-     */
-    @ApiModelProperty(required= true,value = "担保比例(期初收取担保公司费比例)")
-    private BigDecimal guaranteeRate;
-    /**
-     * 担保预计收入(期初收取担保公司费用总金额)
-     */
-    @TableField("guarantee_amount")
-    @ApiModelProperty(required= true,value = "担保预计收入(期初收取担保公司费用总金额)")
-    private BigDecimal guaranteeAmount;
-    /**
-     * 分公司比例(期初收取分公司费用比例)
-     */
-    @TableField("sub_company_rate")
-    @ApiModelProperty(required= true,value = "分公司比例(期初收取分公司费用比例)")
-    private BigDecimal subCompanyRate;
-    /**
-     * 分公司预计金额(期初收取分公司费用总金额)
-     */
-    @ApiModelProperty(required= true,value = "分公司预计金额(期初收取分公司费用总金额)")
-    private BigDecimal subCompanyCharge;
+//    /**
+//     * 团贷比例(期初收取平台费上标比例)
+//     */
+//    @ApiModelProperty(required= true,value = "团贷比例(期初收取平台费上标比例)")
+//    private BigDecimal tuandaiRate;
+//    /**
+//     * 团贷预计佣金(期初收取平台费总金额)
+//     */
+//    @ApiModelProperty(required= true,value = "团贷预计佣金(期初收取平台费总金额)")
+//    private BigDecimal tuandaiAmount;
+//    /**
+//     * 担保比例(期初收取担保公司费比例)
+//     */
+//    @ApiModelProperty(required= true,value = "担保比例(期初收取担保公司费比例)")
+//    private BigDecimal guaranteeRate;
+//    /**
+//     * 担保预计收入(期初收取担保公司费用总金额)
+//     */
+//    @TableField("guarantee_amount")
+//    @ApiModelProperty(required= true,value = "担保预计收入(期初收取担保公司费用总金额)")
+//    private BigDecimal guaranteeAmount;
+//    /**
+//     * 分公司比例(期初收取分公司费用比例)
+//     */
+//    @TableField("sub_company_rate")
+//    @ApiModelProperty(required= true,value = "分公司比例(期初收取分公司费用比例)")
+//    private BigDecimal subCompanyRate;
+//    /**
+//     * 分公司预计金额(期初收取分公司费用总金额)
+//     */
+//    @ApiModelProperty(required= true,value = "分公司预计金额(期初收取分公司费用总金额)")
+//    private BigDecimal subCompanyCharge;
     /**
      * 中介Id或担保
      */
     @ApiModelProperty(required= true,value = "中介Id或担保")
     private String agencyId;
-    /**
-     * 中介比例
-     */
-    @ApiModelProperty(required= true,value = "中介比例")
-    private BigDecimal agencyRate;
-    /**
-     * 中介金额
-     */
-    @ApiModelProperty(required= true,value = "中介金额")
-    private BigDecimal agencyAmount;
-    /**
-     * 保证金金额
-     */
-    @ApiModelProperty(required= true,value = "保证金金额")
-    private BigDecimal depositAmount;
-    /**
-     * 押金
-     */
-    @ApiModelProperty(required= true,value = "押金")
-    private BigDecimal freedAmount;
-    /**
-     * 押金费率
-     */
-    @ApiModelProperty(required= true,value = "押金费率")
-    private BigDecimal freedRate;
+//    /**
+//     * 中介比例
+//     */
+//    @ApiModelProperty(required= true,value = "中介比例")
+//    private BigDecimal agencyRate;
+//    /**
+//     * 中介金额
+//     */
+//    @ApiModelProperty(required= true,value = "中介金额")
+//    private BigDecimal agencyAmount;
+//    /**
+//     * 保证金金额
+//     */
+//    @ApiModelProperty(required= true,value = "保证金金额")
+//    private BigDecimal depositAmount;
+//    /**
+//     * 押金
+//     */
+//    @ApiModelProperty(required= true,value = "押金")
+//    private BigDecimal freedAmount;
+//    /**
+//     * 押金费率
+//     */
+//    @ApiModelProperty(required= true,value = "押金费率")
+//    private BigDecimal freedRate;
     /**
      * 合作公司所属团贷网分公司编号
      */
     @ApiModelProperty(required= true,value = "合作公司所属团贷网分公司编号")
     private String cooperativeTdComUserId;
-    /**
-     * 合作公司所属团贷网分公司费用比例
-     */
-    @ApiModelProperty(required= true,value = "合作公司所属团贷网分公司费用比例")
-    private BigDecimal cooperativeTdComRate;
-    /**
-     * 合作公司所属团贷网分公司金额
-     */
-    @ApiModelProperty(required= true,value = "合作公司所属团贷网分公司金额")
-    private BigDecimal cooperativeTdComAmount;
+//    /**
+//     * 合作公司所属团贷网分公司费用比例
+//     */
+//    @ApiModelProperty(required= true,value = "合作公司所属团贷网分公司费用比例")
+//    private BigDecimal cooperativeTdComRate;
+//    /**
+//     * 合作公司所属团贷网分公司金额
+//     */
+//    @ApiModelProperty(required= true,value = "合作公司所属团贷网分公司金额")
+//    private BigDecimal cooperativeTdComAmount;
     /**
      * 借款人所得比例
      */
@@ -545,14 +541,6 @@ public class TuandaiProjInfoReq {
 
     public void setFullBorrowMoney(BigDecimal fullBorrowMoney) {
         this.fullBorrowMoney = fullBorrowMoney;
-    }
-
-    public Integer getBorrowLimit() {
-        return borrowLimit;
-    }
-
-    public void setBorrowLimit(Integer borrowLimit) {
-        this.borrowLimit = borrowLimit;
     }
 
     public String getAccounterConfirmUserId() {
@@ -938,102 +926,102 @@ public class TuandaiProjInfoReq {
     public void setIsHaveCar(Integer isHaveCar) {
         this.isHaveCar = isHaveCar;
     }
-
-    public BigDecimal getTuandaiRate() {
-        return tuandaiRate;
-    }
-
-    public void setTuandaiRate(BigDecimal tuandaiRate) {
-        this.tuandaiRate = tuandaiRate;
-    }
-
-    public BigDecimal getTuandaiAmount() {
-        return tuandaiAmount;
-    }
-
-    public void setTuandaiAmount(BigDecimal tuandaiAmount) {
-        this.tuandaiAmount = tuandaiAmount;
-    }
-
-    public BigDecimal getGuaranteeRate() {
-        return guaranteeRate;
-    }
-
-    public void setGuaranteeRate(BigDecimal guaranteeRate) {
-        this.guaranteeRate = guaranteeRate;
-    }
-
-    public BigDecimal getGuaranteeAmount() {
-        return guaranteeAmount;
-    }
-
-    public void setGuaranteeAmount(BigDecimal guaranteeAmount) {
-        this.guaranteeAmount = guaranteeAmount;
-    }
-
-    public BigDecimal getSubCompanyRate() {
-        return subCompanyRate;
-    }
-
-    public void setSubCompanyRate(BigDecimal subCompanyRate) {
-        this.subCompanyRate = subCompanyRate;
-    }
-
-    public BigDecimal getSubCompanyCharge() {
-        return subCompanyCharge;
-    }
-
-    public void setSubCompanyCharge(BigDecimal subCompanyCharge) {
-        this.subCompanyCharge = subCompanyCharge;
-    }
-
-    public String getAgencyId() {
-        return agencyId;
-    }
-
-    public void setAgencyId(String agencyId) {
-        this.agencyId = agencyId;
-    }
-
-    public BigDecimal getAgencyRate() {
-        return agencyRate;
-    }
-
-    public void setAgencyRate(BigDecimal agencyRate) {
-        this.agencyRate = agencyRate;
-    }
-
-    public BigDecimal getAgencyAmount() {
-        return agencyAmount;
-    }
-
-    public void setAgencyAmount(BigDecimal agencyAmount) {
-        this.agencyAmount = agencyAmount;
-    }
-
-    public BigDecimal getDepositAmount() {
-        return depositAmount;
-    }
-
-    public void setDepositAmount(BigDecimal depositAmount) {
-        this.depositAmount = depositAmount;
-    }
-
-    public BigDecimal getFreedAmount() {
-        return freedAmount;
-    }
-
-    public void setFreedAmount(BigDecimal freedAmount) {
-        this.freedAmount = freedAmount;
-    }
-
-    public BigDecimal getFreedRate() {
-        return freedRate;
-    }
-
-    public void setFreedRate(BigDecimal freedRate) {
-        this.freedRate = freedRate;
-    }
+//
+//    public BigDecimal getTuandaiRate() {
+//        return tuandaiRate;
+//    }
+//
+//    public void setTuandaiRate(BigDecimal tuandaiRate) {
+//        this.tuandaiRate = tuandaiRate;
+//    }
+//
+//    public BigDecimal getTuandaiAmount() {
+//        return tuandaiAmount;
+//    }
+//
+//    public void setTuandaiAmount(BigDecimal tuandaiAmount) {
+//        this.tuandaiAmount = tuandaiAmount;
+//    }
+//
+//    public BigDecimal getGuaranteeRate() {
+//        return guaranteeRate;
+//    }
+//
+//    public void setGuaranteeRate(BigDecimal guaranteeRate) {
+//        this.guaranteeRate = guaranteeRate;
+//    }
+//
+//    public BigDecimal getGuaranteeAmount() {
+//        return guaranteeAmount;
+//    }
+//
+//    public void setGuaranteeAmount(BigDecimal guaranteeAmount) {
+//        this.guaranteeAmount = guaranteeAmount;
+//    }
+//
+//    public BigDecimal getSubCompanyRate() {
+//        return subCompanyRate;
+//    }
+//
+//    public void setSubCompanyRate(BigDecimal subCompanyRate) {
+//        this.subCompanyRate = subCompanyRate;
+//    }
+//
+//    public BigDecimal getSubCompanyCharge() {
+//        return subCompanyCharge;
+//    }
+//
+//    public void setSubCompanyCharge(BigDecimal subCompanyCharge) {
+//        this.subCompanyCharge = subCompanyCharge;
+//    }
+//
+//    public String getAgencyId() {
+//        return agencyId;
+//    }
+//
+//    public void setAgencyId(String agencyId) {
+//        this.agencyId = agencyId;
+//    }
+//
+//    public BigDecimal getAgencyRate() {
+//        return agencyRate;
+//    }
+//
+//    public void setAgencyRate(BigDecimal agencyRate) {
+//        this.agencyRate = agencyRate;
+//    }
+//
+//    public BigDecimal getAgencyAmount() {
+//        return agencyAmount;
+//    }
+//
+//    public void setAgencyAmount(BigDecimal agencyAmount) {
+//        this.agencyAmount = agencyAmount;
+//    }
+//
+//    public BigDecimal getDepositAmount() {
+//        return depositAmount;
+//    }
+//
+//    public void setDepositAmount(BigDecimal depositAmount) {
+//        this.depositAmount = depositAmount;
+//    }
+//
+//    public BigDecimal getFreedAmount() {
+//        return freedAmount;
+//    }
+//
+//    public void setFreedAmount(BigDecimal freedAmount) {
+//        this.freedAmount = freedAmount;
+//    }
+//
+//    public BigDecimal getFreedRate() {
+//        return freedRate;
+//    }
+//
+//    public void setFreedRate(BigDecimal freedRate) {
+//        this.freedRate = freedRate;
+//    }
 
     public String getCooperativeTdComUserId() {
         return cooperativeTdComUserId;
@@ -1043,21 +1031,21 @@ public class TuandaiProjInfoReq {
         this.cooperativeTdComUserId = cooperativeTdComUserId;
     }
 
-    public BigDecimal getCooperativeTdComRate() {
-        return cooperativeTdComRate;
-    }
-
-    public void setCooperativeTdComRate(BigDecimal cooperativeTdComRate) {
-        this.cooperativeTdComRate = cooperativeTdComRate;
-    }
-
-    public BigDecimal getCooperativeTdComAmount() {
-        return cooperativeTdComAmount;
-    }
-
-    public void setCooperativeTdComAmount(BigDecimal cooperativeTdComAmount) {
-        this.cooperativeTdComAmount = cooperativeTdComAmount;
-    }
+//    public BigDecimal getCooperativeTdComRate() {
+//        return cooperativeTdComRate;
+//    }
+//
+//    public void setCooperativeTdComRate(BigDecimal cooperativeTdComRate) {
+//        this.cooperativeTdComRate = cooperativeTdComRate;
+//    }
+//
+//    public BigDecimal getCooperativeTdComAmount() {
+//        return cooperativeTdComAmount;
+//    }
+//
+//    public void setCooperativeTdComAmount(BigDecimal cooperativeTdComAmount) {
+//        this.cooperativeTdComAmount = cooperativeTdComAmount;
+//    }
 
     public BigDecimal getBorrowerRate() {
         return borrowerRate;

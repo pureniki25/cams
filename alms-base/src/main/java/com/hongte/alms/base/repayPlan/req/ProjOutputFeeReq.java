@@ -77,16 +77,16 @@ public class ProjOutputFeeReq {
      */
     @ApiModelProperty(required= true,value = "退费申请状态，0或null：退费失败,未申请退费，1：退费成功，2：退费申请中")
     private Integer RefundStatus;
-    /**
-     * 退费申请备注
-     */
-    @ApiModelProperty(required= true,value = "退费申请备注")
-    private String RefundRemark;
-    /**
-     * [关联每一项退费信息ID, tb_refund_info ID]
-     */
-    @ApiModelProperty(required= true,value = "[关联每一项退费信息ID, tb_refund_info ID]")
-    private String refundInfoId;
+//    /**
+//     * 退费申请备注
+//     */
+//    @ApiModelProperty(required= true,value = "退费申请备注")
+//    private String RefundRemark;
+//    /**
+//     * [关联每一项退费信息ID, tb_refund_info ID]
+//     */
+//    @ApiModelProperty(required= true,value = "[关联每一项退费信息ID, tb_refund_info ID]")
+//    private String refundInfoId;
     /**
      * 对应的提现编号
      */
@@ -147,11 +147,11 @@ public class ProjOutputFeeReq {
      */
     @ApiModelProperty(required= true,value = "[是否设置期限范围]")
     private Integer isTermRange;
-    /**
-     * [可退剩余金额]
-     */
-    @ApiModelProperty(required= true,value = "[可退剩余金额]")
-    private BigDecimal canRefundMoney;
+//    /**
+//     * [可退剩余金额]
+//     */
+//    @ApiModelProperty(required= true,value = "[可退剩余金额]")
+//    private BigDecimal canRefundMoney;
     /**
      * 系统默认匹配的费用比例（当收取方式为2时，此字段存零）
      */
@@ -247,21 +247,21 @@ public class ProjOutputFeeReq {
         RefundStatus = refundStatus;
     }
 
-    public String getRefundRemark() {
-        return RefundRemark;
-    }
-
-    public void setRefundRemark(String refundRemark) {
-        RefundRemark = refundRemark;
-    }
-
-    public String getRefundInfoId() {
-        return refundInfoId;
-    }
-
-    public void setRefundInfoId(String refundInfoId) {
-        this.refundInfoId = refundInfoId;
-    }
+//    public String getRefundRemark() {
+//        return RefundRemark;
+//    }
+//
+//    public void setRefundRemark(String refundRemark) {
+//        RefundRemark = refundRemark;
+//    }
+//
+//    public String getRefundInfoId() {
+//        return refundInfoId;
+//    }
+//
+//    public void setRefundInfoId(String refundInfoId) {
+//        this.refundInfoId = refundInfoId;
+//    }
 
     public Integer getWithdrawId() {
         return WithdrawId;
@@ -359,13 +359,13 @@ public class ProjOutputFeeReq {
         this.isTermRange = isTermRange;
     }
 
-    public BigDecimal getCanRefundMoney() {
-        return canRefundMoney;
-    }
-
-    public void setCanRefundMoney(BigDecimal canRefundMoney) {
-        this.canRefundMoney = canRefundMoney;
-    }
+//    public BigDecimal getCanRefundMoney() {
+//        return canRefundMoney;
+//    }
+//
+//    public void setCanRefundMoney(BigDecimal canRefundMoney) {
+//        this.canRefundMoney = canRefundMoney;
+//    }
 
     public BigDecimal getNewSystemDefaultRate() {
         return newSystemDefaultRate;
