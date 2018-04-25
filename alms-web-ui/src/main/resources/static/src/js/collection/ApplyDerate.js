@@ -718,7 +718,7 @@ var getGeneralReturnRate= function () {
 ///////////车贷:获取提前结清违约金
 var getPreLateFees = function () {debugger
 
-    var reqStr = basePath +"ApplyDerateController/getPreLateFees?crpId="+crpId+"&preLateFeesType="+vm.baseInfoForm.preLateFeesType+"&afterId="+afterId;
+    var reqStr = basePath +"ApplyDerateController/getPreLateFees?crpId="+crpId+"&preLateFeesType="+vm.baseInfoForm.preLateFeesType+"&afterId="+afterId+"&businessId=" + businessId;
    
     axios.get(reqStr)
         .then(function (res) {debugger
@@ -737,7 +737,7 @@ var getPreLateFees = function () {debugger
 ///////////车贷：获取整个业务的滞纳金
 var getPreviousLateFees = function () {
 
-    var reqStr = basePath +"ApplyDerateController/getPreLateFees?crpId="+crpId+"&preLateFeesType="+vm.baseInfoForm.preLateFeesType+"&afterId="+afterId
+    var reqStr = basePath +"ApplyDerateController/getPreLateFees?crpId="+crpId+"&preLateFeesType="+vm.baseInfoForm.preLateFeesType+"&afterId="+afterId+"&businessId=" + businessId
   
     axios.get(reqStr)
         .then(function (res) {debugger
@@ -765,7 +765,7 @@ var getPreviousLateFees = function () {
 ///////////车贷:获取合同期外逾期利息
 var getOutsideInterest = function () {debugger
 
-    var reqStr = basePath +"ApplyDerateController/getOutsideInterest?crpId="+crpId+"&outsideInterestType="+vm.baseInfoForm.outsideInterestType+"&afterId="+afterId;
+    var reqStr = basePath +"ApplyDerateController/getOutsideInterest?crpId="+crpId+"&outsideInterestType="+vm.baseInfoForm.outsideInterestType+"&afterId="+afterId+"&businessId=" + businessId
   
     axios.get(reqStr)
         .then(function (res) {
@@ -788,7 +788,7 @@ var getOutsideInterest = function () {debugger
 //从后台获取显示数据
 var getShowInfo = function () {
     //取显示需要的相关信息
-    var reqStr = basePath +"ApplyDerateController/selectApplyDeratePageShowInfo?crpId="+crpId+"&afterId="+afterId;
+    var reqStr = basePath +"ApplyDerateController/selectApplyDeratePageShowInfo?crpId="+crpId+"&afterId="+afterId+"&businessId=" + businessId;
     if(processId !=null){
         reqStr += "&processId="+processId;
     }

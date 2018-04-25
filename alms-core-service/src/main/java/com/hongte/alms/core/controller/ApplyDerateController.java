@@ -185,7 +185,7 @@ public class ApplyDerateController {
     public Result<Map<String,Object>> selectApplyDeratePageShowInfo(
             @RequestParam("crpId") String crpId,
             @RequestParam("afterId") String afterId,
-            
+            @RequestParam(value="businessId") String businessId,
             @RequestParam(value = "processId",required = false) String processId
     ){
         Map<String,Object> retMap = new HashMap<>();
@@ -198,7 +198,7 @@ public class ApplyDerateController {
         		isDefer=1;
         	}
             //基本信息
-            List<BusinessInfoForApplyDerateVo> businessVoList =  basicBusinessService.selectBusinessInfoForApplyDerateVo(crpId,isDefer);
+            List<BusinessInfoForApplyDerateVo> businessVoList =  basicBusinessService.selectBusinessInfoForApplyDerateVo(crpId,isDefer,businessId);
      
             //还款方式类型列表
             List<SysParameter> repayTypeList =  sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterTypeEnums.REPAYMENT_TYPE.getKey()).orderBy("row_Index"));
@@ -317,13 +317,13 @@ public class ApplyDerateController {
             }
 
             processService.getProcessShowInfo(retMap,processId, ProcessTypeEnums.Apply_Derate);
-            
-            String businessId = "";
-            
-            if (!CollectionUtils.isEmpty(businessVoList)) {
-            	businessId = businessVoList.get(0).getBusinessId();
-            		
-			}
+//            
+//            String businessId = "";
+//            
+//            if (!CollectionUtils.isEmpty(businessVoList)) {
+//            	businessId = businessVoList.get(0).getBusinessId();
+//            		
+//			}
             
             
        
@@ -411,6 +411,7 @@ public class ApplyDerateController {
     public Result<Map<String,Object>> getPreLateFees(
             @RequestParam("crpId") String crpId,
             @RequestParam(value="afterId") String afterId,
+            @RequestParam(value="businessId") String businessId,
             @RequestParam(value = "preLateFeesType") String preLateFeesType
     ){
     	
@@ -422,14 +423,14 @@ public class ApplyDerateController {
               		isDefer=1;
               	}
             //基本信息
-            List<BusinessInfoForApplyDerateVo> businessVoList =  basicBusinessService.selectBusinessInfoForApplyDerateVo(crpId,isDefer);
+            List<BusinessInfoForApplyDerateVo> businessVoList =  basicBusinessService.selectBusinessInfoForApplyDerateVo(crpId,isDefer,businessId);
      
-            String businessId="";
-            if (!CollectionUtils.isEmpty(businessVoList)) {
-            	
-            	businessId=businessVoList.get(0).getBusinessId();
-            	
-			}
+//            String businessId="";
+//            if (!CollectionUtils.isEmpty(businessVoList)) {
+//            	
+//            	businessId=businessVoList.get(0).getBusinessId();
+//            	
+//			}
 
             CarLoanBilVO carLoanBilVO=new CarLoanBilVO();
             carLoanBilVO.setBillDate(new Date());
@@ -467,6 +468,7 @@ public class ApplyDerateController {
     public Result<Map<String,Object>> getOutsideInterest(
             @RequestParam("crpId") String crpId,
             @RequestParam("afterId") String afterId,
+            @RequestParam(value="businessId") String businessId,
             @RequestParam(value = "outsideInterestType") String outsideInterestType
     ){
         Map<String,Object> retMap = new HashMap<>();
@@ -477,14 +479,14 @@ public class ApplyDerateController {
            	}
         	
             //基本信息
-            List<BusinessInfoForApplyDerateVo> businessVoList =  basicBusinessService.selectBusinessInfoForApplyDerateVo(crpId,isDefer);
+            List<BusinessInfoForApplyDerateVo> businessVoList =  basicBusinessService.selectBusinessInfoForApplyDerateVo(crpId,isDefer,businessId);
      
-            String businessId="";
-            if (!CollectionUtils.isEmpty(businessVoList)) {
-            	
-            	businessId=businessVoList.get(0).getBusinessId();
-            	
-			}
+//            String businessId="";
+//            if (!CollectionUtils.isEmpty(businessVoList)) {
+//            	
+//            	businessId=businessVoList.get(0).getBusinessId();
+//            	
+//			}
 
             CarLoanBilVO carLoanBilVO=new CarLoanBilVO();
             carLoanBilVO.setBillDate(new Date());

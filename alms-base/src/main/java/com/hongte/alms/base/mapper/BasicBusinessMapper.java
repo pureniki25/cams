@@ -25,7 +25,7 @@ public interface BasicBusinessMapper extends SuperMapper<BasicBusiness> {
      * @param crpId
      * @return
      */
-    List<BusinessInfoForApplyDerateVo> selectBusinessInfoForApplyDerateVo(@Param("crpId") String crpId,@Param("isDefer") Integer isDefer);
+    List<BusinessInfoForApplyDerateVo> selectBusinessInfoForApplyDerateVo(@Param("crpId") String crpId,@Param("isDefer") Integer isDefer,@Param("originalBusinessId") String originalBusinessId);
 
     /**
      * 根据公司列表查询业务简单几个字段信息
