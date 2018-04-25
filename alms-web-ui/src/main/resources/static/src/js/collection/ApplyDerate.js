@@ -637,7 +637,7 @@ var showData=function(){debugger
                 
                 
             	//房贷业务：逾期天数×剩余本金×0.2%
-                if(res.data.data.isInContractDate=="true"){
+                if(res.data.data.isInContractDate=="true"){debugger
                 	vm.baseInfoForm.outsideInterest=0;
                 }else{
                    	vm.baseInfoForm.outsideInterest=vm.baseInfoForm.delayDays*vm.baseInfoForm.remianderPrincipal*0.002;
@@ -645,8 +645,6 @@ var showData=function(){debugger
              
      
             
-               //滞纳金:
-                vm.baseInfoForm.outsideInterest=vm.baseInfoForm.delayDays*vm.baseInfoForm.remianderPrincipal*0.002;
                 //滞纳金:
                 vm.baseInfoForm.needPayPenalty =res.data.data.list[0].lateFee
                
