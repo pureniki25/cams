@@ -271,7 +271,7 @@
   	
 	  /* 线上出款业务一次性收取服务费*/
 	  select a.business_id,ifnull(sum(b.sub_company_charge),0) `fee`,
-	  (ifnull(sum(b.guarantee_amount),0)+ifnull(sum(b.tuandai_amount),0)+ +ifnull(sum(b.freed_amount),0)+ifnull(sum(b.agency_amount),0)+ifnull(sum(b.deposit_amount),0)) `fee2`,
+	  (ifnull(sum(b.guarantee_amount),0)+ifnull(sum(b.tuandai_amount),0)+ +ifnull(sum(b.freed_amount),0)+ifnull(sum(b.agency_amount),0)) `fee2`,
 	  ifnull(sum(b.cooperative_td_com_amount),0) `fee3`
 	  	  	  
 	  from tb_basic_business a 
