@@ -137,7 +137,27 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	
 	@Value("${ht.billing.west.part.business:''}")
 	private String westPartBusiness;
+	@Override
+	public Map<String, Object> getOverDueDatys(String businessId) {
+		if (StringUtil.isEmpty(businessId)) {
+			return null;
+		}
 
+
+		Map<String, Object> resultMap = transferOfLitigationMapper.getOverDueDatys(businessId);
+		if (resultMap == null) {
+			return resultMap;
+		}
+
+		Date factRepayDate = (Date) resultMap.get("factRepayDate");
+		Date dueDate = (Date) resultMap.get("dueDate"); // 第一期应还日期
+		int overdueDays = DateUtil.getDiffDays(factRepayDate == null ? dueDate : factRepayDate, new Date());
+		resultMap.put("overdueDays", overdueDays < 0 ? 0 : overdueDays);
+
+	
+
+		return resultMap;
+	}
 	@Override
 	public Map<String, Object> queryCarLoanData(String businessId) {
 		if (StringUtil.isEmpty(businessId)) {

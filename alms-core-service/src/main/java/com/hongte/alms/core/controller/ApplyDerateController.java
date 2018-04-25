@@ -226,7 +226,9 @@ public class ApplyDerateController {
     		    businessVoList.get(0).setNoSettleNeedPayInterest(businessVoList.get(0).getNeedPayInterest());
     		    businessVoList.get(0).setNoSettleNeedPayPrincipal(businessVoList.get(0).getNeedPayPrincipal());
     		    businessVoList.get(0).setNoSettleNeedPayService(businessVoList.get(0).getNeedPayService());
-    		    
+    		    //逾期天数
+    			Map<String, Object> overDaysMap = transferOfLitigationService.getOverDueDatys(businessVoList.get(0).getBusinessId());
+    			businessVoList.get(0).setDelayDays(Integer.valueOf(overDaysMap.get("overdueDays").toString()));
     		    
     		    
     		    //判断是车贷还是房贷的减免费用项
