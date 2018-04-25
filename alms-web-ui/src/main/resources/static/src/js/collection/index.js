@@ -426,7 +426,7 @@ window.layinit(function(htConfig){
                                     {
                                     	
                                         "name": "减免申请", click: function (e, currentItem) {
-                                            if (currentItem.statusName != '已还款'||currentItem.afterColStatusName='已移交法务') {
+                                            if (currentItem.statusName != '已还款'||currentItem.afterColStatusName=='已移交法务') {
                                         var url = '/collectionUI/applyDerateUI?businessId=' + currentItem.businessId + '&crpId=' + currentItem.crpId + "&processStatus=-1"+'&businessTypeId='+currentItem.businessTypeId+"&afterId="+currentItem.afterId
                                         showOneLineOprLayer(url, "减免申请")
                                             }else{
