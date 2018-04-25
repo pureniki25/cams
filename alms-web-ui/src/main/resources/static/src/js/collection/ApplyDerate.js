@@ -623,7 +623,7 @@ var showData=function(){debugger
                   app.$Modal.error({content:'接口调用失败'})
                 })
       //房贷
-    }else if(businessTypeId == 2 || businessTypeId == 11){debugger
+    }else if(businessTypeId == 2 || businessTypeId == 11){
     	//获取提前结清违约金
         axios.get(basePath + 'expenseSettle/calByPreSettleDate', {
             params: {
@@ -632,11 +632,18 @@ var showData=function(){debugger
             }
         }
         ).then(function(res){
-            if(res.data.code=='1'){debugger
+            if(res.data.code=='1'){
                 vm.baseInfoForm.preLateFees = res.data.data.penalty
                 
-             	//房贷业务：逾期天数×剩余本金×0.2%
-            	vm.baseInfoForm.outsideInterest=vm.baseInfoForm.delayDays*vm.baseInfoForm.remianderPrincipal*0.002;
+                
+            	//房贷业务：逾期天数×剩余本金×0.2%
+                if(res.data.data.isInContractDate=="true"){
+                	vm.baseInfoForm.outsideInterest=0;
+                }else{
+                   	vm.baseInfoForm.outsideInterest=vm.baseInfoForm.delayDays*vm.baseInfoForm.remianderPrincipal*0.002;
+                }
+             
+     
             
                //滞纳金:
                 vm.baseInfoForm.outsideInterest=vm.baseInfoForm.delayDays*vm.baseInfoForm.remianderPrincipal*0.002;
