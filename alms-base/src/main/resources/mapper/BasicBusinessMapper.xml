@@ -378,10 +378,8 @@
 
 		left join tb_repayment_biz_plan_list pList on
 		pList.plan_list_id=pDetail.plan_list_id
-
-		left join tb_basic_business business on
-		business.business_id=pList.orig_business_id
-		where business.business_id=#{original_business_id} and pList.current_status!='已还款'
+		left join tb_repayment_biz_plan plan on pList.plan_id=plan.plan_id
+		where plan.original_business_id=#{original_business_id} and pList.current_status!='已还款'
 	</select>
 	
 
@@ -398,10 +396,10 @@
 
 		left join tb_repayment_biz_plan_list pList on
 		pList.plan_list_id=pDetail.plan_list_id
+		left join tb_repayment_biz_plan plan on pList.plan_id=plan.plan_id
 
-		left join tb_basic_business business on
-		business.business_id=pList.orig_business_id
-		where business.business_id=#{original_business_id}
+
+		where  plan.original_business_id=#{original_business_id}
 	</select>
 	
 	
@@ -423,9 +421,9 @@
 		left join tb_repayment_biz_plan_list pList on
 		pList.plan_list_id=pDetail.plan_list_id
 
-		left join tb_basic_business business on
-		business.business_id=pList.orig_business_id
-		where business.business_id=#{original_business_id}
+			left join tb_repayment_biz_plan plan on pList.plan_id=plan.plan_id
+
+		where plan.original_business_id=#{original_business_id}
 	</select>
 
 </mapper>
