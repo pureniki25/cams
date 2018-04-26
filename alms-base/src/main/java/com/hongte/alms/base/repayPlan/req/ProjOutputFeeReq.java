@@ -66,6 +66,9 @@ public class ProjOutputFeeReq {
      */
     @ApiModelProperty(required= true,value = "[业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值]")
     private BigDecimal feeValue;
+
+    //添加进位方式标志位
+
     /**
      * 创建者
      */
