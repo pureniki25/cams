@@ -146,7 +146,7 @@ window.layinit(function(htConfig){
                 layer.open({
                     type: 2,
                     title: '分配电催',
-                    area: ['1250px', '800px'],
+                    area: ['95%', '95%'],
                     content: '/collectionUI/setPhoneStaffUI?crpIds='+getSelectedcrpIds()
                 });
             },
@@ -161,7 +161,7 @@ window.layinit(function(htConfig){
                 layer.open({
                     type: 2,
                     title: '移交催收',
-                    area: ['1250px', '800px'],
+                    area: ['95%', '95%'],
                     content: '/collectionUI/setVisitStaffUI?crpIds='+getSelectedcrpIds()
                 });
 
@@ -265,7 +265,7 @@ window.layinit(function(htConfig){
                     title: '业务编号'
                 }, {
                     field: 'afterId',
-                    width:60,
+                    width:90,
                     title: '期数'
                 }, {
                     field: 'districtAreaName',
@@ -289,7 +289,7 @@ window.layinit(function(htConfig){
                     title: '业务类型'
                 }, {
                     field: 'borrowMoney',
-                    width:90,
+                    width:120,
                     title: '借款金额',
                     align: 'right',
                     templet:function(d){
@@ -297,7 +297,7 @@ window.layinit(function(htConfig){
                     }
                 }, {
                     field: 'totalBorrowAmount',
-                    width:90,
+                    width:150,
                     title: '应还金额',
                     align: 'right',
                     templet:function(d){
@@ -331,14 +331,14 @@ window.layinit(function(htConfig){
                     title: '应还日期',
                     templet:function(d){
                         console.log(d)
-                        return d.dueDate?moment(d.dueDate).format("YYYY年MM月DD日"):''
+                        return d.dueDate?moment(d.dueDate).format("YYYY-MM-DD"):''
                     }
                 }, {
                     field: 'repaymentDate',
                     width:105,
                     title: '实还日期',
                     templet:function(d){
-                        return d.repaymentDate?moment(d.repaymentDate).format("YYYY年MM月DD日"):''
+                        return d.repaymentDate?moment(d.repaymentDate).format("YYYY-MM-DD"):''
                     }
                 }, {
                     field: 'phoneStaffName',
