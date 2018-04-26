@@ -140,6 +140,8 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
             if(parameter!=null){
                 vo.setAfterColStatusName(parameter.getParamName());
             }
+            
+            vo.setPeroidStatus();
 //            if(pList.size()>0){
 //                vo.setAfterColStatusName(pList.get(0).getParamName());
 //            }
