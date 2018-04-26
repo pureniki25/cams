@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+    <title>手动匹配银行流水</title>
+    <script src="/properties/config.js"></script>
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css" />
+    <!-- iview样式 -->
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/2.13.1/css/iview.css" />
+    <!-- 引入layui样式 -->
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all" />
+
+    <!-- 引入vue -->
+    <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+    <!-- iview js -->
+    <script type="text/javascript" src="/plugins/iview/2.13.1/js/iview.min.js"></script>
+    <!--引入layui.js-->
+    <script src="/plugins/layui/layui.js"></script>
+    <!--引入axios.js 用于ajax调用-->
+    <script src="/plugins/axios/axios.min.js"></script>
+    <!-- 引入jQuery，必须在appToken.js 之前引入 -->
+    <script src="/build/js/jquery-3.3.1.min.js"></script>
+    <!-- 设置全局请求头:app、Authorization -->
+    <script src="/build/js/appToken.js"></script>
+    <!--引入公共的一些方法-->
+    <script src="/src/js/comm.js"></script>
+</head>
+
+<body>
+    <!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+    <div id="app" v-cloak>
+        <layout>
+            <Header style="height: 40px;line-height: 40px;text-align: right;">
+                <i-form inline label-position="right" label-width="70">
+                    <form-item label="日期">
+                        <date-picker type="date" placeholder="Select date" v-model="regDate" format="yyyy-MM-dd"></date-picker>
+                    </form-item>
+                    <form-item label="金额">
+                        <i-input v-model="moneyAmount"></i-input>
+                    </form-item>
+                    <form-item label="转入账号">
+                        <i-select v-model="bankAccount" style="width:150px;text-align: left;">
+                            <i-option value="所有账户">所有账户</i-option>
+                            <i-option v-for="(item,index) in bankAccounts" :value="item.financeName" :key="item.financeName+index">{{item.financeName}}</i-option>
+                        </i-select>
+                    </form-item>
+                    <form-item>
+                        <i-button type="success" icon="ios-search">搜索</i-button>
+                    </form-item>
+                </i-form>
+            </Header>
+            <Content>
+                <i-table show-header no-data-text="暂无数据" stripe border ref="selection" :columns="table.col" :data="table.data"></i-table>
+            </Content>
+            <Footer style="text-align: right;padding-right: 10px;height: 40px;line-height: 40px;">
+                <i-button type="success" >确认</i-button>
+            </Footer>
+        </layout>
+
+    </div>
+    <script src="/src/js/finance/ManualMatchBankSatements.js"></script>
+</body>
+
+</html>

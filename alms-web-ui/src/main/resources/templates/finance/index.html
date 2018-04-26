@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Insert title here</title>
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/2.13.1/css/iview.css" />
+</head>
+
+<body>
+    <div id="app">
+        <Modal v-model="show" >
+            <iframe :src="url" ></iframe>
+        </Modal>
+    </div>
+    <!-- 引入vue -->
+    <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+    <!-- iview js -->
+    <script type="text/javascript" src="/plugins/iview/2.13.1/js/iview.min.js"></script>
+    <script type="text/javascript" src="/src/js/comm.js"></script>
+
+    <!-- <script type="text/javascript" src="/src/js/finance/ManualMatchBankSatements.js"></script> -->
+    <script type="text/javascript" src="/src/js/finance/index.js"></script>
+</body>
+
+</html>
