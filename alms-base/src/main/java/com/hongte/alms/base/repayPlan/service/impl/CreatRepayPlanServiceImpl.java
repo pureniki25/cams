@@ -158,9 +158,8 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                         zeroListDetail.setPlanRate(new BigDecimal(0));//项目计划应还比例(%)，如0.5%则存0.5，可空
                         zeroListDetail.setFeeId(feeReq.getFeeItemId());//资产端费用项ID，用于资产端区分同名的项目，若不存在同名费用项，可为空
                         zeroListDetail.setPlanItemName(feeReq.getFeeTypeName());//应还项目名称
-//                        zeroListDetail.setPlanItemType(feeReq.getFeeTypeId());//应还项目所属分类
-                        zeroListDetail.setAccountStatus(null);//分账标记
-
+                        zeroListDetail.setPlanItemType(feeReq.getFeeType());//应还项目所属分类
+                        zeroListDetail.setAccountStatus(feeReq.getAccountStatus());//分账标记
                     }
                 }
             }

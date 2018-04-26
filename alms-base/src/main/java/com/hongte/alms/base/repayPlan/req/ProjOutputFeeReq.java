@@ -37,16 +37,30 @@ public class ProjOutputFeeReq {
      */
     @ApiModelProperty(required= true,value = "费用项目名称")
     private String feeItemName;
+
+
     /**
-     * 费用类型ID
+     * 费用项类型
      */
-    @ApiModelProperty(required= true,value = "费用类型ID")
-    private String feeTypeId;
+    @ApiModelProperty(required= true,value = "费用项所属分类，" +
+            "10：本金，20：利息，30：资产端分公司服务费，40：担保公司费用，" +
+            "50：资金端平台服务费，60：滞纳金，70：违约金，80：中介费，90：押金类费用，100：冲应收")
+    private Integer feeType;
+
+
     /**
-     * 费用分类名称
+     * 费用项名称
      */
-    @ApiModelProperty(required= true,value = "费用分类名称")
+    @ApiModelProperty(required= true,value = "应还项目名称")
     private String feeTypeName;
+
+    /**
+     * 分账标记(冲应收还款，根据冲应收明细进行分账)，0：不线上分账，10：分账到借款人账户，20：分账到资产端账户，30：分账到资金端账户(平台)，40：分账到担保公司账户
+     */
+    @TableField("account_status")
+    @ApiModelProperty(required= true,value = "分账标记(冲应收还款，根据冲应收明细进行分账)，0：不线上分账，10：分账到借款人账户，20：分账到资产端账户，30：分账到资金端账户(平台)，40：分账到担保公司账户")
+    private Integer accountStatus;
+
     /**
      * [业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值]
      */
@@ -77,16 +91,7 @@ public class ProjOutputFeeReq {
      */
     @ApiModelProperty(required= true,value = "退费申请状态，0或null：退费失败,未申请退费，1：退费成功，2：退费申请中")
     private Integer RefundStatus;
-//    /**
-//     * 退费申请备注
-//     */
-//    @ApiModelProperty(required= true,value = "退费申请备注")
-//    private String RefundRemark;
-//    /**
-//     * [关联每一项退费信息ID, tb_refund_info ID]
-//     */
-//    @ApiModelProperty(required= true,value = "[关联每一项退费信息ID, tb_refund_info ID]")
-//    private String refundInfoId;
+
     /**
      * 对应的提现编号
      */
@@ -181,14 +186,6 @@ public class ProjOutputFeeReq {
 
     public void setFeeItemName(String feeItemName) {
         this.feeItemName = feeItemName;
-    }
-
-    public String getFeeTypeId() {
-        return feeTypeId;
-    }
-
-    public void setFeeTypeId(String feeTypeId) {
-        this.feeTypeId = feeTypeId;
     }
 
     public String getFeeTypeName() {
@@ -381,5 +378,21 @@ public class ProjOutputFeeReq {
 
     public void setProjOutputFeeDetailInfos(List<ProjOutputFeeDetailReq> projOutputFeeDetailInfos) {
         ProjOutputFeeDetailInfos = projOutputFeeDetailInfos;
+    }
+
+    public Integer getFeeType() {
+        return feeType;
+    }
+
+    public void setFeeType(Integer feeType) {
+        this.feeType = feeType;
+    }
+
+    public Integer getAccountStatus() {
+        return accountStatus;
+    }
+
+    public void setAccountStatus(Integer accountStatus) {
+        this.accountStatus = accountStatus;
     }
 }
