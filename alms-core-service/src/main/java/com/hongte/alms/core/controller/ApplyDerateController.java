@@ -230,9 +230,11 @@ public class ApplyDerateController {
     		    }
     		
     		    //逾期天数
+    		  
     			Map<String, Object> overDaysMap = transferOfLitigationService.getOverDueDatys(businessVoList.get(0).getBusinessId());
+    			  if(overDaysMap!=null) {
     			businessVoList.get(0).setDelayDays(Integer.valueOf(overDaysMap.get("overdueDays").toString()));
-    		    
+    		    }
     		    
     		    //判断是车贷还是房贷的减免费用项
     		    if(businessVoList.get(0).getBusinessType()==BusinessTypeEnum.CYD_TYPE.getValue()||businessVoList.get(0).getBusinessType()==BusinessTypeEnum.CYDZQ_TYPE.getValue()) {
@@ -285,19 +287,7 @@ public class ApplyDerateController {
                 }else {
                 	  retMap.put("otherFeeEditFlage", JSON.toJSON("1", JsonUtil.getMapping()));
                 }
-                //如果currentStep=null,说明流程已经结束
-                if(process.getCurrentStep()!=null) {
-                    ProcessTypeStep currentStep = processService.getStepByPTypeStepCode(ProcessTypeEnums.Apply_Derate,process.getCurrentStep());
-                    if(null!=currentStep.getNextStepSelectSql()&&(!"".equals(currentStep.getNextStepSelectSql().trim()))) {
-                    	ApplyTypeVo vo=applyDerateTypeService.getApplyTypeVo(process.getProcessId());
-                    	//车贷减免流程：减免金额<= 10000或者房贷减免流程：减免金额<= 20000 ，流程到区域贷后主管审批就结束
-                    	if((vo.getBusinessTypeId()==BusinessTypeEnum.CYD_TYPE.getValue()&&vo.getDerateMoney().compareTo(new BigDecimal("10000"))<=0)
-                    			||vo.getBusinessTypeId()==BusinessTypeEnum.FSD_TYPE.getValue()&&vo.getDerateMoney().compareTo(new BigDecimal("20000"))<=0) {
-                    		   retMap.put("realReceiveMoneyEditFlage", JSON.toJSON("true", JsonUtil.getMapping()));
-                    	}
-
-                    }
-                }
+           
            
                 //查询其他费用项
                 List<ApplyDerateProcessOtherFees> otherFees= applyDerateProcessOtherFeesService.selectList(new EntityWrapper<ApplyDerateProcessOtherFees>().eq("plan_list_id", crpId).eq("business_id", pList.getBusinessId()).eq("apply_derate_process_id", applyList.get(0).getApplyDerateProcessId()));
@@ -317,15 +307,7 @@ public class ApplyDerateController {
             }
 
             processService.getProcessShowInfo(retMap,processId, ProcessTypeEnums.Apply_Derate);
-//            
-//            String businessId = "";
-//            
-//            if (!CollectionUtils.isEmpty(businessVoList)) {
-//            	businessId = businessVoList.get(0).getBusinessId();
-//            		
-//			}
-            
-            
+
        
             
          // 查询附件
@@ -337,57 +319,7 @@ public class ApplyDerateController {
 				retMap.put("returnRegFiles", fileList);
 			}
 
-/*
 
-
-            //传递流程信息到前端
-            Process process = null;
-            if(processId !=null){
-                process =  processService.getProcess(processId);
-                if(process !=null){
-                    List<Process> l = new LinkedList<>(); 
-                    l.add(process);
-                    retMap.put("process",(JSONArray) JSON.toJSON(l, JsonUtil.getMapping()));
-                }
-
-                //历史审核记录  开始
-                List<ProcessLog> logs =  processLogService.getProcessLogList(processId);
-                List<ProcessLogVo>  logsVo = new LinkedList<ProcessLogVo>();
-                for(ProcessLog log : logs){
-                    ProcessLogVo vo  = ClassCopyUtil.copyObject(log,ProcessLogVo.class);
-//                    ProcessTypeStep step = processTypeStepService.getProcessTypeStep(Constant.APPLY_DERATE_PROCEEE_TYPE_ID,log.getCurrentStep());
-//                    vo.setStepName(step.getStepName());
-                    vo.setApproveUserName(log.getApproveUserId());
-                    logsVo.add(vo);
-                }
-                retMap.put("processLogs",(JSONArray) JSON.toJSON(logsVo, JsonUtil.getMapping()));
-                //历史审核记录  结束
-
-                //申请减免的信息
-                List<ApplyDerateProcess>  applyList = applyDerateProcessService.selectList(new EntityWrapper<ApplyDerateProcess>().eq("process_id",processId));
-                retMap.put("applyList",(JSONArray) JSON.toJSON(applyList, JsonUtil.getMapping()));
-
-            }
-
-            //流程列表
-            List<ProcessTypeStep>  stepList = processTypeStepService.getProcessTypeStep(Constant.APPLY_DERATE_PROCEEE_TYPE_ID);
-            JSONArray stepArray = processTypeStepService.getProcessTypeStepArray(stepList,process);
-            retMap.put("stepArray",stepArray);
-
-
-            //当前审核信息
-            if(process!=null){
-                retMap.put("approveUserName",process.getApproveUserId());
-                ProcessTypeStep currentStepInfo  =  processTypeStepService.findCurrentStepInfo(stepList,process);
-                retMap.put("currentStepName",currentStepInfo!=null?currentStepInfo.getStepName():"");
-            }else{
-                retMap.put("approveUserName","");
-                retMap.put("currentStepName","");
-            }
-            retMap.put("approveDate",new Date());
-
-
-            //可选抄送人列表*/
 
             return Result.success(retMap);
 
