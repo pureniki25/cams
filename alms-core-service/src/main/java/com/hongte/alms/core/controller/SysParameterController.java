@@ -221,7 +221,7 @@ public class SysParameterController {
 			s.setParamValue3(j.getString("paramValue3"));
 			s.setParamValue4(j.getString("paramValue4"));
 			s.setParamValue5(j.getString("paramValue5"));
-			s.setParamId(UUID.randomUUID().toString());
+			s.setParamId(j.getString("paramId"));
 			s.setCreateTime(new Date());
 			s.setCreateUser(userId);
 			s.setStatus(sysParameter.getStatus());

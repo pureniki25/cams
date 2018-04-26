@@ -855,8 +855,11 @@ var getShowInfo = function () {
 
 
 ////////////////////  ---------------  流程审批信息 赋初始值 开始 -------------------////////////
+                
+       
                     //流程显示
                     vm.myProcess = res.data.data.stepArray;
+              
                     //抄送用户
                     vm.canSendUserList =res.data.data.canSendUserList;
                     //回退步骤列表
@@ -884,6 +887,24 @@ var getShowInfo = function () {
                             vm.approvalInfoList[i].isPassFlage = t.isPass=="1"?"是":"否";
                         }
                         processStatus = vm.approvalInfoForm.process.status;
+                        
+                        
+                        //车贷  减免金额<= 10000,流程到区域贷后主管审批就结束
+                        if(businessTypeId == 1 || businessTypeId == 9){debugger
+                        	if(dereteMoneySum()<=10000){
+                        		res.data.data.stepArray.pop();
+                        		res.data.data.stepArray.pop();
+                        	}
+                        } 
+                        //房贷 减免金额<= 20000 ,流程到区域贷后主管审批就结束
+                        if(businessTypeId == 2 || businessTypeId == 11){
+                         	if(dereteMoneySum()<=20000){
+                         		res.data.data.stepArray.pop();
+                         		res.data.data.stepArray.pop();
+                        	}
+                        }
+                            //流程显示
+                            vm.myProcess = res.data.data.stepArray;
                     }
 
 

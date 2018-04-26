@@ -270,6 +270,7 @@
         s_user.user_name as createUserName,
 		business.company_id as companyId,
 		company.area_name as companyName,
+	   business.business_type as businessTypeId,
 		
 			(CASE process.status
          WHEN 2 THEN process.update_time 
