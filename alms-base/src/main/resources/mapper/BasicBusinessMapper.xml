@@ -213,13 +213,14 @@
 		    ON pList.plan_list_id = c.plan_list_id 
 		  LEFT JOIN 
 		    (--   出款金额 -->
-		    SELECT 
-		      SUM(bplan.borrow_money) AS `getMoney`,
-		      bplan.original_business_id AS `original_business_id` 
+		 	  SELECT 
+		      a.business_id,
+		    sum(a.fact_output_money) getMoney
 		    FROM
-		      tb_repayment_biz_plan bplan  where bplan.is_defer=#{isDefer}
-		   and  bplan.original_business_id=#{originalBusinessId,jdbcType=VARCHAR}) b 
-		    ON business.business_id = b.original_business_id 
+		      tb_biz_output_record a 
+		    WHERE 
+	 a.business_id=#{originalBusinessId,jdbcType=VARCHAR}) b 
+		    ON business.business_id = b.business_id 
 		WHERE pList.plan_list_id = #{crpId,jdbcType=VARCHAR}
     </select>
     
