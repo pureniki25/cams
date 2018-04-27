@@ -195,7 +195,7 @@ let methods = {
     },
     openEditParamModal: function (data) {
         if (data) {
-            app.editParamForm.param = data;
+            app.editParamForm = data;
             app.editParamModal.show = true;
             app.editParamModal.title = "编辑参数"
             app.editParamModal.add = false;
@@ -203,17 +203,17 @@ let methods = {
             app.editParamModal.title = "新增参数"
             app.editParamModal.add = true;
             app.editParamModal.show = true;
+            app.$refs['editParamForm'].resetFields()
         }
     },
     saveParm: function () {
         if (app.editParamModal.add) {
-            app.editParamForm.param.paramType = app.currentParamList.paramType
-            app.editParamForm.param.paramTypeName = app.currentParamList.paramTypeName
-            axios.post(basePath + 'sys/param/addParm', [app.editParamForm.param])
+            app.editParamForm.paramType = app.currentParamList.paramType
+            app.editParamForm.paramTypeName = app.currentParamList.paramTypeName
+            axios.post(basePath + 'sys/param/addParm', [app.editParamForm])
                 .then(function (res) {
                     if (res.data.code == '1') {
                         app.editParamModal.show = false;
-
                         app.listParam(app.currentParamList);
 
                     } else {
@@ -224,7 +224,7 @@ let methods = {
 
                 })
         } else {
-            axios.post(basePath + 'sys/param/updateParm', app.editParamForm.param)
+            axios.post(basePath + 'sys/param/updateParm', app.editParamForm)
                 .then(function (res) {
                     if (res.data.code == '1') {
                         app.editParamModal.show = false;
@@ -276,8 +276,8 @@ let methods = {
         app.batchAddParmModal.show = true
     },
     batchSaveParam: function () {
-        app.editParamForm.param.paramType = app.currentParamList.paramType
-        app.editParamForm.param.paramTypeName = app.currentParamList.paramTypeName
+        app.editParamForm.paramType = app.currentParamList.paramType
+        app.editParamForm.paramTypeName = app.currentParamList.paramTypeName
         console.log(app.batchAddParmModal.param)
         let t = app.batchAddParmModal.param.split('\n');
         if (t.length == 0) {
@@ -301,8 +301,8 @@ let methods = {
                         }
                     });
                 }
-                param.paramType = app.editParamForm.param.paramType;
-                param.paramTypeName = app.editParamForm.param.paramTypeName;
+                param.paramType = app.editParamForm.paramType;
+                param.paramTypeName = app.editParamForm.paramTypeName;
                 params.push(param)
             }
         });

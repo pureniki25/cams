@@ -25,6 +25,7 @@ layui.define(function (exports) {
         // ,useGateWayflage:true
         // ,defaultUser:"admin-alms"
         ,defaultUser:"0111130000"   //贷后中心清算一部主管
+        //,defaultUser:"0111200049"//何靖
         // ,defaultUser:"test_leader"  //区域贷后主管
         ,localBasePath:"http://localhost:30606/"
         ,openBasePath:"http://localhost:30616/"

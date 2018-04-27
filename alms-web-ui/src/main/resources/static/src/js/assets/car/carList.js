@@ -274,13 +274,13 @@ window.layinit(function (htConfig) {
                         field: 'evaluationDate',
                         title: '评估日期',
                         templet:function(d){
-                            return moment(d.evaluationDate).format(YYYYMMDD)
+                            return moment(d.evaluationDate).format("YYYY-MM-DD")
                         }
                     }, {
                         field: 'trailerDate',
                         title: '拖车日期',
                         templet:function(d){
-                            return moment(d.evaluationDate).format(YYYYMMDD)
+                            return moment(d.evaluationDate).format("YYYY-MM-DD")
                         }
                     }, {
 

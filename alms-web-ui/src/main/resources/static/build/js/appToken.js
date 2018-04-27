@@ -134,25 +134,29 @@ var authValid = function(param) {
 
 var getAuth = function() {
 
-	$.ajax({
-		type : 'GET',
-		async : false,
-		// url : "http://10.110.1.240:30111/uc/auth/loadBtnAndTab",
-		// url : "http://localhost:30111/uc/auth/loadBtnAndTab",
-		url : _loadBtnAndTabUrl,
-		headers : {
-			app : 'ALMS',
-			Authorization : "Bearer " + getToken()
-		},
-		success : function(data) {
-			allAuth = data;
-		},
-		error : function() {
-			layer.confirm('Navbar error:AJAX请求出错!', function(index) {
-				top.location.href = loginUrl;
-				layer.close(index);
-			});
-			return false;
-		}
-	});
+	if(typeof allAuth == "undefined" ){
+        $.ajax({
+            type : 'GET',
+            async : false,
+            // url : "http://10.110.1.240:30111/uc/auth/loadBtnAndTab",
+            // url : "http://localhost:30111/uc/auth/loadBtnAndTab",
+            url : _loadBtnAndTabUrl,
+            headers : {
+                app : 'ALMS',
+                Authorization : "Bearer " + getToken()
+            },
+            success : function(data) {
+                allAuth = data;
+            },
+            error : function() {
+                layer.confirm('Navbar error:AJAX请求出错!', function(index) {
+                    top.location.href = loginUrl;
+                    layer.close(index);
+                });
+                return false;
+            }
+        });
+	}
+	
+
 }

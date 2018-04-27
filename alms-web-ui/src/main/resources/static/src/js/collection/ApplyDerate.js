@@ -13,29 +13,43 @@ var processStatus = document.getElementById("processStatus").getAttribute("value
 //流程实例ID
 var processId = document.getElementById("processId").getAttribute("value");
 
+//业务类型ID
+var businessTypeId = getQueryStr("businessTypeId");
+//期数
+var afterId=getQueryStr("afterId");
+var isReceiveMoney=false;
 
 //设置表单验证
 var setFormValidate = {
-    derateMoney: [
-        {required: true, message: '请填写申请减免金额'},
-        // {pattern:/^^[0-9]{8}$/,   message: '请填写不超过两位小数的数字', trigger: 'blur'}
-        // {pattern:/^([0-9]{1,2})+(.[0-9]{1,2})?$/,   message: '请填写不超过两位小数的数字', trigger: 'blur'}
-        {pattern:/^\d{1,8}(\.\d{1,2})?$/,   message: '请填写整数位数不大于8位，小数位数不超过两位的数字', trigger: 'change'}
+//    derateMoney: [
+//        {required: true, message: '请填写申请减免金额'},
+//        // {pattern:/^^[0-9]{8}$/,   message: '请填写不超过两位小数的数字', trigger: 'blur'}
+//        // {pattern:/^([0-9]{1,2})+(.[0-9]{1,2})?$/,   message: '请填写不超过两位小数的数字', trigger: 'blur'}
+//        {pattern:/^\d{1,8}(\.\d{1,2})?$/,   message: '请填写整数位数不大于8位，小数位数不超过两位的数字', trigger: 'change'}
+//    ],
+//    derateType: [
+//        {required: true, message: '请填写申请减免费用项', trigger: 'change'}
+//    ],
+		
+		feeId:[
+        {required: true, message: '请选择减免费用项', trigger: 'change'}
     ],
-    derateType: [
-        {required: true, message: '请填写申请减免费用项', trigger: 'change'}
-    ],
+//	        
+//    derateMoney:[
+//        {required: true, message: '请填写减免金额', trigger: 'change'}
+//    ],
     isSettleFlage: [
         {required: true, message: '请填选择是否结清', trigger: 'change'}
     ],
-    realReceiveMoney: [
-        {pattern:/^[0-9]+(.[0-9]{1,2})?$/,   message: '请填写不超过两位小数的数字', trigger: 'blur'}
-    ],
+    
+//    realReceiveMoney: [
+//        {pattern:/^[0-9]+(.[0-9]{1,2})?$/,   message: '请填写不超过两位小数的数字', trigger: 'blur'}
+//    ],
 	derateReson: [
-		{required: true, message: '必填', trigger: 'change'}  ,  
+		{message: '必填', trigger: 'change'}  ,  
     	{
     		validator: function (rule, value, callback, source, options) {
-    			if (value.length > 500 ) {
+    			if (value!=null&&value.length > 500 ) {
     				callback(new Error('字数长度不能超过500'));
     			} else {
     				callback();//校验通过
@@ -48,11 +62,12 @@ var setFormValidate = {
 
 
 window.layinit(function (htConfig) {
+	
     var _htConfig = htConfig;
     basePath = htConfig.coreBasePath;
 
     getShowInfo();
-
+ 
     vm = new Vue({
         el: '#app',
         data: {
@@ -79,15 +94,28 @@ window.layinit(function (htConfig) {
             // realReceiveMoneyShowFlage:false,
             //实收金额是否可编辑的标志位
             realReceiveMoneyEditFlage:false,
-
+            
             //保存草稿按钮是否显示的标志位
             saveDraftShowFlage:true,
             //其他按钮是否显示的标志位
             buttonShowFlage:true,
-
+            //车贷(是否上标且等额本息)标志
+            preLateFeesFlag:false,
+            //
+            otherFeeShowFlage:true,
+            //是否为车贷:
+            isCarFlag:false,
+            //其他费用项是否可以编辑标志  0:新增 -1:草稿  1：修改
+            otherFeeEditFlage:"0",
+        
 
 //////////////   -------------   基础信息  开始 --------------------//////////////////////
             baseInfoForm:{
+            	afterId:"", 
+                preLateFeesType:"", //提前还款违约金方式:
+          
+                outsideInterestType:"",//合同期外逾期利息类型
+                outsideInterest:"",//合同期外逾期利息
                 businessId:""		   	, //业务编号
                 customerName:""        , //客户名称
                 companyId:""           , //所属分公司ID
@@ -109,8 +137,25 @@ window.layinit(function (htConfig) {
                 needPayPenalty:"" 		, //应付违约金 		待找
                 otherPayAmount:"" 		, //应付其他费用	待找
                 totalBorrowAmount:""   , //应付总额
-
+                preFees:"",//前置费用
+                sumFactAmount:"",//出款后已交月收等费用总额
+                generalReturnRate:"",//综合收益率
+                preLateFees:"",     //提前还款违约金:
+                needPayPlatform:"",      //应付平台费
+                needPayGuarantee:"",   //应付担保费
+                needPaydeposit:"",//应收押金
+                needPayRush:"",//应收冲应收
+                needPayAgency:"",//应收中介费
+                needPayAgency:"",//应收中介费
+                totalFactAmount:"",//实还金额
+                settleTotalFactAmount:"",//结清时该业务实还总额
+                settleNeedPayInterest:"",//结清时该业应付利息;  
+                settleNeedPayService:"",//结清时该业应付月收服务费; 
+                noSettleNeedPayInterest:"",//不结清时该业应付利息;  
+                noSettleNeedPayService:"",//不结清时该业应付月收服务费; 
+                noSettleNeedPayPrincipal:""//不结清时应付本金;
             },
+
             
             returnRegFiles:[{
 	    		file: '',
@@ -120,10 +165,18 @@ window.layinit(function (htConfig) {
 	    		downloadFileName:'',
 	   			docUrl:''
 	    	}],
+	    	 applyTypes:[{
+	    		 derateTypeList:'',
+	    		 derateMoney:'', 
+	    		 feeId:'',
+	    		 applyDerateTypeId:'',
+	    		 beforeDerateMoney:''
+	    	 }],
 	    	reqRegFiles:[{
 	    		originalName: '',
 	    		oldDocId:''
 	    	}],
+	    
 //////////////   -------------   基础信息  结束 --------------------//////////////////////
 
 //////////////   -------------   申请减免信息  开始 --------------------//////////////////////
@@ -131,13 +184,13 @@ window.layinit(function (htConfig) {
             //申请减免信息表单
             applyInfoForm:{
                 applyDerateId:'',           //申请减免列表ID
-                derateType:'',				//申请减免费用项
-                derateMoney:'',				//申请减免金额
+                shouldReceiveMoney:'',		//减免后应收总额
                 realReceiveMoney:'',		//减免后实收总额
                 derateReson:'',				//减免原因
                 title:'',                    //减免标题
                 isSettle:'',                //是否结清标志位
                 isSettleFlage:'',           //是否结清界面显示标志位
+                feeId:'test'
             },
             //后台返回的初始的减免信息
             initalApplyInfo:{},
@@ -152,6 +205,8 @@ window.layinit(function (htConfig) {
                                 paramName:'申请类型二'
                             }*/
             ],
+            otherDerateTypeList:[],
+            otherFees:[],//其他费用项
 
             validApplyInfoForm: setFormValidate,
 //////////////   -------------   申请减免信息  结束 --------------------//////////////////////
@@ -208,6 +263,8 @@ window.layinit(function (htConfig) {
                 sendUserIds		:[],//抄送人ID,以逗号间隔
                 // sendUserNames		:'',//抄送人名字,以逗号间隔
                 copySendInfo		:'',//抄送内容
+                crpId:'',
+                businessId:''
             },
 
 
@@ -270,13 +327,13 @@ window.layinit(function (htConfig) {
                 Submit();
             },
             //减免类型变化响应事件
-            derateTypeChange(){
-                for(var i=0;i<this.derateTypeList.length;i++){
-                    if(this.derateTypeList[i].paramValue == this.applyInfoForm.derateType){
-                        this.applyInfoForm.title = this.baseInfoForm.customerName+this.derateTypeList[i].paramName+"减免申请";
-                    }
-                }
-            },
+//            derateTypeChange(){
+//                for(var i=0;i<this.derateTypeList.length;i++){
+//                    if(this.derateTypeList[i].paramValue == this.applyInfoForm.derateType){
+//                        this.applyInfoForm.title = this.baseInfoForm.customerName+this.derateTypeList[i].paramName+"减免申请";
+//                    }
+//                }
+//            },
 
  ////////  ------------------   流程审批 响应函数 开始 --------------------////////////
             //判断是否审批通过
@@ -292,9 +349,66 @@ window.layinit(function (htConfig) {
                 this.rockBackStepShowFlage = !vm.approvalInfoForm.isPassBoolean&&flage
 
             },
+            //是否结清
+            isClosedClick(flage){
+              if(flage==false){
+            	  vm.otherFeeShowFlage=false;
+         		   var otherList=vm.otherDerateTypeList;
+           		if(otherList != null && otherList.length > 0){
+           	    	for (var i = 0; i < otherList.length; i++){
+           	    		otherList[i].paramValue2='';
+           	    	}
+           		}
+           		   var otherList=vm.otherFees;
+           			if(otherList != null && otherList.length > 0){
+               	    	for (var i = 0; i < otherList.length; i++){
+               	    		otherList[i].planAmount='';
+               	    	}
+               		}
+            	  vm.baseInfoForm.outsideInterest=0;
+            	  vm.baseInfoForm.preLateFees=0;
+            	  vm.applyInfoForm.realReceiveMoney=vm.baseInfoForm.totalFactAmount;
+            	  if(vm.applyInfoForm.realReceiveMoney==0){
+            		  vm.applyInfoForm.realReceiveMoney=''
+            	  }
+            	  
+            	  //不结清时应付本金
+            	  vm.baseInfoForm.needPayPrincipal=vm.baseInfoForm.noSettleNeedPayPrincipal
+            	  //不结清时应付利息
+            	  vm.baseInfoForm.needPayInterest=vm.baseInfoForm.noSettleNeedPayInterest
+            	  //不结清时应付月收服务费
+            	  vm.baseInfoForm.needPayService=vm.baseInfoForm.noSettleNeedPayService
+            	  //不结清时，新增费用项全部为0
+            	  setOhterFeeZero();
+            	  //重新计算应付总额
+            	  getTotalShouldPay();
+            	  
+              }
+              if(flage==true){
+            	  
+            	  vm.otherFeeShowFlage=true;
+            	  vm.applyInfoForm.realReceiveMoney=vm.baseInfoForm.settleTotalFactAmount;
+            	  if(vm.applyInfoForm.realReceiveMoney==0){
+            		  vm.applyInfoForm.realReceiveMoney=''
+            	  }
+            	  showData();
+            	  //结清时应付本金等于剩余本金
+            	  vm.baseInfoForm.needPayPrincipal=vm.baseInfoForm.remianderPrincipal
+            	  //结清时应付利息
+            	  vm.baseInfoForm.needPayInterest=vm.baseInfoForm.settleNeedPayInterest
+            	  //结清时应付月收服务费
+            	  vm.baseInfoForm.needPayService=vm.baseInfoForm.settleNeedPayService
+            	  
+            	  //重新计算应付总额
+            	  getTotalShouldPay();
+            	  
+            	  
+              }
+
+            },
 
 ////////  ------------------   流程审批 响应函数 结束 --------------------////////////
-            
+     
             uploadFile:function(event,index){
 	    		var fileId=event.currentTarget.id;
 	    		// alert(JSON.stringify($('#'+fileId)));
@@ -445,12 +559,109 @@ window.layinit(function (htConfig) {
 	    			 originalName: '',
 	    			 oldDocId:''
 	    		 })
-	    	}
+	    	},
+	    	
+	     	addTypeTr :function(event){
+	    		 this.applyTypes.push({
+	    			 derateTypeList: '',
+	    			 derateMoney: ''
+	    			 
+	    		 })
+	    	},
+            removeTypesItem:function(event,index)
+            {
+
+                var types=vm.applyTypes;
+       	       	if(types != null && types.length > 0){
+       	           	for (var i = 0; i < types.length; i++){
+       	           		if(i==index){
+       	           			vm.applyInfoForm.shouldReceiveMoney=Number(vm.applyInfoForm.shouldReceiveMoney)+Number(types[i].derateMoney);
+       	           		}
+       	           	
+       	           	}
+       	       	}
+            	
+                var that = this;
+            	that.applyTypes.splice(index, 1);
+   	            if(that.applyTypes==""){
+   	            	that.addTypeTr(event);
+   	            }
+               
+   	         getGeneralReturnRate();
+
+            }
+       
         }
     });
 
 
 })
+
+///////////判断是车贷还是房贷，对应不同类型获取提前结清违约金和逾期利息
+var showData=function(){debugger
+	//车贷
+    if(businessTypeId == 1 || businessTypeId == 9){debugger
+                    
+                //判断是否上标且是否等额本息
+            	var reqUrl = basePath + 'transferOfLitigation/queryCarLoanBilDetail?businessId=' + businessId
+                
+                axios.get(reqUrl).then(function(res){
+                	vm.isCarFlag=true
+                  if(res.data.code=='1'){
+                	  getPreviousLateFees();//获取整个业务的滞纳金
+                		vm.baseInfoForm.totalBorrowAmount="";
+                    if (res.data.data.outputPlatformId == 0 && res.data.data.repaymentTypeId == '等额本息') {
+                      vm.preLateFeesFlag = res.data.data.preLateFeesFlag;
+                    }else{
+                    	//如果不是等额本息，就直接调用方法获取违约金
+                    	getPreLateFees();
+                    }
+                  }else{
+                    vm.$Modal.error({content: res.data.msg });
+                  }
+                }).catch(function(error){
+                	vm.isCarFlag=true;
+                  app.$Modal.error({content:'接口调用失败'})
+                })
+      //房贷
+    }else if(businessTypeId == 2 || businessTypeId == 11){
+    	//获取提前结清违约金
+        axios.get(basePath + 'expenseSettle/calByPreSettleDate', {
+            params: {
+                businessId: businessId,
+                preSettleDate: dateToString(new Date())
+            }
+        }
+        ).then(function(res){
+            if(res.data.code=='1'){
+                vm.baseInfoForm.preLateFees = res.data.data.penalty
+                
+                
+            	//房贷业务：逾期天数×剩余本金×0.2%
+                if(res.data.data.isInContractDate=="true"){debugger
+                	vm.baseInfoForm.outsideInterest=0;
+                }else{
+                   	vm.baseInfoForm.outsideInterest=vm.baseInfoForm.delayDays*vm.baseInfoForm.remianderPrincipal*0.002;
+                }
+             
+     
+            
+                //滞纳金:
+                vm.baseInfoForm.needPayPenalty =res.data.data.list[0].lateFee
+               
+            	//获取应付总额
+            	getTotalShouldPay();
+            }else{
+                vm.$Modal.error({content:res.data.msg})
+            }
+        }).catch(function(error){
+            vm.$Modal.error({content:res.data.msg})
+        })
+    }
+
+	
+}
+
 
 /////////////  流程审批相关函数 开始  ///////////////
 //撤销流程审批操作信息
@@ -464,27 +675,157 @@ var restProcessApprovalInfo = function(){
 
 /////////////  流程审批相关函数 结束  ///////////////
 
+///////////应付总额：应付本金+应付利息+应付月收服务费+应付滞纳金+应付其他费用+应付提前结清违约金+应付逾期利息
+var getTotalShouldPay = function () {
+	vm.baseInfoForm.totalBorrowAmount=0;
+	
+	vm.baseInfoForm.totalBorrowAmount=vm.baseInfoForm.needPayPrincipal+vm.baseInfoForm.needPayInterest+vm.baseInfoForm.needPayService+vm.baseInfoForm.needPayPenalty
+                      +Number(getOtherFee())+vm.baseInfoForm.preLateFees+vm.baseInfoForm.outsideInterest
+                      
+                      getGeneralReturnRate();       
+	                   getSumMoney();
+}
+
+
+
+
+
+
+//综合收益率
+//：（前置费用+出款后已交月收等费用总额+应付利息+应付月收服务费+应付滞纳金+应付其他费用+应付提前结清违约金+应付逾期利息）-减免金额合计/借款金额/借款期限
+//（借款期限是客户实际的借款期限，不足一个月按月计算）若客户提前结清或正常结清则直接去结清期的 期限即可，若客户逾期结清 则需计算 真实的借款期限，合同期限+（逾期天数/30 进一
+var getGeneralReturnRate= function () {
+	var borrowLimit=vm.baseInfoForm.borrowLimit;
+	vm.baseInfoForm.generalReturnRate=0;
+    //逾期天数如果大于0,说明逾期，否则直接取借款期限
+     if(vm.baseInfoForm.delayDays>0){
+    	 borrowLimit=borrowLimit+Math.ceil(vm.baseInfoForm.delayDays/30);
+     }
+     
+     var num=((vm.baseInfoForm.preFees+vm.baseInfoForm.sumFactAmount+vm.baseInfoForm.needPayInterest
+                     +vm.baseInfoForm.needPayService+vm.baseInfoForm.needPayPenalty+Number(getOtherFee())+vm.baseInfoForm.preLateFees
+                     +vm.baseInfoForm.outsideInterest)-Number(dereteMoneySum()))/vm.baseInfoForm.borrowMoney/borrowLimit;
+                num=num*100;
+                num=num.toFixed(2);
+                vm.baseInfoForm.generalReturnRate=num+"%";
+     
+
+}
+
+
+
+
+
+///////////车贷:获取提前结清违约金
+var getPreLateFees = function () {debugger
+
+    var reqStr = basePath +"ApplyDerateController/getPreLateFees?crpId="+crpId+"&preLateFeesType="+vm.baseInfoForm.preLateFeesType+"&afterId="+afterId+"&businessId=" + businessId;
+   
+    axios.get(reqStr)
+        .then(function (res) {debugger
+            if (res.data.code == "1") {
+               
+                    vm.baseInfoForm.preLateFees = res.data.data.preLateFees;
+                    getTotalShouldPay();
+            } else {
+                vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
+            }
+        })
+        .catch(function (error) {
+            vm.$Modal.error({content: '接口调用异常!'});
+        });
+}
+///////////车贷：获取整个业务的滞纳金
+var getPreviousLateFees = function () {
+
+    var reqStr = basePath +"ApplyDerateController/getPreLateFees?crpId="+crpId+"&preLateFeesType="+vm.baseInfoForm.preLateFeesType+"&afterId="+afterId+"&businessId=" + businessId
+  
+    axios.get(reqStr)
+        .then(function (res) {debugger
+            if (res.data.code == "1") {
+               
+                    var fees=res.data.data.previousFees;
+                 	for (var i = 0; i < fees.length; i++){
+                 		if(fees[i].previousLateFees!=0&&fees[i].previousLateFees!=''){
+                 			vm.baseInfoForm.needPayPenalty=fees[i].previousLateFees;
+                 		}
+                	
+                	}
+                    getTotalShouldPay();
+            } else {
+                vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
+            }
+        })
+        .catch(function (error) {
+            vm.$Modal.error({content: '接口调用异常!'});
+        });
+}
+
+
+
+///////////车贷:获取合同期外逾期利息
+var getOutsideInterest = function () {debugger
+
+    var reqStr = basePath +"ApplyDerateController/getOutsideInterest?crpId="+crpId+"&outsideInterestType="+vm.baseInfoForm.outsideInterestType+"&afterId="+afterId+"&businessId=" + businessId
+  
+    axios.get(reqStr)
+        .then(function (res) {
+            if (res.data.code == "1") {
+               
+                    vm.baseInfoForm.outsideInterest = res.data.data.outsideInterest;
+                    getTotalShouldPay();
+            } else {
+                vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
+            }
+        })
+        .catch(function (error) {
+            vm.$Modal.error({content: '接口调用异常!'});
+        });
+}
+
+
+
+
 //从后台获取显示数据
 var getShowInfo = function () {
-
     //取显示需要的相关信息
-    var reqStr = basePath +"ApplyDerateController/selectApplyDeratePageShowInfo?crpId="+crpId
+    var reqStr = basePath +"ApplyDerateController/selectApplyDeratePageShowInfo?crpId="+crpId+"&afterId="+afterId+"&businessId=" + businessId;
     if(processId !=null){
         reqStr += "&processId="+processId;
     }
     axios.get(reqStr)
         .then(function (res) {
-            if (res.data.code == "1") {
+            if (res.data.code == "1") {debugger
 ////////// --------------  基本信息  赋值  开始---------------//////////
+                	
+              
                 //基本信息
                 if(res.data.data.baseInfo.length>0){
                     vm.baseInfoForm = res.data.data.baseInfo[0];
+                    vm.baseInfoForm.needPayPenalty=0;
+                    if(vm.baseInfoForm.delayDays==''||vm.baseInfoForm.delayDays==null){
+                    	vm.baseInfoForm.delayDays=0;
+                    }
                 }
+                //默认加载结清的数据
+		            //结清时应付本金等于剩余本金
+		      	  vm.baseInfoForm.needPayPrincipal=vm.baseInfoForm.remianderPrincipal
+		      	  //结清时应付利息
+		      	  vm.baseInfoForm.needPayInterest=vm.baseInfoForm.settleNeedPayInterest
+		      	  //结清时应付月收服务费
+		      	  vm.baseInfoForm.needPayService=vm.baseInfoForm.settleNeedPayService
+            
+            
+               //获取提前还款违约金
+                showData();
+            
+             
  ////////// --------------  基本信息  赋值  结束---------------//////////
 
 ////////// --------------  减免信息  赋值  开始---------------//////////
                 //减免类型显示
                 vm.derateTypeList = res.data.data.derateTypeList;
+                vm.otherDerateTypeList=res.data.data.otherDerateTypeList;
 
                 if(res.data.data.applyList !=null && res.data.data.applyList.length>0){
                     //赋值申请信息
@@ -494,11 +835,17 @@ var getShowInfo = function () {
                     //赋值审批信息初始信息
                     vm.initalApplyInfo.isSettleFlage = vm.initalApplyInfo.isSettle=="1"?"是":"否";
                     vm.initalApplyInfo = res.data.data.applyList[0];
-                    for(var i=0;i<vm.derateTypeList.length;i++){
-                        if(vm.derateTypeList[i].paramValue == vm.applyInfoForm.derateType){
-                            vm.applyInfoForm.title = vm.baseInfoForm.customerName+vm.derateTypeList[i].paramName+"减免申请";
-                        }
-                    }
+                    
+                    vm.baseInfoForm.generalReturnRate =vm.applyInfoForm.generalReturnRate;
+                    vm.baseInfoForm.preLateFees =vm.applyInfoForm.preLateFees;
+                    vm.baseInfoForm.outsideInterest=vm.applyInfoForm.outsideInterest;
+                    
+                    
+//                    for(var i=0;i<vm.derateTypeList.length;i++){
+//                        if(vm.derateTypeList[i].paramValue == vm.applyInfoForm.derateType){
+//                            vm.applyInfoForm.title = vm.baseInfoForm.customerName+vm.derateTypeList[i].paramName+"减免申请";
+//                        }
+//                    }
                 }else{
                     vm.applyInfoForm.title = vm.baseInfoForm.customerName+"减免申请";
                 }
@@ -511,8 +858,11 @@ var getShowInfo = function () {
 
 
 ////////////////////  ---------------  流程审批信息 赋初始值 开始 -------------------////////////
+                
+       
                     //流程显示
                     vm.myProcess = res.data.data.stepArray;
+              
                     //抄送用户
                     vm.canSendUserList =res.data.data.canSendUserList;
                     //回退步骤列表
@@ -540,6 +890,24 @@ var getShowInfo = function () {
                             vm.approvalInfoList[i].isPassFlage = t.isPass=="1"?"是":"否";
                         }
                         processStatus = vm.approvalInfoForm.process.status;
+                        
+                        
+                        //车贷  减免金额<= 10000,流程到区域贷后主管审批就结束
+                        if(businessTypeId == 1 || businessTypeId == 9){debugger
+                        	if(dereteMoneySum()<=10000){
+                        		res.data.data.stepArray.pop();
+                        		res.data.data.stepArray.pop();
+                        	}
+                        } 
+                        //房贷 减免金额<= 20000 ,流程到区域贷后主管审批就结束
+                        if(businessTypeId == 2 || businessTypeId == 11){
+                         	if(dereteMoneySum()<=20000){
+                         		res.data.data.stepArray.pop();
+                         		res.data.data.stepArray.pop();
+                        	}
+                        }
+                            //流程显示
+                            vm.myProcess = res.data.data.stepArray;
                     }
 
 
@@ -569,6 +937,35 @@ var getShowInfo = function () {
 	                		// i++;
 	                	}
                 	}
+                	
+                	
+////////////////////---------------  减免项目类型 赋初始值 开始 -------------------////////////               	
+            var types=res.data.data.applyTypes;
+                	
+                	if(types != null && types.length > 0){
+                		vm.applyTypes[types.length];
+	                	for (var i = 0; i < types.length; i++){
+	                		if(i > 0){
+	                			vm.applyTypes.push({
+	                  				applyDerateTypeId:types[i].applyDerateTypeId,
+	                				derateTypeList:vm.derateTypeList,
+	                				derateMoney:types[i].derateMoney,
+	                				feeId: types[i].feeId,
+	              
+	   	               		 	});
+	                		}else{
+	                     		vm.applyTypes[i].derateTypeList = vm.derateTypeList;
+	                			vm.applyTypes[i].derateMoney = types[i].derateMoney;
+		                		vm.applyTypes[i].feeId = types[i].feeId;
+		                		vm.applyTypes[i].applyDerateTypeId = types[i].applyDerateTypeId;
+		                		
+	                		}
+	                		// i++;
+	                	}
+                	}
+                  	vm.applyInfoForm.feeId="test";
+                	
+////////////////////---------------  减免项目类型 赋初始值 结束 -------------------////////////    
 
  ////////// --------------  界面显示控制   结束---------------//////////
 
@@ -614,10 +1011,20 @@ var getShowInfo = function () {
                     vm.applyInfoFormEditFlage = false;
 ////////// --------------  界面显示控制   结束---------------//////////
 
+                    //----------------判断减免流程节点是否为结束节点，如果是结束节点可以编辑实收金额-----开始--------
 
-
-
+                    if(res.data.data.realReceiveMoneyEditFlage=="true"){
+                    	vm.realReceiveMoneyEditFlage=true;
+                    	isReceiveMoney=true;
+                    }
+                    //-------------------------判断减免流程节点是否为结束节点-------------------结束
                 }
+                
+                //----------------判断其他费用项是否可以编辑-----开始--------
+            	vm.otherFeeEditFlage=res.data.data.otherFeeEditFlage;
+            	vm.otherFees=res.data.data.otherFees;
+            	
+            //----------------判断其他费用项是否可以编辑-----结束--------
 
             } else {
                 vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
@@ -628,16 +1035,81 @@ var getShowInfo = function () {
         });
 }
 
+/**
+ * 计算应收总减免后的金额
+ * 
+ */
+var getSumMoney= function (event,index) {
+		   var types=vm.applyTypes;
+		   vm.applyInfoForm.shouldReceiveMoney=0;
+       	if(types != null && types.length > 0){
+           	for (var i = 0; i < types.length; i++){
+           			vm.applyInfoForm.shouldReceiveMoney=Number(vm.applyInfoForm.shouldReceiveMoney)+Number(types[i].derateMoney);
+           	
+           	}
+       	}
+       	vm.applyInfoForm.shouldReceiveMoney=vm.baseInfoForm.totalBorrowAmount-vm.applyInfoForm.shouldReceiveMoney;
+       	var money=numeral(vm.applyInfoForm.shouldReceiveMoney).format('0.00');
+       			
+    	vm.applyInfoForm.shouldReceiveMoney=Number(money);
+       	
+       	//获取综合效益率
+       	getGeneralReturnRate();
+
+};
+/**
+ * 计算其他费用总额
+ * 
+ */
+var getOtherFee= function (event,index) {
+	   var otherList=vm.otherDerateTypeList;
+	   var otherFee=0;
+	if(otherList != null && otherList.length > 0){
+    	for (var i = 0; i < otherList.length; i++){
+    		otherFee=Number(otherFee)+Number(otherList[i].paramValue2);
+    	}
+	}
+   return otherFee
+};
+
+
+
+/**
+ * 新增其他费用全部等于0
+ * 
+ */
+var setOhterFeeZero= function () {
+	   var otherList=vm.otherDerateTypeList;
+	if(otherList != null && otherList.length > 0){
+    	for (var i = 0; i < otherList.length; i++){
+    		otherList[i].paramValue2='';
+    	}
+	}
+};
+var dereteMoneySum= function () {
+	var dereteMoneySum=0;
+	   var types=vm.applyTypes;
+	if(types != null && types.length > 0){
+    	for (var i = 0; i < types.length; i++){
+    		dereteMoneySum=dereteMoneySum+Number(types[i].derateMoney);
+    	
+    	}
+	}
+    return dereteMoneySum;
+};
+
+
+
 
 /**
  * 只校验 实收金额
  * @type {{realReceiveMoney: [null,null],  : [null], derateType: [null], isSettleFlage: [null]}}
  */
 var setFormValidate1 = {
-    realReceiveMoney: [
-        {required: true, message: '请填写实收金额', trigger: 'blur'},
-        {pattern:/^[0-9]+(.[0-9]{1,2})?$/,   message: '请填写不超过两位小数的数字', trigger: 'blur'}
-    ]
+//    realReceiveMoney: [
+//        {required: true, message: '请填写实收金额', trigger: 'blur'},
+//        {pattern:/^[0-9]+(.[0-9]{1,2})?$/,   message: '请填写不超过两位小数的数字', trigger: 'blur'}
+//    ]
     // derateMoney: [
     //     {required: false, message: '', trigger: 'blur'},
     // ],
@@ -670,11 +1142,11 @@ var Submit = function () {
     if(processStatus == PROCESS_STATUS_NEW || processStatus == PROCESS_STATUS_START){
         saveapplyInfo(PROCESS_STATUS_RUNNING);
     }else if(processStatus == PROCESS_STATUS_RUNNING){
-        if(vm.approvalInfoForm.process.currentStep == APPLY_DERATE_LAST_STATUS){
-            if(vm.applyInfoForm.realReceiveMoney == ''){
-                vm.$Message.error({content: '请填写实收金额!'});
-                return ;
-            }
+        if(vm.approvalInfoForm.process.currentStep == APPLY_DERATE_LAST_STATUS||isReceiveMoney==true){
+//            if(vm.applyInfoForm.realReceiveMoney == ''){
+//                vm.$Message.error({content: '请填写实收金额!'});
+//                return ;
+//            }
             vm.approvalInfoForm.realReceiveMoney = vm.applyInfoForm.realReceiveMoney;
         }
 
@@ -711,6 +1183,8 @@ var saveApprovalInfo = function(){
     ////////////  ---------------   审批流程 标志位转换 ------------------///////////////
     vm.approvalInfoForm.isPass = vm.approvalInfoForm.isPassFlage=="是"?"1":"0";   //是否审批通过
     vm.approvalInfoForm.isDirectBack = vm.approvalInfoForm.isDirectBackFlage=="是"?"1":"0";  //是否回退
+    vm.approvalInfoForm.crpId=crpId;
+    vm.approvalInfoForm.businessId=businessId;
     ////////////  ---------------   审批流程 标志位转换 ------------------///////////////
 
     // vm.approvalInfoForm.sendUserIds.length>0?vm.applyInfoForm.isCopySend=1:0;
@@ -760,13 +1234,22 @@ var saveapplyInfo = function(pStatus){debugger
 	    			vm.reqRegFiles[i]=vm.returnRegFiles[i];
 
 	    		}
+                for(var i=0;i<vm.applyTypes.length;i++){
+	    			if(vm.applyTypes[i].derateMoney==''){
+	    				   vm.$Modal.error({content: '减免费用金额不能为空' });
+	    				   return;
+	    			}
+
+	    		}
+            
                 
                 $.ajax({
 		               type: "POST",
 		               url: basePath+'ApplyDerateController/saveApplyDerateInfo',
 		               contentType: "application/json; charset=utf-8",
-		               data: JSON.stringify({"applyData":[vm.applyInfoForm],"reqRegFiles":vm.reqRegFiles}),
-		               success: function (res) {debugger
+		               data: JSON.stringify({"applyData":[vm.applyInfoForm],"reqRegFiles":vm.reqRegFiles,"applytTypes":vm.applyTypes,"otherDerateTypeList":vm.otherDerateTypeList,
+		            	   "outsideInterest":vm.baseInfoForm.outsideInterest,"generalReturnRate":vm.baseInfoForm.generalReturnRate,"preLateFees":vm.baseInfoForm.preLateFees}),
+		               success: function (res) {
 		            	   if (res.code == "1"){
 		            		   vm.$Modal.success({
 	                                // title: title,
@@ -811,5 +1294,31 @@ var saveapplyInfo = function(pStatus){debugger
         vm.$Message.error({content: '流程状态不对，不能保存申请信息!'});
     }
 }
+
+var dateToString=function(now){  
+    var year = now.getFullYear();  
+    var month =(now.getMonth() + 1).toString();  
+    var day = (now.getDate()).toString();  
+    var hour = (now.getHours()).toString();  
+    var minute = (now.getMinutes()).toString();  
+    var second = (now.getSeconds()).toString();  
+    if (month.length == 1) {  
+        month = "0" + month;  
+    }  
+    if (day.length == 1) {  
+        day = "0" + day;  
+    }  
+    if (hour.length == 1) {  
+        hour = "0" + hour;  
+    }  
+    if (minute.length == 1) {  
+        minute = "0" + minute;  
+    }  
+    if (second.length == 1) {  
+        second = "0" + second;  
+    }  
+     var dateTime = year + "-" + month + "-" + day +" "+ hour +":"+minute+":"+second;  
+     return dateTime;  
+  }  
 
 

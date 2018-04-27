@@ -12,7 +12,7 @@ import java.util.Date;
  */
 @ExcelTarget("ApplyDerateVo")
 public class ApplyDerateVo {
-
+    
     @Excel(name = "业务编号", orderNum = "1",  isImportField = "true_st")
     private String businessId			;		//业务编号
     @Excel(name = "期数", orderNum = "2",  isImportField = "true_st")
@@ -42,8 +42,17 @@ public class ApplyDerateVo {
     @Excel(name = "减免时间", orderNum = "12",   databaseFormat = "yyyyMMddHHmmss", format = "yyyy-MM-dd", isImportField = "true_st", width = 20)
     private String derateTime			;		//减免时间
 
+    private String applyDerateProcessId;//减免流程ID
+    
+    public String getApplyDerateProcessId() {
+		return applyDerateProcessId;
+	}
 
-    public String getBusinessId() {
+	public void setApplyDerateProcessId(String applyDerateProcessId) {
+		this.applyDerateProcessId = applyDerateProcessId;
+	}
+
+	public String getBusinessId() {
         return businessId;
     }
 

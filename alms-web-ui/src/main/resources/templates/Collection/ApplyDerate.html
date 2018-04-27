@@ -47,6 +47,7 @@
     <script src="/src/js/comm.js"></script>
 
 <style type="text/css">
+
 .layui-form-item {
 	border-bottom: 2px solid #DBDBDB; /*下边框线*/
 }
@@ -96,6 +97,8 @@ color: #FF3030;
     top: 0;
     opacity: 0;
 }
+
+
 </style>
 
 </head>
@@ -105,8 +108,9 @@ color: #FF3030;
 <p id="crpId"  th:attr="value=${crpId}"  hidden />
 <p id="processStatus"  th:attr="value=${processStatus}"  hidden />
 <p id="processId"  th:attr="value=${processId}"  hidden />
+
 <!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
-<div id="app" v-cloak>
+<div id="app" v-cloak  >
 
     <row type="flex" justify="end" class="code-row-bg">
         <i-col span="18"><font size="16px" color="#464c5b">{{ applyInfoForm.title }}</font></i-col>
@@ -139,7 +143,7 @@ color: #FF3030;
 
             <!--基本信息表单内容-->
             <row :gutter="16">
-                <i-form ref="baseInfoForm"  :model="baseInfoForm"   label-position="right" :label-width="100">
+                        <i-form ref="baseInfoForm"  :model="baseInfoForm"   label-position="right" :label-width="100">
                     <div class="table">
                         <div class="tr">
                             <div class="td"> <div class="td-box">业务编号：</div><div class="td-box">{{ baseInfoForm.businessId }} </div> </div>
@@ -153,29 +157,88 @@ color: #FF3030;
                         </div>
                         <div class="tr">
                             <div class="td"> <div class="td-box">{{baseInfoForm.borrowRateName}}</div><div class="td-box"> {{ baseInfoForm.borrowRateStr }} </div> </div>
-                            <div class="td"> <div class="td-box">借款金额：</div><div class="td-box">{{ baseInfoForm.borrowMoney?numeral(baseInfoForm.borrowMoney).format('0,0.00'):'' }} </div> </div>
-                            <div class="td"> <div class="td-box">出款金额：</div><div class="td-box">{{ baseInfoForm.getMoney?numeral(baseInfoForm.getMoney).format('0,0.00'):''   }} </div> </div>
+                            <div class="td"> <div class="td-box">借款金额：</div><div class="td-box">{{ baseInfoForm.borrowMoney }} </div> </div>
+                            <div class="td"> <div class="td-box">出款金额：</div><div class="td-box">{{ baseInfoForm.getMoney }} </div> </div>
+                        </div>
+                         <div class="tr">
+                    
+                            <div class="td"> <div class="td-box">前置费用：</div><div class="td-box">{{ baseInfoForm.preFees }} </div> </div>
+                            <div class="td"> <div class="td-box">出款后已交月收等费用总额：</div><div class="td-box">{{ baseInfoForm.sumFactAmount }} </div> </div>
+                            <div class="td"> <div class="td-box">剩余本金：</div><div class="td-box">{{ baseInfoForm.remianderPrincipal }} </div> </div>
                         </div>
                         <div class="tr">
-                            <div class="td"> <div class="td-box">剩余本金：</div><div class="td-box">{{ baseInfoForm.remianderPrincipal?numeral(baseInfoForm.remianderPrincipal).format('0,0.00'):''  }} </div> </div>
-                            <div class="td"> <div class="td-box">当前还款期数：</div><div class="td-box">{{ baseInfoForm.periods }} </div> </div>
-                            <div class="td"> <div class="td-box">逾期天数：</div><div class="td-box">{{ baseInfoForm.delayDays }} </div> </div>
+                            <div class="td"> <div class="td-box">综合收益率：</div><div class="td-box">{{ baseInfoForm.generalReturnRate }} </div> </div>
+                            <div class="td"> <div class="td-box">当前还款期数：</div><div class="td-box">{{ baseInfoForm.afterId }} </div> </div>
+                            <div class="td"> <div class="td-box">逾期天数：</div><div class="td-box">{{ baseInfoForm.delayDays}} </div> </div>
                         </div>
                         <div class="tr">
-                            <div class="td"> <div class="td-box">应付利息：</div><div class="td-box">{{ baseInfoForm.needPayInterest?numeral(baseInfoForm.needPayInterest).format('0,0.00'):'' }} </div> </div>
-                            <div class="td"> <div class="td-box">应付本金：</div><div class="td-box">{{ baseInfoForm.needPayPrincipal?numeral(baseInfoForm.needPayPrincipal).format('0,0.00'):''   }} </div> </div>
-                            <div class="td"> <div class="td-box">应付违约金：</div><div class="td-box">{{ baseInfoForm.needPayPenalty?numeral(baseInfoForm.needPayPenalty).format('0,0.00'):''  }} </div> </div>
+                            <div class="td"> <div class="td-box">应付利息：</div><div class="td-box">{{ baseInfoForm.needPayInterest }} </div> </div>
+                            <div class="td"> <div class="td-box">应付本金：</div><div class="td-box">{{ baseInfoForm.needPayPrincipal }} </div> </div>
+                            <div class="td"> <div class="td-box">应付月收服务费：</div><div class="td-box">{{ baseInfoForm.needPayService }} </div> </div>
                         </div>
                         <div class="tr">
-                            <div class="td"> <div class="td-box">应付其他费用：</div><div class="td-box">{{ baseInfoForm.otherPayAmount?numeral(baseInfoForm.otherPayAmount).format('0,0.00'):'' }} </div> </div>
-                            <div class="td"> <div class="td-box">应付总额：</div><div class="td-box">{{ baseInfoForm.totalBorrowAmount?numeral(baseInfoForm.totalBorrowAmount).format('0,0.00'):'' }} </div> </div>
-                            <div class="td"> <div class="td-box">        </div><div class="td-box">              </div> </div>
+                            <div class="td"> <div class="td-box">应付滞纳金：</div><div class="td-box">{{ baseInfoForm.needPayPenalty }} </div> </div>
+<!--                             <div class="td"> <div class="td-box">应付其他费用：</div><i-input v-model="baseInfoForm.otherPayAmount" class="td-box" @on-blur="getTotalShouldPay()"> </i-input> </div> -->
+                                <div class="td"> <div class="td-box">应付逾期利息：</div><div class="td-box">		
+                            <i-select v-model="baseInfoForm.outsideInterestType" clearable  filterable style="width:100px" v-if="isCarFlag" @on-change="getOutsideInterest">
+                                    <i-option value="0.03334">3.334%</i-option>
+                                    <i-option value="0.03">3%</i-option>
+                                    <i-option value="0.028334">2.8334%</i-option>
+                                    <i-option value="0.025">2.5%</i-option>
+                                    <i-option value="0.023334">2.3334%</i-option>
+                                    <i-option value="0.018">1.8%</i-option>
+                                    <i-option value="0.016">1.6%</i-option>
+                                    <i-option value="0.015">1.5%</i-option>
+                                </i-select>
+		                		<span>{{ baseInfoForm.outsideInterest }} </span></div> </div>
+                            <div class="td"> <div class="td-box">应付提前结清违约金：</div><div class="td-box">
+                            <i-select  v-model="baseInfoForm.preLateFeesType" clearable  filterable style="width:165px" v-if="preLateFeesFlag" @on-change="getPreLateFees">
+	                                    <i-option value="1">一个月利息</i-option>
+	                                    <i-option value="2">借款本金*3%</i-option>
+	                                    <i-option value="3">剩余本金*0.5%*剩余期数</i-option>
+	                                </i-select >
+                            
+                           <span> {{ baseInfoForm.preLateFees }} </span></div> </div>
+                        </div>
+                        <div class="tr">
+                                  <div class="td"> <div class="td-box">应付总额：</div><div class="td-box">{{ baseInfoForm.totalBorrowAmount?numeral(baseInfoForm.totalBorrowAmount).format('0,0.00'):'' }} </div> </div>
+                                <div class="td"> <div class="td-box"></div><div class="td-box"> </div> </div>
+                  
+                            <div class="td"> <div class="td-box">    </div>	<div class="td-box">	</div></div>
+			                		
+			                
                         </div>
                     </div>
 
                 </i-form>
             </row>
+            
+           
         </Card>
+        
+        <card>
+            <row :gutter="16">
+                <i-form v-if="otherFeeShowFlage" ref="baseInfoForm"  :model="baseInfoForm"   label-position="right" :label-width="100">
+                    <div class="table">
+                  
+                        <div  v-if="otherFeeEditFlage == '0'" class="tr" v-for="(item, index) in otherDerateTypeList">
+                            <div class="td"> <div class="td-box">{{ item.paramName }}</div><i-input v-model="item.paramValue2" class="td-box" @on-blur="getTotalShouldPay()"> </i-input> </div>
+                     
+                        </div>
+                        
+                        <div  v-if="otherFeeEditFlage == '-1'" class="tr" v-for="(item, index) in otherFees">
+                            <div class="td"> <div class="td-box">{{ item.planItemName }}</div><i-input v-model="item.planAmount" class="td-box" @on-blur="getTotalShouldPay()"> </i-input> </div>
+                     
+                        </div>
+                         <div v-if="otherFeeEditFlage == '1'"  class="tr" v-for="(item, index) in otherFees">
+                            <div class="td"> <div class="td-box">{{ item.planItemName }}</div><i-input disabled  v-model="item.planAmount" class="td-box" @on-blur="getTotalShouldPay()"> </i-input> </div>
+                     
+                        </div>
+                    </div>
+
+                </i-form>
+                </row>
+        </card>
 
 
         <Card>
@@ -184,25 +247,13 @@ color: #FF3030;
             </p>
             <!--申请信息表单内容-->
             <row :gutter="16">
-                <i-form ref="applyInfoForm"  :model="applyInfoForm"  :rules = "validApplyInfoForm"  label-position="right" :label-width="180">
+                <i-form ref="applyInfoForm"  :model="applyInfoForm"  :rules = "validApplyInfoForm"  label-position="right" :label-width="100">
                     <row :gutter="16">
-                        <i-col span="10">
-                            <form-item v-if="applyInfoFormEditFlage == true"  label="申请减免费用项：" prop="derateType" >
-                                <i-select v-model="applyInfoForm.derateType" @on-change="derateTypeChange()" clearable filterable  >
-                                    <i-option v-for="item in derateTypeList" :value="item.paramValue" :key="item.paramValue">{{ item.paramName }}</i-option>
-                                </i-select>
-                            </form-item>
-                            <form-item v-else   label="申请减免费用项：" prop="derateType"  disabled>
-                                <i-select v-model="applyInfoForm.derateType" clearable filterable disabled >
-                                    <i-option v-for="item in derateTypeList" :value="item.paramValue" :key="item.paramValue">{{ item.paramName }}</i-option>
-                                </i-select>
-                            </form-item>
-                        </i-col>
                         <i-col span="10">
                             <form-item v-if="applyInfoFormEditFlage == true" label="是否结清申请：" prop="isSettleFlage"  >
                                 <radio-group v-model="applyInfoForm.isSettleFlage" >
-                                    <radio label="是" ></radio>
-                                    <radio label="否" ></radio>
+                                       <span @click="isClosedClick(true)"> <radio label="是" ></radio></span>
+                                       <span @click="isClosedClick(false)"> <radio label="否" ></radio></span>
                                 </radio-group>
                             </form-item>
                             <form-item v-else label="是否结清申请：" prop="isSettleFlage" disabled  >
@@ -211,22 +262,64 @@ color: #FF3030;
                                     <radio label="否" disabled></radio>
                                 </radio-group>
                             </form-item>
+                     
+                        </i-col>
+                    </row>
+                    <row :gutter="16" v-for="(item, index) in applyTypes">
+                        <i-col span="7">
+                            <form-item v-if="applyInfoFormEditFlage == true"  :label="'申请减免费用项' +(index+1)" prop="feeId" >
+                                <i-select v-model="item.feeId" clearable filterable  >
+                                    <i-option v-for="item in derateTypeList" :value="item.feeId" :key="item.feeId" >{{ item.planItemName }}</i-option>
+                                </i-select>
+                            </form-item>
+                            <form-item v-else   label="申请减免费用项：" prop="derateType"  disabled>
+                                <i-select v-model="item.feeId" clearable filterable disabled >
+                                    <i-option v-for="item in derateTypeList" :value="item.feeId" :key="item.feeId">{{ item.planItemName }}</i-option>
+                                </i-select>
+                            </form-item>
+                            
+                                 <form-item class="layui-hide"  label="减免项目ID："  prop="applyDerateTypeId">
+                                <i-input v-model="item.applyDerateTypeId" ></i-input>
+                            </form-item>
+                      
+                        
+                        </i-col>
+                         <i-col span="7">
+                            <form-item v-if="applyInfoFormEditFlage"  label="申请减免金额："   prop="derateMoney">
+                                <i-input v-model="item.derateMoney" @on-blur="getSumMoney($event, index)" ></i-input>
+                            </form-item>
+                            <form-item v-else label="申请减免金额："   disabled>
+                                <i-input v-model="item.derateMoney" disabled ></i-input>
+                            </form-item>
+                            
+                        </i-col>
+                         <i-col  span="1">
+                                     <i-button v-if="applyInfoFormEditFlage" class="layui-btn layui-btn-primary layui-btn-sm"  v-on:click="addTypeTr($event)"><Icon type="plus"></Icon></i-button>
+     
+								
+                        </i-col>
+                
+                             <i-col  span="1">
+                          		    <i-button v-if="applyInfoFormEditFlage" class="layui-btn layui-btn-primary layui-btn-sm"  v-on:click="removeTypesItem($event, index)"><Icon type="trash-a"></Icon></i-button>
+								
+                        </i-col>
+                    </row>
+     
+                     <row :gutter="16">
+                        <i-col span="10">
+                         
+                            <form-item label="最终应缴金额："  prop="shouldReceiveMoney"   >
+                                <i-input v-model="applyInfoForm.shouldReceiveMoney" disabled ></i-input>
+                            </form-item>
                         </i-col>
                     </row>
                     <row :gutter="16">
+                    
                         <i-col span="10">
-                            <form-item v-if="applyInfoFormEditFlage" label="申请减免金额："   prop="derateMoney">
-                                <i-input v-model="applyInfoForm.derateMoney" ></i-input>
-                            </form-item>
-                            <form-item v-else label="申请减免金额："   disabled>
-                                <i-input v-model="applyInfoForm.derateMoney" disabled ></i-input>
-                            </form-item>
-                        </i-col>
-                        <i-col span="10">
-                            <form-item v-if="realReceiveMoneyEditFlage" label="减免后实收总额："   prop="realReceiveMoney">
-                                <i-input v-model="applyInfoForm.realReceiveMoney" ></i-input>
-                            </form-item>
-                            <form-item v-else label="减免后实收总额："  prop="realReceiveMoney"   >
+<!--                             <form-item v-if="realReceiveMoneyEditFlage" label="最终实缴金额："   prop="realReceiveMoney"> -->
+<!--                                 <i-input v-model="applyInfoForm.realReceiveMoney" ></i-input> -->
+<!--                             </form-item> -->
+                            <form-item  label="最终实缴金额："  prop="realReceiveMoney"   >
                                 <i-input v-model="applyInfoForm.realReceiveMoney" disabled ></i-input>
                             </form-item>
                         </i-col>
@@ -280,8 +373,7 @@ color: #FF3030;
 								</td>
 								<td class="td_label" v-if="applyInfoFormEditFlage">重命名文件名称</td>
 								<td v-if="applyInfoFormEditFlage">
-                                    <i-input v-model="info.originalName" :id="'uploadfileName'+index"></i-input>
-									<!-- <input type="text" name="lname" v-model="info.originalName" style="width: 100%" maxlength="100" :id="'uploadfileName'+index" /> -->
+									  <i-input v-model="info.originalName" :id="'uploadfileName'+index"></i-input>
 								</td>
 								<td>
 								<td v-if="applyInfoFormEditFlage">
@@ -424,14 +516,11 @@ color: #FF3030;
 
         <row style="padding: 10px">  <!--@click="showCollectionStackLog()"-->
             <i-col span="24">
-                    <div class="layui-btn-group" style="float: right;" >
+                          <div class="layui-btn-group" style="float: right;" >
                             <button v-if = "buttonShowFlage" class="layui-btn"  @click="saveAppply()">提交审批</button>
                             <button v-if ="saveDraftShowFlage" class="layui-btn" @click="saveDeraf()">保存草稿</button>
                             <button v-if = "buttonShowFlage" class="layui-btn layui-btn-danger" @click="resetEdit()">撤销</button>
                           </div>
-                <!-- <i-button v-if = "buttonShowFlage"  type="success"  @click="saveAppply()" >提交审批</i-button>
-                <i-button v-if ="saveDraftShowFlage" type="info"  @click="saveDeraf()" >保存草稿</i-button>
-                <i-button v-if = "buttonShowFlage"  type="success"  @click="resetEdit()"  >撤销</i-button> -->
             </i-col>
         </row>
 
