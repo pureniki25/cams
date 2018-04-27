@@ -103,6 +103,13 @@ public class RepaymentBizPlan extends Model<RepaymentBizPlan> {
 	@TableField("xd_out_id")
 	@ApiModelProperty(required= true,value = "对应原信贷的出款计划ID(out_id)，用作历史数据迁移的标记字段。若非原信贷系统生成的还款计划，则为空")
 	private Integer xdOutId;
+
+	/**
+	 * 是否有效状态：1 有效 ，0 无效
+	 */
+	@ApiModelProperty(required= true,value = "是否有效状态：1 有效 ，0 无效")
+	private Integer active;
+
     /**
      * 创建日期
      */
@@ -291,5 +298,13 @@ public class RepaymentBizPlan extends Model<RepaymentBizPlan> {
 			", updateTime=" + updateTime +
 			", updateUser=" + updateUser +
 			"}";
+	}
+
+	public Integer getActive() {
+		return active;
+	}
+
+	public void setActive(Integer active) {
+		this.active = active;
 	}
 }

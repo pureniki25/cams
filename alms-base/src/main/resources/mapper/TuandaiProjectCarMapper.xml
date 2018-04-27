@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.TuandaiProjectCarMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.TuandaiProjectCar">
+        <id column="project_id" property="projectId" />
+        <result column="ForecastBorrowAmount" property="ForecastBorrowAmount" />
+        <result column="car_brand" property="carBrand" />
+        <result column="car_type" property="carType" />
+        <result column="car_price" property="carPrice" />
+        <result column="car_origin" property="carOrigin" />
+        <result column="car_KM" property="carKM" />
+        <result column="car_is_big_repair" property="carIsBigRepair" />
+        <result column="car_place" property="carPlace" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="update_time" property="updateTime" />
+        <result column="update_user" property="updateUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        project_id AS projectId, ForecastBorrowAmount, car_brand AS carBrand, car_type AS carType, car_price AS carPrice, car_origin AS carOrigin, car_KM AS carKM, car_is_big_repair AS carIsBigRepair, car_place AS carPlace, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
+    </sql>
+
+</mapper>

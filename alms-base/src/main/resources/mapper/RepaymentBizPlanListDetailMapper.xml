@@ -17,6 +17,7 @@
         <result column="fact_amount" property="factAmount" />
         <result column="repay_source" property="repaySource" />
         <result column="fact_repay_date" property="factRepayDate" />
+        <result column="active" property="active" />
         <result column="create_date" property="createDate" />
         <result column="create_user" property="createUser" />
         <result column="update_date" property="updateDate" />
@@ -25,7 +26,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        plan_detail_id AS planDetailId, plan_list_id AS planListId, business_id AS businessId, period, plan_amount AS planAmount, plan_rate AS planRate, fee_id AS feeId, plan_item_name AS planItemName, plan_item_type AS planItemType, account_status AS accountStatus, fact_amount AS factAmount, repay_source AS repaySource, fact_repay_date AS factRepayDate, create_date AS createDate, create_user AS createUser, update_date AS updateDate, update_user AS updateUser
+        plan_detail_id AS planDetailId, plan_list_id AS planListId, business_id AS businessId, period, plan_amount AS planAmount, plan_rate AS planRate, fee_id AS feeId, plan_item_name AS planItemName, plan_item_type AS planItemType, account_status AS accountStatus, fact_amount AS factAmount, repay_source AS repaySource, fact_repay_date AS factRepayDate,active,  create_date AS createDate, create_user AS createUser, update_date AS updateDate, update_user AS updateUser
     </sql>
 
 </mapper>

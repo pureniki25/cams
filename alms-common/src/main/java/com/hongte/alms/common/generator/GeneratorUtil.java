@@ -43,7 +43,7 @@ public class GeneratorUtil {
                                 return super.processTypeConvert(fieldType);
                             }
                         })
-                        .setDriverName("com.mysql.jdbc.Driver")
+                        .setDriverName("com.mysql.cj.jdbc.Driver")
                         .setUsername(account)
                         .setPassword(pass)
                         .setUrl(dburl);
