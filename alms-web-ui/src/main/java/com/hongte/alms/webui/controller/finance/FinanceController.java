@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.hongte.alms.webui.controller.finance;
 
@@ -18,7 +18,7 @@ public class FinanceController {
 	public String index() {
 		return "/finance/index" ;
 	}
-	
+
 	@RequestMapping("/manualMatchBankSatements")
 	public String manualMatchBankSatements() {
 		return "/finance/manualMatchBankSatements" ;

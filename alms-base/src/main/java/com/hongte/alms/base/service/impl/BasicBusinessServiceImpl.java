@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -41,8 +42,8 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 
 
 
-    public List<BusinessInfoForApplyDerateVo> selectBusinessInfoForApplyDerateVo(String crpId){
-        List<BusinessInfoForApplyDerateVo> List  =  basicBusinessMapper.selectBusinessInfoForApplyDerateVo(crpId);
+    public List<BusinessInfoForApplyDerateVo> selectBusinessInfoForApplyDerateVo(String crpId,Integer isDefer,String originalBusinessId){
+        List<BusinessInfoForApplyDerateVo> List  =  basicBusinessMapper.selectBusinessInfoForApplyDerateVo(crpId,isDefer,originalBusinessId);
         
        
         //利息类型列表
@@ -89,8 +90,8 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 
     }
 
-    public BusinessInfoForApplyDerateVo selectBusinessInfoForApplyDerateVoOne(String crpId){
-        List<BusinessInfoForApplyDerateVo> List  =selectBusinessInfoForApplyDerateVo(crpId);
+    public BusinessInfoForApplyDerateVo selectBusinessInfoForApplyDerateVoOne(String crpId,Integer isDefer,String originalBusinessId){
+        List<BusinessInfoForApplyDerateVo> List  =selectBusinessInfoForApplyDerateVo(crpId,isDefer,originalBusinessId);
 
 
         if(List.size()>0){
@@ -118,14 +119,46 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
         return sList;
     }
 
+	/**
+	 * 	结清最终缴纳的金额 
+	 * @param original_business_id
+	 * @return
+	 */
+	@Override
+	 public Double getSettleTotalFactSum(@Param("original_business_id") String original_business_id) {
+		 
+		 return basicBusinessMapper.getSettleTotalFactSum(original_business_id);
+	 }
 
-
-
+    
+    /**
+     * 一次性收取的分公司费用+期初收取的月收分公司服务费+平台费+担保费
+     * @param original_business_id
+     * @return
+     */
+	@Override
+	public BigDecimal getPreChargeAndPreFees(String original_business_id) {
+		BigDecimal preCharge=BigDecimal.valueOf(basicBusinessMapper.getPreCharge(original_business_id)==null?0:basicBusinessMapper.getPreCharge(original_business_id));
+//		BigDecimal preFees=BigDecimal.valueOf(basicBusinessMapper.getPreFees(original_business_id)==null?0:basicBusinessMapper.getPreFees(original_business_id));
+		BigDecimal sum=preCharge;
+		return sum;
+	}
 //
 //    Public BusinessInfoForApplyDerateVo selectBusinessInfoForApplyDerateVo(String crpId){
 //
 //        return null;
 //    }
+
+	@Override
+	public Double getMonthSumFactAmount(String original_business_id) {
+		 return basicBusinessMapper.getMonthSumFactAmount(original_business_id); 
+	}
+
+	@Override
+	public Map<String, Object> getNeedPay(String original_business_id) {
+		// TODO Auto-generated method stub
+		return basicBusinessMapper.getNeedPay(original_business_id);
+	}
 
 //    Public List<BusinessInfoForApplyDerateVo> selectBusinessInfoForApplyDerateVo(String crpId){
 //       return  basicBusinessMapper.selectBusinessInfoForApplyDerateVo(crpId);

@@ -10,6 +10,7 @@
 
 
 
+	
 		select
 
 		pList.plan_list_id as planListId,
@@ -46,29 +47,29 @@
 
 		from tb_repayment_biz_plan_list as pList
 
-		JOIN tb_repayment_biz_plan as plan on pList.plan_id = plan.plan_id
+		left JOIN tb_repayment_biz_plan as plan on pList.plan_id = plan.plan_id
 
 
-		JOIN tb_basic_business as business ON plan.original_business_id =
+		left JOIN tb_basic_business as business ON plan.original_business_id =
 		business.business_id
 
 
-		JOIN tb_basic_business_customer as customer on
+		left JOIN tb_basic_business_customer as customer on
 		plan.original_business_id=customer.business_id
 
 
-		join tb_customer_bind_card as bindcard on
+		left join tb_customer_bind_card as bindcard on
 		bindcard.customer_id=customer.customer_id
 
-		join tb_customer_bind_platform as bindPlatform on bindPlatform.bind_id=
+		left join tb_customer_bind_platform as bindPlatform on bindPlatform.bind_id=
 		bindcard.bind_id
 
-		join tb_withholding_platform as platform on
+		left join tb_withholding_platform as platform on
 		platform.platform_id=bindPlatform.platform_id
-		join tb_basic_repayment_type as repayment on
+		left join tb_basic_repayment_type as repayment on
 		repayment.repayment_type_id=business.repayment_type_id
 
-		join(
+		left join(
 		select t1.plan_list_id,
 		-- 应还本金总额
 		sum(case when t1.plan_item_type =10 then t1.plan_amount else 0 end)
@@ -134,6 +135,7 @@
 		group by t1.plan_list_id
 
 		) c on pList.plan_list_id=c.plan_list_id 
+
 
 
 		<where>

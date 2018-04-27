@@ -7,6 +7,7 @@ import com.hongte.alms.common.mapper.SuperMapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -24,7 +25,7 @@ public interface BasicBusinessMapper extends SuperMapper<BasicBusiness> {
      * @param crpId
      * @return
      */
-    List<BusinessInfoForApplyDerateVo> selectBusinessInfoForApplyDerateVo(@Param("crpId") String crpId);
+    List<BusinessInfoForApplyDerateVo> selectBusinessInfoForApplyDerateVo(@Param("crpId") String crpId,@Param("isDefer") Integer isDefer,@Param("originalBusinessId") String originalBusinessId);
 
     /**
      * 根据公司列表查询业务简单几个字段信息
@@ -34,4 +35,44 @@ public interface BasicBusinessMapper extends SuperMapper<BasicBusiness> {
     List<UserPermissionBusinessDto> selectUserPermissionBusinessDtos(@Param("companyIds") List<String> companyIds);
     
     Double queryPayedPrincipal(@Param("businessId") String businessId);
+    
+    /**
+     * 一次性收取的分公司费用
+     * @param original_business_id
+     * @return
+     */
+    Double getPreCharge(@Param("original_business_id") String original_business_id);
+    
+    
+    /**
+     * 期初收取的月收分公司服务费+平台费+担保费
+     * @param original_business_id
+     * @return
+     */
+    Double getPreFees(@Param("original_business_id") String original_business_id);
+    
+    
+
+	/**
+	 * 	结清最终缴纳的金额 
+	 * @param original_business_id
+	 * @return
+	 */
+	 Double getSettleTotalFactSum(@Param("original_business_id") String original_business_id);
+	 
+	/**
+	 * 	 月收等费用总额
+	 * @param original_business_id
+	 * @return
+	 */
+	 Double getMonthSumFactAmount(@Param("original_business_id") String original_business_id);
+	 /**
+	 * 	 （所有还款计划中）的应还利息 和（所有还款计划中）的应还月收服务费
+	 * @param original_business_id
+	 * @return
+	 */
+	 Map<String, Object>  getNeedPay(@Param("original_business_id") String original_business_id);
+	 
 }
+
+

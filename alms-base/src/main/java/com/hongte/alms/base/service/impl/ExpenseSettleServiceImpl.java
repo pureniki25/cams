@@ -564,6 +564,9 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		int daysBeyoungFinalPeriod = DateUtil.getDiffDays(finalPeriod.getRepaymentBizPlanList().getDueDate(), settleDate);
 		if (daysBeyoungFinalPeriod > 0) {
 			expenseSettleVO.setDemurrage(expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.002)).multiply(new BigDecimal(daysBeyoungFinalPeriod)));
+			expenseSettleVO.setIsInContractDate("false");
+		}else {
+			expenseSettleVO.setIsInContractDate("true");
 		}
 	}
 	
