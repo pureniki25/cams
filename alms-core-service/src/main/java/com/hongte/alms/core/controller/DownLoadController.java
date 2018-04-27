@@ -46,7 +46,9 @@ public class DownLoadController  implements Serializable {
     @ApiOperation(value = "下载Excel文件接口")
     @RequestMapping("excelFiles")
     public void downloadExcel(HttpServletRequest request, HttpServletResponse response,@RequestParam("filename") String filename) {
+		LOG.info("@DownLoadController@文件下载--下载Excel文件--开始[{}]" , filename);
         storageService.downloadExcel(request,response,filename);
+		LOG.info("@DownLoadController@文件下载--下载Excel文件--结束[{}]","");
     }
 
     @RequestMapping(value = "/download", method = RequestMethod.GET)
