@@ -57,7 +57,8 @@
 --         visitUser.user_name AS  visitStaffName,
 
         pList.plan_list_id AS  crpId,
-        pList.current_status as statusName,
+        (case when plan.plan_status = 10 or plan.plan_status = 20 OR  plan.plan_status =30 then '已结清' else pList.current_status end)as statusName,
+        -- pList.current_status as statusName,
         col_status.collection_status as colStatus,
 --          sys_param.param_name as afterColStatusName
 
@@ -111,7 +112,7 @@
             </if>
             <!--       /*逾期天数 结束*/ -->
             <if test="delayDaysEnd !=null ">
-                <![CDATA[ and pList.overdue_days <= #{delayDaysEnd}]]>
+                <![CDATA[ and pList.overdue_days < #{delayDaysEnd}]]>
             </if>
             <!--          /*//业务获取*/ -->
             <if test="operatorName !=null and operatorName !='' ">
@@ -130,8 +131,11 @@
                 and col_status.collection_status = #{businessStatus}
             </if>
            <!--   /*//还款状态*/ -->
-            <if test="repayStatus !=null and repayStatus !='' ">
+            <if test="repayStatus !=null and repayStatus !='' and  repayStatus !='已结清'">
                 and pList.current_status = #{repayStatus}
+            </if>
+            <if test="repayStatus !=null and repayStatus =='已结清' ">
+                and (plan.plan_status = 10 or plan.plan_status = 20 OR  plan.plan_status =30)
             </if>
 
             <!--   /*//清算一用户ID列表*/ -->

@@ -8,6 +8,7 @@ import com.hongte.alms.base.assets.car.vo.AuditVo;
 import com.hongte.alms.base.process.entity.Process;
 import com.hongte.alms.base.vo.module.ApplyDerateListSearchReq;
 import com.hongte.alms.base.vo.module.ApplyDerateVo;
+import com.hongte.alms.base.vo.module.ApplyTypeVo;
 import com.hongte.alms.common.service.BaseService;
 import com.hongte.alms.common.vo.PageResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -36,7 +37,7 @@ public interface ProcessService extends BaseService<Process> {
     Process saveProcess(ProcessSaveReq  processSaveReq, ProcessTypeEnums  processType);
 
 
-
+    Process saveProcessApprovalResultDerate(ProcessLogReq req ,ProcessTypeEnums processTypeEnums,boolean isFinish,ApplyTypeVo vo) throws IllegalAccessException, InstantiationException;
     /**
      * 存储审批记录并修改流程审批信息
      * @param req

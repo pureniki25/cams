@@ -30,6 +30,7 @@
             parameterType="com.hongte.alms.base.vo.module.ApplyDerateListSearchReq">
 
         select
+        derate.apply_derate_process_id as applyDerateProcessId,
         business.business_id AS businessId,
         pList.period as  periods,
         pList.total_borrow_amount as showPayMoney,
@@ -42,9 +43,9 @@
         business.company_name AS companyName,
 
         derate.create_user as createrId,
-        derate.derate_type as derateTypeId ,
+ 
 
-        derate.derate_money as derateMoney,
+  
         derate.real_receive_money as realPayMoney,
         derate.create_time as derateTime
 

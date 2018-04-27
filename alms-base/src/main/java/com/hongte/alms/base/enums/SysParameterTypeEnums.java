@@ -18,8 +18,9 @@ public enum SysParameterTypeEnums {
 	BORROW_RATE_UNIT(9,"借款利率类型"),
 	COL_TYPE(10,"移交催收类型"),
 	SMS_TYPE(11,"短信类型"),
-	CAR_STATUS(12,"车辆状态");
-
+	CAR_STATUS(12,"车辆状态"),
+	CAR_DERATE_TYPE(13,"车贷减免费用类型"),
+	HOUSE_DERATE_TYPE(14,"房减免费用类型");
 //	borrowLimitUnit
 
 	private Integer key; // 数据保存的值
