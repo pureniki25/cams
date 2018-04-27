@@ -31,9 +31,9 @@ var setFormValidate = {
 //        {required: true, message: '请填写申请减免费用项', trigger: 'change'}
 //    ],
 		
-//		feeId:[
-//        {required: true, message: '请选择减免费用项', trigger: 'change'}
-//    ],
+		feeId:[
+        {required: true, message: '请选择减免费用项', trigger: 'change'}
+    ],
 //	        
 //    derateMoney:[
 //        {required: true, message: '请填写减免金额', trigger: 'change'}
@@ -190,6 +190,7 @@ window.layinit(function (htConfig) {
                 title:'',                    //减免标题
                 isSettle:'',                //是否结清标志位
                 isSettleFlage:'',           //是否结清界面显示标志位
+                feeId:'test'
             },
             //后台返回的初始的减免信息
             initalApplyInfo:{},
@@ -407,7 +408,7 @@ window.layinit(function (htConfig) {
             },
 
 ////////  ------------------   流程审批 响应函数 结束 --------------------////////////
-            
+     
             uploadFile:function(event,index){
 	    		var fileId=event.currentTarget.id;
 	    		// alert(JSON.stringify($('#'+fileId)));
@@ -796,6 +797,8 @@ var getShowInfo = function () {
         .then(function (res) {
             if (res.data.code == "1") {debugger
 ////////// --------------  基本信息  赋值  开始---------------//////////
+                	
+              
                 //基本信息
                 if(res.data.data.baseInfo.length>0){
                     vm.baseInfoForm = res.data.data.baseInfo[0];
@@ -960,7 +963,7 @@ var getShowInfo = function () {
 	                		// i++;
 	                	}
                 	}
-     
+                  	vm.applyInfoForm.feeId="test";
                 	
 ////////////////////---------------  减免项目类型 赋初始值 结束 -------------------////////////    
 
