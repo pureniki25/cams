@@ -80,7 +80,7 @@ public class FileSystemStorageService implements StorageService {
         response.setCharacterEncoding(request.getCharacterEncoding());
         response.setContentType("application/octet-stream");
         FileInputStream fis = null;
-        logger.error("下载Excel文件  文件名："+filename);
+        logger.info("下载Excel文件  文件名："+filename);
         try {
             File file = new File(excelSavePath+filename);
             fis = new FileInputStream(file);

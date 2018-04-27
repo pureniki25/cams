@@ -46,13 +46,14 @@ public class DownLoadController  implements Serializable {
     @ApiOperation(value = "下载Excel文件接口")
     @RequestMapping("excelFiles")
     public void downloadExcel(HttpServletRequest request, HttpServletResponse response,@RequestParam("filename") String filename) {
-		LOG.info("@DownLoadController@文件下载--下载Excel文件--开始[{}]" , filename);
+		LOG.info("@文件下载@下载Excel文件--开始[{}]" , filename);
         storageService.downloadExcel(request,response,filename);
-		LOG.info("@DownLoadController@文件下载--下载Excel文件--结束[{}]","");
+		LOG.info("@文件下载@下载Excel文件--结束[{}]","");
     }
 
     @RequestMapping(value = "/download", method = RequestMethod.GET)
 	public void download(@RequestParam("downloadFile") String downloadFile, @RequestParam("docUrl") String docUrl) {
+		LOG.info("@文件下载@下载附件--开始[{}]" , downloadFile);
 		if (StringUtil.isEmpty(downloadFile) || StringUtil.isEmpty(docUrl)) {
 			LOG.error("非法参数！downloadFile：" + downloadFile + "，docUrl：" + docUrl);
 			return;
@@ -67,6 +68,7 @@ public class DownLoadController  implements Serializable {
 		} catch (Exception e) {
 			LOG.error("文件下载失败：" + e.getMessage());
 		}
+		LOG.info("@文件下载@下载附件--结束[{}]" , downloadFile);
 	}
 
 
