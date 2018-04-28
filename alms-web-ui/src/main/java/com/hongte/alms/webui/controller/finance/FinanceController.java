@@ -23,4 +23,14 @@ public class FinanceController {
 	public String manualMatchBankSatements() {
 		return "/finance/manualMatchBankSatements" ;
 	}
+	
+	@RequestMapping("/repayConfirm")
+	public String repayConfirm() {
+		return "/finance/repayConfirm" ;
+	}
+	
+	@RequestMapping("/repayBaseInfo")
+	public String repayBaseInfo() {
+		return "/finance/repayBaseInfo" ;
+	}
 }

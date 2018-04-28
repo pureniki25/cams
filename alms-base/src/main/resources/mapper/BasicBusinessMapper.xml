@@ -21,6 +21,7 @@
         <result column="operator_name" property="operatorName" />
         <result column="asset_id" property="assetId" />
         <result column="company_id" property="companyId" />
+        <result column="company_name" property="companyName" />
         <result column="output_platform_id" property="outputPlatformId" />
         <result column="issue_split_type" property="issueSplitType" />
         <result column="source_type" property="sourceType" />
@@ -34,7 +35,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        business_id AS businessId, input_time AS inputTime, business_type AS businessType, business_ctype AS businessCtype, business_stype AS businessStype, customer_id AS customerId, customer_name AS customerName, repayment_type_id AS repaymentTypeId, borrow_money AS borrowMoney, borrow_limit AS borrowLimit, borrow_limit_unit AS borrowLimitUnit, borrow_rate AS borrowRate, borrow_rate_unit AS borrowRateUnit, operator_id AS operatorId, operator_name AS operatorName, asset_id AS assetId, company_id AS companyId, output_platform_id AS outputPlatformId, issue_split_type AS issueSplitType, source_type AS sourceType, source_business_id AS sourceBusinessId, is_tuandai_repay AS isTuandaiRepay, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
+        business_id AS businessId, input_time AS inputTime, business_type AS businessType, business_ctype AS businessCtype, business_stype AS businessStype, customer_id AS customerId, customer_name AS customerName, repayment_type_id AS repaymentTypeId, borrow_money AS borrowMoney, borrow_limit AS borrowLimit, borrow_limit_unit AS borrowLimitUnit, borrow_rate AS borrowRate, borrow_rate_unit AS borrowRateUnit, operator_id AS operatorId, operator_name AS operatorName, asset_id AS assetId, company_id AS companyId ,company_name as companyName , output_platform_id AS outputPlatformId, issue_split_type AS issueSplitType, source_type AS sourceType, source_business_id AS sourceBusinessId, is_tuandai_repay AS isTuandaiRepay, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
     </sql>
 
     <!-- 查询申请减免界面业务基本信息内容 -->
