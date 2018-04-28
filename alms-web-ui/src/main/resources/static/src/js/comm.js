@@ -26,18 +26,19 @@ var addInput = function(form, type,name,value){
     form.appendChild(input);
 }
 
-var expoertExcel = function (url,data) {
+var expoertExcel = function (url,data,fileName) {
 
     axios.post(url,data)
         .then(function (res) {
             if (res.data.code == "1") {
-                var fileName = res.data.data;
-                console.log(fileName);
+                var docUrl = res.data.data;
+                console.log(docUrl);
                 var ExportForm = document.createElement("FORM");
                 document.body.appendChild(ExportForm);
                 ExportForm.method = "GET";
                 ExportForm.action = basePath + "downLoadController/excelFiles";
-                addInput(ExportForm, "text", "filename", fileName);//区域ID
+                addInput(ExportForm, "text", "docUrl", docUrl);
+                addInput(ExportForm, "text", "downloadFile", fileName);
                 // http://localhost:30111/alms/core/collection/saveExcel?files=64eda1f0-8f76-4833-94f2-3407380ab37b.xls
                 ExportForm.submit();
 

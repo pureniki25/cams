@@ -3,6 +3,7 @@ package com.hongte.alms.core.controller;
 
 import com.aliyun.oss.ServiceException;
 import com.hongte.alms.base.service.DocService;
+import com.hongte.alms.common.util.AliyunHelper;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.core.storage.StorageService;
 
@@ -38,6 +39,10 @@ public class DownLoadController  implements Serializable {
     @Autowired
 	@Qualifier("DocService")
 	private DocService docService;
+    
+    @Autowired
+    private AliyunHelper ossClient;
+    
 
     public DownLoadController(StorageService storageService) {
         this.storageService = storageService;
@@ -45,9 +50,14 @@ public class DownLoadController  implements Serializable {
     
     @ApiOperation(value = "下载Excel文件接口")
     @RequestMapping("excelFiles")
-    public void downloadExcel(HttpServletRequest request, HttpServletResponse response,@RequestParam("filename") String filename) {
-		LOG.info("@文件下载@下载Excel文件--开始[{}]" , filename);
-        storageService.downloadExcel(request,response,filename);
+    public void downloadExcel(@RequestParam("downloadFile") String downloadFile, @RequestParam("docUrl") String docUrl) {
+		LOG.info("@文件下载@下载Excel文件--开始[{}]" , downloadFile);
+		ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder
+				.getRequestAttributes();
+		HttpServletResponse response = requestAttributes.getResponse();
+		docService.download(downloadFile, docUrl, response);
+        //删除文件
+        ossClient.deleteObject(docUrl);
 		LOG.info("@文件下载@下载Excel文件--结束[{}]","");
     }
 

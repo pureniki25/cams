@@ -581,7 +581,10 @@ public class ApplyDerateController {
     @ApiOperation(value = "减免管理 存储Excel  ")
     @PostMapping("/saveExcel")
     public Result<String> saveExcel(HttpServletRequest request, HttpServletResponse response,@RequestBody ApplyDerateListSearchReq req) throws Exception {
+    	
+        logger.info("@减免管理@减免管理台账--存储Excel--开始[{}]" , req);
         EasyPoiExcelExportUtil.setResponseHead(response,"AfterLoanStandingBook.xls");
+        req.setUserId(loginUserInfoHelper.getUserId());
         List<ApplyDerateVo> list = applyDerateProcessService.selectApplyDerateList(req);
 
         Workbook workbook = ExcelExportUtil.exportExcel(new ExportParams(), ApplyDerateVo.class, list);
@@ -591,13 +594,16 @@ public class ApplyDerateController {
 
 
         Map<String,String> retMap = storageService.storageExcelWorkBook(workbook,fileName);
-
-//        retMap.put("errorInfo","");
-//        retMap.put("sucFlage","true");
+        String docUrl=retMap.get("docUrl");
+        retMap.put("errorInfo","");
+        retMap.put("sucFlage","true");
 
         if(retMap.get("sucFlage").equals("true")){
-            return  Result.success(fileName);
+            logger.info("@减免管理@减免管理台账--存储Excel---结束[{}]" , fileName);
+            return  Result.success(docUrl);
+            
         }else{
+            logger.info("@减免管理首页@减免管理台账--存储Excel---失败[{}]" ,  retMap.get("errorInfo"));
             return Result.error("500", retMap.get("errorInfo"));
         }
 //        workbook.write(response.getOutputStream());

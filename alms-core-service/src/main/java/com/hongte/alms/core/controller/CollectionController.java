@@ -244,13 +244,14 @@ public class CollectionController {
 
 
         Map<String,String> retMap = storageService.storageExcelWorkBook(workbook,fileName);
+        String docUrl=retMap.get("docUrl");
 
         retMap.put("errorInfo","");
         retMap.put("sucFlage","true");
 
         if(retMap.get("sucFlage").equals("true")){
             logger.info("@贷后管理首页@贷后首页台账--存储Excel---结束[{}]" , fileName);
-            return  Result.success(fileName);
+            return  Result.success(docUrl);
         }else{
             logger.info("@贷后管理首页@贷后首页台账--存储Excel---失败[{}]" ,  retMap.get("errorInfo"));
             return Result.error("500", retMap.get("errorInfo"));
