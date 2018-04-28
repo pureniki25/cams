@@ -3,10 +3,6 @@
  */
 package com.hongte.alms.open.controller;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import com.hongte.alms.base.service.CarBasicService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,16 +15,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.hongte.alms.base.collection.entity.CollectionLog;
-import com.hongte.alms.base.collection.entity.CollectionStatus;
 import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
 import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
 import com.hongte.alms.base.collection.service.CollectionLogService;
 import com.hongte.alms.base.collection.service.CollectionStatusService;
 import com.hongte.alms.common.result.Result;
-import com.hongte.alms.common.util.Constant;
 
 import io.swagger.annotations.Api;
 

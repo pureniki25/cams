@@ -47,7 +47,7 @@ public class CollectionStrategyPersonServiceImpl implements CollectionStrategyPe
     @Transactional(rollbackFor = Exception.class)
     public Result saveStrategyPerson(CollectionStrategySinglePersonSettingReq req, HttpHeaders headers) {
         System.out.println(req.getCollectionGroup1Users());
-        List<String> collectionGroup1Users = new ArrayList<>();
+         List<String> collectionGroup1Users = new ArrayList<>();
         List<String> collectionGroup2Users = new ArrayList<>();
         List<String> companyList = new ArrayList<>();
         collectionGroup1Users = req.getCollectionGroup1Users();

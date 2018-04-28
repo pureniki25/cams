@@ -1,6 +1,4 @@
 package com.hongte.alms.base.service;
-import com.hongte.alms.base.entity.MoneyPool;
-import com.hongte.alms.base.entity.MoneyPoolRepayment;
 
 import feign.Headers;
 import feign.Param;
@@ -16,4 +14,10 @@ public interface XindaiService {
     @RequestLine("POST /api/ltgproject/dod/")
     @Headers("Content-Type: application/json")
     String dod(String content) ;
+    
+    
+    //减免申请审批通过同步费用项给信贷系统
+    @RequestLine("POST /api/ltgproject/dod/")
+    @Headers("Content-Type: application/json")
+    String syc(String content) ;
 }

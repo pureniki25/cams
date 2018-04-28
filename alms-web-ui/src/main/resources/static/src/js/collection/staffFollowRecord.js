@@ -122,7 +122,10 @@ window.layinit(function (htConfig) {
                 }, {
                     field: 'content',
                     title: '记录内容',
-                    align:'center'
+                    align:'center',
+                    templet:function(d){
+                        return '<span title="'+d.content+'" style="display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;" >'+d.content+'</span>' ;
+                    }
                 }, {
                     fixed: 'right',
                     title: '操作',

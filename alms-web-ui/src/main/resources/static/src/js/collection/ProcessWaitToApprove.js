@@ -270,7 +270,7 @@ function getDerateProcessUrl(){
         },
         success : function(data) {
             var applyDerateProcess = data.data;
-            url =  '/collectionUI/applyDerateUI?businessId='+vm.selectedRowInfo.businessId+'&crpId='+applyDerateProcess.crpId+"&processStatus="+vm.selectedRowInfo.status+"&processId="+vm.selectedRowInfo.processId
+            url =  '/collectionUI/applyDerateUI?businessId='+vm.selectedRowInfo.businessId+'&crpId='+applyDerateProcess.crpId+"&processStatus="+vm.selectedRowInfo.status+"&processId="+vm.selectedRowInfo.processId+"&businessTypeId="+vm.selectedRowInfo.businessTypeId
         },
         error : function() {
             layer.confirm('Navbar error:AJAX请求出错!', function(index) {

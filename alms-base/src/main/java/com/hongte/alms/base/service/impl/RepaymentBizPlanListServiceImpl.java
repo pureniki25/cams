@@ -26,31 +26,31 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
 
 
     @Override
-    public List<RepaymentBizPlanList> selectNeedPhoneUrgNorBiz(String companyId,Integer overDueDays) {
+    public List<RepaymentBizPlanList> selectNeedPhoneUrgNorBiz(String companyId,Integer overDueDays,Integer businessType) {
 //        if(overDueDays.equals(0)){
 //            overDueDays = 1000;
 //        }
        return repaymentBizPlanListMapper.selectNeedSetColInfoNormalBizPlansBycomId(
                 companyId,
                 overDueDays,
-                CollectionStatusEnum.PHONE_STAFF.getKey());
+                CollectionStatusEnum.PHONE_STAFF.getKey(),businessType);
     }
 
     @Override
-    public List<RepaymentBizPlanList> selectNeedVisitNorBiz(String companyId,Integer overDueDays ) {
+    public List<RepaymentBizPlanList> selectNeedVisitNorBiz(String companyId,Integer overDueDays,Integer businessType ) {
         return repaymentBizPlanListMapper.selectNeedSetColInfoNormalBizPlansBycomId(
                 companyId,
                 overDueDays,
-                CollectionStatusEnum.COLLECTING.getKey());
+                CollectionStatusEnum.COLLECTING.getKey(),businessType);
 
     }
 
     @Override
-    public List<RepaymentBizPlanList> selectNeedLawNorBiz(Integer overDueDays) {
+    public List<RepaymentBizPlanList> selectNeedLawNorBiz(Integer overDueDays,Integer businessType ) {
         return repaymentBizPlanListMapper.selectNeedSetColInfoNormalBizPlansBycomId(
                 null,
                 overDueDays,
-                CollectionStatusEnum.TO_LAW_WORK.getKey());
+                CollectionStatusEnum.TO_LAW_WORK.getKey(),businessType);
     }
     
     @Override

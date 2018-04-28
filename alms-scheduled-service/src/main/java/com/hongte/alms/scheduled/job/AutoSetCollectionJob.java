@@ -64,7 +64,9 @@ public class AutoSetCollectionJob {
     private  static  boolean runningFlage = false;
 
     //每10分钟执行一次
-    @Scheduled(cron = "0 0/10 * * * ? ")
+//    @Scheduled(cron = "0 0/10 * * * ? ")
+    //每天凌晨2点执行一次
+    @Scheduled(cron = "0 0 2 * * ?")
     public  void job(){
 
         if(runningFlage){

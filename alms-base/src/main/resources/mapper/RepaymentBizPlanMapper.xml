@@ -17,6 +17,7 @@
 		<result column="is_defer" property="isDefer" />
 		<result column="xd_after_guid" property="xdAfterGuid" />
 		<result column="xd_out_id" property="xdOutId" />
+		<result column="active" property="active" />
 		<result column="create_time" property="createTime" />
 		<result column="create_user" property="createUser" />
 		<result column="update_time" property="updateTime" />
@@ -31,7 +32,7 @@
 		borrow_rate_unit AS borrowRateUnit, borrow_limit AS borrowLimit,
 		borrow_limit_unit AS borrowLimitUnit, plan_status AS planStatus,
 		is_defer AS isDefer, xd_after_guid AS xdAfterGuid, xd_out_id AS
-		xdOutId, create_time AS createTime, create_user AS createUser,
+		xdOutId, active, create_time AS createTime, create_user AS createUser,
 		update_time AS updateTime, update_user AS updateUser
 	</sql>
 

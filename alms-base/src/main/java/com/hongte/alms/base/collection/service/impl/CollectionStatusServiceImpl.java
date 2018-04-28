@@ -401,6 +401,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
         for(CollectionPersonSet set:list){
             String companyId = set.getCompanyCode();
+            Integer businessType=set.getBusinessType();
 
             List<String>  phonePersons = getStaffPersons(set.getColPersonId(),StaffPersonType.PHONE_STAFF);
             List<String>  visitPersons = getStaffPersons(set.getColPersonId(),StaffPersonType.VISIT_STAFF);
@@ -411,11 +412,11 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
             //自动移交电催
             if(phonePersons.size()>0){
-                setBusinessPhoneStaff(companyId, phonePersons, daysBeforeOverDue);
+                setBusinessPhoneStaff(companyId, phonePersons, daysBeforeOverDue,businessType);
             }
             //自动移交催收
             if(visitPersons.size()>0){
-                settBusinessVisitStaff(companyId, visitPersons, visitDaysAfterOverDue );
+                settBusinessVisitStaff(companyId, visitPersons, visitDaysAfterOverDue ,businessType);
             }
 
         }
@@ -449,7 +450,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
      * @param phonePersons
      * @param daysBeforeOverDue
      */
-    public void setBusinessPhoneStaff(String companyId,List<String> phonePersons,Integer daysBeforeOverDue){
+    public void setBusinessPhoneStaff(String companyId,List<String> phonePersons,Integer daysBeforeOverDue,Integer businessType){
         ////////////  分配电催  开始 ////////////////////
         //末期逾期  电催 跟进人员列表 带计数
         List<CollectionStatusCountDto> lastPlanPFPersonlist = selecLastPlanPhoneFollwPList(phonePersons);
@@ -458,7 +459,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
 
         //一般业务
-        List<RepaymentBizPlanList> planLists = repaymentBizPlanListService.selectNeedPhoneUrgNorBiz(companyId,daysBeforeOverDue);
+        List<RepaymentBizPlanList> planLists = repaymentBizPlanListService.selectNeedPhoneUrgNorBiz(companyId,daysBeforeOverDue,businessType);
 //        //展期业务
 //        List<RepaymentBizPlanList> renewPlanLists = repaymentBizPlanListService.selectNeedPhoneUrgRenewBiz(companyId,daysBeforeOverDue);
 //        planLists.addAll(renewPlanLists);
@@ -520,7 +521,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
      * @param visitPersons
      * @param visitDaysAfterOverDue
      */
-    public  void settBusinessVisitStaff(String companyId,List<String> visitPersons, Integer visitDaysAfterOverDue ){
+    public  void settBusinessVisitStaff(String companyId,List<String> visitPersons, Integer visitDaysAfterOverDue,Integer businessType ){
         ////////////  分配上门催收  开始 ////////////////////
         //末期逾期  电催 跟进人员列表 带计数
         List<CollectionStatusCountDto> lastPlanVisitPersonlist = selecLastPlanVisitFollwPList(visitPersons);
@@ -529,7 +530,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
 
         //一般业务
-        List<RepaymentBizPlanList> visitPlanLists = repaymentBizPlanListService.selectNeedVisitNorBiz(companyId,visitDaysAfterOverDue);
+        List<RepaymentBizPlanList> visitPlanLists = repaymentBizPlanListService.selectNeedVisitNorBiz(companyId,visitDaysAfterOverDue, businessType);
 //        //展期业务
 //        List<RepaymentBizPlanList> visitRnewPlanLists = repaymentBizPlanListService.selectNeedVisitRenewBiz(companyId,visitDaysAfterOverDue);
 //        visitPlanLists.addAll(visitRnewPlanLists);
@@ -586,7 +587,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
         Integer lawDaysAfterOverDue = lawTimeSet!=null?lawTimeSet.getOverDueDays():91;
 
         //一般业务
-        List<RepaymentBizPlanList> planLists = repaymentBizPlanListService.selectNeedLawNorBiz(lawDaysAfterOverDue);
+        List<RepaymentBizPlanList> planLists = repaymentBizPlanListService.selectNeedLawNorBiz(lawDaysAfterOverDue,null);
 //        //展期业务
 //        List<RepaymentBizPlanList> renewPlanLists = repaymentBizPlanListService.selectNeedLawRenewBiz(lawDaysAfterOverDue);
 //        planLists.addAll(renewPlanLists);

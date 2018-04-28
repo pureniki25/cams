@@ -102,6 +102,13 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 	@TableField("fact_repay_date")
 	@ApiModelProperty(required= true,value = "实还日期")
 	private Date factRepayDate;
+
+	/**
+	 * 是否有效状态：1 有效 ，0 无效
+	 */
+	@ApiModelProperty(required= true,value = "是否有效状态：1 有效 ，0 无效")
+	private Integer active;
+
     /**
      * 创建日期
      */
@@ -290,5 +297,13 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 			", updateDate=" + updateDate +
 			", updateUser=" + updateUser +
 			"}";
+	}
+
+	public Integer getActive() {
+		return active;
+	}
+
+	public void setActive(Integer active) {
+		this.active = active;
 	}
 }
