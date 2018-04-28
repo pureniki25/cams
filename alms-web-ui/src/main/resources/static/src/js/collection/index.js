@@ -816,7 +816,6 @@ var getData = function(){
     	if(vm.searchForm.showRepayDateRange[1]!=null){
        	   
        	   var date =vm.searchForm.showRepayDateRange[1];
-           date.setDate(date.getDate() + 1);
            dataObject.showRepayDateEnd=date.getTime();
       	   vm.searchForm.showRepayDateEnd=date.getTime();
        	}
@@ -829,7 +828,6 @@ var getData = function(){
       	}
       	if(vm.searchForm.realRepayDateRange[1]!=null){
           	   var date =vm.searchForm.realRepayDateRange[1];
-              date.setDate(date.getDate() + 1);
               dataObject.realRepayDateEnd=date.getTime();
           	  vm.searchForm.realRepayDateEnd=date.getTime();
         	}
