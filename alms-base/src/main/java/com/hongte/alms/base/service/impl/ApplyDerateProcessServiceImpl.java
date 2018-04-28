@@ -9,6 +9,7 @@ import com.hongte.alms.base.entity.ApplyDerateProcess;
 import com.hongte.alms.base.entity.ApplyDerateProcessOtherFees;
 import com.hongte.alms.base.entity.ApplyDerateType;
 import com.hongte.alms.base.entity.BasicCompany;
+import com.hongte.alms.base.entity.IssueSendOutsideLog;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.SysUser;
@@ -29,6 +30,7 @@ import com.hongte.alms.base.service.ApplyDerateProcessOtherFeesService;
 import com.hongte.alms.base.service.ApplyDerateProcessService;
 import com.hongte.alms.base.service.ApplyDerateTypeService;
 import com.hongte.alms.base.service.BasicCompanyService;
+import com.hongte.alms.base.service.IssueSendOutsideLogService;
 import com.hongte.alms.base.service.RepaymentBizPlanListDetailService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.SysParameterService;
@@ -63,6 +65,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 import com.hongte.alms.base.entity.SysParameter;
 /**
  * <p>
@@ -137,7 +142,14 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
     @Autowired
     @Qualifier("SysUserService")
     SysUserService sysUserService; 
+    
+    @Autowired
+    Executor executor;
+    
 
+    @Autowired
+    @Qualifier("IssueSendOutsideLogService")
+    IssueSendOutsideLogService issueSendOutsideLogService;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -350,14 +362,34 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
 		requestData.setData(JSON.toJSONString(reqParam));
 
 		try {
-		String encryptStr = JSON.toJSONString(requestData);
+		String sendJason = JSON.toJSONString(requestData);
 		// 请求数据加密
-		encryptStr = encryptPostData(encryptStr);
+		String encryptStr = encryptPostData(sendJason);
 		//发送接口
 		XindaiService xindaiService = Feign.builder().target(XindaiService.class, xindaiAplUrlUrl);
 		String respStr = xindaiService.syc(encryptStr); 
 		// 返回数据解密
 		ResponseData respData = getRespData(respStr);
+		//异步插入数据库
+		executor.execute(new Runnable() {
+			@Override
+			public void run() {
+				IssueSendOutsideLog log=new IssueSendOutsideLog();
+				log.setCreateTime(new Date());
+				log.setCreateUserId(loginUserInfoHelper.getUserId());
+				log.setInterfacecode("BusinessDerate_BusinessDerateFee");
+				log.setInterfacename("减免申请同步费用项");
+				log.setSendJsonEncrypt(encryptStr);
+				log.setSendJson(JSON.toJSONString(requestData));
+				log.setReturnJson(respStr);
+				log.setReturnJsonDecrypt(JSON.toJSONString(respData));
+				log.setSystem("xindai");
+				log.setSendUrl(xindaiAplUrlUrl);
+				
+				issueSendOutsideLogService.insert(log);
+			}
+		});
+		
 		
 		} catch (Exception ex) {
 			logger.error("减免申请审批通过同步信贷出错"+ex.getMessage());
