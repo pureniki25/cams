@@ -29,7 +29,9 @@ window.layinit(function (htConfig) {
                 businessType		:'',  //业务类型
                 derateDateRange		:'',	//减免时间 包含开始和结束时间
                 derateMoneyBegin	:'',    //减免金额 开始
-                derateMoneyEnd		:'', //减免金额 结束
+                derateMoneyEnd		:'', 
+                derateDateBegin		:'', 
+                derateDateEnd       :''
             },
             ruleValidate:setSearchFormValidate, //表单验证
 
@@ -115,8 +117,9 @@ window.layinit(function (htConfig) {
                 layui.use(['layer', 'table','ht_config'], function () {debugger
                     vm.$refs['searchForm'].validate((valid) => {
     		                    if (valid) {debugger
+    		                    	getData();
     		                        vm.exporting = true;
-    		                        expoertExcel(basePath + "ApplyDerateController/saveExcel",vm.searchForm);
+    		                        expoertExcel(basePath + "ApplyDerateController/saveExcel",vm.searchForm,"减免管理.xlsx");
 
     		                        vm.exporting = false;
     		
@@ -362,12 +365,14 @@ var getData = function(){
     if(vm.searchForm.derateDateRange.length>0){
     	if(vm.searchForm.derateDateRange[0]!=null){
     	      dataObject.derateDateBegin = vm.searchForm.derateDateRange[0].getTime();
+    	      vm.searchForm.derateDateBegin= vm.searchForm.derateDateRange[0].getTime();
     	}
     	
       	if(vm.searchForm.derateDateRange[1]!=null){
       	   var date =vm.searchForm.derateDateRange[1];
            date.setDate(date.getDate() + 1);
            dataObject.derateDateEnd=date.getTime();
+ 	      vm.searchForm.derateDateEnd= date.getTime();
   	}
   	
     }

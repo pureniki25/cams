@@ -694,7 +694,7 @@ var getTotalShouldPay = function () {
 //综合收益率
 //：（前置费用+出款后已交月收等费用总额+应付利息+应付月收服务费+应付滞纳金+应付其他费用+应付提前结清违约金+应付逾期利息）-减免金额合计/借款金额/借款期限
 //（借款期限是客户实际的借款期限，不足一个月按月计算）若客户提前结清或正常结清则直接去结清期的 期限即可，若客户逾期结清 则需计算 真实的借款期限，合同期限+（逾期天数/30 进一
-var getGeneralReturnRate= function () {
+var getGeneralReturnRate= function () {debugger
 	var borrowLimit=vm.baseInfoForm.borrowLimit;
 	vm.baseInfoForm.generalReturnRate=0;
     //逾期天数如果大于0,说明逾期，否则直接取借款期限
