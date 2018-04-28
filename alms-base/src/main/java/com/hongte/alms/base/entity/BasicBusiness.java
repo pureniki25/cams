@@ -127,6 +127,11 @@ public class BasicBusiness extends Model<BasicBusiness> {
 	@TableField("company_id")
 	@ApiModelProperty(required= true,value = "业务所属分公司编号")
 	private String companyId;
+	
+	@TableField("company_name")
+	@ApiModelProperty(required= true,value = "业务所属分公司名称")
+	private String companyName;
+	
     /**
      * 出款平台ID，0：线下出款，1：团贷网P2P上标
      */
@@ -426,5 +431,19 @@ public class BasicBusiness extends Model<BasicBusiness> {
 			", updateTime=" + updateTime +
 			", updateUser=" + updateUser +
 			"}";
+	}
+
+	/**
+	 * @return the companyName
+	 */
+	public String getCompanyName() {
+		return companyName;
+	}
+
+	/**
+	 * @param companyName the companyName to set
+	 */
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
 	}
 }
