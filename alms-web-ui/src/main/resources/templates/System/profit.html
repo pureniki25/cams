@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+    <title>角色设置</title>
+    <script src="/properties/config.js"></script>
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css" />
+    <!-- iview样式 -->
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css" />
+    <!--@import url("//unpkg.com/iview/dist/styles/iview.css");-->
+    <!--<link rel="stylesheet" type="text/css" href="//unpkg.com/iview/dist/styles/iview.css"/>-->
+    <!-- 引入layui样式 -->
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all" />
+
+    <!--   <script src="//unpkg.com/vue/dist/vue.js"></script>
+       <script src="//unpkg.com/iview/dist/iview.min.js"></script>-->
+    <!-- 引入vue -->
+    <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+    <!-- iview js -->
+    <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+    <!--引入layui.js-->
+    <script src="/plugins/layui/layui.js"></script>
+    <!--引入axios.js 用于ajax调用-->
+    <script src="/plugins/axios/axios.min.js"></script>
+    <!-- 引入jQuery，必须在appToken.js 之前引入 -->
+    <script src="/build/js/jquery-3.3.1.min.js"></script>
+    <!-- 设置全局请求头:app、Authorization -->
+    <script src="/build/js/appToken.js"></script>
+    <!--引入公共的一些方法-->
+    <script src="/src/js/comm.js"></script>
+</head>
+
+<body>
+    <!--隐藏元素-->
+    <!--<p id="staffType"  th:attr="value=${staffType}"  hidden />-->
+    <!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+    <div id="app" v-cloak>
+        <card title="分润顺序设置">
+            <row>
+            
+            </row>
+            <table id="profit" lay-filter="profit"></table>
+            <script type="text/html" id="barTools">
+                <a class="layui-btn layui-btn-xs" lay-event="edit">设置</a>
+            </script>
+
+<!--             新增/编辑菜单Modal -->
+<!-- 		    <Modal v-model="add_modal" title="项目所属分类顺序设置"  :styles="{left:'0px',top:'10px',width:'960px'}"> -->
+<!-- 		        <row> -->
+<!-- 		            <i-col span="22"> -->
+<!-- 		                <i-form ref='editForm' :model="editForm"   label-position="right" autocomplete="off" -->
+<!-- 		                        :label-width="100"> -->
+<!-- 		                <div   class="tr" v-for="(item, index) in itemTypes"> -->
+                               
+<!--                              <form-item  label="" prop="typeCode"> -->
+<!-- 										  <span slot="label">{{ item.paramName }} -->
+<!-- 										  </span> -->
+<!-- 		                        <i-input type="text"     style="width:50%"> -->
+<!-- 		                    </form-item> -->
+<!--                         </div> -->
+		            
+		                   
+<!-- 		                </i-form> -->
+<!-- 		            </i-col> -->
+<!-- 		        </row> -->
+		        
+<!-- 		           <div slot="footer" style="text-align:left"> -->
+<!-- 		            <i-button type="primary" :loading="submitLoading" @click="saveRepayment()"> -->
+<!-- 		                <span v-if="!submitLoading">保存</span> -->
+<!-- 		                <span v-else>处理中...</span> -->
+<!-- 		            </i-button> -->
+<!-- 		            <i-button type="ghost" @click="closeModal()" style="margin-left: 8px;background-color:rgba(255, 153, 0, 1);color:#ffffff">撤销</i-button> -->
+<!-- 		        </div> -->
+<!-- 		    </Modal> -->
+		    
+		     <Modal v-model="add_modal" title="项目所属分类顺序设置" :styles="{left:'0px',top:'10px',width:'960px'}">
+            <row style="margin-bottom:0.5rem;margin-top:0.5rem">
+                <i-col span="6">项目所属分类</i-col>
+                <i-col span="6">顺序</i-col>
+            </row>
+            
+               <row v-if="itemTypeFlag" v-for=" (item, index) in itemTypes" style="margin-bottom:0.5rem">
+                <i-col span="6">{{item.itemName}}</i-col>
+                <i-col span="6"><i-input type="text"   v-model="item.itemLevel"  style="width:50%"></i-col>
+                <i-col span="6">
+                        <div class="layui-btn-group">
+                                <button class="layui-btn layui-btn-sm" @click="openFeeModal(item)">设置</button>
+                         </div>
+
+           
+                </i-col>
+            </row>
+            <row v-if="!itemTypeFlag" v-for=" (item, index) in itemTypes" style="margin-bottom:0.5rem">
+                <i-col span="6">{{item.paramName}}</i-col>
+                <i-col span="6"><i-input type="text"   v-model="item.paramValue2"  style="width:50%"></i-col>
+                <i-col span="6">
+                        <div class="layui-btn-group">
+                                <button class="layui-btn layui-btn-sm" @click="openFeeModal(item)">设置</button>
+                         </div>
+
+           
+                </i-col>
+            </row>
+          
+            <p slot="footer">
+                      <button class="layui-btn" @click="saveItem">保存</button>
+                            <button class="layui-btn" @click="add_modal=false">关闭</button>
+            </p>
+        </Modal>
+        
+        
+        
+             <Modal v-model="fee_add_modal" title="费用项顺序设置" :styles="{left:'0px',top:'10px',width:'960px'}">
+            <row style="margin-bottom:0.5rem;margin-top:0.5rem">
+                <i-col span="6">费用项类型</i-col>
+                <i-col span="6">顺序</i-col>
+            </row>
+            
+               <row v-if="feeTypeFlag" v-for=" (item, index) in feeTypes" style="margin-bottom:0.5rem">
+              <i-col span="6">{{item.feeName}}</i-col>
+                <i-col span="6"><i-input type="text"   v-model="item.feeLevel"  style="width:50%"></i-col>
+                <i-col span="6">
+                    
+           
+                </i-col>
+            </row>
+            <row v-if="!feeTypeFlag" v-for=" (item, index) in feeTypes" style="margin-bottom:0.5rem">
+                  <i-col span="6">{{item.planItemName}}</i-col>
+                <i-col span="6"><i-input type="text"   v-model="item.itemLevel"  style="width:50%"></i-col>
+                <i-col span="6">
+           
+                </i-col>
+            </row>
+          
+            <p slot="footer">
+                      <button class="layui-btn" @click="saveFee">保存</button>
+                            <button class="layui-btn" @click="fee_add_modal=false">关闭</button>
+            </p>
+        </Modal>
+        </card>
+    </div>
+    <script src="/src/js/System/profit.js"></script>
+</body>
+
+</html>
