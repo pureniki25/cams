@@ -186,6 +186,7 @@ public class ExpenseSettleController {
 			expenseSettleVO = expenseSettleService.cal(businessId, settleDate);
 			return Result.success(expenseSettleVO);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return Result.error("500", e.getMessage()) ;
 		}
 
