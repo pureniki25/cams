@@ -28,4 +28,5 @@ public interface MoneyPoolService extends BaseService<MoneyPool> {
 	Result addCustomerRepayment(RepaymentRegisterInfoDTO registerInfoDTO);
 	Result updateCustomerRepayment(RepaymentRegisterInfoDTO registerInfoDTO);
 	Result deleteCustermerRepayment(RepaymentRegisterInfoDTO registerInfoDTO);
+	Result matchBankStatement(List<MoneyPool> moneyPools,String businessId,String afterId);
 }

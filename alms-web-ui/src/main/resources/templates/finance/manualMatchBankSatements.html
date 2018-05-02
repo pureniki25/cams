@@ -38,32 +38,32 @@
             <Header style="height: 40px;line-height: 40px;text-align: right;">
                 <i-form inline label-position="right" label-width="70">
                     <form-item label="日期">
-                        <date-picker type="date" placeholder="Select date" v-model="regDate" format="yyyy-MM-dd"></date-picker>
+                        <date-picker type="date" placeholder="选择日期" v-model="repayDate" format="yyyy-MM-dd"></date-picker>
                     </form-item>
                     <form-item label="金额">
-                        <i-input v-model="moneyAmount"></i-input>
+                        <i-input v-model="accountMoney"></i-input>
                     </form-item>
                     <form-item label="转入账号">
-                        <i-select v-model="bankAccount" style="width:150px;text-align: left;">
+                        <i-select v-model="acceptBank" style="width:150px;text-align: left;">
                             <i-option value="所有账户">所有账户</i-option>
                             <i-option v-for="(item,index) in bankAccounts" :value="item.financeName" :key="item.financeName+index">{{item.financeName}}</i-option>
                         </i-select>
                     </form-item>
                     <form-item>
-                        <i-button type="success" icon="ios-search">搜索</i-button>
+                        <i-button type="success" icon="ios-search" @click="search">搜索</i-button>
                     </form-item>
                 </i-form>
             </Header>
             <Content>
-                <i-table show-header no-data-text="暂无数据" stripe border ref="selection" :columns="table.col" :data="table.data"></i-table>
+                <i-table show-header no-data-text="暂无数据" stripe border ref="selection" @on-selection-change="onSelectChange($event)" :columns="table.col" :data="table.data"></i-table>
             </Content>
             <Footer style="text-align: right;padding-right: 10px;height: 40px;line-height: 40px;">
-                <i-button type="success" >确认</i-button>
+                <i-button type="success" @click="submit" >确认</i-button>
             </Footer>
         </layout>
 
     </div>
-    <script src="/src/js/finance/ManualMatchBankSatements.js"></script>
+    <script src="/src/js/finance/manualMatchBankSatements.js"></script>
 </body>
 
 </html>

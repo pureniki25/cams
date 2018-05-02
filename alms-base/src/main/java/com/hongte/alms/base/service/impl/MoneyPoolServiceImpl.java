@@ -28,6 +28,7 @@ import com.hongte.alms.common.util.EncryptionResult;
 import com.hongte.alms.common.vo.RequestData;
 import com.hongte.alms.common.vo.ResponseData;
 import com.hongte.alms.common.vo.ResponseEncryptData;
+import com.ht.ussp.bean.LoginUserInfoHelper;
 
 import feign.Feign;
 
@@ -75,6 +76,8 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 	@Autowired
 	RepaymentBizPlanListMapper repaymentBizPlanListMapper ;
 
+	@Autowired
+	LoginUserInfoHelper loginUserInfoHelper ;
 	@Override
 	public List<MoneyPoolVO> listMoneyPool(String businessId, String afterId) {
 		return null;
@@ -427,5 +430,47 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 		}else {
 			return Result.error("500", "数据删除失败");
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see com.hongte.alms.base.service.MoneyPoolService#matchBankStatement(java.util.List, java.lang.String, java.lang.String)
+	 */
+	@Override
+	public Result matchBankStatement(List<MoneyPool> moneyPools, String businessId, String afterId) {
+		List<RepaymentBizPlanList> planLists = repaymentBizPlanListMapper.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId));
+		if (planLists==null||planLists.size()==0) {
+			return Result.error("500", "找不到对应的还款计划");
+		}
+		for (MoneyPool moneyPool : moneyPools) {
+			MoneyPoolRepayment moneyPoolRepayment = copy(moneyPool, businessId, afterId);
+			moneyPoolRepayment.setIsFinanceMatch(1);
+			
+		}
+		return null;
+	}
+	
+	private MoneyPoolRepayment copy(MoneyPool moneyPool, String businessId, String afterId) {
+		if (moneyPool==null) {
+			throw new RuntimeException();
+		}
+		Date now = new Date();
+		String userId = loginUserInfoHelper.getUserId();
+		
+		MoneyPoolRepayment repayment = new MoneyPoolRepayment();
+		repayment.setAccountMoney(moneyPool.getAccountMoney());
+		repayment.setAfterId(afterId);
+		repayment.setBankAccount(moneyPool.getAcceptBank());
+		repayment.setClaimDate(now);
+		repayment.setFactTransferName(moneyPool.getRemitBank());
+		repayment.setIncomeType(moneyPool.getIncomeType());
+		repayment.setMoneyPoolId(moneyPool.getMoneyPoolId());
+		repayment.setOperateId(userId);
+		repayment.setOperateName(userId);
+		repayment.setTradeType(moneyPool.getTradeType());
+		repayment.setTradePlace(moneyPool.getTradePlace());
+		repayment.setTradeDate(moneyPool.getTradeDate());
+		
+		return repayment;
+		
 	}
 }
