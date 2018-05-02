@@ -318,7 +318,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		return  expenseSettleMapper.listLackFee(businessId);
 	}
 
-	public ExpenseSettleVO cal(String businessId,Date settleDate) throws Exception {
+	public ExpenseSettleVO cal(String businessId,Date settleDate) {
 		final BasicBusiness basicBusiness = basicBusinessMapper.selectById(businessId);
 		RepaymentBizPlan repaymentBizPlan = new RepaymentBizPlan() ;
 		repaymentBizPlan.setBusinessId(businessId);
