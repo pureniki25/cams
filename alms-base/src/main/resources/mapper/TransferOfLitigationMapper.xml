@@ -750,18 +750,14 @@
 	<select id="queryPreviousFees" resultType="com.hongte.alms.base.vo.billing.PreviousFeesVO">
 		SELECT 
 		  tab.original_business_id businessId,
-		  tab.afterId,
-		  -- 期数
-		  tab.current_status currentStatus,
-		  -- 当期还款状态
+		  tab.afterId, -- 期数
+		  tab.current_status currentStatus, -- 当期还款状态
 		  (
 		    tab.planAccrual - tab.factAccrual
-		  ) AS previousPlanAccrual,
-		  -- 往期少交利息
+		  ) AS previousPlanAccrual, -- 往期少交利息
 		  (
 		    tab.planServiceCharge - tab.factServiceCharge
-		  ) AS previousPlanServiceCharge,
-		  --  往期 少交服务费
+		  ) AS previousPlanServiceCharge, --  往期 少交服务费
 		  (tab.pateFees - tab.factLateFees) AS previousLateFees --  往期少交滞纳金
 		FROM
 		  (SELECT 

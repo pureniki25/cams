@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.FiveLevelClassifyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.FiveLevelClassify">
+        <id column="id" property="id" />
+        <result column="business_type" property="businessType" />
+        <result column="class_name" property="className" />
+        <result column="class_level" property="classLevel" />
+        <result column="remark" property="remark" />
+        <result column="update_time" property="updateTime" />
+        <result column="update_user" property="updateUser" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="valid_status" property="validStatus" />
+        <result column="black_value1" property="blackValue1" />
+        <result column="black_value2" property="blackValue2" />
+        <result column="black_value3" property="blackValue3" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, business_type AS businessType, class_name AS className, class_level AS classLevel, remark, update_time AS updateTime, update_user AS updateUser, create_time AS createTime, create_user AS createUser, valid_status AS validStatus, black_value1 AS blackValue1, black_value2 AS blackValue2, black_value3 AS blackValue3
+    </sql>
+
+	<select id="queryDataByCondition" resultMap="BaseResultMap">
+    	SELECT 
+		  t.id, t.business_type, t.class_name, t.remark, t.class_level, t.update_time, t.update_user
+		FROM
+		  tb_five_level_classify t 
+		WHERE valid_status = 1
+		<if test="businessType != null and businessType != ''">
+			AND t.`business_type` = #{businessType,jdbcType=VARCHAR}
+		</if>
+		<if test="className != null and className != ''">
+			AND t.`class_name` = #{className,jdbcType=VARCHAR}
+		</if>
+		ORDER BY t.`business_type`,
+		  t.`class_name` 
+    </select>
+    
+    <select id="queryMayBeUsed" resultType="java.lang.Integer">
+    	SELECT 
+		  COUNT(1) 
+		FROM
+		  `tb_basic_business` t1,
+		  `tb_five_level_classify_business_change_log` t2 
+		WHERE t1.`business_type` = 
+		  (SELECT 
+		    business_type_id 
+		  FROM
+		    `tb_basic_business_type` 
+		  WHERE `business_type_name` = #{businessType,jdbcType=VARCHAR}) 
+		  AND t1.`business_id` = t2.`orig_business_id` 
+		  AND t2.`valid_status` = 1 
+		  AND t2.`class_name` = #{className,jdbcType=VARCHAR} 
+    </select>
+</mapper>

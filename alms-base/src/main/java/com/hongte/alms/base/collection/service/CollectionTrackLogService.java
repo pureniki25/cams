@@ -31,4 +31,6 @@ public interface CollectionTrackLogService extends BaseService<CollectionTrackLo
      * @return
      */
     List<String> selectProjectIdByRbpId(String rbpId);
+    
+    void addOrUpdateLog(CollectionTrackLog log);
 }

@@ -3,6 +3,7 @@ package com.hongte.alms.base.service;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.common.service.BaseService;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
@@ -59,7 +60,24 @@ public interface RepaymentBizPlanListService extends BaseService<RepaymentBizPla
 //     */
 //    public List<RepaymentBizPlanList> selectNeedLawRenewBiz(Integer overDueDays );
 //
-
+    /**
+     * 获取首期逾期到今天的天数
+     * @param businessId
+     * @return
+     */
+    Integer queryFirstPeriodOverdueByBusinessId(String businessId);
+    /**
+     * 获取利息第一次逾期到今天的天数
+     * @param businessId
+     * @return
+     */
+    Integer queryInterestOverdueByBusinessId(String businessId);
+    /**
+     * 获取本金第一次逾期到今天的天数
+     * @param businessId
+     * @return
+     */
+    Integer queryPrincipalOverdueByBusinessId(String businessId);
 
 
 }
