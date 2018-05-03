@@ -66,6 +66,7 @@ window.layinit(function(htConfig){
                 liquidationOne:'', //清算一
                 liquidationTow:'',  //清算二
                 businessStatus:'',   //业务状态
+                businessClassName:'',   //业务类别
                 repayStatus:'逾期',      //还款状态
                 customerName:'',  //客户名称
                 peroidStatus:'' //期数状态,首期/本金期/末期
@@ -116,6 +117,7 @@ window.layinit(function(htConfig){
                                 liquidationOne:vm.searchForm.liquidationOne, //清算一
                                 liquidationTow:vm.searchForm.liquidationTow,  //清算二
                                 businessStatus:vm.searchForm.businessStatus,   //业务状态
+                                businessClassName:vm.searchForm.businessClassName,   //业务状态
                                 repayStatus:vm.searchForm.repayStatus,      //还款状态
                                 customerName:vm.searchForm.customerName,  //客户名称
                                 peroidStatus:vm.searchForm.peroidStatus,  //期数状态
@@ -261,7 +263,7 @@ window.layinit(function(htConfig){
                     fixed: 'left'
                 },{
                     field: 'businessId',
-                    width:200,
+                    width:140,
                     title: '业务编号'
                 }, {
                     field: 'afterId',
@@ -359,6 +361,11 @@ window.layinit(function(htConfig){
                     width:90,
                     title: '业务状态'
                 },{
+
+                    field: 'className',
+                    width:90,
+                    title: '业务类别'
+                },{
                     fixed: 'right',
                     title: '操作',
                     width: 115,
@@ -382,6 +389,7 @@ window.layinit(function(htConfig){
                 liquidationOne:vm.searchForm.liquidationOne, //清算一
                 liquidationTow:vm.searchForm.liquidationTow,  //清算二
                 businessStatus:vm.searchForm.businessStatus,   //业务状态
+                businessClassName:vm.searchForm.businessClassName,   //业务类别
                 repayStatus:vm.searchForm.repayStatus,      //还款状态
                 customerName:vm.searchForm.customerName,  //客户名称
                 peroidStatus:vm.searchForm.peroidStatus,  //期数状态

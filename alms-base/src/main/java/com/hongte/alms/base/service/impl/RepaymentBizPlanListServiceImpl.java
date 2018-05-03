@@ -1,14 +1,15 @@
 package com.hongte.alms.base.service.impl;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListMapper;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * <p>
@@ -87,4 +88,19 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
 //                CollectionStatusEnum.TO_LAW_WORK.getKey()
 //        );
 //    }
+    
+    @Override
+    public Integer queryFirstPeriodOverdueByBusinessId(String businessId) {
+    	return repaymentBizPlanListMapper.queryFirstPeriodOverdueByBusinessId(businessId);
+    }
+    
+    @Override
+    public Integer queryInterestOverdueByBusinessId(String businessId) {
+    	return repaymentBizPlanListMapper.queryInterestOverdueByBusinessId(businessId);
+    }
+    
+    @Override
+    public Integer queryPrincipalOverdueByBusinessId(String businessId) {
+    	return repaymentBizPlanListMapper.queryPrincipalOverdueByBusinessId(businessId);
+    }
 }

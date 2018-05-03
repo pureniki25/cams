@@ -49,11 +49,156 @@
 <!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
 <div id="app" v-cloak>
 	<Card>
-        <p slot="title">
-			五级分类设置
-        </p>
+		<row>
+			<i-col span="12"><i-button type="primary" @click="openAddOrEidtBusinessParamModal({}, true)">新增</i-button></i-col>
+			<i-col span="4">
+				业务类型：
+		    	<i-select v-model="commitQueryConditionModel.businessType" clearable filterable style="width:200px">
+      				<i-option v-for="item in fiveLevelClassifyModel.businessTypeList" :value="item.businessTypeName" :key="item.businessTypeName" >{{ item.businessTypeName }}</i-option>
+  				</i-select>
+		    </i-col>
+			<i-col span="4">
+				分类名称：
+				<i-input v-model="commitQueryConditionModel.className" type="info" style="width:200px"/>
+			</i-col>
+			<i-col span="4">
+				<i-button type="primary" @click="queryDataByCondition">查询</i-button>
+			</i-col>
+	    </row>
+	    <row>
+            <i-col span="24">
+                <table id="param" lay-filter="param"></table>
+                <script type="text/html" id="toolbar">
+                    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
+                    <a class="layui-btn layui-btn-xs" lay-event="setCondition">设置条件</a>
+                </script>
+            </i-col>
+        </row>
     </Card>
     
+   	<Modal v-model="showBusinessParamModal" :title="fiveLevelClassifyModel.editBusinessTypeModalTitle">
+   		<i-form ref="commitBusinessTypeForm" :model="commitBusinessTypeForm" :rules="ruleValidate" label-position="right" label-width="100">
+	    	<row>
+	            <i-col span="24">
+	                <form-item label="业务类型：" prop="businessType">
+	                    <i-select v-model="commitBusinessTypeForm.businessType" clearable filterable v-if="addBusinessParamModal">
+	        				<i-option v-for="item in fiveLevelClassifyModel.businessTypeList" :value="item.businessTypeName">{{ item.businessTypeName }}</i-option>
+	    				</i-select>
+	                    <i-select v-model="commitBusinessTypeForm.businessType" clearable filterable v-else disabled>
+	        				<i-option v-for="item in fiveLevelClassifyModel.businessTypeList" :value="item.businessTypeName">{{ item.businessTypeName }}</i-option>
+	    				</i-select>
+	                </form-item>
+	            </i-col>
+	        </row>
+	        <row>
+	            <i-col span="24">
+	                <form-item label="类别名称：" prop="className">
+	                    <i-input v-model="commitBusinessTypeForm.className"></i-input>
+	                </form-item>
+	            </i-col>
+	        </row>
+	        <row>
+	            <i-col span="24">
+	                <form-item label="类别级别：" prop="classLevel">
+	                    <i-select v-model="commitBusinessTypeForm.classLevel" clearable filterable v-if="addBusinessParamModal">
+	        				<i-option value="1">1</i-option>
+	        				<i-option value="2">2</i-option>
+	        				<i-option value="3">3</i-option>
+	        				<i-option value="4">4</i-option>
+	        				<i-option value="5">5</i-option>
+	    				</i-select>
+	                    <i-select v-model="commitBusinessTypeForm.classLevel" clearable filterable v-else disabled>
+	        				<i-option value="1">1</i-option>
+	        				<i-option value="2">2</i-option>
+	        				<i-option value="3">3</i-option>
+	        				<i-option value="4">4</i-option>
+	        				<i-option value="5">5</i-option>
+	    				</i-select>
+	                </form-item>
+	            </i-col>
+	        </row>
+	        <row>
+			    <i-col span="24">
+			        <form-item label="备注说明：" prop="remark">
+			            <i-input type="textarea" v-model="commitBusinessTypeForm.remark"></i-input>
+			        </form-item>
+			    </i-col>
+			</row>
+		</i-form>
+		<row slot="footer">
+            <div class="layui-btn-group">
+                <button class="layui-btn" @click="saveFiveLevelClassify">保存</button>
+                <button class="layui-btn layui-btn-danger" @click="cancelCommit">取消</button>
+            </div>
+   		</row>
+	</Modal>
+    
+    <Modal v-model="showConditionModal" title="设置条件" width="800">
+		<row style="margin:10px 0">
+    		<i-col span="24">
+	            <i-label>{{fiveLevelClassifyModel.businessType}}：{{fiveLevelClassifyModel.className}}</i-label>
+	    	</i-col>
+        </row>
+        <row style="margin:15px 0">
+	    	<i-col span="24">
+	            <i-label>条件名称：</i-label>
+	            <i-input v-model="commitSetConditionModel.subClassName" style="width:400px"></i-input>
+	    	</i-col>
+        </row>
+        <row style="margin:15px 0">
+	    	<i-col span="24">
+	            <i-label>执行条件：</i-label>
+	            <radio-group v-model="commitSetConditionModel.executeCondition" >
+		           	<radio label="1">
+		            	<span>满足已下所有条件</span>
+			        </radio>
+	             	<radio label="2">
+		            	<span>满足已下任意条件</span>
+	       			</radio>
+		        </radio-group>
+	    	</i-col>
+        </row>
+         <row style="margin:15px 0">
+	    	<i-col span="24" track-by="$index" v-for="(item, index) in commitSetConditionModel.commitSetCondition">
+	        	<i-select v-model="item.conditionType" clearable filterable style="width:130px" @on-change="conditionTypeChange($event, index)" >
+	  				<i-option v-for="opItem1 in item.conditionTypeList" :value="opItem1.paramTypeName" :key="item.conditionType + index">{{ opItem1.paramTypeName }}</i-option>
+				</i-select>
+	        	<i-select v-model="item.relation" clearable filterable style="width:130px" >
+	  				<i-option v-for="opItem2 in item.relationList" :value="opItem2.value" :key="item.conditionType + index">{{opItem2.label}}</i-option>
+				</i-select>
+				<i-select v-model="item.conditionDesc" clearable filterable style="width:400px">
+	  				<i-option v-for="opItem3 in item.conditionDescList" :value="opItem3" :key="item.conditionType + index">{{opItem3 }}</i-option>
+				</i-select>
+				<div class="layui-btn-group">
+					<button class="layui-btn layui-btn-primary layui-btn-sm" v-on:click="addSelectOp()">+</button>
+				    <button v-if="index != 0" class="layui-btn layui-btn-primary layui-btn-sm"  v-on:click="removeSelectOp($event, index)">-</button>
+			    </div>
+	   	 	</i-col>
+   		</row>
+   		
+		<row slot="footer">
+	    	<i-col span="24">
+	            <div class="layui-btn-group">
+	                <button class="layui-btn" @click="saveConditionForClassify">确定</button>
+	                <button class="layui-btn layui-btn-danger" @click="cancelCommit">取消</button>
+	            </div>
+	   		</i-col>
+   		</row>
+	</Modal>
+	
+	<Modal v-model="setConditionCatalogue" title="条件列表" width="800">
+		<row style="margin:10px 0">
+			<i-button type="primary" @click="openSetConditionModal({},true)">新增</i-button>
+		</row>
+		<i-col span="24">
+    		<table id="condition" lay-filter="condition"></table>
+    		<script type="text/html" id="toolbar2">
+                <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
+            </script>
+		</i-col>
+	</Modal>
 </div>
 <script src="/src/js/businessParameter/fiveLevelClassify.js" ></script>
 </body>

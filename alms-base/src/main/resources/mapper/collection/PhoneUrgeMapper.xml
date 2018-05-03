@@ -62,7 +62,8 @@
 --          sys_param.param_name as afterColStatusName
 
 		plan.borrow_limit as borrowLimit ,
-		business.repayment_type_id as repaymentTypeId 
+		business.repayment_type_id as repaymentTypeId ,
+		changeLog.class_name className
 		
         from tb_repayment_biz_plan_list  as pList
         LEFT JOIN tb_repayment_biz_plan as plan ON pList.plan_id = plan.plan_id
@@ -71,6 +72,8 @@
         LEFT JOIN tb_basic_business_type as  b_type ON business.business_type = b_type.business_type_id
         LEFT JOIN tb_collection_status as  col_status ON pList.plan_list_id = col_status.crp_id
           JOIN tb_sys_user_permission as permission  ON  permission.business_id = business.business_id
+          left JOIN tb_five_level_classify_business_change_log as changeLog  ON  changeLog.orig_business_id = business.business_id
+          and changeLog.valid_status = '1'
 --         LEFT JOIN tb_sys_user as phoneUser ON  col_status.phone_staff = phoneUser.user_id
 --         LEFT JOIN tb_sys_user as visitUser ON  col_status.visit_staff = visitUser.user_id
 --         LEFT JOIN tb_sys_parameter as sys_param  ON  col_status.collection_status = sys_param.param_value
@@ -128,6 +131,10 @@
             <!--   /*//业务状态（贷后状态）*/ -->
             <if test="businessStatus !=null">
                 and col_status.collection_status = #{businessStatus}
+            </if>
+            <!--   /*//业务状态（贷后状态）*/ -->
+            <if test="businessClassName !=null and businessClassName != ''">
+                and changeLog.class_name = #{businessClassName}
             </if>
            <!--   /*//还款状态*/ -->
             <if test="repayStatus !=null and repayStatus !='' ">
