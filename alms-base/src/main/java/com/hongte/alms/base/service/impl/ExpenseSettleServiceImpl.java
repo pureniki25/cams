@@ -699,8 +699,12 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 					if (firstLateFee == null) {
 						if (e.getRepaymentBizPlanList() != null && e.getRepaymentBizPlanList().getCurrentStatus().equals("逾期")) {
 							int daysBeyoungDueDate = DateUtil.getDiffDays(e.getRepaymentBizPlanList().getDueDate(), settleDate);
-							BigDecimal lateFeeRate = d.getPlanAmount()
-									.divide(e.getRepaymentBizPlanList().getOverdueDays().multiply(expenseSettleVO.getPrincipal()),10,RoundingMode.HALF_UP);
+							BigDecimal lateFeeRate=BigDecimal.valueOf(0);
+							if(e.getRepaymentBizPlanList().getOverdueDays().multiply(expenseSettleVO.getPrincipal()).compareTo(BigDecimal.valueOf(0))==1) {
+								 lateFeeRate = d.getPlanAmount()
+										.divide(e.getRepaymentBizPlanList().getOverdueDays().multiply(expenseSettleVO.getPrincipal()),10,RoundingMode.HALF_UP);
+							}
+					
 							if (daysBeyoungDueDate > 1) {
 								firstLateFee = expenseSettleVO.getPrincipal().multiply(lateFeeRate)
 										.multiply(new BigDecimal(daysBeyoungDueDate));
