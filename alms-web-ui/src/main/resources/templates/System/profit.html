@@ -118,23 +118,21 @@
              <Modal v-model="fee_add_modal" title="费用项顺序设置" :styles="{left:'0px',top:'10px',width:'960px'}">
             <row style="margin-bottom:0.5rem;margin-top:0.5rem">
                 <i-col span="6">费用项类型</i-col>
+                <i-col span="6">费用项ID</i-col>
                 <i-col span="6">顺序</i-col>
             </row>
             
                <row v-if="feeTypeFlag" v-for=" (item, index) in feeTypes" style="margin-bottom:0.5rem">
               <i-col span="6">{{item.feeName}}</i-col>
+                   <i-col span="6">{{item.feeId}}</i-col>
                 <i-col span="6"><i-input type="text"   v-model="item.feeLevel"  style="width:50%"></i-col>
-                <i-col span="6">
-                    
            
-                </i-col>
             </row>
             <row v-if="!feeTypeFlag" v-for=" (item, index) in feeTypes" style="margin-bottom:0.5rem">
                   <i-col span="6">{{item.planItemName}}</i-col>
+                   <i-col span="6">{{item.feeId}}</i-col>
                 <i-col span="6"><i-input type="text"   v-model="item.itemLevel"  style="width:50%"></i-col>
-                <i-col span="6">
-           
-                </i-col>
+              
             </row>
           
             <p slot="footer">
