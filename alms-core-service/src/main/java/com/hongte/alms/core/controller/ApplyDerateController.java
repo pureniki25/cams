@@ -75,6 +75,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * <p>
@@ -189,12 +190,12 @@ public class ApplyDerateController {
             @RequestParam(value = "processId",required = false) String processId
     ){
         Map<String,Object> retMap = new HashMap<>();
-
+	    List<SysParameter> tempList=new ArrayList();
 
 
       Integer isDefer=0;
         try{
-        	if(afterId!=null&&afterId.startsWith("ZQ")) {
+        	if(afterId!=null&&afterId.contains("ZQ")) {
         		isDefer=1;
         	}
             //基本信息
@@ -243,13 +244,16 @@ public class ApplyDerateController {
     		    	otherDerateTypeList= sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterTypeEnums.HOUSE_DERATE_TYPE.getKey()).orderBy("row_Index"));
 
     		    }
+    		    
+               //只是为了页面填充表格效果
     		    if(otherDerateTypeList.size()%3>0) {
     		    	int length=otherDerateTypeList.size()%3;
-    		    	
-    		    		while(otherDerateTypeList.size()%3!=0) {
-    		    			otherDerateTypeList.add(new SysParameter());
-    		    		}
+    		    	length=3-length;
+    		    	for(int i=0;i<length;i++) {
+    		    		tempList.add(new SysParameter());
+    		    	}
     		    }
+    		    retMap.put("tempList", (JSONArray) JSON.toJSON(tempList, JsonUtil.getMapping()));
     		    retMap.put("otherDerateTypeList", (JSONArray) JSON.toJSON(otherDerateTypeList, JsonUtil.getMapping()));
             	
 			}
@@ -291,15 +295,17 @@ public class ApplyDerateController {
            
                 //查询其他费用项
                 List<ApplyDerateProcessOtherFees> otherFees= applyDerateProcessOtherFeesService.selectList(new EntityWrapper<ApplyDerateProcessOtherFees>().eq("plan_list_id", crpId).eq("business_id", pList.getBusinessId()).eq("apply_derate_process_id", applyList.get(0).getApplyDerateProcessId()));
+                //只是为了页面填充表格效果
                 if(otherFees!=null&&otherFees.size()%3>0) {
     		    	int length=otherFees.size()%3;
-    		    	
-    		    		while(otherFees.size()%3!=0) {
-    		    			otherFees.add(new ApplyDerateProcessOtherFees());
-    		    		}
+    		    	tempList.clear();
+    		    	length=3-length;
+    		    	for(int i=0;i<length;i++) {
+    		    		tempList.add(new SysParameter());
+    		    	}
     		    }
                 retMap.put("otherFees",(JSONArray) JSON.toJSON(otherFees, JsonUtil.getMapping()));
-                
+                retMap.put("tempList",(JSONArray) JSON.toJSON(tempList, JsonUtil.getMapping()));
             }else {
             	  //otherFeeEditFlage 0:新增 
                 	
@@ -474,9 +480,10 @@ public class ApplyDerateController {
           	String outsideInterest=reqMap.get("outsideInterest")==null?"0":reqMap.get("outsideInterest").toString();//合同期外逾期利息
           	String generalReturnRate=reqMap.get("generalReturnRate").toString();//综合收益率
           	String preLateFees=reqMap.get("preLateFees").toString(); //提前还款违约金:
-        	
+         	String otherFeeEditFlage=reqMap.get("otherFeeEditFlage").toString();//0:新增 -1草稿
+         	List<ApplyDerateProcessOtherFees>  otherFees=JsonUtil.map2objList(reqMap.get("otherFees"), ApplyDerateProcessOtherFees.class);
         	if (!CollectionUtils.isEmpty(req)) {
-        		applyDerateProcessService.saveApplyDerateProcess(req.get(0),types,otherDerateTypeList,outsideInterest,generalReturnRate,preLateFees);
+        		applyDerateProcessService.saveApplyDerateProcess(req.get(0),types,otherDerateTypeList,outsideInterest,generalReturnRate,preLateFees,otherFees,otherFeeEditFlage);
 			}
         	if (!CollectionUtils.isEmpty(files)) {
     			for (FileVo file : files) {

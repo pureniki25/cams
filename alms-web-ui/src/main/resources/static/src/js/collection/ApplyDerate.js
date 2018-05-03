@@ -206,6 +206,7 @@ window.layinit(function (htConfig) {
                             }*/
             ],
             otherDerateTypeList:[],
+            tempList:[],
             otherFees:[],//其他费用项
 
             validApplyInfoForm: setFormValidate,
@@ -826,7 +827,7 @@ var getShowInfo = function () {
                 //减免类型显示
                 vm.derateTypeList = res.data.data.derateTypeList;
                 vm.otherDerateTypeList=res.data.data.otherDerateTypeList;
-
+                vm.tempList=res.data.data.tempList;
                 if(res.data.data.applyList !=null && res.data.data.applyList.length>0){
                     //赋值申请信息
                     vm.applyInfoForm = res.data.data.applyList[0];
@@ -1248,7 +1249,8 @@ var saveapplyInfo = function(pStatus){debugger
 		               url: basePath+'ApplyDerateController/saveApplyDerateInfo',
 		               contentType: "application/json; charset=utf-8",
 		               data: JSON.stringify({"applyData":[vm.applyInfoForm],"reqRegFiles":vm.reqRegFiles,"applytTypes":vm.applyTypes,"otherDerateTypeList":vm.otherDerateTypeList,
-		            	   "outsideInterest":vm.baseInfoForm.outsideInterest,"generalReturnRate":vm.baseInfoForm.generalReturnRate,"preLateFees":vm.baseInfoForm.preLateFees}),
+		            	   "outsideInterest":vm.baseInfoForm.outsideInterest,"generalReturnRate":vm.baseInfoForm.generalReturnRate,"preLateFees":vm.baseInfoForm.preLateFees,"otherFees":vm.otherFees,
+                          "otherFeeEditFlage":vm.otherFeeEditFlage}),
 		               success: function (res) {
 		            	   if (res.code == "1"){
 		            		   vm.$Modal.success({

@@ -2,6 +2,7 @@ package com.hongte.alms.base.service;
 
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.entity.ApplyDerateProcess;
+import com.hongte.alms.base.entity.ApplyDerateProcessOtherFees;
 import com.hongte.alms.base.entity.ApplyDerateType;
 import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.vo.module.ApplyDerateProcessReq;
@@ -26,7 +27,7 @@ public interface ApplyDerateProcessService extends BaseService<ApplyDerateProces
      * 存储申请减免的信息
      * @param req
      */
-    void saveApplyDerateProcess(ApplyDerateProcessReq req,List<ApplyDerateType>  types,List<SysParameter> params,String outsideInterest,String generalReturnRate,String preLateFees) throws IllegalAccessException, InstantiationException;
+    void saveApplyDerateProcess(ApplyDerateProcessReq req,List<ApplyDerateType>  types,List<SysParameter> params,String outsideInterest,String generalReturnRate,String preLateFees,List<ApplyDerateProcessOtherFees> otherFees,String otherFeeEditFlage) throws IllegalAccessException, InstantiationException;
 
     /**
      * 存储减免审批的记录信息

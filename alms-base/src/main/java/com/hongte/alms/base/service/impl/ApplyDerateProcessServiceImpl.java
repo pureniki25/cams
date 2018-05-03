@@ -153,7 +153,7 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void saveApplyDerateProcess(ApplyDerateProcessReq req,List<ApplyDerateType>  types,List<SysParameter> params,String outsideInterest,String generalReturnRate,String preLateFees) throws IllegalAccessException, InstantiationException {
+    public void saveApplyDerateProcess(ApplyDerateProcessReq req,List<ApplyDerateType>  types,List<SysParameter> params,String outsideInterest,String generalReturnRate,String preLateFees,List<ApplyDerateProcessOtherFees> otherFees,String otherFeeEditFlage) throws IllegalAccessException, InstantiationException {
     
         
         String businessId = req.getBusinessId();
@@ -223,33 +223,44 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
         }
   
         applyDerateTypeService.insertOrUpdateBatch(newTypes);
-        //保存其他费用
-        List<ApplyDerateProcessOtherFees> fees=new ArrayList<ApplyDerateProcessOtherFees>(); 
-
-       
-        params.forEach(item->{
-        	if(StringUtil.notEmpty(item.getParamValue2())) {
-        		  ApplyDerateProcessOtherFees fee=new ApplyDerateProcessOtherFees();
-        		  fee.setPlanDetailId(UUID.randomUUID().toString());
-        		  fee.setBusinessId(pList.getBusinessId());
-        		  fee.setPlanListId(pList.getPlanListId());
-        		  fee.setPeriod(pList.getPeriod());
-        		  fee.setPlanItemName(item.getParamName());
-        		  fee.setPlanItemType(Integer.valueOf(item.getParamValue3()));
-        		  fee.setFeeId(item.getParamValue());
-        		  fee.setPlanAmount(BigDecimal.valueOf(Double.valueOf(item.getParamValue2())));
-        		  fee.setAccountStatus(0);//0：不线上分账
-        		  fee.setCreateDate(new Date());
-        		  fee.setCreateUser(loginUserInfoHelper.getUserId());
-        		  fee.setApplyDerateProcessId(applyInfo.getApplyDerateProcessId());
-        		  fees.add(fee);
-        	}
-        	
-        });
-        if(fees.size()>0) {
-        	  applyDerateProcessOtherFeesService.insertBatch(fees);	
+        
+      //新增的时候
+        if(otherFeeEditFlage.equals("0")) {
+		        //保存其他费用
+		        List<ApplyDerateProcessOtherFees> fees=new ArrayList<ApplyDerateProcessOtherFees>(); 
+		
+		       
+		        params.forEach(item->{
+		        	if(StringUtil.notEmpty(item.getParamValue2())) {
+		        		  ApplyDerateProcessOtherFees fee=new ApplyDerateProcessOtherFees();
+		        		  fee.setPlanDetailId(UUID.randomUUID().toString());
+		        		  fee.setBusinessId(pList.getBusinessId());
+		        		  fee.setPlanListId(pList.getPlanListId());
+		        		  fee.setPeriod(pList.getPeriod());
+		        		  fee.setPlanItemName(item.getParamName());
+		        		  fee.setPlanItemType(Integer.valueOf(item.getParamValue3()));
+		        		  fee.setFeeId(item.getParamValue());
+		        		  fee.setPlanAmount(BigDecimal.valueOf(Double.valueOf(item.getParamValue2())));
+		        		  fee.setAccountStatus(0);//0：不线上分账
+		        		  fee.setCreateDate(new Date());
+		        		  fee.setCreateUser(loginUserInfoHelper.getUserId());
+		        		  fee.setApplyDerateProcessId(applyInfo.getApplyDerateProcessId());
+		        		  fees.add(fee);
+		        	}
+		        	
+		        });
+		        if(fees.size()>0) {
+		        	  applyDerateProcessOtherFeesService.insertBatch(fees);	
+		        }
         }
         
+        //草稿的时候
+        if(otherFeeEditFlage.equals("-1")) {
+	        //保存其他费用
+	        if(otherFees.size()>0) {
+	        	  applyDerateProcessOtherFeesService.insertOrUpdateBatch(otherFees);	
+	        }
+    }
         
     }
 
