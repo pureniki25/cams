@@ -61,7 +61,7 @@
             and business.company_id = #{companyId}
         </if>
         
-         <if test = "businessType != null and businessType!='' ">
+         <if test = "businessType != null and businessType!='' and businessType!=0">
             and type.business_type_id = #{businessType}
         </if>
         AND planList.current_status IN ("还款中","逾期")
