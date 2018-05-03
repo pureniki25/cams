@@ -13,11 +13,15 @@
         <result column="borrow_money" property="borrowMoney" />
         <result column="borrow_rate" property="borrowRate" />
         <result column="borrow_rate_unit" property="borrowRateUnit" />
+        <result column="over_due_rate" property="overDueRate" />
+        <result column="over_due_rate_unit" property="overDueRateUnit" />
         <result column="borrow_limit" property="borrowLimit" />
         <result column="borrow_limit_unit" property="borrowLimitUnit" />
         <result column="plan_status" property="planStatus" />
         <result column="is_defer" property="isDefer" />
         <result column="active" property="active" />
+        <result column="creat_sys_type" property="creatSysType" />
+        <result column="plate_type" property="plateType" />
         <result column="create_time" property="createTime" />
         <result column="create_user" property="createUser" />
         <result column="update_time" property="updateTime" />
@@ -26,7 +30,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        proj_plan_id AS projPlanId, project_id AS projectId, business_id AS businessId, original_business_id AS originalBusinessId, repayment_batch_id AS repaymentBatchId, plan_id AS planId, borrow_money AS borrowMoney, borrow_rate AS borrowRate, borrow_rate_unit AS borrowRateUnit, borrow_limit AS borrowLimit, borrow_limit_unit AS borrowLimitUnit, plan_status AS planStatus, is_defer AS isDefer, active,create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
+        proj_plan_id AS projPlanId, project_id AS projectId, business_id AS businessId, original_business_id AS originalBusinessId, repayment_batch_id AS repaymentBatchId, plan_id AS planId, borrow_money AS borrowMoney, borrow_rate AS borrowRate, borrow_rate_unit AS borrowRateUnit, over_due_rate AS overDueRate, over_due_rate_unit AS overDueRateUnit, borrow_limit AS borrowLimit, borrow_limit_unit AS borrowLimitUnit, plan_status AS planStatus, is_defer AS isDefer, active, creat_sys_type AS creatSysType, plate_type AS plateType, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
     </sql>
 
 </mapper>

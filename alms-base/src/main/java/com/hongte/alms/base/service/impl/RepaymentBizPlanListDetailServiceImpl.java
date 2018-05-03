@@ -12,8 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
  * 还款计划应还项目明细表 服务实现类
  * </p>
  *
- * @author cj
- * @since 2018-03-06
+ * @author 曾坤
+ * @since 2018-05-03
  */
 @Service("RepaymentBizPlanListDetailService")
 @Transactional

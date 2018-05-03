@@ -17,9 +17,9 @@ import com.hongte.alms.common.service.BaseService;
  * @since 2018-03-06
  */
 public interface RepaymentBizPlanService extends BaseService<RepaymentBizPlan> {
-	
-	
+
+
 	public   List<RepaymentOpenServiceVO> selectRepaymentOpenServiceList(String originalBusinessId,String afterId);
-   
+
 	public void repayResultUpdateRecord(RepayResultRespData data);
 }

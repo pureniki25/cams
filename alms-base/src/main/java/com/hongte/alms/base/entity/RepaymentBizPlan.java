@@ -16,8 +16,8 @@ import io.swagger.annotations.ApiModelProperty;
  * 业务还款计划信息
  * </p>
  *
- * @author 王继光
- * @since 2018-03-06
+ * @author 曾坤
+ * @since 2018-05-03
  */
 @ApiModel
 @TableName("tb_repayment_biz_plan")
@@ -103,13 +103,17 @@ public class RepaymentBizPlan extends Model<RepaymentBizPlan> {
 	@TableField("xd_out_id")
 	@ApiModelProperty(required= true,value = "对应原信贷的出款计划ID(out_id)，用作历史数据迁移的标记字段。若非原信贷系统生成的还款计划，则为空")
 	private Integer xdOutId;
-
-	/**
-	 * 是否有效状态：1 有效 ，0 无效
-	 */
+    /**
+     * 是否有效状态：1 有效 ，0 无效
+     */
 	@ApiModelProperty(required= true,value = "是否有效状态：1 有效 ，0 无效")
 	private Integer active;
-
+    /**
+     * 来源类型：1.信贷生成，2.贷后管理生成
+     */
+	@TableField("src_type")
+	@ApiModelProperty(required= true,value = "来源类型：1.信贷生成，2.贷后管理生成")
+	private Integer srcType;
     /**
      * 创建日期
      */
@@ -240,6 +244,22 @@ public class RepaymentBizPlan extends Model<RepaymentBizPlan> {
 		this.xdOutId = xdOutId;
 	}
 
+	public Integer getActive() {
+		return active;
+	}
+
+	public void setActive(Integer active) {
+		this.active = active;
+	}
+
+	public Integer getSrcType() {
+		return srcType;
+	}
+
+	public void setSrcType(Integer srcType) {
+		this.srcType = srcType;
+	}
+
 	public Date getCreateTime() {
 		return createTime;
 	}
@@ -293,18 +313,12 @@ public class RepaymentBizPlan extends Model<RepaymentBizPlan> {
 			", isDefer=" + isDefer +
 			", xdAfterGuid=" + xdAfterGuid +
 			", xdOutId=" + xdOutId +
+			", active=" + active +
+			", srcType=" + srcType +
 			", createTime=" + createTime +
 			", createUser=" + createUser +
 			", updateTime=" + updateTime +
 			", updateUser=" + updateUser +
 			"}";
-	}
-
-	public Integer getActive() {
-		return active;
-	}
-
-	public void setActive(Integer active) {
-		this.active = active;
 	}
 }

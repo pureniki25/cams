@@ -40,33 +40,33 @@ import org.springframework.transaction.annotation.Transactional;
 @Service("RepaymentBizPlanService")
 @Transactional
 public class RepaymentBizPlanServiceImpl extends BaseServiceImpl<RepaymentBizPlanMapper, RepaymentBizPlan> implements RepaymentBizPlanService {
-	
-	
+
+
 	@Autowired
 	@Qualifier("WithholdingRecordLogService")
 	WithholdingRecordLogService WithholdingRecordLogService;
 
-	
+
     @Autowired
     RepaymentBizPlanMapper repaymentBizPlanMapper;
 	@Autowired
 	@Qualifier("RepaymentBizPlanService")
 	RepaymentBizPlanService repaymentBizPlanService;
 
-	
+
 	@Autowired
 	@Qualifier("RepaymentBizPlanListService")
 	RepaymentBizPlanListService repaymentBizPlanListService;
-	
+
 	@Autowired
 	@Qualifier("RepaymentBizPlanListDetailService")
 	RepaymentBizPlanListDetailService repaymentBizPlanDetailListService;
-	
+
 	@Autowired
 	@Qualifier("CollectionStatusService")
 	CollectionStatusService collectionStatusService;
     /**
-     * 
+     *
      * 根据主业务编号和afterId查询还款计划详细信息
      */
 	@Override
@@ -75,15 +75,15 @@ public class RepaymentBizPlanServiceImpl extends BaseServiceImpl<RepaymentBizPla
 		return list;
 	}
 
-	
+
 	 /**
-     * 
+     *
      * 代扣结果更新表记录
      * @author chenzs
-     * 
+     *
      */
-	
-	
+
+
 	  @Transactional(rollbackFor = Exception.class)
 	@Override
 	public void repayResultUpdateRecord(RepayResultRespData data) {
@@ -93,14 +93,14 @@ public class RepaymentBizPlanServiceImpl extends BaseServiceImpl<RepaymentBizPla
 			if(list!=null&&list.size()>0) {
 				 vo=list.get(0);
 			}
-			
+
 			//更新Plan表
 			RepaymentBizPlan plan=repaymentBizPlanService.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("plan_id",vo.getPlanId()));
 			plan.setPlanStatus(Integer.parseInt(data.getPlanStatus()));
 			repaymentBizPlanService.updateById(plan);
-			
+
 			//更新Plan_list表
-			
+
 			RepaymentBizPlanList planList=repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("plan_list_id",vo.getPlanListId()));
 			planList.setDueDate(DateUtil.getDate(data.getDueDate()));
 			planList.setTotalBorrowAmount(BigDecimal.valueOf(Double.valueOf(data.getTotalBorrowAmount())));
@@ -120,10 +120,10 @@ public class RepaymentBizPlanServiceImpl extends BaseServiceImpl<RepaymentBizPla
 			planList.setAccountantConfirmUserName(data.getAccountantConfirmUserName());
 			planList.setAccountantConfirmDate(DateUtil.getDate(data.getAccountantConfirmDate()));
 			repaymentBizPlanListService.updateById(planList);
-			
-			
+
+
 			List<RepayDetailResultRespData> repayResultDetailList=data.getRepayResultDetailList();
-			
+
 			//先根据FeeId取修改对象的planListDetail记录并从接口返回的repayResultDetailList中筛选出贷后系统planListDetail表中没有FeeId的记录
 			for(RepaymentOpenServiceVO repaymentOpenServiceVO:list) {
 				updatePlanListDetail(repaymentOpenServiceVO.getPlanDetailId(), repayResultDetailList);
@@ -146,26 +146,26 @@ public class RepaymentBizPlanServiceImpl extends BaseServiceImpl<RepaymentBizPla
 				detail.setFactRepayDate(DateUtil.getDate(respData.getFactRepayDetailDate()));
 				detail.setCreateDate(new Date());
 				detail.setCreateUser("接口同步数据");
-				
+
 				repaymentBizPlanDetailListService.insert(detail);
-				
+
 				List<WithholdingRecordLog> loglist=WithholdingRecordLogService.selectWithholdingRecordLog(data.getOriginalBusinessId(), data.getAfterId());
 				WithholdingRecordLog log=loglist.get(0);
 				log.setRepayStatus(1);
 				WithholdingRecordLogService.updateById(log);
-				
+
 				CollectionStatus status=collectionStatusService.selectOne(new EntityWrapper<CollectionStatus>().eq("crp_id", vo.getPlanListId()));
 				status.setCollectionStatus(200);
 				collectionStatusService.updateById(status);
-				
-		
+
+
 	}
-			
-			
-			
+
+
+
 	  }
-	  
-	  
+
+
 	//更新planListDetail 数据
 		private void updatePlanListDetail(String pDetailId,List<RepayDetailResultRespData> repayResultDetailList) {
 			RepaymentBizPlanListDetail detail=repaymentBizPlanDetailListService.selectOne(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_detail_id",pDetailId ));
@@ -184,6 +184,6 @@ public class RepaymentBizPlanServiceImpl extends BaseServiceImpl<RepaymentBizPla
 				repaymentBizPlanDetailListService.updateById(detail);
 				iter.remove();
 			}
-		
+
 		}
 }

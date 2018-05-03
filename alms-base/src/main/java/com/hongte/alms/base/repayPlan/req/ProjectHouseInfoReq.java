@@ -12,8 +12,8 @@ import java.util.Date;
  * @author zengkun
  * @since 2018/4/23
  */
-@ApiModel("团贷网业务上标房贷信息表")
-public class TuandaiProjectHouseReq {
+@ApiModel("业务上标房贷信息表")
+public class ProjectHouseInfoReq {
 
 
     /**

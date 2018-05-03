@@ -1,6 +1,5 @@
 package com.hongte.alms.base.repayPlan.req;
 
-import com.baomidou.mybatisplus.annotations.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -16,7 +15,6 @@ import java.util.Date;
 public class BusinessBasicInfoReq {
 
 
-
     /**
      * 资产端业务编号
      */
@@ -29,10 +27,10 @@ public class BusinessBasicInfoReq {
     private Date inputTime;
 
     /**
-     * 信贷的业务类型（对应tb_basic_business_type的xd_business_type_id)
+     * 业务类型（对应tb_basic_business_type的xd_business_type_id)
      */
     @ApiModelProperty(required= true,value = "信贷的业务类型")
-    private String  xdBusinessType;
+    private String businessType;
     /**
      * 业务所属子类型，若无则为空
      * 备注：这个业务所属的子类型，对应的信贷的字段是什么 需要与咏康核对一下
@@ -85,6 +83,8 @@ public class BusinessBasicInfoReq {
      */
     @ApiModelProperty(required= true,value = "借款利率类型，1：年利率，2：月利率，3：日利率")
     private Integer borrowRateUnit;
+
+
     /**
      * 业务主办人ID
      */
@@ -149,12 +149,12 @@ public class BusinessBasicInfoReq {
         this.inputTime = inputTime;
     }
 
-    public String getXdBusinessType() {
-        return xdBusinessType;
+    public String getBusinessType() {
+        return businessType;
     }
 
-    public void setXdBusinessType(String xdBusinessType) {
-        this.xdBusinessType = xdBusinessType;
+    public void setBusinessType(String businessType) {
+        this.businessType = businessType;
     }
 
     public String getBusinessCtype() {

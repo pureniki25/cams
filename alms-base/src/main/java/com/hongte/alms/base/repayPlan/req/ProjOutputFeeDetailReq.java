@@ -13,6 +13,8 @@ import java.math.BigDecimal;
 @ApiModel("标的出款申请费用明细期限范围明细")
 public class ProjOutputFeeDetailReq {
 
+
+
     /**
      * 上标编号
      */
@@ -41,12 +43,12 @@ public class ProjOutputFeeDetailReq {
     /**
      * 本期金额
      */
-    @ApiModelProperty(required= true,value = "本期金额")
+    @ApiModelProperty(required= false,value = "本期金额")
     private BigDecimal feeValue;
     /**
      * 本期比例
      */
-    @ApiModelProperty(required= true,value = "本期比例")
+    @ApiModelProperty(required= false,value = "本期比例")
     private BigDecimal feeRate;
     /**
      * 费用收取方式，1为按比例，2为按金额
@@ -56,7 +58,77 @@ public class ProjOutputFeeDetailReq {
     /**
      * 利率,1为年利率，2为月利率，3为日利率
      */
-    @ApiModelProperty(required= true,value = "利率,1为年利率，2为月利率，3为日利率")
+    @ApiModelProperty(required= false,value = "利率,1为年利率，2为月利率，3为日利率")
     private Integer interestRate;
 
+    public Integer getInterestRate() {
+        return interestRate;
+    }
+
+    public void setInterestRate(Integer interestRate) {
+        this.interestRate = interestRate;
+    }
+
+    public Integer getFeeChargingType() {
+        return feeChargingType;
+    }
+
+    public void setFeeChargingType(Integer feeChargingType) {
+        this.feeChargingType = feeChargingType;
+    }
+    public String getProjId() {
+        return projId;
+    }
+
+    public void setProjId(String projId) {
+        this.projId = projId;
+    }
+
+    public Integer getFeeTermRangeMin() {
+        return feeTermRangeMin;
+    }
+
+    public void setFeeTermRangeMin(Integer feeTermRangeMin) {
+        this.feeTermRangeMin = feeTermRangeMin;
+    }
+
+    public Integer getFeeTermRangeMax() {
+        return feeTermRangeMax;
+    }
+
+    public void setFeeTermRangeMax(Integer feeTermRangeMax) {
+        this.feeTermRangeMax = feeTermRangeMax;
+    }
+
+    public String getFeeId() {
+        return feeId;
+    }
+
+    public void setFeeId(String feeId) {
+        this.feeId = feeId;
+    }
+
+    public String getFeeName() {
+        return feeName;
+    }
+
+    public void setFeeName(String feeName) {
+        this.feeName = feeName;
+    }
+
+    public BigDecimal getFeeValue() {
+        return feeValue;
+    }
+
+    public void setFeeValue(BigDecimal feeValue) {
+        this.feeValue = feeValue;
+    }
+
+    public BigDecimal getFeeRate() {
+        return feeRate;
+    }
+
+    public void setFeeRate(BigDecimal feeRate) {
+        this.feeRate = feeRate;
+    }
 }

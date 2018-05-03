@@ -17,26 +17,15 @@
         <result column="overdue_amount" property="overdueAmount" />
         <result column="overdue_days" property="overdueDays" />
         <result column="current_status" property="currentStatus" />
+        <result column="current_sub_status" property="currentSubStatus" />
         <result column="repay_flag" property="repayFlag" />
         <result column="fact_repay_date" property="factRepayDate" />
-        <result column="finance_comfirm_date" property="financeComfirmDate" />
-        <result column="finance_confirm_user" property="financeConfirmUser" />
-        <result column="finance_confirm_user_name" property="financeConfirmUserName" />
-        <result column="confirm_flag" property="confirmFlag" />
-        <result column="auto_withholding_confirmed_date" property="autoWithholdingConfirmedDate" />
-        <result column="auto_withholding_confirmed_user" property="autoWithholdingConfirmedUser" />
-        <result column="auto_withholding_confirmed_user_name" property="autoWithholdingConfirmedUserName" />
-        <result column="accountant_confirm_status" property="accountantConfirmStatus" />
-        <result column="accountant_confirm_user" property="accountantConfirmUser" />
-        <result column="accountant_confirm_user_name" property="accountantConfirmUserName" />
-        <result column="accountant_confirm_date" property="accountantConfirmDate" />
-        <result column="proj_due_date" property="projDueDate" />
         <result column="biz_amount" property="bizAmount" />
         <result column="biz_overdue_amount" property="bizOverdueAmount" />
-        <result column="proj_amount" property="projAmount" />
-        <result column="proj_overdue_amount" property="projOverdueAmount" />
         <result column="remark" property="remark" />
         <result column="active" property="active" />
+        <result column="creat_sys_type" property="creatSysType" />
+        <result column="plate_type" property="plateType" />
         <result column="create_time" property="createTime" />
         <result column="create_user" property="createUser" />
         <result column="update_time" property="updateTime" />
@@ -45,7 +34,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        proj_plan_list_id AS projPlanListId, proj_plan_id AS projPlanId, plan_list_id AS planListId, plan_id AS planId, business_id AS businessId, orig_business_id AS origBusinessId, period, after_id AS afterId, due_date AS dueDate, total_borrow_amount AS totalBorrowAmount, overdue_amount AS overdueAmount, overdue_days AS overdueDays, current_status AS currentStatus, repay_flag AS repayFlag, fact_repay_date AS factRepayDate, finance_comfirm_date AS financeComfirmDate, finance_confirm_user AS financeConfirmUser, finance_confirm_user_name AS financeConfirmUserName, confirm_flag AS confirmFlag, auto_withholding_confirmed_date AS autoWithholdingConfirmedDate, auto_withholding_confirmed_user AS autoWithholdingConfirmedUser, auto_withholding_confirmed_user_name AS autoWithholdingConfirmedUserName, accountant_confirm_status AS accountantConfirmStatus, accountant_confirm_user AS accountantConfirmUser, accountant_confirm_user_name AS accountantConfirmUserName, accountant_confirm_date AS accountantConfirmDate, proj_due_date AS projDueDate, biz_amount AS bizAmount, biz_overdue_amount AS bizOverdueAmount, proj_amount AS projAmount, proj_overdue_amount AS projOverdueAmount, remark,active, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
+        proj_plan_list_id AS projPlanListId, proj_plan_id AS projPlanId, plan_list_id AS planListId, plan_id AS planId, business_id AS businessId, orig_business_id AS origBusinessId, period, after_id AS afterId, due_date AS dueDate, total_borrow_amount AS totalBorrowAmount, overdue_amount AS overdueAmount, overdue_days AS overdueDays, current_status AS currentStatus, current_sub_status AS currentSubStatus, repay_flag AS repayFlag, fact_repay_date AS factRepayDate, biz_amount AS bizAmount, biz_overdue_amount AS bizOverdueAmount, remark, active, creat_sys_type AS creatSysType, plate_type AS plateType, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
     </sql>
 
 </mapper>

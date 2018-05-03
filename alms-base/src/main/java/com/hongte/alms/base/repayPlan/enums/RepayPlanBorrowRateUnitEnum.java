@@ -2,6 +2,7 @@ package com.hongte.alms.base.repayPlan.enums;
 
 import com.baomidou.mybatisplus.enums.IEnum;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.hongte.alms.base.enums.AreaLevel;
 
 /**
  * @author:曾坤
@@ -16,7 +17,7 @@ public enum RepayPlanBorrowRateUnitEnum implements IEnum {
     MONTH_RATE(2,"月利率"),
     DAY_RATE(3,"日利率");
 
-    private int value;
+    private Integer value;
     private String desc;
 
     RepayPlanBorrowRateUnitEnum(final int value, final String desc) {
@@ -33,4 +34,43 @@ public enum RepayPlanBorrowRateUnitEnum implements IEnum {
     public String getDesc(){
         return this.desc;
     }
+
+
+
+
+    public static String nameOf(Integer key){
+        for(RepayPlanBorrowRateUnitEnum d : RepayPlanBorrowRateUnitEnum.values()){
+            if(d.value.equals(key)){
+                return d.desc;
+            }
+        }
+        return null;
+
+    }
+
+    public static RepayPlanBorrowRateUnitEnum getByKey(Integer key){
+        for(RepayPlanBorrowRateUnitEnum d : RepayPlanBorrowRateUnitEnum.values()){
+            if(d.value.equals(key)){
+                return d;
+            }
+        }
+        return null;
+
+    }
+
+    public static Integer keyOf(String name){
+        for(RepayPlanBorrowRateUnitEnum d : RepayPlanBorrowRateUnitEnum.values()){
+            if(d.desc.equals(name)){
+                return d.value;
+            }
+        }
+        return null;
+
+    }
+
+
+
+
+
+
 }

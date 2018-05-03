@@ -30,12 +30,12 @@ public class ProjOutputFeeReq {
     /**
      * 费用项目ID
      */
-    @ApiModelProperty(required= true,value = "费用项目ID")
+    @ApiModelProperty(value = "费用项目ID")
     private String feeItemId;
     /**
      * 费用项目名称
      */
-    @ApiModelProperty(required= true,value = "费用项目名称")
+    @ApiModelProperty(value = "费用项目名称")
     private String feeItemName;
 
 
@@ -69,26 +69,26 @@ public class ProjOutputFeeReq {
 
     //添加进位方式标志位
 
-    /**
-     * 创建者
-     */
-    @ApiModelProperty(required= true,value = "创建者")
-    private String createUser;
-    /**
-     * 创建时间
-     */
-    @ApiModelProperty(required= true,value = "创建时间")
-    private Date createTime;
-    /**
-     * 更新者
-     */
-    @ApiModelProperty(value = "更新者")
-    private String updateUser;
-    /**
-     * 更新时间
-     */
-    @ApiModelProperty(value = "更新时间")
-    private Date updateTime;
+//    /**
+//     * 创建者
+//     */
+//    @ApiModelProperty(required= true,value = "创建者")
+//    private String createUser;
+//    /**
+//     * 创建时间
+//     */
+//    @ApiModelProperty(required= true,value = "创建时间")
+//    private Date createTime;
+//    /**
+//     * 更新者
+//     */
+//    @ApiModelProperty(value = "更新者")
+//    private String updateUser;
+//    /**
+//     * 更新时间
+//     */
+//    @ApiModelProperty(value = "更新时间")
+//    private Date updateTime;
     /**
      * 退费申请状态，0或null：退费失败,未申请退费，1：退费成功，2：退费申请中
      */
@@ -207,37 +207,37 @@ public class ProjOutputFeeReq {
         this.feeValue = feeValue;
     }
 
-    public String getCreateUser() {
-        return createUser;
-    }
-
-    public void setCreateUser(String createUser) {
-        this.createUser = createUser;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public String getUpdateUser() {
-        return updateUser;
-    }
-
-    public void setUpdateUser(String updateUser) {
-        this.updateUser = updateUser;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
+//    public String getCreateUser() {
+//        return createUser;
+//    }
+//
+//    public void setCreateUser(String createUser) {
+//        this.createUser = createUser;
+//    }
+//
+//    public Date getCreateTime() {
+//        return createTime;
+//    }
+//
+//    public void setCreateTime(Date createTime) {
+//        this.createTime = createTime;
+//    }
+//
+//    public String getUpdateUser() {
+//        return updateUser;
+//    }
+//
+//    public void setUpdateUser(String updateUser) {
+//        this.updateUser = updateUser;
+//    }
+//
+//    public Date getUpdateTime() {
+//        return updateTime;
+//    }
+//
+//    public void setUpdateTime(Date updateTime) {
+//        this.updateTime = updateTime;
+//    }
 
     public Integer getRefundStatus() {
         return RefundStatus;

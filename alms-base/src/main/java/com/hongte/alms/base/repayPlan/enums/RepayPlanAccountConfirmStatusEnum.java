@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * @date: 2018/4/24
  * 会计确认状态
  */
-public enum RepayPlanAccountConfirmStautsEnum implements IEnum {
+public enum RepayPlanAccountConfirmStatusEnum implements IEnum {
     //会计确认状态，0或null:待审核;1:已审核;2:已退回;3:已返审核;4:导入;
     WAIT(0,"待审核"),
     VERIFIED(1,"已审核"),
@@ -19,7 +19,7 @@ public enum RepayPlanAccountConfirmStautsEnum implements IEnum {
     private int value;
     private String desc;
 
-    RepayPlanAccountConfirmStautsEnum(final int value, final String desc) {
+    RepayPlanAccountConfirmStatusEnum(final int value, final String desc) {
         this.value = value;
         this.desc = desc;
     }
