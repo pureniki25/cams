@@ -351,9 +351,11 @@ window.layinit(function (htConfig) {
 
             },
             //是否结清
-            isClosedClick(flage){
+            isClosedClick(flage){debugger
               if(flage==false){
-            	  vm.otherFeeShowFlage=false;
+            	  
+            		  vm.otherFeeShowFlage=false;
+            
          		   var otherList=vm.otherDerateTypeList;
            		if(otherList != null && otherList.length > 0){
            	    	for (var i = 0; i < otherList.length; i++){
@@ -386,8 +388,8 @@ window.layinit(function (htConfig) {
             	  
               }
               if(flage==true){
-            	  
-            	  vm.otherFeeShowFlage=true;
+            		  vm.otherFeeShowFlage=true;
+         
             	  vm.applyInfoForm.realReceiveMoney=vm.baseInfoForm.settleTotalFactAmount;
             	  if(vm.applyInfoForm.realReceiveMoney==0){
             		  vm.applyInfoForm.realReceiveMoney=''
@@ -833,6 +835,10 @@ var getShowInfo = function () {
                     vm.applyInfoForm = res.data.data.applyList[0];
 
                     vm.applyInfoForm.isSettleFlage = vm.applyInfoForm.isSettle=="1"?"是":"否";
+                    
+                    if(vm.applyInfoForm.isSettle!="1"){
+              		  vm.otherFeeShowFlage=false;
+                    }
                     //赋值审批信息初始信息
                     vm.initalApplyInfo.isSettleFlage = vm.initalApplyInfo.isSettle=="1"?"是":"否";
                     vm.initalApplyInfo = res.data.data.applyList[0];
@@ -882,13 +888,14 @@ var getShowInfo = function () {
 
                     //赋值流程信息
                     var p = res.data.data.process;
-                    if(p!=null&& p.length>0){
+                    if(p!=null&& p.length>0){debugger
                         vm.approvalInfoForm.process = p[0];
                         vm.approvalInfoFormShowFlage = true;
                         vm.approvalInfoList = res.data.data.processLogs;
                         for(var i = 0;i<vm.approvalInfoList.length;i++){
                             var t = vm.approvalInfoList[i];
                             vm.approvalInfoList[i].isPassFlage = t.isPass=="1"?"是":"否";
+                      
                         }
                         processStatus = vm.approvalInfoForm.process.status;
                         

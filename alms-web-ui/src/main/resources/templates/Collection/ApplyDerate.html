@@ -230,13 +230,23 @@ color: #FF3030;
                             <div class="td"> <div class="td-box">{{ item.planItemName }}</div><i-input v-model="item.planAmount" class="td-box" @on-blur="getTotalShouldPay()"> </i-input> </div>
                      
                         </div>
+                        
+                        
                          <div  v-if="otherFeeEditFlage == '1'"  class="tr" v-for="(item, index) in otherFees">
                             <div class="td"> <div class="td-box">{{ item.planItemName }}</div><i-input disabled  v-model="item.planAmount" class="td-box" @on-blur="getTotalShouldPay()"> </i-input> </div>
                     </div>
-                     <!-- 只是为了填充表格效果 -->
-                         <div class="tr" v-for="(item, index) in tempList">
+                     <!-- 只是为了填充表格效果 ======================-->
+                         <div  v-if="otherFeeEditFlage == '0'" class="tr" v-for="(item, index) in tempList">
                              <div class="td"> <div class="td-box"></div><div class="td-box"> </div> </div>
                           </div>
+                         <div  v-if="otherFeeEditFlage == '-1'" class="tr" v-for="(item, index) in tempList">
+                             <div class="td"> <div class="td-box"></div><div class="td-box"> </div> </div>
+                          </div>
+                       
+                         <div  v-if="otherFeeEditFlage == '1'" class="tr" v-for="(item, index) in tempList">
+                             <div class="td"> <div class="td-box"></div><div class="td-box"> </div> </div>
+                          </div>
+                     <!-- =================== -->     
                 </i-form>
                 </row>
         </card>
