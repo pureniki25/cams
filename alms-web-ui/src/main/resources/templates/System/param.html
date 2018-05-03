@@ -164,56 +164,56 @@
                 <row>
                     <i-col span="24">
                         <form-item label="参数编号" prop="paramId">
-                            <i-input :value.sync="editParamForm.param.paramId" v-model="editParamForm.param.paramId"></i-input>
+                            <i-input  v-model="editParamForm.paramId" :disabled="editParamModal.title=='编辑参数'" ></i-input>
                         </form-item>
                     </i-col>
                 </row>
                 <row>
                     <i-col span="24">
                         <form-item label="参数名称" prop="paramName">
-                            <i-input :value.sync="editParamForm.param.paramName" v-model="editParamForm.param.paramName"></i-input>
+                            <i-input  v-model="editParamForm.paramName"></i-input>
                         </form-item>
                     </i-col>
                 </row>
                 <row>
                     <i-col span="24">
                         <form-item label="参数类型说明" prop="remark">
-                            <i-input type="textarea" :value.sync="editParamForm.param.remark" v-model="editParamForm.param.remark"></i-input>
+                            <i-input type="textarea"  v-model="editParamForm.remark"></i-input>
                         </form-item>
                     </i-col>
                 </row>
                 <row>
                     <i-col span="24">
                         <form-item label="参数值" prop="paramValue">
-                            <i-input type="text" :value.sync="editParamForm.param.paramValue" v-model="editParamForm.param.paramValue"></i-input>
+                            <i-input type="text"  v-model="editParamForm.paramValue"></i-input>
                         </form-item>
                     </i-col>
                 </row>
                 <row>
                     <i-col span="24">
                         <form-item label="参数值2" prop="paramValue2">
-                            <i-input type="text" :value.sync="editParamForm.param.paramValue2" v-model="editParamForm.param.paramValue2"></i-input>
+                            <i-input type="text"  v-model="editParamForm.paramValue2"></i-input>
                         </form-item>
                     </i-col>
                 </row>
                 <row>
                     <i-col span="24">
                         <form-item label="参数值3" prop="paramValue3">
-                            <i-input type="text" :value.sync="editParamForm.param.paramValue3" v-model="editParamForm.param.paramValue3"></i-input>
+                            <i-input type="text"  v-model="editParamForm.paramValue3"></i-input>
                         </form-item>
                     </i-col>
                 </row>
                 <row>
                     <i-col span="24">
                         <form-item label="参数值4" prop="paramValue4">
-                            <i-input type="text" :value.sync="editParamForm.param.paramValue4" v-model="editParamForm.param.paramValue4"></i-input>
+                            <i-input type="text"  v-model="editParamForm.paramValue4"></i-input>
                         </form-item>
                     </i-col>
                 </row>
                 <row>
                     <i-col span="24">
                         <form-item label="参数值5" prop="paramValue5">
-                            <i-input type="text" :value.sync="editParamForm.param.paramValue5" v-model="editParamForm.param.paramValue5"></i-input>
+                            <i-input type="text"  v-model="editParamForm.paramValue5"></i-input>
                         </form-item>
                     </i-col>
                 </row>

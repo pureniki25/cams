@@ -6,7 +6,9 @@ import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.common.service.BaseService;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -23,8 +25,8 @@ public interface BasicBusinessService extends BaseService<BasicBusiness> {
      * @param crpId
      * @return
      */
-    List<BusinessInfoForApplyDerateVo> selectBusinessInfoForApplyDerateVo(String crpId);
-    BusinessInfoForApplyDerateVo selectBusinessInfoForApplyDerateVoOne(String crpId);
+    List<BusinessInfoForApplyDerateVo> selectBusinessInfoForApplyDerateVo(String crpId,Integer isDefer,String originalBusinessId);
+    BusinessInfoForApplyDerateVo selectBusinessInfoForApplyDerateVoOne(String crpId,Integer isDefer,String originalBusinessId);
 
 
     /**
@@ -35,7 +37,36 @@ public interface BasicBusinessService extends BaseService<BasicBusiness> {
     List<UserPermissionBusinessDto> selectUserPermissionBusinessDtos(List<String> companyIds);
 
     List<String> selectCompanysBusinessIds(List<String> companyIds);
+    
+    /**
+     * 前置费用:一次性收取的分公司费用+ 期初收取的月收分公司服务费+平台费+担保费
+     * @param original_business_id
+     * @return
+     */
+     BigDecimal getPreChargeAndPreFees(String original_business_id);
+    
+    
 
+     
 
+ 	/**
+ 	 * 	结清最终缴纳的金额 
+ 	 * @param original_business_id
+ 	 * @return
+ 	 */
+ 	 Double getSettleTotalFactSum(@Param("original_business_id") String original_business_id);
+  	/**
+  	 * 	月收等费用总额
+  	 * @param original_business_id
+  	 * @return
+  	 */
+  	 Double getMonthSumFactAmount(@Param("original_business_id") String original_business_id);
+
+	 /**
+	 * 	 （所有还款计划中）的应还利息 和（所有还款计划中）的应还月收服务费
+	 * @param original_business_id
+	 * @return
+	 */
+	 Map<String, Object>  getNeedPay(@Param("original_business_id") String original_business_id);
 
 }

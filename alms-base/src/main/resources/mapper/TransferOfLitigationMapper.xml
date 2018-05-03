@@ -50,6 +50,24 @@
    			<result property="companyName" column="company_name"/>
 	</resultMap>  
 
+	<select id="getOverDueDatys" resultType="map">
+		SELECT 
+		      tab2.`original_business_id` business_id,
+		      MAX(tab1.fact_repay_date) factRepayDate,
+		      MIN(tab1.due_date) dueDate	-- 最小应还日期
+		  
+		    FROM
+		      `tb_repayment_biz_plan_list` tab1,
+		      tb_repayment_biz_plan tab2,
+		      tb_repayment_biz_plan_list_detail tab3 
+		    WHERE tab1.`plan_id` = tab2.`plan_id` 
+		      AND tab1.`plan_list_id` = tab3.`plan_list_id` 
+		      AND IFNULL(tab1.repay_flag,0) != 6
+		      AND tab2.`original_business_id` =  #{businessId,jdbcType=VARCHAR}
+	</select>
+
+
+
 	<select id="queryCarLoanData" resultType="map">
 		SELECT 
 		  (SELECT 
@@ -180,7 +198,7 @@
 		  AND t1.`business_id` = t3.`business_id` 
 		  AND t1.`business_id` = t6.`business_id` 
 		  AND t2.`last_detection_id` = t3.`id` 
-		  AND t1.`business_id` = #{businessId,jdbcType=VARCHAR}	
+		  AND t1.`business_id` = #{businessId,jdbcType=VARCHAR}	limit 1
 	</select>
 	
 	<select id="queryTransferLitigationCarData" resultType="com.hongte.alms.base.vo.litigation.BusinessCar">
@@ -444,12 +462,13 @@
 		SELECT 
 		  (plan_principal - fact_principal) surplusPrincipal,
 		  fact_principal factPrincipal,
-		  DATEDIFF(SYSDATE(), fact_repay_date) overdueDays,
-		  fact_repay_date dueDate 
+		  DATEDIFF(SYSDATE(), max(fact_repay_date)) overdueDays,
+		  
+		  max(fact_repay_date) dueDate 
 		FROM
-		  (SELECT 
+		  ( SELECT 
 		      b.plan_id,
-		      b.`business_id`,
+		      b.`original_business_id`,
 		      SUM(
 		        CASE
 		          WHEN c.plan_item_type = 10 
@@ -471,9 +490,9 @@
 		      tb_repayment_biz_plan_list_detail c 
 		  WHERE a.plan_list_id = c.plan_list_id 
 		    AND a.plan_id = b.plan_id 
-		    AND IFNULL(a.repay_flag, 0) != 6 
-		  GROUP BY b.plan_id) tt
-		WHERE tt.business_id = #{businessId,jdbcType=VARCHAR}
+		    AND IFNULL(a.repay_flag, 0) != 6  
+		 and  b.original_business_id =#{businessId,jdbcType=VARCHAR}) tt
+		WHERE tt.original_business_id = #{businessId,jdbcType=VARCHAR}
 	</select>
 	
 	<select id="queryHouseLoanData" resultMap="HouseLoanMap">
@@ -871,7 +890,7 @@
 		    END
 		  ) AS `planAccrual`,
 		  SUM(
-		    CASE
+		    CASE 
 		      WHEN t3.plan_item_type = 30 
 		      THEN t3.plan_amount 
 		      ELSE 0 

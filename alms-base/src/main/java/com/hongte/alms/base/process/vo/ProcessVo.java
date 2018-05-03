@@ -22,6 +22,10 @@ public class ProcessVo {
      * 业务编号
      */
     private String businessId;
+    private String businessTypeId;
+    /**
+     * 业务类型ID
+     */
     private  String  customerName; //客户名称
     /**
      * 流程注释
@@ -84,7 +88,7 @@ public class ProcessVo {
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date finishTime;
 
-
+   
     /**
      * 所属分公司
      */
@@ -101,7 +105,15 @@ public class ProcessVo {
     private boolean isMyApprove ;
     
     
-    public Date getFinishTime() {
+    public String getBusinessTypeId() {
+		return businessTypeId;
+	}
+
+	public void setBusinessTypeId(String businessTypeId) {
+		this.businessTypeId = businessTypeId;
+	}
+
+	public Date getFinishTime() {
 		return finishTime;
 	}
 

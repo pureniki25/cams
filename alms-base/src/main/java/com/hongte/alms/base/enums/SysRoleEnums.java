@@ -18,7 +18,11 @@ public enum SysRoleEnums {
 	DH_CENTER_DIRECTOR 	 ("DH_CENTER_DIRECTOR"	,"贷后管理中心总监")      ,
 	DH_0001  			 ("DH_0001"	,"贷后管理员")                        ,
 	DH_COMPANY_LEADER  	 ("DH_COMPANY_LEADER"	,"分公司负责人")          ,
-	DH_DATA_ANALYSIS 	 ("DH_DATA_ANALYSIS"	,"数据分析专员")          ;
+	DH_DATA_ANALYSIS 	 ("DH_DATA_ANALYSIS"	,"数据分析专员")          ,
+	
+	DH_CAR_TELLER 	 ("DH_CAR_TELLER"	,"车贷业务车贷出纳人员")  ,
+	DH_HOUSE_TELLER 	 ("DH_HOUSE_TELLER"	,"房贷业务出纳人员") ,
+	DH_GENERAL_APPROVE 	 ("DH_GENERAL_APPROVE"	,"综合岗审批") ;
 	
 
 

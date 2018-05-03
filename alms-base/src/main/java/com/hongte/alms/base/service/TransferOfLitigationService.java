@@ -20,6 +20,13 @@ public interface TransferOfLitigationService {
 	Map<String, Object> queryCarLoanData(String businessId);
 	
 	/**
+	 * 查询逾期天数
+	 * @return 
+	 * @param businessId 业务编号
+	 */
+	Map<String, Object> getOverDueDatys(String businessId);
+	
+	/**
 	 * 查询车贷诉讼相关数据
 	 * @return 车贷诉讼相关数据
 	 * @param businessId 业务编号

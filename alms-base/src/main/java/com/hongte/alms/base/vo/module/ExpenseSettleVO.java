@@ -48,6 +48,10 @@ public class ExpenseSettleVO implements Serializable{
 	 */
 	private BigDecimal demurrage ;
 	/**
+	 * 是否在合同期内
+	 */
+	private String isInContractDate ;
+	/**
 	 * 提前还款违约金
 	 */
 	private BigDecimal penalty ;
@@ -143,6 +147,15 @@ public class ExpenseSettleVO implements Serializable{
 	 */
 	public BigDecimal getLateFee() {
 		return lateFee;
+	}
+
+	
+	public String getIsInContractDate() {
+		return isInContractDate;
+	}
+
+	public void setIsInContractDate(String isInContractDate) {
+		this.isInContractDate = isInContractDate;
 	}
 
 	/**

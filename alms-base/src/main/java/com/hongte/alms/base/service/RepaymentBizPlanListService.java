@@ -23,20 +23,20 @@ public interface RepaymentBizPlanListService extends BaseService<RepaymentBizPla
      * @param companyId
      * @return
      */
-    public List<RepaymentBizPlanList> selectNeedPhoneUrgNorBiz(String companyId,Integer beforeDueDays);
+    public List<RepaymentBizPlanList> selectNeedPhoneUrgNorBiz(String companyId,Integer beforeDueDays, Integer businessType);
 
     /**
      * 查出需要移交上门催收的正常业务还款计划列表
      * @param companyId
      * @return
      */
-    public List<RepaymentBizPlanList> selectNeedVisitNorBiz(String companyId,Integer overDueDays );
+    public List<RepaymentBizPlanList> selectNeedVisitNorBiz(String companyId,Integer overDueDays, Integer businessType );
 
     /**
      * 查出需要移交法务的正常业务还款计划列表
      * @return
      */
-    public List<RepaymentBizPlanList> selectNeedLawNorBiz(Integer overDueDays );
+    public List<RepaymentBizPlanList> selectNeedLawNorBiz(Integer overDueDays,Integer businessType );
      
     String queryRepaymentBizPlanListByConditions(@Param(value="businessId") String businessId, @Param(value="afterId") String afterId);
 

@@ -148,7 +148,7 @@ window.layinit(function(htConfig){
                 layer.open({
                     type: 2,
                     title: '分配电催',
-                    area: ['1250px', '800px'],
+                    area: ['95%', '95%'],
                     content: '/collectionUI/setPhoneStaffUI?crpIds='+getSelectedcrpIds()
                 });
             },
@@ -163,7 +163,7 @@ window.layinit(function(htConfig){
                 layer.open({
                     type: 2,
                     title: '移交催收',
-                    area: ['1250px', '800px'],
+                    area: ['95%', '95%'],
                     content: '/collectionUI/setVisitStaffUI?crpIds='+getSelectedcrpIds()
                 });
 
@@ -267,7 +267,7 @@ window.layinit(function(htConfig){
                     title: '业务编号'
                 }, {
                     field: 'afterId',
-                    width:60,
+                    width:90,
                     title: '期数'
                 }, {
                     field: 'districtAreaName',
@@ -291,7 +291,7 @@ window.layinit(function(htConfig){
                     title: '业务类型'
                 }, {
                     field: 'borrowMoney',
-                    width:90,
+                    width:120,
                     title: '借款金额',
                     align: 'right',
                     templet:function(d){
@@ -299,7 +299,7 @@ window.layinit(function(htConfig){
                     }
                 }, {
                     field: 'totalBorrowAmount',
-                    width:90,
+                    width:150,
                     title: '应还金额',
                     align: 'right',
                     templet:function(d){
@@ -333,14 +333,14 @@ window.layinit(function(htConfig){
                     title: '应还日期',
                     templet:function(d){
                         console.log(d)
-                        return d.dueDate?moment(d.dueDate).format("YYYY年MM月DD日"):''
+                        return d.dueDate?moment(d.dueDate).format("YYYY-MM-DD"):''
                     }
                 }, {
                     field: 'repaymentDate',
                     width:105,
                     title: '实还日期',
                     templet:function(d){
-                        return d.repaymentDate?moment(d.repaymentDate).format("YYYY年MM月DD日"):''
+                        return d.repaymentDate?moment(d.repaymentDate).format("YYYY-MM-DD"):''
                     }
                 }, {
                     field: 'phoneStaffName',
@@ -432,9 +432,30 @@ window.layinit(function(htConfig){
                             if (authValid('applyDerate')) {
                                 buttons.push(
                                     {
-                                        "name": "减免申请", click: function (e, currentItem) {
-                                        var url = '/collectionUI/applyDerateUI?businessId=' + currentItem.businessId + '&crpId=' + currentItem.crpId + "&processStatus=-1"
-                                        showOneLineOprLayer(url, "减免申请")
+                                    	
+                                        "name": "减免申请", click: function (e, currentItem) {debugger
+                                            if (currentItem.statusName == '已还款'){
+                                            	 vm.$Modal.error({content: '已还款不能发起减免申请！'});
+                                            }else{
+	                                                if (currentItem.afterColStatusName=='已移交法务'){
+	                                              	   vm.$Modal.error({content: '已移交法务的不能发起减免申请！'});
+	                                                }else{
+		                                            	     if (currentItem.repaymentTypeId ==1||currentItem.repaymentTypeId==9||currentItem.repaymentTypeId==4){
+		                                                 	   vm.$Modal.error({content: '现在只支持等额本息和每月付息到期还本这2种还款方式的减免申请！'});
+			                                                 }else{
+			                                                     var url = '/collectionUI/applyDerateUI?businessId=' + currentItem.businessId + '&crpId=' + currentItem.crpId + "&processStatus=-1"+'&businessTypeId='+currentItem.businessTypeId+"&afterId="+currentItem.afterId
+			                                                     showOneLineOprLayer(url, "减免申请")
+			                                                 }
+	                                                   
+	                                              }
+                                            }
+                                  
+                                            
+                                           
+                              
+                                 
+                                            
+                                         
                                     }
                                     }
                                 )
