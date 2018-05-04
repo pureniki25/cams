@@ -102,7 +102,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         Map<String,List<RepaymentProjPlanListDetail>> repaymentPlanListDetailMap = new HashMap<>();
 
 
-        //计算每个标的还款计划列表
+        ////////   计算每个标的还款计划列表   开始 ////////////
         for(ProjInfoReq projInfoReq:tuandaiProjReqInfos){
             List<RepaymentProjPlan> projList =  repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("project_id",projInfoReq.getProjectId()));
 
