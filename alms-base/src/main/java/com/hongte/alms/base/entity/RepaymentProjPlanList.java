@@ -120,18 +120,7 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 	@TableField("fact_repay_date")
 	@ApiModelProperty(required= true,value = "客户实还日期")
 	private Date factRepayDate;
-    /**
-     * 标的当前期资产端总应还金额(元)，不含滞纳金
-     */
-	@TableField("biz_amount")
-	@ApiModelProperty(required= true,value = "标的当前期资产端总应还金额(元)，不含滞纳金")
-	private BigDecimal bizAmount;
-    /**
-     * 标的当前期资产端总应还滞纳金(元)，每天零点由系统自动计算
-     */
-	@TableField("biz_overdue_amount")
-	@ApiModelProperty(required= true,value = "标的当前期资产端总应还滞纳金(元)，每天零点由系统自动计算")
-	private BigDecimal bizOverdueAmount;
+
     /**
      * 还款备注
      */
@@ -308,22 +297,6 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 		this.factRepayDate = factRepayDate;
 	}
 
-	public BigDecimal getBizAmount() {
-		return bizAmount;
-	}
-
-	public void setBizAmount(BigDecimal bizAmount) {
-		this.bizAmount = bizAmount;
-	}
-
-	public BigDecimal getBizOverdueAmount() {
-		return bizOverdueAmount;
-	}
-
-	public void setBizOverdueAmount(BigDecimal bizOverdueAmount) {
-		this.bizOverdueAmount = bizOverdueAmount;
-	}
-
 	public String getRemark() {
 		return remark;
 	}
@@ -412,8 +385,6 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 			", currentSubStatus=" + currentSubStatus +
 			", repayFlag=" + repayFlag +
 			", factRepayDate=" + factRepayDate +
-			", bizAmount=" + bizAmount +
-			", bizOverdueAmount=" + bizOverdueAmount +
 			", remark=" + remark +
 			", active=" + active +
 			", creatSysType=" + creatSysType +

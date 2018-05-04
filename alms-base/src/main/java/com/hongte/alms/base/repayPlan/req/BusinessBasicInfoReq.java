@@ -9,7 +9,7 @@ import java.util.Date;
 /**
  * @author zengkun
  * @since 2018/4/20
- * 生成还款计划   业务的基本
+ * 生成还款计划   业务的基本信息
  */
 @ApiModel("创建还款计划的请求信息")
 public class BusinessBasicInfoReq {
@@ -20,6 +20,13 @@ public class BusinessBasicInfoReq {
      */
     @ApiModelProperty(required= true,value = "资产端业务编号")
     private String businessId;
+
+    /**
+     * 资产端原业务编号
+     */
+    @ApiModelProperty(required= true,value = "资产端业原务编号")
+    private String orgBusinessId;
+
     /**
      * 进件日期
      */
@@ -131,6 +138,12 @@ public class BusinessBasicInfoReq {
      */
     @ApiModelProperty(required= true,value = "是否需要进行平台还款，1：是，0：否")
     private Integer isTuandaiRepay;
+
+    /**
+     * 是否展期业务，1：是，0：否
+     */
+    @ApiModelProperty(required= true,value = "是否展期业务，1：是，0：否")
+    private Integer isRenewBusiness;
 
 
     public String getBusinessId() {
@@ -310,5 +323,19 @@ public class BusinessBasicInfoReq {
     }
 
 
+    public Integer getIsRenewBusiness() {
+        return isRenewBusiness;
+    }
 
+    public void setIsRenewBusiness(Integer isRenewBusiness) {
+        this.isRenewBusiness = isRenewBusiness;
+    }
+
+    public String getOrgBusinessId() {
+        return orgBusinessId;
+    }
+
+    public void setOrgBusinessId(String orgBusinessId) {
+        this.orgBusinessId = orgBusinessId;
+    }
 }

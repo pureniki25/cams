@@ -43,11 +43,7 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 	@TableField("business_id")
 	@ApiModelProperty(required= true,value = "还款计划所属业务ID(若当前业务为展期，则存展期业务编号)")
 	private String businessId;
-	
-	@TableField("share_profit_index")
-	@ApiModelProperty(required= true,value = "分润顺序（根据分润配置计算）")
-	private String shareProfitIndex;
-	
+
     /**
      * 所属期数
      */
@@ -150,13 +146,6 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 	private String updateUser;
 
 
-	public String getShareProfitIndex() {
-		return shareProfitIndex;
-	}
-
-	public void setShareProfitIndex(String shareProfitIndex) {
-		this.shareProfitIndex = shareProfitIndex;
-	}
 
 	public String getPlanDetailId() {
 		return planDetailId;

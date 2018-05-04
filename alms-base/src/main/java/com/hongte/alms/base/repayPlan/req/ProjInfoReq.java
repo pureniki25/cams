@@ -39,11 +39,11 @@ public class ProjInfoReq {
      */
     @ApiModelProperty(required= true,value = "项目编号")
     private String projectId;
-    /**
-     * 业务编号
-     */
-    @ApiModelProperty(required= true,value = "业务编号")
-    private String businessId;
+//    /**
+//     * 业务编号
+//     */
+//    @ApiModelProperty(required= true,value = "业务编号")
+//    private String businessId;
     /**
      * 上标状态(-100:业务员出款申请,-50:财务未上标,0:财务不同意上标,1:财务同意上标,2:已满标,3:财务确认出款计划可放款,4:团贷网已提现给借款人,5:提现失败,6:展期资金分配完成,7:部分提现给借款人)
      */
@@ -521,13 +521,13 @@ public class ProjInfoReq {
         this.projectId = projectId;
     }
 
-    public String getBusinessId() {
-        return businessId;
-    }
-
-    public void setBusinessId(String businessId) {
-        this.businessId = businessId;
-    }
+//    public String getBusinessId() {
+//        return businessId;
+//    }
+//
+//    public void setBusinessId(String businessId) {
+//        this.businessId = businessId;
+//    }
 
     public String getStatusFlag() {
         return statusFlag;
