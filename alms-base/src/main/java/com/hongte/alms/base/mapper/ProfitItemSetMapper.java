@@ -1,5 +1,9 @@
 package com.hongte.alms.base.mapper;
 
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Param;
+
 import com.hongte.alms.base.entity.ProfitItemSet;
 import com.hongte.alms.common.mapper.SuperMapper;
 
@@ -12,5 +16,6 @@ import com.hongte.alms.common.mapper.SuperMapper;
  * @since 2018-05-02
  */
 public interface ProfitItemSetMapper extends SuperMapper<ProfitItemSet> {
+	
 
 }

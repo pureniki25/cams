@@ -1,6 +1,9 @@
 package com.hongte.alms.base.service;
 
 import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Param;
 
 import com.hongte.alms.base.entity.ProfitItemSet;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
@@ -31,5 +34,11 @@ public interface ProfitItemSetService extends BaseService<ProfitItemSet> {
      */
     
     void updateItemTypes(List<ProfitItemSet> itemTypes);
-
+    
+    /**
+     * 根据业务类型,项目类型，费用项ID查出对应等级
+     * @return itemLevel feeLevel
+     */
+    
+	 Map<String, Object>  getLevel( String businessId,Integer itemType,String feeId);
 }

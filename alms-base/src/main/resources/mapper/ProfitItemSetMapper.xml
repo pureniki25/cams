@@ -17,5 +17,14 @@
     <sql id="Base_Column_List">
         profit_item_set_id AS profitItemSetId, business_type_id AS businessTypeId, item_name AS itemName, item_type AS itemType, item_level AS itemLevel, update_user_id AS updateUserId, update_time AS updateTime
     </sql>
+	<select id="getLevel" resultType="map">
+	            
+		select item.item_name,item.item_level as itemLevel,fee.fee_name,fee.fee_level  as feeLevel
+		
+		
+		from tb_profit_item_set item  join tb_profit_fee_set fee on item.profit_item_set_id=fee.profit_item_set_id
 
+where item.item_type= and fee.fee_id     
+	</select>
+	
 </mapper>
