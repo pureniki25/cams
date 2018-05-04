@@ -261,10 +261,6 @@ public class MoneyPoolController {
 		if (businessId == null) {
 			return Result.error("500", "businessId can't be null");
 		}
-		String userId = loginUserInfoHelper.getUserId();
-		if (userId == null) {
-			return Result.error("500", "userId can't be null");
-		}
 		try {
 			List<DepartmentBankVO> list = departmentBankService.listDepartmentBank(businessId);
 			return Result.success(list);

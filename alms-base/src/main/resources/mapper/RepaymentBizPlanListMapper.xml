@@ -146,7 +146,7 @@
 				AND b.company_name = #{companyId}
 			</if>
 			<if test="businessType != null ">
-				AND b.business_ctype = #{businessType}
+				AND b.business_type = #{businessType}
 			</if>
 			<if test="repayDate != null">
 				AND pl.due_date = #{repayDate}
@@ -200,7 +200,7 @@
 				AND b.company_name = #{companyId}
 			</if>
 			<if test="businessType != null ">
-				AND b.business_ctype = #{businessType}
+				AND b.business_type = #{businessType}
 			</if>
 			<if test="repayDate != null">
 				AND pl.due_date = #{repayDate}

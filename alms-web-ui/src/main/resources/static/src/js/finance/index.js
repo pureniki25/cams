@@ -32,7 +32,7 @@ window.layinit(function (htConfig) {
             table: {
                 col: [{
                     title: '业务编号',
-                    key: 'businessId'
+                    key: 'businessId',
                 },
                 {
                     title: '期数',
@@ -40,7 +40,7 @@ window.layinit(function (htConfig) {
                 },
                 {
                     title: '部门',
-                    key: 'dept'
+                    key: 'dept',
                 },
                 {
                     title: '主办',
@@ -57,19 +57,15 @@ window.layinit(function (htConfig) {
                 {
                     title: '还款日期',
                     key: 'planRepayDate',
-                    // render: (h, p) => {
-                    //     return h('span', moment(p.row.repayDate).format('YYYY-MM-DD'))
-                    // }
                 },
                 {
                     title: '还款登记日期',
-                    key: 'factRepayDate'
+                    key: 'factRepayDate',
                 },
                 {
                     title: '还款金额',
                     key: 'planRepayAmount',
                     align: 'right',
-                    width: 200,
                     render: (h, p) => {
 
                         let firstPeriod = h('Tag', {
@@ -108,22 +104,58 @@ window.layinit(function (htConfig) {
                     title: '会计确认状态',
                     key: 'financeConfirmStatus',
                     render: (h, p) => {
+                        let s = p.row.financeConfirmStatus;
+                        let color = 'blue'
+                        let content = ''
+                        // '会计确认状态，0或null:待审核;1:已审核;2:已退回;3:已返审核;4:导入;',
+                        if (!s || s == 0) {
+                            content = '待审核'
+                        } else if (s == 1) {
+                            content = '已审核'
+                        } else if (s == 2) {
+                            content = '已退回'
+                        } else if (s == 3) {
+                            content = '已返审核'
+                        } else if (s == 4) {
+                            content = '导入'
+                        }
                         return h('Tag', {
                             props: {
-                                color: "blue"
+                                color: color
                             }
-                        }, p.row.financeConfirmStatus)
+                        }, content)
                     }
                 },
                 {
                     title: '状态',
                     key: 'status',
                     render: (h, p) => {
+                        var s1 = p.row.planRepayDate;
+                        s1 = new Date(s1.replace(/-/g, "/"));
+                        s2 = new Date();//当前日期：2017-04-24
+                        var days = s2.getTime() - s1.getTime();
+                        var time = parseInt(days / (1000 * 60 * 60 * 24));
+                        let color = 'blue'
+                        let content = p.row.status
+
+                        if(content=='逾期'){
+                            if(time<=15&&time>1){
+                                color = 'red'
+                            }if(time>15){
+                                color = 'black'
+                            }
+                        }
+                        if(time<0&&time>-4&&content=='还款中'){
+                            color = 'yellow'
+                        }
+                        if(content=='已还款'){
+                            color = 'green'
+                        }
                         return h('Tag', {
                             props: {
-                                color: "blue"
+                                color: color
                             }
-                        }, p.row.status)
+                        }, content)
                     }
                 },
                 {
@@ -140,6 +172,7 @@ window.layinit(function (htConfig) {
                                     class: ['menuItem'],
                                     on: {
                                         click: function () {
+                                            window.location.href = link ;
                                             console.log(link)
                                         }
                                     }
@@ -148,7 +181,10 @@ window.layinit(function (htConfig) {
                         }
                         /* 根据p.row状态封装菜单 */
                         let menu = []
-                        let repayConfirm = initMenuItem('财务人员确认还款', '/ssssxx')
+                        let repayConfirm = initMenuItem('财务人员确认还款', '/finance/repayConfirm?businessId='
+                                                +p.row.businessId+'&afterId='
+                                                +p.row.afterId+'&planListId='
+                                                +p.row.planListId);
                         let businessAllSettle = initMenuItem('业务全部结清确认', '/ssssxx')
 
                         menu.push(repayConfirm)
@@ -181,29 +217,27 @@ window.layinit(function (htConfig) {
 
                 ],
                 data: [],
-                total:0
+                total: 0
             }
         },
         methods: {
             search: function (page) {
-                let params = this.form
-                
-                for (const key in params) {
-                    if (params.hasOwnProperty(key)) {
-                        const element = params[key];
-                        if(!element||element==''){
-                            console.log(key+element);
-                            delete params[key]
-                        }
+                let params = {}
+
+
+                Object.keys(this.form).forEach(element => {
+                    if (this.form[element] &&
+                        (this.form[element] != '' || this.form[element].length != 0)) {
+                        params[element] = this.form[element]
                     }
-                }
-                console.log(params);
+                })
+
                 axios.get('http://localhost:30621/' + 'finance/getFinanceMangerList', {
                     params: params
                 })
                     .then(function (res) {
                         if (res.data.code == '0') {
-                            app.table.data = res.data.data 
+                            app.table.data = res.data.data
                             app.table.total = res.data.count
                         } else {
                             app.$Message.error({ content: '获取列表数据失败' })
@@ -214,8 +248,8 @@ window.layinit(function (htConfig) {
                         app.$Message.error({ content: '获取列表数据失败' })
                     })
             },
-            paging:function(page){
-                app.form.curPage = page ;
+            paging: function (page) {
+                app.form.curPage = page;
                 app.search()
             }
         },

@@ -39,6 +39,7 @@ import com.hongte.alms.base.service.BasicBusinessTypeService;
 import com.hongte.alms.base.service.BasicCompanyService;
 import com.hongte.alms.base.service.BasicRepaymentTypeService;
 import com.hongte.alms.base.service.BizOutputRecordService;
+import com.hongte.alms.base.service.MoneyPoolRepaymentService;
 import com.hongte.alms.base.service.MoneyPoolService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
@@ -77,6 +78,9 @@ public class FinanceController {
 	@Autowired
 	@Qualifier("MoneyPoolService")
 	private MoneyPoolService moneyPoolService ;
+	@Autowired
+	@Qualifier("MoneyPoolRepaymentService")
+	private MoneyPoolRepaymentService moneyPoolRepaymentService ;
 	@Autowired
 	@Qualifier("BasicCompanyService")
 	private BasicCompanyService basicCompanyService ;
@@ -197,4 +201,28 @@ public class FinanceController {
 		logger.info("@getFinanceMangerList@获取财务管理列表数据--结束[{}]",pageResult);
 		return pageResult ;
 	}
+	
+	@GetMapping(value="/regRepayInfoList")
+	@ApiOperation(value="获取登记还款信息列表数据")
+	public Result regRepayInfoList(String planListId,String businessId,String afterId) {
+		Result result ;
+		logger.info("@getFinanceMangerList@获取财务管理列表数据--开始[{},{},{}]",planListId,businessId,afterId);
+		RepaymentBizPlanList repaymentBizPlanList ;
+		if (planListId==null) {
+			repaymentBizPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId)) ;
+		}else {
+			repaymentBizPlanList = repaymentBizPlanListService.selectById(planListId);
+		}
+		if (repaymentBizPlanList==null) {
+			result = Result.error("500", "找不到对应的还款计划");
+			logger.info("@getFinanceMangerList@获取财务管理列表数据--结束[{}]",result);
+			return result ;
+		}
+		List<MoneyPoolRepayment> list = moneyPoolRepaymentService.selectList(new EntityWrapper<MoneyPoolRepayment>().eq("plan_list_id", repaymentBizPlanList.getPlanListId()).ne("is_deleted", 1).orderBy("trade_date"));
+		result = Result.success(list);
+		logger.info("@getFinanceMangerList@获取财务管理列表数据--结束[{}]",result);
+		return result;
+		
+	}
+	
 }
