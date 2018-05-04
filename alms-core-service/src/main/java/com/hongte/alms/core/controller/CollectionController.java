@@ -131,7 +131,7 @@ public class CollectionController {
 //    @CrossOrigin(allowCredentials="true", allowedHeaders="*", origins="*")
     @GetMapping("getALStandingBookVoPageSelectsData")
     public Result<Map<String,JSONArray>> getALStandingBookVoPageSelectsData() {
-
+        logger.info("@贷后管理首页@取得分贷后管理首页台账界面下拉选项框数据--开始[{}]" , "");
         Map<String,JSONArray> retMap = new HashMap<String,JSONArray>();
 
         //区域
@@ -157,7 +157,8 @@ public class CollectionController {
         
         List<SysParameter> carStatusList = sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterTypeEnums.CAR_STATUS.getKey()).orderBy("row_Index"));
         retMap.put("carStatusList",(JSONArray) JSON.toJSON(carStatusList, JsonUtil.getMapping()));
-        
+
+        logger.info("@贷后管理首页@取得分贷后管理首页台账界面下拉选项框数据--结束[{}]" , "");
         return Result.success(retMap);
     }
 
@@ -213,11 +214,13 @@ public class CollectionController {
     @PostMapping("/download")
     @ResponseBody
     public void download(HttpServletRequest request, HttpServletResponse response,@ModelAttribute AfterLoanStandingBookReq req) throws Exception {
+        logger.info("@贷后管理首页@贷后首页台账--导出成excel--结束[{}]" , req);
         EasyPoiExcelExportUtil.setResponseHead(response,"AfterLoanStandingBook.xls");
         List<AfterLoanStandingBookVo> list = phoneUrgeService.selectAfterLoanStandingBookList(req);
         Workbook workbook = ExcelExportUtil.exportExcel(new ExportParams(), AfterLoanStandingBookVo.class, list);
 
         workbook.write(response.getOutputStream());
+        logger.info("@贷后管理首页@贷后首页台账--导出成excel---结束[{}]" , req);
     }
 
 
@@ -228,7 +231,9 @@ public class CollectionController {
     @ApiOperation(value = "贷后首页台账 存储Excel  ")
     @PostMapping("/saveExcel")
     public Result saveExcel(HttpServletRequest request, HttpServletResponse response,@RequestBody AfterLoanStandingBookReq req) throws Exception {
-    	req.setUserId(loginUserInfoHelper.getUserId());
+
+        logger.info("@贷后管理首页@贷后首页台账--存储Excel--开始[{}]" , req);
+        req.setUserId(loginUserInfoHelper.getUserId());
         EasyPoiExcelExportUtil.setResponseHead(response,"AfterLoanStandingBook.xls");
         List<AfterLoanStandingBookVo> list = phoneUrgeService.selectAfterLoanStandingBookList(req);
 
@@ -239,13 +244,16 @@ public class CollectionController {
 
 
         Map<String,String> retMap = storageService.storageExcelWorkBook(workbook,fileName);
+        String docUrl=retMap.get("docUrl");
 
         retMap.put("errorInfo","");
         retMap.put("sucFlage","true");
 
         if(retMap.get("sucFlage").equals("true")){
-            return  Result.success(fileName);
+            logger.info("@贷后管理首页@贷后首页台账--存储Excel---结束[{}]" , fileName);
+            return  Result.success(docUrl);
         }else{
+            logger.info("@贷后管理首页@贷后首页台账--存储Excel---失败[{}]" ,  retMap.get("errorInfo"));
             return Result.error("500", retMap.get("errorInfo"));
         }
 //        workbook.write(response.getOutputStream());
@@ -293,7 +301,7 @@ public class CollectionController {
     public Result<Map<String,JSONArray>> getPhoneUrgeSelectsData(
             @RequestParam("staffType")  String staffType
     ) {
-
+        logger.info("@分配电催界面@取得分配电催界面下拉选项框数据--开始[{}]" , staffType);
         Map<String,JSONArray> retMap = new HashMap<String,JSONArray>();
 
         //区域
@@ -326,7 +334,7 @@ public class CollectionController {
         }
 
         retMap.put("operators",(JSONArray) JSON.toJSON(opr_list));
-
+        logger.info("@贷后管理首页@取得分配电催界面下拉选项框数据--结束[{}]" , retMap);
         return Result.success(retMap);
     }
 
@@ -345,12 +353,15 @@ public class CollectionController {
             @RequestParam("describe") String describe,
             @RequestParam("staffType") String staffType
     ){
+        logger.info("@分配电催页面@设置电催人员--开始[{}]" ,"taffVoList:"+ taffVoList +"   staffUserId:"+staffUserId+"    describe:"+describe+"    staffType"+staffType);
         List<StaffBusinessVo> voList =  JSON.parseArray(taffVoList,StaffBusinessVo.class);
 
         try{
             collectionStatusService.setBusinessStaff(voList,staffUserId,describe,staffType, CollectionSetWayEnum.MANUAL_SET);
+            logger.info("@分配电催页面@设置电催人员--结束[{}]","");
             return Result.success();
         }catch(Exception e){
+            logger.error("@分配电催页面@设置电催人员 异常[{}]",e);
             return Result.error("erroe","数据库存储异常"+e.getMessage());
         }
 
@@ -368,15 +379,16 @@ public class CollectionController {
             @RequestParam("businessId") String businessId,
             @RequestParam("crpId") String crpId
     ){
-
+        logger.info("@贷后管理@查询员工跟进催收记录--开始[{}]","   businessId："+businessId+"   crpId:"+crpId);
         Page<StaffBusinessVo> pages = new Page<>();
         pages.setCurrent(req.getPage());
         pages.setSize(req.getLimit());
         try{
 //            pages = phoneUrgeService.selectPhoneUrgePage(pages,req);
+            logger.info("@贷后管理@查询员工跟进催收记录--结束[{}]",pages);
             return PageResult.success(pages.getRecords(),pages.getTotal());
         }catch (Exception ex){
-            logger.error(ex.getMessage());
+            logger.error(" @贷后管理@查询员工跟进催收记录--异常"+ex);
             return PageResult.error(500, "数据库访问异常");
         }
 /*
