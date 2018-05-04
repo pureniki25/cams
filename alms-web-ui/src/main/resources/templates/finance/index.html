@@ -5,66 +5,62 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <title>Insert title here</title>
-    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css" />
     <link rel="stylesheet" type="text/css" href="/plugins/iview/2.13.1/css/iview.css" />
     <title>财务管理</title>
+    <style>
+    .menuItem{
+        margin-top: 10px
+    }
+    </style>
 </head>
 
 <body>
-    <div id="app">
+    <div id="app" v-cloak>
         <layout>
             <Header>
                 <i-form ref="form" show-message label-width="90" label-position="right" inline autocomplete="off" model="form" style="text-align: right;">
                     <form-item label="客户姓名">
-                        <i-input v-model="form.name"></i-input>
+                        <i-input v-model="form.customer"></i-input>
                     </form-item>
                     <form-item label="业务编号">
                         <i-input v-model="form.businessId"></i-input>
                     </form-item>
                     <form-item label="是否本金到期">
-                        <i-select v-model="form.isExpired" placeholder="请选择">
+                        <i-select v-model="form.principalDeadLine" placeholder="请选择">
                             <i-option value="1">是</i-option>
                             <i-option value="0">否</i-option>
                         </i-select>
                     </form-item>
                     <form-item label="会计确认状态">
-                        <i-select v-model="form.confirmStatus" placeholder="请选择">
-                            <i-option value="待审核">待审核</i-option>
-                            <i-option value="已审核">已审核</i-option>
-                            <i-option value="已退回">已退回</i-option>
-                            <i-option value="已返审核">已返审核</i-option>
-                            <i-option value="导入">导入</i-option>
+                        <i-select v-model="form.accountantConfirmStatus" placeholder="请选择" style="width: 100px">
+                            <i-option v-for="item in accountingConfirmStatus" :value="item.paramValue" >{{item.paramName}}</i-option>
                         </i-select>
                     </form-item>
                     <form-item label="分公司">
-                        <i-select v-model="form.deptId" placeholder="请选择" filterable>
-                            <i-option value="分公司1">分公司1</i-option>
-                            <i-option value="分公司2">分公司2</i-option>
-                            <i-option value="分公司3">分公司3</i-option>
-                            <i-option value="分公司4">分公司4</i-option>
-                            <i-option value="导入">导入</i-option>
+                        <i-select v-model="form.companyId" placeholder="请选择" filterable style="width: 180px">
+                            <i-option v-for="item in companys" :value="item.areaId" >{{item.areaName}}</i-option>
                         </i-select>
                     </form-item>
                     <form-item label="业务类型">
-                        <i-select v-model="form.businessTypeId" placeholder="请选择" filterable>
-                            <i-option value="分公司4">分公司4</i-option>
-                            <i-option value="导入">导入</i-option>
+                        <i-select v-model="form.businessType" placeholder="请选择" filterable>
+                            <i-option v-for="item in businessTypes" :value="item.businessTypeId" >{{item.businessTypeName}}</i-option>
                         </i-select>
                     </form-item>
                     <form-item label="还款日期">
                         <date-picker format="yyyy-MM-dd" v-model="form.repayDate" placeholder="还款日期"></date-picker>
                     </form-item>
                     <form-item label="还款登记日期">
-                        <date-picker type="daterange" split-panels format="yyyy-MM-dd" v-model="form.repayRegDate" placeholder="还款登记日期"></date-picker>
+                        <date-picker type="daterange" split-panels format="yyyy-MM-dd" v-model="form.regDate" placeholder="还款登记日期"></date-picker>
                     </form-item>
                     <form-item label="贷后状态">
                         <i-select v-model="form.status" placeholder="请选择" filterable>
-                            <i-option value="分公司4">分公司4</i-option>
-                            <i-option value="导入">导入</i-option>
+                            <i-option v-for="item in collectionStatus" :value="item.paramValue" >{{item.paramName}}</i-option>
                         </i-select>
                     </form-item>
                     <form-item>
-                        <i-button type="primary">
+                        <i-button type="primary" @click="search(1)
+                        ">
                             查询
                         </i-button>
                     </form-item>
@@ -73,10 +69,11 @@
             <Content>
                 <i-table :columns="table.col" :data="table.data" stripe></i-table>
             </Content>
-            <Footer style="text-align: center;width: 100%">
-                    <Page :total="100" show-total></Page>
+            <Footer style="text-align: center;width: 100%" >
+                <Page :total="table.total" show-total @on-change="paging" ></Page>
             </Footer>
         </layout>
+
     </div>
     <!-- 引入vue -->
     <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
