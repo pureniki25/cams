@@ -19,7 +19,7 @@ window.layinit(function (htConfig) {
         beforeCreate: function () {
         },
         created: function () {
-            axios.get('http://localhost:30621/finance/repayBaseInfo', {
+            axios.get('http://localhost:30621/'+'finance/repayBaseInfo', {
                 params: {
                     businessId: businessId,
                     afterId: afterId
@@ -28,6 +28,8 @@ window.layinit(function (htConfig) {
                 .then(function (res) {
                     if (res.data.code == '1') {
                         app.info = res.data.data;
+                    }else{
+                        app.$Message.error({content:res.data.msg})
                     }
                     app.spinShow=false
                 })
