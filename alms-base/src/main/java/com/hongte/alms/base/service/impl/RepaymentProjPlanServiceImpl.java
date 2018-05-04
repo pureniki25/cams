@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
  * @author 曾坤
  * @since 2018-05-03
  */
-@Service
+@Service("RepaymentProjPlanService")
 public class RepaymentProjPlanServiceImpl extends BaseServiceImpl<RepaymentProjPlanMapper, RepaymentProjPlan> implements RepaymentProjPlanService {
 
 }

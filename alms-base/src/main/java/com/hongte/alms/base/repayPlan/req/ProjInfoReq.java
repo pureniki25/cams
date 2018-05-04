@@ -29,10 +29,10 @@ public class ProjInfoReq {
 
 
     /**
-     * 标的的出款费用信息列表
+     * 标的费用信息列表
      */
     @ApiModelProperty(required= true,value = "标的的出款费用信息列表")
-    private List<ProjOutputFeeReq> projOutputFeeInfos;
+    private List<ProjFeeReq> projFeeInfos;
 
     /**
      * 项目编号
@@ -511,13 +511,7 @@ public class ProjInfoReq {
         this.projHouseInfos = projHouseInfos;
     }
 
-    public List<ProjOutputFeeReq> getProjOutputFeeInfos() {
-        return projOutputFeeInfos;
-    }
 
-    public void setProjOutputFeeInfos(List<ProjOutputFeeReq> projOutputFeeInfos) {
-        this.projOutputFeeInfos = projOutputFeeInfos;
-    }
 
     public String getProjectId() {
         return projectId;
@@ -1253,5 +1247,13 @@ public class ProjInfoReq {
 
     public void setOverDueRateUnit(Integer overDueRateUnit) {
         this.overDueRateUnit = overDueRateUnit;
+    }
+
+    public List<ProjFeeReq> getProjFeeInfos() {
+        return projFeeInfos;
+    }
+
+    public void setProjFeeInfos(List<ProjFeeReq> projFeeInfos) {
+        this.projFeeInfos = projFeeInfos;
     }
 }

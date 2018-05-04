@@ -125,4 +125,12 @@ public class CreatRepayPlanReq {
     public void setSmallNum(Integer smallNum) {
         this.smallNum = smallNum;
     }
+
+    public Integer getPlateType() {
+        return plateType;
+    }
+
+    public void setPlateType(Integer plateType) {
+        this.plateType = plateType;
+    }
 }

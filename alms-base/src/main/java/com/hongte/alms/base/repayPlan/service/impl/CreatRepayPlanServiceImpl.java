@@ -2,6 +2,7 @@ package com.hongte.alms.base.repayPlan.service.impl;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.baseException.CreatRepaymentExcepiton;
+import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentProjPlan;
 import com.hongte.alms.base.entity.RepaymentProjPlanList;
 import com.hongte.alms.base.entity.RepaymentProjPlanListDetail;
@@ -9,6 +10,7 @@ import com.hongte.alms.base.enums.RepayPlanStatus;
 import com.hongte.alms.base.repayPlan.enums.*;
 import com.hongte.alms.base.repayPlan.req.*;
 import com.hongte.alms.base.repayPlan.service.CreatRepayPlanService;
+import com.hongte.alms.base.service.RepaymentBizPlanService;
 import com.hongte.alms.base.service.RepaymentProjPlanService;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.DateUtil;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -39,6 +42,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
     @Qualifier("RepaymentProjPlanService")
     RepaymentProjPlanService  repaymentProjPlanService;
 
+    @Autowired
+    @Qualifier("RepaymentBizPlanService")
+    RepaymentBizPlanService RepaymentBizPlanService;
 
 
     //进位方式枚举
@@ -61,13 +67,12 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         smallNum = creatRepayPlanReq.getSmallNum();
         roundingMode = RoundingMode.valueOf(creatRepayPlanReq.getRondmode());
 
-
+        //批次号
+        String batchId = UUID.randomUUID().toString();
 
         //1、根据业务和标的对应关系，判断出需要生成几个还款计划，每个还款计划相对于业务总金额占的比例
         // 1))业务基本信息
         BusinessBasicInfoReq  businessBasicInfo = creatRepayPlanReq.getBusinessBasicInfoReq();
-
-//        List<BizOutPutPlanReq> outPutPlanList  = creatRepayPlanReq.getOutPutPlanList();
 
         List<ProjInfoReq> tuandaiProjReqInfos = creatRepayPlanReq.getTuandaiProjReqInfos();
 
@@ -81,14 +86,14 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         String bizPlanId = UUID.randomUUID().toString();
         List<RepaymentProjPlan> repaymentProjPlanList = new LinkedList<>();
 
-        //标的planId对应的List列表
+        //标的planId对应的List列表   以业务计
         Map<String,List<RepaymentProjPlanList>>  repaymentPlanListMap = new HashMap<>();
 
-        //期数对应的标List列表
+        //期数对应的标List列表    以业务计
         //Map<期数，标还款计划费用详情列表>
         Map<Integer,List<RepaymentProjPlanList>>  repaymentPlanListPeriorMap = new HashMap<>();
 
-        //期数 费用类型对应的标ListDetail列表
+        //期数 费用类型对应的标ListDetail列表  以业务计
         //Map<期数，Map<费用类型fee_id,标还款计划费用详情列表>>
         Map<Integer,Map<String,List<RepaymentProjPlanListDetail>>>  RepaymentProjPlanListDetailPeriorMap = new HashMap<>();
 
@@ -132,6 +137,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             repaymentProjPlan.setActive(RepayPlanActiveEnum.ACTIVE.getValue());//是否有效标志位
             repaymentProjPlan.setCreateTime(new Date());
             repaymentProjPlan.setCreateUser(Constant.SYS_DEFAULT_USER);
+            repaymentProjPlan.setCreatSysType(RepayPlanCreateSysEnum.ALMS.getValue());
+            repaymentProjPlan.setPlateType(creatRepayPlanReq.getPlateType());
+            repaymentProjPlan.setRepaymentBatchId(batchId);//批次号
 
             repaymentProjPlanList.add(repaymentProjPlan);
 
@@ -144,18 +152,19 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
            addPlanListToMap(repaymentPlanListPeriorMap,zeroList, 0);
 
 
-            List<ProjOutputFeeReq> projOutputFeeReqs =  projInfoReq.getProjOutputFeeInfos();
+            List<ProjFeeReq> projFeeReqs =  projInfoReq.getProjFeeInfos();
 
             List<RepaymentProjPlanListDetail>  zeroListDetails = new LinkedList<>();
 
-            if(projOutputFeeReqs!=null && projOutputFeeReqs.size()>0){
-                for(ProjOutputFeeReq feeReq:projOutputFeeReqs){
+            //轮询标的费用项列表
+            if(projFeeReqs !=null && projFeeReqs.size()>0){
+                for(ProjFeeReq feeReq: projFeeReqs){
                     //如果费用是一次性收取
                     if(feeReq.getIsOneTimeCharge().equals(RepayPlanIsOneTimeChargeEnum.ONE_TIME.getKey())){
                         String feeItemId = getFeeItemId(feeReq.getFeeItemId(),feeReq.getFeeType());
                         RepaymentProjPlanListDetail   zeroListDetail = creatProjListDetail(zeroList);
                         zeroListDetail.setPlanAmount(feeReq.getFeeValue());//项目计划应还总金额(元)
-                        zeroListDetail.setFeeId(feeReq.getFeeItemId());//资产端费用项ID，用于资产端区分同名的项目，若不存在同名费用项，可为空
+                        zeroListDetail.setFeeId(feeItemId);//资产端费用项ID，用于资产端区分同名的项目，若不存在同名费用项，可为空
                         zeroListDetail.setPlanItemName(feeReq.getFeeTypeName());//应还项目名称
                         zeroListDetail.setPlanItemType(feeReq.getFeeType());//应还项目所属分类
                         zeroListDetail.setAccountStatus(feeReq.getAccountStatus());//分账标记
@@ -169,6 +178,10 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                         //添加到第0期详情列表中
                         zeroListDetails.add(zeroListDetail);
                     }
+                    else{
+                        //不是一次性收取的话就计算出每一期需要交的费用项
+                        String feeItemId = getFeeItemId(feeReq.getFeeItemId(),feeReq.getFeeType());
+                    }
                 }
             }
 
@@ -177,7 +190,6 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 zeroProidTotol.add(detail.getProjPlanAmount());
             }
             zeroList.setTotalBorrowAmount(zeroProidTotol);
-
 
             ///////  标的还款计划00期   一次性收取的费用信息  结束   ///////////////
 
@@ -191,27 +203,79 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     projInfoReq.getRate(),rateUnitEnum,repayType );
 
             for(int i=1;i<projInfoReq.getPeriodMonth()+1;i++){
-               //创建还款计划list
+                //还款计划详情项列表
+                List<RepaymentProjPlanListDetail>  priodListDetails = new LinkedList<>();
+                //创建还款计划list
                 RepaymentProjPlanList  projPlanList =  creatRepaymentProjPlanList(repaymentProjPlan,i);// new RepaymentProjPlanList();
+                Date date = DateUtil.addMonth2Date(i,projInfoReq.getBeginTime());
+                date = DateUtil.addDay2Date(-1,date);
+                projPlanList.setDueDate(date);
 
                 //本金detail
                 RepaymentProjPlanListDetail   prinDetail = creatProjListDetail(projPlanList);
-                String feeItemId = RepayPlanItemTypeEnum.PRINCIPAL.getUuid();
                 prinDetail.setPlanAmount(repayPrinAndIni.get(i).get(principal_str));//项目计划应还总金额(元)
                 prinDetail.setFeeId(RepayPlanItemTypeEnum.PRINCIPAL.getUuid());//资产端费用项ID，用于资产端区分同名的项目，若不存在同名费用项，可为空
                 prinDetail.setPlanItemName(RepayPlanItemTypeEnum.PRINCIPAL.getDesc());//应还项目名称
                 prinDetail.setPlanItemType(RepayPlanItemTypeEnum.PRINCIPAL.getValue());//应还项目所属分类
                 prinDetail.setAccountStatus(RepayPlanAccountStatusEnum.DIVISION_TO_PLAT.getValue());//分账标记
 
-
+                addDetialToMap(  RepaymentProjPlanListDetailPeriorMap,
+                        RepayPlanItemTypeEnum.PRINCIPAL.getUuid(), prinDetail,i);
+                priodListDetails.add(prinDetail);
 
                 //利息
+                RepaymentProjPlanListDetail   iniDetail = creatProjListDetail(projPlanList);
+                iniDetail.setPlanAmount(repayPrinAndIni.get(i).get(interest_str));//项目计划应还总金额(元)
+                iniDetail.setFeeId(RepayPlanItemTypeEnum.INTEREST.getUuid());//资产端费用项ID，用于资产端区分同名的项目，若不存在同名费用项，可为空
+                iniDetail.setPlanItemName(RepayPlanItemTypeEnum.INTEREST.getDesc());//应还项目名称
+                iniDetail.setPlanItemType(RepayPlanItemTypeEnum.INTEREST.getValue());//应还项目所属分类
+                iniDetail.setAccountStatus(RepayPlanAccountStatusEnum.DIVISION_TO_PLAT.getValue());//分账标记
+
+                addDetialToMap(  RepaymentProjPlanListDetailPeriorMap,
+                        RepayPlanItemTypeEnum.INTEREST.getUuid(), iniDetail,i);
+                priodListDetails.add(iniDetail);
+
+
                 //列表费用
+                if(projFeeReqs !=null && projFeeReqs.size()>0) {
+                    for (ProjFeeReq feeReq : projFeeReqs) {
+                        if(feeReq.getIsOneTimeCharge().equals(RepayPlanIsOneTimeChargeEnum.BY_MONTH.getKey())){
+                            RepaymentProjPlanListDetail   peroidFeelDetail = creatProjListDetail(projPlanList);
+                            String feeItemId = getFeeItemId(feeReq.getFeeItemId(),feeReq.getFeeType());
+                            peroidFeelDetail.setFeeId(feeItemId);//资产端费用项ID，用于资产端区分同名的项目，若不存在同名费用项，可为空
+                            peroidFeelDetail.setPlanItemName(feeReq.getFeeTypeName());//应还项目名称
+                            peroidFeelDetail.setPlanItemType(feeReq.getFeeType());//应还项目所属分类
+                            peroidFeelDetail.setAccountStatus(feeReq.getAccountStatus());//分账标记
+                            if(feeReq.getIsTermRange().equals(FeeIsTermRangeEnum.YES.getValue())){
+                                //是分段收费  需要从分段收费信息列表中
+                                List<ProjFeeDetailReq>  feeDetailReqs = feeReq.getProjFeeDetailInfos();
+                                if(feeDetailReqs==null||feeDetailReqs.size()==0){
+                                    throw new CreatRepaymentExcepiton("分段收费的费用必须包含分段列表信息");
+                                }
+                                for(ProjFeeDetailReq  feeDetail: feeDetailReqs){
+                                    if(i<=feeDetail.getFeeTermRangeMax() && i>=feeDetail.getFeeTermRangeMin()){
+                                        peroidFeelDetail.setPlanAmount(feeDetail.getFeeValue());
+                                    }
+                                }
+                            }else{
+                                //不是分段收费直接存储应还总金额
+                                peroidFeelDetail.setPlanAmount(feeReq.getFeeValue());//项目计划应还总金额(元)
+                            }
+                            addDetialToMap(  RepaymentProjPlanListDetailPeriorMap,
+                                    feeItemId, peroidFeelDetail,i);
+                            priodListDetails.add(peroidFeelDetail);
 
+                        }
+                    }
+                }
 
+                //计算这当前标这一期  总应还金额
+                BigDecimal proidTotol = new BigDecimal(0);
+                for(RepaymentProjPlanListDetail detail:priodListDetails){
+                    proidTotol.add(detail.getProjPlanAmount());
+                }
+                projPlanList.setTotalBorrowAmount(zeroProidTotol);
             }
-
-
 
             //////   标的其他期还款计划   按月收取费用信息   结束  ///////////////
 
@@ -224,6 +288,12 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
     }
 
 
+    /**
+     * 取得FeeID
+     * @param intemId
+     * @param feeType
+     * @return
+     */
     private String getFeeItemId(String intemId,Integer feeType){
 
         String feeItemId = intemId;
@@ -279,6 +349,11 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
     //创建标的还款计划，并设置基本信息
     private   RepaymentProjPlanList  creatRepaymentProjPlanList(RepaymentProjPlan repaymentProjPlan,Integer period){
+        Boolean isRenew = false;
+        if(!repaymentProjPlan.getBusinessId().equals(repaymentProjPlan.getOriginalBusinessId())){
+            isRenew = true;
+        }
+
         RepaymentProjPlanList  projPlanList = new RepaymentProjPlanList();
         projPlanList.setProjPlanListId(UUID.randomUUID().toString());
         projPlanList.setProjPlanId(repaymentProjPlan.getProjPlanId());
@@ -287,7 +362,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         projPlanList.setBusinessId(repaymentProjPlan.getBusinessId());  //还款计划所属业务编号(若当前业务为展期，则存展期业务编号)
         projPlanList.setOrigBusinessId(repaymentProjPlan.getOriginalBusinessId());  //还款计划所属原业务编号
         projPlanList.setPeriod(period);  //还款计划期数
-        projPlanList.setAfterId(""); // 总批次期数，  核对原来信贷还款计划是怎么写的
+        projPlanList.setAfterId(calcAfterId(repaymentProjPlan.getBusinessId(),period,isRenew)); // 总批次期数，  核对原来信贷还款计划是怎么写的
         projPlanList.setDueDate(new Date()); //应还日期 怎么设置， 需要核对
         projPlanList.setTotalBorrowAmount(new BigDecimal(0));// 总计划应还金额   需要按照每一项计算
         projPlanList.setOverdueAmount(new BigDecimal(0)); //总应还滞纳金
@@ -297,9 +372,35 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         projPlanList.setActive(RepayPlanActiveEnum.ACTIVE.getValue());//设置是否有效标志位
         projPlanList.setCreateTime(new Date());//设置创建时间
         projPlanList.setCreateUser(Constant.SYS_DEFAULT_USER);//设置创建用户
+        projPlanList.setCreatSysType(repaymentProjPlan.getCreatSysType()); //创建系统标志
+        projPlanList.setPlateType(repaymentProjPlan.getPlateType()); //平台类型标志
 //        projPlanList.setP
 
         return projPlanList;
+    }
+
+    /**
+     * 计算还款计划的afterId
+     * @param businessId
+     * @param period
+     * @param isRenew
+     * @return
+     */
+    private  String  calcAfterId(String businessId,Integer period,boolean isRenew){
+
+         List<RepaymentBizPlan> bizPlans =  RepaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",businessId));
+         Integer size = bizPlans.size();
+         size++;
+
+        String periodStr=(new DecimalFormat("00")).format(period);
+         String  afterId;
+         if(isRenew){
+            afterId = size+"-ZQ-"+periodStr;
+         }else{
+             afterId = size+"-"+periodStr;
+         }
+
+        return afterId;
     }
 
 
@@ -505,13 +606,15 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         RepaymentProjPlanListDetail   projPlanListDetail = new RepaymentProjPlanListDetail();
         projPlanListDetail.setProjPlanDetailId(UUID.randomUUID().toString());
         projPlanListDetail.setProjPlanListId(projPlanList.getProjPlanListId());
-        projPlanListDetail.setPlanDetailId("");//  所属还款计划列表详情ID(外键，对应tb_repayment_biz_plan_list.plan_list_id)
-        projPlanListDetail.setPlanListId("");//  所属还款计划列表详情ID(外键，对应tb_repayment_biz_plan_list.plan_list_id)
+        projPlanListDetail.setPlanDetailId("");//  所属还款计划列表详情ID(外键，tb_repayment_biz_plan_list_detail.plan_detail_id)
+        projPlanListDetail.setPlanListId("");//  所属还款计划列表ID(外键，对应tb_repayment_biz_plan_list.plan_list_id)
         projPlanListDetail.setBusinessId(projPlanList.getBusinessId());//  所属还款计划列表详情ID(外键，对应tb_repayment_biz_plan_list.plan_list_id)
         projPlanListDetail.setPeriod(projPlanList.getPeriod()); //所属期数
         projPlanListDetail.setActive(RepayPlanActiveEnum.ACTIVE.getValue());
         projPlanListDetail.setCreateDate(new Date());
         projPlanListDetail.setCreateUser(Constant.SYS_DEFAULT_USER);
+        projPlanListDetail.setCreatSysType(projPlanList.getCreatSysType()); //创建系统标志
+        projPlanListDetail.setPlateType(projPlanList.getPlateType()); //平台类型标志
 
         return projPlanListDetail;
     }
@@ -521,8 +624,10 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
     public static void main(String[] args) {
 
 
-        System.out.println(UUID.randomUUID().toString());
+//        System.out.println(UUID.randomUUID().toString());
 
+        String periodStr=(new DecimalFormat("00")).format(120);
+        System.out.println(periodStr);
 
         //---------  还款本息   测试   开始----------//
 //        Integer periodMonth = 12;

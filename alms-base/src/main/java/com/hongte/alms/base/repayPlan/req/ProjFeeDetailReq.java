@@ -1,6 +1,5 @@
 package com.hongte.alms.base.repayPlan.req;
 
-import com.baomidou.mybatisplus.annotations.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -11,8 +10,7 @@ import java.math.BigDecimal;
  * @since 2018/4/23
  */
 @ApiModel("标的出款申请费用明细期限范围明细")
-public class ProjOutputFeeDetailReq {
-
+public class ProjFeeDetailReq {
 
 
     /**
@@ -30,25 +28,25 @@ public class ProjOutputFeeDetailReq {
      */
     @ApiModelProperty(required= true,value = "最大期限范围")
     private Integer feeTermRangeMax;
-    /**
-     * 费用项ID
-     */
-    @ApiModelProperty(required= true,value = "费用项ID")
-    private String feeId;
-    /**
-     * 费用名称
-     */
-    @ApiModelProperty(required= true,value = "费用名称")
-    private String feeName;
+//    /**
+//     * 费用项ID
+//     */
+//    @ApiModelProperty(required= true,value = "费用项ID")
+//    private String feeId;
+//    /**
+//     * 费用名称
+//     */
+//    @ApiModelProperty(required= true,value = "费用名称")
+//    private String feeName;
     /**
      * 本期金额
      */
-    @ApiModelProperty(required= false,value = "本期金额")
+    @ApiModelProperty(required= true,value = "本期金额")
     private BigDecimal feeValue;
     /**
      * 本期比例
      */
-    @ApiModelProperty(required= false,value = "本期比例")
+    @ApiModelProperty(value = "本期比例")
     private BigDecimal feeRate;
     /**
      * 费用收取方式，1为按比例，2为按金额
@@ -58,16 +56,9 @@ public class ProjOutputFeeDetailReq {
     /**
      * 利率,1为年利率，2为月利率，3为日利率
      */
-    @ApiModelProperty(required= false,value = "利率,1为年利率，2为月利率，3为日利率")
-    private Integer interestRate;
+    @ApiModelProperty(value = "利率,1为年利率，2为月利率，3为日利率")
+    private Integer feeRateUnit;
 
-    public Integer getInterestRate() {
-        return interestRate;
-    }
-
-    public void setInterestRate(Integer interestRate) {
-        this.interestRate = interestRate;
-    }
 
     public Integer getFeeChargingType() {
         return feeChargingType;
@@ -100,22 +91,6 @@ public class ProjOutputFeeDetailReq {
         this.feeTermRangeMax = feeTermRangeMax;
     }
 
-    public String getFeeId() {
-        return feeId;
-    }
-
-    public void setFeeId(String feeId) {
-        this.feeId = feeId;
-    }
-
-    public String getFeeName() {
-        return feeName;
-    }
-
-    public void setFeeName(String feeName) {
-        this.feeName = feeName;
-    }
-
     public BigDecimal getFeeValue() {
         return feeValue;
     }
@@ -130,5 +105,13 @@ public class ProjOutputFeeDetailReq {
 
     public void setFeeRate(BigDecimal feeRate) {
         this.feeRate = feeRate;
+    }
+
+    public Integer getFeeRateUnit() {
+        return feeRateUnit;
+    }
+
+    public void setFeeRateUnit(Integer feeRateUnit) {
+        this.feeRateUnit = feeRateUnit;
     }
 }
