@@ -1,10 +1,15 @@
 package com.hongte.alms.base.service.impl;
 
+import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
+import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListMapper;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
+import com.hongte.alms.base.vo.module.FinanceManagerListVO;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
+import com.hongte.alms.common.vo.PageResult;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,33 +63,11 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
     	return repaymentBizPlanListMapper.queryRepaymentBizPlanListByConditions(businessId, afterId);
     }
 
-//    @Override
-//    public List<RepaymentBizPlanList> selectNeedPhoneUrgRenewBiz(String companyId,Integer beforeDueDays) {
-//        if(beforeDueDays.equals(0)){
-//            beforeDueDays = 1000;
-//        }
-//       return repaymentBizPlanListMapper.selectNeedSetColInfoRenewBizPlansBycomId(
-//               companyId,
-//               0-beforeDueDays,
-//               CollectionStatusEnum.PHONE_STAFF.getKey()
-//       );
-//    }
-//
-//    @Override
-//    public List<RepaymentBizPlanList> selectNeedVisitRenewBiz(String companyId,Integer overDueDays) {
-//        return repaymentBizPlanListMapper.selectNeedSetColInfoRenewBizPlansBycomId(
-//                companyId,
-//                overDueDays,
-//                CollectionStatusEnum.COLLECTING.getKey()
-//        );
-//    }
-//
-//    @Override
-//    public List<RepaymentBizPlanList> selectNeedLawRenewBiz(Integer overDueDays) {
-//        return repaymentBizPlanListMapper.selectNeedSetColInfoRenewBizPlansBycomId(
-//                null,
-//                overDueDays,
-//                CollectionStatusEnum.TO_LAW_WORK.getKey()
-//        );
-//    }
+	@Override
+	public PageResult selectByFinanceManagerListReq(FinanceManagerListReq req) {
+		int count = repaymentBizPlanListMapper.conutFinanceManagerList(req);
+		List<FinanceManagerListVO> list = repaymentBizPlanListMapper.selectFinanceMangeList(req);
+		return PageResult.success(list, count);
+	}
+
 }

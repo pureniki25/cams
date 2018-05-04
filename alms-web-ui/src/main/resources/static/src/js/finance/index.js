@@ -10,16 +10,24 @@ window.layinit(function (htConfig) {
         el: "#app",
         data: {
             show: true,
+            accountingConfirmStatus: [],
+            companys: [],
+            businessTypes: [],
+            collectionStatus: [],
             form: {
-                name: '',
+                curPage: 1,
+                pageSize: 10,
+                customer: '',
                 businessId: '',
-                isExpired: '',
-                confirmStatus: '',
-                deptId: '',
-                businessTypeId: '',
+                principalDeadLine: '',
+                accountantConfirmStatus: '',
+                companyId: '',
+                businessType: '',
                 repayDate: '',
-                repayRegDate: '',
-                status:''
+                regDate: '',
+                regDateStart: '',
+                regDateEnd: '',
+                status: ''
             },
             table: {
                 col: [{
@@ -32,36 +40,36 @@ window.layinit(function (htConfig) {
                 },
                 {
                     title: '部门',
-                    key: 'deptId'
+                    key: 'dept'
                 },
                 {
                     title: '主办',
-                    key: 'operatorId'
+                    key: 'operator'
                 },
                 {
                     title: '客户姓名',
-                    key: 'customerName'
+                    key: 'customer'
                 },
                 {
                     title: '业务类型',
-                    key: 'businessTypeId'
+                    key: 'businessType'
                 },
                 {
                     title: '还款日期',
-                    key: 'repayDate',
-                    render: (h, p) => {
-                        return h('span', moment(p.row.repayDate).format('YYYY-MM-DD'))
-                    }
+                    key: 'planRepayDate',
+                    // render: (h, p) => {
+                    //     return h('span', moment(p.row.repayDate).format('YYYY-MM-DD'))
+                    // }
                 },
                 {
                     title: '还款登记日期',
-                    key: 'repayRegDate'
+                    key: 'factRepayDate'
                 },
                 {
                     title: '还款金额',
-                    key: 'repayAmount',
-                    align:'right',
-                    width:200,
+                    key: 'planRepayAmount',
+                    align: 'right',
+                    width: 200,
                     render: (h, p) => {
 
                         let firstPeriod = h('Tag', {
@@ -79,17 +87,17 @@ window.layinit(function (htConfig) {
                                 color: 'yellow'
                             }
                         }, '末期');
-                        let text = h('span',numeral(p.row.repayAmount).format('0,0.00'));
+                        let text = h('span', numeral(p.row.planRepayAmount).format('0,0.00'));
 
                         let res = []
-                        let isZQ = p.row.afterId.indexOf('ZQ')>-1?true:false;
-                        if(p.row.periods==1&&!isZQ){
+                        let isZQ = p.row.afterId.indexOf('ZQ') > -1 ? true : false;
+                        if (p.row.periods == 1 && !isZQ) {
                             res.push(firstPeriod)
                         }
-                        if(p.row.repaymentTypeId==2&&p.row.borrowLimit==p.row.periods){
+                        if (p.row.repaymentTypeId == 2 && p.row.borrowLimit == p.row.periods) {
                             res.push(benjinPeriod)
                         }
-                        if(p.row.repaymentTypeId==5&&p.row.borrowLimit==p.row.periods){
+                        if (p.row.repaymentTypeId == 5 && p.row.borrowLimit == p.row.periods) {
                             res.push(lastPeriod)
                         }
                         res.push(text)
@@ -98,13 +106,13 @@ window.layinit(function (htConfig) {
                 },
                 {
                     title: '会计确认状态',
-                    key: 'confirmStatus',
+                    key: 'financeConfirmStatus',
                     render: (h, p) => {
                         return h('Tag', {
                             props: {
                                 color: "blue"
                             }
-                        }, p.row.confirmStatus)
+                        }, p.row.financeConfirmStatus)
                     }
                 },
                 {
@@ -123,85 +131,148 @@ window.layinit(function (htConfig) {
                     key: 'canWithhold'
                 },
                 {
-                    title: '操作'
+                    title: '操作',
+                    render: (h, p) => {
+
+                        function initMenuItem(title, link) {
+                            return h('li', [
+                                h('i-button', {
+                                    class: ['menuItem'],
+                                    on: {
+                                        click: function () {
+                                            console.log(link)
+                                        }
+                                    }
+                                }, title)
+                            ])
+                        }
+                        /* 根据p.row状态封装菜单 */
+                        let menu = []
+                        let repayConfirm = initMenuItem('财务人员确认还款', '/ssssxx')
+                        let businessAllSettle = initMenuItem('业务全部结清确认', '/ssssxx')
+
+                        menu.push(repayConfirm)
+                        menu.push(businessAllSettle)
+
+                        return h('Poptip', {
+                            props: {
+                                placement: 'left'
+                            }
+                        }, [
+                                h('i-button', '操作'),
+                                h('ul', {
+                                    slot: 'content'
+                                }, menu)
+                            ])
+                    }
                 },
                 {
-                    title: '详情'
+                    title: '详情',
+                    render: (h, p) => {
+                        return h('i-button', {
+                            on: {
+                                click: function () {
+                                    console.log(this)
+                                }
+                            }
+                        }, '详情')
+                    }
                 }
 
                 ],
-                data: [
-                    {
-                        businessId: 'asdasdas',
-                        confirmStatus: '待确定',
-                        repayDate:new Date(),
-                        periods:1,
-                        afterId:'1-01',
-                        repaymentTypeId:2,
-                        borrowLimit:1,
-                        repayAmount:456312.12
-                    },
-                    {
-                        businessId: 'asdasdasASSSSSSSSSSSS',
-                        repayAmount:456312.12
-                    },
-                    {
-                        businessId: 'asdasdas',
-                        confirmStatus: '待确定',
-                        repayDate:new Date(),
-                        periods:1,
-                        afterId:'1-01',
-                        repaymentTypeId:2,
-                        borrowLimit:1,
-                        repayAmount:456312.12
-                    },
-                    {
-                        businessId: 'asdasdasASSSSSSSSSSSS',
-                        repayAmount:456312.12
-                    },{
-                        businessId: 'asdasdas',
-                        confirmStatus: '待确定',
-                        repayDate:new Date(),
-                        periods:1,
-                        afterId:'1-01',
-                        repaymentTypeId:2,
-                        borrowLimit:1,
-                        repayAmount:456312.12
-                    },
-                    {
-                        businessId: 'asdasdasASSSSSSSSSSSS',
-                        repayAmount:456312.12
-                    },{
-                        businessId: 'asdasdas',
-                        confirmStatus: '待确定',
-                        repayDate:new Date(),
-                        periods:1,
-                        afterId:'1-01',
-                        repaymentTypeId:2,
-                        borrowLimit:1,
-                        repayAmount:456312.12
-                    },
-                    {
-                        businessId: 'asdasdasASSSSSSSSSSSS',
-                        repayAmount:456312.12
-                    },{
-                        businessId: 'asdasdas',
-                        confirmStatus: '待确定',
-                        repayDate:new Date(),
-                        periods:1,
-                        afterId:'1-01',
-                        repaymentTypeId:2,
-                        borrowLimit:1,
-                        repayAmount:456312.12
-                    },
-                    {
-                        businessId: 'asdasdasASSSSSSSSSSSS',
-                        repayAmount:456312.12
-                    }
-                ]
+                data: [],
+                total:0
             }
         },
-        methods: {},
-        created: function () { }
+        methods: {
+            search: function (page) {
+                let params = this.form
+                
+                for (const key in params) {
+                    if (params.hasOwnProperty(key)) {
+                        const element = params[key];
+                        if(!element||element==''){
+                            console.log(key+element);
+                            delete params[key]
+                        }
+                    }
+                }
+                console.log(params);
+                axios.get('http://localhost:30621/' + 'finance/getFinanceMangerList', {
+                    params: params
+                })
+                    .then(function (res) {
+                        if (res.data.code == '0') {
+                            app.table.data = res.data.data 
+                            app.table.total = res.data.count
+                        } else {
+                            app.$Message.error({ content: '获取列表数据失败' })
+                            console.log(res.data.msg);
+                        }
+                    })
+                    .catch(function (err) {
+                        app.$Message.error({ content: '获取列表数据失败' })
+                    })
+            },
+            paging:function(page){
+                app.form.curPage = page ;
+                app.search()
+            }
+        },
+        created: function () {
+            axios.get('http://localhost:30606/' + 'sys/param/getParam', { params: { paramType: '会计确认状态' } })
+                .then(function (res) {
+                    if (res.data.code == '1') {
+                        app.accountingConfirmStatus = res.data.data
+                    } else {
+                        app.$Message.error({ content: '获取会计确认状态失败' })
+                        console.log(res.data.msg);
+                    }
+                })
+                .catch(function (err) {
+                    app.$Message.error({ content: '获取会计确认状态失败' })
+                })
+
+            axios.get('http://localhost:30621/' + 'finance/getCompanys')
+                .then(function (res) {
+                    if (res.data.code == '1') {
+                        app.companys = res.data.data
+                    } else {
+                        app.$Message.error({ content: '获取分公司失败' })
+                        console.log(res.data.msg);
+                    }
+                })
+                .catch(function (err) {
+                    app.$Message.error({ content: '获取分公司失败' })
+                })
+
+            axios.get('http://localhost:30621/' + 'finance/getBusinessType')
+                .then(function (res) {
+                    if (res.data.code == '1') {
+                        app.businessTypes = res.data.data
+                    } else {
+                        app.$Message.error({ content: '获取业务类型失败' })
+                        console.log(res.data.msg);
+                    }
+                })
+                .catch(function (err) {
+                    app.$Message.error({ content: '获取业务类型失败' })
+                })
+
+            axios.get('http://localhost:30606/' + 'sys/param/getParam', { params: { paramType: '贷后状态' } })
+                .then(function (res) {
+                    if (res.data.code == '1') {
+                        app.collectionStatus = res.data.data
+                    } else {
+                        app.$Message.error({ content: '获取贷后状态失败' })
+                        console.log(res.data.msg);
+                    }
+                })
+                .catch(function (err) {
+                    app.$Message.error({ content: '获取贷后状态失败' })
+                })
+
+            this.search()
+        }
     })
 })

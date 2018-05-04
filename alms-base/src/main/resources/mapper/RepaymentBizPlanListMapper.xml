@@ -124,4 +124,100 @@
 
     </select>-->
     <!-- AND cStatus.crp_id = planList.plan_list_id -->
+    
+    <select id="conutFinanceManagerList" resultType="int"
+		parameterType="com.hongte.alms.base.dto.FinanceManagerListReq">
+		SELECT 
+			count(1)
+		FROM
+			tb_repayment_biz_plan_list pl
+		LEFT JOIN
+			tb_basic_business b ON b.business_id = pl.business_id
+		<where>
+			1 = 1
+			<if test="customer != null">
+				AND b.customer_name = #{customer}
+			</if>
+			<if test="businessId != null">
+				AND pl.business_id = #{businessId}
+			</if>
+			<if test="accountantConfirmStatus != null">
+				AND pl.accountant_confirm_status =
+				#{accountantConfirmStatus}
+			</if>
+			<if test="companyId != null">
+				AND b.company_name = #{companyId}
+			</if>
+			<if test="businessType != null ">
+				AND b.business_ctype = #{businessType}
+			</if>
+			<if test="repayDate != null">
+				AND pl.due_date = #{repayDate}
+			</if>
+			<if test="regDateStart != null ">
+				AND pl.fact_repay_date &gt;= #{regDateStart}
+			</if>
+			<if test="regDateEnd != null ">
+				AND pl.fact_repay_date &lt;= #{regDateEnd}
+			</if>
+			<if test="status != null ">
+				AND pl.current_status = #{status}
+			</if>
+		</where>
+
+	</select>
+
+	<select id="selectFinanceMangeList"
+		resultType="com.hongte.alms.base.vo.module.FinanceManagerListVO"
+		parameterType="com.hongte.alms.base.dto.FinanceManagerListReq">
+		SELECT
+			pl.plan_list_id as planListId,
+			pl.business_id as businessId,
+			pl.after_id as afterId ,
+			b.company_name as dept,
+			b.operator_name as operator,
+			b.customer_name as customer,
+			b.business_ctype as businessType ,
+			pl.due_date as planRepayDate ,
+			pl.fact_repay_date as factRepayDate,
+			pl.total_borrow_amount as planRepayAmount,
+			pl.current_status as status ,
+			pl.accountant_confirm_status as financeConfirmStatus
+		FROM
+			tb_repayment_biz_plan_list pl
+		LEFT JOIN
+			tb_basic_business b ON b.business_id = pl.business_id
+		<where>
+			1 = 1
+			<if test="customer != null">
+				AND b.customer_name = #{customer}
+			</if>
+			<if test="businessId != null">
+				AND pl.business_id = #{businessId}
+			</if>
+			<if test="accountantConfirmStatus != null">
+				AND pl.accountant_confirm_status =
+				#{accountantConfirmStatus}
+			</if>
+			<if test="companyId != null">
+				AND b.company_name = #{companyId}
+			</if>
+			<if test="businessType != null ">
+				AND b.business_ctype = #{businessType}
+			</if>
+			<if test="repayDate != null">
+				AND pl.due_date = #{repayDate}
+			</if>
+			<if test="regDateStart != null ">
+				AND pl.fact_repay_date &gt;= #{regDateStart}
+			</if>
+			<if test="regDateEnd != null ">
+				AND pl.fact_repay_date &lt;= #{regDateEnd}
+			</if>
+			<if test="status != null ">
+				AND pl.current_status = #{status}
+			</if>
+		</where>
+		limit ${(curPage-1)*pageSize} , ${pageSize}
+	</select>
 </mapper>

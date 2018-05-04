@@ -10,6 +10,9 @@ import java.util.Map;
 import java.util.UUID;
 
 import io.swagger.annotations.Api;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -37,9 +40,10 @@ import io.swagger.annotations.ApiOperation;
  */
 @Controller
 @RequestMapping(value = "/sys/param")
-@Api(tags = "RenewalBusinessController", description = "展期业务相关接口")
+@Api(tags = "SysParameterController", description = "系统参数相关接口")
 public class SysParameterController {
-
+	private static Logger logger = LoggerFactory.getLogger(SysParameterController.class);
+	
 	@Autowired
 	@Qualifier("SysParameterService")
 	SysParameterService sysParameterService;
@@ -311,5 +315,18 @@ public class SysParameterController {
 		} else {
 			return Result.error("500", "数据删除失败");
 		}
+	}
+
+	@GetMapping("/getParam")
+	@ResponseBody
+	@ApiOperation(value = "调用获取参数接口")
+	public Result getParam(String paramType) {
+		Result result ;
+		logger.info("@getParam@调用获取参数接口--开始[{}]",paramType);
+		List<SysParameter> list = sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type_name", paramType).eq("status", 1));
+		result = Result.success(list);
+		logger.info("@getParam@调用获取参数接口--结束[{}]",result);
+		return result;
+		
 	}
 }
