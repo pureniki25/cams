@@ -72,12 +72,12 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
      */
 	@ApiModelProperty(required= true,value = "所属期数")
 	private Integer period;
-    /**
-     * 项目计划应还总金额(元)
-     */
-	@TableField("plan_amount")
-	@ApiModelProperty(required= true,value = "项目计划应还总金额(元)")
-	private BigDecimal planAmount;
+//    /**
+//     * 项目计划应还总金额(元)
+//     */
+//	@TableField("plan_amount")
+//	@ApiModelProperty(required= true,value = "项目计划应还总金额(元)")
+//	private BigDecimal planAmount;
     /**
      * 资产端费用项ID，用于资产端区分同名的项目，若不存在同名费用项，可为空
      */
@@ -227,14 +227,6 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
 		this.period = period;
 	}
 
-	public BigDecimal getPlanAmount() {
-		return planAmount;
-	}
-
-	public void setPlanAmount(BigDecimal planAmount) {
-		this.planAmount = planAmount;
-	}
-
 	public String getFeeId() {
 		return feeId;
 	}
@@ -363,7 +355,6 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
 			", businessId=" + businessId +
 			", origBusinessId=" + origBusinessId +
 			", period=" + period +
-			", planAmount=" + planAmount +
 			", feeId=" + feeId +
 			", planItemName=" + planItemName +
 			", planItemType=" + planItemType +

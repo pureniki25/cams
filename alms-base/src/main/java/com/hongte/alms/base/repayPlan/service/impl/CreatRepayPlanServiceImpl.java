@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.baseException.CreatRepaymentExcepiton;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.RepayPlanStatus;
+import com.hongte.alms.base.repayPlan.dto.RepaymentBizPlanDto;
+import com.hongte.alms.base.repayPlan.dto.RepaymentBizPlanListDto;
 import com.hongte.alms.base.repayPlan.enums.*;
 import com.hongte.alms.base.repayPlan.req.*;
 import com.hongte.alms.base.repayPlan.service.CreatRepayPlanService;
@@ -64,7 +66,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
     //需要判断是否重复传入
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean creatRepayPlan(CreatRepayPlanReq creatRepayPlanReq) {
+    public List<RepaymentBizPlanDto> creatRepayPlan(CreatRepayPlanReq creatRepayPlanReq) {
+
+        List<RepaymentBizPlanDto>  retList = new LinkedList<>();
 
         //设置进位方式枚举和保留的小数位数
         smallNum = creatRepayPlanReq.getSmallNum();
@@ -91,9 +95,18 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         //Map<批次，Map<期数，标还款计划费用详情列表>>
         Map<String,Map<Integer,List<RepaymentProjPlanList>>>  repaymentPlanListBatchMap = new HashMap<>();
 
+        //标还款计划ListMap
+//        Map<批次,Map<标还款计划主表Id，标的还款计划list列表>>
+        Map<String,Map<String,List<RepaymentProjPlanList>>> projPlanListTotalMap = new HashMap<>();
+
+
+
         //期数 费用类型对应的标ListDetail列表  以业务批次计
         //Map<批次,Map<期数，Map<费用类型fee_id,标还款计划费用详情列表>>>
         Map<String,Map<Integer,Map<String,List<RepaymentProjPlanListDetail>>>>  RepaymentProjPlanListDetailBatchMap = new HashMap<>();
+        //标还款计划ListMap
+//        Map<批次,Map<标还款计划主表Id，Map<标还款计划list表Id，标的还款计划detail列表>>
+        Map<String,Map<String,Map<String,List<RepaymentProjPlanListDetail>>>> projPlanDetailTotalMap = new HashMap<>();
 
 
 
@@ -109,9 +122,14 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 RepaymentProjPlanListDetailBatchMap,
                 repaymentProjPlanMap,
                 creatRepayPlanReq.getPlateType(),
-                businessBasicInfo);
+                businessBasicInfo,
+                projPlanDetailTotalMap,
+                projPlanListTotalMap );
         ////////   计算每个标的还款计划列表   结束 ////////////
-
+//    //        Map<批次,Map<标还款计划主表Id，Map<标还款计划list表Id，标的还款计划detail列表>>
+//    Map<String,Map<String,Map<String,List<RepaymentProjPlanListDetail>>>> projPlanDetailTotalMap = new HashMap<>();
+//    //        Map<批次,Map<标还款计划主表Id，标的还款计划list列表>>
+//    Map<String,Map<String,List<RepaymentProjPlanList>>> projPlanListTotalMap = new HashMap<>();
         /////  根据标的的还款计划  生成 业务的还款计划  开始   //////////////
 
 
@@ -125,14 +143,85 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 //                Map<String,Map<Integer,Map<String,List<RepaymentProjPlanListDetail>>>>  RepaymentProjPlanListDetailBatchMap = new HashMap<>();
 
         //业务还款计划 Map
+        //Map<批次Id，业务还款计划>
         Map<String,RepaymentBizPlan>  bizPlanMap = new HashMap<>();
 
         //业务还款计划List  Map
+        //Map<批次Id，业务还款计划List列表>
         Map<String,List<RepaymentBizPlanList>>  bizPlanListMap = new HashMap<>();
 
         //业务还款计划Detail Map
+        //Map<批次Id，业务还款计划Id，业务还款计划Detail列表>
         Map<String,Map<String,List<RepaymentBizPlanListDetail>>> bizPlanListDetialMap =  new HashMap<>();
 
+
+        //根据标的还款计划  生成 业务的还款计划信息
+        calcBizRepayPlans(
+                repaymentPlanListBatchMap,
+                repaymentProjPlanMap,
+                RepaymentProjPlanListDetailBatchMap,
+                bizPlanMap,
+                bizPlanListMap,
+                bizPlanListDetialMap,
+                businessBasicInfo
+        );
+
+        /////  根据标的的还款计划  生成 业务的还款计划  结束   //////////////
+
+
+        //////  整理成 返回数据的格式  将信息返回出去  开始  ///////////
+
+        for(String batchId:bizPlanMap.keySet()){
+            RepaymentBizPlanDto planDto = new RepaymentBizPlanDto();
+            planDto.setRepaymentBizPlan(bizPlanMap.get(batchId));
+
+            List<RepaymentBizPlanList> bizPlanLists =bizPlanListMap.get(batchId);
+            Map<String,List<RepaymentBizPlanListDetail>>  bizDetailMaps = bizPlanListDetialMap.get(batchId);
+            List<RepaymentBizPlanListDto>  bizPlanListDtos = new LinkedList<>();
+            planDto.setBizPlanListDtos(bizPlanListDtos);
+            for (RepaymentBizPlanList bizPlanList:bizPlanLists){
+                RepaymentBizPlanListDto bizPlanListDto = new RepaymentBizPlanListDto();
+                bizPlanListDto.setRepaymentBizPlanList(bizPlanList);
+
+                List<RepaymentBizPlanListDetail> bizPlanListDetails = bizDetailMaps.get(bizPlanList.getPlanListId());
+                bizPlanListDto.setBizPlanListDetails(bizPlanListDetails);
+
+            }
+
+
+
+
+
+
+
+        }
+
+
+        //////  整理成 返回数据的格式  将信息返回出去  结束  ///////////
+
+
+        return null;
+    }
+
+
+    /**
+     * 根据标的的还款计划  生成 业务的还款计划信息
+     * @param repaymentPlanListBatchMap  标的还款计划list表Map
+     * @param repaymentProjPlanMap       标的还款计划主表Map
+     * @param RepaymentProjPlanListDetailBatchMap  标的还款计划Detail表Map
+     * @param bizPlanMap            业务还款计划主表Map
+     * @param bizPlanListMap        业务还款计划List表Map
+     * @param bizPlanListDetialMap  业务还款计划Detail表Map
+     * @param businessBasicInfo     业务基础信息
+     */
+    private void calcBizRepayPlans(Map<String,Map<Integer,List<RepaymentProjPlanList>>>  repaymentPlanListBatchMap,
+                                   Map<String,List<RepaymentProjPlan>> repaymentProjPlanMap,
+                                   Map<String,Map<Integer,Map<String,List<RepaymentProjPlanListDetail>>>> RepaymentProjPlanListDetailBatchMap,
+                                   Map<String,RepaymentBizPlan>  bizPlanMap,
+                                   Map<String,List<RepaymentBizPlanList>>  bizPlanListMap,
+                                   Map<String,Map<String,List<RepaymentBizPlanListDetail>>> bizPlanListDetialMap,
+                                   BusinessBasicInfoReq  businessBasicInfo
+                                   ){
 
         for(String batchId:repaymentPlanListBatchMap.keySet()){
             List<RepaymentProjPlan> projPlans = repaymentProjPlanMap.get(batchId);
@@ -167,7 +256,10 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             bizPlan.setCreateTime(new Date());       //创建日期
             bizPlan.setCreateUser(Constant.SYS_DEFAULT_USER);       //创建用户
 
-
+            //更新标的还款计划主表的 plan_id
+            for (RepaymentProjPlan projPlan:projPlans ){
+                projPlan.setPlanId(bizPlan.getPlanId());
+            }
 
             for(Integer period : planListPeroidMap.keySet()){
                 //这一期 标还款计划列表
@@ -200,6 +292,14 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 bizPlanList.setSrcType(bizPlanList.getSrcType());   // 来源类型
                 bizPlanList.setCreateUser(Constant.SYS_DEFAULT_USER);   // 创建用户
 
+
+                //更新标的 list 业务还款计划相关Id
+                for(RepaymentProjPlanList projPlanList:planLists){
+                    projPlanList.setPlanId(bizPlan.getPlanId());
+                    projPlanList.setPlanListId(bizPlanList.getPlanListId());
+                }
+
+
                 //业务这一期  还款明细列表
                 List<RepaymentBizPlanListDetail>  bizPlanListDetails = new LinkedList<>();
                 bizPlanListDetailMap.put(bizPlanList.getPlanListId(),bizPlanListDetails);
@@ -211,144 +311,38 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     RepaymentBizPlanListDetail  bizpDetial = new RepaymentBizPlanListDetail();
                     bizPlanListDetails.add(bizpDetial);
 
+                    bizpDetial.setPlanDetailId(UUID.randomUUID().toString());   //主键
+                    bizpDetial.setPlanListId(bizPlanList.getPlanListId());  //planListId
+                    bizpDetial.setBusinessId(bizPlanList.getBusinessId());  //业务Id
+                    bizpDetial.setPeriod(bizPlanList.getPeriod());          //期数
+                    bizpDetial.setShareProfitIndex(projpDetials.get(0).getShareProfitIndex());  //分润顺序
 
+                    //项目计划应还总金额(元)
+                    BigDecimal planAmount = new BigDecimal(0);
+                    for(RepaymentProjPlanListDetail pDetail: projpDetials){
+                        planAmount.add(pDetail.getProjPlanAmount());
+                    }
+                    bizpDetial.setPlanAmount(planAmount);  //项目计划应还总金额(元)
 
-//                    /**
-//                     * 应还项目明细ID(主键)
-//                     */
-//                    @TableId("plan_detail_id")
-//                    @ApiModelProperty(required= true,value = "应还项目明细ID(主键)")
-//                    private String planDetailId;
-//                    /**
-//                     * 所属还款计划列表ID(外键，对应tb_repayment_biz_plan_list.plan_list_id)
-//                     */
-//                    @TableField("plan_list_id")
-//                    @ApiModelProperty(required= true,value = "所属还款计划列表ID(外键，对应tb_repayment_biz_plan_list.plan_list_id)")
-//                    private String planListId;
-//                    /**
-//                     * 还款计划所属业务ID(若当前业务为展期，则存展期业务编号)
-//                     */
-//                    @TableField("business_id")
-//                    @ApiModelProperty(required= true,value = "还款计划所属业务ID(若当前业务为展期，则存展期业务编号)")
-//                    private String businessId;
-//
-//                    /**
-//                     * 所属期数
-//                     */
-//                    @ApiModelProperty(required= true,value = "所属期数")
-//                    private Integer period;
-//                    /**
-//                     * 分润顺序（根据分润配置计算）
-//                     */
-//                    @TableField("share_profit_index")
-//                    @ApiModelProperty(required= true,value = "分润顺序（根据分润配置计算）")
-//                    private Integer shareProfitIndex;
-//                    /**
-//                     * 项目计划应还总金额(元)
-//                     */
-//                    @TableField("plan_amount")
-//                    @ApiModelProperty(required= true,value = "项目计划应还总金额(元)")
-//                    private BigDecimal planAmount;
-//                    /**
-//                     * 项目计划应还比例(%)，如0.5%则存0.5，可空
-//                     */
-//                    @TableField("plan_rate")
-//                    @ApiModelProperty(required= true,value = "项目计划应还比例(%)，如0.5%则存0.5，可空")
-//                    private BigDecimal planRate;
-//                    /**
-//                     * 资产端费用项ID，用于资产端区分同名的项目，若不存在同名费用项，可为空
-//                     */
-//                    @TableField("fee_id")
-//                    @ApiModelProperty(required= true,value = "资产端费用项ID，用于资产端区分同名的项目，若不存在同名费用项，可为空")
-//                    private String feeId;
-//                    /**
-//                     * 应还项目名称
-//                     */
-//                    @TableField("plan_item_name")
-//                    @ApiModelProperty(required= true,value = "应还项目名称")
-//                    private String planItemName;
-//                    /**
-//                     * 应还项目所属分类，10：本金，20：利息，30：资产端分公司服务费，40：担保公司费用，50：资金端平台服务费，60：滞纳金，70：违约金，80：中介费，90：押金类费用，100：冲应收
-//                     */
-//                    @TableField("plan_item_type")
-//                    @ApiModelProperty(required= true,value = "应还项目所属分类，10：本金，20：利息，30：资产端分公司服务费，40：担保公司费用，50：资金端平台服务费，60：滞纳金，70：违约金，80：中介费，90：押金类费用，100：冲应收")
-//                    private Integer planItemType;
-//                    /**
-//                     * 分账标记(冲应收还款，根据冲应收明细进行分账)，0：不线上分账，10：分账到借款人账户，20：分账到资产端账户，30：分账到资金端账户(平台)，40：分账到担保公司账户
-//                     */
-//                    @TableField("account_status")
-//                    @ApiModelProperty(required= true,value = "分账标记(冲应收还款，根据冲应收明细进行分账)，0：不线上分账，10：分账到借款人账户，20：分账到资产端账户，30：分账到资金端账户(平台)，40：分账到担保公司账户")
-//                    private Integer accountStatus;
-//                    /**
-//                     * 实还金额(元)
-//                     */
-//                    @TableField("fact_amount")
-//                    @ApiModelProperty(required= true,value = "实还金额(元)")
-//                    private BigDecimal factAmount;
-//                    /**
-//                     * 还款来源，10：线下转账，20：线下代扣，30：银行代扣
-//                     */
-//                    @TableField("repay_source")
-//                    @ApiModelProperty(required= true,value = "还款来源，10：线下转账，20：线下代扣，30：银行代扣")
-//                    private Integer repaySource;
-//                    /**
-//                     * 实还日期
-//                     */
-//                    @TableField("fact_repay_date")
-//                    @ApiModelProperty(required= true,value = "实还日期")
-//                    private Date factRepayDate;
-//                    /**
-//                     * 是否有效状态：1 有效 ，0 无效
-//                     */
-//                    @ApiModelProperty(required= true,value = "是否有效状态：1 有效 ，0 无效")
-//                    private Integer active;
-//                    /**
-//                     * 创建日期
-//                     */
-//                    @TableField("create_date")
-//                    @ApiModelProperty(required= true,value = "创建日期")
-//                    private Date createDate;
-//                    /**
-//                     * 来源类型：1.信贷生成，2.贷后管理生成
-//                     */
-//                    @TableField("src_type")
-//                    @ApiModelProperty(required= true,value = "来源类型：1.信贷生成，2.贷后管理生成")
-//                    private Integer srcType;
-//                    /**
-//                     * 创建用户
-//                     */
-//                    @TableField("create_user")
-//                    @ApiModelProperty(required= true,value = "创建用户")
-//                    private String createUser;
-//                    /**
-//                     * 更新日期
-//                     */
-//                    @TableField("update_date")
-//                    @ApiModelProperty(required= true,value = "更新日期")
-//                    private Date updateDate;
-//                    /**
-//                     * 更新用户
-//                     */
-//                    @TableField("update_user")
-//                    @ApiModelProperty(required= true,value = "更新用户")
-//                    private String updateUser;
+                    bizpDetial.setPlanRate(null);  //项目计划应还比例(%)，如0.5%则存0.5，可空
+                    bizpDetial.setFeeId(feeId);  //资产端费用项ID，用于资产端区分同名的项目
+                    bizpDetial.setPlanItemName(projpDetials.get(0).getPlanItemName());  //应还项目名称
+                    bizpDetial.setPlanItemType(projpDetials.get(0).getPlanItemType());  //应还项目所属分类
+                    bizpDetial.setAccountStatus(projpDetials.get(0).getAccountStatus());  // 分账标记
+                    bizpDetial.setActive(RepayPlanActiveEnum.ACTIVE.getValue());  // 是否有效状态
+                    bizpDetial.setCreateDate(new Date());  // 创建日期
+                    bizpDetial.setSrcType(RepayPlanCreateSysEnum.ALMS.getValue());  // 来源类型
+                    bizpDetial.setCreateUser(Constant.SYS_DEFAULT_USER);  // 来源类型
 
+                    //更新标的detail   业务还款计划相关Id
+                    for(RepaymentProjPlanListDetail projPlanListDetail: projpDetials){
+                        projPlanListDetail.setPlanListId(bizPlanList.getPlanListId());
+                        projPlanListDetail.setPlanDetailId(bizpDetial.getPlanDetailId());
+                    }
 
                 }
-
-
-
             }
-
-
-
         }
-
-
-
-        /////  根据标的的还款计划  生成 业务的还款计划  结束   //////////////
-
-        return null;
     }
 
 
@@ -375,6 +369,10 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
     }
 
 
+
+
+
+
     /**
      * 计算标的还款计划信息
      * @param projInfoReqMap  输入的标出款信息
@@ -382,13 +380,20 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
      * @param RepaymentProjPlanListDetailBatchMap  标的还款计划详情Map
      * @param repaymentProjPlanMap  标的还款计划Map
      * @param plateType  平台类型
+     * @param businessBasicInfo  业务基础信息
+     * @param projPlanDetailTotalMap  Map<批次,Map<标还款计划主表Id，Map<标还款计划list表Id，标的还款计划detail列表>>
+     * @param projPlanListTotalMap  Map<批次,Map<标还款计划主表Id，标的还款计划list列表>>
      */
+
+
     private void  calcProjRepayments(Map<String,List<ProjInfoReq>>projInfoReqMap,
                                      Map<String,Map<Integer,List<RepaymentProjPlanList>>>  repaymentPlanListBatchMap,
                                      Map<String,Map<Integer,Map<String,List<RepaymentProjPlanListDetail>>>>  RepaymentProjPlanListDetailBatchMap,
                                      Map<String,List<RepaymentProjPlan>> repaymentProjPlanMap,
                                      Integer plateType,
-                                     BusinessBasicInfoReq  businessBasicInfo){
+                                     BusinessBasicInfoReq  businessBasicInfo,
+                                     Map<String,Map<String,Map<String,List<RepaymentProjPlanListDetail>>>> projPlanDetailTotalMap,
+                                     Map<String,Map<String,List<RepaymentProjPlanList>>> projPlanListTotalMap){
         for(String beginDay:projInfoReqMap.keySet()){
             List<ProjInfoReq> reqList = projInfoReqMap.get(beginDay);
             //批次Id
@@ -397,10 +402,19 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             //Map<期数，标还款计划费用详情列表>
             Map<Integer,List<RepaymentProjPlanList>>  repaymentPlanListPeriorMap = new HashMap<>();
             repaymentPlanListBatchMap.put(batchId,repaymentPlanListPeriorMap);
+
+//            Map<标还款计划主表Id，标的还款计划list列表>>
+            Map<String,List<RepaymentProjPlanList>> projPlanListPMap = new HashMap<>();
+            projPlanListTotalMap.put(batchId,projPlanListPMap);
+
             //期数 费用类型对应的标ListDetail列表  以业务计
             //Map<期数，Map<费用类型fee_id,标还款计划费用详情列表>>
             Map<Integer,Map<String,List<RepaymentProjPlanListDetail>>>  repaymentProjPlanListDetailPeriorMap = new HashMap<>();
             RepaymentProjPlanListDetailBatchMap.put(batchId,repaymentProjPlanListDetailPeriorMap);
+
+            //Map<标还款计划主表Id，Map<标还款计划list表Id，标的还款计划detail列表>>
+            Map<String,Map<String,List<RepaymentProjPlanListDetail>>> projdetailListMap = new HashMap<>();
+            projPlanDetailTotalMap.put(batchId,projdetailListMap);
 
             List<RepaymentProjPlan> projPlans = new LinkedList<>();
             repaymentProjPlanMap.put(batchId,projPlans);
@@ -450,7 +464,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 RepaymentProjPlanList  zeroList =  creatRepaymentProjPlanList(repaymentProjPlan,0);// new RepaymentProjPlanList();
                 zeroList.setCurrentStatus(RepayPlanStatus.REPAYED.getName()); //当前还款状态  00期的直接置位为已还款
                 //将标的00期写入还款计划map
-                addPlanListToMap(repaymentPlanListPeriorMap,zeroList, 0);
+                addPlanListToMap(repaymentPlanListPeriorMap,projPlanListPMap,zeroList, 0);
 
 
                 List<ProjFeeReq> projFeeReqs =  projInfoReq.getProjFeeInfos();
@@ -464,7 +478,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                         if(feeReq.getIsOneTimeCharge().equals(RepayPlanIsOneTimeChargeEnum.ONE_TIME.getKey())){
                             String feeItemId = getFeeItemId(feeReq.getFeeItemId(),feeReq.getFeeType());
                             RepaymentProjPlanListDetail   zeroListDetail = creatProjListDetail(zeroList);
-                            zeroListDetail.setPlanAmount(feeReq.getFeeValue());//项目计划应还总金额(元)
+                            zeroListDetail.setProjPlanAmount(feeReq.getFeeValue());//项目计划应还总金额(元)
                             zeroListDetail.setFeeId(feeItemId);//资产端费用项ID，用于资产端区分同名的项目，若不存在同名费用项，可为空
                             zeroListDetail.setPlanItemName(feeReq.getFeeTypeName());//应还项目名称
                             zeroListDetail.setPlanItemType(feeReq.getFeeType());//应还项目所属分类
@@ -472,7 +486,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
                             //将第0期费用项添加到Map中
                             addDetialToMap(  repaymentProjPlanListDetailPeriorMap,
-                                    feeItemId, zeroListDetail,0);
+                                    projdetailListMap,
+                                    feeItemId, zeroListDetail,0,
+                                    zeroList.getProjPlanId());
                             //添加到第0期详情列表中
                             zeroListDetails.add(zeroListDetail);
                         }
@@ -509,30 +525,34 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     date = DateUtil.addDay2Date(-1,date);
                     projPlanList.setDueDate(date);
                     //将标的第i期写入还款计划map
-                    addPlanListToMap(repaymentPlanListPeriorMap,projPlanList, i);
+                    addPlanListToMap(repaymentPlanListPeriorMap,projPlanListPMap,projPlanList, i);
 
                     //本金detail
                     RepaymentProjPlanListDetail   prinDetail = creatProjListDetail(projPlanList);
-                    prinDetail.setPlanAmount(repayPrinAndIni.get(i).get(principal_str));//项目计划应还总金额(元)
+                    prinDetail.setProjPlanAmount(repayPrinAndIni.get(i).get(principal_str));//项目计划应还总金额(元)
                     prinDetail.setFeeId(RepayPlanItemTypeEnum.PRINCIPAL.getUuid());//资产端费用项ID，用于资产端区分同名的项目，若不存在同名费用项，可为空
                     prinDetail.setPlanItemName(RepayPlanItemTypeEnum.PRINCIPAL.getDesc());//应还项目名称
                     prinDetail.setPlanItemType(RepayPlanItemTypeEnum.PRINCIPAL.getValue());//应还项目所属分类
                     prinDetail.setAccountStatus(RepayPlanAccountStatusEnum.DIVISION_TO_PLAT.getValue());//分账标记
 
                     addDetialToMap(  repaymentProjPlanListDetailPeriorMap,
-                            RepayPlanItemTypeEnum.PRINCIPAL.getUuid(), prinDetail,i);
+                            projdetailListMap,
+                            RepayPlanItemTypeEnum.PRINCIPAL.getUuid(), prinDetail,i,
+                            projPlanList.getProjPlanId() );
                     priodListDetails.add(prinDetail);
 
                     //利息
                     RepaymentProjPlanListDetail   iniDetail = creatProjListDetail(projPlanList);
-                    iniDetail.setPlanAmount(repayPrinAndIni.get(i).get(interest_str));//项目计划应还总金额(元)
+                    iniDetail.setProjPlanAmount(repayPrinAndIni.get(i).get(interest_str));//项目计划应还总金额(元)
                     iniDetail.setFeeId(RepayPlanItemTypeEnum.INTEREST.getUuid());//资产端费用项ID，用于资产端区分同名的项目，若不存在同名费用项，可为空
                     iniDetail.setPlanItemName(RepayPlanItemTypeEnum.INTEREST.getDesc());//应还项目名称
                     iniDetail.setPlanItemType(RepayPlanItemTypeEnum.INTEREST.getValue());//应还项目所属分类
                     iniDetail.setAccountStatus(RepayPlanAccountStatusEnum.DIVISION_TO_PLAT.getValue());//分账标记
 
                     addDetialToMap(  repaymentProjPlanListDetailPeriorMap,
-                            RepayPlanItemTypeEnum.INTEREST.getUuid(), iniDetail,i);
+                            projdetailListMap,
+                            RepayPlanItemTypeEnum.INTEREST.getUuid(), iniDetail,i,
+                            projPlanList.getProjPlanId());
                     priodListDetails.add(iniDetail);
 
 
@@ -554,15 +574,17 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                                     }
                                     for(ProjFeeDetailReq  feeDetail: feeDetailReqs){
                                         if(i<=feeDetail.getFeeTermRangeMax() && i>=feeDetail.getFeeTermRangeMin()){
-                                            peroidFeelDetail.setPlanAmount(feeDetail.getFeeValue());
+                                            peroidFeelDetail.setProjPlanAmount(feeDetail.getFeeValue());
                                         }
                                     }
                                 }else{
                                     //不是分段收费直接存储应还总金额
-                                    peroidFeelDetail.setPlanAmount(feeReq.getFeeValue());//项目计划应还总金额(元)
+                                    peroidFeelDetail.setProjPlanAmount(feeReq.getFeeValue());//项目计划应还总金额(元)
                                 }
                                 addDetialToMap(  repaymentProjPlanListDetailPeriorMap,
-                                        feeItemId, peroidFeelDetail,i);
+                                        projdetailListMap,
+                                        feeItemId, peroidFeelDetail,i,
+                                        projPlanList.getProjPlanId());
                                 priodListDetails.add(peroidFeelDetail);
 
                             }
@@ -612,15 +634,24 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
      * 把标的还款计划添加到Map中
      */
     private void addPlanListToMap(Map<Integer,List<RepaymentProjPlanList>>repaymentPlanListPeriorMap,
+                                  Map<String,List<RepaymentProjPlanList>> projPlanListPMap,
                                   RepaymentProjPlanList peroidPlanList, Integer peroid ){
 
-        //将标的00期写入还款计划map
-        List<RepaymentProjPlanList> planList = repaymentPlanListPeriorMap.get(0);
+        //将标的每一期写入还款计划map
+        List<RepaymentProjPlanList> planList = repaymentPlanListPeriorMap.get(peroid);
         if(planList == null){
             planList = new LinkedList<>();
             repaymentPlanListPeriorMap.put(peroid,planList);
         }
+
+        List<RepaymentProjPlanList> pList1 = projPlanListPMap.get(peroidPlanList.getProjPlanId());
+        if(pList1 == null){
+            pList1 = new LinkedList<>();
+            projPlanListPMap.put(peroidPlanList.getProjPlanId(),pList1);
+        }
+
         planList.add(peroidPlanList);
+        pList1.add(peroidPlanList);
     }
 
 
@@ -631,7 +662,8 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
      * @param detail
      */
     private  void addDetialToMap(Map<Integer,Map<String,List<RepaymentProjPlanListDetail>>>  RepaymentProjPlanListDetailPeriorMap,
-                                 String feeItemId, RepaymentProjPlanListDetail detail,Integer period){
+                                 Map<String,Map<String,List<RepaymentProjPlanListDetail>>> projdetailListMap,
+                                 String feeItemId, RepaymentProjPlanListDetail detail,Integer period,String projPlanId){
         Map<String,List<RepaymentProjPlanListDetail>> feeIdMap = RepaymentProjPlanListDetailPeriorMap.get(period);
         if(feeIdMap == null){
             feeIdMap = new HashMap<>();
@@ -642,7 +674,21 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             pDetailList = new LinkedList<>();
             feeIdMap.put(feeItemId,pDetailList);
         }
+
+        Map<String,List<RepaymentProjPlanListDetail>>  projPlanIdMap = projdetailListMap.get(projPlanId);
+        if(projPlanIdMap == null){
+            projPlanIdMap = new HashMap<>();
+            projdetailListMap.put(projPlanId,projPlanIdMap);
+        }
+
+        List<RepaymentProjPlanListDetail> projPListIdList = projPlanIdMap.get(detail.getProjPlanListId());
+        if(projPListIdList == null){
+            projPListIdList = new LinkedList<>();
+            projPlanIdMap.put(detail.getProjPlanListId(),projPListIdList);
+        }
+
         pDetailList.add(detail);
+        projPListIdList.add(detail);
 
     }
 

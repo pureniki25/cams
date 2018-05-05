@@ -1,6 +1,9 @@
 package com.hongte.alms.base.repayPlan.service;
 
+import com.hongte.alms.base.repayPlan.dto.RepaymentBizPlanDto;
 import com.hongte.alms.base.repayPlan.req.CreatRepayPlanReq;
+
+import java.util.List;
 
 /**
  * @author zengkun
@@ -14,7 +17,7 @@ public interface CreatRepayPlanService {
      * @param creatRepayPlanReq
      * @return
      */
-    public Boolean  creatRepayPlan(CreatRepayPlanReq creatRepayPlanReq);
+    public List<RepaymentBizPlanDto> creatRepayPlan(CreatRepayPlanReq creatRepayPlanReq);
 
 
 }
