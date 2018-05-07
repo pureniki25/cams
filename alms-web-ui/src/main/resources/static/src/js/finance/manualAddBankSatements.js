@@ -7,17 +7,17 @@ window.layinit(function (htConfig) {
     var _htConfig = htConfig;
     basePath = htConfig.coreBasePath;
     let businessId = getQueryStr('businessId')
-
+    let afterId = getQueryStr('afterId')
 
     app = new Vue({
         el: "#app",
         data: {
             form: {
-                repayDate: '',
-                repayType: '',
-                repayAmount: 0,
-                acceptAcount: '',
-                certUrl:''
+                repaymentDate: '',
+                tradeType: '',
+                repaymentMoney: 0,
+                acceptBank: '',
+                cert:''
             },
             acceptAccountLabel: '',
             upload: {
@@ -39,7 +39,7 @@ window.layinit(function (htConfig) {
         methods: {
             computeAcceptAccountLabel: function () {
                 let res;
-                switch (this.form.repayType) {
+                switch (this.form.tradeType) {
                     case '转账':
                         res = '转入账户'
                         break;
@@ -59,7 +59,7 @@ window.layinit(function (htConfig) {
                 this.upload.data.fileName = file.name
             }, onUploadSuccess: function (response, file, fileList) {
                 let docItemListJson = JSON.parse(response.docItemListJson)
-                app.form.certUrl = docItemListJson.docUrl;
+                app.form.cert = docItemListJson.docUrl;
             }, onUploadError: function (error, file, fileList) {
                 app.$Message.error({ content: '上传失败,请稍后再试' });
             }, onExceededSize: function (file, fileList) {
@@ -71,23 +71,55 @@ window.layinit(function (htConfig) {
                 axios.get('http://localhost:30606/'+'moneyPool/listDepartmentBank',{params:{
                     businessId:businessId
                 }}).then(function(res){
-                    app.bankAccountList = res.data.data
-                    console.log(res.data.data)
+                    if(res.data.code=='1'){
+                        app.bankAccountList = res.data.data
+                    }else{
+                        app.$Message.error({content:res.data.msg})
+                    }
                 }).catch(function(err){
-
+                    app.$Message.error({content:'获取银行转入账户数据失败'})
                 })
+            },
+            submit:function(){
+                console.log(app.form);
+                let params = {}
+
+
+                Object.keys(this.form).forEach(element => {
+                    if (this.form[element] &&
+                        (this.form[element] != '' || this.form[element].length != 0)) {
+                        params[element] = this.form[element]
+                    }
+                })
+                params.businessId = businessId;
+                params.afterId = afterId;
+                axios.post(basePath+'moneyPool/addCustomerRepayment',params)
+                .then(function(res){
+                    if(res.data.code=='1'){
+                        this.cancel()
+                    }else{
+                        app.$Message.error({content:res.data.msg})
+                    }
+                })
+                .catch(function(err){
+                    app.$Message.error({content:'提交还款登记失败'})
+                })
+            },
+            cancel:function(){
+                app.$refs['form'].resetFields()
+                window.parent.app.closeModal('manualAddBankSatementsShow')
             }
         },
         computed: {
-            repayType() {
-                return this.form.repayType;
+            tradeType() {
+                return this.form.tradeType;
             },
             acceptAcount(){
                 return this.form.acceptAcount;
             }
         },
         watch: {
-            repayType(n, o) {
+            tradeType(n, o) {
                 this.computeAcceptAccountLabel()
             },
             acceptAcount(n,o){

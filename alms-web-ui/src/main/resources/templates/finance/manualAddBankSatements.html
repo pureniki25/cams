@@ -37,54 +37,50 @@
         <Card title="手动新增银行流水">
             <i-form ref="form" :model="form" label-position="left" label-width="100">
                 <form-item prop="repayDate" label="还款日期" required>
-                    <date-picker v-model="form.repayDate"></date-picker>
+                    <date-picker v-model="form.repaymentDate"></date-picker>
                 </form-item>
                 <form-item prop="repayAmount" label="还款金额" required>
-                    <i-input v-model="form.repayAmount" number></i-input>
-                    <span style="color:red">{{ArabicToChinese(form.repayAmount)}}</span>
+                    <i-input v-model="form.repaymentMoney" number></i-input>
+                    <span style="color:red">{{ArabicToChinese(form.repaymentMoney)}}</span>
                     <!-- <i-input :value="ArabicToChinese(form.repayAmount)" style="color:red" readonly></i-input> -->
                 </form-item>
 
-                <form-item prop="repayType" label="支付类型" required >
-                    <i-select v-model="form.repayType">
+                <form-item prop="tradeType" label="支付类型" required>
+                    <i-select v-model="form.tradeType">
                         <i-option value="转账">转账</i-option>
                         <i-option value="现金">现金</i-option>
                         <i-option value="刷卡">刷卡</i-option>
                     </i-select>
                 </form-item>
 
-                <form-item prop="acceptAcount" :label="acceptAccountLabel" required >
-                    <i-select v-if="form.repayType=='转账'||form.repayType=='刷卡'" v-model="form.acceptAcount">
-                        <i-option v-for="item in bankAccountList" :value="item.financeName"  >{{item.financeName}}</i-option>
+                <form-item prop="acceptBank" :label="acceptAccountLabel" required>
+                    <i-select v-if="form.tradeType=='转账'||form.tradeType=='刷卡'" v-model="form.acceptBank">
+                        <i-option v-for="item in bankAccountList" :value="item.financeName">{{item.financeName}}</i-option>
                     </i-select>
-                    <i-input v-if="form.repayType=='转账'||form.repayType=='刷卡'" :value="curBankAccount" readonly></i-input>
-                    <i-input v-if="form.repayType=='现金'" v-model="form.acceptAcount" ></i-input>
+                    <i-input v-if="form.tradeType=='转账'||form.tradeType=='刷卡'" :value="curBankAccount" readonly></i-input>
+                    <i-input v-if="form.tradeType=='现金'" v-model="form.acceptBank"></i-input>
                 </form-item>
 
-                <form-item prop="tradePlace" label="交易场所" v-if="form.repayType=='转账'||form.repayType=='刷卡'">
+                <form-item prop="factRepaymentUser" label="实际转款人" required>
+                    <i-input v-model="form.factRepaymentUser"></i-input>
+                </form-item>
+                <form-item prop="tradePlace" label="交易场所" v-if="form.tradeType=='转账'||form.tradeType=='刷卡'">
                     <i-input v-model="form.tradePlace"></i-input>
                 </form-item>
 
-                <form-item label="上传凭证" >
-                        <Upload 
-                        ref="upload"
-                        :action="upload.url" 
-                        :headers="upload.headers" 
-                        :data="upload.data" 
-                        :before-upload="beforeUpload"
-                        :max-size="upload.maxSize"
-                        :accept="upload.accept"
-                        :on-success="onUploadSuccess"
-                        :on-error="onUploadError"
-                        :on-format-error="onFormatError"
-                        :on-exceeded-size="onExceededSize"
-                        >
-                            <i-button type="ghost" icon="ios-cloud-upload-outline">{{form.certUrl&&form.certUrl.length>0?'重新上传凭证':'上传凭证'}}</i-button>
-                        </Upload>
+                <form-item label="上传凭证">
+                    <Upload ref="upload" :action="upload.url" :headers="upload.headers" :data="upload.data" :before-upload="beforeUpload" :max-size="upload.maxSize"
+                        :accept="upload.accept" :on-success="onUploadSuccess" :on-error="onUploadError" :on-format-error="onFormatError"
+                        :on-exceeded-size="onExceededSize">
+                        <i-button type="ghost" icon="ios-cloud-upload-outline">{{form.certUrl&&form.certUrl.length>0?'重新上传凭证':'上传凭证'}}</i-button>
+                    </Upload>
                 </form-item>
-
+                <form-item prop="remark" label="备注">
+                    <i-input v-model="form.remark" type="textarea"></i-input>
+                </form-item>
                 <form-item>
-                    <i-button @click="window.parent.app.parentMethod(form)" ></i-button>
+                    <i-button @click="submit">提交</i-button>
+                    <i-button @click="cancel">取消</i-button>
                 </form-item>
             </i-form>
         </Card>

@@ -13,12 +13,14 @@ window.layinit(function (htConfig) {
         data:{
             repayInfoUrl:'/finance/repayBaseInfo?businessId='+businessId+"&afterId="+afterId,
             repayRegListUrl:'/finance/repayRegList?planListId='+planListId,
-            manualAddBankSatements:'/finance/manualAddBankSatements?businessId='+businessId,
+            manualAddBankSatements:'/finance/manualAddBankSatements?businessId='+businessId+"&afterId="+afterId,
             manualAddBankSatementsShow:true
         },
         methods:{
-            parentMethod:function(o){
-                console.log(o);
+            closeModal:function(target){
+                if(app[target]){
+                    app[target]=false;
+                }
             }
         },
         created:function(){
