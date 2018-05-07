@@ -2,25 +2,25 @@ package com.hongte.alms.base.repayPlan.enums;
 
 import com.baomidou.mybatisplus.enums.IEnum;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.hongte.alms.base.enums.AreaLevel;
 
 /**
  * @author:曾坤
- * @date: 2018/4/24
- * 还款计划借款利率单位
+ * @date: 2018/5/4
+ * 还款计划还款状态枚举   对应 tb_repayment_biz_plan    plan_status   状态
  */
-public enum RepayPlanBorrowRateUnitEnum implements IEnum {
+public enum RepayPlanPayStatusEnum implements IEnum {
 
-//    1：年利率，2：月利率，3：日利率
-
-    YEAR_RATE(1,"年利率"),
-    MONTH_RATE(2,"月利率"),
-    DAY_RATE(3,"日利率");
+//0:还款中，10:提前结清，20:已结清，30:亏损结清，50:已申请展期
+    REPAYINF(0,"还款中"),
+    PAYED_EARLY(10,"提前结清"),
+    PAYED(20,"已结清"),
+    PAYED_LOSS(30,"亏损结清"),
+    RENEWED(50,"已申请展期");
 
     private Integer value;
     private String desc;
 
-    RepayPlanBorrowRateUnitEnum(final int value, final String desc) {
+    RepayPlanPayStatusEnum(final int value, final String desc) {
         this.value = value;
         this.desc = desc;
     }
@@ -39,7 +39,7 @@ public enum RepayPlanBorrowRateUnitEnum implements IEnum {
 
 
     public static String nameOf(Integer key){
-        for(RepayPlanBorrowRateUnitEnum d : RepayPlanBorrowRateUnitEnum.values()){
+        for(RepayPlanPayStatusEnum d : RepayPlanPayStatusEnum.values()){
             if(d.value.equals(key)){
                 return d.desc;
             }
@@ -48,8 +48,8 @@ public enum RepayPlanBorrowRateUnitEnum implements IEnum {
 
     }
 
-    public static RepayPlanBorrowRateUnitEnum getByKey(Integer key){
-        for(RepayPlanBorrowRateUnitEnum d : RepayPlanBorrowRateUnitEnum.values()){
+    public static RepayPlanPayStatusEnum getByKey(Integer key){
+        for(RepayPlanPayStatusEnum d : RepayPlanPayStatusEnum.values()){
             if(d.value.equals(key)){
                 return d;
             }
@@ -59,7 +59,7 @@ public enum RepayPlanBorrowRateUnitEnum implements IEnum {
     }
 
     public static Integer keyOf(String name){
-        for(RepayPlanBorrowRateUnitEnum d : RepayPlanBorrowRateUnitEnum.values()){
+        for(RepayPlanPayStatusEnum d : RepayPlanPayStatusEnum.values()){
             if(d.desc.equals(name)){
                 return d.value;
             }

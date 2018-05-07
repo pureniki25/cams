@@ -2,25 +2,22 @@ package com.hongte.alms.base.repayPlan.enums;
 
 import com.baomidou.mybatisplus.enums.IEnum;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.hongte.alms.base.enums.AreaLevel;
 
 /**
  * @author:曾坤
- * @date: 2018/4/24
- * 还款计划借款利率单位
+ * @date: 2018/5/4
+ * 是否是分段收费标志位
  */
-public enum RepayPlanBorrowRateUnitEnum implements IEnum {
+public enum FeeIsTermRangeEnum implements IEnum {
 
-//    1：年利率，2：月利率，3：日利率
 
-    YEAR_RATE(1,"年利率"),
-    MONTH_RATE(2,"月利率"),
-    DAY_RATE(3,"日利率");
+    YES(1,"是"),
+    NO(0,"否");
 
     private Integer value;
     private String desc;
 
-    RepayPlanBorrowRateUnitEnum(final int value, final String desc) {
+    FeeIsTermRangeEnum(final int value, final String desc) {
         this.value = value;
         this.desc = desc;
     }
@@ -39,7 +36,7 @@ public enum RepayPlanBorrowRateUnitEnum implements IEnum {
 
 
     public static String nameOf(Integer key){
-        for(RepayPlanBorrowRateUnitEnum d : RepayPlanBorrowRateUnitEnum.values()){
+        for(FeeIsTermRangeEnum d : FeeIsTermRangeEnum.values()){
             if(d.value.equals(key)){
                 return d.desc;
             }
@@ -48,8 +45,8 @@ public enum RepayPlanBorrowRateUnitEnum implements IEnum {
 
     }
 
-    public static RepayPlanBorrowRateUnitEnum getByKey(Integer key){
-        for(RepayPlanBorrowRateUnitEnum d : RepayPlanBorrowRateUnitEnum.values()){
+    public static FeeIsTermRangeEnum getByKey(Integer key){
+        for(FeeIsTermRangeEnum d : FeeIsTermRangeEnum.values()){
             if(d.value.equals(key)){
                 return d;
             }
@@ -59,7 +56,7 @@ public enum RepayPlanBorrowRateUnitEnum implements IEnum {
     }
 
     public static Integer keyOf(String name){
-        for(RepayPlanBorrowRateUnitEnum d : RepayPlanBorrowRateUnitEnum.values()){
+        for(FeeIsTermRangeEnum d : FeeIsTermRangeEnum.values()){
             if(d.desc.equals(name)){
                 return d.value;
             }

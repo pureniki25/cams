@@ -9,7 +9,7 @@ import com.hongte.alms.common.service.BaseService;
  * </p>
  *
  * @author 曾坤
- * @since 2018-04-24
+ * @since 2018-05-03
  */
 public interface RepaymentProjPlanListService extends BaseService<RepaymentProjPlanList> {
 

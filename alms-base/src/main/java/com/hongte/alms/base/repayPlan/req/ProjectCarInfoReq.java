@@ -12,8 +12,8 @@ import java.util.Date;
  * @author zengkun
  * @since 2018/4/23
  */
-@ApiModel(" 业务上标车贷信息表")
-public class TuandaiProjectCarReq {
+@ApiModel("业务上标车贷信息表")
+public class ProjectCarInfoReq {
 
     /**
      * 项目编号

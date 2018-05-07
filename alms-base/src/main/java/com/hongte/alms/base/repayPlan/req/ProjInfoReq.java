@@ -1,9 +1,5 @@
 package com.hongte.alms.base.repayPlan.req;
 
-import com.baomidou.mybatisplus.annotations.TableField;
-import com.baomidou.mybatisplus.annotations.TableId;
-import com.hongte.alms.base.entity.TuandaiProjectCar;
-import com.hongte.alms.base.entity.TuandaiProjectHouse;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -15,41 +11,39 @@ import java.util.List;
  * @author zengkun
  * @since 2018/4/23
  */
-@ApiModel("创建还款计划团贷上标信息")
-public class TuandaiProjInfoReq {
+@ApiModel("上标信息")
+public class ProjInfoReq {
 
 
     /**
      * 标的车辆信息
      */
     @ApiModelProperty(value = "标的车辆信息")
-    private  List<TuandaiProjectCarReq> projCarInfos;
+    private  List<ProjectCarInfoReq> projCarInfos;
 
     /**
      * 标的房源信息
      */
     @ApiModelProperty(value = "标的房源信息")
-    private  List<TuandaiProjectCarReq> projHouseInfos;
+    private  List<ProjectHouseInfoReq> projHouseInfos;
 
 
     /**
-     * 标的的出款费用信息列表
+     * 标的费用信息列表
      */
     @ApiModelProperty(required= true,value = "标的的出款费用信息列表")
-    private List<ProjOutputFeeReq> projOutputFeeInfos;
-
-
+    private List<ProjFeeReq> projFeeInfos;
 
     /**
      * 项目编号
      */
     @ApiModelProperty(required= true,value = "项目编号")
     private String projectId;
-    /**
-     * 业务编号
-     */
-    @ApiModelProperty(required= true,value = "业务编号")
-    private String businessId;
+//    /**
+//     * 业务编号
+//     */
+//    @ApiModelProperty(required= true,value = "业务编号")
+//    private String businessId;
     /**
      * 上标状态(-100:业务员出款申请,-50:财务未上标,0:财务不同意上标,1:财务同意上标,2:已满标,3:财务确认出款计划可放款,4:团贷网已提现给借款人,5:提现失败,6:展期资金分配完成,7:部分提现给借款人)
      */
@@ -77,12 +71,12 @@ public class TuandaiProjInfoReq {
     @ApiModelProperty(required= true,value = "财务确认放款人名称")
     private String accounterConfirmUserName;
     /**
-     * 团贷网放款时间
+     * 放款时间
      */
     @ApiModelProperty(required= true,value = "团贷网放款时间")
     private Date tdLoanTime;
     /**
-     * 团贷网放款金额
+     * 放款金额
      */
     @ApiModelProperty(required= true,value = "团贷网放款金额")
     private BigDecimal tdLoanMoney;
@@ -97,9 +91,9 @@ public class TuandaiProjInfoReq {
     @ApiModelProperty(required= true,value = "投资者已投金额")
     private BigDecimal catsedAmount;
     /**
-     * 展期标对应的原业务上标编号(仅展期业务)
+     * 原业务上标编号
      */
-    @ApiModelProperty(required= true,value = "展期标对应的原业务上标编号(仅展期业务)")
+    @ApiModelProperty(required= true,value = "原业务上标编号")
     private String orgIssueId;
     /**
      * 主借标ID
@@ -246,11 +240,33 @@ public class TuandaiProjInfoReq {
      */
     @ApiModelProperty(required= true,value = "担保公司可用金额")
     private BigDecimal aviCreditGrantingAmount;
+//    /**
+//     * 年化利率
+//     */
+//    @ApiModelProperty(required= true,value = "年化利率")
+//    private BigDecimal interestRate;
+
+
     /**
-     * 年化利率
+     *利率
      */
-    @ApiModelProperty(required= true,value = "年化利率")
-    private BigDecimal interestRate;
+    @ApiModelProperty(required= true,value = "利率")
+    private BigDecimal rate;
+
+    @ApiModelProperty(required= true,value = "利率单位：1 年利率; 2 月利率; 3 日利率")
+    private Integer rateUnitType;
+
+    @ApiModelProperty(required= true,value = "逾期滞纳金费率(%)")
+    private BigDecimal overDueRate;
+
+    @ApiModelProperty(required= true,value = "逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率")
+    private  Integer overDueRateUnit;
+
+
+    @ApiModelProperty(required= true,value = "还款方式：1 先息后本； 2 分期还本付息； 3 等额本息； 4 等本等息")
+    private Integer repayType;
+
+
     /**
      * 逾期年利率
      */
@@ -479,29 +495,23 @@ public class TuandaiProjInfoReq {
     @ApiModelProperty(required= true,value = "更新人")
     private String updateUser;
 
-    public List<TuandaiProjectCarReq> getProjCarInfos() {
+    public List<ProjectCarInfoReq> getProjCarInfos() {
         return projCarInfos;
     }
 
-    public void setProjCarInfos(List<TuandaiProjectCarReq> projCarInfos) {
+    public void setProjCarInfos(List<ProjectCarInfoReq> projCarInfos) {
         this.projCarInfos = projCarInfos;
     }
 
-    public List<TuandaiProjectCarReq> getProjHouseInfos() {
+    public List<ProjectHouseInfoReq> getProjHouseInfos() {
         return projHouseInfos;
     }
 
-    public void setProjHouseInfos(List<TuandaiProjectCarReq> projHouseInfos) {
+    public void setProjHouseInfos(List<ProjectHouseInfoReq> projHouseInfos) {
         this.projHouseInfos = projHouseInfos;
     }
 
-    public List<ProjOutputFeeReq> getProjOutputFeeInfos() {
-        return projOutputFeeInfos;
-    }
 
-    public void setProjOutputFeeInfos(List<ProjOutputFeeReq> projOutputFeeInfos) {
-        this.projOutputFeeInfos = projOutputFeeInfos;
-    }
 
     public String getProjectId() {
         return projectId;
@@ -511,13 +521,13 @@ public class TuandaiProjInfoReq {
         this.projectId = projectId;
     }
 
-    public String getBusinessId() {
-        return businessId;
-    }
-
-    public void setBusinessId(String businessId) {
-        this.businessId = businessId;
-    }
+//    public String getBusinessId() {
+//        return businessId;
+//    }
+//
+//    public void setBusinessId(String businessId) {
+//        this.businessId = businessId;
+//    }
 
     public String getStatusFlag() {
         return statusFlag;
@@ -831,13 +841,13 @@ public class TuandaiProjInfoReq {
         this.aviCreditGrantingAmount = aviCreditGrantingAmount;
     }
 
-    public BigDecimal getInterestRate() {
-        return interestRate;
-    }
-
-    public void setInterestRate(BigDecimal interestRate) {
-        this.interestRate = interestRate;
-    }
+//    public BigDecimal getInterestRate() {
+//        return interestRate;
+//    }
+//
+//    public void setInterestRate(BigDecimal interestRate) {
+//        this.interestRate = interestRate;
+//    }
 
     public BigDecimal getOverRate() {
         return overRate;
@@ -1197,5 +1207,53 @@ public class TuandaiProjInfoReq {
 
     public void setUpdateUser(String updateUser) {
         this.updateUser = updateUser;
+    }
+
+    public BigDecimal getRate() {
+        return rate;
+    }
+
+    public void setRate(BigDecimal rate) {
+        this.rate = rate;
+    }
+
+    public Integer getRateUnitType() {
+        return rateUnitType;
+    }
+
+    public void setRateUnitType(Integer rateUnitType) {
+        this.rateUnitType = rateUnitType;
+    }
+
+    public Integer getRepayType() {
+        return repayType;
+    }
+
+    public void setRepayType(Integer repayType) {
+        this.repayType = repayType;
+    }
+
+    public BigDecimal getOverDueRate() {
+        return overDueRate;
+    }
+
+    public void setOverDueRate(BigDecimal overDueRate) {
+        this.overDueRate = overDueRate;
+    }
+
+    public Integer getOverDueRateUnit() {
+        return overDueRateUnit;
+    }
+
+    public void setOverDueRateUnit(Integer overDueRateUnit) {
+        this.overDueRateUnit = overDueRateUnit;
+    }
+
+    public List<ProjFeeReq> getProjFeeInfos() {
+        return projFeeInfos;
+    }
+
+    public void setProjFeeInfos(List<ProjFeeReq> projFeeInfos) {
+        this.projFeeInfos = projFeeInfos;
     }
 }

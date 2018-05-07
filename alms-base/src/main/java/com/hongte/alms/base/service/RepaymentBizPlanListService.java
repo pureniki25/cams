@@ -16,7 +16,7 @@ import org.apache.ibatis.annotations.Param;
  * </p>
  *
  * @author 曾坤
- * @since 2018-03-06
+ * @since 2018-05-03
  */
 public interface RepaymentBizPlanListService extends BaseService<RepaymentBizPlanList> {
 
@@ -39,7 +39,7 @@ public interface RepaymentBizPlanListService extends BaseService<RepaymentBizPla
      * @return
      */
     public List<RepaymentBizPlanList> selectNeedLawNorBiz(Integer overDueDays,Integer businessType );
-     
+
     String queryRepaymentBizPlanListByConditions(@Param(value="businessId") String businessId, @Param(value="afterId") String afterId);
 
     /**

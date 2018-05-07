@@ -1,6 +1,5 @@
 package com.hongte.alms.base.repayPlan.req;
 
-import com.baomidou.mybatisplus.annotations.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -10,11 +9,10 @@ import java.util.Date;
 /**
  * @author zengkun
  * @since 2018/4/20
- * 生成还款计划   业务的基本
+ * 生成还款计划   业务的基本信息
  */
 @ApiModel("创建还款计划的请求信息")
 public class BusinessBasicInfoReq {
-
 
 
     /**
@@ -22,6 +20,13 @@ public class BusinessBasicInfoReq {
      */
     @ApiModelProperty(required= true,value = "资产端业务编号")
     private String businessId;
+
+    /**
+     * 资产端原业务编号
+     */
+    @ApiModelProperty(required= true,value = "资产端业原务编号")
+    private String orgBusinessId;
+
     /**
      * 进件日期
      */
@@ -29,10 +34,10 @@ public class BusinessBasicInfoReq {
     private Date inputTime;
 
     /**
-     * 信贷的业务类型（对应tb_basic_business_type的xd_business_type_id)
+     * 业务类型（对应tb_basic_business_type的xd_business_type_id)
      */
     @ApiModelProperty(required= true,value = "信贷的业务类型")
-    private String  xdBusinessType;
+    private String businessType;
     /**
      * 业务所属子类型，若无则为空
      * 备注：这个业务所属的子类型，对应的信贷的字段是什么 需要与咏康核对一下
@@ -85,6 +90,8 @@ public class BusinessBasicInfoReq {
      */
     @ApiModelProperty(required= true,value = "借款利率类型，1：年利率，2：月利率，3：日利率")
     private Integer borrowRateUnit;
+
+
     /**
      * 业务主办人ID
      */
@@ -132,6 +139,12 @@ public class BusinessBasicInfoReq {
     @ApiModelProperty(required= true,value = "是否需要进行平台还款，1：是，0：否")
     private Integer isTuandaiRepay;
 
+    /**
+     * 是否展期业务，1：是，0：否
+     */
+    @ApiModelProperty(required= true,value = "是否展期业务，1：是，0：否")
+    private Integer isRenewBusiness;
+
 
     public String getBusinessId() {
         return businessId;
@@ -149,12 +162,12 @@ public class BusinessBasicInfoReq {
         this.inputTime = inputTime;
     }
 
-    public String getXdBusinessType() {
-        return xdBusinessType;
+    public String getBusinessType() {
+        return businessType;
     }
 
-    public void setXdBusinessType(String xdBusinessType) {
-        this.xdBusinessType = xdBusinessType;
+    public void setBusinessType(String businessType) {
+        this.businessType = businessType;
     }
 
     public String getBusinessCtype() {
@@ -310,5 +323,19 @@ public class BusinessBasicInfoReq {
     }
 
 
+    public Integer getIsRenewBusiness() {
+        return isRenewBusiness;
+    }
 
+    public void setIsRenewBusiness(Integer isRenewBusiness) {
+        this.isRenewBusiness = isRenewBusiness;
+    }
+
+    public String getOrgBusinessId() {
+        return orgBusinessId;
+    }
+
+    public void setOrgBusinessId(String orgBusinessId) {
+        this.orgBusinessId = orgBusinessId;
+    }
 }

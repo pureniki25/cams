@@ -13,11 +13,11 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
  * <p>
- * 业务还款计划信息
+ * 标的还款计划信息
  * </p>
  *
  * @author 曾坤
- * @since 2018-04-24
+ * @since 2018-05-03
  */
 @ApiModel
 @TableName("tb_repayment_proj_plan")
@@ -80,6 +80,18 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 	@ApiModelProperty(required= true,value = "生成还款计划对应的借款利率类型，1：年利率，2：月利率，3：日利率")
 	private Integer borrowRateUnit;
     /**
+     * 逾期滞纳金费率(%)
+     */
+	@TableField("over_due_rate")
+	@ApiModelProperty(required= true,value = "逾期滞纳金费率(%)")
+	private BigDecimal overDueRate;
+    /**
+     * 逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
+     */
+	@TableField("over_due_rate_unit")
+	@ApiModelProperty(required= true,value = "逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率")
+	private BigDecimal overDueRateUnit;
+    /**
      * 生成还款计划对应的借款期限
      */
 	@TableField("borrow_limit")
@@ -103,13 +115,23 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 	@TableField("is_defer")
 	@ApiModelProperty(required= true,value = "是否展期还款计划,0:否，1:是")
 	private Integer isDefer;
-
-	/**
-	 * 是否有效状态：1 有效 ，0 无效
-	 */
+    /**
+     * 是否有效状态：1 有效 ，0 无效
+     */
 	@ApiModelProperty(required= true,value = "是否有效状态：1 有效 ，0 无效")
 	private Integer active;
-
+    /**
+     * 创建系统类型：1.信贷生成，2.贷后管理生成
+     */
+	@TableField("creat_sys_type")
+	@ApiModelProperty(required= true,value = "创建系统类型：1.信贷生成，2.贷后管理生成")
+	private Integer creatSysType;
+    /**
+     * 平台标志：1.团贷网，2.你我金融
+     */
+	@TableField("plate_type")
+	@ApiModelProperty(required= true,value = "平台标志：1.团贷网，2.你我金融")
+	private Integer plateType;
     /**
      * 创建日期
      */
@@ -208,6 +230,22 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 		this.borrowRateUnit = borrowRateUnit;
 	}
 
+	public BigDecimal getOverDueRate() {
+		return overDueRate;
+	}
+
+	public void setOverDueRate(BigDecimal overDueRate) {
+		this.overDueRate = overDueRate;
+	}
+
+	public BigDecimal getOverDueRateUnit() {
+		return overDueRateUnit;
+	}
+
+	public void setOverDueRateUnit(BigDecimal overDueRateUnit) {
+		this.overDueRateUnit = overDueRateUnit;
+	}
+
 	public Integer getBorrowLimit() {
 		return borrowLimit;
 	}
@@ -238,6 +276,30 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 
 	public void setIsDefer(Integer isDefer) {
 		this.isDefer = isDefer;
+	}
+
+	public Integer getActive() {
+		return active;
+	}
+
+	public void setActive(Integer active) {
+		this.active = active;
+	}
+
+	public Integer getCreatSysType() {
+		return creatSysType;
+	}
+
+	public void setCreatSysType(Integer creatSysType) {
+		this.creatSysType = creatSysType;
+	}
+
+	public Integer getPlateType() {
+		return plateType;
+	}
+
+	public void setPlateType(Integer plateType) {
+		this.plateType = plateType;
 	}
 
 	public Date getCreateTime() {
@@ -289,22 +351,19 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 			", borrowMoney=" + borrowMoney +
 			", borrowRate=" + borrowRate +
 			", borrowRateUnit=" + borrowRateUnit +
+			", overDueRate=" + overDueRate +
+			", overDueRateUnit=" + overDueRateUnit +
 			", borrowLimit=" + borrowLimit +
 			", borrowLimitUnit=" + borrowLimitUnit +
 			", planStatus=" + planStatus +
 			", isDefer=" + isDefer +
+			", active=" + active +
+			", creatSysType=" + creatSysType +
+			", plateType=" + plateType +
 			", createTime=" + createTime +
 			", createUser=" + createUser +
 			", updateTime=" + updateTime +
 			", updateUser=" + updateUser +
 			"}";
-	}
-
-	public Integer getActive() {
-		return active;
-	}
-
-	public void setActive(Integer active) {
-		this.active = active;
 	}
 }

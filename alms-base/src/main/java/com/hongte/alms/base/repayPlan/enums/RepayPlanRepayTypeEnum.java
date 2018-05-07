@@ -35,7 +35,7 @@ public enum RepayPlanRepayTypeEnum {
 
 	}
 
-	public static RepayPlanRepayTypeEnum getByKey(String key){
+	public static RepayPlanRepayTypeEnum getByKey(Integer key){
 		for(RepayPlanRepayTypeEnum d : RepayPlanRepayTypeEnum.values()){
 			if(d.key.equals(key)){
 				return d;

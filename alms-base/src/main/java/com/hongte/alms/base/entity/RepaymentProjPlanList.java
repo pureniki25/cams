@@ -17,7 +17,7 @@ import io.swagger.annotations.ApiModelProperty;
  * </p>
  *
  * @author 曾坤
- * @since 2018-04-24
+ * @since 2018-05-03
  */
 @ApiModel
 @TableName("tb_repayment_proj_plan_list")
@@ -100,8 +100,14 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
      * 当前还款状态，目前只有三种，分别为"还款中"，"逾期"，"已还款"
      */
 	@TableField("current_status")
-	@ApiModelProperty(required= true,value = "当前还款状态，目前只有三种，分别为‘还款中’，‘逾期’，‘已还款’")
+	@ApiModelProperty(required= true,value = "当前还款状态，目前只有三种，分别为还款中，逾期，已还款")
 	private String currentStatus;
+    /**
+     * 当前还款子状态
+     */
+	@TableField("current_sub_status")
+	@ApiModelProperty(required= true,value = "当前还款子状态")
+	private String currentSubStatus;
     /**
      * 已还款类型标记，null或0：还款中，6：申请展期已还款，10：线下确认已还款，20：自动线下代扣已还款，21，人工线下代扣已还款，30：自动银行代扣已还款，31：人工银行代扣已还款，40：用户APP主动还款，50：线下财务确认全部结清，60：线下代扣全部结清，70：银行代扣全部结清
      */
@@ -114,114 +120,29 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 	@TableField("fact_repay_date")
 	@ApiModelProperty(required= true,value = "客户实还日期")
 	private Date factRepayDate;
-    /**
-     * 财务确认还款操作日期
-     */
-	@TableField("finance_comfirm_date")
-	@ApiModelProperty(required= true,value = "财务确认还款操作日期")
-	private Date financeComfirmDate;
-    /**
-     * 财务还款确认人ID
-     */
-	@TableField("finance_confirm_user")
-	@ApiModelProperty(required= true,value = "财务还款确认人ID")
-	private String financeConfirmUser;
-    /**
-     * 财务还款确认人名称
-     */
-	@TableField("finance_confirm_user_name")
-	@ApiModelProperty(required= true,value = "财务还款确认人名称")
-	private String financeConfirmUserName;
-    /**
-     * 财务还款金额确认(1:已确认,0:未确认)
-     */
-	@TableField("confirm_flag")
-	@ApiModelProperty(required= true,value = "财务还款金额确认(1:已确认,0:未确认)")
-	private Integer confirmFlag;
-    /**
-     * 财务确认自动代扣日期
-     */
-	@TableField("auto_withholding_confirmed_date")
-	@ApiModelProperty(required= true,value = "财务确认自动代扣日期")
-	private Date autoWithholdingConfirmedDate;
-    /**
-     * 确认自动代扣的确认者ID
-     */
-	@TableField("auto_withholding_confirmed_user")
-	@ApiModelProperty(required= true,value = "确认自动代扣的确认者ID")
-	private String autoWithholdingConfirmedUser;
-    /**
-     * 确认自动代扣的确认者姓名
-     */
-	@TableField("auto_withholding_confirmed_user_name")
-	@ApiModelProperty(required= true,value = "确认自动代扣的确认者姓名")
-	private String autoWithholdingConfirmedUserName;
-    /**
-     * 会计确认状态，0或null:待审核;1:已审核;2:已退回;3:已返审核;4:导入;
-     */
-	@TableField("accountant_confirm_status")
-	@ApiModelProperty(required= true,value = "会计确认状态，0或null:待审核;1:已审核;2:已退回;3:已返审核;4:导入;")
-	private Integer accountantConfirmStatus;
-    /**
-     * 会计确认人ID
-     */
-	@TableField("accountant_confirm_user")
-	@ApiModelProperty(required= true,value = "会计确认人ID")
-	private String accountantConfirmUser;
-    /**
-     * 会计确认人姓名
-     */
-	@TableField("accountant_confirm_user_name")
-	@ApiModelProperty(required= true,value = "会计确认人姓名")
-	private String accountantConfirmUserName;
-    /**
-     * 会计确认日期
-     */
-	@TableField("accountant_confirm_date")
-	@ApiModelProperty(required= true,value = "会计确认日期")
-	private Date accountantConfirmDate;
-    /**
-     * 标的资金端(平台)应还日期
-     */
-	@TableField("proj_due_date")
-	@ApiModelProperty(required= true,value = "标的资金端(平台)应还日期")
-	private Date projDueDate;
-    /**
-     * 标的当前期资产端总应还金额(元)，不含滞纳金
-     */
-	@TableField("biz_amount")
-	@ApiModelProperty(required= true,value = "标的当前期资产端总应还金额(元)，不含滞纳金")
-	private BigDecimal bizAmount;
-    /**
-     * 标的当前期资产端总应还滞纳金(元)，每天零点由系统自动计算
-     */
-	@TableField("biz_overdue_amount")
-	@ApiModelProperty(required= true,value = "标的当前期资产端总应还滞纳金(元)，每天零点由系统自动计算")
-	private BigDecimal bizOverdueAmount;
-    /**
-     * 标的当前期资金端总应还金额(元)，不含滞纳金
-     */
-	@TableField("proj_amount")
-	@ApiModelProperty(required= true,value = "标的当前期资金端总应还金额(元)，不含滞纳金")
-	private BigDecimal projAmount;
-    /**
-     * 标的当前期资金端总应还滞纳金(元)
-     */
-	@TableField("proj_overdue_amount")
-	@ApiModelProperty(required= true,value = "标的当前期资金端总应还滞纳金(元)")
-	private BigDecimal projOverdueAmount;
+
     /**
      * 还款备注
      */
 	@ApiModelProperty(required= true,value = "还款备注")
 	private String remark;
-
-	/**
-	 * 是否有效状态：1 有效 ，0 无效
-	 */
+    /**
+     * 是否有效状态：1 有效 ，0 无效
+     */
 	@ApiModelProperty(required= true,value = "是否有效状态：1 有效 ，0 无效")
 	private Integer active;
-
+    /**
+     * 生成系统类型：1.信贷生成，2.贷后管理生成
+     */
+	@TableField("creat_sys_type")
+	@ApiModelProperty(required= true,value = "生成系统类型：1.信贷生成，2.贷后管理生成")
+	private Integer creatSysType;
+    /**
+     * 平台标志：1.团贷网，2.你我金融
+     */
+	@TableField("plate_type")
+	@ApiModelProperty(required= true,value = "平台标志：1.团贷网，2.你我金融")
+	private Integer plateType;
     /**
      * 创建日期
      */
@@ -352,6 +273,14 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 		this.currentStatus = currentStatus;
 	}
 
+	public String getCurrentSubStatus() {
+		return currentSubStatus;
+	}
+
+	public void setCurrentSubStatus(String currentSubStatus) {
+		this.currentSubStatus = currentSubStatus;
+	}
+
 	public Integer getRepayFlag() {
 		return repayFlag;
 	}
@@ -368,140 +297,36 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 		this.factRepayDate = factRepayDate;
 	}
 
-	public Date getFinanceComfirmDate() {
-		return financeComfirmDate;
-	}
-
-	public void setFinanceComfirmDate(Date financeComfirmDate) {
-		this.financeComfirmDate = financeComfirmDate;
-	}
-
-	public String getFinanceConfirmUser() {
-		return financeConfirmUser;
-	}
-
-	public void setFinanceConfirmUser(String financeConfirmUser) {
-		this.financeConfirmUser = financeConfirmUser;
-	}
-
-	public String getFinanceConfirmUserName() {
-		return financeConfirmUserName;
-	}
-
-	public void setFinanceConfirmUserName(String financeConfirmUserName) {
-		this.financeConfirmUserName = financeConfirmUserName;
-	}
-
-	public Integer getConfirmFlag() {
-		return confirmFlag;
-	}
-
-	public void setConfirmFlag(Integer confirmFlag) {
-		this.confirmFlag = confirmFlag;
-	}
-
-	public Date getAutoWithholdingConfirmedDate() {
-		return autoWithholdingConfirmedDate;
-	}
-
-	public void setAutoWithholdingConfirmedDate(Date autoWithholdingConfirmedDate) {
-		this.autoWithholdingConfirmedDate = autoWithholdingConfirmedDate;
-	}
-
-	public String getAutoWithholdingConfirmedUser() {
-		return autoWithholdingConfirmedUser;
-	}
-
-	public void setAutoWithholdingConfirmedUser(String autoWithholdingConfirmedUser) {
-		this.autoWithholdingConfirmedUser = autoWithholdingConfirmedUser;
-	}
-
-	public String getAutoWithholdingConfirmedUserName() {
-		return autoWithholdingConfirmedUserName;
-	}
-
-	public void setAutoWithholdingConfirmedUserName(String autoWithholdingConfirmedUserName) {
-		this.autoWithholdingConfirmedUserName = autoWithholdingConfirmedUserName;
-	}
-
-	public Integer getAccountantConfirmStatus() {
-		return accountantConfirmStatus;
-	}
-
-	public void setAccountantConfirmStatus(Integer accountantConfirmStatus) {
-		this.accountantConfirmStatus = accountantConfirmStatus;
-	}
-
-	public String getAccountantConfirmUser() {
-		return accountantConfirmUser;
-	}
-
-	public void setAccountantConfirmUser(String accountantConfirmUser) {
-		this.accountantConfirmUser = accountantConfirmUser;
-	}
-
-	public String getAccountantConfirmUserName() {
-		return accountantConfirmUserName;
-	}
-
-	public void setAccountantConfirmUserName(String accountantConfirmUserName) {
-		this.accountantConfirmUserName = accountantConfirmUserName;
-	}
-
-	public Date getAccountantConfirmDate() {
-		return accountantConfirmDate;
-	}
-
-	public void setAccountantConfirmDate(Date accountantConfirmDate) {
-		this.accountantConfirmDate = accountantConfirmDate;
-	}
-
-	public Date getProjDueDate() {
-		return projDueDate;
-	}
-
-	public void setProjDueDate(Date projDueDate) {
-		this.projDueDate = projDueDate;
-	}
-
-	public BigDecimal getBizAmount() {
-		return bizAmount;
-	}
-
-	public void setBizAmount(BigDecimal bizAmount) {
-		this.bizAmount = bizAmount;
-	}
-
-	public BigDecimal getBizOverdueAmount() {
-		return bizOverdueAmount;
-	}
-
-	public void setBizOverdueAmount(BigDecimal bizOverdueAmount) {
-		this.bizOverdueAmount = bizOverdueAmount;
-	}
-
-	public BigDecimal getProjAmount() {
-		return projAmount;
-	}
-
-	public void setProjAmount(BigDecimal projAmount) {
-		this.projAmount = projAmount;
-	}
-
-	public BigDecimal getProjOverdueAmount() {
-		return projOverdueAmount;
-	}
-
-	public void setProjOverdueAmount(BigDecimal projOverdueAmount) {
-		this.projOverdueAmount = projOverdueAmount;
-	}
-
 	public String getRemark() {
 		return remark;
 	}
 
 	public void setRemark(String remark) {
 		this.remark = remark;
+	}
+
+	public Integer getActive() {
+		return active;
+	}
+
+	public void setActive(Integer active) {
+		this.active = active;
+	}
+
+	public Integer getCreatSysType() {
+		return creatSysType;
+	}
+
+	public void setCreatSysType(Integer creatSysType) {
+		this.creatSysType = creatSysType;
+	}
+
+	public Integer getPlateType() {
+		return plateType;
+	}
+
+	public void setPlateType(Integer plateType) {
+		this.plateType = plateType;
 	}
 
 	public Date getCreateTime() {
@@ -557,37 +382,17 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 			", overdueAmount=" + overdueAmount +
 			", overdueDays=" + overdueDays +
 			", currentStatus=" + currentStatus +
+			", currentSubStatus=" + currentSubStatus +
 			", repayFlag=" + repayFlag +
 			", factRepayDate=" + factRepayDate +
-			", financeComfirmDate=" + financeComfirmDate +
-			", financeConfirmUser=" + financeConfirmUser +
-			", financeConfirmUserName=" + financeConfirmUserName +
-			", confirmFlag=" + confirmFlag +
-			", autoWithholdingConfirmedDate=" + autoWithholdingConfirmedDate +
-			", autoWithholdingConfirmedUser=" + autoWithholdingConfirmedUser +
-			", autoWithholdingConfirmedUserName=" + autoWithholdingConfirmedUserName +
-			", accountantConfirmStatus=" + accountantConfirmStatus +
-			", accountantConfirmUser=" + accountantConfirmUser +
-			", accountantConfirmUserName=" + accountantConfirmUserName +
-			", accountantConfirmDate=" + accountantConfirmDate +
-			", projDueDate=" + projDueDate +
-			", bizAmount=" + bizAmount +
-			", bizOverdueAmount=" + bizOverdueAmount +
-			", projAmount=" + projAmount +
-			", projOverdueAmount=" + projOverdueAmount +
 			", remark=" + remark +
+			", active=" + active +
+			", creatSysType=" + creatSysType +
+			", plateType=" + plateType +
 			", createTime=" + createTime +
 			", createUser=" + createUser +
 			", updateTime=" + updateTime +
 			", updateUser=" + updateUser +
 			"}";
-	}
-
-	public Integer getActive() {
-		return active;
-	}
-
-	public void setActive(Integer active) {
-		this.active = active;
 	}
 }

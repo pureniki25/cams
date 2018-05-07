@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
@@ -13,60 +12,59 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
  * <p>
- * 还款计划应还项目明细表
+ * 标实还明细表
  * </p>
  *
  * @author 曾坤
  * @since 2018-05-03
  */
 @ApiModel
-@TableName("tb_repayment_biz_plan_list_detail")
-public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail> {
+@TableName("tb_repayment_proj_fact_repay")
+public class RepaymentProjFactRepay extends Model<RepaymentProjFactRepay> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 应还项目明细ID(主键)
+     * 标的实还项目明细ID（主键）
      */
-    @TableId("plan_detail_id")
-	@ApiModelProperty(required= true,value = "应还项目明细ID(主键)")
-	private String planDetailId;
+	@TableField("proj_plan_detail_repay_id")
+	@ApiModelProperty(required= true,value = "标的实还项目明细ID（主键）")
+	private String projPlanDetailRepayId;
     /**
-     * 所属还款计划列表ID(外键，对应tb_repayment_biz_plan_list.plan_list_id)
+     * 标的应还项目明细ID(外键  对应 tb_repayment_proj_plan_list_detail. proj_plan_detail_id)
      */
-	@TableField("plan_list_id")
-	@ApiModelProperty(required= true,value = "所属还款计划列表ID(外键，对应tb_repayment_biz_plan_list.plan_list_id)")
-	private String planListId;
+	@TableField("proj_plan_detail_id")
+	@ApiModelProperty(required= true,value = "标的应还项目明细ID(外键  对应 tb_repayment_proj_plan_list_detail. proj_plan_detail_id)")
+	private String projPlanDetailId;
     /**
-     * 还款计划所属业务ID(若当前业务为展期，则存展期业务编号)
+     * 上标项目编号
+     */
+	@TableField("project_id")
+	@ApiModelProperty(required= true,value = "上标项目编号")
+	private String projectId;
+    /**
+     * 还款计划所属业务编号(若当前业务为展期，则存展期业务编号)
      */
 	@TableField("business_id")
-	@ApiModelProperty(required= true,value = "还款计划所属业务ID(若当前业务为展期，则存展期业务编号)")
+	@ApiModelProperty(required= true,value = "还款计划所属业务编号(若当前业务为展期，则存展期业务编号)")
 	private String businessId;
-
+    /**
+     * 还款计划所属原业务编号
+     */
+	@TableField("orig_business_id")
+	@ApiModelProperty(required= true,value = "还款计划所属原业务编号")
+	private String origBusinessId;
     /**
      * 所属期数
      */
 	@ApiModelProperty(required= true,value = "所属期数")
 	private Integer period;
     /**
-     * 分润顺序（根据分润配置计算）
+     * 总批次期数，唯一，对应信贷系统的还款计划编号
      */
-	@TableField("share_profit_index")
-	@ApiModelProperty(required= true,value = "分润顺序（根据分润配置计算）")
-	private Integer shareProfitIndex;
-    /**
-     * 项目计划应还总金额(元)
-     */
-	@TableField("plan_amount")
-	@ApiModelProperty(required= true,value = "项目计划应还总金额(元)")
-	private BigDecimal planAmount;
-    /**
-     * 项目计划应还比例(%)，如0.5%则存0.5，可空
-     */
-	@TableField("plan_rate")
-	@ApiModelProperty(required= true,value = "项目计划应还比例(%)，如0.5%则存0.5，可空")
-	private BigDecimal planRate;
+	@TableField("after_id")
+	@ApiModelProperty(required= true,value = "总批次期数，唯一，对应信贷系统的还款计划编号")
+	private String afterId;
     /**
      * 资产端费用项ID，用于资产端区分同名的项目，若不存在同名费用项，可为空
      */
@@ -86,12 +84,6 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 	@ApiModelProperty(required= true,value = "应还项目所属分类，10：本金，20：利息，30：资产端分公司服务费，40：担保公司费用，50：资金端平台服务费，60：滞纳金，70：违约金，80：中介费，90：押金类费用，100：冲应收")
 	private Integer planItemType;
     /**
-     * 分账标记(冲应收还款，根据冲应收明细进行分账)，0：不线上分账，10：分账到借款人账户，20：分账到资产端账户，30：分账到资金端账户(平台)，40：分账到担保公司账户
-     */
-	@TableField("account_status")
-	@ApiModelProperty(required= true,value = "分账标记(冲应收还款，根据冲应收明细进行分账)，0：不线上分账，10：分账到借款人账户，20：分账到资产端账户，30：分账到资金端账户(平台)，40：分账到担保公司账户")
-	private Integer accountStatus;
-    /**
      * 实还金额(元)
      */
 	@TableField("fact_amount")
@@ -110,22 +102,17 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 	@ApiModelProperty(required= true,value = "实还日期")
 	private Date factRepayDate;
     /**
-     * 是否有效状态：1 有效 ，0 无效
+     * 还款来源关联的相关记录ID
      */
-	@ApiModelProperty(required= true,value = "是否有效状态：1 有效 ，0 无效")
-	private Integer active;
+	@TableField("repay_ref_id")
+	@ApiModelProperty(required= true,value = "还款来源关联的相关记录ID")
+	private String repayRefId;
     /**
      * 创建日期
      */
 	@TableField("create_date")
 	@ApiModelProperty(required= true,value = "创建日期")
 	private Date createDate;
-    /**
-     * 来源类型：1.信贷生成，2.贷后管理生成
-     */
-	@TableField("src_type")
-	@ApiModelProperty(required= true,value = "来源类型：1.信贷生成，2.贷后管理生成")
-	private Integer srcType;
     /**
      * 创建用户
      */
@@ -146,21 +133,28 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 	private String updateUser;
 
 
-
-	public String getPlanDetailId() {
-		return planDetailId;
+	public String getProjPlanDetailRepayId() {
+		return projPlanDetailRepayId;
 	}
 
-	public void setPlanDetailId(String planDetailId) {
-		this.planDetailId = planDetailId;
+	public void setProjPlanDetailRepayId(String projPlanDetailRepayId) {
+		this.projPlanDetailRepayId = projPlanDetailRepayId;
 	}
 
-	public String getPlanListId() {
-		return planListId;
+	public String getProjPlanDetailId() {
+		return projPlanDetailId;
 	}
 
-	public void setPlanListId(String planListId) {
-		this.planListId = planListId;
+	public void setProjPlanDetailId(String projPlanDetailId) {
+		this.projPlanDetailId = projPlanDetailId;
+	}
+
+	public String getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(String projectId) {
+		this.projectId = projectId;
 	}
 
 	public String getBusinessId() {
@@ -171,6 +165,14 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 		this.businessId = businessId;
 	}
 
+	public String getOrigBusinessId() {
+		return origBusinessId;
+	}
+
+	public void setOrigBusinessId(String origBusinessId) {
+		this.origBusinessId = origBusinessId;
+	}
+
 	public Integer getPeriod() {
 		return period;
 	}
@@ -179,28 +181,12 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 		this.period = period;
 	}
 
-	public Integer getShareProfitIndex() {
-		return shareProfitIndex;
+	public String getAfterId() {
+		return afterId;
 	}
 
-	public void setShareProfitIndex(Integer shareProfitIndex) {
-		this.shareProfitIndex = shareProfitIndex;
-	}
-
-	public BigDecimal getPlanAmount() {
-		return planAmount;
-	}
-
-	public void setPlanAmount(BigDecimal planAmount) {
-		this.planAmount = planAmount;
-	}
-
-	public BigDecimal getPlanRate() {
-		return planRate;
-	}
-
-	public void setPlanRate(BigDecimal planRate) {
-		this.planRate = planRate;
+	public void setAfterId(String afterId) {
+		this.afterId = afterId;
 	}
 
 	public String getFeeId() {
@@ -227,14 +213,6 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 		this.planItemType = planItemType;
 	}
 
-	public Integer getAccountStatus() {
-		return accountStatus;
-	}
-
-	public void setAccountStatus(Integer accountStatus) {
-		this.accountStatus = accountStatus;
-	}
-
 	public BigDecimal getFactAmount() {
 		return factAmount;
 	}
@@ -259,12 +237,12 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 		this.factRepayDate = factRepayDate;
 	}
 
-	public Integer getActive() {
-		return active;
+	public String getRepayRefId() {
+		return repayRefId;
 	}
 
-	public void setActive(Integer active) {
-		this.active = active;
+	public void setRepayRefId(String repayRefId) {
+		this.repayRefId = repayRefId;
 	}
 
 	public Date getCreateDate() {
@@ -273,14 +251,6 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 
 	public void setCreateDate(Date createDate) {
 		this.createDate = createDate;
-	}
-
-	public Integer getSrcType() {
-		return srcType;
-	}
-
-	public void setSrcType(Integer srcType) {
-		this.srcType = srcType;
 	}
 
 	public String getCreateUser() {
@@ -309,29 +279,27 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 
 	@Override
 	protected Serializable pkVal() {
-		return this.planDetailId;
+		return this.projPlanDetailRepayId;
 	}
 
 	@Override
 	public String toString() {
-		return "RepaymentBizPlanListDetail{" +
-			", planDetailId=" + planDetailId +
-			", planListId=" + planListId +
+		return "RepaymentProjFactRepay{" +
+			", projPlanDetailRepayId=" + projPlanDetailRepayId +
+			", projPlanDetailId=" + projPlanDetailId +
+			", projectId=" + projectId +
 			", businessId=" + businessId +
+			", origBusinessId=" + origBusinessId +
 			", period=" + period +
-			", shareProfitIndex=" + shareProfitIndex +
-			", planAmount=" + planAmount +
-			", planRate=" + planRate +
+			", afterId=" + afterId +
 			", feeId=" + feeId +
 			", planItemName=" + planItemName +
 			", planItemType=" + planItemType +
-			", accountStatus=" + accountStatus +
 			", factAmount=" + factAmount +
 			", repaySource=" + repaySource +
 			", factRepayDate=" + factRepayDate +
-			", active=" + active +
+			", repayRefId=" + repayRefId +
 			", createDate=" + createDate +
-			", srcType=" + srcType +
 			", createUser=" + createUser +
 			", updateDate=" + updateDate +
 			", updateUser=" + updateUser +
