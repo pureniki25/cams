@@ -4,7 +4,7 @@
 let app
 window.layinit(function (htConfig) {
     var _htConfig = htConfig;
-    var basePath = htConfig.coreBasePath;
+    var basePath = htConfig.basePath;
     var businessId = getQueryStr('businessId')
     var afterId = getQueryStr('afterId')
     var planListId = getQueryStr('planListId')
@@ -53,7 +53,7 @@ window.layinit(function (htConfig) {
 
         },
         created: function () {
-            axios.get('http://localhost:30621/' + 'finance/regRepayInfoList', {
+            axios.get(basePath + 'finance/finance/regRepayInfoList', {
                 params: {
                     planListId: planListId
                 }

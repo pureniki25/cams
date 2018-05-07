@@ -5,7 +5,7 @@
 let app
 window.layinit(function (htConfig) {
     var _htConfig = htConfig;
-    basePath = htConfig.coreBasePath;
+    let basePath = htConfig.basePath;
 
     app = new Vue({
         el: "#app",
@@ -75,7 +75,7 @@ window.layinit(function (htConfig) {
         },
         methods: {
             listDepartmentBank: function () {
-                axios.get(basePath + 'moneyPool/listDepartmentBank', { params: { businessId: this.businessId } })
+                axios.get(basePath + 'core/moneyPool/listDepartmentBank', { params: { businessId: this.businessId } })
                     .then(function (res) {
                         if (res.data.code == '1') {
                             app.bankAccounts = res.data.data
@@ -111,7 +111,7 @@ window.layinit(function (htConfig) {
                 if (this.acceptBank) {
                     params.acceptBank = this.acceptBank;
                 }
-                axios.get('http://localhost:30621/' + 'finance/moneyPool', { params: params })
+                axios.get(basePath + 'finance/finance/moneyPool', { params: params })
                     .then(function (res) {
                         if (res.data.code == '1') {
                             app.table.data = res.data.data
@@ -135,7 +135,7 @@ window.layinit(function (htConfig) {
                     this.$Message.warning({content:'未选择需要匹配的流水'})
                     return ;
                 }
-                axios.post('http://localhost:30621/' + 'finance/matchBankStatement',{
+                axios.post(basePath + 'finance/finance/matchBankStatement',{
                     req:{
                         array:this.selections,
                         businessId:this.businessId,
