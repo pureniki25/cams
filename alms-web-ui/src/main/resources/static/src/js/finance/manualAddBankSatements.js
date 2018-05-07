@@ -5,7 +5,7 @@
 let app
 window.layinit(function (htConfig) {
     var _htConfig = htConfig;
-    basePath = htConfig.coreBasePath;
+    let basePath = htConfig.basePath;
     let businessId = getQueryStr('businessId')
     let afterId = getQueryStr('afterId')
 

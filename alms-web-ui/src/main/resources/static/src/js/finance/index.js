@@ -4,7 +4,7 @@
 let app
 window.layinit(function (htConfig) {
     var _htConfig = htConfig;
-    var basePath = htConfig.coreBasePath;
+    var basePath = htConfig.basePath;
 
     app = new Vue({
         el: "#app",
@@ -232,7 +232,7 @@ window.layinit(function (htConfig) {
                     }
                 })
 
-                axios.get(basePath + 'finance/getFinanceMangerList', {
+                axios.get(basePath + 'finance/finance/getFinanceMangerList', {
                     params: params
                 })
                     .then(function (res) {
@@ -267,7 +267,7 @@ window.layinit(function (htConfig) {
                     app.$Message.error({ content: '获取会计确认状态失败' })
                 })
 
-            axios.get(basePath + 'finance/getCompanys')
+            axios.get(basePath + 'finance/finance/getCompanys')
                 .then(function (res) {
                     if (res.data.code == '1') {
                         app.companys = res.data.data
@@ -280,7 +280,7 @@ window.layinit(function (htConfig) {
                     app.$Message.error({ content: '获取分公司失败' })
                 })
 
-            axios.get(basePath + 'finance/getBusinessType')
+            axios.get(basePath + 'finance/finance/getBusinessType')
                 .then(function (res) {
                     if (res.data.code == '1') {
                         app.businessTypes = res.data.data

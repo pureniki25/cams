@@ -4,7 +4,7 @@
 let app
 window.layinit(function (htConfig) {
     var _htConfig = htConfig;
-    var basePath = htConfig.coreBasePath;
+    var basePath = htConfig.basePath;
     var businessId = getQueryStr('businessId')
     var afterId = getQueryStr('afterId')
     app = new Vue({
@@ -19,7 +19,7 @@ window.layinit(function (htConfig) {
         beforeCreate: function () {
         },
         created: function () {
-            axios.get(basePath+'finance/repayBaseInfo', {
+            axios.get(basePath+'finance/finance/repayBaseInfo', {
                 params: {
                     businessId: businessId,
                     afterId: afterId
