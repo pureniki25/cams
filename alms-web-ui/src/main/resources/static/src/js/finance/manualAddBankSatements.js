@@ -21,7 +21,7 @@ window.layinit(function (htConfig) {
             },
             acceptAccountLabel: '',
             upload: {
-                url: basePath + "moneyPool/uploadCert",
+                url: basePath + "core/moneyPool/uploadCert",
                 headers: {
                     app: axios.defaults.headers.common['app'],
                     Authorization: axios.defaults.headers.common['Authorization'],
@@ -68,7 +68,7 @@ window.layinit(function (htConfig) {
                 app.$Message.error({ content: '只能上传图片格式文件' });
             },
             listDepartmentBank:function(){
-                axios.get('http://localhost:30606/'+'moneyPool/listDepartmentBank',{params:{
+                axios.get(basePath+'core/moneyPool/listDepartmentBank',{params:{
                     businessId:businessId
                 }}).then(function(res){
                     if(res.data.code=='1'){
@@ -93,7 +93,7 @@ window.layinit(function (htConfig) {
                 })
                 params.businessId = businessId;
                 params.afterId = afterId;
-                axios.post(basePath+'moneyPool/addCustomerRepayment',params)
+                axios.post(basePath+'core/moneyPool/addCustomerRepayment',params)
                 .then(function(res){
                     if(res.data.code=='1'){
                         this.cancel()

@@ -53,7 +53,7 @@ window.layinit(function (htConfig) {
 
         },
         created: function () {
-            axios.get('http://localhost:30621/' + 'finance/regRepayInfoList', {
+            axios.get(basePath + 'finance/regRepayInfoList', {
                 params: {
                     planListId: planListId
                 }

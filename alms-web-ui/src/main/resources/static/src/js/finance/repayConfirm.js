@@ -21,6 +21,9 @@ window.layinit(function (htConfig) {
                 if(app[target]){
                     app[target]=false;
                 }
+            },
+            configModalStyle:function(target,style){
+                
             }
         },
         created:function(){

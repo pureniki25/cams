@@ -19,7 +19,7 @@ window.layinit(function (htConfig) {
         beforeCreate: function () {
         },
         created: function () {
-            axios.get('http://localhost:30621/'+'finance/repayBaseInfo', {
+            axios.get(basePath+'finance/repayBaseInfo', {
                 params: {
                     businessId: businessId,
                     afterId: afterId
