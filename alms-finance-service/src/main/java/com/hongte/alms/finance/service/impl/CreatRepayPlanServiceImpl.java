@@ -6,15 +6,14 @@ import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.BooleanEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.enums.repayPlan.*;
+import com.hongte.alms.base.service.*;
+import com.hongte.alms.common.util.ClassCopyUtil;
 import com.hongte.alms.finance.dto.repayPlan.RepaymentBizPlanDto;
 import com.hongte.alms.finance.dto.repayPlan.RepaymentBizPlanListDto;
 import com.hongte.alms.finance.dto.repayPlan.RepaymentProjPlanDto;
 import com.hongte.alms.finance.dto.repayPlan.RepaymentProjPlanListDto;
 import com.hongte.alms.finance.req.repayPlan.*;
 import com.hongte.alms.finance.service.CreatRepayPlanService;
-import com.hongte.alms.base.service.ProfitItemSetService;
-import com.hongte.alms.base.service.RepaymentBizPlanService;
-import com.hongte.alms.base.service.RepaymentProjPlanService;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.DateUtil;
 import org.slf4j.Logger;
@@ -46,8 +45,24 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
     RepaymentProjPlanService  repaymentProjPlanService;
 
     @Autowired
+    @Qualifier("RepaymentProjPlanListService")
+    RepaymentProjPlanListService  repaymentProjPlanListService;
+
+    @Autowired
+    @Qualifier("RepaymentProjPlanListDetailService")
+    RepaymentProjPlanListDetailService repaymentProjPlanListDetailService;
+
+    @Autowired
     @Qualifier("RepaymentBizPlanService")
-    RepaymentBizPlanService RepaymentBizPlanService;
+    RepaymentBizPlanService repaymentBizPlanService;
+
+    @Autowired
+    @Qualifier("RepaymentBizPlanListService")
+    RepaymentBizPlanListService repaymentBizPlanListService;
+
+    @Autowired
+    @Qualifier("RepaymentBizPlanListDetailService")
+    RepaymentBizPlanListDetailService repaymentBizPlanListDetailSevice;
 
     @Autowired
     @Qualifier("ProfitItemSetService")
@@ -236,6 +251,79 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         return retList;
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public  List<RepaymentBizPlanDto> creatAndSaveRepayPlan(CreatRepayPlanReq creatRepayPlanReq) throws IllegalAccessException, InstantiationException {
+
+        //判断是否重传
+        for(ProjInfoReq projInfoReq:creatRepayPlanReq.getProjInfoReqs() ){
+            List<RepaymentProjPlan> projList =  repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("project_id",projInfoReq.getProjectId()));
+
+            if(projList.size()>0){
+                for(RepaymentProjPlan projPlan:projList){
+                    if(projPlan.getActive().equals(RepayPlanActiveEnum.ACTIVE.getValue())){
+                        Integer diffDays = DateUtil.getDiffDays(projPlan.getCreateTime(),projInfoReq.getQueryFullsuccessDate());
+                        //如果同一个标的满标时间与还款计划生成的时间相差一天以内
+                        if(diffDays <= 1){
+                            throw  new CreatRepaymentExcepiton("已存在时间相近的还款计划");
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+        List<RepaymentBizPlanDto>  dtos = creatRepayPlan(creatRepayPlanReq);
+
+        /////  存储还款计划相关信息   开始  ////////////////
+        for(RepaymentBizPlanDto bizPlanDto:dtos){
+            RepaymentBizPlan bizPlan = bizPlanDto.getRepaymentBizPlan();
+            repaymentBizPlanService.insert(bizPlan);
+
+            List<RepaymentBizPlanListDto> bizPlanListDtos = bizPlanDto.getBizPlanListDtos();
+            for(RepaymentBizPlanListDto bizPlanListDto:bizPlanListDtos){
+                RepaymentBizPlanList  bizPlanList = bizPlanListDto.getRepaymentBizPlanList();
+                repaymentBizPlanListService.insert(bizPlanList);
+                List<RepaymentBizPlanListDetail>  bizPlanListDetails = bizPlanListDto.getBizPlanListDetails();
+                repaymentBizPlanListDetailSevice.insertBatch(bizPlanListDetails);
+            }
+
+            List<RepaymentProjPlanDto> projPlanDtos = bizPlanDto.getProjPlanDtos();
+            for(RepaymentProjPlanDto projPlanDto:projPlanDtos){
+                RepaymentProjPlan projPlan = projPlanDto.getRepaymentProjPlan();
+                repaymentProjPlanService.insert(projPlan);
+
+                List<RepaymentProjPlanListDto> projPlanListDtos = projPlanDto.getProjPlanListDtos();
+                for(RepaymentProjPlanListDto projPlanListDto:projPlanListDtos){
+                    RepaymentProjPlanList projPlanList = projPlanListDto.getRepaymentProjPlanList();
+                    repaymentProjPlanListService.insert(projPlanList);
+                    List<RepaymentProjPlanListDetail> repaymentProjPlanListDetails = projPlanListDto.getProjPlanListDetails();
+                    repaymentProjPlanListDetailService.insertBatch(repaymentProjPlanListDetails);
+                }
+            }
+        }
+        /////  存储还款计划相关信息   开始  ////////////////
+
+        /////  存储传入的相关信息  开始  //////////////
+
+        BasicBusiness  basicBusiness = ClassCopyUtil.copy(creatRepayPlanReq.getBusinessBasicInfoReq(),BusinessBasicInfoReq.class,BasicBusiness.class);
+
+        List<ProjInfoReq>  projInfoReqs = creatRepayPlanReq.getProjInfoReqs();
+        for(ProjInfoReq projInfoReq:projInfoReqs){
+
+        }
+
+//        copyObject
+
+
+        /////////   存储传入的相关信息   结束   ////////////
+
+
+        return dtos;
+
+
+    }
 
     /**
      * 根据标的的还款计划  生成 业务的还款计划信息
@@ -470,20 +558,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             repaymentProjPlanMap.put(batchId,projPlans);
 
             for(ProjInfoReq projInfoReq:reqList){
-                List<RepaymentProjPlan> projList =  repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("project_id",projInfoReq.getProjectId()));
 
-                if(projList.size()>0){
-                    for(RepaymentProjPlan projPlan:projList){
-                        if(projPlan.getActive().equals(RepayPlanActiveEnum.ACTIVE.getValue())){
-                            Integer diffDays = DateUtil.getDiffDays(projPlan.getCreateTime(),projInfoReq.getQueryFullsuccessDate());
-                            //如果同一个标的满标时间与还款计划生成的时间相差一天以内
-                            if(diffDays <= 1){
-                                throw  new CreatRepaymentExcepiton("已存在时间相近的还款计划");
-                            }
-                        }
-
-                    }
-                }
 
                 ///////  标还款计划表   一次出款 生成一条记录
                 RepaymentProjPlan repaymentProjPlan = new RepaymentProjPlan();
@@ -797,7 +872,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
      */
     private  String  calcAfterId(String businessId,Integer period,boolean isRenew){
 
-         List<RepaymentBizPlan> bizPlans =  RepaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",businessId));
+         List<RepaymentBizPlan> bizPlans =  repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",businessId));
          Integer size = bizPlans.size();
          size++;
 
