@@ -45,7 +45,7 @@ public class CreatRepayPlanServiceImplTest {
 
         creatRepayPlanReq.setRondmode(0);
         creatRepayPlanReq.setSmallNum(4);
-        creatRepayPlanReq.setPlateType(1);
+//        creatRepayPlanReq.setPlateType(1);
 
 
 
@@ -99,7 +99,7 @@ public class CreatRepayPlanServiceImplTest {
 
         creatRepayPlanReq.setRondmode(0);
         creatRepayPlanReq.setSmallNum(2);
-        creatRepayPlanReq.setPlateType(1);
+//        creatRepayPlanReq.setPlateType(1);
 
 
 
@@ -391,6 +391,7 @@ public class CreatRepayPlanServiceImplTest {
     private  ProjInfoReq creatProjInfoReq(BusinessBasicInfoReq  businessBasicInfoReq){
         ProjInfoReq req1 = new ProjInfoReq();
 
+        req1.setPlateType(1);
         req1.setProjectId("TestProjId111");
         req1.setStatusFlag("2");
         req1.setBeginTime(DateUtil.getDateTime("2018-5-1")); // 启标时间(用于生成还款计划)

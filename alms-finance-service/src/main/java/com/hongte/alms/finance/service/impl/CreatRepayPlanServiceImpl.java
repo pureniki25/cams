@@ -124,7 +124,6 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 repaymentPlanListBatchMap,
                 RepaymentProjPlanListDetailBatchMap,
                 repaymentProjPlanMap,
-                creatRepayPlanReq.getPlateType(),
                 businessBasicInfo,
                 projPlanDetailTotalMap,
                 projPlanListTotalMap );
@@ -432,7 +431,6 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
      * @param repaymentPlanListBatchMap  标的还款计划列表Map
      * @param RepaymentProjPlanListDetailBatchMap  标的还款计划详情Map
      * @param repaymentProjPlanMap  标的还款计划Map
-     * @param plateType  平台类型
      * @param businessBasicInfo  业务基础信息
      * @param projPlanDetailTotalMap  Map<批次,Map<标还款计划主表Id，Map<标还款计划list表Id，标的还款计划detail列表>>
      * @param projPlanListTotalMap  Map<批次,Map<标还款计划主表Id，标的还款计划list列表>>
@@ -443,7 +441,6 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                                      Map<String,Map<Integer,List<RepaymentProjPlanList>>>  repaymentPlanListBatchMap,
                                      Map<String,Map<Integer,Map<String,List<RepaymentProjPlanListDetail>>>>  RepaymentProjPlanListDetailBatchMap,
                                      Map<String,List<RepaymentProjPlan>> repaymentProjPlanMap,
-                                     Integer plateType,
                                      BusinessBasicInfoReq  businessBasicInfo,
                                      Map<String,Map<String,Map<String,List<RepaymentProjPlanListDetail>>>> projPlanDetailTotalMap,
                                      Map<String,Map<String,List<RepaymentProjPlanList>>> projPlanListTotalMap){
@@ -507,7 +504,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 repaymentProjPlan.setCreateTime(new Date());
                 repaymentProjPlan.setCreateUser(Constant.SYS_DEFAULT_USER);
                 repaymentProjPlan.setCreatSysType(RepayPlanCreateSysEnum.ALMS.getValue());
-                repaymentProjPlan.setPlateType(plateType);
+                repaymentProjPlan.setPlateType(projInfoReq.getPlateType());
 
                 projPlans.add(repaymentProjPlan);
                 List<ProjFeeReq> projFeeReqs =  projInfoReq.getProjFeeInfos();

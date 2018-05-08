@@ -65,8 +65,6 @@ public class CreatRepayPlanReq {
     private Integer smallNum;
 
 
-    @ApiModelProperty(required= true,value = "平台标志位：1，团贷网； 2，你我金融")
-    private Integer plateType;
 
 
 
@@ -126,11 +124,4 @@ public class CreatRepayPlanReq {
         this.smallNum = smallNum;
     }
 
-    public Integer getPlateType() {
-        return plateType;
-    }
-
-    public void setPlateType(Integer plateType) {
-        this.plateType = plateType;
-    }
 }

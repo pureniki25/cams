@@ -473,6 +473,11 @@ public class ProjInfoReq {
      */
     @ApiModelProperty(required= true,value = "审核结果,标审核失败时这里有原因(标的状态查询接口)")
     private String queryResultContent;
+
+    @ApiModelProperty(required= true,value = "平台标志位：1，团贷网； 2，你我金融")
+    private Integer plateType;
+
+
     /**
      * 创建日期
      */
@@ -1247,5 +1252,13 @@ public class ProjInfoReq {
 
     public void setPricipleMap(Map<Integer, BigDecimal> pricipleMap) {
         this.pricipleMap = pricipleMap;
+    }
+
+    public Integer getPlateType() {
+        return plateType;
+    }
+
+    public void setPlateType(Integer plateType) {
+        this.plateType = plateType;
     }
 }
