@@ -15,7 +15,6 @@
         <result column="guarantee_condition_desc" property="guaranteeConditionDesc" />
         <result column="class_name" property="className" />
         <result column="valid_status" property="validStatus" />
-        <result column="param_json" property="paramJson" />
         <result column="black_value1" property="blackValue1" />
         <result column="black_value2" property="blackValue2" />
         <result column="black_value3" property="blackValue3" />
@@ -23,19 +22,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, orig_business_id AS origBusinessId, op_sourse_type AS opSourseType, op_sourse_id AS opSourseId, op_user_id AS opUserId, op_username AS opUsername, op_time AS opTime, borrower_condition_desc AS borrowerConditionDesc, guarantee_condition_desc AS guaranteeConditionDesc, class_name AS className, valid_status AS validStatus, param_json AS paramJson, black_value1 AS blackValue1, black_value2 AS blackValue2, black_value3 AS blackValue3
+        id, orig_business_id AS origBusinessId, op_sourse_type AS opSourseType, op_sourse_id AS opSourseId, op_user_id AS opUserId, op_username AS opUsername, op_time AS opTime, borrower_condition_desc AS borrowerConditionDesc, guarantee_condition_desc AS guaranteeConditionDesc, class_name AS className, valid_status AS validStatus, black_value1 AS blackValue1, black_value2 AS blackValue2, black_value3 AS blackValue3
     </sql>
 
-	<update id="updateValidStatusByBusinessId">
-    	UPDATE 
-		  `tb_five_level_classify_business_change_log` t 
-		SET
-		  t.`valid_status` = '0' 
-		WHERE t.`orig_business_id` IN 
-		<foreach collection="businessIds" item="businessId" index="index"
-            open="(" close=")" separator=",">
-			#{businessId,jdbcType=VARCHAR}
-		</foreach>
-		AND t.`valid_status` = '1'
-    </update>
 </mapper>

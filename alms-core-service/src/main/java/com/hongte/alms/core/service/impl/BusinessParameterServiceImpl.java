@@ -1,4 +1,4 @@
-package com.hongte.alms.base.service.impl;
+package com.hongte.alms.core.service.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -6,6 +6,12 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -21,7 +27,6 @@ import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.entity.FiveLevelClassify;
 import com.hongte.alms.base.entity.FiveLevelClassifyCondition;
 import com.hongte.alms.base.mapper.BasicBusinessTypeMapper;
-import com.hongte.alms.base.service.BusinessParameterService;
 import com.hongte.alms.base.service.FiveLevelClassifyConditionService;
 import com.hongte.alms.base.service.FiveLevelClassifyService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
@@ -30,6 +35,7 @@ import com.hongte.alms.base.vo.module.classify.FiveLevelClassifyConditionVO;
 import com.hongte.alms.base.vo.module.classify.FiveLevelClassifyVO;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.StringUtil;
+import com.hongte.alms.core.service.BusinessParameterService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 
 @Service("BusinessParameterService")
@@ -335,106 +341,101 @@ public class BusinessParameterServiceImpl implements BusinessParameterService {
 
 	@Override
 	public String fiveLevelClassifyForBusiness(ClassifyConditionVO classifyConditionVO) {
-		try {
-			String resultClassName = "";
-			String businessId = classifyConditionVO.getBusinessId();
-			String opSourse = classifyConditionVO.getOpSourse();
-			List<String> guaranteeConditions = classifyConditionVO.getGuaranteeConditions();
-			List<String> mainBorrowerConditions = classifyConditionVO.getMainBorrowerConditions();
-			/*
-			 * 1、根据businessId获取到业务类型
-			 */
-			String businessTypeName = basicBusinessTypeMapper.queryBusinessTypeNameByBusinessId(businessId);
+		String resultClassName = "";
+		String businessId = classifyConditionVO.getBusinessId();
+		String opSourse = classifyConditionVO.getOpSourse();
+		List<String> guaranteeConditions = classifyConditionVO.getGuaranteeConditions();
+		List<String> mainBorrowerConditions = classifyConditionVO.getMainBorrowerConditions();
+		/*
+		 * 1、根据businessId获取到业务类型
+		 */
+		String businessTypeName = basicBusinessTypeMapper.queryBusinessTypeNameByBusinessId(businessId);
 
-			/*
-			 * 2、根据业务类型 获取 tb_five_level_classify 实体
-			 */
-			// 按严重级别降序排序，从最严重的开始匹配
-			List<FiveLevelClassify> fiveLevelClassifies = fiveLevelClassifyService
-					.selectList(new EntityWrapper<FiveLevelClassify>().eq("business_type", businessTypeName)
-							.orderBy("class_level", false));
-			if (CollectionUtils.isEmpty(fiveLevelClassifies)) {
-				return resultClassName;
-			}
+		/*
+		 * 2、根据业务类型 获取 tb_five_level_classify 实体
+		 */
+		// 按严重级别降序排序，从最严重的开始匹配
+		List<FiveLevelClassify> fiveLevelClassifies = fiveLevelClassifyService
+				.selectList(new EntityWrapper<FiveLevelClassify>().eq("business_type", businessTypeName)
+						.orderBy("class_level", false));
+		if (CollectionUtils.isEmpty(fiveLevelClassifies)) {
+			return resultClassName;
+		}
 
-			/*
-			 * 3、获取 该业务的 利息逾期，首期逾期，本期逾期，贷后跟踪记录配置，风控配置
-			 */
+		/*
+		 * 3、获取 该业务的 利息逾期，首期逾期，本期逾期，贷后跟踪记录配置，风控配置
+		 */
 
-			Integer interestOverdue = repaymentBizPlanListService.queryInterestOverdueByBusinessId(businessId); // 利息逾期
-			Integer firstPeriodOverdue = repaymentBizPlanListService.queryFirstPeriodOverdueByBusinessId(businessId); // 首期逾期
-			Integer principalOverdue = repaymentBizPlanListService.queryPrincipalOverdueByBusinessId(businessId); // 本期逾期
+		Integer interestOverdue = repaymentBizPlanListService.queryInterestOverdueByBusinessId(businessId); // 利息逾期
+		Integer firstPeriodOverdue = repaymentBizPlanListService.queryFirstPeriodOverdueByBusinessId(businessId); // 首期逾期
+		Integer principalOverdue = repaymentBizPlanListService.queryPrincipalOverdueByBusinessId(businessId); // 本期逾期
 
-			/*
-			 * 4、根据 tb_five_level_classify 实体 id 关联 tb_five_level_classify_condition
-			 * 的parent_id 且 valid_status = 1 的数据
-			 */
+		/*
+		 * 4、根据 tb_five_level_classify 实体 id 关联 tb_five_level_classify_condition
+		 * 的parent_id 且 valid_status = 1 的数据
+		 */
 
-			List<Boolean> bList = new ArrayList<>();
+		List<Boolean> bList = new ArrayList<>();
+		List<String> conditionId = new ArrayList<>();
 
-			for (FiveLevelClassify fiveLevelClassify : fiveLevelClassifies) {
+		for (FiveLevelClassify fiveLevelClassify : fiveLevelClassifies) {
 
-				// 查询 是否配置对应的条件列表且状态是 1（有效）的
-				List<FiveLevelClassifyCondition> conditions = fiveLevelClassifyConditionService
-						.selectList(new EntityWrapper<FiveLevelClassifyCondition>()
-								.eq("parent_id", fiveLevelClassify.getId()).eq("valid_status", "1"));
+			// 查询 是否配置对应的条件列表且状态是 1（有效）的
+			List<FiveLevelClassifyCondition> conditions = fiveLevelClassifyConditionService
+					.selectList(new EntityWrapper<FiveLevelClassifyCondition>()
+							.eq("parent_id", fiveLevelClassify.getId()).eq("valid_status", "1"));
 
-				if (CollectionUtils.isNotEmpty(conditions)) {
-					// 按照条件名称分别装入 conditionMap
-					Map<String, List<FiveLevelClassifyCondition>> conditionMap = handleConditions(conditions);
+			if (CollectionUtils.isNotEmpty(conditions)) {
+				// 按照条件名称分别装入 conditionMap
+				Map<String, List<FiveLevelClassifyCondition>> conditionMap = handleConditions(conditions);
 
-					if (!conditionMap.isEmpty()) {
-						for (Map.Entry<String, List<FiveLevelClassifyCondition>> entry : conditionMap.entrySet()) {
-							List<FiveLevelClassifyCondition> subConditions = entry.getValue();
-							if (CollectionUtils.isNotEmpty(subConditions)) {
+				if (!conditionMap.isEmpty()) {
+					for (Map.Entry<String, List<FiveLevelClassifyCondition>> entry : conditionMap.entrySet()) {
+						List<FiveLevelClassifyCondition> subConditions = entry.getValue();
+						if (CollectionUtils.isNotEmpty(subConditions)) {
 
-								String executeCondition = subConditions.get(0).getExecuteCondition();
+							String executeCondition = subConditions.get(0).getExecuteCondition();
 
-								for (FiveLevelClassifyCondition condition : subConditions) {
+							for (FiveLevelClassifyCondition condition : subConditions) {
 
-									String paramType = condition.getParamType();
+								String paramType = condition.getParamType();
 
-									String paramName = condition.getParamName();
+								String paramName = condition.getParamName();
 
-									String relation = condition.getTypeNameRelation();
+								String relation = condition.getTypeNameRelation();
 
-									// 首期逾期
-									handleFirstPeriod(firstPeriodOverdue, bList, paramType, paramName, relation);
-									// 利息逾期
-									handleIntersectOverdue(interestOverdue, bList, paramType, paramName, relation);
-									// 本金逾期
-									handlePrincipalOverdue(principalOverdue, bList, paramType, paramName, relation);
+								// 首期逾期
+								handleFirstPeriod(firstPeriodOverdue, bList, paramType, paramName, relation);
+								// 利息逾期
+								handleIntersectOverdue(interestOverdue, bList, paramType, paramName, relation);
+								// 本金逾期
+								handlePrincipalOverdue(principalOverdue, bList, paramType, paramName, relation);
 
-									if (Constant.FIVE_LEVEL_CLASSIFY_OP_SOUSE_TYPE_ALMS_LOG.equals(opSourse)
-											|| Constant.FIVE_LEVEL_CLASSIFY_OP_SOUSE_TYPE_ALMS_RISK_CONTROL
-													.equals(opSourse)) {
-										// 抵押物情况
-										handleGuarantee(guaranteeConditions, bList, paramType, paramName);
-										// 主借款人情况
-										handleMainBorrower(mainBorrowerConditions, bList, paramType, paramName);
-									}
+								if (Constant.FIVE_LEVEL_CLASSIFY_OP_SOUSE_TYPE_ALMS_LOG.equals(opSourse)
+										|| Constant.FIVE_LEVEL_CLASSIFY_OP_SOUSE_TYPE_ALMS_RISK_CONTROL
+												.equals(opSourse)) {
+									// 抵押物情况
+									handleGuarantee(guaranteeConditions, bList, paramType, paramName);
+									// 主借款人情况
+									handleMainBorrower(mainBorrowerConditions, bList, paramType, paramName);
 								}
-								// 满足条件的标识
-								Boolean executeConditionFlag = handleExecuteCondition(bList, executeCondition);
-
-								if (executeConditionFlag != null && executeConditionFlag) {
-									resultClassName = fiveLevelClassify.getClassName();
-									if (StringUtil.notEmpty(resultClassName)) {
-										return resultClassName;
-									}
-								}
-								bList.clear();
 							}
+							// 满足条件的标识
+							Boolean executeConditionFlag = handleExecuteCondition(bList, executeCondition);
+
+							if (executeConditionFlag != null && executeConditionFlag) {
+								resultClassName = fiveLevelClassify.getClassName();
+								if (StringUtil.notEmpty(resultClassName)) {
+									return resultClassName;
+								}
+							}
+							bList.clear();
 						}
 					}
 				}
 			}
-			return resultClassName;
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-			throw new ServiceException(e);
 		}
-
+		return resultClassName;
 	}
 
 	private void handleMainBorrower(List<String> mainBorrowerConditions, List<Boolean> bList, String paramType,
@@ -582,31 +583,32 @@ public class BusinessParameterServiceImpl implements BusinessParameterService {
 		return fiveLevelClassifyService.queryMayBeUsed(businessType, className);
 	}
 
-	@Transactional(rollbackFor = Exception.class)
-	@Override
-	public void deleteFiveLevelClassify(Map<String, Object> paramMap) {
-		try {
-			String userId = loginUserInfoHelper.getUserId();
-			Date currentTime = new Date();
-			FiveLevelClassify classify = new FiveLevelClassify();
-			String id = (String) paramMap.get("id");
-			classify.setId(id);
-			classify.setValidStatus("0"); // 0 、失效
-			classify.setUpdateTime(currentTime);
-			classify.setUpdateUser(userId);
-			fiveLevelClassifyService.updateById(classify);
-
-			FiveLevelClassifyCondition condition = new FiveLevelClassifyCondition();
-			condition.setValidStatus("0");
-			condition.setOpType("3");
-			condition.setUpdateTime(currentTime);
-			condition.setUpdateUser(userId);
-			fiveLevelClassifyConditionService.update(condition,
-					new EntityWrapper<FiveLevelClassifyCondition>().eq("parent_id", id));
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-			throw new ServiceException(e);
+	public static void main(String[] args) throws Exception {
+		long start = System.currentTimeMillis();
+		ExecutorService threadPool = Executors.newFixedThreadPool(2);
+		CompletionService<Integer> cs = new ExecutorCompletionService<>(threadPool);
+		for (int i = 1; i < 1000000; i++) {
+			final int taskID = i;
+			cs.submit(new Callable<Integer>() {
+				public Integer call() throws Exception {
+					return taskID;
+				}
+			});
 		}
+
+		for (int i = 1; i < 1000000; i++) {
+			try {
+				System.out.println(cs.take().get());
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
+		}
+
+		threadPool.shutdown();
+		long end = System.currentTimeMillis();
+		System.out.println("abdcasdsad:" + (end - start));
 	}
 
 }
