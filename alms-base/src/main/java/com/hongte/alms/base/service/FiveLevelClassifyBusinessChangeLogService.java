@@ -3,6 +3,7 @@ package com.hongte.alms.base.service;
 import java.util.List;
 
 import com.hongte.alms.base.entity.FiveLevelClassifyBusinessChangeLog;
+import com.hongte.alms.base.vo.module.classify.ClassifyConditionVO;
 import com.hongte.alms.common.service.BaseService;
 
 /**
@@ -16,6 +17,7 @@ import com.hongte.alms.common.service.BaseService;
 
 public interface FiveLevelClassifyBusinessChangeLogService extends BaseService<FiveLevelClassifyBusinessChangeLog> {
 
-	void businessChangeLog(String className, List<String> borrowerConditionDescList,
-			List<String> guaranteeConditionDescList, String uniqueId, String origBusinessId);
+	void businessChangeLog(ClassifyConditionVO classifyConditionVO);
+	
+	void updateValidStatusByBusinessId(List<String> businessIds);
 }

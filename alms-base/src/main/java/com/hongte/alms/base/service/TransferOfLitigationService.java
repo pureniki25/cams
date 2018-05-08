@@ -27,8 +27,8 @@ public interface TransferOfLitigationService {
 	Map<String, Object> getOverDueDatys(String businessId);
 	
 	/**
-	 * 查询车贷诉讼相关数据
-	 * @return 车贷诉讼相关数据
+	 * 查询房贷诉讼相关数据
+	 * @return 房贷诉讼相关数据
 	 * @param businessId 业务编号
 	 */
 	HouseLoanVO queryHouseLoanData(String businessId);

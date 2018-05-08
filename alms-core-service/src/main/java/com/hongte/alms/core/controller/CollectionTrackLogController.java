@@ -29,6 +29,7 @@ import com.hongte.alms.base.collection.vo.CollectionTrckLogReq;
 import com.hongte.alms.base.entity.FiveLevelClassifyBusinessChangeLog;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.feignClient.service.EipOperateService;
+import com.hongte.alms.base.service.BusinessParameterService;
 import com.hongte.alms.base.service.FiveLevelClassifyBusinessChangeLogService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.vo.module.classify.ClassifyConditionVO;
@@ -36,7 +37,6 @@ import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.common.vo.PageResult;
-import com.hongte.alms.core.service.BusinessParameterService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -211,7 +211,7 @@ public class CollectionTrackLogController {
 				vo.setGuaranteeConditions(guaranteeConditionDescList);
 			}
     		
-    		vo.setOpSourse("2"); 	//	操作源： 2、 贷后跟踪记录
+    		vo.setOpSourse(Constant.FIVE_LEVEL_CLASSIFY_OP_SOUSE_TYPE_ALMS_LOG); 	//	操作源： 2、 贷后跟踪记录
     		
     		String className = businessParameterService.fiveLevelClassifyForBusiness(vo);
     		return Result.success(className);
