@@ -228,12 +228,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
                 }
             }
-
-
-
-
         }
-
 
         //////  整理成 返回数据的格式  将信息返回出去  结束  ///////////
 
@@ -300,8 +295,12 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             BigDecimal bizPlanBorrowMoney= new BigDecimal(0);
             for (RepaymentProjPlan projPlan:projPlans ){
                 projPlan.setPlanId(bizPlan.getPlanId());
-                bizPlanBorrowMoney.add(projPlan.getBorrowMoney());
+                BigDecimal projBorrowMoney =projPlan.getBorrowMoney();
+                bizPlanBorrowMoney = bizPlanBorrowMoney.add(projBorrowMoney);
+                projBorrowMoney = projBorrowMoney.setScale(smallNum,roundingMode);
+                projPlan.setBorrowMoney(projBorrowMoney);
             }
+            bizPlanBorrowMoney = bizPlanBorrowMoney.setScale(smallNum,roundingMode);
             bizPlan.setBorrowMoney(bizPlanBorrowMoney);// 生成还款计划对应的借款总额(元)
 
             for(Integer period : planListPeroidMap.keySet()){
@@ -323,8 +322,12 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 //总计划应还金额
                 BigDecimal  totalBorrowAmount = new BigDecimal(0);
                 for(RepaymentProjPlanList  projPList:planLists){
-                    totalBorrowAmount.add(projPList.getTotalBorrowAmount());
+                    BigDecimal projTBAmount = projPList.getTotalBorrowAmount();
+                    totalBorrowAmount = totalBorrowAmount.add(projTBAmount);
+                    projTBAmount = projTBAmount.setScale(smallNum,roundingMode);
+                    projPList.setTotalBorrowAmount(projTBAmount);
                 }
+                totalBorrowAmount = totalBorrowAmount.setScale(smallNum,roundingMode);
                 bizPlanList.setTotalBorrowAmount(totalBorrowAmount);   //应还金额
                 bizPlanList.setOverdueAmount(null);   //总应还滞纳金(元)
                 bizPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());   //当前还款状态
@@ -364,8 +367,12 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                         //项目计划应还总金额(元)
                         BigDecimal planAmount = new BigDecimal(0);
                         for(RepaymentProjPlanListDetail pDetail: projpDetials){
-                            planAmount.add(pDetail.getProjPlanAmount());
+                            BigDecimal pPAmount = pDetail.getProjPlanAmount();
+                            planAmount = planAmount.add(pPAmount);
+                            pPAmount=  pPAmount.setScale(smallNum,roundingMode);
+                            pDetail.setProjPlanAmount(pPAmount);
                         }
+                        planAmount = planAmount.setScale(smallNum,roundingMode);
                         bizpDetial.setPlanAmount(planAmount);  //项目计划应还总金额(元)
 
                         bizpDetial.setPlanRate(null);  //项目计划应还比例(%)，如0.5%则存0.5，可空
@@ -503,55 +510,56 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 repaymentProjPlan.setPlateType(plateType);
 
                 projPlans.add(repaymentProjPlan);
-
-
-                ///////  标的还款计划00期   一次性收取的费用信息  开始   ///////////////
-                ////00期List 信息
-                RepaymentProjPlanList  zeroList =  creatRepaymentProjPlanList(repaymentProjPlan,0);// new RepaymentProjPlanList();
-                zeroList.setCurrentStatus(RepayPlanStatus.REPAYED.getName()); //当前还款状态  00期的直接置位为已还款
-                //将标的00期写入还款计划map
-                addPlanListToMap(repaymentPlanListPeriorMap,projPlanListPMap,zeroList, 0);
-
-
                 List<ProjFeeReq> projFeeReqs =  projInfoReq.getProjFeeInfos();
 
-                List<RepaymentProjPlanListDetail>  zeroListDetails = new LinkedList<>();
-
-                //轮询标的费用项列表
-                if(projFeeReqs !=null && projFeeReqs.size()>0){
-                    for(ProjFeeReq feeReq: projFeeReqs){
-                        //如果费用是一次性收取
-                        if(feeReq.getIsOneTimeCharge().equals(RepayPlanIsOneTimeChargeEnum.ONE_TIME.getKey())){
-                            String feeItemId = getFeeItemId(feeReq.getFeeItemId(),feeReq.getFeeType());
-                            RepaymentProjPlanListDetail   zeroListDetail = creatProjListDetail(zeroList);
-                            zeroListDetail.setProjPlanAmount(feeReq.getFeeValue());//项目计划应还总金额(元)
-                            zeroListDetail.setFeeId(feeItemId);//资产端费用项ID，用于资产端区分同名的项目，若不存在同名费用项，可为空
-                            zeroListDetail.setPlanItemName(feeReq.getFeeTypeName());//应还项目名称
-                            zeroListDetail.setPlanItemType(feeReq.getFeeType());//应还项目所属分类
-                            zeroListDetail.setAccountStatus(feeReq.getAccountStatus());//分账标记
-
-                            //将第0期费用项添加到Map中
-                            addDetialToMap(  repaymentProjPlanListDetailPeriorMap,
-                                    projdetailListMap,
-                                    feeItemId, zeroListDetail,0,
-                                    zeroList.getProjPlanId());
-                            //添加到第0期详情列表中
-                            zeroListDetails.add(zeroListDetail);
-                        }
-                        else{
-                            //不是一次性收取的话就计算出每一期需要交的费用项
-                            String feeItemId = getFeeItemId(feeReq.getFeeItemId(),feeReq.getFeeType());
-                        }
-                    }
-                }
-
-                BigDecimal zeroProidTotol = new BigDecimal(0);
-                for(RepaymentProjPlanListDetail detail:zeroListDetails){
-                    zeroProidTotol.add(detail.getProjPlanAmount());
-                }
-                zeroList.setTotalBorrowAmount(zeroProidTotol);
-
-                ///////  标的还款计划00期   一次性收取的费用信息  结束   ///////////////
+                ///////  标的还款计划00期   一次性收取的费用信息  开始   ///////////////
+//                ////00期List 信息
+//                RepaymentProjPlanList  zeroList =  creatRepaymentProjPlanList(repaymentProjPlan,0);// new RepaymentProjPlanList();
+//                zeroList.setCurrentStatus(RepayPlanStatus.REPAYED.getName()); //当前还款状态  00期的直接置位为已还款
+//                //将标的00期写入还款计划map
+//                addPlanListToMap(repaymentPlanListPeriorMap,projPlanListPMap,zeroList, 0);
+//
+//
+//
+//
+//                List<RepaymentProjPlanListDetail>  zeroListDetails = new LinkedList<>();
+//
+//                //轮询标的费用项列表
+//                if(projFeeReqs !=null && projFeeReqs.size()>0){
+//                    for(ProjFeeReq feeReq: projFeeReqs){
+//                        //如果费用是一次性收取
+//                        if(feeReq.getIsOneTimeCharge().equals(RepayPlanIsOneTimeChargeEnum.ONE_TIME.getKey())){
+//                            String feeItemId = getFeeItemId(feeReq.getFeeItemId(),feeReq.getFeeType());
+//                            RepaymentProjPlanListDetail   zeroListDetail = creatProjListDetail(zeroList);
+//                            zeroListDetail.setProjPlanAmount(feeReq.getFeeValue());//项目计划应还总金额(元)
+//                            zeroListDetail.setFeeId(feeItemId);//资产端费用项ID，用于资产端区分同名的项目，若不存在同名费用项，可为空
+//                            zeroListDetail.setPlanItemName(feeReq.getFeeTypeName());//应还项目名称
+//                            zeroListDetail.setPlanItemType(feeReq.getFeeType());//应还项目所属分类
+//                            zeroListDetail.setAccountStatus(feeReq.getAccountStatus());//分账标记
+//
+//                            //将第0期费用项添加到Map中
+//                            addDetialToMap(  repaymentProjPlanListDetailPeriorMap,
+//                                    projdetailListMap,
+//                                    feeItemId, zeroListDetail,0,
+//                                    zeroList.getProjPlanId());
+//                            //添加到第0期详情列表中
+//                            zeroListDetails.add(zeroListDetail);
+//                        }
+//                        else{
+//                            //不是一次性收取的话就计算出每一期需要交的费用项
+//                            String feeItemId = getFeeItemId(feeReq.getFeeItemId(),feeReq.getFeeType());
+//                        }
+//                    }
+//                }
+//
+//                BigDecimal zeroProidTotol = new BigDecimal(0);
+//
+//                for(RepaymentProjPlanListDetail detail:zeroListDetails){
+//                    zeroProidTotol = zeroProidTotol.add(detail.getProjPlanAmount());
+//                }
+//                zeroList.setTotalBorrowAmount(zeroProidTotol);
+//
+//                ///////  标的还款计划00期   一次性收取的费用信息  结束   ///////////////
 
                 //////   标的其他期还款计划   按月收取费用信息   开始  ///////////////
 
@@ -560,7 +568,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 //计算每月应还本金利息
                 Map<Integer,Map<String,BigDecimal>> repayPrinAndIni = calculateRepayPrinAndIni(
                         projInfoReq.getPeriodMonth(),projInfoReq.getFullBorrowMoney(),
-                        projInfoReq.getRate(),rateUnitEnum,repayType );
+                        projInfoReq.getRate(),rateUnitEnum,repayType,projInfoReq.getPricipleMap() );
 
                 for(int i=1;i<projInfoReq.getPeriodMonth()+1;i++){
                     //还款计划详情项列表
@@ -651,9 +659,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     //计算这当前标这一期  总应还金额
                     BigDecimal proidTotol = new BigDecimal(0);
                     for(RepaymentProjPlanListDetail detail:priodListDetails){
-                        proidTotol.add(detail.getProjPlanAmount());
+                        proidTotol=proidTotol.add(detail.getProjPlanAmount());
                     }
-                    projPlanList.setTotalBorrowAmount(zeroProidTotol);
+                    projPlanList.setTotalBorrowAmount(proidTotol);
                 }
 
                 //////   标的其他期还款计划   按月收取费用信息   结束  ///////////////
@@ -821,7 +829,8 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
     private Map<Integer,Map<String,BigDecimal>> calculateRepayPrinAndIni(
             Integer periodMonth,BigDecimal fullBorrowMoney,
             BigDecimal rate,RepayPlanBorrowRateUnitEnum rateUnit,
-            RepayPlanRepayIniCalcWayEnum repayType
+            RepayPlanRepayIniCalcWayEnum repayType,
+            Map<Integer,BigDecimal> principleMap
             ){
 
         Map<Integer,Map<String,BigDecimal>>  retMap  = new HashMap<>();
@@ -839,7 +848,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 break;
             case INT_AND_PRIN_EVERYTIME:   //分期还本付息
                 calcintAndPrinEverytime(fullBorrowMoney,monthRate
-                        ,periodMonth,retMap);
+                        ,periodMonth,retMap,principleMap);
                 break;
             case INT_AND_PRIN_AVERAGE:  //等本等息
                 calcIntAndPrinAverage(fullBorrowMoney,monthRate
@@ -927,13 +936,22 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
      * @param retList
      */
     private void calcintAndPrinEverytime(BigDecimal fullBorrowMoney,BigDecimal monthRate,
-                                         Integer periodMonth ,Map<Integer,Map<String,BigDecimal>>  retList
-            ){
+                                         Integer periodMonth ,Map<Integer,Map<String,BigDecimal>>  retList,
+            Map<Integer,BigDecimal> principleMap){
+
+        if(principleMap == null || principleMap.size()<=0){
+            throw new  CreatRepaymentExcepiton("分期还本付息没有每期应还本金对应信息");
+        }
+
         //每月应还本金
-        BigDecimal priciple = fullBorrowMoney.divide(new BigDecimal(periodMonth),smallNum,roundingMode);
+//        BigDecimal priciple = fullBorrowMoney.divide(new BigDecimal(periodMonth),smallNum,roundingMode);
         //前期已还本金
         BigDecimal payedPriciple = new BigDecimal(0);
         for(int i=0;i<periodMonth;i++){
+            BigDecimal priciple = principleMap.get(i+1);
+            if(priciple == null){
+                throw new  CreatRepaymentExcepiton("分期还本付息，找不到当前期:第"+(i+1)+"期应还本金");
+            }
             //每月应还利息
             BigDecimal interest = (fullBorrowMoney.subtract(payedPriciple)).multiply(monthRate);
             addPAndIToList(priciple,interest,retList,i);
@@ -987,7 +1005,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         BigDecimal monthRate;
         switch (rateUnit){
             case YEAR_RATE:
-                monthRate = rate.divide(new BigDecimal(12),smallNum,roundingMode);
+                monthRate = rate.divide(new BigDecimal(12),10,roundingMode);
                 break;
             case MONTH_RATE:
                 monthRate = rate;
@@ -999,7 +1017,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 monthRate = rate;
                 break;
         }
-        return monthRate.divide(new BigDecimal(100),smallNum,roundingMode);
+        return monthRate.divide(new BigDecimal(100),10,roundingMode);
     }
 
 
@@ -1033,7 +1051,16 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
     public static void main(String[] args) {
 
+        //进位方式枚举
+         RoundingMode roundingMode=RoundingMode.HALF_UP;
+        //保留的小数位数
+         Integer smallNum=4;
 
+         BigDecimal projTBAmount = new BigDecimal(12.3333335476554634532213234);
+
+        projTBAmount= projTBAmount.setScale(2,BigDecimal.ROUND_HALF_DOWN);
+
+        System.out.println(projTBAmount);
 //        System.out.println(UUID.randomUUID().toString());
 
         String periodStr=(new DecimalFormat("00")).format(120);

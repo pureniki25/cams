@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author zengkun
@@ -265,6 +266,9 @@ public class ProjInfoReq {
 
     @ApiModelProperty(required= true,value = "还款方式：1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息,11:等本等息")
     private Integer repayType;
+
+    @ApiModelProperty(value = "每期还本Map  Map<期数，还本金额>")
+    private Map<Integer,BigDecimal> pricipleMap;
 
 
     /**
@@ -1235,5 +1239,13 @@ public class ProjInfoReq {
 
     public void setProjFeeInfos(List<ProjFeeReq> projFeeInfos) {
         this.projFeeInfos = projFeeInfos;
+    }
+
+    public Map<Integer, BigDecimal> getPricipleMap() {
+        return pricipleMap;
+    }
+
+    public void setPricipleMap(Map<Integer, BigDecimal> pricipleMap) {
+        this.pricipleMap = pricipleMap;
     }
 }

@@ -22,10 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author zengkun
@@ -101,7 +98,7 @@ public class CreatRepayPlanServiceImplTest {
         CreatRepayPlanReq creatRepayPlanReq = new CreatRepayPlanReq();
 
         creatRepayPlanReq.setRondmode(0);
-        creatRepayPlanReq.setSmallNum(4);
+        creatRepayPlanReq.setSmallNum(2);
         creatRepayPlanReq.setPlateType(1);
 
 
@@ -125,6 +122,15 @@ public class CreatRepayPlanServiceImplTest {
         ProjInfoReq req1 =creatProjInfoReq(businessBasicInfoReq);
         tuandaiProjReqInfos.add(req1);
 
+        Map<Integer,BigDecimal> principleMap1 = new HashMap<>();
+        req1.setPricipleMap(principleMap1);
+        principleMap1.put(1,new BigDecimal(4200));
+        principleMap1.put(2,new BigDecimal(4200));
+        principleMap1.put(3,new BigDecimal(4200));
+        principleMap1.put(4,new BigDecimal(4200));
+        principleMap1.put(5,new BigDecimal(4200));
+        principleMap1.put(6,new BigDecimal(9000));
+
         req1.setProjectId("137e8a4a-0727-4551-b20a-48b0d6679cfa");
         req1.setStatusFlag("4");
         req1.setBeginTime(DateUtil.getDateTime("2018/3/15")); // 启标时间(用于生成还款计划)
@@ -143,9 +149,9 @@ public class CreatRepayPlanServiceImplTest {
 
 
 
-
         List<ProjFeeReq>   feeList1 = new LinkedList<>();
         req1.setProjFeeInfos(feeList1);
+
 
 
         ProjFeeReq feeReq10 = creatProjFeeReq(req1);
@@ -208,6 +214,16 @@ public class CreatRepayPlanServiceImplTest {
 
         ProjInfoReq req2 =creatProjInfoReq(businessBasicInfoReq);
         tuandaiProjReqInfos.add(req2);
+
+        Map<Integer,BigDecimal> principleMap2 = new HashMap<>();
+        req2.setPricipleMap(principleMap2);
+        principleMap2.put(1,new BigDecimal(2800));
+        principleMap2.put(2,new BigDecimal(2800));
+        principleMap2.put(3,new BigDecimal(2800));
+        principleMap2.put(4,new BigDecimal(2800));
+        principleMap2.put(5,new BigDecimal(2800));
+        principleMap2.put(6,new BigDecimal(6000));
+
 
 
         req2.setProjectId("670d149e-6b63-4810-b437-f993b0bc9af9");
