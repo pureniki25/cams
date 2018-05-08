@@ -221,7 +221,24 @@ public class WithholdingRepaymentLogController {
 	    @ApiOperation(value = "还款计划日志表导出Excel  ")
 	    @PostMapping("/saveExcel")  
 	    public Result saveExcel(HttpServletRequest request, HttpServletResponse response,@RequestBody RepaymentLogReq req) throws Exception {
+	        logger.info("@代扣查询@代扣查询台账--存储Excel--开始[{}]" , req);
 	    	req.setUserId(loginUserInfoHelper.getUserId());
+	    	
+	        //取最近3天记录
+        	if(req.getDateBegin()==null&&req.getDateEnd()==null) {
+	            Calendar calendar = Calendar.getInstance();
+	            calendar.setTime(new Date());
+                calendar.set(Calendar.HOUR_OF_DAY, -48);
+                calendar.set(Calendar.MINUTE, 0);
+                calendar.set(Calendar.SECOND, 0);
+                req.setDateBegin(calendar.getTime());
+                calendar.setTime(new Date());
+                calendar.set(Calendar.HOUR_OF_DAY, 24);
+                calendar.set(Calendar.MINUTE, 0);
+                calendar.set(Calendar.SECOND, 0);
+                req.setDateEnd(calendar.getTime());
+        	}
+
 	        EasyPoiExcelExportUtil.setResponseHead(response,"repaylogmengt.xls");
 	        List<RepaymentLogVO> list = withholdingRepaymentlogService.selectRepaymentLogExcel(req);
  
@@ -233,13 +250,15 @@ public class WithholdingRepaymentLogController {
 
 
 	        Map<String,String> retMap = storageService.storageExcelWorkBook(workbook,fileName);
-
+	        String docUrl=retMap.get("docUrl");
 	        retMap.put("errorInfo","");
 	        retMap.put("sucFlage","true");
 
 	        if(retMap.get("sucFlage").equals("true")){
-	            return  Result.success(fileName);
+	            logger.info("@代扣查询@代扣查询台账--存储Excel---结束[{}]" , fileName);
+	            return  Result.success(docUrl);
 	        }else{
+	            logger.info("@代扣查询首页@代扣查询台账--存储Excel---失败[{}]" ,  retMap.get("errorInfo"));
 	            return Result.error("500", retMap.get("errorInfo"));
 	        }
 
