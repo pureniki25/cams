@@ -340,21 +340,6 @@ public class BusinessParameterController {
 		}
 	}
 
-	@PostMapping("/fiveLevelClassifyForBusiness")
-	@ResponseBody
-	public Result<String> fiveLevelClassifyForBusiness(@RequestBody ClassifyConditionVO classifyConditionVO) {
-		try {
-			if (classifyConditionVO == null || StringUtil.isEmpty(classifyConditionVO.getBusinessId())
-					|| StringUtil.isEmpty(classifyConditionVO.getOpSourse())) {
-				return Result.error("500", "参数不能为空！");
-			}
-			return Result.success(businessParameterService.fiveLevelClassifyForBusiness(classifyConditionVO));
-		} catch (Exception e) {
-			LOG.error("匹配业务类别失败！", e);
-			throw new ServiceException("系统异常，匹配业务类别失败！");
-		}
-	}
-
 	@GetMapping("/fiveLevelClassifySchedule")
 	@ResponseBody
 	public Result<String> fiveLevelClassifySchedule() {
@@ -364,23 +349,6 @@ public class BusinessParameterController {
 		} catch (Exception e) {
 			LOG.error("手工执行五级分类调度任务失败！", e);
 			throw new ServiceException("系统异常，手工执行五级分类调度任务失败！");
-		}
-	}
-
-	@PostMapping("/businessChangeLog")
-	@ResponseBody
-	public Result<String> businessChangeLog(@RequestBody ClassifyConditionVO classifyConditionVO) {
-		try {
-			if (classifyConditionVO == null || StringUtil.isEmpty(classifyConditionVO.getBusinessId())
-					|| StringUtil.isEmpty(classifyConditionVO.getOpSourse())
-					|| StringUtil.isEmpty(classifyConditionVO.getOpSourseId())) {
-				return Result.error("500", "参数不能为空！");
-			}
-			fiveLevelClassifyBusinessChangeLogService.businessChangeLog(classifyConditionVO);
-			return Result.success();
-		} catch (Exception e) {
-			LOG.error("业务类别变更记录失败！", e);
-			throw new ServiceException("系统异常，业务类别变更记录失败！");
 		}
 	}
 
