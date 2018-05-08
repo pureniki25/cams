@@ -17,7 +17,7 @@ import io.swagger.annotations.ApiModelProperty;
  * </p>
  *
  * @author 胡伟骞
- * @since 2018-04-27
+ * @since 2018-05-07
  */
 @ApiModel
 @TableName("tb_five_level_classify_business_change_log")
@@ -91,6 +91,12 @@ public class FiveLevelClassifyBusinessChangeLog extends Model<FiveLevelClassifyB
 	@TableField("valid_status")
 	@ApiModelProperty(required= true,value = "是否有效：1、有效；0、失效")
 	private String validStatus;
+    /**
+     * 参数JSON
+     */
+	@TableField("param_json")
+	@ApiModelProperty(required= true,value = "参数JSON")
+	private String paramJson;
     /**
      * 预留字段1
      */
@@ -199,6 +205,14 @@ public class FiveLevelClassifyBusinessChangeLog extends Model<FiveLevelClassifyB
 		this.validStatus = validStatus;
 	}
 
+	public String getParamJson() {
+		return paramJson;
+	}
+
+	public void setParamJson(String paramJson) {
+		this.paramJson = paramJson;
+	}
+
 	public String getBlackValue1() {
 		return blackValue1;
 	}
@@ -242,6 +256,7 @@ public class FiveLevelClassifyBusinessChangeLog extends Model<FiveLevelClassifyB
 			", guaranteeConditionDesc=" + guaranteeConditionDesc +
 			", className=" + className +
 			", validStatus=" + validStatus +
+			", paramJson=" + paramJson +
 			", blackValue1=" + blackValue1 +
 			", blackValue2=" + blackValue2 +
 			", blackValue3=" + blackValue3 +

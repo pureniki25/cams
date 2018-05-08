@@ -27,15 +27,17 @@ import com.hongte.alms.base.entity.FiveLevelClassify;
 import com.hongte.alms.base.entity.FiveLevelClassifyCondition;
 import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.service.BasicBusinessTypeService;
+import com.hongte.alms.base.service.BusinessParameterService;
+import com.hongte.alms.base.service.FiveLevelClassifyBusinessChangeLogService;
 import com.hongte.alms.base.service.FiveLevelClassifyService;
 import com.hongte.alms.base.service.SysParameterService;
+import com.hongte.alms.base.vo.module.classify.ClassifyConditionVO;
 import com.hongte.alms.base.vo.module.classify.FiveLevelClassifyConditionVO;
 import com.hongte.alms.base.vo.module.classify.FiveLevelClassifyVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.common.vo.PageResult;
-import com.hongte.alms.core.service.BusinessParameterService;
 
 @Controller
 @RequestMapping("/businessParameter")
@@ -57,6 +59,10 @@ public class BusinessParameterController {
 	@Autowired
 	@Qualifier("SysParameterService")
 	private SysParameterService sysParameterService;
+
+	@Autowired
+	@Qualifier("FiveLevelClassifyBusinessChangeLogService")
+	private FiveLevelClassifyBusinessChangeLogService fiveLevelClassifyBusinessChangeLogService;
 
 	@SuppressWarnings("rawtypes")
 	@GetMapping("/queryFiveLevelClassifys")
@@ -151,8 +157,9 @@ public class BusinessParameterController {
 					|| StringUtil.isEmpty(param.getClassName())) {
 				return Result.error("500", "参数不能为空！");
 			}
-			int count = fiveLevelClassifyService.selectCount(new EntityWrapper<FiveLevelClassify>()
-					.eq("business_type", param.getBusinessType()).eq("class_name", param.getClassName()).eq("valid_status", "1"));
+			int count = fiveLevelClassifyService
+					.selectCount(new EntityWrapper<FiveLevelClassify>().eq("business_type", param.getBusinessType())
+							.eq("class_name", param.getClassName()).eq("valid_status", "1"));
 			if (count > 0) {
 				return Result.error("500", "已存在该类型，请重新输入");
 			}
@@ -188,10 +195,8 @@ public class BusinessParameterController {
 	@ResponseBody
 	public Result deleteFiveLevelClassify(@RequestBody Map<String, Object> param) {
 		try {
-			if (fiveLevelClassifyService.deleteById((String) param.get("id"))) {
-				return Result.success();
-			}
-			return Result.error("500", "删除失败！");
+			businessParameterService.deleteFiveLevelClassify(param);
+			return Result.success();
 		} catch (Exception e) {
 			LOG.error("--deleteFiveLevelClassify--删除五级分类设置信息失败！", e);
 			throw new ServiceException("系统异常，删除五级分类设置信息失败！");
@@ -296,12 +301,11 @@ public class BusinessParameterController {
 			throw new ServiceException("系统异常，查找业务类别-条件明细失败！");
 		}
 	}
-	
+
 	@SuppressWarnings("rawtypes")
 	@GetMapping("/queryMayBeUsed")
 	@ResponseBody
-	public Result queryMayBeUsed(
-			@RequestParam(value = "className") String className,
+	public Result queryMayBeUsed(@RequestParam(value = "className") String className,
 			@RequestParam(value = "businessType") String businessType) {
 		try {
 			if (StringUtil.isEmpty(className) || StringUtil.isEmpty(businessType)) {
@@ -333,6 +337,50 @@ public class BusinessParameterController {
 		} catch (Exception e) {
 			LOG.error("删除业务类别-条件明细失败！", e);
 			throw new ServiceException("系统异常，删除业务类别-条件明细失败！");
+		}
+	}
+
+	@PostMapping("/fiveLevelClassifyForBusiness")
+	@ResponseBody
+	public Result<String> fiveLevelClassifyForBusiness(@RequestBody ClassifyConditionVO classifyConditionVO) {
+		try {
+			if (classifyConditionVO == null || StringUtil.isEmpty(classifyConditionVO.getBusinessId())
+					|| StringUtil.isEmpty(classifyConditionVO.getOpSourse())) {
+				return Result.error("500", "参数不能为空！");
+			}
+			return Result.success(businessParameterService.fiveLevelClassifyForBusiness(classifyConditionVO));
+		} catch (Exception e) {
+			LOG.error("匹配业务类别失败！", e);
+			throw new ServiceException("系统异常，匹配业务类别失败！");
+		}
+	}
+
+	@GetMapping("/fiveLevelClassifySchedule")
+	@ResponseBody
+	public Result<String> fiveLevelClassifySchedule() {
+		try {
+			fiveLevelClassifyService.fiveLevelClassifySchedule();
+			return Result.success();
+		} catch (Exception e) {
+			LOG.error("手工执行五级分类调度任务失败！", e);
+			throw new ServiceException("系统异常，手工执行五级分类调度任务失败！");
+		}
+	}
+
+	@PostMapping("/businessChangeLog")
+	@ResponseBody
+	public Result<String> businessChangeLog(@RequestBody ClassifyConditionVO classifyConditionVO) {
+		try {
+			if (classifyConditionVO == null || StringUtil.isEmpty(classifyConditionVO.getBusinessId())
+					|| StringUtil.isEmpty(classifyConditionVO.getOpSourse())
+					|| StringUtil.isEmpty(classifyConditionVO.getOpSourseId())) {
+				return Result.error("500", "参数不能为空！");
+			}
+			fiveLevelClassifyBusinessChangeLogService.businessChangeLog(classifyConditionVO);
+			return Result.success();
+		} catch (Exception e) {
+			LOG.error("业务类别变更记录失败！", e);
+			throw new ServiceException("系统异常，业务类别变更记录失败！");
 		}
 	}
 

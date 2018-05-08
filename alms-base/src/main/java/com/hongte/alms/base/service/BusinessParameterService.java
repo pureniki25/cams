@@ -1,4 +1,4 @@
-package com.hongte.alms.core.service;
+package com.hongte.alms.base.service;
 
 import java.util.List;
 import java.util.Map;
@@ -34,5 +34,7 @@ public interface BusinessParameterService {
 	String fiveLevelClassifyForBusiness(ClassifyConditionVO classifyConditionVO);
 	
 	Integer queryMayBeUsed(String businessType, String className);
+	
+	void deleteFiveLevelClassify(Map<String, Object> paramMap);
 	
 }
