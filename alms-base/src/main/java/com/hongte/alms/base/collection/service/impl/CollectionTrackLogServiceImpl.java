@@ -9,9 +9,7 @@ import com.hongte.alms.base.collection.vo.CollectionTrackLogVo;
 import com.hongte.alms.base.collection.vo.CollectionTrckLogReq;
 import com.hongte.alms.base.service.FiveLevelClassifyBusinessChangeLogService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
-import com.hongte.alms.base.vo.module.classify.ClassifyConditionVO;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
-import com.hongte.alms.common.util.Constant;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,16 +92,10 @@ public class CollectionTrackLogServiceImpl extends BaseServiceImpl<CollectionTra
 		if (count > 0) {
 
 			String origBusinessId = repaymentBizPlanListService.selectById(log.getRbpId()).getOrigBusinessId();
-			
-			ClassifyConditionVO classifyConditionVO = new ClassifyConditionVO();
-			classifyConditionVO.setBusinessId(origBusinessId);
-			classifyConditionVO.setClassName(log.getClassName());
-			classifyConditionVO.setGuaranteeConditions(log.getGuaranteeConditionDescList());
-			classifyConditionVO.setMainBorrowerConditions(log.getBorrowerConditionDescList());
-			classifyConditionVO.setOpSourse(Constant.FIVE_LEVEL_CLASSIFY_OP_SOUSE_TYPE_ALMS_LOG);
-			classifyConditionVO.setOpSourseId(log.getUniqueId());
-			
-			fiveLevelClassifyBusinessChangeLogService.businessChangeLog(classifyConditionVO);
+
+			fiveLevelClassifyBusinessChangeLogService.businessChangeLog(log.getClassName(),
+					log.getBorrowerConditionDescList(), log.getGuaranteeConditionDescList(), log.getUniqueId(),
+					origBusinessId);
 		}
 	}
 

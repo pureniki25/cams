@@ -18,16 +18,6 @@ public class ClassifyConditionVO implements Serializable {
 	private String opSourse;
 
 	/**
-	 * 操作源ID
-	 */
-	private String opSourseId;
-
-	/**
-	 * 分类名称
-	 */
-	private String className;
-
-	/**
 	 * 抵押物信息
 	 */
 	private List<String> guaranteeConditions;
@@ -53,22 +43,6 @@ public class ClassifyConditionVO implements Serializable {
 		this.opSourse = opSourse;
 	}
 
-	public String getOpSourseId() {
-		return opSourseId;
-	}
-
-	public void setOpSourseId(String opSourseId) {
-		this.opSourseId = opSourseId;
-	}
-
-	public String getClassName() {
-		return className;
-	}
-
-	public void setClassName(String className) {
-		this.className = className;
-	}
-
 	public List<String> getGuaranteeConditions() {
 		return guaranteeConditions;
 	}
@@ -87,9 +61,8 @@ public class ClassifyConditionVO implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ClassifyConditionVO [businessId=" + businessId + ", opSourse=" + opSourse + ", opSourseId=" + opSourseId
-				+ ", className=" + className + ", guaranteeConditions=" + guaranteeConditions
-				+ ", mainBorrowerConditions=" + mainBorrowerConditions + "]";
+		return "ClassifyConditionVO [businessId=" + businessId + ", opSourse=" + opSourse + ", guaranteeConditions="
+				+ guaranteeConditions + ", mainBorrowerConditions=" + mainBorrowerConditions + "]";
 	}
 
 }

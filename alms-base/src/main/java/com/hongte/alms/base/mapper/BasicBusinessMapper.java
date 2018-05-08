@@ -73,7 +73,6 @@ public interface BasicBusinessMapper extends SuperMapper<BasicBusiness> {
 	 */
 	 Map<String, Object>  getNeedPay(@Param("original_business_id") String original_business_id);
 	 
-	 List<String> queryFiveLevelClassify();
 }
 
 
