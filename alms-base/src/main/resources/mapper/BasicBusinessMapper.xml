@@ -215,11 +215,11 @@
 		    (--   出款金额 -->
 		 	  SELECT 
 		      a.business_id,
-		    sum(a.fact_output_money) getMoney
+		    sum(a.fact_output_money) getMoney 
 		    FROM
-		      tb_biz_output_record a 
+		      tb_biz_output_record a left join tb_repayment_biz_plan a2 on a.business_id=a2.original_business_id
 		    WHERE 
-	 a.business_id=#{originalBusinessId,jdbcType=VARCHAR}) b 
+	 a.business_id=#{originalBusinessId,jdbcType=VARCHAR}   and   a2.is_defer=#{isDefer} ) b 
 		    ON business.business_id = b.business_id 
 		WHERE pList.plan_list_id = #{crpId,jdbcType=VARCHAR}
     </select>
@@ -401,6 +401,46 @@
 
 		where  plan.original_business_id=#{original_business_id}
 	</select>
+		<!-- 月收平台费服务费-->
+	<select id="getMonthPlatformAmount" resultType="java.lang.Double">
+				select 
+
+	 ifnull(sum(pDetail.plan_amount),0)
+		   from
+
+
+		tb_repayment_biz_plan_list_detail pDetail
+
+		left join tb_repayment_biz_plan_list pList on
+		pList.plan_list_id=pDetail.plan_list_id
+
+			left join tb_repayment_biz_plan plan on pList.plan_id=plan.plan_id
+
+		where pList.plan_list_id=#{crpId,jdbcType=VARCHAR} and pDetail.plan_item_type = 50 limit 1
+	</select>
+ 
+		<!-- 月收分公司服务费-->
+	<select id="getMonthCompanyAmount" resultType="java.lang.Double">
+		
+		select 
+
+	sum(pDetail.plan_amount)
+		   from
+
+
+		tb_repayment_biz_plan_list_detail pDetail
+
+		left join tb_repayment_biz_plan_list pList on
+		pList.plan_list_id=pDetail.plan_list_id
+
+			left join tb_repayment_biz_plan plan on pList.plan_id=plan.plan_id
+
+		where pList.plan_list_id=#{crpId,jdbcType=VARCHAR}  and pDetail.plan_item_type = 30  limit 1
+	</select>
+ 
+	
+	
+	
 	
 	
 		<!-- 月收等费用总额-->

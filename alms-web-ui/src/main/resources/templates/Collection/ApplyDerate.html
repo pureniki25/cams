@@ -143,55 +143,53 @@ color: #FF3030;
 
             <!--基本信息表单内容-->
             <row :gutter="16">
-                        <i-form ref="baseInfoForm"  :model="baseInfoForm"   label-position="right" :label-width="100">
+                        <i-form  v-if="otherFeeShowFlage" ref="baseInfoForm"  :model="baseInfoForm"  :rules = "validApplyInfoForm"   label-position="right" :label-width="100">
                     <div class="table">
                         <div class="tr">
-                            <div class="td"> <div class="td-box">业务编号：</div><div class="td-box">{{ baseInfoForm.businessId }} </div> </div>
-                            <div class="td"> <div class="td-box">客户名称：</div><div class="td-box">{{ baseInfoForm.customerName }} </div> </div>
-                            <div class="td"> <div class="td-box">所属分公司：</div><div class="td-box">{{ baseInfoForm.companyName }} </div> </div>
+                                <div class="td" v-if="applyInfoFormEditFlage == true" ><div class="td-box"> 是否结清      </div>
+		                                 <div class="td-box"> 
+					                          <radio-group v-model="applyInfoForm.isSettleFlage" > 
+			                                        <span @click="isClosedClick(true)"> <radio label="是" ></radio></span> 
+			                                       <span @click="isClosedClick(false)"> <radio label="否" ></radio></span> 
+			                                 </radio-group>
+										</div>
+                               </div>  
+                               <div class="td" v-else ><div class="td-box"> 是否结清      </div>
+	                                      <div class="td-box" > 
+					                          <radio-group v-model="applyInfoForm.isSettleFlage" > 
+			                                        <span @click="isClosedClick(true)" > <radio label="是" disabled></radio></span> 
+			                                       <span @click="isClosedClick(false)"> <radio label="否" disabled ></radio></span> 
+			                                 </radio-group>
+										</div>
+                               </div>
+                            <div class="td"> <div class="td-box">申请期数：</div><div class="td-box">{{ baseInfoForm.afterId }} </div> </div>
+                            <div class="td"> <div class="td-box">借款期限：</div><div class="td-box">{{ baseInfoForm.borrowLimit }} </div> </div>
+                  
+                        
+                        </div>
+                        <div class="tr">
+                        
+                             <div class="td"> <div class="td-box">客户姓名：</div><div class="td-box">{{ baseInfoForm.customerName }} </div> </div>
+                            <div class="td"> <div class="td-box">所属网点：</div><div class="td-box">{{ baseInfoForm.companyName }} </div> </div>
+                            <div class="td"> <div class="td-box">合同编号：</div><div class="td-box">{{ baseInfoForm.businessId }} </div> </div>
+            
+                 
                         </div>
                         <div class="tr">
                             <div class="td"> <div class="td-box">业务类型：</div><div class="td-box">{{ baseInfoForm.businessTypeName }} </div> </div>
-                            <div class="td"> <div class="td-box">借款期限：</div><div class="td-box">{{ baseInfoForm.borrowLimit }} </div> </div>
-                            <div class="td"> <div class="td-box">还款方式：</div><div class="td-box">{{ baseInfoForm.repaymentTypeName }} </div> </div>
-                        </div>
-                        <div class="tr">
-                            <div class="td"> <div class="td-box">{{baseInfoForm.borrowRateName}}</div><div class="td-box"> {{ baseInfoForm.borrowRateStr }} </div> </div>
                             <div class="td"> <div class="td-box">借款金额：</div><div class="td-box">{{ baseInfoForm.borrowMoney }} </div> </div>
-                            <div class="td"> <div class="td-box">出款金额：</div><div class="td-box">{{ baseInfoForm.getMoney }} </div> </div>
+                            <div class="td"> <div class="td-box">还款方式：</div><div class="td-box">{{ baseInfoForm.repaymentTypeName }} </div> </div>
+              
                         </div>
                          <div class="tr">
-                    
-                            <div class="td"> <div class="td-box">前置费用：</div><div class="td-box">{{ baseInfoForm.preFees }} </div> </div>
-                            <div class="td"> <div class="td-box">出款后已交月收等费用总额：</div><div class="td-box">{{ baseInfoForm.sumFactAmount }} </div> </div>
-                            <div class="td"> <div class="td-box">剩余本金：</div><div class="td-box">{{ baseInfoForm.remianderPrincipal }} </div> </div>
-                        </div>
-                        <div class="tr">
-                            <div class="td"> <div class="td-box">综合收益率：</div><div class="td-box">{{ baseInfoForm.generalReturnRate }} </div> </div>
-                            <div class="td"> <div class="td-box">当前还款期数：</div><div class="td-box">{{ baseInfoForm.afterId }} </div> </div>
-                            <div class="td"> <div class="td-box">逾期天数：</div><div class="td-box">{{ baseInfoForm.delayDays}} </div> </div>
-                        </div>
-                        <div class="tr">
-                            <div class="td"> <div class="td-box">应付利息：</div><div class="td-box">{{ baseInfoForm.needPayInterest }} </div> </div>
                             <div class="td"> <div class="td-box">应付本金：</div><div class="td-box">{{ baseInfoForm.needPayPrincipal }} </div> </div>
-                            <div class="td"> <div class="td-box">应付月收服务费：</div><div class="td-box">{{ baseInfoForm.needPayService }} </div> </div>
+                            <div class="td"> <div class="td-box">应付利息和服务费：</div><div class="td-box">{{numeral(baseInfoForm.needPayInterest+baseInfoForm.needPayService).format('0,0.00')}} </div></div>
+                            <div class="td"> <div class="td-box">提前还款期数：</div><div class="td-box">{{baseInfoForm.borrowLimit-baseInfoForm.periods}} </div> </div>
+                   
+                            
                         </div>
                         <div class="tr">
-                            <div class="td"> <div class="td-box">应付滞纳金：</div><div class="td-box">{{ baseInfoForm.needPayPenalty }} </div> </div>
-<!--                             <div class="td"> <div class="td-box">应付其他费用：</div><i-input v-model="baseInfoForm.otherPayAmount" class="td-box" @on-blur="getTotalShouldPay()"> </i-input> </div> -->
-                                <div class="td"> <div class="td-box">应付逾期利息：</div><div class="td-box">		
-                            <i-select v-model="baseInfoForm.outsideInterestType" clearable  filterable style="width:100px" v-if="isCarFlag" @on-change="getOutsideInterest">
-                                    <i-option value="0.03334">3.334%</i-option>
-                                    <i-option value="0.03">3%</i-option>
-                                    <i-option value="0.028334">2.8334%</i-option>
-                                    <i-option value="0.025">2.5%</i-option>
-                                    <i-option value="0.023334">2.3334%</i-option>
-                                    <i-option value="0.018">1.8%</i-option>
-                                    <i-option value="0.016">1.6%</i-option>
-                                    <i-option value="0.015">1.5%</i-option>
-                                </i-select>
-		                		<span>{{ baseInfoForm.outsideInterest }} </span></div> </div>
-                            <div class="td"> <div class="td-box">应付提前结清违约金：</div><div class="td-box">
+                           <div class="td"> <div class="td-box">应付提前结清违约金：</div><div class="td-box">
                             <i-select  v-model="baseInfoForm.preLateFeesType" clearable  filterable style="width:165px" v-if="preLateFeesFlag" @on-change="getPreLateFees">
 	                                    <i-option value="1">一个月利息</i-option>
 	                                    <i-option value="2">借款本金*3%</i-option>
@@ -199,16 +197,73 @@ color: #FF3030;
 	                                </i-select >
                             
                            <span> {{ baseInfoForm.preLateFees }} </span></div> </div>
+                            <div class="td"> <div class="td-box">应付逾期违约金：</div><div class="td-box">{{ baseInfoForm.needPayPenalty }} </div> </div> 
+                            <div class="td"> <div class="td-box">逾期天数：</div><div class="td-box">{{ baseInfoForm.delayDays}} </div> </div>
                         </div>
                         <div class="tr">
-                                  <div class="td"> <div class="td-box">应付总额：</div><div class="td-box">{{ baseInfoForm.totalBorrowAmount?numeral(baseInfoForm.totalBorrowAmount).format('0,0.00'):'' }} </div> </div>
-                                <div class="td"> <div class="td-box"></div><div class="td-box"> </div> </div>
-                  
-                            <div class="td"> <div class="td-box">    </div>	<div class="td-box">	</div></div>
-			                		
-			                
+                            <div class="td"> <div class="td-box">往期少缴费用：</div><div class="td-box">{{baseInfoForm.lackFee}}</div> </div>
+                            <div class="td"> <div class="td-box">逾期收益率：</div><div class="td-box"> </div> </div>
+                            <div class="td"> <div class="td-box">应付总额：</div><div class="td-box">{{ baseInfoForm.totalBorrowAmount?numeral(baseInfoForm.totalBorrowAmount).format('0,0.00'):'' }} </div> </div>
+  
                         </div>
+                   
                     </div>
+
+                </i-form>
+                
+                    <i-form v-if="!otherFeeShowFlage" ref="baseInfoForm"  :model="baseInfoForm"  :rules = "validApplyInfoForm"   label-position="right" :label-width="100">
+                    <div class="table">
+                        <div class="tr">
+                                <div class="td" v-if="applyInfoFormEditFlage == true" ><div class="td-box"> 是否结清      </div>
+		                                 <div class="td-box"> 
+					                          <radio-group v-model="applyInfoForm.isSettleFlage" > 
+			                                        <span @click="isClosedClick(true)"> <radio label="是" ></radio></span> 
+			                                       <span @click="isClosedClick(false)"> <radio label="否" ></radio></span> 
+			                                 </radio-group>
+										</div>
+                               </div>  
+                               <div class="td" v-else ><div class="td-box"> 是否结清      </div>
+	                                      <div class="td-box" > 
+					                          <radio-group v-model="applyInfoForm.isSettleFlage" > 
+			                                        <span @click="isClosedClick(true)" > <radio label="是" disabled></radio></span> 
+			                                       <span @click="isClosedClick(false)"> <radio label="否" disabled ></radio></span> 
+			                                 </radio-group>
+										</div>
+                               </div>
+                            <div class="td"> <div class="td-box">申请期数：</div><div class="td-box">{{ baseInfoForm.afterId }} </div> </div>
+                            
+                            <div class="td"> <div class="td-box">借款期限：</div><div class="td-box">{{ baseInfoForm.borrowLimit }} </div> </div>
+                    
+             
+                        
+                        </div>
+                        <div class="tr">
+                             <div class="td"> <div class="td-box">客户姓名：</div><div class="td-box">{{ baseInfoForm.customerName }} </div> </div>
+                            <div class="td"> <div class="td-box">所属网点：</div><div class="td-box">{{ baseInfoForm.companyName }} </div> </div>
+                            <div class="td"> <div class="td-box">合同编号：</div><div class="td-box">{{ baseInfoForm.businessId }} </div> </div>
+            
+                      
+                        </div>
+                        <div class="tr">
+                            <div class="td"> <div class="td-box">业务类型：</div><div class="td-box">{{ baseInfoForm.businessTypeName }} </div> </div>
+                            <div class="td"> <div class="td-box">借款金额：</div><div class="td-box">{{ baseInfoForm.borrowMoney }} </div> </div>
+                            <div class="td"> <div class="td-box">还款方式：</div><div class="td-box">{{ baseInfoForm.repaymentTypeName }} </div> </div>
+              
+                        </div>
+                         <div class="tr">
+                            <div class="td"> <div class="td-box">应付本金：</div><div class="td-box">{{ baseInfoForm.needPayPrincipal }} </div> </div>
+                            <div class="td"> <div class="td-box">应付利息和服务费：</div><div class="td-box">{{numeral(baseInfoForm.needPayInterest+baseInfoForm.needPayService).format('0,0.00')}} </div></div>
+                            <div class="td"> <div class="td-box">逾期天数：</div><div class="td-box">{{ baseInfoForm.delayDays}} </div> </div>
+                      
+                        </div>
+                        <div class="tr">
+                            <div class="td"> <div class="td-box">应付滞纳金：</div><div class="td-box">{{ baseInfoForm.needPayPenalty }} </div> </div>
+                            <div class="td"> <div class="td-box">应付总额：</div><div class="td-box">{{ baseInfoForm.totalBorrowAmount?numeral(baseInfoForm.totalBorrowAmount).format('0,0.00'):'' }} </div> </div>
+                            <div class="td"> <div class="td-box">    </div>	<div class="td-box">	</div></div>            
+        
+                        </div>
+              
+             
 
                 </i-form>
             </row>
@@ -259,23 +314,23 @@ color: #FF3030;
             <!--申请信息表单内容-->
             <row :gutter="16">
                 <i-form ref="applyInfoForm"  :model="applyInfoForm"  :rules = "validApplyInfoForm"  label-position="right" :label-width="100">
-                    <row :gutter="16">
-                        <i-col span="10">
-                            <form-item v-if="applyInfoFormEditFlage == true" label="是否结清申请：" prop="isSettleFlage"  >
-                                <radio-group v-model="applyInfoForm.isSettleFlage" >
-                                       <span @click="isClosedClick(true)"> <radio label="是" ></radio></span>
-                                       <span @click="isClosedClick(false)"> <radio label="否" ></radio></span>
-                                </radio-group>
-                            </form-item>
-                            <form-item v-else label="是否结清申请：" prop="isSettleFlage" disabled  >
-                                <radio-group v-model="applyInfoForm.isSettleFlage" disabled>
-                                    <radio label="是" disabled></radio>
-                                    <radio label="否" disabled></radio>
-                                </radio-group>
-                            </form-item>
+<!--                     <row :gutter="16"> -->
+<!--                         <i-col span="10"> -->
+<!--                             <form-item v-if="applyInfoFormEditFlage == true" label="是否结清申请：" prop="isSettleFlage"  > -->
+<!--                                 <radio-group v-model="applyInfoForm.isSettleFlage" > -->
+<!--                                        <span @click="isClosedClick(true)"> <radio label="是" ></radio></span> -->
+<!--                                        <span @click="isClosedClick(false)"> <radio label="否" ></radio></span> -->
+<!--                                 </radio-group> -->
+<!--                             </form-item> -->
+<!--                             <form-item v-else label="是否结清申请：" prop="isSettleFlage" disabled  > -->
+<!--                                 <radio-group v-model="applyInfoForm.isSettleFlage" disabled> -->
+<!--                                     <radio label="是" disabled></radio> -->
+<!--                                     <radio label="否" disabled></radio> -->
+<!--                                 </radio-group> -->
+<!--                             </form-item> -->
                      
-                        </i-col>
-                    </row>
+<!--                         </i-col> -->
+<!--                     </row> -->
                     <row :gutter="16" v-for="(item, index) in applyTypes">
                         <i-col span="7">
                             <form-item v-if="applyInfoFormEditFlage == true"  :label="'申请减免费用项' +(index+1)" prop="feeId" >

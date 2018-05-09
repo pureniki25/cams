@@ -361,7 +361,8 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 	 * 2018年3月30日 下午2:35:29
 	 * @param expenseSettleVO
 	 */
-	private void calPrincipal(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan,List<BizOutputRecord> bizOutputRecords) {
+	@Override
+	public void calPrincipal(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan,List<BizOutputRecord> bizOutputRecords) {
 		BigDecimal outPutMoney = new BigDecimal(0);
 		for (BizOutputRecord bizOutputRecord : bizOutputRecords) {
 			outPutMoney = outPutMoney.add(bizOutputRecord.getFactOutputMoney());
@@ -644,7 +645,8 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 	 * @param plan
 	 * @return
 	 */
-	private void calLackFee(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan){
+	@Override
+	public  void calLackFee(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan){
 		/*往期滞纳金,取最大一期*/
 		BigDecimal firstLateFee = null ;
 		List<BigDecimal> instersets = new ArrayList<>() ;
