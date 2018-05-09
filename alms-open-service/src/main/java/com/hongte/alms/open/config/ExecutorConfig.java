@@ -1,4 +1,4 @@
-package com.hongte.alms.scheduled.config;
+package com.hongte.alms.open.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
