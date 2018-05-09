@@ -255,55 +255,55 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
     @Transactional(rollbackFor = Exception.class)
     public  List<RepaymentBizPlanDto> creatAndSaveRepayPlan(CreatRepayPlanReq creatRepayPlanReq) throws IllegalAccessException, InstantiationException {
 
-        //判断是否重传
-        for(ProjInfoReq projInfoReq:creatRepayPlanReq.getProjInfoReqs() ){
-            List<RepaymentProjPlan> projList =  repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("project_id",projInfoReq.getProjectId()));
-
-            if(projList.size()>0){
-                for(RepaymentProjPlan projPlan:projList){
-                    if(projPlan.getActive().equals(RepayPlanActiveEnum.ACTIVE.getValue())){
-                        Integer diffDays = DateUtil.getDiffDays(projPlan.getCreateTime(),projInfoReq.getQueryFullsuccessDate());
-                        //如果同一个标的满标时间与还款计划生成的时间相差一天以内
-                        if(diffDays <= 1){
-                            throw  new CreatRepaymentExcepiton("已存在时间相近的还款计划");
-                        }
-                    }
-                }
-            }
-        }
-
-
-
-        List<RepaymentBizPlanDto>  dtos = creatRepayPlan(creatRepayPlanReq);
-
-        /////  存储还款计划相关信息   开始  ////////////////
-        for(RepaymentBizPlanDto bizPlanDto:dtos){
-            RepaymentBizPlan bizPlan = bizPlanDto.getRepaymentBizPlan();
-            repaymentBizPlanService.insert(bizPlan);
-
-            List<RepaymentBizPlanListDto> bizPlanListDtos = bizPlanDto.getBizPlanListDtos();
-            for(RepaymentBizPlanListDto bizPlanListDto:bizPlanListDtos){
-                RepaymentBizPlanList  bizPlanList = bizPlanListDto.getRepaymentBizPlanList();
-                repaymentBizPlanListService.insert(bizPlanList);
-                List<RepaymentBizPlanListDetail>  bizPlanListDetails = bizPlanListDto.getBizPlanListDetails();
-                repaymentBizPlanListDetailSevice.insertBatch(bizPlanListDetails);
-            }
-
-            List<RepaymentProjPlanDto> projPlanDtos = bizPlanDto.getProjPlanDtos();
-            for(RepaymentProjPlanDto projPlanDto:projPlanDtos){
-                RepaymentProjPlan projPlan = projPlanDto.getRepaymentProjPlan();
-                repaymentProjPlanService.insert(projPlan);
-
-                List<RepaymentProjPlanListDto> projPlanListDtos = projPlanDto.getProjPlanListDtos();
-                for(RepaymentProjPlanListDto projPlanListDto:projPlanListDtos){
-                    RepaymentProjPlanList projPlanList = projPlanListDto.getRepaymentProjPlanList();
-                    repaymentProjPlanListService.insert(projPlanList);
-                    List<RepaymentProjPlanListDetail> repaymentProjPlanListDetails = projPlanListDto.getProjPlanListDetails();
-                    repaymentProjPlanListDetailService.insertBatch(repaymentProjPlanListDetails);
-                }
-            }
-        }
-        /////  存储还款计划相关信息   开始  ////////////////
+//        //判断是否重传
+//        for(ProjInfoReq projInfoReq:creatRepayPlanReq.getProjInfoReqs() ){
+//            List<RepaymentProjPlan> projList =  repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("project_id",projInfoReq.getProjectId()));
+//
+//            if(projList.size()>0){
+//                for(RepaymentProjPlan projPlan:projList){
+//                    if(projPlan.getActive().equals(RepayPlanActiveEnum.ACTIVE.getValue())){
+//                        Integer diffDays = DateUtil.getDiffDays(projPlan.getCreateTime(),projInfoReq.getQueryFullsuccessDate());
+//                        //如果同一个标的满标时间与还款计划生成的时间相差一天以内
+//                        if(diffDays <= 1){
+//                            throw  new CreatRepaymentExcepiton("已存在时间相近的还款计划");
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//
+//
+//        List<RepaymentBizPlanDto>  dtos = creatRepayPlan(creatRepayPlanReq);
+//
+//        /////  存储还款计划相关信息   开始  ////////////////
+//        for(RepaymentBizPlanDto bizPlanDto:dtos){
+//            RepaymentBizPlan bizPlan = bizPlanDto.getRepaymentBizPlan();
+//            repaymentBizPlanService.insert(bizPlan);
+//
+//            List<RepaymentBizPlanListDto> bizPlanListDtos = bizPlanDto.getBizPlanListDtos();
+//            for(RepaymentBizPlanListDto bizPlanListDto:bizPlanListDtos){
+//                RepaymentBizPlanList  bizPlanList = bizPlanListDto.getRepaymentBizPlanList();
+//                repaymentBizPlanListService.insert(bizPlanList);
+//                List<RepaymentBizPlanListDetail>  bizPlanListDetails = bizPlanListDto.getBizPlanListDetails();
+//                repaymentBizPlanListDetailSevice.insertBatch(bizPlanListDetails);
+//            }
+//
+//            List<RepaymentProjPlanDto> projPlanDtos = bizPlanDto.getProjPlanDtos();
+//            for(RepaymentProjPlanDto projPlanDto:projPlanDtos){
+//                RepaymentProjPlan projPlan = projPlanDto.getRepaymentProjPlan();
+//                repaymentProjPlanService.insert(projPlan);
+//
+//                List<RepaymentProjPlanListDto> projPlanListDtos = projPlanDto.getProjPlanListDtos();
+//                for(RepaymentProjPlanListDto projPlanListDto:projPlanListDtos){
+//                    RepaymentProjPlanList projPlanList = projPlanListDto.getRepaymentProjPlanList();
+//                    repaymentProjPlanListService.insert(projPlanList);
+//                    List<RepaymentProjPlanListDetail> repaymentProjPlanListDetails = projPlanListDto.getProjPlanListDetails();
+//                    repaymentProjPlanListDetailService.insertBatch(repaymentProjPlanListDetails);
+//                }
+//            }
+//        }
+//        /////  存储还款计划相关信息   开始  ////////////////
 
         /////  存储传入的相关信息  开始  //////////////
 
@@ -311,7 +311,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
         List<ProjInfoReq>  projInfoReqs = creatRepayPlanReq.getProjInfoReqs();
         for(ProjInfoReq projInfoReq:projInfoReqs){
-
+            TuandaiProjectInfo  projInfo = ClassCopyUtil.copy(projInfoReq,ProjInfoReq.class,TuandaiProjectInfo.class);
         }
 
 //        copyObject
@@ -320,8 +320,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         /////////   存储传入的相关信息   结束   ////////////
 
 
-        return dtos;
+//        return dtos;
 
+        return null;
 
     }
 

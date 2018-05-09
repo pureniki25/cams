@@ -92,9 +92,34 @@ public class CreatRepayPlanServiceImplTest {
 
 
 
-    @Test
+//    @Test
     //无分段费用 创建还款计划  测试  需要核对与原信贷生成的还款计划的差异有多大
     public void  noFeeDetailCreatRepayPlanTest(){
+        CreatRepayPlanReq creatRepayPlanReq =creatNoFeeCreatReq();
+
+        List<RepaymentBizPlanDto>  planDtos = creatRepayPlanService.creatRepayPlan(creatRepayPlanReq);
+        LOGGER.error(JSON.toJSONString(planDtos));
+
+        System.out.println("ttttttttttttttt");
+    }
+
+
+
+    @Test
+    public void SaveInfoTest() {
+        CreatRepayPlanReq creatRepayPlanReq =creatNoFeeCreatReq();
+
+        try {
+            creatRepayPlanService.creatAndSaveRepayPlan(creatRepayPlanReq);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public CreatRepayPlanReq  creatNoFeeCreatReq(){
         CreatRepayPlanReq creatRepayPlanReq = new CreatRepayPlanReq();
 
         creatRepayPlanReq.setRondmode(0);
@@ -307,12 +332,10 @@ public class CreatRepayPlanServiceImplTest {
         feeReq24.setIsOneTimeCharge(2); //是否一次收取，1为按月收取，2为一次收取
         feeReq24.setRepaymentFlag(1); //标记该项费用的还款类型，1:期初收取,2:期末收取
 
+        return creatRepayPlanReq;
 
-        List<RepaymentBizPlanDto>  planDtos = creatRepayPlanService.creatRepayPlan(creatRepayPlanReq);
-        LOGGER.error(JSON.toJSONString(planDtos));
-
-        System.out.println("ttttttttttttttt");
     }
+
 
     @Test
     //有分段费用 创建还款计划  测试  需要核对与原信贷生成的还款计划的差异有多大
