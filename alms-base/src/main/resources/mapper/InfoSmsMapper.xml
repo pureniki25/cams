@@ -33,7 +33,6 @@ FROM tb_sms_log sms
 LEFT JOIN tb_basic_business business ON sms.original_business_id=business.business_id
 LEFT JOIN tb_basic_company AS company ON business.company_id = company.area_id
 LEFT JOIN tb_basic_business_type AS b_type ON business.business_type = b_type.business_type_id
-     
 
         <where>
                1=1
