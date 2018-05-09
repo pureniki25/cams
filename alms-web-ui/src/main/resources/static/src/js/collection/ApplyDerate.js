@@ -154,7 +154,8 @@ window.layinit(function (htConfig) {
                 noSettleNeedPayInterest:"",//不结清时该业应付利息;  
                 noSettleNeedPayService:"",//不结清时该业应付月收服务费; 
                 noSettleNeedPayPrincipal:"",//不结清时应付本金;
-                lackFee:""//往期少交费用
+                lackFee:0,//往期少交费用,
+                overReturnRate:""//逾期收益率
             },
 
             
@@ -680,11 +681,11 @@ var restProcessApprovalInfo = function(){
 /////////////  流程审批相关函数 结束  ///////////////
 
 ///////////应付总额：应付本金+应付利息+应付月收服务费+应付其他费用+应付提前结清违约金+应付逾期利息
-var getTotalShouldPay = function () {
+var getTotalShouldPay = function () {debugger
 	vm.baseInfoForm.totalBorrowAmount=0;
 	
 	vm.baseInfoForm.totalBorrowAmount=vm.baseInfoForm.needPayPrincipal+vm.baseInfoForm.needPayInterest+vm.baseInfoForm.needPayService
-                      +Number(getOtherFee())+vm.baseInfoForm.preLateFees+vm.baseInfoForm.outsideInterest
+                      +Number(getOtherFee())+vm.baseInfoForm.preLateFees+vm.baseInfoForm.outsideInterest+vm.baseInfoForm.lackFee
                       
                         
 	                   getSumMoney();
@@ -717,7 +718,30 @@ var getTotalShouldPay = function () {
 //}
 
 
+///////////计算逾期收益率
+var getOverReturnRate = function () {debugger
+	var rate=0;
+    var derateMoney=0;
+	var types=vm.applyTypes;
+			
+	if(types != null && types.length > 0){
+		for (var i = 0; i < types.length; i++){
+			//逾期利息feeId
+			if(types[i].feeId=='e404a126-45ab-11e7-8ed5-000c2928bb0d'){
+		      derateMoney=Number(types[i].derateMoney);
+			}
+		}
+	}
+	
+	if(vm.baseInfoForm.outsideInterest==0){
+		rate=0+"%";
+	}else{
+		rate=vm.baseInfoForm.outsideInterest-derateMoney/vm.baseInfoForm.borrowMoney*vm.baseInfoForm.delayDays;
+		rate=rate+"%";
+	}
+	vm.baseInfoForm.overReturnRate=rate;
 
+}
 
 
 ///////////车贷:获取提前结清违约金
@@ -1032,6 +1056,9 @@ var getShowInfo = function () {
                 //----------------判断其他费用项是否可以编辑-----开始--------
             	vm.otherFeeEditFlage=res.data.data.otherFeeEditFlage;
             	vm.otherFees=res.data.data.otherFees;
+            	if(typeof(vm.otherFees) != "undefined"&&vm.otherFees==0){
+            		vm.tempList=null;
+            	}
             	
             //----------------判断其他费用项是否可以编辑-----结束--------
 
@@ -1048,7 +1075,7 @@ var getShowInfo = function () {
  * 计算应收总减免后的金额
  * 
  */
-var getSumMoney= function (event,index) {
+var getSumMoney= function (event,index) {debugger
 		   var types=vm.applyTypes;
 		   vm.applyInfoForm.shouldReceiveMoney=0;
        	if(types != null && types.length > 0){
@@ -1062,7 +1089,7 @@ var getSumMoney= function (event,index) {
        			
     	vm.applyInfoForm.shouldReceiveMoney=Number(money);
        	
-   
+    	getOverReturnRate();
 
 };
 /**
@@ -1231,7 +1258,7 @@ var saveapplyInfo = function(pStatus){debugger
                     vm.applyInfoForm.crpId = crpId;
                 }
                 // 0 不结清， 1结清
-                vm.applyInfoForm.isSettle = vm.applyInfoForm.isSettleFlage=="是"?1:0;
+                vm.applyInfoForm.isSettle = vm.applyInfoForm.isSettleFlage=="否"?0:1;
                 //赋值 processId
                 if(vm.approvalInfoForm.process!=null){
                     vm.applyInfoForm.processId = vm.approvalInfoForm.process.processId;

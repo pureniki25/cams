@@ -564,7 +564,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 	 * @param basicBusiness
 	 * @param plan
 	 */
-	private void calDemurrage(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan) {
+	public void calDemurrage(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan) {
 		ExpenseSettleRepaymentPlanListVO finalPeriod = plan.findFinalPeriod();
 		int daysBeyoungFinalPeriod = DateUtil.getDiffDays(finalPeriod.getRepaymentBizPlanList().getDueDate(), settleDate);
 		if (daysBeyoungFinalPeriod > 0) {

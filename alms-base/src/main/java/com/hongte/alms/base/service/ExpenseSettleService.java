@@ -25,4 +25,5 @@ public interface ExpenseSettleService {
 	public List<ExpenseSettleLackFeeVO> listLackFee(String businessId) ;
 	public void calLackFee(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan);
 	public void calPrincipal(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan,List<BizOutputRecord> bizOutputRecords);
+	public void calDemurrage(Date settleDate, ExpenseSettleVO expenseSettleVO, BasicBusiness basicBusiness, ExpenseSettleRepaymentPlanVO plan);
 }

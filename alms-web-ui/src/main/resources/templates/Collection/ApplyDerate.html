@@ -197,12 +197,12 @@ color: #FF3030;
 	                                </i-select >
                             
                            <span> {{ baseInfoForm.preLateFees }} </span></div> </div>
-                            <div class="td"> <div class="td-box">应付逾期违约金：</div><div class="td-box">{{ baseInfoForm.needPayPenalty }} </div> </div> 
+                            <div class="td"> <div class="td-box">应付逾期违约金：</div><div class="td-box">{{ baseInfoForm.outsideInterest }} </div> </div> 
                             <div class="td"> <div class="td-box">逾期天数：</div><div class="td-box">{{ baseInfoForm.delayDays}} </div> </div>
                         </div>
                         <div class="tr">
                             <div class="td"> <div class="td-box">往期少缴费用：</div><div class="td-box">{{baseInfoForm.lackFee}}</div> </div>
-                            <div class="td"> <div class="td-box">逾期收益率：</div><div class="td-box"> </div> </div>
+                            <div class="td"> <div class="td-box">逾期收益率：</div><div class="td-box">{{baseInfoForm.overReturnRate}} </div> </div>
                             <div class="td"> <div class="td-box">应付总额：</div><div class="td-box">{{ baseInfoForm.totalBorrowAmount?numeral(baseInfoForm.totalBorrowAmount).format('0,0.00'):'' }} </div> </div>
   
                         </div>

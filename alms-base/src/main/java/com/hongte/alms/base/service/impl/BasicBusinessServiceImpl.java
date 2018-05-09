@@ -248,6 +248,8 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 		ExpenseSettleVO vo = cal(original_business_id, preSettleDate);
 		if (bizOutputRecord != null) {
 			outputDate = bizOutputRecord.getFactOutputDate();
+		}else {
+			throw new ServiceRuntimeException("找不到出款记录");
 		}
 		try {
 
@@ -448,7 +450,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 		expenseSettleService.calPrincipal(settleDate, expenseSettleVO, basicBusiness, plan, bizOutputRecord);
 		calPenalty(settleDate, expenseSettleVO, basicBusiness, plan);
 		expenseSettleService.calLackFee(settleDate, expenseSettleVO, basicBusiness, plan);
-
+		expenseSettleService.calDemurrage(settleDate, expenseSettleVO, basicBusiness, plan);
 		return expenseSettleVO;
 
 	}

@@ -398,7 +398,6 @@ public class ApplyDerateController {
 			if(pList!=null) {
 				List<RepaymentBizPlanList> list=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", pList.getPlanId()).orderBy("period")); 
 				if(list.size()>0) {
-					
 				  vo=basicBusinessService.getPreLateFees(crpId, businessId, repaymentTypeId, BusinessTypeEnum.FSD_TYPE.getValue().toString(), new Date(), new Date(), list.get(0).getDueDate());
 				}
 			}
@@ -409,6 +408,7 @@ public class ApplyDerateController {
 			
 				retMap.put("preLateFees", JSON.toJSON(vo.getPenalty(), JsonUtil.getMapping()));// 提前还款违约金
                 retMap.put("lackFee",  JSON.toJSON(vo.getLackFee(), JsonUtil.getMapping()));//往期少交费用
+                retMap.put("isInContractDate",  JSON.toJSON(vo.getIsInContractDate(), JsonUtil.getMapping()));//是否在合同期内
 
 
 			return Result.success(retMap);
@@ -555,14 +555,14 @@ public class ApplyDerateController {
 					SysParameter.class);
 			String outsideInterest = reqMap.get("outsideInterest") == null ? "0"
 					: reqMap.get("outsideInterest").toString();// 合同期外逾期利息
-			String generalReturnRate = reqMap.get("generalReturnRate").toString();// 综合收益率
+			//String generalReturnRate = reqMap.get("generalReturnRate").toString();// 综合收益率
 			String preLateFees = reqMap.get("preLateFees").toString(); // 提前还款违约金:
 			String otherFeeEditFlage = reqMap.get("otherFeeEditFlage").toString();// 0:新增 -1草稿
 			List<ApplyDerateProcessOtherFees> otherFees = JsonUtil.map2objList(reqMap.get("otherFees"),
 					ApplyDerateProcessOtherFees.class);
 			if (!CollectionUtils.isEmpty(req)) {
 				applyDerateProcessService.saveApplyDerateProcess(req.get(0), types, otherDerateTypeList,
-						outsideInterest, generalReturnRate, preLateFees, otherFees, otherFeeEditFlage);
+						outsideInterest, null, preLateFees, otherFees, otherFeeEditFlage);
 			}
 			if (!CollectionUtils.isEmpty(files)) {
 				for (FileVo file : files) {
