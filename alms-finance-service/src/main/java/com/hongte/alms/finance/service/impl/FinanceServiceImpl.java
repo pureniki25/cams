@@ -116,8 +116,7 @@ public class FinanceServiceImpl implements FinanceService {
 				.eq("original_business_id", businessId)
 				.eq("after_id",afterId)
 				.in("money_pool_id", moneyPoolIds)
-				.eq("is_finance_match", 1)
-				.ne("is_deleted",1));
+				.eq("is_finance_match", 1));
 		
 		if (list!=null&&list.size()>0) {
 			return Result.error("500","已存在匹配的银行流水,不可重复匹配");
@@ -146,7 +145,6 @@ public class FinanceServiceImpl implements FinanceService {
 				moneyPoolRepayment.setPlanListId(repaymentBizPlanList.getPlanListId());
 				moneyPoolRepayment.setCreateTime(now);
 				moneyPoolRepayment.setCreateUser(loginUserInfoHelper.getUserId());
-				moneyPoolRepayment.setMoneyPoolId(mprid);
 				moneyPoolRepayment.setState(RepayRegisterFinanceStatus.财务指定银行流水.toString());
 				moneyPoolRepayment.setIsFinanceMatch(1);
 				boolean r = moneyPoolRepayment.insert();

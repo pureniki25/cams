@@ -23,7 +23,9 @@ window.layinit(function (htConfig) {
                         title: '还款日期',
                         key: 'tradeDate',
                         render: (h, p) => {
-                            return h('span', moment(p.row.tradeDate).format('YYYY-MM-DD'))
+                            if(p.row.tradeDate){
+                                return h('span', moment(p.row.tradeDate).format('YYYY-MM-DD'))
+                            }
                         }
                     }, {
                         title: '还款金额',
@@ -71,8 +73,6 @@ window.layinit(function (htConfig) {
                             let content = [];
                             if (p.row.certificatePictureUrl) {
                                 content.push(checkCert)
-                            }else{
-                                content.push(Null)
                             }
                             return h('div', content)
                         }
@@ -122,9 +122,17 @@ window.layinit(function (htConfig) {
                 }
             })
                 .then(function (res) {
-                    console.log(res);
                     if (res.data.code == '1') {
+                        let sumMoney = 0 ;
+                        res.data.data.forEach(element => {
+                            sumMoney += element.accountMoney
+                        });
+                        let sum = {
+                            moneyPoolId:'合计',
+                            accountMoney:sumMoney
+                        }
                         app.table.data = res.data.data
+                        app.table.data.push(sum)
                         let style = {
                             height: (app.table.data.length ? (app.table.data.length + 2) * 50 : 175 )+ 'px',
                             width: '100%'
