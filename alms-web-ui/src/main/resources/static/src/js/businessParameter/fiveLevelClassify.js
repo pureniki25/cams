@@ -458,6 +458,9 @@ window.layinit(function (htConfig) {
 	 	    },
 	 	    removeSelectOp:function(event, index){
 	 	    	this.commitSetConditionModel.commitSetCondition.splice(index, 1);
+	 	    	if (this.commitSetConditionModel.commitSetCondition == '') {
+					this.addSelectOp(event);
+				}
 	 	    },
 		   conditionTypeChange:function(value, index){
 			   if(value == '主借款人情况' || value == '抵押物情况' || value == '档案资料情况' || value == '案件情况'){
