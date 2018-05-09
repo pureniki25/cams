@@ -6,7 +6,7 @@ var amt=/^(([1-9]\d*)|\d)(\.\d{1,2})?$/;
 var mobi= /^(((13[0-9]{1})|(14[0-9]{1})|(17[0]{1})|(15[0-3]{1})|(15[5-9]{1})|(18[0-9]{1}))+\d{8})$/; 
 var tel = /^\d{3,4}-?\d{7,9}$/;
 var carNum=/^([1-9]{1})(\d{15}|\d{16}|\d{17}|\d{18})$/;
-var currentDate=new Date();
+var currentDate=new Date(formatDate(new Date()));
 var basePath;
 var vm;
 window.layinit(function (htConfig) {
@@ -881,7 +881,8 @@ window.layinit(function (htConfig) {
 	    		}
 	    		if(vm.carBasic.lastTransferDate !=null&&vm.carBasic.lastTransferDate!=''){
 	    			var inputDate=new Date(vm.carBasic.lastTransferDate.replace("-", "/").replace("-", "/"));  
-	    		
+					console.log(inputDate);
+					console.log(currentDate);
 	    			if(inputDate>currentDate){
 	    				$("#lastTransferDate").css("border","1px solid #FF3030");
 	    				layer.msg("不能大于当前日期！",{icon:5,shade: [0.8, '#393D49']});
@@ -970,7 +971,7 @@ window.layinit(function (htConfig) {
 	    		}else{
 	    	
 	    			var inputDate=new Date(vm.carAuction.auctionStartTime.replace("-", "/").replace("-", "/"));  
-	    			if(inputDate<currentDate){
+					if(inputDate<currentDate){
 	    				$("#auctionStartTime").css("border","1px solid #FF3030");
 	    				layer.msg("不能小于当前日期！",{icon:5,shade: [0.8, '#393D49']});
 	    				return ;
@@ -1040,7 +1041,9 @@ window.layinit(function (htConfig) {
 	    			return ;
 	    		}else{
 	    			var inputDate=new Date(vm.carAuction.consStartTime.replace("-", "/").replace("-", "/"));  
-	    			if(inputDate<currentDate){
+					console.log(inputDate);
+					console.log(currentDate);
+					if(inputDate<currentDate){
 	    				$("#consStartTime").css("border","1px solid #FF3030");
 	    				layer.msg("不能小于当前日期！",{icon:5,shade: [0.8, '#393D49']});
 	    				return ;
@@ -1069,7 +1072,9 @@ window.layinit(function (htConfig) {
 	    			return ;
 	    		}else{
 	    			var inputDate=new Date(vm.carAuction.viewSampleStartTime.replace("-", "/").replace("-", "/"));  
-	    			if(inputDate<currentDate){
+					console.log(inputDate);
+					console.log(currentDate);
+					if(inputDate<currentDate){
 	    				$("#viewSampleStartTime").css("border","1px solid #FF3030");
 	    				layer.msg("不能小于当前日期！",{icon:5,shade: [0.8, '#393D49']});
 	    				return ;
@@ -1135,7 +1140,9 @@ window.layinit(function (htConfig) {
 	    			return ;
 	    		}else{
 	    			var inputDate=new Date(vm.carAuction.paymentEndTime.replace("-", "/").replace("-", "/"));  
-	    			if(inputDate<currentDate){
+					console.log(inputDate);
+					console.log(currentDate);
+					if(inputDate<currentDate){
 	    				$("#paymentEndTime").css("border","1px solid #FF3030");
 	    				layer.msg("不能小于当前日期！",{icon:5,shade: [0.8, '#393D49']});
 	    				return ;
