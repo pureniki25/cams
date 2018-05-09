@@ -5,7 +5,9 @@
 let app
 window.layinit(function (htConfig) {
     var _htConfig = htConfig;
-    let basePath = htConfig.basePath;
+
+    let cpath = htConfig.coreBasePath;
+    let fpath = htConfig.financeBasePath;
 
     app = new Vue({
         el: "#app",
@@ -19,6 +21,8 @@ window.layinit(function (htConfig) {
             status: decodeURI(getQueryStr('status')),
             bankAccounts: [],
             selections:[],
+            curPage: 1,
+            pageSize: 10,
             table: {
                 col: [
                     {
@@ -70,12 +74,17 @@ window.layinit(function (htConfig) {
                         }
                     }
                 ],
-                data: []
+                data: [],
+                total: 0
             }
         },
         methods: {
+            onDateChange:function(date){
+                console.log(date);
+                this.repayDate = date ;
+            },
             listDepartmentBank: function () {
-                axios.get(basePath + 'core/moneyPool/listDepartmentBank', { params: { businessId: this.businessId } })
+                axios.get(cpath + 'moneyPool/listDepartmentBank', { params: { businessId: this.businessId } })
                     .then(function (res) {
                         if (res.data.code == '1') {
                             app.bankAccounts = res.data.data
@@ -89,32 +98,29 @@ window.layinit(function (htConfig) {
             },
             listMoneyPool: function () {
                 let params = {}
-
+                params.curPage = this.curPage;
+                params.pageSize = this.pageSize ;
                 if (this.businessId) {
                     params.businessId = this.businessId;
                 }
                 if (this.afterId) {
                     params.afterId = this.afterId;
                 }
-                if (this.moenyPoolId) {
-                    params.moenyPoolId = this.moenyPoolId;
-                }
                 if (this.accountMoney) {
                     params.accountMoney = this.accountMoney;
                 }
-                if (this.status) {
-                    params.status = this.status;
-                }
                 if (this.repayDate) {
+                    console.log(typeof this.repayDate);
                     params.repayDate = this.repayDate;
                 }
                 if (this.acceptBank) {
                     params.acceptBank = this.acceptBank;
                 }
-                axios.get(basePath + 'finance/finance/moneyPool', { params: params })
+                axios.get(fpath + 'finance/moneyPool', { params: params })
                     .then(function (res) {
-                        if (res.data.code == '1') {
+                        if (res.data.code == '0') {
                             app.table.data = res.data.data
+                            app.table.total = res.data.count
                         } else {
                             app.$Modal.error({ content: '接口调用异常' + res.data.msg })
                         }
@@ -123,7 +129,10 @@ window.layinit(function (htConfig) {
                         console.log(error)
                     })
             },
-            search: function () {
+            search: function (page) {
+                if(page){
+                    this.curPage = 1
+                }
                 this.table.data = []
                 this.listMoneyPool()
             },
@@ -135,18 +144,19 @@ window.layinit(function (htConfig) {
                     this.$Message.warning({content:'未选择需要匹配的流水'})
                     return ;
                 }
-                axios.post(basePath + 'finance/finance/matchBankStatement',{
-                    req:{
+                axios.post(fpath + 'finance/matchBankStatement',{
                         array:this.selections,
                         businessId:this.businessId,
                         afterId:this.afterId
-                    }
                 }).then(function(res){
 
                 }).catch(function(err){
 
                 })
                 console.log(this.selections)
+            },
+            paging: function (page) {
+                app.search(page)
             }
         },
         watch: {

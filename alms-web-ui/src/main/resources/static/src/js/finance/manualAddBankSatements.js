@@ -5,7 +5,10 @@
 let app
 window.layinit(function (htConfig) {
     var _htConfig = htConfig;
-    let basePath = htConfig.basePath;
+    
+    let cpath = htConfig.coreBasePath;
+    let fpath = htConfig.financeBasePath;
+
     let businessId = getQueryStr('businessId')
     let afterId = getQueryStr('afterId')
 
@@ -21,7 +24,7 @@ window.layinit(function (htConfig) {
             },
             acceptAccountLabel: '',
             upload: {
-                url: basePath + "core/moneyPool/uploadCert",
+                url: cpath + "moneyPool/uploadCert",
                 headers: {
                     app: axios.defaults.headers.common['app'],
                     Authorization: axios.defaults.headers.common['Authorization'],
@@ -68,7 +71,7 @@ window.layinit(function (htConfig) {
                 app.$Message.error({ content: '只能上传图片格式文件' });
             },
             listDepartmentBank:function(){
-                axios.get(basePath+'core/moneyPool/listDepartmentBank',{params:{
+                axios.get(cpath+'moneyPool/listDepartmentBank',{params:{
                     businessId:businessId
                 }}).then(function(res){
                     if(res.data.code=='1'){
@@ -93,10 +96,10 @@ window.layinit(function (htConfig) {
                 })
                 params.businessId = businessId;
                 params.afterId = afterId;
-                axios.post(basePath+'core/moneyPool/addCustomerRepayment',params)
+                axios.post(cpath+'moneyPool/addCustomerRepayment',params)
                 .then(function(res){
                     if(res.data.code=='1'){
-                        this.cancel()
+                        app.cancel()
                     }else{
                         app.$Message.error({content:res.data.msg})
                     }

@@ -4,8 +4,10 @@
 let app
 window.layinit(function (htConfig) {
     var _htConfig = htConfig;
-    var basePath = htConfig.basePath;
-
+    let cpath = htConfig.coreBasePath;
+    let fpath = htConfig.financeBasePath;
+    console.log(cpath);
+    console.log(fpath);
     app = new Vue({
         el: "#app",
         data: {
@@ -232,7 +234,7 @@ window.layinit(function (htConfig) {
                     }
                 })
 
-                axios.get(basePath + 'finance/finance/getFinanceMangerList', {
+                axios.get(fpath + 'finance/getFinanceMangerList', {
                     params: params
                 })
                     .then(function (res) {
@@ -254,7 +256,7 @@ window.layinit(function (htConfig) {
             }
         },
         created: function () {
-            axios.get(basePath + 'core/sys/param/getParam', { params: { paramType: '会计确认状态' } })
+            axios.get(cpath + 'sys/param/getParam', { params: { paramType: '会计确认状态' } })
                 .then(function (res) {
                     if (res.data.code == '1') {
                         app.accountingConfirmStatus = res.data.data
@@ -267,7 +269,7 @@ window.layinit(function (htConfig) {
                     app.$Message.error({ content: '获取会计确认状态失败' })
                 })
 
-            axios.get(basePath + 'finance/finance/getCompanys')
+            axios.get(fpath + 'finance/getCompanys')
                 .then(function (res) {
                     if (res.data.code == '1') {
                         app.companys = res.data.data
@@ -280,7 +282,7 @@ window.layinit(function (htConfig) {
                     app.$Message.error({ content: '获取分公司失败' })
                 })
 
-            axios.get(basePath + 'finance/finance/getBusinessType')
+            axios.get(fpath + 'finance/getBusinessType')
                 .then(function (res) {
                     if (res.data.code == '1') {
                         app.businessTypes = res.data.data
@@ -293,7 +295,7 @@ window.layinit(function (htConfig) {
                     app.$Message.error({ content: '获取业务类型失败' })
                 })
 
-            axios.get(basePath + 'core/sys/param/getParam', { params: { paramType: '贷后状态' } })
+            axios.get(cpath + 'sys/param/getParam', { params: { paramType: '贷后状态' } })
                 .then(function (res) {
                     if (res.data.code == '1') {
                         app.collectionStatus = res.data.data

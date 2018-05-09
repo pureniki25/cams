@@ -5,6 +5,7 @@ import java.io.Serializable;
 import com.baomidou.mybatisplus.enums.IdType;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
+import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.common.util.DateUtil;
 
 import java.math.BigDecimal;
@@ -476,7 +477,7 @@ public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
 	public MoneyPoolRepayment(RepaymentRegisterInfoDTO repayInfo) {
 		super();
 		if (repayInfo == null) {
-			throw new RuntimeException("repayInfo is null!!!");
+			throw new ServiceRuntimeException("repayInfo is null!!!");
 		}
 		if (repayInfo.getAcceptBank() != null && !repayInfo.getAcceptBank().equals("")) {
 			this.bankAccount = repayInfo.getAcceptBank();
