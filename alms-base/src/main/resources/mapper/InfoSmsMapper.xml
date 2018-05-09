@@ -24,7 +24,28 @@
     </resultMap>
 
 
+ <select id="selectInfoSmsDetail" resultType="com.hongte.alms.base.vo.module.InfoSmsListSearchVO"
+            parameterType="com.hongte.alms.base.vo.module.InfoSmsListSearchReq">
 
+      
+SELECT sms.log_id AS logId,sms.plan_list_id AS planListId,sms.original_business_id AS originalBusinessId,sms.after_id AS afterId,sms.phone_number AS phoneNumber, sms.sms_type AS smsType,sms.send_date AS sendDate,sms.content AS content, sms.service_name AS serviceName,sms.status AS STATUS,sms.service_status_code AS serviceStatusCode,sms.create_time AS createTime,sms.create_user AS createUser, sms.update_time AS UpdateTime,sms.update_user AS updateUser,sms.recipient AS recipient, company.district_id AS districtId, business.company_id AS companyId, b_type.business_type_name AS businessTypeName
+FROM tb_sms_log sms
+LEFT JOIN tb_basic_business business ON sms.original_business_id=business.business_id
+LEFT JOIN tb_basic_company AS company ON business.company_id = company.area_id
+LEFT JOIN tb_basic_business_type AS b_type ON business.business_type = b_type.business_type_id
+     
+
+        <where>
+               1=1
+      WHERE 1=1 and sms.log_id=#{logId}
+
+        </where>
+      limit 1
+
+
+    </select>
+    
+    
 
     <select id="selectInfoSmsList" resultType="com.hongte.alms.base.vo.module.InfoSmsListSearchVO"
             parameterType="com.hongte.alms.base.vo.module.InfoSmsListSearchReq">

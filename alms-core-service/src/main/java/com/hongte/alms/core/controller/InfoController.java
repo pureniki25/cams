@@ -210,7 +210,7 @@ public class InfoController {
     public Result<InfoSmsListSearchVO> getInfoSmsDetailById(
             @RequestParam("logId") String logId
     ){
-    	InfoSmsListSearchVO  vo = infoSmsService.selectLastInfoSmsDetail(logId);
+    	InfoSmsListSearchVO  vo = infoSmsService.selectInfoSmsDetail(logId);
         if(vo!=null){
             return Result.success(vo);
         }else{

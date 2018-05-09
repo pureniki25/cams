@@ -87,6 +87,11 @@ public class InfoSmsServiceImpl extends BaseServiceImpl<InfoSmsMapper, InfoSms> 
 		InfoSmsListSearchVO vo=infoSmsMap.selectNextInfoSmsDetail(logId);
 		return vo;
 	}
+	@Override
+	public InfoSmsListSearchVO selectInfoSmsDetail(String logId) {
+		InfoSmsListSearchVO vo=infoSmsMap.selectInfoSmsDetail(logId);
+		return vo;
+	}
 
 //    LoginUs
 
