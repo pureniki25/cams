@@ -4,7 +4,8 @@
 let app
 window.layinit(function (htConfig) {
     var _htConfig = htConfig;
-    var basePath = htConfig.basePath;
+    let cpath = htConfig.coreBasePath;
+    let fpath = htConfig.financeBasePath;
     var businessId = getQueryStr('businessId')
     var afterId = getQueryStr('afterId')
     var planListId = getQueryStr('planListId')
@@ -38,9 +39,9 @@ window.layinit(function (htConfig) {
                     }, {
                         title: '记账金额',
                         key: 'accountMoney',
-                        render:(h,p)=>{
-                            let content = numeral(p.row.accountMoney).format('0,0.00')+''
-                            return h('span',content)
+                        render: (h, p) => {
+                            let content = numeral(p.row.accountMoney).format('0,0.00') + ''
+                            return h('span', content)
                         }
                     }, {
                         title: '交易备注',
@@ -76,15 +77,42 @@ window.layinit(function (htConfig) {
                 ],
                 data: [{
                     moneyPoolId: 'test',
-                    status:'待领取',
-                    accountMoney:565.56
+                    status: '待领取',
+                    accountMoney: 565.56
                 }]
             }
         },
         methods: {
-
+            handleParentStyle: function (style) {
+                window.parent.app.configModalStyle('matchedBankStatement', style)
+            }
         },
         created: function () {
+            axios.get(cpath + 'moneyPool/checkMoneyPool', {
+                params: {
+                    businessId: businessId,
+                    afterId: afterId,
+                    isMatched: true,
+                }
+            })
+                .then(function (res) {
+                    console.log(res);
+                    if (res.data.code == '1') {
+                        app.table.data = res.data.data
+                        let style = {
+                            height: (app.table.data.length?(app.table.data.length+2)*50:175 )+ 'px',
+                            width: '100%'
+                        }
+                        app.handleParentStyle(style)
+                    } else {
+                        app.$Message.error({ content: res.data.msg })
+                    }
+                    app.spinShow = false;
+                }).catch(function (err) {
+                    console.log(err);
+                    app.$Message.error({ content: '获取匹配的款项池银行流水数据失败' })
+                    app.spinShow = false;
+                })
         }
     })
 })

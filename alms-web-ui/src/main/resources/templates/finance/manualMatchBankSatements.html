@@ -38,7 +38,7 @@
             <Header style="height: 40px;line-height: 40px;text-align: right;">
                 <i-form inline label-position="right" label-width="70">
                     <form-item label="日期">
-                        <date-picker type="date" placeholder="选择日期" v-model="repayDate" format="yyyy-MM-dd"></date-picker>
+                        <date-picker type="date" placeholder="选择日期" v-model="repayDate" @on-change="onDateChange($event)" format="yyyy-MM-dd"></date-picker>
                     </form-item>
                     <form-item label="金额">
                         <i-input v-model="accountMoney"></i-input>
@@ -50,12 +50,13 @@
                         </i-select>
                     </form-item>
                     <form-item>
-                        <i-button type="success" icon="ios-search" @click="search">搜索</i-button>
+                        <i-button type="success" icon="ios-search" @click="search(1)">搜索</i-button>
                     </form-item>
                 </i-form>
             </Header>
-            <Content>
+            <Content style="text-align: center">
                 <i-table show-header no-data-text="暂无数据" stripe border ref="selection" @on-selection-change="onSelectChange($event)" :columns="table.col" :data="table.data"></i-table>
+                <Page :total="table.total" show-total @on-change="paging" ></Page>
             </Content>
             <Footer style="text-align: right;padding-right: 10px;height: 40px;line-height: 40px;">
                 <i-button type="success" @click="submit" >确认</i-button>

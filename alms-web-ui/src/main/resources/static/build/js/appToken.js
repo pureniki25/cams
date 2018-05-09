@@ -23,12 +23,14 @@ window.layinit = function (cb) {
        if(!htConfig.useGateWayflage){
             htConfig.basePath = htConfig.localBasePath;
             htConfig.coreBasePath = htConfig.localBasePath;
+            htConfig.financeBasePath = htConfig.financeBasePath;
             htConfig.uiBasePath = htConfig.uiBasePath;
         axios.defaults.headers.common['userId'] = htConfig.defaultUser;
         }else{
             // htConfig.basePath =  htConfig.basePath +"core/"
             htConfig.coreBasePath = htConfig.basePath +"core/";
             htConfig.openBasePath = htConfig.basePath +"open/";
+            htConfig.financeBasePath = htConfig.basePath +"finance/";
             htConfig.uiBasePath = htConfig.uiBasePath;
         }
         //axios 访问前处理token问题

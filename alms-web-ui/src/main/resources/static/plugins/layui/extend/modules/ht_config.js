@@ -28,6 +28,7 @@ layui.define(function (exports) {
         //,defaultUser:"0111200049"//何靖
         // ,defaultUser:"test_leader"  //区域贷后主管
         ,localBasePath:"http://localhost:30606/"
+        ,financeBasePath:"http://localhost:30621/"
         ,openBasePath:"http://localhost:30616/"
         ,uiBasePath:"http://localhost:30601/"
     	/*

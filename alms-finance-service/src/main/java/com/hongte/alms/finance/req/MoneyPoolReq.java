@@ -15,7 +15,8 @@ public class MoneyPoolReq {
 	private String businessId ;
 	private String afterId ;
 	private String moneyPoolId;
-	
+	private int curPage ;
+	private int pageSize ;
 	/**
 	 * 还款日期
 	 */
@@ -116,5 +117,29 @@ public class MoneyPoolReq {
 	 */
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	/**
+	 * @return the curPage
+	 */
+	public int getCurPage() {
+		return curPage;
+	}
+	/**
+	 * @param curPage the curPage to set
+	 */
+	public void setCurPage(int curPage) {
+		this.curPage = curPage;
+	}
+	/**
+	 * @return the pageSize
+	 */
+	public int getPageSize() {
+		return pageSize;
+	}
+	/**
+	 * @param pageSize the pageSize to set
+	 */
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
 	}
 }

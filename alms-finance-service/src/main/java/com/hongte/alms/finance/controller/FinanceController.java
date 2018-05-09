@@ -24,7 +24,9 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.entity.Columns;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.dto.FinanceManagerListReq;
+import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.BasicBusinessType;
 import com.hongte.alms.base.entity.BasicCompany;
@@ -34,6 +36,7 @@ import com.hongte.alms.base.entity.MoneyPool;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.enums.AreaLevel;
+import com.hongte.alms.base.enums.RepayRegisterState;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.BasicBusinessTypeService;
 import com.hongte.alms.base.service.BasicCompanyService;
@@ -46,70 +49,77 @@ import com.hongte.alms.base.util.CompanySortByPINYINUtil;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.finance.req.MoneyPoolReq;
+import com.hongte.alms.finance.service.FinanceService;
 
 import io.swagger.annotations.ApiOperation;
 
 /**
- * @author 王继光
- * 2018年4月27日 下午6:00:37
+ * @author 王继光 2018年4月27日 下午6:00:37
  */
 @RestController
 @RefreshScope
-@RequestMapping(value="/finance")
+@RequestMapping(value = "/finance")
 public class FinanceController {
 
 	private static Logger logger = LoggerFactory.getLogger(FinanceController.class);
-	
+
 	@Autowired
 	@Qualifier("BasicBusinessService")
-	private BasicBusinessService basicBusinessService ;
+	private BasicBusinessService basicBusinessService;
 	@Autowired
 	@Qualifier("BasicRepaymentTypeService")
-	private BasicRepaymentTypeService basicRepaymentTypeService ;
+	private BasicRepaymentTypeService basicRepaymentTypeService;
 	@Autowired
 	@Qualifier("BizOutputRecordService")
-	private BizOutputRecordService bizOutputRecordService ;
+	private BizOutputRecordService bizOutputRecordService;
 	@Autowired
 	@Qualifier("RepaymentBizPlanListService")
-	private RepaymentBizPlanListService repaymentBizPlanListService ;
+	private RepaymentBizPlanListService repaymentBizPlanListService;
 	@Autowired
 	@Qualifier("BasicBusinessTypeService")
-	private BasicBusinessTypeService basicBusinessTypeService ;
+	private BasicBusinessTypeService basicBusinessTypeService;
 	@Autowired
 	@Qualifier("MoneyPoolService")
-	private MoneyPoolService moneyPoolService ;
+	private MoneyPoolService moneyPoolService;
 	@Autowired
 	@Qualifier("MoneyPoolRepaymentService")
-	private MoneyPoolRepaymentService moneyPoolRepaymentService ;
+	private MoneyPoolRepaymentService moneyPoolRepaymentService;
 	@Autowired
 	@Qualifier("BasicCompanyService")
-	private BasicCompanyService basicCompanyService ;
-	
-	@GetMapping(value="/repayBaseInfo")
-	@ApiOperation(value="获取还款基本信息")
-	public Result repayBaseInfo(String businessId,String afterId) {
-		Result result ;
-		logger.info("@repayBaseInfo@获取还款基本信息--开始[{},{}]",businessId,afterId);
-		BasicBusiness basicBusiness =  basicBusinessService.selectById(businessId);
-		if (basicBusiness==null) {
-			result = Result.error("500", "找不到对应的业务"); 
-			logger.info("@repayBaseInfo@获取还款基本信息--结束[{}]",result);
+	private BasicCompanyService basicCompanyService;
+	@Autowired
+	@Qualifier("FinanceService")
+	private FinanceService financeService;
+
+	@GetMapping(value = "/repayBaseInfo")
+	@ApiOperation(value = "获取还款基本信息")
+	public Result repayBaseInfo(String businessId, String afterId) {
+		Result result;
+		logger.info("@repayBaseInfo@获取还款基本信息--开始[{},{}]", businessId, afterId);
+		BasicBusiness basicBusiness = basicBusinessService.selectById(businessId);
+		if (basicBusiness == null) {
+			result = Result.error("500", "找不到对应的业务");
+			logger.info("@repayBaseInfo@获取还款基本信息--结束[{}]", result);
 			return result;
 		}
-		RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id",afterId)) ;
-		BasicBusinessType basicBusinessType =  basicBusinessTypeService.selectById(basicBusiness.getBusinessType());
-		BasicRepaymentType basicRepaymentType =  basicRepaymentTypeService.selectById(basicBusiness.getRepaymentTypeId()) ;
-		List<BizOutputRecord> outputRecords = bizOutputRecordService.selectList(new EntityWrapper<BizOutputRecord>().eq("business_id", businessId));
-		BigDecimal outPutMoney = new BigDecimal(0) ;
+		RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService.selectOne(
+				new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId));
+		BasicBusinessType basicBusinessType = basicBusinessTypeService.selectById(basicBusiness.getBusinessType());
+		BasicRepaymentType basicRepaymentType = basicRepaymentTypeService
+				.selectById(basicBusiness.getRepaymentTypeId());
+		List<BizOutputRecord> outputRecords = bizOutputRecordService
+				.selectList(new EntityWrapper<BizOutputRecord>().eq("business_id", businessId));
+		BigDecimal outPutMoney = new BigDecimal(0);
 		for (BizOutputRecord bizOutputRecord : outputRecords) {
-			outPutMoney = outPutMoney.add(bizOutputRecord.getFactOutputMoney()) ;
+			outPutMoney = outPutMoney.add(bizOutputRecord.getFactOutputMoney());
 		}
-		JSONObject r = new JSONObject() ;
+		JSONObject r = new JSONObject();
 		r.put("businessId", businessId);
 		r.put("afterId", afterId);
 		r.put("businessType", basicBusinessType.getBusinessTypeName());
 		r.put("companyName", basicBusiness.getCompanyName());
-		r.put("operatorName", basicBusiness.getOperatorName()==null?basicBusiness.getOperatorId():basicBusiness.getOperatorName());
+		r.put("operatorName", basicBusiness.getOperatorName() == null ? basicBusiness.getOperatorId()
+				: basicBusiness.getOperatorName());
 		r.put("customerName", basicBusiness.getCustomerName());
 		r.put("repaymentType", basicRepaymentType.getRepaymentTypeName());
 		r.put("repayDate", repaymentBizPlanList.getDueDate());
@@ -119,133 +129,158 @@ public class FinanceController {
 		r.put("borrowLimitUnit", basicBusiness.getBorrowLimitUnit());
 		r.put("borrowRate", basicBusiness.getBorrowRate());
 		r.put("borrowRateUnit", basicBusiness.getBorrowRateUnit());
-		result = Result.success(r) ;
-		logger.info("@repayBaseInfo@获取还款基本信息--结束[{}]",result);
+		result = Result.success(r);
+		logger.info("@repayBaseInfo@获取还款基本信息--结束[{}]", result);
 		return result;
 	}
-	
-	@GetMapping(value="/moneyPool")
-	@ApiOperation(value="根据条件获取款项池")
-	public Result moneyPool(MoneyPoolReq req) {
-		Result result ;
-		logger.info("@moneyPool@根据条件获取款项池--开始[{}]",req);
+
+	@GetMapping(value = "/moneyPool")
+	@ApiOperation(value = "根据条件获取款项池")
+	public PageResult moneyPool(MoneyPoolReq req) {
+		PageResult result;
+		logger.info("@moneyPool@根据条件获取款项池--开始[{}]", req);
 		EntityWrapper ew = new EntityWrapper<MoneyPool>();
-		if (req.getMoneyPoolId()!=null&&req.getMoneyPoolId().length()>0) {
-			ew.eq("money_pool_id", req.getMoneyPoolId()) ;
-		}else {
-			if (req.getAcceptBank()!=null&&req.getAcceptBank().length()>0) {
-				ew.eq("accept_bank", req.getAcceptBank());
-			}
-			if (req.getRepayDate()!=null) {
-				ew.eq("DATE_FORMAT(trade_date,'%Y-%m-%d')", req.getRepayDate());
-			}
-			if (req.getAccountMoney()!=null) {
-				ew.eq("account_money", req.getAccountMoney());	
-			}
-			if (req.getStatus()!=null&&req.getStatus().length()>0) {
-				ew.eq("status", req.getStatus());
-			}
+		if (req.getAcceptBank() != null && req.getAcceptBank().length() > 0 && !req.getAcceptBank().equals("所有账户")) {
+			ew.eq("accept_bank", req.getAcceptBank());
 		}
-		List<MoneyPool> list = moneyPoolService.selectList(ew);
-		result = Result.success(list);
-		logger.info("@moneyPool@根据条件获取款项池--结束[{}]",result);
+		if (req.getRepayDate() != null) {
+			ew.eq("DATE_FORMAT(trade_date,'%Y-%m-%d')", req.getRepayDate());
+		}
+		if (req.getAccountMoney() != null) {
+			ew.eq("account_money", req.getAccountMoney());
+		}
+		ew.eq("status", RepayRegisterState.待领取.toString());
+		Page<MoneyPool> page = moneyPoolService.selectPage(new Page<MoneyPool>(req.getCurPage(), req.getPageSize()),
+				ew);
+		result = PageResult.success(page.getRecords(), page.getTotal());
+		logger.info("@moneyPool@根据条件获取款项池--结束[{}]", result);
 		return result;
-		
+
 	}
-	
-	@PostMapping(value="/matchBankStatement")
-	@ApiOperation(value="还款计划匹配银行流水")
+
+	@PostMapping(value = "/matchBankStatement")
+	@ApiOperation(value = "银行流水匹配还款计划")
 	public Result matchBankStatement(@RequestBody JSONObject req) {
-		logger.info("@matchBankStatement@还款计划匹配银行流水--开始[{}]",req.toJSONString());
+		Result result ;
+		logger.info("@matchBankStatement@还款计划匹配银行流水--开始[{}]", req.toJSONString());
 		String businessId = req.getString("businessId");
 		String afterId = req.getString("afterId");
-		JSONArray array = req.getJSONArray("array") ;
-		List<MoneyPool> moneyPools = new ArrayList<>();
+		JSONArray array = req.getJSONArray("array");
+		String mprid = req.getString("mprid");
+		
+		List<String> moneyPoolIds = new ArrayList<>();
 		for (Object obj : array) {
-			moneyPools.add((MoneyPool)obj);
+			JSONObject j = (JSONObject) obj;
+			String moneyPoolId = j.getString("moneyPoolId");
+			moneyPoolIds.add(moneyPoolId);
 		}
-		RepaymentBizPlanList planList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId));
-		logger.info("@matchBankStatement@还款计划匹配银行流水--结束[{}]",req.toJSONString());
-		return null;
-		//TODO
+		List<MoneyPool> list = moneyPoolService.selectBatchIds(moneyPoolIds);
+		result = financeService.matchBankStatement(moneyPoolIds, businessId, afterId,mprid);
+		logger.info("@matchBankStatement@还款计划匹配银行流水--结束[{}]", req.toJSONString());
+		return result;
+		// TODO
 	}
-	
-	@GetMapping(value="/getCompanys")
-	@ApiOperation(value="获取所有分公司数据")
+
+	@GetMapping(value = "/getCompanys")
+	@ApiOperation(value = "获取所有分公司数据")
 	public Result getCompanys() {
 		logger.info("@getCompanys@获取所有分公司数据--开始[]");
-		Result result ;
-		//公司
-        List<BasicCompany> company_list = basicCompanyService.selectList(new EntityWrapper<BasicCompany>().eq("area_level",AreaLevel.COMPANY_LEVEL.getKey()));
-        CompanySortByPINYINUtil.sortByPINYIN(company_list);
-        result = Result.success(company_list);
-        logger.info("@getCompanys@获取所有分公司数据--结束[{}]",result);
-        return result;
+		Result result;
+		// 公司
+		List<BasicCompany> company_list = basicCompanyService
+				.selectList(new EntityWrapper<BasicCompany>().eq("area_level", AreaLevel.COMPANY_LEVEL.getKey()));
+		CompanySortByPINYINUtil.sortByPINYIN(company_list);
+		result = Result.success(company_list);
+		logger.info("@getCompanys@获取所有分公司数据--结束[{}]", result);
+		return result;
 	}
-	
-	@GetMapping(value="/getBusinessType")
-	@ApiOperation(value="获取所有业务类型")
+
+	@GetMapping(value = "/getBusinessType")
+	@ApiOperation(value = "获取所有业务类型")
 	public Result getBusinessType() {
 		logger.info("@getBusinessType@获取所有业务类型--开始[]");
-		Result result ;
+		Result result;
 		List<BasicBusinessType> list = basicBusinessTypeService.selectList(new EntityWrapper<BasicBusinessType>());
-		result = Result.success(list) ;
-        logger.info("@getBusinessType@获取所有业务类型--结束[{}]",result);
-        return result;
+		result = Result.success(list);
+		logger.info("@getBusinessType@获取所有业务类型--结束[{}]", result);
+		return result;
 	}
-	@GetMapping(value="/getFinanceMangerList")
-	@ApiOperation(value="获取财务管理列表数据")
+
+	@GetMapping(value = "/getFinanceMangerList")
+	@ApiOperation(value = "获取财务管理列表数据")
 	public PageResult getFinanceMangerList(FinanceManagerListReq req) {
-		logger.info("@getFinanceMangerList@获取财务管理列表数据--开始[{}]",req);
+		logger.info("@getFinanceMangerList@获取财务管理列表数据--开始[{}]", req);
 		PageResult pageResult = repaymentBizPlanListService.selectByFinanceManagerListReq(req);
-		logger.info("@getFinanceMangerList@获取财务管理列表数据--结束[{}]",pageResult);
-		return pageResult ;
+		logger.info("@getFinanceMangerList@获取财务管理列表数据--结束[{}]", pageResult);
+		return pageResult;
 	}
-	
-	/*@GetMapping(value="/regRepayInfoList")
-	@ApiOperation(value="获取登记还款信息列表数据")
-	public Result regRepayInfoList(String planListId,String businessId,String afterId) {
-		Result result ;
-		logger.info("@getFinanceMangerList@获取财务管理列表数据--开始[{},{},{}]",planListId,businessId,afterId);
-		RepaymentBizPlanList repaymentBizPlanList ;
-		if (planListId==null) {
-			repaymentBizPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId)) ;
-		}else {
+
+	@GetMapping(value = "/regRepayInfoList")
+	@ApiOperation(value = "获取登记还款信息列表数据")
+	public Result regRepayInfoList(String planListId, String businessId, String afterId) {
+		Result result;
+		logger.info("@getFinanceMangerList@获取财务管理列表数据--开始[{},{},{}]", planListId, businessId, afterId);
+		RepaymentBizPlanList repaymentBizPlanList;
+		if (planListId == null) {
+			repaymentBizPlanList = repaymentBizPlanListService.selectOne(
+					new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId));
+		} else {
 			repaymentBizPlanList = repaymentBizPlanListService.selectById(planListId);
 		}
-		if (repaymentBizPlanList==null) {
+		if (repaymentBizPlanList == null) {
 			result = Result.error("500", "找不到对应的还款计划");
-			logger.info("@getFinanceMangerList@获取财务管理列表数据--结束[{}]",result);
-			return result ;
+			logger.info("@getFinanceMangerList@获取财务管理列表数据--结束[{}]", result);
+			return result;
 		}
-		List<MoneyPoolRepayment> list = moneyPoolRepaymentService.selectList(new EntityWrapper<MoneyPoolRepayment>().eq("plan_list_id", repaymentBizPlanList.getPlanListId()).ne("is_deleted", 1).orderBy("trade_date"));
+		List<MoneyPoolRepayment> list = moneyPoolRepaymentService.selectList(new EntityWrapper<MoneyPoolRepayment>()
+				.eq("plan_list_id", repaymentBizPlanList.getPlanListId()).ne("is_deleted", 1).orderBy("trade_date"));
 		result = Result.success(list);
-		logger.info("@getFinanceMangerList@获取财务管理列表数据--结束[{}]",result);
+		logger.info("@getFinanceMangerList@获取财务管理列表数据--结束[{}]", result);
 		return result;
-		
-	}*/
-	
-	/*@GetMapping(value="/matchedBankStatementList")
-	@ApiOperation(value="获取匹配的款项池银行流水数据")
-	public Result matchedBankStatementList(String planListId,String businessId,String afterId) {
-		Result result ;
-		logger.info("@getFinanceMangerList@获取财务管理列表数据--开始[{},{},{}]",planListId,businessId,afterId);
-		RepaymentBizPlanList repaymentBizPlanList ;
-		if (planListId==null) {
-			repaymentBizPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId)) ;
-		}else {
+
+	}
+
+	@GetMapping(value = "/matchedBankStatementList")
+	@ApiOperation(value = "获取匹配的款项池银行流水数据")
+	public Result matchedBankStatementList(String planListId, String businessId, String afterId) {
+		Result result;
+		logger.info("@getFinanceMangerList@获取财务管理列表数据--开始[{},{},{}]", planListId, businessId, afterId);
+		RepaymentBizPlanList repaymentBizPlanList;
+		if (planListId == null) {
+			repaymentBizPlanList = repaymentBizPlanListService.selectOne(
+					new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId));
+		} else {
 			repaymentBizPlanList = repaymentBizPlanListService.selectById(planListId);
 		}
-		if (repaymentBizPlanList==null) {
+		if (repaymentBizPlanList == null) {
 			result = Result.error("500", "找不到对应的还款计划");
-			logger.info("@getFinanceMangerList@获取财务管理列表数据--结束[{}]",result);
-			return result ;
+			logger.info("@getFinanceMangerList@获取财务管理列表数据--结束[{}]", result);
+			return result;
 		}
-		List<MoneyPoolRepayment> list = moneyPoolRepaymentService.selectList(new EntityWrapper<MoneyPoolRepayment>().eq("plan_list_id", repaymentBizPlanList.getPlanListId()).eq("is_finance_match", 1).ne("is_deleted", 1).orderBy("trade_date"));
+		List<MoneyPoolRepayment> list = moneyPoolRepaymentService.selectList(
+				new EntityWrapper<MoneyPoolRepayment>().eq("plan_list_id", repaymentBizPlanList.getPlanListId())
+						.eq("is_finance_match", 1).ne("is_deleted", 1).orderBy("trade_date"));
 		result = Result.success(list);
-		logger.info("@getFinanceMangerList@获取财务管理列表数据--结束[{}]",result);
+		logger.info("@getFinanceMangerList@获取财务管理列表数据--结束[{}]", result);
 		return result;
-		
-	}*/
-	
+
+	}
+
+	@ResponseBody
+	@PostMapping("/appointBankStatement")
+	@ApiOperation(value = "财务指定(新增)银行流水")
+	public Result appointBankStatement(@RequestBody RepaymentRegisterInfoDTO repayInfo) {
+		Result result;
+		try {
+			logger.info("@appointBankStatement@财务指定(新增)银行流水--开始[{}]", repayInfo);
+			result = financeService.appointBankStatement(repayInfo);
+			logger.info("@appointBankStatement@财务指定(新增)银行流水--结束[{}]", result);
+			return result;
+		} catch (Exception e) {
+			result = Result.error("500", e.getMessage());
+			logger.info("@appointBankStatement@财务指定(新增)银行流水--结束[{}]", result);
+			return result;
+		}
+
+	}
 }

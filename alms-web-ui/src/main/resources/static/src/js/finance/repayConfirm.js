@@ -4,17 +4,21 @@
 window.app;
 window.layinit(function (htConfig) {
     var _htConfig = htConfig;
-    var basePath = htConfig.basePath;
     var businessId = getQueryStr('businessId')
     var afterId = getQueryStr('afterId')
     var planListId = getQueryStr('planListId')
     app = new Vue({
         el: "#app",
         data:{
+            manualAddBankSatementsShow:false,
             repayInfoUrl:'/finance/repayBaseInfo?businessId='+businessId+"&afterId="+afterId,
-            repayRegListUrl:'/finance/repayRegList?planListId='+planListId,
+            repayRegListUrl:'/finance/repayRegList?businessId='+businessId+"&afterId="+afterId,
             manualAddBankSatements:'/finance/manualAddBankSatements?businessId='+businessId+"&afterId="+afterId,
-            manualAddBankSatementsShow:true
+            matchedBankStatementUrl:'/finance/matchedBankStatement?businessId='+businessId+"&afterId="+afterId,
+            style:{
+                repayRegList:{},
+                matchedBankStatement:{}
+            }
         },
         methods:{
             closeModal:function(target){
@@ -23,7 +27,12 @@ window.layinit(function (htConfig) {
                 }
             },
             configModalStyle:function(target,style){
-                
+                console.log(target);
+                console.log(style);
+                console.log(app.style[target]);
+                if(app.style[target]){
+                    app.style[target] = style
+                }
             }
         },
         created:function(){
