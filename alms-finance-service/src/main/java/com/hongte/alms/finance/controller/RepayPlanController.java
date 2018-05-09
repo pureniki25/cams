@@ -1,6 +1,6 @@
 package com.hongte.alms.finance.controller;
 
-import com.hongte.alms.base.repayPlan.req.CreatRepayPlanReq;
+import com.hongte.alms.finance.req.repayPlan.CreatRepayPlanReq;
 import com.hongte.alms.common.result.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
