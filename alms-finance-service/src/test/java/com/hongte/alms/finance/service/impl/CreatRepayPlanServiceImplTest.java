@@ -337,7 +337,7 @@ public class CreatRepayPlanServiceImplTest {
     }
 
 
-    @Test
+//    @Test
     //有分段费用 创建还款计划  测试  需要核对与原信贷生成的还款计划的差异有多大
     public  void  withFeeDetailCreatRepayPlanTest(){
 

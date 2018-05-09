@@ -47,14 +47,29 @@ public class RepayPlanController {
             logger.info("程序异常[{}]" , e);
             return Result.error("9889",e.getMessage());
         }
-        logger.info("@还款计划@创建还款计划接口,对业务和标的还款计划进行试算--结束[{}]" , creatRepayPlanReq);
+        logger.info("@还款计划@创建还款计划接口,对业务和标的还款计划进行试算--结束[{}]" , list);
 
-        return Result.success();
+        return Result.success(list);
     }
 
-
+    @ApiOperation(value = "创建还款计划并将还款计划及业务和上标信息存储到数据库 接口")
+    @PostMapping("/creatAndSaveRepayPlan")
+    @ResponseBody
     public Result creatAndSaveRepayPlan(CreatRepayPlanReq creatRepayPlanReq){
+        logger.info("@还款计划@创建还款计划接口,对业务和标的还款计划进行试算--开始[{}]" , creatRepayPlanReq);
 
+        List<RepaymentBizPlanDto>  list ;
+        try{
+            list = creatRepayPlanService.creatAndSaveRepayPlan(creatRepayPlanReq);
+        }catch (CreatRepaymentExcepiton e){
+            logger.info("传入数据格式不对[{}]" , e);
+            return Result.error(e.getCode(),e.getMsg());
+        }catch (Exception e){
+            logger.info("程序异常[{}]" , e);
+            return Result.error("9889",e.getMessage());
+        }
+
+        logger.info("@还款计划@创建还款计划接口,对业务和标的还款计划进行试算--结束[{}]" , creatRepayPlanReq);
 
         return  null;
     }
