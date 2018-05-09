@@ -85,6 +85,7 @@ public interface BasicBusinessMapper extends SuperMapper<BasicBusiness> {
 	 */
 	 Double  getMonthCompanyAmount(@Param("crpId") String crpId);
 	
+	 List<String> queryFiveLevelClassify();
 }
 
 

@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.hongte.alms.base.service.BusinessParameterService;
 import com.hongte.alms.base.vo.module.classify.ClassifyConditionVO;
 import com.hongte.alms.core.CoreServiceApplication;
-import com.hongte.alms.core.service.BusinessParameterService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = CoreServiceApplication.class)

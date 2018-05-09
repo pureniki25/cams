@@ -1,5 +1,9 @@
 package com.hongte.alms.base.mapper;
 
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
 import com.hongte.alms.base.entity.FiveLevelClassifyBusinessChangeLog;
 import com.hongte.alms.common.mapper.SuperMapper;
 
@@ -12,5 +16,5 @@ import com.hongte.alms.common.mapper.SuperMapper;
  * @since 2018-04-20
  */
 public interface FiveLevelClassifyBusinessChangeLogMapper extends SuperMapper<FiveLevelClassifyBusinessChangeLog> {
-
+	void updateValidStatusByBusinessId(@Param(value = "businessIds") List<String> businessIds);
 }

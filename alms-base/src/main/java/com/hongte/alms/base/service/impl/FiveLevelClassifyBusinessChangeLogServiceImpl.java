@@ -1,9 +1,12 @@
 package com.hongte.alms.base.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.aliyun.oss.ServiceException;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.FiveLevelClassifyBusinessChangeLog;
 import com.hongte.alms.base.mapper.FiveLevelClassifyBusinessChangeLogMapper;
 import com.hongte.alms.base.service.FiveLevelClassifyBusinessChangeLogService;
+import com.hongte.alms.base.vo.module.classify.ClassifyConditionVO;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.Constant;
 import com.ht.ussp.bean.LoginUserInfoHelper;
@@ -29,58 +32,74 @@ public class FiveLevelClassifyBusinessChangeLogServiceImpl
 		implements FiveLevelClassifyBusinessChangeLogService {
 
 	@Autowired
-	LoginUserInfoHelper loginUserInfoHelper;
+	private LoginUserInfoHelper loginUserInfoHelper;
+	
+	@Autowired
+	private FiveLevelClassifyBusinessChangeLogMapper fiveLevelClassifyBusinessChangeLogMapper;
 
 	@Override
-	public void businessChangeLog(String className, List<String> borrowerConditionDescList,
-			List<String> guaranteeConditionDescList, String uniqueId, String origBusinessId) {
-		FiveLevelClassifyBusinessChangeLog changeLog = new FiveLevelClassifyBusinessChangeLog();
+	public void businessChangeLog(ClassifyConditionVO classifyConditionVO) {
+		
+		try {
+			FiveLevelClassifyBusinessChangeLog changeLog = new FiveLevelClassifyBusinessChangeLog();
 
-		List<FiveLevelClassifyBusinessChangeLog> oldChangeLogs = this
-				.selectList(new EntityWrapper<FiveLevelClassifyBusinessChangeLog>().eq("orig_business_id", origBusinessId)
-						.eq("valid_status", "1"));
+			String businessId = classifyConditionVO.getBusinessId();
+			List<FiveLevelClassifyBusinessChangeLog> oldChangeLogs = this
+					.selectList(new EntityWrapper<FiveLevelClassifyBusinessChangeLog>().eq("orig_business_id", businessId)
+							.eq("valid_status", "1"));
 
-		if (CollectionUtils.isNotEmpty(oldChangeLogs)) {
-			for (FiveLevelClassifyBusinessChangeLog oldChangeLog : oldChangeLogs) {
-				oldChangeLog.setValidStatus("0");
-				this.updateById(oldChangeLog);
-			}
-		}
-
-		changeLog.setOrigBusinessId(origBusinessId);
-		changeLog.setOpSourseType(Constant.FIVE_LEVEL_CLASSIFY_OP_SOUSE_TYPE_ALMS_LOG);
-		changeLog.setOpSourseId(uniqueId);
-		changeLog.setOpUserId(loginUserInfoHelper.getUserId());
-		changeLog.setOpUsername(loginUserInfoHelper.getLoginInfo().getUserName());
-		changeLog.setOpTime(new Date());
-		changeLog.setValidStatus("1");
-
-		StringBuilder borrowerConditionDescBuilder = new StringBuilder();
-		if (CollectionUtils.isNotEmpty(borrowerConditionDescList)) {
-			for (String string : borrowerConditionDescList) {
-				if (borrowerConditionDescList.indexOf(string) == (borrowerConditionDescList.size() - 1)) {
-					borrowerConditionDescBuilder.append(string);
-				} else {
-					borrowerConditionDescBuilder.append((string + Constant.FIVE_LEVEL_CLASSIFY_SPLIT));
+			if (CollectionUtils.isNotEmpty(oldChangeLogs)) {
+				for (FiveLevelClassifyBusinessChangeLog oldChangeLog : oldChangeLogs) {
+					oldChangeLog.setValidStatus("0");
+					this.updateById(oldChangeLog);
 				}
 			}
-		}
-		changeLog.setBorrowerConditionDesc(borrowerConditionDescBuilder.toString());
 
-		StringBuilder guaranteeConditionDescBuilder = new StringBuilder();
-		if (CollectionUtils.isNotEmpty(guaranteeConditionDescList)) {
-			for (String string : guaranteeConditionDescList) {
-				if (guaranteeConditionDescList.indexOf(string) == (guaranteeConditionDescList.size() - 1)) {
-					guaranteeConditionDescBuilder.append(string);
-				} else {
-					guaranteeConditionDescBuilder.append((string + Constant.FIVE_LEVEL_CLASSIFY_SPLIT));
+			changeLog.setOrigBusinessId(businessId);
+			changeLog.setOpSourseType(classifyConditionVO.getOpSourse());
+			changeLog.setOpSourseId(classifyConditionVO.getOpSourseId());
+			changeLog.setOpUserId(loginUserInfoHelper.getUserId());
+			changeLog.setOpUsername(loginUserInfoHelper.getLoginInfo().getUserName());
+			changeLog.setOpTime(new Date());
+			changeLog.setValidStatus("1");
+			changeLog.setParamJson(JSON.toJSONString(classifyConditionVO));
+
+			StringBuilder borrowerConditionDescBuilder = new StringBuilder();
+			List<String> mainBorrowerConditions = classifyConditionVO.getMainBorrowerConditions();
+			if (CollectionUtils.isNotEmpty(mainBorrowerConditions)) {
+				for (String string : mainBorrowerConditions) {
+					if (mainBorrowerConditions.indexOf(string) == (mainBorrowerConditions.size() - 1)) {
+						borrowerConditionDescBuilder.append(string);
+					} else {
+						borrowerConditionDescBuilder.append((string + Constant.FIVE_LEVEL_CLASSIFY_SPLIT));
+					}
 				}
 			}
-		}
-		changeLog.setGuaranteeConditionDesc(guaranteeConditionDescBuilder.toString());
+			changeLog.setBorrowerConditionDesc(borrowerConditionDescBuilder.toString());
 
-		changeLog.setClassName(className);
-		this.insert(changeLog);
+			StringBuilder guaranteeConditionDescBuilder = new StringBuilder();
+			List<String> guaranteeConditions = classifyConditionVO.getGuaranteeConditions();
+			if (CollectionUtils.isNotEmpty(guaranteeConditions)) {
+				for (String string : guaranteeConditions) {
+					if (guaranteeConditions.indexOf(string) == (guaranteeConditions.size() - 1)) {
+						guaranteeConditionDescBuilder.append(string);
+					} else {
+						guaranteeConditionDescBuilder.append((string + Constant.FIVE_LEVEL_CLASSIFY_SPLIT));
+					}
+				}
+			}
+			changeLog.setGuaranteeConditionDesc(guaranteeConditionDescBuilder.toString());
+
+			changeLog.setClassName(classifyConditionVO.getClassName());
+			this.insert(changeLog);
+		} catch (Exception e) {
+			throw new ServiceException(e);
+		}
+	}
+
+	@Override
+	public void updateValidStatusByBusinessId(List<String> businessIds) {
+		fiveLevelClassifyBusinessChangeLogMapper.updateValidStatusByBusinessId(businessIds);
 	}
 
 }

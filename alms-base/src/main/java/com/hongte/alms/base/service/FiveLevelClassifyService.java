@@ -19,4 +19,6 @@ public interface FiveLevelClassifyService extends BaseService<FiveLevelClassify>
 	List<FiveLevelClassify> queryDataByCondition(Map<String, Object> paramMap);
 	
 	Integer queryMayBeUsed(String businessType, String className);
+	
+	void fiveLevelClassifySchedule();
 }
