@@ -12,11 +12,9 @@ import org.springframework.stereotype.Service;
  * </p>
  *
  * @author 曾坤
- * @since 2018-04-24
+ * @since 2018-05-03
  */
 @Service("RepaymentProjPlanListDetailService")
 public class RepaymentProjPlanListDetailServiceImpl extends BaseServiceImpl<RepaymentProjPlanListDetailMapper, RepaymentProjPlanListDetail> implements RepaymentProjPlanListDetailService {
-
-
 
 }

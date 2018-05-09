@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+    <title>手动匹配银行流水</title>
+    <script src="/properties/config.js"></script>
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css" />
+    <!-- iview样式 -->
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/2.13.1/css/iview.css" />
+    <!-- 引入layui样式 -->
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all" />
+
+    <!-- 引入vue -->
+    <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+    <!-- iview js -->
+    <script type="text/javascript" src="/plugins/iview/2.13.1/js/iview.min.js"></script>
+    <!--引入layui.js-->
+    <script src="/plugins/layui/layui.js"></script>
+    <!--引入axios.js 用于ajax调用-->
+    <script src="/plugins/axios/axios.min.js"></script>
+    <!-- 引入jQuery，必须在appToken.js 之前引入 -->
+    <script src="/build/js/jquery-3.3.1.min.js"></script>
+    <!-- 设置全局请求头:app、Authorization -->
+    <script src="/build/js/appToken.js"></script>
+    <!--引入公共的一些方法-->
+    <script src="/src/js/comm.js"></script>
+</head>
+
+<body>
+    <!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+    <div id="app" v-cloak>
+        <Card title="手动新增银行流水">
+            <i-form ref="form" :model="form" label-position="left" label-width="100">
+                <form-item prop="repayDate" label="还款日期" required>
+                    <date-picker v-model="form.repaymentDate"></date-picker>
+                </form-item>
+                <form-item prop="repayAmount" label="还款金额" required>
+                    <i-input v-model="form.repaymentMoney" number></i-input>
+                    <span style="color:red">{{ArabicToChinese(form.repaymentMoney)}}</span>
+                    <!-- <i-input :value="ArabicToChinese(form.repayAmount)" style="color:red" readonly></i-input> -->
+                </form-item>
+
+                <form-item prop="tradeType" label="支付类型" required>
+                    <i-select v-model="form.tradeType">
+                        <i-option value="转账">转账</i-option>
+                        <i-option value="现金">现金</i-option>
+                        <i-option value="刷卡">刷卡</i-option>
+                    </i-select>
+                </form-item>
+
+                <form-item prop="acceptBank" :label="acceptAccountLabel" required>
+                    <i-select v-if="form.tradeType=='转账'||form.tradeType=='刷卡'" v-model="form.acceptBank">
+                        <i-option v-for="item in bankAccountList" :value="item.financeName">{{item.financeName}}</i-option>
+                    </i-select>
+                    <i-input v-if="form.tradeType=='转账'||form.tradeType=='刷卡'" :value="curBankAccount" readonly></i-input>
+                    <i-input v-if="form.tradeType=='现金'" v-model="form.acceptBank"></i-input>
+                </form-item>
+
+                <form-item prop="factRepaymentUser" label="实际转款人" required>
+                    <i-input v-model="form.factRepaymentUser"></i-input>
+                </form-item>
+                <form-item prop="tradePlace" label="交易场所" v-if="form.tradeType=='转账'||form.tradeType=='刷卡'">
+                    <i-input v-model="form.tradePlace"></i-input>
+                </form-item>
+
+                <form-item label="上传凭证">
+                    <Upload ref="upload" :action="upload.url" :headers="upload.headers" :data="upload.data" :before-upload="beforeUpload" :max-size="upload.maxSize"
+                        :accept="upload.accept" :on-success="onUploadSuccess" :on-error="onUploadError" :on-format-error="onFormatError"
+                        :on-exceeded-size="onExceededSize">
+                        <i-button type="ghost" icon="ios-cloud-upload-outline">{{form.certUrl&&form.certUrl.length>0?'重新上传凭证':'上传凭证'}}</i-button>
+                    </Upload>
+                </form-item>
+                <form-item prop="remark" label="备注">
+                    <i-input v-model="form.remark" type="textarea"></i-input>
+                </form-item>
+                <form-item>
+                    <i-button @click="submit">提交</i-button>
+                    <i-button @click="cancel">取消</i-button>
+                </form-item>
+            </i-form>
+        </Card>
+    </div>
+    <script src="/src/js/finance/manualAddBankSatements.js"></script>
+</body>
+
+</html>

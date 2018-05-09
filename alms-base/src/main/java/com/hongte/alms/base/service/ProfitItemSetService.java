@@ -40,5 +40,5 @@ public interface ProfitItemSetService extends BaseService<ProfitItemSet> {
      * @return itemLevel feeLevel
      */
     
-	 Map<String, Object>  getLevel( String businessId,Integer itemType,String feeId);
+	 Map<String, Integer>  getLevel( String businessId,Integer itemType,String feeId);
 }

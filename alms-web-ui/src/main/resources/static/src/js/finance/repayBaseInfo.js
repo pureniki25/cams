@@ -4,7 +4,10 @@
 let app
 window.layinit(function (htConfig) {
     var _htConfig = htConfig;
-    var basePath = htConfig.coreBasePath;
+
+    let cpath = htConfig.coreBasePath;
+    let fpath = htConfig.financeBasePath;
+
     var businessId = getQueryStr('businessId')
     var afterId = getQueryStr('afterId')
     app = new Vue({
@@ -19,7 +22,7 @@ window.layinit(function (htConfig) {
         beforeCreate: function () {
         },
         created: function () {
-            axios.get('http://localhost:30621/finance/repayBaseInfo', {
+            axios.get(fpath+'finance/repayBaseInfo', {
                 params: {
                     businessId: businessId,
                     afterId: afterId
@@ -28,6 +31,8 @@ window.layinit(function (htConfig) {
                 .then(function (res) {
                     if (res.data.code == '1') {
                         app.info = res.data.data;
+                    }else{
+                        app.$Message.error({content:res.data.msg})
                     }
                     app.spinShow=false
                 })

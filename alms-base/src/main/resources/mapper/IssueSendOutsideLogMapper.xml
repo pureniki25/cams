@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.IssueSendOutsideLogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.IssueSendOutsideLog">
+        <id column="id" property="id" />
+        <result column="system" property="system" />
+        <result column="send_url" property="sendUrl" />
+        <result column="send_key" property="sendKey" />
+        <result column="send_json" property="sendJson" />
+        <result column="send_json_encrypt" property="sendJsonEncrypt" />
+        <result column="return_json" property="returnJson" />
+        <result column="Interfacecode" property="Interfacecode" />
+        <result column="Interfacename" property="Interfacename" />
+        <result column="return_json_decrypt" property="returnJsonDecrypt" />
+        <result column="create_user_id" property="createUserId" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, system, send_url AS sendUrl, send_key AS sendKey, send_json AS sendJson, send_json_encrypt AS sendJsonEncrypt, return_json AS returnJson, Interfacecode, Interfacename, return_json_decrypt AS returnJsonDecrypt, create_user_id AS createUserId, create_time AS createTime
+    </sql>
+
+</mapper>

@@ -16,8 +16,8 @@ import io.swagger.annotations.ApiModelProperty;
  * 还款计划应还项目明细表
  * </p>
  *
- * @author 王继光
- * @since 2018-03-06
+ * @author 曾坤
+ * @since 2018-05-03
  */
 @ApiModel
 @TableName("tb_repayment_biz_plan_list_detail")
@@ -43,16 +43,18 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 	@TableField("business_id")
 	@ApiModelProperty(required= true,value = "还款计划所属业务ID(若当前业务为展期，则存展期业务编号)")
 	private String businessId;
-	
-	@TableField("share_profit_index")
-	@ApiModelProperty(required= true,value = "分润顺序（根据分润配置计算）")
-	private String shareProfitIndex;
-	
+
     /**
      * 所属期数
      */
 	@ApiModelProperty(required= true,value = "所属期数")
 	private Integer period;
+    /**
+     * 分润顺序（根据分润配置计算）
+     */
+	@TableField("share_profit_index")
+	@ApiModelProperty(required= true,value = "分润顺序（根据分润配置计算）")
+	private Integer shareProfitIndex;
     /**
      * 项目计划应还总金额(元)
      */
@@ -107,19 +109,23 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 	@TableField("fact_repay_date")
 	@ApiModelProperty(required= true,value = "实还日期")
 	private Date factRepayDate;
-
-	/**
-	 * 是否有效状态：1 有效 ，0 无效
-	 */
+    /**
+     * 是否有效状态：1 有效 ，0 无效
+     */
 	@ApiModelProperty(required= true,value = "是否有效状态：1 有效 ，0 无效")
 	private Integer active;
-
     /**
      * 创建日期
      */
 	@TableField("create_date")
 	@ApiModelProperty(required= true,value = "创建日期")
 	private Date createDate;
+    /**
+     * 来源类型：1.信贷生成，2.贷后管理生成
+     */
+	@TableField("src_type")
+	@ApiModelProperty(required= true,value = "来源类型：1.信贷生成，2.贷后管理生成")
+	private Integer srcType;
     /**
      * 创建用户
      */
@@ -140,13 +146,6 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 	private String updateUser;
 
 
-	public String getShareProfitIndex() {
-		return shareProfitIndex;
-	}
-
-	public void setShareProfitIndex(String shareProfitIndex) {
-		this.shareProfitIndex = shareProfitIndex;
-	}
 
 	public String getPlanDetailId() {
 		return planDetailId;
@@ -178,6 +177,14 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 
 	public void setPeriod(Integer period) {
 		this.period = period;
+	}
+
+	public Integer getShareProfitIndex() {
+		return shareProfitIndex;
+	}
+
+	public void setShareProfitIndex(Integer shareProfitIndex) {
+		this.shareProfitIndex = shareProfitIndex;
 	}
 
 	public BigDecimal getPlanAmount() {
@@ -252,12 +259,28 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 		this.factRepayDate = factRepayDate;
 	}
 
+	public Integer getActive() {
+		return active;
+	}
+
+	public void setActive(Integer active) {
+		this.active = active;
+	}
+
 	public Date getCreateDate() {
 		return createDate;
 	}
 
 	public void setCreateDate(Date createDate) {
 		this.createDate = createDate;
+	}
+
+	public Integer getSrcType() {
+		return srcType;
+	}
+
+	public void setSrcType(Integer srcType) {
+		this.srcType = srcType;
 	}
 
 	public String getCreateUser() {
@@ -296,6 +319,7 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 			", planListId=" + planListId +
 			", businessId=" + businessId +
 			", period=" + period +
+			", shareProfitIndex=" + shareProfitIndex +
 			", planAmount=" + planAmount +
 			", planRate=" + planRate +
 			", feeId=" + feeId +
@@ -305,18 +329,12 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 			", factAmount=" + factAmount +
 			", repaySource=" + repaySource +
 			", factRepayDate=" + factRepayDate +
+			", active=" + active +
 			", createDate=" + createDate +
+			", srcType=" + srcType +
 			", createUser=" + createUser +
 			", updateDate=" + updateDate +
 			", updateUser=" + updateUser +
 			"}";
-	}
-
-	public Integer getActive() {
-		return active;
-	}
-
-	public void setActive(Integer active) {
-		this.active = active;
 	}
 }

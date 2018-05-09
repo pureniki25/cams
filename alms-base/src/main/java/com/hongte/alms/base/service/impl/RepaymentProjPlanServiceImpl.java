@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * 业务还款计划信息 服务实现类
+ * 标的还款计划信息 服务实现类
  * </p>
  *
  * @author 曾坤
- * @since 2018-04-24
+ * @since 2018-05-03
  */
 @Service("RepaymentProjPlanService")
 public class RepaymentProjPlanServiceImpl extends BaseServiceImpl<RepaymentProjPlanMapper, RepaymentProjPlan> implements RepaymentProjPlanService {

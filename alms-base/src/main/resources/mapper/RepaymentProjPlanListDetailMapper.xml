@@ -6,25 +6,22 @@
     <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.RepaymentProjPlanListDetail">
         <id column="proj_plan_detail_id" property="projPlanDetailId" />
         <result column="proj_plan_list_id" property="projPlanListId" />
+        <result column="share_profit_index" property="shareProfitIndex" />
         <result column="plan_detail_id" property="planDetailId" />
         <result column="plan_list_id" property="planListId" />
         <result column="business_id" property="businessId" />
+        <result column="orig_business_id" property="origBusinessId" />
         <result column="period" property="period" />
-        <result column="plan_amount" property="planAmount" />
-        <result column="plan_rate" property="planRate" />
         <result column="fee_id" property="feeId" />
         <result column="plan_item_name" property="planItemName" />
         <result column="plan_item_type" property="planItemType" />
         <result column="account_status" property="accountStatus" />
-        <result column="fact_amount" property="factAmount" />
-        <result column="repay_source" property="repaySource" />
         <result column="fact_repay_date" property="factRepayDate" />
-        <result column="biz_plan_amount" property="bizPlanAmount" />
         <result column="proj_plan_amount" property="projPlanAmount" />
-        <result column="biz_fact_amount" property="bizFactAmount" />
         <result column="proj_fact_amount" property="projFactAmount" />
-        <result column="proj_fact_repay_date" property="projFactRepayDate" />
         <result column="active" property="active" />
+        <result column="creat_sys_type" property="creatSysType" />
+        <result column="plate_type" property="plateType" />
         <result column="create_date" property="createDate" />
         <result column="create_user" property="createUser" />
         <result column="update_date" property="updateDate" />
@@ -33,7 +30,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        proj_plan_detail_id AS projPlanDetailId, proj_plan_list_id AS projPlanListId, plan_detail_id AS planDetailId, plan_list_id AS planListId, business_id AS businessId, period, plan_amount AS planAmount, plan_rate AS planRate, fee_id AS feeId, plan_item_name AS planItemName, plan_item_type AS planItemType, account_status AS accountStatus, fact_amount AS factAmount, repay_source AS repaySource, fact_repay_date AS factRepayDate, biz_plan_amount AS bizPlanAmount, proj_plan_amount AS projPlanAmount, biz_fact_amount AS bizFactAmount, proj_fact_amount AS projFactAmount, proj_fact_repay_date AS projFactRepayDate,active, create_date AS createDate, create_user AS createUser, update_date AS updateDate, update_user AS updateUser
+        proj_plan_detail_id AS projPlanDetailId, proj_plan_list_id AS projPlanListId, share_profit_index AS shareProfitIndex, plan_detail_id AS planDetailId, plan_list_id AS planListId, business_id AS businessId, orig_business_id AS origBusinessId, period, fee_id AS feeId, plan_item_name AS planItemName, plan_item_type AS planItemType, account_status AS accountStatus, fact_repay_date AS factRepayDate, proj_plan_amount AS projPlanAmount, proj_fact_amount AS projFactAmount, active, creat_sys_type AS creatSysType, plate_type AS plateType, create_date AS createDate, create_user AS createUser, update_date AS updateDate, update_user AS updateUser
     </sql>
 
 </mapper>

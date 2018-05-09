@@ -24,6 +24,11 @@ public class FinanceController {
 		return "/finance/manualMatchBankSatements" ;
 	}
 	
+	@RequestMapping("/manualAddBankSatements")
+	public String manualAddBankSatements() {
+		return "/finance/manualAddBankSatements" ;
+	}
+	
 	@RequestMapping("/repayConfirm")
 	public String repayConfirm() {
 		return "/finance/repayConfirm" ;
@@ -32,5 +37,15 @@ public class FinanceController {
 	@RequestMapping("/repayBaseInfo")
 	public String repayBaseInfo() {
 		return "/finance/repayBaseInfo" ;
+	}
+	
+	@RequestMapping("/repayRegList")
+	public String repayRegList() {
+		return "/finance/repayRegList" ;
+	}
+	
+	@RequestMapping("/matchedBankStatement")
+	public String matchedBankStatement() {
+		return "/finance/matchedBankStatement";
 	}
 }

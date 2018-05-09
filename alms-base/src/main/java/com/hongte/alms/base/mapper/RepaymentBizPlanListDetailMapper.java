@@ -8,8 +8,8 @@ import com.hongte.alms.common.mapper.SuperMapper;
  * 还款计划应还项目明细表 Mapper 接口
  * </p>
  *
- * @author 王继光
- * @since 2018-03-06
+ * @author 曾坤
+ * @since 2018-05-03
  */
 public interface RepaymentBizPlanListDetailMapper extends SuperMapper<RepaymentBizPlanListDetail> {
 

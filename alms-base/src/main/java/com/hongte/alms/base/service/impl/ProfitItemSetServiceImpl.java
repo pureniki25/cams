@@ -42,6 +42,9 @@ public class ProfitItemSetServiceImpl extends BaseServiceImpl<ProfitItemSetMappe
     @Autowired
 	@Qualifier("ProfitFeeSetService")
 	ProfitFeeSetService profitFeeSetService;
+
+    private final  Integer  initLevel = 1000;
+
 	@Override
 	public void saveItemTypes(List<SysParameter> itemTypes, Integer businessTypeId) {
 		ProfitItemSet itemSet=new ProfitItemSet();
@@ -64,8 +67,8 @@ public class ProfitItemSetServiceImpl extends BaseServiceImpl<ProfitItemSetMappe
 		
 	}
 	@Override
-	public Map<String, Object> getLevel(String businessTypeId, Integer itemType, String feeId) {
-		Map <String,Object> map=new HashMap<String, Object>();
+	public Map<String, Integer> getLevel(String businessTypeId, Integer itemType, String feeId) {
+		Map <String,Integer> map=new HashMap<>();
 		ProfitItemSet itemSet=selectOne(new EntityWrapper<ProfitItemSet>().eq("item_type", itemType).eq("business_type_id", businessTypeId));
 		
 		if(itemSet!=null) {
@@ -77,7 +80,11 @@ public class ProfitItemSetServiceImpl extends BaseServiceImpl<ProfitItemSetMappe
 				map.put("feeLevel", itemSet.getItemLevel());
 			}
 		}
-		
+
+		if(map.get("feeLevel")==null){
+			map.put("feeLevel", initLevel);
+		}
+
 		return map;
 	}
 

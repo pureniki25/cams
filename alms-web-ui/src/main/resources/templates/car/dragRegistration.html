@@ -191,21 +191,24 @@
                             </form-item>
                         </i-col>
                     </row>
-                    <form-item label="拖车地点：">
-                        <row :gutter="9">
-                            <i-col span="4">
-                                <form-item prop="dragArea">
+                 <row :gutter="16"> 
+                            <i-col span="6">
+                                <form-item label="拖车地点：" prop="dragArea">
                                     <cascader :data="componentOption.areaData" v-model="registrationInfoForm.dragArea"></cascader>
                                 </form-item>
+                               
                             </i-col>
-                            <i-col span="5">
-                                <form-item prop="detailAddress">
+                      
+                     </row>
+                     
+                          <row :gutter="16"> 
+                       
+                            <i-col span="10">
+                                <form-item  label="详细地址：" prop="detailAddress">
                                     <i-input v-model="registrationInfoForm.detailAddress" placeholder="详细地址"></i-input>
                                 </form-item>
                             </i-col>
-                        </row>
-                    </form-item>
-
+                     </row>
                     <row :gutter="16">
                         <i-col span="10">
                             <form-item label="拖车费用：" prop="fee">

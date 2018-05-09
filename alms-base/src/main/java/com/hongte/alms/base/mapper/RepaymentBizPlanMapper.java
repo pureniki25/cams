@@ -12,14 +12,13 @@ import com.hongte.alms.common.mapper.SuperMapper;
  * 业务还款计划信息 Mapper 接口
  * </p>
  *
- * @author 王继光
- * @since 2018-03-06
+ * @author 曾坤
+ * @since 2018-05-03
  */
 public interface RepaymentBizPlanMapper extends SuperMapper<RepaymentBizPlan> {
-	
 
     /**
-     * 
+     *
      * @author chenzs
      * @param key
      * @return

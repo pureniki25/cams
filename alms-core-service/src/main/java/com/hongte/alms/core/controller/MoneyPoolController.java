@@ -261,10 +261,6 @@ public class MoneyPoolController {
 		if (businessId == null) {
 			return Result.error("500", "businessId can't be null");
 		}
-		String userId = loginUserInfoHelper.getUserId();
-		if (userId == null) {
-			return Result.error("500", "userId can't be null");
-		}
 		try {
 			List<DepartmentBankVO> list = departmentBankService.listDepartmentBank(businessId);
 			return Result.success(list);
@@ -293,15 +289,16 @@ public class MoneyPoolController {
 	@GetMapping("/checkMoneyPool")
 	@ResponseBody
 	public Result checkMoneyPool(String businessId,String afterId,Boolean isMatched) {
-//		RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId));
-		
+		logger.info("@checkMoneyPool@款项池登记信息--开始[{},{},{}]",businessId,afterId,isMatched);
 		if (isMatched) {
 			List<MatchedMoneyPoolVO> list = moneyPoolService.listMatchedMoneyPool(businessId,afterId);
+			logger.info("@checkMoneyPool@款项池登记信息--结束[{}]",list);
 			return Result.success(list);
 		}else {
 			EntityWrapper<MoneyPoolRepayment> ew = new EntityWrapper<MoneyPoolRepayment>();
 			ew.eq("original_business_id", businessId).eq("after_id", afterId).orderBy("update_time",false).orderBy("trade_date",false);
 			List<MoneyPoolRepayment> list = moneyPoolRepaymentService.selectList(ew);
+			logger.info("@checkMoneyPool@款项池登记信息--结束[{}]",list);
 			return Result.success(list);
 		}
 		

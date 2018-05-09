@@ -17,7 +17,7 @@ import io.swagger.annotations.ApiModelProperty;
  * </p>
  *
  * @author 曾坤
- * @since 2018-04-24
+ * @since 2018-05-03
  */
 @ApiModel
 @TableName("tb_repayment_proj_plan_list_detail")
@@ -38,6 +38,12 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
 	@ApiModelProperty(required= true,value = "所属标的还款计划列表ID(外键，对应tb_repayment_proj_plan_list.proj_plan_list_id)")
 	private String projPlanListId;
     /**
+     * 分润顺序（根据分润配置计算）
+     */
+	@TableField("share_profit_index")
+	@ApiModelProperty(required= true,value = "分润顺序（根据分润配置计算）")
+	private Integer shareProfitIndex;
+    /**
      * 所属还款计划列表详情ID(外键，对应tb_repayment_biz_plan_list_detail.plan_detail_id)
      */
 	@TableField("plan_detail_id")
@@ -56,22 +62,22 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
 	@ApiModelProperty(required= true,value = "还款计划所属业务ID(若当前业务为展期，则存展期业务编号)")
 	private String businessId;
     /**
+     * 还款计划所属原业务编号
+     */
+	@TableField("orig_business_id")
+	@ApiModelProperty(required= true,value = "还款计划所属原业务编号")
+	private String origBusinessId;
+    /**
      * 所属期数
      */
 	@ApiModelProperty(required= true,value = "所属期数")
 	private Integer period;
-    /**
-     * 项目计划应还总金额(元)
-     */
-	@TableField("plan_amount")
-	@ApiModelProperty(required= true,value = "项目计划应还总金额(元)")
-	private BigDecimal planAmount;
-    /**
-     * 项目计划应还比例(%)，如0.5%则存0.5，可空
-     */
-	@TableField("plan_rate")
-	@ApiModelProperty(required= true,value = "项目计划应还比例(%)，如0.5%则存0.5，可空")
-	private BigDecimal planRate;
+//    /**
+//     * 项目计划应还总金额(元)
+//     */
+//	@TableField("plan_amount")
+//	@ApiModelProperty(required= true,value = "项目计划应还总金额(元)")
+//	private BigDecimal planAmount;
     /**
      * 资产端费用项ID，用于资产端区分同名的项目，若不存在同名费用项，可为空
      */
@@ -97,18 +103,6 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
 	@ApiModelProperty(required= true,value = "分账标记(冲应收还款，根据冲应收明细进行分账)，0：不线上分账，10：分账到借款人账户，20：分账到资产端账户，30：分账到资金端账户(平台)，40：分账到担保公司账户")
 	private Integer accountStatus;
     /**
-     * 实还金额(元)
-     */
-	@TableField("fact_amount")
-	@ApiModelProperty(required= true,value = "实还金额(元)")
-	private BigDecimal factAmount;
-    /**
-     * 还款来源，10：线下转账，20：线下代扣，30：银行代扣
-     */
-	@TableField("repay_source")
-	@ApiModelProperty(required= true,value = "还款来源，10：线下转账，20：线下代扣，30：银行代扣")
-	private Integer repaySource;
-    /**
      * 实还日期
      */
 	@TableField("fact_repay_date")
@@ -117,41 +111,32 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
     /**
      * 标的资产端计划还款金额(元)
      */
-	@TableField("biz_plan_amount")
-	@ApiModelProperty(required= true,value = "标的资产端计划还款金额(元)")
-	private BigDecimal bizPlanAmount;
-    /**
-     * 标的资金端(平台)计划还款金额(元)
-     */
 	@TableField("proj_plan_amount")
-	@ApiModelProperty(required= true,value = "标的资金端(平台)计划还款金额(元)")
+	@ApiModelProperty(required= true,value = "标的资产端计划还款金额(元)")
 	private BigDecimal projPlanAmount;
     /**
      * 标的资产端实还金额(元)
      */
-	@TableField("biz_fact_amount")
-	@ApiModelProperty(required= true,value = "标的资产端实还金额(元)")
-	private BigDecimal bizFactAmount;
-    /**
-     * 标的资金端(平台)实还金额(元)
-     */
 	@TableField("proj_fact_amount")
-	@ApiModelProperty(required= true,value = "标的资金端(平台)实还金额(元)")
+	@ApiModelProperty(required= true,value = "标的资产端实还金额(元)")
 	private BigDecimal projFactAmount;
     /**
-     * 标的资金端(平台)实还日期
+     * 是否有效状态：1 有效 ，0 无效
      */
-	@TableField("proj_fact_repay_date")
-	@ApiModelProperty(required= true,value = "标的资金端(平台)实还日期")
-	private Date projFactRepayDate;
-
-	/**
-	 * 是否有效状态：1 有效 ，0 无效
-	 */
 	@ApiModelProperty(required= true,value = "是否有效状态：1 有效 ，0 无效")
 	private Integer active;
-
-
+    /**
+     * 生成系统类型：1.信贷生成，2.贷后管理生成
+     */
+	@TableField("creat_sys_type")
+	@ApiModelProperty(required= true,value = "生成系统类型：1.信贷生成，2.贷后管理生成")
+	private Integer creatSysType;
+    /**
+     * 平台标志：1.团贷网，2.你我金融
+     */
+	@TableField("plate_type")
+	@ApiModelProperty(required= true,value = "平台标志：1.团贷网，2.你我金融")
+	private Integer plateType;
     /**
      * 创建日期
      */
@@ -194,6 +179,14 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
 		this.projPlanListId = projPlanListId;
 	}
 
+	public Integer getShareProfitIndex() {
+		return shareProfitIndex;
+	}
+
+	public void setShareProfitIndex(Integer shareProfitIndex) {
+		this.shareProfitIndex = shareProfitIndex;
+	}
+
 	public String getPlanDetailId() {
 		return planDetailId;
 	}
@@ -218,28 +211,20 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
 		this.businessId = businessId;
 	}
 
+	public String getOrigBusinessId() {
+		return origBusinessId;
+	}
+
+	public void setOrigBusinessId(String origBusinessId) {
+		this.origBusinessId = origBusinessId;
+	}
+
 	public Integer getPeriod() {
 		return period;
 	}
 
 	public void setPeriod(Integer period) {
 		this.period = period;
-	}
-
-	public BigDecimal getPlanAmount() {
-		return planAmount;
-	}
-
-	public void setPlanAmount(BigDecimal planAmount) {
-		this.planAmount = planAmount;
-	}
-
-	public BigDecimal getPlanRate() {
-		return planRate;
-	}
-
-	public void setPlanRate(BigDecimal planRate) {
-		this.planRate = planRate;
 	}
 
 	public String getFeeId() {
@@ -274,36 +259,12 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
 		this.accountStatus = accountStatus;
 	}
 
-	public BigDecimal getFactAmount() {
-		return factAmount;
-	}
-
-	public void setFactAmount(BigDecimal factAmount) {
-		this.factAmount = factAmount;
-	}
-
-	public Integer getRepaySource() {
-		return repaySource;
-	}
-
-	public void setRepaySource(Integer repaySource) {
-		this.repaySource = repaySource;
-	}
-
 	public Date getFactRepayDate() {
 		return factRepayDate;
 	}
 
 	public void setFactRepayDate(Date factRepayDate) {
 		this.factRepayDate = factRepayDate;
-	}
-
-	public BigDecimal getBizPlanAmount() {
-		return bizPlanAmount;
-	}
-
-	public void setBizPlanAmount(BigDecimal bizPlanAmount) {
-		this.bizPlanAmount = bizPlanAmount;
 	}
 
 	public BigDecimal getProjPlanAmount() {
@@ -314,14 +275,6 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
 		this.projPlanAmount = projPlanAmount;
 	}
 
-	public BigDecimal getBizFactAmount() {
-		return bizFactAmount;
-	}
-
-	public void setBizFactAmount(BigDecimal bizFactAmount) {
-		this.bizFactAmount = bizFactAmount;
-	}
-
 	public BigDecimal getProjFactAmount() {
 		return projFactAmount;
 	}
@@ -330,12 +283,28 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
 		this.projFactAmount = projFactAmount;
 	}
 
-	public Date getProjFactRepayDate() {
-		return projFactRepayDate;
+	public Integer getActive() {
+		return active;
 	}
 
-	public void setProjFactRepayDate(Date projFactRepayDate) {
-		this.projFactRepayDate = projFactRepayDate;
+	public void setActive(Integer active) {
+		this.active = active;
+	}
+
+	public Integer getCreatSysType() {
+		return creatSysType;
+	}
+
+	public void setCreatSysType(Integer creatSysType) {
+		this.creatSysType = creatSysType;
+	}
+
+	public Integer getPlateType() {
+		return plateType;
+	}
+
+	public void setPlateType(Integer plateType) {
+		this.plateType = plateType;
 	}
 
 	public Date getCreateDate() {
@@ -380,36 +349,26 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
 		return "RepaymentProjPlanListDetail{" +
 			", projPlanDetailId=" + projPlanDetailId +
 			", projPlanListId=" + projPlanListId +
+			", shareProfitIndex=" + shareProfitIndex +
 			", planDetailId=" + planDetailId +
 			", planListId=" + planListId +
 			", businessId=" + businessId +
+			", origBusinessId=" + origBusinessId +
 			", period=" + period +
-			", planAmount=" + planAmount +
-			", planRate=" + planRate +
 			", feeId=" + feeId +
 			", planItemName=" + planItemName +
 			", planItemType=" + planItemType +
 			", accountStatus=" + accountStatus +
-			", factAmount=" + factAmount +
-			", repaySource=" + repaySource +
 			", factRepayDate=" + factRepayDate +
-			", bizPlanAmount=" + bizPlanAmount +
 			", projPlanAmount=" + projPlanAmount +
-			", bizFactAmount=" + bizFactAmount +
 			", projFactAmount=" + projFactAmount +
-			", projFactRepayDate=" + projFactRepayDate +
+			", active=" + active +
+			", creatSysType=" + creatSysType +
+			", plateType=" + plateType +
 			", createDate=" + createDate +
 			", createUser=" + createUser +
 			", updateDate=" + updateDate +
 			", updateUser=" + updateUser +
 			"}";
-	}
-
-	public Integer getActive() {
-		return active;
-	}
-
-	public void setActive(Integer active) {
-		this.active = active;
 	}
 }

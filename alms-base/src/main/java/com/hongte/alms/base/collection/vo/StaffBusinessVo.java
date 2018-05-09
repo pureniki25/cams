@@ -1,7 +1,5 @@
 package com.hongte.alms.base.collection.vo;
 
-import com.hongte.alms.base.enums.RepayPlanStatus;
-
 import java.util.Date;
 
 /**

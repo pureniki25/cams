@@ -51,11 +51,11 @@ window.layinit(function(htConfig){
             searchForm: {
                 areaId:'',  //区域ID
                 companyId:'', //分公司ID
-                // showRepayDateBegin:'', //应还日期  开始
-                // showRepayDateEnd:'',  //应还日期 结束
+                 showRepayDateBegin:'', //应还日期  开始
+                 showRepayDateEnd:'',  //应还日期 结束
                 showRepayDateRange:'',//应还日期 区间 包含开始和结束时间
-                // realRepayDateBegin:'', //实还日期 开始
-                // realRepayDateEnd:'', //实还日期 结束
+                 realRepayDateBegin:'', //实还日期 开始
+                 realRepayDateEnd:'', //实还日期 结束
                 realRepayDateRange:'',//实还日期  区间 包含开始和结束时间
                 delayDaysBegin:0,    //逾期天数 开始
                 delayDaysEnd:'', //逾期天数 结束
@@ -69,6 +69,7 @@ window.layinit(function(htConfig){
                 repayStatus:'逾期',      //还款状态
                 customerName:'',  //客户名称
                 peroidStatus:'' //期数状态,首期/本金期/末期
+        
             },
             areaList:'',//area_array,   //区域列表
             companyList: '',//company_array,  //公司列表
@@ -173,33 +174,10 @@ window.layinit(function(htConfig){
                 layui.use(['layer', 'table','ht_config'], function () {debugger
                 vm.$refs['searchForm'].validate((valid) => {
 		                    if (valid) {debugger
-		                        var dateObj = getData();
+		                        getData();
 		                        vm.exporting = true;
-		                        expoertExcel(basePath + "collection/saveExcel",vm.searchForm);
-		//                         var ExportForm = document.createElement("FORM");
-		//                         document.body.appendChild(ExportForm);
-		//                         ExportForm.method = "POST";
-		//                         ExportForm.action = basePath+"collection/saveExcel";
-		//                         ExportForm.target = "iframe";
-		//                         addInput(ExportForm, "text", "areaId", vm.searchForm.areaId);//区域ID
-		//                         addInput(ExportForm, "text", "companyId", vm.searchForm.companyId); //分公司ID
-		//                         addInput(ExportForm, "text", "showRepayDateBegin", dateObj.showRepayDateBegin);
-		//                         addInput(ExportForm, "text", "showRepayDateEnd",dateObj.showRepayDateEnd);
-		//                         addInput(ExportForm, "text", "realRepayDateBegin", dateObj.realRepayDateBegin);
-		//                         addInput(ExportForm, "text", "realRepayDateEnd", dateObj.realRepayDateEnd);
-		//                         addInput(ExportForm, "text", "delayDaysBegin", vm.searchForm.delayDaysBegin);
-		//                         addInput(ExportForm, "text", "delayDaysEnd", vm.searchForm.delayDaysEnd);
-		//                         addInput(ExportForm, "text", "collectLevel", vm.searchForm.collectLevel);
-		//                         addInput(ExportForm, "text", "operatorName", vm.searchForm.operatorName);
-		//                         addInput(ExportForm, "text", "businessId", vm.searchForm.businessId);
-		//                         addInput(ExportForm, "text", "businessType", vm.searchForm.businessType);
-		//                         addInput(ExportForm, "text", "liquidationOne", vm.searchForm.liquidationOne);
-		//                         addInput(ExportForm, "text", "liquidationTow", vm.searchForm.liquidationTow);
-		//                         addInput(ExportForm, "text", "businessStatus", vm.searchForm.businessStatus);
-		//                         addInput(ExportForm, "text", "repayStatus", vm.searchForm.repayStatus);
-		//                         addInput(ExportForm, "text", "customerName", vm.searchForm.customerName);
-		//                         ExportForm.submit();
-		//                         document.body.removeChild(ExportForm);
+		                        expoertExcel(basePath + "collection/saveExcel",vm.searchForm,"贷后管理.xlsx");
+
 		                        vm.exporting = false;
 		
 		                    }
@@ -829,27 +807,29 @@ var getData = function(){
         realRepayDateBegin:'',
         realRepayDateEnd:''
     }
-    if(vm.searchForm.showRepayDateRange.length>0){
+    if(vm.searchForm.showRepayDateRange.length>0){debugger
       	if(vm.searchForm.showRepayDateRange[0]!=null){
       	   dataObject.showRepayDateBegin = vm.searchForm.showRepayDateRange[0].getTime();
+      	   vm.searchForm.showRepayDateBegin=vm.searchForm.showRepayDateRange[0].getTime();
       	}
       	
     	if(vm.searchForm.showRepayDateRange[1]!=null){
        	   
        	   var date =vm.searchForm.showRepayDateRange[1];
-           date.setDate(date.getDate() + 1);
            dataObject.showRepayDateEnd=date.getTime();
+      	   vm.searchForm.showRepayDateEnd=date.getTime();
        	}
      
     }
     if(vm.searchForm.realRepayDateRange.length>0){
       	if(vm.searchForm.realRepayDateRange[0]!=null){
       	  dataObject.realRepayDateBegin = vm.searchForm.realRepayDateRange[0].getTime();
+      	  vm.searchForm.realRepayDateBegin=vm.searchForm.realRepayDateRange[0].getTime();
       	}
       	if(vm.searchForm.realRepayDateRange[1]!=null){
           	   var date =vm.searchForm.realRepayDateRange[1];
-              date.setDate(date.getDate() + 1);
               dataObject.realRepayDateEnd=date.getTime();
+          	  vm.searchForm.realRepayDateEnd=date.getTime();
         	}
     }
     return dataObject;

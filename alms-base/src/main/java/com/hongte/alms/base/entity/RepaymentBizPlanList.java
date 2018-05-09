@@ -16,8 +16,8 @@ import io.swagger.annotations.ApiModelProperty;
  * 业务还款计划列表
  * </p>
  *
- * @author 王继光
- * @since 2018-03-06
+ * @author 曾坤
+ * @since 2018-05-03
  */
 @ApiModel
 @TableName("tb_repayment_biz_plan_list")
@@ -38,19 +38,17 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 	@ApiModelProperty(required= true,value = "所属还款计划编号(外键，对应tb_repayment_biz_plan.plan_id)")
 	private String planId;
     /**
-     * 还款计划所属业务ID(若当前业务为展期，则存展期业务编号)
+     * 还款计划所属业务编号(若当前业务为展期，则存展期业务编号)
      */
 	@TableField("business_id")
-	@ApiModelProperty(required= true,value = "还款计划所属业务ID(若当前业务为展期，则存展期业务编号)")
+	@ApiModelProperty(required= true,value = "还款计划所属业务编号(若当前业务为展期，则存展期业务编号)")
 	private String businessId;
-	
-	/**
+    /**
      * 还款计划所属原业务编号
      */
 	@TableField("orig_business_id")
 	@ApiModelProperty(required= true,value = "还款计划所属原业务编号")
 	private String origBusinessId;
-	
     /**
      * 当前还款计划期数，若期数为0，表示为展期还款计划第0期或者线下出款业务的第0期
      */
@@ -90,8 +88,14 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
      * 当前还款状态，目前只有三种，分别为"还款中"，"逾期"，"已还款"
      */
 	@TableField("current_status")
-	@ApiModelProperty(required= true,value = "当前还款状态，目前只有三种，分别为还款中,逾期,已还款")
+	@ApiModelProperty(required= true,value = "当前还款状态，目前只有三种，分别为还款中，逾期，已还款")
 	private String currentStatus;
+    /**
+     * 当前还款子状态
+     */
+	@TableField("current_sub_status")
+	@ApiModelProperty(required= true,value = "当前还款子状态")
+	private String currentSubStatus;
     /**
      * 已还款类型标记，null或0：还款中，6：申请展期已还款，10：线下确认已还款，20：自动线下代扣已还款，21，人工线下代扣已还款，30：自动银行代扣已还款，31：人工银行代扣已还款，40：用户APP主动还款，50：线下财务确认全部结清，60：线下代扣全部结清，70：银行代扣全部结清
      */
@@ -141,6 +145,12 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 	@ApiModelProperty(required= true,value = "确认自动代扣的确认者ID")
 	private String autoWithholdingConfirmedUser;
     /**
+     * 确认自动代扣的确认者姓名
+     */
+	@TableField("auto_withholding_confirmed_user_name")
+	@ApiModelProperty(required= true,value = "确认自动代扣的确认者姓名")
+	private String autoWithholdingConfirmedUserName;
+    /**
      * 会计确认状态，0或null:待审核;1:已审核;2:已退回;3:已返审核;4:导入;
      */
 	@TableField("accountant_confirm_status")
@@ -169,19 +179,23 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
      */
 	@ApiModelProperty(required= true,value = "还款备注")
 	private String remark;
-
-	/**
-	 * 是否有效状态：1 有效 ，0 无效
-	 */
+    /**
+     * 是否有效状态：1 有效 ，0 无效
+     */
 	@ApiModelProperty(required= true,value = "是否有效状态：1 有效 ，0 无效")
 	private Integer active;
-
     /**
      * 创建日期
      */
 	@TableField("create_time")
 	@ApiModelProperty(required= true,value = "创建日期")
 	private Date createTime;
+    /**
+     * 来源类型：1.信贷生成，2.贷后管理生成
+     */
+	@TableField("src_type")
+	@ApiModelProperty(required= true,value = "来源类型：1.信贷生成，2.贷后管理生成")
+	private Integer srcType;
     /**
      * 创建用户
      */
@@ -224,6 +238,14 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 
 	public void setBusinessId(String businessId) {
 		this.businessId = businessId;
+	}
+
+	public String getOrigBusinessId() {
+		return origBusinessId;
+	}
+
+	public void setOrigBusinessId(String origBusinessId) {
+		this.origBusinessId = origBusinessId;
 	}
 
 	public Integer getPeriod() {
@@ -280,6 +302,14 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 
 	public void setCurrentStatus(String currentStatus) {
 		this.currentStatus = currentStatus;
+	}
+
+	public String getCurrentSubStatus() {
+		return currentSubStatus;
+	}
+
+	public void setCurrentSubStatus(String currentSubStatus) {
+		this.currentSubStatus = currentSubStatus;
 	}
 
 	public Integer getRepayFlag() {
@@ -346,6 +376,14 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 		this.autoWithholdingConfirmedUser = autoWithholdingConfirmedUser;
 	}
 
+	public String getAutoWithholdingConfirmedUserName() {
+		return autoWithholdingConfirmedUserName;
+	}
+
+	public void setAutoWithholdingConfirmedUserName(String autoWithholdingConfirmedUserName) {
+		this.autoWithholdingConfirmedUserName = autoWithholdingConfirmedUserName;
+	}
+
 	public Integer getAccountantConfirmStatus() {
 		return accountantConfirmStatus;
 	}
@@ -386,12 +424,28 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 		this.remark = remark;
 	}
 
+	public Integer getActive() {
+		return active;
+	}
+
+	public void setActive(Integer active) {
+		this.active = active;
+	}
+
 	public Date getCreateTime() {
 		return createTime;
 	}
 
 	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
+	}
+
+	public Integer getSrcType() {
+		return srcType;
+	}
+
+	public void setSrcType(Integer srcType) {
+		this.srcType = srcType;
 	}
 
 	public String getCreateUser() {
@@ -429,6 +483,7 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 			", planListId=" + planListId +
 			", planId=" + planId +
 			", businessId=" + businessId +
+			", origBusinessId=" + origBusinessId +
 			", period=" + period +
 			", afterId=" + afterId +
 			", dueDate=" + dueDate +
@@ -436,6 +491,7 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 			", overdueAmount=" + overdueAmount +
 			", overdueDays=" + overdueDays +
 			", currentStatus=" + currentStatus +
+			", currentSubStatus=" + currentSubStatus +
 			", repayFlag=" + repayFlag +
 			", factRepayDate=" + factRepayDate +
 			", financeComfirmDate=" + financeComfirmDate +
@@ -444,37 +500,18 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 			", confirmFlag=" + confirmFlag +
 			", autoWithholdingConfirmedDate=" + autoWithholdingConfirmedDate +
 			", autoWithholdingConfirmedUser=" + autoWithholdingConfirmedUser +
+			", autoWithholdingConfirmedUserName=" + autoWithholdingConfirmedUserName +
 			", accountantConfirmStatus=" + accountantConfirmStatus +
 			", accountantConfirmUser=" + accountantConfirmUser +
 			", accountantConfirmUserName=" + accountantConfirmUserName +
 			", accountantConfirmDate=" + accountantConfirmDate +
 			", remark=" + remark +
+			", active=" + active +
 			", createTime=" + createTime +
+			", srcType=" + srcType +
 			", createUser=" + createUser +
 			", updateTime=" + updateTime +
 			", updateUser=" + updateUser +
 			"}";
-	}
-
-	/**
-	 * @return the origBusinessId
-	 */
-	public String getOrigBusinessId() {
-		return origBusinessId;
-	}
-
-	/**
-	 * @param origBusinessId the origBusinessId to set
-	 */
-	public void setOrigBusinessId(String origBusinessId) {
-		this.origBusinessId = origBusinessId;
-	}
-
-	public Integer getActive() {
-		return active;
-	}
-
-	public void setActive(Integer active) {
-		this.active = active;
 	}
 }
