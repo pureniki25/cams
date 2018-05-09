@@ -7,10 +7,7 @@ import com.hongte.alms.base.enums.repayPlan.*;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.finance.FinanceServiceApplication;
 import com.hongte.alms.finance.dto.repayPlan.RepaymentBizPlanDto;
-import com.hongte.alms.finance.req.repayPlan.BusinessBasicInfoReq;
-import com.hongte.alms.finance.req.repayPlan.CreatRepayPlanReq;
-import com.hongte.alms.finance.req.repayPlan.ProjFeeReq;
-import com.hongte.alms.finance.req.repayPlan.ProjInfoReq;
+import com.hongte.alms.finance.req.repayPlan.*;
 import com.hongte.alms.finance.service.CreatRepayPlanService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -147,14 +144,46 @@ public class CreatRepayPlanServiceImplTest {
         ProjInfoReq req1 =creatProjInfoReq(businessBasicInfoReq);
         tuandaiProjReqInfos.add(req1);
 
-        Map<Integer,BigDecimal> principleMap1 = new HashMap<>();
-        req1.setPricipleMap(principleMap1);
-        principleMap1.put(1,new BigDecimal(4200));
-        principleMap1.put(2,new BigDecimal(4200));
-        principleMap1.put(3,new BigDecimal(4200));
-        principleMap1.put(4,new BigDecimal(4200));
-        principleMap1.put(5,new BigDecimal(4200));
-        principleMap1.put(6,new BigDecimal(9000));
+        List<PrincipleReq> principleReqs = new LinkedList<>();
+        req1.setPricipleMap(principleReqs);
+        PrincipleReq principleReq1 = new PrincipleReq();
+        principleReq1.setPeriod(1);
+        principleReq1.setPrinciple(new BigDecimal(4200));
+        principleReqs.add(principleReq1);
+
+        PrincipleReq principleReq2 = new PrincipleReq();
+        principleReq2.setPeriod(2);
+        principleReq2.setPrinciple(new BigDecimal(4200));
+        principleReqs.add(principleReq2);
+
+        PrincipleReq principleReq3 = new PrincipleReq();
+        principleReq3.setPeriod(3);
+        principleReq3.setPrinciple(new BigDecimal(4200));
+        principleReqs.add(principleReq3);
+
+        PrincipleReq principleReq4 = new PrincipleReq();
+        principleReq4.setPeriod(4);
+        principleReq4.setPrinciple(new BigDecimal(4200));
+        principleReqs.add(principleReq4);
+
+        PrincipleReq principleReq5 = new PrincipleReq();
+        principleReq5.setPeriod(5);
+        principleReq5.setPrinciple(new BigDecimal(4200));
+        principleReqs.add(principleReq5);
+
+        PrincipleReq principleReq6 = new PrincipleReq();
+        principleReq6.setPeriod(6);
+        principleReq6.setPrinciple(new BigDecimal(9000));
+        principleReqs.add(principleReq6);
+
+//        Map<Integer,BigDecimal> principleMap1 = new HashMap<>();
+//        req1.setPricipleMap(principleMap1);
+//        principleMap1.put(1,new BigDecimal(4200));
+//        principleMap1.put(2,new BigDecimal(4200));
+//        principleMap1.put(3,new BigDecimal(4200));
+//        principleMap1.put(4,new BigDecimal(4200));
+//        principleMap1.put(5,new BigDecimal(4200));
+//        principleMap1.put(6,new BigDecimal(9000));
 
         req1.setProjectId("137e8a4a-0727-4551-b20a-48b0d6679cfa");
         req1.setStatusFlag("4");
@@ -236,18 +265,58 @@ public class CreatRepayPlanServiceImplTest {
 
 
 
+        List<ProjInfoReq> tuandaiProjReqInfos2   = new LinkedList<>();
+        creatRepayPlanReq.setProjInfoReqs(tuandaiProjReqInfos2);
 
+        //        private List<ProjFeeReq> projFeeInfos;
         ProjInfoReq req2 =creatProjInfoReq(businessBasicInfoReq);
-        tuandaiProjReqInfos.add(req2);
+        tuandaiProjReqInfos2.add(req2);
 
-        Map<Integer,BigDecimal> principleMap2 = new HashMap<>();
-        req2.setPricipleMap(principleMap2);
-        principleMap2.put(1,new BigDecimal(2800));
-        principleMap2.put(2,new BigDecimal(2800));
-        principleMap2.put(3,new BigDecimal(2800));
-        principleMap2.put(4,new BigDecimal(2800));
-        principleMap2.put(5,new BigDecimal(2800));
-        principleMap2.put(6,new BigDecimal(6000));
+
+        List<PrincipleReq> principleReqs2 = new LinkedList<>();
+        req2.setPricipleMap(principleReqs2);
+        PrincipleReq principlereq21 = new PrincipleReq();
+        principlereq21.setPeriod(1);
+        principlereq21.setPrinciple(new BigDecimal(2800));
+        principleReqs2.add(principlereq21);
+
+        PrincipleReq principleReq22 = new PrincipleReq();
+        principleReq22.setPeriod(22);
+        principleReq22.setPrinciple(new BigDecimal(2800));
+        principleReqs2.add(principleReq22);
+
+        PrincipleReq principleReq23 = new PrincipleReq();
+        principleReq23.setPeriod(3);
+        principleReq23.setPrinciple(new BigDecimal(2800));
+        principleReqs2.add(principleReq23);
+
+        PrincipleReq principleReq24 = new PrincipleReq();
+        principleReq24.setPeriod(4);
+        principleReq24.setPrinciple(new BigDecimal(2800));
+        principleReqs2.add(principleReq24);
+
+        PrincipleReq principleReq25 = new PrincipleReq();
+        principleReq25.setPeriod(5);
+        principleReq25.setPrinciple(new BigDecimal(2800));
+        principleReqs2.add(principleReq25);
+
+        PrincipleReq principleReq26 = new PrincipleReq();
+        principleReq26.setPeriod(6);
+        principleReq26.setPrinciple(new BigDecimal(6000));
+        principleReqs2.add(principleReq26);
+
+
+//        ProjInfoReq req2 =creatProjInfoReq(businessBasicInfoReq);
+//        tuandaiProjReqInfos.add(req2);
+//
+//        Map<Integer,BigDecimal> principleMap2 = new HashMap<>();
+//        req2.setPricipleMap(principleMap2);
+//        principleMap2.put(1,new BigDecimal(2800));
+//        principleMap2.put(2,new BigDecimal(2800));
+//        principleMap2.put(3,new BigDecimal(2800));
+//        principleMap2.put(4,new BigDecimal(2800));
+//        principleMap2.put(5,new BigDecimal(2800));
+//        principleMap2.put(6,new BigDecimal(6000));
 
 
 

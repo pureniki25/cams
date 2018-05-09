@@ -268,7 +268,7 @@ public class ProjInfoReq {
     private Integer repayType;
 
     @ApiModelProperty(value = "每期还本Map  Map<期数，还本金额>")
-    private Map<Integer,BigDecimal> pricipleMap;
+    private List<PrincipleReq> pricipleMap;
 
 
     /**
@@ -1246,11 +1246,11 @@ public class ProjInfoReq {
         this.projFeeInfos = projFeeInfos;
     }
 
-    public Map<Integer, BigDecimal> getPricipleMap() {
+    public  List<PrincipleReq> getPricipleMap() {
         return pricipleMap;
     }
 
-    public void setPricipleMap(Map<Integer, BigDecimal> pricipleMap) {
+    public void setPricipleMap( List<PrincipleReq> pricipleMap) {
         this.pricipleMap = pricipleMap;
     }
 
