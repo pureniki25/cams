@@ -42,7 +42,7 @@ ht:
   config:
     ui:
       gatewayUrl: http://172.16.200.110:30111/  #网关地址
-      useGateWayflage: true   #是否使用网关的标志位
+      useGateWayflage: false   #是否使用网关的标志位
       changePwdPath: http://172.16.200.110:30131/html/user/changePwdOther.html  #首次登陆 修改密码 界面跳转地址
       instanceId: none   #本服务在注册服务器中的注册名字
 ---

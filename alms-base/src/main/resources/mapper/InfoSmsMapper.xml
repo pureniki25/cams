@@ -37,7 +37,7 @@ LEFT JOIN tb_basic_business_type AS b_type ON business.business_type = b_type.bu
 
         <where>
                1=1
-      WHERE 1=1 and sms.log_id=#{logId}
+  and sms.log_id=#{logId}
 
         </where>
       limit 1
