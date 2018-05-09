@@ -41,10 +41,16 @@ window.layinit(function (htConfig) {
                 }
             }, {
                 field: 'updateUser',
-                title: '更新人id'
+                title: '更新人id',
+                templet:function(d){
+                    return (d.updateUser||d.createUser)||''
+                }
             }, {
                 field: 'updateTime',
-                title: '更新时间'
+                title: '更新时间',
+                templet:function(d){
+                    return (d.updateTime||d.createTime)||''
+                }
             }, {
                 title: '操作',
                 toolbar: "#toolbar"
@@ -274,6 +280,7 @@ let methods = {
     openBatchAddParmModal: function () {
         app.editParamModal.add = true
         app.batchAddParmModal.show = true
+        app.batchAddParmModal.param = ''
     },
     batchSaveParam: function () {
         app.editParamForm.paramType = app.currentParamList.paramType
