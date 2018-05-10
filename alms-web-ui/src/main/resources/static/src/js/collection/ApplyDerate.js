@@ -851,7 +851,7 @@ var getShowInfo = function () {
                 //基本信息
                 if(res.data.data.baseInfo.length>0){
                     vm.baseInfoForm = res.data.data.baseInfo[0];
-                    vm.baseInfoForm.needPayPenalty=0;
+                   // vm.baseInfoForm.needPayPenalty=0;
                     if(vm.baseInfoForm.delayDays==''||vm.baseInfoForm.delayDays==null){
                     	vm.baseInfoForm.delayDays=0;
                     }
