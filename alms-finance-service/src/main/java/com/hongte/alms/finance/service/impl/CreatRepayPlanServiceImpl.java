@@ -628,7 +628,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 repaymentProjPlan.setOriginalBusinessId(businessBasicInfo.getOrgBusinessId());
                 repaymentProjPlan.setRepaymentBatchId(batchId);  //还款计划批次号
                 repaymentProjPlan.setPlanId("");   //业务还款计划ID
-                repaymentProjPlan.setBorrowMoney(projInfoReq.getAmount());  //生成还款计划对应的借款总额
+                repaymentProjPlan.setBorrowMoney(projInfoReq.getFullBorrowMoney());  //生成还款计划对应的借款总额
                 repaymentProjPlan.setBorrowRate(projInfoReq.getRate());  //生成还款计划对应的借款利率
                 repaymentProjPlan.setBorrowRateUnit(projInfoReq.getRateUnitType());//利率类型
                 repaymentProjPlan.setBorrowLimit(projInfoReq.getPeriodMonth());//借款期限
@@ -761,14 +761,19 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                                 if(feeReq.getIsTermRange().equals(BooleanEnum.YES.getValue())){
                                     //是分段收费  需要从分段收费信息列表中
 
-                                    Map<Integer, ProjFeeDetailReq>  feeDetailReqMap = feeReq.getFeeDetailReqMap();
+                                    List<ProjFeeDetailReq>  feeDetailReqMap = feeReq.getFeeDetailReqMap();
                                     if(feeDetailReqMap==null||feeDetailReqMap.size()==0){
                                         throw new CreatRepaymentExcepiton("分段收费的费用必须包含费用详情信息");
                                     }
                                     if(feeDetailReqMap.size()<projInfoReq.getPeriodMonth()){
                                         throw new CreatRepaymentExcepiton("分段收费的费用详情条数不能少于期数");
                                     }
-                                    ProjFeeDetailReq feeDetail = feeDetailReqMap.get(i);
+                                    ProjFeeDetailReq feeDetail = null;
+                                    for(ProjFeeDetailReq feeDetailReq: feeDetailReqMap) {
+                                        if (feeDetailReq.getPeroid().equals(i)) {
+                                            feeDetail = feeDetailReq;
+                                        }
+                                    }
                                     if(feeDetail==null){
                                         throw new CreatRepaymentExcepiton("分段收费的费用详情找不到  期数："+i
                                                 +"     费用类型："+feeReq.getFeeType()  + "    费用ItemId："+feeReq.getFeeItemId());
@@ -962,7 +967,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             Integer periodMonth,BigDecimal fullBorrowMoney,
             BigDecimal rate,RepayPlanBorrowRateUnitEnum rateUnit,
             RepayPlanRepayIniCalcWayEnum repayType,
-            Map<Integer,BigDecimal> principleMap
+            List<PrincipleReq> principleMap
             ){
 
         Map<Integer,Map<String,BigDecimal>>  retMap  = new HashMap<>();
@@ -1069,7 +1074,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
      */
     private void calcintAndPrinEverytime(BigDecimal fullBorrowMoney,BigDecimal monthRate,
                                          Integer periodMonth ,Map<Integer,Map<String,BigDecimal>>  retList,
-            Map<Integer,BigDecimal> principleMap){
+            List<PrincipleReq> principleMap){
 
         if(principleMap == null || principleMap.size()<=0){
             throw new  CreatRepaymentExcepiton("分期还本付息没有每期应还本金对应信息");
@@ -1080,7 +1085,12 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         //前期已还本金
         BigDecimal payedPriciple = new BigDecimal(0);
         for(int i=0;i<periodMonth;i++){
-            BigDecimal priciple = principleMap.get(i+1);
+            BigDecimal priciple = null;
+            for(PrincipleReq  principleReq:principleMap){
+                if(principleReq.getPeriod().equals(i+1)){
+                    priciple =principleReq.getPrinciple();
+                }
+            }
             if(priciple == null){
                 throw new  CreatRepaymentExcepiton("分期还本付息，找不到当前期:第"+(i+1)+"期应还本金");
             }

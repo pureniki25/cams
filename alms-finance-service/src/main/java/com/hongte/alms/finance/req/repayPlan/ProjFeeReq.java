@@ -18,18 +18,18 @@ public class ProjFeeReq {
     /**
      * [是否设置期限范围]
      */
-    @ApiModelProperty(required= true,value = "[是否设置期限范围]")
+    @ApiModelProperty(required= true,value = "[是否设置期限范围,1是，0 否]")
     private Integer isTermRange;
 //    @ApiModelProperty(value = "标的出款申请费用明细期限范围明细列表，分段收费的费用，必须填写这一项")
 //    private List<ProjFeeDetailReq> ProjFeeDetailInfos;
 
     @ApiModelProperty(value = "标的出款申请费用明细期限范围明细列表，分段收费的费用，必须填写这一项，期数从1开始计算")
-    private Map<Integer,ProjFeeDetailReq> feeDetailReqMap;
+    private List<ProjFeeDetailReq> feeDetailReqMap;
 
 
-    /**
-     * 上标编号
-     */
+//    /**
+//     * 上标编号
+//     */
     @ApiModelProperty(required= true,value = "上标编号")
     private String projId;
     /**
@@ -399,11 +399,11 @@ public class ProjFeeReq {
     }
 
 
-    public Map<Integer, ProjFeeDetailReq> getFeeDetailReqMap() {
+    public List<ProjFeeDetailReq> getFeeDetailReqMap() {
         return feeDetailReqMap;
     }
 
-    public void setFeeDetailReqMap(Map<Integer, ProjFeeDetailReq> feeDetailReqMap) {
+    public void setFeeDetailReqMap(List<ProjFeeDetailReq> feeDetailReqMap) {
         this.feeDetailReqMap = feeDetailReqMap;
     }
 }
