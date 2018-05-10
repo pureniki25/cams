@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiModelProperty;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author zengkun
@@ -257,11 +256,23 @@ public class ProjInfoReq {
     @ApiModelProperty(required= true,value = "利率单位：1 年利率; 2 月利率; 3 日利率")
     private Integer rateUnitType;
 
-    @ApiModelProperty(required= true,value = "逾期滞纳金费率(%)")
-    private BigDecimal overDueRate;
+    @ApiModelProperty(required= true,value = "线下期内逾期滞纳金费率(%)")
+    private BigDecimal offLineInOverDueRate;
 
-    @ApiModelProperty(required= true,value = "逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率")
-    private  Integer overDueRateUnit;
+    @ApiModelProperty(required= true,value = "线下期内逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率")
+    private  Integer offLineInOverDueRateUnit;
+
+    @ApiModelProperty(required= true,value = "线下期外逾期滞纳金费率(%)")
+    private BigDecimal offLineOutOverDueRate;
+
+    @ApiModelProperty(required= true,value = "线下期外逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率")
+    private  Integer offLineOutOverDueRateUnit;
+
+    @ApiModelProperty(required= true,value = "线上逾期滞纳金费率(%)")
+    private BigDecimal onLineOverDueRate;
+
+    @ApiModelProperty(required= true,value = "线上逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率")
+    private  Integer onLineOverDueRateUnit;
 
 
     @ApiModelProperty(required= true,value = "还款方式：1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息,11:等本等息")
@@ -1222,20 +1233,20 @@ public class ProjInfoReq {
         this.repayType = repayType;
     }
 
-    public BigDecimal getOverDueRate() {
-        return overDueRate;
+    public BigDecimal getOffLineInOverDueRate() {
+        return offLineInOverDueRate;
     }
 
-    public void setOverDueRate(BigDecimal overDueRate) {
-        this.overDueRate = overDueRate;
+    public void setOffLineInOverDueRate(BigDecimal offLineInOverDueRate) {
+        this.offLineInOverDueRate = offLineInOverDueRate;
     }
 
-    public Integer getOverDueRateUnit() {
-        return overDueRateUnit;
+    public Integer getOffLineInOverDueRateUnit() {
+        return offLineInOverDueRateUnit;
     }
 
-    public void setOverDueRateUnit(Integer overDueRateUnit) {
-        this.overDueRateUnit = overDueRateUnit;
+    public void setOffLineInOverDueRateUnit(Integer offLineInOverDueRateUnit) {
+        this.offLineInOverDueRateUnit = offLineInOverDueRateUnit;
     }
 
     public List<ProjFeeReq> getProjFeeInfos() {
@@ -1260,5 +1271,37 @@ public class ProjInfoReq {
 
     public void setPlateType(Integer plateType) {
         this.plateType = plateType;
+    }
+
+    public BigDecimal getOnLineOverDueRate() {
+        return onLineOverDueRate;
+    }
+
+    public void setOnLineOverDueRate(BigDecimal onLineOverDueRate) {
+        this.onLineOverDueRate = onLineOverDueRate;
+    }
+
+    public Integer getOnLineOverDueRateUnit() {
+        return onLineOverDueRateUnit;
+    }
+
+    public void setOnLineOverDueRateUnit(Integer onLineOverDueRateUnit) {
+        this.onLineOverDueRateUnit = onLineOverDueRateUnit;
+    }
+
+    public BigDecimal getOffLineOutOverDueRate() {
+        return offLineOutOverDueRate;
+    }
+
+    public void setOffLineOutOverDueRate(BigDecimal offLineOutOverDueRate) {
+        this.offLineOutOverDueRate = offLineOutOverDueRate;
+    }
+
+    public Integer getOffLineOutOverDueRateUnit() {
+        return offLineOutOverDueRateUnit;
+    }
+
+    public void setOffLineOutOverDueRateUnit(Integer offLineOutOverDueRateUnit) {
+        this.offLineOutOverDueRateUnit = offLineOutOverDueRateUnit;
     }
 }

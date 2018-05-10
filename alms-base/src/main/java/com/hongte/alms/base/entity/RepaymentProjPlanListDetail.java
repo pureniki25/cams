@@ -72,12 +72,6 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
      */
 	@ApiModelProperty(required= true,value = "所属期数")
 	private Integer period;
-//    /**
-//     * 项目计划应还总金额(元)
-//     */
-//	@TableField("plan_amount")
-//	@ApiModelProperty(required= true,value = "项目计划应还总金额(元)")
-//	private BigDecimal planAmount;
     /**
      * 资产端费用项ID，用于资产端区分同名的项目，若不存在同名费用项，可为空
      */
@@ -102,6 +96,14 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
 	@TableField("account_status")
 	@ApiModelProperty(required= true,value = "分账标记(冲应收还款，根据冲应收明细进行分账)，0：不线上分账，10：分账到借款人账户，20：分账到资产端账户，30：分账到资金端账户(平台)，40：分账到担保公司账户")
 	private Integer accountStatus;
+	/**
+	 * 应还日期
+	 */
+	@TableField("due_date")
+	@ApiModelProperty(required= true,value = "应还日期")
+	private Date dueDate;
+	/**
+
     /**
      * 实还日期
      */
@@ -347,28 +349,37 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
 	@Override
 	public String toString() {
 		return "RepaymentProjPlanListDetail{" +
-			", projPlanDetailId=" + projPlanDetailId +
-			", projPlanListId=" + projPlanListId +
-			", shareProfitIndex=" + shareProfitIndex +
-			", planDetailId=" + planDetailId +
-			", planListId=" + planListId +
-			", businessId=" + businessId +
-			", origBusinessId=" + origBusinessId +
-			", period=" + period +
-			", feeId=" + feeId +
-			", planItemName=" + planItemName +
-			", planItemType=" + planItemType +
-			", accountStatus=" + accountStatus +
-			", factRepayDate=" + factRepayDate +
-			", projPlanAmount=" + projPlanAmount +
-			", projFactAmount=" + projFactAmount +
-			", active=" + active +
-			", creatSysType=" + creatSysType +
-			", plateType=" + plateType +
-			", createDate=" + createDate +
-			", createUser=" + createUser +
-			", updateDate=" + updateDate +
-			", updateUser=" + updateUser +
-			"}";
+				", projPlanDetailId=" + projPlanDetailId +
+				", projPlanListId=" + projPlanListId +
+				", shareProfitIndex=" + shareProfitIndex +
+				", planDetailId=" + planDetailId +
+				", planListId=" + planListId +
+				", businessId=" + businessId +
+				", origBusinessId=" + origBusinessId +
+				", period=" + period +
+				", feeId=" + feeId +
+				", planItemName=" + planItemName +
+				", planItemType=" + planItemType +
+				", accountStatus=" + accountStatus +
+				", factRepayDate=" + factRepayDate +
+				", dueDate=" + dueDate +
+				", projPlanAmount=" + projPlanAmount +
+				", projFactAmount=" + projFactAmount +
+				", active=" + active +
+				", creatSysType=" + creatSysType +
+				", plateType=" + plateType +
+				", createDate=" + createDate +
+				", createUser=" + createUser +
+				", updateDate=" + updateDate +
+				", updateUser=" + updateUser +
+				"}";
+	}
+
+	public Date getDueDate() {
+		return dueDate;
+	}
+
+	public void setDueDate(Date dueDate) {
+		this.dueDate = dueDate;
 	}
 }

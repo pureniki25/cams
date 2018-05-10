@@ -41,7 +41,7 @@ public class RepayPlanController {
     CreatRepayPlanService creatRepayPlanService;
 
 
-    @ApiOperation(value = "创建还款计划接口,对业务和标的还款计划进行试算")
+    @ApiOperation(value = "创建还款计划接口,不存储   全字段")
     @PostMapping("/creatRepayPlan")
     @ResponseBody
     public Result<List<RepaymentBizPlanDto>> creatRepayPlan(CreatRepayPlanReq creatRepayPlanReq){
@@ -85,7 +85,7 @@ public class RepayPlanController {
     }
 
 
-    @ApiOperation(value = "试算还款计划接口,对业务和标的还款计划进行试算")
+    @ApiOperation(value = "试算还款计划接口, 精简字段")
     @PostMapping("/trailRepayPlan")
     @ResponseBody
     public Result<List<RepaymentBizPlanDto>> trailRepayPlan(TrailRepayPlanReq trailRepayPlanReq){
