@@ -315,7 +315,7 @@ window.layinit(function (htConfig) {
                  let _this = this
                 $.each(_this.bank_account_list, function (i, o) {
                     if (o.financeName == cb) {
-                        _this.editForm.acceptBankAccount = o.repaymentId
+                        _this.editForm.acceptBankAccount = o.repaymentId||''
                         return false
                     }
                 }) 

@@ -38,7 +38,7 @@
             <Header style="height: 40px;line-height: 40px;text-align: right;">
                 <i-form inline label-position="right" label-width="70">
                     <form-item label="日期">
-                        <date-picker type="date" placeholder="选择日期" v-model="repayDate" @on-change="onDateChange($event)" format="yyyy-MM-dd"></date-picker>
+                        <date-picker type="date" placeholder="选择日期" format="yyyy-MM-dd" v-model="repayDate" @on-change="onDateChange($event)" format="yyyy-MM-dd"></date-picker>
                     </form-item>
                     <form-item label="金额">
                         <i-input v-model="accountMoney"></i-input>
