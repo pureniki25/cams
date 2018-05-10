@@ -197,12 +197,8 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
                     if(delayDays.length == 1&&req.getDelayDaysEnd()==null){
                         req.setDelayDaysEnd(Integer.parseInt(delayDays[0]));
                     }else if(delayDays.length == 2){
-                        if(req.getDelayDaysEnd()==null){
                             req.setDelayDaysEnd(Integer.parseInt(delayDays[1]));
-                        }
-                        if(req.getDelayDaysBegin()==null) {
                             req.setDelayDaysBegin(Integer.parseInt(delayDays[0]));
-                        }
                     }
                 }catch (NumberFormatException  e){
                     e.printStackTrace();

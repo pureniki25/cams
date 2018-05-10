@@ -182,7 +182,13 @@ public class InfoSmsListSearchVO {
 
 
 	public void setAfterId(String afterId) {
-		this.afterId = afterId;
+		int a=afterId.indexOf("_");
+		if(a!=-1) {
+			this.afterId = afterId.substring(0, a);
+		}else {
+			this.afterId =afterId;
+		}
+	
 	}
 
 

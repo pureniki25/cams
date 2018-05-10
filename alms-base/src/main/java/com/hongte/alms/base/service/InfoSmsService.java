@@ -44,6 +44,11 @@ public interface InfoSmsService extends BaseService<InfoSms> {
      */
     InfoSmsListSearchVO selectNextInfoSmsDetail(String logId);
 
-
+    /**
+     * 短信查询当前条
+     * @param key
+     * @return
+     */
+    InfoSmsListSearchVO selectInfoSmsDetail(String logId);
 
 }

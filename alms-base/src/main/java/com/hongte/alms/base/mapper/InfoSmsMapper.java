@@ -44,6 +44,10 @@ public interface InfoSmsMapper extends SuperMapper<InfoSms> {
     * @return
     */
    InfoSmsListSearchVO selectNextInfoSmsDetail( @Param("logId")String logId);
+   /**
+    * 查询短信记录详情
+    */
+   InfoSmsListSearchVO selectInfoSmsDetail( @Param("logId")String logId);
 
 
 }
