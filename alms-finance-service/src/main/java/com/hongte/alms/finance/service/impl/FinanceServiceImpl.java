@@ -123,8 +123,20 @@ public class FinanceServiceImpl implements FinanceService {
 		}
 		Date now = new Date();
 		if (mprid != null) {
+			MoneyPool moneyPool = moneyPoolMapper.selectById(moneyPoolIds.get(0));
 			MoneyPoolRepayment moneyPoolRepayment = moneyPoolRepaymentMapper.selectById(mprid);
-			moneyPoolRepayment.setMoneyPoolId(mprid);
+			moneyPoolRepayment.setAccountMoney(moneyPool.getAccountMoney());
+			moneyPoolRepayment.setBankAccount(moneyPool.getAcceptBank());
+			moneyPoolRepayment.setCreateUser(loginUserInfoHelper.getUserId());
+			moneyPoolRepayment.setFactTransferName(moneyPool.getRemitBank());
+			moneyPoolRepayment.setIncomeType(1);
+			moneyPoolRepayment.setRemark(moneyPool.getTradeRemark());
+			moneyPoolRepayment.setMoneyPoolId(moneyPool.getMoneyPoolId());
+			moneyPoolRepayment.setTradeDate(moneyPool.getTradeDate());
+			moneyPoolRepayment.setTradePlace(moneyPool.getTradePlace());
+			moneyPoolRepayment.setTradeType(moneyPool.getTradeType());
+			
+			moneyPoolRepayment.setMoneyPoolId(moneyPool.getMoneyPoolId());
 			moneyPoolRepayment.setState(RepayRegisterFinanceStatus.财务指定银行流水.toString());
 			moneyPoolRepayment.setIsFinanceMatch(1);
 			moneyPoolRepayment.updateById();
