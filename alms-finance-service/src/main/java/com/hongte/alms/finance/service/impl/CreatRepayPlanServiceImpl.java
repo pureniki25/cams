@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.baseException.CreatRepaymentExcepiton;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.BooleanEnum;
+import com.hongte.alms.base.enums.BusinessSourceTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.enums.repayPlan.*;
 import com.hongte.alms.base.service.*;
@@ -100,7 +101,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
     //需要判断是否重复传入
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public List<RepaymentBizPlanDto> creatRepayPlan(CreatRepayPlanReq creatRepayPlanReq) {
+    public List<RepaymentBizPlanDto> creatRepayPlan(CreatRepayPlanReq creatRepayPlanReq) throws InstantiationException, IllegalAccessException {
 
         List<RepaymentBizPlanDto>  retList = new LinkedList<>();
 
@@ -288,6 +289,38 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             }
         }
 
+        /////////////   输入数据校验   开始 ////////////////////////
+
+        BusinessBasicInfoReq  businessBasicInfoReq = creatRepayPlanReq.getBusinessBasicInfoReq();
+
+        if(businessBasicInfoReq.getSourceType().equals(BusinessSourceTypeEnum.SETTLE_NEW.getValue())||
+                businessBasicInfoReq.getSourceType().equals(BusinessSourceTypeEnum.SETTLE_NEW.getValue())){
+
+            if(businessBasicInfoReq.getSourceBusinessId()==null){
+                throw  new CreatRepaymentExcepiton("结清再贷业务必须填写原始来源业务的业务编号");
+            }
+
+        }
+        List<ProjInfoReq>  projInfoReqs = creatRepayPlanReq.getProjInfoReqs();
+
+        for(ProjInfoReq projInfoReq :projInfoReqs){
+            if(projInfoReq.getIsHaveCar().equals(BooleanEnum.YES.getValue())){
+                if(projInfoReq.getProjCarInfos()==null){
+                    throw  new CreatRepaymentExcepiton("有车辆信息的标必须把车辆信息列表传入");
+                }
+            }
+            if(projInfoReq.getIsHaveHouse().equals(BooleanEnum.YES.getValue())){
+                if(projInfoReq.getProjHouseInfos()==null){
+                    throw  new CreatRepaymentExcepiton("有房产信息的标必须把房产信息列表传入");
+                }
+            }
+
+        }
+
+//        TuandaiProjectCar
+
+
+        /////////////   输入数据校验   结束 ////////////////////////
 
 
         List<RepaymentBizPlanDto>  dtos = creatRepayPlan(creatRepayPlanReq);
@@ -325,6 +358,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
         BasicBusiness  basicBusiness = ClassCopyUtil.copy(creatRepayPlanReq.getBusinessBasicInfoReq(),BusinessBasicInfoReq.class,BasicBusiness.class);
         basicBusiness.setBorrowLimitUnit(1);
+        basicBusiness.setOutputPlatformId(1);//默认为团贷网p2p业务
+        basicBusiness.setIsTuandaiRepay(1);//默认为使用平台还款
+        basicBusiness.setAssetId("ht_xindai");//默认为鸿特信贷中心
         BasicBusiness  oldBasicBusiness = basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id",basicBusiness.getBusinessId()));
         if(oldBasicBusiness!=null){
             basicBusiness.setCreateUser(oldBasicBusiness.getCreateUser());
@@ -337,12 +373,18 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         }
         basicBusinessService.insertOrUpdate(basicBusiness);
 
-        List<ProjInfoReq>  projInfoReqs = creatRepayPlanReq.getProjInfoReqs();
+
         for(ProjInfoReq projInfoReq:projInfoReqs){
             TuandaiProjectInfo  projInfo = ClassCopyUtil.copy(projInfoReq,ProjInfoReq.class,TuandaiProjectInfo.class);
             projInfo.setBusinessId(basicBusiness.getBusinessId());
+//            for(RepaymentBizPlanDto bizPlanDto: dtos){
+//                BizPlanListDto  bizPlanListDto = bizPlanDto.getBizPlanListDtos();
+//            }
+//            for(RepaymentProjPlanDto projPlanDto:projPlanDtos){
+//
+//            }
 
-
+//            List<RepaymentProjPlanDto> projPlanDtos
             TuandaiProjectInfo  oldProjInfp =tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("project_id",projInfo.getProjectId()));
 
             if(oldProjInfp!=null){
@@ -355,8 +397,23 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 projInfo.setCreateTime(new Date());
             }
 
-
             tuandaiProjectInfoService.insertOrUpdate(projInfo);
+
+
+            if(projInfoReq.getIsHaveCar().equals(BooleanEnum.YES.getValue())){
+                List<ProjectCarInfoReq> projectCarInfoReqs = projInfoReq.getProjCarInfos();
+
+                if(projInfoReq.getProjCarInfos()==null){
+                    throw  new CreatRepaymentExcepiton("有车辆信息的标必须把车辆信息列表传入");
+                }
+            }
+            if(projInfoReq.getIsHaveHouse().equals(BooleanEnum.YES.getValue())){
+                if(projInfoReq.getProjHouseInfos()==null){
+                    throw  new CreatRepaymentExcepiton("有房产信息的标必须把房产信息列表传入");
+                }
+            }
+
+
         }
 
         /////////   存储传入的相关信息   结束   ////////////
@@ -483,7 +540,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 bizPlanList.setRepayFlag(RepayPlanPayedTypeEnum.PAYING.getValue());   // 已还款类型标记
                 bizPlanList.setActive(RepayPlanActiveEnum.ACTIVE.getValue());   // 是否有效状态
                 bizPlanList.setCreateTime(new Date());   // 创建日期
-                bizPlanList.setSrcType(bizPlanList.getSrcType());   // 来源类型
+                bizPlanList.setSrcType(bizPlan.getSrcType());   // 来源类型
                 bizPlanList.setCreateUser(Constant.SYS_DEFAULT_USER);   // 创建用户
 
 
@@ -592,7 +649,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                                      Map<String,List<RepaymentProjPlan>> repaymentProjPlanMap,
                                      BusinessBasicInfoReq  businessBasicInfo,
                                      Map<String,Map<String,Map<String,List<RepaymentProjPlanListDetail>>>> projPlanDetailTotalMap,
-                                     Map<String,Map<String,List<RepaymentProjPlanList>>> projPlanListTotalMap){
+                                     Map<String,Map<String,List<RepaymentProjPlanList>>> projPlanListTotalMap) throws IllegalAccessException, InstantiationException {
         for(String beginDay:projInfoReqMap.keySet()){
             List<ProjInfoReq> reqList = projInfoReqMap.get(beginDay);
             //批次Id
@@ -622,7 +679,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
 
                 ///////  标还款计划表   一次出款 生成一条记录
-                RepaymentProjPlan repaymentProjPlan = new RepaymentProjPlan();
+                RepaymentProjPlan repaymentProjPlan = new RepaymentProjPlan(); //ClassCopyUtil.copy(projInfoReq,ProjInfoReq.class,RepaymentProjPlan.class);
                 repaymentProjPlan.setProjPlanId(UUID.randomUUID().toString());
                 repaymentProjPlan.setProjectId(projInfoReq.getProjectId());
                 repaymentProjPlan.setBusinessId(businessBasicInfo.getBusinessId());
@@ -641,6 +698,15 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 repaymentProjPlan.setCreateUser(Constant.SYS_DEFAULT_USER);
                 repaymentProjPlan.setCreatSysType(RepayPlanCreateSysEnum.ALMS.getValue());
                 repaymentProjPlan.setPlateType(projInfoReq.getPlateType());
+                repaymentProjPlan.setOnLineOverDueRate(projInfoReq.getOnLineOverDueRate());
+                repaymentProjPlan.setOnLineOverDueRateUnit(projInfoReq.getOnLineOverDueRateUnit());
+                repaymentProjPlan.setOffLineOutOverDueRate(projInfoReq.getOffLineOutOverDueRate());
+                repaymentProjPlan.setOffLineOutOverDueRateUnit(projInfoReq.getOffLineOutOverDueRateUnit());
+                repaymentProjPlan.setOffLineInOverDueRate(projInfoReq.getOffLineInOverDueRate());
+                repaymentProjPlan.setOffLineInOverDueRateUnit(projInfoReq.getOffLineInOverDueRateUnit());
+
+
+
 
                 projPlans.add(repaymentProjPlan);
                 List<ProjFeeReq> projFeeReqs =  projInfoReq.getProjFeeInfos();
@@ -1198,20 +1264,34 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
     public static void main(String[] args) {
 
-        //进位方式枚举
-         RoundingMode roundingMode=RoundingMode.HALF_UP;
-        //保留的小数位数
-         Integer smallNum=4;
+        BigDecimal t1 = new BigDecimal(7415.8400000);
+        t1= t1.setScale(2,BigDecimal.ROUND_HALF_DOWN);
 
-         BigDecimal projTBAmount = new BigDecimal(12.3333335476554634532213234);
+        BigDecimal t2 = new BigDecimal(7415.84);
+        t2= t2.setScale(2,BigDecimal.ROUND_HALF_DOWN);
 
-        projTBAmount= projTBAmount.setScale(2,BigDecimal.ROUND_HALF_DOWN);
+//        new BigDecimal(7415.84).setScale(creatRepayPlanReq.getSmallNum(),creatRepayPlanReq.getRondmode())
 
-        System.out.println(projTBAmount);
-//        System.out.println(UUID.randomUUID().toString());
+        Integer tt =t1.compareTo(t2);
+        System.out.println(tt);
 
-        String periodStr=(new DecimalFormat("00")).format(120);
-        System.out.println(periodStr);
+//                bizPlanList.getTotalBorrowAmount().compareTo(new BigDecimal(7415.84));
+
+//
+//        //进位方式枚举
+//         RoundingMode roundingMode=RoundingMode.HALF_UP;
+//        //保留的小数位数
+//         Integer smallNum=4;
+//
+//         BigDecimal projTBAmount = new BigDecimal(12.3333335476554634532213234);
+//
+//        projTBAmount= projTBAmount.setScale(2,BigDecimal.ROUND_HALF_DOWN);
+//
+//        System.out.println(projTBAmount);
+////        System.out.println(UUID.randomUUID().toString());
+//
+//        String periodStr=(new DecimalFormat("00")).format(120);
+//        System.out.println(periodStr);
 
         //---------  还款本息   测试   开始----------//
 //        Integer periodMonth = 12;

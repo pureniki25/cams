@@ -18,7 +18,7 @@ public class ProjFeeReq {
     /**
      * [是否设置期限范围]
      */
-    @ApiModelProperty(required= true,value = "[是否设置期限范围,1是，0 否]")
+    @ApiModelProperty(required= true,value = "[是否分段收费,1是，0 否]")
     private Integer isTermRange;
 //    @ApiModelProperty(value = "标的出款申请费用明细期限范围明细列表，分段收费的费用，必须填写这一项")
 //    private List<ProjFeeDetailReq> ProjFeeDetailInfos;
@@ -46,10 +46,12 @@ public class ProjFeeReq {
 
     /**
      * 费用项类型
+     *             "10：本金，20：利息，30：资产端分公司服务费，40：担保公司费用，" +
+     "50：资金端平台服务费，60：滞纳金，70：违约金，80：中介费，90：押金类费用，100：冲应收"
      */
     @ApiModelProperty(required= true,value = "费用项所属分类，" +
-            "10：本金，20：利息，30：资产端分公司服务费，40：担保公司费用，" +
-            "50：资金端平台服务费，60：滞纳金，70：违约金，80：中介费，90：押金类费用，100：冲应收")
+            "30：资产端分公司服务费，40：担保公司费用，" +
+            "50：资金端平台服务费，80：中介费，90：押金类费用")
     private Integer feeType;
 
 
@@ -60,23 +62,23 @@ public class ProjFeeReq {
     private String feeTypeName;
 
     /**
-     * 分账标记(冲应收还款，根据冲应收明细进行分账)，0：不线上分账，10：分账到借款人账户，20：分账到资产端账户，30：分账到资金端账户(平台)，40：分账到担保公司账户
+     * 分账标记 0：不线上分账，10：分账到借款人账户，20：分账到资产端账户，30：分账到资金端账户(平台)，40：分账到担保公司账户
      */
     @TableField("account_status")
-    @ApiModelProperty(required= true,value = "分账标记(冲应收还款，根据冲应收明细进行分账)，0：不线上分账，10：分账到借款人账户，20：分账到资产端账户，30：分账到资金端账户(平台)，40：分账到担保公司账户")
+    @ApiModelProperty(required= true,value = "分账标记 0：不线上分账，10：分账到借款人账户，20：分账到资产端账户，30：分账到资金端账户(平台)，40：分账到担保公司账户")
     private Integer accountStatus;
 
-    /**
-     * 费用收取方式，1为按比例，2为按固定金额
-     */
-    @ApiModelProperty(required= true,value = "费用收取方式，1为按比例，2为按固定金额")
-    private Integer feeChargingType;
+//    /**
+//     * 费用收取方式，1为按比例，2为按固定金额
+//     */
+//    @ApiModelProperty(required= true,value = "费用收取方式，1为按比例，2为按固定金额")
+//    private Integer feeChargingType;
 
-    /**
-     * 系统默认匹配的费用比例（当收取方式为2时，此字段存零）
-     */
-    @ApiModelProperty(required= true,value = "系统默认匹配的费用比例（当收取方式为2时，此字段存零）")
-    private BigDecimal newSystemDefaultRate;
+//    /**
+//     * 系统默认匹配的费用比例（当收取方式为2时，此字段存零）
+//     */
+//    @ApiModelProperty(required= true,value = "系统默认匹配的费用比例（当收取方式为2时，此字段存零）")
+//    private BigDecimal newSystemDefaultRate;
 
     /**
      * [业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值]
@@ -277,13 +279,13 @@ public class ProjFeeReq {
         WithdrawId = withdrawId;
     }
 
-    public Integer getFeeChargingType() {
-        return feeChargingType;
-    }
-
-    public void setFeeChargingType(Integer feeChargingType) {
-        this.feeChargingType = feeChargingType;
-    }
+//    public Integer getFeeChargingType() {
+//        return feeChargingType;
+//    }
+//
+//    public void setFeeChargingType(Integer feeChargingType) {
+//        this.feeChargingType = feeChargingType;
+//    }
 
     public Integer getIsOneTimeCharge() {
         return isOneTimeCharge;
@@ -373,13 +375,13 @@ public class ProjFeeReq {
 //        this.canRefundMoney = canRefundMoney;
 //    }
 
-    public BigDecimal getNewSystemDefaultRate() {
-        return newSystemDefaultRate;
-    }
-
-    public void setNewSystemDefaultRate(BigDecimal newSystemDefaultRate) {
-        this.newSystemDefaultRate = newSystemDefaultRate;
-    }
+//    public BigDecimal getNewSystemDefaultRate() {
+//        return newSystemDefaultRate;
+//    }
+//
+//    public void setNewSystemDefaultRate(BigDecimal newSystemDefaultRate) {
+//        this.newSystemDefaultRate = newSystemDefaultRate;
+//    }
 
 
     public Integer getFeeType() {
