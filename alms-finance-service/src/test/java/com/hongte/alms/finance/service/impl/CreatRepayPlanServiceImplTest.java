@@ -134,6 +134,7 @@ public class CreatRepayPlanServiceImplTest {
         businessBasicInfoReq.setRepaymentTypeId(9);  //1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息
         businessBasicInfoReq.setBorrowMoney(new BigDecimal(50000));  //借款总额
         businessBasicInfoReq.setBorrowLimit(6);  //借款期限
+        businessBasicInfoReq.setBorrowRateUnit(1);  //借款期限
 
 
 
@@ -196,8 +197,8 @@ public class CreatRepayPlanServiceImplTest {
         req1.setMasterIssueId("670d149e-6b63-4810-b437-f993b0bc9af9"); // 主借标ID
         req1.setRate(new BigDecimal(9.5)); // 利率
         req1.setRateUnitType(1); // 利率单位：1 年利率; 2 月利率; 3 日利率
-        req1.setOverDueRate(new BigDecimal(12)); // 逾期滞纳金费率(%)
-        req1.setOverDueRateUnit(1); // 逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
+        req1.setOffLineInOverDueRate(new BigDecimal(12)); // 逾期滞纳金费率(%)
+        req1.setOffLineInOverDueRateUnit(1); // 逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
         req1.setRepayType(RepayPlanRepayIniCalcWayEnum.INT_AND_PRIN_EVERYTIME.getKey()); // 还款方式：1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息,11:等本等息
         req1.setPeriodMonth(6); // 借款期限  月
 
@@ -281,7 +282,7 @@ public class CreatRepayPlanServiceImplTest {
         principleReqs2.add(principlereq21);
 
         PrincipleReq principleReq22 = new PrincipleReq();
-        principleReq22.setPeriod(22);
+        principleReq22.setPeriod(2);
         principleReq22.setPrinciple(new BigDecimal(2800));
         principleReqs2.add(principleReq22);
 
@@ -331,8 +332,8 @@ public class CreatRepayPlanServiceImplTest {
         req2.setMasterIssueId("670d149e-6b63-4810-b437-f993b0bc9af9"); // 主借标ID
         req2.setRate(new BigDecimal(9.5)); // 利率
         req2.setRateUnitType(1); // 利率单位：1 年利率; 2 月利率; 3 日利率
-        req2.setOverDueRate(new BigDecimal(12)); // 逾期滞纳金费率(%)
-        req2.setOverDueRateUnit(1); // 逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
+        req2.setOffLineInOverDueRate(new BigDecimal(12)); // 逾期滞纳金费率(%)
+        req2.setOffLineInOverDueRateUnit(1); // 逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
         req2.setRepayType(RepayPlanRepayIniCalcWayEnum.INT_AND_PRIN_EVERYTIME.getKey()); // 还款方式：1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息,11:等本等息
         req2.setPeriodMonth(6); // 借款期限  月
 
@@ -528,8 +529,8 @@ public class CreatRepayPlanServiceImplTest {
 
         req1.setRate(new BigDecimal(12)); // 利率
         req1.setRateUnitType(1); // 利率单位：1 年利率; 2 月利率; 3 日利率
-        req1.setOverDueRate(new BigDecimal(12)); // 逾期滞纳金费率(%)
-        req1.setOverDueRateUnit(1); // 逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
+        req1.setOffLineInOverDueRate(new BigDecimal(12)); // 逾期滞纳金费率(%)
+        req1.setOffLineInOverDueRateUnit(1); // 逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
         req1.setRepayType(RepayPlanRepayIniCalcWayEnum.PRINCIPAL_LAST.getKey()); // 还款方式：1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息,11:等本等息
         req1.setSex(PeayPlanSexEnum.MAN.getValue()); // 性别
         req1.setCredTypeId(1); // 证件类型

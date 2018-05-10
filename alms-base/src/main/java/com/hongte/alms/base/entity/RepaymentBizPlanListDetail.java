@@ -8,7 +8,6 @@ import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
-import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
@@ -109,6 +108,13 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 	@TableField("fact_repay_date")
 	@ApiModelProperty(required= true,value = "实还日期")
 	private Date factRepayDate;
+	/**
+	 * 应还日期
+     */
+	@TableField("due_date")
+	@ApiModelProperty(required= true,value = "应还日期")
+	private Date dueDate;
+	/**
     /**
      * 是否有效状态：1 有效 ，0 无效
      */
@@ -329,6 +335,7 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 			", factAmount=" + factAmount +
 			", repaySource=" + repaySource +
 			", factRepayDate=" + factRepayDate +
+			", dueDate=" + dueDate +
 			", active=" + active +
 			", createDate=" + createDate +
 			", srcType=" + srcType +
@@ -336,5 +343,13 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 			", updateDate=" + updateDate +
 			", updateUser=" + updateUser +
 			"}";
+	}
+
+	public Date getDueDate() {
+		return dueDate;
+	}
+
+	public void setDueDate(Date dueDate) {
+		this.dueDate = dueDate;
 	}
 }

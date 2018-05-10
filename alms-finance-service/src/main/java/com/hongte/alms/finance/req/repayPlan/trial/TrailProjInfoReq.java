@@ -92,19 +92,19 @@ public class TrailProjInfoReq {
         this.repayType = repayType;
     }
 
-//    public BigDecimal getOverDueRate() {
+//    public BigDecimal getOffLineInOverDueRate() {
 //        return overDueRate;
 //    }
 //
-//    public void setOverDueRate(BigDecimal overDueRate) {
+//    public void setOffLineInOverDueRate(BigDecimal overDueRate) {
 //        this.overDueRate = overDueRate;
 //    }
 //
-//    public Integer getOverDueRateUnit() {
+//    public Integer getOffLineInOverDueRateUnit() {
 //        return overDueRateUnit;
 //    }
 //
-//    public void setOverDueRateUnit(Integer overDueRateUnit) {
+//    public void setOffLineInOverDueRateUnit(Integer overDueRateUnit) {
 //        this.overDueRateUnit = overDueRateUnit;
 //    }
 

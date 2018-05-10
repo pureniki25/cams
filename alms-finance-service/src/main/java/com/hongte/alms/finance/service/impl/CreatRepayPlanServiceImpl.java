@@ -324,6 +324,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         /////  存储传入的相关信息  开始  //////////////
 
         BasicBusiness  basicBusiness = ClassCopyUtil.copy(creatRepayPlanReq.getBusinessBasicInfoReq(),BusinessBasicInfoReq.class,BasicBusiness.class);
+        basicBusiness.setBorrowLimitUnit(1);
         BasicBusiness  oldBasicBusiness = basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id",basicBusiness.getBusinessId()));
         if(oldBasicBusiness!=null){
             basicBusiness.setCreateUser(oldBasicBusiness.getCreateUser());
@@ -381,7 +382,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         });
 
 
-        return null;
+        return dtos;
 
     }
 
@@ -531,7 +532,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                         bizpDetial.setCreateDate(new Date());  // 创建日期
                         bizpDetial.setSrcType(RepayPlanCreateSysEnum.ALMS.getValue());  // 来源类型
                         bizpDetial.setCreateUser(Constant.SYS_DEFAULT_USER);  // 来源类型
-
+                        bizpDetial.setDueDate(bizPlanList.getDueDate());
                         //更新标的detail   业务还款计划相关Id
                         for(RepaymentProjPlanListDetail projPlanListDetail: projpDetials){
                             projPlanListDetail.setPlanListId(bizPlanList.getPlanListId());
@@ -720,6 +721,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     prinDetail.setPlanItemName(RepayPlanFeeTypeEnum.PRINCIPAL.getDesc());//应还项目名称
                     prinDetail.setPlanItemType(RepayPlanFeeTypeEnum.PRINCIPAL.getValue());//应还项目所属分类
                     prinDetail.setAccountStatus(RepayPlanAccountStatusEnum.DIVISION_TO_PLAT.getValue());//分账标记
+
 
                     addDetialToMap(  repaymentProjPlanListDetailPeriorMap,
                             projdetailListMap,
@@ -1085,10 +1087,12 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         //前期已还本金
         BigDecimal payedPriciple = new BigDecimal(0);
         for(int i=0;i<periodMonth;i++){
+            Integer p = i+1;
             BigDecimal priciple = null;
             for(PrincipleReq  principleReq:principleMap){
-                if(principleReq.getPeriod().equals(i+1)){
+                if(principleReq.getPeriod().equals(p)){
                     priciple =principleReq.getPrinciple();
+                    break;
                 }
             }
             if(priciple == null){
@@ -1186,6 +1190,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         Integer shareProfitIndex =  profitItemSetService.getLevel(projPlanListDetail.getBusinessId(),projPlanListDetail.getPlanItemType(),projPlanListDetail.getFeeId())
                 .get("feeLevel");
         projPlanListDetail.setShareProfitIndex(shareProfitIndex);
+        projPlanListDetail.setDueDate(projPlanList.getDueDate());
         return projPlanListDetail;
     }
 
