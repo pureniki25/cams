@@ -9,33 +9,51 @@ window.layinit(function (htConfig) {
     var planListId = getQueryStr('planListId')
     app = new Vue({
         el: "#app",
-        data:{
-            manualAddBankSatementsShow:false,
-            repayInfoUrl:'/finance/repayBaseInfo?businessId='+businessId+"&afterId="+afterId,
-            repayRegListUrl:'/finance/repayRegList?businessId='+businessId+"&afterId="+afterId,
-            manualAddBankSatements:'/finance/manualAddBankSatements?businessId='+businessId+"&afterId="+afterId,
-            matchedBankStatementUrl:'/finance/matchedBankStatement?businessId='+businessId+"&afterId="+afterId,
-            style:{
-                repayRegList:{},
-                matchedBankStatement:{}
+        data: {
+            repayInfo: {
+                url: '/finance/repayBaseInfo?businessId=' + businessId + "&afterId=" + afterId,
+            },
+            repayRegList: {
+                url: '/finance/repayRegList?businessId=' + businessId + "&afterId=" + afterId,
+                style:{}
+            },
+            matchedBankStatement: {
+                show: false,
+                url: '/finance/matchedBankStatement?businessId=' + businessId + "&afterId=" + afterId,
+                style:{}
+            },
+            manualAddBankSatements: {
+                show: false,
+                url: '/finance/manualAddBankSatements?businessId=' + businessId + "&afterId=" + afterId,
+                
+            },
+            manualMatchBankSatements:{
+                show:false,
+                url:'/finance/manualMatchBankSatements?businessId=' + businessId + "&afterId=" + afterId,
+            },
+            style: {
+                repayRegList: {},
+                matchedBankStatement: {}
             }
         },
-        methods:{
-            closeModal:function(target){
-                if(app[target]){
-                    app[target]=false;
+        methods: {
+            closeModal: function (target) {
+                if (app[target]) {
+                    app[target] = false;
                 }
             },
-            configModalStyle:function(target,style){
-                console.log(target);
-                console.log(style);
-                console.log(app.style[target]);
-                if(app.style[target]){
-                    app.style[target] = style
+            openModal: function (target) {
+                if (!app[target]) {
+                    app[target] = true
+                }
+            },
+            configModalStyle: function (target, style) {
+                if (app[target].style) {
+                    app[target].style = style
                 }
             }
         },
-        created:function(){
+        created: function () {
         }
     })
 })

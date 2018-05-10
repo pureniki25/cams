@@ -128,8 +128,7 @@ window.layinit(function (htConfig) {
             acceptAcount(n,o){
                 this.bankAccountList.forEach(e=>{
                     if(n==e.financeName){
-                        app.curBankAccount = e.repaymentId ;
-                        console.log(e.repaymentId);
+                        app.curBankAccount = e.repaymentId||'' ;
                     }
                 })
             }
