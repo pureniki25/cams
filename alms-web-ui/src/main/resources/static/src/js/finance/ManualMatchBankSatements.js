@@ -8,7 +8,7 @@ window.layinit(function (htConfig) {
 
     let cpath = htConfig.coreBasePath;
     let fpath = htConfig.financeBasePath;
-
+    console.log(typeof getQueryStr('repayDate'));
     app = new Vue({
         el: "#app",
         data: {
@@ -110,10 +110,9 @@ window.layinit(function (htConfig) {
                     params.accountMoney = this.accountMoney;
                 }
                 if (this.repayDate) {
-                    console.log(typeof this.repayDate);
                     params.repayDate = this.repayDate;
                 }
-                if (this.acceptBank) {
+                if (this.acceptBank&&this.acceptBank.length>0) {
                     params.acceptBank = this.acceptBank;
                 }
                 axios.get(fpath + 'finance/moneyPool', { params: params })
