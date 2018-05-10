@@ -426,7 +426,7 @@ public class ApplyDerateController {
 	
 	
 
-	@ApiOperation(value = "车贷:获取提前结清违约金和滞纳金")
+	@ApiOperation(value = "车贷:获取提前结清违约金")
 	@GetMapping("/getPreLateFees")
 	@ResponseBody
 	public Result<Map<String, Object>> getPreLateFees(@RequestParam("crpId") String crpId,
@@ -443,13 +443,6 @@ public class ApplyDerateController {
 			List<BusinessInfoForApplyDerateVo> businessVoList = basicBusinessService
 					.selectBusinessInfoForApplyDerateVo(crpId, isDefer, businessId);
 
-			// String businessId="";
-			// if (!CollectionUtils.isEmpty(businessVoList)) {
-			//
-			// businessId=businessVoList.get(0).getBusinessId();
-			//
-			// }
-
 			CarLoanBilVO carLoanBilVO = new CarLoanBilVO();
 			carLoanBilVO.setBillDate(new Date());
 			carLoanBilVO.setBusinessId(businessId);
@@ -461,7 +454,7 @@ public class ApplyDerateController {
 			Map<String, Object> resultMap = transferOfLitigationService.carLoanBilling(carLoanBilVO);
 			if (resultMap != null) {
 				retMap.put("preLateFees", JSON.toJSON(resultMap.get("preLateFees"), JsonUtil.getMapping()));// 提前还款违约金
-
+				retMap.put("balanceDue", JSON.toJSON(resultMap.get("balanceDue"), JsonUtil.getMapping()));// 往期少交费用
 				retMap.put("previousFees",
 						(JSONArray) JSON.toJSON(resultMap.get("previousFees"), JsonUtil.getMapping()));
 
@@ -478,6 +471,11 @@ public class ApplyDerateController {
 		}
 
 	}
+	
+	
+	
+	
+	
 
 	@ApiOperation(value = "车贷:获取应付逾期利息")
 	@GetMapping("/getOutsideInterest")

@@ -610,16 +610,17 @@ var showData=function(){debugger
 	//车贷
     if(businessTypeId == 1 || businessTypeId == 9){debugger
                     
-                //判断是否上标且是否等额本息
+                //判断是否非上标且是否等额本息
             	var reqUrl = basePath + 'transferOfLitigation/queryCarLoanBilDetail?businessId=' + businessId
                 
-                axios.get(reqUrl).then(function(res){
+                axios.get(reqUrl).then(function(res){debugger
                 	vm.isCarFlag=true
                   if(res.data.code=='1'){
+                	  getBalanceDue();//获取往期少交费用
                 	  //getPreviousLateFees();//获取整个业务的滞纳金
                 		vm.baseInfoForm.totalBorrowAmount="";
                     if (res.data.data.outputPlatformId == 0 && res.data.data.repaymentTypeId == '等额本息') {
-                      vm.preLateFeesFlag = res.data.data.preLateFeesFlag;
+                      vm.preLateFeesFlag =true
                     }else{
                     	//如果不是等额本息，就直接调用方法获取违约金
                     	getPreLateFees();
@@ -754,6 +755,26 @@ var getPreLateFees = function () {debugger
             if (res.data.code == "1") {
                
                     vm.baseInfoForm.preLateFees = res.data.data.preLateFees;
+                    getTotalShouldPay();
+            } else {
+                vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
+            }
+        })
+        .catch(function (error) {
+            vm.$Modal.error({content: '接口调用异常!'});
+        });
+}
+
+///////////车贷:获取往期少交费用
+var getBalanceDue = function () {debugger
+
+    var reqStr = basePath +"ApplyDerateController/getPreLateFees?crpId="+crpId+"&preLateFeesType="+vm.baseInfoForm.preLateFeesType+"&afterId="+afterId+"&businessId=" + businessId;
+   
+    axios.get(reqStr)
+        .then(function (res) {debugger
+            if (res.data.code == "1") {
+               
+                    vm.baseInfoForm.lackFee = res.data.data.balanceDue;
                     getTotalShouldPay();
             } else {
                 vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
