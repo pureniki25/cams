@@ -64,8 +64,8 @@
         <if test = "companyId != null and companyId!='' ">
             and business.company_id = #{companyId}
         </if>
-
-         <if test = "businessType != null and businessType!='' ">
+        
+         <if test = "businessType != null and businessType!='' and businessType!=0">
             and type.business_type_id = #{businessType}
         </if>
         AND planList.current_status IN ("还款中","逾期")
@@ -83,9 +83,9 @@
 
 
     </select>
-
+    
     <select id="queryRepaymentBizPlanListByConditions" resultType="java.lang.String">
-   		SELECT b.plan_list_id
+   		SELECT b.plan_list_id 
    		  FROM `tb_repayment_biz_plan` a, `tb_repayment_biz_plan_list` b
 		WHERE a.`plan_id` = b.`plan_id`
 		  AND a.`original_business_id` = #{businessId,jdbcType=VARCHAR}
@@ -124,10 +124,10 @@
 
     </select>-->
     <!-- AND cStatus.crp_id = planList.plan_list_id -->
-    
+
     <select id="conutFinanceManagerList" resultType="int"
 		parameterType="com.hongte.alms.base.dto.FinanceManagerListReq">
-		SELECT 
+		SELECT
 			count(1)
 		FROM
 			tb_repayment_biz_plan_list pl

@@ -318,7 +318,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		return  expenseSettleMapper.listLackFee(businessId);
 	}
 
-	public ExpenseSettleVO cal(String businessId,Date settleDate) throws Exception {
+	public ExpenseSettleVO cal(String businessId,Date settleDate) {
 		final BasicBusiness basicBusiness = basicBusinessMapper.selectById(businessId);
 		RepaymentBizPlan repaymentBizPlan = new RepaymentBizPlan() ;
 		repaymentBizPlan.setBusinessId(businessId);
@@ -472,24 +472,28 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		logger.info(JSON.toJSONString(respData));
 		logger.info("信贷返回数据解密-结束");
 		
-		BigDecimal g = new BigDecimal(0);
 		JSONArray jsonArray = JSONArray.parseArray(respData.getData());
-		for (Object object : jsonArray) {
-			JSONObject j = (JSONObject) object ;
-			String feeTypeName = j.getString("fee_type_name");
-			BigDecimal feeValue =  j.getBigDecimal("fee_value");
-			BigDecimal factFeeValue = j.getBigDecimal("fact_fee_value");
-			Integer isOneTimeCharge = j.getInteger("is_one_time_charge");
-			if (feeTypeName.equals("担保公司费用")&&isOneTimeCharge.equals(new Integer(1))) {
-				if (factFeeValue==null) {
-					guaranteeFee = feeValue ;
-					return ;
-				}else {
-					guaranteeFee = feeValue.subtract(factFeeValue) ;
-					return ;
+		if (jsonArray.size()==0) {
+			guaranteeFee = new BigDecimal(0);
+		}else {
+			for (Object object : jsonArray) {
+				JSONObject j = (JSONObject) object ;
+				String feeTypeName = j.getString("fee_type_name");
+				BigDecimal feeValue =  j.getBigDecimal("fee_value");
+				BigDecimal factFeeValue = j.getBigDecimal("fact_fee_value");
+				Integer isOneTimeCharge = j.getInteger("is_one_time_charge");
+				if (feeTypeName.equals("担保公司费用")&&isOneTimeCharge.equals(new Integer(1))) {
+					if (factFeeValue==null) {
+						guaranteeFee = feeValue ;
+						return ;
+					}else {
+						guaranteeFee = feeValue.subtract(factFeeValue) ;
+						return ;
+					}
 				}
 			}
 		}
+		
 		
 		expenseSettleVO.setGuaranteeFee(guaranteeFee);
 		
@@ -695,8 +699,12 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 					if (firstLateFee == null) {
 						if (e.getRepaymentBizPlanList() != null && e.getRepaymentBizPlanList().getCurrentStatus().equals("逾期")) {
 							int daysBeyoungDueDate = DateUtil.getDiffDays(e.getRepaymentBizPlanList().getDueDate(), settleDate);
-							BigDecimal lateFeeRate = d.getPlanAmount()
-									.divide(e.getRepaymentBizPlanList().getOverdueDays().multiply(expenseSettleVO.getPrincipal()),10,RoundingMode.HALF_UP);
+							BigDecimal lateFeeRate=BigDecimal.valueOf(0);
+							if(e.getRepaymentBizPlanList().getOverdueDays().multiply(expenseSettleVO.getPrincipal()).compareTo(BigDecimal.valueOf(0))==1) {
+								 lateFeeRate = d.getPlanAmount()
+										.divide(e.getRepaymentBizPlanList().getOverdueDays().multiply(expenseSettleVO.getPrincipal()),10,RoundingMode.HALF_UP);
+							}
+					
 							if (daysBeyoungDueDate > 1) {
 								firstLateFee = expenseSettleVO.getPrincipal().multiply(lateFeeRate)
 										.multiply(new BigDecimal(daysBeyoungDueDate));

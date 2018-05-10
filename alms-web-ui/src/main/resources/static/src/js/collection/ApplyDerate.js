@@ -206,6 +206,7 @@ window.layinit(function (htConfig) {
                             }*/
             ],
             otherDerateTypeList:[],
+            tempList:[],
             otherFees:[],//其他费用项
 
             validApplyInfoForm: setFormValidate,
@@ -350,9 +351,11 @@ window.layinit(function (htConfig) {
 
             },
             //是否结清
-            isClosedClick(flage){
+            isClosedClick(flage){debugger
               if(flage==false){
-            	  vm.otherFeeShowFlage=false;
+            	  
+            		  vm.otherFeeShowFlage=false;
+            
          		   var otherList=vm.otherDerateTypeList;
            		if(otherList != null && otherList.length > 0){
            	    	for (var i = 0; i < otherList.length; i++){
@@ -385,8 +388,8 @@ window.layinit(function (htConfig) {
             	  
               }
               if(flage==true){
-            	  
-            	  vm.otherFeeShowFlage=true;
+            		  vm.otherFeeShowFlage=true;
+         
             	  vm.applyInfoForm.realReceiveMoney=vm.baseInfoForm.settleTotalFactAmount;
             	  if(vm.applyInfoForm.realReceiveMoney==0){
             		  vm.applyInfoForm.realReceiveMoney=''
@@ -694,7 +697,7 @@ var getTotalShouldPay = function () {
 //综合收益率
 //：（前置费用+出款后已交月收等费用总额+应付利息+应付月收服务费+应付滞纳金+应付其他费用+应付提前结清违约金+应付逾期利息）-减免金额合计/借款金额/借款期限
 //（借款期限是客户实际的借款期限，不足一个月按月计算）若客户提前结清或正常结清则直接去结清期的 期限即可，若客户逾期结清 则需计算 真实的借款期限，合同期限+（逾期天数/30 进一
-var getGeneralReturnRate= function () {
+var getGeneralReturnRate= function () {debugger
 	var borrowLimit=vm.baseInfoForm.borrowLimit;
 	vm.baseInfoForm.generalReturnRate=0;
     //逾期天数如果大于0,说明逾期，否则直接取借款期限
@@ -826,12 +829,16 @@ var getShowInfo = function () {
                 //减免类型显示
                 vm.derateTypeList = res.data.data.derateTypeList;
                 vm.otherDerateTypeList=res.data.data.otherDerateTypeList;
-
+                vm.tempList=res.data.data.tempList;
                 if(res.data.data.applyList !=null && res.data.data.applyList.length>0){
                     //赋值申请信息
                     vm.applyInfoForm = res.data.data.applyList[0];
 
                     vm.applyInfoForm.isSettleFlage = vm.applyInfoForm.isSettle=="1"?"是":"否";
+                    
+                    if(vm.applyInfoForm.isSettle!="1"){
+              		  vm.otherFeeShowFlage=false;
+                    }
                     //赋值审批信息初始信息
                     vm.initalApplyInfo.isSettleFlage = vm.initalApplyInfo.isSettle=="1"?"是":"否";
                     vm.initalApplyInfo = res.data.data.applyList[0];
@@ -881,13 +888,14 @@ var getShowInfo = function () {
 
                     //赋值流程信息
                     var p = res.data.data.process;
-                    if(p!=null&& p.length>0){
+                    if(p!=null&& p.length>0){debugger
                         vm.approvalInfoForm.process = p[0];
                         vm.approvalInfoFormShowFlage = true;
                         vm.approvalInfoList = res.data.data.processLogs;
                         for(var i = 0;i<vm.approvalInfoList.length;i++){
                             var t = vm.approvalInfoList[i];
                             vm.approvalInfoList[i].isPassFlage = t.isPass=="1"?"是":"否";
+                      
                         }
                         processStatus = vm.approvalInfoForm.process.status;
                         
@@ -1248,7 +1256,8 @@ var saveapplyInfo = function(pStatus){debugger
 		               url: basePath+'ApplyDerateController/saveApplyDerateInfo',
 		               contentType: "application/json; charset=utf-8",
 		               data: JSON.stringify({"applyData":[vm.applyInfoForm],"reqRegFiles":vm.reqRegFiles,"applytTypes":vm.applyTypes,"otherDerateTypeList":vm.otherDerateTypeList,
-		            	   "outsideInterest":vm.baseInfoForm.outsideInterest,"generalReturnRate":vm.baseInfoForm.generalReturnRate,"preLateFees":vm.baseInfoForm.preLateFees}),
+		            	   "outsideInterest":vm.baseInfoForm.outsideInterest,"generalReturnRate":vm.baseInfoForm.generalReturnRate,"preLateFees":vm.baseInfoForm.preLateFees,"otherFees":vm.otherFees,
+                          "otherFeeEditFlage":vm.otherFeeEditFlage}),
 		               success: function (res) {
 		            	   if (res.code == "1"){
 		            		   vm.$Modal.success({

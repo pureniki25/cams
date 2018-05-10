@@ -77,6 +77,8 @@ window.layinit(function (htConfig) {
 		        	companyId:'', //分公司ID
 		        	keyName :'',      //业务编号 或客户名称
 		            platformId :'',  //代扣平台
+		            dateBegin :'',  
+		            dateEnd :'',  
 		            /*
 		            dateRange:[{
 		            	date1:new Date(),
@@ -157,9 +159,9 @@ window.layinit(function (htConfig) {
                 layui.use(['layer', 'table','ht_config'], function () {
                 	//config = layui.ht_config;
                 vm.$refs['searchForm'].validate((valid) => {debugger
-               
+                	getData();
                         vm.exporting = true;
-                        expoertExcel(basePath + "RepaymentLogController/saveExcel",vm.searchForm);
+                        expoertExcel(basePath + "RepaymentLogController/saveExcel",vm.searchForm,"代扣查询.xlsx");
                         vm.exporting = false;
                 })
                 });
@@ -454,15 +456,18 @@ var getData = function(){debugger
     if(vm.searchForm.dateRange.length>0){
     	if(vm.searchForm.dateRange[0]!=null){
     		 dataObject.dateBegin = vm.searchForm.dateRange[0].getTime();
+    		 vm.searchForm.dateBegin=vm.searchForm.dateRange[0].getTime();
     	}else{
     		var date1=new Date();
     		vm.searchForm.dateRange[0]=date1;
     		vm.searchForm.dateRange[0].setTime(new Date(new Date(new Date().toLocaleDateString()).getTime()-48*60*60*1000-1));
     		 dataObject.dateBegin=vm.searchForm.dateRange[0].getTime();
+    
     	}
      	if(vm.searchForm.dateRange[1]!=null){
             var date =vm.searchForm.dateRange[1];
             dataObject.dateEnd=date.getTime();
+       	 vm.searchForm.dateEnd=date.getTime();
    	   }else{
    		   var date2=new Date();
    		vm.searchForm.dateRange[1]=date2;

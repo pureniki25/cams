@@ -19,4 +19,7 @@ public interface CreatRepayPlanService {
     public List<RepaymentBizPlanDto> creatRepayPlan(CreatRepayPlanReq creatRepayPlanReq);
 
 
+    public  List<RepaymentBizPlanDto> creatAndSaveRepayPlan(CreatRepayPlanReq creatRepayPlanReq) throws IllegalAccessException, InstantiationException;
+
+
 }

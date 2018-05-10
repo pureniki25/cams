@@ -132,7 +132,7 @@
 		sum(case when t1.plan_item_type =100 then t1.fact_amount else 0 end)
 		`fact_reducing_debtors`
 		from tb_repayment_biz_plan_list_detail t1
-		group by t1.plan_list_id
+		where  t1.plan_list_id=#{planListId}
 
 		) c on pList.plan_list_id=c.plan_list_id 
 

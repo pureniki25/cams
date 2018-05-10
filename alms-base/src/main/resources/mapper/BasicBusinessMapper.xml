@@ -230,7 +230,7 @@
 		  SUM(
 		    CASE
 		      WHEN pdetail.plan_item_type = 10 
-		      THEN pdetail.plan_amount 
+		      THEN pdetail.fact_amount 
 		      ELSE 0 
 		    END
 		  ) AS `payedPrincipal`,	--   已还本金

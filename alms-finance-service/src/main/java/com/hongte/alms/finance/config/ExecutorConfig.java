@@ -22,16 +22,16 @@ public class ExecutorConfig {
      * */
     private int queueCapacity = 10;
 
-    @Bean
-    public Executor mySimpleAsync() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(corePoolSize);
-        executor.setMaxPoolSize(maxPoolSize);
-        executor.setQueueCapacity(queueCapacity);
-        executor.setThreadNamePrefix("MySimpleExecutor-");
-        executor.initialize();
-        return executor;
-    }
+//    @Bean
+//    public Executor mySimpleAsync() {
+//        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+//        executor.setCorePoolSize(corePoolSize);
+//        executor.setMaxPoolSize(maxPoolSize);
+//        executor.setQueueCapacity(queueCapacity);
+//        executor.setThreadNamePrefix("MySimpleExecutor-");
+//        executor.initialize();
+//        return executor;
+//    }
 
     @Bean
     public Executor myAsync() {

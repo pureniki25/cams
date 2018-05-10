@@ -219,23 +219,34 @@ color: #FF3030;
         <card>
             <row :gutter="16">
                 <i-form v-if="otherFeeShowFlage" ref="baseInfoForm"  :model="baseInfoForm"   label-position="right" :label-width="100">
-                    <div class="table">
+                    <div class="table" >
                   
                         <div  v-if="otherFeeEditFlage == '0'" class="tr" v-for="(item, index) in otherDerateTypeList">
-                            <div class="td"> <div class="td-box">{{ item.paramName }}</div><i-input v-model="item.paramValue2" class="td-box" @on-blur="getTotalShouldPay()"> </i-input> </div>
-                     
+                            <div  class="td"> <div class="td-box">{{ item.paramName }}</div><i-input v-model="item.paramValue2" class="td-box" @on-blur="getTotalShouldPay()"> </i-input> </div>
+                  
                         </div>
                         
                         <div  v-if="otherFeeEditFlage == '-1'" class="tr" v-for="(item, index) in otherFees">
                             <div class="td"> <div class="td-box">{{ item.planItemName }}</div><i-input v-model="item.planAmount" class="td-box" @on-blur="getTotalShouldPay()"> </i-input> </div>
                      
                         </div>
-                         <div v-if="otherFeeEditFlage == '1'"  class="tr" v-for="(item, index) in otherFees">
+                        
+                        
+                         <div  v-if="otherFeeEditFlage == '1'"  class="tr" v-for="(item, index) in otherFees">
                             <div class="td"> <div class="td-box">{{ item.planItemName }}</div><i-input disabled  v-model="item.planAmount" class="td-box" @on-blur="getTotalShouldPay()"> </i-input> </div>
-                     
-                        </div>
                     </div>
-
+                     <!-- 只是为了填充表格效果 ======================-->
+                         <div  v-if="otherFeeEditFlage == '0'" class="tr" v-for="(item, index) in tempList">
+                             <div class="td"> <div class="td-box"></div><div class="td-box"> </div> </div>
+                          </div>
+                         <div  v-if="otherFeeEditFlage == '-1'" class="tr" v-for="(item, index) in tempList">
+                             <div class="td"> <div class="td-box"></div><div class="td-box"> </div> </div>
+                          </div>
+                       
+                         <div  v-if="otherFeeEditFlage == '1'" class="tr" v-for="(item, index) in tempList">
+                             <div class="td"> <div class="td-box"></div><div class="td-box"> </div> </div>
+                          </div>
+                     <!-- =================== -->     
                 </i-form>
                 </row>
         </card>

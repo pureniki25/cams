@@ -1,4 +1,4 @@
-package com.hongte.alms.finance.req.repayPlan;
+package com.hongte.alms.finance.req.repayPlan.trial;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -8,31 +8,17 @@ import java.util.List;
 /**
  * @author zengkun
  * @since 2018/4/20
- * 创建还款计划的接口
+ * 试算还款计划的接口
  */
 @ApiModel("创建还款计划的请求信息")
-public class CreatRepayPlanReq {
+public class TrailRepayPlanReq {
 
 
     /**
      * 业务的基本信息
      */
     @ApiModelProperty(required= true,value = "业务基本信息")
-    private BusinessBasicInfoReq businessBasicInfoReq;
-
-//    /**
-//     *  业务的出款计划信息
-//     */
-//    @ApiModelProperty(required= true,value = "业务出款计划信息")
-//    private List<BizOutPutPlanReq> outPutPlanList;
-//
-//
-//    /**
-//     *  业务的出款记录信息
-//     */
-//    @ApiModelProperty(required= true,value = "业务出款详情信息")
-//    private  List<BizOutPutRecordReq >  outPutRecordReqList;
-
+    private TrailBizInfoReq trailBizInfoReq;
 
     /**
      * 进位方式标志位
@@ -57,7 +43,7 @@ public class CreatRepayPlanReq {
         1.15>1.2 1.25>1.2
      7：断言请求的操作具有精确的结果，因此不需要舍入
      */
-    @ApiModelProperty(required= true,value = "进位方式标志位 0：进一位，1：不进位，2：正数进一位，负数不进位，3：正数不进位，负数进一位，4：四舍五入，5：五舍六入，6：银行家舍入法，前一位为奇数则入位，为偶数则舍去\n ")
+    @ApiModelProperty(required= true,value = "进位方式标志位 0：进一位，1：不进位，2：正数进一位，负数不进位，3：正数不进位，负数进一位，4：四舍五入，5：五舍六入，6：银行家舍入法，前一位为奇数则入位，为偶数则舍去\n")
     private Integer rondmode;
 
 
@@ -65,23 +51,20 @@ public class CreatRepayPlanReq {
     private Integer smallNum;
 
 
-
-
-
     /**
      *  上标信息
      */
     @ApiModelProperty(required= true,value = "上标信息")
-    private  List<ProjInfoReq> projInfoReqs;
+    private  List<TrailProjInfoReq> projInfoReqs;
 
 
-    public BusinessBasicInfoReq getBusinessBasicInfoReq() {
-        return businessBasicInfoReq;
-    }
-
-    public void setBusinessBasicInfoReq(BusinessBasicInfoReq businessBasicInfoReq) {
-        this.businessBasicInfoReq = businessBasicInfoReq;
-    }
+//    public BusinessBasicInfoReq getBusinessBasicInfoReq() {
+//        return businessBasicInfoReq;
+//    }
+//
+//    public void setBusinessBasicInfoReq(BusinessBasicInfoReq businessBasicInfoReq) {
+//        this.businessBasicInfoReq = businessBasicInfoReq;
+//    }
 
 
 //    public List<BizOutPutPlanReq> getOutPutPlanList() {
@@ -100,11 +83,11 @@ public class CreatRepayPlanReq {
 //        this.outPutRecordReqList = outPutRecordReqList;
 //    }
 
-    public List<ProjInfoReq> getProjInfoReqs() {
+    public List<TrailProjInfoReq> getProjInfoReqs() {
         return projInfoReqs;
     }
 
-    public void setProjInfoReqs(List<ProjInfoReq> projInfoReqs) {
+    public void setProjInfoReqs(List<TrailProjInfoReq> projInfoReqs) {
         this.projInfoReqs = projInfoReqs;
     }
 
@@ -124,4 +107,11 @@ public class CreatRepayPlanReq {
         this.smallNum = smallNum;
     }
 
+    public TrailBizInfoReq getTrailBizInfoReq() {
+        return trailBizInfoReq;
+    }
+
+    public void setTrailBizInfoReq(TrailBizInfoReq trailBizInfoReq) {
+        this.trailBizInfoReq = trailBizInfoReq;
+    }
 }

@@ -42,13 +42,13 @@ public class BusinessBasicInfoReq {
      * 业务所属子类型，若无则为空
      * 备注：这个业务所属的子类型，对应的信贷的字段是什么 需要与咏康核对一下
      */
-    @ApiModelProperty(required= true,value = "业务所属子类型，若无则为空")
+    @ApiModelProperty(value = "业务所属子类型，若无则为空")
     private String businessCtype;
     /**
      * 业务所属孙类型，若无则为空
      * 备注：这个业务所属的子类型，对应的信贷的字段是什么 需要与咏康核对一下
      */
-    @ApiModelProperty(required= true,value = "业务所属孙类型，若无则为空")
+    @ApiModelProperty(value = "业务所属孙类型，若无则为空")
     private String businessStype;
     /**
      * 客户资产端唯一编号

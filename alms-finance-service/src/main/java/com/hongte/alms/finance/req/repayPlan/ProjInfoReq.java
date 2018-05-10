@@ -221,11 +221,11 @@ public class ProjInfoReq {
      */
     @ApiModelProperty(required= true,value = "上标状态(0:暂存 1:待审 2:审核成功 3:审核失败,4:待上标)")
     private Integer tdStatus;
-//    /**
-//     * 业务类型(9:车贷 11:房贷 35:信用贷 32:共借项目 36 农饲贷 41 二手车商贷  39 车全 47 闪贷 48 扶贫贷)
-//     */
-//    @ApiModelProperty(required= true,value = "业务类型(9:车贷 11:房贷 35:信用贷 32:共借项目 36 农饲贷 41 二手车商贷  39 车全 47 闪贷 48 扶贫贷)")
-//    private Integer projectType;
+    /**
+     * 业务类型(9:车贷 11:房贷 35:信用贷 32:共借项目 36 农饲贷 41 二手车商贷  39 车全 47 闪贷 48 扶贫贷)
+     */
+    @ApiModelProperty(required= true,value = "业务类型(9:车贷 11:房贷 35:信用贷 32:共借项目 36 农饲贷 41 二手车商贷  39 车全 47 闪贷 48 扶贫贷)")
+    private Integer projectType;
     /**
      * 上标结果
      */
@@ -268,7 +268,7 @@ public class ProjInfoReq {
     private Integer repayType;
 
     @ApiModelProperty(value = "每期还本Map  Map<期数，还本金额>")
-    private Map<Integer,BigDecimal> pricipleMap;
+    private List<PrincipleReq> pricipleMap;
 
 
     /**
@@ -813,13 +813,13 @@ public class ProjInfoReq {
         this.tdStatus = tdStatus;
     }
 
-//    public Integer getProjectType() {
-//        return projectType;
-//    }
-//
-//    public void setProjectType(Integer projectType) {
-//        this.projectType = projectType;
-//    }
+    public Integer getProjectType() {
+        return projectType;
+    }
+
+    public void setProjectType(Integer projectType) {
+        this.projectType = projectType;
+    }
 
     public String getResultContent() {
         return resultContent;
@@ -1246,11 +1246,11 @@ public class ProjInfoReq {
         this.projFeeInfos = projFeeInfos;
     }
 
-    public Map<Integer, BigDecimal> getPricipleMap() {
+    public  List<PrincipleReq> getPricipleMap() {
         return pricipleMap;
     }
 
-    public void setPricipleMap(Map<Integer, BigDecimal> pricipleMap) {
+    public void setPricipleMap( List<PrincipleReq> pricipleMap) {
         this.pricipleMap = pricipleMap;
     }
 
