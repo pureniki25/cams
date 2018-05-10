@@ -73,6 +73,13 @@
 		   	<i-lable>设置指定用户可访问业务对照关系：</i-lable>
 		   	<i-button @click="setSingleUserPermissons">执行</i-button>
     	</div>
+    	<div style="margin-top:10px; margin-left:10px">
+		   	<i-lable>五级分类设置：</i-lable>
+		   	<i-button :loading="fiveLevelClassifyLoading" @click="fiveLevelClassify">
+		   		<i-span v-if="!fiveLevelClassifyLoading">执行</i-span>
+		   		<i-span v-else>执行中...</i-span>
+		   	</i-button>
+    	</div>
     </div>
     <script src="/src/js/System/admin.js"></script>
 </body>

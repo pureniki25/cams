@@ -2,11 +2,13 @@ package com.hongte.alms.base.service;
 
 import com.hongte.alms.base.dto.UserPermissionBusinessDto;
 import com.hongte.alms.base.vo.module.BusinessInfoForApplyDerateVo;
+import com.hongte.alms.base.vo.module.ExpenseSettleVO;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.common.service.BaseService;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -68,5 +70,25 @@ public interface BasicBusinessService extends BaseService<BasicBusiness> {
 	 * @return
 	 */
 	 Map<String, Object>  getNeedPay(@Param("original_business_id") String original_business_id);
+	 /**
+	 * 	 月收平台服务费的业务
+	 * @param original_business_id
+	 * @return
+	 */
+	 Double  getMonthPlatformAmount(@Param("crpId") String crpId);
+	 /**
+	 * 	 月收公司服务费的业务
+	 * @param original_business_id
+	 * @return
+	 */
+	 Double  getMonthCompanyAmount(@Param("crpId") String crpId);
+	 /**
+	  * 获取提前结清违约金
+	  * @param original_business_id
+	  * @return
+	  */
 
+	 ExpenseSettleVO getPreLateFees(String crpId, String original_business_id,String repayType,String businessTypeId,Date settleDate,Date ContractDate,Date firstRepayDate) throws Exception;
+    	 
+     
 }

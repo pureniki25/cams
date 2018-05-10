@@ -88,7 +88,7 @@
 
 
     <!--新增/编辑贷后跟踪记录Modal-->
-    <Modal  ref="addLogModal" v-model="addLogModal" :title="modalAction+'贷后跟踪信息'" @on-cancel="hideEditForm">
+    <Modal  ref="addLogModal" v-model="addLogModal" :title="modalAction+'贷后跟踪信息'" @on-cancel="hideEditForm" width="900">
         <row>
             <i-col span="22">
                 <i-form ref="editLogForm" :model="editLogForm" :rules="ruleValidate" label-position="right"
@@ -112,6 +112,20 @@
                     <row style="padding: 10px">
                         <form-item label="跟踪记录："   prop="content">
                             <i-input v-model="editLogForm.content" type="textarea" :rows="4" maxlength="200" placeholder="请填写跟踪记录"></i-input>
+                        </form-item>
+                    </row>
+                    <row style="padding: 10px">
+                        <form-item label="借款人情况："   prop="borrower">
+	                        <checkbox-group v-model="editLogForm.borrowerConditionDescList">
+						        <checkbox v-for="item in borrowerConditionDescList" :value="item" :label="item" style="display:block">{{item}}</checkbox>
+						    </checkbox-group>
+                        </form-item>
+                    </row>
+                    <row style="padding: 10px">
+                        <form-item label="抵押物情况："   prop="guarantee">
+                            <checkbox-group v-model="editLogForm.guaranteeConditionDescList">
+						        <checkbox v-for="item in guaranteeConditionDescList" :value="item" :label="item" style="display:block">{{item}}</checkbox>
+						    </checkbox-group>
                         </form-item>
                     </row>
                 </i-form>

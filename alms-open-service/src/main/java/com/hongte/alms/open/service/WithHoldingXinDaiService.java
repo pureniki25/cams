@@ -18,4 +18,9 @@ public interface WithHoldingXinDaiService {
     @RequestLine("POST /api/ltgproject/dod ")
     @Headers("Content-Type: application/json")
     String searchRepayRecord(String content);
+    
+    
+    @RequestLine("POST /api/ltgproject/dod ")
+    @Headers("Content-Type: application/json")
+    String getContractDate(String content);
 }

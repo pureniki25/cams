@@ -65,6 +65,9 @@ public class AfterLoanStandingBookReq extends PageRequest {
 
     @ApiModelProperty(value="业务状态",name="businessStatus",dataType = "int")
     private Integer businessStatus;   //业务状态（贷后状态）
+    
+    @ApiModelProperty(value="业务类别",name="businessClassName",dataType = "int")
+    private String businessClassName;   //业务状态（贷后状态）
 
 //    @ApiModelProperty(value="还款状态",name="repayStatus",dataType = "int")
 //    private Integer repayStatus;      //还款状态
@@ -209,6 +212,14 @@ public class AfterLoanStandingBookReq extends PageRequest {
 
     public void setBusinessStatus(Integer businessStatus) {
         this.businessStatus = businessStatus;
+    }
+    
+    public String getBusinessClassName() {
+    	return businessClassName;
+    }
+    
+    public void setBusinessClassName(String businessClassName) {
+    	this.businessClassName = businessClassName;
     }
 
     public String getRepayStatus() {

@@ -178,7 +178,7 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
             applyInfo.setProcessId(process.getProcessId());
             applyInfo.setCreateTime(new Date());
             applyInfo.setCreateUser(loginUserInfoHelper.getUserId());
-            applyInfo.setGeneralReturnRate(generalReturnRate);//综合收益率
+            //applyInfo.setGeneralReturnRate(generalReturnRate);//综合收益率
             applyInfo.setOutsideInterest(StringUtil.notEmpty(outsideInterest)?BigDecimal.valueOf(Double.valueOf(outsideInterest)):BigDecimal.valueOf(0.0));//应付逾期利息
             applyInfo.setPreLateFees(StringUtil.notEmpty(preLateFees)?BigDecimal.valueOf(Double.valueOf(preLateFees)):BigDecimal.valueOf(0.0));//提前还款违约金
         }

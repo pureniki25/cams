@@ -11,6 +11,7 @@ window.layinit(function (htConfig) {
 		   syncCollectionLoading:false,
            synOneListColLoading:false,
            setUserPermissonsLoading:false,
+           fiveLevelClassifyLoading:false,
 		   // --- 按钮控制标识 end---
 
 		   onePListCollogBId:"",
@@ -73,6 +74,25 @@ window.layinit(function (htConfig) {
 			   })
 			   .catch(function (error) {
 				   vm.setUserPermissonsLoading = false;
+				   vm.$Modal.error({content: '接口调用异常!'});
+			   });
+		   },
+		   // 五级分类设置
+		   fiveLevelClassify:function(){
+			   this.fiveLevelClassifyLoading = true;
+			   axios.get(basePath +"businessParameter/fiveLevelClassifySchedule",{timeout: 0})
+			   .then(function (res) {
+				   vm.fiveLevelClassifyLoading = false;
+				   if (res.data.code == 1) {
+					   vm.$Modal.success({
+						   content: res.data.msg
+					   });
+				   } else {
+					   vm.$Modal.error({content: res.data.msg });
+				   }
+			   })
+			   .catch(function (error) {
+				   vm.fiveLevelClassifyLoading = false;
 				   vm.$Modal.error({content: '接口调用异常!'});
 			   });
 		   },

@@ -153,7 +153,9 @@ window.layinit(function (htConfig) {
                 settleNeedPayService:"",//结清时该业应付月收服务费; 
                 noSettleNeedPayInterest:"",//不结清时该业应付利息;  
                 noSettleNeedPayService:"",//不结清时该业应付月收服务费; 
-                noSettleNeedPayPrincipal:""//不结清时应付本金;
+                noSettleNeedPayPrincipal:"",//不结清时应付本金;
+                lackFee:0,//往期少交费用,
+                overReturnRate:""//逾期收益率
             },
 
             
@@ -190,7 +192,8 @@ window.layinit(function (htConfig) {
                 title:'',                    //减免标题
                 isSettle:'',                //是否结清标志位
                 isSettleFlage:'',           //是否结清界面显示标志位
-                feeId:'test'
+                feeId:'test',
+                isSettleFlag:true
             },
             //后台返回的初始的减免信息
             initalApplyInfo:{},
@@ -370,6 +373,8 @@ window.layinit(function (htConfig) {
                		}
             	  vm.baseInfoForm.outsideInterest=0;
             	  vm.baseInfoForm.preLateFees=0;
+            	  
+            	  vm.baseInfoForm.lackFee=0;
             	  vm.applyInfoForm.realReceiveMoney=vm.baseInfoForm.totalFactAmount;
             	  if(vm.applyInfoForm.realReceiveMoney==0){
             		  vm.applyInfoForm.realReceiveMoney=''
@@ -605,16 +610,17 @@ var showData=function(){debugger
 	//车贷
     if(businessTypeId == 1 || businessTypeId == 9){debugger
                     
-                //判断是否上标且是否等额本息
+                //判断是否非上标且是否等额本息
             	var reqUrl = basePath + 'transferOfLitigation/queryCarLoanBilDetail?businessId=' + businessId
                 
-                axios.get(reqUrl).then(function(res){
+                axios.get(reqUrl).then(function(res){debugger
                 	vm.isCarFlag=true
                   if(res.data.code=='1'){
-                	  getPreviousLateFees();//获取整个业务的滞纳金
+                	  getBalanceDue();//获取往期少交费用
+                	  //getPreviousLateFees();//获取整个业务的滞纳金
                 		vm.baseInfoForm.totalBorrowAmount="";
                     if (res.data.data.outputPlatformId == 0 && res.data.data.repaymentTypeId == '等额本息') {
-                      vm.preLateFeesFlag = res.data.data.preLateFeesFlag;
+                      vm.preLateFeesFlag =true
                     }else{
                     	//如果不是等额本息，就直接调用方法获取违约金
                     	getPreLateFees();
@@ -628,17 +634,14 @@ var showData=function(){debugger
                 })
       //房贷
     }else if(businessTypeId == 2 || businessTypeId == 11){
-    	//获取提前结清违约金
-        axios.get(basePath + 'expenseSettle/calByPreSettleDate', {
-            params: {
-                businessId: businessId,
-                preSettleDate: dateToString(new Date())
-            }
-        }
+    	
+    	
+    	//获取提前结清违约金和往期少交费用
+        axios.get(basePath + "ApplyDerateController/getHousePreLateFees?crpId="+crpId+"&repaymentTypeId="+vm.baseInfoForm.repaymentTypeId+"&afterId="+afterId+"&businessId=" + businessId
         ).then(function(res){
             if(res.data.code=='1'){
-                vm.baseInfoForm.preLateFees = res.data.data.penalty
-                
+                vm.baseInfoForm.preLateFees = res.data.data.preLateFees
+                vm.baseInfoForm.lackFee = res.data.data.lackFee
                 
             	//房贷业务：逾期天数×剩余本金×0.2%
                 if(res.data.data.isInContractDate=="true"){debugger
@@ -650,7 +653,7 @@ var showData=function(){debugger
      
             
                 //滞纳金:
-                vm.baseInfoForm.needPayPenalty =res.data.data.list[0].lateFee
+//                vm.baseInfoForm.needPayPenalty =res.data.data.list[0].lateFee
                
             	//获取应付总额
             	getTotalShouldPay();
@@ -678,14 +681,14 @@ var restProcessApprovalInfo = function(){
 
 /////////////  流程审批相关函数 结束  ///////////////
 
-///////////应付总额：应付本金+应付利息+应付月收服务费+应付滞纳金+应付其他费用+应付提前结清违约金+应付逾期利息
-var getTotalShouldPay = function () {
+///////////应付总额：应付本金+应付利息+应付月收服务费+应付其他费用+应付提前结清违约金+应付逾期利息
+var getTotalShouldPay = function () {debugger
 	vm.baseInfoForm.totalBorrowAmount=0;
 	
-	vm.baseInfoForm.totalBorrowAmount=vm.baseInfoForm.needPayPrincipal+vm.baseInfoForm.needPayInterest+vm.baseInfoForm.needPayService+vm.baseInfoForm.needPayPenalty
-                      +Number(getOtherFee())+vm.baseInfoForm.preLateFees+vm.baseInfoForm.outsideInterest
+	vm.baseInfoForm.totalBorrowAmount=vm.baseInfoForm.needPayPrincipal+vm.baseInfoForm.needPayInterest+vm.baseInfoForm.needPayService
+                      +Number(getOtherFee())+vm.baseInfoForm.preLateFees+vm.baseInfoForm.outsideInterest+vm.baseInfoForm.lackFee
                       
-                      getGeneralReturnRate();       
+                        
 	                   getSumMoney();
 }
 
@@ -697,26 +700,49 @@ var getTotalShouldPay = function () {
 //综合收益率
 //：（前置费用+出款后已交月收等费用总额+应付利息+应付月收服务费+应付滞纳金+应付其他费用+应付提前结清违约金+应付逾期利息）-减免金额合计/借款金额/借款期限
 //（借款期限是客户实际的借款期限，不足一个月按月计算）若客户提前结清或正常结清则直接去结清期的 期限即可，若客户逾期结清 则需计算 真实的借款期限，合同期限+（逾期天数/30 进一
-var getGeneralReturnRate= function () {debugger
-	var borrowLimit=vm.baseInfoForm.borrowLimit;
-	vm.baseInfoForm.generalReturnRate=0;
-    //逾期天数如果大于0,说明逾期，否则直接取借款期限
-     if(vm.baseInfoForm.delayDays>0){
-    	 borrowLimit=borrowLimit+Math.ceil(vm.baseInfoForm.delayDays/30);
-     }
-     
-     var num=((vm.baseInfoForm.preFees+vm.baseInfoForm.sumFactAmount+vm.baseInfoForm.needPayInterest
-                     +vm.baseInfoForm.needPayService+vm.baseInfoForm.needPayPenalty+Number(getOtherFee())+vm.baseInfoForm.preLateFees
-                     +vm.baseInfoForm.outsideInterest)-Number(dereteMoneySum()))/vm.baseInfoForm.borrowMoney/borrowLimit;
-                num=num*100;
-                num=num.toFixed(2);
-                vm.baseInfoForm.generalReturnRate=num+"%";
-     
+//var getGeneralReturnRate= function () {debugger
+//	var borrowLimit=vm.baseInfoForm.borrowLimit;
+//	vm.baseInfoForm.generalReturnRate=0;
+//    //逾期天数如果大于0,说明逾期，否则直接取借款期限
+//     if(vm.baseInfoForm.delayDays>0){
+//    	 borrowLimit=borrowLimit+Math.ceil(vm.baseInfoForm.delayDays/30);
+//     }
+//     
+//     var num=((vm.baseInfoForm.preFees+vm.baseInfoForm.sumFactAmount+vm.baseInfoForm.needPayInterest
+//                     +vm.baseInfoForm.needPayService+vm.baseInfoForm.needPayPenalty+Number(getOtherFee())+vm.baseInfoForm.preLateFees
+//                     +vm.baseInfoForm.outsideInterest)-Number(dereteMoneySum()))/vm.baseInfoForm.borrowMoney/borrowLimit;
+//                num=num*100;
+//                num=num.toFixed(2);
+//                vm.baseInfoForm.generalReturnRate=num+"%";
+//     
+//
+//}
+
+
+///////////计算逾期收益率
+var getOverReturnRate = function () {debugger
+	var rate=0;
+    var derateMoney=0;
+	var types=vm.applyTypes;
+			
+	if(types != null && types.length > 0){
+		for (var i = 0; i < types.length; i++){
+			//逾期利息feeId
+			if(types[i].feeId=='e404a126-45ab-11e7-8ed5-000c2928bb0d'){
+		      derateMoney=Number(types[i].derateMoney);
+			}
+		}
+	}
+	
+	if(vm.baseInfoForm.outsideInterest==0){
+		rate=0+"%";
+	}else{
+		rate=vm.baseInfoForm.outsideInterest-derateMoney/vm.baseInfoForm.borrowMoney*vm.baseInfoForm.delayDays;
+		rate=rate+"%";
+	}
+	vm.baseInfoForm.overReturnRate=rate;
 
 }
-
-
-
 
 
 ///////////车贷:获取提前结清违约金
@@ -738,22 +764,17 @@ var getPreLateFees = function () {debugger
             vm.$Modal.error({content: '接口调用异常!'});
         });
 }
-///////////车贷：获取整个业务的滞纳金
-var getPreviousLateFees = function () {
 
-    var reqStr = basePath +"ApplyDerateController/getPreLateFees?crpId="+crpId+"&preLateFeesType="+vm.baseInfoForm.preLateFeesType+"&afterId="+afterId+"&businessId=" + businessId
-  
+///////////车贷:获取往期少交费用
+var getBalanceDue = function () {debugger
+
+    var reqStr = basePath +"ApplyDerateController/getPreLateFees?crpId="+crpId+"&preLateFeesType="+vm.baseInfoForm.preLateFeesType+"&afterId="+afterId+"&businessId=" + businessId;
+   
     axios.get(reqStr)
         .then(function (res) {debugger
             if (res.data.code == "1") {
                
-                    var fees=res.data.data.previousFees;
-                 	for (var i = 0; i < fees.length; i++){
-                 		if(fees[i].previousLateFees!=0&&fees[i].previousLateFees!=''){
-                 			vm.baseInfoForm.needPayPenalty=fees[i].previousLateFees;
-                 		}
-                	
-                	}
+                    vm.baseInfoForm.lackFee = res.data.data.balanceDue;
                     getTotalShouldPay();
             } else {
                 vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
@@ -763,6 +784,31 @@ var getPreviousLateFees = function () {
             vm.$Modal.error({content: '接口调用异常!'});
         });
 }
+///////////车贷：获取整个业务的滞纳金
+//var getPreviousLateFees = function () {
+//
+//    var reqStr = basePath +"ApplyDerateController/getPreLateFees?crpId="+crpId+"&preLateFeesType="+vm.baseInfoForm.preLateFeesType+"&afterId="+afterId+"&businessId=" + businessId
+//  
+//    axios.get(reqStr)
+//        .then(function (res) {debugger
+//            if (res.data.code == "1") {
+//               
+//                    var fees=res.data.data.previousFees;
+//                 	for (var i = 0; i < fees.length; i++){
+//                 		if(fees[i].previousLateFees!=0&&fees[i].previousLateFees!=''){
+//                 			vm.baseInfoForm.needPayPenalty=fees[i].previousLateFees;
+//                 		}
+//                	
+//                	}
+//                    getTotalShouldPay();
+//            } else {
+//                vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
+//            }
+//        })
+//        .catch(function (error) {
+//            vm.$Modal.error({content: '接口调用异常!'});
+//        });
+//}
 
 
 
@@ -1031,6 +1077,9 @@ var getShowInfo = function () {
                 //----------------判断其他费用项是否可以编辑-----开始--------
             	vm.otherFeeEditFlage=res.data.data.otherFeeEditFlage;
             	vm.otherFees=res.data.data.otherFees;
+            	if(typeof(vm.otherFees) != "undefined"&&vm.otherFees==0){
+            		vm.tempList=null;
+            	}
             	
             //----------------判断其他费用项是否可以编辑-----结束--------
 
@@ -1047,7 +1096,7 @@ var getShowInfo = function () {
  * 计算应收总减免后的金额
  * 
  */
-var getSumMoney= function (event,index) {
+var getSumMoney= function (event,index) {debugger
 		   var types=vm.applyTypes;
 		   vm.applyInfoForm.shouldReceiveMoney=0;
        	if(types != null && types.length > 0){
@@ -1061,8 +1110,7 @@ var getSumMoney= function (event,index) {
        			
     	vm.applyInfoForm.shouldReceiveMoney=Number(money);
        	
-       	//获取综合效益率
-       	getGeneralReturnRate();
+    	getOverReturnRate();
 
 };
 /**
@@ -1231,7 +1279,7 @@ var saveapplyInfo = function(pStatus){debugger
                     vm.applyInfoForm.crpId = crpId;
                 }
                 // 0 不结清， 1结清
-                vm.applyInfoForm.isSettle = vm.applyInfoForm.isSettleFlage=="是"?1:0;
+                vm.applyInfoForm.isSettle = vm.applyInfoForm.isSettleFlage=="否"?0:1;
                 //赋值 processId
                 if(vm.approvalInfoForm.process!=null){
                     vm.applyInfoForm.processId = vm.approvalInfoForm.process.processId;
