@@ -86,6 +86,15 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
     @Qualifier("IssueSendOutsideLogService")
     IssueSendOutsideLogService issueSendOutsideLogService;
 
+
+    @Autowired
+    @Qualifier("TuandaiProjectCarService")
+    TuandaiProjectCarService tuandaiProjectCarService;
+
+    @Autowired
+    @Qualifier("TuandaiProjectHouseService")
+    TuandaiProjectHouseService tuandaiProjectHouseService;
+
     //进位方式枚举
     private  RoundingMode roundingMode=RoundingMode.HALF_UP;
     //保留的小数位数
@@ -377,9 +386,36 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         for(ProjInfoReq projInfoReq:projInfoReqs){
             TuandaiProjectInfo  projInfo = ClassCopyUtil.copy(projInfoReq,ProjInfoReq.class,TuandaiProjectInfo.class);
             projInfo.setBusinessId(basicBusiness.getBusinessId());
-//            for(RepaymentBizPlanDto bizPlanDto: dtos){
-//                BizPlanListDto  bizPlanListDto = bizPlanDto.getBizPlanListDtos();
-//            }
+            //设置标的batchId
+            boolean setBatchFlage = false;
+            for(RepaymentBizPlanDto bizPlanDto: dtos){
+                List<RepaymentBizPlanListDto>  bizPlanListDtos = bizPlanDto.getBizPlanListDtos();
+                for(RepaymentBizPlanListDto bizPlanListDto : bizPlanListDtos){
+                    List<RepaymentProjPlanDto> projPlanDtos = bizPlanDto.getProjPlanDtos();
+                    for(RepaymentProjPlanDto projPlanDto:projPlanDtos){
+                        RepaymentProjPlan projPlan = projPlanDto.getRepaymentProjPlan();
+                        if(projPlan.getProjectId().equals(projInfo.getProjectId())){
+                            setBatchFlage = true;
+                            projInfo.setBusinessAfterGuid(projPlan.getRepaymentBatchId());
+                            break;
+                        }
+                    }
+                    if(setBatchFlage) break;
+                }
+            }
+            //年利率  逾期年利率  设置
+
+
+            //    /**
+//     * 年化利率
+//     */
+//    @ApiModelProperty(required= true,value = "年化利率")
+//    private BigDecimal interestRate;
+//    /**
+//     * 逾期年利率
+//     */
+//    @ApiModelProperty(required= true,value = "逾期年利率")
+//    private BigDecimal overRate;
 //            for(RepaymentProjPlanDto projPlanDto:projPlanDtos){
 //
 //            }
@@ -399,15 +435,38 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
             tuandaiProjectInfoService.insertOrUpdate(projInfo);
 
-
+            //如果有车辆信息，存储车辆信息
             if(projInfoReq.getIsHaveCar().equals(BooleanEnum.YES.getValue())){
                 List<ProjectCarInfoReq> projectCarInfoReqs = projInfoReq.getProjCarInfos();
-
-                if(projInfoReq.getProjCarInfos()==null){
-                    throw  new CreatRepaymentExcepiton("有车辆信息的标必须把车辆信息列表传入");
+                String projectId = projInfo.getProjectId();
+                List<TuandaiProjectCar> tuandaiProjectCars = new LinkedList<>();
+                for (ProjectCarInfoReq  pCarInfoReq:projectCarInfoReqs){
+                    TuandaiProjectCar tuandaiProjectCar = ClassCopyUtil.copy(pCarInfoReq,ProjectCarInfoReq.class,TuandaiProjectCar.class);
+                    tuandaiProjectCar.setProjectId(projInfo.getProjectId());
+                    tuandaiProjectCar.setCreateTime(new Date());
+                    tuandaiProjectCar.setCreateUser(Constant.SYS_DEFAULT_USER);
+                    tuandaiProjectCars.add(tuandaiProjectCar);
                 }
+                tuandaiProjectCarService.delete(new EntityWrapper<TuandaiProjectCar>().eq("project_id",projectId));
+                tuandaiProjectCarService.insertBatch(tuandaiProjectCars);
+
             }
+            //如果有房屋信息，存储房屋信息
             if(projInfoReq.getIsHaveHouse().equals(BooleanEnum.YES.getValue())){
+
+                List<ProjectHouseInfoReq> projectHouseInfoReqs = projInfoReq.getProjHouseInfos();
+                String projectId = projInfo.getProjectId();
+                List<TuandaiProjectHouse> tuandaiProjectHouses = new LinkedList<>();
+                for (ProjectHouseInfoReq  pHouseInfoReq:projectHouseInfoReqs){
+                    TuandaiProjectHouse tuandaiProjectHosue = ClassCopyUtil.copy(pHouseInfoReq,ProjectHouseInfoReq.class,TuandaiProjectHouse.class);
+                    tuandaiProjectHosue.setProjectId(projInfo.getProjectId());
+                    tuandaiProjectHosue.setCreateTime(new Date());
+                    tuandaiProjectHosue.setCreateUser(Constant.SYS_DEFAULT_USER);
+                    tuandaiProjectHouses.add(tuandaiProjectHosue);
+                }
+                tuandaiProjectHouseService.delete(new EntityWrapper<TuandaiProjectHouse>().eq("",projectId));
+                tuandaiProjectHouseService.insertBatch(tuandaiProjectHouses);
+
                 if(projInfoReq.getProjHouseInfos()==null){
                     throw  new CreatRepaymentExcepiton("有房产信息的标必须把房产信息列表传入");
                 }
@@ -727,7 +786,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 //                if(projFeeReqs !=null && projFeeReqs.size()>0){
 //                    for(ProjFeeReq feeReq: projFeeReqs){
 //                        //如果费用是一次性收取
-//                        if(feeReq.getIsOneTimeCharge().equals(RepayPlanIsOneTimeChargeEnum.ONE_TIME.getKey())){
+//                        if(feeReq.getChargeType().equals(RepayPlanIsOneTimeChargeEnum.ONE_TIME.getKey())){
 //                            String feeItemId = getFeeItemId(feeReq.getFeeItemId(),feeReq.getFeeType());
 //                            RepaymentProjPlanListDetail   zeroListDetail = creatProjListDetail(zeroList);
 //                            zeroListDetail.setProjPlanAmount(feeReq.getFeeValue());//项目计划应还总金额(元)
@@ -767,7 +826,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 //计算每月应还本金利息
                 Map<Integer,Map<String,BigDecimal>> repayPrinAndIni = calculateRepayPrinAndIni(
                         projInfoReq.getPeriodMonth(),projInfoReq.getFullBorrowMoney(),
-                        projInfoReq.getRate(),rateUnitEnum,repayType,projInfoReq.getPricipleMap() );
+                        projInfoReq.getRate(),rateUnitEnum,repayType,projInfoReq.getPrincipleReqList() );
 
                 for(int i=1;i<projInfoReq.getPeriodMonth()+1;i++){
                     //还款计划详情项列表
@@ -813,7 +872,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     //列表费用
                     if(projFeeReqs !=null && projFeeReqs.size()>0) {
                         for (ProjFeeReq feeReq : projFeeReqs) {
-                            if(feeReq.getIsOneTimeCharge().equals(RepayPlanIsOneTimeChargeEnum.BY_MONTH.getKey())){
+                            if(feeReq.getChargeType().equals(RepayPlanIsOneTimeChargeEnum.BY_MONTH.getKey())){
                                 //最后一期，期初收取的费用不收
                                 if(i==projInfoReq.getPeriodMonth()){
                                     feeReq.getRepaymentFlag().equals(PepayPlanRepayFlageEnum.BEGIN.getValue());
@@ -829,7 +888,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                                 if(feeReq.getIsTermRange().equals(BooleanEnum.YES.getValue())){
                                     //是分段收费  需要从分段收费信息列表中
 
-                                    List<ProjFeeDetailReq>  feeDetailReqMap = feeReq.getFeeDetailReqMap();
+                                    List<ProjFeeDetailReq>  feeDetailReqMap = feeReq.getFeeDetailReqList();
                                     if(feeDetailReqMap==null||feeDetailReqMap.size()==0){
                                         throw new CreatRepaymentExcepiton("分段收费的费用必须包含费用详情信息");
                                     }

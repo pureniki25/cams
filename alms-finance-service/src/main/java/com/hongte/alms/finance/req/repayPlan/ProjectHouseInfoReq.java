@@ -16,11 +16,11 @@ import java.util.Date;
 public class ProjectHouseInfoReq {
 
 
-    /**
-     * 项目编号
-     */
-    @ApiModelProperty(value = "项目编号")
-    private String projectId;
+//    /**
+//     * 项目编号
+//     */
+//    @ApiModelProperty(value = "项目编号")
+//    private String projectId;
     /**
      * 购买日期
      */
@@ -68,38 +68,38 @@ public class ProjectHouseInfoReq {
 
     @ApiModelProperty(value = "贷款期限")
     private Integer houseLoanYears;
-    /**
-     * 创建日期
-     */
+//    /**
+//     * 创建日期
+//     */
+//
+//    @ApiModelProperty(value = "创建日期")
+//    private Date createTime;
+//    /**
+//     * 创建人
+//     */
+//
+//    @ApiModelProperty(value = "创建人")
+//    private String createUser;
+//    /**
+//     * 更新日期
+//     */
+//
+//    @ApiModelProperty(value = "更新日期")
+//    private Date updateTime;
+//    /**
+//     * 更新人
+//     */
+//    @ApiModelProperty(value = "更新人")
+//    private String updateUser;
 
-    @ApiModelProperty(value = "创建日期")
-    private Date createTime;
-    /**
-     * 创建人
-     */
 
-    @ApiModelProperty(value = "创建人")
-    private String createUser;
-    /**
-     * 更新日期
-     */
-
-    @ApiModelProperty(value = "更新日期")
-    private Date updateTime;
-    /**
-     * 更新人
-     */
-    @ApiModelProperty(value = "更新人")
-    private String updateUser;
-
-
-    public String getProjectId() {
-        return projectId;
-    }
-
-    public void setProjectId(String projectId) {
-        this.projectId = projectId;
-    }
+//    public String getProjectId() {
+//        return projectId;
+//    }
+//
+//    public void setProjectId(String projectId) {
+//        this.projectId = projectId;
+//    }
 
     public Date getHouseBuyDate() {
         return houseBuyDate;
@@ -165,35 +165,35 @@ public class ProjectHouseInfoReq {
         this.houseLoanYears = houseLoanYears;
     }
 
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public String getCreateUser() {
-        return createUser;
-    }
-
-    public void setCreateUser(String createUser) {
-        this.createUser = createUser;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public String getUpdateUser() {
-        return updateUser;
-    }
-
-    public void setUpdateUser(String updateUser) {
-        this.updateUser = updateUser;
-    }
+//    public Date getCreateTime() {
+//        return createTime;
+//    }
+//
+//    public void setCreateTime(Date createTime) {
+//        this.createTime = createTime;
+//    }
+//
+//    public String getCreateUser() {
+//        return createUser;
+//    }
+//
+//    public void setCreateUser(String createUser) {
+//        this.createUser = createUser;
+//    }
+//
+//    public Date getUpdateTime() {
+//        return updateTime;
+//    }
+//
+//    public void setUpdateTime(Date updateTime) {
+//        this.updateTime = updateTime;
+//    }
+//
+//    public String getUpdateUser() {
+//        return updateUser;
+//    }
+//
+//    public void setUpdateUser(String updateUser) {
+//        this.updateUser = updateUser;
+//    }
 }
