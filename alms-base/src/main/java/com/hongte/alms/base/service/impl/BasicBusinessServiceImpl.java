@@ -547,5 +547,16 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 		Integer months = DateUtil.getDiffMonths(firstRepayDate, settleDate);
 		return months;
 	}
+	
+	 /**
+		 * 	 获取展期的借款期数
+		 * @param crpId
+		 * @return
+		 */
+	@Override
+	 public Integer   getBorrowLlimitZQ(@Param("crpId") String crpId) {
+		return basicBusinessMapper.getBorrowLlimitZQ(crpId);
+		 
+	 }
 
 }

@@ -209,7 +209,7 @@ public class ApplyDerateController {
 			// 基本信息
 			List<BusinessInfoForApplyDerateVo> businessVoList = basicBusinessService
 					.selectBusinessInfoForApplyDerateVo(crpId, isDefer, businessId);
-    
+             
 			// 还款方式类型列表
 			List<SysParameter> repayTypeList = sysParameterService.selectList(new EntityWrapper<SysParameter>()
 					.eq("param_type", SysParameterTypeEnums.REPAYMENT_TYPE.getKey()).orderBy("row_Index"));
@@ -258,6 +258,13 @@ public class ApplyDerateController {
 				if (overDaysMap != null) {
 					businessVoList.get(0).setNoSettleDelayDays(businessVoList.get(0).getDelayDays());
 					businessVoList.get(0).setDelayDays(Integer.valueOf(overDaysMap.get("overdueDays").toString()));
+				}
+				
+				
+				//如果是展期，获取展期的借款期数
+				if(isDefer==1) {
+					Integer borrowLimit=basicBusinessService.getBorrowLlimitZQ(crpId);
+					businessVoList.get(0).setBorrowLimit(borrowLimit);
 				}
 
 				// 判断是车贷还是房贷的减免费用项

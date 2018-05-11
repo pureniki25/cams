@@ -89,6 +89,10 @@ public interface BasicBusinessService extends BaseService<BasicBusiness> {
 	  */
 
 	 ExpenseSettleVO getPreLateFees(String crpId, String original_business_id,String repayType,String businessTypeId,Date settleDate,Date ContractDate,Date firstRepayDate) throws Exception;
-    	 
-     
+	 /**
+	 * 	 获取展期的借款期数
+	 * @param crpId
+	 * @return
+	 */
+	 Integer   getBorrowLlimitZQ(@Param("crpId") String crpId);
 }

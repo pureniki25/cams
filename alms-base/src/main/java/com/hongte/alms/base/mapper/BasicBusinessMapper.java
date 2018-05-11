@@ -86,6 +86,15 @@ public interface BasicBusinessMapper extends SuperMapper<BasicBusiness> {
 	 Double  getMonthCompanyAmount(@Param("crpId") String crpId);
 	
 	 List<String> queryFiveLevelClassify();
+	 /**
+	 * 	 获取展期的借款期数
+	 * @param crpId
+	 * @return
+	 */
+	 Integer   getBorrowLlimitZQ(@Param("crpId") String crpId);
+	 
+	
+	 
 }
 
 
