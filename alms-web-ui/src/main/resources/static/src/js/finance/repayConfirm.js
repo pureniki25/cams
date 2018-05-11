@@ -7,6 +7,8 @@ window.layinit(function (htConfig) {
     var businessId = getQueryStr('businessId')
     var afterId = getQueryStr('afterId')
     var planListId = getQueryStr('planListId')
+    var layer = layui.layer;
+    let curIndex ;
     app = new Vue({
         el: "#app",
         data: {
@@ -15,22 +17,23 @@ window.layinit(function (htConfig) {
             },
             repayRegList: {
                 url: '/finance/repayRegList?businessId=' + businessId + "&afterId=" + afterId,
-                style:{}
+                style: {}
             },
             matchedBankStatement: {
                 show: false,
                 url: '/finance/matchedBankStatement?businessId=' + businessId + "&afterId=" + afterId,
-                style:{}
+                style: {}
             },
             manualAddBankSatements: {
                 show: false,
                 url: '/finance/manualAddBankSatements?businessId=' + businessId + "&afterId=" + afterId,
-                
+
             },
-            manualMatchBankSatements:{
-                show:false,
-                url:'/finance/manualMatchBankSatements?businessId=' + businessId + "&afterId=" + afterId,
+            manualMatchBankSatements: {
+                show: false,
+                url: '/finance/manualMatchBankSatements?businessId=' + businessId + "&afterId=" + afterId,
             },
+
             style: {
                 repayRegList: {},
                 matchedBankStatement: {}
@@ -40,6 +43,8 @@ window.layinit(function (htConfig) {
             closeModal: function (target) {
                 if (app[target]) {
                     app[target] = false;
+                }else{
+                    layer.close(curIndex)
                 }
             },
             openModal: function (target) {
@@ -51,9 +56,34 @@ window.layinit(function (htConfig) {
                 if (app[target].style) {
                     app[target].style = style
                 }
+            },
+            openMatchBankStatementModal(p) {
+                let url = '/finance/manualMatchBankSatements?businessId=' + businessId + "&afterId=" + afterId;
+                layer.open({
+                    type: 2,
+                    title: '手动匹配流水',
+                    content: [url, 'no'],
+                    area: ['1600px', '800px'],
+                    success: function (layero, index) {
+                        console.log(layero, index);
+                        curIndex = index ;
+                    }
+                })
+            },
+            openAddBankStatementModal() {
+                let url = '/finance/manualAddBankSatements?businessId=' + businessId + "&afterId=" + afterId;
+                layer.open({
+                    type: 2,
+                    title: '手动新增流水',
+                    content: [url, 'no'],
+                    area: ['1600px', '800px'],
+                    success: function (layero, index) {
+                        console.log(layero, index);
+                        curIndex = index ;
+                    }
+                })
             }
         },
-        created: function () {
-        }
+        created: function () {}
     })
 })

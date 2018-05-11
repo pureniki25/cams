@@ -174,6 +174,7 @@ window.layinit(function (htConfig) {
                 axios.post(fpath + 'finance/matchBankStatement', params).then(function (res) {
                     if(res.data.code=='1'){
                         window.parent.location.reload()
+                        //parent.app.closeModal()
                     }else{
                         app.$Message.error({content:res.data.msg})
                     }

@@ -48,4 +48,9 @@ public class FinanceController {
 	public String matchedBankStatement() {
 		return "/finance/matchedBankStatement";
 	}
+	
+	@RequestMapping("/thisPeriodRepayment")
+	public String thisPeriodRepayment() {
+		return "/finance/thisPeriodRepayment" ;
+	}
 }

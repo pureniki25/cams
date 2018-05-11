@@ -36,6 +36,7 @@ import com.hongte.alms.base.entity.MoneyPool;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.enums.AreaLevel;
+import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.enums.RepayRegisterState;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.BasicBusinessTypeService;
@@ -178,7 +179,32 @@ public class FinanceController {
 		result = financeService.matchBankStatement(moneyPoolIds, businessId, afterId,mprid);
 		logger.info("@matchBankStatement@还款计划匹配银行流水--结束[{}]", req.toJSONString());
 		return result;
-		// TODO
+	}
+	
+	@PostMapping(value="/rejectRepayReg")
+	@ApiOperation(value="拒绝客户还款登记")
+	public Result rejectRepayReg(@RequestBody JSONObject req) {
+		Result result ;
+		logger.info("@rejectRepayReg@拒绝客户还款登记--开始[{}]", req.toJSONString());
+		String mprid = req.getString("mprid");
+		MoneyPoolRepayment mpr = moneyPoolRepaymentService.selectById(mprid);
+		if (mpr.getState().equals(RepayRegisterFinanceStatus.财务确认已还款.toString())) {
+			result = Result.error("500", RepayRegisterFinanceStatus.财务确认已还款.toString()+"的登记不可拒绝");
+			logger.info("@rejectRepayReg@拒绝客户还款登记--结束[{}]", result);
+			return result ;
+		}
+		mpr.setIsFinanceMatch(0);
+		mpr.setState(RepayRegisterFinanceStatus.还款登记被财务拒绝.toString());
+		boolean res = mpr.updateById();
+		if (res) {
+			result = Result.success();
+			logger.info("@rejectRepayReg@拒绝客户还款登记--结束[{}]", result);
+			return result ;
+		}else {
+			result = Result.error("500", "更新数据失败");
+			logger.info("@rejectRepayReg@拒绝客户还款登记--结束[{}]", result);
+			return result;
+		}
 	}
 
 	@GetMapping(value = "/getCompanys")
@@ -283,4 +309,34 @@ public class FinanceController {
 		}
 
 	}
+	
+	@PostMapping(value="/disMatchBankStatement")
+	@ApiOperation(value="取消关联银行流水")
+	public Result disMatchedBankStatement(@RequestBody JSONObject req) {
+		Result result ;
+		logger.info("@disMatchBankStatement@取消关联银行流水--开始[{}]",req);
+		String mpid = req.getString("mpid");
+		List<MoneyPoolRepayment> mprs= moneyPoolRepaymentService.selectList(new EntityWrapper<MoneyPoolRepayment>().eq("money_pool_id", mpid).eq("is_finance_match", 1));
+		if (mprs==null||mprs.size()==0) {
+			result = Result.error("500", "找不到对应的还款登记") ;
+			logger.info("@disMatchBankStatement@取消关联银行流水--结束[{}]",result);
+			return result ;
+		}
+		MoneyPoolRepayment moneyPoolRepayment = mprs.get(0);
+		MoneyPool moneyPool = moneyPoolService.selectById(mpid);
+		if(moneyPool==null) {
+			result = Result.error("500", "找不到对应的银行流水") ;
+			logger.info("@disMatchBankStatement@取消关联银行流水--结束[{}]",result);
+			return result;
+		}
+		if (moneyPool.getStatus().equals(RepayRegisterState.完成.toString())) {
+			result = Result.error("500", "已完成的银行流水不能取消关联");
+			logger.info("@disMatchBankStatement@取消关联银行流水--结束[{}]",result);
+			return result ;
+		}
+		result = financeService.disMatchedBankStatement(moneyPool, moneyPoolRepayment);
+		logger.info("@disMatchBankStatement@取消关联银行流水--结束[{}]",result);
+		return result ;
+	}
+	
 }
