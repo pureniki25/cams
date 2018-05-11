@@ -89,6 +89,7 @@ public class FinanceServiceImpl implements FinanceService {
 		moneyPoolRepayment.setClaimDate(now);
 		moneyPoolRepayment.setOperateName(loginUserInfoHelper.getLoginInfo().getUserName());
 		moneyPoolRepayment.setIncomeType(moneyPool.getIncomeType());
+		moneyPoolRepayment.setMoneyPoolId(moneyPool.getMoneyPoolId());
 		boolean mrpSaveResult = moneyPoolRepayment.insert();
 		if (!mrpSaveResult) {
 			throw new ServiceRuntimeException("保存银行流水mpr失败");
@@ -183,4 +184,33 @@ public class FinanceServiceImpl implements FinanceService {
 		moneyPoolRepayment.setTradeType(moneyPool.getTradeType());
 		return moneyPoolRepayment;
 	}
+
+	@Override
+	@Transactional(rollbackFor=Exception.class)
+	public Result disMatchedBankStatement(MoneyPool moneyPool, MoneyPoolRepayment moneyPoolRepayment) {
+		try {
+			Date now = new Date();
+			moneyPoolRepayment.setIsFinanceMatch(0);
+			moneyPoolRepayment.setState(RepayRegisterFinanceStatus.未关联银行流水.toString());
+			moneyPoolRepayment.setClaimDate(null);
+			moneyPoolRepayment.setMoneyPoolId(null);
+			moneyPoolRepayment.setUpdateTime(now);
+			moneyPoolRepayment.setUpdateUser(loginUserInfoHelper.getUserId());
+			boolean mprUpdateRes = moneyPoolRepayment.updateById();
+			if (!mprUpdateRes) {
+				return Result.error("500", "更新还款登记数据失败");
+			}
+			moneyPool.setFinanceStatus(RepayRegisterFinanceStatus.未关联银行流水.toString());
+			moneyPool.setStatus(RepayRegisterState.待领取.toString());
+			boolean mpUpdateRes = moneyPool.updateById();
+			if(!mpUpdateRes) {
+				return Result.error("500", "更新银行流水数据失败");
+			}
+			return Result.success();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Result.error("500", "处理发生异常");
+		}
+	}
+
 }

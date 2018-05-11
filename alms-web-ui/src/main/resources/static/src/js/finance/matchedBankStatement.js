@@ -70,7 +70,17 @@ window.layinit(function (htConfig) {
                             return h('i-button', {
                                     on: {
                                         click: function () {
-                                            console.log(p.row);
+                                            axios.post(fpath+'finance/disMatchBankStatement',{mpid:p.row.moneyPoolId})
+                                            .then(function(r){
+                                                if(r.data.code=="1"){
+                                                    location.reload()
+                                                }else{
+                                                    parent.app.$Message.error({content:r.data.msg})
+                                                }
+                                            })
+                                            .catch(function(e){
+                                                parent.app.$Message.error({content:'取消关联银行流水失败'})
+                                            })
                                         }
                                     }
                                 },
@@ -92,6 +102,15 @@ window.layinit(function (htConfig) {
         methods: {
             handleParentStyle: function (style) {
                 window.parent.app.configModalStyle('matchedBankStatement', style)
+            },
+            openMatchBankStatementModal(){
+                window.parent.app.openMatchBankStatementModal({
+                    businessId:businessId,
+                    afterId:afterId
+                })
+            },
+            openAddBankStatementModal(){
+                parent.app.openAddBankStatementModal();
             }
         },
         created: function () {
