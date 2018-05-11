@@ -155,7 +155,9 @@ window.layinit(function (htConfig) {
                 noSettleNeedPayService:"",//不结清时该业应付月收服务费; 
                 noSettleNeedPayPrincipal:"",//不结清时应付本金;
                 lackFee:0,//往期少交费用,
-                overReturnRate:""//逾期收益率
+                overReturnRate:"",//逾期收益率
+                noSettleDelayDays:"",//不结清时的逾期天数  
+                overDays:""           , //逾期天数
             },
 
             
@@ -386,6 +388,7 @@ window.layinit(function (htConfig) {
             	  vm.baseInfoForm.needPayInterest=vm.baseInfoForm.noSettleNeedPayInterest
             	  //不结清时应付月收服务费
             	  vm.baseInfoForm.needPayService=vm.baseInfoForm.noSettleNeedPayService
+            	  vm.baseInfoForm.overDays=vm.baseInfoForm.noSettleDelayDays
             	  //不结清时，新增费用项全部为0
             	  setOhterFeeZero();
             	  //重新计算应付总额
@@ -406,7 +409,7 @@ window.layinit(function (htConfig) {
             	  vm.baseInfoForm.needPayInterest=vm.baseInfoForm.settleNeedPayInterest
             	  //结清时应付月收服务费
             	  vm.baseInfoForm.needPayService=vm.baseInfoForm.settleNeedPayService
-            	  
+            	  vm.baseInfoForm.overDays=vm.baseInfoForm.delayDays
             	  //重新计算应付总额
             	  getTotalShouldPay();
             	  
@@ -647,7 +650,7 @@ var showData=function(){debugger
                 if(res.data.data.isInContractDate=="true"){debugger
                 	vm.baseInfoForm.outsideInterest=0;
                 }else{
-                   	vm.baseInfoForm.outsideInterest=vm.baseInfoForm.delayDays*vm.baseInfoForm.remianderPrincipal*0.002;
+                   	vm.baseInfoForm.outsideInterest=vm.baseInfoForm.overDays*vm.baseInfoForm.remianderPrincipal*0.002;
                 }
              
      
@@ -737,7 +740,7 @@ var getOverReturnRate = function () {debugger
 	if(vm.baseInfoForm.outsideInterest==0){
 		rate=0+"%";
 	}else{
-		rate=vm.baseInfoForm.outsideInterest-derateMoney/vm.baseInfoForm.borrowMoney*vm.baseInfoForm.delayDays;
+		rate=(vm.baseInfoForm.outsideInterest-derateMoney)/vm.baseInfoForm.borrowMoney*vm.baseInfoForm.overDays.toFixed(2);
 		rate=rate+"%";
 	}
 	vm.baseInfoForm.overReturnRate=rate;
@@ -851,6 +854,7 @@ var getShowInfo = function () {
                 //基本信息
                 if(res.data.data.baseInfo.length>0){
                     vm.baseInfoForm = res.data.data.baseInfo[0];
+                  	vm.baseInfoForm.overDays=vm.baseInfoForm.delayDays;
                    // vm.baseInfoForm.needPayPenalty=0;
                     if(vm.baseInfoForm.delayDays==''||vm.baseInfoForm.delayDays==null){
                     	vm.baseInfoForm.delayDays=0;

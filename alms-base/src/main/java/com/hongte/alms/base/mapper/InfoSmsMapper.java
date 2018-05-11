@@ -37,17 +37,17 @@ public interface InfoSmsMapper extends SuperMapper<InfoSms> {
     * @param key
     * @return
     */
-   InfoSmsListSearchVO selectLastInfoSmsDetail( @Param("logId")String logId);
+   InfoSmsListSearchVO selectLastInfoSmsDetail( @Param("logId")Integer logId);
    /**
     * 查找下一条短信记录
     * @param key
     * @return
     */
-   InfoSmsListSearchVO selectNextInfoSmsDetail( @Param("logId")String logId);
+   InfoSmsListSearchVO selectNextInfoSmsDetail( @Param("logId")Integer logId);
    /**
     * 查询短信记录详情
     */
-   InfoSmsListSearchVO selectInfoSmsDetail( @Param("logId")String logId);
+   InfoSmsListSearchVO selectInfoSmsDetail( @Param("logId")Integer logId);
 
 
 }

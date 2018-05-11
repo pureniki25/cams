@@ -209,7 +209,7 @@ color: #FF3030;
                                     <i-option value="0.015">1.5%</i-option>
                                 </i-select>
 		                		<span>{{ baseInfoForm.outsideInterest }} </span></div> </div>
-                            <div class="td"> <div class="td-box">逾期天数：</div><div class="td-box">{{ baseInfoForm.delayDays}} </div> </div>
+                            <div class="td"> <div class="td-box">逾期天数：</div><div class="td-box">{{ baseInfoForm.overDays}} </div> </div>
                         </div>
                         <div class="tr">
                             <div class="td"> <div class="td-box">往期少缴费用：</div><div class="td-box">{{baseInfoForm.lackFee?numeral(baseInfoForm.lackFee).format('0,0.00'):'' }}</div> </div>
@@ -264,11 +264,11 @@ color: #FF3030;
                          <div class="tr">
                             <div class="td"> <div class="td-box">应付本金：</div><div class="td-box">{{ baseInfoForm.needPayPrincipal }} </div> </div>
                             <div class="td"> <div class="td-box">应付利息和服务费：</div><div class="td-box">{{numeral(baseInfoForm.needPayInterest+baseInfoForm.needPayService).format('0,0.00')}} </div></div>
-                            <div class="td"> <div class="td-box">逾期天数：</div><div class="td-box">{{ baseInfoForm.delayDays}} </div> </div>
+                            <div class="td"> <div class="td-box">逾期天数：</div><div class="td-box">{{ baseInfoForm.overDays}} </div> </div>
                       
                         </div>
                         <div class="tr">
-                            <div class="td"> <div class="td-box">应付滞纳金：</div><div class="td-box">{{ baseInfoForm.needPayPenalty }} </div> </div>
+                            <div class="td"> <div class="td-box">应付滞纳金：</div><div class="td-box">{{ baseInfoForm.needPayPenalty?numeral(baseInfoForm.needPayPenalty).format('0,0.00'):'' }} </div> </div>
                             <div class="td"> <div class="td-box">应付总额：</div><div class="td-box">{{ baseInfoForm.totalBorrowAmount?numeral(baseInfoForm.totalBorrowAmount).format('0,0.00'):'' }} </div> </div>
                             <div class="td"> <div class="td-box">    </div>	<div class="td-box">	</div></div>            
         

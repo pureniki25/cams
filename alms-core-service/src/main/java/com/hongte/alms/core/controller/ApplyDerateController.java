@@ -256,6 +256,7 @@ public class ApplyDerateController {
 				Map<String, Object> overDaysMap = transferOfLitigationService
 						.getOverDueDatys(businessVoList.get(0).getBusinessId());
 				if (overDaysMap != null) {
+					businessVoList.get(0).setNoSettleDelayDays(businessVoList.get(0).getDelayDays());
 					businessVoList.get(0).setDelayDays(Integer.valueOf(overDaysMap.get("overdueDays").toString()));
 				}
 

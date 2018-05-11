@@ -36,19 +36,19 @@ public interface InfoSmsService extends BaseService<InfoSms> {
      * @param key
      * @return
      */
-    InfoSmsListSearchVO selectLastInfoSmsDetail(String logId);
+    InfoSmsListSearchVO selectLastInfoSmsDetail(Integer logId);
     /**
      * 短信查询下一条
      * @param key
      * @return
      */
-    InfoSmsListSearchVO selectNextInfoSmsDetail(String logId);
+    InfoSmsListSearchVO selectNextInfoSmsDetail(Integer logId);
 
     /**
      * 短信查询当前条
      * @param key
      * @return
      */
-    InfoSmsListSearchVO selectInfoSmsDetail(String logId);
+    InfoSmsListSearchVO selectInfoSmsDetail(Integer logId);
 
 }

@@ -32,7 +32,7 @@ public class InfoSms extends Model<InfoSms> {
      */
     @TableId("log_id")
 	@ApiModelProperty(required= true,value = "短信ID")
-	private String logId;
+	private Integer logId;
     /**
      * plan ID
      */
@@ -167,12 +167,12 @@ public class InfoSms extends Model<InfoSms> {
 	}
 
 
-	public String getLogId() {
+	public Integer getLogId() {
 		return logId;
 	}
 
 
-	public void setLogId(String logId) {
+	public void setLogId(Integer logId) {
 		this.logId = logId;
 	}
 
