@@ -14,6 +14,9 @@
     <div id="app" v-cloak>
         <Spin size="large" fix v-if="spinShow"></Spin>
         <card title="匹配的款项池银行流水">
+            <div slot='title'>
+                <span>匹配的款项池银行流水</span>
+            </div>
             <i-table stripe :columns="table.col" :data="table.data"></i-table>
         </card>
     </div>

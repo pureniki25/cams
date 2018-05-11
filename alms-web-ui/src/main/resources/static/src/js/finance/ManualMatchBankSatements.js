@@ -20,12 +20,11 @@ window.layinit(function (htConfig) {
             moenyPoolId: getQueryStr('moenyPoolId'),
             status: decodeURI(getQueryStr('status')),
             bankAccounts: [],
-            selections:[],
+            selections: [],
             curPage: 1,
             pageSize: 10,
             table: {
-                col: [
-                    {
+                col: [{
                         type: 'selection',
                         width: 60,
                         align: 'center'
@@ -79,17 +78,23 @@ window.layinit(function (htConfig) {
             }
         },
         methods: {
-            onDateChange:function(date){
+            onDateChange: function (date) {
                 console.log(date);
-                this.repayDate = date ;
+                this.repayDate = date;
             },
             listDepartmentBank: function () {
-                axios.get(cpath + 'moneyPool/listDepartmentBank', { params: { businessId: this.businessId } })
+                axios.get(cpath + 'moneyPool/listDepartmentBank', {
+                        params: {
+                            businessId: this.businessId
+                        }
+                    })
                     .then(function (res) {
                         if (res.data.code == '1') {
                             app.bankAccounts = res.data.data
                         } else {
-                            app.$Modal.error({ content: '接口调用异常' + res.data.msg })
+                            app.$Modal.error({
+                                content: '接口调用异常' + res.data.msg
+                            })
                         }
                     })
                     .catch(function (error) {
@@ -99,7 +104,7 @@ window.layinit(function (htConfig) {
             listMoneyPool: function () {
                 let params = {}
                 params.curPage = this.curPage;
-                params.pageSize = this.pageSize ;
+                params.pageSize = this.pageSize;
                 if (this.businessId) {
                     params.businessId = this.businessId;
                 }
@@ -112,16 +117,21 @@ window.layinit(function (htConfig) {
                 if (this.repayDate) {
                     params.repayDate = this.repayDate;
                 }
-                if (this.acceptBank&&this.acceptBank.length>0) {
+                if (this.acceptBank && this.acceptBank.length > 0) {
                     params.acceptBank = this.acceptBank;
                 }
-                axios.get(fpath + 'finance/moneyPool', { params: params })
+
+                axios.get(fpath + 'finance/moneyPool', {
+                        params: params
+                    })
                     .then(function (res) {
                         if (res.data.code == '0') {
                             app.table.data = res.data.data
                             app.table.total = res.data.count
                         } else {
-                            app.$Modal.error({ content: '接口调用异常' + res.data.msg })
+                            app.$Modal.error({
+                                content: '接口调用异常' + res.data.msg
+                            })
                         }
                     })
                     .catch(function (error) {
@@ -129,30 +139,48 @@ window.layinit(function (htConfig) {
                     })
             },
             search: function (page) {
-                if(page){
+                if (page) {
                     this.curPage = 1
                 }
                 this.table.data = []
                 this.listMoneyPool()
             },
-            onSelectChange:function(selections){
+            onSelectChange: function (selections) {
                 this.selections = selections;
             },
-            submit:function(){
-                if(this.selections.length==0){
-                    this.$Message.warning({content:'未选择需要匹配的流水'})
-                    return ;
+            submit: function () {
+                if (this.selections.length == 0) {
+                    this.$Message.warning({
+                        content: '未选择需要匹配的流水'
+                    })
+                    return;
                 }
-                axios.post(fpath + 'finance/matchBankStatement',{
-                        array:this.selections,
-                        businessId:this.businessId,
-                        afterId:this.afterId
-                }).then(function(res){
+                let params = {
+                    array: this.selections,
+                    businessId: this.businessId,
+                    afterId: this.afterId
+                }
 
-                }).catch(function(err){
-
+                let mprid = getQueryStr('mprid')
+                if(mprid&&mprid.length>0){
+                    if(params.array.length>1){
+                        app.$Message.error({
+                            content:'只能匹配1条流水,请重新检查'
+                        })
+                        return;
+                    }
+                    params.mprid = mprid
+                }
+                axios.post(fpath + 'finance/matchBankStatement', params).then(function (res) {
+                    if(res.data.code=='1'){
+                        window.parent.location.reload()
+                    }else{
+                        app.$Message.error({content:res.data.msg})
+                    }
+                    console.log(res.data);
+                }).catch(function (err) {
+                    console.log(err);
                 })
-                console.log(this.selections)
             },
             paging: function (page) {
                 app.search(page)
