@@ -566,7 +566,7 @@ public class CarServiceImpl  implements CarService {
 			vo.setType(SmsTypeEnum.NOTICE.getValue());
 			//记录短信日志
 			InfoSms sms=new InfoSms();
-			sms.setLogId(UUID.randomUUID().toString());
+//			sms.setLogId(UUID.randomUUID().toString());
 			sms.setOriginalBusinessId(carAuction.getBusinessId());
 			sms.setPhoneNumber(telephone);
 			sms.setRecipient(userName);
