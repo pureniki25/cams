@@ -358,7 +358,7 @@ window.layinit(function (htConfig) {
             //是否结清
             isClosedClick(flage){debugger
               if(flage==false){
-            	  
+            	  vm.applyInfoForm.isSettleFlage='否';
             		  vm.otherFeeShowFlage=false;
             
          		   var otherList=vm.otherDerateTypeList;
@@ -396,6 +396,7 @@ window.layinit(function (htConfig) {
             	  
               }
               if(flage==true){
+            	  vm.applyInfoForm.isSettleFlage='是';
             		  vm.otherFeeShowFlage=true;
          
             	  vm.applyInfoForm.realReceiveMoney=vm.baseInfoForm.settleTotalFactAmount;
@@ -687,11 +688,13 @@ var restProcessApprovalInfo = function(){
 ///////////应付总额：应付本金+应付利息+应付月收服务费+应付其他费用+应付提前结清违约金+应付逾期利息
 var getTotalShouldPay = function () {debugger
 	vm.baseInfoForm.totalBorrowAmount=0;
-	
-	vm.baseInfoForm.totalBorrowAmount=vm.baseInfoForm.needPayPrincipal+vm.baseInfoForm.needPayInterest+vm.baseInfoForm.needPayService
-                      +Number(getOtherFee())+vm.baseInfoForm.preLateFees+vm.baseInfoForm.outsideInterest+vm.baseInfoForm.lackFee
-                      
-                        
+	if(vm.applyInfoForm.isSettleFlage=='否'){
+		vm.baseInfoForm.totalBorrowAmount=vm.baseInfoForm.needPayPrincipal+vm.baseInfoForm.needPayInterest+vm.baseInfoForm.needPayService
+        +Number(getOtherFee())+vm.baseInfoForm.preLateFees+vm.baseInfoForm.outsideInterest+vm.baseInfoForm.lackFee+vm.baseInfoForm.needPayPenalty
+	}else{
+		vm.baseInfoForm.totalBorrowAmount=vm.baseInfoForm.needPayPrincipal+vm.baseInfoForm.needPayInterest+vm.baseInfoForm.needPayService
+        +Number(getOtherFee())+vm.baseInfoForm.preLateFees+vm.baseInfoForm.outsideInterest+vm.baseInfoForm.lackFee
+	}
 	                   getSumMoney();
 }
 
