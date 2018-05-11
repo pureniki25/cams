@@ -598,7 +598,7 @@ window.layinit(function (htConfig) {
    	            	that.addTypeTr(event);
    	            }
                
-   	         getGeneralReturnRate();
+//   	         getGeneralReturnRate();
 
             }
        
@@ -740,7 +740,7 @@ var getOverReturnRate = function () {debugger
 	if(vm.baseInfoForm.outsideInterest==0){
 		rate=0+"%";
 	}else{
-		rate=(vm.baseInfoForm.outsideInterest-derateMoney)/vm.baseInfoForm.borrowMoney*vm.baseInfoForm.overDays.toFixed(2);
+		rate=((vm.baseInfoForm.outsideInterest-derateMoney)/vm.baseInfoForm.borrowMoney*vm.baseInfoForm.overDays).toFixed(2);
 		rate=rate+"%";
 	}
 	vm.baseInfoForm.overReturnRate=rate;
