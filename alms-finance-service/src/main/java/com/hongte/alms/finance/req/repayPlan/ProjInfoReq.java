@@ -67,10 +67,8 @@ public class ProjInfoReq {
     @ApiModelProperty(required= true,value = "还款方式：1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息,11:等本等息")
     private Integer repayType;
 
-    @ApiModelProperty(value = "每期还本Map  Map<期数，还本金额>")
-    private List<PrincipleReq> pricipleMap;
-
-
+    @ApiModelProperty(value = "每期还本列表  List<PrincipleReq> 当还款方式为“分期还本付息”时，必须填写此列表 ")
+    private List<PrincipleReq> principleReqList;
 
 
     /**
@@ -118,7 +116,7 @@ public class ProjInfoReq {
     /**
      * 展期标对应的原业务上标编号(仅展期业务)
      */
-    @ApiModelProperty(required= true,value = "展期标对应的原业务上标编号(仅展期业务)")
+    @ApiModelProperty(value = "展期标对应的原业务上标编号(仅展期业务)")
     private String orgIssueId;
     /**
      * 主借标ID
@@ -132,9 +130,9 @@ public class ProjInfoReq {
     private Integer issueOrder;
 
     /**
-     * 满标时间(标的状态查询接口)
+     * 满标时间
      */
-    @ApiModelProperty(required= true,value = "满标时间(标的状态查询接口)")
+    @ApiModelProperty(required= true,value = "满标时间")
     private Date queryFullsuccessDate;
     /**
      * 昵称
@@ -261,16 +259,16 @@ public class ProjInfoReq {
      */
     @ApiModelProperty(required= true,value = "担保公司可用金额")
     private BigDecimal aviCreditGrantingAmount;
-    /**
-     * 年化利率
-     */
-    @ApiModelProperty(required= true,value = "年化利率")
-    private BigDecimal interestRate;
-    /**
-     * 逾期年利率
-     */
-    @ApiModelProperty(required= true,value = "逾期年利率")
-    private BigDecimal overRate;
+//    /**
+//     * 年化利率
+//     */
+//    @ApiModelProperty(required= true,value = "年化利率")
+//    private BigDecimal interestRate;
+//    /**
+//     * 逾期年利率
+//     */
+//    @ApiModelProperty(required= true,value = "逾期年利率")
+//    private BigDecimal overRate;
     /**
      * 性别
      */
@@ -304,22 +302,22 @@ public class ProjInfoReq {
     /**
      * 婚姻状况, 已婚、未婚 (信用贷时必填)
      */
-    @ApiModelProperty(required= true,value = "婚姻状况, 已婚、未婚 (信用贷时必填)")
+    @ApiModelProperty(value = "婚姻状况, 已婚、未婚 (信用贷时必填)")
     private String marriage;
     /**
      * 居住地址,详细地址，包括省份城市 (信用贷时必填)
      */
-    @ApiModelProperty(required= true,value = "居住地址,详细地址，包括省份城市 (信用贷时必填)")
+    @ApiModelProperty(value = "居住地址,详细地址，包括省份城市 (信用贷时必填)")
     private String address;
     /**
      * 是否有房产
      */
-    @ApiModelProperty(required= true,value = "是否有房产")
+    @ApiModelProperty(required= true,value = "是否有房产 1：有，0：无")
     private Integer isHaveHouse;
     /**
      * 是否有车产
      */
-    @ApiModelProperty(required= true,value = "是否有车产")
+    @ApiModelProperty(required= true,value = "是否有车产 1：有， 0：无")
     private Integer isHaveCar;
     /**
      * 团贷比例(期初收取平台费上标比例)
@@ -459,26 +457,26 @@ public class ProjInfoReq {
      */
     @ApiModelProperty(required= true,value = "平台标志位：1，团贷网； 2，你我金融")
     private Integer plateType;
-    /**
-     * 创建日期
-     */
-    @ApiModelProperty(required= true,value = "创建日期")
-    private Date createTime;
-    /**
-     * 创建人
-     */
-    @ApiModelProperty(required= true,value = "创建人")
-    private String createUser;
-    /**
-     * 更新日期
-     */
-    @ApiModelProperty(required= true,value = "更新日期")
-    private Date updateTime;
-    /**
-     * 更新人
-     */
-    @ApiModelProperty(required= true,value = "更新人")
-    private String updateUser;
+//    /**
+//     * 创建日期
+//     */
+//    @ApiModelProperty(required= true,value = "创建日期")
+//    private Date createTime;
+//    /**
+//     * 创建人
+//     */
+//    @ApiModelProperty(required= true,value = "创建人")
+//    private String createUser;
+//    /**
+//     * 更新日期
+//     */
+//    @ApiModelProperty(required= true,value = "更新日期")
+//    private Date updateTime;
+//    /**
+//     * 更新人
+//     */
+//    @ApiModelProperty(required= true,value = "更新人")
+//    private String updateUser;
 
     public List<ProjectCarInfoReq> getProjCarInfos() {
         return projCarInfos;
@@ -1107,38 +1105,38 @@ public class ProjInfoReq {
     public void setQueryResultContent(String queryResultContent) {
         this.queryResultContent = queryResultContent;
     }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public String getCreateUser() {
-        return createUser;
-    }
-
-    public void setCreateUser(String createUser) {
-        this.createUser = createUser;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public String getUpdateUser() {
-        return updateUser;
-    }
-
-    public void setUpdateUser(String updateUser) {
-        this.updateUser = updateUser;
-    }
+//
+//    public Date getCreateTime() {
+//        return createTime;
+//    }
+//
+//    public void setCreateTime(Date createTime) {
+//        this.createTime = createTime;
+//    }
+//
+//    public String getCreateUser() {
+//        return createUser;
+//    }
+//
+//    public void setCreateUser(String createUser) {
+//        this.createUser = createUser;
+//    }
+//
+//    public Date getUpdateTime() {
+//        return updateTime;
+//    }
+//
+//    public void setUpdateTime(Date updateTime) {
+//        this.updateTime = updateTime;
+//    }
+//
+//    public String getUpdateUser() {
+//        return updateUser;
+//    }
+//
+//    public void setUpdateUser(String updateUser) {
+//        this.updateUser = updateUser;
+//    }
 
     public BigDecimal getRate() {
         return rate;
@@ -1188,12 +1186,12 @@ public class ProjInfoReq {
         this.projFeeInfos = projFeeInfos;
     }
 
-    public  List<PrincipleReq> getPricipleMap() {
-        return pricipleMap;
+    public  List<PrincipleReq> getPrincipleReqList() {
+        return principleReqList;
     }
 
-    public void setPricipleMap( List<PrincipleReq> pricipleMap) {
-        this.pricipleMap = pricipleMap;
+    public void setPrincipleReqList(List<PrincipleReq> principleReqList) {
+        this.principleReqList = principleReqList;
     }
 
     public Integer getPlateType() {
@@ -1234,5 +1232,125 @@ public class ProjInfoReq {
 
     public void setOffLineOutOverDueRateUnit(Integer offLineOutOverDueRateUnit) {
         this.offLineOutOverDueRateUnit = offLineOutOverDueRateUnit;
+    }
+
+    public String getTdUserId() {
+        return tdUserId;
+    }
+
+    public void setTdUserId(String tdUserId) {
+        this.tdUserId = tdUserId;
+    }
+
+    public BigDecimal getTuandaiRate() {
+        return tuandaiRate;
+    }
+
+    public void setTuandaiRate(BigDecimal tuandaiRate) {
+        this.tuandaiRate = tuandaiRate;
+    }
+
+    public BigDecimal getTuandaiAmount() {
+        return tuandaiAmount;
+    }
+
+    public void setTuandaiAmount(BigDecimal tuandaiAmount) {
+        this.tuandaiAmount = tuandaiAmount;
+    }
+
+    public BigDecimal getGuaranteeRate() {
+        return guaranteeRate;
+    }
+
+    public void setGuaranteeRate(BigDecimal guaranteeRate) {
+        this.guaranteeRate = guaranteeRate;
+    }
+
+    public BigDecimal getGuaranteeAmount() {
+        return guaranteeAmount;
+    }
+
+    public void setGuaranteeAmount(BigDecimal guaranteeAmount) {
+        this.guaranteeAmount = guaranteeAmount;
+    }
+
+    public BigDecimal getSubCompanyRate() {
+        return subCompanyRate;
+    }
+
+    public void setSubCompanyRate(BigDecimal subCompanyRate) {
+        this.subCompanyRate = subCompanyRate;
+    }
+
+    public BigDecimal getSubCompanyCharge() {
+        return subCompanyCharge;
+    }
+
+    public void setSubCompanyCharge(BigDecimal subCompanyCharge) {
+        this.subCompanyCharge = subCompanyCharge;
+    }
+
+    public String getAgencyId() {
+        return agencyId;
+    }
+
+    public void setAgencyId(String agencyId) {
+        this.agencyId = agencyId;
+    }
+
+    public BigDecimal getAgencyRate() {
+        return agencyRate;
+    }
+
+    public void setAgencyRate(BigDecimal agencyRate) {
+        this.agencyRate = agencyRate;
+    }
+
+    public BigDecimal getAgencyAmount() {
+        return agencyAmount;
+    }
+
+    public void setAgencyAmount(BigDecimal agencyAmount) {
+        this.agencyAmount = agencyAmount;
+    }
+
+    public BigDecimal getDepositAmount() {
+        return depositAmount;
+    }
+
+    public void setDepositAmount(BigDecimal depositAmount) {
+        this.depositAmount = depositAmount;
+    }
+
+    public BigDecimal getFreedAmount() {
+        return freedAmount;
+    }
+
+    public void setFreedAmount(BigDecimal freedAmount) {
+        this.freedAmount = freedAmount;
+    }
+
+    public BigDecimal getFreedRate() {
+        return freedRate;
+    }
+
+    public void setFreedRate(BigDecimal freedRate) {
+        this.freedRate = freedRate;
+    }
+
+    public BigDecimal getCooperativeTdComRate() {
+        return cooperativeTdComRate;
+    }
+
+    public void setCooperativeTdComRate(BigDecimal cooperativeTdComRate) {
+        this.cooperativeTdComRate = cooperativeTdComRate;
+    }
+
+    public BigDecimal getCooperativeTdComAmount() {
+        return cooperativeTdComAmount;
+    }
+
+    public void setCooperativeTdComAmount(BigDecimal cooperativeTdComAmount) {
+        this.cooperativeTdComAmount = cooperativeTdComAmount;
     }
 }

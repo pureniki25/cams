@@ -14,7 +14,7 @@ public class ProjFeeDetailReq {
 
 
     /**
-     * 上标编号
+     * 期数
      */
 
     @ApiModelProperty(required= true,value = "期数")
