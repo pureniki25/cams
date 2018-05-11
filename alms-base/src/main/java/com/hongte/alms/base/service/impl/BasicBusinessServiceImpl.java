@@ -236,7 +236,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 
 	@Override
 	public ExpenseSettleVO getPreLateFees(String crpId, String original_business_id, String repayType, String businessTypeId,
-			Date preSettleDate, Date ContractDate, Date firstRepayDate) throws Exception {
+			Date preSettleDate, Date ContractDate, Date firstRepayDate,String restPeriods) throws Exception {
 		Integer settleMonth = getSettleMonths(preSettleDate, firstRepayDate);// 结清阶段
 		Double preLateFees = Double.valueOf(0);
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -296,7 +296,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 						}
 						// 出款日期在2017年6月5日至今 ,并且分公司服务费是按月收取的，提前还款违约金为:剩余本金*0.5%*剩余还款期数
 						if (outputDate.compareTo(date4) > 0 && monthCompanyAmount > 0) {
-							preLateFees = vo.getPrincipal().doubleValue() * 0.005 * vo.getRestPeriod();
+							preLateFees = vo.getPrincipal().doubleValue() * 0.005 * Integer.valueOf(restPeriods);
 						}
 					} else {
 						preLateFees = Double.valueOf(0);
@@ -330,7 +330,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 							// 先息后本
 						} else if (repayType.equals(RepayTypeEnum.FIRST_INTEREST.getValue().toString())) {
 							if (settleMonth <= 12) {
-								preLateFees = vo.getPrincipal().doubleValue() * 0.005 * vo.getRestPeriod();
+								preLateFees = vo.getPrincipal().doubleValue() * 0.005 * Integer.valueOf(restPeriods);
 								if (preLateFees > vo.getPrincipal().doubleValue() * 0.06) {
 									preLateFees = vo.getPrincipal().doubleValue() * 0.06;
 								}
@@ -374,7 +374,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 							// 先息后本
 						} else if (repayType.equals(RepayTypeEnum.FIRST_INTEREST.getValue().toString())) {
 							if (settleMonth <= 12) {
-								preLateFees = vo.getPrincipal().doubleValue() * 0.005 * vo.getRestPeriod();
+								preLateFees = vo.getPrincipal().doubleValue() * 0.005 * Integer.valueOf(restPeriods);
 								if (preLateFees > vo.getPrincipal().doubleValue() * 0.06) {
 									preLateFees = vo.getPrincipal().doubleValue() * 0.06;
 								}
@@ -434,12 +434,12 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 				new EntityWrapper<RepaymentBizPlanListDetail>().in("business_id", businessIds).orderBy("period"));
 		final ExpenseSettleRepaymentPlanVO plan = new ExpenseSettleRepaymentPlanVO(repaymentBizPlan, planLists,
 				details);
-		plan.findCurrentPeriods(settleDate);
+//		plan.findCurrentPeriods(settleDate);
 		final List<BizOutputRecord> bizOutputRecord = bizOutputRecordMapper.selectList(
 				new EntityWrapper<BizOutputRecord>().eq("business_id", businessId).orderBy("fact_output_date", true));
 		ExpenseSettleVO expenseSettleVO = new ExpenseSettleVO();
-		expenseSettleVO.setRestPeriod(plan.getFinalPeriod().getRepaymentBizPlanList().getPeriod()
-				- plan.getCurrentPeriod().getRepaymentBizPlanList().getPeriod());
+//		expenseSettleVO.setRestPeriod(plan.getFinalPeriod().getRepaymentBizPlanList().getPeriod()
+//				- plan.getCurrentPeriod().getRepaymentBizPlanList().getPeriod());
 		if (!basicBusiness.getRepaymentTypeId().equals(RepayTypeEnum.EQUAL_AMOUNT_INTEREST.getValue())
 				&& !basicBusiness.getRepaymentTypeId().equals(RepayTypeEnum.FIRST_INTEREST.getValue())
 				&& !basicBusiness.getRepaymentTypeId().equals(RepayTypeEnum.DIVIDE_INTEREST_TEN.getValue())
