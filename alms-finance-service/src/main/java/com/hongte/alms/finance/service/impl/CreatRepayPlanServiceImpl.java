@@ -4,16 +4,14 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.baseException.CreatRepaymentExcepiton;
 import com.hongte.alms.base.entity.*;
+import com.hongte.alms.base.enums.BizCustomerTypeEnum;
 import com.hongte.alms.base.enums.BooleanEnum;
 import com.hongte.alms.base.enums.BusinessSourceTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.enums.repayPlan.*;
 import com.hongte.alms.base.service.*;
 import com.hongte.alms.common.util.ClassCopyUtil;
-import com.hongte.alms.finance.dto.repayPlan.RepaymentBizPlanDto;
-import com.hongte.alms.finance.dto.repayPlan.RepaymentBizPlanListDto;
-import com.hongte.alms.finance.dto.repayPlan.RepaymentProjPlanDto;
-import com.hongte.alms.finance.dto.repayPlan.RepaymentProjPlanListDto;
+import com.hongte.alms.finance.dto.repayPlan.*;
 import com.hongte.alms.finance.req.repayPlan.*;
 import com.hongte.alms.finance.service.CreatRepayPlanService;
 import com.hongte.alms.common.util.Constant;
@@ -95,6 +93,20 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
     @Qualifier("TuandaiProjectHouseService")
     TuandaiProjectHouseService tuandaiProjectHouseService;
 
+    @Autowired
+    @Qualifier("BasicBizCustomerService")
+    BasicBizCustomerService basicBizCustomerService;
+
+
+    @Autowired
+    @Qualifier("BaiscBizExtRateService")
+    BaiscBizExtRateService baiscBizExtRateService;
+
+
+    @Autowired
+    @Qualifier("BasicBusinessTypeService")
+    BasicBusinessTypeService basicBusinessTypeService;
+
     //进位方式枚举
     private  RoundingMode roundingMode=RoundingMode.HALF_UP;
     //保留的小数位数
@@ -107,12 +119,16 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
 
 
-    //需要判断是否重复传入
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public List<RepaymentBizPlanDto> creatRepayPlan(CreatRepayPlanReq creatRepayPlanReq) throws InstantiationException, IllegalAccessException {
+    public PlanReturnInfoDto creatRepayPlan(CreatRepayPlanReq creatRepayPlanReq) throws InstantiationException, IllegalAccessException {
+        PlanReturnInfoDto planReturnInfoDto = new PlanReturnInfoDto();
 
         List<RepaymentBizPlanDto>  retList = new LinkedList<>();
+        planReturnInfoDto.setRepaymentBizPlanDtos(retList);
+
+        List<CarBusinessAfterDto>  carBizAfterList = new LinkedList<>();
+        planReturnInfoDto.setCarBusinessAfterDtoList(carBizAfterList);
 
         //设置进位方式枚举和保留的小数位数
         smallNum = creatRepayPlanReq.getSmallNum();
@@ -270,16 +286,219 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             }
         }
 
+
+
+        List<CarBusinessAfterDto> bizAfterDtos = new LinkedList<>();
+        for(RepaymentBizPlanDto bizPlanDto:retList) {
+            RepaymentBizPlan repaymentBizPlan = bizPlanDto.getRepaymentBizPlan();
+            List<RepaymentBizPlanListDto> repaymentBizPlanListDtos = bizPlanDto.getBizPlanListDtos();
+            for(RepaymentBizPlanListDto repaymentBizPlanListDto:repaymentBizPlanListDtos){
+                RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListDto.getRepaymentBizPlanList();
+                List<RepaymentBizPlanListDetail> repaymentBizPlanListDetails = repaymentBizPlanListDto.getBizPlanListDetails();
+                CarBusinessAfterDto bizAfterDto = new CarBusinessAfterDto();
+                bizAfterDto.setCarBusinessId(repaymentBizPlan.getBusinessId());//业务id
+                bizAfterDto.setCarBusinessAfterId(repaymentBizPlanList.getAfterId());//[当前还款期数]
+                BasicBusinessType basicBusinessType =basicBusinessTypeService.selectById(businessBasicInfo.getBusinessType());
+                if(basicBusinessType ==null){
+                    logger.error("业务类型在 BasicBusinessType 表中不存在 业务信息："+JSON.toJSONString(businessBasicInfo));
+                    throw  new CreatRepaymentExcepiton("业务类型不存在  业务类型："+businessBasicInfo.getBusinessType());
+                }
+                bizAfterDto.setParatype(basicBusinessType.getBusinessTypeName());
+                bizAfterDto.setCustomerName(businessBasicInfo.getCustomerName());
+                bizAfterDto.setOperatorName(businessBasicInfo.getOperatorName()); //业务主办人
+                bizAfterDto.setOperatorDept(businessBasicInfo.getCompanyId()); //业务主办人部门
+                bizAfterDto.setCreateTime(new Date()); //新建时间
+                bizAfterDto.setRepaymentType(RepayPlanRepayIniCalcWayEnum.getByKey(businessBasicInfo.getRepaymentTypeId()).getName()); //还款方式
+                bizAfterDto.setBorrowMoney(repaymentBizPlan.getBorrowMoney().toPlainString());//借款金额
+                bizAfterDto.setOddcorpus(repaymentBizPlan.getBorrowMoney().toPlainString());//剩余本金
+//                bizAfterDto.setInstallmentNumDate(null);//不知道什么意思的字段 没有的
+//                bizAfterDto.setInstallmentNum(null);//不知道什么意思的字段 没有的
+                bizAfterDto.setCurrentPrincipa(repaymentBizPlanList.getTotalBorrowAmount());//本期应还本金
+
+                BigDecimal currentAccrual = null;
+                BigDecimal otherFee = new BigDecimal(0).setScale(smallNum ,  roundingMode);
+                for(RepaymentBizPlanListDetail repaymentBizPlanListDetail:repaymentBizPlanListDetails){
+                    if(repaymentBizPlanListDetail.getPlanItemType().equals(RepayPlanFeeTypeEnum.INTEREST.getValue())){
+                        currentAccrual =repaymentBizPlanListDetail.getPlanAmount();
+                    }else {
+                        otherFee.add(repaymentBizPlanListDetail.getPlanAmount());
+                    }
+                }
+                if(currentAccrual  == null){
+                    logger.error("找不到本期应还利息 ："+JSON.toJSONString(repaymentBizPlanListDto));
+                    throw  new CreatRepaymentExcepiton("找不到本期应还利息 ："+JSON.toJSONString(repaymentBizPlanListDto));
+                }
+                bizAfterDto.setCurrentAccrual(currentAccrual.toPlainString());//本期应还利息
+                bizAfterDto.setBorrowDate(repaymentBizPlanList.getDueDate());//还款日期
+                bizAfterDto.setCarBusinessAfterType("还款中");//[还款状态分类]：还款中，已还款，逾期
+                bizAfterDto.setOtherMoney(otherFee.toPlainString()); //其他费用
+                bizAfterDto.setCreatedate(new Date());
+                bizAfterDto.setRepayedFlag(0);
+                bizAfterDto.setReserve2("还款中");
+                bizAfterDto.setConfirmFlag(0);
+//                outId
+//                carBusinessAfterDefer  //[展期业务编号]
+//                bizAfterDto.setCurrentAccrual
+//                RepayPlanRepayIniCalcWayEnum
+
+                //                bizAfterDto.setParatype(businessBasicInfo.getBusinessType());//[业务类型]
+
+
+//                bizAfterDt
+            }
+
+
+
+
+
+
+
+//            /**
+//             * [财务还款金额确认(1:已确认,0:未确认)]
+//             */
+//            @TableField("confirm_flag")
+//            @ApiModelProperty(required= true,value = "[财务还款金额确认(1:已确认,0:未确认)]")
+//            private Integer confirmFlag;
+//            /**
+//             * [电话催收人]
+//             */
+//            @TableField("collection_user")
+//            @ApiModelProperty(required= true,value = "[电话催收人]")
+//            private String collectionUser;
+//            /**
+//             * [电催分配备注]
+//             */
+//            @TableField("collection_remark")
+//            @ApiModelProperty(required= true,value = "[电催分配备注]")
+//            private String collectionRemark;
+//            /**
+//             * [出款编号]
+//             */
+//            @TableField("out_id")
+//            @ApiModelProperty(required= true,value = "[出款编号]")
+//            private Integer outId;
+//            /**
+//             * [是否亏损结清 空或者0：不是亏损结清 1:是亏损结清]
+//             */
+//            @TableField("is_loss_settle")
+//            @ApiModelProperty(required= true,value = "[是否亏损结清 空或者0：不是亏损结清 1:是亏损结清]")
+//            private Integer isLossSettle;
+//            /**
+//             * [财务还款确认日期]
+//             */
+//            @TableField("finance_confirmed_date")
+//            @ApiModelProperty(required= true,value = "[财务还款确认日期]")
+//            private Date financeConfirmedDate;
+//            /**
+//             * [财务还款确认人ID]
+//             */
+//            @TableField("finance_confirmed_user")
+//            @ApiModelProperty(required= true,value = "[财务还款确认人ID]")
+//            private String financeConfirmedUser;
+//            /**
+//             * [财务确认自动代扣日期]
+//             */
+//            @TableField("auto_withholding_confirmed_date")
+//            @ApiModelProperty(required= true,value = "[财务确认自动代扣日期]")
+//            private Date autoWithholdingConfirmedDate;
+//            /**
+//             * [确认自动代扣的确认者ID]
+//             */
+//            @TableField("auto_withholding_confirmed_user")
+//            @ApiModelProperty(required= true,value = "[确认自动代扣的确认者ID]")
+//            private String autoWithholdingConfirmedUser;
+//            /**
+//             * [财务还款确认的时候选择的还款银行]
+//             */
+//            @TableField("finance_bank_id")
+//            @ApiModelProperty(required= true,value = "[财务还款确认的时候选择的还款银行]")
+//            private Integer financeBankId;
+//            /**
+//             * [会计确认状态，0或null:待审核;1:已审核;2:已退回;3:已返审核;4:导入;]
+//             */
+//            @TableField("accountant_confirm_status")
+//            @ApiModelProperty(required= true,value = "[会计确认状态，0或null:待审核;1:已审核;2:已退回;3:已返审核;4:导入;]")
+//            private Integer accountantConfirmStatus;
+//            /**
+//             * [会计确认人]
+//             */
+//            @TableField("accountant_confirm_user")
+//            @ApiModelProperty(required= true,value = "[会计确认人]")
+//            private String accountantConfirmUser;
+//            /**
+//             * [会计确认日期]
+//             */
+//            @TableField("accountant_confirm_date")
+//            @ApiModelProperty(required= true,value = "[会计确认日期]")
+//            private Date accountantConfirmDate;
+//            /**
+//             * [null或0：未执行垫付操作，1:本期平台垫付已结清，2：本期平台垫付未结清，3：本期不需要还垫付]
+//             */
+//            @TableField("tuandai_advance_status")
+//            @ApiModelProperty(required= true,value = "[null或0：未执行垫付操作，1:本期平台垫付已结清，2：本期平台垫付未结清，3：本期不需要还垫付]")
+//            private Integer tuandaiAdvanceStatus;
+//            /**
+//             * [null或0：未执行分润操作，1:本期分润已还清，2：本期分润未结清，3：本期不需要还分润]
+//             */
+//            @TableField("tuandai_profit_status")
+//            @ApiModelProperty(required= true,value = "[null或0：未执行分润操作，1:本期分润已还清，2：本期分润未结清，3：本期不需要还分润]")
+//            private Integer tuandaiProfitStatus;
+//            /**
+//             * [资金充值状态，null或0:资金未充值，1:所有标资金充值成功或自动充值成功，2：资金充值处理中，3：所有标资金充值失败，4：资金部分标充值成功]
+//             */
+//            @TableField("tuandai_distribute_fund_status")
+//            @ApiModelProperty(required= true,value = "[资金充值状态，null或0:资金未充值，1:所有标资金充值成功或自动充值成功，2：资金充值处理中，3：所有标资金充值失败，4：资金部分标充值成功]")
+//            private Integer tuandaiDistributeFundStatus;
+//            /**
+//             * [资金分发备注]
+//             */
+//            @TableField("tuandai_distribute_fund_remark")
+//            @ApiModelProperty(required= true,value = "[资金分发备注]")
+//            private String tuandaiDistributeFundRemark;
+//            /**
+//             * [平台还款状态：未还款，已代偿，已还款]
+//             */
+//            @TableField("issue_after_type")
+//            @ApiModelProperty(required= true,value = "[平台还款状态：未还款，已代偿，已还款]")
+//            private String issueAfterType;
+//            /**
+//             * 还款计划guid
+//             */
+//            @TableField("business_after_guid")
+//            @ApiModelProperty(required= true,value = "还款计划guid")
+//            private String businessAfterGuid;
+//            /**
+//             * [贷后跟踪状态:电催、催收、诉讼 ]
+//             */
+//            @TableField("tracking_after_type")
+//            @ApiModelProperty(required= true,value = "[贷后跟踪状态:电催、催收、诉讼 ]")
+//            private String trackingAfterType;
+//            /**
+//             * 是否移交法务后被退回
+//             */
+//            @TableField("legal_return_status")
+//            @ApiModelProperty(required= true,value = "是否移交法务后被退回")
+//            private Integer legalReturnStatus;
+//            /**
+//             * 本息还款状态 0:未还款 1:本息已还款 2:本期已结清
+//             */
+//            @TableField("interest_paid")
+//            @ApiModelProperty(required= true,value = "本息还款状态 0:未还款 1:本息已还款 2:本期已结清")
+//            private Integer interestPaid;
+
+        }
+
+
         //////  整理成 返回数据的格式  将信息返回出去  结束  ///////////
 
 
 
-        return retList;
+        return planReturnInfoDto;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public  List<RepaymentBizPlanDto> creatAndSaveRepayPlan(CreatRepayPlanReq creatRepayPlanReq) throws IllegalAccessException, InstantiationException {
+    public  PlanReturnInfoDto creatAndSaveRepayPlan(CreatRepayPlanReq creatRepayPlanReq) throws IllegalAccessException, InstantiationException {
 
         //判断是否重传
         for(ProjInfoReq projInfoReq:creatRepayPlanReq.getProjInfoReqs() ){
@@ -300,18 +519,100 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
         /////////////   输入数据校验   开始 ////////////////////////
 
+        //业务基础信息校验
         BusinessBasicInfoReq  businessBasicInfoReq = creatRepayPlanReq.getBusinessBasicInfoReq();
-
         if(businessBasicInfoReq.getSourceType().equals(BusinessSourceTypeEnum.SETTLE_NEW.getValue())||
                 businessBasicInfoReq.getSourceType().equals(BusinessSourceTypeEnum.SETTLE_NEW.getValue())){
-
             if(businessBasicInfoReq.getSourceBusinessId()==null){
                 throw  new CreatRepaymentExcepiton("结清再贷业务必须填写原始来源业务的业务编号");
             }
-
         }
+
+
+        //业务用户信息校验
+        List<BusinessCustomerInfoReq> bizCusInfoReqs = creatRepayPlanReq.getBizCusInfoReqs();
+        if(bizCusInfoReqs.size()==0){
+            throw  new CreatRepaymentExcepiton("请填写业务用户信息");
+        }
+        for(BusinessCustomerInfoReq bizCusInfoReq:bizCusInfoReqs){
+            if(!bizCusInfoReq.getCustomerType().equals(BizCustomerTypeEnum.PERSON.getName())&&
+                    !bizCusInfoReq.getCustomerType().equals(BizCustomerTypeEnum.COMPANY.getName())){
+                logger.error("客户类型需为'个人'或'公司'  bizId:"+businessBasicInfoReq.getBusinessId()
+                +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
+                throw  new CreatRepaymentExcepiton("客户类型需为'个人'或'公司'");
+            }
+
+            if(bizCusInfoReq.getCustomerType().equals(BizCustomerTypeEnum.COMPANY.getName())){
+               if(bizCusInfoReq.getIsCompanyBankAccount()==null){
+                   logger.error("公司用户 必须填写是否提供公账  bizId:"+businessBasicInfoReq.getBusinessId()
+                           +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
+                   throw  new CreatRepaymentExcepiton("公司用户 必须填写是否提供公账  customerId:"+bizCusInfoReq.getCustomerId());
+               }
+
+               if(bizCusInfoReq.getIsCompanyBankAccount().equals(BooleanEnum.YES.getValue())
+                       &&bizCusInfoReq.getIsCompanyBankAccount().equals(BooleanEnum.NO.getValue())){
+                   logger.error("公司用户 是否提供公账 字段输入值不正确  bizId:"+businessBasicInfoReq.getBusinessId()
+                           +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
+                   throw  new CreatRepaymentExcepiton("用户信息  是否提供公账 字段输入值不正确  customerId:"+bizCusInfoReq.getCustomerId());
+               }
+
+               if(bizCusInfoReq.getIsMergedCertificate()==null){
+                   logger.error("公司用户 必须填写是否三证合一  bizId:"+businessBasicInfoReq.getBusinessId()
+                           +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
+                   throw  new CreatRepaymentExcepiton("公司用户 必须填写是否三证合一 customerId:"+bizCusInfoReq.getCustomerId());
+               }
+
+               if(bizCusInfoReq.getIsCompanyBankAccount().equals(BooleanEnum.YES.getValue())
+                       &&bizCusInfoReq.getIsCompanyBankAccount().equals(BooleanEnum.NO.getValue())){
+                   logger.error("公司用户  是否三证合一 字段输入值不正确  bizId:"+businessBasicInfoReq.getBusinessId()
+                           +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
+                   throw  new CreatRepaymentExcepiton("公司用户  是否三证合一 字段输入值不正确  customerId:"+bizCusInfoReq.getCustomerId());
+               }
+
+                if(bizCusInfoReq.getIsCompanyBankAccount().equals(BooleanEnum.YES.getValue())){
+                   if(bizCusInfoReq.getUnifiedCode()==null){
+                       logger.error("三证合一的公司用户 需填写统一社会信用代码  bizId:"+businessBasicInfoReq.getBusinessId()
+                               +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
+                       throw  new CreatRepaymentExcepiton("三证合一的公司用户 需填写统一社会信用代码 customerId:"+bizCusInfoReq.getCustomerId());
+
+                   }
+                }
+               if(bizCusInfoReq.getIsCompanyBankAccount().equals(BooleanEnum.NO.getValue())){
+                   if(bizCusInfoReq.getBusinessLicence()==null){
+                       logger.error("非三证合一的公司用户 需填写营业执照号  bizId:"+businessBasicInfoReq.getBusinessId()
+                               +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
+                       throw  new CreatRepaymentExcepiton("非三证合一的公司用户 需填写营业执照号 customerId:"+bizCusInfoReq.getCustomerId());
+                   }
+                }
+                if(bizCusInfoReq.getRegisterProvince()==null){
+                    logger.error("公司用户 需填写企业注册地址所在省份  bizId:"+businessBasicInfoReq.getBusinessId()
+                            +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
+                    throw  new CreatRepaymentExcepiton("公司用户 需填写企业注册地址所在省份 customerId:"+bizCusInfoReq.getCustomerId());
+                }
+                if(bizCusInfoReq.getCompanyLegalPerson()==null){
+                    logger.error("公司用户 需填写企业法人  bizId:"+businessBasicInfoReq.getBusinessId()
+                            +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
+                    throw  new CreatRepaymentExcepiton("公司用户 需填写企业法人 customerId:"+bizCusInfoReq.getCustomerId());
+                }
+                if(bizCusInfoReq.getLegalPersonIdentityCard()==null){
+                    logger.error("公司用户 需填写企业法人身份证  bizId:"+businessBasicInfoReq.getBusinessId()
+                            +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
+                    throw  new CreatRepaymentExcepiton("公司用户 需填写企业法人身份证 customerId:"+bizCusInfoReq.getCustomerId());
+                }
+                if(bizCusInfoReq.getCompanyLegalPerson()==null){
+                    logger.error("公司用户 需填写企业法人是否大陆居民  bizId:"+businessBasicInfoReq.getBusinessId()
+                            +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
+                    throw  new CreatRepaymentExcepiton("公司用户 需填写企业法人是否大陆居民 customerId:"+bizCusInfoReq.getCustomerId());
+                }
+            }
+        }
+
+
+
+
         List<ProjInfoReq>  projInfoReqs = creatRepayPlanReq.getProjInfoReqs();
 
+        //标的车辆/房产信息校验
         for(ProjInfoReq projInfoReq :projInfoReqs){
             if(projInfoReq.getIsHaveCar().equals(BooleanEnum.YES.getValue())){
                 if(projInfoReq.getProjCarInfos()==null){
@@ -331,8 +632,8 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
         /////////////   输入数据校验   结束 ////////////////////////
 
-
-        List<RepaymentBizPlanDto>  dtos = creatRepayPlan(creatRepayPlanReq);
+        PlanReturnInfoDto  planReturnInfoDto = creatRepayPlan(creatRepayPlanReq);
+        List<RepaymentBizPlanDto>  dtos = planReturnInfoDto.getRepaymentBizPlanDtos();
 
         /////  存储还款计划相关信息   开始  ////////////////
         for(RepaymentBizPlanDto bizPlanDto:dtos){
@@ -365,6 +666,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
         /////  存储传入的相关信息  开始  //////////////
 
+        //存储业务信息
         BasicBusiness  basicBusiness = ClassCopyUtil.copy(creatRepayPlanReq.getBusinessBasicInfoReq(),BusinessBasicInfoReq.class,BasicBusiness.class);
         basicBusiness.setBorrowLimitUnit(1);
         basicBusiness.setOutputPlatformId(1);//默认为团贷网p2p业务
@@ -382,7 +684,35 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         }
         basicBusinessService.insertOrUpdate(basicBusiness);
 
+//        List<BusinessCustomerInfoReq> bizCusInfoReqs
+        //存储业务客户信息
+        List<BasicBizCustomer> bizCustomers = new LinkedList<>();
+        for(BusinessCustomerInfoReq bCustInfo:bizCusInfoReqs){
+            BasicBizCustomer bizCusInfo =  ClassCopyUtil.copy(bCustInfo,BusinessCustomerInfoReq.class,BasicBizCustomer.class);
+            bizCusInfo.setBusinessId(basicBusiness.getBusinessId());
+            bizCusInfo.setCreateUser(Constant.SYS_DEFAULT_USER);
+            bizCusInfo.setCreateTime(new Date());
+            bizCustomers.add(bizCusInfo);
+        }
+        basicBizCustomerService.delete(new EntityWrapper<BasicBizCustomer>().eq("business_id",basicBusiness.getBusinessId()));
+        basicBizCustomerService.insertBatch(bizCustomers);
 
+        //存储业务额外费用信息
+        if(creatRepayPlanReq.getBizExtRateReqs()!=null){
+            List<BusinessExtRateReq> bizExtRateReqs = creatRepayPlanReq.getBizExtRateReqs();
+            List<BaiscBizExtRate> bizExtRates = new LinkedList<>();
+            for(BusinessExtRateReq rateReq: bizExtRateReqs){
+                BaiscBizExtRate bizExtRate =  ClassCopyUtil.copy(rateReq,BusinessExtRateReq.class,BaiscBizExtRate.class);
+                bizExtRate.setBusinessId(basicBusiness.getBusinessId());
+                bizExtRate.setCreateUser(Constant.SYS_DEFAULT_USER);
+                bizExtRate.setCreateTime(new Date());
+                bizExtRates.add(bizExtRate);
+            }
+            baiscBizExtRateService.delete(new EntityWrapper<BaiscBizExtRate>().eq("business_id",basicBusiness.getBusinessId()));
+            baiscBizExtRateService.insertBatch(bizExtRates);
+        }
+
+        //存储标信息
         for(ProjInfoReq projInfoReq:projInfoReqs){
             TuandaiProjectInfo  projInfo = ClassCopyUtil.copy(projInfoReq,ProjInfoReq.class,TuandaiProjectInfo.class);
             projInfo.setBusinessId(basicBusiness.getBusinessId());
@@ -403,25 +733,10 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     if(setBatchFlage) break;
                 }
             }
-            //年利率  逾期年利率  设置
-
-
-            //    /**
-//     * 年化利率
-//     */
-//    @ApiModelProperty(required= true,value = "年化利率")
-//    private BigDecimal interestRate;
-//    /**
-//     * 逾期年利率
-//     */
-//    @ApiModelProperty(required= true,value = "逾期年利率")
-//    private BigDecimal overRate;
-//            for(RepaymentProjPlanDto projPlanDto:projPlanDtos){
-//
-//            }
-
-//            List<RepaymentProjPlanDto> projPlanDtos
             TuandaiProjectInfo  oldProjInfp =tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("project_id",projInfo.getProjectId()));
+
+
+
 
             if(oldProjInfp!=null){
                 projInfo.setCreateUser(oldProjInfp.getCreateUser());
@@ -498,7 +813,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         });
 
 
-        return dtos;
+        return planReturnInfoDto;
 
     }
 
