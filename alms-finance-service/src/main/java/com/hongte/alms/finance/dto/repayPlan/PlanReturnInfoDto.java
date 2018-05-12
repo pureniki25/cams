@@ -11,17 +11,12 @@ import java.util.List;
 public class PlanReturnInfoDto {
 
 //    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
-    private List<CarBusinessAfterDto> carBusinessAfterDtoList;
+    //信贷还款计划信息
+    private List<XdPlanDto> xdPlanDtos;
 
+    //贷后还款计划列表信息
     private  List<RepaymentBizPlanDto> repaymentBizPlanDtos;
 
-    public List<CarBusinessAfterDto> getCarBusinessAfterDtoList() {
-        return carBusinessAfterDtoList;
-    }
-
-    public void setCarBusinessAfterDtoList(List<CarBusinessAfterDto> carBusinessAfterDtoList) {
-        this.carBusinessAfterDtoList = carBusinessAfterDtoList;
-    }
 
     public List<RepaymentBizPlanDto> getRepaymentBizPlanDtos() {
         return repaymentBizPlanDtos;
@@ -29,5 +24,13 @@ public class PlanReturnInfoDto {
 
     public void setRepaymentBizPlanDtos(List<RepaymentBizPlanDto> repaymentBizPlanDtos) {
         this.repaymentBizPlanDtos = repaymentBizPlanDtos;
+    }
+
+    public List<XdPlanDto> getXdPlanDtos() {
+        return xdPlanDtos;
+    }
+
+    public void setXdPlanDtos(List<XdPlanDto> xdPlanDtos) {
+        this.xdPlanDtos = xdPlanDtos;
     }
 }

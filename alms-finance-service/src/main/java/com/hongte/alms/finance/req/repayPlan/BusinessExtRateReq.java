@@ -13,11 +13,11 @@ import java.math.BigDecimal;
 @ApiModel("业务额外的费率信息")
 public class BusinessExtRateReq {
 
-    /**
-     * 业务ID
-     */
-    @ApiModelProperty(required= true,value = "业务ID")
-    private String businessId;
+//    /**
+//     * 业务ID
+//     */
+//    @ApiModelProperty(required= true,value = "业务ID")
+//    private String businessId;
     /**
      * 费率类型
      */
@@ -34,9 +34,9 @@ public class BusinessExtRateReq {
     @ApiModelProperty(required= true,value = "费率值")
     private BigDecimal rateValue;
     /**
-     * 费率类型，1：年利率，2：月利率，3：日利率
+     * 费率值单位，1：年利率，2：月利率，3：日利率
      */
-    @ApiModelProperty(required= true,value = "费率类型，1：年利率，2：月利率，3：日利率")
+    @ApiModelProperty(required= true,value = "费率值单位，1：年利率，2：月利率，3：日利率")
     private Integer rateUnit;
     /**
      * 资产端费用项ID
@@ -50,13 +50,13 @@ public class BusinessExtRateReq {
     private String feeName;
 
 
-    public String getBusinessId() {
-        return businessId;
-    }
-
-    public void setBusinessId(String businessId) {
-        this.businessId = businessId;
-    }
+//    public String getBusinessId() {
+//        return businessId;
+//    }
+//
+//    public void setBusinessId(String businessId) {
+//        this.businessId = businessId;
+//    }
 
     public Integer getRateType() {
         return rateType;

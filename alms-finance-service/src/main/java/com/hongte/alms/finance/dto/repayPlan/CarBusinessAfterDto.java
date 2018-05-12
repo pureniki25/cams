@@ -14,7 +14,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
  * <p>
- * [贷后管理主表]
+ * 贷后管理主表
  * </p>
  *
  * @author 曾坤
@@ -27,77 +27,78 @@ public class CarBusinessAfterDto extends Model<CarBusinessAfterDto> {
     private static final long serialVersionUID = 1L;
 
 
+	@ApiModelProperty(required= true,value = "信贷还款计划详情")
 	private List<CarBusinessAfterDetailDto> carBizDetailDtos;
 
     /**
-     * [业务编号]
+     * 业务编号
      */
     @TableId("car_business_id")
-	@ApiModelProperty(required= true,value = "[业务编号]")
+	@ApiModelProperty(required= true,value = "业务编号")
 	private String carBusinessId;
     /**
-     * [当前还款期数]
+     * 当前还款期数
      */
 	@TableField("car_business_after_id")
-	@ApiModelProperty(required= true,value = "[当前还款期数]")
+	@ApiModelProperty(required= true,value = "当前还款期数")
 	private String carBusinessAfterId;
     /**
-     * [业务类型]
+     * 业务类型
      */
-	@ApiModelProperty(required= true,value = "[业务类型]")
+	@ApiModelProperty(required= true,value = "业务类型")
 	private String paratype;
     /**
-     * [弃用]
+     * 弃用
      */
 	@TableField("Customer_Name")
-	@ApiModelProperty(required= true,value = "[弃用]")
+	@ApiModelProperty(required= true,value = "弃用")
 	private String CustomerName;
     /**
-     * [业务主办人]
+     * 业务主办人
      */
 	@TableField("operator_name")
-	@ApiModelProperty(required= true,value = "[业务主办人]")
+	@ApiModelProperty(required= true,value = "业务主办人")
 	private String operatorName;
     /**
-     * [业务主办人部门]
+     * 业务主办人部门
      */
 	@TableField("operator_dept")
-	@ApiModelProperty(required= true,value = "[业务主办人部门]")
+	@ApiModelProperty(required= true,value = "业务主办人部门")
 	private String operatorDept;
     /**
-     * [新建时间]
+     * 新建时间
      */
 	@TableField("create_time")
-	@ApiModelProperty(required= true,value = "[新建时间]")
+	@ApiModelProperty(required= true,value = "新建时间")
 	private Date createTime;
     /**
-     * [修改时间]
+     * 修改时间
      */
 	@TableField("modify_time")
-	@ApiModelProperty(required= true,value = "[修改时间]")
+	@ApiModelProperty(required= true,value = "修改时间")
 	private Date modifyTime;
     /**
-     * [是否删除]
+     * 是否删除
      */
 	@TableField("is_delete")
-	@ApiModelProperty(required= true,value = "[是否删除]")
+	@ApiModelProperty(required= true,value = "是否删除")
 	private Boolean isDelete;
     /**
-     * [还款方式]
+     * 还款方式
      */
 	@TableField("repayment_type")
-	@ApiModelProperty(required= true,value = "[还款方式]")
+	@ApiModelProperty(required= true,value = "还款方式")
 	private String repaymentType;
     /**
-     * [借款金额]
+     * 借款金额
      */
 	@TableField("borrow_money")
-	@ApiModelProperty(required= true,value = "[借款金额]")
+	@ApiModelProperty(required= true,value = "借款金额")
 	private String borrowMoney;
     /**
-     * [剩余本金]
+     * 剩余本金
      */
-	@ApiModelProperty(required= true,value = "[剩余本金]")
+	@ApiModelProperty(required= true,value = "剩余本金")
 	private String oddcorpus;
     /**
      * installment_num_date
@@ -112,115 +113,115 @@ public class CarBusinessAfterDto extends Model<CarBusinessAfterDto> {
 	@ApiModelProperty(required= true,value = "installment_num")
 	private String installmentNum;
     /**
-     * [本期应还本金]
+     * 本期应还本金
      */
 	@TableField("current_Principa")
-	@ApiModelProperty(required= true,value = "[本期应还本金]")
+	@ApiModelProperty(required= true,value = "本期应还本金")
 	private BigDecimal currentPrincipa;
     /**
-     * [本期应还利息]
+     * 本期应还利息
      */
 	@TableField("current_accrual")
-	@ApiModelProperty(required= true,value = "[本期应还利息]")
+	@ApiModelProperty(required= true,value = "本期应还利息")
 	private String currentAccrual;
     /**
-     * [罚息应收]
+     * 罚息应收
      */
 	@TableField("punitive_rate_should")
-	@ApiModelProperty(required= true,value = "[罚息应收]")
+	@ApiModelProperty(required= true,value = "罚息应收")
 	private String punitiveRateShould;
     /**
-     * [罚息实收]
+     * 罚息实收
      */
 	@TableField("punitive_rate_fact")
-	@ApiModelProperty(required= true,value = "[罚息实收]")
+	@ApiModelProperty(required= true,value = "罚息实收")
 	private String punitiveRateFact;
     /**
-     * [逾期天数]
+     * 逾期天数
      */
-	@ApiModelProperty(required= true,value = "[逾期天数]")
+	@ApiModelProperty(required= true,value = "逾期天数")
 	private String overdueDays;
     /**
-     * [还款日期]
+     * 还款日期
      */
 	@TableField("borrow_date")
-	@ApiModelProperty(required= true,value = "[还款日期]")
+	@ApiModelProperty(required= true,value = "还款日期")
 	private Date borrowDate;
     /**
-     * [还款状态分类]：还款中，已还款，逾期
+     * 还款状态分类：还款中，已还款，逾期
      */
 	@TableField("car_business_after_type")
-	@ApiModelProperty(required= true,value = "[还款状态分类]：还款中，已还款，逾期")
+	@ApiModelProperty(required= true,value = "还款状态分类：还款中，已还款，逾期")
 	private String carBusinessAfterType;
     /**
-     * [展期业务编号]
+     * 展期业务编号
      */
 	@TableField("car_business_after_defer")
-	@ApiModelProperty(required= true,value = "[展期业务编号]")
+	@ApiModelProperty(required= true,value = "展期业务编号")
 	private String carBusinessAfterDefer;
     /**
-     * [是否展期]
+     * 是否展期
      */
 	@TableField("is_defer")
-	@ApiModelProperty(required= true,value = "[是否展期]")
+	@ApiModelProperty(required= true,value = "是否展期")
 	private Boolean isDefer;
     /**
-     * [当前展期期数]
+     * 当前展期期数
      */
 	@TableField("car_business_defer_id")
-	@ApiModelProperty(required= true,value = "[当前展期期数]")
+	@ApiModelProperty(required= true,value = "当前展期期数")
 	private String carBusinessDeferId;
     /**
-     * [其他费用]
+     * 其他费用
      */
 	@TableField("other_money")
-	@ApiModelProperty(required= true,value = "[其他费用]")
+	@ApiModelProperty(required= true,value = "其他费用")
 	private String otherMoney;
     /**
-     * [应收款调整实收款]
+     * 应收款调整实收款
      */
 	@TableField("fact_money")
-	@ApiModelProperty(required= true,value = "[应收款调整实收款]")
+	@ApiModelProperty(required= true,value = "应收款调整实收款")
 	private String factMoney;
     /**
-     * [应收款调整律师费]
+     * 应收款调整律师费
      */
 	@TableField("lawyer_money")
-	@ApiModelProperty(required= true,value = "[应收款调整律师费]")
+	@ApiModelProperty(required= true,value = "应收款调整律师费")
 	private String lawyerMoney;
     /**
-     * [新增时间]
+     * 新增时间
      */
-	@ApiModelProperty(required= true,value = "[新增时间]")
+	@ApiModelProperty(required= true,value = "新增时间")
 	private Date createdate;
     /**
-     * [更新时间]
+     * 更新时间
      */
-	@ApiModelProperty(required= true,value = "[更新时间]")
+	@ApiModelProperty(required= true,value = "更新时间")
 	private Date updateDate;
     /**
-     * [是否催款]
+     * 是否催款
      */
 	@TableField("is_collection")
-	@ApiModelProperty(required= true,value = "[是否催款]")
+	@ApiModelProperty(required= true,value = "是否催款")
 	private Boolean isCollection;
     /**
-     * [已还款类型]0:还款中1:财务确认已还款 2:自动匹配已还款 3:财务确认全部结清,4:财务代扣已还款,5:自动代扣已还款,6:标识展期已还款,7:当期部分已还款,8:用户APP主动还款,9:代扣全部结清
+     * 已还款类型0:还款中1:财务确认已还款 2:自动匹配已还款 3:财务确认全部结清,4:财务代扣已还款,5:自动代扣已还款,6:标识展期已还款,7:当期部分已还款,8:用户APP主动还款,9:代扣全部结清
      */
 	@TableField("repayed_flag")
-	@ApiModelProperty(required= true,value = "[已还款类型]0:还款中1:财务确认已还款 2:自动匹配已还款 3:财务确认全部结清,4:财务代扣已还款,5:自动代扣已还款,6:标识展期已还款,7:当期部分已还款,8:用户APP主动还款,9:代扣全部结清")
+	@ApiModelProperty(required= true,value = "已还款类型0:还款中1:财务确认已还款 2:自动匹配已还款 3:财务确认全部结清,4:财务代扣已还款,5:自动代扣已还款,6:标识展期已还款,7:当期部分已还款,8:用户APP主动还款,9:代扣全部结清")
 	private Integer repayedFlag;
     /**
-     * [还款状态]还款中,逾期,还款待确认,还款登记被财务拒绝,催款中,已拖车登记,已移交法务,已还款,坏账,退租申请,全部结清
+     * 还款状态还款中,逾期,还款待确认,还款登记被财务拒绝,催款中,已拖车登记,已移交法务,已还款,坏账,退租申请,全部结清
      */
 	@TableField("reserve_2")
-	@ApiModelProperty(required= true,value = "[还款状态]还款中,逾期,还款待确认,还款登记被财务拒绝,催款中,已拖车登记,已移交法务,已还款,坏账,退租申请,全部结清")
+	@ApiModelProperty(required= true,value = "还款状态还款中,逾期,还款待确认,还款登记被财务拒绝,催款中,已拖车登记,已移交法务,已还款,坏账,退租申请,全部结清")
 	private String reserve2;
     /**
-     * [还款登记拒绝原因]
+     * 还款登记拒绝原因
      */
 	@TableField("reserve_3")
-	@ApiModelProperty(required= true,value = "[还款登记拒绝原因]")
+	@ApiModelProperty(required= true,value = "还款登记拒绝原因")
 	private String reserve3;
     /**
      * reserve_4
@@ -229,26 +230,26 @@ public class CarBusinessAfterDto extends Model<CarBusinessAfterDto> {
 	@ApiModelProperty(required= true,value = "reserve_4")
 	private String reserve4;
     /**
-     * [应收实收差额 线上业务调团贷网还款接口将此差额加到本金中]
+     * 应收实收差额 线上业务调团贷网还款接口将此差额加到本金中
      */
 	@TableField("reserve_5")
-	@ApiModelProperty(required= true,value = "[应收实收差额 线上业务调团贷网还款接口将此差额加到本金中]")
+	@ApiModelProperty(required= true,value = "应收实收差额 线上业务调团贷网还款接口将此差额加到本金中")
 	private String reserve5;
     /**
-     * [修改人]
+     * 修改人
      */
-	@ApiModelProperty(required= true,value = "[修改人]")
+	@ApiModelProperty(required= true,value = "修改人")
 	private String ModifyUser;
     /**
-     * [流程子节点顺序]
+     * 流程子节点顺序
      */
-	@ApiModelProperty(required= true,value = "[流程子节点顺序]")
+	@ApiModelProperty(required= true,value = "流程子节点顺序")
 	private String workflowstatus;
     /**
-     * [流程子节点名称]
+     * 流程子节点名称
      */
 	@TableField("reserve_6")
-	@ApiModelProperty(required= true,value = "[流程子节点名称]")
+	@ApiModelProperty(required= true,value = "流程子节点名称")
 	private String reserve6;
     /**
      * reserve_7
@@ -263,10 +264,10 @@ public class CarBusinessAfterDto extends Model<CarBusinessAfterDto> {
 	@ApiModelProperty(required= true,value = "reserve_8")
 	private String reserve8;
     /**
-     * [贷后状态颜色]
+     * 贷后状态颜色
      */
 	@TableField("reserve_9")
-	@ApiModelProperty(required= true,value = "[贷后状态颜色]")
+	@ApiModelProperty(required= true,value = "贷后状态颜色")
 	private String reserve9;
     /**
      * reserve_10
@@ -280,9 +281,9 @@ public class CarBusinessAfterDto extends Model<CarBusinessAfterDto> {
 	@ApiModelProperty(required= true,value = "TrackRecord")
 	private String TrackRecord;
     /**
-     * [催款日期]
+     * 催款日期
      */
-	@ApiModelProperty(required= true,value = "[催款日期]")
+	@ApiModelProperty(required= true,value = "催款日期")
 	private Date collectionDate;
     /**
      * bad_debt_mark
@@ -291,10 +292,10 @@ public class CarBusinessAfterDto extends Model<CarBusinessAfterDto> {
 	@ApiModelProperty(required= true,value = "bad_debt_mark")
 	private String badDebtMark;
     /**
-     * [结清备注]
+     * 结清备注
      */
 	@TableField("settle_mark")
-	@ApiModelProperty(required= true,value = "[结清备注]")
+	@ApiModelProperty(required= true,value = "结清备注")
 	private String settleMark;
     /**
      * fact_replayMoney
@@ -303,171 +304,171 @@ public class CarBusinessAfterDto extends Model<CarBusinessAfterDto> {
 	@ApiModelProperty(required= true,value = "fact_replayMoney")
 	private String factReplayMoney;
     /**
-     * [实际还款日期]
+     * 实际还款日期
      */
 	@TableField("fatct_replayDate")
-	@ApiModelProperty(required= true,value = "[实际还款日期]")
+	@ApiModelProperty(required= true,value = "实际还款日期")
 	private Date fatctReplayDate;
     /**
-     * [实际归还本金]
+     * 实际归还本金
      */
 	@TableField("fact_principa")
-	@ApiModelProperty(required= true,value = "[实际归还本金]")
+	@ApiModelProperty(required= true,value = "实际归还本金")
 	private String factPrincipa;
     /**
-     * [实际归还利息]
+     * 实际归还利息
      */
 	@TableField("fact_accrual")
-	@ApiModelProperty(required= true,value = "[实际归还利息]")
+	@ApiModelProperty(required= true,value = "实际归还利息")
 	private String factAccrual;
     /**
-     * [实收滞纳金]
+     * 实收滞纳金
      */
 	@TableField("overdue_money")
-	@ApiModelProperty(required= true,value = "[实收滞纳金]")
+	@ApiModelProperty(required= true,value = "实收滞纳金")
 	private String overdueMoney;
     /**
-     * [本期应收滞纳金，每天零点由系统自动计算]
+     * 本期应收滞纳金，每天零点由系统自动计算
      */
 	@TableField("current_Breach")
-	@ApiModelProperty(required= true,value = "[本期应收滞纳金，每天零点由系统自动计算]")
+	@ApiModelProperty(required= true,value = "本期应收滞纳金，每天零点由系统自动计算")
 	private String currentBreach;
     /**
-     * [本期应还咨询服务费]
+     * 本期应还咨询服务费
      */
 	@TableField("repay_service")
-	@ApiModelProperty(required= true,value = "[本期应还咨询服务费]")
+	@ApiModelProperty(required= true,value = "本期应还咨询服务费")
 	private BigDecimal repayService;
     /**
-     * [实际还款服务费]
+     * 实际还款服务费
      */
 	@TableField("fact_service")
-	@ApiModelProperty(required= true,value = "[实际还款服务费]")
+	@ApiModelProperty(required= true,value = "实际还款服务费")
 	private BigDecimal factService;
     /**
-     * [备注]
+     * 备注
      */
-	@ApiModelProperty(required= true,value = "[备注]")
+	@ApiModelProperty(required= true,value = "备注")
 	private String remark;
     /**
-     * [支付方式]
+     * 支付方式
      */
 	@TableField("payment_type")
-	@ApiModelProperty(required= true,value = "[支付方式]")
+	@ApiModelProperty(required= true,value = "支付方式")
 	private String paymentType;
     /**
-     * [计划其他费用]
+     * 计划其他费用
      */
 	@TableField("current_other_money")
-	@ApiModelProperty(required= true,value = "[计划其他费用]")
+	@ApiModelProperty(required= true,value = "计划其他费用")
 	private BigDecimal currentOtherMoney;
     /**
-     * [财务还款金额确认(1:已确认,0:未确认)]
+     * 财务还款金额确认(1:已确认,0:未确认)
      */
 	@TableField("confirm_flag")
-	@ApiModelProperty(required= true,value = "[财务还款金额确认(1:已确认,0:未确认)]")
+	@ApiModelProperty(required= true,value = "财务还款金额确认(1:已确认,0:未确认)")
 	private Integer confirmFlag;
     /**
-     * [电话催收人]
+     * 电话催收人
      */
 	@TableField("collection_user")
-	@ApiModelProperty(required= true,value = "[电话催收人]")
+	@ApiModelProperty(required= true,value = "电话催收人")
 	private String collectionUser;
     /**
-     * [电催分配备注]
+     * 电催分配备注
      */
 	@TableField("collection_remark")
-	@ApiModelProperty(required= true,value = "[电催分配备注]")
+	@ApiModelProperty(required= true,value = "电催分配备注")
 	private String collectionRemark;
     /**
-     * [出款编号]
+     * 出款编号
      */
 	@TableField("out_id")
-	@ApiModelProperty(required= true,value = "[出款编号]")
+	@ApiModelProperty(required= true,value = "出款编号")
 	private Integer outId;
     /**
-     * [是否亏损结清 空或者0：不是亏损结清 1:是亏损结清]
+     * 是否亏损结清 空或者0：不是亏损结清 1:是亏损结清
      */
 	@TableField("is_loss_settle")
-	@ApiModelProperty(required= true,value = "[是否亏损结清 空或者0：不是亏损结清 1:是亏损结清]")
+	@ApiModelProperty(required= true,value = "是否亏损结清 空或者0：不是亏损结清 1:是亏损结清")
 	private Integer isLossSettle;
     /**
-     * [财务还款确认日期]
+     * 财务还款确认日期
      */
 	@TableField("finance_confirmed_date")
-	@ApiModelProperty(required= true,value = "[财务还款确认日期]")
+	@ApiModelProperty(required= true,value = "财务还款确认日期")
 	private Date financeConfirmedDate;
     /**
-     * [财务还款确认人ID]
+     * 财务还款确认人ID
      */
 	@TableField("finance_confirmed_user")
-	@ApiModelProperty(required= true,value = "[财务还款确认人ID]")
+	@ApiModelProperty(required= true,value = "财务还款确认人ID")
 	private String financeConfirmedUser;
     /**
-     * [财务确认自动代扣日期]
+     * 财务确认自动代扣日期
      */
 	@TableField("auto_withholding_confirmed_date")
-	@ApiModelProperty(required= true,value = "[财务确认自动代扣日期]")
+	@ApiModelProperty(required= true,value = "财务确认自动代扣日期")
 	private Date autoWithholdingConfirmedDate;
     /**
-     * [确认自动代扣的确认者ID]
+     * 确认自动代扣的确认者ID
      */
 	@TableField("auto_withholding_confirmed_user")
-	@ApiModelProperty(required= true,value = "[确认自动代扣的确认者ID]")
+	@ApiModelProperty(required= true,value = "确认自动代扣的确认者ID")
 	private String autoWithholdingConfirmedUser;
     /**
-     * [财务还款确认的时候选择的还款银行]
+     * 财务还款确认的时候选择的还款银行
      */
 	@TableField("finance_bank_id")
-	@ApiModelProperty(required= true,value = "[财务还款确认的时候选择的还款银行]")
+	@ApiModelProperty(required= true,value = "财务还款确认的时候选择的还款银行")
 	private Integer financeBankId;
     /**
-     * [会计确认状态，0或null:待审核;1:已审核;2:已退回;3:已返审核;4:导入;]
+     * 会计确认状态，0或null:待审核;1:已审核;2:已退回;3:已返审核;4:导入;
      */
 	@TableField("accountant_confirm_status")
-	@ApiModelProperty(required= true,value = "[会计确认状态，0或null:待审核;1:已审核;2:已退回;3:已返审核;4:导入;]")
+	@ApiModelProperty(required= true,value = "会计确认状态，0或null:待审核;1:已审核;2:已退回;3:已返审核;4:导入;")
 	private Integer accountantConfirmStatus;
     /**
-     * [会计确认人]
+     * 会计确认人
      */
 	@TableField("accountant_confirm_user")
-	@ApiModelProperty(required= true,value = "[会计确认人]")
+	@ApiModelProperty(required= true,value = "会计确认人")
 	private String accountantConfirmUser;
     /**
-     * [会计确认日期]
+     * 会计确认日期
      */
 	@TableField("accountant_confirm_date")
-	@ApiModelProperty(required= true,value = "[会计确认日期]")
+	@ApiModelProperty(required= true,value = "会计确认日期")
 	private Date accountantConfirmDate;
     /**
-     * [null或0：未执行垫付操作，1:本期平台垫付已结清，2：本期平台垫付未结清，3：本期不需要还垫付]
+     * null或0：未执行垫付操作，1:本期平台垫付已结清，2：本期平台垫付未结清，3：本期不需要还垫付
      */
 	@TableField("tuandai_advance_status")
-	@ApiModelProperty(required= true,value = "[null或0：未执行垫付操作，1:本期平台垫付已结清，2：本期平台垫付未结清，3：本期不需要还垫付]")
+	@ApiModelProperty(required= true,value = "null或0：未执行垫付操作，1:本期平台垫付已结清，2：本期平台垫付未结清，3：本期不需要还垫付")
 	private Integer tuandaiAdvanceStatus;
     /**
-     * [null或0：未执行分润操作，1:本期分润已还清，2：本期分润未结清，3：本期不需要还分润]
+     * null或0：未执行分润操作，1:本期分润已还清，2：本期分润未结清，3：本期不需要还分润
      */
 	@TableField("tuandai_profit_status")
-	@ApiModelProperty(required= true,value = "[null或0：未执行分润操作，1:本期分润已还清，2：本期分润未结清，3：本期不需要还分润]")
+	@ApiModelProperty(required= true,value = "null或0：未执行分润操作，1:本期分润已还清，2：本期分润未结清，3：本期不需要还分润")
 	private Integer tuandaiProfitStatus;
     /**
-     * [资金充值状态，null或0:资金未充值，1:所有标资金充值成功或自动充值成功，2：资金充值处理中，3：所有标资金充值失败，4：资金部分标充值成功]
+     * 资金充值状态，null或0:资金未充值，1:所有标资金充值成功或自动充值成功，2：资金充值处理中，3：所有标资金充值失败，4：资金部分标充值成功
      */
 	@TableField("tuandai_distribute_fund_status")
-	@ApiModelProperty(required= true,value = "[资金充值状态，null或0:资金未充值，1:所有标资金充值成功或自动充值成功，2：资金充值处理中，3：所有标资金充值失败，4：资金部分标充值成功]")
+	@ApiModelProperty(required= true,value = "资金充值状态，null或0:资金未充值，1:所有标资金充值成功或自动充值成功，2：资金充值处理中，3：所有标资金充值失败，4：资金部分标充值成功")
 	private Integer tuandaiDistributeFundStatus;
     /**
-     * [资金分发备注]
+     * 资金分发备注
      */
 	@TableField("tuandai_distribute_fund_remark")
-	@ApiModelProperty(required= true,value = "[资金分发备注]")
+	@ApiModelProperty(required= true,value = "资金分发备注")
 	private String tuandaiDistributeFundRemark;
     /**
-     * [平台还款状态：未还款，已代偿，已还款]
+     * 平台还款状态：未还款，已代偿，已还款
      */
 	@TableField("issue_after_type")
-	@ApiModelProperty(required= true,value = "[平台还款状态：未还款，已代偿，已还款]")
+	@ApiModelProperty(required= true,value = "平台还款状态：未还款，已代偿，已还款")
 	private String issueAfterType;
     /**
      * 还款计划guid
@@ -476,10 +477,10 @@ public class CarBusinessAfterDto extends Model<CarBusinessAfterDto> {
 	@ApiModelProperty(required= true,value = "还款计划guid")
 	private String businessAfterGuid;
     /**
-     * [贷后跟踪状态:电催、催收、诉讼 ]
+     * 贷后跟踪状态:电催、催收、诉讼 
      */
 	@TableField("tracking_after_type")
-	@ApiModelProperty(required= true,value = "[贷后跟踪状态:电催、催收、诉讼 ]")
+	@ApiModelProperty(required= true,value = "贷后跟踪状态:电催、催收、诉讼 ")
 	private String trackingAfterType;
     /**
      * 是否移交法务后被退回

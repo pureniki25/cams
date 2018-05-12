@@ -127,8 +127,8 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         List<RepaymentBizPlanDto>  retList = new LinkedList<>();
         planReturnInfoDto.setRepaymentBizPlanDtos(retList);
 
-        List<CarBusinessAfterDto>  carBizAfterList = new LinkedList<>();
-        planReturnInfoDto.setCarBusinessAfterDtoList(carBizAfterList);
+//        List<CarBusinessAfterDto>  carBizAfterList = new LinkedList<>();
+//        planReturnInfoDto.setCarBusinessAfterDtoList(carBizAfterList);
 
         //设置进位方式枚举和保留的小数位数
         smallNum = creatRepayPlanReq.getSmallNum();
@@ -287,15 +287,21 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         }
 
 
-
-        List<CarBusinessAfterDto> bizAfterDtos = new LinkedList<>();
+        //整理成信贷的还款计划格式
+        List<XdPlanDto> xdPlanDtos = new LinkedList<>();
+        planReturnInfoDto.setXdPlanDtos(xdPlanDtos);
         for(RepaymentBizPlanDto bizPlanDto:retList) {
             RepaymentBizPlan repaymentBizPlan = bizPlanDto.getRepaymentBizPlan();
             List<RepaymentBizPlanListDto> repaymentBizPlanListDtos = bizPlanDto.getBizPlanListDtos();
+            XdPlanDto xdPlanDto = new XdPlanDto();
+            xdPlanDtos.add(xdPlanDto);
+            List<CarBusinessAfterDto> bizAfterDtos = new LinkedList<>();
+            xdPlanDto.setBatchUUid(repaymentBizPlan.getRepaymentBatchId());
             for(RepaymentBizPlanListDto repaymentBizPlanListDto:repaymentBizPlanListDtos){
                 RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListDto.getRepaymentBizPlanList();
                 List<RepaymentBizPlanListDetail> repaymentBizPlanListDetails = repaymentBizPlanListDto.getBizPlanListDetails();
                 CarBusinessAfterDto bizAfterDto = new CarBusinessAfterDto();
+                bizAfterDtos.add(bizAfterDto);
                 bizAfterDto.setCarBusinessId(repaymentBizPlan.getBusinessId());//业务id
                 bizAfterDto.setCarBusinessAfterId(repaymentBizPlanList.getAfterId());//[当前还款期数]
                 BasicBusinessType basicBusinessType =basicBusinessTypeService.selectById(businessBasicInfo.getBusinessType());
@@ -304,15 +310,13 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     throw  new CreatRepaymentExcepiton("业务类型不存在  业务类型："+businessBasicInfo.getBusinessType());
                 }
                 bizAfterDto.setParatype(basicBusinessType.getBusinessTypeName());
-                bizAfterDto.setCustomerName(businessBasicInfo.getCustomerName());
+//                bizAfterDto.setCustomerName(businessBasicInfo.getCustomerName());
                 bizAfterDto.setOperatorName(businessBasicInfo.getOperatorName()); //业务主办人
                 bizAfterDto.setOperatorDept(businessBasicInfo.getCompanyId()); //业务主办人部门
-                bizAfterDto.setCreateTime(new Date()); //新建时间
+//                bizAfterDto.setCreateTime(new Date()); //新建时间
                 bizAfterDto.setRepaymentType(RepayPlanRepayIniCalcWayEnum.getByKey(businessBasicInfo.getRepaymentTypeId()).getName()); //还款方式
                 bizAfterDto.setBorrowMoney(repaymentBizPlan.getBorrowMoney().toPlainString());//借款金额
                 bizAfterDto.setOddcorpus(repaymentBizPlan.getBorrowMoney().toPlainString());//剩余本金
-//                bizAfterDto.setInstallmentNumDate(null);//不知道什么意思的字段 没有的
-//                bizAfterDto.setInstallmentNum(null);//不知道什么意思的字段 没有的
                 bizAfterDto.setCurrentPrincipa(repaymentBizPlanList.getTotalBorrowAmount());//本期应还本金
 
                 BigDecimal currentAccrual = null;
@@ -332,19 +336,34 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 bizAfterDto.setBorrowDate(repaymentBizPlanList.getDueDate());//还款日期
                 bizAfterDto.setCarBusinessAfterType("还款中");//[还款状态分类]：还款中，已还款，逾期
                 bizAfterDto.setOtherMoney(otherFee.toPlainString()); //其他费用
-                bizAfterDto.setCreatedate(new Date());
+//                bizAfterDto.setCreatedate(new Date());
                 bizAfterDto.setRepayedFlag(0);
                 bizAfterDto.setReserve2("还款中");
-                bizAfterDto.setConfirmFlag(0);
-//                outId
-//                carBusinessAfterDefer  //[展期业务编号]
-//                bizAfterDto.setCurrentAccrual
-//                RepayPlanRepayIniCalcWayEnum
+//                bizAfterDto.setConfirmFlag(0);
+//                bizAfterDto.setAccountantConfirmStatus(0);
+//                bizAfterDto.setTuandaiAdvanceStatus(0);
+//                bizAfterDto.setTuandaiProfitStatus(0);
+//                bizAfterDto.setTuandaiDistributeFundStatus(0); // 资金充值状态
+//                bizAfterDto.setIssueAfterType("未还款"); // 平台还款状态
+                bizAfterDto.setBusinessAfterGuid(repaymentBizPlan.getRepaymentBatchId()); // 还款计划guid
+                bizAfterDto.setInterestPaid(0); // 本息还款状态
 
-                //                bizAfterDto.setParatype(businessBasicInfo.getBusinessType());//[业务类型]
+                List<CarBusinessAfterDetailDto>  bizAfterDetailDtos = new LinkedList<>();
+                bizAfterDto.setCarBizDetailDtos(bizAfterDetailDtos);
+                for(RepaymentBizPlanListDetail bizPlanListDetail: repaymentBizPlanListDetails){
+                    CarBusinessAfterDetailDto afterDetailDto = new CarBusinessAfterDetailDto();
+                    bizAfterDetailDtos.add(afterDetailDto);
 
+                    afterDetailDto.setBusinessId(bizAfterDto.getCarBusinessId());//业务编号
+                    afterDetailDto.setBusinessAfterId(bizAfterDto.getCarBusinessAfterId());//期数
+                    afterDetailDto.setFeeId(bizPlanListDetail.getFeeId());//费用项ID
+                    afterDetailDto.setFeeName(bizPlanListDetail.getPlanItemName());//费用名称
+                    afterDetailDto.setAfterFeeType(RepayPlanFeeTypeEnum.getByKey(bizPlanListDetail.getPlanItemType()).getXd_value());//费用对应贷后主表的分类ID
+                    afterDetailDto.setPlanFeeValue(bizPlanListDetail.getPlanAmount());//本期应还金额
+                    afterDetailDto.setPlanRepaymentDate(bizPlanListDetail.getDueDate());//应还日期
+//                    afterDetailDto.setCreateTime(new Date());//创建日期
 
-//                bizAfterDt
+                }
             }
 
 
@@ -353,138 +372,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
 
 
-//            /**
-//             * [财务还款金额确认(1:已确认,0:未确认)]
-//             */
-//            @TableField("confirm_flag")
-//            @ApiModelProperty(required= true,value = "[财务还款金额确认(1:已确认,0:未确认)]")
-//            private Integer confirmFlag;
-//            /**
-//             * [电话催收人]
-//             */
-//            @TableField("collection_user")
-//            @ApiModelProperty(required= true,value = "[电话催收人]")
-//            private String collectionUser;
-//            /**
-//             * [电催分配备注]
-//             */
-//            @TableField("collection_remark")
-//            @ApiModelProperty(required= true,value = "[电催分配备注]")
-//            private String collectionRemark;
-//            /**
-//             * [出款编号]
-//             */
-//            @TableField("out_id")
-//            @ApiModelProperty(required= true,value = "[出款编号]")
-//            private Integer outId;
-//            /**
-//             * [是否亏损结清 空或者0：不是亏损结清 1:是亏损结清]
-//             */
-//            @TableField("is_loss_settle")
-//            @ApiModelProperty(required= true,value = "[是否亏损结清 空或者0：不是亏损结清 1:是亏损结清]")
-//            private Integer isLossSettle;
-//            /**
-//             * [财务还款确认日期]
-//             */
-//            @TableField("finance_confirmed_date")
-//            @ApiModelProperty(required= true,value = "[财务还款确认日期]")
-//            private Date financeConfirmedDate;
-//            /**
-//             * [财务还款确认人ID]
-//             */
-//            @TableField("finance_confirmed_user")
-//            @ApiModelProperty(required= true,value = "[财务还款确认人ID]")
-//            private String financeConfirmedUser;
-//            /**
-//             * [财务确认自动代扣日期]
-//             */
-//            @TableField("auto_withholding_confirmed_date")
-//            @ApiModelProperty(required= true,value = "[财务确认自动代扣日期]")
-//            private Date autoWithholdingConfirmedDate;
-//            /**
-//             * [确认自动代扣的确认者ID]
-//             */
-//            @TableField("auto_withholding_confirmed_user")
-//            @ApiModelProperty(required= true,value = "[确认自动代扣的确认者ID]")
-//            private String autoWithholdingConfirmedUser;
-//            /**
-//             * [财务还款确认的时候选择的还款银行]
-//             */
-//            @TableField("finance_bank_id")
-//            @ApiModelProperty(required= true,value = "[财务还款确认的时候选择的还款银行]")
-//            private Integer financeBankId;
-//            /**
-//             * [会计确认状态，0或null:待审核;1:已审核;2:已退回;3:已返审核;4:导入;]
-//             */
-//            @TableField("accountant_confirm_status")
-//            @ApiModelProperty(required= true,value = "[会计确认状态，0或null:待审核;1:已审核;2:已退回;3:已返审核;4:导入;]")
-//            private Integer accountantConfirmStatus;
-//            /**
-//             * [会计确认人]
-//             */
-//            @TableField("accountant_confirm_user")
-//            @ApiModelProperty(required= true,value = "[会计确认人]")
-//            private String accountantConfirmUser;
-//            /**
-//             * [会计确认日期]
-//             */
-//            @TableField("accountant_confirm_date")
-//            @ApiModelProperty(required= true,value = "[会计确认日期]")
-//            private Date accountantConfirmDate;
-//            /**
-//             * [null或0：未执行垫付操作，1:本期平台垫付已结清，2：本期平台垫付未结清，3：本期不需要还垫付]
-//             */
-//            @TableField("tuandai_advance_status")
-//            @ApiModelProperty(required= true,value = "[null或0：未执行垫付操作，1:本期平台垫付已结清，2：本期平台垫付未结清，3：本期不需要还垫付]")
-//            private Integer tuandaiAdvanceStatus;
-//            /**
-//             * [null或0：未执行分润操作，1:本期分润已还清，2：本期分润未结清，3：本期不需要还分润]
-//             */
-//            @TableField("tuandai_profit_status")
-//            @ApiModelProperty(required= true,value = "[null或0：未执行分润操作，1:本期分润已还清，2：本期分润未结清，3：本期不需要还分润]")
-//            private Integer tuandaiProfitStatus;
-//            /**
-//             * [资金充值状态，null或0:资金未充值，1:所有标资金充值成功或自动充值成功，2：资金充值处理中，3：所有标资金充值失败，4：资金部分标充值成功]
-//             */
-//            @TableField("tuandai_distribute_fund_status")
-//            @ApiModelProperty(required= true,value = "[资金充值状态，null或0:资金未充值，1:所有标资金充值成功或自动充值成功，2：资金充值处理中，3：所有标资金充值失败，4：资金部分标充值成功]")
-//            private Integer tuandaiDistributeFundStatus;
-//            /**
-//             * [资金分发备注]
-//             */
-//            @TableField("tuandai_distribute_fund_remark")
-//            @ApiModelProperty(required= true,value = "[资金分发备注]")
-//            private String tuandaiDistributeFundRemark;
-//            /**
-//             * [平台还款状态：未还款，已代偿，已还款]
-//             */
-//            @TableField("issue_after_type")
-//            @ApiModelProperty(required= true,value = "[平台还款状态：未还款，已代偿，已还款]")
-//            private String issueAfterType;
-//            /**
-//             * 还款计划guid
-//             */
-//            @TableField("business_after_guid")
-//            @ApiModelProperty(required= true,value = "还款计划guid")
-//            private String businessAfterGuid;
-//            /**
-//             * [贷后跟踪状态:电催、催收、诉讼 ]
-//             */
-//            @TableField("tracking_after_type")
-//            @ApiModelProperty(required= true,value = "[贷后跟踪状态:电催、催收、诉讼 ]")
-//            private String trackingAfterType;
-//            /**
-//             * 是否移交法务后被退回
-//             */
-//            @TableField("legal_return_status")
-//            @ApiModelProperty(required= true,value = "是否移交法务后被退回")
-//            private Integer legalReturnStatus;
-//            /**
-//             * 本息还款状态 0:未还款 1:本息已还款 2:本期已结清
-//             */
-//            @TableField("interest_paid")
-//            @ApiModelProperty(required= true,value = "本息还款状态 0:未还款 1:本息已还款 2:本期已结清")
-//            private Integer interestPaid;
+
 
         }
 
@@ -531,7 +419,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
         //业务用户信息校验
         List<BusinessCustomerInfoReq> bizCusInfoReqs = creatRepayPlanReq.getBizCusInfoReqs();
-        if(bizCusInfoReqs.size()==0){
+        if(bizCusInfoReqs == null ||bizCusInfoReqs.size()==0){
             throw  new CreatRepaymentExcepiton("请填写业务用户信息");
         }
         for(BusinessCustomerInfoReq bizCusInfoReq:bizCusInfoReqs){

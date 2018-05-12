@@ -53,7 +53,7 @@ public class BusinessCustomerInfoReq {
     /**
      *  客户是否大陆居民，0或null：否，1：是 
      */
-    @ApiModelProperty(required= true,value = " 客户是否大陆居民，0或null：否，1：是 ")
+    @ApiModelProperty(value = " 客户是否大陆居民，0或null：否，1：是 ")
     private Integer ismainlandResident;
     /**
      *  是否提供对公账号,null或0为否，1为是 客户为企业需要填写 
@@ -68,12 +68,12 @@ public class BusinessCustomerInfoReq {
     /**
      *  统一社会信用代码 客户为企业并且为三证合一时必须填写并作为tb_business表，绑卡表的外键 
      */
-    @ApiModelProperty(value = " 统一社会信用代码 客户为企业并且为三证合一时必须填写并作为tb_business表，绑卡表的外键 ")
+    @ApiModelProperty(value = " 统一社会信用代码 客户为企业并且为三证合一时必须填写 ")
     private String unifiedCode;
     /**
      *  营业执照号 客户为企业时并且非三证合一时必须填写，并作为tb_business，绑卡表的外键 
      */
-    @ApiModelProperty(value = " 营业执照号 客户为企业时并且非三证合一时必须填写，并作为tb_business，绑卡表的外键 ")
+    @ApiModelProperty(value = " 营业执照号 客户为企业时并且非三证合一时必须填写")
     private String businessLicence;
     /**
      *  企业注册地址所在省份 客户为企业时需要填写 

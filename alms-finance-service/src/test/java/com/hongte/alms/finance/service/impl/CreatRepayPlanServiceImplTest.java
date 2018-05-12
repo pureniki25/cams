@@ -7,6 +7,7 @@ import com.hongte.alms.base.enums.UserTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.*;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.finance.FinanceServiceApplication;
+import com.hongte.alms.finance.dto.repayPlan.PlanReturnInfoDto;
 import com.hongte.alms.finance.dto.repayPlan.RepaymentBizPlanDto;
 import com.hongte.alms.finance.req.repayPlan.*;
 import com.hongte.alms.finance.service.CreatRepayPlanService;
@@ -83,8 +84,8 @@ public class CreatRepayPlanServiceImplTest {
         ProjFeeReq feeReq22 = creatProjFeeReq(req2);
         feeList2.add(feeReq22);
 
-
-        List<RepaymentBizPlanDto>  planDtos = creatRepayPlanService.creatRepayPlan(creatRepayPlanReq);
+        PlanReturnInfoDto planReturnInfoDto =creatRepayPlanService.creatRepayPlan(creatRepayPlanReq);
+        List<RepaymentBizPlanDto>  planDtos =planReturnInfoDto.getRepaymentBizPlanDtos();
         LOGGER.error(JSON.toJSONString(planDtos));
 
         System.out.println(planDtos);
@@ -101,7 +102,9 @@ public class CreatRepayPlanServiceImplTest {
 
         List<RepaymentBizPlanDto>  planDtos = null;
         try {
-            planDtos = creatRepayPlanService.creatRepayPlan(creatRepayPlanReq);
+            PlanReturnInfoDto planReturnInfoDto= creatRepayPlanService.creatRepayPlan(creatRepayPlanReq);
+            planDtos = planReturnInfoDto.getRepaymentBizPlanDtos();
+
         } catch (InstantiationException e) {
             assertNotNull(e);
             e.printStackTrace();
@@ -124,7 +127,9 @@ public class CreatRepayPlanServiceImplTest {
         CreatRepayPlanReq creatRepayPlanReq =creatNoFeeCreatReq();
 
         try {
-            List<RepaymentBizPlanDto> dto = creatRepayPlanService.creatAndSaveRepayPlan(creatRepayPlanReq);
+            PlanReturnInfoDto planReturnInfoDto= creatRepayPlanService.creatAndSaveRepayPlan(creatRepayPlanReq);
+            LOGGER.error(JSON.toJSONString(planReturnInfoDto));
+            List<RepaymentBizPlanDto> dto =planReturnInfoDto.getRepaymentBizPlanDtos();
             RepaymentBizPlanDto bizPlanDto = dto.get(0);
             RepaymentBizPlan repaymentBizPlan = bizPlanDto.getRepaymentBizPlan();
 
@@ -193,13 +198,59 @@ public class CreatRepayPlanServiceImplTest {
         BusinessBasicInfoReq  businessBasicInfoReq =creatBusinessBasicInfoReq();
         creatRepayPlanReq.setBusinessBasicInfoReq(businessBasicInfoReq);
 
-        businessBasicInfoReq.setBusinessId("TDF1012018031505");
-        businessBasicInfoReq.setOrgBusinessId("TDF1012018031505");
+        businessBasicInfoReq.setBusinessId("TDF1012018031505-5-20");
+        businessBasicInfoReq.setOrgBusinessId("TDF1012018031505-5-20");
         businessBasicInfoReq.setInputTime(DateUtil.getDateTime("2018/3/15"));
         businessBasicInfoReq.setRepaymentTypeId(9);  //1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息
         businessBasicInfoReq.setBorrowMoney(new BigDecimal(50000));  //借款总额
         businessBasicInfoReq.setBorrowLimit(6);  //借款期限
         businessBasicInfoReq.setBorrowRateUnit(1);  //借款期限
+
+
+        List<BusinessCustomerInfoReq> businessCustomerInfoReqs = new LinkedList<>();
+        creatRepayPlanReq.setBizCusInfoReqs(businessCustomerInfoReqs);
+
+        BusinessCustomerInfoReq businessCustomerInfoReq1 = new BusinessCustomerInfoReq();
+        businessCustomerInfoReqs.add(businessCustomerInfoReq1);
+
+        businessCustomerInfoReq1.setCustomerId("TDF1012018031505-5-20-custom");  //客户ID，资产端主键
+        businessCustomerInfoReq1.setIsmainCustomer(0); //是否主借款人，0：否，1：是
+        businessCustomerInfoReq1.setCustomerName("测试-个人"); //客户名称，个人则填个人名称，企业则填企业名称
+        businessCustomerInfoReq1.setIsReceiptAccount(0); //是否收款账户，0：否，1：是
+        businessCustomerInfoReq1.setCustomerType("个人"); //客户类型：个人，企业
+        businessCustomerInfoReq1.setIdentifyCard("442374790-42122355676"); //客户身份证唯一标识，当客户为个人时，此字段存身份证，当客户类型为企业时，三证合一时，存统一社会信用代码，非三证合一时存营业执照号
+        businessCustomerInfoReq1.setPhoneNumber("183203498543821"); //客户接收短信的手机号码，当客户类型为企业时，此字段保存联系人手机号码
+//        businessCustomerInfoReq1.setIsmainlandResident(1); //客户是否大陆居民，0或null：否，1：是
+//        businessCustomerInfoReq1.setIsCompanyBankAccount(0); //是否提供对公账号,null或0为否，1为是 客户为企业需要填写
+//        businessCustomerInfoReq1.setIsMergedCertificate(0); //是否三证合一,null或0为否，1为是 客户为企业需要填写，三证合一是指用【统一社会信用代码】代替以上三证。如果是三证合一，那么只需填写【统一社会信用代码】（必填），如果非三证合一，那么需填写【开户许可证】（必填）、【组织机构代码】、【营业执照编号】（必填）
+//        businessCustomerInfoReq1.setUnifiedCode(""); //统一社会信用代码 客户为企业并且为三证合一时必须填写并作为tb_business表，绑卡表的外键
+//        businessCustomerInfoReq1.setBusinessLicence("1111111"); //营业执照号 客户为企业时并且非三证合一时必须填写，并作为tb_business，绑卡表的外键
+//        businessCustomerInfoReq1.setRegisterProvince("1111111"); //企业注册地址所在省份 客户为企业时需要填写
+//        businessCustomerInfoReq1.setCompanyLegalPerson("1111111"); //企业法人 客户为企业时需要填写
+//        businessCustomerInfoReq1.setLegalPersonIdentityCard("1111111"); //企业法人身份证 客户为企业且提供对公账号时需要填写
+//        businessCustomerInfoReq1.setLegalPersonIsmainCustomer(true); //企业法人身份证 客户为企业且提供对公账号时需要填写
+
+
+        BusinessCustomerInfoReq businessCustomerInfoReq2 = new BusinessCustomerInfoReq();
+        businessCustomerInfoReqs.add(businessCustomerInfoReq1);
+        businessCustomerInfoReq2.setCustomerId("TDF1012018031505-5-20-custom");  //客户ID，资产端主键
+        businessCustomerInfoReq2.setIsmainCustomer(1); //是否主借款人，0：否，1：是
+        businessCustomerInfoReq2.setCustomerName("测试-企业"); //客户名称，个人则填个人名称，企业则填企业名称
+        businessCustomerInfoReq2.setIsReceiptAccount(1); //是否收款账户，0：否，1：是
+        businessCustomerInfoReq2.setCustomerType("企业"); //客户类型：个人，企业
+        businessCustomerInfoReq2.setIdentifyCard("442374790-42122355676-213"); //客户身份证唯一标识，当客户为个人时，此字段存身份证，当客户类型为企业时，三证合一时，存统一社会信用代码，非三证合一时存营业执照号
+        businessCustomerInfoReq2.setPhoneNumber("183203498543821"); //客户接收短信的手机号码，当客户类型为企业时，此字段保存联系人手机号码
+        businessCustomerInfoReq2.setIsmainlandResident(1); //客户是否大陆居民，0或null：否，1：是
+        businessCustomerInfoReq2.setIsCompanyBankAccount(1); //是否提供对公账号,null或0为否，1为是 客户为企业需要填写
+        businessCustomerInfoReq2.setIsMergedCertificate(0); //是否三证合一,null或0为否，1为是 客户为企业需要填写，三证合一是指用【统一社会信用代码】代替以上三证。如果是三证合一，那么只需填写【统一社会信用代码】（必填），如果非三证合一，那么需填写【开户许可证】（必填）、【组织机构代码】、【营业执照编号】（必填）
+        businessCustomerInfoReq2.setUnifiedCode(""); //统一社会信用代码 客户为企业并且为三证合一时必须填写并作为tb_business表，绑卡表的外键
+        businessCustomerInfoReq2.setBusinessLicence("1111111"); //营业执照号 客户为企业时并且非三证合一时必须填写，并作为tb_business，绑卡表的外键
+        businessCustomerInfoReq2.setRegisterProvince("1111111"); //企业注册地址所在省份 客户为企业时需要填写
+        businessCustomerInfoReq2.setCompanyLegalPerson("1111111"); //企业法人 客户为企业时需要填写
+        businessCustomerInfoReq2.setLegalPersonIdentityCard("1111111"); //企业法人身份证 客户为企业且提供对公账号时需要填写
+        businessCustomerInfoReq2.setLegalPersonIsmainCustomer(true); //企业法人身份证 客户为企业且提供对公账号时需要填写
+
+
 
 
 
@@ -251,7 +302,7 @@ public class CreatRepayPlanServiceImplTest {
 //        principleMap1.put(5,new BigDecimal(4200));
 //        principleMap1.put(6,new BigDecimal(9000));
 
-        req1.setProjectId("137e8a4a-0727-4551-b20a-48b0d6679cfa");
+        req1.setProjectId("137e8a4a-0727-4551-b20a-48b0d6679cfa-5-20");
         req1.setStatusFlag("4");
         req1.setBeginTime(DateUtil.getDateTime("2018/3/15")); // 启标时间(用于生成还款计划)
         req1.setFullBorrowMoney(new BigDecimal(30000)); // 满标金额
@@ -386,7 +437,7 @@ public class CreatRepayPlanServiceImplTest {
 
 
 
-        req2.setProjectId("670d149e-6b63-4810-b437-f993b0bc9af9");
+        req2.setProjectId("670d149e-6b63-4810-b437-f993b0bc9af9-5-20");
         req2.setStatusFlag("4");
         req2.setBeginTime(DateUtil.getDateTime("2018/3/15")); // 启标时间(用于生成还款计划)
         req2.setFullBorrowMoney(new BigDecimal(20000)); // 满标金额
