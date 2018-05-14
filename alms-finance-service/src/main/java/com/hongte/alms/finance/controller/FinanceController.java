@@ -339,4 +339,17 @@ public class FinanceController {
 		return result ;
 	}
 	
+	@GetMapping(value="/thisPeroidRepayment")
+	@ApiOperation(value="本期还款信息(包括标的信息)")
+	public Result thisPeroidRepayment(String businessId,String afterId) {
+		Result result ;
+		logger.info("@thisPeroidRepayment@本期还款信息(包括标的信息)--开始[{}{}]",businessId,afterId);
+		List<RepaymentBizPlanList> rpls = repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId));
+		if (rpls==null||rpls.size()==0) {
+			result = Result.error("500", "找不到对应的还款计划");
+			logger.info("@thisPeroidRepayment@本期还款信息(包括标的信息)--开始[{}]",result);
+			return result ;
+		}
+		return null ;
+	}
 }
