@@ -124,7 +124,7 @@
             </row>
         </Modal>
 
-        <Modal v-model="paramListModal.show" title="参数列表">
+        <Modal v-model="paramListModal.show" title="参数列表" :width="80">
             <row>
                 <i-col span='4'>
                     <button class="layui-btn" @click="openEditParamModal(false)">新增</button>
@@ -233,7 +233,14 @@
         </Modal>
 
         <Modal v-model="batchAddParmModal.show" title="批量增加">
-            <i-input type="textarea" :value.sync="batchAddParmModal.param" v-model="batchAddParmModal.param"></i-input>
+        	<p style="color:red">
+        		<span>例如:要批量添加一批参数a-c,其参数值分别为av,bv,bv1,bv2,bv3,cv,cv1,cv2,cv3,cv4</span>
+        		<p>a:av(换行)</p>
+        		<p>b:bv:bv1:bv2:bv3(换行)</p>
+        		<p>c:cv:cv1:cv2:cv3:cv4(换行)</p>
+        		<span style="color:red">注意:可以多个参数,但每个参数最多5个参数值</span>
+        	</p>
+            <i-input type="textarea" :value.sync="batchAddParmModal.param" v-model="batchAddParmModal.param" placeholder="参数:参数值:参数值2:参数值3:参数值4:参数值5"></i-input>
             <row slot="footer">
                     <div class="layui-btn-group">
                             <button class="layui-btn" @click="batchSaveParam">保存</button>

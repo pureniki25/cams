@@ -35,7 +35,7 @@ public class ExecutorConfig {
 //        return executor;
 //    }
 
-    @Bean
+    @Bean("coreExecutor")
     public Executor myAsync() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(corePoolSize);

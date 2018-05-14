@@ -34,6 +34,7 @@ public class ExpenseSettleRepaymentPlanVO  {
 	private List<RepaymentBizPlanListDetail> allDetails ;
 	private List<ExpenseSettleRepaymentPlanListVO> pastPeriodVOs ;
 	private ExpenseSettleRepaymentPlanListVO finalPeriod ;
+	private ExpenseSettleRepaymentPlanListVO currentPeriod;
 	
 	
 	class PlanListSortor implements Comparator<RepaymentBizPlanList> {
@@ -100,8 +101,8 @@ public class ExpenseSettleRepaymentPlanVO  {
 		if (currentPeriodVOs!=null&&currentPeriodVOs.size()>0) {
 			return currentPeriodVOs ;
 		}
-		ExpenseSettleRepaymentPlanListVO currentPeriod = null ;
 		ExpenseSettleRepaymentPlanListVO finalPeriod = findFinalPeriod();
+		this.finalPeriod=finalPeriod;
 		//diff>0;应还日期大于结清日期
 		//diff=0;应还日期等于结清日期
 		//diff<0;应还日期小于结清日期;
@@ -316,4 +317,22 @@ public class ExpenseSettleRepaymentPlanVO  {
 	public void setRepaymentPlanListVOs(List<ExpenseSettleRepaymentPlanListVO> repaymentPlanListVOs) {
 		this.repaymentPlanListVOs = repaymentPlanListVOs;
 	}
+
+	public ExpenseSettleRepaymentPlanListVO getFinalPeriod() {
+		return finalPeriod;
+	}
+
+	public void setFinalPeriod(ExpenseSettleRepaymentPlanListVO finalPeriod) {
+		this.finalPeriod = finalPeriod;
+	}
+
+	public ExpenseSettleRepaymentPlanListVO getCurrentPeriod() {
+		return currentPeriod;
+	}
+
+	public void setCurrentPeriod(ExpenseSettleRepaymentPlanListVO currentPeriod) {
+		this.currentPeriod = currentPeriod;
+	}
+	
+	
 }

@@ -566,7 +566,7 @@ public class CarServiceImpl  implements CarService {
 			vo.setType(SmsTypeEnum.NOTICE.getValue());
 			//记录短信日志
 			InfoSms sms=new InfoSms();
-			sms.setLogId(UUID.randomUUID().toString());
+//			sms.setLogId(UUID.randomUUID().toString());
 			sms.setOriginalBusinessId(carAuction.getBusinessId());
 			sms.setPhoneNumber(telephone);
 			sms.setRecipient(userName);
@@ -579,7 +579,7 @@ public class CarServiceImpl  implements CarService {
 			try {
 				if(MsgTemplateEnableEnum.ENABLE.getValue().equals(msgTemplate.getEnableFlag())) {//发送开关
 					Result eipResult=eipRemote.sendSms(vo);
-					logger.debug("EIP返回信息,code="+eipResult.getReturnCode()+",msg="+eipResult.getMsg());
+					logger.info("EIP返回信息,code="+eipResult.getReturnCode()+",msg="+eipResult.getMsg());
 					if(eipResult==null||!"0000".equals(eipResult.getReturnCode())) {
 						logger.error("调用EIP系统发送短信失败,eipResult="+eipResult==null?null:"调用EIP系统发送短信返回码："+eipResult.getReturnCode());
 						throw new AlmsBaseExcepiton( "调用EIP系统发送短信失败"); 

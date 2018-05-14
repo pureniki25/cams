@@ -44,16 +44,14 @@ import java.util.*;
 public class MysqlGenerator {
     public static void main(String[] args) {
 
-//        String dburl = "jdbc:mysql://172.16.200.111:3306/hongte_alms?characterEncoding=utf8";
-        String dburl = "jdbc:mysql://172.16.200.105:3306/tuandai_bm?characterEncoding=utf8";
+        String dburl = "jdbc:mysql://172.16.200.111:3306/hongte_alms?characterEncoding=utf8";
 //        String tableName="tb_basic_company";//本次需要生成的表名
 //        String tableName="tb_collection_status";//本次需要生成的表名
-//        String tableName="tb_baisc_biz_ext_rate";//本次需要生成的表名
-        String tableName="tb_car_business_after_detail";//本次需要生成的表名
+        String tableName="tb_money_pool_repayment";//本次需要生成的表名
         //1 设定生成配置
         GeneratorConfig inputConfig = new GeneratorConfig(
 //                "黄咏康",
-                "曾坤",
+                "王继光",
                 //{自定义}包模块名
                 "com.hongte.alms.",
                 //父类包路径(指SuperMapper，BaseService的包路径)
@@ -67,8 +65,7 @@ public class MysqlGenerator {
                 //表前缀，不需修改
                 "tb_");
         //2 设定数据源账号密码
-//        DataSourceConfig dataSourceConfig = GeneratorUtil.setDataSorceConfig("hongte_alms","EfjsfHM5",dburl);
-        DataSourceConfig dataSourceConfig = GeneratorUtil.setDataSorceConfig("root","tuandai888",dburl);
+        DataSourceConfig dataSourceConfig = GeneratorUtil.setDataSorceConfig("hongte_alms","EfjsfHM5",dburl);
         //3 设定需要生成的表名
         GeneratorUtil.execute(inputConfig,dataSourceConfig,tableName);
         //4 为了避免覆盖代码，输出目录设置为{path}/alms-genertor/src/main/java ，自行复制到微服务项目后手工删除

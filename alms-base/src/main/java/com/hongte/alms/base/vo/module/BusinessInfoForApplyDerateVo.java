@@ -54,9 +54,20 @@ public class BusinessInfoForApplyDerateVo  {
     private BigDecimal noSettleNeedPayInterest;//不结清时该业应付利息;  
     private BigDecimal noSettleNeedPayService;//不结清时该业应付月收服务费; 
     private BigDecimal noSettleNeedPayPrincipal;//不结清时应付本金;
+    private Integer noSettleDelayDays;//不结清时的逾期天数
     
     
-    public BigDecimal getNoSettleNeedPayInterest() {
+    public Integer getNoSettleDelayDays() {
+		return noSettleDelayDays;
+	}
+
+
+	public void setNoSettleDelayDays(Integer noSettleDelayDays) {
+		this.noSettleDelayDays = noSettleDelayDays;
+	}
+
+
+	public BigDecimal getNoSettleNeedPayInterest() {
 		return noSettleNeedPayInterest;
 	}
 

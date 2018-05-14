@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>
@@ -23,105 +24,134 @@ import java.util.Date;
 @TableName("tb_collection_track_log")
 public class CollectionTrackLog extends Model<CollectionTrackLog> {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * 跟踪记录日志主键
-     */
-	@TableId(value="track_log_id", type= IdType.AUTO)
-	@ApiModelProperty(required= true,value = "跟踪记录日志主键")
+	/**
+	 * 跟踪记录日志主键
+	 */
+	@TableId(value = "track_log_id", type = IdType.AUTO)
+	@ApiModelProperty(required = true, value = "跟踪记录日志主键")
 	private Integer trackLogId;
-    /**
-     * 还款计划编号，对应tb_repayment_biz_plan的主键
-     */
+	/**
+	 * 还款计划编号，对应tb_repayment_biz_plan的主键
+	 */
 	@TableField("rbp_id")
-	@ApiModelProperty(required= true,value = "还款计划编号，对应tb_repayment_biz_plan的主键")
+	@ApiModelProperty(required = true, value = "还款计划编号，对应tb_repayment_biz_plan的主键")
 	private String rbpId;
-    /**
-     * 记录者UserId
-     */
+	/**
+	 * 记录者UserId
+	 */
 	@TableField("recorder_user")
-	@ApiModelProperty(required= true,value = "记录者UserId")
+	@ApiModelProperty(required = true, value = "记录者UserId")
 	private String recorderUser;
-    /**
-     * 记录日期
-     */
+	/**
+	 * 记录日期
+	 */
 	@TableField("record_date")
-	@ApiModelProperty(required= true,value = "记录日期")
+	@ApiModelProperty(required = true, value = "记录日期")
 	private Date recordDate;
-    /**
-     * 状态ID，对应tb_sys_parameter的ID
-     */
+	/**
+	 * 状态ID，对应tb_sys_parameter的ID
+	 */
 	@TableField("track_status_id")
-	@ApiModelProperty(required= true,value = "状态ID，对应tb_sys_parameter的ID")
+	@ApiModelProperty(required = true, value = "状态ID，对应tb_sys_parameter的ID")
 	private String trackStatusId;
-    /**
-     * 状态名称，缓存当时保存的状态
-     */
+	/**
+	 * 状态名称，缓存当时保存的状态
+	 */
 	@TableField("track_status_name")
-	@ApiModelProperty(required= true,value = "状态名称，缓存当时保存的状态")
+	@ApiModelProperty(required = true, value = "状态名称，缓存当时保存的状态")
 	private String trackStatusName;
-    /**
-     * 是否传输平台，0：否，1：是
-     */
+	/**
+	 * 是否传输平台，0：否，1：是
+	 */
 	@TableField("is_send")
-	@ApiModelProperty(required= true,value = "是否传输平台，0：否，1：是")
+	@ApiModelProperty(required = true, value = "是否传输平台，0：否，1：是")
 	private Integer isSend;
-    /**
-     * 传输平台状态，若非传输平台此字段为null，0：传送失败，1：传送成功
-     */
+	/**
+	 * 传输平台状态，若非传输平台此字段为null，0：传送失败，1：传送成功
+	 */
 	@TableField("send_status")
-	@ApiModelProperty(required= true,value = "传输平台状态，若非传输平台此字段为null，0：传送失败，1：传送成功")
+	@ApiModelProperty(required = true, value = "传输平台状态，若非传输平台此字段为null，0：传送失败，1：传送成功")
 	private Integer sendStatus;
-    /**
-     * 记录内容
-     */
-	@ApiModelProperty(required= true,value = "记录内容")
+	/**
+	 * 记录内容
+	 */
+	@ApiModelProperty(required = true, value = "记录内容")
 	private String content;
-    /**
-     * 创建日期
-     */
+	/**
+	 * 创建日期
+	 */
 	@TableField("create_time")
-	@ApiModelProperty(required= true,value = "创建日期")
+	@ApiModelProperty(required = true, value = "创建日期")
 	private Date createTime;
-    /**
-     * 创建人用户ID
-     */
+	/**
+	 * 创建人用户ID
+	 */
 	@TableField("create_user")
-	@ApiModelProperty(required= true,value = "创建人用户ID")
+	@ApiModelProperty(required = true, value = "创建人用户ID")
 	private String createUser;
-    /**
-     * 更新日期
-     */
+	/**
+	 * 更新日期
+	 */
 	@TableField("update_time")
-	@ApiModelProperty(required= true,value = "更新日期")
+	@ApiModelProperty(required = true, value = "更新日期")
 	private Date updateTime;
-    /**
-     * 更新人用户ID
-     */
+	/**
+	 * 更新人用户ID
+	 */
 	@TableField("update_user")
-	@ApiModelProperty(required= true,value = "更新人用户ID")
+	@ApiModelProperty(required = true, value = "更新人用户ID")
 	private String updateUser;
 	/**
 	 * 成功的标的id
 	 */
 	@TableField("success_project_id")
-	@ApiModelProperty(required= true,value = "成功的标的id")
+	@ApiModelProperty(required = true, value = "成功的标的id")
 	private String successProjectId;
 	/**
 	 * 失败的标的id
 	 */
 	@TableField("fail_project_id")
-	@ApiModelProperty(required= true,value = "失败的标的id")
+	@ApiModelProperty(required = true, value = "失败的标的id")
 	private String failProjectId;
 
 	/**
 	 * 是否重发
 	 */
 	@TableField("is_resend")
-	@ApiModelProperty(required= true,value = "是否重发（推平台）")
+	@ApiModelProperty(required = true, value = "是否重发（推平台）")
 	private String isResend;
 
+	/**
+	 * 唯一标识ID
+	 */
+	@TableField("unique_id")
+	@ApiModelProperty(required = true, value = "唯一标识ID")
+	private String uniqueId;
+
+	/**
+	 * 借款人情况描述
+	 */
+	@TableField(exist = false)
+	private List<String> borrowerConditionDescList;
+
+	/**
+	 * 抵押物情况描述
+	 */
+	@TableField(exist = false)
+	private List<String> guaranteeConditionDescList;
+
+	/**
+	 * 五级分类名称
+	 */
+	@TableField(exist = false)
+	private String className;
+
+	@Override
+	protected Serializable pkVal() {
+		return this.trackLogId;
+	}
 
 	public Integer getTrackLogId() {
 		return trackLogId;
@@ -251,30 +281,48 @@ public class CollectionTrackLog extends Model<CollectionTrackLog> {
 		this.isResend = isResend;
 	}
 
-	@Override
-	protected Serializable pkVal() {
-		return this.trackLogId;
+	public String getUniqueId() {
+		return uniqueId;
+	}
+
+	public void setUniqueId(String uniqueId) {
+		this.uniqueId = uniqueId;
+	}
+
+	public List<String> getBorrowerConditionDescList() {
+		return borrowerConditionDescList;
+	}
+
+	public void setBorrowerConditionDescList(List<String> borrowerConditionDescList) {
+		this.borrowerConditionDescList = borrowerConditionDescList;
+	}
+
+	public List<String> getGuaranteeConditionDescList() {
+		return guaranteeConditionDescList;
+	}
+
+	public void setGuaranteeConditionDescList(List<String> guaranteeConditionDescList) {
+		this.guaranteeConditionDescList = guaranteeConditionDescList;
+	}
+
+	public String getClassName() {
+		return className;
+	}
+
+	public void setClassName(String className) {
+		this.className = className;
 	}
 
 	@Override
 	public String toString() {
-		return "CollectionTrackLog{" +
-			", trackLogId=" + trackLogId +
-			", rbpId=" + rbpId +
-			", recorderUser=" + recorderUser +
-			", recordDate=" + recordDate +
-			", trackStatusId=" + trackStatusId +
-			", trackStatusName=" + trackStatusName +
-			", isSend=" + isSend +
-			", sendStatus=" + sendStatus +
-			", content=" + content +
-			", createTime=" + createTime +
-			", createUser=" + createUser +
-			", updateTime=" + updateTime +
-			", updateUser=" + updateUser +
-			", failProjectId=" + failProjectId +
-			", successProjectId=" + successProjectId +
-			", isResend=" + isResend +
-			"}";
+		return "CollectionTrackLog [trackLogId=" + trackLogId + ", rbpId=" + rbpId + ", recorderUser=" + recorderUser
+				+ ", recordDate=" + recordDate + ", trackStatusId=" + trackStatusId + ", trackStatusName="
+				+ trackStatusName + ", isSend=" + isSend + ", sendStatus=" + sendStatus + ", content=" + content
+				+ ", createTime=" + createTime + ", createUser=" + createUser + ", updateTime=" + updateTime
+				+ ", updateUser=" + updateUser + ", successProjectId=" + successProjectId + ", failProjectId="
+				+ failProjectId + ", isResend=" + isResend + ", uniqueId=" + uniqueId + ", borrowerConditionDescList="
+				+ borrowerConditionDescList + ", guaranteeConditionDescList=" + guaranteeConditionDescList
+				+ ", className=" + className + "]";
 	}
+
 }

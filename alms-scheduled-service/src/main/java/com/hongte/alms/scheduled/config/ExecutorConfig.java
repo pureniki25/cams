@@ -7,9 +7,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 
-
+@Configuration
 public class ExecutorConfig {
-    /** Set the ThreadPoolExecutor's scheduled pool size.
+    /** Set the ThreadPoolExecutor's core pool size.
      * 线程池维护线程的最小数量.
      * */
     private int corePoolSize = 10;
@@ -21,17 +21,19 @@ public class ExecutorConfig {
      *队列最大长度
      * */
     private int queueCapacity = 10;
-
-    @Bean
-    public Executor mySimpleAsync() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(corePoolSize);
-        executor.setMaxPoolSize(maxPoolSize);
-        executor.setQueueCapacity(queueCapacity);
-        executor.setThreadNamePrefix("MySimpleExecutor-");
-        executor.initialize();
-        return executor;
-    }
+    
+    
+    
+//    @Bean
+//    public Executor mySimpleAsync() {
+//        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+//        executor.setCorePoolSize(corePoolSize);
+//        executor.setMaxPoolSize(maxPoolSize);
+//        executor.setQueueCapacity(queueCapacity);
+//        executor.setThreadNamePrefix("MySimpleExecutor-");
+//        executor.initialize();
+//        return executor;
+//    }
 
     @Bean
     public Executor myAsync() {

@@ -29,7 +29,7 @@ import org.springframework.web.client.RestTemplate;
 @EnableScheduling
 @MapperScan(basePackages = {"com.hongte.alms.scheduled.mapper","com.hongte.alms.base"})
 @EnableTransactionManagement 
-@ComponentScan(basePackages= {"com.hongte.alms.scheduled","com.hongte.alms.common","com.hongte.alms.base.*","com.ht.ussp.bean"})
+@ComponentScan(basePackages= {"com.hongte.alms.scheduled","com.hongte.alms.common","com.hongte.alms.base.*","com.ht.ussp.bean","com.hongte.alms.core.*"})
 public class ScheduledServiceApplication {
 
 	@Bean
