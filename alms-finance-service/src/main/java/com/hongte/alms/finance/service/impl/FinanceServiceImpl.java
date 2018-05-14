@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
+import com.hongte.alms.base.entity.ApplyDerateProcess;
 import com.hongte.alms.base.entity.MoneyPool;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
@@ -26,19 +27,22 @@ import com.hongte.alms.base.entity.RepaymentProjFactRepay;
 import com.hongte.alms.base.entity.RepaymentResource;
 import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.enums.RepayRegisterState;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
+import com.hongte.alms.base.mapper.ApplyDerateProcessMapper;
 import com.hongte.alms.base.mapper.MoneyPoolMapper;
 import com.hongte.alms.base.mapper.MoneyPoolRepaymentMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListDetailMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListMapper;
 import com.hongte.alms.base.mapper.RepaymentProjFactRepayMapper;
 import com.hongte.alms.base.mapper.RepaymentResourceMapper;
+import com.hongte.alms.base.process.mapper.ProcessMapper;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.finance.service.FinanceService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.BoaInRoleInfoDto;
-
+import com.hongte.alms.base.process.entity.Process;
 /**
  * @author 王继光 2018年5月7日 下午6:03:41
  */
@@ -55,6 +59,10 @@ public class FinanceServiceImpl implements FinanceService {
 	RepaymentBizPlanListDetailMapper repaymentBizPlanListDetailMapper ;
 	@Autowired
 	MoneyPoolMapper moneyPoolMapper;
+	@Autowired
+	ApplyDerateProcessMapper applyDerateProcessMapper ;
+	@Autowired
+	ProcessMapper processMapper ;
 
 	@Autowired
 	MoneyPoolRepaymentMapper moneyPoolRepaymentMapper;
@@ -252,7 +260,7 @@ public class FinanceServiceImpl implements FinanceService {
 	}
 	
 	private JSONObject thisPeriodPlanRepayment(RepaymentBizPlanList rpl) {
-		JSONObject t = new JSONObject() ;
+		JSONObject t = initThisPeriodPlanRepaymentBase() ;
 		t.put("repayDate", DateUtil.toDateString(rpl.getDueDate(), DateUtil.DEFAULT_FORMAT_DATE)) ;
 		List<RepaymentBizPlanListDetail> details = repaymentBizPlanListDetailMapper.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", rpl.getPlanListId()));
 		for (RepaymentBizPlanListDetail repaymentBizPlanListDetail : details) {
@@ -272,15 +280,24 @@ public class FinanceServiceImpl implements FinanceService {
 				t.put("item50", repaymentBizPlanListDetail.getPlanAmount());
 				continue;
 			}
-			if (repaymentBizPlanListDetail.getPlanItemType().equals(60)) {
-				t.put("item50", repaymentBizPlanListDetail.getPlanAmount());
+			if (repaymentBizPlanListDetail.getPlanItemType().equals(60) && repaymentBizPlanListDetail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
+				t.put("onlineOverDue", repaymentBizPlanListDetail.getPlanAmount());
 				continue;
 			}
-			if (repaymentBizPlanListDetail.getPlanItemType().equals(50)) {
-				t.put("item50", repaymentBizPlanListDetail.getPlanAmount());
+			if (repaymentBizPlanListDetail.getPlanItemType().equals(60) && repaymentBizPlanListDetail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
+				t.put("offlineOverDue", repaymentBizPlanListDetail.getPlanAmount());
 				continue;
 			}
 		}
+		
+		List<ApplyDerateProcess> applyDerateProcesses = applyDerateProcessMapper.selectList(new EntityWrapper<ApplyDerateProcess>().eq("crp_id", rpl.getPlanListId()));
+		for (ApplyDerateProcess applyDerateProcess : applyDerateProcesses) {
+			Process process = new Process() ;
+			process.setProcessId(applyDerateProcess.getProcessId());
+			process = processMapper.selectOne(process) ;
+		}
+		
+		
 		return t ;
 	}
 	
