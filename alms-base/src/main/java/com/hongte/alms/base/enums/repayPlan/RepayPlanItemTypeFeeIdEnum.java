@@ -24,7 +24,7 @@ public enum RepayPlanItemTypeFeeIdEnum implements IEnum {
     ,OVER_DUE_AMONT_UNDERLINE("79069922-e13a-4229-8656-2a1e19b44881",60,"线下滞纳金")
     ,OVER_DUE_INTEREST("e404a126-45ab-11e7-8ed5-000c2928bb0d",40,"逾期利息")
     ,PRE_LATEFEES("65bf9587-37b4-11e7-9482-000c2928bb0d",70,"提前结清违约金")
-    ,RUSH_RECEIVABLES("adede422-4293-4456-8517-5b4c8874b700",100,"冲应收")
+     ,RUSH_RECEIVABLES("adede422-4293-4456-8517-5b4c8874b700",100,"冲应收")
 //    INTEREST(20,"利息"),
 //    SUB_COMPANY_CHARGE(30,"资产端分公司服务费"),
 //    BOND_COMPANY_CHARGE(40,"担保公司费用"),
