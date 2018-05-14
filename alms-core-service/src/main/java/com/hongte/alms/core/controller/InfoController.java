@@ -210,7 +210,7 @@ public class InfoController {
     public Result<InfoSmsListSearchVO> getInfoSmsDetailById(
             @RequestParam("logId") String logId
     ){
-    	InfoSmsListSearchVO  vo = infoSmsService.selectLastInfoSmsDetail(logId);
+    	InfoSmsListSearchVO  vo = infoSmsService.selectInfoSmsDetail(Integer.valueOf(logId));
         if(vo!=null){
             return Result.success(vo);
         }else{
@@ -233,7 +233,7 @@ public class InfoController {
     public Result<InfoSmsListSearchVO> selectLastInfoSmsDetail(
             @RequestParam("logId") String logId
     ){
-    	InfoSmsListSearchVO  vo = infoSmsService.selectLastInfoSmsDetail(logId);
+    	InfoSmsListSearchVO  vo = infoSmsService.selectLastInfoSmsDetail(Integer.valueOf(logId));
 
         if(vo!=null){
             return Result.success(vo);
@@ -256,7 +256,7 @@ public class InfoController {
     public Result<InfoSmsListSearchVO> selectNextInfoSmsDetail(
             @RequestParam("logId") String logId
     ){
-    	InfoSmsListSearchVO  vo = infoSmsService.selectNextInfoSmsDetail(logId);
+    	InfoSmsListSearchVO  vo = infoSmsService.selectNextInfoSmsDetail(Integer.valueOf(logId));
 
         if(vo!=null){
             return Result.success(vo);

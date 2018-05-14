@@ -112,6 +112,23 @@ window.layinit(function (htConfig) {
                                 },
                                 style: {
                                     marginRight: '10px'
+                                },
+                                on:{
+                                    click(){
+                                        let mprid = p.row.id 
+                                        axios.post(fpath+'finance/rejectRepayReg',{mprid:mprid})
+                                        .then(function(res){
+                                            if(res.data.code=='1'){
+                                                window.location.reload()
+                                            }else{
+                                                window.parent.app.$Message.error({content:res.data.msg})
+                                            }
+                                        })
+                                        .catch(function(err){
+                                            window.parent.app.$Message.error({content:'拒绝还款登记失败'})
+                                            console.log(err);
+                                        })
+                                    }
                                 }
                             }, '拒绝')
                             let content = []

@@ -16,6 +16,10 @@
         <card title="匹配的款项池银行流水">
             <div slot='title'>
                 <span>匹配的款项池银行流水</span>
+                <span style="float: right;">
+                    <i-button size="small" @click="openMatchBankStatementModal">匹配流水</i-button>
+                    <i-button size="small" @click="openAddBankStatementModal">新增</i-button>
+                </span>
             </div>
             <i-table stripe :columns="table.col" :data="table.data"></i-table>
         </card>

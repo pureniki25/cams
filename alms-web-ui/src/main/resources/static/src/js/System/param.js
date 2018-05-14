@@ -41,10 +41,16 @@ window.layinit(function (htConfig) {
                 }
             }, {
                 field: 'updateUser',
-                title: '更新人id'
+                title: '更新人id',
+                templet:function(d){
+                    return (d.updateUser||d.createUser)||''
+                }
             }, {
                 field: 'updateTime',
-                title: '更新时间'
+                title: '更新时间',
+                templet:function(d){
+                    return (d.updateTime||d.createTime)||''
+                }
             }, {
                 title: '操作',
                 toolbar: "#toolbar"
@@ -274,6 +280,7 @@ let methods = {
     openBatchAddParmModal: function () {
         app.editParamModal.add = true
         app.batchAddParmModal.show = true
+        app.batchAddParmModal.param = ''
     },
     batchSaveParam: function () {
         app.editParamForm.paramType = app.currentParamList.paramType
@@ -284,6 +291,7 @@ let methods = {
             return;
         }
         let params = []
+        let cancelFlag = false
         t.forEach(element => {
             if (element && element != '') {
                 let param = {}
@@ -291,13 +299,19 @@ let methods = {
                 if (value.length == 0) {
                     param.paramName = element;
                 } else {
+                	console.log(value)
+                	if(value.length>6){
+                		cancelFlag = true
+                		app.$Message.error({content:element+'有错,请检查'});
+                		return ;
+                	}
                     value.forEach((e, i) => {
                         if (i == 0) {
                             param.paramName = e
                         } else if (i == 1) {
                             param['paramValue'] = e
                         } else {
-                            param['paramValue' + (i + 1)] = e
+                            param['paramValue' + (i)] = e
                         }
                     });
                 }
@@ -306,6 +320,9 @@ let methods = {
                 params.push(param)
             }
         });
+        if(cancelFlag){
+        	return ;
+        }
         axios.post(basePath + 'sys/param/addParm', params)
             .then(function (res) {
                 if (res.data.code == '1') {

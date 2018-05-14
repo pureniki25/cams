@@ -38,6 +38,8 @@ public class BusinessBasicInfoReq {
      */
     @ApiModelProperty(required= true,value = "业务类型: 1,车易贷展期;  2, 房速贷展期;   3,金融仓储;   4, 三农金融; 9,车易贷; 11,房速贷;  12,车全垫资代采;  13,扶贫贷;  14,汽车融资租赁;  15,二手车商贷; 20,一点车贷")
     private Integer businessType;
+
+
     /**
      * 业务所属子类型，若无则为空
      * 备注：这个业务所属的子类型，对应的信贷的字段是什么 需要与咏康核对一下

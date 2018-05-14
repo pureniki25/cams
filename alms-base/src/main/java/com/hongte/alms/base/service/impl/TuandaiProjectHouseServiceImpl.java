@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
  * @author 王继光
  * @since 2018-04-23
  */
-@Service
+@Service("TuandaiProjectHouseService")
 public class TuandaiProjectHouseServiceImpl extends BaseServiceImpl<TuandaiProjectHouseMapper, TuandaiProjectHouse> implements TuandaiProjectHouseService {
 
 }

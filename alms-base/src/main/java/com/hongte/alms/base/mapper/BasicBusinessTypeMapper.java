@@ -12,5 +12,10 @@ import com.hongte.alms.common.mapper.SuperMapper;
  * @since 2018-01-25
  */
 public interface BasicBusinessTypeMapper extends SuperMapper<BasicBusinessType> {
-
+	/**
+	 * 根据businessId获取businessTypeName
+	 * @param businessId
+	 * @return
+	 */
+	String queryBusinessTypeNameByBusinessId(String businessId);
 }

@@ -37,6 +37,7 @@
 	<link rel="stylesheet" href="/Components/ProcessLine/ProcessLine.css">
 	<script src="/Components/ProcessLine/ProcessLine.js"></script>
 
+	<script src="/src/js/comm.js"></script>
 	<script src="/src/js/moment.min.js"></script>
 
 	<script type="text/javascript" src="/plugins/selectSearch/select-vue-component.js"></script>
@@ -471,12 +472,12 @@
 								<label class="input_label">*</label>
 							</td>
 							<td>
-								<i-select v-model="carAuction.fareRange" name="fuelLeft" id="fareRange" :disabled="!canEdit">
+								<i-select v-model="carAuction.fareRange" name="fareRange" id="fareRange" :disabled="!canEdit">
 									<i-option value="">--请选择--</i-option>
-									<i-option value="500">500</i-option>
-									<i-option value="1000">1000</i-option>
-									<i-option value="1500">1500</i-option>
-									<i-option value="2000">2000</i-option>
+									<i-option :value=500>500</i-option>
+									<i-option :value=1000>1000</i-option>
+									<i-option :value=1500>1500</i-option>
+									<i-option :value=2000>2000</i-option>
 								</i-select>
 							</td>
 						</tr>

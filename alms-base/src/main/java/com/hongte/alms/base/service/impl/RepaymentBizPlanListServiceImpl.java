@@ -1,6 +1,8 @@
 package com.hongte.alms.base.service.impl;
 
 import com.baomidou.mybatisplus.plugins.Page;
+import java.util.List;
+
 import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
 import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
@@ -57,7 +59,7 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
                 overDueDays,
                 CollectionStatusEnum.TO_LAW_WORK.getKey(),businessType);
     }
-
+    
     @Override
     public String queryRepaymentBizPlanListByConditions(String businessId, String afterId) {
     	return repaymentBizPlanListMapper.queryRepaymentBizPlanListByConditions(businessId, afterId);
@@ -70,4 +72,48 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
 		return PageResult.success(list, count);
 	}
 
+//    @Override
+//    public List<RepaymentBizPlanList> selectNeedPhoneUrgRenewBiz(String companyId,Integer beforeDueDays) {
+//        if(beforeDueDays.equals(0)){
+//            beforeDueDays = 1000;
+//        }
+//       return repaymentBizPlanListMapper.selectNeedSetColInfoRenewBizPlansBycomId(
+//               companyId,
+//               0-beforeDueDays,
+//               CollectionStatusEnum.PHONE_STAFF.getKey()
+//       );
+//    }
+//
+//    @Override
+//    public List<RepaymentBizPlanList> selectNeedVisitRenewBiz(String companyId,Integer overDueDays) {
+//        return repaymentBizPlanListMapper.selectNeedSetColInfoRenewBizPlansBycomId(
+//                companyId,
+//                overDueDays,
+//                CollectionStatusEnum.COLLECTING.getKey()
+//        );
+//    }
+//
+//    @Override
+//    public List<RepaymentBizPlanList> selectNeedLawRenewBiz(Integer overDueDays) {
+//        return repaymentBizPlanListMapper.selectNeedSetColInfoRenewBizPlansBycomId(
+//                null,
+//                overDueDays,
+//                CollectionStatusEnum.TO_LAW_WORK.getKey()
+//        );
+//    }
+
+    @Override
+    public Integer queryFirstPeriodOverdueByBusinessId(String businessId) {
+    	return repaymentBizPlanListMapper.queryFirstPeriodOverdueByBusinessId(businessId);
+    }
+
+    @Override
+    public Integer queryInterestOverdueByBusinessId(String businessId) {
+    	return repaymentBizPlanListMapper.queryInterestOverdueByBusinessId(businessId);
+    }
+
+    @Override
+    public Integer queryPrincipalOverdueByBusinessId(String businessId) {
+    	return repaymentBizPlanListMapper.queryPrincipalOverdueByBusinessId(businessId);
+    }
 }

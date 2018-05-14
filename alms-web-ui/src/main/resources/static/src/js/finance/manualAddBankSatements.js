@@ -96,7 +96,7 @@ window.layinit(function (htConfig) {
                 })
                 params.businessId = businessId;
                 params.afterId = afterId;
-                axios.post(cpath+'moneyPool/addCustomerRepayment',params)
+                axios.post(fpath+'finance/appointBankStatement',params)
                 .then(function(res){
                     if(res.data.code=='1'){
                         app.cancel()
@@ -110,7 +110,8 @@ window.layinit(function (htConfig) {
             },
             cancel:function(){
                 app.$refs['form'].resetFields()
-                window.parent.app.closeModal('manualAddBankSatementsShow')
+                parent.app.closeModal();
+                // window.parent.app.closeModal('manualAddBankSatementsShow')
             }
         },
         computed: {

@@ -46,8 +46,13 @@ window.layinit(function (htConfig) {
                 ifSendToPlat:'', //是否提交平台
                 content:'', //跟踪记录描述
                 isSend:'',//是否提交平台 int标志位
-                rbpId:''//还款计划ID
+                rbpId:'',//还款计划ID
+                borrowerConditionDescList:[], //借款人情况
+                guaranteeConditionDescList:[], // 抵押物情况
+                className:'' // 分类名称
             },
+            borrowerConditionDescList:[], // 借款人情况条件描述列表 
+            guaranteeConditionDescList:[], // 抵押物情况条件描述列表 
             ruleValidate:setFormValidate
         },
         methods: {
@@ -71,6 +76,8 @@ window.layinit(function (htConfig) {
             },
             hideEditForm() {
                 this.addLogModal = false;
+                this.editLogForm.borrowerConditionDescList = [];
+                this.editLogForm.guaranteeConditionDescList = [];
                 this.$refs['editLogForm'].resetFields();
                 Object.assign(this.editLogForm, editLogFormDefaultVal)
 
@@ -79,8 +86,28 @@ window.layinit(function (htConfig) {
                 this.addLogModal = true;
                 this.modalAction= '新增'
                 this.editLogForm.ifSendToPlat = '否'
-            }
-        }
+            },
+            initConditionDescList:function(){
+ 			   axios.get(basePath + 'businessParameter/queryConditionDesc')
+                .then(function (res) {
+                    console.log(res)
+                    if (res.data.code == "1") {
+                 	   if (res.data.data) {
+ 		               	   vm.borrowerConditionDescList = res.data.data.fiveLevelClassify_04;
+ 		               	   vm.guaranteeConditionDescList = res.data.data.fiveLevelClassify_05;
+                 	   }
+                    } else {
+                        vm.$Modal.error({ content: res.data.msg });
+                    }
+                })
+                .catch(function (err) {
+                    vm.$Modal.error({ content: '接口调用异常!' });
+                })
+ 		   },
+        },
+        created:function(){
+ 		   this.initConditionDescList();
+ 	   },
     });
 
 //使用layerUI的表格组件
@@ -279,23 +306,38 @@ var editLogFormSubmit = function () {
             // vm.editLogForm.trackStatusId = vm.editLogForm.status.paramValue;
             // vm.editLogForm.trackStatusName = vm.editLogForm.status.paramName;
             vm.editLogForm.rbpId = crpId;
-
-            axios.post(basePath +'collectionTrackLog/addOrUpdateLog', vm.editLogForm)
-                .then(function (res) {
-                    if (res.data.code == "1") {
-                        vm.hideEditForm();
-                        vm.$Modal.success({
-                            title: '',
-                            content: '操作成功'
-                        });
-                        vm.toLoading();
-                    } else {
-                        vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
-                    }
-                })
-                .catch(function (error) {
-                    vm.$Modal.error({content: '接口调用异常!'});
-                });
+            
+		   axios.post(basePath + 'collectionTrackLog/matchBusinessClassify', vm.editLogForm)
+		   .then(function (res) {
+			   if (res.data.code == "1") {
+				   vm.editLogForm.className = res.data.data;
+				   vm.$Modal.confirm({content: '根据设置条件当前类别为: ' + res.data.data + ' ，确认是否保存',
+					   onOk:function(){
+						   axios.post(basePath +'collectionTrackLog/addOrUpdateLog', vm.editLogForm)
+			                .then(function (res) {
+			                    if (res.data.code == "1") {
+			                        vm.hideEditForm();
+			                        vm.$Modal.success({
+			                            title: '',
+			                            content: '操作成功'
+			                        });
+			                        vm.toLoading();
+			                    } else {
+			                        vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
+			                    }
+			                })
+			                .catch(function (error) {
+			                    vm.$Modal.error({content: '接口调用异常!'});
+			                });
+					   }
+				   });
+			   } else {
+				   vm.$Modal.error({ content: '系统异常！' });
+			   }
+		   })
+		   .catch(function (err) {
+			   vm.$Modal.error({ content: '接口调用异常!' });
+		   })
         }else{
             vm.$Message.error({content: '表单校验失败!'});
         }
@@ -316,7 +358,9 @@ var queryEditModule = function (trackLogId) {
                 vm.editLogForm.ifSendToPlat = (res.data.data.isSend==0)?"否":"是";
                 vm.editLogForm.isSend = res.data.data.isSend;
                 vm.editLogForm.content = res.data.data.content;
-
+                vm.editLogForm.borrowerConditionDescList = res.data.data.borrowerConditionDescList;
+                vm.editLogForm.guaranteeConditionDescList = res.data.data.guaranteeConditionDescList;
+                
                 vm.addLogModal = true;
             } else {
                 vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});

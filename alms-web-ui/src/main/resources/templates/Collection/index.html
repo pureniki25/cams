@@ -192,6 +192,18 @@
                                 </i-select>
                             </form-item>
                         </i-col>
+                        
+                        <i-col span="6">
+                            <form-item label="业务类别：" prop="businessClassName">
+                                <i-select v-model="searchForm.businessClassName" clearable filterable  style="width:200px">
+                                    <i-option value="正常类" >正常类</i-option>
+                                    <i-option value="关注类" >关注类</i-option>
+                                    <i-option value="次级类" >次级类</i-option>
+                                    <i-option value="可疑类" >可疑类</i-option>
+                                    <i-option value="损失类" >损失类</i-option>
+                                </i-select>
+                            </form-item>
+                        </i-col>
 
                         <!--customerName:'',     //客户名字-->
                         <i-col span="6">

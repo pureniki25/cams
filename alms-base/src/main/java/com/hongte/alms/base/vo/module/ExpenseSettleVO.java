@@ -70,6 +70,11 @@ public class ExpenseSettleVO implements Serializable{
 	 */
 	private BigDecimal deposit ;
 	
+	/**
+	 * 剩余期数
+	 */
+	private Integer restPeriod ;
+	
 	private List<ExpenseSettleLackFeeVO> list ;
 
 	/**
@@ -254,6 +259,18 @@ public class ExpenseSettleVO implements Serializable{
 	 */
 	public void setDeposit(BigDecimal deposit) {
 		this.deposit = deposit.setScale(2,BigDecimal.ROUND_HALF_UP);;
+	}
+	
+	
+
+
+
+	public Integer getRestPeriod() {
+		return restPeriod;
+	}
+
+	public void setRestPeriod(Integer restPeriod) {
+		this.restPeriod = restPeriod;
 	}
 
 	/**

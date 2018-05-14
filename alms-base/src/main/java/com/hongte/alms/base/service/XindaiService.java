@@ -20,4 +20,12 @@ public interface XindaiService {
     @RequestLine("POST /api/ltgproject/dod/")
     @Headers("Content-Type: application/json")
     String syc(String content) ;
+    
+    
+    
+    //减免申请获取合同日期
+    
+    @RequestLine("POST /api/ltgproject/dod ")
+    @Headers("Content-Type: application/json")
+    String getContractDate(String content);
 }
