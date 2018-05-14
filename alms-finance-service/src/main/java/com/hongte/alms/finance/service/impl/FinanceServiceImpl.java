@@ -19,23 +19,33 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.entity.ApplyDerateProcess;
+import com.hongte.alms.base.entity.ApplyDerateType;
 import com.hongte.alms.base.entity.MoneyPool;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentProjFactRepay;
+import com.hongte.alms.base.entity.RepaymentProjPlan;
+import com.hongte.alms.base.entity.RepaymentProjPlanList;
+import com.hongte.alms.base.entity.RepaymentProjPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentResource;
+import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.enums.RepayRegisterState;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.mapper.ApplyDerateProcessMapper;
+import com.hongte.alms.base.mapper.ApplyDerateTypeMapper;
 import com.hongte.alms.base.mapper.MoneyPoolMapper;
 import com.hongte.alms.base.mapper.MoneyPoolRepaymentMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListDetailMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListMapper;
 import com.hongte.alms.base.mapper.RepaymentProjFactRepayMapper;
+import com.hongte.alms.base.mapper.RepaymentProjPlanListDetailMapper;
+import com.hongte.alms.base.mapper.RepaymentProjPlanListMapper;
+import com.hongte.alms.base.mapper.RepaymentProjPlanMapper;
 import com.hongte.alms.base.mapper.RepaymentResourceMapper;
+import com.hongte.alms.base.mapper.TuandaiProjectInfoMapper;
 import com.hongte.alms.base.process.mapper.ProcessMapper;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.DateUtil;
@@ -43,6 +53,7 @@ import com.hongte.alms.finance.service.FinanceService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.BoaInRoleInfoDto;
 import com.hongte.alms.base.process.entity.Process;
+
 /**
  * @author 王继光 2018年5月7日 下午6:03:41
  */
@@ -52,17 +63,27 @@ public class FinanceServiceImpl implements FinanceService {
 	@Autowired
 	RepaymentBizPlanListMapper repaymentBizPlanListMapper;
 	@Autowired
-	RepaymentResourceMapper repaymentResourceMapper ;
+	RepaymentResourceMapper repaymentResourceMapper;
 	@Autowired
-	RepaymentProjFactRepayMapper repaymentProjFactRepayMapper ;
+	RepaymentProjFactRepayMapper repaymentProjFactRepayMapper;
 	@Autowired
-	RepaymentBizPlanListDetailMapper repaymentBizPlanListDetailMapper ;
+	RepaymentBizPlanListDetailMapper repaymentBizPlanListDetailMapper;
+	@Autowired
+	RepaymentProjPlanListDetailMapper repaymentProjPlanListDetailMapper;
+	@Autowired
+	RepaymentProjPlanListMapper repaymentProjPlanListMapper;
+	@Autowired
+	TuandaiProjectInfoMapper tuandaiProjectInfoMapper;
+	@Autowired
+	RepaymentProjPlanMapper repaymentProjPlanMapper;
 	@Autowired
 	MoneyPoolMapper moneyPoolMapper;
 	@Autowired
-	ApplyDerateProcessMapper applyDerateProcessMapper ;
+	ApplyDerateProcessMapper applyDerateProcessMapper;
 	@Autowired
-	ProcessMapper processMapper ;
+	ApplyDerateTypeMapper applyDerateTypeMapper;
+	@Autowired
+	ProcessMapper processMapper;
 
 	@Autowired
 	MoneyPoolRepaymentMapper moneyPoolRepaymentMapper;
@@ -133,15 +154,12 @@ public class FinanceServiceImpl implements FinanceService {
 	@Override
 	@Transactional(rollbackFor = ServiceRuntimeException.class)
 	public Result matchBankStatement(List<String> moneyPoolIds, String businessId, String afterId, String mprid) {
-		List<MoneyPoolRepayment> list = moneyPoolRepaymentMapper.selectList(
-				new EntityWrapper<MoneyPoolRepayment>()
-				.eq("original_business_id", businessId)
-				.eq("after_id",afterId)
-				.in("money_pool_id", moneyPoolIds)
-				.eq("is_finance_match", 1));
-		
-		if (list!=null&&list.size()>0) {
-			return Result.error("500","已存在匹配的银行流水,不可重复匹配");
+		List<MoneyPoolRepayment> list = moneyPoolRepaymentMapper
+				.selectList(new EntityWrapper<MoneyPoolRepayment>().eq("original_business_id", businessId)
+						.eq("after_id", afterId).in("money_pool_id", moneyPoolIds).eq("is_finance_match", 1));
+
+		if (list != null && list.size() > 0) {
+			return Result.error("500", "已存在匹配的银行流水,不可重复匹配");
 		}
 		Date now = new Date();
 		if (mprid != null) {
@@ -157,7 +175,7 @@ public class FinanceServiceImpl implements FinanceService {
 			moneyPoolRepayment.setTradeDate(moneyPool.getTradeDate());
 			moneyPoolRepayment.setTradePlace(moneyPool.getTradePlace());
 			moneyPoolRepayment.setTradeType(moneyPool.getTradeType());
-			
+
 			moneyPoolRepayment.setMoneyPoolId(moneyPool.getMoneyPoolId());
 			moneyPoolRepayment.setState(RepayRegisterFinanceStatus.财务指定银行流水.toString());
 			moneyPoolRepayment.setIsFinanceMatch(1);
@@ -186,8 +204,6 @@ public class FinanceServiceImpl implements FinanceService {
 			return Result.success();
 		}
 
-		
-
 	}
 
 	private MoneyPoolRepayment copy(MoneyPool moneyPool) {
@@ -207,7 +223,7 @@ public class FinanceServiceImpl implements FinanceService {
 	}
 
 	@Override
-	@Transactional(rollbackFor=Exception.class)
+	@Transactional(rollbackFor = Exception.class)
 	public Result disMatchedBankStatement(MoneyPool moneyPool, MoneyPoolRepayment moneyPoolRepayment) {
 		try {
 			Date now = new Date();
@@ -224,7 +240,7 @@ public class FinanceServiceImpl implements FinanceService {
 			moneyPool.setFinanceStatus(RepayRegisterFinanceStatus.未关联银行流水.toString());
 			moneyPool.setStatus(RepayRegisterState.待领取.toString());
 			boolean mpUpdateRes = moneyPool.updateById();
-			if(!mpUpdateRes) {
+			if (!mpUpdateRes) {
 				return Result.error("500", "更新银行流水数据失败");
 			}
 			return Result.success();
@@ -236,33 +252,78 @@ public class FinanceServiceImpl implements FinanceService {
 
 	@Override
 	public Result thisPeroidRepayment(String businessId, String afterId) {
-		RepaymentBizPlanList rpl = new RepaymentBizPlanList() ;
+		RepaymentBizPlanList rpl = new RepaymentBizPlanList();
 		rpl.setBusinessId(businessId);
 		rpl.setAfterId(afterId);
-		rpl = repaymentBizPlanListMapper.selectOne(rpl) ;
-		if (rpl==null) {
+		rpl = repaymentBizPlanListMapper.selectOne(rpl);
+		if (rpl == null) {
 			return Result.error("500", "找不到对应的还款计划");
 		}
-		List<RepaymentResource> resources = repaymentResourceMapper.selectList(new EntityWrapper<RepaymentResource>().eq("business_id", businessId).eq("after_id", afterId).eq("is_cancelled",0)) ;
+		List<RepaymentResource> resources = repaymentResourceMapper.selectList(new EntityWrapper<RepaymentResource>()
+				.eq("business_id", businessId).eq("after_id", afterId).eq("is_cancelled", 0));
 		List<String> ids = new ArrayList<>();
 		for (RepaymentResource o : resources) {
-			if (o!=null&&o.getResourceId()!=null) {
+			if (o != null && o.getResourceId() != null) {
 				ids.add(o.getResourceId());
 			}
 		}
-		
-		List<RepaymentProjFactRepay> factRepays = repaymentProjFactRepayMapper.selectList(new EntityWrapper<RepaymentProjFactRepay>().in("repay_ref_id", ids).orderBy("repay_ref_id"));
-		
-		List<JSONObject> infos = new ArrayList<>() ;
-		
-		
-		return null;
+
+		List<RepaymentProjFactRepay> factRepays = repaymentProjFactRepayMapper
+				.selectList(new EntityWrapper<RepaymentProjFactRepay>().in("repay_ref_id", ids).orderBy("create_date")
+						.orderBy("repay_ref_id"));
+		List<JSONObject> facts = new ArrayList<>();
+		for (RepaymentResource o : resources) {
+			if (o != null && o.getResourceId() != null) {
+				JSONObject fact = new JSONObject();
+				fact.put("type", "实际还款日期") ;
+				fact.put("repayDate", DateUtil.toDateString(o.getRepayDate(), DateUtil.DEFAULT_FORMAT_DATE));
+				for (RepaymentProjFactRepay repaymentProjFactRepay : factRepays) {
+					if (repaymentProjFactRepay.getRepayRefId().equals(o.getResourceId())) {
+						if (repaymentProjFactRepay.getPlanItemType().equals(10)) {
+							fact.put("item10", repaymentProjFactRepay.getFactAmount());
+							continue;
+						}
+						if (repaymentProjFactRepay.getPlanItemType().equals(20)) {
+							fact.put("item20", repaymentProjFactRepay.getFactAmount());
+							continue;
+						}
+						if (repaymentProjFactRepay.getPlanItemType().equals(30)) {
+							fact.put("item30", repaymentProjFactRepay.getFactAmount());
+							continue;
+						}
+						if (repaymentProjFactRepay.getPlanItemType().equals(50)) {
+							fact.put("item50", repaymentProjFactRepay.getFactAmount());
+							continue;
+						}
+						if (repaymentProjFactRepay.getPlanItemType().equals(60) && repaymentProjFactRepay.getFeeId()
+								.equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
+							fact.put("onlineOverDue", repaymentProjFactRepay.getFactAmount());
+							continue;
+						}
+						if (repaymentProjFactRepay.getPlanItemType().equals(60) && repaymentProjFactRepay.getFeeId()
+								.equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
+							fact.put("offlineOverDue", repaymentProjFactRepay.getFactAmount());
+							continue;
+						}
+					}
+				}
+				facts.add(fact);
+			}
+		}
+		JSONObject fact = new JSONObject() ;
+		fact.put("facts", facts);
+		List<JSONObject> infos = new ArrayList<>();
+		infos.add(thisPeriodPlanRepayment(rpl));
+		infos.add(fact);
+		return Result.success(infos);
 	}
-	
+
 	private JSONObject thisPeriodPlanRepayment(RepaymentBizPlanList rpl) {
-		JSONObject t = initThisPeriodPlanRepaymentBase() ;
-		t.put("repayDate", DateUtil.toDateString(rpl.getDueDate(), DateUtil.DEFAULT_FORMAT_DATE)) ;
-		List<RepaymentBizPlanListDetail> details = repaymentBizPlanListDetailMapper.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", rpl.getPlanListId()));
+		JSONObject t = initThisPeriodPlanRepaymentBase();
+		t.put("type", "本期应还日期");
+		t.put("repayDate", DateUtil.toDateString(rpl.getDueDate(), DateUtil.DEFAULT_FORMAT_DATE));
+		List<RepaymentBizPlanListDetail> details = repaymentBizPlanListDetailMapper
+				.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", rpl.getPlanListId()));
 		for (RepaymentBizPlanListDetail repaymentBizPlanListDetail : details) {
 			if (repaymentBizPlanListDetail.getPlanItemType().equals(10)) {
 				t.put("item10", repaymentBizPlanListDetail.getPlanAmount());
@@ -280,29 +341,100 @@ public class FinanceServiceImpl implements FinanceService {
 				t.put("item50", repaymentBizPlanListDetail.getPlanAmount());
 				continue;
 			}
-			if (repaymentBizPlanListDetail.getPlanItemType().equals(60) && repaymentBizPlanListDetail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
+			if (repaymentBizPlanListDetail.getPlanItemType().equals(60) && repaymentBizPlanListDetail.getFeeId()
+					.equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
 				t.put("onlineOverDue", repaymentBizPlanListDetail.getPlanAmount());
 				continue;
 			}
-			if (repaymentBizPlanListDetail.getPlanItemType().equals(60) && repaymentBizPlanListDetail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
+			if (repaymentBizPlanListDetail.getPlanItemType().equals(60) && repaymentBizPlanListDetail.getFeeId()
+					.equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
 				t.put("offlineOverDue", repaymentBizPlanListDetail.getPlanAmount());
 				continue;
 			}
 		}
-		
-		List<ApplyDerateProcess> applyDerateProcesses = applyDerateProcessMapper.selectList(new EntityWrapper<ApplyDerateProcess>().eq("crp_id", rpl.getPlanListId()));
+
+		List<ApplyDerateProcess> applyDerateProcesses = applyDerateProcessMapper.selectList(
+				new EntityWrapper<ApplyDerateProcess>().eq("crp_id", rpl.getPlanListId()).eq("is_settle", 0));
+		List<String> applyDerateProcessIds = new ArrayList<>();
 		for (ApplyDerateProcess applyDerateProcess : applyDerateProcesses) {
-			Process process = new Process() ;
+			Process process = new Process();
 			process.setProcessId(applyDerateProcess.getProcessId());
-			process = processMapper.selectOne(process) ;
+			process = processMapper.selectOne(process);
+			if (process.getProcessResult() == null || process.getProcessResult().equals(2)) {
+				continue;
+			}
+			applyDerateProcessIds.add(applyDerateProcess.getApplyDerateProcessId());
 		}
-		
-		
-		return t ;
+
+		if (applyDerateProcessIds.size() > 0) {
+			List<ApplyDerateType> applyDerateTypes = applyDerateTypeMapper.selectList(
+					new EntityWrapper<ApplyDerateType>().in("apply_derate_process_id", applyDerateProcessIds));
+			BigDecimal t1 = new BigDecimal(0);
+			for (ApplyDerateType applyDerateType : applyDerateTypes) {
+				t1 = t1.add(applyDerateType.getDerateMoney());
+			}
+			t.put("derate", t1);
+		}
+
+		List<TuandaiProjectInfo> tuandaiProjectInfos = tuandaiProjectInfoMapper
+				.selectList(new EntityWrapper<TuandaiProjectInfo>().eq("business_id", rpl.getOrigBusinessId()));
+		List<JSONObject> projs = new ArrayList<>();
+		for (TuandaiProjectInfo tuandaiProjectInfo : tuandaiProjectInfos) {
+			RepaymentProjPlan projPlan = new RepaymentProjPlan();
+			projPlan.setProjectId(tuandaiProjectInfo.getProjectId());
+			projPlan.setBusinessId(tuandaiProjectInfo.getBusinessId());
+			projPlan = repaymentProjPlanMapper.selectOne(projPlan);
+			if (projPlan == null) {
+				continue;
+			}
+			RepaymentProjPlanList repaymentProjPlanList = new RepaymentProjPlanList();
+			repaymentProjPlanList.setProjPlanId(projPlan.getPlanId());
+			repaymentProjPlanList.setPlanListId(rpl.getPlanListId());
+			repaymentProjPlanList = repaymentProjPlanListMapper.selectOne(repaymentProjPlanList);
+			if (repaymentProjPlanList == null) {
+				continue;
+			}
+			JSONObject proj = new JSONObject();
+			List<RepaymentProjPlanListDetail> repaymentProjPlanListDetails = repaymentProjPlanListDetailMapper
+					.selectList(new EntityWrapper<RepaymentProjPlanListDetail>().eq("proj_plan_list_id",
+							repaymentProjPlanList.getProjPlanListId()));
+			proj.put("realName", tuandaiProjectInfo.getRealName());
+			proj.put("amount", tuandaiProjectInfo.getAmount());
+			for (RepaymentProjPlanListDetail repaymentProjPlanListDetail : repaymentProjPlanListDetails) {
+				if (repaymentProjPlanListDetail.getPlanItemType().equals(10)) {
+					proj.put("item10", repaymentProjPlanListDetail.getProjPlanAmount());
+					continue;
+				}
+				if (repaymentProjPlanListDetail.getPlanItemType().equals(20)) {
+					proj.put("item20", repaymentProjPlanListDetail.getProjPlanAmount());
+					continue;
+				}
+				if (repaymentProjPlanListDetail.getPlanItemType().equals(30)) {
+					proj.put("item30", repaymentProjPlanListDetail.getProjPlanAmount());
+					continue;
+				}
+				if (repaymentProjPlanListDetail.getPlanItemType().equals(50)) {
+					proj.put("item50", repaymentProjPlanListDetail.getProjPlanAmount());
+					continue;
+				}
+				if (repaymentProjPlanListDetail.getPlanItemType().equals(60) && repaymentProjPlanListDetail.getFeeId()
+						.equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
+					proj.put("onlineOverDue", repaymentProjPlanListDetail.getProjPlanAmount());
+					continue;
+				}
+				if (repaymentProjPlanListDetail.getPlanItemType().equals(60) && repaymentProjPlanListDetail.getFeeId()
+						.equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
+					proj.put("offlineOverDue", repaymentProjPlanListDetail.getProjPlanAmount());
+					continue;
+				}
+			}
+			t.put("projs", proj);
+		}
+		return t;
 	}
-	
+
 	private JSONObject initThisPeriodPlanRepaymentBase() {
-		JSONObject t = new JSONObject() ;
+		JSONObject t = new JSONObject();
 		t.put("item10", 0);
 		t.put("item20", 0);
 		t.put("item30", 0);
@@ -312,7 +444,7 @@ public class FinanceServiceImpl implements FinanceService {
 		t.put("onlineOverDue", 0);
 		t.put("derate", 0);
 		t.put("total", 0);
-		return t ;
+		return t;
 	}
 
 }
