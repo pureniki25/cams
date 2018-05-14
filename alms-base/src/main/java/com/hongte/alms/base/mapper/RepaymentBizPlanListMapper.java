@@ -1,6 +1,8 @@
 package com.hongte.alms.base.mapper;
 
+import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.vo.module.FinanceManagerListVO;
 import com.hongte.alms.common.mapper.SuperMapper;
 import org.apache.ibatis.annotations.Param;
 
