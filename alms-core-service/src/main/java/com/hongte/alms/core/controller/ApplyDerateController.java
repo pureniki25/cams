@@ -51,6 +51,7 @@ import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.ClassCopyUtil;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.DESC;
+import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.EasyPoiExcelExportUtil;
 import com.hongte.alms.common.util.EncryptionResult;
 import com.hongte.alms.common.util.JsonUtil;
@@ -407,7 +408,11 @@ public class ApplyDerateController {
 				isDefer = 1;
 			}
 			
-			getContractDate(businessId);
+			String date=getContractDate(businessId);
+			Date contractDate=null;
+			if(StringUtil.notEmpty(date)) {
+				contractDate=DateUtil.getDate(date, "yyyy-MM-dd");
+			}
 			// 基本信息
 			List<BusinessInfoForApplyDerateVo> businessVoList = basicBusinessService
 					.selectBusinessInfoForApplyDerateVo(crpId, isDefer, businessId);
@@ -415,7 +420,7 @@ public class ApplyDerateController {
 			if(pList!=null) {
 				List<RepaymentBizPlanList> list=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", pList.getPlanId()).orderBy("period")); 
 				if(list.size()>0) {
-				  vo=basicBusinessService.getPreLateFees(crpId, businessId, repaymentTypeId, BusinessTypeEnum.FSD_TYPE.getValue().toString(), new Date(), new Date(), list.get(0).getDueDate(),restPeriods);
+				  vo=basicBusinessService.getPreLateFees(crpId, businessId, repaymentTypeId, BusinessTypeEnum.FSD_TYPE.getValue().toString(), new Date(), contractDate, list.get(0).getDueDate(),restPeriods);
 				}
 			}
 

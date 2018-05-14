@@ -251,6 +251,9 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 		}else {
 			throw new ServiceRuntimeException("找不到出款记录");
 		}
+		if(ContractDate==null) {
+			ContractDate=outputDate;
+		}
 		try {
 
 			if (businessTypeId.equals(BusinessTypeEnum.FSD_TYPE.getValue().toString())) {// 房贷
@@ -305,6 +308,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 				} else {// 有月收平台服务费
 
 					// 2018年4月2日以后的数据
+
 					if (ContractDate.after(DateUtil.getDate("2018-04-02", "yyyy-MM-dd"))) {
 						// 等额本息,还本付息5年
 						if (repayType.equals(RepayTypeEnum.EQUAL_AMOUNT_INTEREST.getValue().toString())
@@ -334,7 +338,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 								if (preLateFees > vo.getPrincipal().doubleValue() * 0.06) {
 									preLateFees = vo.getPrincipal().doubleValue() * 0.06;
 								}
-								preLateFees = preLateFees + monthPlatformAmount * 2 + monthCompanyAmount * 2;
+								preLateFees = preLateFees + monthPlatformAmount  + monthCompanyAmount ;
 							}
 
 							// 还本付息10年
