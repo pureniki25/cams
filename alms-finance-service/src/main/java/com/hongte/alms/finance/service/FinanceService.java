@@ -18,4 +18,5 @@ public interface FinanceService {
 	public Result appointBankStatement(RepaymentRegisterInfoDTO dto);
 	public Result matchBankStatement(List<String> moneyPoolIds,String businessId,String afterId,String mprid);
 	public Result disMatchedBankStatement(MoneyPool moneyPool,MoneyPoolRepayment moneyPoolRepayment);
+	public Result thisPeroidRepayment(String businessId,String afterId);
 }
