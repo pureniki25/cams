@@ -16,5 +16,15 @@
     <sql id="Base_Column_List">
         business_type_id AS businessTypeId, business_type_name AS businessTypeName, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
     </sql>
+    
+    <select id="queryBusinessTypeNameByBusinessId" resultType="java.lang.String">
+    	SELECT 
+		  t2.`business_type_name`
+		FROM
+		  tb_basic_business t1,
+		  tb_basic_business_type t2 
+		WHERE t1.`business_type` = t2.`business_type_id` 
+		  AND t1.`business_id` = #{businessId,jdbcType=VARCHAR}
+    </select>
 
 </mapper>

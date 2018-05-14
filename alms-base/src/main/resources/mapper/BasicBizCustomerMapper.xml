@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.BasicBizCustomerMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.BasicBizCustomer">
+        <id column="id" property="id" />
+        <result column="customer_id" property="customerId" />
+        <result column="business_id" property="businessId" />
+        <result column="ismain_customer" property="ismainCustomer" />
+        <result column="customer_name" property="customerName" />
+        <result column="is_receipt_account" property="isReceiptAccount" />
+        <result column="customer_type" property="customerType" />
+        <result column="identify_card" property="identifyCard" />
+        <result column="phone_number" property="phoneNumber" />
+        <result column="ismainland_resident" property="ismainlandResident" />
+        <result column="is_company_bank_account" property="isCompanyBankAccount" />
+        <result column="is_merged_certificate" property="isMergedCertificate" />
+        <result column="unifiedCode" property="unifiedCode" />
+        <result column="business_licence" property="businessLicence" />
+        <result column="register_province" property="registerProvince" />
+        <result column="company_legal_person" property="companyLegalPerson" />
+        <result column="legal_person_identity_card" property="legalPersonIdentityCard" />
+        <result column="legal_person_ismain_customer" property="legalPersonIsmainCustomer" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="update_user" property="updateUser" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, customer_id AS customerId, business_id AS businessId, ismain_customer AS ismainCustomer, customer_name AS customerName, is_receipt_account AS isReceiptAccount, customer_type AS customerType, identify_card AS identifyCard, phone_number AS phoneNumber, ismainland_resident AS ismainlandResident, is_company_bank_account AS isCompanyBankAccount, is_merged_certificate AS isMergedCertificate, unifiedCode, business_licence AS businessLicence, register_province AS registerProvince, company_legal_person AS companyLegalPerson, legal_person_identity_card AS legalPersonIdentityCard, legal_person_ismain_customer AS legalPersonIsmainCustomer, create_time AS createTime, create_user AS createUser, update_user AS updateUser, update_time AS updateTime
+    </sql>
+
+</mapper>

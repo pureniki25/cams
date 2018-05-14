@@ -183,6 +183,7 @@ public class CarAuctionController {
 		return Result.error(e.getCode(),e.getMsg()); 
 	}catch (Exception e) {
 		logger.error(e.getMessage());
+		e.printStackTrace();
 		return Result.error("9999", "报名失败"); 
 	}
 	}

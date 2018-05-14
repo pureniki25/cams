@@ -1,5 +1,6 @@
 package com.hongte.alms.finance.service;
 
+import com.hongte.alms.finance.dto.repayPlan.PlanReturnInfoDto;
 import com.hongte.alms.finance.dto.repayPlan.RepaymentBizPlanDto;
 import com.hongte.alms.finance.req.repayPlan.CreatRepayPlanReq;
 
@@ -16,10 +17,10 @@ public interface CreatRepayPlanService {
      * @param creatRepayPlanReq
      * @return
      */
-    public List<RepaymentBizPlanDto> creatRepayPlan(CreatRepayPlanReq creatRepayPlanReq) throws InstantiationException, IllegalAccessException;
+    public PlanReturnInfoDto creatRepayPlan(CreatRepayPlanReq creatRepayPlanReq) throws InstantiationException, IllegalAccessException;
 
 
-    public  List<RepaymentBizPlanDto> creatAndSaveRepayPlan(CreatRepayPlanReq creatRepayPlanReq) throws IllegalAccessException, InstantiationException;
+    public  PlanReturnInfoDto creatAndSaveRepayPlan(CreatRepayPlanReq creatRepayPlanReq) throws IllegalAccessException, InstantiationException;
 
 
 }

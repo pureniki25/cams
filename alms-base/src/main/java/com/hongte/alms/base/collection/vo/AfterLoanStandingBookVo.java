@@ -86,6 +86,7 @@ public class AfterLoanStandingBookVo implements java.io.Serializable  {
 
     private Integer borrowLimit ;//借款期限,用于判断是否最后一期
     private Integer repaymentTypeId ;//还款方式
+    private String className; // 分类名称
     
     @Excel(name = "期数状态", orderNum = "17",   isImportField = "true_st")
     private String peroidStatus ;//期数状态,首期/本金期/末期
@@ -335,6 +336,13 @@ public class AfterLoanStandingBookVo implements java.io.Serializable  {
 	 */
 	public void setRepaymentTypeId(Integer repaymentTypeId) {
 		this.repaymentTypeId = repaymentTypeId;
+	}
+	public String getClassName() {
+		return className;
+	}
+
+	public void setClassName(String className) {
+		this.className = className;
 	}
 
 	/**

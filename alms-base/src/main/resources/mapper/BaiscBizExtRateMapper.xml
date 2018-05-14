@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.BaiscBizExtRateMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.BaiscBizExtRate">
+        <id column="id" property="id" />
+        <result column="business_id" property="businessId" />
+        <result column="rate_type" property="rateType" />
+        <result column="rate_name" property="rateName" />
+        <result column="rate_value" property="rateValue" />
+        <result column="rate_unit" property="rateUnit" />
+        <result column="fee_id" property="feeId" />
+        <result column="fee_name" property="feeName" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="update_time" property="updateTime" />
+        <result column="update_user" property="updateUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, business_id AS businessId, rate_type AS rateType, rate_name AS rateName, rate_value AS rateValue, rate_unit AS rateUnit, fee_id AS feeId, fee_name AS feeName, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
+    </sql>
+
+</mapper>
