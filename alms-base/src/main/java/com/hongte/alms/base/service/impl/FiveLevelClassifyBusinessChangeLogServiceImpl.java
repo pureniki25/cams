@@ -1,5 +1,12 @@
 package com.hongte.alms.base.service.impl;
 
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.alibaba.fastjson.JSON;
 import com.aliyun.oss.ServiceException;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
@@ -9,14 +16,6 @@ import com.hongte.alms.base.service.FiveLevelClassifyBusinessChangeLogService;
 import com.hongte.alms.base.vo.module.classify.ClassifyConditionVO;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.Constant;
-import com.ht.ussp.bean.LoginUserInfoHelper;
-
-import java.util.Date;
-import java.util.List;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 /**
  * <p>
@@ -30,9 +29,6 @@ import org.springframework.stereotype.Service;
 public class FiveLevelClassifyBusinessChangeLogServiceImpl
 		extends BaseServiceImpl<FiveLevelClassifyBusinessChangeLogMapper, FiveLevelClassifyBusinessChangeLog>
 		implements FiveLevelClassifyBusinessChangeLogService {
-
-	@Autowired
-	private LoginUserInfoHelper loginUserInfoHelper;
 	
 	@Autowired
 	private FiveLevelClassifyBusinessChangeLogMapper fiveLevelClassifyBusinessChangeLogMapper;
@@ -58,8 +54,8 @@ public class FiveLevelClassifyBusinessChangeLogServiceImpl
 			changeLog.setOrigBusinessId(businessId);
 			changeLog.setOpSourseType(classifyConditionVO.getOpSourse());
 			changeLog.setOpSourseId(classifyConditionVO.getOpSourseId());
-			changeLog.setOpUserId(loginUserInfoHelper.getUserId());
-			changeLog.setOpUsername(loginUserInfoHelper.getLoginInfo().getUserName());
+			changeLog.setOpUserId(classifyConditionVO.getOpUserId());
+			changeLog.setOpUsername(classifyConditionVO.getOpUsername());
 			changeLog.setOpTime(new Date());
 			changeLog.setValidStatus("1");
 			changeLog.setParamJson(JSON.toJSONString(classifyConditionVO));

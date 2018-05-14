@@ -101,7 +101,9 @@ public class BusinessParameterController {
 		try {
 			if (classifyConditionVO == null || StringUtil.isEmpty(classifyConditionVO.getBusinessId())
 					|| StringUtil.isEmpty(classifyConditionVO.getOpSourse())
-					|| StringUtil.isEmpty(classifyConditionVO.getOpSourseId())) {
+					|| StringUtil.isEmpty(classifyConditionVO.getOpSourseId())
+					|| StringUtil.isEmpty(classifyConditionVO.getOpUserId())
+					|| StringUtil.isEmpty(classifyConditionVO.getOpUsername())) {
 				return Result.error("500", "参数不能为空！");
 			}
 			fiveLevelClassifyBusinessChangeLogService.businessChangeLog(classifyConditionVO);
