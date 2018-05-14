@@ -96,7 +96,6 @@ public class BusinessParameterServiceImpl implements BusinessParameterService {
 
 	private FiveLevelClassify assembleFiveLevelClassify(FiveLevelClassifyVO param) {
 		FiveLevelClassify classify = new FiveLevelClassify();
-		classify.setId(param.getId());
 		classify.setBusinessType(param.getBusinessType());
 		classify.setClassName(param.getClassName());
 		classify.setClassLevel(param.getClassLevel());
@@ -108,6 +107,7 @@ public class BusinessParameterServiceImpl implements BusinessParameterService {
 			classify.setCreateTime(new Date());
 		}
 		if ("updateFiveLevelClassify".equals(methodName)) {
+			classify.setId(param.getId());
 			classify.setUpdateUser(userId);
 			classify.setUpdateTime(new Date());
 		}

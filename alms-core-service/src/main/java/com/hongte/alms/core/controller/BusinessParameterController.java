@@ -31,7 +31,6 @@ import com.hongte.alms.base.service.BusinessParameterService;
 import com.hongte.alms.base.service.FiveLevelClassifyBusinessChangeLogService;
 import com.hongte.alms.base.service.FiveLevelClassifyService;
 import com.hongte.alms.base.service.SysParameterService;
-import com.hongte.alms.base.vo.module.classify.ClassifyConditionVO;
 import com.hongte.alms.base.vo.module.classify.FiveLevelClassifyConditionVO;
 import com.hongte.alms.base.vo.module.classify.FiveLevelClassifyVO;
 import com.hongte.alms.common.result.Result;
@@ -256,8 +255,11 @@ public class BusinessParameterController {
 	@ResponseBody
 	public Result saveConditionForClassify(@RequestBody Map<String, Object> paramMap) {
 		try {
-			if (paramMap == null || paramMap.isEmpty()) {
-				return Result.error("-500", "参数不能为空！");
+			if (paramMap == null) {
+				return Result.error("500", "参数不能为空！");
+			}
+			if (paramMap.get("subClassName") == null || StringUtil.isEmpty((String) paramMap.get("subClassName"))) {
+				return Result.error("500", "条件名称不能为空！");
 			}
 			businessParameterService.saveConditionForClassify(paramMap);
 			return Result.success();
@@ -272,8 +274,11 @@ public class BusinessParameterController {
 	@ResponseBody
 	public Result updateConditionForClassify(@RequestBody Map<String, Object> paramMap) {
 		try {
-			if (paramMap == null || paramMap.isEmpty()) {
+			if (paramMap == null) {
 				return Result.error("500", "参数不能为空！");
+			}
+			if (paramMap.get("subClassName") == null || StringUtil.isEmpty((String) paramMap.get("subClassName"))) {
+				return Result.error("500", "条件名称不能为空！");
 			}
 			businessParameterService.updateConditionForClassify(paramMap);
 			return Result.success();
