@@ -1,8 +1,6 @@
 package com.hongte.alms.base.service.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -58,25 +56,9 @@ public class BusinessParameterServiceImpl implements BusinessParameterService {
 
 	@Override
 	public Page<FiveLevelClassify> queryFiveLevelClassifys(Integer page, Integer limit) {
-		Page<FiveLevelClassify> pageParam = new Page<>(page, limit);
-		Page<FiveLevelClassify> resultPage = fiveLevelClassifyService.selectPage(pageParam);
-		List<FiveLevelClassify> records = resultPage.getRecords();
-		List<FiveLevelClassify> list = new ArrayList<>();
-		if (CollectionUtils.isNotEmpty(records)) {
-			Collections.sort(records, new Comparator<FiveLevelClassify>() {
-				public int compare(FiveLevelClassify classify1, FiveLevelClassify classify2) {
-					return classify1.getBusinessType().compareTo(classify2.getBusinessType());
-				}
-			});
-			for (FiveLevelClassify fiveLevelClassify : records) {
-				if ("0".equals(fiveLevelClassify.getValidStatus())) {
-					list.add(fiveLevelClassify);
-				}
-			}
-			records.removeAll(list);
-			resultPage.setRecords(records);
-		}
-		return resultPage;
+		Page<FiveLevelClassify> pageParam = new Page<>(page, limit, "business_type");
+		return fiveLevelClassifyService.selectPage(pageParam,
+				new EntityWrapper<FiveLevelClassify>().eq("valid_status", "1"));
 	}
 
 	@Override
@@ -158,7 +140,7 @@ public class BusinessParameterServiceImpl implements BusinessParameterService {
 					conditionVOs.add(vo);
 				}
 			}
-			
+
 			return conditionVOs;
 		} catch (Exception e) {
 			LOG.error("方法 queryFiveLevelClassifyCondition 执行失败！", e);
