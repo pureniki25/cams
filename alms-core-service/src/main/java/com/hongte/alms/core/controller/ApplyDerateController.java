@@ -26,6 +26,7 @@ import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.enums.AreaLevel;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanItemTypeFeeIdEnum;
 import com.hongte.alms.base.process.entity.Process;
 import com.hongte.alms.base.process.entity.ProcessLog;
 import com.hongte.alms.base.process.entity.ProcessTypeStep;
@@ -296,9 +297,17 @@ public class ApplyDerateController {
 			// 申请类型列表
 			RepaymentBizPlanList pList = repaymentBizPlanListService.selectById(crpId);
 			if (pList != null) {
-				List<RepaymentBizPlanListDetail> derateTypeList = repaymentBizPlanListDetailService.selectList(
+//				List<RepaymentBizPlanListDetail> derateTypeList = repaymentBizPlanListDetailService.selectList(
+//						new EntityWrapper<RepaymentBizPlanListDetail>().eq("business_id", pList.getBusinessId())
+//								.eq("plan_list_id", crpId).and().ne("plan_item_name", "本金").groupBy("fee_id"));
+				List<String> feeIds=new ArrayList();
+				//减免费用项只能减免:1.逾期利息 2.提前还款违约金 3.滞纳金
+				feeIds.add(RepayPlanItemTypeFeeIdEnum.OVER_DUE_INTEREST.getValue());//逾期利息
+				feeIds.add(RepayPlanItemTypeFeeIdEnum.PRE_LATEFEES.getValue());//提前还款违约金
+				feeIds.add(RepayPlanItemTypeFeeIdEnum.OVER_DUE_AMONT.getValue());//滞纳金
+				List<RepaymentBizPlanListDetail> derateTypeList=repaymentBizPlanListDetailService.selectList(
 						new EntityWrapper<RepaymentBizPlanListDetail>().eq("business_id", pList.getBusinessId())
-								.eq("plan_list_id", crpId).and().ne("plan_item_name", "本金").groupBy("fee_id"));
+								.eq("plan_list_id", crpId).and().in("fee_id", feeIds));
 				// List<SysParameter> derateTypeList = sysParameterService.selectList(new
 				// EntityWrapper<SysParameter>().eq("param_type",
 				// SysParameterTypeEnums.DERATE_TYPE.getKey()).orderBy("row_Index"));
