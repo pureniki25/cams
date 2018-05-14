@@ -28,6 +28,16 @@ public class ClassifyConditionVO implements Serializable {
 	private String className;
 
 	/**
+	 * 操作者ID
+	 */
+	private String opUserId;
+
+	/**
+	 * 操作者姓名
+	 */
+	private String opUsername;
+
+	/**
 	 * 抵押物信息
 	 */
 	private List<String> guaranteeConditions;
@@ -85,11 +95,28 @@ public class ClassifyConditionVO implements Serializable {
 		this.mainBorrowerConditions = mainBorrowerConditions;
 	}
 
+	public String getOpUserId() {
+		return opUserId;
+	}
+
+	public void setOpUserId(String opUserId) {
+		this.opUserId = opUserId;
+	}
+
+	public String getOpUsername() {
+		return opUsername;
+	}
+
+	public void setOpUsername(String opUsername) {
+		this.opUsername = opUsername;
+	}
+
 	@Override
 	public String toString() {
 		return "ClassifyConditionVO [businessId=" + businessId + ", opSourse=" + opSourse + ", opSourseId=" + opSourseId
-				+ ", className=" + className + ", guaranteeConditions=" + guaranteeConditions
-				+ ", mainBorrowerConditions=" + mainBorrowerConditions + "]";
+				+ ", className=" + className + ", opUserId=" + opUserId + ", opUsername=" + opUsername
+				+ ", guaranteeConditions=" + guaranteeConditions + ", mainBorrowerConditions=" + mainBorrowerConditions
+				+ "]";
 	}
 
 }
