@@ -139,7 +139,9 @@
 		      FROM
 		        tb_repayment_biz_plan_list 
 		      WHERE orig_business_id = t1.`business_id`)
-		      AND t1.`business_id` = #{businessId,jdbcType=VARCHAR}) tab
+		      AND t1.`business_id` = #{businessId,jdbcType=VARCHAR}
+		      ORDER BY t2.`due_date`
+		      LIMIT 1) tab
     </select>
     
     <select id="queryInterestOverdueByBusinessId" resultType="java.lang.Integer">

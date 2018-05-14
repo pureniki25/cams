@@ -2,6 +2,7 @@ package com.hongte.alms.core.controller;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -156,11 +157,17 @@ public class BusinessParameterController {
 					|| StringUtil.isEmpty(param.getClassName())) {
 				return Result.error("500", "参数不能为空！");
 			}
-			int count = fiveLevelClassifyService
+			int classNameCount = fiveLevelClassifyService
 					.selectCount(new EntityWrapper<FiveLevelClassify>().eq("business_type", param.getBusinessType())
 							.eq("class_name", param.getClassName()).eq("valid_status", "1"));
-			if (count > 0) {
-				return Result.error("500", "已存在该类型，请重新输入");
+			if (classNameCount > 0) {
+				return Result.error("500", "类别重复，请重新输入");
+			}
+			int classLevelCount = fiveLevelClassifyService
+					.selectCount(new EntityWrapper<FiveLevelClassify>().eq("business_type", param.getBusinessType())
+							.eq("class_level", param.getClassLevel()).eq("valid_status", "1"));
+			if (classLevelCount > 0) {
+				return Result.error("500", "等级重复，请重新输入");
 			}
 			businessParameterService.saveFiveLevelClassify(param);
 			return Result.success();
@@ -241,6 +248,11 @@ public class BusinessParameterController {
 			List<FiveLevelClassifyConditionVO> classifyConditionVOs = businessParameterService
 					.queryFiveLevelClassifyCondition(className, businessType);
 			if (CollectionUtils.isNotEmpty(classifyConditionVOs)) {
+				Collections.sort(classifyConditionVOs, new Comparator<FiveLevelClassifyConditionVO>() {
+					public int compare(FiveLevelClassifyConditionVO conditionVO1, FiveLevelClassifyConditionVO conditionVO2) {
+						return conditionVO1.getSubClassName().compareTo(conditionVO2.getSubClassName());
+					}
+				});
 				return Result.build("0", "请求成功！", classifyConditionVOs);
 			}
 			return Result.build("0", "没有找到数据！", null);
