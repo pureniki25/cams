@@ -95,4 +95,11 @@ public interface BasicBusinessService extends BaseService<BasicBusiness> {
 	 * @return
 	 */
 	 Integer   getBorrowLlimitZQ(@Param("crpId") String crpId);
+	    /**
+		 * 	 月收平台服务费的业务记录条数
+		 * @param original_business_id
+		 * @return
+		 */
+	 
+	 Integer getMonthPlatformAmountCount(@Param("crpId") String crpId);
 }

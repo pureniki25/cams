@@ -418,6 +418,25 @@
 
 		where pList.plan_list_id=#{crpId,jdbcType=VARCHAR} and pDetail.plan_item_type = 50 limit 1
 	</select>
+	
+			<!-- 月收平台费服务费-->
+	<select id="getMonthPlatformAmountCount" resultType="java.lang.Integer">
+				select 
+
+            count(1)
+		   from
+
+
+		tb_repayment_biz_plan_list_detail pDetail
+
+		left join tb_repayment_biz_plan_list pList on
+		pList.plan_list_id=pDetail.plan_list_id
+
+			left join tb_repayment_biz_plan plan on pList.plan_id=plan.plan_id
+
+		where pList.plan_list_id=#{crpId,jdbcType=VARCHAR} and pDetail.plan_item_type = 50 limit 1
+	</select>
+ 
  
 		<!-- 月收分公司服务费-->
 	<select id="getMonthCompanyAmount" resultType="java.lang.Double">

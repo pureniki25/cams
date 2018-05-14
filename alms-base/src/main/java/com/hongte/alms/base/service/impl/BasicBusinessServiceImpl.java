@@ -240,6 +240,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 		Integer settleMonth = getSettleMonths(preSettleDate, firstRepayDate);// 结清阶段
 		Double preLateFees = Double.valueOf(0);
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Integer platformCount=getMonthPlatformAmountCount(crpId);//有无月收平台费
 		Double monthPlatformAmount = getMonthPlatformAmount(crpId);// 月收平台费
 		Double monthCompanyAmount = getMonthCompanyAmount(crpId);// 月收公司服务费
 		BizOutputRecord bizOutputRecord = bizOutputRecordService
@@ -258,7 +259,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 
 			if (businessTypeId.equals(BusinessTypeEnum.FSD_TYPE.getValue().toString())) {// 房贷
 				// 无月收平台服务费
-				if (monthPlatformAmount == 0) {
+				if (platformCount ==0) {
 					Date date1 = dateFormat.parse("2017-03-01");
 					Date date2 = dateFormat.parse("2017-12-04");
 					Date date3 = dateFormat.parse("2017-12-05");
@@ -562,5 +563,10 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 		return basicBusinessMapper.getBorrowLlimitZQ(crpId);
 		 
 	 }
+
+	@Override
+	public Integer getMonthPlatformAmountCount(String crpId) {
+		return basicBusinessMapper.getMonthPlatformAmountCount(crpId);
+	}
 
 }

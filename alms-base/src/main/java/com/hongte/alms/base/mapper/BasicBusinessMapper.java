@@ -78,6 +78,8 @@ public interface BasicBusinessMapper extends SuperMapper<BasicBusiness> {
 	 * @return
 	 */
 	 Double  getMonthPlatformAmount(@Param("crpId") String crpId);
+	 
+	 Integer getMonthPlatformAmountCount(@Param("crpId") String crpId);
 	 /**
 	 * 	 月收公司服务费的业务
 	 * @param original_business_id
