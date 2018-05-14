@@ -365,35 +365,39 @@ window.layinit(function (htConfig) {
 		   saveFiveLevelClassify:function(){
 			   if (this.addBusinessParamModal) {
 				   this.$refs['commitBusinessTypeForm'].validate((valid) => {
-					   axios.post(basePath + 'businessParameter/saveFiveLevelClassify', this.commitBusinessTypeForm)
-					   .then(function (res) {
-						   console.log(res)
-						   if (res.data.code == "1") {
-							   vm.showBusinessParamModal = false
-							   tableReload(vm.key && vm.key != '' ? { key: vm.key } : {}, { curr: 1 })
-						   } else {
-							   vm.$Modal.error({ content: res.data.msg });
-						   }
-					   })
-					   .catch(function (err) {
-						   vm.$Modal.error({ content: '接口调用异常!' });
-					   })
+					   if (valid) {
+						   axios.post(basePath + 'businessParameter/saveFiveLevelClassify', this.commitBusinessTypeForm)
+						   .then(function (res) {
+							   console.log(res)
+							   if (res.data.code == "1") {
+								   vm.showBusinessParamModal = false
+								   tableReload(vm.key && vm.key != '' ? { key: vm.key } : {}, { curr: 1 })
+							   } else {
+								   vm.$Modal.error({ content: res.data.msg });
+							   }
+						   })
+						   .catch(function (err) {
+							   vm.$Modal.error({ content: '接口调用异常!' });
+						   })
+					   }
 				   })
 			   }else if (this.editBusinessParamModal) {
 				   this.$refs['commitBusinessTypeForm'].validate((valid) => {
-					   axios.post(basePath + 'businessParameter/updateFiveLevelClassify', this.commitBusinessTypeForm)
-					   .then(function (res) {
-						   console.log(res)
-						   if (res.data.code == "1") {
-							   vm.showBusinessParamModal = false
-							   tableReload(vm.key && vm.key != '' ? { key: vm.key } : {}, { curr: 1 })
-						   } else {
-							   vm.$Modal.error({ content: res.data.msg });
-						   }
-					   })
-					   .catch(function (err) {
-						   vm.$Modal.error({ content: '接口调用异常!' });
-					   })
+					   if(valid){
+						   axios.post(basePath + 'businessParameter/updateFiveLevelClassify', this.commitBusinessTypeForm)
+						   .then(function (res) {
+							   console.log(res)
+							   if (res.data.code == "1") {
+								   vm.showBusinessParamModal = false
+								   tableReload(vm.key && vm.key != '' ? { key: vm.key } : {}, { curr: 1 })
+							   } else {
+								   vm.$Modal.error({ content: res.data.msg });
+							   }
+						   })
+						   .catch(function (err) {
+							   vm.$Modal.error({ content: '接口调用异常!' });
+						   })
+					   }
 				   })
 			   }
 		   },
@@ -458,6 +462,9 @@ window.layinit(function (htConfig) {
 	 	    },
 	 	    removeSelectOp:function(event, index){
 	 	    	this.commitSetConditionModel.commitSetCondition.splice(index, 1);
+	 	    	if (this.commitSetConditionModel.commitSetCondition == '') {
+					this.addSelectOp(event);
+				}
 	 	    },
 		   conditionTypeChange:function(value, index){
 			   if(value == '主借款人情况' || value == '抵押物情况' || value == '档案资料情况' || value == '案件情况'){
