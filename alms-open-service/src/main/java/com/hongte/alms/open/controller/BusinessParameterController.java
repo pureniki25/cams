@@ -126,8 +126,8 @@ public class BusinessParameterController {
 			FiveLevelClassifyBusinessChangeLog changeLog = fiveLevelClassifyBusinessChangeLogService
 					.selectOne(new EntityWrapper<FiveLevelClassifyBusinessChangeLog>()
 							.eq("orig_business_id", businessId).eq("valid_status", "1"));
-			String borrowerConditionDesc = changeLog.getBorrowerConditionDesc();
 			if (changeLog != null) {
+				String borrowerConditionDesc = changeLog.getBorrowerConditionDesc();
 				if (StringUtil.notEmpty(borrowerConditionDesc)) {
 					String[] arrBorrower = borrowerConditionDesc.split(Constant.FIVE_LEVEL_CLASSIFY_SPLIT);
 					resultMap.put("borrowerConditionDesc", Arrays.asList(arrBorrower));
