@@ -339,7 +339,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 								if (preLateFees > vo.getPrincipal().doubleValue() * 0.06) {
 									preLateFees = vo.getPrincipal().doubleValue() * 0.06;
 								}
-								preLateFees = preLateFees + monthPlatformAmount  + monthCompanyAmount ;
+								preLateFees = preLateFees + monthPlatformAmount*2  + monthCompanyAmount*2 ;
 							}
 
 							// 还本付息10年
