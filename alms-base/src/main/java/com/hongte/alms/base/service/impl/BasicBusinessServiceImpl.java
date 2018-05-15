@@ -401,7 +401,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 								// 本金违约金
 								double bjwyj = vo.getPrincipal().doubleValue() * 0.02 - monthPlatformAmount
 										- monthCompanyAmount;
-								preLateFees = monthPlatformAmount + monthCompanyAmount;
+								preLateFees =bjwyj+monthPlatformAmount + monthCompanyAmount;
 							} else if (settleMonth >= 13 && settleMonth <= 120) {
 								preLateFees = monthPlatformAmount * 2 + monthCompanyAmount * 2;
 							}
