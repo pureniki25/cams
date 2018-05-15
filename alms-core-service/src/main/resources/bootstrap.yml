@@ -41,7 +41,7 @@ eureka:
 ht:
   config:
     ui:
-      useGateWayflage: false   #是否使用网关的标志位
+      useGateWayflage: true   #是否使用网关的标志位
 ---
 spring:
   profiles: dev
