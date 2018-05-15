@@ -368,7 +368,9 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 								// 本金违约金
 								double bjwyj = vo.getPrincipal().doubleValue() * 0.02 - monthPlatformAmount
 										- monthCompanyAmount;
-
+								if (bjwyj < 0) {// 如果是负数，只收取服务费违约金
+									bjwyj = 0;
+								}
 								preLateFees = bjwyj + monthPlatformAmount + monthCompanyAmount;
 
 							} else if (repayType.equals(RepayTypeEnum.EQUAL_AMOUNT_INTEREST.getValue().toString())
