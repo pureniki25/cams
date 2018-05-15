@@ -224,22 +224,22 @@ window.layinit(function (htConfig) {
 			    				return d.LAY_INDEX
 			    			},
 			    			align: 'center',
-							width:200
+							width:190
 			    		}, {
 			    			field: 'subClassName',
 			    			title: '条件名称',
 			    			align: 'center',
-							width:200
+							width:190
 			    		}, {
 			    			field: 'updateTime',
 			    			title: '更新时间',
 			    			align: 'center',
-							width:200
+							width:190
 			    		}, {
 			    			title: '操作',
 			    			toolbar: "#toolbar2",
 			    			align: 'center',
-							width:200
+							width:193
 			    		}]
 			    		], // 设置表头
 			    		url: basePath + 'businessParameter/queryFiveLevelClassifyCondition?className=' + vm.fiveLevelClassifyModel.className + "&businessType=" + vm.fiveLevelClassifyModel.businessType,

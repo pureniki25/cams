@@ -127,17 +127,18 @@ public class BusinessParameterController {
 					.selectOne(new EntityWrapper<FiveLevelClassifyBusinessChangeLog>()
 							.eq("orig_business_id", businessId).eq("valid_status", "1"));
 			String borrowerConditionDesc = changeLog.getBorrowerConditionDesc();
-			
-			if (StringUtil.notEmpty(borrowerConditionDesc)) {
-				String[] arrBorrower = borrowerConditionDesc.split(Constant.FIVE_LEVEL_CLASSIFY_SPLIT);
-				resultMap.put("borrowerConditionDesc", Arrays.asList(arrBorrower));
-			}
-			
-			String guaranteeConditionDesc = changeLog.getGuaranteeConditionDesc();
-			
-			if (StringUtil.notEmpty(guaranteeConditionDesc)) {
-				String[] arrBorrower = guaranteeConditionDesc.split(Constant.FIVE_LEVEL_CLASSIFY_SPLIT);
-				resultMap.put("guaranteeConditionDesc", Arrays.asList(arrBorrower));
+			if (changeLog != null) {
+				if (StringUtil.notEmpty(borrowerConditionDesc)) {
+					String[] arrBorrower = borrowerConditionDesc.split(Constant.FIVE_LEVEL_CLASSIFY_SPLIT);
+					resultMap.put("borrowerConditionDesc", Arrays.asList(arrBorrower));
+				}
+				
+				String guaranteeConditionDesc = changeLog.getGuaranteeConditionDesc();
+				
+				if (StringUtil.notEmpty(guaranteeConditionDesc)) {
+					String[] arrBorrower = guaranteeConditionDesc.split(Constant.FIVE_LEVEL_CLASSIFY_SPLIT);
+					resultMap.put("guaranteeConditionDesc", Arrays.asList(arrBorrower));
+				}
 			}
 			return Result.success(resultMap);
 		} catch (Exception e) {
