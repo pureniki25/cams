@@ -549,7 +549,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 
 	// 获取结清阶段
 	private Integer getSettleMonths(Date settleDate, Date firstRepayDate) {
-		Integer months = DateUtil.getDiffMonths(firstRepayDate, settleDate);
+		Integer months = DateUtil.getDiffMonths(settleDate,firstRepayDate);
 		return months;
 	}
 	
