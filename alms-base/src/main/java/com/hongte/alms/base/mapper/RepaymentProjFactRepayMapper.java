@@ -1,5 +1,7 @@
 package com.hongte.alms.base.mapper;
 
+import java.math.BigDecimal;
+
 import com.hongte.alms.base.entity.RepaymentProjFactRepay;
 import com.hongte.alms.common.mapper.SuperMapper;
 
@@ -12,5 +14,5 @@ import com.hongte.alms.common.mapper.SuperMapper;
  * @since 2018-05-03
  */
 public interface RepaymentProjFactRepayMapper extends SuperMapper<RepaymentProjFactRepay> {
-
+	public BigDecimal calFactRepay(Integer itemType,String feeId,String businessId,String afterId) ;
 }

@@ -29,4 +29,17 @@
         proj_plan_detail_repay_id AS projPlanDetailRepayId, proj_plan_detail_id AS projPlanDetailId, project_id AS projectId, business_id AS businessId, orig_business_id AS origBusinessId, period, after_id AS afterId, fee_id AS feeId, plan_item_name AS planItemName, plan_item_type AS planItemType, fact_amount AS factAmount, repay_source AS repaySource, fact_repay_date AS factRepayDate, repay_ref_id AS repayRefId, create_date AS createDate, create_user AS createUser, update_date AS updateDate, update_user AS updateUser
     </sql>
 
+	<select id="calFactRepay" resultType="java.math.BigDecimal">
+		SELECT
+			IFNULL( sum( fact_amount ), 0 ) 
+		FROM
+			tb_repayment_proj_fact_repay 
+		WHERE
+			business_id = #{businessId}
+			AND after_id = #{afterId}
+			AND plan_item_type = ${itemType}
+			<if test="feeId !=null ">
+				AND fee_id = #{feeId}
+			</if>
+	</select>
 </mapper>
