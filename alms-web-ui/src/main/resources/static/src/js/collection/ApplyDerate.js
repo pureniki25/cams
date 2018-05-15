@@ -113,7 +113,7 @@ window.layinit(function (htConfig) {
             baseInfoForm:{
             	afterId:"", 
                 preLateFeesType:"", //提前还款违约金方式:
-          
+                zqBusinessId:"",//如果当前期是展期业务,则存展期业务编号，否则存原业务编号
                 outsideInterestType:"",//合同期外逾期利息类型
                 outsideInterest:"",//合同期外逾期利息
                 businessId:""		   	, //业务编号
@@ -641,7 +641,7 @@ var showData=function(){debugger
     	
     	var restPeriods=vm.baseInfoForm.borrowLimit-vm.baseInfoForm.periods;
     	//获取提前结清违约金和往期少交费用
-        axios.get(basePath + "ApplyDerateController/getHousePreLateFees?crpId="+crpId+"&repaymentTypeId="+vm.baseInfoForm.repaymentTypeId+"&afterId="+afterId+"&businessId=" + businessId+"&restPeriods="+restPeriods
+        axios.get(basePath + "ApplyDerateController/getHousePreLateFees?crpId="+crpId+"&repaymentTypeId="+vm.baseInfoForm.repaymentTypeId+"&afterId="+afterId+"&businessId=" + vm.baseInfoForm.zqBusinessId+"&restPeriods="+restPeriods
         ).then(function(res){
             if(res.data.code=='1'){
                 vm.baseInfoForm.preLateFees = res.data.data.preLateFees

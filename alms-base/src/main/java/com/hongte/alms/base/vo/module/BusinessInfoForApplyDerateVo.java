@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 public class BusinessInfoForApplyDerateVo  {
 
     private String businessId		   	; //业务编号
+    private String zqBusinessId         ;//如果当前期是展期业务,则存展期业务编号，否则存原业务编号
     private String customerName        ; //客户名称
     private String companyId           ; //所属分公司ID
     private String companyName  		; //所属分公司		需处理
@@ -57,7 +58,17 @@ public class BusinessInfoForApplyDerateVo  {
     private Integer noSettleDelayDays;//不结清时的逾期天数
     
     
-    public Integer getNoSettleDelayDays() {
+    public String getZqBusinessId() {
+		return zqBusinessId;
+	}
+
+
+	public void setZqBusinessId(String zqBusinessId) {
+		this.zqBusinessId = zqBusinessId;
+	}
+
+
+	public Integer getNoSettleDelayDays() {
 		return noSettleDelayDays;
 	}
 

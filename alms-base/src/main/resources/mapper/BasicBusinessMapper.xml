@@ -41,6 +41,7 @@
     <select id="selectBusinessInfoForApplyDerateVo" resultType="com.hongte.alms.base.vo.module.BusinessInfoForApplyDerateVo">
 		SELECT 
 		  business.business_id AS businessId,
+		  pList.business_id as zqBusinessId,
 		  business.customer_name AS customerName,
 		  business.company_id AS companyId,
 		  company.area_name AS companyName,
