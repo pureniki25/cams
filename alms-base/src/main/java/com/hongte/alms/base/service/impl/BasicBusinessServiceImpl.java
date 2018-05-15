@@ -325,7 +325,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 										- monthCompanyAmount * 2;
 								if (bjwyj < 0) {// 如果是负数，只收取服务费违约金
 									bjwyj = 0;
-								}
+								} 
 								preLateFees = bjwyj + monthPlatformAmount * 2 + monthCompanyAmount * 2;
 
 							} else if (settleMonth >= 13 && settleMonth <= 48) {
