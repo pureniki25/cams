@@ -2,7 +2,6 @@ package com.hongte.alms.core.controller;
 
 
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,10 +55,8 @@ import com.hongte.alms.base.service.SysParameterService;
 import com.hongte.alms.base.service.SysUserService;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
 import com.hongte.alms.common.result.Result;
-import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.EasyPoiExcelExportUtil;
 import com.hongte.alms.common.util.JsonUtil;
-import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.core.storage.StorageService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
@@ -176,8 +173,7 @@ public class CollectionController {
     public PageResult<List<AfterLoanStandingBookVo>> selectALStandingBookVoPage(@ModelAttribute AfterLoanStandingBookReq req){
 
         try{
-            System.out.println(JSON.toJSONString(req));
-			if (req.getShowRepayDateBegin() == null && req.getShowRepayDateEnd() == null 
+			/*if (req.getShowRepayDateBegin() == null && req.getShowRepayDateEnd() == null 
 					&& req.getDelayDaysEnd() == null
 					&& req.getRealRepayDateBegin() == null && req.getRealRepayDateEnd() == null
 					&& req.getCollectLevel() == null && StringUtil.isEmpty(req.getBusinessId())) {
@@ -192,7 +188,7 @@ public class CollectionController {
 			if (req.getRealRepayDateBegin() != null && req.getRealRepayDateEnd() != null
 					&& DateUtil.getDiffDays(req.getRealRepayDateBegin(), req.getRealRepayDateEnd()) > 93) {
 				return PageResult.error(500, "实还日期选择范围不能超过93天！");
-			}
+			}*/
             if(req.getRepayStatus()!=null&&req.getRepayStatus().equals(""))req.setRepayStatus(null);
             
             long startTime = System.currentTimeMillis();
@@ -207,7 +203,7 @@ public class CollectionController {
             return PageResult.error(500, "数据库访问异常");
         }
     }
-
+    
 
     @ApiOperation(value = "贷后首页台账 导出成excel")
 //    @RequestMapping("/download")
