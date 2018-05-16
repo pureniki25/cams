@@ -16,6 +16,8 @@ import com.hongte.alms.finance.req.repayPlan.*;
 import com.hongte.alms.finance.service.CreatRepayPlanService;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.DateUtil;
+import com.hongte.alms.common.util.StringUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1522,6 +1524,25 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         return projPlanListDetail;
     }
 
+    @Override
+	public PlanReturnInfoDto queryRepayPlan(String businessId) {
+    	try {
+    		PlanReturnInfoDto planReturnInfoDto = null;
+    		
+    		if (StringUtil.isEmpty(businessId)) {
+    			return planReturnInfoDto;
+    		}
+    		
+    		List<RepaymentBizPlanDto> repaymentBizPlanDtos = new ArrayList<>();
+    		List<XdPlanDto> xdPlanDtos = new ArrayList<>();
+    		
+			
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return null;
+	}
 
 
     public static void main(String[] args) {
@@ -1577,4 +1598,6 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 //        BigDecimal big2 = new BigDecimal(50);
 //        System.out.println(big2.divide(big1));
     }
+
+	
 }

@@ -1,10 +1,7 @@
 package com.hongte.alms.finance.service;
 
 import com.hongte.alms.finance.dto.repayPlan.PlanReturnInfoDto;
-import com.hongte.alms.finance.dto.repayPlan.RepaymentBizPlanDto;
 import com.hongte.alms.finance.req.repayPlan.CreatRepayPlanReq;
-
-import java.util.List;
 
 /**
  * @author zengkun
@@ -22,5 +19,10 @@ public interface CreatRepayPlanService {
 
     public  PlanReturnInfoDto creatAndSaveRepayPlan(CreatRepayPlanReq creatRepayPlanReq) throws IllegalAccessException, InstantiationException;
 
-
+    /**
+     * 根据 业务编号 查询还款计划
+     * @param businessId
+     * @return
+     */
+    PlanReturnInfoDto queryRepayPlan(String businessId);
 }
