@@ -46,6 +46,7 @@ window.layinit(function (htConfig) {
 	    		executeCondition:'',
 	    		commitSetCondition: [
 	    			{
+	    				id:'',
 	    				conditionType:'',
 		    			relation:'',
 		    			conditionDesc:'',
@@ -185,6 +186,7 @@ window.layinit(function (htConfig) {
 								   for (var i = 0; i < classifyConditions.length; i++) {
 									   vm.commitSetConditionModel.commitSetCondition.push(
 											{
+												id:classifyConditions[i].id,
 											    conditionType:classifyConditions[i].paramType,
 												relation:classifyConditions[i].typeNameRelation,
 												conditionDesc:classifyConditions[i].paramName,
