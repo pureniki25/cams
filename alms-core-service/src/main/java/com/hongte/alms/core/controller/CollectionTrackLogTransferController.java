@@ -159,7 +159,7 @@ public class CollectionTrackLogTransferController {
 						collectionTrackLog.setXdIndexId(parametertracelog.getId());
 
 						collectionTrackLogService.insert(collectionTrackLog);
-
+						deleteErrorInfo(carBusinessId,carBusinessAfterId);
 
 
 					}catch (Exception e){
