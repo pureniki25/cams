@@ -1,7 +1,6 @@
-package com.hongte.alms.base.mapper;
+package com.hongte.alms.base.collection.mapper;
 
-import com.baomidou.mybatisplus.plugins.Page;
-import com.hongte.alms.base.entity.Collection;
+import com.hongte.alms.base.collection.entity.Collection;
 import com.hongte.alms.base.vo.module.CollectionReq;
 import com.hongte.alms.common.mapper.SuperMapper;
 

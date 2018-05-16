@@ -40,6 +40,14 @@ public class TransferFailLog extends Model<TransferFailLog> {
 	@ApiModelProperty(required= true,value = "失败原因 1：贷后不存在该业务 2：催收人员在贷后管理系统不存在")
 	private Integer failReason;
 
+	/**
+	 * 同步的类型：null/1:电催 催收数据同步； 2: 贷后跟踪记录同步
+	 */
+	@TableField("trans_type")
+	@ApiModelProperty(required= true,value = "同步的类型：null/1:电催 催收数据同步； 2: 贷后跟踪记录同步")
+	private Integer transType;
+
+
 
 	public String getBusinessId() {
 		return businessId;
@@ -85,6 +93,15 @@ public class TransferFailLog extends Model<TransferFailLog> {
 			", afterId=" + afterId +
 			", id=" + id +
 			", failReason=" + failReason +
+			", transType=" + transType +
 			"}";
+	}
+
+	public Integer getTransType() {
+		return transType;
+	}
+
+	public void setTransType(Integer transType) {
+		this.transType = transType;
 	}
 }

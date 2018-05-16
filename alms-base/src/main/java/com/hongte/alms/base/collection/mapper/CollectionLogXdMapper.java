@@ -1,6 +1,6 @@
-package com.hongte.alms.base.mapper;
+package com.hongte.alms.base.collection.mapper;
 
-import com.hongte.alms.base.entity.CollectionLogXd;
+import com.hongte.alms.base.collection.entity.CollectionLogXd;
 import com.hongte.alms.base.vo.module.CollectionReq;
 import com.hongte.alms.common.mapper.SuperMapper;
 

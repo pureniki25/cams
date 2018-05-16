@@ -56,9 +56,9 @@ public class BusinessParameterServiceImpl implements BusinessParameterService {
 
 	@Override
 	public Page<FiveLevelClassify> queryFiveLevelClassifys(Integer page, Integer limit) {
-		Page<FiveLevelClassify> pageParam = new Page<>(page, limit, "business_type");
+		Page<FiveLevelClassify> pageParam = new Page<>(page, limit);
 		return fiveLevelClassifyService.selectPage(pageParam,
-				new EntityWrapper<FiveLevelClassify>().eq("valid_status", "1"));
+				new EntityWrapper<FiveLevelClassify>().eq("valid_status", "1").orderBy("business_type").orderBy("class_level"));
 	}
 
 	@Override
@@ -292,7 +292,7 @@ public class BusinessParameterServiceImpl implements BusinessParameterService {
 		List<FiveLevelClassifyCondition> conditions = fiveLevelClassifyConditionService
 				.selectList(new EntityWrapper<FiveLevelClassifyCondition>().eq("class_name", className)
 						.eq("business_type", businessType).eq("sub_class_name", subClassName).eq("valid_status", "1")
-						.orderBy("update_time"));
+						.orderBy("param_type").orderBy("type_name_relation").orderBy("param_name"));
 
 		FiveLevelClassifyConditionVO vo = new FiveLevelClassifyConditionVO();
 
