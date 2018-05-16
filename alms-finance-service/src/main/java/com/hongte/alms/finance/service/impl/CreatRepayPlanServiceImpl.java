@@ -963,11 +963,11 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 repaymentProjPlan.setCreatSysType(RepayPlanCreateSysEnum.ALMS.getValue());
                 repaymentProjPlan.setPlateType(projInfoReq.getPlateType());
                 repaymentProjPlan.setOnLineOverDueRate(projInfoReq.getOnLineOverDueRate());
-                repaymentProjPlan.setOnLineOverDueRateUnit(projInfoReq.getOnLineOverDueRateUnit());
+                repaymentProjPlan.setOnLineOverDueRateType(projInfoReq.getOnLineOverDueRateUnit());
                 repaymentProjPlan.setOffLineOutOverDueRate(projInfoReq.getOffLineOutOverDueRate());
-                repaymentProjPlan.setOffLineOutOverDueRateUnit(projInfoReq.getOffLineOutOverDueRateUnit());
+                repaymentProjPlan.setOffLineOutOverDueRateType(projInfoReq.getOffLineOutOverDueRateUnit());
                 repaymentProjPlan.setOffLineInOverDueRate(projInfoReq.getOffLineInOverDueRate());
-                repaymentProjPlan.setOffLineInOverDueRateUnit(projInfoReq.getOffLineInOverDueRateUnit());
+                repaymentProjPlan.setOffLineInOverDueRateType(projInfoReq.getOffLineInOverDueRateUnit());
 
 
 
