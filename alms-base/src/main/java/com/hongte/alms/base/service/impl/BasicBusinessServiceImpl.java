@@ -551,7 +551,13 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 
 	// 获取结清阶段
 	private Integer getSettleMonths(Date settleDate, Date firstRepayDate) {
-		Integer months = DateUtil.getDiffMonths(settleDate,firstRepayDate);
+		Integer days = DateUtil.getDiffDays(firstRepayDate, settleDate);
+		Integer months=0;
+		if(days<0) {
+			months=0;
+		}else {
+			months=days/30;
+		}
 		return months;
 	}
 	
@@ -570,5 +576,10 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 	public Integer getMonthPlatformAmountCount(String crpId) {
 		return basicBusinessMapper.getMonthPlatformAmountCount(crpId);
 	}
-
+		   public static void main(String[] args) {
+			Integer days=DateUtil.getDiffDays(DateUtil.getDate("2018-12-12"), DateUtil.getDate("2018-5-11"));
+			Integer months=days/30;
+			System.out.println(days);
+			System.out.println(months);
+		}
 }
