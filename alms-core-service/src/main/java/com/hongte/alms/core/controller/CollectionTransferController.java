@@ -456,9 +456,17 @@ public class CollectionTransferController {
 		failLog.setBusinessId(businessId);
 		failLog.setAfterId(afterId);
 		failLog.setFailReason(reson);
-		TransferFailLog transferFailLog = transferFailLogService.selectOne(new EntityWrapper<TransferFailLog>()
+		List<TransferFailLog> transferFailLogs = transferFailLogService.selectList(new EntityWrapper<TransferFailLog>()
 				.eq("business_id", businessId).eq("after_id", afterId));
 		LOGGER.error("信贷历史催收数据导入错误，"+failReson +"  businessID:"+businessId+"     afterId:"+afterId+"   status:"+status);
+		TransferFailLog transferFailLog = null;
+		if(transferFailLogs!=null&&transferFailLogs.size()>0){
+			for(TransferFailLog log :transferFailLogs ){
+				if(log.getTransType()==null){
+					transferFailLog = log;
+				}
+			}
+		}
 		if (transferFailLog == null) {
 			transferFailLogService.insert(failLog);
 		}
@@ -501,11 +509,17 @@ public class CollectionTransferController {
 		//催收中，电催需要 判断用户信息
 		if("电催".equals(status) ||"催收中".equals(status)||"催款中".equals(status)){
 			if (StringUtil.isEmpty(dto.getUserId())) {
-				recordErrorInfo(businessId ,afterId, NoUser,status,"没有用户信息");
-				return null;
+				if("电催".equals(status)){
+					recordErrorInfo(businessId ,afterId, NoUser,status,"没有用户信息");
+					return null;
+				}else{
+					map.put("userId","");
+				}
+			}else{
+				map.put("userId",dto.getUserId());
 			}
-			map.put("userId",dto.getUserId());
 		}
+
 		if("电催".equals(status)){
 			staffType = CollectionStatusEnum.PHONE_STAFF.getPageStr();
 		}

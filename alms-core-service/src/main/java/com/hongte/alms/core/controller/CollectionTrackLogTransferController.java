@@ -142,7 +142,7 @@ public class CollectionTrackLogTransferController {
 						collectionTrackLog.setTrackStatusId(defaultStatus.toString());
 						List<SysParameter> list = sysParameterService.selectList(new EntityWrapper<SysParameter>()
 								.eq("param_type", SysParameterTypeEnums.COLLECTION_FOLLOW_STATUS.getKey())
-								.and("param_value",defaultStatus));
+								.eq("param_value",defaultStatus));
 						String statusName = "";
 
 						if(list.size()>0){
@@ -159,7 +159,7 @@ public class CollectionTrackLogTransferController {
 						collectionTrackLog.setXdIndexId(parametertracelog.getId());
 
 						collectionTrackLogService.insert(collectionTrackLog);
-
+						deleteErrorInfo(carBusinessId,carBusinessAfterId);
 
 
 					}catch (Exception e){
@@ -207,10 +207,19 @@ public class CollectionTrackLogTransferController {
 		failLog.setFailReason(reson);
 		failLog.setTransType(2);//贷后跟踪记录同步
 		TransferFailLog transferFailLog = transferFailLogService.selectOne(new EntityWrapper<TransferFailLog>()
-				.eq("business_id", businessId).eq("after_id", afterId));
+				.eq("business_id", businessId).eq("after_id", afterId).eq("trans_type",2));
 		LOGGER.error("信贷历史催收数据导入错误，"+failReson +"  businessID:"+businessId+"     afterId:"+afterId+"   status:"+status);
 		if (transferFailLog == null) {
 			transferFailLogService.insert(failLog);
+		}
+	}
+
+	private  void deleteErrorInfo(String businessId,String afterId){
+
+		TransferFailLog transferFailLog = transferFailLogService.selectOne(new EntityWrapper<TransferFailLog>()
+				.eq("business_id", businessId).eq("after_id", afterId).eq("trans_type",2));
+		if(transferFailLog !=null){
+			transferFailLogService.deleteById(transferFailLog.getId());
 		}
 	}
 

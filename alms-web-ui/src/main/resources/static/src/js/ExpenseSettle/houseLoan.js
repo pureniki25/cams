@@ -22,8 +22,7 @@ window.layinit(function (htConfig) {
                 lawyerFee:0,
                 legalFee:0,
                 otherFee:0,
-                deposit:0,
-                lastRepayDate:''
+                deposit:0
             },
             preSettleDate:{
                 date:'',
@@ -33,7 +32,7 @@ window.layinit(function (htConfig) {
                         var year = DATE.getFullYear();
                         var month = DATE.getMonth()+1;
                         var day = DATE.getDate();
-                        return date.getTime() < (app.business.lastRepayDate ? new Date(app.business.lastRepayDate).getTime():new Date(year+"-"+month+"-"+day+" 00:00:00").getTime()) || (new Date(year+"-"+month+"-"+day+" 00:00:00").getTime() + 1000*60*60*24*15 ) <= date.getTime()
+                        return date.getTime() < new Date(year+"-"+month+"-"+day+" 00:00:00").getTime() || (new Date(year+"-"+month+"-"+day+" 00:00:00").getTime() + 1000*60*60*24*15 ) <= date.getTime()
                     }
                 }
             },
@@ -85,7 +84,6 @@ window.layinit(function (htConfig) {
                     baseData = res.data.data
                     app.business.base = Object.assign(res.data.data.business,res.data.data.detail) 
                     app.business.repaymentType = res.data.data.repaymentType
-                    app.business.lastRepayDate = res.data.data.lastRepayDate
                     let outPutCount = 0 
                     $.each(res.data.data.output,function(i,o){
                         if(i==0){
