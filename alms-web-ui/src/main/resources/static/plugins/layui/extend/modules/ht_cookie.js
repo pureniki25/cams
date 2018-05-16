@@ -64,7 +64,7 @@ layui.define([], function (exports) {
             cookie.setCookie(tokenCookieName, token, 28, "/");
         }
         , setRefreshToken: function (refreshToken) {
-            cookie.setCookie(refreshTokenCookieName, refreshToken, 30, "/");
+            cookie.setCookie(refreshTokenCookieName, refreshToken, 240, "/");
         }
         , getToken: function () {
             return cookie.getCookieValue(tokenCookieName);
