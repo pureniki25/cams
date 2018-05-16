@@ -716,12 +716,36 @@ public class FinanceServiceImpl implements FinanceService {
 
 	@Override
 	public Result previewConfirmRepayment(ConfirmRepaymentReq req) {
+		isSurplusFundEnough(req);
+			
 		return null;
 	}
 
 	@Override
 	public Result confirmRepayment(ConfirmRepaymentReq req) {
+		isSurplusFundEnough(req);
 		return null;
 	}
 
+	
+	/**
+	 * 检查结余金额是否足够
+	 * @author 王继光
+	 * 2018年5月16日 下午3:12:46
+	 * @return
+	 */
+	private boolean isSurplusFundEnough(ConfirmRepaymentReq req) {
+		if (req.getSurplusFund()==null||req.getSurplusFund().equals(new BigDecimal(0))) {
+			return true ;
+		}
+		BigDecimal surplusFund = getSurplusFund(req.getBusinessId(), req.getAfterId());
+		int compareResult = req.getSurplusFund().compareTo(surplusFund);
+		if (compareResult>0) {
+			return false;
+		}else {
+			return true ;
+		}
+	}
+	
+	
 }

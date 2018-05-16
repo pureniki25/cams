@@ -4,6 +4,7 @@
 package com.hongte.alms.base.dto;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author 王继光
@@ -16,6 +17,7 @@ public class ConfirmRepaymentReq {
 	private BigDecimal offlineOverDue ;
 	private BigDecimal onlineOverDue ;
 	private BigDecimal surplusFund ;
+	private List<String> mprIds ;
 	private String remark ;
 	public String getBusinessId() {
 		return businessId;
@@ -52,6 +54,18 @@ public class ConfirmRepaymentReq {
 	}
 	public void setRemark(String remark) {
 		this.remark = remark;
+	}
+	/**
+	 * @return the mprIds
+	 */
+	public List<String> getMprIds() {
+		return mprIds;
+	}
+	/**
+	 * @param mprIds the mprIds to set
+	 */
+	public void setMprIds(List<String> mprIds) {
+		this.mprIds = mprIds;
 	}
 	
 }
