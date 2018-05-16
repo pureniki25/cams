@@ -1,0 +1,33 @@
+let projRepayment = {
+    col:[
+        {
+            title:'借款人',
+            key:'userName'
+        },{
+            title:'上标金额',
+            key:'projAmount'
+        },{
+            title:'本金',
+            key:'item10'
+        },{
+            title:'利息',
+            key:'item20'
+        },{
+            title:'月收分公司服务费',
+            key:'item30'
+        },{
+            title:'月收平台费',
+            key:'item50'
+        },{
+            title:'线下逾期费',
+            key:'offlineOverDue'
+        },{
+            title:'线上逾期费',
+            key:'onlineOverDue'
+        },{
+            title:'合计',
+            key:'total'
+        }
+    ],
+    data:[]
+}

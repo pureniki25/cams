@@ -53,4 +53,9 @@ public class FinanceController {
 	public String thisPeriodRepayment() {
 		return "/finance/thisPeriodRepayment" ;
 	}
+	
+	@RequestMapping("/confirmedRepayment")
+	public String confirmedRepayment() {
+		return "/finance/confirmedRepayment" ;
+	}
 }

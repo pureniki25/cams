@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.hongte.alms.base.dto.ConfirmRepaymentReq;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.entity.ApplyDerateProcess;
 import com.hongte.alms.base.entity.ApplyDerateType;
@@ -52,6 +53,7 @@ import com.hongte.alms.base.process.mapper.ProcessMapper;
 import com.hongte.alms.base.vo.finance.CurrPeriodDerateInfoVO;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.base.vo.finance.CurrPeriodRepaymentInfoVO;
+import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.finance.service.FinanceService;
@@ -466,29 +468,31 @@ public class FinanceServiceImpl implements FinanceService {
 				.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", rpl.getPlanListId()));
 		for (RepaymentBizPlanListDetail rd : details) {
 			if (rd.getPlanItemType().equals(10)) {
-				c.setItem10(rd.getPlanAmount().subtract(calFactRepay(10,null, businessId, afterId)));
+				c.setItem10(rd.getPlanAmount().subtract(calFactRepay(10, null, businessId, afterId)));
 				continue;
 			}
 			if (rd.getPlanItemType().equals(20)) {
-				c.setItem20(rd.getPlanAmount().subtract(calFactRepay(20,null, businessId, afterId)));
+				c.setItem20(rd.getPlanAmount().subtract(calFactRepay(20, null, businessId, afterId)));
 				continue;
 			}
 			if (rd.getPlanItemType().equals(30)) {
-				c.setItem30(rd.getPlanAmount().subtract(calFactRepay(30,null, businessId, afterId)));
+				c.setItem30(rd.getPlanAmount().subtract(calFactRepay(30, null, businessId, afterId)));
 				continue;
 			}
 			if (rd.getPlanItemType().equals(50)) {
-				c.setItem50(rd.getPlanAmount().subtract(calFactRepay(50,null, businessId, afterId)));
+				c.setItem50(rd.getPlanAmount().subtract(calFactRepay(50, null, businessId, afterId)));
 				continue;
 			}
 			if (rd.getPlanItemType().equals(60)
 					&& rd.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
-				c.setOnlineOverDue(rd.getPlanAmount().subtract(calFactRepay(60,RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), businessId, afterId)));
+				c.setOnlineOverDue(rd.getPlanAmount().subtract(
+						calFactRepay(60, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), businessId, afterId)));
 				continue;
 			}
 			if (rd.getPlanItemType().equals(60)
 					&& rd.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
-				c.setOfflineOverDue(rd.getPlanAmount().subtract(calFactRepay(60,RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid(), businessId, afterId)));
+				c.setOfflineOverDue(rd.getPlanAmount().subtract(calFactRepay(60,
+						RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid(), businessId, afterId)));
 				continue;
 			}
 		}
@@ -600,7 +604,7 @@ public class FinanceServiceImpl implements FinanceService {
 			if (repaymentProjPlanList == null) {
 				continue;
 			}
-			CurrPeriodProjDetailVO currPeriodProjDetailVO = new CurrPeriodProjDetailVO() ;
+			CurrPeriodProjDetailVO currPeriodProjDetailVO = new CurrPeriodProjDetailVO();
 			List<RepaymentProjPlanListDetail> repaymentProjPlanListDetails = repaymentProjPlanListDetailMapper
 					.selectList(new EntityWrapper<RepaymentProjPlanListDetail>().eq("proj_plan_list_id",
 							repaymentProjPlanList.getProjPlanListId()));
@@ -608,7 +612,7 @@ public class FinanceServiceImpl implements FinanceService {
 			currPeriodProjDetailVO.setProjAmount(tuandaiProjectInfo.getAmount());
 			if (tuandaiProjectInfo.getMasterIssueId().equals(tuandaiProjectInfo.getProjectId())) {
 				currPeriodProjDetailVO.setMaster(true);
-			}else {
+			} else {
 				currPeriodProjDetailVO.setMaster(false);
 			}
 			for (RepaymentProjPlanListDetail repaymentProjPlanListDetail : repaymentProjPlanListDetails) {
@@ -645,8 +649,79 @@ public class FinanceServiceImpl implements FinanceService {
 	}
 
 	@Override
-	public BigDecimal calFactRepay(Integer itemType,String feeId, String businessId, String afterId) {
-		return repaymentProjFactRepayMapper.calFactRepay(itemType,feeId, businessId, afterId);
+	public BigDecimal calFactRepay(Integer itemType, String feeId, String businessId, String afterId) {
+		return repaymentProjFactRepayMapper.calFactRepay(itemType, feeId, businessId, afterId);
+	}
+
+	@Override
+	public List<MatchedMoneyPoolVO> selectConfirmedBankStatement(String businessId, String afterId) {
+		List<MatchedMoneyPoolVO> list = new ArrayList<>() ;
+		List<RepaymentResource> repaymentResources = repaymentResourceMapper
+				.selectList(new EntityWrapper<RepaymentResource>().eq("business_id", businessId).eq("after_id", afterId)
+						.eq("is_cancelled", 0).orderBy("repay_date"));
+		for (RepaymentResource repaymentResource : repaymentResources) {
+			MatchedMoneyPoolVO matchedMoneyPoolVO = null ;
+			String resource = repaymentResource.getRepaySource();
+			switch (resource) {
+			case "10":
+				//线下转账
+				MoneyPoolRepayment moneyPoolRepayment = moneyPoolRepaymentMapper.selectById(repaymentResource.getRepaySourceRefId());
+				if (moneyPoolRepayment==null||moneyPoolRepayment.getMoneyPoolId()==null) {
+					matchedMoneyPoolVO = new MatchedMoneyPoolVO() ;
+					matchedMoneyPoolVO.setAccountMoney(repaymentResource.getRepayAmount());
+					matchedMoneyPoolVO.setTradeDate(repaymentResource.getRepayDate());
+					matchedMoneyPoolVO.setRemark("找不到还款登记信息");
+					break;
+				}
+				MoneyPool moneyPool = moneyPoolMapper.selectById(moneyPoolRepayment.getMoneyPoolId());
+				if (moneyPool==null) {
+					matchedMoneyPoolVO = new MatchedMoneyPoolVO() ;
+					matchedMoneyPoolVO.setAccountMoney(repaymentResource.getRepayAmount());
+					matchedMoneyPoolVO.setTradeDate(repaymentResource.getRepayDate());
+					matchedMoneyPoolVO.setRemark("找不到银行流水信息");
+					break;
+				}
+				matchedMoneyPoolVO = new MatchedMoneyPoolVO() ;
+				matchedMoneyPoolVO.setAccountMoney(moneyPool.getAccountMoney());
+				matchedMoneyPoolVO.setBankAccount(moneyPool.getAcceptBank());
+				matchedMoneyPoolVO.setMoneyPoolId(moneyPoolRepayment.getMoneyPoolId());
+				matchedMoneyPoolVO.setRemark(moneyPoolRepayment.getRemark());
+				matchedMoneyPoolVO.setRepaymentCode(moneyPool.getPayCode());
+				matchedMoneyPoolVO.setTradeDate(moneyPool.getTradeDate());
+				matchedMoneyPoolVO.setTradePlace(moneyPool.getTradePlace());
+				matchedMoneyPoolVO.setSummary(moneyPool.getSummary());
+				matchedMoneyPoolVO.setTradeType(moneyPool.getTradeType());
+				matchedMoneyPoolVO.setStatus(moneyPoolRepayment.getState());
+				
+				break;
+			case "20":
+				//线下代扣
+				//TODO
+				break;
+			case "30":
+				//银行代扣
+				//TODO
+				break;
+			default:
+				matchedMoneyPoolVO = new MatchedMoneyPoolVO() ;
+				matchedMoneyPoolVO.setAccountMoney(repaymentResource.getRepayAmount());
+				matchedMoneyPoolVO.setTradeDate(repaymentResource.getRepayDate());
+				matchedMoneyPoolVO.setRemark("还款来源:"+repaymentResource.getRepaySource());
+				break;
+			}
+			list.add(matchedMoneyPoolVO);
+		}
+		return list;
+	}
+
+	@Override
+	public Result previewConfirmRepayment(ConfirmRepaymentReq req) {
+		return null;
+	}
+
+	@Override
+	public Result confirmRepayment(ConfirmRepaymentReq req) {
+		return null;
 	}
 
 }
