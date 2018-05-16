@@ -100,6 +100,7 @@ public class TuandaiProjectInfo extends Model<TuandaiProjectInfo> {
     /**
      * 满标时间(标的状态查询接口)
      */
+	@TableField("queryFullSuccessDate")
 	@ApiModelProperty(required= true,value = "满标时间(标的状态查询接口)")
 	private Date queryFullSuccessDate;
     /**
@@ -111,6 +112,7 @@ public class TuandaiProjectInfo extends Model<TuandaiProjectInfo> {
     /**
      * 手机号码
      */
+	@TableField("TelNo")
 	@ApiModelProperty(required= true,value = "手机号码")
 	private String TelNo;
     /**
@@ -461,11 +463,13 @@ public class TuandaiProjectInfo extends Model<TuandaiProjectInfo> {
     /**
      * 审核时间(标的状态查询接口)
      */
+	@TableField("queryAuditDate")
 	@ApiModelProperty(required= true,value = "审核时间(标的状态查询接口)")
 	private Date queryAuditDate;
     /**
      * 审核结果,标审核失败时这里有原因(标的状态查询接口)
      */
+	@TableField("queryResultContent")
 	@ApiModelProperty(required= true,value = "审核结果,标审核失败时这里有原因(标的状态查询接口)")
 	private String queryResultContent;
     /**
