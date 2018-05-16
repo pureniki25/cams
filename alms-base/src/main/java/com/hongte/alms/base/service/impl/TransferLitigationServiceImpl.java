@@ -665,6 +665,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 					if (outputPlatformId == 1) {
 						preLateFees = ((BigDecimal) resultMap.get("surplusServiceCharge")).doubleValue();
+						preLateFees = preLateFees > borrowMoney * 0.06 ? borrowMoney * 0.06 : preLateFees;
 					}
 				} else if ("等额本息".equals(repaymentTypeId)) {
 					planAccrual = surplusPrincipal * monthBorrowRate;
