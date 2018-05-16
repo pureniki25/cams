@@ -379,6 +379,9 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 								// 本金违约金
 								double bjwyj = vo.getPrincipal().doubleValue() * 0.04 - monthPlatformAmount * 2
 										- monthCompanyAmount * 2;
+								if (bjwyj < 0) {// 如果是负数，只收取服务费违约金
+									bjwyj = 0;
+								}
 								preLateFees = bjwyj + monthPlatformAmount * 2 + monthCompanyAmount * 2;
 							} else if (settleMonth >= 7 && settleMonth <= 12) {
 								// 本金违约金
@@ -412,14 +415,20 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 								// 本金违约金
 								double bjwyj = vo.getPrincipal().doubleValue() * 0.06 - monthPlatformAmount * 2
 										- monthCompanyAmount * 2;
+								if (bjwyj < 0) {// 如果是负数，只收取服务费违约金
+									bjwyj = 0;
+								}
 								preLateFees = bjwyj+monthPlatformAmount * 2 + monthCompanyAmount * 2;
 							} else if (settleMonth <= 12 && settleMonth >= 7) {
 								// 本金违约金
 								double bjwyj = vo.getPrincipal().doubleValue() * 0.02 - monthPlatformAmount
 										- monthCompanyAmount;
+								if (bjwyj < 0) {// 如果是负数，只收取服务费违约金
+									bjwyj = 0;
+								}
 								preLateFees =bjwyj+monthPlatformAmount + monthCompanyAmount;
 							} else if (settleMonth >= 13 && settleMonth <= 120) {
-								preLateFees = monthPlatformAmount * 2 + monthCompanyAmount * 2;
+								preLateFees = Double.valueOf(0);
 							}
 						}
 					}
