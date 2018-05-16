@@ -100,6 +100,7 @@ public class TuandaiProjectInfo extends Model<TuandaiProjectInfo> {
     /**
      * 满标时间(标的状态查询接口)
      */
+	@TableField("queryFullSuccessDate")
 	@ApiModelProperty(required= true,value = "满标时间(标的状态查询接口)")
 	private Date queryFullSuccessDate;
     /**
@@ -111,11 +112,13 @@ public class TuandaiProjectInfo extends Model<TuandaiProjectInfo> {
     /**
      * 手机号码
      */
+	@TableField("TelNo")
 	@ApiModelProperty(required= true,value = "手机号码")
 	private String TelNo;
     /**
      * 邮箱
      */
+	@TableField("Email")
 	@ApiModelProperty(required= true,value = "邮箱")
 	private String Email;
     /**
@@ -163,6 +166,7 @@ public class TuandaiProjectInfo extends Model<TuandaiProjectInfo> {
     /**
      * 标题
      */
+	@TableField("title")
 	@ApiModelProperty(required= true,value = "标题")
 	private String title;
     /**
@@ -180,6 +184,7 @@ public class TuandaiProjectInfo extends Model<TuandaiProjectInfo> {
     /**
      * 总金额(元)
      */
+	@TableField("amount")
 	@ApiModelProperty(required= true,value = "总金额(元)")
 	private BigDecimal amount;
     /**
@@ -215,6 +220,7 @@ public class TuandaiProjectInfo extends Model<TuandaiProjectInfo> {
     /**
      * 备注
      */
+	@TableField("remark")
 	@ApiModelProperty(required= true,value = "备注")
 	private String remark;
     /**
@@ -296,11 +302,13 @@ public class TuandaiProjectInfo extends Model<TuandaiProjectInfo> {
     /**
      * 婚姻状况, 已婚、未婚 (信用贷时必填)
      */
+	@TableField("marriage")
 	@ApiModelProperty(required= true,value = "婚姻状况, 已婚、未婚 (信用贷时必填)")
 	private String marriage;
     /**
      * 居住地址,详细地址，包括省份城市 (信用贷时必填)
      */
+	@TableField("address")
 	@ApiModelProperty(required= true,value = "居住地址,详细地址，包括省份城市 (信用贷时必填)")
 	private String address;
     /**
@@ -456,16 +464,19 @@ public class TuandaiProjectInfo extends Model<TuandaiProjectInfo> {
     /**
      * 个人信息扩展字段
      */
+	@TableField("Ext")
 	@ApiModelProperty(required= true,value = "个人信息扩展字段")
 	private String Ext;
     /**
      * 审核时间(标的状态查询接口)
      */
+	@TableField("queryAuditDate")
 	@ApiModelProperty(required= true,value = "审核时间(标的状态查询接口)")
 	private Date queryAuditDate;
     /**
      * 审核结果,标审核失败时这里有原因(标的状态查询接口)
      */
+	@TableField("queryResultContent")
 	@ApiModelProperty(required= true,value = "审核结果,标审核失败时这里有原因(标的状态查询接口)")
 	private String queryResultContent;
     /**
