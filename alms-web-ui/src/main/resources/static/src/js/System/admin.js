@@ -105,6 +105,25 @@ window.layinit(function (htConfig) {
                    content: '/system/admin/setSingleUserPermissons'
                });
 		   },
+           // 同步贷后跟踪记录
+           syncTrackLog:function(){
+               this.syncCollectionLoading = true;
+               axios.get(basePath +"collectionTrackLog/transfer",{timeout: 0})
+                   .then(function (res) {
+                       vm.syncCollectionLoading = false;
+                       if (res.data.data != null && res.data.code == 1) {
+                           vm.$Modal.success({
+                               content: res.data.msg
+                           });
+                       } else {
+                           vm.$Modal.error({content: res.data.msg });
+                       }
+                   })
+                   .catch(function (error) {
+                       vm.syncCollectionLoading = false;
+                       vm.$Modal.error({content: '接口调用异常!'});
+                   });
+           },
 	   }
 	});
     

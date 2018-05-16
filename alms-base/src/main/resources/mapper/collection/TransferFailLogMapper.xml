@@ -8,11 +8,12 @@
         <result column="business_id" property="businessId" />
         <result column="after_id" property="afterId" />
         <result column="fail_reason" property="failReason" />
+        <result column="trans_type" property="transType" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        business_id AS businessId, after_id AS afterId, id, fail_reason AS failReason
+        business_id AS businessId, after_id AS afterId, id, fail_reason AS failReason, trans_type AS transType
     </sql>
 
 </mapper>
