@@ -118,6 +118,7 @@ public class TuandaiProjectInfo extends Model<TuandaiProjectInfo> {
     /**
      * 邮箱
      */
+	@TableField("Email")
 	@ApiModelProperty(required= true,value = "邮箱")
 	private String Email;
     /**
@@ -165,6 +166,7 @@ public class TuandaiProjectInfo extends Model<TuandaiProjectInfo> {
     /**
      * 标题
      */
+	@TableField("title")
 	@ApiModelProperty(required= true,value = "标题")
 	private String title;
     /**
@@ -182,6 +184,7 @@ public class TuandaiProjectInfo extends Model<TuandaiProjectInfo> {
     /**
      * 总金额(元)
      */
+	@TableField("amount")
 	@ApiModelProperty(required= true,value = "总金额(元)")
 	private BigDecimal amount;
     /**
@@ -217,6 +220,7 @@ public class TuandaiProjectInfo extends Model<TuandaiProjectInfo> {
     /**
      * 备注
      */
+	@TableField("remark")
 	@ApiModelProperty(required= true,value = "备注")
 	private String remark;
     /**
@@ -298,11 +302,13 @@ public class TuandaiProjectInfo extends Model<TuandaiProjectInfo> {
     /**
      * 婚姻状况, 已婚、未婚 (信用贷时必填)
      */
+	@TableField("marriage")
 	@ApiModelProperty(required= true,value = "婚姻状况, 已婚、未婚 (信用贷时必填)")
 	private String marriage;
     /**
      * 居住地址,详细地址，包括省份城市 (信用贷时必填)
      */
+	@TableField("address")
 	@ApiModelProperty(required= true,value = "居住地址,详细地址，包括省份城市 (信用贷时必填)")
 	private String address;
     /**
@@ -458,6 +464,7 @@ public class TuandaiProjectInfo extends Model<TuandaiProjectInfo> {
     /**
      * 个人信息扩展字段
      */
+	@TableField("Ext")
 	@ApiModelProperty(required= true,value = "个人信息扩展字段")
 	private String Ext;
     /**
