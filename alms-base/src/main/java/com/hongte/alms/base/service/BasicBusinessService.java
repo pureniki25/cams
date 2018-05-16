@@ -1,6 +1,7 @@
 package com.hongte.alms.base.service;
 
 import com.hongte.alms.base.dto.UserPermissionBusinessDto;
+import com.hongte.alms.base.vo.billing.CarLoanBilVO;
 import com.hongte.alms.base.vo.module.BusinessInfoForApplyDerateVo;
 import com.hongte.alms.base.vo.module.ExpenseSettleVO;
 import com.hongte.alms.base.entity.BasicBusiness;
@@ -102,4 +103,10 @@ public interface BasicBusinessService extends BaseService<BasicBusiness> {
 		 */
 	 
 	 Integer getMonthPlatformAmountCount(@Param("crpId") String crpId);
+	 
+	 
+	 /**
+	     * 车贷业务减免申请的逾期利息
+	     */
+	    Map<String, Object> carLoanBilling(CarLoanBilVO carLoanBilVO,Integer overdueDays);
 }

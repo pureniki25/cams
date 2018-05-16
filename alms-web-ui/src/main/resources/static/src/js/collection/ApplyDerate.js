@@ -821,7 +821,7 @@ var getBalanceDue = function () {debugger
 ///////////车贷:获取合同期外逾期利息
 var getOutsideInterest = function () {debugger
 
-    var reqStr = basePath +"ApplyDerateController/getOutsideInterest?crpId="+crpId+"&outsideInterestType="+vm.baseInfoForm.outsideInterestType+"&afterId="+afterId+"&businessId=" + businessId
+    var reqStr = basePath +"ApplyDerateController/getOutsideInterest?crpId="+crpId+"&outsideInterestType="+vm.baseInfoForm.outsideInterestType+"&afterId="+afterId+"&businessId=" + businessId+"&overDays="+vm.baseInfoForm.overDays
   
     axios.get(reqStr)
         .then(function (res) {
