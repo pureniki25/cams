@@ -19,6 +19,10 @@ window.layinit(function (htConfig) {
                 url: '/finance/repayRegList?businessId=' + businessId + "&afterId=" + afterId,
                 style: {}
             },
+            confirmedRepayment:{
+                url: '/finance/confirmedRepayment?businessId=' + businessId + "&afterId=" + afterId,
+                style: {}
+            },
             matchedBankStatement: {
                 show: false,
                 url: '/finance/matchedBankStatement?businessId=' + businessId + "&afterId=" + afterId,
@@ -37,6 +41,11 @@ window.layinit(function (htConfig) {
             style: {
                 repayRegList: {},
                 matchedBankStatement: {}
+            },
+
+            table:{
+                currRepayment:currRepayment,
+                projRepayment:projRepayment
             }
         },
         methods: {

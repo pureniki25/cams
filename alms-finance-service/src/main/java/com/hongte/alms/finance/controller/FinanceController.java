@@ -47,6 +47,7 @@ import com.hongte.alms.base.service.MoneyPoolRepaymentService;
 import com.hongte.alms.base.service.MoneyPoolService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
+import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.finance.req.MoneyPoolReq;
@@ -290,6 +291,17 @@ public class FinanceController {
 		logger.info("@getFinanceMangerList@获取财务管理列表数据--结束[{}]", result);
 		return result;
 
+	}
+	
+	@GetMapping(value="/selectConfirmedBankStatement")
+	@ApiOperation(value="查询已完成的还款信息")
+	public Result selectConfirmedBankStatement(String businessId,String afterId) {
+		Result result  ;
+		logger.info("@selectConfirmedBankStatement@查询已完成的还款信息--开始[{}{}]",businessId,afterId);
+		List<MatchedMoneyPoolVO> list = financeService.selectConfirmedBankStatement(businessId, afterId);
+		result = Result.success(list);
+		logger.info("@selectConfirmedBankStatement@查询已完成的还款信息--结束[{}]",result);
+		return result;
 	}
 
 	@ResponseBody
