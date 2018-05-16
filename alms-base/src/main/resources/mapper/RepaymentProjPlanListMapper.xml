@@ -34,5 +34,97 @@
     <sql id="Base_Column_List">
         proj_plan_list_id AS projPlanListId, proj_plan_id AS projPlanId, plan_list_id AS planListId, plan_id AS planId, business_id AS businessId, orig_business_id AS origBusinessId, period, after_id AS afterId, due_date AS dueDate, total_borrow_amount AS totalBorrowAmount, overdue_amount AS overdueAmount, overdue_days AS overdueDays, current_status AS currentStatus, current_sub_status AS currentSubStatus, repay_flag AS repayFlag, fact_repay_date AS factRepayDate, remark, active, creat_sys_type AS creatSysType, plate_type AS plateType, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
     </sql>
+    
+    
+    
+    		<!-- 线上计划还款金额总和-->
+	<select id="getOnLinePlanAmountSum" resultType="java.lang.Double">
+			select 
+				    /*除去线下滞纳金*/
+              ifnull(
+	            SUM(
+			        CASE
+			          WHEN (
+			            projDetail.fee_id != '3131c075-5721-11e8-8a00-0242ac110002'	         		       
+			          ) 
+			          THEN projDetail.plan_amount 
+			          ELSE 0 
+			        END
+		      ) ,0) `sumPlanAmount` from tb_repayment_proj_plan_list projList 
+			
+			left join tb_repayment_proj_plan_list_detail projDetail
+			
+			
+			on projList.proj_plan_list_id=projDetail.proj_plan_list_id
+			
+
+
+		where projList.proj_plan_list_id=#{projListId}
+	</select>
+	
+	
+	    
+    		<!-- 线上实还还款金额总和-->
+	<select id="getOnLineFactAmountSum" resultType="java.lang.Double">
+				select 
+								    /*除去线下滞纳金*/
+		              ifnull(
+			            SUM(
+					        CASE
+					          WHEN (
+					            projDetail.fee_id != '3131c075-5721-11e8-8a00-0242ac110002'	         		       
+					          ) 
+					          THEN projDetail.proj_fact_amount 
+					          ELSE 0 
+					        END
+				      ) ,0)  as `sumFactAmount`  from tb_repayment_proj_plan_list projList 
+					
+					left join tb_repayment_proj_plan_list_detail projDetail
+					
+					
+					on projList.proj_plan_list_id=projDetail.proj_plan_list_id
+			
+
+		
+				where projList.proj_plan_list_id=#{projListId}
+	</select>
+	
+	
+					  		<!-- 每个标的实还金额总和-->
+	<select id="getFactAmountSum" resultType="java.lang.Double">
+			select 
+					sum(projDetail.proj_fact_amount) 
+					   from tb_repayment_proj_plan projPlan
+						
+						left join tb_repayment_proj_plan_list projList 
+						
+						on projPlan.proj_plan_id=projList.proj_plan_id
+					
+					left join tb_repayment_proj_plan_list_detail projDetail
+					
+					
+					on projList.proj_plan_list_id=projDetail.proj_plan_list_id
+
+		
+				where projPlan.proj_plan_id=#{projPlanId}
+	</select>
+	
+			
+	
+					  		<!-- 每个标每期的应还本金和利息-->
+	<select id="getPrincipalAndInterestPeriod" resultType="java.lang.Double">
+				select 
+					sum(projDetail.proj_fact_amount) 
+					   from tb_repayment_proj_plan_list projList 
+					
+					left join tb_repayment_proj_plan_list_detail projDetail
+					
+					
+					on projList.proj_plan_list_id=projDetail.proj_plan_list_id
+
+		
+				where projList.proj_plan_list_id=#{projListId}
+	</select>
+	
 
 </mapper>
