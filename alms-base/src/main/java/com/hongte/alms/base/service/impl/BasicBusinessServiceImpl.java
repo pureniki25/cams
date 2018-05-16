@@ -325,7 +325,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 										- monthCompanyAmount * 2;
 								if (bjwyj < 0) {// 如果是负数，只收取服务费违约金
 									bjwyj = 0;
-								}
+								} 
 								preLateFees = bjwyj + monthPlatformAmount * 2 + monthCompanyAmount * 2;
 
 							} else if (settleMonth >= 13 && settleMonth <= 48) {
@@ -368,7 +368,9 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 								// 本金违约金
 								double bjwyj = vo.getPrincipal().doubleValue() * 0.02 - monthPlatformAmount
 										- monthCompanyAmount;
-
+								if (bjwyj < 0) {// 如果是负数，只收取服务费违约金
+									bjwyj = 0;
+								}
 								preLateFees = bjwyj + monthPlatformAmount + monthCompanyAmount;
 
 							} else if (repayType.equals(RepayTypeEnum.EQUAL_AMOUNT_INTEREST.getValue().toString())
@@ -399,7 +401,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 								// 本金违约金
 								double bjwyj = vo.getPrincipal().doubleValue() * 0.02 - monthPlatformAmount
 										- monthCompanyAmount;
-								preLateFees = monthPlatformAmount + monthCompanyAmount;
+								preLateFees =bjwyj+monthPlatformAmount + monthCompanyAmount;
 							} else if (settleMonth >= 13 && settleMonth <= 120) {
 								preLateFees = monthPlatformAmount * 2 + monthCompanyAmount * 2;
 							}
@@ -549,7 +551,13 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 
 	// 获取结清阶段
 	private Integer getSettleMonths(Date settleDate, Date firstRepayDate) {
-		Integer months = DateUtil.getDiffMonths(settleDate,firstRepayDate);
+		Integer days = DateUtil.getDiffDays(firstRepayDate, settleDate);
+		Integer months=0;
+		if(days<0) {
+			months=0;
+		}else {
+			months=days/30;
+		}
 		return months;
 	}
 	
@@ -568,5 +576,10 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 	public Integer getMonthPlatformAmountCount(String crpId) {
 		return basicBusinessMapper.getMonthPlatformAmountCount(crpId);
 	}
-
+		   public static void main(String[] args) {
+			Integer days=DateUtil.getDiffDays(DateUtil.getDate("2018-12-12"), DateUtil.getDate("2018-5-11"));
+			Integer months=days/30;
+			System.out.println(days);
+			System.out.println(months);
+		}
 }

@@ -56,9 +56,9 @@ public class BusinessParameterServiceImpl implements BusinessParameterService {
 
 	@Override
 	public Page<FiveLevelClassify> queryFiveLevelClassifys(Integer page, Integer limit) {
-		Page<FiveLevelClassify> pageParam = new Page<>(page, limit, "business_type");
+		Page<FiveLevelClassify> pageParam = new Page<>(page, limit);
 		return fiveLevelClassifyService.selectPage(pageParam,
-				new EntityWrapper<FiveLevelClassify>().eq("valid_status", "1"));
+				new EntityWrapper<FiveLevelClassify>().eq("valid_status", "1").orderBy("business_type").orderBy("class_level"));
 	}
 
 	@Override
@@ -196,7 +196,7 @@ public class BusinessParameterServiceImpl implements BusinessParameterService {
 				String className = (String) paramMap.get("className");
 				String parentId = (String) paramMap.get("parentId");
 				String executeCondition = (String) paramMap.get("executeCondition");
-
+				
 				int count = fiveLevelClassifyConditionService
 						.selectCount(new EntityWrapper<FiveLevelClassifyCondition>().eq("class_name", className)
 								.eq("business_type", businessType).eq("sub_class_name", subClassName)
@@ -246,22 +246,18 @@ public class BusinessParameterServiceImpl implements BusinessParameterService {
 				String className = (String) paramMap.get("className");
 				String parentId = (String) paramMap.get("parentId");
 				String executeCondition = (String) paramMap.get("executeCondition");
-
-				List<FiveLevelClassifyCondition> classifyConditions = fiveLevelClassifyConditionService
-						.selectList(new EntityWrapper<FiveLevelClassifyCondition>().eq("class_name", className)
-								.eq("business_type", businessType).eq("sub_class_name", subClassName)
-								.eq("valid_status", "1"));
-
-				if (CollectionUtils.isNotEmpty(classifyConditions)) {
-					for (FiveLevelClassifyCondition condition : classifyConditions) {
-						condition.setValidStatus("0");
-						condition.setOpType(Constant.FIVE_LEVEL_CLASSIFY_CONDITION_UPDATE);
-						fiveLevelClassifyConditionService.updateById(condition);
-					}
-				}
-
+				
+				List<FiveLevelClassifyCondition> classifyConditions = new ArrayList<>();;
+				
+				List<FiveLevelClassifyCondition> odlConditions = new ArrayList<>();
+				
 				for (LinkedHashMap<String, Object> linkedHashMap : commitSetCondition) {
-
+					FiveLevelClassifyCondition odlCondition = new FiveLevelClassifyCondition();
+					odlCondition.setId((String) linkedHashMap.get("id"));
+					odlCondition.setValidStatus("0");
+					odlCondition.setOpType(Constant.FIVE_LEVEL_CLASSIFY_CONDITION_UPDATE);
+					odlConditions.add(odlCondition);
+					
 					Date currTime = new Date();
 					String userId = loginUserInfoHelper.getUserId();
 					FiveLevelClassifyCondition condition = new FiveLevelClassifyCondition();
@@ -278,8 +274,10 @@ public class BusinessParameterServiceImpl implements BusinessParameterService {
 					condition.setUpdateUser(userId);
 					condition.setCreateUser(userId);
 					condition.setCreateTime(currTime);
-					fiveLevelClassifyConditionService.insert(condition);
+					classifyConditions.add(condition);
 				}
+				fiveLevelClassifyConditionService.updateBatchById(odlConditions);
+				fiveLevelClassifyConditionService.insertBatch(classifyConditions);
 			}
 		} catch (Exception e) {
 			LOG.error("方法 updateConditionForClassify 执行失败！", e);
@@ -294,7 +292,7 @@ public class BusinessParameterServiceImpl implements BusinessParameterService {
 		List<FiveLevelClassifyCondition> conditions = fiveLevelClassifyConditionService
 				.selectList(new EntityWrapper<FiveLevelClassifyCondition>().eq("class_name", className)
 						.eq("business_type", businessType).eq("sub_class_name", subClassName).eq("valid_status", "1")
-						.orderBy("update_time"));
+						.orderBy("param_type").orderBy("type_name_relation").orderBy("param_name"));
 
 		FiveLevelClassifyConditionVO vo = new FiveLevelClassifyConditionVO();
 

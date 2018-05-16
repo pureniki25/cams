@@ -10,6 +10,8 @@ public class FiveLevelClassifyConditionVO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	private String id;
+
 	private String subClassName;
 
 	private String parentId;
@@ -20,6 +22,14 @@ public class FiveLevelClassifyConditionVO implements Serializable {
 	private Date updateTime;
 
 	private List<FiveLevelClassifyCondition> classifyConditions;
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	public String getSubClassName() {
 		return subClassName;
@@ -79,7 +89,7 @@ public class FiveLevelClassifyConditionVO implements Serializable {
 
 	@Override
 	public String toString() {
-		return "FiveLevelClassifyConditionVO [subClassName=" + subClassName + ", parentId=" + parentId
+		return "FiveLevelClassifyConditionVO [id=" + id + ", subClassName=" + subClassName + ", parentId=" + parentId
 				+ ", executeCondition=" + executeCondition + ", className=" + className + ", businessType="
 				+ businessType + ", updateTime=" + updateTime + ", classifyConditions=" + classifyConditions + "]";
 	}
