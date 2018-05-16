@@ -504,7 +504,7 @@ public class ApplyDerateController {
 	@ResponseBody
 	public Result<Map<String, Object>> getOutsideInterest(@RequestParam("crpId") String crpId,
 			@RequestParam("afterId") String afterId, @RequestParam(value = "businessId") String businessId,
-			@RequestParam(value = "outsideInterestType") String outsideInterestType) {
+			@RequestParam(value = "outsideInterestType") String outsideInterestType,@RequestParam(value = "overDays") String overDays) {
 		Map<String, Object> retMap = new HashMap<>();
 		try {
 			Integer isDefer = 0;
@@ -516,13 +516,7 @@ public class ApplyDerateController {
 			List<BusinessInfoForApplyDerateVo> businessVoList = basicBusinessService
 					.selectBusinessInfoForApplyDerateVo(crpId, isDefer, businessId);
 
-			// String businessId="";
-			// if (!CollectionUtils.isEmpty(businessVoList)) {
-			//
-			// businessId=businessVoList.get(0).getBusinessId();
-			//
-			// }
-
+	
 			CarLoanBilVO carLoanBilVO = new CarLoanBilVO();
 			carLoanBilVO.setBillDate(new Date());
 			carLoanBilVO.setBusinessId(businessId);
@@ -531,7 +525,7 @@ public class ApplyDerateController {
 					Double.valueOf(StringUtil.isEmpty(outsideInterestType) ? "0" : outsideInterestType));
 
 			// 车贷：应付逾期利息
-			Map<String, Object> resultMap = transferOfLitigationService.carLoanBilling(carLoanBilVO);
+			Map<String, Object> resultMap = basicBusinessService.carLoanBilling(carLoanBilVO,Integer.valueOf(overDays));
 
 			retMap.put("outsideInterest", JSON.toJSON(resultMap.get("outsideInterest"), JsonUtil.getMapping()));//
 

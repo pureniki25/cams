@@ -35,8 +35,6 @@ import com.hongte.alms.base.entity.RenewalBusiness;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
-import com.hongte.alms.base.enums.RepayPlanStatus;
-import com.hongte.alms.base.enums.RepayRegisterState;
 import com.hongte.alms.base.mapper.TransferOfLitigationMapper;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.BasicRepaymentTypeService;
@@ -145,19 +143,13 @@ public class ExpenseSettleController {
 		BasicRepaymentType basicRepaymentType = basicRepaymentTypeService.selectById(business.getRepaymentTypeId());
 		List<BizOutputRecord> bizOutputRecord = bizOutputRecordService.selectList(
 				new EntityWrapper<BizOutputRecord>().eq("business_id", businessId).orderBy("fact_output_date", true));
-		List<RepaymentBizPlanList> repaymentBizPlanLists = repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("current_status", RepayPlanStatus.REPAYED.getName()).orderBy("fact_repay_date",false));
-		Date lastRepayDate = null ;
-		if (repaymentBizPlanLists!=null&&repaymentBizPlanLists.size()>0) {
-			lastRepayDate = repaymentBizPlanLists.get(0).getFactRepayDate();
-		}
-		/*List<RepaymentBizPlanListDetail> repaymentBizPlanListDetails = repaymentBizPlanListDetailService
+		List<RepaymentBizPlanListDetail> repaymentBizPlanListDetails = repaymentBizPlanListDetailService
 				.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("business_id", businessId)
-						.orderBy("period").orderBy("plan_item_type"));*/
+						.orderBy("period").orderBy("plan_item_type"));
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("business", business);
 		jsonObject.put("repaymentType", basicRepaymentType.getRepaymentTypeName());
 		jsonObject.put("output", bizOutputRecord);
-		jsonObject.put("lastRepayDate", lastRepayDate==null?lastRepayDate:DateUtil.toDateString(lastRepayDate, DateUtil.DEFAULT_FORMAT_DATE));
 		return Result.success(jsonObject);
 	}
 

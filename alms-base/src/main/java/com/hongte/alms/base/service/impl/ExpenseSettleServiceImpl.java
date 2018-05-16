@@ -84,7 +84,6 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 	String xindaiAplUrlUrl;
 
 	@Override
-	@Deprecated
 	public ExpenseSettleVO cal(String preSettleDate, String businessId) {
 		BasicBusiness business = basicBusinessMapper.selectById(businessId);
 		if (business == null) {
@@ -347,7 +346,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		calGuaranteeFee(expenseSettleVO, basicBusiness);
 		calPlatformFee(settleDate, expenseSettleVO, basicBusiness, plan);
 		calDemurrage(settleDate, expenseSettleVO, basicBusiness, plan);
-		calPenalty(settleDate, expenseSettleVO, basicBusiness, plan , bizOutputRecord.get(0).getFactOutputDate());
+		calPenalty(settleDate, expenseSettleVO, basicBusiness, plan);
 		calLateFee(settleDate, expenseSettleVO, basicBusiness, plan);
 		calLackFee(settleDate, expenseSettleVO, basicBusiness, plan);
 		calBalance(expenseSettleVO, basicBusiness);
@@ -585,7 +584,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 	 * @param basicBusiness
 	 * @param plan
 	 */
-	private void calPenalty(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan,Date outPutDate) {
+	private void calPenalty(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan) {
 		BigDecimal penalty = new BigDecimal(0);
 		RepaymentBizPlanList lastCurrentPeriod = plan.findCurrentPeriods(settleDate).get(plan.findCurrentPeriods(settleDate).size()-1).getRepaymentBizPlanList() ;
 		for (RepaymentBizPlanListDetail detail : plan.allDetails()) {
@@ -595,31 +594,19 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 			}
 			
 		}
-		boolean before20170605 = outPutDate.before(DateUtil.getDate("2017-06-05", DateUtil.DEFAULT_FORMAT_DATE)) ;
-		boolean before20170301 = outPutDate.before(DateUtil.getDate("2017-03-01", DateUtil.DEFAULT_FORMAT_DATE)) ;
-		boolean before20171204 = outPutDate.before(DateUtil.getDate("2017-12-04", DateUtil.DEFAULT_FORMAT_DATE)) ;
+		
 		switch (basicBusiness.getRepaymentTypeId()) {
 		case 2:
 			//先息后本
-		
-			if (before20170605) {
-				penalty = new BigDecimal(0);
-			}else {
-				BigDecimal surplus = new BigDecimal(plan.getSurplusPeriod().size()) ;
-				penalty = expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.005).multiply(surplus));
+			
+			BigDecimal p6 = expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.06));
+			if (penalty.compareTo(p6)>=0) {
+				penalty = p6 ;
 			}
 			
 			break;
 		case 5:
 			//等额本息
-			if (before20170301) {
-				penalty = new BigDecimal(0);
-			}else if(before20171204) {
-				BigDecimal p6 = expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.06));
-				if (penalty.compareTo(p6)>=0) {
-					penalty = p6 ;
-				}
-			}
 			break;
 		default:
 			/*找不到还款方式233333333333*/
