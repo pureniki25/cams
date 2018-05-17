@@ -1297,10 +1297,38 @@ var saveapplyInfo = function(pStatus){debugger
 	    			vm.reqRegFiles[i]=vm.returnRegFiles[i];
 
 	    		}
-                for(var i=0;i<vm.applyTypes.length;i++){
+                for(var i=0;i<vm.applyTypes.length;i++){debugger
 	    			if(vm.applyTypes[i].derateMoney==''){
-	    				   vm.$Modal.error({content: '减免费用金额不能为空' });
+	    				   vm.$Modal.error({content: '减免金额不能为0' });
 	    				   return;
+	    			}
+	    			
+	    			if(vm.applyInfoForm.isSettleFlage=='是'){
+	    				if(vm.applyTypes[i].feeId=='79069922-e13a-4229-8656-2a1e19b44879'){
+	    					   vm.$Modal.error({content: '结清时滞纳金不能减免' });
+	    				      return;
+	    				}
+	    				if(vm.applyTypes[i].feeId=='e404a126-45ab-11e7-8ed5-000c2928bb0d'&&vm.baseInfoForm.outsideInterest==0){
+	    					 vm.$Modal.error({content: '逾期利息为0不能减免' });
+	    					   return;
+	    				}
+	    				if(vm.applyTypes[i].feeId=='65bf9587-37b4-11e7-9482-000c2928bb0d'&&vm.baseInfoForm.preLateFees==0){
+	    					 vm.$Modal.error({content: '提前结清违约金为0不能减免' });
+	    					   return;
+	    				}
+	    			}else{
+	    				if(vm.applyTypes[i].feeId=='79069922-e13a-4229-8656-2a1e19b44879'&&vm.baseInfoForm.needPayPenalty==0){
+	    					   vm.$Modal.error({content: '滞纳金为0不能减免' });
+	    				      return;
+	    				}
+	    				if(vm.applyTypes[i].feeId=='e404a126-45ab-11e7-8ed5-000c2928bb0d'){
+	    					 vm.$Modal.error({content: '非结清时逾期利息不能减免' });
+	    					   return;
+	    				}
+	    				if(vm.applyTypes[i].feeId=='65bf9587-37b4-11e7-9482-000c2928bb0d'){
+	    					 vm.$Modal.error({content: '非结清时提前结清违约金不能减免' });
+	    					   return;
+	    				}
 	    			}
 
 	    		}
