@@ -1,22 +1,24 @@
 package com.hongte.alms.open.controller;
 
 
-import com.hongte.alms.common.result.Result;
-import com.hongte.alms.open.dto.repayPlan.PlanReturnInfoDto;
-import com.hongte.alms.open.req.repayPlan.CreatRepayPlanReq;
-import com.hongte.alms.open.feignClient.CreatRepayPlanRemoteApi;
-import com.hongte.alms.open.req.repayPlan.trial.TrailRepayPlanReq;
-import com.hongte.alms.open.util.TripleDESDecrypt;
-import io.swagger.annotations.Api;
-
-import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.hongte.alms.common.result.Result;
+import com.hongte.alms.open.dto.repayPlan.PlanReturnInfoDto;
+import com.hongte.alms.open.feignClient.CreatRepayPlanRemoteApi;
+import com.hongte.alms.open.req.repayPlan.CreatRepayPlanReq;
+import com.hongte.alms.open.req.repayPlan.trial.TrailRepayPlanReq;
+import com.hongte.alms.open.util.TripleDESDecrypt;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 /**
  * @author zengkun
@@ -58,6 +60,14 @@ public class RepayPlanController {
     @TripleDESDecrypt
     public Result<PlanReturnInfoDto> trailRepayPlan(TrailRepayPlanReq trailRepayPlanReq){
         return creatRepayPlanRemoteService.trailRepayPlan(trailRepayPlanReq);
+    }
+    
+    @ApiOperation(value = "根据businessId查询还款计划")
+	@GetMapping("/queryRepayPlanByBusinessId")
+    @ResponseBody
+    @TripleDESDecrypt
+    public Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(String businessId){
+    	return creatRepayPlanRemoteService.queryRepayPlanByBusinessId(businessId);
     }
 
 

@@ -2,16 +2,14 @@ package com.hongte.alms.open.feignClient;
 
 
 
+import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.open.dto.repayPlan.PlanReturnInfoDto;
 import com.hongte.alms.open.req.repayPlan.CreatRepayPlanReq;
 import com.hongte.alms.open.req.repayPlan.trial.TrailRepayPlanReq;
-import feign.Headers;
-import feign.RequestLine;
-import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * @author chenzesheng
@@ -29,5 +27,8 @@ public interface CreatRepayPlanRemoteApi {
 
     @RequestMapping(value = "/alms/finance/RepayPlan/creatAndSaveRepayPlan",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
     Result<PlanReturnInfoDto> trailRepayPlan(TrailRepayPlanReq trailRepayPlanReq);
+    
+    @RequestMapping(value = "/alms/finance/RepayPlan/queryRepayPlanByBusinessId",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
+    Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(String businessId);
 
 }
