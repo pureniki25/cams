@@ -199,6 +199,15 @@ public class TuandaiProjectInfo extends Model<TuandaiProjectInfo> {
 	@TableField("branch_company_id")
 	@ApiModelProperty(required= true,value = "标的来源(所属分公司的分润用户ID)")
 	private String branchCompanyId;
+
+	/**
+	 * 标的所属团贷分公司全称
+	 */
+	@TableField("branch_company_name")
+	@ApiModelProperty(required= true,value = "标的所属团贷分公司全称")
+	private String branchCompanyName;
+
+
     /**
      * 风险控制措施
      */
@@ -1196,6 +1205,7 @@ public class TuandaiProjectInfo extends Model<TuandaiProjectInfo> {
 			", amount=" + amount +
 			", lowerUnit=" + lowerUnit +
 			", branchCompanyId=" + branchCompanyId +
+			", branchCompanyName=" + branchCompanyName +
 			", controlDesc=" + controlDesc +
 			", imageUrl=" + imageUrl +
 			", titleImageId=" + titleImageId +
@@ -1249,5 +1259,13 @@ public class TuandaiProjectInfo extends Model<TuandaiProjectInfo> {
 			", updateTime=" + updateTime +
 			", updateUser=" + updateUser +
 			"}";
+	}
+
+	public String getBranchCompanyName() {
+		return branchCompanyName;
+	}
+
+	public void setBranchCompanyName(String branchCompanyName) {
+		this.branchCompanyName = branchCompanyName;
 	}
 }
