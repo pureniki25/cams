@@ -3,6 +3,7 @@ package com.hongte.alms.base.service.impl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -15,12 +16,13 @@ import com.hongte.alms.core.CoreServiceApplication;
 public class BusinessParameterServiceImplTest {
 	
 	@Autowired
+	@Qualifier("BusinessParameterService")
 	private BusinessParameterService businessParameterService;
 	
 	@Test
 	public void testFiveLevelClassifyForBusiness() {
 		ClassifyConditionVO vo = new ClassifyConditionVO();
-		vo.setBusinessId("TDC5012017101402");
+		vo.setBusinessId("TDC1012018031504");
 		vo.setOpSourse("1");
 		String className = businessParameterService.fiveLevelClassifyForBusiness(vo);
 		System.out.println(className);
