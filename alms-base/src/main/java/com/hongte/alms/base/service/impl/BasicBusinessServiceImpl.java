@@ -100,8 +100,6 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 	@Autowired
 	RepaymentBizPlanListDetailMapper repaymentBizPlanListDetailMapper;
 	
-	@Value("${ht.billing.west.part.business:''}")
-	private String westPartBusiness;
 
 	public List<BusinessInfoForApplyDerateVo> selectBusinessInfoForApplyDerateVo(String crpId, Integer isDefer,
 			String originalBusinessId) {

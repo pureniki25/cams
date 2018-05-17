@@ -461,11 +461,13 @@ public class ApplyDerateController {
 			if (afterId != null && afterId.startsWith("ZQ")) {
 				isDefer = 1;
 			}
-			// 基本信息
+			// 基本信息 
 			List<BusinessInfoForApplyDerateVo> businessVoList = basicBusinessService
 					.selectBusinessInfoForApplyDerateVo(crpId, isDefer, businessId);
-
+            
 			CarLoanBilVO carLoanBilVO = new CarLoanBilVO();
+			carLoanBilVO.setCurrentPriod(businessVoList.get(0).getPeriods());
+			carLoanBilVO.setNeedPayInterest(businessVoList.get(0).getNeedPayInterest().doubleValue());
 			carLoanBilVO.setBillDate(new Date());
 			carLoanBilVO.setBusinessId(businessId);
 			if (null != preLateFeesType && !"".equals(preLateFeesType)) {
