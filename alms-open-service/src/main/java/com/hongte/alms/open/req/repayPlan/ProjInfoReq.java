@@ -214,6 +214,14 @@ public class ProjInfoReq {
      */
     @ApiModelProperty(required= true,value = "标的来源(所属分公司的分润用户ID)")
     private String branchCompanyId;
+
+    /**
+     * 标的所属团贷分公司全称
+     */
+    @ApiModelProperty(required= true,value = "分公司存管注册时在资金端的全称FullName(需要调用团贷网接口二十、获取标来源分公司资料 )")
+    private String branchCompanyName;
+
+
     /**
      * 风险控制措施
      */
@@ -1352,5 +1360,13 @@ public class ProjInfoReq {
 
     public void setCooperativeTdComAmount(BigDecimal cooperativeTdComAmount) {
         this.cooperativeTdComAmount = cooperativeTdComAmount;
+    }
+
+    public String getBranchCompanyName() {
+        return branchCompanyName;
+    }
+
+    public void setBranchCompanyName(String branchCompanyName) {
+        this.branchCompanyName = branchCompanyName;
     }
 }

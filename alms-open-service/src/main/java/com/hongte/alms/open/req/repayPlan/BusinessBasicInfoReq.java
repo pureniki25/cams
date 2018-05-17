@@ -104,11 +104,36 @@ public class BusinessBasicInfoReq {
 //     */
 //    @ApiModelProperty(required= true,value = "业务所属资产端编号(对应tb_basic_asset_side的asset_side_id)")
 //    private String assetId;
+
+
     /**
      * 业务所属分公司编号
      */
     @ApiModelProperty(required= true,value = "业务所属分公司编号")
     private String companyId;
+
+    /**
+     * 业务所属分公司名称
+     */
+    @ApiModelProperty(required= true,value = "业务所属分公司名称")
+    private String companyName;
+    /**
+     * 业务所属片区编号
+     */
+    @ApiModelProperty(required= true,value = "业务所属片区编号")
+    private String  districtId;
+
+    /**
+     * 业务所属片区名称
+     */
+    @ApiModelProperty(required= true,value = "业务所属片区名称")
+    private String  districtName;
+
+    /**
+     * 出款平台类型
+     */
+    @ApiModelProperty(required= true,value = "出款平台类型 0：线下出款，1：团贷网P2P上标 2：你我金融上标")
+    private Integer  outputPlatformId;
 
     /**
      * 标识是否P2P拆标业务，0：非P2P拆标业务，1：P2P拆标业务
@@ -302,5 +327,37 @@ public class BusinessBasicInfoReq {
 
     public void setOrgBusinessId(String orgBusinessId) {
         this.orgBusinessId = orgBusinessId;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+
+    public String getDistrictId() {
+        return districtId;
+    }
+
+    public void setDistrictId(String districtId) {
+        this.districtId = districtId;
+    }
+
+    public String getDistrictName() {
+        return districtName;
+    }
+
+    public void setDistrictName(String districtName) {
+        this.districtName = districtName;
+    }
+
+    public Integer getOutputPlatformId() {
+        return outputPlatformId;
+    }
+
+    public void setOutputPlatformId(Integer outputPlatformId) {
+        this.outputPlatformId = outputPlatformId;
     }
 }
