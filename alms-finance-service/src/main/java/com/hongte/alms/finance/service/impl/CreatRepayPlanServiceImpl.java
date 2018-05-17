@@ -112,6 +112,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
     BasicBusinessTypeService basicBusinessTypeService;
     
     @Autowired
+    @Qualifier("RepaymentProjFactRepayService")
     private RepaymentProjFactRepayService repaymentProjFactRepayService;
 
     //进位方式枚举
@@ -1541,10 +1542,6 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 		try {
 			PlanReturnInfoDto planReturnInfoDto = null;
 
-			if (StringUtil.isEmpty(businessId)) {
-				return planReturnInfoDto;
-			}
-
 			List<RepaymentBizPlanDto> repaymentBizPlanDtos = new ArrayList<>();
 			
 			/*
@@ -1599,12 +1596,11 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 				planReturnInfoDto.setXdPlanDtos(xdPlanDtos);
 			}
 			
-			
 			return planReturnInfoDto;
 			
 		} catch (Exception e) {
 			logger.error("根据业务ID查找还款计划失败！", e);
-			throw new ServiceRuntimeException(e.getMessage(), e);
+			throw new ServiceRuntimeException("根据业务ID查找还款计划失败！");
 		}
 		
 	}
@@ -1704,9 +1700,6 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 	@Override
 	public void deleteRepayPlanByConditions(String businessId, String repaymentBatchId) {
 		try {
-			if (StringUtil.isEmpty(businessId) || StringUtil.isEmpty(repaymentBatchId)) {
-				throw new ServiceRuntimeException("业务编号或还款批次号不能为空");
-			}
 			
 			/*
 			 * 1、根据 businessId 和 repaymentBatchId 查询 贷后管理生成 的 业务还款计划信息
@@ -1715,71 +1708,109 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 					.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id", businessId)
 							.eq("repayment_batch_id", repaymentBatchId).eq("src_type", 2));
 			
-			List<String> projPlanIds = new ArrayList<>();
+			List<String> planIds = new LinkedList<>();
+			List<String> planListIds = new LinkedList<>();
+			List<String> planDetailIds = new LinkedList<>();
+			List<String> projPlanIds = new LinkedList<>();
+			List<String> projPlanListIds = new LinkedList<>();
+			List<String> projPlanDetailIds = new LinkedList<>();
 			
 			if (CollectionUtils.isNotEmpty(repaymentBizPlans)) {
+				
 				for (RepaymentBizPlan repaymentBizPlan : repaymentBizPlans) {
 					
-					String planId = repaymentBizPlan.getPlanId();
+					planIds.add(repaymentBizPlan.getPlanId());
 					
+				}
+				
+				/*
+				 * 2、根据 plan_id 查询 标的还款计划信息
+				 */
+				List<RepaymentProjPlan> repaymentProjPlans = repaymentProjPlanService
+						.selectList(new EntityWrapper<RepaymentProjPlan>().in("plan_id", planIds));
+				
+				if (CollectionUtils.isNotEmpty(repaymentProjPlans)) {
+					for (RepaymentProjPlan repaymentProjPlan : repaymentProjPlans) {
+						projPlanIds.add(repaymentProjPlan.getProjPlanId());
+					}
+				}
+				
+				if (!projPlanIds.isEmpty()) {
 					/*
-					 * 2、根据 plan_id 查询 标的还款计划信息
+					 * 3、根据 proj_plan_id 查询 标的还款计划列表
 					 */
-					List<RepaymentProjPlan> repaymentProjPlans = repaymentProjPlanService
-							.selectList(new EntityWrapper<RepaymentProjPlan>().eq("plan_id", planId));
+					List<RepaymentProjPlanList> repaymentProjPlanLists = repaymentProjPlanListService
+							.selectList(new EntityWrapper<RepaymentProjPlanList>().in("proj_plan_id", projPlanIds));
 					
+					if (CollectionUtils.isNotEmpty(repaymentProjPlanLists)) {
+						
+						for (RepaymentProjPlanList repaymentProjPlanList : repaymentProjPlanLists) {
+							
+							projPlanListIds.add(repaymentProjPlanList.getProjPlanListId());
+							
+						}
+					}
 					
+				}
+				
+				if (!projPlanListIds.isEmpty()) {
+					/*
+					 * 4、根据 proj_plan_list_id 查询 标 的还款计划明细
+					 */
+					List<RepaymentProjPlanListDetail> repaymentProjPlanListDetails = repaymentProjPlanListDetailService
+							.selectList(new EntityWrapper<RepaymentProjPlanListDetail>().in("proj_plan_list_id", projPlanListIds));
 					
-					if (CollectionUtils.isNotEmpty(repaymentProjPlans)) {
-						for (RepaymentProjPlan repaymentProjPlan : repaymentProjPlans) {
-							projPlanIds.add(repaymentProjPlan.getProjPlanId());
+					if (CollectionUtils.isNotEmpty(repaymentProjPlanListDetails)) {
+						
+						for (RepaymentProjPlanListDetail repaymentProjPlanListDetail : repaymentProjPlanListDetails) {
+							
+							projPlanDetailIds.add(repaymentProjPlanListDetail.getProjPlanDetailId());
+							
 						}
 					}
 				}
-			}
-			
-			List<String> projPlanDetailIds = new ArrayList<>();
-			
-			if (!projPlanIds.isEmpty()) {
-				/*
-				 * 3、根据 proj_plan_id 查询 标的还款计划列表
-				 */
-				List<RepaymentProjPlanList> repaymentProjPlanLists = repaymentProjPlanListService
-						.selectList(new EntityWrapper<RepaymentProjPlanList>().in("proj_plan_id", projPlanIds));
-				if (CollectionUtils.isNotEmpty(repaymentProjPlanLists)) {
-					for (RepaymentProjPlanList repaymentProjPlanList : repaymentProjPlanLists) {
-						String projPlanListId = repaymentProjPlanList.getProjPlanListId();
+				
+				if (!projPlanDetailIds.isEmpty()) {
+					/*
+					 * 5、根据 proj_plan_detail_id 查询标实还明细
+					 */
+					List<RepaymentProjFactRepay> repaymentProjFactRepays = repaymentProjFactRepayService.selectList(
+							new EntityWrapper<RepaymentProjFactRepay>().in("proj_plan_detail_id", projPlanDetailIds));
+					// 若产生任意实还金额, 则不允许删除还款计划
+					if (CollectionUtils.isNotEmpty(repaymentProjFactRepays)) {
+						throw new ServiceRuntimeException("此还款计划已产生实还项目，不允许删除");
+					}else {
 						
-						/*
-						 * 4、根据 proj_plan_list_id 查询 标 的还款计划明细
-						 */
-						List<RepaymentProjPlanListDetail> repaymentProjPlanListDetails = repaymentProjPlanListDetailService
-								.selectList(new EntityWrapper<RepaymentProjPlanListDetail>().eq("proj_plan_list_id", projPlanListId));
+						List<RepaymentBizPlanList> repaymentBizPlanLists = repaymentBizPlanListService
+								.selectList(new EntityWrapper<RepaymentBizPlanList>().in("plan_id", planIds));
 						
-						if (CollectionUtils.isNotEmpty(repaymentProjPlanListDetails)) {
-							for (RepaymentProjPlanListDetail repaymentProjPlanListDetail : repaymentProjPlanListDetails) {
-								projPlanDetailIds.add(repaymentProjPlanListDetail.getProjPlanDetailId());
+						if (CollectionUtils.isNotEmpty(repaymentBizPlanLists)) {
+							for (RepaymentBizPlanList repaymentBizPlanList : repaymentBizPlanLists) {
+								planListIds.add(repaymentBizPlanList.getPlanListId());
 							}
 						}
+						
+						if (!planListIds.isEmpty()) {
+							List<RepaymentBizPlanListDetail> repaymentBizPlanListDetails = repaymentBizPlanListDetailSevice
+									.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().in("plan_list_id", planListIds));
+							
+							if (CollectionUtils.isNotEmpty(repaymentBizPlanListDetails)) {
+								for (RepaymentBizPlanListDetail repaymentBizPlanListDetail : repaymentBizPlanListDetails) {
+									planDetailIds.add(repaymentBizPlanListDetail.getPlanDetailId());
+								}
+							}
+						}
+						
+						repaymentBizPlanService.deleteBatchIds(planIds);
+						repaymentBizPlanListService.deleteBatchIds(planListIds);
+						repaymentBizPlanListDetailSevice.deleteBatchIds(planDetailIds);
+						repaymentProjPlanListService.deleteBatchIds(projPlanListIds);
+						repaymentBizPlanListDetailSevice.deleteBatchIds(projPlanDetailIds);
 					}
 				}
+			}else {
+				throw new ServiceRuntimeException("没有找到相关数据，撤销还款计划失败");
 			}
-			
-			if (!projPlanDetailIds.isEmpty()) {
-				/*
-				 * 5、根据 proj_plan_detail_id 查询标实还明细
-				 */
-				List<RepaymentProjFactRepay> repaymentProjFactRepays = repaymentProjFactRepayService.selectList(
-						new EntityWrapper<RepaymentProjFactRepay>().in("proj_plan_detail_id", projPlanDetailIds));
-				for (RepaymentProjFactRepay repaymentProjFactRepay : repaymentProjFactRepays) {
-					// 若任意实还金额大于0 fact_amount > 0, 则不允许删除还款计划
-					BigDecimal factAmount = repaymentProjFactRepay.getFactAmount();
-					if (factAmount != null && factAmount.doubleValue() > 0) {
-						throw new ServiceRuntimeException("");
-					}
-				}
-			}
-			
 		} catch (Exception e) {
 			logger.error("按条件删除还款计划失败！", e);
 			throw new ServiceRuntimeException(e.getMessage(), e);

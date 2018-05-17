@@ -30,5 +30,8 @@ public interface CreatRepayPlanRemoteApi {
     
     @RequestMapping(value = "/alms/finance/RepayPlan/queryRepayPlanByBusinessId",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
     Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(String businessId);
+    
+    @RequestMapping(value = "/alms/finance/RepayPlan/deleteRepayPlanByConditions",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
+    Result<PlanReturnInfoDto> deleteRepayPlanByConditions(String businessId, String repaymentBatchId);
 
 }

@@ -69,6 +69,14 @@ public class RepayPlanController {
     public Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(String businessId){
     	return creatRepayPlanRemoteService.queryRepayPlanByBusinessId(businessId);
     }
+    
+    @ApiOperation(value = "根据businessId查询还款计划")
+    @GetMapping("/deleteRepayPlanByConditions")
+    @ResponseBody
+    @TripleDESDecrypt
+    public Result<PlanReturnInfoDto> deleteRepayPlanByConditions(String businessId, String repaymentBatchId){
+    	return creatRepayPlanRemoteService.deleteRepayPlanByConditions(businessId, repaymentBatchId);
+    }
 
 
 
