@@ -871,7 +871,6 @@ var getShowInfo = function () {
 		      	  //结清时应付月收服务费
 		      	  vm.baseInfoForm.needPayService=vm.baseInfoForm.settleNeedPayService
             
-            
                //获取提前还款违约金
                 showData();
             
@@ -889,8 +888,12 @@ var getShowInfo = function () {
 
                     vm.applyInfoForm.isSettleFlage = vm.applyInfoForm.isSettle=="1"?"是":"否";
                     
+                    
                     if(vm.applyInfoForm.isSettle!="1"){
               		  vm.otherFeeShowFlage=false;
+    		      	  vm.baseInfoForm.needPayPrincipal=vm.baseInfoForm.noSettleNeedPayPrincipal
+    		      	  vm.baseInfoForm.needPayInterest=vm.baseInfoForm.noSettleNeedPayInterest
+    		      	  vm.baseInfoForm.needPayService=vm.baseInfoForm.noSettleNeedPayService
                     }
                     //赋值审批信息初始信息
                     vm.initalApplyInfo.isSettleFlage = vm.initalApplyInfo.isSettle=="1"?"是":"否";
