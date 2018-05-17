@@ -51,5 +51,7 @@
 			<foreach collection="ids" index="index" item="item" open="(" separator="," close=")">  
 		        #{item}  
 		    </foreach> 
+		    AND mpr.is_finance_match = 1
+		    AND ( mpr.is_deleted IS NULL OR mpr.is_deleted = 0 ) 
 	</select>
 </mapper>

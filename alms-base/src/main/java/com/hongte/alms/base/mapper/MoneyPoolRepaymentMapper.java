@@ -19,7 +19,7 @@ import com.hongte.alms.common.mapper.SuperMapper;
 public interface MoneyPoolRepaymentMapper extends SuperMapper<MoneyPoolRepayment> {
 
 	/**
-	 * 根据ids统计对应还款登记的金额合计
+	 * 根据ids统计财务匹配且未被删除的还款登记的金额合计
 	 * @author 王继光
 	 * 2018年5月17日 上午11:22:39
 	 * @param ids

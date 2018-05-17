@@ -728,6 +728,11 @@ public class FinanceServiceImpl implements FinanceService {
 		}
 		/*查到的本次还款金额*/
 		BigDecimal dtotal = moneyPoolRepaymentMapper.sumMoneyPoolRepaymentAmountByMprIds(req.getMprIds());
+		if (dtotal==null||dtotal.equals(new BigDecimal(0))) {
+			return Result.error("500", "找不到本次还款信息或本次还款总金额为0");
+		}
+		/*查到的本次还款金额,用于减法运算*/
+		BigDecimal dtotalCopy = dtotal ;
 		/*上标总金额*/
 		BigDecimal projCount = new BigDecimal(0);
 		for (Map<String, Object> map : projs) {
@@ -741,8 +746,14 @@ public class FinanceServiceImpl implements FinanceService {
 			BigDecimal projAmount = (BigDecimal)projs.get(i).get("amount");
 			/*标的与上标总金额占比*/
 			BigDecimal proportion = calProportion(projCount, projAmount);
-			
-			
+			/*标的分配到的金额*/
+			BigDecimal distributive = new BigDecimal(0);
+			if (i==projs.size()-1) {
+				distributive = dtotalCopy ;
+			}else {
+				distributive = dtotal.multiply(proportion);
+				dtotalCopy = dtotalCopy.subtract(distributive);
+			}
 			
 			boolean isMaster = (boolean)projs.get(i).get("isMaster") ;
 			CurrPeriodProjDetailVO currPeriodProjDetailVO = new CurrPeriodProjDetailVO() ;
