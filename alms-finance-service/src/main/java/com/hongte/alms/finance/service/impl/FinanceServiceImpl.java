@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.slf4j.Logger;
@@ -655,33 +656,34 @@ public class FinanceServiceImpl implements FinanceService {
 
 	@Override
 	public List<MatchedMoneyPoolVO> selectConfirmedBankStatement(String businessId, String afterId) {
-		List<MatchedMoneyPoolVO> list = new ArrayList<>() ;
+		List<MatchedMoneyPoolVO> list = new ArrayList<>();
 		List<RepaymentResource> repaymentResources = repaymentResourceMapper
 				.selectList(new EntityWrapper<RepaymentResource>().eq("business_id", businessId).eq("after_id", afterId)
 						.eq("is_cancelled", 0).orderBy("repay_date"));
 		for (RepaymentResource repaymentResource : repaymentResources) {
-			MatchedMoneyPoolVO matchedMoneyPoolVO = null ;
+			MatchedMoneyPoolVO matchedMoneyPoolVO = null;
 			String resource = repaymentResource.getRepaySource();
 			switch (resource) {
 			case "10":
-				//线下转账
-				MoneyPoolRepayment moneyPoolRepayment = moneyPoolRepaymentMapper.selectById(repaymentResource.getRepaySourceRefId());
-				if (moneyPoolRepayment==null||moneyPoolRepayment.getMoneyPoolId()==null) {
-					matchedMoneyPoolVO = new MatchedMoneyPoolVO() ;
+				// 线下转账
+				MoneyPoolRepayment moneyPoolRepayment = moneyPoolRepaymentMapper
+						.selectById(repaymentResource.getRepaySourceRefId());
+				if (moneyPoolRepayment == null || moneyPoolRepayment.getMoneyPoolId() == null) {
+					matchedMoneyPoolVO = new MatchedMoneyPoolVO();
 					matchedMoneyPoolVO.setAccountMoney(repaymentResource.getRepayAmount());
 					matchedMoneyPoolVO.setTradeDate(repaymentResource.getRepayDate());
 					matchedMoneyPoolVO.setRemark("找不到还款登记信息");
 					break;
 				}
 				MoneyPool moneyPool = moneyPoolMapper.selectById(moneyPoolRepayment.getMoneyPoolId());
-				if (moneyPool==null) {
-					matchedMoneyPoolVO = new MatchedMoneyPoolVO() ;
+				if (moneyPool == null) {
+					matchedMoneyPoolVO = new MatchedMoneyPoolVO();
 					matchedMoneyPoolVO.setAccountMoney(repaymentResource.getRepayAmount());
 					matchedMoneyPoolVO.setTradeDate(repaymentResource.getRepayDate());
 					matchedMoneyPoolVO.setRemark("找不到银行流水信息");
 					break;
 				}
-				matchedMoneyPoolVO = new MatchedMoneyPoolVO() ;
+				matchedMoneyPoolVO = new MatchedMoneyPoolVO();
 				matchedMoneyPoolVO.setAccountMoney(moneyPool.getAccountMoney());
 				matchedMoneyPoolVO.setBankAccount(moneyPool.getAcceptBank());
 				matchedMoneyPoolVO.setMoneyPoolId(moneyPoolRepayment.getMoneyPoolId());
@@ -692,21 +694,21 @@ public class FinanceServiceImpl implements FinanceService {
 				matchedMoneyPoolVO.setSummary(moneyPool.getSummary());
 				matchedMoneyPoolVO.setTradeType(moneyPool.getTradeType());
 				matchedMoneyPoolVO.setStatus(moneyPoolRepayment.getState());
-				
+
 				break;
 			case "20":
-				//线下代扣
-				//TODO
+				// 线下代扣
+				// TODO
 				break;
 			case "30":
-				//银行代扣
-				//TODO
+				// 银行代扣
+				// TODO
 				break;
 			default:
-				matchedMoneyPoolVO = new MatchedMoneyPoolVO() ;
+				matchedMoneyPoolVO = new MatchedMoneyPoolVO();
 				matchedMoneyPoolVO.setAccountMoney(repaymentResource.getRepayAmount());
 				matchedMoneyPoolVO.setTradeDate(repaymentResource.getRepayDate());
-				matchedMoneyPoolVO.setRemark("还款来源:"+repaymentResource.getRepaySource());
+				matchedMoneyPoolVO.setRemark("还款来源:" + repaymentResource.getRepaySource());
 				break;
 			}
 			list.add(matchedMoneyPoolVO);
@@ -716,36 +718,96 @@ public class FinanceServiceImpl implements FinanceService {
 
 	@Override
 	public Result previewConfirmRepayment(ConfirmRepaymentReq req) {
-		isSurplusFundEnough(req);
+		boolean enough = isSurplusFundEnough(req);
+		if (!enough) {
+			return Result.error("500", "结余金额不够");
+		}
+		List<Map<String,Object>> projs = repaymentProjPlanMapper.selectProjPlanProjectInfo(req.getBusinessId()) ;
+		if (projs==null||projs.size()==0) {
+			return Result.error("500", "找不到对应的标的信息");
+		}
+		/*查到的本次还款金额*/
+		BigDecimal dtotal = moneyPoolRepaymentMapper.sumMoneyPoolRepaymentAmountByMprIds(req.getMprIds());
+		/*上标总金额*/
+		BigDecimal projCount = new BigDecimal(0);
+		for (Map<String, Object> map : projs) {
+			BigDecimal projAmount = (BigDecimal)map.get("amount");
+			projCount = projCount.add(projAmount) ;
+		}
+		
+		for (int i = 0; i < projs.size(); i++) {
+			String projectId = (String)projs.get(i).get("projectId");
+			String realName = (String)projs.get(i).get("realName");
+			BigDecimal projAmount = (BigDecimal)projs.get(i).get("amount");
+			/*标的与上标总金额占比*/
+			BigDecimal proportion = calProportion(projCount, projAmount);
 			
+			
+			
+			boolean isMaster = (boolean)projs.get(i).get("isMaster") ;
+			CurrPeriodProjDetailVO currPeriodProjDetailVO = new CurrPeriodProjDetailVO() ;
+			currPeriodProjDetailVO.setMaster(isMaster);
+			currPeriodProjDetailVO.setUserName(realName);
+			currPeriodProjDetailVO.setProjAmount(projAmount);
+			
+			RepaymentProjPlanList repaymentProjPlanList = repaymentProjPlanListMapper.selectByProjectIDAndAfterId(projectId, req.getAfterId());
+		}
+		
+		/*for (Map<String, Object> map : projs) {
+			String projectId = (String)map.get("projectId");
+			String realName = (String)map.get("realName");
+			BigDecimal projAmount = (BigDecimal)map.get("amount");
+			
+			BigDecimal proportion = projAmount.divide(projCount).setScale(10, BigDecimal.ROUND_HALF_UP);
+			
+			boolean isMaster = (boolean)map.get("isMaster") ;
+			CurrPeriodProjDetailVO currPeriodProjDetailVO = new CurrPeriodProjDetailVO() ;
+			currPeriodProjDetailVO.setMaster(isMaster);
+			currPeriodProjDetailVO.setUserName(realName);
+			currPeriodProjDetailVO.setProjAmount(projAmount);
+			
+			RepaymentProjPlanList repaymentProjPlanList = repaymentProjPlanListMapper.selectByProjectIDAndAfterId(projectId, req.getAfterId());
+			
+		}*/
+		
 		return null;
 	}
 
+	/**
+	 * 计算占比
+	 * @author 王继光
+	 * 2018年5月17日 上午11:17:10
+	 * @param total
+	 * @param sub
+	 * @return
+	 */
+	private BigDecimal calProportion(BigDecimal total,BigDecimal sub) {
+		return sub.divide(total).setScale(10, BigDecimal.ROUND_HALF_UP);
+	}
+	
 	@Override
 	public Result confirmRepayment(ConfirmRepaymentReq req) {
 		isSurplusFundEnough(req);
 		return null;
 	}
 
-	
 	/**
 	 * 检查结余金额是否足够
-	 * @author 王继光
-	 * 2018年5月16日 下午3:12:46
+	 * 
+	 * @author 王继光 2018年5月16日 下午3:12:46
 	 * @return
 	 */
 	private boolean isSurplusFundEnough(ConfirmRepaymentReq req) {
-		if (req.getSurplusFund()==null||req.getSurplusFund().equals(new BigDecimal(0))) {
-			return true ;
+		if (req.getSurplusFund() == null || req.getSurplusFund().equals(new BigDecimal(0))) {
+			return true;
 		}
 		BigDecimal surplusFund = getSurplusFund(req.getBusinessId(), req.getAfterId());
 		int compareResult = req.getSurplusFund().compareTo(surplusFund);
-		if (compareResult>0) {
+		if (compareResult > 0) {
 			return false;
-		}else {
-			return true ;
+		} else {
+			return true;
 		}
 	}
-	
-	
+
 }

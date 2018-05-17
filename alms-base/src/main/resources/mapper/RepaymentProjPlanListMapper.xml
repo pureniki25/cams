@@ -126,5 +126,17 @@
 				where projList.proj_plan_list_id=#{projListId}
 	</select>
 	
+	<select id="selectByProjectIDAndAfterId" resultType="com.hongte.alms.base.entity.RepaymentProjPlanList">
+		SELECT
+			ppl.* 
+		FROM
+			tb_repayment_proj_plan pp
+			LEFT JOIN tb_repayment_proj_plan_list ppl ON ppl.proj_plan_id = pp.proj_plan_id 
+		WHERE
+			pp.project_id = '137e8a4a-0727-4551-b20a-48b0d6679cfa' AND ppl.after_id = '1-01'
+		ORDER BY
+			ppl.after_id
+	</select>
+	
 
 </mapper>
