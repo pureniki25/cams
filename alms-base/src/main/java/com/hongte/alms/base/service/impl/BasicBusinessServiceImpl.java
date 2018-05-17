@@ -257,14 +257,17 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 		Integer platformCount=getMonthPlatformAmountCount(crpId);//有无月收平台费
 		Double monthPlatformAmount = getMonthPlatformAmount(crpId);// 月收平台费
 		Double monthCompanyAmount = getMonthCompanyAmount(crpId);// 月收公司服务费
+		
 		BizOutputRecord bizOutputRecord = bizOutputRecordService
 				.selectOne(new EntityWrapper<BizOutputRecord>().eq("business_id", original_business_id));
 		Date outputDate = null;// 出款日期
 		ExpenseSettleVO vo = cal(original_business_id, preSettleDate);
+		
 		if (bizOutputRecord != null) {
 			outputDate = bizOutputRecord.getFactOutputDate();
 		}else {
-			throw new ServiceRuntimeException("找不到出款记录");
+			//throw new ServiceRuntimeException("找不到出款记录");
+			ContractDate=DateUtil.getDate("2018-04-03", "yyyy-MM-dd");
 		}
 		if(ContractDate==null) {
 			ContractDate=outputDate;
