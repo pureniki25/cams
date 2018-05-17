@@ -423,8 +423,8 @@ window.layinit(function(htConfig){
 	                                                if (currentItem.afterColStatusName=='已移交法务'){
 	                                              	   vm.$Modal.error({content: '已移交法务的不能发起减免申请！'});
 	                                                }else{
-		                                            	     if (currentItem.repaymentTypeId ==1||currentItem.repaymentTypeId==9||currentItem.repaymentTypeId==4){
-		                                                 	   vm.$Modal.error({content: '现在只支持等额本息和每月付息到期还本这2种还款方式的减免申请！'});
+		                                            	     if (currentItem.repaymentTypeId==9||currentItem.repaymentTypeId==4){
+		                                                 	   vm.$Modal.error({content: '现在只支持等额本息,先息后本,分期还本付息5年,分期还本付息10年还款方式的减免申请！'});
 			                                                 }else{
 			                                                     var url = '/collectionUI/applyDerateUI?businessId=' + currentItem.businessId + '&crpId=' + currentItem.crpId + "&processStatus=-1"+'&businessTypeId='+currentItem.businessTypeId+"&afterId="+currentItem.afterId
 			                                                     showOneLineOprLayer(url, "减免申请")
