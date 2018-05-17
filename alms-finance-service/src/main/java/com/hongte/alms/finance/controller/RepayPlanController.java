@@ -176,7 +176,7 @@ public class RepayPlanController {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	@ApiOperation(value = "根据businessId查询还款计划")
+	@ApiOperation(value = "根据条件撤销还款计划")
 	@GetMapping("/deleteRepayPlanByConditions")
 	@ResponseBody
 	public Result deleteRepayPlanByConditions(@RequestParam(value = "businessId") String businessId,
@@ -189,7 +189,7 @@ public class RepayPlanController {
 			creatRepayPlanService.deleteRepayPlanByConditions(businessId, repaymentBatchId);
 			return Result.success();
 		} catch (Exception e) {
-			logger.error("查询还款计划异常[{}]", e);
+			logger.error("删除还款计划异常[{}]", e);
 			return Result.error("9889", e.getMessage());
 		}
 	}
