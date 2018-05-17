@@ -436,6 +436,31 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         if(bizCusInfoReqs == null ||bizCusInfoReqs.size()==0){
             throw  new CreatRepaymentExcepiton("请填写业务用户信息");
         }
+
+
+        //判断是否有主借人  开始
+        Boolean mainBorrowPersonFlage = false;
+        for(BusinessCustomerInfoReq bizCusInfoReq:bizCusInfoReqs){
+           if(bizCusInfoReq.getIsmainCustomer().equals(BooleanEnum.YES.getValue())){
+               mainBorrowPersonFlage = true;
+               break;
+           }
+        }
+        if(!mainBorrowPersonFlage){
+            List<BasicBizCustomer> customerList =  basicBizCustomerService.selectList(
+                    new EntityWrapper<BasicBizCustomer>().eq("business_id",businessBasicInfoReq.getBusinessId()));
+            for(BasicBizCustomer basicBizCustomer:customerList){
+                if(basicBizCustomer.getIsmainCustomer().equals(BooleanEnum.YES.getValue())){
+                    mainBorrowPersonFlage = true;
+                    break;
+                }
+            }
+        }
+        if(!mainBorrowPersonFlage){
+            throw  new  CreatRepaymentExcepiton("业务用户信息列表中没有主借人信息");
+        }
+        //判断是否有主借人  结束
+
         for(BusinessCustomerInfoReq bizCusInfoReq:bizCusInfoReqs){
             if(!bizCusInfoReq.getCustomerType().equals(BizCustomerTypeEnum.PERSON.getName())&&
                     !bizCusInfoReq.getCustomerType().equals(BizCustomerTypeEnum.COMPANY.getName())){
@@ -594,10 +619,18 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             bizCusInfo.setBusinessId(basicBusiness.getBusinessId());
             bizCusInfo.setCreateUser(Constant.SYS_DEFAULT_USER);
             bizCusInfo.setCreateTime(new Date());
-            bizCustomers.add(bizCusInfo);
+            List<BasicBizCustomer> customerList =  basicBizCustomerService.selectList(
+                    new EntityWrapper<BasicBizCustomer>().eq("business_id",businessBasicInfoReq.getBusinessId())
+                            .eq("customer_id",bCustInfo.getCustomerId()).eq("identify_card",bCustInfo.getIdentifyCard()));
+            if(customerList.size()>0){
+                BasicBizCustomer oldCustomerInfo =customerList.get(0);
+                bizCusInfo.setId(oldCustomerInfo.getId());
+            }
+
+            basicBizCustomerService.insertOrUpdate(bizCusInfo);
         }
-        basicBizCustomerService.delete(new EntityWrapper<BasicBizCustomer>().eq("business_id",basicBusiness.getBusinessId()));
-        basicBizCustomerService.insertBatch(bizCustomers);
+//        basicBizCustomerService.delete(new EntityWrapper<BasicBizCustomer>().eq("business_id",basicBusiness.getBusinessId()));
+//        basicBizCustomerService.insertBatch(bizCustomers);
 
         //存储业务额外费用信息
         if(creatRepayPlanReq.getBizExtRateReqs()!=null){
@@ -608,6 +641,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 bizExtRate.setBusinessId(basicBusiness.getBusinessId());
                 bizExtRate.setCreateUser(Constant.SYS_DEFAULT_USER);
                 bizExtRate.setCreateTime(new Date());
+
                 bizExtRates.add(bizExtRate);
             }
             baiscBizExtRateService.delete(new EntityWrapper<BaiscBizExtRate>().eq("business_id",basicBusiness.getBusinessId()));
