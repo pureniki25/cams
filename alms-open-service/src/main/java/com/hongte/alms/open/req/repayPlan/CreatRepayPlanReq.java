@@ -24,8 +24,8 @@ public class CreatRepayPlanReq {
     @ApiModelProperty(required= true,value = "业务用户信息列表")
     private List<BusinessCustomerInfoReq> bizCusInfoReqs;
 
-    @ApiModelProperty(value = "业务额外的费率信息列表")
-    private List<BusinessExtRateReq>  bizExtRateReqs;
+//    @ApiModelProperty(value = "业务额外的费率信息列表")
+//    private List<BusinessExtRateReq>  bizExtRateReqs;
 
 
     /**
@@ -126,11 +126,11 @@ public class CreatRepayPlanReq {
         this.bizCusInfoReqs = bizCusInfoReqs;
     }
 
-    public List<BusinessExtRateReq> getBizExtRateReqs() {
-        return bizExtRateReqs;
-    }
-
-    public void setBizExtRateReqs(List<BusinessExtRateReq> bizExtRateReqs) {
-        this.bizExtRateReqs = bizExtRateReqs;
-    }
+//    public List<BusinessExtRateReq> getBizExtRateReqs() {
+//        return bizExtRateReqs;
+//    }
+//
+//    public void setBizExtRateReqs(List<BusinessExtRateReq> bizExtRateReqs) {
+//        this.bizExtRateReqs = bizExtRateReqs;
+//    }
 }
