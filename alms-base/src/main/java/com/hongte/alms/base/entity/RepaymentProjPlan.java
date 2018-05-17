@@ -85,39 +85,36 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 	@TableField("on_line_over_due_rate")
 	@ApiModelProperty(required= true,value = "线上逾期滞纳金费率(%)")
 	private BigDecimal onLineOverDueRate;
-	/**
-	 * 线上逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
-	 */
-	@TableField("on_line_over_due_rate_unit")
-	@ApiModelProperty(required= true,value = "线上逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率")
-	private Integer onLineOverDueRateUnit;
+	
 	/**
 	 * 线下期外逾期滞纳金费率(%)
 	 */
 	@TableField("off_line_out_over_due_rate")
 	@ApiModelProperty(required= true,value = "线下期外逾期滞纳金费率(%)")
 	private BigDecimal offLineOutOverDueRate;
-	/**
-	 * 线下期外逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
-	 */
-	@TableField("off_line_out_over_due_rate_unit")
-	@ApiModelProperty(required= true,value = "线下期外逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率")
-	private Integer offLineOutOverDueRateUnit;
+
 	/**
 	 * 线下期内逾期滞纳金费率(%)
 	 */
 	@TableField("off_line_in_over_due_rate")
 	@ApiModelProperty(required= true,value = "线下期内逾期滞纳金费率(%)")
 	private BigDecimal offLineInOverDueRate;
-	/**
-	 * 线下期内逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
-	 */
-	@TableField("off_line_in_over_due_rate_unit")
-	@ApiModelProperty(required= true,value = "线下期内逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率")
-	private Integer offLineInOverDueRateUnit;
 
+    
+	
+	@TableField("off_line_in_over_due_rate_type")
+	@ApiModelProperty(required=true,value="线下期内逾期滞纳金费率类型,1：按标的总借款金额乘以比例每天  ,2：按标的剩余本金乘以比例每天,3：按固定金额每天")
+	private Integer offLineInOverDueRateType;
+	
+	
+	@TableField("off_line_out_over_due_rate_type")
+	@ApiModelProperty(required=true,value="线下期外逾期滞纳金费率类型,1：按标的总借款金额乘以比例每天  ,2：按标的剩余本金乘以比例每天,3：按固定金额每天")
+	private Integer offLineOutOverDueRateType;
 
-
+    
+	@TableField("on_line_over_due_rate_type")
+	@ApiModelProperty(required=true,value="1：按标的总借款金额乘以比例每天 ，2：按标的剩余本金乘以比例每天 ，3：按固定金额每天，4：按标的当前应还本息乘以比例每天(目前只有这种算法，固定传4)")
+	private Integer onLineOverDueRateType;
 	/**
      * 生成还款计划对应的借款期限
      */
@@ -192,6 +189,30 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 	private Date queryFullSuccessDate;
 
 
+	public Integer getOffLineInOverDueRateType() {
+		return offLineInOverDueRateType;
+	}
+
+	public void setOffLineInOverDueRateType(Integer offLineInOverDueRateType) {
+		this.offLineInOverDueRateType = offLineInOverDueRateType;
+	}
+
+	public Integer getOffLineOutOverDueRateType() {
+		return offLineOutOverDueRateType;
+	}
+
+	public void setOffLineOutOverDueRateType(Integer offLineOutOverDueRateType) {
+		this.offLineOutOverDueRateType = offLineOutOverDueRateType;
+	}
+
+	public Integer getOnLineOverDueRateType() {
+		return onLineOverDueRateType;
+	}
+
+	public void setOnLineOverDueRateType(Integer onLineOverDueRateType) {
+		this.onLineOverDueRateType = onLineOverDueRateType;
+	}
+
 	public BigDecimal getOnLineOverDueRate() {
 		return onLineOverDueRate;
 	}
@@ -200,13 +221,7 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 		this.onLineOverDueRate = onLineOverDueRate;
 	}
 
-	public Integer getOnLineOverDueRateUnit() {
-		return onLineOverDueRateUnit;
-	}
 
-	public void setOnLineOverDueRateUnit(Integer onLineOverDueRateUnit) {
-		this.onLineOverDueRateUnit = onLineOverDueRateUnit;
-	}
 
 	public BigDecimal getOffLineOutOverDueRate() {
 		return offLineOutOverDueRate;
@@ -216,13 +231,7 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 		this.offLineOutOverDueRate = offLineOutOverDueRate;
 	}
 
-	public Integer getOffLineOutOverDueRateUnit() {
-		return offLineOutOverDueRateUnit;
-	}
 
-	public void setOffLineOutOverDueRateUnit(Integer offLineOutOverDueRateUnit) {
-		this.offLineOutOverDueRateUnit = offLineOutOverDueRateUnit;
-	}
 
 	public BigDecimal getOffLineInOverDueRate() {
 		return offLineInOverDueRate;
@@ -232,13 +241,7 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 		this.offLineInOverDueRate = offLineInOverDueRate;
 	}
 
-	public Integer getOffLineInOverDueRateUnit() {
-		return offLineInOverDueRateUnit;
-	}
-
-	public void setOffLineInOverDueRateUnit(Integer offLineInOverDueRateUnit) {
-		this.offLineInOverDueRateUnit = offLineInOverDueRateUnit;
-	}
+	
 
 	public Date getQueryFullSuccessDate() {
 		return queryFullSuccessDate;
@@ -426,11 +429,8 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 			", borrowRate=" + borrowRate +
 			", borrowRateUnit=" + borrowRateUnit +
 			", onLineOverDueRate=" + onLineOverDueRate +
-			", onLineOverDueRateUnit=" + onLineOverDueRateUnit +
 			", offLineOutOverDueRate=" + offLineOutOverDueRate +
-			", offLineOutOverDueRateUnit=" + offLineOutOverDueRateUnit +
 			", offLineInOverDueRate=" + offLineInOverDueRate +
-			", offLineInOverDueRateUnit=" + offLineInOverDueRateUnit +
 			", borrowLimit=" + borrowLimit +
 			", borrowLimitUnit=" + borrowLimitUnit +
 			", planStatus=" + planStatus +
