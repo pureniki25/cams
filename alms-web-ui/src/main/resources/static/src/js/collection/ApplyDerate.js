@@ -623,6 +623,12 @@ var showData=function(){debugger
                 	  getBalanceDue();//获取往期少交费用
                 	  //getPreviousLateFees();//获取整个业务的滞纳金
                 		vm.baseInfoForm.totalBorrowAmount="";
+                		
+                		if(res.data.data.outputPlatformId == 0){
+                		  	vm.isCarFlag=false;
+                		  	getOutsideInterest();
+                		}
+                		
                     if (res.data.data.outputPlatformId == 0 && res.data.data.repaymentTypeId == '等额本息') {
                       vm.preLateFeesFlag =true
                     }else{
