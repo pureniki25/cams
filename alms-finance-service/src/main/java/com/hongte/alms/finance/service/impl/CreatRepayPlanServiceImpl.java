@@ -8,6 +8,7 @@ import com.hongte.alms.base.enums.BizCustomerTypeEnum;
 import com.hongte.alms.base.enums.BooleanEnum;
 import com.hongte.alms.base.enums.BusinessSourceTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
+import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.enums.repayPlan.*;
 import com.hongte.alms.base.service.*;
 import com.hongte.alms.common.util.ClassCopyUtil;
@@ -18,6 +19,7 @@ import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1524,24 +1526,143 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         return projPlanListDetail;
     }
 
-    @Override
+	@Override
 	public PlanReturnInfoDto queryRepayPlan(String businessId) {
-    	try {
-    		PlanReturnInfoDto planReturnInfoDto = null;
-    		
-    		if (StringUtil.isEmpty(businessId)) {
-    			return planReturnInfoDto;
-    		}
-    		
-    		List<RepaymentBizPlanDto> repaymentBizPlanDtos = new ArrayList<>();
-    		List<XdPlanDto> xdPlanDtos = new ArrayList<>();
-    		
+		try {
+			PlanReturnInfoDto planReturnInfoDto = null;
+
+			if (StringUtil.isEmpty(businessId)) {
+				return planReturnInfoDto;
+			}
+
+			List<RepaymentBizPlanDto> repaymentBizPlanDtos = new ArrayList<>();
 			
+			/*
+			 * 1、根据 businessId 找到对应的业务还款计划信息
+			 */
+			List<RepaymentBizPlan> repaymentBizPlans = repaymentBizPlanService
+					.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id", businessId));
+			
+			if (CollectionUtils.isNotEmpty(repaymentBizPlans)) {
+				
+				// 遍历所有业务还款计划
+				for (RepaymentBizPlan repaymentBizPlan : repaymentBizPlans) {
+					
+					// 得到 plan_id 
+					String planId = repaymentBizPlan.getPlanId();
+					
+					RepaymentBizPlanDto repaymentBizPlanDto = new RepaymentBizPlanDto();
+					
+					repaymentBizPlanDto.setRepaymentBizPlan(repaymentBizPlan);
+					
+					// 根据 plan_id 找到对应的 业务还款计划 信息
+					queryRapaymentBizPlanInfo(planId, repaymentBizPlanDto);
+					
+					// 根据 plan_id 找到对应的 标的还款计划
+					queryProjPlanInfo(planId, repaymentBizPlanDto);
+					
+					
+					
+					repaymentBizPlanDtos.add(repaymentBizPlanDto);
+				}
+			}
 			
 		} catch (Exception e) {
-			// TODO: handle exception
+			logger.error("根据业务ID查找还款计划失败！", e);
+			throw new ServiceRuntimeException(e.getMessage(), e);
 		}
 		return null;
+	}
+
+	/**
+	 * 根据 plan_id 找到对应的 业务还款计划 信息
+	 * @param planId
+	 * @param repaymentBizPlanDto
+	 */
+	private void queryRapaymentBizPlanInfo(String planId, RepaymentBizPlanDto repaymentBizPlanDto) {
+		
+		List<RepaymentBizPlanListDto> repaymentBizPlanListDtos = new ArrayList<>();
+		/*
+		 * 1.1、根据 plan_id 找到对应的 业务还款计划列表
+		 */
+		List<RepaymentBizPlanList> repaymentBizPlanLists = repaymentBizPlanListService
+				.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", planId));
+		
+		if (CollectionUtils.isNotEmpty(repaymentBizPlanLists)) {
+			for (RepaymentBizPlanList repaymentBizPlanList : repaymentBizPlanLists) {
+				
+				// 得到 plan_list_id
+				String planListId = repaymentBizPlanList.getPlanListId();
+				
+				RepaymentBizPlanListDto repaymentBizPlanListDto = new RepaymentBizPlanListDto();
+				repaymentBizPlanListDto.setRepaymentBizPlanList(repaymentBizPlanList);
+				
+				/*
+				 * 1.2、根据 plan_list_id 找到对应的 还款计划应还项目明细
+				 */
+				List<RepaymentBizPlanListDetail> repaymentBizPlanListDetails = repaymentBizPlanListDetailSevice
+						.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", planListId));
+				repaymentBizPlanListDto.setBizPlanListDetails(repaymentBizPlanListDetails);
+				repaymentBizPlanListDtos.add(repaymentBizPlanListDto);
+			}
+		}
+		
+		repaymentBizPlanDto.setBizPlanListDtos(repaymentBizPlanListDtos);
+	}
+
+	/**
+	 * 根据 plan_id 找到对应的 标的还款计划
+	 * @param planId
+	 * @param repaymentBizPlanDto
+	 */
+	private void queryProjPlanInfo(String planId, RepaymentBizPlanDto repaymentBizPlanDto) {
+		List<RepaymentProjPlanDto> repaymentProjPlanDtos = new ArrayList<>();
+		
+		/*
+		 * 2.1、根据 plan_id 找到对应的 标的还款计划信息
+		 */
+		List<RepaymentProjPlan> repaymentProjPlans = repaymentProjPlanService
+				.selectList(new EntityWrapper<RepaymentProjPlan>().eq("plan_id", planId));
+		if (CollectionUtils.isNotEmpty(repaymentProjPlans)) {
+			for (RepaymentProjPlan repaymentProjPlan : repaymentProjPlans) {
+				
+				RepaymentProjPlanDto repaymentProjPlanDto = new RepaymentProjPlanDto();
+				repaymentProjPlanDto.setRepaymentProjPlan(repaymentProjPlan);
+				
+				// 得到 proj_plan_id
+				String projPlanId = repaymentProjPlan.getProjPlanId();
+				
+				List<RepaymentProjPlanListDto> repaymentProjPlanListDtos = new ArrayList<>();
+				
+				/*
+				 * 2.2、根据 proj_plan_id 找到对应的 标的还款计划列表
+				 */
+				List<RepaymentProjPlanList> repaymentProjPlanLists = repaymentProjPlanListService
+						.selectList(new EntityWrapper<RepaymentProjPlanList>().eq("proj_plan_id", projPlanId));
+				if (CollectionUtils.isNotEmpty(repaymentProjPlanLists)) {
+					for (RepaymentProjPlanList repaymentProjPlanList : repaymentProjPlanLists) {
+						
+						RepaymentProjPlanListDto repaymentProjPlanListDto = new RepaymentProjPlanListDto();
+						repaymentProjPlanListDto.setRepaymentProjPlanList(repaymentProjPlanList);
+						
+						// 得到 proj_plan_list_id
+						String projPlanListId = repaymentProjPlanList.getProjPlanListId();
+						
+						/*
+						 * 2.3 根据 proj_plan_list_id 找到对应的 标的还款计划应还项目明细
+						 */
+						List<RepaymentProjPlanListDetail> repaymentProjPlanListDetails = repaymentProjPlanListDetailService
+								.selectList(new EntityWrapper<RepaymentProjPlanListDetail>()
+										.eq("proj_plan_list_id", projPlanListId));
+						repaymentProjPlanListDto.setProjPlanListDetails(repaymentProjPlanListDetails);
+						repaymentProjPlanListDtos.add(repaymentProjPlanListDto);
+					}
+				}
+				repaymentProjPlanDto.setProjPlanListDtos(repaymentProjPlanListDtos);
+				repaymentProjPlanDtos.add(repaymentProjPlanDto);
+			}
+			repaymentBizPlanDto.setProjPlanDtos(repaymentProjPlanDtos);
+		}
 	}
 
 
