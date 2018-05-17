@@ -24,5 +24,12 @@ public interface CreatRepayPlanService {
      * @param businessId
      * @return
      */
-    PlanReturnInfoDto queryRepayPlan(String businessId);
+    PlanReturnInfoDto queryRepayPlanByBusinessId(String businessId);
+    
+    /**
+     * 根据条件删除还款计划
+     * @param businessId
+     * @param repaymentBatchId
+     */
+    void deleteRepayPlanByConditions(String businessId, String repaymentBatchId);
 }

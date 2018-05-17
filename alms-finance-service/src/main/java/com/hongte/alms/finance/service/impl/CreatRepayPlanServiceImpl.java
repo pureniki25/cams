@@ -292,15 +292,27 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
 
         //整理成信贷的还款计划格式
-        List<XdPlanDto> xdPlanDtos = new LinkedList<>();
+        List<XdPlanDto> xdPlanDtos = xdPlanDtoHandle(retList, businessBasicInfo);
         planReturnInfoDto.setXdPlanDtos(xdPlanDtos);
-        for(RepaymentBizPlanDto bizPlanDto:retList) {
+
+        //////  整理成 返回数据的格式  将信息返回出去  结束  ///////////
+
+
+
+        return planReturnInfoDto;
+    }
+
+	private List<XdPlanDto> xdPlanDtoHandle(List<RepaymentBizPlanDto> retList, BusinessBasicInfoReq businessBasicInfo) {
+		List<XdPlanDto> xdPlanDtos = new LinkedList<>();
+		
+		for(RepaymentBizPlanDto bizPlanDto:retList) {
             RepaymentBizPlan repaymentBizPlan = bizPlanDto.getRepaymentBizPlan();
             List<RepaymentBizPlanListDto> repaymentBizPlanListDtos = bizPlanDto.getBizPlanListDtos();
             XdPlanDto xdPlanDto = new XdPlanDto();
             xdPlanDtos.add(xdPlanDto);
             List<CarBusinessAfterDto> bizAfterDtos = new LinkedList<>();
             xdPlanDto.setBatchUUid(repaymentBizPlan.getRepaymentBatchId());
+            xdPlanDto.setCarBusinessAfterDtoList(bizAfterDtos);
             for(RepaymentBizPlanListDto repaymentBizPlanListDto:repaymentBizPlanListDtos){
                 RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListDto.getRepaymentBizPlanList();
                 List<RepaymentBizPlanListDetail> repaymentBizPlanListDetails = repaymentBizPlanListDto.getBizPlanListDetails();
@@ -379,14 +391,8 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
 
         }
-
-
-        //////  整理成 返回数据的格式  将信息返回出去  结束  ///////////
-
-
-
-        return planReturnInfoDto;
-    }
+		return xdPlanDtos;
+	}
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -1527,7 +1533,8 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
     }
 
 	@Override
-	public PlanReturnInfoDto queryRepayPlan(String businessId) {
+	public PlanReturnInfoDto queryRepayPlanByBusinessId(String businessId) {
+		
 		try {
 			PlanReturnInfoDto planReturnInfoDto = null;
 
@@ -1545,6 +1552,24 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 			
 			if (CollectionUtils.isNotEmpty(repaymentBizPlans)) {
 				
+				String origBusinessId = repaymentBizPlans.get(0).getOriginalBusinessId();
+				
+				if (StringUtil.isEmpty(origBusinessId)) {
+					return planReturnInfoDto;
+				}
+				
+				BasicBusiness basicBusiness = basicBusinessService.selectById(origBusinessId);
+				
+				if (basicBusiness == null) {
+					return planReturnInfoDto;
+				}
+				
+				BusinessBasicInfoReq req = new BusinessBasicInfoReq();
+				req.setBusinessType(basicBusiness.getBusinessType());
+				req.setOperatorName(basicBusiness.getOperatorName());
+				req.setCompanyId(basicBusiness.getCompanyId());
+				req.setRepaymentTypeId(basicBusiness.getRepaymentTypeId());
+				
 				// 遍历所有业务还款计划
 				for (RepaymentBizPlan repaymentBizPlan : repaymentBizPlans) {
 					
@@ -1561,17 +1586,24 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 					// 根据 plan_id 找到对应的 标的还款计划
 					queryProjPlanInfo(planId, repaymentBizPlanDto);
 					
-					
-					
 					repaymentBizPlanDtos.add(repaymentBizPlanDto);
+					
 				}
+				// 拼装 XdPlanDto
+				List<XdPlanDto> xdPlanDtos = xdPlanDtoHandle(repaymentBizPlanDtos, req);
+				planReturnInfoDto = new PlanReturnInfoDto();
+				planReturnInfoDto.setRepaymentBizPlanDtos(repaymentBizPlanDtos);
+				planReturnInfoDto.setXdPlanDtos(xdPlanDtos);
 			}
+			
+			
+			return planReturnInfoDto;
 			
 		} catch (Exception e) {
 			logger.error("根据业务ID查找还款计划失败！", e);
 			throw new ServiceRuntimeException(e.getMessage(), e);
 		}
-		return null;
+		
 	}
 
 	/**
