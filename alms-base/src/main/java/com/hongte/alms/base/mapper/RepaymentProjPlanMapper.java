@@ -1,5 +1,8 @@
 package com.hongte.alms.base.mapper;
 
+import java.util.List;
+import java.util.Map;
+
 import com.hongte.alms.base.entity.RepaymentProjPlan;
 import com.hongte.alms.common.mapper.SuperMapper;
 
@@ -13,4 +16,13 @@ import com.hongte.alms.common.mapper.SuperMapper;
  */
 public interface RepaymentProjPlanMapper extends SuperMapper<RepaymentProjPlan> {
 
+	/**
+	 * 查询tb_repayment_proj_plan left join tb_tuandai_project_info 的信息
+	 * <br><br>返回 isMaster(boolean,是否主借标),masterIssueId(string),projectId(string),realName(string),amount(BigDecimal)
+	 * @author 王继光
+	 * 2018年5月17日 上午9:35:19
+	 * @param businessId
+	 * @return
+	 */
+	public List<Map<String,Object>> selectProjPlanProjectInfo(String businessId);
 }

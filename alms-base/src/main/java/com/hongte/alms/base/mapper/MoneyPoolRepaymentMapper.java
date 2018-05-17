@@ -1,5 +1,10 @@
 package com.hongte.alms.base.mapper;
 
+import java.math.BigDecimal;
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
 import com.hongte.alms.common.mapper.SuperMapper;
 
@@ -13,4 +18,12 @@ import com.hongte.alms.common.mapper.SuperMapper;
  */
 public interface MoneyPoolRepaymentMapper extends SuperMapper<MoneyPoolRepayment> {
 
+	/**
+	 * 根据ids统计对应还款登记的金额合计
+	 * @author 王继光
+	 * 2018年5月17日 上午11:22:39
+	 * @param ids
+	 * @return
+	 */
+	public BigDecimal sumMoneyPoolRepaymentAmountByMprIds(@Param("ids")List<String> ids);
 }

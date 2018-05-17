@@ -148,6 +148,18 @@ public class RepayPlanController {
 //
 //        return Result.success(list);
     }
-
-
+    
+	@ApiOperation(value = "根据businessId查询还款计划")
+	@GetMapping("/queryRepayPlanByBusinessId")
+	@ResponseBody
+	public Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(@RequestParam(value = "businessId") String businessId) {
+		logger.info("查询还款计划，业务编号：[{}]", businessId);
+		try {
+			PlanReturnInfoDto planReturnInfoDto = creatRepayPlanService.queryRepayPlanByBusinessId(businessId);
+			return Result.success(planReturnInfoDto);
+		} catch (Exception e) {
+			logger.error("查询还款计划异常[{}]", e);
+			return Result.error("9889", e.getMessage());
+		}
+	}
 }
