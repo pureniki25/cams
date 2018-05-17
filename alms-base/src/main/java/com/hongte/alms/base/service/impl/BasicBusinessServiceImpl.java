@@ -479,8 +479,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 		if (!basicBusiness.getRepaymentTypeId().equals(RepayTypeEnum.EQUAL_AMOUNT_INTEREST.getValue())
 				&& !basicBusiness.getRepaymentTypeId().equals(RepayTypeEnum.FIRST_INTEREST.getValue())
 				&& !basicBusiness.getRepaymentTypeId().equals(RepayTypeEnum.DIVIDE_INTEREST_TEN.getValue())
-				&& !basicBusiness.getRepaymentTypeId()
-						.equals(RepayTypeEnum.DIVIDE_INTEREST_FIVE.getValue())) {
+				&& !basicBusiness.getRepaymentTypeId().equals(RepayTypeEnum.DIVIDE_INTEREST_FIVE.getValue())&&!basicBusiness.getRepaymentTypeId().equals(RepayTypeEnum.EXPIRY_INTEREST.getValue())) {
 			throw new ServiceRuntimeException("暂时不支持这种还款方式的减免申请");
 		}
 		calPrincipal(settleDate, expenseSettleVO, basicBusiness, plan, bizOutputRecord);
