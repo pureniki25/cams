@@ -1317,17 +1317,17 @@ var saveapplyInfo = function(pStatus){debugger
 	    					   vm.$Modal.error({content: '结清时滞纳金不能减免' });
 	    				      return;
 	    				}
-	    				if(vm.applyTypes[i].feeId=='e404a126-45ab-11e7-8ed5-000c2928bb0d'&&vm.baseInfoForm.outsideInterest==0){
-	    					 vm.$Modal.error({content: '逾期利息为0不能减免' });
+	    				if(vm.applyTypes[i].feeId=='e404a126-45ab-11e7-8ed5-000c2928bb0d'&&(vm.baseInfoForm.outsideInterest==0||vm.applyTypes[i].derateMoney>vm.baseInfoForm.outsideInterest)){
+	    					 vm.$Modal.error({content: '减免金额大于逾期利息,或逾期利息为0都不能减免' });
 	    					   return;
 	    				}
-	    				if(vm.applyTypes[i].feeId=='65bf9587-37b4-11e7-9482-000c2928bb0d'&&vm.baseInfoForm.preLateFees==0){
-	    					 vm.$Modal.error({content: '提前结清违约金为0不能减免' });
+	    				if(vm.applyTypes[i].feeId=='65bf9587-37b4-11e7-9482-000c2928bb0d'&&(vm.baseInfoForm.preLateFees==0||vm.applyTypes[i].derateMoney>vm.baseInfoForm.preLateFees)){
+	    					 vm.$Modal.error({content: '减免金额大于提前结清违约金,或提前结清违约金为0都不能减免' });
 	    					   return;
 	    				}
 	    			}else{
-	    				if(vm.applyTypes[i].feeId=='79069922-e13a-4229-8656-2a1e19b44879'&&vm.baseInfoForm.needPayPenalty==0){
-	    					   vm.$Modal.error({content: '滞纳金为0不能减免' });
+	    				if(vm.applyTypes[i].feeId=='79069922-e13a-4229-8656-2a1e19b44879'&&(vm.baseInfoForm.needPayPenalty==0||vm.applyTypes[i].derateMoney>vm.baseInfoForm.needPayPenalty)){
+	    					   vm.$Modal.error({content: '减免金额大于滞纳金,或者滞纳金为0都不能减免' });
 	    				      return;
 	    				}
 	    				if(vm.applyTypes[i].feeId=='e404a126-45ab-11e7-8ed5-000c2928bb0d'){
