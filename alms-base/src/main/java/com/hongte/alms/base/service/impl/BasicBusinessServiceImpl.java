@@ -250,21 +250,24 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 
 	@Override
 	public ExpenseSettleVO getPreLateFees(String crpId, String original_business_id, String repayType, String businessTypeId,
-			Date preSettleDate, Date ContractDate, Date firstRepayDate,String restPeriods) throws Exception {
+			Date preSettleDate, Date ContractDate, Date firstRepayDate,String restPeriods,Double needPayPrincipal) throws Exception {
 		Integer settleMonth = getSettleMonths(preSettleDate, firstRepayDate);// 结清阶段
 		Double preLateFees = Double.valueOf(0);
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Integer platformCount=getMonthPlatformAmountCount(crpId);//有无月收平台费
 		Double monthPlatformAmount = getMonthPlatformAmount(crpId);// 月收平台费
 		Double monthCompanyAmount = getMonthCompanyAmount(crpId);// 月收公司服务费
+		
 		BizOutputRecord bizOutputRecord = bizOutputRecordService
 				.selectOne(new EntityWrapper<BizOutputRecord>().eq("business_id", original_business_id));
 		Date outputDate = null;// 出款日期
 		ExpenseSettleVO vo = cal(original_business_id, preSettleDate);
+		vo.setPrincipal(BigDecimal.valueOf(needPayPrincipal));//剩余本金;
 		if (bizOutputRecord != null) {
 			outputDate = bizOutputRecord.getFactOutputDate();
 		}else {
-			throw new ServiceRuntimeException("找不到出款记录");
+			throw new ServiceRuntimeException("找不到合同记录");
+			//ContractDate=DateUtil.getDate("2018-04-03", "yyyy-MM-dd");
 		}
 		if(ContractDate==null) {
 			ContractDate=outputDate;
@@ -307,7 +310,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 
 						}
 
-					} else if (repayType.equals(String.valueOf(RepayTypeEnum.FIRST_INTEREST.getValue().toString()))) {// 先息后本
+					} else if (repayType.equals(String.valueOf(RepayTypeEnum.FIRST_INTEREST.getValue().toString()))||repayType.equals(String.valueOf(RepayTypeEnum.EXPIRY_INTEREST.getValue().toString()))) {// 先息后本
 						// 出款日期在2017年6月5日之前 ,并且分公司服务费是按月收取的，提前还款违约金为:0
 						if (outputDate.compareTo(date4) < 0 && monthCompanyAmount > 0) {
 							preLateFees = Double.valueOf(0);
@@ -347,7 +350,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 							}
 
 							// 先息后本
-						} else if (repayType.equals(RepayTypeEnum.FIRST_INTEREST.getValue().toString())) {
+						} else if (repayType.equals(RepayTypeEnum.FIRST_INTEREST.getValue().toString())||repayType.equals(String.valueOf(RepayTypeEnum.EXPIRY_INTEREST.getValue().toString()))) {
 							if (settleMonth <= 12) {
 								preLateFees = vo.getPrincipal().doubleValue() * 0.005 * Integer.valueOf(restPeriods);
 								if (preLateFees > vo.getPrincipal().doubleValue() * 0.06) {
@@ -396,7 +399,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 							}
 
 							// 先息后本
-						} else if (repayType.equals(RepayTypeEnum.FIRST_INTEREST.getValue().toString())) {
+						} else if (repayType.equals(RepayTypeEnum.FIRST_INTEREST.getValue().toString())||repayType.equals(String.valueOf(RepayTypeEnum.EXPIRY_INTEREST.getValue().toString()))) {
 							if (settleMonth <= 12) {
 								preLateFees = vo.getPrincipal().doubleValue() * 0.005 * Integer.valueOf(restPeriods);
 								if (preLateFees > vo.getPrincipal().doubleValue() * 0.06) {
@@ -458,8 +461,14 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 			businessIds = new ArrayList<>();
 		}
 		businessIds.add(businessId);
-		final List<RepaymentBizPlanList> planLists = repaymentBizPlanListMapper.selectList(
+		List<RepaymentBizPlanList> planLists=null;
+		if(businessId.contains("ZQ")) {
+			 planLists = repaymentBizPlanListMapper.selectList(
+					new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).orderBy("due_date"));
+		}else {
+		planLists = repaymentBizPlanListMapper.selectList(
 				new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", businessId).orderBy("due_date"));
+		}
 		final List<RepaymentBizPlanListDetail> details = repaymentBizPlanListDetailMapper.selectList(
 				new EntityWrapper<RepaymentBizPlanListDetail>().in("business_id", businessIds).orderBy("period"));
 		final ExpenseSettleRepaymentPlanVO plan = new ExpenseSettleRepaymentPlanVO(repaymentBizPlan, planLists,
@@ -473,11 +482,10 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 		if (!basicBusiness.getRepaymentTypeId().equals(RepayTypeEnum.EQUAL_AMOUNT_INTEREST.getValue())
 				&& !basicBusiness.getRepaymentTypeId().equals(RepayTypeEnum.FIRST_INTEREST.getValue())
 				&& !basicBusiness.getRepaymentTypeId().equals(RepayTypeEnum.DIVIDE_INTEREST_TEN.getValue())
-				&& !basicBusiness.getRepaymentTypeId()
-						.equals(RepayTypeEnum.DIVIDE_INTEREST_FIVE.getValue())) {
+				&& !basicBusiness.getRepaymentTypeId().equals(RepayTypeEnum.DIVIDE_INTEREST_FIVE.getValue())&&!basicBusiness.getRepaymentTypeId().equals(RepayTypeEnum.EXPIRY_INTEREST.getValue())) {
 			throw new ServiceRuntimeException("暂时不支持这种还款方式的减免申请");
 		}
-		calPrincipal(settleDate, expenseSettleVO, basicBusiness, plan, bizOutputRecord);
+		//calPrincipal(settleDate, expenseSettleVO, basicBusiness, plan, bizOutputRecord);
 		calPenalty(settleDate, expenseSettleVO, basicBusiness, plan);
 		expenseSettleService.calLackFee(settleDate, expenseSettleVO, basicBusiness, plan);
 		expenseSettleService.calDemurrage(settleDate, expenseSettleVO, basicBusiness, plan);
@@ -498,6 +506,9 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 			outPutMoney = outPutMoney.add(bizOutputRecord.getFactOutputMoney());
 		}
 		switch (basicBusiness.getRepaymentTypeId()) {
+		case 1:
+			expenseSettleVO.setPrincipal(outPutMoney);
+			break;
 		case 2:
 			expenseSettleVO.setPrincipal(outPutMoney);
 			break;
