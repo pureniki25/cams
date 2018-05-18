@@ -104,7 +104,7 @@ public class CollectionTrackLogTransferController {
 
 						List<RepaymentBizPlanList> planLists =  repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().
 								eq("business_id",carBusinessId).
-								and("after_id",carBusinessAfterId));
+								eq("after_id",carBusinessAfterId));
 
 						if(planLists == null ||planLists.size() == 0){
 							recordErrorInfo(carBusinessId,carBusinessAfterId,
@@ -124,7 +124,7 @@ public class CollectionTrackLogTransferController {
 						LoginInfoDto dto = new LoginInfoDto();
 						if(bmUserId!=null&&!bmUserId.equals("")){
 							dto = loginUserInfoHelper.getUserInfoByUserId("", bmUserId);
-							if(dto==null){
+							if(dto==null|| dto.getUserId() == null){
 //						collectionTrackLog.setRecorderUser(Constant.ADMIN_ID);
 								recordErrorInfo(carBusinessId,carBusinessAfterId,
 										NoUser,"1","没有用户信息");
