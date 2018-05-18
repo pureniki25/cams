@@ -133,8 +133,14 @@ public class CollectionTrackLogTransferController {
 						}else{
 							collectionTrackLog.setRecorderUser(Constant.ADMIN_ID);
 						}
-
-						collectionTrackLog.setRecordDate(parametertracelog.getTranceDate());
+						Date recordDate = parametertracelog.getTranceDate();
+						if(recordDate == null){
+							recordDate = parametertracelog.getCreateTime();
+						}
+						if(recordDate == null){
+							recordDate = new Date();
+						}
+						collectionTrackLog.setRecordDate(recordDate);
 						Integer defaultStatus =8;
 						if(parametertracelog.getStatus()!=null){
 							defaultStatus = parametertracelog.getStatus();
@@ -150,7 +156,7 @@ public class CollectionTrackLogTransferController {
 						}
 						collectionTrackLog.setTrackStatusName(statusName);
 						collectionTrackLog.setIsSend(0);//是否传输平台，0：否，1：是
-						collectionTrackLog.setContent(parametertracelog.getTranceContent());//记录内容
+						collectionTrackLog.setContent(parametertracelog.getTranceContent()==null?"":parametertracelog.getTranceContent());//记录内容
 						collectionTrackLog.setCreateTime(new Date());
 						collectionTrackLog.setCreateUser(Constant.SYS_DEFAULT_USER);
 						collectionTrackLog.setUpdateTime(new Date());
