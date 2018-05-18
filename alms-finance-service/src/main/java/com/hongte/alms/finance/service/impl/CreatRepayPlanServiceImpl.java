@@ -1838,6 +1838,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 						repaymentBizPlanService.deleteBatchIds(planIds);
 						repaymentBizPlanListService.deleteBatchIds(planListIds);
 						repaymentBizPlanListDetailSevice.deleteBatchIds(planDetailIds);
+						repaymentProjPlanService.deleteBatchIds(projPlanIds);
 						repaymentProjPlanListService.deleteBatchIds(projPlanListIds);
 						repaymentBizPlanListDetailSevice.deleteBatchIds(projPlanDetailIds);
 					}
