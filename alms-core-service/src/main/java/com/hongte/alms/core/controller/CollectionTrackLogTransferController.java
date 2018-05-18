@@ -182,6 +182,7 @@ public class CollectionTrackLogTransferController {
 		}
 
 		LOGGER.error("完成一次历史贷后跟踪记录同步");
+		runningFlage = false;
 		return Result.success();
 
 	}
