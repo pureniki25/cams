@@ -60,11 +60,11 @@ public class TrailProjInfoReq {
     @ApiModelProperty(required= true,value = "标的的出款费用信息列表")
     private List<TrailProjFeeReq> projFeeInfos;
 
-    /**
-     * 业务类型(9:车贷 11:房贷 35:信用贷 32:共借项目 36 农饲贷 41 二手车商贷  39 车全 47 闪贷 48 扶贫贷)
-     */
-    @ApiModelProperty(required= true,value = "业务类型(9:车贷 11:房贷 35:信用贷 32:共借项目 36 农饲贷 41 二手车商贷  39 车全 47 闪贷 48 扶贫贷)")
-    private Integer projectType;
+//    /**
+//     * 业务类型(9:车贷 11:房贷 35:信用贷 32:共借项目 36 农饲贷 41 二手车商贷  39 车全 47 闪贷 48 扶贫贷)
+//     */
+//    @ApiModelProperty(required= true,value = "业务类型(9:车贷 11:房贷 35:信用贷 32:共借项目 36 农饲贷 41 二手车商贷  39 车全 47 闪贷 48 扶贫贷)")
+//    private Integer projectType;
 
 
 
@@ -140,11 +140,11 @@ public class TrailProjInfoReq {
         this.periodMonth = periodMonth;
     }
 
-    public Integer getProjectType() {
-        return projectType;
-    }
-
-    public void setProjectType(Integer projectType) {
-        this.projectType = projectType;
-    }
+//    public Integer getProjectType() {
+//        return projectType;
+//    }
+//
+//    public void setProjectType(Integer projectType) {
+//        this.projectType = projectType;
+//    }
 }
