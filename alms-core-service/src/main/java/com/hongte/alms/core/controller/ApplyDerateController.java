@@ -404,7 +404,7 @@ public class ApplyDerateController {
 	@ResponseBody
 	public Result<Map<String, Object>> getHousePreLateFees(@RequestParam("crpId") String crpId,
 			@RequestParam(value = "afterId") String afterId, @RequestParam(value = "businessId") String businessId,
-			@RequestParam(value = "repaymentTypeId") String repaymentTypeId,@RequestParam(value = "restPeriods") String restPeriods) {
+			@RequestParam(value = "repaymentTypeId") String repaymentTypeId,@RequestParam(value = "restPeriods") String restPeriods,@RequestParam(value = "needPayPrincipal") String needPayPrincipal) {
 
 		Map<String, Object> retMap = new HashMap<>();
 		ExpenseSettleVO vo=null;
@@ -426,7 +426,7 @@ public class ApplyDerateController {
 			if(pList!=null) {
 				List<RepaymentBizPlanList> list=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", pList.getPlanId()).orderBy("period")); 
 				if(list.size()>0) {
-				  vo=basicBusinessService.getPreLateFees(crpId, businessId, repaymentTypeId, BusinessTypeEnum.FSD_TYPE.getValue().toString(), new Date(), contractDate, list.get(0).getDueDate(),restPeriods);
+				  vo=basicBusinessService.getPreLateFees(crpId, businessId, repaymentTypeId, BusinessTypeEnum.FSD_TYPE.getValue().toString(), new Date(), contractDate, list.get(0).getDueDate(),restPeriods,Double.valueOf(needPayPrincipal));
 				}
 			}
 
