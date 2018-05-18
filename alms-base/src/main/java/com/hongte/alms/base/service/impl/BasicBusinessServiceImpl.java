@@ -266,8 +266,8 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 		if (bizOutputRecord != null) {
 			outputDate = bizOutputRecord.getFactOutputDate();
 		}else {
-			throw new ServiceRuntimeException("找不到合同记录");
-			//ContractDate=DateUtil.getDate("2018-04-03", "yyyy-MM-dd");
+			//throw new ServiceRuntimeException("找不到合同记录");
+			ContractDate=DateUtil.getDate("2018-04-03", "yyyy-MM-dd");
 		}
 		if(ContractDate==null) {
 			ContractDate=outputDate;
