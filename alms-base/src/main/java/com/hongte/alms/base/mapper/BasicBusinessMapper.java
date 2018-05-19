@@ -95,6 +95,13 @@ public interface BasicBusinessMapper extends SuperMapper<BasicBusiness> {
 	 */
 	 Integer   getBorrowLlimitZQ(@Param("crpId") String crpId);
 	 
+
+	/**
+	 * 获取线上线下逾期费用
+	 */
+	Map<String, Object> getOverDueMoney(@Param("crpId") String crpId, @Param("onLineFeeId") String onLineFeeId,@Param("underLineFeeId") String underLineFeeId);
+
+	 
 	
 	 
 }

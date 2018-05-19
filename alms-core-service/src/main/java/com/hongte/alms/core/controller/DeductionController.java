@@ -21,6 +21,7 @@ import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.entity.WithholdingPlatform;
 import com.hongte.alms.base.enums.AreaLevel;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.process.entity.Process;
 import com.hongte.alms.base.process.entity.ProcessLog;
 import com.hongte.alms.base.process.entity.ProcessTypeStep;
@@ -64,6 +65,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -87,6 +90,10 @@ public class DeductionController {
     DeductionService deductionService;
     
     @Autowired
+    @Qualifier("BasicBusinessService")
+    BasicBusinessService basicBusinessService;
+    
+    @Autowired
     @Qualifier("WithholdingPlatformService")
     WithholdingPlatformService withholdingplatformService;
 
@@ -100,13 +107,14 @@ public class DeductionController {
             @RequestParam("planListId") String planListId
     ){
 
-
-
-
         try{
             //执行代扣信息
             DeductionVo deductionVo=  deductionService.selectDeductionInfoByPlanListId(planListId);
-        	   
+            Map<String, Object> map=basicBusinessService.getOverDueMoney(planListId, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid());
+        	BigDecimal onLineOverDueMoney=BigDecimal.valueOf(Double.valueOf(map.get("onLineOverDueMoney").toString()));
+        	BigDecimal underLineOverDueMoney=BigDecimal.valueOf(Double.valueOf(map.get("underLineOverDueMoney").toString()));
+        	deductionVo.setOnLineOverDueMoney(onLineOverDueMoney);
+        	deductionVo.setUnderLineOverDueMoney(underLineOverDueMoney);
             return Result.success(deductionVo);
 
         }catch (Exception ex){

@@ -783,4 +783,9 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 			int i=16%15;
 			System.out.println(i);
 		}
+
+		@Override
+		public Map<String, Object> getOverDueMoney(String pListId, String onLineFeeId, String underLineFeeId) {
+			return basicBusinessMapper.getOverDueMoney(pListId, onLineFeeId, underLineFeeId);
+		}
 }
