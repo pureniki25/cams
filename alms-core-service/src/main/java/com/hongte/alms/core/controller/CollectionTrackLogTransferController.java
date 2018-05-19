@@ -104,7 +104,7 @@ public class CollectionTrackLogTransferController {
 
 						List<RepaymentBizPlanList> planLists =  repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().
 								eq("business_id",carBusinessId).
-								and("after_id",carBusinessAfterId));
+								eq("after_id",carBusinessAfterId));
 
 						if(planLists == null ||planLists.size() == 0){
 							recordErrorInfo(carBusinessId,carBusinessAfterId,
@@ -124,7 +124,7 @@ public class CollectionTrackLogTransferController {
 						LoginInfoDto dto = new LoginInfoDto();
 						if(bmUserId!=null&&!bmUserId.equals("")){
 							dto = loginUserInfoHelper.getUserInfoByUserId("", bmUserId);
-							if(dto==null){
+							if(dto==null|| dto.getUserId() == null){
 //						collectionTrackLog.setRecorderUser(Constant.ADMIN_ID);
 								recordErrorInfo(carBusinessId,carBusinessAfterId,
 										NoUser,"1","没有用户信息");
@@ -133,8 +133,14 @@ public class CollectionTrackLogTransferController {
 						}else{
 							collectionTrackLog.setRecorderUser(Constant.ADMIN_ID);
 						}
-
-						collectionTrackLog.setRecordDate(parametertracelog.getTranceDate());
+						Date recordDate = parametertracelog.getTranceDate();
+						if(recordDate == null){
+							recordDate = parametertracelog.getCreateTime();
+						}
+						if(recordDate == null){
+							recordDate = new Date();
+						}
+						collectionTrackLog.setRecordDate(recordDate);
 						Integer defaultStatus =8;
 						if(parametertracelog.getStatus()!=null){
 							defaultStatus = parametertracelog.getStatus();
@@ -150,7 +156,7 @@ public class CollectionTrackLogTransferController {
 						}
 						collectionTrackLog.setTrackStatusName(statusName);
 						collectionTrackLog.setIsSend(0);//是否传输平台，0：否，1：是
-						collectionTrackLog.setContent(parametertracelog.getTranceContent());//记录内容
+						collectionTrackLog.setContent(parametertracelog.getTranceContent()==null?"":parametertracelog.getTranceContent());//记录内容
 						collectionTrackLog.setCreateTime(new Date());
 						collectionTrackLog.setCreateUser(Constant.SYS_DEFAULT_USER);
 						collectionTrackLog.setUpdateTime(new Date());
@@ -182,6 +188,7 @@ public class CollectionTrackLogTransferController {
 		}
 
 		LOGGER.error("完成一次历史贷后跟踪记录同步");
+		runningFlage = false;
 		return Result.success();
 
 	}
