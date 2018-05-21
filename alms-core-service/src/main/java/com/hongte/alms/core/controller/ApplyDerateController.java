@@ -51,6 +51,7 @@ import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.ClassCopyUtil;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.DESC;
+import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.EasyPoiExcelExportUtil;
 import com.hongte.alms.common.util.EncryptionResult;
 import com.hongte.alms.common.util.JsonUtil;
@@ -300,17 +301,23 @@ public class ApplyDerateController {
 //				List<RepaymentBizPlanListDetail> derateTypeList = repaymentBizPlanListDetailService.selectList(
 //						new EntityWrapper<RepaymentBizPlanListDetail>().eq("business_id", pList.getBusinessId())
 //								.eq("plan_list_id", crpId).and().ne("plan_item_name", "本金").groupBy("fee_id"));
-				List<String> feeIds=new ArrayList();
 				//减免费用项只能减免:1.逾期利息 2.提前还款违约金 3.滞纳金
-				feeIds.add(RepayPlanItemTypeFeeIdEnum.OVER_DUE_INTEREST.getValue());//逾期利息
-				feeIds.add(RepayPlanItemTypeFeeIdEnum.PRE_LATEFEES.getValue());//提前还款违约金
-				feeIds.add(RepayPlanItemTypeFeeIdEnum.OVER_DUE_AMONT.getValue());//滞纳金
-				List<RepaymentBizPlanListDetail> derateTypeList=repaymentBizPlanListDetailService.selectList(
-						new EntityWrapper<RepaymentBizPlanListDetail>().eq("business_id", pList.getBusinessId())
-								.eq("plan_list_id", crpId).and().in("fee_id", feeIds));
-				// List<SysParameter> derateTypeList = sysParameterService.selectList(new
-				// EntityWrapper<SysParameter>().eq("param_type",
-				// SysParameterTypeEnums.DERATE_TYPE.getKey()).orderBy("row_Index"));
+				RepaymentBizPlanListDetail detail1=new RepaymentBizPlanListDetail();
+				RepaymentBizPlanListDetail detail2=new RepaymentBizPlanListDetail();
+				RepaymentBizPlanListDetail detail3=new RepaymentBizPlanListDetail();
+				detail1.setFeeId(RepayPlanItemTypeFeeIdEnum.OVER_DUE_INTEREST.getValue());//逾期利息
+				detail1.setPlanItemName(RepayPlanItemTypeFeeIdEnum.OVER_DUE_INTEREST.getDesc());
+				detail1.setPlanItemType(RepayPlanItemTypeFeeIdEnum.OVER_DUE_INTEREST.getTypeValue());
+				detail2.setFeeId(RepayPlanItemTypeFeeIdEnum.PRE_LATEFEES.getValue());//提前还款违约金
+				detail2.setPlanItemName(RepayPlanItemTypeFeeIdEnum.PRE_LATEFEES.getDesc());
+				detail2.setPlanItemType(RepayPlanItemTypeFeeIdEnum.PRE_LATEFEES.getTypeValue());
+				detail3.setFeeId(RepayPlanItemTypeFeeIdEnum.OVER_DUE_AMONT.getValue());//滞纳金
+				detail3.setPlanItemName(RepayPlanItemTypeFeeIdEnum.OVER_DUE_AMONT.getDesc());
+				detail3.setPlanItemType(RepayPlanItemTypeFeeIdEnum.OVER_DUE_AMONT.getTypeValue());
+				List<RepaymentBizPlanListDetail> derateTypeList=new ArrayList<RepaymentBizPlanListDetail>();
+				derateTypeList.add(detail1);
+				derateTypeList.add(detail2);
+				derateTypeList.add(detail3);
 				retMap.put("derateTypeList", (JSONArray) JSON.toJSON(derateTypeList, JsonUtil.getMapping()));
 
 			}
@@ -397,7 +404,7 @@ public class ApplyDerateController {
 	@ResponseBody
 	public Result<Map<String, Object>> getHousePreLateFees(@RequestParam("crpId") String crpId,
 			@RequestParam(value = "afterId") String afterId, @RequestParam(value = "businessId") String businessId,
-			@RequestParam(value = "repaymentTypeId") String repaymentTypeId,@RequestParam(value = "restPeriods") String restPeriods) {
+			@RequestParam(value = "repaymentTypeId") String repaymentTypeId,@RequestParam(value = "restPeriods") String restPeriods,@RequestParam(value = "needPayPrincipal") String needPayPrincipal) {
 
 		Map<String, Object> retMap = new HashMap<>();
 		ExpenseSettleVO vo=null;
@@ -407,7 +414,11 @@ public class ApplyDerateController {
 				isDefer = 1;
 			}
 			
-			getContractDate(businessId);
+			String date=getContractDate(businessId);
+			Date contractDate=null;
+			if(StringUtil.notEmpty(date)) {
+				contractDate=DateUtil.getDate(date, "yyyy-MM-dd");
+			}
 			// 基本信息
 			List<BusinessInfoForApplyDerateVo> businessVoList = basicBusinessService
 					.selectBusinessInfoForApplyDerateVo(crpId, isDefer, businessId);
@@ -415,7 +426,7 @@ public class ApplyDerateController {
 			if(pList!=null) {
 				List<RepaymentBizPlanList> list=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", pList.getPlanId()).orderBy("period")); 
 				if(list.size()>0) {
-				  vo=basicBusinessService.getPreLateFees(crpId, businessId, repaymentTypeId, BusinessTypeEnum.FSD_TYPE.getValue().toString(), new Date(), new Date(), list.get(0).getDueDate(),restPeriods);
+				  vo=basicBusinessService.getPreLateFees(crpId, businessId, repaymentTypeId, BusinessTypeEnum.FSD_TYPE.getValue().toString(), new Date(), contractDate, list.get(0).getDueDate(),restPeriods,Double.valueOf(needPayPrincipal));
 				}
 			}
 
@@ -456,11 +467,13 @@ public class ApplyDerateController {
 			if (afterId != null && afterId.startsWith("ZQ")) {
 				isDefer = 1;
 			}
-			// 基本信息
+			// 基本信息 
 			List<BusinessInfoForApplyDerateVo> businessVoList = basicBusinessService
 					.selectBusinessInfoForApplyDerateVo(crpId, isDefer, businessId);
-
+            
 			CarLoanBilVO carLoanBilVO = new CarLoanBilVO();
+			carLoanBilVO.setCurrentPriod(businessVoList.get(0).getPeriods());
+			carLoanBilVO.setNeedPayInterest(businessVoList.get(0).getNeedPayInterest().doubleValue());
 			carLoanBilVO.setBillDate(new Date());
 			carLoanBilVO.setBusinessId(businessId);
 			if (null != preLateFeesType && !"".equals(preLateFeesType)) {
@@ -499,7 +512,7 @@ public class ApplyDerateController {
 	@ResponseBody
 	public Result<Map<String, Object>> getOutsideInterest(@RequestParam("crpId") String crpId,
 			@RequestParam("afterId") String afterId, @RequestParam(value = "businessId") String businessId,
-			@RequestParam(value = "outsideInterestType") String outsideInterestType) {
+			@RequestParam(value = "outsideInterestType") String outsideInterestType,@RequestParam(value = "overDays") String overDays) {
 		Map<String, Object> retMap = new HashMap<>();
 		try {
 			Integer isDefer = 0;
@@ -511,13 +524,7 @@ public class ApplyDerateController {
 			List<BusinessInfoForApplyDerateVo> businessVoList = basicBusinessService
 					.selectBusinessInfoForApplyDerateVo(crpId, isDefer, businessId);
 
-			// String businessId="";
-			// if (!CollectionUtils.isEmpty(businessVoList)) {
-			//
-			// businessId=businessVoList.get(0).getBusinessId();
-			//
-			// }
-
+	
 			CarLoanBilVO carLoanBilVO = new CarLoanBilVO();
 			carLoanBilVO.setBillDate(new Date());
 			carLoanBilVO.setBusinessId(businessId);
@@ -526,7 +533,7 @@ public class ApplyDerateController {
 					Double.valueOf(StringUtil.isEmpty(outsideInterestType) ? "0" : outsideInterestType));
 
 			// 车贷：应付逾期利息
-			Map<String, Object> resultMap = transferOfLitigationService.carLoanBilling(carLoanBilVO);
+			Map<String, Object> resultMap = basicBusinessService.carLoanBilling(carLoanBilVO,Integer.valueOf(overDays));
 
 			retMap.put("outsideInterest", JSON.toJSON(resultMap.get("outsideInterest"), JsonUtil.getMapping()));//
 

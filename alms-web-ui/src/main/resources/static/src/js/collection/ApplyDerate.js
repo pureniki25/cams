@@ -113,7 +113,7 @@ window.layinit(function (htConfig) {
             baseInfoForm:{
             	afterId:"", 
                 preLateFeesType:"", //提前还款违约金方式:
-          
+                zqBusinessId:"",//如果当前期是展期业务,则存展期业务编号，否则存原业务编号
                 outsideInterestType:"",//合同期外逾期利息类型
                 outsideInterest:"",//合同期外逾期利息
                 businessId:""		   	, //业务编号
@@ -623,6 +623,12 @@ var showData=function(){debugger
                 	  getBalanceDue();//获取往期少交费用
                 	  //getPreviousLateFees();//获取整个业务的滞纳金
                 		vm.baseInfoForm.totalBorrowAmount="";
+                		
+                		if(res.data.data.outputPlatformId == 0){
+                		  	vm.isCarFlag=false;
+                		  	getOutsideInterest();
+                		}
+                		
                     if (res.data.data.outputPlatformId == 0 && res.data.data.repaymentTypeId == '等额本息') {
                       vm.preLateFeesFlag =true
                     }else{
@@ -641,7 +647,7 @@ var showData=function(){debugger
     	
     	var restPeriods=vm.baseInfoForm.borrowLimit-vm.baseInfoForm.periods;
     	//获取提前结清违约金和往期少交费用
-        axios.get(basePath + "ApplyDerateController/getHousePreLateFees?crpId="+crpId+"&repaymentTypeId="+vm.baseInfoForm.repaymentTypeId+"&afterId="+afterId+"&businessId=" + businessId+"&restPeriods="+restPeriods
+        axios.get(basePath + "ApplyDerateController/getHousePreLateFees?crpId="+crpId+"&repaymentTypeId="+vm.baseInfoForm.repaymentTypeId+"&afterId="+afterId+"&businessId=" + vm.baseInfoForm.zqBusinessId+"&restPeriods="+restPeriods+"&needPayPrincipal="+vm.baseInfoForm.needPayPrincipal
         ).then(function(res){
             if(res.data.code=='1'){
                 vm.baseInfoForm.preLateFees = res.data.data.preLateFees
@@ -821,7 +827,7 @@ var getBalanceDue = function () {debugger
 ///////////车贷:获取合同期外逾期利息
 var getOutsideInterest = function () {debugger
 
-    var reqStr = basePath +"ApplyDerateController/getOutsideInterest?crpId="+crpId+"&outsideInterestType="+vm.baseInfoForm.outsideInterestType+"&afterId="+afterId+"&businessId=" + businessId
+    var reqStr = basePath +"ApplyDerateController/getOutsideInterest?crpId="+crpId+"&outsideInterestType="+vm.baseInfoForm.outsideInterestType+"&afterId="+afterId+"&businessId=" + businessId+"&overDays="+vm.baseInfoForm.overDays
   
     axios.get(reqStr)
         .then(function (res) {
@@ -871,7 +877,6 @@ var getShowInfo = function () {
 		      	  //结清时应付月收服务费
 		      	  vm.baseInfoForm.needPayService=vm.baseInfoForm.settleNeedPayService
             
-            
                //获取提前还款违约金
                 showData();
             
@@ -889,8 +894,12 @@ var getShowInfo = function () {
 
                     vm.applyInfoForm.isSettleFlage = vm.applyInfoForm.isSettle=="1"?"是":"否";
                     
+                    
                     if(vm.applyInfoForm.isSettle!="1"){
               		  vm.otherFeeShowFlage=false;
+    		      	  vm.baseInfoForm.needPayPrincipal=vm.baseInfoForm.noSettleNeedPayPrincipal
+    		      	  vm.baseInfoForm.needPayInterest=vm.baseInfoForm.noSettleNeedPayInterest
+    		      	  vm.baseInfoForm.needPayService=vm.baseInfoForm.noSettleNeedPayService
                     }
                     //赋值审批信息初始信息
                     vm.initalApplyInfo.isSettleFlage = vm.initalApplyInfo.isSettle=="1"?"是":"否";
@@ -1297,10 +1306,38 @@ var saveapplyInfo = function(pStatus){debugger
 	    			vm.reqRegFiles[i]=vm.returnRegFiles[i];
 
 	    		}
-                for(var i=0;i<vm.applyTypes.length;i++){
+                for(var i=0;i<vm.applyTypes.length;i++){debugger
 	    			if(vm.applyTypes[i].derateMoney==''){
-	    				   vm.$Modal.error({content: '减免费用金额不能为空' });
+	    				   vm.$Modal.error({content: '减免金额不能为0' });
 	    				   return;
+	    			}
+	    			
+	    			if(vm.applyInfoForm.isSettleFlage=='是'){
+	    				if(vm.applyTypes[i].feeId=='79069922-e13a-4229-8656-2a1e19b44879'){
+	    					   vm.$Modal.error({content: '结清时滞纳金不能减免' });
+	    				      return;
+	    				}
+	    				if(vm.applyTypes[i].feeId=='e404a126-45ab-11e7-8ed5-000c2928bb0d'&&(vm.baseInfoForm.outsideInterest==0||vm.applyTypes[i].derateMoney>vm.baseInfoForm.outsideInterest)){
+	    					 vm.$Modal.error({content: '减免金额大于逾期利息,或逾期利息为0都不能减免' });
+	    					   return;
+	    				}
+	    				if(vm.applyTypes[i].feeId=='65bf9587-37b4-11e7-9482-000c2928bb0d'&&(vm.baseInfoForm.preLateFees==0||vm.applyTypes[i].derateMoney>vm.baseInfoForm.preLateFees)){
+	    					 vm.$Modal.error({content: '减免金额大于提前结清违约金,或提前结清违约金为0都不能减免' });
+	    					   return;
+	    				}
+	    			}else{
+	    				if(vm.applyTypes[i].feeId=='79069922-e13a-4229-8656-2a1e19b44879'&&(vm.baseInfoForm.needPayPenalty==0||vm.applyTypes[i].derateMoney>vm.baseInfoForm.needPayPenalty)){
+	    					   vm.$Modal.error({content: '减免金额大于滞纳金,或者滞纳金为0都不能减免' });
+	    				      return;
+	    				}
+	    				if(vm.applyTypes[i].feeId=='e404a126-45ab-11e7-8ed5-000c2928bb0d'){
+	    					 vm.$Modal.error({content: '非结清时逾期利息不能减免' });
+	    					   return;
+	    				}
+	    				if(vm.applyTypes[i].feeId=='65bf9587-37b4-11e7-9482-000c2928bb0d'){
+	    					 vm.$Modal.error({content: '非结清时提前结清违约金不能减免' });
+	    					   return;
+	    				}
 	    			}
 
 	    		}

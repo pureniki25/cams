@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.hongte.alms.base.mapper.CollectionMapper">
+<mapper namespace="com.hongte.alms.base.collection.mapper.CollectionMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.Collection">
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.collection.entity.Collection">
         <id column="business_id" property="businessId" />
         <result column="after_id" property="afterId" />
         <result column="status" property="status" />
@@ -22,7 +22,7 @@
         business_id AS businessId, after_id AS afterId, status, collection_user AS collectionUser, assign_remark AS assignRemark, create_user AS createUser, create_time AS createTime, update_user AS updateUser, update_time AS updateTime, hand_to_remark AS handToRemark, process_id AS processId
     </sql>
 
-    <select id="queryNotTransferCollection" resultType="com.hongte.alms.base.entity.Collection" parameterType="com.hongte.alms.base.vo.module.CollectionReq">
+    <select id="queryNotTransferCollection" resultType="com.hongte.alms.base.collection.entity.Collection" parameterType="com.hongte.alms.base.vo.module.CollectionReq">
 
         SELECT
           business_id,after_id,collection_user,status

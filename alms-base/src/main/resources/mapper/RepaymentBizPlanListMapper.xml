@@ -239,7 +239,9 @@
 		      FROM
 		        tb_repayment_biz_plan_list
 		      WHERE orig_business_id = t1.`business_id`)
-		      AND t1.`business_id` = #{businessId,jdbcType=VARCHAR}) tab
+		      AND t1.`business_id` = #{businessId,jdbcType=VARCHAR}
+		      ORDER BY t2.`due_date`
+		      LIMIT 1) tab
     </select>
 
     <select id="queryInterestOverdueByBusinessId" resultType="java.lang.Integer">
@@ -250,20 +252,20 @@
 		    t2.`due_date`
 		  FROM
 		    tb_basic_business t1,
-		    tb_repayment_biz_plan_list t2
-		  WHERE t1.`business_id` = t2.`orig_business_id`
-		    AND t2.`current_status` = '逾期'
+		    tb_repayment_biz_plan_list t2 
+		  WHERE t1.`business_id` = t2.`orig_business_id` 
+		    AND t2.`current_status` = '逾期' 
 		    AND t1.`business_id` = #{businessId,jdbcType=VARCHAR}
-		    AND EXISTS
-		    (SELECT
-		      1
+		    AND NOT EXISTS 
+		    (SELECT 
+		      1 
 		    FROM
-		      tb_repayment_biz_plan_list_detail d
+		      tb_repayment_biz_plan_list_detail d 
 		    WHERE d.`plan_list_id` = t2.`plan_list_id`
-		      AND d.`plan_item_type` = '10'
-		      AND d.`plan_amount` = 0)
-		  ORDER BY t2.`due_date`
-		  LIMIT 1) tab
+		      AND d.`plan_item_type` = '10' 
+		      AND d.`plan_amount` > 0) 
+		  ORDER BY t2.`due_date` 
+		  LIMIT 1) tab 
     </select>
 
     <select id="queryPrincipalOverdueByBusinessId" resultType="java.lang.Integer">

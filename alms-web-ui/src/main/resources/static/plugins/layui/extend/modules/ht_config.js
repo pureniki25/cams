@@ -10,6 +10,7 @@ layui.define(function (exports) {
         app: "ALMS"
         , basePath: base + "alms/"
         , basePath1: base + "xxx/"
+        , gatewayUrl:base
         , loginPath: "/login"
         , indexPath: "/index"
         , loadMenuUrl: base + "uc/auth/loadMenu"

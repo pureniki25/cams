@@ -120,8 +120,8 @@ public class CollectionTrackLog extends Model<CollectionTrackLog> {
 	 * 是否重发
 	 */
 	@TableField("is_resend")
-	@ApiModelProperty(required = true, value = "是否重发（推平台）")
-	private String isResend;
+	@ApiModelProperty(required= true,value = "是否重发")
+	private Integer isResend;
 
 	/**
 	 * 唯一标识ID
@@ -147,6 +147,13 @@ public class CollectionTrackLog extends Model<CollectionTrackLog> {
 	 */
 	@TableField(exist = false)
 	private String className;
+
+	/**
+	 * 信贷的主键Id，只有从信贷同步过来的历史跟踪记录才
+	 */
+	@TableField("xd_index_id")
+	@ApiModelProperty(required= true,value = "信贷的主键Id，只有从信贷同步过来的历史跟踪记录才")
+	private Integer xdIndexId;
 
 	@Override
 	protected Serializable pkVal() {
@@ -273,11 +280,11 @@ public class CollectionTrackLog extends Model<CollectionTrackLog> {
 		this.failProjectId = failProjectId;
 	}
 
-	public String getIsResend() {
+	public Integer getIsResend() {
 		return isResend;
 	}
 
-	public void setIsResend(String isResend) {
+	public void setIsResend(Integer isResend) {
 		this.isResend = isResend;
 	}
 
@@ -322,7 +329,14 @@ public class CollectionTrackLog extends Model<CollectionTrackLog> {
 				+ ", updateUser=" + updateUser + ", successProjectId=" + successProjectId + ", failProjectId="
 				+ failProjectId + ", isResend=" + isResend + ", uniqueId=" + uniqueId + ", borrowerConditionDescList="
 				+ borrowerConditionDescList + ", guaranteeConditionDescList=" + guaranteeConditionDescList
-				+ ", className=" + className + "]";
+				+ ", className=" + className + ", xdIndexId=" + xdIndexId +"]";
 	}
 
+	public Integer getXdIndexId() {
+		return xdIndexId;
+	}
+
+	public void setXdIndexId(Integer xdIndexId) {
+		this.xdIndexId = xdIndexId;
+	}
 }

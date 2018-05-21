@@ -10,6 +10,11 @@ public class CarLoanBilVO {
 	 */
 	@JsonFormat(pattern="yyyy-MM-dd",timezone="GMT-16")
 	private Date billDate;
+	
+	
+	private Integer currentPriod;//减免申请的期数
+	
+	private double needPayInterest;//减免申请的当期应还利息 
 	/**
 	 * 期内滞纳金
 	 */
@@ -50,6 +55,22 @@ public class CarLoanBilVO {
 	 * 还款计划列表ID
 	 */
 	private String crpId;
+
+	public double getNeedPayInterest() {
+		return needPayInterest;
+	}
+
+	public void setNeedPayInterest(double needPayInterest) {
+		this.needPayInterest = needPayInterest;
+	}
+
+	public Integer getCurrentPriod() {
+		return currentPriod;
+	}
+
+	public void setCurrentPriod(Integer currentPriod) {
+		this.currentPriod = currentPriod;
+	}
 
 	public Date getBillDate() {
 		return billDate;

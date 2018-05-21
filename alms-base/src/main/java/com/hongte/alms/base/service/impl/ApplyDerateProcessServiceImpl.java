@@ -14,6 +14,7 @@ import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.SysUser;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanItemTypeFeeIdEnum;
 import com.hongte.alms.base.mapper.ApplyDerateProcessMapper;
 import com.hongte.alms.base.process.entity.*;
 import com.hongte.alms.base.process.entity.Process;
@@ -196,17 +197,20 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
         		applyDerateType.setApplyDerateTypeId(UUID.randomUUID().toString());
         		applyDerateType.setApplyDerateProcessId(applyInfo.getApplyDerateProcessId());
         		RepaymentBizPlanListDetail detail=null;
+        		List<RepaymentBizPlanListDetail> list=new ArrayList();
         		if(applyDerateType.getFeeId()==null) {
-            		 detail=repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", req.getCrpId()).eq("business_id", pList.getBusinessId()).isNull("fee_id")).get(0);
+        			 list=repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", req.getCrpId()).eq("business_id", pList.getBusinessId()).isNull("fee_id"));
 		
         		}else {
-            		 detail=repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", req.getCrpId()).eq("business_id", pList.getBusinessId()).eq("fee_id", applyDerateType.getFeeId())).get(0);
+            		  list=repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", req.getCrpId()).eq("business_id", pList.getBusinessId()).eq("fee_id", applyDerateType.getFeeId()));
 
         		}
-        		//减免金额不能大于费用项应还金额
-	        		if(applyDerateType.getDerateMoney().compareTo(detail.getPlanAmount())==1) {
+        		if(list!=null&&list.size()>0) {
+        			//减免金额不能大于费用项应还金额
+	        		if(applyDerateType.getDerateMoney().compareTo(list.get(0).getPlanAmount())==1) {
 		                throw new RuntimeException("减免金额不能大于费用项应还金额");
 	        		}else {
+	        			
 	        		applyDerateType.setDerateTypeName(detail.getPlanItemName());
 	        		applyDerateType.setFeeId(applyDerateType.getFeeId());
 	        		applyDerateType.setDerateType(detail.getPlanItemType().toString());
@@ -214,6 +218,27 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
 	        		applyDerateType.setBeforeDerateMoney(detail.getPlanAmount());
 	        		applyDerateType.setCreateUser(loginUserInfoHelper.getUserId());
 	        		}
+        		}else {
+        		   //如果根据feeId在还款计划详情里面找不到对应记录的话，就根据feeId对应的名称，类型插入表apply_derate_Type
+    				if(applyDerateType.getFeeId().equals(RepayPlanItemTypeFeeIdEnum.OVER_DUE_AMONT.getValue())) {
+        				applyDerateType.setDerateTypeName(RepayPlanItemTypeFeeIdEnum.OVER_DUE_AMONT.getDesc());
+        				applyDerateType.setDerateType(RepayPlanItemTypeFeeIdEnum.OVER_DUE_AMONT.getTypeValue().toString());
+        			}
+        			if(applyDerateType.getFeeId().equals(RepayPlanItemTypeFeeIdEnum.PRE_LATEFEES.getValue())) {
+        				applyDerateType.setDerateTypeName(RepayPlanItemTypeFeeIdEnum.PRE_LATEFEES.getDesc());
+        				applyDerateType.setDerateType(RepayPlanItemTypeFeeIdEnum.PRE_LATEFEES.getTypeValue().toString());
+        			}
+        			if(applyDerateType.getFeeId().equals(RepayPlanItemTypeFeeIdEnum.OVER_DUE_INTEREST.getValue())) {
+        				applyDerateType.setDerateTypeName(RepayPlanItemTypeFeeIdEnum.OVER_DUE_INTEREST.getDesc());
+        				applyDerateType.setDerateType(RepayPlanItemTypeFeeIdEnum.OVER_DUE_INTEREST.getTypeValue().toString());
+        			}
+	        		applyDerateType.setFeeId(applyDerateType.getFeeId());
+	        		applyDerateType.setCreateTime(new Date());
+	        		//applyDerateType.setBeforeDerateMoney(detail.getPlanAmount());
+	        		applyDerateType.setCreateUser(loginUserInfoHelper.getUserId());
+        		}
+        		
+        	
         	}
         
         	applyDerateType.setUpdateTime(new Date());

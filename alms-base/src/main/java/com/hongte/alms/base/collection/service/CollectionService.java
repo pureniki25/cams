@@ -1,7 +1,6 @@
-package com.hongte.alms.base.service;
+package com.hongte.alms.base.collection.service;
 
-import com.baomidou.mybatisplus.plugins.Page;
-import com.hongte.alms.base.entity.Collection;
+import com.hongte.alms.base.collection.entity.Collection;
 import com.hongte.alms.base.vo.module.CollectionReq;
 import com.hongte.alms.common.service.BaseService;
 

@@ -137,6 +137,10 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	
 	@Value("${ht.billing.west.part.business:''}")
 	private String westPartBusiness;
+	
+	@Value("${ht.applyderate.company:''}")
+	private String companyNames;
+
 	@Override
 	public Map<String, Object> getOverDueDatys(String businessId) {
 		if (StringUtil.isEmpty(businessId)) {
@@ -519,7 +523,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		Map<String, Object> resultMap = queryCarLoanData(businessId);
 		
 		List<String> lstWestPartBusiness = Arrays.asList(westPartBusiness.split(","));
-
+		List<String> lstcompanyNames = Arrays.asList(companyNames.split(","));
 		double innerLateFees = 0; // 期内滞纳金
 		double outsideInterest = 0; // 期外逾期利息
 		double overdueDefault = 0; // 逾期违约金
@@ -589,6 +593,10 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			double attorneyFees = carLoanBilVO.getAttorneyFees(); // 律师
 
 			int curPeriod = (int) resultMap.get("curPeriod"); // // 当前期数
+			if(carLoanBilVO.getCurrentPriod()!=null) {//如果不为null,说明是减免申请调用此方法获取减免结清时候的提前违约金
+				curPeriod=carLoanBilVO.getCurrentPriod();
+				planAccrual=carLoanBilVO.getNeedPayInterest();
+			}
 			long totalPeriod = (long) resultMap.get("totalPeriod"); // 总还款期数
 
 			int outputPlatformId = (int) resultMap.get("outputPlatformId"); // 出款平台
@@ -623,7 +631,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				} else {
 					int i = (overdueDays / 30) <= 1 ? 1 : (overdueDays / 30);
 					int j = overdueDays % 30;
-					if (i > 1) { // 若 i 大于 1，说明超过30天, 期外逾期费 = 剩余本金 * 费率 * i + 剩余本金 * 费率 / 30 * j
+					if (i >=1) { // 若 i 大于 1，说明超过30天, 期外逾期费 = 剩余本金 * 费率 * i + 剩余本金 * 费率 / 30 * j
 						outsideInterest = surplusPrincipal * outside * i;
 						outsideInterest += surplusPrincipal * outside / 30 * j;
 					}
@@ -649,7 +657,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 						} else {
 							int i = (overdueDays / 30) <= 1 ? 1 : (overdueDays / 30);
 							int j = overdueDays % 30;
-							if (i > 1) { // 若 i 大于 1，说明超过30天, 期外逾期费 = 剩余本金 * 费率 * i + 剩余本金 * 费率 / 30 * j
+							if (i >=1) { // 若 i 大于 1，说明超过30天, 期外逾期费 = 剩余本金 * 费率 * i + 剩余本金 * 费率 / 30 * j
 								outsideInterest = borrowMoney * outside * i;
 								outsideInterest += borrowMoney * outside / 30 * j;
 							}
@@ -665,33 +673,45 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 					if (outputPlatformId == 1) {
 						preLateFees = ((BigDecimal) resultMap.get("surplusServiceCharge")).doubleValue();
+						preLateFees = preLateFees > borrowMoney * 0.06 ? borrowMoney * 0.06 : preLateFees;
 					}
 				} else if ("等额本息".equals(repaymentTypeId)) {
-					planAccrual = surplusPrincipal * monthBorrowRate;
+					//planAccrual = surplusPrincipal * monthBorrowRate;
 					if (outputPlatformId == 0) {
-						
-						preLateFeesFlag = true;	// 提前还款违约金标识，非上标业务，等额本息为true
-						
-						switch (preLateFeeType) {
-						case 1:
-							// 一个月利息
-							preLateFees = borrowMoney * monthBorrowRate;
-							break;
-						case 2:
-							// 借款本金 * 0.03
-							preLateFees = borrowMoney * 0.03;
-							break;
-						case 3:
-							// 剩余本金 * 0.005 * 剩余期数
-							preLateFees = surplusPrincipal * 0.005 * (totalPeriod - curPeriod);
-							break;
-						default:
-							break;
-						}
+						if (companyName.equals("厦门分公司")) {
+							preLateFees = 0;
+					
+						}else if(companyName.equals("保定分公司")) {
+							if((totalPeriod - curPeriod)<6) {
+								preLateFees=preLateFees = surplusPrincipal * 0.005 * (totalPeriod - curPeriod);
+							}else {
+								preLateFees=preLateFees = surplusPrincipal * 0.005 *6;
+						    }
+					    }else {
+							preLateFeesFlag = true;	// 提前还款违约金标识，非上标业务，等额本息为true
+							
+							switch (preLateFeeType) {
+							case 1:
+								// 一个月利息
+								preLateFees = planAccrual;
+								break;
+							case 2:
+								// 借款本金 * 0.03
+								preLateFees = borrowMoney * 0.03;
+								break;
+							case 3:
+								// 剩余本金 * 0.005 * 剩余期数
+								preLateFees = surplusPrincipal * 0.005 * (totalPeriod - curPeriod);
+								break;
+							default:
+								break;
+							}
+					    }
 					} else if (outputPlatformId == 1) {
 						preLateFees = ((BigDecimal) resultMap.get("surplusServiceCharge")).doubleValue();
 						preLateFees = preLateFees > borrowMoney * 0.06 ? borrowMoney * 0.06 : preLateFees;
 					}
+					
 				}
 			}
 

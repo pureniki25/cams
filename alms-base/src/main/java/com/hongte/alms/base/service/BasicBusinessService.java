@@ -1,6 +1,7 @@
 package com.hongte.alms.base.service;
 
 import com.hongte.alms.base.dto.UserPermissionBusinessDto;
+import com.hongte.alms.base.vo.billing.CarLoanBilVO;
 import com.hongte.alms.base.vo.module.BusinessInfoForApplyDerateVo;
 import com.hongte.alms.base.vo.module.ExpenseSettleVO;
 import com.hongte.alms.base.entity.BasicBusiness;
@@ -88,11 +89,24 @@ public interface BasicBusinessService extends BaseService<BasicBusiness> {
 	  * @return
 	  */
 
-	 ExpenseSettleVO getPreLateFees(String crpId, String original_business_id,String repayType,String businessTypeId,Date settleDate,Date ContractDate,Date firstRepayDate,String restPeriods) throws Exception;
+	 ExpenseSettleVO getPreLateFees(String crpId, String original_business_id,String repayType,String businessTypeId,Date settleDate,Date ContractDate,Date firstRepayDate,String restPeriods,Double needPayPrincipal) throws Exception;
 	 /**
 	 * 	 获取展期的借款期数
 	 * @param crpId
 	 * @return
 	 */
 	 Integer   getBorrowLlimitZQ(@Param("crpId") String crpId);
+	    /**
+		 * 	 月收平台服务费的业务记录条数
+		 * @param original_business_id
+		 * @return
+		 */
+	 
+	 Integer getMonthPlatformAmountCount(@Param("crpId") String crpId);
+	 
+	 
+	 /**
+	     * 车贷业务减免申请的逾期利息
+	     */
+	    Map<String, Object> carLoanBilling(CarLoanBilVO carLoanBilVO,Integer overdueDays);
 }

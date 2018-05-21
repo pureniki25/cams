@@ -15,11 +15,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.aliyun.oss.ServiceException;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.entity.FiveLevelClassify;
 import com.hongte.alms.base.entity.FiveLevelClassifyCondition;
+import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.mapper.BasicBusinessTypeMapper;
 import com.hongte.alms.base.service.BusinessParameterService;
 import com.hongte.alms.base.service.FiveLevelClassifyConditionService;
@@ -57,19 +57,8 @@ public class BusinessParameterServiceImpl implements BusinessParameterService {
 	@Override
 	public Page<FiveLevelClassify> queryFiveLevelClassifys(Integer page, Integer limit) {
 		Page<FiveLevelClassify> pageParam = new Page<>(page, limit);
-		Page<FiveLevelClassify> resultPage = fiveLevelClassifyService.selectPage(pageParam);
-		List<FiveLevelClassify> records = resultPage.getRecords();
-		List<FiveLevelClassify> list = new ArrayList<>();
-		if (CollectionUtils.isNotEmpty(records)) {
-			for (FiveLevelClassify fiveLevelClassify : records) {
-				if ("0".equals(fiveLevelClassify.getValidStatus())) {
-					list.add(fiveLevelClassify);
-				}
-			}
-			records.removeAll(list);
-			resultPage.setRecords(records);
-		}
-		return resultPage;
+		return fiveLevelClassifyService.selectPage(pageParam,
+				new EntityWrapper<FiveLevelClassify>().eq("valid_status", "1").orderBy("business_type").orderBy("class_level"));
 	}
 
 	@Override
@@ -79,7 +68,7 @@ public class BusinessParameterServiceImpl implements BusinessParameterService {
 			fiveLevelClassifyService.insert(assembleFiveLevelClassify(param));
 		} catch (Exception e) {
 			LOG.error("方法 saveFiveLevelClassify 执行失败！", e);
-			throw new ServiceException("保存五级分类失败！", e);
+			throw new ServiceRuntimeException("保存五级分类失败！", e);
 		}
 
 	}
@@ -90,7 +79,7 @@ public class BusinessParameterServiceImpl implements BusinessParameterService {
 			fiveLevelClassifyService.updateById(assembleFiveLevelClassify(param));
 		} catch (Exception e) {
 			LOG.error("方法 updateFiveLevelClassify 执行失败！", e);
-			throw new ServiceException("更新五级分类失败！", e);
+			throw new ServiceRuntimeException("更新五级分类失败！", e);
 		}
 	}
 
@@ -151,10 +140,11 @@ public class BusinessParameterServiceImpl implements BusinessParameterService {
 					conditionVOs.add(vo);
 				}
 			}
+
 			return conditionVOs;
 		} catch (Exception e) {
 			LOG.error("方法 queryFiveLevelClassifyCondition 执行失败！", e);
-			throw new ServiceException("获取条件列表信息失败！", e);
+			throw new ServiceRuntimeException("获取条件列表信息失败！", e);
 		}
 	}
 
@@ -206,13 +196,13 @@ public class BusinessParameterServiceImpl implements BusinessParameterService {
 				String className = (String) paramMap.get("className");
 				String parentId = (String) paramMap.get("parentId");
 				String executeCondition = (String) paramMap.get("executeCondition");
-
+				
 				int count = fiveLevelClassifyConditionService
 						.selectCount(new EntityWrapper<FiveLevelClassifyCondition>().eq("class_name", className)
 								.eq("business_type", businessType).eq("sub_class_name", subClassName)
 								.eq("valid_status", "1"));
 				if (count > 0) {
-					throw new ServiceException(
+					throw new ServiceRuntimeException(
 							businessType + "-" + className + "-" + subClassName + "，已经设定过，请重新命名条件名称！");
 				}
 
@@ -239,7 +229,7 @@ public class BusinessParameterServiceImpl implements BusinessParameterService {
 			}
 		} catch (Exception e) {
 			LOG.error("方法 saveConditionForClassify 执行失败！", e);
-			throw new ServiceException(e.getMessage(), e);
+			throw new ServiceRuntimeException(e.getMessage(), e);
 		}
 	}
 
@@ -256,22 +246,18 @@ public class BusinessParameterServiceImpl implements BusinessParameterService {
 				String className = (String) paramMap.get("className");
 				String parentId = (String) paramMap.get("parentId");
 				String executeCondition = (String) paramMap.get("executeCondition");
-
-				List<FiveLevelClassifyCondition> classifyConditions = fiveLevelClassifyConditionService
-						.selectList(new EntityWrapper<FiveLevelClassifyCondition>().eq("class_name", className)
-								.eq("business_type", businessType).eq("sub_class_name", subClassName)
-								.eq("valid_status", "1"));
-
-				if (CollectionUtils.isNotEmpty(classifyConditions)) {
-					for (FiveLevelClassifyCondition condition : classifyConditions) {
-						condition.setValidStatus("0");
-						condition.setOpType(Constant.FIVE_LEVEL_CLASSIFY_CONDITION_UPDATE);
-						fiveLevelClassifyConditionService.updateById(condition);
-					}
-				}
-
+				
+				List<FiveLevelClassifyCondition> classifyConditions = new ArrayList<>();;
+				
+				List<FiveLevelClassifyCondition> odlConditions = new ArrayList<>();
+				
 				for (LinkedHashMap<String, Object> linkedHashMap : commitSetCondition) {
-
+					FiveLevelClassifyCondition odlCondition = new FiveLevelClassifyCondition();
+					odlCondition.setId((String) linkedHashMap.get("id"));
+					odlCondition.setValidStatus("0");
+					odlCondition.setOpType(Constant.FIVE_LEVEL_CLASSIFY_CONDITION_UPDATE);
+					odlConditions.add(odlCondition);
+					
 					Date currTime = new Date();
 					String userId = loginUserInfoHelper.getUserId();
 					FiveLevelClassifyCondition condition = new FiveLevelClassifyCondition();
@@ -288,12 +274,14 @@ public class BusinessParameterServiceImpl implements BusinessParameterService {
 					condition.setUpdateUser(userId);
 					condition.setCreateUser(userId);
 					condition.setCreateTime(currTime);
-					fiveLevelClassifyConditionService.insert(condition);
+					classifyConditions.add(condition);
 				}
+				fiveLevelClassifyConditionService.updateBatchById(odlConditions);
+				fiveLevelClassifyConditionService.insertBatch(classifyConditions);
 			}
 		} catch (Exception e) {
-			LOG.error("方法 saveConditionForClassify 执行失败！", e);
-			throw new ServiceException("更新五级分类设置业务类别-条件失败！", e);
+			LOG.error("方法 updateConditionForClassify 执行失败！", e);
+			throw new ServiceRuntimeException("更新五级分类设置业务类别-条件失败！", e);
 		}
 
 	}
@@ -304,7 +292,7 @@ public class BusinessParameterServiceImpl implements BusinessParameterService {
 		List<FiveLevelClassifyCondition> conditions = fiveLevelClassifyConditionService
 				.selectList(new EntityWrapper<FiveLevelClassifyCondition>().eq("class_name", className)
 						.eq("business_type", businessType).eq("sub_class_name", subClassName).eq("valid_status", "1")
-						.orderBy("update_time"));
+						.orderBy("param_type").orderBy("type_name_relation").orderBy("param_name"));
 
 		FiveLevelClassifyConditionVO vo = new FiveLevelClassifyConditionVO();
 
@@ -329,7 +317,7 @@ public class BusinessParameterServiceImpl implements BusinessParameterService {
 							.eq("sub_class_name", condition.getSubClassName()).eq("valid_status", "1"));
 		} catch (Exception e) {
 			LOG.error("方法 deleteConditionParamModal 执行失败！", e);
-			throw new ServiceException("删除五级分类设置业务类别-条件失败！", e);
+			throw new ServiceRuntimeException("删除五级分类设置业务类别-条件失败！", e);
 		}
 	}
 
@@ -432,7 +420,7 @@ public class BusinessParameterServiceImpl implements BusinessParameterService {
 			return resultClassName;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			throw new ServiceException(e);
+			throw new ServiceRuntimeException(e.getMessage(), e);
 		}
 
 	}
@@ -605,7 +593,7 @@ public class BusinessParameterServiceImpl implements BusinessParameterService {
 					new EntityWrapper<FiveLevelClassifyCondition>().eq("parent_id", id));
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			throw new ServiceException(e);
+			throw new ServiceRuntimeException(e.getMessage(), e);
 		}
 	}
 

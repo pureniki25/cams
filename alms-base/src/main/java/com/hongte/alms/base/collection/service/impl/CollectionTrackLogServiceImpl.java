@@ -87,7 +87,8 @@ public class CollectionTrackLogServiceImpl extends BaseServiceImpl<CollectionTra
 			logOld.setClassName(log.getClassName());
 			log = logOld;
 		}
-		CollectionTrackLogVo.setDefaultVal(log, loginUserInfoHelper.getUserId());
+		String userId = loginUserInfoHelper.getUserId();
+		CollectionTrackLogVo.setDefaultVal(log, userId);
 		this.insertOrUpdate(log);
 
 		int count = this.selectCount(new EntityWrapper<CollectionTrackLog>().eq("unique_id", log.getUniqueId()));
@@ -102,6 +103,8 @@ public class CollectionTrackLogServiceImpl extends BaseServiceImpl<CollectionTra
 			classifyConditionVO.setMainBorrowerConditions(log.getBorrowerConditionDescList());
 			classifyConditionVO.setOpSourse(Constant.FIVE_LEVEL_CLASSIFY_OP_SOUSE_TYPE_ALMS_LOG);
 			classifyConditionVO.setOpSourseId(log.getUniqueId());
+			classifyConditionVO.setOpUserId(userId);
+			classifyConditionVO.setOpUsername(loginUserInfoHelper.getLoginInfo().getUserName());
 			
 			fiveLevelClassifyBusinessChangeLogService.businessChangeLog(classifyConditionVO);
 		}
