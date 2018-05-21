@@ -35,9 +35,11 @@ import com.hongte.alms.base.entity.Doc;
 import com.hongte.alms.base.entity.DocTmp;
 import com.hongte.alms.base.entity.DocType;
 import com.hongte.alms.base.entity.FsdHouse;
+import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.TransferLitigationCar;
 import com.hongte.alms.base.entity.TransferLitigationHouse;
 import com.hongte.alms.base.entity.TransferLitigationLog;
+import com.hongte.alms.base.enums.RepayPlanStatus;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.mapper.TransferOfLitigationMapper;
 import com.hongte.alms.base.process.entity.Process;
@@ -53,6 +55,7 @@ import com.hongte.alms.base.service.DocService;
 import com.hongte.alms.base.service.DocTmpService;
 import com.hongte.alms.base.service.DocTypeService;
 import com.hongte.alms.base.service.FsdHouseService;
+import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.SysProvinceService;
 import com.hongte.alms.base.service.TransferLitigationCarService;
 import com.hongte.alms.base.service.TransferLitigationHouseService;
@@ -135,6 +138,10 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	@Qualifier("TransferLitigationLogService")
 	private TransferLitigationLogService transferLitigationLogService;
 	
+	@Autowired
+	@Qualifier("RepaymentBizPlanListService")
+	RepaymentBizPlanListService repaymentBizPlanListService;
+	
 	@Value("${ht.billing.west.part.business:''}")
 	private String westPartBusiness;
 	
@@ -173,6 +180,18 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		if (resultMap == null) {
 			return resultMap;
 		}
+		
+		List<RepaymentBizPlanList> repaymentBizPlanLists = repaymentBizPlanListService
+				.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", businessId)
+						.eq("current_status", RepayPlanStatus.REPAYED.getName()).ne("repay_flag", 6)
+						.orderBy("fact_repay_date", false));
+		Date lastRepayDate = null;
+		if (CollectionUtils.isNotEmpty(repaymentBizPlanLists)) {
+			lastRepayDate = repaymentBizPlanLists.get(0).getFactRepayDate();
+		}
+
+		resultMap.put("lastRepayDate", lastRepayDate == null ? lastRepayDate
+				: DateUtil.toDateString(lastRepayDate, DateUtil.DEFAULT_FORMAT_DATE));
 
 		Date factRepayDate = (Date) resultMap.get("factRepayDate");
 		Date dueDate = (Date) resultMap.get("_dueDate"); // 第一期应还日期

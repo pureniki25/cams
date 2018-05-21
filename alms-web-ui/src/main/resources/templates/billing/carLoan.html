@@ -93,7 +93,7 @@
                 <i-col span="4">预计结清日期</i-col>
                 <i-col span="8">
                 	<date-picker type="date" v-model="commitInfoForm.billDate" :options="preSettleDate.disabledDate"/> 
-                	<i-button type="info" style="margin-left:1rem" @click="carLoanBilling">开始计算</i-button>
+                	<i-button type="info" style="margin-left:1rem" :loading="carLoanBilLoading" @click="carLoanBilling">开始计算</i-button>
                 </i-col>
                 <i-col span="12"></i-col>
             </row>
