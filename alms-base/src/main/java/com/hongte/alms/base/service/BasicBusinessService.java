@@ -4,6 +4,8 @@ import com.hongte.alms.base.dto.UserPermissionBusinessDto;
 import com.hongte.alms.base.vo.billing.CarLoanBilVO;
 import com.hongte.alms.base.vo.module.BusinessInfoForApplyDerateVo;
 import com.hongte.alms.base.vo.module.ExpenseSettleVO;
+import com.hongte.alms.base.vo.module.LiquidationVO;
+import com.hongte.alms.base.vo.module.LitigationVO;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.common.service.BaseService;
 import org.apache.ibatis.annotations.Param;
@@ -101,7 +103,7 @@ public interface BasicBusinessService extends BaseService<BasicBusiness> {
 	 */
 
 	ExpenseSettleVO getPreLateFees(String crpId, String original_business_id, String repayType, String businessTypeId,
-			Date settleDate, Date ContractDate, Date firstRepayDate, String restPeriods) throws Exception;
+			Date settleDate, Date ContractDate, Date firstRepayDate, String restPeriods,Double needPayPrincipal) throws Exception;
 
 	/**
 	 * 获取展期的借款期数
@@ -129,5 +131,26 @@ public interface BasicBusinessService extends BaseService<BasicBusiness> {
 	 * 获取线上线下逾期费用
 	 */
 	Map<String, Object> getOverDueMoney(String pListId, String onLineFeeId, String underLineFeeId);
+	
+
+	/**
+	 * 清算一分配信息
+	 */
+	List<LiquidationVO> selectLiquidationOne(String crpId);
+	/**
+	 * 清算二分配信息
+	 */
+	List<LiquidationVO> selectLiquidationTwo( String crpId);
+	
+	/**
+	 * 房贷移交法务信息
+	 */
+	List<LitigationVO> selectLitigationHouseVO( String crpId);
+	
+	/**
+	 * 车贷移交法务信息
+	 */
+	List<LitigationVO> selectLitigationCarVO( String crpId);
+	 
 
 }

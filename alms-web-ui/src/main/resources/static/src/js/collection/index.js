@@ -569,6 +569,15 @@ window.layinit(function(htConfig){
                                     }
                                 )
                             }
+                            buttons.push(
+                                    {
+                                        "name": "贷后详情", click: function (e, currentItem) {
+                                             var url = '/collectionUI/afterDetail?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+'&businessTypeId='+currentItem.businessTypeId
+                                            showOneLineOprLayer(url, "贷后详情")
+                                    
+                                    }
+                                    }
+                                )
                             return buttons;
                         }
                     });

@@ -49,6 +49,7 @@ import com.hongte.alms.base.entity.SysUser;
 import com.hongte.alms.base.enums.AreaLevel;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
 import com.hongte.alms.base.enums.SysRoleEnums;
+import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.BasicBusinessTypeService;
 import com.hongte.alms.base.service.BasicCompanyService;
 import com.hongte.alms.base.service.SysParameterService;
@@ -110,6 +111,8 @@ public class CollectionController {
     @Autowired
     @Qualifier("SysUserService")
     SysUserService  sysUserService;
+    
+
     
     @Autowired
     @Qualifier("SysUserAreaService")
@@ -225,7 +228,9 @@ public class CollectionController {
         try{
             long startTime = System.currentTimeMillis();
             List<String> companyIds= sysUserAreaService.selectUserAreas(loginUserInfoHelper.getUserId());
-            req.setCommIds(companyIds);
+            if(companyIds.size()>0) {
+                req.setCommIds(companyIds);
+            }
             Page<AfterLoanStandingBookVo> pages = phoneUrgeService.selectRepayManage(req);
             long end = System.currentTimeMillis();
             System.out.println(end - startTime);
@@ -459,5 +464,9 @@ public class CollectionController {
             return PageResult.error(500, "数据库访问异常");
         }
     }*/
+    
+    
+ 
+
 }
 

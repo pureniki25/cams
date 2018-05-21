@@ -1,0 +1,278 @@
+
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<head>
+<meta charset="utf-8" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>贷后详情</title>
+<script src="/properties/config.js"></script>
+<!-- 默认主题样式 -->
+<link rel="stylesheet" type="text/css"
+	href="/src/css/themes/default.css" />
+<!-- iview样式 -->
+<link rel="stylesheet" type="text/css"
+	href="/plugins/iview/css/iview.css" />
+<!--<link rel="stylesheet" type="//unpkg.com/iview/dist/styles/iview.css"/>-->
+<!-- 引入layui样式 -->
+<link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all" />
+
+<!-- 引入vue -->
+<script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+<!--iview js -->
+<script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+<!--    <script src="//unpkg.com/vue/dist/vue.js"></script>
+        <script src="//unpkg.com/iview/dist/iview.min.js"></script>-->
+
+<!--引入layui.js-->
+<script src="/plugins/layui/layui.js"></script>
+<!--引入axios.js 用于ajax调用-->
+<script src="/plugins/axios/axios.min.js"></script>
+
+<!-- 流程组件的  -->
+<link rel="stylesheet" href="/Components/ProcessLine/ProcessLine.css">
+<script src="/Components/ProcessLine/ProcessLine.js"></script>
+
+<!--表格样式-->
+<link rel="stylesheet" href="/Components/Table/Table.css">
+
+<!-- 引入jQuery，必须在appToken.js 之前引入 -->
+<script src="/build/js/jquery-3.3.1.min.js"></script>
+<!-- 设置全局请求头:app、Authorization -->
+<script src="/build/js/appToken.js"></script>
+
+<!--引入公共的一些方法-->
+<script src="/src/js/comm.js"></script>
+
+
+
+</head>
+<style>
+</style>
+
+<body>
+	<!--隐藏元素-->
+	<p id="planListId" th:attr="value=${planListId}" hidden />
+
+
+	<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+	<div id="app" v-cloak>
+
+
+
+		<Card v-if="liquidationOneFlag == true">
+		<p slot="title">清算一分配信息</p>
+		<table class="layui-table">
+
+			<tbody v-for="(item, index) in liquidationOnes">
+				<tr>
+					<td rowspan="4">第{{item.rowNo}}次分配信息</td>
+					<td class="column">清算一人员</td>
+					<td class="column">{{item.liquidationOneName}}</td>
+
+				</tr>
+				<tr>
+					<td class="column">分配备注</td>
+					<td class="column">{{item.describe}}</td>
+
+				</tr>
+
+
+				<tr>
+					<td class="column">分配方式</td>
+					<td class="column">{{item.setWayStr}}</td>
+
+				</tr>
+
+				<tr>
+					<td class="column">分配时间</td>
+					<td class="column">{{item.setTime}}</td>
+				</tr>
+			</tbody>
+		</table>
+		</Card>
+
+		<Card v-if="liquidationTwoFlag == true">
+		<p slot="title">清算二分配信息</p>
+		<table class="layui-table">
+
+			<tbody v-for="(item, index) in liquidationTwos">
+				<tr>
+					<td rowspan="4">第{{item.rowNo}}次分配信息</td>
+					<td class="column">清算二人员</td>
+					<td class="column">{{item.liquidationTwoName}}</td>
+
+				</tr>
+				<tr>
+					<td class="column">分配备注</td>
+					<td class="column">{{item.describe}}</td>
+
+				</tr>
+
+
+				<tr>
+					<td class="column">分配方式</td>
+					<td class="column">{{item.setWayStr}}</td>
+
+				</tr>
+
+				<tr>
+					<td class="column">分配时间</td>
+					<td class="column">{{item.setTime}}</td>
+				</tr>
+			</tbody>
+		</table>
+		</Card>
+
+		<Card v-if="litigationHouseFlag == true">
+		<p slot="title">房贷移交法务信息</p>
+		<table class="layui-table">
+
+			<tbody v-for="(item, index) in litigations">
+				<tr>
+					<td rowspan="4">第{{item.rowNo}}次分配信息</td>
+					<td class="column">移交人员</td>
+					<td class="column">{{item.operator}}</td>
+
+				</tr>
+				<tr>
+					<td class="column">移交时间</td>
+					<td class="column">{{item.operatTime}}</td>
+
+				</tr>
+
+
+				<tr>
+					<td colspan="2">其他财务情况：{{item.pecuniaryCondition}}</td>
+
+				</tr>
+
+				<tr>
+					<td colspan="2">资产管理部经办人催收调查结果：{{item.relatedPersonnel}}</td>
+				</tr>
+			</tbody>
+		</table>
+		</Card>
+
+
+		<Card v-if="litigationCarFlag == true">
+		<p slot="title">车贷移交法务信息</p>
+		<table class="layui-table">
+
+			<tbody v-for="(item, index) in litigations">
+				<tr>
+					<td rowspan="4">第{{item.rowNo}}次分配信息</td>
+					<td class="column">移交人员</td>
+					<td class="column">{{item.operator}}</td>
+
+				</tr>
+				<tr>
+					<td class="column">移交时间</td>
+					<td class="column">{{item.operatTime}}</td>
+
+				</tr>
+
+
+				<tr>
+					<td colspan="2">客户车辆目前情况：{{item.carCondition}}</td>
+
+				</tr>
+
+				<tr>
+					<td colspan="2">贷后意见：{{item.almsOpinion}}</td>
+				</tr>
+			</tbody>
+		</table>
+		</Card>
+
+
+
+		<Card v-if="carDragFlag == true">
+		<p slot="title">拖车信息</p>
+		<table class="layui-table">
+
+			<tbody>
+				<tr>
+					<td class="column">拖车日期</td>
+					<td class="column">{{carDrag.dragDate}}</td>
+
+				</tr>
+				<tr>
+					<td class="column">拖车经办人</td>
+					<td class="column">{{carDrag.dragHandler}}</td>
+
+				</tr>
+
+
+				<tr>
+					<td class="column">拖车地点</td>
+					<td class="column">{{carDrag.detailAddress}}</td>
+
+				</tr>
+
+				<tr>
+					<td class="column">拖车费</td>
+					<td class="column">{{carDrag.fee}}</td>
+				</tr>
+				<tr>
+					<td class="column">备注</td>
+					<td class="column">{{carDrag.remark}}</td>
+				</tr>
+			</tbody>
+		</table>
+		</Card>
+		
+		
+		<Card v-if="carReturnFlag == true">
+		<p slot="title">车辆归还</p>
+		<table class="layui-table">
+
+			<tbody>
+				<tr>
+					<td class="column">归还日期</td>
+					<td class="column">{{carReturnReg.returnDate}}</td>
+
+				</tr>
+				<tr>
+					<td class="column">归还经办人</td>
+					<td class="column">{{carReturnReg.returnOperator}}</td>
+
+				</tr>
+
+
+				<tr>
+					<td class="column">归还地点</td>
+					<td class="column">{{carReturnReg.returnAddr}}</td>
+
+				</tr>
+
+				<tr>
+					<td class="column">已缴纳拖车费用</td>
+					<td class="column">{{carReturnReg.payTrailerCost}}</td>
+				</tr>
+				<tr>
+					<td class="column">已缴纳的拖车其他费用</td>
+					<td class="column">{{carReturnReg.payTrailerOtherCost}}</td>
+				</tr>
+				<tr>
+					<td class="column">备注</td>
+					<td class="column">{{carReturnReg.note}}</td>
+				</tr>
+			</tbody>
+		</table>
+		</Card>
+
+
+		<br>
+
+	</div>
+
+	<script src="/src/js/collection/afterDetail.js"></script>
+	<script>
+
+
+</script>
+</body>
+</html>

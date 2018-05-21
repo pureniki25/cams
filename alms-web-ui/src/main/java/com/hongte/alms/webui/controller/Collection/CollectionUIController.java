@@ -169,4 +169,12 @@ public class CollectionUIController {
    public String repaymentManage(){
        return "/Collection/repaymentManage";
    }
+   
+   
+   
+ //贷后详情界面
+   @RequestMapping("afterDetail")
+   public String afterDetail(){
+       return "/Collection/afterDetail";
+   }
 }
