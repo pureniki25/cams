@@ -27,7 +27,7 @@ public class StaffInfoXinDaiSyncJob implements BaseJob {
     }
 
 
-    @Scheduled(cron = "0 0 3 * * ?")
+//    @Scheduled(cron = "0 0 3 * * ?")
     public void execute(JobExecutionContext context) throws JobExecutionException {
 //        ixdSyncDataService.syncBaseBusinessData();
         _log.info("同步完毕: " + new Date());
