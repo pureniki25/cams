@@ -33,6 +33,7 @@ public class ExpenseSettleRepaymentPlanVO  {
 	private List<RepaymentBizPlanListDetail> currentDetails ;
 	private List<RepaymentBizPlanListDetail> allDetails ;
 	private List<ExpenseSettleRepaymentPlanListVO> pastPeriodVOs ;
+	private List<ExpenseSettleRepaymentPlanListVO> surplusPeriodVOs ;
 	private ExpenseSettleRepaymentPlanListVO finalPeriod ;
 	private ExpenseSettleRepaymentPlanListVO currentPeriod;
 	
@@ -334,5 +335,34 @@ public class ExpenseSettleRepaymentPlanVO  {
 		this.currentPeriod = currentPeriod;
 	}
 	
+	/**
+	 * 求剩余的期数(先用findCurrentPeriods找到当前期后再使用此方法)
+	 * @author 王继光
+	 * 2018年5月15日 上午10:48:53
+	 * @return
+	 */
+	public List<ExpenseSettleRepaymentPlanListVO> getSurplusPeriod() {
+		
+		if (this.surplusPeriodVOs!=null&&this.surplusPeriodVOs.size()>0) {
+			return surplusPeriodVOs ;
+		}
+		
+		List<ExpenseSettleRepaymentPlanListVO> surplus = new ArrayList<>() ;
+		if (currentPeriodVOs==null||currentPeriodVOs.size()==0) {
+			return null ;
+		}
+		
+		Date lastCurrDate = currentPeriodVOs.get(currentPeriodVOs.size()-1).getRepaymentBizPlanList().getDueDate();
+		this.surplusPeriodVOs = new ArrayList<>() ;
+		for (ExpenseSettleRepaymentPlanListVO e : getRepaymentPlanListVOs()) {
+			Date compareDate = e.getRepaymentBizPlanList().getDueDate() ;
+			if (DateUtil.getDiffDays(lastCurrDate, compareDate)>0) {
+				surplusPeriodVOs.add(e);
+			}
+		}
+		return surplusPeriodVOs;
+		
+	}
+
 	
 }
