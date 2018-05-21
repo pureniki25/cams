@@ -97,6 +97,7 @@ public class BasicBizCustomer extends Model<BasicBizCustomer> {
     /**
      * [统一社会信用代码 客户为企业并且为三证合一时必须填写并作为tb_business表，绑卡表的外键]
      */
+	@TableField("unifiedCode")
 	@ApiModelProperty(required= true,value = "[统一社会信用代码 客户为企业并且为三证合一时必须填写并作为tb_business表，绑卡表的外键]")
 	private String unifiedCode;
     /**

@@ -242,7 +242,7 @@ public class CreatRepayPlanServiceImplTest {
 
 
         BusinessCustomerInfoReq businessCustomerInfoReq2 = new BusinessCustomerInfoReq();
-        businessCustomerInfoReqs.add(businessCustomerInfoReq1);
+        businessCustomerInfoReqs.add(businessCustomerInfoReq2);
         businessCustomerInfoReq2.setCustomerId(UUID.randomUUID().toString());  //客户ID，资产端主键
         businessCustomerInfoReq2.setIsmainCustomer(1); //是否主借款人，0：否，1：是
         businessCustomerInfoReq2.setCustomerName("测试-企业"); //客户名称，个人则填个人名称，企业则填企业名称
