@@ -48,6 +48,7 @@ import com.hongte.alms.base.service.MoneyPoolRepaymentService;
 import com.hongte.alms.base.service.MoneyPoolService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
+import com.hongte.alms.base.vo.finance.CurrPeriodRepaymentInfoVO;
 import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.vo.PageResult;
@@ -359,6 +360,20 @@ public class FinanceController {
 		logger.info("@thisPeroidRepayment@本期还款信息(包括标的信息)--开始[{}{}]",businessId,afterId);
 		result = financeService.thisPeroidRepayment(businessId, afterId);
 		logger.info("@thisPeroidRepayment@本期还款信息(包括标的信息)--结束[{}]",result);
+		return result ;
+	}
+	
+	@GetMapping(value="/thisTimeRepayment")
+	@ApiOperation(value="本次还款信息")
+	public Result thisTimeRepayment(String businessId,String afterId) {
+		Result result ;
+		logger.info("@thisTimeRepayment@本次还款信息--开始[{}{}]",businessId,afterId);
+		CurrPeriodRepaymentInfoVO infoVO  = financeService.getCurrPeriodRepaymentInfoVO(businessId, afterId);
+		if (infoVO==null) {
+			result = Result.error("500", "找不到本次还款信息");
+		}
+		result = Result.success(infoVO);
+		logger.info("@thisTimeRepayment@本次还款信息--结束[{}]",result);
 		return result ;
 	}
 	
