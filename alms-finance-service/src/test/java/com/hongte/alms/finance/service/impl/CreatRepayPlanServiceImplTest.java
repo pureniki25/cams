@@ -1,10 +1,13 @@
 package com.hongte.alms.finance.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.enums.BooleanEnum;
 import com.hongte.alms.base.enums.UserTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.*;
+import com.hongte.alms.base.mapper.BasicBizCustomerMapper;
+import com.hongte.alms.base.mapper.BasicBusinessMapper;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.finance.FinanceServiceApplication;
 import com.hongte.alms.finance.dto.repayPlan.PlanReturnInfoDto;
@@ -31,6 +34,10 @@ import static junit.framework.TestCase.assertTrue;
  * @author zengkun
  * @since 2018/5/7
  */
+/**
+ * @author 王继光
+ * 2018年5月18日 下午6:04:49
+ */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = FinanceServiceApplication.class)
 public class CreatRepayPlanServiceImplTest {
@@ -40,6 +47,10 @@ public class CreatRepayPlanServiceImplTest {
     @Autowired
     @Qualifier("CreatRepayPlanService")
     CreatRepayPlanService creatRepayPlanService;
+    @Autowired
+    BasicBusinessMapper basicBusinessMapper ;
+    @Autowired
+	BasicBizCustomerMapper basicBizCustomerMapper ;
 
 //    @Test
     public void creatRepayPlanTest() throws Exception {
@@ -135,9 +146,9 @@ public class CreatRepayPlanServiceImplTest {
 
 //            boolean b= repaymentBizPlan.getBorrowMoney().compareTo(new BigDecimal("50000.00"))==0;
 
-            assertTrue(repaymentBizPlan.getBorrowMoney().compareTo(new BigDecimal(50000.00))==0);
-            assertTrue(repaymentBizPlan.getBorrowRate().compareTo(new BigDecimal(9.5))==0);
-            assertTrue(repaymentBizPlan.getBorrowLimit().equals(6));
+//            assertTrue(repaymentBizPlan.getBorrowMoney().compareTo(new BigDecimal(50000.00))==0);
+//            assertTrue(repaymentBizPlan.getBorrowRate().compareTo(new BigDecimal(9.5))==0);
+//            assertTrue(repaymentBizPlan.getBorrowLimit().equals(6));
 
 
 //            List<RepaymentBizPlanListDto>  bizPlanListDtos = bizPlanDto.getBizPlanListDtos();
@@ -198,12 +209,12 @@ public class CreatRepayPlanServiceImplTest {
         BusinessBasicInfoReq  businessBasicInfoReq =creatBusinessBasicInfoReq();
         creatRepayPlanReq.setBusinessBasicInfoReq(businessBasicInfoReq);
 
-        businessBasicInfoReq.setBusinessId("TDF1012018031505-5-20");
-        businessBasicInfoReq.setOrgBusinessId("TDF1012018031505-5-20");
-        businessBasicInfoReq.setInputTime(DateUtil.getDateTime("2018/3/15"));
-        businessBasicInfoReq.setRepaymentTypeId(9);  //1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息
-        businessBasicInfoReq.setBorrowMoney(new BigDecimal(50000));  //借款总额
-        businessBasicInfoReq.setBorrowLimit(6);  //借款期限
+        businessBasicInfoReq.setBusinessId("TDF1012018032201");
+        businessBasicInfoReq.setOrgBusinessId("TDF1012018032201");
+        businessBasicInfoReq.setInputTime(DateUtil.getDateTime("2018/3/22"));
+        businessBasicInfoReq.setRepaymentTypeId(2);  //1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息
+        businessBasicInfoReq.setBorrowMoney(new BigDecimal(10000));  //借款总额
+        businessBasicInfoReq.setBorrowLimit(3);  //借款期限
         businessBasicInfoReq.setBorrowRateUnit(1);  //借款期限
 
 
@@ -212,8 +223,7 @@ public class CreatRepayPlanServiceImplTest {
 
         BusinessCustomerInfoReq businessCustomerInfoReq1 = new BusinessCustomerInfoReq();
         businessCustomerInfoReqs.add(businessCustomerInfoReq1);
-
-        businessCustomerInfoReq1.setCustomerId("TDF1012018031505-5-20-custom");  //客户ID，资产端主键
+        businessCustomerInfoReq1.setCustomerId(UUID.randomUUID().toString());  //客户ID，资产端主键
         businessCustomerInfoReq1.setIsmainCustomer(0); //是否主借款人，0：否，1：是
         businessCustomerInfoReq1.setCustomerName("测试-个人"); //客户名称，个人则填个人名称，企业则填企业名称
         businessCustomerInfoReq1.setIsReceiptAccount(0); //是否收款账户，0：否，1：是
@@ -232,8 +242,8 @@ public class CreatRepayPlanServiceImplTest {
 
 
         BusinessCustomerInfoReq businessCustomerInfoReq2 = new BusinessCustomerInfoReq();
-        businessCustomerInfoReqs.add(businessCustomerInfoReq1);
-        businessCustomerInfoReq2.setCustomerId("TDF1012018031505-5-20-custom");  //客户ID，资产端主键
+        businessCustomerInfoReqs.add(businessCustomerInfoReq2);
+        businessCustomerInfoReq2.setCustomerId(UUID.randomUUID().toString());  //客户ID，资产端主键
         businessCustomerInfoReq2.setIsmainCustomer(1); //是否主借款人，0：否，1：是
         businessCustomerInfoReq2.setCustomerName("测试-企业"); //客户名称，个人则填个人名称，企业则填企业名称
         businessCustomerInfoReq2.setIsReceiptAccount(1); //是否收款账户，0：否，1：是
@@ -265,33 +275,33 @@ public class CreatRepayPlanServiceImplTest {
         req1.setPrincipleReqList(principleReqs);
         PrincipleReq principleReq1 = new PrincipleReq();
         principleReq1.setPeriod(1);
-        principleReq1.setPrinciple(new BigDecimal(4200));
+        principleReq1.setPrinciple(new BigDecimal(3000));
         principleReqs.add(principleReq1);
 
         PrincipleReq principleReq2 = new PrincipleReq();
         principleReq2.setPeriod(2);
-        principleReq2.setPrinciple(new BigDecimal(4200));
+        principleReq2.setPrinciple(new BigDecimal(3000));
         principleReqs.add(principleReq2);
 
         PrincipleReq principleReq3 = new PrincipleReq();
         principleReq3.setPeriod(3);
-        principleReq3.setPrinciple(new BigDecimal(4200));
+        principleReq3.setPrinciple(new BigDecimal(3000));
         principleReqs.add(principleReq3);
 
-        PrincipleReq principleReq4 = new PrincipleReq();
-        principleReq4.setPeriod(4);
-        principleReq4.setPrinciple(new BigDecimal(4200));
-        principleReqs.add(principleReq4);
-
-        PrincipleReq principleReq5 = new PrincipleReq();
-        principleReq5.setPeriod(5);
-        principleReq5.setPrinciple(new BigDecimal(4200));
-        principleReqs.add(principleReq5);
-
-        PrincipleReq principleReq6 = new PrincipleReq();
-        principleReq6.setPeriod(6);
-        principleReq6.setPrinciple(new BigDecimal(9000));
-        principleReqs.add(principleReq6);
+//        PrincipleReq principleReq4 = new PrincipleReq();
+//        principleReq4.setPeriod(4);
+//        principleReq4.setPrinciple(new BigDecimal(4200));
+//        principleReqs.add(principleReq4);
+//
+//        PrincipleReq principleReq5 = new PrincipleReq();
+//        principleReq5.setPeriod(5);
+//        principleReq5.setPrinciple(new BigDecimal(4200));
+//        principleReqs.add(principleReq5);
+//
+//        PrincipleReq principleReq6 = new PrincipleReq();
+//        principleReq6.setPeriod(6);
+//        principleReq6.setPrinciple(new BigDecimal(9000));
+//        principleReqs.add(principleReq6);
 
 //        Map<Integer,BigDecimal> principleMap1 = new HashMap<>();
 //        req1.setPrincipleReqList(principleMap1);
@@ -301,22 +311,22 @@ public class CreatRepayPlanServiceImplTest {
 //        principleMap1.put(4,new BigDecimal(4200));
 //        principleMap1.put(5,new BigDecimal(4200));
 //        principleMap1.put(6,new BigDecimal(9000));
-
-        req1.setProjectId("137e8a4a-0727-4551-b20a-48b0d6679cfa-5-20");
+        String mainProjectId = UUID.randomUUID().toString() ;
+        req1.setProjectId(mainProjectId);
         req1.setStatusFlag("4");
-        req1.setBeginTime(DateUtil.getDateTime("2018/3/15")); // 启标时间(用于生成还款计划)
-        req1.setFullBorrowMoney(new BigDecimal(30000)); // 满标金额
+        req1.setBeginTime(DateUtil.getDateTime("2018/3/22")); // 启标时间(用于生成还款计划)
+        req1.setFullBorrowMoney(new BigDecimal(9000)); // 满标金额
 //        req1.setTdLoanMoney(new BigDecimal(30000)); // 放款金额
         req1.setExtendFlag(0); // 是否是展期(0:不是展期,1:是展期)
 //        req1.setCatsedAmount(new BigDecimal(30000)); // 投资者已投金额
-        req1.setAmount(new BigDecimal(30000)); // 总金额(元)
-        req1.setMasterIssueId("670d149e-6b63-4810-b437-f993b0bc9af9"); // 主借标ID
+        req1.setAmount(new BigDecimal(9000)); // 总金额(元)
+        req1.setMasterIssueId(mainProjectId); // 主借标ID
         req1.setRate(new BigDecimal(9.5)); // 利率
         req1.setRateUnitType(1); // 利率单位：1 年利率; 2 月利率; 3 日利率
         req1.setOffLineInOverDueRate(new BigDecimal(12)); // 逾期滞纳金费率(%)
         req1.setOffLineInOverDueRateUnit(1); // 逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
         req1.setRepayType(RepayPlanRepayIniCalcWayEnum.INT_AND_PRIN_EVERYTIME.getKey()); // 还款方式：1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息,11:等本等息
-        req1.setPeriodMonth(6); // 借款期限  月
+        req1.setPeriodMonth(3); // 借款期限  月
 
 
 
@@ -394,20 +404,20 @@ public class CreatRepayPlanServiceImplTest {
         req2.setPrincipleReqList(principleReqs2);
         PrincipleReq principlereq21 = new PrincipleReq();
         principlereq21.setPeriod(1);
-        principlereq21.setPrinciple(new BigDecimal(2800));
+        principlereq21.setPrinciple(new BigDecimal(333.33));
         principleReqs2.add(principlereq21);
 
         PrincipleReq principleReq22 = new PrincipleReq();
         principleReq22.setPeriod(2);
-        principleReq22.setPrinciple(new BigDecimal(2800));
+        principleReq22.setPrinciple(new BigDecimal(333.33));
         principleReqs2.add(principleReq22);
 
         PrincipleReq principleReq23 = new PrincipleReq();
         principleReq23.setPeriod(3);
-        principleReq23.setPrinciple(new BigDecimal(2800));
+        principleReq23.setPrinciple(new BigDecimal(333.34));
         principleReqs2.add(principleReq23);
 
-        PrincipleReq principleReq24 = new PrincipleReq();
+       /* PrincipleReq principleReq24 = new PrincipleReq();
         principleReq24.setPeriod(4);
         principleReq24.setPrinciple(new BigDecimal(2800));
         principleReqs2.add(principleReq24);
@@ -420,7 +430,7 @@ public class CreatRepayPlanServiceImplTest {
         PrincipleReq principleReq26 = new PrincipleReq();
         principleReq26.setPeriod(6);
         principleReq26.setPrinciple(new BigDecimal(6000));
-        principleReqs2.add(principleReq26);
+        principleReqs2.add(principleReq26);*/
 
 
 //        ProjInfoReq req2 =creatProjInfoReq(businessBasicInfoReq);
@@ -437,21 +447,21 @@ public class CreatRepayPlanServiceImplTest {
 
 
 
-        req2.setProjectId("670d149e-6b63-4810-b437-f993b0bc9af9-5-20");
+        req2.setProjectId(UUID.randomUUID().toString());
         req2.setStatusFlag("4");
-        req2.setBeginTime(DateUtil.getDateTime("2018/3/15")); // 启标时间(用于生成还款计划)
-        req2.setFullBorrowMoney(new BigDecimal(20000)); // 满标金额
+        req2.setBeginTime(DateUtil.getDateTime("2018/3/22")); // 启标时间(用于生成还款计划)
+        req2.setFullBorrowMoney(new BigDecimal(1000)); // 满标金额
 //        req2.setTdLoanMoney(new BigDecimal(20000)); // 放款金额
         req2.setExtendFlag(0); // 是否是展期(0:不是展期,1:是展期)
 //        req2.setCatsedAmount(new BigDecimal(20000)); // 投资者已投金额
-        req2.setAmount(new BigDecimal(20000)); // 总金额(元)
-        req2.setMasterIssueId("670d149e-6b63-4810-b437-f993b0bc9af9"); // 主借标ID
+        req2.setAmount(new BigDecimal(1000)); // 总金额(元)
+        req2.setMasterIssueId(mainProjectId); // 主借标ID
         req2.setRate(new BigDecimal(9.5)); // 利率
         req2.setRateUnitType(1); // 利率单位：1 年利率; 2 月利率; 3 日利率
         req2.setOffLineInOverDueRate(new BigDecimal(12)); // 逾期滞纳金费率(%)
         req2.setOffLineInOverDueRateUnit(1); // 逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
         req2.setRepayType(RepayPlanRepayIniCalcWayEnum.INT_AND_PRIN_EVERYTIME.getKey()); // 还款方式：1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息,11:等本等息
-        req2.setPeriodMonth(6); // 借款期限  月
+        req2.setPeriodMonth(3); // 借款期限  月
 
 
 
@@ -591,6 +601,46 @@ public class CreatRepayPlanServiceImplTest {
 
     }
 
+    
+    
+    /**
+     * 查tb_basic_business
+     * @author 王继光
+     * 2018年5月18日 下午6:04:51
+     * @param businessId
+     * @return
+     */
+    private BusinessBasicInfoReq  creatBusinessBasicInfoReq(String businessId){
+
+        BusinessBasicInfoReq  businessBasicInfoReq = new BusinessBasicInfoReq();
+       BasicBusiness business =  basicBusinessMapper.selectById(businessId);
+        businessBasicInfoReq.setBusinessId(business.getBusinessId());
+        businessBasicInfoReq.setOrgBusinessId(business.getBusinessId());
+        businessBasicInfoReq.setInputTime(business.getCreateTime());
+        businessBasicInfoReq.setBusinessType(business.getBusinessType());
+        businessBasicInfoReq.setBusinessCtype(business.getBusinessCtype());  //业务所属子类型，若无则为空
+        businessBasicInfoReq.setBusinessStype(business.getBusinessStype());  //业务所属孙类型，若无则为空
+        businessBasicInfoReq.setCustomerId(business.getCustomerId());  //客户资产端唯一编号
+        businessBasicInfoReq.setCustomerName(business.getCustomerName());  //客户姓名
+        businessBasicInfoReq.setRepaymentTypeId(business.getRepaymentTypeId());  //1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息
+        businessBasicInfoReq.setBorrowMoney(business.getBorrowMoney());  //借款总额
+        businessBasicInfoReq.setBorrowLimit(business.getBorrowLimit());  //借款期限
+        businessBasicInfoReq.setBorrowRate(business.getBorrowRate());  //借款利率
+        businessBasicInfoReq.setBorrowRateUnit(business.getBorrowRateUnit());  //借款利率类型，1：年利率，2：月利率，3：日利率
+        businessBasicInfoReq.setOperatorId(business.getOperatorId());  //业务主办人ID
+        businessBasicInfoReq.setOperatorName(business.getOperatorName());  //业务主办人姓名
+//        businessBasicInfoReq.setAssetId(UUID.randomUUID().toString());  //业务所属资产端编号
+        businessBasicInfoReq.setCompanyId(business.getCompanyId());  //业务所属分公司编号
+//        businessBasicInfoReq.setOutputPlatformId(1);  //出款平台ID，0：线下出款，1：团贷网P2P上标
+        businessBasicInfoReq.setIssueSplitType(1);  //标识是否P2P拆标业务，0：非P2P拆标业务，1：P2P拆标业务
+        businessBasicInfoReq.setSourceType(0);  //业务来源：0-常规录入 1-结清续贷新业务 2-结清续贷续贷业务 3-线下历史导入 4-扫码业务 5-优质车抵贷 6 -一点授信
+        businessBasicInfoReq.setSourceBusinessId("9999999");  //原始来源业务的业务编号(当业务来源为结清再贷时，必填)
+//        businessBasicInfoReq.setIsTuandaiRepay(1);  //是否需要进行平台还款，1：是，0：否
+        businessBasicInfoReq.setIsRenewBusiness(0);  //是否展期业务，1：是，0：否
+
+        return businessBasicInfoReq;
+
+    }
 
     /**
      * 创建标的信息

@@ -15,6 +15,8 @@ public class RepaymentProjPlanListDto {
     private RepaymentProjPlanList repaymentProjPlanList;
 
     private List<RepaymentProjPlanListDetail> projPlanListDetails;
+    
+    private List<RepaymentProjPlanListDetailDto> repaymentProjPlanListDetailDtos ;
 
     public RepaymentProjPlanList getRepaymentProjPlanList() {
         return repaymentProjPlanList;
@@ -31,4 +33,18 @@ public class RepaymentProjPlanListDto {
     public void setProjPlanListDetails(List<RepaymentProjPlanListDetail> projPlanListDetails) {
         this.projPlanListDetails = projPlanListDetails;
     }
+
+	/**
+	 * @return the repaymentProjPlanListDetailDtos
+	 */
+	public List<RepaymentProjPlanListDetailDto> getRepaymentProjPlanListDetailDtos() {
+		return repaymentProjPlanListDetailDtos;
+	}
+
+	/**
+	 * @param repaymentProjPlanListDetailDtos the repaymentProjPlanListDetailDtos to set
+	 */
+	public void setRepaymentProjPlanListDetailDtos(List<RepaymentProjPlanListDetailDto> repaymentProjPlanListDetailDtos) {
+		this.repaymentProjPlanListDetailDtos = repaymentProjPlanListDetailDtos;
+	}
 }

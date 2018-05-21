@@ -75,5 +75,7 @@
 			tb_tuandai_project_info pi ON pi.project_id = pp.project_id
 		WHERE
 			pp.business_id = #{businessId}
+		ORDER BY
+			pp.amount DESC
 	</select>
 </mapper>

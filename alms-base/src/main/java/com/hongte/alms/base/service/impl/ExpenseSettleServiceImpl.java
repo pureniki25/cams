@@ -84,6 +84,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 	String xindaiAplUrlUrl;
 
 	@Override
+	@Deprecated
 	public ExpenseSettleVO cal(String preSettleDate, String businessId) {
 		BasicBusiness business = basicBusinessMapper.selectById(businessId);
 		if (business == null) {
