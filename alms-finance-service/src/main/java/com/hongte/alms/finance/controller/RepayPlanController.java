@@ -1,13 +1,27 @@
 package com.hongte.alms.finance.controller;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.alibaba.fastjson.JSON;
 import com.hongte.alms.base.baseException.CreatRepaymentExcepiton;
+import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.ClassCopyUtil;
+import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.finance.dto.repayPlan.PlanReturnInfoDto;
-import com.hongte.alms.finance.dto.repayPlan.RepaymentBizPlanDto;
 import com.hongte.alms.finance.req.repayPlan.BusinessBasicInfoReq;
 import com.hongte.alms.finance.req.repayPlan.CreatRepayPlanReq;
-import com.hongte.alms.common.result.Result;
 import com.hongte.alms.finance.req.repayPlan.ProjFeeReq;
 import com.hongte.alms.finance.req.repayPlan.ProjInfoReq;
 import com.hongte.alms.finance.req.repayPlan.trial.TrailBizInfoReq;
@@ -15,16 +29,9 @@ import com.hongte.alms.finance.req.repayPlan.trial.TrailProjFeeReq;
 import com.hongte.alms.finance.req.repayPlan.trial.TrailProjInfoReq;
 import com.hongte.alms.finance.req.repayPlan.trial.TrailRepayPlanReq;
 import com.hongte.alms.finance.service.CreatRepayPlanService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * @author zengkun
@@ -76,7 +83,6 @@ public class RepayPlanController {
     public Result<PlanReturnInfoDto> creatAndSaveRepayPlan(CreatRepayPlanReq creatRepayPlanReq){
         logger.info("@还款计划@创建还款计划接口,对业务和标的还款计划进行试算--开始[{}]" , JSON.toJSONString(creatRepayPlanReq));
         PlanReturnInfoDto  planReturnInfoDto;
-        List<RepaymentBizPlanDto>  list ;
         try{
             planReturnInfoDto = creatRepayPlanService.creatAndSaveRepayPlan(creatRepayPlanReq);
         }catch (CreatRepaymentExcepiton e){
@@ -155,10 +161,35 @@ public class RepayPlanController {
 	public Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(@RequestParam(value = "businessId") String businessId) {
 		logger.info("查询还款计划，业务编号：[{}]", businessId);
 		try {
+			if (StringUtil.isEmpty(businessId)) {
+				return Result.error("9889", "业务编号不能为空！");
+			}
 			PlanReturnInfoDto planReturnInfoDto = creatRepayPlanService.queryRepayPlanByBusinessId(businessId);
+			if (planReturnInfoDto == null) {
+				return Result.build("1", "没有找到相关数据，请检查业务编号是否输入正确！", planReturnInfoDto);
+			}
 			return Result.success(planReturnInfoDto);
 		} catch (Exception e) {
 			logger.error("查询还款计划异常[{}]", e);
+			return Result.error("9889", e.getMessage());
+		}
+	}
+	
+	@SuppressWarnings("rawtypes")
+	@ApiOperation(value = "根据条件撤销还款计划")
+	@GetMapping("/deleteRepayPlanByConditions")
+	@ResponseBody
+	public Result deleteRepayPlanByConditions(@RequestParam(value = "businessId") String businessId,
+			@RequestParam(value = "repaymentBatchId") String repaymentBatchId) {
+		logger.info("删除还款计划，业务编号：[{}], 还款计划编号[{}]", businessId, repaymentBatchId);
+		try {
+			if (StringUtil.isEmpty(businessId)  || StringUtil.isEmpty(repaymentBatchId)) {
+				return Result.error("9889", "业务编号或还款批次号不能为空！");
+			}
+			creatRepayPlanService.deleteRepayPlanByConditions(businessId, repaymentBatchId);
+			return Result.success();
+		} catch (Exception e) {
+			logger.error("删除还款计划异常[{}]", e);
 			return Result.error("9889", e.getMessage());
 		}
 	}
