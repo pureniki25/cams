@@ -3,19 +3,20 @@
  */
 package com.hongte.alms;
 
-import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.List;
 
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.hongte.alms.base.mapper.MoneyPoolRepaymentMapper;
+import com.hongte.alms.base.dto.ConfirmRepaymentReq;
+import com.hongte.alms.common.result.Result;
 import com.hongte.alms.finance.FinanceServiceApplication;
+import com.hongte.alms.finance.service.FinanceService;
 
 /**
  * @author 王继光
@@ -26,12 +27,18 @@ import com.hongte.alms.finance.FinanceServiceApplication;
 public class Test {
 
 	@Autowired
-	MoneyPoolRepaymentMapper MoneyPoolRepaymentMapper ;
+	@Qualifier("FinanceService")
+	private FinanceService financeService ;
+	
 	@org.junit.Test
-	public void test() {
-		List<String> strings = Arrays.asList("69","70","71","72","73","74");
-		BigDecimal result = MoneyPoolRepaymentMapper.sumMoneyPoolRepaymentAmountByMprIds(strings);
-		System.out.println(result);
+	public void Test() {
+		ConfirmRepaymentReq req = new ConfirmRepaymentReq() ;
+		req.setBusinessId("TDF1012018031505-5-216");
+		req.setAfterId("1-01");
+		req.setOfflineOverDue(new BigDecimal(500));
+		req.setOnlineOverDue(new BigDecimal(100));
+		req.setMprIds(Arrays.asList("75","76","77"));
+		Result result = financeService.confirmRepayment(req);
+		
 	}
-
 }

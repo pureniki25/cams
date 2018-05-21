@@ -18,6 +18,8 @@ public class ConfirmRepaymentReq {
 	private BigDecimal onlineOverDue ;
 	private BigDecimal surplusFund ;
 	private List<String> mprIds ;
+	//TODO 线下代扣ids
+	//TODO 银行代扣ids
 	private String remark ;
 	public String getBusinessId() {
 		return businessId;

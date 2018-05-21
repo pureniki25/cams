@@ -25,6 +25,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.entity.Columns;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
+import com.hongte.alms.base.dto.ConfirmRepaymentReq;
 import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.entity.BasicBusiness;
@@ -358,6 +359,16 @@ public class FinanceController {
 		logger.info("@thisPeroidRepayment@本期还款信息(包括标的信息)--开始[{}{}]",businessId,afterId);
 		result = financeService.thisPeroidRepayment(businessId, afterId);
 		logger.info("@thisPeroidRepayment@本期还款信息(包括标的信息)--结束[{}]",result);
+		return result ;
+	}
+	
+	@PostMapping(value="/previewConfirmRepayment")
+	@ApiOperation(value="预览确认还款拆标情况")
+	public Result previewConfirmRepayment(@RequestBody ConfirmRepaymentReq req) {
+		Result result ;
+		logger.info("@previewConfirmRepayment@预览确认还款拆标情况--开始[{}{}]",req);
+		result = financeService.previewConfirmRepayment(req);
+		logger.info("@previewConfirmRepayment@预览确认还款拆标情况--结束[{}]",result);
 		return result ;
 	}
 	
