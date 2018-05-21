@@ -18,6 +18,8 @@ public class JobConfigEnums {
 		SET_USER_PSERMISION("设置用户可访问的业务定时任务","setUserPermissionTask")
 		,SET_BUSINESS_COL("设置业务移交催收","setBusinessColTask")
 		,ADD_PROJECT_TRACT("添加项目追踪","addProjectTract")
+		,TRANS_COL_TRACK_LOG("同步历史贷后跟踪记录","transColTrackLog")
+		,TRANS_STAFF_SET("同步电催/催收信息","transStaffSet")
 		;
 		
 		
