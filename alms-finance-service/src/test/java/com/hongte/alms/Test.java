@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.alibaba.fastjson.JSON;
 import com.hongte.alms.base.dto.ConfirmRepaymentReq;
+import com.hongte.alms.base.vo.finance.CurrPeriodRepaymentInfoVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.finance.FinanceServiceApplication;
 import com.hongte.alms.finance.service.FinanceService;
@@ -32,13 +34,7 @@ public class Test {
 	
 	@org.junit.Test
 	public void Test() {
-		ConfirmRepaymentReq req = new ConfirmRepaymentReq() ;
-		req.setBusinessId("TDF1012018031505-5-216");
-		req.setAfterId("1-01");
-		req.setOfflineOverDue(new BigDecimal(500));
-		req.setOnlineOverDue(new BigDecimal(100));
-		req.setMprIds(Arrays.asList("75","76","77"));
-		Result result = financeService.confirmRepayment(req);
-		
+		CurrPeriodRepaymentInfoVO  info = financeService.getCurrPeriodRepaymentInfoVO("TDF1012018032101", "1-01");
+		System.out.println(JSON.toJSONString(info));
 	}
 }

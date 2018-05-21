@@ -37,7 +37,7 @@
 		WHERE
 			business_id = #{businessId}
 			AND after_id = #{afterId}
-			AND plan_item_type = ${itemType}
+			AND plan_item_type = #{itemType}
 			<if test="feeId !=null ">
 				AND fee_id = #{feeId}
 			</if>
