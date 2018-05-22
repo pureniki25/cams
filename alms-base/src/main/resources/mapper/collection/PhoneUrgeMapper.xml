@@ -245,6 +245,7 @@
 
         select
         business.business_id AS businessId,
+        pList.plan_list_id as crpId,
         pList.period as  periods,
         pList.after_id as  afterId,
         business.district_id as districtId,
@@ -263,7 +264,8 @@
         pList.due_date as dueDate,
         pList.fact_repay_date AS repaymentDate,
 
-		business.repayment_type_id as repaymentTypeId 
+		business.repayment_type_id as repaymentTypeId ,
+        (case when plan.plan_status = 10 or plan.plan_status = 20 OR  plan.plan_status =30 then '已结清' else pList.current_status end)as statusName
 		
         from tb_repayment_biz_plan_list  as pList
         LEFT JOIN tb_repayment_biz_plan as plan ON pList.plan_id = plan.plan_id

@@ -110,13 +110,18 @@ public class DeductionController {
         try{
             //执行代扣信息
             DeductionVo deductionVo=  deductionService.selectDeductionInfoByPlanListId(planListId);
-            Map<String, Object> map=basicBusinessService.getOverDueMoney(planListId, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid());
-        	BigDecimal onLineOverDueMoney=BigDecimal.valueOf(Double.valueOf(map.get("onLineOverDueMoney").toString()));
-        	BigDecimal underLineOverDueMoney=BigDecimal.valueOf(Double.valueOf(map.get("underLineOverDueMoney").toString()));
-        	deductionVo.setOnLineOverDueMoney(onLineOverDueMoney);
-        	deductionVo.setUnderLineOverDueMoney(underLineOverDueMoney);
-            return Result.success(deductionVo);
-
+            if(deductionVo!=null) {
+                Map<String, Object> map=basicBusinessService.getOverDueMoney(planListId, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid());
+            	BigDecimal onLineOverDueMoney=BigDecimal.valueOf(Double.valueOf(map.get("onLineOverDueMoney").toString()));
+            	BigDecimal underLineOverDueMoney=BigDecimal.valueOf(Double.valueOf(map.get("underLineOverDueMoney").toString()));
+            	deductionVo.setOnLineOverDueMoney(onLineOverDueMoney);
+            	deductionVo.setUnderLineOverDueMoney(underLineOverDueMoney);
+                return Result.success(deductionVo);
+	
+            }else {
+            	 return Result.error("-1", "找不到代扣信息");
+            }
+      
         }catch (Exception ex){
             ex.printStackTrace();
             logger.error(ex.getMessage());

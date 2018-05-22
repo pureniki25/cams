@@ -36,9 +36,32 @@ public class DeductionVo {
     
     private BigDecimal underLineOverDueMoney;//线下逾期费
     private BigDecimal onLineOverDueMoney;//线上逾期费
+    private BigDecimal  planAllAmount;//应还总额
+    private BigDecimal  repayAllAmount;//已还总额
+    private BigDecimal  restAmount;//剩余应还总额
     
     
-    public BigDecimal getUnderLineOverDueMoney() {
+    
+    
+    public BigDecimal getRestAmount() {
+		return restAmount;
+	}
+	public void setRestAmount(BigDecimal restAmount) {
+		this.restAmount = restAmount;
+	}
+	public BigDecimal getPlanAllAmount() {
+		return planAllAmount;
+	}
+	public void setPlanAllAmount(BigDecimal planAllAmount) {
+		this.planAllAmount = planAllAmount;
+	}
+	public BigDecimal getRepayAllAmount() {
+		return repayAllAmount;
+	}
+	public void setRepayAllAmount(BigDecimal repayAllAmount) {
+		this.repayAllAmount = repayAllAmount;
+	}
+	public BigDecimal getUnderLineOverDueMoney() {
 		return underLineOverDueMoney;
 	}
 	public void setUnderLineOverDueMoney(BigDecimal underLineOverDueMoney) {
