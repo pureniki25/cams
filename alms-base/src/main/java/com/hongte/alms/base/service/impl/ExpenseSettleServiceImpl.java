@@ -442,6 +442,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		for (BizOutputRecord bizOutputRecord : bizOutputRecords) {
 			outPutMoney = outPutMoney.add(bizOutputRecord.getFactOutputMoney());
 		}
+		expenseSettleVO.setBorrowAmount(outPutMoney);
 		switch (basicBusiness.getRepaymentTypeId()) {
 		case 2:
 			expenseSettleVO.setPrincipal(outPutMoney);
@@ -1053,14 +1054,14 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 					if (firstLateFee == null) {
 						if (e.getRepaymentBizPlanList() != null && e.getRepaymentBizPlanList().getCurrentStatus().equals("逾期")) {
 							int daysBeyoungDueDate = DateUtil.getDiffDays(e.getRepaymentBizPlanList().getDueDate(), settleDate);
-							BigDecimal lateFeeRate=BigDecimal.valueOf(0);
-							if(e.getRepaymentBizPlanList().getOverdueDays().multiply(expenseSettleVO.getPrincipal()).compareTo(BigDecimal.valueOf(0))==1) {
-								 lateFeeRate = d.getPlanAmount()
-										.divide(e.getRepaymentBizPlanList().getOverdueDays().multiply(expenseSettleVO.getPrincipal()),10,RoundingMode.HALF_UP);
-							}
-					
+//							利率不用自己算了,都用千一,20180522肖莹环说的
+//							BigDecimal lateFeeRate=BigDecimal.valueOf(0);
+//							if(e.getRepaymentBizPlanList().getOverdueDays().multiply(expenseSettleVO.getPrincipal()).compareTo(BigDecimal.valueOf(0))==1) {
+//								 lateFeeRate = d.getPlanAmount()
+//										.divide(e.getRepaymentBizPlanList().getOverdueDays().multiply(expenseSettleVO.getPrincipal()),10,RoundingMode.HALF_UP);
+//							}
 							if (daysBeyoungDueDate > 1) {
-								firstLateFee = expenseSettleVO.getPrincipal().multiply(lateFeeRate)
+								firstLateFee = expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.001))
 										.multiply(new BigDecimal(daysBeyoungDueDate));
 								expenseSettleLackFeeVO.setLateFee(firstLateFee);
 							}
