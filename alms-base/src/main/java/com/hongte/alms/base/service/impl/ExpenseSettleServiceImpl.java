@@ -492,10 +492,8 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 			Date finalPeriodDueDate = plan.getFinalPeriod().getRepaymentBizPlanList().getDueDate() ;
 			int diff = DateUtil.getDiffDays(finalPeriodDueDate, settleDate);
 			
-			if (diff>10) {
-				
-			}else {
-				diff = Math.abs(diff);
+			if (diff>=1&&diff<=10) {
+//				若合同期外逾期少于等于10天,利息按日利率计算,贷后管理-20180518原型要求用千一计算
 				interest = expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.001)).multiply(new BigDecimal(diff)) ;
 			}
 			expenseSettleVO.setInterest(interest);
