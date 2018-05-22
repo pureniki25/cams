@@ -16,8 +16,30 @@ public class WithHoldingInfo {
     private String FactDate;
 
     private String Overduemoney;
+    
+    private Integer isRepayAll;
+    
+    private String repayMoney;
+    
+    
+   
+    public Integer getIsRepayAll() {
+		return isRepayAll;
+	}
 
-    public String getBusinessId() {
+	public void setIsRepayAll(Integer isRepayAll) {
+		this.isRepayAll = isRepayAll;
+	}
+
+	public String getRepayMoney() {
+		return repayMoney;
+	}
+
+	public void setRepayMoney(String repayMoney) {
+		this.repayMoney = repayMoney;
+	}
+
+	public String getBusinessId() {
 		return BusinessId;
 	}
 

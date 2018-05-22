@@ -49,6 +49,7 @@ window.layinit(function(htConfig){
             exporting:false,//导出标志位
             submitLoading: false,
             searchForm: {
+            	keyName:'',
                 areaId:'',  //区域ID
                 companyId:'', //分公司ID
                  showRepayDateBegin:'', //应还日期  开始
@@ -101,11 +102,11 @@ window.layinit(function(htConfig){
                         var dateObj = getData();
 
                         table.reload('listTable', {
-                        	url: basePath + 'collection/selectALStandingBookVoPage',
+                        	url: basePath + 'collection/selectRepayManage',
                             where: {
                                 areaId:vm.searchForm.areaId,  //区域ID
                                 companyId:vm.searchForm.companyId, //分公司ID
-
+                                keyName:vm.searchForm.keyName, 
                                 showRepayDateBegin:dateObj.showRepayDateBegin, //应还日期  开始
                                 showRepayDateEnd:dateObj.showRepayDateEnd,  //应还日期 结束
                                 // showRepayDateRange:vm.searchForm.showRepayDateRange,//应还日期 区间 包含开始和结束时间
@@ -116,7 +117,7 @@ window.layinit(function(htConfig){
                                 delayDaysBegin:vm.searchForm.delayDaysBegin,    //逾期天数 开始
                                 delayDaysEnd:vm.searchForm.delayDaysEnd, //逾期天数 结束
                                 collectLevel:vm.searchForm.collectLevel,  //催收级别
-                                operatorName:vm.searchForm.operatorName,  //业务获取
+                                operatorName:vm.searchForm.operatorName,  //业务获取s
                                 businessId:vm.searchForm.businessId,  //业务编号
                                 businessType:vm.searchForm.businessType,  //业务类型
                                 liquidationOne:vm.searchForm.liquidationOne, //清算一
@@ -245,40 +246,46 @@ window.layinit(function(htConfig){
                     fixed: 'left'
                 },{
                     field: 'businessId',
-                    width:140,
+                    width:180,
                     title: '业务编号'
                 }, {
                     field: 'afterId',
-                    width:90,
+                    width:110,
                     title: '期数'
                 }, {
                     field: 'districtAreaName',
-                    width:90,
+                    width:130,
                     title: '区域'
                 }, {
                     field: 'companyName',
-                    width:100,
+                    width:130,
                     title: '分公司'
                 }, {
                     field: 'operatorName',
-                    width:90,
+                    width:130,
                     title: '业务获取'
                 }, {
                     field: 'customerName',
-                    width:90,
+                    width:130,
                     title: '客户名称'
                 }, {
                     field: 'businessTypeName',
-                    width:90,
+                    width:130,
                     title: '业务类型'
-                }, {
-                    field: 'borrowMoney',
-                    width:120,
-                    title: '借款金额',
-                    align: 'right',
+                },  {
+
+                    field: 'dueDate',
+                    width:130,
+                    title: '应还日期',
                     templet:function(d){
-                        return numeral(d.borrowMoney).format('0,0.00')
+                        console.log(d)
+                        return d.dueDate?moment(d.dueDate).format("YYYY-MM-DD"):''
                     }
+                },{
+
+                    field: 'delayDays',
+                    width:100,
+                    title: '逾期天数'
                 }, {
                     field: 'totalBorrowAmount',
                     width:150,
@@ -304,53 +311,9 @@ window.layinit(function(htConfig){
                         return res 
                     }
                 }, {
-
-                    field: 'delayDays',
-                    width:65,
-                    title: '逾期'
-                }, {
-
-                    field: 'dueDate',
-                    width:105,
-                    title: '应还日期',
-                    templet:function(d){
-                        console.log(d)
-                        return d.dueDate?moment(d.dueDate).format("YYYY-MM-DD"):''
-                    }
-                }, {
-                    field: 'repaymentDate',
-                    width:105,
-                    title: '实还日期',
-                    templet:function(d){
-                        return d.repaymentDate?moment(d.repaymentDate).format("YYYY-MM-DD"):''
-                    }
-                }, {
-                    field: 'phoneStaffName',
-                    width:80,
-                    title: '清算一'
-                }, {
-                    field: 'visitStaffName',
-                    width:80,
-                    title: '清算二'
-                }, {
-
-                    field: 'statusName',
-                    width:90,
-                    title: '还款状态'
-                },{
-
-                    field: 'afterColStatusName',
-                    width:90,
-                    title: '业务状态'
-                },{
-
-                    field: 'className',
-                    width:90,
-                    title: '业务类别'
-                },{
                     fixed: 'right',
                     title: '操作',
-                    width: 115,
+                    width: 200,
                     align: 'left',
                     toolbar: '#barTools'
                 }
@@ -361,6 +324,7 @@ window.layinit(function(htConfig){
             //request: {} //如果无需自定义请求参数，可不加该参数
             //response: {} //如果无需自定义数据响应名称，可不加该参数
             where: {
+            	keyName:vm.searchForm.keyName,
                 areaId:vm.searchForm.areaId,  //区域ID
                 companyId:vm.searchForm.companyId, //分公司ID
                 delayDaysBegin:vm.searchForm.delayDaysBegin,    //逾期天数 开始
@@ -397,52 +361,8 @@ window.layinit(function(htConfig){
                             //console.log('e',e);
                             var buttons = [];
 
-                            if (authValid('trackRecord')) {
-                                buttons.push(
-                                    {
-                                        "name": "贷后跟踪记录", click: function (e, currentItem) {
-                                        if (currentItem.statusName == '逾期') {
-                                            var url = "/collectionUI/staffTrackRecordUI?businessId=" + currentItem.businessId + "&crpId=" + currentItem.crpId
-                                            showOneLineOprLayer(url, "贷后跟踪记录");
-                                        } else {
-                                            vm.$Modal.error({content: "逾期的业务才能添加贷后跟踪记录！"})
-                                        }
-
-                                    }
-                                    }
-                                )
-                            }
-                            if (authValid('applyDerate')) {
-                                buttons.push(
-                                    {
-                                    	
-                                        "name": "减免申请", click: function (e, currentItem) {debugger
-                                            if (currentItem.statusName == '已还款'){
-                                            	 vm.$Modal.error({content: '已还款不能发起减免申请！'});
-                                            }else{
-	                                                if (currentItem.afterColStatusName=='已移交法务'){
-	                                              	   vm.$Modal.error({content: '已移交法务的不能发起减免申请！'});
-	                                                }else{
-		                                            	     if (currentItem.repaymentTypeId==9||currentItem.repaymentTypeId==4){
-		                                                 	   vm.$Modal.error({content: '现在只支持等额本息,先息后本,分期还本付息5年,分期还本付息10年还款方式的减免申请！'});
-			                                                 }else{
-			                                                     var url = '/collectionUI/applyDerateUI?businessId=' + currentItem.businessId + '&crpId=' + currentItem.crpId + "&processStatus=-1"+'&businessTypeId='+currentItem.businessTypeId+"&afterId="+currentItem.afterId
-			                                                     showOneLineOprLayer(url, "减免申请")
-			                                                 }
-	                                                   
-	                                              }
-                                            }
-                                  
-                                            
-                                           
-                              
-                                 
-                                            
-                                         
-                                    }
-                                    }
-                                )
-                            }
+                    
+                         
 
                             if (authValid('deduction')) {
                                 buttons.push(
@@ -459,125 +379,7 @@ window.layinit(function(htConfig){
                                     }
                                 )
                             }
-                            // if(obj.data.businessTypeId == 9 || obj.data.businessTypeId == 1){
-
-                            if (authValid('dragRegistration')) {
-                                if (e.businessTypeId == 9 || e.businessTypeId == 1) {
-
-                                    buttons.push(
-                                        {
-                                            "name": "拖车登记", click: function (e, currentItem) {
-                                            // url = getDeductionUrl(currentItem);
-                                            if (currentItem.businessTypeId != 9 && currentItem.businessTypeId != 1) {
-                                                vm.$Modal.error({content: '车贷业务才能拖车登记！'});
-                                            } else {
-                                                var url = '/carUI/dragRegistration?businessId=' + currentItem.businessId
-                                                showOneLineOprLayer(url, "拖车登记")
-                                            }
-                                        }
-                                        }
-                                    )
-                                }
-
-                            }
-                            if (authValid('repaymentRegister')) {
-                                buttons.push(
-                                    {
-                                        "name": "客户还款登记", click: function (e, currentItem) {
-                                        var url = '/collectionUI/repaymentRegister?businessId=' + currentItem.businessId + '&afterId=' + currentItem.afterId
-                                        showOneLineOprLayer(url, "客户还款登记")
-                                    }
-                                    }
-                                )
-                            }
-                            if (authValid('checkFundPool')) {
-                                buttons.push(
-                                    {
-                                        "name": "查看款项池", click: function (e, currentItem) {
-                                        var url = '/collectionUI/checkFundPool?businessId=' + currentItem.businessId + '&afterId=' + currentItem.afterId
-                                        showOneLineOprLayer(url, "查看款项池")
-                                    }
-                                    }
-                                )
-                            }
-
-                            if (authValid('checkDoc')) {
-                                buttons.push(
-                                    {
-                                        "name": "查看信贷附件", click: function (e, currentItem) {
-                                        $.ajax({
-                                            type: 'GET',
-                                            async: false,
-                                            // url : "http://10.110.1.240:30111/uc/auth/loadBtnAndTab",
-                                            // url : "http://localhost:30111/uc/auth/loadBtnAndTab",
-                                            url: basePath + "api/getXindaiThumbnailView?businessId=" + currentItem.businessId,
-                                            headers: {
-                                                app: 'ALMS',
-                                                Authorization: "Bearer " + getToken()
-                                            },
-                                            success: function (data) {
-                                                showOneLineOprLayer(data.data, "查看信贷附件");
-                                            },
-                                            error: function () {
-                                                vm.$Modal.error({content: '接口调用异常!'});
-                                            }
-                                        });
-                                    }
-                                    }
-                                )
-                            }
-                            if (authValid('upLoad')) {
-                                buttons.push(
-                                    {
-                                        "name": "附件上传及查看", click: function (e, currentItem) {
-                                        var url = '/page/doc/upLoad.html?businessId=' + currentItem.businessId
-                                        showOneLineOprLayer(url, "附件上传及查看")
-                                    }
-                                    }
-                                )
-                            }
-
-                            if (authValid('carLoanBilling')) {
-                                buttons.push(
-                                    {
-                                        "name": "结清试算", click: function (e, currentItem) {
-                                        // var url = '/transferOfLitigation/carLoanBilling?businessId='+currentItem.businessId
-                                        var url = ''
-                                        if (currentItem.businessTypeId == 1 || currentItem.businessTypeId == 9) {
-                                            url = '/transferOfLitigation/carLoanBilling?businessId=' + currentItem.businessId;
-                                        } else if (currentItem.businessTypeId == 2 || currentItem.businessTypeId == 11) {
-                                            url = '/expenseSettle/houseLoan?businessId=' + currentItem.businessId;
-                                        }
-                                        showOneLineOprLayer(url, "结清试算")
-                                    }
-                                    }
-                                )
-                            }
-                            if (authValid('litigation')) {
-                                buttons.push(
-                                    {
-                                        "name": "移交法务", click: function (e, currentItem) {
-                                        //                            	 var url = '/transferOfLitigation/carLoan?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+"&processStatus=-1"
-                                        var url = ''
-                                        if (currentItem.businessTypeId == 1 || currentItem.businessTypeId == 9) {
-                                            url = '/transferOfLitigation/carLoan?businessId=' + currentItem.businessId + '&crpId=' + currentItem.crpId + "&processStatus=-1";
-                                        } else if (currentItem.businessTypeId == 2 || currentItem.businessTypeId == 11) {
-                                            url = '/transferOfLitigation/houseLoan?businessId=' + currentItem.businessId + '&crpId=' + currentItem.crpId + "&processStatus=-1";
-                                        }
-                                        showOneLineOprLayer(url, "移交法务")
-                                    }
-                                    }
-                                )
-                            }
-                            buttons.push(
-                                    {
-                                        "name": "贷后详情", click: function (e, currentItem) {
-                                             var url = '/collectionUI/afterDetail?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+'&businessTypeId='+currentItem.businessTypeId
-                                            showOneLineOprLayer(url, "贷后详情")
-                                    
-                                    }
-                                    }
-                                )
+                      
                             return buttons;
                         }
                     });

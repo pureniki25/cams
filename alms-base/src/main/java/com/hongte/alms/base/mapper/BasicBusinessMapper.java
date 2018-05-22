@@ -2,6 +2,8 @@ package com.hongte.alms.base.mapper;
 
 import com.hongte.alms.base.dto.UserPermissionBusinessDto;
 import com.hongte.alms.base.vo.module.BusinessInfoForApplyDerateVo;
+import com.hongte.alms.base.vo.module.LiquidationVO;
+import com.hongte.alms.base.vo.module.LitigationVO;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.common.mapper.SuperMapper;
 import org.apache.ibatis.annotations.Param;
@@ -95,8 +97,30 @@ public interface BasicBusinessMapper extends SuperMapper<BasicBusiness> {
 	 */
 	 Integer   getBorrowLlimitZQ(@Param("crpId") String crpId);
 	 
+
+	/**
+	 * 获取线上线下逾期费用
+	 */
+	Map<String, Object> getOverDueMoney(@Param("crpId") String crpId, @Param("onLineFeeId") String onLineFeeId,@Param("underLineFeeId") String underLineFeeId);
+
+	/**
+	 * 清算一分配信息
+	 */
+	List<LiquidationVO> selectLiquidationOne(@Param("crpId") String crpId);
+	/**
+	 * 清算二分配信息
+	 */
+	List<LiquidationVO> selectLiquidationTwo(@Param("crpId") String crpId);
 	
-	 
+	/**
+	 * 房贷移交法务信息
+	 */
+	List<LitigationVO> selectLitigationHouseVO(@Param("crpId") String crpId);
+	
+	/**
+	 * 车贷移交法务信息
+	 */
+	List<LitigationVO> selectLitigationCarVO(@Param("crpId") String crpId);
 }
 
 
