@@ -349,8 +349,11 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		
 		String contractDateStr=getContractDate(businessId);
 		Date contractDate=null;
-		if(StringUtil.notEmpty(contractDateStr)) {
+		if(StringUtil.notEmpty(contractDateStr)&&!contractDateStr.equals("0001-01-01 00:00:00")) {
 			contractDate=DateUtil.getDate(contractDateStr, "yyyy-MM-dd");
+		}else {
+			//若合同期为空或者等于0001-01-01 00:00:00,则用第一次出款日期代替合同日期
+			contractDate = bizOutputRecord.get(0).getFactOutputDate() ;
 		}
 		
 		calPrincipal(settleDate, expenseSettleVO, basicBusiness, plan,bizOutputRecord);
