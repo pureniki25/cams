@@ -340,6 +340,8 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 				new EntityWrapper<BizOutputRecord>().eq("business_id", businessId).orderBy("fact_output_date", true));
 		ExpenseSettleVO expenseSettleVO = new ExpenseSettleVO() ;
 		if (!basicBusiness.getRepaymentTypeId().equals(new Integer(2))
+				&&!basicBusiness.getRepaymentTypeId().equals(new Integer(1))
+				&&!basicBusiness.getRepaymentTypeId().equals(new Integer(9))
 				&&!basicBusiness.getRepaymentTypeId().equals(new Integer(5))
 				&&!basicBusiness.getRepaymentTypeId().equals(new Integer(500))
 				&&!basicBusiness.getRepaymentTypeId().equals(new Integer(1000))
