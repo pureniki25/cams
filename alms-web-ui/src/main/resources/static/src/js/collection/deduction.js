@@ -51,7 +51,10 @@ var layer;
                     nowdate:"",               
                     operatorName:"",          
                     repaymentTypeName:"",
-                    currentStatus:""
+                    currentStatus:"",
+                    planAllAmount:"",//应还总额
+                    repayAllAmount:"",//已还总额
+                    restAmount:""
                    
 
                 },
@@ -270,13 +273,13 @@ var layer;
 
                     });
                     
-                } else {
-                    self.$Modal.error({content: '获取数据失败：' + result.data.msg});
+                } else {debugger
+                    vm.$Modal.error({content: '获取数据失败：' + result.data.msg});
                 }
             })
    
         .catch(function (error) {
-            vm.$Modal.error({content: '接口调用异常!'});
+        	vm.$Modal.error({content: '接口调用异常!'});
         });
 		
    

@@ -73,7 +73,9 @@ window.layinit(function(htConfig){
 //                repayStatus:'逾期',      //还款状态
                 repayStatus:'',      //还款状态
                 customerName:'',  //客户名称
-                peroidStatus:'' //期数状态,首期/本金期/末期
+                peroidStatus:'', //期数状态,首期/本金期/末期
+                crpId:'',
+                statusName:''
         
             },
             areaList:'',//area_array,   //区域列表
@@ -143,37 +145,7 @@ window.layinit(function(htConfig){
                 tt.resetFields();
                 vm.toLoading();
             },
-            showSetPhoneStaff (name) {//显示分配电催人员 界面
-
-                var alarmStr = canOpenLayer();
-                if(alarmStr!=null){
-                    vm.$Modal.error({content:alarmStr});
-                    return ;
-                }
-
-                layer.open({
-                    type: 2,
-                    title: '分配电催',
-                    area: ['95%', '95%'],
-                    content: '/collectionUI/setPhoneStaffUI?crpIds='+getSelectedcrpIds()
-                });
-            },
-            //显示移交催收人员 界面
-            showSetVisitStaff (name) {
-                var alarmStr = canOpenLayer();
-                if(alarmStr!=null){
-                    vm.$Modal.error({content:alarmStr});
-                    return ;
-                }
-
-                layer.open({
-                    type: 2,
-                    title: '移交催收',
-                    area: ['95%', '95%'],
-                    content: '/collectionUI/setVisitStaffUI?crpIds='+getSelectedcrpIds()
-                });
-
-            },
+         
 
             ////  ----   单行操作界面显示  结束 -----------------
             clickExport() {//导出Excel表格
@@ -341,54 +313,8 @@ window.layinit(function(htConfig){
                 customerName:vm.searchForm.customerName,  //客户名称
                 peroidStatus:vm.searchForm.peroidStatus,  //期数状态
             },
-            page: true,
-            done: function (res, curr, count) {
-                console.log('res',res);
-                //数据渲染完的回调。你可以借此做一些其它的操作
-                //如果是异步请求数据方式，res即为你接口返回的信息。
-                //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
-                vm.loading = false;
-
-                //alert($('#'+this.id).next().find(''));
-                var dom = $('#' + this.id).next();
-                //console.log('dom',dom);
-                $.each(dom.find('[lay-event="operate"]'), function(i, e) {
-                    $(e).optionsPopover({title: "操作",
-                        //disableHeader:false,
-                        id: 'operate',
-                        tableid: 'listTable',
-                        onBefore: function (e) {
-                            //console.log('e',e);
-                            var buttons = [];
-
-                    
-                         
-
-                            if (authValid('deduction')) {
-                                buttons.push(
-                                    {
-                                        "name": "执行代扣", click: function (e, currentItem) {
-                                        if (currentItem.statusName != '已还款') {
-                                            var url = getDeductionUrl(currentItem);
-                                            // var url = '/collectionUI/applyDerateUI?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+"&processStatus=-1"
-                                            showOneLineOprLayer(url, "执行代扣")
-                                        } else {
-                                            vm.$Modal.error({content: '已还款的不能执行代扣！'});
-                                        }
-                                    }
-                                    }
-                                )
-                            }
-                      
-                            return buttons;
-                        }
-                    });
-                })
-
-
-                // dom.find('[lay-event="operate"]').optionsPopover({
-
-            }
+            page: true
+          
         })
     })
 //        var getTransferLitigationUrl = function(obj) {
@@ -402,40 +328,16 @@ window.layinit(function(htConfig){
 //        }
 
         //监听工具条
-        table.on('tool(listTable)', function (obj) {
+        table.on('tool(listTable)', function (obj) {debugger
             // vm.selectedRowInfo = obj.data;
             if (obj.event === 'operate') {
-
-            }else  if(obj.event ==='info'){
-                if(obj.data.businessTypeId == 9 || obj.data.businessTypeId == 1){
-                   //车贷  车贷展期
-                    axios.get(basePath + 'api/getXindaiAfterView?businessId='+obj.data.businessId+"&businessAfterId="+obj.data.afterId)
-                        .then(function (res) {
-                            if (res.data.code == "1") {
-                                showOneLineOprLayer(res.data.data,"车贷详情");
+                            if (obj.data.statusName != '已还款') {
+                                var url = getDeductionUrl(obj.data.crpId);
+                                // var url = '/collectionUI/applyDerateUI?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+"&processStatus=-1"
+                                showOneLineOprLayer(url, "执行代扣")
                             } else {
-                                vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
+                                vm.$Modal.error({content: '已还款的不能执行代扣！'});
                             }
-                        })
-                        .catch(function (error) {
-                            vm.$Modal.error({content: '接口调用异常!'});
-                        });
-                }else if(obj.data.businessTypeId == 11 || obj.data.businessTypeId == 2){
-                    //房贷
-                    axios.get(basePath + 'api/getXindaiAfterView?businessId='+obj.data.businessId+"&businessAfterId="+obj.data.afterId)
-                        .then(function (res) {
-                            if (res.data.code == "1") {
-                                showOneLineOprLayer(res.data.data,"房贷详情");
-                            } else {
-                                vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
-                            }
-                        })
-                        .catch(function (error) {
-                            vm.$Modal.error({content: '接口调用异常!'});
-                        });
-                }
-
-                // vm.menu_modal = false;
             }
         });
 
@@ -671,19 +573,19 @@ var downloadExcel = function (href, title) {
 
 
 //获取执行代扣的URL路径
-function getDeductionUrl(currentItem){
+function getDeductionUrl(crpId){
     var url
     $.ajax({
         type : 'GET',
         async : false,
-        url : basePath +'DeductionController/selectDeductionInfoByPlayListId?planListId='+currentItem.crpId,
+        url : basePath +'DeductionController/selectDeductionInfoByPlayListId?planListId='+crpId,
         headers : {
             app : 'ALMS',
             Authorization : "Bearer " + getToken()
         }, 
         success : function(data) {
             var deduction = data.data;
-            url =  '/collectionUI/deductionUI?planListId='+currentItem.crpId
+            url =  '/collectionUI/deductionUI?planListId='+crpId
             },
         error : function() {
             layer.confirm('Navbar error:AJAX请求出错!', function(index) {
