@@ -478,18 +478,22 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 			BigDecimal interest = new BigDecimal(0);
 			for (ExpenseSettleRepaymentPlanListVO expenseSettleRepaymentPlanListVO : list) {
 				RepaymentBizPlanList planList = expenseSettleRepaymentPlanListVO.getRepaymentBizPlanList() ;
-				Date planDueDate = planList.getDueDate() ;
-				int diff = DateUtil.getDiffDays(planDueDate, settleDate);
-				if (diff>10) {
-					for (RepaymentBizPlanListDetail detail : expenseSettleRepaymentPlanListVO.getRepaymentBizPlanListDetails()) {
-						if (detail.getPlanItemType().equals(20)) {
-							interest = interest.add(detail.getPlanAmount()) ;
-							break ;
-						}
+				for (RepaymentBizPlanListDetail detail : expenseSettleRepaymentPlanListVO.getRepaymentBizPlanListDetails()) {
+					if (detail.getPlanItemType().equals(20)) {
+						interest = interest.add(detail.getPlanAmount()) ;
+						break ;
 					}
-				}else {
-					interest = interest.add(expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.001)).multiply(new BigDecimal(diff)));
 				}
+			}
+			
+			Date finalPeriodDueDate = plan.getFinalPeriod().getRepaymentBizPlanList().getDueDate() ;
+			int diff = DateUtil.getDiffDays(finalPeriodDueDate, settleDate);
+			
+			if (diff>10) {
+				
+			}else {
+				diff = Math.abs(diff);
+				interest = expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.001)).multiply(new BigDecimal(diff)) ;
 			}
 			expenseSettleVO.setInterest(interest);
 			break ;
@@ -702,7 +706,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		for (ExpenseSettleRepaymentPlanListVO planListVO : plan.getRepaymentPlanListVOs()) {
 			List<RepaymentBizPlanListDetail> details = planListVO.getRepaymentBizPlanListDetails();
 			for (RepaymentBizPlanListDetail repaymentBizPlanListDetail : details) {
-				if (repaymentBizPlanListDetail.equals(50)) {
+				if (repaymentBizPlanListDetail.getPlanItemType().equals(50)) {
 					count++ ;
 					continue;
 				}
