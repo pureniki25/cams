@@ -652,12 +652,12 @@ var showData=function(){debugger
             if(res.data.code=='1'){
                 vm.baseInfoForm.preLateFees = res.data.data.preLateFees
                 vm.baseInfoForm.lackFee = res.data.data.lackFee
-                
+               var houseRate=res.data.data.houseRate
             	//房贷业务：逾期天数×剩余本金×0.2%
                 if(res.data.data.isInContractDate=="true"){debugger
                 	vm.baseInfoForm.outsideInterest=0;
                 }else{
-                   	vm.baseInfoForm.outsideInterest=vm.baseInfoForm.overDays*vm.baseInfoForm.remianderPrincipal*0.002;
+                   	vm.baseInfoForm.outsideInterest=vm.baseInfoForm.overDays*vm.baseInfoForm.remianderPrincipal*Number(houseRate);
                 }
              
      

@@ -20,7 +20,7 @@ public enum SysParameterTypeEnums {
 	SMS_TYPE(11,"短信类型"),
 	CAR_STATUS(12,"车辆状态"),
 	CAR_DERATE_TYPE(13,"车贷减免费用类型"),
-	HOUSE_DERATE_TYPE(14,"房减免费用类型");
+	HOUSE_DERATE_TYPE(14,"房贷减免费用类型");
 //	borrowLimitUnit
 
 	private Integer key; // 数据保存的值
