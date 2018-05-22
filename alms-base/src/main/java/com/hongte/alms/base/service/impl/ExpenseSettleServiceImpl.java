@@ -444,10 +444,12 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		}
 		expenseSettleVO.setBorrowAmount(outPutMoney);
 		switch (basicBusiness.getRepaymentTypeId()) {
+		case 1:
 		case 2:
 			expenseSettleVO.setPrincipal(outPutMoney);
 			break;
-//			包含还本付息5年10年
+//			包含还本付息还本付息5年10年
+		case 9:
 		case 500:
 		case 1000:
 		case 5:
@@ -477,6 +479,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 	 */
 	private void calInterest(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan) {
 		switch (basicBusiness.getRepaymentTypeId()) {
+		case 1:
 		case 2:
 			List<ExpenseSettleRepaymentPlanListVO>  list = plan.findCurrentPeriods(settleDate);
 			BigDecimal interest = new BigDecimal(0);
@@ -499,6 +502,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 			}
 			expenseSettleVO.setInterest(interest);
 			break ;
+		case 9:
 		case 500:
 		case 1000:
 		case 5:
@@ -522,7 +526,9 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 	 */
 	private void calServicecharge(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan) {
 		switch (basicBusiness.getRepaymentTypeId()) {
+		case 1:
 		case 2:
+		case 9:
 		case 500:
 		case 1000:
 		case 5:
@@ -616,7 +622,9 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 	 */
 	private void calPlatformFee(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan) {
 		switch (basicBusiness.getRepaymentTypeId()) {
+		case 1:
 		case 2:
+		case 9:
 		case 500:
 		case 1000:
 		case 5:
@@ -641,8 +649,10 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 	private void calLateFee(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan) {
 		BigDecimal rate = null;
 		switch (basicBusiness.getRepaymentTypeId()) {
+		case 1:
 		case 2:
 			//先息后本
+		case 9:
 		case 500:
 		case 1000:
 		case 5:
@@ -746,6 +756,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 			BigDecimal penaltyFee = new BigDecimal(0);
 			if (after20180402) {
 				switch (basicBusiness.getRepaymentTypeId()) {
+				case 1:
 				case 2:
 					if (diffMonths<=12) {
 //						剩余借款本金×（2×月分公司服务费率）
@@ -764,6 +775,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 						
 					}
 					break;
+				case 9:
 				case 5:
 				case 500:
 					if (diffMonths<=6) {
@@ -825,6 +837,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 				
 			}else if (after20171230) {
 				switch (basicBusiness.getRepaymentTypeId()) {
+				case 1:
 				case 2:
 					if (diffMonths<=12) {
 //						剩余借款本金×（月分公司服务费率）
@@ -843,6 +856,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 						
 					}
 					break;
+				case 9:
 				case 5:
 				case 500:
 					if (diffMonths<=6) {
@@ -926,6 +940,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 			boolean before20171204 = outPutDate.before(DateUtil.getDate("2017-12-04", DateUtil.DEFAULT_FORMAT_DATE)) ;
 			boolean after20171205 = outPutDate.after(DateUtil.getDate("2017-12-05", DateUtil.DEFAULT_FORMAT_DATE)) ;
 			switch (basicBusiness.getRepaymentTypeId()) {
+			case 1:
 			case 2:
 				//先息后本
 			
@@ -936,6 +951,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 				}
 				
 				break;
+			case 9:
 			case 5:
 				//等额本息
 				if (before20170301) {
@@ -1015,7 +1031,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 			expenseSettleLackFeeVO.setInterest(new BigDecimal(0));
 			
 			for (RepaymentBizPlanListDetail d : e.getRepaymentBizPlanListDetails()) {
-				if (d.getPlanItemType().equals(new Integer(30)) && (d.getFactAmount() == null
+				if (d.getPlanItemType().equals(new Integer(30))&&!d.getAccountStatus().equals(0) && (d.getFactAmount() == null
 						|| d.getFactAmount().subtract(d.getPlanAmount()).compareTo(new BigDecimal(0)) < 0)) {
 
 					expenseSettleLackFeeVO.setServicecharge(d.getPlanAmount()
@@ -1048,7 +1064,6 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 					}
 					expenseSettleLackFeeVO.setInterest(instersets.get(Integer.valueOf(n)-1));
 					
-					expenseSettleLackFeeVO.setInterest(instersets.get(Integer.valueOf(n)-1));
 				} else if (d.getPlanItemType().equals(new Integer(60))) {
 					if (firstLateFee == null) {
 						if (e.getRepaymentBizPlanList() != null && e.getRepaymentBizPlanList().getCurrentStatus().equals("逾期")) {
