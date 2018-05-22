@@ -132,6 +132,12 @@ window.layinit(function(htConfig){
                             }
                             , page: {
                                 curr: 1 //重新从第 1 页开始
+                            },
+                            done: function (res, curr, count) {
+                                //数据渲染完的回调。你可以借此做一些其它的操作
+                                //如果是异步请求数据方式，res即为你接口返回的信息。
+                                //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
+                                vm.loading = false;
                             }
                         });
 
