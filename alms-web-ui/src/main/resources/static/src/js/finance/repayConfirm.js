@@ -7,6 +7,8 @@ window.layinit(function (htConfig) {
     var businessId = getQueryStr('businessId')
     var afterId = getQueryStr('afterId')
     var planListId = getQueryStr('planListId')
+    let cpath = htConfig.coreBasePath;
+    let fpath = htConfig.financeBasePath;
     var layer = layui.layer;
     let curIndex ;
     app = new Vue({
@@ -44,8 +46,31 @@ window.layinit(function (htConfig) {
             },
 
             table:{
-                currRepayment:currRepayment,
+                currPeriodRepayment:currPeriodRepayment,
                 projRepayment:projRepayment
+            },
+            thisTimeRepaymentInfo:{
+                derate:'',
+                item10:'',
+                item20:'',
+                item30:'',
+                item30:'',
+                item50:'',
+                offlineOverDue:'',
+                onlineOverDue:'',
+                overDays:'',
+                repayDate:'',
+                subtotal:'',
+                total:'',
+                derateDetails:[]
+            },
+            factRepaymentInfo:{
+                repayDate:'',
+                surplusFund:'',
+                onlineOverDuel:'',
+                offlineOverDue:'',
+                remark:'',
+                canUseSurplus:0
             }
         },
         methods: {
@@ -91,8 +116,54 @@ window.layinit(function (htConfig) {
                         curIndex = index ;
                     }
                 })
+            },
+            getThisTimeRepayment(){
+                axios.get(fpath+'finance/thisTimeRepayment?businessId=' + businessId + "&afterId=" + afterId)
+                .then(function(res){
+                    if(res.data.code=='1'){
+                        app.thisTimeRepaymentInfo =  Object.assign(app.thisTimeRepaymentInfo,res.data.data);
+                    }else{
+                        app.$Message.error({content:res.data.msg})
+                    }
+                    console.log(res)
+                })
+                .catch(function(err){
+                    app.$Message.error({content:'获取本次还款信息失败'})
+                })
+            },
+            getThisPeroidRepayment(){
+                axios.get(fpath+'finance/thisPeroidRepayment?businessId=' + businessId + "&afterId=" + afterId)
+                .then(function(res){
+                    if(res.data.code=='1'){
+                        app.table.currPeriodRepayment.data =  Object.assign(app.table.currPeriodRepayment.data,res.data.data);
+                    }else{
+                        app.$Message.error({content:res.data.msg})
+                    }
+                    console.log(res)
+                })
+                .catch(function(err){
+                    app.$Message.error({content:'获取本期还款信息失败'})
+                })
+            },
+            getSurplusFund(){
+                axios.get(fpath+'finance/getSurplusFund?businessId=' + businessId + "&afterId=" + afterId)
+                .then(function(res){
+                    if(res.data.code=='1'){
+                        app.factRepaymentInfo.canUseSurplus = res.data.data
+                    }else{
+                        app.$Message.error({content:res.data.msg})
+                    }
+                    console.log(res)
+                })
+                .catch(function(err){
+                    app.$Message.error({content:'获取结余信息失败'})
+                })
             }
         },
-        created: function () {}
+        created: function () {
+            this.getThisTimeRepayment()
+            this.getThisPeroidRepayment()
+            this.getSurplusFund()
+        }
     })
 })

@@ -381,9 +381,20 @@ public class FinanceController {
 	@ApiOperation(value="预览确认还款拆标情况")
 	public Result previewConfirmRepayment(@RequestBody ConfirmRepaymentReq req) {
 		Result result ;
-		logger.info("@previewConfirmRepayment@预览确认还款拆标情况--开始[{}{}]",req);
+		logger.info("@previewConfirmRepayment@预览确认还款拆标情况--开始[{}]",req);
 		result = financeService.previewConfirmRepayment(req);
 		logger.info("@previewConfirmRepayment@预览确认还款拆标情况--结束[{}]",result);
+		return result ;
+	}
+	
+	@GetMapping(value="/getSurplusFund")
+	@ApiOperation(value="获取结余情况")
+	public Result getSurplusFund(String businessId,String afterId) {
+		Result result ;
+		logger.info("@getSurplusFund@获取结余情况--开始[{}{}]",businessId,afterId);
+		BigDecimal surplusFund = financeService.getSurplusFund(businessId, afterId);
+		result = Result.success(surplusFund);
+		logger.info("@getSurplusFund@获取结余情况--结束[{}]",result);
 		return result ;
 	}
 	

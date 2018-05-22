@@ -1,4 +1,4 @@
-let currRepayment = {
+let currPeriodRepayment = {
     col: [{
         title: '展开',
         type: 'expand',
@@ -7,10 +7,7 @@ let currRepayment = {
                 props: {
                     stripe: true,
                     columns: expandCol,
-                    data: [{
-                        userName: '测试',
-                        total: 1000
-                    }]
+                    data: p.row.projs||[]
                 }
             })
         }

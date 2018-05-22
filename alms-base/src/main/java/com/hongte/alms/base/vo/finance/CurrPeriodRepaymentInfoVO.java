@@ -5,7 +5,9 @@ package com.hongte.alms.base.vo.finance;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
@@ -60,6 +62,7 @@ public class CurrPeriodRepaymentInfoVO {
 	 */
 	private BigDecimal total = new BigDecimal(0);
 	
+	private List<JSONObject> derateDetails  ;
 	public Date getRepayDate() {
 		return repayDate;
 	}
@@ -130,5 +133,17 @@ public class CurrPeriodRepaymentInfoVO {
 	}
 	public void setTotal(BigDecimal total) {
 		this.total = total;
+	}
+	/**
+	 * @return the derateDetails
+	 */
+	public List<JSONObject> getDerateDetails() {
+		return derateDetails;
+	}
+	/**
+	 * @param derateDetails the derateDetails to set
+	 */
+	public void setDerateDetails(List<JSONObject> derateDetails) {
+		this.derateDetails = derateDetails;
 	}
 }

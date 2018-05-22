@@ -455,8 +455,9 @@ public class FinanceServiceImpl implements FinanceService {
 					continue;
 				}
 			}
-			t.put("projs", proj);
+			projs.add(proj);
 		}
+		t.put("projs", projs);
 		return t;
 	}
 
@@ -532,11 +533,16 @@ public class FinanceServiceImpl implements FinanceService {
 		}
 
 		if (applyDerateProcessIds.size() > 0) {
+			List<JSONObject> derateDetails = new ArrayList<>() ;
 			List<ApplyDerateType> applyDerateTypes = applyDerateTypeMapper.selectList(
 					new EntityWrapper<ApplyDerateType>().in("apply_derate_process_id", applyDerateProcessIds));
 			BigDecimal t1 = new BigDecimal(0);
 			for (ApplyDerateType applyDerateType : applyDerateTypes) {
 				t1 = t1.add(applyDerateType.getDerateMoney());
+				JSONObject derateDetail = new JSONObject() ;
+				derateDetail.put("name", applyDerateType.getDerateTypeName());
+				derateDetail.put("amount", applyDerateType.getDerateMoney());
+				derateDetails.add(derateDetail);
 			}
 			c.setDerate(t1);
 		}
