@@ -186,14 +186,14 @@
 		FROM
 			tb_repayment_biz_plan_list pl
 		LEFT JOIN
-			tb_basic_business b ON b.business_id = pl.business_id
+			tb_basic_business b ON b.business_id = pl.orig_business_id
 		<where>
 			1 = 1
 			<if test="customer != null">
 				AND b.customer_name = #{customer}
 			</if>
 			<if test="businessId != null">
-				AND pl.business_id = #{businessId}
+				AND pl.orig_business_id = #{businessId}
 			</if>
 			<if test="accountantConfirmStatus != null">
 				AND pl.accountant_confirm_status =
