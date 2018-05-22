@@ -311,9 +311,9 @@ public class ApplyDerateController {
 				detail2.setFeeId(RepayPlanItemTypeFeeIdEnum.PRE_LATEFEES.getValue());//提前还款违约金
 				detail2.setPlanItemName(RepayPlanItemTypeFeeIdEnum.PRE_LATEFEES.getDesc());
 				detail2.setPlanItemType(RepayPlanItemTypeFeeIdEnum.PRE_LATEFEES.getTypeValue());
-				detail3.setFeeId(RepayPlanItemTypeFeeIdEnum.OVER_DUE_AMONT.getValue());//滞纳金
-				detail3.setPlanItemName(RepayPlanItemTypeFeeIdEnum.OVER_DUE_AMONT.getDesc());
-				detail3.setPlanItemType(RepayPlanItemTypeFeeIdEnum.OVER_DUE_AMONT.getTypeValue());
+				detail3.setFeeId(RepayPlanItemTypeFeeIdEnum.OVER_DUE_AMONT_UNDERLINE.getValue());//线下滞纳金
+				detail3.setPlanItemName(RepayPlanItemTypeFeeIdEnum.OVER_DUE_AMONT_UNDERLINE.getDesc());
+				detail3.setPlanItemType(RepayPlanItemTypeFeeIdEnum.OVER_DUE_AMONT_UNDERLINE.getTypeValue());
 				List<RepaymentBizPlanListDetail> derateTypeList=new ArrayList<RepaymentBizPlanListDetail>();
 				derateTypeList.add(detail1);
 				derateTypeList.add(detail2);
