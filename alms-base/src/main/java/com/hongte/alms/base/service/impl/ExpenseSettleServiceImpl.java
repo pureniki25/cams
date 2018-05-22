@@ -349,8 +349,11 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		
 		String contractDateStr=getContractDate(businessId);
 		Date contractDate=null;
-		if(StringUtil.notEmpty(contractDateStr)) {
+		if(StringUtil.notEmpty(contractDateStr)&&!contractDateStr.equals("0001-01-01 00:00:00")) {
 			contractDate=DateUtil.getDate(contractDateStr, "yyyy-MM-dd");
+		}else {
+			//若合同期为空或者等于0001-01-01 00:00:00,则用第一次出款日期代替合同日期
+			contractDate = bizOutputRecord.get(0).getFactOutputDate() ;
 		}
 		
 		calPrincipal(settleDate, expenseSettleVO, basicBusiness, plan,bizOutputRecord);
@@ -439,6 +442,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		for (BizOutputRecord bizOutputRecord : bizOutputRecords) {
 			outPutMoney = outPutMoney.add(bizOutputRecord.getFactOutputMoney());
 		}
+		expenseSettleVO.setBorrowAmount(outPutMoney);
 		switch (basicBusiness.getRepaymentTypeId()) {
 		case 2:
 			expenseSettleVO.setPrincipal(outPutMoney);
@@ -478,18 +482,20 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 			BigDecimal interest = new BigDecimal(0);
 			for (ExpenseSettleRepaymentPlanListVO expenseSettleRepaymentPlanListVO : list) {
 				RepaymentBizPlanList planList = expenseSettleRepaymentPlanListVO.getRepaymentBizPlanList() ;
-				Date planDueDate = planList.getDueDate() ;
-				int diff = DateUtil.getDiffDays(planDueDate, settleDate);
-				if (diff>10) {
-					for (RepaymentBizPlanListDetail detail : expenseSettleRepaymentPlanListVO.getRepaymentBizPlanListDetails()) {
-						if (detail.getPlanItemType().equals(20)) {
-							interest = interest.add(detail.getPlanAmount()) ;
-							break ;
-						}
+				for (RepaymentBizPlanListDetail detail : expenseSettleRepaymentPlanListVO.getRepaymentBizPlanListDetails()) {
+					if (detail.getPlanItemType().equals(20)) {
+						interest = interest.add(detail.getPlanAmount()) ;
+						break ;
 					}
-				}else {
-					interest = interest.add(expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.001)).multiply(new BigDecimal(diff)));
 				}
+			}
+			
+			Date finalPeriodDueDate = plan.getFinalPeriod().getRepaymentBizPlanList().getDueDate() ;
+			int diff = DateUtil.getDiffDays(finalPeriodDueDate, settleDate);
+			
+			if (diff>=1&&diff<=10) {
+//				若合同期外逾期少于等于10天,利息按日利率计算,贷后管理-20180518原型要求用千一计算
+				interest = expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.001)).multiply(new BigDecimal(diff)) ;
 			}
 			expenseSettleVO.setInterest(interest);
 			break ;
@@ -702,7 +708,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		for (ExpenseSettleRepaymentPlanListVO planListVO : plan.getRepaymentPlanListVOs()) {
 			List<RepaymentBizPlanListDetail> details = planListVO.getRepaymentBizPlanListDetails();
 			for (RepaymentBizPlanListDetail repaymentBizPlanListDetail : details) {
-				if (repaymentBizPlanListDetail.equals(50)) {
+				if (repaymentBizPlanListDetail.getPlanItemType().equals(50)) {
 					count++ ;
 					continue;
 				}
@@ -1048,14 +1054,14 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 					if (firstLateFee == null) {
 						if (e.getRepaymentBizPlanList() != null && e.getRepaymentBizPlanList().getCurrentStatus().equals("逾期")) {
 							int daysBeyoungDueDate = DateUtil.getDiffDays(e.getRepaymentBizPlanList().getDueDate(), settleDate);
-							BigDecimal lateFeeRate=BigDecimal.valueOf(0);
-							if(e.getRepaymentBizPlanList().getOverdueDays().multiply(expenseSettleVO.getPrincipal()).compareTo(BigDecimal.valueOf(0))==1) {
-								 lateFeeRate = d.getPlanAmount()
-										.divide(e.getRepaymentBizPlanList().getOverdueDays().multiply(expenseSettleVO.getPrincipal()),10,RoundingMode.HALF_UP);
-							}
-					
+//							利率不用自己算了,都用千一,20180522肖莹环说的
+//							BigDecimal lateFeeRate=BigDecimal.valueOf(0);
+//							if(e.getRepaymentBizPlanList().getOverdueDays().multiply(expenseSettleVO.getPrincipal()).compareTo(BigDecimal.valueOf(0))==1) {
+//								 lateFeeRate = d.getPlanAmount()
+//										.divide(e.getRepaymentBizPlanList().getOverdueDays().multiply(expenseSettleVO.getPrincipal()),10,RoundingMode.HALF_UP);
+//							}
 							if (daysBeyoungDueDate > 1) {
-								firstLateFee = expenseSettleVO.getPrincipal().multiply(lateFeeRate)
+								firstLateFee = expenseSettleVO.getBorrowAmount().multiply(new BigDecimal(0.001))
 										.multiply(new BigDecimal(daysBeyoungDueDate));
 								expenseSettleLackFeeVO.setLateFee(firstLateFee);
 							}

@@ -17,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
+import com.hongte.alms.base.enums.RepayPlanStatus;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.common.util.DateUtil;
 
 /**
@@ -36,7 +38,6 @@ public class ExpenseSettleRepaymentPlanVO  {
 	private List<ExpenseSettleRepaymentPlanListVO> surplusPeriodVOs ;
 	private ExpenseSettleRepaymentPlanListVO finalPeriod ;
 	private ExpenseSettleRepaymentPlanListVO currentPeriod;
-	
 	
 	class PlanListSortor implements Comparator<RepaymentBizPlanList> {
 
@@ -274,6 +275,25 @@ public class ExpenseSettleRepaymentPlanVO  {
 		}
 		allDetails = list ;
 		return list ;
+	}
+	
+	/**
+	 * 查找所有已还款的还款计划
+	 * @author 王继光
+	 * 2018年5月22日 下午1:57:10
+	 * @return
+	 */
+	public List<RepaymentBizPlanList> findRepaidPeriods(){
+		List<ExpenseSettleRepaymentPlanListVO> list = this.repaymentPlanListVOs ;
+		List<RepaymentBizPlanList> res = new ArrayList<>() ;
+		for (ExpenseSettleRepaymentPlanListVO expenseSettleRepaymentPlanListVO : list) {
+			RepaymentBizPlanList repaymentBizPlanList =  expenseSettleRepaymentPlanListVO.getRepaymentBizPlanList();
+			if (repaymentBizPlanList.getCurrentStatus().equals(RepayPlanStatus.REPAYED.getName())) {
+				res.add(repaymentBizPlanList);
+			}
+		}
+		return res;
+		
 	}
 	
 	/**
