@@ -1,6 +1,6 @@
 package com.hongte.alms.base.collection.vo;
 
-
+import java.math.BigDecimal;
 
 /**
  * 执行代扣信息vo
@@ -33,7 +33,24 @@ public class DeductionVo {
     private String repaymentTypeName;//还款方式
     private String  operatorName;//业务主办人
     private Integer platformId;
-    public Integer getPlatformId() {
+    
+    private BigDecimal underLineOverDueMoney;//线下逾期费
+    private BigDecimal onLineOverDueMoney;//线上逾期费
+    
+    
+    public BigDecimal getUnderLineOverDueMoney() {
+		return underLineOverDueMoney;
+	}
+	public void setUnderLineOverDueMoney(BigDecimal underLineOverDueMoney) {
+		this.underLineOverDueMoney = underLineOverDueMoney;
+	}
+	public BigDecimal getOnLineOverDueMoney() {
+		return onLineOverDueMoney;
+	}
+	public void setOnLineOverDueMoney(BigDecimal onLineOverDueMoney) {
+		this.onLineOverDueMoney = onLineOverDueMoney;
+	}
+	public Integer getPlatformId() {
  		return platformId;
  	}
  	public void setPlatformId(Integer platformId) {

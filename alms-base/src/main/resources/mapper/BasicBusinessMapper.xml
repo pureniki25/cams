@@ -528,7 +528,87 @@
 
 	</select>
 	
-
+			<!-- 获取线上逾期费和线下逾期费-->
+	<select id="getOverDueMoney" resultType="map">
+			select sum((case when pDetail.fee_id=#{onLineFeeId,jdbcType=VARCHAR} then pDetail.plan_amount else 0 end )) as onLineOverDueMoney, 
+		 sum((case when pDetail.fee_id=#{underLineFeeId,jdbcType=VARCHAR} then pDetail.plan_amount else 0 end )) as underLineOverDueMoney
+		from tb_repayment_biz_plan_list pList 
+		
+		left join tb_repayment_biz_plan_list_detail pDetail
+		
+		on pList.plan_list_id=pDetail.plan_list_id
+		
+		where pDetail.plan_list_id=#{crpId,jdbcType=VARCHAR}
+	</select>
 	
+	
+	<!-- 清算一分配信息 -->
+	<select id="selectLiquidationOne" resultType="com.hongte.alms.base.vo.module.LiquidationVO">
+	
+		SELECT (@rowNum:=@rowNum+1) as rowNo,c_log.collection_user AS liquidationOneId,user.user_name AS liquidationOneName,c_log.`describe` as `describe`, c_status.set_Way AS setWay,c_log.create_time AS setTime
+		FROM tb_collection_status c_status
+		LEFT JOIN tb_collection_log c_log ON c_status.crp_id=c_log.crp_id
+		LEFT JOIN tb_sys_user user ON user.user_id=c_log.collection_user,
+		(Select (@rowNum :=0) ) b
+		
+		where c_status.collection_status=1 and c_status.phone_staff is not null
+		
+		and c_status.crp_id=#{crpId,jdbcType=VARCHAR}
+
+		
+    </select>
+    
+    
+    	<!-- 清算二分配信息 -->
+	<select id="selectLiquidationTwo" resultType="com.hongte.alms.base.vo.module.LiquidationVO">
+	
+		
+		SELECT (@rowNum:=@rowNum+1) as rowNo,c_log.collection_user AS liquidationTwoId,user.user_name AS liquidationTwoName,c_log.`describe` as `describe`, c_status.set_Way AS setWay,c_log.create_time AS setTime
+		FROM tb_collection_status c_status
+		LEFT JOIN tb_collection_log c_log ON c_status.crp_id=c_log.crp_id
+		LEFT JOIN tb_sys_user user ON user.user_id=c_log.collection_user,
+		(Select (@rowNum :=0) ) b
+		
+		where c_status.collection_status=50 and c_status.visit_staff is not null
+		
+		and c_status.crp_id=#{crpId,jdbcType=VARCHAR}
+
+    </select>
+    
+    
+    
+    
+      	<!-- 移交法务房贷移交信息 -->
+	<select id="selectLitigationHouseVO" resultType="com.hongte.alms.base.vo.module.LitigationVO">
+	
+			select (@rowNum:=@rowNum+1) as rowNo,user.user_name as operator,house.create_time as operatTime,
+			
+			house.second_pecuniary_condition as pecuniaryCondition,
+			house.second_related_personnel as relatedPersonnel from tb_transfer_litigation_house house 
+				
+			left join tb_process process on house.process_id=process.process_id
+			left join tb_sys_user user on user.user_id=house.create_user,
+				(Select (@rowNum :=0) ) b
+			
+			
+			where house.crp_id=#{crpId,jdbcType=VARCHAR}  and process.process_result=1 and process.`status`=2
+
+    </select>
+    
+    
+          	<!-- 移交法务车贷移交信息 -->
+	<select id="selectLitigationCarVO" resultType="com.hongte.alms.base.vo.module.LitigationVO">
+	
+				
+			select (@rowNum:=@rowNum+1) as rowNo,  user.user_id=car.create_user
+			 as operator,car.create_time as operatTime,
+			
+			car.car_condition as carCondition,
+			car.alms_opinion as almsOpinion from tb_transfer_litigation_car car 
+			left join tb_process process on car.process_id=process.process_id
+			left join tb_sys_user user on user.user_id=car.create_user,
+					(Select (@rowNum :=0) ) b
+			where car.crp_id=#{crpId,jdbcType=VARCHAR} and process.process_result=1 and process.`status`=2
+    </select>
 
 </mapper>

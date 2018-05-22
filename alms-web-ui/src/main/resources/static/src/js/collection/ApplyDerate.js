@@ -1313,7 +1313,7 @@ var saveapplyInfo = function(pStatus){debugger
 	    			}
 	    			
 	    			if(vm.applyInfoForm.isSettleFlage=='是'){
-	    				if(vm.applyTypes[i].feeId=='79069922-e13a-4229-8656-2a1e19b44879'){
+	    				if(vm.applyTypes[i].feeId=='79069922-e13a-4229-8656-2a1e19b44881'){
 	    					   vm.$Modal.error({content: '结清时滞纳金不能减免' });
 	    				      return;
 	    				}
@@ -1326,7 +1326,7 @@ var saveapplyInfo = function(pStatus){debugger
 	    					   return;
 	    				}
 	    			}else{
-	    				if(vm.applyTypes[i].feeId=='79069922-e13a-4229-8656-2a1e19b44879'&&(vm.baseInfoForm.needPayPenalty==0||vm.applyTypes[i].derateMoney>vm.baseInfoForm.needPayPenalty)){
+	    				if(vm.applyTypes[i].feeId=='79069922-e13a-4229-8656-2a1e19b44881'&&(vm.baseInfoForm.needPayPenalty==0||vm.applyTypes[i].derateMoney>vm.baseInfoForm.needPayPenalty)){
 	    					   vm.$Modal.error({content: '减免金额大于滞纳金,或者滞纳金为0都不能减免' });
 	    				      return;
 	    				}

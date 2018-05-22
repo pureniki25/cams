@@ -43,7 +43,11 @@ var layer;
                     phoneNumber:"",           
                     platformName:"",          
                     planServiceCharge:"",     
-                    planOverDueMoney:"",      
+                    planOverDueMoney:"", 
+                    onLineOverDueMoney:"",//线上逾期费
+                    underLineOverDueMoney:"",//线下逾期费
+                    underLineFactOverDueMoney:"",//线下逾期费实际扣除
+                    factPayAllMoney:"",//本次代扣全部金额
                     nowdate:"",               
                     operatorName:"",          
                     repaymentTypeName:"",
@@ -100,7 +104,7 @@ var layer;
 		
 		
         var self = this;
-        var reqStr =openPath+ "WithHoldingController/withholding?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId+"&total="+vm.ajax_data.total+"&planOverDueMoney="+vm.ajax_data.planOverDueMoney+"&platformId="+vm.platformId+"&type=1"+"&nowdate="+vm.ajax_data.nowdate
+        var reqStr =openPath+ "WithHoldingController/withholding?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId+"&total="+vm.ajax_data.total+"&planOverDueMoney="+vm.ajax_data.underLineFactOverDueMoney+"&platformId="+vm.platformId+"&type=1"+"&nowdate="+vm.ajax_data.nowdate
         axios.get(reqStr)
             .then(function (result) {
                 if (result.data.code == "1") {
@@ -125,11 +129,14 @@ var layer;
    
 	}
 	
-	var withHoldingRecordWithoutOverMoeny=function(){ 
+	var withHoldingRecordWithoutOverMoeny=function(){ debugger
 		
-		
+		var isRepayAll=1;//全部代扣
+	if(vm.ajax_data.factPayAllMoney<vm.ajax_data.total){
+		isRepayAll=0;//部分代扣
+	}
         var self = this;
-        var reqStr =openPath+ "WithHoldingController/withholding?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId+"&total="+vm.ajax_data.total+"&planOverDueMoney="+vm.ajax_data.planOverDueMoney+"&platformId="+vm.platformId+"&type=0"+"&nowdate="+vm.ajax_data.nowdate
+        var reqStr =openPath+ "WithHoldingController/withholding?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId+"&total="+vm.ajax_data.factPayAllMoney+"&planOverDueMoney="+vm.ajax_data.underLineFactOverDueMoney+"&platformId="+vm.platformId+"&type=0"+"&nowdate="+vm.ajax_data.nowdate+"&isRepayAll="+isRepayAll
         axios.get(reqStr)
             .then(function (result) {
                 if (result.data.code == "1") {
@@ -187,8 +194,14 @@ var layer;
                           vm.$Modal.error({content: '没有找到数据'});
                           return;
                       }
-                    vm.ajax_data=result.data.data;
+                    vm.ajax_data=result.data.data; 
                     vm.platformId=result.data.data.platformId;
+                    if(result.data.data.underLineOverDueMoney>0){
+                     	vm.ajax_data.planOverDueMoney=result.data.data.underLineOverDueMoney;
+                     	vm.ajax_data.onLineOverDueMoney=result.data.data.onLineOverDueMoney;
+               
+                    }
+                 	vm.ajax_data.underLineFactOverDueMoney=vm.ajax_data.planOverDueMoney;
 //                    searchRepayLog();
                     
                     //使用layerUI的表格组件
@@ -271,7 +284,13 @@ var layer;
 	
 	
 	
+	var getTotalShouldPay = function () {debugger
+		vm.ajax_data.total=0;
 	
+	vm.ajax_data.total=vm.ajax_data.planPrincipal+vm.ajax_data.planAccrual+vm.ajax_data.planServiceCharge+vm.ajax_data.platformCharge+vm.ajax_data.planGuaranteeCharge+Number(vm.ajax_data.onLineOverDueMoney)+Number(vm.ajax_data.underLineFactOverDueMoney)+vm.ajax_data.otherFee;
+	vm.ajax_data.factPayAllMoney=vm.ajax_data.total;
+	}
+
 	
 	
 	

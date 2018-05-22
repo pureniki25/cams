@@ -228,5 +228,135 @@
         order BY  pList.due_date 
 
     </select>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+       <select id="selectRepayManage" resultType="com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo"
+            parameterType="com.hongte.alms.base.collection.vo.AfterLoanStandingBookReq">
+
+        select
+        business.business_id AS businessId,
+        pList.period as  periods,
+        pList.after_id as  afterId,
+        business.district_id as districtId,
+        business.district_name AS  districtAreaName,
+        business.company_id as companyId,
+        business.company_name as companyName,
+        business.operator_id AS operatorId,
+        business.operator_name AS operatorName,
+        business.customer_id AS customerId,
+        business.customer_name AS customerName,
+        business.business_type AS businessTypeId,
+        b_type.business_type_name AS businessTypeName,
+        business.borrow_money AS borrowMoney,
+        pList.total_borrow_amount as totalBorrowAmount,
+        pList.overdue_days as delayDays,
+        pList.due_date as dueDate,
+        pList.fact_repay_date AS repaymentDate,
+
+		business.repayment_type_id as repaymentTypeId 
+		
+        from tb_repayment_biz_plan_list  as pList
+        LEFT JOIN tb_repayment_biz_plan as plan ON pList.plan_id = plan.plan_id
+        LEFT JOIN tb_basic_business as business ON plan.original_business_id = business.business_id
+        LEFT JOIN tb_basic_company as company ON business.company_id = company.area_id
+        LEFT JOIN tb_basic_business_type as  b_type ON business.business_type = b_type.business_type_id
+--          JOIN tb_sys_user_permission as permission  ON  permission.business_id = business.business_id
+--         LEFT JOIN tb_sys_user as phoneUser ON  col_status.phone_staff = phoneUser.user_id
+--         LEFT JOIN tb_sys_user as visitUser ON  col_status.visit_staff = visitUser.user_id
+--         LEFT JOIN tb_sys_parameter as sys_param  ON  col_status.collection_status = sys_param.param_value
+
+--         LEFT JOIN tb_sys_parameter  as sys_param ON  col_status.collection_status = sys_param.param_value
+
+        <where>
+            1=1
+            and IFNULL(pList.repay_flag,0) != 6
+            and plan.plan_status=0 or plan.plan_status=50
+            <!--   改用列表 IN查询 这两个先屏蔽
+            <if test="areaId !=null and areaId !=''">
+                and business.company_id IN (SELECT area_id FROM tb_basic_company WHERE district_id = #{areaId})
+            </if>
+            <if test="companyId !=null and companyId !=''">
+                and business.company_id = #{companyId}
+            </if>-->
+            <!--          /*应还日期 开始*/ -->
+            
+               <if test="keyName !=null and keyName !=''">
+                and ((business.operator_name LIKE '%${keyName}%') or (business.business_id  LIKE '%${keyName}%') or (business.customer_name  LIKE '%${keyName}%') )
+            </if>
+            <if test="showRepayDateBegin !=null ">
+                <![CDATA[ and pList.due_date >= #{showRepayDateBegin,jdbcType=TIMESTAMP}]]>
+            </if>
+            <!--            /*应还日期 结束*/ -->
+            <if test="showRepayDateEnd !=null ">
+                <![CDATA[ and pList.due_date <= #{showRepayDateEnd,jdbcType=TIMESTAMP}]]>
+            </if>
+            <!--          /*实还日期 开始*/  -->
+            <if test="realRepayDateBegin !=null ">
+                <![CDATA[ and pList.fact_repay_date >= #{realRepayDateBegin,jdbcType=TIMESTAMP}]]>
+
+            </if>
+            <!--            /*实还日期 结束*/ -->
+            <if test="realRepayDateEnd !=null ">
+                <![CDATA[ and pList.fact_repay_date <= #{realRepayDateEnd,jdbcType=TIMESTAMP}]]>
+            </if>
+            <!--             /*逾期天数 开始*/-->
+            <if test="delayDaysBegin !=null ">
+                <![CDATA[ and pList.overdue_days >= #{delayDaysBegin}]]>
+            </if>
+            <!--       /*逾期天数 结束*/ -->
+            <if test="delayDaysEnd !=null ">
+                <![CDATA[ and pList.overdue_days < #{delayDaysEnd}]]>
+            </if>
+            <!--          /*//业务获取*/ -->
+            <if test="operatorName !=null and operatorName !='' ">
+                and business.operator_name LIKE '%${operatorName}%'
+            </if>
+            <!--         /*//业务编号*/ -->
+            <if test="businessId !=null and businessId !='' ">
+                and business.business_id  LIKE '%${businessId}%'
+            </if>
+            <!--   /*//业务类型*/ -->
+            <if test="businessType !=null ">
+                and business.business_type = #{businessType}
+            </if>
+   
+        
+            <!--   /*//用户ID列表*/ --> 
+            <if test="customerIds !=null ">
+                and business.customer_id IN
+                <foreach collection="customerIds" item="customerId" index="index"
+                         open="(" close=")" separator=",">
+                    #{customerId}
+                </foreach>
+            </if>
+            <!--   /*//分公司列表*/ -->
+            <if test="commIds !=null ">
+                and business.company_id IN
+                <foreach collection="commIds" item="commId" index="index"
+                         open="(" close=")" separator=",">
+                    #{commId}
+                </foreach>
+            </if>
+            <!--   /*//客户名称*/ -->
+            <if test="customerName !=null  and customerName !=''  ">
+                and business.customer_name  LIKE '%${customerName}%'
+            </if>
+     
+	
+        </where>
+         
+        order BY  pList.due_date desc
+
+    </select>
 
 </mapper>

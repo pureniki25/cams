@@ -52,6 +52,8 @@ import com.hongte.alms.base.vo.billing.CarLoanBilVO;
 import com.hongte.alms.base.vo.module.BusinessInfoForApplyDerateVo;
 import com.hongte.alms.base.vo.module.ExpenseSettleRepaymentPlanVO;
 import com.hongte.alms.base.vo.module.ExpenseSettleVO;
+import com.hongte.alms.base.vo.module.LiquidationVO;
+import com.hongte.alms.base.vo.module.LitigationVO;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
@@ -785,5 +787,30 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 		public static void main(String[] args) {
 			int i=16%15;
 			System.out.println(i);
+		}
+
+		@Override
+		public Map<String, Object> getOverDueMoney(String pListId, String onLineFeeId, String underLineFeeId) {
+			return basicBusinessMapper.getOverDueMoney(pListId, onLineFeeId, underLineFeeId);
+		}
+
+		@Override
+		public List<LiquidationVO> selectLiquidationOne(String crpId) {
+			return basicBusinessMapper.selectLiquidationOne(crpId);
+		}
+
+		@Override
+		public List<LiquidationVO> selectLiquidationTwo(String crpId) {
+			return basicBusinessMapper.selectLiquidationTwo(crpId);
+		}
+
+		@Override
+		public List<LitigationVO> selectLitigationHouseVO(String crpId) {
+			return basicBusinessMapper.selectLitigationHouseVO(crpId);
+		}
+
+		@Override
+		public List<LitigationVO> selectLitigationCarVO(String crpId) {
+			return basicBusinessMapper.selectLitigationCarVO(crpId);
 		}
 }
