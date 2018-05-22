@@ -356,7 +356,7 @@ public class ExpenseSettleRepaymentPlanVO  {
 	}
 	
 	/**
-	 * 求剩余的期数(先用findCurrentPeriods找到当前期后再使用此方法)
+	 * 求剩余的还款计划(先用findCurrentPeriods找到当前期后再使用此方法)
 	 * @author 王继光
 	 * 2018年5月15日 上午10:48:53
 	 * @return
@@ -384,5 +384,21 @@ public class ExpenseSettleRepaymentPlanVO  {
 		
 	}
 
+	/**
+	 * 求剩余的期数
+	 * @author 王继光
+	 * 2018年5月22日 下午5:25:54
+	 * @param settleDate
+	 * @return
+	 */
+	public Integer getSurplusPeriodSize(Date settleDate) {
+		if (currentPeriodVOs==null||currentPeriodVOs.size()==0) {
+			this.findCurrentPeriods(settleDate);
+		}
+		Integer periodCount = this.repaymentBizPlan.getBorrowLimit() ;
+		Integer currentPeriod = currentPeriodVOs.get(currentPeriodVOs.size()-1).getRepaymentBizPlanList().getPeriod() ;
+		return periodCount-currentPeriod;
+		
+	}
 	
 }

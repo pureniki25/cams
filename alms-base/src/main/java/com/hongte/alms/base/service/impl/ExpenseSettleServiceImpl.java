@@ -735,12 +735,12 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		BigDecimal penalty = new BigDecimal(0);
 		RepaymentBizPlanList lastCurrentPeriod = plan.findCurrentPeriods(settleDate).get(plan.findCurrentPeriods(settleDate).size()-1).getRepaymentBizPlanList() ;
 		boolean isMonthPlatformFee = isMonthPlatformFee(plan);
+		int surplusPeriodSize = plan.getSurplusPeriodSize(settleDate).intValue() ;
 		if (isMonthPlatformFee) {
 			boolean after20180402 = contactDate.after(DateUtil.getDate("2018-04-02",DateUtil.DEFAULT_FORMAT_DATE)) ;
 			boolean after20171230 = contactDate.after(DateUtil.getDate("2017-12-30",DateUtil.DEFAULT_FORMAT_DATE)) ;
 			Date firstRepayDate = plan.getRepaymentPlanListVOs().get(0).getRepaymentBizPlanList().getDueDate();
 			int diffMonths = DateUtil.getDiffMonths(firstRepayDate, settleDate);
-			int surplusPeriodSize = plan.getSurplusPeriod().size() ;
 			BigDecimal serviceFee = new BigDecimal(0);
 			BigDecimal platFormFee = new BigDecimal(0);
 			BigDecimal penaltyFee = new BigDecimal(0);
@@ -932,8 +932,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 				if (before20170605) {
 					penalty = new BigDecimal(0);
 				}else {
-					BigDecimal surplus = new BigDecimal(plan.getSurplusPeriod().size()) ;
-					penalty = expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.005).multiply(surplus));
+					penalty = expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.005).multiply(new BigDecimal(surplusPeriodSize)));
 				}
 				
 				break;
