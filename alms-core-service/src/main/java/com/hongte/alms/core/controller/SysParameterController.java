@@ -226,7 +226,6 @@ public class SysParameterController {
 			s.setCreateUser(userId);
 			s.setStatus(sysParameter.getStatus());
 			s.setParentParamId(sysParameter.getParamId()!=null?sysParameter.getParamId():null);
-			s.setParamName(sysParameter.getParamName()!=null?sysParameter.getParamName():null);
 			sysParameters.add(s);
 		}
 
