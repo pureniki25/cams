@@ -618,17 +618,17 @@
 	<select id="queryCarLoanFees" resultType="map">
 		SELECT 
 		  a.`due_date` dueDate,
-		  -- 应还日期
+		  -- 应还日期 
 		  a.`period` curPeriod,
-		  -- 当前应还期数
+		  -- 当前应还期数 
 		  c.plan_accrual planAccrual,
-		  -- 当期应还利息
+		  -- 当期应还利息 
 		  c.plan_service_charge planServiceCharge,
-		  -- 本期应还服务费
+		  -- 本期应还服务费 
 		  c.plan_guarantee_charge planGuaranteeCharge,
-		  -- 本期应还担保公司费用
+		  -- 本期应还担保公司费用 
 		  c.plan_platform_charge planPlatformCharge,
-		  -- 本期应还平台费
+		  -- 本期应还平台费 
 		  (SELECT 
 		    CASE
 		      WHEN SUM(`plan_amount`) > 0 
@@ -644,42 +644,42 @@
 		      tb_repayment_biz_plan_list_detail t3 
 		    WHERE t1.plan_id = t2.plan_id 
 		      AND t1.plan_list_id = t3.plan_list_id 
+		      AND t2.original_business_id = #{businessId,jdbcType=VARCHAR}
+		      AND IFNULL(t3.plan_item_type, 0) = 30 
+		      AND IFNULL(t1.repay_flag, 0) != 6 
+		      AND IFNULL(t1.`period`, 0) != 0) tab) isPreCharge,
+		  -- 是否服务费一次性收取的业务 
+		  (SELECT 
+		    CASE
+		      WHEN plan_amount > 0 
+		      THEN 0 
+		      ELSE 1 
+		    END 
+		  FROM
+		    (SELECT 
+		      t3.`plan_amount` 
+		    FROM
+		      tb_repayment_biz_plan_list t1,
+		      tb_repayment_biz_plan t2,
+		      tb_repayment_biz_plan_list_detail t3 
+		    WHERE t1.plan_id = t2.plan_id 
+		      AND t1.plan_list_id = t3.plan_list_id 
 		      AND t2.original_business_id = #{businessId,jdbcType=VARCHAR} 
 		      AND IFNULL(t3.plan_item_type, 0) = 30 
 		      AND IFNULL(t1.repay_flag, 0) != 6 
-		      AND IFNULL(t1.`period`, 0) != 0) tab) isPreCharge, -- 是否服务费一次性收取的业务
-		  (SELECT 
-			  CASE
-			    WHEN plan_amount > 0 
-			    THEN 0 
-			    ELSE 1 
-			  END  
-			FROM
-			  (SELECT 
-			    t3.`plan_amount` 
-			  FROM
-			    tb_repayment_biz_plan_list t1,
-			    tb_repayment_biz_plan t2,
-			    tb_repayment_biz_plan_list_detail t3 
-			  WHERE t1.plan_id = t2.plan_id 
-			    AND t1.plan_list_id = t3.plan_list_id 
-			    AND t2.original_business_id = #{businessId,jdbcType=VARCHAR} 
-			    AND IFNULL(t3.plan_item_type, 0) = 30 
-			    AND IFNULL(t1.repay_flag, 0) != 6
-			    GROUP BY t1.plan_list_id
-			    ORDER BY t1.due_date DESC
-			    LIMIT 1) tab) isPreServiceFees,	-- 是否服务费前置收取
+		    GROUP BY t1.plan_list_id 
+		    ORDER BY t1.due_date DESC 
+		    LIMIT 1) tab) isPreServiceFees,
+		  -- 是否服务费前置收取 
 		  (SELECT 
 		    COUNT(1) 
 		  FROM
 		    `tb_repayment_biz_plan_list` 
-		  WHERE business_id = b.original_business_id) totalPeriod
-		  -- 总期数
+		  WHERE orig_business_id = a.orig_business_id) totalPeriod -- 总期数 
 		FROM
 		  tb_repayment_biz_plan_list a,
-		  tb_repayment_biz_plan b,
 		  (SELECT 
-		    t1.plan_list_id,
+		    t2.orig_business_id,
 		    SUM(
 		      CASE
 		        WHEN t1.plan_item_type = 40 
@@ -709,11 +709,13 @@
 		      END
 		    ) AS `plan_service_charge` 
 		  FROM
-		    tb_repayment_biz_plan_list_detail t1 
-		  GROUP BY t1.plan_list_id) c
-		WHERE a.plan_id = b.plan_id 
-		  AND a.plan_list_id = c.plan_list_id
-		  AND b.original_business_id = #{businessId,jdbcType=VARCHAR}
+		    tb_repayment_biz_plan_list_detail t1,
+		    tb_repayment_biz_plan_list t2
+		    WHERE t1.`plan_list_id` = t2.`plan_list_id`
+		    AND t2.`orig_business_id` = #{businessId,jdbcType=VARCHAR}
+		  GROUP BY t1.plan_list_id) c 
+		WHERE a.orig_business_id = c.orig_business_id 
+		  AND a.orig_business_id = #{businessId,jdbcType=VARCHAR}
 		  AND a.`due_date` <![CDATA[ >= ]]> #{billDate,jdbcType=DATE}
 		  AND IFNULL(a.repay_flag, 0) != 6 
 		ORDER BY a.due_date 
