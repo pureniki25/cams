@@ -123,9 +123,20 @@ public class DeductionController {
             	deductionVo.setUnderLineOverDueMoney(underLineOverDueMoney);
             	
             	
-        		List<WithholdingRecordLog> loglist=withholdingRecordLogService.selectWithholdingRecordLog(deductionVo.getOriginalBusinessId(), deductionVo.getAfterId());
+        		List<WithholdingRecordLog> loglist=withholdingRecordLogService.selectList(new EntityWrapper<WithholdingRecordLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).ne("repay_status", 0));
+        		List<WithholdingRecordLog> repayingList=withholdingRecordLogService.selectList(new EntityWrapper<WithholdingRecordLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).eq("repay_status", 2));
+        		BigDecimal repayAmount=BigDecimal.valueOf(0);
+        		BigDecimal repayingAmount=BigDecimal.valueOf(0);
+        		for(WithholdingRecordLog log:loglist) {
+        			repayAmount=repayAmount.add(log.getCurrentAmount());
+        		}
+        		for(WithholdingRecordLog log:repayingList) {
+        			repayingAmount=repayingAmount.add(log.getCurrentAmount());
+        		}
         		if(loglist!=null&&loglist.size()>0) {
-        			deductionVo.setRepayingAmount(loglist.get(0).getCurrentAmount());
+        			deductionVo.setRepayAllAmount(repayAmount);
+        			deductionVo.setRepayingAmount(repayingAmount);
+        			deductionVo.setRestAmount(BigDecimal.valueOf(deductionVo.getTotal()).subtract(repayAmount));
         			deductionVo.setTotal(deductionVo.getTotal()-deductionVo.getRepayingAmount().doubleValue());
         		}
                 return Result.success(deductionVo);
