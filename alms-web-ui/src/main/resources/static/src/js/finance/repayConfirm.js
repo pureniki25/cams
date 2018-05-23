@@ -74,6 +74,7 @@ window.layinit(function (htConfig) {
                 canUseSurplus:0,
                 moneyPoolAccount:0,
                 repayAccount:0,
+                mprids:[]
             },
         },
         watch:{
@@ -81,7 +82,8 @@ window.layinit(function (htConfig) {
                 let moneyPoolAccount = 0 
                 if(n&&n.length>0){
                     n.forEach(element => {
-                        moneyPoolAccount += element.accountMoney    
+                        moneyPoolAccount += element.accountMoney
+                        app.factRepaymentInfo.mprids.push(element.moneyPoolId);
                     });
                     let o = n[n.length-1]
                     app.factRepaymentInfo.repayDate=o.tradeDate
@@ -95,7 +97,7 @@ window.layinit(function (htConfig) {
                 }
             },
             'factRepaymentInfo.repayAccount':function(n){
-                
+                app.previewConfirmRepayment()
             }
         },
         methods: {
@@ -178,7 +180,30 @@ window.layinit(function (htConfig) {
                 .catch(function(err){
                     app.$Message.error({content:'获取结余信息失败'})
                 })
-            }
+            },
+            previewConfirmRepayment(){
+                // private String businessId ;
+                // private String afterId ;
+                // private BigDecimal offlineOverDue ;
+                // private BigDecimal onlineOverDue ;
+                // private BigDecimal surplusFund ;
+                // private List<String> mprIds ;
+                //TODO 线下代扣ids
+                //TODO 银行代扣ids
+                // private String remark ;
+                let param ;
+                param.businessId=businessId;
+                param.afterId=afterId;
+                param = Object.assign(app.factRepaymentInfo,param);
+                
+                axios.post(fpath+'finance/previewConfirmRepayment',{param:param})
+                .then(function(res){
+                    console.log(res);
+                })
+                .catch(function(err){
+
+                })
+            },
         },
         created: function () {
             this.getThisTimeRepayment()
