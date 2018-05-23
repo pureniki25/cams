@@ -455,8 +455,9 @@ public class FinanceServiceImpl implements FinanceService {
 					continue;
 				}
 			}
-			t.put("projs", proj);
+			projs.add(proj);
 		}
+		t.put("projs", projs);
 		return t;
 	}
 
@@ -482,6 +483,9 @@ public class FinanceServiceImpl implements FinanceService {
 		rpl.setAfterId(afterId);
 		rpl = repaymentBizPlanListMapper.selectOne(rpl);
 		c.setRepayDate(rpl.getDueDate());
+		if (rpl.getOverdueDays()!=null) {
+			c.setOverDays(rpl.getOverdueDays().intValue());
+		}
 		List<RepaymentBizPlanListDetail> details = repaymentBizPlanListDetailMapper
 				.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", rpl.getPlanListId()));
 		for (RepaymentBizPlanListDetail rd : details) {
@@ -529,11 +533,16 @@ public class FinanceServiceImpl implements FinanceService {
 		}
 
 		if (applyDerateProcessIds.size() > 0) {
+			List<JSONObject> derateDetails = new ArrayList<>() ;
 			List<ApplyDerateType> applyDerateTypes = applyDerateTypeMapper.selectList(
 					new EntityWrapper<ApplyDerateType>().in("apply_derate_process_id", applyDerateProcessIds));
 			BigDecimal t1 = new BigDecimal(0);
 			for (ApplyDerateType applyDerateType : applyDerateTypes) {
 				t1 = t1.add(applyDerateType.getDerateMoney());
+				JSONObject derateDetail = new JSONObject() ;
+				derateDetail.put("name", applyDerateType.getDerateTypeName());
+				derateDetail.put("amount", applyDerateType.getDerateMoney());
+				derateDetails.add(derateDetail);
 			}
 			c.setDerate(t1);
 		}
@@ -739,22 +748,24 @@ public class FinanceServiceImpl implements FinanceService {
 		if (!isSurplusFundEnough) {
 			return Result.error("500", "结余金额不足");
 		}
-		final List<TuandaiProjectInfo> tuandaiProjectInfos = tuandaiProjectInfoMapper.selectList(new EntityWrapper<TuandaiProjectInfo>().eq("business_id", req.getBusinessId()));
 		RepaymentBizPlanDto repaymentBizPlanDto = initRepaymentBizPlanDto(req);
-		
 		List<MoneyPoolRepayment> list = moneyPoolRepaymentMapper.selectBatchIds(req.getMprIds());
 		BigDecimal repayMoney = new BigDecimal(0);
+		ConfirmRepaymentPreviewDto confirmRepaymentPreviewDto= new ConfirmRepaymentPreviewDto();
 		for (MoneyPoolRepayment moneyPoolRepayment : list) {
 			repayMoney = moneyPoolRepayment.getAccountMoney().add(repayMoney);
+			confirmRepaymentPreviewDto = fillItem(
+					repayMoney, 
+					req.getOnlineOverDue(), 
+					req.getOfflineOverDue(), 
+					repaymentBizPlanDto, 
+					moneyPoolRepayment.getTradeDate(), 
+					10, 
+					moneyPoolRepayment.getId().toString(), 
+					true);
 		}
-		
-		ConfirmRepaymentPreviewDto confirmRepaymentPreviewDto= new ConfirmRepaymentPreviewDto() ;
-		confirmRepaymentPreviewDto.fillItem(req,repayMoney, repaymentBizPlanDto,true);
-//				new RepaymentBizPlanDtoUtil().fillItem(req,repayMoney, repaymentBizPlanDto,true);
-		
-		return Result.success(confirmRepaymentPreviewDto);
-		
-		
+		logger.info(JSON.toJSONString(confirmRepaymentPreviewDto.getList()));
+		return Result.success(confirmRepaymentPreviewDto.getList());
 	}
 
 	/**
@@ -820,7 +831,7 @@ public class FinanceServiceImpl implements FinanceService {
 					false);
 			repaymentResource.insert();
 		}
-		
+		logger.info(JSON.toJSONString(confirmRepaymentPreviewDto.getList()));
 		return Result.success(confirmRepaymentPreviewDto);
 	}
 

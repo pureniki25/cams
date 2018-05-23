@@ -82,7 +82,30 @@ layui.define(['element', 'table', 'nprogress', 'tab', 'navbar', 'onelevel', 'lay
                     }
                 }).render(function (data) {
                     //阻塞
-                    tab.tabAdd(data);
+                    //tab.tabAdd(data);
+
+                    if(Utils.getQueryString(data.url,'viewtype')=='iframe'){
+                        var url='';
+                        if(Utils.getQueryString(data.url,'gateway')=='1'){
+                            url=layui.ht_config.gatewayUrl+data.url.substr(1);
+                        }else{
+                            url=data.url;
+                        }
+                        $('#container').html('<iframe id="mainFrame" name="mainFrame"  src="'
+                            +url+'"frameborder="0" style="padding: 0px; width: 100%; height: 100%;"></iframe>');
+                        return
+                    }
+
+                    $.ajax({
+                        type: 'get',
+                        dataType: 'html',
+                        url: '.'+data.url,
+                        success: function(html) {
+
+                            location.hash =data.url// 'tab-content=' + othis.attr('lid');
+                            $('#container').html(html);
+                        }
+                    });
                 });
             }
             if (_config.type === 'iframe') {
@@ -114,6 +137,18 @@ layui.define(['element', 'table', 'nprogress', 'tab', 'navbar', 'onelevel', 'lay
                         url: config.loadMenuUrl
                     }
                 }).render(function (data) {
+
+                    if(Utils.getQueryString(data.url,'viewtype')=='iframe'){
+                        var url='';
+                        if(Utils.getQueryString(data.url,'gateway')=='1'){
+                            url=layui.ht_config.gatewayUrl+data.url.substr(1);
+                        }else{
+                            url=data.url;
+                        }
+
+                        data.url=url;
+                    }
+
                     tab.tabAdd(data);
                 });
                 //navbar加载方式二，设置远程地址加载
@@ -249,3 +284,19 @@ layui.define(['element', 'table', 'nprogress', 'tab', 'navbar', 'onelevel', 'lay
 
     exports('app', app);
 });
+
+Utils = function () {
+}
+
+Utils.getQueryString = function (url, name) {
+    var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+    var idx = url.indexOf('?');
+    if (idx < 0) return null;
+
+    url = url.substr(idx + 1);
+    var r = url.match(reg);
+    if (r != null) {
+        return unescape(r[2]);
+    }
+    return null;
+}

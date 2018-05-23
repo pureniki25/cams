@@ -48,6 +48,7 @@ import com.hongte.alms.base.service.MoneyPoolRepaymentService;
 import com.hongte.alms.base.service.MoneyPoolService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
+import com.hongte.alms.base.vo.finance.CurrPeriodRepaymentInfoVO;
 import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.vo.PageResult;
@@ -362,13 +363,38 @@ public class FinanceController {
 		return result ;
 	}
 	
+	@GetMapping(value="/thisTimeRepayment")
+	@ApiOperation(value="本次还款信息")
+	public Result thisTimeRepayment(String businessId,String afterId) {
+		Result result ;
+		logger.info("@thisTimeRepayment@本次还款信息--开始[{}{}]",businessId,afterId);
+		CurrPeriodRepaymentInfoVO infoVO  = financeService.getCurrPeriodRepaymentInfoVO(businessId, afterId);
+		if (infoVO==null) {
+			result = Result.error("500", "找不到本次还款信息");
+		}
+		result = Result.success(infoVO);
+		logger.info("@thisTimeRepayment@本次还款信息--结束[{}]",result);
+		return result ;
+	}
+	
 	@PostMapping(value="/previewConfirmRepayment")
 	@ApiOperation(value="预览确认还款拆标情况")
 	public Result previewConfirmRepayment(@RequestBody ConfirmRepaymentReq req) {
 		Result result ;
-		logger.info("@previewConfirmRepayment@预览确认还款拆标情况--开始[{}{}]",req);
+		logger.info("@previewConfirmRepayment@预览确认还款拆标情况--开始[{}]",req);
 		result = financeService.previewConfirmRepayment(req);
 		logger.info("@previewConfirmRepayment@预览确认还款拆标情况--结束[{}]",result);
+		return result ;
+	}
+	
+	@GetMapping(value="/getSurplusFund")
+	@ApiOperation(value="获取结余情况")
+	public Result getSurplusFund(String businessId,String afterId) {
+		Result result ;
+		logger.info("@getSurplusFund@获取结余情况--开始[{}{}]",businessId,afterId);
+		BigDecimal surplusFund = financeService.getSurplusFund(businessId, afterId);
+		result = Result.success(surplusFund);
+		logger.info("@getSurplusFund@获取结余情况--结束[{}]",result);
 		return result ;
 	}
 	

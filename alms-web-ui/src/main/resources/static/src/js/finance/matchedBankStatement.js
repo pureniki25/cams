@@ -122,9 +122,9 @@ window.layinit(function (htConfig) {
                     }
                 })
                 .then(function (res) {
-                    console.log(res);
                     if (res.data.code == '1') {
-                        app.table.data = res.data.data
+                        parent.app.matchedBankStatement.data = res.data.data.slice(0) ;
+                        app.table.data = res.data.data.slice(0);
                         let t = 0;
                         app.table.data.forEach(element => {
                             t += element.accountMoney
@@ -135,6 +135,7 @@ window.layinit(function (htConfig) {
                         }
 
                         app.table.data.push(sum)
+                        console.log(res.data.data);
                         let style = {
                             height: (app.table.data.length ? (app.table.data.length + 2) * 50 : 175) + 'px',
                             width: '100%'
@@ -147,7 +148,6 @@ window.layinit(function (htConfig) {
                     }
                     app.spinShow = false;
                 }).catch(function (err) {
-                    console.log(err);
                     app.$Message.error({
                         content: '获取匹配的款项池银行流水数据失败'
                     })

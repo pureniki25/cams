@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.collection.mapper.ParametertracelogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.collection.entity.Parametertracelog">
+        <id column="ID" property="id" />
+        <result column="Car_Business_Id" property="CarBusinessId" />
+        <result column="Car_Business_After_Id" property="CarBusinessAfterId" />
+        <result column="Trance_Content" property="TranceContent" />
+        <result column="Trance_Name" property="TranceName" />
+        <result column="Trance_Date" property="TranceDate" />
+        <result column="status" property="status" />
+        <result column="litigation_status" property="litigationStatus" />
+        <result column="create_user" property="createUser" />
+        <result column="create_time" property="createTime" />
+        <result column="log_type" property="logType" />
+        <result column="is_delete" property="isDelete" />
+        <result column="is_transmission_platform" property="isTransmissionPlatform" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        ID AS id, Car_Business_Id AS CarBusinessId, Car_Business_After_Id AS CarBusinessAfterId, Trance_Content AS TranceContent, Trance_Name AS TranceName, Trance_Date AS TranceDate, status, litigation_status AS litigationStatus, create_user AS createUser, create_time AS createTime, log_type AS logType, is_delete AS isDelete, is_transmission_platform AS isTransmissionPlatform
+    </sql>
+
+    <select id="selectUnTransParametertracelogs" resultType="com.hongte.alms.base.collection.entity.Parametertracelog">
+
+
+        SELECT
+            tt.ID AS id,
+            tt.Car_Business_Id AS CarBusinessId,
+            tt.Car_Business_After_Id AS CarBusinessAfterId,
+            tt.Trance_Content AS TranceContent,
+            tt.Trance_Name AS TranceName,
+            tt.Trance_Date AS TranceDate,
+            tt.status,
+            tt.litigation_status AS litigationStatus,
+            tt.create_user AS createUser,
+            tt.create_time AS createTime,
+            tt.log_type AS logType,
+            tt.is_delete AS isDelete,
+            tt.is_transmission_platform AS isTransmissionPlatform
+        FROM
+        tb_parametertracelog tt
+        WHERE NOT EXISTS
+        (SELECT
+        1
+        FROM
+        tb_collection_track_log log
+        WHERE  log.xd_index_id = tt.ID)
+
+
+
+
+    </select>
+
+</mapper>

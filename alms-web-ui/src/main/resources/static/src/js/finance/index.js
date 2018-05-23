@@ -210,7 +210,18 @@ window.layinit(function (htConfig) {
                         return h('i-button', {
                             on: {
                                 click: function () {
-                                    console.log(this)
+                                	console.log(p)
+                                	let url = '/finance/repaymentPlanInfo?businessId=' + p.row.businessId;
+                                    layer.open({
+                                        type: 2,
+                                        title: '计划详情',
+                                        content: url,
+                                        area: ['1600px', '800px'],
+                                        success: function (layero, index) {
+                                            console.log(layero, index);
+                                            curIndex = index ;
+                                        }
+                                    })
                                 }
                             }
                         }, '详情')

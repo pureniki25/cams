@@ -7,6 +7,8 @@ window.layinit(function (htConfig) {
     var businessId = getQueryStr('businessId')
     var afterId = getQueryStr('afterId')
     var planListId = getQueryStr('planListId')
+    let cpath = htConfig.coreBasePath;
+    let fpath = htConfig.financeBasePath;
     var layer = layui.layer;
     let curIndex ;
     app = new Vue({
@@ -26,7 +28,8 @@ window.layinit(function (htConfig) {
             matchedBankStatement: {
                 show: false,
                 url: '/finance/matchedBankStatement?businessId=' + businessId + "&afterId=" + afterId,
-                style: {}
+                style: {},
+                data:11
             },
             manualAddBankSatements: {
                 show: false,
@@ -38,14 +41,61 @@ window.layinit(function (htConfig) {
                 url: '/finance/manualMatchBankSatements?businessId=' + businessId + "&afterId=" + afterId,
             },
 
-            style: {
-                repayRegList: {},
-                matchedBankStatement: {}
-            },
+            // style: {
+            //     repayRegList: {},
+            //     matchedBankStatement: {}
+            // },
 
             table:{
-                currRepayment:currRepayment,
+                currPeriodRepayment:currPeriodRepayment,
                 projRepayment:projRepayment
+            },
+            thisTimeRepaymentInfo:{
+                derate:'',
+                item10:'',
+                item20:'',
+                item30:'',
+                item30:'',
+                item50:'',
+                offlineOverDue:'',
+                onlineOverDue:'',
+                overDays:'',
+                repayDate:'',
+                subtotal:'',
+                total:'',
+                derateDetails:[]
+            },
+            factRepaymentInfo:{
+                repayDate:'',
+                surplusFund:'',
+                onlineOverDuel:'',
+                offlineOverDue:'',
+                remark:'',
+                canUseSurplus:0,
+                moneyPoolAccount:0,
+                repayAccount:0,
+            },
+        },
+        watch:{
+            'matchedBankStatement.data':function(n){
+                let moneyPoolAccount = 0 
+                if(n&&n.length>0){
+                    n.forEach(element => {
+                        moneyPoolAccount += element.accountMoney    
+                    });
+                    let o = n[n.length-1]
+                    app.factRepaymentInfo.repayDate=o.tradeDate
+                }
+                app.factRepaymentInfo.moneyPoolAccount = moneyPoolAccount 
+                app.factRepaymentInfo.repayAccount = app.factRepaymentInfo.moneyPoolAccount + (app.factRepaymentInfo.surplusFund||0)
+            },
+            'factRepaymentInfo.surplusFund':function(n){
+                if(n&&!isNaN(n)){
+                    app.factRepaymentInfo.repayAccount = app.factRepaymentInfo.moneyPoolAccount + (app.factRepaymentInfo.surplusFund||0)
+                }
+            },
+            'factRepaymentInfo.repayAccount':function(n){
+                
             }
         },
         methods: {
@@ -74,7 +124,6 @@ window.layinit(function (htConfig) {
                     content: [url, 'no'],
                     area: ['1600px', '800px'],
                     success: function (layero, index) {
-                        console.log(layero, index);
                         curIndex = index ;
                     }
                 })
@@ -87,12 +136,54 @@ window.layinit(function (htConfig) {
                     content: [url, 'no'],
                     area: ['1600px', '800px'],
                     success: function (layero, index) {
-                        console.log(layero, index);
                         curIndex = index ;
                     }
                 })
+            },
+            getThisTimeRepayment(){
+                axios.get(fpath+'finance/thisTimeRepayment?businessId=' + businessId + "&afterId=" + afterId)
+                .then(function(res){
+                    if(res.data.code=='1'){
+                        app.thisTimeRepaymentInfo =  Object.assign(app.thisTimeRepaymentInfo,res.data.data);
+                    }else{
+                        app.$Message.error({content:res.data.msg})
+                    }
+                })
+                .catch(function(err){
+                    app.$Message.error({content:'获取本次还款信息失败'})
+                })
+            },
+            getThisPeroidRepayment(){
+                axios.get(fpath+'finance/thisPeroidRepayment?businessId=' + businessId + "&afterId=" + afterId)
+                .then(function(res){
+                    if(res.data.code=='1'){
+                        app.table.currPeriodRepayment.data =  Object.assign(app.table.currPeriodRepayment.data,res.data.data);
+                    }else{
+                        app.$Message.error({content:res.data.msg})
+                    }
+                })
+                .catch(function(err){
+                    app.$Message.error({content:'获取本期还款信息失败'})
+                })
+            },
+            getSurplusFund(){
+                axios.get(fpath+'finance/getSurplusFund?businessId=' + businessId + "&afterId=" + afterId)
+                .then(function(res){
+                    if(res.data.code=='1'){
+                        app.factRepaymentInfo.canUseSurplus = res.data.data
+                    }else{
+                        app.$Message.error({content:res.data.msg})
+                    }
+                })
+                .catch(function(err){
+                    app.$Message.error({content:'获取结余信息失败'})
+                })
             }
         },
-        created: function () {}
+        created: function () {
+            this.getThisTimeRepayment()
+            this.getThisPeroidRepayment()
+            this.getSurplusFund()
+        }
     })
 })

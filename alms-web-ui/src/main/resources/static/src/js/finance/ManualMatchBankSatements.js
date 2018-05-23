@@ -8,7 +8,6 @@ window.layinit(function (htConfig) {
 
     let cpath = htConfig.coreBasePath;
     let fpath = htConfig.financeBasePath;
-    console.log(typeof getQueryStr('repayDate'));
     app = new Vue({
         el: "#app",
         data: {

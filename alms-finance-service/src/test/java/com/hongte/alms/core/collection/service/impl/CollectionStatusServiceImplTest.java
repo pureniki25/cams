@@ -3,22 +3,28 @@ package com.hongte.alms.core.collection.service.impl;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.collection.dto.CollectionStatusCountDto;
+import com.hongte.alms.base.collection.entity.Collection;
+import com.hongte.alms.base.collection.entity.CollectionLogXd;
 import com.hongte.alms.base.collection.enums.CollectionCrpTypeEnum;
 import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
 import com.hongte.alms.base.collection.enums.StaffPersonType;
 import com.hongte.alms.base.collection.mapper.CollectionStatusMapper;
+import com.hongte.alms.base.collection.service.CollectionLogXdService;
+import com.hongte.alms.base.collection.service.CollectionService;
 import com.hongte.alms.base.collection.service.CollectionStatusService;
 import com.hongte.alms.base.collection.service.CollectionTimeSetService;
-import com.hongte.alms.base.entity.Collection;
-import com.hongte.alms.base.entity.CollectionLogXd;
 import com.hongte.alms.base.feignClient.EipRemote;
-import com.hongte.alms.base.service.CollectionLogXdService;
-import com.hongte.alms.base.service.CollectionService;
 import com.hongte.alms.base.service.SysJobConfigService;
 import com.hongte.alms.base.vo.comm.SmsVo;
 import com.hongte.alms.base.vo.module.CollectionReq;
 import com.hongte.alms.finance.FinanceServiceApplication;
 import com.ht.ussp.bean.LoginUserInfoHelper;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +32,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.*;
 
 /**
  * @author:喻尊龙

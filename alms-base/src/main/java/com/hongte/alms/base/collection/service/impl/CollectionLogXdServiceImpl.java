@@ -1,10 +1,8 @@
-package com.hongte.alms.base.service.impl;
+package com.hongte.alms.base.collection.service.impl;
 
-import com.hongte.alms.base.collection.mapper.CollectionLogMapper;
-import com.hongte.alms.base.entity.Collection;
-import com.hongte.alms.base.entity.CollectionLogXd;
-import com.hongte.alms.base.mapper.CollectionLogXdMapper;
-import com.hongte.alms.base.service.CollectionLogXdService;
+import com.hongte.alms.base.collection.entity.CollectionLogXd;
+import com.hongte.alms.base.collection.mapper.CollectionLogXdMapper;
+import com.hongte.alms.base.collection.service.CollectionLogXdService;
 import com.hongte.alms.base.vo.module.CollectionReq;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;

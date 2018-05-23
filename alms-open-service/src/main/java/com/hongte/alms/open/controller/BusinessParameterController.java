@@ -101,7 +101,9 @@ public class BusinessParameterController {
 		try {
 			if (classifyConditionVO == null || StringUtil.isEmpty(classifyConditionVO.getBusinessId())
 					|| StringUtil.isEmpty(classifyConditionVO.getOpSourse())
-					|| StringUtil.isEmpty(classifyConditionVO.getOpSourseId())) {
+					|| StringUtil.isEmpty(classifyConditionVO.getOpSourseId())
+					|| StringUtil.isEmpty(classifyConditionVO.getOpUserId())
+					|| StringUtil.isEmpty(classifyConditionVO.getOpUsername())) {
 				return Result.error("500", "参数不能为空！");
 			}
 			fiveLevelClassifyBusinessChangeLogService.businessChangeLog(classifyConditionVO);
@@ -124,18 +126,19 @@ public class BusinessParameterController {
 			FiveLevelClassifyBusinessChangeLog changeLog = fiveLevelClassifyBusinessChangeLogService
 					.selectOne(new EntityWrapper<FiveLevelClassifyBusinessChangeLog>()
 							.eq("orig_business_id", businessId).eq("valid_status", "1"));
-			String borrowerConditionDesc = changeLog.getBorrowerConditionDesc();
-			
-			if (StringUtil.notEmpty(borrowerConditionDesc)) {
-				String[] arrBorrower = borrowerConditionDesc.split(Constant.FIVE_LEVEL_CLASSIFY_SPLIT);
-				resultMap.put("borrowerConditionDesc", Arrays.asList(arrBorrower));
-			}
-			
-			String guaranteeConditionDesc = changeLog.getGuaranteeConditionDesc();
-			
-			if (StringUtil.notEmpty(guaranteeConditionDesc)) {
-				String[] arrBorrower = guaranteeConditionDesc.split(Constant.FIVE_LEVEL_CLASSIFY_SPLIT);
-				resultMap.put("guaranteeConditionDesc", Arrays.asList(arrBorrower));
+			if (changeLog != null) {
+				String borrowerConditionDesc = changeLog.getBorrowerConditionDesc();
+				if (StringUtil.notEmpty(borrowerConditionDesc)) {
+					String[] arrBorrower = borrowerConditionDesc.split(Constant.FIVE_LEVEL_CLASSIFY_SPLIT);
+					resultMap.put("borrowerConditionDesc", Arrays.asList(arrBorrower));
+				}
+				
+				String guaranteeConditionDesc = changeLog.getGuaranteeConditionDesc();
+				
+				if (StringUtil.notEmpty(guaranteeConditionDesc)) {
+					String[] arrBorrower = guaranteeConditionDesc.split(Constant.FIVE_LEVEL_CLASSIFY_SPLIT);
+					resultMap.put("guaranteeConditionDesc", Arrays.asList(arrBorrower));
+				}
 			}
 			return Result.success(resultMap);
 		} catch (Exception e) {

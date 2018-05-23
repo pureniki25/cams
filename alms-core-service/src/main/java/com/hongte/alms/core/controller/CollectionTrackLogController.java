@@ -116,19 +116,20 @@ public class CollectionTrackLogController {
 				FiveLevelClassifyBusinessChangeLog changeLog = fiveLevelClassifyBusinessChangeLogService
 						.selectOne(new EntityWrapper<FiveLevelClassifyBusinessChangeLog>()
 								.eq("orig_business_id", origBusinessId).eq("valid_status", "1"));
-				
-				String borrowerConditionDesc = changeLog.getBorrowerConditionDesc();
-				
-				if (StringUtil.notEmpty(borrowerConditionDesc)) {
-					String[] arrBorrower = borrowerConditionDesc.split(Constant.FIVE_LEVEL_CLASSIFY_SPLIT);
-					log.setBorrowerConditionDescList(Arrays.asList(arrBorrower));
-				}
-				
-				String guaranteeConditionDesc = changeLog.getGuaranteeConditionDesc();
-				
-				if (StringUtil.notEmpty(guaranteeConditionDesc)) {
-					String[] arrBorrower = guaranteeConditionDesc.split(Constant.FIVE_LEVEL_CLASSIFY_SPLIT);
-					log.setGuaranteeConditionDescList(Arrays.asList(arrBorrower));
+				if (changeLog != null) {
+					String borrowerConditionDesc = changeLog.getBorrowerConditionDesc();
+					
+					if (StringUtil.notEmpty(borrowerConditionDesc)) {
+						String[] arrBorrower = borrowerConditionDesc.split(Constant.FIVE_LEVEL_CLASSIFY_SPLIT);
+						log.setBorrowerConditionDescList(Arrays.asList(arrBorrower));
+					}
+					
+					String guaranteeConditionDesc = changeLog.getGuaranteeConditionDesc();
+					
+					if (StringUtil.notEmpty(guaranteeConditionDesc)) {
+						String[] arrBorrower = guaranteeConditionDesc.split(Constant.FIVE_LEVEL_CLASSIFY_SPLIT);
+						log.setGuaranteeConditionDescList(Arrays.asList(arrBorrower));
+					}
 				}
 				return Result.success(log);
             }
