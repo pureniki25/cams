@@ -13,12 +13,14 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.enums.RepayPlanStatus;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
+import com.hongte.alms.base.mapper.RepaymentBizPlanMapper;
 import com.hongte.alms.common.util.DateUtil;
 
 /**
@@ -26,9 +28,9 @@ import com.hongte.alms.common.util.DateUtil;
  * 2018年3月30日 上午10:00:23
  */
 public class ExpenseSettleRepaymentPlanVO  {
+	
 	private Logger logger = LoggerFactory.getLogger(ExpenseSettleRepaymentPlanVO.class) ;
-	private RepaymentBizPlan repaymentBizPlan ;
-
+	private List<RepaymentBizPlan> repaymentBizPlans ;
 	private List<ExpenseSettleRepaymentPlanListVO> repaymentPlanListVOs ;
 	
 	private List<ExpenseSettleRepaymentPlanListVO> currentPeriodVOs ;
@@ -38,7 +40,7 @@ public class ExpenseSettleRepaymentPlanVO  {
 	private List<ExpenseSettleRepaymentPlanListVO> surplusPeriodVOs ;
 	private ExpenseSettleRepaymentPlanListVO finalPeriod ;
 	private ExpenseSettleRepaymentPlanListVO currentPeriod;
-	
+	private Boolean isDefer = false ;
 	class PlanListSortor implements Comparator<RepaymentBizPlanList> {
 
 		@Override
@@ -58,14 +60,15 @@ public class ExpenseSettleRepaymentPlanVO  {
 	/**
 	 * 
 	 */
-	public ExpenseSettleRepaymentPlanVO(RepaymentBizPlan plan,List<RepaymentBizPlanList> planLists,List<RepaymentBizPlanListDetail> details) {
+	public ExpenseSettleRepaymentPlanVO(List<RepaymentBizPlan > plans,List<RepaymentBizPlanList> planLists,List<RepaymentBizPlanListDetail> details) {
 		super();
-		this.repaymentBizPlan = plan ;
+		this.repaymentBizPlans = plans ;
 		this.setRepaymentPlanListVOs(new ArrayList<>()) ;
 		
 		for (RepaymentBizPlanList planList : planLists) {
 			ExpenseSettleRepaymentPlanListVO vo = new ExpenseSettleRepaymentPlanListVO() ;
 			vo.setRepaymentBizPlanList(planList);
+			
 			List<RepaymentBizPlanListDetail> repaymentBizPlanListDetails = new ArrayList<>() ;
 			for (RepaymentBizPlanListDetail repaymentBizPlanListDetail : details) {
 				if (repaymentBizPlanListDetail.getPlanListId().equals(planList.getPlanListId())) {
@@ -74,22 +77,14 @@ public class ExpenseSettleRepaymentPlanVO  {
 			}
 			vo.setRepaymentBizPlanListDetails(repaymentBizPlanListDetails);
 			this.getRepaymentPlanListVOs().add(vo);
+			String businessId = planList.getBusinessId();
+			String orgBusinessId = planList.getOrigBusinessId();
+			if (!businessId.equals(orgBusinessId)&&!getIsDefer()) {
+				setIsDefer(true);
+			}
 		}
 	}
 
-	/**
-	 * @return the repaymentBizPlan
-	 */
-	public RepaymentBizPlan getRepaymentBizPlan() {
-		return repaymentBizPlan;
-	}
-
-	/**
-	 * @param repaymentBizPlan the repaymentBizPlan to set
-	 */
-	public void setRepaymentBizPlan(RepaymentBizPlan repaymentBizPlan) {
-		this.repaymentBizPlan = repaymentBizPlan;
-	}
 	
 	/**
 	 * 
@@ -233,7 +228,7 @@ public class ExpenseSettleRepaymentPlanVO  {
 	public BigDecimal calCurrentDetails(Date settleDate,Integer itemType,boolean factAmount) {
 		BigDecimal res = new BigDecimal(0);
 		for (RepaymentBizPlanListDetail detail : findCurrentDetails(settleDate)) {
-			if (detail.getPlanItemType().equals(itemType)) {
+			if (detail.getPlanItemType().equals(itemType)&&detail.getAccountStatus()!=null&&!detail.getAccountStatus().equals(0)) {
 				if (factAmount) {
 					res=res.add(detail.getFactAmount()==null?new BigDecimal(0):detail.getFactAmount());
 				}else {
@@ -395,10 +390,51 @@ public class ExpenseSettleRepaymentPlanVO  {
 		if (currentPeriodVOs==null||currentPeriodVOs.size()==0) {
 			this.findCurrentPeriods(settleDate);
 		}
-		Integer periodCount = this.repaymentBizPlan.getBorrowLimit() ;
+//		Integer surplusDefer = 0 ;
+//		for (ExpenseSettleRepaymentPlanListVO planListVO : getSurplusPeriod()) {
+//			RepaymentBizPlanList repaymentBizPlanList = planListVO.getRepaymentBizPlanList();
+//			String businessId = repaymentBizPlanList.getBusinessId();
+//			String orgBusinessId = repaymentBizPlanList.getOrigBusinessId();
+//			if (!businessId.equals(orgBusinessId)) {
+//				surplusDefer++;
+//			}
+//		}
+		Integer periodCount = 0;
+		for (RepaymentBizPlan repaymentBizPlan : repaymentBizPlans) {
+			periodCount += repaymentBizPlan.getBorrowLimit();
+		}
 		Integer currentPeriod = currentPeriodVOs.get(currentPeriodVOs.size()-1).getRepaymentBizPlanList().getPeriod() ;
 		return periodCount-currentPeriod;
 		
 	}
-	
+
+	/**
+	 * @return the isDefer
+	 */
+	public Boolean getIsDefer() {
+		return isDefer;
+	}
+
+	/**
+	 * @param isDefer the isDefer to set
+	 */
+	public void setIsDefer(Boolean isDefer) {
+		this.isDefer = isDefer;
+	}
+
+
+	/**
+	 * @return the repaymentBizPlans
+	 */
+	public List<RepaymentBizPlan> getRepaymentBizPlans() {
+		return repaymentBizPlans;
+	}
+
+	/**
+	 * @param repaymentBizPlans the repaymentBizPlans to set
+	 */
+	public void setRepaymentBizPlans(List<RepaymentBizPlan> repaymentBizPlans) {
+		this.repaymentBizPlans = repaymentBizPlans;
+	}
+
 }

@@ -322,10 +322,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 
 	public ExpenseSettleVO cal(String businessId,Date settleDate) {
 		final BasicBusiness basicBusiness = basicBusinessMapper.selectById(businessId);
-		RepaymentBizPlan repaymentBizPlan = new RepaymentBizPlan() ;
-		repaymentBizPlan.setBusinessId(businessId);
-		repaymentBizPlan = repaymentBizPlanMapper
-				.selectOne(repaymentBizPlan);
+		List<RepaymentBizPlan> repaymentBizPlans = repaymentBizPlanMapper.selectList(new EntityWrapper<RepaymentBizPlan>().eq("original_business_id", businessId).orderBy("business_id"));
 		List<Object> businessIds = renewalBusinessMapper.selectObjs(new EntityWrapper<RenewalBusiness>().eq("original_business_id", businessId).setSqlSelect("renewal_business_id")) ;
 		if (businessIds==null) {
 			businessIds = new ArrayList<>();
@@ -335,7 +332,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 				new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", businessId).orderBy("due_date"));
 		final List<RepaymentBizPlanListDetail> details = repaymentBizPlanListDetailMapper.selectList(
 				new EntityWrapper<RepaymentBizPlanListDetail>().in("business_id", businessIds).orderBy("period"));
-		final ExpenseSettleRepaymentPlanVO plan = new ExpenseSettleRepaymentPlanVO(repaymentBizPlan, planLists, details);
+		final ExpenseSettleRepaymentPlanVO plan = new ExpenseSettleRepaymentPlanVO(repaymentBizPlans, planLists, details);
 		final List<BizOutputRecord> bizOutputRecord = bizOutputRecordMapper.selectList(
 				new EntityWrapper<BizOutputRecord>().eq("business_id", businessId).orderBy("fact_output_date", true));
 		ExpenseSettleVO expenseSettleVO = new ExpenseSettleVO() ;
@@ -489,11 +486,12 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 				RepaymentBizPlanList planList = expenseSettleRepaymentPlanListVO.getRepaymentBizPlanList() ;
 				for (RepaymentBizPlanListDetail detail : expenseSettleRepaymentPlanListVO.getRepaymentBizPlanListDetails()) {
 					if (detail.getPlanItemType().equals(20)) {
-						interest = interest.add(detail.getPlanAmount()) ;
+						interest = interest.add(detail.getPlanAmount().subtract(detail.getFactAmount()!=null?detail.getFactAmount():new BigDecimal(0))) ;
 						break ;
 					}
 				}
 			}
+			interest = plan.calCurrentDetails(settleDate, 20, false).subtract(plan.calCurrentDetails(settleDate, 20, true)) ;
 			
 			Date finalPeriodDueDate = plan.getFinalPeriod().getRepaymentBizPlanList().getDueDate() ;
 			int diff = DateUtil.getDiffDays(finalPeriodDueDate, settleDate);
@@ -508,7 +506,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		case 500:
 		case 1000:
 		case 5:
-			expenseSettleVO.setInterest(plan.calCurrentDetails(settleDate, 20, false));
+			expenseSettleVO.setInterest(plan.calCurrentDetails(settleDate, 20, false).subtract(plan.calCurrentDetails(settleDate, 20, true)));
 			break;
 		default:
 			/*找不到还款方式233333333333*/
@@ -534,7 +532,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		case 500:
 		case 1000:
 		case 5:
-			expenseSettleVO.setServicecharge(plan.calCurrentDetails(settleDate, 30, false));
+			expenseSettleVO.setServicecharge(plan.calCurrentDetails(settleDate, 30, false).subtract(plan.calCurrentDetails(settleDate, 30, true)));
 			break;
 		default:
 			/*找不到还款方式233333333333*/
@@ -630,7 +628,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		case 500:
 		case 1000:
 		case 5:
-			expenseSettleVO.setPlatformFee(plan.calCurrentDetails(settleDate, 50, false));
+			expenseSettleVO.setPlatformFee(plan.calCurrentDetails(settleDate, 50, false).subtract(plan.calCurrentDetails(settleDate, 50, true)));
 			break;
 		default:
 			/*找不到还款方式233333333333*/
