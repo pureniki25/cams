@@ -84,7 +84,6 @@ window.layinit(function (htConfig) {
                 })
             },
             submit:function(){
-                console.log(app.form);
                 let params = {}
 
 

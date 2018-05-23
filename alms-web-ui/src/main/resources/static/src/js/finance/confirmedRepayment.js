@@ -92,7 +92,6 @@ window.layinit(function (htConfig) {
                     }
                 })
                 .then(function (res) {
-                    console.log(res);
                     if (res.data.code == '1') {
                         app.table.data = res.data.data
                         let t = 0;
@@ -117,7 +116,6 @@ window.layinit(function (htConfig) {
                     }
                     app.spinShow = false;
                 }).catch(function (err) {
-                    console.log(err);
                     app.$Message.error({
                         content: '查询已完成的还款信息数据失败'
                     })

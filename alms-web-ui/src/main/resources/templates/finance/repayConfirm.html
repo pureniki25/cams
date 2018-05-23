@@ -93,7 +93,7 @@
                     <row>
                         <i-col span="6">实还日期</i-col>
                         <i-col span="6">
-                            <i-input disabled v-model="factRepaymentInfo.repayDate"></i-input>
+                            <i-input disabled v-model="factRepaymentInfo.repayDate" ></i-input>
                         </i-col>
                     </row>
                     <row>
@@ -107,11 +107,11 @@
                     </row>
                     <row>
                         <i-col span="6">流水合计</i-col>
-                        <i-col span="6">#</i-col>
+                        <i-col span="6">{{factRepaymentInfo.moneyPoolAccount}}</i-col>
                     </row>
                     <row>
                         <i-col span="6">还款合计</i-col>
-                        <i-col span="6">#</i-col>
+                        <i-col span="6">{{factRepaymentInfo.repayAccount}}</i-col>
                     </row>
                     <row>
                         <i-col span="6">本金</i-col>

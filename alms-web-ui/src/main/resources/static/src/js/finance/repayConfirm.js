@@ -28,7 +28,8 @@ window.layinit(function (htConfig) {
             matchedBankStatement: {
                 show: false,
                 url: '/finance/matchedBankStatement?businessId=' + businessId + "&afterId=" + afterId,
-                style: {}
+                style: {},
+                data:11
             },
             manualAddBankSatements: {
                 show: false,
@@ -40,10 +41,10 @@ window.layinit(function (htConfig) {
                 url: '/finance/manualMatchBankSatements?businessId=' + businessId + "&afterId=" + afterId,
             },
 
-            style: {
-                repayRegList: {},
-                matchedBankStatement: {}
-            },
+            // style: {
+            //     repayRegList: {},
+            //     matchedBankStatement: {}
+            // },
 
             table:{
                 currPeriodRepayment:currPeriodRepayment,
@@ -70,7 +71,31 @@ window.layinit(function (htConfig) {
                 onlineOverDuel:'',
                 offlineOverDue:'',
                 remark:'',
-                canUseSurplus:0
+                canUseSurplus:0,
+                moneyPoolAccount:0,
+                repayAccount:0,
+            },
+        },
+        watch:{
+            'matchedBankStatement.data':function(n){
+                let moneyPoolAccount = 0 
+                if(n&&n.length>0){
+                    n.forEach(element => {
+                        moneyPoolAccount += element.accountMoney    
+                    });
+                    let o = n[n.length-1]
+                    app.factRepaymentInfo.repayDate=o.tradeDate
+                }
+                app.factRepaymentInfo.moneyPoolAccount = moneyPoolAccount 
+                app.factRepaymentInfo.repayAccount = app.factRepaymentInfo.moneyPoolAccount + (app.factRepaymentInfo.surplusFund||0)
+            },
+            'factRepaymentInfo.surplusFund':function(n){
+                if(n&&!isNaN(n)){
+                    app.factRepaymentInfo.repayAccount = app.factRepaymentInfo.moneyPoolAccount + (app.factRepaymentInfo.surplusFund||0)
+                }
+            },
+            'factRepaymentInfo.repayAccount':function(n){
+                
             }
         },
         methods: {
@@ -99,7 +124,6 @@ window.layinit(function (htConfig) {
                     content: [url, 'no'],
                     area: ['1600px', '800px'],
                     success: function (layero, index) {
-                        console.log(layero, index);
                         curIndex = index ;
                     }
                 })
@@ -112,7 +136,6 @@ window.layinit(function (htConfig) {
                     content: [url, 'no'],
                     area: ['1600px', '800px'],
                     success: function (layero, index) {
-                        console.log(layero, index);
                         curIndex = index ;
                     }
                 })
@@ -125,7 +148,6 @@ window.layinit(function (htConfig) {
                     }else{
                         app.$Message.error({content:res.data.msg})
                     }
-                    console.log(res)
                 })
                 .catch(function(err){
                     app.$Message.error({content:'获取本次还款信息失败'})
@@ -139,7 +161,6 @@ window.layinit(function (htConfig) {
                     }else{
                         app.$Message.error({content:res.data.msg})
                     }
-                    console.log(res)
                 })
                 .catch(function(err){
                     app.$Message.error({content:'获取本期还款信息失败'})
@@ -153,7 +174,6 @@ window.layinit(function (htConfig) {
                     }else{
                         app.$Message.error({content:res.data.msg})
                     }
-                    console.log(res)
                 })
                 .catch(function(err){
                     app.$Message.error({content:'获取结余信息失败'})
