@@ -172,7 +172,7 @@
 		parameterType="com.hongte.alms.base.dto.FinanceManagerListReq">
 		SELECT
 			pl.plan_list_id as planListId,
-			pl.business_id as businessId,
+			pl.orig_business_id as businessId,
 			pl.after_id as afterId ,
 			b.company_name as dept,
 			b.operator_name as operator,
