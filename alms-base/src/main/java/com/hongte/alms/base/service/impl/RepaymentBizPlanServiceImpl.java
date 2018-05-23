@@ -194,26 +194,7 @@ public class RepaymentBizPlanServiceImpl extends BaseServiceImpl<RepaymentBizPla
 	}
 
 
-	/**
-	 * 查询客户还款计划列表
-	 *
-	 * @param identifyCard
-	 * @param pageIndex
-	 * @param pageSize
-	 * @return
-	 */
-	@Override
-	public Page<RepayingPlanDto> queryCustomerRepayPlan(String identifyCard, Integer pageIndex, Integer pageSize) {
-		Page<RepayingPlanDto> pages = new Page<>();
-		pages.setSize(pageSize);
-		pages.setCurrent(pageIndex);
 
-		List<RepayingPlanDto> lsit = repaymentBizPlanMapper.queryCustomerRepayPlan(pages, identifyCard);
-
-		pages.setRecords(lsit);
-
-		return pages;
-	}
 
 
 	public Page<RepayingPlanVo> queryCustomeRepayPlanInfo(String identifyCard, Integer pageIndex, Integer pageSize) throws IllegalAccessException, InstantiationException {
@@ -254,8 +235,15 @@ public class RepaymentBizPlanServiceImpl extends BaseServiceImpl<RepaymentBizPla
 			List<PlanVo> planVos = new LinkedList<>();
 			vo.setPlans(planVos);
 			for (RepaymentBizPlan bizPlan : bizPlans) {
-				List<RepaymentBizPlanList> bizPlanLists = repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", bizPlan.getPlanId()));
+				List<RepaymentBizPlanList> bizPlanLists = repaymentBizPlanListService.selectList(
+						new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", bizPlan.getPlanId())
+								.orderBy("due_date"));
 				for (RepaymentBizPlanList bizPlanList : bizPlanLists) {
+					//展期已结清的那一期不返回
+					if(bizPlanList.getRepayFlag()!=null
+							&& bizPlanList.getRepayFlag().equals(6)){
+						continue;
+					}
 					PlanVo planVo = new PlanVo();
 					planVos.add(planVo);
 					planVo.setPeriod(bizPlanList.getPeriod().toString());
@@ -279,5 +267,25 @@ public class RepaymentBizPlanServiceImpl extends BaseServiceImpl<RepaymentBizPla
 
 		}
 		return voPage;
+	}
+
+	/**
+	 * 查询客户还款计划列表
+	 *
+	 * @param identifyCard
+	 * @param pageIndex
+	 * @param pageSize
+	 * @return
+	 */
+	private Page<RepayingPlanDto> queryCustomerRepayPlan(String identifyCard, Integer pageIndex, Integer pageSize) {
+		Page<RepayingPlanDto> pages = new Page<>();
+		pages.setSize(pageSize);
+		pages.setCurrent(pageIndex);
+
+		List<RepayingPlanDto> lsit = repaymentBizPlanMapper.queryCustomerRepayPlan(pages, identifyCard);
+
+		pages.setRecords(lsit);
+
+		return pages;
 	}
 }

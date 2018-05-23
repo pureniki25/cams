@@ -151,7 +151,7 @@ public class CreatRepayPlanServiceImplTest {
 //            assertTrue(repaymentBizPlan.getBorrowLimit().equals(6));
 
 
-//            List<RepaymentBizPlanListDto>  bizPlanListDtos = bizPlanDto.getBizPlanListDtos();
+//            List<RepaymentBizPlanListDto>  bizPlanListDtos = BizPlanDto.getBizPlanListDtos();
 
 //            for(RepaymentBizPlanListDto bizPlanDto1: bizPlanListDtos){
 //                RepaymentBizPlanList bizPlanList = bizPlanDto1.getRepaymentBizPlanList();
