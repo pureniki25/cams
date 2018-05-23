@@ -454,9 +454,10 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 
 	private ExpenseSettleVO cal(String businessId, Date settleDate) {
 		final BasicBusiness basicBusiness = basicBusinessMapper.selectById(businessId);
-		RepaymentBizPlan repaymentBizPlan = new RepaymentBizPlan();
-		repaymentBizPlan.setBusinessId(businessId);
-		repaymentBizPlan = repaymentBizPlanMapper.selectOne(repaymentBizPlan);
+//		RepaymentBizPlan repaymentBizPlan = new RepaymentBizPlan();
+//		repaymentBizPlan.setBusinessId(businessId);
+//		repaymentBizPlan = repaymentBizPlanMapper.selectOne(repaymentBizPlan);
+		List<RepaymentBizPlan> repaymentBizPlans = repaymentBizPlanMapper.selectList(new EntityWrapper<RepaymentBizPlan>().eq("original_business_id", businessId).orderBy("business_id"));
 		List<Object> businessIds = renewalBusinessMapper.selectObjs(new EntityWrapper<RenewalBusiness>()
 				.eq("original_business_id", businessId).setSqlSelect("renewal_business_id"));
 		if (businessIds == null) {
@@ -473,7 +474,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 		}
 		final List<RepaymentBizPlanListDetail> details = repaymentBizPlanListDetailMapper.selectList(
 				new EntityWrapper<RepaymentBizPlanListDetail>().in("business_id", businessIds).orderBy("period"));
-		final ExpenseSettleRepaymentPlanVO plan = new ExpenseSettleRepaymentPlanVO(repaymentBizPlan, planLists,
+		final ExpenseSettleRepaymentPlanVO plan = new ExpenseSettleRepaymentPlanVO(repaymentBizPlans, planLists,
 				details);
 //		plan.findCurrentPeriods(settleDate);
 		final List<BizOutputRecord> bizOutputRecord = bizOutputRecordMapper.selectList(
