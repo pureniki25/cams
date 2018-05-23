@@ -457,7 +457,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 //		RepaymentBizPlan repaymentBizPlan = new RepaymentBizPlan();
 //		repaymentBizPlan.setBusinessId(businessId);
 //		repaymentBizPlan = repaymentBizPlanMapper.selectOne(repaymentBizPlan);
-		List<RepaymentBizPlan> repaymentBizPlans = repaymentBizPlanMapper.selectList(new EntityWrapper<RepaymentBizPlan>().eq("original_business_id", businessId).orderBy("business_id"));
+//		List<RepaymentBizPlan> repaymentBizPlans = repaymentBizPlanMapper.selectList(new EntityWrapper<RepaymentBizPlan>().eq("original_business_id", businessId).orderBy("business_id"));
 		List<Object> businessIds = renewalBusinessMapper.selectObjs(new EntityWrapper<RenewalBusiness>()
 				.eq("original_business_id", businessId).setSqlSelect("renewal_business_id"));
 		if (businessIds == null) {
