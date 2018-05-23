@@ -55,7 +55,8 @@ var layer;
                     currentStatus:"",
                     planAllAmount:"",//应还总额
                     repayAllAmount:"",//已还总额
-                    restAmount:""
+                    restAmount:"",
+                    repayingAmount:''//代扣中金额
                    
 
                 },
@@ -112,10 +113,12 @@ var layer;
 		}
 	   if(vm.ajax_data.total>vm.ajax_data.restAmount){debugger
 		   vm.$Modal.error({content:"代扣金额不能大于本次最大可代扣金额"});
+	   return;
 	   }
 		   
 	   if(vm.ajax_data.underLineFactOverDueMoney>vm.ajax_data.planOverDueMoney){
 		   vm.$Modal.error({content:"本次代扣线下逾期费不能大于线下逾期费"});
+		   return;
 			   }
 	    var url
 	    $.ajax({
@@ -305,7 +308,7 @@ var layer;
 	var total=0;
 		vm.ajax_data.total=0;
 	
-	vm.ajax_data.total=vm.ajax_data.planPrincipal+vm.ajax_data.planAccrual+vm.ajax_data.planServiceCharge+vm.ajax_data.platformCharge+vm.ajax_data.planGuaranteeCharge+Number(vm.ajax_data.onLineOverDueMoney)+Number(vm.ajax_data.underLineFactOverDueMoney)+vm.ajax_data.otherFee;
+	vm.ajax_data.total=vm.ajax_data.planPrincipal+vm.ajax_data.planAccrual+vm.ajax_data.planServiceCharge+vm.ajax_data.platformCharge+Number(vm.ajax_data.onLineOverDueMoney)+Number(vm.ajax_data.underLineFactOverDueMoney)-vm.ajax_data.repayingAmount;
 	var total=vm.ajax_data.total;
 	vm.ajax_data.total=total.toFixed(2);
 	

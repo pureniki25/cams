@@ -454,9 +454,10 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 
 	private ExpenseSettleVO cal(String businessId, Date settleDate) {
 		final BasicBusiness basicBusiness = basicBusinessMapper.selectById(businessId);
-		RepaymentBizPlan repaymentBizPlan = new RepaymentBizPlan();
-		repaymentBizPlan.setBusinessId(businessId);
-		repaymentBizPlan = repaymentBizPlanMapper.selectOne(repaymentBizPlan);
+//		RepaymentBizPlan repaymentBizPlan = new RepaymentBizPlan();
+//		repaymentBizPlan.setBusinessId(businessId);
+//		repaymentBizPlan = repaymentBizPlanMapper.selectOne(repaymentBizPlan);
+//		List<RepaymentBizPlan> repaymentBizPlans = repaymentBizPlanMapper.selectList(new EntityWrapper<RepaymentBizPlan>().eq("original_business_id", businessId).orderBy("business_id"));
 		List<Object> businessIds = renewalBusinessMapper.selectObjs(new EntityWrapper<RenewalBusiness>()
 				.eq("original_business_id", businessId).setSqlSelect("renewal_business_id"));
 		if (businessIds == null) {
