@@ -28,14 +28,6 @@ public interface RepaymentBizPlanService extends BaseService<RepaymentBizPlan> {
 	public void repayResultUpdateRecord(RepayResultRespData data);
 
 
-	/**
-	 * 查询指定用户还款计划列表 分页
-	 * @param identifyCard
-	 * @param pageIndex
-	 * @param pageSize
-	 * @return
-	 */
-	public Page<RepayingPlanDto> queryCustomerRepayPlan(String identifyCard, Integer pageIndex, Integer pageSize );
 
 
 	/**
