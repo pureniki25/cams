@@ -400,10 +400,25 @@ public class ExpenseSettleRepaymentPlanVO  {
 //			}
 //		}
 		Integer periodCount = 0;
+		Integer orgPeriods = 0 ;
+		Integer renewPeriods = 0 ;
 		for (RepaymentBizPlan repaymentBizPlan : repaymentBizPlans) {
 			periodCount += repaymentBizPlan.getBorrowLimit();
+			if (repaymentBizPlan.getBusinessId().equals(repaymentBizPlan.getOriginalBusinessId())) {
+				orgPeriods = repaymentBizPlan.getBorrowLimit();
+			}else {
+				renewPeriods+=repaymentBizPlan.getBorrowLimit();
+			}
 		}
-		Integer currentPeriod = currentPeriodVOs.get(currentPeriodVOs.size()-1).getRepaymentBizPlanList().getPeriod() ;
+		RepaymentBizPlanList finalCurrentPeriod = currentPeriodVOs.get(currentPeriodVOs.size()-1).getRepaymentBizPlanList();
+		Integer currentPeriod = finalCurrentPeriod.getPeriod() ; ;
+		if (!finalCurrentPeriod.getBusinessId().equals(finalCurrentPeriod.getOrigBusinessId())) {
+			if (finalCurrentPeriod.getPeriod()==0) {
+				RepaymentBizPlanList firstCurrentPeriod = currentPeriodVOs.get(0).getRepaymentBizPlanList();
+				currentPeriod = firstCurrentPeriod.getPeriod() ;
+			}
+			currentPeriod += orgPeriods;
+		}
 		return periodCount-currentPeriod;
 		
 	}
