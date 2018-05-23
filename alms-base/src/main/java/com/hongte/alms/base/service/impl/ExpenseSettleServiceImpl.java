@@ -742,6 +742,13 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 	 * @param plan
 	 */
 	private void calPenalty(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan,Date outPutDate,Date contactDate) {
+		RepaymentBizPlanList finalPeriod = plan.getFinalPeriod().getRepaymentBizPlanList();
+		int compare = DateUtil.getDiffDays(settleDate, finalPeriod.getDueDate());
+		if (compare<0) {
+			expenseSettleVO.setPenalty(new BigDecimal(0));
+			return ;
+		}
+		
 		BigDecimal penalty = new BigDecimal(0);
 		RepaymentBizPlanList lastCurrentPeriod = plan.findCurrentPeriods(settleDate).get(plan.findCurrentPeriods(settleDate).size()-1).getRepaymentBizPlanList() ;
 		boolean isMonthPlatformFee = isMonthPlatformFee(plan);
