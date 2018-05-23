@@ -472,6 +472,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 		planLists = repaymentBizPlanListMapper.selectList(
 				new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", businessId).orderBy("due_date"));
 		}
+		List<RepaymentBizPlan> repaymentBizPlans = repaymentBizPlanMapper.selectList(new EntityWrapper<RepaymentBizPlan>().eq("original_business_id", businessId).orderBy("business_id"));
 		final List<RepaymentBizPlanListDetail> details = repaymentBizPlanListDetailMapper.selectList(
 				new EntityWrapper<RepaymentBizPlanListDetail>().in("business_id", businessIds).orderBy("period"));
 		final ExpenseSettleRepaymentPlanVO plan = new ExpenseSettleRepaymentPlanVO(repaymentBizPlans, planLists,
