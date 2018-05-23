@@ -18,11 +18,12 @@ var layer;
         };
         getDeductionInfo();
         getDeductionPlatformInfo();
+      
         vm = new Vue({
         	el: '#app',
         	data:{
         		
-        		
+        		isBankFlag:false,
         		ajax_data:{
                     businessId:""	, //业务编号
                     originalBusinessId:""  ,  
@@ -101,45 +102,58 @@ var layer;
 	    });
 
 	}
-
+	function withHoldingRecord(){
 	
-	var withHoldingRecord=function(){debugger
-		
-		
-        var self = this;
-        var reqStr =openPath+ "WithHoldingController/withholding?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId+"&total="+vm.ajax_data.total+"&planOverDueMoney="+vm.ajax_data.underLineFactOverDueMoney+"&platformId="+vm.platformId+"&type=1"+"&nowdate="+vm.ajax_data.nowdate
-        axios.get(reqStr)
-            .then(function (result) {
-                if (result.data.code == "1") {
-                	
-          
-                	 vm.$Modal.success({
-                         title: '',
-                         content:result.data.data
-                     });
-                } else {
-                    self.$Modal.error({content:result.data.msg});
-                }
-            })
-   
-        .catch(function (error) {
-        
-        		   vm.$Modal.error({content: '接口调用异常!'});
-        
-        
-        });
-		
-   
+		var isAmountWithheld="false";
+		if(vm.ajax_data.total<vm.ajax_data.restAmount){
+			isAmountWithheld="true";//部分代扣
+		}else if(vm.ajax_data.total=vm.ajax_data.restAmount){
+			isAmountWithheld="false";//全部代扣
+		}
+	   if(vm.ajax_data.total>vm.ajax_data.restAmount){debugger
+		   vm.$Modal.error({content:"代扣金额不能大于本次最大可代扣金额"});
+	   }
+		   
+	   if(vm.ajax_data.underLineFactOverDueMoney>vm.ajax_data.planOverDueMoney){
+		   vm.$Modal.error({content:"本次代扣线下逾期费不能大于线下逾期费"});
+			   }
+	    var url
+	    $.ajax({
+	        type : 'GET',
+	        async : false,
+	        url : openPath+ "WithHoldingController/withholding?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId+"&total="+vm.ajax_data.total+"&planOverDueMoney="+vm.ajax_data.underLineFactOverDueMoney+"&platformId="+vm.platformId+"&type=0"+"&nowdate="+vm.ajax_data.nowdate+"&isAmountWithheld="+isAmountWithheld,
+	        headers : {
+	            app : 'ALMS',
+	            Authorization : "Bearer " + getToken()
+	        },
+	        success : function(data) {debugger
+	             if(data.code=='1'){
+	            	 vm.$Modal.success({content:data.data});
+	             }else{
+	                 vm.$Modal.error({content:data.data});
+	             }
+	        },
+	        error : function() {
+	            layer.confirm('Navbar error:AJAX请求出错!', function(index) {
+	                top.location.href = loginUrl;
+	                layer.close(index);
+	            });
+	            return false;
+	        }
+	    });
+
 	}
+	
+
 	
 	var withHoldingRecordWithoutOverMoeny=function(){ debugger
 		
-		var isRepayAll=1;//全部代扣
+		var isAmountWithheld="false";//全部代扣
 	if(vm.ajax_data.factPayAllMoney<vm.ajax_data.total){
-		isRepayAll=0;//部分代扣
+		isAmountWithheld="true";//部分代扣
 	}
         var self = this;
-        var reqStr =openPath+ "WithHoldingController/withholding?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId+"&total="+vm.ajax_data.factPayAllMoney+"&planOverDueMoney="+vm.ajax_data.underLineFactOverDueMoney+"&platformId="+vm.platformId+"&type=0"+"&nowdate="+vm.ajax_data.nowdate+"&isRepayAll="+isRepayAll
+        var reqStr =openPath+ "WithHoldingController/withholding?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId+"&total="+vm.ajax_data.total+"&planOverDueMoney="+vm.ajax_data.underLineFactOverDueMoney+"&platformId="+vm.platformId+"&type=0"+"&nowdate="+vm.ajax_data.nowdate+"&isAmountWithheld="+isAmountWithheld
         axios.get(reqStr)
             .then(function (result) {
                 if (result.data.code == "1") {
@@ -288,10 +302,14 @@ var layer;
 	
 	
 	var getTotalShouldPay = function () {debugger
+	var total=0;
 		vm.ajax_data.total=0;
 	
 	vm.ajax_data.total=vm.ajax_data.planPrincipal+vm.ajax_data.planAccrual+vm.ajax_data.planServiceCharge+vm.ajax_data.platformCharge+vm.ajax_data.planGuaranteeCharge+Number(vm.ajax_data.onLineOverDueMoney)+Number(vm.ajax_data.underLineFactOverDueMoney)+vm.ajax_data.otherFee;
-	vm.ajax_data.factPayAllMoney=vm.ajax_data.total;
+	var total=vm.ajax_data.total;
+	vm.ajax_data.total=total.toFixed(2);
+	
+	return vm.ajax_data.total;
 	}
 
 	
@@ -322,5 +340,14 @@ var layer;
 		
    
 	}
-	
+	var doOperate = function () {debugger
+        if(vm.platformId=='5'){debugger
+        	vm.isBankFlag=true;
+        	vm.ajax_data.underLineFactOverDueMoney=0;
+        	vm.ajax_data.total=getTotalShouldPay();
+        }else{
+        	vm.isBankFlag=false;
+        	vm.ajax_data.total=getTotalShouldPay();
+        }
+	}
 	

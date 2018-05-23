@@ -17,26 +17,27 @@ public class WithHoldingInfo {
 
     private String Overduemoney;
     
-    private Integer isRepayAll;
+    private String isAmountWithheld;
     
-    private String repayMoney;
+    private String nowRepayMoney;
     
     
    
-    public Integer getIsRepayAll() {
-		return isRepayAll;
+ 
+	public String getIsAmountWithheld() {
+		return isAmountWithheld;
 	}
 
-	public void setIsRepayAll(Integer isRepayAll) {
-		this.isRepayAll = isRepayAll;
+	public void setIsAmountWithheld(String isAmountWithheld) {
+		this.isAmountWithheld = isAmountWithheld;
 	}
 
-	public String getRepayMoney() {
-		return repayMoney;
+	public String getNowRepayMoney() {
+		return nowRepayMoney;
 	}
 
-	public void setRepayMoney(String repayMoney) {
-		this.repayMoney = repayMoney;
+	public void setNowRepayMoney(String nowRepayMoney) {
+		this.nowRepayMoney = nowRepayMoney;
 	}
 
 	public String getBusinessId() {

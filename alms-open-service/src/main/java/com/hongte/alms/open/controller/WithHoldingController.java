@@ -76,7 +76,7 @@ public class WithHoldingController {
 	public Result<String> withholding(@RequestParam("originalBusinessId") String originalBusinessId,
 			@RequestParam("afterId") String afterId, @RequestParam("total") String total,
 			@RequestParam("planOverDueMoney") String planOverDueMoney, @RequestParam("platformId") String platformId,
-			@RequestParam("type") String type, @RequestParam("nowdate") String nowdate,@RequestParam("isRepayAll") Integer isRepayAll
+			@RequestParam("type") String type, @RequestParam("nowdate") String nowdate,@RequestParam("isAmountWithheld") String isAmountWithheld
 
 	) {
 		try {
@@ -89,8 +89,8 @@ public class WithHoldingController {
 			info.setFactDate(nowdate);
 			info.setRepayplatform(Integer.valueOf(platformId));
 			info.setType(Integer.valueOf(type));
-			info.setRepayMoney(total);
-			info.setIsRepayAll(isRepayAll);
+			info.setNowRepayMoney(total);
+			info.setIsAmountWithheld(isAmountWithheld);
 
 			requestData.setData(JSON.toJSONString(info));
 			requestData.setMethodName("AfterLoanRepayment_SubmitAutoRepay");
