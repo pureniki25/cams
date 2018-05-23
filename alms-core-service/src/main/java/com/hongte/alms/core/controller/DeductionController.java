@@ -19,6 +19,7 @@ import com.hongte.alms.base.entity.InfoSms;
 import com.hongte.alms.base.entity.SysBank;
 import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.entity.WithholdingPlatform;
+import com.hongte.alms.base.entity.WithholdingRecordLog;
 import com.hongte.alms.base.enums.AreaLevel;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
@@ -96,7 +97,11 @@ public class DeductionController {
     @Autowired
     @Qualifier("WithholdingPlatformService")
     WithholdingPlatformService withholdingplatformService;
-
+    
+    @Autowired
+    @Qualifier("WithholdingRecordLogService")
+    WithholdingRecordLogService withholdingRecordLogService;
+    
     @Autowired
     @Qualifier("SysBankService")
     SysBankService sysBankService;
@@ -116,6 +121,13 @@ public class DeductionController {
             	BigDecimal underLineOverDueMoney=BigDecimal.valueOf(Double.valueOf(map.get("underLineOverDueMoney").toString()));
             	deductionVo.setOnLineOverDueMoney(onLineOverDueMoney);
             	deductionVo.setUnderLineOverDueMoney(underLineOverDueMoney);
+            	
+            	
+        		List<WithholdingRecordLog> loglist=withholdingRecordLogService.selectWithholdingRecordLog(deductionVo.getOriginalBusinessId(), deductionVo.getAfterId());
+        		if(loglist!=null&&loglist.size()>0) {
+        			deductionVo.setRepayingAmount(loglist.get(0).getCurrentAmount());
+        			deductionVo.setTotal(deductionVo.getTotal()-deductionVo.getRepayingAmount().doubleValue());
+        		}
                 return Result.success(deductionVo);
 	
             }else {

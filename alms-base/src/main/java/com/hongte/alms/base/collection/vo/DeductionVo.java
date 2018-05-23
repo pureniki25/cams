@@ -20,7 +20,7 @@ public class DeductionVo {
     private double planAccrual;    //利息
     private double planGuaranteeCharge;    //担保费
     private double otherFee;           //其他费用
-    private String total; //本期应还金额
+    private double total; //本期应还金额
 
 
     private double borrowMoney;   //借款金额
@@ -39,11 +39,18 @@ public class DeductionVo {
     private BigDecimal  planAllAmount;//应还总额
     private BigDecimal  repayAllAmount;//已还总额
     private BigDecimal  restAmount;//剩余应还总额
+    private BigDecimal  repayingAmount;//代扣中的金额
     
     
     
     
-    public BigDecimal getRestAmount() {
+    public BigDecimal getRepayingAmount() {
+		return repayingAmount;
+	}
+	public void setRepayingAmount(BigDecimal repayingAmount) {
+		this.repayingAmount = repayingAmount;
+	}
+	public BigDecimal getRestAmount() {
 		return restAmount;
 	}
 	public void setRestAmount(BigDecimal restAmount) {
@@ -170,10 +177,10 @@ public class DeductionVo {
 	public void setOtherFee(double otherFee) {
 		this.otherFee = otherFee;
 	}
-	public String getTotal() {
+	public double getTotal() {
 		return total;
 	}
-	public void setTotal(String total) {
+	public void setTotal(double total) {
 		this.total = total;
 	}
 	public double getBorrowMoney() {

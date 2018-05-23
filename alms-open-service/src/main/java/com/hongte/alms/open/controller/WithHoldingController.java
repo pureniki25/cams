@@ -107,7 +107,7 @@ public class WithHoldingController {
 			
 			if ("1".equals(respData.getReturnCode())) {// 处理中
 				
-				Boolean flag=withHoldingInsertRecord(WithholdingRecordLogService, afterId, originalBusinessId, planOverDueMoney);
+				Boolean flag=withHoldingInsertRecord(WithholdingRecordLogService, afterId, originalBusinessId, total);
 				if(flag) {
 					return Result.success("代扣正在处理中,请稍后查看代扣结果");
 				}else {
