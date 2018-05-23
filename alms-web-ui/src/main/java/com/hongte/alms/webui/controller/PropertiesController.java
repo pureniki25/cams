@@ -33,7 +33,7 @@ public class PropertiesController {
 
 
 
-    @Value("${ht.config.ui.useGateWayflage}")
+    @Value("${ht.config.ui.useGateWayflage:true}")
     private Boolean useGateWayflage;//是否使用网关的标志位
 
     //修改密码的跳转地址

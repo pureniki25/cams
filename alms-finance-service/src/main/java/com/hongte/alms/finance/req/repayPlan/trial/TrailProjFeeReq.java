@@ -39,13 +39,13 @@ public class TrailProjFeeReq {
     private String feeItemName;
 
 
-    /**
-     * 费用项类型
-     */
-    @ApiModelProperty(required= true,value = "费用项所属分类，" +
-            "10：本金，20：利息，30：资产端分公司服务费，40：担保公司费用，" +
-            "50：资金端平台服务费，60：滞纳金，70：违约金，80：中介费，90：押金类费用，100：冲应收")
-    private Integer feeType;
+//    /**
+//     * 费用项类型
+//     */
+//    @ApiModelProperty(required= true,value = "费用项所属分类，" +
+//            "10：本金，20：利息，30：资产端分公司服务费，40：担保公司费用，" +
+//            "50：资金端平台服务费，60：滞纳金，70：违约金，80：中介费，90：押金类费用，100：冲应收")
+//    private Integer feeType;
 
 
     /**
@@ -135,14 +135,14 @@ public class TrailProjFeeReq {
 
 
 
-    public Integer getFeeType() {
-        return feeType;
-    }
-
-    public void setFeeType(Integer feeType) {
-        this.feeType = feeType;
-    }
-
+//    public Integer getFeeType() {
+//        return feeType;
+//    }
+//
+//    public void setFeeType(Integer feeType) {
+//        this.feeType = feeType;
+//    }
+//
 
 
     public List<ProjFeeDetailReq> getFeeDetailReqMap() {

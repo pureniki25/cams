@@ -1154,7 +1154,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                                     }
                                     if(feeDetail==null){
                                         throw new CreatRepaymentExcepiton("分段收费的费用详情找不到  期数："+i
-                                                +"     费用类型："+feeReq.getFeeType()  + "    费用ItemId："+feeReq.getFeeItemId());
+                                                  + "    费用ItemId："+feeReq.getFeeItemId());
                                     }
                                     peroidFeelDetail.setProjPlanAmount(feeDetail.getFeeValue());
                                 }else{

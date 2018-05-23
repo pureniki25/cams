@@ -58,4 +58,30 @@
 
 
 	</select>
+
+
+    <select id="queryCustomerRepayPlan" resultType="com.hongte.alms.base.RepayPlan.vo.RepayingPlanDto">
+
+      select
+        biz.business_id as businessId,
+        bizPlan.plan_status as planStatus,
+        bizPlan.original_business_id as orgBusinessId,
+        bType.business_type_name as businessType,
+        biz.business_type as bizTypeId
+      from tb_basic_business biz
+      join tb_repayment_biz_plan bizPlan on biz.business_id = bizPlan.business_id
+      left join tb_basic_business_type bType on biz.business_type= bType.business_type_id
+        <where>
+            biz.customer_identify_card = #{identifyCard}
+        </where>
+
+
+    </select>
+
+
+
+
+
+
+
 </mapper>

@@ -3,6 +3,12 @@ package com.hongte.alms.finance.controller;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.baomidou.mybatisplus.plugins.Page;
+import com.hongte.alms.base.RepayPlan.vo.RepayingPlanVo;
+import com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo;
+import com.hongte.alms.base.service.RepaymentBizPlanService;
+import com.hongte.alms.common.vo.PageResult;
+import io.swagger.models.auth.In;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +53,10 @@ public class RepayPlanController {
     @Autowired
     @Qualifier("CreatRepayPlanService")
     CreatRepayPlanService creatRepayPlanService;
+
+    @Autowired
+    @Qualifier("RepaymentBizPlanService")
+    RepaymentBizPlanService repaymentBizPlanService;
 
 
     @ApiOperation(value = "创建还款计划接口,不存储   全字段")
@@ -193,4 +203,24 @@ public class RepayPlanController {
 			return Result.error("9889", e.getMessage());
 		}
 	}
+
+    @ApiOperation(value = "根据用户身份证ID获取用户待还款的业务信息列表")
+    @GetMapping("/repaymentGetRepayingList")
+    @ResponseBody
+   public PageResult<Page<RepayingPlanVo>> repaymentGetRepayingList(Integer pageIndex, Integer pageSize, String identifyCard){
+        logger.info("根据用户身份证ID获取用户待还款的业务信息列表，客户身份证号：[{}], 页数[{}],每页大小[{}]", identifyCard, pageIndex,pageSize);
+        Page<RepayingPlanVo>  page = null;
+        try{
+            page = repaymentBizPlanService.queryCustomeRepayPlanInfo(identifyCard, pageIndex, pageSize) ;
+            logger.info("根据用户身份证ID获取用户待还款的业务信息列表，返回数据：[{}]", JSON.toJSONString(page));
+            return  PageResult.success(page,page.getTotal());
+        }catch (Exception e){
+            logger.error("根据用户身份证ID获取用户待还款的业务信息列表异常[{}]", e);
+            return  PageResult.error(9889, e.getMessage());
+        }
+   }
+
+
+
+
 }

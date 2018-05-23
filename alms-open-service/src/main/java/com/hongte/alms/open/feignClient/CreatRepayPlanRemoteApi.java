@@ -19,19 +19,19 @@ import com.hongte.alms.open.req.repayPlan.trial.TrailRepayPlanReq;
 @FeignClient(value = "alms-finance-service")
 public interface CreatRepayPlanRemoteApi {
 
-    @RequestMapping(value = "/alms/finance/RepayPlan/creatRepayPlan",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+    @RequestMapping(value = "/RepayPlan/creatRepayPlan",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
     Result<PlanReturnInfoDto> creatRepayPlan(CreatRepayPlanReq creatRepayPlanReq);
 
-    @RequestMapping(value = "/alms/finance/RepayPlan/creatAndSaveRepayPlan",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+    @RequestMapping(value = "/RepayPlan/creatAndSaveRepayPlan",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
     Result<PlanReturnInfoDto> creatAndSaveRepayPlan(CreatRepayPlanReq creatRepayPlanReq);
 
-    @RequestMapping(value = "/alms/finance/RepayPlan/creatAndSaveRepayPlan",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+    @RequestMapping(value = "/RepayPlan/creatAndSaveRepayPlan",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
     Result<PlanReturnInfoDto> trailRepayPlan(TrailRepayPlanReq trailRepayPlanReq);
     
-    @RequestMapping(value = "/alms/finance/RepayPlan/queryRepayPlanByBusinessId",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
+    @RequestMapping(value = "/RepayPlan/queryRepayPlanByBusinessId",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
     Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(String businessId);
     
-    @RequestMapping(value = "/alms/finance/RepayPlan/deleteRepayPlanByConditions",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
+    @RequestMapping(value = "/RepayPlan/deleteRepayPlanByConditions",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
     Result<PlanReturnInfoDto> deleteRepayPlanByConditions(String businessId, String repaymentBatchId);
 
 }
