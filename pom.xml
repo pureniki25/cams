@@ -10,6 +10,7 @@
     <modules>
         <module>alms-core-service</module>
         <module>alms-finance-service</module>
+        <module>alms-withhold-service</module>
         <module>alms-open-service</module>
         <module>alms-common</module>
         <module>alms-web-ui</module>
@@ -20,6 +21,12 @@
         <module>alms-scheduled-service</module>
 
     </modules>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-netflix-core</artifactId>
+        </dependency>
+    </dependencies>
     <packaging>pom</packaging>
 
     <properties>
