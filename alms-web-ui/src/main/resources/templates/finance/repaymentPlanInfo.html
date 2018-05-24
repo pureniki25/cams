@@ -50,13 +50,13 @@
 		        		<tbody v-for="(item, index) in bizRepaymentPlanList">
 			        		<tr>
 		        				<td>{{ item.afterId }}</td>
-			        			<td v-html="addEventForType(item.repayment)"></td>
+			        			<td v-html="addEventForType(item)"></td>
 			        			<td>{{ item.repaymentDate }}</td>
 			        			<td>{{ item.principal }}</td>
 			        			<td>{{ item.accrual }}</td>
 			        			<td>{{ item.serviceCharge }}</td>
 			        			<td>{{ item.platformCharge }}</td>
-			        			<td v-if="item.repayment == '实际还款'" v-html="addEventForOtherFee(item.otherFee)"></td>
+			        			<td v-if="item.repayment == '实际还款'" v-html="addEventForOtherFee(item)"></td>
 			        			<td v-else>{{ item.otherFee }}</td>
 			        			<td>{{ item.subtotal }}</td>
 			        			<td>{{ item.overdueDays }}</td>
