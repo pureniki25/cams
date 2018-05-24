@@ -1,4 +1,4 @@
-package com.hongte.alms.finance.req.repayPlan;
+package com.hongte.alms.base.RepayPlan.req;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -49,19 +49,19 @@ public class ProjInfoReq {
     private BigDecimal offLineInOverDueRate;
 
     @ApiModelProperty(required= true,value = "线下期内逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率")
-    private  Integer offLineInOverDueRateUnit;
+    private  Integer offLineInOverDueRateType;
 
     @ApiModelProperty(required= true,value = "线下期外逾期滞纳金费率(%)")
     private BigDecimal offLineOutOverDueRate;
 
     @ApiModelProperty(required= true,value = "线下期外逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率")
-    private  Integer offLineOutOverDueRateUnit;
+    private  Integer offLineOutOverDueRateType;
 
     @ApiModelProperty(required= true,value = "线上逾期滞纳金费率(%)")
     private BigDecimal onLineOverDueRate;
 
     @ApiModelProperty(required= true,value = "线上逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率")
-    private  Integer onLineOverDueRateUnit;
+    private  Integer onLineOverDueRateType;
 
 
     @ApiModelProperty(required= true,value = "还款方式：1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息,11:等本等息")
@@ -1170,12 +1170,12 @@ public class ProjInfoReq {
         this.offLineInOverDueRate = offLineInOverDueRate;
     }
 
-    public Integer getOffLineInOverDueRateUnit() {
-        return offLineInOverDueRateUnit;
+    public Integer getOffLineInOverDueRateType() {
+        return offLineInOverDueRateType;
     }
 
-    public void setOffLineInOverDueRateUnit(Integer offLineInOverDueRateUnit) {
-        this.offLineInOverDueRateUnit = offLineInOverDueRateUnit;
+    public void setOffLineInOverDueRateType(Integer offLineInOverDueRateType) {
+        this.offLineInOverDueRateType = offLineInOverDueRateType;
     }
 
     public List<ProjFeeReq> getProjFeeInfos() {
@@ -1210,12 +1210,12 @@ public class ProjInfoReq {
         this.onLineOverDueRate = onLineOverDueRate;
     }
 
-    public Integer getOnLineOverDueRateUnit() {
-        return onLineOverDueRateUnit;
+    public Integer getOnLineOverDueRateType() {
+        return onLineOverDueRateType;
     }
 
-    public void setOnLineOverDueRateUnit(Integer onLineOverDueRateUnit) {
-        this.onLineOverDueRateUnit = onLineOverDueRateUnit;
+    public void setOnLineOverDueRateType(Integer onLineOverDueRateType) {
+        this.onLineOverDueRateType = onLineOverDueRateType;
     }
 
     public BigDecimal getOffLineOutOverDueRate() {
@@ -1226,12 +1226,12 @@ public class ProjInfoReq {
         this.offLineOutOverDueRate = offLineOutOverDueRate;
     }
 
-    public Integer getOffLineOutOverDueRateUnit() {
-        return offLineOutOverDueRateUnit;
+    public Integer getOffLineOutOverDueRateType() {
+        return offLineOutOverDueRateType;
     }
 
-    public void setOffLineOutOverDueRateUnit(Integer offLineOutOverDueRateUnit) {
-        this.offLineOutOverDueRateUnit = offLineOutOverDueRateUnit;
+    public void setOffLineOutOverDueRateType(Integer offLineOutOverDueRateType) {
+        this.offLineOutOverDueRateType = offLineOutOverDueRateType;
     }
 
     public String getTdUserId() {

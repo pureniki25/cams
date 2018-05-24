@@ -1,6 +1,6 @@
-package com.hongte.alms.open.req.repayPlan.trial;
+package com.hongte.alms.base.RepayPlan.req.trial;
 
-import com.hongte.alms.open.req.repayPlan.ProjFeeDetailReq;
+import com.hongte.alms.base.RepayPlan.req.ProjFeeDetailReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -38,13 +38,13 @@ public class TrailProjFeeReq {
     private String feeItemName;
 
 
-    /**
-     * 费用项类型
-     */
-    @ApiModelProperty(required= true,value = "费用项所属分类，" +
-            "10：本金，20：利息，30：资产端分公司服务费，40：担保公司费用，" +
-            "50：资金端平台服务费，60：滞纳金，70：违约金，80：中介费，90：押金类费用，100：冲应收")
-    private Integer feeType;
+//    /**
+//     * 费用项类型
+//     */
+//    @ApiModelProperty(required= true,value = "费用项所属分类，" +
+//            "10：本金，20：利息，30：资产端分公司服务费，40：担保公司费用，" +
+//            "50：资金端平台服务费，60：滞纳金，70：违约金，80：中介费，90：押金类费用，100：冲应收")
+//    private Integer feeType;
 
 
     /**
@@ -58,6 +58,12 @@ public class TrailProjFeeReq {
      */
     @ApiModelProperty(required= true,value = "[业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值]")
     private BigDecimal feeValue;
+
+    /**
+     * [收取费用方式，1为按月收取，2为一次收取]
+     */
+    @ApiModelProperty(required= true,value = "收取费用方式，1为按月收取，2为一次收取")
+    private Integer chargeType;
 
     /**
      * [是否一次收取，1为按月收取，2为一次收取]
@@ -134,14 +140,14 @@ public class TrailProjFeeReq {
 
 
 
-    public Integer getFeeType() {
-        return feeType;
-    }
-
-    public void setFeeType(Integer feeType) {
-        this.feeType = feeType;
-    }
-
+//    public Integer getFeeType() {
+//        return feeType;
+//    }
+//
+//    public void setFeeType(Integer feeType) {
+//        this.feeType = feeType;
+//    }
+//
 
 
     public List<ProjFeeDetailReq> getFeeDetailReqMap() {
@@ -150,5 +156,13 @@ public class TrailProjFeeReq {
 
     public void setFeeDetailReqMap(List<ProjFeeDetailReq> feeDetailReqMap) {
         this.feeDetailReqMap = feeDetailReqMap;
+    }
+
+    public Integer getChargeType() {
+        return chargeType;
+    }
+
+    public void setChargeType(Integer chargeType) {
+        this.chargeType = chargeType;
     }
 }

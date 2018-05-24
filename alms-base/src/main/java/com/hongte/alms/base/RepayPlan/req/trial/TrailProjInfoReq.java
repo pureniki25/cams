@@ -1,16 +1,11 @@
-package com.hongte.alms.finance.req.repayPlan.trial;
+package com.hongte.alms.base.RepayPlan.req.trial;
 
-import com.hongte.alms.finance.req.repayPlan.PrincipleReq;
-import com.hongte.alms.finance.req.repayPlan.ProjFeeReq;
-import com.hongte.alms.finance.req.repayPlan.ProjectCarInfoReq;
-import com.hongte.alms.finance.req.repayPlan.ProjectHouseInfoReq;
+import com.hongte.alms.base.RepayPlan.req.PrincipleReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author zengkun
@@ -100,11 +95,11 @@ public class TrailProjInfoReq {
 //        this.overDueRate = overDueRate;
 //    }
 //
-//    public Integer getOffLineInOverDueRateUnit() {
+//    public Integer getOffLineInOverDueRateType() {
 //        return overDueRateUnit;
 //    }
 //
-//    public void setOffLineInOverDueRateUnit(Integer overDueRateUnit) {
+//    public void setOffLineInOverDueRateType(Integer overDueRateUnit) {
 //        this.overDueRateUnit = overDueRateUnit;
 //    }
 
