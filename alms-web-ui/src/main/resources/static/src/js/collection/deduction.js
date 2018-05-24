@@ -60,8 +60,7 @@ var layer;
 
                 },
                 platformList:[],
-                platformId:1,
-                details:[]
+                platformId:5
                 
          
         	},
@@ -214,9 +213,11 @@ var layer;
                           vm.$Modal.error({content: '没有找到数据'});
                           return;
                       }
+                  
                     vm.ajax_data=result.data.data; 
                     vm.details=result.data.data.details;
                     vm.platformId=result.data.data.platformId;
+                    vm.platformId=5;
                     if(result.data.data.underLineOverDueMoney>0){
                      	vm.ajax_data.planOverDueMoney=result.data.data.underLineOverDueMoney;
                      	vm.ajax_data.onLineOverDueMoney=result.data.data.onLineOverDueMoney;

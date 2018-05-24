@@ -16,6 +16,8 @@ import com.hongte.alms.base.entity.ApplyDerateProcess;
 import com.hongte.alms.base.entity.BasicBusinessType;
 import com.hongte.alms.base.entity.BasicCompany;
 import com.hongte.alms.base.entity.InfoSms;
+import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.SysBank;
 import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.entity.WithholdingPlatform;
@@ -103,6 +105,10 @@ public class DeductionController {
     WithholdingRecordLogService withholdingRecordLogService;
     
     @Autowired
+    @Qualifier("RepaymentBizPlanListService")
+    RepaymentBizPlanListService repaymentBizPlanListService;
+    
+    @Autowired
     @Qualifier("SysBankService")
     SysBankService sysBankService;
     @ApiOperation(value = "根据Plan_list_id查找代扣信息")
@@ -115,7 +121,13 @@ public class DeductionController {
         try{
             //执行代扣信息
             DeductionVo deductionVo=  deductionService.selectDeductionInfoByPlanListId(planListId);
+            	
             if(deductionVo!=null) {
+            	RepaymentBizPlanList pList=repaymentBizPlanListService.selectById(planListId);
+            	if(istLastPeriod(pList)) {
+            	 	 return Result.error("-1", "最后一期不能代扣");
+            	}
+            	
                 Map<String, Object> map=basicBusinessService.getOverDueMoney(planListId, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid());
             	BigDecimal onLineOverDueMoney=BigDecimal.valueOf(Double.valueOf(map.get("onLineOverDueMoney").toString()));
             	BigDecimal underLineOverDueMoney=BigDecimal.valueOf(Double.valueOf(map.get("underLineOverDueMoney").toString()));
@@ -126,6 +138,7 @@ public class DeductionController {
         		List<WithholdingRecordLog> loglist=withholdingRecordLogService.selectList(new EntityWrapper<WithholdingRecordLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).ne("repay_status", 0));
         		//还款中的数据
         		List<WithholdingRecordLog> repayingList=withholdingRecordLogService.selectList(new EntityWrapper<WithholdingRecordLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).eq("repay_status", 2));
+        		
         		BigDecimal repayAmount=BigDecimal.valueOf(0);
         		BigDecimal repayingAmount=BigDecimal.valueOf(0);
         		for(WithholdingRecordLog log:loglist) {
@@ -216,6 +229,27 @@ public class DeductionController {
        }
    }
 
+   /**
+    * 
+    * 判断每期还款计划是否为最后一期
+    * @param projPlanList
+    * @return
+    */
+	private boolean istLastPeriod(RepaymentBizPlanList pList) {
+		boolean isLast=false;
+		List<RepaymentBizPlanList> pLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", pList.getPlanId()));
+		RepaymentBizPlanList lastpList=pLists.stream().max(new Comparator<RepaymentBizPlanList>() {
+			@Override
+			public int compare(RepaymentBizPlanList o1, RepaymentBizPlanList o2) {
+				return o1.getDueDate().compareTo(o2.getDueDate());
+			}
+		}).get();
+		
+		if(pList.getPlanListId().equals(lastpList.getPlanListId())) {
+			isLast=true;
+		}
+		return isLast;
+	}	
    
 
    }
