@@ -623,6 +623,9 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			}
 
 			int curPeriod = (int) resultMap.get("curPeriod"); // // 当前期数
+			String pListId = resultMap.get("pListId").toString(); // // 当前期ID
+			
+			
 			if(carLoanBilVO.getCurrentPriod()!=null) {//如果不为null,说明是减免申请调用此方法获取减免结清时候的提前违约金
 				curPeriod=carLoanBilVO.getCurrentPriod();
 				planAccrual=carLoanBilVO.getNeedPayInterest();
@@ -697,8 +700,15 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				if ("到期还本息".equals(repaymentTypeId) || "每月付息到期还本".equals(repaymentTypeId)) {
 
 					if (outputPlatformId == 1) {
-						preLateFees = ((BigDecimal) resultMap.get("surplusServiceCharge")).doubleValue();
-						preLateFees = preLateFees > borrowMoney * 0.06 ? borrowMoney * 0.06 : preLateFees;
+						RepaymentBizPlanList pList=new RepaymentBizPlanList();
+						pList.setPlanListId(pListId);
+						if(istLastPeriod(pList)) {
+							preLateFees=0;
+						}else {
+							preLateFees = ((BigDecimal) resultMap.get("surplusServiceCharge")).doubleValue();
+							preLateFees = preLateFees > borrowMoney * 0.06 ? borrowMoney * 0.06 : preLateFees;
+						}
+					
 					}
 				} else if ("等额本息".equals(repaymentTypeId)) {
 					//planAccrual = surplusPrincipal * monthBorrowRate;
@@ -878,5 +888,25 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			throw new ServiceRuntimeException(e.getMessage(), e);
 		}
 	}
-
+	   /**
+	    * 
+	    * 判断每期还款计划是否为最后一期
+	    * @param projPlanList
+	    * @return
+	    */
+		private boolean istLastPeriod(RepaymentBizPlanList pList) {
+			boolean isLast=false;
+			RepaymentBizPlanList lastpList=pLists.stream().max(new Comparator<RepaymentBizPlanList>() {
+				List<RepaymentBizPlanList> pLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", pList.getPlanId()));
+				@Override
+				public int compare(RepaymentBizPlanList o1, RepaymentBizPlanList o2) {
+					return o1.getDueDate().compareTo(o2.getDueDate());
+				}
+			}).get();
+			
+			if(pList.getPlanListId().equals(lastpList.getPlanListId())) {
+				isLast=true;
+			}
+			return isLast;
+		}	
 }
