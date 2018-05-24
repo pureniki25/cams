@@ -57,11 +57,10 @@ var layer;
                     repayAllAmount:"",//已还总额
                     restAmount:"",
                     repayingAmount:''//代扣中金额
-                   
 
                 },
                 platformList:[],
-                platformId:1
+                platformId:5
                 
          
         	},
@@ -214,8 +213,11 @@ var layer;
                           vm.$Modal.error({content: '没有找到数据'});
                           return;
                       }
+                  
                     vm.ajax_data=result.data.data; 
+                    vm.details=result.data.data.details;
                     vm.platformId=result.data.data.platformId;
+                    vm.platformId=5;
                     if(result.data.data.underLineOverDueMoney>0){
                      	vm.ajax_data.planOverDueMoney=result.data.data.underLineOverDueMoney;
                      	vm.ajax_data.onLineOverDueMoney=result.data.data.onLineOverDueMoney;
@@ -277,10 +279,18 @@ var layer;
                             //request: {} //如果无需自定义请求参数，可不加该参数
                             //response: {} //如果无需自定义数据响应名称，可不加该参数
                             page: false,
-                            done: function (res, curr, count) {
-                                //数据渲染完的回调。你可以借此做一些其它的操作
-                                //如果是异步请求数据方式，res即为你接口返回的信息。
-                                //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
+                            done: function (res, curr, count) {debugger
+                            	  var list=res.data;
+                                  var repayMoney=0;
+                   	            	if(list != null && list.length > 0){
+		                   	           	for (var i = 0; i < list.length; i++){
+		                   	           		if(list[i].repayStatus!="失败"){
+		                   	           	 	repayMoney=repayMoney+Number(list[i].planTotalRepayMoney);
+		                   	           		}
+		                   	           	}
+		                   	       	}
+                   	            	vm.ajax_data.repayAllAmount=repayMoney;
+                   	            	getTotalShouldPay();
                                 vm.loading = false;
                             }
                         });
@@ -308,7 +318,7 @@ var layer;
 	var total=0;
 		vm.ajax_data.total=0;
 	
-	vm.ajax_data.total=vm.ajax_data.planPrincipal+vm.ajax_data.planAccrual+vm.ajax_data.planServiceCharge+vm.ajax_data.platformCharge+Number(vm.ajax_data.onLineOverDueMoney)+Number(vm.ajax_data.underLineFactOverDueMoney)-vm.ajax_data.repayingAmount;
+	vm.ajax_data.total=vm.ajax_data.planPrincipal+vm.ajax_data.planAccrual+vm.ajax_data.planServiceCharge+vm.ajax_data.platformCharge+Number(vm.ajax_data.onLineOverDueMoney)+Number(vm.ajax_data.underLineFactOverDueMoney)-vm.ajax_data.repayAllAmount;
 	var total=vm.ajax_data.total;
 	vm.ajax_data.total=total.toFixed(2);
 	
