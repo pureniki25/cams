@@ -617,7 +617,8 @@
 	
 	<select id="queryCarLoanFees" resultType="map">
 		SELECT 
-		  c.`due_date` dueDate,
+		  c.current_status curCurrentStatus, 
+		  c.`due_date` curDueDate,
 		  -- 应还日期 
 		  c.`period` curPeriod,
 		  -- 当前应还期数 
@@ -674,6 +675,7 @@
 		    t2.`period`,
 		    t2.`due_date`,
 		    t3.totalPeriod,
+		    t2.current_status, 
 		    SUM(
 		      CASE
 		        WHEN t1.plan_item_type = 40 
@@ -752,6 +754,7 @@
 		  tab.afterId,
 		  -- 期数
 		  tab.current_status currentStatus,
+		  tab.due_date,
 		  -- 当期还款状态
 		  (
 		    tab.planAccrual - tab.factAccrual
@@ -767,6 +770,7 @@
 		    t2.`after_id` afterId,
 		    t2.current_status,
 		    t2.orig_business_id,
+		    t2.due_date,
 		    SUM(
 		      CASE
 		        WHEN t.plan_item_type = 20 
@@ -825,7 +829,7 @@
 		WHERE (tab.planAccrual - tab.factAccrual) > 0 
 		OR (tab.planServiceCharge - tab.factServiceCharge) > 0
 		OR (tab.pateFees - tab.factLateFees) > 0
-		ORDER BY tab.afterId 
+		ORDER BY tab.due_date 
 	</select>
 	
 	<select id="queryMatchingRepaymentPlanAccrualSurplusPrincipal" resultType="java.lang.Double">
