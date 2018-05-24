@@ -60,6 +60,14 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 	@TableField("plan_amount")
 	@ApiModelProperty(required= true,value = "项目计划应还总金额(元)")
 	private BigDecimal planAmount;
+	
+	/**
+     * 减免金额
+     */
+	@TableField("derate_amount")
+	@ApiModelProperty(required= true,value = "减免金额")
+	private BigDecimal derateAmount;
+	
     /**
      * 项目计划应还比例(%)，如0.5%则存0.5，可空
      */

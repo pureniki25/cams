@@ -22,6 +22,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.dto.ConfirmRepaymentReq;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
+import com.hongte.alms.base.entity.AccountantOverRepayLog;
 import com.hongte.alms.base.entity.ApplyDerateProcess;
 import com.hongte.alms.base.entity.ApplyDerateType;
 import com.hongte.alms.base.entity.BasicBusiness;
@@ -43,6 +44,7 @@ import com.hongte.alms.base.enums.RepayedFlag;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
+import com.hongte.alms.base.mapper.AccountantOverRepayLogMapper;
 import com.hongte.alms.base.mapper.ApplyDerateProcessMapper;
 import com.hongte.alms.base.mapper.ApplyDerateTypeMapper;
 import com.hongte.alms.base.mapper.BasicBusinessMapper;
@@ -111,6 +113,8 @@ public class FinanceServiceImpl implements FinanceService {
 	ApplyDerateTypeMapper applyDerateTypeMapper;
 	@Autowired
 	ProcessMapper processMapper;
+	@Autowired
+	AccountantOverRepayLogMapper accountantOverRepayLogMapper;
 
 	
 	@Autowired
@@ -776,7 +780,7 @@ public class FinanceServiceImpl implements FinanceService {
 	 * @param moneyPoolRepayment
 	 * @return
 	 */
-	private RepaymentResource initByMoneyPoolRepayment(MoneyPoolRepayment moneyPoolRepayment) {
+	private void saveByMoneyPoolRepayment(MoneyPoolRepayment moneyPoolRepayment) {
 		RepaymentResource repaymentResource = new RepaymentResource() ;
 		repaymentResource.setAfterId(moneyPoolRepayment.getAfterId());
 		repaymentResource.setBusinessId(moneyPoolRepayment.getOriginalBusinessId());
@@ -787,9 +791,36 @@ public class FinanceServiceImpl implements FinanceService {
 		repaymentResource.setRepayDate(moneyPoolRepayment.getTradeDate());
 		repaymentResource.setRepaySource("10");
 		repaymentResource.setRepaySourceRefId(moneyPoolRepayment.getId().toString());
-		return repaymentResource;
+		repaymentResource.insert();
 	}
 	
+	private AccountantOverRepayLog saveByAccountOverRepay(ConfirmRepaymentReq req) {
+		AccountantOverRepayLog accountantOverRepayLog = new AccountantOverRepayLog() ;
+		accountantOverRepayLog.setBusinessAfterId(req.getAfterId());
+		accountantOverRepayLog.setBusinessId(req.getBusinessId());
+		accountantOverRepayLog.setCreateTime(new Date());
+		accountantOverRepayLog.setCreateUser(loginUserInfoHelper.getUserId());
+		accountantOverRepayLog.setFreezeStatus(0);
+		accountantOverRepayLog.setIsRefund(0);
+		accountantOverRepayLog.setIsTemporary(0);
+		accountantOverRepayLog.setMoneyType(0);
+		accountantOverRepayLog.setOverRepayMoney(req.getSurplusFund());
+		accountantOverRepayLog.setRemark(String.format("支出于%s的%s期线下财务确认", req.getBusinessId(),req.getAfterId()));
+		accountantOverRepayLog.insert();
+		
+		RepaymentResource repaymentResource = new RepaymentResource() ;
+		repaymentResource.setAfterId(req.getAfterId());
+		repaymentResource.setBusinessId(req.getBusinessId());
+		repaymentResource.setCreateDate(new Date());
+		repaymentResource.setCreateUser(loginUserInfoHelper.getUserId());
+		repaymentResource.setIsCancelled(0);
+		repaymentResource.setRepayAmount(req.getSurplusFund());
+		repaymentResource.setRepayDate(new Date());
+		repaymentResource.setRepaySource("11");
+		repaymentResource.setRepaySourceRefId(accountantOverRepayLog.getId().toString());
+		repaymentResource.insert();
+		return accountantOverRepayLog;
+	}
 	
 	/**
 	 * 计算本次总还款金额
@@ -815,16 +846,24 @@ public class FinanceServiceImpl implements FinanceService {
 			return Result.error("500", "结余金额不足");
 		}
 		RepaymentBizPlanDto repaymentBizPlanDto = initRepaymentBizPlanDto(req);
+		ConfirmRepaymentPreviewDto confirmRepaymentPreviewDto= new ConfirmRepaymentPreviewDto();
 		
 		if (req.getSurplusFund()!=null||req.getSurplusFund().compareTo(new BigDecimal(0))>0) {
 			/*用结余*/
-			
+			AccountantOverRepayLog accountantOverRepayLog = saveByAccountOverRepay(req);
+			confirmRepaymentPreviewDto = fillItem(
+					req.getSurplusFund(),
+					new BigDecimal(0),
+					new BigDecimal(0),
+					repaymentBizPlanDto,
+					new Date(),
+					11,
+					accountantOverRepayLog.getId().toString(),
+					false);
 		}
 		List<MoneyPoolRepayment> list = moneyPoolRepaymentMapper.selectBatchIds(req.getMprIds());
 		BigDecimal repayMoney = new BigDecimal(0);
-		ConfirmRepaymentPreviewDto confirmRepaymentPreviewDto= new ConfirmRepaymentPreviewDto();
 		for (MoneyPoolRepayment moneyPoolRepayment : list) {
-			RepaymentResource repaymentResource = initByMoneyPoolRepayment(moneyPoolRepayment);
 			repayMoney = moneyPoolRepayment.getAccountMoney().add(repayMoney);
 			confirmRepaymentPreviewDto = fillItem(
 					repayMoney, 
@@ -835,11 +874,12 @@ public class FinanceServiceImpl implements FinanceService {
 					10, 
 					moneyPoolRepayment.getId().toString(), 
 					false);
-			repaymentResource.insert();
+			saveByMoneyPoolRepayment(moneyPoolRepayment);
 		}
 		logger.info(JSON.toJSONString(confirmRepaymentPreviewDto.getList()));
 		return Result.success(confirmRepaymentPreviewDto);
 	}
+	
 
 	/**
 	 * 查找并关联业务有关的还款计划
@@ -953,18 +993,6 @@ public class FinanceServiceImpl implements FinanceService {
 		}
 	}
 	
-	/**
-	 * 处理还款来源为线下还款
-	 * @author 王继光
-	 * 2018年5月18日 上午10:17:06
-	 * @param req
-	 */
-	private void handleMoneyPoolRepayment(ConfirmRepaymentReq req,RepaymentBizPlanDto dto) {
-		List<MoneyPoolRepayment> list = moneyPoolRepaymentMapper.selectBatchIds(req.getMprIds());
-		for (MoneyPoolRepayment moneyPoolRepayment : list) {
-			RepaymentResource repaymentResource = initByMoneyPoolRepayment(moneyPoolRepayment);
-		}
-	}
 	
 	/**
 	 * 计算每个标的占比
