@@ -211,7 +211,8 @@ window.layinit(function (htConfig) {
                             on: {
                                 click: function () {
                                 	console.log(p)
-                                	let url = '/finance/repaymentPlanInfo?businessId=' + p.row.businessId;
+                                	let url = '/finance/repaymentPlanInfo?businessId=' + p.row.businessId + '&customer=' + p.row.customer + '&phoneNumber=' + p.row.phoneNumber
+                                	 + '&repaymentType=' + p.row.repaymentType + '&borrowMoney=' + p.row.borrowMoney + '&borrowLimit=' + p.row.borrowLimit;
                                     layer.open({
                                         type: 2,
                                         title: '计划详情',
@@ -219,7 +220,6 @@ window.layinit(function (htConfig) {
                                         area: ['1600px', '800px'],
                                         success: function (layero, index) {
                                             console.log(layero, index);
-                                            curIndex = index ;
                                         }
                                     })
                                 }

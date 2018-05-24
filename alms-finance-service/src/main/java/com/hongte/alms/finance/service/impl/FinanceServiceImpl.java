@@ -4,13 +4,17 @@
 package com.hongte.alms.finance.service.impl;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.UUID;
 
-import org.json.JSONArray;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +25,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.dto.ConfirmRepaymentReq;
+import com.hongte.alms.base.dto.RepaymentPlanInfoDTO;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.entity.ApplyDerateProcess;
 import com.hongte.alms.base.entity.ApplyDerateType;
-import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.MoneyPool;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
@@ -36,7 +40,6 @@ import com.hongte.alms.base.entity.RepaymentProjPlanList;
 import com.hongte.alms.base.entity.RepaymentProjPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentResource;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
-import com.hongte.alms.base.enums.RepayCurrentStatusEnums;
 import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.enums.RepayRegisterState;
 import com.hongte.alms.base.enums.RepayedFlag;
@@ -57,6 +60,7 @@ import com.hongte.alms.base.mapper.RepaymentProjPlanListMapper;
 import com.hongte.alms.base.mapper.RepaymentProjPlanMapper;
 import com.hongte.alms.base.mapper.RepaymentResourceMapper;
 import com.hongte.alms.base.mapper.TuandaiProjectInfoMapper;
+import com.hongte.alms.base.process.entity.Process;
 import com.hongte.alms.base.process.mapper.ProcessMapper;
 import com.hongte.alms.base.vo.finance.CurrPeriodDerateInfoVO;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
@@ -66,8 +70,6 @@ import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.finance.dto.repayPlan.ConfirmRepaymentPreviewDto;
 import com.hongte.alms.finance.dto.repayPlan.RepaymentBizPlanDto;
-import com.hongte.alms.finance.dto.repayPlan.RepaymentBizPlanDtoUtil;
-import com.hongte.alms.finance.dto.repayPlan.RepaymentBizPlanListDetailDto;
 import com.hongte.alms.finance.dto.repayPlan.RepaymentBizPlanListDto;
 import com.hongte.alms.finance.dto.repayPlan.RepaymentProjPlanDto;
 import com.hongte.alms.finance.dto.repayPlan.RepaymentProjPlanListDetailDto;
@@ -75,7 +77,6 @@ import com.hongte.alms.finance.dto.repayPlan.RepaymentProjPlanListDto;
 import com.hongte.alms.finance.service.FinanceService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.BoaInRoleInfoDto;
-import com.hongte.alms.base.process.entity.Process;
 
 /**
  * @author 王继光 2018年5月7日 下午6:03:41
@@ -1540,6 +1541,126 @@ public class FinanceServiceImpl implements FinanceService {
 		}
 		return null;
 		
+	}
+
+	@Override
+	public Map<String, Object> queryRepaymentPlanInfoByBusinessId(String businessId) {
+		try {
+			Map<String, Object> resultMap = new HashMap<>();
+
+			List<RepaymentPlanInfoDTO> repaymentPlanInfoDTOs = repaymentBizPlanListMapper
+					.queryRepaymentPlanInfoByBusinessId(businessId);
+
+			if (CollectionUtils.isNotEmpty(repaymentPlanInfoDTOs)) {
+
+				Map<String, List<RepaymentPlanInfoDTO>> map = new TreeMap<>();
+
+				for (RepaymentPlanInfoDTO repaymentPlanInfoDTO : repaymentPlanInfoDTOs) {
+
+					double accrual = repaymentPlanInfoDTO.getAccrual();
+					double principal = repaymentPlanInfoDTO.getPrincipal();
+					double serviceCharge = repaymentPlanInfoDTO.getServiceCharge();
+					double platformCharge = repaymentPlanInfoDTO.getPlatformCharge();
+					double offlineLateFee = repaymentPlanInfoDTO.getOfflineLateFee();
+					double onlineLateFee = repaymentPlanInfoDTO.getOnlineLateFee();
+					repaymentPlanInfoDTO
+							.setSubtotal(BigDecimal.valueOf(accrual + principal + serviceCharge + platformCharge)
+									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+					repaymentPlanInfoDTO.setTotal(
+							BigDecimal.valueOf(onlineLateFee + offlineLateFee + repaymentPlanInfoDTO.getSubtotal())
+									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+
+					String afterId = repaymentPlanInfoDTO.getAfterId();
+
+					// 根据afterId 将 应还与实还分组
+					List<RepaymentPlanInfoDTO> dtos = map.get(afterId);
+
+					if (dtos == null) {
+						dtos = new ArrayList<>();
+						dtos.add(repaymentPlanInfoDTO);
+						map.put(afterId, dtos);
+					} else {
+						dtos.add(repaymentPlanInfoDTO);
+						map.put(afterId, dtos);
+					}
+
+				}
+
+				if (!map.isEmpty()) {
+
+					List<RepaymentPlanInfoDTO> resultList = new ArrayList<>();
+
+					for (Entry<String, List<RepaymentPlanInfoDTO>> entry : map.entrySet()) {
+
+						// 每一个 infoDTOs 只可能有一个应还数据，可能有多个实还数据
+						List<RepaymentPlanInfoDTO> infoDTOs = entry.getValue();
+
+						RepaymentPlanInfoDTO planInfoDTO = new RepaymentPlanInfoDTO(); // 计划还款
+
+						double accrual = 0; // 利息
+						double offlineLateFee = 0; // 线下滞纳金
+						double principal = 0; // 本金
+						double serviceCharge = 0; // 月收分公司服务费
+						double platformCharge = 0; // 月收平台费
+						double subtotal = 0; // 小计
+						double onlineLateFee = 0; // 线上滞纳金
+						double total = 0; // 还款合计（含滞纳金）
+
+						for (RepaymentPlanInfoDTO infoDTO : infoDTOs) {
+							String repayment = infoDTO.getRepayment();
+							if ("计划还款".equals(repayment)) {
+								planInfoDTO = infoDTO; // infoDTOs.get(0) 根据sql取数规则，必定为计划还款
+							} else if ("实际还款".equals(repayment)) {
+								accrual += infoDTO.getAccrual();
+								offlineLateFee += infoDTO.getOfflineLateFee();
+								principal += infoDTO.getPrincipal();
+								serviceCharge += infoDTO.getServiceCharge();
+								platformCharge += infoDTO.getPlatformCharge();
+								subtotal += infoDTO.getSubtotal();
+								onlineLateFee += infoDTO.getOnlineLateFee();
+								total += infoDTO.getTotal();
+								infoDTO.setSurplus((infoDTO.getAmount() - planInfoDTO.getAmount()) < 0 ? 0
+										: (infoDTO.getAmount() - planInfoDTO.getAmount()));
+							}
+						}
+
+						RepaymentPlanInfoDTO balanceRepayment = new RepaymentPlanInfoDTO(); // 差额
+						balanceRepayment.setAccrual(planInfoDTO.getAccrual() - accrual);
+						balanceRepayment.setAfterId(planInfoDTO.getAfterId());
+						balanceRepayment.setConfirmFlag(planInfoDTO.getConfirmFlag());
+						balanceRepayment.setOfflineLateFee(planInfoDTO.getOfflineLateFee() - offlineLateFee);
+						balanceRepayment.setOnlineLateFee(planInfoDTO.getOnlineLateFee() - onlineLateFee);
+						balanceRepayment.setOverdueDays(planInfoDTO.getOverdueDays());
+						balanceRepayment.setPlanListId(planInfoDTO.getPlanListId());
+						balanceRepayment.setPlatformCharge(planInfoDTO.getPlatformCharge() - platformCharge);
+						balanceRepayment.setPrincipal(planInfoDTO.getPrincipal() - principal);
+						balanceRepayment.setSubtotal(planInfoDTO.getSubtotal() - subtotal);
+						balanceRepayment.setTotal(planInfoDTO.getTotal() - total);
+						balanceRepayment.setRepayment("差额");
+						balanceRepayment.setServiceCharge(planInfoDTO.getServiceCharge() - serviceCharge);
+
+						infoDTOs.add(balanceRepayment);
+
+						resultList.addAll(infoDTOs);
+
+						resultMap.put("resultList", resultList);
+
+					}
+					return resultMap;
+				}
+			}
+
+			return resultMap;
+		} catch (Exception e) {
+			logger.error("根据业务编号获取还款计划信息失败！", e);
+			throw new ServiceRuntimeException(e.getMessage(), e);
+		}
+	}
+	
+	@Override
+	public Map<String, Object> queryRepaymentProjInfoByPlanListId(String planListId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
