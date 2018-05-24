@@ -1,6 +1,9 @@
 package com.hongte.alms.base.service.impl;
 
 import com.baomidou.mybatisplus.plugins.Page;
+
+import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
@@ -11,6 +14,7 @@ import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.vo.module.FinanceManagerListVO;
 import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
+import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.vo.PageResult;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +76,46 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
 		List<FinanceManagerListVO> list = repaymentBizPlanListMapper.selectFinanceMangeList(req);
 		return PageResult.success(list, count);
 	}
+
+    @Override
+    public RepaymentBizPlanList findCurrentPeriod(Date settleDate, List<RepaymentBizPlanList> planLists) {
+        RepaymentBizPlanList finalPeriod = planLists.get(planLists.size() - 1);
+        int diff = DateUtil.getDiffDays(settleDate, finalPeriod.getDueDate());
+        RepaymentBizPlanList currentPeriod = null;
+
+        // 提前还款结清
+        if (diff > 0) {
+            RepaymentBizPlanList temp = new RepaymentBizPlanList();
+            temp.setDueDate(settleDate);
+            temp.setBusinessId("temp");
+            // 把提前结清的日期放进PlanLists一起比较
+            planLists.add(temp);
+            planLists.sort(
+                    (RepaymentBizPlanList a1, RepaymentBizPlanList a2) -> a1.getDueDate().compareTo(a2.getDueDate()));
+            for (int i = 0; i < planLists.size(); i++) {
+                if (planLists.get(i).getBusinessId().equals("temp")) {
+                    currentPeriod = planLists.get(i + 1);
+                }
+            }
+
+            // 筛选temp记录
+            for (Iterator<RepaymentBizPlanList> it = planLists.iterator(); it.hasNext();) {
+                RepaymentBizPlanList pList = it.next();
+                if (pList.getBusinessId().equals("temp")) {
+                    it.remove();
+                }
+            }
+
+        } else {
+            // 期外
+            currentPeriod = finalPeriod;
+        }
+
+
+
+        return currentPeriod;
+    }
+
 
 //    @Override
 //    public List<RepaymentBizPlanList> selectNeedPhoneUrgRenewBiz(String companyId,Integer beforeDueDays) {

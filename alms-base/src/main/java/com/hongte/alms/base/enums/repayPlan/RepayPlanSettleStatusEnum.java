@@ -68,7 +68,36 @@ public enum RepayPlanSettleStatusEnum implements IEnum {
 
     }
 
+    /**
+     * 根据传入的状态判断是否已结清
+     * @param status
+     * @return
+     */
+    public static boolean payed(Integer status){
 
+        if(status.equals(RepayPlanSettleStatusEnum.PAYED_EARLY.getValue())
+                ||status.equals(RepayPlanSettleStatusEnum.PAYED.getValue())
+                ||status.equals(RepayPlanSettleStatusEnum.PAYED_LOSS.getValue()) ){
+            return  true;
+        }else {
+            return false;
+        }
+    }
+
+
+    /**
+     * 根据传入的状态判断是否已申请展期
+     * @param status
+     * @return
+     */
+    public  static  boolean renewed(Integer status){
+
+        if(status.equals(RepayPlanSettleStatusEnum.RENEWED.getValue())){
+            return true;
+        }else{
+            return false;
+        }
+    }
 
 
 

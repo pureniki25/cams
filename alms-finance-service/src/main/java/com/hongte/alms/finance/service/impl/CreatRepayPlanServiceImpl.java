@@ -13,7 +13,7 @@ import com.hongte.alms.base.enums.repayPlan.*;
 import com.hongte.alms.base.service.*;
 import com.hongte.alms.common.util.ClassCopyUtil;
 import com.hongte.alms.finance.dto.repayPlan.*;
-import com.hongte.alms.finance.req.repayPlan.*;
+import com.hongte.alms.base.RepayPlan.req.*;
 import com.hongte.alms.finance.service.CreatRepayPlanService;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.DateUtil;
@@ -1009,11 +1009,11 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 repaymentProjPlan.setCreatSysType(RepayPlanCreateSysEnum.ALMS.getValue());
                 repaymentProjPlan.setPlateType(projInfoReq.getPlateType());
                 repaymentProjPlan.setOnLineOverDueRate(projInfoReq.getOnLineOverDueRate());
-                repaymentProjPlan.setOnLineOverDueRateType(projInfoReq.getOnLineOverDueRateUnit());
+                repaymentProjPlan.setOnLineOverDueRateType(projInfoReq.getOnLineOverDueRateType());
                 repaymentProjPlan.setOffLineOutOverDueRate(projInfoReq.getOffLineOutOverDueRate());
-                repaymentProjPlan.setOffLineOutOverDueRateType(projInfoReq.getOffLineOutOverDueRateUnit());
+                repaymentProjPlan.setOffLineOutOverDueRateType(projInfoReq.getOffLineOutOverDueRateType());
                 repaymentProjPlan.setOffLineInOverDueRate(projInfoReq.getOffLineInOverDueRate());
-                repaymentProjPlan.setOffLineInOverDueRateType(projInfoReq.getOffLineInOverDueRateUnit());
+                repaymentProjPlan.setOffLineInOverDueRateType(projInfoReq.getOffLineInOverDueRateType());
 
 
 
@@ -1154,7 +1154,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                                     }
                                     if(feeDetail==null){
                                         throw new CreatRepaymentExcepiton("分段收费的费用详情找不到  期数："+i
-                                                +"     费用类型："+feeReq.getFeeType()  + "    费用ItemId："+feeReq.getFeeItemId());
+                                                  + "    费用ItemId："+feeReq.getFeeItemId());
                                     }
                                     peroidFeelDetail.setProjPlanAmount(feeDetail.getFeeValue());
                                 }else{

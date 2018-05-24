@@ -51,6 +51,15 @@ public interface RepaymentBizPlanListService extends BaseService<RepaymentBizPla
      * @return
      */
     public PageResult selectByFinanceManagerListReq(FinanceManagerListReq req) ;
+
+    /**
+     *
+     * @param settleDate
+     * @param planLists
+     * @return
+     */
+    public RepaymentBizPlanList findCurrentPeriod(Date settleDate, List<RepaymentBizPlanList> planLists);
+
 //    /**
 //     * 查出需要移交电催的展期业务还款计划列表
 //     * @param companyId

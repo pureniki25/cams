@@ -19,8 +19,8 @@ import org.springframework.web.client.RestTemplate;
 /**
  * 服务提供者<br>
  * 
- * @author 谭荣巧
- * @date 2017年11月17日 下午3:01:38
+ * @author 曾坤
+ * @date 2017年4月17日
  * @since alms-service 1.0-SNAPSHOT
  */
 @EnableFeignClients(basePackages = {"com.ht.ussp.client", "com.hongte.alms.base.feignClient"})

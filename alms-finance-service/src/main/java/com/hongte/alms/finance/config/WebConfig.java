@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Configuration
 public class WebConfig extends WebMvcConfigurerAdapter {
 
-    @Value("${ht.config.ui.useGateWayflage}")
+    @Value("${ht.config.ui.useGateWayflage:true}")
     private Boolean useGateWayflage;
 
     //定义时间格式转换器

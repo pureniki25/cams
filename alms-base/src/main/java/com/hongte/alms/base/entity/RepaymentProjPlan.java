@@ -113,7 +113,7 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 
     
 	@TableField("on_line_over_due_rate_type")
-	@ApiModelProperty(required=true,value="1：按标的总借款金额乘以比例每天 ，2：按标的剩余本金乘以比例每天 ，3：按固定金额每天，4：按标的当前应还本息乘以比例每天(目前只有这种算法，固定传4)")
+	@ApiModelProperty(required=true,value="线上期外逾期滞纳金费率类型,1：按标的总借款金额乘以比例每天 ，2：按标的剩余本金乘以比例每天 ，3：按固定金额每天，4：按标的当前应还本息乘以比例每天，5：按标的垫付本息乘以比例每天 ")
 	private Integer onLineOverDueRateType;
 	/**
      * 生成还款计划对应的借款期限

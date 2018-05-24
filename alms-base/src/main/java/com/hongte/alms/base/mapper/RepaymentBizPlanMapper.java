@@ -2,6 +2,8 @@ package com.hongte.alms.base.mapper;
 
 import java.util.List;
 
+import com.baomidou.mybatisplus.plugins.pagination.Pagination;
+import com.hongte.alms.base.RepayPlan.vo.RepayingPlanDto;
 import org.apache.ibatis.annotations.Param;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.vo.module.RepaymentOpenServiceVO;
@@ -24,5 +26,14 @@ public interface RepaymentBizPlanMapper extends SuperMapper<RepaymentBizPlan> {
      * @return
      */
     List<RepaymentOpenServiceVO> selectRepaymentOpenServiceList(@Param("originalBusinessId")String originalBusinessId,@Param("afterId") String afterId);
+
+
+    /**
+     * 查询指定客户的还款计划列表，分页
+     * @param identifyCard
+     * @return
+     */
+    List<RepayingPlanDto> queryCustomerRepayPlan(@Param("identifyCard") String identifyCard);
+    List<RepayingPlanDto> queryCustomerRepayPlan(Pagination page, @Param("identifyCard") String identifyCard);
 
 }
