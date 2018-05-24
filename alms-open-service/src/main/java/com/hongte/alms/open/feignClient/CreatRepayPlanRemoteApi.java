@@ -10,6 +10,7 @@ import com.hongte.alms.common.result.Result;
 import com.hongte.alms.open.dto.repayPlan.PlanReturnInfoDto;
 import com.hongte.alms.open.req.repayPlan.CreatRepayPlanReq;
 import com.hongte.alms.open.req.repayPlan.trial.TrailRepayPlanReq;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author chenzesheng
@@ -32,6 +33,6 @@ public interface CreatRepayPlanRemoteApi {
     Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(String businessId);
     
     @RequestMapping(value = "/RepayPlan/deleteRepayPlanByConditions",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
-    Result<PlanReturnInfoDto> deleteRepayPlanByConditions(String businessId, String repaymentBatchId);
+    Result<PlanReturnInfoDto> deleteRepayPlanByConditions(@RequestParam(value = "businessId")String businessId, @RequestParam(value = "repaymentBatchId")String repaymentBatchId);
 
 }

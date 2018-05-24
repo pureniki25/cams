@@ -280,7 +280,7 @@ public class ProjInfoReq {
     /**
      * 性别
      */
-    @ApiModelProperty(required= true,value = "性别")
+    @ApiModelProperty(value = "性别")
     private Integer sex;
     /**
      * 证件类型
@@ -453,12 +453,12 @@ public class ProjInfoReq {
     /**
      * 审核时间(标的状态查询接口)
      */
-    @ApiModelProperty(required= true,value = "审核时间(标的状态查询接口)")
+    @ApiModelProperty(value = "审核时间(标的状态查询接口)")
     private Date queryAuditDate;
     /**
      * 审核结果,标审核失败时这里有原因(标的状态查询接口)
      */
-    @ApiModelProperty(required= true,value = "审核结果,标审核失败时这里有原因(标的状态查询接口)")
+    @ApiModelProperty(value = "审核结果,标审核失败时这里有原因(标的状态查询接口)")
     private String queryResultContent;
     /**
      * 平台标志位：1，团贷网； 2，你我金融

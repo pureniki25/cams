@@ -47,7 +47,7 @@ public class RepayPlanController {
     @ApiOperation(value = "创建还款计划并将还款计划及业务和上标信息存储到数据库 接口")
     @PostMapping("/creatAndSaveRepayPlan")
     @ResponseBody
-    @TripleDESDecrypt
+    //@TripleDESDecrypt
     public Result<PlanReturnInfoDto> creatAndSaveRepayPlan(CreatRepayPlanReq creatRepayPlanReq){
         return creatRepayPlanRemoteService.creatAndSaveRepayPlan(creatRepayPlanReq);
     }

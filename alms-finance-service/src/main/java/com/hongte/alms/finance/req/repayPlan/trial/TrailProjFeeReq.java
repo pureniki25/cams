@@ -61,6 +61,12 @@ public class TrailProjFeeReq {
     private BigDecimal feeValue;
 
     /**
+     * [收取费用方式，1为按月收取，2为一次收取]
+     */
+    @ApiModelProperty(required= true,value = "收取费用方式，1为按月收取，2为一次收取")
+    private Integer chargeType;
+
+    /**
      * [是否一次收取，1为按月收取，2为一次收取]
      */
     @ApiModelProperty(required= true,value = "[是否一次收取，1为按月收取，2为一次收取]")
@@ -151,5 +157,13 @@ public class TrailProjFeeReq {
 
     public void setFeeDetailReqMap(List<ProjFeeDetailReq> feeDetailReqMap) {
         this.feeDetailReqMap = feeDetailReqMap;
+    }
+
+    public Integer getChargeType() {
+        return chargeType;
+    }
+
+    public void setChargeType(Integer chargeType) {
+        this.chargeType = chargeType;
     }
 }

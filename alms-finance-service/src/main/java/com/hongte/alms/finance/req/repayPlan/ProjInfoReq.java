@@ -137,7 +137,7 @@ public class ProjInfoReq {
     /**
      * 昵称
      */
-    @ApiModelProperty(required= true,value = "昵称")
+    @ApiModelProperty(value = "昵称")
     private String nickName;
     /**
      * 手机号码
@@ -147,7 +147,7 @@ public class ProjInfoReq {
     /**
      * 邮箱
      */
-    @ApiModelProperty(required= true,value = "邮箱")
+    @ApiModelProperty(value = "邮箱")
     private String Email;
     /**
      * 身份证号码
@@ -187,7 +187,7 @@ public class ProjInfoReq {
     /**
      * 标题
      */
-    @ApiModelProperty(required= true,value = "标题")
+    @ApiModelProperty(value = "标题")
     private String title;
     /**
      * 借款期限
@@ -197,7 +197,7 @@ public class ProjInfoReq {
     /**
      * 平台还款方式ID(到期还本息用1表示， 每月付息到期还本用2表示)
      */
-    @ApiModelProperty(required= true,value = "平台还款方式ID(到期还本息用1表示， 每月付息到期还本用2表示)")
+    @ApiModelProperty(value = "平台还款方式ID(到期还本息用1表示， 每月付息到期还本用2表示)")
     private Integer repaymentType;
     /**
      * 总金额(元)
@@ -207,7 +207,7 @@ public class ProjInfoReq {
     /**
      * 最小投资单位(元)
      */
-    @ApiModelProperty(required= true,value = "最小投资单位(元)")
+    @ApiModelProperty(value = "最小投资单位(元)")
     private BigDecimal lowerUnit;
     /**
      * 标的来源(所属分公司的分润用户ID)
@@ -222,17 +222,17 @@ public class ProjInfoReq {
     /**
      * 标题图片
      */
-    @ApiModelProperty(required= true,value = "标题图片")
+    @ApiModelProperty(value = "标题图片")
     private String imageUrl;
     /**
      * 标题图片编号
      */
-    @ApiModelProperty(required= true,value = "标题图片编号")
+    @ApiModelProperty(value = "标题图片编号")
     private String titleImageId;
     /**
      * 备注
      */
-    @ApiModelProperty(required= true,value = "备注")
+    @ApiModelProperty(value = "备注")
     private String remark;
     /**
      * 上标状态(0:暂存 1:待审 2:审核成功 3:审核失败,4:待上标)
@@ -247,7 +247,7 @@ public class ProjInfoReq {
     /**
      * 上标结果
      */
-    @ApiModelProperty(required= true,value = "上标结果")
+    @ApiModelProperty(value = "上标结果")
     private String resultContent;
     /**
      * 担保方编号(所属担保公司分润用户ID)
@@ -272,22 +272,22 @@ public class ProjInfoReq {
     /**
      * 性别
      */
-    @ApiModelProperty(required= true,value = "性别")
+    @ApiModelProperty(value = "性别")
     private Integer sex;
     /**
      * 证件类型
      */
-    @ApiModelProperty(required= true,value = "证件类型")
+    @ApiModelProperty(value = "证件类型")
     private Integer credTypeId;
     /**
      * 生日
      */
-    @ApiModelProperty(required= true,value = "生日")
+    @ApiModelProperty(value = "生日")
     private Date birthday;
     /**
      * 风险评估意见
      */
-    @ApiModelProperty(required= true,value = "风险评估意见")
+    @ApiModelProperty(value = "风险评估意见")
     private String riskAssessment;
     /**
      * 团贷用户ID(资金端用户ID)
@@ -312,12 +312,12 @@ public class ProjInfoReq {
     /**
      * 是否有房产
      */
-    @ApiModelProperty(required= true,value = "是否有房产 1：有，0：无")
+    @ApiModelProperty(value = "是否有房产 1：有，0：无")
     private Integer isHaveHouse;
     /**
      * 是否有车产
      */
-    @ApiModelProperty(required= true,value = "是否有车产 1：有， 0：无")
+    @ApiModelProperty(value = "是否有车产 1：有， 0：无")
     private Integer isHaveCar;
     /**
      * 团贷比例(期初收取平台费上标比例)
@@ -407,12 +407,12 @@ public class ProjInfoReq {
     /**
      * 抵押权人(委托人)的团贷用户ID
      */
-    @ApiModelProperty(required= true,value = "抵押权人(委托人)的团贷用户ID")
+    @ApiModelProperty(value = "抵押权人(委托人)的团贷用户ID")
     private String creditorId;
     /**
      * 是否委托人提现
      */
-    @ApiModelProperty(required= true,value = "是否委托人提现")
+    @ApiModelProperty(value = "是否委托人提现")
     private Boolean isBailorWithdraw;
 
     /**
@@ -423,17 +423,17 @@ public class ProjInfoReq {
     /**
      * 资金用途 (指资金流向信息、使用信息及计划等资金运用情况)
      */
-    @ApiModelProperty(required= true,value = "资金用途 (指资金流向信息、使用信息及计划等资金运用情况)")
+    @ApiModelProperty(value = "资金用途 (指资金流向信息、使用信息及计划等资金运用情况)")
     private String fundUse;
     /**
      * 还款保障措施 (如：第一还款来源：xxx 第二还款来源：xxx)
      */
-    @ApiModelProperty(required= true,value = "还款保障措施 (如：第一还款来源：xxx 第二还款来源：xxx)")
+    @ApiModelProperty(value = "还款保障措施 (如：第一还款来源：xxx 第二还款来源：xxx)")
     private String repaymentAssure;
     /**
      * 个人信息扩展字段
      */
-    @ApiModelProperty(required= true,value = "个人信息扩展字段")
+    @ApiModelProperty(value = "个人信息扩展字段")
     private String Ext;
     /**
      * 每月还本金额
@@ -445,12 +445,12 @@ public class ProjInfoReq {
     /**
      * 审核时间(标的状态查询接口)
      */
-    @ApiModelProperty(required= true,value = "审核时间(标的状态查询接口)")
+    @ApiModelProperty(value = "审核时间(标的状态查询接口)")
     private Date queryAuditDate;
     /**
      * 审核结果,标审核失败时这里有原因(标的状态查询接口)
      */
-    @ApiModelProperty(required= true,value = "审核结果,标审核失败时这里有原因(标的状态查询接口)")
+    @ApiModelProperty(value = "审核结果,标审核失败时这里有原因(标的状态查询接口)")
     private String queryResultContent;
     /**
      * 平台标志位：1，团贷网； 2，你我金融

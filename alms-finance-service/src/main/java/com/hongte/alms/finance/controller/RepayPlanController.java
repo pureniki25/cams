@@ -17,6 +17,7 @@ import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.finance.dto.repayPlan.app.BizDto;
 import com.hongte.alms.finance.dto.repayPlan.app.BizPlanDto;
 import com.hongte.alms.finance.dto.repayPlan.app.BizPlanListDto;
+import com.hongte.alms.finance.req.repayPlan.*;
 import io.swagger.models.auth.In;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,10 +36,6 @@ import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.ClassCopyUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.finance.dto.repayPlan.PlanReturnInfoDto;
-import com.hongte.alms.finance.req.repayPlan.BusinessBasicInfoReq;
-import com.hongte.alms.finance.req.repayPlan.CreatRepayPlanReq;
-import com.hongte.alms.finance.req.repayPlan.ProjFeeReq;
-import com.hongte.alms.finance.req.repayPlan.ProjInfoReq;
 import com.hongte.alms.finance.req.repayPlan.trial.TrailBizInfoReq;
 import com.hongte.alms.finance.req.repayPlan.trial.TrailProjFeeReq;
 import com.hongte.alms.finance.req.repayPlan.trial.TrailProjInfoReq;
@@ -146,12 +143,17 @@ public class RepayPlanController {
                 ProjInfoReq projInfoReq =ClassCopyUtil.copy(trailProjInfoReq,TrailProjInfoReq.class,ProjInfoReq.class);
                 projInfoReqs.add(projInfoReq);
 
+                List<PrincipleReq> principleReqs =  trailProjInfoReq.getPricipleMap();
+                projInfoReq.setPrincipleReqList(principleReqs);
+
                 List<TrailProjFeeReq> trailProjFeeReqs = trailProjInfoReq.getProjFeeInfos();
                 List<ProjFeeReq> projFeeReqs = new LinkedList<>();
                 projInfoReq.setProjFeeInfos(projFeeReqs);
 
                 for(TrailProjFeeReq trailProjFeeReq:trailProjFeeReqs){
                     ProjFeeReq projFeeReq = ClassCopyUtil.copy(trailProjFeeReq,TrailProjFeeReq.class,ProjFeeReq.class);
+                    List<ProjFeeDetailReq> projFeeDetailReqs = trailProjFeeReq.getFeeDetailReqMap();
+                    projFeeReq.setFeeDetailReqList(projFeeDetailReqs);
                     projFeeReqs.add(projFeeReq);
                 }
 
