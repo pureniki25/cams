@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
  * @author 王继光
  * @since 2018-05-24
  */
-@Service
+@Service("AccountantOverRepayLogService")
 public class AccountantOverRepayLogServiceImpl extends BaseServiceImpl<AccountantOverRepayLogMapper, AccountantOverRepayLog> implements AccountantOverRepayLogService {
 
 	@Autowired
