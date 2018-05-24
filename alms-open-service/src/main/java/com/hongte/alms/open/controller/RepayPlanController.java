@@ -1,20 +1,16 @@
 package com.hongte.alms.open.controller;
 
 
+import com.hongte.alms.base.RepayPlan.req.CreatRepayPlanReq;
+import com.hongte.alms.base.RepayPlan.req.trial.TrailRepayPlanReq;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.open.dto.repayPlan.PlanReturnInfoDto;
 import com.hongte.alms.open.feignClient.CreatRepayPlanRemoteApi;
-import com.hongte.alms.open.req.repayPlan.CreatRepayPlanReq;
-import com.hongte.alms.open.req.repayPlan.trial.TrailRepayPlanReq;
 import com.hongte.alms.open.util.TripleDESDecrypt;
 
 import io.swagger.annotations.Api;
@@ -39,7 +35,7 @@ public class RepayPlanController {
     @PostMapping("/creatRepayPlan")
     @ResponseBody
     @TripleDESDecrypt
-    public Result<PlanReturnInfoDto> creatRepayPlan(CreatRepayPlanReq creatRepayPlanReq){
+    public Result<PlanReturnInfoDto> creatRepayPlan(@RequestBody CreatRepayPlanReq creatRepayPlanReq){
         return creatRepayPlanRemoteService.creatRepayPlan(creatRepayPlanReq);
     }
 
@@ -47,8 +43,8 @@ public class RepayPlanController {
     @ApiOperation(value = "创建还款计划并将还款计划及业务和上标信息存储到数据库 接口")
     @PostMapping("/creatAndSaveRepayPlan")
     @ResponseBody
-    @TripleDESDecrypt
-    public Result<PlanReturnInfoDto> creatAndSaveRepayPlan(CreatRepayPlanReq creatRepayPlanReq){
+    //@TripleDESDecrypt
+    public Result<PlanReturnInfoDto> creatAndSaveRepayPlan(@RequestBody CreatRepayPlanReq creatRepayPlanReq){
         return creatRepayPlanRemoteService.creatAndSaveRepayPlan(creatRepayPlanReq);
     }
 
@@ -58,7 +54,7 @@ public class RepayPlanController {
     @PostMapping("/trailRepayPlan")
     @ResponseBody
     @TripleDESDecrypt
-    public Result<PlanReturnInfoDto> trailRepayPlan(TrailRepayPlanReq trailRepayPlanReq){
+    public Result<PlanReturnInfoDto> trailRepayPlan(@RequestBody TrailRepayPlanReq trailRepayPlanReq){
         return creatRepayPlanRemoteService.trailRepayPlan(trailRepayPlanReq);
     }
     
@@ -66,7 +62,7 @@ public class RepayPlanController {
 	@GetMapping("/queryRepayPlanByBusinessId")
     @ResponseBody
     @TripleDESDecrypt
-    public Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(String businessId){
+    public Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(@RequestParam(value = "businessId") String businessId){
     	return creatRepayPlanRemoteService.queryRepayPlanByBusinessId(businessId);
     }
     
@@ -74,7 +70,8 @@ public class RepayPlanController {
     @GetMapping("/deleteRepayPlanByConditions")
     @ResponseBody
     @TripleDESDecrypt
-    public Result<PlanReturnInfoDto> deleteRepayPlanByConditions(String businessId, String repaymentBatchId){
+    public Result<PlanReturnInfoDto> deleteRepayPlanByConditions(@RequestParam(value = "businessId") String businessId,
+                                                                 @RequestParam(value = "repaymentBatchId") String repaymentBatchId){
     	return creatRepayPlanRemoteService.deleteRepayPlanByConditions(businessId, repaymentBatchId);
     }
 

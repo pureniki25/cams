@@ -19,15 +19,15 @@
 		<result column="on_line_over_due_rate"
 			property="onLineOverDueRate" />
 		<result column="on_line_over_due_rate_unit"
-			property="onLineOverDueRateUnit" />
+			property="onLineOverDueRateType" />
 		<result column="off_line_out_over_due_rate"
 			property="offLineOutOverDueRate" />
 		<result column="off_line_out_over_due_rate_unit"
-			property="offLineOutOverDueRateUnit" />
+			property="offLineOutOverDueRateType" />
 		<result column="off_line_in_over_due_rate"
 			property="offLineInOverDueRate" />
 		<result column="off_line_in_over_due_rate_unit"
-			property="offLineInOverDueRateUnit" />
+			property="offLineInOverDueRateType" />
 		<result column="borrow_limit" property="borrowLimit" />
 		<result column="borrow_limit_unit" property="borrowLimitUnit" />
 		<result column="plan_status" property="planStatus" />
@@ -50,11 +50,11 @@
 		repaymentBatchId, plan_id AS planId, borrow_money AS borrowMoney,
 		borrow_rate AS borrowRate, borrow_rate_unit AS borrowRateUnit,
 		on_line_over_due_rate AS onLineOverDueRate, on_line_over_due_rate_unit
-		AS onLineOverDueRateUnit, off_line_out_over_due_rate AS
+		AS onLineOverDueRateType, off_line_out_over_due_rate AS
 		offLineOutOverDueRate, off_line_out_over_due_rate_unit AS
-		offLineOutOverDueRateUnit, off_line_in_over_due_rate AS
+		offLineOutOverDueRateType, off_line_in_over_due_rate AS
 		offLineInOverDueRate, off_line_in_over_due_rate_unit AS
-		offLineInOverDueRateUnit, borrow_limit AS borrowLimit,
+		offLineInOverDueRateType, borrow_limit AS borrowLimit,
 		borrow_limit_unit AS borrowLimitUnit, plan_status AS planStatus,
 		is_defer AS isDefer, active, creat_sys_type AS creatSysType,
 		plate_type AS plateType, create_time AS createTime, create_user AS

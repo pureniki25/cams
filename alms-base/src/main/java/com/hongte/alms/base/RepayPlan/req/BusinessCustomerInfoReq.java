@@ -1,10 +1,7 @@
-package com.hongte.alms.finance.req.repayPlan;
+package com.hongte.alms.base.RepayPlan.req;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
-import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * @author zengkun

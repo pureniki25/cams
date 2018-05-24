@@ -1,6 +1,5 @@
-package com.hongte.alms.finance.req.repayPlan;
+package com.hongte.alms.base.RepayPlan.req;
 
-import com.baomidou.mybatisplus.annotations.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 

@@ -1,7 +1,7 @@
 package com.hongte.alms.finance.service;
 
+import com.hongte.alms.base.RepayPlan.req.CreatRepayPlanReq;
 import com.hongte.alms.finance.dto.repayPlan.PlanReturnInfoDto;
-import com.hongte.alms.finance.req.repayPlan.CreatRepayPlanReq;
 
 /**
  * @author zengkun

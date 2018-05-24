@@ -1,4 +1,4 @@
-package com.hongte.alms.open.req.repayPlan;
+package com.hongte.alms.base.RepayPlan.req;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -36,15 +36,14 @@ public class BusinessBasicInfoReq {
     /**
      * 业务类型
      */
-    @ApiModelProperty(required= true,value = "业务类型: 1,车易贷展期;  2, 房速贷展期;   3,金融仓储;   4, 三农金融; 9,车易贷; 11,房速贷;  12,车全垫资代采;  13,扶贫贷;  14,汽车融资租赁;  15,二手车商贷; 20,一点车贷")
+    @ApiModelProperty(required= true,value = "业务类型: 1,车易贷展期;  2, 房速贷展期;   3,金融仓储;   4, 三农金融; 9,车易贷; 11,房速贷;  12,车全垫资代采;  13,扶贫贷;  14,汽车融资租赁;  15,二手车商贷; 20,一点车贷;25,信用贷")
     private Integer businessType;
 
 
     /**
-     * 业务所属子类型，若无则为空
-     * 备注：这个业务所属的子类型，对应的信贷的字段是什么 需要与咏康核对一下
+     * 业务所属子类型，若无则为空     *
      */
-    @ApiModelProperty(value = "业务所属子类型，若无则为空")
+    @ApiModelProperty(value = "业务所属子类型，如：业主信用贷，小微企业贷，若无则为空")
     private String businessCtype;
     /**
      * 业务所属孙类型，若无则为空
@@ -104,36 +103,11 @@ public class BusinessBasicInfoReq {
 //     */
 //    @ApiModelProperty(required= true,value = "业务所属资产端编号(对应tb_basic_asset_side的asset_side_id)")
 //    private String assetId;
-
-
     /**
      * 业务所属分公司编号
      */
     @ApiModelProperty(required= true,value = "业务所属分公司编号")
     private String companyId;
-
-    /**
-     * 业务所属分公司名称
-     */
-    @ApiModelProperty(required= true,value = "业务所属分公司名称")
-    private String companyName;
-    /**
-     * 业务所属片区编号
-     */
-    @ApiModelProperty(required= true,value = "业务所属片区编号")
-    private String  districtId;
-
-    /**
-     * 业务所属片区名称
-     */
-    @ApiModelProperty(required= true,value = "业务所属片区名称")
-    private String  districtName;
-
-    /**
-     * 出款平台类型
-     */
-    @ApiModelProperty(required= true,value = "出款平台类型 0：线下出款，1：团贷网P2P上标 2：你我金融上标")
-    private Integer  outputPlatformId;
 
     /**
      * 标识是否P2P拆标业务，0：非P2P拆标业务，1：P2P拆标业务
@@ -327,37 +301,5 @@ public class BusinessBasicInfoReq {
 
     public void setOrgBusinessId(String orgBusinessId) {
         this.orgBusinessId = orgBusinessId;
-    }
-
-    public String getCompanyName() {
-        return companyName;
-    }
-
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
-    }
-
-    public String getDistrictId() {
-        return districtId;
-    }
-
-    public void setDistrictId(String districtId) {
-        this.districtId = districtId;
-    }
-
-    public String getDistrictName() {
-        return districtName;
-    }
-
-    public void setDistrictName(String districtName) {
-        this.districtName = districtName;
-    }
-
-    public Integer getOutputPlatformId() {
-        return outputPlatformId;
-    }
-
-    public void setOutputPlatformId(Integer outputPlatformId) {
-        this.outputPlatformId = outputPlatformId;
     }
 }

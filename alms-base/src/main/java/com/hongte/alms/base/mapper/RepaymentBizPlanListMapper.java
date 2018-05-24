@@ -1,6 +1,7 @@
 package com.hongte.alms.base.mapper;
 
 import com.hongte.alms.base.dto.FinanceManagerListReq;
+import com.hongte.alms.base.dto.RepaymentPlanInfoDTO;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.vo.module.FinanceManagerListVO;
 import com.hongte.alms.common.mapper.SuperMapper;
@@ -64,4 +65,11 @@ public interface RepaymentBizPlanListMapper extends SuperMapper<RepaymentBizPlan
 
     int conutFinanceManagerList(FinanceManagerListReq req) ;
     List<FinanceManagerListVO> selectFinanceMangeList(FinanceManagerListReq req) ;
+    
+    /**
+     * 根据源业务编号获取还款计划信息
+     * @param businessId
+     * @return
+     */
+    List<RepaymentPlanInfoDTO> queryRepaymentPlanInfoByBusinessId(@Param(value = "businessId") String businessId);
 }

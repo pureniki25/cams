@@ -1,4 +1,4 @@
-package com.hongte.alms.finance.req.repayPlan;
+package com.hongte.alms.base.RepayPlan.req;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

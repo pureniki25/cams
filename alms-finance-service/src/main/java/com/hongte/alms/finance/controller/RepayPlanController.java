@@ -4,6 +4,11 @@ import java.util.*;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
+import com.hongte.alms.base.RepayPlan.req.*;
+import com.hongte.alms.base.RepayPlan.req.trial.TrailBizInfoReq;
+import com.hongte.alms.base.RepayPlan.req.trial.TrailProjFeeReq;
+import com.hongte.alms.base.RepayPlan.req.trial.TrailProjInfoReq;
+import com.hongte.alms.base.RepayPlan.req.trial.TrailRepayPlanReq;
 import com.hongte.alms.base.RepayPlan.vo.PlanPayedVo;
 import com.hongte.alms.base.RepayPlan.vo.RepayingPlanVo;
 import com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo;
@@ -13,21 +18,16 @@ import com.hongte.alms.base.enums.repayPlan.RepayPlanSettleStatusEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.RepaymentBizPlanService;
-import com.hongte.alms.common.vo.PageResult;
+
 import com.hongte.alms.finance.dto.repayPlan.app.BizDto;
 import com.hongte.alms.finance.dto.repayPlan.app.BizPlanDto;
 import com.hongte.alms.finance.dto.repayPlan.app.BizPlanListDto;
-import io.swagger.models.auth.In;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.alibaba.fastjson.JSON;
 import com.hongte.alms.base.baseException.CreatRepaymentExcepiton;
@@ -35,14 +35,7 @@ import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.ClassCopyUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.finance.dto.repayPlan.PlanReturnInfoDto;
-import com.hongte.alms.finance.req.repayPlan.BusinessBasicInfoReq;
-import com.hongte.alms.finance.req.repayPlan.CreatRepayPlanReq;
-import com.hongte.alms.finance.req.repayPlan.ProjFeeReq;
-import com.hongte.alms.finance.req.repayPlan.ProjInfoReq;
-import com.hongte.alms.finance.req.repayPlan.trial.TrailBizInfoReq;
-import com.hongte.alms.finance.req.repayPlan.trial.TrailProjFeeReq;
-import com.hongte.alms.finance.req.repayPlan.trial.TrailProjInfoReq;
-import com.hongte.alms.finance.req.repayPlan.trial.TrailRepayPlanReq;
+
 import com.hongte.alms.finance.service.CreatRepayPlanService;
 
 import io.swagger.annotations.Api;
@@ -75,7 +68,7 @@ public class RepayPlanController {
     @ApiOperation(value = "创建还款计划接口,不存储   全字段")
     @PostMapping("/creatRepayPlan")
     @ResponseBody
-    public Result<PlanReturnInfoDto> creatRepayPlan(CreatRepayPlanReq creatRepayPlanReq){
+    public Result<PlanReturnInfoDto> creatRepayPlan(@RequestBody CreatRepayPlanReq creatRepayPlanReq){
         logger.info("@还款计划@创建还款计划接口,对业务和标的还款计划进行试算--开始[{}]" , JSON.toJSONString(creatRepayPlanReq));
         PlanReturnInfoDto  planReturnInfoDto;
 //        List<RepaymentBizPlanDto>  list ;
@@ -103,7 +96,7 @@ public class RepayPlanController {
     @ApiOperation(value = "创建还款计划并将还款计划及业务和上标信息存储到数据库 接口")
     @PostMapping("/creatAndSaveRepayPlan")
     @ResponseBody
-    public Result<PlanReturnInfoDto> creatAndSaveRepayPlan(CreatRepayPlanReq creatRepayPlanReq){
+    public Result<PlanReturnInfoDto> creatAndSaveRepayPlan(@RequestBody CreatRepayPlanReq creatRepayPlanReq){
         logger.info("@还款计划@创建还款计划接口,对业务和标的还款计划进行试算--开始[{}]" , JSON.toJSONString(creatRepayPlanReq));
         PlanReturnInfoDto  planReturnInfoDto;
         try{
@@ -113,7 +106,7 @@ public class RepayPlanController {
             return Result.error(e.getCode(),e.getMsg());
         }catch (Exception e){
             logger.info("程序异常[{}]" , e);
-            return Result.error("9889",e.getMessage());
+            return Result.error("9889","程序异常报错："+e.getMessage());
         }
 
         logger.info("@还款计划@创建还款计划接口,对业务和标的还款计划进行试算--结束[{}]" , JSON.toJSONString(creatRepayPlanReq));
@@ -125,7 +118,7 @@ public class RepayPlanController {
     @ApiOperation(value = "试算还款计划接口, 精简字段")
     @PostMapping("/trailRepayPlan")
     @ResponseBody
-    public Result<PlanReturnInfoDto> trailRepayPlan(TrailRepayPlanReq trailRepayPlanReq){
+    public Result<PlanReturnInfoDto> trailRepayPlan(@RequestBody TrailRepayPlanReq trailRepayPlanReq){
         logger.info("@还款计划@试算还款计划接口,对业务和标的还款计划进行试算--开始[{}]" , JSON.toJSONString(trailRepayPlanReq));
         CreatRepayPlanReq creatRepayPlanReq= null;
         try{
@@ -146,12 +139,17 @@ public class RepayPlanController {
                 ProjInfoReq projInfoReq =ClassCopyUtil.copy(trailProjInfoReq,TrailProjInfoReq.class,ProjInfoReq.class);
                 projInfoReqs.add(projInfoReq);
 
+                List<PrincipleReq> principleReqs =  trailProjInfoReq.getPricipleMap();
+                projInfoReq.setPrincipleReqList(principleReqs);
+
                 List<TrailProjFeeReq> trailProjFeeReqs = trailProjInfoReq.getProjFeeInfos();
                 List<ProjFeeReq> projFeeReqs = new LinkedList<>();
                 projInfoReq.setProjFeeInfos(projFeeReqs);
 
                 for(TrailProjFeeReq trailProjFeeReq:trailProjFeeReqs){
                     ProjFeeReq projFeeReq = ClassCopyUtil.copy(trailProjFeeReq,TrailProjFeeReq.class,ProjFeeReq.class);
+                    List<ProjFeeDetailReq> projFeeDetailReqs = trailProjFeeReq.getFeeDetailReqMap();
+                    projFeeReq.setFeeDetailReqList(projFeeDetailReqs);
                     projFeeReqs.add(projFeeReq);
                 }
 

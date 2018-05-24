@@ -1,4 +1,4 @@
-package com.hongte.alms.finance.req.repayPlan;
+package com.hongte.alms.base.RepayPlan.req;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -19,7 +19,7 @@ public class BusinessExtRateReq {
 //    @ApiModelProperty(required= true,value = "业务ID")
 //    private String businessId;
     /**
-     * 费率类型
+     * 费率类型 1，
      */
     @ApiModelProperty(required= true,value = "费率类型")
     private Integer rateType;
@@ -41,12 +41,12 @@ public class BusinessExtRateReq {
     /**
      * 资产端费用项ID
      */
-    @ApiModelProperty(required= true,value = "资产端费用项ID")
+    @ApiModelProperty(value = "资产端费用项ID")
     private String feeId;
     /**
      * 资产端费用项名称
      */
-    @ApiModelProperty(required= true,value = "资产端费用项名称")
+    @ApiModelProperty(value = "资产端费用项名称")
     private String feeName;
 
 
