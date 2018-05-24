@@ -26,22 +26,18 @@ public class RepaymentProjPlanDto implements Serializable {
     /**
      * 标的分配到的金额
      */
-    private BigDecimal distributiveMoney = new BigDecimal(0); 
+    private BigDecimal divideAmount = new BigDecimal(0); 
     
     /**
      * 标的分配到的线上滞纳金
      */
     private BigDecimal onlineOverDue = new BigDecimal(0);
+    
     /**
      * 标的分配到的线下滞纳金
      */
     private BigDecimal offlineOverDue = new BigDecimal(0);
     
-    /**
-     * 分配后剩余金额
-     */
-    private BigDecimal surplusMoney = new BigDecimal(0);
-
     /**
      * 标的信息
      */
@@ -74,34 +70,6 @@ public class RepaymentProjPlanDto implements Serializable {
 	 */
 	public void setProportion(BigDecimal proportion) {
 		this.proportion = proportion;
-	}
-
-	/**
-	 * @return the distributiveMoney
-	 */
-	public BigDecimal getDistributiveMoney() {
-		return distributiveMoney;
-	}
-
-	/**
-	 * @param distributiveMoney the distributiveMoney to set
-	 */
-	public void setDistributiveMoney(BigDecimal distributiveMoney) {
-		this.distributiveMoney = distributiveMoney;
-	}
-
-	/**
-	 * @return the surplusMoney
-	 */
-	public BigDecimal getSurplusMoney() {
-		return surplusMoney;
-	}
-
-	/**
-	 * @param surplusMoney the surplusMoney to set
-	 */
-	public void setSurplusMoney(BigDecimal surplusMoney) {
-		this.surplusMoney = surplusMoney;
 	}
 
 	/**
@@ -145,6 +113,21 @@ public class RepaymentProjPlanDto implements Serializable {
 	public void setOnlineOverDue(BigDecimal onlineOverDue) {
 		this.onlineOverDue = onlineOverDue;
 	}
+
+	/**
+	 * @return the divideAmount
+	 */
+	public BigDecimal getDivideAmount() {
+		return divideAmount;
+	}
+
+	/**
+	 * @param divideAmount the divideAmount to set
+	 */
+	public void setDivideAmount(BigDecimal divideAmount) {
+		this.divideAmount = divideAmount;
+	}
+
 
 
 }
