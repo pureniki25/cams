@@ -23,8 +23,8 @@ window.layinit(function (htConfig) {
         	 */
         	repayPlanColumns: [
         		{
-                    title: '期数',
-                    key: 'afterId',
+                    title: '客户姓名',
+                    key: 'realName',
                     align: 'center',
                 },
                 {
@@ -106,8 +106,8 @@ window.layinit(function (htConfig) {
         	 */
         	repayActualColumns: [
         		{
-        			title: '期数',
-        			key: 'afterId',
+        			title: '客户姓名',
+        			key: 'realName',
         			align: 'center',
         		},
         		{
@@ -216,38 +216,40 @@ window.layinit(function (htConfig) {
             /*
              * 为类型增加点击事件
              */
-            addEventForType: function(type){
-            	if (type == '计划还款') {
-					return '<a href="#" onclick="app.openRepayPlan()" style="text-decoration:underline ">计划还款</a>';
-				}else if (type == '实际还款') {
-					return '<a href="#" onclick="app.openRepayActual()" style="text-decoration:underline ">实际还款</a>';
+            addEventForType: function(item){
+            	var planListId = item.planListId;
+            	if (item.repayment == '计划还款') {
+					return '<a href="#" onclick="app.openRepayPlan(`'+planListId+'`)" style="text-decoration:underline ">计划还款</a>';
+				}else if (item.repayment == '实际还款') {
+					return '<a href="#" onclick="app.openRepayActual(`'+planListId+'`)" style="text-decoration:underline ">实际还款</a>';
 				}else {
-					return type;
+					return item.repayment;
 				}
             },
             /*
              * 为其他费用增加点击事件
              */
-            addEventForOtherFee: function(otherFee){
-        		return '<a href="#" onclick="app.openRepayOtherFee()" style="text-decoration:underline ">' + otherFee + '</a>';
+            addEventForOtherFee: function(item){
+            	var planListId = item.planListId;
+        		return '<a href="#" onclick="app.openRepayOtherFee(`'+planListId+'`)" style="text-decoration:underline ">' + item.otherFee + '</a>';
             },
             /*
              * 打开计划还款，查看本期还款计划所属的标的计划
              */
-            openRepayPlan: function(){
+            openRepayPlan: function(planListId){
             	this.repayPlanFlag = true;
             	
             },
             /*
              * 打开实际还款，查看本期实际还款的标的计划
              */
-            openRepayActual: function(){
+            openRepayActual: function(planListId){
             	this.repayActualFlag = true;
             },
             /*
              * 打开其他费用，查看其他费用明细项，相应的点击标的中的其他费用也看查看相应的其他费用项
              */
-            openRepayOtherFee: function(){
+            openRepayOtherFee: function(planListId){
             	this.repayOtherFeeFlag = true;
             },
         },
