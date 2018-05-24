@@ -3,6 +3,7 @@ package com.hongte.alms.base.RepayPlan.req.trial;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 /**
@@ -36,6 +37,7 @@ public class TrailBizInfoReq {
      * 业务类型
      */
     @ApiModelProperty(required= true,value = "业务类型: 1,车易贷展期;  2, 房速贷展期;   3,金融仓储;   4, 三农金融; 9,车易贷; 11,房速贷;  12,车全垫资代采;  13,扶贫贷;  14,汽车融资租赁;  15,二手车商贷; 20,一点车贷;25,信用贷")
+    @NotNull(message = "业务类型(businessType)不能为空")
     private Integer businessType;
 
 
@@ -69,6 +71,7 @@ public class TrailBizInfoReq {
      * 借款金额(元)
      */
     @ApiModelProperty(required= true,value = "借款金额(元)")
+    @NotNull(message = "借款金额(borrowMoney)不能为空")
     private BigDecimal borrowMoney;
 //    /**
 //     * 借款期限  以月为单位
