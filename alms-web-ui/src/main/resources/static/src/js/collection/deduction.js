@@ -57,11 +57,11 @@ var layer;
                     repayAllAmount:"",//已还总额
                     restAmount:"",
                     repayingAmount:''//代扣中金额
-                   
 
                 },
                 platformList:[],
-                platformId:1
+                platformId:1,
+                details:[]
                 
          
         	},
@@ -215,6 +215,7 @@ var layer;
                           return;
                       }
                     vm.ajax_data=result.data.data; 
+                    vm.details=result.data.data.details;
                     vm.platformId=result.data.data.platformId;
                     if(result.data.data.underLineOverDueMoney>0){
                      	vm.ajax_data.planOverDueMoney=result.data.data.underLineOverDueMoney;
@@ -277,10 +278,17 @@ var layer;
                             //request: {} //如果无需自定义请求参数，可不加该参数
                             //response: {} //如果无需自定义数据响应名称，可不加该参数
                             page: false,
-                            done: function (res, curr, count) {
-                                //数据渲染完的回调。你可以借此做一些其它的操作
-                                //如果是异步请求数据方式，res即为你接口返回的信息。
-                                //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
+                            done: function (res, curr, count) {debugger
+                            	  var list=res.data;
+                                  var repayMoney=0;
+                   	            	if(list != null && list.length > 0){
+		                   	           	for (var i = 0; i < list.length; i++){
+		                   	           		if(list[i].repayStatus!="失败"){
+		                   	           	 	repayMoney=repayMoney+Number(list[i].planTotalRepayMoney);
+		                   	           		}
+		                   	           	}
+		                   	       	}
+                   	            	vm.ajax_data.repayAllAmount=repayMoney;
                                 vm.loading = false;
                             }
                         });
