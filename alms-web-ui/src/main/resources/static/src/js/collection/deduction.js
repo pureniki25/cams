@@ -285,7 +285,7 @@ var layer;
                    	            	if(list != null && list.length > 0){
 		                   	           	for (var i = 0; i < list.length; i++){
 		                   	           		if(list[i].repayStatus!="失败"){
-		                   	           	 	repayMoney=repayMoney+Number(list[i].planTotalRepayMoney);
+		                   	           	 	repayMoney=repayMoney+Number(list[i].currentAmount);
 		                   	           		}
 		                   	           	}
 		                   	       	}
