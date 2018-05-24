@@ -14,6 +14,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.UUID;
 
+import com.hongte.alms.base.RepayPlan.dto.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,12 +69,6 @@ import com.hongte.alms.base.vo.finance.CurrPeriodRepaymentInfoVO;
 import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.DateUtil;
-import com.hongte.alms.finance.dto.repayPlan.ConfirmRepaymentPreviewDto;
-import com.hongte.alms.finance.dto.repayPlan.RepaymentBizPlanDto;
-import com.hongte.alms.finance.dto.repayPlan.RepaymentBizPlanListDto;
-import com.hongte.alms.finance.dto.repayPlan.RepaymentProjPlanDto;
-import com.hongte.alms.finance.dto.repayPlan.RepaymentProjPlanListDetailDto;
-import com.hongte.alms.finance.dto.repayPlan.RepaymentProjPlanListDto;
 import com.hongte.alms.finance.service.FinanceService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.BoaInRoleInfoDto;
@@ -1539,7 +1534,7 @@ public class FinanceServiceImpl implements FinanceService {
 	}
 	
 	
-	private  RepaymentBizPlanListDto findRepaymentBizPlanListDto(String planListId,RepaymentBizPlanDto dto) {
+	private RepaymentBizPlanListDto findRepaymentBizPlanListDto(String planListId, RepaymentBizPlanDto dto) {
 		List<RepaymentBizPlanListDto> list =  dto.getBizPlanListDtos();
 		for (RepaymentBizPlanListDto repaymentBizPlanListDto : list) {
 			if (repaymentBizPlanListDto.getRepaymentBizPlanList().getPlanListId().equals(planListId)) {

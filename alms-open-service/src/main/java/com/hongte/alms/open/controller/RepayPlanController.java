@@ -1,15 +1,16 @@
 package com.hongte.alms.open.controller;
 
 
+import com.alibaba.fastjson.JSON;
+import com.hongte.alms.base.RepayPlan.dto.PlanReturnInfoDto;
 import com.hongte.alms.base.RepayPlan.req.CreatRepayPlanReq;
 import com.hongte.alms.base.RepayPlan.req.trial.TrailRepayPlanReq;
+import com.hongte.alms.common.result.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.hongte.alms.common.result.Result;
-import com.hongte.alms.open.dto.repayPlan.PlanReturnInfoDto;
 import com.hongte.alms.open.feignClient.CreatRepayPlanRemoteApi;
 import com.hongte.alms.open.util.TripleDESDecrypt;
 
@@ -45,17 +46,35 @@ public class RepayPlanController {
     @ResponseBody
     //@TripleDESDecrypt
     public Result<PlanReturnInfoDto> creatAndSaveRepayPlan(@RequestBody CreatRepayPlanReq creatRepayPlanReq){
-        return creatRepayPlanRemoteService.creatAndSaveRepayPlan(creatRepayPlanReq);
+        logger.info("创建还款计划并将还款计划及业务和上标信息存储到数据库 接口--开始[{}]" , JSON.toJSONString(creatRepayPlanReq));
+        Result<PlanReturnInfoDto> ret= creatRepayPlanRemoteService.creatAndSaveRepayPlan(creatRepayPlanReq);
+        logger.info("创建还款计划并将还款计划及业务和上标信息存储到数据库 接口--结束[{}]" , JSON.toJSONString(ret));
+        return ret;
+
     }
+
+//    @ApiOperation(value = "测试时间转换")
+//    @PostMapping("/testTime")
+//    public Result<PlanReturnInfoDto> testTime(){
+//         Result<PlanReturnInfoDto> ret= creatRepayPlanRemoteService.testTime();
+//         return ret;
+//
+//    }
 
 
 
     @ApiOperation(value = "试算还款计划接口, 精简字段")
-    @PostMapping("/trailRepayPlan")
+    @GetMapping("/trailRepayPlan")
     @ResponseBody
     @TripleDESDecrypt
     public Result<PlanReturnInfoDto> trailRepayPlan(@RequestBody TrailRepayPlanReq trailRepayPlanReq){
-        return creatRepayPlanRemoteService.trailRepayPlan(trailRepayPlanReq);
+        logger.info("试算还款计划接口, 精简字段--开始[{}]" , JSON.toJSONString(trailRepayPlanReq));
+        Result<PlanReturnInfoDto> ret = creatRepayPlanRemoteService.trailRepayPlan(trailRepayPlanReq);
+        logger.info("试算还款计划接口, 精简字段--结束[{}]" , JSON.toJSONString(ret));
+
+
+
+        return ret;
     }
     
     @ApiOperation(value = "根据businessId查询还款计划")

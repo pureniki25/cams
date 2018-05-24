@@ -1,5 +1,6 @@
-package com.hongte.alms.finance.dto.repayPlan.app;
+package com.hongte.alms.base.RepayPlan.dto.app;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -7,7 +8,7 @@ import java.util.List;
  * @author zengkun
  * @since 2018/5/23
  */
-public class BizPlanDto {
+public class BizPlanDto  implements Serializable {
 
     //还款计划ID
     private String planId;

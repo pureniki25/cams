@@ -1,7 +1,8 @@
-package com.hongte.alms.finance.dto.repayPlan.app;
+package com.hongte.alms.base.RepayPlan.dto.app;
 
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -9,7 +10,7 @@ import java.util.Date;
  * @author zengkun
  * @since 2018/5/23
  */
-public class BizPlanListDto {
+public class BizPlanListDto  implements Serializable {
 
     private  Integer period;  //View期数
 

@@ -1,30 +1,59 @@
 /**
  * 
  */
-package com.hongte.alms.finance.dto.repayPlan;
+package com.hongte.alms.base.RepayPlan.dto;
 
+import com.hongte.alms.base.dto.ConfirmRepaymentReq;
+import com.hongte.alms.base.entity.RepaymentProjPlanListDetail;
+import com.hongte.alms.base.entity.TuandaiProjectInfo;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
+import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
+
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.hongte.alms.base.dto.ConfirmRepaymentReq;
-import com.hongte.alms.base.entity.RepaymentProjPlanList;
-import com.hongte.alms.base.entity.RepaymentProjPlanListDetail;
-import com.hongte.alms.base.entity.TuandaiProjectInfo;
-import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
-import com.hongte.alms.base.mapper.TuandaiProjectInfoMapper;
-import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
-
 /**
- * @author 王继光 2018年5月17日 下午9:43:45
+ * @author 王继光
+ * 2018年5月18日 下午2:00:26
  */
-public class RepaymentBizPlanDtoUtil {
+public class ConfirmRepaymentPreviewDto implements Serializable {
+	
 
-	@Autowired
-	private TuandaiProjectInfoMapper tuandaiProjectInfoMapper;
 
+	private RepaymentBizPlanDto bizPlanDto ;
+	private List<CurrPeriodProjDetailVO> list ;
+	public RepaymentBizPlanDto getBizPlanDto() {
+		return bizPlanDto;
+	}
+	public void setBizPlanDto(RepaymentBizPlanDto bizPlanDto) {
+		this.bizPlanDto = bizPlanDto;
+	}
+	public List<CurrPeriodProjDetailVO> getList() {
+		return list;
+	}
+	public void setList(List<CurrPeriodProjDetailVO> list) {
+		if (this.list==null) {
+			this.list = list;
+		}else{
+			for (CurrPeriodProjDetailVO currPeriodProjDetailVO : this.list) {
+				for (CurrPeriodProjDetailVO vo : list) {
+					if (currPeriodProjDetailVO.getProject().equals(vo.getProject())) {
+						currPeriodProjDetailVO.setItem10(currPeriodProjDetailVO.getItem10().add(vo.getItem10()));
+						currPeriodProjDetailVO.setItem20(currPeriodProjDetailVO.getItem20().add(vo.getItem20()));
+						currPeriodProjDetailVO.setItem30(currPeriodProjDetailVO.getItem30().add(vo.getItem30()));
+						currPeriodProjDetailVO.setItem50(currPeriodProjDetailVO.getItem50().add(vo.getItem50()));
+						currPeriodProjDetailVO.setOfflineOverDue(currPeriodProjDetailVO.getOfflineOverDue().add(vo.getOfflineOverDue()));
+						currPeriodProjDetailVO.setOnlineOverDue(currPeriodProjDetailVO.getOnlineOverDue().add(vo.getOnlineOverDue()));
+						currPeriodProjDetailVO.setSubTotal(currPeriodProjDetailVO.getSubTotal().add(vo.getSubTotal()));
+						currPeriodProjDetailVO.setTotal(currPeriodProjDetailVO.getTotal().add(vo.getTotal()));
+					}
+				}
+			}
+		}
+	}
+	
 	/**
 	 * 计算每个标的占比
 	 * 

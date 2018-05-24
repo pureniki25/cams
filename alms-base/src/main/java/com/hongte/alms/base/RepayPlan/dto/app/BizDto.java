@@ -1,5 +1,6 @@
-package com.hongte.alms.finance.dto.repayPlan.app;
+package com.hongte.alms.base.RepayPlan.dto.app;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -7,7 +8,7 @@ import java.util.List;
  * @author zengkun
  * @since 2018/5/23
  */
-public class BizDto {
+public class BizDto  implements Serializable {
     private String  businessId; //业务编号
 
     private String orgBusinessId; //原始业务编号

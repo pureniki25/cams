@@ -2,6 +2,7 @@ package com.hongte.alms.finance.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.hongte.alms.base.RepayPlan.dto.*;
 import com.hongte.alms.base.baseException.CreatRepaymentExcepiton;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.BizCustomerTypeEnum;
@@ -12,7 +13,6 @@ import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.enums.repayPlan.*;
 import com.hongte.alms.base.service.*;
 import com.hongte.alms.common.util.ClassCopyUtil;
-import com.hongte.alms.finance.dto.repayPlan.*;
 import com.hongte.alms.base.RepayPlan.req.*;
 import com.hongte.alms.finance.service.CreatRepayPlanService;
 import com.hongte.alms.common.util.Constant;
@@ -140,6 +140,10 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
         //设置进位方式枚举和保留的小数位数
         smallNum = creatRepayPlanReq.getSmallNum();
+        if(creatRepayPlanReq.getRondmode()==null){
+            logger.error("请传入进位方式："+JSON.toJSONString(creatRepayPlanReq));
+            throw  new CreatRepaymentExcepiton("请传入进位方式：rondmode");
+        }
         roundingMode = RoundingMode.valueOf(creatRepayPlanReq.getRondmode());
 
         //1、根据业务和标的对应关系，判断出需要生成几个还款计划，每个还款计划相对于业务总金额占的比例
@@ -316,6 +320,12 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             xdPlanDtos.add(xdPlanDto);
             List<CarBusinessAfterDto> bizAfterDtos = new LinkedList<>();
             xdPlanDto.setBatchUUid(repaymentBizPlan.getRepaymentBatchId());
+            List<String> projIds= new LinkedList<>();
+            xdPlanDto.setProjectIds(projIds);
+            List<RepaymentProjPlanDto> projPlanDtos = bizPlanDto.getProjPlanDtos();
+            for(RepaymentProjPlanDto repaymentProjPlanDto: projPlanDtos){
+                projIds.add(repaymentProjPlanDto.getRepaymentProjPlan().getProjectId());
+            }
             xdPlanDto.setCarBusinessAfterDtoList(bizAfterDtos);
             for(RepaymentBizPlanListDto repaymentBizPlanListDto:repaymentBizPlanListDtos){
                 RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListDto.getRepaymentBizPlanList();
@@ -329,7 +339,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     logger.error("业务类型在 BasicBusinessType 表中不存在 业务信息："+JSON.toJSONString(businessBasicInfo));
                     throw  new CreatRepaymentExcepiton("业务类型不存在  业务类型："+businessBasicInfo.getBusinessType());
                 }
-                bizAfterDto.setParatype(basicBusinessType.getBusinessTypeName());
+//                bizAfterDto.setParatype(basicBusinessType.getBusinessTypeName());
 //                bizAfterDto.setCustomerName(businessBasicInfo.getCustomerName());
                 bizAfterDto.setOperatorName(businessBasicInfo.getOperatorName()); //业务主办人
                 bizAfterDto.setOperatorDept(businessBasicInfo.getCompanyId()); //业务主办人部门
@@ -400,7 +410,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public  PlanReturnInfoDto creatAndSaveRepayPlan(CreatRepayPlanReq creatRepayPlanReq) throws IllegalAccessException, InstantiationException {
+    public PlanReturnInfoDto creatAndSaveRepayPlan(CreatRepayPlanReq creatRepayPlanReq) throws IllegalAccessException, InstantiationException {
 
         //判断是否重传
         for(ProjInfoReq projInfoReq:creatRepayPlanReq.getProjInfoReqs() ){

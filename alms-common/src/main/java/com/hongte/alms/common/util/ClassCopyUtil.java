@@ -107,7 +107,7 @@ public class ClassCopyUtil {
                 }
                 catch ( Exception e )
                 {
-                    logger.error("执行{}类的{}属性的set方法时出错。{}",clazzDes.getSimpleName(),field.getName(),e);
+//                    logger.error("执行{}类的{}属性的set方法时出错。{}",clazzDes.getSimpleName(),field.getName(),e);
                 }
             }
             return objDes;

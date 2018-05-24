@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
@@ -107,12 +108,14 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
      */
 	@TableField("fact_repay_date")
 	@ApiModelProperty(required= true,value = "实还日期")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date factRepayDate;
 	/**
 	 * 应还日期
      */
 	@TableField("due_date")
 	@ApiModelProperty(required= true,value = "应还日期")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date dueDate;
 	/**
     /**
@@ -125,6 +128,7 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
      */
 	@TableField("create_date")
 	@ApiModelProperty(required= true,value = "创建日期")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createDate;
     /**
      * 来源类型：1.信贷生成，2.贷后管理生成
@@ -143,6 +147,7 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
      */
 	@TableField("update_date")
 	@ApiModelProperty(required= true,value = "更新日期")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date updateDate;
     /**
      * 更新用户

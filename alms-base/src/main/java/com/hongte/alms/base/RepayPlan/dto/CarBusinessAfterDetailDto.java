@@ -1,16 +1,17 @@
-package com.hongte.alms.finance.dto.repayPlan;
+package com.hongte.alms.base.RepayPlan.dto;
 
-import java.io.Serializable;
-
-import com.baomidou.mybatisplus.enums.IdType;
-import java.math.BigDecimal;
-import java.util.Date;
-import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
-import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.baomidou.mybatisplus.enums.IdType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
+
 /**
  * <p>
  * 业务还款计划费用项目明细表
@@ -21,7 +22,7 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @ApiModel
 @TableName("tb_car_business_after_detail")
-public class CarBusinessAfterDetailDto extends Model<CarBusinessAfterDetailDto> {
+public class CarBusinessAfterDetailDto implements Serializable  {
 
     private static final long serialVersionUID = 1L;
 
@@ -72,6 +73,7 @@ public class CarBusinessAfterDetailDto extends Model<CarBusinessAfterDetailDto> 
      */
 	@TableField("plan_repayment_date")
 	@ApiModelProperty(required= true,value = "应还日期")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date planRepaymentDate;
     /**
      * [本期实还金额]
@@ -84,6 +86,7 @@ public class CarBusinessAfterDetailDto extends Model<CarBusinessAfterDetailDto> 
      */
 	@TableField("actual_repayment_date")
 	@ApiModelProperty(required= true,value = "实还日期")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date actualRepaymentDate;
     /**
      * 减免金额
@@ -96,6 +99,7 @@ public class CarBusinessAfterDetailDto extends Model<CarBusinessAfterDetailDto> 
      */
 	@TableField("create_time")
 	@ApiModelProperty(required= true,value = "创建日期")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createTime;
     /**
      * 创建人
@@ -108,6 +112,7 @@ public class CarBusinessAfterDetailDto extends Model<CarBusinessAfterDetailDto> 
      */
 	@TableField("update_time")
 	@ApiModelProperty(required= true,value = "更新日期")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date updateTime;
     /**
      * 更新人
@@ -251,30 +256,5 @@ public class CarBusinessAfterDetailDto extends Model<CarBusinessAfterDetailDto> 
 		this.planFeeRate = planFeeRate;
 	}
 
-	@Override
-	protected Serializable pkVal() {
-		return this.id;
-	}
 
-	@Override
-	public String toString() {
-		return "CarBusinessAfterDetailDto{" +
-			", id=" + id +
-			", businessId=" + businessId +
-			", businessAfterId=" + businessAfterId +
-			", feeId=" + feeId +
-			", feeName=" + feeName +
-			", afterFeeType=" + afterFeeType +
-			", planFeeValue=" + planFeeValue +
-			", planRepaymentDate=" + planRepaymentDate +
-			", actualFeeValue=" + actualFeeValue +
-			", actualRepaymentDate=" + actualRepaymentDate +
-			", derateAmount=" + derateAmount +
-			", createTime=" + createTime +
-			", createUser=" + createUser +
-			", updateTime=" + updateTime +
-			", updateUser=" + updateUser +
-			", planFeeRate=" + planFeeRate +
-			"}";
-	}
 }

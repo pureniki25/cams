@@ -3,25 +3,21 @@ package com.hongte.alms.finance.controller;
 import java.util.*;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.plugins.Page;
+import com.hongte.alms.base.RepayPlan.dto.PlanReturnInfoDto;
+import com.hongte.alms.base.RepayPlan.dto.app.BizDto;
+import com.hongte.alms.base.RepayPlan.dto.app.BizPlanDto;
+import com.hongte.alms.base.RepayPlan.dto.app.BizPlanListDto;
 import com.hongte.alms.base.RepayPlan.req.*;
 import com.hongte.alms.base.RepayPlan.req.trial.TrailBizInfoReq;
 import com.hongte.alms.base.RepayPlan.req.trial.TrailProjFeeReq;
 import com.hongte.alms.base.RepayPlan.req.trial.TrailProjInfoReq;
 import com.hongte.alms.base.RepayPlan.req.trial.TrailRepayPlanReq;
-import com.hongte.alms.base.RepayPlan.vo.PlanPayedVo;
-import com.hongte.alms.base.RepayPlan.vo.RepayingPlanVo;
-import com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanSettleStatusEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.RepaymentBizPlanService;
-
-import com.hongte.alms.finance.dto.repayPlan.app.BizDto;
-import com.hongte.alms.finance.dto.repayPlan.app.BizPlanDto;
-import com.hongte.alms.finance.dto.repayPlan.app.BizPlanListDto;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +30,6 @@ import com.hongte.alms.base.baseException.CreatRepaymentExcepiton;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.ClassCopyUtil;
 import com.hongte.alms.common.util.StringUtil;
-import com.hongte.alms.finance.dto.repayPlan.PlanReturnInfoDto;
 
 import com.hongte.alms.finance.service.CreatRepayPlanService;
 
@@ -97,7 +92,7 @@ public class RepayPlanController {
     @PostMapping("/creatAndSaveRepayPlan")
     @ResponseBody
     public Result<PlanReturnInfoDto> creatAndSaveRepayPlan(@RequestBody CreatRepayPlanReq creatRepayPlanReq){
-        logger.info("@还款计划@创建还款计划接口,对业务和标的还款计划进行试算--开始[{}]" , JSON.toJSONString(creatRepayPlanReq));
+        logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口--开始[{}]" , JSON.toJSONString(creatRepayPlanReq));
         PlanReturnInfoDto  planReturnInfoDto;
         try{
             planReturnInfoDto = creatRepayPlanService.creatAndSaveRepayPlan(creatRepayPlanReq);
@@ -109,10 +104,19 @@ public class RepayPlanController {
             return Result.error("9889","程序异常报错："+e.getMessage());
         }
 
-        logger.info("@还款计划@创建还款计划接口,对业务和标的还款计划进行试算--结束[{}]" , JSON.toJSONString(creatRepayPlanReq));
-
+        logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口--结束[{}]" , JSON.toJSONString(creatRepayPlanReq));
         return  Result.success(planReturnInfoDto);
     }
+
+//    @ApiOperation(value = "测试时间转换")
+//    @PostMapping("/testTime")
+//    @ResponseBody
+//    public Result<PlanReturnInfoDto> testTime() {
+//        PlanReturnInfoDto dto = new PlanReturnInfoDto();
+//        dto.setTestTime(new Date());
+//        return Result.success(dto);
+//    }
+
 
 
     @ApiOperation(value = "试算还款计划接口, 精简字段")
@@ -156,7 +160,7 @@ public class RepayPlanController {
             }
         }catch (Exception e){
             logger.info("@还款计划@试算还款计划接口,对业务和标的还款计划进行试算--异常[{}]" , e);
-            return Result.error("9889",e.getMessage());
+            return Result.error("9889","程序内部异常"+e.getMessage());
         }
 //        logger.info("@还款计划@试算还款计划接口,对业务和标的还款计划进行试算--结束[{}]" , trailRepayPlanReq);
         return creatRepayPlan(creatRepayPlanReq);

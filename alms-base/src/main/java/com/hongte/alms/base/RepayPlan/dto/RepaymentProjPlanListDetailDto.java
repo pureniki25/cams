@@ -1,16 +1,17 @@
-package com.hongte.alms.finance.dto.repayPlan;
-
-import java.util.List;
+package com.hongte.alms.base.RepayPlan.dto;
 
 import com.hongte.alms.base.entity.RepaymentProjFactRepay;
 import com.hongte.alms.base.entity.RepaymentProjPlanListDetail;
+
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author zengkun
  * @since 2018/5/5
  * 标的还款计划Detail表DTO
  */
-public class RepaymentProjPlanListDetailDto {
+public class RepaymentProjPlanListDetailDto implements Serializable {
 	private RepaymentProjPlanListDetail repaymentProjPlanListDetail ;
 	private List<RepaymentProjFactRepay> repaymentProjFactRepays ;
 
