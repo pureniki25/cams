@@ -116,6 +116,7 @@ public class WithHoldingController {
 				}
 		
 			} else {
+				withHoldingInsertRecordFail(WithholdingRecordLogService, afterId, originalBusinessId, total);
 				Result result=new Result();
 				result.setCode("-2");
 				result.setData(respData.getReturnMessage());
@@ -223,11 +224,7 @@ public class WithHoldingController {
 	// 代扣记录日志入库
 	private Boolean withHoldingInsertRecord(WithholdingRecordLogService service, String afterId, String originalBusinessId,
 			String planOverDueMoney) {
-		List<WithholdingRecordLog> loglist=service.selectWithholdingRecordLog(originalBusinessId, afterId);
-		//已经存在记录
-		if(loglist.size()>0) {
-			return false;
-		}else {
+	
 			WithholdingRecordLog log = new WithholdingRecordLog();
 			log.setOriginalBusinessId(originalBusinessId);
 			log.setAfterId(afterId);
@@ -237,9 +234,22 @@ public class WithHoldingController {
 			log.setUpdateTime(new Date());
 			service.insert(log);
 			return true;
-		}
 	}
 
+	
+	private Boolean withHoldingInsertRecordFail(WithholdingRecordLogService service, String afterId, String originalBusinessId,
+			String planOverDueMoney) {
+	
+			WithholdingRecordLog log = new WithholdingRecordLog();
+			log.setOriginalBusinessId(originalBusinessId);
+			log.setAfterId(afterId);
+			log.setCreateTime(new Date());
+			log.setCurrentAmount(BigDecimal.valueOf(Double.valueOf(planOverDueMoney)));
+			log.setRepayStatus(0);
+			log.setUpdateTime(new Date());
+			service.insert(log);
+			return true;
+	}
 
 	
 	
