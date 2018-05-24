@@ -617,9 +617,9 @@
 	
 	<select id="queryCarLoanFees" resultType="map">
 		SELECT 
-		  a.`due_date` dueDate,
+		  c.`due_date` dueDate,
 		  -- 应还日期 
-		  a.`period` curPeriod,
+		  c.`period` curPeriod,
 		  -- 当前应还期数 
 		  c.plan_accrual planAccrual,
 		  -- 当期应还利息 
@@ -640,11 +640,9 @@
 		      t3.`plan_amount` 
 		    FROM
 		      tb_repayment_biz_plan_list t1,
-		      tb_repayment_biz_plan t2,
 		      tb_repayment_biz_plan_list_detail t3 
-		    WHERE t1.plan_id = t2.plan_id 
-		      AND t1.plan_list_id = t3.plan_list_id 
-		      AND t2.original_business_id = #{businessId,jdbcType=VARCHAR}
+		    WHERE t1.plan_list_id = t3.plan_list_id 
+		      AND t1.orig_business_id = #{businessId,jdbcType=VARCHAR} 
 		      AND IFNULL(t3.plan_item_type, 0) = 30 
 		      AND IFNULL(t1.repay_flag, 0) != 6 
 		      AND IFNULL(t1.`period`, 0) != 0) tab) isPreCharge,
@@ -660,26 +658,22 @@
 		      t3.`plan_amount` 
 		    FROM
 		      tb_repayment_biz_plan_list t1,
-		      tb_repayment_biz_plan t2,
 		      tb_repayment_biz_plan_list_detail t3 
-		    WHERE t1.plan_id = t2.plan_id 
-		      AND t1.plan_list_id = t3.plan_list_id 
-		      AND t2.original_business_id = #{businessId,jdbcType=VARCHAR} 
+		    WHERE t1.plan_list_id = t3.plan_list_id 
+		      AND t1.orig_business_id = #{businessId,jdbcType=VARCHAR} 
 		      AND IFNULL(t3.plan_item_type, 0) = 30 
 		      AND IFNULL(t1.repay_flag, 0) != 6 
 		    GROUP BY t1.plan_list_id 
 		    ORDER BY t1.due_date DESC 
 		    LIMIT 1) tab) isPreServiceFees,
 		  -- 是否服务费前置收取 
-		  (SELECT 
-		    COUNT(1) 
-		  FROM
-		    `tb_repayment_biz_plan_list` 
-		  WHERE orig_business_id = a.orig_business_id) totalPeriod -- 总期数 
+		  c.totalPeriod -- 总期数 
 		FROM
-		  tb_repayment_biz_plan_list a,
 		  (SELECT 
 		    t2.orig_business_id,
+		    t2.`period`,
+		    t2.`due_date`,
+		    t3.totalPeriod,
 		    SUM(
 		      CASE
 		        WHEN t1.plan_item_type = 40 
@@ -710,15 +704,18 @@
 		    ) AS `plan_service_charge` 
 		  FROM
 		    tb_repayment_biz_plan_list_detail t1,
-		    tb_repayment_biz_plan_list t2
-		    WHERE t1.`plan_list_id` = t2.`plan_list_id`
-		    AND t2.`orig_business_id` = #{businessId,jdbcType=VARCHAR}
-		  GROUP BY t1.plan_list_id) c 
-		WHERE a.orig_business_id = c.orig_business_id 
-		  AND a.orig_business_id = #{businessId,jdbcType=VARCHAR}
-		  AND a.`due_date` <![CDATA[ >= ]]> #{billDate,jdbcType=DATE}
-		  AND IFNULL(a.repay_flag, 0) != 6 
-		ORDER BY a.due_date 
+		    tb_repayment_biz_plan_list t2,
+		    (SELECT 
+		      COUNT(1) totalPeriod 
+		    FROM
+		      `tb_repayment_biz_plan_list` 
+		    WHERE orig_business_id = #{businessId,jdbcType=VARCHAR}) t3 
+		  WHERE t1.`plan_list_id` = t2.`plan_list_id` 
+		    AND t2.`orig_business_id` = #{businessId,jdbcType=VARCHAR} 
+		    AND t2.`due_date` <![CDATA[ >= ]]> #{billDate,jdbcType=DATE} 
+		    AND IFNULL(t2.repay_flag, 0) != 6 
+		  GROUP BY t1.plan_list_id 
+		  ORDER BY t2.`due_date`) c 
 		LIMIT 1 
 	</select>
 	
