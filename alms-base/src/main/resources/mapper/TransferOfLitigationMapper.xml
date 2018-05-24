@@ -748,21 +748,25 @@
 	
 	<select id="queryPreviousFees" resultType="com.hongte.alms.base.vo.billing.PreviousFeesVO">
 		SELECT 
-		  tab.original_business_id businessId,
-		  tab.afterId, -- 期数
-		  tab.current_status currentStatus, -- 当期还款状态
+		  tab.orig_business_id businessId,
+		  tab.afterId,
+		  -- 期数
+		  tab.current_status currentStatus,
+		  -- 当期还款状态
 		  (
 		    tab.planAccrual - tab.factAccrual
-		  ) AS previousPlanAccrual, -- 往期少交利息
+		  ) AS previousPlanAccrual,
+		  -- 往期少交利息
 		  (
 		    tab.planServiceCharge - tab.factServiceCharge
-		  ) AS previousPlanServiceCharge, --  往期 少交服务费
+		  ) AS previousPlanServiceCharge,
+		  --  往期 少交服务费
 		  (tab.pateFees - tab.factLateFees) AS previousLateFees --  往期少交滞纳金
 		FROM
 		  (SELECT 
 		    t2.`after_id` afterId,
 		    t2.current_status,
-		    t3.original_business_id,
+		    t2.orig_business_id,
 		    SUM(
 		      CASE
 		        WHEN t.plan_item_type = 20 
@@ -812,14 +816,15 @@
 		    ) AS `factLateFees` -- 实缴滞纳金
 		  FROM
 		    tb_repayment_biz_plan_list_detail t,
-		    tb_repayment_biz_plan_list t2,
-		    tb_repayment_biz_plan t3 
+		    tb_repayment_biz_plan_list t2 
 		  WHERE t.plan_list_id = t2.plan_list_id 
-		    AND t2.plan_id = t3.plan_id 
 		    AND t2.`due_date` <![CDATA[ < ]]> #{billDate,jdbcType=DATE}
-		    AND t3.original_business_id = #{businessId,jdbcType=VARCHAR}
+		    AND t2.orig_business_id = #{businessId,jdbcType=VARCHAR}
 		    AND IFNULL(t2.repay_flag, 0) != 6 
 		  GROUP BY t.`plan_list_id`) tab 
+		WHERE (tab.planAccrual - tab.factAccrual) > 0 
+		OR (tab.planServiceCharge - tab.factServiceCharge) > 0
+		OR (tab.pateFees - tab.factLateFees) > 0
 		ORDER BY tab.afterId 
 	</select>
 	
