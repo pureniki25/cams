@@ -1022,7 +1022,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 	 */
 	@Override
 	public  void calLackFee(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan){
-		/*往期滞纳金,取最大一期*/
+		/*连续的往期滞纳金,取最大一期,且如果有逾期变已还款但滞纳金没缴的情况,需要加上*/
 		BigDecimal firstLateFee = null ;
 		List<BigDecimal> instersets = new ArrayList<>() ;
 		for (int i = 0; i < 10; i++) {
@@ -1072,6 +1072,18 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 					expenseSettleLackFeeVO.setInterest(instersets.get(Integer.valueOf(n)-1));
 					
 				} else if (d.getPlanItemType().equals(new Integer(60))) {
+//					//已还款
+//					if(e.getRepaymentBizPlanList().getCurrentStatus().equals("已还款")) {
+//						BigDecimal overDue = e.getRepaymentBizPlanList().getOverdueAmount();
+//						BigDecimal fact = d.getFactAmount()==null?new BigDecimal(0):d.getFactAmount() ;
+//						//但是产生逾期滞纳金
+//						if (overDue!=null) {
+//							//逾期费与detail的逾期费相等
+//							if (d.getPlanAmount().equals(overDue)) {
+//								expenseSettleLackFeeVO.setLateFee(d.getPlanAmount().subtract(fact));
+//							}
+//						}
+//					}
 					if (firstLateFee == null) {
 						if (e.getRepaymentBizPlanList() != null && e.getRepaymentBizPlanList().getCurrentStatus().equals("逾期")) {
 							int daysBeyoungDueDate = DateUtil.getDiffDays(e.getRepaymentBizPlanList().getDueDate(), settleDate);
