@@ -184,10 +184,10 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		List<RepaymentBizPlanList> repaymentBizPlanLists = repaymentBizPlanListService
 				.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", businessId)
 						.eq("current_status", RepayPlanStatus.REPAYED.getName()).ne("repay_flag", 6)
-						.orderBy("fact_repay_date", false));
+						.orderBy("due_date", false));
 		Date lastRepayDate = null;
 		if (CollectionUtils.isNotEmpty(repaymentBizPlanLists)) {
-			lastRepayDate = repaymentBizPlanLists.get(0).getFactRepayDate();
+			lastRepayDate = repaymentBizPlanLists.get(0).getDueDate();
 		}
 
 		resultMap.put("lastRepayDate", lastRepayDate == null ? lastRepayDate
