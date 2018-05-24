@@ -103,7 +103,7 @@ public class WithHoldingController {
 			String respStr = withholdingxindaiService.withholding(encryptStr);
 			// 返回数据解密
 			ResponseData respData = getRespData(respStr);
-			logger.info("执行代扣接口返回数据:"+respData.getData());
+			logger.info("执行代扣接口返回数据:"+respData.getData()+",returnCode="+respData.getReturnCode()+",message="+respData.getReturnMessage());
 			
 			if ("1".equals(respData.getReturnCode())) {// 处理中
 				
