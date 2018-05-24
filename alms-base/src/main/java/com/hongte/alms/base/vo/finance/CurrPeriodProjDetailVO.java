@@ -20,6 +20,7 @@ public class CurrPeriodProjDetailVO {
 	private BigDecimal onlineOverDue = new BigDecimal(0);
 	private BigDecimal subTotal = new BigDecimal(0);
 	private BigDecimal total = new BigDecimal(0);
+	private BigDecimal surplus = new BigDecimal(0);
 	private String project ;
 
 	public String getUserName() {
@@ -134,5 +135,19 @@ public class CurrPeriodProjDetailVO {
 	 */
 	public void setProject(String project) {
 		this.project = project;
+	}
+
+	/**
+	 * @return the surplus
+	 */
+	public BigDecimal getSurplus() {
+		return surplus;
+	}
+
+	/**
+	 * @param surplus the surplus to set
+	 */
+	public void setSurplus(BigDecimal surplus) {
+		this.surplus = surplus;
 	}
 }

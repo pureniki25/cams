@@ -38,6 +38,7 @@
 
 	<select id="listMatchedMoneyPool" resultType="com.hongte.alms.base.vo.module.MatchedMoneyPoolVO" >
 		SELECT 
+			mpr.id AS mprId,
 		    mpr.money_pool_id AS moneyPoolId,
 		    mp.pay_code AS repaymentCode,
 		    mp.trade_date AS tradeDate,
