@@ -16,6 +16,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 public class MatchedMoneyPoolVO {
 
 	/**
+	 * 还款登记id
+	 */
+	private String mprId ;
+	/**
 	 * 流水号
 	 */
 	private String moneyPoolId ;
@@ -133,5 +137,17 @@ public class MatchedMoneyPoolVO {
 	 */
 	public void setBankAccount(String bankAccount) {
 		this.bankAccount = bankAccount;
+	}
+	/**
+	 * @return the mprId
+	 */
+	public String getMprId() {
+		return mprId;
+	}
+	/**
+	 * @param mprId the mprId to set
+	 */
+	public void setMprId(String mprId) {
+		this.mprId = mprId;
 	}
 }

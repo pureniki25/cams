@@ -112,6 +112,7 @@ public class FinanceServiceImpl implements FinanceService {
 	@Autowired
 	ProcessMapper processMapper;
 
+	
 	@Autowired
 	MoneyPoolRepaymentMapper moneyPoolRepaymentMapper;
 	@Autowired
@@ -814,6 +815,11 @@ public class FinanceServiceImpl implements FinanceService {
 			return Result.error("500", "结余金额不足");
 		}
 		RepaymentBizPlanDto repaymentBizPlanDto = initRepaymentBizPlanDto(req);
+		
+		if (req.getSurplusFund()!=null||req.getSurplusFund().compareTo(new BigDecimal(0))>0) {
+			/*用结余*/
+			
+		}
 		List<MoneyPoolRepayment> list = moneyPoolRepaymentMapper.selectBatchIds(req.getMprIds());
 		BigDecimal repayMoney = new BigDecimal(0);
 		ConfirmRepaymentPreviewDto confirmRepaymentPreviewDto= new ConfirmRepaymentPreviewDto();
@@ -1113,6 +1119,7 @@ public class FinanceServiceImpl implements FinanceService {
 					surplusFund = distributiveMoney.subtract(repayAmount);
 					BigDecimal surplusFundAdd = repaymentProjPlanDto.getSurplusMoney().add(surplusFund);
 					repaymentProjPlanDto.setSurplusMoney(surplusFundAdd);
+					detailVO.setSurplus(surplusFund);
 				} else {
 					/* 总还金额==分配金额,没有余额,且每一项都填满 */
 					/* 总还金额>分配金额,没有余额,有没填满的项 */
