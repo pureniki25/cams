@@ -93,6 +93,13 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 	@TableField("overdue_amount")
 	@ApiModelProperty(required= true,value = "总应还滞纳金(元)，每天零点由系统自动计算")
 	private BigDecimal overdueAmount;
+	/**
+     * 减免金额
+     */
+	@TableField("derate_amount")
+	@ApiModelProperty(required= true,value = "减免金额")
+	private BigDecimal derateAmount;
+	
     /**
      * 逾期天数，每天零点由系统自动计算
      */

@@ -120,6 +120,14 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
 	@TableField("proj_plan_amount")
 	@ApiModelProperty(required= true,value = "标的资产端计划还款金额(元)")
 	private BigDecimal projPlanAmount;
+	
+	 /**
+     * 标的减免金额
+     */
+	@TableField("derate_amount")
+	@ApiModelProperty(required= true,value = "标的减免金额")
+	private BigDecimal derateAmount;
+	
     /**
      * 标的资产端实还金额(元)
      */
