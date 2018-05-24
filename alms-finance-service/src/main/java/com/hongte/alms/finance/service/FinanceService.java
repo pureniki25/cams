@@ -5,10 +5,10 @@ package com.hongte.alms.finance.service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.hongte.alms.base.dto.ConfirmRepaymentReq;
+import com.hongte.alms.base.dto.RepaymentPlanInfoDTO;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.entity.MoneyPool;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
@@ -16,7 +16,6 @@ import com.hongte.alms.base.vo.finance.CurrPeriodDerateInfoVO;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.base.vo.finance.CurrPeriodRepaymentInfoVO;
 import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
-import com.hongte.alms.base.vo.module.RepaymentLogVO;
 import com.hongte.alms.common.result.Result;
 
 /**
@@ -102,4 +101,18 @@ public interface FinanceService {
 	 * @return
 	 */
 	public Result confirmRepayment(ConfirmRepaymentReq req);
+	
+	/**
+     * 根据源业务编号获取还款计划信息
+     * @param businessId
+     * @return
+     */
+    Map<String, Object> queryRepaymentPlanInfoByBusinessId(String businessId);
+    
+    /**
+     * 根据源业务编号获取还款计划信息
+     * @param planListId
+     * @return
+     */
+    Map<String, Object> queryRepaymentProjInfoByPlanListId(String planListId);
 }
