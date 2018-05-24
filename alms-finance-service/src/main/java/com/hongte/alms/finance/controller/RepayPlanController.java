@@ -27,12 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.alibaba.fastjson.JSON;
 import com.hongte.alms.base.baseException.CreatRepaymentExcepiton;
@@ -73,7 +68,7 @@ public class RepayPlanController {
     @ApiOperation(value = "创建还款计划接口,不存储   全字段")
     @PostMapping("/creatRepayPlan")
     @ResponseBody
-    public Result<PlanReturnInfoDto> creatRepayPlan(CreatRepayPlanReq creatRepayPlanReq){
+    public Result<PlanReturnInfoDto> creatRepayPlan(@RequestBody CreatRepayPlanReq creatRepayPlanReq){
         logger.info("@还款计划@创建还款计划接口,对业务和标的还款计划进行试算--开始[{}]" , JSON.toJSONString(creatRepayPlanReq));
         PlanReturnInfoDto  planReturnInfoDto;
 //        List<RepaymentBizPlanDto>  list ;
@@ -101,7 +96,7 @@ public class RepayPlanController {
     @ApiOperation(value = "创建还款计划并将还款计划及业务和上标信息存储到数据库 接口")
     @PostMapping("/creatAndSaveRepayPlan")
     @ResponseBody
-    public Result<PlanReturnInfoDto> creatAndSaveRepayPlan(CreatRepayPlanReq creatRepayPlanReq){
+    public Result<PlanReturnInfoDto> creatAndSaveRepayPlan(@RequestBody CreatRepayPlanReq creatRepayPlanReq){
         logger.info("@还款计划@创建还款计划接口,对业务和标的还款计划进行试算--开始[{}]" , JSON.toJSONString(creatRepayPlanReq));
         PlanReturnInfoDto  planReturnInfoDto;
         try{
@@ -111,7 +106,7 @@ public class RepayPlanController {
             return Result.error(e.getCode(),e.getMsg());
         }catch (Exception e){
             logger.info("程序异常[{}]" , e);
-            return Result.error("9889",e.getMessage());
+            return Result.error("9889","程序异常报错："+e.getMessage());
         }
 
         logger.info("@还款计划@创建还款计划接口,对业务和标的还款计划进行试算--结束[{}]" , JSON.toJSONString(creatRepayPlanReq));
@@ -123,7 +118,7 @@ public class RepayPlanController {
     @ApiOperation(value = "试算还款计划接口, 精简字段")
     @PostMapping("/trailRepayPlan")
     @ResponseBody
-    public Result<PlanReturnInfoDto> trailRepayPlan(TrailRepayPlanReq trailRepayPlanReq){
+    public Result<PlanReturnInfoDto> trailRepayPlan(@RequestBody TrailRepayPlanReq trailRepayPlanReq){
         logger.info("@还款计划@试算还款计划接口,对业务和标的还款计划进行试算--开始[{}]" , JSON.toJSONString(trailRepayPlanReq));
         CreatRepayPlanReq creatRepayPlanReq= null;
         try{
