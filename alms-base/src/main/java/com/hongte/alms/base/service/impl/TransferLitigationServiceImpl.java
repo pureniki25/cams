@@ -599,11 +599,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			double lastPlanServiceCharge = ((BigDecimal) maxPeriodMap.get("planServiceCharge")).doubleValue(); // 最后一期应还服务费
 			double lastGuaranteeCharge = ((BigDecimal) maxPeriodMap.get("plan_guarantee_charge")).doubleValue(); // 最后一期担保公司费用
 			double lastPlatformCharge = ((BigDecimal) maxPeriodMap.get("plan_platform_charge")).doubleValue(); // 最后一期平台费
-			int overdueDays = 0; // 逾期天数
-			if (minDueDate != null) {
-				overdueDays = DateUtil.getDiffDays(minDueDate, billDate); 
-			}
-			overdueDays = overdueDays < 0 ? 0 : overdueDays;
+			
 //			long isPreCharge = (long) resultMap.get("isPreCharge"); // 是否服务费一次性收取业务
 //			long isPreServiceFees = (long) resultMap.get("isPreServiceFees"); // 是否分公司服务费前置收取
 			double planAccrual = ((BigDecimal) resultMap.get("planAccrual")).doubleValue(); // 本期应还利息
@@ -616,10 +612,16 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			double dragFees = carLoanBilVO.getDragFees(); // 拖车费
 			double otherFees = carLoanBilVO.getOtherFees(); // 其他费用
 			double attorneyFees = carLoanBilVO.getAttorneyFees(); // 律师
+			Date curDueDate = (Date) resultMap.get("curDueDate");
+			
+			int overdueDays = 0; // 逾期天数
+			if (curDueDate != null) {
+				overdueDays = DateUtil.getDiffDays(curDueDate, billDate); 
+			}
+			overdueDays = overdueDays < 0 ? 0 : overdueDays;
 			
 			String curCurrentStatus = (String) resultMap.get("curCurrentStatus");
 			if (RepayPlanStatus.OVERDUE.getName().equals(curCurrentStatus)) {
-				Date curDueDate = (Date) resultMap.get("curDueDate");
 				int diffDays = DateUtil.getDiffDays(curDueDate, billDate);
 				innerLateFees = diffDays * innerLate * borrowMoney;
 			}
@@ -694,8 +696,13 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 							int i = (overdueDays / 30) <= 1 ? 1 : (overdueDays / 30);
 							int j = overdueDays % 30;
 							if (i >=1) { // 若 i 大于 1，说明超过30天, 期外逾期费 = 剩余本金 * 费率 * i + 剩余本金 * 费率 / 30 * j
-								outsideInterest = borrowMoney * outside * i;
-								outsideInterest += borrowMoney * outside / 30 * j;
+								if (j > 0 && j < 15) {
+									outsideInterest = borrowMoney * outside * i + borrowMoney * outside / 30 * j;
+								}else if (j >= 15) {
+									outsideInterest = borrowMoney * outside * (i + 1);
+								}else {
+									outsideInterest = borrowMoney * outside * i;
+								}
 							}
 						}
 
