@@ -2,7 +2,9 @@ package com.hongte.alms.withhold.controller;
 
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.withhold.service.AfterLoanRepaymentService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,6 +25,8 @@ public class AfterLoanRepaymentController {
      * @param bankCard 银行卡号
      * @return 是否代扣成功
      */
+    @PostMapping("/SubmitAutoRepay")
+    @ApiOperation(value = "执行代扣")
     public Result SubmitAutoRepay(String businessId,String afterId,String bankCard){
         return afterLoanRepaymentService.submitAutoRepay(businessId,afterId,bankCard);
     }
