@@ -569,26 +569,28 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			String repaymentTypeId = (String) resultMap.get("repaymentTypeId"); // 还款类型
 			double borrowRate = ((BigDecimal) resultMap.get("borrowRate")).doubleValue() * 0.01; // 年利率
 			double monthBorrowRate = borrowRate / 12;	// 月利率
-			
+			double balanceDue = 0; // 往期少交费用合计
 			if (!billDate.after(maxDueDate)) {	// 若 billDate 早于 maxDueDate  取dueDate比billDate大的最近的一期
 				// 当期的 利息、服务费、担保公司费用、平台费
 				resultMap.putAll(transferOfLitigationMapper.queryCarLoanFees(businessId, billDate)); 
 				// 查询往期少交费用明细
-				List<PreviousFeesVO> previousFees = setMatchingRepaymentPlanAccrual("等额本息", setPreviosFees(businessId, billDate, borrowMoney, innerLate), monthBorrowRate);
+//				List<PreviousFeesVO> previousFees = setMatchingRepaymentPlanAccrual("等额本息", setPreviosFees(businessId, billDate, borrowMoney, innerLate), monthBorrowRate);
+				List<PreviousFeesVO> previousFees = setPreviosFees(businessId, billDate, borrowMoney, innerLate);
 				resultMap.put("previousFees", previousFees);
 				// 往期少交费用合计
-				Double balanceDue = transferOfLitigationMapper.queryBalanceDueByBillDate(businessId, billDate);
-				balanceDue = setMatchingRepaymentPlanAccrualBalanceDue(resultMap, previousFees, balanceDue);
+//				Double balanceDue = transferOfLitigationMapper.queryBalanceDueByBillDate(businessId, billDate);
+				balanceDue = setMatchingRepaymentPlanAccrualBalanceDue(resultMap, previousFees);
 				resultMap.put("balanceDue", balanceDue);
 			}else {// 若 billDate 晚于 maxDueDate
 				// 当期的 利息、服务费、担保公司费用、平台费 取最后一期
 				resultMap.putAll(transferOfLitigationMapper.queryCarLoanFees(businessId, maxDueDate)); 
 				// 查询往期少交费用明细
-				List<PreviousFeesVO> previousFees = setMatchingRepaymentPlanAccrual("等额本息", setPreviosFees(businessId, maxDueDate, borrowMoney, innerLate), monthBorrowRate);
+//				List<PreviousFeesVO> previousFees = setMatchingRepaymentPlanAccrual("等额本息", setPreviosFees(businessId, maxDueDate, borrowMoney, innerLate), monthBorrowRate);
+				List<PreviousFeesVO> previousFees = setPreviosFees(businessId, maxDueDate, borrowMoney, innerLate);
 				resultMap.put("previousFees", previousFees);
 				// 往期少交费用合计
-				Double balanceDue = transferOfLitigationMapper.queryBalanceDueByBillDate(businessId, maxDueDate);
-				balanceDue = setMatchingRepaymentPlanAccrualBalanceDue(resultMap, previousFees, balanceDue);
+//				Double balanceDue = transferOfLitigationMapper.queryBalanceDueByBillDate(businessId, maxDueDate);
+				balanceDue = setMatchingRepaymentPlanAccrualBalanceDue(resultMap, previousFees);
 				resultMap.put("balanceDue", balanceDue);
 			}
 
@@ -597,27 +599,28 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			double lastPlanServiceCharge = ((BigDecimal) maxPeriodMap.get("planServiceCharge")).doubleValue(); // 最后一期应还服务费
 			double lastGuaranteeCharge = ((BigDecimal) maxPeriodMap.get("plan_guarantee_charge")).doubleValue(); // 最后一期担保公司费用
 			double lastPlatformCharge = ((BigDecimal) maxPeriodMap.get("plan_platform_charge")).doubleValue(); // 最后一期平台费
-			int overdueDays = 0; // 逾期天数
-			if (minDueDate != null) {
-				overdueDays = DateUtil.getDiffDays(minDueDate, billDate); 
-			}
-			overdueDays = overdueDays < 0 ? 0 : overdueDays;
+			
 //			long isPreCharge = (long) resultMap.get("isPreCharge"); // 是否服务费一次性收取业务
 //			long isPreServiceFees = (long) resultMap.get("isPreServiceFees"); // 是否分公司服务费前置收取
 			double planAccrual = ((BigDecimal) resultMap.get("planAccrual")).doubleValue(); // 本期应还利息
 			double planServiceCharge = ((BigDecimal) resultMap.get("planServiceCharge")).doubleValue(); // 本期应还服务费
 			double planPlatformCharge = ((BigDecimal) resultMap.get("planPlatformCharge")).doubleValue(); // 本期应还平台费
 			double planGuaranteeCharge = ((BigDecimal) resultMap.get("planGuaranteeCharge")).doubleValue(); // 本期应还担保公司费用
-			double balanceDue = (double) resultMap.get("balanceDue"); // 往期少交费用合计
 			double parkingFees = carLoanBilVO.getParkingFees(); // 停车费
 			double gpsFees = carLoanBilVO.getGpsFees(); // GPS费
 			double dragFees = carLoanBilVO.getDragFees(); // 拖车费
 			double otherFees = carLoanBilVO.getOtherFees(); // 其他费用
 			double attorneyFees = carLoanBilVO.getAttorneyFees(); // 律师
+			Date curDueDate = (Date) resultMap.get("curDueDate");
+			
+			int overdueDays = 0; // 逾期天数
+			if (curDueDate != null) {
+				overdueDays = DateUtil.getDiffDays(curDueDate, billDate); 
+			}
+			overdueDays = overdueDays < 0 ? 0 : overdueDays;
 			
 			String curCurrentStatus = (String) resultMap.get("curCurrentStatus");
 			if (RepayPlanStatus.OVERDUE.getName().equals(curCurrentStatus)) {
-				Date curDueDate = (Date) resultMap.get("curDueDate");
 				int diffDays = DateUtil.getDiffDays(curDueDate, billDate);
 				innerLateFees = diffDays * innerLate * borrowMoney;
 			}
@@ -661,8 +664,13 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 					int i = (overdueDays / 30) <= 1 ? 1 : (overdueDays / 30);
 					int j = overdueDays % 30;
 					if (i >=1) { // 若 i 大于 1，说明超过30天, 期外逾期费 = 剩余本金 * 费率 * i + 剩余本金 * 费率 / 30 * j
-						outsideInterest = surplusPrincipal * outside * i;
-						outsideInterest += surplusPrincipal * outside / 30 * j;
+						if (j > 0 && j < 15) {
+							outsideInterest = surplusPrincipal * outside * i + surplusPrincipal * outside / 30 * j;
+						}else if (j >= 15) {
+							outsideInterest = surplusPrincipal * outside * (i + 1);
+						}else {
+							outsideInterest = surplusPrincipal * outside * i;
+						}
 					}
 				}
 
@@ -687,8 +695,13 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 							int i = (overdueDays / 30) <= 1 ? 1 : (overdueDays / 30);
 							int j = overdueDays % 30;
 							if (i >=1) { // 若 i 大于 1，说明超过30天, 期外逾期费 = 剩余本金 * 费率 * i + 剩余本金 * 费率 / 30 * j
-								outsideInterest = borrowMoney * outside * i;
-								outsideInterest += borrowMoney * outside / 30 * j;
+								if (j > 0 && j < 15) {
+									outsideInterest = borrowMoney * outside * i + borrowMoney * outside / 30 * j;
+								}else if (j >= 15) {
+									outsideInterest = borrowMoney * outside * (i + 1);
+								}else {
+									outsideInterest = borrowMoney * outside * i;
+								}
 							}
 						}
 
@@ -704,13 +717,14 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				double surplusSerCharge = 0;
 				
 				if (CollectionUtils.isNotEmpty(listDetails)) {
-					listDetails.remove(0);
-					if (!listDetails.isEmpty()) {
-						for (RepaymentBizPlanListDetail detail : listDetails) {
-							BigDecimal planAmount = (detail.getPlanAmount() == null ? BigDecimal.valueOf(0) : detail.getPlanAmount());
-							BigDecimal factAmount = (detail.getFactAmount() == null ? BigDecimal.valueOf(0) : detail.getFactAmount());
-							surplusSerCharge += (planAmount.doubleValue() - factAmount.doubleValue());
+					
+					for (RepaymentBizPlanListDetail detail : listDetails) {
+						if (detail.getPlanListId().equals(_planListId)) {
+							continue;
 						}
+						BigDecimal planAmount = (detail.getPlanAmount() == null ? BigDecimal.valueOf(0) : detail.getPlanAmount());
+						BigDecimal factAmount = (detail.getFactAmount() == null ? BigDecimal.valueOf(0) : detail.getFactAmount());
+						surplusSerCharge += (planAmount.doubleValue() - factAmount.doubleValue());
 					}
 				}
 				
@@ -768,9 +782,9 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				}
 			}
 
-			receivableTotal = borrowMoney + planAccrual + planServiceCharge + planPlatformCharge + planGuaranteeCharge
+			receivableTotal = surplusPrincipal + planAccrual + planServiceCharge + planPlatformCharge + planGuaranteeCharge
 					+ innerLateFees + outsideInterest + preLateFees + balanceDue + parkingFees + gpsFees + dragFees
-					+ otherFees + attorneyFees + overdueDefault - overRepayMoney - refundMoney;
+					+ otherFees + attorneyFees + overdueDefault;
 			squaredUp = receivableTotal - overRepayMoney - refundMoney;
 			resultMap.put("innerLateFees", BigDecimal.valueOf(innerLateFees).setScale(2, RoundingMode.HALF_UP).doubleValue());
 			resultMap.put("outsideInterest", BigDecimal.valueOf(outsideInterest).setScale(2, RoundingMode.HALF_UP).doubleValue());
@@ -787,12 +801,13 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		return resultMap;
 	}
 
-	private Double setMatchingRepaymentPlanAccrualBalanceDue(Map<String, Object> resultMap,
-			List<PreviousFeesVO> previousFees, Double balanceDue) {
-		if (CollectionUtils.isNotEmpty(previousFees) && "等额本息".equals(previousFees.get(0).getCurrentStatus())) {
+	private double setMatchingRepaymentPlanAccrualBalanceDue(Map<String, Object> resultMap,
+			List<PreviousFeesVO> previousFees) {
+		double balanceDue = 0;
+		if (CollectionUtils.isNotEmpty(previousFees)) {
 			resultMap.put("previousFees", previousFees);
 			for (PreviousFeesVO vo : previousFees) {
-				balanceDue = vo.getPreviousLateFees() + vo.getPreviousPlanAccrual() + vo.getPreviousPlanServiceCharge();
+				balanceDue += vo.getPreviousLateFees() + vo.getPreviousPlanAccrual() + vo.getPreviousPlanServiceCharge();
 			}
 		}
 		return balanceDue;
