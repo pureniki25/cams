@@ -896,8 +896,9 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	    */
 		private boolean istLastPeriod(RepaymentBizPlanList pList) {
 			boolean isLast=false;
+			List<RepaymentBizPlanList> pLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", pList.getPlanId()));
 			RepaymentBizPlanList lastpList=pLists.stream().max(new Comparator<RepaymentBizPlanList>() {
-				List<RepaymentBizPlanList> pLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", pList.getPlanId()));
+			
 				@Override
 				public int compare(RepaymentBizPlanList o1, RepaymentBizPlanList o2) {
 					return o1.getDueDate().compareTo(o2.getDueDate());
