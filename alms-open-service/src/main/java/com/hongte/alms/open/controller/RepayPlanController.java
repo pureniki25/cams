@@ -64,7 +64,7 @@ public class RepayPlanController {
 
 
     @ApiOperation(value = "试算还款计划接口, 精简字段")
-    @GetMapping("/trailRepayPlan")
+    @PostMapping("/trailRepayPlan")
     @ResponseBody
     @TripleDESDecrypt
     public Result<PlanReturnInfoDto> trailRepayPlan(@RequestBody TrailRepayPlanReq trailRepayPlanReq){
@@ -78,7 +78,7 @@ public class RepayPlanController {
     }
 
     @ApiOperation(value = "根据businessId查询还款计划")
-    @GetMapping("/queryRepayPlanByBusinessId")
+    @PostMapping("/queryRepayPlanByBusinessId")
     @ResponseBody
     @TripleDESDecrypt
     public Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(@RequestParam(value = "businessId") String businessId){
@@ -86,7 +86,7 @@ public class RepayPlanController {
     }
 
     @ApiOperation(value = "根据businessId查询还款计划")
-    @GetMapping("/deleteRepayPlanByConditions")
+    @PostMapping("/deleteRepayPlanByConditions")
     @ResponseBody
     @TripleDESDecrypt
     public Result<PlanReturnInfoDto> deleteRepayPlanByConditions(@RequestParam(value = "businessId") String businessId,
