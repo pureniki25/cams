@@ -4,7 +4,7 @@ import com.hongte.alms.base.RepayPlan.req.PrincipleReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -13,6 +13,7 @@ import java.util.List;
  * @since 2018/4/23
  */
 @ApiModel("上标信息")
+//@Data
 public class TrailProjInfoReq {
 
 
@@ -35,9 +36,10 @@ public class TrailProjInfoReq {
 
 
     @ApiModelProperty(required= true,value = "还款方式：1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息,11:等本等息")
+    @NotNull(message = "还款方式(repayType)不能为空")
     private Integer repayType;
 
-    @ApiModelProperty(required= true,value = "每期还本Map  Map<期数，还本金额>")
+    @ApiModelProperty(value = "每期还本Map  Map<期数，还本金额>")
     private List<PrincipleReq> pricipleMap;
 
     /**

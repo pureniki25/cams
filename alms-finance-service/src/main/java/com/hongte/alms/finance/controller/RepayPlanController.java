@@ -23,6 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import com.alibaba.fastjson.JSON;
@@ -35,6 +39,13 @@ import com.hongte.alms.finance.service.CreatRepayPlanService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+
+import javax.annotation.PostConstruct;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import javax.validation.Valid;
 
 /**
  * @author zengkun
@@ -60,12 +71,26 @@ public class RepayPlanController {
     RepaymentBizPlanListService repaymentBizPlanListService;
 
 
+
+    private static Validator validator;
+
+    //初始化
+    @PostConstruct
+    public void  init(){
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
+    }
+
+
     @ApiOperation(value = "创建还款计划接口,不存储   全字段")
     @PostMapping("/creatRepayPlan")
     @ResponseBody
-    public Result<PlanReturnInfoDto> creatRepayPlan(@RequestBody CreatRepayPlanReq creatRepayPlanReq){
+    public Result<PlanReturnInfoDto> creatRepayPlan(@RequestBody @Validated CreatRepayPlanReq creatRepayPlanReq){
         logger.info("@还款计划@创建还款计划接口,对业务和标的还款计划进行试算--开始[{}]" , JSON.toJSONString(creatRepayPlanReq));
         PlanReturnInfoDto  planReturnInfoDto;
+
+
+
 //        List<RepaymentBizPlanDto>  list ;
         try{
             planReturnInfoDto = creatRepayPlanService.creatRepayPlan(creatRepayPlanReq);
@@ -91,7 +116,94 @@ public class RepayPlanController {
     @ApiOperation(value = "创建还款计划并将还款计划及业务和上标信息存储到数据库 接口")
     @PostMapping("/creatAndSaveRepayPlan")
     @ResponseBody
-    public Result<PlanReturnInfoDto> creatAndSaveRepayPlan(@RequestBody CreatRepayPlanReq creatRepayPlanReq){
+    public Result<PlanReturnInfoDto> creatAndSaveRepayPlan(@RequestBody @Valid CreatRepayPlanReq creatRepayPlanReq, BindingResult bindingResult){
+
+        // =========   校验参数输入是否正确  开始  ================
+        if(bindingResult.hasErrors()){
+            StringBuilder retErrMsg = new StringBuilder();
+            for (FieldError fieldError : bindingResult.getFieldErrors()) {
+                retErrMsg.append("   "+ fieldError.getDefaultMessage());
+            }
+            logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口,输入参数校验错误：" ,retErrMsg.toString());
+            return Result.error("9889","输入参数校验错误："+retErrMsg.toString());
+        }
+
+        //== 校验业务基础信息
+        BusinessBasicInfoReq businessBasicInfoReq = creatRepayPlanReq.getBusinessBasicInfoReq();
+        Set<ConstraintViolation<BusinessBasicInfoReq>> bizInfovalit =
+                validator.validate( creatRepayPlanReq.getBusinessBasicInfoReq() );
+        if(bizInfovalit.size()>0){
+            logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口,业务信息校验出错" , bizInfovalit.iterator().next().getMessage());
+            return Result.error("9889","业务信息校验出错："+bizInfovalit.iterator().next().getMessage());
+//            constraintViolations.iterator().next().getMessage();
+        }
+
+
+        //  ==  校验业务用户信息
+
+        List<BusinessCustomerInfoReq> bizCusInfoReqs =creatRepayPlanReq.getBizCusInfoReqs();
+        for(BusinessCustomerInfoReq bizCusInfoReq:bizCusInfoReqs ){
+            Set<ConstraintViolation<BusinessCustomerInfoReq>> CusInfovalit =
+                    validator.validate( bizCusInfoReq );
+            if(bizInfovalit.size()>0){
+                logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口,用户信息校验出错  传入信息： "+ JSON.toJSONString(bizCusInfoReq)+"  错误信息：" , bizInfovalit.iterator().next().getMessage());
+                return Result.error("9889","用户信息校验出错： 传入信息： "+JSON.toJSONString(bizCusInfoReq)+"     错误信息："+bizInfovalit.iterator().next().getMessage());
+            }
+        }
+
+        //  ===校验上标信息
+//        /**
+//         *  上标信息
+//         */
+//        @ApiModelProperty(required= true,value = "上标信息")
+//        private  List<ProjInfoReq> projInfoReqs;
+        List<ProjInfoReq> projInfoReqs = creatRepayPlanReq.getProjInfoReqs();
+
+        for(ProjInfoReq  projInfoReq: projInfoReqs){
+            Set<ConstraintViolation<ProjInfoReq>> CusInfovalit =
+                    validator.validate( projInfoReq );
+            if(bizInfovalit.size()>0){
+                logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口,上标信息校验出错  传入信息： "+ JSON.toJSONString(projInfoReq)+"  错误信息：" , bizInfovalit.iterator().next().getMessage());
+                return Result.error("9889","上标信息校验出错： 传入信息： "+JSON.toJSONString(projInfoReq)+"     错误信息："+bizInfovalit.iterator().next().getMessage());
+            }
+
+            //   ==  校验标的费用信息
+//            /**
+//             * 标的费用信息列表
+//             */
+//            @ApiModelProperty(required= true,value = "标的的出款费用信息列表")
+//            private List<ProjFeeReq> projFeeInfos;
+            List<ProjFeeReq> projFeeInfos =projInfoReq.getProjFeeInfos();
+            for(ProjFeeReq projFeeReq:projFeeInfos){
+                Set<ConstraintViolation<ProjInfoReq>> projFeeReqValit =
+                        validator.validate( projInfoReq );
+                if(projFeeReqValit.size()>0){
+                    logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口,标的的出款费用信息校验出错  传入信息： "+ JSON.toJSONString(projInfoReq)+"  错误信息：" , projFeeReqValit.iterator().next().getMessage());
+                    return Result.error("9889","标的的出款费用信息校验出错： 传入信息： "+JSON.toJSONString(projInfoReq)+"     错误信息："+projFeeReqValit.iterator().next().getMessage());
+                }
+            }
+
+
+
+        }
+
+
+
+//        BusinessBasicInfoReq businessBasicInfoReq = creatRepayPlanReq.getBusinessBasicInfoReq();
+//        Set<ConstraintViolation<BusinessBasicInfoReq>> bizInfovalit =
+//                validator.validate( creatRepayPlanReq.getBusinessBasicInfoReq() );
+//        if(bizInfovalit.size()>0){
+//            logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口,业务信息校验出错" , bizInfovalit.iterator().next().getMessage());
+//            return Result.error("9889","业务信息校验出错："+bizInfovalit.iterator().next().getMessage());
+////            constraintViolations.iterator().next().getMessage();
+//        }
+
+
+
+        // =========   校验参数输入是否正确  结束  ================
+
+
+
         logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口--开始[{}]" , JSON.toJSONString(creatRepayPlanReq));
         PlanReturnInfoDto  planReturnInfoDto;
         try{
@@ -122,7 +234,67 @@ public class RepayPlanController {
     @ApiOperation(value = "试算还款计划接口, 精简字段")
     @PostMapping("/trailRepayPlan")
     @ResponseBody
-    public Result<PlanReturnInfoDto> trailRepayPlan(@RequestBody TrailRepayPlanReq trailRepayPlanReq){
+    public Result<PlanReturnInfoDto> trailRepayPlan(@Valid @RequestBody TrailRepayPlanReq trailRepayPlanReq , BindingResult bindingResult){
+        // =========   校验参数输入是否正确  开始  ================
+        if(bindingResult.hasErrors()){
+            StringBuilder retErrMsg = new StringBuilder();
+            for (FieldError fieldError : bindingResult.getFieldErrors()) {
+                retErrMsg.append("   "+ fieldError.getDefaultMessage());
+            }
+            logger.info("@还款计划@试算还款计划接口,输入参数校验错误：" ,retErrMsg.toString());
+            return Result.error("9889","输入参数校验错误："+retErrMsg.toString());
+        }
+
+//        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+//        validator = factory.getValidator();
+
+        Set<ConstraintViolation<TrailBizInfoReq>> constraintViolations =
+                validator.validate( trailRepayPlanReq.getTrailBizInfoReq() );
+        if(constraintViolations.size()>0){
+            logger.info("@还款计划@试算还款计划接口,业务信息校验出错" , constraintViolations.iterator().next().getMessage());
+            return Result.error("9889","业务信息校验出错："+constraintViolations.iterator().next().getMessage());
+//            constraintViolations.iterator().next().getMessage();
+        }
+        // =========   校验参数输入是否正确  结束  ================
+
+        List<TrailProjInfoReq>   trailProjInfoReqs = trailRepayPlanReq.getProjInfoReqs();
+
+        for(TrailProjInfoReq trailProjInfoReq:trailProjInfoReqs){
+            Set<ConstraintViolation<TrailProjInfoReq>> constraintViolations1 =
+                    validator.validate( trailProjInfoReq );
+            if(constraintViolations1.size()>0){
+                logger.info("@还款计划@试算还款计划接口,标的信息校验出错" , constraintViolations1.iterator().next().getMessage());
+                return Result.error("9889","标的信息校验出错："+constraintViolations1.iterator().next().getMessage());
+            }
+        }
+
+//
+//        Errors errors = null;
+//        validator.validate()
+//        globalValidator.validate(trailRepayPlanReq.getTrailBizInfoReq(), errors);
+//        if(errors!=null){
+//            List<ObjectError>  ee = errors.getAllErrors();
+//            if(ee.size()>0){
+//                return Result.error("9889","输入参数业务信息校验错误："+ee.get(0).toString());
+//            }
+//        }
+//
+//        List<TrailProjInfoReq>   trailProjInfoReqs = trailRepayPlanReq.getProjInfoReqs();
+//
+//        for(TrailProjInfoReq trailProjInfoReq:trailProjInfoReqs){
+//            errors = null;
+//            if(errors!=null) {
+//                globalValidator.validate(trailRepayPlanReq.getTrailBizInfoReq(), errors);
+//                List<ObjectError> er = errors.getAllErrors();
+//                if (er.size() > 0) {
+//                    return Result.error("9889", " 输入参数标信息校验错误：" + er.get(0).toString());
+//                }
+//            }
+//        }
+
+
+
+
         logger.info("@还款计划@试算还款计划接口,对业务和标的还款计划进行试算--开始[{}]" , JSON.toJSONString(trailRepayPlanReq));
         CreatRepayPlanReq creatRepayPlanReq= null;
         try{
@@ -135,7 +307,7 @@ public class RepayPlanController {
             businessBasicInfoReq.setBusinessId("111");
             businessBasicInfoReq.setOrgBusinessId(businessBasicInfoReq.getBusinessId());
 
-            List<TrailProjInfoReq> trailProjInfoReqs = trailRepayPlanReq.getProjInfoReqs();
+//            List<TrailProjInfoReq> trailProjInfoReqs = trailRepayPlanReq.getProjInfoReqs();
 
             List<ProjInfoReq>  projInfoReqs = new LinkedList<>();
             creatRepayPlanReq.setProjInfoReqs(projInfoReqs);

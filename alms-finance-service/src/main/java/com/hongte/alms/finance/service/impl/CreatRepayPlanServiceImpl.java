@@ -26,7 +26,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
+import org.springframework.validation.Validator;
 
+import javax.validation.ConstraintViolation;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -115,6 +119,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
     @Qualifier("RepaymentProjFactRepayService")
     private RepaymentProjFactRepayService repaymentProjFactRepayService;
 
+    @Autowired
+    Validator globalValidator;
+
     //进位方式枚举
     private  RoundingMode roundingMode=RoundingMode.HALF_UP;
     //保留的小数位数
@@ -134,6 +141,8 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
         List<RepaymentBizPlanDto>  retList = new LinkedList<>();
         planReturnInfoDto.setRepaymentBizPlanDtos(retList);
+
+
 
 //        List<CarBusinessAfterDto>  carBizAfterList = new LinkedList<>();
 //        planReturnInfoDto.setCarBusinessAfterDtoList(carBizAfterList);
