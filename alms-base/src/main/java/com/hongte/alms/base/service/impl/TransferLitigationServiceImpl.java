@@ -704,13 +704,14 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				double surplusSerCharge = 0;
 				
 				if (CollectionUtils.isNotEmpty(listDetails)) {
-					listDetails.remove(0);
-					if (!listDetails.isEmpty()) {
-						for (RepaymentBizPlanListDetail detail : listDetails) {
-							BigDecimal planAmount = (detail.getPlanAmount() == null ? BigDecimal.valueOf(0) : detail.getPlanAmount());
-							BigDecimal factAmount = (detail.getFactAmount() == null ? BigDecimal.valueOf(0) : detail.getFactAmount());
-							surplusSerCharge += (planAmount.doubleValue() - factAmount.doubleValue());
+					
+					for (RepaymentBizPlanListDetail detail : listDetails) {
+						if (detail.getPlanListId().equals(_planListId)) {
+							continue;
 						}
+						BigDecimal planAmount = (detail.getPlanAmount() == null ? BigDecimal.valueOf(0) : detail.getPlanAmount());
+						BigDecimal factAmount = (detail.getFactAmount() == null ? BigDecimal.valueOf(0) : detail.getFactAmount());
+						surplusSerCharge += (planAmount.doubleValue() - factAmount.doubleValue());
 					}
 				}
 				
