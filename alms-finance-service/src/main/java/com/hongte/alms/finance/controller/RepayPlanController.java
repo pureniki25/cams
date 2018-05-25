@@ -315,6 +315,7 @@ public class RepayPlanController {
 
                 for(TrailProjFeeReq trailProjFeeReq:trailProjFeeReqs){
                     ProjFeeReq projFeeReq = ClassCopyUtil.copy(trailProjFeeReq,TrailProjFeeReq.class,ProjFeeReq.class);
+                    projFeeReq.setFeeType(30);//试算的时候默认把费用类型都设置成分公司服务费
                     List<ProjFeeDetailReq> projFeeDetailReqs = trailProjFeeReq.getFeeDetailReqMap();
                     projFeeReq.setFeeDetailReqList(projFeeDetailReqs);
                     projFeeReqs.add(projFeeReq);
