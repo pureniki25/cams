@@ -226,6 +226,7 @@ var layer;
                     vm.details=result.data.data.details;
                     vm.platformId=result.data.data.platformId;
                     vm.platformId=5;
+                    vm.isBankFlag=true;
                  
                     if(result.data.data.underLineOverDueMoney>0){
                      	vm.ajax_data.planOverDueMoney=result.data.data.underLineOverDueMoney;
