@@ -46,5 +46,8 @@ public interface WithholdingRepaymentLogService extends BaseService<WithholdingR
       * @return
       */
      RepaymentLogVO selectSumByLogId(RepaymentLogReq key);
+     
+     
+     
 
 }

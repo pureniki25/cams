@@ -7,13 +7,18 @@ import com.hongte.alms.common.result.Result;
 import com.hongte.alms.withhold.feignClient.WithHoldingClient;
 import com.hongte.alms.withhold.service.AfterLoanRepaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
+
+@Service("AfterLoanRepaymentService")
 public class AfterLoanRepaymentServiceImpl implements AfterLoanRepaymentService {
 
     @Autowired
     private WithHoldingClient withHoldingClient;
 
     @Autowired
+    @Qualifier("RepaymentBizPlanListService")
     private RepaymentBizPlanListService repaymentBizPlanListService;
 
     /**

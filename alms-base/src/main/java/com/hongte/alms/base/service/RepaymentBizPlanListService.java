@@ -98,6 +98,12 @@ public interface RepaymentBizPlanListService extends BaseService<RepaymentBizPla
      * @return
      */
     Integer queryPrincipalOverdueByBusinessId(String businessId);
+    /**
+     * @author czs
+     * 获取符合自动代扣的数据
+     * @return
+     */
+    List<RepaymentBizPlanList> selectAutoRepayList();
 
 
 }
