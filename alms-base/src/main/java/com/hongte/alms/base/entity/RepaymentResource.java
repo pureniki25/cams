@@ -103,6 +103,15 @@ public class RepaymentResource extends Model<RepaymentResource> {
 	@TableField("udpate_time")
 	@ApiModelProperty(required= true,value = "记录更新时间")
 	private Date udpateTime;
+	
+	/**
+	 * 被分配到的线上滞纳金,用于财务确认分润
+	 */
+	private BigDecimal dOfflineOverDue ;
+	/**
+	 * 被分配到的线下滞纳金,用于财务确认分润
+	 */
+	private BigDecimal dOnlineOverDue ;
 
 
 	public String getResourceId() {
@@ -231,5 +240,33 @@ public class RepaymentResource extends Model<RepaymentResource> {
 			", updateUser=" + updateUser +
 			", udpateTime=" + udpateTime +
 			"}";
+	}
+
+	/**
+	 * @return the dOfflineOverDue
+	 */
+	public BigDecimal getdOfflineOverDue() {
+		return dOfflineOverDue;
+	}
+
+	/**
+	 * @param dOfflineOverDue the dOfflineOverDue to set
+	 */
+	public void setdOfflineOverDue(BigDecimal dOfflineOverDue) {
+		this.dOfflineOverDue = dOfflineOverDue;
+	}
+
+	/**
+	 * @return the dOnlineOverDue
+	 */
+	public BigDecimal getdOnlineOverDue() {
+		return dOnlineOverDue;
+	}
+
+	/**
+	 * @param dOnlineOverDue the dOnlineOverDue to set
+	 */
+	public void setdOnlineOverDue(BigDecimal dOnlineOverDue) {
+		this.dOnlineOverDue = dOnlineOverDue;
 	}
 }

@@ -9,6 +9,8 @@ import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
 import java.io.Serializable;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
@@ -161,6 +163,7 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
      */
 	@TableField("create_time")
 	@ApiModelProperty(required= true,value = "创建日期")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createTime;
     /**
      * 创建用户
@@ -173,6 +176,7 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
      */
 	@TableField("update_time")
 	@ApiModelProperty(required= true,value = "更新日期")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date updateTime;
     /**
      * 更新用户
@@ -186,6 +190,7 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 	 */
 	@TableField("query_full_success_date")
 	@ApiModelProperty(required= true,value = "满标时间")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date queryFullSuccessDate;
 
 

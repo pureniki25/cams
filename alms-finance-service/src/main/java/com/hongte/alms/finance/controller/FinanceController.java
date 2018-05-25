@@ -6,7 +6,7 @@ package com.hongte.alms.finance.controller;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.text.html.parser.Entity;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,11 +22,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.entity.Columns;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.dto.ConfirmRepaymentReq;
 import com.hongte.alms.base.dto.FinanceManagerListReq;
+import com.hongte.alms.base.dto.RepaymentPlanInfoDTO;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.BasicBusinessType;
@@ -54,6 +54,7 @@ import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.finance.req.MoneyPoolReq;
 import com.hongte.alms.finance.service.FinanceService;
+import com.hongte.alms.finance.service.ShareProfitService;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -94,6 +95,9 @@ public class FinanceController {
 	@Autowired
 	@Qualifier("FinanceService")
 	private FinanceService financeService;
+	@Autowired
+	@Qualifier("ShareProfitService")
+	private ShareProfitService shareService;
 
 	@GetMapping(value = "/repayBaseInfo")
 	@ApiOperation(value = "获取还款基本信息")
@@ -382,9 +386,10 @@ public class FinanceController {
 	public Result previewConfirmRepayment(@RequestBody ConfirmRepaymentReq req) {
 		Result result ;
 		logger.info("@previewConfirmRepayment@预览确认还款拆标情况--开始[{}]",req);
-		result = financeService.previewConfirmRepayment(req);
-		logger.info("@previewConfirmRepayment@预览确认还款拆标情况--结束[{}]",result);
-		return result ;
+//		result = financeService.previewConfirmRepayment(req);
+		shareService.execute(req, false);
+//		logger.info("@previewConfirmRepayment@预览确认还款拆标情况--结束[{}]",result);
+		return Result.success() ;
 	}
 	
 	@GetMapping(value="/getSurplusFund")
@@ -396,6 +401,25 @@ public class FinanceController {
 		result = Result.success(surplusFund);
 		logger.info("@getSurplusFund@获取结余情况--结束[{}]",result);
 		return result ;
+	}
+	
+	@GetMapping(value = "/queryRepaymentPlanInfoByBusinessId")
+	@ApiOperation(value = "根据源业务编号获取还款计划信息")
+	public Result<Map<String, Object>> queryRepaymentPlanInfoByBusinessId(String businessId) {
+		try {
+			Result<Map<String, Object>> result;
+
+			logger.info("@queryRepaymentPlanInfoByBusinessId@根据源业务编号获取还款计划信息--开始[{}]", businessId);
+
+			result = Result.success(financeService.queryRepaymentPlanInfoByBusinessId(businessId));
+
+			logger.info("@queryRepaymentPlanInfoByBusinessId@根据源业务编号获取还款计划信息--结束[{}]", result);
+
+			return result;
+		} catch (Exception e) {
+			logger.error("根据源业务编号获取还款计划信息失败--[{}]", e);
+			return Result.error("-500", "系统异常，获取还款计划信息失败");
+		}
 	}
 	
 }

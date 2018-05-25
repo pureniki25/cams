@@ -9,6 +9,8 @@ import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
 import java.io.Serializable;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
@@ -65,6 +67,7 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
      */
 	@TableField("due_date")
 	@ApiModelProperty(required= true,value = "应还日期")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date dueDate;
     /**
      * 总计划应还金额(元)，不含滞纳金
@@ -78,6 +81,12 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 	@TableField("overdue_amount")
 	@ApiModelProperty(required= true,value = "总应还滞纳金(元)，每天零点由系统自动计算")
 	private BigDecimal overdueAmount;
+	/**
+     * 减免金额
+     */
+	@TableField("derate_amount")
+	@ApiModelProperty(required= true,value = "减免金额")
+	private BigDecimal derateAmount;
     /**
      * 逾期天数，每天零点由系统自动计算
      */
@@ -107,12 +116,14 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
      */
 	@TableField("fact_repay_date")
 	@ApiModelProperty(required= true,value = "客户实还日期")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date factRepayDate;
     /**
      * 财务确认还款操作日期
      */
 	@TableField("finance_comfirm_date")
 	@ApiModelProperty(required= true,value = "财务确认还款操作日期")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date financeComfirmDate;
     /**
      * 财务还款确认人ID
@@ -137,6 +148,7 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
      */
 	@TableField("auto_withholding_confirmed_date")
 	@ApiModelProperty(required= true,value = "财务确认自动代扣日期")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date autoWithholdingConfirmedDate;
     /**
      * 确认自动代扣的确认者ID
@@ -173,6 +185,7 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
      */
 	@TableField("accountant_confirm_date")
 	@ApiModelProperty(required= true,value = "会计确认日期")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date accountantConfirmDate;
     /**
      * 还款备注
@@ -189,6 +202,7 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
      */
 	@TableField("create_time")
 	@ApiModelProperty(required= true,value = "创建日期")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createTime;
     /**
      * 来源类型：1.信贷生成，2.贷后管理生成
@@ -207,6 +221,7 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
      */
 	@TableField("update_time")
 	@ApiModelProperty(required= true,value = "更新日期")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date updateTime;
     /**
      * 更新用户
@@ -513,5 +528,19 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 			", updateTime=" + updateTime +
 			", updateUser=" + updateUser +
 			"}";
+	}
+
+	/**
+	 * @return the derateAmount
+	 */
+	public BigDecimal getDerateAmount() {
+		return derateAmount;
+	}
+
+	/**
+	 * @param derateAmount the derateAmount to set
+	 */
+	public void setDerateAmount(BigDecimal derateAmount) {
+		this.derateAmount = derateAmount;
 	}
 }

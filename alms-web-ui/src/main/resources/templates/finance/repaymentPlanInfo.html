@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+	<link rel="stylesheet" type="text/css" href="/src/css/themes/default.css" />
+	<link rel="stylesheet" type="text/css" href="/plugins/iview/2.13.1/css/iview.css" />
+	<!-- 引入layui样式 -->
+	<link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all" />
+	
+</head>
+
+<body>
+	<div id="app" v-cloak>
+		<Card> 
+			<row> 
+				<i-col span="5">合同编号：{{ baseInfo.businessId }}</i-col>
+				<i-col span="3">客户姓名：{{ baseInfo.customer }}</i-col> 
+				<i-col span="4">手机号码：{{ baseInfo.phoneNumber }}</i-col>
+				<i-col span="4">还款方式：{{ baseInfo.repaymentType }}</i-col> 
+				<i-col span="4">借款金额：{{ baseInfo.borrowMoney }}</i-col>
+				<i-col span="4">借款期限：{{ baseInfo.borrowLimit }}</i-col> 
+			</row>
+		</Card>
+		
+		<Card>
+			<tabs value="repaymentPlan" :animated="true">
+		        <tab-pane label="还款计划" name="repaymentPlan">
+		        	<table class="layui-table">
+		        		<thead>
+			        		<tr>
+			        			<td>期数</td>
+			        			<td>类型</td>
+			        			<td>还款日期</td>
+			        			<td>本金</td>
+			        			<td>利息</td>
+			        			<td>月收分公司服务费</td>
+			        			<td>月收平台费</td>
+			        			<td>其他费用</td>
+			        			<td>小计</td>
+			        			<td>逾期天数</td>
+			        			<td>线上滞纳金</td>
+			        			<td>线下滞纳金</td>
+			        			<td>结余</td>
+			        			<td>还款合计（含滞纳金）</td>
+			        			<td>状态</td>
+			        		</tr>
+			        	</thead>
+		        		<tbody v-for="(item, index) in bizRepaymentPlanList">
+			        		<tr>
+		        				<td>{{ item.afterId }}</td>
+			        			<td v-html="addEventForType(item)"></td>
+			        			<td>{{ item.repaymentDate }}</td>
+			        			<td>{{ item.principal }}</td>
+			        			<td>{{ item.accrual }}</td>
+			        			<td>{{ item.serviceCharge }}</td>
+			        			<td>{{ item.platformCharge }}</td>
+			        			<td v-if="item.repayment == '实际还款'" v-html="addEventForOtherFee(item)"></td>
+			        			<td v-else>{{ item.otherFee }}</td>
+			        			<td>{{ item.subtotal }}</td>
+			        			<td>{{ item.overdueDays }}</td>
+			        			<td>{{ item.onlineLateFee }}</td>
+			        			<td>{{ item.offlineLateFee }}</td>
+			        			<td>{{ item.surplus }}</td>
+			        			<td>{{ item.total }}</td>
+			        			<td>{{ item.confirmFlag }}</td>
+			        		</tr>
+			        	</tbody>
+		        	</table>
+		        	
+		        	<Modal v-model="repayPlanFlag" title="计划还款" width="1600">
+		        		<i-table border :columns="repayPlanColumns" :data="repayPlanColumnsData"></i-table>
+					</Modal>
+					
+		        	<Modal v-model="repayActualFlag" title="实际还款" width="1600">
+		        		<i-table border :columns="repayActualColumns" :data="repayActualColumnsData"></i-table>
+					</Modal>
+					
+		        	<Modal v-model="repayOtherFeeFlag" title="其他费用" width="1600">
+		        		
+					</Modal>
+				</tab-pane>
+		        <tab-pane label="实还流水" name="realRepaymentRecord"></tab-pane>
+		        <tab-pane label="平台实还" name="platformRealRepayment"></tab-pane>
+		        <tab-pane label="垫付记录" name="advancesRecord"></tab-pane>
+		        <tab-pane label="资金分发记录" name="fundDistributionRecord"></tab-pane>
+		    </tabs>
+		</Card>
+	</div>
+	<!-- 引入vue -->
+	<script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+	<!-- iview js -->
+	<script type="text/javascript" src="/plugins/iview/2.13.1/js/iview.min.js"></script>
+	<script type="text/javascript" src="/plugins/layui/layui.js"></script>
+	<script type="text/javascript" src="/plugins/axios/axios.min.js"></script>
+	<script type="text/javascript" src="/src/js/comm.js"></script>
+	<script type="text/javascript" src="/properties/config.js"></script>
+	<script type="text/javascript" src="/build/js/appToken.js"></script>
+	<script type="text/javascript" src="/src/js/finance/repaymentPlanInfo.js"></script>
+</body>
+
+</html>

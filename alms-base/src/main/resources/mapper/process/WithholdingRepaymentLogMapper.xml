@@ -232,16 +232,11 @@ select repay.*  from tb_withholding_repayment_log  repay
     <select id="selectRepaymentLogForAutoRepay" resultType="com.hongte.alms.base.vo.module.RepaymentLogVO"
             parameterType="com.hongte.alms.base.vo.module.RepaymentLogReq">
 
-      
 		 
-		   SELECT
-		        <include refid="BaseResultMap"/>
+		      SELECT
+		        <include refid="Base_Column_List"/>
 		
-		 from tb_withholding_repayment_log  
-		
-		
-		
-		
+		      from tb_withholding_repayment_log  
 		      
 		        order BY  repay.create_time DESC
 

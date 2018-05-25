@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
 import java.io.Serializable;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
@@ -36,6 +38,21 @@ public class RepaymentProjFactRepay extends Model<RepaymentProjFactRepay> {
 	@TableField("proj_plan_detail_id")
 	@ApiModelProperty(required= true,value = "标的应还项目明细ID(外键  对应 tb_repayment_proj_plan_list_detail. proj_plan_detail_id)")
 	private String projPlanDetailId;
+	
+	 /**
+     * 业务还款计划列表ID
+     */
+	@TableField("plan_list_id")
+	@ApiModelProperty(required= true,value = "业务还款计划列表ID")
+	private String planListId;
+	
+	/**
+     * 标的还款计划列表ID
+     */
+	@TableField("proj_plan_list_id")
+	@ApiModelProperty(required= true,value = "标的还款计划列表ID")
+	private String projPlanListId;
+	
     /**
      * 上标项目编号
      */
@@ -100,6 +117,7 @@ public class RepaymentProjFactRepay extends Model<RepaymentProjFactRepay> {
      */
 	@TableField("fact_repay_date")
 	@ApiModelProperty(required= true,value = "实还日期")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date factRepayDate;
     /**
      * 还款来源关联的相关记录ID
@@ -112,6 +130,7 @@ public class RepaymentProjFactRepay extends Model<RepaymentProjFactRepay> {
      */
 	@TableField("create_date")
 	@ApiModelProperty(required= true,value = "创建日期")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createDate;
     /**
      * 创建用户
@@ -124,12 +143,14 @@ public class RepaymentProjFactRepay extends Model<RepaymentProjFactRepay> {
      */
 	@TableField("update_date")
 	@ApiModelProperty(required= true,value = "更新日期")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date updateDate;
     /**
      * 更新用户
      */
 	@TableField("update_user")
 	@ApiModelProperty(required= true,value = "更新用户")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private String updateUser;
 
 
@@ -304,5 +325,33 @@ public class RepaymentProjFactRepay extends Model<RepaymentProjFactRepay> {
 			", updateDate=" + updateDate +
 			", updateUser=" + updateUser +
 			"}";
+	}
+
+	/**
+	 * @return the projPlanListId
+	 */
+	public String getProjPlanListId() {
+		return projPlanListId;
+	}
+
+	/**
+	 * @param projPlanListId the projPlanListId to set
+	 */
+	public void setProjPlanListId(String projPlanListId) {
+		this.projPlanListId = projPlanListId;
+	}
+
+	/**
+	 * @return the planListId
+	 */
+	public String getPlanListId() {
+		return planListId;
+	}
+
+	/**
+	 * @param planListId the planListId to set
+	 */
+	public void setPlanListId(String planListId) {
+		this.planListId = planListId;
 	}
 }

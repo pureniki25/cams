@@ -14,11 +14,7 @@ import com.hongte.alms.common.util.DESC;
 import com.hongte.alms.common.util.EncryptionResult;
 import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.open.service.WithHoldingXinDaiService;
-import com.hongte.alms.open.vo.RequestData;
-import com.hongte.alms.open.vo.ResponseData;
-import com.hongte.alms.open.vo.ResponseEncryptData;
-import com.hongte.alms.open.vo.SearchRepayRecordReq;
-import com.hongte.alms.open.vo.WithHoldingInfo;
+import com.hongte.alms.open.vo.*;
 import feign.Feign;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,10 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/WithHoldingController")
@@ -126,9 +119,41 @@ public class WithHoldingController {
 		}
 
 	}
-	
-	
-	
+
+	@ApiOperation(value = "指定银行卡代扣")
+	@PostMapping("/repayAssignBank")
+	public Result repayAssignBank(@RequestParam("businessId") String businessId,@RequestParam("afterId") String afterId,@RequestParam("bankCard") String bankCard){
+		Result result=new Result();
+		try {
+			RepayAssignBankInfo repayAssignBankInfo=new RepayAssignBankInfo();
+			RequestData requestData = new RequestData();
+			repayAssignBankInfo.setBusinessId(businessId);
+			repayAssignBankInfo.setAfterId(afterId);
+			repayAssignBankInfo.setBankCard(bankCard);
+
+			requestData.setData(JSON.toJSONString(repayAssignBankInfo));
+			requestData.setMethodName("AfterLoanRepayment_RepayAssignBank");
+			String encryptStr = JSON.toJSONString(requestData);
+			// 请求数据加密
+			encryptStr = encryptPostData(encryptStr);
+			/* http://172.16.200.104:8084/apites是信贷接口域名，这里本机配置的，需要配置成自己的 */
+			WithHoldingXinDaiService withholdingxindaiService = Feign.builder().target(WithHoldingXinDaiService.class,
+					apiUrl);
+			String respStr = withholdingxindaiService.withholding(encryptStr);
+			// 返回数据解密
+			ResponseData respData = getRespData(respStr);
+			logger.info("执行代扣接口返回数据:"+respData.getData());
+
+			result.setCode(respData.getReturnCode());
+			result.setData(respData.getData());
+			result.setMsg(respData.getReturnMessage());
+
+		} catch (Exception ex) {
+			logger.error(ex.getMessage());
+			return Result.error("代扣出现异常", ex.getMessage());
+		}
+		return result;
+	}
 	
 	@ApiOperation(value = "查询代扣记录")
 	@GetMapping("/searchRepayLog")

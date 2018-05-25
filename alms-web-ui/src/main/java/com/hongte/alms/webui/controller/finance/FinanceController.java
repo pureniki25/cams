@@ -4,9 +4,7 @@
 package com.hongte.alms.webui.controller.finance;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author 王继光
@@ -62,8 +60,7 @@ public class FinanceController {
 	}
 	
 	@RequestMapping("/repaymentPlanInfo")
-	public String repaymentPlanInfo(@RequestParam String businessId, ModelMap modelMap) {
-		modelMap.put("businessId", businessId);
+	public String repaymentPlanInfo() {
 		return "/finance/repaymentPlanInfo" ;
 	}
 }

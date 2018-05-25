@@ -2,14 +2,15 @@ package com.hongte.alms.open.feignClient;
 
 
 
-import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-
+import com.hongte.alms.base.RepayPlan.dto.PlanReturnInfoDto;
+import com.hongte.alms.base.RepayPlan.req.CreatRepayPlanReq;
+import com.hongte.alms.base.RepayPlan.req.trial.TrailRepayPlanReq;
 import com.hongte.alms.common.result.Result;
-import com.hongte.alms.open.dto.repayPlan.PlanReturnInfoDto;
-import com.hongte.alms.open.req.repayPlan.CreatRepayPlanReq;
-import com.hongte.alms.open.req.repayPlan.trial.TrailRepayPlanReq;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
 
 /**
  * @author chenzesheng
@@ -25,13 +26,18 @@ public interface CreatRepayPlanRemoteApi {
     @RequestMapping(value = "/RepayPlan/creatAndSaveRepayPlan",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
     Result<PlanReturnInfoDto> creatAndSaveRepayPlan(CreatRepayPlanReq creatRepayPlanReq);
 
-    @RequestMapping(value = "/RepayPlan/creatAndSaveRepayPlan",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+    @RequestMapping(value = "/RepayPlan/trailRepayPlan",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
     Result<PlanReturnInfoDto> trailRepayPlan(TrailRepayPlanReq trailRepayPlanReq);
     
     @RequestMapping(value = "/RepayPlan/queryRepayPlanByBusinessId",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
     Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(String businessId);
     
     @RequestMapping(value = "/RepayPlan/deleteRepayPlanByConditions",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
-    Result<PlanReturnInfoDto> deleteRepayPlanByConditions(String businessId, String repaymentBatchId);
+    Result<PlanReturnInfoDto> deleteRepayPlanByConditions(@RequestParam(value = "businessId")String businessId, @RequestParam(value = "repaymentBatchId")String repaymentBatchId);
+
+
+    @RequestMapping(value = "/RepayPlan/testTime",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+    Result<PlanReturnInfoDto> testTime() ;
+
 
 }

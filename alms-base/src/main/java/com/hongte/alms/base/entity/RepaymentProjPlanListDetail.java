@@ -9,6 +9,8 @@ import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
 import java.io.Serializable;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
@@ -101,6 +103,7 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
 	 */
 	@TableField("due_date")
 	@ApiModelProperty(required= true,value = "应还日期")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date dueDate;
 	/**
 
@@ -109,6 +112,7 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
      */
 	@TableField("fact_repay_date")
 	@ApiModelProperty(required= true,value = "实还日期")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date factRepayDate;
     /**
      * 标的资产端计划还款金额(元)
@@ -116,6 +120,14 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
 	@TableField("proj_plan_amount")
 	@ApiModelProperty(required= true,value = "标的资产端计划还款金额(元)")
 	private BigDecimal projPlanAmount;
+	
+	 /**
+     * 标的减免金额
+     */
+	@TableField("derate_amount")
+	@ApiModelProperty(required= true,value = "标的减免金额")
+	private BigDecimal derateAmount;
+	
     /**
      * 标的资产端实还金额(元)
      */
@@ -144,6 +156,7 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
      */
 	@TableField("create_date")
 	@ApiModelProperty(required= true,value = "创建日期")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createDate;
     /**
      * 创建用户
@@ -156,6 +169,7 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
      */
 	@TableField("update_date")
 	@ApiModelProperty(required= true,value = "更新日期")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date updateDate;
     /**
      * 更新用户
@@ -381,5 +395,19 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
 
 	public void setDueDate(Date dueDate) {
 		this.dueDate = dueDate;
+	}
+
+	/**
+	 * @return the derateAmount
+	 */
+	public BigDecimal getDerateAmount() {
+		return derateAmount;
+	}
+
+	/**
+	 * @param derateAmount the derateAmount to set
+	 */
+	public void setDerateAmount(BigDecimal derateAmount) {
+		this.derateAmount = derateAmount;
 	}
 }

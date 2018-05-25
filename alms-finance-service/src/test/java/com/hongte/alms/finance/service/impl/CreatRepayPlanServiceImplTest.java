@@ -1,6 +1,8 @@
 package com.hongte.alms.finance.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.hongte.alms.base.RepayPlan.dto.PlanReturnInfoDto;
+import com.hongte.alms.base.RepayPlan.dto.RepaymentBizPlanDto;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.enums.BooleanEnum;
@@ -10,9 +12,7 @@ import com.hongte.alms.base.mapper.BasicBizCustomerMapper;
 import com.hongte.alms.base.mapper.BasicBusinessMapper;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.finance.FinanceServiceApplication;
-import com.hongte.alms.finance.dto.repayPlan.PlanReturnInfoDto;
-import com.hongte.alms.finance.dto.repayPlan.RepaymentBizPlanDto;
-import com.hongte.alms.finance.req.repayPlan.*;
+import com.hongte.alms.base.RepayPlan.req.*;
 import com.hongte.alms.finance.service.CreatRepayPlanService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -324,7 +324,7 @@ public class CreatRepayPlanServiceImplTest {
         req1.setRate(new BigDecimal(9.5)); // 利率
         req1.setRateUnitType(1); // 利率单位：1 年利率; 2 月利率; 3 日利率
         req1.setOffLineInOverDueRate(new BigDecimal(12)); // 逾期滞纳金费率(%)
-        req1.setOffLineInOverDueRateUnit(1); // 逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
+        req1.setOffLineInOverDueRateType(1); // 逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
         req1.setRepayType(RepayPlanRepayIniCalcWayEnum.INT_AND_PRIN_EVERYTIME.getKey()); // 还款方式：1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息,11:等本等息
         req1.setPeriodMonth(6); // 借款期限  月
 
@@ -459,7 +459,7 @@ public class CreatRepayPlanServiceImplTest {
         req2.setRate(new BigDecimal(9.5)); // 利率
         req2.setRateUnitType(1); // 利率单位：1 年利率; 2 月利率; 3 日利率
         req2.setOffLineInOverDueRate(new BigDecimal(12)); // 逾期滞纳金费率(%)
-        req2.setOffLineInOverDueRateUnit(1); // 逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
+        req2.setOffLineInOverDueRateType(1); // 逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
         req2.setRepayType(RepayPlanRepayIniCalcWayEnum.INT_AND_PRIN_EVERYTIME.getKey()); // 还款方式：1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息,11:等本等息
         req2.setPeriodMonth(6); // 借款期限  月
 
@@ -696,11 +696,11 @@ public class CreatRepayPlanServiceImplTest {
         req1.setRate(new BigDecimal(12)); // 利率
         req1.setRateUnitType(1); // 利率单位：1 年利率; 2 月利率; 3 日利率
         req1.setOffLineInOverDueRate(new BigDecimal(11)); // 线下期内逾期滞纳金费率(%)
-        req1.setOffLineInOverDueRateUnit(1); // 线下期内逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
+        req1.setOffLineInOverDueRateType(1); // 线下期内逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
         req1.setOffLineOutOverDueRate(new BigDecimal(12)); // 线下期外逾期滞纳金费率(%)
-        req1.setOffLineOutOverDueRateUnit(1); // 线下期外逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
+        req1.setOffLineOutOverDueRateType(1); // 线下期外逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
         req1.setOnLineOverDueRate(new BigDecimal(0.6)); // 线上逾期滞纳金费率(%)
-        req1.setOnLineOverDueRateUnit(1); // 线上逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
+        req1.setOnLineOverDueRateType(1); // 线上逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
 
         req1.setRepayType(RepayPlanRepayIniCalcWayEnum.PRINCIPAL_LAST.getKey()); // 还款方式：1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息,11:等本等息
         req1.setSex(PeayPlanSexEnum.MAN.getValue()); // 性别
