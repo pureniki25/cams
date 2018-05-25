@@ -25,9 +25,9 @@ public class AfterLoanRepaymentController {
      * @param bankCard 银行卡号
      * @return 是否代扣成功
      */
-    @PostMapping("/SubmitAutoRepay")
+    @PostMapping("/submitAutoRepay")
     @ApiOperation(value = "执行代扣")
-    public Result SubmitAutoRepay(String businessId,String afterId,String bankCard){
+    public Result submitAutoRepay(String businessId,String afterId,String bankCard){
         return afterLoanRepaymentService.submitAutoRepay(businessId,afterId,bankCard);
     }
 }
