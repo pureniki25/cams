@@ -4,6 +4,7 @@ import com.hongte.alms.base.entity.RepaymentProjPlanList;
 import com.hongte.alms.base.entity.RepaymentProjPlanListDetail;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -13,6 +14,12 @@ import java.util.List;
  */
 public class RepaymentProjPlanListDto implements Serializable {
 
+
+    /**
+     * 标的剩余未还金额
+     */
+    private BigDecimal unpaid = new BigDecimal(0);
+    
     private RepaymentProjPlanList repaymentProjPlanList;
 
     private List<RepaymentProjPlanListDetail> projPlanListDetails;
@@ -47,5 +54,19 @@ public class RepaymentProjPlanListDto implements Serializable {
 	 */
 	public void setRepaymentProjPlanListDetailDtos(List<RepaymentProjPlanListDetailDto> repaymentProjPlanListDetailDtos) {
 		this.repaymentProjPlanListDetailDtos = repaymentProjPlanListDetailDtos;
+	}
+
+	/**
+	 * @return the unpaid
+	 */
+	public BigDecimal getUnpaid() {
+		return unpaid;
+	}
+
+	/**
+	 * @param unpaid the unpaid to set
+	 */
+	public void setUnpaid(BigDecimal unpaid) {
+		this.unpaid = unpaid;
 	}
 }

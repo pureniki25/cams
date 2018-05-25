@@ -529,4 +529,18 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 			", updateUser=" + updateUser +
 			"}";
 	}
+
+	/**
+	 * @return the derateAmount
+	 */
+	public BigDecimal getDerateAmount() {
+		return derateAmount;
+	}
+
+	/**
+	 * @param derateAmount the derateAmount to set
+	 */
+	public void setDerateAmount(BigDecimal derateAmount) {
+		this.derateAmount = derateAmount;
+	}
 }

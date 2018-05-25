@@ -85,10 +85,10 @@ public class ConfirmRepaymentPreviewDto implements Serializable {
 		for (int i = 0; i < dto.getProjPlanDtos().size(); i++) {
 			RepaymentProjPlanDto repaymentProjPlanDto = dto.getProjPlanDtos().get(i);
 			if (i == dto.getProjPlanDtos().size() - 1) {
-				repaymentProjPlanDto.setDistributiveMoney(moneyCopy);
+//				repaymentProjPlanDto.setDistributiveMoney(moneyCopy);
 			} else {
 				BigDecimal dmoney = money.multiply(repaymentProjPlanDto.getProportion());
-				repaymentProjPlanDto.setDistributiveMoney(dmoney);
+//				repaymentProjPlanDto.setDistributiveMoney(dmoney);
 				moneyCopy = moneyCopy.subtract(dmoney);
 			}
 		}
@@ -163,7 +163,7 @@ public class ConfirmRepaymentPreviewDto implements Serializable {
 		List<RepaymentProjPlanDto> list = dto.getProjPlanDtos();
 		List<CurrPeriodProjDetailVO> currPeriodProjDetailVOs = new ArrayList<>();
 		for (RepaymentProjPlanDto repaymentProjPlanDto : list) {
-			BigDecimal distributiveMoney = repaymentProjPlanDto.getDistributiveMoney();
+			BigDecimal distributiveMoney = repaymentProjPlanDto.getDivideAmount();
 			List<RepaymentProjPlanListDto> projPlanListDtos = repaymentProjPlanDto.getProjPlanListDtos();
 
 			/* 开始渲染每个标的还款信息 */
@@ -185,8 +185,8 @@ public class ConfirmRepaymentPreviewDto implements Serializable {
 				if (c == -1) {
 					/* 总还金额<分配金额,有余额,且每一项都填满 */
 					surplusFund = distributiveMoney.subtract(repayAmount);
-					BigDecimal surplusFundAdd = repaymentProjPlanDto.getSurplusMoney().add(surplusFund);
-					repaymentProjPlanDto.setSurplusMoney(surplusFundAdd);
+//					BigDecimal surplusFundAdd = repaymentProjPlanDto.getSurplusMoney().add(surplusFund);
+//					repaymentProjPlanDto.setSurplusMoney(surplusFundAdd);
 				} else {
 					/* 总还金额==分配金额,没有余额,且每一项都填满 */
 					/* 总还金额>分配金额,没有余额,有没填满的项 */
@@ -273,7 +273,7 @@ public class ConfirmRepaymentPreviewDto implements Serializable {
 
 			}
 			currPeriodProjDetailVOs.add(detailVO);
-			repaymentProjPlanDto.setSurplusMoney(surplusFund);
+//			repaymentProjPlanDto.setSurplusMoney(surplusFund);
 		}
 		ConfirmRepaymentPreviewDto confirmRepaymentPreviewDto = new ConfirmRepaymentPreviewDto();
 		confirmRepaymentPreviewDto.setBizPlanDto(dto);

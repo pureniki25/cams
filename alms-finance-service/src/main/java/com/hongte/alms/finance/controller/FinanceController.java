@@ -54,6 +54,7 @@ import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.finance.req.MoneyPoolReq;
 import com.hongte.alms.finance.service.FinanceService;
+import com.hongte.alms.finance.service.ShareProfitService;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -94,6 +95,9 @@ public class FinanceController {
 	@Autowired
 	@Qualifier("FinanceService")
 	private FinanceService financeService;
+	@Autowired
+	@Qualifier("ShareProfitService")
+	private ShareProfitService shareService;
 
 	@GetMapping(value = "/repayBaseInfo")
 	@ApiOperation(value = "获取还款基本信息")
@@ -382,9 +386,10 @@ public class FinanceController {
 	public Result previewConfirmRepayment(@RequestBody ConfirmRepaymentReq req) {
 		Result result ;
 		logger.info("@previewConfirmRepayment@预览确认还款拆标情况--开始[{}]",req);
-		result = financeService.previewConfirmRepayment(req);
-		logger.info("@previewConfirmRepayment@预览确认还款拆标情况--结束[{}]",result);
-		return result ;
+//		result = financeService.previewConfirmRepayment(req);
+		shareService.execute(req, false);
+//		logger.info("@previewConfirmRepayment@预览确认还款拆标情况--结束[{}]",result);
+		return Result.success() ;
 	}
 	
 	@GetMapping(value="/getSurplusFund")

@@ -561,13 +561,17 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         //标的车辆/房产信息校验
         for(ProjInfoReq projInfoReq :projInfoReqs){
             if(projInfoReq.getIsHaveCar().equals(BooleanEnum.YES.getValue())){
-                if(projInfoReq.getProjCarInfos()==null){
-                    throw  new CreatRepaymentExcepiton("有车辆信息的标必须把车辆信息列表传入");
+                if(projInfoReq.getProjCarInfos()==null|| projInfoReq.getProjCarInfos().size()==0){
+                    logger.error("有车辆信息的标必须把车辆信息列表传入  projId:"+projInfoReq.getProjectId()
+                            +"  projInfoReq:"+JSON.toJSONString(projInfoReq));
+                    throw  new CreatRepaymentExcepiton("有车辆信息的标必须把车辆信息列表传入  projId:" +projInfoReq.getProjectId() );
                 }
             }
             if(projInfoReq.getIsHaveHouse().equals(BooleanEnum.YES.getValue())){
-                if(projInfoReq.getProjHouseInfos()==null){
-                    throw  new CreatRepaymentExcepiton("有房产信息的标必须把房产信息列表传入");
+                if(projInfoReq.getProjHouseInfos()==null || projInfoReq.getProjCarInfos().size()==0){
+                    logger.error("有房产信息的标必须把房产信息列表传入  projId:"+projInfoReq.getProjectId()
+                            +"  projInfoReq:"+JSON.toJSONString(projInfoReq));
+                    throw  new CreatRepaymentExcepiton("有房产信息的标必须把房产信息列表传入 projId:" +projInfoReq.getProjectId());
                 }
             }
 
@@ -708,6 +712,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             //如果有车辆信息，存储车辆信息
             if(projInfoReq.getIsHaveCar().equals(BooleanEnum.YES.getValue())){
                 List<ProjectCarInfoReq> projectCarInfoReqs = projInfoReq.getProjCarInfos();
+
                 String projectId = projInfo.getProjectId();
                 List<TuandaiProjectCar> tuandaiProjectCars = new LinkedList<>();
                 for (ProjectCarInfoReq  pCarInfoReq:projectCarInfoReqs){
@@ -724,7 +729,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             //如果有房屋信息，存储房屋信息
             if(projInfoReq.getIsHaveHouse().equals(BooleanEnum.YES.getValue())){
 
+
                 List<ProjectHouseInfoReq> projectHouseInfoReqs = projInfoReq.getProjHouseInfos();
+
                 String projectId = projInfo.getProjectId();
                 List<TuandaiProjectHouse> tuandaiProjectHouses = new LinkedList<>();
                 for (ProjectHouseInfoReq  pHouseInfoReq:projectHouseInfoReqs){
@@ -734,12 +741,10 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     tuandaiProjectHosue.setCreateUser(Constant.SYS_DEFAULT_USER);
                     tuandaiProjectHouses.add(tuandaiProjectHosue);
                 }
-                tuandaiProjectHouseService.delete(new EntityWrapper<TuandaiProjectHouse>().eq("",projectId));
+                tuandaiProjectHouseService.delete(new EntityWrapper<TuandaiProjectHouse>().eq("project_id",projectId));
                 tuandaiProjectHouseService.insertBatch(tuandaiProjectHouses);
 
-                if(projInfoReq.getProjHouseInfos()==null){
-                    throw  new CreatRepaymentExcepiton("有房产信息的标必须把房产信息列表传入");
-                }
+
             }
 
 
@@ -755,11 +760,11 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 log.setCreateTime(new Date());
                 log.setCreateUserId(Constant.SYS_DEFAULT_USER);
                 log.setInterfacecode("CreatRepayPlanService_creatAndSaveRepayPlan");
-                log.setInterfacename("创建并存储");
+                log.setInterfacename("创建并存储还款计划");
                 log.setSendJsonEncrypt(creatRepayPlanReq.getBusinessBasicInfoReq().getBusinessId());
                 log.setSendJson(JSON.toJSONString(creatRepayPlanReq));
                 log.setReturnJson(JSON.toJSONString(dtos));
-                log.setReturnJsonDecrypt(JSON.toJSONString(dtos));
+//                log.setReturnJsonDecrypt(JSON.toJSONString(dtos));
                 log.setSystem("");
                 log.setSendUrl("");
 

@@ -365,4 +365,18 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 	public void setDueDate(Date dueDate) {
 		this.dueDate = dueDate;
 	}
+
+	/**
+	 * @return the derateAmount
+	 */
+	public BigDecimal getDerateAmount() {
+		return derateAmount;
+	}
+
+	/**
+	 * @param derateAmount the derateAmount to set
+	 */
+	public void setDerateAmount(BigDecimal derateAmount) {
+		this.derateAmount = derateAmount;
+	}
 }
