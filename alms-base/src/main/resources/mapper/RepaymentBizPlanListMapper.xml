@@ -17,6 +17,7 @@
         <result column="overdue_days" property="overdueDays" />
         <result column="current_status" property="currentStatus" />
         <result column="current_sub_status" property="currentSubStatus" />
+        <result column="repay_status" property="repayStatus" />
         <result column="repay_flag" property="repayFlag" />
         <result column="fact_repay_date" property="factRepayDate" />
         <result column="finance_comfirm_date" property="financeComfirmDate" />
@@ -41,7 +42,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        plan_list_id AS planListId, plan_id AS planId, business_id AS businessId, orig_business_id AS origBusinessId, period, after_id AS afterId, due_date AS dueDate, total_borrow_amount AS totalBorrowAmount,derate_amount as derateAmount, overdue_amount AS overdueAmount, overdue_days AS overdueDays, current_status AS currentStatus, current_sub_status AS currentSubStatus, repay_flag AS repayFlag, fact_repay_date AS factRepayDate, finance_comfirm_date AS financeComfirmDate, finance_confirm_user AS financeConfirmUser, finance_confirm_user_name AS financeConfirmUserName, confirm_flag AS confirmFlag, auto_withholding_confirmed_date AS autoWithholdingConfirmedDate, auto_withholding_confirmed_user AS autoWithholdingConfirmedUser, auto_withholding_confirmed_user_name AS autoWithholdingConfirmedUserName, accountant_confirm_status AS accountantConfirmStatus, accountant_confirm_user AS accountantConfirmUser, accountant_confirm_user_name AS accountantConfirmUserName, accountant_confirm_date AS accountantConfirmDate, remark, active, create_time AS createTime, src_type AS srcType, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
+        plan_list_id AS planListId, plan_id AS planId, business_id AS businessId, orig_business_id AS origBusinessId, period, after_id AS afterId, due_date AS dueDate, total_borrow_amount AS totalBorrowAmount,derate_amount as derateAmount, overdue_amount AS overdueAmount, overdue_days AS overdueDays, current_status AS currentStatus, current_sub_status AS currentSubStatus,repay_status as repayStatus, repay_flag AS repayFlag, fact_repay_date AS factRepayDate, finance_comfirm_date AS financeComfirmDate, finance_confirm_user AS financeConfirmUser, finance_confirm_user_name AS financeConfirmUserName, confirm_flag AS confirmFlag, auto_withholding_confirmed_date AS autoWithholdingConfirmedDate, auto_withholding_confirmed_user AS autoWithholdingConfirmedUser, auto_withholding_confirmed_user_name AS autoWithholdingConfirmedUserName, accountant_confirm_status AS accountantConfirmStatus, accountant_confirm_user AS accountantConfirmUser, accountant_confirm_user_name AS accountantConfirmUserName, accountant_confirm_date AS accountantConfirmDate, remark, active, create_time AS createTime, src_type AS srcType, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
     </sql>
 
     <!-- 通用查询结果列 -->
