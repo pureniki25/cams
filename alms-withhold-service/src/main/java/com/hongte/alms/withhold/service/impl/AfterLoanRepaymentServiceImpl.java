@@ -33,7 +33,7 @@ public class AfterLoanRepaymentServiceImpl implements AfterLoanRepaymentService 
         RepaymentBizPlanList repaymentBizPlanList=repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id",businessId).eq("after_id",afterId));
         if(repaymentBizPlanList!=null){
             if(repaymentBizPlanList.getSrcType()!=null && repaymentBizPlanList.getSrcType()==1){
-                return withHoldingClient.repayAssignBank(businessId,afterId,bankCard);
+                return withHoldingClient.repayAssignBank(repaymentBizPlanList.getOrigBusinessId(),afterId,bankCard);
             }else {
                 return null;
             }
