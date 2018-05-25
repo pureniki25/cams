@@ -623,7 +623,8 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			}
 
 			int curPeriod = (int) resultMap.get("curPeriod"); // // 当前期数
-			String pListId = resultMap.get("pListId").toString(); // // 当前期ID
+			String _planId = resultMap.get("_planId").toString(); // // 当前期ID
+			String _planListId = resultMap.get("_planListId").toString(); // // 当前期List_ID
 			
 			
 			if(carLoanBilVO.getCurrentPriod()!=null) {//如果不为null,说明是减免申请调用此方法获取减免结清时候的提前违约金
@@ -701,7 +702,8 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 					if (outputPlatformId == 1) {
 						RepaymentBizPlanList pList=new RepaymentBizPlanList();
-						pList.setPlanListId(pListId);
+						pList.setPlanId(_planId);
+						pList.setPlanListId(_planListId);
 						if(istLastPeriod(pList)) {
 							preLateFees=0;
 						}else {

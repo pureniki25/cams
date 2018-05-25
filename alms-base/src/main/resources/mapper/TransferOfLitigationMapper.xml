@@ -629,7 +629,8 @@
 		  c.plan_guarantee_charge planGuaranteeCharge,
 		  -- 本期应还担保公司费用 
 		  c.plan_platform_charge planPlatformCharge,
-		  c.plan_list_id as pListId,
+		  c.plan_id as _planId,
+		  c.plan_list_id as _planListId,
 		  -- 本期应还平台费 
 		  (SELECT 
 		    CASE
@@ -677,6 +678,7 @@
 		    t2.`due_date`,
 		    t3.totalPeriod,
 		    t2.current_status, 
+		    t2.plan_id,
 		    t2.plan_list_id,
 		    SUM(
 		      CASE
