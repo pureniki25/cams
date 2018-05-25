@@ -3,6 +3,8 @@ package com.hongte.alms.base.RepayPlan.req;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * @author zengkun
  * @since 2018/5/11
@@ -15,6 +17,7 @@ public class BusinessCustomerInfoReq {
      * 客户ID，资产端主键
      */
     @ApiModelProperty(required= true,value = "客户ID，资产端主键")
+    @NotNull(message = "客户ID，资产端主键(customerId)不能为空")
     private String customerId;
 
     /**

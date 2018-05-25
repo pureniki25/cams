@@ -302,10 +302,10 @@ public class RepayPlanController {
 
             List<ProjInfoReq>  projInfoReqs = new LinkedList<>();
             creatRepayPlanReq.setProjInfoReqs(projInfoReqs);
+            businessBasicInfoReq.setRepaymentTypeId(projInfoReqs.get(0).getRepayType());
             for(TrailProjInfoReq trailProjInfoReq:trailProjInfoReqs){
                 ProjInfoReq projInfoReq =ClassCopyUtil.copy(trailProjInfoReq,TrailProjInfoReq.class,ProjInfoReq.class);
                 projInfoReqs.add(projInfoReq);
-
                 List<PrincipleReq> principleReqs =  trailProjInfoReq.getPricipleMap();
                 projInfoReq.setPrincipleReqList(principleReqs);
 
