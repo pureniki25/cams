@@ -38,6 +38,7 @@ import com.hongte.alms.base.entity.DocTmp;
 import com.hongte.alms.base.entity.DocType;
 import com.hongte.alms.base.entity.FsdHouse;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.TransferLitigationCar;
 import com.hongte.alms.base.entity.TransferLitigationHouse;
 import com.hongte.alms.base.entity.TransferLitigationLog;
@@ -569,7 +570,6 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			double borrowRate = ((BigDecimal) resultMap.get("borrowRate")).doubleValue() * 0.01; // 年利率
 			double monthBorrowRate = borrowRate / 12;	// 月利率
 			
-			
 			if (!billDate.after(maxDueDate)) {	// 若 billDate 早于 maxDueDate  取dueDate比billDate大的最近的一期
 				// 当期的 利息、服务费、担保公司费用、平台费
 				resultMap.putAll(transferOfLitigationMapper.queryCarLoanFees(businessId, billDate)); 
@@ -698,8 +698,24 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				}
 
 			} else {
+				
+				List<RepaymentBizPlanListDetail> listDetails = transferOfLitigationMapper.querySurplusServiceChargeByBusinessId(businessId, billDate);
+				
+				double surplusSerCharge = 0;
+				
+				if (CollectionUtils.isNotEmpty(listDetails)) {
+					listDetails.remove(0);
+					if (!listDetails.isEmpty()) {
+						for (RepaymentBizPlanListDetail detail : listDetails) {
+							BigDecimal planAmount = (detail.getPlanAmount() == null ? BigDecimal.valueOf(0) : detail.getPlanAmount());
+							BigDecimal factAmount = (detail.getFactAmount() == null ? BigDecimal.valueOf(0) : detail.getFactAmount());
+							surplusSerCharge += (planAmount.doubleValue() - factAmount.doubleValue());
+						}
+					}
+				}
+				
 				if ("到期还本息".equals(repaymentTypeId) || "每月付息到期还本".equals(repaymentTypeId)) {
-
+					
 					if (outputPlatformId == 1) {
 						RepaymentBizPlanList pList=new RepaymentBizPlanList();
 						pList.setPlanId(_planId);
@@ -707,7 +723,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 						if(istLastPeriod(pList)) {
 							preLateFees=0;
 						}else {
-							preLateFees = ((BigDecimal) resultMap.get("surplusServiceCharge")).doubleValue();
+							preLateFees = surplusSerCharge;
 							preLateFees = preLateFees > borrowMoney * 0.06 ? borrowMoney * 0.06 : preLateFees;
 						}
 					
@@ -745,7 +761,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 							}
 					    }
 					} else if (outputPlatformId == 1) {
-						preLateFees = ((BigDecimal) resultMap.get("surplusServiceCharge")).doubleValue();
+						preLateFees = surplusSerCharge;
 						preLateFees = preLateFees > borrowMoney * 0.06 ? borrowMoney * 0.06 : preLateFees;
 					}
 					
