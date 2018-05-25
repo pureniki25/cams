@@ -264,7 +264,7 @@ public class RepayPlanController {
             Set<ConstraintViolation<TrailProjInfoReq>> constraintViolations1 =
                     validator.validate( trailProjInfoReq );
             if(constraintViolations1.size()>0){
-                logger.info("@还款计划@试算还款计划接口,标的信息校验出错: 传入对象："+JSON.toJSONString(trailProjInfoReq)+"     错误信息：" , constraintViolations1.iterator().next().getMessage());
+                logger.info("@还款计划@试算还款计划接口,标的信息校验出错:  错误信息："+constraintViolations1.iterator().next().getMessage() +"传入对象："  , JSON.toJSONString(trailProjInfoReq));
                 return Result.error("9889","标的信息校验出错：传入对象："+JSON.toJSONString(trailProjInfoReq)+"     错误信息："+constraintViolations1.iterator().next().getMessage());
             }
             List<TrailProjFeeReq>  feeReqList =  trailProjInfoReq.getProjFeeInfos();
