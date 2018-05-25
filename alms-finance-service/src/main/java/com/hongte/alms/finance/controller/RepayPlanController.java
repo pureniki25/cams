@@ -260,6 +260,7 @@ public class RepayPlanController {
 
         List<TrailProjInfoReq>   trailProjInfoReqs = trailRepayPlanReq.getProjInfoReqs();
 
+
         for(TrailProjInfoReq trailProjInfoReq:trailProjInfoReqs){
             Set<ConstraintViolation<TrailProjInfoReq>> constraintViolations1 =
                     validator.validate( trailProjInfoReq );
@@ -302,7 +303,7 @@ public class RepayPlanController {
 
             List<ProjInfoReq>  projInfoReqs = new LinkedList<>();
             creatRepayPlanReq.setProjInfoReqs(projInfoReqs);
-            businessBasicInfoReq.setRepaymentTypeId(projInfoReqs.get(0).getRepayType());
+            businessBasicInfoReq.setRepaymentTypeId(trailProjInfoReqs.get(0).getRepayType());
             for(TrailProjInfoReq trailProjInfoReq:trailProjInfoReqs){
                 ProjInfoReq projInfoReq =ClassCopyUtil.copy(trailProjInfoReq,TrailProjInfoReq.class,ProjInfoReq.class);
                 projInfoReqs.add(projInfoReq);
