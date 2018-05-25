@@ -3,6 +3,7 @@ package com.hongte.alms.base.RepayPlan.req;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 /**
@@ -18,12 +19,14 @@ public class ProjFeeDetailReq {
      */
 
     @ApiModelProperty(required= true,value = "期数")
+    @NotNull(message = "期数(peroid)不能为空")
     private Integer peroid;
 
     /**
      * 本期金额
      */
     @ApiModelProperty(required= true,value = "本期金额")
+    @NotNull(message = "本期金额(feeValue)不能为空")
     private BigDecimal feeValue;
 
 

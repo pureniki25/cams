@@ -3,6 +3,8 @@ package com.hongte.alms.base.RepayPlan.req;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * @author zengkun
  * @since 2018/5/11
@@ -15,37 +17,44 @@ public class BusinessCustomerInfoReq {
      * 客户ID，资产端主键
      */
     @ApiModelProperty(required= true,value = "客户ID，资产端主键")
+    @NotNull(message = "客户ID，资产端主键(customerId)不能为空")
     private String customerId;
 
     /**
      * 是否主借款人，0：否，1：是
      */
     @ApiModelProperty(required= true,value = "是否主借款人，0：否，1：是")
+    @NotNull(message = "是否主借款人(ismainCustomer)不能为空")
     private Integer ismainCustomer;
     /**
      *  客户名称，个人则填个人名称，企业则填企业名称 
      */
     @ApiModelProperty(required= true,value = " 客户名称，个人则填个人名称，企业则填企业名称 ")
+    @NotNull(message = "客户名称(customerName)不能为空")
     private String customerName;
     /**
      *  是否收款账户 
      */
     @ApiModelProperty(required= true,value = "是否收款账户，0：否，1：是")
+    @NotNull(message = "是否收款账户(isReceiptAccount)不能为空")
     private Integer isReceiptAccount;
     /**
      *  客户类型：个人，企业 
      */
     @ApiModelProperty(required= true,value = " 客户类型：个人，企业 ")
+    @NotNull(message = "客户类型(customerType)不能为空")
     private String customerType;
     /**
      *  客户身份证唯一标识，当客户为个人时，此字段存身份证，当客户类型为企业时，三证合一时，存统一社会信用代码，非三证合一时存营业执照号 
      */
     @ApiModelProperty(required= true,value = " 客户身份证唯一标识，当客户为个人时，此字段存身份证，当客户类型为企业时，三证合一时，存统一社会信用代码，非三证合一时存营业执照号 ")
+    @NotNull(message = "客户身份证唯一标识(identifyCard)不能为空")
     private String identifyCard;
     /**
      *  客户接收短信的手机号码，当客户类型为企业时，此字段保存联系人手机号码 
      */
     @ApiModelProperty(required= true,value = " 客户接收短信的手机号码，当客户类型为企业时，此字段保存联系人手机号码 ")
+    @NotNull(message = "客户接收短信的手机号码(phoneNumber)不能为空")
     private String phoneNumber;
     /**
      *  客户是否大陆居民，0或null：否，1：是 
