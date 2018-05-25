@@ -245,9 +245,6 @@ public class RepayPlanController {
             return Result.error("9889","输入参数校验错误："+retErrMsg.toString());
         }
 
-//        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-//        validator = factory.getValidator();
-
         Set<ConstraintViolation<TrailBizInfoReq>> constraintViolations =
                 validator.validate( trailRepayPlanReq.getTrailBizInfoReq() );
         if(constraintViolations.size()>0){
@@ -255,7 +252,11 @@ public class RepayPlanController {
             return Result.error("9889","业务信息校验出错："+constraintViolations.iterator().next().getMessage());
 //            constraintViolations.iterator().next().getMessage();
         }
-        // =========   校验参数输入是否正确  结束  ================
+
+
+
+//        TrailProjFeeReq
+
 
         List<TrailProjInfoReq>   trailProjInfoReqs = trailRepayPlanReq.getProjInfoReqs();
 
@@ -263,34 +264,24 @@ public class RepayPlanController {
             Set<ConstraintViolation<TrailProjInfoReq>> constraintViolations1 =
                     validator.validate( trailProjInfoReq );
             if(constraintViolations1.size()>0){
-                logger.info("@还款计划@试算还款计划接口,标的信息校验出错" , constraintViolations1.iterator().next().getMessage());
-                return Result.error("9889","标的信息校验出错："+constraintViolations1.iterator().next().getMessage());
+                logger.info("@还款计划@试算还款计划接口,标的信息校验出错: 传入对象："+JSON.toJSONString(trailProjInfoReq)+"     错误信息：" , constraintViolations1.iterator().next().getMessage());
+                return Result.error("9889","标的信息校验出错：传入对象："+JSON.toJSONString(trailProjInfoReq)+"     错误信息："+constraintViolations1.iterator().next().getMessage());
             }
-        }
+            List<TrailProjFeeReq>  feeReqList =  trailProjInfoReq.getProjFeeInfos();
 
-//
-//        Errors errors = null;
-//        validator.validate()
-//        globalValidator.validate(trailRepayPlanReq.getTrailBizInfoReq(), errors);
-//        if(errors!=null){
-//            List<ObjectError>  ee = errors.getAllErrors();
-//            if(ee.size()>0){
-//                return Result.error("9889","输入参数业务信息校验错误："+ee.get(0).toString());
-//            }
-//        }
-//
-//        List<TrailProjInfoReq>   trailProjInfoReqs = trailRepayPlanReq.getProjInfoReqs();
-//
-//        for(TrailProjInfoReq trailProjInfoReq:trailProjInfoReqs){
-//            errors = null;
-//            if(errors!=null) {
-//                globalValidator.validate(trailRepayPlanReq.getTrailBizInfoReq(), errors);
-//                List<ObjectError> er = errors.getAllErrors();
-//                if (er.size() > 0) {
-//                    return Result.error("9889", " 输入参数标信息校验错误：" + er.get(0).toString());
-//                }
-//            }
-//        }
+            //校验费用信息
+            for(TrailProjFeeReq trailProjFeeReq:feeReqList){
+
+                Set<ConstraintViolation<TrailProjFeeReq>> trailProjFeeReqViolations1 =
+                        validator.validate( trailProjFeeReq );
+                if(trailProjFeeReqViolations1.size()>0){
+                    logger.info("@还款计划@试算还款计划接口,标的费用项信息校验出错  传入对象："+JSON.toJSONString(trailProjFeeReq)+"     错误信息：" , trailProjFeeReqViolations1.iterator().next().getMessage());
+                    return Result.error("9889","标的费用项信息校验出错：传入对象："+JSON.toJSONString(trailProjFeeReq)+"     错误信息："+trailProjFeeReqViolations1.iterator().next().getMessage());
+                }
+            }
+
+        }
+        // =========   校验参数输入是否正确  结束  ================
 
 
 
