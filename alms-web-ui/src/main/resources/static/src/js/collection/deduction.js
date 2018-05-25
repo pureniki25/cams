@@ -56,7 +56,8 @@ var layer;
                     planAllAmount:"",//应还总额
                     repayAllAmount:"",//已还总额
                     restAmount:"",
-                    repayingAmount:''//代扣中金额
+                    repayingAmount:'',//代扣中金额
+                    issueSplitType:''
 
                 },
                 platformList:[],
@@ -103,7 +104,10 @@ var layer;
 
 	}
 	function withHoldingRecord(){
-	
+		if(vm.ajax_data.issueSplitType==1&&vm.platformId==5){debugger
+			vm.$Modal.error({content: '共借标不能银行代扣'});
+		   return;
+		}
 		var isAmountWithheld="false";
 		if(vm.ajax_data.total<vm.ajax_data.restAmount){
 			isAmountWithheld="true";//部分代扣
@@ -149,6 +153,10 @@ var layer;
 
 	
 	var withHoldingRecordWithoutOverMoeny=function(){ debugger
+	
+		if(vm.ajax_data.issueSplitType==1&&vm.platformId==5){
+			vm.$Modal.error({content: '共借标不能银行代扣'});
+		}
 		
 		var isAmountWithheld="false";//全部代扣
 	if(vm.ajax_data.factPayAllMoney<vm.ajax_data.total){
@@ -166,7 +174,7 @@ var layer;
                          content: '代扣正在处理中,请稍后查看代扣结果'
                      });
                 } else {
-                    self.$Modal.error({content: '获取数据失败：' + result.data.msg});
+                	vm.$Modal.error({content: '获取数据失败：' + result.data.msg});
                 }
             })
    
@@ -218,6 +226,7 @@ var layer;
                     vm.details=result.data.data.details;
                     vm.platformId=result.data.data.platformId;
                     vm.platformId=5;
+                 
                     if(result.data.data.underLineOverDueMoney>0){
                      	vm.ajax_data.planOverDueMoney=result.data.data.underLineOverDueMoney;
                      	vm.ajax_data.onLineOverDueMoney=result.data.data.onLineOverDueMoney;

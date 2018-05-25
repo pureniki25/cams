@@ -40,11 +40,18 @@ public class DeductionVo {
     private BigDecimal  repayAllAmount;//已还总额
     private BigDecimal  restAmount;//剩余应还总额
     private BigDecimal  repayingAmount;//代扣中的金额
+    private Integer issueSplitType;//标识是否P2P拆标业务，0：非P2P拆标业务，1：P2P拆标业务
     
     
     
     
-    public BigDecimal getRepayingAmount() {
+    public Integer getIssueSplitType() {
+		return issueSplitType;
+	}
+	public void setIssueSplitType(Integer issueSplitType) {
+		this.issueSplitType = issueSplitType;
+	}
+	public BigDecimal getRepayingAmount() {
 		return repayingAmount;
 	}
 	public void setRepayingAmount(BigDecimal repayingAmount) {

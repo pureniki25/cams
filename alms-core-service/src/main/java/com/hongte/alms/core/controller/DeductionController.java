@@ -13,6 +13,7 @@ import com.hongte.alms.base.collection.vo.AfterLoanStandingBookReq;
 import com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo;
 import com.hongte.alms.base.collection.vo.DeductionVo;
 import com.hongte.alms.base.entity.ApplyDerateProcess;
+import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.BasicBusinessType;
 import com.hongte.alms.base.entity.BasicCompany;
 import com.hongte.alms.base.entity.InfoSms;
@@ -139,6 +140,9 @@ public class DeductionController {
         		//还款中的数据
         		List<WithholdingRecordLog> repayingList=withholdingRecordLogService.selectList(new EntityWrapper<WithholdingRecordLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).eq("repay_status", 2));
         		
+        		//查看是否共借标，共借标不能银行代扣
+        		BasicBusiness business=basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", deductionVo.getOriginalBusinessId()));
+        		deductionVo.setIssueSplitType(business.getIssueSplitType());
         		BigDecimal repayAmount=BigDecimal.valueOf(0);
         		BigDecimal repayingAmount=BigDecimal.valueOf(0);
         		for(WithholdingRecordLog log:loglist) {
