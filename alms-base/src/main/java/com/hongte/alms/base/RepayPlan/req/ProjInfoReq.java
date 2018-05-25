@@ -3,6 +3,7 @@ package com.hongte.alms.base.RepayPlan.req;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -32,6 +33,7 @@ public class ProjInfoReq {
      * 标的费用信息列表
      */
     @ApiModelProperty(required= true,value = "标的的出款费用信息列表")
+    @NotNull(message = "标的费用信息列表(projFeeInfos)不能为空")
     private List<ProjFeeReq> projFeeInfos;
 
 
@@ -39,19 +41,24 @@ public class ProjInfoReq {
      *利率
      */
     @ApiModelProperty(required= true,value = "利率")
+    @NotNull(message = "利率(rate)不能为空")
     private BigDecimal rate;
 
     @ApiModelProperty(required= true,value = "利率单位：1 年利率; 2 月利率; 3 日利率")
+    @NotNull(message = "利率单位(rateUnitType)不能为空")
     private Integer rateUnitType;
 
 
     @ApiModelProperty(required= true,value = "线下期内逾期滞纳金费率(%)")
+    @NotNull(message = "线下期内逾期滞纳金费率(offLineInOverDueRate)不能为空")
     private BigDecimal offLineInOverDueRate;
 
     @ApiModelProperty(required= true,value = "线下期内逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率")
+    @NotNull(message = "线下期内逾期滞纳金费率类型(offLineInOverDueRateType)不能为空")
     private  Integer offLineInOverDueRateType;
 
     @ApiModelProperty(required= true,value = "线下期外逾期滞纳金费率(%)")
+    @NotNull(message = "线下期外逾期滞纳金费率(offLineOutOverDueRate)不能为空")
     private BigDecimal offLineOutOverDueRate;
 
     @ApiModelProperty(required= true,value = "线下期外逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率")

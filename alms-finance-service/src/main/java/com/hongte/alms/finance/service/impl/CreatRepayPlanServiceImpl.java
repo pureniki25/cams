@@ -655,21 +655,21 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 //        basicBizCustomerService.delete(new EntityWrapper<BasicBizCustomer>().eq("business_id",basicBusiness.getBusinessId()));
 //        basicBizCustomerService.insertBatch(bizCustomers);
 
-        //存储业务额外费用信息
-        if(creatRepayPlanReq.getBizExtRateReqs()!=null){
-            List<BusinessExtRateReq> bizExtRateReqs = creatRepayPlanReq.getBizExtRateReqs();
-            List<BaiscBizExtRate> bizExtRates = new LinkedList<>();
-            for(BusinessExtRateReq rateReq: bizExtRateReqs){
-                BaiscBizExtRate bizExtRate =  ClassCopyUtil.copy(rateReq,BusinessExtRateReq.class,BaiscBizExtRate.class);
-                bizExtRate.setBusinessId(basicBusiness.getBusinessId());
-                bizExtRate.setCreateUser(Constant.SYS_DEFAULT_USER);
-                bizExtRate.setCreateTime(new Date());
-
-                bizExtRates.add(bizExtRate);
-            }
-            baiscBizExtRateService.delete(new EntityWrapper<BaiscBizExtRate>().eq("business_id",basicBusiness.getBusinessId()));
-            baiscBizExtRateService.insertBatch(bizExtRates);
-        }
+//        //存储业务额外费用信息
+//        if(creatRepayPlanReq.getBizExtRateReqs()!=null){
+//            List<BusinessExtRateReq> bizExtRateReqs = creatRepayPlanReq.getBizExtRateReqs();
+//            List<BaiscBizExtRate> bizExtRates = new LinkedList<>();
+//            for(BusinessExtRateReq rateReq: bizExtRateReqs){
+//                BaiscBizExtRate bizExtRate =  ClassCopyUtil.copy(rateReq,BusinessExtRateReq.class,BaiscBizExtRate.class);
+//                bizExtRate.setBusinessId(basicBusiness.getBusinessId());
+//                bizExtRate.setCreateUser(Constant.SYS_DEFAULT_USER);
+//                bizExtRate.setCreateTime(new Date());
+//
+//                bizExtRates.add(bizExtRate);
+//            }
+//            baiscBizExtRateService.delete(new EntityWrapper<BaiscBizExtRate>().eq("business_id",basicBusiness.getBusinessId()));
+//            baiscBizExtRateService.insertBatch(bizExtRates);
+//        }
 
         //存储标信息
         for(ProjInfoReq projInfoReq:projInfoReqs){
