@@ -13,3 +13,4 @@ public interface AfterLoanRepaymentService {
      */
     Result submitAutoRepay(String businessId, String afterId, String bankCard);
 }
+
