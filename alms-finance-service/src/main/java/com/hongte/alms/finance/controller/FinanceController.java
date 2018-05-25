@@ -48,6 +48,7 @@ import com.hongte.alms.base.service.MoneyPoolRepaymentService;
 import com.hongte.alms.base.service.MoneyPoolService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
+import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.base.vo.finance.CurrPeriodRepaymentInfoVO;
 import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
 import com.hongte.alms.common.result.Result;
@@ -387,9 +388,9 @@ public class FinanceController {
 		Result result ;
 		logger.info("@previewConfirmRepayment@预览确认还款拆标情况--开始[{}]",req);
 //		result = financeService.previewConfirmRepayment(req);
-		shareService.execute(req, false);
+		List<CurrPeriodProjDetailVO> detailVOs = shareService.execute(req, false);
 //		logger.info("@previewConfirmRepayment@预览确认还款拆标情况--结束[{}]",result);
-		return Result.success() ;
+		return Result.success(detailVOs) ;
 	}
 	
 	@GetMapping(value="/getSurplusFund")

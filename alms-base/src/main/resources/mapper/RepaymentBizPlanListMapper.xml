@@ -205,7 +205,7 @@
 			tb_repayment_biz_plan_list pl
 		JOIN
 			tb_basic_business b ON b.business_id = pl.orig_business_id
-		JOIN
+		LEFT JOIN
 			tb_basic_business_customer bbc ON b.business_id = bbc.business_id
 		<where>
 			1 = 1
