@@ -264,7 +264,7 @@ public class RepayPlanController {
             Set<ConstraintViolation<TrailProjInfoReq>> constraintViolations1 =
                     validator.validate( trailProjInfoReq );
             if(constraintViolations1.size()>0){
-                logger.info("@还款计划@试算还款计划接口,标的信息校验出错: 传入对象："+JSON.toJSONString(trailProjInfoReq)+"     错误信息：" , constraintViolations1.iterator().next().getMessage());
+                logger.info("@还款计划@试算还款计划接口,标的信息校验出错:  错误信息："+constraintViolations1.iterator().next().getMessage() +"传入对象："  , JSON.toJSONString(trailProjInfoReq));
                 return Result.error("9889","标的信息校验出错：传入对象："+JSON.toJSONString(trailProjInfoReq)+"     错误信息："+constraintViolations1.iterator().next().getMessage());
             }
             List<TrailProjFeeReq>  feeReqList =  trailProjInfoReq.getProjFeeInfos();
@@ -302,10 +302,10 @@ public class RepayPlanController {
 
             List<ProjInfoReq>  projInfoReqs = new LinkedList<>();
             creatRepayPlanReq.setProjInfoReqs(projInfoReqs);
+            businessBasicInfoReq.setRepaymentTypeId(projInfoReqs.get(0).getRepayType());
             for(TrailProjInfoReq trailProjInfoReq:trailProjInfoReqs){
                 ProjInfoReq projInfoReq =ClassCopyUtil.copy(trailProjInfoReq,TrailProjInfoReq.class,ProjInfoReq.class);
                 projInfoReqs.add(projInfoReq);
-
                 List<PrincipleReq> principleReqs =  trailProjInfoReq.getPricipleMap();
                 projInfoReq.setPrincipleReqList(principleReqs);
 
@@ -315,6 +315,7 @@ public class RepayPlanController {
 
                 for(TrailProjFeeReq trailProjFeeReq:trailProjFeeReqs){
                     ProjFeeReq projFeeReq = ClassCopyUtil.copy(trailProjFeeReq,TrailProjFeeReq.class,ProjFeeReq.class);
+                    projFeeReq.setFeeType(30);//试算的时候默认把费用类型都设置成分公司服务费
                     List<ProjFeeDetailReq> projFeeDetailReqs = trailProjFeeReq.getFeeDetailReqMap();
                     projFeeReq.setFeeDetailReqList(projFeeDetailReqs);
                     projFeeReqs.add(projFeeReq);

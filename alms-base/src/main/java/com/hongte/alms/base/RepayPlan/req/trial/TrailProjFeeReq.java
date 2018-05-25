@@ -52,8 +52,8 @@ public class TrailProjFeeReq {
     /**
      * 费用项所属分类名称
      */
-    @ApiModelProperty(required= true,value = "费用项所属分类名称")
-    @NotNull(message = "费用项所属分类名称(feeTypeName)不能为空")
+    @ApiModelProperty(value = "费用项所属分类名称")
+//    @NotNull(message = "费用项所属分类名称(feeTypeName)不能为空")
     private String feeTypeName;
 
     /**
@@ -70,12 +70,12 @@ public class TrailProjFeeReq {
     @NotNull(message = "收取费用方式(chargeType)不能为空")
     private Integer chargeType;
 
-    /**
-     * [是否一次收取，1为按月收取，2为一次收取]
-     */
-    @ApiModelProperty(required= true,value = "[是否一次收取，1为按月收取，2为一次收取]")
-    @NotNull(message = "是否一次收取(isOneTimeCharge)不能为空")
-    private Integer isOneTimeCharge;
+//    /**
+//     * [是否一次收取，1为按月收取，2为一次收取]
+//     */
+//    @ApiModelProperty(required= true,value = "[是否一次收取，1为按月收取，2为一次收取]")
+//    @NotNull(message = "是否一次收取(isOneTimeCharge)不能为空")
+//    private Integer isOneTimeCharge;
 
     /**
      * [标记该项费用的还款类型，1:期初收取,2:期末收取]
@@ -118,13 +118,13 @@ public class TrailProjFeeReq {
 
 
 
-    public Integer getIsOneTimeCharge() {
-        return isOneTimeCharge;
-    }
-
-    public void setIsOneTimeCharge(Integer isOneTimeCharge) {
-        this.isOneTimeCharge = isOneTimeCharge;
-    }
+//    public Integer getIsOneTimeCharge() {
+//        return isOneTimeCharge;
+//    }
+//
+//    public void setIsOneTimeCharge(Integer isOneTimeCharge) {
+//        this.isOneTimeCharge = isOneTimeCharge;
+//    }
 
 
     public Integer getRepaymentFlag() {
