@@ -1,4 +1,4 @@
-package com.hongte.alms.withhold.feign;
+package com.hongte.alms.withhold.feignClient;
 
 import com.hongte.alms.common.result.Result;
 import org.springframework.cloud.netflix.feign.FeignClient;
