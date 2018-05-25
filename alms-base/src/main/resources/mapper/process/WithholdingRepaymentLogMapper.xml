@@ -224,5 +224,20 @@ select repay.*  from tb_withholding_repayment_log  repay
 
 
     </select>
+    
+    
+    
+    
+        
+    <select id="selectRepaymentLogForAutoRepay" resultType="com.hongte.alms.base.vo.module.RepaymentLogVO"
+            parameterType="com.hongte.alms.base.vo.module.RepaymentLogReq">
+
+		  SELECT 
+		  <include refid="Base_Column_List"/>
+		  from tb_withholding_repayment_log      where 1=1  and original_business_id='' and after_id='' 
+		  and DATE_FORMAT(update_time,'%Y-%m-%d')=DATE_FORMAT(NOW(),'%Y-%m-%d')
+
+    </select>
+    
 
 </mapper>

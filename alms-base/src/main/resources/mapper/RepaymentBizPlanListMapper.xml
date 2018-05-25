@@ -312,6 +312,15 @@
 		  LIMIT 1) tab
     </select>
     
+	<select id="selectAutoRepayList" resultType="com.hongte.alms.base.entity.RepaymentBizPlanList">
+     
+	  select 
+	     <include refid="Base_Column_List"/>
+	  from tb_repayment_biz_plan_list   
+	  
+	  where confirm_flag=1 and (date_sub(due_date,interval 1 day)=curdate() or due_date=curdate()) and `current_status!`!='已还款' and src_type=2
+    </select>
+    
     <select id="queryRepaymentPlanInfoByBusinessId" resultType="com.hongte.alms.base.dto.RepaymentPlanInfoDTO">
 		SELECT 
 		  rbpl.plan_list_id,
