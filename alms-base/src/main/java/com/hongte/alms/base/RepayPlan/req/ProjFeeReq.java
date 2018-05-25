@@ -53,6 +53,7 @@ public class ProjFeeReq {
     @ApiModelProperty(required= true,value = "费用项所属分类，" +
             "30：资产端分公司服务费，40：担保公司费用，" +
             "50：资金端平台服务费，80：中介费，90：押金类费用，110：返点（返点都是不线上分账的）")
+    @NotNull(message = "费用项类型(feeType)不能为空")
     private Integer feeType;
 
 
