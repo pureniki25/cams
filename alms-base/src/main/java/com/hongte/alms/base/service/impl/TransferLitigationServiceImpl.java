@@ -574,7 +574,8 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				// 当期的 利息、服务费、担保公司费用、平台费
 				resultMap.putAll(transferOfLitigationMapper.queryCarLoanFees(businessId, billDate)); 
 				// 查询往期少交费用明细
-				List<PreviousFeesVO> previousFees = setMatchingRepaymentPlanAccrual("等额本息", setPreviosFees(businessId, billDate, borrowMoney, innerLate), monthBorrowRate);
+//				List<PreviousFeesVO> previousFees = setMatchingRepaymentPlanAccrual("等额本息", setPreviosFees(businessId, billDate, borrowMoney, innerLate), monthBorrowRate);
+				List<PreviousFeesVO> previousFees = setPreviosFees(businessId, billDate, borrowMoney, innerLate);
 				resultMap.put("previousFees", previousFees);
 				// 往期少交费用合计
 				Double balanceDue = transferOfLitigationMapper.queryBalanceDueByBillDate(businessId, billDate);
@@ -584,7 +585,8 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				// 当期的 利息、服务费、担保公司费用、平台费 取最后一期
 				resultMap.putAll(transferOfLitigationMapper.queryCarLoanFees(businessId, maxDueDate)); 
 				// 查询往期少交费用明细
-				List<PreviousFeesVO> previousFees = setMatchingRepaymentPlanAccrual("等额本息", setPreviosFees(businessId, maxDueDate, borrowMoney, innerLate), monthBorrowRate);
+//				List<PreviousFeesVO> previousFees = setMatchingRepaymentPlanAccrual("等额本息", setPreviosFees(businessId, maxDueDate, borrowMoney, innerLate), monthBorrowRate);
+				List<PreviousFeesVO> previousFees = setPreviosFees(businessId, maxDueDate, borrowMoney, innerLate);
 				resultMap.put("previousFees", previousFees);
 				// 往期少交费用合计
 				Double balanceDue = transferOfLitigationMapper.queryBalanceDueByBillDate(businessId, maxDueDate);
