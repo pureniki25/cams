@@ -428,7 +428,7 @@ public class RepayPlanController {
     @ApiOperation(value = "根据业务ID查找此业务的历史账单")
     @PostMapping("/getLogBill")
     @ResponseBody
-   public  Result<BizDto> getLogBill(String businessId){
+   public  Result<BizDto> getLogBill(@RequestParam(value = "businessId") String businessId){
         //业务基本的还款计划信息
         BizDto bizDto =getBizDtoByBizId(businessId);
 
@@ -466,7 +466,7 @@ public class RepayPlanController {
     @ApiOperation(value = "根据还款计划ID查找出此还款计划的详情账单信息")
     @PostMapping("/getBizPlanBill")
     @ResponseBody
-    public Result<BizPlanDto> getBizPlanBill(String planId){
+    public Result<BizPlanDto> getBizPlanBill(@RequestParam(value = "planId") String planId){
 
        RepaymentBizPlan bizPlan =  repaymentBizPlanService.selectById(planId);
 
