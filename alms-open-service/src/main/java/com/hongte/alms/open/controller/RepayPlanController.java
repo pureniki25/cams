@@ -76,22 +76,22 @@ public class RepayPlanController {
 
         return ret;
     }
-    
+
     @ApiOperation(value = "根据businessId查询还款计划")
-	@GetMapping("/queryRepayPlanByBusinessId")
+    @GetMapping("/queryRepayPlanByBusinessId")
     @ResponseBody
     @TripleDESDecrypt
     public Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(@RequestParam(value = "businessId") String businessId){
-    	return creatRepayPlanRemoteService.queryRepayPlanByBusinessId(businessId);
+        return creatRepayPlanRemoteService.queryRepayPlanByBusinessId(businessId);
     }
-    
+
     @ApiOperation(value = "根据businessId查询还款计划")
     @GetMapping("/deleteRepayPlanByConditions")
     @ResponseBody
     @TripleDESDecrypt
     public Result<PlanReturnInfoDto> deleteRepayPlanByConditions(@RequestParam(value = "businessId") String businessId,
                                                                  @RequestParam(value = "repaymentBatchId") String repaymentBatchId){
-    	return creatRepayPlanRemoteService.deleteRepayPlanByConditions(businessId, repaymentBatchId);
+        return creatRepayPlanRemoteService.deleteRepayPlanByConditions(businessId, repaymentBatchId);
     }
 
 
