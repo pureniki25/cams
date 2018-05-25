@@ -161,4 +161,9 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
     public Integer queryPrincipalOverdueByBusinessId(String businessId) {
     	return repaymentBizPlanListMapper.queryPrincipalOverdueByBusinessId(businessId);
     }
+
+	@Override
+	public List<RepaymentBizPlanList> selectAutoRepayList() {
+		return repaymentBizPlanListMapper.selectAutoRepayList();
+	}
 }
