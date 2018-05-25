@@ -782,9 +782,9 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				}
 			}
 
-			receivableTotal = borrowMoney + planAccrual + planServiceCharge + planPlatformCharge + planGuaranteeCharge
+			receivableTotal = surplusPrincipal + planAccrual + planServiceCharge + planPlatformCharge + planGuaranteeCharge
 					+ innerLateFees + outsideInterest + preLateFees + balanceDue + parkingFees + gpsFees + dragFees
-					+ otherFees + attorneyFees + overdueDefault - overRepayMoney - refundMoney;
+					+ otherFees + attorneyFees + overdueDefault;
 			squaredUp = receivableTotal - overRepayMoney - refundMoney;
 			resultMap.put("innerLateFees", BigDecimal.valueOf(innerLateFees).setScale(2, RoundingMode.HALF_UP).doubleValue());
 			resultMap.put("outsideInterest", BigDecimal.valueOf(outsideInterest).setScale(2, RoundingMode.HALF_UP).doubleValue());

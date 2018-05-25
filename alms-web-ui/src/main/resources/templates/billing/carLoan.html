@@ -150,7 +150,7 @@
                                     <i-option value="2">借款本金*3%</i-option>
                                     <i-option value="3">剩余本金*0.5%*剩余期数</i-option>
                                 </i-select >
-		                		{{ baseInfoForm.preLateFees?numeral( baseInfoForm.preLateFees).format('0,0.00'):0 }}
+		                	 {{ baseInfoForm.preLateFees?numeral( baseInfoForm.preLateFees).format('0,0.00'):0 }}	
 		                	</div>
 		                </div>
 		                <div class="td"> <div class="td-box">往期少交费用（含滞纳金）</div><div class="td-box">{{baseInfoForm.balanceDue?numeral( baseInfoForm.balanceDue).format('0,0.00'):0   }} </div> </div>

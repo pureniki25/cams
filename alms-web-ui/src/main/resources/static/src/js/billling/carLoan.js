@@ -130,7 +130,7 @@ window.layinit(function (htConfig) {
 					vm.lastRepayDate = res.data.data.lastRepayDate;
 					vm.baseInfoForm.borrowRate = res.data.data.borrowRate + '%/年';
 					if (res.data.data.outputPlatformId == 0 && res.data.data.repaymentTypeId == '等额本息') {
-						vm.preLateFeesFlag = res.data.data.preLateFeesFlag;
+						vm.preLateFeesFlag = true;
 					}
 				}else{
 					vm.$Modal.error({content: res.data.msg });
