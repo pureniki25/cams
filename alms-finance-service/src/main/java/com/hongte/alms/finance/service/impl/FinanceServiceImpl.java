@@ -27,6 +27,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.dto.ConfirmRepaymentReq;
 import com.hongte.alms.base.dto.RepaymentPlanInfoDTO;
+import com.hongte.alms.base.dto.RepaymentProjInfoDTO;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.entity.AccountantOverRepayLog;
 import com.hongte.alms.base.entity.ApplyDerateProcess;
@@ -1689,7 +1690,8 @@ public class FinanceServiceImpl implements FinanceService {
 	
 	@Override
 	public Map<String, Object> queryRepaymentProjInfoByPlanListId(String planListId) {
-		// TODO Auto-generated method stub
+		RepaymentProjInfoDTO dto = new RepaymentProjInfoDTO();
+		
 		return null;
 	}
 
