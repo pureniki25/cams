@@ -38,6 +38,21 @@ public class RepaymentProjFactRepay extends Model<RepaymentProjFactRepay> {
 	@TableField("proj_plan_detail_id")
 	@ApiModelProperty(required= true,value = "标的应还项目明细ID(外键  对应 tb_repayment_proj_plan_list_detail. proj_plan_detail_id)")
 	private String projPlanDetailId;
+	
+	 /**
+     * 业务还款计划列表ID
+     */
+	@TableField("plan_list_id")
+	@ApiModelProperty(required= true,value = "业务还款计划列表ID")
+	private String planListId;
+	
+	/**
+     * 标的还款计划列表ID
+     */
+	@TableField("proj_plan_list_id")
+	@ApiModelProperty(required= true,value = "标的还款计划列表ID")
+	private String projPlanListId;
+	
     /**
      * 上标项目编号
      */
@@ -310,5 +325,33 @@ public class RepaymentProjFactRepay extends Model<RepaymentProjFactRepay> {
 			", updateDate=" + updateDate +
 			", updateUser=" + updateUser +
 			"}";
+	}
+
+	/**
+	 * @return the projPlanListId
+	 */
+	public String getProjPlanListId() {
+		return projPlanListId;
+	}
+
+	/**
+	 * @param projPlanListId the projPlanListId to set
+	 */
+	public void setProjPlanListId(String projPlanListId) {
+		this.projPlanListId = projPlanListId;
+	}
+
+	/**
+	 * @return the planListId
+	 */
+	public String getPlanListId() {
+		return planListId;
+	}
+
+	/**
+	 * @param planListId the planListId to set
+	 */
+	public void setPlanListId(String planListId) {
+		this.planListId = planListId;
 	}
 }

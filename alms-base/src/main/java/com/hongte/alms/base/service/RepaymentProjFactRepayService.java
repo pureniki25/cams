@@ -14,5 +14,14 @@ import com.hongte.alms.common.service.BaseService;
  * @since 2018-05-03
  */
 public interface RepaymentProjFactRepayService extends BaseService<RepaymentProjFactRepay> {
-
+	/**
+	 * 计算本期剩余未还总金额
+	 * @author 王继光
+	 * 2018年5月24日 下午8:14:42
+	 * @param businessId
+	 * @param afterId
+	 * @return
+	 */
+	public BigDecimal caluUnpaid(String businessId,String afterId) ;
+	
 }

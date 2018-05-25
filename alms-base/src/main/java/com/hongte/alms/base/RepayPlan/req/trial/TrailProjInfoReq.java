@@ -4,6 +4,7 @@ import com.hongte.alms.base.RepayPlan.req.PrincipleReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import java.util.List;
  * @since 2018/4/23
  */
 @ApiModel("上标信息")
+//@Data
 public class TrailProjInfoReq {
 
 
@@ -19,9 +21,11 @@ public class TrailProjInfoReq {
      *利率
      */
     @ApiModelProperty(required= true,value = "利率")
+    @NotNull(message = "利率(rate)不能为空")
     private BigDecimal rate;
 
     @ApiModelProperty(required= true,value = "利率单位：1 年利率; 2 月利率; 3 日利率")
+    @NotNull(message = "利率单位(rateUnitType)不能为空")
     private Integer rateUnitType;
 
 //    @ApiModelProperty(required= true,value = "逾期滞纳金费率(%)")
@@ -32,27 +36,31 @@ public class TrailProjInfoReq {
 
 
     @ApiModelProperty(required= true,value = "还款方式：1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息,11:等本等息")
+    @NotNull(message = "还款方式(repayType)不能为空")
     private Integer repayType;
 
-    @ApiModelProperty(required= true,value = "每期还本Map  Map<期数，还本金额>")
+    @ApiModelProperty(value = "每期还本Map  Map<期数，还本金额>")
     private List<PrincipleReq> pricipleMap;
 
     /**
      * 满标金额(元)
      */
     @ApiModelProperty(required= true,value = "满标金额(元)")
+    @NotNull(message = "满标金额(fullBorrowMoney)不能为空")
     private BigDecimal fullBorrowMoney;
 
     /**
      * 借款期限
      */
     @ApiModelProperty(required= true,value = "借款期限")
+    @NotNull(message = "借款期限(periodMonth)不能为空")
     private Integer periodMonth;
 
     /**
      * 标的费用信息列表
      */
     @ApiModelProperty(required= true,value = "标的的出款费用信息列表")
+    @NotNull(message = "标的费用信息列表(projFeeInfos)不能为空")
     private List<TrailProjFeeReq> projFeeInfos;
 
 //    /**

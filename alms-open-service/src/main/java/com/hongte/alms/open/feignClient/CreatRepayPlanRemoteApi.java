@@ -26,7 +26,7 @@ public interface CreatRepayPlanRemoteApi {
     @RequestMapping(value = "/RepayPlan/creatAndSaveRepayPlan",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
     Result<PlanReturnInfoDto> creatAndSaveRepayPlan(CreatRepayPlanReq creatRepayPlanReq);
 
-    @RequestMapping(value = "/RepayPlan/creatAndSaveRepayPlan",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+    @RequestMapping(value = "/RepayPlan/trailRepayPlan",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
     Result<PlanReturnInfoDto> trailRepayPlan(TrailRepayPlanReq trailRepayPlanReq);
     
     @RequestMapping(value = "/RepayPlan/queryRepayPlanByBusinessId",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)

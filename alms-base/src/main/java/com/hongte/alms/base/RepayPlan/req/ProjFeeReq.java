@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotations.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -18,6 +19,7 @@ public class ProjFeeReq {
      * [是否设置期限范围]
      */
     @ApiModelProperty(required= true,value = "是否分段收费,1是，0 否")
+    @NotNull(message = "是否设置期限范围(isTermRange)不能为空")
     private Integer isTermRange;
 //    @ApiModelProperty(value = "标的出款申请费用明细期限范围明细列表，分段收费的费用，必须填写这一项")
 //    private List<ProjFeeDetailReq> ProjFeeDetailInfos;
@@ -58,6 +60,7 @@ public class ProjFeeReq {
      * 费用项所属分类名称
      */
     @ApiModelProperty(required= true,value = "费用项所属分类名称")
+    @NotNull(message = "费用项所属分类名称(feeTypeName)不能为空")
     private String feeTypeName;
 
     /**
@@ -65,6 +68,7 @@ public class ProjFeeReq {
      */
     @TableField("account_status")
     @ApiModelProperty(required= true,value = "分账标记 0：不线上分账，10：分账到借款人账户，20：分账到资产端账户，30：分账到资金端账户(平台)，40：分账到担保公司账户")
+    @NotNull(message = "分账标记(accountStatus)不能为空")
     private Integer accountStatus;
 
 //    /**
@@ -83,6 +87,7 @@ public class ProjFeeReq {
      * [业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值]
      */
     @ApiModelProperty(required= true,value = "业务应收取费用值")
+    @NotNull(message = "业务应收取费用值(feeValue)不能为空")
     private BigDecimal feeValue;
 
     //添加进位方式标志位
@@ -124,6 +129,7 @@ public class ProjFeeReq {
      * [收取费用方式，1为按月收取，2为一次收取]
      */
     @ApiModelProperty(required= true,value = "收取费用方式，1为按月收取，2为一次收取")
+    @NotNull(message = "收取费用方式(chargeType)不能为空")
     private Integer chargeType;
 //    /**
 //     * 放款去处 1:提到银行卡  2：转到可用金额
@@ -139,6 +145,7 @@ public class ProjFeeReq {
      * [标记该项费用的还款类型，1:期初收取,2:期末收取]
      */
     @ApiModelProperty(required= true,value = "[标记该项费用的还款类型，1:期初收取,2:期末收取]")
+    @NotNull(message = "标记该项费用的还款类型(repaymentFlag)不能为空")
     private Integer repaymentFlag;
 //    /**
 //     * [是否P2P主标收取,1为是，0为否]

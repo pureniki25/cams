@@ -6,6 +6,8 @@
     <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.RepaymentProjFactRepay">
         <result column="proj_plan_detail_repay_id" property="projPlanDetailRepayId" />
         <result column="proj_plan_detail_id" property="projPlanDetailId" />
+        <result column="plan_list_id" property="planListid" />
+        <result column="proj_plan_list_id" property="projPlanListId" />
         <result column="project_id" property="projectId" />
         <result column="business_id" property="businessId" />
         <result column="orig_business_id" property="origBusinessId" />
@@ -26,7 +28,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        proj_plan_detail_repay_id AS projPlanDetailRepayId, proj_plan_detail_id AS projPlanDetailId, project_id AS projectId, business_id AS businessId, orig_business_id AS origBusinessId, period, after_id AS afterId, fee_id AS feeId, plan_item_name AS planItemName, plan_item_type AS planItemType, fact_amount AS factAmount, repay_source AS repaySource, fact_repay_date AS factRepayDate, repay_ref_id AS repayRefId, create_date AS createDate, create_user AS createUser, update_date AS updateDate, update_user AS updateUser
+        proj_plan_detail_repay_id AS projPlanDetailRepayId,plan_list_id as planListid,proj_plan_list_id as projPlanListId, proj_plan_detail_id AS projPlanDetailId, project_id AS projectId, business_id AS businessId, orig_business_id AS origBusinessId, period, after_id AS afterId, fee_id AS feeId, plan_item_name AS planItemName, plan_item_type AS planItemType, fact_amount AS factAmount, repay_source AS repaySource, fact_repay_date AS factRepayDate, repay_ref_id AS repayRefId, create_date AS createDate, create_user AS createUser, update_date AS updateDate, update_user AS updateUser
     </sql>
 
 	<select id="calFactRepay" resultType="java.math.BigDecimal">
