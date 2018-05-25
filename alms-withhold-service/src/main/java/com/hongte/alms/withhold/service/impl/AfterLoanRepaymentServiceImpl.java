@@ -6,6 +6,7 @@ import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.withhold.feignClient.WithHoldingClient;
 import com.hongte.alms.withhold.service.AfterLoanRepaymentService;
+import com.hongte.alms.withhold.service.RechargeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,9 @@ public class AfterLoanRepaymentServiceImpl implements AfterLoanRepaymentService 
     @Qualifier("RepaymentBizPlanListService")
     private RepaymentBizPlanListService repaymentBizPlanListService;
 
+    @Autowired
+    private RechargeService rechargeService;
+
     /**
      * 执行代扣
      * @param businessId 业务单号
@@ -35,7 +39,7 @@ public class AfterLoanRepaymentServiceImpl implements AfterLoanRepaymentService 
             if(repaymentBizPlanList.getSrcType()!=null && repaymentBizPlanList.getSrcType()==1){
                 return withHoldingClient.repayAssignBank(repaymentBizPlanList.getOrigBusinessId(),afterId,bankCard);
             }else {
-                return null;
+                return rechargeService.recharge(repaymentBizPlanList.getOrigBusinessId(),afterId,bankCard);
             }
         }
         Result result=new Result();
