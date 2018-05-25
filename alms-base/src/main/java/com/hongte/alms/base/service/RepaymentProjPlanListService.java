@@ -19,5 +19,7 @@ public interface RepaymentProjPlanListService extends BaseService<RepaymentProjP
 	Double getOnLineFactAmountSum(String projListId);
 	Double getFactAmountSum(String projPlanId);
 	Double getPrincipalAndinterestPeriod(@Param("projListId") String projListId);
+	
+	
 
 }

@@ -224,5 +224,29 @@ select repay.*  from tb_withholding_repayment_log  repay
 
 
     </select>
+    
+    
+    
+    
+        
+    <select id="selectRepaymentLogForAutoRepay" resultType="com.hongte.alms.base.vo.module.RepaymentLogVO"
+            parameterType="com.hongte.alms.base.vo.module.RepaymentLogReq">
+
+      
+		 
+		   SELECT
+		        <include refid="BaseResultMap"/>
+		
+		 from tb_withholding_repayment_log  
+		
+		
+		
+		
+		      
+		        order BY  repay.create_time DESC
+
+
+    </select>
+    
 
 </mapper>

@@ -64,4 +64,6 @@ public interface RepaymentBizPlanListMapper extends SuperMapper<RepaymentBizPlan
 
     int conutFinanceManagerList(FinanceManagerListReq req) ;
     List<FinanceManagerListVO> selectFinanceMangeList(FinanceManagerListReq req) ;
+    
+    List<RepaymentBizPlanList> selectAutoRepayList();
 }

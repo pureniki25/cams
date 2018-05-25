@@ -291,6 +291,40 @@
 		  ORDER BY t2.`due_date`
 		  LIMIT 1) tab
     </select>
+    
+    
+      <select id="queryPrincipalOverdueByBusinessId" resultType="java.lang.Integer">
+    	SELECT
+		  DATEDIFF(CURDATE(), tab.due_date) principalOverdue -- 本金逾期
+		FROM
+		  (SELECT
+		    t2.`due_date`
+		  FROM
+		    tb_basic_business t1,
+		    tb_repayment_biz_plan_list t2
+		  WHERE t1.`business_id` = t2.`orig_business_id`
+		    AND t2.`current_status` = '逾期'
+		    AND t1.`business_id` = #{businessId,jdbcType=VARCHAR}
+		    AND EXISTS
+		    (SELECT
+		      1
+		    FROM
+		      tb_repayment_biz_plan_list_detail d
+		    WHERE d.`plan_list_id` = t2.`plan_list_id`
+		      AND d.`plan_item_type` = '10'
+		      AND d.`plan_amount` > 0)
+		  ORDER BY t2.`due_date`
+		  LIMIT 1) tab
+    </select>
+    
+    <select id="selectAutoRepayList" resultType="com.hongte.alms.base.entity.RepaymentBizPlanList">
+     
+	  select 
+	     <include refid="Base_Column_List"/>
+	  from tb_repayment_biz_plan_list   
+	  
+	  where confirm_flag=1 and (date_sub(due_date,interval 1 day)=curdate() or due_date=curdate()) and `current_status!`!='已还款' and src_type=2
+    </select>
 
 
 
