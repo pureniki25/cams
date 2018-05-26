@@ -119,8 +119,11 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
     @Qualifier("RepaymentProjFactRepayService")
     private RepaymentProjFactRepayService repaymentProjFactRepayService;
 
-    @Autowired
-    Validator globalValidator;
+
+
+
+//    @Autowired
+//    Validator globalValidator;
 
     //进位方式枚举
     private  RoundingMode roundingMode=RoundingMode.HALF_UP;
@@ -558,8 +561,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
         List<ProjInfoReq>  projInfoReqs = creatRepayPlanReq.getProjInfoReqs();
 
-        //标的车辆/房产信息校验
+
         for(ProjInfoReq projInfoReq :projInfoReqs){
+            //标的车辆信息校验
             if(projInfoReq.getIsHaveCar().equals(BooleanEnum.YES.getValue())){
                 if(projInfoReq.getProjCarInfos()==null|| projInfoReq.getProjCarInfos().size()==0){
                     logger.error("有车辆信息的标必须把车辆信息列表传入  projId:"+projInfoReq.getProjectId()
@@ -567,6 +571,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     throw  new CreatRepaymentExcepiton("有车辆信息的标必须把车辆信息列表传入  projId:" +projInfoReq.getProjectId() );
                 }
             }
+            //标的房产信息校验
             if(projInfoReq.getIsHaveHouse().equals(BooleanEnum.YES.getValue())){
                 if(projInfoReq.getProjHouseInfos()==null || projInfoReq.getProjCarInfos().size()==0){
                     logger.error("有房产信息的标必须把房产信息列表传入  projId:"+projInfoReq.getProjectId()
@@ -577,7 +582,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
         }
 
-        //标的额外费率信息校验
+
+
+
 
 //        TuandaiProjectCar
 

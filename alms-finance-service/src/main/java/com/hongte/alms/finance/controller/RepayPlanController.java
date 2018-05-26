@@ -175,15 +175,26 @@ public class RepayPlanController {
 //            private List<ProjFeeReq> projFeeInfos;
             List<ProjFeeReq> projFeeInfos =projInfoReq.getProjFeeInfos();
             for(ProjFeeReq projFeeReq:projFeeInfos){
-                Set<ConstraintViolation<ProjInfoReq>> projFeeReqValit =
-                        validator.validate( projInfoReq );
+                Set<ConstraintViolation<ProjFeeReq>> projFeeReqValit =
+                        validator.validate( projFeeReq );
                 if(projFeeReqValit.size()>0){
-                    logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口,标的的出款费用信息校验出错  传入信息： "+ JSON.toJSONString(projInfoReq)+"  错误信息：" , projFeeReqValit.iterator().next().getMessage());
-                    return Result.error("9889","标的的出款费用信息校验出错： 传入信息： "+JSON.toJSONString(projInfoReq)+"     错误信息："+projFeeReqValit.iterator().next().getMessage());
+                    logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口,标的的出款费用信息校验出错  传入信息： "+ JSON.toJSONString(projFeeReq)+"  错误信息：" , projFeeReqValit.iterator().next().getMessage());
+                    return Result.error("9889","标的的出款费用信息校验出错： 传入信息： "+JSON.toJSONString(projFeeReq)+"     错误信息："+projFeeReqValit.iterator().next().getMessage());
                 }
             }
 
-
+            // 校验标的额外费率信息
+            List<ProjExtRateReq> projExtRateReqs = projInfoReq.getProjExtRateReqs();
+            if(projExtRateReqs!=null&&projExtRateReqs.size()>0){
+                for(ProjExtRateReq projExtRateReq:projExtRateReqs){
+                    Set<ConstraintViolation<ProjExtRateReq>> projExtRateReqValit =
+                            validator.validate( projExtRateReq );
+                    if(projExtRateReqValit.size()>0){
+                        logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口,标的额外费率信息校验出错  传入信息： "+ JSON.toJSONString(projExtRateReq)+"  错误信息：" , projExtRateReqValit.iterator().next().getMessage());
+                        return Result.error("9889","标的额外费率信息校验出错： 传入信息： "+JSON.toJSONString(projExtRateReq)+"     错误信息："+projExtRateReqValit.iterator().next().getMessage());
+                    }
+                }
+            }
 
         }
 
