@@ -26,7 +26,6 @@ public class ProjExtRateReq {
     @ApiModelProperty(required= true,value = "费率名称")
     @NotNull(message = "费率名称(rateName)不能为空")
     private String rateName;
-
     /**
      * 费率值
      */
@@ -43,26 +42,28 @@ public class ProjExtRateReq {
     /**
      * 资产端费用项ID
      */
-    @ApiModelProperty(value = "资产端费用项ID")
+    @ApiModelProperty(required= true,value = "资产端费用项ID")
+    @NotNull(message="资产端费用项ID(feeId)不能为空")
     private String feeId;
     /**
      * 资产端费用项名称
      */
-    @ApiModelProperty(value = "资产端费用项名称")
+    @ApiModelProperty(required= true,value = "资产端费用项名称")
+    @NotNull(message="资产端费用项名称(feeName)不能为空")
     private String feeName;
 
 
     /**
      * 开始期数
      */
-    @ApiModelProperty(required= true,value = "费用信息有效的开始期数")
+    @ApiModelProperty(value = "开始期数")
     private Integer beginPeroid;
 
 
     /**
      * 结束期数
      */
-    @ApiModelProperty(required= true,value = "费用信息有效的结束期数")
+    @ApiModelProperty(value = "结束期数")
     private  Integer  endPeroid;
 
 
