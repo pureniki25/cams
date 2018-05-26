@@ -554,7 +554,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 							logger.info("没有钱可以分配到细项,跳出标的细项循环");
 							break;
 						}
-						BigDecimal unpaid = detail.getProjPlanAmount().subtract(detail.getProjFactAmount());
+						BigDecimal unpaid = detail.getProjPlanAmount()
+								.subtract(detail.getDerateAmount()==null?new BigDecimal(0):detail.getDerateAmount())
+								.subtract(detail.getProjFactAmount());
 						logger.info("{}-{}未还金额{}",detail.getProjPlanDetailId(),detail.getPlanItemName(),unpaid);
 						BigDecimal money = new BigDecimal(0);
 						int c = divideAmount.compareTo(unpaid);
@@ -691,5 +693,13 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			}
 			
 			return fact ;
+	}
+	
+	private void updateStatus() {
+		for (RepaymentProjPlanDto projPlanDto : planDto.get().getProjPlanDtos()) {
+			for (RepaymentProjPlanListDto projPlanListDto : projPlanDto.getProjPlanListDtos()) {
+				
+			}
+		}
 	}
 }

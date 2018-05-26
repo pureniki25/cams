@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.RepaymentConfirmLogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.RepaymentConfirmLog">
+        <id column="confirm_log_id" property="confirmLogId" />
+        <result column="business_id" property="businessId" />
+        <result column="org_business_id" property="orgBusinessId" />
+        <result column="after_id" property="afterId" />
+        <result column="index" property="index" />
+        <result column="can_revoke" property="canRevoke" />
+        <result column="proj_plan_json" property="projPlanJson" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="update_time" property="updateTime" />
+        <result column="update_user" property="updateUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        confirm_log_id AS confirmLogId, business_id AS businessId, org_business_id AS orgBusinessId, after_id AS afterId, index, can_revoke AS canRevoke, proj_plan_json AS projPlanJson, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
+    </sql>
+
+</mapper>

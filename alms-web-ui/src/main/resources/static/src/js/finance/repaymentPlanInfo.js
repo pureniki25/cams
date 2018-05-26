@@ -2,12 +2,12 @@ let app
 window.layinit(function (htConfig) {
 	
     let financeBasePath = htConfig.financeBasePath;
-    let businessId = getQueryStr('businessId');
-    let customer = decodeURI(getQueryStr('customer'));
-    let phoneNumber = getQueryStr('phoneNumber');
-    let repaymentType = decodeURI(getQueryStr('repaymentType'));
-    let borrowMoney = getQueryStr('borrowMoney');
-    let borrowLimit = getQueryStr('borrowLimit');
+    let businessId = getQueryStr('businessId');	// 业务编号
+    let customer = decodeURI(getQueryStr('customer'));	// 客户姓名
+    let phoneNumber = getQueryStr('phoneNumber');	// 电话号码
+    let repaymentType = decodeURI(getQueryStr('repaymentType'));	// 还款方式
+    let borrowMoney = getQueryStr('borrowMoney');	// 借款金额
+    let borrowLimit = getQueryStr('borrowLimit');	// 借款期限
     
     app = new Vue({
         el: "#app",
