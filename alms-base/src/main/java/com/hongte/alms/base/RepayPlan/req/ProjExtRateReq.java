@@ -37,7 +37,7 @@ public class ProjExtRateReq {
     /**
      * 费用计算方式
      */
-    @ApiModelProperty(required= true,value = "费用计算方式")
+    @ApiModelProperty(required= true,value = "费用计算方式:1.借款金额*费率值；2剩余本金*费率值")
     @NotNull(message = "费用计算方式(calcWay)不能为空")
     private Integer calcWay;
 

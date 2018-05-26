@@ -801,6 +801,52 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 }
             }
 
+            //标的额外费用信息校验
+            List<ProjExtRateReq> projExtRateReqs = projInfoReq.getProjExtRateReqs();
+            Map<String,List<ProjExtRateReq>> projExtRateReqMap = new HashMap<>();
+            //校验输入的开始期数，结束期数是否是连续的，是否等于总期数
+            if(projExtRateReqs !=null &&projExtRateReqs.size()>0){
+                for(ProjExtRateReq projExtRateReq:projExtRateReqs){
+                    String feeId = projExtRateReq.getFeeId();
+                    List<ProjExtRateReq> projExtRateReqList =projExtRateReqMap.get(feeId);
+                    if(projExtRateReqList==null){
+                        projExtRateReqList = new LinkedList<>();
+                        projExtRateReqMap.put(feeId,projExtRateReqList);
+                    }
+                    projExtRateReqList.add(projExtRateReq);
+                }
+            }
+
+            for(String feeId:projExtRateReqMap.keySet() ){
+
+                List<ProjExtRateReq> rateReqs = projExtRateReqMap.get(feeId);
+                //排序 由低到高
+                Collections.sort(rateReqs, new Comparator<ProjExtRateReq>() {
+                    @Override
+                    public int compare(ProjExtRateReq o1, ProjExtRateReq o2) {
+                        if(o1.getBeginPeroid().compareTo(o2.getBeginPeroid())==0){
+                            return Integer.valueOf(o1.getBeginPeroid().compareTo(o2.getBeginPeroid()));
+                        }else{
+                            return o1.getBeginPeroid().compareTo(o2.getBeginPeroid());
+                        }
+                    }
+                });
+                //判断开始结束时间是否是连续的
+                Integer lastEndPeriod;
+                for(ProjExtRateReq projExtRateReq:rateReqs){
+
+                }
+
+
+            }
+
+
+
+
+
+
+
+
         }
 
 
@@ -1908,6 +1954,53 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
     public static void main(String[] args) {
 
+
+
+        List<ProjExtRateReq> rateReqs = new LinkedList<>();
+
+        ProjExtRateReq rateReq = new ProjExtRateReq();
+        rateReqs.add(rateReq);
+        rateReq.setRateType(70);
+        rateReq.setRateValue(new BigDecimal(0.5));
+        rateReq.setCalcWay(1);
+        rateReq.setFeeId("79069922-e13a-4229-8656-2a1e19b44879");
+        rateReq.setBeginPeroid(1);
+
+
+        ProjExtRateReq rateReq1 = new ProjExtRateReq();
+        rateReqs.add(rateReq1);
+        rateReq1.setRateType(70);
+        rateReq1.setRateValue(new BigDecimal(0.5));
+        rateReq1.setCalcWay(1);
+        rateReq1.setFeeId("79069922-e13a-4229-8656-2a1e19b44879");
+        rateReq1.setBeginPeroid(3);
+
+        ProjExtRateReq rateReq2 = new ProjExtRateReq();
+        rateReqs.add(rateReq2);
+        rateReq2.setRateType(70);
+        rateReq2.setRateValue(new BigDecimal(0.5));
+        rateReq2.setCalcWay(1);
+        rateReq2.setFeeId("79069922-e13a-4229-8656-2a1e19b44879");
+        rateReq2.setBeginPeroid(2);
+
+
+
+        Collections.sort(rateReqs, new Comparator<ProjExtRateReq>() {
+            @Override
+            public int compare(ProjExtRateReq o1, ProjExtRateReq o2) {
+                if(o1.getBeginPeroid().compareTo(o2.getBeginPeroid())==0){
+                    return Integer.valueOf(o1.getBeginPeroid().compareTo(o2.getBeginPeroid()));
+                }else{
+                    return o1.getBeginPeroid().compareTo(o2.getBeginPeroid());
+                }
+            }
+        });
+
+        System.out.println(JSON.toJSONString(rateReqs));
+
+
+
+
 //        BigDecimal t1 = new BigDecimal(7415.8400000);
 //        t1= t1.setScale(2,BigDecimal.ROUND_HALF_DOWN);
 //
@@ -1932,9 +2025,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 //        projTBAmount= projTBAmount.setScale(2,BigDecimal.ROUND_HALF_DOWN);
 //
 //        System.out.println(projTBAmount);
- System.out.println(UUID.randomUUID().toString());
- System.out.println(UUID.randomUUID().toString());
- System.out.println(UUID.randomUUID().toString());
+// System.out.println(UUID.randomUUID().toString());
+// System.out.println(UUID.randomUUID().toString());
+// System.out.println(UUID.randomUUID().toString());
 //
 //        String periodStr=(new DecimalFormat("00")).format(120);
 //        System.out.println(periodStr);
