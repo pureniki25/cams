@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
  * @author 胡伟骞
  * @since 2018-05-26
  */
-@Service
+@Service("ProjExtRateService")
 public class ProjExtRateServiceImpl extends BaseServiceImpl<ProjExtRateMapper, ProjExtRate> implements ProjExtRateService {
 
 }

@@ -1359,4 +1359,12 @@ public class ProjInfoReq {
     public void setCooperativeTdComAmount(BigDecimal cooperativeTdComAmount) {
         this.cooperativeTdComAmount = cooperativeTdComAmount;
     }
+
+    public List<ProjExtRateReq> getProjExtRateReqs() {
+        return projExtRateReqs;
+    }
+
+    public void setProjExtRateReqs(List<ProjExtRateReq> projExtRateReqs) {
+        this.projExtRateReqs = projExtRateReqs;
+    }
 }
