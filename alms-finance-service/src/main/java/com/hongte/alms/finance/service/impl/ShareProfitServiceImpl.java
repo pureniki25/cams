@@ -845,8 +845,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		planList.setFinanceComfirmDate(new Date());
 		planList.setFinanceConfirmUserName(loginUserInfoHelper.getLoginInfo().getUserName());
 		planList.updateById();
-		
-		confirmLog.get().setProjPlanJson(JSON.toJSONString(projListDetails));
+		System.out.println(JSON.toJSONString(projListDetails.get()));
+		confirmLog.get().setProjPlanJson(JSON.toJSONString(projListDetails.get()));
 		confirmLog.get().insert();
 	}
 }

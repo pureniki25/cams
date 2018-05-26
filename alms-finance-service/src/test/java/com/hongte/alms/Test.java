@@ -15,6 +15,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.alibaba.fastjson.JSON;
 import com.hongte.alms.base.dto.ConfirmRepaymentReq;
+import com.hongte.alms.base.service.RepaymentConfirmLogService;
 import com.hongte.alms.base.vo.finance.CurrPeriodRepaymentInfoVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.finance.FinanceServiceApplication;
@@ -32,9 +33,12 @@ public class Test {
 	@Qualifier("FinanceService")
 	private FinanceService financeService ;
 	
+	@Autowired
+	@Qualifier("RepaymentConfirmLogService")
+	private RepaymentConfirmLogService confirmLogService ;
+	
 	@org.junit.Test
 	public void Test() {
-		CurrPeriodRepaymentInfoVO  info = financeService.getCurrPeriodRepaymentInfoVO("TDF1012018032101", "1-01");
-		System.out.println(JSON.toJSONString(info));
+		Result result = confirmLogService.revokeConfirm("TDF1012018032101", "1-01");
 	}
 }

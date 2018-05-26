@@ -37,7 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author 王继光
  * @since 2018-05-25
  */
-@Service
+@Service("RepaymentConfirmLogService")
 public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentConfirmLogMapper, RepaymentConfirmLog> implements RepaymentConfirmLogService {
 
 	@Autowired
@@ -115,7 +115,7 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 			if (resource!=null) {
 				resource.deleteById();
 			}
-			factRepay.deleteById();
+			repaymentProjFactRepayMapper.delete(new EntityWrapper<RepaymentProjFactRepay>().eq("proj_plan_detail_repay_id", factRepay.getProjPlanDetailRepayId()));
 		}
 		
 		RepaymentBizPlanList planList = new RepaymentBizPlanList() ;
@@ -166,11 +166,12 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 			planList.setRepayFlag(RepayedFlag.REPAYING.getKey());
 		}
 		planList.setFactRepayDate(lastRepaymentResource==null?null:lastRepaymentResource.getRepayDate());
-		planList.setFinanceComfirmDate(lastLog.getCreateTime());
-		planList.setFinanceConfirmUser(lastLog.getCreateUser());
-		planList.setFinanceConfirmUserName(lastLog.getCreateUserName());
+		planList.setFinanceComfirmDate(lastLog==null?null:lastLog.getCreateTime());
+		planList.setFinanceConfirmUser(lastLog==null?null:lastLog.getCreateUser());
+		planList.setFinanceConfirmUserName(lastLog==null?null:lastLog.getCreateUserName());
+		planList.updateById();
 		
-		
-		return null;
+		log.deleteById();
+		return Result.success();
 	}
 }

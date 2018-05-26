@@ -58,6 +58,7 @@ import com.hongte.alms.base.mapper.MoneyPoolRepaymentMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListDetailMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanMapper;
+import com.hongte.alms.base.mapper.RepaymentConfirmLogMapper;
 import com.hongte.alms.base.mapper.RepaymentProjFactRepayMapper;
 import com.hongte.alms.base.mapper.RepaymentProjPlanListDetailMapper;
 import com.hongte.alms.base.mapper.RepaymentProjPlanListMapper;
@@ -112,7 +113,8 @@ public class FinanceServiceImpl implements FinanceService {
 	ProcessMapper processMapper;
 	@Autowired
 	AccountantOverRepayLogMapper accountantOverRepayLogMapper;
-
+	@Autowired
+	RepaymentConfirmLogMapper confirmLogMapper ;
 	
 	@Autowired
 	MoneyPoolRepaymentMapper moneyPoolRepaymentMapper;
@@ -297,6 +299,7 @@ public class FinanceServiceImpl implements FinanceService {
 			}
 		}
 
+		
 		List<RepaymentProjFactRepay> factRepays = repaymentProjFactRepayMapper
 				.selectList(new EntityWrapper<RepaymentProjFactRepay>().in("repay_ref_id", ids).orderBy("create_date")
 						.orderBy("repay_ref_id"));

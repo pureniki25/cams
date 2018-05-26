@@ -47,6 +47,7 @@ import com.hongte.alms.base.service.BizOutputRecordService;
 import com.hongte.alms.base.service.MoneyPoolRepaymentService;
 import com.hongte.alms.base.service.MoneyPoolService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
+import com.hongte.alms.base.service.RepaymentConfirmLogService;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.base.vo.finance.CurrPeriodRepaymentInfoVO;
@@ -99,6 +100,9 @@ public class FinanceController {
 	@Autowired
 	@Qualifier("ShareProfitService")
 	private ShareProfitService shareService;
+	@Autowired
+	@Qualifier("RepaymentConfirmLogService")
+	private RepaymentConfirmLogService confrimLogService;
 
 	@GetMapping(value = "/repayBaseInfo")
 	@ApiOperation(value = "获取还款基本信息")
@@ -443,6 +447,21 @@ public class FinanceController {
 		} catch (Exception e) {
 			logger.error("根据源业务编号获取还款计划信息失败--[{}]", e);
 			return Result.error("-500", "系统异常，获取还款计划信息失败");
+		}
+	}
+	
+	@GetMapping(value = "/revokeConfirm")
+	@ApiOperation(value = "撤销还款确认")
+	public Result revokeConfirm(String businessId,String afterId) {
+		try {
+			logger.info("@revokeConfirm@撤销还款确认--开始[{}]", businessId,afterId);
+			Result result = null;
+			result = confrimLogService.revokeConfirm(businessId, afterId);
+			logger.info("@revokeConfirm@撤销还款确认--结束[{}]", result);
+			return result;
+		} catch (Exception e) {
+			logger.error("撤销还款确认失败--[{}]", e);
+			return Result.error("-500", "系统异常:撤销还款确认失败");
 		}
 	}
 	
