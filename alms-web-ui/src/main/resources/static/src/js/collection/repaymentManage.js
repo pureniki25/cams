@@ -111,10 +111,10 @@ window.layinit(function(htConfig){
                                 keyName:vm.searchForm.keyName, 
                                 showRepayDateBegin:dateObj.showRepayDateBegin, //应还日期  开始
                                 showRepayDateEnd:dateObj.showRepayDateEnd,  //应还日期 结束
-                                // showRepayDateRange:vm.searchForm.showRepayDateRange,//应还日期 区间 包含开始和结束时间
+//                                 showRepayDateRange:vm.searchForm.showRepayDateRange,//应还日期 区间 包含开始和结束时间
                                 realRepayDateBegin:dateObj.realRepayDateBegin, //实还日期 开始
                                 realRepayDateEnd:dateObj.realRepayDateEnd, //实还日期 结束
-                                // realRepayDateRange:vm.searchForm.realRepayDateRange,//实还日期  区间 包含开始和结束时间
+//                                 realRepayDateRange:vm.searchForm.realRepayDateRange,//实还日期  区间 包含开始和结束时间
 
                                 delayDaysBegin:vm.searchForm.delayDaysBegin,    //逾期天数 开始
                                 delayDaysEnd:vm.searchForm.delayDaysEnd, //逾期天数 结束
