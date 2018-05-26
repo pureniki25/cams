@@ -577,6 +577,8 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
         }
 
+        //标的额外费率信息校验
+
 //        TuandaiProjectCar
 
 

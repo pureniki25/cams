@@ -407,7 +407,7 @@ public class RepayPlanController {
     @ApiOperation(value = "根据业务ID列表查找出业务账单列表")
     @PostMapping("/getRepayList")
     @ResponseBody
-   public Result<List<BizDto>> getRepayList(@RequestParam(value = "businessIds")List<String> businessIds){
+   public Result<List<BizDto>> getRepayList(@RequestBody List<String> businessIds){
         logger.info("根据业务ID列表查找出业务账单列表，业务ID列表：[{}]", JSON.toJSONString(businessIds));
 
        List<BizDto> bizDtos = new LinkedList<>();
