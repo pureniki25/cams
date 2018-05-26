@@ -3,6 +3,7 @@ package com.hongte.alms.base.RepayPlan.req;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -18,14 +19,17 @@ public class CreatRepayPlanReq {
      * 业务的基本信息
      */
     @ApiModelProperty(required= true,value = "业务基本信息")
+    @NotNull(message = "业务基本信息(businessBasicInfoReq)不能为空")
     private BusinessBasicInfoReq businessBasicInfoReq;
 
 
     @ApiModelProperty(required= true,value = "业务用户信息列表")
+    @NotNull(message = "业务用户信息列表(bizCusInfoReqs)不能为空")
     private List<BusinessCustomerInfoReq> bizCusInfoReqs;
 
-    @ApiModelProperty(value = "业务额外的费率信息列表")
-    private List<BusinessExtRateReq>  bizExtRateReqs;
+//    @ApiModelProperty(value = "业务额外的费率信息列表")
+//    @NotNull(message = "业务额外的费率信息列表(bizExtRateReqs)不能为空")
+//    private List<BusinessExtRateReq>  bizExtRateReqs;
 
 
     /**
@@ -52,10 +56,12 @@ public class CreatRepayPlanReq {
      7：断言请求的操作具有精确的结果，因此不需要舍入
      */
     @ApiModelProperty(required= true,value = "进位方式标志位 0：进一位，1：不进位，4：四舍五入 ")
+    @NotNull(message = "进位方式标志位(rondmode)不能为空")
     private Integer rondmode;
 
 
     @ApiModelProperty(required= true,value = "计算保留的小数位数")
+    @NotNull(message = "计算保留的小数位数(smallNum)不能为空")
     private Integer smallNum;
 
 
@@ -126,11 +132,11 @@ public class CreatRepayPlanReq {
         this.bizCusInfoReqs = bizCusInfoReqs;
     }
 
-    public List<BusinessExtRateReq> getBizExtRateReqs() {
-        return bizExtRateReqs;
-    }
-
-    public void setBizExtRateReqs(List<BusinessExtRateReq> bizExtRateReqs) {
-        this.bizExtRateReqs = bizExtRateReqs;
-    }
+//    public List<BusinessExtRateReq> getBizExtRateReqs() {
+//        return bizExtRateReqs;
+//    }
+//
+//    public void setBizExtRateReqs(List<BusinessExtRateReq> bizExtRateReqs) {
+//        this.bizExtRateReqs = bizExtRateReqs;
+//    }
 }

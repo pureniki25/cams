@@ -18,26 +18,26 @@ public class ProjExtRateReq {
      * 费率类型 1，
      */
     @ApiModelProperty(required= true,value = "费率类型")
-    @NotNull(message="费率类型(rateType)不能为空")
+    @NotNull(message = "费率类型(rateType)不能为空")
     private Integer rateType;
     /**
      * 费率名称
      */
     @ApiModelProperty(required= true,value = "费率名称")
-    @NotNull(message="费率名称(rateName)不能为空")
+    @NotNull(message = "费率名称(rateName)不能为空")
     private String rateName;
     /**
      * 费率值
      */
     @ApiModelProperty(required= true,value = "费率值")
-    @NotNull(message="费率名称(rateValue)不能为空")
+    @NotNull(message = "费率值(rateValue)不能为空")
     private BigDecimal rateValue;
 
     /**
      * 费用计算方式
      */
     @ApiModelProperty(required= true,value = "费用计算方式")
-    @NotNull(message="费用计算方式(calcWay)不能为空")
+    @NotNull(message = "费用计算方式(calcWay)不能为空")
     private Integer calcWay;
     /**
      * 资产端费用项ID
@@ -56,16 +56,14 @@ public class ProjExtRateReq {
     /**
      * 开始期数
      */
-    @ApiModelProperty(required= true,value = "开始期数")
-    @NotNull(message="开始期数(beginPeroid)不能为空")
+    @ApiModelProperty(value = "开始期数")
     private Integer beginPeroid;
 
 
     /**
      * 结束期数
      */
-    @ApiModelProperty(required= true,value = "结束期数")
-    @NotNull(message="结束期数(endPeroid)不能为空")
+    @ApiModelProperty(value = "结束期数")
     private  Integer  endPeroid;
 
 
