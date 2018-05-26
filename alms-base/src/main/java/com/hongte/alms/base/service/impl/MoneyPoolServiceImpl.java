@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo;
+import com.hongte.alms.base.dto.ConfirmRepaymentReq;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.entity.MoneyPool;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
@@ -29,6 +30,7 @@ import com.hongte.alms.common.vo.RequestData;
 import com.hongte.alms.common.vo.ResponseData;
 import com.hongte.alms.common.vo.ResponseEncryptData;
 import com.ht.ussp.bean.LoginUserInfoHelper;
+import com.mysql.cj.x.protobuf.MysqlxDatatypes.Scalar.String;
 
 import feign.Feign;
 
@@ -472,5 +474,11 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 		
 		return repayment;
 		
+	}
+
+	@Override
+	public void confirmRepaid(ConfirmRepaymentReq req) {
+		List<MoneyPoolRepayment> moneyPoolRepayments = moneyPoolRepaymentMapper.selectBatchIds(req.getMprIds());
+		List<String> mpids = new ArrayList<>();
 	}
 }

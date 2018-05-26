@@ -3,6 +3,7 @@ package com.hongte.alms.base.service;
 import java.util.List;
 
 import com.baomidou.mybatisplus.plugins.Page;
+import com.hongte.alms.base.dto.ConfirmRepaymentReq;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.entity.MoneyPool;
 import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
@@ -29,4 +30,11 @@ public interface MoneyPoolService extends BaseService<MoneyPool> {
 	Result updateCustomerRepayment(RepaymentRegisterInfoDTO registerInfoDTO);
 	Result deleteCustermerRepayment(RepaymentRegisterInfoDTO registerInfoDTO);
 	Result matchBankStatement(List<MoneyPool> moneyPools,String businessId,String afterId);
+	/**
+	 * 财务确认后修改流水状态
+	 * @author 王继光
+	 * 2018年5月26日 下午4:58:28
+	 * @param req
+	 */
+	void confirmRepaid(ConfirmRepaymentReq req);
 }
