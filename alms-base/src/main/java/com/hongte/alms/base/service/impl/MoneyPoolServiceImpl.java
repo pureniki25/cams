@@ -30,12 +30,12 @@ import com.hongte.alms.common.vo.RequestData;
 import com.hongte.alms.common.vo.ResponseData;
 import com.hongte.alms.common.vo.ResponseEncryptData;
 import com.ht.ussp.bean.LoginUserInfoHelper;
-import com.mysql.cj.x.protobuf.MysqlxDatatypes.Scalar.String;
 
 import feign.Feign;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
