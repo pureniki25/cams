@@ -84,23 +84,6 @@ public interface FinanceService {
 	 */
 	public List<MatchedMoneyPoolVO> selectConfirmedBankStatement(String businessId, String afterId);
 
-	/**
-	 * 预览确认还款后的信息
-	 * @author 王继光
-	 * 2018年5月15日 下午9:04:29
-	 * @param req
-	 * @return
-	 */
-	public Result previewConfirmRepayment(ConfirmRepaymentReq req) ;
-
-	/**
-	 * 确认还款
-	 * @author 王继光
-	 * 2018年5月15日 下午9:05:33
-	 * @param req
-	 * @return
-	 */
-	public Result confirmRepayment(ConfirmRepaymentReq req);
 	
 	/**
      * 根据源业务编号获取还款计划信息
@@ -109,10 +92,6 @@ public interface FinanceService {
      */
     Map<String, Object> queryRepaymentPlanInfoByBusinessId(String businessId);
     
-    /**
-     * 根据源业务编号获取还款计划信息
-     * @param planListId
-     * @return
-     */
-    Map<String, Object> queryRepaymentProjInfoByPlanListId(String planListId);
+    
+    
 }

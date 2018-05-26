@@ -111,7 +111,7 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
      */
 	@TableField("repay_status")
 	@ApiModelProperty(required= true,value = "部分还款状态子状态,null:未还款,1:部分还款,2:线上已还款,3:全部已还款")
-	private String repayStatus;
+	private Integer repayStatus;
 	
     /**
      * 已还款类型标记，null或0：还款中，6：申请展期已还款，10：线下确认已还款，20：自动线下代扣已还款，21，人工线下代扣已还款，30：自动银行代扣已还款，31：人工银行代扣已还款，40：用户APP主动还款，50：线下财务确认全部结清，60：线下代扣全部结清，70：银行代扣全部结清
@@ -550,5 +550,19 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 	 */
 	public void setDerateAmount(BigDecimal derateAmount) {
 		this.derateAmount = derateAmount;
+	}
+
+	/**
+	 * @return the repayStatus
+	 */
+	public Integer getRepayStatus() {
+		return repayStatus;
+	}
+
+	/**
+	 * @param repayStatus the repayStatus to set
+	 */
+	public void setRepayStatus(Integer repayStatus) {
+		this.repayStatus = repayStatus;
 	}
 }

@@ -387,11 +387,34 @@ public class FinanceController {
 	public Result previewConfirmRepayment(@RequestBody ConfirmRepaymentReq req) {
 		Result result ;
 		logger.info("@previewConfirmRepayment@预览确认还款拆标情况--开始[{}]",req);
-//		result = financeService.previewConfirmRepayment(req);
-		List<CurrPeriodProjDetailVO> detailVOs = shareService.execute(req, false);
-//		logger.info("@previewConfirmRepayment@预览确认还款拆标情况--结束[{}]",result);
-		return Result.success(detailVOs) ;
+		try {
+			List<CurrPeriodProjDetailVO> detailVOs = shareService.execute(req, false);
+			result = Result.success(detailVOs);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			result = Result.error("500", e.getMessage());
+		}
+		logger.info("@previewConfirmRepayment@预览确认还款拆标情况--结束[{}]",result);
+		return result ;
 	}
+	
+	@PostMapping(value="/confirmRepayment")
+	@ApiOperation(value="预览确认还款拆标情况")
+	public Result confirmRepayment(@RequestBody ConfirmRepaymentReq req) {
+		Result result ;
+		logger.info("@confirmRepayment@确认还款拆标情况--开始[{}]",req);
+		try {
+			List<CurrPeriodProjDetailVO> detailVOs = shareService.execute(req, true);
+			result = Result.success(detailVOs);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			result = Result.error("500", e.getMessage());
+			e.printStackTrace();
+		}
+		logger.info("@confirmRepayment@确认还款拆标情况--结束[{}]",result);
+		return result ;
+	}
+	
 	
 	@GetMapping(value="/getSurplusFund")
 	@ApiOperation(value="获取结余情况")

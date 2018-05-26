@@ -554,4 +554,29 @@
 		  AND rbpl.orig_business_id = #{businessId,jdbcType=VARCHAR} 
 		GROUP BY rbpl.`plan_list_id` 
     </select>
+    
+    <select id="caluBizPlanListUnpaid" resultType="java.math.BigDecimal">
+	    SELECT
+			( IFNULL( SUM( proj_plan_amount ), 0 ) - IFNULL( SUM( derate_amount ), 0 ) ) - ( IFNULL( SUM( proj_fact_amount ), 0 ) ) 
+		FROM
+			tb_repayment_proj_plan_list_detail 
+		WHERE
+			plan_list_id = #{planListId};
+    </select>
+    <select id="caluBizPlanListFactAmount" resultType="java.math.BigDecimal">
+	    SELECT
+			IFNULL( SUM( proj_fact_amount ), 0 ) 
+		FROM
+			tb_repayment_proj_plan_list_detail 
+		WHERE
+			plan_list_id = #{planListId};
+    </select>
+    <select id="caluBizPlanListPlanAmount" resultType="java.math.BigDecimal">
+	    SELECT
+			( IFNULL( SUM( proj_plan_amount ), 0 ) - IFNULL( SUM( derate_amount ), 0 ) ) 
+		FROM
+			tb_repayment_proj_plan_list_detail 
+		WHERE
+			plan_list_id = #{planListId};
+    </select>
 </mapper>

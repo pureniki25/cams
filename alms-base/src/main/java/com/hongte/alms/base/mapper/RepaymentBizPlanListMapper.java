@@ -7,6 +7,7 @@ import com.hongte.alms.base.vo.module.FinanceManagerListVO;
 import com.hongte.alms.common.mapper.SuperMapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -73,4 +74,29 @@ public interface RepaymentBizPlanListMapper extends SuperMapper<RepaymentBizPlan
      * @return
      */
     List<RepaymentPlanInfoDTO> queryRepaymentPlanInfoByBusinessId(@Param(value = "businessId") String businessId);
+    
+    /**
+     * 计算业务还款计划应还金额(已减去减免)
+     * @author 王继光
+     * 2018年5月26日 下午3:01:53
+     * @param planListId
+     * @return
+     */
+    BigDecimal caluBizPlanListPlanAmount(String planListId);
+    /**
+     * 计算业务还款计划实还金额
+     * @author 王继光
+     * 2018年5月26日 下午3:02:25
+     * @param planListId
+     * @return
+     */
+    BigDecimal caluBizPlanListFactAmount(String planListId);
+    /**
+     * 计算业务还款计划未还金额
+     * @author 王继光
+     * 2018年5月26日 下午3:02:41
+     * @param planListId
+     * @return
+     */
+    BigDecimal caluBizPlanListUnpaid(String planListId);
 }

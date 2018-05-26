@@ -33,4 +33,22 @@ public interface RepaymentProjPlanListMapper extends SuperMapper<RepaymentProjPl
 	 * @return
 	 */
 	RepaymentProjPlanList selectByProjectIDAndAfterId(String projectId,String afterId) ;
+	
+	/**
+	 * 计算某个proj_plan_list的总实还
+	 * @author 王继光
+	 * 2018年5月26日 下午2:40:25
+	 * @param projPlanListId
+	 * @return
+	 */
+	BigDecimal caluProjPlanListFactAmount(String projPlanListId);
+	
+	/**计算某个proj_plan_list的总应还(已减去减免)
+	 * @author 王继光
+	 * 2018年5月26日 下午2:41:10
+	 * @param projPlanListId
+	 * @return
+	 */
+	BigDecimal caluProjPlanListPlanAmount(String projPlanListId);
+	
 }

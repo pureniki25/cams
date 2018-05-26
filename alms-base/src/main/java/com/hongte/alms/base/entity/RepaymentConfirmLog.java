@@ -77,6 +77,12 @@ public class RepaymentConfirmLog extends Model<RepaymentConfirmLog> {
 	@TableField("create_user")
 	@ApiModelProperty(required= true,value = "创建人")
 	private String createUser;
+	/**
+     * 创建人
+     */
+	@TableField("create_user_name")
+	@ApiModelProperty(required= true)
+	private String createUserName;
     /**
      * 更新时间
      */
@@ -199,5 +205,19 @@ public class RepaymentConfirmLog extends Model<RepaymentConfirmLog> {
 			", updateTime=" + updateTime +
 			", updateUser=" + updateUser +
 			"}";
+	}
+
+	/**
+	 * @return the createUserName
+	 */
+	public String getCreateUserName() {
+		return createUserName;
+	}
+
+	/**
+	 * @param createUserName the createUserName to set
+	 */
+	public void setCreateUserName(String createUserName) {
+		this.createUserName = createUserName;
 	}
 }

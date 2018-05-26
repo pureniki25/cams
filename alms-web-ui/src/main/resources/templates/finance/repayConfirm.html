@@ -139,19 +139,19 @@
                     </row>
                     <row>
                         <i-col span="6">结余</i-col>
-                        <i-col span="6">{{factRepayPreview.subtotal}}</i-col>
+                        <i-col span="6">{{factRepayPreview.surplus}}</i-col>
                         <i-col span="6"></i-col>
                         <i-col span="6"></i-col>
                     </row>
                     <row>
                         <i-col span="6">合计</i-col>
-                        <i-col span="6">{{factRepayPreview.total}}</i-col>
+                        <i-col span="6">{{factRepayPreview.total+factRepayPreview.surplus}}</i-col>
                         <i-col span="6"></i-col>
                         <i-col span="6"></i-col>
                     </row>
                     <row>
                         <i-col span="6">备注</i-col>
-                        <i-col span="6"><i-input type="textarea"></i-input></i-col>
+                        <i-col span="6"><i-input type="textarea" v-model="factRepaymentInfo.remark"></i-input></i-col>
                         <i-col span="6"></i-col>
                         <i-col span="6"></i-col>
                     </row>
@@ -164,8 +164,8 @@
         <row>
             <i-col span="22">&nbsp;</i-col>
             <i-col span="2">
-                <i-button>提交</i-button>
-                <i-button>关闭</i-button>
+                <i-button @click="confirmRepayment()">提交</i-button>
+                <i-button @clcik="window.history.go(-1)">关闭</i-button>
             </i-col>
         </row>
         <Modal v-model="manualAddBankSatements.show" :closable=false>

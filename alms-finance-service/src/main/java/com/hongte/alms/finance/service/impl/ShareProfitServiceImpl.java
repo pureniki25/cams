@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import com.hongte.alms.base.RepayPlan.dto.*;
 import org.slf4j.Logger;
@@ -21,13 +22,17 @@ import com.hongte.alms.base.entity.MoneyPoolRepayment;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
+import com.hongte.alms.base.entity.RepaymentConfirmLog;
 import com.hongte.alms.base.entity.RepaymentProjFactRepay;
 import com.hongte.alms.base.entity.RepaymentProjPlan;
 import com.hongte.alms.base.entity.RepaymentProjPlanList;
 import com.hongte.alms.base.entity.RepaymentProjPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentResource;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
+import com.hongte.alms.base.enums.RepayedFlag;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
+import com.hongte.alms.base.enums.repayPlan.SectionRepayStatusEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.mapper.AccountantOverRepayLogMapper;
 import com.hongte.alms.base.mapper.ApplyDerateProcessMapper;
@@ -101,16 +106,12 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	RepaymentProjFactRepayService repaymentProjFactRepayService;
 
 	private ThreadLocal<String> businessId = new ThreadLocal<String>();
-	private ThreadLocal<List<CurrPeriodProjDetailVO>> projListDetails = new ThreadLocal<List<CurrPeriodProjDetailVO>>();
-	// private List<CurrPeriodProjDetailVO> projListDetails = new ArrayList<>();
-	private ThreadLocal<List<RepaymentResource>> repaymentResources = new ThreadLocal<List<RepaymentResource>>();
-	// private List<RepaymentResource> repaymentResources = new ArrayList<>();
-	// private RepaymentBizPlanDto repaymentBizPlanDto ;
-	// private String businessId;
-	// private String afterId;
+	private ThreadLocal<String> orgBusinessId = new ThreadLocal<String>();
 	private ThreadLocal<String> afterId = new ThreadLocal<String>();
+	private ThreadLocal<List<CurrPeriodProjDetailVO>> projListDetails = new ThreadLocal<List<CurrPeriodProjDetailVO>>();
+	private ThreadLocal<List<RepaymentResource>> repaymentResources = new ThreadLocal<List<RepaymentResource>>();
 	private ThreadLocal<RepaymentBizPlanDto> planDto = new ThreadLocal<RepaymentBizPlanDto>();
-	// private RepaymentBizPlanDto planDto;
+	
 	/**
 	 * 总应还金额
 	 */
@@ -119,25 +120,21 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	 * 总实还金额
 	 */
 	private ThreadLocal<BigDecimal> repayFactAmount = new ThreadLocal<BigDecimal>();
-	// private BigDecimal repayFactAmount ;
 	/**
 	 * 总银行流水金额
 	 */
 	private ThreadLocal<BigDecimal> moneyPoolAmount = new ThreadLocal<BigDecimal>();
-	// private BigDecimal moneyPoolAmount ;
 	/**
 	 * 本次还款后,结余金额
 	 */
 	private ThreadLocal<BigDecimal> surplusAmount = new ThreadLocal<BigDecimal>();
-	// private BigDecimal surplusAmount;
 	/**
 	 * 本次还款后,缺多少金额
 	 */
 	private ThreadLocal<BigDecimal> lackAmount = new ThreadLocal<BigDecimal>();
-	// private BigDecimal lackAmount;
 	private ThreadLocal<Boolean> save = new ThreadLocal<Boolean>();
-	// private Boolean save;
-
+	private ThreadLocal<RepaymentConfirmLog> confirmLog = new ThreadLocal<RepaymentConfirmLog>();
+	private ThreadLocal<List<Integer>> repaySource = new ThreadLocal<List<Integer>>();
 	private void initVariable(ConfirmRepaymentReq req) {
 		businessId.set(req.getBusinessId());
 		afterId.set(req.getAfterId());
@@ -148,6 +145,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		moneyPoolAmount.set(new BigDecimal(0));
 		surplusAmount.set(new BigDecimal(0));
 		lackAmount.set(new BigDecimal(0));
+		repaySource.set(req.getRepaySource());
+		confirmLog.set(createConfirmLog());
 	}
 
 	@Override
@@ -192,10 +191,12 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			logger.info("lackAmount={}",lackAmount.get());
 		}
 		caluProportion(planDto.get());
-//		divideMoney(repayFactAmount.get(), planDto.get());
 		divideOveryDueMoney(req.getOfflineOverDue(), planDto.get(), false);
 		divideOveryDueMoney(req.getOnlineOverDue(), planDto.get(), true);
 		fill();
+		if (save) {
+			updateStatus();
+		}
 		System.out.println(JSON.toJSONString(projListDetails));
 		return projListDetails.get();
 	}
@@ -221,6 +222,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 				RepaymentResource repaymentResource = new RepaymentResource();
 				repaymentResource.setAfterId(moneyPoolRepayment.getAfterId());
 				repaymentResource.setBusinessId(moneyPoolRepayment.getOriginalBusinessId());
+				repaymentResource.setOrgBusinessId(moneyPoolRepayment.getOriginalBusinessId());
 				repaymentResource.setCreateDate(new Date());
 				repaymentResource.setCreateUser(loginUserInfoHelper.getUserId());
 				repaymentResource.setIsCancelled(0);
@@ -288,6 +290,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		RepaymentBizPlan repaymentBizPlan = new RepaymentBizPlan();
 		repaymentBizPlan.setBusinessId(req.getBusinessId());
 		repaymentBizPlan = repaymentBizPlanMapper.selectOne(repaymentBizPlan);
+		orgBusinessId.set(repaymentBizPlan.getOriginalBusinessId());
 		repaymentBizPlanDto.setRepaymentBizPlan(repaymentBizPlan);
 
 		List<RepaymentBizPlanList> repaymentBizPlanLists = repaymentBizPlanListMapper
@@ -585,19 +588,19 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 						case 20:
 						case 30:
 						case 50:
-							createProjFactRepay(money, detail, currPeriodProjDetailVO);
+							createProjFactRepay(money, detail, currPeriodProjDetailVO,resource);
 							break;
 						case 60:
 							if (detail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
-								createProjFactRepay(money, detail, currPeriodProjDetailVO);
+								createProjFactRepay(money, detail, currPeriodProjDetailVO,resource);
 							}
 							if (detail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
-								createProjFactRepay(money, detail, currPeriodProjDetailVO);
+								createProjFactRepay(money, detail, currPeriodProjDetailVO,resource);
 							}
 							break;
 						default:
 							logger.info("又或者难道是这里!!!");
-							createProjFactRepay(money, detail, currPeriodProjDetailVO);
+							createProjFactRepay(money, detail, currPeriodProjDetailVO,resource);
 							break;
 						}
 					}
@@ -665,41 +668,185 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	 * @return
 	 */
 	private RepaymentProjFactRepay createProjFactRepay(BigDecimal divideAmount, RepaymentProjPlanListDetail detail,
-			CurrPeriodProjDetailVO vo) {
+			CurrPeriodProjDetailVO vo,RepaymentResource resource) {
 			RepaymentProjFactRepay fact = new RepaymentProjFactRepay();
 			fact.setAfterId(afterId.get());
 			fact.setBusinessId(businessId.get());
 			fact.setCreateDate(new Date());
 			fact.setCreateUser(loginUserInfoHelper.getUserId());
 			fact.setOrigBusinessId(detail.getOrigBusinessId());
+			fact.setProjectId(vo.getProject());
 			fact.setPeriod(detail.getPeriod());
 			fact.setPlanItemName(detail.getPlanItemName());
 			fact.setPlanItemType(detail.getPlanItemType());
 			fact.setPlanListId(detail.getPlanListId());
 			fact.setProjPlanDetailId(detail.getProjPlanDetailId());
 			fact.setProjPlanListId(detail.getProjPlanListId());
-			fact.setFactRepayDate(null);// 还款来源日期
-			fact.setRepayRefId(null);// 还款来源id
-			fact.setRepaySource(null);// 还款来源类别
-			
+			fact.setFactRepayDate(resource.getRepayDate());// 还款来源日期
+			fact.setRepayRefId(resource.getRepaySourceRefId());// 还款来源id
+			fact.setRepaySourceId(resource.getResourceId());
+			fact.setRepaySource(Integer.valueOf(resource.getRepaySource()));// 还款来源类别
+			fact.setConfirmLogId(confirmLog.get().getConfirmLogId());
 			fact.setFactAmount(divideAmount);
 			detail.setProjFactAmount(detail.getProjFactAmount().add(divideAmount));
 			rendCurrPeriodProjDetailVO(divideAmount, detail, vo);
 			if (save.get()) {
+				fact.setProjPlanDetailRepayId(UUID.randomUUID().toString());
 				fact.insert();
-				
-				
+				detail.setRepaySource(Integer.valueOf(resource.getRepaySource()));
+				detail.setFactRepayDate(resource.getRepayDate());
+				detail.setUpdateDate(new Date());
+				detail.setUpdateUser(loginUserInfoHelper.getUserId());
 				detail.updateById();
 			}
 			
 			return fact ;
 	}
 	
-	private void updateStatus() {
-		for (RepaymentProjPlanDto projPlanDto : planDto.get().getProjPlanDtos()) {
-			for (RepaymentProjPlanListDto projPlanListDto : projPlanDto.getProjPlanListDtos()) {
-				
+	private RepaymentConfirmLog createConfirmLog() {
+		RepaymentConfirmLog repaymentConfirmLog = new RepaymentConfirmLog();
+		repaymentConfirmLog.setAfterId(afterId.get());
+		repaymentConfirmLog.setBusinessId(businessId.get());
+		repaymentConfirmLog.setCanRevoke(1);
+		repaymentConfirmLog.setConfirmLogId(UUID.randomUUID().toString());
+		repaymentConfirmLog.setCreateTime(new Date());
+		repaymentConfirmLog.setCreateUser(loginUserInfoHelper.getUserId());
+		List<RepaymentConfirmLog> repaymentConfirmLogs = repaymentConfirmLog.selectList(new EntityWrapper<>().eq("business_id", businessId.get()).eq("after_id",afterId.get()).orderBy("`index`",false));
+		if (repaymentConfirmLogs==null) {
+			repaymentConfirmLog.setIndex(1);
+		}else {
+			if (repaymentConfirmLogs.size()==0) {
+				repaymentConfirmLog.setIndex(1);
+			}else {
+				repaymentConfirmLog.setIndex(repaymentConfirmLogs.get(0).getIndex()+1);
 			}
 		}
+		repaymentConfirmLog.setOrgBusinessId(orgBusinessId.get());
+		repaymentConfirmLog.setProjPlanJson(JSON.toJSONString(projListDetails.get()));
+		return repaymentConfirmLog;
+	}
+	
+	private List<RepaymentProjPlanListDetail> findProjPlanListDetailByPlanDetailId(String planDetailId){
+		List<RepaymentProjPlanListDetail> details = new ArrayList<>() ;
+		for (RepaymentProjPlanDto projPlanDto : planDto.get().getProjPlanDtos()) {
+			 List<RepaymentProjPlanListDto> projPlanListDtos = projPlanDto.getProjPlanListDtos();
+			 for (RepaymentProjPlanListDto projPlanListDto : projPlanListDtos) {
+				 for (RepaymentProjPlanListDetail detail : projPlanListDto.getProjPlanListDetails()) {
+					 if (detail.getPlanDetailId().equals(planDetailId)) {
+						details.add(detail);
+					}
+				}
+			}
+		}
+		return details;
+	}
+	
+	private List<RepaymentProjPlanListDetail> findProjPlanListDetailByProjPlanListId(String projPlanListId){
+		List<RepaymentProjPlanListDetail> details = new ArrayList<>() ;
+		for (RepaymentProjPlanDto projPlanDto : planDto.get().getProjPlanDtos()) {
+			 List<RepaymentProjPlanListDto> projPlanListDtos = projPlanDto.getProjPlanListDtos();
+			 for (RepaymentProjPlanListDto projPlanListDto : projPlanListDtos) {
+				 if (projPlanListDto.getRepaymentProjPlanList().getProjPlanListId().equals(projPlanListId)) {
+					details.addAll(projPlanListDto.getProjPlanListDetails());
+				}
+			}
+		}
+		return details;
+	}
+	
+	
+	private List<RepaymentProjPlanListDetail> findProjPlanListDetailByPlanList(String planListId){
+		List<RepaymentProjPlanListDetail> details = new ArrayList<>() ;
+		for (RepaymentProjPlanDto projPlanDto : planDto.get().getProjPlanDtos()) {
+			 List<RepaymentProjPlanListDto> projPlanListDtos = projPlanDto.getProjPlanListDtos();
+			 for (RepaymentProjPlanListDto projPlanListDto : projPlanListDtos) {
+				 if (projPlanListDto.getRepaymentProjPlanList().getPlanListId().equals(planListId)) {
+						details.addAll(projPlanListDto.getProjPlanListDetails());
+					}
+			}
+		}
+		return details;
+	}
+	
+	
+	private void updateStatus() {
+		
+		RepaymentBizPlanListDto planListDto = planDto.get().getBizPlanListDtos().get(0);
+		RepaymentBizPlanList planList = planListDto.getRepaymentBizPlanList();
+		List<RepaymentBizPlanListDetail> planListDetails = planListDto.getBizPlanListDetails();
+		boolean item10Repaid = false ;
+		boolean item20Repaid = false ;
+		boolean item30Repaid = false ;
+		boolean item50Repaid = false ;
+		boolean onlineOverDueRepaid = false ;
+		BigDecimal planAmount = planList.getTotalBorrowAmount();
+		BigDecimal derateAmount = planList.getDerateAmount();
+		BigDecimal factAmount = new BigDecimal(0);
+		
+		for (RepaymentBizPlanListDetail planListDetail : planListDetails) {
+			BigDecimal detailtPlanAmount = planListDetail.getPlanAmount();
+			BigDecimal detailDerateAmount = planListDetail.getDerateAmount();
+			BigDecimal detailFactAmount = new BigDecimal(0);
+			List<RepaymentProjPlanListDetail> projPlanListDetails = findProjPlanListDetailByPlanDetailId(planListDetail.getPlanDetailId());
+			Integer repaySource = null ;
+			Date repayDate = null ;
+			
+			for (RepaymentProjPlanListDetail projPlanListDetail : projPlanListDetails) {
+				repaySource = projPlanListDetail.getRepaySource();
+				repayDate = projPlanListDetail.getFactRepayDate();
+				detailFactAmount = detailFactAmount.add(projPlanListDetail.getProjFactAmount());
+			}
+			
+			if (detailFactAmount.compareTo(detailtPlanAmount.subtract(detailDerateAmount))==0) {
+				//某项还完
+				switch (planListDetail.getPlanItemType()) {
+				case 10:
+					item10Repaid = true;
+				case 20:
+					item20Repaid = true;
+				case 30:
+					item30Repaid = true;
+					break;
+				case 50:
+					item50Repaid = true;
+					break;
+				case 60:
+					if (planListDetail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
+						onlineOverDueRepaid = true;
+					}
+					break;
+				default:
+					break;
+				}
+			}
+			
+			planListDetail.setFactAmount(detailFactAmount);
+			planListDetail.setRepaySource(repaySource);
+			planListDetail.setFactRepayDate(repayDate);
+			factAmount = factAmount.add(detailFactAmount);
+			planListDetail.setFactAmount(detailFactAmount);
+			planListDetail.updateById();
+		}
+		
+		int compare = factAmount.compareTo(planAmount.subtract(derateAmount));
+		if (compare==0) {
+			planList.setCurrentStatus(RepayPlanStatus.REPAYED.getName());
+			planList.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
+			planList.setRepayFlag(RepayedFlag.CONFIRM_OFFLINE_REPAYED.getKey());
+		}else {
+			if (onlineOverDueRepaid&&item10Repaid&&item20Repaid&&item30Repaid&&item50Repaid) {
+				planList.setRepayStatus(SectionRepayStatusEnum.ONLINE_REPAID.getKey());
+			}else {
+				planList.setRepayStatus(SectionRepayStatusEnum.SECTION_REPAID.getKey());
+			}
+		}
+		planList.setConfirmFlag(1);
+		planList.setFinanceConfirmUser(loginUserInfoHelper.getUserId());
+		planList.setFinanceComfirmDate(new Date());
+		planList.setFinanceConfirmUserName(loginUserInfoHelper.getLoginInfo().getUserName());
+		planList.updateById();
+		
+		confirmLog.get().setProjPlanJson(JSON.toJSONString(projListDetails));
+		confirmLog.get().insert();
 	}
 }
