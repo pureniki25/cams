@@ -103,6 +103,9 @@ public class FinanceController {
 	@Autowired
 	@Qualifier("RepaymentConfirmLogService")
 	private RepaymentConfirmLogService confrimLogService;
+	@Autowired
+	@Qualifier("MoneyPoolService")
+	private MoneyPoolService MoneyPoolService ;
 
 	@GetMapping(value = "/repayBaseInfo")
 	@ApiOperation(value = "获取还款基本信息")
