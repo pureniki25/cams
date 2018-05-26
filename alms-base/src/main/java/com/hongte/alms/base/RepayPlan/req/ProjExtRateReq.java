@@ -15,16 +15,17 @@ import java.math.BigDecimal;
 public class ProjExtRateReq {
 
     /**
-     * 费率类型 1，
+     * 费率类型 ,70,违约金；
      */
-    @ApiModelProperty(required= true,value = "费率类型")
+    @ApiModelProperty(required= true,value = "费率类型：70,违约金")
     @NotNull(message = "费率类型(rateType)不能为空")
     private Integer rateType;
+
+
     /**
      * 费率名称
      */
-    @ApiModelProperty(required= true,value = "费率名称")
-    @NotNull(message = "费率名称(rateName)不能为空")
+    @ApiModelProperty(value = "费率名称，对应费率类型对应的名称，不填则从系统默认对应关系中取值")
     private String rateName;
     /**
      * 费率值
@@ -39,31 +40,32 @@ public class ProjExtRateReq {
     @ApiModelProperty(required= true,value = "费用计算方式")
     @NotNull(message = "费用计算方式(calcWay)不能为空")
     private Integer calcWay;
-    /**
-     * 资产端费用项ID
-     */
-    @ApiModelProperty(required= true,value = "资产端费用项ID")
+
+
+    @ApiModelProperty(required= true,value = "资产端费用项ID：违约金，79069922-e13a-4229-8656-2a1e19b44879；本金违约金， bff1558f-5a9f-4f7c-87c9-90322fd09080；" +
+            "月收服务费违约金，60e4c310-165d-4b59-beb1-66b878a51c48；平台服务费违约金，1192f59f-e5ad-4773-b785-8c41b43a4fa6")
     @NotNull(message="资产端费用项ID(feeId)不能为空")
     private String feeId;
     /**
      * 资产端费用项名称
      */
-    @ApiModelProperty(required= true,value = "资产端费用项名称")
-    @NotNull(message="资产端费用项名称(feeName)不能为空")
+    @ApiModelProperty(value = "资产端费用项名称，费用ID对应的费用项名称，不填则取系统默认对应的名称填充")
     private String feeName;
 
 
     /**
      * 开始期数
      */
-    @ApiModelProperty(value = "开始期数")
+    @ApiModelProperty(required= true,value = "开始期数")
+    @NotNull(message = "开始期数(beginPeroid)不能为空")
     private Integer beginPeroid;
 
 
     /**
      * 结束期数
      */
-    @ApiModelProperty(value = "结束期数")
+    @ApiModelProperty(required= true,value = "结束期数")
+    @NotNull(message = "结束期数(endPeroid)不能为空")
     private  Integer  endPeroid;
 
 

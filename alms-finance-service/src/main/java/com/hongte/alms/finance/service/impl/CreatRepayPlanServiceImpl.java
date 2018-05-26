@@ -120,6 +120,10 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
     private RepaymentProjFactRepayService repaymentProjFactRepayService;
 
 
+    @Autowired
+    @Qualifier("ProjExtRateService")
+    private  ProjExtRateService projExtRateService;
+
 
 
 //    @Autowired
@@ -425,172 +429,12 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
     public PlanReturnInfoDto creatAndSaveRepayPlan(CreatRepayPlanReq creatRepayPlanReq) throws IllegalAccessException, InstantiationException {
 
         //判断是否重传
-        for(ProjInfoReq projInfoReq:creatRepayPlanReq.getProjInfoReqs() ){
-            List<RepaymentProjPlan> projList =  repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("project_id",projInfoReq.getProjectId()));
+        checkResave(creatRepayPlanReq);
 
-            if(projList.size()>0){
-                for(RepaymentProjPlan projPlan:projList){
-                    if(projPlan.getActive().equals(RepayPlanActiveEnum.ACTIVE.getValue())){
-                        Integer diffDays = DateUtil.getDiffDays(projPlan.getCreateTime(),projInfoReq.getQueryFullsuccessDate());
-                        //如果同一个标的满标时间与还款计划生成的时间相差一天以内
-                        if(diffDays <= 1){
-                            throw  new CreatRepaymentExcepiton("已存在时间相近的还款计划");
-                        }
-                    }
-                }
-            }
-        }
+        //   输入数据校验
+        checkInputRep(creatRepayPlanReq);
 
-        /////////////   输入数据校验   开始 ////////////////////////
-
-        //业务基础信息校验
-        BusinessBasicInfoReq  businessBasicInfoReq = creatRepayPlanReq.getBusinessBasicInfoReq();
-        if(businessBasicInfoReq.getSourceType().equals(BusinessSourceTypeEnum.SETTLE_NEW.getValue())||
-                businessBasicInfoReq.getSourceType().equals(BusinessSourceTypeEnum.SETTLE_NEW.getValue())){
-            if(businessBasicInfoReq.getSourceBusinessId()==null){
-                throw  new CreatRepaymentExcepiton("结清再贷业务必须填写原始来源业务的业务编号");
-            }
-        }
-
-
-        //业务用户信息校验
-        List<BusinessCustomerInfoReq> bizCusInfoReqs = creatRepayPlanReq.getBizCusInfoReqs();
-        if(bizCusInfoReqs == null ||bizCusInfoReqs.size()==0){
-            throw  new CreatRepaymentExcepiton("请填写业务用户信息");
-        }
-
-
-        //判断是否有主借人  开始
-        Boolean mainBorrowPersonFlage = false;
-        for(BusinessCustomerInfoReq bizCusInfoReq:bizCusInfoReqs){
-           if(bizCusInfoReq.getIsmainCustomer().equals(BooleanEnum.YES.getValue())){
-               mainBorrowPersonFlage = true;
-               break;
-           }
-        }
-        if(!mainBorrowPersonFlage){
-            List<BasicBizCustomer> customerList =  basicBizCustomerService.selectList(
-                    new EntityWrapper<BasicBizCustomer>().eq("business_id",businessBasicInfoReq.getBusinessId()));
-            for(BasicBizCustomer basicBizCustomer:customerList){
-                if(basicBizCustomer.getIsmainCustomer().equals(BooleanEnum.YES.getValue())){
-                    mainBorrowPersonFlage = true;
-                    break;
-                }
-            }
-        }
-        if(!mainBorrowPersonFlage){
-            throw  new  CreatRepaymentExcepiton("业务用户信息列表中没有主借人信息");
-        }
-        //判断是否有主借人  结束
-
-        for(BusinessCustomerInfoReq bizCusInfoReq:bizCusInfoReqs){
-            if(!bizCusInfoReq.getCustomerType().equals(BizCustomerTypeEnum.PERSON.getName())&&
-                    !bizCusInfoReq.getCustomerType().equals(BizCustomerTypeEnum.COMPANY.getName())){
-                logger.error("客户类型需为'个人'或'公司'  bizId:"+businessBasicInfoReq.getBusinessId()
-                +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
-                throw  new CreatRepaymentExcepiton("客户类型需为'个人'或'公司'");
-            }
-
-            if(bizCusInfoReq.getCustomerType().equals(BizCustomerTypeEnum.COMPANY.getName())){
-               if(bizCusInfoReq.getIsCompanyBankAccount()==null){
-                   logger.error("公司用户 必须填写是否提供公账  bizId:"+businessBasicInfoReq.getBusinessId()
-                           +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
-                   throw  new CreatRepaymentExcepiton("公司用户 必须填写是否提供公账  customerId:"+bizCusInfoReq.getCustomerId());
-               }
-
-               if(bizCusInfoReq.getIsCompanyBankAccount().equals(BooleanEnum.YES.getValue())
-                       &&bizCusInfoReq.getIsCompanyBankAccount().equals(BooleanEnum.NO.getValue())){
-                   logger.error("公司用户 是否提供公账 字段输入值不正确  bizId:"+businessBasicInfoReq.getBusinessId()
-                           +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
-                   throw  new CreatRepaymentExcepiton("用户信息  是否提供公账 字段输入值不正确  customerId:"+bizCusInfoReq.getCustomerId());
-               }
-
-               if(bizCusInfoReq.getIsMergedCertificate()==null){
-                   logger.error("公司用户 必须填写是否三证合一  bizId:"+businessBasicInfoReq.getBusinessId()
-                           +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
-                   throw  new CreatRepaymentExcepiton("公司用户 必须填写是否三证合一 customerId:"+bizCusInfoReq.getCustomerId());
-               }
-
-               if(bizCusInfoReq.getIsCompanyBankAccount().equals(BooleanEnum.YES.getValue())
-                       &&bizCusInfoReq.getIsCompanyBankAccount().equals(BooleanEnum.NO.getValue())){
-                   logger.error("公司用户  是否三证合一 字段输入值不正确  bizId:"+businessBasicInfoReq.getBusinessId()
-                           +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
-                   throw  new CreatRepaymentExcepiton("公司用户  是否三证合一 字段输入值不正确  customerId:"+bizCusInfoReq.getCustomerId());
-               }
-
-                if(bizCusInfoReq.getIsCompanyBankAccount().equals(BooleanEnum.YES.getValue())){
-                   if(bizCusInfoReq.getUnifiedCode()==null){
-                       logger.error("三证合一的公司用户 需填写统一社会信用代码  bizId:"+businessBasicInfoReq.getBusinessId()
-                               +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
-                       throw  new CreatRepaymentExcepiton("三证合一的公司用户 需填写统一社会信用代码 customerId:"+bizCusInfoReq.getCustomerId());
-
-                   }
-                }
-               if(bizCusInfoReq.getIsCompanyBankAccount().equals(BooleanEnum.NO.getValue())){
-                   if(bizCusInfoReq.getBusinessLicence()==null){
-                       logger.error("非三证合一的公司用户 需填写营业执照号  bizId:"+businessBasicInfoReq.getBusinessId()
-                               +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
-                       throw  new CreatRepaymentExcepiton("非三证合一的公司用户 需填写营业执照号 customerId:"+bizCusInfoReq.getCustomerId());
-                   }
-                }
-                if(bizCusInfoReq.getRegisterProvince()==null){
-                    logger.error("公司用户 需填写企业注册地址所在省份  bizId:"+businessBasicInfoReq.getBusinessId()
-                            +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
-                    throw  new CreatRepaymentExcepiton("公司用户 需填写企业注册地址所在省份 customerId:"+bizCusInfoReq.getCustomerId());
-                }
-                if(bizCusInfoReq.getCompanyLegalPerson()==null){
-                    logger.error("公司用户 需填写企业法人  bizId:"+businessBasicInfoReq.getBusinessId()
-                            +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
-                    throw  new CreatRepaymentExcepiton("公司用户 需填写企业法人 customerId:"+bizCusInfoReq.getCustomerId());
-                }
-                if(bizCusInfoReq.getLegalPersonIdentityCard()==null){
-                    logger.error("公司用户 需填写企业法人身份证  bizId:"+businessBasicInfoReq.getBusinessId()
-                            +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
-                    throw  new CreatRepaymentExcepiton("公司用户 需填写企业法人身份证 customerId:"+bizCusInfoReq.getCustomerId());
-                }
-                if(bizCusInfoReq.getCompanyLegalPerson()==null){
-                    logger.error("公司用户 需填写企业法人是否大陆居民  bizId:"+businessBasicInfoReq.getBusinessId()
-                            +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
-                    throw  new CreatRepaymentExcepiton("公司用户 需填写企业法人是否大陆居民 customerId:"+bizCusInfoReq.getCustomerId());
-                }
-            }
-        }
-
-
-
-
-        List<ProjInfoReq>  projInfoReqs = creatRepayPlanReq.getProjInfoReqs();
-
-
-        for(ProjInfoReq projInfoReq :projInfoReqs){
-            //标的车辆信息校验
-            if(projInfoReq.getIsHaveCar().equals(BooleanEnum.YES.getValue())){
-                if(projInfoReq.getProjCarInfos()==null|| projInfoReq.getProjCarInfos().size()==0){
-                    logger.error("有车辆信息的标必须把车辆信息列表传入  projId:"+projInfoReq.getProjectId()
-                            +"  projInfoReq:"+JSON.toJSONString(projInfoReq));
-                    throw  new CreatRepaymentExcepiton("有车辆信息的标必须把车辆信息列表传入  projId:" +projInfoReq.getProjectId() );
-                }
-            }
-            //标的房产信息校验
-            if(projInfoReq.getIsHaveHouse().equals(BooleanEnum.YES.getValue())){
-                if(projInfoReq.getProjHouseInfos()==null || projInfoReq.getProjCarInfos().size()==0){
-                    logger.error("有房产信息的标必须把房产信息列表传入  projId:"+projInfoReq.getProjectId()
-                            +"  projInfoReq:"+JSON.toJSONString(projInfoReq));
-                    throw  new CreatRepaymentExcepiton("有房产信息的标必须把房产信息列表传入 projId:" +projInfoReq.getProjectId());
-                }
-            }
-
-        }
-
-
-
-
-
-//        TuandaiProjectCar
-
-
-        /////////////   输入数据校验   结束 ////////////////////////
-
+        // 计算还款计划
         PlanReturnInfoDto  planReturnInfoDto = creatRepayPlan(creatRepayPlanReq);
         List<RepaymentBizPlanDto>  dtos = planReturnInfoDto.getRepaymentBizPlanDtos();
 
@@ -625,8 +469,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
         /////  存储传入的相关信息  开始  //////////////
 
+        BusinessBasicInfoReq  businessBasicInfoReq = creatRepayPlanReq.getBusinessBasicInfoReq();
         //存储业务信息
-        BasicBusiness  basicBusiness = ClassCopyUtil.copy(creatRepayPlanReq.getBusinessBasicInfoReq(),BusinessBasicInfoReq.class,BasicBusiness.class);
+        BasicBusiness  basicBusiness = ClassCopyUtil.copy(businessBasicInfoReq,BusinessBasicInfoReq.class,BasicBusiness.class);
         basicBusiness.setBorrowLimitUnit(1);
         basicBusiness.setOutputPlatformId(1);//默认为团贷网p2p业务
         basicBusiness.setIsTuandaiRepay(1);//默认为使用平台还款
@@ -643,7 +488,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         }
         basicBusinessService.insertOrUpdate(basicBusiness);
 
-//        List<BusinessCustomerInfoReq> bizCusInfoReqs
+        List<BusinessCustomerInfoReq> bizCusInfoReqs = creatRepayPlanReq.getBizCusInfoReqs();
         //存储业务客户信息
         List<BasicBizCustomer> bizCustomers = new LinkedList<>();
         for(BusinessCustomerInfoReq bCustInfo:bizCusInfoReqs){
@@ -679,7 +524,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 //            baiscBizExtRateService.delete(new EntityWrapper<BaiscBizExtRate>().eq("business_id",basicBusiness.getBusinessId()));
 //            baiscBizExtRateService.insertBatch(bizExtRates);
 //        }
-
+        List<ProjInfoReq>  projInfoReqs = creatRepayPlanReq.getProjInfoReqs();
         //存储标信息
         for(ProjInfoReq projInfoReq:projInfoReqs){
             TuandaiProjectInfo  projInfo = ClassCopyUtil.copy(projInfoReq,ProjInfoReq.class,TuandaiProjectInfo.class);
@@ -756,6 +601,11 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
             }
 
+            //存储标额外的费用信息
+            List<ProjExtRateReq>  projExtRateReqs = projInfoReq.getProjExtRateReqs();
+
+
+
 
         }
 
@@ -784,6 +634,177 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
         return planReturnInfoDto;
 
+    }
+
+    /**
+     * 判断是否重传
+     * @param creatRepayPlanReq
+     * @return
+     */
+    private Boolean checkResave(CreatRepayPlanReq creatRepayPlanReq){
+        for(ProjInfoReq projInfoReq:creatRepayPlanReq.getProjInfoReqs() ){
+            List<RepaymentProjPlan> projList =  repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("project_id",projInfoReq.getProjectId()));
+
+            if(projList.size()>0){
+                for(RepaymentProjPlan projPlan:projList){
+                    if(projPlan.getActive().equals(RepayPlanActiveEnum.ACTIVE.getValue())){
+                        Integer diffDays = DateUtil.getDiffDays(projPlan.getCreateTime(),projInfoReq.getQueryFullsuccessDate());
+                        //如果同一个标的满标时间与还款计划生成的时间相差一天以内
+                        if(diffDays <= 1){
+                            throw  new CreatRepaymentExcepiton("已存在时间相近的还款计划");
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 输入数据校验
+     * @param creatRepayPlanReq
+     * @return
+     */
+    private Boolean checkInputRep(CreatRepayPlanReq creatRepayPlanReq){
+        //业务基础信息校验
+        BusinessBasicInfoReq  businessBasicInfoReq = creatRepayPlanReq.getBusinessBasicInfoReq();
+        if(businessBasicInfoReq.getSourceType().equals(BusinessSourceTypeEnum.SETTLE_NEW.getValue())||
+                businessBasicInfoReq.getSourceType().equals(BusinessSourceTypeEnum.SETTLE_NEW.getValue())){
+            if(businessBasicInfoReq.getSourceBusinessId()==null){
+                throw  new CreatRepaymentExcepiton("结清再贷业务必须填写原始来源业务的业务编号");
+            }
+        }
+
+
+        //业务用户信息校验
+        List<BusinessCustomerInfoReq> bizCusInfoReqs = creatRepayPlanReq.getBizCusInfoReqs();
+        if(bizCusInfoReqs == null ||bizCusInfoReqs.size()==0){
+            throw  new CreatRepaymentExcepiton("请填写业务用户信息");
+        }
+
+
+        //判断是否有主借人  开始
+        Boolean mainBorrowPersonFlage = false;
+        for(BusinessCustomerInfoReq bizCusInfoReq:bizCusInfoReqs){
+            if(bizCusInfoReq.getIsmainCustomer().equals(BooleanEnum.YES.getValue())){
+                mainBorrowPersonFlage = true;
+                break;
+            }
+        }
+        if(!mainBorrowPersonFlage){
+            List<BasicBizCustomer> customerList =  basicBizCustomerService.selectList(
+                    new EntityWrapper<BasicBizCustomer>().eq("business_id",businessBasicInfoReq.getBusinessId()));
+            for(BasicBizCustomer basicBizCustomer:customerList){
+                if(basicBizCustomer.getIsmainCustomer().equals(BooleanEnum.YES.getValue())){
+                    mainBorrowPersonFlage = true;
+                    break;
+                }
+            }
+        }
+        if(!mainBorrowPersonFlage){
+            throw  new  CreatRepaymentExcepiton("业务用户信息列表中没有主借人信息");
+        }
+        //判断是否有主借人  结束
+
+        for(BusinessCustomerInfoReq bizCusInfoReq:bizCusInfoReqs){
+            if(!bizCusInfoReq.getCustomerType().equals(BizCustomerTypeEnum.PERSON.getName())&&
+                    !bizCusInfoReq.getCustomerType().equals(BizCustomerTypeEnum.COMPANY.getName())){
+                logger.error("客户类型需为'个人'或'公司'  bizId:"+businessBasicInfoReq.getBusinessId()
+                        +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
+                throw  new CreatRepaymentExcepiton("客户类型需为'个人'或'公司'");
+            }
+
+            if(bizCusInfoReq.getCustomerType().equals(BizCustomerTypeEnum.COMPANY.getName())){
+                if(bizCusInfoReq.getIsCompanyBankAccount()==null){
+                    logger.error("公司用户 必须填写是否提供公账  bizId:"+businessBasicInfoReq.getBusinessId()
+                            +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
+                    throw  new CreatRepaymentExcepiton("公司用户 必须填写是否提供公账  customerId:"+bizCusInfoReq.getCustomerId());
+                }
+
+                if(bizCusInfoReq.getIsCompanyBankAccount().equals(BooleanEnum.YES.getValue())
+                        &&bizCusInfoReq.getIsCompanyBankAccount().equals(BooleanEnum.NO.getValue())){
+                    logger.error("公司用户 是否提供公账 字段输入值不正确  bizId:"+businessBasicInfoReq.getBusinessId()
+                            +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
+                    throw  new CreatRepaymentExcepiton("用户信息  是否提供公账 字段输入值不正确  customerId:"+bizCusInfoReq.getCustomerId());
+                }
+
+                if(bizCusInfoReq.getIsMergedCertificate()==null){
+                    logger.error("公司用户 必须填写是否三证合一  bizId:"+businessBasicInfoReq.getBusinessId()
+                            +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
+                    throw  new CreatRepaymentExcepiton("公司用户 必须填写是否三证合一 customerId:"+bizCusInfoReq.getCustomerId());
+                }
+
+                if(bizCusInfoReq.getIsCompanyBankAccount().equals(BooleanEnum.YES.getValue())
+                        &&bizCusInfoReq.getIsCompanyBankAccount().equals(BooleanEnum.NO.getValue())){
+                    logger.error("公司用户  是否三证合一 字段输入值不正确  bizId:"+businessBasicInfoReq.getBusinessId()
+                            +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
+                    throw  new CreatRepaymentExcepiton("公司用户  是否三证合一 字段输入值不正确  customerId:"+bizCusInfoReq.getCustomerId());
+                }
+
+                if(bizCusInfoReq.getIsCompanyBankAccount().equals(BooleanEnum.YES.getValue())){
+                    if(bizCusInfoReq.getUnifiedCode()==null){
+                        logger.error("三证合一的公司用户 需填写统一社会信用代码  bizId:"+businessBasicInfoReq.getBusinessId()
+                                +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
+                        throw  new CreatRepaymentExcepiton("三证合一的公司用户 需填写统一社会信用代码 customerId:"+bizCusInfoReq.getCustomerId());
+
+                    }
+                }
+                if(bizCusInfoReq.getIsCompanyBankAccount().equals(BooleanEnum.NO.getValue())){
+                    if(bizCusInfoReq.getBusinessLicence()==null){
+                        logger.error("非三证合一的公司用户 需填写营业执照号  bizId:"+businessBasicInfoReq.getBusinessId()
+                                +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
+                        throw  new CreatRepaymentExcepiton("非三证合一的公司用户 需填写营业执照号 customerId:"+bizCusInfoReq.getCustomerId());
+                    }
+                }
+                if(bizCusInfoReq.getRegisterProvince()==null){
+                    logger.error("公司用户 需填写企业注册地址所在省份  bizId:"+businessBasicInfoReq.getBusinessId()
+                            +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
+                    throw  new CreatRepaymentExcepiton("公司用户 需填写企业注册地址所在省份 customerId:"+bizCusInfoReq.getCustomerId());
+                }
+                if(bizCusInfoReq.getCompanyLegalPerson()==null){
+                    logger.error("公司用户 需填写企业法人  bizId:"+businessBasicInfoReq.getBusinessId()
+                            +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
+                    throw  new CreatRepaymentExcepiton("公司用户 需填写企业法人 customerId:"+bizCusInfoReq.getCustomerId());
+                }
+                if(bizCusInfoReq.getLegalPersonIdentityCard()==null){
+                    logger.error("公司用户 需填写企业法人身份证  bizId:"+businessBasicInfoReq.getBusinessId()
+                            +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
+                    throw  new CreatRepaymentExcepiton("公司用户 需填写企业法人身份证 customerId:"+bizCusInfoReq.getCustomerId());
+                }
+                if(bizCusInfoReq.getCompanyLegalPerson()==null){
+                    logger.error("公司用户 需填写企业法人是否大陆居民  bizId:"+businessBasicInfoReq.getBusinessId()
+                            +"  customerinfo:"+JSON.toJSONString(bizCusInfoReq));
+                    throw  new CreatRepaymentExcepiton("公司用户 需填写企业法人是否大陆居民 customerId:"+bizCusInfoReq.getCustomerId());
+                }
+            }
+        }
+
+
+        List<ProjInfoReq>  projInfoReqs = creatRepayPlanReq.getProjInfoReqs();
+
+
+        for(ProjInfoReq projInfoReq :projInfoReqs){
+            //标的车辆信息校验
+            if(projInfoReq.getIsHaveCar().equals(BooleanEnum.YES.getValue())){
+                if(projInfoReq.getProjCarInfos()==null|| projInfoReq.getProjCarInfos().size()==0){
+                    logger.error("有车辆信息的标必须把车辆信息列表传入  projId:"+projInfoReq.getProjectId()
+                            +"  projInfoReq:"+JSON.toJSONString(projInfoReq));
+                    throw  new CreatRepaymentExcepiton("有车辆信息的标必须把车辆信息列表传入  projId:" +projInfoReq.getProjectId() );
+                }
+            }
+            //标的房产信息校验
+            if(projInfoReq.getIsHaveHouse().equals(BooleanEnum.YES.getValue())){
+                if(projInfoReq.getProjHouseInfos()==null || projInfoReq.getProjCarInfos().size()==0){
+                    logger.error("有房产信息的标必须把房产信息列表传入  projId:"+projInfoReq.getProjectId()
+                            +"  projInfoReq:"+JSON.toJSONString(projInfoReq));
+                    throw  new CreatRepaymentExcepiton("有房产信息的标必须把房产信息列表传入 projId:" +projInfoReq.getProjectId());
+                }
+            }
+
+        }
+
+
+        return true;
     }
 
     /**
