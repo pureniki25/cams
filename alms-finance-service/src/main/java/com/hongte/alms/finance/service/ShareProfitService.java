@@ -3,7 +3,10 @@
  */
 package com.hongte.alms.finance.service;
 
+import java.util.List;
+
 import com.hongte.alms.base.dto.ConfirmRepaymentReq;
+import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 
 /**
  * @author 王继光
@@ -18,5 +21,5 @@ public interface ShareProfitService {
 	 * @param req
 	 * @param save,true=保存分润后数据,false=不保存分润后数据
 	 */
-	public void execute(ConfirmRepaymentReq req,boolean save);
+	public  List<CurrPeriodProjDetailVO>  execute(ConfirmRepaymentReq req,boolean save);
 }
