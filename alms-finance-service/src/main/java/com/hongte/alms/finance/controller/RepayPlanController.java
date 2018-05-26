@@ -346,7 +346,7 @@ public class RepayPlanController {
     }
     
 	@ApiOperation(value = "根据businessId查询还款计划")
-	@GetMapping("/queryRepayPlanByBusinessId")
+	@PostMapping("/queryRepayPlanByBusinessId")
 	@ResponseBody
 	public Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(@RequestParam(value = "businessId") String businessId) {
 		logger.info("查询还款计划，业务编号：[{}]", businessId);
@@ -356,8 +356,10 @@ public class RepayPlanController {
 			}
 			PlanReturnInfoDto planReturnInfoDto = creatRepayPlanService.queryRepayPlanByBusinessId(businessId);
 			if (planReturnInfoDto == null) {
+                logger.error("没有找到相关数据，请检查业务编号是否输入正确！", businessId);
 				return Result.build("1", "没有找到相关数据，请检查业务编号是否输入正确！", planReturnInfoDto);
 			}
+            logger.info("查询还款计划，查询成功：[{}]", planReturnInfoDto);
 			return Result.success(planReturnInfoDto);
 		} catch (Exception e) {
 			logger.error("查询还款计划异常[{}]", e);
@@ -367,7 +369,7 @@ public class RepayPlanController {
 	
 	@SuppressWarnings("rawtypes")
 	@ApiOperation(value = "根据条件撤销还款计划")
-	@GetMapping("/deleteRepayPlanByConditions")
+	@PostMapping("/deleteRepayPlanByConditions")
 	@ResponseBody
 	public Result deleteRepayPlanByConditions(@RequestParam(value = "businessId") String businessId,
 			@RequestParam(value = "repaymentBatchId") String repaymentBatchId) {
@@ -403,9 +405,9 @@ public class RepayPlanController {
 
 
     @ApiOperation(value = "根据业务ID列表查找出业务账单列表")
-    @GetMapping("/getRepayList")
+    @PostMapping("/getRepayList")
     @ResponseBody
-   public Result<List<BizDto>> getRepayList(@RequestParam(value = "businessIds")List<String> businessIds){
+   public Result<List<BizDto>> getRepayList(@RequestBody List<String> businessIds){
         logger.info("根据业务ID列表查找出业务账单列表，业务ID列表：[{}]", JSON.toJSONString(businessIds));
 
        List<BizDto> bizDtos = new LinkedList<>();
@@ -424,9 +426,9 @@ public class RepayPlanController {
 
 
     @ApiOperation(value = "根据业务ID查找此业务的历史账单")
-    @GetMapping("/getLogBill")
+    @PostMapping("/getLogBill")
     @ResponseBody
-   public  Result<BizDto> getLogBill(String businessId){
+   public  Result<BizDto> getLogBill(@RequestParam(value = "businessId") String businessId){
         //业务基本的还款计划信息
         BizDto bizDto =getBizDtoByBizId(businessId);
 
@@ -462,9 +464,9 @@ public class RepayPlanController {
 
 
     @ApiOperation(value = "根据还款计划ID查找出此还款计划的详情账单信息")
-    @GetMapping("/getBizPlanBill")
+    @PostMapping("/getBizPlanBill")
     @ResponseBody
-    public Result<BizPlanDto> getBizPlanBill(String planId){
+    public Result<BizPlanDto> getBizPlanBill(@RequestParam(value = "planId") String planId){
 
        RepaymentBizPlan bizPlan =  repaymentBizPlanService.selectById(planId);
 

@@ -19,7 +19,7 @@ public class ProjFeeDetailReq {
      */
 
     @ApiModelProperty(required= true,value = "期数")
-    @NotNull(message = "期数(peroid)不能为空")
+    @NotNull(message = "期数(period)不能为空")
     private Integer peroid;
 
     /**

@@ -3,6 +3,7 @@ package com.hongte.alms.base.RepayPlan.req;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -32,8 +33,13 @@ public class ProjInfoReq {
      * 标的费用信息列表
      */
     @ApiModelProperty(required= true,value = "标的的出款费用信息列表")
+    @NotNull(message="的费用信息列表(projFeeInfos)不能为空")
     private List<ProjFeeReq> projFeeInfos;
 
+
+
+    @ApiModelProperty(value = "标的的额外费用信息列表")
+    private  List<ProjExtRateReq> projExtRateReqs;
 
     /**
      *利率
