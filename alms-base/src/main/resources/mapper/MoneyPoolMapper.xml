@@ -59,6 +59,9 @@
 		    mpr.after_id = #{afterId}
 		    AND
 		    mpr.is_finance_match = 1
+		    <if test="notConfirmed !=null and notConfirmed == true">
+		    AND mp.status != '完成'
+		    </if>
 		ORDER BY  mp.trade_date desc
 	</select>
 </mapper>

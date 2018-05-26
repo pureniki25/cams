@@ -13,6 +13,7 @@ public enum RepayPlanRepaySrcEnum implements IEnum {
 //还款来源，10：线下转账，20：线下代扣，30：银行代扣
 
     OFFLINE_TRANSFER(10,"线下转账"),
+    SURPLUS_REPAY(11,"用结余还款"),
     OFFLINE_WITHHOLD(20,"线下代扣"),
     BNAK_WITHHOLD(30,"银行代扣")
 

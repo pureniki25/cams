@@ -13,4 +13,5 @@ import com.hongte.alms.common.mapper.SuperMapper;
  */
 public interface TuandaiProjectInfoMapper extends SuperMapper<TuandaiProjectInfo> {
 
+	public TuandaiProjectInfo selectProjectInfoByProjPlanId(String projPlanId);
 }

@@ -29,7 +29,7 @@ window.layinit(function (htConfig) {
                 show: false,
                 url: '/finance/matchedBankStatement?businessId=' + businessId + "&afterId=" + afterId,
                 style: {},
-                data: 11
+                data: []
             },
             manualAddBankSatements: {
                 show: false,
@@ -47,7 +47,88 @@ window.layinit(function (htConfig) {
             // },
 
             table: {
-                currPeriodRepayment: currPeriodRepayment,
+                currPeriodRepayment: {
+                    col: [{
+                        title: '展开',
+                        type: 'expand',
+                        render: (h, p) => {
+                            return h('i-table', {
+                                props: {
+                                    stripe: true,
+                                    columns: [{
+                                            title: '借款人',
+                                            key: 'userName'
+                                        },
+                                        {
+                                            title: '上标金额',
+                                            key: 'projAmount'
+                                        },
+                                        {
+                                            title: '本金',
+                                            key: 'item10'
+                                        }, {
+                                            title: '利息',
+                                            key: 'item20'
+                                        }, {
+                                            title: '月收分公司服务费',
+                                            key: 'item30'
+                                        }, {
+                                            title: '月收平台费',
+                                            key: 'item50'
+                                        }, {
+                                            title: '小计',
+                                            key: 'subTotal'
+                                        }, {
+                                            title: '线下逾期费',
+                                            key: 'offlineOverDue'
+                                        }, {
+                                            title: '减免金额',
+                                            key: 'onlineOverDue'
+                                        }, {
+                                            title: '合计（含滞纳金）',
+                                            key: 'total'
+                                        }
+                                    ],
+                                    data: p.row.list || []
+                                }
+                            })
+                        }
+                    }, {
+                        title: '类型',
+                        key: 'type'
+                    }, {
+                        title: '还款日期',
+                        key: 'repayDate'
+                    }, {
+                        title: '本金',
+                        key: 'item10'
+                    }, {
+                        title: '利息',
+                        key: 'item20'
+                    }, {
+                        title: '月收分公司服务费',
+                        key: 'item30'
+                    }, {
+                        title: '月收平台费',
+                        key: 'item50'
+                    }, {
+                        title: '小计',
+                        key: 'subtotal'
+                    }, {
+                        title: '线下逾期费',
+                        key: 'offlineOverDue'
+                    }, {
+                        title: '线上逾期费',
+                        key: 'onlineOverDue'
+                    }, {
+                        title: '减免金额',
+                        key: 'derate'
+                    }, {
+                        title: '合计(含滞纳金)',
+                        key: 'total'
+                    }],
+                    data: []
+                },
                 projRepayment: projRepayment
             },
             thisTimeRepaymentInfo: {
@@ -174,7 +255,8 @@ window.layinit(function (htConfig) {
                 axios.get(fpath + 'finance/thisPeroidRepayment?businessId=' + businessId + "&afterId=" + afterId)
                     .then(function (res) {
                         if (res.data.code == '1') {
-                            app.table.currPeriodRepayment.data = Object.assign(app.table.currPeriodRepayment.data, res.data.data);
+                            console.log(res.data.data);
+                            app.table.currPeriodRepayment.data = res.data.data;
                         } else {
                             app.$Message.error({
                                 content: res.data.msg
@@ -253,6 +335,8 @@ window.layinit(function (htConfig) {
                     .then(function (res) {
                         if (res.data.code == '1') {
                             app.handleConfirmRepaymentResult(res)
+
+                            window.location.reload()
                         }
                     })
                     .catch(function (err) {

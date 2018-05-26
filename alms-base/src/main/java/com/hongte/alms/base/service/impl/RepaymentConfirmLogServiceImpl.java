@@ -1,6 +1,10 @@
 package com.hongte.alms.base.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.hongte.alms.base.entity.AccountantOverRepayLog;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentConfirmLog;
@@ -11,6 +15,7 @@ import com.hongte.alms.base.entity.RepaymentResource;
 import com.hongte.alms.base.enums.RepayedFlag;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.SectionRepayStatusEnum;
+import com.hongte.alms.base.mapper.AccountantOverRepayLogMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListDetailMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListMapper;
 import com.hongte.alms.base.mapper.RepaymentConfirmLogMapper;
@@ -18,14 +23,18 @@ import com.hongte.alms.base.mapper.RepaymentProjFactRepayMapper;
 import com.hongte.alms.base.mapper.RepaymentProjPlanListDetailMapper;
 import com.hongte.alms.base.mapper.RepaymentProjPlanListMapper;
 import com.hongte.alms.base.mapper.RepaymentResourceMapper;
+import com.hongte.alms.base.service.MoneyPoolService;
 import com.hongte.alms.base.service.RepaymentConfirmLogService;
+import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +63,11 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 	RepaymentProjPlanListMapper repaymentProjPlanListMapper ;
 	@Autowired
 	RepaymentResourceMapper repaymentResourceMapper ;
+	@Autowired
+	@Qualifier("MoneyPoolService")
+	MoneyPoolService moneyPoolService ;
+	@Autowired
+	AccountantOverRepayLogMapper accountantOverRepayLogMapper;
 	@Override
 	@Transactional(rollbackFor=Exception.class)
 	public Result revokeConfirm(String businessId, String afterId) {
@@ -112,6 +126,9 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 			RepaymentResource resource = new RepaymentResource() ;
 			resource.setResourceId(factRepay.getRepaySourceId());
 			resource = repaymentResourceMapper.selectOne(resource);
+			
+			moneyPoolService.revokeConfirmRepaidUpdateMoneyPool(resource);
+			
 			if (resource!=null) {
 				resource.deleteById();
 			}
@@ -171,7 +188,64 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 		planList.setFinanceConfirmUserName(lastLog==null?null:lastLog.getCreateUserName());
 		planList.updateById();
 		
+		if (log.getSurplusRefId()!=null) {
+			AccountantOverRepayLog accountantOverRepayLog = accountantOverRepayLogMapper.selectById(log.getSurplusRefId());
+			if (accountantOverRepayLog!=null) {
+				accountantOverRepayLog.deleteById();
+			}
+		}
+		
 		log.deleteById();
 		return Result.success();
+	}
+	
+	@Override
+	public List<JSONObject> selectCurrentPeriodConfirmedProjInfo(String businessId, String afterId) {
+		List<RepaymentConfirmLog> list = confirmLogMapper.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("business_id", businessId).eq("after_id", afterId).orderBy("`index`",false)) ;
+		List<JSONObject> res = new ArrayList<>() ;
+		for (RepaymentConfirmLog repaymentConfirmLog : list) {
+			String json = repaymentConfirmLog.getProjPlanJson();
+			List<CurrPeriodProjDetailVO> proj = JSON.parseArray(json, CurrPeriodProjDetailVO.class) ;
+			BigDecimal item10 = new BigDecimal(0);
+			BigDecimal item20 = new BigDecimal(0);
+			BigDecimal item30 = new BigDecimal(0);
+			BigDecimal item50 = new BigDecimal(0);
+			BigDecimal offlineOverDue = new BigDecimal(0);
+			BigDecimal onlineOverDue = new BigDecimal(0);
+			BigDecimal subTotal = new BigDecimal(0);
+			BigDecimal total = new BigDecimal(0);
+			String realName = null ;
+			BigDecimal amount = new BigDecimal(0);
+			for (CurrPeriodProjDetailVO currPeriodProjDetailVO : proj) {
+				realName = currPeriodProjDetailVO.getUserName();
+				amount = currPeriodProjDetailVO.getProjAmount();
+				item10 = item10.add(currPeriodProjDetailVO.getItem10());
+				item20 = item20.add(currPeriodProjDetailVO.getItem20());
+				item30 = item30.add(currPeriodProjDetailVO.getItem30());
+				item50 = item50.add(currPeriodProjDetailVO.getItem50());
+				offlineOverDue = offlineOverDue.add(currPeriodProjDetailVO.getOfflineOverDue());
+				onlineOverDue = onlineOverDue.add(currPeriodProjDetailVO.getOnlineOverDue());
+				subTotal = subTotal.add(currPeriodProjDetailVO.getSubTotal());
+				total = total.add(currPeriodProjDetailVO.getTotal());
+			}
+			
+			JSONObject p = new JSONObject() ;
+			p.put("realName", realName);
+			p.put("amount", amount);
+			p.put("item10", item10);
+			p.put("item20", item20);
+			p.put("item30", item30);
+			p.put("item50", item50);
+			p.put("repayDate", repaymentConfirmLog.getRepayDate());
+			p.put("offlineOverDue", offlineOverDue);
+			p.put("onlineOverDue", onlineOverDue);
+			p.put("subTotal", subTotal);
+			p.put("total", total);
+			p.put("list", proj);
+			p.put("type", "实际应还日期");
+			res.add(p);
+		}
+		
+		return res;
 	}
 }

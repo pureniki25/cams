@@ -39,6 +39,7 @@ import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.enums.AreaLevel;
 import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.enums.RepayRegisterState;
+import com.hongte.alms.base.service.AccountantOverRepayLogService;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.BasicBusinessTypeService;
 import com.hongte.alms.base.service.BasicCompanyService;
@@ -106,6 +107,9 @@ public class FinanceController {
 	@Autowired
 	@Qualifier("MoneyPoolService")
 	private MoneyPoolService MoneyPoolService ;
+	@Autowired
+	@Qualifier("AccountantOverRepayLogService")
+	private AccountantOverRepayLogService accountantOverRepayLogService;
 
 	@GetMapping(value = "/repayBaseInfo")
 	@ApiOperation(value = "获取还款基本信息")
@@ -399,6 +403,7 @@ public class FinanceController {
 			result = Result.success(detailVOs);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
+			e.printStackTrace();
 			result = Result.error("500", e.getMessage());
 		}
 		logger.info("@previewConfirmRepayment@预览确认还款拆标情况--结束[{}]",result);
@@ -412,6 +417,7 @@ public class FinanceController {
 		logger.info("@confirmRepayment@确认还款拆标情况--开始[{}]",req);
 		try {
 			List<CurrPeriodProjDetailVO> detailVOs = shareService.execute(req, true);
+			moneyPoolService.confirmRepaidUpdateMoneyPool(req);
 			result = Result.success(detailVOs);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -428,7 +434,7 @@ public class FinanceController {
 	public Result getSurplusFund(String businessId,String afterId) {
 		Result result ;
 		logger.info("@getSurplusFund@获取结余情况--开始[{}{}]",businessId,afterId);
-		BigDecimal surplusFund = financeService.getSurplusFund(businessId, afterId);
+		BigDecimal surplusFund = accountantOverRepayLogService.caluCanUse(businessId, null );
 		result = Result.success(surplusFund);
 		logger.info("@getSurplusFund@获取结余情况--结束[{}]",result);
 		return result ;

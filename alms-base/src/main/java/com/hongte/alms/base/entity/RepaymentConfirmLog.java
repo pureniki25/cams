@@ -1,7 +1,7 @@
 package com.hongte.alms.base.entity;
 
 import java.io.Serializable;
-
+import java.math.BigDecimal;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
@@ -65,6 +65,25 @@ public class RepaymentConfirmLog extends Model<RepaymentConfirmLog> {
 	@TableField("proj_plan_json")
 	@ApiModelProperty(required= true,value = "标的还款分润后的镜像")
 	private String projPlanJson;
+	/**
+     * 还款时间
+     */
+	@TableField("repay_date")
+	@ApiModelProperty(required= true,value = "还款时间")
+	private Date repayDate;
+//	`fact_amount` decimal(18,4) DEFAULT NULL COMMENT '实还总金额',
+//	  `surplus_amount` decimal(18,4) DEFAULT NULL COMMENT '结余金额',
+//	  `surplus_ref_id` varchar(50) DEFAULT NULL COMMENT '结余表关联id',
+	@TableField("fact_amount")
+	@ApiModelProperty(required= true,value = "实还总金额")
+	private BigDecimal factAmount;
+	@TableField("surplus_amount")
+	@ApiModelProperty(required= true,value = "结余金额")
+	private BigDecimal surplusAmount;
+	@TableField("surplus_ref_id")
+	@ApiModelProperty(required= true,value = "结余表关联id")
+	private String surplusRefId;
+	
     /**
      * 创建时间
      */
@@ -219,5 +238,61 @@ public class RepaymentConfirmLog extends Model<RepaymentConfirmLog> {
 	 */
 	public void setCreateUserName(String createUserName) {
 		this.createUserName = createUserName;
+	}
+
+	/**
+	 * @return the repayDate
+	 */
+	public Date getRepayDate() {
+		return repayDate;
+	}
+
+	/**
+	 * @param repayDate the repayDate to set
+	 */
+	public void setRepayDate(Date repayDate) {
+		this.repayDate = repayDate;
+	}
+
+	/**
+	 * @return the factAmount
+	 */
+	public BigDecimal getFactAmount() {
+		return factAmount;
+	}
+
+	/**
+	 * @param factAmount the factAmount to set
+	 */
+	public void setFactAmount(BigDecimal factAmount) {
+		this.factAmount = factAmount;
+	}
+
+	/**
+	 * @return the surplusAmount
+	 */
+	public BigDecimal getSurplusAmount() {
+		return surplusAmount;
+	}
+
+	/**
+	 * @param surplusAmount the surplusAmount to set
+	 */
+	public void setSurplusAmount(BigDecimal surplusAmount) {
+		this.surplusAmount = surplusAmount;
+	}
+
+	/**
+	 * @return the surplusRefId
+	 */
+	public String getSurplusRefId() {
+		return surplusRefId;
+	}
+
+	/**
+	 * @param surplusRefId the surplusRefId to set
+	 */
+	public void setSurplusRefId(String surplusRefId) {
+		this.surplusRefId = surplusRefId;
 	}
 }
