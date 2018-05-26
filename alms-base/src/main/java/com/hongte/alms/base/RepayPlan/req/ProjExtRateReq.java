@@ -3,6 +3,7 @@ package com.hongte.alms.base.RepayPlan.req;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 /**
@@ -17,22 +18,27 @@ public class ProjExtRateReq {
      * 费率类型 1，
      */
     @ApiModelProperty(required= true,value = "费率类型")
+    @NotNull(message = "费率类型(rateType)不能为空")
     private Integer rateType;
     /**
      * 费率名称
      */
     @ApiModelProperty(required= true,value = "费率名称")
+    @NotNull(message = "费率名称(rateName)不能为空")
     private String rateName;
+
     /**
      * 费率值
      */
     @ApiModelProperty(required= true,value = "费率值")
+    @NotNull(message = "费率值(rateValue)不能为空")
     private BigDecimal rateValue;
 
     /**
      * 费用计算方式
      */
     @ApiModelProperty(required= true,value = "费用计算方式")
+    @NotNull(message = "费用计算方式(calcWay)不能为空")
     private Integer calcWay;
     /**
      * 资产端费用项ID
@@ -49,14 +55,14 @@ public class ProjExtRateReq {
     /**
      * 开始期数
      */
-    @ApiModelProperty(value = "开始期数")
+    @ApiModelProperty(required= true,value = "费用信息有效的开始期数")
     private Integer beginPeroid;
 
 
     /**
      * 结束期数
      */
-    @ApiModelProperty(value = "结束期数")
+    @ApiModelProperty(required= true,value = "费用信息有效的结束期数")
     private  Integer  endPeroid;
 
 

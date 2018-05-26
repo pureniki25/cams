@@ -1878,16 +1878,16 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
     public static void main(String[] args) {
 
-        BigDecimal t1 = new BigDecimal(7415.8400000);
-        t1= t1.setScale(2,BigDecimal.ROUND_HALF_DOWN);
-
-        BigDecimal t2 = new BigDecimal(7415.84);
-        t2= t2.setScale(2,BigDecimal.ROUND_HALF_DOWN);
-
-//        new BigDecimal(7415.84).setScale(creatRepayPlanReq.getSmallNum(),creatRepayPlanReq.getRondmode())
-
-        Integer tt =t1.compareTo(t2);
-        System.out.println(tt);
+//        BigDecimal t1 = new BigDecimal(7415.8400000);
+//        t1= t1.setScale(2,BigDecimal.ROUND_HALF_DOWN);
+//
+//        BigDecimal t2 = new BigDecimal(7415.84);
+//        t2= t2.setScale(2,BigDecimal.ROUND_HALF_DOWN);
+//
+////        new BigDecimal(7415.84).setScale(creatRepayPlanReq.getSmallNum(),creatRepayPlanReq.getRondmode())
+//
+//        Integer tt =t1.compareTo(t2);
+//        System.out.println(tt);
 
 //                bizPlanList.getTotalBorrowAmount().compareTo(new BigDecimal(7415.84));
 
@@ -1902,7 +1902,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 //        projTBAmount= projTBAmount.setScale(2,BigDecimal.ROUND_HALF_DOWN);
 //
 //        System.out.println(projTBAmount);
-////        System.out.println(UUID.randomUUID().toString());
+ System.out.println(UUID.randomUUID().toString());
+ System.out.println(UUID.randomUUID().toString());
+ System.out.println(UUID.randomUUID().toString());
 //
 //        String periodStr=(new DecimalFormat("00")).format(120);
 //        System.out.println(periodStr);
