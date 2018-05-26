@@ -49,9 +49,11 @@ import com.hongte.alms.base.entity.SysUser;
 import com.hongte.alms.base.enums.AreaLevel;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
 import com.hongte.alms.base.enums.SysRoleEnums;
+import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.BasicBusinessTypeService;
 import com.hongte.alms.base.service.BasicCompanyService;
 import com.hongte.alms.base.service.SysParameterService;
+import com.hongte.alms.base.service.SysUserAreaService;
 import com.hongte.alms.base.service.SysUserService;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
 import com.hongte.alms.common.result.Result;
@@ -109,6 +111,12 @@ public class CollectionController {
     @Autowired
     @Qualifier("SysUserService")
     SysUserService  sysUserService;
+    
+
+    
+    @Autowired
+    @Qualifier("SysUserAreaService")
+    SysUserAreaService sysUserAreaService;
 
     @Autowired
     LoginUserInfoHelper loginUserInfoHelper;
@@ -190,10 +198,40 @@ public class CollectionController {
 				return PageResult.error(500, "实还日期选择范围不能超过93天！");
 			}*/
             if(req.getRepayStatus()!=null&&req.getRepayStatus().equals(""))req.setRepayStatus(null);
-            
             long startTime = System.currentTimeMillis();
             Page<AfterLoanStandingBookVo> pages = phoneUrgeService.selectAfterLoanStandingBookPage(req);
 //            System.out.println(JSON.toJSONString(pages));
+            long end = System.currentTimeMillis();
+            System.out.println(end - startTime);
+            return PageResult.success(pages.getRecords(),pages.getTotal());
+        }catch (Exception ex){
+            logger.error(ex.getMessage());
+            ex.printStackTrace();
+            return PageResult.error(500, "数据库访问异常");
+        }
+    }
+    
+    
+    
+    /**
+     * 获取分页待贷后首页台账
+     * @param req 分页请求数据
+     * @author zengkun
+     * @date 2018年01月30日
+     * @return 菜单分页数据
+     */
+    @ApiOperation(value = "获取分页代扣管理台账")
+    @GetMapping("/selectRepayManage")
+    @ResponseBody
+    public PageResult<List<AfterLoanStandingBookVo>> selectRepayManage(@ModelAttribute AfterLoanStandingBookReq req){
+
+        try{
+            long startTime = System.currentTimeMillis();
+            List<String> companyIds= sysUserAreaService.selectUserAreas(loginUserInfoHelper.getUserId());
+            if(companyIds.size()>0) {
+                req.setCommIds(companyIds);
+            }
+            Page<AfterLoanStandingBookVo> pages = phoneUrgeService.selectRepayManage(req);
             long end = System.currentTimeMillis();
             System.out.println(end - startTime);
             return PageResult.success(pages.getRecords(),pages.getTotal());
@@ -426,5 +464,9 @@ public class CollectionController {
             return PageResult.error(500, "数据库访问异常");
         }
     }*/
+    
+    
+ 
+
 }
 

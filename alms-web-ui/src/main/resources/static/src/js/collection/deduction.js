@@ -18,11 +18,12 @@ var layer;
         };
         getDeductionInfo();
         getDeductionPlatformInfo();
+      
         vm = new Vue({
         	el: '#app',
         	data:{
         		
-        		
+        		isBankFlag:false,
         		ajax_data:{
                     businessId:""	, //业务编号
                     originalBusinessId:""  ,  
@@ -43,16 +44,24 @@ var layer;
                     phoneNumber:"",           
                     platformName:"",          
                     planServiceCharge:"",     
-                    planOverDueMoney:"",      
+                    planOverDueMoney:"", 
+                    onLineOverDueMoney:"",//线上逾期费
+                    underLineOverDueMoney:"",//线下逾期费
+                    underLineFactOverDueMoney:"",//线下逾期费实际扣除
+                    factPayAllMoney:"",//本次代扣全部金额
                     nowdate:"",               
                     operatorName:"",          
                     repaymentTypeName:"",
-                    currentStatus:""
-                   
+                    currentStatus:"",
+                    planAllAmount:"",//应还总额
+                    repayAllAmount:"",//已还总额
+                    restAmount:"",
+                    repayingAmount:'',//代扣中金额
+                    issueSplitType:''
 
                 },
                 platformList:[],
-                platformId:1
+                platformId:5
                 
          
         	},
@@ -94,42 +103,67 @@ var layer;
 	    });
 
 	}
+	function withHoldingRecord(){
+		if(vm.ajax_data.issueSplitType==1&&vm.platformId==5){debugger
+			vm.$Modal.error({content: '共借标不能银行代扣'});
+		   return;
+		}
+		var isAmountWithheld="false";
+		if(vm.ajax_data.total<vm.ajax_data.restAmount){
+			isAmountWithheld="true";//部分代扣
+		}else if(vm.ajax_data.total=vm.ajax_data.restAmount){
+			isAmountWithheld="false";//全部代扣
+		}
+	   if(vm.ajax_data.total>vm.ajax_data.restAmount){debugger
+		   vm.$Modal.error({content:"代扣金额不能大于本次最大可代扣金额"});
+	   return;
+	   }
+		   
+	   if(vm.ajax_data.underLineFactOverDueMoney>vm.ajax_data.planOverDueMoney){
+		   vm.$Modal.error({content:"本次代扣线下逾期费不能大于线下逾期费"});
+		   return;
+			   }
+	    var url
+	    $.ajax({
+	        type : 'GET',
+	        async : false,
+	        url : openPath+ "WithHoldingController/withholding?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId+"&total="+vm.ajax_data.total+"&planOverDueMoney="+vm.ajax_data.underLineFactOverDueMoney+"&platformId="+vm.platformId+"&type=0"+"&nowdate="+vm.ajax_data.nowdate+"&isAmountWithheld="+isAmountWithheld,
+	        headers : {
+	            app : 'ALMS',
+	            Authorization : "Bearer " + getToken()
+	        },
+	        success : function(data) {debugger
+	             if(data.code=='1'){
+	            	 vm.$Modal.success({content:data.data});
+	             }else{
+	                 vm.$Modal.error({content:data.data});
+	             }
+	        },
+	        error : function() {
+	            layer.confirm('Navbar error:AJAX请求出错!', function(index) {
+	                top.location.href = loginUrl;
+	                layer.close(index);
+	            });
+	            return false;
+	        }
+	    });
 
-	
-	var withHoldingRecord=function(){debugger
-		
-		
-        var self = this;
-        var reqStr =openPath+ "WithHoldingController/withholding?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId+"&total="+vm.ajax_data.total+"&planOverDueMoney="+vm.ajax_data.planOverDueMoney+"&platformId="+vm.platformId+"&type=1"+"&nowdate="+vm.ajax_data.nowdate
-        axios.get(reqStr)
-            .then(function (result) {
-                if (result.data.code == "1") {
-                	
-          
-                	 vm.$Modal.success({
-                         title: '',
-                         content:result.data.data
-                     });
-                } else {
-                    self.$Modal.error({content:result.data.msg});
-                }
-            })
-   
-        .catch(function (error) {
-        
-        		   vm.$Modal.error({content: '接口调用异常!'});
-        
-        
-        });
-		
-   
 	}
 	
-	var withHoldingRecordWithoutOverMoeny=function(){ 
+
+	
+	var withHoldingRecordWithoutOverMoeny=function(){ debugger
+	
+		if(vm.ajax_data.issueSplitType==1&&vm.platformId==5){
+			vm.$Modal.error({content: '共借标不能银行代扣'});
+		}
 		
-		
+		var isAmountWithheld="false";//全部代扣
+	if(vm.ajax_data.factPayAllMoney<vm.ajax_data.total){
+		isAmountWithheld="true";//部分代扣
+	}
         var self = this;
-        var reqStr =openPath+ "WithHoldingController/withholding?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId+"&total="+vm.ajax_data.total+"&planOverDueMoney="+vm.ajax_data.planOverDueMoney+"&platformId="+vm.platformId+"&type=0"+"&nowdate="+vm.ajax_data.nowdate
+        var reqStr =openPath+ "WithHoldingController/withholding?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId+"&total="+vm.ajax_data.total+"&planOverDueMoney="+vm.ajax_data.underLineFactOverDueMoney+"&platformId="+vm.platformId+"&type=0"+"&nowdate="+vm.ajax_data.nowdate+"&isAmountWithheld="+isAmountWithheld
         axios.get(reqStr)
             .then(function (result) {
                 if (result.data.code == "1") {
@@ -140,7 +174,7 @@ var layer;
                          content: '代扣正在处理中,请稍后查看代扣结果'
                      });
                 } else {
-                    self.$Modal.error({content: '获取数据失败：' + result.data.msg});
+                	vm.$Modal.error({content: '获取数据失败：' + result.data.msg});
                 }
             })
    
@@ -187,8 +221,19 @@ var layer;
                           vm.$Modal.error({content: '没有找到数据'});
                           return;
                       }
-                    vm.ajax_data=result.data.data;
+                  
+                    vm.ajax_data=result.data.data; 
+                    vm.details=result.data.data.details;
                     vm.platformId=result.data.data.platformId;
+                    vm.platformId=5;
+                    vm.isBankFlag=true;
+                 
+                    if(result.data.data.underLineOverDueMoney>0){
+                     	vm.ajax_data.planOverDueMoney=result.data.data.underLineOverDueMoney;
+                     	vm.ajax_data.onLineOverDueMoney=result.data.data.onLineOverDueMoney;
+               
+                    }
+                 	vm.ajax_data.underLineFactOverDueMoney=vm.ajax_data.planOverDueMoney;
 //                    searchRepayLog();
                     
                     //使用layerUI的表格组件
@@ -244,10 +289,18 @@ var layer;
                             //request: {} //如果无需自定义请求参数，可不加该参数
                             //response: {} //如果无需自定义数据响应名称，可不加该参数
                             page: false,
-                            done: function (res, curr, count) {
-                                //数据渲染完的回调。你可以借此做一些其它的操作
-                                //如果是异步请求数据方式，res即为你接口返回的信息。
-                                //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
+                            done: function (res, curr, count) {debugger
+                            	  var list=res.data;
+                                  var repayMoney=0;
+                   	            	if(list != null && list.length > 0){
+		                   	           	for (var i = 0; i < list.length; i++){
+		                   	           		if(list[i].repayStatus!="失败"){
+		                   	           	 	repayMoney=repayMoney+Number(list[i].currentAmount);
+		                   	           		}
+		                   	           	}
+		                   	       	}
+                   	            	vm.ajax_data.repayAllAmount=repayMoney;
+                   	            	getTotalShouldPay();
                                 vm.loading = false;
                             }
                         });
@@ -257,13 +310,13 @@ var layer;
 
                     });
                     
-                } else {
-                    self.$Modal.error({content: '获取数据失败：' + result.data.msg});
+                } else {debugger
+                    vm.$Modal.error({content: '获取数据失败：' + result.data.msg});
                 }
             })
    
         .catch(function (error) {
-            vm.$Modal.error({content: '接口调用异常!'});
+        	vm.$Modal.error({content: '接口调用异常!'});
         });
 		
    
@@ -271,7 +324,17 @@ var layer;
 	
 	
 	
+	var getTotalShouldPay = function () {debugger
+	var total=0;
+		vm.ajax_data.total=0;
 	
+	vm.ajax_data.total=vm.ajax_data.planPrincipal+vm.ajax_data.planAccrual+vm.ajax_data.planServiceCharge+vm.ajax_data.platformCharge+Number(vm.ajax_data.onLineOverDueMoney)+Number(vm.ajax_data.underLineFactOverDueMoney)-vm.ajax_data.repayAllAmount;
+	var total=vm.ajax_data.total;
+	vm.ajax_data.total=total.toFixed(2);
+	
+	return vm.ajax_data.total;
+	}
+
 	
 	
 	
@@ -300,5 +363,14 @@ var layer;
 		
    
 	}
-	
+	var doOperate = function () {debugger
+        if(vm.platformId=='5'){debugger
+        	vm.isBankFlag=true;
+        	vm.ajax_data.underLineFactOverDueMoney=0;
+        	vm.ajax_data.total=getTotalShouldPay();
+        }else{
+        	vm.isBankFlag=false;
+        	vm.ajax_data.total=getTotalShouldPay();
+        }
+	}
 	

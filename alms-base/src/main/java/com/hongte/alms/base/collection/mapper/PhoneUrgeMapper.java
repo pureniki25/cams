@@ -35,6 +35,15 @@ public interface PhoneUrgeMapper extends SuperMapper<StaffBusinessVo> {
      */
     List<AfterLoanStandingBookVo> selectAfterLoadStanding(Pagination pages, AfterLoanStandingBookReq key);
     List<AfterLoanStandingBookVo> selectAfterLoadStanding(AfterLoanStandingBookReq key);
+    
+    /**
+     * 代扣管理台账
+     * @param pages
+     * @param key
+     * @return
+     */
+    List<AfterLoanStandingBookVo> selectRepayManage(Pagination pages, AfterLoanStandingBookReq key);
+    
 
 
 

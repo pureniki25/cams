@@ -248,6 +248,31 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
         return req;
     }
 
+	@Override
+	public Page<AfterLoanStandingBookVo> selectRepayManage(AfterLoanStandingBookReq req) {
+        setAfterLoanStandingBookReqInfo(req);
+        Page<AfterLoanStandingBookVo> pages = new Page<>();
+        pages.setCurrent(req.getPage());
+        pages.setSize(req.getLimit());
+
+        if (req.getJustCheckMine()!=null && req.getJustCheckMine() ) {
+        	if (req.getBusinessIds()==null||req.getBusinessIds().size()==0) {
+        		pages.setRecords(new ArrayList<>()) ;
+        		pages.setTotal(0);
+        		return pages;
+			}
+		}
+
+
+
+        List<AfterLoanStandingBookVo> list = phoneUrgeMapper.selectRepayManage(pages,req);
+
+
+        pages.setRecords(list);
+        return pages;
+
+	}
+
 
     /**
      * 设置贷后台账的额外信息

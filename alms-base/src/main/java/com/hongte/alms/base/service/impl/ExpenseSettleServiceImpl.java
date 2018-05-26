@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,7 @@ import com.hongte.alms.base.vo.module.ExpenseSettleVO;
 import com.hongte.alms.common.util.DESC;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.EncryptionResult;
+import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.common.vo.RequestData;
 import com.hongte.alms.common.vo.ResponseData;
 import com.hongte.alms.common.vo.ResponseEncryptData;
@@ -82,8 +84,8 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 	TransferOfLitigationMapper transferOfLitigationMapper ;
 	@Value("${bmApi.apiUrl}")
 	String xindaiAplUrlUrl;
-
 	@Override
+	@Deprecated
 	public ExpenseSettleVO cal(String preSettleDate, String businessId) {
 		BasicBusiness business = basicBusinessMapper.selectById(businessId);
 		if (business == null) {
@@ -320,10 +322,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 
 	public ExpenseSettleVO cal(String businessId,Date settleDate) {
 		final BasicBusiness basicBusiness = basicBusinessMapper.selectById(businessId);
-		RepaymentBizPlan repaymentBizPlan = new RepaymentBizPlan() ;
-		repaymentBizPlan.setBusinessId(businessId);
-		repaymentBizPlan = repaymentBizPlanMapper
-				.selectOne(repaymentBizPlan);
+		List<RepaymentBizPlan> repaymentBizPlans = repaymentBizPlanMapper.selectList(new EntityWrapper<RepaymentBizPlan>().eq("original_business_id", businessId).orderBy("business_id"));
 		List<Object> businessIds = renewalBusinessMapper.selectObjs(new EntityWrapper<RenewalBusiness>().eq("original_business_id", businessId).setSqlSelect("renewal_business_id")) ;
 		if (businessIds==null) {
 			businessIds = new ArrayList<>();
@@ -333,20 +332,36 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 				new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", businessId).orderBy("due_date"));
 		final List<RepaymentBizPlanListDetail> details = repaymentBizPlanListDetailMapper.selectList(
 				new EntityWrapper<RepaymentBizPlanListDetail>().in("business_id", businessIds).orderBy("period"));
-		final ExpenseSettleRepaymentPlanVO plan = new ExpenseSettleRepaymentPlanVO(repaymentBizPlan, planLists, details);
+		final ExpenseSettleRepaymentPlanVO plan = new ExpenseSettleRepaymentPlanVO(repaymentBizPlans, planLists, details);
 		final List<BizOutputRecord> bizOutputRecord = bizOutputRecordMapper.selectList(
 				new EntityWrapper<BizOutputRecord>().eq("business_id", businessId).orderBy("fact_output_date", true));
 		ExpenseSettleVO expenseSettleVO = new ExpenseSettleVO() ;
-		if (!basicBusiness.getRepaymentTypeId().equals(new Integer(2))&&!basicBusiness.getRepaymentTypeId().equals(new Integer(5))) {
+		if (!basicBusiness.getRepaymentTypeId().equals(new Integer(2))
+				&&!basicBusiness.getRepaymentTypeId().equals(new Integer(1))
+				&&!basicBusiness.getRepaymentTypeId().equals(new Integer(9))
+				&&!basicBusiness.getRepaymentTypeId().equals(new Integer(5))
+				&&!basicBusiness.getRepaymentTypeId().equals(new Integer(500))
+				&&!basicBusiness.getRepaymentTypeId().equals(new Integer(1000))
+				) {
 			throw new ServiceRuntimeException("暂时不支持这种还款方式的试算");
 		}
+		
+		String contractDateStr=getContractDate(businessId);
+		Date contractDate=null;
+		if(StringUtil.notEmpty(contractDateStr)&&!contractDateStr.equals("0001-01-01 00:00:00")) {
+			contractDate=DateUtil.getDate(contractDateStr, "yyyy-MM-dd");
+		}else {
+			//若合同期为空或者等于0001-01-01 00:00:00,则用第一次出款日期代替合同日期
+			contractDate = bizOutputRecord.get(0).getFactOutputDate() ;
+		}
+		
 		calPrincipal(settleDate, expenseSettleVO, basicBusiness, plan,bizOutputRecord);
 		calInterest(settleDate, expenseSettleVO, basicBusiness, plan);
 		calServicecharge(settleDate, expenseSettleVO, basicBusiness, plan);
 		calGuaranteeFee(expenseSettleVO, basicBusiness);
 		calPlatformFee(settleDate, expenseSettleVO, basicBusiness, plan);
 		calDemurrage(settleDate, expenseSettleVO, basicBusiness, plan);
-		calPenalty(settleDate, expenseSettleVO, basicBusiness, plan);
+		calPenalty(settleDate, expenseSettleVO, basicBusiness, plan , bizOutputRecord.get(0).getFactOutputDate(),contractDate);
 		calLateFee(settleDate, expenseSettleVO, basicBusiness, plan);
 		calLackFee(settleDate, expenseSettleVO, basicBusiness, plan);
 		calBalance(expenseSettleVO, basicBusiness);
@@ -354,6 +369,65 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		return expenseSettleVO;
 		
 	}
+	
+	private String getContractDate(String originalBusinessId) {
+		String signDate = "";
+		try {
+
+			RequestData requestData = new RequestData();
+			JSONObject data = new JSONObject();
+			data.put("BusinessId", originalBusinessId);
+			requestData.setData(data.toJSONString());
+			requestData.setMethodName("BusinessDerate_GetContractSignDate");
+			String encryptStr = JSON.toJSONString(requestData);
+			// 请求数据加密
+			encryptStr = encryptPostData(encryptStr);
+			XindaiService xindaiService = Feign.builder().target(XindaiService.class, xindaiAplUrlUrl);
+			String respStr = xindaiService.getContractDate(encryptStr);
+			// 返回数据解密
+			ResponseData respData = getRespData(respStr);
+			if (respData.getData() != null) {
+				Map map = (Map) JSON.parse(respData.getData());
+				signDate = (String) map.get("SignDate");
+			}
+
+			logger.info("接口返回数据:" + respData.getData());
+
+		} catch (Exception ex) {
+			logger.error(ex.getMessage());
+		}
+		return signDate;
+
+	}
+
+	// 返回数据解密
+	private ResponseData getRespData(String str) throws Exception {
+		ResponseEncryptData resp = JSON.parseObject(str, ResponseEncryptData.class);
+		String decryptStr = decryptRespData(resp);
+		EncryptionResult result = JSON.parseObject(decryptStr, EncryptionResult.class);
+		ResponseData respData = JSON.parseObject(result.getParam(), ResponseData.class);
+
+		return respData;
+
+	}
+
+	// 加密
+	private String encryptPostData(String str) throws Exception {
+
+		DESC desc = new DESC();
+		str = desc.Encryption(str);
+
+		return str;
+	}
+
+	// 解密
+	private String decryptRespData(ResponseEncryptData data) throws Exception {
+
+		DESC desc = new DESC();
+		String str = desc.Decode(data.getA(), data.getUUId());
+		return str;
+	}
+		
 	
 	/**
 	 * 计算剩余未还本金
@@ -367,10 +441,16 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		for (BizOutputRecord bizOutputRecord : bizOutputRecords) {
 			outPutMoney = outPutMoney.add(bizOutputRecord.getFactOutputMoney());
 		}
+		expenseSettleVO.setBorrowAmount(outPutMoney);
 		switch (basicBusiness.getRepaymentTypeId()) {
+		case 1:
 		case 2:
 			expenseSettleVO.setPrincipal(outPutMoney);
 			break;
+//			包含还本付息还本付息5年10年
+		case 9:
+		case 500:
+		case 1000:
 		case 5:
 			BigDecimal paid = new BigDecimal(0);
 			for (RepaymentBizPlanListDetail detail : plan.allDetails()) {
@@ -398,9 +478,35 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 	 */
 	private void calInterest(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan) {
 		switch (basicBusiness.getRepaymentTypeId()) {
+		case 1:
 		case 2:
+			List<ExpenseSettleRepaymentPlanListVO>  list = plan.findCurrentPeriods(settleDate);
+			BigDecimal interest = new BigDecimal(0);
+			for (ExpenseSettleRepaymentPlanListVO expenseSettleRepaymentPlanListVO : list) {
+				RepaymentBizPlanList planList = expenseSettleRepaymentPlanListVO.getRepaymentBizPlanList() ;
+				for (RepaymentBizPlanListDetail detail : expenseSettleRepaymentPlanListVO.getRepaymentBizPlanListDetails()) {
+					if (detail.getPlanItemType().equals(20)) {
+						interest = interest.add(detail.getPlanAmount().subtract(detail.getFactAmount()!=null?detail.getFactAmount():new BigDecimal(0))) ;
+						break ;
+					}
+				}
+			}
+			interest = plan.calCurrentDetails(settleDate, 20, false).subtract(plan.calCurrentDetails(settleDate, 20, true)) ;
+			
+			Date finalPeriodDueDate = plan.getFinalPeriod().getRepaymentBizPlanList().getDueDate() ;
+			int diff = DateUtil.getDiffDays(finalPeriodDueDate, settleDate);
+			
+			if (diff>=1&&diff<=10) {
+//				若合同期外逾期少于等于10天,利息按日利率计算,贷后管理-20180518原型要求用千一计算
+				interest = expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.001)).multiply(new BigDecimal(diff)) ;
+			}
+			expenseSettleVO.setInterest(interest);
+			break ;
+		case 9:
+		case 500:
+		case 1000:
 		case 5:
-			expenseSettleVO.setInterest(plan.calCurrentDetails(settleDate, 20, false));
+			expenseSettleVO.setInterest(plan.calCurrentDetails(settleDate, 20, false).subtract(plan.calCurrentDetails(settleDate, 20, true)));
 			break;
 		default:
 			/*找不到还款方式233333333333*/
@@ -420,9 +526,13 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 	 */
 	private void calServicecharge(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan) {
 		switch (basicBusiness.getRepaymentTypeId()) {
+		case 1:
 		case 2:
+		case 9:
+		case 500:
+		case 1000:
 		case 5:
-			expenseSettleVO.setServicecharge(plan.calCurrentDetails(settleDate, 30, false));
+			expenseSettleVO.setServicecharge(plan.calCurrentDetails(settleDate, 30, false).subtract(plan.calCurrentDetails(settleDate, 30, true)));
 			break;
 		default:
 			/*找不到还款方式233333333333*/
@@ -512,9 +622,13 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 	 */
 	private void calPlatformFee(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan) {
 		switch (basicBusiness.getRepaymentTypeId()) {
+		case 1:
 		case 2:
+		case 9:
+		case 500:
+		case 1000:
 		case 5:
-			expenseSettleVO.setPlatformFee(plan.calCurrentDetails(settleDate, 50, false));
+			expenseSettleVO.setPlatformFee(plan.calCurrentDetails(settleDate, 50, false).subtract(plan.calCurrentDetails(settleDate, 50, true)));
 			break;
 		default:
 			/*找不到还款方式233333333333*/
@@ -523,13 +637,24 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 		}
 	}
 	
+	/**
+	 * 计算期内逾期费/期内滞纳金
+	 * @author 王继光
+	 * 2018年5月21日 下午5:07:42
+	 * @param settleDate
+	 * @param expenseSettleVO
+	 * @param basicBusiness
+	 * @param plan
+	 */
 	private void calLateFee(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan) {
 		BigDecimal rate = null;
 		switch (basicBusiness.getRepaymentTypeId()) {
+		case 1:
 		case 2:
 			//先息后本
-			rate = new BigDecimal(0.003);
-			break;
+		case 9:
+		case 500:
+		case 1000:
 		case 5:
 			//等额本息
 			rate = new BigDecimal(0.001);
@@ -544,15 +669,21 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 			return ;
 		}
 		
-		for (ExpenseSettleRepaymentPlanListVO e : plan.findCurrentPeriods(settleDate)) {
-			String status = e.getRepaymentBizPlanList().getCurrentStatus() ;
-			if (status.equals("逾期")) {
-				int daysBeyoungDueDate = DateUtil.getDiffDays(e.getRepaymentBizPlanList().getDueDate(), settleDate);
-				if (daysBeyoungDueDate > 1) {
-					expenseSettleVO.setLateFee(expenseSettleVO.getLateFee().add(expenseSettleVO.getPrincipal().multiply(rate).multiply(new BigDecimal(daysBeyoungDueDate)))); 
-				}
-			}
+		RepaymentBizPlanList repaymentBizPlanList = plan.findCurrentPeriods(settleDate).get(0).getRepaymentBizPlanList() ;
+		Date dueDate = repaymentBizPlanList.getDueDate();
+		int daysBeyoungDueDate = DateUtil.getDiffDays(dueDate, settleDate);
+		if (daysBeyoungDueDate > 1) {
+			expenseSettleVO.setLateFee(expenseSettleVO.getPrincipal().multiply(rate).multiply(new BigDecimal(daysBeyoungDueDate))); 
 		}
+//		for (ExpenseSettleRepaymentPlanListVO e : plan.findCurrentPeriods(settleDate)) {
+//			String status = e.getRepaymentBizPlanList().getCurrentStatus() ;
+//			if (status.equals("逾期")) {
+//				int daysBeyoungDueDate = DateUtil.getDiffDays(e.getRepaymentBizPlanList().getDueDate(), settleDate);
+//				if (daysBeyoungDueDate > 1) {
+//					expenseSettleVO.setLateFee(expenseSettleVO.getLateFee().add(expenseSettleVO.getPrincipal().multiply(rate).multiply(new BigDecimal(daysBeyoungDueDate)))); 
+//				}
+//			}
+//		}
 	}
 	
 	/**
@@ -576,6 +707,32 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 	}
 	
 	/**
+	 * 是否有月收平台费
+	 * @author 王继光
+	 * 2018年5月21日 下午4:27:19
+	 * @param plan
+	 * @return
+	 */
+	private boolean isMonthPlatformFee(ExpenseSettleRepaymentPlanVO plan) {
+		int count = 0 ;
+		for (ExpenseSettleRepaymentPlanListVO planListVO : plan.getRepaymentPlanListVOs()) {
+			List<RepaymentBizPlanListDetail> details = planListVO.getRepaymentBizPlanListDetails();
+			for (RepaymentBizPlanListDetail repaymentBizPlanListDetail : details) {
+				if (repaymentBizPlanListDetail.getPlanItemType().equals(50)) {
+					count++ ;
+					continue;
+				}
+			}
+			
+		}
+		if (count==0) {
+			return false ;
+		}
+		
+		return true ;
+	}
+	
+	/**
 	 * 计算提前还款违约金
 	 * @author 王继光
 	 * 2018年3月30日 下午5:58:40
@@ -584,34 +741,252 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 	 * @param basicBusiness
 	 * @param plan
 	 */
-	private void calPenalty(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan) {
-		BigDecimal penalty = new BigDecimal(0);
-		RepaymentBizPlanList lastCurrentPeriod = plan.findCurrentPeriods(settleDate).get(plan.findCurrentPeriods(settleDate).size()-1).getRepaymentBizPlanList() ;
-		for (RepaymentBizPlanListDetail detail : plan.allDetails()) {
-			if (detail.getPeriod()>lastCurrentPeriod.getPeriod()
-					&& detail.getPlanItemType() == 30) {
-				penalty = penalty.add(detail.getPlanAmount());
-			}
-			
+	private void calPenalty(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan,Date outPutDate,Date contactDate) {
+		RepaymentBizPlanList finalPeriod = plan.getFinalPeriod().getRepaymentBizPlanList();
+		int compare = DateUtil.getDiffDays(settleDate, finalPeriod.getDueDate());
+		if (compare<0) {
+			expenseSettleVO.setPenalty(new BigDecimal(0));
+			return ;
 		}
 		
-		switch (basicBusiness.getRepaymentTypeId()) {
-		case 2:
-			//先息后本
-			
-			BigDecimal p6 = expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.06));
-			if (penalty.compareTo(p6)>=0) {
-				penalty = p6 ;
+		BigDecimal penalty = new BigDecimal(0);
+		RepaymentBizPlanList lastCurrentPeriod = plan.findCurrentPeriods(settleDate).get(plan.findCurrentPeriods(settleDate).size()-1).getRepaymentBizPlanList() ;
+		boolean isMonthPlatformFee = isMonthPlatformFee(plan);
+		int surplusPeriodSize = plan.getSurplusPeriodSize(settleDate).intValue() ;
+		if (isMonthPlatformFee) {
+			boolean after20180402 = contactDate.after(DateUtil.getDate("2018-04-02",DateUtil.DEFAULT_FORMAT_DATE)) ;
+			boolean after20171230 = contactDate.after(DateUtil.getDate("2017-12-30",DateUtil.DEFAULT_FORMAT_DATE)) ;
+			Date firstRepayDate = plan.getRepaymentPlanListVOs().get(0).getRepaymentBizPlanList().getDueDate();
+			int diffMonths = DateUtil.getDiffMonths(firstRepayDate, settleDate);
+			BigDecimal serviceFee = new BigDecimal(0);
+			BigDecimal platFormFee = new BigDecimal(0);
+			BigDecimal penaltyFee = new BigDecimal(0);
+			if (after20180402) {
+				switch (basicBusiness.getRepaymentTypeId()) {
+				case 1:
+				case 2:
+					if (diffMonths<=12) {
+//						剩余借款本金×（2×月分公司服务费率）
+						serviceFee = plan.calCurrentDetails(settleDate, 30, false).multiply(new BigDecimal(2));
+//						剩余借款本金×（2×月平台服务费率）
+						platFormFee = plan.calCurrentDetails(settleDate, 50, false).multiply(new BigDecimal(2));
+//						剩余借款本金×0.5%×剩余借款期数（最高不超过剩余借款本金的6%）					
+						penaltyFee = expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.005)).multiply(new BigDecimal(surplusPeriodSize));
+//						提前结清违约金=月分公司服务费+月平台服务费+本金违约金
+						penalty = serviceFee.add(platFormFee).add(penaltyFee) ;
+//						最高不超过剩余借款本金的6%
+						BigDecimal less6 = expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.06)) ;
+						if (penalty.compareTo(less6)>0) {
+							penalty = less6 ;
+						}
+						
+					}
+					break;
+				case 9:
+				case 5:
+				case 500:
+					if (diffMonths<=6) {
+//						剩余借款本金×（2×月分公司服务费率）
+						serviceFee = plan.calCurrentDetails(settleDate, 30, false).multiply(new BigDecimal(2));
+//						剩余借款本金×（2×月平台服务费率）
+						platFormFee = plan.calCurrentDetails(settleDate, 50, false).multiply(new BigDecimal(2));
+//						本金违约金=（4%×剩余借款本金）-2×{剩余借款本金×（月分公司服务费率+月平台服务费率）				
+						penaltyFee = (expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.04)))
+								.subtract(
+										(plan.calCurrentDetails(settleDate, 30, false).add(plan.calCurrentDetails(settleDate, 50, false)))
+											.multiply(new BigDecimal(2))) ;
+//						提前结清违约金=月分公司服务费+月平台服务费+本金违约金
+						penalty = serviceFee.add(platFormFee).add(penaltyFee) ;
+					}
+					
+					if (diffMonths>=7&&diffMonths<=12) {
+//						剩余借款本金×（2×月分公司服务费率）
+						serviceFee = plan.calCurrentDetails(settleDate, 30, false).multiply(new BigDecimal(2));
+//						剩余借款本金×（2×月平台服务费率）
+						platFormFee = plan.calCurrentDetails(settleDate, 50, false).multiply(new BigDecimal(2));
+//						本金违约金=（2%×剩余借款本金）-2×{剩余借款本金×（月分公司服务费率+月平台服务费率）}
+						penaltyFee = (expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.02)))
+								.subtract(
+										(plan.calCurrentDetails(settleDate, 30, false).add(plan.calCurrentDetails(settleDate, 50, false)))
+											.multiply(new BigDecimal(2))) ;
+//						（根据公式，若计算结果为负数，则只收取服务费违约金。即本金违约金<=0）
+						if (penaltyFee.compareTo(new BigDecimal(0))<=0) {
+							penaltyFee = new BigDecimal(0);
+						}
+//						提前结清违约金=月分公司服务费+月平台服务费+本金违约金
+						penalty = serviceFee.add(platFormFee).add(penaltyFee) ;
+					}
+					
+					if (diffMonths>=13&&diffMonths<=48) {
+//						剩余借款本金×（2×月分公司服务费率）
+						serviceFee = plan.calCurrentDetails(settleDate, 30, false).multiply(new BigDecimal(2));
+//						剩余借款本金×（2×月平台服务费率）
+						platFormFee = plan.calCurrentDetails(settleDate, 50, false).multiply(new BigDecimal(2));
+//						提前结清违约金=月分公司服务费+月平台服务费
+						penalty = serviceFee.add(platFormFee) ;
+					}
+					break;
+				case 1000:
+//					剩余借款本金×（2×月分公司服务费率）
+					serviceFee = plan.calCurrentDetails(settleDate, 30, false).multiply(new BigDecimal(2));
+//					剩余借款本金×（2×月平台服务费率）
+					platFormFee = plan.calCurrentDetails(settleDate, 50, false).multiply(new BigDecimal(2));
+//					6月内（含）
+//					7-12月内（含）
+//					13-36
+					if (diffMonths<=36) {
+//						提前结清违约金=月分公司服务费+月平台服务费
+						penalty = serviceFee.add(platFormFee) ;
+					}
+				default:
+					break;
+				}
+				
+			}else if (after20171230) {
+				switch (basicBusiness.getRepaymentTypeId()) {
+				case 1:
+				case 2:
+					if (diffMonths<=12) {
+//						剩余借款本金×（月分公司服务费率）
+						serviceFee = plan.calCurrentDetails(settleDate, 30, false);
+//						剩余借款本金×（月平台服务费率）
+						platFormFee = plan.calCurrentDetails(settleDate, 50, false);
+//						剩余借款本金×0.5%×剩余借款期数（最高不超过剩余借款本金的6%）					
+						penaltyFee = expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.005)).multiply(new BigDecimal(surplusPeriodSize));
+//						提前结清违约金=月分公司服务费+月平台服务费+本金违约金
+						penalty = serviceFee.add(platFormFee).add(penaltyFee) ;
+//						最高不超过剩余借款本金的6%
+						BigDecimal less6 = expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.06)) ;
+						if (penalty.compareTo(less6)>0) {
+							penalty = less6 ;
+						}
+						
+					}
+					break;
+				case 9:
+				case 5:
+				case 500:
+					if (diffMonths<=6) {
+//						剩余借款本金×（2×月分公司服务费率）
+						serviceFee = plan.calCurrentDetails(settleDate, 30, false).multiply(new BigDecimal(2));
+//						剩余借款本金×（2×月平台服务费率）
+						platFormFee = plan.calCurrentDetails(settleDate, 50, false).multiply(new BigDecimal(2));
+//						本金违约金=（4%×剩余借款本金）-2×{剩余借款本金×（月分公司服务费率+月平台服务费率）				
+						penaltyFee = (expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.04)))
+								.subtract(
+										(plan.calCurrentDetails(settleDate, 30, false).add(plan.calCurrentDetails(settleDate, 50, false)))
+											.multiply(new BigDecimal(2))) ;
+//						提前结清违约金=月分公司服务费+月平台服务费+本金违约金
+						penalty = serviceFee.add(platFormFee).add(penaltyFee) ;
+					}
+					if (diffMonths>=7&&diffMonths<=12) {
+//						剩余借款本金×（月分公司服务费率）
+						serviceFee = plan.calCurrentDetails(settleDate, 30, false).multiply(new BigDecimal(1));
+//						剩余借款本金×（月平台服务费率）
+						platFormFee = plan.calCurrentDetails(settleDate, 50, false).multiply(new BigDecimal(1));
+//						本金违约金=（2%×剩余借款本金）-1×{剩余借款本金×（月分公司服务费率+月平台服务费率）}
+						penaltyFee = (expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.02)))
+								.subtract(
+										(plan.calCurrentDetails(settleDate, 30, false).add(plan.calCurrentDetails(settleDate, 50, false)))
+											.multiply(new BigDecimal(1))) ;
+//						（根据公式，若计算结果为负数，则只收取服务费违约金。即本金违约金<=0）
+						if (penaltyFee.compareTo(new BigDecimal(0))<=0) {
+							penaltyFee = new BigDecimal(0);
+						}
+//						提前结清违约金=月分公司服务费+月平台服务费+本金违约金
+						penalty = serviceFee.add(platFormFee).add(penaltyFee) ;
+					}
+					break;
+				case 1000:
+					if (diffMonths<=6) {
+//						剩余借款本金×（2×月分公司服务费率）
+						serviceFee = plan.calCurrentDetails(settleDate, 30, false).multiply(new BigDecimal(2));
+//						剩余借款本金×（2×月平台服务费率）
+						platFormFee = plan.calCurrentDetails(settleDate, 50, false).multiply(new BigDecimal(2));
+//						本金违约金=（6%×剩余借款本金）-2×{剩余借款本金×（月分公司服务费率+月平台服务费率）				
+						penaltyFee = (expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.06)))
+								.subtract(
+										(plan.calCurrentDetails(settleDate, 30, false).add(plan.calCurrentDetails(settleDate, 50, false)))
+											.multiply(new BigDecimal(2))) ;
+//						提前结清违约金=月分公司服务费+月平台服务费+本金违约金
+						penalty = serviceFee.add(platFormFee).add(penaltyFee) ;
+					}
+					if (diffMonths>=7&&diffMonths<=12) {
+//						剩余借款本金×（月分公司服务费率）
+						serviceFee = plan.calCurrentDetails(settleDate, 30, false).multiply(new BigDecimal(1));
+//						剩余借款本金×（月平台服务费率）
+						platFormFee = plan.calCurrentDetails(settleDate, 50, false).multiply(new BigDecimal(1));
+//						本金违约金=（2%×剩余借款本金）-2×{剩余借款本金×（月分公司服务费率+月平台服务费率）}
+						penaltyFee = (expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.02)))
+								.subtract(
+										(plan.calCurrentDetails(settleDate, 30, false).add(plan.calCurrentDetails(settleDate, 50, false)))
+											.multiply(new BigDecimal(1))) ;
+//						（根据公式，若计算结果为负数，则只收取服务费违约金。即本金违约金<=0）
+						if (penaltyFee.compareTo(new BigDecimal(0))<=0) {
+							penaltyFee = new BigDecimal(0);
+						}
+//						提前结清违约金=月分公司服务费+月平台服务费+本金违约金
+						penalty = serviceFee.add(platFormFee).add(penaltyFee) ;
+					}
+					break;
+				default:
+					break;
+				}
 			}
+		}else {
+			for (RepaymentBizPlanListDetail detail : plan.allDetails()) {
+				
+				if (detail.getPeriod()>lastCurrentPeriod.getPeriod()
+						&& detail.getPlanItemType() == 30) {
+					penalty = penalty.add(detail.getPlanAmount());
+				}
+				
+			}
+			boolean before20170605 = outPutDate.before(DateUtil.getDate("2017-06-05", DateUtil.DEFAULT_FORMAT_DATE)) ;
+			boolean before20170301 = outPutDate.before(DateUtil.getDate("2017-03-01", DateUtil.DEFAULT_FORMAT_DATE)) ;
+			boolean before20171204 = outPutDate.before(DateUtil.getDate("2017-12-04", DateUtil.DEFAULT_FORMAT_DATE)) ;
+			boolean after20171205 = outPutDate.after(DateUtil.getDate("2017-12-05", DateUtil.DEFAULT_FORMAT_DATE)) ;
+			switch (basicBusiness.getRepaymentTypeId()) {
+			case 1:
+			case 2:
+				//先息后本
 			
-			break;
-		case 5:
-			//等额本息
-			break;
-		default:
-			/*找不到还款方式233333333333*/
-			break;
+				if (before20170605) {
+					penalty = new BigDecimal(0);
+				}else {
+					penalty = expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.005).multiply(new BigDecimal(surplusPeriodSize)));
+				}
+				
+				break;
+			case 9:
+			case 5:
+				//等额本息
+				if (before20170301) {
+					penalty = new BigDecimal(0);
+				}else if(before20171204) {
+					BigDecimal p6 = expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.06));
+					if (penalty.compareTo(p6)>=0) {
+						penalty = p6 ;
+					}
+				}else if (after20171205) {
+					int diffMonth = DateUtil.getDiffMonths(outPutDate, settleDate) ;
+					if (diffMonth<=6) {
+						penalty = expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.04));
+					}else if(diffMonth<12) {
+						penalty = expenseSettleVO.getPrincipal().multiply(new BigDecimal(0.02));
+					}else {
+						penalty = new BigDecimal(0);
+					}
+				}
+				break;
+			default:
+				/*找不到还款方式233333333333*/
+				break;
+			}
 		}
+		
+		
+		
 		
 		expenseSettleVO.setPenalty(penalty);
 		
@@ -647,7 +1022,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 	 */
 	@Override
 	public  void calLackFee(Date settleDate ,ExpenseSettleVO expenseSettleVO,BasicBusiness basicBusiness ,ExpenseSettleRepaymentPlanVO plan){
-		/*往期滞纳金,取最大一期*/
+		/*连续的往期滞纳金,取最大一期,且如果有逾期变已还款但滞纳金没缴的情况,需要加上*/
 		BigDecimal firstLateFee = null ;
 		List<BigDecimal> instersets = new ArrayList<>() ;
 		for (int i = 0; i < 10; i++) {
@@ -663,7 +1038,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 			expenseSettleLackFeeVO.setInterest(new BigDecimal(0));
 			
 			for (RepaymentBizPlanListDetail d : e.getRepaymentBizPlanListDetails()) {
-				if (d.getPlanItemType().equals(new Integer(30)) && (d.getFactAmount() == null
+				if (d.getPlanItemType().equals(new Integer(30))&&!d.getAccountStatus().equals(0) && (d.getFactAmount() == null
 						|| d.getFactAmount().subtract(d.getPlanAmount()).compareTo(new BigDecimal(0)) < 0)) {
 
 					expenseSettleLackFeeVO.setServicecharge(d.getPlanAmount()
@@ -696,19 +1071,30 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 					}
 					expenseSettleLackFeeVO.setInterest(instersets.get(Integer.valueOf(n)-1));
 					
-					expenseSettleLackFeeVO.setInterest(instersets.get(Integer.valueOf(n)-1));
 				} else if (d.getPlanItemType().equals(new Integer(60))) {
+//					//已还款
+//					if(e.getRepaymentBizPlanList().getCurrentStatus().equals("已还款")) {
+//						BigDecimal overDue = e.getRepaymentBizPlanList().getOverdueAmount();
+//						BigDecimal fact = d.getFactAmount()==null?new BigDecimal(0):d.getFactAmount() ;
+//						//但是产生逾期滞纳金
+//						if (overDue!=null) {
+//							//逾期费与detail的逾期费相等
+//							if (d.getPlanAmount().equals(overDue)) {
+//								expenseSettleLackFeeVO.setLateFee(d.getPlanAmount().subtract(fact));
+//							}
+//						}
+//					}
 					if (firstLateFee == null) {
 						if (e.getRepaymentBizPlanList() != null && e.getRepaymentBizPlanList().getCurrentStatus().equals("逾期")) {
 							int daysBeyoungDueDate = DateUtil.getDiffDays(e.getRepaymentBizPlanList().getDueDate(), settleDate);
-							BigDecimal lateFeeRate=BigDecimal.valueOf(0);
-							if(e.getRepaymentBizPlanList().getOverdueDays().multiply(expenseSettleVO.getPrincipal()).compareTo(BigDecimal.valueOf(0))==1) {
-								 lateFeeRate = d.getPlanAmount()
-										.divide(e.getRepaymentBizPlanList().getOverdueDays().multiply(expenseSettleVO.getPrincipal()),10,RoundingMode.HALF_UP);
-							}
-					
+//							利率不用自己算了,都用千一,20180522肖莹环说的
+//							BigDecimal lateFeeRate=BigDecimal.valueOf(0);
+//							if(e.getRepaymentBizPlanList().getOverdueDays().multiply(expenseSettleVO.getPrincipal()).compareTo(BigDecimal.valueOf(0))==1) {
+//								 lateFeeRate = d.getPlanAmount()
+//										.divide(e.getRepaymentBizPlanList().getOverdueDays().multiply(expenseSettleVO.getPrincipal()),10,RoundingMode.HALF_UP);
+//							}
 							if (daysBeyoungDueDate > 1) {
-								firstLateFee = expenseSettleVO.getPrincipal().multiply(lateFeeRate)
+								firstLateFee = expenseSettleVO.getBorrowAmount().multiply(new BigDecimal(0.001))
 										.multiply(new BigDecimal(daysBeyoungDueDate));
 								expenseSettleLackFeeVO.setLateFee(firstLateFee);
 							}

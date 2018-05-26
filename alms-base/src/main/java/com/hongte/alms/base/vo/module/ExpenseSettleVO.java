@@ -19,6 +19,7 @@ public class ExpenseSettleVO implements Serializable{
 	 */
 	private static final long serialVersionUID = -1312491103861263898L;
 
+	private BigDecimal borrowAmount ;
 	/**
 	 * 剩余未还本金
 	 */
@@ -290,6 +291,20 @@ public class ExpenseSettleVO implements Serializable{
 		setPlatformFee(new BigDecimal(0));
 		setServicecharge(new BigDecimal(0));
 		setList(Collections.EMPTY_LIST);
+	}
+
+	/**
+	 * @return the borrowAmount
+	 */
+	public BigDecimal getBorrowAmount() {
+		return borrowAmount;
+	}
+
+	/**
+	 * @param borrowAmount the borrowAmount to set
+	 */
+	public void setBorrowAmount(BigDecimal borrowAmount) {
+		this.borrowAmount = borrowAmount;
 	}
 	
 	

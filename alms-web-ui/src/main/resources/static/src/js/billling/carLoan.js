@@ -13,6 +13,7 @@ window.layinit(function (htConfig) {
 	    data: {
 	    	
 	    	preLateFeesFlag:false,	//提前还款违约金标识，非上标业务，等额本息为true
+	    	carLoanBilLoading:false,
 	    	
 	        baseInfoForm:{
 	        	customerName:""        , // 客户名称
@@ -36,8 +37,10 @@ window.layinit(function (htConfig) {
 	        	receivableTotal: '',//	应收合计
 	        	overRepayMoney: '',		//	结余
 	        	refundMoney: '',		//	押金转还款金额
-				squaredUp: ''		//	最终结清金额
+				squaredUp: '',		//	最终结清金额
 	        },
+	        
+	        lastRepayDate: '',	// 最后一次结清日期
 	        
 	        commitInfoForm: {
 				businessId:""		   	, // 业务编号
@@ -89,16 +92,18 @@ window.layinit(function (htConfig) {
                         var year = DATE.getFullYear();
                         var month = DATE.getMonth()+1;
                         var day = DATE.getDate();
-                        return date.getTime() < new Date(year+"-"+month+"-"+day+" 00:00:00").getTime() || (new Date(year+"-"+month+"-"+day+" 00:00:00").getTime() + 1000*60*60*24*15 ) <= date.getTime()
+                        return date.getTime() < (vm.lastRepayDate ? new Date(vm.lastRepayDate).getTime():new Date(year+"-"+month+"-"+day+" 00:00:00").getTime()) || (new Date(year+"-"+month+"-"+day+" 00:00:00").getTime() + 1000*60*60*24*15 ) <= date.getTime()
                     }
                 }
             }
 	    },
 	   methods: {
 		   carLoanBilling:function(){
+			   vm.carLoanBilLoading = true;
 			   vm.commitInfoForm.businessId = businessId;
 			   axios.post(basePath +"transferOfLitigation/carLoanBilling", vm.commitInfoForm)
 		        .then(function (res) {
+		        	vm.carLoanBilLoading = false;
 		            if (res.data.data != null && res.data.code == 1) {
 		            	vm.baseInfoForm = res.data.data;
 		            	vm.baseInfoForm.borrowRate = res.data.data.borrowRate + '%/年';
@@ -108,6 +113,7 @@ window.layinit(function (htConfig) {
 		            }
 		        })
 		        .catch(function (error) {
+		        	vm.carLoanBilLoading = false;
 		            vm.$Modal.error({content: '接口调用异常!'});
 		        });
 		   },
@@ -121,9 +127,10 @@ window.layinit(function (htConfig) {
 			axios.get(reqUrl).then(function(res){
 				if(res.data.code=='1'){
 					vm.baseInfoForm = res.data.data;
+					vm.lastRepayDate = res.data.data.lastRepayDate;
 					vm.baseInfoForm.borrowRate = res.data.data.borrowRate + '%/年';
 					if (res.data.data.outputPlatformId == 0 && res.data.data.repaymentTypeId == '等额本息') {
-						vm.preLateFeesFlag = res.data.data.preLateFeesFlag;
+						vm.preLateFeesFlag = true;
 					}
 				}else{
 					vm.$Modal.error({content: res.data.msg });
