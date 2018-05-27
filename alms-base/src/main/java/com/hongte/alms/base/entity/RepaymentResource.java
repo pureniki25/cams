@@ -107,10 +107,12 @@ public class RepaymentResource extends Model<RepaymentResource> {
 	/**
 	 * 被分配到的线上滞纳金,用于财务确认分润
 	 */
+	@TableField(exist=false)
 	private BigDecimal dOfflineOverDue ;
 	/**
 	 * 被分配到的线下滞纳金,用于财务确认分润
 	 */
+	@TableField(exist=false)
 	private BigDecimal dOnlineOverDue ;
 
 

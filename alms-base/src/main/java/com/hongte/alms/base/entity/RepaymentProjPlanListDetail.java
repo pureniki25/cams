@@ -179,6 +179,9 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
 	private String updateUser;
 
 
+	@TableField(exist=false)
+	private Integer repaySource ;
+	
 	public String getProjPlanDetailId() {
 		return projPlanDetailId;
 	}
@@ -409,5 +412,19 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
 	 */
 	public void setDerateAmount(BigDecimal derateAmount) {
 		this.derateAmount = derateAmount;
+	}
+
+	/**
+	 * @return the repaySource
+	 */
+	public Integer getRepaySource() {
+		return repaySource;
+	}
+
+	/**
+	 * @param repaySource the repaySource to set
+	 */
+	public void setRepaySource(Integer repaySource) {
+		this.repaySource = repaySource;
 	}
 }

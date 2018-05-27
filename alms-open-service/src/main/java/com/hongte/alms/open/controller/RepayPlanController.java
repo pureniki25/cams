@@ -3,6 +3,8 @@ package com.hongte.alms.open.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.hongte.alms.base.RepayPlan.dto.PlanReturnInfoDto;
+import com.hongte.alms.base.RepayPlan.dto.app.BizDto;
+import com.hongte.alms.base.RepayPlan.dto.app.BizPlanDto;
 import com.hongte.alms.base.RepayPlan.req.CreatRepayPlanReq;
 import com.hongte.alms.base.RepayPlan.req.trial.TrailRepayPlanReq;
 import com.hongte.alms.common.result.Result;
@@ -16,6 +18,8 @@ import com.hongte.alms.open.util.TripleDESDecrypt;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+
+import java.util.List;
 
 /**
  * @author zengkun
@@ -64,7 +68,7 @@ public class RepayPlanController {
 
 
     @ApiOperation(value = "试算还款计划接口, 精简字段")
-    @GetMapping("/trailRepayPlan")
+    @PostMapping("/trailRepayPlan")
     @ResponseBody
     @TripleDESDecrypt
     public Result<PlanReturnInfoDto> trailRepayPlan(@RequestBody TrailRepayPlanReq trailRepayPlanReq){
@@ -78,7 +82,7 @@ public class RepayPlanController {
     }
 
     @ApiOperation(value = "根据businessId查询还款计划")
-    @GetMapping("/queryRepayPlanByBusinessId")
+    @PostMapping("/queryRepayPlanByBusinessId")
     @ResponseBody
     @TripleDESDecrypt
     public Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(@RequestParam(value = "businessId") String businessId){
@@ -86,13 +90,40 @@ public class RepayPlanController {
     }
 
     @ApiOperation(value = "根据businessId查询还款计划")
-    @GetMapping("/deleteRepayPlanByConditions")
+    @PostMapping("/deleteRepayPlanByConditions")
     @ResponseBody
     @TripleDESDecrypt
     public Result<PlanReturnInfoDto> deleteRepayPlanByConditions(@RequestParam(value = "businessId") String businessId,
                                                                  @RequestParam(value = "repaymentBatchId") String repaymentBatchId){
         return creatRepayPlanRemoteService.deleteRepayPlanByConditions(businessId, repaymentBatchId);
     }
+
+    @ApiOperation(value = "根据businessId查询还款计划")
+    @PostMapping("/getRepayList")
+    @ResponseBody
+//    @TripleDESDecrypt
+    Result<List<BizDto>> getRepayList(@RequestParam(value = "businessIds") List<String> businessIds){
+        return creatRepayPlanRemoteService.getRepayList(businessIds);
+    }
+
+
+     @ApiOperation(value = "根据业务ID查找此业务的历史账单")
+    @PostMapping("/getLogBill")
+    @ResponseBody
+    Result<BizDto> getLogBill(@RequestParam(value = "businessId")String businessId){
+        return creatRepayPlanRemoteService.getLogBill(businessId);
+    }
+
+    @ApiOperation(value = "根据还款计划ID查找出此还款计划的详情账单信息")
+    @PostMapping("/getBizPlanBill")
+    @ResponseBody
+     Result<BizPlanDto> getBizPlanBill(@RequestParam(value = "planId") String planId){
+        return creatRepayPlanRemoteService.getBizPlanBill(planId);
+    }
+
+
+//    @RequestMapping(value = "/RepayPlan/getRepayList",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+//    Result<PlanReturnInfoDto> getRepayList(@RequestParam(value = "businessIds") List<String> businessIds) ;
 
 
 

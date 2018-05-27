@@ -19,6 +19,8 @@
         <result column="fact_amount" property="factAmount" />
         <result column="repay_source" property="repaySource" />
         <result column="fact_repay_date" property="factRepayDate" />
+        <result column="repay_source_id" property="repaySourceId" />
+        <result column="confirm_log_id" property="confirmlogId" />
         <result column="repay_ref_id" property="repayRefId" />
         <result column="create_date" property="createDate" />
         <result column="create_user" property="createUser" />
@@ -28,7 +30,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        proj_plan_detail_repay_id AS projPlanDetailRepayId,plan_list_id as planListid,proj_plan_list_id as projPlanListId, proj_plan_detail_id AS projPlanDetailId, project_id AS projectId, business_id AS businessId, orig_business_id AS origBusinessId, period, after_id AS afterId, fee_id AS feeId, plan_item_name AS planItemName, plan_item_type AS planItemType, fact_amount AS factAmount, repay_source AS repaySource, fact_repay_date AS factRepayDate, repay_ref_id AS repayRefId, create_date AS createDate, create_user AS createUser, update_date AS updateDate, update_user AS updateUser
+        proj_plan_detail_repay_id AS projPlanDetailRepayId,plan_list_id as planListid,repay_source_id AS repaySourceId,confirm_log_id AS confirmlogId, proj_plan_list_id as projPlanListId, proj_plan_detail_id AS projPlanDetailId, project_id AS projectId, business_id AS businessId, orig_business_id AS origBusinessId, period, after_id AS afterId, fee_id AS feeId, plan_item_name AS planItemName, plan_item_type AS planItemType, fact_amount AS factAmount, repay_source AS repaySource, fact_repay_date AS factRepayDate, repay_ref_id AS repayRefId, create_date AS createDate, create_user AS createUser, update_date AS updateDate, update_user AS updateUser
     </sql>
 
 	<select id="calFactRepay" resultType="java.math.BigDecimal">

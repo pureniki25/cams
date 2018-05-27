@@ -139,5 +139,22 @@
 			ppl.after_id
 	</select>
 	
+	<select id="caluProjPlanListFactAmount" resultType="java.math.BigDecimal">
+		SELECT
+			IFNULL(SUM(proj_fact_amount),0)
+		FROM
+			tb_repayment_proj_plan_list_detail 
+		WHERE
+			proj_plan_list_id = #{projPlanListId}
+	</select>
+	
+	<select id="caluProjPlanListPlanAmount" resultType="java.math.BigDecimal">
+		SELECT
+			(IFNULL(SUM(proj_plan_amount),0)-IFNULL(SUM(derate_amount),0))
+		FROM
+			tb_repayment_proj_plan_list_detail 
+		WHERE
+			proj_plan_list_id = #{projPlanListId}
+	</select>
 
 </mapper>

@@ -5,15 +5,19 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo;
+import com.hongte.alms.base.dto.ConfirmRepaymentReq;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.entity.MoneyPool;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.RepaymentResource;
 import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.enums.RepayRegisterState;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanRepaySrcEnum;
 import com.hongte.alms.base.mapper.MoneyPoolMapper;
 import com.hongte.alms.base.mapper.MoneyPoolRepaymentMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListMapper;
+import com.hongte.alms.base.mapper.RepaymentConfirmLogMapper;
 import com.hongte.alms.base.service.MoneyPoolService;
 import com.hongte.alms.base.service.XindaiService;
 import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
@@ -34,6 +38,7 @@ import feign.Feign;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -77,6 +82,8 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 	RepaymentBizPlanListMapper repaymentBizPlanListMapper ;
 
 	@Autowired
+	RepaymentConfirmLogMapper confirmLogMapper;
+	@Autowired
 	LoginUserInfoHelper loginUserInfoHelper ;
 	@Override
 	public List<MoneyPoolVO> listMoneyPool(String businessId, String afterId) {
@@ -84,8 +91,8 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 	}
 
 	@Override
-	public List<MatchedMoneyPoolVO> listMatchedMoneyPool(String businessId, String afterId) {
-		return moneyPoolMapper.listMatchedMoneyPool( businessId,  afterId);
+	public List<MatchedMoneyPoolVO> listMatchedMoneyPool(String businessId, String afterId,Boolean notConfirmed) {
+		return moneyPoolMapper.listMatchedMoneyPool( businessId,  afterId , notConfirmed);
 	}
 
 	@Override
@@ -473,4 +480,36 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 		return repayment;
 		
 	}
+
+	@Override
+	public void confirmRepaidUpdateMoneyPool(ConfirmRepaymentReq req) {
+		if (req.getMprIds()==null) {
+			return ;
+		}
+		List<MoneyPoolRepayment> moneyPoolRepayments = moneyPoolRepaymentMapper.selectBatchIds(req.getMprIds());
+		for (MoneyPoolRepayment mpr : moneyPoolRepayments) {
+			mpr.setState(RepayRegisterFinanceStatus.财务确认已还款.toString());
+			MoneyPool moneyPool = moneyPoolMapper.selectById(mpr.getMoneyPoolId());
+			moneyPool.setStatus(RepayRegisterState.完成.toString());
+			moneyPool.setFinanceStatus(RepayRegisterFinanceStatus.财务确认已还款.toString());
+			mpr.updateById();
+			moneyPool.updateById();
+		}
+	}
+
+	@Override
+	public void revokeConfirmRepaidUpdateMoneyPool(RepaymentResource repaymentResource) {
+		if (repaymentResource!=null&&repaymentResource.getRepaySource().equals(
+				RepayPlanRepaySrcEnum.OFFLINE_TRANSFER.getValue().toString())) {
+			MoneyPoolRepayment mpr = moneyPoolRepaymentMapper.selectById(repaymentResource.getRepaySourceRefId());
+			MoneyPool moneyPool = moneyPoolMapper.selectById(mpr.getMoneyPoolId()); 
+			mpr.setState(RepayRegisterFinanceStatus.未关联银行流水.toString());
+			mpr.setIsFinanceMatch(0);
+			moneyPool.setStatus(RepayRegisterState.待领取.toString());
+			moneyPool.setFinanceStatus(RepayRegisterFinanceStatus.未关联银行流水.toString());
+			mpr.updateById();
+			moneyPool.updateById();
+		}
+	}
+
 }

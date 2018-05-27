@@ -39,6 +39,7 @@ import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.enums.AreaLevel;
 import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.enums.RepayRegisterState;
+import com.hongte.alms.base.service.AccountantOverRepayLogService;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.BasicBusinessTypeService;
 import com.hongte.alms.base.service.BasicCompanyService;
@@ -47,7 +48,9 @@ import com.hongte.alms.base.service.BizOutputRecordService;
 import com.hongte.alms.base.service.MoneyPoolRepaymentService;
 import com.hongte.alms.base.service.MoneyPoolService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
+import com.hongte.alms.base.service.RepaymentConfirmLogService;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
+import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.base.vo.finance.CurrPeriodRepaymentInfoVO;
 import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
 import com.hongte.alms.common.result.Result;
@@ -98,6 +101,15 @@ public class FinanceController {
 	@Autowired
 	@Qualifier("ShareProfitService")
 	private ShareProfitService shareService;
+	@Autowired
+	@Qualifier("RepaymentConfirmLogService")
+	private RepaymentConfirmLogService confrimLogService;
+	@Autowired
+	@Qualifier("MoneyPoolService")
+	private MoneyPoolService MoneyPoolService ;
+	@Autowired
+	@Qualifier("AccountantOverRepayLogService")
+	private AccountantOverRepayLogService accountantOverRepayLogService;
 
 	@GetMapping(value = "/repayBaseInfo")
 	@ApiOperation(value = "获取还款基本信息")
@@ -386,18 +398,43 @@ public class FinanceController {
 	public Result previewConfirmRepayment(@RequestBody ConfirmRepaymentReq req) {
 		Result result ;
 		logger.info("@previewConfirmRepayment@预览确认还款拆标情况--开始[{}]",req);
-//		result = financeService.previewConfirmRepayment(req);
-		shareService.execute(req, false);
-//		logger.info("@previewConfirmRepayment@预览确认还款拆标情况--结束[{}]",result);
-		return Result.success() ;
+		try {
+			List<CurrPeriodProjDetailVO> detailVOs = shareService.execute(req, false);
+			result = Result.success(detailVOs);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			result = Result.error("500", e.getMessage());
+		}
+		logger.info("@previewConfirmRepayment@预览确认还款拆标情况--结束[{}]",result);
+		return result ;
 	}
+	
+	@PostMapping(value="/confirmRepayment")
+	@ApiOperation(value="预览确认还款拆标情况")
+	public Result confirmRepayment(@RequestBody ConfirmRepaymentReq req) {
+		Result result ;
+		logger.info("@confirmRepayment@确认还款拆标情况--开始[{}]",req);
+		try {
+			List<CurrPeriodProjDetailVO> detailVOs = shareService.execute(req, true);
+			moneyPoolService.confirmRepaidUpdateMoneyPool(req);
+			result = Result.success(detailVOs);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			result = Result.error("500", e.getMessage());
+			e.printStackTrace();
+		}
+		logger.info("@confirmRepayment@确认还款拆标情况--结束[{}]",result);
+		return result ;
+	}
+	
 	
 	@GetMapping(value="/getSurplusFund")
 	@ApiOperation(value="获取结余情况")
 	public Result getSurplusFund(String businessId,String afterId) {
 		Result result ;
 		logger.info("@getSurplusFund@获取结余情况--开始[{}{}]",businessId,afterId);
-		BigDecimal surplusFund = financeService.getSurplusFund(businessId, afterId);
+		BigDecimal surplusFund = accountantOverRepayLogService.caluCanUse(businessId, null );
 		result = Result.success(surplusFund);
 		logger.info("@getSurplusFund@获取结余情况--结束[{}]",result);
 		return result ;
@@ -419,6 +456,21 @@ public class FinanceController {
 		} catch (Exception e) {
 			logger.error("根据源业务编号获取还款计划信息失败--[{}]", e);
 			return Result.error("-500", "系统异常，获取还款计划信息失败");
+		}
+	}
+	
+	@GetMapping(value = "/revokeConfirm")
+	@ApiOperation(value = "撤销还款确认")
+	public Result revokeConfirm(String businessId,String afterId) {
+		try {
+			logger.info("@revokeConfirm@撤销还款确认--开始[{}]", businessId,afterId);
+			Result result = null;
+			result = confrimLogService.revokeConfirm(businessId, afterId);
+			logger.info("@revokeConfirm@撤销还款确认--结束[{}]", result);
+			return result;
+		} catch (Exception e) {
+			logger.error("撤销还款确认失败--[{}]", e);
+			return Result.error("-500", "系统异常:撤销还款确认失败");
 		}
 	}
 	
