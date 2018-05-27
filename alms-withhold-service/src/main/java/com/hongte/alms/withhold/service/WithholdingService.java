@@ -10,7 +10,7 @@ public interface WithholdingService {
 
 
     /**
-     * 代扣操作
+     * 自动代扣操作
      */
     void withholding();
     
