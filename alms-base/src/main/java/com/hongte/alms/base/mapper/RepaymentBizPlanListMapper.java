@@ -3,6 +3,7 @@ package com.hongte.alms.base.mapper;
 import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.base.dto.RepaymentPlanInfoDTO;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.vo.finance.ConfirmWithholdListVO;
 import com.hongte.alms.base.vo.module.FinanceManagerListVO;
 import com.hongte.alms.common.mapper.SuperMapper;
 import org.apache.ibatis.annotations.Param;
@@ -99,4 +100,13 @@ public interface RepaymentBizPlanListMapper extends SuperMapper<RepaymentBizPlan
      * @return
      */
     BigDecimal caluBizPlanListUnpaid(String planListId);
+    
+    /**
+     * 查询业务的代扣确认列表信息
+     * @author 王继光
+     * 2018年5月28日 下午4:09:31
+     * @param businessId
+     * @return
+     */
+    List<ConfirmWithholdListVO> listConfirmWithhold(String businessId);
 }

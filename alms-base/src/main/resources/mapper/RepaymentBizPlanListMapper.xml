@@ -579,4 +579,34 @@
 		WHERE
 			plan_list_id = #{planListId};
     </select>
+    <select id="listConfirmWithhold" resultType="com.hongte.alms.base.vo.finance.ConfirmWithholdListVO">
+    SELECT
+		after_id AS afterId,
+		due_date AS dueDate,
+	IF
+		( confirm_flag = 1, '已确认', '待确认' ) AS `status`,
+		total_borrow_amount AS total,
+		IFNULL(
+		( SELECT sum( IFNULL( plan_amount, 0 ) ) FROM tb_repayment_biz_plan_list_detail WHERE plan_list_id = bpl.plan_list_id AND plan_item_type = 10 ),
+		0 
+		) AS item10,
+		IFNULL(
+		( SELECT sum( IFNULL( plan_amount, 0 ) ) FROM tb_repayment_biz_plan_list_detail WHERE plan_list_id = bpl.plan_list_id AND plan_item_type = 20 ),
+		0 
+		) AS item20,
+		IFNULL(
+		( SELECT sum( IFNULL( plan_amount, 0 ) ) FROM tb_repayment_biz_plan_list_detail WHERE plan_list_id = bpl.plan_list_id AND plan_item_type = 30 ),
+		0 
+		) AS item30,
+		IFNULL(
+		( SELECT sum( IFNULL( plan_amount, 0 ) ) FROM tb_repayment_biz_plan_list_detail WHERE plan_list_id = bpl.plan_list_id AND plan_item_type = 50 ),
+		0 
+		) AS item50 
+	FROM
+		tb_repayment_biz_plan_list bpl 
+	WHERE
+		bpl.business_id = #{businessId} 
+	ORDER BY
+		bpl.after_id
+    </select>
 </mapper>
