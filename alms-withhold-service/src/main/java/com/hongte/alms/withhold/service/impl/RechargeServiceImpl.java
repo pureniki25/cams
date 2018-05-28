@@ -5,6 +5,7 @@ import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.WithholdingChannel;
 import com.hongte.alms.base.entity.WithholdingRepaymentLog;
+import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.feignClient.dto.CustomerInfoDto;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
@@ -12,7 +13,11 @@ import com.hongte.alms.base.service.WithholdingChannelService;
 import com.hongte.alms.base.service.WithholdingRepaymentLogService;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.StringUtil;
+import com.hongte.alms.withhold.service.EipOutRechargeService;
 import com.hongte.alms.withhold.service.RechargeService;
+
+import feign.Feign;
+
 import java.util.Comparator;
 import java.util.List;
 
@@ -41,6 +46,9 @@ public class RechargeServiceImpl implements RechargeService {
     @Autowired
     @Qualifier("withholdingChannelService")
     WithholdingChannelService withholdingChannelService;
+    
+    @Autowired
+    EipOutRechargeService eipOutRechargeService;
 
 	@Override
 	public Result recharge(String businessId, String afterId, String bankCard,String amount,String platformId) {
@@ -75,6 +83,17 @@ public class RechargeServiceImpl implements RechargeService {
 			result.setData(null);
 			result.setCode("-1");
 			result.setMsg("当前失败或者执行中次数为:" + failCount + ",超过限制次数，不允许执行。");
+		}else {
+			if(platformId.equals(PlatformEnum.YB_FORM.getValue().toString())) {
+				//eipOutRechargeService.platfromRecharge(dto);
+			}
+			if(platformId.equals(PlatformEnum.BF_FORM.getValue().toString())) {
+				//eipOutRechargeService.platfromRecharge(dto);
+			}
+            if(platformId.equals(PlatformEnum.YH_FORM.getValue().toString())) {
+            	//eipOutRechargeService.bankRecharge(dto);
+			}
+			
 		}
 		return result;
 	}
