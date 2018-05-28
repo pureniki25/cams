@@ -6,7 +6,7 @@ spring:
     name: alms-core-service
   cloud:
     config:
-#      name: eip-in,base,rabbitmq,mongo,redis
+      name: alms-core-service,base,rabbitmq,mongo,redis
       discovery:
         service-id: ussp-config-app
         enabled: true
