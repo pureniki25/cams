@@ -751,6 +751,10 @@ public class CreatRepayPlanServiceImplTest {
 
     }
 
-
+    @Test
+    public void testQueryRepayPlanByBusinessId() {
+    	PlanReturnInfoDto dto = creatRepayPlanService.queryRepayPlanByBusinessId("TSYD1012018051901");
+    	System.out.println(dto);
+    }
 
 }

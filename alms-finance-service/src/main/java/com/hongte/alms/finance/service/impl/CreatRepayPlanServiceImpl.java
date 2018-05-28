@@ -1759,7 +1759,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 					return planReturnInfoDto;
 				}
 				
-				BasicBusiness basicBusiness = basicBusinessService.selectById(origBusinessId);
+				BasicBusiness basicBusiness = basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", origBusinessId));
 				
 				if (basicBusiness == null) {
 					return planReturnInfoDto;
