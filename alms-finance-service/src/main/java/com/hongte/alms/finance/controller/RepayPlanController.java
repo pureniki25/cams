@@ -362,8 +362,8 @@ public class RepayPlanController {
 	@PostMapping("/queryRepayPlanByBusinessId")
 	@ResponseBody
 	public Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(@RequestBody RepayPlanReq req) {
-		logger.info("查询还款计划，业务编号：[{}]", req.getBusinessId());
 		try {
+			logger.info("查询还款计划，业务编号：[{}]", req.getBusinessId());
 			if (StringUtil.isEmpty(req.getBusinessId())) {
 				return Result.error("9889", "业务编号不能为空！");
 			}
@@ -384,14 +384,13 @@ public class RepayPlanController {
 	@ApiOperation(value = "根据条件撤销还款计划")
 	@PostMapping("/deleteRepayPlanByConditions")
 	@ResponseBody
-	public Result deleteRepayPlanByConditions(@RequestParam(value = "businessId") String businessId,
-			@RequestParam(value = "repaymentBatchId") String repaymentBatchId) {
-		logger.info("删除还款计划，业务编号：[{}], 还款计划编号[{}]", businessId, repaymentBatchId);
+	public Result deleteRepayPlanByConditions(@RequestBody RepayPlanReq req) {
 		try {
-			if (StringUtil.isEmpty(businessId)  || StringUtil.isEmpty(repaymentBatchId)) {
+			logger.info("删除还款计划，业务编号：[{}], 还款计划编号[{}]", req.getBusinessId(), req.getRepaymentBatchId());
+			if (StringUtil.isEmpty(req.getBusinessId())  || StringUtil.isEmpty(req.getRepaymentBatchId())) {
 				return Result.error("9889", "业务编号或还款批次号不能为空！");
 			}
-			creatRepayPlanService.deleteRepayPlanByConditions(businessId, repaymentBatchId);
+			creatRepayPlanService.deleteRepayPlanByConditions(req.getBusinessId(), req.getRepaymentBatchId());
 			return Result.success();
 		} catch (Exception e) {
 			logger.error("删除还款计划异常[{}]", e);

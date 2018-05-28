@@ -38,7 +38,7 @@ public interface CreatRepayPlanRemoteApi {
     Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(RepayPlanReq req);
     
     @RequestMapping(value = "/RepayPlan/deleteRepayPlanByConditions",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
-    Result<PlanReturnInfoDto> deleteRepayPlanByConditions(@RequestParam(value = "businessId")String businessId, @RequestParam(value = "repaymentBatchId")String repaymentBatchId);
+    Result<PlanReturnInfoDto> deleteRepayPlanByConditions(RepayPlanReq req);
 
 
 //    @RequestMapping(value = "/RepayPlan/testTime",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
