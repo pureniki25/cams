@@ -26,11 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.Errors;
-import org.springframework.validation.ObjectError;
-import org.springframework.validation.Validator;
 
-import javax.validation.ConstraintViolation;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -647,7 +643,60 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             //3.存储传入的标费用信息中类型为一次性收取的费用
             List<ProjFeeReq> projFeeReqs = projInfoReq.getProjFeeInfos();
             for(ProjFeeReq projFeeReq:projFeeReqs){
-//                if(projFeeReq.getChargeType().equals())
+                if(projFeeReq.getChargeType().equals(RepayPlanChargeTypeEnum.ONE_TIME.getKey())){
+                    ProjExtRate projExtRate = new ProjExtRate();
+                    projExtRate.setBusinessId(businessBasicInfoReq.getBusinessId());
+                    projExtRate.setProjectId(projInfoReq.getProjectId());
+                    projExtRate.setRateType(projFeeReq.getFeeType());
+                    projExtRate.setRateName(projFeeReq.getFeeTypeName());
+                    projExtRate.setRateValue(projFeeReq.getFeeValue());
+                    projExtRate.setCalcWay(RepayPlanExtRateCalcWayEnum.RATE_VALUE.getKey());
+                    projExtRate.setFeeId(projFeeReq.getFeeItemId());
+                    projExtRate.setFeeName(projFeeReq.getFeeItemName());
+                    //如果是分段收费的
+                    if(projFeeReq.getIsTermRange().equals(BooleanEnum.YES.getValue())){
+
+                    }
+
+
+
+//                    /**
+//                     * 开始期数
+//                     */
+//                    @TableField("begin_peroid")
+//                    @ApiModelProperty(required= true,value = "开始期数")
+//                    private Integer beginPeroid;
+//                    /**
+//                     * 结束期数
+//                     */
+//                    @TableField("end_peroid")
+//                    @ApiModelProperty(required= true,value = "结束期数")
+//                    private Integer endPeroid;
+//                    /**
+//                     * 创建日期
+//                     */
+//                    @TableField("create_time")
+//                    @ApiModelProperty(required= true,value = "创建日期")
+//                    private Date createTime;
+//                    /**
+//                     * 创建用户
+//                     */
+//                    @TableField("create_user")
+//                    @ApiModelProperty(required= true,value = "创建用户")
+//                    private String createUser;
+//                    /**
+//                     * 更新日期
+//                     */
+//                    @TableField("update_time")
+//                    @ApiModelProperty(required= true,value = "更新日期")
+//                    private Date updateTime;
+//                    /**
+//                     * 更新用户
+//                     */
+//                    @TableField("update_user")
+//                    @ApiModelProperty(required= true,value = "更新用户")
+//                    private String updateUser;
+                }
             }
 
         }
@@ -1185,7 +1234,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 //                if(projFeeReqs !=null && projFeeReqs.size()>0){
 //                    for(ProjFeeReq feeReq: projFeeReqs){
 //                        //如果费用是一次性收取
-//                        if(feeReq.getChargeType().equals(RepayPlanIsOneTimeChargeEnum.ONE_TIME.getKey())){
+//                        if(feeReq.getChargeType().equals(RepayPlanChargeTypeEnum.ONE_TIME.getKey())){
 //                            String feeItemId = getFeeItemId(feeReq.getFeeItemId(),feeReq.getFeeType());
 //                            RepaymentProjPlanListDetail   zeroListDetail = creatProjListDetail(zeroList);
 //                            zeroListDetail.setProjPlanAmount(feeReq.getFeeValue());//项目计划应还总金额(元)
@@ -1271,7 +1320,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     //列表费用
                     if(projFeeReqs !=null && projFeeReqs.size()>0) {
                         for (ProjFeeReq feeReq : projFeeReqs) {
-                            if(feeReq.getChargeType().equals(RepayPlanIsOneTimeChargeEnum.BY_MONTH.getKey())){
+                            if(feeReq.getChargeType().equals(RepayPlanChargeTypeEnum.BY_MONTH.getKey())){
                                 //最后一期，期初收取的费用不收
                                 if(i==projInfoReq.getPeriodMonth()){
                                     feeReq.getRepaymentFlag().equals(PepayPlanRepayFlageEnum.BEGIN.getValue());
