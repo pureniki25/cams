@@ -288,10 +288,10 @@ public class MoneyPoolController {
 	@ApiOperation(value = "款项池登记信息")
 	@GetMapping("/checkMoneyPool")
 	@ResponseBody
-	public Result checkMoneyPool(String businessId,String afterId,Boolean isMatched) {
+	public Result checkMoneyPool(String businessId,String afterId,Boolean isMatched,Boolean noConfirmed) {
 		logger.info("@checkMoneyPool@款项池登记信息--开始[{},{},{}]",businessId,afterId,isMatched);
 		if (isMatched) {
-			List<MatchedMoneyPoolVO> list = moneyPoolService.listMatchedMoneyPool(businessId,afterId);
+			List<MatchedMoneyPoolVO> list = moneyPoolService.listMatchedMoneyPool(businessId,afterId,noConfirmed);
 			logger.info("@checkMoneyPool@款项池登记信息--结束[{}]",list);
 			return Result.success(list);
 		}else {

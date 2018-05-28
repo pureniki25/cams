@@ -25,6 +25,15 @@ public class BasicBusiness extends Model<BasicBusiness> {
 
     private static final long serialVersionUID = 1L;
 
+    
+    
+    
+    /**客户身份证号码
+     * 
+     */
+    @TableId("customer_identify_card")
+	@ApiModelProperty(required= true,value = "客户身份证号码")
+    private String  customerIdentifyCard;
     /**
      * 资产端业务编号
      */
@@ -186,7 +195,15 @@ public class BasicBusiness extends Model<BasicBusiness> {
 	@TableField("update_user")
 	@ApiModelProperty(required= true,value = "更新用户ID")
 	private String updateUser;
+    
 
+	public String getCustomerIdentifyCard() {
+		return customerIdentifyCard;
+	}
+
+	public void setCustomerIdentifyCard(String customerIdentifyCard) {
+		this.customerIdentifyCard = customerIdentifyCard;
+	}
 
 	public String getBusinessId() {
 		return businessId;

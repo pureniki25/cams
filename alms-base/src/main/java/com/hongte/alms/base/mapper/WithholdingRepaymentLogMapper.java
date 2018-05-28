@@ -53,6 +53,14 @@ public interface WithholdingRepaymentLogMapper extends SuperMapper<WithholdingRe
      * @return
      */
     RepaymentLogVO selectSumByLogId(RepaymentLogReq key);
+    
+    
+    /**
+     * 根据业务ID,afterId
+     * @param key
+     * @return
+     */
+    List<WithholdingRepaymentLog> selectRepaymentLogForAutoRepay(@Param("businessId") String businessId,@Param("afterId") String afterId,@Param("platformId") String platformId);
 
 
 }

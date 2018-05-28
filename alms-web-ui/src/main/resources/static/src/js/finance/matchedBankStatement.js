@@ -66,7 +66,7 @@ window.layinit(function (htConfig) {
                     title: '操作',
                     render: (h, p) => {
 
-                        if (p.row.moneyPoolId!='合计') {
+                        if (p.row.moneyPoolId!='合计'&&!p.row.status=='完成') {
                             return h('i-button', {
                                     on: {
                                         click: function () {
@@ -92,11 +92,7 @@ window.layinit(function (htConfig) {
 
                     }
                 }],
-                data: [{
-                    moneyPoolId: 'test',
-                    status: '待领取',
-                    accountMoney: 565.56
-                }]
+                data: []
             }
         },
         methods: {
@@ -119,11 +115,17 @@ window.layinit(function (htConfig) {
                         businessId: businessId,
                         afterId: afterId,
                         isMatched: true,
+                        noConfirmed:true
                     }
                 })
                 .then(function (res) {
                     if (res.data.code == '1') {
-                        parent.app.matchedBankStatement.data = res.data.data.slice(0) ;
+                        //parent.app.matchedBankStatement.data = res.data.data.slice(0) ;
+                        res.data.data.forEach(e=>{
+                            if(e.status!='完成'&&e.status!='已完成'){
+                                parent.app.matchedBankStatement.data.push(e)
+                            }
+                        })
                         app.table.data = res.data.data.slice(0);
                         let t = 0;
                         app.table.data.forEach(element => {

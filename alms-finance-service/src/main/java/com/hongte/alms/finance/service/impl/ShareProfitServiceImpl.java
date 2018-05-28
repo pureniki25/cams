@@ -185,6 +185,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 				accountantOverRepayLog.setOverRepayMoney(surplusAmount.get());
 				accountantOverRepayLog.setRemark(String.format("收入于%s的%s期线下财务确认", req.getBusinessId(),req.getAfterId()));
 				accountantOverRepayLog.insert();
+				
+				confirmLog.get().setSurplusAmount(surplusAmount.get());
+				confirmLog.get().setSurplusRefId(accountantOverRepayLog.getId().toString());
 			}
 		} else {
 			lackAmount.set(repayPlanAmount.get().subtract(repayFactAmount.get()));
@@ -238,7 +241,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		}
 		// TODO 银行代扣,线下代扣尚待完善
 		if (surplus != null && surplus.compareTo(new BigDecimal(0)) > 0) {
-			BigDecimal canUseSurplus = accountantOverRepayLogService.caluCanUse(businessId.get(), afterId.get());
+			BigDecimal canUseSurplus = accountantOverRepayLogService.caluCanUse(businessId.get(), null);
 			if (surplus.compareTo(canUseSurplus) > 0) {
 				throw new ServiceRuntimeException("往期结余金额不足");
 			}
@@ -261,14 +264,15 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			RepaymentResource repaymentResource = new RepaymentResource();
 			repaymentResource.setAfterId(req.getAfterId());
 			repaymentResource.setBusinessId(req.getBusinessId());
+			repaymentResource.setOrgBusinessId(req.getBusinessId());
 			repaymentResource.setCreateDate(new Date());
 			repaymentResource.setCreateUser(loginUserInfoHelper.getUserId());
 			repaymentResource.setIsCancelled(0);
 			repaymentResource.setRepayAmount(req.getSurplusFund());
 			repaymentResource.setRepayDate(new Date());
 			repaymentResource.setRepaySource("11");
-			repaymentResource.setRepaySourceRefId(accountantOverRepayLog.getId().toString());
 			if (save.get()) {
+				repaymentResource.setRepaySourceRefId(accountantOverRepayLog.getId().toString());
 				repaymentResource.insert();
 			}
 			repayFactAmount.get().add(req.getSurplusFund());
@@ -846,6 +850,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		planList.setFinanceConfirmUserName(loginUserInfoHelper.getLoginInfo().getUserName());
 		planList.updateById();
 		System.out.println(JSON.toJSONString(projListDetails.get()));
+		confirmLog.get().setFactAmount(repayFactAmount.get());
+		confirmLog.get().setRepayDate(planList.getFactRepayDate());
 		confirmLog.get().setProjPlanJson(JSON.toJSONString(projListDetails.get()));
 		confirmLog.get().insert();
 	}

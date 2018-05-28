@@ -58,6 +58,7 @@ public interface FinanceService {
 	 * @param afterId
 	 * @return
 	 */
+	@Deprecated
 	public BigDecimal getSurplusFund(String businessId, String afterId);
 
 	public List<CurrPeriodProjDetailVO> getCurrPeriodProjDetailVOs(String businessId, String afterId);

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.hongte.alms.base.entity.RepaymentProjPlan;
+import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.common.mapper.SuperMapper;
 
 /**
@@ -25,4 +26,5 @@ public interface RepaymentProjPlanMapper extends SuperMapper<RepaymentProjPlan> 
 	 * @return
 	 */
 	public List<Map<String,Object>> selectProjPlanProjectInfo(String businessId);
+	
 }
