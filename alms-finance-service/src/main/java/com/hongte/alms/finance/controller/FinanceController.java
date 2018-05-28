@@ -518,9 +518,9 @@ public class FinanceController {
 	
 	@GetMapping(value = "/queryProjOtherFee")
 	@ApiOperation(value = "获取标维度的其他费用")
-	public Result<List<Map<String, Object>>> queryProjOtherFee(@RequestParam("projPlanListId") String projPlanListId) {
+	public Result<List<String>> queryProjOtherFee(@RequestParam("projPlanListId") String projPlanListId) {
 		try {
-			Result<List<Map<String, Object>>> result;
+			Result<List<String>> result;
 			
 			logger.info("@queryProjOtherFee@获取标维度的其他费用--开始[{}]", projPlanListId);
 			
@@ -532,6 +532,25 @@ public class FinanceController {
 		} catch (Exception e) {
 			logger.error("获取标维度的其他费用--[{}]", e);
 			return Result.error("-500", "系统异常，获取标维度的其他费用");
+		}
+	}
+	
+	@GetMapping(value = "/queryBizOtherFee")
+	@ApiOperation(value = "获取业务维度的其他费用")
+	public Result<List<String>> queryBizOtherFee(@RequestParam("planListId") String planListId) {
+		try {
+			Result<List<String>> result;
+			
+			logger.info("@queryBizOtherFee@获取业务维度的其他费用--开始[{}]", planListId);
+			
+			result = Result.success(financeService.queryBizOtherFee(planListId));
+			
+			logger.info("@queryBizOtherFee@获取业务维度的其他费用--结束[{}]", result);
+			
+			return result;
+		} catch (Exception e) {
+			logger.error("获取业务维度的其他费用--[{}]", e);
+			return Result.error("-500", "系统异常，获取业务维度的其他费用");
 		}
 	}
 	

@@ -34,7 +34,7 @@ import com.hongte.alms.base.baseException.CreatRepaymentExcepiton;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.ClassCopyUtil;
 import com.hongte.alms.common.util.StringUtil;
-
+import com.hongte.alms.finance.req.RepayPlanReq;
 import com.hongte.alms.finance.service.CreatRepayPlanService;
 
 import io.swagger.annotations.Api;
@@ -361,15 +361,15 @@ public class RepayPlanController {
 	@ApiOperation(value = "根据businessId查询还款计划")
 	@PostMapping("/queryRepayPlanByBusinessId")
 	@ResponseBody
-	public Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(@RequestBody String businessId) {
-		logger.info("查询还款计划，业务编号：[{}]", businessId);
+	public Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(@RequestBody RepayPlanReq req) {
+		logger.info("查询还款计划，业务编号：[{}]", req.getBusinessId());
 		try {
-			if (StringUtil.isEmpty(businessId)) {
+			if (StringUtil.isEmpty(req.getBusinessId())) {
 				return Result.error("9889", "业务编号不能为空！");
 			}
-			PlanReturnInfoDto planReturnInfoDto = creatRepayPlanService.queryRepayPlanByBusinessId(businessId);
+			PlanReturnInfoDto planReturnInfoDto = creatRepayPlanService.queryRepayPlanByBusinessId(req.getBusinessId());
 			if (planReturnInfoDto == null) {
-                logger.error("没有找到相关数据，请检查业务编号是否输入正确！", businessId);
+                logger.error("没有找到相关数据，请检查业务编号是否输入正确！", req.getBusinessId());
 				return Result.build("1", "没有找到相关数据，请检查业务编号是否输入正确！", planReturnInfoDto);
 			}
             logger.info("查询还款计划，查询成功：[{}]", planReturnInfoDto);

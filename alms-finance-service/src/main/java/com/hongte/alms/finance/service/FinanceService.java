@@ -117,13 +117,13 @@ public interface FinanceService {
      * @param planListId
      * @return
      */
-    List<Map<String, Object>> queryBizOtherFee(String planListId);
+    List<String> queryBizOtherFee(String planListId);
     
     /**
      * 获取标维度的其他费用
      * @param projPlanListId
      * @return
      */
-    List<Map<String, Object>> queryProjOtherFee(String projPlanListId);
+    List<String> queryProjOtherFee(String projPlanListId);
     
 }
