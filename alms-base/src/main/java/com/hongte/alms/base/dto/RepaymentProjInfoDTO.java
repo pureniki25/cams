@@ -4,7 +4,17 @@ public class RepaymentProjInfoDTO extends RepaymentPlanInfoDTO {
 
 	private static final long serialVersionUID = 1L;
 
+	private String projPlanListId;
+
 	private String realName;
+
+	public String getProjPlanListId() {
+		return projPlanListId;
+	}
+
+	public void setProjPlanListId(String projPlanListId) {
+		this.projPlanListId = projPlanListId;
+	}
 
 	public String getRealName() {
 		return realName;
@@ -16,7 +26,7 @@ public class RepaymentProjInfoDTO extends RepaymentPlanInfoDTO {
 
 	@Override
 	public String toString() {
-		return "RepaymentProjInfoDTO [realName=" + realName + "]";
+		return "RepaymentProjInfoDTO [projPlanListId=" + projPlanListId + ", realName=" + realName + "]";
 	}
 
 }

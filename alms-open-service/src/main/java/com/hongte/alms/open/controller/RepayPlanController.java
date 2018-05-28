@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.hongte.alms.open.feignClient.CreatRepayPlanRemoteApi;
 import com.hongte.alms.open.util.TripleDESDecrypt;
+import com.hongte.alms.open.vo.RepayPlanReq;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -85,11 +86,11 @@ public class RepayPlanController {
     @PostMapping("/queryRepayPlanByBusinessId")
     @ResponseBody
     @TripleDESDecrypt
-    public Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(@RequestParam(value = "businessId") String businessId){
-        return creatRepayPlanRemoteService.queryRepayPlanByBusinessId(businessId);
+    public Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(@RequestBody RepayPlanReq req){
+        return creatRepayPlanRemoteService.queryRepayPlanByBusinessId(req.getBusinessId());
     }
 
-    @ApiOperation(value = "根据businessId查询还款计划")
+    @ApiOperation(value = "撤销还款计划")
     @PostMapping("/deleteRepayPlanByConditions")
     @ResponseBody
     @TripleDESDecrypt

@@ -20,7 +20,7 @@ import java.util.List;
  * @date 2018/3/3 17:37
  * 创建还款计划的远程调用
  */
-@FeignClient(value = "alms-finance-service")
+@FeignClient(value = "alms-finance-service" , url = "http://192.168.15.176:30616")
 public interface CreatRepayPlanRemoteApi {
 
     @RequestMapping(value = "/RepayPlan/creatRepayPlan",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
