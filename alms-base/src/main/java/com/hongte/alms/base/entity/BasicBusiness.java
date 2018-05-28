@@ -31,7 +31,6 @@ public class BasicBusiness extends Model<BasicBusiness> {
     /**客户身份证号码
      * 
      */
-    @TableId("customer_identify_card")
 	@ApiModelProperty(required= true,value = "客户身份证号码")
     private String  customerIdentifyCard;
     /**
