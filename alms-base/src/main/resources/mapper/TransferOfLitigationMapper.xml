@@ -617,18 +617,21 @@
 	
 	<select id="queryCarLoanFees" resultType="map">
 		SELECT 
-		  a.`due_date` dueDate,
-		  -- 应还日期
-		  a.`period` curPeriod,
-		  -- 当前应还期数
+		  c.current_status curCurrentStatus, 
+		  c.`due_date` curDueDate,
+		  -- 应还日期 
+		  c.`period` curPeriod,
+		  -- 当前应还期数 
 		  c.plan_accrual planAccrual,
-		  -- 当期应还利息
+		  -- 当期应还利息 
 		  c.plan_service_charge planServiceCharge,
-		  -- 本期应还服务费
+		  -- 本期应还服务费 
 		  c.plan_guarantee_charge planGuaranteeCharge,
-		  -- 本期应还担保公司费用
+		  -- 本期应还担保公司费用 
 		  c.plan_platform_charge planPlatformCharge,
-		  -- 本期应还平台费
+		  c.plan_id as _planId,
+		  c.plan_list_id as _planListId,
+		  -- 本期应还平台费 
 		  (SELECT 
 		    CASE
 		      WHEN SUM(`plan_amount`) > 0 
@@ -640,46 +643,43 @@
 		      t3.`plan_amount` 
 		    FROM
 		      tb_repayment_biz_plan_list t1,
-		      tb_repayment_biz_plan t2,
 		      tb_repayment_biz_plan_list_detail t3 
-		    WHERE t1.plan_id = t2.plan_id 
-		      AND t1.plan_list_id = t3.plan_list_id 
-		      AND t2.original_business_id = #{businessId,jdbcType=VARCHAR} 
+		    WHERE t1.plan_list_id = t3.plan_list_id 
+		      AND t1.orig_business_id = #{businessId,jdbcType=VARCHAR} 
 		      AND IFNULL(t3.plan_item_type, 0) = 30 
 		      AND IFNULL(t1.repay_flag, 0) != 6 
-		      AND IFNULL(t1.`period`, 0) != 0) tab) isPreCharge, -- 是否服务费一次性收取的业务
+		      AND IFNULL(t1.`period`, 0) != 0) tab) isPreCharge,
+		  -- 是否服务费一次性收取的业务 
 		  (SELECT 
-			  CASE
-			    WHEN plan_amount > 0 
-			    THEN 0 
-			    ELSE 1 
-			  END  
-			FROM
-			  (SELECT 
-			    t3.`plan_amount` 
-			  FROM
-			    tb_repayment_biz_plan_list t1,
-			    tb_repayment_biz_plan t2,
-			    tb_repayment_biz_plan_list_detail t3 
-			  WHERE t1.plan_id = t2.plan_id 
-			    AND t1.plan_list_id = t3.plan_list_id 
-			    AND t2.original_business_id = #{businessId,jdbcType=VARCHAR} 
-			    AND IFNULL(t3.plan_item_type, 0) = 30 
-			    AND IFNULL(t1.repay_flag, 0) != 6
-			    GROUP BY t1.plan_list_id
-			    ORDER BY t1.due_date DESC
-			    LIMIT 1) tab) isPreServiceFees,	-- 是否服务费前置收取
-		  (SELECT 
-		    COUNT(1) 
+		    CASE
+		      WHEN plan_amount > 0 
+		      THEN 0 
+		      ELSE 1 
+		    END 
 		  FROM
-		    `tb_repayment_biz_plan_list` 
-		  WHERE business_id = b.original_business_id) totalPeriod
-		  -- 总期数
+		    (SELECT 
+		      t3.`plan_amount` 
+		    FROM
+		      tb_repayment_biz_plan_list t1,
+		      tb_repayment_biz_plan_list_detail t3 
+		    WHERE t1.plan_list_id = t3.plan_list_id 
+		      AND t1.orig_business_id = #{businessId,jdbcType=VARCHAR} 
+		      AND IFNULL(t3.plan_item_type, 0) = 30 
+		      AND IFNULL(t1.repay_flag, 0) != 6 
+		    GROUP BY t1.plan_list_id 
+		    ORDER BY t1.due_date DESC 
+		    LIMIT 1) tab) isPreServiceFees,
+		  -- 是否服务费前置收取 
+		  c.totalPeriod -- 总期数 
 		FROM
-		  tb_repayment_biz_plan_list a,
-		  tb_repayment_biz_plan b,
 		  (SELECT 
-		    t1.plan_list_id,
+		    t2.orig_business_id,
+		    t2.`period`,
+		    t2.`due_date`,
+		    t3.totalPeriod,
+		    t2.current_status, 
+		    t2.plan_id,
+		    t2.plan_list_id,
 		    SUM(
 		      CASE
 		        WHEN t1.plan_item_type = 40 
@@ -709,30 +709,39 @@
 		      END
 		    ) AS `plan_service_charge` 
 		  FROM
-		    tb_repayment_biz_plan_list_detail t1 
-		  GROUP BY t1.plan_list_id) c
-		WHERE a.plan_id = b.plan_id 
-		  AND a.plan_list_id = c.plan_list_id
-		  AND b.original_business_id = #{businessId,jdbcType=VARCHAR}
-		  AND a.`due_date` <![CDATA[ >= ]]> #{billDate,jdbcType=DATE}
-		  AND IFNULL(a.repay_flag, 0) != 6 
-		ORDER BY a.due_date 
+		    tb_repayment_biz_plan_list_detail t1,
+		    tb_repayment_biz_plan_list t2,
+		    (SELECT 
+		      COUNT(1) totalPeriod 
+		    FROM
+		      `tb_repayment_biz_plan_list` 
+		    WHERE orig_business_id = #{businessId,jdbcType=VARCHAR}) t3 
+		  WHERE t1.`plan_list_id` = t2.`plan_list_id` 
+		    AND t2.`orig_business_id` = #{businessId,jdbcType=VARCHAR} 
+		    AND t2.`due_date` <![CDATA[ >= ]]> #{billDate,jdbcType=DATE} 
+		    AND IFNULL(t2.repay_flag, 0) != 6 
+		  GROUP BY t1.plan_list_id 
+		  ORDER BY t2.`due_date`) c 
 		LIMIT 1 
 	</select>
 	
 	<select id="queryBalanceDueByBillDate" resultType="java.lang.Double">
-		SELECT 	  
-		  ifnull(SUM(t.plan_amount),0)
-		FROM
-		  tb_repayment_biz_plan_list_detail t,
-		  tb_repayment_biz_plan_list t2,
-		  tb_repayment_biz_plan t3 
-		WHERE t.plan_list_id = t2.plan_list_id 
-		  AND t2.plan_id = t3.plan_id 
-		  AND t.`plan_item_type` IN (20,30,60) 
-		  AND t2.`due_date` <![CDATA[ < ]]> #{billDate,jdbcType=DATE}
-		  AND IFNULL(t2.repay_flag, 0) != 6 
-		  AND t3.original_business_id = #{businessId,jdbcType=VARCHAR}
+		  SELECT 
+			  tab.plan_amount - tab.fact_amount 
+			FROM
+			  (SELECT 
+			    IFNULL(SUM(t.plan_amount), 0) plan_amount,
+			    IFNULL(SUM(t.fact_amount), 0) fact_amount 
+			  FROM
+			    tb_repayment_biz_plan_list_detail t,
+			    tb_repayment_biz_plan_list t2,
+			    tb_repayment_biz_plan t3 
+			  WHERE t.plan_list_id = t2.plan_list_id 
+			    AND t2.plan_id = t3.plan_id 
+			    AND t.`plan_item_type` IN (20, 30, 60) 
+			    AND t2.`due_date` <![CDATA[ < ]]> #{billDate,jdbcType=DATE}
+			    AND IFNULL(t2.repay_flag, 0) != 6 
+			    AND t3.original_business_id = #{businessId,jdbcType=VARCHAR}) tab 
 	</select>
 	
 	<select id="queryMinNoRepaymentDueDateByBusinessId" resultType="java.util.Date">
@@ -749,21 +758,27 @@
 	
 	<select id="queryPreviousFees" resultType="com.hongte.alms.base.vo.billing.PreviousFeesVO">
 		SELECT 
-		  tab.original_business_id businessId,
-		  tab.afterId, -- 期数
-		  tab.current_status currentStatus, -- 当期还款状态
+		  tab.orig_business_id businessId,
+		  tab.afterId,
+		  -- 期数
+		  tab.current_status currentStatus,
+		  tab.due_date,
+		  -- 当期还款状态
 		  (
 		    tab.planAccrual - tab.factAccrual
-		  ) AS previousPlanAccrual, -- 往期少交利息
+		  ) AS previousPlanAccrual,
+		  -- 往期少交利息
 		  (
 		    tab.planServiceCharge - tab.factServiceCharge
-		  ) AS previousPlanServiceCharge, --  往期 少交服务费
+		  ) AS previousPlanServiceCharge,
+		  --  往期 少交服务费
 		  (tab.pateFees - tab.factLateFees) AS previousLateFees --  往期少交滞纳金
 		FROM
 		  (SELECT 
 		    t2.`after_id` afterId,
 		    t2.current_status,
-		    t3.original_business_id,
+		    t2.orig_business_id,
+		    t2.due_date,
 		    SUM(
 		      CASE
 		        WHEN t.plan_item_type = 20 
@@ -813,58 +828,57 @@
 		    ) AS `factLateFees` -- 实缴滞纳金
 		  FROM
 		    tb_repayment_biz_plan_list_detail t,
-		    tb_repayment_biz_plan_list t2,
-		    tb_repayment_biz_plan t3 
+		    tb_repayment_biz_plan_list t2 
 		  WHERE t.plan_list_id = t2.plan_list_id 
-		    AND t2.plan_id = t3.plan_id 
 		    AND t2.`due_date` <![CDATA[ < ]]> #{billDate,jdbcType=DATE}
-		    AND t3.original_business_id = #{businessId,jdbcType=VARCHAR}
+		    AND t2.orig_business_id = #{businessId,jdbcType=VARCHAR}
 		    AND IFNULL(t2.repay_flag, 0) != 6 
 		  GROUP BY t.`plan_list_id`) tab 
-		ORDER BY tab.afterId 
+		WHERE (tab.planAccrual - tab.factAccrual) > 0 
+		OR (tab.planServiceCharge - tab.factServiceCharge) > 0
+		OR (tab.pateFees - tab.factLateFees) > 0
+		ORDER BY tab.due_date 
 	</select>
 	
 	<select id="queryMatchingRepaymentPlanAccrualSurplusPrincipal" resultType="java.lang.Double">
-		SELECT 
-		  (
-		    tt.plan_principal - tt.fact_principal
-		  ) surplusPrincipal 
-		FROM
-		  (SELECT 
-		    -- 应还本金总额
-		    SUM(
-		      CASE
-		        WHEN detail.plan_item_type = 10 
-		        THEN detail.plan_amount 
-		        ELSE 0 
-		      END
-		    ) `plan_principal`,
-		    -- 实还本金总额
-		    SUM(
-		      CASE
-		        WHEN detail.plan_item_type = 10 
-		        THEN detail.fact_amount 
-		        ELSE 0 
-		      END
-		    ) `fact_principal` 
-		  FROM
-		    `tb_repayment_biz_plan_list` lst,
-		    `tb_repayment_biz_plan_list_detail` detail,
-		    (SELECT 
-		      MIN(t2.`due_date`) min_due_date,
-		      t1.`plan_id` 
-		    FROM
-		      `tb_repayment_biz_plan` t1,
-		      `tb_repayment_biz_plan_list` t2,
-		      `tb_repayment_biz_plan_list_detail` t3 
-		    WHERE t1.`plan_id` = t2.`plan_id` 
-		      AND t2.`plan_list_id` = t3.`plan_list_id` 
-		      AND t2.`current_status` = '逾期' 
-		      AND IFNULL(t2.repay_flag, 0) != 6
-		      AND t1.`original_business_id` = #{businessId,jdbcType=VARCHAR}) tab 
-		  WHERE lst.`due_date` <![CDATA[ <= ]]> tab.min_due_date 
-		    AND lst.`plan_list_id` = detail.`plan_list_id` 
-		    AND lst.`plan_id` = tab.plan_id) tt 
+		    SELECT 
+			  (
+			    tt.plan_principal - tt.fact_principal
+			  ) surplusPrincipal 
+			FROM
+			  (SELECT 
+			    -- 应还本金总额
+			    SUM(
+			      CASE
+			        WHEN detail.plan_item_type = 10 
+			        THEN detail.plan_amount 
+			        ELSE 0 
+			      END
+			    ) `plan_principal`,
+			    -- 实还本金总额
+			    SUM(
+			      CASE
+			        WHEN detail.plan_item_type = 10 
+			        THEN detail.fact_amount 
+			        ELSE 0 
+			      END
+			    ) `fact_principal` 
+			  FROM
+			    `tb_repayment_biz_plan_list` lst,
+			    `tb_repayment_biz_plan_list_detail` detail,
+			    (SELECT 
+			      MIN(t2.`due_date`) min_due_date,
+			      t2.`plan_id` 
+			    FROM
+			      `tb_repayment_biz_plan_list` t2,
+			      `tb_repayment_biz_plan_list_detail` t3 
+			    WHERE t2.`plan_list_id` = t3.`plan_list_id` 
+			      AND t2.`current_status` = '逾期' 
+			      AND IFNULL(t2.repay_flag, 0) != 6 
+			      AND t2.`orig_business_id` = #{businessId,jdbcType=VARCHAR}) tab 
+			    WHERE lst.`due_date` <![CDATA[ >= ]]>  tab.min_due_date 
+			      AND lst.`plan_list_id` = detail.`plan_list_id` 
+			      AND lst.`plan_id` = tab.plan_id) tt  
 	</select>
 	
 	<select id="countOverdueByBusinessId" resultType="java.lang.Integer">
@@ -953,5 +967,20 @@
 		FROM
 		  `tb_refund_detail` t 
 		WHERE t.business_id = #{businessId,jdbcType=VARCHAR} 
+	</select>
+	
+	<select id="querySurplusServiceChargeByBusinessId" resultType="com.hongte.alms.base.entity.RepaymentBizPlanListDetail">
+		SELECT 
+		  t2.`plan_amount`,
+		  t2.`fact_amount`,
+		  t2.plan_list_id
+		FROM
+		  tb_repayment_biz_plan_list t1,
+		  `tb_repayment_biz_plan_list_detail` t2 
+		WHERE t1.plan_list_id = t2.plan_list_id 
+		  AND t2.`plan_item_type` = '30'
+		  AND t1.due_date <![CDATA[ >= ]]> #{billDate,jdbcType=DATE} 
+		  AND t1.orig_business_id = #{businessId,jdbcType=VARCHAR} 
+		  ORDER BY t1.`due_date`
 	</select>
 </mapper>

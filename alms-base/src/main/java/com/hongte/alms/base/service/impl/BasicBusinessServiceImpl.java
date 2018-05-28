@@ -52,6 +52,8 @@ import com.hongte.alms.base.vo.billing.CarLoanBilVO;
 import com.hongte.alms.base.vo.module.BusinessInfoForApplyDerateVo;
 import com.hongte.alms.base.vo.module.ExpenseSettleRepaymentPlanVO;
 import com.hongte.alms.base.vo.module.ExpenseSettleVO;
+import com.hongte.alms.base.vo.module.LiquidationVO;
+import com.hongte.alms.base.vo.module.LitigationVO;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
@@ -266,8 +268,8 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 		if (bizOutputRecord != null) {
 			outputDate = bizOutputRecord.getFactOutputDate();
 		}else {
-			//throw new ServiceRuntimeException("找不到合同记录");
-			ContractDate=DateUtil.getDate("2018-04-03", "yyyy-MM-dd");
+			throw new ServiceRuntimeException("找不到合同记录");
+			//ContractDate=DateUtil.getDate("2018-04-03", "yyyy-MM-dd");
 		}
 		if(ContractDate==null) {
 			ContractDate=outputDate;
@@ -452,9 +454,10 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 
 	private ExpenseSettleVO cal(String businessId, Date settleDate) {
 		final BasicBusiness basicBusiness = basicBusinessMapper.selectById(businessId);
-		RepaymentBizPlan repaymentBizPlan = new RepaymentBizPlan();
-		repaymentBizPlan.setBusinessId(businessId);
-		repaymentBizPlan = repaymentBizPlanMapper.selectOne(repaymentBizPlan);
+//		RepaymentBizPlan repaymentBizPlan = new RepaymentBizPlan();
+//		repaymentBizPlan.setBusinessId(businessId);
+//		repaymentBizPlan = repaymentBizPlanMapper.selectOne(repaymentBizPlan);
+//		List<RepaymentBizPlan> repaymentBizPlans = repaymentBizPlanMapper.selectList(new EntityWrapper<RepaymentBizPlan>().eq("original_business_id", businessId).orderBy("business_id"));
 		List<Object> businessIds = renewalBusinessMapper.selectObjs(new EntityWrapper<RenewalBusiness>()
 				.eq("original_business_id", businessId).setSqlSelect("renewal_business_id"));
 		if (businessIds == null) {
@@ -469,9 +472,10 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 		planLists = repaymentBizPlanListMapper.selectList(
 				new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", businessId).orderBy("due_date"));
 		}
+		List<RepaymentBizPlan> repaymentBizPlans = repaymentBizPlanMapper.selectList(new EntityWrapper<RepaymentBizPlan>().eq("original_business_id", businessId).orderBy("business_id"));
 		final List<RepaymentBizPlanListDetail> details = repaymentBizPlanListDetailMapper.selectList(
 				new EntityWrapper<RepaymentBizPlanListDetail>().in("business_id", businessIds).orderBy("period"));
-		final ExpenseSettleRepaymentPlanVO plan = new ExpenseSettleRepaymentPlanVO(repaymentBizPlan, planLists,
+		final ExpenseSettleRepaymentPlanVO plan = new ExpenseSettleRepaymentPlanVO(repaymentBizPlans, planLists,
 				details);
 //		plan.findCurrentPeriods(settleDate);
 		final List<BizOutputRecord> bizOutputRecord = bizOutputRecordMapper.selectList(
@@ -785,5 +789,30 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 		public static void main(String[] args) {
 			int i=16%15;
 			System.out.println(i);
+		}
+
+		@Override
+		public Map<String, Object> getOverDueMoney(String pListId, String onLineFeeId, String underLineFeeId) {
+			return basicBusinessMapper.getOverDueMoney(pListId, onLineFeeId, underLineFeeId);
+		}
+
+		@Override
+		public List<LiquidationVO> selectLiquidationOne(String crpId) {
+			return basicBusinessMapper.selectLiquidationOne(crpId);
+		}
+
+		@Override
+		public List<LiquidationVO> selectLiquidationTwo(String crpId) {
+			return basicBusinessMapper.selectLiquidationTwo(crpId);
+		}
+
+		@Override
+		public List<LitigationVO> selectLitigationHouseVO(String crpId) {
+			return basicBusinessMapper.selectLitigationHouseVO(crpId);
+		}
+
+		@Override
+		public List<LitigationVO> selectLitigationCarVO(String crpId) {
+			return basicBusinessMapper.selectLitigationCarVO(crpId);
 		}
 }

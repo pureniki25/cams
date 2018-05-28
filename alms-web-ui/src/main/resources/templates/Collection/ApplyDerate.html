@@ -594,8 +594,11 @@ color: #FF3030;
         <row style="padding: 10px">  <!--@click="showCollectionStackLog()"-->
             <i-col span="24">
                           <div class="layui-btn-group" style="float: right;" >
-                            <button v-if = "buttonShowFlage" class="layui-btn"  @click="saveAppply()">提交审批</button>
-                            <button v-if ="saveDraftShowFlage" class="layui-btn" @click="saveDeraf()">保存草稿</button>
+<!--                             <button v-if = "buttonShowFlage" class="layui-btn"  @click="saveAppply()">提交审批</button> -->
+<!--                             <button v-if ="saveDraftShowFlage" class="layui-btn" @click="saveDeraf()">保存草稿</button> -->
+                            
+                                       <button v-if = "buttonShowFlage" class="layui-btn"  @click="alert('系统升级中')">提交审批</button>
+                            <button v-if ="saveDraftShowFlage" class="layui-btn" @click="alert('系统升级中')">保存草稿</button>
                             <button v-if = "buttonShowFlage" class="layui-btn layui-btn-danger" @click="resetEdit()">撤销</button>
                           </div>
             </i-col>

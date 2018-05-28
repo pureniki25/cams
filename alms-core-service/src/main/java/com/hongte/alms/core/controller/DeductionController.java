@@ -13,14 +13,19 @@ import com.hongte.alms.base.collection.vo.AfterLoanStandingBookReq;
 import com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo;
 import com.hongte.alms.base.collection.vo.DeductionVo;
 import com.hongte.alms.base.entity.ApplyDerateProcess;
+import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.BasicBusinessType;
 import com.hongte.alms.base.entity.BasicCompany;
 import com.hongte.alms.base.entity.InfoSms;
+import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.SysBank;
 import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.entity.WithholdingPlatform;
+import com.hongte.alms.base.entity.WithholdingRecordLog;
 import com.hongte.alms.base.enums.AreaLevel;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.process.entity.Process;
 import com.hongte.alms.base.process.entity.ProcessLog;
 import com.hongte.alms.base.process.entity.ProcessTypeStep;
@@ -64,6 +69,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -87,9 +94,21 @@ public class DeductionController {
     DeductionService deductionService;
     
     @Autowired
+    @Qualifier("BasicBusinessService")
+    BasicBusinessService basicBusinessService;
+    
+    @Autowired
     @Qualifier("WithholdingPlatformService")
     WithholdingPlatformService withholdingplatformService;
-
+    
+    @Autowired
+    @Qualifier("WithholdingRecordLogService")
+    WithholdingRecordLogService withholdingRecordLogService;
+    
+    @Autowired
+    @Qualifier("RepaymentBizPlanListService")
+    RepaymentBizPlanListService repaymentBizPlanListService;
+    
     @Autowired
     @Qualifier("SysBankService")
     SysBankService sysBankService;
@@ -100,15 +119,50 @@ public class DeductionController {
             @RequestParam("planListId") String planListId
     ){
 
-
-
-
         try{
             //执行代扣信息
             DeductionVo deductionVo=  deductionService.selectDeductionInfoByPlanListId(planListId);
-        	   
-            return Result.success(deductionVo);
-
+            	
+            if(deductionVo!=null) {
+            	RepaymentBizPlanList pList=repaymentBizPlanListService.selectById(planListId);
+            	if(istLastPeriod(pList)) {
+            	 	 return Result.error("-1", "最后一期不能代扣");
+            	}
+            	
+                Map<String, Object> map=basicBusinessService.getOverDueMoney(planListId, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid());
+            	BigDecimal onLineOverDueMoney=BigDecimal.valueOf(Double.valueOf(map.get("onLineOverDueMoney").toString()));
+            	BigDecimal underLineOverDueMoney=BigDecimal.valueOf(Double.valueOf(map.get("underLineOverDueMoney").toString()));
+            	deductionVo.setOnLineOverDueMoney(onLineOverDueMoney);
+            	deductionVo.setUnderLineOverDueMoney(underLineOverDueMoney);
+            	
+            	//还款成功和还款中的数据
+        		List<WithholdingRecordLog> loglist=withholdingRecordLogService.selectList(new EntityWrapper<WithholdingRecordLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).ne("repay_status", 0));
+        		//还款中的数据
+        		List<WithholdingRecordLog> repayingList=withholdingRecordLogService.selectList(new EntityWrapper<WithholdingRecordLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).eq("repay_status", 2));
+        		
+        		//查看是否共借标，共借标不能银行代扣
+        		BasicBusiness business=basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", deductionVo.getOriginalBusinessId()));
+        		deductionVo.setIssueSplitType(business.getIssueSplitType());
+        		BigDecimal repayAmount=BigDecimal.valueOf(0);
+        		BigDecimal repayingAmount=BigDecimal.valueOf(0);
+        		for(WithholdingRecordLog log:loglist) {
+        			repayAmount=repayAmount.add(log.getCurrentAmount());
+        		}
+        		for(WithholdingRecordLog log:repayingList) {
+        			repayingAmount=repayingAmount.add(log.getCurrentAmount());
+        		}
+        		if(loglist!=null&&loglist.size()>0) {
+        			deductionVo.setRepayAllAmount(repayAmount);
+        			deductionVo.setRepayingAmount(repayingAmount);
+        			deductionVo.setRestAmount(BigDecimal.valueOf(deductionVo.getTotal()).subtract(repayAmount));
+        			deductionVo.setTotal(deductionVo.getTotal()-deductionVo.getRepayingAmount().doubleValue());
+        		}
+                return Result.success(deductionVo);
+	
+            }else {
+            	 return Result.error("-1", "找不到代扣信息");
+            }
+      
         }catch (Exception ex){
             ex.printStackTrace();
             logger.error(ex.getMessage());
@@ -179,6 +233,27 @@ public class DeductionController {
        }
    }
 
+   /**
+    * 
+    * 判断每期还款计划是否为最后一期
+    * @param projPlanList
+    * @return
+    */
+	private boolean istLastPeriod(RepaymentBizPlanList pList) {
+		boolean isLast=false;
+		List<RepaymentBizPlanList> pLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", pList.getPlanId()));
+		RepaymentBizPlanList lastpList=pLists.stream().max(new Comparator<RepaymentBizPlanList>() {
+			@Override
+			public int compare(RepaymentBizPlanList o1, RepaymentBizPlanList o2) {
+				return o1.getDueDate().compareTo(o2.getDueDate());
+			}
+		}).get();
+		
+		if(pList.getPlanListId().equals(lastpList.getPlanListId())) {
+			isLast=true;
+		}
+		return isLast;
+	}	
    
 
    }

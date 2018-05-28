@@ -652,12 +652,12 @@ var showData=function(){debugger
             if(res.data.code=='1'){
                 vm.baseInfoForm.preLateFees = res.data.data.preLateFees
                 vm.baseInfoForm.lackFee = res.data.data.lackFee
-                
+               var houseRate=res.data.data.houseRate
             	//房贷业务：逾期天数×剩余本金×0.2%
                 if(res.data.data.isInContractDate=="true"){debugger
                 	vm.baseInfoForm.outsideInterest=0;
                 }else{
-                   	vm.baseInfoForm.outsideInterest=vm.baseInfoForm.overDays*vm.baseInfoForm.remianderPrincipal*0.002;
+                   	vm.baseInfoForm.outsideInterest=vm.baseInfoForm.overDays*vm.baseInfoForm.remianderPrincipal*Number(houseRate);
                 }
              
      
@@ -1313,7 +1313,7 @@ var saveapplyInfo = function(pStatus){debugger
 	    			}
 	    			
 	    			if(vm.applyInfoForm.isSettleFlage=='是'){
-	    				if(vm.applyTypes[i].feeId=='79069922-e13a-4229-8656-2a1e19b44879'){
+	    				if(vm.applyTypes[i].feeId=='79069922-e13a-4229-8656-2a1e19b44881'){
 	    					   vm.$Modal.error({content: '结清时滞纳金不能减免' });
 	    				      return;
 	    				}
@@ -1326,7 +1326,7 @@ var saveapplyInfo = function(pStatus){debugger
 	    					   return;
 	    				}
 	    			}else{
-	    				if(vm.applyTypes[i].feeId=='79069922-e13a-4229-8656-2a1e19b44879'&&(vm.baseInfoForm.needPayPenalty==0||vm.applyTypes[i].derateMoney>vm.baseInfoForm.needPayPenalty)){
+	    				if(vm.applyTypes[i].feeId=='79069922-e13a-4229-8656-2a1e19b44881'&&(vm.baseInfoForm.needPayPenalty==0||vm.applyTypes[i].derateMoney>vm.baseInfoForm.needPayPenalty)){
 	    					   vm.$Modal.error({content: '减免金额大于滞纳金,或者滞纳金为0都不能减免' });
 	    				      return;
 	    				}

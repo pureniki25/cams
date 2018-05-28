@@ -67,15 +67,10 @@
        
            <Card>
             <p slot="title">
-                执行代扣
+                基本信息
             </p>
    
 
-           <!-- <row>
-           		<i-col span="24">
-           			<i-table border :show-header="false" :columns="columns1" :data="data1"></i-table>
-           		</i-col>
-           </row> -->
            
      <table class="layui-table">
 	  <colgroup>
@@ -108,58 +103,95 @@
 	  
 	    <tr>
 	      <td class="column">代扣用户信息</td>
-	      <td>{{ajax_data.customerName}}({{ajax_data.identifyCard}})</td>
+	      <td colspan="3">{{ajax_data.customerName}}({{ajax_data.identifyCard}})</td>
 	      <td class="column">绑定银行卡</td>
-	      <td colspan="2">{{ajax_data.bankName}}({{ajax_data.bankCard}})</td>
-	      <td class="column">代扣平台</td>
-	      <td colspan="2">
-	      	<i-select   v-model="platformId" style="width:200px">
+	      <td colspan="3">{{ajax_data.bankName}}({{ajax_data.bankCard}})</td>
+	    </tr>
+	    
+	    
+	  </tbody>
+	</table>
+     </Card>
+
+         <Card>
+            <p slot="title">
+                  代扣信息
+            </p>
+
+     <table class="layui-table">
+	  <colgroup>
+	    <col width="150">
+	    <col width="200">
+	    <col>
+	  </colgroup>
+	  <tbody>
+	  
+	    <tr>
+	       <td class="column" >应还日期</td>
+	      <td >{{ajax_data.nowdate?moment(ajax_data.nowdate).format('YYYY年MM月DD日'):''}}</td>
+	       <td class="column" >本期应还</td>
+	      <td >{{ajax_data.planAllAmount?numeral(ajax_data.planAllAmount).format('0,0.00'):0}} </td>
+	     <td class="column" >本期已还</td>
+	      <td>{{ajax_data.repayAllAmount?numeral(ajax_data.repayAllAmount).format('0,0.00'):0}}</td>
+	    </tr>
+	    
+	     <tr>
+	       <td class="column">代扣平台</td>
+	      <td >
+	      	<i-select   v-model="platformId" style="width:200px" @on-change="doOperate">
 		        <i-option v-for="item in platformList" :value="item.platformId" :key="item.platformId" >{{ item.platformName }}</i-option>
 		    </i-select>
 		  </td>
-	    </tr>
-	    
-	     <tr>
 	      <td class="column">本金</td>
 	      <td>{{ajax_data.planPrincipal?numeral(ajax_data.planPrincipal).format('0,0.00'):0 }}</td>
 	      <td class="column">利息</td>
-	      <td colspan="2">{{ajax_data.planAccrual?numeral(ajax_data.planAccrual).format('0,0.00'):0 }}</td>
-	      <td class="column" >服务费</td>
-	      <td colspan="2">{{ajax_data.planServiceCharge?numeral(ajax_data.planServiceCharge).format('0,0.00'):0 }}</td>
-	     
+	      <td >{{ajax_data.planAccrual?numeral(ajax_data.planAccrual).format('0,0.00'):0 }}</td>
+
 	    </tr>
 	    
 	     <tr>
-	      <td class="column">平台费</td>
-	      <td>{{ajax_data.platformCharge?numeral(ajax_data.platformCharge).format('0,0.00'):0  }}</td>
-	      <td class="column">担保费</td>
-	      <td colspan="2">{{ajax_data.planGuaranteeCharge?numeral(ajax_data.planGuaranteeCharge).format('0,0.00'):0 }}</td>
-	      <td class="column" >逾期费用</td>
-	      <td colspan="2">{{ajax_data.planOverDueMoney?numeral(ajax_data.planOverDueMoney).format('0,0.00'):0 }}</td>
+	      <td class="column" >月收分公司服务费</td>
+	      <td >{{ajax_data.planServiceCharge?numeral(ajax_data.planServiceCharge).format('0,0.00'):0 }}</td>
 	     
+	      <td class="column">月收平台费</td>
+	      <td>{{ajax_data.platformCharge?numeral(ajax_data.platformCharge).format('0,0.00'):0  }}</td>
+
+	      <td class="column" >(平台)逾期费</td>
+	      <td >{{ajax_data.onLineOverDueMoney?numeral(ajax_data.onLineOverDueMoney).format('0,0.00'):0 }}</td>
 	    </tr>
 	    
 
 	    
 	       <tr>
-	      <td class="column">其他费用</td>
-	      <td>{{ajax_data.otherFee?numeral(ajax_data.otherFee).format('0,0.00'):0 }}</td>
-	      <td style="color: red;" class="column">本期应还金额</td>
-	      <td colspan="2">{{ajax_data.total?numeral(ajax_data.total).format('0,0.00'):0 }}</td>
-	      <td class="column" >应还日期</td>
-	      <td colspan="2">{{ajax_data.nowdate?moment(ajax_data.nowdate).format('YYYY年MM月DD日'):''}}</td>
-	     
+	      <td class="column">线下逾期费</td>
+	      <td>{{ajax_data.planOverDueMoney?numeral(ajax_data.planOverDueMoney).format('0,0.00'):0 }}</td>
+	      <td class="column">本次代扣线下逾期费</td>
+	      <td ><i-input v-model="ajax_data.underLineFactOverDueMoney" class="td-box" @on-blur="getTotalShouldPay()" v-if="isBankFlag" disabled> </i-input>
+	      <i-input v-model="ajax_data.underLineFactOverDueMoney" class="td-box" @on-blur="getTotalShouldPay()" v-if="!isBankFlag" > </i-input>
+	      </td>
+          <td class="column" >本期应还金额</td>
+	      <td><i-input v-model="ajax_data.total" class="td-box" v-if="isBankFlag" disabled> </i-input>
+	      <i-input v-model="ajax_data.total" class="td-box" v-if="!isBankFlag"> </i-input>
+	      (本次最大可代扣金额{{ajax_data.restAmount?numeral(ajax_data.restAmount).format('0,0.00'):0}})元</td>
 	    </tr>
+	    
+	    
+	
 	  </tbody>
 	</table>
-     </Card>
+	
+	
+	
+	
 
+     </Card>
      
 
         <row style="padding: 10px"> 
             <i-col span="24">
-                <i-button  type="success"  @click="withHolding()" >代扣</i-button>
-                <i-button  type="info"  @click="withHoldingWithout()" >代扣(不含逾期费)</i-button>  
+<!--                 <i-button  type="success"  @click="withHolding()" >代扣</i-button> -->
+ <i-button  type="success"  @click="alert('系统升级中')" >代扣</i-button> 
+<!--                 <i-button  type="info"  @click="withHoldingWithout()" >代扣(不含逾期费)</i-button>   -->
                   <i-button  type="info"  @click="bankLimit()" >代扣额度表</i-button>
             </i-col>
            

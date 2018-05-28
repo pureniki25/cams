@@ -46,13 +46,13 @@ public class AutoSetCollectionJob {
 
                 logger.info("完成一次催收自动移交");
                 config.setLastRunTime(new Date());
-                sysJobConfigService.updateById(config);
+
             }catch (Exception e){
                 e.printStackTrace();
                 logger.error("定时任务 业务自动移交 异常："+e.getMessage());
             }
 
-
+            sysJobConfigService.updateById(config);
         }catch (Exception e){
             e.printStackTrace();
             logger.error("定时任务 业务自动移交  更新执行时间 异常："+e.getMessage());

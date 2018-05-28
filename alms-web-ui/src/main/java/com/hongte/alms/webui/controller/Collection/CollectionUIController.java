@@ -162,4 +162,19 @@ public class CollectionUIController {
    public String bankLimit(){
        return "/Collection/bankLimit";
    }
+   
+   
+ //执行管理界面
+   @RequestMapping("repaymentManage")
+   public String repaymentManage(){
+       return "/Collection/repaymentManage";
+   }
+   
+   
+   
+ //贷后详情界面
+   @RequestMapping("afterDetail")
+   public String afterDetail(){
+       return "/Collection/afterDetail";
+   }
 }

@@ -19,6 +19,8 @@ public class JobConfigEnums {
 		,SET_BUSINESS_COL("设置业务移交催收","setBusinessColTask")
 		,ADD_PROJECT_TRACT("添加项目追踪","addProjectTract")
 		,Cal_OVERDAYS_LATEFEE("计算还款计划表的逾期天数和滞纳金","calOverdaysLatefee")
+		,TRANS_COL_TRACK_LOG("同步历史贷后跟踪记录","transColTrackLog")
+		,TRANS_STAFF_SET("同步电催/催收信息","transStaffSet")
 		;
 		
 		

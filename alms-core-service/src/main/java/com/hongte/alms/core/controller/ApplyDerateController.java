@@ -311,9 +311,9 @@ public class ApplyDerateController {
 				detail2.setFeeId(RepayPlanItemTypeFeeIdEnum.PRE_LATEFEES.getValue());//提前还款违约金
 				detail2.setPlanItemName(RepayPlanItemTypeFeeIdEnum.PRE_LATEFEES.getDesc());
 				detail2.setPlanItemType(RepayPlanItemTypeFeeIdEnum.PRE_LATEFEES.getTypeValue());
-				detail3.setFeeId(RepayPlanItemTypeFeeIdEnum.OVER_DUE_AMONT.getValue());//滞纳金
-				detail3.setPlanItemName(RepayPlanItemTypeFeeIdEnum.OVER_DUE_AMONT.getDesc());
-				detail3.setPlanItemType(RepayPlanItemTypeFeeIdEnum.OVER_DUE_AMONT.getTypeValue());
+				detail3.setFeeId(RepayPlanItemTypeFeeIdEnum.OVER_DUE_AMONT_UNDERLINE.getValue());//线下滞纳金
+				detail3.setPlanItemName(RepayPlanItemTypeFeeIdEnum.OVER_DUE_AMONT_UNDERLINE.getDesc());
+				detail3.setPlanItemType(RepayPlanItemTypeFeeIdEnum.OVER_DUE_AMONT_UNDERLINE.getTypeValue());
 				List<RepaymentBizPlanListDetail> derateTypeList=new ArrayList<RepaymentBizPlanListDetail>();
 				derateTypeList.add(detail1);
 				derateTypeList.add(detail2);
@@ -431,12 +431,20 @@ public class ApplyDerateController {
 			}
 
 
-		
+	        //获取房贷逾期费率
+	        List<SysParameter> sysParameters =  sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type","houseRate").eq("status",1).orderBy("row_Index"));
+	 
 			// 应付提前结清违约金
 			
 				retMap.put("preLateFees", JSON.toJSON(vo.getPenalty(), JsonUtil.getMapping()));// 提前还款违约金
                 retMap.put("lackFee",  JSON.toJSON(vo.getLackFee(), JsonUtil.getMapping()));//往期少交费用
                 retMap.put("isInContractDate",  JSON.toJSON(vo.getIsInContractDate(), JsonUtil.getMapping()));//是否在合同期内
+                if(sysParameters!=null&&sysParameters.size()>0) {
+                    retMap.put("houseRate",  JSON.toJSON(sysParameters.get(0).getParamValue(), JsonUtil.getMapping()));//房贷逾期费率
+                }else {
+                	 retMap.put("houseRate",  JSON.toJSON(0.002, JsonUtil.getMapping()));//房贷逾期费率
+                }
+            
 
 
 			return Result.success(retMap);

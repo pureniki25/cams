@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.vo.billing.PreviousFeesVO;
 import com.hongte.alms.base.vo.litigation.BusinessCar;
 import com.hongte.alms.base.vo.litigation.LitigationBorrowerDetailed;
@@ -152,5 +153,12 @@ public interface TransferOfLitigationMapper {
 	 * @return
 	 */
 	Double queryRefundMoneyByBusinessId(@Param(value="businessId") String businessId);
+	
+	/**
+	 * 根据业务编号查找剩余期数（包含当前期）的服务费
+	 * @param businessId
+	 * @return
+	 */
+	List<RepaymentBizPlanListDetail> querySurplusServiceChargeByBusinessId(@Param(value="businessId") String businessId, @Param(value="billDate") Date billDate);
 	
 }
