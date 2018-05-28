@@ -200,11 +200,7 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
      */
 	@ApiModelProperty(required= true,value = "还款备注")
 	private String remark;
-    /**
-     * 是否有效状态：1 有效 ，0 无效
-     */
-	@ApiModelProperty(required= true,value = "是否有效状态：1 有效 ，0 无效")
-	private Integer active;
+
     /**
      * 创建日期
      */
@@ -447,13 +443,6 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 		this.remark = remark;
 	}
 
-	public Integer getActive() {
-		return active;
-	}
-
-	public void setActive(Integer active) {
-		this.active = active;
-	}
 
 	public Date getCreateTime() {
 		return createTime;
@@ -529,7 +518,6 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 			", accountantConfirmUserName=" + accountantConfirmUserName +
 			", accountantConfirmDate=" + accountantConfirmDate +
 			", remark=" + remark +
-			", active=" + active +
 			", createTime=" + createTime +
 			", srcType=" + srcType +
 			", createUser=" + createUser +

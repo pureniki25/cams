@@ -17,7 +17,6 @@
         <result column="is_defer" property="isDefer" />
         <result column="xd_after_guid" property="xdAfterGuid" />
         <result column="xd_out_id" property="xdOutId" />
-        <result column="active" property="active" />
         <result column="src_type" property="srcType" />
         <result column="create_time" property="createTime" />
         <result column="create_user" property="createUser" />
@@ -27,7 +26,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        plan_id AS planId, business_id AS businessId, original_business_id AS originalBusinessId, repayment_batch_id AS repaymentBatchId, borrow_money AS borrowMoney, borrow_rate AS borrowRate, borrow_rate_unit AS borrowRateUnit, borrow_limit AS borrowLimit, borrow_limit_unit AS borrowLimitUnit, plan_status AS planStatus, is_defer AS isDefer, xd_after_guid AS xdAfterGuid, xd_out_id AS xdOutId, active, src_type AS srcType, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
+        plan_id AS planId, business_id AS businessId, original_business_id AS originalBusinessId, repayment_batch_id AS repaymentBatchId, borrow_money AS borrowMoney, borrow_rate AS borrowRate, borrow_rate_unit AS borrowRateUnit, borrow_limit AS borrowLimit, borrow_limit_unit AS borrowLimitUnit, plan_status AS planStatus, is_defer AS isDefer, xd_after_guid AS xdAfterGuid, xd_out_id AS xdOutId, src_type AS srcType, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
     </sql>
 
 

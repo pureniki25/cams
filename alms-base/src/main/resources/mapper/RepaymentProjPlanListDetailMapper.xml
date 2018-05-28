@@ -21,7 +21,6 @@
         <result column="proj_plan_amount" property="projPlanAmount" />
         <result column="derate_amount" property="derateAmount" />
         <result column="proj_fact_amount" property="projFactAmount" />
-        <result column="active" property="active" />
         <result column="creat_sys_type" property="creatSysType" />
         <result column="plate_type" property="plateType" />
         <result column="create_date" property="createDate" />
@@ -32,7 +31,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-       proj_plan_detail_id AS projPlanDetailId, proj_plan_list_id AS projPlanListId,derate_amount AS derateAmount, share_profit_index AS shareProfitIndex, plan_detail_id AS planDetailId, plan_list_id AS planListId, business_id AS businessId, orig_business_id AS origBusinessId, period, fee_id AS feeId, plan_item_name AS planItemName, plan_item_type AS planItemType, account_status AS accountStatus, fact_repay_date AS factRepayDate, due_date AS dueDate, proj_plan_amount AS projPlanAmount, proj_fact_amount AS projFactAmount, active, creat_sys_type AS creatSysType, plate_type AS plateType, create_date AS createDate, create_user AS createUser, update_date AS updateDate, update_user AS updateUser
+       proj_plan_detail_id AS projPlanDetailId, proj_plan_list_id AS projPlanListId,derate_amount AS derateAmount, share_profit_index AS shareProfitIndex, plan_detail_id AS planDetailId, plan_list_id AS planListId, business_id AS businessId, orig_business_id AS origBusinessId, period, fee_id AS feeId, plan_item_name AS planItemName, plan_item_type AS planItemType, account_status AS accountStatus, fact_repay_date AS factRepayDate, due_date AS dueDate, proj_plan_amount AS projPlanAmount, proj_fact_amount AS projFactAmount,  creat_sys_type AS creatSysType, plate_type AS plateType, create_date AS createDate, create_user AS createUser, update_date AS updateDate, update_user AS updateUser
     </sql>
 
 	<select id="selectProjDetailResidueAmount" resultType="java.util.Map">
