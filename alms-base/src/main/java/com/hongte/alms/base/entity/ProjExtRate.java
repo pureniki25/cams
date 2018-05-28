@@ -6,8 +6,11 @@ import java.math.BigDecimal;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.enums.IdType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
@@ -27,6 +30,7 @@ public class ProjExtRate extends Model<ProjExtRate> {
     /**
      * 主键 自增
      */
+	@TableId(value="id", type= IdType.AUTO)
 	@ApiModelProperty(required= true,value = "主键 自增")
 	private Integer id;
     /**

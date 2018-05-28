@@ -361,7 +361,7 @@ public class RepayPlanController {
 	@ApiOperation(value = "根据businessId查询还款计划")
 	@PostMapping("/queryRepayPlanByBusinessId")
 	@ResponseBody
-	public Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(@RequestParam(value = "businessId") String businessId) {
+	public Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(@RequestBody String businessId) {
 		logger.info("查询还款计划，业务编号：[{}]", businessId);
 		try {
 			if (StringUtil.isEmpty(businessId)) {

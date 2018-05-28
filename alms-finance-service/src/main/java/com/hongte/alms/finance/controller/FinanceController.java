@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,7 +27,6 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.dto.ConfirmRepaymentReq;
 import com.hongte.alms.base.dto.FinanceManagerListReq;
-import com.hongte.alms.base.dto.RepaymentPlanInfoDTO;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.BasicBusinessType;
@@ -442,7 +442,7 @@ public class FinanceController {
 	
 	@GetMapping(value = "/queryRepaymentPlanInfoByBusinessId")
 	@ApiOperation(value = "根据源业务编号获取还款计划信息")
-	public Result<Map<String, Object>> queryRepaymentPlanInfoByBusinessId(String businessId) {
+	public Result<Map<String, Object>> queryRepaymentPlanInfoByBusinessId(@RequestParam("businessId") String businessId) {
 		try {
 			Result<Map<String, Object>> result;
 
@@ -456,6 +456,82 @@ public class FinanceController {
 		} catch (Exception e) {
 			logger.error("根据源业务编号获取还款计划信息失败--[{}]", e);
 			return Result.error("-500", "系统异常，获取还款计划信息失败");
+		}
+	}
+	
+	@GetMapping(value = "/queryPlanRepaymentProjInfoByPlanListId")
+	@ApiOperation(value = "根据业务还款计划列表ID获取所有对应的标的应还还款计划信息")
+	public Result<Map<String, Object>> queryPlanRepaymentProjInfoByPlanListId(@RequestParam("planListId") String planListId) {
+		try {
+			Result<Map<String, Object>> result;
+			
+			logger.info("@queryPlanRepaymentProjInfoByPlanListId@根据业务还款计划列表ID获取所有对应的标的应还还款计划信息--开始[{}]", planListId);
+			
+			result = Result.success(financeService.queryPlanRepaymentProjInfoByPlanListId(planListId));
+			
+			logger.info("@queryPlanRepaymentProjInfoByPlanListId@根据业务还款计划列表ID获取所有对应的标的应还还款计划信息--结束[{}]", result);
+			
+			return result;
+		} catch (Exception e) {
+			logger.error("根据业务还款计划列表ID获取所有对应的标的应还还款计划信息失败--[{}]", e);
+			return Result.error("-500", "系统异常，获取所有对应的标的应还还款计划信息");
+		}
+	}
+	
+	@GetMapping(value = "/queryActualRepaymentProjInfoByPlanListId")
+	@ApiOperation(value = "根据业务还款计划列表ID获取所有对应的标的实还还款计划信息")
+	public Result<Map<String, Object>> queryActualRepaymentProjInfoByPlanListId(@RequestParam("planListId") String planListId) {
+		try {
+			Result<Map<String, Object>> result;
+			
+			logger.info("@queryActualRepaymentProjInfoByPlanListId@根据业务还款计划列表ID获取所有对应的标的实还还款计划信息--开始[{}]", planListId);
+			
+			result = Result.success(financeService.queryActualRepaymentProjInfoByPlanListId(planListId));
+			
+			logger.info("@queryActualRepaymentProjInfoByPlanListId@根据业务还款计划列表ID获取所有对应的标的实还还款计划信息--结束[{}]", result);
+			
+			return result;
+		} catch (Exception e) {
+			logger.error("根据业务还款计划列表ID获取所有对应的标的实还还款计划信息失败--[{}]", e);
+			return Result.error("-500", "系统异常，获取所有对应的标的实还还款计划信息");
+		}
+	}
+	
+	@GetMapping(value = "/queryDifferenceRepaymentProjInfo")
+	@ApiOperation(value = "获取标还款计划差额")
+	public Result<Map<String, Object>> queryDifferenceRepaymentProjInfo(@RequestParam("planListId") String planListId) {
+		try {
+			Result<Map<String, Object>> result;
+			
+			logger.info("@queryDifferenceRepaymentProjInfo@获取标还款计划差额--开始[{}]", planListId);
+			
+			result = Result.success(financeService.queryDifferenceRepaymentProjInfo(planListId));
+			
+			logger.info("@queryDifferenceRepaymentProjInfo@获取标还款计划差额--结束[{}]", result);
+			
+			return result;
+		} catch (Exception e) {
+			logger.error("获取标还款计划差额--[{}]", e);
+			return Result.error("-500", "系统异常，获取标还款计划差额信息");
+		}
+	}
+	
+	@GetMapping(value = "/queryProjOtherFee")
+	@ApiOperation(value = "获取标维度的其他费用")
+	public Result<List<Map<String, Object>>> queryProjOtherFee(@RequestParam("projPlanListId") String projPlanListId) {
+		try {
+			Result<List<Map<String, Object>>> result;
+			
+			logger.info("@queryProjOtherFee@获取标维度的其他费用--开始[{}]", projPlanListId);
+			
+			result = Result.success(financeService.queryProjOtherFee(projPlanListId));
+			
+			logger.info("@queryProjOtherFee@获取标维度的其他费用--结束[{}]", result);
+			
+			return result;
+		} catch (Exception e) {
+			logger.error("获取标维度的其他费用--[{}]", e);
+			return Result.error("-500", "系统异常，获取标维度的其他费用");
 		}
 	}
 	

@@ -125,12 +125,7 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 	@ApiModelProperty(required= true,value = "应还日期")
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date dueDate;
-	/**
-    /**
-     * 是否有效状态：1 有效 ，0 无效
-     */
-	@ApiModelProperty(required= true,value = "是否有效状态：1 有效 ，0 无效")
-	private Integer active;
+
     /**
      * 创建日期
      */
@@ -278,13 +273,6 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 		this.factRepayDate = factRepayDate;
 	}
 
-	public Integer getActive() {
-		return active;
-	}
-
-	public void setActive(Integer active) {
-		this.active = active;
-	}
 
 	public Date getCreateDate() {
 		return createDate;
@@ -349,7 +337,6 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 			", repaySource=" + repaySource +
 			", factRepayDate=" + factRepayDate +
 			", dueDate=" + dueDate +
-			", active=" + active +
 			", createDate=" + createDate +
 			", srcType=" + srcType +
 			", createUser=" + createUser +

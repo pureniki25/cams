@@ -343,7 +343,7 @@ public class CreatRepayPlanServiceImplTest {
         feeReq10.setFeeType(RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getValue()); //费用项类型
         feeReq10.setFeeTypeName("分公司费用"); //费用项名称
         feeReq10.setFeeValue(new BigDecimal(6)); //业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值
-        feeReq10.setChargeType(RepayPlanIsOneTimeChargeEnum.BY_MONTH.getKey()); //是否一次收取，1为按月收取，2为一次收取
+        feeReq10.setChargeType(RepayPlanChargeTypeEnum.BY_MONTH.getKey()); //是否一次收取，1为按月收取，2为一次收取
         feeReq10.setRepaymentFlag(2); //标记该项费用的还款类型，1:期初收取,2:期末收取
 
 
@@ -739,7 +739,7 @@ public class CreatRepayPlanServiceImplTest {
 //        feeReq.setNewSystemDefaultRate(new BigDecimal(0)); //系统默认匹配的费用比例（当收取方式为2时，此字段存零）
         feeReq.setFeeValue(new BigDecimal(800)); //业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值
 //        feeReq.setWithdrawId(111); //对应的提现编号
-        feeReq.setChargeType(RepayPlanIsOneTimeChargeEnum.BY_MONTH.getKey()); //是否一次收取，1为按月收取，2为一次收取
+        feeReq.setChargeType(RepayPlanChargeTypeEnum.BY_MONTH.getKey()); //是否一次收取，1为按月收取，2为一次收取
 //        feeReq.setWithdrawPlace(1); //放款去处 1:提到银行卡  2：转到可用金额
 //        feeReq.setOutputFlag(1); //标记该项费用是否单独收取，null或0:不单独收取，1:单独收取
 //        feeReq.setRepaymentFlag(1); //标记该项费用的还款类型，1:期初收取,2:期末收取
