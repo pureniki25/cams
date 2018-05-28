@@ -8,23 +8,24 @@
         <result column="business_type_id" property="businessTypeId" />
         <result column="item_name" property="itemName" />
         <result column="item_type" property="itemType" />
-        <result column="item_level" property="itemLevel" />
+        <result column="item_min_level" property="itemMinLevel" />
+        <result column="item_max_level" property="itemMaxLevel" />
         <result column="update_user_id" property="updateUserId" />
         <result column="update_time" property="updateTime" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        profit_item_set_id AS profitItemSetId, business_type_id AS businessTypeId, item_name AS itemName, item_type AS itemType, item_level AS itemLevel, update_user_id AS updateUserId, update_time AS updateTime
+        profit_item_set_id AS profitItemSetId, business_type_id AS businessTypeId, item_name AS itemName, item_type AS itemType, item_min_level AS itemMinLevel, item_max_level AS itemMaxLevel,  update_user_id AS updateUserId, update_time AS updateTime
     </sql>
 	<select id="getLevel" resultType="map">
 	            
-		select item.item_name,item.item_level as itemLevel,fee.fee_name,fee.fee_level  as feeLevel
+		select item.item_name,item.item_mine_level as itemMinLevel,item_max_leve as itemMaxLevel,fee.fee_name,fee.fee_level  as feeLevel
 		
 		
 		from tb_profit_item_set item  join tb_profit_fee_set fee on item.profit_item_set_id=fee.profit_item_set_id
 
-where item.item_type= and fee.fee_id     
+        where item.item_type= and fee.fee_id     
 	</select>
 	
 </mapper>

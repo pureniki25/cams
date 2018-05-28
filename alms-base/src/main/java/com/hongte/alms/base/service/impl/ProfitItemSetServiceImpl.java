@@ -51,7 +51,8 @@ public class ProfitItemSetServiceImpl extends BaseServiceImpl<ProfitItemSetMappe
 		itemTypes.forEach(item->{
 			itemSet.setProfitItemSetId(UUID.randomUUID().toString());
 			itemSet.setBusinessTypeId(businessTypeId);
-			itemSet.setItemLevel(StringUtil.notEmpty(item.getParamValue2())?Integer.valueOf(item.getParamValue2()):0);
+			itemSet.setItemMinLevel(StringUtil.notEmpty(item.getParamValue2())?Integer.valueOf(item.getParamValue2()):0);
+			itemSet.setItemMaxLevel(StringUtil.notEmpty(item.getParamValue3())?Integer.valueOf(item.getParamValue3()):0);
 			itemSet.setItemName(item.getParamName());
 			itemSet.setItemType(StringUtil.notEmpty(item.getParamValue())?Integer.valueOf(item.getParamValue()):0);
 			itemSet.setUpdateTime(new Date());
@@ -72,12 +73,13 @@ public class ProfitItemSetServiceImpl extends BaseServiceImpl<ProfitItemSetMappe
 		ProfitItemSet itemSet=selectOne(new EntityWrapper<ProfitItemSet>().eq("item_type", itemType).eq("business_type_id", businessTypeId));
 		
 		if(itemSet!=null) {
-			map.put("itemLevel", itemSet.getItemLevel());
+			map.put("itemMaxLevel", itemSet.getItemMaxLevel());
+			map.put("itemMixLevel", itemSet.getItemMinLevel());
 			ProfitFeeSet feeSet=profitFeeSetService.selectOne(new EntityWrapper<ProfitFeeSet>().eq("profit_item_set_id", itemSet.getProfitItemSetId()).eq("fee_id", feeId));
 			if(feeSet!=null) {
 				map.put("feeLevel", feeSet.getFeeLevel());
 			}else{
-				map.put("feeLevel", itemSet.getItemLevel());
+				map.put("feeLevel", itemSet.getItemMaxLevel());
 			}
 		}
 

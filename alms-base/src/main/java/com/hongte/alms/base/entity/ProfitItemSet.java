@@ -51,9 +51,18 @@ public class ProfitItemSet extends Model<ProfitItemSet> {
     /**
      * 级别
      */
-	@TableField("item_level")
-	@ApiModelProperty(required= true,value = "级别")
-	private Integer itemLevel;
+	@TableField("item_min_level")
+	@ApiModelProperty(required= true,value = "最小级别")
+	private Integer itemMinLevel;
+	
+	
+    /**
+     * 级别
+     */
+	@TableField("item_max_level")
+	@ApiModelProperty(required= true,value = "最大级别")
+	private Integer itemMaxLevel;
+	
     /**
      * 创建人用户编号
      */
@@ -99,13 +108,23 @@ public class ProfitItemSet extends Model<ProfitItemSet> {
 	public void setItemType(Integer itemType) {
 		this.itemType = itemType;
 	}
+    
 
-	public Integer getItemLevel() {
-		return itemLevel;
+
+	public Integer getItemMinLevel() {
+		return itemMinLevel;
 	}
 
-	public void setItemLevel(Integer itemLevel) {
-		this.itemLevel = itemLevel;
+	public void setItemMinLevel(Integer itemMinLevel) {
+		this.itemMinLevel = itemMinLevel;
+	}
+
+	public Integer getItemMaxLevel() {
+		return itemMaxLevel;
+	}
+
+	public void setItemMaxLevel(Integer itemMaxLevel) {
+		this.itemMaxLevel = itemMaxLevel;
 	}
 
 	public String getUpdateUserId() {
@@ -136,7 +155,6 @@ public class ProfitItemSet extends Model<ProfitItemSet> {
 			", businessTypeId=" + businessTypeId +
 			", itemName=" + itemName +
 			", itemType=" + itemType +
-			", itemLevel=" + itemLevel +
 			", updateUserId=" + updateUserId +
 			", updateTime=" + updateTime +
 			"}";
