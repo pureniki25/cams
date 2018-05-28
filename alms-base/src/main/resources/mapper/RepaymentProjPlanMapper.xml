@@ -32,7 +32,6 @@
 		<result column="borrow_limit_unit" property="borrowLimitUnit" />
 		<result column="plan_status" property="planStatus" />
 		<result column="is_defer" property="isDefer" />
-		<result column="active" property="active" />
 		<result column="creat_sys_type" property="creatSysType" />
 		<result column="plate_type" property="plateType" />
 		<result column="create_time" property="createTime" />
@@ -56,7 +55,7 @@
 		offLineInOverDueRate, off_line_in_over_due_rate_unit AS
 		offLineInOverDueRateType, borrow_limit AS borrowLimit,
 		borrow_limit_unit AS borrowLimitUnit, plan_status AS planStatus,
-		is_defer AS isDefer, active, creat_sys_type AS creatSysType,
+		is_defer AS isDefer,  creat_sys_type AS creatSysType,
 		plate_type AS plateType, create_time AS createTime, create_user AS
 		createUser, update_time AS updateTime, update_user AS updateUser,
 		query_full_success_date AS queryFullSuccessDate

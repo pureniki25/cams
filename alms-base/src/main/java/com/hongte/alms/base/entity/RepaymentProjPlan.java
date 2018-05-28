@@ -141,11 +141,7 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 	@TableField("is_defer")
 	@ApiModelProperty(required= true,value = "是否展期还款计划,0:否，1:是")
 	private Integer isDefer;
-    /**
-     * 是否有效状态：1 有效 ，0 无效
-     */
-	@ApiModelProperty(required= true,value = "是否有效状态：1 有效 ，0 无效")
-	private Integer active;
+
     /**
      * 创建系统类型：1.信贷生成，2.贷后管理生成
      */
@@ -360,13 +356,7 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 		this.isDefer = isDefer;
 	}
 
-	public Integer getActive() {
-		return active;
-	}
 
-	public void setActive(Integer active) {
-		this.active = active;
-	}
 
 	public Integer getCreatSysType() {
 		return creatSysType;
@@ -440,7 +430,7 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 			", borrowLimitUnit=" + borrowLimitUnit +
 			", planStatus=" + planStatus +
 			", isDefer=" + isDefer +
-			", active=" + active +
+
 			", creatSysType=" + creatSysType +
 			", plateType=" + plateType +
 			", createTime=" + createTime +

@@ -26,11 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.Errors;
-import org.springframework.validation.ObjectError;
-import org.springframework.validation.Validator;
 
-import javax.validation.ConstraintViolation;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -106,9 +102,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
     BasicBizCustomerService basicBizCustomerService;
 
 
-    @Autowired
-    @Qualifier("BaiscBizExtRateService")
-    BaiscBizExtRateService baiscBizExtRateService;
+//    @Autowired
+//    @Qualifier("BaiscBizExtRateService")
+//    BaiscBizExtRateService baiscBizExtRateService;
 
 
     @Autowired
@@ -481,9 +477,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             basicBusiness.setCreateUser(oldBasicBusiness.getCreateUser());
             basicBusiness.setCreateTime(oldBasicBusiness.getCreateTime());
             basicBusiness.setUpdateTime(new Date());
-            basicBusiness.setUpdateUser(Constant.SYS_DEFAULT_USER);
+            basicBusiness.setUpdateUser(Constant.ADMIN_ID);
         }else{
-            basicBusiness.setCreateUser(Constant.SYS_DEFAULT_USER);
+            basicBusiness.setCreateUser(Constant.ADMIN_ID);
             basicBusiness.setCreateTime(new Date());
         }
         basicBusinessService.insertOrUpdate(basicBusiness);
@@ -494,7 +490,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         for(BusinessCustomerInfoReq bCustInfo:bizCusInfoReqs){
             BasicBizCustomer bizCusInfo =  ClassCopyUtil.copy(bCustInfo,BusinessCustomerInfoReq.class,BasicBizCustomer.class);
             bizCusInfo.setBusinessId(basicBusiness.getBusinessId());
-            bizCusInfo.setCreateUser(Constant.SYS_DEFAULT_USER);
+            bizCusInfo.setCreateUser(Constant.ADMIN_ID);
             bizCusInfo.setCreateTime(new Date());
             List<BasicBizCustomer> customerList =  basicBizCustomerService.selectList(
                     new EntityWrapper<BasicBizCustomer>().eq("business_id",businessBasicInfoReq.getBusinessId())
@@ -516,7 +512,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 //            for(BusinessExtRateReq rateReq: bizExtRateReqs){
 //                BaiscBizExtRate bizExtRate =  ClassCopyUtil.copy(rateReq,BusinessExtRateReq.class,BaiscBizExtRate.class);
 //                bizExtRate.setBusinessId(basicBusiness.getBusinessId());
-//                bizExtRate.setCreateUser(Constant.SYS_DEFAULT_USER);
+//                bizExtRate.setCreateUser(Constant.ADMIN_ID);
 //                bizExtRate.setCreateTime(new Date());
 //
 //                bizExtRates.add(bizExtRate);
@@ -555,9 +551,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 projInfo.setCreateUser(oldProjInfp.getCreateUser());
                 projInfo.setCreateTime(oldProjInfp.getCreateTime());
                 projInfo.setUpdateTime(new Date());
-                projInfo.setUpdateUser(Constant.SYS_DEFAULT_USER);
+                projInfo.setUpdateUser(Constant.ADMIN_ID);
             }else{
-                projInfo.setCreateUser(Constant.SYS_DEFAULT_USER);
+                projInfo.setCreateUser(Constant.ADMIN_ID);
                 projInfo.setCreateTime(new Date());
             }
 
@@ -573,7 +569,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     TuandaiProjectCar tuandaiProjectCar = ClassCopyUtil.copy(pCarInfoReq,ProjectCarInfoReq.class,TuandaiProjectCar.class);
                     tuandaiProjectCar.setProjectId(projInfo.getProjectId());
                     tuandaiProjectCar.setCreateTime(new Date());
-                    tuandaiProjectCar.setCreateUser(Constant.SYS_DEFAULT_USER);
+                    tuandaiProjectCar.setCreateUser(Constant.ADMIN_ID);
                     tuandaiProjectCars.add(tuandaiProjectCar);
                 }
                 tuandaiProjectCarService.delete(new EntityWrapper<TuandaiProjectCar>().eq("project_id",projectId));
@@ -592,7 +588,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     TuandaiProjectHouse tuandaiProjectHosue = ClassCopyUtil.copy(pHouseInfoReq,ProjectHouseInfoReq.class,TuandaiProjectHouse.class);
                     tuandaiProjectHosue.setProjectId(projInfo.getProjectId());
                     tuandaiProjectHosue.setCreateTime(new Date());
-                    tuandaiProjectHosue.setCreateUser(Constant.SYS_DEFAULT_USER);
+                    tuandaiProjectHosue.setCreateUser(Constant.ADMIN_ID);
                     tuandaiProjectHouses.add(tuandaiProjectHosue);
                 }
                 tuandaiProjectHouseService.delete(new EntityWrapper<TuandaiProjectHouse>().eq("project_id",projectId));
@@ -603,12 +599,86 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
             //存储标额外的费用信息
             List<ProjExtRateReq>  projExtRateReqs = projInfoReq.getProjExtRateReqs();
+//            Map<String,List<ProjExtRateReq>> projExtRateReqMap = projInfoReq.getProjExtRateReqMap();
+            //1.如果没有传入数据，则本金违约金、月收服务费违约金、平台服务费违约金 需要写一段代码，设置一个默认的信息进去
+            boolean principal_penalty_in_flage = false;  //本金违约金传入标志位
+            boolean sub_company_penalty_in_flage = false; //月收服务费违约金传入标志位
+            boolean plat_penalty_in_flage = false;  //平台服务费违约金传入标志位
 
+            List<ProjExtRate> projExtRates = new LinkedList<>();
 
+            //2.存储传入的额外费用
+            if(projExtRateReqs!=null&&projExtRateReqs.size()>0){
+//                for()
 
+                for(ProjExtRateReq projExtRateReq: projExtRateReqs){
+                    ProjExtRate projExtRate = ClassCopyUtil.copyObject(projExtRateReq,ProjExtRate.class);
+                    projExtRates.add(projExtRate);
+                    projExtRate.setBusinessId(businessBasicInfoReq.getBusinessId());
+                    projExtRate.setProjectId(projInfoReq.getProjectId());
+                    projExtRate.setCreateTime(new Date());
+                    projExtRate.setCreateUser(Constant.ADMIN_ID);
+                    if(projExtRateReq.getFeeId().equals(RepayPlanFeeTypeEnum.PRINCIPAL_PENALTY.getUuid())){
+                        principal_penalty_in_flage = true;
+                    }
+                    if(projExtRateReq.getFeeId().equals(RepayPlanFeeTypeEnum.SUB_COMPANY_PENALTY.getUuid())){
+                        sub_company_penalty_in_flage = true;
+                    }
+                    if(projExtRateReq.getFeeId().equals(RepayPlanFeeTypeEnum.PLAT_PENALTY.getUuid())){
+                        plat_penalty_in_flage = true;
+                    }
+                }
+            }
 
+            if(!principal_penalty_in_flage){
+                //未传入本金违约金默认写入默认配置
+            }
+            if(!sub_company_penalty_in_flage){
+                //未传入月收服务费违约金写入默认配置
+            }
+            if(!plat_penalty_in_flage){
+                //平台服务费违约金写入默认配置
+            }
+
+            //3.存储传入的标费用信息中类型为一次性收取的费用
+            List<ProjFeeReq> projFeeReqs = projInfoReq.getProjFeeInfos();
+            for(ProjFeeReq projFeeReq:projFeeReqs){
+                if(projFeeReq.getChargeType().equals(RepayPlanChargeTypeEnum.ONE_TIME.getKey())){
+                    ProjExtRate projExtRate = new ProjExtRate();
+                    projExtRate.setBusinessId(businessBasicInfoReq.getBusinessId());
+                    projExtRate.setProjectId(projInfoReq.getProjectId());
+                    projExtRate.setRateType(projFeeReq.getFeeType());
+                    projExtRate.setRateName(projFeeReq.getFeeTypeName());
+                    projExtRate.setRateValue(projFeeReq.getFeeValue());
+                    projExtRate.setCalcWay(RepayPlanExtRateCalcWayEnum.RATE_VALUE.getKey());
+                    projExtRate.setFeeId(projFeeReq.getFeeItemId());
+                    projExtRate.setFeeName(projFeeReq.getFeeItemName());
+                    projExtRate.setCreateUser(Constant.ADMIN_ID);
+                    projExtRate.setCreateTime(new Date());
+                    //如果是分段收费的
+                    if(projFeeReq.getIsTermRange().equals(BooleanEnum.YES.getValue())){
+                        List<ProjFeeDetailReq>  projFeeDetailReqs = projFeeReq.getFeeDetailReqList();
+                        for(ProjFeeDetailReq projFeeDetailReq: projFeeDetailReqs){
+                            ProjExtRate projExtRate1 = ClassCopyUtil.copyObject(projExtRate,ProjExtRate.class);
+                            projExtRate1.setBeginPeroid(projFeeDetailReq.getPeroid());
+                            projExtRate1.setEndPeroid(projFeeDetailReq.getPeroid());
+                            projExtRate1.setRateValue(projFeeDetailReq.getFeeValue());
+                            projExtRates.add(projExtRate1);
+                        }
+
+                    }else {
+                        projExtRate.setBeginPeroid(1);
+                        projExtRate.setEndPeroid(projInfoReq.getPeriodMonth());
+                        projExtRates.add(projExtRate);
+                    }
+
+                    projExtRateService.delete(new EntityWrapper<ProjExtRate>().eq("project_id",projInfoReq.getProjectId()));
+                    if(projExtRates.size()>0){
+                        projExtRateService.insertBatch(projExtRates);
+                    }
+                }
+            }
         }
-
         /////////   存储传入的相关信息   结束   ////////////
 
         //异步存储调用此接口传入的参数
@@ -617,7 +687,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             public void run() {
                 IssueSendOutsideLog log=new IssueSendOutsideLog();
                 log.setCreateTime(new Date());
-                log.setCreateUserId(Constant.SYS_DEFAULT_USER);
+                log.setCreateUserId(Constant.ADMIN_ID);
                 log.setInterfacecode("CreatRepayPlanService_creatAndSaveRepayPlan");
                 log.setInterfacename("创建并存储还款计划");
                 log.setSendJsonEncrypt(creatRepayPlanReq.getBusinessBasicInfoReq().getBusinessId());
@@ -647,12 +717,10 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
             if(projList.size()>0){
                 for(RepaymentProjPlan projPlan:projList){
-                    if(projPlan.getActive().equals(RepayPlanActiveEnum.ACTIVE.getValue())){
-                        Integer diffDays = DateUtil.getDiffDays(projPlan.getCreateTime(),projInfoReq.getQueryFullsuccessDate());
-                        //如果同一个标的满标时间与还款计划生成的时间相差一天以内
-                        if(diffDays <= 1){
-                            throw  new CreatRepaymentExcepiton("已存在时间相近的还款计划");
-                        }
+                    Integer diffDays = DateUtil.getDiffDays(projPlan.getCreateTime(),projInfoReq.getQueryFullsuccessDate());
+                    //如果同一个标的满标时间与还款计划生成的时间相差一天以内
+                    if(diffDays <= 1){
+                        throw  new CreatRepaymentExcepiton("已存在时间相近的还款计划");
                     }
                 }
             }
@@ -801,9 +869,10 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 }
             }
 
-            //标的额外费用信息校验
+            //标的额外费用信息校验  开始  ------------------
             List<ProjExtRateReq> projExtRateReqs = projInfoReq.getProjExtRateReqs();
             Map<String,List<ProjExtRateReq>> projExtRateReqMap = new HashMap<>();
+            projInfoReq.setProjExtRateReqMap(projExtRateReqMap);
             //校验输入的开始期数，结束期数是否是连续的，是否等于总期数
             if(projExtRateReqs !=null &&projExtRateReqs.size()>0){
                 for(ProjExtRateReq projExtRateReq:projExtRateReqs){
@@ -832,24 +901,28 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     }
                 });
                 //判断开始结束时间是否是连续的
-                Integer lastEndPeriod;
+                Integer lastEndPeriod=0;
                 for(ProjExtRateReq projExtRateReq:rateReqs){
+                    Integer beginPeroid = projExtRateReq.getBeginPeroid();
+                    if(!(beginPeroid-lastEndPeriod==1)){
+                        logger.error("额外费率期数设置不连续  List:"+JSON.toJSONString(rateReqs)
+                                +"  ProjExtRateReq:"+JSON.toJSONString(projExtRateReq));
+                        throw  new CreatRepaymentExcepiton("额外费率期数设置不连续 List:"+JSON.toJSONString(rateReqs)
+                                +"  ProjExtRateReq:"+JSON.toJSONString(projExtRateReq));
+                    }
+                    lastEndPeriod = projExtRateReq.getEndPeroid();
+                }
+                if(lastEndPeriod!=projInfoReq.getPeriodMonth()){
+                    logger.error("额外费率期数设置不足  List:"+JSON.toJSONString(rateReqs)
+                            +"  标的期数:"+projInfoReq.getPeriodMonth());
+                    throw  new CreatRepaymentExcepiton("额外费率期数设置不足  List:"+JSON.toJSONString(rateReqs)
+                            +"  标的期数:"+projInfoReq.getPeriodMonth());
 
                 }
 
-
             }
-
-
-
-
-
-
-
-
+            //标的额外费用信息校验  结束  ------------------
         }
-
-
         return true;
     }
 
@@ -901,10 +974,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             bizPlan.setIsDefer(businessBasicInfo.getIsRenewBusiness()); //是否展期还款计划
             bizPlan.setXdAfterGuid(null);       //对应原信贷的还款批次号  置位为空
             bizPlan.setXdOutId(null);       //对应原信贷的出款计划ID  置位为空
-            bizPlan.setActive(RepayPlanActiveEnum.ACTIVE.getValue());       //是否有效状态
             bizPlan.setSrcType(RepayPlanCreateSysEnum.ALMS.getValue());       //还款计划生成系统标志
             bizPlan.setCreateTime(new Date());       //创建日期
-            bizPlan.setCreateUser(Constant.SYS_DEFAULT_USER);       //创建用户
+            bizPlan.setCreateUser(Constant.ADMIN_ID);       //创建用户
 
             //更新标的还款计划主表的 plan_id
             BigDecimal bizPlanBorrowMoney= new BigDecimal(0);
@@ -948,10 +1020,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 bizPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());   //当前还款状态
                 bizPlanList.setCurrentSubStatus(null);   //当前还款子状态
                 bizPlanList.setRepayFlag(RepayPlanPayedTypeEnum.PAYING.getValue());   // 已还款类型标记
-                bizPlanList.setActive(RepayPlanActiveEnum.ACTIVE.getValue());   // 是否有效状态
                 bizPlanList.setCreateTime(new Date());   // 创建日期
                 bizPlanList.setSrcType(bizPlan.getSrcType());   // 来源类型
-                bizPlanList.setCreateUser(Constant.SYS_DEFAULT_USER);   // 创建用户
+                bizPlanList.setCreateUser(Constant.ADMIN_ID);   // 创建用户
 
 
                 //更新标的 list 业务还款计划相关Id
@@ -995,10 +1066,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                         bizpDetial.setPlanItemName(projpDetials.get(0).getPlanItemName());  //应还项目名称
                         bizpDetial.setPlanItemType(projpDetials.get(0).getPlanItemType());  //应还项目所属分类
                         bizpDetial.setAccountStatus(projpDetials.get(0).getAccountStatus());  // 分账标记
-                        bizpDetial.setActive(RepayPlanActiveEnum.ACTIVE.getValue());  // 是否有效状态
                         bizpDetial.setCreateDate(new Date());  // 创建日期
                         bizpDetial.setSrcType(RepayPlanCreateSysEnum.ALMS.getValue());  // 来源类型
-                        bizpDetial.setCreateUser(Constant.SYS_DEFAULT_USER);  // 来源类型
+                        bizpDetial.setCreateUser(Constant.ADMIN_ID);  // 创建者
                         bizpDetial.setDueDate(bizPlanList.getDueDate());
                         //更新标的detail   业务还款计划相关Id
                         for(RepaymentProjPlanListDetail projPlanListDetail: projpDetials){
@@ -1103,9 +1173,8 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 repaymentProjPlan.setBorrowLimitUnit(RepayPlanBorrowLimitUnitEnum.MONTH.getValue());//借款期限单位
                 repaymentProjPlan.setPlanStatus(RepayPlanStatus.REPAYING.getKey());//还款计划状态
                 repaymentProjPlan.setIsDefer(RepayPlanIsDeferEnum.NO.getValue());//是否展期还款计划
-                repaymentProjPlan.setActive(RepayPlanActiveEnum.ACTIVE.getValue());//是否有效标志位
                 repaymentProjPlan.setCreateTime(new Date());
-                repaymentProjPlan.setCreateUser(Constant.SYS_DEFAULT_USER);
+                repaymentProjPlan.setCreateUser(Constant.ADMIN_ID);
                 repaymentProjPlan.setCreatSysType(RepayPlanCreateSysEnum.ALMS.getValue());
                 repaymentProjPlan.setPlateType(projInfoReq.getPlateType());
                 repaymentProjPlan.setOnLineOverDueRate(projInfoReq.getOnLineOverDueRate());
@@ -1137,7 +1206,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 //                if(projFeeReqs !=null && projFeeReqs.size()>0){
 //                    for(ProjFeeReq feeReq: projFeeReqs){
 //                        //如果费用是一次性收取
-//                        if(feeReq.getChargeType().equals(RepayPlanIsOneTimeChargeEnum.ONE_TIME.getKey())){
+//                        if(feeReq.getChargeType().equals(RepayPlanChargeTypeEnum.ONE_TIME.getKey())){
 //                            String feeItemId = getFeeItemId(feeReq.getFeeItemId(),feeReq.getFeeType());
 //                            RepaymentProjPlanListDetail   zeroListDetail = creatProjListDetail(zeroList);
 //                            zeroListDetail.setProjPlanAmount(feeReq.getFeeValue());//项目计划应还总金额(元)
@@ -1223,7 +1292,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     //列表费用
                     if(projFeeReqs !=null && projFeeReqs.size()>0) {
                         for (ProjFeeReq feeReq : projFeeReqs) {
-                            if(feeReq.getChargeType().equals(RepayPlanIsOneTimeChargeEnum.BY_MONTH.getKey())){
+                            if(feeReq.getChargeType().equals(RepayPlanChargeTypeEnum.BY_MONTH.getKey())){
                                 //最后一期，期初收取的费用不收
                                 if(i==projInfoReq.getPeriodMonth()){
                                     feeReq.getRepaymentFlag().equals(PepayPlanRepayFlageEnum.BEGIN.getValue());
@@ -1396,9 +1465,8 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         projPlanList.setOverdueDays(new BigDecimal(0)); //逾期天数
         projPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName()); //当前还款状态
         projPlanList.setRepayFlag(RepayPlanPayedTypeEnum.GET_MONEY_PAY.getValue()); //已还款类型标记
-        projPlanList.setActive(RepayPlanActiveEnum.ACTIVE.getValue());//设置是否有效标志位
         projPlanList.setCreateTime(new Date());//设置创建时间
-        projPlanList.setCreateUser(Constant.SYS_DEFAULT_USER);//设置创建用户
+        projPlanList.setCreateUser(Constant.ADMIN_ID);//设置创建用户
         projPlanList.setCreatSysType(repaymentProjPlan.getCreatSysType()); //创建系统标志
         projPlanList.setPlateType(repaymentProjPlan.getPlateType()); //平台类型标志
 //        projPlanList.setP
@@ -1657,9 +1725,8 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         projPlanListDetail.setBusinessId(projPlanList.getBusinessId());//  所属还款计划列表详情ID(外键，对应tb_repayment_biz_plan_list.plan_list_id)
         projPlanListDetail.setOrigBusinessId(projPlanList.getOrigBusinessId());//原业务Id
         projPlanListDetail.setPeriod(projPlanList.getPeriod()); //所属期数
-        projPlanListDetail.setActive(RepayPlanActiveEnum.ACTIVE.getValue());
         projPlanListDetail.setCreateDate(new Date());
-        projPlanListDetail.setCreateUser(Constant.SYS_DEFAULT_USER);
+        projPlanListDetail.setCreateUser(Constant.ADMIN_ID);
         projPlanListDetail.setCreatSysType(projPlanList.getCreatSysType()); //创建系统标志
         projPlanListDetail.setPlateType(projPlanList.getPlateType()); //平台类型标志
         //分润顺序项
@@ -1692,7 +1759,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 					return planReturnInfoDto;
 				}
 				
-				BasicBusiness basicBusiness = basicBusinessService.selectById(origBusinessId);
+				BasicBusiness basicBusiness = basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", origBusinessId));
 				
 				if (basicBusiness == null) {
 					return planReturnInfoDto;

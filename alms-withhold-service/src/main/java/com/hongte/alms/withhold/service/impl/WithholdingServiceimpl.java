@@ -14,8 +14,9 @@ import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
-import com.hongte.alms.base.entity.RepaymentProjPlanList;
+import com.hongte.alms.base.feignClient.dto.CustomerInfoDto;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
+import com.hongte.alms.withhold.service.RechargeService;
 import com.hongte.alms.withhold.service.WithholdingService;
 
 /**
@@ -34,12 +35,16 @@ public class WithholdingServiceimpl  implements WithholdingService {
     @Qualifier("RepaymentBizPlanListService")
     RepaymentBizPlanListService repaymentBizPlanListService;
 
+    
+    @Autowired
+    @Qualifier("RechargeService")
+    RechargeService rechargeService;
 	@Override
 	public void withholding() {
 		List<RepaymentBizPlanList> pLists=repaymentBizPlanListService.selectAutoRepayList();
 		for(RepaymentBizPlanList pList:pLists) {
 			//不是最后一期才能代扣
-			if(!istLastPeriod(pList)) {
+			if(!rechargeService.istLastPeriod(pList)) {
 				
 			}else {
 				continue;
@@ -53,6 +58,9 @@ public class WithholdingServiceimpl  implements WithholdingService {
 	
 	
 	
+	/*
+	 * 每一期自动代扣
+	 */
 	
 	private void autoRepayPerList(RepaymentBizPlanList pList) {
 		
@@ -69,29 +77,8 @@ public class WithholdingServiceimpl  implements WithholdingService {
 	
 	
 	
+
 	
-	
-    /**
-     * 
-     * 判断每期还款计划是否为最后一期
-     * @param projPlanList
-     * @return
-     */
-	private boolean istLastPeriod(RepaymentBizPlanList pList) {
-		boolean isLast=false;
-		List<RepaymentBizPlanList> pLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", pList.getPlanId()));
-		RepaymentBizPlanList lastpList=pLists.stream().max(new Comparator<RepaymentBizPlanList>() {
-			@Override
-			public int compare(RepaymentBizPlanList o1, RepaymentBizPlanList o2) {
-				return o1.getDueDate().compareTo(o2.getDueDate());
-			}
-		}).get();
-		
-		if(pList.getPlanListId().equals(lastpList.getPlanListId())) {
-			isLast=true;
-		}
-		return isLast;
-	}	
 	
 	
 	

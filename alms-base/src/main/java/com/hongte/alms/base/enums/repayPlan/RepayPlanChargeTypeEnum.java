@@ -3,26 +3,29 @@ package com.hongte.alms.base.enums.repayPlan;
 /**
  * @author zengkun
  * @since 2018/4/25
- * 还款计划费用项是否是一次性收取的枚举
+ * 还款计划费用项收取方式枚举（是否是一次性收取）
  */
-public enum RepayPlanIsOneTimeChargeEnum {
+public enum RepayPlanChargeTypeEnum {
 
-//	[是否一次收取，1为按月收取，2为一次收取]
+	//	[是否一次收取，1为按月收取，2为一次收取]
 	BY_MONTH(1,"按月收取"),
 	ONE_TIME(2,"一次收取")
 	;
 
+
+
+
 	private Integer key; // 数据保存的值
 	private String name; // 名称
 
-	private RepayPlanIsOneTimeChargeEnum(int key, String name) {
+	private RepayPlanChargeTypeEnum(int key, String name) {
 		this.name = name;
 		this.key = key;
 	}
 
 
 	public static String nameOf(Integer key){
-		for(RepayPlanIsOneTimeChargeEnum d : RepayPlanIsOneTimeChargeEnum.values()){
+		for(RepayPlanChargeTypeEnum d : RepayPlanChargeTypeEnum.values()){
 			if(d.key.equals(key)){
 				return d.name;
 			}
@@ -31,8 +34,8 @@ public enum RepayPlanIsOneTimeChargeEnum {
 
 	}
 
-	public static RepayPlanIsOneTimeChargeEnum getByKey(String key){
-		for(RepayPlanIsOneTimeChargeEnum d : RepayPlanIsOneTimeChargeEnum.values()){
+	public static RepayPlanChargeTypeEnum getByKey(String key){
+		for(RepayPlanChargeTypeEnum d : RepayPlanChargeTypeEnum.values()){
 			if(d.key.equals(key)){
 				return d;
 			}
@@ -42,7 +45,7 @@ public enum RepayPlanIsOneTimeChargeEnum {
 	}
 
 	public static Integer keyOf(String name){
-		for(RepayPlanIsOneTimeChargeEnum d : RepayPlanIsOneTimeChargeEnum.values()){
+		for(RepayPlanChargeTypeEnum d : RepayPlanChargeTypeEnum.values()){
 			if(d.name.equals(name)){
 				return d.key;
 			}

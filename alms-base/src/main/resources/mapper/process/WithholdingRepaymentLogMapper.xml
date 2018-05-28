@@ -229,13 +229,20 @@ select repay.*  from tb_withholding_repayment_log  repay
     
     
         
-    <select id="selectRepaymentLogForAutoRepay" resultType="com.hongte.alms.base.vo.module.RepaymentLogVO"
-            parameterType="com.hongte.alms.base.vo.module.RepaymentLogReq">
+    <select id="selectRepaymentLogForAutoRepay" resultType="com.hongte.alms.base.entity.WithholdingRepaymentLog"
+            >
 
 		  SELECT 
 		  <include refid="Base_Column_List"/>
-		  from tb_withholding_repayment_log      where 1=1  and original_business_id='' and after_id='' 
-		  and DATE_FORMAT(update_time,'%Y-%m-%d')=DATE_FORMAT(NOW(),'%Y-%m-%d')
+		  from tb_withholding_repayment_log     
+		  
+        <where>
+         1=1  and original_business_id=#{businessId} and after_id=#{afterId} 
+		  and DATE_FORMAT(update_time,'%Y-%m-%d')=DATE_FORMAT(NOW(),'%Y-%m-%d') and (repay_status='失败' or repay_status='处理中')
+		    <if test="platformId !=null and platformId !=''">
+                and bind_platform_id = #{platformId}
+            </if>
+        </where>
 
     </select>
     

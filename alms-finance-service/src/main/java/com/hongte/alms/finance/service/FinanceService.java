@@ -7,8 +7,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import com.hongte.alms.base.dto.ConfirmRepaymentReq;
-import com.hongte.alms.base.dto.RepaymentPlanInfoDTO;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.entity.MoneyPool;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
@@ -93,6 +91,39 @@ public interface FinanceService {
      */
     Map<String, Object> queryRepaymentPlanInfoByBusinessId(String businessId);
     
+    /**
+     * 根据业务还款计划列表ID获取所有对应的标的应还还款计划信息
+     * @param planListId
+     * @return
+     */
+    Map<String, Object> queryPlanRepaymentProjInfoByPlanListId(String planListId);
     
+    /**
+     * 根据业务还款计划列表ID获取所有对应的标的实还还款计划信息
+     * @param planListId
+     * @return
+     */
+    Map<String, Object> queryActualRepaymentProjInfoByPlanListId(String planListId);
+    
+    /**
+     * 获取标还款计划差额
+     * @param planListId
+     * @return
+     */
+    Map<String, Object> queryDifferenceRepaymentProjInfo(String planListId);
+    
+    /**
+     * 获取业务维度的其他费用
+     * @param planListId
+     * @return
+     */
+    List<String> queryBizOtherFee(String planListId);
+    
+    /**
+     * 获取标维度的其他费用
+     * @param projPlanListId
+     * @return
+     */
+    List<String> queryProjOtherFee(String projPlanListId);
     
 }

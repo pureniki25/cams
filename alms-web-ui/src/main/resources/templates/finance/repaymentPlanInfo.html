@@ -74,11 +74,26 @@
 					</Modal>
 					
 		        	<Modal v-model="repayActualFlag" title="实际还款" width="1600">
-		        		<i-table border :columns="repayActualColumns" :data="repayActualColumnsData"></i-table>
+		        		<i-table border :columns="repayPlanColumns" :data="repayActualColumnsData"></i-table>
 					</Modal>
 					
-		        	<Modal v-model="repayOtherFeeFlag" title="其他费用" width="1600">
-		        		
+		        	<Modal v-model="repayDifferenceFlag" title="差额" width="1600">
+		        		<i-table border :columns="repayPlanColumns" :data="repayDifferenceColumnsData"></i-table>
+					</Modal>
+					
+		        	<Modal v-model="repayOtherFeeFlag" title="其他费用" width="30%">
+		        		<p v-for="item in bizOtherFeeList">
+		        			<span>
+		        				{{ item }}
+		        			</span>
+		        		</p>
+					</Modal>
+		        	<Modal v-model="repayProjOtherFeeFlag" title="其他费用" width="30%">
+		        		<p v-for="item in projOtherFeeList">
+		        			<span>
+		        				{{ item }}
+		        			</span>
+		        		</p>
 					</Modal>
 				</tab-pane>
 		        <tab-pane label="实还流水" name="realRepaymentRecord"></tab-pane>
