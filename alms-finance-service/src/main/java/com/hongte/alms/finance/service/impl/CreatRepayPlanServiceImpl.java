@@ -653,54 +653,32 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     projExtRate.setCalcWay(RepayPlanExtRateCalcWayEnum.RATE_VALUE.getKey());
                     projExtRate.setFeeId(projFeeReq.getFeeItemId());
                     projExtRate.setFeeName(projFeeReq.getFeeItemName());
+                    projExtRate.setCreateUser(Constant.ADMIN_ID);
+                    projExtRate.setCreateTime(new Date());
                     //如果是分段收费的
                     if(projFeeReq.getIsTermRange().equals(BooleanEnum.YES.getValue())){
+                        List<ProjFeeDetailReq>  projFeeDetailReqs = projFeeReq.getFeeDetailReqList();
+                        for(ProjFeeDetailReq projFeeDetailReq: projFeeDetailReqs){
+                            ProjExtRate projExtRate1 = ClassCopyUtil.copyObject(projExtRate,ProjExtRate.class);
+                            projExtRate1.setBeginPeroid(projFeeDetailReq.getPeroid());
+                            projExtRate1.setEndPeroid(projFeeDetailReq.getPeroid());
+                            projExtRate1.setRateValue(projFeeDetailReq.getFeeValue());
+                            projExtRates.add(projExtRate1);
+                        }
 
+                    }else {
+                        projExtRate.setBeginPeroid(1);
+                        projExtRate.setEndPeroid(projInfoReq.getPeriodMonth());
+                        projExtRates.add(projExtRate);
                     }
 
-
-
-//                    /**
-//                     * 开始期数
-//                     */
-//                    @TableField("begin_peroid")
-//                    @ApiModelProperty(required= true,value = "开始期数")
-//                    private Integer beginPeroid;
-//                    /**
-//                     * 结束期数
-//                     */
-//                    @TableField("end_peroid")
-//                    @ApiModelProperty(required= true,value = "结束期数")
-//                    private Integer endPeroid;
-//                    /**
-//                     * 创建日期
-//                     */
-//                    @TableField("create_time")
-//                    @ApiModelProperty(required= true,value = "创建日期")
-//                    private Date createTime;
-//                    /**
-//                     * 创建用户
-//                     */
-//                    @TableField("create_user")
-//                    @ApiModelProperty(required= true,value = "创建用户")
-//                    private String createUser;
-//                    /**
-//                     * 更新日期
-//                     */
-//                    @TableField("update_time")
-//                    @ApiModelProperty(required= true,value = "更新日期")
-//                    private Date updateTime;
-//                    /**
-//                     * 更新用户
-//                     */
-//                    @TableField("update_user")
-//                    @ApiModelProperty(required= true,value = "更新用户")
-//                    private String updateUser;
+                    projExtRateService.delete(new EntityWrapper<ProjExtRate>().eq("project_id",projInfoReq.getProjectId()));
+                    if(projExtRates.size()>0){
+                        projExtRateService.insertBatch(projExtRates);
+                    }
                 }
             }
-
         }
-
         /////////   存储传入的相关信息   结束   ////////////
 
         //异步存储调用此接口传入的参数
