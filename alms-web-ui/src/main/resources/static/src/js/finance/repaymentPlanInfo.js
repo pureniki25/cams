@@ -15,6 +15,7 @@ window.layinit(function (htConfig) {
         	baseInfo:{},	// 业务基本信息
         	bizRepaymentPlanList: [],	// 还款计划信息
         	projOtherFeeList: [],	// 标还款计划其他费用
+        	bizOtherFeeList: [],	// 业务还款计划其他费用
         	repayPlanFlag: false, 	// 计划还款弹窗控制标识
         	repayActualFlag: false, 	// 实际还款弹窗控制标识
         	repayDifferenceFlag: false, 	// 差额弹窗控制标识
@@ -71,7 +72,11 @@ window.layinit(function (htConfig) {
                         		},
                         		on:{
                         			click:function(){
-                        				
+                        				if (p.row.projPlanListId  != null) {
+											app.openProjRepayOtherFee(p.row.projPlanListId)
+										}else {
+											app.openRepayOtherFee(p.row.planListId)
+										}
                         			}
                         		}
                         	},p.row.otherFee)
@@ -121,7 +126,7 @@ window.layinit(function (htConfig) {
         	
         	repayPlanColumnsData: [], // 计划还款数据
     		repayActualColumnsData: [], // 实际还款数据
-    		repayDifferenceColumnsData: [], // 实际还款数据
+    		repayDifferenceColumnsData: [], // 差额数据
         },
         methods: {
         	/*
@@ -148,7 +153,6 @@ window.layinit(function (htConfig) {
     	            }
     	        })
     	        .catch(function (error) {
-    	        	app.syncCollectionLoading = false;
     	        	app.$Modal.error({content: '接口调用异常!'});
     	        });
             },
@@ -165,7 +169,6 @@ window.layinit(function (htConfig) {
             		}
             	})
             	.catch(function (error) {
-            		app.syncCollectionLoading = false;
             		app.$Modal.error({content: '接口调用异常!'});
             	});
             },
@@ -182,7 +185,6 @@ window.layinit(function (htConfig) {
             		}
             	})
             	.catch(function (error) {
-            		app.syncCollectionLoading = false;
             		app.$Modal.error({content: '接口调用异常!'});
             	});
             },
@@ -199,29 +201,43 @@ window.layinit(function (htConfig) {
             		}
             	})
             	.catch(function (error) {
-            		app.syncCollectionLoading = false;
             		app.$Modal.error({content: '接口调用异常!'});
             	});
             },
             /*
-             * 获取标还款计划差额
+             * 获取标还款计划其他费用
              */
             queryProjOtherFee: function(projPlanListId){
-            	axios.get(financeBasePath +"finance/queryDifferenceRepaymentProjInfo?projPlanListId=" + projPlanListId)
+            	axios.get(financeBasePath +"finance/queryProjOtherFee?projPlanListId=" + projPlanListId)
             	.then(function (res) {
             		if (res.data.data != null && res.data.code == 1) {
-            			app.repayDifferenceColumnsData = res.data.data.resultProjInfo;
+            			app.projOtherFeeList = res.data.data;
             		} else {
             			app.$Modal.error({content: res.data.msg });
             		}
             	})
             	.catch(function (error) {
-            		app.syncCollectionLoading = false;
             		app.$Modal.error({content: '接口调用异常!'});
             	});
             },
             /*
-             * 为类型增加点击事件
+             * 获取业务还款计划其他费用
+             */
+            queryBizOtherFee: function(planListId){
+            	axios.get(financeBasePath +"finance/queryBizOtherFee?planListId=" + planListId)
+            	.then(function (res) {
+            		if (res.data.data != null && res.data.code == 1) {
+            			app.bizOtherFeeList = res.data.data;
+            		} else {
+            			app.$Modal.error({content: res.data.msg });
+            		}
+            	})
+            	.catch(function (error) {
+            		app.$Modal.error({content: '接口调用异常!'});
+            	});
+            },
+            /*
+             * 为类型增加点击事件	
              */
             addEventForType: function(item){
             	var planListId = item.planListId;
@@ -266,12 +282,14 @@ window.layinit(function (htConfig) {
              */
             openRepayOtherFee: function(planListId){
             	this.repayOtherFeeFlag = true;
+            	this.queryBizOtherFee(planListId);
             },
             /*
              * 打开其他费用，查看其他费用明细项，相应的点击标的中的其他费用也看查看相应的其他费用项（标维度）
              */
-            openProjRepayOtherFee: function(planListId){
+            openProjRepayOtherFee: function(projPlanListId){
             	this.repayProjOtherFeeFlag = true;
+            	this.queryProjOtherFee(projPlanListId);
             },
         },
         created: function () {

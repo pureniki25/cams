@@ -1,4 +1,4 @@
-package com.hongte.alms.open.vo;
+package com.hongte.alms.finance.req;
 
 import java.io.Serializable;
 

@@ -25,21 +25,21 @@ public class BasicBusiness extends Model<BasicBusiness> {
 
     private static final long serialVersionUID = 1L;
 
+	/**
+	 * 资产端业务编号
+	 */
+	@TableId("business_id")
+	@ApiModelProperty(required= true,value = "资产端业务编号")
+	private String businessId;
     
     
     
     /**客户身份证号码
      * 
      */
-    @TableId("customer_identify_card")
 	@ApiModelProperty(required= true,value = "客户身份证号码")
     private String  customerIdentifyCard;
-    /**
-     * 资产端业务编号
-     */
-    @TableId("business_id")
-	@ApiModelProperty(required= true,value = "资产端业务编号")
-	private String businessId;
+
     /**
      * 进件日期
      */

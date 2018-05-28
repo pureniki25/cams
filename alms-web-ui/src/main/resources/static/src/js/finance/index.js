@@ -181,6 +181,18 @@ window.layinit(function (htConfig) {
                                                 if(call=='revokeConfirm'){
                                                     app.revokeConfirm(p.row)
                                                 }
+                                                if(call=='confirmWithhold'){
+                                                    let url = '/finance/confirmWithhold?businessId='+p.row.businessId+'&afterId='+p.row.afterId
+                                                    layer.open({
+                                                        type: 2,
+                                                        title: '代扣确认',
+                                                        content: [url, 'no'],
+                                                        area: ['1600px', '800px'],
+                                                        success: function (layero, index) {
+                                                            curIndex = index;
+                                                        }
+                                                    })
+                                                }
                                             }
                                         }
                                     }
@@ -193,11 +205,13 @@ window.layinit(function (htConfig) {
                                                 +p.row.businessId+'&afterId='
                                                 +p.row.afterId+'&planListId='
                                                 +p.row.planListId);
-                        let businessAllSettle = initMenuItem('业务全部结清确认', '/ssssxx')
+                        //let businessAllSettle = initMenuItem('业务全部结清确认', '/ssssxx')
                         let revokeConfirm = initMenuItem('撤销还款确认',null,'revokeConfirm')
+                        let confirmWithhold = initMenuItem('代扣确认',null,'confirmWithhold')
                         menu.push(repayConfirm)
-                        menu.push(businessAllSettle)
+                        //menu.push(businessAllSettle)
                         menu.push(revokeConfirm)
+                        menu.push(confirmWithhold)
 
                         return h('Poptip', {
                             props: {

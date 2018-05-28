@@ -1624,17 +1624,17 @@ public class FinanceServiceImpl implements FinanceService {
 	}
 
 	@Override
-	public List<Map<String, Object>> queryBizOtherFee(String planListId) {
+	public List<String> queryBizOtherFee(String planListId) {
 		try {
-			List<Map<String, Object>> resultList = new ArrayList<>();
-			int[] types = {10, 20, 30, 50, 60};
+			List<String> resultList = new ArrayList<>();
 			List<RepaymentBizPlanListDetail> details = repaymentBizPlanListDetailService
-					.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().notIn("plan_item_type", types));
+					.selectList(new EntityWrapper<RepaymentBizPlanListDetail>()
+							.notIn("plan_item_type", 10, 20, 30, 50, 60).eq("plan_list_id", planListId));
 			if (CollectionUtils.isNotEmpty(details)) {
 				for (RepaymentBizPlanListDetail detail : details) {
-					Map<String, Object> map = new HashMap<>();
-					map.put(detail.getPlanItemName(), detail.getPlanAmount());
-					resultList.add(map);
+					BigDecimal planAmount = detail.getPlanAmount();
+					resultList.add(detail.getPlanItemName() + ": " + (planAmount == null ? BigDecimal.valueOf(0) : planAmount)
+					.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
 				}
 			}
 			return resultList;
@@ -1645,17 +1645,17 @@ public class FinanceServiceImpl implements FinanceService {
 	}
 	
 	@Override
-	public List<Map<String, Object>> queryProjOtherFee(String projPlanListId) {
+	public List<String> queryProjOtherFee(String projPlanListId) {
 		try {
-			List<Map<String, Object>> resultList = new ArrayList<>();
-			int[] types = {10, 20, 30, 50, 60};
+			List<String> resultList = new ArrayList<>();
 			List<RepaymentProjPlanListDetail> details = repaymentProjPlanListDetailService
-					.selectList(new EntityWrapper<RepaymentProjPlanListDetail>().notIn("plan_item_type", types));
+					.selectList(new EntityWrapper<RepaymentProjPlanListDetail>().eq("proj_plan_list_id", projPlanListId)
+							.notIn("plan_item_type", 10, 20, 30, 50, 60));
 			if (CollectionUtils.isNotEmpty(details)) {
 				for (RepaymentProjPlanListDetail detail : details) {
-					Map<String, Object> map = new HashMap<>();
-					map.put(detail.getPlanItemName(), detail.getProjFactAmount());
-					resultList.add(map);
+					BigDecimal projFactAmount = detail.getProjFactAmount();
+					resultList.add(detail.getPlanItemName() + ": " + (projFactAmount == null ? BigDecimal.valueOf(0) : projFactAmount)
+							.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
 				}
 			}
 			return resultList;

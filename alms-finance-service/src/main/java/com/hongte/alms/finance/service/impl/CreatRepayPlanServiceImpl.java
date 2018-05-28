@@ -102,9 +102,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
     BasicBizCustomerService basicBizCustomerService;
 
 
-    @Autowired
-    @Qualifier("BaiscBizExtRateService")
-    BaiscBizExtRateService baiscBizExtRateService;
+//    @Autowired
+//    @Qualifier("BaiscBizExtRateService")
+//    BaiscBizExtRateService baiscBizExtRateService;
 
 
     @Autowired
@@ -717,12 +717,10 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
             if(projList.size()>0){
                 for(RepaymentProjPlan projPlan:projList){
-                    if(projPlan.getActive().equals(RepayPlanActiveEnum.ACTIVE.getValue())){
-                        Integer diffDays = DateUtil.getDiffDays(projPlan.getCreateTime(),projInfoReq.getQueryFullsuccessDate());
-                        //如果同一个标的满标时间与还款计划生成的时间相差一天以内
-                        if(diffDays <= 1){
-                            throw  new CreatRepaymentExcepiton("已存在时间相近的还款计划");
-                        }
+                    Integer diffDays = DateUtil.getDiffDays(projPlan.getCreateTime(),projInfoReq.getQueryFullsuccessDate());
+                    //如果同一个标的满标时间与还款计划生成的时间相差一天以内
+                    if(diffDays <= 1){
+                        throw  new CreatRepaymentExcepiton("已存在时间相近的还款计划");
                     }
                 }
             }
@@ -976,7 +974,6 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             bizPlan.setIsDefer(businessBasicInfo.getIsRenewBusiness()); //是否展期还款计划
             bizPlan.setXdAfterGuid(null);       //对应原信贷的还款批次号  置位为空
             bizPlan.setXdOutId(null);       //对应原信贷的出款计划ID  置位为空
-            bizPlan.setActive(RepayPlanActiveEnum.ACTIVE.getValue());       //是否有效状态
             bizPlan.setSrcType(RepayPlanCreateSysEnum.ALMS.getValue());       //还款计划生成系统标志
             bizPlan.setCreateTime(new Date());       //创建日期
             bizPlan.setCreateUser(Constant.ADMIN_ID);       //创建用户
@@ -1023,7 +1020,6 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 bizPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());   //当前还款状态
                 bizPlanList.setCurrentSubStatus(null);   //当前还款子状态
                 bizPlanList.setRepayFlag(RepayPlanPayedTypeEnum.PAYING.getValue());   // 已还款类型标记
-                bizPlanList.setActive(RepayPlanActiveEnum.ACTIVE.getValue());   // 是否有效状态
                 bizPlanList.setCreateTime(new Date());   // 创建日期
                 bizPlanList.setSrcType(bizPlan.getSrcType());   // 来源类型
                 bizPlanList.setCreateUser(Constant.ADMIN_ID);   // 创建用户
@@ -1070,7 +1066,6 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                         bizpDetial.setPlanItemName(projpDetials.get(0).getPlanItemName());  //应还项目名称
                         bizpDetial.setPlanItemType(projpDetials.get(0).getPlanItemType());  //应还项目所属分类
                         bizpDetial.setAccountStatus(projpDetials.get(0).getAccountStatus());  // 分账标记
-                        bizpDetial.setActive(RepayPlanActiveEnum.ACTIVE.getValue());  // 是否有效状态
                         bizpDetial.setCreateDate(new Date());  // 创建日期
                         bizpDetial.setSrcType(RepayPlanCreateSysEnum.ALMS.getValue());  // 来源类型
                         bizpDetial.setCreateUser(Constant.ADMIN_ID);  // 创建者
@@ -1178,7 +1173,6 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 repaymentProjPlan.setBorrowLimitUnit(RepayPlanBorrowLimitUnitEnum.MONTH.getValue());//借款期限单位
                 repaymentProjPlan.setPlanStatus(RepayPlanStatus.REPAYING.getKey());//还款计划状态
                 repaymentProjPlan.setIsDefer(RepayPlanIsDeferEnum.NO.getValue());//是否展期还款计划
-                repaymentProjPlan.setActive(RepayPlanActiveEnum.ACTIVE.getValue());//是否有效标志位
                 repaymentProjPlan.setCreateTime(new Date());
                 repaymentProjPlan.setCreateUser(Constant.ADMIN_ID);
                 repaymentProjPlan.setCreatSysType(RepayPlanCreateSysEnum.ALMS.getValue());
@@ -1471,7 +1465,6 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         projPlanList.setOverdueDays(new BigDecimal(0)); //逾期天数
         projPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName()); //当前还款状态
         projPlanList.setRepayFlag(RepayPlanPayedTypeEnum.GET_MONEY_PAY.getValue()); //已还款类型标记
-        projPlanList.setActive(RepayPlanActiveEnum.ACTIVE.getValue());//设置是否有效标志位
         projPlanList.setCreateTime(new Date());//设置创建时间
         projPlanList.setCreateUser(Constant.ADMIN_ID);//设置创建用户
         projPlanList.setCreatSysType(repaymentProjPlan.getCreatSysType()); //创建系统标志
@@ -1732,7 +1725,6 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         projPlanListDetail.setBusinessId(projPlanList.getBusinessId());//  所属还款计划列表详情ID(外键，对应tb_repayment_biz_plan_list.plan_list_id)
         projPlanListDetail.setOrigBusinessId(projPlanList.getOrigBusinessId());//原业务Id
         projPlanListDetail.setPeriod(projPlanList.getPeriod()); //所属期数
-        projPlanListDetail.setActive(RepayPlanActiveEnum.ACTIVE.getValue());
         projPlanListDetail.setCreateDate(new Date());
         projPlanListDetail.setCreateUser(Constant.ADMIN_ID);
         projPlanListDetail.setCreatSysType(projPlanList.getCreatSysType()); //创建系统标志
@@ -1767,7 +1759,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 					return planReturnInfoDto;
 				}
 				
-				BasicBusiness basicBusiness = basicBusinessService.selectById(origBusinessId);
+				BasicBusiness basicBusiness = basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", origBusinessId));
 				
 				if (basicBusiness == null) {
 					return planReturnInfoDto;

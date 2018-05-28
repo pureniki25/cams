@@ -5,6 +5,7 @@ package com.hongte.alms.finance.controller;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -50,6 +51,7 @@ import com.hongte.alms.base.service.MoneyPoolService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.RepaymentConfirmLogService;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
+import com.hongte.alms.base.vo.finance.ConfirmWithholdListVO;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.base.vo.finance.CurrPeriodRepaymentInfoVO;
 import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
@@ -58,6 +60,7 @@ import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.finance.req.MoneyPoolReq;
 import com.hongte.alms.finance.service.FinanceService;
 import com.hongte.alms.finance.service.ShareProfitService;
+import com.ht.ussp.bean.LoginUserInfoHelper;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -110,6 +113,8 @@ public class FinanceController {
 	@Autowired
 	@Qualifier("AccountantOverRepayLogService")
 	private AccountantOverRepayLogService accountantOverRepayLogService;
+	@Autowired
+	private LoginUserInfoHelper loginUserInfoHelper ;
 
 	@GetMapping(value = "/repayBaseInfo")
 	@ApiOperation(value = "获取还款基本信息")
@@ -518,9 +523,9 @@ public class FinanceController {
 	
 	@GetMapping(value = "/queryProjOtherFee")
 	@ApiOperation(value = "获取标维度的其他费用")
-	public Result<List<Map<String, Object>>> queryProjOtherFee(@RequestParam("projPlanListId") String projPlanListId) {
+	public Result<List<String>> queryProjOtherFee(@RequestParam("projPlanListId") String projPlanListId) {
 		try {
-			Result<List<Map<String, Object>>> result;
+			Result<List<String>> result;
 			
 			logger.info("@queryProjOtherFee@获取标维度的其他费用--开始[{}]", projPlanListId);
 			
@@ -532,6 +537,25 @@ public class FinanceController {
 		} catch (Exception e) {
 			logger.error("获取标维度的其他费用--[{}]", e);
 			return Result.error("-500", "系统异常，获取标维度的其他费用");
+		}
+	}
+	
+	@GetMapping(value = "/queryBizOtherFee")
+	@ApiOperation(value = "获取业务维度的其他费用")
+	public Result<List<String>> queryBizOtherFee(@RequestParam("planListId") String planListId) {
+		try {
+			Result<List<String>> result;
+			
+			logger.info("@queryBizOtherFee@获取业务维度的其他费用--开始[{}]", planListId);
+			
+			result = Result.success(financeService.queryBizOtherFee(planListId));
+			
+			logger.info("@queryBizOtherFee@获取业务维度的其他费用--结束[{}]", result);
+			
+			return result;
+		} catch (Exception e) {
+			logger.error("获取业务维度的其他费用--[{}]", e);
+			return Result.error("-500", "系统异常，获取业务维度的其他费用");
 		}
 	}
 	
@@ -547,6 +571,53 @@ public class FinanceController {
 		} catch (Exception e) {
 			logger.error("撤销还款确认失败--[{}]", e);
 			return Result.error("-500", "系统异常:撤销还款确认失败");
+		}
+	}
+	
+	@GetMapping(value = "/listConfirmWithhold")
+	@ApiOperation(value = "查找业务代扣确认列表")
+	public Result listConfirmWithhold(String businessId) {
+		try {
+			logger.info("@listConfirmWithhold@查找业务代扣确认列表--开始[{}]", businessId);
+			Result result = null;
+			List<ConfirmWithholdListVO> list = repaymentBizPlanListService.listConfirmWithhold(businessId);
+			result = Result.success(list);
+			logger.info("@listConfirmWithhold@查找业务代扣确认列表--结束[{}]", result);
+			return result;
+		} catch (Exception e) {
+			logger.error("查找业务代扣确认列表失败--[{}]", e);
+			return Result.error("-500", "系统异常:查找业务代扣确认列表失败");
+		}
+	}
+
+	@GetMapping(value = "/confirmWithhold")
+	@ApiOperation(value = "代扣确认")
+	public Result confirmWithhold(String businessId, String afterId) {
+		try {
+			logger.info("@confirmWithhold@代扣确认--开始[{}]", businessId);
+			Result result = null;
+
+			EntityWrapper<RepaymentBizPlanList> ew = new EntityWrapper<RepaymentBizPlanList>();
+			ew.eq("business_id", businessId);
+			if (afterId != null) {
+				ew.eq("after_id", afterId);
+			}
+			ew.andNew().isNull("confirm_flag").or().eq("confirm_flag", 0);
+			List<RepaymentBizPlanList> list = repaymentBizPlanListService.selectList(ew);
+			for (RepaymentBizPlanList planList : list) {
+				planList.setConfirmFlag(1);
+				planList.setAutoWithholdingConfirmedDate(new Date());
+				planList.setAutoWithholdingConfirmedUser(loginUserInfoHelper.getUserId());
+				planList.setAutoWithholdingConfirmedUserName(loginUserInfoHelper.getLoginInfo().getUserName());
+				planList.updateById();
+			}
+
+			logger.info("@confirmWithhold@代扣确认--结束[{}]", result);
+			return Result.success();
+		} catch (Exception e) {
+			logger.error("@confirmWithhold@代扣确认失败--[{}]", e);
+			e.printStackTrace();
+			return Result.error("-500", "系统异常:代扣确认失败");
 		}
 	}
 	
