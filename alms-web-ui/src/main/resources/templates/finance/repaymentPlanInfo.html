@@ -82,14 +82,18 @@
 					</Modal>
 					
 		        	<Modal v-model="repayOtherFeeFlag" title="其他费用" width="30%">
-		        		<p >
-		        			<span>aaa</span>
-		        			<span>ss</span>
+		        		<p v-for="item in bizOtherFeeList">
+		        			<span>
+		        				{{ item }}
+		        			</span>
 		        		</p>
-			        		<p >
-			        			<span>aaa</span>
-			        			<span>ss</span>
-			        		</p>
+					</Modal>
+		        	<Modal v-model="repayProjOtherFeeFlag" title="其他费用" width="30%">
+		        		<p v-for="item in projOtherFeeList">
+		        			<span>
+		        				{{ item }}
+		        			</span>
+		        		</p>
 					</Modal>
 				</tab-pane>
 		        <tab-pane label="实还流水" name="realRepaymentRecord"></tab-pane>

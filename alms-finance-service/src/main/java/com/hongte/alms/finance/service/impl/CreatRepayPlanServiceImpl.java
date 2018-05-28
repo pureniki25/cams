@@ -102,9 +102,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
     BasicBizCustomerService basicBizCustomerService;
 
 
-    @Autowired
-    @Qualifier("BaiscBizExtRateService")
-    BaiscBizExtRateService baiscBizExtRateService;
+//    @Autowired
+//    @Qualifier("BaiscBizExtRateService")
+//    BaiscBizExtRateService baiscBizExtRateService;
 
 
     @Autowired

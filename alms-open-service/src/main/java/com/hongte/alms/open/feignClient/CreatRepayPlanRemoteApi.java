@@ -8,6 +8,8 @@ import com.hongte.alms.base.RepayPlan.dto.app.BizPlanDto;
 import com.hongte.alms.base.RepayPlan.req.CreatRepayPlanReq;
 import com.hongte.alms.base.RepayPlan.req.trial.TrailRepayPlanReq;
 import com.hongte.alms.common.result.Result;
+import com.hongte.alms.open.vo.RepayPlanReq;
+
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +22,7 @@ import java.util.List;
  * @date 2018/3/3 17:37
  * 创建还款计划的远程调用
  */
-@FeignClient(value = "alms-finance-service")
+@FeignClient(value = "alms-finance-service", url="http://192.168.15.176:30621")
 public interface CreatRepayPlanRemoteApi {
 
     @RequestMapping(value = "/RepayPlan/creatRepayPlan",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
@@ -33,7 +35,7 @@ public interface CreatRepayPlanRemoteApi {
     Result<PlanReturnInfoDto> trailRepayPlan(TrailRepayPlanReq trailRepayPlanReq);
     
     @RequestMapping(value = "/RepayPlan/queryRepayPlanByBusinessId",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
-    Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(String businessId);
+    Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(RepayPlanReq req);
     
     @RequestMapping(value = "/RepayPlan/deleteRepayPlanByConditions",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
     Result<PlanReturnInfoDto> deleteRepayPlanByConditions(@RequestParam(value = "businessId")String businessId, @RequestParam(value = "repaymentBatchId")String repaymentBatchId);

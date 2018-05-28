@@ -87,7 +87,7 @@ public class RepayPlanController {
     @ResponseBody
     @TripleDESDecrypt
     public Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(@RequestBody RepayPlanReq req){
-        return creatRepayPlanRemoteService.queryRepayPlanByBusinessId(req.getBusinessId());
+        return creatRepayPlanRemoteService.queryRepayPlanByBusinessId(req);
     }
 
     @ApiOperation(value = "撤销还款计划")
