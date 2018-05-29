@@ -19,7 +19,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @since 2018-05-02
  */
 @ApiModel
-@TableName("tb_profit_fee_set")
+@TableName("tb_sys_profit_fee_set")
 public class ProfitFeeSet extends Model<ProfitFeeSet> {
 
     private static final long serialVersionUID = 1L;
