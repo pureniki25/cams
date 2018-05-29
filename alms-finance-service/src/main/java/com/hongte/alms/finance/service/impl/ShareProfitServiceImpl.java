@@ -844,7 +844,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 				planList.setRepayStatus(SectionRepayStatusEnum.SECTION_REPAID.getKey());
 			}
 		}
-		planList.setConfirmFlag(1);
+//		planList.setConfirmFlag(1);
 		planList.setFinanceConfirmUser(loginUserInfoHelper.getUserId());
 		planList.setFinanceComfirmDate(new Date());
 		planList.setFinanceConfirmUserName(loginUserInfoHelper.getLoginInfo().getUserName());
