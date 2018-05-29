@@ -5,6 +5,7 @@ package com.hongte.alms.finance.controller;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,7 +28,6 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.dto.ConfirmRepaymentReq;
 import com.hongte.alms.base.dto.FinanceManagerListReq;
-import com.hongte.alms.base.dto.RepaymentPlanInfoDTO;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.BasicBusinessType;
@@ -39,6 +40,7 @@ import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.enums.AreaLevel;
 import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.enums.RepayRegisterState;
+import com.hongte.alms.base.service.AccountantOverRepayLogService;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.BasicBusinessTypeService;
 import com.hongte.alms.base.service.BasicCompanyService;
@@ -47,7 +49,9 @@ import com.hongte.alms.base.service.BizOutputRecordService;
 import com.hongte.alms.base.service.MoneyPoolRepaymentService;
 import com.hongte.alms.base.service.MoneyPoolService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
+import com.hongte.alms.base.service.RepaymentConfirmLogService;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
+import com.hongte.alms.base.vo.finance.ConfirmWithholdListVO;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.base.vo.finance.CurrPeriodRepaymentInfoVO;
 import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
@@ -56,6 +60,7 @@ import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.finance.req.MoneyPoolReq;
 import com.hongte.alms.finance.service.FinanceService;
 import com.hongte.alms.finance.service.ShareProfitService;
+import com.ht.ussp.bean.LoginUserInfoHelper;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -99,6 +104,17 @@ public class FinanceController {
 	@Autowired
 	@Qualifier("ShareProfitService")
 	private ShareProfitService shareService;
+	@Autowired
+	@Qualifier("RepaymentConfirmLogService")
+	private RepaymentConfirmLogService confrimLogService;
+	@Autowired
+	@Qualifier("MoneyPoolService")
+	private MoneyPoolService MoneyPoolService ;
+	@Autowired
+	@Qualifier("AccountantOverRepayLogService")
+	private AccountantOverRepayLogService accountantOverRepayLogService;
+	@Autowired
+	private LoginUserInfoHelper loginUserInfoHelper ;
 
 	@GetMapping(value = "/repayBaseInfo")
 	@ApiOperation(value = "获取还款基本信息")
@@ -387,18 +403,43 @@ public class FinanceController {
 	public Result previewConfirmRepayment(@RequestBody ConfirmRepaymentReq req) {
 		Result result ;
 		logger.info("@previewConfirmRepayment@预览确认还款拆标情况--开始[{}]",req);
-//		result = financeService.previewConfirmRepayment(req);
-		List<CurrPeriodProjDetailVO> detailVOs = shareService.execute(req, false);
-//		logger.info("@previewConfirmRepayment@预览确认还款拆标情况--结束[{}]",result);
-		return Result.success(detailVOs) ;
+		try {
+			List<CurrPeriodProjDetailVO> detailVOs = shareService.execute(req, false);
+			result = Result.success(detailVOs);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			result = Result.error("500", e.getMessage());
+		}
+		logger.info("@previewConfirmRepayment@预览确认还款拆标情况--结束[{}]",result);
+		return result ;
 	}
+	
+	@PostMapping(value="/confirmRepayment")
+	@ApiOperation(value="预览确认还款拆标情况")
+	public Result confirmRepayment(@RequestBody ConfirmRepaymentReq req) {
+		Result result ;
+		logger.info("@confirmRepayment@确认还款拆标情况--开始[{}]",req);
+		try {
+			List<CurrPeriodProjDetailVO> detailVOs = shareService.execute(req, true);
+			moneyPoolService.confirmRepaidUpdateMoneyPool(req);
+			result = Result.success(detailVOs);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			result = Result.error("500", e.getMessage());
+			e.printStackTrace();
+		}
+		logger.info("@confirmRepayment@确认还款拆标情况--结束[{}]",result);
+		return result ;
+	}
+	
 	
 	@GetMapping(value="/getSurplusFund")
 	@ApiOperation(value="获取结余情况")
 	public Result getSurplusFund(String businessId,String afterId) {
 		Result result ;
 		logger.info("@getSurplusFund@获取结余情况--开始[{}{}]",businessId,afterId);
-		BigDecimal surplusFund = financeService.getSurplusFund(businessId, afterId);
+		BigDecimal surplusFund = accountantOverRepayLogService.caluCanUse(businessId, null );
 		result = Result.success(surplusFund);
 		logger.info("@getSurplusFund@获取结余情况--结束[{}]",result);
 		return result ;
@@ -406,7 +447,7 @@ public class FinanceController {
 	
 	@GetMapping(value = "/queryRepaymentPlanInfoByBusinessId")
 	@ApiOperation(value = "根据源业务编号获取还款计划信息")
-	public Result<Map<String, Object>> queryRepaymentPlanInfoByBusinessId(String businessId) {
+	public Result<Map<String, Object>> queryRepaymentPlanInfoByBusinessId(@RequestParam("businessId") String businessId) {
 		try {
 			Result<Map<String, Object>> result;
 
@@ -420,6 +461,163 @@ public class FinanceController {
 		} catch (Exception e) {
 			logger.error("根据源业务编号获取还款计划信息失败--[{}]", e);
 			return Result.error("-500", "系统异常，获取还款计划信息失败");
+		}
+	}
+	
+	@GetMapping(value = "/queryPlanRepaymentProjInfoByPlanListId")
+	@ApiOperation(value = "根据业务还款计划列表ID获取所有对应的标的应还还款计划信息")
+	public Result<Map<String, Object>> queryPlanRepaymentProjInfoByPlanListId(@RequestParam("planListId") String planListId) {
+		try {
+			Result<Map<String, Object>> result;
+			
+			logger.info("@queryPlanRepaymentProjInfoByPlanListId@根据业务还款计划列表ID获取所有对应的标的应还还款计划信息--开始[{}]", planListId);
+			
+			result = Result.success(financeService.queryPlanRepaymentProjInfoByPlanListId(planListId));
+			
+			logger.info("@queryPlanRepaymentProjInfoByPlanListId@根据业务还款计划列表ID获取所有对应的标的应还还款计划信息--结束[{}]", result);
+			
+			return result;
+		} catch (Exception e) {
+			logger.error("根据业务还款计划列表ID获取所有对应的标的应还还款计划信息失败--[{}]", e);
+			return Result.error("-500", "系统异常，获取所有对应的标的应还还款计划信息");
+		}
+	}
+	
+	@GetMapping(value = "/queryActualRepaymentProjInfoByPlanListId")
+	@ApiOperation(value = "根据业务还款计划列表ID获取所有对应的标的实还还款计划信息")
+	public Result<Map<String, Object>> queryActualRepaymentProjInfoByPlanListId(@RequestParam("planListId") String planListId) {
+		try {
+			Result<Map<String, Object>> result;
+			
+			logger.info("@queryActualRepaymentProjInfoByPlanListId@根据业务还款计划列表ID获取所有对应的标的实还还款计划信息--开始[{}]", planListId);
+			
+			result = Result.success(financeService.queryActualRepaymentProjInfoByPlanListId(planListId));
+			
+			logger.info("@queryActualRepaymentProjInfoByPlanListId@根据业务还款计划列表ID获取所有对应的标的实还还款计划信息--结束[{}]", result);
+			
+			return result;
+		} catch (Exception e) {
+			logger.error("根据业务还款计划列表ID获取所有对应的标的实还还款计划信息失败--[{}]", e);
+			return Result.error("-500", "系统异常，获取所有对应的标的实还还款计划信息");
+		}
+	}
+	
+	@GetMapping(value = "/queryDifferenceRepaymentProjInfo")
+	@ApiOperation(value = "获取标还款计划差额")
+	public Result<Map<String, Object>> queryDifferenceRepaymentProjInfo(@RequestParam("planListId") String planListId) {
+		try {
+			Result<Map<String, Object>> result;
+			
+			logger.info("@queryDifferenceRepaymentProjInfo@获取标还款计划差额--开始[{}]", planListId);
+			
+			result = Result.success(financeService.queryDifferenceRepaymentProjInfo(planListId));
+			
+			logger.info("@queryDifferenceRepaymentProjInfo@获取标还款计划差额--结束[{}]", result);
+			
+			return result;
+		} catch (Exception e) {
+			logger.error("获取标还款计划差额--[{}]", e);
+			return Result.error("-500", "系统异常，获取标还款计划差额信息");
+		}
+	}
+	
+	@GetMapping(value = "/queryProjOtherFee")
+	@ApiOperation(value = "获取标维度的其他费用")
+	public Result<List<String>> queryProjOtherFee(@RequestParam("projPlanListId") String projPlanListId) {
+		try {
+			Result<List<String>> result;
+			
+			logger.info("@queryProjOtherFee@获取标维度的其他费用--开始[{}]", projPlanListId);
+			
+			result = Result.success(financeService.queryProjOtherFee(projPlanListId));
+			
+			logger.info("@queryProjOtherFee@获取标维度的其他费用--结束[{}]", result);
+			
+			return result;
+		} catch (Exception e) {
+			logger.error("获取标维度的其他费用--[{}]", e);
+			return Result.error("-500", "系统异常，获取标维度的其他费用");
+		}
+	}
+	
+	@GetMapping(value = "/queryBizOtherFee")
+	@ApiOperation(value = "获取业务维度的其他费用")
+	public Result<List<String>> queryBizOtherFee(@RequestParam("planListId") String planListId) {
+		try {
+			Result<List<String>> result;
+			
+			logger.info("@queryBizOtherFee@获取业务维度的其他费用--开始[{}]", planListId);
+			
+			result = Result.success(financeService.queryBizOtherFee(planListId));
+			
+			logger.info("@queryBizOtherFee@获取业务维度的其他费用--结束[{}]", result);
+			
+			return result;
+		} catch (Exception e) {
+			logger.error("获取业务维度的其他费用--[{}]", e);
+			return Result.error("-500", "系统异常，获取业务维度的其他费用");
+		}
+	}
+	
+	@GetMapping(value = "/revokeConfirm")
+	@ApiOperation(value = "撤销还款确认")
+	public Result revokeConfirm(String businessId,String afterId) {
+		try {
+			logger.info("@revokeConfirm@撤销还款确认--开始[{}]", businessId,afterId);
+			Result result = null;
+			result = confrimLogService.revokeConfirm(businessId, afterId);
+			logger.info("@revokeConfirm@撤销还款确认--结束[{}]", result);
+			return result;
+		} catch (Exception e) {
+			logger.error("撤销还款确认失败--[{}]", e);
+			return Result.error("-500", "系统异常:撤销还款确认失败");
+		}
+	}
+	
+	@GetMapping(value = "/listConfirmWithhold")
+	@ApiOperation(value = "查找业务代扣确认列表")
+	public Result listConfirmWithhold(String businessId) {
+		try {
+			logger.info("@listConfirmWithhold@查找业务代扣确认列表--开始[{}]", businessId);
+			Result result = null;
+			List<ConfirmWithholdListVO> list = repaymentBizPlanListService.listConfirmWithhold(businessId);
+			result = Result.success(list);
+			logger.info("@listConfirmWithhold@查找业务代扣确认列表--结束[{}]", result);
+			return result;
+		} catch (Exception e) {
+			logger.error("查找业务代扣确认列表失败--[{}]", e);
+			return Result.error("-500", "系统异常:查找业务代扣确认列表失败");
+		}
+	}
+
+	@GetMapping(value = "/confirmWithhold")
+	@ApiOperation(value = "代扣确认")
+	public Result confirmWithhold(String businessId, String afterId) {
+		try {
+			logger.info("@confirmWithhold@代扣确认--开始[{}]", businessId);
+			Result result = null;
+
+			EntityWrapper<RepaymentBizPlanList> ew = new EntityWrapper<RepaymentBizPlanList>();
+			ew.eq("business_id", businessId);
+			if (afterId != null) {
+				ew.eq("after_id", afterId);
+			}
+			ew.andNew().isNull("confirm_flag").or().eq("confirm_flag", 0);
+			List<RepaymentBizPlanList> list = repaymentBizPlanListService.selectList(ew);
+			for (RepaymentBizPlanList planList : list) {
+				planList.setConfirmFlag(1);
+				planList.setAutoWithholdingConfirmedDate(new Date());
+				planList.setAutoWithholdingConfirmedUser(loginUserInfoHelper.getUserId());
+				planList.setAutoWithholdingConfirmedUserName(loginUserInfoHelper.getLoginInfo().getUserName());
+				planList.updateById();
+			}
+
+			logger.info("@confirmWithhold@代扣确认--结束[{}]", result);
+			return Result.success();
+		} catch (Exception e) {
+			logger.error("@confirmWithhold@代扣确认失败--[{}]", e);
+			e.printStackTrace();
+			return Result.error("-500", "系统异常:代扣确认失败");
 		}
 	}
 	

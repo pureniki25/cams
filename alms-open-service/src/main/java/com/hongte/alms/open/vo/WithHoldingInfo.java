@@ -16,8 +16,31 @@ public class WithHoldingInfo {
     private String FactDate;
 
     private String Overduemoney;
+    
+    private String isAmountWithheld;
+    
+    private String nowRepayMoney;
+    
+    
+   
+ 
+	public String getIsAmountWithheld() {
+		return isAmountWithheld;
+	}
 
-    public String getBusinessId() {
+	public void setIsAmountWithheld(String isAmountWithheld) {
+		this.isAmountWithheld = isAmountWithheld;
+	}
+
+	public String getNowRepayMoney() {
+		return nowRepayMoney;
+	}
+
+	public void setNowRepayMoney(String nowRepayMoney) {
+		this.nowRepayMoney = nowRepayMoney;
+	}
+
+	public String getBusinessId() {
 		return BusinessId;
 	}
 

@@ -3,10 +3,11 @@ package com.hongte.alms.base.feignClient.dto;
 import java.io.Serializable;
 
 /**
+ * 银行代扣dto
  * @author:陈泽圣
  * @date: 2018/5/24
  */
-public class AutoRechargeReqDto implements Serializable {
+public class BankRechargeReqDto implements Serializable {
 	 private static final long serialVersionUID = -4095682638492039883L;
 	 
 	 private String oidPartner;//资产端账户唯一编号,团贷分配，商户唯一号(测试，生产不一样)

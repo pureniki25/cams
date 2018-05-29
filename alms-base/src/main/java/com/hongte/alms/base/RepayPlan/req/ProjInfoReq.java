@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author zengkun
@@ -40,6 +41,9 @@ public class ProjInfoReq {
 
     @ApiModelProperty(value = "标的的额外费用信息列表")
     private  List<ProjExtRateReq> projExtRateReqs;
+
+    //标的额外费用，按feeId分好分类
+    private Map<String,List<ProjExtRateReq>> projExtRateReqMap;
 
     /**
      *利率
@@ -1358,5 +1362,21 @@ public class ProjInfoReq {
 
     public void setCooperativeTdComAmount(BigDecimal cooperativeTdComAmount) {
         this.cooperativeTdComAmount = cooperativeTdComAmount;
+    }
+
+    public List<ProjExtRateReq> getProjExtRateReqs() {
+        return projExtRateReqs;
+    }
+
+    public void setProjExtRateReqs(List<ProjExtRateReq> projExtRateReqs) {
+        this.projExtRateReqs = projExtRateReqs;
+    }
+
+    public Map<String, List<ProjExtRateReq>> getProjExtRateReqMap() {
+        return projExtRateReqMap;
+    }
+
+    public void setProjExtRateReqMap(Map<String, List<ProjExtRateReq>> projExtRateReqMap) {
+        this.projExtRateReqMap = projExtRateReqMap;
     }
 }

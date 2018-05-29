@@ -119,6 +119,18 @@ public class RepaymentProjFactRepay extends Model<RepaymentProjFactRepay> {
 	@ApiModelProperty(required= true,value = "实还日期")
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date factRepayDate;
+	/**
+     * 还款确认日志id
+     */
+	@TableField("confirm_log_id")
+	@ApiModelProperty(required= true,value = "还款确认日志id")
+	private String confirmLogId;
+	/**
+     * 还款来源id
+     */
+	@TableField("repay_source_id")
+	@ApiModelProperty(required= true,value = "还款来源id")
+	private String repaySourceId;
     /**
      * 还款来源关联的相关记录ID
      */
@@ -353,5 +365,33 @@ public class RepaymentProjFactRepay extends Model<RepaymentProjFactRepay> {
 	 */
 	public void setPlanListId(String planListId) {
 		this.planListId = planListId;
+	}
+
+	/**
+	 * @return the confirmLogId
+	 */
+	public String getConfirmLogId() {
+		return confirmLogId;
+	}
+
+	/**
+	 * @param confirmLogId the confirmLogId to set
+	 */
+	public void setConfirmLogId(String confirmLogId) {
+		this.confirmLogId = confirmLogId;
+	}
+
+	/**
+	 * @return the repaySourceId
+	 */
+	public String getRepaySourceId() {
+		return repaySourceId;
+	}
+
+	/**
+	 * @param repaySourceId the repaySourceId to set
+	 */
+	public void setRepaySourceId(String repaySourceId) {
+		this.repaySourceId = repaySourceId;
 	}
 }

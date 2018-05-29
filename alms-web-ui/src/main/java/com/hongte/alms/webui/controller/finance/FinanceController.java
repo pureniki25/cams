@@ -63,4 +63,9 @@ public class FinanceController {
 	public String repaymentPlanInfo() {
 		return "/finance/repaymentPlanInfo" ;
 	}
+	
+	@RequestMapping("/confirmWithhold")
+	public String confirmWithhold() {
+		return "/finance/confirmWithhold" ;
+	}
 }

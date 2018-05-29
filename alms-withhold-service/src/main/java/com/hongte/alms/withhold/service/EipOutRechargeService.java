@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.hongte.alms.base.feignClient.dto.AddProjectTrackReqDto;
-import com.hongte.alms.base.feignClient.dto.AutoRechargeReqDto;
+import com.hongte.alms.base.feignClient.dto.BankRechargeReqDto;
 import com.ht.ussp.core.Result;
 
 /**
@@ -17,9 +17,19 @@ import com.ht.ussp.core.Result;
 
 
 @FeignClient(value = "eip-out")
-public interface AutoRechargeService {
+public interface EipOutRechargeService {
 	
-     
+     /*
+      * 银行代扣
+      */
     @RequestMapping(value = "/eip/td/assetside/autoRecharge",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
-    String autoRecharge(@RequestBody AutoRechargeReqDto dto);
+    String bankRecharge(@RequestBody BankRechargeReqDto dto);
+    
+    
+    /*
+     * 第三方代扣
+     */
+    
+    @RequestMapping(value = "/eip/td/assetside/autoRecharge",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+    String platfromRecharge(@RequestBody BankRechargeReqDto dto);
 }

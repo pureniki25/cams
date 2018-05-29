@@ -14,6 +14,11 @@ import java.util.List;
  */
 @ApiModel(value="贷后台账查询请求对象",description="贷后台账查询请求对象")
 public class AfterLoanStandingBookReq extends PageRequest {
+	
+	
+	
+    @ApiModelProperty(value="关键字",name="keyName",example="test" ,dataType = "String")
+    private String keyName      	;     //关键字
     @ApiModelProperty(value="区域ID",name="areaId",example="test")
     private String areaId;  //区域ID
 
@@ -94,7 +99,15 @@ public class AfterLoanStandingBookReq extends PageRequest {
 
     private String userId;//用户ID
 
-    public String getAreaId() {
+    public String getKeyName() {
+		return keyName;
+	}
+
+	public void setKeyName(String keyName) {
+		this.keyName = keyName;
+	}
+
+	public String getAreaId() {
         return areaId;
     }
 

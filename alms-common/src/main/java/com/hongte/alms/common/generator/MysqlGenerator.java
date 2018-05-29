@@ -51,7 +51,7 @@ public class MysqlGenerator {
         //1 设定生成配置
         GeneratorConfig inputConfig = new GeneratorConfig(
 //                "黄咏康",
-                "胡伟骞",
+                "曾坤",
                 //{自定义}包模块名
                 "com.hongte.alms.",
                 //父类包路径(指SuperMapper，BaseService的包路径)

@@ -41,7 +41,10 @@
 		business.operator_name as operatorName,
 		customer.phone_number as phoneNumber,
 		pList.current_status  as currentStatus,
-		platform.platform_id as platformId
+		platform.platform_id as platformId,
+		c.plan_all_amount as planAllAmount,
+		c.repay_all_amount as repayAllAmount,
+		(c.plan_all_amount-c.repay_all_amount) as restAmount
 
 
 
@@ -128,6 +131,12 @@
 		-- 应还冲应收总额
 		sum(case when t1.plan_item_type =100 then t1.plan_amount else 0 end)
 		`plan_reducing_debtors`,
+			-- 应还总额
+		sum(ifnull(t1.plan_amount,0))
+		`plan_all_amount`,
+			-- 已还总额
+		sum(ifnull(t1.fact_amount,0))
+		`repay_all_amount`,
 		-- 实还冲应收总额
 		sum(case when t1.plan_item_type =100 then t1.fact_amount else 0 end)
 		`fact_reducing_debtors`

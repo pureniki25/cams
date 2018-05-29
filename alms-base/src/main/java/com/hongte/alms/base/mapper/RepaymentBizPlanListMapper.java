@@ -2,11 +2,14 @@ package com.hongte.alms.base.mapper;
 
 import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.base.dto.RepaymentPlanInfoDTO;
+import com.hongte.alms.base.dto.RepaymentProjInfoDTO;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.vo.finance.ConfirmWithholdListVO;
 import com.hongte.alms.base.vo.module.FinanceManagerListVO;
 import com.hongte.alms.common.mapper.SuperMapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -73,4 +76,50 @@ public interface RepaymentBizPlanListMapper extends SuperMapper<RepaymentBizPlan
      * @return
      */
     List<RepaymentPlanInfoDTO> queryRepaymentPlanInfoByBusinessId(@Param(value = "businessId") String businessId);
+    /**
+     * 根据业务还款计划列表ID获取所有对应的标的应还还款计划信息
+     * @param planListId
+     * @return
+     */
+    List<RepaymentProjInfoDTO> queryPlanRepaymentProjInfoByPlanListId(@Param(value = "planListId") String planListId);
+    /**
+     * 根据业务还款计划列表ID获取所有对应的标的实还还款计划信息
+     * @param planListId
+     * @return
+     */
+    List<RepaymentProjInfoDTO> queryActualRepaymentProjInfoByPlanListId(@Param(value = "planListId") String planListId);
+    
+    /**
+     * 计算业务还款计划应还金额(已减去减免)
+     * @author 王继光
+     * 2018年5月26日 下午3:01:53
+     * @param planListId
+     * @return
+     */
+    BigDecimal caluBizPlanListPlanAmount(String planListId);
+    /**
+     * 计算业务还款计划实还金额
+     * @author 王继光
+     * 2018年5月26日 下午3:02:25
+     * @param planListId
+     * @return
+     */
+    BigDecimal caluBizPlanListFactAmount(String planListId);
+    /**
+     * 计算业务还款计划未还金额
+     * @author 王继光
+     * 2018年5月26日 下午3:02:41
+     * @param planListId
+     * @return
+     */
+    BigDecimal caluBizPlanListUnpaid(String planListId);
+    
+    /**
+     * 查询业务的代扣确认列表信息
+     * @author 王继光
+     * 2018年5月28日 下午4:09:31
+     * @param businessId
+     * @return
+     */
+    List<ConfirmWithholdListVO> listConfirmWithhold(String businessId);
 }

@@ -34,7 +34,7 @@ import com.hongte.alms.base.baseException.CreatRepaymentExcepiton;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.ClassCopyUtil;
 import com.hongte.alms.common.util.StringUtil;
-
+import com.hongte.alms.finance.req.RepayPlanReq;
 import com.hongte.alms.finance.service.CreatRepayPlanService;
 
 import io.swagger.annotations.Api;
@@ -119,6 +119,7 @@ public class RepayPlanController {
     public Result<PlanReturnInfoDto> creatAndSaveRepayPlan(@RequestBody @Valid CreatRepayPlanReq creatRepayPlanReq, BindingResult bindingResult){
 
         // =========   校验参数输入是否正确  开始  ================
+        logger.info("创建还款计划并将还款计划及业务和上标信息存储到数据库 接口 开始 输入的请求信息：[{}]", JSON.toJSONString(creatRepayPlanReq));
         if(bindingResult.hasErrors()){
             StringBuilder retErrMsg = new StringBuilder();
             for (FieldError fieldError : bindingResult.getFieldErrors()) {
@@ -175,15 +176,26 @@ public class RepayPlanController {
 //            private List<ProjFeeReq> projFeeInfos;
             List<ProjFeeReq> projFeeInfos =projInfoReq.getProjFeeInfos();
             for(ProjFeeReq projFeeReq:projFeeInfos){
-                Set<ConstraintViolation<ProjInfoReq>> projFeeReqValit =
-                        validator.validate( projInfoReq );
+                Set<ConstraintViolation<ProjFeeReq>> projFeeReqValit =
+                        validator.validate( projFeeReq );
                 if(projFeeReqValit.size()>0){
-                    logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口,标的的出款费用信息校验出错  传入信息： "+ JSON.toJSONString(projInfoReq)+"  错误信息：" , projFeeReqValit.iterator().next().getMessage());
-                    return Result.error("9889","标的的出款费用信息校验出错： 传入信息： "+JSON.toJSONString(projInfoReq)+"     错误信息："+projFeeReqValit.iterator().next().getMessage());
+                    logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口,标的的出款费用信息校验出错  传入信息： "+ JSON.toJSONString(projFeeReq)+"  错误信息：" , projFeeReqValit.iterator().next().getMessage());
+                    return Result.error("9889","标的的出款费用信息校验出错： 传入信息： "+JSON.toJSONString(projFeeReq)+"     错误信息："+projFeeReqValit.iterator().next().getMessage());
                 }
             }
 
-
+            // 校验标的额外费率信息
+            List<ProjExtRateReq> projExtRateReqs = projInfoReq.getProjExtRateReqs();
+            if(projExtRateReqs!=null&&projExtRateReqs.size()>0){
+                for(ProjExtRateReq projExtRateReq:projExtRateReqs){
+                    Set<ConstraintViolation<ProjExtRateReq>> projExtRateReqValit =
+                            validator.validate( projExtRateReq );
+                    if(projExtRateReqValit.size()>0){
+                        logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口,标的额外费率信息校验出错  传入信息： "+ JSON.toJSONString(projExtRateReq)+"  错误信息：" , projExtRateReqValit.iterator().next().getMessage());
+                        return Result.error("9889","标的额外费率信息校验出错： 传入信息： "+JSON.toJSONString(projExtRateReq)+"     错误信息："+projExtRateReqValit.iterator().next().getMessage());
+                    }
+                }
+            }
 
         }
 
@@ -236,6 +248,7 @@ public class RepayPlanController {
     @ResponseBody
     public Result<PlanReturnInfoDto> trailRepayPlan(@Valid @RequestBody TrailRepayPlanReq trailRepayPlanReq , BindingResult bindingResult){
         // =========   校验参数输入是否正确  开始  ================
+        logger.info("试算还款计划接口, 精简字段  开始 输入的试算信息：[{}]", JSON.toJSONString(trailRepayPlanReq));
         if(bindingResult.hasErrors()){
             StringBuilder retErrMsg = new StringBuilder();
             for (FieldError fieldError : bindingResult.getFieldErrors()) {
@@ -327,7 +340,7 @@ public class RepayPlanController {
             logger.info("@还款计划@试算还款计划接口,对业务和标的还款计划进行试算--异常[{}]" , e);
             return Result.error("9889","程序内部异常"+e.getMessage());
         }
-//        logger.info("@还款计划@试算还款计划接口,对业务和标的还款计划进行试算--结束[{}]" , trailRepayPlanReq);
+        logger.info("@还款计划@试算还款计划接口,对业务和标的还款计划进行试算--结束[{}]" , JSON.toJSONString(creatRepayPlanReq));
         return creatRepayPlan(creatRepayPlanReq);
 
 //        List<RepaymentBizPlanDto>  list ;
@@ -348,15 +361,15 @@ public class RepayPlanController {
 	@ApiOperation(value = "根据businessId查询还款计划")
 	@PostMapping("/queryRepayPlanByBusinessId")
 	@ResponseBody
-	public Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(@RequestParam(value = "businessId") String businessId) {
-		logger.info("查询还款计划，业务编号：[{}]", businessId);
+	public Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(@RequestBody RepayPlanReq req) {
 		try {
-			if (StringUtil.isEmpty(businessId)) {
+			logger.info("查询还款计划，业务编号：[{}]", req.getBusinessId());
+			if (StringUtil.isEmpty(req.getBusinessId())) {
 				return Result.error("9889", "业务编号不能为空！");
 			}
-			PlanReturnInfoDto planReturnInfoDto = creatRepayPlanService.queryRepayPlanByBusinessId(businessId);
+			PlanReturnInfoDto planReturnInfoDto = creatRepayPlanService.queryRepayPlanByBusinessId(req.getBusinessId());
 			if (planReturnInfoDto == null) {
-                logger.error("没有找到相关数据，请检查业务编号是否输入正确！", businessId);
+                logger.error("没有找到相关数据，请检查业务编号是否输入正确！", req.getBusinessId());
 				return Result.build("1", "没有找到相关数据，请检查业务编号是否输入正确！", planReturnInfoDto);
 			}
             logger.info("查询还款计划，查询成功：[{}]", planReturnInfoDto);
@@ -371,14 +384,13 @@ public class RepayPlanController {
 	@ApiOperation(value = "根据条件撤销还款计划")
 	@PostMapping("/deleteRepayPlanByConditions")
 	@ResponseBody
-	public Result deleteRepayPlanByConditions(@RequestParam(value = "businessId") String businessId,
-			@RequestParam(value = "repaymentBatchId") String repaymentBatchId) {
-		logger.info("删除还款计划，业务编号：[{}], 还款计划编号[{}]", businessId, repaymentBatchId);
+	public Result deleteRepayPlanByConditions(@RequestBody RepayPlanReq req) {
 		try {
-			if (StringUtil.isEmpty(businessId)  || StringUtil.isEmpty(repaymentBatchId)) {
+			logger.info("删除还款计划，业务编号：[{}], 还款计划编号[{}]", req.getBusinessId(), req.getRepaymentBatchId());
+			if (StringUtil.isEmpty(req.getBusinessId())  || StringUtil.isEmpty(req.getRepaymentBatchId())) {
 				return Result.error("9889", "业务编号或还款批次号不能为空！");
 			}
-			creatRepayPlanService.deleteRepayPlanByConditions(businessId, repaymentBatchId);
+			creatRepayPlanService.deleteRepayPlanByConditions(req.getBusinessId(), req.getRepaymentBatchId());
 			return Result.success();
 		} catch (Exception e) {
 			logger.error("删除还款计划异常[{}]", e);
@@ -408,7 +420,7 @@ public class RepayPlanController {
     @PostMapping("/getRepayList")
     @ResponseBody
    public Result<List<BizDto>> getRepayList(@RequestBody List<String> businessIds){
-        logger.info("根据业务ID列表查找出业务账单列表，业务ID列表：[{}]", JSON.toJSONString(businessIds));
+        logger.info("根据业务ID列表查找出业务账单列表 开始，业务ID列表：[{}]", JSON.toJSONString(businessIds));
 
        List<BizDto> bizDtos = new LinkedList<>();
 
@@ -417,7 +429,7 @@ public class RepayPlanController {
            bizDtos.add(bizDto);
 
        }
-        logger.info("根据业务ID列表查找出业务账单列表，返回数据：[{}]", JSON.toJSONString(bizDtos));
+        logger.info("根据业务ID列表查找出业务账单列表 结束，返回数据：[{}]", JSON.toJSONString(bizDtos));
 
        return Result.success(bizDtos);
    }
@@ -429,6 +441,10 @@ public class RepayPlanController {
     @PostMapping("/getLogBill")
     @ResponseBody
    public  Result<BizDto> getLogBill(@RequestParam(value = "businessId") String businessId){
+
+        logger.info("根据业务ID查找此业务的历史账单 开始，业务ID列表：[{}]", JSON.toJSONString(businessId));
+
+
         //业务基本的还款计划信息
         BizDto bizDto =getBizDtoByBizId(businessId);
 
@@ -457,6 +473,8 @@ public class RepayPlanController {
             renewBizDtos.add(renewBizDto);
         }
 
+        logger.info("根据业务ID查找此业务的历史账单 结束，返回数据：[{}]", JSON.toJSONString(bizDto));
+
         return Result.success(bizDto);
    }
 
@@ -467,6 +485,9 @@ public class RepayPlanController {
     @PostMapping("/getBizPlanBill")
     @ResponseBody
     public Result<BizPlanDto> getBizPlanBill(@RequestParam(value = "planId") String planId){
+        logger.info("根据还款计划ID查找出此还款计划的详情账单信息 开始，还款计划ID：[{}]", JSON.toJSONString(planId));
+
+
 
        RepaymentBizPlan bizPlan =  repaymentBizPlanService.selectById(planId);
 
@@ -474,7 +495,7 @@ public class RepayPlanController {
            return Result.error("9889","未找到对应的还款计划");
        }
         BizPlanDto  bizPlanDto  = getBizPlanDtoByBizPlan(bizPlan);
-
+        logger.info("根据还款计划ID查找出此还款计划的详情账单信息 结束，返回数据：[{}]", JSON.toJSONString(bizPlanDto));
 
        return  Result.success(bizPlanDto);
     }

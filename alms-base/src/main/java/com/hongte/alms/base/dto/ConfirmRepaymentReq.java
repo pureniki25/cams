@@ -21,6 +21,9 @@ public class ConfirmRepaymentReq {
 	//TODO 线下代扣ids
 	//TODO 银行代扣ids
 	private String remark ;
+	//10：线下转账，20：线下代扣，30：银行代扣,11:用往期结余还款
+	private List<Integer> repaySource ;
+	
 	public String getBusinessId() {
 		return businessId;
 	}
@@ -68,6 +71,18 @@ public class ConfirmRepaymentReq {
 	 */
 	public void setMprIds(List<String> mprIds) {
 		this.mprIds = mprIds;
+	}
+	/**
+	 * @return the repaySource
+	 */
+	public List<Integer> getRepaySource() {
+		return repaySource;
+	}
+	/**
+	 * @param repaySource the repaySource to set
+	 */
+	public void setRepaySource(List<Integer> repaySource) {
+		this.repaySource = repaySource;
 	}
 	
 }

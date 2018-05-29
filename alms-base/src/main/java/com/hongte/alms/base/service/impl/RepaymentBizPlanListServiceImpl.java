@@ -11,6 +11,7 @@ import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListMapper;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
+import com.hongte.alms.base.vo.finance.ConfirmWithholdListVO;
 import com.hongte.alms.base.vo.module.FinanceManagerListVO;
 import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
@@ -165,5 +166,10 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
 	@Override
 	public List<RepaymentBizPlanList> selectAutoRepayList() {
 		return repaymentBizPlanListMapper.selectAutoRepayList();
+	}
+
+	@Override
+	public List<ConfirmWithholdListVO> listConfirmWithhold(String businessId) {
+		return repaymentBizPlanListMapper.listConfirmWithhold(businessId);
 	}
 }

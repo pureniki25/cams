@@ -69,7 +69,7 @@ public class WithHoldingController {
 	public Result<String> withholding(@RequestParam("originalBusinessId") String originalBusinessId,
 			@RequestParam("afterId") String afterId, @RequestParam("total") String total,
 			@RequestParam("planOverDueMoney") String planOverDueMoney, @RequestParam("platformId") String platformId,
-			@RequestParam("type") String type, @RequestParam("nowdate") String nowdate
+			@RequestParam("type") String type, @RequestParam("nowdate") String nowdate,@RequestParam("isAmountWithheld") String isAmountWithheld
 
 	) {
 		try {
@@ -82,6 +82,8 @@ public class WithHoldingController {
 			info.setFactDate(nowdate);
 			info.setRepayplatform(Integer.valueOf(platformId));
 			info.setType(Integer.valueOf(type));
+			info.setNowRepayMoney(total);
+			info.setIsAmountWithheld(isAmountWithheld);
 
 			requestData.setData(JSON.toJSONString(info));
 			requestData.setMethodName("AfterLoanRepayment_SubmitAutoRepay");
@@ -94,11 +96,11 @@ public class WithHoldingController {
 			String respStr = withholdingxindaiService.withholding(encryptStr);
 			// 返回数据解密
 			ResponseData respData = getRespData(respStr);
-			logger.info("执行代扣接口返回数据:"+respData.getData());
+			logger.info("执行代扣接口返回数据:"+respData.getData()+",returnCode="+respData.getReturnCode()+",message="+respData.getReturnMessage());
 			
 			if ("1".equals(respData.getReturnCode())) {// 处理中
 				
-				Boolean flag=withHoldingInsertRecord(WithholdingRecordLogService, afterId, originalBusinessId, planOverDueMoney);
+				Boolean flag=withHoldingInsertRecord(WithholdingRecordLogService, afterId, originalBusinessId, total);
 				if(flag) {
 					return Result.success("代扣正在处理中,请稍后查看代扣结果");
 				}else {
@@ -107,6 +109,7 @@ public class WithHoldingController {
 				}
 		
 			} else {
+				withHoldingInsertRecordFail(WithholdingRecordLogService, afterId, originalBusinessId, total);
 				Result result=new Result();
 				result.setCode("-2");
 				result.setData(respData.getReturnMessage());
@@ -246,11 +249,7 @@ public class WithHoldingController {
 	// 代扣记录日志入库
 	private Boolean withHoldingInsertRecord(WithholdingRecordLogService service, String afterId, String originalBusinessId,
 			String planOverDueMoney) {
-		List<WithholdingRecordLog> loglist=service.selectWithholdingRecordLog(originalBusinessId, afterId);
-		//已经存在记录
-		if(loglist.size()>0) {
-			return false;
-		}else {
+	
 			WithholdingRecordLog log = new WithholdingRecordLog();
 			log.setOriginalBusinessId(originalBusinessId);
 			log.setAfterId(afterId);
@@ -260,9 +259,22 @@ public class WithHoldingController {
 			log.setUpdateTime(new Date());
 			service.insert(log);
 			return true;
-		}
 	}
 
+	
+	private Boolean withHoldingInsertRecordFail(WithholdingRecordLogService service, String afterId, String originalBusinessId,
+			String planOverDueMoney) {
+	
+			WithholdingRecordLog log = new WithholdingRecordLog();
+			log.setOriginalBusinessId(originalBusinessId);
+			log.setAfterId(afterId);
+			log.setCreateTime(new Date());
+			log.setCurrentAmount(BigDecimal.valueOf(Double.valueOf(planOverDueMoney)));
+			log.setRepayStatus(0);
+			log.setUpdateTime(new Date());
+			service.insert(log);
+			return true;
+	}
 
 	
 	

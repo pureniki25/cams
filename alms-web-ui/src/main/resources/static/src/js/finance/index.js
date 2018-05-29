@@ -168,14 +168,32 @@ window.layinit(function (htConfig) {
                     title: '操作',
                     render: (h, p) => {
 
-                        function initMenuItem(title, link) {
+                        function initMenuItem(title, link,call) {
                             return h('li', [
                                 h('i-button', {
                                     class: ['menuItem'],
                                     on: {
                                         click: function () {
-                                            window.location.href = link ;
-                                            console.log(link)
+                                            if(link){
+                                                window.location.href = link ;
+                                                console.log(link)
+                                            }else{
+                                                if(call=='revokeConfirm'){
+                                                    app.revokeConfirm(p.row)
+                                                }
+                                                if(call=='confirmWithhold'){
+                                                    let url = '/finance/confirmWithhold?businessId='+p.row.businessId+'&afterId='+p.row.afterId
+                                                    layer.open({
+                                                        type: 2,
+                                                        title: '代扣确认',
+                                                        content: [url, 'no'],
+                                                        area: ['1600px', '800px'],
+                                                        success: function (layero, index) {
+                                                            curIndex = index;
+                                                        }
+                                                    })
+                                                }
+                                            }
                                         }
                                     }
                                 }, title)
@@ -187,10 +205,13 @@ window.layinit(function (htConfig) {
                                                 +p.row.businessId+'&afterId='
                                                 +p.row.afterId+'&planListId='
                                                 +p.row.planListId);
-                        let businessAllSettle = initMenuItem('业务全部结清确认', '/ssssxx')
-
+                        //let businessAllSettle = initMenuItem('业务全部结清确认', '/ssssxx')
+                        let revokeConfirm = initMenuItem('撤销还款确认',null,'revokeConfirm')
+                        let confirmWithhold = initMenuItem('代扣确认',null,'confirmWithhold')
                         menu.push(repayConfirm)
-                        menu.push(businessAllSettle)
+                        //menu.push(businessAllSettle)
+                        menu.push(revokeConfirm)
+                        menu.push(confirmWithhold)
 
                         return h('Poptip', {
                             props: {
@@ -264,6 +285,19 @@ window.layinit(function (htConfig) {
             paging: function (page) {
                 app.form.curPage = page;
                 app.search()
+            },
+            revokeConfirm(p){
+                axios.get(fpath+'finance/revokeConfirm',{ params: { businessId: p.businessId,afterId:p.afterId }})
+                .then(function(res){
+                    if(res.data.code=='1'){
+                        app.$Message.success({content:res.data.msg})
+                    }else{
+                        app.$Message.error({content:res.data.msg})
+                    }
+                })
+                .catch(function(err){
+
+                })
             }
         },
         created: function () {

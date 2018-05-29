@@ -29,7 +29,7 @@ window.layinit(function (htConfig) {
                 show: false,
                 url: '/finance/matchedBankStatement?businessId=' + businessId + "&afterId=" + afterId,
                 style: {},
-                data: 11
+                data: []
             },
             manualAddBankSatements: {
                 show: false,
@@ -47,7 +47,88 @@ window.layinit(function (htConfig) {
             // },
 
             table: {
-                currPeriodRepayment: currPeriodRepayment,
+                currPeriodRepayment: {
+                    col: [{
+                        title: '展开',
+                        type: 'expand',
+                        render: (h, p) => {
+                            return h('i-table', {
+                                props: {
+                                    stripe: true,
+                                    columns: [{
+                                            title: '借款人',
+                                            key: 'userName'
+                                        },
+                                        {
+                                            title: '上标金额',
+                                            key: 'projAmount'
+                                        },
+                                        {
+                                            title: '本金',
+                                            key: 'item10'
+                                        }, {
+                                            title: '利息',
+                                            key: 'item20'
+                                        }, {
+                                            title: '月收分公司服务费',
+                                            key: 'item30'
+                                        }, {
+                                            title: '月收平台费',
+                                            key: 'item50'
+                                        }, {
+                                            title: '小计',
+                                            key: 'subTotal'
+                                        }, {
+                                            title: '线下逾期费',
+                                            key: 'offlineOverDue'
+                                        }, {
+                                            title: '减免金额',
+                                            key: 'onlineOverDue'
+                                        }, {
+                                            title: '合计（含滞纳金）',
+                                            key: 'total'
+                                        }
+                                    ],
+                                    data: p.row.list || []
+                                }
+                            })
+                        }
+                    }, {
+                        title: '类型',
+                        key: 'type'
+                    }, {
+                        title: '还款日期',
+                        key: 'repayDate'
+                    }, {
+                        title: '本金',
+                        key: 'item10'
+                    }, {
+                        title: '利息',
+                        key: 'item20'
+                    }, {
+                        title: '月收分公司服务费',
+                        key: 'item30'
+                    }, {
+                        title: '月收平台费',
+                        key: 'item50'
+                    }, {
+                        title: '小计',
+                        key: 'subtotal'
+                    }, {
+                        title: '线下逾期费',
+                        key: 'offlineOverDue'
+                    }, {
+                        title: '线上逾期费',
+                        key: 'onlineOverDue'
+                    }, {
+                        title: '减免金额',
+                        key: 'derate'
+                    }, {
+                        title: '合计(含滞纳金)',
+                        key: 'total'
+                    }],
+                    data: []
+                },
                 projRepayment: projRepayment
             },
             thisTimeRepaymentInfo: {
@@ -85,6 +166,7 @@ window.layinit(function (htConfig) {
                 onlineOverDue: 0,
                 subTotal: 0,
                 total: 0,
+                surplus: 0
             }
         },
         watch: {
@@ -173,7 +255,8 @@ window.layinit(function (htConfig) {
                 axios.get(fpath + 'finance/thisPeroidRepayment?businessId=' + businessId + "&afterId=" + afterId)
                     .then(function (res) {
                         if (res.data.code == '1') {
-                            app.table.currPeriodRepayment.data = Object.assign(app.table.currPeriodRepayment.data, res.data.data);
+                            console.log(res.data.data);
+                            app.table.currPeriodRepayment.data = res.data.data;
                         } else {
                             app.$Message.error({
                                 content: res.data.msg
@@ -204,15 +287,6 @@ window.layinit(function (htConfig) {
                     })
             },
             previewConfirmRepayment() {
-                // private String businessId ;
-                // private String afterId ;
-                // private BigDecimal offlineOverDue ;
-                // private BigDecimal onlineOverDue ;
-                // private BigDecimal surplusFund ;
-                // private List<String> mprIds ;
-                //TODO 线下代扣ids
-                //TODO 银行代扣ids
-                // private String remark ;
                 let param = {};
                 param.businessId = businessId;
                 param.afterId = afterId;
@@ -221,25 +295,48 @@ window.layinit(function (htConfig) {
                 axios.post(fpath + 'finance/previewConfirmRepayment', param)
                     .then(function (res) {
                         if (res.data.code == '1') {
-                            app.table.projRepayment.data = res.data.data
-                            app.factRepayPreview.item10 += 0
-                            app.factRepayPreview.item20 += 0
-                            app.factRepayPreview.item30 += 0
-                            app.factRepayPreview.item50 += 0
-                            app.factRepayPreview.offlineOverDue += 0
-                            app.factRepayPreview.onlineOverDue += 0
-                            app.factRepayPreview.subTotal += 0
-                            app.factRepayPreview.total += 0
-                            app.table.projRepayment.data.forEach(e => {
-                                app.factRepayPreview.item10 += e.item10
-                                app.factRepayPreview.item20 += e.item20
-                                app.factRepayPreview.item30 += e.item30
-                                app.factRepayPreview.item50 += e.item50
-                                app.factRepayPreview.offlineOverDue += e.offlineOverDue
-                                app.factRepayPreview.onlineOverDue += e.onlineOverDue
-                                app.factRepayPreview.subTotal += e.subTotal
-                                app.factRepayPreview.total += e.total
-                            })
+                            app.handleConfirmRepaymentResult(res)
+                        }
+                    })
+                    .catch(function (err) {
+                        console.log(err);
+                    })
+            },
+            handleConfirmRepaymentResult(res) {
+                app.table.projRepayment.data = res.data.data
+                app.factRepayPreview.item10 = 0
+                app.factRepayPreview.item20 = 0
+                app.factRepayPreview.item30 = 0
+                app.factRepayPreview.item50 = 0
+                app.factRepayPreview.offlineOverDue = 0
+                app.factRepayPreview.onlineOverDue = 0
+                app.factRepayPreview.subTotal = 0
+                app.factRepayPreview.total = 0
+                app.factRepayPreview.surplus = 0
+                app.table.projRepayment.data.forEach(e => {
+                    app.factRepayPreview.surplus += e.surplus
+                    app.factRepayPreview.item10 += e.item10
+                    app.factRepayPreview.item20 += e.item20
+                    app.factRepayPreview.item30 += e.item30
+                    app.factRepayPreview.item50 += e.item50
+                    app.factRepayPreview.offlineOverDue += e.offlineOverDue
+                    app.factRepayPreview.onlineOverDue += e.onlineOverDue
+                    app.factRepayPreview.subTotal += e.subTotal
+                    app.factRepayPreview.total += e.total
+                })
+            },
+            confirmRepayment() {
+                let param = {};
+                param.businessId = businessId;
+                param.afterId = afterId;
+                param = Object.assign(app.factRepaymentInfo, param);
+
+                axios.post(fpath + 'finance/confirmRepayment', param)
+                    .then(function (res) {
+                        if (res.data.code == '1') {
+                            app.handleConfirmRepaymentResult(res)
+
+                            window.location.reload()
                         }
                     })
                     .catch(function (err) {

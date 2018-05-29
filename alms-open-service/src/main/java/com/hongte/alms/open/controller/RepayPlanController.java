@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.hongte.alms.open.feignClient.CreatRepayPlanRemoteApi;
 import com.hongte.alms.open.util.TripleDESDecrypt;
+import com.hongte.alms.open.vo.RepayPlanReq;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -48,7 +49,7 @@ public class RepayPlanController {
     @ApiOperation(value = "创建还款计划并将还款计划及业务和上标信息存储到数据库 接口")
     @PostMapping("/creatAndSaveRepayPlan")
     @ResponseBody
-    //@TripleDESDecrypt
+    @TripleDESDecrypt
     public Result<PlanReturnInfoDto> creatAndSaveRepayPlan(@RequestBody CreatRepayPlanReq creatRepayPlanReq){
         logger.info("创建还款计划并将还款计划及业务和上标信息存储到数据库 接口--开始[{}]" , JSON.toJSONString(creatRepayPlanReq));
         Result<PlanReturnInfoDto> ret= creatRepayPlanRemoteService.creatAndSaveRepayPlan(creatRepayPlanReq);
@@ -85,17 +86,16 @@ public class RepayPlanController {
     @PostMapping("/queryRepayPlanByBusinessId")
     @ResponseBody
     @TripleDESDecrypt
-    public Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(@RequestParam(value = "businessId") String businessId){
-        return creatRepayPlanRemoteService.queryRepayPlanByBusinessId(businessId);
+    public Result<PlanReturnInfoDto> queryRepayPlanByBusinessId(@RequestBody RepayPlanReq req){
+        return creatRepayPlanRemoteService.queryRepayPlanByBusinessId(req);
     }
 
-    @ApiOperation(value = "根据businessId查询还款计划")
+    @ApiOperation(value = "撤销还款计划")
     @PostMapping("/deleteRepayPlanByConditions")
     @ResponseBody
     @TripleDESDecrypt
-    public Result<PlanReturnInfoDto> deleteRepayPlanByConditions(@RequestParam(value = "businessId") String businessId,
-                                                                 @RequestParam(value = "repaymentBatchId") String repaymentBatchId){
-        return creatRepayPlanRemoteService.deleteRepayPlanByConditions(businessId, repaymentBatchId);
+    public Result<PlanReturnInfoDto> deleteRepayPlanByConditions(@RequestBody RepayPlanReq req){
+        return creatRepayPlanRemoteService.deleteRepayPlanByConditions(req);
     }
 
     @ApiOperation(value = "根据businessId查询还款计划")

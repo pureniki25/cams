@@ -2,6 +2,7 @@ package com.hongte.alms.base.service;
 
 import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.vo.finance.ConfirmWithholdListVO;
 import com.hongte.alms.common.service.BaseService;
 import com.hongte.alms.common.vo.PageResult;
 
@@ -106,4 +107,12 @@ public interface RepaymentBizPlanListService extends BaseService<RepaymentBizPla
     List<RepaymentBizPlanList> selectAutoRepayList();
 
 
+    /**
+     * 查询业务的代扣确认列表信息
+     * @author 王继光
+     * 2018年5月28日 下午4:09:31
+     * @param businessId
+     * @return
+     */
+    List<ConfirmWithholdListVO> listConfirmWithhold(String businessId);
 }

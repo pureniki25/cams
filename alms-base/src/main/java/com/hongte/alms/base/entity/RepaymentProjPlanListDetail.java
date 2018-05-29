@@ -134,11 +134,7 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
 	@TableField("proj_fact_amount")
 	@ApiModelProperty(required= true,value = "标的资产端实还金额(元)")
 	private BigDecimal projFactAmount;
-    /**
-     * 是否有效状态：1 有效 ，0 无效
-     */
-	@ApiModelProperty(required= true,value = "是否有效状态：1 有效 ，0 无效")
-	private Integer active;
+
     /**
      * 生成系统类型：1.信贷生成，2.贷后管理生成
      */
@@ -179,6 +175,9 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
 	private String updateUser;
 
 
+	@TableField(exist=false)
+	private Integer repaySource ;
+	
 	public String getProjPlanDetailId() {
 		return projPlanDetailId;
 	}
@@ -299,14 +298,6 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
 		this.projFactAmount = projFactAmount;
 	}
 
-	public Integer getActive() {
-		return active;
-	}
-
-	public void setActive(Integer active) {
-		this.active = active;
-	}
-
 	public Integer getCreatSysType() {
 		return creatSysType;
 	}
@@ -379,7 +370,6 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
 				", dueDate=" + dueDate +
 				", projPlanAmount=" + projPlanAmount +
 				", projFactAmount=" + projFactAmount +
-				", active=" + active +
 				", creatSysType=" + creatSysType +
 				", plateType=" + plateType +
 				", createDate=" + createDate +
@@ -409,5 +399,19 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
 	 */
 	public void setDerateAmount(BigDecimal derateAmount) {
 		this.derateAmount = derateAmount;
+	}
+
+	/**
+	 * @return the repaySource
+	 */
+	public Integer getRepaySource() {
+		return repaySource;
+	}
+
+	/**
+	 * @param repaySource the repaySource to set
+	 */
+	public void setRepaySource(Integer repaySource) {
+		this.repaySource = repaySource;
 	}
 }
