@@ -425,13 +425,13 @@ window.layinit(function (htConfig) {
                 axios.get(fpath+'finance/listRepaymentSettleListVOs?businessId='+businessId+(planId?('&planId='+planId):''))
                 .then(function(res){
                     if(res.data.code=='1'){
-
+                        app.plan.data = res.data.data
                     }else{
-
+                        app.$Message.error({content:res.data.msg})
                     }
                 })
                 .catch(function(err){
-
+                    app.$Message.error({content:err})
                 })
             }
         },

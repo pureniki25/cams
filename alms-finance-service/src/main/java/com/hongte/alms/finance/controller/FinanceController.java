@@ -147,7 +147,7 @@ public class FinanceController {
 		r.put("businessId", businessId);
 		r.put("afterId", afterId);
 		r.put("businessType", basicBusinessType.getBusinessTypeName());
-		r.put("companyName", basicBusiness.getCompanyName());
+		r.put("companyName", basicBusiness.getCompanyName()==null?basicBusiness.getCompanyId(): basicBusiness.getCompanyName());
 		r.put("operatorName", basicBusiness.getOperatorName() == null ? basicBusiness.getOperatorId()
 				: basicBusiness.getOperatorName());
 		r.put("customerName", basicBusiness.getCustomerName());

@@ -193,6 +193,10 @@ window.layinit(function (htConfig) {
             }
         },
         methods: {
+            closePage(){
+                var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                parent.layer.close(index);
+            },
             closeModal: function (target) {
                 if (app[target]) {
                     app[target] = false;

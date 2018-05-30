@@ -175,8 +175,16 @@ window.layinit(function (htConfig) {
                                     on: {
                                         click: function () {
                                             if(link){
-                                                window.location.href = link ;
-                                                console.log(link)
+                                                // window.location.href = link ;
+                                                layer.open({
+                                                    type: 2,
+                                                    title: title,
+                                                    content: [link],
+                                                    area: ['1600px', '800px'],
+                                                    success: function (layero, index) {
+                                                        curIndex = index;
+                                                    }
+                                                })
                                             }else{
                                                 if(call=='revokeConfirm'){
                                                     app.revokeConfirm(p.row)
