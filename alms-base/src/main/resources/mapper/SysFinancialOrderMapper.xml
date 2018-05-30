@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.SysFinancialOrderMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.SysFinancialOrder">
+        <id column="id" property="id" />
+        <result column="area_id" property="areaId" />
+        <result column="company_id" property="companyId" />
+        <result column="business_type" property="businessType" />
+        <result column="user_ids" property="userIds" />
+        <result column="user_names" property="userNames" />
+        <result column="update_user" property="updateUser" />
+        <result column="update_time" property="updateTime" />
+        <result column="create_user" property="createUser" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, area_id AS areaId, company_id AS companyId, business_type AS businessType, user_ids AS userIds, user_names AS userNames, update_user AS updateUser, update_time AS updateTime, create_user AS createUser, create_time AS createTime
+    </sql>
+
+</mapper>

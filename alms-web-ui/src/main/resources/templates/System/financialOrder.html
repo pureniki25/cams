@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+    <title>财务人员跟单设置</title>
+    <script src="/properties/config.js"></script>
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css" />
+    <!-- iview样式 -->
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css" />
+    <!--@import url("//unpkg.com/iview/dist/styles/iview.css");-->
+    <!--<link rel="stylesheet" type="text/css" href="//unpkg.com/iview/dist/styles/iview.css"/>-->
+    <!-- 引入layui样式 -->
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all" />
+
+    <!--   <script src="//unpkg.com/vue/dist/vue.js"></script>
+       <script src="//unpkg.com/iview/dist/iview.min.js"></script>-->
+    <!-- 引入vue -->
+    <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+    <!-- iview js -->
+    <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+    <!--引入layui.js-->
+    <script src="/plugins/layui/layui.js"></script>
+    <!--引入axios.js 用于ajax调用-->
+    <script src="/plugins/axios/axios.min.js"></script>
+    <!-- 引入jQuery，必须在appToken.js 之前引入 -->
+    <script src="/build/js/jquery-3.3.1.min.js"></script>
+    <!-- 设置全局请求头:app、Authorization -->
+    <script src="/build/js/appToken.js"></script>
+    <!--引入公共的一些方法-->
+    <script src="/src/js/comm.js"></script>
+</head>
+
+<body>
+    <!--隐藏元素-->
+    <!--<p id="staffType"  th:attr="value=${staffType}"  hidden />-->
+    <!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+    <div id="app" v-cloak>
+        <Card title="财务人员跟单设置">
+            <Row>
+                <i-col span="24">
+                    <i-form :model="schForm" label-position="right" :label-width="100" inline style="display: inline">
+                        <i-col span="6">
+                            <form-item label="区域：" prop="areaId">
+                                <i-select v-model="searchForm.areaId" clearable  filterable >
+                                    <i-option v-for="item in areaList" :value="item.areaId" :key="item.areaId">{{ item.areaName }}</i-option>
+                                </i-select>
+                            </form-item>
+                        </i-col>
+                        <i-col span="6">
+                            <form-item label="分公司：" prop="companyId">
+                                <i-select v-model="searchForm.companyId" clearable filterable >
+                                    <i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{ item.areaName }}</i-option>
+                                </i-select>
+                            </form-item>
+                        </i-col>
+                        <form-item label="用户姓名：">
+                            <i-input v-model="schForm.userName"></i-input>
+                        </form-item>
+                    </i-form>
+                        <button class="layui-btn layui-btn-sm"   @click="search">查询</button>
+                        <button class="layui-btn layui-btn-sm"  @click="openAddModal">分配设置</button>
+                </i-col>
+            </Row>
+            <table id="financialOrder" lay-filter="financialOrder"></table>
+            <script type="text/html" id="barTools">
+                <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="set">设置</a>
+                <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</a>
+            </script>
+        </Card>
+        <Modal title="分配设置" v-model="addFinancialOrderModal.show">
+            <Row>
+                <i-col span="24">
+                    <i-form :model="addFinancialOrderForm" ref="addFinancialOrderForm" label-position="right" :label-width="100" inline>
+                        <form-item label="区域：" prop="areaId">
+                            <i-select v-model="searchForm.areaId" clearable  filterable >
+                                <i-option v-for="item in areaList" :value="item.areaId" :key="item.areaId">{{ item.areaName }}</i-option>
+                            </i-select>
+                        </form-item>
+                        <form-item label="分公司：" prop="companyId">
+                            <i-select v-model="searchForm.companyId" clearable filterable >
+                                <i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{ item.areaName }}</i-option>
+                            </i-select>
+                        </form-item>
+                        <form-item label="业务类型：" prop="businessType">
+                            <i-select v-model="searchForm.companyId" clearable filterable >
+                                <i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{ item.areaName }}</i-option>
+                            </i-select>
+                        </form-item>
+                        <form-item label="出纳：" prop="userId">
+                            <i-select v-model="searchForm.companyId" clearable filterable >
+                                <i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{ item.areaName }}</i-option>
+                            </i-select>
+                        </form-item>
+                    </i-form>
+                </i-col>
+            </Row>
+            <Row slot="footer">
+                    <div class="layui-btn-group">
+                        <button class="layui-btn layui-btn-sm"   @click="add">确定</button>
+                        <button class="layui-btn layui-btn-sm"  @click="app.addFinancialOrderModal.show=false">关闭</button>
+                    </div>
+            </Row>
+        </Modal>
+    </div>
+    <script src="/src/js/System/financialOrder.js"></script>
+    <script>
+    </script>
+</body>
+
+</html>

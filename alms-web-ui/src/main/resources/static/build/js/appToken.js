@@ -86,6 +86,21 @@ var getToken = function() {
 
 
 var allAuth;
+var menuCode = (function(){
+    // forEach 是无法中断的。除非用这种hack
+    try {
+        top.document.querySelectorAll('.layui-nav-tree a[data-options]').forEach(function (e, i) {
+            var options = $(e).attr("data-options")
+            if (~options.indexOf(window.location.pathname)) {
+                throw new Error(eval('(' + options + ')').id)
+            }
+        });
+    } catch(err) {
+        return err.message
+    }
+}());
+
+console.log(menuCode);
 
 var authValid = function(param) {
 	if(!htConfig.useGateWayflage){
@@ -93,9 +108,10 @@ var authValid = function(param) {
 	}
 
 
+
 	getAuth();
 	for (var i = 0; i < allAuth.length; i++) {
-		if (allAuth[i].resContent == param) {
+		if (allAuth[i].resContent == param&&  menuCode == allAuth[i].resParent) {
 			return true;
 		}
 	}
@@ -148,6 +164,7 @@ var getAuth = function() {
                 Authorization : "Bearer " + getToken()
             },
             success : function(data) {
+                console.log("权限",JSON.stringify(data));
                 allAuth = data;
             },
             error : function() {
