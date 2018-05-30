@@ -1,5 +1,6 @@
 package com.hongte.alms.base.mapper;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
@@ -35,5 +36,12 @@ public interface RepaymentBizPlanMapper extends SuperMapper<RepaymentBizPlan> {
      */
     List<RepayingPlanDto> queryCustomerRepayPlan(@Param("identifyCard") String identifyCard);
     List<RepayingPlanDto> queryCustomerRepayPlan(Pagination page, @Param("identifyCard") String identifyCard);
+    
+    /**
+     * 获取业务维度贷款余额（非源业务编号）
+     * @param businessId
+     * @return
+     */
+    BigDecimal queryLoanBalanceByBusinessId(String businessId);
 
 }

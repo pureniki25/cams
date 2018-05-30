@@ -77,10 +77,27 @@
 
     </select>
 
-
-
-
-
-
+	<!-- 获取业务维度贷款余额（非源业务编号） -->
+	<select id="queryLoanBalanceByBusinessId" resultType="java.math.BigDecimal">
+		SELECT 
+		  tab.borrowMoney - tab.factAmount 
+		FROM
+		  (SELECT 
+		    t1.`borrow_money` borrowMoney,
+		    SUM(
+		      CASE
+		        t2.`plan_item_type` 
+		        WHEN 10 
+		        THEN IFNULL(t2.`fact_amount`, 0) 
+		        ELSE 0 
+		      END
+		    ) factAmount 
+		  FROM
+		    `tb_repayment_biz_plan` t1,
+		    `tb_repayment_biz_plan_list_detail` t2 
+		  WHERE t1.`business_id` = t2.`business_id` 
+		    AND t1.business_id = #{businessId,jdbcType=VARCHAR} 
+		  GROUP BY t2.`business_id`) tab
+	</select>
 
 </mapper>

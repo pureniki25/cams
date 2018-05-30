@@ -76,8 +76,11 @@ import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.base.vo.finance.CurrPeriodRepaymentInfoVO;
 import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
 import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.DateUtil;
+import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.finance.service.FinanceService;
+import com.hongte.alms.finance.util.kafka.KafkaUtils;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.BoaInRoleInfoDto;
 
@@ -136,6 +139,8 @@ public class FinanceServiceImpl implements FinanceService {
 	@Autowired
 	@Qualifier("RepaymentProjPlanListDetailService")
 	private RepaymentProjPlanListDetailService repaymentProjPlanListDetailService;
+	
+	private static final String SEND_DATA_PLATFORM_SPLIT_SYMBOL = "\\t";
 
 	@Override
 	@Transactional(rollbackFor = ServiceRuntimeException.class)
@@ -1664,4 +1669,24 @@ public class FinanceServiceImpl implements FinanceService {
 			throw new ServiceRuntimeException(e.getMessage(), e);
 		}
 	}
+	
+	@Override
+	public void sendLoanBalanceToDataPlatform(String businessId) {
+		try {
+			if (StringUtil.isEmpty(businessId)) {
+				throw new ServiceRuntimeException("业务编号不能为空！");
+			}
+			BigDecimal bigDecimal = repaymentBizPlanMapper.queryLoanBalanceByBusinessId(businessId);
+			double loanBalance = (bigDecimal == null ? 0 : bigDecimal.doubleValue());
+			/*
+			 * 推送到kafka
+			 */
+			KafkaUtils.sendMessage(Constant.TOTAL_BUSINESS_BALANCE_TOPIC, businessId + SEND_DATA_PLATFORM_SPLIT_SYMBOL + loanBalance);
+			logger.info("发送数据平台贷款余额（撮合业务余额）成功！业务编号：{}，金额：{}", businessId, loanBalance);
+		} catch (Exception e) {
+			logger.error("获取业务维度贷款余额失败，业务编号：{}；抛出异常{}", businessId, e);
+			throw new ServiceRuntimeException(e.getMessage(), e);
+		}
+	}
+	
 }

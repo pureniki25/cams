@@ -126,4 +126,11 @@ public interface FinanceService {
      */
     List<String> queryProjOtherFee(String projPlanListId);
     
+    /**
+     * 获取业务维度贷款余额（非源业务编号）
+     * @param businessId
+     * @return
+     */
+    void sendLoanBalanceToDataPlatform(String businessId);
+    
 }
