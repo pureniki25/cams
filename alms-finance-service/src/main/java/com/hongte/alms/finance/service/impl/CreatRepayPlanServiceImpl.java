@@ -166,9 +166,19 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
         //计算每个标 在占整个业务的比例
         Map<String,BigDecimal>  projPersent = new HashMap<>();
+        Integer  projIndex =0;
+        BigDecimal setedPersent = new BigDecimal(0);
         for(ProjInfoReq projInfoReq:tuandaiProjReqInfos){
-            BigDecimal persent = projInfoReq.getFullBorrowMoney().divide(businessBasicInfo.getBorrowMoney());
-            projPersent.put(projInfoReq.getProjectId(),persent);
+            projIndex++;
+            //如果是最后一个，则用减的
+            if(projIndex.equals(tuandaiProjReqInfos.size())){
+                BigDecimal persent = new BigDecimal(1).subtract(setedPersent);
+                projPersent.put(projInfoReq.getProjectId(),persent);
+            }else{
+                BigDecimal persent = projInfoReq.getFullBorrowMoney().divide(businessBasicInfo.getBorrowMoney(),smallNum,roundingMode);
+                setedPersent = setedPersent.add(persent);
+                projPersent.put(projInfoReq.getProjectId(),persent);
+            }
         }
 
 //        String bizPlanId = UUID.randomUUID().toString();
@@ -2026,49 +2036,85 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
     public static void main(String[] args) {
 
+        BusinessBasicInfoReq  businessBasicInfo = new BusinessBasicInfoReq();
+        businessBasicInfo.setBorrowMoney(new BigDecimal(3000));
 
 
-        List<ProjExtRateReq> rateReqs = new LinkedList<>();
+        List<ProjInfoReq>tuandaiProjReqInfos  = new LinkedList<>();
+        ProjInfoReq  req1= new ProjInfoReq();
+        tuandaiProjReqInfos.add(req1);
+        req1.setFullBorrowMoney(new BigDecimal(1000));
+        req1.setProjectId("11");
 
-        ProjExtRateReq rateReq = new ProjExtRateReq();
-        rateReqs.add(rateReq);
-        rateReq.setRateType(70);
-        rateReq.setRateValue(new BigDecimal(0.5));
-        rateReq.setCalcWay(1);
-        rateReq.setFeeId("79069922-e13a-4229-8656-2a1e19b44879");
-        rateReq.setBeginPeroid(1);
+        ProjInfoReq  req2= new ProjInfoReq();
+        tuandaiProjReqInfos.add(req2);
+        req2.setFullBorrowMoney(new BigDecimal(1000));
+        req2.setProjectId("22");
 
+        ProjInfoReq  req3= new ProjInfoReq();
+        tuandaiProjReqInfos.add(req3);
+        req3.setFullBorrowMoney(new BigDecimal(1000));
+        req3.setProjectId("33");
 
-        ProjExtRateReq rateReq1 = new ProjExtRateReq();
-        rateReqs.add(rateReq1);
-        rateReq1.setRateType(70);
-        rateReq1.setRateValue(new BigDecimal(0.5));
-        rateReq1.setCalcWay(1);
-        rateReq1.setFeeId("79069922-e13a-4229-8656-2a1e19b44879");
-        rateReq1.setBeginPeroid(3);
-
-        ProjExtRateReq rateReq2 = new ProjExtRateReq();
-        rateReqs.add(rateReq2);
-        rateReq2.setRateType(70);
-        rateReq2.setRateValue(new BigDecimal(0.5));
-        rateReq2.setCalcWay(1);
-        rateReq2.setFeeId("79069922-e13a-4229-8656-2a1e19b44879");
-        rateReq2.setBeginPeroid(2);
-
-
-
-        Collections.sort(rateReqs, new Comparator<ProjExtRateReq>() {
-            @Override
-            public int compare(ProjExtRateReq o1, ProjExtRateReq o2) {
-                if(o1.getBeginPeroid().compareTo(o2.getBeginPeroid())==0){
-                    return Integer.valueOf(o1.getBeginPeroid().compareTo(o2.getBeginPeroid()));
-                }else{
-                    return o1.getBeginPeroid().compareTo(o2.getBeginPeroid());
-                }
+        Integer projIndex = 0;
+        BigDecimal setedPersent = new BigDecimal(0);
+        Map<String,BigDecimal>  projPersent = new HashMap<>();
+        for(ProjInfoReq projInfoReq:tuandaiProjReqInfos){
+            projIndex++;
+            //如果是最后一个，则用减的
+            if(projIndex.equals(tuandaiProjReqInfos.size())){
+                BigDecimal persent = new BigDecimal(1).subtract(setedPersent);
+                projPersent.put(projInfoReq.getProjectId(),persent);
+            }else{
+                BigDecimal persent = projInfoReq.getFullBorrowMoney().divide(businessBasicInfo.getBorrowMoney(),4,0);
+                setedPersent = setedPersent.add(persent);
+                projPersent.put(projInfoReq.getProjectId(),persent);
             }
-        });
+        }
+        System.out.println(JSON.toJSONString(projPersent));
 
-        System.out.println(JSON.toJSONString(rateReqs));
+//
+//        List<ProjExtRateReq> rateReqs = new LinkedList<>();
+//
+//        ProjExtRateReq rateReq = new ProjExtRateReq();
+//        rateReqs.add(rateReq);
+//        rateReq.setRateType(70);
+//        rateReq.setRateValue(new BigDecimal(0.5));
+//        rateReq.setCalcWay(1);
+//        rateReq.setFeeId("79069922-e13a-4229-8656-2a1e19b44879");
+//        rateReq.setBeginPeroid(1);
+//
+//
+//        ProjExtRateReq rateReq1 = new ProjExtRateReq();
+//        rateReqs.add(rateReq1);
+//        rateReq1.setRateType(70);
+//        rateReq1.setRateValue(new BigDecimal(0.5));
+//        rateReq1.setCalcWay(1);
+//        rateReq1.setFeeId("79069922-e13a-4229-8656-2a1e19b44879");
+//        rateReq1.setBeginPeroid(3);
+//
+//        ProjExtRateReq rateReq2 = new ProjExtRateReq();
+//        rateReqs.add(rateReq2);
+//        rateReq2.setRateType(70);
+//        rateReq2.setRateValue(new BigDecimal(0.5));
+//        rateReq2.setCalcWay(1);
+//        rateReq2.setFeeId("79069922-e13a-4229-8656-2a1e19b44879");
+//        rateReq2.setBeginPeroid(2);
+//
+//
+//
+//        Collections.sort(rateReqs, new Comparator<ProjExtRateReq>() {
+//            @Override
+//            public int compare(ProjExtRateReq o1, ProjExtRateReq o2) {
+//                if(o1.getBeginPeroid().compareTo(o2.getBeginPeroid())==0){
+//                    return Integer.valueOf(o1.getBeginPeroid().compareTo(o2.getBeginPeroid()));
+//                }else{
+//                    return o1.getBeginPeroid().compareTo(o2.getBeginPeroid());
+//                }
+//            }
+//        });
+//
+//        System.out.println(JSON.toJSONString(rateReqs));
 
 
 
