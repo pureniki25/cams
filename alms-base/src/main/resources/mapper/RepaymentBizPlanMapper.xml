@@ -77,10 +77,50 @@
 
     </select>
 
+	<select id="listRepaymentSettleListVOs" resultType="com.hongte.alms.base.vo.finance.RepaymentSettleListVO">
+		SELECT
+			pl.after_id AS afterId,
+			pl.due_date AS repayDate,
+			( SELECT IFNULL( sum( plan_amount ), 0 ) FROM tb_repayment_biz_plan_list_detail WHERE plan_list_id = pl.plan_list_id AND plan_item_type = 10 ) AS item10,
+			( SELECT IFNULL( sum( plan_amount ), 0 ) FROM tb_repayment_biz_plan_list_detail WHERE plan_list_id = pl.plan_list_id AND plan_item_type = 20 ) AS item20,
+			( SELECT IFNULL( sum( plan_amount ), 0 ) FROM tb_repayment_biz_plan_list_detail WHERE plan_list_id = pl.plan_list_id AND plan_item_type = 30 ) AS item30,
+			( SELECT IFNULL( sum( plan_amount ), 0 ) FROM tb_repayment_biz_plan_list_detail WHERE plan_list_id = pl.plan_list_id AND plan_item_type = 50 ) AS item50,
+			( SELECT IFNULL( sum( plan_amount ), 0 ) FROM tb_repayment_biz_plan_list_detail WHERE plan_list_id = pl.plan_list_id AND fee_id = '3131c075-5721-11e8-8a00-0242ac110002' ) AS offlineOverDue,
+			( SELECT IFNULL( sum( plan_amount ), 0 ) FROM tb_repayment_biz_plan_list_detail WHERE plan_list_id = pl.plan_list_id AND fee_id = '2e646c87-5721-11e8-8a00-0242ac110002' ) AS onlineOverDue,
+			pl.total_borrow_amount AS planAmount,
+			( SELECT IFNULL( sum( fact_amount ), 0 ) FROM tb_repayment_biz_plan_list_detail WHERE plan_list_id = pl.plan_list_id ) AS factAmount 
+		FROM
+			tb_repayment_biz_plan p LEFT JOIN 
+			tb_repayment_biz_plan_list pl ON  pl.plan_id = p.plan_id
+		WHERE
+			p.original_business_id = #{businessId} 
+			<if test="planId != null">
+			AND	p.plan_id = #{planId}
+			</if>
+		ORDER BY
+			pl.after_id
+	</select>
 
 
-
-
-
-
-</mapper>
+	<!-- 获取业务维度贷款余额（非源业务编号） -->
+	<select id="queryLoanBalanceByBusinessId" resultType="java.math.BigDecimal">
+		SELECT 
+		  tab.borrowMoney - tab.factAmount 
+		FROM
+		  (SELECT 
+		    t1.`borrow_money` borrowMoney,
+		    SUM(
+		      CASE
+		        t2.`plan_item_type` 
+		        WHEN 10 
+		        THEN IFNULL(t2.`fact_amount`, 0) 
+		        ELSE 0 
+		      END
+		    ) factAmount 
+		  FROM
+		    `tb_repayment_biz_plan` t1,
+		    `tb_repayment_biz_plan_list_detail` t2 
+		  WHERE t1.`business_id` = t2.`business_id` 
+		    AND t1.business_id = #{businessId,jdbcType=VARCHAR} 
+		  GROUP BY t2.`business_id`) tab
+	</select></mapper>

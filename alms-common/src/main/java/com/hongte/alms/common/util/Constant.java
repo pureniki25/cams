@@ -90,4 +90,8 @@ public class Constant {
      * 五级分类：主借款人情况
      */
     public static final String FIVE_LEVEL_CLASSIFY_SPLIT = "#--SPLIT--#";
+    /**
+     * 发送数据平台贷款余额（撮合业务余额）kafka主题
+     */
+    public static final String TOTAL_BUSINESS_BALANCE_TOPIC = "storm_demo";
 }

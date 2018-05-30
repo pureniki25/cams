@@ -49,11 +49,13 @@ import com.hongte.alms.base.service.BizOutputRecordService;
 import com.hongte.alms.base.service.MoneyPoolRepaymentService;
 import com.hongte.alms.base.service.MoneyPoolService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
+import com.hongte.alms.base.service.RepaymentBizPlanService;
 import com.hongte.alms.base.service.RepaymentConfirmLogService;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
 import com.hongte.alms.base.vo.finance.ConfirmWithholdListVO;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.base.vo.finance.CurrPeriodRepaymentInfoVO;
+import com.hongte.alms.base.vo.finance.RepaymentSettleListVO;
 import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.vo.PageResult;
@@ -113,6 +115,9 @@ public class FinanceController {
 	@Autowired
 	@Qualifier("AccountantOverRepayLogService")
 	private AccountantOverRepayLogService accountantOverRepayLogService;
+	@Autowired
+	@Qualifier("RepaymentBizPlanService")
+	private RepaymentBizPlanService repaymentBizPlanService ;
 	@Autowired
 	private LoginUserInfoHelper loginUserInfoHelper ;
 
@@ -618,6 +623,23 @@ public class FinanceController {
 			logger.error("@confirmWithhold@代扣确认失败--[{}]", e);
 			e.printStackTrace();
 			return Result.error("-500", "系统异常:代扣确认失败");
+		}
+	}
+	
+	@GetMapping(value="/listRepaymentSettleListVOs")
+	@ApiOperation(value="还款计划")
+	public Result listRepaymentSettleListVOs(String businessId,String planId) {
+		try {
+			logger.info("@listRepaymentSettleListVOs@还款计划--开始[{}]", businessId);
+			Result result = null;
+			List<RepaymentSettleListVO> list = repaymentBizPlanService.listRepaymentSettleListVOs(businessId, planId);
+			result = Result.success(list);
+			logger.info("@listRepaymentSettleListVOs@还款计划--结束[{}]", result);
+			return result;
+		} catch (Exception e) {
+			logger.error("@listRepaymentSettleListVOs@还款计划--[{}]", e);
+			e.printStackTrace();
+			return Result.error("500", "系统异常:还款计划失败");
 		}
 	}
 	

@@ -20,6 +20,7 @@ import com.hongte.alms.base.service.RepaymentBizPlanListDetailService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.RepaymentBizPlanService;
 import com.hongte.alms.base.service.WithholdingRecordLogService;
+import com.hongte.alms.base.vo.finance.RepaymentSettleListVO;
 import com.hongte.alms.base.vo.module.RepaymentOpenServiceVO;
 import com.hongte.alms.base.vo.module.api.RepayDetailResultRespData;
 import com.hongte.alms.base.vo.module.api.RepayResultRespData;
@@ -287,5 +288,11 @@ public class RepaymentBizPlanServiceImpl extends BaseServiceImpl<RepaymentBizPla
 		pages.setRecords(lsit);
 
 		return pages;
+	}
+
+
+	@Override
+	public List<RepaymentSettleListVO> listRepaymentSettleListVOs(String businessId, String planId) {
+		return repaymentBizPlanMapper.listRepaymentSettleListVOs(businessId, planId);
 	}
 }

@@ -185,7 +185,31 @@ window.layinit(function (htConfig) {
                                                     let url = '/finance/confirmWithhold?businessId='+p.row.businessId+'&afterId='+p.row.afterId
                                                     layer.open({
                                                         type: 2,
-                                                        title: '代扣确认',
+                                                        title: title,
+                                                        content: [url, 'no'],
+                                                        area: ['1600px', '800px'],
+                                                        success: function (layero, index) {
+                                                            curIndex = index;
+                                                        }
+                                                    })
+                                                }
+                                                if(call=='settle'){
+                                                    let url = '/finance/settle?businessId='+p.row.businessId+'&afterId='+p.row.afterId
+                                                    layer.open({
+                                                        type: 2,
+                                                        title: title,
+                                                        content: [url, 'no'],
+                                                        area: ['1600px', '800px'],
+                                                        success: function (layero, index) {
+                                                            curIndex = index;
+                                                        }
+                                                    })
+                                                }
+                                                if(call=='planSettle'){
+                                                    let url = '/finance/settle?businessId='+p.row.businessId+'&afterId='+p.row.afterId+'&planId='+p.row.planId
+                                                    layer.open({
+                                                        type: 2,
+                                                        title: title,
                                                         content: [url, 'no'],
                                                         area: ['1600px', '800px'],
                                                         success: function (layero, index) {
@@ -208,11 +232,15 @@ window.layinit(function (htConfig) {
                         //let businessAllSettle = initMenuItem('业务全部结清确认', '/ssssxx')
                         let revokeConfirm = initMenuItem('撤销还款确认',null,'revokeConfirm')
                         let confirmWithhold = initMenuItem('代扣确认',null,'confirmWithhold')
+                        let settle = initMenuItem('财务结清',null,'settle')
+                        let planSettle = initMenuItem('还款计划结清',null,'planSettle')
                         menu.push(repayConfirm)
                         //menu.push(businessAllSettle)
                         menu.push(revokeConfirm)
                         menu.push(confirmWithhold)
-
+                        menu.push(planSettle)
+                        menu.push(settle)
+                        
                         return h('Poptip', {
                             props: {
                                 placement: 'left'
