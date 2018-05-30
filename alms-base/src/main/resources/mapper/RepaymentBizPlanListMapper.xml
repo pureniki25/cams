@@ -172,6 +172,7 @@
 		resultType="com.hongte.alms.base.vo.module.FinanceManagerListVO"
 		parameterType="com.hongte.alms.base.dto.FinanceManagerListReq">
 		SELECT
+			pl.plan_id as planId,
 			pl.plan_list_id as planListId,
 			pl.orig_business_id as businessId,
 			pl.after_id as afterId ,

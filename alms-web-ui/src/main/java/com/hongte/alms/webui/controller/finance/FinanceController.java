@@ -68,4 +68,9 @@ public class FinanceController {
 	public String confirmWithhold() {
 		return "/finance/confirmWithhold" ;
 	}
+	
+	@RequestMapping("/settle")
+	public String settle() {
+		return "/finance/settle" ;
+	}
 }

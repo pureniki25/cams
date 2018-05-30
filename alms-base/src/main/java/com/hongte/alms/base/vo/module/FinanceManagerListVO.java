@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 public class FinanceManagerListVO {
 
 	// 业务编号 期数 部门 主办 客户姓名 业务类型 还款日期 还款登记日期 还款金额 会计确认状态 状态 是否支持代扣
-
+	private String planId ;
 	/**
 	 * 还款计划id
 	 */
@@ -229,6 +229,20 @@ public class FinanceManagerListVO {
 
 	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;
+	}
+
+	/**
+	 * @return the planId
+	 */
+	public String getPlanId() {
+		return planId;
+	}
+
+	/**
+	 * @param planId the planId to set
+	 */
+	public void setPlanId(String planId) {
+		this.planId = planId;
 	}
 
 }
