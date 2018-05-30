@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+    <!--<properties resource="dev.properties"/>-->
+
+    <context id="Mysql" targetRuntime="MyBatis3Simple" defaultModelType="flat">
+        <property name="beginningDelimiter" value="`"/>
+        <property name="endingDelimiter" value="`"/>
+        <property name="mergeable" value="false"></property>
+        <property name="javaFileEncoding" value="UTF-8"/>
+        <plugin type="tk.mybatis.mapper.generator.MapperPlugin">
+          <property name="mappers" value="tk.mybatis.mapper.common.Mapper"/>
+        </plugin>
+
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://10.110.1.240:3306/hongte_alms?useUnicode=true&amp;characterEncoding=UTF8"
+                        userId="root"
+                        password="tuandai_bm2015">
+        </jdbcConnection>
+
+        <javaModelGenerator targetPackage="${targetModelPackage}" targetProject="${targetJavaProject}"/>
+
+        <sqlMapGenerator targetPackage="${targetXMLPackage}"  targetProject="${targetResourcesProject}"/>
+
+        <javaClientGenerator targetPackage="${targetMapperPackage}" targetProject="${targetJavaProject}" type="XMLMAPPER" />
+
+        <!--<table tableName="base_user" domainObjectName="User" >-->
+        	<!--<generatedKey column="id" identity="false" sqlStatement="myql"/>-->
+        <!--</table>-->
+        <!--<table tableName="base_menu" domainObjectName="Menu" >-->
+            <!--<generatedKey column="id" identity="false" sqlStatement="myql"/>-->
+        <!--</table>-->
+        <!--<table tableName="tb_account" domainObjectName="Account" >
+        </table>
+        <table tableName="tb_account_action" domainObjectName="AccountAction" >
+        </table>
+        <table tableName="tb_account_bank_card" domainObjectName="AccountBankCard" >
+        </table>
+        <table tableName="tb_account_list" domainObjectName="AccountList" >
+        </table>
+        <table tableName="tb_account_type" domainObjectName="AccountType" >
+        </table>-->
+        <table tableName="tb_module" domainObjectName="Module" >
+        </table>
+    </context>
+</generatorConfiguration>
