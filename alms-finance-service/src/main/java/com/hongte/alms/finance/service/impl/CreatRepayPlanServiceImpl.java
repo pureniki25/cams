@@ -1155,8 +1155,10 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             List<RepaymentProjPlan> projPlans = new LinkedList<>();
             repaymentProjPlanMap.put(batchId,projPlans);
 
-            for(ProjInfoReq projInfoReq:reqList){
 
+            Integer planIndex = 0;
+            for(ProjInfoReq projInfoReq:reqList){
+                planIndex++;
 
                 ///////  标还款计划表   一次出款 生成一条记录
                 RepaymentProjPlan repaymentProjPlan = new RepaymentProjPlan(); //ClassCopyUtil.copy(projInfoReq,ProjInfoReq.class,RepaymentProjPlan.class);
@@ -1252,7 +1254,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     //还款计划详情项列表
                     List<RepaymentProjPlanListDetail>  priodListDetails = new LinkedList<>();
                     //创建还款计划list
-                    RepaymentProjPlanList  projPlanList =  creatRepaymentProjPlanList(repaymentProjPlan,i);// new RepaymentProjPlanList();
+                    RepaymentProjPlanList  projPlanList =  creatRepaymentProjPlanList(repaymentProjPlan,i,planIndex);// new RepaymentProjPlanList();
                     Date date = DateUtil.addMonth2Date(i,projInfoReq.getBeginTime());
                     date = DateUtil.addDay2Date(-1,date);
                     projPlanList.setDueDate(date);
@@ -1444,7 +1446,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
 
     //创建标的还款计划，并设置基本信息
-    private   RepaymentProjPlanList  creatRepaymentProjPlanList(RepaymentProjPlan repaymentProjPlan,Integer period){
+    private   RepaymentProjPlanList  creatRepaymentProjPlanList(RepaymentProjPlan repaymentProjPlan,Integer period,Integer planIndex){
         Boolean isRenew = false;
         if(!repaymentProjPlan.getBusinessId().equals(repaymentProjPlan.getOriginalBusinessId())){
             isRenew = true;
@@ -1458,7 +1460,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         projPlanList.setBusinessId(repaymentProjPlan.getBusinessId());  //还款计划所属业务编号(若当前业务为展期，则存展期业务编号)
         projPlanList.setOrigBusinessId(repaymentProjPlan.getOriginalBusinessId());  //还款计划所属原业务编号
         projPlanList.setPeriod(period);  //还款计划期数
-        projPlanList.setAfterId(calcAfterId(repaymentProjPlan.getBusinessId(),period,isRenew)); // 总批次期数，  核对原来信贷还款计划是怎么写的
+        projPlanList.setAfterId(calcAfterId(repaymentProjPlan.getBusinessId(),period,isRenew,planIndex)); // 总批次期数，  核对原来信贷还款计划是怎么写的
         projPlanList.setDueDate(new Date()); //应还日期 怎么设置， 需要核对
         projPlanList.setTotalBorrowAmount(new BigDecimal(0));// 总计划应还金额   需要按照每一项计算
         projPlanList.setOverdueAmount(new BigDecimal(0)); //总应还滞纳金
@@ -1479,13 +1481,14 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
      * @param businessId
      * @param period
      * @param isRenew
+     * @param planIndex   还款计划排序，这一次生成的所有还款计划
      * @return
      */
-    private  String  calcAfterId(String businessId,Integer period,boolean isRenew){
+    private  String  calcAfterId(String businessId,Integer period,boolean isRenew,Integer planIndex){
 
          List<RepaymentBizPlan> bizPlans =  repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",businessId));
-         Integer size = bizPlans.size();
-         size++;
+         Integer size = bizPlans==null?0:bizPlans.size();
+         size = size+planIndex;
 
         String periodStr=(new DecimalFormat("00")).format(period);
          String  afterId;
@@ -1497,6 +1500,8 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
         return afterId;
     }
+
+
 
 
     /**
