@@ -38,7 +38,7 @@ public class PlatRepayServiceApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(PlatRepayServiceApplication.class, args);
-		System.err.println("ヾ(◍°∇°◍)ﾉﾞ    finance-service启动成功      ヾ(◍°∇°◍)ﾉﾞ\n");
+		System.err.println("ヾ(◍°∇°◍)ﾉﾞ    platRepay-service启动成功      ヾ(◍°∇°◍)ﾉﾞ\n");
 	}
 
 

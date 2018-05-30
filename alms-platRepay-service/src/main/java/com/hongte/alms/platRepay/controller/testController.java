@@ -1,4 +1,4 @@
-package com.hongte.alms.finance.controller;
+package com.hongte.alms.platRepay.controller;
 
 
 import com.hongte.alms.base.service.SysCityService;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/test")
-@Api(tags = "testController", description = "测试财务模块工程")
+@Api(tags = "testController", description = "测试平台还款模块工程")
 public class testController {
     private Logger logger = LoggerFactory.getLogger(testController.class);
 
