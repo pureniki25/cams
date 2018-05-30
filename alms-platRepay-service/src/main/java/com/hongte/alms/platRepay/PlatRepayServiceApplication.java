@@ -4,7 +4,7 @@
  * 创建人 谭荣巧
  * 创建时间 2017年11月17日 下午3:01:38 
  */
-package com.hongte.alms.finance;
+package com.hongte.alms.platRepay;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
