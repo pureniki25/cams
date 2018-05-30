@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.hongte.alms.base.RepayPlan.vo.RepayingPlanDto;
 import org.apache.ibatis.annotations.Param;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
+import com.hongte.alms.base.vo.finance.RepaymentSettleListVO;
 import com.hongte.alms.base.vo.module.RepaymentOpenServiceVO;
 import com.hongte.alms.common.mapper.SuperMapper;
 
@@ -38,10 +39,19 @@ public interface RepaymentBizPlanMapper extends SuperMapper<RepaymentBizPlan> {
     List<RepayingPlanDto> queryCustomerRepayPlan(Pagination page, @Param("identifyCard") String identifyCard);
     
     /**
+     * 查询RepaymentSettleListVOl
+     * @author 王继光
+     * 2018年5月30日 上午9:17:06
+     * @param businessId
+     * @param planId
+     * @return
+     */
+    List<RepaymentSettleListVO> listRepaymentSettleListVOs(@Param("businessId")String businessId,@Param("planId")String planId);
+
+ 	/**
      * 获取业务维度贷款余额（非源业务编号）
      * @param businessId
      * @return
      */
     BigDecimal queryLoanBalanceByBusinessId(String businessId);
-
 }
