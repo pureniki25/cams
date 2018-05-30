@@ -2,44 +2,50 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.hongte.alms.base.mapper.BasicBusinessMapper">
 
-    <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.BasicBusiness">
-        <id column="business_id" property="businessId" />
-        <result column="input_time" property="inputTime" />
-        <result column="business_type" property="businessType" />
-        <result column="business_ctype" property="businessCtype" />
-        <result column="business_stype" property="businessStype" />
-        <result column="customer_id" property="customerId" />
-        <result column="customer_name" property="customerName" />
-        <result column="repayment_type_id" property="repaymentTypeId" />
-        <result column="borrow_money" property="borrowMoney" />
-        <result column="borrow_limit" property="borrowLimit" />
-        <result column="borrow_limit_unit" property="borrowLimitUnit" />
-        <result column="borrow_rate" property="borrowRate" />
-        <result column="borrow_rate_unit" property="borrowRateUnit" />
-        <result column="operator_id" property="operatorId" />
-        <result column="operator_name" property="operatorName" />
-        <result column="asset_id" property="assetId" />
-        <result column="company_id" property="companyId" />
-        <result column="company_name" property="companyName" />
-        <result column="output_platform_id" property="outputPlatformId" />
-        <result column="issue_split_type" property="issueSplitType" />
-        <result column="source_type" property="sourceType" />
-        <result column="source_business_id" property="sourceBusinessId" />
-        <result column="is_tuandai_repay" property="isTuandaiRepay" />
-        <result column="create_time" property="createTime" />
-        <result column="create_user" property="createUser" />
-        <result column="update_time" property="updateTime" />
-        <result column="update_user" property="updateUser" />
-    </resultMap>
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.BasicBusiness">
+		<id column="business_id" property="businessId" />
+		<result column="input_time" property="inputTime" />
+		<result column="business_type" property="businessType" />
+		<result column="business_ctype" property="businessCtype" />
+		<result column="business_stype" property="businessStype" />
+		<result column="customer_id" property="customerId" />
+		<result column="customer_name" property="customerName" />
+		<result column="customer_identify_card" property="customerIdentifyCard" />
+		<result column="repayment_type_id" property="repaymentTypeId" />
+		<result column="borrow_money" property="borrowMoney" />
+		<result column="borrow_limit" property="borrowLimit" />
+		<result column="borrow_limit_unit" property="borrowLimitUnit" />
+		<result column="borrow_rate" property="borrowRate" />
+		<result column="borrow_rate_unit" property="borrowRateUnit" />
+		<result column="original_userid" property="originalUserid" />
+		<result column="original_name" property="originalName" />
+		<result column="operator_id" property="operatorId" />
+		<result column="operator_name" property="operatorName" />
+		<result column="asset_id" property="assetId" />
+		<result column="company_id" property="companyId" />
+		<result column="company_name" property="companyName" />
+		<result column="district_id" property="districtId" />
+		<result column="district_name" property="districtName" />
+		<result column="output_platform_id" property="outputPlatformId" />
+		<result column="issue_split_type" property="issueSplitType" />
+		<result column="source_type" property="sourceType" />
+		<result column="source_business_id" property="sourceBusinessId" />
+		<result column="is_tuandai_repay" property="isTuandaiRepay" />
+		<result column="src_type" property="srcType" />
+		<result column="create_time" property="createTime" />
+		<result column="create_user" property="createUser" />
+		<result column="update_time" property="updateTime" />
+		<result column="update_user" property="updateUser" />
+	</resultMap>
 
-    <!-- 通用查询结果列 -->
-    <sql id="Base_Column_List">
-        business_id AS businessId, input_time AS inputTime, business_type AS businessType, business_ctype AS businessCtype, business_stype AS businessStype, customer_id AS customerId, customer_name AS customerName, repayment_type_id AS repaymentTypeId, borrow_money AS borrowMoney, borrow_limit AS borrowLimit, borrow_limit_unit AS borrowLimitUnit, borrow_rate AS borrowRate, borrow_rate_unit AS borrowRateUnit, operator_id AS operatorId, operator_name AS operatorName, asset_id AS assetId, company_id AS companyId ,company_name as companyName , output_platform_id AS outputPlatformId, issue_split_type AS issueSplitType, source_type AS sourceType, source_business_id AS sourceBusinessId, is_tuandai_repay AS isTuandaiRepay, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+        business_id AS businessId, input_time AS inputTime, business_type AS businessType, business_ctype AS businessCtype, business_stype AS businessStype, customer_id AS customerId, customer_name AS customerName, customer_identify_card AS customerIdentifyCard, repayment_type_id AS repaymentTypeId, borrow_money AS borrowMoney, borrow_limit AS borrowLimit, borrow_limit_unit AS borrowLimitUnit, borrow_rate AS borrowRate, borrow_rate_unit AS borrowRateUnit, original_userid AS originalUserid, original_name AS originalName, operator_id AS operatorId, operator_name AS operatorName, asset_id AS assetId, company_id AS companyId, company_name AS companyName, district_id AS districtId, district_name AS districtName, output_platform_id AS outputPlatformId, issue_split_type AS issueSplitType, source_type AS sourceType, source_business_id AS sourceBusinessId, is_tuandai_repay AS isTuandaiRepay, src_type AS srcType, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
     </sql>
 
-    <!-- 查询申请减免界面业务基本信息内容 -->
-    <select id="selectBusinessInfoForApplyDerateVo" resultType="com.hongte.alms.base.vo.module.BusinessInfoForApplyDerateVo">
+	<!-- 查询申请减免界面业务基本信息内容 -->
+	<select id="selectBusinessInfoForApplyDerateVo" resultType="com.hongte.alms.base.vo.module.BusinessInfoForApplyDerateVo">
 		SELECT 
 		  business.business_id AS businessId,
 		  pList.business_id as zqBusinessId,
@@ -225,8 +231,8 @@
 		    ON business.business_id = b.business_id 
 		WHERE pList.plan_list_id = #{crpId,jdbcType=VARCHAR}
     </select>
-    
-    <select id="queryPayedPrincipal" resultType="java.lang.Double">
+
+	<select id="queryPayedPrincipal" resultType="java.lang.Double">
     	SELECT 
 		  SUM(
 		    CASE
@@ -247,28 +253,28 @@
 		GROUP BY rp.original_business_id 
     </select>
 
-    <!-- 查询用户可访问的业务几个字段信息  -->
-    <select id="selectUserPermissionBusinessDtos" resultType="com.hongte.alms.base.dto.UserPermissionBusinessDto">
-        select company_id as CompanyId,
-        business_id as businessId
-        FROM  tb_basic_business WHERE
-        1=1
-        <if test="companyIds !=null">
-            AND  company_id IN
-            <foreach collection="companyIds" item="companyId" index="index"
-                     open="(" close=")" separator=",">
-                #{companyId}
-            </foreach>
-        </if>
+	<!-- 查询用户可访问的业务几个字段信息  -->
+	<select id="selectUserPermissionBusinessDtos" resultType="com.hongte.alms.base.dto.UserPermissionBusinessDto">
+		select company_id as CompanyId,
+		business_id as businessId
+		FROM  tb_basic_business WHERE
+		1=1
+		<if test="companyIds !=null">
+			AND  company_id IN
+			<foreach collection="companyIds" item="companyId" index="index"
+					 open="(" close=")" separator=",">
+				#{companyId}
+			</foreach>
+		</if>
 
 
-    </select>
-    
-    
-    
-    
-    <!-- 一次性收取的分公司费用 -->
-    <select id="getPreCharge" resultType="java.lang.Double">
+	</select>
+
+
+
+
+	<!-- 一次性收取的分公司费用 -->
+	<select id="getPreCharge" resultType="java.lang.Double">
   select sum(fee+fee2+fee3) 
   from (
   	
@@ -299,11 +305,11 @@
   group by tab.business_id
   
     </select>
-    
-    
-    
-        <!-- 期初收取的月收分公司服务费-->
-    <select id="getPreFees" resultType="java.lang.Double">
+
+
+
+	<!-- 期初收取的月收分公司服务费-->
+	<select id="getPreFees" resultType="java.lang.Double">
 			 SELECT 
   (case when t3.plan_amount>0
     then 0 else sum(t3.plan_amount) end ) `plan_amount`
@@ -324,11 +330,11 @@
         ORDER BY t1.due_date
 		  limit 1;
     </select>
-    
-    
-        
-        <!-- 期初收取的月收分公司服务费-->
-    <select id="getPreFees" resultType="java.lang.Double">
+
+
+
+	<!-- 期初收取的月收分公司服务费-->
+	<select id="getPreFees" resultType="java.lang.Double">
 			 SELECT 
   (case when t3.plan_amount>0
     then 0 else sum(t3.plan_amount) end ) `plan_amount`
@@ -383,7 +389,7 @@
 		left join tb_repayment_biz_plan plan on pList.plan_id=plan.plan_id
 		where plan.original_business_id=#{original_business_id} and pList.current_status!='已还款'
 	</select>
-	
+
 
 
 
@@ -403,7 +409,7 @@
 
 		where  plan.original_business_id=#{original_business_id}
 	</select>
-		<!-- 月收平台费服务费-->
+	<!-- 月收平台费服务费-->
 	<select id="getMonthPlatformAmount" resultType="java.lang.Double">
 				select 
 
@@ -420,8 +426,8 @@
 
 		where pList.plan_list_id=#{crpId,jdbcType=VARCHAR} and pDetail.plan_item_type = 50 limit 1
 	</select>
-	
-			<!-- 月收平台费服务费-->
+
+	<!-- 月收平台费服务费-->
 	<select id="getMonthPlatformAmountCount" resultType="java.lang.Integer">
 				select 
 
@@ -438,9 +444,9 @@
 
 		where pList.plan_list_id=#{crpId,jdbcType=VARCHAR} and pDetail.plan_item_type = 50 limit 1
 	</select>
- 
- 
-		<!-- 月收分公司服务费-->
+
+
+	<!-- 月收分公司服务费-->
 	<select id="getMonthCompanyAmount" resultType="java.lang.Double">
 		
 		select 
@@ -458,13 +464,13 @@
 
 		where pList.plan_list_id=#{crpId,jdbcType=VARCHAR}  and pDetail.plan_item_type = 30  limit 1
 	</select>
- 
-	
-	
-	
-	
-	
-		<!-- 月收等费用总额-->
+
+
+
+
+
+
+	<!-- 月收等费用总额-->
 	<select id="getMonthSumFactAmount" resultType="java.lang.Double">
 		select 
 --   出款后已交月收等费用总额：还款计划中的实收合计（不含本金部分） -->
@@ -486,7 +492,7 @@
 
 		where plan.original_business_id=#{original_business_id}
 	</select>
-	
+
 	<select id="queryFiveLevelClassify" resultType="java.lang.String">
 		SELECT 
 		  DISTINCT t1.`business_id`
@@ -497,8 +503,8 @@
 		AND t2.`current_status` != '已还款'
 		AND IFNULL(t2.`repay_flag`,0) != 6
 	</select>
-	
-			<!-- 月收等费用总额-->
+
+	<!-- 月收等费用总额-->
 	<select id="getMonthSumFactAmount" resultType="java.lang.Double">
 		select 
 --   出款后已交月收等费用总额：还款计划中的实收合计（不含本金部分） -->
@@ -520,16 +526,16 @@
 
 		where plan.original_business_id=#{original_business_id}
 	</select>
-	
-				<!-- 获取展期的借款期数-->
+
+	<!-- 获取展期的借款期数-->
 	<select id="getBorrowLlimitZQ" resultType="java.lang.Integer">
 	select count(1)-1 as borrowLimit from 
 	
 	tb_repayment_biz_plan_list where plan_id=( select plan_id from  tb_repayment_biz_plan_list where plan_list_id=#{crpId,jdbcType=VARCHAR} )
 
 	</select>
-	
-			<!-- 获取线上逾期费和线下逾期费-->
+
+	<!-- 获取线上逾期费和线下逾期费-->
 	<select id="getOverDueMoney" resultType="map">
 			select sum((case when pDetail.fee_id=#{onLineFeeId,jdbcType=VARCHAR} then pDetail.plan_amount else 0 end )) as onLineOverDueMoney, 
 		 sum((case when pDetail.fee_id=#{underLineFeeId,jdbcType=VARCHAR} then pDetail.plan_amount else 0 end )) as underLineOverDueMoney
@@ -541,8 +547,8 @@
 		
 		where pDetail.plan_list_id=#{crpId,jdbcType=VARCHAR}
 	</select>
-	
-	
+
+
 	<!-- 清算一分配信息 -->
 	<select id="selectLiquidationOne" resultType="com.hongte.alms.base.vo.module.LiquidationVO">
 	
@@ -558,9 +564,9 @@
 
 		
     </select>
-    
-    
-    	<!-- 清算二分配信息 -->
+
+
+	<!-- 清算二分配信息 -->
 	<select id="selectLiquidationTwo" resultType="com.hongte.alms.base.vo.module.LiquidationVO">
 	
 		
@@ -575,11 +581,11 @@
 		and c_status.crp_id=#{crpId,jdbcType=VARCHAR}
 
     </select>
-    
-    
-    
-    
-      	<!-- 移交法务房贷移交信息 -->
+
+
+
+
+	<!-- 移交法务房贷移交信息 -->
 	<select id="selectLitigationHouseVO" resultType="com.hongte.alms.base.vo.module.LitigationVO">
 	
 			select (@rowNum:=@rowNum+1) as rowNo,user.user_name as operator,house.create_time as operatTime,
@@ -595,9 +601,9 @@
 			where house.crp_id=#{crpId,jdbcType=VARCHAR}  and process.process_result=1 and process.`status`=2
 
     </select>
-    
-    
-          	<!-- 移交法务车贷移交信息 -->
+
+
+	<!-- 移交法务车贷移交信息 -->
 	<select id="selectLitigationCarVO" resultType="com.hongte.alms.base.vo.module.LitigationVO">
 	
 				

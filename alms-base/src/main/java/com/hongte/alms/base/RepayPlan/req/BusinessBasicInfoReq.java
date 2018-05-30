@@ -1,5 +1,6 @@
 package com.hongte.alms.base.RepayPlan.req;
 
+import com.baomidou.mybatisplus.annotations.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -101,6 +102,20 @@ public class BusinessBasicInfoReq {
     private Integer borrowRateUnit;
 
     /**
+     * 业务获取人ID
+     */
+    @ApiModelProperty(required= true,value = "业务获取人ID")
+    @NotNull(message = "业务获取人ID(originalUserid)不能为空")
+    private String originalUserid;
+    /**
+     * 业务获取人姓名
+     */
+    @ApiModelProperty(required= true,value = "业务获取人姓名")
+    @NotNull(message = "业务获取人姓名(originalName)不能为空")
+    private String originalName;
+
+
+    /**
      * 业务主办人ID
      */
     @ApiModelProperty(required= true,value = "业务主办人ID")
@@ -123,6 +138,27 @@ public class BusinessBasicInfoReq {
     @ApiModelProperty(required= true,value = "业务所属分公司编号")
     @NotNull(message = "业务所属分公司编号(companyId)不能为空")
     private String companyId;
+
+
+    /**
+     * 业务所属分公司名称
+     */
+    @ApiModelProperty(required= true,value = "业务所属分公司名称")
+    @NotNull(message = "业务所属分公司名称(companyName)不能为空")
+    private String companyName;
+
+    /**
+     * 业务所属片区编号
+     */
+    @ApiModelProperty(required= true,value = "业务所属片区编号")
+    @NotNull(message = "业务所属片区编号(districtId)不能为空")
+    private String districtId;
+    /**
+     * 业务所属片区名称
+     */
+    @ApiModelProperty(required= true,value = "业务所属片区名称")
+    @NotNull(message = "业务所属片区名称(districtName)不能为空")
+    private String districtName;
 
     /**
      * 标识是否P2P拆标业务，0：非P2P拆标业务，1：P2P拆标业务
@@ -319,5 +355,45 @@ public class BusinessBasicInfoReq {
 
     public void setOrgBusinessId(String orgBusinessId) {
         this.orgBusinessId = orgBusinessId;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+
+    public String getDistrictId() {
+        return districtId;
+    }
+
+    public void setDistrictId(String districtId) {
+        this.districtId = districtId;
+    }
+
+    public String getDistrictName() {
+        return districtName;
+    }
+
+    public void setDistrictName(String districtName) {
+        this.districtName = districtName;
+    }
+
+    public String getOriginalUserid() {
+        return originalUserid;
+    }
+
+    public void setOriginalUserid(String originalUserid) {
+        this.originalUserid = originalUserid;
+    }
+
+    public String getOriginalName() {
+        return originalName;
+    }
+
+    public void setOriginalName(String originalName) {
+        this.originalName = originalName;
     }
 }
