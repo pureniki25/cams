@@ -1681,8 +1681,8 @@ public class FinanceServiceImpl implements FinanceService {
 			/*
 			 * 推送到kafka
 			 */
+			logger.info("发送数据平台贷款余额（撮合业务余额），业务编号：{}，金额：{}", businessId, loanBalance);
 			KafkaUtils.sendMessage(Constant.TOTAL_BUSINESS_BALANCE_TOPIC, businessId + SEND_DATA_PLATFORM_SPLIT_SYMBOL + loanBalance);
-			logger.info("发送数据平台贷款余额（撮合业务余额）成功！业务编号：{}，金额：{}", businessId, loanBalance);
 		} catch (Exception e) {
 			logger.error("获取业务维度贷款余额失败，业务编号：{}；抛出异常{}", businessId, e);
 			throw new ServiceRuntimeException(e.getMessage(), e);
