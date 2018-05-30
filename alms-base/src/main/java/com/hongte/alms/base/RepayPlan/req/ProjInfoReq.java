@@ -49,32 +49,41 @@ public class ProjInfoReq {
      *利率
      */
     @ApiModelProperty(required= true,value = "利率")
+    @NotNull(message="利率(rate)不能为空")
     private BigDecimal rate;
 
     @ApiModelProperty(required= true,value = "利率单位：1 年利率; 2 月利率; 3 日利率")
+    @NotNull(message="利率单位(rateUnitType)不能为空")
     private Integer rateUnitType;
 
 
     @ApiModelProperty(required= true,value = "线下期内逾期滞纳金费率(%)")
+    @NotNull(message="线下期内逾期滞纳金费率(offLineInOverDueRate)不能为空")
     private BigDecimal offLineInOverDueRate;
 
     @ApiModelProperty(required= true,value = "线下期内逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率")
+    @NotNull(message="线下期内逾期滞纳金费率类型(offLineInOverDueRateType)不能为空")
     private  Integer offLineInOverDueRateType;
 
     @ApiModelProperty(required= true,value = "线下期外逾期滞纳金费率(%)")
+    @NotNull(message="线下期外逾期滞纳金费率(offLineOutOverDueRate)不能为空")
     private BigDecimal offLineOutOverDueRate;
 
     @ApiModelProperty(required= true,value = "线下期外逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率")
+    @NotNull(message="线下期外逾期滞纳金费率类型(offLineOutOverDueRateType)不能为空")
     private  Integer offLineOutOverDueRateType;
 
     @ApiModelProperty(required= true,value = "线上逾期滞纳金费率(%)")
+    @NotNull(message="线上逾期滞纳金费率(onLineOverDueRate)不能为空")
     private BigDecimal onLineOverDueRate;
 
     @ApiModelProperty(required= true,value = "线上逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率")
+    @NotNull(message="线上逾期滞纳金费率类型(onLineOverDueRateType)不能为空")
     private  Integer onLineOverDueRateType;
 
 
     @ApiModelProperty(required= true,value = "还款方式：1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息,11:等本等息")
+    @NotNull(message="还款方式(repayType)不能为空")
     private Integer repayType;
 
     @ApiModelProperty(value = "每期还本列表  List<PrincipleReq> 当还款方式为“分期还本付息”时，必须填写此列表 ")
@@ -85,36 +94,43 @@ public class ProjInfoReq {
      * 项目编号
      */
     @ApiModelProperty(required= true,value = "项目编号")
+    @NotNull(message="项目编号(projectId)不能为空")
     private String projectId;
     /**
      * 业务编号
      */
     @ApiModelProperty(required= true,value = "业务编号")
+    @NotNull(message="业务编号(businessId)不能为空")
     private String businessId;
     /**
      * 资产端用户ID
      */
     @ApiModelProperty(required= true,value = "资产端用户ID")
+    @NotNull(message="资产端用户ID(customerId)不能为空")
     private String customerId;
     /**
      * 上标状态(-100:业务员出款申请,-50:财务未上标,0:财务不同意上标,1:财务同意上标,2:已满标,3:财务确认出款计划可放款,4:团贷网已提现给借款人,5:提现失败,6:展期资金分配完成,7:部分提现给借款人)
      */
     @ApiModelProperty(required= true,value = "上标状态(-100:业务员出款申请,-50:财务未上标,0:财务不同意上标,1:财务同意上标,2:已满标,3:财务确认出款计划可放款,4:团贷网已提现给借款人,5:提现失败,6:展期资金分配完成,7:部分提现给借款人)")
+    @NotNull(message="上标状态(statusFlag)不能为空")
     private String statusFlag;
     /**
      * 启标时间(用于生成还款计划)
      */
     @ApiModelProperty(required= true,value = "启标时间(用于生成还款计划)")
+    @NotNull(message="启标时间(beginTime)不能为空")
     private Date beginTime;
     /**
      * 满标金额(元)
      */
     @ApiModelProperty(required= true,value = "满标金额(元)")
+    @NotNull(message="满标金额(fullBorrowMoney)不能为空")
     private BigDecimal fullBorrowMoney;
     /**
      * 借款期限
      */
     @ApiModelProperty(required= true,value = "借款期限")
+    @NotNull(message="借款期限(borrowLimit)不能为空")
     private Integer borrowLimit;
 
 
@@ -122,27 +138,32 @@ public class ProjInfoReq {
      * 是否是展期(0:不是展期,1:是展期)
      */
     @ApiModelProperty(required= true,value = "是否是展期(0:不是展期,1:是展期)")
+    @NotNull(message="借款期限(borrowLimit)不能为空")
     private Integer extendFlag;
     /**
      * 展期标对应的原业务上标编号(仅展期业务)
      */
     @ApiModelProperty(value = "展期标对应的原业务上标编号(仅展期业务)")
+    @NotNull(message="展期标对应的原业务上标编号(orgIssueId)不能为空")
     private String orgIssueId;
     /**
      * 主借标ID
      */
     @ApiModelProperty(required= true,value = "主借标ID")
+    @NotNull(message="主借标ID(masterIssueId)不能为空")
     private String masterIssueId;
     /**
      * 超额拆标共借项目的序号
      */
     @ApiModelProperty(required= true,value = "超额拆标共借项目的序号")
+    @NotNull(message="超额拆标共借项目的序号(issueOrder)不能为空")
     private Integer issueOrder;
 
     /**
      * 满标时间
      */
     @ApiModelProperty(required= true,value = "满标时间")
+    @NotNull(message="满标时间(queryFullsuccessDate)不能为空")
     private Date queryFullsuccessDate;
     /**
      * 昵称
@@ -153,6 +174,7 @@ public class ProjInfoReq {
      * 手机号码
      */
     @ApiModelProperty(required= true,value = "手机号码")
+    @NotNull(message="手机号码(TelNo)不能为空")
     private String TelNo;
     /**
      * 邮箱
@@ -163,36 +185,43 @@ public class ProjInfoReq {
      * 身份证号码
      */
     @ApiModelProperty(required= true,value = "身份证号码")
+    @NotNull(message="身份证号码(identityCard)不能为空")
     private String identityCard;
     /**
      * 真实姓名
      */
     @ApiModelProperty(required= true,value = "真实姓名")
+    @NotNull(message="真实姓名(realName)不能为空")
     private String realName;
     /**
      * 银行卡
      */
     @ApiModelProperty(required= true,value = "银行卡")
+    @NotNull(message="银行卡(bankAccountNo)不能为空")
     private String bankAccountNo;
     /**
      * 银行类型
      */
     @ApiModelProperty(required= true,value = "银行类型")
+    @NotNull(message="银行类型(bankType)不能为空")
     private Integer bankType;
     /**
      * 银行卡归属地省
      */
     @ApiModelProperty(required= true,value = "银行卡归属地省")
+    @NotNull(message="银行卡归属地省(bankProvice)不能为空")
     private String bankProvice;
     /**
      * 银行卡归属地市
      */
     @ApiModelProperty(required= true,value = "银行卡归属地市")
+    @NotNull(message="银行卡归属地市(bankCity)不能为空")
     private String bankCity;
     /**
      * 开户银行名称
      */
     @ApiModelProperty(required= true,value = "开户银行名称")
+    @NotNull(message="开户银行名称(openBankName)不能为空")
     private String openBankName;
     /**
      * 标题
@@ -203,6 +232,7 @@ public class ProjInfoReq {
      * 借款期限
      */
     @ApiModelProperty(required= true,value = "借款期限")
+    @NotNull(message="借款期限(periodMonth)不能为空")
     private Integer periodMonth;
     /**
      * 平台还款方式ID(到期还本息用1表示， 每月付息到期还本用2表示)
@@ -213,6 +243,7 @@ public class ProjInfoReq {
      * 总金额(元)
      */
     @ApiModelProperty(required= true,value = "总金额(元)")
+    @NotNull(message="总金额(amount)不能为空")
     private BigDecimal amount;
     /**
      * 最小投资单位(元)
@@ -223,11 +254,13 @@ public class ProjInfoReq {
      * 标的来源(所属分公司的分润用户ID)
      */
     @ApiModelProperty(required= true,value = "标的来源(所属分公司的分润用户ID)")
+    @NotNull(message="标的来源(branchCompanyId)不能为空")
     private String branchCompanyId;
     /**
      * 风险控制措施
      */
     @ApiModelProperty(required= true,value = "风险控制措施")
+    @NotNull(message="风险控制措施(controlDesc)不能为空")
     private String controlDesc;
     /**
      * 标题图片
@@ -248,11 +281,13 @@ public class ProjInfoReq {
      * 上标状态(0:暂存 1:待审 2:审核成功 3:审核失败,4:待上标)
      */
     @ApiModelProperty(required= true,value = "上标状态(0:暂存 1:待审 2:审核成功 3:审核失败,4:待上标)")
+    @NotNull(message="上标状态(tdStatus)不能为空")
     private Integer tdStatus;
     /**
      * 团贷网业务类型(9:车贷 11:房贷 35:信用贷 32:共借项目 36 农饲贷 41 二手车商贷  39 车全 47 闪贷 48 扶贫贷)
      */
     @ApiModelProperty(required= true,value = "团贷网业务类型(9:车贷 11:房贷 35:信用贷 32:共借项目 36 农饲贷 41 二手车商贷  39 车全 47 闪贷 48 扶贫贷)")
+    @NotNull(message="团贷网业务类型(projectType)不能为空")
     private Integer projectType;
     /**
      * 上标结果
@@ -263,11 +298,13 @@ public class ProjInfoReq {
      * 担保方编号(所属担保公司分润用户ID)
      */
     @ApiModelProperty(required= true,value = "担保方编号(所属担保公司分润用户ID)")
+    @NotNull(message="担保方编号(enterpriseUserId)不能为空")
     private String enterpriseUserId;
     /**
      * 担保公司可用金额
      */
     @ApiModelProperty(required= true,value = "担保公司可用金额")
+    @NotNull(message="担保公司可用金额(aviCreditGrantingAmount)不能为空")
     private BigDecimal aviCreditGrantingAmount;
 //    /**
 //     * 年化利率
@@ -303,11 +340,13 @@ public class ProjInfoReq {
      * 团贷用户ID(资金端用户ID)
      */
     @ApiModelProperty(required= true,value = "团贷用户ID(资金端用户ID)")
+    @NotNull(message="团贷用户ID(tdUserId)不能为空")
     private String tdUserId;
     /**
      * 客户类型 1:个人 2:企业
      */
     @ApiModelProperty(required= true,value = "客户类型 1:个人 2:企业")
+    @NotNull(message="客户类型(userTypeId)不能为空")
     private Integer userTypeId;
     /**
      * 婚姻状况, 已婚、未婚 (信用贷时必填)
@@ -333,86 +372,103 @@ public class ProjInfoReq {
      * 团贷比例(期初收取平台费上标比例)
      */
     @ApiModelProperty(required= true,value = "团贷比例(期初收取平台费上标比例)")
+    @NotNull(message="团贷比例(tuandaiRate)不能为空")
     private BigDecimal tuandaiRate;
     /**
      * 团贷预计佣金(期初收取平台费总金额)
      */
     @ApiModelProperty(required= true,value = "团贷预计佣金(期初收取平台费总金额)")
+    @NotNull(message="团贷预计佣金(tuandaiAmount)不能为空")
     private BigDecimal tuandaiAmount;
     /**
      * 担保比例(期初收取担保公司费比例)
      */
     @ApiModelProperty(required= true,value = "担保比例(期初收取担保公司费比例)")
+    @NotNull(message="担保比例(guaranteeRate)不能为空")
     private BigDecimal guaranteeRate;
     /**
      * 担保预计收入(期初收取担保公司费用总金额)
      */
     @ApiModelProperty(required= true,value = "担保预计收入(期初收取担保公司费用总金额)")
+    @NotNull(message="担保预计收入(guaranteeAmount)不能为空")
     private BigDecimal guaranteeAmount;
     /**
      * 分公司比例(期初收取分公司费用比例)
      */
     @ApiModelProperty(required= true,value = "分公司比例(期初收取分公司费用比例)")
+    @NotNull(message="分公司比例(subCompanyRate)不能为空")
     private BigDecimal subCompanyRate;
     /**
      * 分公司预计金额(期初收取分公司费用总金额)
      */
     @ApiModelProperty(required= true,value = "分公司预计金额(期初收取分公司费用总金额)")
+    @NotNull(message="分公司预计金额(subCompanyCharge)不能为空")
     private BigDecimal subCompanyCharge;
     /**
      * 中介Id或担保
      */
     @ApiModelProperty(required= true,value = "中介Id或担保")
+    @NotNull(message="中介Id或担保(agencyId)不能为空")
     private String agencyId;
     /**
      * 中介比例
      */
     @ApiModelProperty(required= true,value = "中介比例")
+    @NotNull(message="中介比例(agencyRate)不能为空")
     private BigDecimal agencyRate;
     /**
      * 中介金额
      */
     @ApiModelProperty(required= true,value = "中介金额")
+    @NotNull(message="中介金额(agencyAmount)不能为空")
     private BigDecimal agencyAmount;
     /**
      * 保证金金额
      */
     @ApiModelProperty(required= true,value = "保证金金额")
+    @NotNull(message="保证金金额(depositAmount)不能为空")
     private BigDecimal depositAmount;
     /**
      * 押金
      */
     @ApiModelProperty(required= true,value = "押金")
+    @NotNull(message="押金(freedAmount)不能为空")
     private BigDecimal freedAmount;
     /**
      * 押金费率
      */
     @ApiModelProperty(required= true,value = "押金费率")
+    @NotNull(message="押金费率(freedRate)不能为空")
     private BigDecimal freedRate;
     /**
      * 合作公司所属团贷网分公司编号
      */
     @ApiModelProperty(required= true,value = "合作公司所属团贷网分公司编号")
+    @NotNull(message="合作公司所属团贷网分公司编号(cooperativeTdComUserId)不能为空")
     private String cooperativeTdComUserId;
     /**
      * 合作公司所属团贷网分公司费用比例
      */
     @ApiModelProperty(required= true,value = "合作公司所属团贷网分公司费用比例")
+    @NotNull(message="合作公司所属团贷网分公司费用比例(cooperativeTdComRate)不能为空")
     private BigDecimal cooperativeTdComRate;
     /**
      * 合作公司所属团贷网分公司金额
      */
     @ApiModelProperty(required= true,value = "合作公司所属团贷网分公司金额")
+    @NotNull(message="合作公司所属团贷网分公司金额(cooperativeTdComAmount)不能为空")
     private BigDecimal cooperativeTdComAmount;
     /**
      * 借款人所得比例
      */
     @ApiModelProperty(required= true,value = "借款人所得比例")
+    @NotNull(message="借款人所得比例(borrowerRate)不能为空")
     private BigDecimal borrowerRate;
     /**
      * 借款人实际金额
      */
     @ApiModelProperty(required= true,value = "借款人实际金额")
+    @NotNull(message="借款人实际金额(borrowAmount)不能为空")
     private BigDecimal borrowAmount;
     /**
      * 抵押权人(委托人)的团贷用户ID
@@ -429,6 +485,7 @@ public class ProjInfoReq {
      * 标的来源0小贷系统 1一点车贷
      */
     @ApiModelProperty(required= true,value = "标的来源0小贷系统 1一点车贷")
+    @NotNull(message="标的来源(projectFrom)不能为空")
     private Integer projectFrom;
     /**
      * 资金用途 (指资金流向信息、使用信息及计划等资金运用情况)
@@ -449,6 +506,7 @@ public class ProjInfoReq {
      * 每月还本金额
      */
     @ApiModelProperty(required= true,value = "每月还本金额")
+    @NotNull(message="每月还本金额(monthPrincipalAmount)不能为空")
     private BigDecimal monthPrincipalAmount;
 
 
@@ -466,6 +524,7 @@ public class ProjInfoReq {
      * 平台标志位：1，团贷网； 2，你我金融
      */
     @ApiModelProperty(required= true,value = "平台标志位：1，团贷网； 2，你我金融")
+    @NotNull(message="平台标志位(plateType)不能为空")
     private Integer plateType;
 //    /**
 //     * 创建日期
