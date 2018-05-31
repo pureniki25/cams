@@ -23,10 +23,12 @@ public class FinanceManagerListVO {
 	 * 业务编号
 	 */
 	private String businessId;
+	private String orgBusinessId;
 	/**
 	 * 期数
 	 */
 	private String afterId;
+	private Integer period ;
 	/**
 	 * 部门
 	 */
@@ -88,6 +90,10 @@ public class FinanceManagerListVO {
 	 */
 	private boolean canWithhold;
 
+	/**
+	 * 代扣确认状态
+	 */
+	private Integer confirmFlag ;
 	public String getBusinessId() {
 		return businessId;
 	}
@@ -243,6 +249,48 @@ public class FinanceManagerListVO {
 	 */
 	public void setPlanId(String planId) {
 		this.planId = planId;
+	}
+
+	/**
+	 * @return the confirmFlag
+	 */
+	public Integer getConfirmFlag() {
+		return confirmFlag;
+	}
+
+	/**
+	 * @param confirmFlag the confirmFlag to set
+	 */
+	public void setConfirmFlag(Integer confirmFlag) {
+		this.confirmFlag = confirmFlag;
+	}
+
+	/**
+	 * @return the orgBusinessId
+	 */
+	public String getOrgBusinessId() {
+		return orgBusinessId;
+	}
+
+	/**
+	 * @param orgBusinessId the orgBusinessId to set
+	 */
+	public void setOrgBusinessId(String orgBusinessId) {
+		this.orgBusinessId = orgBusinessId;
+	}
+
+	/**
+	 * @return the period
+	 */
+	public Integer getPeriod() {
+		return period;
+	}
+
+	/**
+	 * @param period the period to set
+	 */
+	public void setPeriod(Integer period) {
+		this.period = period;
 	}
 
 }

@@ -425,7 +425,7 @@ window.layinit(function (htConfig) {
                 axios.get(fpath+'finance/listRepaymentSettleListVOs?businessId='+businessId+(planId?('&planId='+planId):''))
                 .then(function(res){
                     if(res.data.code=='1'){
-                        app.plan.data = res.data.data
+                        app.table.plan.data = res.data.data
                     }else{
                         app.$Message.error({content:res.data.msg})
                     }
@@ -433,6 +433,10 @@ window.layinit(function (htConfig) {
                 .catch(function(err){
                     app.$Message.error({content:err})
                 })
+            },
+            closePage(){
+                var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                parent.layer.close(index); //再执行关闭   
             }
         },
         created: function () {

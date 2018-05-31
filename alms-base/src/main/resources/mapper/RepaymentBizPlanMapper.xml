@@ -79,6 +79,8 @@
 
 	<select id="listRepaymentSettleListVOs" resultType="com.hongte.alms.base.vo.finance.RepaymentSettleListVO">
 		SELECT
+			if(pl.orig_business_id != pl.business_id,true,false) as isDefer
+			pl.period as period,
 			pl.after_id AS afterId,
 			pl.due_date AS repayDate,
 			( SELECT IFNULL( sum( plan_amount ), 0 ) FROM tb_repayment_biz_plan_list_detail WHERE plan_list_id = pl.plan_list_id AND plan_item_type = 10 ) AS item10,

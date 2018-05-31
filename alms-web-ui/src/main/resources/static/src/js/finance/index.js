@@ -162,7 +162,10 @@ window.layinit(function (htConfig) {
                 },
                 {
                     title: '是否支持代扣',
-                    key: 'canWithhold'
+                    key: 'canWithhold',
+                    render:(h,p)=>{
+                        return h('span',(p.row.canWithhold&&p.row.canWithhold==true?'支持代扣':'不支持代扣'));
+                    }
                 },
                 {
                     title: '操作',
@@ -194,7 +197,7 @@ window.layinit(function (htConfig) {
                                                     layer.open({
                                                         type: 2,
                                                         title: title,
-                                                        content: [url, 'no'],
+                                                        content: [url],
                                                         area: ['1600px', '800px'],
                                                         success: function (layero, index) {
                                                             curIndex = index;
@@ -206,7 +209,7 @@ window.layinit(function (htConfig) {
                                                     layer.open({
                                                         type: 2,
                                                         title: title,
-                                                        content: [url, 'no'],
+                                                        content: [url],
                                                         area: ['1600px', '800px'],
                                                         success: function (layero, index) {
                                                             curIndex = index;
@@ -218,7 +221,7 @@ window.layinit(function (htConfig) {
                                                     layer.open({
                                                         type: 2,
                                                         title: title,
-                                                        content: [url, 'no'],
+                                                        content: [url],
                                                         area: ['1600px', '800px'],
                                                         success: function (layero, index) {
                                                             curIndex = index;
@@ -291,9 +294,8 @@ window.layinit(function (htConfig) {
             }
         },
         methods: {
-            search: function (page) {
+            search: function () {
                 let params = {}
-
 
                 Object.keys(this.form).forEach(element => {
                     if (this.form[element] &&
