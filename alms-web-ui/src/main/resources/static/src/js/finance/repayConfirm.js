@@ -300,47 +300,53 @@ window.layinit(function (htConfig) {
                     .then(function (res) {
                         if (res.data.code == '1') {
                             app.handleConfirmRepaymentResult(res)
+                        }else{
+                            app.factRepaymentInfo.surplusFund = 0
+                            app.$Message.error({content:res.data.msg})
                         }
                     })
                     .catch(function (err) {
                         console.log(err);
                     })
-            },
-            handleConfirmRepaymentResult(res) {
-                app.table.projRepayment.data = res.data.data
-                app.factRepayPreview.item10 = 0
-                app.factRepayPreview.item20 = 0
-                app.factRepayPreview.item30 = 0
-                app.factRepayPreview.item50 = 0
-                app.factRepayPreview.offlineOverDue = 0
-                app.factRepayPreview.onlineOverDue = 0
-                app.factRepayPreview.subTotal = 0
-                app.factRepayPreview.total = 0
-                app.factRepayPreview.surplus = 0
-                app.table.projRepayment.data.forEach(e => {
-                    app.factRepayPreview.surplus += e.surplus
-                    app.factRepayPreview.item10 += e.item10
-                    app.factRepayPreview.item20 += e.item20
-                    app.factRepayPreview.item30 += e.item30
-                    app.factRepayPreview.item50 += e.item50
-                    app.factRepayPreview.offlineOverDue += e.offlineOverDue
-                    app.factRepayPreview.onlineOverDue += e.onlineOverDue
-                    app.factRepayPreview.subTotal += e.subTotal
-                    app.factRepayPreview.total += e.total
-                })
-            },
-            confirmRepayment() {
-                let param = {};
-                param.businessId = businessId;
-                param.afterId = afterId;
-                param = Object.assign(app.factRepaymentInfo, param);
-
-                axios.post(fpath + 'finance/confirmRepayment', param)
+                },
+                handleConfirmRepaymentResult(res) {
+                    app.table.projRepayment.data = res.data.data
+                    app.factRepayPreview.item10 = 0
+                    app.factRepayPreview.item20 = 0
+                    app.factRepayPreview.item30 = 0
+                    app.factRepayPreview.item50 = 0
+                    app.factRepayPreview.offlineOverDue = 0
+                    app.factRepayPreview.onlineOverDue = 0
+                    app.factRepayPreview.subTotal = 0
+                    app.factRepayPreview.total = 0
+                    app.factRepayPreview.surplus = 0
+                    app.table.projRepayment.data.forEach(e => {
+                        app.factRepayPreview.surplus += e.surplus
+                        app.factRepayPreview.item10 += e.item10
+                        app.factRepayPreview.item20 += e.item20
+                        app.factRepayPreview.item30 += e.item30
+                        app.factRepayPreview.item50 += e.item50
+                        app.factRepayPreview.offlineOverDue += e.offlineOverDue
+                        app.factRepayPreview.onlineOverDue += e.onlineOverDue
+                        app.factRepayPreview.subTotal += e.subTotal
+                        app.factRepayPreview.total += e.total
+                    })
+                },
+                confirmRepayment() {
+                    let param = {};
+                    param.businessId = businessId;
+                    param.afterId = afterId;
+                    param = Object.assign(app.factRepaymentInfo, param);
+                    
+                    axios.post(fpath + 'finance/confirmRepayment', param)
                     .then(function (res) {
                         if (res.data.code == '1') {
                             app.handleConfirmRepaymentResult(res)
-
+                            
                             window.location.reload()
+                        }else{
+                            app.factRepaymentInfo.surplusFund = 0
+                            app.$Message.error({content:res.data.msg})
                         }
                     })
                     .catch(function (err) {

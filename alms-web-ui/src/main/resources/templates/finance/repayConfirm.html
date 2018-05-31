@@ -101,7 +101,7 @@
                             <Checkbox :disabled="factRepaymentInfo.canUseSurplus==0">结余暂收</Checkbox>
                         </i-col>
                         <i-col span="6">
-                            <i-input v-model="factRepaymentInfo.surplusFund" :disabled="factRepaymentInfo.canUseSurplus==0"></i-input>
+                            <i-input number v-model="factRepaymentInfo.surplusFund" :disabled="factRepaymentInfo.canUseSurplus==0" ></i-input>
                             <span>结余暂收可用金额{{factRepaymentInfo.canUseSurplus}}元</span>
                         </i-col>
                     </row>
