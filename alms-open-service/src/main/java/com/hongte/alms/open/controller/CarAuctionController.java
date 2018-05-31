@@ -1,5 +1,6 @@
 package com.hongte.alms.open.controller;
 
+import com.hongte.alms.base.assets.car.vo.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -16,9 +17,6 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.assets.car.service.CarService;
-import com.hongte.alms.base.assets.car.vo.AuctionBidderVo;
-import com.hongte.alms.base.assets.car.vo.AuctionRespVo;
-import com.hongte.alms.base.assets.car.vo.AuctionsReqVo;
 import com.hongte.alms.base.baseException.AlmsBaseExcepiton;
 import com.hongte.alms.base.entity.CarAuction;
 import com.hongte.alms.base.entity.CarAuctionBidder;
@@ -32,10 +30,7 @@ import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.vo.PageResult;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("carAuction")
@@ -68,13 +63,13 @@ public class CarAuctionController {
 	
 	@ApiOperation(value = "分页查询审核信息对外接口")
     @PostMapping("/selectAuctionsPage")
-    public PageResult<List<AuctionRespVo>> selectAuctionsPage (@RequestBody AuctionsReqVo req) {
+    public PageResult<List<AuctionRespVo>> selectAuctionsPage (@RequestBody AuctionsReq req) {
 			 
 		try {
 
 			if(req==null||StringUtils.isEmpty(req.getType())) {
 				logger.error("参数为空,type="+req.getType());
-				return PageResult.error(9999, "参数为空,type="+req.getType()); 
+				return PageResult.error(9999, "参数为空,type="+req.getType());
 			}
 			Page<AuctionRespVo> pages=carService.selectAuctionsPageForApp(req);
 			return PageResult.success(pages.getRecords(),pages.getTotal());
@@ -83,23 +78,7 @@ public class CarAuctionController {
 			return PageResult.error(9999, "系统异常"); 
 		}
     }
-	@ApiOperation(value = "分页查询竞价信息对外接口")
-    @PostMapping("/selectBiddersPage")
-    public PageResult<List<AuctionBidderVo>> selectBiddersPage (@RequestBody AuctionsReqVo req) {
-			 
-		try {
-	
-			if(req==null||StringUtils.isEmpty(req.getPriceID())||StringUtils.isEmpty(req.getTelephone())) {
-				logger.error("参数为空,priceId="+req.getPriceID()+",telephone="+req.getTelephone());
-				return PageResult.error(9999, "参数为空,priceId="+req.getPriceID()+",telephone="+req.getTelephone()); 
-			}
-			Page<AuctionBidderVo> pages=carService.selectBiddersPageForApp(req);
-			return PageResult.success(pages.getRecords(),pages.getTotal());
-		}catch (Exception e) {
-			logger.error(e.getMessage());
-			return PageResult.error(9999, "系统异常"); 
-		}
-    }
+
 	@ApiOperation(value="查询拍卖最高竞价")
 	@PostMapping("/selectMaxOfferPriceByAuctionId")
 	public Result<Object> selectMaxOfferPriceByAuctionId(@RequestBody Map<String,Object> params){
@@ -116,62 +95,86 @@ public class CarAuctionController {
 			return Result.error("9999", "系统异常"); 
 		}
 	}
+
 	@ApiOperation(value="更新拍卖信息")
 	@PostMapping("/updateAuctions")
-	public Result<Object>updateAuctions(@RequestBody Map<String,Object> params){
+	public Result<Object> updateAuctions(@RequestBody CarBidReq req){
 		try {
-			String priceID=(String) params.get("priceID");
-			String userName=(String) params.get("userName");
-			String userId=(String) params.get("userID");
-			String telephone=(String) params.get("telephone");
-			double amount =(double) params.get("amount");
-			List<CarAuction> auctions=carAuctionService.selectList( new EntityWrapper<CarAuction>().eq("auction_id", priceID).eq("status", "04"));
+			List<CarAuction> auctions=carAuctionService.selectList( new EntityWrapper<CarAuction>().eq("auction_id", req.getAuctionId()).eq("status", "04"));
 			if(auctions==null||auctions.size()!=1) {
-				logger.error("参数为空,auction_id="+priceID);
-				return Result.error("9999", "无效的拍卖"); 
+				logger.error("参数为空,auction_id="+req.getAuctionId());
+				return Result.error("9999", "无效的拍卖");
 			}
 			CarAuction carAuction=auctions.get(0);
-			if(carAuction.getAuctionStartTime()==null||carAuction.getAuctionEndTime()==null) {
-				logger.error("不在竞拍时间内,auctionStartTime="+carAuction.getAuctionStartTime()+",auctionEndTime"+carAuction.getAuctionEndTime());
-				return Result.error("9999", "无效的拍卖"); 
-			}
 			//判断当前是否还在拍卖时间
 			long startTime=carAuction.getAuctionStartTime().getTime();
 			long endtTime=carAuction.getAuctionEndTime().getTime();
-			long currentTime=new Date().getTime();
+			long currentTime=System.currentTimeMillis();
 			if(!(currentTime>=startTime&&currentTime<=endtTime)) {
-				logger.error("不在竞拍时间内,auctionStartTime="+carAuction.getAuctionStartTime()+",auctionEndTime"+carAuction.getAuctionEndTime());
-				return Result.error("9999", "不在竞拍时间内不能竞拍"); 
+				logger.error("不在活动时间内,auctionStartTime="+carAuction.getAuctionStartTime()+",auctionEndTime"+carAuction.getAuctionEndTime());
+				return Result.error("9999", "不在活动时间内");
 			}
-			//查询拍卖登记信息并更新保存竞拍记录
-			List<CarAuctionReg> auctRegs=carAuctionRegService.selectList(new EntityWrapper<CarAuctionReg>().eq("auction_id", priceID).eq("reg_tel", telephone));
-			if(auctRegs==null||auctRegs.size()!=1) {
-				logger.error("参数为空,auction_id="+priceID+",reg_tel"+telephone);
-				return Result.error("9999", "无效的拍卖登记信息"); 
+			//查询竞价记录
+			List<CarAuctionPriceLog> bidLogs=carAuctionPriceLogService.selectList(new EntityWrapper<CarAuctionPriceLog>().eq("auction_id", req.getAuctionId()).eq("bidder_tel", req.getTelephone()));
+			if(bidLogs.size()>=3) {
+				logger.error("超过3次竞价,auction_id="+req.getAuctionId()+",reg_tel"+req.getTelephone());
+				return Result.error("9999", "已经超过报价次数，不能报价");
 			}
-			CarAuctionReg auctReg=auctRegs.get(0);
-			//未交保证金不参与竞拍
-			if(!auctReg.getPayDeposit()) {
-				logger.error("未缴纳保证金,auction_id="+priceID+",reg_tel"+telephone);
-				return Result.error("9999", "未缴纳保证金不允许竞拍"); 
+			for(CarAuctionPriceLog bidLog :bidLogs)
+			{
+				if(bidLog.getPrice().equals(req.getAmount()))
+				{
+					logger.error("报价重复,auction_id="+req.getAuctionId()+",reg_tel"+req.getTelephone()+",price"+req.getAmount());
+					return Result.error("9999", "与之前报价重复，请修改价格后再报价");
+				}
 			}
-			CarAuctionPriceLog pLog=new CarAuctionPriceLog();
-			pLog.setId(UUID.randomUUID().toString());
-			pLog.setAuctionId(auctReg.getAuctionId());
-			pLog.setBidderTel(auctReg.getRegTel());
-			pLog.setPrice(amount+"");
-			pLog.setCreateTime(new Date());
-			pLog.setBidderCertId(userId);
-			carAuctionPriceLogService.insert(pLog);
-			auctReg.setOfferAmount(new BigDecimal(amount));
-			auctReg.setUpdateTime(new Date());
-			carAuctionRegService.updateById(auctReg);
-			return Result.error("0000", "竞拍成功"); 
+			carAuctionPriceLogService.bid(req);
+			return Result.error("0", "提交成功");
 		}catch (Exception e) {
 			logger.error(e.getMessage());
 			return Result.error("9999", "系统异常"); 
 		}
 	}
+
+	@ApiOperation(value="我的报价记录")
+	@PostMapping("/myBids")
+	public Result<Object> myBids(@RequestBody MyBidsReq req){
+		try {
+         List<CarAuctionPriceLog> bids=carAuctionPriceLogService.selectList(new EntityWrapper<CarAuctionPriceLog>().eq("user_id",req.getUserId()).eq("auction_id",req.getAuctionId()));
+         List<MyBidsVo> myBidsList=new ArrayList<MyBidsVo>();
+         for(CarAuctionPriceLog bid :bids) {
+			 MyBidsVo myBidsVo = new MyBidsVo();
+			 myBidsVo.setBidTime(bid.getCreateTime());
+			 myBidsVo.setBidPrice(bid.getPrice());
+			 myBidsList.add(myBidsVo);
+		 }
+		 return Result.build("0","请求成功",myBidsList);
+		}catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			return Result.error("9999", "系统异常");
+		}
+	}
+
+
+	@ApiOperation(value = "分页查询我报过价的车辆")
+	@PostMapping("/myBidCars")
+	public PageResult<List<MyBadeCarVo>> myBidCars(@RequestBody MyBadeCarReq req) {
+
+		try {
+			if(req==null) {
+				logger.error("参数为空,req为null");
+				return PageResult.error(9999, "参数为空,req为null");
+			}
+			Page<MyBadeCarVo> pages=carService.selectMyBidCarsForApp(req);
+			return PageResult.success(pages.getRecords(),pages.getTotal());
+		}catch (Exception e) {
+			logger.error(e.getMessage());
+			return PageResult.error(9999, "系统异常");
+		}
+	}
+
+
 	@ApiOperation(value="拍卖报名")
 	@PostMapping("/auctionSign")
 	public Result<Object>auctionSign(@RequestBody Map<String,Object> params){
@@ -187,9 +190,10 @@ public class CarAuctionController {
 		return Result.error("9999", "报名失败"); 
 	}
 	}
+
 	@ApiOperation(value = "分页查询竞拍记录")
     @PostMapping("/selectAuctionReg")
-    public PageResult<List<AuctionRespVo>> selectAuctionReg (@RequestBody AuctionsReqVo req) {
+    public PageResult<List<AuctionRespVo>> selectAuctionReg (@RequestBody AuctionsReq req) {
 			 
 		try {
 
