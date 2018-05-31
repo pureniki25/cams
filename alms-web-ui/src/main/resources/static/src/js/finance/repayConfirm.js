@@ -148,7 +148,7 @@ window.layinit(function (htConfig) {
             },
             factRepaymentInfo: {
                 repayDate: '',
-                surplusFund: '',
+                surplusFund: 0,
                 onlineOverDuel: '',
                 offlineOverDue: '',
                 remark: '',
@@ -185,6 +185,11 @@ window.layinit(function (htConfig) {
             },
             'factRepaymentInfo.surplusFund': function (n) {
                 if (n && !isNaN(n)) {
+                    if(n>app.factRepaymentInfo.canUseSurplus){
+                        app.$Message.warning({content:'可使用结余金额不能大于'+app.factRepaymentInfo.canUseSurplus})
+                        app.factRepaymentInfo.surplusFund = 0
+                        return;
+                    }
                     app.factRepaymentInfo.repayAccount = parseFloat(app.factRepaymentInfo.moneyPoolAccount) + parseFloat(app.factRepaymentInfo.surplusFund || 0)
                 }
             },
