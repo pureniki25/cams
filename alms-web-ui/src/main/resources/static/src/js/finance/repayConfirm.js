@@ -181,11 +181,11 @@ window.layinit(function (htConfig) {
                     app.factRepaymentInfo.repayDate = o.tradeDate
                 }
                 app.factRepaymentInfo.moneyPoolAccount = moneyPoolAccount
-                app.factRepaymentInfo.repayAccount = app.factRepaymentInfo.moneyPoolAccount + (app.factRepaymentInfo.surplusFund || 0)
+                app.factRepaymentInfo.repayAccount = parseFloat(app.factRepaymentInfo.moneyPoolAccount)  + parseFloat(app.factRepaymentInfo.surplusFund || 0)
             },
             'factRepaymentInfo.surplusFund': function (n) {
                 if (n && !isNaN(n)) {
-                    app.factRepaymentInfo.repayAccount = app.factRepaymentInfo.moneyPoolAccount + (app.factRepaymentInfo.surplusFund || 0)
+                    app.factRepaymentInfo.repayAccount = parseFloat(app.factRepaymentInfo.moneyPoolAccount) + parseFloat(app.factRepaymentInfo.surplusFund || 0)
                 }
             },
             'factRepaymentInfo.repayAccount': function (n) {
