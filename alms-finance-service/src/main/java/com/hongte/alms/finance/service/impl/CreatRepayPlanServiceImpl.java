@@ -482,6 +482,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         basicBusiness.setOutputPlatformId(1);//默认为团贷网p2p业务
         basicBusiness.setIsTuandaiRepay(1);//默认为使用平台还款
         basicBusiness.setAssetId("ht_xindai");//默认为鸿特信贷中心
+        basicBusiness.setSrcType(RepayPlanCreateSysEnum.ALMS.getValue());
         BasicBusiness  oldBasicBusiness = basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id",basicBusiness.getBusinessId()));
         if(oldBasicBusiness!=null){
             basicBusiness.setCreateUser(oldBasicBusiness.getCreateUser());

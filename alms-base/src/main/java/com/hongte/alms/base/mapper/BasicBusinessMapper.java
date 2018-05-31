@@ -76,7 +76,7 @@ public interface BasicBusinessMapper extends SuperMapper<BasicBusiness> {
 	 Map<String, Object>  getNeedPay(@Param("original_business_id") String original_business_id);
 	 /**
 	 * 	 月收平台服务费的业务
-	 * @param original_business_id
+	 * @param crpId
 	 * @return
 	 */
 	 Double  getMonthPlatformAmount(@Param("crpId") String crpId);
@@ -84,7 +84,7 @@ public interface BasicBusinessMapper extends SuperMapper<BasicBusiness> {
 	 Integer getMonthPlatformAmountCount(@Param("crpId") String crpId);
 	 /**
 	 * 	 月收公司服务费的业务
-	 * @param original_business_id
+	 * @param crpId
 	 * @return
 	 */
 	 Double  getMonthCompanyAmount(@Param("crpId") String crpId);

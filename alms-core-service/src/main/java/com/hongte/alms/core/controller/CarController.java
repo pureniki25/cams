@@ -5,13 +5,8 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.assets.car.enums.CarStatusEnums;
 import com.hongte.alms.base.assets.car.service.CarService;
-import com.hongte.alms.base.assets.car.vo.AuctionAplyVo;
-import com.hongte.alms.base.assets.car.vo.AuctionBidderVo;
-import com.hongte.alms.base.assets.car.vo.AuctionsReqVo;
-import com.hongte.alms.base.assets.car.vo.AuditVo;
-import com.hongte.alms.base.assets.car.vo.CarReq;
-import com.hongte.alms.base.assets.car.vo.CarVo;
-import com.hongte.alms.base.assets.car.vo.FileVo;
+import com.hongte.alms.base.assets.car.vo.*;
+import com.hongte.alms.base.assets.car.vo.AuctionsReq;
 import com.hongte.alms.base.baseException.AlmsBaseExcepiton;
 import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
 import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
@@ -953,17 +948,18 @@ try {
     @ApiOperation(value = "获取竞价信息")
     @GetMapping("/auctionRegList")
     @ResponseBody
-    public PageResult<List<AuctionBidderVo>> selectBiddersPageForApp(@ModelAttribute AuctionsReqVo req){
+    public PageResult<List<AuctionBidderVo>> selectBiddersPageForApp(@ModelAttribute AuctionsReq req){
 
         try{
-        	List<CarAuction> carAuctions=carAuctionService.selectList(new EntityWrapper<CarAuction>().eq("business_id", req.getBusinessId()));
+        	/*List<CarAuction> carAuctions=carAuctionService.selectList(new EntityWrapper<CarAuction>().eq("business_id", req.getBusinessId()));
         	CarAuction carAuction=new CarAuction();
         	if(carAuctions!=null&&carAuctions.size()==1) {
         		carAuction=carAuctions.get(0);
         	}
         	req.setPriceID(carAuction.getAuctionId());
         	Page<AuctionBidderVo>  pages=carService.selectBiddersPageForApp(req);
-            return PageResult.success(pages.getRecords(),pages.getTotal());
+            return PageResult.success(pages.getRecords(),pages.getTotal());*/
+        	return null;
         }catch (Exception ex){
             logger.error(ex.getMessage());
             ex.printStackTrace();
