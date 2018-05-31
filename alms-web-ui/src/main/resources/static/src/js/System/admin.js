@@ -12,6 +12,7 @@ window.layinit(function (htConfig) {
            synOneListColLoading:false,
            setUserPermissonsLoading:false,
            fiveLevelClassifyLoading:false,
+           syncTrackLogLoading:false,
 		   // --- 按钮控制标识 end---
 
 		   onePListCollogBId:"",
