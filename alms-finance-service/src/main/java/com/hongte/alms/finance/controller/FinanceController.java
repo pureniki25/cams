@@ -484,7 +484,7 @@ public class FinanceController {
 			return result;
 		} catch (Exception e) {
 			logger.error("根据业务还款计划列表ID获取所有对应的标的应还还款计划信息失败--[{}]", e);
-			return Result.error("-500", "系统异常，获取所有对应的标的应还还款计划信息");
+			return Result.error("-500", "系统异常，获取所有对应的标的应还还款计划信息失败");
 		}
 	}
 	
@@ -503,7 +503,7 @@ public class FinanceController {
 			return result;
 		} catch (Exception e) {
 			logger.error("根据业务还款计划列表ID获取所有对应的标的实还还款计划信息失败--[{}]", e);
-			return Result.error("-500", "系统异常，获取所有对应的标的实还还款计划信息");
+			return Result.error("-500", "系统异常，获取所有对应的标的实还还款计划信息失败");
 		}
 	}
 	
@@ -521,8 +521,8 @@ public class FinanceController {
 			
 			return result;
 		} catch (Exception e) {
-			logger.error("获取标还款计划差额--[{}]", e);
-			return Result.error("-500", "系统异常，获取标还款计划差额信息");
+			logger.error("获取标还款计划差额失败--[{}]", e);
+			return Result.error("-500", "系统异常，获取标还款计划差额信息失败");
 		}
 	}
 	
@@ -540,8 +540,8 @@ public class FinanceController {
 			
 			return result;
 		} catch (Exception e) {
-			logger.error("获取标维度的其他费用--[{}]", e);
-			return Result.error("-500", "系统异常，获取标维度的其他费用");
+			logger.error("获取标维度的其他费用失败--[{}]", e);
+			return Result.error("-500", "系统异常，获取标维度的其他费用失败");
 		}
 	}
 	
@@ -561,6 +561,25 @@ public class FinanceController {
 		} catch (Exception e) {
 			logger.error("获取业务维度的其他费用--[{}]", e);
 			return Result.error("-500", "系统异常，获取业务维度的其他费用");
+		}
+	}
+	
+	@GetMapping(value = "/queryActualPaymentByBusinessId")
+	@ApiOperation(value = "根据业务编号查找实还流水")
+	public Result<Map<String, Object>> queryActualPaymentByBusinessId(@RequestParam("businessId") String businessId) {
+		try {
+			Result<Map<String, Object>> result;
+			
+			logger.info("@queryBizOtherFee@根据业务编号查找实还流水--开始[{}]", businessId);
+			
+			result = Result.success(financeService.queryActualPaymentByBusinessId(businessId));
+			
+			logger.info("@queryBizOtherFee@根据业务编号查找实还流水--结束[{}]", result);
+			
+			return result;
+		} catch (Exception e) {
+			logger.error("根据业务编号查找实还流水失败--[{}]", e);
+			return Result.error("-500", "系统异常，根据业务编号查找实还流水失败");
 		}
 	}
 	

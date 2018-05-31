@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.hongte.alms.base.dto.ActualPaymentSingleLogDTO;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
 import com.hongte.alms.common.mapper.SuperMapper;
 
@@ -20,10 +21,15 @@ public interface MoneyPoolRepaymentMapper extends SuperMapper<MoneyPoolRepayment
 
 	/**
 	 * 根据ids统计财务匹配且未被删除的还款登记的金额合计
-	 * @author 王继光
-	 * 2018年5月17日 上午11:22:39
+	 * 
+	 * @author 王继光 2018年5月17日 上午11:22:39
 	 * @param ids
 	 * @return
 	 */
-	public BigDecimal sumMoneyPoolRepaymentAmountByMprIds(@Param("ids")List<String> ids);
+	public BigDecimal sumMoneyPoolRepaymentAmountByMprIds(@Param("ids") List<String> ids);
+
+	/**
+	 * 根据业务编号查找实还流水
+	 */
+	List<ActualPaymentSingleLogDTO> queryActualPaymentByBusinessId(@Param(value = "businessId") String businessId);
 }

@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import com.hongte.alms.base.dto.ActualPaymentSingleLogDTO;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.entity.MoneyPool;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
@@ -132,5 +133,10 @@ public interface FinanceService {
      * @return
      */
     void sendLoanBalanceToDataPlatform(String businessId);
+    
+    /**
+	 * 根据业务编号查找实还流水
+	 */
+    Map<String, Object> queryActualPaymentByBusinessId(String businessId);
     
 }
