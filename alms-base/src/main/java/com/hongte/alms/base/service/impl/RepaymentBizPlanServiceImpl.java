@@ -29,6 +29,7 @@ import com.hongte.alms.common.util.ClassCopyUtil;
 import com.hongte.alms.common.util.DateUtil;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -293,6 +294,41 @@ public class RepaymentBizPlanServiceImpl extends BaseServiceImpl<RepaymentBizPla
 
 	@Override
 	public List<RepaymentSettleListVO> listRepaymentSettleListVOs(String businessId, String planId) {
+		List<RepaymentSettleListVO> list = repaymentBizPlanMapper.listRepaymentSettleListVOs(businessId, planId);
+		RepaymentSettleListVO finalVO = list.get(list.size()-1) ;
+		List<RepaymentSettleListVO> currents = new ArrayList<>();
+		RepaymentSettleListVO curr = null ;
+		findCurrentPeriod(finalVO, list, currents, curr);
+
+		
 		return repaymentBizPlanMapper.listRepaymentSettleListVOs(businessId, planId);
+	}
+	
+	private void findCurrentPeriod(RepaymentSettleListVO finalVO,List<RepaymentSettleListVO> list,List<RepaymentSettleListVO> currents,RepaymentSettleListVO curr) {
+		Date now = new Date();
+		int outOfContact = DateUtil.getDiffDays(finalVO.getRepayDate(), now) ;
+		if (outOfContact>=0) {
+			/*期外逾期*/
+			for (RepaymentSettleListVO repaymentSettleListVO : list) {
+				if (repaymentSettleListVO.samePeriod(finalVO)) {
+					currents.add(repaymentSettleListVO);
+				}
+			}
+			curr = finalVO ;
+		}else if(outOfContact<0){
+			/*提前结清*/
+			for (RepaymentSettleListVO repaymentSettleListVO : currents) {
+				if (DateUtil.getDiff(now, repaymentSettleListVO.getRepayDate())>0) {
+					curr = repaymentSettleListVO ;
+					break;
+				}
+			}
+			
+			for (RepaymentSettleListVO repaymentSettleListVO : currents) {
+				if (repaymentSettleListVO.samePeriod(curr)) {
+					currents.add(curr);
+				}
+			}
+		}
 	}
 }
