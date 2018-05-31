@@ -40,7 +40,7 @@ public class AuctionRespVo implements Serializable {
      * 活动开始时间
      */
     @ApiModelProperty(value = "活动开始时间", name = "startPriceDate")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date startPriceDate;
 
     /**
@@ -222,7 +222,7 @@ public class AuctionRespVo implements Serializable {
         return endPriceDate;
     }
 
-    public void setEndPriceDate(Date endtPriceDate) {
+    public void setEndPriceDate(Date endPriceDate) {
         this.endPriceDate = endPriceDate;
     }
 
