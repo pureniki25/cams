@@ -182,7 +182,7 @@
 		SELECT
 			pl.plan_id as planId,
 			pl.confirm_flag as confirmFlag,
-			pl.plan_list_id as planListId,
+			distinct pl.plan_list_id as planListId,
 			pl.business_id as businessId,
 			pl.orig_business_id as orgBusinessId,
 			pl.period as period,
