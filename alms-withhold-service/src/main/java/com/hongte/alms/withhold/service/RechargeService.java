@@ -1,9 +1,9 @@
 package com.hongte.alms.withhold.service;
 
-import java.util.Comparator;
-import java.util.List;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import java.math.BigDecimal;
+
+import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.feignClient.dto.CustomerInfoDto;
 import com.hongte.alms.common.result.Result;
@@ -23,11 +23,12 @@ public interface RechargeService {
      * @param businessId
      * @param afterId
      * @param bankCard
-     *  @param amount 金额为空时，默认代扣每期应还金额
-     *   @param platformId 代扣平台ID,ID为空是,默认客户银行卡号绑定的平台代扣
+     * @param amount 金额为空时，默认代扣每期应还金额
+     * @param platformId 代扣平台ID,ID为空是,默认客户银行卡号绑定的平台代扣
+     * @param merchOrderId 生成商户订单号
      * @return
      */
-    Result recharge(String businessId, String afterId, String bankCard,String amount,String platformId);
+    Result recharge(String businessId, String afterId, String bankCard,Double amount,String platformId,String merchOrderId);
     
     
     
@@ -38,6 +39,11 @@ public interface RechargeService {
      * @return
      */
 	boolean istLastPeriod(RepaymentBizPlanList pList);
+	  /**
+	   * 是否可以执行自动代扣
+	   */
+	
+	 boolean EnsureAutoPayIsEnabled(RepaymentBizPlanList pList);
 	
 	
 	/**
@@ -46,7 +52,48 @@ public interface RechargeService {
 	 CustomerInfoDto getCustomerInfo(String identifyCard);
 	 
 	 
-	
-	
+	 
+	 /**
+	  * 生成代扣唯一商户号
+	  */
+	 String getMerchOrderId();
+	 
+	 
+	/**
+	 * 插入代扣记录
+	 * boolLastRepay：表示本期是否分多笔代扣,0:一次性代扣，1:分多笔代扣
+	 * boolPartRepay：表示本期是否分多笔代扣中的最后一笔代扣，若非多笔代扣，本字段存1。  0:非最后一笔代扣，1:最后一笔代扣
+	 */
+		
+     void recordRepaymentLog(Result result,RepaymentBizPlanList list,BasicBusiness business,CustomerInfoDto dto,Integer platformId,Integer boolLastRepay,Integer boolPartRepay,String merchOrderId,Integer settlementType,BigDecimal currentAmount);
+		
+     /**
+	  * 查询每期扣除处理中和成功代扣的金额，得出剩余未的还金额
+	  */
+	 BigDecimal getRestAmount(RepaymentBizPlanList list);
+	 
+	 
+     /**
+	  * 查询银行代扣线上应还金额
+	  */
+	 BigDecimal getOnlineAmount(RepaymentBizPlanList list);
+	 
+	 
+	 
+     /**
+	  * 查询银行代扣线下应还金额
+	  */
+	 BigDecimal getUnderlineAmount(RepaymentBizPlanList list);
+	 
+	 
+	 
+     /**
+	  * 查询当前期银行代扣成功次数
+	  */
+	 Integer getBankRepaySuccessCount(RepaymentBizPlanList list);
+	 
+	 
+	 
+	 
 }
 
