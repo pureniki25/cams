@@ -180,9 +180,10 @@
 		resultType="com.hongte.alms.base.vo.module.FinanceManagerListVO"
 		parameterType="com.hongte.alms.base.dto.FinanceManagerListReq">
 		SELECT
+			distinct 
 			pl.plan_id as planId,
 			pl.confirm_flag as confirmFlag,
-			distinct pl.plan_list_id as planListId,
+			pl.plan_list_id as planListId,
 			pl.business_id as businessId,
 			pl.orig_business_id as orgBusinessId,
 			pl.period as period,
