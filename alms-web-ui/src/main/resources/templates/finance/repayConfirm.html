@@ -29,63 +29,66 @@
                             应还日期：{{thisTimeRepaymentInfo.repayDate}}
                         </i-col>
                     </row>
-                    <row>
+                    <!-- <row>
                         <i-col span="24">
                             <p>本次应还：</p>
                             <p>
-                                <!-- 本次应还金额 -->
-                                <row>
-                                    <!-- 本金利息 -->
-                                    <i-col span="6">本金</i-col>
-                                    <i-col span="6">{{thisTimeRepaymentInfo.item10}}</i-col>
-                                    <i-col span="6">利息</i-col>
-                                    <i-col span="6">{{thisTimeRepaymentInfo.item20}}</i-col>
-                                </row>
-                                <row>
-                                    <!-- 服务费 平台费 -->
-                                    <i-col span="6">月收分公司服务费</i-col>
-                                    <i-col span="6">{{thisTimeRepaymentInfo.item30}}</i-col>
-                                    <i-col span="6">月收平台费</i-col>
-                                    <i-col span="6">{{thisTimeRepaymentInfo.item50}}</i-col>
-                                </row>
-                                <row>
-                                    <!-- 小计 逾期天数 -->
-                                    <i-col span="6">小计</i-col>
-                                    <i-col span="6">{{thisTimeRepaymentInfo.subtotal}}</i-col>
-                                    <i-col span="6">逾期天数</i-col>
-                                    <i-col span="6">{{thisTimeRepaymentInfo.overDays}}</i-col>
-                                </row>
-                                <row>
-                                    <!-- 线上逾期费 线下逾期费 -->
-                                    <i-col span="6">线下逾期费</i-col>
-                                    <i-col span="6">{{thisTimeRepaymentInfo.overDays}}</i-col>
-                                    <i-col span="6">线上逾期费</i-col>
-                                    <i-col span="6">{{thisTimeRepaymentInfo.overDays}}</i-col>
-                                </row>
-                                <row>
-                                    <!-- 减免金额 -->
-                                    <i-col span="6">减免金额</i-col>
-                                    <i-col span="6">{{thisTimeRepaymentInfo.derate}}</i-col>
-                                    <i-col span="6"></i-col>
-                                    <i-col span="6"></i-col>
-                                </row>
-                                <row>
-                                    <!-- 合计(含滞纳金) -->
-                                    <i-col span="6">合计(含滞纳金)</i-col>
-                                    <i-col span="6">{{thisTimeRepaymentInfo.total}}</i-col>
-                                    <i-col span="6"></i-col>
-                                    <i-col span="6"></i-col>
-                                </row>
-                            </p>
-                            <p v-if="thisTimeRepaymentInfo.derateDetails&&thisTimeRepaymentInfo.derateDetails.length>0">
-                                减免费用明细:
-                                <hr>
-                                <p v-for="item in thisTimeRepaymentInfo.derateDetails">
-                                    {{item.name}}:{{item.amount}}
-                                </p>
-                            </p>
+                               
                         </i-col>
-                    </row>
+                    </row> -->
+                    <card title="本次应还">
+                         <!-- 本次应还金额 -->
+                         <row>
+                            <!-- 本金利息 -->
+                            <i-col span="6">本金</i-col>
+                            <i-col span="6">{{thisTimeRepaymentInfo.item10}}</i-col>
+                            <i-col span="6">利息</i-col>
+                            <i-col span="6">{{thisTimeRepaymentInfo.item20}}</i-col>
+                        </row>
+                        <row>
+                            <!-- 服务费 平台费 -->
+                            <i-col span="6">月收分公司服务费</i-col>
+                            <i-col span="6">{{thisTimeRepaymentInfo.item30}}</i-col>
+                            <i-col span="6">月收平台费</i-col>
+                            <i-col span="6">{{thisTimeRepaymentInfo.item50}}</i-col>
+                        </row>
+                        <row>
+                            <!-- 小计 逾期天数 -->
+                            <i-col span="6">小计</i-col>
+                            <i-col span="6">{{thisTimeRepaymentInfo.subtotal}}</i-col>
+                            <i-col span="6">逾期天数</i-col>
+                            <i-col span="6">{{thisTimeRepaymentInfo.overDays}}</i-col>
+                        </row>
+                        <row>
+                            <!-- 线上逾期费 线下逾期费 -->
+                            <i-col span="6">线下逾期费</i-col>
+                            <i-col span="6">{{thisTimeRepaymentInfo.overDays}}</i-col>
+                            <i-col span="6">线上逾期费</i-col>
+                            <i-col span="6">{{thisTimeRepaymentInfo.overDays}}</i-col>
+                        </row>
+                        <row>
+                            <!-- 减免金额 -->
+                            <i-col span="6">减免金额</i-col>
+                            <i-col span="6">{{thisTimeRepaymentInfo.derate}}</i-col>
+                            <i-col span="6"></i-col>
+                            <i-col span="6"></i-col>
+                        </row>
+                        <row>
+                            <!-- 合计(含滞纳金) -->
+                            <i-col span="6">合计(含滞纳金)</i-col>
+                            <i-col span="6">{{thisTimeRepaymentInfo.total}}</i-col>
+                            <i-col span="6"></i-col>
+                            <i-col span="6"></i-col>
+                        </row>
+                    </p>
+                    <p v-if="thisTimeRepaymentInfo.derateDetails&&thisTimeRepaymentInfo.derateDetails.length>0">
+                        减免费用明细:
+                        <hr>
+                        <p v-for="item in thisTimeRepaymentInfo.derateDetails">
+                            {{item.name}}:{{item.amount}}
+                        </p>
+                    </p>
+                    </card>
                 </card>
             </i-col>
             <i-col span="12">

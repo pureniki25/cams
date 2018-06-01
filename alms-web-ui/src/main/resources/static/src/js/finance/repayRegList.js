@@ -18,7 +18,9 @@ window.layinit(function (htConfig) {
                 col: [
                     {
                         title: '流水号',
-                        key: 'moneyPoolId'
+                        key: 'moneyPoolId',
+                        ellipsis:true,
+                        width:250
                     }, {
                         title: '还款日期',
                         key: 'tradeDate',

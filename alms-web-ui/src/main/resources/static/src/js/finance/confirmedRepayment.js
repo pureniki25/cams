@@ -16,7 +16,9 @@ window.layinit(function (htConfig) {
             table: {
                 col: [{
                     title: '流水号',
-                    key: 'moneyPoolId'
+                    key: 'moneyPoolId',
+                    width:250,
+                    ellipsis:true,
                 }, {
                     title: '款项码',
                     key: 'repaymentCode'

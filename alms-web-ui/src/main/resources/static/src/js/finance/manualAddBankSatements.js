@@ -137,6 +137,13 @@ window.layinit(function (htConfig) {
                         app.curBankAccount = e.repaymentId||'' ;
                     }
                 })
+            },
+            'form.repaymentMoney':function(n,o){
+                var reg = /^\d{1,10}(\.\d{1,2})?$/;
+                if (!reg.test(n)) {
+                    app.$Message.error({content:'输入金额不符合要求，小数点前最多10位，小数点后最多2位'})
+                    app.form.repaymentMoney = 0
+                }
             }
         },
         created: function () {
