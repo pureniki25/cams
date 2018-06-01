@@ -98,6 +98,7 @@ window.layinit(function (htConfig) {
                 axios.post(fpath+'finance/appointBankStatement',params)
                 .then(function(res){
                     if(res.data.code=='1'){
+                        parent.location.reload()
                         app.cancel()
                     }else{
                         app.$Message.error({content:res.data.msg})
@@ -109,7 +110,9 @@ window.layinit(function (htConfig) {
             },
             cancel:function(){
                 app.$refs['form'].resetFields()
-                parent.app.closeModal();
+                //当你在iframe页面关闭自身时
+                var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                parent.layer.close(index); //再执行关闭 
                 // window.parent.app.closeModal('manualAddBankSatementsShow')
             }
         },
@@ -117,15 +120,18 @@ window.layinit(function (htConfig) {
             tradeType() {
                 return this.form.tradeType;
             },
-            acceptAcount(){
-                return this.form.acceptAcount;
+            acceptBank(){
+                return this.form.acceptBank;
             }
         },
         watch: {
             tradeType(n, o) {
+                app.form.acceptBank = ''
+                app.curBankAccount = ''
                 this.computeAcceptAccountLabel()
             },
-            acceptAcount(n,o){
+            acceptBank(n,o){
+                console.log(this.bankAccountList);
                 this.bankAccountList.forEach(e=>{
                     if(n==e.financeName){
                         app.curBankAccount = e.repaymentId||'' ;

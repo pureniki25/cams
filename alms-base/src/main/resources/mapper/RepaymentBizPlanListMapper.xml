@@ -129,17 +129,20 @@
     <select id="conutFinanceManagerList" resultType="int"
 		parameterType="com.hongte.alms.base.dto.FinanceManagerListReq">
 		SELECT
-			count(1)
+			count(distinct pl.plan_list_id)
 		FROM
 			tb_repayment_biz_plan_list pl
 		JOIN
 			tb_basic_business b ON b.business_id = pl.orig_business_id
 		LEFT JOIN
 			tb_basic_company bc ON bc.area_id = b.company_id
+		LEFT JOIN
+			tb_tuandai_project_info pi ON pi.business_id = pl.business_id
 		<where>
 			1 = 1
 			<if test="customer != null">
-				AND b.customer_name = #{customer}
+				<!-- AND b.customer_name = #{customer} -->
+				AND pi.real_name = #{customer}
 			</if>
 			<if test="businessId != null">
 				AND pl.orig_business_id = #{businessId}
@@ -218,10 +221,13 @@
 			tb_basic_business_customer bbc ON b.business_id = bbc.business_id
 		LEFT JOIN
 			tb_basic_company bc ON bc.area_id = b.company_id
+		LEFT JOIN
+			tb_tuandai_project_info pi ON pi.business_id = pl.business_id
 		<where>
 			1 = 1
 			<if test="customer != null">
-				AND b.customer_name = #{customer}
+				<!-- AND b.customer_name = #{customer} -->
+				AND pi.real_name = #{customer}
 			</if>
 			<if test="businessId != null">
 				AND pl.orig_business_id = #{businessId}
