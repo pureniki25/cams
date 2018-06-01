@@ -1,4 +1,4 @@
-package com.hongte.alms.withhold.service;
+package com.hongte.alms.withhold.feignClient;
 
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.hongte.alms.base.feignClient.dto.AddProjectTrackReqDto;
 import com.hongte.alms.base.feignClient.dto.BankRechargeReqDto;
+import com.hongte.alms.base.feignClient.dto.BaofuRechargeReqDto;
+import com.hongte.alms.base.feignClient.dto.YiBaoRechargeReqDto;
 import com.ht.ussp.core.Result;
 
 /**
@@ -17,7 +19,7 @@ import com.ht.ussp.core.Result;
 
 
 @FeignClient(value = "eip-out")
-public interface EipOutRechargeService {
+public interface EipOutRechargeRemote {
 	
      /*
       * 银行代扣
@@ -27,9 +29,19 @@ public interface EipOutRechargeService {
     
     
     /*
-     * 第三方代扣
+     * 宝付代扣
      */
     
-    @RequestMapping(value = "/eip/td/assetside/autoRecharge",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
-    String platfromRecharge(@RequestBody BankRechargeReqDto dto);
+    @RequestMapping(value = "/eip/td/backTransRequest",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+    String baofuRecharge(@RequestBody BaofuRechargeReqDto dto);
+    
+    
+    
+    /*
+     * 易宝代扣
+     */
+    
+    @RequestMapping(value = "/eip/td/tzt/invokeBindBankCard",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+    String yibaoRecharge(@RequestBody YiBaoRechargeReqDto dto);
+    
 }
