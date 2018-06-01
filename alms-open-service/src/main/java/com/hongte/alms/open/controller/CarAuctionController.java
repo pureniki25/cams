@@ -30,6 +30,7 @@ import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.vo.PageResult;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RestController
@@ -107,15 +108,17 @@ public class CarAuctionController {
 			}
 			CarAuction carAuction=auctions.get(0);
 			//判断当前是否还在拍卖时间
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 			long startTime=carAuction.getAuctionStartTime().getTime();
-			long endtTime=carAuction.getAuctionEndTime().getTime();
+			//获取第二天，比如活动时间设置为2018-05-06，是包含这一天的
+			long endTime=dateFormat.parse(dateFormat.format(carAuction.getAuctionEndTime())).getTime()*24*60*60*1000L;
 			long currentTime=System.currentTimeMillis();
-			if(!(currentTime>=startTime&&currentTime<=endtTime)) {
+			if(!(currentTime>=startTime&&currentTime<endTime)) {
 				logger.error("不在活动时间内,auctionStartTime="+carAuction.getAuctionStartTime()+",auctionEndTime"+carAuction.getAuctionEndTime());
 				return Result.error("9999", "不在活动时间内");
 			}
 			//查询竞价记录
-			List<CarAuctionPriceLog> bidLogs=carAuctionPriceLogService.selectList(new EntityWrapper<CarAuctionPriceLog>().eq("auction_id", req.getAuctionId()).eq("bidder_tel", req.getTelephone()));
+			List<CarAuctionPriceLog> bidLogs=carAuctionPriceLogService.selectList(new EntityWrapper<CarAuctionPriceLog>().eq("auction_id", req.getAuctionId()).eq("user_id", req.getUserId()));
 			if(bidLogs.size()>=3) {
 				logger.error("超过3次竞价,auction_id="+req.getAuctionId()+",reg_tel"+req.getTelephone());
 				return Result.error("9999", "已经超过报价次数，不能报价");
@@ -146,6 +149,10 @@ public class CarAuctionController {
 			 MyBidsVo myBidsVo = new MyBidsVo();
 			 myBidsVo.setBidTime(bid.getCreateTime());
 			 myBidsVo.setBidPrice(bid.getPrice());
+			 myBidsVo.setUserName(bid.getUsername());
+			 myBidsVo.setIdCard(bid.getBidderCertId());
+			 myBidsVo.setTelephone(bid.getBidderTel());
+			 myBidsVo.setRemark(bid.getRemark());
 			 myBidsList.add(myBidsVo);
 		 }
 		 return Result.build("0","请求成功",myBidsList);
