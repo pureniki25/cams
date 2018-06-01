@@ -20,7 +20,7 @@ public class BaofuRechargeReqDto implements Serializable {
 	 private String validDate      ;
 	 private String validNo        ;
 	 private String transId        ;
-	 private String txnAmt         ;
+	 private Double txnAmt         ;
 	 private String tradeDate      ;
 	 private String additionalInfo ;
 	 private String reqReserved    ;
@@ -92,10 +92,10 @@ public class BaofuRechargeReqDto implements Serializable {
 		public void setTransId(String transId) {
 			this.transId = transId;
 		}
-		public String getTxnAmt() {
+		public Double getTxnAmt() {
 			return txnAmt;
 		}
-		public void setTxnAmt(String txnAmt) {
+		public void setTxnAmt(Double txnAmt) {
 			this.txnAmt = txnAmt;
 		}
 		public String getTradeDate() {

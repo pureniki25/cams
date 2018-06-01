@@ -22,6 +22,26 @@ window.layinit(function (htConfig) {
         	repayOtherFeeFlag: false, // 其他费用弹窗控制标识(业务维度)
         	repayProjOtherFeeFlag: false, // 其他费用弹窗控制标识（标维度）
         	
+        	// -- 实还流水 --
+        	actualPaymentRecordList: [	
+        		{
+	        		afterId: '',	// 期数
+	        		receivedTotal: '', // 实还合计
+	        		
+	        		//  -- 单条实还流水 --
+	        		actualPaymentSingleRecordList: [  
+	        			{
+		        			currentAmount: '',	//	交易金额
+		        			incomeType: '',	//	收支类型
+		        			tradeTime: '',	//	交易时间
+		        			tradeType: '',	//	交易方式
+		        			accountName: ''	//	账户名称
+	        			}
+	        		]
+        		}
+        	],
+        	
+        	actualPaymentRecordAfterIdNullList: [],	// -- 实还流水afterId为空的数据 --
         	
         	// 还款计划表头  -- start --
         	repayPlanColumns: [
@@ -237,6 +257,33 @@ window.layinit(function (htConfig) {
             	});
             },
             /*
+             * 根据业务编号查找实还流水
+             */
+            queryActualPaymentByBusinessId: function(){
+            	axios.get(financeBasePath +"finance/queryActualPaymentByBusinessId?businessId=" + businessId)
+            	.then(function (res) {
+            		if (res.data.data != null && res.data.code == 1) {
+            			
+            			app.actualPaymentRecordList = res.data.data.actualPaymentLogDTOs;
+            			app.actualPaymentRecordAfterIdNullList = res.data.data.singleLogDTOs;
+            		
+            			if (res.data.data.actualPaymentLogDTOs != null && res.data.data.actualPaymentLogDTOs.length > 0) {
+            				
+							for (var i = 0; i < res.data.data.actualPaymentLogDTOs.length; i++) {
+								
+								app.actualPaymentRecordList[i].actualPaymentSingleRecordList = app.actualPaymentRecordList[i].actualPaymentSingleLogDTOs;
+								
+							}
+						}
+            		} else {
+            			app.$Modal.error({content: res.data.msg });
+            		}
+            	})
+            	.catch(function (error) {
+            		app.$Modal.error({content: '接口调用异常!'});
+            	});
+            },
+            /*
              * 为类型增加点击事件	
              */
             addEventForType: function(item){
@@ -295,6 +342,7 @@ window.layinit(function (htConfig) {
         created: function () {
         	this.initBaseInfo();
         	this.queryRepaymentPlanInfoByBusinessId();
+        	this.queryActualPaymentByBusinessId();
         }
     })
 })

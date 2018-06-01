@@ -53,5 +53,5 @@ public interface RepaymentBizPlanMapper extends SuperMapper<RepaymentBizPlan> {
      * @param businessId
      * @return
      */
-    BigDecimal queryLoanBalanceByBusinessId(String businessId);
+    BigDecimal queryLoanBalanceByBusinessId(@Param(value="businessId") String businessId);
 }
