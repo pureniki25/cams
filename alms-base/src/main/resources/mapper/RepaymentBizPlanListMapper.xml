@@ -259,6 +259,7 @@
 				AND pl.current_status = #{status}
 			</if>
 		</where>
+		order by pl.due_date
 		limit ${(curPage-1)*pageSize} , ${pageSize}
 	</select>
 
