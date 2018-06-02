@@ -18,6 +18,18 @@ public class MyBidsVo {
     @ApiModelProperty(value = "报价金额", name = "bidPrice")
     private BigDecimal bidPrice;
 
+    @ApiModelProperty(value="身份证号码",name="idCard")
+    private String idCard;
+
+    @ApiModelProperty(value="用户姓名",name="userName")
+    private String userName;
+
+    @ApiModelProperty(value="联系方式",name="telephone")
+    private String   telephone;
+
+    @ApiModelProperty(value="备注",name="remark")
+    private  String  remark;
+
     public Date getBidTime() {
         return bidTime;
     }
@@ -34,6 +46,35 @@ public class MyBidsVo {
         this.bidPrice = bidPrice;
     }
 
+    public String getIdCard() {
+        return idCard;
+    }
 
+    public void setIdCard(String idCard) {
+        this.idCard = idCard;
+    }
 
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getTelephone() {
+        return telephone;
+    }
+
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
 }

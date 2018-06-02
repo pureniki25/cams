@@ -7,13 +7,13 @@
     <title>Insert title here</title>
     <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css" />
     <link rel="stylesheet" type="text/css" href="/plugins/iview/2.13.1/css/iview.css" />
-    <title>本期款项池银行流水</title>
+    <title>本期已匹配款项池银行流水</title>
 </head>
 
 <body>
     <div id="app" v-cloak>
         <Spin size="large" fix v-if="spinShow"></Spin>
-        <card title="本期款项池银行流水">
+        <card title="本期已匹配款项池银行流水">
             <i-table stripe :columns="table.col" :data="table.data"></i-table>
         </card>
     </div>

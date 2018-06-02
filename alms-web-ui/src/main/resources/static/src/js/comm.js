@@ -95,6 +95,9 @@ var APPLY_DERATE_LAST_STATUS = "400"
 function ArabicToChinese(n) {
 
     if(n==''){
+        if(n==0){
+            return '零'
+        }
         return n
     }
     if (!/^(0|[1-9]\d*)(\.\d+)?$/.test(n)){

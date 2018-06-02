@@ -6,6 +6,7 @@ package com.hongte.alms.finance.controller;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
@@ -58,6 +60,8 @@ import com.hongte.alms.base.vo.finance.CurrPeriodRepaymentInfoVO;
 import com.hongte.alms.base.vo.finance.RepaymentSettleListVO;
 import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
 import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.util.DateUtil;
+import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.finance.req.MoneyPoolReq;
 import com.hongte.alms.finance.service.FinanceService;
@@ -152,9 +156,9 @@ public class FinanceController {
 				: basicBusiness.getOperatorName());
 		r.put("customerName", basicBusiness.getCustomerName());
 		r.put("repaymentType", basicRepaymentType.getRepaymentTypeName());
-		r.put("repayDate", repaymentBizPlanList.getDueDate());
+		r.put("repayDate", DateUtil.formatDate(repaymentBizPlanList.getDueDate()));
 		r.put("repayAmount", repaymentBizPlanList.getTotalBorrowAmount());
-		r.put("borrowAmount", outPutMoney);
+		r.put("borrowAmount", basicBusiness.getBorrowMoney());
 		r.put("borrowLimit", basicBusiness.getBorrowLimit());
 		r.put("borrowLimitUnit", basicBusiness.getBorrowLimitUnit());
 		r.put("borrowRate", basicBusiness.getBorrowRate());
@@ -247,6 +251,24 @@ public class FinanceController {
 		CompanySortByPINYINUtil.sortByPINYIN(company_list);
 		result = Result.success(company_list);
 		logger.info("@getCompanys@获取所有分公司数据--结束[{}]", result);
+		return result;
+	}
+	
+	@GetMapping(value = "/getAreaCompany")
+	@ApiOperation(value = "获取所有区域分公司数据")
+	public Result getAreaCompany() {
+		logger.info("@getCompanys@获取所有分公司数据--开始[]");
+		Result result;
+		Map<String, Object> retMap = new HashMap<>();
+		//区域
+        List<BasicCompany> area_list = basicCompanyService.selectList(new EntityWrapper<BasicCompany>().eq("area_level",AreaLevel.AREA_LEVEL.getKey()));
+        retMap.put("area", (JSONArray) JSON.toJSON(area_list,JsonUtil.getMapping()));
+        //公司
+        List<BasicCompany> company_list = basicCompanyService.selectList(new EntityWrapper<BasicCompany>().eq("area_level",AreaLevel.COMPANY_LEVEL.getKey()));
+        CompanySortByPINYINUtil.sortByPINYIN(company_list);
+        retMap.put("company",(JSONArray) JSON.toJSON(company_list,JsonUtil.getMapping()));
+        result = Result.success(retMap);
+        logger.info("@getCompanys@获取所有分公司数据--结束[{}]", result);
 		return result;
 	}
 

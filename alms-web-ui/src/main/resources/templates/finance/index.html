@@ -26,7 +26,7 @@
                     <form-item label="业务编号">
                         <i-input v-model="form.businessId"></i-input>
                     </form-item>
-                    <form-item label="是否本金到期">
+                    <!-- <form-item label="是否本金到期">
                         <i-select v-model="form.principalDeadLine" placeholder="请选择">
                             <i-option value="1">是</i-option>
                             <i-option value="0">否</i-option>
@@ -36,26 +36,35 @@
                         <i-select v-model="form.accountantConfirmStatus" placeholder="请选择" style="width: 100px">
                             <i-option v-for="item in accountingConfirmStatus" :value="item.paramValue" >{{item.paramName}}</i-option>
                         </i-select>
+                    </form-item> -->
+                    <form-item label="区域">
+                        <i-select v-model="form.areaId" placeholder="请选择" filterable style="width: 180px" clearable>
+                            <i-option v-for="item in areaList" :value="item.areaId" :key="item.areaId" >{{item.areaName}}</i-option>
+                        </i-select>
                     </form-item>
                     <form-item label="分公司">
-                        <i-select v-model="form.companyId" placeholder="请选择" filterable style="width: 180px">
-                            <i-option v-for="item in companys" :value="item.areaId" >{{item.areaName}}</i-option>
+                        <i-select v-model="form.companyId" placeholder="请选择" filterable style="width: 180px" clearable>
+                            <i-option v-for="item in companys" :value="item.areaId" :key="item.areaId" >{{item.areaName}}</i-option>
                         </i-select>
                     </form-item>
                     <form-item label="业务类型">
-                        <i-select v-model="form.businessType" placeholder="请选择" filterable>
+                        <i-select v-model="form.businessType" placeholder="请选择" filterable clearable>
                             <i-option v-for="item in businessTypes" :value="item.businessTypeId" >{{item.businessTypeName}}</i-option>
                         </i-select>
                     </form-item>
                     <form-item label="还款日期">
-                        <date-picker format="yyyy-MM-dd" v-model="form.repayDate" placeholder="还款日期"></date-picker>
+                        <date-picker format="yyyy-MM-dd" v-model="form.repayDate" placeholder="还款日期" clearable></date-picker>
                     </form-item>
                     <form-item label="还款登记日期">
-                        <date-picker type="daterange" split-panels format="yyyy-MM-dd" v-model="form.regDate" placeholder="还款登记日期"></date-picker>
+                        <date-picker type="daterange" split-panels format="yyyy-MM-dd" v-model="form.regDate" placeholder="还款登记日期" clearable></date-picker>
                     </form-item>
-                    <form-item label="贷后状态">
-                        <i-select v-model="form.status" placeholder="请选择" filterable>
-                            <i-option v-for="item in collectionStatus" :value="item.paramValue" >{{item.paramName}}</i-option>
+                    <form-item label="还款状态">
+                        <i-select v-model="form.status" placeholder="请选择" filterable clearable>
+                            <!-- <i-option v-for="item in collectionStatus" :value="item.paramValue" >{{item.paramName}}</i-option> -->
+                            <i-option value="还款中">还款中</i-option>
+                            <i-option value="逾期">逾期</i-option>
+                            <i-option value="已还款">已还款</i-option>
+                            <i-option value="已结清">已结清</i-option>
                         </i-select>
                     </form-item>
                     <form-item>

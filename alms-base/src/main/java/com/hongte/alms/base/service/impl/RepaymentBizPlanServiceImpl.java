@@ -299,7 +299,7 @@ public class RepaymentBizPlanServiceImpl extends BaseServiceImpl<RepaymentBizPla
 		List<RepaymentSettleListVO> currents = new ArrayList<>();
 		RepaymentSettleListVO curr = null ;
 		findCurrentPeriod(finalVO, list, currents, curr);
-
+		//TODO
 		
 		return repaymentBizPlanMapper.listRepaymentSettleListVOs(businessId, planId);
 	}

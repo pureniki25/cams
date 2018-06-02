@@ -13,7 +13,9 @@ window.layinit(function (htConfig) {
         data: {
             show: true,
             accountingConfirmStatus: [],
+            areaList:[],
             companys: [],
+            companyList:[],
             businessTypes: [],
             collectionStatus: [],
             form: {
@@ -23,6 +25,7 @@ window.layinit(function (htConfig) {
                 businessId: '',
                 principalDeadLine: '',
                 accountantConfirmStatus: '',
+                areaId:'',
                 companyId: '',
                 businessType: '',
                 repayDate: '',
@@ -293,6 +296,23 @@ window.layinit(function (htConfig) {
                 total: 0
             }
         },
+        watch:{
+            'form.areaId':function(n){
+                if(n){
+                    app.companys = []
+                    app.companyList.forEach(e=>{
+                        if(e.areaPid===n){
+                            app.companys.push(e)
+                        }
+                    })
+                }else{
+                    app.companyList.forEach(e=>{
+                        app.companys.push(e)
+                    })
+                }
+               
+            }
+        },
         methods: {
             search: function () {
                 let params = {}
@@ -339,7 +359,24 @@ window.layinit(function (htConfig) {
             }
         },
         created: function () {
-            axios.get(cpath + 'sys/param/getParam', { params: { paramType: '会计确认状态' } })
+
+
+                //取区域列表
+                axios.get(fpath + 'finance/getAreaCompany')
+                    .then(function (res) {
+                        if (res.data.code == "1") {
+                            app.areaList = res.data.data.area;
+                            app.companyList = res.data.data.company;
+                        } else {
+                            app.$Message.error({content: '操作失败，消息：' + res.data.msg});
+                        }
+                    })
+                    .catch(function (error) {
+                        vm.$Message.error({content: '接口调用异常!'});
+                    });
+
+
+           /*  axios.get(cpath + 'sys/param/getParam', { params: { paramType: '会计确认状态' } })
                 .then(function (res) {
                     if (res.data.code == '1') {
                         app.accountingConfirmStatus = res.data.data
@@ -350,7 +387,7 @@ window.layinit(function (htConfig) {
                 })
                 .catch(function (err) {
                     app.$Message.error({ content: '获取会计确认状态失败' })
-                })
+                }) */
 
             axios.get(fpath + 'finance/getCompanys')
                 .then(function (res) {
@@ -378,7 +415,7 @@ window.layinit(function (htConfig) {
                     app.$Message.error({ content: '获取业务类型失败' })
                 })
 
-            axios.get(cpath + 'sys/param/getParam', { params: { paramType: '贷后状态' } })
+           /*  axios.get(cpath + 'sys/param/getParam', { params: { paramType: '贷后状态' } })
                 .then(function (res) {
                     if (res.data.code == '1') {
                         app.collectionStatus = res.data.data
@@ -390,7 +427,7 @@ window.layinit(function (htConfig) {
                 .catch(function (err) {
                     app.$Message.error({ content: '获取贷后状态失败' })
                 })
-
+ */
             this.search()
         }
     })

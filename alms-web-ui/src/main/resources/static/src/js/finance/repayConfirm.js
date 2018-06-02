@@ -225,7 +225,7 @@ window.layinit(function (htConfig) {
                     type: 2,
                     title: '手动匹配流水',
                     content: [url, 'no'],
-                    area: ['1600px', '800px'],
+                    area: ['40%', '90%'],
                     success: function (layero, index) {
                         curIndex = index;
                     }
@@ -236,8 +236,8 @@ window.layinit(function (htConfig) {
                 layer.open({
                     type: 2,
                     title: '手动新增流水',
-                    content: [url, 'no'],
-                    area: ['1600px', '800px'],
+                    content: [url],
+                    area: ['40%', '90%'],
                     success: function (layero, index) {
                         curIndex = index;
                     }
