@@ -343,20 +343,27 @@ window.layinit(function (htConfig) {
                     param.afterId = afterId;
                     param = Object.assign(app.factRepaymentInfo, param);
                     
-                    axios.post(fpath + 'finance/confirmRepayment', param)
-                    .then(function (res) {
-                        if (res.data.code == '1') {
-                            app.handleConfirmRepaymentResult(res)
-                            
-                            window.location.reload()
-                        }else{
-                            app.factRepaymentInfo.surplusFund = 0
-                            app.$Message.error({content:res.data.msg})
+                    app.$Modal.confirm({
+                        content:'确认本次还款?',
+                        onOk(){
+                            axios.post(fpath + 'finance/confirmRepayment', param)
+                            .then(function (res) {
+                                if (res.data.code == '1') {
+                                    app.handleConfirmRepaymentResult(res)
+                                    
+                                    window.location.reload()
+                                }else{
+                                    app.factRepaymentInfo.surplusFund = 0
+                                    app.$Message.error({content:res.data.msg})
+                                }
+                            })
+                            .catch(function (err) {
+                                console.log(err);
+                            })
                         }
                     })
-                    .catch(function (err) {
-                        console.log(err);
-                    })
+                    
+                    
             },
         },
         created: function () {
