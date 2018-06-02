@@ -13,7 +13,7 @@ public class BizDto  implements Serializable {
 
     private String orgBusinessId; //原始业务编号
 
-    private Integer businessType ;//业务类型
+    private String businessType ;//业务类型
     private Boolean hasDeffer; //是否已经展期
 
     private Boolean isOver;//是否已经结清
@@ -84,14 +84,14 @@ public class BizDto  implements Serializable {
 	/**
 	 * @return the businessType
 	 */
-	public Integer getBusinessType() {
+	public String getBusinessType() {
 		return businessType;
 	}
 
 	/**
 	 * @param businessType the businessType to set
 	 */
-	public void setBusinessType(Integer businessType) {
+	public void setBusinessType(String businessType) {
 		this.businessType = businessType;
 	}
 }
