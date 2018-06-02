@@ -48,7 +48,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class RepaymentProjPlanListServiceImpl extends
 		BaseServiceImpl<RepaymentProjPlanListMapper, RepaymentProjPlanList> implements RepaymentProjPlanListService {
 	
-    //进位方式枚举
+
+
+	//进位方式枚举
     private  RoundingMode roundingMode=RoundingMode.HALF_UP;
     
 	@Autowired
@@ -77,8 +79,10 @@ public class RepaymentProjPlanListServiceImpl extends
 	@Qualifier("RepaymentBizPlanListService")
 	RepaymentBizPlanListService repaymentBizPlanListService;
 	
-	@Transactional(rollbackFor = Exception.class)
-	private void calLateFee() throws InstantiationException, IllegalAccessException {
+	
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+	public void calLateFee() {
 		// 所有业务贷后生成的业务
 		List<BasicBusiness> basicBusiness = basicBusinessService
 				.selectList((new EntityWrapper<BasicBusiness>().eq("creat_sys_type", 2)));
