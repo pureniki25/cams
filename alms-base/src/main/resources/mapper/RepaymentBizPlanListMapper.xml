@@ -152,7 +152,7 @@
 				#{accountantConfirmStatus}
 			</if>
 			<if test="areaId != null">
-				AND bc.area_id = #{areaId}
+				AND bc.area_pid = #{areaId}
 			</if>
 			<if test="companyId != null">
 				AND b.company_name = #{companyId}
@@ -238,7 +238,7 @@
 				#{accountantConfirmStatus}
 			</if>
 			<if test="areaId != null">
-				AND bc.area_id = #{areaId}
+				AND bc.area_pid = #{areaId}
 			</if>
 			<if test="companyId != null">
 				AND b.company_name = #{companyId}

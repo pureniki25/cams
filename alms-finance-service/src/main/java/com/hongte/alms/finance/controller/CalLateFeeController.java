@@ -87,7 +87,7 @@ public class CalLateFeeController {
 	private RepaymentBizPlanService repaymentBizPlanService ;
 	
 	@Autowired
-	@Qualifier("RepaymentBizPlanListService")
+	@Qualifier("RepaymentProjPlanListService")
 	RepaymentProjPlanListService repaymentProjPlanListService;
 	@Autowired
 	private LoginUserInfoHelper loginUserInfoHelper ;
