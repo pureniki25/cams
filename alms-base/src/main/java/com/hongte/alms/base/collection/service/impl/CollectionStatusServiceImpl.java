@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.collection.dto.CollectionStatusCountDto;
 import com.hongte.alms.base.collection.entity.*;
+import com.hongte.alms.base.collection.entity.Collection;
 import com.hongte.alms.base.collection.enums.CollectionCrpTypeEnum;
 import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
 import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
@@ -11,16 +12,18 @@ import com.hongte.alms.base.collection.enums.StaffPersonType;
 import com.hongte.alms.base.collection.mapper.CollectionStatusMapper;
 import com.hongte.alms.base.collection.service.*;
 import com.hongte.alms.base.collection.vo.StaffBusinessVo;
+import com.hongte.alms.base.entity.CarBusinessAfter;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
-import com.hongte.alms.base.service.RepaymentBizPlanListDetailService;
+import com.hongte.alms.base.feignClient.CollectionSynceToXindaiRemoteApi;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.RepaymentBizPlanService;
 import com.hongte.alms.base.service.TransferOfLitigationService;
+import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.Constant;
-import com.hongte.alms.common.util.RandomUtil;
 import com.ht.ussp.bean.LoginUserInfoHelper;
+import com.ht.ussp.client.dto.LoginInfoDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +86,9 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
     @Autowired
     @Qualifier("TransferOfLitigationService")
     TransferOfLitigationService transferLitigationService;
+
+    @Autowired
+    CollectionSynceToXindaiRemoteApi collectionSynceToXindaiRemoteApi;
 
     /**
      * 设置电催/人员(界面手动设置)
@@ -252,6 +258,105 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
     }
 
     /**
+     * 同步业务的贷后状态到信贷
+     * @param voList
+     * @param staffUserId
+     * @param describe
+     * @param staffType
+     * @return
+     */
+    public  boolean SyncBusinessColStatusToXindai(
+            List<StaffBusinessVo> voList,
+            String staffUserId,
+            String describe ,
+            String staffType
+    ){
+        LoginInfoDto dto =loginUserInfoHelper.getUserInfoByUserId(staffUserId,null);
+        for(StaffBusinessVo businessVo:voList){
+
+            if(businessVo.getCrpId()==null){
+                List<RepaymentBizPlan> plans = repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("original_business_id",businessVo.getBusinessId()).orderBy("create_time desc"));
+                String crpId = "";
+                if(plans.size()>0){
+                    RepaymentBizPlan plan = plans.get(0);
+                    List<RepaymentBizPlanList> planLists = repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id",plan.getPlanId()).orderBy("create_time desc"));
+                    if(planLists.size()>0){
+                        crpId = planLists.get(0).getPlanListId();
+                    }
+                }
+                businessVo.setCrpId(crpId);
+            }
+
+            RepaymentBizPlanList list =  repaymentBizPlanListService.selectById(businessVo.getCrpId());
+            if(staffType.equals(CollectionStatusEnum.PHONE_STAFF.getPageStr())){
+                //电催
+                CarBusinessAfter carBusinessAfter  = new CarBusinessAfter();
+                carBusinessAfter.setCarBusinessId(businessVo.getBusinessId());
+
+
+                carBusinessAfter.setCarBusinessAfterId(list.getAfterId());
+
+
+                if(dto!=null&&dto.getBmUserId()!=null){
+                    carBusinessAfter.setCollectionUser(dto.getBmUserId());
+                }else{
+                    logger.error("设置电催人员,同步电催设置到信贷,找不到信贷用户信息，信息："+ JSON.toJSONString(businessVo)+"  staffUserId:"+staffUserId);
+                    continue;
+                }
+
+                carBusinessAfter.setCollectionRemark(describe);
+                Result result = collectionSynceToXindaiRemoteApi.transferOnePhoneSetToXd(carBusinessAfter);
+                if(!result.getCode().equals(1)){
+                    logger.error("设置电催人员,同步电催设置到信贷失败，信息："+ JSON.toJSONString(businessVo)+"  staffUserId:"+staffUserId);
+                }
+
+            }else if(staffType.equals(CollectionStatusEnum.COLLECTING.getPageStr())){
+                //催收
+                Collection collection = new Collection();
+                collection.setBusinessId(businessVo.getBusinessId());
+                collection.setAfterId(list.getAfterId());
+                collection.setStatus("催款中");
+                if(dto!=null&&dto.getBmUserId()!=null){
+                    collection.setCollectionUser(dto.getBmUserId());
+                }else{
+                    logger.error("设置催收人员,同步催收设置到信贷,找不到信贷用户信息，信息："+ JSON.toJSONString(businessVo)+"  staffUserId:"+staffUserId);
+                    continue;
+                }
+                collection.setAssignRemark(describe);
+                LoginInfoDto userDro = loginUserInfoHelper.getLoginInfo();
+                collection.setCreateUser(userDro.getBmUserId());
+                collection.setCreateTime(new Date());
+                Result result = collectionSynceToXindaiRemoteApi.transferOneVisitSetToXd(collection);
+                if(!result.getCode().equals(1)){
+                    logger.error("设置催收人员,同步催收设置到信贷失败，信息："+ JSON.toJSONString(businessVo)+"  staffUserId:"+staffUserId);
+                }
+            }
+            else {
+                Collection collection = new Collection();
+                collection.setBusinessId(businessVo.getBusinessId());
+                collection.setAfterId(list.getAfterId());
+                collection.setStatus(CollectionStatusEnum.getByPageStr(staffType).getName());
+                collection.setCreateUser("admin");
+                collection.setCreateTime(new Date());
+                Result result = collectionSynceToXindaiRemoteApi.transferOneVisitSetToXd(collection);
+                if(!result.getCode().equals(1)){
+                    logger.error("设置催收人员,同步催收设置到信贷失败，信息："+ JSON.toJSONString(businessVo)+"  staffUserId:"+staffUserId);
+                }
+            }
+        }
+
+                return true;
+
+    }
+
+
+
+
+
+
+
+
+    /**
      * 根据业务逻辑取得当前应该设置的催收状态
      * @param status
      * @param setTypeStatus
@@ -379,12 +484,15 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
         vo.setCrpId(planListId);
         // 将StaffBusinessVo 放入list
         voList.add(vo);
-        return setBusinessStaff(
+        boolean bl= setBusinessStaff(
                 voList,
                 staffUserId,
                 "定时任务自动分配",
                 staffType,
                 CollectionSetWayEnum.AUTO_SET);
+
+        SyncBusinessColStatusToXindai(voList,staffUserId,"定时任务自动分配",staffType);
+        return bl;
     };
 
     /**
@@ -413,6 +521,8 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
             //自动移交电催
             if(phonePersons.size()>0){
                 setBusinessPhoneStaff(companyId, phonePersons, daysBeforeOverDue,businessType);
+
+
             }
             //自动移交催收
             if(visitPersons.size()>0){
@@ -605,6 +715,16 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                         "自动移交法务",
                         CollectionStatusEnum.TO_LAW_WORK,
                         CollectionSetWayEnum.AUTO_SET);
+
+                List<StaffBusinessVo> voList = new LinkedList<>();
+                StaffBusinessVo vo  = new StaffBusinessVo();
+                vo.setCrpId(planList.getPlanListId());
+                vo.setBusinessId(repaymentBizPlan.getOriginalBusinessId());
+                voList.add(vo);
+
+                //同步贷后状态到信贷
+                SyncBusinessColStatusToXindai(voList,null,"定时任务自动分配",CollectionStatusEnum.TO_LAW_WORK.getPageStr());
+
             }catch (Exception e){
                 logger.error("自動移交法务异常",e);
                 e.printStackTrace();

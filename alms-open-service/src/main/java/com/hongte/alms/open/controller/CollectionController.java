@@ -3,17 +3,27 @@
  */
 package com.hongte.alms.open.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.hongte.alms.base.collection.entity.Collection;
+import com.hongte.alms.base.collection.entity.Parametertracelog;
+import com.hongte.alms.base.entity.CarBusinessAfter;
 import com.hongte.alms.base.service.CarBasicService;
+import com.hongte.alms.common.util.ErroInfoUtil;
+import com.hongte.alms.open.feignClient.CollectionRemoteApi;
+import com.hongte.alms.open.service.CollectionXindaiService;
+import com.hongte.alms.open.util.XinDaiEncryptUtil;
+import com.hongte.alms.open.vo.RequestData;
+import com.hongte.alms.open.vo.ResponseData;
+import feign.Feign;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
 import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
@@ -22,6 +32,8 @@ import com.hongte.alms.base.collection.service.CollectionStatusService;
 import com.hongte.alms.common.result.Result;
 
 import io.swagger.annotations.Api;
+
+import javax.validation.Valid;
 
 /**
  * @author 王继光
@@ -45,6 +57,12 @@ public class  CollectionController {
 	@Autowired
 	@Qualifier("CollectionLogService")
 	CollectionLogService collectionLogService ;
+
+	@Autowired
+	CollectionRemoteApi collectionRemoteApi;
+
+	@Value(value="${bmApi.apiUrl:http://127.0.0.1}")
+	private String apiUrl;
 
 	/**
 	 * 财务确认结清，信贷调用此接口  更新贷后相关状态
@@ -123,6 +141,7 @@ public class  CollectionController {
 	 * @param businessId
 	 * @return
 	 */
+	@ApiOperation(value = "财务撤销结清，信贷调用此接口   更新贷后相关状态")
 	@PostMapping("/settleRevoke")
 	@ResponseBody
 	@Transactional
@@ -146,6 +165,298 @@ public class  CollectionController {
 
 
 	}
+
+	/**
+	 * 同步电催人员
+	 * @param carBusinessAfter
+	 * @return
+	 */
+	@ApiOperation(value = "同步电催人员 接口")
+	@PostMapping("/setPhoneStaff")
+	@ResponseBody
+	@Transactional
+	public Result transferOnePhoneSet(@RequestBody @Valid CarBusinessAfter carBusinessAfter, BindingResult bindingResult){
+
+		logger.info("同步电催人员 开始 输入的请求信息：[{}]", JSON.toJSONString(carBusinessAfter));
+		if(bindingResult.hasErrors()){
+			String errorStr = ErroInfoUtil.getErroeInfo(bindingResult);
+			logger.info("同步电催人员 接口,输入参数校验错误：" ,errorStr);
+			return Result.error("500","输入参数校验错误："+errorStr);
+		}
+
+		Result ret = collectionRemoteApi.transferOnePhoneSet(carBusinessAfter);
+
+		logger.info("同步电催人员 结束，结果：" ,ret.getMsg());
+
+		return ret;
+	}
+
+	/**
+	 * 同步催收人员
+	 * @param collection
+	 * @return
+	 */
+	@ApiOperation(value = "同步催收人员 接口")
+	@PostMapping("/transferOneVisitStaffSet")
+	@ResponseBody
+	@Transactional
+	public Result transferOneVisitStaffSet(@RequestBody @Valid Collection collection, BindingResult bindingResult){
+
+		logger.info("同步催收人员 开始 输入的请求信息：[{}]", JSON.toJSONString(collection));
+		if(bindingResult.hasErrors()){
+			String errorStr = ErroInfoUtil.getErroeInfo(bindingResult);
+			logger.info("同步催收人员 接口,输入参数校验错误：" ,errorStr);
+			return Result.error("500","输入参数校验错误："+errorStr);
+		}
+		Result ret = collectionRemoteApi.transOneCollectSet(collection);
+
+		logger.info("同步催收人员 结束，结果：" ,ret.getMsg());
+
+		return ret;
+	}
+
+
+	/**
+	 * 同步贷后跟踪信息
+	 * @param parametertracelog
+	 * @return
+	 */
+	@ApiOperation(value = "同步贷后跟踪信息 接口 数据库能找到信贷主键ID则更新，找不到则新增")
+	@PostMapping("/transferOneCollectionLog")
+	@ResponseBody
+	@Transactional
+	public Result transferOneCollectionLog(@RequestBody @Valid Parametertracelog parametertracelog, BindingResult bindingResult){
+		logger.info("同步贷后跟踪信息 开始 输入的请求信息：[{}]", JSON.toJSONString(parametertracelog));
+		if(bindingResult.hasErrors()){
+			String errorStr = ErroInfoUtil.getErroeInfo(bindingResult);
+			logger.info("同步贷后跟踪信息 接口,输入参数校验错误：" ,errorStr);
+			return Result.error("500","输入参数校验错误："+errorStr);
+		}
+
+		Result ret = collectionRemoteApi.transferOneCollectionLog(parametertracelog);
+
+		logger.info("同步贷后跟踪信息 结束，结果：" ,ret.getMsg());
+
+		return ret;
+	}
+
+
+	@ApiOperation(value = "删除贷后跟踪信息 接口 ")
+	@PostMapping("/deleteByxdId")
+	@ResponseBody
+	@Transactional
+	public Result deleteByxdId(@RequestBody Integer xdIndexId){
+
+		logger.info("删除贷后跟踪信息 开始，参数：" ,xdIndexId);
+
+		Result ret = collectionRemoteApi.deleteByxdId(xdIndexId);
+
+		logger.info("删除贷后跟踪信息 结束，结果：" ,ret.getMsg());
+
+		return ret;
+	}
+
+
+	//  -------------   同步信息到信贷接口 开始  ====================
+
+	@ApiOperation(value = "同步催收人员信息到信贷 接口")
+	@PostMapping("/transferOneVisitSetToXd")
+	@ResponseBody
+	@Transactional
+	public Result transferOneVisitSetToXd(@RequestBody @Valid Collection collection, BindingResult bindingResult) throws Exception {
+		logger.info("同步催收人员信息到信贷 开始 输入的请求信息：[{}]", JSON.toJSONString(collection));
+
+		if(bindingResult.hasErrors()){
+			String errorStr = ErroInfoUtil.getErroeInfo(bindingResult);
+			logger.info("同步催收人员信息到信贷 接口,输入参数校验错误：" ,errorStr);
+			return Result.error("500","输入参数校验错误："+errorStr);
+		}
+			String encryptStr = JSON.toJSONString(collection);
+			// 请求数据加密
+		try {
+			encryptStr = XinDaiEncryptUtil.encryptPostData(encryptStr);
+		} catch (Exception e) {
+			logger.info("同步催收人员信息到信贷 接口,加密数据异常：" ,e.fillInStackTrace());
+			e.printStackTrace();
+			return Result.error("500","同步电催人员信息到信贷 接口,加密数据异常："+e.fillInStackTrace());
+
+		}
+		CollectionXindaiService collectionXindaiService = Feign.builder().target(CollectionXindaiService.class,
+					apiUrl);
+//
+			String respStr = collectionXindaiService.transferOneVisitSet(encryptStr);
+//			// 返回数据解密
+			ResponseData respData = XinDaiEncryptUtil.getRespData(respStr);
+			logger.info("同步催收人员信息到信贷接口返回数据:"+respData.getData());
+//			String ixIndexId = respData.getData();
+			return Result.success();
+
+	}
+
+	@ApiOperation(value = "同步电催人员信息到信贷 接口")
+	@PostMapping("/transferOnePhoneSetToXd")
+	@ResponseBody
+	@Transactional
+	public Result transferOnePhoneSetToXd(@RequestBody @Valid CarBusinessAfter carBusinessAfter, BindingResult bindingResult) throws Exception {
+		logger.info("同步电催人员信息到信贷 开始 输入的请求信息：[{}]", JSON.toJSONString(carBusinessAfter));
+
+		if(bindingResult.hasErrors()){
+			String errorStr = ErroInfoUtil.getErroeInfo(bindingResult);
+			logger.info("同步电催人员信息到信贷 接口,输入参数校验错误：" ,errorStr);
+			return Result.error("500","输入参数校验错误："+errorStr);
+		}
+		String encryptStr = JSON.toJSONString(carBusinessAfter);
+		// 请求数据加密
+		try {
+			encryptStr = XinDaiEncryptUtil.encryptPostData(encryptStr);
+		} catch (Exception e) {
+			logger.info("同步电催人员信息到信贷 接口,加密数据异常：" ,e.fillInStackTrace());
+			e.printStackTrace();
+			return Result.error("500","同步电催人员信息到信贷 接口,加密数据异常："+e.fillInStackTrace());
+
+		}
+		CollectionXindaiService collectionXindaiService = Feign.builder().target(CollectionXindaiService.class,
+				apiUrl);
+//
+		String respStr = collectionXindaiService.transferOnePhoneSet(encryptStr);
+//			// 返回数据解密
+		ResponseData respData = XinDaiEncryptUtil.getRespData(respStr);
+		logger.info("同步电催人员信息到信贷接口返回数据:"+respData.getData());
+		String ixIndexId = respData.getData();
+		return Result.success();
+
+	}
+
+
+
+	@ApiOperation(value = "同步贷后跟踪信息到信贷 接口  有主键ID则更新，无主键ID则新增")
+	@PostMapping("/transferOneCollectionLogToXd")
+	@ResponseBody
+	@Transactional
+	public Result<Integer> transferOneCollectionLogToXd(@RequestBody @Valid Parametertracelog parametertracelog, BindingResult bindingResult) throws Exception {
+		logger.info("同步贷后跟踪信息到信贷 开始 输入的请求信息：[{}]", JSON.toJSONString(parametertracelog));
+		if(bindingResult.hasErrors()){
+			String errorStr = ErroInfoUtil.getErroeInfo(bindingResult);
+			logger.info("同步贷后跟踪信息到信贷 接口,输入参数校验错误：" ,errorStr);
+			return Result.error("500","输入参数校验错误："+errorStr);
+		}
+
+
+		String encryptStr = JSON.toJSONString(parametertracelog);
+		// 请求数据加密
+
+		encryptStr = XinDaiEncryptUtil.encryptPostData(encryptStr);
+
+		CollectionXindaiService collectionXindaiService = Feign.builder().target(CollectionXindaiService.class,
+				apiUrl);
+//
+		String respStr = collectionXindaiService.transferOneCollectionLog(encryptStr);
+//			// 返回数据解密
+		ResponseData respData = XinDaiEncryptUtil.getRespData(respStr);
+		logger.info("同步贷后跟踪信息到信贷接口返回数据:"+respData.getData());
+		Integer xindaiId = Integer.valueOf(respData.getData());
+		return Result.success(xindaiId);
+	}
+
+
+	@ApiOperation(value = "根据信贷ID删除信贷贷后跟踪记录")
+	@PostMapping("/deleteXdCollectionLogById")
+	@ResponseBody
+	@Transactional
+	public Result deleteXdCollectionLogById(@RequestBody Integer xdIndex) throws Exception {
+		logger.info("根据信贷ID删除信贷贷后跟踪记录 开始 输入的请求信息：[{}]", xdIndex);
+
+
+
+		String encryptStr = JSON.toJSONString(xdIndex);
+		// 请求数据加密
+
+		encryptStr = XinDaiEncryptUtil.encryptPostData(encryptStr);
+
+		CollectionXindaiService collectionXindaiService = Feign.builder().target(CollectionXindaiService.class,
+				apiUrl);
+//
+		String respStr = collectionXindaiService.deleteXdCollectionLogById(encryptStr);
+//			// 返回数据解密
+		ResponseData respData = XinDaiEncryptUtil.getRespData(respStr);
+		logger.info("同步贷后跟踪信息到信贷接口返回数据:"+respData.getData());
+		Integer xindaiId = Integer.valueOf(respData.getData());
+		return Result.success(xindaiId);
+	}
+
+	//  -------------   同步信息到信贷接口 结束  ====================
+
+
+
+
+
+
+
+
+
+
+//	@ApiOperation(value = "查询代扣记录")
+//	@GetMapping("/searchRepayLog")
+//	public PageResult<List<RepayLogResp>>searchRepayLog(@RequestParam("originalBusinessId") String originalBusinessId,@RequestParam("afterId") String afterId) {
+//		try {
+//
+//			RequestData requestData = new RequestData();
+//			SearchRepayRecordReq req=new SearchRepayRecordReq();
+//			req.setBusinessId(originalBusinessId);
+//			requestData.setData(JSON.toJSONString(req));
+//			requestData.setMethodName("AfterLoanRepayment_SearRepayLog");
+//			String encryptStr = JSON.toJSONString(requestData);
+//			// 请求数据加密
+//			encryptStr = encryptPostData(encryptStr);
+//			WithHoldingXinDaiService withholdingxindaiService = Feign.builder().target(WithHoldingXinDaiService.class,
+//					apiUrl);
+//
+//			String respStr = withholdingxindaiService.searchRepayRecord(encryptStr);
+//			// 返回数据解密
+//			ResponseData respData = getRespData(respStr);
+//			logger.info("代扣查询接口返回数据:"+respData.getData());
+//			List<RepayLogResp> list=JSON.parseArray(respData.getData(), RepayLogResp.class);
+//			//筛选对应本期的代扣记录
+//			for(Iterator<RepayLogResp> it = list.iterator();it.hasNext();) {
+//				RepayLogResp resp=it.next();
+//				if(!resp.getAfterId().equals(afterId)) {
+//					it.remove();
+//				}
+//			}
+//			RepayLogResp repayLogResp=null;
+//			for(int i=0;i< list.size();i++) {
+//				repayLogResp=list.get(i);
+//				repayLogResp.setListId(String.valueOf(i+1));
+//				if(repayLogResp.getRepayStatus().equals("1")) {
+//					repayLogResp.setRepayStatus("成功");
+//				}else if(repayLogResp.getRepayStatus().equals("2")){
+//					repayLogResp.setRepayStatus("处理中");
+//				}else {
+//					repayLogResp.setRepayStatus("失败");
+//				}
+//				if(repayLogResp.getBindPlatformId()==PlatformEnum.AN_FORM.getValue()) {
+//					repayLogResp.setBindPlatform(PlatformEnum.AN_FORM.getName());
+//				}else if(repayLogResp.getBindPlatformId()==PlatformEnum.BF_FORM.getValue()) {
+//					repayLogResp.setBindPlatform(PlatformEnum.BF_FORM.getName());
+//				}else if(repayLogResp.getBindPlatformId()==PlatformEnum.FY_FORM.getValue()) {
+//					repayLogResp.setBindPlatform(PlatformEnum.FY_FORM.getName());
+//				}else if(repayLogResp.getBindPlatformId()==PlatformEnum.YB_FORM.getValue()) {
+//					repayLogResp.setBindPlatform(PlatformEnum.YB_FORM.getName());
+//				}else if(repayLogResp.getBindPlatformId()==PlatformEnum.YS_FORM.getValue()) {
+//					repayLogResp.setBindPlatform(PlatformEnum.YS_FORM.getName());
+//				}else if(repayLogResp.getBindPlatformId()==PlatformEnum.YH_FORM.getValue()) {
+//					repayLogResp.setBindPlatform(PlatformEnum.YH_FORM.getName());
+//				}
+//			}
+//			return PageResult.success(list, list.size());
+//		} catch (Exception ex) {
+//			logger.error(ex.getMessage());
+//			return PageResult.error(9999, "查询代扣记录出错");
+//		}
+//
+//	}
+
+
 
 
 }

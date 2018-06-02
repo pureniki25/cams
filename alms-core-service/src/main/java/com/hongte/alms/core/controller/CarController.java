@@ -16,6 +16,7 @@ import com.hongte.alms.base.baseException.AlmsBaseExcepiton;
 import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
 import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
 import com.hongte.alms.base.collection.service.CollectionStatusService;
+import com.hongte.alms.base.collection.vo.StaffBusinessVo;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.AuctionStatusEnums;
 import com.hongte.alms.base.process.entity.Process;
@@ -326,6 +327,13 @@ public class CarController {
 					registrationInfo.getBusinessId(),null,"",
 					CollectionStatusEnum.TRAILER_REG,
 					CollectionSetWayEnum.MANUAL_SET);
+			//同时更新信贷的贷后状态
+			List<StaffBusinessVo> voList = new LinkedList<>();
+			StaffBusinessVo vo  = new StaffBusinessVo();
+			vo.setBusinessId(registrationInfo.getBusinessId());
+			voList.add(vo);
+			collectionStatusService.SyncBusinessColStatusToXindai(voList,null,"界面设置移交诉讼",CollectionStatusEnum.TO_LAW_WORK.getPageStr());
+
 			return Result.success();
 		}
 		catch(Exception ex)

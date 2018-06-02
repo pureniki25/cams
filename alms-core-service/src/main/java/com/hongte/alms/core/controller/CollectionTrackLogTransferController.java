@@ -11,6 +11,7 @@ import com.hongte.alms.base.collection.service.ParametertracelogService;
 import com.hongte.alms.base.collection.vo.StaffBusinessVo;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.collection.entity.Collection;
+import com.hongte.alms.base.enums.BooleanEnum;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.RepaymentBizPlanService;
@@ -21,16 +22,14 @@ import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.StringUtil;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.LoginInfoDto;
+import com.sun.org.apache.regexp.internal.RE;
 import io.swagger.annotations.Api;
 import io.swagger.models.auth.In;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
@@ -90,92 +89,8 @@ public class CollectionTrackLogTransferController {
 
 			if(parametertracelogs!=null){
 				for(Parametertracelog parametertracelog:parametertracelogs){
-					String carBusinessId = parametertracelog.getCarBusinessId()!=null?parametertracelog.getCarBusinessId():UUID.randomUUID().toString();
-					String carBusinessAfterId = parametertracelog.getCarBusinessAfterId() != null?parametertracelog.getCarBusinessAfterId():"default-2";
 
-					try{
-
-						CollectionTrackLog collectionTrackLog = new CollectionTrackLog();
-
-						List<CollectionTrackLog> collectionTrackLogs = collectionTrackLogService.selectList(new EntityWrapper<CollectionTrackLog>().eq("xd_index_id",parametertracelog.getId()));
-						if(collectionTrackLogs.size()>0){
-							continue;
-						}
-
-						List<RepaymentBizPlanList> planLists =  repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().
-								eq("business_id",carBusinessId).
-								eq("after_id",carBusinessAfterId));
-
-						if(planLists == null ||planLists.size() == 0){
-							recordErrorInfo(carBusinessId,carBusinessAfterId,
-									NoList,"1","无还款计划数据");
-							continue;
-						}else if(planLists.size()>1){
-							recordErrorInfo(carBusinessId,carBusinessAfterId,
-									DoubleList,"1","查出两条以上还款计划数据");
-							continue;
-						}
-
-
-						collectionTrackLog.setRbpId(planLists.get(0).getPlanListId());
-
-						String  bmUserId =parametertracelog.getCreateUser();
-						// 根据信贷userId 获取贷后userId
-						LoginInfoDto dto = new LoginInfoDto();
-						if(bmUserId!=null&&!bmUserId.equals("")){
-							dto = loginUserInfoHelper.getUserInfoByUserId("", bmUserId);
-							if(dto==null|| dto.getUserId() == null){
-//						collectionTrackLog.setRecorderUser(Constant.ADMIN_ID);
-								recordErrorInfo(carBusinessId,carBusinessAfterId,
-										NoUser,"1","没有用户信息");
-							}
-							collectionTrackLog.setRecorderUser(dto.getUserId());
-						}else{
-							collectionTrackLog.setRecorderUser(Constant.ADMIN_ID);
-						}
-						Date recordDate = parametertracelog.getTranceDate();
-						if(recordDate == null){
-							recordDate = parametertracelog.getCreateTime();
-						}
-						if(recordDate == null){
-							recordDate = new Date();
-						}
-						collectionTrackLog.setRecordDate(recordDate);
-						Integer defaultStatus =8;
-						if(parametertracelog.getStatus()!=null){
-							defaultStatus = parametertracelog.getStatus();
-						}
-						collectionTrackLog.setTrackStatusId(defaultStatus.toString());
-						List<SysParameter> list = sysParameterService.selectList(new EntityWrapper<SysParameter>()
-								.eq("param_type", SysParameterTypeEnums.COLLECTION_FOLLOW_STATUS.getKey())
-								.eq("param_value",defaultStatus));
-						String statusName = "";
-
-						if(list.size()>0){
-							statusName = list.get(0).getParamName();
-						}
-						collectionTrackLog.setTrackStatusName(statusName);
-						collectionTrackLog.setIsSend(0);//是否传输平台，0：否，1：是
-						collectionTrackLog.setContent(parametertracelog.getTranceContent()==null?"":parametertracelog.getTranceContent());//记录内容
-						collectionTrackLog.setCreateTime(new Date());
-						collectionTrackLog.setCreateUser(Constant.SYS_DEFAULT_USER);
-						collectionTrackLog.setUpdateTime(new Date());
-						collectionTrackLog.setUpdateUser(Constant.SYS_DEFAULT_USER);
-						collectionTrackLog.setUniqueId(UUID.randomUUID().toString());
-						collectionTrackLog.setXdIndexId(parametertracelog.getId());
-
-						collectionTrackLogService.insert(collectionTrackLog);
-						deleteErrorInfo(carBusinessId,carBusinessAfterId);
-
-
-					}catch (Exception e){
-						e.printStackTrace();
-						LOGGER.error("同步历史贷后跟踪记录，同步数据出现异常信息"+e.getMessage());
-
-						recordErrorInfo(carBusinessId,carBusinessAfterId,
-								Exception,"1","同步数据出现异常信息");
-					}
-
+					transferOneCollectionLog(parametertracelog);
 				}
 			}
 
@@ -192,6 +107,139 @@ public class CollectionTrackLogTransferController {
 		return Result.success();
 
 	}
+
+
+	/**
+	 * 同步一条贷后跟踪记录
+	 * @param parametertracelog
+	 * @return
+	 */
+	@PostMapping("/transferOneCollectionLog")
+	@ResponseBody
+	public Result transferOneCollectionLog(@RequestBody Parametertracelog parametertracelog){
+		String carBusinessId = parametertracelog.getCarBusinessId()!=null?parametertracelog.getCarBusinessId():UUID.randomUUID().toString();
+		String carBusinessAfterId = parametertracelog.getCarBusinessAfterId() != null?parametertracelog.getCarBusinessAfterId():"default-2";
+
+		try{
+
+			CollectionTrackLog collectionTrackLog = new CollectionTrackLog();
+
+			List<CollectionTrackLog> collectionTrackLogs = collectionTrackLogService.selectList(new EntityWrapper<CollectionTrackLog>().eq("xd_index_id",parametertracelog.getId()));
+//			if(collectionTrackLogs!=null&&collectionTrackLogs.size()>0){
+//
+//				return Result.error("111111","已同步过此贷后跟踪记录");
+//			}
+
+			List<RepaymentBizPlanList> planLists =  repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().
+					eq("business_id",carBusinessId).
+					eq("after_id",carBusinessAfterId));
+
+			if(planLists == null ||planLists.size() == 0){
+				recordErrorInfo(carBusinessId,carBusinessAfterId,
+						NoList,"1","无还款计划数据");
+				return Result.error("111111","无还款计划数据");
+			}else if(planLists.size()>1){
+				recordErrorInfo(carBusinessId,carBusinessAfterId,
+						DoubleList,"1","查出两条以上还款计划数据");
+				return Result.error("111111","查出两条以上还款计划数据");
+			}
+
+
+			collectionTrackLog.setRbpId(planLists.get(0).getPlanListId());
+
+			String  bmUserId =parametertracelog.getCreateUser();
+			// 根据信贷userId 获取贷后userId
+			LoginInfoDto dto = new LoginInfoDto();
+			if(bmUserId!=null&&!bmUserId.equals("")){
+				dto = loginUserInfoHelper.getUserInfoByUserId("", bmUserId);
+				if(dto==null|| dto.getUserId() == null){
+//						collectionTrackLog.setRecorderUser(Constant.ADMIN_ID);
+					recordErrorInfo(carBusinessId,carBusinessAfterId,
+							NoUser,"1","没有用户信息");
+				}
+				collectionTrackLog.setRecorderUser(dto.getUserId());
+			}else{
+				collectionTrackLog.setRecorderUser(Constant.ADMIN_ID);
+			}
+			Date recordDate = parametertracelog.getTranceDate();
+			if(recordDate == null){
+				recordDate = parametertracelog.getCreateTime();
+			}
+			if(recordDate == null){
+				recordDate = new Date();
+			}
+			collectionTrackLog.setRecordDate(recordDate);
+			Integer defaultStatus =8;
+			if(parametertracelog.getStatus()!=null){
+				defaultStatus = parametertracelog.getStatus();
+			}
+			collectionTrackLog.setTrackStatusId(defaultStatus.toString());
+			List<SysParameter> list = sysParameterService.selectList(new EntityWrapper<SysParameter>()
+					.eq("param_type", SysParameterTypeEnums.COLLECTION_FOLLOW_STATUS.getKey())
+					.eq("param_value",defaultStatus));
+			String statusName = "";
+
+			if(list.size()>0){
+				statusName = list.get(0).getParamName();
+			}
+			collectionTrackLog.setTrackStatusName(statusName);
+			collectionTrackLog.setIsSend(0);//是否传输平台，0：否，1：是
+			collectionTrackLog.setContent(parametertracelog.getTranceContent()==null?"":parametertracelog.getTranceContent());//记录内容
+			collectionTrackLog.setCreateTime(new Date());
+			collectionTrackLog.setCreateUser(Constant.SYS_DEFAULT_USER);
+			collectionTrackLog.setUpdateTime(new Date());
+			collectionTrackLog.setUpdateUser(Constant.SYS_DEFAULT_USER);
+			collectionTrackLog.setUniqueId(UUID.randomUUID().toString());
+			collectionTrackLog.setXdIndexId(parametertracelog.getId());
+
+			//已存在则更新
+			if(collectionTrackLogs!=null&&collectionTrackLogs.size()>0){
+				CollectionTrackLog oldLog = collectionTrackLogs.get(0);
+				collectionTrackLog.setCreateTime(oldLog.getCreateTime());
+				collectionTrackLog.setCreateUser(oldLog.getCreateUser());
+				collectionTrackLog.setUniqueId(oldLog.getUniqueId());
+				collectionTrackLog.setTrackLogId(oldLog.getTrackLogId());
+				collectionTrackLogService.updateById(collectionTrackLog);
+			}else{
+				collectionTrackLogService.insert(collectionTrackLog);
+			}
+
+			deleteErrorInfo(carBusinessId,carBusinessAfterId);
+
+
+		}catch (Exception e){
+			e.printStackTrace();
+			LOGGER.error("同步历史贷后跟踪记录，同步数据出现异常信息"+e.getMessage());
+
+			recordErrorInfo(carBusinessId,carBusinessAfterId,
+					Exception,"1","同步数据出现异常信息");
+			return Result.error("111111","同步历史贷后跟踪记录，同步数据出现异常信息");
+		}
+
+		return Result.success();
+	}
+
+	/**
+	 * 删除一条信贷贷后跟踪记录
+	 * @param xdIndexId
+	 * @return
+	 */
+	@PostMapping("/deleteByxdId")
+	@ResponseBody
+	public Result deleteByxdId(@RequestBody Integer xdIndexId){
+
+		Boolean bl = collectionTrackLogService.delete(new EntityWrapper<CollectionTrackLog>().eq("xd_index_id",xdIndexId));
+
+		if(bl){
+			return Result.success();
+		}else{
+			return Result.error("200","删除失败");
+		}
+//		return null;
+	}
+
+
+
 
 	/**
 	 *
