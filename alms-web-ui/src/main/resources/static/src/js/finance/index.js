@@ -376,7 +376,7 @@ window.layinit(function (htConfig) {
                     });
 
 
-            axios.get(cpath + 'sys/param/getParam', { params: { paramType: '会计确认状态' } })
+           /*  axios.get(cpath + 'sys/param/getParam', { params: { paramType: '会计确认状态' } })
                 .then(function (res) {
                     if (res.data.code == '1') {
                         app.accountingConfirmStatus = res.data.data
@@ -387,7 +387,7 @@ window.layinit(function (htConfig) {
                 })
                 .catch(function (err) {
                     app.$Message.error({ content: '获取会计确认状态失败' })
-                })
+                }) */
 
             axios.get(fpath + 'finance/getCompanys')
                 .then(function (res) {
@@ -415,7 +415,7 @@ window.layinit(function (htConfig) {
                     app.$Message.error({ content: '获取业务类型失败' })
                 })
 
-            axios.get(cpath + 'sys/param/getParam', { params: { paramType: '贷后状态' } })
+           /*  axios.get(cpath + 'sys/param/getParam', { params: { paramType: '贷后状态' } })
                 .then(function (res) {
                     if (res.data.code == '1') {
                         app.collectionStatus = res.data.data
@@ -427,7 +427,7 @@ window.layinit(function (htConfig) {
                 .catch(function (err) {
                     app.$Message.error({ content: '获取贷后状态失败' })
                 })
-
+ */
             this.search()
         }
     })
