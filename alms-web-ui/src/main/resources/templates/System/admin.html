@@ -87,6 +87,13 @@
 				<i-span v-else>同步中...</i-span>
 			</i-button>
 		</div>
+			<div style="margin-top:10px; margin-left:10px">
+			<i-lable>滞纳金计算：</i-lable>
+			<i-button :loading="calLateFeeLoading" @click="calLateFee">
+				<i-span v-if="!calLateFeeLoading">计算</i-span>
+				<i-span v-else>计算中...</i-span>
+			</i-button>
+		</div>
     </div>
     <script src="/src/js/System/admin.js"></script>
 </body>

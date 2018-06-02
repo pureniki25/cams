@@ -26,6 +26,7 @@ public interface RechargeService {
      * @param amount 金额为空时，默认代扣每期应还金额
      * @param platformId 代扣平台ID,ID为空是,默认客户银行卡号绑定的平台代扣
      * @param merchOrderId 生成商户订单号
+     * @
      * @return
      */
     Result recharge(String businessId, String afterId, String bankCard,Double amount,String platformId,String merchOrderId);
@@ -41,9 +42,10 @@ public interface RechargeService {
 	boolean istLastPeriod(RepaymentBizPlanList pList);
 	  /**
 	   * 是否可以执行自动代扣
+	   * @param days 周期天数
 	   */
 	
-	 boolean EnsureAutoPayIsEnabled(RepaymentBizPlanList pList);
+	 boolean EnsureAutoPayIsEnabled(RepaymentBizPlanList pList,Integer days);
 	
 	
 	/**

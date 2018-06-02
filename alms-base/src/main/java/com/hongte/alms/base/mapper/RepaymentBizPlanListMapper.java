@@ -69,7 +69,7 @@ public interface RepaymentBizPlanListMapper extends SuperMapper<RepaymentBizPlan
     int conutFinanceManagerList(FinanceManagerListReq req) ;
     List<FinanceManagerListVO> selectFinanceMangeList(FinanceManagerListReq req) ;
     
-    List<RepaymentBizPlanList> selectAutoRepayList();
+    List<RepaymentBizPlanList> selectAutoRepayList(@Param(value = "days") Integer days);
     /**
      * 根据源业务编号获取还款计划信息
      * @param businessId
