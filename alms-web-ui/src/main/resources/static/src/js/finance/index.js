@@ -60,15 +60,11 @@ window.layinit(function (htConfig) {
                     key: 'businessType'
                 },
                 {
-                    title: '还款日期',
+                    title: '应还日期',
                     key: 'planRepayDate',
                 },
                 {
-                    title: '还款登记日期',
-                    key: 'factRepayDate',
-                },
-                {
-                    title: '还款金额',
+                    title: '应还金额',
                     key: 'planRepayAmount',
                     align: 'right',
                     render: (h, p) => {
@@ -103,6 +99,14 @@ window.layinit(function (htConfig) {
                         }
                         res.push(text)
                         return h('div', res)
+                    }
+                },
+                {
+                    title: '已还金额',
+                    key: 'repaidAmount',
+                    align: 'right',
+                    render:(h,p)=>{
+                        return h('span', numeral(p.row.repaidAmount).format('0,0.00'))
                     }
                 },
                 {
