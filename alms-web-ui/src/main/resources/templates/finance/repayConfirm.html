@@ -105,7 +105,25 @@
                             </td>
                         </tr>
                     </table>
-
+                    <br>
+                    <p style="font-size: 14px;color: #1c2438;font-weight: 700;">
+                            减免明细
+                        </p>
+                    <table>
+                        <tr>
+                            <td style="border-top-width: 6px;border-top-style: solid;"></td>
+                            <td style="border-top-width: 6px;border-top-style: solid;"></td>
+                            <td style="border-top-width: 6px;border-top-style: solid;"></td>
+                            <td style="border-top-width: 6px;border-top-style: solid;"></td>
+                        </tr>
+                        <tr v-if="thisTimeRepaymentInfo.derateDetails&&thisTimeRepaymentInfo.derateDetails.length>0" v-for="item in thisTimeRepaymentInfo.derateDetails">
+                            <td>{{item.name}}</td>
+                            <td>{{item.amount}}</td>
+                        </tr>
+                        <tr v-else>
+                            <td >无</td>
+                        </tr>
+                    </table>
                 </card>
             </i-col>
             <i-col span="12">
