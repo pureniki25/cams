@@ -579,8 +579,9 @@ public class RepayPlanController {
     private BizDto getBizDtoByBizId(String businessId){
         BizDto bizDto = new BizDto();
 
+        BasicBusiness business = basicBusinessService.selectById(businessId);
         bizDto.setBusinessId(businessId);
-
+        bizDto.setBusinessType(business.getBusinessType());
         List<RepaymentBizPlan> bizPlans = repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",businessId));
         if(bizPlans!=null && bizPlans.size()>0){
             List<BizPlanDto> bizPlanDtos = new LinkedList<>();
