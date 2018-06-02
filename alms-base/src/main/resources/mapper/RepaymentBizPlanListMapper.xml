@@ -320,9 +320,10 @@
      
 	  select 
 	     <include refid="Base_Column_List"/>
-	  from tb_repayment_biz_plan_list   
+       from tb_repayment_biz_plan_list   
 	  
-	  where confirm_flag=1 and (date_sub(due_date,interval 1 day)=curdate() or due_date=curdate()) and `current_status!`!='已还款' and src_type=2
+	  where confirm_flag=1   <![CDATA[ and (date_sub(curdate(),interval #{days} day)<=due_date) and  due_date<=curdate()]]>     <![CDATA[ and    `current_status`  <>'已还款' ]]> and src_type=2
+	  
     </select>
     
     <select id="queryRepaymentPlanInfoByBusinessId" resultType="com.hongte.alms.base.dto.RepaymentPlanInfoDTO">

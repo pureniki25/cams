@@ -227,7 +227,7 @@ public class RechargeServiceImpl implements RechargeService {
 	}
 
 	@Override
-	public boolean EnsureAutoPayIsEnabled(RepaymentBizPlanList pList) {
+	public boolean EnsureAutoPayIsEnabled(RepaymentBizPlanList pList,Integer days) {
 		BizOutputRecord record=bizOutputRecordService.selectOne(new EntityWrapper<BizOutputRecord>().eq("business_id", pList.getBusinessId()));
         if (DateUtil.getDiff(new Date(), pList.getDueDate())>30)
         {
@@ -251,12 +251,19 @@ public class RechargeServiceImpl implements RechargeService {
         	//msg="最后一期不能自动代扣"
         	return false;
         }
+        RepaymentBizPlanList next= repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", pList.getBusinessId()).eq("plan_id", pList.getPlanId()).eq("period", pList.getPeriod()+1));
         
-//        if (next?.borrow_date != null && next.borrow_date.Value.Date.AddDays(-1) < dtfact_date.Date)
-//        {
-//            msg = "下一期还款时间开始停止自动代扣上一期";
-//            return false;
-//        }
+        if (next!=null )
+        {
+	        Date nowDate=new Date();
+	        days=0-days;
+	        Date before30Days=DateUtil.getDate(DateUtil.formatDate(DateUtil.addDay2Date(days,nowDate)));
+	        if(next.getDueDate().compareTo(before30Days)>=0&&next.getDueDate().compareTo(nowDate)<=0) {
+	        	   //msg = "下一期还款时间开始停止自动代扣上一期";
+	            return false;
+	        }
+       
+        }
 		return true;
 	}
    
