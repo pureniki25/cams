@@ -508,6 +508,7 @@ public class FinanceServiceImpl implements FinanceService {
 				derateDetails.add(derateDetail);
 			}
 			c.setDerate(t1);
+			c.setDerateDetails(derateDetails);
 		}
 		return c;
 	}
