@@ -26,7 +26,7 @@ import org.springframework.web.filter.CorsFilter;
  * @date 2017年11月17日 下午3:01:38
  * @since alms-service 1.0-SNAPSHOT
  */
-@EnableFeignClients(basePackages = {"com.ht.ussp.client","com.hongte.alms.base.feignClient"})
+@EnableFeignClients(basePackages = {"com.ht.ussp.client","com.hongte.alms.base.feignClient","com.hongte.alms.core.feginClient"})
 @SpringCloudApplication
 @MapperScan(basePackages = {"com.hongte.alms.core.mapper","com.hongte.alms.base"})
 @EnableTransactionManagement 
