@@ -87,6 +87,15 @@ public class CarAuctionReg extends Model<CarAuctionReg> {
 	@TableField("offer_amount")
 	@ApiModelProperty(required= true,value = "出价金额")
 	private BigDecimal offerAmount;
+
+
+	/**
+	 * 出价时间
+	 */
+	@TableField("offer_time")
+	@ApiModelProperty(required= true,value = "出价时间")
+	private Date offerTime;
+
     /**
      * 身份证号码（关联竞价人信息）
      */
@@ -272,26 +281,12 @@ public class CarAuctionReg extends Model<CarAuctionReg> {
 		this.remark = remark;
 	}
 
-	@Override
-	public String toString() {
-		return "CarAuctionReg{" +
-				"regId='" + regId + '\'' +
-				", businessId='" + businessId + '\'' +
-				", userId='" + userId + '\'' +
-				", username='" + username + '\'' +
-				", regTel='" + regTel + '\'' +
-				", isPayDeposit=" + isPayDeposit +
-				", offerAmount=" + offerAmount +
-				", regCertId='" + regCertId + '\'' +
-				", isAuctionSuccess=" + isAuctionSuccess +
-				", transPrice=" + transPrice +
-				", createTime=" + createTime +
-				", auctionId='" + auctionId + '\'' +
-				", remark='" + remark + '\'' +
-				", updateUser='" + updateUser + '\'' +
-				", updateTime=" + updateTime +
-				", createUser='" + createUser + '\'' +
-				'}';
+	public Date getOfferTime() {
+		return offerTime;
+	}
+
+	public void setOfferTime(Date offerTime) {
+		this.offerTime = offerTime;
 	}
 
 	@Override

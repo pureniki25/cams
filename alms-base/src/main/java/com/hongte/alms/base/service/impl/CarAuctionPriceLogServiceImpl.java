@@ -44,12 +44,13 @@ public class CarAuctionPriceLogServiceImpl extends BaseServiceImpl<CarAuctionPri
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void bid(CarBidReq bidReq) {
+        Date currentTime=new Date();
         CarAuctionPriceLog newBidLog=new CarAuctionPriceLog();
         newBidLog.setId(UUID.randomUUID().toString());
         newBidLog.setAuctionId(bidReq.getAuctionId());
         newBidLog.setBidderTel(bidReq.getTelephone());
         newBidLog.setPrice(bidReq.getAmount());
-        newBidLog.setCreateTime(new Date());
+        newBidLog.setCreateTime(currentTime);
         newBidLog.setBidderCertId(bidReq.getIdCard());
         newBidLog.setUserId(bidReq.getUserId());
         newBidLog.setUsername(bidReq.getUserName());
@@ -68,9 +69,10 @@ public class CarAuctionPriceLogServiceImpl extends BaseServiceImpl<CarAuctionPri
             auctionReg.setAuctionId(bidReq.getAuctionId());
             auctionReg.setAuctionSuccess(false);
             auctionReg.setBusinessId(carAuction.getBusinessId());
-            auctionReg.setCreateTime(new Date());
+            auctionReg.setCreateTime(currentTime);
             auctionReg.setCreateUser("");
             auctionReg.setOfferAmount(bidReq.getAmount());
+            auctionReg.setOfferTime(currentTime);
             auctionReg.setRegCertId(bidReq.getIdCard());
             auctionReg.setUserId(bidReq.getUserId());
             auctionReg.setUsername(bidReq.getUserName());
@@ -85,7 +87,8 @@ public class CarAuctionPriceLogServiceImpl extends BaseServiceImpl<CarAuctionPri
             auctionReg.setOfferAmount(bidReq.getAmount());
             auctionReg.setRegTel(bidReq.getTelephone());
             auctionReg.setRemark(bidReq.getRemark());
-            auctionReg.setUpdateTime(new Date());
+            auctionReg.setOfferTime(currentTime);
+            auctionReg.setUpdateTime(currentTime);
             auctionReg.setUpdateUser("");
             carAuctionRegService.updateById(auctionReg);
         }
