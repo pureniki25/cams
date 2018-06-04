@@ -188,7 +188,7 @@
 			pl.orig_business_id as orgBusinessId,
 			pl.period as period,
 			pl.after_id as afterId ,
-			b.company_name as dept,
+			b.company_id as dept,
 			b.operator_name as operator,
 			bbc.customer_name as customer,
 			bbc.phone_number as phoneNumber,
