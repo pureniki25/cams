@@ -67,11 +67,6 @@ public class CarAuctionController {
     public PageResult<List<AuctionRespVo>> selectAuctionsPage (@RequestBody AuctionsReq req) {
 			 
 		try {
-
-			if(req==null||StringUtils.isEmpty(req.getType())) {
-				logger.error("参数为空,type="+req.getType());
-				return PageResult.error(9999, "参数为空,type="+req.getType());
-			}
 			Page<AuctionRespVo> pages=carService.selectAuctionsPageForApp(req);
 			return PageResult.success(pages.getRecords(),pages.getTotal());
 		}catch (Exception e) {
