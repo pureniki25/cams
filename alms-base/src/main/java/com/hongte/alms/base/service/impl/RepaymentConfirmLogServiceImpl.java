@@ -242,7 +242,7 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 			p.put("subTotal", subTotal);
 			p.put("total", total);
 			p.put("list", proj);
-			p.put("type", "实际应还日期");
+			p.put("type", "实际应还");
 			res.add(p);
 		}
 		

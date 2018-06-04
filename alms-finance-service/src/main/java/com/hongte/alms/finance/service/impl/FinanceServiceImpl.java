@@ -197,6 +197,9 @@ public class FinanceServiceImpl implements FinanceService {
 		return Result.success();
 	}
 
+	private boolean update(RepaymentRegisterInfoDTO dto) {
+		return false;
+	}
 	private MoneyPool initBy(RepaymentRegisterInfoDTO dto) {
 		MoneyPool moneyPool = new MoneyPool();
 		moneyPool.setAcceptBank(dto.getAcceptBank());
@@ -323,7 +326,7 @@ public class FinanceServiceImpl implements FinanceService {
 
 	private JSONObject thisPeriodPlanRepayment(RepaymentBizPlanList rpl) {
 		JSONObject t = initThisPeriodPlanRepaymentBase();
-		t.put("type", "本期应还日期");
+		t.put("type", "本期应还");
 		t.put("repayDate", DateUtil.toDateString(rpl.getDueDate(), DateUtil.DEFAULT_FORMAT_DATE));
 		List<RepaymentBizPlanListDetail> details = repaymentBizPlanListDetailMapper
 				.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", rpl.getPlanListId()));
