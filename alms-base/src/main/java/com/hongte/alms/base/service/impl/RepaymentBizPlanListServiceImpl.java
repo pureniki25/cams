@@ -20,6 +20,8 @@ import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.vo.PageResult;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +37,7 @@ import java.util.List;
  */
 @Service("RepaymentBizPlanListService")
 public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBizPlanListMapper, RepaymentBizPlanList> implements RepaymentBizPlanListService {
-
+	private static Logger logger = LoggerFactory.getLogger(RepaymentBizPlanListServiceImpl.class);
     @Autowired
     RepaymentBizPlanListMapper repaymentBizPlanListMapper;
 

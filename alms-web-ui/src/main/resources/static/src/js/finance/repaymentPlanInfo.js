@@ -23,23 +23,7 @@ window.layinit(function (htConfig) {
         	repayProjOtherFeeFlag: false, // 其他费用弹窗控制标识（标维度）
         	
         	// -- 实还流水 --
-        	actualPaymentRecordList: [	
-        		{
-	        		afterId: '',	// 期数
-	        		receivedTotal: '', // 实还合计
-	        		
-	        		//  -- 单条实还流水 --
-	        		actualPaymentSingleRecordList: [  
-	        			{
-		        			currentAmount: '',	//	交易金额
-		        			incomeType: '',	//	收支类型
-		        			tradeTime: '',	//	交易时间
-		        			tradeType: '',	//	交易方式
-		        			accountName: ''	//	账户名称
-	        			}
-	        		]
-        		}
-        	],
+        	actualPaymentRecordList: [],
         	
         	actualPaymentRecordAfterIdNullList: [],	// -- 实还流水afterId为空的数据 --
         	
@@ -161,36 +145,52 @@ window.layinit(function (htConfig) {
             	this.baseInfo.borrowLimit = borrowLimit + '个月';
             },
             /*
+             * 初始化方法
+             */
+            initFunction: function(event){
+            	if (event == 'realRepaymentRecord') {
+					this.queryActualPaymentByBusinessId();
+				}else if (event == 'platformRealRepayment') {
+					
+				}else if (event == 'advancesRecord') {
+					
+				}else if (event == 'fundDistributionRecord') {
+					
+				}
+            },
+            /*
              * 根据业务编号获取业务维度的还款计划信息
              */
             queryRepaymentPlanInfoByBusinessId: function(){
-            	axios.get(financeBasePath +"finance/queryRepaymentPlanInfoByBusinessId?businessId=" + businessId)
-    	        .then(function (res) {
-    	            if (res.data.data != null && res.data.code == 1) {
-    	            	app.bizRepaymentPlanList = res.data.data.resultList;
-    	            } else {
-    	            	app.$Modal.error({content: res.data.msg });
-    	            }
-    	        })
-    	        .catch(function (error) {
-    	        	app.$Modal.error({content: '接口调用异常!'});
-    	        });
+            	if (!this.bizRepaymentPlanList || this.bizRepaymentPlanList.length == 0) {
+            		axios.get(financeBasePath +"finance/queryRepaymentPlanInfoByBusinessId?businessId=" + businessId)
+        	        .then(function (res) {
+        	            if (res.data.data != null && res.data.code == 1) {
+        	            	app.bizRepaymentPlanList = res.data.data.resultList;
+        	            } else {
+        	            	app.$Modal.error({content: res.data.msg });
+        	            }
+        	        })
+        	        .catch(function (error) {
+        	        	app.$Modal.error({content: '接口调用异常!'});
+        	        });
+				}
             },
             /*
              * 根据业务还款计划列表ID获取所有对应的标的应还还款计划信息
              */
             queryPlanRepaymentProjInfoByPlanListId: function(planListId){
-            	axios.get(financeBasePath +"finance/queryPlanRepaymentProjInfoByPlanListId?planListId=" + planListId)
-            	.then(function (res) {
-            		if (res.data.data != null && res.data.code == 1) {
-            			app.repayPlanColumnsData = res.data.data.resultProjInfo;
-            		} else {
-            			app.$Modal.error({content: res.data.msg });
-            		}
-            	})
-            	.catch(function (error) {
-            		app.$Modal.error({content: '接口调用异常!'});
-            	});
+        		axios.get(financeBasePath +"finance/queryPlanRepaymentProjInfoByPlanListId?planListId=" + planListId)
+        		.then(function (res) {
+        			if (res.data.data != null && res.data.code == 1) {
+        				app.repayPlanColumnsData = res.data.data.resultProjInfo;
+        			} else {
+        				app.$Modal.error({content: res.data.msg });
+        			}
+        		})
+        		.catch(function (error) {
+        			app.$Modal.error({content: '接口调用异常!'});
+        		});
             },
             /*
              * 根据业务还款计划列表ID获取所有对应的标的应还还款计划信息
@@ -260,28 +260,30 @@ window.layinit(function (htConfig) {
              * 根据业务编号查找实还流水
              */
             queryActualPaymentByBusinessId: function(){
-            	axios.get(financeBasePath +"finance/queryActualPaymentByBusinessId?businessId=" + businessId)
-            	.then(function (res) {
-            		if (res.data.data != null && res.data.code == 1) {
-            			
-            			app.actualPaymentRecordList = res.data.data.actualPaymentLogDTOs;
-            			app.actualPaymentRecordAfterIdNullList = res.data.data.singleLogDTOs;
-            		
-            			if (res.data.data.actualPaymentLogDTOs != null && res.data.data.actualPaymentLogDTOs.length > 0) {
-            				
-							for (var i = 0; i < res.data.data.actualPaymentLogDTOs.length; i++) {
-								
-								app.actualPaymentRecordList[i].actualPaymentSingleRecordList = app.actualPaymentRecordList[i].actualPaymentSingleLogDTOs;
-								
-							}
-						}
-            		} else {
-            			app.$Modal.error({content: res.data.msg });
-            		}
-            	})
-            	.catch(function (error) {
-            		app.$Modal.error({content: '接口调用异常!'});
-            	});
+            	if (!this.actualPaymentRecordList || this.actualPaymentRecordList.length == 0) {
+            		axios.get(financeBasePath +"finance/queryActualPaymentByBusinessId?businessId=" + businessId)
+                	.then(function (res) {
+                		if (res.data.data != null && res.data.code == 1) {
+                			
+                			app.actualPaymentRecordList = res.data.data.actualPaymentLogDTOs;
+                			app.actualPaymentRecordAfterIdNullList = res.data.data.singleLogDTOs;
+                		
+                			if (res.data.data.actualPaymentLogDTOs != null && res.data.data.actualPaymentLogDTOs.length > 0) {
+                				
+    							for (var i = 0; i < res.data.data.actualPaymentLogDTOs.length; i++) {
+    								
+    								app.actualPaymentRecordList[i].actualPaymentSingleRecordList = app.actualPaymentRecordList[i].actualPaymentSingleLogDTOs;
+    								
+    							}
+    						}
+                		} else {
+                			app.$Modal.error({content: res.data.msg });
+                		}
+                	})
+                	.catch(function (error) {
+                		app.$Modal.error({content: '接口调用异常!'});
+                	});
+				}
             },
             /*
              * 为类型增加点击事件	
@@ -342,7 +344,6 @@ window.layinit(function (htConfig) {
         created: function () {
         	this.initBaseInfo();
         	this.queryRepaymentPlanInfoByBusinessId();
-        	this.queryActualPaymentByBusinessId();
         }
     })
 })
