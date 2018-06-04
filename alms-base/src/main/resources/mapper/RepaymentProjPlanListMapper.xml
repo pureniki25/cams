@@ -47,7 +47,7 @@
 			          WHEN (
 			            projDetail.fee_id != '3131c075-5721-11e8-8a00-0242ac110002'	         		       
 			          ) 
-			          THEN projDetail.plan_amount 
+			          THEN projDetail.proj_plan_amount 
 			          ELSE 0 
 			        END
 		      ) ,0) `sumPlanAmount` from tb_repayment_proj_plan_list projList 
@@ -93,7 +93,7 @@
 					  		<!-- 每个标的实还金额总和-->
 	<select id="getFactAmountSum" resultType="java.lang.Double">
 			select 
-					sum(projDetail.proj_fact_amount) 
+					sum(ifnull(projDetail.proj_fact_amount,0)) 
 					   from tb_repayment_proj_plan projPlan
 						
 						left join tb_repayment_proj_plan_list projList 
@@ -114,7 +114,7 @@
 					  		<!-- 每个标每期的应还本金和利息-->
 	<select id="getPrincipalAndInterestPeriod" resultType="java.lang.Double">
 				select 
-					sum(projDetail.proj_fact_amount) 
+					sum(ifnull(projDetail.proj_fact_amount,0)) 
 					   from tb_repayment_proj_plan_list projList 
 					
 					left join tb_repayment_proj_plan_list_detail projDetail

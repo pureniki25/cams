@@ -409,7 +409,13 @@ window.layinit(function (htConfig) {
             axios.get(fpath + 'finance/getBusinessType')
                 .then(function (res) {
                     if (res.data.code == '1') {
-                        app.businessTypes = res.data.data
+                        res.data.data.forEach((e)=>{
+                            //过滤房贷车贷展期
+                            if(e.businessTypeId!=1&&e.businessTypeId!=2){
+                                app.businessTypes.push(e)
+                            }
+                        })
+                        // app.businessTypes = res.data.data
                     } else {
                         app.$Message.error({ content: '获取业务类型失败' })
                         console.log(res.data.msg);
