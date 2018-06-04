@@ -118,17 +118,22 @@ window.layinit(function (htConfig) {
                                 on:{
                                     click(){
                                         let mprid = p.row.id 
-                                        axios.post(fpath+'finance/rejectRepayReg',{mprid:mprid})
-                                        .then(function(res){
-                                            if(res.data.code=='1'){
-                                                window.location.reload()
-                                            }else{
-                                                window.parent.app.$Message.error({content:res.data.msg})
+                                        app.$Modal.confirm({
+                                            content:'确认拒绝此条还款登记?',
+                                            onOk(){
+                                                axios.post(fpath+'finance/rejectRepayReg',{mprid:mprid})
+                                                .then(function(res){
+                                                    if(res.data.code=='1'){
+                                                        window.location.reload()
+                                                    }else{
+                                                        window.parent.app.$Message.error({content:res.data.msg})
+                                                    }
+                                                })
+                                                .catch(function(err){
+                                                    window.parent.app.$Message.error({content:'拒绝还款登记失败'})
+                                                    console.log(err);
+                                                })
                                             }
-                                        })
-                                        .catch(function(err){
-                                            window.parent.app.$Message.error({content:'拒绝还款登记失败'})
-                                            console.log(err);
                                         })
                                     }
                                 }
