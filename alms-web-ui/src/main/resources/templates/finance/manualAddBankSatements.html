@@ -61,7 +61,7 @@
                     <i-input v-if="form.tradeType=='现金'" v-model="form.acceptBank"></i-input>
                 </form-item>
 
-                <form-item prop="factRepaymentUser" :label="form.tradeType=='转账'?'实际转款人':'支付人'" >
+                <form-item prop="factRepaymentUser" :label="form.tradeType=='转账'?'实际转款人':'支付人'" required>
                     <i-input v-model="form.factRepaymentUser"></i-input>
                 </form-item>
                 <form-item prop="tradePlace" label="交易场所" >
