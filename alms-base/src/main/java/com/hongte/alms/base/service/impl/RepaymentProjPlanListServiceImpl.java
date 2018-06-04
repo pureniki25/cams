@@ -131,8 +131,8 @@ public class RepaymentProjPlanListServiceImpl extends
 									logger.info("逾期费用计算开始===============：planListid:"+pList.getPlanListId()+"===============");
 									BigDecimal days=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), projPList.getDueDate())));//逾期天数
 									projPList.setOverdueDays(days);
-								
-									
+								     
+									BigDecimal oriOverdueAmount=projPList.getOverdueAmount();//本来每个标的一共的逾期费用
 									BigDecimal underLateFee=getUnderLateFee(projPList,projList, projPlan);//线下逾期费
 									underLateFeeSum=underLateFeeSum.add(underLateFee);
 									updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid(), underLateFee);
@@ -140,7 +140,7 @@ public class RepaymentProjPlanListServiceImpl extends
 									BigDecimal onlineLateFee=getOnLineLateFee(projPList, projPlan);//线上逾期费
 									onlineLateFeeSum=onlineLateFeeSum.add(onlineLateFee);
 									updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), onlineLateFee);
-									projPList.setOverdueAmount(underLateFee.add(onlineLateFee));
+									projPList.setOverdueAmount(underLateFee.add(onlineLateFee).add(oriOverdueAmount));
 									projPList.setCurrentStatus(RepayCurrentStatusEnums.逾期.name());
 									updateById(projPList);
 									logger.info("逾期费用===============：projListId:"+projPList.getProjPlanListId()+"线下逾期费:"+underLateFee+",线上逾期费:"+onlineLateFee+"==============");
@@ -149,10 +149,10 @@ public class RepaymentProjPlanListServiceImpl extends
 								//更新还款计划业务表
 								updateOrInsertPlanDetail(pList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid(), underLateFeeSum);//每个业务每期还款计划的线下收费
 								updateOrInsertPlanDetail(pList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), onlineLateFeeSum);//每个业务每期还款计划的线上收费
-								
+								BigDecimal oriOverdueAmount=pList.getOverdueAmount();//本来每个业务每期的一共的逾期费用
 								BigDecimal days=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), pList.getDueDate())));//每个业务每期款还计划的逾期天数
 								pList.setOverdueDays(days);
-								pList.setOverdueAmount(underLateFeeSum.add(onlineLateFeeSum));
+								pList.setOverdueAmount(underLateFeeSum.add(onlineLateFeeSum).add(oriOverdueAmount));
 								pList.setCurrentStatus(RepayCurrentStatusEnums.逾期.name());
 								repaymentBizPlanListService.updateById(pList);
 								logger.info("逾期费用计算结束===============：planListid:"+pList.getPlanListId()+"===============");
