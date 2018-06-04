@@ -190,7 +190,7 @@
 			pl.after_id as afterId ,
 			b.company_id as dept,
 			b.operator_name as operator,
-			bbc.customer_name as customer,
+			b.customer_name as customer,
 			bbc.phone_number as phoneNumber,
 			b.business_ctype as businessType ,
 			pl.due_date as planRepayDate ,
