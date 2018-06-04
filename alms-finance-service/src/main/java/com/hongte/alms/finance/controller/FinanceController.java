@@ -230,6 +230,7 @@ public class FinanceController {
 		Result result ;
 		logger.info("@rejectRepayReg@拒绝客户还款登记--开始[{}]", req.toJSONString());
 		String mprid = req.getString("mprid");
+		String remark = req.getString("remark");
 		MoneyPoolRepayment mpr = moneyPoolRepaymentService.selectById(mprid);
 		if (mpr.getState().equals(RepayRegisterFinanceStatus.财务确认已还款.toString())) {
 			result = Result.error("500", RepayRegisterFinanceStatus.财务确认已还款.toString()+"的登记不可拒绝");
@@ -237,6 +238,9 @@ public class FinanceController {
 			return result ;
 		}
 		mpr.setIsFinanceMatch(0);
+		if (remark!=null) {
+			mpr.setRemark(remark);
+		}
 		mpr.setState(RepayRegisterFinanceStatus.还款登记被财务拒绝.toString());
 		boolean res = mpr.updateById();
 		if (res) {
