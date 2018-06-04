@@ -9,6 +9,8 @@ import java.util.List;
 import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
 import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.enums.RepayCurrentStatusEnums;
+import com.hongte.alms.base.enums.RepayedFlag;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListMapper;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.vo.finance.ConfirmWithholdListVO;
@@ -75,6 +77,37 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
 	public PageResult selectByFinanceManagerListReq(FinanceManagerListReq req) {
 		int count = repaymentBizPlanListMapper.conutFinanceManagerList(req);
 		List<FinanceManagerListVO> list = repaymentBizPlanListMapper.selectFinanceMangeList(req);
+		for (FinanceManagerListVO financeManagerListVO : list) {
+			/*未代扣确认的不能代扣*/
+			if (financeManagerListVO.getConfirmFlag()==null||financeManagerListVO.getConfirmFlag().equals(0)) {
+				financeManagerListVO.setCanWithhold(false);
+				continue;
+			}
+			/*已还款的不能代扣*/
+			if (financeManagerListVO.getStatus().equals(RepayCurrentStatusEnums.已还款.toString())) {
+				financeManagerListVO.setCanWithhold(false);
+				continue;
+			}
+			if (financeManagerListVO.getBusinessId().equals(financeManagerListVO.getOrgBusinessId())) {
+				/*正常业务最后一期不能代扣*/
+				if (financeManagerListVO.getBorrowLimit().equals(financeManagerListVO.getPeriod().toString())) {
+					financeManagerListVO.setCanWithhold(false);
+					continue;
+				}
+			}else {
+				/*展期业务00期不能代扣*/
+				if (financeManagerListVO.getPeriod().equals(0)) {
+					financeManagerListVO.setCanWithhold(false);
+					continue;
+				}
+				/*展期业务最后一期不能代扣*/
+				if (financeManagerListVO.getBorrowLimit().equals(financeManagerListVO.getPeriod().toString())) {
+					financeManagerListVO.setCanWithhold(false);
+					continue;
+				}
+			}
+			financeManagerListVO.setCanWithhold(true);
+		}
 		return PageResult.success(list, count);
 	}
 
@@ -164,8 +197,8 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
     }
 
 	@Override
-	public List<RepaymentBizPlanList> selectAutoRepayList() {
-		return repaymentBizPlanListMapper.selectAutoRepayList();
+	public List<RepaymentBizPlanList> selectAutoRepayList(Integer days) {
+		return repaymentBizPlanListMapper.selectAutoRepayList(days);
 	}
 
 	@Override

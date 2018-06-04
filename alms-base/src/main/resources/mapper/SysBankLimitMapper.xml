@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.SysBankLimitMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.SysBankLimit">
+        <id column="limit_id" property="limitId" />
+        <result column="bank_code" property="bankCode" />
+        <result column="platform_id" property="platformId" />
+        <result column="has_once_limit" property="hasOnceLimit" />
+        <result column="once_limit" property="onceLimit" />
+        <result column="has_day_limit" property="hasDayLimit" />
+        <result column="day_limit" property="dayLimit" />
+        <result column="status" property="status" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="update_time" property="updateTime" />
+        <result column="update_user" property="updateUser" />
+        <result column="has_month_limit" property="hasMonthLimit" />
+        <result column="month_limit" property="monthLimit" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        limit_id AS limitId, bank_code AS bankCode, platform_id AS platformId, has_once_limit AS hasOnceLimit, once_limit AS onceLimit, has_day_limit AS hasDayLimit, day_limit AS dayLimit, status, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser, has_month_limit AS hasMonthLimit, month_limit AS monthLimit
+    </sql>
+
+</mapper>

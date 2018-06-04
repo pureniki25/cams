@@ -29,6 +29,10 @@ public class FinanceManagerListReq {
 	 */
 	private String accountantConfirmStatus ;
 	/**
+	 * 区域
+	 */
+	private String areaId ;
+	/**
 	 * 分公司
 	 */
 	private String companyId ;
@@ -141,5 +145,17 @@ public class FinanceManagerListReq {
 	 */
 	public void setAccountantConfirmStatus(String accountantConfirmStatus) {
 		this.accountantConfirmStatus = accountantConfirmStatus;
+	}
+	/**
+	 * @return the areaId
+	 */
+	public String getAreaId() {
+		return areaId;
+	}
+	/**
+	 * @param areaId the areaId to set
+	 */
+	public void setAreaId(String areaId) {
+		this.areaId = areaId;
 	}
 }

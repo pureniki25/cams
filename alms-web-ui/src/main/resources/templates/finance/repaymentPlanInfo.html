@@ -96,9 +96,67 @@
 		        		</p>
 					</Modal>
 				</tab-pane>
-		        <tab-pane label="实还流水" name="realRepaymentRecord"></tab-pane>
+				
+		        <tab-pane label="实还流水" name="realRepaymentRecord">
+		        	<table class="layui-table">
+				        <thead>
+				            <tr>
+				                <th>期数</th>
+				                <th>实收合计</th>
+				                <th>账户名称</th>
+				                <th>交易时间</th>
+				                <th>收支类型</th>
+				                <th>交易金额</th>
+				                <th>交易方式</th>
+				            </tr>
+				        </thead>
+				        <tbody>
+				            <tr v-for='(item, index) in actualPaymentRecordList' :key='index'>
+				                <td>{{ item.afterId }}</td>
+				                <td>{{ item.receivedTotal }}</td>
+				                <td>
+				                    <div v-for = '(subItem, subIndex) in item.actualPaymentSingleRecordList' :key='subIndex'>{{ subItem.accountName }}</div>
+				                </td>
+				                <td>
+				                    <div v-for = '(subItem, subIndex) in item.actualPaymentSingleRecordList' :key='subIndex'>{{ subItem.tradeTime }}</div>
+				                </td>
+				                <td>
+				                    <div v-for = '(subItem, subIndex) in item.actualPaymentSingleRecordList' :key='subIndex'>{{ subItem.incomeType }}</div>
+				                </td>
+				                <td>
+				                    <div v-for = '(subItem, subIndex) in item.actualPaymentSingleRecordList' :key='subIndex'>{{ subItem.currentAmount }}</div>
+				                </td>
+				                <td>
+				                    <div v-for = '(subItem, subIndex) in item.actualPaymentSingleRecordList' :key='subIndex'>{{ subItem.tradeType }}</div>
+				                </td>
+				            </tr>
+				            <tr v-for='(item, index) in actualPaymentRecordAfterIdNullList' :key='index'>
+				                <td></td>
+				                <td></td>
+				                <td>
+				                    <div>{{ item.accountName }}</div>
+				                </td>
+				                <td>
+				                    <div>{{ item.tradeTime }}</div>
+				                </td>
+				                <td>
+				                    <div>{{ item.incomeType }}</div>
+				                </td>
+				                <td>
+				                    <div>{{ item.currentAmount }}</div>
+				                </td>
+				                <td>
+				                    <div>{{ item.tradeType }}</div>
+				                </td>
+				            </tr>
+				        </tbody>
+				    </table>
+		        </tab-pane>
+		        
 		        <tab-pane label="平台实还" name="platformRealRepayment"></tab-pane>
+		        
 		        <tab-pane label="垫付记录" name="advancesRecord"></tab-pane>
+		        
 		        <tab-pane label="资金分发记录" name="fundDistributionRecord"></tab-pane>
 		    </tabs>
 		</Card>

@@ -34,12 +34,13 @@ public class AfterLoanRepaymentServiceImpl implements AfterLoanRepaymentService 
      */
     @Override
     public Result submitAutoRepay(String businessId, String afterId, String bankCard) {
+    	
         RepaymentBizPlanList repaymentBizPlanList=repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id",businessId).eq("after_id",afterId));
         if(repaymentBizPlanList!=null){
             if(repaymentBizPlanList.getSrcType()!=null && repaymentBizPlanList.getSrcType()==1){
                 return withHoldingClient.repayAssignBank(repaymentBizPlanList.getOrigBusinessId(),afterId,bankCard);
             }else {
-                return rechargeService.recharge(repaymentBizPlanList.getOrigBusinessId(),afterId,bankCard,null,null);
+                return rechargeService.recharge(repaymentBizPlanList.getOrigBusinessId(),afterId,bankCard,null,null,rechargeService.getMerchOrderId());
             }
         }
         Result result=new Result();

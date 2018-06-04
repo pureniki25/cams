@@ -17,6 +17,8 @@ public class RepaymentSettleListVO {
 	private String afterId ;
 	@JsonFormat(pattern="yyyy-MM-dd")
 	private Date repayDate;
+	private Integer period ;
+	private Boolean isDefer ;
 	private BigDecimal item10 ;
 	private BigDecimal item20 ;
 	private BigDecimal item30 ;
@@ -29,6 +31,15 @@ public class RepaymentSettleListVO {
 	private BigDecimal penalty ;
 	private String remark ;
 	private String status ;
+	public Integer getRepayYear() {
+		return DateUtil.getYear(repayDate);
+	}
+	public Integer getRepayMonth() {
+		return DateUtil.getMonth(repayDate);
+	}
+	public Integer getRepayDay() {
+		return DateUtil.getDay(repayDate);
+	}
 	public String getAfterId() {
 		return afterId;
 	}
@@ -118,5 +129,40 @@ public class RepaymentSettleListVO {
 	}
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	/**
+	 * @return the period
+	 */
+	public Integer getPeriod() {
+		return period;
+	}
+	/**
+	 * @param period the period to set
+	 */
+	public void setPeriod(Integer period) {
+		this.period = period;
+	}
+	/**
+	 * @return the isDefer
+	 */
+	public Boolean getIsDefer() {
+		return isDefer;
+	}
+	/**
+	 * @param isDefer the isDefer to set
+	 */
+	public void setIsDefer(Boolean isDefer) {
+		this.isDefer = isDefer;
+	}
+	
+	public boolean samePeriod(RepaymentSettleListVO vo) {
+		if (!vo.getRepayYear().equals(getRepayYear())) {
+			return false ;
+		}
+		if (!vo.getRepayMonth().equals(getRepayMonth())) {
+			return false ;
+		}
+			
+		return true;
 	}
 }

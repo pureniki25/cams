@@ -34,12 +34,12 @@
 <body>
     <!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
     <div id="app" v-cloak>
-        <Card title="手动新增银行流水">
-            <i-form ref="form" :model="form" label-position="left" label-width="100">
-                <form-item prop="repayDate" label="还款日期" required>
-                    <date-picker v-model="form.repaymentDate"></date-picker>
+        <Card >
+            <i-form ref="form" :model="form" label-position="left" label-width="100" >
+                <form-item prop="repaymentDate" label="还款日期" required>
+                    <date-picker v-model="form.repaymentDate" @on-change="form.repaymentDate=$event"></date-picker>
                 </form-item>
-                <form-item prop="repayAmount" label="还款金额" required>
+                <form-item prop="repaymentMoney" label="还款金额" required>
                     <i-input v-model="form.repaymentMoney" number></i-input>
                     <span style="color:red">{{ArabicToChinese(form.repaymentMoney)}}</span>
                     <!-- <i-input :value="ArabicToChinese(form.repayAmount)" style="color:red" readonly></i-input> -->
@@ -53,7 +53,7 @@
                     </i-select>
                 </form-item>
 
-                <form-item prop="acceptBank" :label="acceptAccountLabel" required>
+                <form-item prop="acceptBank" :label="acceptAccountLabel"  required>
                     <i-select v-if="form.tradeType=='转账'||form.tradeType=='刷卡'" v-model="form.acceptBank">
                         <i-option v-for="item in bankAccountList" :value="item.financeName">{{item.financeName}}</i-option>
                     </i-select>
@@ -61,10 +61,10 @@
                     <i-input v-if="form.tradeType=='现金'" v-model="form.acceptBank"></i-input>
                 </form-item>
 
-                <form-item prop="factRepaymentUser" label="实际转款人" required>
+                <form-item prop="factRepaymentUser" :label="form.tradeType=='转账'?'实际转款人':'支付人'" >
                     <i-input v-model="form.factRepaymentUser"></i-input>
                 </form-item>
-                <form-item prop="tradePlace" label="交易场所" v-if="form.tradeType=='转账'||form.tradeType=='刷卡'">
+                <form-item prop="tradePlace" label="交易场所" >
                     <i-input v-model="form.tradePlace"></i-input>
                 </form-item>
 

@@ -1,12 +1,9 @@
 package com.hongte.alms.base.assets.car.service.impl;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+
+import com.hongte.alms.base.assets.car.vo.*;
 import org.apache.ibatis.session.RowBounds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,13 +18,6 @@ import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.assets.car.enums.CarStatusEnums;
 import com.hongte.alms.base.assets.car.mapper.CarMapper;
 import com.hongte.alms.base.assets.car.service.CarService;
-import com.hongte.alms.base.assets.car.vo.AuctionAplyVo;
-import com.hongte.alms.base.assets.car.vo.AuctionBidderVo;
-import com.hongte.alms.base.assets.car.vo.AuctionRespVo;
-import com.hongte.alms.base.assets.car.vo.AuctionsReqVo;
-import com.hongte.alms.base.assets.car.vo.CarReq;
-import com.hongte.alms.base.assets.car.vo.CarVo;
-import com.hongte.alms.base.assets.car.vo.FileVo;
 import com.hongte.alms.base.baseException.AlmsBaseExcepiton;
 import com.hongte.alms.base.entity.CarAuction;
 import com.hongte.alms.base.entity.CarAuctionBidder;
@@ -111,7 +101,8 @@ public class CarServiceImpl  implements CarService {
    
    @Autowired
    private CarReturnRegMapper carReturnRegMapper;
-	
+
+	@Override
 	public Page<CarVo> selectCarPage(CarReq carReq) {
 			Page<CarVo> pages = new Page<CarVo>();
 			String userId = loginUserInfoHelper.getUserId();
@@ -126,21 +117,21 @@ public class CarServiceImpl  implements CarService {
 		return pages;
 	}
 
+	@Override
 	public List<CarVo> selectCarList(CarReq carReq){
 		  List<CarVo> list=carMapper.selectCarPage(carReq);
 		  return list;
 	}
 	
-	public Page<AuctionRespVo> selectAuctionsPageForApp( AuctionsReqVo vo){
+	@Override
+	public Page<AuctionRespVo> selectAuctionsPageForApp(AuctionsReq req){
 		Page<AuctionRespVo> pages = new Page<AuctionRespVo>();
-		if(vo.getCurrentDate()==null) {
-			vo.setCurrentDate(new Date());
-		}
-		int count=carMapper.selectAuctionsCountForApp(vo);
+
+		int count=carMapper.selectAuctionsCountForApp(req);
 		  if(count<=0) {
 			   return pages;
 		   }
-		List<AuctionRespVo> list=carMapper.selectAuctionsPageForApp(vo);
+		List<AuctionRespVo> list=carMapper.selectAuctionsPageForApp(req);
 		if(list==null||list.size()<=0) {
 			return pages;
 		}
@@ -152,27 +143,52 @@ public class CarServiceImpl  implements CarService {
 		DocType docType=docTypes.get(0);
 		for(AuctionRespVo res:list) {
 		List<Doc> docs=docMapper.selectPage(new RowBounds(0,3), new EntityWrapper<Doc>().eq("doc_type_id", docType.getDocTypeId()).eq("doc_attr", "01").eq("business_id", res.getBusinessId()).orderBy("create_time", true));
-		res.setDocs(docs);
+			List<AuctionDocVo> auctionDocVoList = new ArrayList<>();
+			for (Doc doc : docs) {
+				AuctionDocVo auctionDocVo = new AuctionDocVo();
+				auctionDocVo.setDocUrl(doc.getDocUrl());
+				auctionDocVoList.add(auctionDocVo);
+			}
+			res.setDocs(auctionDocVoList);
 		}
 		pages.setTotal(count);
 		pages.setRecords(list);
 		return pages;
 	}
-	public Page<AuctionBidderVo> selectBiddersPageForApp( AuctionsReqVo vo){
-		Page<AuctionBidderVo>  pages=new Page<AuctionBidderVo> ();
-		int count=carMapper.selectBiddersCountForApp( vo);
-		  if(count<=0) {
-			   return pages;
-		   }
-		List<AuctionBidderVo> list=carMapper.selectBiddersPageForApp(vo);
-		pages.setTotal(count);
+
+	@Override
+	public Page<MyBadeCarVo> selectMyBidCarsForApp(MyBadeCarReq req) {
+		Page<MyBadeCarVo> pages = new Page<>();
+		pages.setCurrent(req.getPage());
+		pages.setSize(req.getLimit());
+		List<DocType> docTypes = docTypeMapper.selectList(new EntityWrapper<DocType>().eq("type_code", "AfterLoan_Material_CarAuction"));
+		if (docTypes == null || docTypes.size() != 1) {
+			logger.error("文件类型不存在或存在多条记录,docTypeCode=AfterLoan_Material_CarAuction");
+			throw new RuntimeException("文件类型不存在或存在多条记录");
+		}
+		DocType docType = docTypes.get(0);
+		List<MyBadeCarVo> list = carMapper.selectMyBidCarsForApp(pages, req);
+		for (MyBadeCarVo myBadeCarVo : list) {
+			List<Doc> docs = docMapper.selectPage(new RowBounds(0, 3), new EntityWrapper<Doc>().eq("doc_type_id", docType.getDocTypeId()).eq("doc_attr", "01").eq("business_id", myBadeCarVo.getBusinessId()).orderBy("create_time", true));
+			List<AuctionDocVo> auctionDocVoList = new ArrayList<>();
+			for (Doc doc : docs) {
+				AuctionDocVo auctionDocVo = new AuctionDocVo();
+				auctionDocVo.setDocUrl(doc.getDocUrl());
+				auctionDocVoList.add(auctionDocVo);
+			}
+			myBadeCarVo.setDocs(auctionDocVoList);
+		}
 		pages.setRecords(list);
-		return pages;		
+		return pages;
 	}
+
+	@Override
 	public Map<String,BigDecimal> selectMaxOfferPriceByAuctionId(String auctionId){
 		return carMapper.selectMaxOfferPriceByAuctionId(auctionId);
 	}
-	public Page<AuctionRespVo> selectAuctionsRegPageForApp( AuctionsReqVo vo){
+
+	@Override
+	public Page<AuctionRespVo> selectAuctionsRegPageForApp(AuctionsReq vo){
 		Page<AuctionRespVo> pages = new Page<AuctionRespVo>();
 		int count=carMapper.selectAuctionsRegCountForApp(vo);
 		  if(count<=0) {
@@ -189,8 +205,14 @@ public class CarServiceImpl  implements CarService {
 		}
 		DocType docType=docTypes.get(0);
 		for(AuctionRespVo res:list) {
-		List<Doc> docs=docMapper.selectPage(new RowBounds(0,3), new EntityWrapper<Doc>().eq("doc_type_id", docType.getDocTypeId()).eq("doc_attr", "01").eq("business_id", res.getBusinessId()).orderBy("create_time", true));
-		res.setDocs(docs);
+			List<Doc> docs = docMapper.selectPage(new RowBounds(0, 3), new EntityWrapper<Doc>().eq("doc_type_id", docType.getDocTypeId()).eq("doc_attr", "01").eq("business_id", res.getBusinessId()).orderBy("create_time", true));
+			List<AuctionDocVo> auctionDocVoList = new ArrayList<>();
+			for (Doc doc : docs) {
+				AuctionDocVo auctionDocVo = new AuctionDocVo();
+				auctionDocVo.setDocUrl(doc.getDocUrl());
+				auctionDocVoList.add(auctionDocVo);
+			}
+			res.setDocs(auctionDocVoList);
 		}
 		pages.setTotal(count);
 		pages.setRecords(list);
@@ -643,5 +665,15 @@ public class CarServiceImpl  implements CarService {
     		}
     	}
 		//
+	}
+
+	@Override
+	public Page<BusinessBidsVo> selectBusinessBids(BusinessBidsReq req) {
+		Page<BusinessBidsVo> pages = new Page<>();
+		pages.setCurrent(req.getPage());
+		pages.setSize(req.getLimit());
+		List<BusinessBidsVo> list = carMapper.selectBusinessBids(pages, req);
+		pages.setRecords(list);
+		return pages;
 	}
 }

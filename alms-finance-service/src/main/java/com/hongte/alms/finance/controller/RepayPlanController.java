@@ -7,17 +7,25 @@ import com.hongte.alms.base.RepayPlan.dto.PlanReturnInfoDto;
 import com.hongte.alms.base.RepayPlan.dto.app.BizDto;
 import com.hongte.alms.base.RepayPlan.dto.app.BizPlanDto;
 import com.hongte.alms.base.RepayPlan.dto.app.BizPlanListDto;
+import com.hongte.alms.base.RepayPlan.dto.app.BizPlanListMessageDto;
 import com.hongte.alms.base.RepayPlan.req.*;
 import com.hongte.alms.base.RepayPlan.req.trial.TrailBizInfoReq;
 import com.hongte.alms.base.RepayPlan.req.trial.TrailProjFeeReq;
 import com.hongte.alms.base.RepayPlan.req.trial.TrailProjInfoReq;
 import com.hongte.alms.base.RepayPlan.req.trial.TrailRepayPlanReq;
+import com.hongte.alms.base.entity.BasicBusiness;
+import com.hongte.alms.base.entity.BasicBusinessType;
+import com.hongte.alms.base.entity.BizOutputRecord;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanSettleStatusEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
+import com.hongte.alms.base.service.BasicBusinessService;
+import com.hongte.alms.base.service.BasicBusinessTypeService;
+import com.hongte.alms.base.service.BizOutputRecordService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.RepaymentBizPlanService;
+import com.hongte.alms.base.vo.module.api.RepayLogResp;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +44,7 @@ import com.hongte.alms.common.util.ClassCopyUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.finance.req.RepayPlanReq;
 import com.hongte.alms.finance.service.CreatRepayPlanService;
+import com.ht.ussp.util.DateUtil;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -69,8 +78,19 @@ public class RepayPlanController {
     @Autowired
     @Qualifier("RepaymentBizPlanListService")
     RepaymentBizPlanListService repaymentBizPlanListService;
-
-
+    
+    @Autowired
+    @Qualifier("BasicBusinessService")
+    BasicBusinessService basicBusinessService;
+    
+    @Autowired
+    @Qualifier("BasicBusinessTypeService")
+    BasicBusinessTypeService basicBusinessTypeService;
+    
+    
+    @Autowired
+    @Qualifier("BizOutputRecordService")
+    BizOutputRecordService bizOutputRecordService;
 
     private static Validator validator;
 
@@ -499,7 +519,57 @@ public class RepayPlanController {
 
        return  Result.success(bizPlanDto);
     }
+    
+    @ApiOperation(value = "获取业务的还款计划信息进行消息推送")
+    @PostMapping("/getMessage")
+    @ResponseBody
+    public Result<List<BizPlanListMessageDto>> getMessage(@RequestParam(value = "messageType") String messageType,@RequestParam(value = "dateCount") Integer dateCount){
+        logger.info("获取业务的还款计划信息进行消息推送 开始，推送类型和天数：[{}]", JSON.toJSONString(messageType),JSON.toJSONString(dateCount));
+        List<BizPlanListMessageDto> messages=new ArrayList();
+        List<RepaymentBizPlanList>  lists=null;
+        if(messageType.equals("0")) {//还款提醒
+    	    Date dueDate=DateUtil.getDate(DateUtil.formatDate(DateUtil.addDay2Date(dateCount, new Date())));
+    	    lists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("current_status","还款中").eq("due_date", dueDate));
+    	  	   
+       }
+       if(messageType.equals("1")) {//1.逾期提醒
+    	   dateCount=0-dateCount;
+    	   Date dueDate=DateUtil.getDate(DateUtil.formatDate(DateUtil.addDay2Date(dateCount, new Date())));
+    	   lists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("current_status","逾期").eq("due_date", dueDate));
+       }
+       if(messageType.equals("2")) {//2.结清提醒
+    	   Date dueDate=DateUtil.getDate(DateUtil.formatDate(DateUtil.addDay2Date(dateCount, new Date())));
+    	   lists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("current_status","还款中").eq("due_date", dueDate).orderBy("due_date",false));
+    		//筛选是最后一期的还款记录
+			for(Iterator<RepaymentBizPlanList> it = lists.iterator();it.hasNext();) {
+				RepaymentBizPlanList pList=it.next();
+				if(!istLastPeriod(pList)) {
+					it.remove();
+				}
+			}
+       }
+       
+    
+       for(RepaymentBizPlanList list:lists) {
+    	  BasicBusiness business= basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", list.getOrigBusinessId()));
+    	  BasicBusinessType type=basicBusinessTypeService.selectOne(new EntityWrapper<BasicBusinessType>().eq("business_type_id", business.getBusinessType()));
+    	  List<BizOutputRecord> outputRecords=bizOutputRecordService.selectList(new EntityWrapper<BizOutputRecord>().eq("business_id", business.getBusinessId()).orderBy("fact_output_date"));
+    	  Date outputDate=null;
+    	  if(outputRecords!=null&&outputRecords.size()>0) {
+    		  outputDate=outputRecords.get(0).getFactOutputDate();
+    	  }
+    	
+    	  BizPlanListMessageDto message=new BizPlanListMessageDto(list.getBusinessId(), business.getCustomerName(), business.getCustomerIdentifyCard(), type.getBusinessTypeName(), outputDate, list.getTotalBorrowAmount(), list.getPeriod(), business.getBorrowMoney(), list.getDueDate());
+    	  messages.add(message);
+       }   
+      
+       if(lists ==null||lists.size()==0){
+           return Result.error("9889","未找到对应的还款计划信息");
+       }
+        logger.info("获取业务的还款计划信息进行消息推送  结束，返回数据：[{}]", JSON.toJSONString(messages));
 
+       return  Result.success(messages);
+    }
 
     /**
      * 根据业务ID取得此业务的还款计划信息返回
@@ -509,8 +579,9 @@ public class RepayPlanController {
     private BizDto getBizDtoByBizId(String businessId){
         BizDto bizDto = new BizDto();
 
+        BasicBusiness business = basicBusinessService.selectById(businessId);
         bizDto.setBusinessId(businessId);
-
+        bizDto.setBusinessType(business==null?null:business.getBusinessCtype());
         List<RepaymentBizPlan> bizPlans = repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",businessId));
         if(bizPlans!=null && bizPlans.size()>0){
             List<BizPlanDto> bizPlanDtos = new LinkedList<>();
@@ -581,8 +652,21 @@ public class RepayPlanController {
 
 
 
-
-
+	public boolean istLastPeriod(RepaymentBizPlanList pList) {
+		boolean isLast=false;
+		List<RepaymentBizPlanList> pLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", pList.getPlanId()));
+		RepaymentBizPlanList lastpList=pLists.stream().max(new Comparator<RepaymentBizPlanList>() {
+			@Override
+			public int compare(RepaymentBizPlanList o1, RepaymentBizPlanList o2) {
+				return o1.getDueDate().compareTo(o2.getDueDate());
+			}
+		}).get();
+		
+		if(pList.getPlanListId().equals(lastpList.getPlanListId())) {
+			isLast=true;
+		}
+		return isLast;
+	}
 
 
 

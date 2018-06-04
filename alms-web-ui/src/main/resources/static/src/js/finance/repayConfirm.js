@@ -148,7 +148,7 @@ window.layinit(function (htConfig) {
             },
             factRepaymentInfo: {
                 repayDate: '',
-                surplusFund: '',
+                surplusFund: 0,
                 onlineOverDuel: '',
                 offlineOverDue: '',
                 remark: '',
@@ -181,11 +181,16 @@ window.layinit(function (htConfig) {
                     app.factRepaymentInfo.repayDate = o.tradeDate
                 }
                 app.factRepaymentInfo.moneyPoolAccount = moneyPoolAccount
-                app.factRepaymentInfo.repayAccount = app.factRepaymentInfo.moneyPoolAccount + (app.factRepaymentInfo.surplusFund || 0)
+                app.factRepaymentInfo.repayAccount = parseFloat(app.factRepaymentInfo.moneyPoolAccount)  + parseFloat(app.factRepaymentInfo.surplusFund || 0)
             },
             'factRepaymentInfo.surplusFund': function (n) {
                 if (n && !isNaN(n)) {
-                    app.factRepaymentInfo.repayAccount = app.factRepaymentInfo.moneyPoolAccount + (app.factRepaymentInfo.surplusFund || 0)
+                    if(n>app.factRepaymentInfo.canUseSurplus){
+                        app.$Message.warning({content:'可使用结余金额不能大于'+app.factRepaymentInfo.canUseSurplus})
+                        app.factRepaymentInfo.surplusFund = 0
+                        return;
+                    }
+                    app.factRepaymentInfo.repayAccount = parseFloat(app.factRepaymentInfo.moneyPoolAccount) + parseFloat(app.factRepaymentInfo.surplusFund || 0)
                 }
             },
             'factRepaymentInfo.repayAccount': function (n) {
@@ -220,7 +225,7 @@ window.layinit(function (htConfig) {
                     type: 2,
                     title: '手动匹配流水',
                     content: [url, 'no'],
-                    area: ['1600px', '800px'],
+                    area: ['40%', '90%'],
                     success: function (layero, index) {
                         curIndex = index;
                     }
@@ -231,8 +236,8 @@ window.layinit(function (htConfig) {
                 layer.open({
                     type: 2,
                     title: '手动新增流水',
-                    content: [url, 'no'],
-                    area: ['1600px', '800px'],
+                    content: [url],
+                    area: ['40%', '90%'],
                     success: function (layero, index) {
                         curIndex = index;
                     }
@@ -300,52 +305,65 @@ window.layinit(function (htConfig) {
                     .then(function (res) {
                         if (res.data.code == '1') {
                             app.handleConfirmRepaymentResult(res)
+                        }else{
+                            app.factRepaymentInfo.surplusFund = 0
+                            app.$Message.error({content:res.data.msg})
                         }
                     })
                     .catch(function (err) {
                         console.log(err);
                     })
-            },
-            handleConfirmRepaymentResult(res) {
-                app.table.projRepayment.data = res.data.data
-                app.factRepayPreview.item10 = 0
-                app.factRepayPreview.item20 = 0
-                app.factRepayPreview.item30 = 0
-                app.factRepayPreview.item50 = 0
-                app.factRepayPreview.offlineOverDue = 0
-                app.factRepayPreview.onlineOverDue = 0
-                app.factRepayPreview.subTotal = 0
-                app.factRepayPreview.total = 0
-                app.factRepayPreview.surplus = 0
-                app.table.projRepayment.data.forEach(e => {
-                    app.factRepayPreview.surplus += e.surplus
-                    app.factRepayPreview.item10 += e.item10
-                    app.factRepayPreview.item20 += e.item20
-                    app.factRepayPreview.item30 += e.item30
-                    app.factRepayPreview.item50 += e.item50
-                    app.factRepayPreview.offlineOverDue += e.offlineOverDue
-                    app.factRepayPreview.onlineOverDue += e.onlineOverDue
-                    app.factRepayPreview.subTotal += e.subTotal
-                    app.factRepayPreview.total += e.total
-                })
-            },
-            confirmRepayment() {
-                let param = {};
-                param.businessId = businessId;
-                param.afterId = afterId;
-                param = Object.assign(app.factRepaymentInfo, param);
-
-                axios.post(fpath + 'finance/confirmRepayment', param)
-                    .then(function (res) {
-                        if (res.data.code == '1') {
-                            app.handleConfirmRepaymentResult(res)
-
-                            window.location.reload()
+                },
+                handleConfirmRepaymentResult(res) {
+                    app.table.projRepayment.data = res.data.data
+                    app.factRepayPreview.item10 = 0
+                    app.factRepayPreview.item20 = 0
+                    app.factRepayPreview.item30 = 0
+                    app.factRepayPreview.item50 = 0
+                    app.factRepayPreview.offlineOverDue = 0
+                    app.factRepayPreview.onlineOverDue = 0
+                    app.factRepayPreview.subTotal = 0
+                    app.factRepayPreview.total = 0
+                    app.factRepayPreview.surplus = 0
+                    app.table.projRepayment.data.forEach(e => {
+                        app.factRepayPreview.surplus += e.surplus
+                        app.factRepayPreview.item10 += e.item10
+                        app.factRepayPreview.item20 += e.item20
+                        app.factRepayPreview.item30 += e.item30
+                        app.factRepayPreview.item50 += e.item50
+                        app.factRepayPreview.offlineOverDue += e.offlineOverDue
+                        app.factRepayPreview.onlineOverDue += e.onlineOverDue
+                        app.factRepayPreview.subTotal += e.subTotal
+                        app.factRepayPreview.total += e.total
+                    })
+                },
+                confirmRepayment() {
+                    let param = {};
+                    param.businessId = businessId;
+                    param.afterId = afterId;
+                    param = Object.assign(app.factRepaymentInfo, param);
+                    
+                    app.$Modal.confirm({
+                        content:'确认本次还款?',
+                        onOk(){
+                            axios.post(fpath + 'finance/confirmRepayment', param)
+                            .then(function (res) {
+                                if (res.data.code == '1') {
+                                    app.handleConfirmRepaymentResult(res)
+                                    
+                                    window.location.reload()
+                                }else{
+                                    app.factRepaymentInfo.surplusFund = 0
+                                    app.$Message.error({content:res.data.msg})
+                                }
+                            })
+                            .catch(function (err) {
+                                console.log(err);
+                            })
                         }
                     })
-                    .catch(function (err) {
-                        console.log(err);
-                    })
+                    
+                    
             },
         },
         created: function () {

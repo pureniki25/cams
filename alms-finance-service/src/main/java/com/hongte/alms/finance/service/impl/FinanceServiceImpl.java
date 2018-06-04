@@ -6,11 +6,15 @@ package com.hongte.alms.finance.service.impl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import java.util.TreeMap;
 import java.util.UUID;
 
@@ -29,6 +33,8 @@ import com.hongte.alms.base.RepayPlan.dto.RepaymentBizPlanDto;
 import com.hongte.alms.base.RepayPlan.dto.RepaymentBizPlanListDto;
 import com.hongte.alms.base.RepayPlan.dto.RepaymentProjPlanDto;
 import com.hongte.alms.base.RepayPlan.dto.RepaymentProjPlanListDto;
+import com.hongte.alms.base.dto.ActualPaymentLogDTO;
+import com.hongte.alms.base.dto.ActualPaymentSingleLogDTO;
 import com.hongte.alms.base.dto.RepaymentPlanInfoDTO;
 import com.hongte.alms.base.dto.RepaymentProjInfoDTO;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
@@ -324,6 +330,10 @@ public class FinanceServiceImpl implements FinanceService {
 		BigDecimal derate = new BigDecimal(0);
 		BigDecimal subtotal = new BigDecimal(0);
 		BigDecimal total = new BigDecimal(0);
+		t.put("item30", new BigDecimal(0));
+		t.put("item50", new BigDecimal(0));
+		t.put("onlineOverDue", new BigDecimal(0));
+		t.put("offlineOverDue", new BigDecimal(0));
 		for (RepaymentBizPlanListDetail repaymentBizPlanListDetail : details) {
 			if (repaymentBizPlanListDetail.getDerateAmount()!=null) {
 				derate = derate.add(repaymentBizPlanListDetail.getDerateAmount());
@@ -368,7 +378,7 @@ public class FinanceServiceImpl implements FinanceService {
 		
 		t.put("derate", derate);
 		total = total.subtract(derate);
-		t.put("subtotal", subtotal);
+		t.put("subTotal", subtotal);
 		t.put("total", total);
 
 		List<JSONObject> projs = new ArrayList<>();
@@ -498,6 +508,7 @@ public class FinanceServiceImpl implements FinanceService {
 				derateDetails.add(derateDetail);
 			}
 			c.setDerate(t1);
+			c.setDerateDetails(derateDetails);
 		}
 		return c;
 	}
@@ -1685,6 +1696,91 @@ public class FinanceServiceImpl implements FinanceService {
 			KafkaUtils.sendMessage(Constant.TOTAL_BUSINESS_BALANCE_TOPIC, businessId + SEND_DATA_PLATFORM_SPLIT_SYMBOL + loanBalance);
 		} catch (Exception e) {
 			logger.error("获取业务维度贷款余额失败，业务编号：{}；抛出异常{}", businessId, e);
+			throw new ServiceRuntimeException(e.getMessage(), e);
+		}
+	}
+	
+	@Override
+	public Map<String, Object> queryActualPaymentByBusinessId(String businessId) {
+		try {
+			if (StringUtil.isEmpty(businessId)) {
+				throw new ServiceRuntimeException("业务编号不能为空！");
+			}
+			Map<String, Object> resultMap = new HashMap<>();
+			
+			List<ActualPaymentSingleLogDTO> actualPaymentSingleLogDTOs = moneyPoolRepaymentMapper.queryActualPaymentByBusinessId(businessId);
+			
+			if (CollectionUtils.isNotEmpty(actualPaymentSingleLogDTOs)) {
+				
+				List<ActualPaymentSingleLogDTO> singleLogDTOs = new ArrayList<>();	// afterId 为空的实还流水
+				
+				Map<String, List<ActualPaymentSingleLogDTO>> map = new TreeMap<>();
+				
+				for (ActualPaymentSingleLogDTO actualPaymentSingleLogDTO : actualPaymentSingleLogDTOs) {
+					
+					String afterId = actualPaymentSingleLogDTO.getAfterId();
+					
+					if (StringUtil.isEmpty(afterId)) {
+						if (actualPaymentSingleLogDTO.getTradeTime() != null) {
+							singleLogDTOs.add(actualPaymentSingleLogDTO);
+						}
+						continue;
+					}
+					
+					// 根据afterId分组
+					List<ActualPaymentSingleLogDTO> list = map.get(afterId);
+					
+					if (list == null) {
+						List<ActualPaymentSingleLogDTO> dtoList = new LinkedList<>();
+						dtoList.add(actualPaymentSingleLogDTO);
+						map.put(afterId, dtoList);
+					}else {
+						list.add(actualPaymentSingleLogDTO);
+						map.put(afterId, list);
+					}
+					
+				}
+				
+				// 分别求每一期的实收合计
+				if (!map.isEmpty()) {
+					
+					List<ActualPaymentLogDTO>  actualPaymentLogDTOs = new LinkedList<>();
+					
+					for (Entry<String, List<ActualPaymentSingleLogDTO>> entry : map.entrySet()) {
+						// 一个list相当于一期
+						List<ActualPaymentSingleLogDTO> list = entry.getValue();
+						
+						// 实收合计
+						double receivedTotal = 0;
+						
+						for (ActualPaymentSingleLogDTO dto : list) {
+							receivedTotal += dto.getCurrentAmount();
+						}
+						
+						ActualPaymentLogDTO logDTO = new ActualPaymentLogDTO();
+						logDTO.setActualPaymentSingleLogDTOs(list);
+						logDTO.setAfterId(entry.getKey());
+						logDTO.setReceivedTotal(receivedTotal);
+						actualPaymentLogDTOs.add(logDTO);
+					}
+					resultMap.put("actualPaymentLogDTOs", actualPaymentLogDTOs);
+				}
+				
+				if (singleLogDTOs.size() > 1) {
+					Collections.sort(singleLogDTOs, new Comparator<ActualPaymentSingleLogDTO>() {
+						@Override
+						public int compare(ActualPaymentSingleLogDTO o1, ActualPaymentSingleLogDTO o2) {
+							return o1.getTradeTime().compareTo(o2.getTradeTime());
+						}
+					});
+				}
+				
+				resultMap.put("singleLogDTOs", singleLogDTOs);
+				
+			}
+			return resultMap;
+		} catch (Exception e) {
+			logger.error("根据业务编号查找实还流水失败，业务编号：{}；抛出异常{}", businessId, e);
 			throw new ServiceRuntimeException(e.getMessage(), e);
 		}
 	}

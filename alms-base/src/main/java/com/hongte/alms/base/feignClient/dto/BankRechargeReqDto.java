@@ -13,7 +13,7 @@ public class BankRechargeReqDto implements Serializable {
 	 private String oidPartner;//资产端账户唯一编号,团贷分配，商户唯一号(测试，生产不一样)
 	 private String rechargeUserId;//充值账户Id
 	 private String orgUserName;//机构账户(团贷登录用户名)
-	 private String amount;//充值金额
+	 private Double amount;//充值金额
 	 private String channelType;//渠道类型:102：易宝 104：厦门银行云支付 105：通联 106：快钱
 	 private String cmOrderNo;//机构订单编号
 	 private String userIP;
@@ -35,10 +35,11 @@ public class BankRechargeReqDto implements Serializable {
 	public void setOrgUserName(String orgUserName) {
 		this.orgUserName = orgUserName;
 	}
-	public String getAmount() {
+
+	public Double getAmount() {
 		return amount;
 	}
-	public void setAmount(String amount) {
+	public void setAmount(Double amount) {
 		this.amount = amount;
 	}
 	public String getChannelType() {

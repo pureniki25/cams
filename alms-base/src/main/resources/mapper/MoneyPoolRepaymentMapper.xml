@@ -54,4 +54,56 @@
 		    AND mpr.is_finance_match = 1
 		    AND ( mpr.is_deleted IS NULL OR mpr.is_deleted = 0 ) 
 	</select>
+	
+	<select id="queryActualPaymentByBusinessId" resultType="com.hongte.alms.base.dto.ActualPaymentSingleLogDTO">
+		SELECT 
+		  wrl.`after_id` afterId,
+		  IFNULL(wrl.`current_amount`, 0) currentAmount,
+		  '收入' incomeType,
+		  wrl.`create_time` tradeTime,
+		  CASE
+		    wp.`platform_id` 
+		    WHEN 5 
+		    THEN wp.platform_name 
+		    ELSE '第三方代扣' 
+		  END tradeType,
+		  CASE
+		    wp.`platform_id` 
+		    WHEN 0 
+		    THEN '易宝' 
+		    WHEN 3 
+		    THEN '宝付' 
+		    ELSE sb.bank_name 
+		  END accountName 
+		FROM
+		  `tb_withholding_repayment_log` wrl 
+		  JOIN `tb_withholding_platform` wp 
+		    ON wrl.`bind_platform_id` = wp.`platform_id` 
+		    AND wrl.`repay_status` = 1 
+		    AND wrl.original_business_id = #{businessId,jdbcType=VARCHAR}
+		  LEFT JOIN `tb_sys_bank_limit` sbl 
+		    ON wrl.bind_platform_id = sbl.platform_id 
+		  LEFT JOIN `tb_sys_bank` sb 
+		    ON sbl.bank_code = sb.bank_code 
+		UNION
+		ALL 
+		SELECT 
+		  mpr.`after_id` afterId,
+		  mpr.`account_money` currentAmount,
+		  CASE
+		    mpr.`income_type` 
+		    WHEN 1 
+		    THEN '收入' 
+		    ELSE '支出' 
+		  END incomeType,
+		  mpr.trade_date tradeTime,
+		  '线下转账' tradeType,
+		  mpr.bank_account accountName 
+		FROM
+		  `tb_money_pool_repayment` mpr,
+		  `tb_repayment_biz_plan_list` lst 
+		WHERE mpr.plan_list_id = lst.plan_list_id 
+		  AND lst.orig_business_id = #{businessId,jdbcType=VARCHAR}
+		ORDER BY 1
+	</select>
 </mapper>

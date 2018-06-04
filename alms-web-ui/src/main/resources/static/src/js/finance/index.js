@@ -13,7 +13,9 @@ window.layinit(function (htConfig) {
         data: {
             show: true,
             accountingConfirmStatus: [],
+            areaList:[],
             companys: [],
+            companyList:[],
             businessTypes: [],
             collectionStatus: [],
             form: {
@@ -23,6 +25,7 @@ window.layinit(function (htConfig) {
                 businessId: '',
                 principalDeadLine: '',
                 accountantConfirmStatus: '',
+                areaId:'',
                 companyId: '',
                 businessType: '',
                 repayDate: '',
@@ -57,15 +60,11 @@ window.layinit(function (htConfig) {
                     key: 'businessType'
                 },
                 {
-                    title: '还款日期',
+                    title: '应还日期',
                     key: 'planRepayDate',
                 },
                 {
-                    title: '还款登记日期',
-                    key: 'factRepayDate',
-                },
-                {
-                    title: '还款金额',
+                    title: '应还金额',
                     key: 'planRepayAmount',
                     align: 'right',
                     render: (h, p) => {
@@ -100,6 +99,14 @@ window.layinit(function (htConfig) {
                         }
                         res.push(text)
                         return h('div', res)
+                    }
+                },
+                {
+                    title: '已还金额',
+                    key: 'repaidAmount',
+                    align: 'right',
+                    render:(h,p)=>{
+                        return h('span', numeral(p.row.repaidAmount).format('0,0.00'))
                     }
                 },
                 {
@@ -162,7 +169,10 @@ window.layinit(function (htConfig) {
                 },
                 {
                     title: '是否支持代扣',
-                    key: 'canWithhold'
+                    key: 'canWithhold',
+                    render:(h,p)=>{
+                        return h('span',(p.row.canWithhold&&p.row.canWithhold==true?'支持代扣':'不支持代扣'));
+                    }
                 },
                 {
                     title: '操作',
@@ -194,7 +204,7 @@ window.layinit(function (htConfig) {
                                                     layer.open({
                                                         type: 2,
                                                         title: title,
-                                                        content: [url, 'no'],
+                                                        content: [url],
                                                         area: ['1600px', '800px'],
                                                         success: function (layero, index) {
                                                             curIndex = index;
@@ -206,7 +216,7 @@ window.layinit(function (htConfig) {
                                                     layer.open({
                                                         type: 2,
                                                         title: title,
-                                                        content: [url, 'no'],
+                                                        content: [url],
                                                         area: ['1600px', '800px'],
                                                         success: function (layero, index) {
                                                             curIndex = index;
@@ -218,7 +228,7 @@ window.layinit(function (htConfig) {
                                                     layer.open({
                                                         type: 2,
                                                         title: title,
-                                                        content: [url, 'no'],
+                                                        content: [url],
                                                         area: ['1600px', '800px'],
                                                         success: function (layero, index) {
                                                             curIndex = index;
@@ -290,10 +300,26 @@ window.layinit(function (htConfig) {
                 total: 0
             }
         },
+        watch:{
+            'form.areaId':function(n){
+                if(n){
+                    app.companys = []
+                    app.companyList.forEach(e=>{
+                        if(e.areaPid===n){
+                            app.companys.push(e)
+                        }
+                    })
+                }else{
+                    app.companyList.forEach(e=>{
+                        app.companys.push(e)
+                    })
+                }
+               
+            }
+        },
         methods: {
-            search: function (page) {
+            search: function () {
                 let params = {}
-
 
                 Object.keys(this.form).forEach(element => {
                     if (this.form[element] &&
@@ -337,7 +363,24 @@ window.layinit(function (htConfig) {
             }
         },
         created: function () {
-            axios.get(cpath + 'sys/param/getParam', { params: { paramType: '会计确认状态' } })
+
+
+                //取区域列表
+                axios.get(fpath + 'finance/getAreaCompany')
+                    .then(function (res) {
+                        if (res.data.code == "1") {
+                            app.areaList = res.data.data.area;
+                            app.companyList = res.data.data.company;
+                        } else {
+                            app.$Message.error({content: '操作失败，消息：' + res.data.msg});
+                        }
+                    })
+                    .catch(function (error) {
+                        vm.$Message.error({content: '接口调用异常!'});
+                    });
+
+
+           /*  axios.get(cpath + 'sys/param/getParam', { params: { paramType: '会计确认状态' } })
                 .then(function (res) {
                     if (res.data.code == '1') {
                         app.accountingConfirmStatus = res.data.data
@@ -348,7 +391,7 @@ window.layinit(function (htConfig) {
                 })
                 .catch(function (err) {
                     app.$Message.error({ content: '获取会计确认状态失败' })
-                })
+                }) */
 
             axios.get(fpath + 'finance/getCompanys')
                 .then(function (res) {
@@ -376,7 +419,7 @@ window.layinit(function (htConfig) {
                     app.$Message.error({ content: '获取业务类型失败' })
                 })
 
-            axios.get(cpath + 'sys/param/getParam', { params: { paramType: '贷后状态' } })
+           /*  axios.get(cpath + 'sys/param/getParam', { params: { paramType: '贷后状态' } })
                 .then(function (res) {
                     if (res.data.code == '1') {
                         app.collectionStatus = res.data.data
@@ -388,7 +431,7 @@ window.layinit(function (htConfig) {
                 .catch(function (err) {
                     app.$Message.error({ content: '获取贷后状态失败' })
                 })
-
+ */
             this.search()
         }
     })

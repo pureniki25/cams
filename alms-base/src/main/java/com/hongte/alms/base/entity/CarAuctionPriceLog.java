@@ -2,6 +2,7 @@ package com.hongte.alms.base.entity;
 
 import java.io.Serializable;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
@@ -26,13 +27,27 @@ public class CarAuctionPriceLog extends Model<CarAuctionPriceLog> {
     /**
      * 竞拍记录id 
      */
-	@ApiModelProperty(required= true,value = "竞拍记录id ")
+	@ApiModelProperty(required= true,value = "竞拍记录id")
 	private String id;
+
+
+	/**
+	 * 用户Id
+	 */
+	@TableField("user_id")
+	@ApiModelProperty(required= true,value = "用户Id")
+	private String userId;
+
+	@TableField("username")
+	@ApiModelProperty(required= true,value = "用户姓名")
+	private String username;
+
+
     /**
      * 竞拍id 
      */
 	@TableField("auction_id")
-	@ApiModelProperty(required= true,value = "竞拍id ")
+	@ApiModelProperty(required= true,value = "竞拍id")
 	private String auctionId;
     /**
      * 竞拍人手机
@@ -41,10 +56,10 @@ public class CarAuctionPriceLog extends Model<CarAuctionPriceLog> {
 	@ApiModelProperty(required= true,value = "竞拍人手机")
 	private String bidderTel;
     /**
-     * 联系方式 
+     * 出价
      */
-	@ApiModelProperty(required= true,value = "联系方式 ")
-	private String price;
+	@ApiModelProperty(required= true,value = "出价")
+	private BigDecimal price;
     /**
      * 创建时间 
      */
@@ -57,6 +72,13 @@ public class CarAuctionPriceLog extends Model<CarAuctionPriceLog> {
 	@TableField("bidder_cert_id")
 	@ApiModelProperty(required= true,value = "身份证号码")
 	private String bidderCertId;
+
+	/**
+	 * 出价备注
+	 */
+	@TableField("remark")
+	@ApiModelProperty(value = "出价备注")
+	private String remark;
 
 
 	public String getId() {
@@ -83,11 +105,11 @@ public class CarAuctionPriceLog extends Model<CarAuctionPriceLog> {
 		this.bidderTel = bidderTel;
 	}
 
-	public String getPrice() {
+	public BigDecimal getPrice() {
 		return price;
 	}
 
-	public void setPrice(String price) {
+	public void setPrice(BigDecimal price) {
 		this.price = price;
 	}
 
@@ -106,21 +128,52 @@ public class CarAuctionPriceLog extends Model<CarAuctionPriceLog> {
 	public void setBidderCertId(String bidderCertId) {
 		this.bidderCertId = bidderCertId;
 	}
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+
+	public String getUsername() {
+		return username;
+	}
+
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+
+	@Override
+	public String toString() {
+		return "CarAuctionPriceLog{" +
+				"id='" + id + '\'' +
+				", userId='" + userId + '\'' +
+				", username='" + username + '\'' +
+				", auctionId='" + auctionId + '\'' +
+				", bidderTel='" + bidderTel + '\'' +
+				", price=" + price +
+				", createTime=" + createTime +
+				", bidderCertId='" + bidderCertId + '\'' +
+				", remark='" + remark + '\'' +
+				'}';
+	}
 
 	@Override
 	protected Serializable pkVal() {
 		return this.id;
 	}
 
-	@Override
-	public String toString() {
-		return "CarAuctionPriceLog{" +
-			", id=" + id +
-			", auctionId=" + auctionId +
-			", bidderTel=" + bidderTel +
-			", price=" + price +
-			", createTime=" + createTime +
-			", bidderCertId=" + bidderCertId +
-			"}";
-	}
 }

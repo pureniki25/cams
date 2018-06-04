@@ -37,7 +37,38 @@ public class CarAuctionReg extends Model<CarAuctionReg> {
 	@TableField("business_id")
 	@ApiModelProperty(required= true,value = "资产端业务编号 ")
 	private String businessId;
-    /**
+
+
+	/**
+	 * 用户Id
+	 */
+
+	@TableField("user_id")
+
+	@ApiModelProperty(required= true,value = "用户Id")
+	private String userId;
+
+
+	/**
+	 * 用户姓名
+
+	 */
+
+	@TableField("username")
+
+	@ApiModelProperty(required= true,value = "用户姓名")
+	private String username;
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+
+	/**
      * 联系方式 
      */
 	@TableField("reg_tel")
@@ -56,6 +87,15 @@ public class CarAuctionReg extends Model<CarAuctionReg> {
 	@TableField("offer_amount")
 	@ApiModelProperty(required= true,value = "出价金额")
 	private BigDecimal offerAmount;
+
+
+	/**
+	 * 出价时间
+	 */
+	@TableField("offer_time")
+	@ApiModelProperty(required= true,value = "出价时间")
+	private Date offerTime;
+
     /**
      * 身份证号码（关联竞价人信息）
      */
@@ -88,14 +128,25 @@ public class CarAuctionReg extends Model<CarAuctionReg> {
 	@TableField("auction_id")
 	@ApiModelProperty(required= true,value = "竞拍id")
 	private String auctionId;
+
+	/**
+	 * 出价备注
+	 */
+	@TableField("remark")
+	@ApiModelProperty(value = "出价备注")
+	private String remark;
     /**
      * 更新人
      */
 	@TableField("update_user")
 	@ApiModelProperty(required= true,value = "更新人")
 	private String updateUser;
-    /**
+
+
+
+	/**
      * 更新时间
+
      */
 	@TableField("update_time")
 	@ApiModelProperty(required= true,value = "更新时间")
@@ -212,6 +263,32 @@ public class CarAuctionReg extends Model<CarAuctionReg> {
 		this.createUser = createUser;
 	}
 
+	public String getUserId() {
+		return userId;
+	}
+
+
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+	public Date getOfferTime() {
+		return offerTime;
+	}
+
+	public void setOfferTime(Date offerTime) {
+		this.offerTime = offerTime;
+	}
+
 	@Override
 	protected Serializable pkVal() {
 		return this.regId;
@@ -221,22 +298,4 @@ public class CarAuctionReg extends Model<CarAuctionReg> {
 
 
 
-	@Override
-	public String toString() {
-		return "CarAuctionReg{" +
-			", regId=" + regId +
-			", businessId=" + businessId +
-			", regTel=" + regTel +
-			", isPayDeposit=" + isPayDeposit +
-			", offerAmount=" + offerAmount +
-			", regCertId=" + regCertId +
-			", isAuctionSuccess=" + isAuctionSuccess +
-			", transPrice=" + transPrice +
-			", createTime=" + createTime +
-			", auctionId=" + auctionId +
-			", updateUser=" + updateUser +
-			", updateTime=" + updateTime +
-			", createUser=" + createUser +
-			"}";
-	}
 }

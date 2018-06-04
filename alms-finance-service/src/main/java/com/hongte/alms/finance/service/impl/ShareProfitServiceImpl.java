@@ -275,7 +275,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 				repaymentResource.setRepaySourceRefId(accountantOverRepayLog.getId().toString());
 				repaymentResource.insert();
 			}
-			repayFactAmount.get().add(req.getSurplusFund());
+			repayFactAmount.set(repayFactAmount.get().add(req.getSurplusFund()));
 			repaymentResources.get().add(repaymentResource);
 		}
 

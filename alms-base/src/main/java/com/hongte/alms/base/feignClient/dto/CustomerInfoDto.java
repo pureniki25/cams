@@ -13,10 +13,18 @@ public class CustomerInfoDto implements Serializable {
      private String platformBindCardNo;//绑定第三方平台银行卡号
      private String phone;//客户电话号码
      private String isDepository;//是否有注册存管账号
-     private String platformId;//绑定第三方平台ID	
+     private String platformId;//绑定平台ID
+     private Integer isBindThirdParty;//是否绑定第三方平台 0:否 1：是
      private String validDate;//绑定第三方平台银行卡的有效期
      private String validNo;//绑定第三方平台银行卡的安全码	
      private String rechargeUserId;//团贷网用户ID
+     
+	public Integer getIsBindThirdParty() {
+		return isBindThirdParty;
+	}
+	public void setIsBindThirdParty(Integer isBindThirdParty) {
+		this.isBindThirdParty = isBindThirdParty;
+	}
 	public String getBankBindCardNo() {
 		return bankBindCardNo;
 	}
