@@ -177,13 +177,17 @@ window.layinit(function (htConfig) {
                 this.add_modal = false
                 this.$refs['editForm'].resetFields();
             },
+            onChangeDate(date){
+                console.log(typeof date);
+                this.editForm.repaymentDate = date;
+            },
             handleParams: function () {
                 let o = {}
                 let ef = this.editForm
                 if (ef.moneyPoolId) {
                     o.moneyPoolId = ef.moneyPoolId
                 }
-                o.repaymentDate = ef.repaymentDate
+                o.repaymentDate = moment(ef.repaymentDate).format('YYYY-MM-DD')
                 o.repaymentMoney = ef.repaymentMoney
                 o.factRepaymentUser = ef.realRepaymentUser
                 o.tradePlace = ef.tradePlace
@@ -199,6 +203,7 @@ window.layinit(function (htConfig) {
                 } else {
                     return;
                 }
+                console.log(typeof o.repaymentDate);
                 return o
             },
             saveRepayment: function () {

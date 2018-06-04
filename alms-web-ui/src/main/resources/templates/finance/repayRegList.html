@@ -16,6 +16,13 @@
         <card title="登记还款信息列表">
             <i-table stripe :columns="table.col" :data="table.data"></i-table>
         </card>
+        <Modal v-model="rejectModal" title="拒绝原因:">
+            <i-input v-model="remark" type="textarea"></i-input>
+            <div slot="footer">
+                <i-button @click="app.remark='';app.rejectModal=false;" >取消</i-button>
+                <i-button @click="reject">确认</i-button>
+            </div>
+        </Modal>
     </div>
     <!-- 引入vue -->
     <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
