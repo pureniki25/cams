@@ -69,6 +69,7 @@ import com.hongte.alms.finance.service.FinanceService;
 import com.hongte.alms.finance.service.ShareProfitService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 
+import feign.Feign;
 import io.swagger.annotations.ApiOperation;
 
 /**
@@ -123,8 +124,15 @@ public class FinanceController {
 	@Autowired
 	@Qualifier("RepaymentBizPlanService")
 	private RepaymentBizPlanService repaymentBizPlanService ;
+	
+	@Autowired
+	@Qualifier("ShareProfitService")
+	private ShareProfitService shareProfitService ;
+	
 	@Autowired
 	private LoginUserInfoHelper loginUserInfoHelper ;
+	
+	
 	@Value("${oss.readUrl}")
 	private String ossReadUrl ;
 	@GetMapping(value = "/repayBaseInfo")
@@ -684,6 +692,28 @@ public class FinanceController {
 			e.printStackTrace();
 			return Result.error("500", "系统异常:还款计划失败");
 		}
+	}
+
+	
+	@ApiOperation(value = "分润")
+	@PostMapping("/shareProfit")
+	public Result shareProfit(@RequestParam("businessId") String businessId,@RequestParam("afterId") String afterId){
+		Result result=new Result();
+		try {
+			ConfirmRepaymentReq req=new ConfirmRepaymentReq();
+			List<Integer> list=new ArrayList<Integer>();
+			list.add(30);//还款来源银行代扣
+			
+			req.setAfterId(afterId);
+			req.setBusinessId(businessId);
+			req.setRepaySource(list);
+			shareProfitService.execute(req, true);
+              result.success(1);
+		} catch (Exception ex) {
+			logger.error(ex.getMessage());
+			return Result.error("分润出现异常", ex.getMessage());
+		}
+		return result;
 	}
 	
 }
