@@ -61,7 +61,9 @@ public class ProjInfoReq {
     @NotNull(message="线下期内逾期滞纳金费率(offLineInOverDueRate)不能为空")
     private BigDecimal offLineInOverDueRate;
 
-    @ApiModelProperty(required= true,value = "线下期内逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率")
+    @ApiModelProperty(required= true,value = "线下期内逾期滞纳金费率类型，1：按标的总借款金额乘以比例每天 \n" +
+            "2：按标的剩余本金乘以比例每天 \n" +
+            "3：按固定金额每天")
     @NotNull(message="线下期内逾期滞纳金费率类型(offLineInOverDueRateType)不能为空")
     private  Integer offLineInOverDueRateType;
 
@@ -69,7 +71,9 @@ public class ProjInfoReq {
     @NotNull(message="线下期外逾期滞纳金费率(offLineOutOverDueRate)不能为空")
     private BigDecimal offLineOutOverDueRate;
 
-    @ApiModelProperty(required= true,value = "线下期外逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率")
+    @ApiModelProperty(required= true,value = "线下期外逾期滞纳金费率类型，1：按标的总借款金额乘以比例每天 \n" +
+            "2：按标的剩余本金乘以比例每天 \n" +
+            "3：按固定金额每天")
     @NotNull(message="线下期外逾期滞纳金费率类型(offLineOutOverDueRateType)不能为空")
     private  Integer offLineOutOverDueRateType;
 
@@ -77,7 +81,11 @@ public class ProjInfoReq {
     @NotNull(message="线上逾期滞纳金费率(onLineOverDueRate)不能为空")
     private BigDecimal onLineOverDueRate;
 
-    @ApiModelProperty(required= true,value = "线上逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率")
+    @ApiModelProperty(required= true,value = "线上逾期滞纳金费率类型，1：按标的总借款金额乘以比例每天 \n" +
+            "2：按标的剩余本金乘以比例每天 \n" +
+            "3：按固定金额每天\n" +
+            "4：按标的当前应还本息乘以比例每天\n" +
+            "5：按标的垫付本息乘以比例每天")
     @NotNull(message="线上逾期滞纳金费率类型(onLineOverDueRateType)不能为空")
     private  Integer onLineOverDueRateType;
 
