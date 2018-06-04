@@ -224,8 +224,8 @@ window.layinit(function (htConfig) {
                 layer.open({
                     type: 2,
                     title: '手动匹配流水',
-                    content: [url, 'no'],
-                    area: ['40%', '90%'],
+                    content: [url],
+                    area: ['80%', '90%'],
                     success: function (layero, index) {
                         curIndex = index;
                     }
@@ -236,6 +236,18 @@ window.layinit(function (htConfig) {
                 layer.open({
                     type: 2,
                     title: '手动新增流水',
+                    content: [url],
+                    area: ['40%', '90%'],
+                    success: function (layero, index) {
+                        curIndex = index;
+                    }
+                })
+            },
+            openEditBankStatementModal(mprid) {
+                let url = '/finance/manualAddBankSatements?businessId=' + businessId + "&afterId=" + afterId+"&mprid="+mprid;
+                layer.open({
+                    type: 2,
+                    title: '手动编辑流水',
                     content: [url],
                     area: ['40%', '90%'],
                     success: function (layero, index) {

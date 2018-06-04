@@ -11,9 +11,12 @@ import com.hongte.alms.base.entity.MoneyPool;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentResource;
+import com.hongte.alms.base.enums.RepayCurrentStatusEnums;
 import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.enums.RepayRegisterState;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanAccountConfirmStatusEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanRepaySrcEnum;
+import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.mapper.MoneyPoolMapper;
 import com.hongte.alms.base.mapper.MoneyPoolRepaymentMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListMapper;
@@ -238,8 +241,11 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 
 	@Override
 	public MoneyPoolVO getMoneyPool(String moneyPoolId) {
-		MoneyPoolRepayment moneyPoolRepayment = new MoneyPoolRepayment();
-		moneyPoolRepayment = moneyPoolRepaymentMapper.selectOne(moneyPoolRepayment);
+		List<MoneyPoolRepayment> moneyPoolRepayments = moneyPoolRepaymentMapper.selectList(new EntityWrapper<MoneyPoolRepayment>().eq("money_pool_id", moneyPoolId).ne("state",RepayRegisterFinanceStatus.未关联银行流水.toString()));
+		if (moneyPoolRepayments==null) {
+			throw new ServiceRuntimeException("找不到对应的还款登记");
+		}
+		MoneyPoolRepayment moneyPoolRepayment = moneyPoolRepayments.get(0);
 		
 		MoneyPool moneyPool = new MoneyPool() ;
 		moneyPool = moneyPoolMapper.selectOne(moneyPool);

@@ -11,7 +11,7 @@ window.layinit(function (htConfig) {
 
     let businessId = getQueryStr('businessId')
     let afterId = getQueryStr('afterId')
-    let mpid = getQueryStr('mpid')
+    let mprid = getQueryStr('mprid')
 
     app = new Vue({
         el: "#app",
@@ -109,12 +109,15 @@ window.layinit(function (htConfig) {
                 })
                 params.businessId = businessId;
                 params.afterId = afterId;
-                if(mpid){
-                    params.mpid = mpid
+                if(mprid){
+                    params.mprid = mprid
                 }
                 if(!params.repaymentDate){
                     app.$Message.error({content:'还款日期不能为空'})
                     return ;
+                }
+                if(typeof params.repaymentDate!='string'){
+                    params.repaymentDate = moment(params.repaymentDate).format('YYYY-MM-DD')
                 }
                 if(!/^(\d{4})-(\d{2})-(\d{2})$/.test(params.repaymentDate)){
                     app.$Message.error({content:'还款日期格式错误'})
@@ -136,8 +139,8 @@ window.layinit(function (htConfig) {
                     app.$Message.error({content:(params.tradeType=='转账'?'实际转款人':'支付人')+'不能为空'})
                     return ;
                 }
-                let msg = mpid?"确认编辑此流水?":"确认新增此流水?"
-                let url = mpid?"确认编辑此流水?":"确认新增此流水?"
+                let msg = mprid?"确认编辑此流水?":"确认新增此流水?"
+                let url = mprid?"确认编辑此流水?":"确认新增此流水?"
                 app.$Modal.confirm({
                     content:msg,
                     onOk(){
@@ -164,7 +167,7 @@ window.layinit(function (htConfig) {
                 // window.parent.app.closeModal('manualAddBankSatementsShow')
             },
             getMoneyPool(){
-                axios.get(cpath + 'moneyPool/get', { params: { moneyPoolId: mpid } })
+                axios.get(cpath + 'moneyPool/getCustomerRepayment', { params: { id: mprid } })
                     .then(function (res) {
                         if (res.data.code == "1") {
 
@@ -174,11 +177,11 @@ window.layinit(function (htConfig) {
                             app.form.repaymentMoney = data.accountMoney
                             app.form.realRepaymentUser = data.factTransferName
                             app.form.tradeType = data.tradeType
-                            app.form.factRepaymentUser = data.remitBank
+                            app.form.factRepaymentUser = data.factTransferName
                             if (data.tradeType == '现金') {
-                                app.form.acceptBank = data.acceptBank
+                                app.form.acceptBank = data.bankAccount
                             } else {
-                                app.form.acceptBank = data.acceptBank
+                                app.form.acceptBank = data.bankAccount
                                 $.each(app.bankAccountList, function (i, o) {
                                     if (o.financeName == data.bankAccount) {
                                         app.curBankAccount = o.repaymentId
@@ -226,18 +229,27 @@ window.layinit(function (htConfig) {
                 }
             },
             'form.remark':function(n,o){
+                if(o==""){
+                    return ;
+                }
                 if(n.length>50){
                     app.$Message.error({content:'输入字数不符合要求，最多50字'})
                     app.form.remark = ''
                 }
             },
             'form.tradePlace':function(n,o){
+                if(o==""){
+                    return ;
+                }
                 if(n.length>15){
                     app.$Message.error({content:'输入字数不符合要求，最多15字'})
                     app.form.tradePlace = ''
                 }
             },
             'form.factRepaymentUser':function(n,o){
+                if(o==""){
+                    return ;
+                }
                 if(n.length>10){
                     app.$Message.error({content:'输入字数不符合要求，最多10字'})
                     app.form.factRepaymentUser = ''
@@ -246,7 +258,7 @@ window.layinit(function (htConfig) {
         },
         created: function () {
             this.listDepartmentBank()
-            if(mpid){
+            if(mprid){
                 this.getMoneyPool()
             }
         }
