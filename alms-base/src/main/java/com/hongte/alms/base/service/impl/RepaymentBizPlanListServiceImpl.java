@@ -197,8 +197,8 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
     }
 
 	@Override
-	public List<RepaymentBizPlanList> selectAutoRepayList() {
-		return repaymentBizPlanListMapper.selectAutoRepayList();
+	public List<RepaymentBizPlanList> selectAutoRepayList(Integer days) {
+		return repaymentBizPlanListMapper.selectAutoRepayList(days);
 	}
 
 	@Override

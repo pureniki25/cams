@@ -8,10 +8,27 @@
     <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css" />
     <link rel="stylesheet" type="text/css" href="/plugins/iview/2.13.1/css/iview.css" />
     <title>财务确认还款</title>
+    <style>
+        td {
+            width: 180em;
+            text-align: right;
+        }
+
+        .ivu-input-wrapper input {
+            text-align: right;
+        }
+
+        .plan,.fact td {
+            font-weight: 700;
+            font-style: normal;
+            font-size: 14px;
+            color: #000000;
+        }
+    </style>
 </head>
 
 <body>
-    <div id="app"  v-cloak>
+    <div id="app" v-cloak>
         <iframe :src="repayInfo.url" style="width: 100%;height: 200px;" frameborder="0" scrolling="no" seamless="seamless">你浏览器太旧啦!</iframe>
         <iframe :src="repayRegList.url" :style="repayRegList.style" frameborder="0" scrolling="no" seamless="seamless">你浏览器太旧啦!</iframe>
         <iframe :src="confirmedRepayment.url" :style="confirmedRepayment.style" frameborder="0" scrolling="no" seamless="seamless">你浏览器太旧啦!</iframe>
@@ -24,137 +41,199 @@
         <row>
             <i-col span="12">
                 <card title="本次应还信息">
-                    <row>
-                        <i-col span="24">
-                            应还日期：{{thisTimeRepaymentInfo.repayDate}}
-                        </i-col>
-                    </row>
-                    <row>
-                        <i-col span="24">
-                            <p>本次应还：</p>
-                            <p>
-                                <!-- 本次应还金额 -->
-                                <row>
-                                    <!-- 本金利息 -->
-                                    <i-col span="6">本金</i-col>
-                                    <i-col span="6">{{thisTimeRepaymentInfo.item10}}</i-col>
-                                    <i-col span="6">利息</i-col>
-                                    <i-col span="6">{{thisTimeRepaymentInfo.item20}}</i-col>
-                                </row>
-                                <row>
-                                    <!-- 服务费 平台费 -->
-                                    <i-col span="6">月收分公司服务费</i-col>
-                                    <i-col span="6">{{thisTimeRepaymentInfo.item30}}</i-col>
-                                    <i-col span="6">月收平台费</i-col>
-                                    <i-col span="6">{{thisTimeRepaymentInfo.item50}}</i-col>
-                                </row>
-                                <row>
-                                    <!-- 小计 逾期天数 -->
-                                    <i-col span="6">小计</i-col>
-                                    <i-col span="6">{{thisTimeRepaymentInfo.subtotal}}</i-col>
-                                    <i-col span="6">逾期天数</i-col>
-                                    <i-col span="6">{{thisTimeRepaymentInfo.overDays}}</i-col>
-                                </row>
-                                <row>
-                                    <!-- 线上逾期费 线下逾期费 -->
-                                    <i-col span="6">线下逾期费</i-col>
-                                    <i-col span="6">{{thisTimeRepaymentInfo.overDays}}</i-col>
-                                    <i-col span="6">线上逾期费</i-col>
-                                    <i-col span="6">{{thisTimeRepaymentInfo.overDays}}</i-col>
-                                </row>
-                                <row>
-                                    <!-- 减免金额 -->
-                                    <i-col span="6">减免金额</i-col>
-                                    <i-col span="6">{{thisTimeRepaymentInfo.derate}}</i-col>
-                                    <i-col span="6"></i-col>
-                                    <i-col span="6"></i-col>
-                                </row>
-                                <row>
-                                    <!-- 合计(含滞纳金) -->
-                                    <i-col span="6">合计(含滞纳金)</i-col>
-                                    <i-col span="6">{{thisTimeRepaymentInfo.total}}</i-col>
-                                    <i-col span="6"></i-col>
-                                    <i-col span="6"></i-col>
-                                </row>
-                            </p>
-                            <p v-if="thisTimeRepaymentInfo.derateDetails&&thisTimeRepaymentInfo.derateDetails.length>0">
-                                减免费用明细:
-                                <hr>
-                                <p v-for="item in thisTimeRepaymentInfo.derateDetails">
-                                    {{item.name}}:{{item.amount}}
-                                </p>
-                            </p>
-                        </i-col>
-                    </row>
+                    <p style="font-size: 14px;color: #1c2438;font-weight: 700;">
+                        应还日期：{{thisTimeRepaymentInfo.repayDate}}
+                    </p>
+                    <p style="font-size: 14px;color: #1c2438;font-weight: 700;">
+                        本次应还金额
+                    </p>
+                    <table class="plan">
+                        <tr>
+                            <td style="border-top-width: 6px;border-top-style: solid;">本金</td>
+                            <td style="border-top-width: 6px;border-top-style: solid;">
+                                <!-- <i-input disabled v-model="factRepayPreview.item10"></i-input> -->
+                                {{thisTimeRepaymentInfo.item10}}
+                            </td>
+                            <td style="border-top-width: 6px;border-top-style: solid;">利息</td>
+                            <td style="border-top-width: 6px;border-top-style: solid;">
+                                <!-- <i-input disabled v-model="factRepayPreview.item20"></i-input> -->
+                                {{thisTimeRepaymentInfo.item20}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td >月收分公司服务费</td>
+                            <td>
+                                <!-- <i-input disabled v-model="factRepayPreview.item30"></i-input> -->
+                                {{thisTimeRepaymentInfo.item30}}
+                            </td>
+                            <td >月收平台费</td>
+                            <td>
+                                <!-- <i-input disabled v-model="factRepayPreview.item50"></i-input> -->
+                                {{thisTimeRepaymentInfo.item50}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td >小计</td>
+                            <td>{{thisTimeRepaymentInfo.subtotal}}
+                                <!-- <i-input disabled v-model="factRepayPreview.subTotal"></i-input> -->
+                            </td>
+                            <td >逾期天数</td>
+                            <td>
+                                {{thisTimeRepaymentInfo.overDays}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td >线下逾期费</td>
+                            <td>{{thisTimeRepaymentInfo.offlineOverDue}}
+                                <!-- <i-input disabled v-model="factRepayPreview.offlineOverDue"></i-input> -->
+                            </td>
+                            <td >线上逾期费</td>
+                            <td>{{thisTimeRepaymentInfo.onlineOverDue}}
+                                <!-- <i-input disabled v-model="factRepayPreview.onlineOverDue"></i-input> -->
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="color:red;">■减免金额</td>
+                            <td>{{thisTimeRepaymentInfo.derate}}
+                                <!-- <i-input disabled v-model="factRepayPreview.surplus"></i-input> -->
+                            </td>
+                        </tr>
+                        <tr>
+                            <td >合计(含滞纳金)</td>
+                            <td>{{thisTimeRepaymentInfo.total}}
+                                <!-- <i-input disabled :value="factRepayPreview.total+factRepayPreview.surplus"></i-input> -->
+                            </td>
+                        </tr>
+                    </table>
+                    <br>
+                    <p style="font-size: 14px;color: #1c2438;font-weight: 700;">
+                            减免明细
+                        </p>
+                    <table>
+                        <tr>
+                            <td style="border-top-width: 6px;border-top-style: solid;"></td>
+                            <td style="border-top-width: 6px;border-top-style: solid;"></td>
+                            <td style="border-top-width: 6px;border-top-style: solid;"></td>
+                            <td style="border-top-width: 6px;border-top-style: solid;"></td>
+                        </tr>
+                        <tr v-if="thisTimeRepaymentInfo.derateDetails&&thisTimeRepaymentInfo.derateDetails.length>0" v-for="item in thisTimeRepaymentInfo.derateDetails">
+                            <td>{{item.name}}</td>
+                            <td>{{item.amount}}</td>
+                        </tr>
+                        <tr v-else>
+                            <td >无</td>
+                        </tr>
+                    </table>
                 </card>
             </i-col>
             <i-col span="12">
                 <card title="实还信息">
-                    <row>
-                        <i-col span="6">实还日期</i-col>
-                        <i-col span="6">
-                            <i-input disabled v-model="factRepaymentInfo.repayDate" ></i-input>
-                        </i-col>
-                    </row>
-                    <row>
-                        <i-col span="6">
-                            <Checkbox v-model="factRepaymentInfo.useSurplusflag" >结余暂收</Checkbox>
-                        </i-col>
-                        <i-col span="6">
-                            <i-input number v-model="factRepaymentInfo.surplusFund"  :disabled="!factRepaymentInfo.useSurplusflag" ></i-input>
-                            <span>结余暂收可用金额{{factRepaymentInfo.canUseSurplus}}元</span>
-                        </i-col>
-                    </row>
-                    <row>
-                        <i-col span="6">流水合计</i-col>
-                        <i-col span="6">{{factRepaymentInfo.moneyPoolAccount}}</i-col>
-                    </row>
-                    <row>
-                        <i-col span="6">还款合计</i-col>
-                        <i-col span="6">{{factRepaymentInfo.repayAccount}}</i-col>
-                    </row>
-                    <row>
-                        <i-col span="6">本金</i-col>
-                        <i-col span="6">{{factRepayPreview.item10}}</i-col>
-                        <i-col span="6">利息</i-col>
-                        <i-col span="6">{{factRepayPreview.item20}}</i-col>
-                    </row>
-                    <row>
-                        <i-col span="6">月收分公司服务费</i-col>
-                        <i-col span="6">{{factRepayPreview.item30}}</i-col>
-                        <i-col span="6">月收平台费</i-col>
-                        <i-col span="6">{{factRepayPreview.item50}}</i-col>
-                    </row>
-                    <row>
-                        <i-col span="6">小计</i-col>
-                        <i-col span="6">{{factRepayPreview.subTotal}}</i-col>
-                        <i-col span="6"></i-col>
-                        <i-col span="6"></i-col>
-                    </row>
-                    <row>
-                        <i-col span="6">线下逾期费</i-col>
-                        <i-col span="6">{{factRepayPreview.offlineOverDue}}</i-col>
-                        <i-col span="6">线上逾期费</i-col>
-                        <i-col span="6">{{factRepayPreview.onlineOverDue}}</i-col>
-                    </row>
-                    <row>
-                        <i-col span="6">结余</i-col>
-                        <i-col span="6">{{factRepayPreview.surplus}}</i-col>
-                        <i-col span="6"></i-col>
-                        <i-col span="6"></i-col>
-                    </row>
-                    <row>
-                        <i-col span="6">合计</i-col>
-                        <i-col span="6">{{factRepayPreview.total+factRepayPreview.surplus}}</i-col>
-                        <i-col span="6"></i-col>
-                        <i-col span="6"></i-col>
-                    </row>
-                    <row>
-                        <i-col span="6">备注</i-col>
-                        <i-col span="6"><i-input type="textarea" v-model="factRepaymentInfo.remark"></i-input></i-col>
-                        <i-col span="6"></i-col>
-                        <i-col span="6"></i-col>
-                    </row>
+                    <table class="fact">
+                        <tr>
+                            <td>还款金额来源</td>
+                            <td>实还日期:</td>
+                            <td>
+                                <i-input disabled v-model="factRepaymentInfo.repayDate"></i-input>
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <Checkbox v-model="factRepaymentInfo.useSurplusflag"></Checkbox>
+                                结余暂收:
+                            </td>
+                            <td>
+                                <i-input number v-model="factRepaymentInfo.surplusFund" :disabled="!factRepaymentInfo.useSurplusflag" style="text-align: right"></i-input>
+                                </i-input>
+                            </td>
+                            <td style="width: 200px">
+                                <span>结余暂收可用金额{{factRepaymentInfo.canUseSurplus}}元</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>流水合计：</td>
+                            <td>
+                                <i-input disabled v-model="factRepaymentInfo.moneyPoolAccount" style="text-align: right"></i-input>
+                            </td>
+                            <td style="width: 200px">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>还款合计：</td>
+                            <td>
+                                <i-input disabled v-model="factRepaymentInfo.repayAccount" class="rigthText"></i-input>
+                            </td>
+                            <td style="width: 200px">
+                            </td>
+                        </tr>
+                    </table>
+
+
+                    <p style="font-size: 14px;color: #1c2438;font-weight: 700;">
+                        实还明细
+                    </p>
+                    <table class="fact">
+                        <tr>
+                            <td style="border-top-width: 6px;border-top-style: solid;">本金</td>
+                            <td style="border-top-width: 6px;border-top-style: solid;">
+                                <i-input disabled v-model="factRepayPreview.item10"></i-input>
+                            </td>
+                            <td style="border-top-width: 6px;border-top-style: solid;">利息</td>
+                            <td style="border-top-width: 6px;border-top-style: solid;">
+                                <i-input disabled v-model="factRepayPreview.item20"></i-input>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>月收分公司服务费</td>
+                            <td>
+                                <i-input disabled v-model="factRepayPreview.item30"></i-input>
+                            </td>
+                            <td>月收平台费</td>
+                            <td>
+                                <i-input disabled v-model="factRepayPreview.item50"></i-input>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>小计</td>
+                            <td>{{factRepayPreview.subTotal}}
+                                <!-- <i-input disabled v-model="factRepayPreview.subTotal"></i-input> -->
+                            </td>
+                            <td></td>
+                            <td>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>线下逾期费</td>
+                            <td>
+                                <i-input :disabled="thisTimeRepaymentInfo.offlineOverDue==0" v-model="factRepayPreview.offlineOverDue"></i-input>
+                            </td>
+                            <td>线上逾期费</td>
+                            <td>
+                                <i-input disabled="thisTimeRepaymentInfo.onlineOverDue==0" v-model="factRepayPreview.onlineOverDue"></i-input>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>结余</td>
+                            <td>{{factRepayPreview.surplus}}
+                                <!-- <i-input disabled v-model="factRepayPreview.surplus"></i-input> -->
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>合计</td>
+                            <td>{{factRepayPreview.total+factRepayPreview.surplus}}
+                                <!-- <i-input disabled :value="factRepayPreview.total+factRepayPreview.surplus"></i-input> -->
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>备注</td>
+                            <td colspan="3">
+                                <i-input type="textarea" v-model="factRepaymentInfo.remark"></i-input>
+                            </td>
+                        </tr>
+                    </table>
                 </card>
             </i-col>
         </row>

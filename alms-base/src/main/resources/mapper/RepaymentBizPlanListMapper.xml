@@ -152,7 +152,7 @@
 				#{accountantConfirmStatus}
 			</if>
 			<if test="areaId != null">
-				AND bc.area_id = #{areaId}
+				AND bc.area_pid = #{areaId}
 			</if>
 			<if test="companyId != null">
 				AND b.company_name = #{companyId}
@@ -188,7 +188,7 @@
 			pl.orig_business_id as orgBusinessId,
 			pl.period as period,
 			pl.after_id as afterId ,
-			b.company_name as dept,
+			b.company_id as dept,
 			b.operator_name as operator,
 			bbc.customer_name as customer,
 			bbc.phone_number as phoneNumber,
@@ -213,7 +213,8 @@
 			pl.fact_repay_date as factRepayDate,
 			pl.total_borrow_amount as planRepayAmount,
 			pl.current_status as status ,
-			pl.accountant_confirm_status as financeConfirmStatus
+			pl.accountant_confirm_status as financeConfirmStatus,
+			(SELECT IFNULL(SUM(fact_amount),0) FROM tb_repayment_biz_plan_list_detail where plan_list_id = pl.plan_list_id ) as repaidAmount
 		FROM
 			tb_repayment_biz_plan_list pl
 		JOIN
@@ -238,7 +239,7 @@
 				#{accountantConfirmStatus}
 			</if>
 			<if test="areaId != null">
-				AND bc.area_id = #{areaId}
+				AND bc.area_pid = #{areaId}
 			</if>
 			<if test="companyId != null">
 				AND b.company_name = #{companyId}
@@ -259,6 +260,7 @@
 				AND pl.current_status = #{status}
 			</if>
 		</where>
+		order by pl.due_date
 		limit ${(curPage-1)*pageSize} , ${pageSize}
 	</select>
 
@@ -337,9 +339,10 @@
      
 	  select 
 	     <include refid="Base_Column_List"/>
-	  from tb_repayment_biz_plan_list   
+       from tb_repayment_biz_plan_list   
 	  
-	  where confirm_flag=1 and (date_sub(due_date,interval 1 day)=curdate() or due_date=curdate()) and `current_status!`!='已还款' and src_type=2
+	  where confirm_flag=1   <![CDATA[ and (date_sub(curdate(),interval #{days} day)<=due_date) and  due_date<=curdate()]]>     <![CDATA[ and    `current_status`  <>'已还款' ]]> and src_type=2
+	  
     </select>
     
     <select id="queryRepaymentPlanInfoByBusinessId" resultType="com.hongte.alms.base.dto.RepaymentPlanInfoDTO">

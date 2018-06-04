@@ -104,7 +104,7 @@ public interface RepaymentBizPlanListService extends BaseService<RepaymentBizPla
      * 获取符合自动代扣的数据
      * @return
      */
-    List<RepaymentBizPlanList> selectAutoRepayList();
+    List<RepaymentBizPlanList> selectAutoRepayList(Integer days);
 
 
     /**

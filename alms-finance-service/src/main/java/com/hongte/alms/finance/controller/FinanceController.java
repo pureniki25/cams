@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -60,6 +61,7 @@ import com.hongte.alms.base.vo.finance.CurrPeriodRepaymentInfoVO;
 import com.hongte.alms.base.vo.finance.RepaymentSettleListVO;
 import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
 import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.finance.req.MoneyPoolReq;
@@ -123,7 +125,8 @@ public class FinanceController {
 	private RepaymentBizPlanService repaymentBizPlanService ;
 	@Autowired
 	private LoginUserInfoHelper loginUserInfoHelper ;
-
+	@Value("${oss.readUrl}")
+	private String ossReadUrl ;
 	@GetMapping(value = "/repayBaseInfo")
 	@ApiOperation(value = "获取还款基本信息")
 	public Result repayBaseInfo(String businessId, String afterId) {
@@ -155,9 +158,9 @@ public class FinanceController {
 				: basicBusiness.getOperatorName());
 		r.put("customerName", basicBusiness.getCustomerName());
 		r.put("repaymentType", basicRepaymentType.getRepaymentTypeName());
-		r.put("repayDate", repaymentBizPlanList.getDueDate());
+		r.put("repayDate", DateUtil.formatDate(repaymentBizPlanList.getDueDate()));
 		r.put("repayAmount", repaymentBizPlanList.getTotalBorrowAmount());
-		r.put("borrowAmount", outPutMoney);
+		r.put("borrowAmount", basicBusiness.getBorrowMoney());
 		r.put("borrowLimit", basicBusiness.getBorrowLimit());
 		r.put("borrowLimitUnit", basicBusiness.getBorrowLimitUnit());
 		r.put("borrowRate", basicBusiness.getBorrowRate());

@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import java.util.TreeMap;
 import java.util.UUID;
 
@@ -329,6 +330,10 @@ public class FinanceServiceImpl implements FinanceService {
 		BigDecimal derate = new BigDecimal(0);
 		BigDecimal subtotal = new BigDecimal(0);
 		BigDecimal total = new BigDecimal(0);
+		t.put("item30", new BigDecimal(0));
+		t.put("item50", new BigDecimal(0));
+		t.put("onlineOverDue", new BigDecimal(0));
+		t.put("offlineOverDue", new BigDecimal(0));
 		for (RepaymentBizPlanListDetail repaymentBizPlanListDetail : details) {
 			if (repaymentBizPlanListDetail.getDerateAmount()!=null) {
 				derate = derate.add(repaymentBizPlanListDetail.getDerateAmount());
@@ -373,7 +378,7 @@ public class FinanceServiceImpl implements FinanceService {
 		
 		t.put("derate", derate);
 		total = total.subtract(derate);
-		t.put("subtotal", subtotal);
+		t.put("subTotal", subtotal);
 		t.put("total", total);
 
 		List<JSONObject> projs = new ArrayList<>();
@@ -503,6 +508,7 @@ public class FinanceServiceImpl implements FinanceService {
 				derateDetails.add(derateDetail);
 			}
 			c.setDerate(t1);
+			c.setDerateDetails(derateDetails);
 		}
 		return c;
 	}

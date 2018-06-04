@@ -7,15 +7,15 @@
     <title>Insert title here</title>
     <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css" />
     <link rel="stylesheet" type="text/css" href="/plugins/iview/2.13.1/css/iview.css" />
-    <title>匹配的款项池银行流水</title>
+    <title>本次匹配款项池银行流水</title>
 </head>
 
 <body>
     <div id="app" v-cloak>
         <Spin size="large" fix v-if="spinShow"></Spin>
-        <card title="匹配的款项池银行流水">
-            <div slot='title'>
-                <span>匹配的款项池银行流水</span>
+        <card >
+            <div slot='title' >
+                <span style="font-size: 14px;color: #1c2438;font-weight: 700;" >本次匹配款项池银行流水</span>
                 <span style="float: right;">
                     <i-button size="small" @click="openMatchBankStatementModal">匹配流水</i-button>
                     <i-button size="small" @click="openAddBankStatementModal">新增</i-button>

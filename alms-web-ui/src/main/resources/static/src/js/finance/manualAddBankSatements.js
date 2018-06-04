@@ -22,6 +22,20 @@ window.layinit(function (htConfig) {
                 acceptBank: '',
                 cert:''
             },
+            ruleValidate: {
+                repaymentDate: [
+                    { required: true, message: '还款日期不能为空', trigger: 'blur' }
+                ],
+                repaymentMoney: [
+                    { required: true, message: '还款金额不能为空', trigger: 'blur' },
+                ],
+                tradeType: [
+                    { required: true, message: '支付类型不能为空', trigger: 'blur' }
+                ],
+                acceptBank: [
+                    { required: true, message: '', trigger: 'blur' }
+                ],
+            },
             acceptAccountLabel: '',
             upload: {
                 url: cpath + "moneyPool/uploadCert",
@@ -85,8 +99,6 @@ window.layinit(function (htConfig) {
             },
             submit:function(){
                 let params = {}
-
-
                 Object.keys(this.form).forEach(element => {
                     if (this.form[element] &&
                         (this.form[element] != '' || this.form[element].length != 0)) {
@@ -95,17 +107,30 @@ window.layinit(function (htConfig) {
                 })
                 params.businessId = businessId;
                 params.afterId = afterId;
-                axios.post(fpath+'finance/appointBankStatement',params)
-                .then(function(res){
-                    if(res.data.code=='1'){
-                        parent.location.reload()
-                        app.cancel()
-                    }else{
-                        app.$Message.error({content:res.data.msg})
+                if(!params.repaymentDate){
+                    app.$Message.error({content:'还款日期不能为空'})
+                    return ;
+                }
+                if(!/^(\d{4})-(\d{2})-(\d{2})$/.test(params.repaymentDate)){
+                    app.$Message.error({content:'还款日期格式错误'})
+                    return ;
+                }
+                app.$Modal.confirm({
+                    content:'确认新增此流水?',
+                    onOk(){
+                        axios.post(fpath+'finance/appointBankStatement',params)
+                        .then(function(res){
+                            if(res.data.code=='1'){
+                                parent.location.reload()
+                                app.cancel()
+                            }else{
+                                app.$Message.error({content:res.data.msg})
+                            }
+                        })
+                        .catch(function(err){
+                            app.$Message.error({content:'提交还款登记失败'})
+                        })
                     }
-                })
-                .catch(function(err){
-                    app.$Message.error({content:'提交还款登记失败'})
                 })
             },
             cancel:function(){
@@ -137,6 +162,31 @@ window.layinit(function (htConfig) {
                         app.curBankAccount = e.repaymentId||'' ;
                     }
                 })
+            },
+            'form.repaymentMoney':function(n,o){
+                var reg = /^\d{1,10}(\.\d{1,2})?$/;
+                if (!reg.test(n)) {
+                    app.$Message.error({content:'输入金额不符合要求，小数点前最多10位，小数点后最多2位'})
+                    app.form.repaymentMoney = 0
+                }
+            },
+            'form.remark':function(n,o){
+                if(n.length>50){
+                    app.$Message.error({content:'输入字数不符合要求，最多50字'})
+                    app.form.remark = ''
+                }
+            },
+            'form.tradePlace':function(n,o){
+                if(n.length>15){
+                    app.$Message.error({content:'输入字数不符合要求，最多15字'})
+                    app.form.tradePlace = ''
+                }
+            },
+            'form.factRepaymentUser':function(n,o){
+                if(n.length>10){
+                    app.$Message.error({content:'输入字数不符合要求，最多10字'})
+                    app.form.factRepaymentUser = ''
+                }
             }
         },
         created: function () {

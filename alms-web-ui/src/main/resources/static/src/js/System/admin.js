@@ -1,8 +1,10 @@
 var basePath;
+var financeBasePath
 var vm;
 
 window.layinit(function (htConfig) {
     basePath = htConfig.coreBasePath;
+    financeBasePath=htConfig.financeBasePath;
     
 	vm = new Vue({
 	   el: '#app',
@@ -12,6 +14,8 @@ window.layinit(function (htConfig) {
            synOneListColLoading:false,
            setUserPermissonsLoading:false,
            fiveLevelClassifyLoading:false,
+           calLateFeeLoading:false,
+           
 		   // --- 按钮控制标识 end---
 
 		   onePListCollogBId:"",
@@ -111,6 +115,25 @@ window.layinit(function (htConfig) {
                axios.get(basePath +"collectionTrackLog/transfer",{timeout: 0})
                    .then(function (res) {
                        vm.syncCollectionLoading = false;
+                       if (res.data.data != null && res.data.code == 1) {
+                           vm.$Modal.success({
+                               content: res.data.msg
+                           });
+                       } else {
+                           vm.$Modal.error({content: res.data.msg });
+                       }
+                   })
+                   .catch(function (error) {
+                       vm.syncCollectionLoading = false;
+                       vm.$Modal.error({content: '接口调用异常!'});
+                   });
+           },
+           // 
+           calLateFee:function(){
+               this.calLateFeeLoading = true;
+               axios.get(financeBasePath +"calLateFeeController/calLateFee",{timeout: 0})
+                   .then(function (res) {
+                       vm.calLateFeeLoading = false;
                        if (res.data.data != null && res.data.code == 1) {
                            vm.$Modal.success({
                                content: res.data.msg

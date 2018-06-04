@@ -18,7 +18,9 @@ window.layinit(function (htConfig) {
                 col: [
                     {
                         title: '流水号',
-                        key: 'moneyPoolId'
+                        key: 'moneyPoolId',
+                        ellipsis:true,
+                        width:250
                     }, {
                         title: '还款日期',
                         key: 'tradeDate',
@@ -62,7 +64,7 @@ window.layinit(function (htConfig) {
                                 },
                                 on: {
                                     click: function () {
-                                        window.open(p.row.certificatePictureUrl);
+                                        window.open('http://xiaodaioa.oss-cn-beijing.aliyuncs.com/'+p.row.certificatePictureUrl);
                                     }
                                 }
                             }, '查看凭证')

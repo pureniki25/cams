@@ -16,12 +16,16 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.SysBankLimit;
+import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.entity.WithholdingChannel;
 import com.hongte.alms.base.enums.PlatformEnum;
+import com.hongte.alms.base.enums.SysParameterRepaydaysEnums;
+import com.hongte.alms.base.enums.SysParameterTypeEnums;
 import com.hongte.alms.base.feignClient.dto.CustomerInfoDto;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.SysBankLimitService;
+import com.hongte.alms.base.service.SysParameterService;
 import com.hongte.alms.base.service.WithholdingChannelService;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.StringUtil;
@@ -57,14 +61,20 @@ public class WithholdingServiceimpl implements WithholdingService {
 	@Autowired
 	@Qualifier("RechargeService")
 	RechargeService rechargeService;
+	
+	@Autowired
+	@Qualifier("SysParameterService")
+	SysParameterService sysParameterService;
 
 	@Override
 	public void withholding() {
-		List<RepaymentBizPlanList> pLists = repaymentBizPlanListService.selectAutoRepayList();
+	    List<SysParameter> repayStatusList =  sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterRepaydaysEnums.REPAY_DAYS.getKey()).eq("status",1).orderBy("row_Index"));
+	    Integer days= Integer.valueOf(repayStatusList.get(0).getParamValue());
+		List<RepaymentBizPlanList> pLists = repaymentBizPlanListService.selectAutoRepayList(days);//查询一个周期内(30天)要代扣的记录
 		for (RepaymentBizPlanList pList : pLists) {
-			// 不是最后一期才能代扣
-			if (!rechargeService.istLastPeriod(pList)) {
-
+			// 是否符合自动代扣规则
+			if (rechargeService.EnsureAutoPayIsEnabled(pList, days)) {
+				autoRepayPerList(pList);
 			} else {
 				continue;
 			}
