@@ -523,7 +523,7 @@ public class RepayPlanController {
     @ApiOperation(value = "获取业务的还款计划信息进行消息推送")
     @PostMapping("/getMessage")
     @ResponseBody
-    public Result<List<BizPlanListMessageDto>> getMessage(@RequestParam(value = "messageType") String messageType,@RequestParam(value = "dateCount") Integer dateCount){
+    public Result<List<BizPlanListMessageDto>> getMessage(@RequestParam(value="messageType") String messageType,@RequestParam(value="dateCount") Integer dateCount){
         logger.info("获取业务的还款计划信息进行消息推送 开始，推送类型和天数：[{}]", JSON.toJSONString(messageType),JSON.toJSONString(dateCount));
         List<BizPlanListMessageDto> messages=new ArrayList();
         List<RepaymentBizPlanList>  lists=null;
@@ -549,23 +549,26 @@ public class RepayPlanController {
 			}
        }
        
-    
-       for(RepaymentBizPlanList list:lists) {
-    	  BasicBusiness business= basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", list.getOrigBusinessId()));
-    	  BasicBusinessType type=basicBusinessTypeService.selectOne(new EntityWrapper<BasicBusinessType>().eq("business_type_id", business.getBusinessType()));
-    	  List<BizOutputRecord> outputRecords=bizOutputRecordService.selectList(new EntityWrapper<BizOutputRecord>().eq("business_id", business.getBusinessId()).orderBy("fact_output_date"));
-    	  Date outputDate=null;
-    	  if(outputRecords!=null&&outputRecords.size()>0) {
-    		  outputDate=outputRecords.get(0).getFactOutputDate();
-    	  }
-    	
-    	  BizPlanListMessageDto message=new BizPlanListMessageDto(list.getBusinessId(), business.getCustomerName(), business.getCustomerIdentifyCard(), type.getBusinessTypeName(), outputDate, list.getTotalBorrowAmount(), list.getPeriod(), business.getBorrowMoney(), list.getDueDate());
-    	  messages.add(message);
-       }   
-      
        if(lists ==null||lists.size()==0){
            return Result.error("9889","未找到对应的还款计划信息");
+       }else {
+	       for(RepaymentBizPlanList list:lists) {
+	    	  BasicBusiness business= basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", list.getOrigBusinessId()));
+	    	  if(business==null) {
+	    		  continue;
+	    	  }
+	    	  BasicBusinessType type=basicBusinessTypeService.selectOne(new EntityWrapper<BasicBusinessType>().eq("business_type_id", business.getBusinessType()));
+	    	  List<BizOutputRecord> outputRecords=bizOutputRecordService.selectList(new EntityWrapper<BizOutputRecord>().eq("business_id", business.getBusinessId()).orderBy("fact_output_date"));
+	    	  Date outputDate=null;
+	    	  if(outputRecords!=null&&outputRecords.size()>0) {
+	    		  outputDate=outputRecords.get(0).getFactOutputDate();
+	    	  }
+	    	
+	    	  BizPlanListMessageDto message=new BizPlanListMessageDto(list.getBusinessId(), business.getCustomerName(), business.getCustomerIdentifyCard(), type.getBusinessTypeName(), outputDate, list.getTotalBorrowAmount(), list.getPeriod(), business.getBorrowMoney(), list.getDueDate());
+	    	  messages.add(message);
+	       }   
        }
+      
         logger.info("获取业务的还款计划信息进行消息推送  结束，返回数据：[{}]", JSON.toJSONString(messages));
 
        return  Result.success(messages);
