@@ -1,11 +1,26 @@
 package com.hongte.alms.finance.controller;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.baomidou.mybatisplus.plugins.Page;
+import com.hongte.alms.base.RepayPlan.dto.PlanReturnInfoDto;
+import com.hongte.alms.base.RepayPlan.req.CreatRepayPlanReq;
+import com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo;
+import com.hongte.alms.base.entity.SysJobConfig;
+import com.hongte.alms.base.entity.WithholdingRepaymentLog;
 import com.hongte.alms.base.service.WithholdingRepaymentLogService;
+import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.vo.PageResult;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
 
 /**
  * @author zengkun
@@ -20,6 +35,29 @@ public class WithHoldLogController {
     @Autowired
     @Qualifier("WithholdingRepaymentLogService")
     WithholdingRepaymentLogService withholdingRepaymentLogService;
+
+    @ApiOperation(value = "获取代扣记录流水列表，分页")
+    @PostMapping("/getWithHoldLogs")
+    @ResponseBody
+    public PageResult<List<WithholdingRepaymentLog>> getWithHoldLogs(@RequestBody String identifyCard,@RequestBody Integer page,@RequestBody Integer size){
+
+
+        Page<WithholdingRepaymentLog> pages = new Page<>();
+
+        Wrapper<WithholdingRepaymentLog> wrapper = new EntityWrapper<>();
+        wrapper.eq("identity_card",identifyCard);
+
+
+        pages.setCurrent(page);
+        pages.setSize(size);
+
+        pages = withholdingRepaymentLogService.selectPage(pages,wrapper);
+
+        return PageResult.success(pages.getRecords(),pages.getTotal());
+    }
+
+
+
 
 
     

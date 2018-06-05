@@ -24,7 +24,7 @@ public enum RepayTypeEnum  implements IEnum{
 	DIVIDE_INTEREST_TEN(1000,"分期还本付息10年");
 
 
-    private int value;
+    private Integer value;
     private String name;
 
     RepayTypeEnum(final int value, final String name) {
@@ -41,4 +41,38 @@ public enum RepayTypeEnum  implements IEnum{
     public String getName(){
         return this.name;
     }
+
+
+
+    public static String nameOf(Integer key){
+        for(RepayTypeEnum d : RepayTypeEnum.values()){
+            if(d.value.equals(key)){
+                return d.name;
+            }
+        }
+        return null;
+
+    }
+
+    public static RepayTypeEnum getByKey(Integer key){
+        for(RepayTypeEnum d : RepayTypeEnum.values()){
+            if(d.value.equals(key)){
+                return d;
+            }
+        }
+        return null;
+
+    }
+
+    public static Integer keyOf(String name){
+        for(RepayTypeEnum d : RepayTypeEnum.values()){
+            if(d.name.equals(name)){
+                return d.value;
+            }
+        }
+        return null;
+
+    }
+
+
 }

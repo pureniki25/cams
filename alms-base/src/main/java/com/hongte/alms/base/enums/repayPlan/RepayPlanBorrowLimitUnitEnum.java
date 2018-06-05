@@ -15,7 +15,7 @@ public enum RepayPlanBorrowLimitUnitEnum implements IEnum {
     MONTH(1,"月"),
     DAY(2,"天");
 
-    private int value;
+    private Integer value;
     private String desc;
 
     RepayPlanBorrowLimitUnitEnum(final int value, final String desc) {
@@ -32,4 +32,36 @@ public enum RepayPlanBorrowLimitUnitEnum implements IEnum {
     public String getDesc(){
         return this.desc;
     }
+
+
+    public static String nameOf(Integer key){
+        for(RepayPlanBorrowLimitUnitEnum d : RepayPlanBorrowLimitUnitEnum.values()){
+            if(d.value.equals(key)){
+                return d.desc;
+            }
+        }
+        return null;
+
+    }
+
+    public static RepayPlanBorrowLimitUnitEnum getByKey(Integer key){
+        for(RepayPlanBorrowLimitUnitEnum d : RepayPlanBorrowLimitUnitEnum.values()){
+            if(d.value.equals(key)){
+                return d;
+            }
+        }
+        return null;
+
+    }
+
+    public static Integer keyOf(String name){
+        for(RepayPlanBorrowLimitUnitEnum d : RepayPlanBorrowLimitUnitEnum.values()){
+            if(d.desc.equals(name)){
+                return d.value;
+            }
+        }
+        return null;
+
+    }
+
 }
