@@ -275,6 +275,7 @@ public class CarServiceImpl  implements CarService {
       			auctionAplyVo.getCarAuction().setAuctionId(UUID.randomUUID().toString());
       			auctionAplyVo.getCarAuction().setCreateTime(new Date());
       			auctionAplyVo.getCarAuction().setCreateUser(loginUserInfoHelper.getUserId());
+      			auctionAplyVo.getCarAuction().setBidderCount(new Random().nextInt(451)+50);
       		}
       	}
       	ProcessSaveReq processSaveReq=new ProcessSaveReq();
@@ -295,7 +296,17 @@ public class CarServiceImpl  implements CarService {
       	if(rCarAuction==null) {
       		carAuctionMapper.insert(auctionAplyVo.getCarAuction());
       	}else {
-      		carAuctionMapper.updateById(auctionAplyVo.getCarAuction());
+      		rCarAuction.setStartingPrice(auctionAplyVo.getCarAuction().getStartingPrice());
+      		rCarAuction.setAuctionStartTime(auctionAplyVo.getCarAuction().getAuctionStartTime());
+			rCarAuction.setAuctionEndTime(auctionAplyVo.getCarAuction().getAuctionEndTime());
+			rCarAuction.setConsultant(auctionAplyVo.getCarAuction().getConsultant());
+			rCarAuction.setConsultantTel(auctionAplyVo.getCarAuction().getConsultantTel());
+			rCarAuction.setConsultantEmail(auctionAplyVo.getCarAuction().getConsultantEmail());
+			rCarAuction.setPaymentMethod(auctionAplyVo.getCarAuction().getPaymentMethod());
+			rCarAuction.setAuctionPosition(auctionAplyVo.getCarAuction().getAuctionPosition());
+			rCarAuction.setRemark(auctionAplyVo.getCarAuction().getRemark());
+			rCarAuction.setStatus("audit".equals(auctionAplyVo.getSubmitType())?AuctionStatusEnums.AUDIT.getKey():rCarAuction.getStatus());
+			carAuctionMapper.updateById(auctionAplyVo.getCarAuction());
       	}
       	processSaveReq.setTitle(ProcessTypeEnums.Aply_CarAuction.getName());
       	processSaveReq.setBusinessId(auctionAplyVo.getCarAuction().getBusinessId());

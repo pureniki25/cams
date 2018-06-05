@@ -65,7 +65,6 @@ width: 150px;
 <!--隐藏元素-->
 <!--<p id="staffType"  th:attr="value=${staffType}"  hidden />-->
 <!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
-	<p id="businessId" th:attr="value=${businessId}" hidden />
 <div id="app" v-cloak>
 
     <!-- 搜索工具框 开始-->
@@ -88,29 +87,13 @@ width: 150px;
                     </button>
                 </div>
 
-                <!-- <i-button slot="extra" type="info" :loading="loading" icon="ios-search" @click="toLoading" style="margin-right:10px">
-                    <span v-if="!loading">查询</span>
-                    <span v-else>查询中...</span>
-                </i-button>
-                <i-button slot="extra"  @click="handleReset('searchForm')" style="margin-right:10px">
-                    <span>重置</span>
-                </i-button> -->
-
 
                 <!--查询表单内容-->
                 <row :gutter="16">
                     <i-form ref="searchForm"  :model="searchForm"   :rules="ruleValidate" label-position="right" :label-width="100">
                        <i-col span="6">
-                            <form-item label="用户名"  prop="regName">
-                                <i-input v-model="searchForm.regName"></i-input>
-                            </form-item>
-                        </i-col>
-    
-                        <i-col span="6">
-                            <form-item label="是否缴纳保证金" prop="isPayDeposit" >
-                                <i-select v-model="searchForm.isPayDeposit" clearable filterable  style="width:200px">
-                                    <i-option v-for="item in isPayDeposits" :value="item.paramValue" :key="item.paramValue">{{ item.paramName }}</i-option>
-                                </i-select>
+                            <form-item label="关键字"  prop="keyword">
+                                <i-input v-model="searchForm.keyword" placeholder="姓名/身份证/联系电话"></i-input>
                             </form-item>
                         </i-col>
                     </i-form>

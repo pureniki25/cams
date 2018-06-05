@@ -58,6 +58,9 @@
 			font-weight: bolder;
 			width: 150px;
 		}
+		.input_label {
+			color: #FF3030;
+		}
 	</style>
 </head>
 
@@ -73,46 +76,42 @@
 				<div class="grid-demo layui-bg-gray">
 					<table class="layui-table">
 						<tr>
-							<td class="td_label">用户姓名</td>
+							<td class="td_label">用户姓名  <label class="input_label">*</label></td>
 							<td>
-								<i-input type="text" name="lname" v-bind:value="bidder.bidderName" readonly></i-input>
+								<i-input type="text" name="lname" v-bind:value="auctionReg.username" disabled></i-input>
 							</td>
 						</tr>
 						<tr>
-							<td class="td_label">身份证号码</td>
+							<td class="td_label">身份证号码	<label class="input_label">*</label></td>
+
 							<td>
-								<i-input type="text" name="lname" v-bind:value="bidder.bidderCertId" readonly></i-input>
+								<i-input type="text" name="lname" v-bind:value="auctionReg.regCertId" disabled></i-input>
 							</td>
 
 						</tr>
 						<tr>
-							<td class="td_label">联系方式</td>
+							<td class="td_label">联系方式  <label class="input_label">*</label></td>
 							<td>
-								<i-input type="text" name="lname" v-bind:value="bidder.bidderTel" readonly></i-input>
+								<i-input type="text" name="lname" v-bind:value="auctionReg.regTel" disabled></i-input>
 							</td>
 						</tr>
 						<tr>
-							<td class="td_label">是否缴纳保证金：</td>
+							<td class="td_label">出价金额  <label class="input_label">*</label></td>
 							<td>
-								<input value="false" type="radio" v-model="auctionReg.payDeposit">否&nbsp;
-								<input value="true" type="radio" v-model="auctionReg.payDeposit">是&nbsp;</td>
-						</tr>
-						<tr>
-							<td class="td_label">出价金额</td>
-							<td>
-								<i-input type="text" name="lname" v-bind:value="numeral(auctionReg.offerAmount).format()" readonly></i-input>
+								<i-input type="text" name="lname" v-bind:value="numeral(auctionReg.offerAmount).format()" disabled></i-input>
 							</td>
 						</tr>
 						<tr>
-							<td class="td_label">是否竞拍成功：</td>
+							<td class="td_label">是否竞拍成功  <label class="input_label">*</label></td>
 							<td>
 								<input value="false" type="radio" v-model="auctionReg.auctionSuccess">否&nbsp;
-								<input value="true" type="radio" v-model="auctionReg.auctionSuccess">是&nbsp;</td>
+								<input value="true" type="radio" v-model="auctionReg.auctionSuccess">是&nbsp;
+							</td>
 						</tr>
 						<tr>
-							<td class="td_label">成交价格</td>
+							<td class="td_label">成交价格  </td>
 							<td>
-								<i-input type="text" name="lname" v-model="numeral(auctionReg.transPrice).format()"></i-input>
+								<i-input type="text" name="lname"  v-model="auctionReg.transPrice"></i-input>
 							</td>
 						</tr>
 					</table>

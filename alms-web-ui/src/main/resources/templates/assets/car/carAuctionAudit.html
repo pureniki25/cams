@@ -375,7 +375,7 @@
 							</td>
 							<td>
 								<!-- <i-input v-model="carBasic.insuranceExpirationDate" id="insuranceExpirationDate" placeholder="yyyy-MM-dd"></i-input> -->
-								<input type="text" v-model="carBasic.insuranceExpirationDate" id="insuranceExpirationDate" placeholder="yyyy-MM-dd" :disabled="!canEdit">
+								<input type="text" v-model="detection.insuranceExpirationDate" id="insuranceExpirationDate" placeholder="yyyy-MM-dd" :disabled="!canEdit">
 							</td>
 						</tr>
 						<tr>
@@ -454,235 +454,62 @@
 				<div class="grid-demo layui-bg-gray">
 					<table class="layui-table">
 						<tr>
-							<td class="td_label">起拍价
+							<td class="td_label">最低价
 								<label class="input_label">*</label>
 							</td>
 							<td>
-								<i-input v-model="carAuction.startingPrice" id="startingPrice" maxlength="10" :readonly="!canEdit"></i-input>
-								<!-- <input type="text" v-model="carAuction.startingPrice" id="startingPrice" maxlength="10"> -->
+								<i-input type="text" v-model="carAuction.startingPrice" id="startingPrice" maxlength="10" :readonly="!canEdit"></i-input>
 							</td>
-							<td class="td_label">保证金
+							<td class="td_label">活动开始时间
 								<label class="input_label">*</label>
 							</td>
 							<td>
-									<i-input v-model="carAuction.deposit" id="deposit" maxlength="10" :readonly="!canEdit"></i-input>
-								<!-- <input type="text" v-model="carAuction.deposit" id="deposit" max="10"> -->
+								<i-input type="text" v-model="carAuction.auctionStartTime" id="auctionStartTime" placeholder="yyyy-MM-dd" :disabled="!canEdit"></i-input>
 							</td>
-							<td class="td_label">加价幅度
+							<td class="td_label">活动结束时间
 								<label class="input_label">*</label>
 							</td>
 							<td>
-								<i-select v-model="carAuction.fareRange" name="fareRange" id="fareRange" :disabled="!canEdit">
-									<i-option value="">--请选择--</i-option>
-									<i-option :value=500>500</i-option>
-									<i-option :value=1000>1000</i-option>
-									<i-option :value=1500>1500</i-option>
-									<i-option :value=2000>2000</i-option>
-								</i-select>
+								<i-input type="text" v-model="carAuction.auctionEndTime" id="auctionEndTime" placeholder="yyyy-MM-dd" :disabled="!canEdit"></i-input>
 							</td>
 						</tr>
 						<tr>
-							<td class="td_label">保留价
+							<td class="td_label">咨询人姓名
 								<label class="input_label">*</label>
 							</td>
 							<td>
-									<i-input v-model="carAuction.reservePrice" id="reservePrice" maxlength="10" :readonly="!canEdit"></i-input>
-								<!-- <input type="text" v-model="carAuction.reservePrice" id="reservePrice" maxlength="10"> -->
+								<i-input type="text" v-model="carAuction.consultant" id="consultant" :readonly="!canEdit"></i-input>
 							</td>
-							<td class="td_label">拍卖开始时间
+							<td class="td_label">咨询邮箱
 								<label class="input_label">*</label>
 							</td>
 							<td>
-									<!-- <i-input v-model="carAuction.auctionStartTime" id="auctionStartTime" placeholder="yyyy-MM-dd"></i-input> -->
-								<input type="text" v-model="carAuction.auctionStartTime" id="auctionStartTime" placeholder="yyyy-MM-dd" :disabled="!canEdit">
+								<i-input type="text" v-model="carAuction.consultantEmail" id="consultantEmail" :readonly="!canEdit"></i-input>
 							</td>
-							<td class="td_label">拍卖截止时间
+							<td class="td_label">咨询人联系电话
 								<label class="input_label">*</label>
 							</td>
 							<td>
-									<!-- <i-input v-model="carAuction.auctionEndTime" id="auctionEndTime" placeholder="yyyy-MM-dd"></i-input> -->
-								<input type="text" v-model="carAuction.auctionEndTime" id="auctionEndTime" placeholder="yyyy-MM-dd" :disabled="!canEdit">
+								<i-input type="text" v-model="carAuction.consultantTel" id="consultantTel" :readonly="!canEdit"></i-input>
 							</td>
+
 						</tr>
 
 						<tr>
-							<td class="td_label">交易类型
-								<label class="input_label">*</label>
-							</td>
-							<td>
-								<i-select v-model="carAuction.transType" id="transType" :disabled="!canEdit">
-									<i-option selected="selected" value="">--请选择--</i-option>
-									<i-option value="01">债权转让</i-option>
-									<i-option value="02">交易过户</i-option>
-								</i-select>
-							</td>
-							<td class="td_label">优先购权人
-								<label class="input_label">*</label>
-							</td>
-							<td>
-								<i-input v-model="carAuction.priorityPurchaser" id="priorityPurchaser" :readonly="!canEdit"></i-input>
-								<!-- <input type="text" v-model="carAuction.priorityPurchaser" id="priorityPurchaser" :disabled="!canEdit"> -->
-							</td>
-							<td class="td_label">取货方式
-								<label class="input_label">*</label>
-							</td>
-							<td>
-								<i-select v-model="carAuction.takeWay" id="takeWay" :disabled="!canEdit">
-									<i-option selected="selected" value="">--请选择--</i-option>
-									<i-option value="01">门店自提</i-option>
-									<i-option value="02">运费自付</i-option>
-								</i-select>
-							</td>
-						</tr>
-						<tr>
-
-							<td class="td_label">竞买开始时间
-								<label class="input_label">*</label>
-							</td>
-							<td>
-								<!-- <i-input v-model="carAuction.buyStartTime" id="buyStartTime" placeholder="yyyy-MM-dd"></i-input> -->
-								<input type="text" v-model="carAuction.buyStartTime" id="buyStartTime" placeholder="yyyy-MM-dd" :disabled="!canEdit">
-							</td>
-							<td class="td_label">竞买结束时间
-								<label class="input_label">*</label>
-							</td>
-							<td>
-									<!-- <i-input v-model="carAuction.buyEndTime" id="buyEndTime" placeholder="yyyy-MM-dd"></i-input> -->
-								<input type="text" v-model="carAuction.buyEndTime" id="buyEndTime" placeholder="yyyy-MM-dd" :disabled="!canEdit">
-							</td>
-							<td class="td_label">支付方式
-								<label class="input_label">*</label>
-							</td>
-							<td>
-								<i-select v-model="carAuction.payWay" id="payWay" :disabled="!canEdit">
-									<i-option selected="selected" value="">--请选择--</i-option>
-									<i-option value="01">线下支付</i-option>
-									<i-option value="02">线上支付</i-option>
-								</i-select>
-							</td>
-						</tr>
-						<tr>
-
-							<td class="td_label">咨询开始时间
-								<label class="input_label">*</label>
-							</td>
-							<td>
-									<!-- <i-input v-model="carAuction.consStartTime" id="consStartTime" placeholder="yyyy-MM-dd"></i-input> -->
-								<input type="text" v-model="carAuction.consStartTime" id="consStartTime" placeholder="yyyy-MM-dd" :disabled="!canEdit">
-							</td>
-							<td class="td_label">咨询结束时间
-								<label class="input_label">*</label>
-							</td>
-							<td>
-									<!-- <i-input v-model="carAuction.consEndTime" id="consEndTime" placeholder="yyyy-MM-dd"></i-input> -->
-								<input type="text" v-model="carAuction.consEndTime" id="consEndTime" placeholder="yyyy-MM-dd" :disabled="!canEdit">
-							</td>
-							<td class="td_label">咨询人
-								<label class="input_label">*</label>
-							</td>
-							<td>
-									<i-input v-model="carAuction.consultant" id="consultant" :readonly="!canEdit"></i-input>
-								<!-- <input type="text" v-model="carAuction.consultant" id="consultant"> -->
-							</td>
-						</tr>
-						<tr>
-
-							<td class="td_label">看样开始时间
-								<label class="input_label">*</label>
-							</td>
-							<td>
-									<!-- <i-input v-model="carAuction.viewSampleStartTime" id="viewSampleStartTime" placeholder="yyyy-MM-dd"></i-input> -->
-								<input type="text" v-model="carAuction.viewSampleStartTime" id="viewSampleStartTime" placeholder="yyyy-MM-dd" :disabled="!canEdit">
-							</td>
-							<td class="td_label">看样结束时间
-								<label class="input_label">*</label>
-							</td>
-							<td>
-									<!-- <i-input v-model="carAuction.viewSampleEndTime" id="viewSampleEndTime" placeholder="yyyy-MM-dd"></i-input> -->
-								<input type="text" v-model="carAuction.viewSampleEndTime" id="viewSampleEndTime" placeholder="yyyy-MM-dd" :disabled="!canEdit">
-							</td>
-							<td class="td_label">咨询人联系方式
-								<label class="input_label">*</label>
-							</td>
-							<td>
-									<i-input v-model="carAuction.consultantTel" id="consultantTel" :readonly="!canEdit"></i-input>
-								<!-- <input type="text" v-model="carAuction.consultantTel" id="consultantTel"> -->
-							</td>
-						</tr>
-						<!-- 			<tr>
-							<td class="td_label">拍卖物所在位置</td>
-							<td colspan="5"><input type="text" 
-								v-model="carAuction.auctionPosition" style="width: 100%" maxlength="200">
-							</td>
-						</tr> -->
-						<tr>
-							<td class="td_label">处置单位
+							<td class="td_label">付款方式
 								<label class="input_label">*</label>
 							</td>
 							<td colspan="5">
-									<i-input v-model="carAuction.handleUnit" style="width: 100%" maxlength="200" id="handleUnit" :readonly="!canEdit"></i-input>
-								<!-- <input type="text" v-model="carAuction.handleUnit" style="width: 100%" maxlength="200" id="handleUnit"> -->
+								<i-input type="text" v-model="carAuction.paymentMethod" style="width: 100%" maxlength="200" readonly="paymentMethod" readonly></i-input>
 							</td>
 						</tr>
 						<tr>
-							<td class="td_label">联系地点
-								<label class="input_label">*</label>
-							</td>
-							<td colspan="5">
-									<i-input v-model="carAuction.unitAddr" style="width: 100%" maxlength="400" id="unitAddr" :readonly="!canEdit"></i-input>
-								<!-- <input type="text" v-model="carAuction.unitAddr" style="width: 100%" maxlength="400" id="unitAddr"> -->
-							</td>
-						</tr>
-						<tr>
-							<td class="td_label">账户姓名
-								<label class="input_label">*</label>
-							</td>
-							<td>
-									<i-input v-model="carAuction.acountName" style="width: 100%" id="acountName" maxlength="100" :readonly="!canEdit"></i-input>
-								<!-- <input type="text" v-model="carAuction.acountName" style="width: 100%" id="acountName" maxlength="100"> -->
-							</td>
-							<td class="td_label">开户银行
-								<label class="input_label">*</label>
-							</td>
-							<td>
-									<i-input v-model="carAuction.openBank" style="width: 100%" id="openBank" maxlength="100" :readonly="!canEdit"></i-input>
-								<!-- <input type="text" v-model="carAuction.openBank" style="width: 100%" id="openBank" maxlength="100"> -->
 
-							</td>
-							<td class="td_label">银行卡号
-								<label class="input_label">*</label>
-							</td>
-							<td>
-									<i-input v-model="carAuction.acountNum" style="width: 100%" id="acountNum" maxlength="20" :readonly="!canEdit"></i-input>
-								<!-- <input type="text" v-model="carAuction.acountNum" style="width: 100%" id="acountNum" maxlength="20"> -->
-								<input type="text" v-model="carAuction.auctionId" hidden="">
-							</td>
-						</tr>
-						<tr>
-							<td class="td_label">缴款截止时间
-								<label class="input_label">*</label>
-							</td>
-							<td>
-									<!-- <i-input v-model="carAuction.paymentEndTime" id="paymentEndTime" placeholder="yyyy-MM-dd"></i-input> -->
-								<input type="text" v-model="carAuction.paymentEndTime" id="paymentEndTime" placeholder="yyyy-MM-dd" :disabled="!canEdit">
-							</td>
-							<td class="td_label">交易税费
-								<label class="input_label">*</label>
-							</td>
-							<td>
-									<i-input v-model="carAuction.transFree" id="transFree" maxlength="10" :readonly="!canEdit"></i-input>
-								<!-- <input type="text" v-model="carAuction.transFree" id="transFree" maxlength="10"> -->
-							</td>
-							<td class="td_label"></td>
-							<td></td>
-						</tr>
-						<tr>
-							<td class="td_label">看样地点
+							<td class="td_label">交易地点
 								<label class="input_label">*</label>
 							</td>
 							<td colspan="5">
-									<i-input v-model="carAuction.viewSampleAddr" style="width: 100%" maxlength="400" id="viewSampleAddr" :readonly="!canEdit"></i-input>
-								<!-- <input type="text" v-model="carAuction.viewSampleAddr" style="width: 100%" maxlength="400" id="viewSampleAddr"> -->
+								<i-input type="text" v-model="carAuction.auctionPosition" style="width: 100%" maxlength="100" :readonly="!canEdit"></i-input>
 							</td>
 						</tr>
 						<tr>

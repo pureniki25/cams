@@ -185,6 +185,11 @@ public class AuctionRespVo implements Serializable {
     @ApiModelProperty(value = "交易税费", name = "taxation")
     private String taxation;
 
+    /**
+     * 出价人数量
+     */
+    @ApiModelProperty(value = "出价人数量", name = "bidderCount")
+    private Integer bidderCount;
 
     public String getAuctionId() {
         return auctionId;
@@ -440,6 +445,14 @@ public class AuctionRespVo implements Serializable {
 
     public void setDocs(List<AuctionDocVo> docs) {
         this.docs = docs;
+    }
+
+    public Integer getBidderCount() {
+        return bidderCount;
+    }
+
+    public void setBidderCount(Integer bidderCount) {
+        this.bidderCount = bidderCount;
     }
 
     /**

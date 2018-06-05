@@ -1,4 +1,4 @@
-var businessId = document.getElementById("businessId").getAttribute("value");
+var businessId =getQueryStr("businessId");
 /*
 * 贷后管理首页 台账 js
 *
@@ -131,20 +131,8 @@ window.layinit(function (htConfig) {
        
         submitLoading: false,
         searchForm: {
-        	businessId:'',
-        	regName:'',  //客户名称
-        	isPayDeposit:''
-   
-            
+        	keyword:''  //关键字
         },
-        isPayDeposits:[{paramValue: '',paramName: '--请选择--'},{paramValue: true,paramName: '是'},{paramValue: false,paramName: '否'}],
-        areaList:'',//area_array,   //区域列表
-        companyList: '',//company_array,  //公司列表
-        businessTypeList:'',//btype_array,   //业务类型列表
-        carStatusList:'',//business_status_array,        //业务状态列表
-        repayStatusList:'',//repay_status_array,        //还款状态列表
-        collectLevelList:'',//collect_level_array, //催收级别列表
-
 
         selectedRowInfo:'',//存储当前选中行信息
         edit_modal:false,//控制编辑项选择modal显示的标志位
@@ -155,11 +143,10 @@ window.layinit(function (htConfig) {
 
     methods: {
         //重载表格
-        toLoading() {
-        	//alert(vm.searchForm.businessId);
-        	//alert($("#trailerStartDate").val());
+        toLoading:function() {
+
             if (table == null) return;
-            vm.$refs['searchForm'].validate((valid) =>{
+            vm.$refs['searchForm'].validate(function (valid){
                 if (valid) {
                     this.loading = true;
                     console.log(vm.searchForm);
@@ -169,8 +156,7 @@ window.layinit(function (htConfig) {
                     table.reload('listTable', {
                         where: {
                         	businessId:businessId,//业务编号
-                        	regName:vm.searchForm.regName,  //客户名称
-                        	isPayDeposit:vm.searchForm.isPayDeposit  //是否缴纳保证金
+                        	keyword:vm.searchForm.keyword,  //关键字
   
                         }
                         , page: {
@@ -183,14 +169,7 @@ window.layinit(function (htConfig) {
                 // this.loading = false;
             })
         },
-        handleReset (name) { // 重置表单
-        	vm.searchForm.trailerStartDate='';
-        	vm.searchForm.trailerEndDate='';
-        	
-        	vm.searchForm.status='';
-        	//var a=$("#trailerStartDate");
-        	//console.log(a);
-        	//alert(JSON.stringify(a));
+        handleReset:function (name) { // 重置表单
             var tt = this.$refs[name];
             tt.resetFields();
             vm.toLoading();
@@ -204,41 +183,38 @@ window.layinit(function (htConfig) {
             config = layui.ht_config;
             table = layui.table;
         	 laydate = layui.laydate;
-       	    laydate.render({
-    	        elem: '#trailerStartDate',
-    	        type:'datetime',
-    	    
-    	    });
-      	    laydate.render({
-    	        elem: '#trailerEndDate',
-    	        type:'datetime',
-    	     
-    	    });
             //执行渲染
             table.render({
                 elem: '#listTable' //指定原始表格元素选择器（推荐id选择器）
                 //, id: 'carList'
-                , height: 550 //容器高度
+
                 , cols: [[
                     {
-                        field: 'bidderName',
+                        field: 'seqNum',
+                        title: '序号'
+                    },
+                    {
+                        field: 'userName',
                         title: '用户姓名'
                     }, {
-                        field: 'bidderCertId',
+                        field: 'idCard',
                         title: '身份证号码'
                     }, {
-                        field: 'bidderTel',
+                        field: 'telephone',
                         title: '联系方式'
-                    },  {
-                        field: 'payDepositStr',
-                        title: '是否缴纳保证金'
                     }, {
-                        field: 'offerAmount',
+                        field: 'bidPrice',
                         title: '出价金额'
                     }, {
 
-                        field: 'auctionSuccessStr',
-                        title: '是否竞拍成功'
+                        field: 'auctionSuccess',
+                        title: '是否竞拍成功',
+                        templet: function(d){
+                            return d.auctionSuccess?"是":"否"
+                        }
+                    }, {
+                        field: 'remark',
+                        title: '备注'
                     }, {
                         fixed: 'right',
                         title: '操作',
@@ -248,9 +224,6 @@ window.layinit(function (htConfig) {
                     }
                 ]], //设置表头
                 url: basePath+'car/auctionRegList',
-                //method: 'post' //如果无需自定义HTTP类型，可不加该参数
-                //request: {} //如果无需自定义请求参数，可不加该参数
-                //response: {} //如果无需自定义数据响应名称，可不加该参数
                 width: window.innerWidth - 30,
                 where: {businessId:businessId},
                 page: true
@@ -266,7 +239,7 @@ window.layinit(function (htConfig) {
                 	 layer.open({
                 		 title:'车辆拍卖信息登记',
                          type: 2,
-                         content: '/assets/car/auctionReg?regId='+obj.data.regId,
+                         content: '/assets/car/auctionReg?regId='+obj.data.id,
                          area: ['40%', '65%']
                      });
                 }
@@ -275,62 +248,7 @@ window.layinit(function (htConfig) {
         });
     }
 });
-});//
+});
 
-var getSelectedcrpIds = function(){
-    var  crpIds = '';
-    var checkStatus = table.checkStatus('listTable');
-
-
-    for(var i=0;i<checkStatus.data.length;i++){
-        if(i!=0){
-            crpIds +=','
-        }
-        crpIds +=checkStatus.data[i].crpId;
-    }
-    return crpIds;
-}
-
-//为表单添加输入
-var addInput = function(form, type,name,value){
-    var input=document.createElement("input");
-    input.type=type;
-    input.name=name;
-    input.value = value;
-    form.appendChild(input);
-}
-
-
-//导出Excel文档
-var downloadExcel = function (href, title) {
-    const a = document.createElement('a');
-    a.setAttribute('href', href);
-    a.setAttribute('download', title);
-    a.click();
-}
-
-
-//从后台获取下拉框数据
-/**var getSelectsData = function () {
-    //取区域列表
-    axios.get('/core/collection/getALStandingBookVoPageSelectsData')
-        .then(function (res) {
-            if (res.data.code == "1") {
-                vm.areaList = res.data.data.area;
-                vm.companyList = res.data.data.company;
-                vm.businessTypeList = res.data.data.businessType;
-                vm.carStatusList = res.data.data.carStatusList;
-                vm.repayStatusList = res.data.data.repayStatusList;
-                vm.collectLevelList = res.data.data.collectLevelList;
-                
-            } else {
-                vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
-            }
-        })
-        .catch(function (error) {
-   
-            vm.$Modal.error({content: '接口调用异常!'});
-        });
-}**/
 
 
