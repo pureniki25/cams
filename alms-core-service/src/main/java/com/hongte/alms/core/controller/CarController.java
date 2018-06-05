@@ -605,7 +605,7 @@ try {
     		outputRecord.put("outputUserName", outputRecords.get(0).getOutputUserName());
     	}
     	
-    	List<CarAuction> carAuctions=carAuctionService.selectList(new EntityWrapper<CarAuction>().eq("business_id", businessId));
+    	List<CarAuction> carAuctions=carAuctionService.selectList(new EntityWrapper<CarAuction>().eq("business_id", businessId).orderBy("create_time",false));
     	CarAuction carAuction=new CarAuction();
     	if(carAuctions!=null&&carAuctions.size()==1) {
     		carAuction=carAuctions.get(0);
@@ -948,96 +948,81 @@ try {
     @ApiOperation(value = "获取竞价信息")
     @GetMapping("/auctionRegList")
     @ResponseBody
-    public PageResult<List<AuctionBidderVo>> selectBiddersPageForApp(@ModelAttribute AuctionsReq req){
+    public PageResult<List<BusinessBidsVo>> selectBusinessBids(@ModelAttribute BusinessBidsReq req) {
+		try {
+			Page<BusinessBidsVo> pages = carService.selectBusinessBids(req);
+			return PageResult.success(pages.getRecords(), pages.getTotal());
+		} catch (Exception ex) {
+			logger.error(ex.getMessage());
+			ex.printStackTrace();
+			return PageResult.error(9999, "系统异常");
+		}
+	}
 
-        try{
-        	/*List<CarAuction> carAuctions=carAuctionService.selectList(new EntityWrapper<CarAuction>().eq("business_id", req.getBusinessId()));
-        	CarAuction carAuction=new CarAuction();
-        	if(carAuctions!=null&&carAuctions.size()==1) {
-        		carAuction=carAuctions.get(0);
-        	}
-        	req.setPriceID(carAuction.getAuctionId());
-        	Page<AuctionBidderVo>  pages=carService.selectBiddersPageForApp(req);
-            return PageResult.success(pages.getRecords(),pages.getTotal());*/
-        	return null;
-        }catch (Exception ex){
-            logger.error(ex.getMessage());
-            ex.printStackTrace();
-            return PageResult.error(500, "数据库访问异常");
-        }
-    }
     @ApiOperation(value = "获取车辆拍卖信息")
     @PostMapping("/getAuctionReg")
-    public Result<Object> getAuctionReg(@ModelAttribute("regId") String regId){
-    	try{
-    		CarAuctionReg reg=carAuctionRegService.selectById(regId);
-    	if(reg==null) {
-    		logger.error("拍卖登记信息不存在，regId="+regId);
-    		return Result.error("9999", "拍卖登记信息不存在");
-    	}
-    	if(StringUtils.isEmpty(reg.getRegTel())) {
-    		logger.error("拍卖登记信息不存在，regId="+regId+",regTel="+reg.getRegTel());
-    		return Result.error("9999", "拍卖登记信息不存在");
-    	}
-    	CarAuctionBidder bidder=carAuctionBidderService.selectById(reg.getRegTel());
-    	if(bidder==null) {
-    		logger.error("拍卖登记信息不存在，regId="+regId+",regTel="+reg.getRegTel());
-    		return Result.error("9999", "竞拍人信息不存在");
-    	}
-    	Map<String, Object> map=new HashMap<String,Object>();
-    	map.put("auctionReg", reg);
-    	map.put("bidder", bidder);
-        return Result.build("0000", "操作成功", map);
- 	}catch (Exception e) {
-      	logger.error(e.getMessage());
-      	return Result.error("9999", "操作异常");
-  	}
-  }
+    public Result<Object> getAuctionReg(@ModelAttribute("regId") String regId) {
+		try {
+			CarAuctionReg reg = carAuctionRegService.selectById(regId);
+			if (reg == null) {
+				logger.error("拍卖登记信息不存在，regId=" + regId);
+				return Result.error("9999", "拍卖登记信息不存在");
+			}
+			return Result.build("0", "操作成功", reg);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return Result.error("9999", "操作异常");
+		}
+	}
       
     
-    @ApiOperation(value = "获取车辆拍卖信息")
+    @ApiOperation(value = "更新拍卖登记信息")
     @PostMapping("/updateAuctionReg")
-    public Result<Object> updateAuctionReg(@RequestBody Map<String,Object> params){
-    	try {
-    	@SuppressWarnings("unchecked")
-		CarAuctionReg auctionReg=JsonUtil.map2obj((Map<String,Object>)params.get("auctionReg"), CarAuctionReg.class);
-      	CarAuctionReg reg=carAuctionRegService.selectById(auctionReg.getRegId());
-    	if(reg==null) {
-    		logger.error("拍卖登记信息不存在，regId="+auctionReg.getRegId());
-    		return Result.error("9999", "拍卖登记信息不存在");
-    	}
-    	CarAuction carAuction=carAuctionService.selectById(reg.getAuctionId());
-    	if(carAuction==null) {
-    		logger.error("拍卖信息不存在，auctionId="+reg.getAuctionId());
-    		return Result.error("9999", "拍卖信息不存在");
-    	}
-    	if(!new Date().after(carAuction.getAuctionStartTime())) {
-    		logger.error("该拍卖进行中或已结束，auctionId="+reg.getAuctionId()+",auctionStartTime="+carAuction.getAuctionStartTime());
-    		return Result.error("9999", "该拍卖进行中或已结束");
-    	}
-    	if(auctionReg.getAuctionSuccess()!=null&&true==auctionReg.getAuctionSuccess()) {
-    		List<CarAuctionReg> auctionRegs=	carAuctionRegService.selectList(new EntityWrapper<CarAuctionReg>().eq("auction_id", reg.getAuctionId()).eq("is_auction_success", auctionReg.getAuctionSuccess()));
-    		if(auctionRegs!=null&&auctionRegs.size()>0) {
-    			logger.error("该拍卖已竞拍成功，auctionId="+reg.getAuctionId());
-        		return Result.error("9999", "该拍卖已竞拍成功");
-    		}
+    public synchronized Result<Object> updateAuctionReg(@ModelAttribute CarAuctionReg req) {
+		try {
+			if (req.getAuctionSuccess() == null) {
+				logger.error("auctionSuccess不能为null");
+				return Result.error("9999", "auctionSuccess不能为null");
+			}
+			if (req.getAuctionSuccess() == false && req.getTransPrice() != null) {
+				logger.error("是否竞拍成功 为否时，成交价格 不能有值");
+				return Result.error("9999", "是否竞拍成功 为否时，成交价格 不能有值");
+			}
+			if (req.getAuctionSuccess() == true && req.getTransPrice() == null) {
+				logger.error("是否竞拍成功 为是时，成交价格 必须有值");
+				return Result.error("9999", "是否竞拍成功 为是时，成交价格 必须有值");
+			}
+			CarAuctionReg reg = carAuctionRegService.selectById(req.getRegId());
+			if (reg == null) {
+				logger.error("拍卖登记信息不存在，regId=" + req.getRegId());
+				return Result.error("9999", "拍卖登记信息不存在");
+			}
+			CarAuction carAuction = carAuctionService.selectById(reg.getAuctionId());
+			if (carAuction == null) {
+				logger.error("拍卖信息不存在，auctionId=" + reg.getAuctionId());
+				return Result.error("9999", "拍卖信息不存在");
+			}
+			CarAuctionReg existSuccessReg = carAuctionRegService.selectOne(new EntityWrapper<CarAuctionReg>().eq("auction_id", reg.getAuctionId()).eq("is_auction_success", true));
+			if (existSuccessReg != null&&(!existSuccessReg.getUserId().equals(reg.getUserId())) ) {
+				logger.error("已经存在竞拍成功的纪录，auctionId=" + reg.getAuctionId());
+				return Result.error("9999", "已经存在竞拍成功的纪录");
+			}
+			if (req.getAuctionSuccess()) {
 
-    		reg.setTransPrice(auctionReg.getTransPrice());
-    		
-    		carAuction.setStatus(AuctionStatusEnums.AUCTION.getKey());
-    		carAuctionService.updateById(carAuction);
-    	}
-    	reg.setAuctionSuccess(auctionReg.getAuctionSuccess());
-    	reg.setPayDeposit(auctionReg.getPayDeposit());
-		reg.setUpdateTime(new Date());
-		reg.setUpdateUser(loginUserInfoHelper.getUserId());
-    	carAuctionRegService.updateById(reg);
-        return Result.build("0000", "操作成功", "");
- 	}catch (Exception e) {
-      	logger.error(e.getMessage());
-      	return Result.error("9999", "操作异常");
-  	}
-  }
+				carAuction.setStatus(AuctionStatusEnums.AUCTION.getKey());
+				carAuctionService.updateById(carAuction);
+			}
+			reg.setTransPrice(req.getTransPrice());
+			reg.setAuctionSuccess(req.getAuctionSuccess());
+			reg.setUpdateTime(new Date());
+			reg.setUpdateUser(loginUserInfoHelper.getUserId());
+			carAuctionRegService.updateAllColumnById(reg);
+			return Result.build("0", "操作成功", "");
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return Result.error("9999", "操作异常");
+		}
+	}
       
     
     @ApiOperation(value="拍卖审核信息")
@@ -1105,7 +1090,7 @@ try {
     		outputRecord.put("outputUserName", outputRecords.get(0).getOutputUserName());
     	}
     	
-    	List<CarAuction> carAuctions=carAuctionService.selectList(new EntityWrapper<CarAuction>().eq("business_id", businessId));
+    	List<CarAuction> carAuctions=carAuctionService.selectList(new EntityWrapper<CarAuction>().eq("business_id", businessId).orderBy("create_time",false));
     	CarAuction carAuction=new CarAuction();
     	if(carAuctions!=null&&carAuctions.size()==1) {
     		carAuction=carAuctions.get(0);
