@@ -99,7 +99,7 @@ window.layinit(function (htConfig) {
                                     },
                                     on:{
                                         click(){
-                                            app.disMatchedStatement(p)
+                                            app.deleteMoneyPool(p)
                                         }
                                     }
                                 },'删除')
@@ -136,7 +136,7 @@ window.layinit(function (htConfig) {
                             })
                             .then(function (r) {
                                 if (r.data.code == "1") {
-                                    location.reload()
+                                    parent.location.reload()
                                 } else {
                                     parent.app.$Message.error({
                                         content: r.data.msg
@@ -146,6 +146,32 @@ window.layinit(function (htConfig) {
                             .catch(function (e) {
                                 parent.app.$Message.error({
                                     content: '取消关联银行流水失败'
+                                })
+                            })
+                    }
+                })
+            },
+            deleteMoneyPool(p){
+                app.$Modal.confirm({
+                    content:'确认删除此条流水?',
+                    onOk() {
+                        axios.get(fpath + 'finance/deleteMoneyPool', {
+                                params: {
+                                    mprId: p.row.mprId
+                                }
+                            })
+                            .then(function (r) {
+                                if (r.data.code == "1") {
+                                    parent.location.reload()
+                                } else {
+                                    parent.app.$Message.error({
+                                        content: r.data.msg
+                                    })
+                                }
+                            })
+                            .catch(function (e) {
+                                parent.app.$Message.error({
+                                    content: '删除此条流水失败'
                                 })
                             })
                     }

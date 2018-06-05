@@ -71,6 +71,7 @@ import com.ht.ussp.bean.LoginUserInfoHelper;
 
 import feign.Feign;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 /**
  * @author 王继光 2018年4月27日 下午6:00:37
@@ -115,9 +116,6 @@ public class FinanceController {
 	@Autowired
 	@Qualifier("RepaymentConfirmLogService")
 	private RepaymentConfirmLogService confrimLogService;
-	@Autowired
-	@Qualifier("MoneyPoolService")
-	private MoneyPoolService MoneyPoolService ;
 	@Autowired
 	@Qualifier("AccountantOverRepayLogService")
 	private AccountantOverRepayLogService accountantOverRepayLogService;
@@ -699,7 +697,7 @@ public class FinanceController {
 	}
 
 	
-	@ApiOperation(value = "分润")
+	/*@ApiOperation(value = "分润")
 	@PostMapping("/shareProfit")
 	public Result shareProfit(@RequestParam("businessId") String businessId,@RequestParam("afterId") String afterId){
 		Result result=new Result();
@@ -718,6 +716,24 @@ public class FinanceController {
 			return Result.error("分润出现异常", ex.getMessage());
 		}
 		return result;
+	}*/
+	
+	@ApiOperation(value = "删除财务新增的银行流水")
+	@GetMapping("/deleteMoneyPool")
+	public Result deleteMoneyPool(String mprId) {
+		try {
+			logger.info("@deleteMoneyPool@删除财务新增的银行流水--开始[{}]", mprId);
+			Result result = null;
+			boolean res = moneyPoolRepaymentService.deleteFinanceAddStatement(mprId);
+			result = Result.success();
+			logger.info("@deleteMoneyPool@删除财务新增的银行流水--结束[{}]", result);
+			return result;
+		} catch (Exception e) {
+			logger.error("@deleteMoneyPool@删除财务新增的银行流水--[{}]", e);
+			return Result.error("500", "删除财务新增的银行流水失败");
+		}
+		
+		
 	}
 	
 }
