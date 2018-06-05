@@ -208,11 +208,11 @@
                         <tr>
                             <td>线下逾期费</td>
                             <td>
-                                <i-input :disabled="thisTimeRepaymentInfo.offlineOverDue==0" v-model="factRepayPreview.offlineOverDue"></i-input>
+                                <i-input :disabled="thisTimeRepaymentInfo.offlineOverDue==0" v-model="factRepaymentInfo.offlineOverDue"></i-input>
                             </td>
                             <td>线上逾期费</td>
                             <td>
-                                <i-input disabled="thisTimeRepaymentInfo.onlineOverDue==0" v-model="factRepayPreview.onlineOverDue"></i-input>
+                                <i-input :disabled="thisTimeRepaymentInfo.onlineOverDue==0" v-model="factRepaymentInfo.onlineOverDue"></i-input>
                             </td>
                         </tr>
                         <tr>

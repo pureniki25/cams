@@ -252,23 +252,33 @@ window.layinit(function (htConfig) {
                         let confirmWithhold = initMenuItem('代扣确认',null,'confirmWithhold')
                         let settle = initMenuItem('财务结清',null,'settle')
                         let planSettle = initMenuItem('还款计划结清',null,'planSettle')
-                        menu.push(repayConfirm)
-                        //menu.push(businessAllSettle)
-                        menu.push(revokeConfirm)
-                        menu.push(confirmWithhold)
-                        menu.push(planSettle)
-                        menu.push(settle)
+
+                        if(p.row.srcType==2){
+                            menu.push(repayConfirm)
+                            //menu.push(businessAllSettle)
+                            menu.push(revokeConfirm)
+                            menu.push(confirmWithhold)
+                            menu.push(planSettle)
+                            menu.push(settle)
+                        }
+                        let poptipContent ;
+                        if(p.row.srcType==2){
+                            poptipContent = [
+                                h('i-button', '操作'),
+                                h('ul', {
+                                    slot: 'content'
+                                }, menu)
+                            ]
+                        }else{
+                            poptipContent = '暂不能处理信贷生成的业务'
+                        }
+                        
                         
                         return h('Poptip', {
                             props: {
                                 placement: 'left'
                             }
-                        }, [
-                                h('i-button', '操作'),
-                                h('ul', {
-                                    slot: 'content'
-                                }, menu)
-                            ])
+                        }, poptipContent)
                     }
                 },
                 {
@@ -409,7 +419,13 @@ window.layinit(function (htConfig) {
             axios.get(fpath + 'finance/getBusinessType')
                 .then(function (res) {
                     if (res.data.code == '1') {
-                        app.businessTypes = res.data.data
+                        res.data.data.forEach((e)=>{
+                            //过滤房贷车贷展期
+                            if(e.businessTypeId!=1&&e.businessTypeId!=2){
+                                app.businessTypes.push(e)
+                            }
+                        })
+                        // app.businessTypes = res.data.data
                     } else {
                         app.$Message.error({ content: '获取业务类型失败' })
                         console.log(res.data.msg);

@@ -152,6 +152,12 @@ public class FinanceServiceImpl implements FinanceService {
 	@Transactional(rollbackFor = ServiceRuntimeException.class)
 	public Result appointBankStatement(RepaymentRegisterInfoDTO dto) {
 		logger.info("@appointBankStatement--开始[{}]", dto);
+		
+		if (!StringUtil.isEmpty(dto.getMprid())) {
+			update(dto);
+			return Result.success();
+		}
+		
 		RepaymentBizPlanList repaymentBizPlanList = new RepaymentBizPlanList();
 		repaymentBizPlanList.setOrigBusinessId(dto.getBusinessId());
 		repaymentBizPlanList.setAfterId(dto.getAfterId());
@@ -177,9 +183,6 @@ public class FinanceServiceImpl implements FinanceService {
 		moneyPoolRepayment.setPlanListId(repaymentBizPlanList.getPlanListId());
 		moneyPoolRepayment.setCreateTime(now);
 		moneyPoolRepayment.setCreateUser(loginUserInfoHelper.getUserId());
-		for (BoaInRoleInfoDto i : loginUserInfoHelper.getUserRole()) {
-			logger.info(i.getRoleName());
-		}
 		moneyPoolRepayment.setCreateUserRole(null);
 		moneyPoolRepayment.setIsFinanceMatch(1);
 		moneyPoolRepayment.setState(moneyPool.getFinanceStatus());
@@ -197,6 +200,54 @@ public class FinanceServiceImpl implements FinanceService {
 		return Result.success();
 	}
 
+	private boolean update(RepaymentRegisterInfoDTO dto) {
+		String mprid = dto.getMprid();
+		Date now = new Date() ;
+		if (StringUtil.isEmpty(mprid)) {
+			throw new ServiceRuntimeException("mprid不能为空");
+		}
+		MoneyPoolRepayment moneyPoolRepayment = moneyPoolRepaymentMapper.selectById(mprid);
+		if (StringUtil.isEmpty(moneyPoolRepayment.getMoneyPoolId())) {
+			throw new ServiceRuntimeException("此还款登记没关联银行流水");
+		}
+		MoneyPool moneyPool = moneyPoolMapper.selectById(moneyPoolRepayment.getMoneyPoolId());
+		moneyPool.setAcceptBank(dto.getAcceptBank());
+		moneyPool.setAccountMoney(new BigDecimal(dto.getRepaymentMoney()));
+		moneyPool.setTradeType(dto.getTradeType());
+		moneyPool.setTradeDate(DateUtil.getDate(dto.getRepaymentDate()));
+		moneyPool.setTradeRemark(dto.getRemark() != null ? dto.getRemark() : null);
+		moneyPool.setTradePlace(dto.getTradePlace() != null ? dto.getTradePlace() : null);
+		moneyPool.setRemitBank(dto.getFactRepaymentUser());
+		moneyPool.setUpdateTime(now);
+		moneyPool.setUpdateUser(loginUserInfoHelper.getUserId());
+		moneyPoolRepayment.setState(moneyPool.getFinanceStatus());
+		moneyPoolRepayment.setOriginalBusinessId(dto.getBusinessId());
+		moneyPoolRepayment.setAfterId(dto.getAfterId());
+		moneyPoolRepayment.setOperateId(loginUserInfoHelper.getUserId());
+		moneyPoolRepayment.setOperateName(loginUserInfoHelper.getLoginInfo().getUserName());
+		moneyPoolRepayment.setIncomeType(moneyPool.getIncomeType());
+		moneyPoolRepayment.setMoneyPoolId(moneyPool.getMoneyPoolId());
+		moneyPoolRepayment.setUpdateTime(now);
+		moneyPoolRepayment.setUpdateUser(loginUserInfoHelper.getUserId());
+		moneyPoolRepayment.setBankAccount(dto.getAcceptBank());
+		moneyPoolRepayment.setCertificatePictureUrl(dto.getCert());
+		moneyPoolRepayment.setCreateTime(now);
+		moneyPoolRepayment.setUpdateTime(now);
+		moneyPoolRepayment.setUpdateUser(dto.getUserId());
+		moneyPoolRepayment.setCreateUser(dto.getUserId());
+		moneyPoolRepayment.setFactTransferName(dto.getFactRepaymentUser());
+		moneyPoolRepayment.setRemark(dto.getRemark());
+		moneyPoolRepayment.setTradePlace(dto.getTradePlace());
+		moneyPoolRepayment.setTradeType(dto.getTradeType());
+		
+		boolean updateMP = moneyPool.updateAllColumnById();
+		boolean updateMPR = moneyPoolRepayment.updateAllColumnById();
+		if (updateMP&&updateMPR) {
+			return true ;
+		}else {
+			throw new ServiceRuntimeException("更新失败");
+		}
+	}
 	private MoneyPool initBy(RepaymentRegisterInfoDTO dto) {
 		MoneyPool moneyPool = new MoneyPool();
 		moneyPool.setAcceptBank(dto.getAcceptBank());
@@ -323,7 +374,7 @@ public class FinanceServiceImpl implements FinanceService {
 
 	private JSONObject thisPeriodPlanRepayment(RepaymentBizPlanList rpl) {
 		JSONObject t = initThisPeriodPlanRepaymentBase();
-		t.put("type", "本期应还日期");
+		t.put("type", "本期应还");
 		t.put("repayDate", DateUtil.toDateString(rpl.getDueDate(), DateUtil.DEFAULT_FORMAT_DATE));
 		List<RepaymentBizPlanListDetail> details = repaymentBizPlanListDetailMapper
 				.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", rpl.getPlanListId()));

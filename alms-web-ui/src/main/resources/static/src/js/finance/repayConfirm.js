@@ -149,8 +149,8 @@ window.layinit(function (htConfig) {
             factRepaymentInfo: {
                 repayDate: '',
                 surplusFund: 0,
-                onlineOverDuel: '',
-                offlineOverDue: '',
+                onlineOverDue: 0,
+                offlineOverDue: 0,
                 remark: '',
                 canUseSurplus: 0,
                 moneyPoolAccount: 0,
@@ -194,6 +194,8 @@ window.layinit(function (htConfig) {
                 }
             },
             'factRepaymentInfo.repayAccount': function (n) {
+                app.factRepaymentInfo.offlineOverDue = app.thisTimeRepaymentInfo.offlineOverDue
+                app.factRepaymentInfo.onlineOverDue = app.thisTimeRepaymentInfo.onlineOverDue
                 app.previewConfirmRepayment()
             }
         },
@@ -224,8 +226,8 @@ window.layinit(function (htConfig) {
                 layer.open({
                     type: 2,
                     title: '手动匹配流水',
-                    content: [url, 'no'],
-                    area: ['40%', '90%'],
+                    content: [url],
+                    area: ['80%', '90%'],
                     success: function (layero, index) {
                         curIndex = index;
                     }
@@ -236,6 +238,18 @@ window.layinit(function (htConfig) {
                 layer.open({
                     type: 2,
                     title: '手动新增流水',
+                    content: [url],
+                    area: ['40%', '90%'],
+                    success: function (layero, index) {
+                        curIndex = index;
+                    }
+                })
+            },
+            openEditBankStatementModal(mprid) {
+                let url = '/finance/manualAddBankSatements?businessId=' + businessId + "&afterId=" + afterId+"&mprid="+mprid;
+                layer.open({
+                    type: 2,
+                    title: '手动编辑流水',
                     content: [url],
                     area: ['40%', '90%'],
                     success: function (layero, index) {
@@ -264,8 +278,37 @@ window.layinit(function (htConfig) {
                 axios.get(fpath + 'finance/thisPeroidRepayment?businessId=' + businessId + "&afterId=" + afterId)
                     .then(function (res) {
                         if (res.data.code == '1') {
-                            console.log(res.data.data);
-                            app.table.currPeriodRepayment.data = res.data.data;
+                            res.data.data.forEach((e)=>{
+                                app.table.currPeriodRepayment.data.push(e)
+                            })
+
+                            let chaer = {}
+                            chaer.type = '差额'
+                            let e1 = res.data.data[0]
+
+                            if(res.data.data.length>1){
+                                res.data.data.forEach((element,index) => {
+                                    if (index > 0) {
+                                        chaer.item10 = e1.item10 - element.item10
+                                        chaer.item20 = e1.item20 - element.item20
+                                        chaer.item30 = e1.item30 - element.item30
+                                        chaer.item50 = e1.item50 - element.item50
+                                        chaer.subtotal = e1.subtotal - element.subtotal
+                                        chaer.offlineOverDue = e1.offlineOverDue - element.offlineOverDue
+                                        chaer.onlineOverDue = e1.onlineOverDue - element.onlineOverDue
+                                        chaer.total = e1.total - element.total
+                                    } 
+                                });
+                            }else {
+                                chaer.item10 = e1.item10
+                                chaer.item20 = e1.item20
+                                chaer.item30 = e1.item30
+                                chaer.item50 = e1.item50
+                                chaer.subtotal = e1.subtotal
+                                chaer.offlineOverDue = e1.offlineOverDue
+                                chaer.onlineOverDue = e1.onlineOverDue
+                                chaer.total = e1.total
+                            }
                         } else {
                             app.$Message.error({
                                 content: res.data.msg
@@ -320,8 +363,8 @@ window.layinit(function (htConfig) {
                     app.factRepayPreview.item20 = 0
                     app.factRepayPreview.item30 = 0
                     app.factRepayPreview.item50 = 0
-                    app.factRepayPreview.offlineOverDue = 0
-                    app.factRepayPreview.onlineOverDue = 0
+                    // app.factRepayPreview.offlineOverDue = 0
+                    // app.factRepayPreview.onlineOverDue = 0
                     app.factRepayPreview.subTotal = 0
                     app.factRepayPreview.total = 0
                     app.factRepayPreview.surplus = 0
@@ -331,8 +374,8 @@ window.layinit(function (htConfig) {
                         app.factRepayPreview.item20 += e.item20
                         app.factRepayPreview.item30 += e.item30
                         app.factRepayPreview.item50 += e.item50
-                        app.factRepayPreview.offlineOverDue += e.offlineOverDue
-                        app.factRepayPreview.onlineOverDue += e.onlineOverDue
+                        // app.factRepayPreview.offlineOverDue += e.offlineOverDue
+                        // app.factRepayPreview.onlineOverDue += e.onlineOverDue
                         app.factRepayPreview.subTotal += e.subTotal
                         app.factRepayPreview.total += e.total
                     })

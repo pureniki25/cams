@@ -131,13 +131,12 @@ public class RepaymentProjPlanListServiceImpl extends
 									logger.info("逾期费用计算开始===============：planListid:"+pList.getPlanListId()+"===============");
 									BigDecimal days=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), projPList.getDueDate())));//逾期天数
 									projPList.setOverdueDays(days);
-								
-									
-									BigDecimal underLateFee=getUnderLateFee(projPList,projList, projPlan);//线下逾期费
+								     
+									BigDecimal underLateFee=getUnderLateFee(projPList,projList, projPlan,days);//线下逾期费
 									underLateFeeSum=underLateFeeSum.add(underLateFee);
 									updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid(), underLateFee);
 									
-									BigDecimal onlineLateFee=getOnLineLateFee(projPList, projPlan);//线上逾期费
+									BigDecimal onlineLateFee=getOnLineLateFee(projPList, projPlan,days);//线上逾期费
 									onlineLateFeeSum=onlineLateFeeSum.add(onlineLateFee);
 									updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), onlineLateFee);
 									projPList.setOverdueAmount(underLateFee.add(onlineLateFee));
@@ -149,7 +148,6 @@ public class RepaymentProjPlanListServiceImpl extends
 								//更新还款计划业务表
 								updateOrInsertPlanDetail(pList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid(), underLateFeeSum);//每个业务每期还款计划的线下收费
 								updateOrInsertPlanDetail(pList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), onlineLateFeeSum);//每个业务每期还款计划的线上收费
-								
 								BigDecimal days=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), pList.getDueDate())));//每个业务每期款还计划的逾期天数
 								pList.setOverdueDays(days);
 								pList.setOverdueAmount(underLateFeeSum.add(onlineLateFeeSum));
@@ -207,7 +205,7 @@ public class RepaymentProjPlanListServiceImpl extends
 		 * @return
 		 */
 		private int isOverDue(Date nowDate, Date repayDate) {
-		 	 nowDate=DateUtil.getDate(DateUtil.formatDate(nowDate));
+		 	nowDate=DateUtil.getDate(DateUtil.formatDate(nowDate));
 		 	repayDate=DateUtil.getDate(DateUtil.formatDate(repayDate));
 			int i = DateUtil.getDiffDays(nowDate, repayDate);
 			return i;
@@ -221,12 +219,14 @@ public class RepaymentProjPlanListServiceImpl extends
 	     * @param projPlan
 	     * @return
 	     */
-		private BigDecimal getOnLineLateFee(RepaymentProjPlanList projPlanList,RepaymentProjPlan projPlan) {
+		private BigDecimal getOnLineLateFee(RepaymentProjPlanList projPlanList,RepaymentProjPlan projPlan,BigDecimal days) {
 			BigDecimal restPricipal=getRestPrincipal(projPlanList, projPlan);
 			BigDecimal principalAndInterest=BigDecimal.valueOf(getPrincipalAndinterestPeriod(projPlanList.getProjPlanListId()));
 			BigDecimal onLineLatefee=new BigDecimal(0);
 		
 			onLineLatefee=getLateFee(projPlan.getOnLineOverDueRate(), projPlan.getOnLineOverDueRateType(), projPlan.getBorrowMoney(), restPricipal, principalAndInterest);
+			
+			onLineLatefee=onLineLatefee.multiply(days);
 			return onLineLatefee;
 		}
 		
@@ -237,7 +237,7 @@ public class RepaymentProjPlanListServiceImpl extends
 	     * @param projPlan
 	     * @return
 	     */
-		private BigDecimal getUnderLateFee(RepaymentProjPlanList projPlanList,List<RepaymentProjPlanList> projPlanLists,RepaymentProjPlan projPlan ) {
+		private BigDecimal getUnderLateFee(RepaymentProjPlanList projPlanList,List<RepaymentProjPlanList> projPlanLists,RepaymentProjPlan projPlan,BigDecimal days) {
 			BigDecimal restPricipal=getRestPrincipal(projPlanList, projPlan);
 			BigDecimal principalAndInterest=BigDecimal.valueOf(getPrincipalAndinterestPeriod(projPlanList.getProjPlanListId()));
 			BigDecimal underLatefee=new BigDecimal(0);
@@ -254,7 +254,7 @@ public class RepaymentProjPlanListServiceImpl extends
 			    	underLatefee=getLateFee(projPlan.getOffLineInOverDueRate(), projPlan.getOffLineInOverDueRateType(), projPlan.getBorrowMoney(), restPricipal, principalAndInterest);
 					    	
 			    }
-			
+			underLatefee=underLatefee.multiply(days);
 			return underLatefee;
 		}
 	

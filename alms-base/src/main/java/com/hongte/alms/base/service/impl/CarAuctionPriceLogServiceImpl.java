@@ -61,6 +61,8 @@ public class CarAuctionPriceLogServiceImpl extends BaseServiceImpl<CarAuctionPri
         {
             throw new NullPointerException("CarAuction不存在");
         }
+        carAuction.setBidderCount(carAuction.getBidderCount()+1);
+        carAuctionService.updateById(carAuction);
         CarAuctionReg auctionReg=carAuctionRegService.selectOne(new EntityWrapper<CarAuctionReg>().eq("auction_id",bidReq.getAuctionId()).eq("user_id",bidReq.getUserId()));
         if(auctionReg==null)
         {
