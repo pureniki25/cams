@@ -273,7 +273,7 @@
 								<label class="input_label">*</label>
 							</td>
 							<td>
-								<i-input type="text" v-model="detection.annualVerificationExpirationDate" id="annualVerificationExpirationDate" placeholder="yyyy-MM-dd"></i-input>
+								<input type="text" v-model="detection.annualVerificationExpirationDate" id="annualVerificationExpirationDate" placeholder="yyyy-MM"></input>
 							</td>
 							<td class="td_label">里程表读数
 								<label class="input_label">*</label>
@@ -301,7 +301,7 @@
 							</td>
 							<td class="td_label">最后一次过户时间</td>
 							<td>
-								<i-input type="text" v-model="carBasic.lastTransferDate" id="lastTransferDate" placeholder="yyyy-MM-dd" id="lastTransferDate"></i-input>
+								<input type="text" v-model="carBasic.lastTransferDate" id="lastTransferDate" placeholder="yyyy-MM-dd" id="lastTransferDate"></input>
 							</td>
 						</tr>
 						<tr>
@@ -319,8 +319,8 @@
 								<label class="input_label">*</label>
 							</td>
 							<td>
-								<i-input type="text" v-model="detection.insuranceExpirationDate" id="insuranceExpirationDate" placeholder="yyyy-MM-dd"
-								 id="insuranceExpirationDate"></i-input>
+								<input type="text" v-model="detection.insuranceExpirationDate" id="insuranceExpirationDate" placeholder="yyyy-MM-dd"
+								 id="insuranceExpirationDate"></input>
 							</td>
 						</tr>
 						<tr>
@@ -406,13 +406,13 @@
 								<label class="input_label">*</label>
 							</td>
 							<td>
-								<i-input type="text" v-model="carAuction.auctionStartTime" id="auctionStartTime" placeholder="yyyy-MM-dd"></i-input>
+								<input type="text" v-model="carAuction.auctionStartTime" id="auctionStartTime" placeholder="yyyy-MM-dd"></input>
 							</td>
 							<td class="td_label">活动结束时间
 								<label class="input_label">*</label>
 							</td>
 							<td>
-								<i-input type="text" v-model="carAuction.auctionEndTime" id="auctionEndTime" placeholder="yyyy-MM-dd"></i-input>
+								<input type="text" v-model="carAuction.auctionEndTime" id="auctionEndTime" placeholder="yyyy-MM-dd"></input>
 							</td>
 						</tr>
 						<tr>
@@ -442,7 +442,7 @@
 								<label class="input_label">*</label>
 							</td>
 							<td colspan="5">
-								<i-input type="text" v-model="carAuction.paymentMethod" style="width: 100%" maxlength="200" readonly="paymentMethod" readonly></i-input>
+								<i-input type="text" v-model="carAuction.paymentMethod" style="width: 100%" maxlength="200" readonly="paymentMethod" disabled></i-input>
 							</td>
 						</tr>
 						<tr>
