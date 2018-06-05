@@ -316,6 +316,7 @@ public class CreatRepayPlanServiceImplTest {
         req1.setStatusFlag("4");
         req1.setBeginTime(DateUtil.getDateTime("2018/3/21")); // 启标时间(用于生成还款计划)
         req1.setFullBorrowMoney(new BigDecimal(15000)); // 满标金额
+        req1.setQueryFullsuccessDate(DateUtil.getDateTime("2018/3/21"));//满标时间（用于分还款计划）
 //        req1.setTdLoanMoney(new BigDecimal(30000)); // 放款金额
         req1.setExtendFlag(0); // 是否是展期(0:不是展期,1:是展期)
 //        req1.setCatsedAmount(new BigDecimal(30000)); // 投资者已投金额
@@ -449,8 +450,9 @@ public class CreatRepayPlanServiceImplTest {
 
         req2.setProjectId(UUID.randomUUID().toString());
         req2.setStatusFlag("4");
-        req2.setBeginTime(DateUtil.getDateTime("2018/3/21")); // 启标时间(用于生成还款计划)
+        req2.setBeginTime(DateUtil.getDateTime("2018/3/22")); // 启标时间(用于生成还款计划)
         req2.setFullBorrowMoney(new BigDecimal(15000)); // 满标金额
+        req2.setQueryFullsuccessDate(DateUtil.getDateTime("2018/3/22"));//满标时间（用于分还款计划）
 //        req2.setTdLoanMoney(new BigDecimal(20000)); // 放款金额
         req2.setExtendFlag(0); // 是否是展期(0:不是展期,1:是展期)
 //        req2.setCatsedAmount(new BigDecimal(20000)); // 投资者已投金额
