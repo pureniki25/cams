@@ -205,8 +205,12 @@ window.layinit(function (htConfig) {
                     }, {
                         field: 'bidPrice',
                         title: '出价金额'
-                    }, {
-
+                    }
+                    , {
+                        field: 'bidTime',
+                        title: '出价时间'
+                    }
+                    , {
                         field: 'auctionSuccess',
                         title: '是否竞拍成功',
                         templet: function(d){

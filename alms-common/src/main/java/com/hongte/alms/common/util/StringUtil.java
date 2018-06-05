@@ -115,6 +115,35 @@ public class StringUtil {
 	}
 
 	/**
+	 * 检测手机合法性
+	 */
+	public static boolean isTelephone(String phone)
+	{
+		if ((phone == null) || (phone.length() == 0)) {
+			return false;
+		}
+		String regEx = "^1\\d{10}$";
+		Pattern p = Pattern.compile(regEx);
+		Matcher m = p.matcher(phone.toLowerCase());
+		return m.find();
+	}
+
+
+	/**
+	 * 检测身份证号合法性
+	 */
+	public static boolean isIdCard(String idCard)
+	{
+		if ((idCard == null) || (idCard.length() == 0)) {
+			return false;
+		}
+		String regEx = "^[1-9]\\d{5}(18|19|([23]\\d))\\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\\d{3}[0-9Xx]$";
+		Pattern p = Pattern.compile(regEx);
+		Matcher m = p.matcher(idCard.toLowerCase());
+		return m.find();
+	}
+
+	/**
 	 * Double进行四舍五入
 	 * 
 	 * @param v
