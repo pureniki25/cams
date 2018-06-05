@@ -32,7 +32,20 @@ public interface CollectionStatusService extends BaseService<CollectionStatus> {
                                     String staffType,
                                     CollectionSetWayEnum setWayEnum);
 
-
+    /**
+     * 将电催、催收人员设置信息同步到信贷的函数
+     * @param voList
+     * @param staffUserId
+     * @param describe
+     * @param staffType
+     * @return
+     */
+    public  boolean SyncBusinessColStatusToXindai(
+            List<StaffBusinessVo> voList,
+            String staffUserId,
+            String describe ,
+            String staffType
+    );
     /**
      * 设置业务的贷后状态（移交法务、拖车登记、关闭 调用此方法）
      * @param businessId  业务ID

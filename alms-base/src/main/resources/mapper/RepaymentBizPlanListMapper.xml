@@ -155,7 +155,7 @@
 				AND bc.area_pid = #{areaId}
 			</if>
 			<if test="companyId != null">
-				AND b.company_name = #{companyId}
+				AND (b.company_name = #{companyId} OR b.company_id = #{companyId})
 			</if>
 			<if test="businessType != null ">
 				AND b.business_type = #{businessType}

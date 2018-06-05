@@ -2,15 +2,14 @@ package com.hongte.alms.core.controller;
 
 
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.hongte.alms.base.entity.*;
+import com.hongte.alms.base.service.*;
+import com.hongte.alms.base.feignClient.CollectionSynceToXindaiRemoteApi;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.jeecgframework.poi.excel.ExcelExportUtil;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -42,19 +41,9 @@ import com.hongte.alms.base.collection.vo.AfterLoanStandingBookReq;
 import com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo;
 import com.hongte.alms.base.collection.vo.StaffBusinessReq;
 import com.hongte.alms.base.collection.vo.StaffBusinessVo;
-import com.hongte.alms.base.entity.BasicBusinessType;
-import com.hongte.alms.base.entity.BasicCompany;
-import com.hongte.alms.base.entity.SysParameter;
-import com.hongte.alms.base.entity.SysUser;
 import com.hongte.alms.base.enums.AreaLevel;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
 import com.hongte.alms.base.enums.SysRoleEnums;
-import com.hongte.alms.base.service.BasicBusinessService;
-import com.hongte.alms.base.service.BasicBusinessTypeService;
-import com.hongte.alms.base.service.BasicCompanyService;
-import com.hongte.alms.base.service.SysParameterService;
-import com.hongte.alms.base.service.SysUserAreaService;
-import com.hongte.alms.base.service.SysUserService;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.EasyPoiExcelExportUtil;
@@ -121,6 +110,13 @@ public class CollectionController {
     @Autowired
     LoginUserInfoHelper loginUserInfoHelper;
 
+    @Autowired
+    @Qualifier("RepaymentBizPlanListService")
+    RepaymentBizPlanListService repaymentBizPlanListService;
+
+    @Autowired
+    CollectionSynceToXindaiRemoteApi collectionRemoteApi;
+
 //    private final StorageService storageService;
 //
 //    @Autowired
@@ -132,7 +128,7 @@ public class CollectionController {
      *
      * @return
      */
-    @ApiOperation(value="取得分贷后管理首页台账界面下拉选项框数据")
+    @ApiOperation(value="取得分页贷后管理首页台账界面下拉选项框数据")
 //    @CrossOrigin(allowCredentials="true", allowedHeaders="*", origins="*")
     @GetMapping("getALStandingBookVoPageSelectsData")
     public Result<Map<String,JSONArray>> getALStandingBookVoPageSelectsData() {
@@ -169,7 +165,7 @@ public class CollectionController {
 
 
     /**
-     * 获取分页待贷后首页台账
+     * 获取分页贷后首页台账
      * @param req 分页请求数据
      * @author zengkun
      * @date 2018年01月30日
@@ -392,6 +388,10 @@ public class CollectionController {
 
         try{
             collectionStatusService.setBusinessStaff(voList,staffUserId,describe,staffType, CollectionSetWayEnum.MANUAL_SET);
+            //同步设置信息到信贷
+            collectionStatusService.SyncBusinessColStatusToXindai(voList,staffUserId,describe,staffType);
+
+
             logger.info("@分配电催页面@设置电催人员--结束[{}]","");
             return Result.success();
         }catch(Exception e){
@@ -402,7 +402,7 @@ public class CollectionController {
     }
 
    /**
-     * 为逾期的业务设置电催人员
+     * 查询员工跟进催收记录
     * @param businessId   业务ID
     * @param crpId  分期表ID
      * @return

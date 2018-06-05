@@ -8,14 +8,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import com.hongte.alms.base.collection.vo.StaffBusinessVo;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -888,6 +883,13 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				// 更新贷后状态为 移交诉讼
 				collectionStatusService.setBussinessAfterStatus(req.getBusinessId(), req.getCrpId(), "",
 						CollectionStatusEnum.TO_LAW_WORK, CollectionSetWayEnum.MANUAL_SET);
+				//同时更新信贷的贷后状态
+				List<StaffBusinessVo> voList = new LinkedList<>();
+				StaffBusinessVo vo  = new StaffBusinessVo();
+				vo.setCrpId(req.getCrpId());
+				vo.setBusinessId(req.getBusinessId());
+				voList.add(vo);
+				collectionStatusService.SyncBusinessColStatusToXindai(voList,null,"界面设置移交诉讼",CollectionStatusEnum.TO_LAW_WORK.getPageStr());
 			}
 		} catch (Exception e) {
 			LOG.error("---saveCarProcessApprovalResult--- 存储房贷审批结果信息失败！", e);
@@ -915,6 +917,13 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				// 更新贷后状态为 移交诉讼
 				collectionStatusService.setBussinessAfterStatus(req.getBusinessId(), req.getCrpId(), "",
 						CollectionStatusEnum.TO_LAW_WORK, CollectionSetWayEnum.MANUAL_SET);
+				//同时更新信贷的贷后状态
+				List<StaffBusinessVo> voList = new LinkedList<>();
+				StaffBusinessVo vo  = new StaffBusinessVo();
+				vo.setCrpId(req.getCrpId());
+				vo.setBusinessId(req.getBusinessId());
+				voList.add(vo);
+				collectionStatusService.SyncBusinessColStatusToXindai(voList,null,"界面设置移交诉讼",CollectionStatusEnum.TO_LAW_WORK.getPageStr());
 			}
 		} catch (Exception e) {
 			LOG.error("---saveHouseProcessApprovalResult--- 存储房贷审批结果信息失败！", e);

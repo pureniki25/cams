@@ -17,6 +17,10 @@ public class RepaymentRegisterInfoDTO implements Serializable{
 		super();
 	}
 	/**
+	 * mprid
+	 */
+	private String mprid ;
+	/**
 	 * businessId
 	 */
 	private String businessId ;
@@ -135,5 +139,17 @@ public class RepaymentRegisterInfoDTO implements Serializable{
 	}
 	public void setAcceptBank(String acceptBank) {
 		this.acceptBank = acceptBank;
+	}
+	/**
+	 * @return the mprid
+	 */
+	public String getMprid() {
+		return mprid;
+	}
+	/**
+	 * @param mprid the mprid to set
+	 */
+	public void setMprid(String mprid) {
+		this.mprid = mprid;
 	}
 }

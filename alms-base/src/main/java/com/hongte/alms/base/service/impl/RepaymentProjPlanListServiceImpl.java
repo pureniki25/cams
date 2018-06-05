@@ -31,6 +31,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -47,7 +49,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service("RepaymentProjPlanListService")
 public class RepaymentProjPlanListServiceImpl extends
 		BaseServiceImpl<RepaymentProjPlanListMapper, RepaymentProjPlanList> implements RepaymentProjPlanListService {
-	
+	private static Logger logger = LoggerFactory.getLogger(RepaymentProjPlanListServiceImpl.class);
 
 
 	//进位方式枚举
@@ -85,26 +87,26 @@ public class RepaymentProjPlanListServiceImpl extends
 	public void calLateFee() {
 		// 所有业务贷后生成的业务
 		List<BasicBusiness> basicBusiness = basicBusinessService
-				.selectList((new EntityWrapper<BasicBusiness>().eq("creat_sys_type", 2)));
+				.selectList((new EntityWrapper<BasicBusiness>().eq("src_type", 2)));
 
 		for (BasicBusiness business : basicBusiness) {
-
+                  
 			// 每个业务对应所有贷后生成的还款计划
-			List<RepaymentBizPlan> plans=repaymentBizPlanService.selectList((new EntityWrapper<RepaymentBizPlan>().eq("creat_sys_type", 2))
+			List<RepaymentBizPlan> plans=repaymentBizPlanService.selectList((new EntityWrapper<RepaymentBizPlan>().eq("src_type", 2))
 							.eq("original_business_id", business.getBusinessId()));
 			
 			
 			for(RepaymentBizPlan plan:plans) {
 				List<RepaymentBizPlanList> pLists=repaymentBizPlanListService.selectList((new EntityWrapper<RepaymentBizPlanList>()
-							.eq("creat_sys_type", 2).eq("active", 1).ne("current_status", RepayCurrentStatusEnums.已还款)
-							.ne("current_sub_status", RepayRegisterFinanceStatus.还款待确认)).eq("plan_id",
+							.eq("src_type", 2).ne("current_status", RepayCurrentStatusEnums.已还款.name())
+							.ne("current_sub_status", RepayRegisterFinanceStatus.还款待确认.name()).or().isNull("current_sub_status")).eq("plan_id",
 									plan.getPlanId()));
 				
 				    for(RepaymentBizPlanList pList:pLists) {
 				    	// 每个业务的还款计划列表对应所有标的还款计划列表
 						List<RepaymentProjPlanList> projList = selectList((new EntityWrapper<RepaymentProjPlanList>()
-								.eq("creat_sys_type", 2).eq("active", 1).ne("current_status", RepayCurrentStatusEnums.已还款)
-								.ne("current_sub_status", RepayRegisterFinanceStatus.还款待确认)).eq("plan_list_id",
+								.eq("creat_sys_type", 2).ne("current_status", RepayCurrentStatusEnums.已还款.name())
+								.ne("current_sub_status", RepayRegisterFinanceStatus.还款待确认.name()).or().isNull("current_sub_status")).eq("plan_list_id",
 										pList.getPlanListId()));
 						BigDecimal underLateFeeSum=BigDecimal.valueOf(0);//每个业务每期还款计划的线下收费
 						BigDecimal onlineLateFeeSum=BigDecimal.valueOf(0);//每个业务每期还款计划的线上收费
@@ -121,33 +123,40 @@ public class RepaymentProjPlanListServiceImpl extends
 								if(getOnLineFactAmountSum(projPList.getProjPlanListId())>=getOnLinePlanAmountSum(projPList.getProjPlanListId())) {
 									continue;
 								}
-								// 没有逾期
-								if (isOverDue(new Date(), projPList.getDueDate()) >=0) {
+								// 没有逾期,若逾期一天不计算逾期费用，逾期> 1天按实际逾期天数进行计算
+								if (isOverDue(new Date(), projPList.getDueDate()) >=0||isOverDue(new Date(), projPList.getDueDate())==-1) {
 									continue;
 									// 逾期的当前期
 								} else {
+									logger.info("逾期费用计算开始===============：planListid:"+pList.getPlanListId()+"===============");
 									BigDecimal days=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), projPList.getDueDate())));//逾期天数
 									projPList.setOverdueDays(days);
-								
-									
-									BigDecimal underLateFee=getUnderLateFee(projPList,projList, projPlan);//线下逾期费
+								     
+									BigDecimal underLateFee=getUnderLateFee(projPList,projList, projPlan,days);//线下逾期费
 									underLateFeeSum=underLateFeeSum.add(underLateFee);
 									updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid(), underLateFee);
 									
-									BigDecimal onlineLateFee=getOnLineLateFee(projPList, projPlan);//线上逾期费
+									BigDecimal onlineLateFee=getOnLineLateFee(projPList, projPlan,days);//线上逾期费
 									onlineLateFeeSum=onlineLateFeeSum.add(onlineLateFee);
 									updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), onlineLateFee);
 									projPList.setOverdueAmount(underLateFee.add(onlineLateFee));
+									projPList.setCurrentStatus(RepayCurrentStatusEnums.逾期.name());
 									updateById(projPList);
+									logger.info("逾期费用===============：projListId:"+projPList.getProjPlanListId()+"线下逾期费:"+underLateFee+",线上逾期费:"+onlineLateFee+"==============");
 								}
+								
+								//更新还款计划业务表
+								updateOrInsertPlanDetail(pList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid(), underLateFeeSum);//每个业务每期还款计划的线下收费
+								updateOrInsertPlanDetail(pList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), onlineLateFeeSum);//每个业务每期还款计划的线上收费
+								BigDecimal days=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), pList.getDueDate())));//每个业务每期款还计划的逾期天数
+								pList.setOverdueDays(days);
+								pList.setOverdueAmount(underLateFeeSum.add(onlineLateFeeSum));
+								pList.setCurrentStatus(RepayCurrentStatusEnums.逾期.name());
+								repaymentBizPlanListService.updateById(pList);
+								logger.info("逾期费用计算结束===============：planListid:"+pList.getPlanListId()+"===============");
 							}
-							updateOrInsertPlanDetail(pList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid(), underLateFeeSum);//每个业务每期还款计划的线下收费
-							updateOrInsertPlanDetail(pList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), onlineLateFeeSum);//每个业务每期还款计划的线上收费
 							
-							BigDecimal days=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), pList.getDueDate())));//每个业务每期款还计划的逾期天数
-							pList.setOverdueDays(days);
-							pList.setOverdueAmount(underLateFeeSum.add(onlineLateFeeSum));
-							repaymentBizPlanListService.updateById(pList);
+							
 							
 				    }
 			
@@ -196,6 +205,8 @@ public class RepaymentProjPlanListServiceImpl extends
 		 * @return
 		 */
 		private int isOverDue(Date nowDate, Date repayDate) {
+		 	nowDate=DateUtil.getDate(DateUtil.formatDate(nowDate));
+		 	repayDate=DateUtil.getDate(DateUtil.formatDate(repayDate));
 			int i = DateUtil.getDiffDays(nowDate, repayDate);
 			return i;
 		}
@@ -208,12 +219,14 @@ public class RepaymentProjPlanListServiceImpl extends
 	     * @param projPlan
 	     * @return
 	     */
-		private BigDecimal getOnLineLateFee(RepaymentProjPlanList projPlanList,RepaymentProjPlan projPlan) {
+		private BigDecimal getOnLineLateFee(RepaymentProjPlanList projPlanList,RepaymentProjPlan projPlan,BigDecimal days) {
 			BigDecimal restPricipal=getRestPrincipal(projPlanList, projPlan);
 			BigDecimal principalAndInterest=BigDecimal.valueOf(getPrincipalAndinterestPeriod(projPlanList.getProjPlanListId()));
 			BigDecimal onLineLatefee=new BigDecimal(0);
 		
 			onLineLatefee=getLateFee(projPlan.getOnLineOverDueRate(), projPlan.getOnLineOverDueRateType(), projPlan.getBorrowMoney(), restPricipal, principalAndInterest);
+			
+			onLineLatefee=onLineLatefee.multiply(days);
 			return onLineLatefee;
 		}
 		
@@ -224,11 +237,12 @@ public class RepaymentProjPlanListServiceImpl extends
 	     * @param projPlan
 	     * @return
 	     */
-		private BigDecimal getUnderLateFee(RepaymentProjPlanList projPlanList,List<RepaymentProjPlanList> projPlanLists,RepaymentProjPlan projPlan ) {
+		private BigDecimal getUnderLateFee(RepaymentProjPlanList projPlanList,List<RepaymentProjPlanList> projPlanLists,RepaymentProjPlan projPlan,BigDecimal days) {
 			BigDecimal restPricipal=getRestPrincipal(projPlanList, projPlan);
 			BigDecimal principalAndInterest=BigDecimal.valueOf(getPrincipalAndinterestPeriod(projPlanList.getProjPlanListId()));
 			BigDecimal underLatefee=new BigDecimal(0);
-			Date lastDate=getLastDueDate(projPlanLists);
+		   List<RepaymentProjPlanList> list=selectList(new EntityWrapper<RepaymentProjPlanList>().eq("proj_plan_id", projPlan.getProjPlanId()));
+			Date lastDate=getLastDueDate(list);
 			    //期外
 			    if(new Date().compareTo(lastDate)>0) {
 			    	underLatefee=getLateFee(projPlan.getOffLineOutOverDueRate(), projPlan.getOffLineOutOverDueRateType(), projPlan.getBorrowMoney(), restPricipal, principalAndInterest);
@@ -240,7 +254,7 @@ public class RepaymentProjPlanListServiceImpl extends
 			    	underLatefee=getLateFee(projPlan.getOffLineInOverDueRate(), projPlan.getOffLineInOverDueRateType(), projPlan.getBorrowMoney(), restPricipal, principalAndInterest);
 					    	
 			    }
-			
+			underLatefee=underLatefee.multiply(days);
 			return underLatefee;
 		}
 	
@@ -429,7 +443,8 @@ public class RepaymentProjPlanListServiceImpl extends
 			Date date1=DateUtil.getDate("2018-05-19", "yyyy-MM-dd");
 			Date date2=DateUtil.getDate("2018-05-15", "yyyy-MM-dd");
 			System.out.println(DateUtil.getDiffDays(date1, date2));
-		}
+		} 
+		 
 
-}
+} 
 

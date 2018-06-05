@@ -11,6 +11,7 @@ window.layinit(function (htConfig) {
 
     let businessId = getQueryStr('businessId')
     let afterId = getQueryStr('afterId')
+    let mprid = getQueryStr('mprid')
 
     app = new Vue({
         el: "#app",
@@ -20,7 +21,8 @@ window.layinit(function (htConfig) {
                 tradeType: '',
                 repaymentMoney: 0,
                 acceptBank: '',
-                cert:''
+                cert:'',
+                remark:''
             },
             ruleValidate: {
                 repaymentDate: [
@@ -107,16 +109,40 @@ window.layinit(function (htConfig) {
                 })
                 params.businessId = businessId;
                 params.afterId = afterId;
+                if(mprid){
+                    params.mprid = mprid
+                }
                 if(!params.repaymentDate){
                     app.$Message.error({content:'还款日期不能为空'})
                     return ;
+                }
+                if(typeof params.repaymentDate!='string'){
+                    params.repaymentDate = moment(params.repaymentDate).format('YYYY-MM-DD')
                 }
                 if(!/^(\d{4})-(\d{2})-(\d{2})$/.test(params.repaymentDate)){
                     app.$Message.error({content:'还款日期格式错误'})
                     return ;
                 }
+                if(!params.repaymentMoney||params.repaymentMoney==0){
+                    app.$Message.error({content:'转账金额不能为0'})
+                    return ;
+                }
+                if(!params.tradeType){
+                    app.$Message.error({content:'交易类型不能为空'})
+                    return ;
+                }
+                if(!params.acceptBank){
+                    app.$Message.error({content:app.acceptAccountLabel+'不能为空'})
+                    return ;
+                }
+                if(!params.factRepaymentUser){
+                    app.$Message.error({content:(params.tradeType=='转账'?'实际转款人':'支付人')+'不能为空'})
+                    return ;
+                }
+                let msg = mprid?"确认编辑此流水?":"确认新增此流水?"
+                let url = mprid?"确认编辑此流水?":"确认新增此流水?"
                 app.$Modal.confirm({
-                    content:'确认新增此流水?',
+                    content:msg,
                     onOk(){
                         axios.post(fpath+'finance/appointBankStatement',params)
                         .then(function(res){
@@ -139,23 +165,55 @@ window.layinit(function (htConfig) {
                 var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
                 parent.layer.close(index); //再执行关闭 
                 // window.parent.app.closeModal('manualAddBankSatementsShow')
-            }
-        },
-        computed: {
-            tradeType() {
-                return this.form.tradeType;
             },
-            acceptBank(){
-                return this.form.acceptBank;
+            getMoneyPool(){
+                axios.get(cpath + 'moneyPool/getCustomerRepayment', { params: { id: mprid } })
+                    .then(function (res) {
+                        if (res.data.code == "1") {
+
+                            data = res.data.data
+                            app.form.moneyPoolId = data.id
+                            app.form.repaymentDate = data.tradeDate
+                            app.form.repaymentMoney = data.accountMoney
+                            app.form.realRepaymentUser = data.factTransferName
+                            app.form.tradeType = data.tradeType
+                            app.form.factRepaymentUser = data.factTransferName
+                            if (data.tradeType == '现金') {
+                                app.form.acceptBank = data.bankAccount
+                            } else {
+                                app.form.acceptBank = data.bankAccount
+                                $.each(app.bankAccountList, function (i, o) {
+                                    if (o.financeName == data.bankAccount) {
+                                        app.curBankAccount = o.repaymentId
+                                        // $("#acceptBankAccount input").attr('disabled', false).val(o.repaymentId).attr('disabled', true)
+                                        return false
+                                    }
+                                })
+                            }
+                            app.form.tradePlace = data.tradePlace
+                            app.form.cert = data.certificatePictureUrl
+                            app.form.remark = data.remark
+
+                            
+                        } else {
+                            app.$Modal.error({ content: '操作失败，消息：' + res.data.msg });
+                        }
+                    })
+                    .catch(function (error) {
+                        app.$Modal.error({ content: '接口调用异常!' });
+                    });
             }
         },
         watch: {
-            tradeType(n, o) {
+            'form.tradeType':function(n, o) {
+                this.computeAcceptAccountLabel()
+                if(o==""){
+                    return ;
+                }
                 app.form.acceptBank = ''
                 app.curBankAccount = ''
-                this.computeAcceptAccountLabel()
             },
-            acceptBank(n,o){
+            'form.acceptBank':function(n,o){
                 console.log(this.bankAccountList);
                 this.bankAccountList.forEach(e=>{
                     if(n==e.financeName){
@@ -171,18 +229,27 @@ window.layinit(function (htConfig) {
                 }
             },
             'form.remark':function(n,o){
+                if(o==""){
+                    return ;
+                }
                 if(n.length>50){
                     app.$Message.error({content:'输入字数不符合要求，最多50字'})
                     app.form.remark = ''
                 }
             },
             'form.tradePlace':function(n,o){
+                if(o==""){
+                    return ;
+                }
                 if(n.length>15){
                     app.$Message.error({content:'输入字数不符合要求，最多15字'})
                     app.form.tradePlace = ''
                 }
             },
             'form.factRepaymentUser':function(n,o){
+                if(o==""){
+                    return ;
+                }
                 if(n.length>10){
                     app.$Message.error({content:'输入字数不符合要求，最多10字'})
                     app.form.factRepaymentUser = ''
@@ -191,6 +258,9 @@ window.layinit(function (htConfig) {
         },
         created: function () {
             this.listDepartmentBank()
+            if(mprid){
+                this.getMoneyPool()
+            }
         }
     })
 

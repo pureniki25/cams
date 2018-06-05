@@ -9,6 +9,9 @@ import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
+import javax.validation.constraints.NotNull;
+
 /**
  * <p>
  * [催收信息主表]
@@ -28,17 +31,20 @@ public class Collection extends Model<Collection> {
      */
     @TableId("business_id")
 	@ApiModelProperty(required= true,value = "[业务编号]")
+	@NotNull(message = "业务编号(businessId)不能为空")
 	private String businessId;
     /**
      * [还款期数]
      */
 	@TableField("after_id")
 	@ApiModelProperty(required= true,value = "[还款期数]")
+	@NotNull(message = "还款期数(afterId)不能为空")
 	private String afterId;
     /**
      * [状态]
      */
 	@ApiModelProperty(required= true,value = "[状态]")
+	@NotNull(message = "状态(status)不能为空")
 	private String status;
     /**
      * [催收业务员]
@@ -57,12 +63,14 @@ public class Collection extends Model<Collection> {
      */
 	@TableField("create_user")
 	@ApiModelProperty(required= true,value = "[创建人]")
+	@NotNull(message = "创建人(createUser)不能为空")
 	private String createUser;
     /**
      * [创建时间]
      */
 	@TableField("create_time")
 	@ApiModelProperty(required= true,value = "[创建时间]")
+	@NotNull(message = "创建时间(createTime)不能为空")
 	private Date createTime;
     /**
      * [更新人]
