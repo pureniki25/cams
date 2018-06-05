@@ -93,7 +93,7 @@ public class PropertiesController {
         stringBuilder.append("\r");
         stringBuilder.append(String.format("var openInstancedId='%s';",openInstancedId));
         stringBuilder.append("\r");*/
-        stringBuilder.append(String.format("var useGateWayflage=%s;",false));
+        stringBuilder.append(String.format("var useGateWayflage=%s;",useGateWayflage));
         stringBuilder.append("\r");
 
         stringBuilder.append(String.format("var changePwdPath='%s';", changePwdPath));
