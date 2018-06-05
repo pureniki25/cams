@@ -52,7 +52,7 @@ public interface WithholdingRepaymentLogService extends BaseService<WithholdingR
       * @param key
       * @return
       */
-     List<WithholdingRepaymentLog> selectRepaymentLogForAutoRepay(String businessId, String afterId,String platformId);
+     List<WithholdingRepaymentLog> selectRepaymentLogForAutoRepay(String businessId, String afterId,Integer platformId);
      
      
      

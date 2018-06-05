@@ -62,7 +62,7 @@ public class WithholdingRepaymentLogServiceImpl extends BaseServiceImpl<Withhold
 	}
 
 	@Override
-	public List<WithholdingRepaymentLog> selectRepaymentLogForAutoRepay(String businessId, String afterId,String platformId) {
+	public List<WithholdingRepaymentLog> selectRepaymentLogForAutoRepay(String businessId, String afterId,Integer platformId) {
 		return withholdingRepaymentLogmapper.selectRepaymentLogForAutoRepay(businessId, afterId,platformId);
 	}
 
