@@ -209,7 +209,7 @@ public class CreatRepayPlanServiceImplTest {
         BusinessBasicInfoReq  businessBasicInfoReq =creatBusinessBasicInfoReq();
         creatRepayPlanReq.setBusinessBasicInfoReq(businessBasicInfoReq);
 
-        businessBasicInfoReq.setBusinessId(" ");
+        businessBasicInfoReq.setBusinessId("TDF1012018032101");
         businessBasicInfoReq.setOrgBusinessId("TDF1012018032101");
         businessBasicInfoReq.setInputTime(DateUtil.getDateTime("2018/3/21"));
         businessBasicInfoReq.setRepaymentTypeId(5);  //1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息
