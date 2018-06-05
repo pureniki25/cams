@@ -60,7 +60,7 @@ public interface WithholdingRepaymentLogMapper extends SuperMapper<WithholdingRe
      * @param key
      * @return
      */
-    List<WithholdingRepaymentLog> selectRepaymentLogForAutoRepay(@Param("businessId") String businessId,@Param("afterId") String afterId,@Param("platformId") String platformId);
+    List<WithholdingRepaymentLog> selectRepaymentLogForAutoRepay(@Param("businessId") String businessId,@Param("afterId") String afterId,@Param("platformId") Integer platformId);
 
 
 }

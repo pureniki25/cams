@@ -9,7 +9,12 @@ import com.hongte.alms.base.entity.WithholdingChannel;
 import com.hongte.alms.base.entity.WithholdingRepaymentLog;
 import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
+import com.hongte.alms.base.feignClient.dto.BankCardInfo;
+import com.hongte.alms.base.feignClient.dto.BankRechargeReqDto;
+import com.hongte.alms.base.feignClient.dto.BaofuRechargeReqDto;
 import com.hongte.alms.base.feignClient.dto.CustomerInfoDto;
+import com.hongte.alms.base.feignClient.dto.ThirdPlatform;
+import com.hongte.alms.base.feignClient.dto.YiBaoRechargeReqDto;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.BizOutputRecordService;
 import com.hongte.alms.base.service.RepaymentBizPlanListDetailService;
@@ -21,15 +26,20 @@ import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.MerchOrderUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.withhold.feignClient.EipOutRechargeRemote;
+import com.hongte.alms.withhold.feignClient.FinanceClient;
 import com.hongte.alms.withhold.service.RechargeService;
 import com.hongte.alms.withhold.service.RedisService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -37,7 +47,7 @@ import org.springframework.stereotype.Service;
 
 @Service("RechargeService")
 public class RechargeServiceImpl implements RechargeService {
-	
+	private static Logger logger = LoggerFactory.getLogger(RechargeServiceImpl.class);
 	
     @Autowired
     @Qualifier("RepaymentBizPlanListService")
@@ -67,6 +77,9 @@ public class RechargeServiceImpl implements RechargeService {
     @Autowired
     EipOutRechargeRemote eipOutRechargeRemote;
     
+    @Autowired
+    FinanceClient financeClient;
+    
     @Autowired  
     private RedisService redisService;  
     
@@ -76,31 +89,59 @@ public class RechargeServiceImpl implements RechargeService {
     
 
 	@Override
-	public Result recharge(String businessId, String afterId, String bankCard,Double amount,String platformId,String merchOrderId) {
-		Result result=new Result();
+	public Result recharge(String businessId, String afterId, String bankCard,Double amount,Integer platformId,String merchOrderId,BankCardInfo info) {
+	
 		BasicBusiness business=basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", businessId));
-		CustomerInfoDto dto=getCustomerInfo(business.getCustomerIdentifyCard());
+
 		  //执行之前先检查一下同一个渠道，当前的失败或者执行中的日志有没超过对应渠道的失败次数，超过则不执行
         //同一个渠道，同一天，最多失败或者执行中运行2次
 		Integer failCount=0;
-		Integer maxFailCount=3;//渠道最大失败次数
-		if(!StringUtil.isEmpty(platformId)) {
+		if(platformId!=null&&info!=null) {
 			List<WithholdingRepaymentLog> logs=withholdingRepaymentLogService.selectRepaymentLogForAutoRepay(businessId, afterId, platformId);
 			failCount=logs.size();
+			Result result=	excuteEipRemote(platformId, failCount,amount, info,merchOrderId);
+			return result;
 		}else {
-			if(!StringUtil.isEmpty(dto.getPlatformId())) {
-				platformId=dto.getPlatformId();
-				List<WithholdingRepaymentLog> logs=withholdingRepaymentLogService.selectRepaymentLogForAutoRepay(businessId, afterId, dto.getPlatformId());
-				failCount=logs.size();
-			}else {
-				//同一天不同渠道一共失败或处理中的次数
-				List<WithholdingRepaymentLog> logs=withholdingRepaymentLogService.selectRepaymentLogForAutoRepay(businessId, afterId, null);
-				failCount=logs.size();
-			}
+//			CustomerInfoDto dto=getCustomerInfo(business.getCustomerIdentifyCard());
+//			List<BankCardInfo> bankCardInfos= dto.getList();
+//			BankCardInfo bankCardInfo=getBankCardInfo(bankCardInfos);
+//			BankCardInfo ThirtyCardInfo=getThirtyPlatformInfo(bankCardInfos);
+//			List<Integer> platformIds=new ArrayList();
+//			
+//			if (bankCardInfo!=null) {
+//				//银行代扣
+//				platformIds.add(5);
+//				
+//			
+//			}else if(ThirtyCardInfo!=null&&bankCardInfo==null){// 第三方代扣
+//				List<ThirdPlatform> thirdPlatforms=ThirtyCardInfo.getThirdPlatformList();
+//				for(ThirdPlatform form:thirdPlatforms) {
+//					platformIds.add(form.getPlatformID());
+//				}
+//			}else{
+//				logger.debug("业务编号为" + businessId+ "期数为"+afterId+"代扣失败，没有找到银行代扣和第三方代扣相关绑定信息");
+//			} 
+//			Result result=null;
+//			for(Integer formId:platformIds) {
+//				 result=excuteEipRemote(platformId, failCount,amount,info,merchOrderId);
+//				if(!result.getCode().equals("1")) {
+//					continue;
+//				}else {
+//					return result;
+//				}
+//			}
+//			return result;
 		}
+		return null;
 	
-		
-		if(!StringUtil.isEmpty(platformId)) {
+	
+	}
+
+	private Result  excuteEipRemote(Integer platformId,Integer failCount,Double amount,BankCardInfo info,String merchOrderId) {
+		Result result=new Result();
+
+		Integer maxFailCount=3;//渠道最大失败次数
+		if(platformId!=null) {
 			WithholdingChannel chanel=withholdingChannelService.selectOne(new EntityWrapper<WithholdingChannel>().eq("platform_id", platformId));
 			maxFailCount=chanel.getFailTimes();
 		}
@@ -109,20 +150,48 @@ public class RechargeServiceImpl implements RechargeService {
 			result.setCode("-1");
 			result.setMsg("当前失败或者执行中次数为:" + failCount + ",超过限制次数，不允许执行。");
 		}else {
-			if(platformId.equals(PlatformEnum.YB_FORM.getValue().toString())) {
-				//eipOutRechargeService.platfromRecharge(dto);
+			if(platformId==PlatformEnum.YB_FORM.getValue()) {
+				YiBaoRechargeReqDto dto=new YiBaoRechargeReqDto();
+				dto.setMerchantaccount(merchOrderId);
+				dto.setOrderid(merchOrderId);
+				dto.setTranstime(Long.parseLong(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date())));
+				dto.setAmount(amount);
+				dto.setProductname("");
+				dto.setIdentityid(info.getIdentityNo());
+				dto.setIdentitytype("01");
+				dto.setCard_top(info.getBankCardNumber().substring(0, 6));
+				dto.setCard_last(info.getBankCardNumber().substring(info.getBankCardNumber().length()-4, info.getBankCardNumber().length()));
+				dto.setCallbackurl("172.0.0.1");
+				dto.setUserip("172.0.0.1");
+				eipOutRechargeRemote.yibaoRecharge(dto);
 			}
-			if(platformId.equals(PlatformEnum.BF_FORM.getValue().toString())) {
-				//eipOutRechargeService.platfromRecharge(dto);
+			if(platformId==PlatformEnum.BF_FORM.getValue()) {
+				BaofuRechargeReqDto dto=new BaofuRechargeReqDto();
+				dto.setPayCode(info.getBankCode());
+				dto.setPayCm("2");
+				dto.setAccNo(info.getBankCardNumber());
+				dto.setIdCardType("01");
+				dto.setIdHolder(info.getBankCardName());
+				dto.setMobile(info.getMobilePhone());
+				dto.setTransId(merchOrderId);
+				dto.setTxnAmt(amount);
+				dto.setTradeDate(String.valueOf(Long.parseLong(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()))));
+				dto.setTransSerialNo(merchOrderId);
+				eipOutRechargeRemote.baofuRecharge(dto);
 			}
-            if(platformId.equals(PlatformEnum.YH_FORM.getValue().toString())) {
-            	//eipOutRechargeService.bankRecharge(dto);
+            if(platformId==PlatformEnum.YH_FORM.getValue()) {
+            	BankRechargeReqDto dto=new BankRechargeReqDto();
+            	dto.setAmount(amount);
+            	dto.setChannelType("102");//todo需要循环子渠道
+            	dto.setRechargeUserId(info.getPlatformUserID());
+            	dto.setCmOrderNo(merchOrderId);
+            	eipOutRechargeRemote.bankRecharge(dto);
 			}
 			
 		}
 		return result;
+		
 	}
-
 	@Override
 	public boolean istLastPeriod(RepaymentBizPlanList pList) {
 		boolean isLast=false;
@@ -163,10 +232,10 @@ public class RechargeServiceImpl implements RechargeService {
 	}
 
 	
-	public void recordRepaymentLog(Result result,RepaymentBizPlanList list,BasicBusiness business,CustomerInfoDto dto,Integer platformId,Integer boolLastRepay,Integer boolPartRepay,String merchOrderId,Integer settlementType,BigDecimal currentAmount) {
+	public void recordRepaymentLog(Result result,RepaymentBizPlanList list,BasicBusiness business,BankCardInfo dto,Integer platformId,Integer boolLastRepay,Integer boolPartRepay,String merchOrderId,Integer settlementType,BigDecimal currentAmount) {
 		WithholdingRepaymentLog log=new WithholdingRepaymentLog();
 		log.setAfterId(list.getAfterId());
-		log.setBankCard(dto.getBankBindCardNo());
+		log.setBankCard(dto.getBankCardNumber());
 		log.setBindPlatformId(platformId);
 		log.setBoolLastRepay(boolLastRepay);
 		log.setBoolPartRepay(boolPartRepay);
@@ -175,7 +244,7 @@ public class RechargeServiceImpl implements RechargeService {
 		log.setIdentityCard(business.getCustomerIdentifyCard());
 		log.setMerchOrderId(merchOrderId);
 		log.setOriginalBusinessId(business.getBusinessId());
-		log.setPhoneNumber(dto.getPhone());
+		log.setPhoneNumber(dto.getMobilePhone());
 		log.setRepayStatus(Integer.valueOf(result.getCode()));
 		log.setRemark(result.getMsg());
 		log.setThirdOrderId(merchOrderId);
@@ -266,5 +335,37 @@ public class RechargeServiceImpl implements RechargeService {
         }
 		return true;
 	}
+
+	@Override
+	public Result shareProfit(RepaymentBizPlanList list) {
+		Result result=financeClient.shareProfit(list.getOrigBusinessId(), list.getAfterId());
+		return result;
+	}
+
+	@Override
+	public BankCardInfo getThirtyPlatformInfo(List<BankCardInfo> list) {
+		for(BankCardInfo card:list) {
+			if(card.getPlatformType()==0&&card.getWithholdingType()==1) {//等于第三方银行代扣并且是代扣主卡
+				return card;
+			}else {
+				return null;
+			}
+	    }
+		return null;
+	}
+
+	@Override
+	public BankCardInfo getBankCardInfo(List<BankCardInfo> list) {
+		for(BankCardInfo card:list) {
+			if(card.getPlatformType()!=0&&card.getWithholdingType()==1) {//不等于第三方代扣银行卡并且是代扣主卡
+				return card;
+			}else {
+				return null;
+			}
+	    }
+		return null;
+	}
+
+
    
 }
