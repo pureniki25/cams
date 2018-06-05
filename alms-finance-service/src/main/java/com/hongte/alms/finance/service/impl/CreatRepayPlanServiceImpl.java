@@ -1180,7 +1180,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                                      BusinessBasicInfoReq  businessBasicInfo,
                                      Map<String,Map<String,Map<String,List<RepaymentProjPlanListDetail>>>> projPlanDetailTotalMap,
                                      Map<String,Map<String,List<RepaymentProjPlanList>>> projPlanListTotalMap) throws IllegalAccessException, InstantiationException {
+        Integer planIndex = 0;
         for(String beginDay:projInfoReqMap.keySet()){
+            planIndex++;
             List<ProjInfoReq> reqList = projInfoReqMap.get(beginDay);
             //批次Id
             String batchId = UUID.randomUUID().toString();
@@ -1206,9 +1208,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             repaymentProjPlanMap.put(batchId,projPlans);
 
 
-            Integer planIndex = 0;
+
             for(ProjInfoReq projInfoReq:reqList){
-                planIndex++;
+
 
                 ///////  标还款计划表   一次出款 生成一条记录
                 RepaymentProjPlan repaymentProjPlan = new RepaymentProjPlan(); //ClassCopyUtil.copy(projInfoReq,ProjInfoReq.class,RepaymentProjPlan.class);

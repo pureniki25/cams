@@ -113,8 +113,30 @@
 	
 					  		<!-- 每个标每期的应还本金和利息-->
 	<select id="getPrincipalAndInterestPeriod" resultType="java.lang.Double">
-				select 
-					sum(ifnull(projDetail.proj_fact_amount,0)) 
+				
+				
+         select (a.planAmount-a.factAmount)  as factAmount from 
+               (select 
+				       SUM(
+					        CASE
+					          WHEN (
+					            projDetail.plan_item_type =10 or projDetail.plan_item_type =20 	         		       
+					          ) 
+					          THEN projDetail.proj_plan_amount
+					          ELSE 0 
+					        END
+	                   ) `planAmount`,
+		      
+				      SUM(
+					        CASE
+					          WHEN (
+					            projDetail.plan_item_type =10 or projDetail.plan_item_type =20 	         		       
+					          ) 
+					          THEN projDetail.proj_fact_amount
+					          ELSE 0 
+					        END
+				      ) `factAmount`
+		      
 					   from tb_repayment_proj_plan_list projList 
 					
 					left join tb_repayment_proj_plan_list_detail projDetail
@@ -123,7 +145,7 @@
 					on projList.proj_plan_list_id=projDetail.proj_plan_list_id
 
 		
-				where projList.proj_plan_list_id=#{projListId}
+				where projList.proj_plan_list_id=#{projListId} ) a
 	</select>
 	
 	<select id="selectByProjectIDAndAfterId" resultType="com.hongte.alms.base.entity.RepaymentProjPlanList">
