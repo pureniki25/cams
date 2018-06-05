@@ -24,7 +24,7 @@ import org.springframework.web.client.RestTemplate;
  * @date 2017年11月17日 下午3:01:38
  * @since alms-service 1.0-SNAPSHOT
  */
-@EnableFeignClients(basePackages = {"com.ht.ussp.client","com.hongte.alms.scheduled.client"})
+@EnableFeignClients(basePackages = {"com.ht.ussp.client","com.hongte.alms.scheduled.client", "com.hongte.alms.base.feignClient"})
 @SpringCloudApplication
 @EnableScheduling
 @MapperScan(basePackages = {"com.hongte.alms.scheduled.mapper","com.hongte.alms.base"})

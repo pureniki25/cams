@@ -1,6 +1,18 @@
 var basePath;
 var vm;
 
+var rechargeModalFormRules = {
+    transferType: [
+    	{required: true, message: '必选', trigger: 'blur'}
+	],
+	rechargeAmount: [
+		{pattern:/^\d{0,9}(\.\d{1,2})?$/, required: true,  message: '请填写整数位数不大于9位，小数位数不超过两位的数字', trigger: 'blur'}
+	],
+	bankCode: [
+		{required: true, message: '必选', trigger: 'blur'}
+	],
+};
+
 window.layinit(function(htConfig) {
 	basePath = htConfig.platRepayBasePath;
 
@@ -50,7 +62,7 @@ window.layinit(function(htConfig) {
 			 * 获取所有线下还款账户
 			 */
 			listAllDepartmentBank: function(){
-				axios.get(basePath + 'recharge/listAllDepartmentBank')
+				axios.get(basePath + 'recharge/listAllDepartmentBank', {timeout: 0})
 				.then(function(result){
 					if (result.data.code == "1") {
 						vm.bankAccountList = result.data.data;
@@ -65,7 +77,7 @@ window.layinit(function(htConfig) {
 			 * 获取代充值账户余额
 			 */
 			queryUserAviMoney: function(){
-				axios.get(basePath + 'recharge/queryUserAviMoney?rechargeAccountType=' + vm.rechargeModalForm.rechargeAccountType)
+				axios.get(basePath + 'recharge/queryUserAviMoney?rechargeAccountType=' + vm.rechargeModalForm.rechargeAccountType, {timeout: 0})
 				.then(function(result){
 					if (result.data.code == "1") {
 						vm.rechargeModalForm.rechargeAccountBalance = result.data.data.data.aviMoney;
@@ -95,22 +107,28 @@ window.layinit(function(htConfig) {
 			 * 代充值账户充值弹窗提交
 			 */
 			rechargeModalCommit: function(){
-				axios.post(basePath + 'recharge/commitRechargeData', vm.rechargeModalForm)
-				.then(function(result){
-					if (result.data.code == "1") {
-						vm.$Modal.success({
-		                    content: "提交成功",
-		                    onOk: () => {
-								vm.rechargeModal = false;
-								vm.rechargeModalForm = vm.initRechargeModalForm;
-		                    },
-		                });
-					} else {
-						vm.$Modal.error({ content: result.data.msg });
-					}
-				}).catch(function (error) {
-					vm.$Modal.error({content: '接口调用异常!'});
-            	});
+				vm.$refs['rechargeModalForm'].validate((valid) => {
+		            if(valid){
+						axios.post(basePath + 'recharge/commitRechargeData', vm.rechargeModalForm, {timeout: 0})
+						.then(function(result){
+							if (result.data.code == "1") {
+								vm.$Modal.success({
+				                    content: "提交成功",
+				                    onOk: () => {
+										vm.rechargeModal = false;
+										vm.rechargeModalForm = vm.initRechargeModalForm;
+				                    },
+				                });
+							} else {
+								vm.$Modal.error({ content: result.data.msg });
+							}
+						}).catch(function (error) {
+							vm.$Modal.error({content: '接口调用异常!'});
+		            	});
+		            }else{
+		                vm.$Message.error({content: '表单校验失败!'});
+		            }
+		        })
 			},
 			/*
 			 * 拼接银行图片地址

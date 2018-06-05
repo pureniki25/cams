@@ -26,13 +26,17 @@ public class AgencyRechargeSchedule {
 	@Scheduled(cron = "0 0 0/2 * * ?")
 	public void run() {
 		try {
+			LOG.info("更新代充值处理状态开始");
+			long start = System.currentTimeMillis();
 			String[] paramArr = {"1", "3"};
 			List<AgencyRechargeLog> logs = agencyRechargeLogService.selectList(new EntityWrapper<AgencyRechargeLog>().in("handle_status", paramArr));
 			if (CollectionUtils.isNotEmpty(logs)) {
 				for (AgencyRechargeLog agencyRechargeLog : logs) {
-					
+					agencyRechargeLogService.queryRechargeOrder(agencyRechargeLog.getoIdPartner(), agencyRechargeLog.getUniqueId());
 				}
 			}
+			long end = System.currentTimeMillis();
+			LOG.info("更新代充值处理状态结束，耗时：{}", (end - start));
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 		}

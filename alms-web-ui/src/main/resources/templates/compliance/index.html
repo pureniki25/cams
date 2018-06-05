@@ -47,6 +47,11 @@
 		.boder{
 			border:1px dashed red
 		}
+		
+		.bank {
+			    display: flex;
+   				 flex-wrap: wrap;
+		}
 	</style>
 </head>
 <body>
@@ -137,7 +142,7 @@
 	</Card>
 	
 	<Modal v-model="rechargeModal" title="代充值账户充值" width="1500">
-		<i-form ref="rechargeModalForm" :model="rechargeModalForm" label-position="right" label-width="150">
+		<i-form ref="rechargeModalForm" :model="rechargeModalForm" label-position="right" label-width="150" :rules="rechargeModalFormRules">
 			<form-item label="代充值账户：" prop="rechargeAccount">
 				<row>
 					<i-col>
@@ -151,7 +156,9 @@
                             <i-option value="二手车业务代充值账户">二手车业务代充值账户</i-option>
                             <i-option value="一点车贷代充值账户">一点车贷代充值账户</i-option>
 		  				</i-select>
-		  				<span style="color: red">{{rechargeModalForm.rechargeAccountBalance?numeral(rechargeModalForm.rechargeAccountBalance).format('0,0.00'):''}}</span>
+		  				<span style="color: red">
+		  					{{rechargeModalForm.rechargeAccountBalance && rechargeModalForm.rechargeAccountType?numeral(rechargeModalForm.rechargeAccountBalance).format('0,0.00'):''}}
+		  				</span>
 					</i-col>
 				</row>
 			</form-item>
@@ -187,7 +194,7 @@
 				</row>
 			</form-item>
 			<form-item label="选择银行：" prop="bankCode">
-				<row>
+				<row class="bank">
 					<i-col span="6" v-for="item in bankCodeList" style="margin-top:1rem" v-model="rechargeModalForm.bankCode">
 						<img :src="handleImgUri(item)" :class="rechargeModalForm.bankCode==item?'boder':''" @click="rechargeModalForm.bankCode=item">
 					</i-col>

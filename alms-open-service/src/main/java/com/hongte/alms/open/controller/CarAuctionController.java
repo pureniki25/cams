@@ -1,6 +1,7 @@
 package com.hongte.alms.open.controller;
 
 import com.hongte.alms.base.assets.car.vo.*;
+import com.hongte.alms.common.util.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -96,12 +97,58 @@ public class CarAuctionController {
 	@PostMapping("/updateAuctions")
 	public Result<Object> updateAuctions(@RequestBody CarBidReq req){
 		try {
+			if(req==null)
+			{
+				logger.error("参数为空,req为null");
+				return Result.error("9999", "传入的参数无效");
+			}
+			if(StringUtils.isEmpty(req.getUserId()) )
+			{
+				logger.error("参数为空,userId"+req.getUserId());
+				return Result.error("9999", "传入的参数无效，用户Id必须填写");
+			}
+			if(StringUtils.isEmpty(req.getAuctionId()) )
+			{
+				logger.error("参数为空,auctionId"+req.getAuctionId());
+				return Result.error("9999", "传入的参数无效，拍卖Id必须填写");
+			}
+			if(req.getAmount()==null )
+			{
+				logger.error("参数为空,amount"+req.getAmount());
+				return Result.error("9999", "传入的参数无效，报价必须填写");
+			}
+			if(StringUtils.isEmpty(req.getTelephone()))
+			{
+				logger.error("参数为空,telephone"+req.getTelephone());
+				return Result.error("9999", "传入的参数无效,手机号码必须填写");
+			}
+			if(!StringUtil.isTelephone(req.getTelephone()))
+			{
+				logger.error("手机号码格式不正确,telephone"+req.getTelephone());
+				return Result.error("9999", "传入的参数无效,手机号码格式不正确");
+			}
+			if(StringUtils.isEmpty(req.getIdCard()))
+			{
+				logger.error("参数为空,idCard"+req.getIdCard());
+				return Result.error("9999", "传入的参数无效,身份证必须填写");
+			}
+            if(!StringUtil.isIdCard(req.getIdCard()))
+			{
+				logger.error("身份证格式不正确,idCard"+req.getIdCard());
+				return Result.error("9999", "传入的参数无效,身份证格式不正确");
+			}
 			List<CarAuction> auctions=carAuctionService.selectList( new EntityWrapper<CarAuction>().eq("auction_id", req.getAuctionId()).eq("status", "04"));
 			if(auctions==null||auctions.size()!=1) {
 				logger.error("参数为空,auction_id="+req.getAuctionId());
 				return Result.error("9999", "无效的拍卖");
 			}
 			CarAuction carAuction=auctions.get(0);
+			if(req.getAmount().compareTo(carAuction.getStartingPrice())==-1)
+			{
+				logger.error("不能小于最低价,amount="+req.getAmount()+"startingPrice"+carAuction.getStartingPrice());
+				return Result.error("9999", "不能小于最低价");
+			}
+
 			//判断当前是否还在拍卖时间
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 			long startTime=carAuction.getAuctionStartTime().getTime();
@@ -138,6 +185,20 @@ public class CarAuctionController {
 	@PostMapping("/myBids")
 	public Result<Object> myBids(@RequestBody MyBidsReq req){
 		try {
+			if(req==null) {
+				logger.error("参数为空,req为null");
+				return  Result.error("9999", "参数为空,req为null");
+			}
+			if(StringUtils.isEmpty(req.getUserId()) )
+			{
+				logger.error("参数为空,userId"+req.getUserId());
+				return Result.error("9999", "传入的参数无效，用户Id必须填写");
+			}
+			if(StringUtils.isEmpty(req.getAuctionId()) )
+			{
+				logger.error("参数为空,auctionId"+req.getAuctionId());
+				return Result.error("9999", "传入的参数无效，拍卖Id必须填写");
+			}
          List<CarAuctionPriceLog> bids=carAuctionPriceLogService.selectList(new EntityWrapper<CarAuctionPriceLog>().eq("user_id",req.getUserId()).eq("auction_id",req.getAuctionId()));
          List<MyBidsVo> myBidsList=new ArrayList<MyBidsVo>();
          for(CarAuctionPriceLog bid :bids) {
@@ -167,6 +228,10 @@ public class CarAuctionController {
 			if(req==null) {
 				logger.error("参数为空,req为null");
 				return PageResult.error(9999, "参数为空,req为null");
+			}
+			if(StringUtils.isEmpty(req.getUserId()) ) {
+				logger.error("参数为空,userId" + req.getUserId());
+				return PageResult.error(9999, "传入的参数无效，用户Id必须填写");
 			}
 			Page<MyBadeCarVo> pages=carService.selectMyBidCarsForApp(req);
 			return PageResult.success(pages.getRecords(),pages.getTotal());
