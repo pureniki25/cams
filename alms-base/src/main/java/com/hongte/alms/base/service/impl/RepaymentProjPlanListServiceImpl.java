@@ -220,6 +220,7 @@ public class RepaymentProjPlanListServiceImpl extends
 	     * @return
 	     */
 		private BigDecimal getOnLineLateFee(RepaymentProjPlanList projPlanList,RepaymentProjPlan projPlan,BigDecimal days) {
+			System.out.println("================="+projPlan.getOriginalBusinessId()+"====================");
 			BigDecimal restPricipal=getRestPrincipal(projPlanList, projPlan);
 			BigDecimal principalAndInterest=BigDecimal.valueOf(getPrincipalAndinterestPeriod(projPlanList.getProjPlanListId()));
 			BigDecimal onLineLatefee=new BigDecimal(0);
@@ -238,6 +239,7 @@ public class RepaymentProjPlanListServiceImpl extends
 	     * @return
 	     */
 		private BigDecimal getUnderLateFee(RepaymentProjPlanList projPlanList,List<RepaymentProjPlanList> projPlanLists,RepaymentProjPlan projPlan,BigDecimal days) {
+			System.out.println("================="+projPlan.getOriginalBusinessId()+"====================");
 			BigDecimal restPricipal=getRestPrincipal(projPlanList, projPlan);
 			BigDecimal principalAndInterest=BigDecimal.valueOf(getPrincipalAndinterestPeriod(projPlanList.getProjPlanListId()));
 			BigDecimal underLatefee=new BigDecimal(0);
@@ -324,7 +326,7 @@ public class RepaymentProjPlanListServiceImpl extends
 	            	lateFee = rate;
 	                break;
 	            case 4:
-	            	lateFee = principalAndInterest.multiply(rate);
+	            	lateFee = principalAndInterest.multiply(rate.divide(new BigDecimal(100)));
 	                break;
 	        }
 	        return lateFee;
@@ -352,7 +354,7 @@ public class RepaymentProjPlanListServiceImpl extends
 	     * @param lateFee
 	     */
 		private void updateOrInsertProjDetail(RepaymentProjPlanList projPList, String feeId, BigDecimal lateFee) {
-			RepaymentProjPlanListDetail projDetail = repaymentProjPlanListDetailService.selectOne(
+ 			RepaymentProjPlanListDetail projDetail = repaymentProjPlanListDetailService.selectOne(
 					new EntityWrapper<RepaymentProjPlanListDetail>().eq("proj_plan_list_id", projPList.getProjPlanListId())
 							.eq("fee_id", feeId));
 			try {
