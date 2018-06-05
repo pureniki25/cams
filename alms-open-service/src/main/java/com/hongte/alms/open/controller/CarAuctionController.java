@@ -107,6 +107,11 @@ public class CarAuctionController {
 				logger.error("参数为空,userId"+req.getUserId());
 				return Result.error("9999", "传入的参数无效，用户Id必须填写");
 			}
+			if(StringUtils.isEmpty(req.getUserName()) )
+			{
+				logger.error("参数为空,userName"+req.getUserName());
+				return Result.error("9999", "传入的参数无效，姓名必须填写");
+			}
 			if(StringUtils.isEmpty(req.getAuctionId()) )
 			{
 				logger.error("参数为空,auctionId"+req.getAuctionId());

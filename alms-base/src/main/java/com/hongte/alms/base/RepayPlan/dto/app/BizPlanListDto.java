@@ -22,6 +22,10 @@ public class BizPlanListDto  implements Serializable {
 
     private BigDecimal totalAmount;  //待还款总金额
 
+    private BigDecimal overdueAmount; //滞纳金
+
+    private BigDecimal derateAmount;//减免金额
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date payDate;  //实还日期
 
@@ -43,6 +47,8 @@ public class BizPlanListDto  implements Serializable {
         this.totalAmount = planList.getTotalBorrowAmount();
         this.payDate = planList.getFactRepayDate();
         this.status = planList.getCurrentStatus();
+        this.overdueAmount = planList.getOverdueAmount();
+        this.derateAmount =planList.getDerateAmount();
 //        this.payedAmount = planList.getF
     }
 
@@ -108,5 +114,21 @@ public class BizPlanListDto  implements Serializable {
 
     public void setIsCurrentPeriod(Boolean currentPeriod) {
         isCurrentPeriod = currentPeriod;
+    }
+
+    public BigDecimal getOverdueAmount() {
+        return overdueAmount;
+    }
+
+    public void setOverdueAmount(BigDecimal overdueAmount) {
+        this.overdueAmount = overdueAmount;
+    }
+
+    public BigDecimal getDerateAmount() {
+        return derateAmount;
+    }
+
+    public void setDerateAmount(BigDecimal derateAmount) {
+        this.derateAmount = derateAmount;
     }
 }

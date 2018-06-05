@@ -18,6 +18,8 @@ import com.hongte.alms.base.entity.BasicBusinessType;
 import com.hongte.alms.base.entity.BizOutputRecord;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.enums.RepayTypeEnum;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanBorrowLimitUnitEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanSettleStatusEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.service.BasicBusinessService;
@@ -519,6 +521,11 @@ public class RepayPlanController {
 
        return  Result.success(bizPlanDto);
     }
+
+
+
+
+
     
     @ApiOperation(value = "获取业务的还款计划信息进行消息推送")
     @PostMapping("/getMessage")
@@ -574,6 +581,13 @@ public class RepayPlanController {
        return  Result.success(messages);
     }
 
+
+
+
+
+
+
+
     /**
      * 根据业务ID取得此业务的还款计划信息返回
      * @param businessId
@@ -584,7 +598,22 @@ public class RepayPlanController {
 
         BasicBusiness business = basicBusinessService.selectById(businessId);
         bizDto.setBusinessId(businessId);
-        bizDto.setBusinessType(business==null?null:business.getBusinessCtype());
+
+        //业务类型
+        List<BasicBusinessType>  types =basicBusinessTypeService.selectList(new EntityWrapper<BasicBusinessType>().eq("business_type_id",business.getBusinessType()));
+        bizDto.setBusinessType((types!=null&&types.size()>0)?types.get(0).getBusinessTypeName():null);
+        //还款方式
+        bizDto.setRepayWay(RepayTypeEnum.nameOf(business.getRepaymentTypeId()));
+        //借款总金额
+        bizDto.setBorrowMoney(business.getBorrowMoney());
+        //借款期限
+        bizDto.setBorrowLimit(business.getBorrowLimit());
+        //借款期限单位
+        bizDto.setBorrowLimitUnit(RepayPlanBorrowLimitUnitEnum.nameOf(business.getBorrowLimitUnit()));
+        //进件日期
+        bizDto.setInputTime(business.getInputTime());
+
+
         List<RepaymentBizPlan> bizPlans = repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",businessId));
         if(bizPlans!=null && bizPlans.size()>0){
             List<BizPlanDto> bizPlanDtos = new LinkedList<>();
@@ -650,6 +679,7 @@ public class RepayPlanController {
                 payingPeroids.add(bizPlanListDto);
             }
         }
+
         return  bizPlanDto;
     }
 

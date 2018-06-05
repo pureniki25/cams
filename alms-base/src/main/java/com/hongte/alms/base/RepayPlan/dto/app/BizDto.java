@@ -1,6 +1,8 @@
 package com.hongte.alms.base.RepayPlan.dto.app;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -17,6 +19,21 @@ public class BizDto  implements Serializable {
     private Boolean hasDeffer; //是否已经展期
 
     private Boolean isOver;//是否已经结清
+
+    private  String repayWay;//还款方式
+
+    private BigDecimal borrowMoney;//借款总金额
+
+    private Integer borrowLimit;//借款期限
+
+    private String borrowLimitUnit;//借款期限单位
+
+    private Date inputTime;//进件日期
+
+
+//
+//    	`borrow_limit` INT(11) NOT NULL COMMENT '借款期限',
+//            `borrow_limit_unit` INT(11) NOT NULL COMMENT '借款期限单位，1：月，2：天',
 
 //    private  String tip; //已展期/已结清（待还款列表为空时显示）
 
@@ -94,4 +111,44 @@ public class BizDto  implements Serializable {
 	public void setBusinessType(String businessType) {
 		this.businessType = businessType;
 	}
+
+    public String getRepayWay() {
+        return repayWay;
+    }
+
+    public void setRepayWay(String repayWay) {
+        this.repayWay = repayWay;
+    }
+
+    public BigDecimal getBorrowMoney() {
+        return borrowMoney;
+    }
+
+    public void setBorrowMoney(BigDecimal borrowMoney) {
+        this.borrowMoney = borrowMoney;
+    }
+
+    public Integer getBorrowLimit() {
+        return borrowLimit;
+    }
+
+    public void setBorrowLimit(Integer borrowLimit) {
+        this.borrowLimit = borrowLimit;
+    }
+
+    public String getBorrowLimitUnit() {
+        return borrowLimitUnit;
+    }
+
+    public void setBorrowLimitUnit(String borrowLimitUnit) {
+        this.borrowLimitUnit = borrowLimitUnit;
+    }
+
+    public Date getInputTime() {
+        return inputTime;
+    }
+
+    public void setInputTime(Date inputTime) {
+        this.inputTime = inputTime;
+    }
 }
