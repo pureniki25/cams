@@ -24,6 +24,7 @@ window.layinit = function (cb) {
             htConfig.basePath = htConfig.localBasePath;
             htConfig.coreBasePath = htConfig.localBasePath;
             htConfig.financeBasePath = htConfig.financeBasePath;
+            htConfig.platRepayBasePath = htConfig.platRepayBasePath;
             htConfig.uiBasePath = htConfig.uiBasePath;
         axios.defaults.headers.common['userId'] = htConfig.defaultUser;
         }else{
@@ -31,6 +32,7 @@ window.layinit = function (cb) {
             htConfig.coreBasePath = htConfig.basePath +"core/";
             htConfig.openBasePath = htConfig.basePath +"open/";
             htConfig.financeBasePath = htConfig.basePath +"finance/";
+            htConfig.platRepayBasePath = htConfig.basePath +"platRepay/";
             htConfig.uiBasePath = htConfig.uiBasePath;
         }
         //axios 访问前处理token问题
