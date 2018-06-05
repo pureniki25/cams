@@ -53,7 +53,7 @@ public class TimerSetController {
         return PageResult.success(pages.getRecords(),pages.getTotal());
     }
 
-    @ApiOperation(value="获取定时器任务列表")
+    @ApiOperation(value="存储定时器任务列表")
     @PostMapping("/saveTimetSetList")
     @ResponseBody
     public Result saveTimerSet(@RequestBody SysJobConfig sysJobConfig){

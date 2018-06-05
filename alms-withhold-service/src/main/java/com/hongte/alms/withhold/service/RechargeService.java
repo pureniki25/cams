@@ -2,9 +2,11 @@ package com.hongte.alms.withhold.service;
 
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.feignClient.dto.BankCardInfo;
 import com.hongte.alms.base.feignClient.dto.CustomerInfoDto;
 import com.hongte.alms.common.result.Result;
 
@@ -23,13 +25,13 @@ public interface RechargeService {
      * @param businessId
      * @param afterId
      * @param bankCard
-     * @param amount 金额为空时，默认代扣每期应还金额
+     * @param amount 金额为null时，默认为代扣每期应还金额
      * @param platformId 代扣平台ID,ID为空是,默认客户银行卡号绑定的平台代扣
      * @param merchOrderId 生成商户订单号
-     * @
+     * @param bankCardInfo 为null时默认为手动代扣
      * @return
      */
-    Result recharge(String businessId, String afterId, String bankCard,Double amount,String platformId,String merchOrderId);
+    Result recharge(String businessId, String afterId, String bankCard,Double amount,Integer platformId,String merchOrderId,BankCardInfo bankCardInfo);
     
     
     
@@ -67,7 +69,7 @@ public interface RechargeService {
 	 * boolPartRepay：表示本期是否分多笔代扣中的最后一笔代扣，若非多笔代扣，本字段存1。  0:非最后一笔代扣，1:最后一笔代扣
 	 */
 		
-     void recordRepaymentLog(Result result,RepaymentBizPlanList list,BasicBusiness business,CustomerInfoDto dto,Integer platformId,Integer boolLastRepay,Integer boolPartRepay,String merchOrderId,Integer settlementType,BigDecimal currentAmount);
+     void recordRepaymentLog(Result result,RepaymentBizPlanList list,BasicBusiness business,BankCardInfo dto,Integer platformId,Integer boolLastRepay,Integer boolPartRepay,String merchOrderId,Integer settlementType,BigDecimal currentAmount);
 		
      /**
 	  * 查询每期扣除处理中和成功代扣的金额，得出剩余未的还金额
@@ -95,7 +97,24 @@ public interface RechargeService {
 	 Integer getBankRepaySuccessCount(RepaymentBizPlanList list);
 	 
 	 
+
+     /**
+	  * 分润接口
+	  */
+	 Result shareProfit(RepaymentBizPlanList list);
 	 
+		/**
+		 * 获得第三方代扣银行卡信息
+		 * @param List<BankCardInfo> list
+		 * @return
+		 */
+	 BankCardInfo getThirtyPlatformInfo(List<BankCardInfo> list);
 	 
+		/**
+		 * 获得银行代扣银行卡信息
+		 * @param List<BankCardInfo> list
+		 * @return
+		 */
+	 BankCardInfo getBankCardInfo(List<BankCardInfo> list);
 }
 

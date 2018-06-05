@@ -332,6 +332,12 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         return planReturnInfoDto;
     }
 
+    /**
+     * 根据贷后的还款计划，计算信贷的还款计划
+     * @param retList
+     * @param businessBasicInfo
+     * @return
+     */
 	private List<XdPlanDto> xdPlanDtoHandle(List<RepaymentBizPlanDto> retList, BusinessBasicInfoReq businessBasicInfo) {
 		List<XdPlanDto> xdPlanDtos = new LinkedList<>();
 		
@@ -348,7 +354,25 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             for(RepaymentProjPlanDto repaymentProjPlanDto: projPlanDtos){
                 projIds.add(repaymentProjPlanDto.getRepaymentProjPlan().getProjectId());
             }
+
             xdPlanDto.setCarBusinessAfterDtoList(bizAfterDtos);
+
+            //排序 由低到高
+            Collections.sort(repaymentBizPlanListDtos, new Comparator<RepaymentBizPlanListDto>() {
+                @Override
+                public int compare(RepaymentBizPlanListDto o1, RepaymentBizPlanListDto o2) {
+                    return o1.getRepaymentBizPlanList().getPeriod().compareTo(o2.getRepaymentBizPlanList().getPeriod());
+
+//                    if(o1.getBeginPeroid().compareTo(o2.getBeginPeroid())==0){
+//                        return Integer.valueOf(o1.getBeginPeroid().compareTo(o2.getBeginPeroid()));
+//                    }else{
+//                        return o1.getBeginPeroid().compareTo(o2.getBeginPeroid());
+//                    }
+                }
+            });
+
+            BigDecimal payedPrincial = new BigDecimal(0);
+
             for(RepaymentBizPlanListDto repaymentBizPlanListDto:repaymentBizPlanListDtos){
                 RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListDto.getRepaymentBizPlanList();
                 List<RepaymentBizPlanListDetail> repaymentBizPlanListDetails = repaymentBizPlanListDto.getBizPlanListDetails();
@@ -368,22 +392,35 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 //                bizAfterDto.setCreateTime(new Date()); //新建时间
                 bizAfterDto.setRepaymentType(RepayPlanRepayIniCalcWayEnum.getByKey(businessBasicInfo.getRepaymentTypeId()).getName()); //还款方式
                 bizAfterDto.setBorrowMoney(repaymentBizPlan.getBorrowMoney().toPlainString());//借款金额
-                bizAfterDto.setOddcorpus(repaymentBizPlan.getBorrowMoney().toPlainString());//剩余本金
-                bizAfterDto.setCurrentPrincipa(repaymentBizPlanList.getTotalBorrowAmount());//本期应还本金
+                bizAfterDto.setOddcorpus(repaymentBizPlan.getBorrowMoney().subtract(payedPrincial).toPlainString());//剩余本金
+
+                //本期应还本金
+                BigDecimal currentPrinciple = null;
+
 
                 BigDecimal currentAccrual = null;
                 BigDecimal otherFee = new BigDecimal(0).setScale(smallNum ,  roundingMode);
                 for(RepaymentBizPlanListDetail repaymentBizPlanListDetail:repaymentBizPlanListDetails){
                     if(repaymentBizPlanListDetail.getPlanItemType().equals(RepayPlanFeeTypeEnum.INTEREST.getValue())){
                         currentAccrual =repaymentBizPlanListDetail.getPlanAmount();
-                    }else {
+                    }else if(repaymentBizPlanListDetail.getPlanItemType().equals(RepayPlanFeeTypeEnum.PRINCIPAL.getValue())){
+                        currentPrinciple = repaymentBizPlanListDetail.getPlanAmount();
+                    }
+                    else {
                         otherFee.add(repaymentBizPlanListDetail.getPlanAmount());
                     }
+                }
+                if(currentPrinciple == null){
+                    logger.error("找不到本期应还本金 ："+JSON.toJSONString(repaymentBizPlanListDto));
+                    throw  new CreatRepaymentExcepiton("找不到本期应还本金 ："+JSON.toJSONString(repaymentBizPlanListDto));
+
                 }
                 if(currentAccrual  == null){
                     logger.error("找不到本期应还利息 ："+JSON.toJSONString(repaymentBizPlanListDto));
                     throw  new CreatRepaymentExcepiton("找不到本期应还利息 ："+JSON.toJSONString(repaymentBizPlanListDto));
                 }
+
+                bizAfterDto.setCurrentPrincipa(currentPrinciple);//本期应还本金
                 bizAfterDto.setCurrentAccrual(currentAccrual.toPlainString());//本期应还利息
                 bizAfterDto.setBorrowDate(repaymentBizPlanList.getDueDate());//还款日期
                 bizAfterDto.setCarBusinessAfterType("还款中");//[还款状态分类]：还款中，已还款，逾期
@@ -416,6 +453,8 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 //                    afterDetailDto.setCreateTime(new Date());//创建日期
 
                 }
+                //计算已还的本金
+                payedPrincial = payedPrincial.add(currentPrinciple);
             }
 
 
@@ -1141,7 +1180,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                                      BusinessBasicInfoReq  businessBasicInfo,
                                      Map<String,Map<String,Map<String,List<RepaymentProjPlanListDetail>>>> projPlanDetailTotalMap,
                                      Map<String,Map<String,List<RepaymentProjPlanList>>> projPlanListTotalMap) throws IllegalAccessException, InstantiationException {
+        Integer planIndex = 0;
         for(String beginDay:projInfoReqMap.keySet()){
+            planIndex++;
             List<ProjInfoReq> reqList = projInfoReqMap.get(beginDay);
             //批次Id
             String batchId = UUID.randomUUID().toString();
@@ -1167,9 +1208,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             repaymentProjPlanMap.put(batchId,projPlans);
 
 
-            Integer planIndex = 0;
+
             for(ProjInfoReq projInfoReq:reqList){
-                planIndex++;
+
 
                 ///////  标还款计划表   一次出款 生成一条记录
                 RepaymentProjPlan repaymentProjPlan = new RepaymentProjPlan(); //ClassCopyUtil.copy(projInfoReq,ProjInfoReq.class,RepaymentProjPlan.class);

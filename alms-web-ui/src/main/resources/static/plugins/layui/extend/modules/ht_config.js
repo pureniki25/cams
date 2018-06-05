@@ -30,6 +30,7 @@ layui.define(function (exports) {
         // ,defaultUser:"test_leader"  //区域贷后主管
         ,localBasePath:"http://localhost:30606/"
         ,financeBasePath:"http://localhost:30621/"
+    	,platRepayBasePath:"http://localhost:30631/"
         ,openBasePath:"http://localhost:30616/"
         ,uiBasePath:"http://localhost:30601/"
     	/*
