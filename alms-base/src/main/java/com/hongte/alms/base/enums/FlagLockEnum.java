@@ -13,7 +13,7 @@ public enum FlagLockEnum implements IEnum {
     OPEN(0,"开"),
     CLOSE(1,"关");
 
-    private int value;
+    private Integer value;
     private String desc;
 
     FlagLockEnum(final int value, final String desc) {
@@ -30,4 +30,39 @@ public enum FlagLockEnum implements IEnum {
     public String getDesc(){
         return this.desc;
     }
+
+
+
+    public static String nameOf(Integer key){
+        for(FlagLockEnum d : FlagLockEnum.values()){
+            if(d.value.equals(key)){
+                return d.desc;
+            }
+        }
+        return null;
+
+    }
+
+    public static FlagLockEnum getByKey(Integer key){
+        for(FlagLockEnum d : FlagLockEnum.values()){
+            if(d.value.equals(key)){
+                return d;
+            }
+        }
+        return null;
+
+    }
+
+    public static Integer keyOf(String name){
+        for(FlagLockEnum d : FlagLockEnum.values()){
+            if(d.desc.equals(name)){
+                return d.value;
+            }
+        }
+        return null;
+
+    }
+
+
+
 }

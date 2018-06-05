@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.hongte.alms.base.enums.ActivateEnum;
 import com.hongte.alms.base.enums.FlagLockEnum;
+import com.hongte.alms.base.enums.JobConfigEnums;
 import com.hongte.alms.base.enums.TimeTypeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -42,13 +43,25 @@ public class SysJobConfig extends Model<SysJobConfig> {
      */
 	@TableField("flag_lock")
 	@ApiModelProperty(required= true,value = "开关：0：开，1：关")
-	private FlagLockEnum flagLock;
+	private Integer flagLock;
+
+	/**
+	 * 开关枚举
+	 */
+//	private  FlagLockEnum flagLockEnum;
+
     /**
      * 时间类型：0：按小时算，1：按分钟算，2：按秒算
      */
 	@TableField("time_type")
 	@ApiModelProperty(required= true,value = "时间类型：0：按小时算，1：按分钟算，2：按秒算")
-	private TimeTypeEnum timeType;
+	private Integer timeType;
+
+	/**
+	 * 时间类型枚举
+	 */
+//	private JobConfigEnums.TimeIntervalType timeIntervalType;
+
     /**
      * 时间间隔
      */
@@ -83,8 +96,12 @@ public class SysJobConfig extends Model<SysJobConfig> {
 	@TableField("last_run_time")
 	@ApiModelProperty(required= true,value = "最后一次成功执行时间")
 	private Date lastRunTime;
+
+
 	@ApiModelProperty(required= true,value = "")
-	private ActivateEnum activate;
+	private Integer activate;
+
+//	private JobConfigEnums.ActiveEnum activeEnum;
 
 
 	public String getId() {
@@ -152,27 +169,27 @@ public class SysJobConfig extends Model<SysJobConfig> {
 		this.lastRunTime = lastRunTime;
 	}
 
-	public FlagLockEnum getFlagLock() {
+	public Integer getFlagLock() {
 		return flagLock;
 	}
 
-	public void setFlagLock(FlagLockEnum flagLock) {
+	public void setFlagLock(Integer flagLock) {
 		this.flagLock = flagLock;
 	}
 
-	public TimeTypeEnum getTimeType() {
+	public Integer getTimeType() {
 		return timeType;
 	}
 
-	public void setTimeType(TimeTypeEnum timeType) {
+	public void setTimeType(Integer timeType) {
 		this.timeType = timeType;
 	}
 
-	public ActivateEnum getActivate() {
+	public Integer getActivate() {
 		return activate;
 	}
 
-	public void setActivate(ActivateEnum activate) {
+	public void setActivate(Integer activate) {
 		this.activate = activate;
 	}
 
@@ -197,4 +214,28 @@ public class SysJobConfig extends Model<SysJobConfig> {
 				", activate=" + activate +
 				'}';
 	}
+
+	public String getFlagLockEnumStr() {
+		return FlagLockEnum.nameOf(this.flagLock);
+	}
+
+//	public void setFlagLockEnum(FlagLockEnum flagLockEnum) {
+//		this.flagLockEnum = flagLockEnum;
+//	}
+
+	public String getTimeIntervalTypeStr() {
+		return JobConfigEnums.TimeIntervalType.nameOf(this.timeType);
+	}
+
+//	public void setTimeIntervalType(JobConfigEnums.TimeIntervalType timeIntervalType) {
+//		this.timeIntervalType = timeIntervalType;
+//	}
+
+	public String getActiveEnumStr() {
+		return  JobConfigEnums.ActiveEnum.nameOf(this.activate);
+	}
+
+//	public void setActiveEnum(JobConfigEnums.ActiveEnum activeEnum) {
+//		this.activeEnum = activeEnum;
+//	}
 }

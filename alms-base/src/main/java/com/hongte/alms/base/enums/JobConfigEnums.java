@@ -47,6 +47,38 @@ public class JobConfigEnums {
 			this.name = name;
 			this.value = val;
 		}
+
+
+		public static String nameOf(String name){
+			for(JobConfigType d : JobConfigType.values()){
+				if(d.value.equals(name)){
+					return d.name;
+				}
+			}
+			return null;
+
+		}
+
+		public static JobConfigType getByKey(Integer key){
+			for(JobConfigType d : JobConfigType.values()){
+				if(d.value.equals(key)){
+					return d;
+				}
+			}
+			return null;
+
+		}
+
+		public static String keyOf(String name){
+			for(JobConfigType d : JobConfigType.values()){
+				if(d.name.equals(name)){
+					return d.value;
+				}
+			}
+			return null;
+
+		}
+
 		
 	    public static Map<String, String> getMap() {
 	  		Map<String, String> statusMap = new HashMap<String, String>();
@@ -67,7 +99,7 @@ public class JobConfigEnums {
 		LOCK("关",1);
 		
 		private String name;// 用户类型
-		private int value;//对应数据库值
+		private Integer value;//对应数据库值
 
 		public String getName() {
 			return name;
@@ -89,7 +121,37 @@ public class JobConfigEnums {
 			this.name = name;
 			this.value = val;
 		}
-		
+
+		public static String nameOf(String name){
+			for(JobLockType d : JobLockType.values()){
+				if(d.value.equals(name)){
+					return d.name;
+				}
+			}
+			return null;
+
+		}
+
+		public static JobLockType getByKey(Integer key){
+			for(JobLockType d : JobLockType.values()){
+				if(d.value.equals(key)){
+					return d;
+				}
+			}
+			return null;
+
+		}
+
+		public static Integer keyOf(String name){
+			for(JobLockType d : JobLockType.values()){
+				if(d.name.equals(name)){
+					return d.value;
+				}
+			}
+			return null;
+
+		}
+
 	    public static Map<Integer, String> getMap() {
 	  		Map<Integer, String> statusMap = new HashMap<Integer, String>();
 	  		for (JobLockType c : JobLockType.values()) {
@@ -106,17 +168,17 @@ public class JobConfigEnums {
 
 //		0：按小时算，1：按分钟算，2：按秒算
 
-		BY_HOUR("按小时算",0)
-		,BY_MINUTE("按分钟算",1)
-		,BY_SECOND("按秒算",2)
-		,BY_DAY("按填算",3)
-		,NONE("不设置时间间隔",4)
+		BY_HOUR("按小时",0)
+		,BY_MINUTE("按分钟",1)
+		,BY_SECOND("按秒",2)
+		,BY_DAY("按天",3)
+		,NONE("无限制",4)
 		;
 
 
 
 		private String name;// 用户类型
-		private int value;//对应数据库值
+		private Integer value;//对应数据库值
 
 		public String getName() {
 			return name;
@@ -139,6 +201,41 @@ public class JobConfigEnums {
 			this.value = val;
 		}
 
+
+		public static String nameOf(Integer key){
+			for(TimeIntervalType d : TimeIntervalType.values()){
+				if(d.value.equals(key)){
+					return d.name;
+				}
+			}
+			return null;
+
+		}
+
+		public static TimeIntervalType getByKey(Integer key){
+			for(TimeIntervalType d : TimeIntervalType.values()){
+				if(d.value.equals(key)){
+					return d;
+				}
+			}
+			return null;
+
+		}
+
+		public static Integer keyOf(String name){
+			for(TimeIntervalType d : TimeIntervalType.values()){
+				if(d.name.equals(name)){
+					return d.value;
+				}
+			}
+			return null;
+
+		}
+
+
+
+
+
 		public static Map<Integer, String> getMap() {
 			Map<Integer, String> statusMap = new HashMap<Integer, String>();
 			for (TimeIntervalType c : TimeIntervalType.values()) {
@@ -150,11 +247,11 @@ public class JobConfigEnums {
 
 
 	/**
-	 * 时间间隔类型
+	 * 定时器设置，是否有效枚举
 	 */
 	public enum ActiveEnum {
 
-//		0：按小时算，1：按分钟算，2：按秒算
+//		1：有效，0：无效
 
 		AVTIVE("有效",1)
 		,INACTIVE("无效",0)
@@ -163,7 +260,7 @@ public class JobConfigEnums {
 
 
 		private String name;// 用户类型
-		private int value;//对应数据库值
+		private Integer value;//对应数据库值
 
 		public String getName() {
 			return name;
@@ -193,6 +290,39 @@ public class JobConfigEnums {
 			}
 			return statusMap;
 		}
+
+
+
+		public static String nameOf(Integer key){
+			for(ActiveEnum d : ActiveEnum.values()){
+				if(d.value.equals(key)){
+					return d.name;
+				}
+			}
+			return null;
+
+		}
+
+		public static ActiveEnum getByKey(Integer key){
+			for(ActiveEnum d : ActiveEnum.values()){
+				if(d.value.equals(key)){
+					return d;
+				}
+			}
+			return null;
+
+		}
+
+		public static Integer keyOf(String name){
+			for(ActiveEnum d : ActiveEnum.values()){
+				if(d.name.equals(name)){
+					return d.value;
+				}
+			}
+			return null;
+
+		}
+
 	}
 
 
