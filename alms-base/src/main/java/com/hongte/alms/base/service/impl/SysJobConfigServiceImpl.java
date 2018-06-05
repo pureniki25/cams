@@ -30,19 +30,19 @@ public class SysJobConfigServiceImpl extends BaseServiceImpl<SysJobConfigMapper,
             return null;
         }
         //如果把定时任务的配置设置为无效，则直接返回，不继续判断
-        if(config.getActivate().getValue().equals(JobConfigEnums.ActiveEnum.INACTIVE.getValue())){
+        if(config.getActivate().equals(JobConfigEnums.ActiveEnum.AVTIVE.getValue())){
             return config;
         }
 
         //判断定时任务是否开启，未开启则返回空
-        if(!config.getFlagLock().getValue().equals(JobConfigEnums.JobLockType.UNLOCK.getValue())){
+        if(!config.getFlagLock().equals(JobConfigEnums.JobLockType.LOCK.getValue())){
             return null;
         }
         if(config.getLastRunTime()==null){
             return config;
         }
 
-        if(config.getTimeType().getValue().equals(JobConfigEnums.TimeIntervalType.BY_HOUR.getValue())){
+        if(config.getTimeType().equals(JobConfigEnums.TimeIntervalType.BY_HOUR.getValue())){
             //按小时算
             if(new Date().compareTo(DateUtil.addHour2Date(config.getTimeInterval(),config.getLastRunTime()))>0){
                 return config;
@@ -50,7 +50,7 @@ public class SysJobConfigServiceImpl extends BaseServiceImpl<SysJobConfigMapper,
                 return null;
             }
 
-        }else  if (config.getTimeType().getValue().equals(JobConfigEnums.TimeIntervalType.BY_MINUTE.getValue())){
+        }else  if (config.getTimeType().equals(JobConfigEnums.TimeIntervalType.BY_MINUTE.getValue())){
             //按分钟算
             Date date = DateUtil.addMinute2Date(config.getTimeInterval(),config.getLastRunTime());
             Date nowDate = new Date();
@@ -59,21 +59,21 @@ public class SysJobConfigServiceImpl extends BaseServiceImpl<SysJobConfigMapper,
             }else{
                 return null;
             }
-        }else  if (config.getTimeType().getValue().equals(JobConfigEnums.TimeIntervalType.BY_SECOND.getValue())){
+        }else  if (config.getTimeType().equals(JobConfigEnums.TimeIntervalType.BY_SECOND.getValue())){
             //按秒算
             if(new Date().compareTo(DateUtil.addSecond2Date(config.getTimeInterval(),config.getLastRunTime()))>0){
                 return config;
             }else{
                 return null;
             }
-        }else  if (config.getTimeType().getValue().equals(JobConfigEnums.TimeIntervalType.BY_DAY.getValue())){
+        }else  if (config.getTimeType().equals(JobConfigEnums.TimeIntervalType.BY_DAY.getValue())){
             //按天算
             if(new Date().compareTo(DateUtil.addDay2Date(config.getTimeInterval(),config.getLastRunTime()))>0){
                 return config;
             }else{
                 return null;
             }
-        }else  if (config.getTimeType().getValue().equals(JobConfigEnums.TimeIntervalType.NONE.getValue())){
+        }else  if (config.getTimeType().equals(JobConfigEnums.TimeIntervalType.NONE.getValue())){
             //无限制
             return config;
         }
