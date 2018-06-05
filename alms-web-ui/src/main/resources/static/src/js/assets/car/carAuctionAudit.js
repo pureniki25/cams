@@ -370,14 +370,14 @@ window.layinit(function (htConfig) {
         });
             laydate.render({
                 elem: '#auctionStartTime',
-                type:'datetime',
+                type:'date',
                 done: (value) => {
                 this.carAuction.auctionStartTime = value
         }
         });
             laydate.render({
                 elem: '#auctionEndTime',
-                type:'datetime',
+                type:'date',
                 done: (value) => {
                 this.carAuction.auctionEndTime = value
         }
@@ -559,6 +559,7 @@ window.layinit(function (htConfig) {
 						vm.drag.dragDate = moment(vm.drag.dragDate).format("YYYY-MM-DD");
 	                 	vm.detection=data.data.detection;
 						vm.detection.createTime = moment(vm.detection.createTime).format("YYYY-MM-DD");
+                        vm.detection.annualVerificationExpirationDate=moment(vm.detection.annualVerificationExpirationDate).format("YYYY-MM")
 						vm.detection.insuranceExpirationDate = moment(vm.detection.insuranceExpirationDate).format("YYYY-MM-DD");
 	                	vm.mortgageDetection=data.data.mortgageDetection;
 	                	vm.mortgageDetection.createTime = moment(vm.mortgageDetection.createTime).format("YYYY-MM-DD")

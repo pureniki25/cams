@@ -464,13 +464,13 @@
 								<label class="input_label">*</label>
 							</td>
 							<td>
-								<i-input type="text" v-model="carAuction.auctionStartTime" id="auctionStartTime" placeholder="yyyy-MM-dd" :disabled="!canEdit"></i-input>
+								<input type="text" v-model="carAuction.auctionStartTime" id="auctionStartTime" placeholder="yyyy-MM-dd" :disabled="!canEdit"></input>
 							</td>
 							<td class="td_label">活动结束时间
 								<label class="input_label">*</label>
 							</td>
 							<td>
-								<i-input type="text" v-model="carAuction.auctionEndTime" id="auctionEndTime" placeholder="yyyy-MM-dd" :disabled="!canEdit"></i-input>
+								<input type="text" v-model="carAuction.auctionEndTime" id="auctionEndTime" placeholder="yyyy-MM-dd" :disabled="!canEdit"></input>
 							</td>
 						</tr>
 						<tr>
@@ -500,7 +500,7 @@
 								<label class="input_label">*</label>
 							</td>
 							<td colspan="5">
-								<i-input type="text" v-model="carAuction.paymentMethod" style="width: 100%" maxlength="200" readonly="paymentMethod" readonly></i-input>
+								<i-input type="text" v-model="carAuction.paymentMethod" style="width: 100%" maxlength="200" readonly="paymentMethod" disabled></i-input>
 							</td>
 						</tr>
 						<tr>
@@ -515,7 +515,7 @@
 						<tr>
 							<td class="td_label" rowspan="3">备注</td>
 							<td colspan="5" rowspan="3">
-									<i-input type="textarea" v-model="carAuction.remark" style="width: 100%;border:1px solid #ccc" maxlength="1000" :readonly="!canEdit"></i-input>
+									<i-input type="textarea" v-model="carAuction.remark" style="width: 100%;border:1px solid #ccc" maxlength="500" :readonly="!canEdit"></i-input>
 								<!-- <textarea rows="" cols="" v-model="carAuction.remark" style="width: 100%;border:1px solid #ccc" maxlength="1000"> </textarea> -->
 
 								<input type="text" v-model="processId" hidden="">
