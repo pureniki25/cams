@@ -16,4 +16,5 @@ import com.hongte.alms.common.service.BaseService;
  */
 public interface DepartmentBankService extends BaseService<DepartmentBank> {
 	List<DepartmentBankVO> listDepartmentBank(String businessId) ;
+	List<DepartmentBank> listDepartmentBank() ;
 }

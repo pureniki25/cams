@@ -214,7 +214,8 @@
 			pl.total_borrow_amount as planRepayAmount,
 			pl.current_status as status ,
 			pl.accountant_confirm_status as financeConfirmStatus,
-			(SELECT IFNULL(SUM(fact_amount),0) FROM tb_repayment_biz_plan_list_detail where plan_list_id = pl.plan_list_id ) as repaidAmount
+			(SELECT IFNULL(SUM(fact_amount),0) FROM tb_repayment_biz_plan_list_detail where plan_list_id = pl.plan_list_id ) as repaidAmount,
+			b.src_type as srcType
 		FROM
 			tb_repayment_biz_plan_list pl
 		JOIN

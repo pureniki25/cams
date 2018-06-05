@@ -66,30 +66,48 @@ window.layinit(function (htConfig) {
                     }
                 }, {
                     title: '操作',
+                    width:150,
                     render: (h, p) => {
 
-                        if (p.row.moneyPoolId!='合计'&&!p.row.status=='完成') {
+                        if (p.row.moneyPoolId!='合计'&&p.row.status=='待领取') {
                             return h('i-button', {
+                                    props:{
+                                        size:'small'
+                                    },
                                     on: {
                                         click: function () {
-                                            axios.post(fpath+'finance/disMatchBankStatement',{mpid:p.row.moneyPoolId})
-                                            .then(function(r){
-                                                if(r.data.code=="1"){
-                                                    location.reload()
-                                                }else{
-                                                    parent.app.$Message.error({content:r.data.msg})
-                                                }
-                                            })
-                                            .catch(function(e){
-                                                parent.app.$Message.error({content:'取消关联银行流水失败'})
-                                            })
+                                            app.disMatchedStatement(p)
                                         }
                                     }
                                 },
                                 '取消关联'
                             )
-                        } else {
-                            return h('span', '')
+                        } else if(p.row.moneyPoolId!='合计'&&p.row.status=='已领取') {
+                            return h('div',[
+                                h('i-button',{
+                                    props:{
+                                        size:'small'
+                                    },
+                                    on:{
+                                        click(){
+                                            app.openEditBankStatementModal(p.row.mprId)
+                                        }
+                                    },
+                                    style:{
+                                        marginRight:'10px'
+                                    }
+                                },'编辑流水'),
+                                h('i-button',{
+                                    props:{
+                                        size:'small'
+                                    },
+                                    on:{
+                                        click(){
+                                            app.deleteMoneyPool(p)
+                                        }
+                                    }
+                                },'删除')
+                            ])
                         }
 
                     }
@@ -110,6 +128,60 @@ window.layinit(function (htConfig) {
             openAddBankStatementModal(){
                 parent.app.openAddBankStatementModal();
             }
+            ,openEditBankStatementModal(mprid){
+                parent.app.openEditBankStatementModal(mprid);
+            },
+            disMatchedStatement(p){
+                app.$Modal.confirm({
+                    content:'确认取消关联此条流水?',
+                    onOk() {
+                        axios.post(fpath + 'finance/disMatchBankStatement', {
+                                mpid: p.row.moneyPoolId
+                            })
+                            .then(function (r) {
+                                if (r.data.code == "1") {
+                                    parent.location.reload()
+                                } else {
+                                    parent.app.$Message.error({
+                                        content: r.data.msg
+                                    })
+                                }
+                            })
+                            .catch(function (e) {
+                                parent.app.$Message.error({
+                                    content: '取消关联银行流水失败'
+                                })
+                            })
+                    }
+                })
+            },
+            deleteMoneyPool(p){
+                app.$Modal.confirm({
+                    content:'确认删除此条流水?',
+                    onOk() {
+                        axios.get(fpath + 'finance/deleteMoneyPool', {
+                                params: {
+                                    mprId: p.row.mprId
+                                }
+                            })
+                            .then(function (r) {
+                                if (r.data.code == "1") {
+                                    parent.location.reload()
+                                } else {
+                                    parent.app.$Message.error({
+                                        content: r.data.msg
+                                    })
+                                }
+                            })
+                            .catch(function (e) {
+                                parent.app.$Message.error({
+                                    content: '删除此条流水失败'
+                                })
+                            })
+                    }
+                })
+            }
+            
         },
         created: function () {
             axios.get(cpath + 'moneyPool/checkMoneyPool', {

@@ -231,6 +231,18 @@ public class CarAuction extends Model<CarAuction> {
 	@ApiModelProperty(required= true,value = "备注")
 	private String remark;
 
+	@TableField("consultant_email")
+	@ApiModelProperty(required= true,value = "咨询邮箱")
+	private String consultantEmail;
+
+	@TableField("payment_method")
+	@ApiModelProperty(required= true,value = "付款方式，如买卖双方实地交易")
+	private String paymentMethod;
+
+	@TableField("bidder_count")
+	@ApiModelProperty(value = "出价人数量")
+	private Integer bidderCount;
+
 	public String getBusinessId() {
 		return businessId;
 	}
@@ -519,6 +531,30 @@ public class CarAuction extends Model<CarAuction> {
 		this.remark = remark;
 	}
 
+	public String getConsultantEmail() {
+		return consultantEmail;
+	}
+
+	public void setConsultantEmail(String consultantEmail) {
+		this.consultantEmail = consultantEmail;
+	}
+
+	public String getPaymentMethod() {
+		return paymentMethod;
+	}
+
+	public void setPaymentMethod(String paymentMethod) {
+		this.paymentMethod = paymentMethod;
+	}
+
+	public Integer getBidderCount() {
+		return bidderCount;
+	}
+
+	public void setBidderCount(Integer bidderCount) {
+		this.bidderCount = bidderCount;
+	}
+
 	@Override
 	protected Serializable pkVal() {
 		return this.auctionId;
@@ -527,41 +563,44 @@ public class CarAuction extends Model<CarAuction> {
 	@Override
 	public String toString() {
 		return "CarAuction{" +
-			", businessId=" + businessId +
-			", startingPrice=" + startingPrice +
-			", deposit=" + deposit +
-			", fareRange=" + fareRange +
-			", reservePrice=" + reservePrice +
-			", auctionStartTime=" + auctionStartTime +
-			", auctionEndTime=" + auctionEndTime +
-			", transType=" + transType +
-			", priorityPurchaser=" + priorityPurchaser +
-			", takeWay=" + takeWay +
-			", buyStartTime=" + buyStartTime +
-			", buyEndTime=" + buyEndTime +
-			", auctionPosition=" + auctionPosition +
-			", handleUnit=" + handleUnit +
-			", unitAddr=" + unitAddr +
-			", consultant=" + consultant +
-			", consultantTel=" + consultantTel +
-			", acountName=" + acountName +
-			", acountNum=" + acountNum +
-			", createTime=" + createTime +
-			", createUser=" + createUser +
-			", status=" + status +
-			", auctionId=" + auctionId +
-			", viewSampleStartTime=" + viewSampleStartTime +
-			", viewSampleEndTime=" + viewSampleEndTime +
-			", auctionRules=" + auctionRules +
-			", openBank=" + openBank +
-			", paymentEndTime=" + paymentEndTime +
-			", consStartTime=" + consStartTime +
-			", consEndTime=" + consEndTime +
-			", viewSampleAddr=" + viewSampleAddr +
-			", consultantAddr=" + consultantAddr +
-			", delayPeriod=" + delayPeriod +
-			", transFree=" + transFree +
-			", remark=" + remark +
-			"}";
+				"businessId='" + businessId + '\'' +
+				", startingPrice=" + startingPrice +
+				", deposit=" + deposit +
+				", fareRange=" + fareRange +
+				", reservePrice=" + reservePrice +
+				", auctionStartTime=" + auctionStartTime +
+				", auctionEndTime=" + auctionEndTime +
+				", transType='" + transType + '\'' +
+				", priorityPurchaser='" + priorityPurchaser + '\'' +
+				", takeWay='" + takeWay + '\'' +
+				", buyStartTime=" + buyStartTime +
+				", buyEndTime=" + buyEndTime +
+				", auctionPosition='" + auctionPosition + '\'' +
+				", handleUnit='" + handleUnit + '\'' +
+				", unitAddr='" + unitAddr + '\'' +
+				", consultant='" + consultant + '\'' +
+				", consultantTel='" + consultantTel + '\'' +
+				", acountName='" + acountName + '\'' +
+				", acountNum='" + acountNum + '\'' +
+				", createTime=" + createTime +
+				", createUser='" + createUser + '\'' +
+				", status='" + status + '\'' +
+				", auctionId='" + auctionId + '\'' +
+				", viewSampleStartTime=" + viewSampleStartTime +
+				", viewSampleEndTime=" + viewSampleEndTime +
+				", auctionRules='" + auctionRules + '\'' +
+				", openBank='" + openBank + '\'' +
+				", paymentEndTime=" + paymentEndTime +
+				", consStartTime=" + consStartTime +
+				", consEndTime=" + consEndTime +
+				", viewSampleAddr='" + viewSampleAddr + '\'' +
+				", consultantAddr='" + consultantAddr + '\'' +
+				", payWay='" + payWay + '\'' +
+				", delayPeriod='" + delayPeriod + '\'' +
+				", transFree=" + transFree +
+				", remark='" + remark + '\'' +
+				", consultantEmail='" + consultantEmail + '\'' +
+				", paymentMethod='" + paymentMethod + '\'' +
+				'}';
 	}
 }

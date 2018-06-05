@@ -12,5 +12,12 @@ import com.hongte.alms.common.service.BaseService;
  * @since 2018-03-23
  */
 public interface MoneyPoolRepaymentService extends BaseService<MoneyPoolRepayment> {
-
+	/**
+	 * 删除财务新增流水
+	 * @author 王继光
+	 * 2018年6月5日 上午9:56:53
+	 * @param mprId
+	 * @return
+	 */
+	public boolean deleteFinanceAddStatement(String mprId);
 }

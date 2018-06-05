@@ -158,15 +158,10 @@
 		tca.auction_end_time endPriceDate,						<!-- 活动结束时间 -->
 		tca.consultant contacts,				<!-- 咨询联系人 -->
 		tca.consultant_tel telephone,					<!-- 咨询联系人 -->
-		case
-		when tca.pay_way='01' then '竞买成功后，尾款线下支付'
-		when tca.pay_way='02'
-		then '竞买成功后，尾款线上支付'
-		else ''
-		end paymentMethod,<!-- 支付方式 -->
+		tca.payment_method paymentMethod,<!-- 支付方式 -->
 		tca.auction_position auctionPosition,<!--交易地点-->
 		tca.remark   remark,<!-- 拍卖备注-->
-
+        tca.bidder_count bidderCount,<!-- 出价人数量-->
 		tcb.brand_name vehicleBrand ,		<!--车辆品牌 -->
 		case
 		when tcb.origin_place=0 then '国产'

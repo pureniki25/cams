@@ -252,23 +252,33 @@ window.layinit(function (htConfig) {
                         let confirmWithhold = initMenuItem('代扣确认',null,'confirmWithhold')
                         let settle = initMenuItem('财务结清',null,'settle')
                         let planSettle = initMenuItem('还款计划结清',null,'planSettle')
-                        menu.push(repayConfirm)
-                        //menu.push(businessAllSettle)
-                        menu.push(revokeConfirm)
-                        menu.push(confirmWithhold)
-                        menu.push(planSettle)
-                        menu.push(settle)
+
+                        if(p.row.srcType==2){
+                            menu.push(repayConfirm)
+                            //menu.push(businessAllSettle)
+                            menu.push(revokeConfirm)
+                            menu.push(confirmWithhold)
+                            menu.push(planSettle)
+                            menu.push(settle)
+                        }
+                        let poptipContent ;
+                        if(p.row.srcType==2){
+                            poptipContent = [
+                                h('i-button', '操作'),
+                                h('ul', {
+                                    slot: 'content'
+                                }, menu)
+                            ]
+                        }else{
+                            poptipContent = '暂不能处理信贷生成的业务'
+                        }
+                        
                         
                         return h('Poptip', {
                             props: {
                                 placement: 'left'
                             }
-                        }, [
-                                h('i-button', '操作'),
-                                h('ul', {
-                                    slot: 'content'
-                                }, menu)
-                            ])
+                        }, poptipContent)
                     }
                 },
                 {

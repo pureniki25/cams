@@ -40,7 +40,7 @@ public class AfterLoanRepaymentServiceImpl implements AfterLoanRepaymentService 
             if(repaymentBizPlanList.getSrcType()!=null && repaymentBizPlanList.getSrcType()==1){
                 return withHoldingClient.repayAssignBank(repaymentBizPlanList.getOrigBusinessId(),afterId,bankCard);
             }else {
-                return rechargeService.recharge(repaymentBizPlanList.getOrigBusinessId(),afterId,bankCard,null,null,rechargeService.getMerchOrderId());
+                return rechargeService.recharge(repaymentBizPlanList.getOrigBusinessId(),afterId,bankCard,null,null,rechargeService.getMerchOrderId(),null);
             }
         }
         Result result=new Result();

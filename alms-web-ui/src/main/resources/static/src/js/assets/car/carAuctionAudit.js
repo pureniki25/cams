@@ -6,6 +6,7 @@ var amt=/^(([1-9]\d*)|\d)(\.\d{1,2})?$/;
 var mobi= /^(((13[0-9]{1})|(14[0-9]{1})|(17[0]{1})|(15[0-3]{1})|(15[5-9]{1})|(18[0-9]{1}))+\d{8})$/; 
 var tel = /^\d{3,4}-?\d{7,9}$/;
 var carNum=/^([1-9]{1})(\d{15}|\d{16}|\d{17}|\d{18})$/;
+var email=/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
 var currentDate=new Date(formatDate(new Date()));
 var basePath;
 var vm;
@@ -125,39 +126,17 @@ window.layinit(function (htConfig) {
 	    	   dragDate:''// 拖车日期
 	       }
 	       ,carAuction:{
-	    	   businessId:''//业务编号
-	    	   ,auctionId:''//拍卖id
-    	   	   ,startingPrice:''//起拍价
-    		   ,deposit:''//保证金
-    		   ,fareRange:''//加价幅度
-    		   ,reservePrice:''//保留价
-    		   ,auctionStartTime:''//拍卖开始时间
-    		   ,auctionEndTime:''//拍卖截止时间
-    		   ,transType:''//交易类型
-    		   ,priorityPurchaser:''//优先购权人
-    		   ,takeWay:''//取货方式
-    		   ,buyStartTime:''//竞买开始时间
-    		   ,buyEndTime:''//竞买结束时间
-    		   ,auctionPosition:''//拍卖物所在位置
-    		   ,handleUnit:''//处置单位
-    		   ,unitAddr:''//单位地址
-    		   ,consultant:''//咨询人
-    		   ,consultantTel:''//咨询电话
-    		   ,acountName:''//账户姓名
-    		   ,acountNum:''//银行卡号
-    		   ,payWay:''//支付方式
-    		   ,consStartTime:''//咨询开始时间
-    		   ,consStartTime:''//咨询结束时间
-    		   ,viewSampleStartTime:''//看样开始时间
-    		   ,viewSampleStartTime:''//看样结束时间
-    		   ,auctionRules:''//竞价规则
-    		   ,openBank:''//开户银行
-    		   ,paymentEndTime:''//缴款截止时间
-    		   //,assessOdometer:''//评估时的里程数，只针对页面的验证
-    		   ,viewSampleAddr:''//看样地址
-	 		   ,delayPeriod:''//延时周期
-	    	   ,remark:''//备注
-	    	   ,transFree:''//交易税费
+                 businessId:''// 业务编号
+                ,auctionId:''// 拍卖id
+                ,startingPrice:''// 起拍价
+                ,auctionStartTime:''// 拍卖开始时间
+                ,auctionEndTime:''// 拍卖截止时间
+                ,consultant:''// 咨询人
+                ,consultantEmail:''//咨询邮箱
+                ,consultantTel:''// 咨询电话
+                ,paymentMethod:''//付款方式
+                ,auctionPosition:''//交易地点
+                ,remark:''// 备注
 	       }
 	       
 	       ,  //可发送审批信息的用户列表
@@ -347,178 +326,62 @@ window.layinit(function (htConfig) {
 	    	$("#carPosition").focus(function(){
 	    		  $("#carPosition").css("border","1px solid #ccc");
 	    		});
-	    	$("#startingPrice").focus(function(){
-	    		  $("#startingPrice").css("border","1px solid #ccc");
-	    		});
-	    	$("#deposit").focus(function(){
-	    		  $("#deposit").css("border","1px solid #ccc");
-	    		});
-	    	$("#fareRange").focus(function(){
-	    		  $("#fareRange").css("border","1px solid #ccc");
-	    		});
-	    	$("#reservePrice").focus(function(){
-	    		  $("#reservePrice").css("border","1px solid #ccc");
-	    		});
-	    	$("#auctionStartTime").focus(function(){
-	    		  $("#auctionStartTime").css("border","1px solid #ccc");
-	    		});
-	       	$("#auctionEndTime").focus(function(){
-	    		  $("#auctionEndTime").css("border","1px solid #ccc");
-	    		});
-	       	$("#transType").focus(function(){
-	    		  $("#transType").css("border","1px solid #ccc");
-	    		});
-	       	$("#priorityPurchaser").focus(function(){
-	    		  $("#priorityPurchaser").css("border","1px solid #ccc");
-	    		});
-	       	$("#takeWay").focus(function(){
-	    		  $("#takeWay").css("border","1px solid #ccc");
-	    		});
-	       	$("#buyStartTime").focus(function(){
-	    		  $("#buyStartTime").css("border","1px solid #ccc");
-	    		});
-	       	$("#buyEndTime").focus(function(){
-	    		  $("#buyEndTime").css("border","1px solid #ccc");
-	    		});
-	       	$("#payWay").focus(function(){
-	    		  $("#payWay").css("border","1px solid #ccc");
-	    		});
-	       	$("#consStartTime").focus(function(){
-	    		  $("#consStartTime").css("border","1px solid #ccc");
-	    		});
-	      	$("#consEndTime").focus(function(){
-	    		  $("#consEndTime").css("border","1px solid #ccc");
-	    		});
-	      	$("#consultant").focus(function(){
-	    		  $("#consultant").css("border","1px solid #ccc");
-	    		});
-	      	$("#viewSampleStartTime").focus(function(){
-	    		  $("#viewSampleStartTime").css("border","1px solid #ccc");
-	    		});
-	      	$("#viewSampleEndTime").focus(function(){
-	    		  $("#viewSampleEndTime").css("border","1px solid #ccc");
-	    		});
-	      	$("#consultantTel").focus(function(){
-	    		  $("#consultantTel").css("border","1px solid #ccc");
-	    		});
-	      	$("#handleUnit").focus(function(){
-	    		  $("#handleUnit").css("border","1px solid #ccc");
-	    		});
-	      	$("#unitAddr").focus(function(){
-	    		  $("#unitAddr").css("border","1px solid #ccc");
-	    		});
-	      	$("#acountName").focus(function(){
-	    		  $("#acountName").css("border","1px solid #ccc");
-	    		});
-	       	$("#openBank").focus(function(){
-	    		  $("#openBank").css("border","1px solid #ccc");
-	    		});
-	       	$("#acountNum").focus(function(){
-	    		  $("#acountNum").css("border","1px solid #ccc");
-	    		});
-	       	$("#paymentEndTime").focus(function(){
-	    		  $("#paymentEndTime").css("border","1px solid #ccc");
-	    		});
-	       	$("#viewSampleAddr").focus(function(){
-	    		  $("#viewSampleAddr").css("border","1px solid #ccc");
-	    		});
-	    	$("#transFree").blur(function(){
-	    		var transFree=$("#transFree").val();
-	    		if (!amt.test(transFree)) {  
-	    			$("#transFree").css("border","1px solid #FF3030");
-	    			layer.msg("请输入有效金额！",{icon:5,shade: [0.8, '#393D49']});
-	    			return;
-	    		}
-	    	});
-	       	$("#transFree").focus(function(){
-	    		  $("#transFree").css("border","1px solid #ccc");
-	    		});
+            $("#startingPrice").focus(function(){
+                $("#startingPrice").css("border","1px solid #ccc");
+            });
+            $("#auctionStartTime").focus(function(){
+                $("#auctionStartTime").css("border","1px solid #ccc");
+            });
+            $("#auctionEndTime").focus(function(){
+                $("#auctionEndTime").css("border","1px solid #ccc");
+            });
 
-	    	this.queryData();
-	   	    laydate.render({
-		        elem: '#annualVerificationExpirationDate',
-		        type:'month',
-		        done: (value) => {
-		          this.detection.annualVerificationExpirationDate = value
-		        }
-		    });
-	   	    laydate.render({
-		        elem: '#lastTransferDate',
-		        type:'date',
-		        done: (value) => {
-		          this.carBasic.lastTransferDate = value
-		        }
-		    });
-	   	    laydate.render({
-		        elem: '#insuranceExpirationDate',
-		        type:'date',
-		        done: (value) => {
-		          this.detection.insuranceExpirationDate = value
-		        }
-		    });
-	   	    laydate.render({
-		        elem: '#auctionStartTime',
-		        type:'datetime',
-		        done: (value) => {
-		          this.carAuction.auctionStartTime = value
-		        }
-		    });
-	   	    laydate.render({
-		        elem: '#auctionEndTime',
-		        type:'datetime',
-		        done: (value) => {
-		          this.carAuction.auctionEndTime = value
-		        }
-		    });
-	   	    laydate.render({
-		        elem: '#buyStartTime',
-		        type:'datetime',
-		        done: (value) => {
-		          this.carAuction.buyStartTime = value
-		        }
-		    });
-	   	    laydate.render({
-		        elem: '#buyEndTime',
-		        type:'datetime',
-		        done: (value) => {
-		          this.carAuction.buyEndTime = value
-		        }
-		    });
-	 	    laydate.render({
-		        elem: '#consStartTime',
-		        type:'datetime',
-		        done: (value) => {
-		          this.carAuction.consStartTime = value
-		        }
-		    });
-	 	    laydate.render({
-		        elem: '#consEndTime',
-		        type:'datetime',
-		        done: (value) => {
-		          this.carAuction.consEndTime = value
-		        }
-		    });
-		    laydate.render({
-		        elem: '#viewSampleStartTime',
-		        type:'datetime',
-		        done: (value) => {
-		          this.carAuction.viewSampleStartTime = value
-		        }
-		    });
-		    laydate.render({
-		        elem: '#viewSampleEndTime',
-		        type:'datetime',
-		        done: (value) => {
-		          this.carAuction.viewSampleEndTime = value
-		        }
-		    });
-		    laydate.render({
-		        elem: '#paymentEndTime',
-		        type:'datetime',
-		        done: (value) => {
-		          this.carAuction.paymentEndTime = value
-		        }
-		    });
+            $("#consultant").focus(function(){
+                $("#consultant").css("border","1px solid #ccc");
+            });
+            $("#consultantTel").focus(function(){
+                $("#consultantTel").css("border","1px solid #ccc");
+            });
+            $("#consultantEmail").focus(function(){
+                $("#consultantEmail").css("border","1px solid #ccc");
+            });
+
+            this.queryData();
+            let annualVerificationExpirationDate = laydate.render({
+                elem: '#annualVerificationExpirationDate',
+                type:'month',
+                done: (value) => {
+                this.detection.annualVerificationExpirationDate = value
+        }
+        });
+            laydate.render({
+                elem: '#lastTransferDate',
+                type:'date',
+                done: (value) => {
+                this.carBasic.lastTransferDate = value
+        }
+        });
+            laydate.render({
+                elem: '#insuranceExpirationDate',
+                type:'date',
+                done: (value) => {
+                this.detection.insuranceExpirationDate = value
+        }
+        });
+            laydate.render({
+                elem: '#auctionStartTime',
+                type:'date',
+                done: (value) => {
+                this.carAuction.auctionStartTime = value
+        }
+        });
+            laydate.render({
+                elem: '#auctionEndTime',
+                type:'date',
+                done: (value) => {
+                this.carAuction.auctionEndTime = value
+        }
+        });
 	    }, 
 	    
 	    methods: {
@@ -693,16 +556,17 @@ window.layinit(function (htConfig) {
 	                	vm.business=data.data.business;
 	                	vm.drag=data.data.drag;
 	                	vm.canEdit = data.data.canEdit ;
-						vm.drag.dragDate = moment(vm.drag.dragDate).format("YYYY年MM月DD日");
+						vm.drag.dragDate = moment(vm.drag.dragDate).format("YYYY-MM-DD");
 	                 	vm.detection=data.data.detection;
-						vm.detection.createTime = moment(vm.detection.createTime).format("YYYY年MM月DD日");
+						vm.detection.createTime = moment(vm.detection.createTime).format("YYYY-MM-DD");
+                        vm.detection.annualVerificationExpirationDate=moment(vm.detection.annualVerificationExpirationDate).format("YYYY-MM")
 						vm.detection.insuranceExpirationDate = moment(vm.detection.insuranceExpirationDate).format("YYYY-MM-DD");
 	                	vm.mortgageDetection=data.data.mortgageDetection;
-	                	vm.mortgageDetection.createTime = moment(vm.mortgageDetection.createTime).format("YYYY年MM月DD日")
+	                	vm.mortgageDetection.createTime = moment(vm.mortgageDetection.createTime).format("YYYY-MM-DD")
 	                	
 	                	if(data.data.repayPlan!=null&&data.data.repayPlan!=''){
 	                		vm.repayPlan=data.data.repayPlan;
-	                		vm.repayPlan.lastPayDate = moment(vm.repayPlan.lastPayDate).format("YYYY年MM月DD日")
+	                		vm.repayPlan.lastPayDate = moment(vm.repayPlan.lastPayDate).format("YYYY-MM-DD")
 	                	}
 	                 	if(vm.repayPlan.payedPrincipal==null||vm.repayPlan.payedPrincipal==''){
 	                		vm.repayPlan.payedPrincipal=0;
@@ -725,7 +589,7 @@ window.layinit(function (htConfig) {
 							vm.mortgageDetection.evaluationAmount = Number(vm.mortgageDetection.evaluationAmount).toFixed(2);
 						}
 	                	vm.outputRecord=data.data.outputRecord;
-	                	vm.outputRecord.factOutputDate = moment(vm.outputRecord.factOutputDate).format("YYYY年MM月DD日")
+	                	vm.outputRecord.factOutputDate = moment(vm.outputRecord.factOutputDate).format("YYYY-MM-DD")
 	                	if(data.data.detection.evaluationAmount==null||data.data.detection.evaluationAmount==''){
 	                		vm.carBasic.differAmount=0;
 	                	}else{
@@ -737,16 +601,18 @@ window.layinit(function (htConfig) {
 	                	}
 	                	vm.detection.assessOdometer=vm.detection.odometer;//为页面验证用
 	                	vm.detection.viewInsuranceExpirationDate=vm.detection.insuranceExpirationDate;
-	                	vm.carAuction=data.data.carAuction;
-	                	if(vm.carAuction.fareRange==null){
-	                		vm.carAuction.fareRange='';
-	                	}
-	                	if(vm.carAuction.takeWay==null){
-	                		vm.carAuction.takeWay='';
-	                	}
-	                	if(vm.carAuction.transType==null){
-	                		vm.carAuction.transType='';
-	                	}
+                        vm.carAuction.businessId=data.data.carAuction.businessId;
+                        vm.carAuction.auctionId=data.data.carAuction.auctionId;
+                        vm.carAuction.startingPrice=data.data.carAuction.startingPrice;
+                        vm.carAuction.auctionStartTime=(data.data.carAuction.auctionStartTime!=null&&data.data.carAuction.auctionStartTime!='')?moment(data.data.carAuction.auctionStartTime).format("YYYY-MM-DD"):'';
+                        vm.carAuction.auctionEndTime=(data.data.carAuction.auctionEndTime!=null&&data.data.carAuction.auctionEndTime!='')?moment(data.data.carAuction.auctionEndTime).format("YYYY-MM-DD"):'';
+                        vm.carAuction.consultant=data.data.carAuction.consultant;
+                        vm.carAuction.consultantEmail=data.data.carAuction.consultantEmail;
+                        vm.carAuction.consultantTel=data.data.carAuction.consultantTel;
+                        vm.carAuction.paymentMethod=data.data.carAuction.paymentMethod!=null&&data.data.carAuction.paymentMethod!=''?data.data.carAuction.paymentMethod:'买卖双方实地交易';
+                        vm.carAuction.auctionPosition=data.data.carAuction.auctionPosition!=null&&data.data.carAuction.auctionPosition!=''?data.data.carAuction.auctionPosition:'车辆所在地';
+                        vm.carAuction.remark=data.data.carAuction.remark;
+
 	                	//alert(JSON.stringify(vm.carAuction));
 	                	var docFiles=data.data.returnRegFiles;
 	                	
@@ -837,12 +703,12 @@ window.layinit(function (htConfig) {
 	            });
 	 
 	    	},
-	    	carAuctionAuditClose(){// 关闭窗口
+	    	carAuctionAuditClose:function(){// 关闭窗口
 
 	    		var index = parent.layer.getFrameIndex(window.name); // 获取窗口索引
 	    		parent.layer.close(index);
 	    	},
-	    	carAuctionAudit (){
+	    	carAuctionAudit:function(){
 	    	
 	    		vm.carAuction.businessId=businessId;
 	    		
@@ -931,233 +797,73 @@ window.layinit(function (htConfig) {
 	    			return ;
 	    		}
 	       		//拍卖信息
-	      		if(vm.carAuction.startingPrice==''||vm.carAuction.startingPrice==null){
-	    			$("#startingPrice").css("border","1px solid #FF3030");
-	    			return ;
-	    		}else{
-		    		if (!amt.test(vm.carAuction.startingPrice)) {  
-		    			$("#startingPrice").css("border","1px solid #FF3030");
-		    			layer.msg("请输入有效金额！",{icon:5,shade: [0.8, '#393D49']});
-		    			return;
-		    		}
-	    		}
-	     		if(vm.carAuction.deposit==''||vm.carAuction.deposit==null){
-	    			$("#deposit").css("border","1px solid #FF3030");
-	    			return ;
-	    		}else{
-		    		if (!amt.test(vm.carAuction.deposit)) {  
-		    			$("#deposit").css("border","1px solid #FF3030");
-		    			layer.msg("请输入有效金额！",{icon:5,shade: [0.8, '#393D49']});
-		    			return;
-		    		}
-	    		}
-	       		if(vm.carAuction.fareRange==''||vm.carAuction.fareRange==null){
-	    			$("#fareRange").css("border","1px solid #FF3030");
-	    			return ;
-	    		}
-	     		if(vm.carAuction.reservePrice==''||vm.carAuction.reservePrice==null){
-	    			$("#reservePrice").css("border","1px solid #FF3030");
-	    			return ;
-	    		}else{
-		    		if (!amt.test(vm.carAuction.reservePrice+'')) {  
-		    			$("#reservePrice").css("border","1px solid #FF3030");
-		    			layer.msg("请输入有效金额！",{icon:5,shade: [0.8, '#393D49']});
-		    			return;
-		    		}
-	    		}
-	     		if(vm.carAuction.auctionStartTime==''||vm.carAuction.auctionStartTime==null){
-	    			$("#auctionStartTime").css("border","1px solid #FF3030");
-	    			return ;
-	    		}else{
-	    	
-	    			var inputDate=new Date(vm.carAuction.auctionStartTime.replace("-", "/").replace("-", "/"));  
-					if(inputDate<currentDate){
-	    				$("#auctionStartTime").css("border","1px solid #FF3030");
-	    				layer.msg("不能小于当前日期！",{icon:5,shade: [0.8, '#393D49']});
-	    				return ;
-	    			}
-	    			
-	    		}
-	    		if(vm.carAuction.auctionEndTime==''||vm.carAuction.auctionEndTime==null){
-	    			$("#auctionEndTime").css("border","1px solid #FF3030");
-	    			return ;
-	    		}else{
-	    			var startDate=new Date(vm.carAuction.auctionStartTime.replace("-", "/").replace("-", "/"));
-	    			var inputDate=new Date(vm.carAuction.auctionEndTime.replace("-", "/").replace("-", "/"));  
-	    			if(inputDate<=startDate){
-	    				$("#auctionEndTime").css("border","1px solid #FF3030");
-	    				layer.msg("结束时间不能小于等于开始时间！",{icon:5,shade: [0.8, '#393D49']});
-	    				return ;
-	    			}
-	    			
-	    		}
-	      		if(vm.carAuction.transType==''||vm.carAuction.transType==null){
-	    			$("#transType").css("border","1px solid #FF3030");
-	    			return ;
-	    		}
-	     		if(vm.carAuction.priorityPurchaser==''||vm.carAuction.priorityPurchaser==null){
-	    			$("#priorityPurchaser").css("border","1px solid #FF3030");
-	    			return ;
-	    		}
-	    		if(vm.carAuction.takeWay==''||vm.carAuction.takeWay==null){
-	    			$("#takeWay").css("border","1px solid #FF3030");
-	    			return ;
-	    		}
-	     		if(vm.carAuction.buyStartTime==''||vm.carAuction.buyStartTime==null){
-	    			$("#buyStartTime").css("border","1px solid #FF3030");
-	    			return ;
-	    		}else{
-	    			var inputDate=new Date(vm.carAuction.buyStartTime.replace("-", "/").replace("-", "/"));  
-	    		
-	    			var auctionStartDate=new Date(vm.carAuction.auctionStartTime.replace("-", "/").replace("-", "/"));
-	    			var auctionEndTime=new Date(vm.carAuction.auctionEndTime.replace("-", "/").replace("-", "/"));
-	    			if(inputDate<auctionStartDate||inputDate>auctionEndTime){
-	    				$("#buyStartTime").css("border","1px solid #FF3030");
-	    				layer.msg("不能小于拍卖开始时间和大于拍卖结束时间！",{icon:5,shade: [0.8, '#393D49']});
-	    				return ;
-	    			}
-	    			
-	    		}
-	    		if(vm.carAuction.buyEndTime==''||vm.carAuction.buyEndTime==null){
-	    			$("#buyEndTime").css("border","1px solid #FF3030");
-	    			return ;
-	    		}else{
-	    			var startDate=new Date(vm.carAuction.buyStartTime.replace("-", "/").replace("-", "/"));
-	    			var inputDate=new Date(vm.carAuction.buyEndTime.replace("-", "/").replace("-", "/"));  
-	    			var auctionEndTime=new Date(vm.carAuction.auctionEndTime.replace("-", "/").replace("-", "/"));
-	    			if(inputDate<=startDate||inputDate>auctionEndTime){
-	    				$("#buyEndTime").css("border","1px solid #FF3030");
-	    				layer.msg("结束时间不能小于等于开始时间！",{icon:5,shade: [0.8, '#393D49']});
-	    				return ;
-	    			}
-	    			
-	    		}
-	    		if(vm.carAuction.payWay==''||vm.carAuction.payWay==null){
-	    			$("#payWay").css("border","1px solid #FF3030");
-	    			return ;
-	    		}
-	    		if(vm.carAuction.consStartTime==''||vm.carAuction.consStartTime==null){
-	    			$("#consStartTime").css("border","1px solid #FF3030");
-	    			return ;
-	    		}else{
-	    			var inputDate=new Date(vm.carAuction.consStartTime.replace("-", "/").replace("-", "/"));  
-					console.log(inputDate);
-					console.log(currentDate);
-					if(inputDate<currentDate){
-	    				$("#consStartTime").css("border","1px solid #FF3030");
-	    				layer.msg("不能小于当前日期！",{icon:5,shade: [0.8, '#393D49']});
-	    				return ;
-	    			}
-	    			
-	    		}
-	    		if(vm.carAuction.consEndTime==''||vm.carAuction.consEndTime==null){
-	    			$("#consEndTime").css("border","1px solid #FF3030");
-	    			return ;
-	    		}else{
-	    			var startDate=new Date(vm.carAuction.consStartTime.replace("-", "/").replace("-", "/"));
-	    			var inputDate=new Date(vm.carAuction.consEndTime.replace("-", "/").replace("-", "/"));  
-	    			if(inputDate<=startDate){
-	    				$("#consEndTime").css("border","1px solid #FF3030");
-	    				layer.msg("结束时间不能小于等于开始时间！",{icon:5,shade: [0.8, '#393D49']});
-	    				return ;
-	    			}
-	    			
-	    		}
-	    		if(vm.carAuction.consultant==''||vm.carAuction.consultant==null){
-	    			$("#consultant").css("border","1px solid #FF3030");
-	    			return ;
-	    		}
-	    		if(vm.carAuction.viewSampleStartTime==''||vm.carAuction.viewSampleStartTime==null){
-	    			$("#viewSampleStartTime").css("border","1px solid #FF3030");
-	    			return ;
-	    		}else{
-	    			var inputDate=new Date(vm.carAuction.viewSampleStartTime.replace("-", "/").replace("-", "/"));  
-					console.log(inputDate);
-					console.log(currentDate);
-					if(inputDate<currentDate){
-	    				$("#viewSampleStartTime").css("border","1px solid #FF3030");
-	    				layer.msg("不能小于当前日期！",{icon:5,shade: [0.8, '#393D49']});
-	    				return ;
-	    			}
-	    			
-	    		}
-	    		if(vm.carAuction.viewSampleEndTime==''||vm.carAuction.viewSampleEndTime==null){
-	    			$("#viewSampleEndTime").css("border","1px solid #FF3030");
-	    			return ;
-	    		}else{
-	    			var startDate=new Date(vm.carAuction.viewSampleStartTime.replace("-", "/").replace("-", "/"));
-	    			var inputDate=new Date(vm.carAuction.viewSampleEndTime.replace("-", "/").replace("-", "/"));  
-	    			if(inputDate<=startDate){
-	    				$("#viewSampleEndTime").css("border","1px solid #FF3030");
-	    				layer.msg("结束时间不能小于等于开始时间！",{icon:5,shade: [0.8, '#393D49']});
-	    				return ;
-	    			}
-	    			
-	    		}
-	    		if(vm.carAuction.consultantTel==''||vm.carAuction.consultantTel==null){
-	    			$("#consultantTel").css("border","1px solid #FF3030");
-	    			return ;
-	    		}else{
-		    		if (!mobi.test(vm.carAuction.consultantTel)&&!tel.test(vm.carAuction.consultantTel)) {  
-		    			$("#consultantTel").css("border","1px solid #FF3030");
-		    			layer.msg("电话格式不正确！",{icon:5,shade: [0.8, '#393D49']});
-		    			return;
-		    		}
-	    		}
-	    		if(vm.carAuction.handleUnit==''||vm.carAuction.handleUnit==null){
-	    			$("#handleUnit").css("border","1px solid #FF3030");
-	    			return ;
-	    		}
-	     		if(vm.carAuction.unitAddr==''||vm.carAuction.unitAddr==null){
-	    			$("#unitAddr").css("border","1px solid #FF3030");
-	    			return ;
-	    		}
-	    		if(vm.carAuction.unitAddr==''||vm.carAuction.unitAddr==null){
-	    			$("#unitAddr").css("border","1px solid #FF3030");
-	    			return ;
-	    		}
-	    		if(vm.carAuction.acountName==''||vm.carAuction.acountName==null){
-	    			$("#acountName").css("border","1px solid #FF3030");
-	    			return ;
-	    		}
-	    		if(vm.carAuction.openBank==''||vm.carAuction.openBank==null){
-	    			$("#openBank").css("border","1px solid #FF3030");
-	    			return ;
-	    		}
-	    		if(vm.carAuction.acountNum==''||vm.carAuction.acountNum==null){
-	    			$("#acountNum").css("border","1px solid #FF3030");
-	    			return ;
-	    		}else{
-	    			if(!carNum.test(vm.carAuction.acountNum)){
-	    				$("#acountNum").css("border","1px solid #FF3030");
-	    				layer.msg("卡号格式有误！",{icon:5,shade: [0.8, '#393D49']});
-	    				return ;
-	    			}
-	    		}
-	    	
-	    		if(vm.carAuction.paymentEndTime==''||vm.carAuction.paymentEndTime==null){
-	    			$("#paymentEndTime").css("border","1px solid #FF3030");
-	    			return ;
-	    		}else{
-	    			var inputDate=new Date(vm.carAuction.paymentEndTime.replace("-", "/").replace("-", "/"));  
-					console.log(inputDate);
-					console.log(currentDate);
-					if(inputDate<currentDate){
-	    				$("#paymentEndTime").css("border","1px solid #FF3030");
-	    				layer.msg("不能小于当前日期！",{icon:5,shade: [0.8, '#393D49']});
-	    				return ;
-	    			}
-	    			
-	    		}
-	    		if(vm.carAuction.viewSampleAddr==''||vm.carAuction.viewSampleAddr==null){
-	    			$("#viewSampleAddr").css("border","1px solid #FF3030");
-	    			return ;
-	    		}
-	    		if(vm.carAuction.transFree==''||vm.carAuction.transFree==null){
-	    			$("#transFree").css("border","1px solid #FF3030");
-	    			return ;
-	    		}
-	    		if((vm.approvalInfoForm.isPass==''||vm.approvalInfoForm.isPass==null)&&vm.approvalInfoForm.process.status!=-1){
+                if(vm.carAuction.startingPrice==''||vm.carAuction.startingPrice==null){
+                    $("#startingPrice").css("border","1px solid #FF3030");
+                    return ;
+                }else{
+                    if (!amt.test(vm.carAuction.startingPrice)) {
+                        $("#startingPrice").css("border","1px solid #FF3030");
+                        layer.msg("请输入有效金额！",{icon:5,shade: [0.8, '#393D49']});
+                        return;
+                    }
+                }
+
+
+                if(vm.carAuction.auctionStartTime==''||vm.carAuction.auctionStartTime==null){
+
+                    $("#auctionStartTime").css("border","1px solid #FF3030");
+                    return ;
+                }else{
+
+                    var inputDate=new Date(vm.carAuction.auctionStartTime.replace("-", "/").replace("-", "/"));
+
+                    if(inputDate<currentDate){
+                        $("#auctionStartTime").css("border","1px solid #FF3030");
+                        layer.msg("不能小于当前日期！",{icon:5,shade: [0.8, '#393D49']});
+                        return ;
+                    }
+
+                }
+                if(vm.carAuction.auctionEndTime==''||vm.carAuction.auctionEndTime==null){
+                    $("#auctionEndTime").css("border","1px solid #FF3030");
+                    return ;
+                }else{
+                    var startDate=new Date(vm.carAuction.auctionStartTime.replace("-", "/").replace("-", "/"));
+                    var inputDate=new Date(vm.carAuction.auctionEndTime.replace("-", "/").replace("-", "/"));
+                    if(inputDate<=startDate){
+                        $("#auctionEndTime").css("border","1px solid #FF3030");
+                        layer.msg("结束时间不能小于等于开始时间！",{icon:5,shade: [0.8, '#393D49']});
+                        return ;
+                    }
+
+                }
+
+                if(vm.carAuction.consultant==''||vm.carAuction.consultant==null){
+                    $("#consultant").css("border","1px solid #FF3030");
+                    return ;
+                }
+                if(vm.carAuction.consultantTel==''||vm.carAuction.consultantTel==null){
+                    $("#consultantTel").css("border","1px solid #FF3030");
+                    return ;
+                }else{
+                    if (!mobi.test(vm.carAuction.consultantTel)&&!tel.test(vm.carAuction.consultantTel)) {
+                        $("#consultantTel").css("border","1px solid #FF3030");
+                        layer.msg("电话格式不正确！",{icon:5,shade: [0.8, '#393D49']});
+                        return;
+                    }
+                }
+                if(vm.carAuction.consultantEmail==''||vm.carAuction.consultantEmail==null){
+                    $("#consultantEmail").css("border","1px solid #FF3030");
+                    return ;
+                }else{
+                    if (!email.test(vm.carAuction.consultantEmail)) {
+                        $("#consultantEmail").css("border","1px solid #FF3030");
+                        layer.msg("咨询邮箱格式不正确！",{icon:5,shade: [0.8, '#393D49']});
+                        return;
+                    }
+                }
+
+                if((vm.approvalInfoForm.isPass==''||vm.approvalInfoForm.isPass==null)&&vm.approvalInfoForm.process.status!=-1){
 	    			//alert(processStatus);
 	    			layer.msg("请输入是否同意审批",{icon:5,shade: [0.8, '#393D49']});
 	    			return ;
