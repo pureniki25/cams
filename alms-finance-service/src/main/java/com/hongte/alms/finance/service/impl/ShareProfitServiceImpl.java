@@ -29,6 +29,7 @@ import com.hongte.alms.base.entity.RepaymentProjPlanList;
 import com.hongte.alms.base.entity.RepaymentProjPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentResource;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
+import com.hongte.alms.base.enums.RepayCurrentStatusEnums;
 import com.hongte.alms.base.enums.RepayedFlag;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
@@ -539,20 +540,20 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 				
 				divideAmount = divideAmount.subtract(offLineOverDue).subtract(onLineOverDue);
 
-				List<RepaymentProjPlanListDto> repaymentProjPlanListDtos = projPlanDto.getProjPlanListDtos();
+//				List<RepaymentProjPlanListDto> repaymentProjPlanListDtos = projPlanDto.getProjPlanListDtos();
 				String projectId = projPlanDto.getTuandaiProjectInfo().getProjectId();
 				CurrPeriodProjDetailVO currPeriodProjDetailVO = getCurrPeriodProjDetailVO(projectId);
 				
 				logger.info("====================开始遍历标的{}还款计划=======================",projectId);
 				
-				for (RepaymentProjPlanListDto repaymentProjPlanListDto : repaymentProjPlanListDtos) {
+				for (RepaymentProjPlanListDto repaymentProjPlanListDto : projPlanDto.getProjPlanListDtos()) {
 					if (divideAmount == null && offLineOverDue == null && onLineOverDue == null) {
 						logger.info("@@没有钱可以分配到细项,跳出标的还款计划循环");
 						break;
 					}
 					logger.info("====================开始遍历{}的细项=======================",repaymentProjPlanListDto.getRepaymentProjPlanList().getProjPlanListId());
-					List<RepaymentProjPlanListDetail> details = repaymentProjPlanListDto.getProjPlanListDetails();
-					for (RepaymentProjPlanListDetail detail : details) {
+//					List<RepaymentProjPlanListDetail> details = repaymentProjPlanListDto.getProjPlanListDetails();
+					for (RepaymentProjPlanListDetail detail : repaymentProjPlanListDto.getProjPlanListDetails()) {
 						if (detail.getProjPlanAmount().compareTo(detail.getProjFactAmount())==0) {
 							logger.info("{}此项实还等于应还,已还满",detail.getPlanItemName());
 							continue;
@@ -771,7 +772,35 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		}
 		return details;
 	}
-	
+	private void updateProjPlanStatus() {
+		for (RepaymentProjPlanDto projPlanDto : planDto.get().getProjPlanDtos()) {
+			for (RepaymentProjPlanListDto projPlanListDto : projPlanDto.getProjPlanListDtos()) {
+				BigDecimal factAmount = new BigDecimal(0);
+				for (RepaymentProjPlanListDetail projPlanListDetail : projPlanListDto.getProjPlanListDetails()) {
+					factAmount = factAmount.add(projPlanListDetail.getProjFactAmount()!=null?projPlanListDetail.getProjFactAmount():new BigDecimal(0));
+				}
+				if (factAmount.compareTo(projPlanListDto.getRepaymentProjPlanList().getTotalBorrowAmount())==0) {
+					projPlanListDto.getRepaymentProjPlanList().setCurrentStatus(RepayCurrentStatusEnums.已还款.toString());
+					projPlanListDto.getRepaymentProjPlanList().setCurrentSubStatus(RepayCurrentStatusEnums.已还款.toString());
+					RepaymentResource repaymentResource = repaymentResources.get().get(repaymentResources.get().size()-1);
+					if (repaymentResource.getRepaySource().equals(10)) {
+						projPlanListDto.getRepaymentProjPlanList().setRepayFlag(RepayedFlag.CONFIRM_OFFLINE_REPAYED.getKey());
+					}
+					if (repaymentResource.getRepaySource().equals(11)) {
+						projPlanListDto.getRepaymentProjPlanList().setRepayFlag(RepayedFlag.CONFIRM_OFFLINE_REPAYED.getKey());
+					}
+					if (repaymentResource.getRepaySource().equals(20)) {
+						projPlanListDto.getRepaymentProjPlanList().setRepayFlag(RepayedFlag.AUTO_WITHHOLD_OFFLINE_REPAYED.getKey());
+					}
+					if (repaymentResource.getRepaySource().equals(30)) {
+						projPlanListDto.getRepaymentProjPlanList().setRepayFlag(RepayedFlag.AUTO_BANK_WITHHOLD_REPAYED.getKey());
+					}
+					projPlanListDto.getRepaymentProjPlanList().updateAllColumnById();
+				}
+			}
+		}
+		
+	}
 	
 	private void updateStatus() {
 		
@@ -835,8 +864,22 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		int compare = factAmount.compareTo(planAmount.subtract(derateAmount));
 		if (compare==0) {
 			planList.setCurrentStatus(RepayPlanStatus.REPAYED.getName());
+			planList.setCurrentSubStatus(RepayPlanStatus.REPAYED.getName());
 			planList.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
-			planList.setRepayFlag(RepayedFlag.CONFIRM_OFFLINE_REPAYED.getKey());
+//			planList.setRepayFlag(RepayedFlag.CONFIRM_OFFLINE_REPAYED.getKey());
+			RepaymentResource repaymentResource = repaymentResources.get().get(repaymentResources.get().size()-1);
+			if (repaymentResource.getRepaySource().equals(10)) {
+				planList.setRepayFlag(RepayedFlag.CONFIRM_OFFLINE_REPAYED.getKey());
+			}
+			if (repaymentResource.getRepaySource().equals(11)) {
+				planList.setRepayFlag(RepayedFlag.CONFIRM_OFFLINE_REPAYED.getKey());
+			}
+			if (repaymentResource.getRepaySource().equals(20)) {
+				planList.setRepayFlag(RepayedFlag.AUTO_WITHHOLD_OFFLINE_REPAYED.getKey());
+			}
+			if (repaymentResource.getRepaySource().equals(30)) {
+				planList.setRepayFlag(RepayedFlag.AUTO_BANK_WITHHOLD_REPAYED.getKey());
+			}
 		}else {
 			if (onlineOverDueRepaid&&item10Repaid&&item20Repaid&&item30Repaid&&item50Repaid) {
 				planList.setRepayStatus(SectionRepayStatusEnum.ONLINE_REPAID.getKey());
