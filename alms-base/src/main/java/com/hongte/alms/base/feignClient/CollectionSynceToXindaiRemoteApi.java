@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * 贷后跟踪相关的远程调用
  */
 //@FeignClient(value = "alms-open-service")
-@FeignClient(value = "alms-open-service",  url="http://192.168.14.163:30616")
+@FeignClient(value = "alms-open-service")
 public interface CollectionSynceToXindaiRemoteApi {
 
     /**
