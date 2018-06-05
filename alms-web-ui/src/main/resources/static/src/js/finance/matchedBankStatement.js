@@ -66,6 +66,7 @@ window.layinit(function (htConfig) {
                     }
                 }, {
                     title: '操作',
+                    width:150,
                     render: (h, p) => {
 
                         if (p.row.moneyPoolId!='合计'&&p.row.status=='待领取') {
@@ -91,6 +92,9 @@ window.layinit(function (htConfig) {
                                         click(){
                                             app.openEditBankStatementModal(p.row.mprId)
                                         }
+                                    },
+                                    style:{
+                                        marginRight:'10px'
                                     }
                                 },'编辑流水'),
                                 h('i-button',{
