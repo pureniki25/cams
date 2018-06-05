@@ -144,8 +144,7 @@
                                 结余暂收:
                             </td>
                             <td>
-                                <i-input number v-model="factRepaymentInfo.surplusFund" :disabled="!factRepaymentInfo.useSurplusflag" style="text-align: right"></i-input>
-                                </i-input>
+                                <i-input number=true v-model="factRepaymentInfo.surplusFund" :disabled="!factRepaymentInfo.useSurplusflag" style="text-align: right"></i-input>
                             </td>
                             <td style="width: 200px">
                                 <span>结余暂收可用金额{{factRepaymentInfo.canUseSurplus}}元</span>
@@ -208,11 +207,11 @@
                         <tr>
                             <td>线下逾期费</td>
                             <td>
-                                <i-input :disabled="thisTimeRepaymentInfo.offlineOverDue==0" v-model="factRepaymentInfo.offlineOverDue"></i-input>
+                                <i-input :disabled="thisTimeRepaymentInfo.offlineOverDue==0" v-model="factRepayPreview.offlineOverDue" @on-change="onOfflineOverDueChange($event)" ></i-input>
                             </td>
                             <td>线上逾期费</td>
                             <td>
-                                <i-input :disabled="thisTimeRepaymentInfo.onlineOverDue==0" v-model="factRepaymentInfo.onlineOverDue"></i-input>
+                                <i-input :disabled="thisTimeRepaymentInfo.onlineOverDue==0" v-model="factRepayPreview.onlineOverDue"></i-input>
                             </td>
                         </tr>
                         <tr>

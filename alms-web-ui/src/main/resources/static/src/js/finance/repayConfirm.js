@@ -149,8 +149,8 @@ window.layinit(function (htConfig) {
             factRepaymentInfo: {
                 repayDate: '',
                 surplusFund: 0,
-                onlineOverDue: 0,
-                offlineOverDue: 0,
+                onlineOverDuel: '',
+                offlineOverDue: '',
                 remark: '',
                 canUseSurplus: 0,
                 moneyPoolAccount: 0,
@@ -183,19 +183,54 @@ window.layinit(function (htConfig) {
                 app.factRepaymentInfo.moneyPoolAccount = moneyPoolAccount
                 app.factRepaymentInfo.repayAccount = parseFloat(app.factRepaymentInfo.moneyPoolAccount)  + parseFloat(app.factRepaymentInfo.surplusFund || 0)
             },
+            'factRepaymentInfo.useSurplusflag':function(n,o){
+                if(o==''){
+                    return ;
+                }
+                app.factRepaymentInfo.surplusFund = 0
+            },
             'factRepaymentInfo.surplusFund': function (n) {
                 if (n && !isNaN(n)) {
                     if(n>app.factRepaymentInfo.canUseSurplus){
-                        app.$Message.warning({content:'可使用结余金额不能大于'+app.factRepaymentInfo.canUseSurplus})
+                        app.$Modal.warning({content:'可使用结余金额不能大于'+app.factRepaymentInfo.canUseSurplus})
                         app.factRepaymentInfo.surplusFund = 0
                         return;
                     }
                     app.factRepaymentInfo.repayAccount = parseFloat(app.factRepaymentInfo.moneyPoolAccount) + parseFloat(app.factRepaymentInfo.surplusFund || 0)
                 }
             },
+            // 'factRepayPreview.offlineOverDue':function(n){
+            //     if(n&&!isNaN(n)){
+            //         if(n>app.thisTimeRepaymentInfo.offlineOverDue){
+            //             app.$Message.warning({content:'线下逾期费不能超过'+app.thisTimeRepaymentInfo.offlineOverDue+'元'});
+            //             app.factRepayPreview.offlineOverDue = 0 ;
+            //             return ;
+            //         }
+            //         app.factRepaymentInfo.offlineOverDue = n ;
+            //         if(app.factRepayPreview.flag){
+            //             app.factRepayPreview.flag = !app.factRepayPreview.flag
+            //             return ;
+            //         }
+            //         app.previewConfirmRepayment()
+            //     }
+            // },
+            // 'factRepayPreview.onlineOverDue':function(n){
+            //     if(n&&!isNaN(n)){
+            //         if(n>app.thisTimeRepaymentInfo.onlineOverDue){
+            //             app.$Message.warning({content:'线上逾期费不能超过'+app.thisTimeRepaymentInfo.onlineOverDue+'元'});
+            //             app.factRepayPreview.onlineOverDue = 0 ;
+            //             return ;
+            //         }
+            //         app.factRepaymentInfo.onlineOverDue = n ;
+            //         if(app.factRepayPreview.flag){
+            //             app.factRepayPreview.flag = !app.factRepayPreview.flag
+            //             return ;
+            //         }
+            //         app.previewConfirmRepayment()
+            //     }
+            // },
+            // thisTimeRepaymentInfo.onlineOverDue
             'factRepaymentInfo.repayAccount': function (n) {
-                app.factRepaymentInfo.offlineOverDue = app.thisTimeRepaymentInfo.offlineOverDue
-                app.factRepaymentInfo.onlineOverDue = app.thisTimeRepaymentInfo.onlineOverDue
                 app.previewConfirmRepayment()
             }
         },
@@ -359,12 +394,13 @@ window.layinit(function (htConfig) {
                 },
                 handleConfirmRepaymentResult(res) {
                     app.table.projRepayment.data = res.data.data
+                    app.factRepayPreview.flag = true
                     app.factRepayPreview.item10 = 0
                     app.factRepayPreview.item20 = 0
                     app.factRepayPreview.item30 = 0
                     app.factRepayPreview.item50 = 0
-                    // app.factRepayPreview.offlineOverDue = 0
-                    // app.factRepayPreview.onlineOverDue = 0
+                    app.factRepayPreview.offlineOverDue = 0
+                    app.factRepayPreview.onlineOverDue = 0
                     app.factRepayPreview.subTotal = 0
                     app.factRepayPreview.total = 0
                     app.factRepayPreview.surplus = 0
@@ -374,8 +410,8 @@ window.layinit(function (htConfig) {
                         app.factRepayPreview.item20 += e.item20
                         app.factRepayPreview.item30 += e.item30
                         app.factRepayPreview.item50 += e.item50
-                        // app.factRepayPreview.offlineOverDue += e.offlineOverDue
-                        // app.factRepayPreview.onlineOverDue += e.onlineOverDue
+                        app.factRepayPreview.offlineOverDue += e.offlineOverDue
+                        app.factRepayPreview.onlineOverDue += e.onlineOverDue
                         app.factRepayPreview.subTotal += e.subTotal
                         app.factRepayPreview.total += e.total
                     })
@@ -408,6 +444,9 @@ window.layinit(function (htConfig) {
                     
                     
             },
+            onOfflineOverDueChange(e){
+                console.log(e.target.value);
+            }
         },
         created: function () {
             this.getThisTimeRepayment()
