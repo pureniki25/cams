@@ -765,14 +765,17 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         for(ProjInfoReq projInfoReq:creatRepayPlanReq.getProjInfoReqs() ){
             List<RepaymentProjPlan> projList =  repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("project_id",projInfoReq.getProjectId()));
 
+
+
             if(projList.size()>0){
-                for(RepaymentProjPlan projPlan:projList){
-                    Integer diffDays = DateUtil.getDiffDays(projPlan.getCreateTime(),projInfoReq.getQueryFullsuccessDate());
-                    //如果同一个标的满标时间与还款计划生成的时间相差一天以内
-                    if(diffDays <= 1){
-                        throw  new CreatRepaymentExcepiton("已存在时间相近的还款计划");
-                    }
-                }
+//                for(RepaymentProjPlan projPlan:projList){
+//                    Integer diffDays = DateUtil.getDiffDays(projPlan.getCreateTime(),projInfoReq.getQueryFullsuccessDate());
+//                    //如果同一个标的满标时间与还款计划生成的时间相差一天以内
+//                    if(diffDays <= 1){
+                logger.error("已存在当前标的还款计划  projId:"+projInfoReq.getProjectId());
+                        throw  new CreatRepaymentExcepiton("已存在当前标的还款计划");
+//                    }
+//                }
             }
         }
         return true;
@@ -1136,19 +1139,19 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
 
     /**
-     * 根据表信息计算批次
+     * 根据表信息计算批次(按满标时间计算)
      * @param tuandaiProjReqInfos
      * @return
      */
     private Map<String,List<ProjInfoReq>> getProjInfoReqMap(List<ProjInfoReq> tuandaiProjReqInfos){
         Map<String,List<ProjInfoReq>>  projInfoReqMap = new HashMap<>();
         for (ProjInfoReq projInfoReq:tuandaiProjReqInfos){
-            Date beginTime = projInfoReq.getBeginTime();
-            String beginDateStr =  DateUtil.formatDate(beginTime);
-            List<ProjInfoReq>  batchProj =projInfoReqMap.get(beginDateStr);
+            Date fullTime = projInfoReq.getQueryFullsuccessDate();
+            String fullTimeStr =  DateUtil.formatDate(fullTime);
+            List<ProjInfoReq>  batchProj =projInfoReqMap.get(fullTimeStr);
             if(batchProj == null){
                 batchProj = new LinkedList<>();
-                projInfoReqMap.put(beginDateStr,batchProj);
+                projInfoReqMap.put(fullTimeStr,batchProj);
             }
             batchProj.add(projInfoReq);
         }
@@ -1309,7 +1312,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     RepaymentProjPlanList  projPlanList =  creatRepaymentProjPlanList(repaymentProjPlan,i,planIndex);// new RepaymentProjPlanList();
                     Date date = DateUtil.addMonth2Date(i,projInfoReq.getBeginTime());
                     date = DateUtil.addDay2Date(-1,date);
-                    projPlanList.setDueDate(date);
+                    projPlanList.setDueDate(DateUtil.getDayStart(date));
                     //将标的第i期写入还款计划map
                     addPlanListToMap(repaymentPlanListPeriorMap,projPlanListPMap,projPlanList, i);
 
