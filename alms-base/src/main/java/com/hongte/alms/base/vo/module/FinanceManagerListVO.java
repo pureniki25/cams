@@ -99,6 +99,10 @@ public class FinanceManagerListVO {
 	 * 代扣确认状态
 	 */
 	private Integer confirmFlag ;
+	/**
+	 * 来源类型：1.信贷生成，2.贷后管理生成
+	 */
+	private Integer srcType;
 	public String getBusinessId() {
 		return businessId;
 	}
@@ -310,6 +314,20 @@ public class FinanceManagerListVO {
 	 */
 	public void setRepaidAmount(BigDecimal repaidAmount) {
 		this.repaidAmount = repaidAmount;
+	}
+
+	/**
+	 * @return the srcType
+	 */
+	public Integer getSrcType() {
+		return srcType;
+	}
+
+	/**
+	 * @param srcType the srcType to set
+	 */
+	public void setSrcType(Integer srcType) {
+		this.srcType = srcType;
 	}
 
 }
