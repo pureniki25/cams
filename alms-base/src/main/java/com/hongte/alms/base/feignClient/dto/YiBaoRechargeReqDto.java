@@ -11,11 +11,17 @@ public class YiBaoRechargeReqDto implements Serializable {
 	 private static final long serialVersionUID = -4095682638492039883L;
 	 private String merchantaccount;
 	 private String orderid        ;
-	 private String transtime      ;
+	 private Long transtime      ;
 	 private String currency       ;
-	 private String amount         ;
+	 private Double amount         ;
 	 private String productname    ;
-	 private String productdesc    ;
+	 public Double getAmount() {
+		return amount;
+	}
+	public void setAmount(Double amount) {
+		this.amount = amount;
+	}
+	private String productdesc    ;
 	 private String identityid     ;
 	 private String identitytype   ;
 	 private String card_top       ;
@@ -37,10 +43,11 @@ public class YiBaoRechargeReqDto implements Serializable {
 	public void setOrderid(String orderid) {
 		this.orderid = orderid;
 	}
-	public String getTranstime() {
+
+	public Long getTranstime() {
 		return transtime;
 	}
-	public void setTranstime(String transtime) {
+	public void setTranstime(Long transtime) {
 		this.transtime = transtime;
 	}
 	public String getCurrency() {
@@ -49,12 +56,7 @@ public class YiBaoRechargeReqDto implements Serializable {
 	public void setCurrency(String currency) {
 		this.currency = currency;
 	}
-	public String getAmount() {
-		return amount;
-	}
-	public void setAmount(String amount) {
-		this.amount = amount;
-	}
+
 	public String getProductname() {
 		return productname;
 	}

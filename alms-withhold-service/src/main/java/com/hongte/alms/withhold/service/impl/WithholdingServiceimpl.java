@@ -21,7 +21,9 @@ import com.hongte.alms.base.entity.WithholdingChannel;
 import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.enums.SysParameterRepaydaysEnums;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
+import com.hongte.alms.base.feignClient.dto.BankCardInfo;
 import com.hongte.alms.base.feignClient.dto.CustomerInfoDto;
+import com.hongte.alms.base.feignClient.dto.ThirdPlatform;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.SysBankLimitService;
@@ -90,20 +92,29 @@ public class WithholdingServiceimpl implements WithholdingService {
 		BasicBusiness basic = basicBusinessService
 				.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", pList.getOrigBusinessId()));
 		CustomerInfoDto customerDto = rechargeService.getCustomerInfo(basic.getCustomerIdentifyCard());
-		if (Integer.valueOf(customerDto.getPlatformId()) != PlatformEnum.YH_FORM.getValue()) {
-			// 第三方代扣
-			ThirdRepaymentCharge(basic, customerDto, pList,null);
-		}else {
+		List<BankCardInfo> bankCardInfos= customerDto.getList();
+		BankCardInfo bankCardInfo=rechargeService.getBankCardInfo(bankCardInfos);
+		BankCardInfo ThirtyCardInfo=rechargeService.getThirtyPlatformInfo(bankCardInfos);
+		
+		
+		if (bankCardInfo!=null) {
 			//银行代扣
-			BankCharge(basic, customerDto, pList);
+			BankCharge(basic, bankCardInfo, pList,bankCardInfos);
+			
+		
+		}else if(ThirtyCardInfo!=null&&bankCardInfo==null){// 第三方代扣
+			ThirdRepaymentCharge(basic, ThirtyCardInfo, pList, null);
+		}else{
+			logger.debug("业务编号为" + pList.getOrigBusinessId() + "期数为"+pList.getAfterId()+"代扣失败，没有找到银行代扣和第三方代扣相关绑定信息");
 		}
 	}
 	/**
 	 * 银行代扣
 	 */
-	private void BankCharge(BasicBusiness basic, CustomerInfoDto customerDto, RepaymentBizPlanList pList) {
+	private void BankCharge(BasicBusiness basic, BankCardInfo bankCardInfo, RepaymentBizPlanList pList,List<BankCardInfo> bankCardInfos) {
 		BigDecimal onlineAmount=rechargeService.getOnlineAmount(pList);
 		BigDecimal underAmount=rechargeService.getUnderlineAmount(pList);
+		Integer platformId=(Integer) PlatformEnum.YH_FORM.getValue();
 		boolean isUseThirdRepay=false;//是否调用第三方代扣
 		// 获取所有银行代扣渠道,先扣线上费用
 		List<WithholdingChannel> channels = withholdingChannelService.selectList(new EntityWrapper<WithholdingChannel>()
@@ -128,11 +139,10 @@ public class WithholdingServiceimpl implements WithholdingService {
 								boolPartRepay = 1;
 							}
 							Result result = rechargeService.recharge(basic.getBusinessId(), pList.getAfterId(),
-									customerDto.getBankBindCardNo(), repayMoney.doubleValue(), customerDto.getPlatformId(),
-									merchOrderId);
+									bankCardInfo.getBankCardName(), repayMoney.doubleValue(), platformId,
+									merchOrderId,bankCardInfo);
 							if (result.getCode().equals("1")) {
-								rechargeService.recordRepaymentLog(result, pList, basic, customerDto,
-										channel.getPlatformId(), 1, boolPartRepay, merchOrderId, 0,
+								rechargeService.recordRepaymentLog(result, pList, basic, bankCardInfo,platformId, 1, boolPartRepay, merchOrderId, 0,
 										repayMoney);
 								break;
 							} else {
@@ -140,8 +150,8 @@ public class WithholdingServiceimpl implements WithholdingService {
 								if (IsNoEnoughMoney(result.getMsg())) {
 									break;
 								} else {
-									rechargeService.recordRepaymentLog(result, pList, basic, customerDto,
-											channel.getPlatformId(), 1, boolPartRepay, merchOrderId, 0,
+									rechargeService.recordRepaymentLog(result, pList, basic, bankCardInfo,
+											platformId, 1, boolPartRepay, merchOrderId, 0,
 											repayMoney);
 									isUseThirdRepay=true;
 									break;
@@ -168,18 +178,18 @@ public class WithholdingServiceimpl implements WithholdingService {
 								}
 								String merchOrderId = rechargeService.getMerchOrderId();// 获取商户订单号
 								Result result = rechargeService.recharge(basic.getBusinessId(), pList.getAfterId(),
-										customerDto.getBankBindCardNo(), currentAmount.doubleValue(),
-										customerDto.getPlatformId(), merchOrderId);
+										bankCardInfo.getBankCardNumber(), currentAmount.doubleValue(),
+										platformId, merchOrderId,bankCardInfo);
 								if (result.getCode().equals("1")) {
 									if(i==last) {//说明是最后一次代扣
 										boolLastRepay=1;
-										rechargeService.recordRepaymentLog(result, pList, basic, customerDto,
-												channel.getPlatformId(), boolLastRepay, boolPartRepay, merchOrderId, 0,
+										rechargeService.recordRepaymentLog(result, pList, basic, bankCardInfo,
+												platformId, boolLastRepay, boolPartRepay, merchOrderId, 0,
 												currentAmount);
 									   break outerloop;
 									}else {
-									rechargeService.recordRepaymentLog(result, pList, basic, customerDto,
-											channel.getPlatformId(), boolLastRepay, boolPartRepay, merchOrderId, 0,
+									rechargeService.recordRepaymentLog(result, pList, basic, bankCardInfo,
+											platformId, boolLastRepay, boolPartRepay, merchOrderId, 0,
 											currentAmount);
 									   continue;
 									}
@@ -188,7 +198,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 									// 如果是余额不足，则跳出最外层循环
 									if (IsNoEnoughMoney(result.getMsg())) {
 										// TODO,可能还要作这样的操作：扣除线下费用再尝试代扣一次
-										rechargeService.recordRepaymentLog(result, pList, basic, customerDto,
+										rechargeService.recordRepaymentLog(result, pList, basic, bankCardInfo,
 												channel.getPlatformId(), 1, boolPartRepay, merchOrderId, 0,
 												currentAmount);
 										break outerloop;
@@ -196,13 +206,13 @@ public class WithholdingServiceimpl implements WithholdingService {
 										//第一次银行代扣就失败就调用第三方平台的
 										if(i==0) {
 											isUseThirdRepay=true;
-											rechargeService.recordRepaymentLog(result, pList, basic, customerDto,
+											rechargeService.recordRepaymentLog(result, pList, basic, bankCardInfo,
 													channel.getPlatformId(), 1, boolPartRepay, merchOrderId, 0,
 													currentAmount);
 										
 										}else {
 											//非第一次银行代扣失败就跳出循环，不能混合代扣
-											rechargeService.recordRepaymentLog(result, pList, basic, customerDto,
+											rechargeService.recordRepaymentLog(result, pList, basic, bankCardInfo,
 													channel.getPlatformId(), 1, boolPartRepay, merchOrderId, 0,
 													currentAmount);
 											break outerloop;
@@ -217,21 +227,31 @@ public class WithholdingServiceimpl implements WithholdingService {
 				}
 				
 			}
-		
-
-		//调用第三方代扣,调用后面逻辑不执行
+		BankCardInfo thirtyCardInfo=rechargeService.getThirtyPlatformInfo(bankCardInfos);
+		//第一次银行代扣就失败,切换第三方代扣
 		if(isUseThirdRepay) {
 			Integer successCount=rechargeService.getBankRepaySuccessCount(pList);
 			if(successCount>0) {//如果当前期在银行代扣成功过,就不能用第三方代扣,直接条出
 				return;
 			}
-			if(customerDto.getIsBindThirdParty()==1) {//绑定了第三方平台
+		
+			if(thirtyCardInfo!=null) {//绑定了第三方平台
+					ThirdRepaymentCharge(basic, thirtyCardInfo, pList, null);
+		
+		   	
+			}else {  //没有绑定第三方平台直接跳出
+				return;
+			}
+			
+		//银行代扣成功，线下逾期费用调用第三方代扣
+		}else {
+			
+			if(thirtyCardInfo!=null) {//绑定了第三方平台	
 				if(underAmount.compareTo(BigDecimal.valueOf(0))>0) {
-					ThirdRepaymentCharge(basic, customerDto, pList, underAmount);
+					ThirdRepaymentCharge(basic, thirtyCardInfo, pList, underAmount);
 				}else {	//没有线下逾期费用直接跳出		
 					return;
 				}
-		   	
 			}else {  //没有绑定第三方平台直接跳出
 				return;
 			}
@@ -247,16 +267,24 @@ public class WithholdingServiceimpl implements WithholdingService {
 	
 	/**
 	 * 第三方代扣
+	 * underAmount不为null的话，说明只扣线下费用
 	 */
-	private void ThirdRepaymentCharge(BasicBusiness basic, CustomerInfoDto customerDto, RepaymentBizPlanList pList,BigDecimal underAmount) {
+	private void ThirdRepaymentCharge(BasicBusiness basic, BankCardInfo thirtyCardInfo, RepaymentBizPlanList pList,BigDecimal underAmount) {
 
 		// 获取所有第三方代扣渠道
 		List<WithholdingChannel> channels = withholdingChannelService.selectList(new EntityWrapper<WithholdingChannel>()
 				.ne("platform_id", PlatformEnum.YH_FORM.getValue()).eq("channel_status", 1).orderBy("level"));
-		WithholdingChannel temp = new WithholdingChannel();
-		temp.setPlatformId(Integer.valueOf(customerDto.getPlatformId()));
-		channels.add(0, temp);
-		outerloop: for (WithholdingChannel channel : channels) {
+		List<ThirdPlatform> thirdPlatforms=thirtyCardInfo.getThirdPlatformList();
+		List<WithholdingChannel> newChanels=new ArrayList();
+		//筛选出客户绑定的第三方平台列表在系统渠道表种生效的有哪几个
+		for(int i=0;i<channels.size();i++) {
+			for(int j=0;j<thirdPlatforms.size();j++) {
+				if(channels.get(i).getPlatformId()==thirdPlatforms.get(j).getPlatformID()) {
+					newChanels.add(channels.get(i));
+				}
+			}
+		}
+		outerloop: for (WithholdingChannel channel : newChanels) {
 			SysBankLimit sysBankLimit = sysBankLimitService.selectOne(
 					new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("status", 1));
 			if (sysBankLimit == null) {
@@ -283,10 +311,10 @@ public class WithholdingServiceimpl implements WithholdingService {
 							boolPartRepay = 1;
 						}
 						Result result = rechargeService.recharge(basic.getBusinessId(), pList.getAfterId(),
-								customerDto.getBankBindCardNo(), repayMoney.doubleValue(), customerDto.getPlatformId(),
-								merchOrderId);
+								thirtyCardInfo.getBankCardNumber(), repayMoney.doubleValue(), channel.getPlatformId(),
+								merchOrderId,thirtyCardInfo);
 						if (result.getCode().equals("1")) {
-							rechargeService.recordRepaymentLog(result, pList, basic, customerDto,
+							rechargeService.recordRepaymentLog(result, pList, basic, thirtyCardInfo,
 									channel.getPlatformId(), 1, boolPartRepay, merchOrderId, 0,
 									repayMoney);
 							break;
@@ -295,7 +323,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 							if (IsNoEnoughMoney(result.getMsg())) {
 								break;
 							} else {
-								rechargeService.recordRepaymentLog(result, pList, basic, customerDto,
+								rechargeService.recordRepaymentLog(result, pList, basic, thirtyCardInfo,
 										channel.getPlatformId(), 1, boolPartRepay, merchOrderId, 0,
 										repayMoney);
 								continue;
@@ -322,17 +350,17 @@ public class WithholdingServiceimpl implements WithholdingService {
 							}
 							String merchOrderId = rechargeService.getMerchOrderId();// 获取商户订单号
 							Result result = rechargeService.recharge(basic.getBusinessId(), pList.getAfterId(),
-									customerDto.getBankBindCardNo(), currentAmount.doubleValue(),
-									customerDto.getPlatformId(), merchOrderId);
+									thirtyCardInfo.getBankCardNumber(), currentAmount.doubleValue(),
+									channel.getPlatformId(), merchOrderId,thirtyCardInfo);
 							if (result.getCode().equals("1")) {
 								if(i==last) {//说明是最后一次代扣
 									boolLastRepay=1;
-									rechargeService.recordRepaymentLog(result, pList, basic, customerDto,
+									rechargeService.recordRepaymentLog(result, pList, basic, thirtyCardInfo,
 											channel.getPlatformId(), boolLastRepay, boolPartRepay, merchOrderId, 0,
 											currentAmount);
 								   break outerloop;
 								}else {
-								rechargeService.recordRepaymentLog(result, pList, basic, customerDto,
+								rechargeService.recordRepaymentLog(result, pList, basic, thirtyCardInfo,
 										channel.getPlatformId(), boolLastRepay, boolPartRepay, merchOrderId, 0,
 										currentAmount);
 								   continue;
@@ -342,12 +370,12 @@ public class WithholdingServiceimpl implements WithholdingService {
 								// 如果是余额不足，则跳出最外层循环
 								if (IsNoEnoughMoney(result.getMsg())) {
 									// TODO,可能还要作这样的操作：扣除线下费用再尝试代扣一次
-									rechargeService.recordRepaymentLog(result, pList, basic, customerDto,
+									rechargeService.recordRepaymentLog(result, pList, basic, thirtyCardInfo,
 											channel.getPlatformId(), 1, boolPartRepay, merchOrderId, 0,
 											currentAmount);
 									break outerloop;
 								} else {
-									rechargeService.recordRepaymentLog(result, pList, basic, customerDto,
+									rechargeService.recordRepaymentLog(result, pList, basic, thirtyCardInfo,
 											channel.getPlatformId(), 1, boolPartRepay, merchOrderId, 0,
 											currentAmount);
 									break;
@@ -371,6 +399,9 @@ public class WithholdingServiceimpl implements WithholdingService {
 		}
 		return isNoEnoughMoney;
 	}
+	
+	
+
 	
 
 }
