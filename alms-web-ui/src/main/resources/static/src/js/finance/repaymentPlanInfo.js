@@ -162,7 +162,7 @@ window.layinit(function (htConfig) {
              * 根据业务编号获取业务维度的还款计划信息
              */
             queryRepaymentPlanInfoByBusinessId: function(){
-            	if (!this.bizRepaymentPlanList || this.bizRepaymentPlanList.length == 0) {
+            	if (this.bizRepaymentPlanList == null || this.bizRepaymentPlanList.length == 0) {
             		axios.get(financeBasePath +"finance/queryRepaymentPlanInfoByBusinessId?businessId=" + businessId)
         	        .then(function (res) {
         	            if (res.data.data != null && res.data.code == 1) {
@@ -260,7 +260,7 @@ window.layinit(function (htConfig) {
              * 根据业务编号查找实还流水
              */
             queryActualPaymentByBusinessId: function(){
-            	if (!this.actualPaymentRecordList || this.actualPaymentRecordList.length == 0) {
+            	if (this.actualPaymentRecordList == null || this.actualPaymentRecordList.length == 0) {
             		axios.get(financeBasePath +"finance/queryActualPaymentByBusinessId?businessId=" + businessId)
                 	.then(function (res) {
                 		if (res.data.data != null && res.data.code == 1) {

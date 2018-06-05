@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-    <title>合规化还款管理</title>
+    <title>合规化还款</title>
     <!-- 默认主题样式 -->
     <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
     <!-- iview样式 -->
@@ -43,15 +43,164 @@
     <!--引入公共的一些方法-->
     <script src="/src/js/comm.js"></script>
 	<script src="/properties/config.js"></script>
-	
+	<style>
+		.boder{
+			border:1px dashed red
+		}
+	</style>
 </head>
 <body>
 <div id="app" v-cloak>
 	<Card>
 		<row>
-			<p>aaa啊啊啊</p>
+			<i-col span="5" offset="8">
+				财务确认日期：
+		    	<date-picker type="daterange"></date-picker>
+		    </i-col>
+			<i-col span="3">
+				分发状态：
+				<i-select  clearable filterable style="width:100px">
+      				<i-option :value="1">全部</i-option>
+      				<i-option :value="2">待分发</i-option>
+      				<i-option :value="3">分发成功</i-option>
+      				<i-option :value="4">分发失败</i-option>
+      				<i-option :value="5">分发处理中</i-option>
+  				</i-select>
+			</i-col>
+			<i-col span="3">
+				还款方式：
+				<i-select  clearable filterable style="width:100px">
+      				<i-option :value="1">全部</i-option>
+      				<i-option :value="2">转账还款</i-option>
+      				<i-option :value="3">第三方代扣</i-option>
+      				<i-option :value="4">银行代扣</i-option>
+      				<i-option :value="5">网关充值</i-option>
+  				</i-select>
+			</i-col>
+			<i-col span="3">
+				期数类型：
+				<i-select  clearable filterable style="width:100px">
+      				<i-option :value="1">全部</i-option>
+      				<i-option :value="2">结清</i-option>
+      				<i-option :value="3">展期结清</i-option>
+      				<i-option :value="4">正常还款</i-option>
+  				</i-select>
+			</i-col>
+			<i-col span="1">
+				<i-button type="primary" @click="">查询</i-button>
+			</i-col>
+			<i-col span="1">
+				<i-button type="primary" @click="">导出</i-button>
+			</i-col>
+	    </row>
+	    
+		<row style="margin-top:1rem">
+			<i-col span="5" offset="8">
+				编号：
+		    	<i-input  type="info" style="width:243px"/>
+		    </i-col>
+			<i-col span="3">
+				业务类型：
+				<i-select  clearable filterable style="width:100px">
+      				<i-option :value="1">全部</i-option>
+      				<i-option :value="2">房速贷</i-option>
+      				<i-option :value="3">车易贷</i-option>
+      				<i-option :value="4">一点车贷</i-option>
+  				</i-select>
+			</i-col>
+			<i-col span="3">
+				平台状态：
+				<i-select  clearable filterable style="width:100px">
+      				<i-option :value="1">全部</i-option>
+      				<i-option :value="2">已还款</i-option>
+      				<i-option :value="3">未还款</i-option>
+      				<i-option :value="4">已代偿</i-option>
+  				</i-select>
+			</i-col>
+			<i-col span="3">
+				分公司：
+				<i-select  clearable filterable style="width:115px">
+      				<i-option :value="1">全部</i-option>
+  				</i-select>
+			</i-col>
+			<i-col span="2">
+				<i-button type="primary" @click="">刷新资金分发状态</i-button>
+			</i-col>
 	    </row>
     </Card>
+    
+    <Card>
+		<i-button type="primary" @click="" style="margin-right:1rem">资金分发</i-button>
+		<i-button type="primary" @click="openRechargeModal" style="margin-right:1rem">充值</i-button>
+		<i-button type="primary" @click="" style="margin-right:1rem">查看充值记录</i-button>
+		<i-button type="primary" @click="" style="margin-right:1rem">查看账户余额</i-button>
+	</Card>
+	
+	<Modal v-model="rechargeModal" title="代充值账户充值" width="1500">
+		<i-form ref="rechargeModalForm" :model="rechargeModalForm" label-position="right" label-width="150">
+			<form-item label="代充值账户：" prop="rechargeAccount">
+				<row>
+					<i-col>
+						<i-select v-model="rechargeModalForm.rechargeAccountType" clearable filterable style="width:200px" 
+									@on-change="rechargeModalForm.rechargeAccountType == '' ? '' : queryUserAviMoney()">
+                            <i-option value="车贷代充值账户">车贷代充值账户</i-option>
+                            <i-option value="房贷代充值账户">房贷代充值账户</i-option>
+                            <i-option value="扶贫贷代充值账户">扶贫贷代充值账户</i-option>
+                            <i-option value="闪贷业务代充值账户">闪贷业务代充值账户</i-option>
+                            <i-option value="车全业务代充值账户">车全业务代充值账户</i-option>
+                            <i-option value="二手车业务代充值账户">二手车业务代充值账户</i-option>
+                            <i-option value="一点车贷代充值账户">一点车贷代充值账户</i-option>
+		  				</i-select>
+		  				<span style="color: red">{{rechargeModalForm.rechargeAccountBalance?numeral(rechargeModalForm.rechargeAccountBalance).format('0,0.00'):''}}</span>
+					</i-col>
+				</row>
+			</form-item>
+			<form-item label="转账类型：" prop="transferType">
+				<row>
+					<i-col>
+						<radio-group v-model="rechargeModalForm.transferType" >
+				           	<radio label="1">
+				            	<span>对公</span>
+					        </radio>
+			             	<radio label="2">
+				            	<span>对私</span>
+			       			</radio>
+				        </radio-group>
+					</i-col>
+				</row>
+			</form-item>
+			<form-item label="充值金额（元）：" prop="rechargeAmount">
+				<row>
+					<i-col>
+						<i-input v-model="rechargeModalForm.rechargeAmount" style="width: 200px"/>
+					</i-col>
+				</row>
+			</form-item>
+			<form-item label="充值来源账户：" prop="rechargeSourseAccount">
+				<row>
+					<i-col>
+						<i-select v-model="rechargeModalForm.rechargeSourseAccount" clearable filterable style="width:200px" @on-change="queryBankAccount(rechargeModalForm.rechargeSourseAccount)">
+		      				<i-option v-for="(item, index) in bankAccountList" :value="item.financeName" :key="item.accountId">{{item.financeName}}</i-option>
+		  				</i-select>
+						<span style="color: red">{{ rechargeModalForm.bankAccount }}</span>
+					</i-col>
+				</row>
+			</form-item>
+			<form-item label="选择银行：" prop="bankCode">
+				<row>
+					<i-col span="6" v-for="item in bankCodeList" style="margin-top:1rem" v-model="rechargeModalForm.bankCode">
+						<img :src="handleImgUri(item)" :class="rechargeModalForm.bankCode==item?'boder':''" @click="rechargeModalForm.bankCode=item">
+					</i-col>
+				</row>
+			</form-item>
+	   	</i-form>
+		<row slot="footer" >
+            <div class="layui-btn-group" style ="float: left">
+                <button class="layui-btn" @click="rechargeModalCommit">提交</button>
+                <button class="layui-btn layui-btn-danger" @click="closeModal">关闭</button>
+            </div>
+   		</row>
+	</Modal>
 </div>
 <script src="/src/js/compliance/index.js" ></script>
 </body>

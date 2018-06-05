@@ -149,8 +149,8 @@ window.layinit(function (htConfig) {
             factRepaymentInfo: {
                 repayDate: '',
                 surplusFund: 0,
-                onlineOverDuel: '',
-                offlineOverDue: '',
+                onlineOverDue: 0,
+                offlineOverDue: 0,
                 remark: '',
                 canUseSurplus: 0,
                 moneyPoolAccount: 0,
@@ -194,6 +194,8 @@ window.layinit(function (htConfig) {
                 }
             },
             'factRepaymentInfo.repayAccount': function (n) {
+                app.factRepaymentInfo.offlineOverDue = app.thisTimeRepaymentInfo.offlineOverDue
+                app.factRepaymentInfo.onlineOverDue = app.thisTimeRepaymentInfo.onlineOverDue
                 app.previewConfirmRepayment()
             }
         },
@@ -361,8 +363,8 @@ window.layinit(function (htConfig) {
                     app.factRepayPreview.item20 = 0
                     app.factRepayPreview.item30 = 0
                     app.factRepayPreview.item50 = 0
-                    app.factRepayPreview.offlineOverDue = 0
-                    app.factRepayPreview.onlineOverDue = 0
+                    // app.factRepayPreview.offlineOverDue = 0
+                    // app.factRepayPreview.onlineOverDue = 0
                     app.factRepayPreview.subTotal = 0
                     app.factRepayPreview.total = 0
                     app.factRepayPreview.surplus = 0
@@ -372,8 +374,8 @@ window.layinit(function (htConfig) {
                         app.factRepayPreview.item20 += e.item20
                         app.factRepayPreview.item30 += e.item30
                         app.factRepayPreview.item50 += e.item50
-                        app.factRepayPreview.offlineOverDue += e.offlineOverDue
-                        app.factRepayPreview.onlineOverDue += e.onlineOverDue
+                        // app.factRepayPreview.offlineOverDue += e.offlineOverDue
+                        // app.factRepayPreview.onlineOverDue += e.onlineOverDue
                         app.factRepayPreview.subTotal += e.subTotal
                         app.factRepayPreview.total += e.total
                     })
