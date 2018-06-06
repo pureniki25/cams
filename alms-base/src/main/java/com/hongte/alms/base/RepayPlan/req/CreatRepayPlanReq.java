@@ -3,6 +3,7 @@ package com.hongte.alms.base.RepayPlan.req;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -20,11 +21,13 @@ public class CreatRepayPlanReq {
      */
     @ApiModelProperty(required= true,value = "业务基本信息")
     @NotNull(message = "业务基本信息(businessBasicInfoReq)不能为空")
+    @Valid
     private BusinessBasicInfoReq businessBasicInfoReq;
 
 
     @ApiModelProperty(required= true,value = "业务用户信息列表")
     @NotNull(message = "业务用户信息列表(bizCusInfoReqs)不能为空")
+    @Valid
     private List<BusinessCustomerInfoReq> bizCusInfoReqs;
 
 //    @ApiModelProperty(value = "业务额外的费率信息列表")
@@ -72,6 +75,7 @@ public class CreatRepayPlanReq {
      *  上标信息
      */
     @ApiModelProperty(required= true,value = "上标信息")
+    @Valid
     private  List<ProjInfoReq> projInfoReqs;
 
 

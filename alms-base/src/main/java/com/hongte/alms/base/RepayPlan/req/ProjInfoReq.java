@@ -3,6 +3,7 @@ package com.hongte.alms.base.RepayPlan.req;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -35,6 +36,7 @@ public class ProjInfoReq {
      */
     @ApiModelProperty(required= true,value = "标的的出款费用信息列表")
     @NotNull(message="的费用信息列表(projFeeInfos)不能为空")
+    @Valid
     private List<ProjFeeReq> projFeeInfos;
 
 
@@ -319,11 +321,12 @@ public class ProjInfoReq {
 //     */
 //    @ApiModelProperty(required= true,value = "年化利率")
 //    private BigDecimal interestRate;
-//    /**
-//     * 逾期年利率
-//     */
-//    @ApiModelProperty(required= true,value = "逾期年利率")
-//    private BigDecimal overRate;
+    /**
+     * 逾期年利率
+     */
+    @ApiModelProperty(required= true,value = "逾期年利率")
+    @NotNull(message="逾期年利率(overRate)不能为空")
+    private BigDecimal overRate;
     /**
      * 性别
      */
@@ -514,7 +517,7 @@ public class ProjInfoReq {
      * 每月还本金额
      */
     @ApiModelProperty(required= true,value = "每月还本金额")
-    @NotNull(message="每月还本金额(monthPrincipalAmount)不能为空")
+    //@NotNull(message="每月还本金额(monthPrincipalAmount)不能为空")
     private BigDecimal monthPrincipalAmount;
 
 
@@ -1461,5 +1464,29 @@ public class ProjInfoReq {
 
     public void setCustomerId(String customerId) {
         this.customerId = customerId;
+    }
+
+    public BigDecimal getOverRate() {
+        return overRate;
+    }
+
+    public void setOverRate(BigDecimal overRate) {
+        this.overRate = overRate;
+    }
+
+    public BigDecimal getMonthPrincipalAmount() {
+        return monthPrincipalAmount;
+    }
+
+    public void setMonthPrincipalAmount(BigDecimal monthPrincipalAmount) {
+        this.monthPrincipalAmount = monthPrincipalAmount;
+    }
+
+    public Integer getBorrowLimit() {
+        return borrowLimit;
+    }
+
+    public void setBorrowLimit(Integer borrowLimit) {
+        this.borrowLimit = borrowLimit;
     }
 }
