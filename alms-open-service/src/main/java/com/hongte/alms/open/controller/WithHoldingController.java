@@ -74,6 +74,7 @@ public class WithHoldingController {
 	) {
 		try {
           
+			logger.info("执行代扣调用的apiUrl:"+apiUrl+"");
 			WithHoldingInfo info = new WithHoldingInfo();
 			RequestData requestData = new RequestData();
 			info.setBusinessId(originalBusinessId);
