@@ -15,6 +15,8 @@ import com.hongte.alms.common.util.EncryptionResult;
 import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.open.service.WithHoldingXinDaiService;
 import com.hongte.alms.open.vo.*;
+import com.ht.ussp.util.DateUtil;
+
 import feign.Feign;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -80,7 +82,7 @@ public class WithHoldingController {
 			info.setBusinessId(originalBusinessId);
 			info.setAfterId(afterId);
 			info.setOverduemoney(planOverDueMoney);
-			info.setFactDate(nowdate);
+			info.setFactDate(DateUtil.formatDate(new Date()));
 			info.setRepayplatform(Integer.valueOf(platformId));
 			info.setType(Integer.valueOf(type));
 			info.setNowRepayMoney(total);

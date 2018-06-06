@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.TdrepayRechargeLogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.TdrepayRechargeLog">
+        <id column="log_id" property="logId" />
+        <result column="project_id" property="projectId" />
+        <result column="asset_type" property="assetType" />
+        <result column="orig_business_id" property="origBusinessId" />
+        <result column="business_type" property="businessType" />
+        <result column="repayment_type" property="repaymentType" />
+        <result column="fact_repay_date" property="factRepayDate" />
+        <result column="customer_name" property="customerName" />
+        <result column="company_name" property="companyName" />
+        <result column="repay_source" property="repaySource" />
+        <result column="after_id" property="afterId" />
+        <result column="td_user_id" property="tdUserId" />
+        <result column="total_amount" property="totalAmount" />
+        <result column="batch_id" property="batchId" />
+        <result column="period" property="period" />
+        <result column="user_id" property="userId" />
+        <result column="recharge_amount" property="rechargeAmount" />
+        <result column="settle_type" property="settleType" />
+        <result column="fact_repay_amount" property="factRepayAmount" />
+        <result column="resource_amount" property="resourceAmount" />
+        <result column="advance_type" property="advanceType" />
+        <result column="is_complete" property="isComplete" />
+        <result column="proj_plan_list_id" property="projPlanListId" />
+        <result column="request_no" property="requestNo" />
+        <result column="user_ip" property="userIp" />
+        <result column="oid_partner" property="oidPartner" />
+        <result column="plat_status" property="platStatus" />
+        <result column="platform_repay_status" property="platformRepayStatus" />
+        <result column="process_status" property="processStatus" />
+        <result column="create_user" property="createUser" />
+        <result column="create_time" property="createTime" />
+        <result column="update_user" property="updateUser" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        log_id AS logId, project_id AS projectId, asset_type AS assetType, orig_business_id AS origBusinessId, business_type AS businessType, repayment_type AS repaymentType, fact_repay_date AS factRepayDate, customer_name AS customerName, company_name AS companyName, repay_source AS repaySource, after_id AS afterId, td_user_id AS tdUserId, total_amount AS totalAmount, batch_id AS batchId, period, user_id AS userId, recharge_amount AS rechargeAmount, settle_type AS settleType, fact_repay_amount AS factRepayAmount, resource_amount AS resourceAmount, advance_type AS advanceType, is_complete AS isComplete, proj_plan_list_id AS projPlanListId, request_no AS requestNo, user_ip AS userIp, oid_partner AS oidPartner, plat_status AS platStatus, platform_repay_status AS platformRepayStatus, process_status AS processStatus, create_user AS createUser, create_time AS createTime, update_user AS updateUser, update_time AS updateTime
+    </sql>
+
+</mapper>

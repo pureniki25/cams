@@ -219,6 +219,7 @@ public class FinanceServiceImpl implements FinanceService {
 		moneyPool.setTradePlace(dto.getTradePlace() != null ? dto.getTradePlace() : null);
 		moneyPool.setRemitBank(dto.getFactRepaymentUser());
 		moneyPool.setUpdateTime(now);
+		
 		moneyPool.setUpdateUser(loginUserInfoHelper.getUserId());
 		moneyPoolRepayment.setState(moneyPool.getFinanceStatus());
 		moneyPoolRepayment.setOriginalBusinessId(dto.getBusinessId());
@@ -229,16 +230,15 @@ public class FinanceServiceImpl implements FinanceService {
 		moneyPoolRepayment.setMoneyPoolId(moneyPool.getMoneyPoolId());
 		moneyPoolRepayment.setUpdateTime(now);
 		moneyPoolRepayment.setUpdateUser(loginUserInfoHelper.getUserId());
-		moneyPoolRepayment.setBankAccount(dto.getAcceptBank());
+		
 		moneyPoolRepayment.setCertificatePictureUrl(dto.getCert());
-		moneyPoolRepayment.setCreateTime(now);
-		moneyPoolRepayment.setUpdateTime(now);
-		moneyPoolRepayment.setUpdateUser(dto.getUserId());
-		moneyPoolRepayment.setCreateUser(dto.getUserId());
-		moneyPoolRepayment.setFactTransferName(dto.getFactRepaymentUser());
+		moneyPoolRepayment.setBankAccount(dto.getAcceptBank());
+		moneyPoolRepayment.setAccountMoney(new BigDecimal(dto.getRepaymentMoney()));
+		moneyPoolRepayment.setTradeType(dto.getTradeType());
+		moneyPoolRepayment.setTradeDate(moneyPool.getTradeDate());
 		moneyPoolRepayment.setRemark(dto.getRemark());
 		moneyPoolRepayment.setTradePlace(dto.getTradePlace());
-		moneyPoolRepayment.setTradeType(dto.getTradeType());
+		moneyPoolRepayment.setFactTransferName(dto.getFactRepaymentUser());
 		
 		boolean updateMP = moneyPool.updateAllColumnById();
 		boolean updateMPR = moneyPoolRepayment.updateAllColumnById();
