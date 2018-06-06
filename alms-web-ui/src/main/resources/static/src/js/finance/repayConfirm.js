@@ -181,7 +181,9 @@ window.layinit(function (htConfig) {
                     app.factRepaymentInfo.repayDate = o.tradeDate
                 }
                 app.factRepaymentInfo.moneyPoolAccount = moneyPoolAccount
-                app.factRepaymentInfo.repayAccount = parseFloat(app.factRepaymentInfo.moneyPoolAccount)  + parseFloat(app.factRepaymentInfo.surplusFund || 0)
+                
+                // app.factRepaymentInfo.repayAccount = parseFloat(app.factRepaymentInfo.moneyPoolAccount.toFixed(2))  + parseFloat(app.factRepaymentInfo.surplusFund.toFixed(2) || 0)
+                app.factRepaymentInfo.repayAccount = (app.factRepaymentInfo.moneyPoolAccount*100+(app.factRepaymentInfo.surplusFund||0)*100)/100
             },
             'factRepaymentInfo.useSurplusflag':function(n,o){
                 if(o==''){
@@ -196,7 +198,8 @@ window.layinit(function (htConfig) {
                         app.factRepaymentInfo.surplusFund = 0
                         return;
                     }
-                    app.factRepaymentInfo.repayAccount = parseFloat(app.factRepaymentInfo.moneyPoolAccount) + parseFloat(app.factRepaymentInfo.surplusFund || 0)
+                    app.factRepaymentInfo.repayAccount = (app.factRepaymentInfo.moneyPoolAccount*100+(app.factRepaymentInfo.surplusFund||0)*100)/100
+                    // app.factRepaymentInfo.repayAccount = parseFloat(app.factRepaymentInfo.moneyPoolAccount.toFixed(2)) + parseFloat(app.factRepaymentInfo.surplusFund.toFixed(2) || 0)
                 }
             },
             // 'factRepayPreview.offlineOverDue':function(n){
@@ -405,7 +408,7 @@ window.layinit(function (htConfig) {
                     app.factRepayPreview.total = 0
                     app.factRepayPreview.surplus = 0
                     app.table.projRepayment.data.forEach(e => {
-                        app.factRepayPreview.surplus += e.surplus
+                        app.factRepayPreview.surplus +=  e.surplus
                         app.factRepayPreview.item10 += e.item10
                         app.factRepayPreview.item20 += e.item20
                         app.factRepayPreview.item30 += e.item30
@@ -415,6 +418,10 @@ window.layinit(function (htConfig) {
                         app.factRepayPreview.subTotal += e.subTotal
                         app.factRepayPreview.total += e.total
                     })
+
+                    // app.factRepayPreview.surplus = parseFloat(app.factRepayPreview.surplus.toFixed(2))
+                    // app.factRepayPreview.subTotal = parseFloat(app.factRepayPreview.subTotal.toFixed(2))
+                    app.factRepayPreview.total = (app.factRepayPreview.subTotal*1000 + app.factRepayPreview.surplus*1000)/1000
                 },
                 confirmRepayment() {
                     let param = {};
