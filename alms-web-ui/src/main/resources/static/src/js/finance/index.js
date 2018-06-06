@@ -183,8 +183,8 @@ window.layinit(function (htConfig) {
                                 return h('li', [
                                     h('i-button', {
                                         class: ['menuItem'],
-                                        props:{
-                                            long:true
+                                        props: {
+                                            long: true
                                         },
                                         on: {
                                             click: function () {
@@ -319,7 +319,8 @@ window.layinit(function (htConfig) {
 
                 ],
                 data: [],
-                total: 0
+                total: 0,
+                loading: false
             }
         },
         watch: {
@@ -353,10 +354,13 @@ window.layinit(function (htConfig) {
                     duration: 0,
                     content: '数据加载中...',
                 })
+
+                this.table.loading = true
                 axios.get(fpath + 'finance/getFinanceMangerList', {
                         params: params
                     })
                     .then(function (res) {
+                        app.table.loading = false
                         app.$Message.destroy()
                         if (res.data.code == '0') {
                             app.table.data = res.data.data
@@ -369,6 +373,7 @@ window.layinit(function (htConfig) {
                         }
                     })
                     .catch(function (err) {
+                        app.table.loading = false
                         app.$Message.destroy()
                         app.$Message.error({
                             content: '获取列表数据失败'

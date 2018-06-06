@@ -415,6 +415,10 @@ window.layinit(function (htConfig) {
                         app.factRepayPreview.subTotal += e.subTotal
                         app.factRepayPreview.total += e.total
                     })
+
+                    app.factRepayPreview.surplus = parseFloat(app.factRepayPreview.surplus.toFixed(2))
+                    app.factRepayPreview.subTotal = parseFloat(app.factRepayPreview.subTotal.toFixed(2))
+                    app.factRepayPreview.total = app.factRepayPreview.subTotal + app.factRepayPreview.surplus
                 },
                 confirmRepayment() {
                     let param = {};
