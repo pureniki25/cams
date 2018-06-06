@@ -177,7 +177,7 @@ window.layinit(function (htConfig) {
                 let moneyPoolAccount = 0
                 if (n && n.length > 0) {
                     n.forEach(element => {
-                        moneyPoolAccount += element.accountMoney
+                        moneyPoolAccount = (moneyPoolAccount*1000+element.accountMoney*1000)/1000
                         app.factRepaymentInfo.mprIds.push(element.mprId);
                     });
                     let o = n[n.length - 1]
@@ -186,7 +186,7 @@ window.layinit(function (htConfig) {
                 app.factRepaymentInfo.moneyPoolAccount = moneyPoolAccount
                 
                 // app.factRepaymentInfo.repayAccount = parseFloat(app.factRepaymentInfo.moneyPoolAccount.toFixed(2))  + parseFloat(app.factRepaymentInfo.surplusFund.toFixed(2) || 0)
-                app.factRepaymentInfo.repayAccount = (app.factRepaymentInfo.moneyPoolAccount*100+(app.factRepaymentInfo.surplusFund||0)*100)/100
+                app.factRepaymentInfo.repayAccount = (app.factRepaymentInfo.moneyPoolAccount*1000+(app.factRepaymentInfo.surplusFund||0)*1000)/1000
             },
             'factRepaymentInfo.useSurplusflag':function(n,o){
                 if(o==''){
@@ -201,7 +201,7 @@ window.layinit(function (htConfig) {
                         app.factRepaymentInfo.surplusFund = 0
                         return;
                     }
-                    app.factRepaymentInfo.repayAccount = (app.factRepaymentInfo.moneyPoolAccount*100+(app.factRepaymentInfo.surplusFund||0)*100)/100
+                    app.factRepaymentInfo.repayAccount = (app.factRepaymentInfo.moneyPoolAccount*1000+(app.factRepaymentInfo.surplusFund||0)*1000)/1000
                     // app.factRepaymentInfo.repayAccount = parseFloat(app.factRepaymentInfo.moneyPoolAccount.toFixed(2)) + parseFloat(app.factRepaymentInfo.surplusFund.toFixed(2) || 0)
                 }
             },
@@ -413,15 +413,15 @@ window.layinit(function (htConfig) {
                     app.factRepayPreview.total = 0
                     app.factRepayPreview.surplus = 0
                     app.table.projRepayment.data.forEach(e => {
-                        app.factRepayPreview.surplus +=  e.surplus
-                        app.factRepayPreview.item10 += e.item10
-                        app.factRepayPreview.item20 += e.item20
-                        app.factRepayPreview.item30 += e.item30
-                        app.factRepayPreview.item50 += e.item50
-                        app.factRepayPreview.offlineOverDue += e.offlineOverDue
-                        app.factRepayPreview.onlineOverDue += e.onlineOverDue
-                        app.factRepayPreview.subTotal += e.subTotal
-                        app.factRepayPreview.total += e.total
+                        app.factRepayPreview.surplus +=  e.surplus*1000/1000
+                        app.factRepayPreview.item10 += e.item10*1000/1000
+                        app.factRepayPreview.item20 += e.item20*1000/1000
+                        app.factRepayPreview.item30 += e.item30*1000/1000
+                        app.factRepayPreview.item50 += e.item50*1000/1000
+                        app.factRepayPreview.offlineOverDue += e.offlineOverDue*1000/1000
+                        app.factRepayPreview.onlineOverDue += e.onlineOverDue*1000/1000
+                        app.factRepayPreview.subTotal += e.subTotal*1000/1000
+                        app.factRepayPreview.total += e.total*1000/1000
                     })
 
                     // app.factRepayPreview.surplus = parseFloat(app.factRepayPreview.surplus.toFixed(2))
