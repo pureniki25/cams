@@ -29,7 +29,7 @@ public class RechargeModalVO implements Serializable {
 	/**
 	 * 代充值账户余额
 	 */
-	private String rechargeAccountBalance;
+	private Double rechargeAccountBalance;
 	/**
 	 * 银行账号
 	 */
@@ -75,11 +75,11 @@ public class RechargeModalVO implements Serializable {
 		this.bankCode = bankCode;
 	}
 
-	public String getRechargeAccountBalance() {
+	public Double getRechargeAccountBalance() {
 		return rechargeAccountBalance;
 	}
 
-	public void setRechargeAccountBalance(String rechargeAccountBalance) {
+	public void setRechargeAccountBalance(Double rechargeAccountBalance) {
 		this.rechargeAccountBalance = rechargeAccountBalance;
 	}
 
