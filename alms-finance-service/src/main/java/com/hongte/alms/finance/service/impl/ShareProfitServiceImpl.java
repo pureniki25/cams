@@ -1,6 +1,7 @@
 package com.hongte.alms.finance.service.impl;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -463,7 +464,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			if (i == dto.getProjPlanDtos().size() - 1) {
 				repaymentProjPlanDto.setDivideAmount(moneyCopy);
 			} else {
-				BigDecimal dmoney = money.multiply(repaymentProjPlanDto.getProportion());
+				BigDecimal dmoney = money.multiply(repaymentProjPlanDto.getProportion()).setScale(2, RoundingMode.HALF_UP);
 				repaymentProjPlanDto.setDivideAmount(dmoney);
 				moneyCopy = moneyCopy.subtract(dmoney);
 			}
@@ -493,7 +494,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 					repaymentProjPlanDto.setOfflineOverDue(moneyCopy);
 				}
 			} else {
-				BigDecimal dmoney = money.multiply(repaymentProjPlanDto.getProportion());
+				BigDecimal dmoney = money.multiply(repaymentProjPlanDto.getProportion()).setScale(2,RoundingMode.HALF_UP);
 				if (online) {
 					repaymentProjPlanDto.setOnlineOverDue(moneyCopy);
 				} else {
