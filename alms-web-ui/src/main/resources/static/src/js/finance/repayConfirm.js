@@ -52,6 +52,9 @@ window.layinit(function (htConfig) {
                         title: '展开',
                         type: 'expand',
                         render: (h, p) => {
+                            if(p.row.type=='差额'){
+                                return ;
+                            }
                             return h('i-table', {
                                 props: {
                                     stripe: true,
@@ -327,26 +330,28 @@ window.layinit(function (htConfig) {
                             if(res.data.data.length>1){
                                 res.data.data.forEach((element,index) => {
                                     if (index > 0) {
-                                        chaer.item10 = e1.item10 - element.item10
-                                        chaer.item20 = e1.item20 - element.item20
-                                        chaer.item30 = e1.item30 - element.item30
-                                        chaer.item50 = e1.item50 - element.item50
-                                        chaer.subtotal = e1.subtotal - element.subtotal
-                                        chaer.offlineOverDue = e1.offlineOverDue - element.offlineOverDue
-                                        chaer.onlineOverDue = e1.onlineOverDue - element.onlineOverDue
-                                        chaer.total = e1.total - element.total
+                                        chaer.item10 = -(e1.item10 - element.item10)
+                                        chaer.item20 = -(e1.item20 - element.item20)
+                                        chaer.item30 = -(e1.item30 - element.item30)
+                                        chaer.item50 = -(e1.item50 - element.item50)
+                                        chaer.subtotal = -(e1.subtotal - element.subtotal)
+                                        chaer.offlineOverDue = -(e1.offlineOverDue - element.offlineOverDue)
+                                        chaer.onlineOverDue = -(e1.onlineOverDue - element.onlineOverDue)
+                                        chaer.total = -(e1.total - element.total)
                                     } 
                                 });
                             }else {
-                                chaer.item10 = e1.item10
-                                chaer.item20 = e1.item20
-                                chaer.item30 = e1.item30
-                                chaer.item50 = e1.item50
-                                chaer.subtotal = e1.subtotal
-                                chaer.offlineOverDue = e1.offlineOverDue
-                                chaer.onlineOverDue = e1.onlineOverDue
-                                chaer.total = e1.total
+                                chaer.item10 = -e1.item10
+                                chaer.item20 = -e1.item20
+                                chaer.item30 = -e1.item30
+                                chaer.item50 = -e1.item50
+                                chaer.subtotal = -e1.subtotal
+                                chaer.offlineOverDue = -e1.offlineOverDue
+                                chaer.onlineOverDue = -e1.onlineOverDue
+                                chaer.total = -e1.total
                             }
+
+                            app.table.currPeriodRepayment.data.push(chaer)
                         } else {
                             app.$Message.error({
                                 content: res.data.msg
