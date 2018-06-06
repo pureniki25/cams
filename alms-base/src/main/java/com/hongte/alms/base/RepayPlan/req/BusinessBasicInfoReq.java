@@ -1,6 +1,7 @@
 package com.hongte.alms.base.RepayPlan.req;
 
 import com.baomidou.mybatisplus.annotations.TableField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -36,6 +37,7 @@ public class BusinessBasicInfoReq {
      */
     @ApiModelProperty(required= true,value = "进件日期")
     @NotNull(message = "BusinessBasicInfoReq进件日期(inputTime)不能为空")
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     private Date inputTime;
 
     /**

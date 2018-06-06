@@ -1,5 +1,6 @@
 package com.hongte.alms.base.RepayPlan.req;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -341,6 +342,7 @@ public class ProjInfoReq {
      * 生日
      */
     @ApiModelProperty(value = "生日")
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     private Date birthday;
     /**
      * 风险评估意见
@@ -525,6 +527,7 @@ public class ProjInfoReq {
      * 审核时间(标的状态查询接口)
      */
     @ApiModelProperty(value = "审核时间(标的状态查询接口)")
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     private Date queryAuditDate;
     /**
      * 审核结果,标审核失败时这里有原因(标的状态查询接口)
