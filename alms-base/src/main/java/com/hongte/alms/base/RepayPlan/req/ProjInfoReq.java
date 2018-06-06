@@ -1446,4 +1446,20 @@ public class ProjInfoReq {
     public void setProjExtRateReqMap(Map<String, List<ProjExtRateReq>> projExtRateReqMap) {
         this.projExtRateReqMap = projExtRateReqMap;
     }
+
+    public String getBusinessId() {
+        return businessId;
+    }
+
+    public void setBusinessId(String businessId) {
+        this.businessId = businessId;
+    }
+
+    public String getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
+    }
 }

@@ -575,6 +575,8 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         for(ProjInfoReq projInfoReq:projInfoReqs){
             TuandaiProjectInfo  projInfo = ClassCopyUtil.copy(projInfoReq,ProjInfoReq.class,TuandaiProjectInfo.class);
             projInfo.setBusinessId(basicBusiness.getBusinessId());
+            projInfo.setQueryFullSuccessDate(projInfoReq.getQueryFullsuccessDate());
+            projInfo.setBorrowLimit(basicBusiness.getBorrowLimit());
             //设置标的batchId
             boolean setBatchFlage = false;
             for(RepaymentBizPlanDto bizPlanDto: dtos){
