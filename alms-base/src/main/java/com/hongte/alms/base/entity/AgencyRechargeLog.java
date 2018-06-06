@@ -3,6 +3,7 @@ package com.hongte.alms.base.entity;
 import java.io.Serializable;
 
 import com.baomidou.mybatisplus.enums.IdType;
+import java.math.BigDecimal;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
@@ -17,7 +18,7 @@ import io.swagger.annotations.ApiModelProperty;
  * </p>
  *
  * @author 胡伟骞
- * @since 2018-06-05
+ * @since 2018-06-06
  */
 @ApiModel
 @TableName("tb_agency_recharge_log")
@@ -32,17 +33,71 @@ public class AgencyRechargeLog extends Model<AgencyRechargeLog> {
 	@ApiModelProperty(required= true,value = "主键ID")
 	private Integer id;
     /**
-     * 团贷分配，商户唯一号(测试，生产不一样)
+     * (代充值参数)代充值账户类型
+     */
+	@TableField("recharge_account_type")
+	@ApiModelProperty(required= true,value = "(代充值参数)代充值账户类型")
+	private String rechargeAccountType;
+    /**
+     * (代充值参数)转账类型(1：对公；2：对私)
+     */
+	@TableField("transfer_type")
+	@ApiModelProperty(required= true,value = "(代充值参数)转账类型(1：对公；2：对私)")
+	private String transferType;
+    /**
+     * (代充值参数)充值金额（元）
+     */
+	@TableField("recharge_amount")
+	@ApiModelProperty(required= true,value = "(代充值参数)充值金额（元）")
+	private BigDecimal rechargeAmount;
+    /**
+     * (代充值参数)充值来源账户
+     */
+	@TableField("recharge_sourse_account")
+	@ApiModelProperty(required= true,value = "(代充值参数)充值来源账户")
+	private String rechargeSourseAccount;
+    /**
+     * (代充值参数)银行编码
+     */
+	@TableField("bank_code")
+	@ApiModelProperty(required= true,value = "(代充值参数)银行编码")
+	private String bankCode;
+    /**
+     * 代充值账户余额
+     */
+	@TableField("recharge_account_balance")
+	@ApiModelProperty(required= true,value = "代充值账户余额")
+	private BigDecimal rechargeAccountBalance;
+    /**
+     * (调用外联平台接口参数)由资产端生成，作为后续查询的一个标识
+     */
+	@TableField("cm_order_no")
+	@ApiModelProperty(required= true,value = "(调用外联平台接口参数)由资产端生成，作为后续查询的一个标识")
+	private String cmOrderNo;
+    /**
+     * (调用外联平台接口参数)团贷分配，商户唯一号(测试，生产不一样)
      */
 	@TableField("oId_partner")
-	@ApiModelProperty(required= true,value = "团贷分配，商户唯一号(测试，生产不一样)")
+	@ApiModelProperty(required= true,value = "(调用外联平台接口参数)团贷分配，商户唯一号(测试，生产不一样)")
 	private String oIdPartner;
     /**
-     * 唯一ID，对应cmOrderNo订单号
+     * (调用外联平台接口参数)代充值账户userID
      */
-	@TableField("unique_id")
-	@ApiModelProperty(required= true,value = "唯一ID，对应cmOrderNo订单号")
-	private String uniqueId;
+	@TableField("recharge_user_id")
+	@ApiModelProperty(required= true,value = "(调用外联平台接口参数)代充值账户userID")
+	private String rechargeUserId;
+    /**
+     * (调用外联平台接口参数)1：网关、2：快捷、3：代充值
+     */
+	@TableField("charge_type")
+	@ApiModelProperty(required= true,value = "(调用外联平台接口参数)1：网关、2：快捷、3：代充值")
+	private String chargeType;
+    /**
+     * (调用外联平台接口参数)用户IP
+     */
+	@TableField("client_ip")
+	@ApiModelProperty(required= true,value = "(调用外联平台接口参数)用户IP")
+	private String clientIp;
     /**
      * 1处理中，2成功，3失败
      */
@@ -56,10 +111,10 @@ public class AgencyRechargeLog extends Model<AgencyRechargeLog> {
 	@ApiModelProperty(required= true,value = "请求参数JSON")
 	private String paramJson;
     /**
-     * 返回结果JSON
+     * 返回结果JSON,若调用接口异常，则保存异常信息
      */
 	@TableField("result_json")
-	@ApiModelProperty(required= true,value = "返回结果JSON")
+	@ApiModelProperty(required= true,value = "返回结果JSON,若调用接口异常，则保存异常信息")
 	private String resultJson;
     /**
      * 创建人
@@ -73,6 +128,18 @@ public class AgencyRechargeLog extends Model<AgencyRechargeLog> {
 	@TableField("create_time")
 	@ApiModelProperty(required= true,value = "创建时间")
 	private Date createTime;
+    /**
+     * 更新人
+     */
+	@TableField("update_user")
+	@ApiModelProperty(required= true,value = "更新人")
+	private String updateUser;
+    /**
+     * 更新时间
+     */
+	@TableField("update_time")
+	@ApiModelProperty(required= true,value = "更新时间")
+	private Date updateTime;
 
 
 	public Integer getId() {
@@ -83,6 +150,62 @@ public class AgencyRechargeLog extends Model<AgencyRechargeLog> {
 		this.id = id;
 	}
 
+	public String getRechargeAccountType() {
+		return rechargeAccountType;
+	}
+
+	public void setRechargeAccountType(String rechargeAccountType) {
+		this.rechargeAccountType = rechargeAccountType;
+	}
+
+	public String getTransferType() {
+		return transferType;
+	}
+
+	public void setTransferType(String transferType) {
+		this.transferType = transferType;
+	}
+
+	public BigDecimal getRechargeAmount() {
+		return rechargeAmount;
+	}
+
+	public void setRechargeAmount(BigDecimal rechargeAmount) {
+		this.rechargeAmount = rechargeAmount;
+	}
+
+	public String getRechargeSourseAccount() {
+		return rechargeSourseAccount;
+	}
+
+	public void setRechargeSourseAccount(String rechargeSourseAccount) {
+		this.rechargeSourseAccount = rechargeSourseAccount;
+	}
+
+	public String getBankCode() {
+		return bankCode;
+	}
+
+	public void setBankCode(String bankCode) {
+		this.bankCode = bankCode;
+	}
+
+	public BigDecimal getRechargeAccountBalance() {
+		return rechargeAccountBalance;
+	}
+
+	public void setRechargeAccountBalance(BigDecimal rechargeAccountBalance) {
+		this.rechargeAccountBalance = rechargeAccountBalance;
+	}
+
+	public String getCmOrderNo() {
+		return cmOrderNo;
+	}
+
+	public void setCmOrderNo(String cmOrderNo) {
+		this.cmOrderNo = cmOrderNo;
+	}
+
 	public String getoIdPartner() {
 		return oIdPartner;
 	}
@@ -91,12 +214,28 @@ public class AgencyRechargeLog extends Model<AgencyRechargeLog> {
 		this.oIdPartner = oIdPartner;
 	}
 
-	public String getUniqueId() {
-		return uniqueId;
+	public String getRechargeUserId() {
+		return rechargeUserId;
 	}
 
-	public void setUniqueId(String uniqueId) {
-		this.uniqueId = uniqueId;
+	public void setRechargeUserId(String rechargeUserId) {
+		this.rechargeUserId = rechargeUserId;
+	}
+
+	public String getChargeType() {
+		return chargeType;
+	}
+
+	public void setChargeType(String chargeType) {
+		this.chargeType = chargeType;
+	}
+
+	public String getClientIp() {
+		return clientIp;
+	}
+
+	public void setClientIp(String clientIp) {
+		this.clientIp = clientIp;
 	}
 
 	public String getHandleStatus() {
@@ -139,6 +278,22 @@ public class AgencyRechargeLog extends Model<AgencyRechargeLog> {
 		this.createTime = createTime;
 	}
 
+	public String getUpdateUser() {
+		return updateUser;
+	}
+
+	public void setUpdateUser(String updateUser) {
+		this.updateUser = updateUser;
+	}
+
+	public Date getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
+	}
+
 	@Override
 	protected Serializable pkVal() {
 		return this.id;
@@ -148,13 +303,24 @@ public class AgencyRechargeLog extends Model<AgencyRechargeLog> {
 	public String toString() {
 		return "AgencyRechargeLog{" +
 			", id=" + id +
+			", rechargeAccountType=" + rechargeAccountType +
+			", transferType=" + transferType +
+			", rechargeAmount=" + rechargeAmount +
+			", rechargeSourseAccount=" + rechargeSourseAccount +
+			", bankCode=" + bankCode +
+			", rechargeAccountBalance=" + rechargeAccountBalance +
+			", cmOrderNo=" + cmOrderNo +
 			", oIdPartner=" + oIdPartner +
-			", uniqueId=" + uniqueId +
+			", rechargeUserId=" + rechargeUserId +
+			", chargeType=" + chargeType +
+			", clientIp=" + clientIp +
 			", handleStatus=" + handleStatus +
 			", paramJson=" + paramJson +
 			", resultJson=" + resultJson +
 			", createUser=" + createUser +
 			", createTime=" + createTime +
+			", updateUser=" + updateUser +
+			", updateTime=" + updateTime +
 			"}";
 	}
 }

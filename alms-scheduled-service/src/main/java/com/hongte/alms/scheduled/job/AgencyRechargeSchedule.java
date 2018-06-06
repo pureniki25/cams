@@ -28,11 +28,10 @@ public class AgencyRechargeSchedule {
 		try {
 			LOG.info("更新代充值处理状态开始");
 			long start = System.currentTimeMillis();
-			String[] paramArr = {"1", "3"};
-			List<AgencyRechargeLog> logs = agencyRechargeLogService.selectList(new EntityWrapper<AgencyRechargeLog>().in("handle_status", paramArr));
+			List<AgencyRechargeLog> logs = agencyRechargeLogService.selectList(new EntityWrapper<AgencyRechargeLog>().eq("handle_status", "1"));
 			if (CollectionUtils.isNotEmpty(logs)) {
 				for (AgencyRechargeLog agencyRechargeLog : logs) {
-					agencyRechargeLogService.queryRechargeOrder(agencyRechargeLog.getoIdPartner(), agencyRechargeLog.getUniqueId());
+					agencyRechargeLogService.queryRechargeOrder(agencyRechargeLog.getoIdPartner(), agencyRechargeLog.getCmOrderNo());
 				}
 			}
 			long end = System.currentTimeMillis();
