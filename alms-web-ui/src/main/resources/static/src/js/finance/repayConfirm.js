@@ -414,14 +414,14 @@ window.layinit(function (htConfig) {
                     app.factRepayPreview.surplus = 0
                     app.table.projRepayment.data.forEach(e => {
                         app.factRepayPreview.surplus +=  e.surplus*1000/1000
-                        app.factRepayPreview.item10 += e.item10*1000/1000
-                        app.factRepayPreview.item20 += e.item20*1000/1000
-                        app.factRepayPreview.item30 += e.item30*1000/1000
-                        app.factRepayPreview.item50 += e.item50*1000/1000
-                        app.factRepayPreview.offlineOverDue += e.offlineOverDue*1000/1000
-                        app.factRepayPreview.onlineOverDue += e.onlineOverDue*1000/1000
-                        app.factRepayPreview.subTotal += e.subTotal*1000/1000
-                        app.factRepayPreview.total += e.total*1000/1000
+                        app.factRepayPreview.item10 = (app.factRepayPreview.item10*1000+e.item10*1000)/1000
+                        app.factRepayPreview.item20 = (app.factRepayPreview.item20*1000+e.item20*1000)/1000
+                        app.factRepayPreview.item30 = (app.factRepayPreview.item30*1000+e.item30*1000)/1000
+                        app.factRepayPreview.item50 = (app.factRepayPreview.item50*1000+e.item50*1000)/1000
+                        app.factRepayPreview.offlineOverDue = (app.factRepayPreview.offlineOverDue*1000+e.offlineOverDue*1000)/1000
+                        app.factRepayPreview.onlineOverDue = (app.factRepayPreview.onlineOverDue*1000+e.onlineOverDue*1000)/1000
+                        app.factRepayPreview.subTotal = (app.factRepayPreview.subTotal*1000+e.subTotal*1000)/1000
+                        app.factRepayPreview.total += (app.factRepayPreview.total*1000+e.total*1000)/1000
                     })
 
                     // app.factRepayPreview.surplus = parseFloat(app.factRepayPreview.surplus.toFixed(2))
