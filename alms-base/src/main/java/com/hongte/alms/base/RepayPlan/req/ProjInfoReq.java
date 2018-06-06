@@ -130,6 +130,7 @@ public class ProjInfoReq {
      */
     @ApiModelProperty(required= true,value = "启标时间(用于生成还款计划)")
     @NotNull(message="ProjInfoReq 启标时间(beginTime)不能为空")
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     private Date beginTime;
     /**
      * 满标金额(元)
@@ -175,6 +176,7 @@ public class ProjInfoReq {
      */
     @ApiModelProperty(required= true,value = "满标时间")
     @NotNull(message="ProjInfoReq 满标时间(queryFullsuccessDate)不能为空")
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     private Date queryFullsuccessDate;
     /**
      * 昵称
