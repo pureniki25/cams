@@ -141,7 +141,7 @@ public class RepayPlanController {
     public Result<PlanReturnInfoDto> creatAndSaveRepayPlan(@Validated  @RequestBody CreatRepayPlanReq creatRepayPlanReq){
 
         // =========   校验参数输入是否正确  开始  ================
-        logger.info("创建还款计划并将还款计划及业务和上标信息存储到数据库 接口 开始 输入的请求信息：[{}]", JSON.toJSONString(creatRepayPlanReq));
+//        logger.info("创建还款计划并将还款计划及业务和上标信息存储到数据库 接口 开始 输入的请求信息：[{}]", JSON.toJSONString(creatRepayPlanReq));
 //        if(bindingResult.hasErrors()){
 //            StringBuilder retErrMsg = new StringBuilder();
 //            for (FieldError fieldError : bindingResult.getFieldErrors()) {
