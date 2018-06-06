@@ -138,88 +138,88 @@ public class RepayPlanController {
     @ApiOperation(value = "创建还款计划并将还款计划及业务和上标信息存储到数据库 接口")
     @PostMapping("/creatAndSaveRepayPlan")
     @ResponseBody
-    public Result<PlanReturnInfoDto> creatAndSaveRepayPlan(@RequestBody @Valid CreatRepayPlanReq creatRepayPlanReq, BindingResult bindingResult){
+    public Result<PlanReturnInfoDto> creatAndSaveRepayPlan(@Validated  @RequestBody CreatRepayPlanReq creatRepayPlanReq){
 
         // =========   校验参数输入是否正确  开始  ================
-        logger.info("创建还款计划并将还款计划及业务和上标信息存储到数据库 接口 开始 输入的请求信息：[{}]", JSON.toJSONString(creatRepayPlanReq));
-        if(bindingResult.hasErrors()){
-            StringBuilder retErrMsg = new StringBuilder();
-            for (FieldError fieldError : bindingResult.getFieldErrors()) {
-                retErrMsg.append("   "+ fieldError.getDefaultMessage());
-            }
-            logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口,输入参数校验错误：" ,retErrMsg.toString());
-            return Result.error("9889","输入参数校验错误："+retErrMsg.toString());
-        }
+//        logger.info("创建还款计划并将还款计划及业务和上标信息存储到数据库 接口 开始 输入的请求信息：[{}]", JSON.toJSONString(creatRepayPlanReq));
+//        if(bindingResult.hasErrors()){
+//            StringBuilder retErrMsg = new StringBuilder();
+//            for (FieldError fieldError : bindingResult.getFieldErrors()) {
+//                retErrMsg.append("   "+ fieldError.getDefaultMessage());
+//            }
+//            logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口,输入参数校验错误：" ,retErrMsg.toString());
+//            return Result.error("9889","输入参数校验错误："+retErrMsg.toString());
+//        }
 
-        //== 校验业务基础信息
-        BusinessBasicInfoReq businessBasicInfoReq = creatRepayPlanReq.getBusinessBasicInfoReq();
-        Set<ConstraintViolation<BusinessBasicInfoReq>> bizInfovalit =
-                validator.validate( creatRepayPlanReq.getBusinessBasicInfoReq() );
-        if(bizInfovalit.size()>0){
-            logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口,业务信息校验出错" , bizInfovalit.iterator().next().getMessage());
-            return Result.error("9889","业务信息校验出错："+bizInfovalit.iterator().next().getMessage());
-//            constraintViolations.iterator().next().getMessage();
-        }
-
-
-        //  ==  校验业务用户信息
-
-        List<BusinessCustomerInfoReq> bizCusInfoReqs =creatRepayPlanReq.getBizCusInfoReqs();
-        for(BusinessCustomerInfoReq bizCusInfoReq:bizCusInfoReqs ){
-            Set<ConstraintViolation<BusinessCustomerInfoReq>> CusInfovalit =
-                    validator.validate( bizCusInfoReq );
-            if(bizInfovalit.size()>0){
-                logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口,用户信息校验出错  传入信息： "+ JSON.toJSONString(bizCusInfoReq)+"  错误信息：" , bizInfovalit.iterator().next().getMessage());
-                return Result.error("9889","用户信息校验出错： 传入信息： "+JSON.toJSONString(bizCusInfoReq)+"     错误信息："+bizInfovalit.iterator().next().getMessage());
-            }
-        }
-
-        //  ===校验上标信息
-//        /**
-//         *  上标信息
-//         */
-//        @ApiModelProperty(required= true,value = "上标信息")
-//        private  List<ProjInfoReq> projInfoReqs;
-        List<ProjInfoReq> projInfoReqs = creatRepayPlanReq.getProjInfoReqs();
-
-        for(ProjInfoReq  projInfoReq: projInfoReqs){
-            Set<ConstraintViolation<ProjInfoReq>> CusInfovalit =
-                    validator.validate( projInfoReq );
-            if(bizInfovalit.size()>0){
-                logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口,上标信息校验出错  传入信息： "+ JSON.toJSONString(projInfoReq)+"  错误信息：" , bizInfovalit.iterator().next().getMessage());
-                return Result.error("9889","上标信息校验出错： 传入信息： "+JSON.toJSONString(projInfoReq)+"     错误信息："+bizInfovalit.iterator().next().getMessage());
-            }
-
-            //   ==  校验标的费用信息
-//            /**
-//             * 标的费用信息列表
-//             */
-//            @ApiModelProperty(required= true,value = "标的的出款费用信息列表")
-//            private List<ProjFeeReq> projFeeInfos;
-            List<ProjFeeReq> projFeeInfos =projInfoReq.getProjFeeInfos();
-            for(ProjFeeReq projFeeReq:projFeeInfos){
-                Set<ConstraintViolation<ProjFeeReq>> projFeeReqValit =
-                        validator.validate( projFeeReq );
-                if(projFeeReqValit.size()>0){
-                    logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口,标的的出款费用信息校验出错  传入信息： "+ JSON.toJSONString(projFeeReq)+"  错误信息：" , projFeeReqValit.iterator().next().getMessage());
-                    return Result.error("9889","标的的出款费用信息校验出错： 传入信息： "+JSON.toJSONString(projFeeReq)+"     错误信息："+projFeeReqValit.iterator().next().getMessage());
-                }
-            }
-
-            // 校验标的额外费率信息
-            List<ProjExtRateReq> projExtRateReqs = projInfoReq.getProjExtRateReqs();
-            if(projExtRateReqs!=null&&projExtRateReqs.size()>0){
-                for(ProjExtRateReq projExtRateReq:projExtRateReqs){
-                    Set<ConstraintViolation<ProjExtRateReq>> projExtRateReqValit =
-                            validator.validate( projExtRateReq );
-                    if(projExtRateReqValit.size()>0){
-                        logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口,标的额外费率信息校验出错  传入信息： "+ JSON.toJSONString(projExtRateReq)+"  错误信息：" , projExtRateReqValit.iterator().next().getMessage());
-                        return Result.error("9889","标的额外费率信息校验出错： 传入信息： "+JSON.toJSONString(projExtRateReq)+"     错误信息："+projExtRateReqValit.iterator().next().getMessage());
-                    }
-                }
-            }
-
-        }
+//        //== 校验业务基础信息
+//        BusinessBasicInfoReq businessBasicInfoReq = creatRepayPlanReq.getBusinessBasicInfoReq();
+//        Set<ConstraintViolation<BusinessBasicInfoReq>> bizInfovalit =
+//                validator.validate( creatRepayPlanReq.getBusinessBasicInfoReq() );
+//        if(bizInfovalit.size()>0){
+//            logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口,业务信息校验出错" , bizInfovalit.iterator().next().getMessage());
+//            return Result.error("9889","业务信息校验出错："+bizInfovalit.iterator().next().getMessage());
+////            constraintViolations.iterator().next().getMessage();
+//        }
+//
+//
+//        //  ==  校验业务用户信息
+//
+//        List<BusinessCustomerInfoReq> bizCusInfoReqs =creatRepayPlanReq.getBizCusInfoReqs();
+//        for(BusinessCustomerInfoReq bizCusInfoReq:bizCusInfoReqs ){
+//            Set<ConstraintViolation<BusinessCustomerInfoReq>> CusInfovalit =
+//                    validator.validate( bizCusInfoReq );
+//            if(bizInfovalit.size()>0){
+//                logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口,用户信息校验出错  传入信息： "+ JSON.toJSONString(bizCusInfoReq)+"  错误信息：" , bizInfovalit.iterator().next().getMessage());
+//                return Result.error("9889","用户信息校验出错： 传入信息： "+JSON.toJSONString(bizCusInfoReq)+"     错误信息："+bizInfovalit.iterator().next().getMessage());
+//            }
+//        }
+//
+//        //  ===校验上标信息
+////        /**
+////         *  上标信息
+////         */
+////        @ApiModelProperty(required= true,value = "上标信息")
+////        private  List<ProjInfoReq> projInfoReqs;
+//        List<ProjInfoReq> projInfoReqs = creatRepayPlanReq.getProjInfoReqs();
+//
+//        for(ProjInfoReq  projInfoReq: projInfoReqs){
+//            Set<ConstraintViolation<ProjInfoReq>> CusInfovalit =
+//                    validator.validate( projInfoReq );
+//            if(bizInfovalit.size()>0){
+//                logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口,上标信息校验出错  传入信息： "+ JSON.toJSONString(projInfoReq)+"  错误信息：" , bizInfovalit.iterator().next().getMessage());
+//                return Result.error("9889","上标信息校验出错： 传入信息： "+JSON.toJSONString(projInfoReq)+"     错误信息："+bizInfovalit.iterator().next().getMessage());
+//            }
+//
+//            //   ==  校验标的费用信息
+////            /**
+////             * 标的费用信息列表
+////             */
+////            @ApiModelProperty(required= true,value = "标的的出款费用信息列表")
+////            private List<ProjFeeReq> projFeeInfos;
+//            List<ProjFeeReq> projFeeInfos =projInfoReq.getProjFeeInfos();
+//            for(ProjFeeReq projFeeReq:projFeeInfos){
+//                Set<ConstraintViolation<ProjFeeReq>> projFeeReqValit =
+//                        validator.validate( projFeeReq );
+//                if(projFeeReqValit.size()>0){
+//                    logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口,标的的出款费用信息校验出错  传入信息： "+ JSON.toJSONString(projFeeReq)+"  错误信息：" , projFeeReqValit.iterator().next().getMessage());
+//                    return Result.error("9889","标的的出款费用信息校验出错： 传入信息： "+JSON.toJSONString(projFeeReq)+"     错误信息："+projFeeReqValit.iterator().next().getMessage());
+//                }
+//            }
+//
+//            // 校验标的额外费率信息
+//            List<ProjExtRateReq> projExtRateReqs = projInfoReq.getProjExtRateReqs();
+//            if(projExtRateReqs!=null&&projExtRateReqs.size()>0){
+//                for(ProjExtRateReq projExtRateReq:projExtRateReqs){
+//                    Set<ConstraintViolation<ProjExtRateReq>> projExtRateReqValit =
+//                            validator.validate( projExtRateReq );
+//                    if(projExtRateReqValit.size()>0){
+//                        logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口,标的额外费率信息校验出错  传入信息： "+ JSON.toJSONString(projExtRateReq)+"  错误信息：" , projExtRateReqValit.iterator().next().getMessage());
+//                        return Result.error("9889","标的额外费率信息校验出错： 传入信息： "+JSON.toJSONString(projExtRateReq)+"     错误信息："+projExtRateReqValit.iterator().next().getMessage());
+//                    }
+//                }
+//            }
+//
+//        }
 
 
 

@@ -1,5 +1,6 @@
 package com.hongte.alms.base.RepayPlan.req;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -23,6 +24,7 @@ public class ProjectHouseInfoReq {
      * 购买日期
      */
     @ApiModelProperty(value = "购买日期")
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     private Date houseBuyDate;
     /**
      * 购买面积

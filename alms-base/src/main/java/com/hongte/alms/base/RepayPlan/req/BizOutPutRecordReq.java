@@ -1,5 +1,6 @@
 package com.hongte.alms.base.RepayPlan.req;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -34,6 +35,7 @@ public class BizOutPutRecordReq {
      * 实际出款时间
      */
     @ApiModelProperty(required= true,value = "实际出款时间")
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     private Date factOutputDate;
     /**
      * 出款经手人ID
@@ -79,6 +81,7 @@ public class BizOutPutRecordReq {
      * 创建时间
      */
     @ApiModelProperty(required= true,value = "创建时间")
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
     /**
      * 创建人
@@ -89,6 +92,7 @@ public class BizOutPutRecordReq {
      * 更新时间
      */
     @ApiModelProperty(value = "更新时间")
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
     /**
      * 更新人

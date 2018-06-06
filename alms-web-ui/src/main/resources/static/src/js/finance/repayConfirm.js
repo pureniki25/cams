@@ -330,14 +330,14 @@ window.layinit(function (htConfig) {
                             if(res.data.data.length>1){
                                 res.data.data.forEach((element,index) => {
                                     if (index > 0) {
-                                        chaer.item10 = -(e1.item10 - element.item10)
-                                        chaer.item20 = -(e1.item20 - element.item20)
-                                        chaer.item30 = -(e1.item30 - element.item30)
-                                        chaer.item50 = -(e1.item50 - element.item50)
-                                        chaer.subtotal = -(e1.subtotal - element.subtotal)
-                                        chaer.offlineOverDue = -(e1.offlineOverDue - element.offlineOverDue)
-                                        chaer.onlineOverDue = -(e1.onlineOverDue - element.onlineOverDue)
-                                        chaer.total = -(e1.total - element.total)
+                                        chaer.item10 = -(e1.item10*1000 - element.item10*1000)/1000
+                                        chaer.item20 = -(e1.item20*1000 - element.item20*1000)/1000
+                                        chaer.item30 = -(e1.item30*1000 - element.item30*1000)/1000
+                                        chaer.item50 = -(e1.item50*1000 - element.item50*1000)/1000
+                                        chaer.subtotal = -(e1.subtotal*1000 - element.subtotal*1000)/1000
+                                        chaer.offlineOverDue = -(e1.offlineOverDue*1000 - element.offlineOverDue*1000)/1000
+                                        chaer.onlineOverDue = -(e1.onlineOverDue*1000 - element.onlineOverDue*1000)/1000
+                                        chaer.total = -(e1.total*1000 - element.total*1000)/1000
                                     } 
                                 });
                             }else {
