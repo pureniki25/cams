@@ -138,6 +138,8 @@
 			tb_basic_company bc ON bc.area_id = b.company_id
 		LEFT JOIN
 			tb_tuandai_project_info pi ON pi.business_id = pl.business_id
+		LEFT JOIN
+			tb_money_pool_repayment mpr ON mpr.plan_list_id = pl.plan_list_id
 		<where>
 			1 = 1
 			<if test="customer != null">
@@ -164,10 +166,10 @@
 				AND pl.due_date = #{repayDate}
 			</if>
 			<if test="regDateStart != null ">
-				AND pl.fact_repay_date &gt;= #{regDateStart}
+				AND mpr.trade_date &gt;= #{regDateStart}
 			</if>
 			<if test="regDateEnd != null ">
-				AND pl.fact_repay_date &lt;= #{regDateEnd}
+				AND mpr.trade_date &lt;= #{regDateEnd}
 			</if>
 			<if test="status != null ">
 				AND pl.current_status = #{status}
@@ -226,6 +228,8 @@
 			tb_basic_company bc ON bc.area_id = b.company_id
 		LEFT JOIN
 			tb_tuandai_project_info pi ON pi.business_id = pl.business_id
+		LEFT JOIN
+			tb_money_pool_repayment mpr ON mpr.plan_list_id = pl.plan_list_id
 		<where>
 			1 = 1
 			<if test="customer != null">
@@ -252,10 +256,10 @@
 				AND pl.due_date = #{repayDate}
 			</if>
 			<if test="regDateStart != null ">
-				AND pl.fact_repay_date &gt;= #{regDateStart}
+				AND mpr.trade_date &gt;= #{regDateStart}
 			</if>
 			<if test="regDateEnd != null ">
-				AND pl.fact_repay_date &lt;= #{regDateEnd}
+				AND mpr.trade_date &lt;= #{regDateEnd}
 			</if>
 			<if test="status != null ">
 				AND pl.current_status = #{status}

@@ -53,10 +53,10 @@
                         </i-select>
                     </form-item>
                     <form-item label="应还日期">
-                        <date-picker format="yyyy-MM-dd" v-model="form.repayDate" placeholder="应还日期" clearable></date-picker>
+                        <date-picker format="yyyy-MM-dd" v-model="form.repayDate" placeholder="应还日期" @on-change="form.repayDate=$event" clearable></date-picker>
                     </form-item>
                     <form-item label="还款登记日期">
-                        <date-picker type="daterange" split-panels format="yyyy-MM-dd" v-model="form.regDate" placeholder="还款登记日期" clearable></date-picker>
+                        <date-picker type="daterange" split-panels format="yyyy-MM-dd" placeholder="还款登记日期" @on-change="form.regDateStart=$event[0];form.regDateEnd=$event[1];console.log($event);" clearable></date-picker>
                     </form-item>
                     <form-item label="还款状态">
                         <i-select v-model="form.status" placeholder="请选择" filterable clearable>
