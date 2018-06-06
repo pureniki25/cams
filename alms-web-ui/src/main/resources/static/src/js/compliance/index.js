@@ -112,11 +112,12 @@ window.layinit(function(htConfig) {
 						axios.post(basePath + 'recharge/commitRechargeData', vm.rechargeModalForm, {timeout: 0})
 						.then(function(result){
 							if (result.data.code == "1") {
+								vm.rechargeModalForm = vm.initRechargeModalForm;
 								vm.$Modal.success({
 				                    content: "提交成功",
 				                    onOk: () => {
 										vm.rechargeModal = false;
-										vm.rechargeModalForm = vm.initRechargeModalForm;
+										window.open(result.data.data.data.result);
 				                    },
 				                });
 							} else {
