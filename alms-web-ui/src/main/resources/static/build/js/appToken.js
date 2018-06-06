@@ -38,6 +38,7 @@ window.layinit = function (cb) {
         //axios 访问前处理token问题
         axios.interceptors.request.use(function (config) {
             layui.ht_ajax.validationAndRefreshToken()
+            axios.defaults.headers.common['Authorization'] = 'Bearer ' + getToken();
             return config;
         }, function (error) {
             // 对请求错误做些什么
