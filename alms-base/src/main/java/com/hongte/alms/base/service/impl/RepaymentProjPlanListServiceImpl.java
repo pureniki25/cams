@@ -345,7 +345,7 @@ public class RepaymentProjPlanListServiceImpl extends
 	            	lateFee = principalAndInterest.multiply(rate.divide(new BigDecimal(100)));
 	                break;
 	            case 5:
-	            	lateFee=principalAndInterest(projId, period);
+	            	lateFee=principalAndInterest(projId, period).multiply(rate.divide(new BigDecimal(100)));
 	            	break;
 	            	
 	        }
