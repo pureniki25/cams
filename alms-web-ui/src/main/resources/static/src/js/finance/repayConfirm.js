@@ -405,19 +405,19 @@ window.layinit(function (htConfig) {
                     app.factRepayPreview.total = 0
                     app.factRepayPreview.surplus = 0
                     app.table.projRepayment.data.forEach(e => {
-                        app.factRepayPreview.surplus += e.surplus
-                        app.factRepayPreview.item10 += e.item10
-                        app.factRepayPreview.item20 += e.item20
-                        app.factRepayPreview.item30 += e.item30
-                        app.factRepayPreview.item50 += e.item50
-                        app.factRepayPreview.offlineOverDue += e.offlineOverDue
-                        app.factRepayPreview.onlineOverDue += e.onlineOverDue
-                        app.factRepayPreview.subTotal += e.subTotal
-                        app.factRepayPreview.total += e.total
+                        app.factRepayPreview.surplus += parseFloat(e.surplus.toFixed(2))
+                        app.factRepayPreview.item10 += parseFloat(e.item10.toFixed(2))
+                        app.factRepayPreview.item20 += parseFloat(e.item20.toFixed(2))
+                        app.factRepayPreview.item30 += parseFloat(e.item30.toFixed(2))
+                        app.factRepayPreview.item50 += parseFloat(e.item50.toFixed(2))
+                        app.factRepayPreview.offlineOverDue += parseFloat(e.offlineOverDue.toFixed(2))
+                        app.factRepayPreview.onlineOverDue += parseFloat(e.onlineOverDue.toFixed(2))
+                        app.factRepayPreview.subTotal += parseFloat(e.subTotal.toFixed(2))
+                        app.factRepayPreview.total += parseFloat(e.total.toFixed(2))
                     })
 
-                    app.factRepayPreview.surplus = parseFloat(app.factRepayPreview.surplus.toFixed(2))
-                    app.factRepayPreview.subTotal = parseFloat(app.factRepayPreview.subTotal.toFixed(2))
+                    // app.factRepayPreview.surplus = parseFloat(app.factRepayPreview.surplus.toFixed(2))
+                    // app.factRepayPreview.subTotal = parseFloat(app.factRepayPreview.subTotal.toFixed(2))
                     app.factRepayPreview.total = app.factRepayPreview.subTotal + app.factRepayPreview.surplus
                 },
                 confirmRepayment() {
