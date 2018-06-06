@@ -52,6 +52,9 @@ window.layinit(function (htConfig) {
                         title: '展开',
                         type: 'expand',
                         render: (h, p) => {
+                            if(p.row.type=='差额'){
+                                return ;
+                            }
                             return h('i-table', {
                                 props: {
                                     stripe: true,
@@ -174,7 +177,7 @@ window.layinit(function (htConfig) {
                 let moneyPoolAccount = 0
                 if (n && n.length > 0) {
                     n.forEach(element => {
-                        moneyPoolAccount += element.accountMoney
+                        moneyPoolAccount = (moneyPoolAccount*1000+element.accountMoney*1000)/1000
                         app.factRepaymentInfo.mprIds.push(element.mprId);
                     });
                     let o = n[n.length - 1]
@@ -183,7 +186,7 @@ window.layinit(function (htConfig) {
                 app.factRepaymentInfo.moneyPoolAccount = moneyPoolAccount
                 
                 // app.factRepaymentInfo.repayAccount = parseFloat(app.factRepaymentInfo.moneyPoolAccount.toFixed(2))  + parseFloat(app.factRepaymentInfo.surplusFund.toFixed(2) || 0)
-                app.factRepaymentInfo.repayAccount = (app.factRepaymentInfo.moneyPoolAccount*100+(app.factRepaymentInfo.surplusFund||0)*100)/100
+                app.factRepaymentInfo.repayAccount = (app.factRepaymentInfo.moneyPoolAccount*1000+(app.factRepaymentInfo.surplusFund||0)*1000)/1000
             },
             'factRepaymentInfo.useSurplusflag':function(n,o){
                 if(o==''){
@@ -198,7 +201,7 @@ window.layinit(function (htConfig) {
                         app.factRepaymentInfo.surplusFund = 0
                         return;
                     }
-                    app.factRepaymentInfo.repayAccount = (app.factRepaymentInfo.moneyPoolAccount*100+(app.factRepaymentInfo.surplusFund||0)*100)/100
+                    app.factRepaymentInfo.repayAccount = (app.factRepaymentInfo.moneyPoolAccount*1000+(app.factRepaymentInfo.surplusFund||0)*1000)/1000
                     // app.factRepaymentInfo.repayAccount = parseFloat(app.factRepaymentInfo.moneyPoolAccount.toFixed(2)) + parseFloat(app.factRepaymentInfo.surplusFund.toFixed(2) || 0)
                 }
             },
@@ -327,26 +330,28 @@ window.layinit(function (htConfig) {
                             if(res.data.data.length>1){
                                 res.data.data.forEach((element,index) => {
                                     if (index > 0) {
-                                        chaer.item10 = e1.item10 - element.item10
-                                        chaer.item20 = e1.item20 - element.item20
-                                        chaer.item30 = e1.item30 - element.item30
-                                        chaer.item50 = e1.item50 - element.item50
-                                        chaer.subtotal = e1.subtotal - element.subtotal
-                                        chaer.offlineOverDue = e1.offlineOverDue - element.offlineOverDue
-                                        chaer.onlineOverDue = e1.onlineOverDue - element.onlineOverDue
-                                        chaer.total = e1.total - element.total
+                                        chaer.item10 = -(e1.item10 - element.item10)
+                                        chaer.item20 = -(e1.item20 - element.item20)
+                                        chaer.item30 = -(e1.item30 - element.item30)
+                                        chaer.item50 = -(e1.item50 - element.item50)
+                                        chaer.subtotal = -(e1.subtotal - element.subtotal)
+                                        chaer.offlineOverDue = -(e1.offlineOverDue - element.offlineOverDue)
+                                        chaer.onlineOverDue = -(e1.onlineOverDue - element.onlineOverDue)
+                                        chaer.total = -(e1.total - element.total)
                                     } 
                                 });
                             }else {
-                                chaer.item10 = e1.item10
-                                chaer.item20 = e1.item20
-                                chaer.item30 = e1.item30
-                                chaer.item50 = e1.item50
-                                chaer.subtotal = e1.subtotal
-                                chaer.offlineOverDue = e1.offlineOverDue
-                                chaer.onlineOverDue = e1.onlineOverDue
-                                chaer.total = e1.total
+                                chaer.item10 = -e1.item10
+                                chaer.item20 = -e1.item20
+                                chaer.item30 = -e1.item30
+                                chaer.item50 = -e1.item50
+                                chaer.subtotal = -e1.subtotal
+                                chaer.offlineOverDue = -e1.offlineOverDue
+                                chaer.onlineOverDue = -e1.onlineOverDue
+                                chaer.total = -e1.total
                             }
+
+                            app.table.currPeriodRepayment.data.push(chaer)
                         } else {
                             app.$Message.error({
                                 content: res.data.msg
@@ -408,15 +413,15 @@ window.layinit(function (htConfig) {
                     app.factRepayPreview.total = 0
                     app.factRepayPreview.surplus = 0
                     app.table.projRepayment.data.forEach(e => {
-                        app.factRepayPreview.surplus +=  e.surplus
-                        app.factRepayPreview.item10 += e.item10
-                        app.factRepayPreview.item20 += e.item20
-                        app.factRepayPreview.item30 += e.item30
-                        app.factRepayPreview.item50 += e.item50
-                        app.factRepayPreview.offlineOverDue += e.offlineOverDue
-                        app.factRepayPreview.onlineOverDue += e.onlineOverDue
-                        app.factRepayPreview.subTotal += e.subTotal
-                        app.factRepayPreview.total += e.total
+                        app.factRepayPreview.surplus +=  e.surplus*1000/1000
+                        app.factRepayPreview.item10 = (app.factRepayPreview.item10*1000+e.item10*1000)/1000
+                        app.factRepayPreview.item20 = (app.factRepayPreview.item20*1000+e.item20*1000)/1000
+                        app.factRepayPreview.item30 = (app.factRepayPreview.item30*1000+e.item30*1000)/1000
+                        app.factRepayPreview.item50 = (app.factRepayPreview.item50*1000+e.item50*1000)/1000
+                        app.factRepayPreview.offlineOverDue = (app.factRepayPreview.offlineOverDue*1000+e.offlineOverDue*1000)/1000
+                        app.factRepayPreview.onlineOverDue = (app.factRepayPreview.onlineOverDue*1000+e.onlineOverDue*1000)/1000
+                        app.factRepayPreview.subTotal = (app.factRepayPreview.subTotal*1000+e.subTotal*1000)/1000
+                        app.factRepayPreview.total += (app.factRepayPreview.total*1000+e.total*1000)/1000
                     })
 
                     // app.factRepayPreview.surplus = parseFloat(app.factRepayPreview.surplus.toFixed(2))

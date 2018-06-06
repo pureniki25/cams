@@ -239,6 +239,7 @@ public class FinanceServiceImpl implements FinanceService {
 		moneyPoolRepayment.setRemark(dto.getRemark());
 		moneyPoolRepayment.setTradePlace(dto.getTradePlace());
 		moneyPoolRepayment.setTradeType(dto.getTradeType());
+		moneyPoolRepayment.setAccountMoney(new BigDecimal(dto.getRepaymentMoney()));
 		
 		boolean updateMP = moneyPool.updateAllColumnById();
 		boolean updateMPR = moneyPoolRepayment.updateAllColumnById();
