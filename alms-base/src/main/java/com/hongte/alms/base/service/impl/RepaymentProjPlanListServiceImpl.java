@@ -12,6 +12,7 @@ import com.hongte.alms.base.enums.RepayCurrentStatusEnums;
 import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanBorrowRateUnitEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
+import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.mapper.RepaymentProjPlanListMapper;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.RepaymentBizPlanListDetailService;
@@ -22,13 +23,17 @@ import com.hongte.alms.base.service.RepaymentProjPlanListService;
 import com.hongte.alms.base.service.RepaymentProjPlanService;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.ClassCopyUtil;
+import com.hongte.alms.common.util.StringUtil;
+import com.ht.ussp.core.Result;
 import com.ht.ussp.util.DateUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -81,6 +86,9 @@ public class RepaymentProjPlanListServiceImpl extends
 	@Qualifier("RepaymentBizPlanListService")
 	RepaymentBizPlanListService repaymentBizPlanListService;
 	
+	 
+    @Autowired
+    EipRemote eipRemote;
 	
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -123,13 +131,21 @@ public class RepaymentProjPlanListServiceImpl extends
 								if(getOnLineFactAmountSum(projPList.getProjPlanListId())>=getOnLinePlanAmountSum(projPList.getProjPlanListId())) {
 									continue;
 								}
-								// 没有逾期,若逾期一天不计算逾期费用，逾期> 1天按实际逾期天数进行计算
-								if (isOverDue(new Date(), projPList.getDueDate()) >=0||isOverDue(new Date(), projPList.getDueDate())==-1) {
+								// 没有逾期
+								if (isOverDue(new Date(), projPList.getDueDate()) >=0) {
 									continue;
 									// 逾期的当前期
 								} else {
 									logger.info("逾期费用计算开始===============：planListid:"+pList.getPlanListId()+"===============");
-									BigDecimal days=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), projPList.getDueDate())));//逾期天数
+									//获取平台对应标对应期的还款日期,取晚的日期
+									Date platformDueDate=getPlatformDuedate(projPlan.getProjectId(), projPList.getPeriod().toString());
+									BigDecimal days=BigDecimal.valueOf(0);
+									if(platformDueDate!=null&&platformDueDate.compareTo(projPList.getDueDate())>0) {
+										 days=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), platformDueDate)));//逾期天数
+									}else {
+										 days=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), projPList.getDueDate())));//逾期天数
+									}
+							
 									projPList.setOverdueDays(days);
 								     
 									BigDecimal underLateFee=getUnderLateFee(projPList,projList, projPlan,days);//线下逾期费
@@ -225,7 +241,7 @@ public class RepaymentProjPlanListServiceImpl extends
 			BigDecimal principalAndInterest=BigDecimal.valueOf(getPrincipalAndinterestPeriod(projPlanList.getProjPlanListId()));
 			BigDecimal onLineLatefee=new BigDecimal(0);
 		
-			onLineLatefee=getLateFee(projPlan.getOnLineOverDueRate(), projPlan.getOnLineOverDueRateType(), projPlan.getBorrowMoney(), restPricipal, principalAndInterest);
+			onLineLatefee=getLateFee(projPlan.getOnLineOverDueRate(), projPlan.getOnLineOverDueRateType(), projPlan.getBorrowMoney(), restPricipal, principalAndInterest, projPlan.getProjectId(),projPlanList.getPeriod());
 			
 			onLineLatefee=onLineLatefee.multiply(days);
 			return onLineLatefee;
@@ -247,13 +263,13 @@ public class RepaymentProjPlanListServiceImpl extends
 			Date lastDate=getLastDueDate(list);
 			    //期外
 			    if(new Date().compareTo(lastDate)>0) {
-			    	underLatefee=getLateFee(projPlan.getOffLineOutOverDueRate(), projPlan.getOffLineOutOverDueRateType(), projPlan.getBorrowMoney(), restPricipal, principalAndInterest);
+			    	underLatefee=getLateFee(projPlan.getOffLineOutOverDueRate(), projPlan.getOffLineOutOverDueRateType(), projPlan.getBorrowMoney(), restPricipal, principalAndInterest,projPlan.getProjectId(),projPlanList.getPeriod());
 			    	
 			    	
 			    }
 			    //期内
 			    else {
-			    	underLatefee=getLateFee(projPlan.getOffLineInOverDueRate(), projPlan.getOffLineInOverDueRateType(), projPlan.getBorrowMoney(), restPricipal, principalAndInterest);
+			    	underLatefee=getLateFee(projPlan.getOffLineInOverDueRate(), projPlan.getOffLineInOverDueRateType(), projPlan.getBorrowMoney(), restPricipal, principalAndInterest,projPlan.getProjectId(),projPlanList.getPeriod());
 					    	
 			    }
 			underLatefee=underLatefee.multiply(days);
@@ -313,7 +329,7 @@ public class RepaymentProjPlanListServiceImpl extends
 	     * @return
 	     *
 	     */
-	    private BigDecimal getLateFee(BigDecimal rate,Integer rateType,BigDecimal borrowMoney,BigDecimal restPrincipal,BigDecimal principalAndInterest) {
+	    private BigDecimal getLateFee(BigDecimal rate,Integer rateType,BigDecimal borrowMoney,BigDecimal restPrincipal,BigDecimal principalAndInterest,String projId,Integer period) {
 	    	BigDecimal lateFee=BigDecimal.valueOf(0);
 	        switch (rateType){
 	            case 1:
@@ -328,10 +344,40 @@ public class RepaymentProjPlanListServiceImpl extends
 	            case 4:
 	            	lateFee = principalAndInterest.multiply(rate.divide(new BigDecimal(100)));
 	                break;
+	            case 5:
+	            	lateFee=principalAndInterest(projId, period);
+	            	break;
+	            	
 	        }
 	        return lateFee;
 	    }
-	    
+	    /**
+	     * 获取平台垫付的本息
+	     * @return
+	     */
+	    private BigDecimal principalAndInterest(String projId,Integer period){
+	    	Map<String, Object> paramMap = new HashMap<>();
+			paramMap.put("projectId", projId);
+		 
+			Result result = eipRemote.advanceShareProfit(paramMap);
+			HashMap<String,HashMap<String,String>> map=(HashMap) result.getData();
+			List<HashMap<String,String>> list=(List<HashMap<String, String>>) map.get("returnAdvanceShareProfits");
+			String principalAndInterest="";
+			if(list.size()!=0){
+				for(int i=0;i<list.size();i++) {
+					String periods=String.valueOf(list.get(i).get("period"));
+					if(period.equals(periods))
+					{
+						principalAndInterest= String.valueOf(list.get(i).get("principalAndInterest"));
+					}
+				}
+			}
+			if(StringUtil.isEmpty(principalAndInterest)) {
+				return BigDecimal.valueOf(0);
+			}else {
+				return BigDecimal.valueOf(Double.valueOf(principalAndInterest));
+			}
+	    }
 	    
 	    /**
 	     * 剩余本金
@@ -439,6 +485,45 @@ public class RepaymentProjPlanListServiceImpl extends
 		@Override
 		public Double getPrincipalAndinterestPeriod(String projListId) {
 			return repaymentProjPlanListMapper.getPrincipalAndInterestPeriod(projListId);
+		}
+		
+		/**
+		 * 获取平台对应期数的还款日期
+		 * @param projId
+		 * @param periods
+		 * @return
+		 */
+		private Date getPlatformDuedate(String projId,String periods) {
+		 	Map<String, Object> paramMap = new HashMap<>();
+			paramMap.put("projectId",projId);
+			paramMap.put("type", "1");
+			try {
+				Result  result = eipRemote.queryProjectRepayment(paramMap);
+				if(result.getReturnCode().equals("0000")) {
+					HashMap<String,HashMap<String,String>> map=(HashMap) result.getData();
+					List<HashMap<String,String>> list=(List<HashMap<String, String>>) map.get("RepaymentList");
+					String dueDate="";
+					for(int i=0;i<list.size();i++) {
+						String period=String.valueOf(list.get(i).get("Periods"));
+						if(period.equals(periods))
+						{
+							dueDate= list.get(i).get("CycDate").toString();
+						}
+					}
+					if(!StringUtil.isEmpty(dueDate)) {
+						return DateUtil.getDate(dueDate);
+					}else {
+						return null;
+					}
+				}else {
+					return null;
+				}
+			}catch(Exception e) {
+				logger.debug("标ID:"+projId+"获取平台标的期数为："+periods+"的还款日日期失败");
+			}finally {
+		
+		     return null;
+			}
 		}
 		
 		public static void main(String[] args) {
