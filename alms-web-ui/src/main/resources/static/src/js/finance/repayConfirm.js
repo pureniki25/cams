@@ -195,7 +195,7 @@ window.layinit(function (htConfig) {
                 app.factRepaymentInfo.surplusFund = 0
             },
             'factRepaymentInfo.surplusFund': function (n) {
-                if (n && !isNaN(n)) {
+                if ((n||n==0 )&& !isNaN(n)) {
                     if(n>app.factRepaymentInfo.canUseSurplus){
                         app.$Modal.warning({content:'可使用结余金额不能大于'+app.factRepaymentInfo.canUseSurplus})
                         app.factRepaymentInfo.surplusFund = 0
