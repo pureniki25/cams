@@ -9,41 +9,27 @@ import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
 import java.io.Serializable;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
  * <p>
- * 标的还款计划列表
+ * 业务还款计划列表
  * </p>
  *
- * @author 曾坤
- * @since 2018-05-03
+ * @author 王继光
+ * @since 2018-06-06
  */
 @ApiModel
-@TableName("tb_repayment_proj_plan_list")
-public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
+@TableName("tb_repayment_biz_plan_list_bak")
+public class RepaymentBizPlanListBak extends Model<RepaymentBizPlanListBak> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 标的还款计划列表ID(主键)
+     * 还款计划列表ID(主键)
      */
-    @TableId("proj_plan_list_id")
-	@ApiModelProperty(required= true,value = "标的还款计划列表ID(主键)")
-	private String projPlanListId;
-    /**
-     * 所属标的还款计划编号(外键，对应tb_repayment_proj_plan.proj_plan_id)
-     */
-	@TableField("proj_plan_id")
-	@ApiModelProperty(required= true,value = "所属标的还款计划编号(外键，对应tb_repayment_proj_plan.proj_plan_id)")
-	private String projPlanId;
-    /**
-     * 对应业务还款计划列表编号(外键，对应tb_repayment_biz_plan_list.plan_list_id)
-     */
-	@TableField("plan_list_id")
-	@ApiModelProperty(required= true,value = "对应业务还款计划列表编号(外键，对应tb_repayment_biz_plan_list.plan_list_id)")
+    @TableId("plan_list_id")
+	@ApiModelProperty(required= true,value = "还款计划列表ID(主键)")
 	private String planListId;
     /**
      * 所属还款计划编号(外键，对应tb_repayment_biz_plan.plan_id)
@@ -79,7 +65,6 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
      */
 	@TableField("due_date")
 	@ApiModelProperty(required= true,value = "应还日期")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date dueDate;
     /**
      * 总计划应还金额(元)，不含滞纳金
@@ -93,13 +78,6 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 	@TableField("overdue_amount")
 	@ApiModelProperty(required= true,value = "总应还滞纳金(元)，每天零点由系统自动计算")
 	private BigDecimal overdueAmount;
-	/**
-     * 减免金额
-     */
-	@TableField("derate_amount")
-	@ApiModelProperty(required= true,value = "减免金额")
-	private BigDecimal derateAmount;
-	
     /**
      * 逾期天数，每天零点由系统自动计算
      */
@@ -107,10 +85,10 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 	@ApiModelProperty(required= true,value = "逾期天数，每天零点由系统自动计算")
 	private BigDecimal overdueDays;
     /**
-     * 当前还款状态，目前只有三种，分别为"还款中"，"逾期"，"已还款"
+     * 当前还款状态，目前只有三种，分别为 还款中，逾期，已还款
      */
 	@TableField("current_status")
-	@ApiModelProperty(required= true,value = "当前还款状态，目前只有三种，分别为还款中，逾期，已还款")
+	@ApiModelProperty(required= true,value = "当前还款状态，目前只有三种，分别为 还款中，逾期，已还款")
 	private String currentStatus;
     /**
      * 当前还款子状态
@@ -118,6 +96,12 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 	@TableField("current_sub_status")
 	@ApiModelProperty(required= true,value = "当前还款子状态")
 	private String currentSubStatus;
+    /**
+     * 部分还款状态子状态,null:未还款,1:部分还款,2:线上已还款,3:全部已还款
+     */
+	@TableField("repay_status")
+	@ApiModelProperty(required= true,value = "部分还款状态子状态,null:未还款,1:部分还款,2:线上已还款,3:全部已还款")
+	private Integer repayStatus;
     /**
      * 已还款类型标记，null或0：还款中，6：申请展期已还款，10：线下确认已还款，20：自动线下代扣已还款，21，人工线下代扣已还款，30：自动银行代扣已还款，31：人工银行代扣已还款，40：用户APP主动还款，50：线下财务确认全部结清，60：线下代扣全部结清，70：银行代扣全部结清
      */
@@ -129,34 +113,96 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
      */
 	@TableField("fact_repay_date")
 	@ApiModelProperty(required= true,value = "客户实还日期")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date factRepayDate;
-
+    /**
+     * 财务确认还款操作日期
+     */
+	@TableField("finance_comfirm_date")
+	@ApiModelProperty(required= true,value = "财务确认还款操作日期")
+	private Date financeComfirmDate;
+    /**
+     * 财务还款确认人ID
+     */
+	@TableField("finance_confirm_user")
+	@ApiModelProperty(required= true,value = "财务还款确认人ID")
+	private String financeConfirmUser;
+    /**
+     * 财务还款确认人名称
+     */
+	@TableField("finance_confirm_user_name")
+	@ApiModelProperty(required= true,value = "财务还款确认人名称")
+	private String financeConfirmUserName;
+    /**
+     * 财务还款金额确认(1:已确认,0:未确认)
+     */
+	@TableField("confirm_flag")
+	@ApiModelProperty(required= true,value = "财务还款金额确认(1:已确认,0:未确认)")
+	private Integer confirmFlag;
+    /**
+     * 财务确认自动代扣日期
+     */
+	@TableField("auto_withholding_confirmed_date")
+	@ApiModelProperty(required= true,value = "财务确认自动代扣日期")
+	private Date autoWithholdingConfirmedDate;
+    /**
+     * 确认自动代扣的确认者ID
+     */
+	@TableField("auto_withholding_confirmed_user")
+	@ApiModelProperty(required= true,value = "确认自动代扣的确认者ID")
+	private String autoWithholdingConfirmedUser;
+    /**
+     * 确认自动代扣的确认者姓名
+     */
+	@TableField("auto_withholding_confirmed_user_name")
+	@ApiModelProperty(required= true,value = "确认自动代扣的确认者姓名")
+	private String autoWithholdingConfirmedUserName;
+    /**
+     * 会计确认状态，0或null:待审核;1:已审核;2:已退回;3:已返审核;4:导入;
+     */
+	@TableField("accountant_confirm_status")
+	@ApiModelProperty(required= true,value = "会计确认状态，0或null:待审核;1:已审核;2:已退回;3:已返审核;4:导入;")
+	private Integer accountantConfirmStatus;
+    /**
+     * 会计确认人ID
+     */
+	@TableField("accountant_confirm_user")
+	@ApiModelProperty(required= true,value = "会计确认人ID")
+	private String accountantConfirmUser;
+    /**
+     * 会计确认人姓名
+     */
+	@TableField("accountant_confirm_user_name")
+	@ApiModelProperty(required= true,value = "会计确认人姓名")
+	private String accountantConfirmUserName;
+    /**
+     * 会计确认日期
+     */
+	@TableField("accountant_confirm_date")
+	@ApiModelProperty(required= true,value = "会计确认日期")
+	private Date accountantConfirmDate;
+    /**
+     * 减免金额
+     */
+	@TableField("derate_amount")
+	@ApiModelProperty(required= true,value = "减免金额")
+	private BigDecimal derateAmount;
     /**
      * 还款备注
      */
 	@ApiModelProperty(required= true,value = "还款备注")
 	private String remark;
-
-    /**
-     * 生成系统类型：1.信贷生成，2.贷后管理生成
-     */
-	@TableField("creat_sys_type")
-	@ApiModelProperty(required= true,value = "生成系统类型：1.信贷生成，2.贷后管理生成")
-	private Integer creatSysType;
-    /**
-     * 平台标志：1.团贷网，2.你我金融
-     */
-	@TableField("plate_type")
-	@ApiModelProperty(required= true,value = "平台标志：1.团贷网，2.你我金融")
-	private Integer plateType;
     /**
      * 创建日期
      */
 	@TableField("create_time")
 	@ApiModelProperty(required= true,value = "创建日期")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createTime;
+    /**
+     * 来源类型：1.信贷生成，2.贷后管理生成
+     */
+	@TableField("src_type")
+	@ApiModelProperty(required= true,value = "来源类型：1.信贷生成，2.贷后管理生成")
+	private Integer srcType;
     /**
      * 创建用户
      */
@@ -168,7 +214,6 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
      */
 	@TableField("update_time")
 	@ApiModelProperty(required= true,value = "更新日期")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date updateTime;
     /**
      * 更新用户
@@ -176,23 +221,13 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 	@TableField("update_user")
 	@ApiModelProperty(required= true,value = "更新用户")
 	private String updateUser;
+    /**
+     * 还款记录id
+     */
+	@TableField("confirm_log_id")
+	@ApiModelProperty(required= true,value = "还款记录id")
+	private String confirmLogId;
 
-
-	public String getProjPlanListId() {
-		return projPlanListId;
-	}
-
-	public void setProjPlanListId(String projPlanListId) {
-		this.projPlanListId = projPlanListId;
-	}
-
-	public String getProjPlanId() {
-		return projPlanId;
-	}
-
-	public void setProjPlanId(String projPlanId) {
-		this.projPlanId = projPlanId;
-	}
 
 	public String getPlanListId() {
 		return planListId;
@@ -290,6 +325,14 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 		this.currentSubStatus = currentSubStatus;
 	}
 
+	public Integer getRepayStatus() {
+		return repayStatus;
+	}
+
+	public void setRepayStatus(Integer repayStatus) {
+		this.repayStatus = repayStatus;
+	}
+
 	public Integer getRepayFlag() {
 		return repayFlag;
 	}
@@ -306,6 +349,102 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 		this.factRepayDate = factRepayDate;
 	}
 
+	public Date getFinanceComfirmDate() {
+		return financeComfirmDate;
+	}
+
+	public void setFinanceComfirmDate(Date financeComfirmDate) {
+		this.financeComfirmDate = financeComfirmDate;
+	}
+
+	public String getFinanceConfirmUser() {
+		return financeConfirmUser;
+	}
+
+	public void setFinanceConfirmUser(String financeConfirmUser) {
+		this.financeConfirmUser = financeConfirmUser;
+	}
+
+	public String getFinanceConfirmUserName() {
+		return financeConfirmUserName;
+	}
+
+	public void setFinanceConfirmUserName(String financeConfirmUserName) {
+		this.financeConfirmUserName = financeConfirmUserName;
+	}
+
+	public Integer getConfirmFlag() {
+		return confirmFlag;
+	}
+
+	public void setConfirmFlag(Integer confirmFlag) {
+		this.confirmFlag = confirmFlag;
+	}
+
+	public Date getAutoWithholdingConfirmedDate() {
+		return autoWithholdingConfirmedDate;
+	}
+
+	public void setAutoWithholdingConfirmedDate(Date autoWithholdingConfirmedDate) {
+		this.autoWithholdingConfirmedDate = autoWithholdingConfirmedDate;
+	}
+
+	public String getAutoWithholdingConfirmedUser() {
+		return autoWithholdingConfirmedUser;
+	}
+
+	public void setAutoWithholdingConfirmedUser(String autoWithholdingConfirmedUser) {
+		this.autoWithholdingConfirmedUser = autoWithholdingConfirmedUser;
+	}
+
+	public String getAutoWithholdingConfirmedUserName() {
+		return autoWithholdingConfirmedUserName;
+	}
+
+	public void setAutoWithholdingConfirmedUserName(String autoWithholdingConfirmedUserName) {
+		this.autoWithholdingConfirmedUserName = autoWithholdingConfirmedUserName;
+	}
+
+	public Integer getAccountantConfirmStatus() {
+		return accountantConfirmStatus;
+	}
+
+	public void setAccountantConfirmStatus(Integer accountantConfirmStatus) {
+		this.accountantConfirmStatus = accountantConfirmStatus;
+	}
+
+	public String getAccountantConfirmUser() {
+		return accountantConfirmUser;
+	}
+
+	public void setAccountantConfirmUser(String accountantConfirmUser) {
+		this.accountantConfirmUser = accountantConfirmUser;
+	}
+
+	public String getAccountantConfirmUserName() {
+		return accountantConfirmUserName;
+	}
+
+	public void setAccountantConfirmUserName(String accountantConfirmUserName) {
+		this.accountantConfirmUserName = accountantConfirmUserName;
+	}
+
+	public Date getAccountantConfirmDate() {
+		return accountantConfirmDate;
+	}
+
+	public void setAccountantConfirmDate(Date accountantConfirmDate) {
+		this.accountantConfirmDate = accountantConfirmDate;
+	}
+
+	public BigDecimal getDerateAmount() {
+		return derateAmount;
+	}
+
+	public void setDerateAmount(BigDecimal derateAmount) {
+		this.derateAmount = derateAmount;
+	}
+
 	public String getRemark() {
 		return remark;
 	}
@@ -314,28 +453,20 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 		this.remark = remark;
 	}
 
-	public Integer getCreatSysType() {
-		return creatSysType;
-	}
-
-	public void setCreatSysType(Integer creatSysType) {
-		this.creatSysType = creatSysType;
-	}
-
-	public Integer getPlateType() {
-		return plateType;
-	}
-
-	public void setPlateType(Integer plateType) {
-		this.plateType = plateType;
-	}
-
 	public Date getCreateTime() {
 		return createTime;
 	}
 
 	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
+	}
+
+	public Integer getSrcType() {
+		return srcType;
+	}
+
+	public void setSrcType(Integer srcType) {
+		this.srcType = srcType;
 	}
 
 	public String getCreateUser() {
@@ -362,16 +493,22 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 		this.updateUser = updateUser;
 	}
 
+	public String getConfirmLogId() {
+		return confirmLogId;
+	}
+
+	public void setConfirmLogId(String confirmLogId) {
+		this.confirmLogId = confirmLogId;
+	}
+
 	@Override
 	protected Serializable pkVal() {
-		return this.projPlanListId;
+		return this.planListId;
 	}
 
 	@Override
 	public String toString() {
-		return "RepaymentProjPlanList{" +
-			", projPlanListId=" + projPlanListId +
-			", projPlanId=" + projPlanId +
+		return "RepaymentBizPlanListBak{" +
 			", planListId=" + planListId +
 			", planId=" + planId +
 			", businessId=" + businessId +
@@ -384,65 +521,28 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 			", overdueDays=" + overdueDays +
 			", currentStatus=" + currentStatus +
 			", currentSubStatus=" + currentSubStatus +
+			", repayStatus=" + repayStatus +
 			", repayFlag=" + repayFlag +
 			", factRepayDate=" + factRepayDate +
+			", financeComfirmDate=" + financeComfirmDate +
+			", financeConfirmUser=" + financeConfirmUser +
+			", financeConfirmUserName=" + financeConfirmUserName +
+			", confirmFlag=" + confirmFlag +
+			", autoWithholdingConfirmedDate=" + autoWithholdingConfirmedDate +
+			", autoWithholdingConfirmedUser=" + autoWithholdingConfirmedUser +
+			", autoWithholdingConfirmedUserName=" + autoWithholdingConfirmedUserName +
+			", accountantConfirmStatus=" + accountantConfirmStatus +
+			", accountantConfirmUser=" + accountantConfirmUser +
+			", accountantConfirmUserName=" + accountantConfirmUserName +
+			", accountantConfirmDate=" + accountantConfirmDate +
+			", derateAmount=" + derateAmount +
 			", remark=" + remark +
-			", creatSysType=" + creatSysType +
-			", plateType=" + plateType +
 			", createTime=" + createTime +
+			", srcType=" + srcType +
 			", createUser=" + createUser +
 			", updateTime=" + updateTime +
 			", updateUser=" + updateUser +
+			", confirmLogId=" + confirmLogId +
 			"}";
-	}
-
-	/**
-	 * @return the derateAmount
-	 */
-	public BigDecimal getDerateAmount() {
-		return derateAmount;
-	}
-
-	/**
-	 * @param derateAmount the derateAmount to set
-	 */
-	public void setDerateAmount(BigDecimal derateAmount) {
-		this.derateAmount = derateAmount;
-	}
-
-	/**
-	 * 
-	 */
-	public RepaymentProjPlanList() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-	
-	public RepaymentProjPlanList(RepaymentProjPlanListBak pl) {
-		super();
-		setAfterId(pl.getAfterId());
-		setBusinessId(pl.getBusinessId());
-		setCreateTime(pl.getCreateTime());
-		setCreateUser(pl.getCreateUser());
-		setCreatSysType(pl.getCreatSysType());
-		setCurrentStatus(pl.getCurrentStatus());
-		setCurrentSubStatus(pl.getCurrentSubStatus());
-		setDerateAmount(pl.getDerateAmount());
-		setDueDate(pl.getDueDate());
-		setFactRepayDate(pl.getFactRepayDate());
-		setOrigBusinessId(pl.getOrigBusinessId());
-		setOverdueAmount(pl.getOverdueAmount());
-		setOverdueDays(pl.getOverdueDays());
-		setPeriod(pl.getPeriod());
-		setPlanId(pl.getPlanId());
-		setPlanListId(pl.getPlanListId());
-		setPlateType(pl.getPlateType());
-		setProjPlanId(pl.getProjPlanId());
-		setProjPlanListId(pl.getProjPlanListId());
-		setRemark(pl.getRemark());
-		setRepayFlag(pl.getRepayFlag());
-		setTotalBorrowAmount(pl.getTotalBorrowAmount());
-		setUpdateTime(pl.getUpdateTime());
-		setUpdateUser(pl.getUpdateUser());
 	}
 }

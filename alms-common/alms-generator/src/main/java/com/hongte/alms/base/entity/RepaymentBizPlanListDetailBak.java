@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
@@ -16,12 +16,12 @@ import io.swagger.annotations.ApiModelProperty;
  * 还款计划应还项目明细表
  * </p>
  *
- * @author 曾坤
- * @since 2018-05-03
+ * @author 王继光
+ * @since 2018-06-06
  */
 @ApiModel
-@TableName("tb_repayment_biz_plan_list_detail")
-public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail> {
+@TableName("tb_repayment_biz_plan_list_detail_bak")
+public class RepaymentBizPlanListDetailBak extends Model<RepaymentBizPlanListDetailBak> {
 
     private static final long serialVersionUID = 1L;
 
@@ -43,7 +43,6 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 	@TableField("business_id")
 	@ApiModelProperty(required= true,value = "还款计划所属业务ID(若当前业务为展期，则存展期业务编号)")
 	private String businessId;
-
     /**
      * 所属期数
      */
@@ -61,14 +60,12 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 	@TableField("plan_amount")
 	@ApiModelProperty(required= true,value = "项目计划应还总金额(元)")
 	private BigDecimal planAmount;
-	
-	/**
+    /**
      * 减免金额
      */
 	@TableField("derate_amount")
 	@ApiModelProperty(required= true,value = "减免金额")
 	private BigDecimal derateAmount;
-	
     /**
      * 项目计划应还比例(%)，如0.5%则存0.5，可空
      */
@@ -88,10 +85,10 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 	@ApiModelProperty(required= true,value = "应还项目名称")
 	private String planItemName;
     /**
-     * 应还项目所属分类，10：本金，20：利息，30：资产端分公司服务费，40：担保公司费用，50：资金端平台服务费，60：滞纳金，70：违约金，80：中介费，90：押金类费用，100：冲应收
+     * 应还项目所属分类，10：本金，20：利息，25：利差， 30：资产端分公司服务费，40：担保公司费用，50：资金端平台服务费，60：滞纳金，70：违约金，80：中介费，90：押金类费用，100：冲应收,110：返点（返点都是不线上分账的11）
      */
 	@TableField("plan_item_type")
-	@ApiModelProperty(required= true,value = "应还项目所属分类，10：本金，20：利息，30：资产端分公司服务费，40：担保公司费用，50：资金端平台服务费，60：滞纳金，70：违约金，80：中介费，90：押金类费用，100：冲应收")
+	@ApiModelProperty(required= true,value = "应还项目所属分类，10：本金，20：利息，25：利差， 30：资产端分公司服务费，40：担保公司费用，50：资金端平台服务费，60：滞纳金，70：违约金，80：中介费，90：押金类费用，100：冲应收,110：返点（返点都是不线上分账的11）")
 	private Integer planItemType;
     /**
      * 分账标记(冲应收还款，根据冲应收明细进行分账)，0：不线上分账，10：分账到借款人账户，20：分账到资产端账户，30：分账到资金端账户(平台)，40：分账到担保公司账户
@@ -116,22 +113,18 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
      */
 	@TableField("fact_repay_date")
 	@ApiModelProperty(required= true,value = "实还日期")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date factRepayDate;
-	/**
-	 * 应还日期
+    /**
+     * 应还日期
      */
 	@TableField("due_date")
 	@ApiModelProperty(required= true,value = "应还日期")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date dueDate;
-
     /**
      * 创建日期
      */
 	@TableField("create_date")
 	@ApiModelProperty(required= true,value = "创建日期")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createDate;
     /**
      * 来源类型：1.信贷生成，2.贷后管理生成
@@ -150,7 +143,6 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
      */
 	@TableField("update_date")
 	@ApiModelProperty(required= true,value = "更新日期")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date updateDate;
     /**
      * 更新用户
@@ -158,7 +150,9 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 	@TableField("update_user")
 	@ApiModelProperty(required= true,value = "更新用户")
 	private String updateUser;
-
+	@TableField("confirm_log_id")
+	@ApiModelProperty(required= true,value = "")
+	private String confirmLogId;
 
 
 	public String getPlanDetailId() {
@@ -207,6 +201,14 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 
 	public void setPlanAmount(BigDecimal planAmount) {
 		this.planAmount = planAmount;
+	}
+
+	public BigDecimal getDerateAmount() {
+		return derateAmount;
+	}
+
+	public void setDerateAmount(BigDecimal derateAmount) {
+		this.derateAmount = derateAmount;
 	}
 
 	public BigDecimal getPlanRate() {
@@ -273,6 +275,13 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 		this.factRepayDate = factRepayDate;
 	}
 
+	public Date getDueDate() {
+		return dueDate;
+	}
+
+	public void setDueDate(Date dueDate) {
+		this.dueDate = dueDate;
+	}
 
 	public Date getCreateDate() {
 		return createDate;
@@ -314,6 +323,14 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 		this.updateUser = updateUser;
 	}
 
+	public String getConfirmLogId() {
+		return confirmLogId;
+	}
+
+	public void setConfirmLogId(String confirmLogId) {
+		this.confirmLogId = confirmLogId;
+	}
+
 	@Override
 	protected Serializable pkVal() {
 		return this.planDetailId;
@@ -321,13 +338,14 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 
 	@Override
 	public String toString() {
-		return "RepaymentBizPlanListDetail{" +
+		return "RepaymentBizPlanListDetailBak{" +
 			", planDetailId=" + planDetailId +
 			", planListId=" + planListId +
 			", businessId=" + businessId +
 			", period=" + period +
 			", shareProfitIndex=" + shareProfitIndex +
 			", planAmount=" + planAmount +
+			", derateAmount=" + derateAmount +
 			", planRate=" + planRate +
 			", feeId=" + feeId +
 			", planItemName=" + planItemName +
@@ -342,64 +360,7 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 			", createUser=" + createUser +
 			", updateDate=" + updateDate +
 			", updateUser=" + updateUser +
+			", confirmLogId=" + confirmLogId +
 			"}";
-	}
-
-	public Date getDueDate() {
-		return dueDate;
-	}
-
-	public void setDueDate(Date dueDate) {
-		this.dueDate = dueDate;
-	}
-
-	/**
-	 * @return the derateAmount
-	 */
-	public BigDecimal getDerateAmount() {
-		return derateAmount;
-	}
-
-	/**
-	 * @param derateAmount the derateAmount to set
-	 */
-	public void setDerateAmount(BigDecimal derateAmount) {
-		this.derateAmount = derateAmount;
-	}
-
-	/**
-	 * 
-	 */
-	public RepaymentBizPlanListDetail() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-
-	/**
-	 * 
-	 */
-	public RepaymentBizPlanListDetail(RepaymentBizPlanListDetailBak pld) {
-		super();
-		setAccountStatus(pld.getAccountStatus());
-		setBusinessId(pld.getBusinessId());
-		setCreateDate(pld.getCreateDate());
-		setCreateUser(pld.getCreateUser());
-		setDerateAmount(pld.getDerateAmount());
-		setDueDate(pld.getDueDate());
-		setFactAmount(pld.getFactAmount());
-		setFactRepayDate(pld.getFactRepayDate());
-		setFeeId(pld.getFeeId());
-		setPeriod(pld.getPeriod());
-		setPlanAmount(pld.getPlanAmount());
-		setPlanDetailId(pld.getPlanDetailId());
-		setPlanItemName(pld.getPlanItemName());
-		setPlanItemType(pld.getPlanItemType());
-		setPlanListId(pld.getPlanListId());
-		setPlanRate(pld.getPlanRate());
-		setRepaySource(pld.getRepaySource());
-		setShareProfitIndex(pld.getShareProfitIndex());
-		setSrcType(pld.getSrcType());
-		setUpdateDate(pld.getUpdateDate());
-		setUpdateUser(pld.getUpdateUser());
 	}
 }

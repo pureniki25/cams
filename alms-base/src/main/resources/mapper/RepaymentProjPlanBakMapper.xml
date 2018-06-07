@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.RepaymentProjPlanBakMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.RepaymentProjPlanBak">
+        <id column="proj_plan_id" property="projPlanId" />
+        <result column="project_id" property="projectId" />
+        <result column="business_id" property="businessId" />
+        <result column="original_business_id" property="originalBusinessId" />
+        <result column="repayment_batch_id" property="repaymentBatchId" />
+        <result column="plan_id" property="planId" />
+        <result column="borrow_money" property="borrowMoney" />
+        <result column="borrow_rate" property="borrowRate" />
+        <result column="borrow_rate_unit" property="borrowRateUnit" />
+        <result column="on_line_over_due_rate" property="onLineOverDueRate" />
+        <result column="on_line_over_due_rate_type" property="onLineOverDueRateType" />
+        <result column="off_line_out_over_due_rate" property="offLineOutOverDueRate" />
+        <result column="off_line_out_over_due_rate_type" property="offLineOutOverDueRateType" />
+        <result column="off_line_in_over_due_rate" property="offLineInOverDueRate" />
+        <result column="off_line_in_over_due_rate_type" property="offLineInOverDueRateType" />
+        <result column="borrow_limit" property="borrowLimit" />
+        <result column="borrow_limit_unit" property="borrowLimitUnit" />
+        <result column="plan_status" property="planStatus" />
+        <result column="is_defer" property="isDefer" />
+        <result column="creat_sys_type" property="creatSysType" />
+        <result column="plate_type" property="plateType" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="update_time" property="updateTime" />
+        <result column="update_user" property="updateUser" />
+        <result column="query_full_success_date" property="queryFullSuccessDate" />
+        <result column="confirm_log_id" property="confirmLogId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        proj_plan_id AS projPlanId, project_id AS projectId, business_id AS businessId, original_business_id AS originalBusinessId, repayment_batch_id AS repaymentBatchId, plan_id AS planId, borrow_money AS borrowMoney, borrow_rate AS borrowRate, borrow_rate_unit AS borrowRateUnit, on_line_over_due_rate AS onLineOverDueRate, on_line_over_due_rate_type AS onLineOverDueRateType, off_line_out_over_due_rate AS offLineOutOverDueRate, off_line_out_over_due_rate_type AS offLineOutOverDueRateType, off_line_in_over_due_rate AS offLineInOverDueRate, off_line_in_over_due_rate_type AS offLineInOverDueRateType, borrow_limit AS borrowLimit, borrow_limit_unit AS borrowLimitUnit, plan_status AS planStatus, is_defer AS isDefer, creat_sys_type AS creatSysType, plate_type AS plateType, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser, query_full_success_date AS queryFullSuccessDate, confirm_log_id AS confirmLogId
+    </sql>
+
+</mapper>

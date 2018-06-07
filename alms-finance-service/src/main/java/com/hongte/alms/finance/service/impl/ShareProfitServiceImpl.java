@@ -3,6 +3,8 @@ package com.hongte.alms.finance.service.impl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -21,13 +23,19 @@ import com.hongte.alms.base.dto.ConfirmRepaymentReq;
 import com.hongte.alms.base.entity.AccountantOverRepayLog;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
+import com.hongte.alms.base.entity.RepaymentBizPlanBak;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.RepaymentBizPlanListBak;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
+import com.hongte.alms.base.entity.RepaymentBizPlanListDetailBak;
 import com.hongte.alms.base.entity.RepaymentConfirmLog;
 import com.hongte.alms.base.entity.RepaymentProjFactRepay;
 import com.hongte.alms.base.entity.RepaymentProjPlan;
+import com.hongte.alms.base.entity.RepaymentProjPlanBak;
 import com.hongte.alms.base.entity.RepaymentProjPlanList;
+import com.hongte.alms.base.entity.RepaymentProjPlanListBak;
 import com.hongte.alms.base.entity.RepaymentProjPlanListDetail;
+import com.hongte.alms.base.entity.RepaymentProjPlanListDetailBak;
 import com.hongte.alms.base.entity.RepaymentResource;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.base.enums.RepayCurrentStatusEnums;
@@ -55,7 +63,7 @@ import com.hongte.alms.base.process.mapper.ProcessMapper;
 import com.hongte.alms.base.service.AccountantOverRepayLogService;
 import com.hongte.alms.base.service.RepaymentProjFactRepayService;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
-
+import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.finance.service.ShareProfitService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 
@@ -136,6 +144,13 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	private ThreadLocal<BigDecimal> lackAmount = new ThreadLocal<BigDecimal>();
 	private ThreadLocal<Boolean> save = new ThreadLocal<Boolean>();
 	private ThreadLocal<RepaymentConfirmLog> confirmLog = new ThreadLocal<RepaymentConfirmLog>();
+	private ThreadLocal<RepaymentBizPlanBak> repaymentBizPlanBak = new ThreadLocal<RepaymentBizPlanBak>();
+	private ThreadLocal<RepaymentBizPlanListBak> repaymentBizPlanListBak = new ThreadLocal<RepaymentBizPlanListBak>();
+	private ThreadLocal<List<RepaymentBizPlanListDetailBak>> repaymentBizPlanListDetailBaks = new ThreadLocal<List<RepaymentBizPlanListDetailBak>>();
+	private ThreadLocal<List<RepaymentProjPlanBak>> repaymentProjPlanBaks = new ThreadLocal<List<RepaymentProjPlanBak>>();
+	private ThreadLocal<List<RepaymentProjPlanListBak>> repaymentProjPlanListBaks = new ThreadLocal<List<RepaymentProjPlanListBak>>();
+	private ThreadLocal<List<RepaymentProjPlanListDetailBak>> repaymentProjPlanListDetailBaks = new ThreadLocal<List<RepaymentProjPlanListDetailBak>>();
+	
 	private ThreadLocal<List<Integer>> repaySource = new ThreadLocal<List<Integer>>();
 	private void initVariable(ConfirmRepaymentReq req) {
 		businessId.set(req.getBusinessId());
@@ -149,6 +164,12 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		lackAmount.set(new BigDecimal(0));
 		repaySource.set(req.getRepaySource());
 		confirmLog.set(createConfirmLog());
+		repaymentBizPlanListDetailBaks.set(new ArrayList<>());
+		repaymentProjPlanBaks.set(new ArrayList<>());
+		repaymentProjPlanListBaks.set(new ArrayList<>());
+		repaymentProjPlanListDetailBaks.set(new ArrayList<>());
+		
+		
 	}
 
 	@Override
@@ -291,25 +312,34 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	 * @return
 	 */
 	private RepaymentBizPlanDto initRepaymentBizPlanDto(ConfirmRepaymentReq req) {
+		List<RepaymentBizPlanList> repaymentBizPlanLists = repaymentBizPlanListMapper
+				.selectList(new EntityWrapper<RepaymentBizPlanList>()
+						.eq("business_id", req.getBusinessId()).eq("after_id", req.getAfterId()).orderBy("after_id"));
 
 		RepaymentBizPlanDto repaymentBizPlanDto = new RepaymentBizPlanDto();
 		RepaymentBizPlan repaymentBizPlan = new RepaymentBizPlan();
-		repaymentBizPlan.setBusinessId(req.getBusinessId());
-		repaymentBizPlan = repaymentBizPlanMapper.selectOne(repaymentBizPlan);
+		
+		repaymentBizPlan = repaymentBizPlanMapper.selectById(repaymentBizPlanLists.get(0).getPlanId());
+		repaymentBizPlanBak.set(new RepaymentBizPlanBak(repaymentBizPlan));
 		orgBusinessId.set(repaymentBizPlan.getOriginalBusinessId());
 		repaymentBizPlanDto.setRepaymentBizPlan(repaymentBizPlan);
-
-		List<RepaymentBizPlanList> repaymentBizPlanLists = repaymentBizPlanListMapper
-				.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", repaymentBizPlan.getPlanId())
-						.eq("business_id", req.getBusinessId()).eq("after_id", req.getAfterId()).orderBy("after_id"));
-
+		
+		
 		List<RepaymentBizPlanListDto> repaymentBizPlanListDtos = new ArrayList<>();
 		for (RepaymentBizPlanList repaymentBizPlanList : repaymentBizPlanLists) {
+			logger.info("这条LOG应该只出现一次,planlistId={},planId={}",repaymentBizPlanList.getPlanListId(),repaymentBizPlan.getPlanId());
+			repaymentBizPlanListBak.set(new RepaymentBizPlanListBak(repaymentBizPlanList));
+			
+			
 			RepaymentBizPlanListDto repaymentBizPlanListDto = new RepaymentBizPlanListDto();
 			List<RepaymentBizPlanListDetail> repaymentBizPlanListDetails = repaymentBizPlanListDetailMapper
 					.selectList(new EntityWrapper<RepaymentBizPlanListDetail>()
 							.eq("plan_list_id", repaymentBizPlanList.getPlanListId()).orderBy("share_profit_index")
 							.orderBy("plan_item_type").orderBy("fee_id"));
+			
+			for (RepaymentBizPlanListDetail repaymentBizPlanListDetail : repaymentBizPlanListDetails) {
+				repaymentBizPlanListDetailBaks.get().add(new RepaymentBizPlanListDetailBak(repaymentBizPlanListDetail));
+			}
 			repaymentBizPlanListDto.setBizPlanListDetails(repaymentBizPlanListDetails);
 			repaymentBizPlanListDto.setRepaymentBizPlanList(repaymentBizPlanList);
 			repaymentBizPlanListDtos.add(repaymentBizPlanListDto);
@@ -319,16 +349,22 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 
 		List<RepaymentProjPlanDto> repaymentProjPlanDtos = new ArrayList<>();
 		List<RepaymentProjPlan> repaymentProjPlans = repaymentProjPlanMapper
-				.selectList(new EntityWrapper<RepaymentProjPlan>().eq("business_id", req.getBusinessId()));
+				.selectList(new EntityWrapper<RepaymentProjPlan>().eq("plan_id",repaymentBizPlan.getPlanId()));
 		for (RepaymentProjPlan repaymentProjPlan : repaymentProjPlans) {
+			repaymentProjPlanBaks.get().add(new RepaymentProjPlanBak(repaymentProjPlan));
+			
+			
 			RepaymentProjPlanDto repaymentProjPlanDto = new RepaymentProjPlanDto();
 			repaymentProjPlanDto.setRepaymentProjPlan(repaymentProjPlan);
 			List<RepaymentProjPlanList> repaymentProjPlanLists = repaymentProjPlanListMapper.selectList(
 					new EntityWrapper<RepaymentProjPlanList>().eq("proj_plan_id", repaymentProjPlan.getProjPlanId())
-							.eq("business_id", req.getBusinessId()).eq("after_id", req.getAfterId())
+							.eq("plan_list_id", repaymentBizPlanLists.get(0).getPlanListId())
 							.orderBy("total_borrow_amount", false));
+			
 			List<RepaymentProjPlanListDto> repaymentProjPlanListDtos = new ArrayList<>();
 			for (RepaymentProjPlanList repaymentProjPlanList : repaymentProjPlanLists) {
+				repaymentProjPlanListBaks.get().add(new RepaymentProjPlanListBak(repaymentProjPlanList));
+				
 				RepaymentProjPlanListDto repaymentProjPlanListDto = new RepaymentProjPlanListDto();
 				repaymentProjPlanListDto.setRepaymentProjPlanList(repaymentProjPlanList);
 				List<RepaymentProjPlanListDetail> repaymentProjPlanListDetails = repaymentProjPlanListDetailMapper
@@ -339,7 +375,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 				List<RepaymentProjPlanListDetailDto> repaymentProjPlanListDetailDtos = new ArrayList<>();
 				BigDecimal unpaid = new BigDecimal(0);
 				for (RepaymentProjPlanListDetail repaymentProjPlanListDetail : repaymentProjPlanListDetails) {
-
+					repaymentProjPlanListDetailBaks.get().add(new RepaymentProjPlanListDetailBak(repaymentProjPlanListDetail));
+					
 					if (repaymentProjPlanListDetail.getProjFactAmount() == null) {
 						repaymentProjPlanListDetail.setProjFactAmount(new BigDecimal(0));
 					}
@@ -379,6 +416,32 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			repaymentProjPlanDtos.add(repaymentProjPlanDto);
 		}
 
+		
+		Collections.sort(repaymentProjPlanDtos,new Comparator<RepaymentProjPlanDto>(){
+
+			@Override
+			public int compare(RepaymentProjPlanDto arg0, RepaymentProjPlanDto arg1) {
+				if (arg0.getTuandaiProjectInfo().getMasterIssueId().equals(arg0.getTuandaiProjectInfo().getProjectId())) {
+					return 1;
+				}
+				if (arg0.getRepaymentProjPlan().getBorrowMoney().compareTo(arg1.getRepaymentProjPlan().getBorrowMoney())<0) {
+					return -1;
+				}
+				if (arg0.getTuandaiProjectInfo().getQueryFullSuccessDate().before(arg1.getTuandaiProjectInfo().getQueryFullSuccessDate())) {
+					return -1;
+				}
+				
+				return 0;
+			}
+			
+		});
+		
+		for (RepaymentProjPlanDto repaymentProjPlanDto2 : repaymentProjPlanDtos) {
+			logger.info("满标时间{}"+DateUtil.formatDate(repaymentProjPlanDto2.getTuandaiProjectInfo().getQueryFullSuccessDate()));
+			logger.info("借款金额{}"+repaymentProjPlanDto2.getRepaymentProjPlan().getBorrowMoney());
+			logger.info("是否主借标{}"+repaymentProjPlanDto2.getTuandaiProjectInfo().getMasterIssueId().equals(repaymentProjPlanDto2.getTuandaiProjectInfo().getProjectId()));
+			
+		}
 		repaymentBizPlanDto.setProjPlanDtos(repaymentProjPlanDtos);
 		return repaymentBizPlanDto;
 
@@ -899,5 +962,31 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		confirmLog.get().setRepayDate(planList.getFactRepayDate());
 		confirmLog.get().setProjPlanJson(JSON.toJSONString(projListDetails.get()));
 		confirmLog.get().insert();
+		
+		repaymentBizPlanBak.get().setConfirmLogId(confirmLog.get().getConfirmLogId());
+		repaymentBizPlanBak.get().insert();
+		repaymentBizPlanListBak.get().setConfirmLogId(confirmLog.get().getConfirmLogId());
+		repaymentBizPlanListBak.get().insert();
+		
+		for (RepaymentBizPlanListDetailBak planListDetailBak  : repaymentBizPlanListDetailBaks.get()) {
+			planListDetailBak.setConfirmLogId(confirmLog.get().getConfirmLogId());
+			planListDetailBak.insert();
+		}
+		
+		for (RepaymentProjPlanBak projPlanBak : repaymentProjPlanBaks.get()) {
+			projPlanBak.setConfirmLogId(confirmLog.get().getConfirmLogId());
+			projPlanBak.insert();
+		}
+		
+		for (RepaymentProjPlanListBak projPlanListBak : repaymentProjPlanListBaks.get()) {
+			projPlanListBak.setConfirmLogId(confirmLog.get().getConfirmLogId());
+			projPlanListBak.insert();
+		}
+		
+		for (RepaymentProjPlanListDetailBak projPlanListDetailBak : repaymentProjPlanListDetailBaks.get()) {
+			projPlanListDetailBak.setConfirmLogId(confirmLog.get().getConfirmLogId());
+			projPlanListDetailBak.insert();
+		}
+		
 	}
 }

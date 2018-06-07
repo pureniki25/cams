@@ -63,7 +63,9 @@ import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.JsonUtil;
+import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.common.vo.PageResult;
+import com.hongte.alms.finance.req.MoneyPoolManagerReq;
 import com.hongte.alms.finance.req.MoneyPoolReq;
 import com.hongte.alms.finance.service.FinanceService;
 import com.hongte.alms.finance.service.ShareProfitService;
@@ -198,6 +200,45 @@ public class FinanceController {
 		logger.info("@moneyPool@根据条件获取款项池--结束[{}]", result);
 		return result;
 
+	}
+	
+	@GetMapping(value = "/moneyPoolManager")
+	@ApiOperation(value = "导入流水管理页面列表数据")
+	public PageResult moneyPoolManager(MoneyPoolManagerReq req) {
+		PageResult result;
+		logger.info("@moneyPoolManager@导入流水管理页面列表数据--开始[{}]", req);
+		
+		Page<MoneyPool> page = new Page<>(req.getCurPage(), req.getPageSize());
+		if (req==null) {
+			logger.info("@moneyPoolManager@导入流水管理页面列表数据--结束[{}]",  "参数不能为空");
+			return PageResult.error(500, "参数不能为空");
+		}
+		EntityWrapper<MoneyPool> ew = new EntityWrapper<>();
+		if (!StringUtil.isEmpty(req.getAcceptBank())) {
+			ew.eq("accept_bank", req.getAcceptBank());
+		}
+		if (!StringUtil.isEmpty(req.getStatus())) {
+			ew.eq("status", req.getStatus());
+		}
+		if (!StringUtil.isEmpty(req.getTradeType())) {
+			ew.eq("trade_type", req.getTradeType());
+		}
+		if (!StringUtil.isEmpty(req.getTradeDateStart())) {
+			ew.ge("trade_date", req.getTradeDateStart());
+		}
+		if (!StringUtil.isEmpty(req.getTradeDateEnd())) {
+			ew.le("trade_date", req.getTradeDateEnd());
+		}
+		if (!StringUtil.isEmpty(req.getUdpateDateStart())) {
+			ew.ge("update_time", req.getUdpateDateStart());
+		}
+		if (!StringUtil.isEmpty(req.getUdpateDateEnd())) {
+			ew.le("update_time", req.getUdpateDateStart());
+		}
+		page = moneyPoolService.selectPage(page, ew);
+		result = PageResult.success(page.getRecords(), page.getTotal());
+		logger.info("@moneyPoolManager@导入流水管理页面列表数据--结束[{}]",  page);
+		return result;
 	}
 
 	@PostMapping(value = "/matchBankStatement")
@@ -735,5 +776,7 @@ public class FinanceController {
 		
 		
 	}
+	
+	
 	
 }
