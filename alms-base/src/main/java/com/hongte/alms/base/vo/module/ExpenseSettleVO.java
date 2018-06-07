@@ -279,17 +279,17 @@ public class ExpenseSettleVO implements Serializable{
 	 */
 	public ExpenseSettleVO() {
 		super();
-		setBalance(new BigDecimal(0));
-		setDemurrage(new BigDecimal(0));
-		setDeposit(new BigDecimal(0));
-		setGuaranteeFee(new BigDecimal(0));
-		setInterest(new BigDecimal(0));
-		setLackFee(new BigDecimal(0));
-		setLateFee(new BigDecimal(0));
-		setPenalty(new BigDecimal(0));
-		setPrincipal(new BigDecimal(0));
-		setPlatformFee(new BigDecimal(0));
-		setServicecharge(new BigDecimal(0));
+		setBalance(new BigDecimal("0"));
+		setDemurrage(new BigDecimal("0"));
+		setDeposit(new BigDecimal("0"));
+		setGuaranteeFee(new BigDecimal("0"));
+		setInterest(new BigDecimal("0"));
+		setLackFee(new BigDecimal("0"));
+		setLateFee(new BigDecimal("0"));
+		setPenalty(new BigDecimal("0"));
+		setPrincipal(new BigDecimal("0"));
+		setPlatformFee(new BigDecimal("0"));
+		setServicecharge(new BigDecimal("0"));
 		setList(Collections.EMPTY_LIST);
 	}
 

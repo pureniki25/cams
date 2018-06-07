@@ -108,30 +108,30 @@ public class ExpenseSettleController {
 	TransferOfLitigationMapper transferOfLitigationMapper ;
 
 	private List<ExpenseSettleLackFeeVO> lackFeeList = new ArrayList<>();
-	private BigDecimal principal = new BigDecimal(0).setScale(2);
-	private BigDecimal interest = new BigDecimal(0).setScale(2);
-	private BigDecimal servicecharge = new BigDecimal(0).setScale(2);
-	private BigDecimal guaranteeFee = new BigDecimal(0).setScale(2);
-	private BigDecimal platformFee = new BigDecimal(0).setScale(2);
+	private BigDecimal principal = new BigDecimal("0").setScale(2);
+	private BigDecimal interest = new BigDecimal("0").setScale(2);
+	private BigDecimal servicecharge = new BigDecimal("0").setScale(2);
+	private BigDecimal guaranteeFee = new BigDecimal("0").setScale(2);
+	private BigDecimal platformFee = new BigDecimal("0").setScale(2);
 
 	/**
 	 * 期内滞纳金
 	 */
-	private BigDecimal lateFee = new BigDecimal(0);
+	private BigDecimal lateFee = new BigDecimal("0");
 	/**
 	 * 期外逾期费
 	 */
-	private BigDecimal demurrage = new BigDecimal(0);
+	private BigDecimal demurrage = new BigDecimal("0");
 	/**
 	 * 提前还款违约金
 	 */
-	private BigDecimal penalty = new BigDecimal(0);
+	private BigDecimal penalty = new BigDecimal("0");
 	/**
 	 * 往期少缴费用
 	 */
 	private BigDecimal lackFee = null;
-	private BigDecimal balance = new BigDecimal(0);
-	private BigDecimal deposit = new BigDecimal(0);
+	private BigDecimal balance = new BigDecimal("0");
+	private BigDecimal deposit = new BigDecimal("0");
 
 	@GetMapping("/business")
 	@ApiOperation(value = "获取房贷结清试算基础数据")

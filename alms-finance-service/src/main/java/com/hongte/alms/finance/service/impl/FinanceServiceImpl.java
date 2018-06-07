@@ -378,13 +378,13 @@ public class FinanceServiceImpl implements FinanceService {
 		t.put("repayDate", DateUtil.toDateString(rpl.getDueDate(), DateUtil.DEFAULT_FORMAT_DATE));
 		List<RepaymentBizPlanListDetail> details = repaymentBizPlanListDetailMapper
 				.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", rpl.getPlanListId()));
-		BigDecimal derate = new BigDecimal(0);
-		BigDecimal subtotal = new BigDecimal(0);
-		BigDecimal total = new BigDecimal(0);
-		t.put("item30", new BigDecimal(0));
-		t.put("item50", new BigDecimal(0));
-		t.put("onlineOverDue", new BigDecimal(0));
-		t.put("offlineOverDue", new BigDecimal(0));
+		BigDecimal derate = new BigDecimal("0");
+		BigDecimal subtotal = new BigDecimal("0");
+		BigDecimal total = new BigDecimal("0");
+		t.put("item30", new BigDecimal("0"));
+		t.put("item50", new BigDecimal("0"));
+		t.put("onlineOverDue", new BigDecimal("0"));
+		t.put("offlineOverDue", new BigDecimal("0"));
 		for (RepaymentBizPlanListDetail repaymentBizPlanListDetail : details) {
 			if (repaymentBizPlanListDetail.getDerateAmount()!=null) {
 				derate = derate.add(repaymentBizPlanListDetail.getDerateAmount());

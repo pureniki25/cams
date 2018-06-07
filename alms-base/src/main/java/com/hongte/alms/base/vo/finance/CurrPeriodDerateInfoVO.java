@@ -20,7 +20,7 @@ public class CurrPeriodDerateInfoVO {
 		return list;
 	}
 	public void setList(List<ApplyDerateType> list) {
-		BigDecimal total = new BigDecimal(0);
+		BigDecimal total = new BigDecimal("0");
 		for (ApplyDerateType applyDerateType : list) {
 			total = total.add(applyDerateType.getDerateMoney());
 		}

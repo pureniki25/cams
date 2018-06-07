@@ -327,16 +327,16 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 		for (RepaymentConfirmLog repaymentConfirmLog : list) {
 			String json = repaymentConfirmLog.getProjPlanJson();
 			List<CurrPeriodProjDetailVO> proj = JSON.parseArray(json, CurrPeriodProjDetailVO.class) ;
-			BigDecimal item10 = new BigDecimal(0);
-			BigDecimal item20 = new BigDecimal(0);
-			BigDecimal item30 = new BigDecimal(0);
-			BigDecimal item50 = new BigDecimal(0);
-			BigDecimal offlineOverDue = new BigDecimal(0);
-			BigDecimal onlineOverDue = new BigDecimal(0);
-			BigDecimal subTotal = new BigDecimal(0);
-			BigDecimal total = new BigDecimal(0);
+			BigDecimal item10 = new BigDecimal("0");
+			BigDecimal item20 = new BigDecimal("0");
+			BigDecimal item30 = new BigDecimal("0");
+			BigDecimal item50 = new BigDecimal("0");
+			BigDecimal offlineOverDue = new BigDecimal("0");
+			BigDecimal onlineOverDue = new BigDecimal("0");
+			BigDecimal subTotal = new BigDecimal("0");
+			BigDecimal total = new BigDecimal("0");
 			String realName = null ;
-			BigDecimal amount = new BigDecimal(0);
+			BigDecimal amount = new BigDecimal("0");
 			for (CurrPeriodProjDetailVO currPeriodProjDetailVO : proj) {
 				realName = currPeriodProjDetailVO.getUserName();
 				amount = currPeriodProjDetailVO.getProjAmount();
