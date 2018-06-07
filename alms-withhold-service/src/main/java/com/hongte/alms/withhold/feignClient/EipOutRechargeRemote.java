@@ -21,27 +21,6 @@ import com.ht.ussp.core.Result;
 @FeignClient(value = "eip-out")
 public interface EipOutRechargeRemote {
 	
-     /*
-      * 银行代扣
-      */
-    @RequestMapping(value = "/eip/td/assetside/autoRecharge",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
-    String bankRecharge(@RequestBody BankRechargeReqDto dto);
-    
-    
-    /*
-     * 宝付代扣
-     */
-    
-    @RequestMapping(value = "/eip/td/backTransRequest",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
-    String baofuRecharge(@RequestBody BaofuRechargeReqDto dto);
-    
-    
-    
-    /*
-     * 易宝代扣
-     */
-    
-    @RequestMapping(value = "/eip/td/tzt/invokeBindBankCard",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
-    String yibaoRecharge(@RequestBody YiBaoRechargeReqDto dto);
+   
     
 }

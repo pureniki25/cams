@@ -9,6 +9,7 @@ import com.hongte.alms.base.entity.WithholdingChannel;
 import com.hongte.alms.base.entity.WithholdingRepaymentLog;
 import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
+import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.feignClient.dto.BankCardInfo;
 import com.hongte.alms.base.feignClient.dto.BankRechargeReqDto;
 import com.hongte.alms.base.feignClient.dto.BaofuRechargeReqDto;
@@ -42,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 
@@ -75,13 +77,22 @@ public class RechargeServiceImpl implements RechargeService {
     BizOutputRecordService bizOutputRecordService;
     
     @Autowired
-    EipOutRechargeRemote eipOutRechargeRemote;
+    EipRemote eipRemote;
     
     @Autowired
     FinanceClient financeClient;
     
     @Autowired  
     private RedisService redisService;  
+    
+    @Value("${tuandai_pay_cm_orderno}")
+	private String oidPartner;
+	
+	@Value("${tuandai_org_username}")
+	private String orgUserName;
+	
+	@Value("${tuandai_org_userid}")
+	private String rechargeUserId;
     
 
     @Autowired
@@ -163,7 +174,7 @@ public class RechargeServiceImpl implements RechargeService {
 				dto.setCard_last(info.getBankCardNumber().substring(info.getBankCardNumber().length()-4, info.getBankCardNumber().length()));
 				dto.setCallbackurl("172.0.0.1");
 				dto.setUserip("172.0.0.1");
-				eipOutRechargeRemote.yibaoRecharge(dto);
+				eipRemote.yibaoRecharge(dto);
 			}
 			if(platformId==PlatformEnum.BF_FORM.getValue()) {
 				BaofuRechargeReqDto dto=new BaofuRechargeReqDto();
@@ -177,7 +188,7 @@ public class RechargeServiceImpl implements RechargeService {
 				dto.setTxnAmt(amount);
 				dto.setTradeDate(String.valueOf(Long.parseLong(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()))));
 				dto.setTransSerialNo(merchOrderId);
-				eipOutRechargeRemote.baofuRecharge(dto);
+				eipRemote.baofuRecharge(dto);
 			}
             if(platformId==PlatformEnum.YH_FORM.getValue()) {
             	BankRechargeReqDto dto=new BankRechargeReqDto();
@@ -185,7 +196,9 @@ public class RechargeServiceImpl implements RechargeService {
             	dto.setChannelType("102");//todo需要循环子渠道
             	dto.setRechargeUserId(info.getPlatformUserID());
             	dto.setCmOrderNo(merchOrderId);
-            	eipOutRechargeRemote.bankRecharge(dto);
+            	dto.setOidPartner(oidPartner);
+            	dto.setOrgUserName(orgUserName);
+            	com.ht.ussp.core.Result result1=eipRemote.bankRecharge(dto);
 			}
 			
 		}
