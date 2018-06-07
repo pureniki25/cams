@@ -501,6 +501,7 @@ public class RepaymentProjPlanListServiceImpl extends
 		 * @return
 		 */
 		private Date getPlatformDuedate(String projId,String periods) {
+			logger.debug("====================标ID:"+projId+"获取平台标的期数为："+periods+"的还款日日期开始=======================================");
 		 	Map<String, Object> paramMap = new HashMap<>();
 			paramMap.put("projectId",projId);
 			paramMap.put("type", "1");
