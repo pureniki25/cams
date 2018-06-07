@@ -150,7 +150,7 @@ window.layinit(function (htConfig) {
                        vm.$Modal.error({content: '接口调用异常!'});
                    });
            },
-           // 更新代充值处理状态
+/*           // 更新代充值处理状态
            updateAgencyRecharge:function(){
         	   this.updateAgencyRechargeHandleStatusLoading = true;
         	   axios.get(platRepayBasePath +"recharge/queryRechargeOrder",{timeout: 0})
@@ -169,7 +169,7 @@ window.layinit(function (htConfig) {
         		   vm.$Modal.error({content: '接口调用异常!'});
         	   });
            },
-	   }
+*/	   }
 	});
     
 });

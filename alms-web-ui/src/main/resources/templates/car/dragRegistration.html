@@ -325,7 +325,7 @@
             <i-col span="24">
                     <div class="layui-btn-group" style="float:right">
                             <button class="layui-btn" @click="saveRegistrationInfo('registrationInfoForm')">保存</button>
-                            <button class="layui-btn layui-btn-danger" @click="resetEdit()">撤销</button>
+                            <button class="layui-btn layui-btn-warm" @click="resetEdit()">撤销</button>
                           </div>
                 <!-- <i-button type="success" @click="saveRegistrationInfo('registrationInfoForm')">保存</i-button>
                 <i-button type="warning" @click="resetEdit()">撤销</i-button> -->
@@ -755,6 +755,14 @@
                                     originalName: ""
                                 }
                         })
+                    },
+                    resetEdit:function()
+                    {
+                        if (typeof (parent.layer) != 'undefined') {
+                            var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+                            parent.layer.close(index);
+                        }
+
                     }
                 },
                 created: function () {

@@ -93,6 +93,12 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 	@ApiModelProperty(required= true,value = "资产端期数")
 	private String afterId;
     /**
+     * 财务确认时间或成功代扣时间
+     */
+	@TableField("confirm_time")
+	@ApiModelProperty(required= true,value = "财务确认时间或成功代扣时间")
+	private Date confirmTime;
+    /**
      * (代充值资金分发接口参数)团贷网用户唯一编号
      */
 	@TableField("td_user_id")
@@ -128,10 +134,10 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 	@ApiModelProperty(required= true,value = "(代充值资金分发接口参数)充值金额")
 	private BigDecimal rechargeAmount;
     /**
-     * 标记当前资金分发操作是否为结清操作，0：非结清，1：正常结清，2：展期原标结清
+     * 标记当前资金分发操作是否为结清操作，0：非结清，1：正常结清，2：展期原标结清，3：坏账结清
      */
 	@TableField("settle_type")
-	@ApiModelProperty(required= true,value = "标记当前资金分发操作是否为结清操作，0：非结清，1：正常结清，2：展期原标结清")
+	@ApiModelProperty(required= true,value = "标记当前资金分发操作是否为结清操作，0：非结清，1：正常结清，2：展期原标结清，3：坏账结清")
 	private Integer settleType;
     /**
      * 实收总金额
@@ -311,6 +317,14 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 
 	public void setAfterId(String afterId) {
 		this.afterId = afterId;
+	}
+
+	public Date getConfirmTime() {
+		return confirmTime;
+	}
+
+	public void setConfirmTime(Date confirmTime) {
+		this.confirmTime = confirmTime;
 	}
 
 	public String getTdUserId() {
@@ -508,6 +522,7 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 			", companyName=" + companyName +
 			", repaySource=" + repaySource +
 			", afterId=" + afterId +
+			", confirmTime=" + confirmTime +
 			", tdUserId=" + tdUserId +
 			", totalAmount=" + totalAmount +
 			", batchId=" + batchId +
