@@ -136,7 +136,7 @@ public class RepaymentProjPlanListServiceImpl extends
 									continue;
 									// 逾期的当前期
 								} else {
-									logger.info("逾期费用计算开始===============：planListid:"+pList.getPlanListId()+"===============");
+									logger.info("===============：planListid:"+pList.getPlanListId()+"逾期费用计算开始===============");
 									//获取平台对应标对应期的还款日期,取晚的日期
 									Date platformDueDate=getPlatformDuedate(projPlan.getProjectId(), projPList.getPeriod().toString());
 									BigDecimal days=BigDecimal.valueOf(0);
@@ -169,7 +169,7 @@ public class RepaymentProjPlanListServiceImpl extends
 								pList.setOverdueAmount(underLateFeeSum.add(onlineLateFeeSum));
 								pList.setCurrentStatus(RepayCurrentStatusEnums.逾期.name());
 								repaymentBizPlanListService.updateById(pList);
-								logger.info("逾期费用计算结束===============：planListid:"+pList.getPlanListId()+"===============");
+								logger.info("===============：planListid:"+pList.getPlanListId()+"逾期费用计算结束===============");
 							}
 							
 							

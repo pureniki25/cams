@@ -10,27 +10,27 @@ import java.io.Serializable;
 public class YiBaoRechargeReqDto implements Serializable {
 	 private static final long serialVersionUID = -4095682638492039883L;
 	 private String merchantaccount;
-	 private String orderid        ;
-	 private Long transtime      ;
-	 private String currency       ;
-	 private Double amount         ;
-	 private String productname    ;
+	 private String orderid;
+	 private Long transtime;
+	 private String currency;
+	 private Double amount;
+	 private String productname;
 	 public Double getAmount() {
 		return amount;
 	}
 	public void setAmount(Double amount) {
 		this.amount = amount;
 	}
-	private String productdesc    ;
-	 private String identityid     ;
-	 private String identitytype   ;
-	 private String card_top       ;
-	 private String card_last      ;
-	 private String orderexpdate   ;
-	 private String callbackurl    ;
-	 private String imei           ;
-	 private String userip         ;
-	 private String ua             ;
+	private String productdesc;
+	 private String identityid;
+	 private String identitytype;
+	 private String card_top;
+	 private String card_last;
+	 private String orderexpdate;
+	 private String callbackurl;
+	 private String imei;
+	 private String userip;
+	 private String ua;
 	public String getMerchantaccount() {
 		return merchantaccount;
 	}
