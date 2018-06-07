@@ -12,6 +12,7 @@ import com.hongte.alms.base.vo.module.api.RepayLogResp;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.DESC;
 import com.hongte.alms.common.util.EncryptionResult;
+import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.open.service.WithHoldingXinDaiService;
 import com.hongte.alms.open.vo.*;
@@ -75,16 +76,25 @@ public class WithHoldingController {
 
 	) {
 		try {
-          
+           
 			logger.info("执行代扣调用的apiUrl:"+apiUrl+"");
 			WithHoldingInfo info = new WithHoldingInfo();
 			RequestData requestData = new RequestData();
 			info.setBusinessId(originalBusinessId);
 			info.setAfterId(afterId);
-			info.setOverduemoney(planOverDueMoney);
+			if(StringUtil.isEmpty(planOverDueMoney)) {
+	           info.setOverduemoney("0");
+	        }else {
+	           info.setOverduemoney(planOverDueMoney);
+	        }
 			info.setFactDate(DateUtil.formatDate(new Date()));
 			info.setRepayplatform(Integer.valueOf(platformId));
 			info.setType(Integer.valueOf(type));
+			if(StringUtil.isEmpty(total)) {
+				info.setNowRepayMoney("0");
+		    }else {
+		    	info.setNowRepayMoney(total);
+		    }
 			info.setNowRepayMoney(total);
 			info.setIsAmountWithheld(isAmountWithheld);
 
