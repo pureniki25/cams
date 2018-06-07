@@ -81,7 +81,7 @@
 		  `tb_withholding_repayment_log` wrl 
 		  LEFT JOIN `tb_withholding_platform` wp 
 		    ON wrl.`bind_platform_id` = wp.`platform_id` 
-		    AND wrl.`repay_status` = 1 
+		  WHERE wrl.`repay_status` = 1 
 		    AND wrl.original_business_id = #{businessId,jdbcType=VARCHAR}
 		UNION
 		ALL 
