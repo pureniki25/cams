@@ -73,7 +73,9 @@
 		    THEN '易宝' 
 		    WHEN 3 
 		    THEN '宝付' 
-		    ELSE wp.platform_name
+		    WHEN 5 
+		    THEN '银行代扣' 
+		    ELSE '' 
 		  END accountName 
 		FROM
 		  `tb_withholding_repayment_log` wrl 
