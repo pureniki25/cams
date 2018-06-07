@@ -44,6 +44,7 @@ import com.hongte.alms.base.service.RepaymentConfirmLogService;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
+import com.hongte.alms.common.util.DateUtil;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -390,6 +391,7 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 			p.put("total", total);
 			p.put("list", proj);
 			p.put("type", "实际还款");
+			p.put("repayDate", DateUtil.formatDate(repaymentConfirmLog.getRepayDate()));
 			res.add(p);
 		}
 		

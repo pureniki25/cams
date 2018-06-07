@@ -116,7 +116,7 @@ window.layinit(function (htConfig) {
                         key: 'item50'
                     }, {
                         title: '小计',
-                        key: 'subtotal'
+                        key: 'subTotal'
                     }, {
                         title: '线下逾期费',
                         key: 'offlineOverDue'
@@ -324,28 +324,45 @@ window.layinit(function (htConfig) {
                             })
 
                             let chaer = {}
+                            chaer.item10 = 0
+                            chaer.item20 = 0
+                            chaer.item30 = 0
+                            chaer.item50 = 0
+                            chaer.subTotal = 0
+                            chaer.offlineOverDue = 0
+                            chaer.onlineOverDue = 0
+                            chaer.total = 0
                             chaer.type = '差额'
                             let e1 = res.data.data[0]
 
                             if(res.data.data.length>1){
                                 res.data.data.forEach((element,index) => {
                                     if (index > 0) {
-                                        chaer.item10 = -(e1.item10*1000 - element.item10*1000)/1000
-                                        chaer.item20 = -(e1.item20*1000 - element.item20*1000)/1000
-                                        chaer.item30 = -(e1.item30*1000 - element.item30*1000)/1000
-                                        chaer.item50 = -(e1.item50*1000 - element.item50*1000)/1000
-                                        chaer.subtotal = -(e1.subtotal*1000 - element.subtotal*1000)/1000
-                                        chaer.offlineOverDue = -(e1.offlineOverDue*1000 - element.offlineOverDue*1000)/1000
-                                        chaer.onlineOverDue = -(e1.onlineOverDue*1000 - element.onlineOverDue*1000)/1000
-                                        chaer.total = -(e1.total*1000 - element.total*1000)/1000
+                                        chaer.item10 +=  element.item10?element.item10:0
+                                        chaer.item20 += element.item20?element.item20:0
+                                        chaer.item30 += element.item30?element.item30:0
+                                        chaer.item50 += element.item50?element.item50:0
+                                        chaer.subTotal += element.subTotal?element.subTotal:0
+                                        chaer.offlineOverDue += element.offlineOverDue?element.offlineOverDue:0
+                                        chaer.onlineOverDue += element.onlineOverDue?element.onlineOverDue:0
+                                        chaer.total += element.total?element.total:0
                                     } 
                                 });
+
+                                chaer.item10 = (chaer.item10*1000 - e1.item10*1000)/1000
+                                chaer.item20 = (chaer.item20*1000 - e1.item20*1000)/1000
+                                chaer.item30 = (chaer.item30*1000 - e1.item30*1000)/1000
+                                chaer.item50 = (chaer.item50*1000 - e1.item50*1000)/1000
+                                chaer.subTotal = (chaer.subTotal*1000 - e1.subTotal*1000)/1000
+                                chaer.offlineOverDue = (chaer.offlineOverDue*1000 - e1.offlineOverDue*1000)/1000
+                                chaer.onlineOverDue = (chaer.onlineOverDue*1000 - e1.onlineOverDue*1000)/1000
+                                chaer.total = (chaer.total*1000 - e1.total*1000)/1000
                             }else {
                                 chaer.item10 = -e1.item10
                                 chaer.item20 = -e1.item20
                                 chaer.item30 = -e1.item30
                                 chaer.item50 = -e1.item50
-                                chaer.subtotal = -e1.subtotal
+                                chaer.subTotal = -e1.subTotal
                                 chaer.offlineOverDue = -e1.offlineOverDue
                                 chaer.onlineOverDue = -e1.onlineOverDue
                                 chaer.total = -e1.total

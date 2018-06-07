@@ -1,6 +1,10 @@
 package com.hongte.alms.base.RepayPlan.dto.app;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -26,6 +30,16 @@ public class BizPlanDto  implements Serializable {
 
 
     private BizPlanListDto currentPeroid;//当前期
+
+
+    private String businessType ;//业务类型
+    private  String repayWay;//还款方式
+    private BigDecimal borrowMoney;//借款总金额
+    private Integer borrowLimit;//借款期限
+    private String borrowLimitUnit;//借款期限单位
+
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date inputTime;//进件日期
 
 
     public String getPlanId() {
@@ -82,5 +96,53 @@ public class BizPlanDto  implements Serializable {
 
     public void setIsOver(Boolean over) {
         isOver = over;
+    }
+
+    public String getBusinessType() {
+        return businessType;
+    }
+
+    public void setBusinessType(String businessType) {
+        this.businessType = businessType;
+    }
+
+    public String getRepayWay() {
+        return repayWay;
+    }
+
+    public void setRepayWay(String repayWay) {
+        this.repayWay = repayWay;
+    }
+
+    public BigDecimal getBorrowMoney() {
+        return borrowMoney;
+    }
+
+    public void setBorrowMoney(BigDecimal borrowMoney) {
+        this.borrowMoney = borrowMoney;
+    }
+
+    public Integer getBorrowLimit() {
+        return borrowLimit;
+    }
+
+    public void setBorrowLimit(Integer borrowLimit) {
+        this.borrowLimit = borrowLimit;
+    }
+
+    public String getBorrowLimitUnit() {
+        return borrowLimitUnit;
+    }
+
+    public void setBorrowLimitUnit(String borrowLimitUnit) {
+        this.borrowLimitUnit = borrowLimitUnit;
+    }
+
+    public Date getInputTime() {
+        return inputTime;
+    }
+
+    public void setInputTime(Date inputTime) {
+        this.inputTime = inputTime;
     }
 }
