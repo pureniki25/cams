@@ -11,6 +11,7 @@ import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.StringUtil;
 import com.ht.ussp.core.Result;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,6 +50,8 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 				throw new ServiceRuntimeException("没有找到对应的代充值记录");
 			}
 			log.setHandleStatus(orderStatus);
+			log.setUpdateTime(new Date());
+			log.setUpdateUser("eip回调");
 			this.updateById(log);
 			
 		} catch (Exception e) {
@@ -60,7 +63,7 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 	@Transactional(rollbackFor = Exception.class)
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public void queryRechargeOrder(String oidPartner, String cmOrderNo) {
+	public void queryRechargeOrder(String oidPartner, String cmOrderNo, String updateUser) {
 		try {
 			Map<String, Object> paramMap = new HashMap<>();
 			paramMap.put("oidPartner", oidPartner);
@@ -78,6 +81,8 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 				LOG.info("查询订单充值，状态：{}，订单号：{}，消息：{}", status, orderId, message);
 				AgencyRechargeLog log = new AgencyRechargeLog();
 				log.setHandleStatus(status);
+				log.setUpdateTime(new Date());
+				log.setUpdateUser(updateUser);
 				this.update(log, new EntityWrapper<AgencyRechargeLog>().eq("unique_id", cmOrderNo));
 			}
 		} catch (Exception e) {

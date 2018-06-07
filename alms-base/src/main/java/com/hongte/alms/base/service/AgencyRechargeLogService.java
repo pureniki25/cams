@@ -26,7 +26,8 @@ public interface AgencyRechargeLogService extends BaseService<AgencyRechargeLog>
 	 * 查询充值订单
 	 * @param oidPartner资产端账户唯一编号
 	 * @param cmOrderNo机构订单编号
+	 * @param updateUser更新人
 	 * @return
 	 */
-	void queryRechargeOrder(String oidPartner, String cmOrderNo);
+	void queryRechargeOrder(String oidPartner, String cmOrderNo, String updateUser);
 }

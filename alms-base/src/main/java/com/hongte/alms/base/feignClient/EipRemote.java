@@ -51,11 +51,20 @@ public interface EipRemote {
     public Result agencyRecharge(@RequestBody RechargeModalDTO dto);
     
     /**
-     * 7.1.29	查询充值订单
+     * 查询充值订单
      * 
      * @param paramMap
      * @return
      */
     @RequestMapping(value = "/eip/td/assetside/queryRechargeOrder", headers = { "app=ALMS", "content-type=application/json" },method = RequestMethod.POST)
     public Result queryRechargeOrder(@RequestBody Map<String, Object> paramMap);
+    
+    /**
+     * 标的还款信息查询接口
+     * 
+     * @param paramMap
+     * @return
+     */
+    @RequestMapping(value = "/eip/td/assetside/getProjectPayment", headers = { "app=ALMS", "content-type=application/json" },method = RequestMethod.POST)
+    public Result getProjectPayment(@RequestBody Map<String, Object> paramMap);
 }

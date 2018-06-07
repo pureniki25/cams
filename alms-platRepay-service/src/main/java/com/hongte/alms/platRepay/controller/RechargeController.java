@@ -325,7 +325,7 @@ public class RechargeController {
 			if (StringUtil.isEmpty(cmOrderNo) || StringUtil.isEmpty(oidPartner)) {
 				return Result.error("500", "订单号或资产端唯一编号不能为空");
 			}
-			agencyRechargeLogService.queryRechargeOrder(oidPartner, cmOrderNo);
+			agencyRechargeLogService.queryRechargeOrder(oidPartner, cmOrderNo, loginUserInfoHelper.getUserId());
 			return Result.success();
 		} catch (Exception e) {
 			LOG.error("查询充值订单失败", e);
