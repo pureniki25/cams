@@ -358,8 +358,15 @@ public class RepaymentProjPlanListServiceImpl extends
 	    private BigDecimal principalAndInterest(String projId,Integer period){
 	    	Map<String, Object> paramMap = new HashMap<>();
 			paramMap.put("projectId", projId);
-		 
-			Result result = eipRemote.advanceShareProfit(paramMap);
+			Result result=null;
+		 try {
+			 result = eipRemote.advanceShareProfit(paramMap);
+			if(result==null) {
+				logger.debug("调查询平台垫付记录接口出错");
+			}
+		 }catch(Exception e) {
+				logger.debug("调查询平台垫付记录接口出错"+e);
+		 }
 			HashMap<String,HashMap<String,String>> map=(HashMap) result.getData();
 			List<HashMap<String,String>> list=(List<HashMap<String, String>>) map.get("returnAdvanceShareProfits");
 			String principalAndInterest="";
