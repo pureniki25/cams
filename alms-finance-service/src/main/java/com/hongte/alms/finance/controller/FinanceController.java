@@ -697,7 +697,7 @@ public class FinanceController {
 	}
 
 	
-	/*@ApiOperation(value = "分润")
+	@ApiOperation(value = "分润")
 	@PostMapping("/shareProfit")
 	public Result shareProfit(@RequestParam("businessId") String businessId,@RequestParam("afterId") String afterId){
 		Result result=new Result();
@@ -716,7 +716,7 @@ public class FinanceController {
 			return Result.error("分润出现异常", ex.getMessage());
 		}
 		return result;
-	}*/
+	}
 	
 	@ApiOperation(value = "删除财务新增的银行流水")
 	@GetMapping("/deleteMoneyPool")
