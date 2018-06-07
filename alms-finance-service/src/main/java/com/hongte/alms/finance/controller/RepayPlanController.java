@@ -29,6 +29,8 @@ import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.RepaymentBizPlanService;
 import com.hongte.alms.base.vo.module.api.RepayLogResp;
 
+import com.hongte.alms.common.exception.ExceptionCodeEnum;
+import com.hongte.alms.common.exception.MyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -598,6 +600,10 @@ public class RepayPlanController {
 
         BasicBusiness business = basicBusinessService.selectById(businessId);
         bizDto.setBusinessId(businessId);
+
+        if(business ==null){
+            throw  new MyException(ExceptionCodeEnum.NULL.getValue().toString(),"找不到业务信息，业务ID："+businessId);
+        }
 
         //业务类型
         List<BasicBusinessType>  types =basicBusinessTypeService.selectList(new EntityWrapper<BasicBusinessType>().eq("business_type_id",business.getBusinessType()));
