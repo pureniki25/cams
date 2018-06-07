@@ -515,10 +515,20 @@ public class RepayPlanController {
 
        RepaymentBizPlan bizPlan =  repaymentBizPlanService.selectById(planId);
 
+
        if(bizPlan ==null){
            return Result.error("9889","未找到对应的还款计划");
        }
+
+        BizDto bizDto =  getBizDtoByBizId(bizPlan.getBusinessId());
+
         BizPlanDto  bizPlanDto  = getBizPlanDtoByBizPlan(bizPlan);
+        bizPlanDto.setBusinessType(bizDto.getBusinessType());
+        bizPlanDto.setRepayWay(bizDto.getRepayWay());
+        bizPlanDto.setBorrowMoney(bizDto.getBorrowMoney());
+        bizPlanDto.setBorrowLimit(bizDto.getBorrowLimit());
+        bizPlanDto.setBorrowLimitUnit(bizDto.getBorrowLimitUnit());
+        bizPlanDto.setInputTime(bizDto.getInputTime());
         logger.info("根据还款计划ID查找出此还款计划的详情账单信息 结束，返回数据：[{}]", JSON.toJSONString(bizPlanDto));
 
        return  Result.success(bizPlanDto);
