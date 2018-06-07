@@ -163,7 +163,7 @@
 				AND b.business_type = #{businessType}
 			</if>
 			<if test="repayDate != null">
-				AND pl.due_date = #{repayDate}
+				AND DATE_FORMAT(pl.due_date,'%Y-%m-%d') = #{repayDate}
 			</if>
 			<if test="regDateStart != null ">
 				AND mpr.trade_date &gt;= #{regDateStart}
@@ -253,7 +253,7 @@
 				AND b.business_type = #{businessType}
 			</if>
 			<if test="repayDate != null">
-				AND pl.due_date = #{repayDate}
+				AND DATE_FORMAT(pl.due_date,'%Y-%m-%d') = #{repayDate}
 			</if>
 			<if test="regDateStart != null ">
 				AND mpr.trade_date &gt;= #{regDateStart}

@@ -8,7 +8,6 @@ import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
-import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
@@ -114,13 +113,13 @@ public class TuandaiProjectInfo extends Model<TuandaiProjectInfo> {
      */
 	@TableField("TelNo")
 	@ApiModelProperty(required= true,value = "手机号码")
-	private String TelNo;
+	private String telNo;
     /**
      * 邮箱
      */
 	@TableField("Email")
 	@ApiModelProperty(required= true,value = "邮箱")
-	private String Email;
+	private String email;
     /**
      * 身份证号码
      */
@@ -633,19 +632,19 @@ public class TuandaiProjectInfo extends Model<TuandaiProjectInfo> {
 	}
 
 	public String getTelNo() {
-		return TelNo;
+		return telNo;
 	}
 
 	public void setTelNo(String TelNo) {
-		this.TelNo = TelNo;
+		this.telNo = TelNo;
 	}
 
 	public String getEmail() {
-		return Email;
+		return email;
 	}
 
 	public void setEmail(String Email) {
-		this.Email = Email;
+		this.email = Email;
 	}
 
 	public String getIdentityCard() {
@@ -1190,8 +1189,8 @@ public class TuandaiProjectInfo extends Model<TuandaiProjectInfo> {
 			", businessAfterGuid=" + businessAfterGuid +
 			", queryFullSuccessDate=" + queryFullSuccessDate +
 			", nickName=" + nickName +
-			", TelNo=" + TelNo +
-			", Email=" + Email +
+			", telNo=" + telNo +
+			", email=" + email +
 			", identityCard=" + identityCard +
 			", realName=" + realName +
 			", bankAccountNo=" + bankAccountNo +
