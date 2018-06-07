@@ -264,15 +264,22 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 			resource = repaymentResourceMapper.selectOne(resource);
 			/*撤销银行流水与财务登记关联*/
 			moneyPoolService.revokeConfirmRepaidUpdateMoneyPool(resource);
-			if (resource!=null) {
-				/*删除还款来源记录*/
-				resource.deleteById();
-			}
+			
 			/*删除实还明细记录*/
 //			factRepay.deleteById();
 			repaymentProjFactRepayMapper.delete(new EntityWrapper<RepaymentProjFactRepay>().eq("proj_plan_detail_repay_id", factRepay.getProjPlanDetailRepayId()));
 		}
 		
+		for (RepaymentProjFactRepay factRepay : factRepays) {
+			RepaymentResource resource = new RepaymentResource() ;
+			resource.setResourceId(factRepay.getRepaySourceId());
+			/*找还款来源记录*/
+			resource = repaymentResourceMapper.selectOne(resource);
+			if (resource!=null) {
+				/*删除还款来源记录*/
+				resource.deleteById();
+			}
+		}
 		/*根据 confirm_log_id 找还款计划6张表相关的备份记录*/
 		List<RepaymentBizPlanBak> selectList = repaymentBizPlanBakMapper.selectList(new EntityWrapper<RepaymentBizPlanBak>().eq("confirm_log_id", log.getConfirmLogId()));
 		List<RepaymentBizPlanListBak> selectList2 = repaymentBizPlanListBakMapper.selectList(new EntityWrapper<RepaymentBizPlanListBak>().eq("confirm_log_id", log.getConfirmLogId()));
@@ -286,37 +293,56 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 			RepaymentProjPlanListDetail detail = new RepaymentProjPlanListDetail(repaymentProjPlanListDetailBak);
 			repaymentProjPlanListDetailMapper.deleteById(detail.getProjPlanDetailId());
 			detail.insert();
+			repaymentProjPlanListDetailBak.delete(new EntityWrapper<>()
+					.eq("proj_plan_detail_id", repaymentProjPlanListDetailBak.getProjPlanDetailId())
+					.eq("confirm_log_id", repaymentProjPlanListDetailBak.getConfirmLogId()));
 		}
 		
 		for (RepaymentProjPlanListBak repaymentProjPlanListBak : selectList5) {
 			RepaymentProjPlanList list = new RepaymentProjPlanList(repaymentProjPlanListBak);
 			repaymentProjPlanListMapper.deleteById(list.getProjPlanListId());
 			list.insert();
+			repaymentProjPlanListBak.delete(new EntityWrapper<>()
+					.eq("proj_plan_list_id", repaymentProjPlanListBak.getProjPlanListId())
+					.eq("confirm_log_id", repaymentProjPlanListBak.getConfirmLogId()));
 		}
 		
 		for (RepaymentProjPlanBak repaymentProjPlanBak : selectList4) {
 			RepaymentProjPlan plan = new RepaymentProjPlan(repaymentProjPlanBak);
 			repaymentProjPlanMapper.deleteById(plan.getProjPlanId());
 			plan.insert();
+			repaymentProjPlanBak.delete(new EntityWrapper<>()
+					.eq("proj_plan_id", repaymentProjPlanBak.getProjPlanId())
+					.eq("confirm_log_id", repaymentProjPlanBak.getConfirmLogId()));
 		}
 		
 		for (RepaymentBizPlanListDetailBak repaymentBizPlanListDetailBak : selectList3) {
 			RepaymentBizPlanListDetail detail = new RepaymentBizPlanListDetail(repaymentBizPlanListDetailBak);
 			repaymentBizPlanListDetailMapper.deleteById(detail.getPlanDetailId());
 			detail.insert();
+			repaymentBizPlanListDetailBak.delete(new EntityWrapper<>()
+					.eq("plan_detail_id", repaymentBizPlanListDetailBak.getPlanDetailId())
+					.eq("confirm_log_id", repaymentBizPlanListDetailBak.getConfirmLogId()));
 		}
 		
 		for (RepaymentBizPlanListBak repaymentBizPlanListBak : selectList2) {
 			RepaymentBizPlanList list = new RepaymentBizPlanList(repaymentBizPlanListBak);
 			repaymentBizPlanListMapper.deleteById(list.getPlanListId());
 			list.insert();
+			repaymentBizPlanListBak.delete(new EntityWrapper<>()
+					.eq("plan_list_id", repaymentBizPlanListBak.getPlanListId())
+					.eq("confirm_log_id", repaymentBizPlanListBak.getConfirmLogId()));
 		}
 		
 		for (RepaymentBizPlanBak repaymentBizPlanBak : selectList) {
 			RepaymentBizPlan plan = new RepaymentBizPlan(repaymentBizPlanBak);
 			repaymentBizPlanMapper.deleteById(plan.getPlanId());
 			plan.insert();
+			repaymentBizPlanBak.delete(new EntityWrapper<>()
+					.eq("plan_id", repaymentBizPlanBak.getPlanId())
+					.eq("confirm_log_id", repaymentBizPlanBak.getConfirmLogId()));
 		}
+		log.deleteById();
 		return Result.success();
 	}
 	
