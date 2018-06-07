@@ -153,7 +153,7 @@ public class FinanceController {
 				.selectById(basicBusiness.getRepaymentTypeId());
 		List<BizOutputRecord> outputRecords = bizOutputRecordService
 				.selectList(new EntityWrapper<BizOutputRecord>().eq("business_id", businessId));
-		BigDecimal outPutMoney = new BigDecimal(0);
+		BigDecimal outPutMoney = new BigDecimal("0");
 		for (BizOutputRecord bizOutputRecord : outputRecords) {
 			outPutMoney = outPutMoney.add(bizOutputRecord.getFactOutputMoney());
 		}

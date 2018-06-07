@@ -226,13 +226,13 @@ public class ExpenseSettleRepaymentPlanVO  {
 	 * @return
 	 */
 	public BigDecimal calCurrentDetails(Date settleDate,Integer itemType,boolean factAmount) {
-		BigDecimal res = new BigDecimal(0);
+		BigDecimal res = new BigDecimal("0");
 		for (RepaymentBizPlanListDetail detail : findCurrentDetails(settleDate)) {
 			if (detail.getPlanItemType().equals(itemType)&&detail.getAccountStatus()!=null&&!detail.getAccountStatus().equals(0)) {
 				if (factAmount) {
-					res=res.add(detail.getFactAmount()==null?new BigDecimal(0):detail.getFactAmount());
+					res=res.add(detail.getFactAmount()==null?new BigDecimal("0"):detail.getFactAmount());
 				}else {
-					res=res.add(detail.getPlanAmount()==null?new BigDecimal(0):detail.getPlanAmount());
+					res=res.add(detail.getPlanAmount()==null?new BigDecimal("0"):detail.getPlanAmount());
 				}
 			}
 		}

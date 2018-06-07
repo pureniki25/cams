@@ -157,11 +157,11 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		afterId.set(req.getAfterId());
 		projListDetails.set(new ArrayList<>());
 		repaymentResources.set(new ArrayList<>());
-		repayPlanAmount.set(new BigDecimal(0));
-		repayFactAmount.set(new BigDecimal(0));
-		moneyPoolAmount.set(new BigDecimal(0));
-		surplusAmount.set(new BigDecimal(0));
-		lackAmount.set(new BigDecimal(0));
+		repayPlanAmount.set(new BigDecimal("0"));
+		repayFactAmount.set(new BigDecimal("0"));
+		moneyPoolAmount.set(new BigDecimal("0"));
+		surplusAmount.set(new BigDecimal("0"));
+		lackAmount.set(new BigDecimal("0"));
 		repaySource.set(req.getRepaySource());
 		confirmLog.set(createConfirmLog());
 		repaymentBizPlanListDetailBaks.set(new ArrayList<>());
@@ -195,7 +195,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		if (repayFactAmount.get().compareTo(repayPlanAmount.get()) >= 0) {
 			surplusAmount.set(repayFactAmount.get().subtract(repayPlanAmount.get()));
 			logger.info("surplusAmount={}",surplusAmount.get());
-			if (surplusAmount.get().compareTo(new BigDecimal(0))>0&&this.save.get()) {
+			if (surplusAmount.get().compareTo(new BigDecimal("0"))>0&&this.save.get()) {
 				AccountantOverRepayLog accountantOverRepayLog = new AccountantOverRepayLog() ;
 				accountantOverRepayLog.setBusinessAfterId(req.getAfterId());
 				accountantOverRepayLog.setBusinessId(req.getBusinessId());
@@ -263,7 +263,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			}
 		}
 		// TODO 银行代扣,线下代扣尚待完善
-		if (surplus != null && surplus.compareTo(new BigDecimal(0)) > 0) {
+		if (surplus != null && surplus.compareTo(new BigDecimal("0")) > 0) {
 			BigDecimal canUseSurplus = accountantOverRepayLogService.caluCanUse(businessId.get(), null);
 			if (surplus.compareTo(canUseSurplus) > 0) {
 				throw new ServiceRuntimeException("往期结余金额不足");
@@ -373,12 +373,12 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 								.orderBy("share_profit_index").orderBy("plan_item_type").orderBy("fee_id"));
 
 				List<RepaymentProjPlanListDetailDto> repaymentProjPlanListDetailDtos = new ArrayList<>();
-				BigDecimal unpaid = new BigDecimal(0);
+				BigDecimal unpaid = new BigDecimal("0");
 				for (RepaymentProjPlanListDetail repaymentProjPlanListDetail : repaymentProjPlanListDetails) {
 					repaymentProjPlanListDetailBaks.get().add(new RepaymentProjPlanListDetailBak(repaymentProjPlanListDetail));
 					
 					if (repaymentProjPlanListDetail.getProjFactAmount() == null) {
-						repaymentProjPlanListDetail.setProjFactAmount(new BigDecimal(0));
+						repaymentProjPlanListDetail.setProjFactAmount(new BigDecimal("0"));
 					}
 					unpaid = unpaid.add(repaymentProjPlanListDetail.getProjPlanAmount()
 							.subtract(repaymentProjPlanListDetail.getProjFactAmount()));
@@ -470,7 +470,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 						offLineOverDue = null;
 					} else {
 						offLineOverDue = offLineOverDue.subtract(surplus);
-						surplus = new BigDecimal(0);
+						surplus = new BigDecimal("0");
 					}
 				}
 			}
@@ -502,7 +502,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	 * @return
 	 */
 	private void caluProportion(RepaymentBizPlanDto dto) {
-		BigDecimal count = new BigDecimal(0);
+		BigDecimal count = new BigDecimal("0");
 		for (RepaymentProjPlanDto projPlanDto : dto.getProjPlanDtos()) {
 			count = count.add(projPlanDto.getRepaymentProjPlan().getBorrowMoney());
 		}
@@ -585,19 +585,19 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			/*每笔还款来源按比例分配金额到标的*/
 			divideMoney(repayAmount, planDto.get());
 			
-			BigDecimal surplus = new BigDecimal(0);
+			BigDecimal surplus = new BigDecimal("0");
 			for (RepaymentProjPlanDto projPlanDto : planDto.get().getProjPlanDtos()) {
 				BigDecimal divideAmount = projPlanDto.getDivideAmount().add(surplus);
 				logger.info("此次还款来源分配到的金额={}",
 						projPlanDto.getDivideAmount());
 				
-				BigDecimal offLineOverDue = projPlanDto.getOfflineOverDue() == null ? new BigDecimal(0)
+				BigDecimal offLineOverDue = projPlanDto.getOfflineOverDue() == null ? new BigDecimal("0")
 						: projPlanDto.getOfflineOverDue();
 				
 				logger.info("此次还款来源分配到offline滞纳的金额={}",
 						offLineOverDue);
 				
-				BigDecimal onLineOverDue = projPlanDto.getOnlineOverDue() == null ? new BigDecimal(0)
+				BigDecimal onLineOverDue = projPlanDto.getOnlineOverDue() == null ? new BigDecimal("0")
 						: projPlanDto.getOnlineOverDue();
 				logger.info("此次还款来源分配到online滞纳的金额={}",
 						onLineOverDue);
@@ -627,10 +627,10 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 							break;
 						}
 						BigDecimal unpaid = detail.getProjPlanAmount()
-								.subtract(detail.getDerateAmount()==null?new BigDecimal(0):detail.getDerateAmount())
+								.subtract(detail.getDerateAmount()==null?new BigDecimal("0"):detail.getDerateAmount())
 								.subtract(detail.getProjFactAmount());
 						logger.info("{}-{}未还金额{}",detail.getProjPlanDetailId(),detail.getPlanItemName(),unpaid);
-						BigDecimal money = new BigDecimal(0);
+						BigDecimal money = new BigDecimal("0");
 						int c = divideAmount.compareTo(unpaid);
 						if (c > 0) {
 							logger.info("divideAmount大于unpaid");
@@ -683,7 +683,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			
 		}
 		
-		if (surplusAmount.get().compareTo(new BigDecimal(0))>0) {
+		if (surplusAmount.get().compareTo(new BigDecimal("0"))>0) {
 			logger.info("============================有结余{}",surplusAmount.get());
 			projListDetails.get().get(0).setSurplus(surplusAmount.get());
 		}
@@ -839,9 +839,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	private void updateProjPlanStatus() {
 		for (RepaymentProjPlanDto projPlanDto : planDto.get().getProjPlanDtos()) {
 			for (RepaymentProjPlanListDto projPlanListDto : projPlanDto.getProjPlanListDtos()) {
-				BigDecimal factAmount = new BigDecimal(0);
+				BigDecimal factAmount = new BigDecimal("0");
 				for (RepaymentProjPlanListDetail projPlanListDetail : projPlanListDto.getProjPlanListDetails()) {
-					factAmount = factAmount.add(projPlanListDetail.getProjFactAmount()!=null?projPlanListDetail.getProjFactAmount():new BigDecimal(0));
+					factAmount = factAmount.add(projPlanListDetail.getProjFactAmount()!=null?projPlanListDetail.getProjFactAmount():new BigDecimal("0"));
 				}
 				if (factAmount.compareTo(projPlanListDto.getRepaymentProjPlanList().getTotalBorrowAmount())==0) {
 					projPlanListDto.getRepaymentProjPlanList().setCurrentStatus(RepayCurrentStatusEnums.已还款.toString());
@@ -878,12 +878,12 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		boolean onlineOverDueRepaid = false ;
 		BigDecimal planAmount = planList.getTotalBorrowAmount();
 		BigDecimal derateAmount = planList.getDerateAmount();
-		BigDecimal factAmount = new BigDecimal(0);
+		BigDecimal factAmount = new BigDecimal("0");
 		
 		for (RepaymentBizPlanListDetail planListDetail : planListDetails) {
 			BigDecimal detailtPlanAmount = planListDetail.getPlanAmount();
-			BigDecimal detailDerateAmount = planListDetail.getDerateAmount() == null ? new BigDecimal(0):planListDetail.getDerateAmount();
-			BigDecimal detailFactAmount = new BigDecimal(0);
+			BigDecimal detailDerateAmount = planListDetail.getDerateAmount() == null ? new BigDecimal("0"):planListDetail.getDerateAmount();
+			BigDecimal detailFactAmount = new BigDecimal("0");
 			List<RepaymentProjPlanListDetail> projPlanListDetails = findProjPlanListDetailByPlanDetailId(planListDetail.getPlanDetailId());
 			Integer repaySource = null ;
 			Date repayDate = null ;

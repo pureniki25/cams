@@ -45,7 +45,7 @@ public class AccountantOverRepayLogServiceImpl extends BaseServiceImpl<Accountan
 	public BigDecimal caluCanUse(String businessId, String afterId) {
 		List<AccountantOverRepayLog> income = select(businessId, afterId, true);
 		List<AccountantOverRepayLog> output = select(businessId, afterId, false);
-		BigDecimal canUse = new BigDecimal(0);
+		BigDecimal canUse = new BigDecimal("0");
 		for (AccountantOverRepayLog accountantOverRepayLog : income) {
 			if (accountantOverRepayLog.getFreezeStatus()==null||accountantOverRepayLog.getFreezeStatus().equals(0)) {
 				canUse = canUse.add(accountantOverRepayLog.getOverRepayMoney());

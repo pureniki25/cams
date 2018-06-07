@@ -36,7 +36,7 @@ public class RepaymentProjFactRepayServiceImpl extends BaseServiceImpl<Repayment
 	
 	@Override
 	public BigDecimal caluUnpaid(String businessId, String afterId) {
-		BigDecimal unpaid = new BigDecimal(0);
+		BigDecimal unpaid = new BigDecimal("0");
 		List<RepaymentBizPlanList> repaymentBizPlanLists = repaymentBizPlanListMapper.selectList(
 				new EntityWrapper<RepaymentBizPlanList>()
 				.eq("business_id", businessId)
@@ -44,7 +44,7 @@ public class RepaymentProjFactRepayServiceImpl extends BaseServiceImpl<Repayment
 		for (RepaymentBizPlanList repaymentBizPlanList : repaymentBizPlanLists) {
 			String planListId = repaymentBizPlanList.getPlanListId() ;
 			BigDecimal planAmount = repaymentBizPlanList.getTotalBorrowAmount();
-			BigDecimal overDue = repaymentBizPlanList.getOverdueAmount()==null?new BigDecimal(0):repaymentBizPlanList.getOverdueAmount();
+			BigDecimal overDue = repaymentBizPlanList.getOverdueAmount()==null?new BigDecimal("0"):repaymentBizPlanList.getOverdueAmount();
 			
 			unpaid = unpaid.add(planAmount).add(overDue);
 			

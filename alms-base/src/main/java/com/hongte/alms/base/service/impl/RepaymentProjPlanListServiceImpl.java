@@ -239,7 +239,7 @@ public class RepaymentProjPlanListServiceImpl extends
 			System.out.println("================="+projPlan.getOriginalBusinessId()+"====================");
 			BigDecimal restPricipal=getRestPrincipal(projPlanList, projPlan);
 			BigDecimal principalAndInterest=BigDecimal.valueOf(getPrincipalAndinterestPeriod(projPlanList.getProjPlanListId()));
-			BigDecimal onLineLatefee=new BigDecimal(0);
+			BigDecimal onLineLatefee=new BigDecimal("0");
 		
 			onLineLatefee=getLateFee(projPlan.getOnLineOverDueRate(), projPlan.getOnLineOverDueRateType(), projPlan.getBorrowMoney(), restPricipal, principalAndInterest, projPlan.getProjectId(),projPlanList.getPeriod());
 			
@@ -258,7 +258,7 @@ public class RepaymentProjPlanListServiceImpl extends
 			System.out.println("================="+projPlan.getOriginalBusinessId()+"====================");
 			BigDecimal restPricipal=getRestPrincipal(projPlanList, projPlan);
 			BigDecimal principalAndInterest=BigDecimal.valueOf(getPrincipalAndinterestPeriod(projPlanList.getProjPlanListId()));
-			BigDecimal underLatefee=new BigDecimal(0);
+			BigDecimal underLatefee=new BigDecimal("0");
 		   List<RepaymentProjPlanList> list=selectList(new EntityWrapper<RepaymentProjPlanList>().eq("proj_plan_id", projPlan.getProjPlanId()));
 			Date lastDate=getLastDueDate(list);
 			    //期外
@@ -306,10 +306,10 @@ public class RepaymentProjPlanListServiceImpl extends
 	        BigDecimal dayRate;
 	        switch (rateUnit){
 	            case YEAR_RATE:
-	            	dayRate = rate.divide(new BigDecimal(365),10,roundingMode);
+	            	dayRate = rate.divide(new BigDecimal("365"),10,roundingMode);
 	                break;
 	            case MONTH_RATE:
-	            	dayRate = rate.divide(new BigDecimal(30),10,roundingMode);
+	            	dayRate = rate.divide(new BigDecimal("30"),10,roundingMode);
 	                break;
 	            case DAY_RATE:
 	            	dayRate = rate;
@@ -318,14 +318,14 @@ public class RepaymentProjPlanListServiceImpl extends
 	            	dayRate = rate;
 	                break;
 	        }
-	        return dayRate.divide(new BigDecimal(100),10,roundingMode);
+	        return dayRate.divide(new BigDecimal("100"),10,roundingMode);
 	    }
 	    
 	    
 	    /**
 	     * 计算滞纳金
 	     * @param rate
-	     * @param rateUnit
+	     * @param
 	     * @return
 	     *
 	     */
@@ -333,19 +333,19 @@ public class RepaymentProjPlanListServiceImpl extends
 	    	BigDecimal lateFee=BigDecimal.valueOf(0);
 	        switch (rateType){
 	            case 1:
-	            	lateFee =borrowMoney.multiply(rate.divide(new BigDecimal(100)));
+	            	lateFee =borrowMoney.multiply(rate.divide(new BigDecimal("100")));
 	                break;
 	            case 2:
-	            	lateFee = restPrincipal.multiply(rate.divide(new BigDecimal(100)));
+	            	lateFee = restPrincipal.multiply(rate.divide(new BigDecimal("100")));
 	                break;
 	            case 3:
 	            	lateFee = rate;
 	                break;
 	            case 4:
-	            	lateFee = principalAndInterest.multiply(rate.divide(new BigDecimal(100)));
+	            	lateFee = principalAndInterest.multiply(rate.divide(new BigDecimal("100")));
 	                break;
 	            case 5:
-	            	lateFee=principalAndInterest(projId, period).multiply(rate.divide(new BigDecimal(100)));
+	            	lateFee=principalAndInterest(projId, period).multiply(rate.divide(new BigDecimal("100")));
 	            	break;
 	            	
 	        }

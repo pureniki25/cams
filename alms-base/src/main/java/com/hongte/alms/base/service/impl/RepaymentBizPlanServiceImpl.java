@@ -113,9 +113,9 @@ public class RepaymentBizPlanServiceImpl extends BaseServiceImpl<RepaymentBizPla
 
 		RepaymentBizPlanList planList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("plan_list_id", vo.getPlanListId()));
 		planList.setDueDate(DateUtil.getDate(data.getDueDate()));
-		planList.setTotalBorrowAmount(BigDecimal.valueOf(Double.valueOf(data.getTotalBorrowAmount())));
-		planList.setOverdueAmount(BigDecimal.valueOf(Double.valueOf(data.getOverdueAmount())));
-		planList.setOverdueDays(BigDecimal.valueOf(Double.valueOf(data.getOverdueDays())));
+		planList.setTotalBorrowAmount(new BigDecimal(data.getTotalBorrowAmount()));
+		planList.setOverdueAmount(new BigDecimal(data.getOverdueAmount()));
+		planList.setOverdueDays(new BigDecimal(data.getOverdueDays()));
 		planList.setCurrentStatus(data.getCurrentStatus());
 		planList.setRepayFlag(Integer.valueOf(data.getRepayFlag()));
 		planList.setFactRepayDate(DateUtil.getDate(data.getFactRepayDate()));

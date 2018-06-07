@@ -213,7 +213,7 @@ public class CreatRepayPlanServiceImplTest {
         businessBasicInfoReq.setOrgBusinessId("TDF1012018032101");
         businessBasicInfoReq.setInputTime(DateUtil.getDateTime("2018/3/21"));
         businessBasicInfoReq.setRepaymentTypeId(5);  //1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息
-        businessBasicInfoReq.setBorrowMoney(new BigDecimal(30000));  //借款总额
+        businessBasicInfoReq.setBorrowMoney(new BigDecimal("30000"));  //借款总额
         businessBasicInfoReq.setBorrowLimit(6);  //借款期限
         businessBasicInfoReq.setBorrowRateUnit(1);  //借款期限
 
@@ -275,32 +275,32 @@ public class CreatRepayPlanServiceImplTest {
         req1.setPrincipleReqList(principleReqs);
         PrincipleReq principleReq1 = new PrincipleReq();
         principleReq1.setPeriod(1);
-        principleReq1.setPrinciple(new BigDecimal(2500));
+        principleReq1.setPrinciple(new BigDecimal("2500"));
         principleReqs.add(principleReq1);
 
         PrincipleReq principleReq2 = new PrincipleReq();
         principleReq2.setPeriod(2);
-        principleReq2.setPrinciple(new BigDecimal(2500));
+        principleReq2.setPrinciple(new BigDecimal("2500"));
         principleReqs.add(principleReq2);
 
         PrincipleReq principleReq3 = new PrincipleReq();
         principleReq3.setPeriod(3);
-        principleReq3.setPrinciple(new BigDecimal(2500));
+        principleReq3.setPrinciple(new BigDecimal("2500"));
         principleReqs.add(principleReq3);
 
         PrincipleReq principleReq4 = new PrincipleReq();
         principleReq4.setPeriod(4);
-        principleReq4.setPrinciple(new BigDecimal(2500));
+        principleReq4.setPrinciple(new BigDecimal("2500"));
         principleReqs.add(principleReq4);
 
         PrincipleReq principleReq5 = new PrincipleReq();
         principleReq5.setPeriod(5);
-        principleReq5.setPrinciple(new BigDecimal(2500));
+        principleReq5.setPrinciple(new BigDecimal("2500"));
         principleReqs.add(principleReq5);
 
         PrincipleReq principleReq6 = new PrincipleReq();
         principleReq6.setPeriod(6);
-        principleReq6.setPrinciple(new BigDecimal(2500));
+        principleReq6.setPrinciple(new BigDecimal("2500"));
         principleReqs.add(principleReq6);
 
 //        Map<Integer,BigDecimal> principleMap1 = new HashMap<>();
@@ -315,16 +315,16 @@ public class CreatRepayPlanServiceImplTest {
         req1.setProjectId(mainProjectId);
         req1.setStatusFlag("4");
         req1.setBeginTime(DateUtil.getDateTime("2018/3/21")); // 启标时间(用于生成还款计划)
-        req1.setFullBorrowMoney(new BigDecimal(15000)); // 满标金额
+        req1.setFullBorrowMoney(new BigDecimal("15000")); // 满标金额
         req1.setQueryFullsuccessDate(DateUtil.getDateTime("2018/3/21"));//满标时间（用于分还款计划）
 //        req1.setTdLoanMoney(new BigDecimal(30000)); // 放款金额
         req1.setExtendFlag(0); // 是否是展期(0:不是展期,1:是展期)
 //        req1.setCatsedAmount(new BigDecimal(30000)); // 投资者已投金额
-        req1.setAmount(new BigDecimal(15000)); // 总金额(元)
+        req1.setAmount(new BigDecimal("15000")); // 总金额(元)
         req1.setMasterIssueId(mainProjectId); // 主借标ID
-        req1.setRate(new BigDecimal(9.5)); // 利率
+        req1.setRate(new BigDecimal("9.5")); // 利率
         req1.setRateUnitType(1); // 利率单位：1 年利率; 2 月利率; 3 日利率
-        req1.setOffLineInOverDueRate(new BigDecimal(12)); // 逾期滞纳金费率(%)
+        req1.setOffLineInOverDueRate(new BigDecimal("12")); // 逾期滞纳金费率(%)
         req1.setOffLineInOverDueRateType(1); // 逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
         req1.setRepayType(RepayPlanRepayIniCalcWayEnum.INT_AND_PRIN_EVERYTIME.getKey()); // 还款方式：1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息,11:等本等息
         req1.setPeriodMonth(6); // 借款期限  月
@@ -343,7 +343,7 @@ public class CreatRepayPlanServiceImplTest {
         feeReq10.setFeeItemName("月收分公司服务费"); //费用项目名称
         feeReq10.setFeeType(RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getValue()); //费用项类型
         feeReq10.setFeeTypeName("分公司费用"); //费用项名称
-        feeReq10.setFeeValue(new BigDecimal(6)); //业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值
+        feeReq10.setFeeValue(new BigDecimal("6")); //业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值
         feeReq10.setChargeType(RepayPlanChargeTypeEnum.BY_MONTH.getKey()); //是否一次收取，1为按月收取，2为一次收取
         feeReq10.setRepaymentFlag(2); //标记该项费用的还款类型，1:期初收取,2:期末收取
 
@@ -354,7 +354,7 @@ public class CreatRepayPlanServiceImplTest {
         feeReq11.setFeeItemName("平台费"); //费用项目名称
         feeReq11.setFeeType(RepayPlanFeeTypeEnum.PLAT_CHARGE.getValue()); //费用项类型
         feeReq11.setFeeTypeName("团贷网平台费用"); //费用项名称
-        feeReq11.setFeeValue(new BigDecimal(3)); //业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值
+        feeReq11.setFeeValue(new BigDecimal("3")); //业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值
         feeReq11.setChargeType(2); //是否一次收取，1为按月收取，2为一次收取
         feeReq11.setRepaymentFlag(1); //标记该项费用的还款类型，1:期初收取,2:期末收取
 
@@ -365,7 +365,7 @@ public class CreatRepayPlanServiceImplTest {
         feeReq12.setFeeItemName("分公司服务费"); //费用项目名称
         feeReq12.setFeeType(RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getValue()); //费用项类型
         feeReq12.setFeeTypeName("分公司费用    "); //费用项名称
-        feeReq12.setFeeValue(new BigDecimal(2.1)); //业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值
+        feeReq12.setFeeValue(new BigDecimal("2.1")); //业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值
         feeReq12.setChargeType(2); //是否一次收取，1为按月收取，2为一次收取
         feeReq12.setRepaymentFlag(1); //标记该项费用的还款类型，1:期初收取,2:期末收取
 
@@ -377,7 +377,7 @@ public class CreatRepayPlanServiceImplTest {
         feeReq13.setFeeItemName("月收平台费"); //费用项目名称
         feeReq13.setFeeType(RepayPlanFeeTypeEnum.PLAT_CHARGE.getValue()); //费用项类型
         feeReq13.setFeeTypeName("团贷网平台费用"); //费用项名称
-        feeReq13.setFeeValue(new BigDecimal(6)); //业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值
+        feeReq13.setFeeValue(new BigDecimal("6")); //业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值
         feeReq13.setChargeType(1); //是否一次收取，1为按月收取，2为一次收取
         feeReq13.setRepaymentFlag(2); //标记该项费用的还款类型，1:期初收取,2:期末收取
 
@@ -387,7 +387,7 @@ public class CreatRepayPlanServiceImplTest {
         feeReq14.setFeeItemName("担保费"); //费用项目名称
         feeReq14.setFeeType(RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE.getValue()); //费用项类型
         feeReq14.setFeeTypeName("担保公司费用  "); //费用项名称
-        feeReq14.setFeeValue(new BigDecimal(3.3)); //业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值
+        feeReq14.setFeeValue(new BigDecimal("3.3")); //业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值
         feeReq14.setChargeType(2); //是否一次收取，1为按月收取，2为一次收取
         feeReq14.setRepaymentFlag(1); //标记该项费用的还款类型，1:期初收取,2:期末收取
 
@@ -405,32 +405,32 @@ public class CreatRepayPlanServiceImplTest {
         req2.setPrincipleReqList(principleReqs2);
         PrincipleReq principlereq21 = new PrincipleReq();
         principlereq21.setPeriod(1);
-        principlereq21.setPrinciple(new BigDecimal(2500));
+        principlereq21.setPrinciple(new BigDecimal("2500"));
         principleReqs2.add(principlereq21);
 
         PrincipleReq principleReq22 = new PrincipleReq();
         principleReq22.setPeriod(2);
-        principleReq22.setPrinciple(new BigDecimal(2500));
+        principleReq22.setPrinciple(new BigDecimal("2500"));
         principleReqs2.add(principleReq22);
 
         PrincipleReq principleReq23 = new PrincipleReq();
         principleReq23.setPeriod(3);
-        principleReq23.setPrinciple(new BigDecimal(2500));
+        principleReq23.setPrinciple(new BigDecimal("2500"));
         principleReqs2.add(principleReq23);
 
         PrincipleReq principleReq24 = new PrincipleReq();
         principleReq24.setPeriod(4);
-        principleReq24.setPrinciple(new BigDecimal(2500));
+        principleReq24.setPrinciple(new BigDecimal("2500"));
         principleReqs2.add(principleReq24);
 
         PrincipleReq principleReq25 = new PrincipleReq();
         principleReq25.setPeriod(5);
-        principleReq25.setPrinciple(new BigDecimal(2500));
+        principleReq25.setPrinciple(new BigDecimal("2500"));
         principleReqs2.add(principleReq25);
 
         PrincipleReq principleReq26 = new PrincipleReq();
         principleReq26.setPeriod(6);
-        principleReq26.setPrinciple(new BigDecimal(2500));
+        principleReq26.setPrinciple(new BigDecimal("2500"));
         principleReqs2.add(principleReq26);
 
 
@@ -451,16 +451,16 @@ public class CreatRepayPlanServiceImplTest {
         req2.setProjectId(UUID.randomUUID().toString());
         req2.setStatusFlag("4");
         req2.setBeginTime(DateUtil.getDateTime("2018/3/22")); // 启标时间(用于生成还款计划)
-        req2.setFullBorrowMoney(new BigDecimal(15000)); // 满标金额
+        req2.setFullBorrowMoney(new BigDecimal("15000")); // 满标金额
         req2.setQueryFullsuccessDate(DateUtil.getDateTime("2018/3/22"));//满标时间（用于分还款计划）
 //        req2.setTdLoanMoney(new BigDecimal(20000)); // 放款金额
         req2.setExtendFlag(0); // 是否是展期(0:不是展期,1:是展期)
 //        req2.setCatsedAmount(new BigDecimal(20000)); // 投资者已投金额
-        req2.setAmount(new BigDecimal(15000)); // 总金额(元)
+        req2.setAmount(new BigDecimal("15000")); // 总金额(元)
         req2.setMasterIssueId(mainProjectId); // 主借标ID
-        req2.setRate(new BigDecimal(9.5)); // 利率
+        req2.setRate(new BigDecimal("9.5")); // 利率
         req2.setRateUnitType(1); // 利率单位：1 年利率; 2 月利率; 3 日利率
-        req2.setOffLineInOverDueRate(new BigDecimal(12)); // 逾期滞纳金费率(%)
+        req2.setOffLineInOverDueRate(new BigDecimal("12")); // 逾期滞纳金费率(%)
         req2.setOffLineInOverDueRateType(1); // 逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
         req2.setRepayType(RepayPlanRepayIniCalcWayEnum.INT_AND_PRIN_EVERYTIME.getKey()); // 还款方式：1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息,11:等本等息
         req2.setPeriodMonth(6); // 借款期限  月
@@ -477,7 +477,7 @@ public class CreatRepayPlanServiceImplTest {
         feeReq20.setFeeItemName("月收分公司服务费"); //费用项目名称
         feeReq20.setFeeType(RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getValue()); //费用项类型
         feeReq20.setFeeTypeName("分公司费用"); //费用项名称
-        feeReq20.setFeeValue(new BigDecimal(4)); //业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值
+        feeReq20.setFeeValue(new BigDecimal("4")); //业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值
         feeReq20.setChargeType(1); //是否一次收取，1为按月收取，2为一次收取
         feeReq20.setRepaymentFlag(2); //标记该项费用的还款类型，1:期初收取,2:期末收取
 
@@ -490,7 +490,7 @@ public class CreatRepayPlanServiceImplTest {
         feeReq21.setFeeItemName("平台费"); //费用项目名称
         feeReq21.setFeeType(RepayPlanFeeTypeEnum.PLAT_CHARGE.getValue()); //费用项类型
         feeReq21.setFeeTypeName("团贷网平台费用"); //费用项名称
-        feeReq21.setFeeValue(new BigDecimal(2)); //业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值
+        feeReq21.setFeeValue(new BigDecimal("2")); //业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值
         feeReq21.setChargeType(2); //是否一次收取，1为按月收取，2为一次收取
         feeReq21.setRepaymentFlag(1); //标记该项费用的还款类型，1:期初收取,2:期末收取
 
@@ -503,7 +503,7 @@ public class CreatRepayPlanServiceImplTest {
         feeReq22.setFeeItemName("分公司服务费"); //费用项目名称
         feeReq22.setFeeType(RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getValue()); //费用项类型
         feeReq22.setFeeTypeName("分公司费用"); //费用项名称
-        feeReq22.setFeeValue(new BigDecimal(1.4)); //业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值
+        feeReq22.setFeeValue(new BigDecimal("1.4")); //业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值
         feeReq22.setChargeType(2); //是否一次收取，1为按月收取，2为一次收取
         feeReq22.setRepaymentFlag(1); //标记该项费用的还款类型，1:期初收取,2:期末收取
 
@@ -515,7 +515,7 @@ public class CreatRepayPlanServiceImplTest {
         feeReq23.setFeeItemName("月收平台费"); //费用项目名称
         feeReq23.setFeeType(RepayPlanFeeTypeEnum.PLAT_CHARGE.getValue()); //费用项类型
         feeReq23.setFeeTypeName("团贷网平台费用"); //费用项名称
-        feeReq23.setFeeValue(new BigDecimal(4)); //业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值
+        feeReq23.setFeeValue(new BigDecimal("4")); //业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值
         feeReq23.setChargeType(1); //是否一次收取，1为按月收取，2为一次收取
         feeReq23.setRepaymentFlag(2); //标记该项费用的还款类型，1:期初收取,2:期末收取
 
@@ -526,7 +526,7 @@ public class CreatRepayPlanServiceImplTest {
         feeReq24.setFeeItemName("担保费"); //费用项目名称
         feeReq24.setFeeType(RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE.getValue()); //费用项类型
         feeReq24.setFeeTypeName("担保公司费用"); //费用项名称
-        feeReq24.setFeeValue(new BigDecimal(2.2)); //业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值
+        feeReq24.setFeeValue(new BigDecimal("2.2")); //业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值
         feeReq24.setChargeType(2); //是否一次收取，1为按月收取，2为一次收取
         feeReq24.setRepaymentFlag(1); //标记该项费用的还款类型，1:期初收取,2:期末收取
 
@@ -557,7 +557,7 @@ public class CreatRepayPlanServiceImplTest {
         businessBasicInfoReq.setOrgBusinessId("TDF1012018031505");
         businessBasicInfoReq.setInputTime(DateUtil.getDateTime("2018/3/15"));
         businessBasicInfoReq.setRepaymentTypeId(9);  //1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息
-        businessBasicInfoReq.setBorrowMoney(new BigDecimal(50000));  //借款总额
+        businessBasicInfoReq.setBorrowMoney(new BigDecimal("50000"));  //借款总额
         businessBasicInfoReq.setBorrowLimit(6);  //借款期限
 
 
@@ -584,9 +584,9 @@ public class CreatRepayPlanServiceImplTest {
         businessBasicInfoReq.setCustomerId("testCustom111");  //客户资产端唯一编号
         businessBasicInfoReq.setCustomerName("1111");  //客户姓名
         businessBasicInfoReq.setRepaymentTypeId(5);  //1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息
-        businessBasicInfoReq.setBorrowMoney(new BigDecimal(24000));  //借款总额
+        businessBasicInfoReq.setBorrowMoney(new BigDecimal("24000"));  //借款总额
         businessBasicInfoReq.setBorrowLimit(12);  //借款期限
-        businessBasicInfoReq.setBorrowRate(new BigDecimal(12));  //借款利率
+        businessBasicInfoReq.setBorrowRate(new BigDecimal("12"));  //借款利率
         businessBasicInfoReq.setBorrowRateUnit(1);  //借款利率类型，1：年利率，2：月利率，3：日利率
         businessBasicInfoReq.setOperatorId("主办人111");  //业务主办人ID
         businessBasicInfoReq.setOperatorName("主办人 ttt");  //业务主办人姓名
@@ -656,7 +656,7 @@ public class CreatRepayPlanServiceImplTest {
         req1.setProjectId("TestProjId111");
         req1.setStatusFlag("2");
         req1.setBeginTime(DateUtil.getDateTime("2018-5-1")); // 启标时间(用于生成还款计划)
-        req1.setFullBorrowMoney(new BigDecimal(12000)); // 满标金额
+        req1.setFullBorrowMoney(new BigDecimal("12000")); // 满标金额
 //        req1.setAccounterConfirmUserId("user1111"); //  财务确认放款用户编号
 //        req1.setAccounterConfirmUserName("用户111"); //  财务确认放款人名称
 //        req1.setTdLoanTime(DateUtil.getDateTime("2018-5-1")); // 放款时间
@@ -682,8 +682,8 @@ public class CreatRepayPlanServiceImplTest {
         req1.setTitle("标题"); // 标题
         req1.setPeriodMonth(12); // 借款期限  月
         req1.setRepaymentType(RepayPlanRepayIniCalcWayEnum.PRINCIPAL_LAST.getKey()); // 台还款方式ID
-        req1.setAmount(new BigDecimal(12000)); // 总金额(元)
-        req1.setLowerUnit(new BigDecimal(100)); // 最小投资单位(元)
+        req1.setAmount(new BigDecimal("12000")); // 总金额(元)
+        req1.setLowerUnit(new BigDecimal("100")); // 最小投资单位(元)
         req1.setBranchCompanyId("东莞总部"); // 标的来源(所属分公司的分润用户ID)
         req1.setControlDesc("风险控制措施"); // 风险控制措施
         req1.setImageUrl("http:www.baidu.com"); // 标题图片
@@ -693,19 +693,19 @@ public class CreatRepayPlanServiceImplTest {
 //        req1.setProjectType(businessBasicInfoReq.getBusinessType()); // 上标状态
         req1.setResultContent("上标结果"); // 上标结果
         req1.setEnterpriseUserId("utryrtwer"); // 担保方编号(所属担保公司分润用户ID)
-        req1.setAviCreditGrantingAmount(new BigDecimal(120000000)); // 担保公司可用金额
+        req1.setAviCreditGrantingAmount(new BigDecimal("120000000")); // 担保公司可用金额
 
         req1.setCustomerId("customerId");   //用户ID
 
-        req1.setOverRate(new BigDecimal(0.01)); //逾期年利率
+        req1.setOverRate(new BigDecimal("0.01")); //逾期年利率
 
-        req1.setRate(new BigDecimal(12)); // 利率
+        req1.setRate(new BigDecimal("12")); // 利率
         req1.setRateUnitType(1); // 利率单位：1 年利率; 2 月利率; 3 日利率
-        req1.setOffLineInOverDueRate(new BigDecimal(11)); // 线下期内逾期滞纳金费率(%)
+        req1.setOffLineInOverDueRate(new BigDecimal("11")); // 线下期内逾期滞纳金费率(%)
         req1.setOffLineInOverDueRateType(1); // 线下期内逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
-        req1.setOffLineOutOverDueRate(new BigDecimal(12)); // 线下期外逾期滞纳金费率(%)
+        req1.setOffLineOutOverDueRate(new BigDecimal("12")); // 线下期外逾期滞纳金费率(%)
         req1.setOffLineOutOverDueRateType(1); // 线下期外逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
-        req1.setOnLineOverDueRate(new BigDecimal(0.6)); // 线上逾期滞纳金费率(%)
+        req1.setOnLineOverDueRate(new BigDecimal("0.6")); // 线上逾期滞纳金费率(%)
         req1.setOnLineOverDueRateType(1); // 线上逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
 
         req1.setRepayType(RepayPlanRepayIniCalcWayEnum.PRINCIPAL_LAST.getKey()); // 还款方式：1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息,11:等本等息
@@ -743,7 +743,7 @@ public class CreatRepayPlanServiceImplTest {
         feeReq.setAccountStatus(RepayPlanAccountStatusEnum.DIVISION_TO_ASSET.getValue()); //分账标记
 //        feeReq.setFeeChargingType(2); //费用收取方式，1为按比例，2为按固定金额
 //        feeReq.setNewSystemDefaultRate(new BigDecimal(0)); //系统默认匹配的费用比例（当收取方式为2时，此字段存零）
-        feeReq.setFeeValue(new BigDecimal(800)); //业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值
+        feeReq.setFeeValue(new BigDecimal("800")); //业务应收取费用值，如果按月收取，则存储按月收取的值，如800元/月收取服务费，此字段存储800。如果一次性收取，则存储应收总费用值
 //        feeReq.setWithdrawId(111); //对应的提现编号
         feeReq.setChargeType(RepayPlanChargeTypeEnum.BY_MONTH.getKey()); //是否一次收取，1为按月收取，2为一次收取
 //        feeReq.setWithdrawPlace(1); //放款去处 1:提到银行卡  2：转到可用金额

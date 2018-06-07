@@ -11,16 +11,16 @@ import java.math.BigDecimal;
 public class CurrPeriodProjDetailVO {
 	private boolean master;
 	private String userName;
-	private BigDecimal projAmount = new BigDecimal(0);
-	private BigDecimal item10 = new BigDecimal(0);
-	private BigDecimal item20 = new BigDecimal(0);
-	private BigDecimal item30 = new BigDecimal(0);
-	private BigDecimal item50 = new BigDecimal(0);
-	private BigDecimal offlineOverDue = new BigDecimal(0);
-	private BigDecimal onlineOverDue = new BigDecimal(0);
-	private BigDecimal subTotal = new BigDecimal(0);
-	private BigDecimal total = new BigDecimal(0);
-	private BigDecimal surplus = new BigDecimal(0);
+	private BigDecimal projAmount = new BigDecimal("0");
+	private BigDecimal item10 = new BigDecimal("0");
+	private BigDecimal item20 = new BigDecimal("0");
+	private BigDecimal item30 = new BigDecimal("0");
+	private BigDecimal item50 = new BigDecimal("0");
+	private BigDecimal offlineOverDue = new BigDecimal("0");
+	private BigDecimal onlineOverDue = new BigDecimal("0");
+	private BigDecimal subTotal = new BigDecimal("0");
+	private BigDecimal total = new BigDecimal("0");
+	private BigDecimal surplus = new BigDecimal("0");
 	private String project ;
 
 	public String getUserName() {
@@ -88,11 +88,11 @@ public class CurrPeriodProjDetailVO {
 	}
 
 	public BigDecimal getSubTotal() {
-		subTotal = new BigDecimal(0);
-		subTotal = subTotal.add(getItem10() == null ? new BigDecimal(0) : getItem10())
-				.add(getItem20() == null ? new BigDecimal(0) : getItem20())
-				.add(getItem30() == null ? new BigDecimal(0) : getItem30())
-				.add(getItem50() == null ? new BigDecimal(0) : getItem50());
+		subTotal = new BigDecimal("0");
+		subTotal = subTotal.add(getItem10() == null ? new BigDecimal("0") : getItem10())
+				.add(getItem20() == null ? new BigDecimal("0") : getItem20())
+				.add(getItem30() == null ? new BigDecimal("0") : getItem30())
+				.add(getItem50() == null ? new BigDecimal("0") : getItem50());
 		return subTotal;
 	}
 
@@ -101,13 +101,13 @@ public class CurrPeriodProjDetailVO {
 	}
 
 	public BigDecimal getTotal() {
-		total = new BigDecimal(0);
-		total = total.add(getItem10() == null ? new BigDecimal(0) : getItem10())
-				.add(getItem20() == null ? new BigDecimal(0) : getItem20())
-				.add(getItem30() == null ? new BigDecimal(0) : getItem30())
-				.add(getItem50() == null ? new BigDecimal(0) : getItem50())
-				.add(getOfflineOverDue() == null ? new BigDecimal(0) : getOfflineOverDue())
-				.add(getOnlineOverDue() == null ? new BigDecimal(0) : getOnlineOverDue());
+		total = new BigDecimal("0");
+		total = total.add(getItem10() == null ? new BigDecimal("0") : getItem10())
+				.add(getItem20() == null ? new BigDecimal("0") : getItem20())
+				.add(getItem30() == null ? new BigDecimal("0") : getItem30())
+				.add(getItem50() == null ? new BigDecimal("0") : getItem50())
+				.add(getOfflineOverDue() == null ? new BigDecimal("0") : getOfflineOverDue())
+				.add(getOnlineOverDue() == null ? new BigDecimal("0") : getOnlineOverDue());
 		return total;
 	}
 
