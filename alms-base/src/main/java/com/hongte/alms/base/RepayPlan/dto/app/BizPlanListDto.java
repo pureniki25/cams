@@ -17,7 +17,7 @@ public class BizPlanListDto  implements Serializable {
 
     private  String  afterId;  //DB期数
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date dueDate;  //应还日期
 
     private BigDecimal totalAmount;  //待还款总金额
@@ -26,7 +26,7 @@ public class BizPlanListDto  implements Serializable {
 
     private BigDecimal derateAmount;//减免金额
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     private Date payDate;  //实还日期
 
 //    private BigDecimal payedAmount;//实还金额
