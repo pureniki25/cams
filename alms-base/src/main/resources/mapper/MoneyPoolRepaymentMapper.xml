@@ -103,6 +103,7 @@
 		WHERE mpr.plan_list_id = lst.plan_list_id 
 		  AND lst.orig_business_id = #{businessId,jdbcType=VARCHAR}
 		  AND mpr.income_type IN (1, 2)
+		  AND mpr.is_finance_match = 1
 		ORDER BY 1
 	</select>
 </mapper>
