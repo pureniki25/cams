@@ -882,7 +882,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		
 		for (RepaymentBizPlanListDetail planListDetail : planListDetails) {
 			BigDecimal detailtPlanAmount = planListDetail.getPlanAmount();
-			BigDecimal detailDerateAmount = planListDetail.getDerateAmount();
+			BigDecimal detailDerateAmount = planListDetail.getDerateAmount() == null ? new BigDecimal(0):planListDetail.getDerateAmount();
 			BigDecimal detailFactAmount = new BigDecimal(0);
 			List<RepaymentProjPlanListDetail> projPlanListDetails = findProjPlanListDetailByPlanDetailId(planListDetail.getPlanDetailId());
 			Integer repaySource = null ;
