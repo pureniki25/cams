@@ -1,6 +1,7 @@
 package com.hongte.alms.base.RepayPlan.req;
 
 import com.baomidou.mybatisplus.annotations.TableField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -25,6 +26,7 @@ public class BizOutPutPlanReq {
      * 计划出款时间
      */
     @ApiModelProperty(required= true,value = "计划出款时间")
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     private Date outputTime;
     /**
      * 转账类型
@@ -86,6 +88,7 @@ public class BizOutPutPlanReq {
      * 创建时间
      */
     @ApiModelProperty(required= true,value = "创建时间")
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
     /**
      * 创建用户
@@ -96,6 +99,7 @@ public class BizOutPutPlanReq {
      * 更新时间
      */
     @ApiModelProperty(value = "更新时间")
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
     /**
      * 更新用户

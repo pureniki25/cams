@@ -8,7 +8,19 @@
 	<link rel="stylesheet" type="text/css" href="/plugins/iview/2.13.1/css/iview.css" />
 	<!-- 引入layui样式 -->
 	<link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all" />
-	
+	<style>
+		.layui-table th, .layui-table td.td {
+			padding:0 !important;
+		}
+		.layui-table th, .layui-table td .receive-inner-div{
+			line-height: 40px;
+			border-bottom:1px solid #ccc;
+			text-align:center;
+		}
+		.layui-table th, .layui-table td .receive-inner-div:last-child {
+			border-bottom:none;
+		}
+	</style>
 </head>
 
 <body>
@@ -112,22 +124,22 @@
 				        </thead>
 				        <tbody>
 				            <tr v-for='(item, index) in actualPaymentRecordList' :key='index'>
-				                <td>{{ item.afterId }}</td>
-				                <td>{{item.receivedTotal?numeral(item.receivedTotal).format('0,0.00'):0}}</td>
-				                <td>
-				                    <div v-for = '(subItem, subIndex) in item.actualPaymentSingleRecordList' :key='subIndex'>{{ subItem.accountName }}</div>
+				                <td style="text-align:center">{{ item.afterId }}</td>
+				                <td style="text-align:center">{{item.receivedTotal?numeral(item.receivedTotal).format('0,0.00'):0}}</td>
+				                <td class="td">
+				                    <div class="receive-inner-div" v-for = '(subItem, subIndex) in item.actualPaymentSingleRecordList' :key='subIndex'>{{ subItem.accountName }}</div>
 				                </td>
-				                <td>
-				                    <div v-for = '(subItem, subIndex) in item.actualPaymentSingleRecordList' :key='subIndex'>{{ subItem.tradeTime }}</div>
+				                <td class="td">
+				                    <div class="receive-inner-div" v-for = '(subItem, subIndex) in item.actualPaymentSingleRecordList' :key='subIndex'>{{ subItem.tradeTime }}</div>
 				                </td>
-				                <td>
-				                    <div v-for = '(subItem, subIndex) in item.actualPaymentSingleRecordList' :key='subIndex'>{{ subItem.incomeType }}</div>
+				                <td class="td">
+				                    <div  class="receive-inner-div" v-for = '(subItem, subIndex) in item.actualPaymentSingleRecordList' :key='subIndex'>{{ subItem.incomeType }}</div>
 				                </td>
-				                <td>
-				                    <div v-for = '(subItem, subIndex) in item.actualPaymentSingleRecordList' :key='subIndex'>{{subItem.currentAmount?numeral(subItem.currentAmount).format('0,0.00'):0}}</div>
+				                <td class="td">
+				                    <div class="receive-inner-div" v-for = '(subItem, subIndex) in item.actualPaymentSingleRecordList' :key='subIndex'>{{subItem.currentAmount?numeral(subItem.currentAmount).format('0,0.00'):0}}</div>
 				                </td>
-				                <td>
-				                    <div v-for = '(subItem, subIndex) in item.actualPaymentSingleRecordList' :key='subIndex'>{{ subItem.tradeType }}</div>
+				                <td class="td">
+				                    <div class="receive-inner-div" v-for = '(subItem, subIndex) in item.actualPaymentSingleRecordList' :key='subIndex'>{{ subItem.tradeType }}</div>
 				                </td>
 				            </tr>
 				            <tr v-for='(item, index) in actualPaymentRecordAfterIdNullList' :key='index'>

@@ -31,7 +31,7 @@ public class AgencyRechargeSchedule {
 			List<AgencyRechargeLog> logs = agencyRechargeLogService.selectList(new EntityWrapper<AgencyRechargeLog>().eq("handle_status", "1"));
 			if (CollectionUtils.isNotEmpty(logs)) {
 				for (AgencyRechargeLog agencyRechargeLog : logs) {
-					agencyRechargeLogService.queryRechargeOrder(agencyRechargeLog.getoIdPartner(), agencyRechargeLog.getCmOrderNo());
+					agencyRechargeLogService.queryRechargeOrder(agencyRechargeLog.getoIdPartner(), agencyRechargeLog.getCmOrderNo(), "贷后定时任务");
 				}
 			}
 			long end = System.currentTimeMillis();

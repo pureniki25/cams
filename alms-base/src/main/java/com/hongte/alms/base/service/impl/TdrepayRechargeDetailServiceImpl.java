@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
  * @author 胡伟骞
  * @since 2018-06-06
  */
-@Service
+@Service("TdrepayRechargeDetailService")
 public class TdrepayRechargeDetailServiceImpl extends BaseServiceImpl<TdrepayRechargeDetailMapper, TdrepayRechargeDetail> implements TdrepayRechargeDetailService {
 
 }

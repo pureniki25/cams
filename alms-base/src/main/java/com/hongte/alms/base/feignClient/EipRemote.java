@@ -2,6 +2,9 @@ package com.hongte.alms.base.feignClient;
 
 import com.hongte.alms.base.dto.RechargeModalDTO;
 import com.hongte.alms.base.feignClient.dto.AddProjectTrackReqDto;
+import com.hongte.alms.base.feignClient.dto.BankRechargeReqDto;
+import com.hongte.alms.base.feignClient.dto.BaofuRechargeReqDto;
+import com.hongte.alms.base.feignClient.dto.YiBaoRechargeReqDto;
 import com.hongte.alms.base.vo.comm.SmsVo;
 import com.ht.ussp.core.Result;
 
@@ -51,11 +54,73 @@ public interface EipRemote {
     public Result agencyRecharge(@RequestBody RechargeModalDTO dto);
     
     /**
-     * 7.1.29	查询充值订单
+     * 查询充值订单
      * 
      * @param paramMap
      * @return
      */
     @RequestMapping(value = "/eip/td/assetside/queryRechargeOrder", headers = { "app=ALMS", "content-type=application/json" },method = RequestMethod.POST)
     public Result queryRechargeOrder(@RequestBody Map<String, Object> paramMap);
+    
+    
+    /**
+     * 银行代扣
+     */
+   @RequestMapping(value = "/eip/td/assetside/autoRecharge",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+   Result bankRecharge(@RequestBody BankRechargeReqDto dto);
+   
+   
+   /**
+    * 宝付代扣
+    */
+   
+   @RequestMapping(value = "/eip/baofu/backTransRequest",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+   Result baofuRecharge(@RequestBody BaofuRechargeReqDto dto);
+   
+   
+   
+   /**
+    * 易宝代扣
+    */
+   
+   @RequestMapping(value = "/eip/td/tzt/invokeBindBankCard",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+   Result yibaoRecharge(@RequestBody YiBaoRechargeReqDto dto);
+   
+   
+   /**
+   * 宝付查询充值订单
+   */
+  
+  @RequestMapping(value = "/eip/td/queryStatus",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+  Result queryBaofuStatus( @RequestBody Map<String, Object> paramMap);
+  
+  
+  
+  
+  /**
+   * 7.1.56查询项目正常还款明细和提前结清待还本息
+   * @param paramMap
+   * @return
+   */
+  @RequestMapping(value = "/eip/td/queryProjectRepayment", headers = { "app=ALMS", "content-type=application/json" },method = RequestMethod.POST)
+  public Result queryProjectRepayment(@RequestBody Map<String, Object> paramMap);
+  
+  
+  
+  /**
+   * 7.1.51查询项目垫付记录
+   * @param paramMap
+   * @return
+   */
+  @RequestMapping(value = "/eip/td/repayment/returnAdvanceShareProfit", headers = { "app=ALMS", "content-type=application/json" },method = RequestMethod.POST)
+  public Result advanceShareProfit(@RequestBody Map<String, Object> paramMap);
+
+	/**
+	 * 标的还款信息查询接口
+	 * 
+	 * @param paramMap
+	 * @return
+	 */
+	@RequestMapping(value = "/eip/td/assetside/getProjectPayment", headers = { "app=ALMS", "content-type=application/json" },method = RequestMethod.POST)
+	public Result getProjectPayment(@RequestBody Map<String, Object> paramMap);
 }

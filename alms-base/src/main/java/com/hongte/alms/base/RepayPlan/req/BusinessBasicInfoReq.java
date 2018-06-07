@@ -1,6 +1,7 @@
 package com.hongte.alms.base.RepayPlan.req;
 
 import com.baomidou.mybatisplus.annotations.TableField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -21,28 +22,29 @@ public class BusinessBasicInfoReq {
      * 资产端业务编号
      */
     @ApiModelProperty(required= true,value = "资产端业务编号")
-    @NotNull(message = "资产端业务编号(businessId)不能为空")
+    @NotNull(message = "BusinessBasicInfoReq资产端业务编号(businessId)不能为空")
     private String businessId;
 
     /**
      * 资产端原业务编号，非展期业务则与资产端业务编号一致，展期业务则存储展期业务的来源业务编号
      */
     @ApiModelProperty(required= true,value = "资产端原业务编号，非展期业务则与资产端业务编号一致，展期业务则存储展期业务的来源业务编号")
-    @NotNull(message = "资产端原业务编号(orgBusinessId)不能为空")
+    @NotNull(message = "BusinessBasicInfoReq资产端原业务编号(orgBusinessId)不能为空")
     private String orgBusinessId;
 
     /**
      * 进件日期
      */
     @ApiModelProperty(required= true,value = "进件日期")
-    @NotNull(message = "进件日期(inputTime)不能为空")
+    @NotNull(message = "BusinessBasicInfoReq进件日期(inputTime)不能为空")
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     private Date inputTime;
 
     /**
      * 业务类型
      */
     @ApiModelProperty(required= true,value = "业务类型: 1,车易贷展期;  2, 房速贷展期;   3,金融仓储;   4, 三农金融; 9,车易贷; 11,房速贷;  12,车全垫资代采;  13,扶贫贷;  14,汽车融资租赁;  15,二手车商贷; 20,一点车贷;25,信用贷")
-    @NotNull(message = "业务类型(businessType)不能为空")
+    @NotNull(message = "BusinessBasicInfoReq业务类型(businessType)不能为空")
     private Integer businessType;
 
 
@@ -61,57 +63,57 @@ public class BusinessBasicInfoReq {
      * 客户资产端唯一编号
      */
     @ApiModelProperty(required= true,value = "客户资产端唯一编号")
-    @NotNull(message = "客户资产端唯一编号(customerId)不能为空")
+    @NotNull(message = "BusinessBasicInfoReq客户资产端唯一编号(customerId)不能为空")
     private String customerId;
     /**
      * 客户姓名
      */
     @ApiModelProperty(required= true,value = "客户姓名")
-    @NotNull(message = "客户姓名(customerName)不能为空")
+    @NotNull(message = "BusinessBasicInfoReq客户姓名(customerName)不能为空")
     private String customerName;
     /**
      * 还款方式ID，1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息
      */
     @ApiModelProperty(required= true,value = "还款方式ID，1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息")
-    @NotNull(message = "还款方式ID(repaymentTypeId)不能为空")
+    @NotNull(message = "BusinessBasicInfoReq还款方式ID(repaymentTypeId)不能为空")
     private Integer repaymentTypeId;
     /**
      * 借款金额(元)
      */
     @ApiModelProperty(required= true,value = "借款金额(元)")
-    @NotNull(message = "借款金额(borrowMoney)不能为空")
+    @NotNull(message = "BusinessBasicInfoReq借款金额(borrowMoney)不能为空")
     private BigDecimal borrowMoney;
     /**
      * 借款期限  以月为单位
      */
     @ApiModelProperty(required= true,value = "借款期限")
-    @NotNull(message = "借款期限(borrowLimit)不能为空")
+    @NotNull(message = "BusinessBasicInfoReq借款期限(borrowLimit)不能为空")
     private Integer borrowLimit;
 
     /**
      * 借款利率(%)，如11%则存11.0
      */
     @ApiModelProperty(required= true,value = "借款利率(%)，如11%则存11.0")
-    @NotNull(message = "借款利率(borrowRate)不能为空")
+    @NotNull(message = "BusinessBasicInfoReq借款利率(borrowRate)不能为空")
     private BigDecimal borrowRate;
     /**
      * 借款利率类型，1：年利率，2：月利率，3：日利率
      */
     @ApiModelProperty(required= true,value = "借款利率类型，1：年利率，2：月利率，3：日利率")
-    @NotNull(message = "借款利率类型(borrowRateUnit)不能为空")
+    @NotNull(message = "BusinessBasicInfoReq借款利率类型(borrowRateUnit)不能为空")
     private Integer borrowRateUnit;
 
     /**
      * 业务获取人ID
      */
     @ApiModelProperty(required= true,value = "业务获取人ID")
-    @NotNull(message = "业务获取人ID(originalUserid)不能为空")
+    @NotNull(message = "BusinessBasicInfoReq业务获取人ID(originalUserid)不能为空")
     private String originalUserid;
     /**
      * 业务获取人姓名
      */
     @ApiModelProperty(required= true,value = "业务获取人姓名")
-    @NotNull(message = "业务获取人姓名(originalName)不能为空")
+    @NotNull(message = "BusinessBasicInfoReq业务获取人姓名(originalName)不能为空")
     private String originalName;
 
 
@@ -119,13 +121,13 @@ public class BusinessBasicInfoReq {
      * 业务主办人ID
      */
     @ApiModelProperty(required= true,value = "业务主办人ID")
-    @NotNull(message = "业务主办人ID(operatorId)不能为空")
+    @NotNull(message = "BusinessBasicInfoReq业务主办人ID(operatorId)不能为空")
     private String operatorId;
     /**
      * 业务主办人姓名
      */
     @ApiModelProperty(required= true,value = "业务主办人姓名")
-    @NotNull(message = "业务主办人姓名(operatorName)不能为空")
+    @NotNull(message = "BusinessBasicInfoReq业务主办人姓名(operatorName)不能为空")
     private String operatorName;
 //    /**
 //     * 业务所属资产端编号(对应tb_basic_asset_side的asset_side_id)
@@ -136,7 +138,7 @@ public class BusinessBasicInfoReq {
      * 业务所属分公司编号
      */
     @ApiModelProperty(required= true,value = "业务所属分公司编号")
-    @NotNull(message = "业务所属分公司编号(companyId)不能为空")
+    @NotNull(message = "BusinessBasicInfoReq业务所属分公司编号(companyId)不能为空")
     private String companyId;
 
 
@@ -144,33 +146,33 @@ public class BusinessBasicInfoReq {
      * 业务所属分公司名称
      */
     @ApiModelProperty(required= true,value = "业务所属分公司名称")
-    @NotNull(message = "业务所属分公司名称(companyName)不能为空")
+    @NotNull(message = "BusinessBasicInfoReq业务所属分公司名称(companyName)不能为空")
     private String companyName;
 
     /**
      * 业务所属片区编号
      */
     @ApiModelProperty(required= true,value = "业务所属片区编号")
-    @NotNull(message = "业务所属片区编号(districtId)不能为空")
+    @NotNull(message = "BusinessBasicInfoReq业务所属片区编号(districtId)不能为空")
     private String districtId;
     /**
      * 业务所属片区名称
      */
     @ApiModelProperty(required= true,value = "业务所属片区名称")
-    @NotNull(message = "业务所属片区名称(districtName)不能为空")
+    @NotNull(message = "BusinessBasicInfoReq业务所属片区名称(districtName)不能为空")
     private String districtName;
 
     /**
      * 标识是否P2P拆标业务，0：非P2P拆标业务，1：P2P拆标业务
      */
     @ApiModelProperty(required= true,value = "标识是否P2P拆标业务，0：非P2P拆标业务，1：P2P拆标业务")
-    @NotNull(message = "标识是否P2P拆标业务(issueSplitType)不能为空")
+    @NotNull(message = "BusinessBasicInfoReq标识是否P2P拆标业务(issueSplitType)不能为空")
     private Integer issueSplitType;
     /**
      * 业务来源：0-常规录入 1-结清续贷新业务 2-结清续贷续贷业务 3-线下历史导入 4-扫码业务 5-优质车抵贷 6 -一点授信
      */
     @ApiModelProperty(required= true,value = "业务来源：0-常规录入 1-结清续贷新业务 2-结清续贷续贷业务 3-线下历史导入 4-扫码业务 5-优质车抵贷 6 -一点授信")
-    @NotNull(message = "业务来源(sourceType)不能为空")
+    @NotNull(message = "BusinessBasicInfoReq业务来源(sourceType)不能为空")
     private Integer sourceType;
     /**
      * 原始来源业务的业务编号(当业务来源为结清再贷时，必填)
@@ -183,7 +185,7 @@ public class BusinessBasicInfoReq {
      * 是否展期业务，1：是，0：否
      */
     @ApiModelProperty(required= true,value = "是否展期业务，1：是，0：否")
-    @NotNull(message = "是否展期业务(isRenewBusiness)不能为空")
+    @NotNull(message = "BusinessBasicInfoReq是否展期业务(isRenewBusiness)不能为空")
     private Integer isRenewBusiness;
 
 

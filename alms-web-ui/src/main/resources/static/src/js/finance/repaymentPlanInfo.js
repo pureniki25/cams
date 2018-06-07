@@ -138,8 +138,8 @@ window.layinit(function (htConfig) {
         	 */
             initBaseInfo: function(){
             	this.baseInfo.businessId = businessId;
-            	this.baseInfo.customer = customer;
-            	this.baseInfo.phoneNumber = phoneNumber;
+            	this.baseInfo.customer = customer == 'null' ? '' : customer;
+            	this.baseInfo.phoneNumber = phoneNumber == 'null' ? '' : phoneNumber;
             	this.baseInfo.repaymentType = repaymentType;
             	this.baseInfo.borrowMoney = borrowMoney;
             	this.baseInfo.borrowLimit = borrowLimit + '个月';

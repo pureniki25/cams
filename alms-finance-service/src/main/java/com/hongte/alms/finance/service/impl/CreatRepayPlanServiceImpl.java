@@ -473,6 +473,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
     @Transactional(rollbackFor = Exception.class)
     public PlanReturnInfoDto creatAndSaveRepayPlan(CreatRepayPlanReq creatRepayPlanReq) throws IllegalAccessException, InstantiationException {
 
+
         //判断是否重传
         checkResave(creatRepayPlanReq);
 
@@ -575,6 +576,13 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         for(ProjInfoReq projInfoReq:projInfoReqs){
             TuandaiProjectInfo  projInfo = ClassCopyUtil.copy(projInfoReq,ProjInfoReq.class,TuandaiProjectInfo.class);
             projInfo.setBusinessId(basicBusiness.getBusinessId());
+            projInfo.setQueryFullSuccessDate(projInfoReq.getQueryFullsuccessDate());
+            projInfo.setBorrowLimit(basicBusiness.getBorrowLimit());
+
+            //设置年化利率
+            BigDecimal yearRate = getYearRate(projInfoReq.getRate(),RepayPlanBorrowRateUnitEnum.getByKey(projInfoReq.getRateUnitType()));
+            projInfo.setInterestRate(yearRate);
+
             //设置标的batchId
             boolean setBatchFlage = false;
             for(RepaymentBizPlanDto bizPlanDto: dtos){
@@ -1769,6 +1777,26 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         }
         return monthRate.divide(new BigDecimal(100),10,roundingMode);
     }
+    private BigDecimal getYearRate(BigDecimal rate,RepayPlanBorrowRateUnitEnum rateUnit){
+        BigDecimal yearRate;
+        switch (rateUnit){
+            case YEAR_RATE:
+                yearRate = rate;
+                break;
+            case MONTH_RATE:
+                yearRate = rate.multiply(new BigDecimal(12));
+                break;
+            case DAY_RATE:
+                yearRate = rate.multiply(new BigDecimal(30)).multiply(new BigDecimal(12));
+                break;
+            default:
+                yearRate = rate;
+                break;
+        }
+        return yearRate.divide(new BigDecimal(100),10,roundingMode);
+    }
+
+
 
 
     /**

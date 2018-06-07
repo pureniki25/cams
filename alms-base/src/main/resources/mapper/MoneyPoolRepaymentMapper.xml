@@ -73,18 +73,16 @@
 		    THEN '易宝' 
 		    WHEN 3 
 		    THEN '宝付' 
-		    ELSE sb.bank_name 
+		    WHEN 5 
+		    THEN '银行代扣' 
+		    ELSE '' 
 		  END accountName 
 		FROM
 		  `tb_withholding_repayment_log` wrl 
-		  JOIN `tb_withholding_platform` wp 
+		  LEFT JOIN `tb_withholding_platform` wp 
 		    ON wrl.`bind_platform_id` = wp.`platform_id` 
-		    AND wrl.`repay_status` = 1 
+		  WHERE wrl.`repay_status` = 1 
 		    AND wrl.original_business_id = #{businessId,jdbcType=VARCHAR}
-		  LEFT JOIN `tb_sys_bank_limit` sbl 
-		    ON wrl.bind_platform_id = sbl.platform_id 
-		  LEFT JOIN `tb_sys_bank` sb 
-		    ON sbl.bank_code = sb.bank_code 
 		UNION
 		ALL 
 		SELECT 
@@ -105,6 +103,7 @@
 		WHERE mpr.plan_list_id = lst.plan_list_id 
 		  AND lst.orig_business_id = #{businessId,jdbcType=VARCHAR}
 		  AND mpr.income_type IN (1, 2)
+		  AND mpr.is_finance_match = 1
 		ORDER BY 1
 	</select>
 </mapper>
