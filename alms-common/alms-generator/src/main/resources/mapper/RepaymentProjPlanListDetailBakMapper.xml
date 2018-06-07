@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.RepaymentProjPlanListDetailBakMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.RepaymentProjPlanListDetailBak">
+        <id column="proj_plan_detail_id" property="projPlanDetailId" />
+        <result column="proj_plan_list_id" property="projPlanListId" />
+        <result column="share_profit_index" property="shareProfitIndex" />
+        <result column="plan_detail_id" property="planDetailId" />
+        <result column="plan_list_id" property="planListId" />
+        <result column="business_id" property="businessId" />
+        <result column="orig_business_id" property="origBusinessId" />
+        <result column="period" property="period" />
+        <result column="fee_id" property="feeId" />
+        <result column="plan_item_name" property="planItemName" />
+        <result column="plan_item_type" property="planItemType" />
+        <result column="account_status" property="accountStatus" />
+        <result column="fact_repay_date" property="factRepayDate" />
+        <result column="due_date" property="dueDate" />
+        <result column="proj_plan_amount" property="projPlanAmount" />
+        <result column="derate_amount" property="derateAmount" />
+        <result column="proj_fact_amount" property="projFactAmount" />
+        <result column="creat_sys_type" property="creatSysType" />
+        <result column="plate_type" property="plateType" />
+        <result column="create_date" property="createDate" />
+        <result column="create_user" property="createUser" />
+        <result column="update_date" property="updateDate" />
+        <result column="update_user" property="updateUser" />
+        <result column="confirm_log_id" property="confirmLogId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        proj_plan_detail_id AS projPlanDetailId, proj_plan_list_id AS projPlanListId, share_profit_index AS shareProfitIndex, plan_detail_id AS planDetailId, plan_list_id AS planListId, business_id AS businessId, orig_business_id AS origBusinessId, period, fee_id AS feeId, plan_item_name AS planItemName, plan_item_type AS planItemType, account_status AS accountStatus, fact_repay_date AS factRepayDate, due_date AS dueDate, proj_plan_amount AS projPlanAmount, derate_amount AS derateAmount, proj_fact_amount AS projFactAmount, creat_sys_type AS creatSysType, plate_type AS plateType, create_date AS createDate, create_user AS createUser, update_date AS updateDate, update_user AS updateUser, confirm_log_id AS confirmLogId
+    </sql>
+
+</mapper>

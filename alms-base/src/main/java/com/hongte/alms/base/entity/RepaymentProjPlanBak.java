@@ -9,8 +9,6 @@ import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
 import java.io.Serializable;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
@@ -18,12 +16,12 @@ import io.swagger.annotations.ApiModelProperty;
  * 标的还款计划信息
  * </p>
  *
- * @author 曾坤
- * @since 2018-05-03
+ * @author 王继光
+ * @since 2018-06-06
  */
 @ApiModel
-@TableName("tb_repayment_proj_plan")
-public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
+@TableName("tb_repayment_proj_plan_bak")
+public class RepaymentProjPlanBak extends Model<RepaymentProjPlanBak> {
 
     private static final long serialVersionUID = 1L;
 
@@ -81,43 +79,43 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 	@TableField("borrow_rate_unit")
 	@ApiModelProperty(required= true,value = "生成还款计划对应的借款利率类型，1：年利率，2：月利率，3：日利率")
 	private Integer borrowRateUnit;
-	/**
-	 * 线上逾期滞纳金费率(%)
-	 */
+    /**
+     * 线上逾期滞纳金费率(%)
+     */
 	@TableField("on_line_over_due_rate")
 	@ApiModelProperty(required= true,value = "线上逾期滞纳金费率(%)")
 	private BigDecimal onLineOverDueRate;
-	
-	/**
-	 * 线下期外逾期滞纳金费率(%)
-	 */
+    /**
+     * 线上逾期滞纳金费率类型，1：按标的总借款金额乘以比例每天 ，2：按标的剩余本金乘以比例每天 ，3：按固定金额每天，4：按标的当前应还本息乘以比例每天(目前只有这种算法，固定传4),5:按标的垫付本息乘以比例每天
+     */
+	@TableField("on_line_over_due_rate_type")
+	@ApiModelProperty(required= true,value = "线上逾期滞纳金费率类型，1：按标的总借款金额乘以比例每天 ，2：按标的剩余本金乘以比例每天 ，3：按固定金额每天，4：按标的当前应还本息乘以比例每天(目前只有这种算法，固定传4),5:按标的垫付本息乘以比例每天")
+	private Integer onLineOverDueRateType;
+    /**
+     * 线下期外逾期滞纳金费率(%)
+     */
 	@TableField("off_line_out_over_due_rate")
 	@ApiModelProperty(required= true,value = "线下期外逾期滞纳金费率(%)")
 	private BigDecimal offLineOutOverDueRate;
-
-	/**
-	 * 线下期内逾期滞纳金费率(%)
-	 */
+    /**
+     * 线下期外逾期滞纳金费率类型,1：按标的总借款金额乘以比例每天  ,2：按标的剩余本金乘以比例每天,3：按固定金额每天
+     */
+	@TableField("off_line_out_over_due_rate_type")
+	@ApiModelProperty(required= true,value = "线下期外逾期滞纳金费率类型,1：按标的总借款金额乘以比例每天  ,2：按标的剩余本金乘以比例每天,3：按固定金额每天")
+	private Integer offLineOutOverDueRateType;
+    /**
+     * 线下期内逾期滞纳金费率(%)
+     */
 	@TableField("off_line_in_over_due_rate")
 	@ApiModelProperty(required= true,value = "线下期内逾期滞纳金费率(%)")
 	private BigDecimal offLineInOverDueRate;
-
-    
-	
+    /**
+     * 线下期内逾期滞纳金费率类型,1：按标的总借款金额乘以比例每天  ,2：按标的剩余本金乘以比例每天,3：按固定金额每天
+     */
 	@TableField("off_line_in_over_due_rate_type")
-	@ApiModelProperty(required=true,value="线下期内逾期滞纳金费率类型,1：按标的总借款金额乘以比例每天  ,2：按标的剩余本金乘以比例每天,3：按固定金额每天")
+	@ApiModelProperty(required= true,value = "线下期内逾期滞纳金费率类型,1：按标的总借款金额乘以比例每天  ,2：按标的剩余本金乘以比例每天,3：按固定金额每天")
 	private Integer offLineInOverDueRateType;
-	
-	
-	@TableField("off_line_out_over_due_rate_type")
-	@ApiModelProperty(required=true,value="线下期外逾期滞纳金费率类型,1：按标的总借款金额乘以比例每天  ,2：按标的剩余本金乘以比例每天,3：按固定金额每天")
-	private Integer offLineOutOverDueRateType;
-
-    
-	@TableField("on_line_over_due_rate_type")
-	@ApiModelProperty(required=true,value="线上期外逾期滞纳金费率类型,1：按标的总借款金额乘以比例每天 ，2：按标的剩余本金乘以比例每天 ，3：按固定金额每天，4：按标的当前应还本息乘以比例每天，5：按标的垫付本息乘以比例每天 ")
-	private Integer onLineOverDueRateType;
-	/**
+    /**
      * 生成还款计划对应的借款期限
      */
 	@TableField("borrow_limit")
@@ -141,7 +139,6 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 	@TableField("is_defer")
 	@ApiModelProperty(required= true,value = "是否展期还款计划,0:否，1:是")
 	private Integer isDefer;
-
     /**
      * 创建系统类型：1.信贷生成，2.贷后管理生成
      */
@@ -159,7 +156,6 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
      */
 	@TableField("create_time")
 	@ApiModelProperty(required= true,value = "创建日期")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createTime;
     /**
      * 创建用户
@@ -172,7 +168,6 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
      */
 	@TableField("update_time")
 	@ApiModelProperty(required= true,value = "更新日期")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date updateTime;
     /**
      * 更新用户
@@ -180,77 +175,16 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 	@TableField("update_user")
 	@ApiModelProperty(required= true,value = "更新用户")
 	private String updateUser;
-
-	/**
-	 * 满标时间
-	 */
+    /**
+     * 满标时间
+     */
 	@TableField("query_full_success_date")
 	@ApiModelProperty(required= true,value = "满标时间")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date queryFullSuccessDate;
+	@TableField("confirm_log_id")
+	@ApiModelProperty(required= true,value = "")
+	private String confirmLogId;
 
-
-	public Integer getOffLineInOverDueRateType() {
-		return offLineInOverDueRateType;
-	}
-
-	public void setOffLineInOverDueRateType(Integer offLineInOverDueRateType) {
-		this.offLineInOverDueRateType = offLineInOverDueRateType;
-	}
-
-	public Integer getOffLineOutOverDueRateType() {
-		return offLineOutOverDueRateType;
-	}
-
-	public void setOffLineOutOverDueRateType(Integer offLineOutOverDueRateType) {
-		this.offLineOutOverDueRateType = offLineOutOverDueRateType;
-	}
-
-	public Integer getOnLineOverDueRateType() {
-		return onLineOverDueRateType;
-	}
-
-	public void setOnLineOverDueRateType(Integer onLineOverDueRateType) {
-		this.onLineOverDueRateType = onLineOverDueRateType;
-	}
-
-	public BigDecimal getOnLineOverDueRate() {
-		return onLineOverDueRate;
-	}
-
-	public void setOnLineOverDueRate(BigDecimal onLineOverDueRate) {
-		this.onLineOverDueRate = onLineOverDueRate;
-	}
-
-
-
-	public BigDecimal getOffLineOutOverDueRate() {
-		return offLineOutOverDueRate;
-	}
-
-	public void setOffLineOutOverDueRate(BigDecimal offLineOutOverDueRate) {
-		this.offLineOutOverDueRate = offLineOutOverDueRate;
-	}
-
-
-
-	public BigDecimal getOffLineInOverDueRate() {
-		return offLineInOverDueRate;
-	}
-
-	public void setOffLineInOverDueRate(BigDecimal offLineInOverDueRate) {
-		this.offLineInOverDueRate = offLineInOverDueRate;
-	}
-
-	
-
-	public Date getQueryFullSuccessDate() {
-		return queryFullSuccessDate;
-	}
-
-	public void setQueryFullSuccessDate(Date queryFullSuccessDate) {
-		this.queryFullSuccessDate = queryFullSuccessDate;
-	}
 
 	public String getProjPlanId() {
 		return projPlanId;
@@ -324,6 +258,54 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 		this.borrowRateUnit = borrowRateUnit;
 	}
 
+	public BigDecimal getOnLineOverDueRate() {
+		return onLineOverDueRate;
+	}
+
+	public void setOnLineOverDueRate(BigDecimal onLineOverDueRate) {
+		this.onLineOverDueRate = onLineOverDueRate;
+	}
+
+	public Integer getOnLineOverDueRateType() {
+		return onLineOverDueRateType;
+	}
+
+	public void setOnLineOverDueRateType(Integer onLineOverDueRateType) {
+		this.onLineOverDueRateType = onLineOverDueRateType;
+	}
+
+	public BigDecimal getOffLineOutOverDueRate() {
+		return offLineOutOverDueRate;
+	}
+
+	public void setOffLineOutOverDueRate(BigDecimal offLineOutOverDueRate) {
+		this.offLineOutOverDueRate = offLineOutOverDueRate;
+	}
+
+	public Integer getOffLineOutOverDueRateType() {
+		return offLineOutOverDueRateType;
+	}
+
+	public void setOffLineOutOverDueRateType(Integer offLineOutOverDueRateType) {
+		this.offLineOutOverDueRateType = offLineOutOverDueRateType;
+	}
+
+	public BigDecimal getOffLineInOverDueRate() {
+		return offLineInOverDueRate;
+	}
+
+	public void setOffLineInOverDueRate(BigDecimal offLineInOverDueRate) {
+		this.offLineInOverDueRate = offLineInOverDueRate;
+	}
+
+	public Integer getOffLineInOverDueRateType() {
+		return offLineInOverDueRateType;
+	}
+
+	public void setOffLineInOverDueRateType(Integer offLineInOverDueRateType) {
+		this.offLineInOverDueRateType = offLineInOverDueRateType;
+	}
+
 	public Integer getBorrowLimit() {
 		return borrowLimit;
 	}
@@ -355,8 +337,6 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 	public void setIsDefer(Integer isDefer) {
 		this.isDefer = isDefer;
 	}
-
-
 
 	public Integer getCreatSysType() {
 		return creatSysType;
@@ -406,6 +386,22 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 		this.updateUser = updateUser;
 	}
 
+	public Date getQueryFullSuccessDate() {
+		return queryFullSuccessDate;
+	}
+
+	public void setQueryFullSuccessDate(Date queryFullSuccessDate) {
+		this.queryFullSuccessDate = queryFullSuccessDate;
+	}
+
+	public String getConfirmLogId() {
+		return confirmLogId;
+	}
+
+	public void setConfirmLogId(String confirmLogId) {
+		this.confirmLogId = confirmLogId;
+	}
+
 	@Override
 	protected Serializable pkVal() {
 		return this.projPlanId;
@@ -413,7 +409,7 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 
 	@Override
 	public String toString() {
-		return "RepaymentProjPlan{" +
+		return "RepaymentProjPlanBak{" +
 			", projPlanId=" + projPlanId +
 			", projectId=" + projectId +
 			", businessId=" + businessId +
@@ -424,13 +420,15 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 			", borrowRate=" + borrowRate +
 			", borrowRateUnit=" + borrowRateUnit +
 			", onLineOverDueRate=" + onLineOverDueRate +
+			", onLineOverDueRateType=" + onLineOverDueRateType +
 			", offLineOutOverDueRate=" + offLineOutOverDueRate +
+			", offLineOutOverDueRateType=" + offLineOutOverDueRateType +
 			", offLineInOverDueRate=" + offLineInOverDueRate +
+			", offLineInOverDueRateType=" + offLineInOverDueRateType +
 			", borrowLimit=" + borrowLimit +
 			", borrowLimitUnit=" + borrowLimitUnit +
 			", planStatus=" + planStatus +
 			", isDefer=" + isDefer +
-
 			", creatSysType=" + creatSysType +
 			", plateType=" + plateType +
 			", createTime=" + createTime +
@@ -438,18 +436,22 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 			", updateTime=" + updateTime +
 			", updateUser=" + updateUser +
 			", queryFullSuccessDate=" + queryFullSuccessDate +
+			", confirmLogId=" + confirmLogId +
 			"}";
 	}
 
 	/**
 	 * 
 	 */
-	public RepaymentProjPlan() {
+	public RepaymentProjPlanBak() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 	
-	public RepaymentProjPlan(RepaymentProjPlanBak plan) {
+	/**
+	 * 
+	 */
+	public RepaymentProjPlanBak(RepaymentProjPlan plan) {
 		super();
 		setBorrowLimit(plan.getBorrowLimit());
 		setBorrowLimitUnit(plan.getBorrowLimitUnit());

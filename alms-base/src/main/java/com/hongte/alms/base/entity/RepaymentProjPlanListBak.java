@@ -9,8 +9,6 @@ import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
 import java.io.Serializable;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
@@ -18,12 +16,12 @@ import io.swagger.annotations.ApiModelProperty;
  * 标的还款计划列表
  * </p>
  *
- * @author 曾坤
- * @since 2018-05-03
+ * @author 王继光
+ * @since 2018-06-06
  */
 @ApiModel
-@TableName("tb_repayment_proj_plan_list")
-public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
+@TableName("tb_repayment_proj_plan_list_bak")
+public class RepaymentProjPlanListBak extends Model<RepaymentProjPlanListBak> {
 
     private static final long serialVersionUID = 1L;
 
@@ -79,7 +77,6 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
      */
 	@TableField("due_date")
 	@ApiModelProperty(required= true,value = "应还日期")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date dueDate;
     /**
      * 总计划应还金额(元)，不含滞纳金
@@ -93,13 +90,12 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 	@TableField("overdue_amount")
 	@ApiModelProperty(required= true,value = "总应还滞纳金(元)，每天零点由系统自动计算")
 	private BigDecimal overdueAmount;
-	/**
+    /**
      * 减免金额
      */
 	@TableField("derate_amount")
 	@ApiModelProperty(required= true,value = "减免金额")
 	private BigDecimal derateAmount;
-	
     /**
      * 逾期天数，每天零点由系统自动计算
      */
@@ -107,10 +103,10 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 	@ApiModelProperty(required= true,value = "逾期天数，每天零点由系统自动计算")
 	private BigDecimal overdueDays;
     /**
-     * 当前还款状态，目前只有三种，分别为"还款中"，"逾期"，"已还款"
+     * 当前还款状态，目前只有三种，分别为 还款中，逾期，已还款
      */
 	@TableField("current_status")
-	@ApiModelProperty(required= true,value = "当前还款状态，目前只有三种，分别为还款中，逾期，已还款")
+	@ApiModelProperty(required= true,value = "当前还款状态，目前只有三种，分别为 还款中，逾期，已还款")
 	private String currentStatus;
     /**
      * 当前还款子状态
@@ -129,15 +125,12 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
      */
 	@TableField("fact_repay_date")
 	@ApiModelProperty(required= true,value = "客户实还日期")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date factRepayDate;
-
     /**
      * 还款备注
      */
 	@ApiModelProperty(required= true,value = "还款备注")
 	private String remark;
-
     /**
      * 生成系统类型：1.信贷生成，2.贷后管理生成
      */
@@ -155,7 +148,6 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
      */
 	@TableField("create_time")
 	@ApiModelProperty(required= true,value = "创建日期")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createTime;
     /**
      * 创建用户
@@ -168,7 +160,6 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
      */
 	@TableField("update_time")
 	@ApiModelProperty(required= true,value = "更新日期")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date updateTime;
     /**
      * 更新用户
@@ -176,6 +167,9 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 	@TableField("update_user")
 	@ApiModelProperty(required= true,value = "更新用户")
 	private String updateUser;
+	@TableField("confirm_log_id")
+	@ApiModelProperty(required= true,value = "")
+	private String confirmLogId;
 
 
 	public String getProjPlanListId() {
@@ -264,6 +258,14 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 
 	public void setOverdueAmount(BigDecimal overdueAmount) {
 		this.overdueAmount = overdueAmount;
+	}
+
+	public BigDecimal getDerateAmount() {
+		return derateAmount;
+	}
+
+	public void setDerateAmount(BigDecimal derateAmount) {
+		this.derateAmount = derateAmount;
 	}
 
 	public BigDecimal getOverdueDays() {
@@ -362,6 +364,14 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 		this.updateUser = updateUser;
 	}
 
+	public String getConfirmLogId() {
+		return confirmLogId;
+	}
+
+	public void setConfirmLogId(String confirmLogId) {
+		this.confirmLogId = confirmLogId;
+	}
+
 	@Override
 	protected Serializable pkVal() {
 		return this.projPlanListId;
@@ -369,7 +379,7 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 
 	@Override
 	public String toString() {
-		return "RepaymentProjPlanList{" +
+		return "RepaymentProjPlanListBak{" +
 			", projPlanListId=" + projPlanListId +
 			", projPlanId=" + projPlanId +
 			", planListId=" + planListId +
@@ -381,6 +391,7 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 			", dueDate=" + dueDate +
 			", totalBorrowAmount=" + totalBorrowAmount +
 			", overdueAmount=" + overdueAmount +
+			", derateAmount=" + derateAmount +
 			", overdueDays=" + overdueDays +
 			", currentStatus=" + currentStatus +
 			", currentSubStatus=" + currentSubStatus +
@@ -393,32 +404,22 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 			", createUser=" + createUser +
 			", updateTime=" + updateTime +
 			", updateUser=" + updateUser +
+			", confirmLogId=" + confirmLogId +
 			"}";
-	}
-
-	/**
-	 * @return the derateAmount
-	 */
-	public BigDecimal getDerateAmount() {
-		return derateAmount;
-	}
-
-	/**
-	 * @param derateAmount the derateAmount to set
-	 */
-	public void setDerateAmount(BigDecimal derateAmount) {
-		this.derateAmount = derateAmount;
 	}
 
 	/**
 	 * 
 	 */
-	public RepaymentProjPlanList() {
+	public RepaymentProjPlanListBak() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 	
-	public RepaymentProjPlanList(RepaymentProjPlanListBak pl) {
+	/**
+	 * 
+	 */
+	public RepaymentProjPlanListBak(RepaymentProjPlanList pl) {
 		super();
 		setAfterId(pl.getAfterId());
 		setBusinessId(pl.getBusinessId());
@@ -445,4 +446,6 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 		setUpdateTime(pl.getUpdateTime());
 		setUpdateUser(pl.getUpdateUser());
 	}
+	
+	
 }

@@ -553,4 +553,52 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 	public void setRepayStatus(Integer repayStatus) {
 		this.repayStatus = repayStatus;
 	}
+
+	/**
+	 * 
+	 */
+	public RepaymentBizPlanList() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * 
+	 */
+	public RepaymentBizPlanList(RepaymentBizPlanListBak pl) {
+		super();
+		setAccountantConfirmDate(pl.getAccountantConfirmDate());
+		setAccountantConfirmStatus(pl.getAccountantConfirmStatus());
+		setAccountantConfirmUser(pl.getAccountantConfirmUser());
+		setAccountantConfirmUserName(pl.getAccountantConfirmUserName());
+		setAfterId(pl.getAfterId());
+		setAutoWithholdingConfirmedDate(pl.getAutoWithholdingConfirmedDate());
+		setAutoWithholdingConfirmedUser(pl.getAutoWithholdingConfirmedUser());
+		setAutoWithholdingConfirmedUserName(pl.getAutoWithholdingConfirmedUserName());
+		setBusinessId(pl.getBusinessId());
+		setConfirmFlag(pl.getConfirmFlag());
+		setCreateTime(pl.getCreateTime());
+		setCreateUser(pl.getCreateUser());
+		setCurrentStatus(pl.getCurrentStatus());
+		setCurrentSubStatus(pl.getCurrentSubStatus());
+		setDerateAmount(pl.getDerateAmount());
+		setDueDate(pl.getDueDate());
+		setFactRepayDate(pl.getFactRepayDate());
+		setFinanceComfirmDate(pl.getFinanceComfirmDate());
+		setFinanceConfirmUser(pl.getFinanceConfirmUser());
+		setFinanceConfirmUserName(pl.getFinanceConfirmUserName());
+		setOrigBusinessId(pl.getOrigBusinessId());
+		setOverdueAmount(pl.getOverdueAmount());
+		setOverdueDays(pl.getOverdueDays());
+		setPeriod(pl.getPeriod());
+		setPlanId(pl.getPlanId());
+		setPlanListId(pl.getPlanListId());
+		setRemark(pl.getRemark());
+		setRepayFlag(pl.getRepayFlag());
+		setRepayStatus(pl.getRepayStatus());
+		setSrcType(pl.getSrcType());
+		setTotalBorrowAmount(pl.getTotalBorrowAmount());
+		setUpdateTime(pl.getUpdateTime());
+		setUpdateUser(pl.getUpdateUser());
+	}
 }
