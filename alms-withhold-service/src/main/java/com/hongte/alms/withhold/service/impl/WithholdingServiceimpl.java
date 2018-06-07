@@ -19,7 +19,7 @@ import com.hongte.alms.base.entity.SysBankLimit;
 import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.entity.WithholdingChannel;
 import com.hongte.alms.base.enums.PlatformEnum;
-import com.hongte.alms.base.enums.SysParameterRepaydaysEnums;
+import com.hongte.alms.base.enums.SysParameterEnums;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
 import com.hongte.alms.base.feignClient.dto.BankCardInfo;
 import com.hongte.alms.base.feignClient.dto.CustomerInfoDto;
@@ -70,7 +70,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 
 	@Override
 	public void withholding() {
-	    List<SysParameter> repayStatusList =  sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterRepaydaysEnums.REPAY_DAYS.getKey()).eq("status",1).orderBy("row_Index"));
+	    List<SysParameter> repayStatusList =  sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterEnums.REPAY_DAYS.getKey()).eq("status",1).orderBy("row_Index"));
 	    Integer days= Integer.valueOf(repayStatusList.get(0).getParamValue());
 		List<RepaymentBizPlanList> pLists = repaymentBizPlanListService.selectAutoRepayList(days);//查询一个周期内(30天)要代扣的记录
 		for (RepaymentBizPlanList pList : pLists) {

@@ -5,9 +5,11 @@ import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.BizOutputRecord;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
+import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.entity.WithholdingChannel;
 import com.hongte.alms.base.entity.WithholdingRepaymentLog;
 import com.hongte.alms.base.enums.PlatformEnum;
+import com.hongte.alms.base.enums.SysParameterEnums;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.feignClient.dto.BankCardInfo;
@@ -20,6 +22,7 @@ import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.BizOutputRecordService;
 import com.hongte.alms.base.service.RepaymentBizPlanListDetailService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
+import com.hongte.alms.base.service.SysParameterService;
 import com.hongte.alms.base.service.WithholdingChannelService;
 import com.hongte.alms.base.service.WithholdingRepaymentLogService;
 import com.hongte.alms.common.result.Result;
@@ -93,7 +96,10 @@ public class RechargeServiceImpl implements RechargeService {
 	
 	@Value("${tuandai_org_userid}")
 	private String rechargeUserId;
-    
+	
+    @Autowired
+    @Qualifier("SysParameterService")
+	SysParameterService sysParameterService;
 
     @Autowired
     LoginUserInfoHelper loginUserInfoHelper;
