@@ -5,8 +5,11 @@ import java.io.Serializable;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.enums.IdType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
@@ -26,8 +29,9 @@ public class BasicBizCustomer extends Model<BasicBizCustomer> {
     /**
      * 主键自增ID
      */
+	@TableId(value="id", type= IdType.AUTO)
 	@ApiModelProperty(required= true,value = "主键自增ID")
-	private String id;
+	private Integer id;
     /**
      * 客户ID，资产端主键
      */
@@ -156,11 +160,11 @@ public class BasicBizCustomer extends Model<BasicBizCustomer> {
 	private Date updateTime;
 
 
-	public String getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
