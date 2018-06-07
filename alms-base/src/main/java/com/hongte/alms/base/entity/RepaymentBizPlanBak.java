@@ -9,21 +9,19 @@ import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
 import java.io.Serializable;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
  * <p>
- * 业务还款计划信息
+ * 业务还款计划信息(备份表,供撤销还款确认使用)
  * </p>
  *
- * @author 曾坤
- * @since 2018-05-03
+ * @author 王继光
+ * @since 2018-06-06
  */
 @ApiModel
-@TableName("tb_repayment_biz_plan")
-public class RepaymentBizPlan extends Model<RepaymentBizPlan> {
+@TableName("tb_repayment_biz_plan_bak")
+public class RepaymentBizPlanBak extends Model<RepaymentBizPlanBak> {
 
     private static final long serialVersionUID = 1L;
 
@@ -105,7 +103,6 @@ public class RepaymentBizPlan extends Model<RepaymentBizPlan> {
 	@TableField("xd_out_id")
 	@ApiModelProperty(required= true,value = "对应原信贷的出款计划ID(out_id)，用作历史数据迁移的标记字段。若非原信贷系统生成的还款计划，则为空")
 	private Integer xdOutId;
-
     /**
      * 来源类型：1.信贷生成，2.贷后管理生成
      */
@@ -117,7 +114,6 @@ public class RepaymentBizPlan extends Model<RepaymentBizPlan> {
      */
 	@TableField("create_time")
 	@ApiModelProperty(required= true,value = "创建日期")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createTime;
     /**
      * 创建用户
@@ -130,7 +126,6 @@ public class RepaymentBizPlan extends Model<RepaymentBizPlan> {
      */
 	@TableField("update_time")
 	@ApiModelProperty(required= true,value = "更新日期")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date updateTime;
     /**
      * 更新用户
@@ -138,6 +133,12 @@ public class RepaymentBizPlan extends Model<RepaymentBizPlan> {
 	@TableField("update_user")
 	@ApiModelProperty(required= true,value = "更新用户")
 	private String updateUser;
+    /**
+     * 还款记录id
+     */
+	@TableField("confirm_log_id")
+	@ApiModelProperty(required= true,value = "还款记录id")
+	private String confirmLogId;
 
 
 	public String getPlanId() {
@@ -244,7 +245,6 @@ public class RepaymentBizPlan extends Model<RepaymentBizPlan> {
 		this.xdOutId = xdOutId;
 	}
 
-
 	public Integer getSrcType() {
 		return srcType;
 	}
@@ -285,6 +285,14 @@ public class RepaymentBizPlan extends Model<RepaymentBizPlan> {
 		this.updateUser = updateUser;
 	}
 
+	public String getConfirmLogId() {
+		return confirmLogId;
+	}
+
+	public void setConfirmLogId(String confirmLogId) {
+		this.confirmLogId = confirmLogId;
+	}
+
 	@Override
 	protected Serializable pkVal() {
 		return this.planId;
@@ -292,7 +300,7 @@ public class RepaymentBizPlan extends Model<RepaymentBizPlan> {
 
 	@Override
 	public String toString() {
-		return "RepaymentBizPlan{" +
+		return "RepaymentBizPlanBak{" +
 			", planId=" + planId +
 			", businessId=" + businessId +
 			", originalBusinessId=" + originalBusinessId +
@@ -311,21 +319,23 @@ public class RepaymentBizPlan extends Model<RepaymentBizPlan> {
 			", createUser=" + createUser +
 			", updateTime=" + updateTime +
 			", updateUser=" + updateUser +
+			", confirmLogId=" + confirmLogId +
 			"}";
 	}
 
 	/**
 	 * 
 	 */
-	public RepaymentBizPlan() {
+	public RepaymentBizPlanBak() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-
+	
+	
 	/**
 	 * 
 	 */
-	public RepaymentBizPlan(RepaymentBizPlanBak plan) {
+	public RepaymentBizPlanBak(RepaymentBizPlan plan) {
 		super();
 		setBorrowLimit(plan.getBorrowLimit());
 		setBorrowLimitUnit(plan.getBorrowLimitUnit());
@@ -346,4 +356,5 @@ public class RepaymentBizPlan extends Model<RepaymentBizPlan> {
 		setXdAfterGuid(plan.getXdAfterGuid());
 		setXdOutId(plan.getXdOutId());
 	}
+	
 }
