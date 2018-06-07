@@ -2,7 +2,7 @@ var businessId = document.getElementById("businessId").getAttribute("value");
 var dragId = document.getElementById("dragId").getAttribute("value");
 var ex = /^[1-9]\d*$/; 
 var amt=/^(([1-9]\d*)|\d)(\.\d{1,2})?$/;
-var mobi= /^(((13[0-9]{1})|(14[0-9]{1})|(17[0]{1})|(15[0-3]{1})|(15[5-9]{1})|(18[0-9]{1}))+\d{8})$/; 
+var mobi= /^1\d{10}$/;
 var tel = /^\d{3,4}-?\d{7,9}$/;
 var carNum=/^([1-9]{1})(\d{15}|\d{16}|\d{17}|\d{18})$/;
 var email=/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
@@ -568,33 +568,36 @@ window.layinit(function (htConfig) {
 	    		that.carAuction.businessId=businessId;
 	    		// 页面信息验证
 	    		if(vm.detection.annualVerificationExpirationDate==''||vm.detection.annualVerificationExpirationDate==null){
+                    layer.msg("年审到期日期必填！",{icon:5,shade: [0.8, '#393D49']});
 	    			$("#annualVerificationExpirationDate").css("border","1px solid #FF3030");
 	    			return ;
 	    		}
 	    		
 	    		if(vm.detection.odometer==''||vm.detection.odometer==null){
+                    layer.msg("里程表读数！",{icon:5,shade: [0.8, '#393D49']});
 	    			$("#odometer").css("border","1px solid #FF3030");
 	    			return ;
 	    		}
 	     	
 	    		if (!ex.test(vm.detection.odometer)) {  
 	    			$("#odometer").css("border","1px solid #FF3030");
-	    			layer.msg("请输入整整数！",{icon:5,shade: [0.8, '#393D49']});
+	    			layer.msg("里程表读数请输入整整数！",{icon:5,shade: [0.8, '#393D49']});
 	    			return;
 	    		}
 	    		if(vm.detection.odometer<vm.detection.assessOdometer){
 	    			$("#odometer").css("border","1px solid #FF3030");
-	    			layer.msg("里程数小于评估时里程数！",{icon:5,shade: [0.8, '#393D49']});
+	    			layer.msg("里程表读数小于评估时里程数！",{icon:5,shade: [0.8, '#393D49']});
 	    			return;
 	    		}
 	    		if(vm.detection.fuelLeft==''||vm.detection.fuelLeft==null){
+                    layer.msg("燃油量必选！",{icon:5,shade: [0.8, '#393D49']});
 	    			$("#fuelLeft").css("border","1px solid #FF3030");
 	    			return ;
 	    		}
 	    		if(vm.carBasic.transferTimes !=null&&vm.carBasic.transferTimes!=''){
 		    		if (!ex.test(vm.carBasic.transferTimes)) {  
 		    			$("#transferTimes").css("border","1px solid #FF3030");
-		    			layer.msg("请输入正整数！",{icon:5,shade: [0.8, '#393D49']});
+		    			layer.msg("过户次数请输入正整数！",{icon:5,shade: [0.8, '#393D49']});
 		    			return;
 		    		}
 	    		}
@@ -603,12 +606,13 @@ window.layinit(function (htConfig) {
 	    		
 	    			if(inputDate>currentDate){
 	    				$("#lastTransferDate").css("border","1px solid #FF3030");
-	    				layer.msg("不能大于当前日期！",{icon:5,shade: [0.8, '#393D49']});
+	    				layer.msg("最后一次过户时间不能大于当前日期！",{icon:5,shade: [0.8, '#393D49']});
 	    				return ;
 	    			}
 	    			
 	    		}
 	      		if(vm.detection.evaluationAmount==''||vm.detection.evaluationAmount==null){
+                    layer.msg("车辆评估价值必填！",{icon:5,shade: [0.8, '#393D49']});
 	    			$("#lastEvaluationAmount").css("border","1px solid #FF3030");
 	    			return ;
 	    		}
@@ -619,50 +623,57 @@ window.layinit(function (htConfig) {
 	    			var lastDate=new Date(vm.detection.viewInsuranceExpirationDate.replace("-", "/").replace("-", "/"));
 	    			if(inputDate<lastDate){
 	    				$("#insuranceExpirationDate").css("border","1px solid #FF3030");
-	    				layer.msg("不能小于最后评估时保险到期日期！",{icon:5,shade: [0.8, '#393D49']});
+	    				layer.msg("保险到期日不能小于最后评估时保险到期日期！",{icon:5,shade: [0.8, '#393D49']});
 	    				return ;
 	    			}
 	    			
 	    		}
 	    		if(vm.detection.userNature==''||vm.detection.userNature==null){
+                    layer.msg("车辆使用性质必填！",{icon:5,shade: [0.8, '#393D49']});
 	    			$("#userNature").css("border","1px solid #FF3030");
 	    			return ;
 	    		}
 	    		if(vm.detection.toolWithCar==''||vm.detection.toolWithCar==null){
+                    layer.msg("随车工具必填！",{icon:5,shade: [0.8, '#393D49']});
 	    			$("#toolWithCar").css("border","1px solid #FF3030");
 	    			return ;
 	    		}
 	       		if(vm.detection.relatedDocs==''||vm.detection.relatedDocs==null){
+                    layer.msg("提供文件必填！",{icon:5,shade: [0.8, '#393D49']});
 	    			$("#relatedDocs").css("border","1px solid #FF3030");
 	    			return ;
 	    		}
 	       		if(vm.detection.trafficViolationSituation==''||vm.detection.trafficViolationSituation==null){
+                    layer.msg("违章未处理记录必填！",{icon:5,shade: [0.8, '#393D49']});
 	    			$("#trafficViolationSituation").css("border","1px solid #FF3030");
 	    			return ;
 	    		}
 	       		if(vm.detection.transactionMode==''||vm.detection.transactionMode==null){
+                    layer.msg("交易方式必填！",{icon:5,shade: [0.8, '#393D49']});
 	    			$("#transactionMode").css("border","1px solid #FF3030");
 	    			return ;
 	    		}
 	       		if(vm.detection.carPosition==''||vm.detection.carPosition==null){
+                    layer.msg("车辆位置必填！",{icon:5,shade: [0.8, '#393D49']});
 	    			$("#carPosition").css("border","1px solid #FF3030");
 	    			return ;
 	    		}
 	       		// 拍卖信息
 	      		if(vm.carAuction.startingPrice==''||vm.carAuction.startingPrice==null){
+                    layer.msg("最低价必填！",{icon:5,shade: [0.8, '#393D49']});
 	    			$("#startingPrice").css("border","1px solid #FF3030");
 	    			return ;
 	    		}else{
 		    		if (!amt.test(vm.carAuction.startingPrice)) {  
 		    			$("#startingPrice").css("border","1px solid #FF3030");
-		    			layer.msg("请输入有效金额！",{icon:5,shade: [0.8, '#393D49']});
+		    			layer.msg("最低价必须输入有效金额！",{icon:5,shade: [0.8, '#393D49']});
 		    			return;
 		    		}
 	    		}
 
 	
 	     		if(vm.carAuction.auctionStartTime==''||vm.carAuction.auctionStartTime==null){
-
+                    layer.msg("活动开始时间必填！",{icon:5,shade: [0.8, '#393D49']});
 	    			$("#auctionStartTime").css("border","1px solid #FF3030");
 	    			return ;
 	    		}else{
@@ -671,12 +682,13 @@ window.layinit(function (htConfig) {
 
 	    			if(inputDate<currentDate){
 	    				$("#auctionStartTime").css("border","1px solid #FF3030");
-	    				layer.msg("不能小于当前日期！",{icon:5,shade: [0.8, '#393D49']});
+	    				layer.msg("活动开始时间不能小于当前日期！",{icon:5,shade: [0.8, '#393D49']});
 	    				return ;
 	    			}
 	    			
 	    		}
 	    		if(vm.carAuction.auctionEndTime==''||vm.carAuction.auctionEndTime==null){
+                    layer.msg("活动结束时间必填！",{icon:5,shade: [0.8, '#393D49']});
 	    			$("#auctionEndTime").css("border","1px solid #FF3030");
 	    			return ;
 	    		}else{
@@ -684,27 +696,30 @@ window.layinit(function (htConfig) {
 	    			var inputDate=new Date(vm.carAuction.auctionEndTime.replace("-", "/").replace("-", "/"));  
 	    			if(inputDate<=startDate){
 	    				$("#auctionEndTime").css("border","1px solid #FF3030");
-	    				layer.msg("结束时间不能小于等于开始时间！",{icon:5,shade: [0.8, '#393D49']});
+	    				layer.msg("活动结束时间不能小于等于开始时间！",{icon:5,shade: [0.8, '#393D49']});
 	    				return ;
 	    			}
 	    			
 	    		}
 
 	    		if(vm.carAuction.consultant==''||vm.carAuction.consultant==null){
+                    layer.msg("咨询人姓名必填！",{icon:5,shade: [0.8, '#393D49']});
 	    			$("#consultant").css("border","1px solid #FF3030");
 	    			return ;
 	    		}
                 if(vm.carAuction.consultantTel==''||vm.carAuction.consultantTel==null){
+                    layer.msg("咨询人联系电话必填！",{icon:5,shade: [0.8, '#393D49']});
                     $("#consultantTel").css("border","1px solid #FF3030");
                     return ;
                 }else{
-                    if (!mobi.test(vm.carAuction.consultantTel)&&!tel.test(vm.carAuction.consultantTel)) {
+                    if (!mobi.test(vm.carAuction.consultantTel)) {
                         $("#consultantTel").css("border","1px solid #FF3030");
-                        layer.msg("电话格式不正确！",{icon:5,shade: [0.8, '#393D49']});
+                        layer.msg("咨询人联系电话格式不正确！",{icon:5,shade: [0.8, '#393D49']});
                         return;
                     }
                 }
                 if(vm.carAuction.consultantEmail==''||vm.carAuction.consultantEmail==null){
+                    layer.msg("咨询邮箱必填！",{icon:5,shade: [0.8, '#393D49']});
                     $("#consultantEmail").css("border","1px solid #FF3030");
                     return ;
                 }else{
@@ -714,7 +729,11 @@ window.layinit(function (htConfig) {
                         return;
                     }
                 }
-
+                if(vm.carAuction.auctionPosition==''||vm.carAuction.auctionPosition==null){
+                    layer.msg("交易地点必填！",{icon:5,shade: [0.8, '#393D49']});
+                    $("#carPosition").css("border","1px solid #FF3030");
+                    return ;
+                }
 
 	    		for(var i=0;i<vm.returnRegFiles.length;i++){
 	    			vm.returnRegFiles[i].file='';

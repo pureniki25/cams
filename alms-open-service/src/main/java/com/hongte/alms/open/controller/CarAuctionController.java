@@ -172,7 +172,7 @@ public class CarAuctionController {
 			}
 			for(CarAuctionPriceLog bidLog :bidLogs)
 			{
-				if(bidLog.getPrice().equals(req.getAmount()))
+				if(bidLog.getPrice().compareTo(req.getAmount())==0)
 				{
 					logger.error("报价重复,auction_id="+req.getAuctionId()+",reg_tel"+req.getTelephone()+",price"+req.getAmount());
 					return Result.error("9999", "与之前报价重复，请修改价格后再报价");
