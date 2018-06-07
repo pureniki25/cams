@@ -5,24 +5,26 @@ package com.hongte.alms.base.enums;
  * @since 2018/6/1
  * 系统参数表参数类型枚举
  */
-public enum SysParameterRepaydaysEnums {
+public enum SysParameterEnums {
 
 	
-	REPAY_DAYS("autoRepayDays","筛选自动代扣记录天数范围");
+	REPAY_DAYS("autoRepayDays","筛选自动代扣记录天数范围"),
+	BANK_CHANNEL("bankChannel","银行代扣子渠道");
+	
 
 //	borrowLimitUnit
 
 	private String key; // 数据保存的值
 	private String name; // 名称
 
-	private SysParameterRepaydaysEnums(String key, String name) {
+	private SysParameterEnums(String key, String name) {
 		this.name = name;
 		this.key = key;
 	}
 
 
 	public static String nameOf(Integer key){
-		for(SysParameterRepaydaysEnums d : SysParameterRepaydaysEnums.values()){
+		for(SysParameterEnums d : SysParameterEnums.values()){
 			if(d.key.equals(key)){
 				return d.name;
 			}
@@ -31,8 +33,8 @@ public enum SysParameterRepaydaysEnums {
 
 	}
 
-	public static SysParameterRepaydaysEnums getByKey(String key){
-		for(SysParameterRepaydaysEnums d : SysParameterRepaydaysEnums.values()){
+	public static SysParameterEnums getByKey(String key){
+		for(SysParameterEnums d : SysParameterEnums.values()){
 			if(d.key.equals(key)){
 				return d;
 			}
@@ -42,7 +44,7 @@ public enum SysParameterRepaydaysEnums {
 	}
 
 	public static String keyOf(String name){
-		for(SysParameterRepaydaysEnums d : SysParameterRepaydaysEnums.values()){
+		for(SysParameterEnums d : SysParameterEnums.values()){
 			if(d.name.equals(name)){
 				return d.key;
 			}
