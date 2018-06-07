@@ -48,6 +48,12 @@ public class IssueSendOutsideLog extends Model<IssueSendOutsideLog> {
 	@TableField("send_key")
 	@ApiModelProperty(required= true,value = "发送信息key值")
 	private String sendKey;
+	/**
+    * 业务ID
+    */
+	@TableField("business_id")
+	@ApiModelProperty(required= true,value = "业务编码")
+	private String businessId;
     /**
      * 发送未加密Json
      */
@@ -195,6 +201,14 @@ public class IssueSendOutsideLog extends Model<IssueSendOutsideLog> {
 	@Override
 	protected Serializable pkVal() {
 		return this.id;
+	}
+
+	public String getBusinessId() {
+		return businessId;
+	}
+
+	public void setBusinessId(String businessId) {
+		this.businessId = businessId;
 	}
 
 	@Override
