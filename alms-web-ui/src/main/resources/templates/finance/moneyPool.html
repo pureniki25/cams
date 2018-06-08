@@ -15,19 +15,19 @@
         <card title="搜索条件">
             <i-form ref="form" :model="form" :label-width="100" inline>
                 <form-item prop="acceptBank" label="转入账号">
-                    <i-select v-model="form.acceptBank">
-                        <i-option v-for="item in bankList" :value="item.bank" :key="item.bank">{{item.bank}}</i-option>
+                    <i-select v-model="form.acceptBank" style="width: 10rem" clearable>
+                        <i-option v-for="item in bankList" :value="item.financeName" :key="item.financeName">{{item.financeName}}</i-option>
                     </i-select>
                 </form-item>
                 <form-item prop="status" label="流水状态">
-                    <i-select v-model="form.status">
+                    <i-select v-model="form.status" clearable>
                         <i-option value="待领取">待领取</i-option>
                         <i-option value="已领取">已领取</i-option>
                         <i-option value="完成">完成</i-option>
                     </i-select>
                 </form-item>
                 <form-item prop="tradeType" label="支付类型">
-                    <i-select v-model="form.tradeType">
+                    <i-select v-model="form.tradeType" clearable>
                         <i-option value="转账">转账</i-option>
                         <i-option value="刷卡">刷卡</i-option>
                         <i-option value="现金">现金</i-option>
@@ -35,23 +35,23 @@
                 </form-item>
 
                 <form-item prop="tradeDate" label="交易日期">
-                    <date-picker type="daterange"></date-picker>
+                    <date-picker type="daterange" @on-change="form.tradeDateStart=$event[0];form.tradeDateEnd=$event[1];" clearable></date-picker>
                 </form-item>
-                <form-item prop="updateDate" label="更新日期">
-                    <date-picker type="daterange"></date-picker>
+                <form-item prop="updateDate" label="更新日期" >
+                    <date-picker type="daterange" @on-change="form.udpateDateStart=$event[0];form.udpateDateEnd=$event[1];" clearable></date-picker>
                 </form-item>
 
-                <i-button>查询</i-button>
+                <i-button @click="search" >查询</i-button>
             </i-form>
             <ButtonGroup>
-                <i-button>删除流水</i-button>
+                <i-button @click="deleteMoneyPool">删除流水</i-button>
                 <i-button>导入流水</i-button>
                 <i-button>模板下载</i-button>
             </ButtonGroup >
         </card>
-        <i-table :columns="table.col" :data="table.data" :loading="table.loading" stripe></i-table>
+        <i-table :columns="table.col" :data="table.data" :loading="table.loading" @on-selection-change="selection=$event" stripe></i-table>
         <p style="text-align: center">
-            <Page :total="100" show-sizer></Page>
+            <Page :total="table.total"  @on-change="page" :current="form.curPage" show-total ></Page>
         </p>
     </div>
     <!-- 引入vue -->

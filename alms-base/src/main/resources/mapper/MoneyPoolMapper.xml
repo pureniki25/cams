@@ -64,4 +64,92 @@
 		    </if>
 		ORDER BY  mp.trade_date desc
 	</select>
+	<select id="conutMoneyPoolManagerList" resultType="java.lang.Integer">
+		SELECT
+			count(1)
+		FROM
+			tb_money_pool mp
+			LEFT JOIN tb_department_bank db ON db.finance_name = mp.accept_bank
+		<where>
+			1=1
+			<if test="tradeDateStart != null and tradeDateStart.length != 0 ">
+				AND mp.trade_date &gt;= #{tradeDateStart,jdbcType=DATE}
+			</if>
+			<if test="tradeDateEnd != null and tradeDateEnd.length != 0 ">
+				AND mp.trade_date &lt;= #{tradeDateStart,jdbcType=DATE}
+			</if>
+			<if test="updateDateStart != null and updateDateStart.length != 0 ">
+				AND update_time &gt;= #{updateDateStart,jdbcType=DATE}
+			</if>
+			<if test="updateDateEnd != null and updateDateEnd.length != 0 ">
+				AND update_time &lt;= #{updateDateEnd,jdbcType=DATE}
+			</if>
+			<if test="acceptBank != null and acceptBank.length != 0 ">
+				AND mp.accept_bank = #{acceptBank}
+			</if>
+			<if test="status != null and status.length != 0 ">
+				AND mp.status = #{status}
+			</if>
+			<if test="tradeType != null and tradeType.length != 0 ">
+				AND mp.trade_type = #{tradeType}
+			</if>
+		</where>
+	</select>
+	<select id="selectMoneyPoolManagerList" resultType="com.hongte.alms.base.vo.finance.MoneyPoolManagerVO">
+		SELECT
+			mp.money_pool_id AS moneyPoolId, 
+			mp.xd_pool_id AS xdPoolId, 
+			mp.pay_code AS payCode, 
+			mp.remit_bank AS remitBank, 
+			mp.trade_date AS tradeDate, 
+			mp.trade_type AS tradeType, summary, 
+			mp.trade_place AS tradePlace, 
+			mp.account_money AS accountMoney, 
+			mp.income_type AS incomeType, 
+			mp.trade_remark AS tradeRemark, 
+			mp.gainer_name AS gainerName, 
+			mp.finance_status AS financeStatus, 
+			mp.status, 
+			mp.import_user AS importUser, 
+			mp.import_user_name AS importUserName, 
+			mp.import_time AS importTime, 
+			mp.accept_bank AS acceptBank, 
+			mp.is_manual_create AS isManualCreate, 
+			mp.is_temporary AS isTemporary, 
+			mp.create_time AS createTime, 
+			mp.create_user AS createUser, 
+			mp.update_time AS updateTime, 
+			mp.update_user AS updateUser, 
+			mp.create_user_role AS createUserRole      ,    
+			db.repayment_id as bankAccount
+		FROM
+			tb_money_pool mp
+			LEFT JOIN tb_department_bank db ON db.finance_name = mp.accept_bank
+		<where>
+			1=1
+			<if test="tradeDateStart != null and tradeDateStart.length != 0 ">
+				AND mp.trade_date &gt;= #{tradeDateStart,jdbcType=DATE}
+			</if>
+			<if test="tradeDateEnd != null and tradeDateEnd.length != 0 ">
+				AND mp.trade_date &lt;= #{tradeDateStart,jdbcType=DATE}
+			</if>
+			<if test="updateDateStart != null and updateDateStart.length != 0 ">
+				AND update_time &gt;= #{updateDateStart,jdbcType=DATE}
+			</if>
+			<if test="updateDateEnd != null and updateDateEnd.length != 0 ">
+				AND update_time &lt;= #{updateDateEnd,jdbcType=DATE}
+			</if>
+			<if test="acceptBank != null and acceptBank.length != 0 ">
+				AND mp.accept_bank = #{acceptBank}
+			</if>
+			<if test="status != null and status.length != 0 ">
+				AND mp.status = #{status}
+			</if>
+			<if test="tradeType != null and tradeType.length != 0 ">
+				AND mp.trade_type = #{tradeType}
+			</if>
+		</where>
+		order by mp.create_time desc , mp.update_time desc
+		limit ${(curPage-1)*pageSize} , ${pageSize}
+	</select>
 </mapper>

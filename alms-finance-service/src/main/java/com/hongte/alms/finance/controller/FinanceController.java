@@ -5,6 +5,7 @@ package com.hongte.alms.finance.controller;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -31,12 +32,14 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.dto.ConfirmRepaymentReq;
 import com.hongte.alms.base.dto.FinanceManagerListReq;
+import com.hongte.alms.base.dto.MoneyPoolManagerReq;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.BasicBusinessType;
 import com.hongte.alms.base.entity.BasicCompany;
 import com.hongte.alms.base.entity.BasicRepaymentType;
 import com.hongte.alms.base.entity.BizOutputRecord;
+import com.hongte.alms.base.entity.DepartmentBank;
 import com.hongte.alms.base.entity.MoneyPool;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
@@ -49,6 +52,7 @@ import com.hongte.alms.base.service.BasicBusinessTypeService;
 import com.hongte.alms.base.service.BasicCompanyService;
 import com.hongte.alms.base.service.BasicRepaymentTypeService;
 import com.hongte.alms.base.service.BizOutputRecordService;
+import com.hongte.alms.base.service.DepartmentBankService;
 import com.hongte.alms.base.service.MoneyPoolRepaymentService;
 import com.hongte.alms.base.service.MoneyPoolService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
@@ -58,6 +62,7 @@ import com.hongte.alms.base.util.CompanySortByPINYINUtil;
 import com.hongte.alms.base.vo.finance.ConfirmWithholdListVO;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.base.vo.finance.CurrPeriodRepaymentInfoVO;
+import com.hongte.alms.base.vo.finance.MoneyPoolManagerVO;
 import com.hongte.alms.base.vo.finance.RepaymentSettleListVO;
 import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
 import com.hongte.alms.common.result.Result;
@@ -65,7 +70,6 @@ import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.common.vo.PageResult;
-import com.hongte.alms.finance.req.MoneyPoolManagerReq;
 import com.hongte.alms.finance.req.MoneyPoolReq;
 import com.hongte.alms.finance.service.FinanceService;
 import com.hongte.alms.finance.service.ShareProfitService;
@@ -132,6 +136,9 @@ public class FinanceController {
 	@Autowired
 	private LoginUserInfoHelper loginUserInfoHelper ;
 	
+	@Qualifier("DepartmentBankService")
+	@Autowired
+	private DepartmentBankService departmentBankService ;
 	
 	@Value("${oss.readUrl}")
 	private String ossReadUrl ;
@@ -207,39 +214,40 @@ public class FinanceController {
 	public PageResult moneyPoolManager(MoneyPoolManagerReq req) {
 		PageResult result;
 		logger.info("@moneyPoolManager@导入流水管理页面列表数据--开始[{}]", req);
-		
-		Page<MoneyPool> page = new Page<>(req.getCurPage(), req.getPageSize());
+		Page<MoneyPoolManagerVO> page = new Page<>(req.getCurPage(), req.getPageSize());
 		if (req==null) {
 			logger.info("@moneyPoolManager@导入流水管理页面列表数据--结束[{}]",  "参数不能为空");
 			return PageResult.error(500, "参数不能为空");
 		}
-		EntityWrapper<MoneyPool> ew = new EntityWrapper<>();
-		if (!StringUtil.isEmpty(req.getAcceptBank())) {
-			ew.eq("accept_bank", req.getAcceptBank());
-		}
-		if (!StringUtil.isEmpty(req.getStatus())) {
-			ew.eq("status", req.getStatus());
-		}
-		if (!StringUtil.isEmpty(req.getTradeType())) {
-			ew.eq("trade_type", req.getTradeType());
-		}
-		if (!StringUtil.isEmpty(req.getTradeDateStart())) {
-			ew.ge("trade_date", req.getTradeDateStart());
-		}
-		if (!StringUtil.isEmpty(req.getTradeDateEnd())) {
-			ew.le("trade_date", req.getTradeDateEnd());
-		}
-		if (!StringUtil.isEmpty(req.getUdpateDateStart())) {
-			ew.ge("update_time", req.getUdpateDateStart());
-		}
-		if (!StringUtil.isEmpty(req.getUdpateDateEnd())) {
-			ew.le("update_time", req.getUdpateDateStart());
-		}
-		page = moneyPoolService.selectPage(page, ew);
+		page = moneyPoolService.selectMoneyPoolManagerList(req);
 		result = PageResult.success(page.getRecords(), page.getTotal());
 		logger.info("@moneyPoolManager@导入流水管理页面列表数据--结束[{}]",  page);
 		return result;
 	}
+	
+	@GetMapping(value = "/delMoneyPool")
+	@ApiOperation(value = "删除流水数据")
+	public Result delMoneyPool(@RequestParam("mpids[]")String[] mpids) {
+		Result result;
+		logger.info("@moneyPoolManager@导入流水管理页面列表数据--开始[{}]", mpids);
+		if(mpids==null||mpids.length==0) {
+			logger.info("@moneyPoolManager@导入流水管理页面列表数据--结束[{}]", "参数不能空");
+			return Result.error("500", "参数不能空");
+		}
+		List<String> ids = Arrays.asList(mpids);
+		List<MoneyPool> moneyPools = moneyPoolService.selectBatchIds(ids);
+		for (MoneyPool moneyPool : moneyPools) {
+			if (moneyPool!=null
+					&&!moneyPool.getStatus().equals(RepayRegisterState.待领取.toString())) {
+				logger.info("@moneyPoolManager@导入流水管理页面列表数据--结束[{}]", "存在部分非待领取状态的流水,删除终止,请检查");
+				return Result.error("500", "存在部分非待领取状态的流水,删除终止,请检查");
+			}
+		}
+		moneyPoolService.deleteBatchIds(ids);
+		logger.info("@moneyPoolManager@导入流水管理页面列表数据--结束[{}]", mpids);
+		return Result.success();
+	}
+	
 
 	@PostMapping(value = "/matchBankStatement")
 	@ApiOperation(value = "银行流水匹配还款计划")
@@ -777,6 +785,15 @@ public class FinanceController {
 		
 	}
 	
-	
+	@ApiOperation(value = "查看所有银行账号")
+	@GetMapping("/listDepartmentBank")
+	public Result listDepartmentBank() {
+		logger.info("@listDepartmentBank@查看所有银行账号--开始[]");
+		Result result = null;
+		List<DepartmentBank> res = departmentBankService.listDepartmentBank();
+		result = Result.success(res);
+		logger.info("@listDepartmentBank@查看所有银行账号--结束[{}]", result);
+		return result;
+	}
 	
 }

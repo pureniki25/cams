@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo;
 import com.hongte.alms.base.dto.ConfirmRepaymentReq;
+import com.hongte.alms.base.dto.MoneyPoolManagerReq;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.entity.MoneyPool;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
@@ -23,6 +24,7 @@ import com.hongte.alms.base.mapper.RepaymentBizPlanListMapper;
 import com.hongte.alms.base.mapper.RepaymentConfirmLogMapper;
 import com.hongte.alms.base.service.MoneyPoolService;
 import com.hongte.alms.base.service.XindaiService;
+import com.hongte.alms.base.vo.finance.MoneyPoolManagerVO;
 import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
 import com.hongte.alms.base.vo.module.MoneyPoolRepaymentXindaiDTO;
 import com.hongte.alms.base.vo.module.MoneyPoolVO;
@@ -42,6 +44,7 @@ import feign.Feign;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -516,6 +519,17 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 			mpr.updateById();
 			moneyPool.updateById();
 		}
+	}
+
+
+	@Override
+	public Page<MoneyPoolManagerVO> selectMoneyPoolManagerList(MoneyPoolManagerReq req) {
+		Page<MoneyPoolManagerVO> page = new Page<>(req.getCurPage(),req.getPageSize());
+		int total = moneyPoolMapper.conutMoneyPoolManagerList(req);
+		List<MoneyPoolManagerVO> moneyPoolManagerVOs = moneyPoolMapper.selectMoneyPoolManagerList(req);
+		page.setTotal(total);
+		page.setRecords(moneyPoolManagerVOs);
+		return page;
 	}
 
 }
