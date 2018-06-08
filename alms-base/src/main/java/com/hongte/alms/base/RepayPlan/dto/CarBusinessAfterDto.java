@@ -70,14 +70,14 @@ public class CarBusinessAfterDto implements Serializable  {
      */
 	@TableField("create_time")
 	@ApiModelProperty(required= true,value = "新建时间")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createTime;
     /**
      * 修改时间
      */
 	@TableField("modify_time")
 	@ApiModelProperty(required= true,value = "修改时间")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date modifyTime;
     /**
      * 是否删除
@@ -148,7 +148,7 @@ public class CarBusinessAfterDto implements Serializable  {
      */
 	@TableField("borrow_date")
 	@ApiModelProperty(required= true,value = "还款日期")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date borrowDate;
     /**
      * 还款状态分类：还款中，已还款，逾期
@@ -196,13 +196,13 @@ public class CarBusinessAfterDto implements Serializable  {
      * 新增时间
      */
 	@ApiModelProperty(required= true,value = "新增时间")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createdate;
     /**
      * 更新时间
      */
 	@ApiModelProperty(required= true,value = "更新时间")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date updateDate;
     /**
      * 是否催款
@@ -289,7 +289,7 @@ public class CarBusinessAfterDto implements Serializable  {
      * 催款日期
      */
 	@ApiModelProperty(required= true,value = "催款日期")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date collectionDate;
     /**
      * bad_debt_mark
@@ -314,7 +314,7 @@ public class CarBusinessAfterDto implements Serializable  {
      */
 	@TableField("fatct_replayDate")
 	@ApiModelProperty(required= true,value = "实际还款日期")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date fatctReplayDate;
     /**
      * 实际归还本金
@@ -404,7 +404,7 @@ public class CarBusinessAfterDto implements Serializable  {
      */
 	@TableField("finance_confirmed_date")
 	@ApiModelProperty(required= true,value = "财务还款确认日期")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date financeConfirmedDate;
     /**
      * 财务还款确认人ID
@@ -417,7 +417,7 @@ public class CarBusinessAfterDto implements Serializable  {
      */
 	@TableField("auto_withholding_confirmed_date")
 	@ApiModelProperty(required= true,value = "财务确认自动代扣日期")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date autoWithholdingConfirmedDate;
     /**
      * 确认自动代扣的确认者ID
@@ -448,7 +448,7 @@ public class CarBusinessAfterDto implements Serializable  {
      */
 	@TableField("accountant_confirm_date")
 	@ApiModelProperty(required= true,value = "会计确认日期")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date accountantConfirmDate;
     /**
      * null或0：未执行垫付操作，1:本期平台垫付已结清，2：本期平台垫付未结清，3：本期不需要还垫付
