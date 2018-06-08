@@ -59,12 +59,12 @@ public class BusinessBasicInfoReq {
      */
     @ApiModelProperty(value = "业务所属孙类型，若无则为空")
     private String businessStype;
-    /**
-     * 客户资产端唯一编号
-     */
-    @ApiModelProperty(required= true,value = "客户资产端唯一编号")
-    @NotNull(message = "BusinessBasicInfoReq客户资产端唯一编号(customerId)不能为空")
-    private String customerId;
+//    /**
+//     * 客户资产端唯一编号
+//     */
+//    @ApiModelProperty(required= true,value = "客户资产端唯一编号")
+//    @NotNull(message = "BusinessBasicInfoReq客户资产端唯一编号(customerId)不能为空")
+//    private String customerId;
     /**
      * 客户姓名
      */
@@ -229,13 +229,13 @@ public class BusinessBasicInfoReq {
         this.businessStype = businessStype;
     }
 
-    public String getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(String customerId) {
-        this.customerId = customerId;
-    }
+//    public String getCustomerId() {
+//        return customerId;
+//    }
+//
+//    public void setCustomerId(String customerId) {
+//        this.customerId = customerId;
+//    }
 
     public String getCustomerName() {
         return customerName;

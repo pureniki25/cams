@@ -55,12 +55,12 @@ public class BasicBusiness extends Model<BasicBusiness> {
 	@TableField("business_stype")
 	@ApiModelProperty(required= true,value = "业务所属孙类型，若无则为空")
 	private String businessStype;
-	/**
-	 * 主借款人的客户资产端唯一编号
-	 */
-	@TableField("customer_id")
-	@ApiModelProperty(required= true,value = "主借款人的客户资产端唯一编号")
-	private String customerId;
+//	/**
+//	 * 主借款人的客户资产端唯一编号
+//	 */
+//	@TableField("customer_id")
+//	@ApiModelProperty(required= true,value = "主借款人的客户资产端唯一编号")
+//	private String customerId;
 	/**
 	 * 主借款人的客户姓名
 	 */
@@ -265,13 +265,13 @@ public class BasicBusiness extends Model<BasicBusiness> {
 		this.businessStype = businessStype;
 	}
 
-	public String getCustomerId() {
-		return customerId;
-	}
-
-	public void setCustomerId(String customerId) {
-		this.customerId = customerId;
-	}
+//	public String getCustomerId() {
+//		return customerId;
+//	}
+//
+//	public void setCustomerId(String customerId) {
+//		this.customerId = customerId;
+//	}
 
 	public String getCustomerName() {
 		return customerName;
@@ -502,7 +502,7 @@ public class BasicBusiness extends Model<BasicBusiness> {
 				", businessType=" + businessType +
 				", businessCtype=" + businessCtype +
 				", businessStype=" + businessStype +
-				", customerId=" + customerId +
+//				", customerId=" + customerId +
 				", customerName=" + customerName +
 				", customerIdentifyCard=" + customerIdentifyCard +
 				", repaymentTypeId=" + repaymentTypeId +
