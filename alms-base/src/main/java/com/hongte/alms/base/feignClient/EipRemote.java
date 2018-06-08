@@ -79,19 +79,13 @@ public interface EipRemote {
    
    
    
-   /**
-    * 易宝代扣
-    */
-   
-   @RequestMapping(value = "/eip/td/tzt/invokeBindBankCard",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
-   Result yibaoRecharge(@RequestBody YiBaoRechargeReqDto dto);
-   
+
    
    /**
    * 宝付查询充值订单
    */
   
-  @RequestMapping(value = "/eip/td/queryStatus",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+  @RequestMapping(value = "/eip/baofu/queryStatus",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
   Result queryBaofuStatus( @RequestBody Map<String, Object> paramMap);
   
   
@@ -123,4 +117,41 @@ public interface EipRemote {
 	 */
 	@RequestMapping(value = "/eip/td/assetside/getProjectPayment", headers = { "app=ALMS", "content-type=application/json" },method = RequestMethod.POST)
 	public Result getProjectPayment(@RequestBody Map<String, Object> paramMap);
+	
+	
+	
+	   /**
+	    * 易宝代扣
+	    */
+	   
+	   @RequestMapping(value = "/eip/yepay/tzt/directBindPay",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+	   Result directBindPay(@RequestBody YiBaoRechargeReqDto dto);
+	   
+	   /**
+	    * 易宝绑卡
+	    */
+	   
+	   @RequestMapping(value = "/eip/yepay/tzt/invokeBindBankCard",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+	   Result invokeBindBankCard(@RequestBody Map<String, Object> paramMap);
+	   
+	   
+	   
+	   /**
+	    * 易宝确定绑卡	
+	    */
+	   
+	   @RequestMapping(value = "/eip/yepay/tzt/confirmBindBankCard",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+	   Result confirmBindBankCard(@RequestBody Map<String, Object> paramMap);
+	   
+	   
+	   /**
+	    * 易宝支付结果查询
+	    */
+	   
+	   @RequestMapping(value = "/eip/yepay/query/order",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+	   Result queryOrder(@RequestBody Map<String, Object> paramMap);
+	   
+	   
+	 
+	
 }

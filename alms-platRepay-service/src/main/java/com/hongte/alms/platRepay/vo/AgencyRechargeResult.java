@@ -2,6 +2,11 @@ package com.hongte.alms.platRepay.vo;
 
 import java.io.Serializable;
 
+/**
+ * 代充值结果
+ * @author 胡伟骞
+ *
+ */
 public class AgencyRechargeResult implements Serializable {
 
 	private static final long serialVersionUID = 1L;

@@ -246,5 +246,17 @@ select repay.*  from tb_withholding_repayment_log  repay
 
     </select>
     
+    
+    
+      <select id="selectRepaymentLogForResult" resultType="com.hongte.alms.base.entity.WithholdingRepaymentLog">
+
+	select log.* from tb_withholding_repayment_log log
+
+     left join tb_basic_business business on log.original_business_id=business.business_id where business.src_type=2 and log.repay_status=2
+
+
+    </select>
+    
+    
 
 </mapper>

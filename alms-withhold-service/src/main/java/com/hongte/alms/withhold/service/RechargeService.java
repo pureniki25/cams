@@ -6,6 +6,8 @@ import java.util.List;
 
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.WithholdingChannel;
+import com.hongte.alms.base.entity.WithholdingRepaymentLog;
 import com.hongte.alms.base.feignClient.dto.BankCardInfo;
 import com.hongte.alms.base.feignClient.dto.CustomerInfoDto;
 import com.hongte.alms.common.result.Result;
@@ -31,7 +33,7 @@ public interface RechargeService {
      * @param bankCardInfo 为null时默认为手动代扣
      * @return
      */
-    Result recharge(String businessId, String afterId, String bankCard,Double amount,Integer platformId,String merchOrderId,BankCardInfo bankCardInfo);
+    Result recharge(BasicBusiness business, RepaymentBizPlanList pList,Double amount,Integer boolLastRepay,Integer boolPartRepay,BankCardInfo bankCardInfo,WithholdingChannel channel);
     
     
     
@@ -69,10 +71,10 @@ public interface RechargeService {
 	 * boolPartRepay：表示本期是否分多笔代扣中的最后一笔代扣，若非多笔代扣，本字段存1。  0:非最后一笔代扣，1:最后一笔代扣
 	 */
 		
-     void recordRepaymentLog(Result result,RepaymentBizPlanList list,BasicBusiness business,BankCardInfo dto,Integer platformId,Integer boolLastRepay,Integer boolPartRepay,String merchOrderId,Integer settlementType,BigDecimal currentAmount);
+	 WithholdingRepaymentLog recordRepaymentLog(String resultMsg,Integer status,RepaymentBizPlanList list,BasicBusiness business,BankCardInfo dto,Integer platformId,Integer boolLastRepay,Integer boolPartRepay,String merchOrderId,Integer settlementType,BigDecimal currentAmount);
 		
      /**
-	  * 查询每期扣除处理中和成功代扣的金额，得出剩余未的还金额
+	  * 查询每期扣除处理中和成功代扣的金额，得出剩余未还金额
 	  */
 	 BigDecimal getRestAmount(RepaymentBizPlanList list);
 	 
@@ -83,8 +85,8 @@ public interface RechargeService {
 	 BigDecimal getOnlineAmount(RepaymentBizPlanList list);
 	 
 	 
-	 
      /**
+	 
 	  * 查询银行代扣线下应还金额
 	  */
 	 BigDecimal getUnderlineAmount(RepaymentBizPlanList list);
@@ -116,5 +118,13 @@ public interface RechargeService {
 		 * @return
 		 */
 	 BankCardInfo getBankCardInfo(List<BankCardInfo> list);
+	 
+	 
+		/**
+		 * 查询回调结果
+		 * @param List<BankCardInfo> list
+		 * @return
+		 */
+	 void getReturnResult();
 }
 

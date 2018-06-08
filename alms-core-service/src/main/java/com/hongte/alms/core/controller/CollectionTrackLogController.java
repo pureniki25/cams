@@ -158,14 +158,14 @@ public class CollectionTrackLogController {
 
         try{
             // -- 删除信贷历史记录   开始  ------------
-            CollectionTrackLog trackLog =  collectionTrackLogService.selectById(trackLogId);
-            if(trackLog!=null &&trackLog.getXdIndexId()!=null){
-                Result ret =  collectionRemoteApi.deleteXdCollectionLogById(trackLog.getXdIndexId());
-                if(!ret.getCode().equals("1")){
-                    logger.error("根据ID删除信贷的历史记录，失败： trackLog："+ JSON.toJSONString(trackLog) +"   失败原因："+ret.getMsg());
-                    return Result.error("500","删除信贷历史贷后跟踪记录失败");
-                }
-            }
+//            CollectionTrackLog trackLog =  collectionTrackLogService.selectById(trackLogId);
+//            if(trackLog!=null &&trackLog.getXdIndexId()!=null){
+//                Result ret =  collectionRemoteApi.deleteXdCollectionLogById(trackLog.getXdIndexId());
+//                if(!ret.getCode().equals("1")){
+//                    logger.error("根据ID删除信贷的历史记录，失败： trackLog："+ JSON.toJSONString(trackLog) +"   失败原因："+ret.getMsg());
+//                    return Result.error("500","删除信贷历史贷后跟踪记录失败");
+//                }
+//            }
             // -- 删除信贷历史记录   结束  ------------
 
             boolean ret =  collectionTrackLogService.deleteById(trackLogId);
@@ -192,33 +192,33 @@ public class CollectionTrackLogController {
 
         try{
 
-            // --------  将贷后跟踪记录同步到信贷  开始 -------------------
-            RepaymentBizPlanList planList = repaymentBizPlanListService.selectById(log.getRbpId());
-            planList.getAfterId();
-            planList.getBusinessId();
-            Parametertracelog parametertracelog = new Parametertracelog();
-            parametertracelog.setId(log.getXdIndexId());
-            parametertracelog.setCarBusinessId(planList.getBusinessId());
-            parametertracelog.setCarBusinessAfterId( planList.getAfterId());
-            parametertracelog.setTranceContent(log.getContent());
-
-            LoginInfoDto loginInfoDto = loginUserInfoHelper.getUserInfoByUserId(log.getRecorderUser(),null);
-            parametertracelog.setTranceName(loginInfoDto.getBmUserId());
-            parametertracelog.setTranceDate(log.getRecordDate());
-            LoginInfoDto creatUDto = loginUserInfoHelper.getUserInfoByUserId(log.getCreateUser(),null);
-            parametertracelog.setCreateUser(creatUDto.getBmUserId());
-            parametertracelog.setCreateTime(log.getCreateTime());
-            parametertracelog.setIsDelete(0);
-            Result<Integer> ret =  collectionRemoteApi.transferOneCollectionLogToXd(parametertracelog);
-
-            if(!ret.getCode().equals("1")){
-                logger.error("根据ID删除信贷的历史记录，失败： trackLog："+ JSON.toJSONString(log) +"   失败原因："+ret.getMsg());
-                return Result.error("500","删除信贷历史贷后跟踪记录失败");
-            }else{
-                log.setXdIndexId(ret.getData());
-            }
-
-            // --------  将贷后跟踪记录同步到信贷  结束 -------------------
+//            // --------  将贷后跟踪记录同步到信贷  开始 -------------------
+//            RepaymentBizPlanList planList = repaymentBizPlanListService.selectById(log.getRbpId());
+//            planList.getAfterId();
+//            planList.getBusinessId();
+//            Parametertracelog parametertracelog = new Parametertracelog();
+//            parametertracelog.setId(log.getXdIndexId());
+//            parametertracelog.setCarBusinessId(planList.getBusinessId());
+//            parametertracelog.setCarBusinessAfterId( planList.getAfterId());
+//            parametertracelog.setTranceContent(log.getContent());
+//
+//            LoginInfoDto loginInfoDto = loginUserInfoHelper.getUserInfoByUserId(log.getRecorderUser(),null);
+//            parametertracelog.setTranceName(loginInfoDto.getBmUserId());
+//            parametertracelog.setTranceDate(log.getRecordDate());
+//            LoginInfoDto creatUDto = loginUserInfoHelper.getUserInfoByUserId(log.getCreateUser(),null);
+//            parametertracelog.setCreateUser(creatUDto.getBmUserId());
+//            parametertracelog.setCreateTime(log.getCreateTime());
+//            parametertracelog.setIsDelete(0);
+//            Result<Integer> ret =  collectionRemoteApi.transferOneCollectionLogToXd(parametertracelog);
+//
+//            if(!ret.getCode().equals("1")){
+//                logger.error("根据ID删除信贷的历史记录，失败： trackLog："+ JSON.toJSONString(log) +"   失败原因："+ret.getMsg());
+//                return Result.error("500","删除信贷历史贷后跟踪记录失败");
+//            }else{
+//                log.setXdIndexId(ret.getData());
+//            }
+//
+//            // --------  将贷后跟踪记录同步到信贷  结束 -------------------
 
             collectionTrackLogService.addOrUpdateLog(log);
 
