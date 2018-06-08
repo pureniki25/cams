@@ -115,6 +115,7 @@
 	<select id="getPrincipalAndInterestPeriod" resultType="java.lang.Double">
 				
 				
+       			
          select (a.planAmount-a.factAmount)  as factAmount from 
                (select 
 				       SUM(
@@ -122,7 +123,7 @@
 					          WHEN (
 					            projDetail.plan_item_type =10 or projDetail.plan_item_type =20 	         		       
 					          ) 
-					          THEN projDetail.proj_plan_amount
+					          THEN ifnull(projDetail.proj_plan_amount,0)
 					          ELSE 0 
 					        END
 	                   ) `planAmount`,
@@ -132,7 +133,7 @@
 					          WHEN (
 					            projDetail.plan_item_type =10 or projDetail.plan_item_type =20 	         		       
 					          ) 
-					          THEN projDetail.proj_fact_amount
+					          THEN ifnull(projDetail.proj_fact_amount,0)
 					          ELSE 0 
 					        END
 				      ) `factAmount`
