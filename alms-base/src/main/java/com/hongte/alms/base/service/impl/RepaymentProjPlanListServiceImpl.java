@@ -510,7 +510,7 @@ public class RepaymentProjPlanListServiceImpl extends
 			try {
 				  result = eipRemote.queryProjectRepayment(paramMap);
 			}catch(Exception e) {
-				logger.info("标ID:"+projId+"获取平台标的期数为："+periods+"的还款日日期失败");
+				logger.info("标ID:"+projId+"，期数为:"+periods+"的还款日日期获取失败"+e);
 			}
 			if(result!=null) {
 				if(result.getReturnCode().equals("0000")) {
@@ -535,7 +535,7 @@ public class RepaymentProjPlanListServiceImpl extends
 				return null;
 			}
 		
-				
+		
 			
 		}
 		
