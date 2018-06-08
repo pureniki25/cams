@@ -491,7 +491,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                 staffType,
                 CollectionSetWayEnum.AUTO_SET);
 
-        SyncBusinessColStatusToXindai(voList,staffUserId,"定时任务自动分配",staffType);
+//        SyncBusinessColStatusToXindai(voList,staffUserId,"定时任务自动分配",staffType);
         return bl;
     };
 
@@ -723,7 +723,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                 voList.add(vo);
 
                 //同步贷后状态到信贷
-                SyncBusinessColStatusToXindai(voList,null,"定时任务自动分配",CollectionStatusEnum.TO_LAW_WORK.getPageStr());
+//                SyncBusinessColStatusToXindai(voList,null,"定时任务自动分配",CollectionStatusEnum.TO_LAW_WORK.getPageStr());
 
             }catch (Exception e){
                 logger.error("自動移交法务异常",e);
