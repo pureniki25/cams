@@ -66,4 +66,9 @@ public class WithholdingRepaymentLogServiceImpl extends BaseServiceImpl<Withhold
 		return withholdingRepaymentLogmapper.selectRepaymentLogForAutoRepay(businessId, afterId,platformId);
 	}
 
+	@Override
+	public List<WithholdingRepaymentLog> selectRepaymentLogForResult() {
+		return withholdingRepaymentLogmapper.selectRepaymentLogForResult();
+	}
+
 }

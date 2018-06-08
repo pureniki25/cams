@@ -118,5 +118,13 @@ public interface RechargeService {
 		 * @return
 		 */
 	 BankCardInfo getBankCardInfo(List<BankCardInfo> list);
+	 
+	 
+		/**
+		 * 查询回调结果
+		 * @param List<BankCardInfo> list
+		 * @return
+		 */
+	 void getReturnResult();
 }
 

@@ -54,7 +54,11 @@ public interface WithholdingRepaymentLogService extends BaseService<WithholdingR
       */
      List<WithholdingRepaymentLog> selectRepaymentLogForAutoRepay(String businessId, String afterId,Integer platformId);
      
-     
-     
+     /**
+      * 查询处理中的代扣记录
+      * @param key
+      * @return
+      */
+     List<WithholdingRepaymentLog> selectRepaymentLogForResult();
 
 }
