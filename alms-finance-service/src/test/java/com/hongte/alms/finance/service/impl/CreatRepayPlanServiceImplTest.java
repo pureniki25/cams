@@ -581,7 +581,6 @@ public class CreatRepayPlanServiceImplTest {
         businessBasicInfoReq.setBusinessType(9);
         businessBasicInfoReq.setBusinessCtype("");  //业务所属子类型，若无则为空
         businessBasicInfoReq.setBusinessStype("");  //业务所属孙类型，若无则为空
-        businessBasicInfoReq.setCustomerId("testCustom111");  //客户资产端唯一编号
         businessBasicInfoReq.setCustomerName("1111");  //客户姓名
         businessBasicInfoReq.setRepaymentTypeId(5);  //1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息
         businessBasicInfoReq.setBorrowMoney(new BigDecimal("24000"));  //借款总额
@@ -622,7 +621,6 @@ public class CreatRepayPlanServiceImplTest {
         businessBasicInfoReq.setBusinessType(business.getBusinessType());
         businessBasicInfoReq.setBusinessCtype(business.getBusinessCtype());  //业务所属子类型，若无则为空
         businessBasicInfoReq.setBusinessStype(business.getBusinessStype());  //业务所属孙类型，若无则为空
-        businessBasicInfoReq.setCustomerId(business.getCustomerId());  //客户资产端唯一编号
         businessBasicInfoReq.setCustomerName(business.getCustomerName());  //客户姓名
         businessBasicInfoReq.setRepaymentTypeId(business.getRepaymentTypeId());  //1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息
         businessBasicInfoReq.setBorrowMoney(business.getBorrowMoney());  //借款总额

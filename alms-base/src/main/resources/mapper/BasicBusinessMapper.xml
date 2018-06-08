@@ -9,7 +9,6 @@
 		<result column="business_type" property="businessType" />
 		<result column="business_ctype" property="businessCtype" />
 		<result column="business_stype" property="businessStype" />
-		<result column="customer_id" property="customerId" />
 		<result column="customer_name" property="customerName" />
 		<result column="customer_identify_card" property="customerIdentifyCard" />
 		<result column="repayment_type_id" property="repaymentTypeId" />
@@ -41,7 +40,7 @@
 
 	<!-- 通用查询结果列 -->
 	<sql id="Base_Column_List">
-        business_id AS businessId, input_time AS inputTime, business_type AS businessType, business_ctype AS businessCtype, business_stype AS businessStype, customer_id AS customerId, customer_name AS customerName, customer_identify_card AS customerIdentifyCard, repayment_type_id AS repaymentTypeId, borrow_money AS borrowMoney, borrow_limit AS borrowLimit, borrow_limit_unit AS borrowLimitUnit, borrow_rate AS borrowRate, borrow_rate_unit AS borrowRateUnit, original_userid AS originalUserid, original_name AS originalName, operator_id AS operatorId, operator_name AS operatorName, asset_id AS assetId, company_id AS companyId, company_name AS companyName, district_id AS districtId, district_name AS districtName, output_platform_id AS outputPlatformId, issue_split_type AS issueSplitType, source_type AS sourceType, source_business_id AS sourceBusinessId, is_tuandai_repay AS isTuandaiRepay, src_type AS srcType, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
+        business_id AS businessId, input_time AS inputTime, business_type AS businessType, business_ctype AS businessCtype, business_stype AS businessStype,  customer_name AS customerName, customer_identify_card AS customerIdentifyCard, repayment_type_id AS repaymentTypeId, borrow_money AS borrowMoney, borrow_limit AS borrowLimit, borrow_limit_unit AS borrowLimitUnit, borrow_rate AS borrowRate, borrow_rate_unit AS borrowRateUnit, original_userid AS originalUserid, original_name AS originalName, operator_id AS operatorId, operator_name AS operatorName, asset_id AS assetId, company_id AS companyId, company_name AS companyName, district_id AS districtId, district_name AS districtName, output_platform_id AS outputPlatformId, issue_split_type AS issueSplitType, source_type AS sourceType, source_business_id AS sourceBusinessId, is_tuandai_repay AS isTuandaiRepay, src_type AS srcType, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
     </sql>
 
 	<!-- 查询申请减免界面业务基本信息内容 -->
