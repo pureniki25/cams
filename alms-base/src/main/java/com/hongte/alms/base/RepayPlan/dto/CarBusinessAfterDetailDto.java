@@ -73,7 +73,7 @@ public class CarBusinessAfterDetailDto implements Serializable  {
      */
 	@TableField("plan_repayment_date")
 	@ApiModelProperty(required= true,value = "应还日期")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date planRepaymentDate;
     /**
      * [本期实还金额]
@@ -86,7 +86,7 @@ public class CarBusinessAfterDetailDto implements Serializable  {
      */
 	@TableField("actual_repayment_date")
 	@ApiModelProperty(required= true,value = "实还日期")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date actualRepaymentDate;
     /**
      * 减免金额
@@ -99,7 +99,7 @@ public class CarBusinessAfterDetailDto implements Serializable  {
      */
 	@TableField("create_time")
 	@ApiModelProperty(required= true,value = "创建日期")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createTime;
     /**
      * 创建人
@@ -112,7 +112,7 @@ public class CarBusinessAfterDetailDto implements Serializable  {
      */
 	@TableField("update_time")
 	@ApiModelProperty(required= true,value = "更新日期")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date updateTime;
     /**
      * 更新人
