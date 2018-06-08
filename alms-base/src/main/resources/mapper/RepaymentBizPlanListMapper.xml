@@ -216,13 +216,13 @@
 			pl.total_borrow_amount as planRepayAmount,
 			pl.current_status as status ,
 			CASE
-				pl.repay_status
+				pl.repay_status 
 				WHEN 1 THEN '部分还款' 
-				WHEN 2 THEN '线上已还款' 
-				WHEN 3 THEN '全部已还款' 
+				WHEN 2 THEN '部分还款' 
+				WHEN 3 THEN pl.current_status
 				ELSE NULL
 			END 
-				 as repayStatus,
+				as repayStatus,
 			pl.accountant_confirm_status as financeConfirmStatus,
 			(SELECT IFNULL(SUM(fact_amount),0) FROM tb_repayment_biz_plan_list_detail where plan_list_id = pl.plan_list_id ) as repaidAmount,
 			b.src_type as srcType
