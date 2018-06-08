@@ -216,11 +216,9 @@
 			pl.total_borrow_amount as planRepayAmount,
 			pl.current_status as status ,
 			CASE
-				pl.repay_status
-				WHEN 1 THEN '部分还款' 
-				WHEN 2 THEN '线上已还款' 
-				WHEN 3 THEN '全部已还款' 
-				ELSE NULL
+				IFNULL(pl.repay_status, -99)
+				WHEN -99 THEN NULL
+				ELSE '部分还款'
 			END 
 				 as repayStatus,
 			pl.accountant_confirm_status as financeConfirmStatus,
