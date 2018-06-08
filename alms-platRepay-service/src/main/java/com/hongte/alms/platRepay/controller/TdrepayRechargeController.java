@@ -1,18 +1,28 @@
 package com.hongte.alms.platRepay.controller;
 
+import java.util.List;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.hongte.alms.base.entity.TdrepayRechargeLog;
+import com.hongte.alms.base.service.TdrepayRechargeLogService;
+import com.hongte.alms.base.vo.module.ComplianceRepaymentVO;
 import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
+import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.platRepay.service.TdrepayRechargeService;
 import com.hongte.alms.platRepay.vo.TdrepayRechargeInfoVO;
 
@@ -30,6 +40,10 @@ public class TdrepayRechargeController {
 	@Autowired
 	@Qualifier("TdrepayRechargeService")
 	private TdrepayRechargeService tdrepayRechargeService;
+
+	@Autowired
+	@Qualifier("TdrepayRechargeLogService")
+	private TdrepayRechargeLogService tdrepayRechargeLogService;
 
 	@SuppressWarnings("rawtypes")
 	@ApiOperation(value = "代充值资金分发参数接入接口")
@@ -93,7 +107,21 @@ public class TdrepayRechargeController {
 		if (CollectionUtils.isEmpty(vo.getDetailList())) {
 			return Result.error(INVALID_PARAM_CODE, "detailList" + INVALID_PARAM_DESC);
 		}
-		
+
+		if (!StringUtil.isEmpty(vo.getProjPlanListId())) {
+			int count = tdrepayRechargeLogService.selectCount(
+					new EntityWrapper<TdrepayRechargeLog>().eq("proj_plan_list_id", vo.getProjPlanListId()));
+			if (count > 0) {
+				return Result.error(INVALID_PARAM_CODE, "实还流水：" + vo.getProjPlanListId() + " 重复推送！");
+			}
+		} else {
+			int count = tdrepayRechargeLogService.selectCount(new EntityWrapper<TdrepayRechargeLog>()
+					.eq("project_id", vo.getProjectId()).eq("period", vo.getPeriod()));
+			if (count > 0) {
+				return Result.error(INVALID_PARAM_CODE, "标ID：" + vo.getProjectId() + "，期次：" + vo.getPeriod() + "，重复推送！");
+			}
+		}
+
 		try {
 			tdrepayRechargeService.saveTdrepayRechargeInfo(vo);
 		} catch (Exception e) {
@@ -102,5 +130,21 @@ public class TdrepayRechargeController {
 		}
 
 		return Result.success();
+	}
+	
+	@ApiOperation(value = "查询合规化还款主页面列表")
+	@GetMapping("/queryComplianceRepaymentData")
+	@ResponseBody
+	public PageResult<List<TdrepayRechargeLog>> queryComplianceRepaymentData(@ModelAttribute ComplianceRepaymentVO vo) {
+		try {
+			if (vo != null && vo.getConfirmTimeEnd() != null) {
+				DateUtil.addDay2Date(1, vo.getConfirmTimeEnd());
+			}
+			List<TdrepayRechargeLog> list = tdrepayRechargeService.queryComplianceRepaymentData(vo);
+			return PageResult.build(0, "请求成功", list);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return PageResult.error(-99, "系统异常，接口调用失败");
+		}
 	}
 }

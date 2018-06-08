@@ -1,5 +1,6 @@
 var basePath;
 var vm;
+var table;
 
 var rechargeModalFormRules = {
     transferType: [
@@ -15,13 +16,31 @@ var rechargeModalFormRules = {
 
 window.layinit(function(htConfig) {
 	basePath = htConfig.platRepayBasePath;
-
+	table = layui.table;
+	
 	vm = new Vue({
 		el : '#app',
 		data : {
 			rechargeModal: false, // 代充值账户充值弹窗控制
 			bankCodeList:['GDB','ICBC','BOC','CMBCHINA','PINGAN','HXYH','BOCO','POST','CCB','SPDB','CMBC','BCCB','CEB','CIB','ECITIC','ABC'],	// 银行代码
 			bankAccountList: [],// 所有银行账户
+			// 初始化信息总条数
+            dataCount:0,
+			
+			/*
+			 * 合规化还款主页面查询条件
+			 */
+			queryConditionModel: {
+				confirmTimeStart: '',	// 财务确认开始日期
+				confirmTimeEnd: '', // 财务确认结束日期
+				processStatus: '', // 分发状态
+				repaymentType: '', // 还款方式
+				settleType: '', // 期数类型
+				origBusinessId: '', // 编号
+				businessType: '', // 业务类型
+				platStatus: '', // 平台状态
+				companyName: '', // 分公司
+			},
 			
 			/*
 			 * 代充值账户充值form
@@ -144,9 +163,127 @@ window.layinit(function(htConfig) {
 				vm.rechargeModalForm = vm.initRechargeModalForm;
 				this.rechargeModal = false;
 			},
+			
+			/*
+			 * 查询合规化还款主页面列表
+			 */
+			queryComplianceRepaymentData: function(){
+				/*
+				 * 合规化还款主页面列表
+				 */
+	            table.render({
+			    	elem: "#complianceRepaymentData",
+			    	height: 600, 
+			    	cols: [
+			    		[{
+			    			type: 'selection',
+			    			field: 'select',
+			    			title: '全选',
+			    			align: 'center',
+							width:52
+			    		}, {
+			    			field: 'origBusinessId',
+			    			title: '业务编号',
+			    			align: 'center',
+							width:200
+			    		}, {
+			    			field: 'businessType',
+			    			title: '业务类型',
+			    			align: 'center',
+							width:100
+			    		}, {
+			    			field: 'repaymentType',
+			    			title: '还款方式',
+			    			align: 'center',
+							width:100
+			    		}, {
+			    			field: 'customerName',
+			    			title: '借款人',
+			    			align: 'center',
+							width:100
+			    		}, {
+			    			field: 'period',
+			    			title: '还款期数',
+			    			align: 'center',
+							width:100
+			    		}, {
+			    			field: 'factRepayDate',
+			    			title: '实还日期',
+			    			align: 'center',
+							width:100
+			    		},{
+			    			field: 'companyName',
+			    			title: '分公司',
+			    			align: 'center',
+							width:100
+			    		},{
+			    			field: 'factRepayDate',
+			    			title: '状态',
+			    			align: 'center',
+							width:100
+			    		},{
+			    			field: 'resourceAmount',
+			    			title: '流水合计',
+			    			align: 'center',
+							width:100
+			    		},{
+			    			field: 'factRepayAmount',
+			    			title: '实收总额',
+			    			align: 'center',
+							width:100
+			    		}, {
+			    			field: 'rechargeAmount',
+			    			title: '充值金额',
+			    			align: 'center',
+							width:100
+			    		}, {
+			    			field: 'platStatus',
+			    			title: '平台状态',
+			    			align: 'center',
+							width:100
+			    		}, {
+			    			field: 'processStatus',
+			    			title: '分发状态',
+			    			align: 'center',
+							width:100
+			    		}, {
+			    			title: '操作',
+			    			toolbar: "#toolbar2",
+			    			align: 'center',
+							width:100
+			    		}, {
+			    			field: 'remark',
+			    			title: '备注',
+			    			align: 'center',
+							width:100
+			    		}]
+			    		], // 设置表头
+			    		url: basePath + 'tdrepayRecharge/queryComplianceRepaymentData', 
+			    		page: true,
+			    		where: {
+			    			confirmTimeStart:vm.queryConditionModel.confirmTimeStart, 
+			    			confirmTimeEnd:vm.queryConditionModel.confirmTimeEnd, 
+			    			processStatus:vm.queryConditionModel.processStatus, 
+			    			repaymentType:vm.queryConditionModel.repaymentType, 
+			    			settleType:vm.queryConditionModel.settleType, 
+			    			origBusinessId:vm.queryConditionModel.origBusinessId, 
+			    			businessType:vm.queryConditionModel.businessType, 
+			    			platStatus:vm.queryConditionModel.platStatus, 
+			    			companyName:vm.queryConditionModel.companyName, 
+			            },
+			    		done: (res, curr, count) => {}
+			    })
+			},
+			/*
+			 * 查看对应记录的费用明细
+			 */
+			queryFeeDetails: function(){
+				
+			}
 		},
 
 		created : function() {
+			vm.queryComplianceRepaymentData();
 		},
 
 	});

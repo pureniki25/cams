@@ -1,5 +1,9 @@
 package com.hongte.alms.platRepay.service;
 
+import java.util.List;
+
+import com.hongte.alms.base.entity.TdrepayRechargeLog;
+import com.hongte.alms.base.vo.module.ComplianceRepaymentVO;
 import com.hongte.alms.platRepay.vo.TdrepayRechargeInfoVO;
 
 /**
@@ -13,4 +17,11 @@ public interface TdrepayRechargeService {
 	 * @param vo
 	 */
 	void saveTdrepayRechargeInfo(TdrepayRechargeInfoVO vo);
+	
+	/**
+	 * 查询合规化还款主页面列表
+	 * @param paramMap
+	 * @return
+	 */
+	List<TdrepayRechargeLog> queryComplianceRepaymentData(ComplianceRepaymentVO vo);
 }
