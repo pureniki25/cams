@@ -740,11 +740,13 @@ public class FinanceController {
 	
 	@ApiOperation(value = "分润")
 	@PostMapping("/shareProfit")
-	public Result shareProfit(@RequestParam("businessId") String businessId,@RequestParam("afterId") String afterId){
+	public Result shareProfit(@RequestParam("businessId") String businessId,@RequestParam("afterId") String afterId,@RequestParam("logId") Integer logId){
 		Result result=new Result();
 		try {
 			ConfirmRepaymentReq req=new ConfirmRepaymentReq();
 			List<Integer> list=new ArrayList<Integer>();
+			List<Integer> logIds=new ArrayList<Integer>();
+			logIds.add(logId);
 			list.add(30);//还款来源银行代扣
 			
 			req.setAfterId(afterId);
