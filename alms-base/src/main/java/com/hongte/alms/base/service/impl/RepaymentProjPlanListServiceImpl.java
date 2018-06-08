@@ -501,16 +501,21 @@ public class RepaymentProjPlanListServiceImpl extends
 		 * @return
 		 */
 		private Date getPlatformDuedate(String projId,String periods) {
-			logger.info("====================标ID:"+projId+"获取平台标的期数为："+periods+"的还款日日期开始=======================================");
-		 	Map<String, Object> paramMap = new HashMap<>();
+			logger.info("====================标ID:"+projId+"获取平台标的期数为："+periods+"的还款日日期=====开始=======================================");
+			String dueDate="";
+			Map<String, Object> paramMap = new HashMap<>();
 			paramMap.put("projectId",projId);
 			paramMap.put("type", "1");
+			Result result=null;
 			try {
-				Result  result = eipRemote.queryProjectRepayment(paramMap);
+				  result = eipRemote.queryProjectRepayment(paramMap);
+			}catch(Exception e) {
+				logger.info("标ID:"+projId+"获取平台标的期数为："+periods+"的还款日日期失败");
+			}
+			if(result!=null) {
 				if(result.getReturnCode().equals("0000")) {
 					HashMap<String,HashMap<String,String>> map=(HashMap) result.getData();
 					List<HashMap<String,String>> list=(List<HashMap<String, String>>) map.get("RepaymentList");
-					String dueDate="";
 					for(int i=0;i<list.size();i++) {
 						String period=String.valueOf(list.get(i).get("Periods"));
 						if(period.equals(periods))
@@ -526,18 +531,22 @@ public class RepaymentProjPlanListServiceImpl extends
 				}else {
 					return null;
 				}
-			}catch(Exception e) {
-				logger.info("标ID:"+projId+"获取平台标的期数为："+periods+"的还款日日期失败");
-			}finally {
-		
-		     return null;
+			}else {
+				return null;
 			}
+		
+				
+			
 		}
 		
 		public static void main(String[] args) {
-			Date date1=DateUtil.getDate("2018-05-19", "yyyy-MM-dd");
-			Date date2=DateUtil.getDate("2018-05-15", "yyyy-MM-dd");
-			System.out.println(DateUtil.getDiffDays(date1, date2));
+			String str="";
+			try {
+			str.subSequence(5, 6);
+			}catch(Exception e) {
+				System.out.println(e);
+			}
+			System.out.println("123");
 		} 
 		 
 

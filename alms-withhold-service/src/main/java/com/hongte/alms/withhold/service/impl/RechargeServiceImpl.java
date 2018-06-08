@@ -2,6 +2,7 @@ package com.hongte.alms.withhold.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.hongte.alms.base.entity.AgencyRechargeLog;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.BizOutputRecord;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
@@ -12,6 +13,7 @@ import com.hongte.alms.base.entity.WithholdingRepaymentLog;
 import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.enums.SysParameterEnums;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
+import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.feignClient.dto.BankCardInfo;
 import com.hongte.alms.base.feignClient.dto.BankRechargeReqDto;
@@ -41,6 +43,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -529,6 +532,64 @@ public class RechargeServiceImpl implements RechargeService {
 			}
 	    }
 		return null;
+	}
+
+	@Override
+	public void getReturnResult() {
+          		List<WithholdingRepaymentLog> losgs=withholdingRepaymentLogService.selectRepaymentLogForResult();
+          		for(WithholdingRepaymentLog log:losgs) {
+          			if(log.getBindPlatformId()==PlatformEnum.YH_FORM.getValue()) {
+          				Map<String, Object> paramMap = new HashMap<>();
+          				paramMap.put("oidPartner", oidPartner);
+          				paramMap.put("cmOrderNo", log.getMerchOrderId());
+          				com.ht.ussp.core.Result result = eipRemote.queryRechargeOrder(paramMap);
+          				if (result == null) {
+          					throw new ServiceRuntimeException("调用外联平台接口失败！");
+          				}
+          				if ("0000".equals(result.getReturnCode())&&result.getMsg().equals("充值成功")) {
+                               log.setUpdateTime(new Date());
+                               log.setRepayStatus(1);
+                               log.setRemark(result.getMsg());
+                               withholdingRepaymentLogService.updateById(log);
+                               RepaymentBizPlanList list=repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", log.getOriginalBusinessId()).eq("after_id", log.getAfterId()));
+                               shareProfit(list);
+          				}else if(!"0000".equals(result.getReturnCode())){
+          				  log.setUpdateTime(new Date());
+                          log.setRepayStatus(0);
+                          log.setRemark(result.getMsg());
+                          withholdingRepaymentLogService.updateById(log);
+                          
+          				}
+          			}
+          			if(log.getBindPlatformId()==PlatformEnum.BF_FORM.getValue()) {
+          				Map<String, Object> paramMap = new HashMap<>();
+          				paramMap.put("transSerialNo", log.getMerchOrderId());
+          				paramMap.put("origTransId", log.getMerchOrderId());
+          				paramMap.put("tradeDate",   log.getMerchOrderId().substring(0, log.getMerchOrderId().length()-7));
+          				com.ht.ussp.core.Result result = eipRemote.queryBaofuStatus(paramMap);
+          				if (result == null) {
+          					throw new ServiceRuntimeException("调用外联平台接口失败！");
+          				}
+          				if ("0000".equals(result.getReturnCode())&&result.getMsg().equals("执行成功")) {
+                               log.setUpdateTime(new Date());
+                               log.setRepayStatus(1);
+                               log.setRemark(result.getMsg());
+                               withholdingRepaymentLogService.updateById(log);
+                               RepaymentBizPlanList list=repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", log.getOriginalBusinessId()).eq("after_id", log.getAfterId()));
+                               shareProfit(list);
+          				}else if(!"0000".equals(result.getReturnCode())){
+          				  log.setUpdateTime(new Date());
+                          log.setRepayStatus(0);
+                          log.setRemark(result.getMsg());
+                          withholdingRepaymentLogService.updateById(log);
+                          
+          				}
+          				
+          			}
+	                if(log.getBindPlatformId()==PlatformEnum.YB_FORM.getValue()) {
+          				//todo
+          			}
+          		}
 	}
 
 
