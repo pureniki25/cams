@@ -145,9 +145,9 @@ window.layinit(function (htConfig) {
                             var days = s2.getTime() - s1.getTime();
                             var time = parseInt(days / (1000 * 60 * 60 * 24));
                             let color = 'blue'
-                            let content = p.row.status
+                            let content = p.row.repayStatus||p.row.status
 
-                            if (content == '逾期') {
+                            if (p.row.status == '逾期') {
                                 if (time <= 15 && time > 1) {
                                     color = 'red'
                                 }
@@ -155,10 +155,10 @@ window.layinit(function (htConfig) {
                                     color = 'black'
                                 }
                             }
-                            if (time < 0 && time > -4 && content == '还款中') {
+                            if (time < 0 && time > -4 && p.row.status == '还款中') {
                                 color = 'yellow'
                             }
-                            if (content == '已还款') {
+                            if (p.row.status == '已还款') {
                                 color = 'green'
                             }
                             return h('Tag', {
