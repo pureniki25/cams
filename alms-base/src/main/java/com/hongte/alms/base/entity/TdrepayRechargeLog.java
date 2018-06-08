@@ -2,13 +2,14 @@ package com.hongte.alms.base.entity;
 
 import java.io.Serializable;
 
-import com.baomidou.mybatisplus.enums.IdType;
 import java.math.BigDecimal;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -18,7 +19,7 @@ import io.swagger.annotations.ApiModelProperty;
  * </p>
  *
  * @author 胡伟骞
- * @since 2018-06-06
+ * @since 2018-06-07
  */
 @ApiModel
 @TableName("tb_tdrepay_recharge_log")
@@ -29,9 +30,9 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
     /**
      * 主键ID
      */
-	@TableId(value="log_id", type= IdType.AUTO)
+    @TableId("log_id")
 	@ApiModelProperty(required= true,value = "主键ID")
-	private Integer logId;
+	private String logId;
     /**
      * 标的ID
      */
@@ -65,6 +66,7 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
     /**
      * 实还日期
      */
+	@JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
 	@TableField("fact_repay_date")
 	@ApiModelProperty(required= true,value = "实还日期")
 	private Date factRepayDate;
@@ -95,6 +97,7 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
     /**
      * 财务确认时间或成功代扣时间
      */
+	@JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
 	@TableField("confirm_time")
 	@ApiModelProperty(required= true,value = "财务确认时间或成功代扣时间")
 	private Date confirmTime;
@@ -188,10 +191,10 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 	@ApiModelProperty(required= true,value = "(代充值资金分发接口参数)资产端账户唯一编号")
 	private String oidPartner;
     /**
-     * 平台状态
+     * 平台状态 1：已还款，2：逾期 3：待还款
      */
 	@TableField("plat_status")
-	@ApiModelProperty(required= true,value = "平台状态")
+	@ApiModelProperty(required= true,value = "平台状态 1：已还款，2：逾期 3：待还款")
 	private String platStatus;
     /**
      * 平台还款状态(1：待还款，2：已还款 3、已垫付 4：逾期)
@@ -231,11 +234,11 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 	private Date updateTime;
 
 
-	public Integer getLogId() {
+	public String getLogId() {
 		return logId;
 	}
 
-	public void setLogId(Integer logId) {
+	public void setLogId(String logId) {
 		this.logId = logId;
 	}
 

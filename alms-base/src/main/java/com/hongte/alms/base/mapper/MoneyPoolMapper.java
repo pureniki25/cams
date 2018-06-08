@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.hongte.alms.base.dto.MoneyPoolManagerReq;
 import com.hongte.alms.base.entity.MoneyPool;
+import com.hongte.alms.base.vo.finance.MoneyPoolManagerVO;
 import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
 import com.hongte.alms.base.vo.module.MoneyPoolVO;
 import com.hongte.alms.common.mapper.SuperMapper;
@@ -19,4 +21,7 @@ import com.hongte.alms.common.mapper.SuperMapper;
  */
 public interface MoneyPoolMapper extends SuperMapper<MoneyPool> {
 	List<MatchedMoneyPoolVO> listMatchedMoneyPool(@Param("businessId") String businessId,@Param("afterId") String afterId,@Param("notConfirmed") Boolean notConfirmed);
+	
+	List<MoneyPoolManagerVO> selectMoneyPoolManagerList(MoneyPoolManagerReq req);
+	int conutMoneyPoolManagerList(MoneyPoolManagerReq req);
 }

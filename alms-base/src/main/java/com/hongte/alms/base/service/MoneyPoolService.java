@@ -2,15 +2,19 @@ package com.hongte.alms.base.service;
 
 import java.util.List;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.dto.ConfirmRepaymentReq;
+import com.hongte.alms.base.dto.MoneyPoolManagerReq;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.entity.MoneyPool;
 import com.hongte.alms.base.entity.RepaymentResource;
+import com.hongte.alms.base.vo.finance.MoneyPoolManagerVO;
 import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
 import com.hongte.alms.base.vo.module.MoneyPoolVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.service.BaseService;
+import com.hongte.alms.common.vo.PageResult;
 
 /**
  * <p>
@@ -45,4 +49,14 @@ public interface MoneyPoolService extends BaseService<MoneyPool> {
 	 * @param repaymentResource
 	 */
 	void revokeConfirmRepaidUpdateMoneyPool(RepaymentResource repaymentResource);
+	
+	/**
+	 * 分页查导入流水列表的数据
+	 * @author 王继光
+	 * 2018年6月8日 上午11:30:08
+	 * @param page
+	 * @param ew
+	 * @return
+	 */
+	Page<MoneyPoolManagerVO> selectMoneyPoolManagerList(MoneyPoolManagerReq req);
 }

@@ -12,9 +12,14 @@ window.layinit(function (htConfig) {
         el: "#app",
         data: {
             form: {
+                curPage:1,
+                pageSize:10,
                 acceptBank: '',
                 tradeType: '',
-
+                tradeDateStart:'',
+                tradeDateEnd:'',
+                updatedateStart:'',
+                updateDateEnd:'',
             },
             bankList: {},
             table: {
@@ -24,61 +29,147 @@ window.layinit(function (htConfig) {
                     },
                     {
                         title: '转入账号',
-                        key: ''
+                        key: 'acceptBank'
                     }, {
                         title: '交易时间',
-                        key: ''
+                        key: 'tradeDate'
                     }, {
                         title: '转入账号',
-                        key: ''
+                        key: 'acceptBank'
                     }, {
                         title: '记账金额',
-                        key: ''
+                        key: 'accountMoney'
                     }, {
                         title: '支付类型',
-                        key: ''
+                        key: 'tradeType'
                     }, {
                         title: '交易场所',
-                        key: ''
+                        key: 'tradePlace'
                     }, {
                         title: '状态',
-                        key: ''
+                        key: 'status'
                     }, {
                         title: '更新时间',
-                        key: ''
+                        key: 'updateTime'
                     }, {
                         title: '交易备注',
-                        key: ''
+                        key: 'tradeRemark'
                     }, {
                         title: '领取人',
-                        key: ''
+                        key: 'gainerName'
                     }, {
                         title: '操作',
-                        key: ''
+                        key: '',
+                        width:200,
+                        render:(h,p)=>{
+                            return h('div',[
+                                h('i-button',{
+                                    style:{
+                                        marginRight:'1rem'
+                                    }
+                                },'详情'),
+                                h('i-button',{
+                                    on:{
+                                        click(){
+                                            app.deleteMoneyPool(p.row.moneyPoolId)
+                                        }
+                                    }
+                                },'删除'),
+                            ])
+                        }
                     },
                 ],
                 data: [],
-                loading: false
-            }
+                loading: false,
+                total:0,
+            },
+            selection:[],
+            bankList:[]
         },
         watch: {},
         methods: {
+            listDepartmentBank: function () {
+                axios.get(fpath + 'finance/listDepartmentBank' )
+                    .then(function (res) {
+                        if (res.data.code == '1') {
+                            app.bankList = res.data.data
+                        } else {
+                            app.$Modal.error({ content: '接口调用异常' })
+                        }
+                    })
+                    .catch(function (error) {
+                        app.$Modal.error({ content: '接口调用异常' })
+                    })
+            },
+            page(page){
+                this.form.curPage = page ;
+                this.getMoneyPoolManager()
+            },
+            search(){
+                this.form.curPage = 1;
+                this.getMoneyPoolManager()
+            },
             getMoneyPoolManager(){
+                this.table.loading = true
                 axios.get(fpath+'finance/moneyPoolManager',{
-                    params:{
-
-                    }
+                    params:this.form
                 })
                 .then(function(res){
+                    app.table.loading = false
+                    if(res.data.code==0){
+                        app.table.data = res.data.data
+                        app.table.total = res.data.count
+                    }else{
+                        app.$Message.error({content:res.data.msg})
+                    }
                     console.log(res);
                 })
                 .catch(function(err){
+                    app.table.loading = false
+                    app.$Message.error({content:err})
+                })
+            },
+            deleteMoneyPool(mpid){
+                let mpids = []
+                if(mpid&&typeof mpid=='string'){
+                    mpids.push(mpid)
+                }else{
+                    this.selection.forEach(element => {
+                        mpids.push(element.moneyPoolId)
+                    });
+                }
 
+                if(mpids.length==0){
+                    app.$Message.warning({content:'请选择要删除的流水'})
+                    return ;
+                }
+                app.$Message.loading({
+                    duration:0,
+                    content:'删除中,请稍后...'
+                })
+                axios.get(fpath+'finance/delMoneyPool',{
+                    params:{
+                        mpids:mpids
+                    }
+                })
+                .then(function(res){
+                    app.$Message.destroy()
+                    if(res.data.code=='1'){
+                        app.$Message.success({content:'删除成功!'})
+                        app.getMoneyPoolManager()
+                    }else{
+                        app.$Message.error({content:res.data.msg})
+                    }
+                })
+                .catch(function(err){
+                    app.$Message.destroy()
+                    app.$Message.error({content:err})
                 })
             }
         },
         created: function () {
-            this.getMoneyPoolManager()
+            this.listDepartmentBank()
+            this.search()
         }
     })
 })

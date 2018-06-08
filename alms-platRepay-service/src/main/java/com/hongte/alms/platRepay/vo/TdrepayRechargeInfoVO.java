@@ -5,6 +5,11 @@ import java.util.List;
 import com.hongte.alms.base.entity.TdrepayRechargeDetail;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
 
+/**
+ * 代充值资金分发参数
+ * @author Administrator
+ *
+ */
 public class TdrepayRechargeInfoVO extends TdrepayRechargeLog {
 
 	private static final long serialVersionUID = 1L;

@@ -90,6 +90,11 @@ public class FinanceManagerListVO {
 	 * 状态
 	 */
 	private String status;
+	
+	/**
+	 * 部分还款状态子状态,null:未还款,1:部分还款,2:线上已还款,3:全部已还款
+	 */
+	private String repayStatus ;
 	/**
 	 * 是否支持代扣
 	 */
@@ -328,6 +333,20 @@ public class FinanceManagerListVO {
 	 */
 	public void setSrcType(Integer srcType) {
 		this.srcType = srcType;
+	}
+
+	/**
+	 * @return the repayStatus
+	 */
+	public String getRepayStatus() {
+		return repayStatus;
+	}
+
+	/**
+	 * @param repayStatus the repayStatus to set
+	 */
+	public void setRepayStatus(String repayStatus) {
+		this.repayStatus = repayStatus;
 	}
 
 }
