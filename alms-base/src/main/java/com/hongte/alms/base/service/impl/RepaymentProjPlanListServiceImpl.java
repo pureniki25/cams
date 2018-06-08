@@ -139,25 +139,27 @@ public class RepaymentProjPlanListServiceImpl extends
 									logger.info("===============：planListid:"+pList.getPlanListId()+"逾期费用计算开始===============");
 									//获取平台对应标对应期的还款日期,取晚的日期
 									Date platformDueDate=getPlatformDuedate(projPlan.getProjectId(), projPList.getPeriod().toString());
-									BigDecimal days=BigDecimal.valueOf(0);
+									BigDecimal onlineDueDays=BigDecimal.valueOf(0);//线上逾期天数
+									BigDecimal underlineDueDays=BigDecimal.valueOf(0);//线下逾期天数
 									if(platformDueDate!=null&&platformDueDate.compareTo(projPList.getDueDate())>0) {
-										 days=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), platformDueDate)));//逾期天数
+										onlineDueDays=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), platformDueDate)));
 									}else {
-										 days=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), projPList.getDueDate())));//逾期天数
+										onlineDueDays=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), projPList.getDueDate())));
 									}
-							        if(days.compareTo(BigDecimal.valueOf(0))==0) {// 没有逾期
-							    		
-							        	continue;
-							        }
-									projPList.setOverdueDays(days);
-								     
-									BigDecimal underLateFee=getUnderLateFee(projPList,projList, projPlan,days);//线下逾期费
+									underlineDueDays=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), projPList.getDueDate())));
+									
+									projPList.setOverdueDays(underlineDueDays);
+									BigDecimal underLateFee=getUnderLateFee(projPList,projList, projPlan,underlineDueDays);//线下逾期费
 									underLateFeeSum=underLateFeeSum.add(underLateFee);
 									updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid(), underLateFee);
 									
-									BigDecimal onlineLateFee=getOnLineLateFee(projPList, projPlan,days);//线上逾期费
-									onlineLateFeeSum=onlineLateFeeSum.add(onlineLateFee);
-									updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), onlineLateFee);
+									BigDecimal onlineLateFee=BigDecimal.valueOf(0);//线上逾期费
+									if(onlineDueDays.compareTo(BigDecimal.valueOf(0))>0) {//如果线上的逾期天数为0,则不用计算线上滞纳金
+										 onlineLateFee=getOnLineLateFee(projPList, projPlan,onlineDueDays);//线上逾期费
+										onlineLateFeeSum=onlineLateFeeSum.add(onlineLateFee);
+										updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), onlineLateFee);
+									}
+							
 									projPList.setOverdueAmount(underLateFee.add(onlineLateFee));
 									projPList.setCurrentStatus(RepayCurrentStatusEnums.逾期.name());
 									updateById(projPList);
