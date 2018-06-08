@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 
 import java.io.Serializable;
@@ -56,6 +57,7 @@ public class MoneyPool extends Model<MoneyPool> {
      */
 	@TableField("trade_date")
 	@ApiModelProperty(required= true,value = "转入时间")
+	@JsonFormat(pattern="yyyy-MM-dd")
 	private Date tradeDate;
     /**
      * 交易类型
@@ -162,6 +164,7 @@ public class MoneyPool extends Model<MoneyPool> {
      */
 	@TableField("update_time")
 	@ApiModelProperty(required= true,value = "更新时间")
+	@JsonFormat(pattern="yyyy-MM-dd")
 	private Date updateTime;
     /**
      * 更新用户

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.hongte.alms.finance.req;
+package com.hongte.alms.base.dto;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -20,8 +20,8 @@ public class MoneyPoolManagerReq {
 	 */
 	private String tradeDateStart;
 	private String tradeDateEnd;
-	private String udpateDateStart;
-	private String udpateDateEnd;
+	private String updateDateStart;
+	private String updateDateEnd;
 
 	/**
 	 * 交易类型
@@ -69,21 +69,6 @@ public class MoneyPoolManagerReq {
 		this.tradeDateEnd = tradeDateEnd;
 	}
 
-	public String getUdpateDateStart() {
-		return udpateDateStart;
-	}
-
-	public void setUdpateDateStart(String udpateDateStart) {
-		this.udpateDateStart = udpateDateStart;
-	}
-
-	public String getUdpateDateEnd() {
-		return udpateDateEnd;
-	}
-
-	public void setUdpateDateEnd(String udpateDateEnd) {
-		this.udpateDateEnd = udpateDateEnd;
-	}
 
 	public String getTradeType() {
 		return tradeType;
@@ -107,5 +92,33 @@ public class MoneyPoolManagerReq {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	/**
+	 * @return the updateDateStart
+	 */
+	public String getUpdateDateStart() {
+		return updateDateStart;
+	}
+
+	/**
+	 * @param updateDateStart the updateDateStart to set
+	 */
+	public void setUpdateDateStart(String updateDateStart) {
+		this.updateDateStart = updateDateStart;
+	}
+
+	/**
+	 * @return the updateDateEnd
+	 */
+	public String getUpdateDateEnd() {
+		return updateDateEnd;
+	}
+
+	/**
+	 * @param updateDateEnd the updateDateEnd to set
+	 */
+	public void setUpdateDateEnd(String updateDateEnd) {
+		this.updateDateEnd = updateDateEnd;
 	}
 }
