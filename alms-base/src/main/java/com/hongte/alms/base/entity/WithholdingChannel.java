@@ -8,7 +8,6 @@ import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
-import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
@@ -42,6 +41,25 @@ public class WithholdingChannel extends Model<WithholdingChannel> {
 	@TableField("platform_id")
 	@ApiModelProperty(required= true,value = "代扣平台ID，tb_withholding_platform表的外键")
 	private Integer platformId;
+	
+	
+	  /**
+     * 银行代扣平台子渠道
+     */
+	@TableField("sub_platform_id")
+	@ApiModelProperty(required= true,value = "银行代扣平台子渠道")
+	private String subPlatformId;
+	
+	
+	
+	 /**
+     * 银行代码
+     */
+	@TableField("bank_code")
+	@ApiModelProperty(required= true,value = "银行代码")
+	private String bankCode;
+	
+	
     /**
      * 渠道状态，0：停用，1：启用
      */
@@ -155,6 +173,22 @@ public class WithholdingChannel extends Model<WithholdingChannel> {
 	@Override
 	protected Serializable pkVal() {
 		return this.channelId;
+	}
+
+	public String getSubPlatformId() {
+		return subPlatformId;
+	}
+
+	public void setSubPlatformId(String subPlatformId) {
+		this.subPlatformId = subPlatformId;
+	}
+
+	public String getBankCode() {
+		return bankCode;
+	}
+
+	public void setBankCode(String bankCode) {
+		this.bankCode = bankCode;
 	}
 
 	@Override

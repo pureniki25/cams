@@ -136,7 +136,7 @@ public class RepaymentProjPlanListServiceImpl extends
 									continue;
 									// 逾期的当前期
 								} else {
-									logger.info("逾期费用计算开始===============：planListid:"+pList.getPlanListId()+"===============");
+									logger.info("===============：planListid:"+pList.getPlanListId()+"逾期费用计算开始===============");
 									//获取平台对应标对应期的还款日期,取晚的日期
 									Date platformDueDate=getPlatformDuedate(projPlan.getProjectId(), projPList.getPeriod().toString());
 									BigDecimal days=BigDecimal.valueOf(0);
@@ -169,7 +169,7 @@ public class RepaymentProjPlanListServiceImpl extends
 								pList.setOverdueAmount(underLateFeeSum.add(onlineLateFeeSum));
 								pList.setCurrentStatus(RepayCurrentStatusEnums.逾期.name());
 								repaymentBizPlanListService.updateById(pList);
-								logger.info("逾期费用计算结束===============：planListid:"+pList.getPlanListId()+"===============");
+								logger.info("===============：planListid:"+pList.getPlanListId()+"逾期费用计算结束===============");
 							}
 							
 							
@@ -358,8 +358,15 @@ public class RepaymentProjPlanListServiceImpl extends
 	    private BigDecimal principalAndInterest(String projId,Integer period){
 	    	Map<String, Object> paramMap = new HashMap<>();
 			paramMap.put("projectId", projId);
-		 
-			Result result = eipRemote.advanceShareProfit(paramMap);
+			Result result=null;
+		 try {
+			 result = eipRemote.advanceShareProfit(paramMap);
+			if(result==null) {
+				logger.debug("调查询平台垫付记录接口出错");
+			}
+		 }catch(Exception e) {
+				logger.debug("调查询平台垫付记录接口出错"+e);
+		 }
 			HashMap<String,HashMap<String,String>> map=(HashMap) result.getData();
 			List<HashMap<String,String>> list=(List<HashMap<String, String>>) map.get("returnAdvanceShareProfits");
 			String principalAndInterest="";
@@ -494,6 +501,7 @@ public class RepaymentProjPlanListServiceImpl extends
 		 * @return
 		 */
 		private Date getPlatformDuedate(String projId,String periods) {
+			logger.info("====================标ID:"+projId+"获取平台标的期数为："+periods+"的还款日日期开始=======================================");
 		 	Map<String, Object> paramMap = new HashMap<>();
 			paramMap.put("projectId",projId);
 			paramMap.put("type", "1");
@@ -519,7 +527,7 @@ public class RepaymentProjPlanListServiceImpl extends
 					return null;
 				}
 			}catch(Exception e) {
-				logger.debug("标ID:"+projId+"获取平台标的期数为："+periods+"的还款日日期失败");
+				logger.info("标ID:"+projId+"获取平台标的期数为："+periods+"的还款日日期失败");
 			}finally {
 		
 		     return null;
