@@ -145,7 +145,10 @@ public class RepaymentProjPlanListServiceImpl extends
 									}else {
 										 days=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), projPList.getDueDate())));//逾期天数
 									}
-							
+							        if(days.compareTo(BigDecimal.valueOf(0))==0) {// 没有逾期
+							    		
+							        	continue;
+							        }
 									projPList.setOverdueDays(days);
 								     
 									BigDecimal underLateFee=getUnderLateFee(projPList,projList, projPlan,days);//线下逾期费
@@ -367,7 +370,7 @@ public class RepaymentProjPlanListServiceImpl extends
 		 }catch(Exception e) {
 				logger.debug("调查询平台垫付记录接口出错"+e);
 		 }
-		 if(result!=null&&result.equals("0000")) {
+		 if(result!=null&&result.getReturnCode().equals("0000")) {
 			 HashMap<String,HashMap<String,String>> map=(HashMap) result.getData();
 				List<HashMap<String,String>> list=(List<HashMap<String, String>>) map.get("returnAdvanceShareProfits");
 				String principalAndInterest="";
