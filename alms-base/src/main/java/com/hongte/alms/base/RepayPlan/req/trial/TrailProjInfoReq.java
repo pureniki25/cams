@@ -1,11 +1,13 @@
 package com.hongte.alms.base.RepayPlan.req.trial;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hongte.alms.base.RepayPlan.req.PrincipleReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.*;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -48,6 +50,15 @@ public class TrailProjInfoReq {
     @ApiModelProperty(required= true,value = "满标金额(元)")
     @NotNull(message = "满标金额(fullBorrowMoney)不能为空")
     private BigDecimal fullBorrowMoney;
+
+    /**
+     * 满标时间
+     */
+    @ApiModelProperty(required= true,value = "满标时间")
+    @NotNull(message="ProjInfoReq 满标时间(queryFullsuccessDate)不能为空")
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date queryFullsuccessDate;
+
 
     /**
      * 借款期限
@@ -141,6 +152,14 @@ public class TrailProjInfoReq {
 
     public void setPeriodMonth(Integer periodMonth) {
         this.periodMonth = periodMonth;
+    }
+
+    public Date getQueryFullsuccessDate() {
+        return queryFullsuccessDate;
+    }
+
+    public void setQueryFullsuccessDate(Date queryFullsuccessDate) {
+        this.queryFullsuccessDate = queryFullsuccessDate;
     }
 
 //    public Integer getProjectType() {
