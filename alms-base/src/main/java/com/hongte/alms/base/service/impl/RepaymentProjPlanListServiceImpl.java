@@ -367,23 +367,28 @@ public class RepaymentProjPlanListServiceImpl extends
 		 }catch(Exception e) {
 				logger.debug("调查询平台垫付记录接口出错"+e);
 		 }
-			HashMap<String,HashMap<String,String>> map=(HashMap) result.getData();
-			List<HashMap<String,String>> list=(List<HashMap<String, String>>) map.get("returnAdvanceShareProfits");
-			String principalAndInterest="";
-			if(list.size()!=0){
-				for(int i=0;i<list.size();i++) {
-					String periods=String.valueOf(list.get(i).get("period"));
-					if(period.equals(periods))
-					{
-						principalAndInterest= String.valueOf(list.get(i).get("principalAndInterest"));
+		 if(result!=null&&result.equals("0000")) {
+			 HashMap<String,HashMap<String,String>> map=(HashMap) result.getData();
+				List<HashMap<String,String>> list=(List<HashMap<String, String>>) map.get("returnAdvanceShareProfits");
+				String principalAndInterest="";
+				if(list.size()!=0){
+					for(int i=0;i<list.size();i++) {
+						String periods=String.valueOf(list.get(i).get("period"));
+						if(period.equals(periods))
+						{
+							principalAndInterest= String.valueOf(list.get(i).get("principalAndInterest"));
+						}
 					}
 				}
-			}
-			if(StringUtil.isEmpty(principalAndInterest)) {
-				return BigDecimal.valueOf(0);
-			}else {
-				return BigDecimal.valueOf(Double.valueOf(principalAndInterest));
-			}
+				if(StringUtil.isEmpty(principalAndInterest)) {
+					return BigDecimal.valueOf(0);
+				}else {
+					return BigDecimal.valueOf(Double.valueOf(principalAndInterest));
+				}
+		 }else {
+			 return BigDecimal.valueOf(0);
+		 }
+			
 	    }
 	    
 	    /**
@@ -510,7 +515,7 @@ public class RepaymentProjPlanListServiceImpl extends
 			try {
 				  result = eipRemote.queryProjectRepayment(paramMap);
 			}catch(Exception e) {
-				logger.info("标ID:"+projId+"，期数为:"+periods+"的还款日日期获取失败"+e);
+				logger.info("还款日期获取失败"+e);
 			}
 			if(result!=null) {
 				if(result.getReturnCode().equals("0000")) {
@@ -521,6 +526,7 @@ public class RepaymentProjPlanListServiceImpl extends
 						if(period.equals(periods))
 						{
 							dueDate= list.get(i).get("CycDate").toString();
+							logger.info("平台还款日期为:"+dueDate);
 						}
 					}
 					if(!StringUtil.isEmpty(dueDate)) {
