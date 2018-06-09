@@ -8,8 +8,6 @@ import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -19,7 +17,7 @@ import io.swagger.annotations.ApiModelProperty;
  * </p>
  *
  * @author 胡伟骞
- * @since 2018-06-07
+ * @since 2018-06-08
  */
 @ApiModel
 @TableName("tb_tdrepay_recharge_log")
@@ -58,15 +56,8 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 	@ApiModelProperty(required= true,value = "业务类型(1:车易贷展期,2:房速贷展期,3:金融仓储,4:三农金融,9:车易贷,11:房速贷,12车全垫资代采,13:扶贫贷,14:汽车融资租赁,15:二手车商贷,20:一点车贷,25:信用贷)")
 	private Integer businessType;
     /**
-     * 还款方式(1:到期还本息,2:每月付息到期还本,5:等额本息,9:分期还本付息)
-     */
-	@TableField("repayment_type")
-	@ApiModelProperty(required= true,value = "还款方式(1:到期还本息,2:每月付息到期还本,5:等额本息,9:分期还本付息)")
-	private Integer repaymentType;
-    /**
      * 实还日期
      */
-	@JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
 	@TableField("fact_repay_date")
 	@ApiModelProperty(required= true,value = "实还日期")
 	private Date factRepayDate;
@@ -97,7 +88,6 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
     /**
      * 财务确认时间或成功代扣时间
      */
-	@JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
 	@TableField("confirm_time")
 	@ApiModelProperty(required= true,value = "财务确认时间或成功代扣时间")
 	private Date confirmTime;
@@ -272,14 +262,6 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 
 	public void setBusinessType(Integer businessType) {
 		this.businessType = businessType;
-	}
-
-	public Integer getRepaymentType() {
-		return repaymentType;
-	}
-
-	public void setRepaymentType(Integer repaymentType) {
-		this.repaymentType = repaymentType;
 	}
 
 	public Date getFactRepayDate() {
@@ -519,7 +501,6 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 			", assetType=" + assetType +
 			", origBusinessId=" + origBusinessId +
 			", businessType=" + businessType +
-			", repaymentType=" + repaymentType +
 			", factRepayDate=" + factRepayDate +
 			", customerName=" + customerName +
 			", companyName=" + companyName +

@@ -2,14 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.hongte.alms.base.mapper.TdrepayRechargeLogMapper">
 
-    <!-- 通用查询映射结果 -->
+	<!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.TdrepayRechargeLog">
         <id column="log_id" property="logId" />
         <result column="project_id" property="projectId" />
         <result column="asset_type" property="assetType" />
         <result column="orig_business_id" property="origBusinessId" />
         <result column="business_type" property="businessType" />
-        <result column="repayment_type" property="repaymentType" />
         <result column="fact_repay_date" property="factRepayDate" />
         <result column="customer_name" property="customerName" />
         <result column="company_name" property="companyName" />
@@ -42,24 +41,56 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        log_id AS logId, project_id AS projectId, asset_type AS assetType, orig_business_id AS origBusinessId, business_type AS businessType, repayment_type AS repaymentType, fact_repay_date AS factRepayDate, customer_name AS customerName, company_name AS companyName, repay_source AS repaySource, after_id AS afterId, confirm_time AS confirmTime, td_user_id AS tdUserId, total_amount AS totalAmount, batch_id AS batchId, period, user_id AS userId, recharge_amount AS rechargeAmount, settle_type AS settleType, fact_repay_amount AS factRepayAmount, resource_amount AS resourceAmount, advance_type AS advanceType, is_complete AS isComplete, proj_plan_list_id AS projPlanListId, request_no AS requestNo, user_ip AS userIp, oid_partner AS oidPartner, plat_status AS platStatus, platform_repay_status AS platformRepayStatus, process_status AS processStatus, create_user AS createUser, create_time AS createTime, update_user AS updateUser, update_time AS updateTime
+        log_id AS logId, project_id AS projectId, asset_type AS assetType, orig_business_id AS origBusinessId, business_type AS businessType, fact_repay_date AS factRepayDate, customer_name AS customerName, company_name AS companyName, repay_source AS repaySource, after_id AS afterId, confirm_time AS confirmTime, td_user_id AS tdUserId, total_amount AS totalAmount, batch_id AS batchId, period, user_id AS userId, recharge_amount AS rechargeAmount, settle_type AS settleType, fact_repay_amount AS factRepayAmount, resource_amount AS resourceAmount, advance_type AS advanceType, is_complete AS isComplete, proj_plan_list_id AS projPlanListId, request_no AS requestNo, user_ip AS userIp, oid_partner AS oidPartner, plat_status AS platStatus, platform_repay_status AS platformRepayStatus, process_status AS processStatus, create_user AS createUser, create_time AS createTime, update_user AS updateUser, update_time AS updateTime
+    </sql>    
+    
+    <sql id="ComplianceRepaymentDataCondition">
+    	1 = 1 
+		<if test="confirmTimeStart != null">
+		    AND t.`confirm_time` <![CDATA[ >= ]]> #{confirmTimeStart,jdbcType=DATE}
+		</if>
+		<if test="confirmTimeEnd != null">
+			AND t.`confirm_time` <![CDATA[ < ]]> #{confirmTimeEnd,jdbcType=DATE}
+		</if>
+		<if test="processStatus != null">
+		    AND t.`process_status` =  #{processStatus,jdbcType=VARCHAR}
+		</if>
+		<if test="repaySource != null">
+			AND t.`repay_source` =  #{repaySource,jdbcType=INTEGER}
+		</if>
+		<if test="settleType != null">
+		    AND t.`settle_type` =  #{settleType,jdbcType=INTEGER}
+		</if>
+		<if test="origBusinessId != null and origBusinessId != ''">
+			AND t.`orig_business_id` =  #{origBusinessId,jdbcType=DATE}
+		</if>
+		<if test="businessType != null">
+			AND t.`business_type` =  #{businessType,jdbcType=INTEGER}
+		</if>
+		<if test="platStatus != null">
+		    AND t.`plat_status` =  #{platStatus,jdbcType=INTEGER}
+		</if>
+		<if test="companyName != null and companyName != ''">
+			AND t.`company_name` =  #{companyName,jdbcType=DATE}
+		</if>
     </sql>
     
     <select id="queryComplianceRepaymentData" resultType="com.hongte.alms.base.entity.TdrepayRechargeLog">
 		SELECT <include refid="Base_Column_List"/>
 		FROM
 		  `tb_tdrepay_recharge_log` t 
-		<where>
-			 1 = 1 
-			<if test="confirmTimeStart != null">
-			    AND t.`confirm_time` <![CDATA[ >= ]]> #{confirmTimeStart,jdbcType=DATE}
-			</if>
-			<if test="confirmTimeEnd != null">
-				AND t.`confirm_time` <![CDATA[ < ]]> #{confirmTimeEnd,jdbcType=DATE}
-			</if>
-		</where>
+		WHERE
+			<include refid="ComplianceRepaymentDataCondition"/>
 		ORDER BY t.`confirm_time`
 		LIMIT ${(page-1) * limit}, ${limit}
+	</select>
+	
+    <select id="countComplianceRepaymentData" resultType="int">
+		SELECT count(1)
+		FROM
+		  `tb_tdrepay_recharge_log` t 
+		WHERE
+			 <include refid="ComplianceRepaymentDataCondition"/>
 	</select>
 
 </mapper>

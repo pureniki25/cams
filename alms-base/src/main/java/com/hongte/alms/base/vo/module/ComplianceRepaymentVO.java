@@ -23,15 +23,15 @@ public class ComplianceRepaymentVO extends PageRequest implements Serializable {
 	/**
 	 * 分发状态
 	 */
-	private String processStatus;
+	private Integer processStatus;
 	/**
 	 * 还款方式
 	 */
-	private String repaymentType;
+	private Integer repaySource;
 	/**
 	 * 期数类型
 	 */
-	private String settleType;
+	private Integer settleType;
 	/**
 	 * 编码
 	 */
@@ -39,11 +39,11 @@ public class ComplianceRepaymentVO extends PageRequest implements Serializable {
 	/**
 	 * 业务类型
 	 */
-	private String businessType;
+	private Integer businessType;
 	/**
 	 * 平台状态
 	 */
-	private String platStatus;
+	private Integer platStatus;
 	/**
 	 * 分公司
 	 */
@@ -65,27 +65,27 @@ public class ComplianceRepaymentVO extends PageRequest implements Serializable {
 		this.confirmTimeEnd = confirmTimeEnd;
 	}
 
-	public String getProcessStatus() {
+	public Integer getProcessStatus() {
 		return processStatus;
 	}
 
-	public void setProcessStatus(String processStatus) {
+	public void setProcessStatus(Integer processStatus) {
 		this.processStatus = processStatus;
 	}
 
-	public String getRepaymentType() {
-		return repaymentType;
+	public Integer getRepaySource() {
+		return repaySource;
 	}
 
-	public void setRepaymentType(String repaymentType) {
-		this.repaymentType = repaymentType;
+	public void setRepaySource(Integer repaySource) {
+		this.repaySource = repaySource;
 	}
 
-	public String getSettleType() {
+	public Integer getSettleType() {
 		return settleType;
 	}
 
-	public void setSettleType(String settleType) {
+	public void setSettleType(Integer settleType) {
 		this.settleType = settleType;
 	}
 
@@ -97,19 +97,19 @@ public class ComplianceRepaymentVO extends PageRequest implements Serializable {
 		this.origBusinessId = origBusinessId;
 	}
 
-	public String getBusinessType() {
+	public Integer getBusinessType() {
 		return businessType;
 	}
 
-	public void setBusinessType(String businessType) {
+	public void setBusinessType(Integer businessType) {
 		this.businessType = businessType;
 	}
 
-	public String getPlatStatus() {
+	public Integer getPlatStatus() {
 		return platStatus;
 	}
 
-	public void setPlatStatus(String platStatus) {
+	public void setPlatStatus(Integer platStatus) {
 		this.platStatus = platStatus;
 	}
 
@@ -124,7 +124,7 @@ public class ComplianceRepaymentVO extends PageRequest implements Serializable {
 	@Override
 	public String toString() {
 		return "ComplianceRepaymentVO [confirmTimeStart=" + confirmTimeStart + ", confirmTimeEnd=" + confirmTimeEnd
-				+ ", processStatus=" + processStatus + ", repaymentType=" + repaymentType + ", settleType=" + settleType
+				+ ", processStatus=" + processStatus + ", repaySource=" + repaySource + ", settleType=" + settleType
 				+ ", origBusinessId=" + origBusinessId + ", businessType=" + businessType + ", platStatus=" + platStatus
 				+ ", companyName=" + companyName + "]";
 	}

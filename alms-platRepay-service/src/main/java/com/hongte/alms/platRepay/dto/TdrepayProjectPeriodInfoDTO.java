@@ -2,6 +2,11 @@ package com.hongte.alms.platRepay.dto;
 
 import java.io.Serializable;
 
+/**
+ * 标的还款信息查询接口返回参数
+ * @author 胡伟骞
+ *
+ */
 public class TdrepayProjectPeriodInfoDTO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
