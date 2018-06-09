@@ -963,7 +963,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		}
 		
 		int compare = factAmount.compareTo(planAmount.subtract(derateAmount));
-		if (compare==0) {
+		if (compare>=0) {
 			planList.setCurrentStatus(RepayPlanStatus.REPAYED.getName());
 			planList.setCurrentSubStatus(RepayPlanStatus.REPAYED.getName());
 			planList.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
