@@ -748,6 +748,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			fact.setPeriod(detail.getPeriod());
 			fact.setPlanItemName(detail.getPlanItemName());
 			fact.setPlanItemType(detail.getPlanItemType());
+			fact.setFeeId(detail.getFeeId());
 			fact.setPlanListId(detail.getPlanListId());
 			fact.setProjPlanDetailId(detail.getProjPlanDetailId());
 			fact.setProjPlanListId(detail.getProjPlanListId());
@@ -898,9 +899,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 				//某项还完
 				switch (planListDetail.getPlanItemType()) {
 				case 10:
-					item10Repaid = true;
+					item10Repaid = true;break;
 				case 20:
-					item20Repaid = true;
+					item20Repaid = true;break;
 				case 30:
 					item30Repaid = true;
 					break;
