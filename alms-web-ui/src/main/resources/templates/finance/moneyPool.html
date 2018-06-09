@@ -43,11 +43,15 @@
 
                 <i-button @click="search" >查询</i-button>
             </i-form>
-            <ButtonGroup>
+            <!-- <ButtonGroup> -->
                 <i-button @click="deleteMoneyPool">删除流水</i-button>
-                <i-button>导入流水</i-button>
-                <i-button>模板下载</i-button>
-            </ButtonGroup >
+                <Upload :action="upload.url" style="float: right;">
+                    <i-button icon="ios-cloud-upload-outline" >导入流水</i-button>
+                    <!-- <Button type="ghost" icon="ios-cloud-upload-outline">Upload files</Button> -->
+                </Upload>
+                <!-- <i-button>导入流水</i-button> -->
+                <i-button @click="window.open('/finance/downloadTemplate')" style="float: right;">模板下载</i-button>
+            <!-- </ButtonGroup > -->
         </card>
         <i-table :columns="table.col" :data="table.data" :loading="table.loading" @on-selection-change="selection=$event" stripe></i-table>
         <p style="text-align: center">

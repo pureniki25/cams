@@ -84,7 +84,10 @@ window.layinit(function (htConfig) {
                 total:0,
             },
             selection:[],
-            bankList:[]
+            bankList:[],
+            upload:{
+                url:fpath+'/finance/importExcel'
+            }
         },
         watch: {},
         methods: {

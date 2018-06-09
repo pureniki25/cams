@@ -3,6 +3,8 @@
  */
 package com.hongte.alms.finance.controller;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +13,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.io.FileUtils;
+import org.jeecgframework.poi.excel.ExcelImportUtil;
+import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -41,6 +49,7 @@ import com.hongte.alms.base.entity.BasicRepaymentType;
 import com.hongte.alms.base.entity.BizOutputRecord;
 import com.hongte.alms.base.entity.DepartmentBank;
 import com.hongte.alms.base.entity.MoneyPool;
+import com.hongte.alms.base.entity.MoneyPoolExcelEntity;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.enums.AreaLevel;
@@ -74,6 +83,7 @@ import com.hongte.alms.finance.req.MoneyPoolReq;
 import com.hongte.alms.finance.service.FinanceService;
 import com.hongte.alms.finance.service.ShareProfitService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
+import com.ht.ussp.util.ExcelUtils;
 
 import feign.Feign;
 import io.swagger.annotations.ApiOperation;
@@ -796,6 +806,14 @@ public class FinanceController {
 		result = Result.success(res);
 		logger.info("@listDepartmentBank@查看所有银行账号--结束[{}]", result);
 		return result;
+	}
+	
+	@RequestMapping("/importExcel")
+	public Result importExcel(@RequestParam("file") MultipartFile file,
+            HttpServletRequest request) throws IOException, Exception {
+		System.out.println(file);
+		List<MoneyPoolExcelEntity> list =  ExcelImportUtil.importExcel(file.getInputStream(), MoneyPoolExcelEntity.class, new ImportParams());
+		return null ;
 	}
 	
 }
