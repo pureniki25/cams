@@ -103,7 +103,7 @@ public interface RechargeService {
      /**
 	  * 分润接口
 	  */
-	 Result shareProfit(RepaymentBizPlanList list);
+	 Result shareProfit(RepaymentBizPlanList list,WithholdingRepaymentLog log);
 	 
 		/**
 		 * 获得第三方代扣银行卡信息

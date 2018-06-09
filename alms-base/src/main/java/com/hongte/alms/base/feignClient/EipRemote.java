@@ -152,6 +152,12 @@ public interface EipRemote {
 	   Result queryOrder(@RequestBody Map<String, Object> paramMap);
 	   
 	   
-	 
-	
+	   /**
+	    * 易宝绑卡列表查询
+	    */
+	   
+	   @RequestMapping(value = "/eip/yepay/authBind",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+	   Result authBind(@RequestBody Map<String, Object> paramMap);
+	   
+	   
 }
