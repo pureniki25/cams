@@ -186,7 +186,7 @@ public class TdrepayRechargeController {
 			return Result.success();
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			return Result.error("-99", "系统异常");
+			return Result.error("-99", "系统异常, 资金分发失败");
 		}
 	}
 }
