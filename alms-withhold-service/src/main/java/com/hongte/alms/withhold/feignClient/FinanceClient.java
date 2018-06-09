@@ -11,5 +11,5 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface FinanceClient {
 
     @RequestMapping(value = "/finance/shareProfit",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
-    public Result shareProfit(@RequestParam("businessId") String businessId, @RequestParam("afterId") String afterId);
+    public Result shareProfit(@RequestParam("businessId") String businessId, @RequestParam("afterId") String afterId,@RequestParam("logId") Integer logId);
 }

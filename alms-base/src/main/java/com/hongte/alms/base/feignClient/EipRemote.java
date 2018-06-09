@@ -157,8 +157,48 @@ public interface EipRemote {
 	 * 易宝支付结果查询
 	 */
 	
-	@RequestMapping(value = "/eip/assetside/userDistributeFund", headers = { "app=ALMS",
-	"content-type=application/json" }, method = RequestMethod.POST)
-	Result userDistributeFund(@RequestBody DistributeFundDTO dto);
-
+	
+	   /**
+	    * 易宝代扣
+	    */
+	   
+	   @RequestMapping(value = "/eip/yepay/tzt/directBindPay",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+	   Result directBindPay(@RequestBody YiBaoRechargeReqDto dto);
+	   
+	   /**
+	    * 易宝绑卡
+	    */
+	   
+	   @RequestMapping(value = "/eip/yepay/tzt/invokeBindBankCard",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+	   Result invokeBindBankCard(@RequestBody Map<String, Object> paramMap);
+	   
+	   
+	   
+	   /**
+	    * 易宝确定绑卡	
+	    */
+	   
+	   @RequestMapping(value = "/eip/yepay/tzt/confirmBindBankCard",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+	   Result confirmBindBankCard(@RequestBody Map<String, Object> paramMap);
+	   
+	   
+	   /**
+	    * 易宝支付结果查询
+	    */
+	   
+	   @RequestMapping(value = "/eip/yepay/query/order",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+	   Result queryOrder(@RequestBody Map<String, Object> paramMap);
+	   
+	   
+	   /**
+	    * 易宝绑卡列表查询
+	    */
+	   
+	   @RequestMapping(value = "/eip/yepay/authBind",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+	   Result authBind(@RequestBody Map<String, Object> paramMap);
+	   
+	   @RequestMapping(value = "/eip/assetside/userDistributeFund", headers = { "app=ALMS",
+	   "content-type=application/json" }, method = RequestMethod.POST)
+	   Result userDistributeFund(@RequestBody DistributeFundDTO dto);
+	   
 }
