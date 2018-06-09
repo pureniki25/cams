@@ -36,7 +36,7 @@ public interface RechargeService {
     Result recharge(BasicBusiness business, RepaymentBizPlanList pList,Double amount,Integer boolLastRepay,Integer boolPartRepay,BankCardInfo bankCardInfo,WithholdingChannel channel);
     
     
-    
+
     /**
      * 
      * 判断每期还款计划是否为最后一期

@@ -98,7 +98,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 
 		if (bankCardInfo != null) {
 			// 银行代扣
-			BankCharge(basic, bankCardInfo, pList, bankCardInfos,null);
+			BankCharge(basic, bankCardInfo, pList, bankCardInfos);
 
 		} else if (ThirtyCardInfo != null && bankCardInfo == null) {// 第三方代扣
 			ThirdRepaymentCharge(basic, ThirtyCardInfo, pList, null);
@@ -111,8 +111,8 @@ public class WithholdingServiceimpl implements WithholdingService {
 	/**
 	 * 银行代扣
 	 */
-	private String BankCharge(BasicBusiness basic, BankCardInfo bankCardInfo, RepaymentBizPlanList pList,
-			List<BankCardInfo> bankCardInfos,BigDecimal handRepayMoney) {
+	private void BankCharge(BasicBusiness basic, BankCardInfo bankCardInfo, RepaymentBizPlanList pList,
+			List<BankCardInfo> bankCardInfos) {
 		BigDecimal onlineAmount = rechargeService.getOnlineAmount(pList);
 		BigDecimal underAmount = rechargeService.getUnderlineAmount(pList);
 		Integer platformId = (Integer) PlatformEnum.YH_FORM.getValue();
@@ -133,12 +133,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		} else {
 			// 本期线上剩余应还金额,剩余应还金额减去线下金额
 			BigDecimal repayMoney = rechargeService.getRestAmount(pList).subtract(underAmount);
-			if(handRepayMoney!=null) {//说明是手工代扣
-				if(handRepayMoney.compareTo(repayMoney)<0) {
-					repayMoney=handRepayMoney;
-				}
-			}
-
+	
 			// 应还金额大于0
 			if (repayMoney.compareTo(BigDecimal.valueOf(0)) > 0) {
 				// 当第一次扣款额度没有超过银行每次的扣款额度时候，尝试一次性扣款
@@ -156,11 +151,10 @@ public class WithholdingServiceimpl implements WithholdingService {
 						// rechargeService.recordRepaymentLog(result, pList, basic,
 						// bankCardInfo,platformId, 1, boolPartRepay, merchOrderId, 0,
 						// repayMoney);
-						return "";
 					} else {
 						// 如果是余额不足，则跳出循环
 						if (IsNoEnoughMoney(result.getMsg())) {
-							return "";
+							return;
 						} else {
 							// 使用第三方代扣
 							// rechargeService.recordRepaymentLog(result, pList, basic, bankCardInfo,
@@ -202,9 +196,8 @@ public class WithholdingServiceimpl implements WithholdingService {
 						} else {
 							// 如果是余额不足，则跳出最外层循环
 							if (IsNoEnoughMoney(result.getMsg())) {
-								// TODO,可能还要作这样的操作：扣除线下费用再尝试代扣一次
 
-								break;
+								return;
 							} else {
 								// 第一次银行代扣就失败就调用第三方平台的
 								if (i == 0) {
@@ -230,14 +223,14 @@ public class WithholdingServiceimpl implements WithholdingService {
 		if (isUseThirdRepay) {
 			Integer successCount = rechargeService.getBankRepaySuccessCount(pList);
 			if (successCount > 0) {// 如果当前期在银行代扣成功过,就不能用第三方代扣,直接条出
-				return "";
+				return;
 			}
 
 			if (thirtyCardInfo != null) {// 绑定了第三方平台
 				ThirdRepaymentCharge(basic, thirtyCardInfo, pList, null);
 
 			} else { // 没有绑定第三方平台直接跳出
-				return "";
+				return;
 			}
 
 			// 银行代扣成功，线下逾期费用调用第三方代扣
@@ -247,17 +240,18 @@ public class WithholdingServiceimpl implements WithholdingService {
 				if (underAmount.compareTo(BigDecimal.valueOf(0)) > 0) {
 					ThirdRepaymentCharge(basic, thirtyCardInfo, pList, underAmount);
 				} else { // 没有线下逾期费用直接跳出
-					return "";
+					return;
 				}
 			} else { // 没有绑定第三方平台直接跳出
-				return "";
+				return;
 			}
 		}
 
 	}
 
 	/**
-	 * 第三方代扣 underAmount不为null的话，说明只扣线下费用
+	 * 第三方代扣 underAmount不为空的话，说明只扣线下费用
+	 * 如果handRepayAmount不为空的话，说明是手工代扣
 	 */
 	private void ThirdRepaymentCharge(BasicBusiness basic, BankCardInfo thirtyCardInfo, RepaymentBizPlanList pList,
 			BigDecimal underAmount) {
@@ -292,6 +286,8 @@ public class WithholdingServiceimpl implements WithholdingService {
 				if (underAmount != null && underAmount.compareTo(BigDecimal.valueOf(0)) > 0) {
 					repayMoney = underAmount;
 				}
+				
+			
 				// 如果应还金额大于0
 				if (repayMoney.compareTo(BigDecimal.valueOf(0)) > 0) {
 
@@ -379,6 +375,212 @@ public class WithholdingServiceimpl implements WithholdingService {
 			}
 		}
 		return isNoEnoughMoney;
+	}
+
+	@Override
+	public void handBankRecharge(BasicBusiness basic, BankCardInfo bankCardInfo, RepaymentBizPlanList pList,
+			List<BankCardInfo> bankCardInfos, BigDecimal handRepayMoney) {
+		BigDecimal onlineAmount = rechargeService.getOnlineAmount(pList);
+		BigDecimal underAmount = rechargeService.getUnderlineAmount(pList);
+		Integer platformId = (Integer) PlatformEnum.YH_FORM.getValue();
+		boolean isUseThirdRepay = false;// 是否调用第三方代扣
+		// 获取所有银行代扣渠道,先扣线上费用
+		List<WithholdingChannel> channels = withholdingChannelService
+				.selectList(new EntityWrapper<WithholdingChannel>().eq("platform_id", PlatformEnum.YH_FORM.getValue())
+						.eq("channel_status", 1).eq("bank_code", bankCardInfo.getBankCode()).orderBy("level"));
+		WithholdingChannel channel = null;
+		if (channels != null && channels.size() > 0) {
+			channel = channels.get(0);
+		}
+        
+		SysBankLimit sysBankLimit = sysBankLimitService.selectOne(
+				new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("status", 1));
+		if (sysBankLimit == null) {
+			logger.debug("第三方代扣限额信息platformId:" + channel.getPlatformId() + "无效/不存在");
+		} else {
+			// 本期线上剩余应还金额,剩余应还金额减去线下金额
+			BigDecimal repayMoney = rechargeService.getRestAmount(pList).subtract(underAmount);
+			if(handRepayMoney.compareTo(repayMoney)<0) {//如果手工代扣的金额大于剩余未还得金额，则取剩余未还得金额，否则取手工代扣的金额
+				repayMoney=handRepayMoney;
+			}
+	
+			// 应还金额大于0
+			if (repayMoney.compareTo(BigDecimal.valueOf(0)) > 0) {
+				// 当第一次扣款额度没有超过银行每次的扣款额度时候，尝试一次性扣款
+				if (sysBankLimit.getHasOnceLimit() == 0 || sysBankLimit.getOnceLimit().compareTo(repayMoney) >= 0) {
+					Integer boolPartRepay = 0;// 表示本期是否分多笔代扣,0:一次性代扣，1:分多笔代扣
+					Integer boolLastRepay = 1;// 表示本期是否分多笔代扣中的最后一笔代扣 0:非最后一笔代扣，1:最后一笔代扣
+					// 计算本来这一期线上费用是否需要多期扣款
+					if (onlineAmount.subtract(sysBankLimit.getOnceLimit()).compareTo(BigDecimal.valueOf(0)) > 0) {
+						boolPartRepay = 1;
+					}
+					Result result = rechargeService.recharge(basic, pList, repayMoney.doubleValue(), boolLastRepay,
+							boolPartRepay, bankCardInfo, channel);
+					if (result.getCode().equals("1")) {
+						// 成功跳出
+						// rechargeService.recordRepaymentLog(result, pList, basic,
+						// bankCardInfo,platformId, 1, boolPartRepay, merchOrderId, 0,
+						// repayMoney);
+					} else {
+						// 如果是余额不足，则跳出
+						if (IsNoEnoughMoney(result.getMsg())) {
+						}
+					}
+
+					// 分多笔代扣
+				} else {
+					// 获取代扣每次最高额
+					BigDecimal eachMax = sysBankLimit.getOnceLimit();
+					// 代扣次数
+					Integer repayCount = repayMoney.divide(eachMax, RoundingMode.CEILING).intValue();
+					// 余数
+					BigDecimal remainder = repayMoney.divideAndRemainder(eachMax)[1];
+					int last = repayCount - 1;
+					Integer boolPartRepay = 1;// 表示本期是否分多笔代扣,0:一次性代扣，1:分多笔代扣
+					Integer boolLastRepay = 0;// 表示本期是否分多笔代扣中的最后一笔代扣，若非多笔代扣，本字段存1。 0:非最后一笔代扣，1:最后一笔代扣
+					for (int i = 0; i < repayCount; i++) {
+						BigDecimal currentAmount = BigDecimal.valueOf(0);// 本次代扣金额
+						if (i == last && remainder.compareTo(BigDecimal.valueOf(0)) > 0) {
+							boolLastRepay = 1;
+							currentAmount = remainder;
+						} else {
+							currentAmount = eachMax;
+						}
+						Result result = rechargeService.recharge(basic, pList, currentAmount.doubleValue(),
+								boolLastRepay, boolPartRepay, bankCardInfo, channel);
+						if (result.getCode().equals("1")) {
+							if (i == last) {// 说明是最后一次代扣
+								break;
+							} else {
+
+								continue;
+							}
+
+						} else {
+								return;
+						}
+					}
+
+				}
+			}
+		}
+	}
+
+	@Override
+	public void handThirdRepaymentCharge(BasicBusiness basic, BankCardInfo thirtyCardInfo, RepaymentBizPlanList pList,
+			BigDecimal underAmount, BigDecimal handRepayAmount, Integer platformId) {
+		// 获取所有第三方代扣渠道
+				List<WithholdingChannel> channels = withholdingChannelService
+						.selectList(new EntityWrapper<WithholdingChannel>().ne("platform_id", PlatformEnum.YH_FORM.getValue())
+								.eq("channel_status", 1).eq("bank_code", thirtyCardInfo.getBankCode()).orderBy("level"));
+				List<ThirdPlatform> thirdPlatforms = thirtyCardInfo.getThirdPlatformList();
+
+				List<WithholdingChannel> newChanels = new ArrayList();
+				// 筛选出客户绑定的第三方平台列表在系统渠道表种生效的有哪几个
+				for (int i = 0; i < channels.size(); i++) {
+					for (int j = 0; j < thirdPlatforms.size(); j++) {
+						if (channels.get(i).getPlatformId() == thirdPlatforms.get(j).getPlatformID()) {
+							newChanels.add(channels.get(i));
+						}
+					}
+				}
+				outerloop: for (WithholdingChannel channel : newChanels) {
+					SysBankLimit sysBankLimit = sysBankLimitService.selectOne(
+							new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("status", 1));
+					if (sysBankLimit == null) {
+						logger.debug("第三方代扣限额信息platformId:" + channel.getPlatformId() + "无效/不存在");
+						continue;
+					} else {
+
+						// 本期剩余应还金额
+						BigDecimal repayMoney = pList.getTotalBorrowAmount().add(pList.getOverdueAmount())
+								.subtract(rechargeService.getRestAmount(pList));
+
+						if (underAmount != null && underAmount.compareTo(BigDecimal.valueOf(0)) > 0) {
+							repayMoney = underAmount;
+						}
+						
+						if(handRepayAmount.compareTo(repayMoney)<0) {//如果手工代扣金额小于剩余应还金额，取手工代扣的金额
+							repayMoney=handRepayAmount;
+						}
+						// 如果应还金额大于0
+						if (repayMoney.compareTo(BigDecimal.valueOf(0)) > 0) {
+
+							// 当第一次扣款额度没有超过银行每次的扣款额度时候，尝试一次性扣款
+							if (sysBankLimit.getHasOnceLimit() == 0 || sysBankLimit.getOnceLimit().compareTo(repayMoney) > 0) {
+								String merchOrderId = rechargeService.getMerchOrderId();// 获取商户订单号
+								Integer boolPartRepay = 0;// 表示本期是否分多笔代扣,0:一次性代扣，1:分多笔代扣
+								Integer boolLastRepay = 1;// 表示本期是否分多笔代扣中的最后一笔代扣，若非多笔代扣，本字段存1。 0:非最后一笔代扣，1:最后一笔代扣
+								if (pList.getTotalBorrowAmount().add(pList.getOverdueAmount())
+										.subtract(sysBankLimit.getOnceLimit()).compareTo(BigDecimal.valueOf(0)) > 0) {
+									boolPartRepay = 1;
+
+								}
+								Result result = rechargeService.recharge(basic, pList, repayMoney.doubleValue(), boolLastRepay,
+										boolPartRepay, thirtyCardInfo, channel);
+								if (result.getCode().equals("1")) {
+
+									break;
+								} else {
+									// 如果是余额不足，则跳出循环
+									if (IsNoEnoughMoney(result.getMsg())) {
+										break;
+									} else {
+
+										continue;
+									}
+								}
+
+								// 第三方代扣，非一次性扣款
+							} else {
+								// 获取代扣每次最高额
+								BigDecimal eachMax = sysBankLimit.getOnceLimit();
+								// 代扣次数
+								Integer repayCount = repayMoney.divide(eachMax, RoundingMode.CEILING).intValue();
+								// 余数
+								BigDecimal remainder = repayMoney.divideAndRemainder(eachMax)[1];
+								int last = repayCount - 1;
+								Integer boolPartRepay = 1;// 表示本期是否分多笔代扣,0:一次性代扣，1:分多笔代扣
+								Integer boolLastRepay = 0;// 表示本期是否分多笔代扣中的最后一笔代扣，若非多笔代扣，本字段存1。 0:非最后一笔代扣，1:最后一笔代扣
+								for (int i = 0; i < repayCount; i++) {
+									BigDecimal currentAmount = BigDecimal.valueOf(0);// 本次代扣金额
+									if (i == last && remainder.compareTo(BigDecimal.valueOf(0)) > 0) {
+										currentAmount = remainder;
+										boolLastRepay = 1;
+									} else {
+										currentAmount = eachMax;
+									}
+									String merchOrderId = rechargeService.getMerchOrderId();// 获取商户订单号
+									Result result = rechargeService.recharge(basic, pList, currentAmount.doubleValue(),
+											boolLastRepay, boolPartRepay, thirtyCardInfo, channel);
+									if (result.getCode().equals("1")) {
+										if (i == last) {// 说明是最后一次代扣
+
+											break outerloop;
+										} else {
+
+											continue;
+										}
+
+									} else {
+										// 如果是余额不足，则跳出最外层循环
+										if (IsNoEnoughMoney(result.getMsg())) {
+											// TODO,可能还要作这样的操作：扣除线下费用再尝试代扣一次
+
+											break outerloop;
+										} else {
+
+											break;
+										}
+									}
+								}
+
+							}
+						}
+
+					}
+				}
+		
 	}
 
 }
