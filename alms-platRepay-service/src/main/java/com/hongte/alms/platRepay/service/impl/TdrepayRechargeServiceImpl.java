@@ -1,5 +1,6 @@
 package com.hongte.alms.platRepay.service.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -66,7 +67,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 	@Autowired
 	private EipRemote eipRemote;
-	
+
 	@Value("${recharge.account.car.loan}")
 	private String carLoanUserId;
 	@Value("${recharge.account.house.loan}")
@@ -188,20 +189,27 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		return tdrepayRechargeLogMapper.countComplianceRepaymentData(vo);
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void tdrepayRecharge(List<TdrepayRechargeInfoVO> vos) {
 
 		if (CollectionUtils.isEmpty(vos)) {
 			return;
 		}
-		
+
+		/*
+		 * 只有还款来源是线下还款和第三方代扣的才需使用代充值账户进行资金分发
+		 * 
+		 * 还款来源，1:线下转账,2:第三方代扣,3:银行代扣,4:APP网关充值,5:协议代扣
+		 */
+		mismatchConditionFilter(vos);
+
 		String userId = loginUserInfoHelper.getUserId();
-		
+
 		try {
-			
+
 			/*
-			 * 将分发状态更新为处理中
-			 * 分发状态（0：待分发，1：分发处理中，2：分发成功，3，分发失败）
+			 * 将分发状态更新为处理中 分发状态（0：待分发，1：分发处理中，2：分发成功，3，分发失败）
 			 */
 			updateTdrepayRechargeLogProcessStatus(vos, 1, userId);
 
@@ -216,20 +224,21 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 					if (infoVOs.size() > 1) {
 						for (List<TdrepayRechargeInfoVO> rechargeInfoVOs : infoVOs) {
 							// 调用 eip 平台资金分发接口
-							sendDistributeFund(rechargeInfoVOs, entry.getKey(), userId);
+							Result result = sendDistributeFund(rechargeInfoVOs, entry.getKey(), userId);
+							handleSendDistributeFundResult(vos, userId, result);
 						}
-					}else if (infoVOs.size() == 1){
-						
+					} else if (infoVOs.size() == 1) {
+
 						// 调用 eip 平台资金分发接口
-						sendDistributeFund(infoVOs.get(0), entry.getKey(), userId);
+						Result result = sendDistributeFund(infoVOs.get(0), entry.getKey(), userId);
+						handleSendDistributeFundResult(vos, userId, result);
 					}
 				}
 			}
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			/*
-			 * 将分发状态更新为处理中
-			 * 分发状态（0：待分发，1：分发处理中，2：分发成功，3，分发失败）
+			 * 将分发状态更新为处理中 分发状态（0：待分发，1：分发处理中，2：分发成功，3，分发失败）
 			 */
 			updateTdrepayRechargeLogProcessStatus(vos, 0, userId);
 
@@ -238,12 +247,32 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 	}
 
-	private void updateTdrepayRechargeLogProcessStatus(List<TdrepayRechargeInfoVO> vos, Integer processStatus, String userId) {
+	private void mismatchConditionFilter(List<TdrepayRechargeInfoVO> vos) {
+		List<TdrepayRechargeInfoVO> lstVO = new LinkedList<>();
+		for (TdrepayRechargeInfoVO vo : vos) {
+			Integer repaySource = vo.getRepaySource();
+			if (repaySource == null || repaySource.intValue() != 1 || repaySource.intValue() != 2) {
+				lstVO.add(vo);
+			}
+		}
+
+		vos.removeAll(lstVO);
+	}
+
+	@SuppressWarnings("rawtypes")
+	private void handleSendDistributeFundResult(List<TdrepayRechargeInfoVO> vos, String userId, Result result) {
+		if (result == null || !"0000".equals(result.getReturnCode())) {
+			updateTdrepayRechargeLogProcessStatus(vos, 3, userId);
+		}
+	}
+
+	private void updateTdrepayRechargeLogProcessStatus(List<TdrepayRechargeInfoVO> vos, Integer processStatus,
+			String userId) {
 		List<TdrepayRechargeLog> rechargeLogs = new LinkedList<>();
 		for (TdrepayRechargeInfoVO vo : vos) {
 			TdrepayRechargeLog tdrepayRechargeLog = new TdrepayRechargeLog();
 			tdrepayRechargeLog.setLogId(vo.getLogId());
-			tdrepayRechargeLog.setProcessStatus(processStatus);	// 分发状态（0：待分发，1：分发处理中，2：分发成功，3，分发失败）
+			tdrepayRechargeLog.setProcessStatus(processStatus); // 分发状态（0：待分发，1：分发处理中，2：分发成功，3，分发失败）
 			tdrepayRechargeLog.setUpdateTime(new Date());
 			tdrepayRechargeLog.setUpdateUser(userId);
 			rechargeLogs.add(tdrepayRechargeLog);
@@ -252,65 +281,90 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	}
 
 	@SuppressWarnings("rawtypes")
-	private void sendDistributeFund(List<TdrepayRechargeInfoVO> rechargeInfoVOs, Integer businessType, String userId) {
+	private Result sendDistributeFund(List<TdrepayRechargeInfoVO> rechargeInfoVOs, Integer businessType,
+			String userId) {
 		DistributeFundDTO dto = new DistributeFundDTO();
 		String batchId = UUID.randomUUID().toString();
 		dto.setBatchId(batchId);
 		String rechargeAccountType = getRechargeAccountTypeByBusinessType(businessType);
-		dto.setOidPartner(handleOIdPartner(rechargeAccountType));
-		dto.setUserIP(CommonUtil.getClientIp());
-		dto.setUserId(this.handleAccountType(rechargeAccountType));
-		
+		String oIdPartner = handleOIdPartner(rechargeAccountType);
+		dto.setOidPartner(oIdPartner);
+		String clientIp = CommonUtil.getClientIp();
+		dto.setUserIP(clientIp);
+		String logUserId = handleAccountType(rechargeAccountType);
+		dto.setUserId(logUserId);
+
 		/*
 		 * 将vos中的数据装入一个批次中
 		 */
 		List<DistributeFundDetailDTO> detailList = new LinkedList<>();
-		
+
 		double totalAmount = 0;
-		
+
 		/*
 		 * 记录调用第三方接口日志
 		 */
 		IssueSendOutsideLog outsideLog = new IssueSendOutsideLog();
 		outsideLog.setSystem(Constant.SYSTEM_CODE_EIP);
-		
+
+		List<TdrepayRechargeLog> tdrepayRechargeLogs = new LinkedList<>();
 		for (TdrepayRechargeInfoVO vo : rechargeInfoVOs) {
 			// 团贷网用户唯一编号 必须为guid转化成的字符串
 			String requestNo = UUID.randomUUID().toString();
+			String tdUserId = UUID.randomUUID().toString();
 			vo.setRequestNo(requestNo);
 			// 设置统一 batchId
 			vo.setBatchId(batchId);
-			
+
 			double amount = vo.getRechargeAmount() == null ? 0 : vo.getRechargeAmount().doubleValue();
-			
+
 			totalAmount += amount;
-			
+
 			DistributeFundDetailDTO detailDTO = new DistributeFundDetailDTO();
 			detailDTO.setAmount(amount);
 			detailDTO.setRequestNo(requestNo);
-			detailDTO.setUserId(UUID.randomUUID().toString());
+			detailDTO.setUserId(tdUserId);
 			detailList.add(detailDTO);
+
+			TdrepayRechargeLog tdrepayRechargeLog = new TdrepayRechargeLog();
+			tdrepayRechargeLog.setLogId(vo.getLogId());
+			tdrepayRechargeLog.setBatchId(batchId);
+			tdrepayRechargeLog.setRequestNo(requestNo);
+			tdrepayRechargeLog.setTotalAmount(BigDecimal.valueOf(totalAmount));
+			tdrepayRechargeLog.setTdUserId(tdUserId);
+			tdrepayRechargeLog.setUserId(logUserId);
+			tdrepayRechargeLog.setUserIp(clientIp);
+			tdrepayRechargeLog.setOidPartner(oIdPartner);
+			tdrepayRechargeLog.setRechargeAmount(BigDecimal.valueOf(amount));
+			tdrepayRechargeLog.setUpdateTime(new Date());
+			tdrepayRechargeLog.setUpdateUser(userId);
+			tdrepayRechargeLogs.add(tdrepayRechargeLog);
 		}
+		tdrepayRechargeLogService.updateBatchById(tdrepayRechargeLogs);
+
 		dto.setTotalAmount(totalAmount);
 		dto.setDetailList(detailList);
-		
+
 		outsideLog.setSendJson(JSONObject.toJSONString(dto));
 		outsideLog.setInterfacecode(Constant.INTERFACE_CODE_SEND_DISTRIBUTE_FUND);
 		outsideLog.setInterfacename(Constant.INTERFACE_NAME_SEND_DISTRIBUTE_FUND);
 		outsideLog.setCreateTime(new Date());
 		outsideLog.setCreateUserId(userId);
-		
+
 		try {
 			// 调用 eip 平台资金分发接口
 			Result result = eipRemote.userDistributeFund(dto);
 			outsideLog.setReturnJson(JSONObject.toJSONString(result));
-			
+			issueSendOutsideLogService.insert(outsideLog);
+
+			return result;
 		} catch (Exception e) {
-			outsideLog.setReturnJson(e.getMessage());
 			LOG.error("批次号:" + batchId + "，调用eip平台资金分发接口失败！DTO 数据：" + dto.toString(), e);
+			outsideLog.setReturnJson(e.getMessage());
+			issueSendOutsideLogService.insert(outsideLog);
+			return null;
 		}
-		
-		issueSendOutsideLogService.insert(outsideLog);
+
 	}
 
 	private Map<Integer, List<List<TdrepayRechargeInfoVO>>> groupTdrepayRechargeInfoVOByBusinessType(
@@ -358,20 +412,22 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 		return map;
 	}
-	
+
 	/**
 	 * 根据业务类型获取代充值账户类型
-	 * @param businessType 业务类型
+	 * 
+	 * @param businessType
+	 *            业务类型
 	 * @return
 	 */
 	private String getRechargeAccountTypeByBusinessType(Integer businessType) {
-		
+
 		String rechargeAccountType = "";
-		
+
 		if (businessType == null) {
 			return rechargeAccountType;
 		}
-		
+
 		switch (businessType) {
 		case 9:
 			rechargeAccountType = "车贷代充值";
@@ -387,9 +443,9 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			break;
 		}
 		return rechargeAccountType;
-		
+
 	}
-	
+
 	@Override
 	public String handleAccountType(String rechargeAccountType) {
 
@@ -465,27 +521,5 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		}
 		return oIdPartner;
 	}
-	
-	public static void main(String[] args) {
-		System.out.println(1);
-		try {
-			
-				try {
-					
-					for (int i = 0; i < 10; i++) {
-						int n = 1/0;
-					}
-				} catch (Exception e) {
-					System.out.println("内层异常");
-					throw new ServiceRuntimeException("内层抛出异常");
-				}
-				System.out.println("外层正常");
-			
-		} catch (Exception e) {
-			// TODO: handle exception
-			System.out.println(e.getMessage());
-			System.out.println("外层异常");
-		}
-		System.out.println(2);
-	}
+
 }

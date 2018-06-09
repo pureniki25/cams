@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -17,7 +19,7 @@ import io.swagger.annotations.ApiModelProperty;
  * </p>
  *
  * @author 胡伟骞
- * @since 2018-06-08
+ * @since 2018-06-09
  */
 @ApiModel
 @TableName("tb_tdrepay_recharge_log")
@@ -26,203 +28,209 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 主键ID
-     */
-    @TableId("log_id")
-	@ApiModelProperty(required= true,value = "主键ID")
+	 * 主键ID
+	 */
+	@TableId("log_id")
+	@ApiModelProperty(required = true, value = "主键ID")
 	private String logId;
-    /**
-     * 标的ID
-     */
+	/**
+	 * 标的ID
+	 */
 	@TableField("project_id")
-	@ApiModelProperty(required= true,value = "标的ID")
+	@ApiModelProperty(required = true, value = "标的ID")
 	private String projectId;
-    /**
-     * 业务所属资产端，1、鸿特信息，2、 一点车贷
-     */
+	/**
+	 * 业务所属资产端，1、鸿特信息，2、 一点车贷
+	 */
 	@TableField("asset_type")
-	@ApiModelProperty(required= true,value = "业务所属资产端，1、鸿特信息，2、 一点车贷")
+	@ApiModelProperty(required = true, value = "业务所属资产端，1、鸿特信息，2、 一点车贷")
 	private Integer assetType;
-    /**
-     * 原业务编号
-     */
+	/**
+	 * 原业务编号
+	 */
 	@TableField("orig_business_id")
-	@ApiModelProperty(required= true,value = "原业务编号")
+	@ApiModelProperty(required = true, value = "原业务编号")
 	private String origBusinessId;
-    /**
-     * 业务类型(1:车易贷展期,2:房速贷展期,3:金融仓储,4:三农金融,9:车易贷,11:房速贷,12车全垫资代采,13:扶贫贷,14:汽车融资租赁,15:二手车商贷,20:一点车贷,25:信用贷)
-     */
+	/**
+	 * 业务类型(1:车易贷展期,2:房速贷展期,3:金融仓储,4:三农金融,9:车易贷,11:房速贷,12车全垫资代采,13:扶贫贷,14:汽车融资租赁,15:二手车商贷,20:一点车贷,25:信用贷)
+	 */
 	@TableField("business_type")
-	@ApiModelProperty(required= true,value = "业务类型(1:车易贷展期,2:房速贷展期,3:金融仓储,4:三农金融,9:车易贷,11:房速贷,12车全垫资代采,13:扶贫贷,14:汽车融资租赁,15:二手车商贷,20:一点车贷,25:信用贷)")
+	@ApiModelProperty(required = true, value = "业务类型(1:车易贷展期,2:房速贷展期,3:金融仓储,4:三农金融,9:车易贷,11:房速贷,12车全垫资代采,13:扶贫贷,14:汽车融资租赁,15:二手车商贷,20:一点车贷,25:信用贷)")
 	private Integer businessType;
-    /**
-     * 实还日期
-     */
+	/**
+	 * 实还日期
+	 */
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@TableField("fact_repay_date")
-	@ApiModelProperty(required= true,value = "实还日期")
+	@ApiModelProperty(required = true, value = "实还日期")
 	private Date factRepayDate;
-    /**
-     * 借款人
-     */
+	/**
+	 * 借款人
+	 */
 	@TableField("customer_name")
-	@ApiModelProperty(required= true,value = "借款人")
+	@ApiModelProperty(required = true, value = "借款人")
 	private String customerName;
-    /**
-     * 分公司
-     */
+	/**
+	 * 分公司
+	 */
 	@TableField("company_name")
-	@ApiModelProperty(required= true,value = "分公司")
+	@ApiModelProperty(required = true, value = "分公司")
 	private String companyName;
-    /**
-     * 还款来源，1:线下转账,2:第三方代扣,3:银行代扣,4:APP网关充值,5:协议代扣
-     */
+	/**
+	 * 还款来源，1:线下转账,2:第三方代扣,3:银行代扣,4:APP网关充值,5:协议代扣
+	 */
 	@TableField("repay_source")
-	@ApiModelProperty(required= true,value = "还款来源，1:线下转账,2:第三方代扣,3:银行代扣,4:APP网关充值,5:协议代扣")
+	@ApiModelProperty(required = true, value = "还款来源，1:线下转账,2:第三方代扣,3:银行代扣,4:APP网关充值,5:协议代扣")
 	private Integer repaySource;
-    /**
-     * 资产端期数
-     */
+	/**
+	 * 资产端期数
+	 */
 	@TableField("after_id")
-	@ApiModelProperty(required= true,value = "资产端期数")
+	@ApiModelProperty(required = true, value = "资产端期数")
 	private String afterId;
-    /**
-     * 财务确认时间或成功代扣时间
-     */
+	/**
+	 * 财务确认时间或成功代扣时间
+	 */
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@TableField("confirm_time")
-	@ApiModelProperty(required= true,value = "财务确认时间或成功代扣时间")
+	@ApiModelProperty(required = true, value = "财务确认时间或成功代扣时间")
 	private Date confirmTime;
-    /**
-     * (代充值资金分发接口参数)团贷网用户唯一编号
-     */
+	/**
+	 * (代充值资金分发接口参数)团贷网用户唯一编号
+	 */
 	@TableField("td_user_id")
-	@ApiModelProperty(required= true,value = "(代充值资金分发接口参数)团贷网用户唯一编号")
+	@ApiModelProperty(required = true, value = "(代充值资金分发接口参数)团贷网用户唯一编号")
 	private String tdUserId;
-    /**
-     * (代充值资金分发接口参数)批次分发总金额(保留两位小数)
-     */
+	/**
+	 * (代充值资金分发接口参数)批次分发总金额(保留两位小数)
+	 */
 	@TableField("total_amount")
-	@ApiModelProperty(required= true,value = "(代充值资金分发接口参数)批次分发总金额(保留两位小数)")
+	@ApiModelProperty(required = true, value = "(代充值资金分发接口参数)批次分发总金额(保留两位小数)")
 	private BigDecimal totalAmount;
-    /**
-     * (代充值资金分发接口参数)分发批次号(批次唯一标识)
-     */
+	/**
+	 * (代充值资金分发接口参数)分发批次号(批次唯一标识)
+	 */
 	@TableField("batch_id")
-	@ApiModelProperty(required= true,value = "(代充值资金分发接口参数)分发批次号(批次唯一标识)")
+	@ApiModelProperty(required = true, value = "(代充值资金分发接口参数)分发批次号(批次唯一标识)")
 	private String batchId;
-    /**
-     * 本次还款对应团贷网的期次
-     */
-	@ApiModelProperty(required= true,value = "本次还款对应团贷网的期次")
+	/**
+	 * 本次还款对应团贷网的期次
+	 */
+	@ApiModelProperty(required = true, value = "本次还款对应团贷网的期次")
 	private Integer period;
-    /**
-     * (代充值资金分发接口参数)出款方帐号
-     */
+	/**
+	 * (代充值资金分发接口参数)出款方帐号
+	 */
 	@TableField("user_id")
-	@ApiModelProperty(required= true,value = "(代充值资金分发接口参数)出款方帐号")
+	@ApiModelProperty(required = true, value = "(代充值资金分发接口参数)出款方帐号")
 	private String userId;
-    /**
-     * (代充值资金分发接口参数)充值金额
-     */
+	/**
+	 * (代充值资金分发接口参数)充值金额
+	 */
 	@TableField("recharge_amount")
-	@ApiModelProperty(required= true,value = "(代充值资金分发接口参数)充值金额")
+	@ApiModelProperty(required = true, value = "(代充值资金分发接口参数)充值金额")
 	private BigDecimal rechargeAmount;
-    /**
-     * 标记当前资金分发操作是否为结清操作，0：非结清，1：正常结清，2：展期原标结清，3：坏账结清
-     */
+	/**
+	 * 标记当前资金分发操作是否为结清操作，0：非结清，1：正常结清，2：展期原标结清，3：坏账结清
+	 */
 	@TableField("settle_type")
-	@ApiModelProperty(required= true,value = "标记当前资金分发操作是否为结清操作，0：非结清，1：正常结清，2：展期原标结清，3：坏账结清")
+	@ApiModelProperty(required = true, value = "标记当前资金分发操作是否为结清操作，0：非结清，1：正常结清，2：展期原标结清，3：坏账结清")
 	private Integer settleType;
-    /**
-     * 实收总金额
-     */
+	/**
+	 * 实收总金额
+	 */
 	@TableField("fact_repay_amount")
-	@ApiModelProperty(required= true,value = "实收总金额")
+	@ApiModelProperty(required = true, value = "实收总金额")
 	private BigDecimal factRepayAmount;
-    /**
-     * 流水合计
-     */
+	/**
+	 * 流水合计
+	 */
 	@TableField("resource_amount")
-	@ApiModelProperty(required= true,value = "流水合计")
+	@ApiModelProperty(required = true, value = "流水合计")
 	private BigDecimal resourceAmount;
-    /**
-     * 0：只垫付本息，1：全额垫付
-     */
+	/**
+	 * 0：只垫付本息，1：全额垫付
+	 */
 	@TableField("advance_type")
-	@ApiModelProperty(required= true,value = "0：只垫付本息，1：全额垫付")
+	@ApiModelProperty(required = true, value = "0：只垫付本息，1：全额垫付")
 	private Integer advanceType;
-    /**
-     * 当期结清状态 0：未结清,1：已结清（目前一点调还垫付接口时使用）
-     */
+	/**
+	 * 当期结清状态 0：未结清,1：已结清（目前一点调还垫付接口时使用）
+	 */
 	@TableField("is_complete")
-	@ApiModelProperty(required= true,value = "当期结清状态 0：未结清,1：已结清（目前一点调还垫付接口时使用）")
+	@ApiModelProperty(required = true, value = "当期结清状态 0：未结清,1：已结清（目前一点调还垫付接口时使用）")
 	private Integer isComplete;
-    /**
-     * 标的还款计划列表ID（实还流水ID）
-     */
+	/**
+	 * 标的还款计划列表ID（实还流水ID）
+	 */
 	@TableField("proj_plan_list_id")
-	@ApiModelProperty(required= true,value = "标的还款计划列表ID（实还流水ID）")
+	@ApiModelProperty(required = true, value = "标的还款计划列表ID（实还流水ID）")
 	private String projPlanListId;
-    /**
-     * (代充值资金分发接口参数)订单唯一标识
-     */
+	/**
+	 * (代充值资金分发接口参数)订单唯一标识
+	 */
 	@TableField("request_no")
-	@ApiModelProperty(required= true,value = "(代充值资金分发接口参数)订单唯一标识")
+	@ApiModelProperty(required = true, value = "(代充值资金分发接口参数)订单唯一标识")
 	private String requestNo;
-    /**
-     * (代充值资金分发接口参数)客户端IP
-     */
+	/**
+	 * (代充值资金分发接口参数)客户端IP
+	 */
 	@TableField("user_ip")
-	@ApiModelProperty(required= true,value = "(代充值资金分发接口参数)客户端IP")
+	@ApiModelProperty(required = true, value = "(代充值资金分发接口参数)客户端IP")
 	private String userIp;
-    /**
-     * (代充值资金分发接口参数)资产端账户唯一编号
-     */
+	/**
+	 * (代充值资金分发接口参数)资产端账户唯一编号
+	 */
 	@TableField("oid_partner")
-	@ApiModelProperty(required= true,value = "(代充值资金分发接口参数)资产端账户唯一编号")
+	@ApiModelProperty(required = true, value = "(代充值资金分发接口参数)资产端账户唯一编号")
 	private String oidPartner;
-    /**
-     * 平台状态 1：已还款，2：逾期 3：待还款
-     */
+	/**
+	 * 平台状态 1：已还款，2：逾期 3：待还款
+	 */
 	@TableField("plat_status")
-	@ApiModelProperty(required= true,value = "平台状态 1：已还款，2：逾期 3：待还款")
+	@ApiModelProperty(required = true, value = "平台状态 1：已还款，2：逾期 3：待还款")
 	private String platStatus;
-    /**
-     * 平台还款状态(1：待还款，2：已还款 3、已垫付 4：逾期)
-     */
+	/**
+	 * 平台还款状态(1：待还款，2：已还款 3、已垫付 4：逾期)
+	 */
 	@TableField("platform_repay_status")
-	@ApiModelProperty(required= true,value = "平台还款状态(1：待还款，2：已还款 3、已垫付 4：逾期)")
+	@ApiModelProperty(required = true, value = "平台还款状态(1：待还款，2：已还款 3、已垫付 4：逾期)")
 	private Integer platformRepayStatus;
-    /**
-     * 分发状态（0：待分发，1：分发处理中，2：分发成功，3，分发失败）
-     */
+	/**
+	 * 分发状态（0：待分发，1：分发处理中，2：分发成功，3，分发失败）
+	 */
 	@TableField("process_status")
-	@ApiModelProperty(required= true,value = "分发状态（0：待分发，1：分发处理中，2：分发成功，3，分发失败）")
+	@ApiModelProperty(required = true, value = "分发状态（0：待分发，1：分发处理中，2：分发成功，3，分发失败）")
 	private Integer processStatus;
-    /**
-     * 创建人
-     */
+	/**
+	 * 备注
+	 */
+	@ApiModelProperty(required = true, value = "备注")
+	private String remark;
+	/**
+	 * 创建人
+	 */
 	@TableField("create_user")
-	@ApiModelProperty(required= true,value = "创建人")
+	@ApiModelProperty(required = true, value = "创建人")
 	private String createUser;
-    /**
-     * 创建时间
-     */
+	/**
+	 * 创建时间
+	 */
 	@TableField("create_time")
-	@ApiModelProperty(required= true,value = "创建时间")
+	@ApiModelProperty(required = true, value = "创建时间")
 	private Date createTime;
-    /**
-     * 更新人
-     */
+	/**
+	 * 更新人
+	 */
 	@TableField("update_user")
-	@ApiModelProperty(required= true,value = "更新人")
+	@ApiModelProperty(required = true, value = "更新人")
 	private String updateUser;
-    /**
-     * 更新时间
-     */
+	/**
+	 * 更新时间
+	 */
 	@TableField("update_time")
-	@ApiModelProperty(required= true,value = "更新时间")
+	@ApiModelProperty(required = true, value = "更新时间")
 	private Date updateTime;
-
 
 	public String getLogId() {
 		return logId;
@@ -456,6 +464,14 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 		this.processStatus = processStatus;
 	}
 
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
 	public String getCreateUser() {
 		return createUser;
 	}
@@ -495,40 +511,17 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 
 	@Override
 	public String toString() {
-		return "TdrepayRechargeLog{" +
-			", logId=" + logId +
-			", projectId=" + projectId +
-			", assetType=" + assetType +
-			", origBusinessId=" + origBusinessId +
-			", businessType=" + businessType +
-			", factRepayDate=" + factRepayDate +
-			", customerName=" + customerName +
-			", companyName=" + companyName +
-			", repaySource=" + repaySource +
-			", afterId=" + afterId +
-			", confirmTime=" + confirmTime +
-			", tdUserId=" + tdUserId +
-			", totalAmount=" + totalAmount +
-			", batchId=" + batchId +
-			", period=" + period +
-			", userId=" + userId +
-			", rechargeAmount=" + rechargeAmount +
-			", settleType=" + settleType +
-			", factRepayAmount=" + factRepayAmount +
-			", resourceAmount=" + resourceAmount +
-			", advanceType=" + advanceType +
-			", isComplete=" + isComplete +
-			", projPlanListId=" + projPlanListId +
-			", requestNo=" + requestNo +
-			", userIp=" + userIp +
-			", oidPartner=" + oidPartner +
-			", platStatus=" + platStatus +
-			", platformRepayStatus=" + platformRepayStatus +
-			", processStatus=" + processStatus +
-			", createUser=" + createUser +
-			", createTime=" + createTime +
-			", updateUser=" + updateUser +
-			", updateTime=" + updateTime +
-			"}";
+		return "TdrepayRechargeLog{" + ", logId=" + logId + ", projectId=" + projectId + ", assetType=" + assetType
+				+ ", origBusinessId=" + origBusinessId + ", businessType=" + businessType + ", factRepayDate="
+				+ factRepayDate + ", customerName=" + customerName + ", companyName=" + companyName + ", repaySource="
+				+ repaySource + ", afterId=" + afterId + ", confirmTime=" + confirmTime + ", tdUserId=" + tdUserId
+				+ ", totalAmount=" + totalAmount + ", batchId=" + batchId + ", period=" + period + ", userId=" + userId
+				+ ", rechargeAmount=" + rechargeAmount + ", settleType=" + settleType + ", factRepayAmount="
+				+ factRepayAmount + ", resourceAmount=" + resourceAmount + ", advanceType=" + advanceType
+				+ ", isComplete=" + isComplete + ", projPlanListId=" + projPlanListId + ", requestNo=" + requestNo
+				+ ", userIp=" + userIp + ", oidPartner=" + oidPartner + ", platStatus=" + platStatus
+				+ ", platformRepayStatus=" + platformRepayStatus + ", processStatus=" + processStatus + ", remark="
+				+ remark + ", createUser=" + createUser + ", createTime=" + createTime + ", updateUser=" + updateUser
+				+ ", updateTime=" + updateTime + "}";
 	}
 }

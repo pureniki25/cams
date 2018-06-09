@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.hongte.alms.base.mapper.TdrepayRechargeLogMapper">
 
-	<!-- 通用查询映射结果 -->
+ 	<!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.TdrepayRechargeLog">
         <id column="log_id" property="logId" />
         <result column="project_id" property="projectId" />
@@ -33,6 +33,7 @@
         <result column="plat_status" property="platStatus" />
         <result column="platform_repay_status" property="platformRepayStatus" />
         <result column="process_status" property="processStatus" />
+        <result column="remark" property="remark" />
         <result column="create_user" property="createUser" />
         <result column="create_time" property="createTime" />
         <result column="update_user" property="updateUser" />
@@ -41,9 +42,9 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        log_id AS logId, project_id AS projectId, asset_type AS assetType, orig_business_id AS origBusinessId, business_type AS businessType, fact_repay_date AS factRepayDate, customer_name AS customerName, company_name AS companyName, repay_source AS repaySource, after_id AS afterId, confirm_time AS confirmTime, td_user_id AS tdUserId, total_amount AS totalAmount, batch_id AS batchId, period, user_id AS userId, recharge_amount AS rechargeAmount, settle_type AS settleType, fact_repay_amount AS factRepayAmount, resource_amount AS resourceAmount, advance_type AS advanceType, is_complete AS isComplete, proj_plan_list_id AS projPlanListId, request_no AS requestNo, user_ip AS userIp, oid_partner AS oidPartner, plat_status AS platStatus, platform_repay_status AS platformRepayStatus, process_status AS processStatus, create_user AS createUser, create_time AS createTime, update_user AS updateUser, update_time AS updateTime
-    </sql>    
-    
+        log_id AS logId, project_id AS projectId, asset_type AS assetType, orig_business_id AS origBusinessId, business_type AS businessType, fact_repay_date AS factRepayDate, customer_name AS customerName, company_name AS companyName, repay_source AS repaySource, after_id AS afterId, confirm_time AS confirmTime, td_user_id AS tdUserId, total_amount AS totalAmount, batch_id AS batchId, period, user_id AS userId, recharge_amount AS rechargeAmount, settle_type AS settleType, fact_repay_amount AS factRepayAmount, resource_amount AS resourceAmount, advance_type AS advanceType, is_complete AS isComplete, proj_plan_list_id AS projPlanListId, request_no AS requestNo, user_ip AS userIp, oid_partner AS oidPartner, plat_status AS platStatus, platform_repay_status AS platformRepayStatus, process_status AS processStatus, remark, create_user AS createUser, create_time AS createTime, update_user AS updateUser, update_time AS updateTime
+    </sql>
+        
     <sql id="ComplianceRepaymentDataCondition">
     	1 = 1 
 		<if test="confirmTimeStart != null">
