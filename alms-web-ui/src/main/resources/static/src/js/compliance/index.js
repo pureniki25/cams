@@ -17,15 +17,20 @@ var rechargeModalFormRules = {
 window.layinit(function(htConfig) {
 	basePath = htConfig.platRepayBasePath;
 	table = layui.table;
-	
+
 	vm = new Vue({
 		el : '#app',
 		data : {
 			rechargeModal: false, // 代充值账户充值弹窗控制
 			bankCodeList:['GDB','ICBC','BOC','CMBCHINA','PINGAN','HXYH','BOCO','POST','CCB','SPDB','CMBC','BCCB','CEB','CIB','ECITIC','ABC'],	// 银行代码
 			bankAccountList: [],// 所有银行账户
-			// 初始化信息总条数
-            dataCount:0,
+			selectAmountList: [], // 已勾选待分发金额集合
+			selectAmount: 0, // 已勾选待分发金额
+			ComplianceRepaymentData:[],// 储存查询到的数据
+			rechargeAccountType: '车贷代充值', // 代充值账户类型
+			rechargeAccountBalance: 0, // 代充值账户余额
+			allBusinessCompanyList: [], // 所有分公司
+			tdrepayRechargeInfoReqList: [], // 
 			
 			/*
 			 * 合规化还款主页面查询条件
@@ -34,7 +39,7 @@ window.layinit(function(htConfig) {
 				confirmTimeStart: '',	// 财务确认开始日期
 				confirmTimeEnd: '', // 财务确认结束日期
 				processStatus: '', // 分发状态
-				repaymentType: '', // 还款方式
+				repaySource: '', // 还款方式
 				settleType: '', // 期数类型
 				origBusinessId: '', // 编号
 				businessType: '', // 业务类型
@@ -96,10 +101,17 @@ window.layinit(function(htConfig) {
 			 * 获取代充值账户余额
 			 */
 			queryUserAviMoney: function(){
-				axios.get(basePath + 'recharge/queryUserAviMoney?rechargeAccountType=' + vm.rechargeModalForm.rechargeAccountType, {timeout: 0})
+				var rechargeAccountType;
+				if (this.rechargeModal) {
+					rechargeAccountType = this.rechargeModalForm.rechargeAccountType;
+				}else {
+					rechargeAccountType = this.rechargeAccountType;
+				}
+				axios.get(basePath + 'recharge/queryUserAviMoney?rechargeAccountType=' + rechargeAccountType, {timeout: 0})
 				.then(function(result){
 					if (result.data.code == "1") {
 						vm.rechargeModalForm.rechargeAccountBalance = result.data.data.data.aviMoney;
+						vm.rechargeAccountBalance = result.data.data.data.aviMoney;
 					} else {
 						vm.rechargeModalForm.rechargeAccountBalance = '';
 						vm.$Modal.error({ content: result.data.msg });
@@ -174,9 +186,9 @@ window.layinit(function(htConfig) {
 	            table.render({
 			    	elem: "#complianceRepaymentData",
 			    	height: 600, 
-			    	cols: [
-			    		[{
-			    			type: 'selection',
+			    	cols: [[
+			    		{
+			    			type: 'checkbox',
 			    			field: 'select',
 			    			title: '全选',
 			    			align: 'center',
@@ -192,7 +204,7 @@ window.layinit(function(htConfig) {
 			    			align: 'center',
 							width:100
 			    		}, {
-			    			field: 'repaymentType',
+			    			field: 'repaySource',
 			    			title: '还款方式',
 			    			align: 'center',
 							width:100
@@ -248,7 +260,7 @@ window.layinit(function(htConfig) {
 							width:100
 			    		}, {
 			    			title: '操作',
-			    			toolbar: "#toolbar2",
+			    			toolbar: "#toolbar",
 			    			align: 'center',
 							width:100
 			    		}, {
@@ -256,22 +268,24 @@ window.layinit(function(htConfig) {
 			    			title: '备注',
 			    			align: 'center',
 							width:100
-			    		}]
-			    		], // 设置表头
+			    		}]],
 			    		url: basePath + 'tdrepayRecharge/queryComplianceRepaymentData', 
 			    		page: true,
 			    		where: {
-			    			confirmTimeStart:vm.queryConditionModel.confirmTimeStart, 
-			    			confirmTimeEnd:vm.queryConditionModel.confirmTimeEnd, 
-			    			processStatus:vm.queryConditionModel.processStatus, 
-			    			repaymentType:vm.queryConditionModel.repaymentType, 
-			    			settleType:vm.queryConditionModel.settleType, 
-			    			origBusinessId:vm.queryConditionModel.origBusinessId, 
-			    			businessType:vm.queryConditionModel.businessType, 
-			    			platStatus:vm.queryConditionModel.platStatus, 
-			    			companyName:vm.queryConditionModel.companyName, 
+			    			confirmTimeStart:this.queryConditionModel.confirmTimeStart, 
+			    			confirmTimeEnd:this.queryConditionModel.confirmTimeEnd, 
+			    			processStatus:this.queryConditionModel.processStatus, 
+			    			repaySource:this.queryConditionModel.repaySource, 
+			    			settleType:this.queryConditionModel.settleType, 
+			    			origBusinessId:this.queryConditionModel.origBusinessId, 
+			    			businessType:this.queryConditionModel.businessType, 
+			    			platStatus:this.queryConditionModel.platStatus, 
+			    			companyName:this.queryConditionModel.companyName, 
 			            },
-			    		done: (res, curr, count) => {}
+			    		done: (res, curr, count) => {
+			    			this.selectAmount = 0;
+			    			this.ComplianceRepaymentData = res.data;
+			    		}
 			    })
 			},
 			/*
@@ -279,13 +293,84 @@ window.layinit(function(htConfig) {
 			 */
 			queryFeeDetails: function(){
 				
+			},
+			/*
+			 * 查询所有分公司
+			 */
+			queryAllBusinessCompany: function(){
+				axios.get(basePath + 'tdrepayRecharge/queryAllBusinessCompany')
+				.then(function(result){
+					if (result.data.code == "1") {
+						vm.allBusinessCompanyList = result.data.data
+					} else {
+						vm.$Modal.error({ content: result.data.msg });
+					}
+				}).catch(function (error) {
+					vm.$Modal.error({content: '接口调用异常!'});
+            	});
+			},
+			
+			/*
+			 * 执行资金分发
+			 */
+			userDistributeFund: function(){
+				if (vm.tdrepayRechargeInfoReqList == null || vm.tdrepayRechargeInfoReqList.length == 0) {
+					vm.$Modal.error({ content: "请选择要资金分发的数据" });
+					return;
+				}
+				axios.post(basePath + 'tdrepayRecharge/userDistributeFund', vm.tdrepayRechargeInfoReqList)
+				.then(function(result){
+					if (result.data.code == "1") {
+						
+					} else {
+						vm.$Modal.error({ content: result.data.msg });
+					}
+				}).catch(function (error) {
+					vm.$Modal.error({content: '接口调用异常!'});
+            	});
 			}
 		},
 
-		created : function() {
-			vm.queryComplianceRepaymentData();
+		mounted: function() {
+			this.queryUserAviMoney();
+			this.queryAllBusinessCompany();
+			this.queryComplianceRepaymentData();
 		},
 
+	});
+	
+	table.on('tool(complianceRepaymentData)', function (obj) {
+		let data = obj.data;
+		let event = obj.event;
+		if (event == 'info') {
+			
+		}
+	});
+	
+	table.on('checkbox(complianceRepaymentData)', function(obj){
+		if (obj && obj.type != 'all' && obj.checked) {
+			vm.tdrepayRechargeInfoReqList.push(obj.data)
+			vm.selectAmount += obj.data.rechargeAmount;
+		}else if (obj && obj.type != 'all' && !obj.checked) {
+			if (vm.tdrepayRechargeInfoReqList.length > 0) {
+				let dataIndex = vm.tdrepayRechargeInfoReqList.indexOf(obj.data);
+				vm.tdrepayRechargeInfoReqList.splice(dataIndex, 1);
+			}
+			vm.selectAmount -= obj.data.rechargeAmount;
+		}else if (obj && obj.type == 'all' && obj.checked) {
+			vm.selectAmount = 0;
+			vm.tdrepayRechargeInfoReqList = [];
+			if (vm.ComplianceRepaymentData && vm.ComplianceRepaymentData.length > 0) {
+				for (var i = 0; i < vm.ComplianceRepaymentData.length; i++) {
+					vm.tdrepayRechargeInfoReqList.push(vm.ComplianceRepaymentData[i]);
+					vm.selectAmount += vm.ComplianceRepaymentData[i].rechargeAmount;
+				}
+			}
+		}else {
+			vm.tdrepayRechargeInfoReqList = [];
+			vm.selectAmount = 0;
+		}
+		console.log(obj)
 	});
 
 });

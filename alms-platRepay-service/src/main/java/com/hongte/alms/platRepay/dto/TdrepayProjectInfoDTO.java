@@ -4,6 +4,11 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * 标的还款信息查询接口返回参数
+ * @author 胡伟骞
+ *
+ */
 public class TdrepayProjectInfoDTO implements Serializable {
 
 	private static final long serialVersionUID = 1L;

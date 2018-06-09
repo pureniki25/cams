@@ -24,4 +24,24 @@ public interface TdrepayRechargeService {
 	 * @return
 	 */
 	List<TdrepayRechargeLog> queryComplianceRepaymentData(ComplianceRepaymentVO vo);
+	int countComplianceRepaymentData(ComplianceRepaymentVO vo);
+	
+	/**
+	 * 执行资金分发
+	 */
+	void tdrepayRecharge(List<TdrepayRechargeInfoVO> vos);
+	
+	/**
+	 * 根据代充值账户类型获取 出款方账号
+	 * @param rechargeAccountType	代充值账户类型
+	 * @return
+	 */
+	String handleAccountType(String rechargeAccountType);
+	
+	/**
+	 * 根据代充值账户类型获取 资产端账户唯一编号
+	 * @param rechargeAccountType 代充值账户类型
+	 * @return
+	 */
+	String handleOIdPartner(String rechargeAccountType);
 }

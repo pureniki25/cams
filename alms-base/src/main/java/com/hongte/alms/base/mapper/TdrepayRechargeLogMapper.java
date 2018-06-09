@@ -1,7 +1,6 @@
 package com.hongte.alms.base.mapper;
 
 import java.util.List;
-import java.util.Map;
 
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.vo.module.ComplianceRepaymentVO;
@@ -22,4 +21,5 @@ public interface TdrepayRechargeLogMapper extends SuperMapper<TdrepayRechargeLog
 	 * @return
 	 */
 	List<TdrepayRechargeLog> queryComplianceRepaymentData(ComplianceRepaymentVO vo);
+	int countComplianceRepaymentData(ComplianceRepaymentVO vo);
 }

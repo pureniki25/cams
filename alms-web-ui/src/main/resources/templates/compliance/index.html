@@ -66,30 +66,27 @@
 			<i-col span="3">
 				分发状态：
 				<i-select v-model="queryConditionModel.processStatus" clearable filterable style="width:100px">
-      				<i-option :value="1">全部</i-option>
-      				<i-option :value="2">待分发</i-option>
-      				<i-option :value="3">分发成功</i-option>
-      				<i-option :value="4">分发失败</i-option>
-      				<i-option :value="5">分发处理中</i-option>
+      				<i-option :value="0">待分发</i-option>
+      				<i-option :value="1">分发处理中</i-option>
+      				<i-option :value="2">分发成功</i-option>
+      				<i-option :value="3">分发失败</i-option>
   				</i-select>
 			</i-col>
 			<i-col span="3">
 				还款方式：
-				<i-select v-model="queryConditionModel.repaymentType" clearable filterable style="width:100px">
-      				<i-option :value="1">全部</i-option>
-      				<i-option :value="2">转账还款</i-option>
-      				<i-option :value="3">第三方代扣</i-option>
-      				<i-option :value="4">银行代扣</i-option>
-      				<i-option :value="5">网关充值</i-option>
+				<i-select v-model="queryConditionModel.repaySource" clearable filterable style="width:100px">
+      				<i-option :value="1">转账还款</i-option>
+      				<i-option :value="2">第三方代扣</i-option>
+      				<i-option :value="3">银行代扣</i-option>
+      				<i-option :value="4">网关充值</i-option>
   				</i-select>
 			</i-col>
 			<i-col span="3">
 				期数类型：
 				<i-select v-model="queryConditionModel.settleType" clearable filterable style="width:100px">
-      				<i-option :value="1">全部</i-option>
-      				<i-option :value="2">结清</i-option>
-      				<i-option :value="3">展期结清</i-option>
-      				<i-option :value="4">正常还款</i-option>
+      				<i-option :value="1">结清</i-option>
+      				<i-option :value="2">展期结清</i-option>
+      				<i-option :value="0">正常还款</i-option>
   				</i-select>
 			</i-col>
 			<i-col span="1">
@@ -101,32 +98,30 @@
 	    </row>
 	    
 		<row style="margin-top:1rem">
-			<i-col span="5" offset="8">
+			<i-col span="4" offset="8">
 				编号：
-		    	<i-input v-model="queryConditionModel.origBusinessId" type="info" style="width:243px"/>
+		    	<i-input v-model="queryConditionModel.origBusinessId" type="info" style="width:200px"/>
 		    </i-col>
 			<i-col span="3">
 				业务类型：
 				<i-select v-model="queryConditionModel.businessType" clearable filterable style="width:100px">
-      				<i-option :value="1">全部</i-option>
-      				<i-option :value="2">房速贷</i-option>
-      				<i-option :value="3">车易贷</i-option>
-      				<i-option :value="4">一点车贷</i-option>
+      				<i-option :value="9">车易贷</i-option>
+      				<i-option :value="11">房速贷</i-option>
+      				<i-option :value="20">一点车贷</i-option>
   				</i-select>
 			</i-col>
 			<i-col span="3">
 				平台状态：
 				<i-select v-model="queryConditionModel.platStatus" clearable filterable style="width:100px">
-      				<i-option :value="1">全部</i-option>
-      				<i-option :value="2">已还款</i-option>
+      				<i-option :value="1">已还款</i-option>
+      				<i-option :value="2">逾期</i-option>
       				<i-option :value="3">未还款</i-option>
-      				<i-option :value="4">已代偿</i-option>
   				</i-select>
 			</i-col>
-			<i-col span="3">
+			<i-col span="4">
 				分公司：
-				<i-select v-model="queryConditionModel.companyName" clearable filterable style="width:115px">
-      				<i-option :value="1">全部</i-option>
+				<i-select v-model="queryConditionModel.companyName" clearable filterable style="width:185px">
+      				<i-option v-for="(item, index) in allBusinessCompanyList" :value="item.areaName" :key="item.areaId">{{ item.areaName }}</i-option>
   				</i-select>
 			</i-col>
 			<i-col span="2">
@@ -137,26 +132,24 @@
     
     <Card>
     	<row>
-			<i-button type="primary" @click="" style="margin-right:1rem">资金分发</i-button>
+			<i-button type="primary" @click="userDistributeFund" style="margin-right:1rem">资金分发</i-button>
 			<i-button type="primary" @click="openRechargeModal" style="margin-right:1rem">充值</i-button>
 			<i-button type="primary" @click="" style="margin-right:1rem">查看充值记录</i-button>
 			<i-button type="primary" @click="" style="margin-right:1rem">查看账户余额</i-button>
 		</row>
 		<row style="margin-top:1rem">
 			<i-col span='6'>
-				{{  }}：代充值存管账号余额为：7556941.45元
+				{{ rechargeAccountType }}：代充值存管账号余额为：{{ rechargeAccountBalance }} 元
 			</i-col>
-			<i-col span='6'>已勾选待分发金额为：1074.8 元</i-col>
+			<i-col span='6'>已勾选待分发金额为：{{ selectAmount }} 元</i-col>
 		</row>
 	</Card>
 	
 	<Card>
-		<i-col span="24">
     		<table id="complianceRepaymentData" lay-filter="complianceRepaymentData"></table>
     		<script type="text/html" id="toolbar">
                 <a class="layui-btn layui-btn-xs" lay-event="info">详情</a>
             </script>
-		</i-col>
 	</Card>
 	
 	<Modal v-model="rechargeModal" title="代充值账户充值" width="1500">
@@ -166,13 +159,13 @@
 					<i-col>
 						<i-select v-model="rechargeModalForm.rechargeAccountType" clearable filterable style="width:200px" 
 									@on-change="rechargeModalForm.rechargeAccountType == '' ? '' : queryUserAviMoney()">
-                            <i-option value="车贷代充值账户">车贷代充值账户</i-option>
-                            <i-option value="房贷代充值账户">房贷代充值账户</i-option>
-                            <i-option value="扶贫贷代充值账户">扶贫贷代充值账户</i-option>
-                            <i-option value="闪贷业务代充值账户">闪贷业务代充值账户</i-option>
-                            <i-option value="车全业务代充值账户">车全业务代充值账户</i-option>
-                            <i-option value="二手车业务代充值账户">二手车业务代充值账户</i-option>
-                            <i-option value="一点车贷代充值账户">一点车贷代充值账户</i-option>
+                            <i-option value="车贷代充值">车贷代充值账户</i-option>
+                            <i-option value="房贷代充值">房贷代充值账户</i-option>
+                            <i-option value="扶贫贷代充值">扶贫贷代充值账户</i-option>
+                            <i-option value="闪贷业务代充值">闪贷业务代充值账户</i-option>
+                            <i-option value="车全业务代充值">车全业务代充值账户</i-option>
+                            <i-option value="二手车业务代充值">二手车业务代充值账户</i-option>
+                            <i-option value="一点车贷代充值">一点车贷代充值账户</i-option>
 		  				</i-select>
 		  				<span style="color: red">
 		  					{{rechargeModalForm.rechargeAccountBalance && 

@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.hongte.alms.base.entity.BasicCompany;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
+import com.hongte.alms.base.service.BasicCompanyService;
 import com.hongte.alms.base.service.TdrepayRechargeLogService;
 import com.hongte.alms.base.vo.module.ComplianceRepaymentVO;
 import com.hongte.alms.common.result.Result;
@@ -40,6 +42,10 @@ public class TdrepayRechargeController {
 	@Autowired
 	@Qualifier("TdrepayRechargeService")
 	private TdrepayRechargeService tdrepayRechargeService;
+	
+	@Autowired
+	@Qualifier("BasicCompanyService")
+	private BasicCompanyService basicCompanyService;
 
 	@Autowired
 	@Qualifier("TdrepayRechargeLogService")
@@ -64,9 +70,6 @@ public class TdrepayRechargeController {
 		}
 		if (vo.getBusinessType() == null) {
 			return Result.error(INVALID_PARAM_CODE, "businessType" + INVALID_PARAM_DESC);
-		}
-		if (vo.getRepaymentType() == null) {
-			return Result.error(INVALID_PARAM_CODE, "repaymentType" + INVALID_PARAM_DESC);
 		}
 		if (vo.getFactRepayDate() == null) {
 			return Result.error(INVALID_PARAM_CODE, "factRepayDate" + INVALID_PARAM_DESC);
@@ -138,13 +141,52 @@ public class TdrepayRechargeController {
 	public PageResult<List<TdrepayRechargeLog>> queryComplianceRepaymentData(@ModelAttribute ComplianceRepaymentVO vo) {
 		try {
 			if (vo != null && vo.getConfirmTimeEnd() != null) {
-				DateUtil.addDay2Date(1, vo.getConfirmTimeEnd());
+				vo.setConfirmTimeEnd(DateUtil.addDay2Date(1, vo.getConfirmTimeEnd()));
 			}
+			int count = tdrepayRechargeService.countComplianceRepaymentData(vo);
+			if (count == 0) {
+				return PageResult.success(count);
+			}
+			
 			List<TdrepayRechargeLog> list = tdrepayRechargeService.queryComplianceRepaymentData(vo);
-			return PageResult.build(0, "请求成功", list);
+			if (CollectionUtils.isNotEmpty(list)) {
+				return PageResult.success(list, count);
+			}
+			return PageResult.success(0);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return PageResult.error(-99, "系统异常，接口调用失败");
+		}
+	}
+	
+	@ApiOperation(value = "查询所有分公司")
+	@GetMapping("/queryAllBusinessCompany")
+	@ResponseBody
+	public Result<List<BasicCompany>> queryAllBusinessCompany() {
+		try {
+			return Result.success(basicCompanyService.selectList(new EntityWrapper<>()));
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error("-99", "系统异常");
+		}
+	}
+	
+	@SuppressWarnings("rawtypes")
+	@ApiOperation(value = "执行资金分发")
+	@PostMapping("/userDistributeFund")
+	@ResponseBody
+	public Result userDistributeFund(@RequestBody List<TdrepayRechargeInfoVO> vos) {
+		try {
+			if (CollectionUtils.isEmpty(vos)) {
+				return Result.error("-99", "请选择要资金分发的数据");
+			}
+			
+			tdrepayRechargeService.tdrepayRecharge(vos);
+			
+			return Result.success();
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error("-99", "系统异常");
 		}
 	}
 }
