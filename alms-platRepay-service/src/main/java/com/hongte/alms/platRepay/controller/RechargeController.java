@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,7 +32,9 @@ import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.service.AgencyRechargeLogService;
 import com.hongte.alms.base.service.DepartmentBankService;
 import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.util.CommonUtil;
 import com.hongte.alms.common.util.StringUtil;
+import com.hongte.alms.platRepay.service.TdrepayRechargeService;
 import com.hongte.alms.platRepay.vo.RechargeModalVO;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 
@@ -53,40 +54,14 @@ public class RechargeController {
 	@Autowired
 	@Qualifier("AgencyRechargeLogService")
 	private AgencyRechargeLogService agencyRechargeLogService;
+	
+	@Autowired
+	@Qualifier("TdrepayRechargeService")
+	private TdrepayRechargeService tdrepayRechargeService;
 
 	@Autowired
 	@Qualifier("DepartmentBankService")
 	private DepartmentBankService departmentBankService;
-
-	@Value("${recharge.account.car.loan}")
-	private String carLoanUserId;
-	@Value("${recharge.account.house.loan}")
-	private String houseLoanUserId;
-	@Value("${recharge.account.relief.loan}")
-	private String reliefLoanUserId;
-	@Value("${recharge.account.quick.loan}")
-	private String quickLoanUserId;
-	@Value("${recharge.account.car.business}")
-	private String carBusinessUserId;
-	@Value("${recharge.account.second.hand.car.loan}")
-	private String secondHandCarLoanUserId;
-	@Value("${recharge.account.yi_dian_car_loan}")
-	private String yiDianCarLoanUserId;
-
-	@Value("${recharge.account.car.loan.oid.partner}")
-	private String carLoanOidPartner;
-	@Value("${recharge.account.house.loan.loan.oid.partner}")
-	private String houseLoanOidPartner;
-	@Value("${recharge.account.relief.loan.loan.oid.partner}")
-	private String reliefLoanOidPartner;
-	@Value("${recharge.account.quick.loan.loan.oid.partner}")
-	private String quickLoanOidPartner;
-	@Value("${recharge.account.car.business.loan.oid.partner}")
-	private String carBusinessOidPartner;
-	@Value("${recharge.account.second.hand.car.loan.loan.oid.partner}")
-	private String secondHandCarLoanOidPartner;
-	@Value("${recharge.account.yi_dian_car_loan.loan.oid.partner}")
-	private String yiDianCarLoanOidPartner;
 
 	@ApiOperation(value = "获取所有的线下还款账户")
 	@GetMapping("/listAllDepartmentBank")
@@ -108,7 +83,7 @@ public class RechargeController {
 
 		Map<String, Object> paramMap = new HashMap<>();
 
-		String userId = handleAccountType(rechargeAccountType);
+		String userId = tdrepayRechargeService.handleAccountType(rechargeAccountType);
 
 		paramMap.put("userId", userId);
 		
@@ -122,80 +97,6 @@ public class RechargeController {
 		return Result.success(result);
 	}
 
-	private String handleAccountType(String rechargeAccountType) {
-
-		String userId = null;
-
-		if (StringUtil.isEmpty(rechargeAccountType)) {
-			return userId;
-		}
-
-		switch (rechargeAccountType) {
-		case "车贷代充值账户":
-			userId = carLoanUserId;
-			break;
-		case "房贷代充值账户":
-			userId = houseLoanUserId;
-			break;
-		case "扶贫贷代充值账户":
-			userId = reliefLoanUserId;
-			break;
-		case "闪贷业务代充值账户":
-			userId = quickLoanUserId;
-			break;
-		case "车全业务代充值账户":
-			userId = carBusinessUserId;
-			break;
-		case "二手车业务代充值账户":
-			userId = secondHandCarLoanUserId;
-			break;
-		case "一点车贷代充值账户":
-			userId = yiDianCarLoanUserId;
-			break;
-		default:
-			userId = "";
-			break;
-		}
-		return userId;
-	}
-
-	private String handleOIdPartner(String rechargeAccountType) {
-
-		String oIdPartner = null;
-
-		if (StringUtil.isEmpty(rechargeAccountType)) {
-			return oIdPartner;
-		}
-
-		switch (rechargeAccountType) {
-		case "车贷代充值账户":
-			oIdPartner = carLoanOidPartner;
-			break;
-		case "房贷代充值账户":
-			oIdPartner = houseLoanOidPartner;
-			break;
-		case "扶贫贷代充值账户":
-			oIdPartner = reliefLoanOidPartner;
-			break;
-		case "闪贷业务代充值账户":
-			oIdPartner = quickLoanOidPartner;
-			break;
-		case "车全业务代充值账户":
-			oIdPartner = carBusinessOidPartner;
-			break;
-		case "二手车业务代充值账户":
-			oIdPartner = secondHandCarLoanOidPartner;
-			break;
-		case "一点车贷代充值账户":
-			oIdPartner = yiDianCarLoanOidPartner;
-			break;
-		default:
-			oIdPartner = "";
-			break;
-		}
-		return oIdPartner;
-	}
-
 	@SuppressWarnings("rawtypes")
 	@ApiOperation(value = "提交充值数据")
 	@PostMapping("/commitRechargeData")
@@ -206,20 +107,11 @@ public class RechargeController {
 			return Result.error("500", "不能空数据！");
 		}
 
-		String clientIp = "";
-		ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder
-				.getRequestAttributes();
-		HttpServletRequest request = requestAttributes.getRequest();
-
-		if (request.getHeader("x-forwarded-for") == null) {
-			clientIp = request.getRemoteAddr();
-		} else {
-			clientIp = request.getHeader("x-forwarded-for");
-		}
+		String clientIp = CommonUtil.getClientIp();
 
 		String rechargeAccountType = vo.getRechargeAccountType();
 
-		String rechargeUserId = handleAccountType(rechargeAccountType);
+		String rechargeUserId = tdrepayRechargeService.handleAccountType(rechargeAccountType);
 
 		if (StringUtil.isEmpty(rechargeUserId)) {
 			return Result.error("500", "没有找到代充值账户用户ID");
@@ -234,7 +126,7 @@ public class RechargeController {
 		dto.setClientIp(clientIp);
 		dto.setChargeType("3"); // 1：网关、2：快捷、3：代充值
 		dto.setCmOrderNo(cmOrderNo);
-		String oIdPartner = handleOIdPartner(rechargeAccountType);
+		String oIdPartner = tdrepayRechargeService.handleOIdPartner(rechargeAccountType);
 		dto.setoIdPartner(oIdPartner);
 		dto.setRechargeUserId(rechargeUserId);
 

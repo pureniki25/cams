@@ -33,7 +33,6 @@ public class TdrepayRechargeServiceImplTest {
 		infoVO.setAssetType(1);
 		infoVO.setOrigBusinessId("aaaaa");
 		infoVO.setBusinessType(1);
-		infoVO.setRepaymentType(1);
 		infoVO.setFactRepayDate(new Date());
 		infoVO.setCustomerName("aa");
 		infoVO.setCompanyName("bb");
