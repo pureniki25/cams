@@ -443,7 +443,10 @@ window.layinit(function (htConfig) {
 
                     // app.factRepayPreview.surplus = parseFloat(app.factRepayPreview.surplus.toFixed(2))
                     // app.factRepayPreview.subTotal = parseFloat(app.factRepayPreview.subTotal.toFixed(2))
-                    app.factRepayPreview.total = (app.factRepayPreview.subTotal*1000 + app.factRepayPreview.surplus*1000)/1000
+                    app.factRepayPreview.total = (app.factRepayPreview.subTotal*1000 
+                        + app.factRepayPreview.offlineOverDue*1000 
+                        + app.factRepayPreview.onlineOverDue*1000 
+                        + app.factRepayPreview.surplus*1000)/1000
                 },
                 confirmRepayment() {
                     let param = {};

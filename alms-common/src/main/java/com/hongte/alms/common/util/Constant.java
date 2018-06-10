@@ -94,4 +94,16 @@ public class Constant {
      * 发送数据平台贷款余额（撮合业务余额）kafka主题
      */
     public static final String TOTAL_BUSINESS_BALANCE_TOPIC = "storm_demo";
+    /**
+     * 调用第三方日志 接口代码
+     */
+    public static final String INTERFACE_CODE_SEND_DISTRIBUTE_FUND = "TdrepayRechargeService.sendDistributeFund";
+    /**
+     * 调用第三方日志 接口名称
+     */
+    public static final String INTERFACE_NAME_SEND_DISTRIBUTE_FUND = "请求EIP资金分发接口";
+    /**
+     * 调用第三方日志 系统标识
+     */
+    public static final String SYSTEM_CODE_EIP = "EIP";
 }

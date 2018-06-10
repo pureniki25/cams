@@ -19,11 +19,18 @@ public class ConfirmRepaymentReq {
 	private BigDecimal surplusFund ;
 	private List<String> mprIds ;
 	//TODO 线下代扣ids
-	//TODO 银行代扣ids
-	private String remark ;
+	// 银行代扣ids
+	private List<Integer> logIds;
+ 	private String remark ;
 	//10：线下转账，20：线下代扣，30：银行代扣,11:用往期结余还款
 	private List<Integer> repaySource ;
 	
+	public List<Integer> getLogIds() {
+		return logIds;
+	}
+	public void setLogIds(List<Integer> logIds) {
+		this.logIds = logIds;
+	}
 	public String getBusinessId() {
 		return businessId;
 	}

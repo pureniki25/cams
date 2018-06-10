@@ -127,6 +127,8 @@ public class RepaymentProjPlanListServiceImpl extends
 								RepaymentProjPlan projPlan = repaymentProjPlanService
 										.selectOne((new EntityWrapper<RepaymentProjPlan>().eq("creat_sys_type", 2))
 												.eq("proj_plan_id", projPList.getProjPlanId()));
+								RepaymentProjPlanListDetail underLineProjDetail=null;   //线下费用的Detail
+								RepaymentProjPlanListDetail onLineProjDetail=null;   //线上费用的Detail
 								//如果已经全部收取本期应交的本息服务费费及线上逾期费用后则停止计算滞纳金
 								if(getOnLineFactAmountSum(projPList.getProjPlanListId())>=getOnLinePlanAmountSum(projPList.getProjPlanListId())) {
 									continue;
@@ -151,15 +153,15 @@ public class RepaymentProjPlanListServiceImpl extends
 									projPList.setOverdueDays(underlineDueDays);
 									BigDecimal underLateFee=getUnderLateFee(projPList,projList, projPlan,underlineDueDays);//线下逾期费
 									underLateFeeSum=underLateFeeSum.add(underLateFee);
-									updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid(), underLateFee);
+									underLineProjDetail=	updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid(), underLateFee);
 									
 									BigDecimal onlineLateFee=BigDecimal.valueOf(0);//线上逾期费
 									if(onlineDueDays.compareTo(BigDecimal.valueOf(0))>0) {//如果线上的逾期天数为0,则不用计算线上滞纳金
 										 onlineLateFee=getOnLineLateFee(projPList, projPlan,onlineDueDays);//线上逾期费
 										onlineLateFeeSum=onlineLateFeeSum.add(onlineLateFee);
-										updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), onlineLateFee);
+										onLineProjDetail=updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), onlineLateFee);
 									}
-							
+							       
 									projPList.setOverdueAmount(underLateFee.add(onlineLateFee));
 									projPList.setCurrentStatus(RepayCurrentStatusEnums.逾期.name());
 									updateById(projPList);
@@ -167,8 +169,11 @@ public class RepaymentProjPlanListServiceImpl extends
 								}
 								
 								//更新还款计划业务表
-								updateOrInsertPlanDetail(pList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid(), underLateFeeSum);//每个业务每期还款计划的线下收费
-								updateOrInsertPlanDetail(pList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), onlineLateFeeSum);//每个业务每期还款计划的线上收费
+								updateOrInsertPlanDetail(pList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid(), underLateFeeSum,underLineProjDetail);//每个业务每期还款计划的线下收费
+								if(onLineProjDetail!=null) {//线上逾期费不为0
+									updateOrInsertPlanDetail(pList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), onlineLateFeeSum,onLineProjDetail);//每个业务每期还款计划的线上收费
+								}
+				
 								BigDecimal days=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), pList.getDueDate())));//每个业务每期款还计划的逾期天数
 								pList.setOverdueDays(days);
 								pList.setOverdueAmount(underLateFeeSum.add(onlineLateFeeSum));
@@ -416,7 +421,7 @@ public class RepaymentProjPlanListServiceImpl extends
 	     * @param feeId
 	     * @param lateFee
 	     */
-		private void updateOrInsertProjDetail(RepaymentProjPlanList projPList, String feeId, BigDecimal lateFee) {
+		private RepaymentProjPlanListDetail updateOrInsertProjDetail(RepaymentProjPlanList projPList, String feeId, BigDecimal lateFee) {
  			RepaymentProjPlanListDetail projDetail = repaymentProjPlanListDetailService.selectOne(
 					new EntityWrapper<RepaymentProjPlanListDetail>().eq("proj_plan_list_id", projPList.getProjPlanListId())
 							.eq("fee_id", feeId));
@@ -424,26 +429,29 @@ public class RepaymentProjPlanListServiceImpl extends
 				if (projDetail != null) {
 					projDetail.setProjPlanAmount(lateFee);
 					repaymentProjPlanListDetailService.updateById(projDetail);
+					
 				} else {
 					List<RepaymentProjPlanListDetail> projDetailList = repaymentProjPlanListDetailService
 							.selectList(new EntityWrapper<RepaymentProjPlanListDetail>().eq("proj_plan_list_id",
 									projPList.getProjPlanListId()));
 					if (projDetailList != null && projDetailList.size() > 0) {
 						RepaymentProjPlanListDetail temp = projDetailList.get(0);
-						RepaymentProjPlanListDetail copy = ClassCopyUtil.copyObject(temp,
+						projDetail = ClassCopyUtil.copyObject(temp,
 								RepaymentProjPlanListDetail.class);
-						copy.setProjPlanDetailId(UUID.randomUUID().toString());
-						copy.setFeeId(feeId);
-						copy.setProjPlanAmount(lateFee);
-						copy.setPlanItemType(60);
-						copy.setPlanItemName("滞纳金");
-						repaymentProjPlanListDetailService.insertOrUpdate(copy);
+						projDetail.setProjPlanDetailId(UUID.randomUUID().toString());
+						projDetail.setFeeId(feeId);
+						projDetail.setProjPlanAmount(lateFee);
+						projDetail.setPlanItemType(60);
+						projDetail.setPlanDetailId(UUID.randomUUID().toString());
+						projDetail.setPlanItemName("滞纳金");
+						repaymentProjPlanListDetailService.insertOrUpdate(projDetail);
 					}
 				}
 	
 			} catch (Exception e) {
 	           
 			}
+			return projDetail;
 	
 		}
 		
@@ -455,7 +463,7 @@ public class RepaymentProjPlanListServiceImpl extends
 	     * @param feeId
 	     * @param lateFee
 	     */
-		private void updateOrInsertPlanDetail(RepaymentBizPlanList pList, String feeId, BigDecimal lateFee) {
+		private void updateOrInsertPlanDetail(RepaymentBizPlanList pList, String feeId, BigDecimal lateFee,RepaymentProjPlanListDetail projDetail) {
 			RepaymentBizPlanListDetail pDetail = repaymentBizPlanListDetailService.selectOne(
 					new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", pList.getPlanListId())
 							.eq("fee_id", feeId));
@@ -471,7 +479,7 @@ public class RepaymentProjPlanListServiceImpl extends
 						RepaymentBizPlanListDetail temp = pDetails.get(0);
 						RepaymentBizPlanListDetail copy = ClassCopyUtil.copyObject(temp,
 								RepaymentBizPlanListDetail.class);
-						copy.setPlanDetailId(UUID.randomUUID().toString());
+						copy.setPlanDetailId(projDetail.getPlanDetailId());
 						copy.setFeeId(feeId);
 						copy.setPlanAmount(lateFee);
 						copy.setPlanItemType(60);

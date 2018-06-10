@@ -38,6 +38,7 @@ import com.hongte.alms.base.entity.RepaymentProjPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentProjPlanListDetailBak;
 import com.hongte.alms.base.entity.RepaymentResource;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
+import com.hongte.alms.base.entity.WithholdingRepaymentLog;
 import com.hongte.alms.base.enums.RepayCurrentStatusEnums;
 import com.hongte.alms.base.enums.RepayedFlag;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
@@ -62,6 +63,7 @@ import com.hongte.alms.base.mapper.TuandaiProjectInfoMapper;
 import com.hongte.alms.base.process.mapper.ProcessMapper;
 import com.hongte.alms.base.service.AccountantOverRepayLogService;
 import com.hongte.alms.base.service.RepaymentProjFactRepayService;
+import com.hongte.alms.base.service.WithholdingRepaymentLogService;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.finance.service.ShareProfitService;
@@ -114,6 +116,10 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	@Autowired
 	@Qualifier("RepaymentProjFactRepayService")
 	RepaymentProjFactRepayService repaymentProjFactRepayService;
+	
+	@Autowired
+	@Qualifier("WithholdingRepaymentLogService")
+	WithholdingRepaymentLogService withholdingRepaymentLogService;
 
 	private ThreadLocal<String> businessId = new ThreadLocal<String>();
 	private ThreadLocal<String> orgBusinessId = new ThreadLocal<String>();
@@ -237,6 +243,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	private void sortRepaymentResource(ConfirmRepaymentReq req) {
 		List<String> mprids = req.getMprIds();
 		BigDecimal surplus = req.getSurplusFund();
+		List<Integer> logIds= req.getLogIds();
 
 		if (mprids != null && mprids.size() > 0) {
 			List<MoneyPoolRepayment> moneyPoolRepayments = moneyPoolRepaymentMapper.selectBatchIds(mprids);
@@ -262,7 +269,36 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 				repaymentResources.get().add(repaymentResource);
 			}
 		}
-		// TODO 银行代扣,线下代扣尚待完善
+		
+		
+		// 银行代扣
+		if(logIds!=null&&logIds.size()>0) {
+			WithholdingRepaymentLog log=withholdingRepaymentLogService.selectById(logIds.get(0));
+			log.getBindPlatformId();
+
+			RepaymentResource repaymentResource = new RepaymentResource();
+			repaymentResource.setAfterId(log.getAfterId());
+			repaymentResource.setBusinessId(log.getOriginalBusinessId());
+			repaymentResource.setOrgBusinessId(log.getOriginalBusinessId());
+			repaymentResource.setCreateDate(new Date());
+			if(loginUserInfoHelper!=null&&loginUserInfoHelper.getUserId()!=null) {
+				repaymentResource.setCreateUser(loginUserInfoHelper.getUserId());
+			}else {
+				repaymentResource.setCreateUser("admin");
+			}
+			
+			repaymentResource.setIsCancelled(0);
+			repaymentResource.setRepayAmount(log.getCurrentAmount());
+			repaymentResource.setRepayDate(log.getCreateTime());
+			repaymentResource.setRepaySource("30");
+			if (save.get()) {
+				repaymentResource.setRepaySourceRefId(log.getLogId().toString());
+				repaymentResource.insert();
+			}
+			repayFactAmount.set(repayFactAmount.get().add(log.getCurrentAmount()));
+			repaymentResources.get().add(repaymentResource);
+			
+		}
 		if (surplus != null && surplus.compareTo(new BigDecimal("0")) > 0) {
 			BigDecimal canUseSurplus = accountantOverRepayLogService.caluCanUse(businessId.get(), null);
 			if (surplus.compareTo(canUseSurplus) > 0) {
@@ -748,6 +784,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			fact.setPeriod(detail.getPeriod());
 			fact.setPlanItemName(detail.getPlanItemName());
 			fact.setPlanItemType(detail.getPlanItemType());
+			fact.setFeeId(detail.getFeeId());
 			fact.setPlanListId(detail.getPlanListId());
 			fact.setProjPlanDetailId(detail.getProjPlanDetailId());
 			fact.setProjPlanListId(detail.getProjPlanListId());
@@ -877,7 +914,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		boolean item50Repaid = false ;
 		boolean onlineOverDueRepaid = false ;
 		BigDecimal planAmount = planList.getTotalBorrowAmount();
-		BigDecimal derateAmount = planList.getDerateAmount();
+		BigDecimal derateAmount = planList.getDerateAmount()==null?new BigDecimal("0"):planList.getDerateAmount();
+		BigDecimal lateFee = planList.getOverdueAmount()==null?new BigDecimal("0"):planList.getOverdueAmount();
 		BigDecimal factAmount = new BigDecimal("0");
 		
 		for (RepaymentBizPlanListDetail planListDetail : planListDetails) {
@@ -898,9 +936,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 				//某项还完
 				switch (planListDetail.getPlanItemType()) {
 				case 10:
-					item10Repaid = true;
+					item10Repaid = true;break;
 				case 20:
-					item20Repaid = true;
+					item20Repaid = true;break;
 				case 30:
 					item30Repaid = true;
 					break;
@@ -925,8 +963,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			planListDetail.updateById();
 		}
 		
-		int compare = factAmount.compareTo(planAmount.subtract(derateAmount));
-		if (compare==0) {
+		int compare = factAmount.compareTo(planAmount.add(lateFee).subtract(derateAmount));
+		if (compare>=0) {
 			planList.setCurrentStatus(RepayPlanStatus.REPAYED.getName());
 			planList.setCurrentSubStatus(RepayPlanStatus.REPAYED.getName());
 			planList.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
