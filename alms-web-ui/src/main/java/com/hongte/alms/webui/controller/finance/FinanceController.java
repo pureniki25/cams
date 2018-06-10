@@ -78,4 +78,15 @@ public class FinanceController {
 	public String moneyPool() {
 		return "/finance/moneyPool" ;
 	}
+
+
+	/**
+	 * 财务人员跟单设置
+	 * @return
+	 */
+	@RequestMapping("/orderSet")
+	public String orderSet(){return "/finance/orderSet";	}
+
+
+
 }

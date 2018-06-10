@@ -38,7 +38,7 @@ public class AfterLoanStandingBookVo implements java.io.Serializable  {
     @Excel(name = "业务获取", orderNum = "5",   isImportField = "true_st")
     private String operatorName; //业务获取 对应tb_basic_business表中业务主办人姓名
 
-    private String customerId; //用户ID 对应 tb_basic_business 表中 客户ID
+//    private String customerId; //用户ID 对应 tb_basic_business 表中 客户ID
     @Excel(name = "用户姓名", orderNum = "6",   isImportField = "true_st")
     private String customerName; //用户姓名  对应 tb_basic_business 表中 客户名称
 
@@ -156,13 +156,13 @@ public class AfterLoanStandingBookVo implements java.io.Serializable  {
         this.operatorName = operatorName;
     }
 
-    public String getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(String customerId) {
-        this.customerId = customerId;
-    }
+//    public String getCustomerId() {
+//        return customerId;
+//    }
+//
+//    public void setCustomerId(String customerId) {
+//        this.customerId = customerId;
+//    }
 
     public String getCustomerName() {
         return customerName;

@@ -797,5 +797,32 @@ public class FinanceController {
 		logger.info("@listDepartmentBank@查看所有银行账号--结束[{}]", result);
 		return result;
 	}
-	
+
+	@ApiOperation(value = "查找财务人员跟单设置查询相关信息")
+	@GetMapping("/getOrderSetSearchInfo")
+	public Result getOrderSetSearchInfo(){
+
+		logger.info("@getOrderSetSearchInfo@查找财务人员跟单设置查询相关信息--开始[]");
+		Result result = null;
+		Map<String,JSONArray> retMap = new HashMap<String,JSONArray>();
+		//区域
+		List<BasicCompany> area_list = basicCompanyService.selectList(new EntityWrapper<BasicCompany>().eq("area_level",AreaLevel.AREA_LEVEL.getKey()));
+		retMap.put("area", (JSONArray) JSON.toJSON(area_list,JsonUtil.getMapping()));
+		//公司
+		List<BasicCompany> company_list = basicCompanyService.selectList(new EntityWrapper<BasicCompany>().eq("area_level",AreaLevel.COMPANY_LEVEL.getKey()));
+		CompanySortByPINYINUtil.sortByPINYIN(company_list);
+		retMap.put("company",(JSONArray) JSON.toJSON(company_list,JsonUtil.getMapping()));
+//		//业务类型
+//		List<BasicBusinessType> btype_list =  basicBusinessTypeService.selectList(new EntityWrapper<BasicBusinessType>().orderBy("business_type_id"));
+//		retMap.put("businessType",(JSONArray) JSON.toJSON(btype_list, JsonUtil.getMapping()));
+
+		logger.info("@getOrderSetSearchInfo@查找财务人员跟单设置查询相关信息--结束[{}]", result);
+		return Result.success(retMap);
+
+	}
+
+
+
+
+
 }

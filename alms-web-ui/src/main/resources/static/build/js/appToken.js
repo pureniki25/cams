@@ -167,7 +167,7 @@ var getAuth = function() {
                 Authorization : "Bearer " + getToken()
             },
             success : function(data) {
-                console.log("权限",JSON.stringify(data));
+                // console.log("权限",JSON.stringify(data));
                 allAuth = data;
             },
             error : function() {

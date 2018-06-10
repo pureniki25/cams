@@ -4,7 +4,7 @@ let dateEnd
 let table 
 window.layinit(function (htConfig) {
     let _htConfig = htConfig
-    basePath = htConfig.coreBasePath
+    basePath = htConfig.financeBasePath
     table = layui.table
     let laydate = layui.laydate
 
@@ -64,8 +64,6 @@ let data = {
         show:false
     },
     addFinancialOrderForm :{
-
-        areaId  companyId  businessType  userId
 
         userId:'',
         areaLevel:'',
