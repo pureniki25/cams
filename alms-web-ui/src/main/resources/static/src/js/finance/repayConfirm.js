@@ -453,7 +453,10 @@ window.layinit(function (htConfig) {
                     param.businessId = businessId;
                     param.afterId = afterId;
                     param = Object.assign(app.factRepaymentInfo, param);
-                    
+                    if(!param.mprIds){
+                        app.$Message.error({content:'不能提交没匹配流水的还款确认'})
+                        return;
+                    }
                     app.$Modal.confirm({
                         content:'确认本次还款?',
                         onOk(){
