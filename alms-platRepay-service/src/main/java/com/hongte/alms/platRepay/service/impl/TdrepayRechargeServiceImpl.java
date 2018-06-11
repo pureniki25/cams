@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hongte.alms.base.dto.compliance.DistributeFundDTO;
 import com.hongte.alms.base.dto.compliance.DistributeFundDetailDTO;
 import com.hongte.alms.base.entity.IssueSendOutsideLog;
@@ -35,6 +37,7 @@ import com.hongte.alms.base.vo.module.ComplianceRepaymentVO;
 import com.hongte.alms.common.util.CommonUtil;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.StringUtil;
+import com.hongte.alms.platRepay.dto.TdProjectPaymentResult;
 import com.hongte.alms.platRepay.dto.TdrepayProjectInfoDTO;
 import com.hongte.alms.platRepay.dto.TdrepayProjectPeriodInfoDTO;
 import com.hongte.alms.platRepay.service.TdrepayRechargeService;
@@ -193,10 +196,6 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	@Override
 	public void tdrepayRecharge(List<TdrepayRechargeInfoVO> vos) {
 
-		if (CollectionUtils.isEmpty(vos)) {
-			return;
-		}
-
 		/*
 		 * 只有还款来源是线下还款和第三方代扣的才需使用代充值账户进行资金分发
 		 * 
@@ -248,15 +247,23 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	}
 
 	private void mismatchConditionFilter(List<TdrepayRechargeInfoVO> vos) {
+		if (CollectionUtils.isEmpty(vos)) {
+			return;
+		}
+
 		List<TdrepayRechargeInfoVO> lstVO = new LinkedList<>();
 		for (TdrepayRechargeInfoVO vo : vos) {
 			Integer repaySource = vo.getRepaySource();
-			if (repaySource == null || repaySource.intValue() != 1 || repaySource.intValue() != 2) {
+			if (repaySource != null && repaySource.intValue() != 1 && repaySource.intValue() != 2) {
 				lstVO.add(vo);
 			}
 		}
 
 		vos.removeAll(lstVO);
+
+		if (CollectionUtils.isEmpty(vos)) {
+			throw new ServiceRuntimeException("请重新选择符合资金分发条件的数据");
+		}
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -520,6 +527,91 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			break;
 		}
 		return oIdPartner;
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public void rePayComplianceWithRequirements(String logId) {
+		/*
+		 * 读取分发成功的数据
+		 */
+		TdrepayRechargeLog rechargeLog = tdrepayRechargeLogService
+				.selectOne(new EntityWrapper<TdrepayRechargeLog>().eq("log_id", logId));
+
+		if (rechargeLog == null) {
+			return;
+		}
+
+		TdrepayRechargeLog paramLog = new TdrepayRechargeLog();
+		paramLog.setProjectId(rechargeLog.getProjectId());
+		paramLog.setProcessStatus(2);
+		List<Integer> lstStatus = new ArrayList<>();
+		lstStatus.add(0);
+		lstStatus.add(3);
+		List<TdrepayRechargeLog> tdrepayRechargeLogs = tdrepayRechargeLogService
+				.selectList(new EntityWrapper<TdrepayRechargeLog>(paramLog).in("status", lstStatus));
+		if (CollectionUtils.isEmpty(tdrepayRechargeLogs)) {
+			return;
+		}
+
+		/*
+		 * 根据 settle_type 是否结清
+		 */
+		List<TdrepayRechargeLog> settleData = new ArrayList<>();
+		List<TdrepayRechargeLog> notSettleData = new ArrayList<>();
+		handleSettleTypeData(tdrepayRechargeLogs, settleData, notSettleData);
+
+		/*
+		 * 一、结清
+		 */
+		// TODO 待添加结清逻辑
+
+		/*
+		 * 二、未结清
+		 */
+
+		if (CollectionUtils.isEmpty(notSettleData)) {
+			LOG.info("没有找到资金分发成功的未结清的数据");
+			return;
+		}
+
+		/*
+		 * 1、判断 标的当前期是否存在垫付未还记录 需另外创建还垫付记录表 根据 标的还款信息查询接口 和 还垫付信息查询接口 取得数据对比
+		 */
+		for (TdrepayRechargeLog tdrepayRechargeLog : notSettleData) {
+			Map<String, Object> paramMap = new HashMap<>();
+			paramMap.put("projectId", tdrepayRechargeLog.getProjectId());
+			Result result = eipRemote.queryProjectPayment(paramMap);
+			if (result != null && "0000".equals(result.getReturnCode())) {
+				String jsonString = JSONObject.toJSONString(result.getData());
+				TdProjectPaymentResult projectPaymentResult = JSONObject.parseObject(jsonString,
+						TdProjectPaymentResult.class);
+
+			}
+		}
+
+		// 若是存在
+
+		// 2、调用 偿还垫付接口 还垫付 （到期垫付本息+分润）
+
+		// a、还垫付成功
+		// 标记成功 流程结束
+
+		// b、还垫付失败
+		// 标记失败 每60分钟重试一次
+	}
+
+	private void handleSettleTypeData(List<TdrepayRechargeLog> tdrepayRechargeLogs, List<TdrepayRechargeLog> settleData,
+			List<TdrepayRechargeLog> notSettleData) {
+		for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
+			Integer settleType = tdrepayRechargeLog.getSettleType();
+			if (settleType != null && (settleType.intValue() == 10 || settleType.intValue() == 11
+					|| settleType.intValue() == 20 || settleType.intValue() == 30)) {
+				settleData.add(tdrepayRechargeLog);
+			} else {
+				notSettleData.add(tdrepayRechargeLog);
+			}
+		}
 	}
 
 }
