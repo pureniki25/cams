@@ -96,9 +96,15 @@ public class FinanceController {
 	@RequestMapping("/downloadTemplate")
 	public ResponseEntity<byte[]> moneyPoolTemplate() throws IOException {
 		final String SEPARATOR = File.separator ;
-		final String root = ResourceUtils.getURL("classpath:").getPath();
+//		final String root = ResourceUtils.getURL("classpath:").getPath();
+		final String root = ResourceUtils.getFile("classpath:").getPath() ;
+		System.out.println(root);
 		String path = SEPARATOR+"templates"+SEPARATOR + "finance" + SEPARATOR + "moneyPoolTemplate.xlsx" ;
-		return ExportFileUtil.download(path, "款项池银行流水模板.xlsx");
+		File t1 = new File(root+"/templates/finance/moneyPoolTemplate.xlsx");
+		if (t1.exists()) {
+			System.out.println("妈的,可以这样访问");
+		}
+		return ExportFileUtil.download("BOOT-INF/classes/templates/finance/moneyPoolTemplate.xlsx", "款项池银行流水模板.xlsx");
 //		return ExportFileUtil.download("src"+SEPARATOR+"main"+SEPARATOR+"resources"+SEPARATOR+"templates"+SEPARATOR+"finance"+SEPARATOR+"moneyPoolTemplate.xlsx", "款项池银行流水模板.xlsx");
 	}
 
