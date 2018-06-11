@@ -5,6 +5,7 @@ package com.hongte.alms.webui.controller.finance;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -95,16 +97,11 @@ public class FinanceController {
 
 	@RequestMapping("/downloadTemplate")
 	public ResponseEntity<byte[]> moneyPoolTemplate() throws IOException {
-		final String SEPARATOR = File.separator ;
+//		final String SEPARATOR = File.separator ;
 //		final String root = ResourceUtils.getURL("classpath:").getPath();
-		final String root = ResourceUtils.getFile("classpath:").getPath() ;
-		System.out.println(root);
-		String path = SEPARATOR+"templates"+SEPARATOR + "finance" + SEPARATOR + "moneyPoolTemplate.xlsx" ;
-		File t1 = new File(root+"/templates/finance/moneyPoolTemplate.xlsx");
-		if (t1.exists()) {
-			System.out.println("妈的,可以这样访问");
-		}
-		return ExportFileUtil.download("BOOT-INF/classes/templates/finance/moneyPoolTemplate.xlsx", "款项池银行流水模板.xlsx");
+		InputStream is = getClass().getClassLoader().getResourceAsStream("/templates/finance/moneyPoolTemplate.xlsx");
+		return ExportFileUtil.download(FileCopyUtils.copyToByteArray(is), "款项池银行流水模板.xlsx");
+//		return ExportFileUtil.download("BOOT-INF/classes/templates/finance/moneyPoolTemplate.xlsx", "款项池银行流水模板.xlsx");
 //		return ExportFileUtil.download("src"+SEPARATOR+"main"+SEPARATOR+"resources"+SEPARATOR+"templates"+SEPARATOR+"finance"+SEPARATOR+"moneyPoolTemplate.xlsx", "款项池银行流水模板.xlsx");
 	}
 
