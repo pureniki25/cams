@@ -52,5 +52,10 @@ public interface TdrepayRechargeService {
 	 * @return
 	 */
 	String handleOIdPartner(String rechargeAccountType);
+	
+	/**
+	 * 资产端对团贷网通用合规化还款流程
+	 */
+	void rePayComplianceWithRequirements(String logId);
 
 }

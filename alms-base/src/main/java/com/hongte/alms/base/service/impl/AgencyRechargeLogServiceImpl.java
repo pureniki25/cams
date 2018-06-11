@@ -48,7 +48,7 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 				throw new ServiceRuntimeException("订单号或处理状态不能为空");
 			}
 
-			AgencyRechargeLog log = this.selectOne(new EntityWrapper<AgencyRechargeLog>().eq("unique_id", cmOrderNo));
+			AgencyRechargeLog log = this.selectOne(new EntityWrapper<AgencyRechargeLog>().eq("cm_order_no", cmOrderNo));
 			if (log == null) {
 				throw new ServiceRuntimeException("没有找到对应的代充值记录");
 			}
@@ -86,7 +86,7 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 				log.setHandleStatus(status);
 				log.setUpdateTime(new Date());
 				log.setUpdateUser(updateUser);
-				this.update(log, new EntityWrapper<AgencyRechargeLog>().eq("unique_id", cmOrderNo));
+				this.update(log, new EntityWrapper<AgencyRechargeLog>().eq("cm_order_no", cmOrderNo));
 			}
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
