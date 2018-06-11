@@ -98,7 +98,7 @@ public class FinanceController {
 		final String SEPARATOR = File.separator ;
 		final String root = ResourceUtils.getURL("classpath:").getPath();
 		String path = SEPARATOR+"templates"+SEPARATOR + "finance" + SEPARATOR + "moneyPoolTemplate.xlsx" ;
-		return ExportFileUtil.download(root+path, "款项池银行流水模板.xlsx");
+		return ExportFileUtil.download(path, "款项池银行流水模板.xlsx");
 //		return ExportFileUtil.download("src"+SEPARATOR+"main"+SEPARATOR+"resources"+SEPARATOR+"templates"+SEPARATOR+"finance"+SEPARATOR+"moneyPoolTemplate.xlsx", "款项池银行流水模板.xlsx");
 	}
 
