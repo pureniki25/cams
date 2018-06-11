@@ -66,7 +66,7 @@
 	</select>
 	<select id="conutMoneyPoolManagerList" resultType="java.lang.Integer">
 		SELECT
-			count(1)
+			count(distinct mp.money_pool_id)
 		FROM
 			tb_money_pool mp
 			LEFT JOIN tb_department_bank db ON db.finance_name = mp.accept_bank
@@ -97,7 +97,7 @@
 		</where>
 	</select>
 	<select id="selectMoneyPoolManagerList" resultType="com.hongte.alms.base.vo.finance.MoneyPoolManagerVO">
-		SELECT
+		SELECT distinct
 			mp.money_pool_id AS moneyPoolId, 
 			mp.xd_pool_id AS xdPoolId, 
 			mp.pay_code AS payCode, 
