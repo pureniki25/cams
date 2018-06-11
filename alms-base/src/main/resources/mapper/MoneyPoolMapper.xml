@@ -76,7 +76,7 @@
 				AND mp.trade_date &gt;= #{tradeDateStart,jdbcType=DATE}
 			</if>
 			<if test="tradeDateEnd != null and tradeDateEnd.length != 0 ">
-				AND mp.trade_date &lt;= #{tradeDateStart,jdbcType=DATE}
+				AND mp.trade_date &lt;= #{tradeDateEnd,jdbcType=DATE}
 			</if>
 			<if test="updateDateStart != null and updateDateStart.length != 0 ">
 				AND update_time &gt;= #{updateDateStart,jdbcType=DATE}
@@ -131,7 +131,7 @@
 				AND mp.trade_date &gt;= #{tradeDateStart,jdbcType=DATE}
 			</if>
 			<if test="tradeDateEnd != null and tradeDateEnd.length != 0 ">
-				AND mp.trade_date &lt;= #{tradeDateStart,jdbcType=DATE}
+				AND mp.trade_date &lt;= #{tradeDateEnd,jdbcType=DATE}
 			</if>
 			<if test="updateDateStart != null and updateDateStart.length != 0 ">
 				AND update_time &gt;= #{updateDateStart,jdbcType=DATE}
