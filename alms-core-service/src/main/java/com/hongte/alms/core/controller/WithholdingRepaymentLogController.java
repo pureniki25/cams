@@ -1,6 +1,7 @@
 package com.hongte.alms.core.controller;
 
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -35,15 +36,19 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.collection.vo.AfterLoanStandingBookReq;
 import com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo;
+import com.hongte.alms.base.entity.ApplyDerateProcess;
 import com.hongte.alms.base.entity.InfoSms;
 import com.hongte.alms.base.entity.WithholdingRepaymentLog;
+import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.service.WithholdingRecordLogService;
 import com.hongte.alms.base.service.WithholdingRepaymentLogService;
 import com.hongte.alms.base.vo.module.InfoSmsListSearchReq;
 import com.hongte.alms.base.vo.module.InfoSmsListSearchVO;
 import com.hongte.alms.base.vo.module.RepaymentLogReq;
 import com.hongte.alms.base.vo.module.RepaymentLogVO;
+import com.hongte.alms.base.vo.module.api.RepayLogResp;
 import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.util.ClassCopyUtil;
 import com.hongte.alms.common.util.EasyPoiExcelExportUtil;
 import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.vo.PageResult;
@@ -110,6 +115,61 @@ public class WithholdingRepaymentLogController {
 	            
 	
 	            return PageResult.success(pages.getRecords(),pages.getTotal());
+	        }catch (Exception ex){
+	            ex.printStackTrace();
+	            logger.error(ex.getMessage());
+	            return PageResult.error(500, "数据库访问异常");
+	        }
+	    }
+	    
+	    
+	    
+	    
+	    
+	    /**
+	     * 执行代扣页面的代扣明细
+	     *
+	     * @author chenzs
+	     * 
+	     * 
+	     */
+	    @ApiOperation(value = "获取分页代扣查询列表")
+	    @GetMapping("/searchAfterRepayLog")
+	    @ResponseBody
+	    public PageResult<List<RepayLogResp>> searchAfterRepayLog(@RequestParam("businessId") String businessId,@RequestParam("afterId") String afterId){
+
+	        try{
+	        	List<WithholdingRepaymentLog> logs=withholdingRepaymentlogService.selectList(new EntityWrapper<WithholdingRepaymentLog>().eq("original_business_id", businessId).eq("after_id", afterId));
+	    		
+	        	RepayLogResp repayLogResp=null;
+	           List<RepayLogResp> repayLogResps=new ArrayList();
+	        		   for(int i=0;i< logs.size();i++) {
+	        			   repayLogResp= ClassCopyUtil.copyObject(logs.get(i),RepayLogResp.class);
+	    				   repayLogResp.setListId(String.valueOf(i+1));
+	    				   if(repayLogResp.getRepayStatus().equals("1")) {
+	    					   repayLogResp.setRepayStatus("成功");
+	    				   }else if(repayLogResp.getRepayStatus().equals("2")){
+	    					   repayLogResp.setRepayStatus("处理中");
+	    				   }else {
+	    					   repayLogResp.setRepayStatus("失败");
+	    				   }
+	    				   if(repayLogResp.getBindPlatformId()==PlatformEnum.AN_FORM.getValue()) {
+	    					   repayLogResp.setBindPlatform(PlatformEnum.AN_FORM.getName());
+	    				   }else if(repayLogResp.getBindPlatformId()==PlatformEnum.BF_FORM.getValue()) {
+	    					   repayLogResp.setBindPlatform(PlatformEnum.BF_FORM.getName());
+	    				   }else if(repayLogResp.getBindPlatformId()==PlatformEnum.FY_FORM.getValue()) {
+	    					   repayLogResp.setBindPlatform(PlatformEnum.FY_FORM.getName());
+	    				   }else if(repayLogResp.getBindPlatformId()==PlatformEnum.YB_FORM.getValue()) {
+	    					   repayLogResp.setBindPlatform(PlatformEnum.YB_FORM.getName());
+	    				   }else if(repayLogResp.getBindPlatformId()==PlatformEnum.YS_FORM.getValue()) {
+	    					   repayLogResp.setBindPlatform(PlatformEnum.YS_FORM.getName());
+	    				   }else if(repayLogResp.getBindPlatformId()==PlatformEnum.YH_FORM.getValue()) {
+	    					   repayLogResp.setBindPlatform(PlatformEnum.YH_FORM.getName());
+	    				   }
+	    				   repayLogResps.add(repayLogResp);
+	    			   }
+	
+	            return PageResult.success(repayLogResps,repayLogResps.size());
 	        }catch (Exception ex){
 	            ex.printStackTrace();
 	            logger.error(ex.getMessage());
