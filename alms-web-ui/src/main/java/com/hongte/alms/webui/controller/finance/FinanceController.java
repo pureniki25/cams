@@ -91,9 +91,20 @@ public class FinanceController {
 	public String moneyPool() {
 		return "/finance/moneyPool" ;
 	}
-	
+
 	@RequestMapping("/downloadTemplate")
 	public ResponseEntity<byte[]> moneyPoolTemplate() throws IOException {
 		return ExportFileUtil.download("src/main/resources/款项池银行流水模板.xlsx", "款项池银行流水模板.xlsx");
 	}
+
+
+	/**
+	 * 财务人员跟单设置
+	 * @return
+	 */
+	@RequestMapping("/orderSet")
+	public String orderSet(){return "/finance/orderSet";	}
+
+
+
 }

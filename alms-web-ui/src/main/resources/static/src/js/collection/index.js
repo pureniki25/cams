@@ -149,13 +149,13 @@ window.layinit(function(htConfig){
                     vm.$Modal.error({content:alarmStr});
                     return ;
                 }
-
-                layer.open({
-                    type: 2,
-                    title: '分配电催',
-                    area: ['95%', '95%'],
-                    content: '/collectionUI/setPhoneStaffUI?crpIds='+getSelectedcrpIds()
-                });
+                showOneLineOprLayer('/collectionUI/setPhoneStaffUI?crpIds='+getSelectedcrpIds(),"分配电催");
+                // layer.open({
+                //     type: 2,
+                //     title: '分配电催',
+                //     area: ['95%', '95%'],
+                //     content: '/collectionUI/setPhoneStaffUI?crpIds='+getSelectedcrpIds()
+                // });
             },
             //显示移交催收人员 界面
             showSetVisitStaff (name) {
@@ -165,12 +165,14 @@ window.layinit(function(htConfig){
                     return ;
                 }
 
-                layer.open({
-                    type: 2,
-                    title: '移交催收',
-                    area: ['95%', '95%'],
-                    content: '/collectionUI/setVisitStaffUI?crpIds='+getSelectedcrpIds()
-                });
+                showOneLineOprLayer('/collectionUI/setVisitStaffUI?crpIds='+getSelectedcrpIds(),"移交催收");
+
+                // layer.open({
+                //     type: 2,
+                //     title: '移交催收',
+                //     area: ['95%', '95%'],
+                //     content: '/collectionUI/setVisitStaffUI?crpIds='+getSelectedcrpIds()
+                // });
 
             },
 
@@ -214,7 +216,11 @@ window.layinit(function(htConfig){
             fixed: false,
             maxmin: true,
             title:title,
-            content: url
+            content: url,
+            success: function (layero, index) {
+                /* 渲染表单 */
+                vm.toLoading();
+            }
         });
 
 
