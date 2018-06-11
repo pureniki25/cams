@@ -120,6 +120,12 @@
 					<include>**/*.xml</include>
 				</includes>
 			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/moneyPoolTemplate.xlsx</include>
+				</includes>
+			</resource>
 		</resources>
 		<!--指定生成的jar包名称-->
 		<finalName>alms-web-ui</finalName>
