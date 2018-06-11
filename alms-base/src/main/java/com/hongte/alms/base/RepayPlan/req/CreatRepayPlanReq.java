@@ -58,7 +58,7 @@ public class CreatRepayPlanReq {
         1.15>1.2 1.25>1.2
      7：断言请求的操作具有精确的结果，因此不需要舍入
      */
-    @ApiModelProperty(required= true,value = "进位方式标志位 0：进一位，1：不进位，4：四舍五入 ")
+    @ApiModelProperty(required= true,value = "进位方式标志位 0：进一位，1：不进位，4：四舍五入, 6:银行家舍入法 ")
     @NotNull(message = "进位方式标志位(rondmode)不能为空")
     private Integer rondmode;
 

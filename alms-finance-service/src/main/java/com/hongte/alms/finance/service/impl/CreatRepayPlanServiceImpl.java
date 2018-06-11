@@ -126,9 +126,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 //    Validator globalValidator;
 
     //进位方式枚举
-    private  RoundingMode roundingMode=RoundingMode.HALF_UP;
+    private  RoundingMode roundingMode=RoundingMode.UP;
     //保留的小数位数
-    private  Integer smallNum=4;
+    public Integer smallNum=4;
 
     //本金字符串
     private static final  String principal_str = "principal";
@@ -175,7 +175,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 BigDecimal persent = new BigDecimal(1).subtract(setedPersent);
                 projPersent.put(projInfoReq.getProjectId(),persent);
             }else{
-                BigDecimal persent = projInfoReq.getFullBorrowMoney().divide(businessBasicInfo.getBorrowMoney(),smallNum,roundingMode);
+                BigDecimal persent = projInfoReq.getFullBorrowMoney().divide(businessBasicInfo.getBorrowMoney(),10,roundingMode);
                 setedPersent = setedPersent.add(persent);
                 projPersent.put(projInfoReq.getProjectId(),persent);
             }
@@ -1731,7 +1731,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         //每月利息
         BigDecimal interest =  fullBorrowMoney.multiply(monthRate);
         //每月本金
-        BigDecimal priciple = fullBorrowMoney.divide(new BigDecimal(periodMonth),smallNum,roundingMode);
+        BigDecimal priciple = fullBorrowMoney.divide(new BigDecimal(periodMonth),10,roundingMode);
         for (int i=0;i<periodMonth;i++){
             addPAndIToList(priciple,interest,retMap,i);
         }
@@ -2109,42 +2109,42 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
     public static void main(String[] args) {
 
-        BusinessBasicInfoReq  businessBasicInfo = new BusinessBasicInfoReq();
-        businessBasicInfo.setBorrowMoney(new BigDecimal(3000));
-
-
-        List<ProjInfoReq>tuandaiProjReqInfos  = new LinkedList<>();
-        ProjInfoReq  req1= new ProjInfoReq();
-        tuandaiProjReqInfos.add(req1);
-        req1.setFullBorrowMoney(new BigDecimal(1000));
-        req1.setProjectId("11");
-
-        ProjInfoReq  req2= new ProjInfoReq();
-        tuandaiProjReqInfos.add(req2);
-        req2.setFullBorrowMoney(new BigDecimal(1000));
-        req2.setProjectId("22");
-
-        ProjInfoReq  req3= new ProjInfoReq();
-        tuandaiProjReqInfos.add(req3);
-        req3.setFullBorrowMoney(new BigDecimal(1000));
-        req3.setProjectId("33");
-
-        Integer projIndex = 0;
-        BigDecimal setedPersent = new BigDecimal(0);
-        Map<String,BigDecimal>  projPersent = new HashMap<>();
-        for(ProjInfoReq projInfoReq:tuandaiProjReqInfos){
-            projIndex++;
-            //如果是最后一个，则用减的
-            if(projIndex.equals(tuandaiProjReqInfos.size())){
-                BigDecimal persent = new BigDecimal(1).subtract(setedPersent);
-                projPersent.put(projInfoReq.getProjectId(),persent);
-            }else{
-                BigDecimal persent = projInfoReq.getFullBorrowMoney().divide(businessBasicInfo.getBorrowMoney(),4,0);
-                setedPersent = setedPersent.add(persent);
-                projPersent.put(projInfoReq.getProjectId(),persent);
-            }
-        }
-        System.out.println(JSON.toJSONString(projPersent));
+//        BusinessBasicInfoReq  businessBasicInfo = new BusinessBasicInfoReq();
+//        businessBasicInfo.setBorrowMoney(new BigDecimal(3000));
+//
+//
+//        List<ProjInfoReq>tuandaiProjReqInfos  = new LinkedList<>();
+//        ProjInfoReq  req1= new ProjInfoReq();
+//        tuandaiProjReqInfos.add(req1);
+//        req1.setFullBorrowMoney(new BigDecimal(1000));
+//        req1.setProjectId("11");
+//
+//        ProjInfoReq  req2= new ProjInfoReq();
+//        tuandaiProjReqInfos.add(req2);
+//        req2.setFullBorrowMoney(new BigDecimal(1000));
+//        req2.setProjectId("22");
+//
+//        ProjInfoReq  req3= new ProjInfoReq();
+//        tuandaiProjReqInfos.add(req3);
+//        req3.setFullBorrowMoney(new BigDecimal(1000));
+//        req3.setProjectId("33");
+//
+//        Integer projIndex = 0;
+//        BigDecimal setedPersent = new BigDecimal(0);
+//        Map<String,BigDecimal>  projPersent = new HashMap<>();
+//        for(ProjInfoReq projInfoReq:tuandaiProjReqInfos){
+//            projIndex++;
+//            //如果是最后一个，则用减的
+//            if(projIndex.equals(tuandaiProjReqInfos.size())){
+//                BigDecimal persent = new BigDecimal(1).subtract(setedPersent);
+//                projPersent.put(projInfoReq.getProjectId(),persent);
+//            }else{
+//                BigDecimal persent = projInfoReq.getFullBorrowMoney().divide(businessBasicInfo.getBorrowMoney(),4,0);
+//                setedPersent = setedPersent.add(persent);
+//                projPersent.put(projInfoReq.getProjectId(),persent);
+//            }
+//        }
+//        System.out.println(JSON.toJSONString(projPersent));
 
 //
 //        List<ProjExtRateReq> rateReqs = new LinkedList<>();
@@ -2224,20 +2224,35 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 //        System.out.println(periodStr);
 
         //---------  还款本息   测试   开始----------//
+        Integer periodMonth = 36;
+        BigDecimal fullBorrowMoney = new BigDecimal(20000);
+        BigDecimal rate =new BigDecimal(11);
 //        Integer periodMonth = 12;
 //        BigDecimal fullBorrowMoney = new BigDecimal(120000);
 //        BigDecimal rate =new BigDecimal(12);
-//        RepayPlanBorrowRateUnitEnum rateUnit = RepayPlanBorrowRateUnitEnum.YEAR_RATE;
-////        RepayPlanRepayIniCalcWayEnum repayType = RepayPlanRepayIniCalcWayEnum.INT_AND_PRIN_AVERAGE;//等本等息
-////        RepayPlanRepayIniCalcWayEnum repayType = RepayPlanRepayIniCalcWayEnum.PRINCIPAL_LAST;//先息后本
-//        RepayPlanRepayIniCalcWayEnum repayType = RepayPlanRepayIniCalcWayEnum.INT_AND_PRIN_EQUAL; //等额本息
-////        RepayPlanRepayIniCalcWayEnum repayType = RepayPlanRepayIniCalcWayEnum.INT_AND_PRIN_EVERYTIME; //分期还本付息
+
+        RepayPlanBorrowRateUnitEnum rateUnit = RepayPlanBorrowRateUnitEnum.YEAR_RATE;
+//        RepayPlanRepayIniCalcWayEnum repayType = RepayPlanRepayIniCalcWayEnum.INT_AND_PRIN_AVERAGE;//等本等息
+//        RepayPlanRepayIniCalcWayEnum repayType = RepayPlanRepayIniCalcWayEnum.PRINCIPAL_LAST;//先息后本
+        RepayPlanRepayIniCalcWayEnum repayType = RepayPlanRepayIniCalcWayEnum.INT_AND_PRIN_EQUAL; //等额本息
+//        RepayPlanRepayIniCalcWayEnum repayType = RepayPlanRepayIniCalcWayEnum.INT_AND_PRIN_EVERYTIME; //分期还本付息
+
+
+
+
+        CreatRepayPlanServiceImpl impl = new CreatRepayPlanServiceImpl();
+        impl.smallNum = 3;
+        List<PrincipleReq> principleMap = new LinkedList<>();
+
+        Map<Integer,Map<String,BigDecimal>> map = impl.calculateRepayPrinAndIni(periodMonth,fullBorrowMoney,rate,rateUnit,repayType,principleMap);
+
+
+        System.out.println(JSON.toJSONString(map));
+
+
+//        BigDecimal ttt = new BigDecimal("2.1111589965");
 //
-//        CreatRepayPlanServiceImpl impl = new CreatRepayPlanServiceImpl();
-//
-//        Map<Integer,Map<String,BigDecimal>> map = impl.calculateRepayPrinAndIni(periodMonth,fullBorrowMoney,rate,rateUnit,repayType);
-//
-//        System.out.println(JSON.toJSONString(map));
+//        ttt
 
         //---------  还款本息   测试   结束----------//
         //
