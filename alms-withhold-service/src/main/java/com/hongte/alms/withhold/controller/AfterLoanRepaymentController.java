@@ -36,7 +36,7 @@ public class AfterLoanRepaymentController {
     
     @Autowired
 	@Qualifier("RechargeService")
-    RechargeService RechargeService;
+    RechargeService rechargeService;
     
     
     @Autowired
@@ -74,7 +74,15 @@ public class AfterLoanRepaymentController {
     
     }
     
-    
+    /**
+     * 查询代扣结果
+ 
+     */
+    @GetMapping("/searchRepayResult")
+    @ApiOperation(value = "查询代扣结果")
+    public void searchRepayResult(){
+    	rechargeService.getReturnResult();
+    }
 
 
 }
