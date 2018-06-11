@@ -117,12 +117,18 @@ public class DeductionController {
     	BankCardInfo bankCardInfo=null;
     	try {
     		 bankCardInfos=customerInfoXindaiRemoteApi.getBankcardInfo(business.getCustomerIdentifyCard());
-    		 for(int i=0;i<bankCardInfos.size();i++) {
-    			 //看看是否有对应资金端的ID
-    			 if(bankCardInfos.get(i).getPlatformType()==business.getOutputPlatformId()) {
-    				 bankCardInfo=bankCardInfos.get(i);
-    			 }
+    		 if(bankCardInfos!=null&&bankCardInfos.size()>0) {
+    			
+    			 for(int i=0;i<bankCardInfos.size();i++) {
+        			 //看看是否有对应资金端的ID
+        			 if(bankCardInfos.get(i).getPlatformType()==business.getOutputPlatformId()) {
+        				 bankCardInfo=bankCardInfos.get(i);
+        			 }
+        		 }
+    		 }else {
+    			 return Result.error("-1", "该客户找不到对应银行卡信息");
     		 }
+    	
     		 if(bankCardInfo==null) {
     			 return Result.error("-1", "该客户信息找不到对应业务的资金端类型");
     		 }

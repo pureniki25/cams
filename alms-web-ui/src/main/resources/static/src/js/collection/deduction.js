@@ -140,12 +140,12 @@ var layer;
                 data: JSON.stringify(vm.ajax_data),
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
-                 
-                    if(data.code=='1'){
-		            	 vm.$Modal.success({content:data.data});
-		             }else{
-		                 vm.$Modal.error({content:data.data});
-		             }
+                  	vm.$Modal.success({content:"执行成功，请稍后查询结果"});
+//                    if(data.code=='1'){
+//		            	 vm.$Modal.success({content:data.data});
+//		             }else{
+//		                 vm.$Modal.error({content:data.data});
+//		             }
                 },
                 error: function (message) {
                 	 layer.confirm('Navbar error:AJAX请求出错!', function(index) {
@@ -166,12 +166,12 @@ var layer;
 		            Authorization : "Bearer " + getToken()
 		        },
 		        success : function(data) {debugger
-		        	vm.$Modal.success({content:"执行成功，请稍后查询结果"});
-//		             if(data.code=='1'){
-//		            	 vm.$Modal.success({content:data.data});
-//		             }else{
-//		                 vm.$Modal.error({content:data.data});
-//		             }
+		      
+		             if(data.code=='1'){
+		            	 vm.$Modal.success({content:data.data});
+		             }else{
+		                 vm.$Modal.error({content:data.data});
+		             }
 		        },
 		        error : function() {
 		            layer.confirm('Navbar error:AJAX请求出错!', function(index) {
