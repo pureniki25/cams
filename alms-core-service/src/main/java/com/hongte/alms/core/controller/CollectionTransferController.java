@@ -311,7 +311,8 @@ public class CollectionTransferController {
 					mapInfo.get("staffType"), CollectionSetWayEnum.XINDAI_LOG);
 
 		} catch (Exception e) {
-			recordErrorInfo(carBusinessAfter.getCarBusinessId(), carBusinessAfter.getCarBusinessAfterId(), DoubleList, "电催", "查出两条以上还款计划数据");
+			e.printStackTrace();
+			recordErrorInfo(carBusinessAfter.getCarBusinessId(), carBusinessAfter.getCarBusinessAfterId(), DoubleList, "电催", "G查出两条以上还款计划数据");
 			return false;
 		}
 		return true;
@@ -542,6 +543,10 @@ public class CollectionTransferController {
 		LoginInfoDto dto = new LoginInfoDto();
 		if(bmUserId!=null&&!bmUserId.equals("")){
 			dto = loginUserInfoHelper.getUserInfoByUserId("", bmUserId);
+		}
+		if(dto ==null){
+			recordErrorInfo(businessId ,afterId, NoUser,status,"没有用户信息");
+			return null;
 		}
 
 		// 判断状态

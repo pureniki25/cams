@@ -67,10 +67,6 @@ public class CreatRepayPlanReq {
     @NotNull(message = "计算保留的小数位数(smallNum)不能为空")
     private Integer smallNum;
 
-
-
-
-
     /**
      *  上标信息
      */

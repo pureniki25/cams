@@ -2,12 +2,14 @@ package com.hongte.alms.base.collection.entity;
 
 import java.io.Serializable;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.baomidou.mybatisplus.enums.IdType;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
@@ -29,22 +31,24 @@ public class Parametertracelog extends Model<Parametertracelog> {
 	private Integer id;
 	@TableField("Car_Business_Id")
 	@ApiModelProperty(required= true,value = "")
-	private String CarBusinessId;
+	private String carBusinessId;
 	@TableField("Car_Business_After_Id")
 	@ApiModelProperty(required= true,value = "")
-	private String CarBusinessAfterId;
+	private String carBusinessAfterId;
     /**
      * [跟踪记录内容]
      */
 	@TableField("Trance_Content")
 	@ApiModelProperty(required= true,value = "[跟踪记录内容]")
-	private String TranceContent;
+	private String tranceContent;
 	@TableField("Trance_Name")
 	@ApiModelProperty(required= true,value = "")
-	private String TranceName;
+	private String tranceName;
 	@TableField("Trance_Date")
 	@ApiModelProperty(required= true,value = "")
-	private Date TranceDate;
+	@JSONField(format="yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+	private Date tranceDate;
     /**
      * 状态
      */
@@ -67,6 +71,8 @@ public class Parametertracelog extends Model<Parametertracelog> {
      */
 	@TableField("create_time")
 	@ApiModelProperty(required= true,value = "创建时间")
+	@JSONField(format="yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createTime;
     /**
      * 1是贷后跟踪记录，2是催收跟踪记录
@@ -97,43 +103,43 @@ public class Parametertracelog extends Model<Parametertracelog> {
 	}
 
 	public String getCarBusinessId() {
-		return CarBusinessId;
+		return carBusinessId;
 	}
 
 	public void setCarBusinessId(String CarBusinessId) {
-		this.CarBusinessId = CarBusinessId;
+		this.carBusinessId = CarBusinessId;
 	}
 
 	public String getCarBusinessAfterId() {
-		return CarBusinessAfterId;
+		return carBusinessAfterId;
 	}
 
 	public void setCarBusinessAfterId(String CarBusinessAfterId) {
-		this.CarBusinessAfterId = CarBusinessAfterId;
+		this.carBusinessAfterId = CarBusinessAfterId;
 	}
 
 	public String getTranceContent() {
-		return TranceContent;
+		return tranceContent;
 	}
 
 	public void setTranceContent(String TranceContent) {
-		this.TranceContent = TranceContent;
+		this.tranceContent = TranceContent;
 	}
 
 	public String getTranceName() {
-		return TranceName;
+		return tranceName;
 	}
 
 	public void setTranceName(String TranceName) {
-		this.TranceName = TranceName;
+		this.tranceName = TranceName;
 	}
 
 	public Date getTranceDate() {
-		return TranceDate;
+		return tranceDate;
 	}
 
 	public void setTranceDate(Date TranceDate) {
-		this.TranceDate = TranceDate;
+		this.tranceDate = TranceDate;
 	}
 
 	public Integer getStatus() {
@@ -201,11 +207,11 @@ public class Parametertracelog extends Model<Parametertracelog> {
 	public String toString() {
 		return "Parametertracelog{" +
 			", id=" + id +
-			", CarBusinessId=" + CarBusinessId +
-			", CarBusinessAfterId=" + CarBusinessAfterId +
-			", TranceContent=" + TranceContent +
-			", TranceName=" + TranceName +
-			", TranceDate=" + TranceDate +
+			", carBusinessId=" + carBusinessId +
+			", carBusinessAfterId=" + carBusinessAfterId +
+			", tranceContent=" + tranceContent +
+			", tranceName=" + tranceName +
+			", tranceDate=" + tranceDate +
 			", status=" + status +
 			", litigationStatus=" + litigationStatus +
 			", createUser=" + createUser +

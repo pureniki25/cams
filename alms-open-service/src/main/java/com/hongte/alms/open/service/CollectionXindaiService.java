@@ -8,25 +8,25 @@ import feign.RequestLine;
  * @since 2018/5/31
  */
 public interface CollectionXindaiService {
-    @RequestLine("POST /api/collection/phoneSetTrans ")
+    @RequestLine("POST /api/ltgproject/dod ")
     @Headers("Content-Type: application/json")
     String transferOnePhoneSet(String content);
 
 
 
-    @RequestLine("POST /api/collection/visitSetTrans ")
+    @RequestLine("POST /api/ltgproject/dod ")
     @Headers("Content-Type: application/json")
     String transferOneVisitSet(String content);
 
 
 
 
-    @RequestLine("POST /api/collection/colLogTrans ")
+    @RequestLine("POST /api/ltgproject/dod ")
     @Headers("Content-Type: application/json")
     String transferOneCollectionLog(String content);
 
 
-    @RequestLine("POST /api/collection/deleteColLog ")
+    @RequestLine("POST /api/ltgproject/dod ")
     @Headers("Content-Type: application/json")
     String deleteXdCollectionLogById(String content);
 }

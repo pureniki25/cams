@@ -5,11 +5,11 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.hongte.alms.base.collection.entity.Parametertracelog">
         <id column="ID" property="id" />
-        <result column="Car_Business_Id" property="CarBusinessId" />
-        <result column="Car_Business_After_Id" property="CarBusinessAfterId" />
-        <result column="Trance_Content" property="TranceContent" />
-        <result column="Trance_Name" property="TranceName" />
-        <result column="Trance_Date" property="TranceDate" />
+        <result column="Car_Business_Id" property="carBusinessId" />
+        <result column="Car_Business_After_Id" property="carBusinessAfterId" />
+        <result column="Trance_Content" property="tranceContent" />
+        <result column="Trance_Name" property="tranceName" />
+        <result column="Trance_Date" property="tranceDate" />
         <result column="status" property="status" />
         <result column="litigation_status" property="litigationStatus" />
         <result column="create_user" property="createUser" />
@@ -21,7 +21,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        ID AS id, Car_Business_Id AS CarBusinessId, Car_Business_After_Id AS CarBusinessAfterId, Trance_Content AS TranceContent, Trance_Name AS TranceName, Trance_Date AS TranceDate, status, litigation_status AS litigationStatus, create_user AS createUser, create_time AS createTime, log_type AS logType, is_delete AS isDelete, is_transmission_platform AS isTransmissionPlatform
+        ID AS id, Car_Business_Id AS carBusinessId, Car_Business_After_Id AS carBusinessAfterId, Trance_Content AS tranceContent, Trance_Name AS tranceName, Trance_Date AS tranceDate, status, litigation_status AS litigationStatus, create_user AS createUser, create_time AS createTime, log_type AS logType, is_delete AS isDelete, is_transmission_platform AS isTransmissionPlatform
     </sql>
 
     <select id="selectUnTransParametertracelogs" resultType="com.hongte.alms.base.collection.entity.Parametertracelog">
@@ -29,11 +29,11 @@
 
         SELECT
             tt.ID AS id,
-            tt.Car_Business_Id AS CarBusinessId,
-            tt.Car_Business_After_Id AS CarBusinessAfterId,
-            tt.Trance_Content AS TranceContent,
-            tt.Trance_Name AS TranceName,
-            tt.Trance_Date AS TranceDate,
+            tt.Car_Business_Id AS carBusinessId,
+            tt.Car_Business_After_Id AS carBusinessAfterId,
+            tt.Trance_Content AS tranceContent,
+            tt.Trance_Name AS tranceName,
+            tt.Trance_Date AS tranceDate,
             tt.status,
             tt.litigation_status AS litigationStatus,
             tt.create_user AS createUser,
