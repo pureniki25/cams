@@ -161,8 +161,31 @@ public interface EipRemote {
 			"content-type=application/json" }, method = RequestMethod.POST)
 	Result authBind(@RequestBody Map<String, Object> paramMap);
 
-	@RequestMapping(value = "/eip/assetside/userDistributeFund", headers = { "app=ALMS",
+	/**
+	 * 资金分发接口
+	 * @param dto
+	 * @return
+	 */
+	@RequestMapping(value = "/eip/td/assetside/userDistributeFund", headers = { "app=ALMS",
 			"content-type=application/json" }, method = RequestMethod.POST)
 	Result userDistributeFund(@RequestBody DistributeFundDTO dto);
+	
+	/**
+	 * 还垫付信息查询接口
+	 * @param paramMap
+	 * @return
+	 */
+	@RequestMapping(value = "/eip/td/repayment/returnAdvanceShareProfit", headers = { "app=ALMS",
+	"content-type=application/json" }, method = RequestMethod.POST)
+	Result returnAdvanceShareProfit(@RequestBody Map<String, Object> paramMap);
+	
+	/**
+	 * 标的还款信息查询接口
+	 * @param paramMap
+	 * @return
+	 */
+	@RequestMapping(value = "/eip/td/repayment/queryProjectPayment", headers = { "app=ALMS",
+	"content-type=application/json" }, method = RequestMethod.POST)
+	Result queryProjectPayment(@RequestBody Map<String, Object> paramMap);
 
 }
