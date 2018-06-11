@@ -41,11 +41,7 @@
 --         company.area_name AS companyName,
         business.operator_id AS operatorId,
         business.operator_name AS operatorName,
-<<<<<<< HEAD
-  --      business.customer_id AS customerId,
-=======
---         business.customer_id AS customerId,
->>>>>>> 9442238de7ff288556a5a593092b855b592094e2
+
         business.customer_name AS customerName,
         business.business_type AS businessTypeId,
         b_type.business_type_name AS businessTypeName,
