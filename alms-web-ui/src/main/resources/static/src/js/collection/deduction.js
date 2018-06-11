@@ -12,7 +12,7 @@ var layer;
 		var _htConfig = htConfig;
         basePath = _htConfig.coreBasePath;
         openPath=_htConfig.openBasePath;
-        withholdPath=_htConfig.withholdPath;
+        withholdPath=_htConfig.withholdBasePath;
         ajax_data={
         	
         	
@@ -166,11 +166,12 @@ var layer;
 		            Authorization : "Bearer " + getToken()
 		        },
 		        success : function(data) {debugger
-		             if(data.code=='1'){
-		            	 vm.$Modal.success({content:data.data});
-		             }else{
-		                 vm.$Modal.error({content:data.data});
-		             }
+		        	vm.$Modal.success({content:"执行成功，请稍后查询结果"});
+//		             if(data.code=='1'){
+//		            	 vm.$Modal.success({content:data.data});
+//		             }else{
+//		                 vm.$Modal.error({content:data.data});
+//		             }
 		        },
 		        error : function() {
 		            layer.confirm('Navbar error:AJAX请求出错!', function(index) {
