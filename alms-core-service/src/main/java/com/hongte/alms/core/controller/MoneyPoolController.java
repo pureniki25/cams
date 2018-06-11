@@ -2,6 +2,7 @@ package com.hongte.alms.core.controller;
 
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 
 import io.swagger.annotations.Api;
@@ -17,12 +18,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.assets.car.vo.FileVo;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
+import com.hongte.alms.base.entity.BasicBusiness;
+import com.hongte.alms.base.entity.MoneyPool;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.DepartmentBankService;
 import com.hongte.alms.base.service.DocService;
 import com.hongte.alms.base.service.MoneyPoolRepaymentService;
@@ -34,6 +39,7 @@ import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
 import com.hongte.alms.base.vo.module.MoneyPoolVO;
 import com.hongte.alms.base.vo.module.doc.UpLoadResult;
 import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.common.vo.PageResult;
 import com.ht.ussp.bean.LoginUserInfoHelper;
@@ -79,6 +85,9 @@ public class MoneyPoolController {
 	@Qualifier("DocService")
 	DocService docService;
 
+	@Qualifier("BasicBusinessService")
+	@Autowired
+	BasicBusinessService basicBusinessService ;
 	@ApiOperation(value = "获取款项池")
 	@GetMapping("/list")
 	@ResponseBody
@@ -238,7 +247,7 @@ public class MoneyPoolController {
 	@ApiOperation(value = "查询 1条还款登记")
 	@GetMapping("/get")
 	@ResponseBody
-	public Result<MoneyPoolVO> getMoneyPool(String moneyPoolId) {
+	public Result getMoneyPool(String moneyPoolId) {
 		if (moneyPoolId == null) {
 			return Result.error("500", "moneyPoolId can't be null");
 		}
@@ -247,7 +256,29 @@ public class MoneyPoolController {
 			return Result.error("500", "userId can't be null");
 		}
 		try {
-			MoneyPoolVO res = moneyPoolService.getMoneyPool(moneyPoolId);
+			MoneyPool moneyPool = moneyPoolService.selectById(moneyPoolId);
+			List<MoneyPoolRepayment> list = moneyPoolRepaymentService.selectList(new EntityWrapper<MoneyPoolRepayment>().eq("money_pool_id", moneyPoolId));
+			List<JSONObject> jsonObjects = new ArrayList<>();
+			for (MoneyPoolRepayment moneyPoolRepayment : list) {
+				RepaymentBizPlanList planList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>()
+						.eq("orig_business_id", moneyPoolRepayment.getOriginalBusinessId())
+						.eq("after_id",moneyPoolRepayment.getAfterId()));
+				BasicBusiness business = basicBusinessService.selectById(moneyPoolRepayment.getOriginalBusinessId());
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("businessId", planList.getOrigBusinessId());
+				jsonObject.put("afterId", planList.getAfterId());
+				jsonObject.put("acceptBank", moneyPoolRepayment.getBankAccount());
+				jsonObject.put("customerName", business.getCustomerName());
+				jsonObject.put("claimUser", moneyPoolRepayment.getOperateName());
+				jsonObject.put("claimDate", DateUtil.formatDate(moneyPoolRepayment.getClaimDate()));
+				jsonObject.put("planAmount", planList.getTotalBorrowAmount());
+				jsonObject.put("remark", moneyPoolRepayment.getRemark());
+				jsonObject.put("status", moneyPool.getFinanceStatus());
+				jsonObjects.add(jsonObject);
+			}
+			JSONObject res = new JSONObject();
+			res.put("mp", moneyPool);
+			res.put("list", jsonObjects);
 			return Result.success(res);
 		} catch (Exception e) {
 			return Result.error("500", e.getMessage());

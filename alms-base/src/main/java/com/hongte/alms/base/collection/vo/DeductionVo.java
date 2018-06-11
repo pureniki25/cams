@@ -2,6 +2,10 @@ package com.hongte.alms.base.collection.vo;
 
 import java.math.BigDecimal;
 
+import com.hongte.alms.base.entity.BasicBusiness;
+import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.feignClient.dto.BankCardInfo;
+
 /**
  * 执行代扣信息vo
  */
@@ -41,11 +45,39 @@ public class DeductionVo {
     private BigDecimal  restAmount;//剩余应还总额
     private BigDecimal  repayingAmount;//代扣中的金额
     private Integer issueSplitType;//标识是否P2P拆标业务，0：非P2P拆标业务，1：P2P拆标业务
+    private Integer strType;//来源类型：1.信贷生成，2.贷后管理生成
+    private BankCardInfo bankCardInfo;
+    private BasicBusiness business;
+    private RepaymentBizPlanList pList;
     
     
     
     
-    public Integer getIssueSplitType() {
+    public BasicBusiness getBusiness() {
+		return business;
+	}
+	public void setBusiness(BasicBusiness business) {
+		this.business = business;
+	}
+	public RepaymentBizPlanList getpList() {
+		return pList;
+	}
+	public void setpList(RepaymentBizPlanList pList) {
+		this.pList = pList;
+	}
+	public Integer getStrType() {
+		return strType;
+	}
+	public void setStrType(Integer strType) {
+		this.strType = strType;
+	}
+	public BankCardInfo getBankCardInfo() {
+		return bankCardInfo;
+	}
+	public void setBankCardInfo(BankCardInfo bankCardInfo) {
+		this.bankCardInfo = bankCardInfo;
+	}
+	public Integer getIssueSplitType() {
 		return issueSplitType;
 	}
 	public void setIssueSplitType(Integer issueSplitType) {

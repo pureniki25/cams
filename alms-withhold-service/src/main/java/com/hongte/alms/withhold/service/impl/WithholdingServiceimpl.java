@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import com.aliyun.oss.ServiceException;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
@@ -293,7 +294,6 @@ public class WithholdingServiceimpl implements WithholdingService {
 
 					// 当第一次扣款额度没有超过银行每次的扣款额度时候，尝试一次性扣款
 					if (sysBankLimit.getHasOnceLimit() == 0 || sysBankLimit.getOnceLimit().compareTo(repayMoney) > 0) {
-						String merchOrderId = rechargeService.getMerchOrderId();// 获取商户订单号
 						Integer boolPartRepay = 0;// 表示本期是否分多笔代扣,0:一次性代扣，1:分多笔代扣
 						Integer boolLastRepay = 1;// 表示本期是否分多笔代扣中的最后一笔代扣，若非多笔代扣，本字段存1。 0:非最后一笔代扣，1:最后一笔代扣
 						if (pList.getTotalBorrowAmount().add(pList.getOverdueAmount())
@@ -335,7 +335,6 @@ public class WithholdingServiceimpl implements WithholdingService {
 							} else {
 								currentAmount = eachMax;
 							}
-							String merchOrderId = rechargeService.getMerchOrderId();// 获取商户订单号
 							Result result = rechargeService.recharge(basic, pList, currentAmount.doubleValue(),
 									boolLastRepay, boolPartRepay, thirtyCardInfo, channel);
 							if (result.getCode().equals("1")) {
@@ -379,7 +378,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 
 	@Override
 	public void handBankRecharge(BasicBusiness basic, BankCardInfo bankCardInfo, RepaymentBizPlanList pList,
-			List<BankCardInfo> bankCardInfos, BigDecimal handRepayMoney) {
+			 BigDecimal handRepayMoney) {
 		BigDecimal onlineAmount = rechargeService.getOnlineAmount(pList);
 		BigDecimal underAmount = rechargeService.getUnderlineAmount(pList);
 		Integer platformId = (Integer) PlatformEnum.YH_FORM.getValue();
@@ -394,7 +393,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		}
         
 		SysBankLimit sysBankLimit = sysBankLimitService.selectOne(
-				new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("status", 1));
+				new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("bank_code", bankCardInfo.getBankCode()).eq("status", 1));
 		if (sysBankLimit == null) {
 			logger.debug("第三方代扣限额信息platformId:" + channel.getPlatformId() + "无效/不存在");
 		} else {
@@ -468,10 +467,10 @@ public class WithholdingServiceimpl implements WithholdingService {
 
 	@Override
 	public void handThirdRepaymentCharge(BasicBusiness basic, BankCardInfo thirtyCardInfo, RepaymentBizPlanList pList,
-			BigDecimal underAmount, BigDecimal handRepayAmount, Integer platformId) {
+			 Integer platformId,BigDecimal handRepayAmount) {
 		// 获取所有第三方代扣渠道
 				List<WithholdingChannel> channels = withholdingChannelService
-						.selectList(new EntityWrapper<WithholdingChannel>().ne("platform_id", PlatformEnum.YH_FORM.getValue())
+						.selectList(new EntityWrapper<WithholdingChannel>().eq("platform_id",platformId)
 								.eq("channel_status", 1).eq("bank_code", thirtyCardInfo.getBankCode()).orderBy("level"));
 				List<ThirdPlatform> thirdPlatforms = thirtyCardInfo.getThirdPlatformList();
 
@@ -484,6 +483,9 @@ public class WithholdingServiceimpl implements WithholdingService {
 						}
 					}
 				}
+				if(newChanels.size()==0) {
+					throw new ServiceException("找不到客户绑定的代扣平台");
+				}
 				outerloop: for (WithholdingChannel channel : newChanels) {
 					SysBankLimit sysBankLimit = sysBankLimitService.selectOne(
 							new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("status", 1));
@@ -495,10 +497,6 @@ public class WithholdingServiceimpl implements WithholdingService {
 						// 本期剩余应还金额
 						BigDecimal repayMoney = pList.getTotalBorrowAmount().add(pList.getOverdueAmount())
 								.subtract(rechargeService.getRestAmount(pList));
-
-						if (underAmount != null && underAmount.compareTo(BigDecimal.valueOf(0)) > 0) {
-							repayMoney = underAmount;
-						}
 						
 						if(handRepayAmount.compareTo(repayMoney)<0) {//如果手工代扣金额小于剩余应还金额，取手工代扣的金额
 							repayMoney=handRepayAmount;
@@ -508,7 +506,6 @@ public class WithholdingServiceimpl implements WithholdingService {
 
 							// 当第一次扣款额度没有超过银行每次的扣款额度时候，尝试一次性扣款
 							if (sysBankLimit.getHasOnceLimit() == 0 || sysBankLimit.getOnceLimit().compareTo(repayMoney) > 0) {
-								String merchOrderId = rechargeService.getMerchOrderId();// 获取商户订单号
 								Integer boolPartRepay = 0;// 表示本期是否分多笔代扣,0:一次性代扣，1:分多笔代扣
 								Integer boolLastRepay = 1;// 表示本期是否分多笔代扣中的最后一笔代扣，若非多笔代扣，本字段存1。 0:非最后一笔代扣，1:最后一笔代扣
 								if (pList.getTotalBorrowAmount().add(pList.getOverdueAmount())
@@ -550,7 +547,6 @@ public class WithholdingServiceimpl implements WithholdingService {
 									} else {
 										currentAmount = eachMax;
 									}
-									String merchOrderId = rechargeService.getMerchOrderId();// 获取商户订单号
 									Result result = rechargeService.recharge(basic, pList, currentAmount.doubleValue(),
 											boolLastRepay, boolPartRepay, thirtyCardInfo, channel);
 									if (result.getCode().equals("1")) {

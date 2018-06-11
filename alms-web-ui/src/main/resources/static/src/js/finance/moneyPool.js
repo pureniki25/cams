@@ -35,10 +35,15 @@ window.layinit(function (htConfig) {
                         key: 'tradeDate'
                     }, {
                         title: '转入账号',
-                        key: 'acceptBank'
+                        key: 'bankAccount',
+                        width:200
                     }, {
                         title: '记账金额',
-                        key: 'accountMoney'
+                        key: 'accountMoney',
+                        align:'right',
+                        render:(h,p)=>{
+                            return h('span',numeral(p.row.accountMoney).format('0,0.00'))
+                        }
                     }, {
                         title: '支付类型',
                         key: 'tradeType'
@@ -66,6 +71,11 @@ window.layinit(function (htConfig) {
                                 h('i-button',{
                                     style:{
                                         marginRight:'1rem'
+                                    },
+                                    on:{
+                                        click(){
+                                            app.getMoneyPool(p.row.moneyPoolId)
+                                        }
                                     }
                                 },'详情'),
                                 h('i-button',{
@@ -84,7 +94,15 @@ window.layinit(function (htConfig) {
                 total:0,
             },
             selection:[],
-            bankList:[]
+            bankList:[],
+            upload:{
+                url:fpath+'/finance/importExcel'
+            },
+            detail:{
+                mp:{},
+                list:[]
+            },
+            detailShow:false
         },
         watch: {},
         methods: {
@@ -164,6 +182,32 @@ window.layinit(function (htConfig) {
                 .catch(function(err){
                     app.$Message.destroy()
                     app.$Message.error({content:err})
+                })
+            },
+            uploadSuccess(response, file, fileList){
+                if(response.code=='1'){
+                    app.$Message.success({content:"导入成功"})
+                    app.search()
+                }else{
+                    app.$Message.error({content:"导入失败"})
+                }
+            },
+            getMoneyPool(mpid){
+                axios.get(cpath+'moneyPool/get',{
+                    params:{
+                        moneyPoolId:mpid
+                    }
+                })
+                .then(function(res){
+                    if(res.data.code=='1'){
+                        app.detail = res.data.data ; 
+                        app.detailShow = true
+                    }else{
+                        app.$Message.error({content:'获取详情失败'})
+                    }
+                })
+                .catch(function(err){
+                    app.$Message.error({content:'获取详情失败'})
                 })
             }
         },

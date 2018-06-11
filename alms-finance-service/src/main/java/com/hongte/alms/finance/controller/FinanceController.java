@@ -3,6 +3,8 @@
  */
 package com.hongte.alms.finance.controller;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +13,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -41,6 +47,7 @@ import com.hongte.alms.base.entity.BasicRepaymentType;
 import com.hongte.alms.base.entity.BizOutputRecord;
 import com.hongte.alms.base.entity.DepartmentBank;
 import com.hongte.alms.base.entity.MoneyPool;
+import com.hongte.alms.base.entity.MoneyPoolExcelEntity;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.enums.AreaLevel;
@@ -74,7 +81,10 @@ import com.hongte.alms.finance.req.MoneyPoolReq;
 import com.hongte.alms.finance.service.FinanceService;
 import com.hongte.alms.finance.service.ShareProfitService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
+import com.ht.ussp.util.ExcelUtils;
 
+import cn.afterturn.easypoi.excel.ExcelImportUtil;
+import cn.afterturn.easypoi.excel.entity.ImportParams;
 import feign.Feign;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -797,5 +807,85 @@ public class FinanceController {
 		logger.info("@listDepartmentBank@查看所有银行账号--结束[{}]", result);
 		return result;
 	}
-	
+
+	@RequestMapping("/importExcel")
+	public Result importExcel(@RequestParam("file") MultipartFile file,
+            HttpServletRequest request)  {
+		Result result = null ;
+		logger.info("@importExcel@导入银行流水Excel--开始[]");
+		try {
+			ImportParams ip = new ImportParams() ;
+			ip.setKeyIndex(8);
+			List<MoneyPoolExcelEntity> list =  ExcelImportUtil.importExcel(file.getInputStream(), MoneyPoolExcelEntity.class, ip);
+			if (list==null||list.isEmpty()) {
+				result = Result.error("500", "Excel没有数据");
+				logger.info("@importExcel@导入银行流水Excel--结束[{}]",result);
+				return result;
+			}
+			List<MoneyPool> moneyPools = new ArrayList<>();
+			for (MoneyPoolExcelEntity entity : list) {
+				MoneyPool moneyPool = entity.transform();
+				if (moneyPool==null) {
+					continue;
+				}
+				moneyPool.setCreateUser(loginUserInfoHelper.getUserId());
+				moneyPool.setImportUser(loginUserInfoHelper.getUserId());
+				if(loginUserInfoHelper.getLoginInfo()!=null&&loginUserInfoHelper.getLoginInfo().getUserName()!=null) {
+					moneyPool.setImportUserName(loginUserInfoHelper.getLoginInfo().getUserName());
+				}
+				moneyPools.add(moneyPool);
+			}
+			if (moneyPools.isEmpty()) {
+				result = Result.error("500", "Excel内容格式错误");
+				logger.info("@importExcel@导入银行流水Excel--结束[{}]",result);
+				return result;
+			}
+			
+			boolean insertRes = moneyPoolService.insertBatch(moneyPools, moneyPools.size());
+			if (insertRes) {
+				result = Result.success();return result;
+			}else {
+				result = Result.error("500", "数据库存储失败");return result;
+			}
+		} catch (IOException e) {
+			logger.info("@importExcel@导入银行流水Excel--IOException[{}]",e.getMessage());
+			result = Result.error("500", "文件读错误");
+			return result;
+		}catch (Exception e) {
+			logger.info("@importExcel@导入银行流水Excel--Exception[{}]",e.getMessage());
+			e.printStackTrace();
+			result = Result.error("500", e.getMessage());
+			return result;
+		}
+		
+	}
+
+
+	@ApiOperation(value = "查找财务人员跟单设置查询相关信息")
+	@GetMapping("/getOrderSetSearchInfo")
+	public Result getOrderSetSearchInfo(){
+
+		logger.info("@getOrderSetSearchInfo@查找财务人员跟单设置查询相关信息--开始[]");
+		Result result = null;
+		Map<String,JSONArray> retMap = new HashMap<String,JSONArray>();
+		//区域
+		List<BasicCompany> area_list = basicCompanyService.selectList(new EntityWrapper<BasicCompany>().eq("area_level",AreaLevel.AREA_LEVEL.getKey()));
+		retMap.put("area", (JSONArray) JSON.toJSON(area_list,JsonUtil.getMapping()));
+		//公司
+		List<BasicCompany> company_list = basicCompanyService.selectList(new EntityWrapper<BasicCompany>().eq("area_level",AreaLevel.COMPANY_LEVEL.getKey()));
+		CompanySortByPINYINUtil.sortByPINYIN(company_list);
+		retMap.put("company",(JSONArray) JSON.toJSON(company_list,JsonUtil.getMapping()));
+//		//业务类型
+//		List<BasicBusinessType> btype_list =  basicBusinessTypeService.selectList(new EntityWrapper<BasicBusinessType>().orderBy("business_type_id"));
+//		retMap.put("businessType",(JSONArray) JSON.toJSON(btype_list, JsonUtil.getMapping()));
+
+		logger.info("@getOrderSetSearchInfo@查找财务人员跟单设置查询相关信息--结束[{}]", result);
+		return Result.success(retMap);
+
+	}
+
+
+
+
+
 }

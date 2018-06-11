@@ -914,7 +914,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		boolean item50Repaid = false ;
 		boolean onlineOverDueRepaid = false ;
 		BigDecimal planAmount = planList.getTotalBorrowAmount();
-		BigDecimal derateAmount = planList.getDerateAmount();
+		BigDecimal derateAmount = planList.getDerateAmount()==null?new BigDecimal("0"):planList.getDerateAmount();
+		BigDecimal lateFee = planList.getOverdueAmount()==null?new BigDecimal("0"):planList.getOverdueAmount();
 		BigDecimal factAmount = new BigDecimal("0");
 		
 		for (RepaymentBizPlanListDetail planListDetail : planListDetails) {
@@ -962,7 +963,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			planListDetail.updateById();
 		}
 		
-		int compare = factAmount.compareTo(planAmount.subtract(derateAmount));
+		int compare = factAmount.compareTo(planAmount.add(lateFee).subtract(derateAmount));
 		if (compare>=0) {
 			planList.setCurrentStatus(RepayPlanStatus.REPAYED.getName());
 			planList.setCurrentSubStatus(RepayPlanStatus.REPAYED.getName());

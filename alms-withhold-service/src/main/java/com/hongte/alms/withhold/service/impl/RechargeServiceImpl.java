@@ -13,6 +13,7 @@ import com.hongte.alms.base.entity.WithholdingRepaymentLog;
 import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.enums.SysParameterEnums;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
+import com.hongte.alms.base.enums.repayPlan.RepayResultCodeEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.feignClient.dto.BankCardInfo;
@@ -100,6 +101,9 @@ public class RechargeServiceImpl implements RechargeService {
 	@Value("${tuandai_org_userid}")
 	private String rechargeUserId;
 
+	@Value("${yibao.merchantaccount}")
+	private String merchantaccount;
+
 	@Autowired
 	@Qualifier("SysParameterService")
 	SysParameterService sysParameterService;
@@ -132,7 +136,7 @@ public class RechargeServiceImpl implements RechargeService {
 				dto.setMerchantaccount(merchOrderId);
 				dto.setOrderid(merchOrderId);
 				dto.setTranstime(Integer.valueOf(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date())));
-				dto.setAmount(amount);
+				dto.setAmount(amount * 100);// 易宝代扣要转换单位:分
 				dto.setProductname("");
 				dto.setIdentityid(bankCardInfo.getIdentityNo());
 				dto.setIdentitytype("01");
@@ -141,7 +145,7 @@ public class RechargeServiceImpl implements RechargeService {
 						bankCardInfo.getBankCardNumber().length() - 4, bankCardInfo.getBankCardNumber().length()));
 				dto.setCallbackurl("172.0.0.1");
 				dto.setUserip("172.0.0.1");
-				// eipRemote.yibaoRecharge(dto);
+				eipRemote.directBindPay(dto);
 			}
 			if (channel.getPlatformId() == PlatformEnum.BF_FORM.getValue()) {
 				BaofuRechargeReqDto dto = new BaofuRechargeReqDto();
@@ -176,7 +180,8 @@ public class RechargeServiceImpl implements RechargeService {
 				}
 
 				String resultMsg = getBFResultMsg(remoteResult);
-				if (remoteResult.getReturnCode().equals("0000") && resultMsg.contains("执行成功")) {
+				if (remoteResult.getReturnCode().equals("0000")
+						&& remoteResult.getReturnCode().equals(RepayResultCodeEnum.BF00114.getValue())) {
 					result.setCode("1");
 					result.setMsg(resultMsg);
 					log.setRepayStatus(1);
@@ -184,7 +189,12 @@ public class RechargeServiceImpl implements RechargeService {
 					log.setUpdateTime(new Date());
 					withholdingRepaymentLogService.updateById(log);
 					shareProfit(pList, log);
-				} else if (remoteResult.getReturnCode().equals("0000")) {
+				} else if (remoteResult.getReturnCode().equals(RepayResultCodeEnum.BF00100.getValue())
+						|| remoteResult.getReturnCode().equals(RepayResultCodeEnum.BF00112.getValue())
+						|| remoteResult.getReturnCode().equals(RepayResultCodeEnum.BF00113.getValue())
+						|| remoteResult.getReturnCode().equals(RepayResultCodeEnum.BF00115.getValue())
+						|| remoteResult.getReturnCode().equals(RepayResultCodeEnum.BF00144.getValue())
+						|| remoteResult.getReturnCode().equals(RepayResultCodeEnum.BF00202.getValue())) {
 					result.setCode("1");
 					result.setMsg(resultMsg);
 					log.setRepayStatus(2);
@@ -193,7 +203,7 @@ public class RechargeServiceImpl implements RechargeService {
 					withholdingRepaymentLogService.updateById(log);
 					recordRepaymentLog(resultMsg, status, pList, business, bankCardInfo, channel.getPlatformId(),
 							boolLastRepay, boolPartRepay, merchOrderId, 0, BigDecimal.valueOf(amount));
-				} else if (!remoteResult.getReturnCode().equals("0000")) {
+				} else {
 					result.setCode("-1");
 					result.setMsg(resultMsg);
 					log.setRepayStatus(0);
@@ -449,7 +459,13 @@ public class RechargeServiceImpl implements RechargeService {
 		for (WithholdingRepaymentLog log : logs) {
 			hasRepayAmount = hasRepayAmount.add(log.getCurrentAmount());
 		}
-		BigDecimal restAmount = list.getTotalBorrowAmount().add(list.getOverdueAmount()).subtract(hasRepayAmount);
+		BigDecimal restAmount = null;
+		if(list.getOverdueAmount()!=null) {
+			 restAmount = list.getTotalBorrowAmount().add(list.getOverdueAmount()).subtract(hasRepayAmount);
+		}else {
+			 restAmount = list.getTotalBorrowAmount().subtract(hasRepayAmount);
+		}
+		
 		return restAmount;
 	}
 
@@ -459,10 +475,16 @@ public class RechargeServiceImpl implements RechargeService {
 				.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("fee_id",
 						RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE));
 		BigDecimal underAmount = BigDecimal.valueOf(0);
+		BigDecimal onlineAmount=BigDecimal.valueOf(0);
 		for (RepaymentBizPlanListDetail detail : details) {
 			underAmount = underAmount.add(detail.getPlanAmount());
 		}
-		BigDecimal onlineAmount = list.getTotalBorrowAmount().add(list.getOverdueAmount()).subtract(underAmount);
+		if(list.getOverdueAmount()!=null) {
+			 onlineAmount = list.getTotalBorrowAmount().add(list.getOverdueAmount()).subtract(underAmount);
+		}else {
+			 onlineAmount = list.getTotalBorrowAmount().subtract(underAmount);
+		}
+		
 		return onlineAmount;
 	}
 
@@ -608,6 +630,16 @@ public class RechargeServiceImpl implements RechargeService {
 									.eq("orig_business_id", log.getOriginalBusinessId())
 									.eq("after_id", log.getAfterId()));
 					shareProfit(list, log);
+				} else if(result.getReturnCode().equals(RepayResultCodeEnum.BF00100.getValue())
+						|| result.getReturnCode().equals(RepayResultCodeEnum.BF00112.getValue())
+						|| result.getReturnCode().equals(RepayResultCodeEnum.BF00113.getValue())
+						|| result.getReturnCode().equals(RepayResultCodeEnum.BF00115.getValue())
+						|| result.getReturnCode().equals(RepayResultCodeEnum.BF00144.getValue())
+						|| result.getReturnCode().equals(RepayResultCodeEnum.BF00202.getValue())) {
+					log.setUpdateTime(new Date());
+					log.setRepayStatus(2);
+					log.setRemark(result.getMsg());
+					
 				} else if (!"0000".equals(result.getReturnCode())) {
 					log.setUpdateTime(new Date());
 					log.setRepayStatus(0);
@@ -618,7 +650,11 @@ public class RechargeServiceImpl implements RechargeService {
 
 			}
 			if (log.getBindPlatformId() == PlatformEnum.YB_FORM.getValue()) {
-				// todo
+				YiBaoRechargeReqDto dto = new YiBaoRechargeReqDto();
+				Map<String, Object> paramMap = new HashMap<>();
+				paramMap.put("merchantaccount", merchantaccount);
+				paramMap.put("orderid", log.getLogId());
+				com.ht.ussp.core.Result result = eipRemote.queryOrder(paramMap);
 			}
 		}
 	}

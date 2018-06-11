@@ -12,6 +12,7 @@ var layer;
 		var _htConfig = htConfig;
         basePath = _htConfig.coreBasePath;
         openPath=_htConfig.openBasePath;
+        withholdPath=_htConfig.withholdPath;
         ajax_data={
         	
         	
@@ -57,7 +58,12 @@ var layer;
                     repayAllAmount:"",//已还总额
                     restAmount:"",
                     repayingAmount:'',//代扣中金额
-                    issueSplitType:''
+                    issueSplitType:'',
+                    business:[],
+                    bankCardInfo:[],
+                    pList:[]
+
+                    
 
                 },
                 platformList:[],
@@ -123,35 +129,64 @@ var layer;
 		   vm.$Modal.error({content:"本次代扣线下逾期费不能大于线下逾期费"});
 		   return;
 			   }
-	    var url
-	    $.ajax({
-	        type : 'GET',
-	        async : false,
-	        url : openPath+ "WithHoldingController/withholding?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId+"&total="+vm.ajax_data.total+"&planOverDueMoney="+vm.ajax_data.underLineFactOverDueMoney+"&platformId="+vm.platformId+"&type=0"+"&nowdate="+vm.ajax_data.nowdate+"&isAmountWithheld="+isAmountWithheld,
-	        headers : {
-	            app : 'ALMS',
-	            Authorization : "Bearer " + getToken()
-	        },
-	        success : function(data) {debugger
-	             if(data.code=='1'){
-	            	 vm.$Modal.success({content:data.data});
-	             }else{
-	                 vm.$Modal.error({content:data.data});
-	             }
-	        },
-	        error : function() {
-	            layer.confirm('Navbar error:AJAX请求出错!', function(index) {
-	                top.location.href = loginUrl;
-	                layer.close(index);
-	            });
-	            return false;
-	        }
-	    });
+	 
+	   //贷后生成的走贷后的代扣接口,否则走信贷的代扣接口
+	   if(vm.ajax_data.strType==2){debugger
+		    var url=withholdPath+ "repay/handRepay"
+		    $.ajax({
+                type: "POST",
+                url: url,
+                data: JSON.stringify(vm.ajax_data),
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                 
+                    if(data.code=='1'){
+		            	 vm.$Modal.success({content:data.data});
+		             }else{
+		                 vm.$Modal.error({content:data.data});
+		             }
+                },
+                error: function (message) {
+                	 layer.confirm('Navbar error:AJAX请求出错!', function(index) {
+ 		                top.location.href = loginUrl;
+ 		                layer.close(index);
+ 		            });
+ 		            return false;
+                }
+            });
+	   }else{
+		    var url=openPath+ "WithHoldingController/withholding?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId+"&total="+vm.ajax_data.total+"&planOverDueMoney="+vm.ajax_data.underLineFactOverDueMoney+"&platformId="+vm.platformId+"&type=0"+"&nowdate="+vm.ajax_data.nowdate+"&isAmountWithheld="+isAmountWithheld
+		    $.ajax({
+		        type : 'GET',
+		        async : false,
+		        url : url,
+		        headers : {
+		            app : 'ALMS',
+		            Authorization : "Bearer " + getToken()
+		        },
+		        success : function(data) {debugger
+		             if(data.code=='1'){
+		            	 vm.$Modal.success({content:data.data});
+		             }else{
+		                 vm.$Modal.error({content:data.data});
+		             }
+		        },
+		        error : function() {
+		            layer.confirm('Navbar error:AJAX请求出错!', function(index) {
+		                top.location.href = loginUrl;
+		                layer.close(index);
+		            });
+		            return false;
+		        }
+		    });
+	   }
+	  
+	
 
 	}
 	
 
-	
+	/*
 	var withHoldingRecordWithoutOverMoeny=function(){ debugger
 	
 		if(vm.ajax_data.issueSplitType==1&&vm.platformId==5){
@@ -184,7 +219,7 @@ var layer;
 		
    
 	}
-
+*/
 	
 	var searchRepayLog=function(){
 		
@@ -208,7 +243,7 @@ var layer;
 		
    
 	}
-	var getDeductionInfo=function(){
+	var getDeductionInfo=function(){debugger
 		
 		
         var self = this;   
