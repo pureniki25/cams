@@ -104,6 +104,7 @@
 				<excludes>
 					<exclude>static/plugins/**</exclude>
 					<exclude>static/plugins/iview/css/fonts/**</exclude>
+					<exclude>**/*.xlsx</exclude>
 				</excludes>
 			</resource>
 			<resource>
@@ -112,18 +113,13 @@
 				<includes>
 					<include>static/plugins/**</include>
 					<include>static/plugins/iview/css/fonts/**</include>
+					<include>**/*.xlsx</include>
 				</includes>
 			</resource>
 			<resource>
 				<directory>src/main/java</directory>
 				<includes>
 					<include>**/*.xml</include>
-				</includes>
-			</resource>
-			<resource>
-				<directory>src/main/resources</directory>
-				<includes>
-					<include>**/moneyPoolTemplate.xlsx</include>
 				</includes>
 			</resource>
 		</resources>
