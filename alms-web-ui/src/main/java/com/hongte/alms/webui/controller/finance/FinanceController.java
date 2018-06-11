@@ -95,7 +95,7 @@ public class FinanceController {
 	@RequestMapping("/downloadTemplate")
 	public ResponseEntity<byte[]> moneyPoolTemplate() throws IOException {
 		final String SEPARATOR = File.separator ;
-		return ExportFileUtil.download("src"+SEPARATOR+"main"+SEPARATOR+"resources"+SEPARATOR+"static"+SEPARATOR+"款项池银行流水模板.xlsx", "款项池银行流水模板.xlsx");
+		return ExportFileUtil.download("src"+SEPARATOR+"main"+SEPARATOR+"resources"+SEPARATOR+"templates"+SEPARATOR+"finance"+SEPARATOR+"款项池银行流水模板.xlsx", "款项池银行流水模板.xlsx");
 	}
 
 

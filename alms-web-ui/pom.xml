@@ -101,9 +101,6 @@
 			<resource>
 				<directory>${project.basedir}/src/main/resources</directory>
 				<filtering>true</filtering>
-				<includes>
-					<include>**/款项池银行流水模板.xlsx</include>
-				</includes>
 				<excludes>
 					<exclude>static/plugins/**</exclude>
 					<exclude>static/plugins/iview/css/fonts/**</exclude>
