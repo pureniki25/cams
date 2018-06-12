@@ -33,6 +33,7 @@ import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.withhold.service.RechargeService;
 import com.hongte.alms.withhold.service.WithholdingService;
+import com.mysql.cj.core.io.BigDecimalValueFactory;
 
 /**
  * @author czs
@@ -130,7 +131,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		SysBankLimit sysBankLimit = sysBankLimitService.selectOne(
 				new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("bank_code", bankCardInfo.getBankCode().trim()).eq("status", 1));
 		if (sysBankLimit == null) {
-			logger.debug("第三方代扣限额信息platformId:" + channel.getPlatformId() + "无效/不存在");
+			logger.debug("银行代扣限额信息platformId:" + channel.getPlatformId() + "无效/不存在");
 		} else {
 			// 本期线上剩余应还金额,剩余应还金额减去线下金额
 			BigDecimal repayMoney = rechargeService.getRestAmount(pList).subtract(underAmount);
@@ -396,10 +397,14 @@ public class WithholdingServiceimpl implements WithholdingService {
 		SysBankLimit sysBankLimit = sysBankLimitService.selectOne(
 				new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("bank_code", bankCardInfo.getBankCode().trim()).eq("status", 1));
 		if (sysBankLimit == null) {
-			logger.debug("第三方代扣限额信息platformId:" + channel.getPlatformId() + "无效/不存在");
+			logger.debug("银行代扣限额信息platformId:" + channel.getPlatformId() + "无效/不存在");
 		} else {
 			// 本期线上剩余应还金额,剩余应还金额减去线下金额
 			BigDecimal repayMoney = rechargeService.getRestAmount(pList).subtract(underAmount);
+		    if(repayMoney.compareTo(BigDecimal.valueOf(0))==0) {
+		    	result.setCode("-1");
+		    	result.setMsg("本期线上剩余应还金额为0,不能代扣");
+		    }
 			if(handRepayMoney.compareTo(repayMoney)<0) {//如果手工代扣的金额大于剩余未还得金额，则取剩余未还得金额，否则取手工代扣的金额
 				repayMoney=handRepayMoney;
 			}
@@ -507,7 +512,10 @@ public class WithholdingServiceimpl implements WithholdingService {
 
 						// 本期剩余应还金额
 						BigDecimal repayMoney = rechargeService.getRestAmount(pList);
-					
+					    if(repayMoney.compareTo(BigDecimal.valueOf(0))==0) {
+					    	result.setCode("-1");
+					    	result.setMsg("本期剩余应还金额为0,不能代扣");
+					    }
 						
 						if(handRepayAmount.compareTo(repayMoney)<0) {//如果手工代扣金额小于剩余应还金额，取手工代扣的金额
 							repayMoney=handRepayAmount;

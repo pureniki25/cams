@@ -136,7 +136,7 @@ public class RechargeServiceImpl implements RechargeService {
 				dto.setMerchantaccount(merchOrderId);
 				dto.setOrderid(merchOrderId);
 				dto.setTranstime(Integer.valueOf(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date())));
-				dto.setAmount(amount * 100);// 易宝代扣要转换单位:分
+				dto.setAmount((int)(amount * 100));// 易宝代扣要转换单位:分
 				dto.setProductname("");
 				dto.setIdentityid(bankCardInfo.getIdentityNo());
 				dto.setIdentitytype("01");
@@ -150,7 +150,7 @@ public class RechargeServiceImpl implements RechargeService {
 			if (channel.getPlatformId() == PlatformEnum.BF_FORM.getValue()) {
 				BaofuRechargeReqDto dto = new BaofuRechargeReqDto();
 				dto.setBizType("0000");
-				dto.setPayCode(bankCardInfo.getBankCode());
+				dto.setPayCode(bankCardInfo.getBankCode().trim());
 				dto.setPayCm("2");
 				dto.setAccNo(bankCardInfo.getBankCardNumber());
 				dto.setIdCardType("01");
@@ -158,7 +158,7 @@ public class RechargeServiceImpl implements RechargeService {
 				dto.setIdHolder(bankCardInfo.getBankCardName());
 				dto.setMobile(bankCardInfo.getMobilePhone());
 				dto.setTransId(merchOrderId);
-				dto.setTxnAmt(amount * 100);// 宝付代扣要转换单位:分
+				dto.setTxnAmt((int) ((amount*100)));// 宝付代扣要转换单位:分
 				dto.setTransSerialNo(merchOrderId);
 				dto.setTradeDate(
 						String.valueOf(Long.parseLong(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()))));
@@ -181,7 +181,7 @@ public class RechargeServiceImpl implements RechargeService {
 
 				String resultMsg = getBFResultMsg(remoteResult);
 				if (remoteResult.getReturnCode().equals("0000")
-						&& remoteResult.getReturnCode().equals(RepayResultCodeEnum.BF00114.getValue())) {
+						&& (remoteResult.getReturnCode().equals(RepayResultCodeEnum.BF0000.getValue())||remoteResult.getReturnCode().equals(RepayResultCodeEnum.BF00114.getValue()))) {
 					result.setCode("1");
 					result.setMsg(resultMsg);
 					log.setRepayStatus(1);
@@ -673,7 +673,8 @@ public class RechargeServiceImpl implements RechargeService {
 		if (result == null) {
 			throw new ServiceRuntimeException("调用外联平台接口失败！");
 		}
-		if ("0000".equals(result.getReturnCode()) && result.getMsg().equals("执行成功")) {
+		String msg=getBFResultMsg(result);
+		if ("0000".equals(result.getReturnCode()) &&msg!=null&&msg.equals("交易成功")) {
 			log.setUpdateTime(new Date());
 			log.setRepayStatus(1);
 			log.setRemark(result.getMsg());
@@ -692,6 +693,8 @@ public class RechargeServiceImpl implements RechargeService {
 			log.setUpdateTime(new Date());
 			log.setRepayStatus(2);
 			log.setRemark(result.getMsg());
+			withholdingRepaymentLogService.updateById(log);
+			
 			
 		} else if (!"0000".equals(result.getReturnCode())) {
 			log.setUpdateTime(new Date());
