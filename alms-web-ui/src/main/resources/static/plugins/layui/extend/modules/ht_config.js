@@ -33,6 +33,7 @@ layui.define(function (exports) {
     	,platRepayBasePath:"http://localhost:30631/"
         ,openBasePath:"http://localhost:30616/"
         ,uiBasePath:"http://localhost:30601/"
+        ,withholdBasePath:"http://localhost:30626/"
     	/*
     	Dev：http://172.16.200.110:30131/html/user/changePwdOther.html
     	Sit: http://172.16.200.112:30131/html/user/changePwdOther.html

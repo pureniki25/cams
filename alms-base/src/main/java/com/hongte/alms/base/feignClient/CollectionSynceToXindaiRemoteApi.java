@@ -1,7 +1,6 @@
 package com.hongte.alms.base.feignClient;
 
 
-
 import com.hongte.alms.base.collection.entity.Collection;
 import com.hongte.alms.base.collection.entity.Parametertracelog;
 import com.hongte.alms.base.entity.CarBusinessAfter;
@@ -52,4 +51,4 @@ public interface CollectionSynceToXindaiRemoteApi {
     Result deleteXdCollectionLogById(@RequestBody Integer xdIndex) throws Exception;
 
 
-}
+    }

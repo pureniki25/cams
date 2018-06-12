@@ -19,12 +19,11 @@
 		plan.borrow_limit as borrowLimit,
 		plan.borrow_limit_unit as borrowLimitUnit,
 		business.customer_name as customerName,
-		customer.identify_card as identifyCard,
+
 		c.plan_principal as planPrincipal,
 		plan_platform_charge as platformCharge,
 		pList.after_id as afterId,
-		bindcard.bank_card as bankCard,
-		bindcard.bank_name as bankName,
+
 		plan_accrual as planAccrual,
 		plan_guarantee_charge as planGuaranteeCharge,
 		c.plan_liquidated_damages+c.plan_agency_fee+c.plan_deposit_fee+c.plan_reducing_debtors
@@ -33,15 +32,15 @@
 		c.plan_principal+c.plan_accrual+c.plan_service_charge+c.plan_guarantee_charge+c.plan_platform_charge+c.plan_overdue_money
 		as total,
 		business.borrow_money as borrowMoney,
-		platform.platform_name as platformName,
+
 		c.plan_service_charge as planServiceCharge,
 		c.plan_overdue_money as planOverDueMoney,
 		pList.due_date as nowdate,
 		repayment.repayment_type_name as repaymentTypeName,
 		business.operator_name as operatorName,
-		customer.phone_number as phoneNumber,
+
 		pList.current_status  as currentStatus,
-		platform.platform_id as platformId,
+
 		c.plan_all_amount as planAllAmount,
 		c.repay_all_amount as repayAllAmount,
 		(c.plan_all_amount-c.repay_all_amount) as restAmount
@@ -57,20 +56,9 @@
 		business.business_id
 
 
-		left JOIN tb_basic_business_customer as customer on
-		plan.original_business_id=customer.business_id
-
-
-		left join tb_customer_bind_card as bindcard on
-		bindcard.customer_id=customer.customer_id
-
-		left join tb_customer_bind_platform as bindPlatform on bindPlatform.bind_id=
-		bindcard.bind_id
-
-		left join tb_withholding_platform as platform on
-		platform.platform_id=bindPlatform.platform_id
 		left join tb_basic_repayment_type as repayment on
 		repayment.repayment_type_id=business.repayment_type_id
+
 
 		left join(
 		select t1.plan_list_id,
@@ -148,8 +136,7 @@
 
 
 		<where>
-			1=1 and 
-		bindcard.is_maincard=1
+			1=1 
 		and pList.plan_list_id=#{planListId} limit 1
 
 		</where>

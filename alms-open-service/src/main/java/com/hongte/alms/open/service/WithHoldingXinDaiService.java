@@ -23,4 +23,9 @@ public interface WithHoldingXinDaiService {
     @RequestLine("POST /api/ltgproject/dod ")
     @Headers("Content-Type: application/json")
     String getContractDate(String content);
+    
+    
+    @RequestLine("POST /api/ltgproject/dod ")
+    @Headers("Content-Type: application/json")
+    String getBankcardInfo(String identityCard);
 }

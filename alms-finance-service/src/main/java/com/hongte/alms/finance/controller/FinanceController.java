@@ -20,8 +20,6 @@ import com.hongte.alms.base.service.*;
 import com.hongte.alms.finance.req.OrderSetReq;
 import io.swagger.annotations.Api;
 import org.apache.commons.io.FileUtils;
-import org.jeecgframework.poi.excel.ExcelImportUtil;
-import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +65,8 @@ import com.hongte.alms.finance.service.ShareProfitService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.util.ExcelUtils;
 
+import cn.afterturn.easypoi.excel.ExcelImportUtil;
+import cn.afterturn.easypoi.excel.entity.ImportParams;
 import feign.Feign;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -798,10 +798,54 @@ public class FinanceController {
 
 	@RequestMapping("/importExcel")
 	public Result importExcel(@RequestParam("file") MultipartFile file,
-            HttpServletRequest request) throws IOException, Exception {
-		System.out.println(file);
-		List<MoneyPoolExcelEntity> list =  ExcelImportUtil.importExcel(file.getInputStream(), MoneyPoolExcelEntity.class, new ImportParams());
-		return null ;
+            HttpServletRequest request)  {
+		Result result = null ;
+		logger.info("@importExcel@导入银行流水Excel--开始[]");
+		try {
+			ImportParams ip = new ImportParams() ;
+			ip.setKeyIndex(8);
+			List<MoneyPoolExcelEntity> list =  ExcelImportUtil.importExcel(file.getInputStream(), MoneyPoolExcelEntity.class, ip);
+			if (list==null||list.isEmpty()) {
+				result = Result.error("500", "Excel没有数据");
+				logger.info("@importExcel@导入银行流水Excel--结束[{}]",result);
+				return result;
+			}
+			List<MoneyPool> moneyPools = new ArrayList<>();
+			for (MoneyPoolExcelEntity entity : list) {
+				MoneyPool moneyPool = entity.transform();
+				if (moneyPool==null) {
+					continue;
+				}
+				moneyPool.setCreateUser(loginUserInfoHelper.getUserId());
+				moneyPool.setImportUser(loginUserInfoHelper.getUserId());
+				if(loginUserInfoHelper.getLoginInfo()!=null&&loginUserInfoHelper.getLoginInfo().getUserName()!=null) {
+					moneyPool.setImportUserName(loginUserInfoHelper.getLoginInfo().getUserName());
+				}
+				moneyPools.add(moneyPool);
+			}
+			if (moneyPools.isEmpty()) {
+				result = Result.error("500", "Excel内容格式错误");
+				logger.info("@importExcel@导入银行流水Excel--结束[{}]",result);
+				return result;
+			}
+			
+			boolean insertRes = moneyPoolService.insertBatch(moneyPools, moneyPools.size());
+			if (insertRes) {
+				result = Result.success();return result;
+			}else {
+				result = Result.error("500", "数据库存储失败");return result;
+			}
+		} catch (IOException e) {
+			logger.info("@importExcel@导入银行流水Excel--IOException[{}]",e.getMessage());
+			result = Result.error("500", "文件读错误");
+			return result;
+		}catch (Exception e) {
+			logger.info("@importExcel@导入银行流水Excel--Exception[{}]",e.getMessage());
+			e.printStackTrace();
+			result = Result.error("500", e.getMessage());
+			return result;
+		}
+		
 	}
 
 

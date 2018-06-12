@@ -66,17 +66,18 @@
 	</select>
 	<select id="conutMoneyPoolManagerList" resultType="java.lang.Integer">
 		SELECT
-			count(1)
+			count(distinct mp.money_pool_id)
 		FROM
 			tb_money_pool mp
 			LEFT JOIN tb_department_bank db ON db.finance_name = mp.accept_bank
 		<where>
 			1=1
+			 AND (db.repayment_id is not null and db.repayment_id != '')
 			<if test="tradeDateStart != null and tradeDateStart.length != 0 ">
 				AND mp.trade_date &gt;= #{tradeDateStart,jdbcType=DATE}
 			</if>
 			<if test="tradeDateEnd != null and tradeDateEnd.length != 0 ">
-				AND mp.trade_date &lt;= #{tradeDateStart,jdbcType=DATE}
+				AND mp.trade_date &lt;= #{tradeDateEnd,jdbcType=DATE}
 			</if>
 			<if test="updateDateStart != null and updateDateStart.length != 0 ">
 				AND update_time &gt;= #{updateDateStart,jdbcType=DATE}
@@ -96,7 +97,7 @@
 		</where>
 	</select>
 	<select id="selectMoneyPoolManagerList" resultType="com.hongte.alms.base.vo.finance.MoneyPoolManagerVO">
-		SELECT
+		SELECT distinct
 			mp.money_pool_id AS moneyPoolId, 
 			mp.xd_pool_id AS xdPoolId, 
 			mp.pay_code AS payCode, 
@@ -127,11 +128,12 @@
 			LEFT JOIN tb_department_bank db ON db.finance_name = mp.accept_bank
 		<where>
 			1=1
+			 AND (db.repayment_id is not null and db.repayment_id != '')
 			<if test="tradeDateStart != null and tradeDateStart.length != 0 ">
 				AND mp.trade_date &gt;= #{tradeDateStart,jdbcType=DATE}
 			</if>
 			<if test="tradeDateEnd != null and tradeDateEnd.length != 0 ">
-				AND mp.trade_date &lt;= #{tradeDateStart,jdbcType=DATE}
+				AND mp.trade_date &lt;= #{tradeDateEnd,jdbcType=DATE}
 			</if>
 			<if test="updateDateStart != null and updateDateStart.length != 0 ">
 				AND update_time &gt;= #{updateDateStart,jdbcType=DATE}

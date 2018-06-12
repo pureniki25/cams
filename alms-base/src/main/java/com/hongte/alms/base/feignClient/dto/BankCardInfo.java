@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class BankCardInfo implements Serializable {
 	 private static final long serialVersionUID = -4095682638492039883L;
-     private String HTUserID;//资产端( 鸿特)用户ID
+     private String htUserID;//资产端( 鸿特)用户ID
      private String platformUserID;//资金端存管用户ID，当platformType为1或2时不能为空。若在团贷网注册存管，则返回团贷用户ID。若在你我金融注册存管，则返回你我金融用户ID。
      private String bankCardNumber;//【四要素】银行卡号码
      private String bankCardName;//【四要素】开户人真实姓名
@@ -24,11 +24,12 @@ public class BankCardInfo implements Serializable {
      private String bankProvince;//银行卡开户行所在省
      private String bankCity;//银行卡开户行名称
      private List<ThirdPlatform> thirdPlatformList;//第三方代扣绑卡平台列表信息, 注1：只要列表内返回，则表示已绑定该平台,注2：存管注册银行卡也可以同时绑定其他第三方代扣平台
-	public String getHTUserID() {
-		return HTUserID;
+
+	public String getHtUserID() {
+		return htUserID;
 	}
-	public void setHTUserID(String hTUserID) {
-		HTUserID = hTUserID;
+	public void setHtUserID(String htUserID) {
+		this.htUserID = htUserID;
 	}
 	public String getPlatformUserID() {
 		return platformUserID;

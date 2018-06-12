@@ -4,6 +4,16 @@
 package com.hongte.alms.base.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
+import com.hongte.alms.base.enums.RepayRegisterState;
+import com.hongte.alms.common.util.DateUtil;
+import com.ht.ussp.bean.LoginUserInfoHelper;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
 import cn.afterturn.easypoi.excel.annotation.ExcelTarget;
@@ -14,7 +24,6 @@ import cn.afterturn.easypoi.excel.annotation.ExcelTarget;
  */
 @ExcelTarget("moneyPoolExcel")
 public class MoneyPoolExcelEntity implements Serializable {
-
 	/**
 	 * 
 	 */
@@ -24,10 +33,10 @@ public class MoneyPoolExcelEntity implements Serializable {
 	private String acceptBank ;
 	@Excel(name="款项编码",orderNum="2")
 	private String payCode ;
-	@Excel(name="交易日期",orderNum="3")
-	private String tradeDate ;
-	@Excel(name="交易时间",orderNum="4")
-	private String tradeTime ;
+	@Excel(name="交易日期",orderNum="3",importFormat="yyyy-MM-dd")
+	private Date tradeDate ;
+	@Excel(name="交易时间",orderNum="4",importFormat="HH:mm:ss")
+	private Date tradeTime ;
 	@Excel(name="支付类型",orderNum="5")
 	private String tradeType ;
 	@Excel(name="摘要",orderNum="6")
@@ -52,16 +61,16 @@ public class MoneyPoolExcelEntity implements Serializable {
 	public void setPayCode(String payCode) {
 		this.payCode = payCode;
 	}
-	public String getTradeDate() {
+	public Date getTradeDate() {
 		return tradeDate;
 	}
-	public void setTradeDate(String tradeDate) {
+	public void setTradeDate(Date tradeDate) {
 		this.tradeDate = tradeDate;
 	}
-	public String getTradeTime() {
+	public Date getTradeTime() {
 		return tradeTime;
 	}
-	public void setTradeTime(String tradeTime) {
+	public void setTradeTime(Date tradeTime) {
 		this.tradeTime = tradeTime;
 	}
 	public String getTradeType() {
@@ -99,5 +108,32 @@ public class MoneyPoolExcelEntity implements Serializable {
 	}
 	public void setRemark(String remark) {
 		this.remark = remark;
+	}
+	
+	public MoneyPool transform() {
+		if (this==null) {
+			return null ;
+		}
+		Date now = new Date();
+		MoneyPool moneyPool = new MoneyPool();
+		moneyPool.setAcceptBank(getAcceptBank());
+		moneyPool.setAccountMoney(new BigDecimal(getAccountMoney()));
+		moneyPool.setCreateTime(now);
+		moneyPool.setFinanceStatus(RepayRegisterFinanceStatus.未关联银行流水.toString());
+		moneyPool.setImportTime(now);
+		moneyPool.setIncomeType(1);
+		moneyPool.setIsManualCreate(0);
+		moneyPool.setIsTemporary(0);
+		moneyPool.setMoneyPoolId(UUID.randomUUID().toString());
+		moneyPool.setPayCode(getPayCode());
+		moneyPool.setStatus(RepayRegisterState.待领取.toString());
+		moneyPool.setSummary(getSummary());
+		String date = DateUtil.formatDate(DateUtil.DEFAULT_FORMAT_DATE,getTradeDate());
+		String time = DateUtil.formatDate("HH:mm:ss",getTradeTime());
+		moneyPool.setTradeDate(DateUtil.stringToDate("yyyy-MM-dd HH:mm:ss", date+" "+time));
+		moneyPool.setTradePlace(getTradePlace());
+		moneyPool.setTradeRemark(getRemark());
+		moneyPool.setTradeType(getTradeType());
+		return moneyPool ;
 	}
 }

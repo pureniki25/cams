@@ -24,6 +24,7 @@ window.layinit = function (cb) {
             htConfig.basePath = htConfig.localBasePath;
             htConfig.coreBasePath = htConfig.localBasePath;
             htConfig.financeBasePath = htConfig.financeBasePath;
+            htConfig.withholdBasePath = htConfig.withholdBasePath;
             htConfig.platRepayBasePath = htConfig.platRepayBasePath;
             htConfig.uiBasePath = htConfig.uiBasePath;
         axios.defaults.headers.common['userId'] = htConfig.defaultUser;
@@ -32,6 +33,7 @@ window.layinit = function (cb) {
             htConfig.coreBasePath = htConfig.basePath +"core/";
             htConfig.openBasePath = htConfig.basePath +"open/";
             htConfig.financeBasePath = htConfig.basePath +"finance/";
+            htConfig.withholdBasePath = htConfig.basePath +"withhold/";
             htConfig.platRepayBasePath = htConfig.basePath +"platRepay/";
             htConfig.uiBasePath = htConfig.uiBasePath;
         }

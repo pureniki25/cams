@@ -27,17 +27,17 @@ public interface WithholdingService {
      * 
      */
     void handBankRecharge(BasicBusiness basic, BankCardInfo bankCardInfo, RepaymentBizPlanList pList,
-			List<BankCardInfo> bankCardInfos,BigDecimal handRepayMoney);
+			BigDecimal handRepayMoney);
     
     /**
      * 手工第三方代扣
      * 
-     * @param underAmount 线上逾期费用
+     * 
      * @param handRepayAmount  手工代扣金额
      * @param platformId 第三方平台ID
      */
     void handThirdRepaymentCharge(BasicBusiness basic, BankCardInfo thirtyCardInfo, RepaymentBizPlanList pList,
-			BigDecimal underAmount,BigDecimal handRepayAmount,Integer platformId); 
+    		Integer platformId,BigDecimal handRepayAmount); 
     
     
     

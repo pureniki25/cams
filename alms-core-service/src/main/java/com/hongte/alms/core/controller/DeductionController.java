@@ -1,7 +1,4 @@
 package com.hongte.alms.core.controller;
-
-
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
@@ -52,23 +49,15 @@ import com.hongte.alms.common.util.EasyPoiExcelExportUtil;
 import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.vo.PageRequest;
 import com.hongte.alms.common.vo.PageResult;
-import com.hongte.alms.core.storage.StorageService;
-import com.ht.ussp.bean.LoginUserInfoHelper;
-import com.ht.ussp.client.dto.LoginInfoDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.poi.ss.usermodel.Workbook;
-
-import org.jeecgframework.poi.excel.ExcelExportUtil;
-import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import com.hongte.alms.base.feignClient.CustomerInfoXindaiRemoteApi;
+import com.hongte.alms.base.feignClient.dto.BankCardInfo;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -112,23 +101,57 @@ public class DeductionController {
     @Autowired
     @Qualifier("SysBankService")
     SysBankService sysBankService;
+    
+    @Autowired
+    CustomerInfoXindaiRemoteApi customerInfoXindaiRemoteApi;
+    
     @ApiOperation(value = "根据Plan_list_id查找代扣信息")
     @GetMapping("/selectDeductionInfoByPlayListId")
     @ResponseBody
     public Result<DeductionVo> selectDeductionInfoByPlayListId(
             @RequestParam("planListId") String planListId
     ){
-
+    	RepaymentBizPlanList planList=repaymentBizPlanListService.selectById(planListId);
+    	BasicBusiness business=basicBusinessService.selectById(planList.getOrigBusinessId());
+    	List<BankCardInfo> bankCardInfos=null;
+    	BankCardInfo bankCardInfo=null;
+    	try {
+    		 bankCardInfos=customerInfoXindaiRemoteApi.getBankcardInfo(business.getCustomerIdentifyCard());
+    		 if(bankCardInfos!=null&&bankCardInfos.size()>0) {
+    			
+    			 for(int i=0;i<bankCardInfos.size();i++) {
+        			 //看看是否有对应资金端的ID
+        			 if(bankCardInfos.get(i).getPlatformType()==business.getOutputPlatformId()) {
+        				 bankCardInfo=bankCardInfos.get(i);
+        			 }
+        		 }
+    		 }else {
+    			 return Result.error("-1", "该客户找不到对应银行卡信息");
+    		 }
+    	
+    		 if(bankCardInfo==null) {
+    			 return Result.error("-1", "该客户信息找不到对应业务的资金端类型");
+    		 }
+		} catch (Exception e) {
+	 	 	 return Result.error("-1", "调用信贷获取客户银行卡信息接口出错");
+		}
         try{
             //执行代扣信息
             DeductionVo deductionVo=  deductionService.selectDeductionInfoByPlanListId(planListId);
-            	
+            deductionVo.setBankCardInfo(bankCardInfo);
+            deductionVo.setStrType(business.getSrcType());
             if(deductionVo!=null) {
-            	RepaymentBizPlanList pList=repaymentBizPlanListService.selectById(planListId);
-            	if(istLastPeriod(pList)) {
+            	if(istLastPeriod(planList)) {
             	 	 return Result.error("-1", "最后一期不能代扣");
             	}
-            	
+            	if(bankCardInfo!=null) {
+            		deductionVo.setPhoneNumber(bankCardInfo.getMobilePhone());
+            		deductionVo.setBankCard(bankCardInfo.getBankCardNumber());
+            		deductionVo.setBankName(bankCardInfo.getBankCardName());
+            		deductionVo.setPlatformId(5);
+            		deductionVo.setBusiness(business);
+            		deductionVo.setpList(planList);
+            	}
                 Map<String, Object> map=basicBusinessService.getOverDueMoney(planListId, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid());
             	BigDecimal onLineOverDueMoney=BigDecimal.valueOf(Double.valueOf(map.get("onLineOverDueMoney").toString()));
             	BigDecimal underLineOverDueMoney=BigDecimal.valueOf(Double.valueOf(map.get("underLineOverDueMoney").toString()));
@@ -141,7 +164,7 @@ public class DeductionController {
         		List<WithholdingRecordLog> repayingList=withholdingRecordLogService.selectList(new EntityWrapper<WithholdingRecordLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).eq("repay_status", 2));
         		
         		//查看是否共借标，共借标不能银行代扣
-        		BasicBusiness business=basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", deductionVo.getOriginalBusinessId()));
+        		 business=basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", deductionVo.getOriginalBusinessId()));
         		deductionVo.setIssueSplitType(business.getIssueSplitType());
         		BigDecimal repayAmount=BigDecimal.valueOf(0);
         		BigDecimal repayingAmount=BigDecimal.valueOf(0);
