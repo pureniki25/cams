@@ -1094,7 +1094,7 @@ public class ExpenseSettleServiceImpl implements ExpenseSettleService {
 //										.divide(e.getRepaymentBizPlanList().getOverdueDays().multiply(expenseSettleVO.getPrincipal()),10,RoundingMode.HALF_UP);
 //							}
 							if (daysBeyoungDueDate > 1) {
-								firstLateFee = expenseSettleVO.getBorrowAmount().multiply(new BigDecimal(0.001))
+								firstLateFee = expenseSettleVO.getBorrowAmount()==null?BigDecimal.valueOf(0):expenseSettleVO.getBorrowAmount().multiply(new BigDecimal(0.001))
 										.multiply(new BigDecimal(daysBeyoungDueDate));
 								expenseSettleLackFeeVO.setLateFee(firstLateFee);
 							}
