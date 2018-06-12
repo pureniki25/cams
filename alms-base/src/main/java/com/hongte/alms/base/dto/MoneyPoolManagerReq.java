@@ -22,6 +22,8 @@ public class MoneyPoolManagerReq {
 	private String tradeDateEnd;
 	private String updateDateStart;
 	private String updateDateEnd;
+	private String createTimeStart;
+	private String createTimeEnd;
 
 	/**
 	 * 交易类型
@@ -120,5 +122,33 @@ public class MoneyPoolManagerReq {
 	 */
 	public void setUpdateDateEnd(String updateDateEnd) {
 		this.updateDateEnd = updateDateEnd;
+	}
+
+	/**
+	 * @return the createTimeEnd
+	 */
+	public String getCreateTimeEnd() {
+		return createTimeEnd;
+	}
+
+	/**
+	 * @param createTimeEnd the createTimeEnd to set
+	 */
+	public void setCreateTimeEnd(String createTimeEnd) {
+		this.createTimeEnd = createTimeEnd;
+	}
+
+	/**
+	 * @return the createTimeStart
+	 */
+	public String getCreateTimeStart() {
+		return createTimeStart;
+	}
+
+	/**
+	 * @param createTimeStart the createTimeStart to set
+	 */
+	public void setCreateTimeStart(String createTimeStart) {
+		this.createTimeStart = createTimeStart;
 	}
 }
