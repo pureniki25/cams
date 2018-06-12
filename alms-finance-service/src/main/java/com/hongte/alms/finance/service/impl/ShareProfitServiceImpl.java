@@ -63,6 +63,7 @@ import com.hongte.alms.base.mapper.TuandaiProjectInfoMapper;
 import com.hongte.alms.base.process.mapper.ProcessMapper;
 import com.hongte.alms.base.service.AccountantOverRepayLogService;
 import com.hongte.alms.base.service.RepaymentProjFactRepayService;
+import com.hongte.alms.base.service.RepaymentResourceService;
 import com.hongte.alms.base.service.WithholdingRepaymentLogService;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.common.util.DateUtil;
@@ -109,6 +110,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	MoneyPoolRepaymentMapper moneyPoolRepaymentMapper;
 	@Autowired
 	LoginUserInfoHelper loginUserInfoHelper;
+	
+	
 
 	@Autowired
 	@Qualifier("AccountantOverRepayLogService")
@@ -116,6 +119,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	@Autowired
 	@Qualifier("RepaymentProjFactRepayService")
 	RepaymentProjFactRepayService repaymentProjFactRepayService;
+	@Autowired
+	@Qualifier("RepaymentResourceService")
+	RepaymentResourceService repaymentResourceService;
 	
 	@Autowired
 	@Qualifier("WithholdingRepaymentLogService")
@@ -276,7 +282,11 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		// 银行代扣
 		if(logIds!=null&&logIds.size()>0) {
 			WithholdingRepaymentLog log=withholdingRepaymentLogService.selectById(logIds.get(0));
-			log.getBindPlatformId();
+			RepaymentResource temp=repaymentResourceService.selectOne(new EntityWrapper<RepaymentResource>().eq("business_id", log.getOriginalBusinessId())
+					.eq("after_id", log.getAfterId()).eq("repay_source_ref_id", log.getLogId()).eq("repay_source", "30"));
+			if(temp!=null) {//已经核销过
+				return;
+			}
 
 			RepaymentResource repaymentResource = new RepaymentResource();
 			repaymentResource.setAfterId(log.getAfterId());

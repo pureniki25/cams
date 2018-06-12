@@ -585,7 +585,12 @@ public class RechargeServiceImpl implements RechargeService {
 
 	@Override
 	public Result shareProfit(RepaymentBizPlanList list, WithholdingRepaymentLog log) {
-		Result result = financeClient.shareProfit(list.getOrigBusinessId(), list.getAfterId(), log.getLogId());
+		Result result=null;
+		try {
+		 result = financeClient.shareProfit(list.getOrigBusinessId(), list.getAfterId(), log.getLogId());
+		}catch (Exception e) {
+			logger.info("调用核销方法异常"+e);
+		}
 		return result;
 	}
 

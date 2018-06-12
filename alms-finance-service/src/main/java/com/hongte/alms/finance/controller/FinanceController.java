@@ -755,7 +755,7 @@ public class FinanceController {
 			List<Integer> logIds=new ArrayList<Integer>();
 			logIds.add(logId);
 			list.add(30);//还款来源银行代扣
-			
+			req.setLogIds(logIds);
 			req.setAfterId(afterId);
 			req.setBusinessId(businessId);
 			req.setRepaySource(list);
