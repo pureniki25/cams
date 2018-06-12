@@ -47,7 +47,8 @@
                 <i-button @click="deleteMoneyPool">删除流水</i-button>
                 <Upload 
                 :action="upload.url" 
-                :multiple=false 
+                :multiple=false
+                :headers="upload.headers" 
                 :with-credentials=true 
                 :on-success="uploadSuccess" 
                 :show-upload-list=false 
