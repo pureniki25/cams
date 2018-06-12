@@ -100,6 +100,7 @@ window.layinit(function (htConfig) {
                 headers: {
                     app: axios.defaults.headers.common['app'],
                     Authorization: axios.defaults.headers.common['Authorization'],
+                    userId: axios.defaults.headers.common['userId']
                 },
             },
             detail:{
