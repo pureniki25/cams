@@ -159,6 +159,12 @@ public class MoneyPoolManagerReq {
 	 * @return the tradeDate
 	 */
 	public String getTradeDate() {
+		if (getTradeDateStart()==null) {
+			return null;
+		}
+		if (getTradeDateEnd()==null) {
+			return null;
+		}
 		if (getTradeDateStart().equals(getTradeDateEnd())) {
 			return getTradeDateStart();
 		}else {
@@ -195,6 +201,12 @@ public class MoneyPoolManagerReq {
 	 * @return the createTime
 	 */
 	public String getCreateTime() {
+		if (getCreateTimeEnd()==null) {
+			return null ;
+		}
+		if(getCreateTimeStart()==null) {
+			return null ;
+		}
 		if (getCreateTimeStart().equals(getCreateTimeEnd())) {
 			return getCreateTimeStart();
 		}else {
