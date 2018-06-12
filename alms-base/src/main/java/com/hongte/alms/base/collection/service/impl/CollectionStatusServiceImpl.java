@@ -328,7 +328,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
                 carBusinessAfter.setCollectionRemark(describe);
                 Result result = collectionSynceToXindaiRemoteApi.transferOnePhoneSetToXd(carBusinessAfter);
-                if(!result.getCode().equals(1)){
+                if(!result.getCode().equals("1")){
                     logger.error("设置电催人员,同步电催设置到信贷失败，信息："+ JSON.toJSONString(businessVo)+"  staffUserId:"+staffUserId);
                 }
 
@@ -349,7 +349,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                 collection.setCreateUser(userDro.getBmUserId());
                 collection.setCreateTime(new Date());
                 Result result = collectionSynceToXindaiRemoteApi.transferOneVisitSetToXd(collection);
-                if(result== null ||!result.getCode().equals(1)){
+                if(result== null ||!result.getCode().equals("1")){
                     logger.error("设置催收人员,同步催收设置到信贷失败，信息："+ JSON.toJSONString(businessVo)+"  staffUserId:"+staffUserId);
                 }
             }
