@@ -762,8 +762,8 @@ public class FinanceController {
 			shareProfitService.execute(req, true);
               result.success(1);
 		} catch (Exception ex) {
-			logger.error(ex.getMessage());
-			return Result.error("分润出现异常", ex.getMessage());
+			logger.error("分润出现异常"+ex);
+			return Result.error("-1","分润出现异常"+ex);
 		}
 		return result;
 	}
