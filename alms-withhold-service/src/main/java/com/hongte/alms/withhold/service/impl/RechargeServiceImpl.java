@@ -201,8 +201,7 @@ public class RechargeServiceImpl implements RechargeService {
 					log.setRemark(resultMsg);
 					log.setUpdateTime(new Date());
 					withholdingRepaymentLogService.updateById(log);
-					recordRepaymentLog(resultMsg, status, pList, business, bankCardInfo, channel.getPlatformId(),
-							boolLastRepay, boolPartRepay, merchOrderId, 0, BigDecimal.valueOf(amount));
+				
 				} else {
 					result.setCode("-1");
 					result.setMsg(resultMsg);
@@ -272,8 +271,7 @@ public class RechargeServiceImpl implements RechargeService {
 						log.setRemark(resultMsg);
 						log.setUpdateTime(new Date());
 						withholdingRepaymentLogService.updateById(log);
-						recordRepaymentLog(resultMsg, status, pList, business, bankCardInfo, channel.getPlatformId(),
-								boolLastRepay, boolPartRepay, merchOrderId, 0, BigDecimal.valueOf(amount));
+
 						break;
 					} else if (!remoteResult.getReturnCode().equals("0000")) {
 						result.setCode("-1");
@@ -464,6 +462,8 @@ public class RechargeServiceImpl implements RechargeService {
 		log.setRemark(msg);
 		log.setThirdOrderId(merchOrderId);
 		log.setSettlementType(settlementType);
+		log.setBankCode(dto.getBankCode());
+		log.setBankName(dto.getBankName());
 		if(list.getOverdueAmount()!=null) {
 			log.setPlanTotalRepayMoney(list.getTotalBorrowAmount().add(list.getOverdueAmount()));
 		}else {
@@ -638,7 +638,7 @@ public class RechargeServiceImpl implements RechargeService {
 		if (result == null) {
 			throw new ServiceRuntimeException("调用外联平台接口失败！");
 		}
-		if ("0000".equals(result.getReturnCode()) && result.getMsg().contains("充值成功")) {
+		if ("0000".equals(result.getReturnCode()) && result.getMsg()!=null&&result.getMsg().contains("充值成功")) {
 			log.setUpdateTime(new Date());
 			log.setRepayStatus(1);
 			log.setRemark(result.getMsg());
@@ -648,7 +648,7 @@ public class RechargeServiceImpl implements RechargeService {
 							.eq("orig_business_id", log.getOriginalBusinessId())
 							.eq("after_id", log.getAfterId()));
 			shareProfit(list, log);
-		} else if(result.getReturnCode().equals(RepayResultCodeEnum.YH_HANDLER_EXCEPTION.getValue())){
+		} else if(result.getReturnCode().equals("0000")||result.getReturnCode().equals(RepayResultCodeEnum.YH_HANDLER_EXCEPTION.getValue())){
 			log.setUpdateTime(new Date());
 			log.setRepayStatus(2);
 			log.setRemark(result.getMsg());
