@@ -18,6 +18,7 @@ import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.feignClient.CollectionSynceToXindaiRemoteApi;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.RepaymentBizPlanService;
+import com.hongte.alms.base.service.SysUserPermissionService;
 import com.hongte.alms.base.service.TransferOfLitigationService;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
@@ -89,6 +90,10 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
     @Autowired
     CollectionSynceToXindaiRemoteApi collectionSynceToXindaiRemoteApi;
+
+    @Autowired
+    @Qualifier("SysUserPermissionService")
+    SysUserPermissionService sysUserPermissionService;
 
     /**
      * 设置电催/人员(界面手动设置)
@@ -196,11 +201,17 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
         Integer setTypeStatus = CollectionStatusEnum.getByPageStr(staffType).getKey();
         for(StaffBusinessVo vo:voList){
+            String oldStaffUserId = null;
             CollectionStatus status = new CollectionStatus();
             //1、插入或更新催收状态表
             List<CollectionStatus> list = selectList(new EntityWrapper<CollectionStatus>().eq("business_id",vo.getBusinessId()).eq("crp_id",vo.getCrpId()));
             if(list.size()>0){
                 status = list.get(0);
+                if(staffType.equals(CollectionStatusEnum.PHONE_STAFF.getPageStr())){
+                    oldStaffUserId = status.getPhoneStaff();
+                }else if (staffType.equals(CollectionStatusEnum.COLLECTING.getPageStr())){
+                    oldStaffUserId = status.getVisitStaff();
+                }
             }else{
                 //如果是设置关闭状态，又没有写过催收的状态记录则跳过，不增加催收状态记录
                 if(CollectionStatusEnum.getByPageStr(staffType).equals(CollectionStatusEnum.CLOSED)){
@@ -253,6 +264,17 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
             collectionLogService.insert(log);
 
 
+            //刷新相关跟单人员的用户设置
+            //1.旧的那个跟单人的permission刷新
+            if(oldStaffUserId!=null){
+                sysUserPermissionService.setUserPermissons(oldStaffUserId);
+            }
+
+            //2.新的那个跟单人的permission刷新
+            if(staffType.equals(CollectionStatusEnum.PHONE_STAFF.getPageStr())
+                    || staffType.equals(CollectionStatusEnum.COLLECTING.getPageStr())) {
+                sysUserPermissionService.setUserPermissons(staffUserId);
+            }
         }
         return true;
     }

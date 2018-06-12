@@ -47,7 +47,8 @@
                 <i-button @click="deleteMoneyPool">删除流水</i-button>
                 <Upload 
                 :action="upload.url" 
-                :multiple=false 
+                :multiple=false
+                :headers="upload.headers" 
                 :with-credentials=true 
                 :on-success="uploadSuccess" 
                 :show-upload-list=false 
@@ -64,7 +65,7 @@
             <Page :total="table.total"  @on-change="page" :current="form.curPage" show-total ></Page>
         </p>
 
-        <Modal v-model="detailShow" width="80">
+        <Modal v-model="detailShow" width="80" closable=false mask-closable title="详情">
             <row style="margin-bottom: 10px">
                 <i-col span="2" style="text-align: right;margin-right: 10px;">
                     交易时间:
