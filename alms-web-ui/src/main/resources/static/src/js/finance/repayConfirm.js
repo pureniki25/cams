@@ -453,8 +453,8 @@ window.layinit(function (htConfig) {
                     param.businessId = businessId;
                     param.afterId = afterId;
                     param = Object.assign(app.factRepaymentInfo, param);
-                    if(!param.mprIds){
-                        app.$Message.error({content:'不能提交没匹配流水的还款确认'})
+                    if((!param.mprIds||param.mprIds=='')&&(!param.surplusFund||param.surplusFund==0)){
+                        app.$Message.error({content:'不能提交没匹配流水且没使用结余金额的还款确认'})
                         return;
                     }
                     app.$Modal.confirm({

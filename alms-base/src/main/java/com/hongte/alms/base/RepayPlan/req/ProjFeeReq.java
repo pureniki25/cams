@@ -57,7 +57,7 @@ public class ProjFeeReq {
     private String feeTypeName;
 
     /**
-     * 分账标记 0：不线上分账，10：分账到借款人账户，20：分账到资产端账户，30：分账到资金端账户(平台)，40：分账到担保公司账户
+     * 分账标记 0：线下收取，10：分账到投资者账户，20：分账到资产端账户，30：分账到资金端账户(平台)，40：分账到担保公司账户
      */
     @TableField("account_status")
     @ApiModelProperty(required= true,value = "分账标记 0：不线上分账，10：分账到借款人账户，20：分账到资产端账户，30：分账到资金端账户(平台)，40：分账到担保公司账户")

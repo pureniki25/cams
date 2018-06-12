@@ -38,4 +38,12 @@ public class ExportFileUtil {
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);   
         return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(file),  headers, HttpStatus.CREATED);    
 	}
+	
+	public static ResponseEntity<byte[]> download(byte[] bate,String exportName) throws UnsupportedEncodingException , IOException {
+        HttpHeaders headers = new HttpHeaders();    
+        String fileName=new String(exportName.getBytes("UTF-8"),"iso-8859-1");//为了解决中文名称乱码问题  
+        headers.setContentDispositionFormData("attachment", fileName);   
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);   
+        return new ResponseEntity<byte[]>(bate,  headers, HttpStatus.CREATED);    
+	}
 }

@@ -43,7 +43,7 @@
         <Card title="财务人员跟单设置">
             <Row>
                 <i-col span="24">
-                    <i-form :model="schForm" label-position="right" :label-width="100" inline style="display: inline">
+                    <i-form :model="searchForm" label-position="right" :label-width="100" inline style="display: inline">
                         <i-col span="6">
                             <form-item label="区域：" prop="areaId">
                                 <i-select v-model="searchForm.areaId" clearable  filterable >
@@ -59,7 +59,7 @@
                             </form-item>
                         </i-col>
                         <form-item label="用户姓名：">
-                            <i-input v-model="schForm.userName"></i-input>
+                            <i-input v-model="searchForm.userName"></i-input>
                         </form-item>
                     </i-form>
                         <button class="layui-btn layui-btn-sm"   @click="search">查询</button>

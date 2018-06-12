@@ -54,8 +54,8 @@ window.layinit(function (htConfig) {
                         title: '状态',
                         key: 'status'
                     }, {
-                        title: '更新时间',
-                        key: 'updateTime'
+                        title: '创建时间',
+                        key: 'createTime'
                     }, {
                         title: '交易备注',
                         key: 'tradeRemark'

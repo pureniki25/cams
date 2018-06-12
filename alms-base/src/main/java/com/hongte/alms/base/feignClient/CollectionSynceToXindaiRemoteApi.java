@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
- * @author zk
- * @date 2018/3/3 17:37
+ * @author 曾坤
+ * @date 2018/6/1 17:37
  * 贷后跟踪相关的远程调用
  */
-//@FeignClient(value = "alms-open-service")
 @FeignClient(value = "alms-open-service")
+//@FeignClient(value = "alms-open-service",  url="http://192.168.12.101:30616")
 public interface CollectionSynceToXindaiRemoteApi {
 
     /**
@@ -40,14 +40,14 @@ public interface CollectionSynceToXindaiRemoteApi {
      * @param parametertracelog
      * @return
      */
-    @RequestMapping(value = "/collectionTrackLog/transferOneCollectionLogToXd",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+    @RequestMapping(value = "/collection/transferOneCollectionLogToXd",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
     Result<Integer> transferOneCollectionLogToXd(@RequestBody Parametertracelog parametertracelog);
 
 
     /**
      * 根据信贷Id删除信贷的贷后跟踪记录
      */
-    @RequestMapping(value = "/collectionTrackLog/deleteXdCollectionLogById",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+    @RequestMapping(value = "/collection/deleteXdCollectionLogById",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
     Result deleteXdCollectionLogById(@RequestBody Integer xdIndex) throws Exception;
 
 
