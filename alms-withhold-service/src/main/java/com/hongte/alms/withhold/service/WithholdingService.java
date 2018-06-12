@@ -26,7 +26,7 @@ public interface WithholdingService {
      * @param handRepayAmount  手工代扣金额
      * 
      */
-    void handBankRecharge(BasicBusiness basic, BankCardInfo bankCardInfo, RepaymentBizPlanList pList,
+    Result handBankRecharge(BasicBusiness basic, BankCardInfo bankCardInfo, RepaymentBizPlanList pList,
 			BigDecimal handRepayMoney);
     
     /**
@@ -36,7 +36,7 @@ public interface WithholdingService {
      * @param handRepayAmount  手工代扣金额
      * @param platformId 第三方平台ID
      */
-    void handThirdRepaymentCharge(BasicBusiness basic, BankCardInfo thirtyCardInfo, RepaymentBizPlanList pList,
+    Result handThirdRepaymentCharge(BasicBusiness basic, BankCardInfo thirtyCardInfo, RepaymentBizPlanList pList,
     		Integer platformId,BigDecimal handRepayAmount); 
     
     
