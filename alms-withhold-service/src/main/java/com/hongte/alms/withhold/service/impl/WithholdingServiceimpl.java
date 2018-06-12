@@ -121,14 +121,14 @@ public class WithholdingServiceimpl implements WithholdingService {
 		// 获取所有银行代扣渠道,先扣线上费用
 		List<WithholdingChannel> channels = withholdingChannelService
 				.selectList(new EntityWrapper<WithholdingChannel>().eq("platform_id", PlatformEnum.YH_FORM.getValue())
-						.eq("channel_status", 1).eq("bank_code", bankCardInfo.getBankCode()).orderBy("level"));
+						.eq("channel_status", 1).eq("bank_code", bankCardInfo.getBankCode().trim()).orderBy("level"));
 		WithholdingChannel channel = null;
 		if (channels != null && channels.size() > 0) {
 			channel = channels.get(0);
 		}
         
 		SysBankLimit sysBankLimit = sysBankLimitService.selectOne(
-				new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("bank_code", bankCardInfo.getBankCode()).eq("status", 1));
+				new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("bank_code", bankCardInfo.getBankCode().trim()).eq("status", 1));
 		if (sysBankLimit == null) {
 			logger.debug("第三方代扣限额信息platformId:" + channel.getPlatformId() + "无效/不存在");
 		} else {
@@ -260,7 +260,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		// 获取所有第三方代扣渠道
 		List<WithholdingChannel> channels = withholdingChannelService
 				.selectList(new EntityWrapper<WithholdingChannel>().ne("platform_id", PlatformEnum.YH_FORM.getValue())
-						.eq("channel_status", 1).eq("bank_code", thirtyCardInfo.getBankCode()).orderBy("level"));
+						.eq("channel_status", 1).eq("bank_code", thirtyCardInfo.getBankCode().trim()).orderBy("level"));
 		List<ThirdPlatform> thirdPlatforms = thirtyCardInfo.getThirdPlatformList();
 
 		List<WithholdingChannel> newChanels = new ArrayList();
@@ -387,14 +387,14 @@ public class WithholdingServiceimpl implements WithholdingService {
 		// 获取所有银行代扣渠道,先扣线上费用
 		List<WithholdingChannel> channels = withholdingChannelService
 				.selectList(new EntityWrapper<WithholdingChannel>().eq("platform_id", PlatformEnum.YH_FORM.getValue())
-						.eq("channel_status", 1).eq("bank_code", bankCardInfo.getBankCode()).orderBy("level"));
+						.eq("channel_status", 1).eq("bank_code", bankCardInfo.getBankCode().trim()).orderBy("level"));
 		WithholdingChannel channel = null;
 		if (channels != null && channels.size() > 0) {
 			channel = channels.get(0);
 		}
         
 		SysBankLimit sysBankLimit = sysBankLimitService.selectOne(
-				new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("bank_code", bankCardInfo.getBankCode()).eq("status", 1));
+				new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("bank_code", bankCardInfo.getBankCode().trim()).eq("status", 1));
 		if (sysBankLimit == null) {
 			logger.debug("第三方代扣限额信息platformId:" + channel.getPlatformId() + "无效/不存在");
 		} else {
@@ -477,7 +477,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		// 获取所有第三方代扣渠道
 				List<WithholdingChannel> channels = withholdingChannelService
 						.selectList(new EntityWrapper<WithholdingChannel>().eq("platform_id",platformId)
-								.eq("channel_status", 1).eq("bank_code", thirtyCardInfo.getBankCode()).orderBy("level"));
+								.eq("channel_status", 1).eq("bank_code", thirtyCardInfo.getBankCode().trim()).orderBy("level"));
 				List<ThirdPlatform> thirdPlatforms = thirtyCardInfo.getThirdPlatformList();
 
 				List<WithholdingChannel> newChanels = new ArrayList();
