@@ -1,4 +1,4 @@
-package com.hongte.alms.platRepay.config;
+package com.hongte.alms.platrepay.config;
 
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.EnvironmentAware;

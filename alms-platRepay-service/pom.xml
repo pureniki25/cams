@@ -15,14 +15,14 @@
         <!-- MyBatis Generator -->
         <!-- Java接口和实体类 -->
         <targetJavaProject>${basedir}/src/main/java</targetJavaProject>
-        <targetMapperPackage>com.hongte.alms.platRepay.mapper</targetMapperPackage>
-        <targetModelPackage>com.hongte.alms.platRepay.entity</targetModelPackage>
+        <targetMapperPackage>com.hongte.alms.platrepay.mapper</targetMapperPackage>
+        <targetModelPackage>com.hongte.alms.platrepay.entity</targetModelPackage>
         <!-- XML生成路径 -->
         <targetResourcesProject>${basedir}/src/main/resources</targetResourcesProject>
         <targetXMLPackage>mapper</targetXMLPackage>
         <!-- 依赖版本 -->
         <mapper.version>3.3.6</mapper.version>
-        <start-class>com.hongte.alms.platRepay.PlatRepayServiceApplication</start-class>
+        <start-class>com.hongte.alms.platrepay.PlatRepayServiceApplication</start-class>
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
     <dependencies>

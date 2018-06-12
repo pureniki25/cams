@@ -1,4 +1,5 @@
-package com.hongte.alms.platRepay.service;
+package com.hongte.alms.platrepay.service;
+
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -14,8 +15,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.alibaba.fastjson.JSONObject;
 import com.hongte.alms.base.entity.TdrepayRechargeDetail;
-import com.hongte.alms.platRepay.PlatRepayServiceApplication;
-import com.hongte.alms.platRepay.vo.TdrepayRechargeInfoVO;
+import com.hongte.alms.platrepay.PlatRepayServiceApplication;
+import com.hongte.alms.platrepay.service.TdrepayRechargeService;
+import com.hongte.alms.platrepay.vo.TdrepayRechargeInfoVO;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = PlatRepayServiceApplication.class)

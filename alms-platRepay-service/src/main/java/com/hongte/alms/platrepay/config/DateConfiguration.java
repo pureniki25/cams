@@ -4,7 +4,7 @@
  * 创建人 汤孝松
  * 创建时间 2017/11/21  10:12
  */
-package com.hongte.alms.platRepay.config;
+package com.hongte.alms.platrepay.config;
 
 import com.hongte.alms.common.util.StringToDateConverter;
 import com.hongte.alms.common.util.StringToDateConverter;

@@ -1,4 +1,4 @@
-package com.hongte.alms.platRepay.config;
+package com.hongte.alms.platrepay.config;
 
 import java.text.SimpleDateFormat;
 import java.util.List;

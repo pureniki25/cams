@@ -11,7 +11,7 @@
         <module>alms-core-service</module>
         <module>alms-finance-service</module>
         <module>alms-withhold-service</module>
-        <module>alms-platRepay-service</module>
+        <module>alms-platrepay-service</module>
         <module>alms-open-service</module>
         <module>alms-common</module>
         <module>alms-web-ui</module>

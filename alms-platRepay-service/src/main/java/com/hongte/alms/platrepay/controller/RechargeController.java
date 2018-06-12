@@ -1,4 +1,4 @@
-package com.hongte.alms.platRepay.controller;
+package com.hongte.alms.platrepay.controller;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
@@ -34,8 +30,8 @@ import com.hongte.alms.base.service.DepartmentBankService;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.CommonUtil;
 import com.hongte.alms.common.util.StringUtil;
-import com.hongte.alms.platRepay.service.TdrepayRechargeService;
-import com.hongte.alms.platRepay.vo.RechargeModalVO;
+import com.hongte.alms.platrepay.service.TdrepayRechargeService;
+import com.hongte.alms.platrepay.vo.RechargeModalVO;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 
 import io.swagger.annotations.ApiOperation;

@@ -4,7 +4,7 @@
  * 创建人 谭荣巧
  * 创建时间 2017年11月17日 下午3:01:38 
  */
-package com.hongte.alms.platRepay;
+package com.hongte.alms.platrepay;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -27,7 +27,7 @@ import org.springframework.web.client.RestTemplate;
 @SpringCloudApplication
 @MapperScan(basePackages = {"com.hongte.alms.finance.mapper","com.hongte.alms.base"})
 @EnableTransactionManagement 
-@ComponentScan(basePackages= {"com.hongte.alms.platRepay","com.hongte.alms.common", "com.hongte.alms.base.*","com.ht.ussp.bean"})
+@ComponentScan(basePackages= {"com.hongte.alms.platrepay","com.hongte.alms.common", "com.hongte.alms.base.*","com.ht.ussp.bean"})
 public class PlatRepayServiceApplication {
 
 	@Bean
@@ -38,7 +38,7 @@ public class PlatRepayServiceApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(PlatRepayServiceApplication.class, args);
-		System.err.println("ヾ(◍°∇°◍)ﾉﾞ    platRepay-service启动成功      ヾ(◍°∇°◍)ﾉﾞ\n");
+		System.err.println("ヾ(◍°∇°◍)ﾉﾞ    platrepay-service启动成功      ヾ(◍°∇°◍)ﾉﾞ\n");
 	}
 
 

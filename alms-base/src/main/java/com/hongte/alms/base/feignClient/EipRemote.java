@@ -2,6 +2,7 @@ package com.hongte.alms.base.feignClient;
 
 import com.hongte.alms.base.dto.RechargeModalDTO;
 import com.hongte.alms.base.dto.compliance.DistributeFundDTO;
+import com.hongte.alms.base.dto.compliance.TdAdvanceShareProfitDTO;
 import com.hongte.alms.base.feignClient.dto.AddProjectTrackReqDto;
 import com.hongte.alms.base.feignClient.dto.BankRechargeReqDto;
 import com.hongte.alms.base.feignClient.dto.BaofuRechargeReqDto;
@@ -187,5 +188,14 @@ public interface EipRemote {
 	@RequestMapping(value = "/eip/td/repayment/queryProjectPayment", headers = { "app=ALMS",
 	"content-type=application/json" }, method = RequestMethod.POST)
 	Result queryProjectPayment(@RequestBody Map<String, Object> paramMap);
+	
+	/**
+	 * 偿还垫付
+	 * @param dto
+	 * @return
+	 */
+	@RequestMapping(value = "/eip/td/repayment/advanceShareProfit", headers = { "app=ALMS",
+	"content-type=application/json" }, method = RequestMethod.POST)
+	Result advanceShareProfit(@RequestBody TdAdvanceShareProfitDTO dto);
 
 }

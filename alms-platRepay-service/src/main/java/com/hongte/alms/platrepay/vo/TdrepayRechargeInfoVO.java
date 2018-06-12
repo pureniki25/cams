@@ -1,4 +1,4 @@
-package com.hongte.alms.platRepay.vo;
+package com.hongte.alms.platrepay.vo;
 
 import java.util.List;
 

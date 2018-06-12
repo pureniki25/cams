@@ -1,4 +1,5 @@
-package com.hongte.alms.platRepay.service;
+package com.hongte.alms.platrepay.service;
+
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -8,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.hongte.alms.base.service.AgencyRechargeLogService;
-import com.hongte.alms.platRepay.PlatRepayServiceApplication;
+import com.hongte.alms.platrepay.PlatRepayServiceApplication;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = PlatRepayServiceApplication.class)

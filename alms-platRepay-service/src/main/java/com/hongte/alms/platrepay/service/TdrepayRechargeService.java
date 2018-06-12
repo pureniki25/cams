@@ -1,10 +1,10 @@
-package com.hongte.alms.platRepay.service;
+package com.hongte.alms.platrepay.service;
 
 import java.util.List;
 
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.vo.module.ComplianceRepaymentVO;
-import com.hongte.alms.platRepay.vo.TdrepayRechargeInfoVO;
+import com.hongte.alms.platrepay.vo.TdrepayRechargeInfoVO;
 
 /**
  * 资金分发接口

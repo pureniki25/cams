@@ -1,4 +1,4 @@
-package com.hongte.alms.platRepay.config;
+package com.hongte.alms.platrepay.config;
 
 import com.alibaba.druid.support.http.StatViewServlet;
 import com.alibaba.druid.support.http.WebStatFilter;

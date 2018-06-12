@@ -1,4 +1,4 @@
-package com.hongte.alms.platRepay.dto;
+package com.hongte.alms.platrepay.dto;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

@@ -1,14 +1,8 @@
-package com.hongte.alms.platRepay.controller;
+package com.hongte.alms.platrepay.controller;
 
 
-import com.hongte.alms.base.service.SysCityService;
-import com.hongte.alms.base.service.SysCountyService;
-import com.hongte.alms.base.service.SysProvinceService;
+import java.util.List;
 
-import com.hongte.alms.base.vo.module.AreaProvinceItemVo;
-import com.hongte.alms.common.result.Result;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +11,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hongte.alms.base.service.SysCityService;
+import com.hongte.alms.base.service.SysCountyService;
 import com.hongte.alms.base.service.SysProvinceService;
+import com.hongte.alms.base.vo.module.AreaProvinceItemVo;
+import com.hongte.alms.common.result.Result;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 /**
  * @author zengkun

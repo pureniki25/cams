@@ -1,4 +1,4 @@
-package com.hongte.alms.platRepay.controller;
+package com.hongte.alms.platrepay.controller;
 
 import java.util.List;
 
@@ -25,8 +25,8 @@ import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.common.vo.PageResult;
-import com.hongte.alms.platRepay.service.TdrepayRechargeService;
-import com.hongte.alms.platRepay.vo.TdrepayRechargeInfoVO;
+import com.hongte.alms.platrepay.service.TdrepayRechargeService;
+import com.hongte.alms.platrepay.vo.TdrepayRechargeInfoVO;
 
 import io.swagger.annotations.ApiOperation;
 
