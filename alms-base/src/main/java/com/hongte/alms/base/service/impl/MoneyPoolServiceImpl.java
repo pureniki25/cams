@@ -514,10 +514,12 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 			MoneyPool moneyPool = moneyPoolMapper.selectById(mpr.getMoneyPoolId()); 
 			mpr.setState(RepayRegisterFinanceStatus.未关联银行流水.toString());
 			mpr.setIsFinanceMatch(0);
-			moneyPool.setStatus(RepayRegisterState.待领取.toString());
-			moneyPool.setFinanceStatus(RepayRegisterFinanceStatus.未关联银行流水.toString());
 			mpr.updateById();
-			moneyPool.updateById();
+			if (moneyPool!=null) {
+				moneyPool.setStatus(RepayRegisterState.待领取.toString());
+				moneyPool.setFinanceStatus(RepayRegisterFinanceStatus.未关联银行流水.toString());
+				moneyPool.updateById();
+			}
 		}
 	}
 
