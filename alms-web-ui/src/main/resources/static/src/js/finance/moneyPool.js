@@ -96,7 +96,7 @@ window.layinit(function (htConfig) {
             selection:[],
             bankList:[],
             upload:{
-                url:fpath+'/finance/importExcel',
+                url:fpath+'finance/importExcel',
                 headers: {
                     app: axios.defaults.headers.common['app'],
                     Authorization: axios.defaults.headers.common['Authorization'],
