@@ -191,7 +191,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		if (req.getAfterId() == null) {
 			throw new ServiceRuntimeException("ConfirmRepaymentReq.afterId 不能为空");
 		}
-		if (req.getMprIds() == null && req.getSurplusFund() == null) {
+		if ((req.getMprIds() == null||req.getMprIds().isEmpty()) 
+				&&( req.getSurplusFund() == null || req.getSurplusFund().equals(new BigDecimal("0")))
+				&& (req.getLogIds() == null || req.getLogIds().isEmpty())) {
 			throw new ServiceRuntimeException("ConfirmRepaymentReq至少要有一个还款来源");
 		}
 		initVariable(req);
