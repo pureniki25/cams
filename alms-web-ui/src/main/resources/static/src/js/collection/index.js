@@ -91,7 +91,7 @@ window.layinit(function(htConfig){
         },
         methods: {
             //重载表格
-            toLoading() {
+            toLoading(data, page) {
                 if (table == null) return;
                 vm.$refs['searchForm'].validate((valid) =>{
                     if (valid) {
@@ -128,7 +128,7 @@ window.layinit(function(htConfig){
                                 peroidStatus:vm.searchForm.peroidStatus,  //期数状态
                             }
                             , page: {
-                                curr: 1 //重新从第 1 页开始
+                                curr: page || 1 //重新从第 1 页开始
                             }
                         });
 
@@ -219,7 +219,7 @@ window.layinit(function(htConfig){
             content: url,
             success: function (layero, index) {
                 /* 渲染表单 */
-                vm.toLoading();
+                // vm.toLoading();
             }
         });
 

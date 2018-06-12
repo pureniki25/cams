@@ -63,7 +63,7 @@ public class AdminController {
 			sysUserPermissionService.setUserPermissons(userId);
 			return Result.success();
 		} catch (Exception e) {
-			LOGGER.error("--AdminController--设置所有用户可访问业务对照关系失败！", e);
+			LOGGER.error("--AdminController--设置所指定用户户可访问业务对照关系失败！ 用户ID："+userId, e);
 			return Result.error("500", e.getMessage());
 		}
 	}
