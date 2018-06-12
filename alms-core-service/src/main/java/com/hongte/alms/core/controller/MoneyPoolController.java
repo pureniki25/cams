@@ -273,7 +273,7 @@ public class MoneyPoolController {
 				jsonObject.put("claimDate", DateUtil.formatDate(moneyPoolRepayment.getClaimDate()));
 				jsonObject.put("planAmount", planList.getTotalBorrowAmount());
 				jsonObject.put("remark", moneyPoolRepayment.getRemark());
-				jsonObject.put("status", moneyPool.getFinanceStatus());
+				jsonObject.put("status", moneyPoolRepayment.getState());
 				jsonObjects.add(jsonObject);
 			}
 			JSONObject res = new JSONObject();
