@@ -306,7 +306,10 @@ var closePareantLayer = function(){
     if (typeof (parent.layer) != 'undefined') {
         var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
         parent.layer.close(index);
-        parent.vm.toLoading()
+        // 获取当前页码
+        var page = parent.document.querySelector('.layui-laypage-curr').textContent;
+        // window.alert(page);
+        parent.vm.toLoading(null, page)
     }
 }
 
