@@ -22,7 +22,7 @@
         <targetXMLPackage>mapper</targetXMLPackage>
         <!-- 依赖版本 -->
         <mapper.version>3.3.6</mapper.version>
-        <start-class>com.hongte.alms.platrepay.platrepayServiceApplication</start-class>
+        <start-class>com.hongte.alms.platrepay.platRepayServiceApplication</start-class>
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
     <dependencies>
