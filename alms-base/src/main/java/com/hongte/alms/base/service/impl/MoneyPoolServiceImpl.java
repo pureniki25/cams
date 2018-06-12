@@ -492,7 +492,7 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 
 	@Override
 	public void confirmRepaidUpdateMoneyPool(ConfirmRepaymentReq req) {
-		if (req.getMprIds()==null) {
+		if (req.getMprIds()==null||req.getMprIds().size()==0) {
 			return ;
 		}
 		List<MoneyPoolRepayment> moneyPoolRepayments = moneyPoolRepaymentMapper.selectBatchIds(req.getMprIds());
