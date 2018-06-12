@@ -71,17 +71,23 @@
 			tb_money_pool mp
 		<where>
 			1=1
-			<if test="tradeDateStart != null and tradeDateStart.length != 0 ">
+			<if test="tradeDateStart != null and tradeDateStart.length != 0 and tradeDate == null ">
 				AND mp.trade_date &gt;= #{tradeDateStart,jdbcType=DATE}
 			</if>
-			<if test="tradeDateEnd != null and tradeDateEnd.length != 0 ">
+			<if test="tradeDateEnd != null and tradeDateEnd.length != 0 and tradeDate == null ">
 				AND mp.trade_date &lt;= #{tradeDateEnd,jdbcType=DATE}
 			</if>
-			<if test="createTimeStart != null and createTimeStart.length != 0 ">
+			<if test="tradeDate != null and tradeDate.length != 0 ">
+				AND DATE_FORMAT(mp.trade_date,'%Y-%m-%d') = #{tradeDate}
+			</if>
+			<if test="createTimeStart != null and createTimeStart.length != 0 and createTime == null">
 				AND mp.create_time &gt;= #{createTimeStart,jdbcType=DATE}
 			</if>
-			<if test="createTimeEnd != null and createTimeEnd.length != 0 ">
+			<if test="createTimeEnd != null and createTimeEnd.length != 0 and createTime == null">
 				AND mp.create_time &lt;= #{createTimeEnd,jdbcType=DATE}
+			</if>
+			<if test="createTime != null and createTime.length != 0 ">
+				AND DATE_FORMAT(mp.create_time,'%Y-%m-%d') = #{createTime}
 			</if>
 			<if test="acceptBank != null and acceptBank.length != 0 ">
 				AND mp.accept_bank = #{acceptBank}
@@ -125,17 +131,23 @@
 			tb_money_pool mp
 		<where>
 			1=1
-			<if test="tradeDateStart != null and tradeDateStart.length != 0 ">
+			<if test="tradeDateStart != null and tradeDateStart.length != 0 and tradeDate == null ">
 				AND mp.trade_date &gt;= #{tradeDateStart,jdbcType=DATE}
 			</if>
-			<if test="tradeDateEnd != null and tradeDateEnd.length != 0 ">
+			<if test="tradeDateEnd != null and tradeDateEnd.length != 0 and tradeDate == null ">
 				AND mp.trade_date &lt;= #{tradeDateEnd,jdbcType=DATE}
 			</if>
-			<if test="createTimeStart != null and createTimeStart.length != 0 ">
+			<if test="tradeDate != null and tradeDate.length != 0 ">
+				AND DATE_FORMAT(mp.trade_date,'%Y-%m-%d') = #{tradeDate}
+			</if>
+			<if test="createTimeStart != null and createTimeStart.length != 0 and createTime == null">
 				AND mp.create_time &gt;= #{createTimeStart,jdbcType=DATE}
 			</if>
-			<if test="createTimeEnd != null and createTimeEnd.length != 0 ">
+			<if test="createTimeEnd != null and createTimeEnd.length != 0 and createTime == null">
 				AND mp.create_time &lt;= #{createTimeEnd,jdbcType=DATE}
+			</if>
+			<if test="createTime != null and createTime.length != 0 ">
+				AND DATE_FORMAT(mp.create_time,'%Y-%m-%d') = #{createTime}
 			</if>
 			<if test="acceptBank != null and acceptBank.length != 0 ">
 				AND mp.accept_bank = #{acceptBank}
