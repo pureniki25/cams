@@ -69,10 +69,8 @@
 			count(distinct mp.money_pool_id)
 		FROM
 			tb_money_pool mp
-			LEFT JOIN tb_department_bank db ON db.finance_name = mp.accept_bank
 		<where>
 			1=1
-			 AND (db.repayment_id is not null and db.repayment_id != '')
 			<if test="tradeDateStart != null and tradeDateStart.length != 0 ">
 				AND mp.trade_date &gt;= #{tradeDateStart,jdbcType=DATE}
 			</if>
@@ -122,13 +120,11 @@
 			mp.update_time AS updateTime, 
 			mp.update_user AS updateUser, 
 			mp.create_user_role AS createUserRole      ,    
-			db.repayment_id as bankAccount
+			(select db.repayment_id from tb_department_bank db where db.finance_name = mp.accept_bank and db.repayment_id is not null and db.repayment_id != '' limit 1) as bankAccount
 		FROM
 			tb_money_pool mp
-			LEFT JOIN tb_department_bank db ON db.finance_name = mp.accept_bank
 		<where>
 			1=1
-			 AND (db.repayment_id is not null and db.repayment_id != '')
 			<if test="tradeDateStart != null and tradeDateStart.length != 0 ">
 				AND mp.trade_date &gt;= #{tradeDateStart,jdbcType=DATE}
 			</if>
