@@ -54,7 +54,6 @@ public class CarBusinessAfter extends Model<CarBusinessAfter> {
 	 */
 	@TableField("collection_remark")
 	@ApiModelProperty(required= true,value = "[电催分配备注]")
-	@NotNull(message="电催分配备注(collectionRemark)不能为空")
 	private String collectionRemark;
 
 

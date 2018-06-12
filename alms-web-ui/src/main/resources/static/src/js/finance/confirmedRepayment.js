@@ -104,10 +104,21 @@ window.layinit(function (htConfig) {
                             moneyPoolId: '合计',
                             accountMoney: t
                         }
-
+                        
                         app.table.data.push(sum)
+                        let height = 20 ;
+
+                        if(app.table.data.length<=2){
+                            height = 50
+                        }
+                        app.table.data.forEach(e=>{
+                            if(e.remark&&e.remark.length>16){
+                                height = height*(e.remark.length/16)
+                            }
+                        })
+                        
                         let style = {
-                            height: (app.table.data.length ? (app.table.data.length + 2) * 50 : 175) + 'px',
+                            height: (app.table.data.length ? (app.table.data.length + 2) * (height) : 175) + 'px',
                             width: '100%'
                         }
                         app.handleParentStyle(style)
