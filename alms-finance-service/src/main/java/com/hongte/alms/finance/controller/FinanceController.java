@@ -15,6 +15,10 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.hongte.alms.base.entity.*;
+import com.hongte.alms.base.service.*;
+import com.hongte.alms.finance.req.OrderSetReq;
+import io.swagger.annotations.Api;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,31 +44,9 @@ import com.hongte.alms.base.dto.ConfirmRepaymentReq;
 import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.base.dto.MoneyPoolManagerReq;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
-import com.hongte.alms.base.entity.BasicBusiness;
-import com.hongte.alms.base.entity.BasicBusinessType;
-import com.hongte.alms.base.entity.BasicCompany;
-import com.hongte.alms.base.entity.BasicRepaymentType;
-import com.hongte.alms.base.entity.BizOutputRecord;
-import com.hongte.alms.base.entity.DepartmentBank;
-import com.hongte.alms.base.entity.MoneyPool;
-import com.hongte.alms.base.entity.MoneyPoolExcelEntity;
-import com.hongte.alms.base.entity.MoneyPoolRepayment;
-import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.enums.AreaLevel;
 import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.enums.RepayRegisterState;
-import com.hongte.alms.base.service.AccountantOverRepayLogService;
-import com.hongte.alms.base.service.BasicBusinessService;
-import com.hongte.alms.base.service.BasicBusinessTypeService;
-import com.hongte.alms.base.service.BasicCompanyService;
-import com.hongte.alms.base.service.BasicRepaymentTypeService;
-import com.hongte.alms.base.service.BizOutputRecordService;
-import com.hongte.alms.base.service.DepartmentBankService;
-import com.hongte.alms.base.service.MoneyPoolRepaymentService;
-import com.hongte.alms.base.service.MoneyPoolService;
-import com.hongte.alms.base.service.RepaymentBizPlanListService;
-import com.hongte.alms.base.service.RepaymentBizPlanService;
-import com.hongte.alms.base.service.RepaymentConfirmLogService;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
 import com.hongte.alms.base.vo.finance.ConfirmWithholdListVO;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
@@ -95,6 +77,7 @@ import io.swagger.annotations.ApiParam;
 @RestController
 @RefreshScope
 @RequestMapping(value = "/finance")
+@Api(tags = "FinanceController", description = "财务管理模块相关控制器")
 public class FinanceController {
 
 	private static Logger logger = LoggerFactory.getLogger(FinanceController.class);
@@ -149,7 +132,12 @@ public class FinanceController {
 	@Qualifier("DepartmentBankService")
 	@Autowired
 	private DepartmentBankService departmentBankService ;
-	
+
+	@Qualifier("SysFinancialOrderService")
+	@Autowired
+	private SysFinancialOrderService sysFinancialOrderService;
+
+
 	@Value("${oss.readUrl}")
 	private String ossReadUrl ;
 	@GetMapping(value = "/repayBaseInfo")
@@ -879,11 +867,36 @@ public class FinanceController {
 //		List<BasicBusinessType> btype_list =  basicBusinessTypeService.selectList(new EntityWrapper<BasicBusinessType>().orderBy("business_type_id"));
 //		retMap.put("businessType",(JSONArray) JSON.toJSON(btype_list, JsonUtil.getMapping()));
 
-		logger.info("@getOrderSetSearchInfo@查找财务人员跟单设置查询相关信息--结束[{}]", result);
+		logger.info("@getOrderSetSearchInfo@查找财务人员跟单设置查询相关信息--结束[{}]", JSON.toJSONString(retMap));
 		return Result.success(retMap);
 
 	}
 
+
+
+	@GetMapping(value = "/getOrderSetPage")
+	@ApiOperation(value = "根据条件获取财务人员跟单设置，分页")
+	public PageResult getOrderSetPage(OrderSetReq req) {
+		PageResult result;
+		logger.info("@getOrderSetPage@根据条件获取财务人员跟单设置--开始[{}]", JSON.toJSONString(req));
+		EntityWrapper ew = new EntityWrapper<SysFinancialOrder>();
+
+		if (req.getCompanyId() != null) {
+			ew.eq("company_id", req.getCompanyId());
+		}
+		if (req.getAreaId() != null) {
+			ew.eq("area_id", req.getAreaId());
+		}
+		if (req.getUserName() != null) {
+			ew.like("user_names", req.getUserName());
+		}
+		Page<MoneyPool> page = sysFinancialOrderService.selectPage(new Page<SysFinancialOrder>(req.getCurPage(), req.getPageSize()),
+				ew);
+		result = PageResult.success(page.getRecords(), page.getTotal());
+		logger.info("@moneyPool@根据条件获取款项池--结束[{}]", JSON.toJSONString(result));
+		return result;
+
+	}
 
 
 

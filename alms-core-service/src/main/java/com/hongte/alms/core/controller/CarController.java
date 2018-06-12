@@ -327,7 +327,7 @@ public class CarController {
 			StaffBusinessVo vo  = new StaffBusinessVo();
 			vo.setBusinessId(registrationInfo.getBusinessId());
 			voList.add(vo);
-//			collectionStatusService.SyncBusinessColStatusToXindai(voList,null,"界面设置移交诉讼",CollectionStatusEnum.TO_LAW_WORK.getPageStr());
+			collectionStatusService.SyncBusinessColStatusToXindai(voList,null,"界面设置移交诉讼",CollectionStatusEnum.TO_LAW_WORK.getPageStr());
 
 			return Result.success();
 		}

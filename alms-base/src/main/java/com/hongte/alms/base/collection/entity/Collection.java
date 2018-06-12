@@ -3,10 +3,13 @@ package com.hongte.alms.base.collection.entity;
 import java.io.Serializable;
 
 import java.util.Date;
+
+import com.alibaba.fastjson.annotation.JSONField;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -51,50 +54,56 @@ public class Collection extends Model<Collection> {
      */
 	@TableField("collection_user")
 	@ApiModelProperty(required= true,value = "[催收业务员]")
+	@NotNull(message = "催收业务员(collectionUser)不能为空")
 	private String collectionUser;
     /**
      * [分配给催收业务员时所写的备注]
      */
 	@TableField("assign_remark")
-	@ApiModelProperty(required= true,value = "[分配给催收业务员时所写的备注]")
+	@ApiModelProperty(value = "[分配给催收业务员时所写的备注]")
 	private String assignRemark;
     /**
      * [创建人]
      */
 	@TableField("create_user")
 	@ApiModelProperty(required= true,value = "[创建人]")
-	@NotNull(message = "创建人(createUser)不能为空")
+//	@NotNull(message = "创建人(createUser)不能为空")
 	private String createUser;
     /**
      * [创建时间]
      */
 	@TableField("create_time")
 	@ApiModelProperty(required= true,value = "[创建时间]")
-	@NotNull(message = "创建时间(createTime)不能为空")
+//	@NotNull(message = "创建时间(createTime)不能为空")
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+	@JSONField(format="yyyy-MM-dd HH:mm:ss")
 	private Date createTime;
     /**
      * [更新人]
      */
 	@TableField("update_user")
-	@ApiModelProperty(required= true,value = "[更新人]")
+	@ApiModelProperty(value = "[更新人]")
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+	@JSONField(format="yyyy-MM-dd HH:mm:ss")
 	private String updateUser;
     /**
      * [更新时间]
      */
 	@TableField("update_time")
-	@ApiModelProperty(required= true,value = "[更新时间]")
+	@ApiModelProperty(value = "[更新时间]")
+	@JSONField(format="yyyy-MM-dd HH:mm:ss")
 	private Date updateTime;
     /**
      * [贷后管理移交催收的备注]
      */
 	@TableField("hand_to_remark")
-	@ApiModelProperty(required= true,value = "[贷后管理移交催收的备注]")
+	@ApiModelProperty(value = "[贷后管理移交催收的备注]")
 	private String handToRemark;
     /**
      * 业务流程编号
      */
 	@TableField("process_id")
-	@ApiModelProperty(required= true,value = "业务流程编号")
+	@ApiModelProperty(value = "业务流程编号")
 	private String processId;
 
 

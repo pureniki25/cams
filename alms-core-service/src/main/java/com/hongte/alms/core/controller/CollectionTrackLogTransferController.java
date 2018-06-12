@@ -1,6 +1,7 @@
 package com.hongte.alms.core.controller;
 
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.collection.entity.CollectionTrackLog;
 import com.hongte.alms.base.collection.entity.Parametertracelog;
@@ -117,6 +118,8 @@ public class CollectionTrackLogTransferController {
 	@PostMapping("/transferOneCollectionLog")
 	@ResponseBody
 	public Result transferOneCollectionLog(@RequestBody Parametertracelog parametertracelog){
+		LOGGER.info("同步一条贷后跟踪记录 开始 输入的请求信息：[{}]", JSON.toJSONString(parametertracelog));
+
 		String carBusinessId = parametertracelog.getCarBusinessId()!=null?parametertracelog.getCarBusinessId():UUID.randomUUID().toString();
 		String carBusinessAfterId = parametertracelog.getCarBusinessAfterId() != null?parametertracelog.getCarBusinessAfterId():"default-2";
 
@@ -215,7 +218,7 @@ public class CollectionTrackLogTransferController {
 					Exception,"1","同步数据出现异常信息");
 			return Result.error("111111","同步历史贷后跟踪记录，同步数据出现异常信息");
 		}
-
+		LOGGER.info("同步一条贷后跟踪记录 成功 输入的请求信息：[{}]", JSON.toJSONString(parametertracelog));
 		return Result.success();
 	}
 
