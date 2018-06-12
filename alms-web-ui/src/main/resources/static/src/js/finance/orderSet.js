@@ -1,7 +1,27 @@
 let app
-let dateStart
-let dateEnd
-let table 
+let table
+var basePath
+
+//从后台获取下拉框数据
+var getSelectsData = function () {
+
+    //取区域列表
+    axios.get(basePath + 'finance/getOrderSetSearchInfo')
+        .then(function (res) {
+            if (res.data.code == "1") {
+                app.areaList = res.data.data.area;
+                app.companyList = res.data.data.company;
+            } else {
+                app.$Modal.error({content: '操作失败，消息：' + res.data.msg});
+            }
+        })
+        .catch(function (error) {
+            app.$Modal.error({content: '接口调用异常!'});
+        });
+}
+
+
+
 window.layinit(function (htConfig) {
     let _htConfig = htConfig
     basePath = htConfig.financeBasePath
@@ -15,6 +35,7 @@ window.layinit(function (htConfig) {
         created: function () { }
 
     })
+    getSelectsData();
 
     table.render({
         elem: "#financialOrder",
@@ -39,7 +60,7 @@ window.layinit(function (htConfig) {
                 toolbar: "#barTools"
             }]
         ], //设置表头
-        url: basePath + 'sys/financialOrder/page',
+        url: basePath + 'finance/getOrderSetPage',
         page: true,
         done: (res, curr, count) => { }
     })
@@ -54,7 +75,7 @@ window.layinit(function (htConfig) {
 })
 
 let data = {
-    schForm:{
+    searchForm:{
         userId:'',
         userName:'',
         areaId:'',
@@ -69,7 +90,10 @@ let data = {
         areaLevel:'',
         areaId:'',
         areaList:[]
-    }
+    },
+    areaList:[],
+    companyList:[]
+
 }
 
 let methods = {

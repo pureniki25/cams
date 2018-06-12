@@ -126,5 +126,26 @@ public interface RechargeService {
 		 * @return
 		 */
 	 void getReturnResult();
+	 
+	 
+	 
+	/**
+	 * 银行代扣结果查询
+	 */
+	 void getBankResult(WithholdingRepaymentLog log);
+	 
+	 
+	 
+	/**
+	 * 宝付代扣结果查询
+	 */
+	 void getBFResult(WithholdingRepaymentLog log);
+	 
+	 
+	 
+	/**
+	 * 易宝代扣结果查询
+	 */
+	 void getYBResult(WithholdingRepaymentLog log);
 }
 

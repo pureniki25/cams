@@ -327,7 +327,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                 collection.setCreateUser(userDro.getBmUserId());
                 collection.setCreateTime(new Date());
                 Result result = collectionSynceToXindaiRemoteApi.transferOneVisitSetToXd(collection);
-                if(!result.getCode().equals(1)){
+                if(result== null ||!result.getCode().equals(1)){
                     logger.error("设置催收人员,同步催收设置到信贷失败，信息："+ JSON.toJSONString(businessVo)+"  staffUserId:"+staffUserId);
                 }
             }
@@ -491,7 +491,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                 staffType,
                 CollectionSetWayEnum.AUTO_SET);
 
-//        SyncBusinessColStatusToXindai(voList,staffUserId,"定时任务自动分配",staffType);
+        SyncBusinessColStatusToXindai(voList,staffUserId,"定时任务自动分配",staffType);
         return bl;
     };
 

@@ -21,7 +21,7 @@ import java.util.List;
  * @date 2018/3/3 17:37
  * 贷后跟踪相关的远程调用
  */
-//@FeignClient(value = "alms-core-service", url="http://192.168.14.163:30606")
+//@FeignClient(value = "alms-core-service", url="http://192.168.12.101:30606")
 @FeignClient(value = "alms-core-service")
 public interface CollectionRemoteApi {
 

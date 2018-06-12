@@ -5,6 +5,7 @@ package com.hongte.alms.webui.controller.finance;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.hongte.alms.common.util.ExportFileUtil;
@@ -94,7 +97,8 @@ public class FinanceController {
 
 	@RequestMapping("/downloadTemplate")
 	public ResponseEntity<byte[]> moneyPoolTemplate() throws IOException {
-		return ExportFileUtil.download("src/main/resources/款项池银行流水模板.xlsx", "款项池银行流水模板.xlsx");
+		InputStream is = getClass().getClassLoader().getResourceAsStream("/templates/finance/moneyPoolTemplate.xlsx");
+		return ExportFileUtil.download(FileCopyUtils.copyToByteArray(is), "款项池银行流水模板.xlsx");
 	}
 
 

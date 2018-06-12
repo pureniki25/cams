@@ -889,7 +889,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				vo.setCrpId(req.getCrpId());
 				vo.setBusinessId(req.getBusinessId());
 				voList.add(vo);
-//				collectionStatusService.SyncBusinessColStatusToXindai(voList,null,"界面设置移交诉讼",CollectionStatusEnum.TO_LAW_WORK.getPageStr());
+				collectionStatusService.SyncBusinessColStatusToXindai(voList,null,"界面设置移交诉讼",CollectionStatusEnum.TO_LAW_WORK.getPageStr());
 			}
 		} catch (Exception e) {
 			LOG.error("---saveCarProcessApprovalResult--- 存储房贷审批结果信息失败！", e);
@@ -923,7 +923,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				vo.setCrpId(req.getCrpId());
 				vo.setBusinessId(req.getBusinessId());
 				voList.add(vo);
-//				collectionStatusService.SyncBusinessColStatusToXindai(voList,null,"界面设置移交诉讼",CollectionStatusEnum.TO_LAW_WORK.getPageStr());
+				collectionStatusService.SyncBusinessColStatusToXindai(voList,null,"界面设置移交诉讼",CollectionStatusEnum.TO_LAW_WORK.getPageStr());
 			}
 		} catch (Exception e) {
 			LOG.error("---saveHouseProcessApprovalResult--- 存储房贷审批结果信息失败！", e);

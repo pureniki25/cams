@@ -8,8 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.hongte.alms.base.entity.*;
-import com.hongte.alms.base.service.*;
 import com.hongte.alms.base.feignClient.CollectionSynceToXindaiRemoteApi;
+import com.hongte.alms.base.service.*;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.jeecgframework.poi.excel.ExcelExportUtil;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -389,7 +389,7 @@ public class CollectionController {
         try{
             collectionStatusService.setBusinessStaff(voList,staffUserId,describe,staffType, CollectionSetWayEnum.MANUAL_SET);
             //同步设置信息到信贷
-//            collectionStatusService.SyncBusinessColStatusToXindai(voList,staffUserId,describe,staffType);
+            collectionStatusService.SyncBusinessColStatusToXindai(voList,staffUserId,describe,staffType);
 
 
             logger.info("@分配电催页面@设置电催人员--结束[{}]","");

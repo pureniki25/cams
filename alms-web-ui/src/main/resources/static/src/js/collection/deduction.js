@@ -12,7 +12,7 @@ var layer;
 		var _htConfig = htConfig;
         basePath = _htConfig.coreBasePath;
         openPath=_htConfig.openBasePath;
-        withholdPath=_htConfig.withholdPath;
+        withholdPath=_htConfig.withholdBasePath;
         ajax_data={
         	
         	
@@ -132,6 +132,7 @@ var layer;
 	 
 	   //贷后生成的走贷后的代扣接口,否则走信贷的代扣接口
 	   if(vm.ajax_data.strType==2){debugger
+		   vm.ajax_data.platformId=vm.platformId;
 		    var url=withholdPath+ "repay/handRepay"
 		    $.ajax({
                 type: "POST",
@@ -139,11 +140,11 @@ var layer;
                 data: JSON.stringify(vm.ajax_data),
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
-                 
+              
                     if(data.code=='1'){
-		            	 vm.$Modal.success({content:data.data});
+                    	vm.$Modal.success({content:"执行成功，请稍后查询结果"});
 		             }else{
-		                 vm.$Modal.error({content:data.data});
+		                 vm.$Modal.error({content:data.msg});
 		             }
                 },
                 error: function (message) {
@@ -165,6 +166,7 @@ var layer;
 		            Authorization : "Bearer " + getToken()
 		        },
 		        success : function(data) {debugger
+		      
 		             if(data.code=='1'){
 		            	 vm.$Modal.success({content:data.data});
 		             }else{
@@ -245,9 +247,10 @@ var layer;
 	}
 	var getDeductionInfo=function(){debugger
 		
-		
+		  var url="";
         var self = this;   
         var reqStr =basePath+ "DeductionController/selectDeductionInfoByPlayListId?planListId=" + planListId
+        
         axios.get(reqStr)
             .then(function (result) {
                 if (result.data.code == "1") {debugger
@@ -270,7 +273,12 @@ var layer;
                     }
                  	vm.ajax_data.underLineFactOverDueMoney=vm.ajax_data.planOverDueMoney;
 //                    searchRepayLog();
-                    
+                 
+                      if(vm.ajax_data.strType==2){
+                      	url=basePath+ "RepaymentLogController/searchAfterRepayLog?businessId="+vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId;
+                      }else{
+                      	url:openPath+ "WithHoldingController/searchRepayLog?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId;
+                      }
                     //使用layerUI的表格组件
                     layui.use(['layer', 'table','ht_ajax', 'ht_auth', 'ht_config'], function () {
                         layer = layui.layer;
@@ -319,7 +327,8 @@ var layer;
                                 
                           
                             ]], //设置表头
-                            url: openPath+ "WithHoldingController/searchRepayLog?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId,
+                          
+                            url: url,
                             //method: 'post' //如果无需自定义HTTP类型，可不加该参数
                             //request: {} //如果无需自定义请求参数，可不加该参数
                             //response: {} //如果无需自定义数据响应名称，可不加该参数

@@ -453,7 +453,10 @@ window.layinit(function (htConfig) {
                     param.businessId = businessId;
                     param.afterId = afterId;
                     param = Object.assign(app.factRepaymentInfo, param);
-                    
+                    if((!param.mprIds||param.mprIds=='')&&(!param.surplusFund||param.surplusFund==0)){
+                        app.$Message.error({content:'不能提交没匹配流水且没使用结余金额的还款确认'})
+                        return;
+                    }
                     app.$Modal.confirm({
                         content:'确认本次还款?',
                         onOk(){
@@ -461,8 +464,14 @@ window.layinit(function (htConfig) {
                             .then(function (res) {
                                 if (res.data.code == '1') {
                                     app.handleConfirmRepaymentResult(res)
-                                    
-                                    window.location.reload()
+                                    parent.app.search()
+
+                                    app.$Modal.success({content:'还款确认成功!',onOk(){
+                                        var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                                        parent.layer.close(index);
+                                    }})
+
+                                    // window.location.reload()
                                 }else{
                                     app.factRepaymentInfo.surplusFund = 0
                                     app.$Message.error({content:res.data.msg})

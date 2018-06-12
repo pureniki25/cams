@@ -11,6 +11,7 @@ import com.hongte.alms.base.service.CarBasicService;
 import com.hongte.alms.common.util.ErroInfoUtil;
 import com.hongte.alms.open.feignClient.CollectionRemoteApi;
 import com.hongte.alms.open.service.CollectionXindaiService;
+import com.hongte.alms.open.service.WithHoldingXinDaiService;
 import com.hongte.alms.open.util.XinDaiEncryptUtil;
 import com.hongte.alms.open.vo.RequestData;
 import com.hongte.alms.open.vo.ResponseData;
@@ -268,25 +269,39 @@ public class  CollectionController {
 
 		if(bindingResult.hasErrors()){
 			String errorStr = ErroInfoUtil.getErroeInfo(bindingResult);
-			logger.info("同步催收人员信息到信贷 接口,输入参数校验错误：" ,errorStr);
+			logger.info("同步催收人员信息到信贷 接口,输入参数校验错误：" ,JSON.toJSONString(errorStr));
 			return Result.error("500","输入参数校验错误："+errorStr);
 		}
-			String encryptStr = JSON.toJSONString(collection);
-			// 请求数据加密
-		try {
-			encryptStr = XinDaiEncryptUtil.encryptPostData(encryptStr);
-		} catch (Exception e) {
-			logger.info("同步催收人员信息到信贷 接口,加密数据异常：" ,e.fillInStackTrace());
-			e.printStackTrace();
-			return Result.error("500","同步电催人员信息到信贷 接口,加密数据异常："+e.fillInStackTrace());
 
-		}
+		RequestData requestData = new RequestData();
+		requestData.setData(JSON.toJSONString(collection));
+		requestData.setMethodName("Collection_VisitSetTrans");
+		String encryptStr = JSON.toJSONString(requestData);
+		// 请求数据加密
+		encryptStr = XinDaiEncryptUtil.encryptPostData(encryptStr);
+			/* http://172.16.200.104:8084/apites是信贷接口域名，这里本机配置的，需要配置成自己的 */
 		CollectionXindaiService collectionXindaiService = Feign.builder().target(CollectionXindaiService.class,
-					apiUrl);
+				apiUrl);
+		String respStr = collectionXindaiService.transferOneVisitSet(encryptStr);
+		// 返回数据解密
+		ResponseData respData = XinDaiEncryptUtil.getRespData(respStr);
 //
-			String respStr = collectionXindaiService.transferOneVisitSet(encryptStr);
-//			// 返回数据解密
-			ResponseData respData = XinDaiEncryptUtil.getRespData(respStr);
+//			String encryptStr = JSON.toJSONString(collection);
+//			// 请求数据加密
+//		try {
+//			encryptStr = XinDaiEncryptUtil.encryptPostData(encryptStr);
+//		} catch (Exception e) {
+//			logger.info("同步催收人员信息到信贷 接口,加密数据异常：" ,e.fillInStackTrace());
+//			e.printStackTrace();
+//			return Result.error("500","同步电催人员信息到信贷 接口,加密数据异常："+e.fillInStackTrace());
+//
+//		}
+//		CollectionXindaiService collectionXindaiService = Feign.builder().target(CollectionXindaiService.class,
+//					apiUrl);
+////
+//			String respStr = collectionXindaiService.transferOneVisitSet(encryptStr);
+////			// 返回数据解密
+//			ResponseData respData = XinDaiEncryptUtil.getRespData(respStr);
 			logger.info("同步催收人员信息到信贷接口返回数据:"+respData.getData());
 //			String ixIndexId = respData.getData();
 			return Result.success();
@@ -305,24 +320,41 @@ public class  CollectionController {
 			logger.info("同步电催人员信息到信贷 接口,输入参数校验错误：" ,errorStr);
 			return Result.error("500","输入参数校验错误："+errorStr);
 		}
-		String encryptStr = JSON.toJSONString(carBusinessAfter);
-		// 请求数据加密
-		try {
-			encryptStr = XinDaiEncryptUtil.encryptPostData(encryptStr);
-		} catch (Exception e) {
-			logger.info("同步电催人员信息到信贷 接口,加密数据异常：" ,e.fillInStackTrace());
-			e.printStackTrace();
-			return Result.error("500","同步电催人员信息到信贷 接口,加密数据异常："+e.fillInStackTrace());
 
-		}
+		RequestData requestData = new RequestData();
+		requestData.setData(JSON.toJSONString(carBusinessAfter));
+		requestData.setMethodName("Collection_PhoneSetTrans");
+		String encryptStr = JSON.toJSONString(requestData);
+		// 请求数据加密
+		encryptStr = XinDaiEncryptUtil.encryptPostData(encryptStr);
+			/* http://172.16.200.104:8084/apites是信贷接口域名，这里本机配置的，需要配置成自己的 */
 		CollectionXindaiService collectionXindaiService = Feign.builder().target(CollectionXindaiService.class,
 				apiUrl);
-//
 		String respStr = collectionXindaiService.transferOnePhoneSet(encryptStr);
-//			// 返回数据解密
+		// 返回数据解密
 		ResponseData respData = XinDaiEncryptUtil.getRespData(respStr);
+
+
+
+
+//		String encryptStr = JSON.toJSONString(carBusinessAfter);
+//		// 请求数据加密
+//		try {
+//			encryptStr = XinDaiEncryptUtil.encryptPostData(encryptStr);
+//		} catch (Exception e) {
+//			logger.info("同步电催人员信息到信贷 接口,加密数据异常：" ,e.fillInStackTrace());
+//			e.printStackTrace();
+//			return Result.error("500","同步电催人员信息到信贷 接口,加密数据异常："+e.fillInStackTrace());
+//
+//		}
+//		CollectionXindaiService collectionXindaiService = Feign.builder().target(CollectionXindaiService.class,
+//				apiUrl);
+////
+//		String respStr = collectionXindaiService.transferOnePhoneSet(encryptStr);
+////			// 返回数据解密
+//		ResponseData respData = XinDaiEncryptUtil.getRespData(respStr);
 		logger.info("同步电催人员信息到信贷接口返回数据:"+respData.getData());
-		String ixIndexId = respData.getData();
+//		String ixIndexId = respData.getData();
 		return Result.success();
 
 	}
@@ -341,18 +373,33 @@ public class  CollectionController {
 			return Result.error("500","输入参数校验错误："+errorStr);
 		}
 
-
-		String encryptStr = JSON.toJSONString(parametertracelog);
+		RequestData requestData = new RequestData();
+		requestData.setData(JSON.toJSONString(parametertracelog));
+		requestData.setMethodName("Collection_ColLogTrans");
+		String encryptStr = JSON.toJSONString(requestData);
 		// 请求数据加密
-
 		encryptStr = XinDaiEncryptUtil.encryptPostData(encryptStr);
-
+			/* http://172.16.200.104:8084/apites是信贷接口域名，这里本机配置的，需要配置成自己的 */
 		CollectionXindaiService collectionXindaiService = Feign.builder().target(CollectionXindaiService.class,
 				apiUrl);
-//
 		String respStr = collectionXindaiService.transferOneCollectionLog(encryptStr);
-//			// 返回数据解密
+		// 返回数据解密
 		ResponseData respData = XinDaiEncryptUtil.getRespData(respStr);
+
+
+
+//
+//		String encryptStr = JSON.toJSONString(parametertracelog);
+//		// 请求数据加密
+//
+//		encryptStr = XinDaiEncryptUtil.encryptPostData(encryptStr);
+//
+//		CollectionXindaiService collectionXindaiService = Feign.builder().target(CollectionXindaiService.class,
+//				apiUrl);
+////
+//		String respStr = collectionXindaiService.transferOneCollectionLog(encryptStr);
+////			// 返回数据解密
+//		ResponseData respData = XinDaiEncryptUtil.getRespData(respStr);
 		logger.info("同步贷后跟踪信息到信贷接口返回数据:"+respData.getData());
 		Integer xindaiId = Integer.valueOf(respData.getData());
 		return Result.success(xindaiId);
@@ -367,21 +414,34 @@ public class  CollectionController {
 		logger.info("根据信贷ID删除信贷贷后跟踪记录 开始 输入的请求信息：[{}]", xdIndex);
 
 
-
-		String encryptStr = JSON.toJSONString(xdIndex);
+		RequestData requestData = new RequestData();
+		requestData.setData(JSON.toJSONString(xdIndex));
+		requestData.setMethodName("Collection_DeleteColLog");
+		String encryptStr = JSON.toJSONString(requestData);
 		// 请求数据加密
-
 		encryptStr = XinDaiEncryptUtil.encryptPostData(encryptStr);
-
+			/* http://172.16.200.104:8084/apites是信贷接口域名，这里本机配置的，需要配置成自己的 */
 		CollectionXindaiService collectionXindaiService = Feign.builder().target(CollectionXindaiService.class,
 				apiUrl);
-//
 		String respStr = collectionXindaiService.deleteXdCollectionLogById(encryptStr);
-//			// 返回数据解密
+		// 返回数据解密
 		ResponseData respData = XinDaiEncryptUtil.getRespData(respStr);
+
+
+//		String encryptStr = JSON.toJSONString(xdIndex);
+//		// 请求数据加密
+//
+//		encryptStr = XinDaiEncryptUtil.encryptPostData(encryptStr);
+//
+//		CollectionXindaiService collectionXindaiService = Feign.builder().target(CollectionXindaiService.class,
+//				apiUrl);
+////
+//		String respStr = collectionXindaiService.deleteXdCollectionLogById(encryptStr);
+////			// 返回数据解密
+//		ResponseData respData = XinDaiEncryptUtil.getRespData(respStr);
 		logger.info("同步贷后跟踪信息到信贷接口返回数据:"+respData.getData());
-		Integer xindaiId = Integer.valueOf(respData.getData());
-		return Result.success(xindaiId);
+//		Integer xindaiId = Integer.valueOf(respData.getData());
+		return Result.success();
 	}
 
 	//  -------------   同步信息到信贷接口 结束  ====================

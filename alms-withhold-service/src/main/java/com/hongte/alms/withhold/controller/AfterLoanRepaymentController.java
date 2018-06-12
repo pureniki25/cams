@@ -36,7 +36,7 @@ public class AfterLoanRepaymentController {
     
     @Autowired
 	@Qualifier("RechargeService")
-    RechargeService RechargeService;
+    RechargeService rechargeService;
     
     
     @Autowired
@@ -65,16 +65,26 @@ public class AfterLoanRepaymentController {
      */
     @PostMapping("/handRepay")
     @ApiOperation(value = "手动代扣")
-    public void handRepay(@RequestBody DeductionVo deuctionVo){
+    public Result handRepay(@RequestBody DeductionVo deuctionVo){
     	if(deuctionVo.getPlatformId()==PlatformEnum.YH_FORM.getValue()) {
-    		withholdingService.handBankRecharge(deuctionVo.getBusiness(), deuctionVo.getBankCardInfo(), deuctionVo.getpList(), BigDecimal.valueOf(deuctionVo.getTotal()));
+    		Result result=withholdingService.handBankRecharge(deuctionVo.getBusiness(), deuctionVo.getBankCardInfo(), deuctionVo.getpList(), BigDecimal.valueOf(deuctionVo.getTotal()));
+    	    return result;
     	}else {
-    		withholdingService.handThirdRepaymentCharge(deuctionVo.getBusiness(), deuctionVo.getBankCardInfo(), deuctionVo.getpList(), deuctionVo.getPlatformId(),BigDecimal.valueOf(deuctionVo.getTotal()));
+    		Result result=withholdingService.handThirdRepaymentCharge(deuctionVo.getBusiness(), deuctionVo.getBankCardInfo(), deuctionVo.getpList(), deuctionVo.getPlatformId(),BigDecimal.valueOf(deuctionVo.getTotal()));
+    		 return result;
     	}
     
     }
     
-    
+    /**
+     * 查询代扣结果
+ 
+     */
+    @GetMapping("/searchRepayResult")
+    @ApiOperation(value = "查询代扣结果")
+    public void searchRepayResult(){
+    	rechargeService.getReturnResult();
+    }
 
 
 }

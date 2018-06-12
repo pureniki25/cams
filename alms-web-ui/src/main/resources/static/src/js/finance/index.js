@@ -499,4 +499,5 @@ window.layinit(function (htConfig) {
             this.search()
         }
     })
+    window.app = app ;
 })
