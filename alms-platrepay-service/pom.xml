@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>alms-platRepay-service</artifactId>
+    <artifactId>alms-platrepay-service</artifactId>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- MyBatis Generator -->
@@ -22,7 +22,7 @@
         <targetXMLPackage>mapper</targetXMLPackage>
         <!-- 依赖版本 -->
         <mapper.version>3.3.6</mapper.version>
-        <start-class>com.hongte.alms.platrepay.PlatRepayServiceApplication</start-class>
+        <start-class>com.hongte.alms.platrepay.platrepayServiceApplication</start-class>
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
     <dependencies>
@@ -232,7 +232,7 @@
     </dependencies>
 
     <build>
-        <finalName>alms-platRepay-service</finalName>
+        <finalName>alms-platrepay-service</finalName>
         <plugins>
             <!-- 此插件用来生成通用mapper的代码 -->
            <plugin>
