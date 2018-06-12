@@ -510,6 +510,7 @@ public class FinanceController {
 			List<CurrPeriodProjDetailVO> detailVOs = shareService.execute(req, true);
 			moneyPoolService.confirmRepaidUpdateMoneyPool(req);
 			result = Result.success(detailVOs);
+			financeService.sendLoanBalanceToDataPlatform(req.getBusinessId());
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			result = Result.error("500", e.getMessage());

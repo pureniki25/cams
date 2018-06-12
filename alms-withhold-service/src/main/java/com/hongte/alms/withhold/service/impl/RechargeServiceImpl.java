@@ -265,7 +265,7 @@ public class RechargeServiceImpl implements RechargeService {
 						withholdingRepaymentLogService.updateById(log);
 						shareProfit(pList, log);
 						break;
-					} else if (remoteResult.getReturnCode().equals("0000")) {
+					} else if (remoteResult.getReturnCode().equals(RepayResultCodeEnum.YH_HANDLER_EXCEPTION.getValue())) {
 						result.setCode("1");
 						result.setMsg(resultMsg);
 						log.setRepayStatus(2);
@@ -638,7 +638,7 @@ public class RechargeServiceImpl implements RechargeService {
 		if (result == null) {
 			throw new ServiceRuntimeException("调用外联平台接口失败！");
 		}
-		if ("0000".equals(result.getReturnCode()) && result.getMsg().equals("充值成功")) {
+		if ("0000".equals(result.getReturnCode()) && result.getMsg().contains("充值成功")) {
 			log.setUpdateTime(new Date());
 			log.setRepayStatus(1);
 			log.setRemark(result.getMsg());
@@ -648,7 +648,12 @@ public class RechargeServiceImpl implements RechargeService {
 							.eq("orig_business_id", log.getOriginalBusinessId())
 							.eq("after_id", log.getAfterId()));
 			shareProfit(list, log);
-		} else if (!"0000".equals(result.getReturnCode())) {
+		} else if(result.getReturnCode().equals(RepayResultCodeEnum.YH_HANDLER_EXCEPTION.getValue())){
+			log.setUpdateTime(new Date());
+			log.setRepayStatus(2);
+			log.setRemark(result.getMsg());
+			withholdingRepaymentLogService.updateById(log);
+		}else if (!"0000".equals(result.getReturnCode())) {
 			log.setUpdateTime(new Date());
 			log.setRepayStatus(0);
 			log.setRemark(result.getMsg());

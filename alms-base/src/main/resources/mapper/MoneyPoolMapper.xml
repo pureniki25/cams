@@ -79,11 +79,11 @@
 			<if test="tradeDateEnd != null and tradeDateEnd.length != 0 ">
 				AND mp.trade_date &lt;= #{tradeDateEnd,jdbcType=DATE}
 			</if>
-			<if test="updateDateStart != null and updateDateStart.length != 0 ">
-				AND update_time &gt;= #{updateDateStart,jdbcType=DATE}
+			<if test="createTimeStart != null and createTimeStart.length != 0 ">
+				AND mp.create_time &gt;= #{createTimeStart,jdbcType=DATE}
 			</if>
-			<if test="updateDateEnd != null and updateDateEnd.length != 0 ">
-				AND update_time &lt;= #{updateDateEnd,jdbcType=DATE}
+			<if test="createTimeEnd != null and createTimeEnd.length != 0 ">
+				AND mp.create_time &lt;= #{createTimeEnd,jdbcType=DATE}
 			</if>
 			<if test="acceptBank != null and acceptBank.length != 0 ">
 				AND mp.accept_bank = #{acceptBank}
@@ -135,11 +135,11 @@
 			<if test="tradeDateEnd != null and tradeDateEnd.length != 0 ">
 				AND mp.trade_date &lt;= #{tradeDateEnd,jdbcType=DATE}
 			</if>
-			<if test="updateDateStart != null and updateDateStart.length != 0 ">
-				AND update_time &gt;= #{updateDateStart,jdbcType=DATE}
+			<if test="createTimeStart != null and createTimeStart.length != 0 ">
+				AND mp.create_time &gt;= #{createTimeStart,jdbcType=DATE}
 			</if>
-			<if test="updateDateEnd != null and updateDateEnd.length != 0 ">
-				AND update_time &lt;= #{updateDateEnd,jdbcType=DATE}
+			<if test="createTimeEnd != null and createTimeEnd.length != 0 ">
+				AND mp.create_time &lt;= #{createTimeEnd,jdbcType=DATE}
 			</if>
 			<if test="acceptBank != null and acceptBank.length != 0 ">
 				AND mp.accept_bank = #{acceptBank}

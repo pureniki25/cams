@@ -37,8 +37,8 @@
                 <form-item prop="tradeDate" label="交易日期">
                     <date-picker type="daterange" @on-change="form.tradeDateStart=$event[0];form.tradeDateEnd=$event[1];" clearable></date-picker>
                 </form-item>
-                <form-item prop="updateDate" label="更新日期" >
-                    <date-picker type="daterange" @on-change="form.udpateDateStart=$event[0];form.udpateDateEnd=$event[1];" clearable></date-picker>
+                <form-item prop="updateDate" label="创建日期" >
+                    <date-picker type="daterange" @on-change="form.createTimeStart=$event[0];form.createTimeEnd=$event[1];" clearable></date-picker>
                 </form-item>
 
                 <i-button @click="search" >查询</i-button>
@@ -47,7 +47,8 @@
                 <i-button @click="deleteMoneyPool">删除流水</i-button>
                 <Upload 
                 :action="upload.url" 
-                :multiple=false 
+                :multiple=false
+                :headers="upload.headers" 
                 :with-credentials=true 
                 :on-success="uploadSuccess" 
                 :show-upload-list=false 
