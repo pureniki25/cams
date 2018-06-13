@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 
-@Service
+@Service("IJobAndTriggerService")
 public class JobAndTriggerImpl extends BaseServiceImpl<JobAndTriggerMapper, JobAndTrigger> implements IJobAndTriggerService {
 
 	@Autowired
