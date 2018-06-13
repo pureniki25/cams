@@ -50,5 +50,5 @@ public interface RepaymentBizPlanService extends BaseService<RepaymentBizPlan> {
 	 * @param planId,若null,则查询所有
 	 * @return
 	 */
-	public List<RepaymentSettleListVO> listRepaymentSettleListVOs(String businessId,String planId);
+	public List<RepaymentSettleListVO> listRepaymentSettleListVOs(String businessId,String afterId,String planId);
 	}

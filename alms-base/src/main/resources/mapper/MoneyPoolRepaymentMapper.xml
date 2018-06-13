@@ -34,11 +34,12 @@
         <result column="create_user_role" property="createUserRole" />
         <result column="original_business_id" property="originalBusinessId" />
         <result column="after_id" property="afterId" />
+        <result column="last_state" property="lastState" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, money_pool_id AS moneyPoolId, xd_pool_id AS xdPoolId, xd_matching_id AS xdMatchingId, plan_list_id AS planListId, operate_id AS operateId, operate_name AS operateName, claim_date AS claimDate, state, income_type AS incomeType, bank_account AS bankAccount, trade_type AS tradeType, trade_place AS tradePlace, fact_transfer_name AS factTransferName, remark, pool_list AS poolList, certificate_picture_url AS certificatePictureUrl, is_finance_match AS isFinanceMatch, create_user AS createUser, create_time AS createTime, update_user AS updateUser, update_time AS updateTime, is_deleted AS isDeleted, delete_user AS deleteUser, delete_time AS deleteTime, account_money AS accountMoney, trade_date AS tradeDate, create_user_role AS createUserRole, original_business_id AS originalBusinessId, after_id AS afterId
+        last_state AS lastState,id, money_pool_id AS moneyPoolId, xd_pool_id AS xdPoolId, xd_matching_id AS xdMatchingId, plan_list_id AS planListId, operate_id AS operateId, operate_name AS operateName, claim_date AS claimDate, state, income_type AS incomeType, bank_account AS bankAccount, trade_type AS tradeType, trade_place AS tradePlace, fact_transfer_name AS factTransferName, remark, pool_list AS poolList, certificate_picture_url AS certificatePictureUrl, is_finance_match AS isFinanceMatch, create_user AS createUser, create_time AS createTime, update_user AS updateUser, update_time AS updateTime, is_deleted AS isDeleted, delete_user AS deleteUser, delete_time AS deleteTime, account_money AS accountMoney, trade_date AS tradeDate, create_user_role AS createUserRole, original_business_id AS originalBusinessId, after_id AS afterId
     </sql>
 
 	<select id="sumMoneyPoolRepaymentAmountByMprIds" resultType="java.math.BigDecimal">

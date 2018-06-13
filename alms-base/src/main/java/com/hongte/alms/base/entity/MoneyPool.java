@@ -181,6 +181,11 @@ public class MoneyPool extends Model<MoneyPool> {
 	@ApiModelProperty(required= true,value = "创建人的角色(客户/财务)")
 	private String createUserRole;
 
+	@TableField("last_status")
+	private String lastStatus ;
+	
+	@TableField("last_finance_status")
+	private String lastFinanceStatus ;
 
 	public String getMoneyPoolId() {
 		return moneyPoolId;
@@ -416,6 +421,34 @@ public class MoneyPool extends Model<MoneyPool> {
 			", updateUser=" + updateUser +
 			", createUserRole=" + createUserRole +
 			"}";
+	}
+
+	/**
+	 * @return the lastStatus
+	 */
+	public String getLastStatus() {
+		return lastStatus;
+	}
+
+	/**
+	 * @param lastStatus the lastStatus to set
+	 */
+	public void setLastStatus(String lastStatus) {
+		this.lastStatus = lastStatus;
+	}
+
+	/**
+	 * @return the lastFinanceStatus
+	 */
+	public String getLastFinanceStatus() {
+		return lastFinanceStatus;
+	}
+
+	/**
+	 * @param lastFinanceStatus the lastFinanceStatus to set
+	 */
+	public void setLastFinanceStatus(String lastFinanceStatus) {
+		this.lastFinanceStatus = lastFinanceStatus;
 	}
 
 	

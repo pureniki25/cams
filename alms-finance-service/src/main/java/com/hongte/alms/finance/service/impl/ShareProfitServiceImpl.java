@@ -555,7 +555,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			count = count.add(projPlanDto.getRepaymentProjPlan().getBorrowMoney());
 		}
 		for (RepaymentProjPlanDto projPlanDto : dto.getProjPlanDtos()) {
-			BigDecimal proportion = projPlanDto.getRepaymentProjPlan().getBorrowMoney().divide(count).setScale(10,
+			BigDecimal proportion = projPlanDto.getRepaymentProjPlan().getBorrowMoney().divide(count,10,
 					BigDecimal.ROUND_HALF_UP);
 			projPlanDto.setProportion(proportion);
 		}

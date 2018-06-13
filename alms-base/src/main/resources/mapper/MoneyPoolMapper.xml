@@ -29,11 +29,14 @@
         <result column="update_time" property="updateTime" />
         <result column="update_user" property="updateUser" />
         <result column="create_user_role" property="createUserRole" />
+        <result column="last_status" property="lastStatus" />
+        <result column="last_finance_status" property="lastFinanceStatus" />
+        
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        money_pool_id AS moneyPoolId, xd_pool_id AS xdPoolId, pay_code AS payCode, remit_bank AS remitBank, trade_date AS tradeDate, trade_type AS tradeType, summary, trade_place AS tradePlace, account_money AS accountMoney, income_type AS incomeType, trade_remark AS tradeRemark, gainer_name AS gainerName, finance_status AS financeStatus, status, import_user AS importUser, import_user_name AS importUserName, import_time AS importTime, accept_bank AS acceptBank, is_manual_create AS isManualCreate, is_temporary AS isTemporary, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser, create_user_role AS createUserRole
+        last_status AS lastStatus,last_finance_status AS lastFinanceStatus , money_pool_id AS moneyPoolId, xd_pool_id AS xdPoolId, pay_code AS payCode, remit_bank AS remitBank, trade_date AS tradeDate, trade_type AS tradeType, summary, trade_place AS tradePlace, account_money AS accountMoney, income_type AS incomeType, trade_remark AS tradeRemark, gainer_name AS gainerName, finance_status AS financeStatus, status, import_user AS importUser, import_user_name AS importUserName, import_time AS importTime, accept_bank AS acceptBank, is_manual_create AS isManualCreate, is_temporary AS isTemporary, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser, create_user_role AS createUserRole
     </sql>
 
 	<select id="listMatchedMoneyPool" resultType="com.hongte.alms.base.vo.module.MatchedMoneyPoolVO" >

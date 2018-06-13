@@ -191,6 +191,7 @@ public class FinanceServiceImpl implements FinanceService {
 		moneyPoolRepayment.setOperateId(loginUserInfoHelper.getUserId());
 		moneyPoolRepayment.setClaimDate(now);
 		moneyPoolRepayment.setOperateName(loginUserInfoHelper.getLoginInfo().getUserName());
+		moneyPoolRepayment.setOperateId(loginUserInfoHelper.getUserId());
 		moneyPoolRepayment.setIncomeType(moneyPool.getIncomeType());
 		moneyPoolRepayment.setMoneyPoolId(moneyPool.getMoneyPoolId());
 		boolean mrpSaveResult = moneyPoolRepayment.insert();
@@ -263,14 +264,6 @@ public class FinanceServiceImpl implements FinanceService {
 	@Override
 	@Transactional(rollbackFor = ServiceRuntimeException.class)
 	public Result matchBankStatement(List<String> moneyPoolIds, String businessId, String afterId, String mprid) {
-		List<MoneyPoolRepayment> list = moneyPoolRepaymentMapper
-				.selectList(new EntityWrapper<MoneyPoolRepayment>().eq("original_business_id", businessId)
-						.eq("after_id", afterId).in("money_pool_id", moneyPoolIds).eq("is_finance_match", 1));
-
-		if (list != null && list.size() > 0) {
-			return Result.error("500", "已存在匹配的银行流水,不可重复匹配");
-		}
-		Date now = new Date();
 		if (mprid != null) {
 			MoneyPool moneyPool = moneyPoolMapper.selectById(moneyPoolIds.get(0));
 			MoneyPoolRepayment moneyPoolRepayment = moneyPoolRepaymentMapper.selectById(mprid);
@@ -290,7 +283,36 @@ public class FinanceServiceImpl implements FinanceService {
 			moneyPoolRepayment.setIsFinanceMatch(1);
 			moneyPoolRepayment.updateById();
 			return Result.success();
-		} else {
+		}
+		
+		List<MoneyPoolRepayment> list = moneyPoolRepaymentMapper
+				.selectList(new EntityWrapper<MoneyPoolRepayment>().eq("original_business_id", businessId)
+						.eq("after_id", afterId).in("money_pool_id", moneyPoolIds));
+
+		if (list != null && list.size() > 0) {
+			return Result.error("500", "已存在匹配的银行流水,不可重复匹配");
+		}
+		Date now = new Date();
+		/*if (mprid != null) {
+			MoneyPool moneyPool = moneyPoolMapper.selectById(moneyPoolIds.get(0));
+			MoneyPoolRepayment moneyPoolRepayment = moneyPoolRepaymentMapper.selectById(mprid);
+			moneyPoolRepayment.setAccountMoney(moneyPool.getAccountMoney());
+			moneyPoolRepayment.setBankAccount(moneyPool.getAcceptBank());
+			moneyPoolRepayment.setCreateUser(loginUserInfoHelper.getUserId());
+			moneyPoolRepayment.setFactTransferName(moneyPool.getRemitBank());
+			moneyPoolRepayment.setIncomeType(1);
+			moneyPoolRepayment.setRemark(moneyPool.getTradeRemark());
+			moneyPoolRepayment.setMoneyPoolId(moneyPool.getMoneyPoolId());
+			moneyPoolRepayment.setTradeDate(moneyPool.getTradeDate());
+			moneyPoolRepayment.setTradePlace(moneyPool.getTradePlace());
+			moneyPoolRepayment.setTradeType(moneyPool.getTradeType());
+
+			moneyPoolRepayment.setMoneyPoolId(moneyPool.getMoneyPoolId());
+			moneyPoolRepayment.setState(RepayRegisterFinanceStatus.财务指定银行流水.toString());
+			moneyPoolRepayment.setIsFinanceMatch(1);
+			moneyPoolRepayment.updateById();
+			return Result.success();
+		} else {*/
 			List<MoneyPool> moneyPools = moneyPoolMapper.selectBatchIds(moneyPoolIds);
 			RepaymentBizPlanList repaymentBizPlanList = new RepaymentBizPlanList();
 			repaymentBizPlanList.setOrigBusinessId(businessId);
@@ -311,7 +333,7 @@ public class FinanceServiceImpl implements FinanceService {
 				boolean r = moneyPoolRepayment.insert();
 			}
 			return Result.success();
-		}
+//		}
 
 	}
 
@@ -741,11 +763,9 @@ public class FinanceServiceImpl implements FinanceService {
 			case "20":
 				// 线下代扣
 				// TODO
-				break;
 			case "30":
 				// 银行代扣
 				// TODO
-				break;
 			default:
 				matchedMoneyPoolVO = new MatchedMoneyPoolVO();
 				matchedMoneyPoolVO.setAccountMoney(repaymentResource.getRepayAmount());

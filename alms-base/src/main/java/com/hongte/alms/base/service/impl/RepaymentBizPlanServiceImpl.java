@@ -293,7 +293,7 @@ public class RepaymentBizPlanServiceImpl extends BaseServiceImpl<RepaymentBizPla
 
 
 	@Override
-	public List<RepaymentSettleListVO> listRepaymentSettleListVOs(String businessId, String planId) {
+	public List<RepaymentSettleListVO> listRepaymentSettleListVOs(String businessId,String afterId, String planId) {
 		List<RepaymentSettleListVO> list = repaymentBizPlanMapper.listRepaymentSettleListVOs(businessId, planId);
 		RepaymentSettleListVO finalVO = list.get(list.size()-1) ;
 		List<RepaymentSettleListVO> currents = new ArrayList<>();

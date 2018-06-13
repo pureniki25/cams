@@ -422,7 +422,7 @@ window.layinit(function (htConfig) {
                 })
             },
             listRepayment(){
-                axios.get(fpath+'finance/listRepaymentSettleListVOs?businessId='+businessId+(planId?('&planId='+planId):''))
+                axios.get(fpath+'settle/listRepaymentSettleListVOs?businessId='+businessId+'&afterId='+afterId+(planId?('&planId='+planId):''))
                 .then(function(res){
                     if(res.data.code=='1'){
                         app.table.plan.data = res.data.data

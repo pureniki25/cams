@@ -29,11 +29,139 @@
 
 <body>
     <div id="app" v-cloak>
-        <iframe :src="repayInfo.url" style="width: 100%;height: 200px;" frameborder="0" scrolling="no" seamless="seamless">你浏览器太旧啦!</iframe>
-        <iframe :src="repayRegList.url" :style="repayRegList.style" frameborder="0" scrolling="no" seamless="seamless">你浏览器太旧啦!</iframe>
-        <iframe :src="confirmedRepayment.url" :style="confirmedRepayment.style" frameborder="0" scrolling="no" seamless="seamless">你浏览器太旧啦!</iframe>
-        <iframe :src="matchedBankStatement.url" :style="matchedBankStatement.style" frameborder="0" scrolling="no" seamless="seamless">你浏览器太旧啦!</iframe>
 
+            <Card title="还款基本信息">
+                    <row>
+                        <i-col span="6">
+                            <div style="width: 49%;display:inline-block;text-align: right">
+                                业务编号：
+                            </div>
+                            <div style="width: 49%;display:inline-block;text-align: left">
+                                {{info.businessId}}
+                            </div>
+                        </i-col>
+                        <i-col span="6">
+                            <div style="width: 49%;display:inline-block;text-align: right">
+                                期数：
+                            </div>
+                            <div style="width: 49%;display:inline-block;text-align: left">
+                                {{info.afterId}}
+                            </div>
+                        </i-col>
+                        <i-col span="6">
+                            <div style="width: 49%;display:inline-block;text-align: right">
+                                业务类型：
+                            </div>
+                            <div style="width: 49%;display:inline-block;text-align: left">
+                                {{info.businessType}}
+                            </div>
+                        </i-col>
+                        <i-col span="6">
+                            <div style="width: 49%;display:inline-block;text-align: right">
+                                业务部门：
+                            </div>
+                            <div style="width: 49%;display:inline-block;text-align: left">
+                                {{info.companyName}}
+                            </div>
+                        </i-col>
+                    </row>
+                    <row>
+                        <i-col span="6">
+                            <div style="width: 49%;display:inline-block;text-align: right">
+                                业务主办：
+                            </div>
+                            <div style="width: 49%;display:inline-block;text-align: left">
+                                {{info.operatorName}}
+                            </div>
+                        </i-col>
+                        <i-col span="6">
+                            <div style="width: 49%;display:inline-block;text-align: right">
+                                客户名：
+                            </div>
+                            <div style="width: 49%;display:inline-block;text-align: left">
+                                {{info.customerName}}
+                            </div>
+                        </i-col>
+                        <i-col span="6">
+                            <div style="width: 49%;display:inline-block;text-align: right">
+                                还款方式：
+                            </div>
+                            <div style="width: 49%;display:inline-block;text-align: left">
+                                {{info.repaymentType}}
+                            </div>
+                        </i-col>
+                        <i-col span="6">
+                            <div style="width: 49%;display:inline-block;text-align: right">
+                                还款日期：
+                            </div>
+                            <div style="width: 49%;display:inline-block;text-align: left">
+                                {{info.repayDate}}
+                            </div>
+                        </i-col>
+                    </row>
+                    <row>
+                        <i-col span="6">
+                            <div style="width: 49%;display:inline-block;text-align: right">
+                                应还金额：
+                            </div>
+                            <div style="width: 49%;display:inline-block;text-align: left">
+                                {{info.repayAmount}}元
+                            </div>
+                        </i-col>
+                        <i-col span="6">
+                            <div style="width: 49%;display:inline-block;text-align: right">
+                                借款金额：
+                            </div>
+                            <div style="width: 49%;display:inline-block;text-align: left">
+                                {{info.borrowAmount}}元
+                            </div>
+                        </i-col>
+                        <i-col span="6">
+                            <div style="width: 49%;display:inline-block;text-align: right">
+                                借款期限：
+                            </div>
+                            <div style="width: 49%;display:inline-block;text-align: left">
+                                {{info.borrowLimit}}个月
+                            </div>
+                        </i-col>
+                        <i-col span="6">
+                            <div style="width: 49%;display:inline-block;text-align: right">
+                                线上出款费率：
+                            </div>
+                            <div style="width: 49%;display:inline-block;text-align: left">
+                                {{info.borrowRate}}%
+                            </div>
+                        </i-col>
+                    </row>
+                </Card>
+
+        <!-- <iframe :src="repayInfo.url" style="width: 100%;height: 200px;" frameborder="0" scrolling="no" seamless="seamless">你浏览器太旧啦!</iframe> -->
+        <card title="登记还款信息列表">
+            <i-table stripe :columns="table.repayRegList.col" :data="table.repayRegList.data"></i-table>
+        </card>
+        <Modal v-model="repayRegList.rejectModal" title="拒绝原因:">
+            <i-input v-model="repayRegList.remark" type="textarea"></i-input>
+            <div slot="footer">
+                <i-button @click="app.repayRegList.remark='';app.repayRegList.rejectModal=false;">取消</i-button>
+                <i-button @click="reject">确认</i-button>
+            </div>
+        </Modal>
+        <!-- <iframe :src="repayRegList.url" :style="repayRegList.style" frameborder="0" scrolling="no" seamless="seamless">你浏览器太旧啦!</iframe> -->
+        <card title="本期已匹配款项池银行流水">
+            <i-table stripe :columns="table.confirmedRepayment.col" :data="table.confirmedRepayment.data"></i-table>
+        </card>
+        <!-- <iframe :src="confirmedRepayment.url" :style="confirmedRepayment.style" frameborder="0" scrolling="no" seamless="seamless">你浏览器太旧啦!</iframe> -->
+        <!-- <iframe :src="matchedBankStatement.url" :style="matchedBankStatement.style" frameborder="0" scrolling="no" seamless="seamless">你浏览器太旧啦!</iframe> -->
+        <card>
+            <div slot='title'>
+                <span style="font-size: 14px;color: #1c2438;font-weight: 700;">本次匹配款项池银行流水</span>
+                <span style="float: right;">
+                    <i-button size="small" @click="openMatchBankStatementModal">匹配流水</i-button>
+                    <i-button size="small" @click="openAddBankStatementModal">新增</i-button>
+                </span>
+            </div>
+            <i-table stripe :columns="table.matchedBankStatement.col" :data="table.matchedBankStatement.data"></i-table>
+        </card>
         <card title="本期还款信息">
             <i-table stripe :columns="table.currPeriodRepayment.col" :data="table.currPeriodRepayment.data"></i-table>
         </card>
