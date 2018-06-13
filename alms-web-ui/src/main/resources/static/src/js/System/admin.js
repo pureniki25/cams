@@ -17,7 +17,7 @@ window.layinit(function (htConfig) {
            syncTrackLogLoading:false,
            calLateFeeLoading:false,
            updateAgencyRechargeHandleStatusLoading:false, // 更新代充值处理状态
-
+           setCollectionLoading:false, //分配贷后跟进人员  标志位
 		   // --- 按钮控制标识 end---
 
 		   onePListCollogBId:"",
@@ -113,10 +113,10 @@ window.layinit(function (htConfig) {
 		   },
            // 同步贷后跟踪记录
            syncTrackLog:function(){
-               this.syncCollectionLoading = true;
+               this.syncTrackLogLoading = true;
                axios.get(basePath +"collectionTrackLog/transfer",{timeout: 0})
                    .then(function (res) {
-                       vm.syncCollectionLoading = false;
+                       vm.syncTrackLogLoading = false;
                        if (res.data.data != null && res.data.code == 1) {
                            vm.$Modal.success({
                                content: res.data.msg
@@ -126,7 +126,7 @@ window.layinit(function (htConfig) {
                        }
                    })
                    .catch(function (error) {
-                       vm.syncCollectionLoading = false;
+                       vm.syncTrackLogLoading = false;
                        vm.$Modal.error({content: '接口调用异常!'});
                    });
            },
@@ -149,6 +149,29 @@ window.layinit(function (htConfig) {
                        vm.$Modal.error({content: '接口调用异常!'});
                    });
            },
+           //分配电催、催收
+           setCollection:function(){
+               this.setCollectionLoading = true;
+               axios.get(basePath +"collection/setAllBizCollection",{timeout: 0})
+                   .then(function (res) {
+                       vm.setCollectionLoading = false;
+                       if (res.data.data != null && res.data.code == 1) {
+                           vm.$Modal.success({
+                               content: res.data.msg
+                           });
+                       } else {
+                           vm.$Modal.error({content: res.data.msg });
+                       }
+                   })
+                   .catch(function (error) {
+                       vm.setCollectionLoading = false;
+                       vm.$Modal.error({content: '接口调用异常!'});
+                   });
+           },
+
+
+
+
 /*           // 更新代充值处理状态
            updateAgencyRecharge:function(){
         	   this.updateAgencyRechargeHandleStatusLoading = true;

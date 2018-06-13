@@ -440,6 +440,18 @@ public class CollectionController {
 //    public Result
 
 
+    @ApiOperation(value = "分配所有业务的电催、催收信息")
+    @GetMapping("/setAllBizCollection")
+    public Result setAllBizCollection(){
+        try{
+            collectionStatusService.autoSetBusinessStaff();
+            return Result.success();
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return Result.error("500", "执行电催、催收分配异常:"+ ex.getMessage());
+        }
+    }
+
 
 
 
