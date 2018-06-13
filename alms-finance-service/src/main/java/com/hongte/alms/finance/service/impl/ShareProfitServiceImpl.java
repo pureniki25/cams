@@ -63,6 +63,7 @@ import com.hongte.alms.base.mapper.TuandaiProjectInfoMapper;
 import com.hongte.alms.base.process.mapper.ProcessMapper;
 import com.hongte.alms.base.service.AccountantOverRepayLogService;
 import com.hongte.alms.base.service.RepaymentProjFactRepayService;
+import com.hongte.alms.base.service.RepaymentResourceService;
 import com.hongte.alms.base.service.WithholdingRepaymentLogService;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.common.util.DateUtil;
@@ -109,6 +110,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	MoneyPoolRepaymentMapper moneyPoolRepaymentMapper;
 	@Autowired
 	LoginUserInfoHelper loginUserInfoHelper;
+	
+	
 
 	@Autowired
 	@Qualifier("AccountantOverRepayLogService")
@@ -116,6 +119,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	@Autowired
 	@Qualifier("RepaymentProjFactRepayService")
 	RepaymentProjFactRepayService repaymentProjFactRepayService;
+	@Autowired
+	@Qualifier("RepaymentResourceService")
+	RepaymentResourceService repaymentResourceService;
 	
 	@Autowired
 	@Qualifier("WithholdingRepaymentLogService")
@@ -191,7 +197,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		if (req.getAfterId() == null) {
 			throw new ServiceRuntimeException("ConfirmRepaymentReq.afterId 不能为空");
 		}
-		if (req.getMprIds() == null && req.getSurplusFund() == null) {
+		if ((req.getMprIds() == null||req.getMprIds().isEmpty()) 
+				&&( req.getSurplusFund() == null || req.getSurplusFund().equals(new BigDecimal("0")))
+				&& (req.getLogIds() == null || req.getLogIds().isEmpty())) {
 			throw new ServiceRuntimeException("ConfirmRepaymentReq至少要有一个还款来源");
 		}
 		initVariable(req);
@@ -274,7 +282,11 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		// 银行代扣
 		if(logIds!=null&&logIds.size()>0) {
 			WithholdingRepaymentLog log=withholdingRepaymentLogService.selectById(logIds.get(0));
-			log.getBindPlatformId();
+			RepaymentResource temp=repaymentResourceService.selectOne(new EntityWrapper<RepaymentResource>().eq("business_id", log.getOriginalBusinessId())
+					.eq("after_id", log.getAfterId()).eq("repay_source_ref_id", log.getLogId()).eq("repay_source", "30"));
+			if(temp!=null) {//已经核销过
+				return;
+			}
 
 			RepaymentResource repaymentResource = new RepaymentResource();
 			repaymentResource.setAfterId(log.getAfterId());
@@ -543,7 +555,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			count = count.add(projPlanDto.getRepaymentProjPlan().getBorrowMoney());
 		}
 		for (RepaymentProjPlanDto projPlanDto : dto.getProjPlanDtos()) {
-			BigDecimal proportion = projPlanDto.getRepaymentProjPlan().getBorrowMoney().divide(count).setScale(10,
+			BigDecimal proportion = projPlanDto.getRepaymentProjPlan().getBorrowMoney().divide(count,10,
 					BigDecimal.ROUND_HALF_UP);
 			projPlanDto.setProportion(proportion);
 		}
@@ -992,7 +1004,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 //		planList.setConfirmFlag(1);
 		planList.setFinanceConfirmUser(loginUserInfoHelper.getUserId());
 		planList.setFinanceComfirmDate(new Date());
-		planList.setFinanceConfirmUserName(loginUserInfoHelper.getLoginInfo().getUserName());
+		planList.setFinanceConfirmUserName(loginUserInfoHelper.getLoginInfo()==null?"手动代扣":loginUserInfoHelper.getLoginInfo().getUserName());
 		planList.updateById();
 		updateProjPlanStatus();
 //		System.out.println(JSON.toJSONString(projListDetails.get()));

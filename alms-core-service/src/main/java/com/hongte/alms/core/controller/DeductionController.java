@@ -20,6 +20,7 @@ import com.hongte.alms.base.entity.SysBank;
 import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.entity.WithholdingPlatform;
 import com.hongte.alms.base.entity.WithholdingRecordLog;
+import com.hongte.alms.base.entity.WithholdingRepaymentLog;
 import com.hongte.alms.base.enums.AreaLevel;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
@@ -99,6 +100,10 @@ public class DeductionController {
     RepaymentBizPlanListService repaymentBizPlanListService;
     
     @Autowired
+    @Qualifier("WithholdingRepaymentLogService")
+    WithholdingRepaymentLogService withholdingRepaymentLogService;
+    
+    @Autowired
     @Qualifier("SysBankService")
     SysBankService sysBankService;
     
@@ -157,30 +162,53 @@ public class DeductionController {
             	BigDecimal underLineOverDueMoney=BigDecimal.valueOf(Double.valueOf(map.get("underLineOverDueMoney").toString()));
             	deductionVo.setOnLineOverDueMoney(onLineOverDueMoney);
             	deductionVo.setUnderLineOverDueMoney(underLineOverDueMoney);
-            	
-            	//还款成功和还款中的数据
-        		List<WithholdingRecordLog> loglist=withholdingRecordLogService.selectList(new EntityWrapper<WithholdingRecordLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).ne("repay_status", 0));
-        		//还款中的数据
-        		List<WithholdingRecordLog> repayingList=withholdingRecordLogService.selectList(new EntityWrapper<WithholdingRecordLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).eq("repay_status", 2));
-        		
-        		//查看是否共借标，共借标不能银行代扣
-        		 business=basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", deductionVo.getOriginalBusinessId()));
+            	//查看是否共借标，共借标不能银行代扣
         		deductionVo.setIssueSplitType(business.getIssueSplitType());
-        		BigDecimal repayAmount=BigDecimal.valueOf(0);
-        		BigDecimal repayingAmount=BigDecimal.valueOf(0);
-        		for(WithholdingRecordLog log:loglist) {
-        			repayAmount=repayAmount.add(log.getCurrentAmount());
-        		}
-        		for(WithholdingRecordLog log:repayingList) {
-        			repayingAmount=repayingAmount.add(log.getCurrentAmount());
-        		}
-        		if(loglist!=null&&loglist.size()>0) {
-        			deductionVo.setRepayAllAmount(repayAmount);
-        			deductionVo.setRepayingAmount(repayingAmount);
-        			deductionVo.setRestAmount(BigDecimal.valueOf(deductionVo.getTotal()).subtract(repayAmount));
-        			deductionVo.setTotal(deductionVo.getTotal()-deductionVo.getRepayingAmount().doubleValue());
-        		}
-                return Result.success(deductionVo);
+            	if(business.getSrcType()==2) {
+            	   	//还款成功和还款中的数据
+	        		List<WithholdingRepaymentLog> loglist=withholdingRepaymentLogService.selectList(new EntityWrapper<WithholdingRepaymentLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).ne("repay_status", 0));
+	        		//还款中的数据
+	        		List<WithholdingRepaymentLog> repayingList=withholdingRepaymentLogService.selectList(new EntityWrapper<WithholdingRepaymentLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).eq("repay_status", 2));
+	        		
+	        	
+	        		BigDecimal repayAmount=BigDecimal.valueOf(0);
+	        		BigDecimal repayingAmount=BigDecimal.valueOf(0);
+	        		for(WithholdingRepaymentLog log:loglist) {
+	        			repayAmount=repayAmount.add(log.getCurrentAmount());
+	        		}
+	        		for(WithholdingRepaymentLog log:repayingList) {
+	        			repayingAmount=repayingAmount.add(log.getCurrentAmount());
+	        		}
+	        		if(loglist!=null&&loglist.size()>0) {
+	        			deductionVo.setRepayAllAmount(repayAmount);
+	        			deductionVo.setRepayingAmount(repayingAmount);
+	        			deductionVo.setRestAmount(BigDecimal.valueOf(deductionVo.getTotal()).subtract(repayAmount));
+	        			deductionVo.setTotal(deductionVo.getTotal()-deductionVo.getRepayingAmount().doubleValue());
+	        		}
+	                return Result.success(deductionVo);
+            	}else {
+	            	//还款成功和还款中的数据
+	        		List<WithholdingRecordLog> loglist=withholdingRecordLogService.selectList(new EntityWrapper<WithholdingRecordLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).ne("repay_status", 0));
+	        		//还款中的数据
+	        		List<WithholdingRecordLog> repayingList=withholdingRecordLogService.selectList(new EntityWrapper<WithholdingRecordLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).eq("repay_status", 2));
+	        		
+	        	
+	        		BigDecimal repayAmount=BigDecimal.valueOf(0);
+	        		BigDecimal repayingAmount=BigDecimal.valueOf(0);
+	        		for(WithholdingRecordLog log:loglist) {
+	        			repayAmount=repayAmount.add(log.getCurrentAmount());
+	        		}
+	        		for(WithholdingRecordLog log:repayingList) {
+	        			repayingAmount=repayingAmount.add(log.getCurrentAmount());
+	        		}
+	        		if(loglist!=null&&loglist.size()>0) {
+	        			deductionVo.setRepayAllAmount(repayAmount);
+	        			deductionVo.setRepayingAmount(repayingAmount);
+	        			deductionVo.setRestAmount(BigDecimal.valueOf(deductionVo.getTotal()).subtract(repayAmount));
+	        			deductionVo.setTotal(deductionVo.getTotal()-deductionVo.getRepayingAmount().doubleValue());
+	        		}
+	                return Result.success(deductionVo);
+            	}
 	
             }else {
             	 return Result.error("-1", "找不到代扣信息");

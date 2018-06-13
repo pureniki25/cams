@@ -193,7 +193,7 @@ window.layinit(function (htConfig) {
                     app.$Message.success({content:"导入成功"})
                     app.search()
                 }else{
-                    app.$Message.error({content:"导入失败"})
+                    app.$Message.error({content:"导入失败:"+response.msg})
                 }
             },
             getMoneyPool(mpid){

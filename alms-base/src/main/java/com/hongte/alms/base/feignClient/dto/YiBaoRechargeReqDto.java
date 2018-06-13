@@ -13,12 +13,12 @@ public class YiBaoRechargeReqDto implements Serializable {
 	 private String orderid;
 	 private Integer transtime;
 	 private String currency;
-	 private Double amount;
+	 private Integer amount;
 	 private String productname;
-	 public Double getAmount() {
+	 public Integer getAmount() {
 		return amount;
 	}
-	public void setAmount(Double amount) {
+	public void setAmount(Integer amount) {
 		this.amount = amount;
 	}
 	private String productdesc;

@@ -182,6 +182,9 @@ window.layinit(function (htConfig) {
                         app.table.data.push(sum)
 
                         let height = 20 ;
+                        if(app.table.data.length<=2){
+                            height = 50
+                        }
                         app.table.data.forEach(e=>{
                             if(e.remark&&e.remark.length>16){
                                 if(height*(e.remark.length/16)>height){
