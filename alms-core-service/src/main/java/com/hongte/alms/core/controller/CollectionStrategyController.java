@@ -11,10 +11,12 @@ import com.hongte.alms.base.collection.entity.CollectionTimeSet;
 import com.hongte.alms.base.collection.service.CollectionPersonSetDetailService;
 import com.hongte.alms.base.collection.service.CollectionPersonSetService;
 import com.hongte.alms.base.collection.service.CollectionTimeSetService;
+import com.hongte.alms.base.entity.BasicBusinessType;
 import com.hongte.alms.base.entity.BasicCompany;
 import com.hongte.alms.base.entity.SysUser;
 import com.hongte.alms.base.enums.AreaLevel;
 import com.hongte.alms.base.enums.SysRoleEnums;
+import com.hongte.alms.base.service.BasicBusinessTypeService;
 import com.hongte.alms.base.service.BasicCompanyService;
 import com.hongte.alms.base.service.SysUserService;
 import com.hongte.alms.base.vo.module.BatchSavePersonReq;
@@ -76,6 +78,11 @@ public class CollectionStrategyController {
     @Qualifier("SysUserService")
     private SysUserService sysUserService;
 
+    @Autowired
+    @Qualifier("BasicBusinessTypeService")
+    private BasicBusinessTypeService basicBusinessTypeService;
+
+
     @ApiOperation(value="获取催收人员设置列表页")
     @GetMapping("getCollectionUserSettingList")
     @ResponseBody
@@ -118,13 +125,24 @@ public class CollectionStrategyController {
     @ResponseBody
     public Result<Map<String,JSONArray>> getClearingPersons (){
         Map<String,JSONArray> retMap = new HashMap<String,JSONArray>();
-        List<SysUser> sysUserList = sysUserService.selectUsersByRole(SysRoleEnums.HD_LIQ_COMMISSIONER.getKey());
+        List<SysUser> sysUser1List = sysUserService.selectUsersByRole(SysRoleEnums.HD_LIQ_COMMISSIONER.getKey());
+        List<SysUser> sysUser2List = sysUserService.selectUsersByRole(SysRoleEnums.HD_ASSET_COMMISSIONE.getKey());
 
         List<BasicCompany> area_list = basicCompanyService.selectList(new EntityWrapper<BasicCompany>().eq("area_level",AreaLevel.AREA_LEVEL.getKey()));
 
         List<BasicCompany> companyList = basicCompanyService.selectList(new EntityWrapper<BasicCompany>().eq("area_level",AreaLevel.COMPANY_LEVEL.getKey()));
 
-        retMap.put("sysUser", (JSONArray) JSON.toJSON(sysUserList, JsonUtil.getMapping()));
+        //业务类型
+        List<BasicBusinessType> btype_list =  basicBusinessTypeService.selectList(new EntityWrapper<BasicBusinessType>().orderBy("business_type_id"));
+        BasicBusinessType basicBusinessType = new BasicBusinessType();
+        basicBusinessType.setBusinessTypeId(0);
+        basicBusinessType.setBusinessTypeName("全部");
+        btype_list.add(basicBusinessType);
+        retMap.put("businessType",(JSONArray) JSON.toJSON(btype_list, JsonUtil.getMapping()));
+
+
+        retMap.put("sysUser1List", (JSONArray) JSON.toJSON(sysUser1List, JsonUtil.getMapping()));
+        retMap.put("sysUser2List", (JSONArray) JSON.toJSON(sysUser2List, JsonUtil.getMapping()));
         retMap.put("areaList", (JSONArray) JSON.toJSON(area_list, JsonUtil.getMapping()));
         retMap.put("companyList", (JSONArray) JSON.toJSON(companyList, JsonUtil.getMapping()));
         return Result.success(retMap);
@@ -137,6 +155,13 @@ public class CollectionStrategyController {
 
         return collectionStrategyPersonService.saveStrategyPerson(req,headers);
 
+    }
+
+    @ApiOperation(value="删除清算人员配置")
+    @PostMapping("/deletePersonSet")
+    @ResponseBody
+    public Result deletePersonSet( String id){
+        return collectionStrategyPersonService.deleteColPersonSet(id);
     }
 
 

@@ -11,4 +11,6 @@ import org.springframework.http.HttpHeaders;
 public interface CollectionStrategyPersonService {
 
     public Result saveStrategyPerson(CollectionStrategySinglePersonSettingReq req, HttpHeaders headers);
+
+    public Result deleteColPersonSet(String id);
 }

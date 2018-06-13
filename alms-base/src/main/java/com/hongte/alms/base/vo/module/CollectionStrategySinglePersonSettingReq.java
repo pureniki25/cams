@@ -16,7 +16,17 @@ public class CollectionStrategySinglePersonSettingReq {
     
     private Integer businessType;
 
+    //旧的业务类型
+    private  Integer oldBizType;
+
+
     private String areaId;
+
+    //编辑的标志位 1：编辑 0：新增
+    private Integer editFalge;
+
+
+
 
     public Integer getBusinessType() {
 		return businessType;
@@ -56,5 +66,21 @@ public class CollectionStrategySinglePersonSettingReq {
 
     public void setAreaId(String areaId) {
         this.areaId = areaId;
+    }
+
+    public Integer getEditFalge() {
+        return editFalge;
+    }
+
+    public void setEditFalge(Integer editFalge) {
+        this.editFalge = editFalge;
+    }
+
+    public Integer getOldBizType() {
+        return oldBizType;
+    }
+
+    public void setOldBizType(Integer oldBizType) {
+        this.oldBizType = oldBizType;
     }
 }

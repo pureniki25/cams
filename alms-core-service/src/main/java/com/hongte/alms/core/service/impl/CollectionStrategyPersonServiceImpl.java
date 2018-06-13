@@ -11,6 +11,7 @@ import com.hongte.alms.base.service.BasicCompanyService;
 import com.hongte.alms.base.vo.module.CollectionStrategySinglePersonSettingReq;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.core.service.CollectionStrategyPersonService;
+import com.ht.ussp.bean.LoginUserInfoHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
@@ -41,6 +42,8 @@ public class CollectionStrategyPersonServiceImpl implements CollectionStrategyPe
     @Qualifier("CollectionPersonSetDetailService")
     private CollectionPersonSetDetailService collectionPersonSetDetailService;
 
+    @Autowired
+    private LoginUserInfoHelper loginUserInfoHelper;
 
 
     @Override
@@ -55,13 +58,22 @@ public class CollectionStrategyPersonServiceImpl implements CollectionStrategyPe
         companyList = req.getCompanyId();
         Integer businessType=req.getBusinessType();
 
+        Integer oldBizType = req.getOldBizType();
+
+
 
         for (String com:companyList) {
-            CollectionPersonSet personSet = collectionPersonSettingService.selectOne(new EntityWrapper<CollectionPersonSet>().eq("company_code",com));
+            CollectionPersonSet personSet =null;
+            if(oldBizType!=null ){
+                personSet = collectionPersonSettingService.selectOne(new EntityWrapper<CollectionPersonSet>().eq("company_code",com).eq("business_type",oldBizType));
+            }else{
+
+                personSet = collectionPersonSettingService.selectOne(new EntityWrapper<CollectionPersonSet>().eq("company_code",com).eq("business_type",businessType));
+            }
             if(personSet !=null){
                 personSet.setUpdateTime(new Date());
-                personSet.setUpdateUser("admin");
-                personSet.setCreatUser("admin");
+                personSet.setUpdateUser(loginUserInfoHelper.getUserId());
+//                personSet.setCreatUser("admin");
                 personSet.setBusinessType(businessType);
                 collectionPersonSettingService.update(personSet,new EntityWrapper<CollectionPersonSet>().eq("col_person_id",personSet.getColPersonId()));
             }else {
@@ -70,7 +82,7 @@ public class CollectionStrategyPersonServiceImpl implements CollectionStrategyPe
                 personSet.setAreaCode(basicCompany.getAreaPid());
                 personSet.setCompanyCode(com);
                 personSet.setCreateTime(new Date());
-                personSet.setCreatUser("admin");
+                personSet.setCreatUser(loginUserInfoHelper.getUserId());
                 personSet.setBusinessType(businessType);
                 collectionPersonSettingService.insert(personSet);
             }
@@ -115,4 +127,18 @@ public class CollectionStrategyPersonServiceImpl implements CollectionStrategyPe
 
         return Result.success();
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Result deleteColPersonSet(String id){
+
+        collectionPersonSetDetailService.delete(new EntityWrapper<CollectionPersonSetDetail>().eq("col_person_id",id));
+
+        collectionPersonSettingService.delete(new EntityWrapper<CollectionPersonSet>().eq("col_person_id",id));
+
+
+        return Result.success();
+
+    }
+
 }
