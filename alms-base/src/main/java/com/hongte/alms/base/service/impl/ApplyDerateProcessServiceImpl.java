@@ -381,10 +381,13 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
     // List<ApplyDerateType>  applyDerateTypeList=applyDerateTypeService.selectList(new EntityWrapper<ApplyDerateType>().eq("apply_derate_process_id",derateInfo.getApplyDerateProcessId()));
      List<ApplyDerateType>  applyDerateTypeList=applyDerateTypeService.getApplyTypeByBusinessIdAndCrpId(derateInfo.getBusinessId(), derateInfo.getCrpId());//这个方法查出如果同一期减免多次费用的总额
        for(ApplyDerateType applyDerateType: applyDerateTypeList) {
-    	   derateFee=new DerateFee();
-    	   derateFee.setAmount(applyDerateType.getDerateMoney());
-    	   derateFee.setFeeId(applyDerateType.getFeeId());
-    	   derateFeeList.add(derateFee);
+    	   if(applyDerateType!=null) {
+    		   derateFee=new DerateFee();
+        	   derateFee.setAmount(applyDerateType.getDerateMoney());
+        	   derateFee.setFeeId(applyDerateType.getFeeId());
+        	   derateFeeList.add(derateFee);  
+    	   }
+    	 
     	
        }
        reqParam.setDerateFeeList(derateFeeList);
