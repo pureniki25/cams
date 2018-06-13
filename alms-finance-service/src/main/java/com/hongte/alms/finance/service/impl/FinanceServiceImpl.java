@@ -266,7 +266,7 @@ public class FinanceServiceImpl implements FinanceService {
 	public Result matchBankStatement(List<String> moneyPoolIds, String businessId, String afterId, String mprid) {
 		List<MoneyPoolRepayment> list = moneyPoolRepaymentMapper
 				.selectList(new EntityWrapper<MoneyPoolRepayment>().eq("original_business_id", businessId)
-						.eq("after_id", afterId).in("money_pool_id", moneyPoolIds).eq("is_finance_match", 1));
+						.eq("after_id", afterId).in("money_pool_id", moneyPoolIds));
 
 		if (list != null && list.size() > 0) {
 			return Result.error("500", "已存在匹配的银行流水,不可重复匹配");

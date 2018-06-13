@@ -263,7 +263,6 @@ public class FinanceController {
 			String moneyPoolId = j.getString("moneyPoolId");
 			moneyPoolIds.add(moneyPoolId);
 		}
-		List<MoneyPool> list = moneyPoolService.selectBatchIds(moneyPoolIds);
 		result = financeService.matchBankStatement(moneyPoolIds, businessId, afterId,mprid);
 		logger.info("@matchBankStatement@还款计划匹配银行流水--结束[{}]", req.toJSONString());
 		return result;
