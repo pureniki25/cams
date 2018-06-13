@@ -210,7 +210,7 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
 	        		if(applyDerateType.getDerateMoney().compareTo(list.get(0).getPlanAmount())==1) {
 		                throw new RuntimeException("减免金额不能大于费用项应还金额");
 	        		}else {
-	        			
+	        			detail=list.get(0);
 	        		applyDerateType.setDerateTypeName(detail.getPlanItemName());
 	        		applyDerateType.setFeeId(applyDerateType.getFeeId());
 	        		applyDerateType.setDerateType(detail.getPlanItemType().toString());
