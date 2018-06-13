@@ -727,7 +727,7 @@ public class FinanceController {
 		}
 	}
 	
-	@GetMapping(value="/listRepaymentSettleListVOs")
+	/*@GetMapping(value="/listRepaymentSettleListVOs")
 	@ApiOperation(value="还款计划")
 	public Result listRepaymentSettleListVOs(String businessId,String planId) {
 		try {
@@ -742,7 +742,7 @@ public class FinanceController {
 			e.printStackTrace();
 			return Result.error("500", "系统异常:还款计划失败");
 		}
-	}
+	}*/
 
 	
 	@ApiOperation(value = "分润")
