@@ -1004,7 +1004,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 //		planList.setConfirmFlag(1);
 		planList.setFinanceConfirmUser(loginUserInfoHelper.getUserId());
 		planList.setFinanceComfirmDate(new Date());
-		planList.setFinanceConfirmUserName(loginUserInfoHelper.getLoginInfo().getUserName());
+		planList.setFinanceConfirmUserName(loginUserInfoHelper.getLoginInfo()==null?"手动代扣":loginUserInfoHelper.getLoginInfo().getUserName());
 		planList.updateById();
 		updateProjPlanStatus();
 //		System.out.println(JSON.toJSONString(projListDetails.get()));
