@@ -1,30 +1,37 @@
+server:
+  port: 30611
+
 spring:
   application:
     name: alms-scheduled-service
   cloud:
     config:
-#      name: eip-in,base,rabbitmq,mongo,redis
+      #name: alms-scheduled-service,base,rabbitmq,mongo,redis
       discovery:
         service-id: ussp-config-app
         enabled: true
       enabled: true
     bus:
       enabled: true
-
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration,org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration.RabbitAnnotationDrivenConfiguration,org.springframework.cloud.config.client.ConfigClientAutoConfiguration
-management:
-  security:
-    enabled: false
 eureka:
   instance:
     prefer-ip-address: true
   client:
-    serviceUrl:
-      defaultZone: http://172.16.200.110:30101/eureka/  # 配置注册中心url
-ht:
-  config:
-    ui:
-      useGateWayflage: false   #是否使用网关的标志位
+      serviceUrl:
+#        defaultZone: http://192.168.12.101:30101/eureka/  # 配置注册中心url
+        defaultZone: http://172.16.200.110:30101/eureka/  # 配置注册中心url
+        
+        
+xxl.job:
+  admin:
+    addresses: http://172.16.200.111:31801/xxl-job-admin
+  executor:
+    appname: alms-scheduled-service
+    ip:
+    port: 30611
+    logpath: /data/applogs/xxl-job/jobhandler
+    logretentiondays: -1
+
+      
 
 
