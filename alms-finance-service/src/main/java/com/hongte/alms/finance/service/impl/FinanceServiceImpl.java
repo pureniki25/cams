@@ -741,11 +741,9 @@ public class FinanceServiceImpl implements FinanceService {
 			case "20":
 				// 线下代扣
 				// TODO
-				break;
 			case "30":
 				// 银行代扣
 				// TODO
-				break;
 			default:
 				matchedMoneyPoolVO = new MatchedMoneyPoolVO();
 				matchedMoneyPoolVO.setAccountMoney(repaymentResource.getRepayAmount());
