@@ -755,15 +755,15 @@ public class FinanceController {
 			List<Integer> logIds=new ArrayList<Integer>();
 			logIds.add(logId);
 			list.add(30);//还款来源银行代扣
-			
+			req.setLogIds(logIds);
 			req.setAfterId(afterId);
 			req.setBusinessId(businessId);
 			req.setRepaySource(list);
 			shareProfitService.execute(req, true);
               result.success(1);
 		} catch (Exception ex) {
-			logger.error(ex.getMessage());
-			return Result.error("分润出现异常", ex.getMessage());
+			logger.error("分润出现异常"+ex);
+			return Result.error("-1","分润出现异常"+ex);
 		}
 		return result;
 	}
