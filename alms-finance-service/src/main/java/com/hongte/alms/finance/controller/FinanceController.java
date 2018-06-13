@@ -816,6 +816,17 @@ public class FinanceController {
 				if (moneyPool==null) {
 					continue;
 				}
+				
+				if (!StringUtil.isEmpty(entity.getPayCode())) {
+					List<MoneyPool> s = moneyPoolService.selectList(new EntityWrapper<MoneyPool>().eq("pay_code", entity.getPayCode()));
+					if (s.size()>0) {
+						result = Result.error("500", "款项编码与数据库已存在数据重复,请修改:"+entity.getPayCode());
+						logger.info("@importExcel@导入银行流水Excel--结束[{}]",result);
+						return result ;
+					}
+					
+				}
+				
 				moneyPool.setCreateUser(loginUserInfoHelper.getUserId());
 				moneyPool.setImportUser(loginUserInfoHelper.getUserId());
 				if(loginUserInfoHelper.getLoginInfo()!=null&&loginUserInfoHelper.getLoginInfo().getUserName()!=null) {
@@ -823,12 +834,26 @@ public class FinanceController {
 				}
 				moneyPools.add(moneyPool);
 			}
+			
+			
 			if (moneyPools.isEmpty()) {
 				result = Result.error("500", "Excel内容格式错误");
 				logger.info("@importExcel@导入银行流水Excel--结束[{}]",result);
 				return result;
 			}
 			
+			for (int i = 0; i < list.size(); i++) {
+				for (int j = 0; j < list.size(); j++) {
+					if (i==j) {
+						continue;
+					}
+					if (list.get(i).getPayCode().equals(list.get(j).getPayCode())) {
+						result = Result.error("500", "款项编码重复,请修改:"+list.get(i).getPayCode());
+						logger.info("@importExcel@导入银行流水Excel--结束[{}]",result);
+						return result;
+					}
+				}
+			}
 			boolean insertRes = moneyPoolService.insertBatch(moneyPools, moneyPools.size());
 			if (insertRes) {
 				result = Result.success();return result;
