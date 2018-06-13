@@ -497,8 +497,11 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 		}
 		List<MoneyPoolRepayment> moneyPoolRepayments = moneyPoolRepaymentMapper.selectBatchIds(req.getMprIds());
 		for (MoneyPoolRepayment mpr : moneyPoolRepayments) {
+			mpr.setLastState(mpr.getState());
 			mpr.setState(RepayRegisterFinanceStatus.财务确认已还款.toString());
 			MoneyPool moneyPool = moneyPoolMapper.selectById(mpr.getMoneyPoolId());
+			moneyPool.setLastStatus(moneyPool.getStatus());
+			moneyPool.setLastFinanceStatus(moneyPool.getFinanceStatus());
 			moneyPool.setStatus(RepayRegisterState.完成.toString());
 			moneyPool.setFinanceStatus(RepayRegisterFinanceStatus.财务确认已还款.toString());
 			mpr.updateById();
@@ -512,12 +515,15 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 				RepayPlanRepaySrcEnum.OFFLINE_TRANSFER.getValue().toString())) {
 			MoneyPoolRepayment mpr = moneyPoolRepaymentMapper.selectById(repaymentResource.getRepaySourceRefId());
 			MoneyPool moneyPool = moneyPoolMapper.selectById(mpr.getMoneyPoolId()); 
-			mpr.setState(RepayRegisterFinanceStatus.未关联银行流水.toString());
-			mpr.setIsFinanceMatch(0);
+			mpr.setState(mpr.getLastState());
+			mpr.setLastState(null);
+//			mpr.setIsFinanceMatch(0);
 			mpr.updateById();
 			if (moneyPool!=null) {
-				moneyPool.setStatus(RepayRegisterState.待领取.toString());
-				moneyPool.setFinanceStatus(RepayRegisterFinanceStatus.未关联银行流水.toString());
+				moneyPool.setStatus(moneyPool.getLastStatus());
+				moneyPool.setFinanceStatus(moneyPool.getLastFinanceStatus());
+				moneyPool.setLastFinanceStatus(null);
+				moneyPool.setLastStatus(null);
 				moneyPool.updateById();
 			}
 		}

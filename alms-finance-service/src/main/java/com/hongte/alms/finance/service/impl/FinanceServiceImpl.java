@@ -191,6 +191,7 @@ public class FinanceServiceImpl implements FinanceService {
 		moneyPoolRepayment.setOperateId(loginUserInfoHelper.getUserId());
 		moneyPoolRepayment.setClaimDate(now);
 		moneyPoolRepayment.setOperateName(loginUserInfoHelper.getLoginInfo().getUserName());
+		moneyPoolRepayment.setOperateId(loginUserInfoHelper.getUserId());
 		moneyPoolRepayment.setIncomeType(moneyPool.getIncomeType());
 		moneyPoolRepayment.setMoneyPoolId(moneyPool.getMoneyPoolId());
 		boolean mrpSaveResult = moneyPoolRepayment.insert();

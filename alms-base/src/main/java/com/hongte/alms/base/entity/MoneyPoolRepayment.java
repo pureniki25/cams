@@ -211,6 +211,9 @@ public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
 	@ApiModelProperty(required = true, value = "期数")
 	private String afterId;
 
+	@TableField("last_state")
+	private String lastState ;
+	
 	public Integer getId() {
 		return id;
 	}
@@ -560,6 +563,20 @@ public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
 	 */
 	public MoneyPoolRepayment() {
 		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * @return the lastState
+	 */
+	public String getLastState() {
+		return lastState;
+	}
+
+	/**
+	 * @param lastState the lastState to set
+	 */
+	public void setLastState(String lastState) {
+		this.lastState = lastState;
 	}
 
 }

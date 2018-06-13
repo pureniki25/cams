@@ -209,13 +209,12 @@ window.layinit(function (htConfig) {
                                 },
                                 on: {
                                     click() {
-                                        console.log(p.row);
                                         let repayDate = moment(p.row.tradeDate).format('YYYY-MM-DD');
                                         let accountMoney = p.row.accountMoney;
                                         let acceptBank = p.row.bankAccount;
                                         let mrpid = p.row.id
-                                        window.parent.app.manualMatchBankSatements.show = true;
-                                        window.parent.app.manualMatchBankSatements.url = '/finance/manualMatchBankSatements?businessId=' +
+                                        app.manualMatchBankSatements.show = true;
+                                        app.manualMatchBankSatements.url = '/finance/manualMatchBankSatements?businessId=' +
                                             businessId + "&afterId=" +
                                             afterId + '&repayDate=' +
                                             repayDate + '&accountMoney=' +
@@ -235,8 +234,8 @@ window.layinit(function (htConfig) {
                                 },
                                 on: {
                                     click() {
-                                        app.rejectModal=true
-                                        app.mprid = p.row.id
+                                        app.repayRegList.rejectModal=true
+                                        app.repayRegList.mprid = p.row.id
                                     }
                                 }
                             }, '拒绝')
@@ -409,6 +408,7 @@ window.layinit(function (htConfig) {
             repayRegList:{
                 remark:'',
                 rejectModal:false,
+                mprid:''
             },
             thisTimeRepaymentInfo: {
                 derate: '',
@@ -785,20 +785,20 @@ window.layinit(function (htConfig) {
             },
             reject() {
                 axios.post(fpath + 'finance/rejectRepayReg', {
-                        mprid: app.mprid,
-                        remark: app.remark
+                        mprid: app.repayRegList.mprid,
+                        remark: app.repayRegList.remark
                     })
                     .then(function (res) {
                         if (res.data.code == '1') {
                             window.location.reload()
                         } else {
-                            window.parent.app.$Message.error({
+                            app.$Message.error({
                                 content: res.data.msg
                             })
                         }
                     })
                     .catch(function (err) {
-                        window.parent.app.$Message.error({
+                        app.$Message.error({
                             content: '拒绝还款登记失败'
                         })
                         console.log(err);
@@ -910,15 +910,15 @@ window.layinit(function (htConfig) {
                             })
                             .then(function (r) {
                                 if (r.data.code == "1") {
-                                    parent.location.reload()
+                                    window.location.reload()
                                 } else {
-                                    parent.app.$Message.error({
+                                    app.$Message.error({
                                         content: r.data.msg
                                     })
                                 }
                             })
                             .catch(function (e) {
-                                parent.app.$Message.error({
+                                app.$Message.error({
                                     content: '取消关联银行流水失败'
                                 })
                             })
@@ -936,15 +936,15 @@ window.layinit(function (htConfig) {
                             })
                             .then(function (r) {
                                 if (r.data.code == "1") {
-                                    parent.location.reload()
+                                    window.location.reload()
                                 } else {
-                                    parent.app.$Message.error({
+                                    app.$Message.error({
                                         content: r.data.msg
                                     })
                                 }
                             })
                             .catch(function (e) {
-                                parent.app.$Message.error({
+                                app.$Message.error({
                                     content: '删除此条流水失败'
                                 })
                             })
