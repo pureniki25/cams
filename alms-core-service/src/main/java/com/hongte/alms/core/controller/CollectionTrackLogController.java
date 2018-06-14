@@ -7,7 +7,9 @@ import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
 import com.hongte.alms.base.collection.entity.Parametertracelog;
+import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.feignClient.CollectionSynceToXindaiRemoteApi;
+import com.hongte.alms.base.service.SysParameterService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.LoginInfoDto;
 import org.apache.commons.collections.CollectionUtils;
@@ -80,6 +82,10 @@ public class CollectionTrackLogController {
     @Autowired
 	@Qualifier("FiveLevelClassifyBusinessChangeLogService")
 	private FiveLevelClassifyBusinessChangeLogService fiveLevelClassifyBusinessChangeLogService;
+
+    @Autowired
+    @Qualifier("SysParameterService")
+    private SysParameterService  sysParameterService;
 
     @Autowired
     private CollectionSynceToXindaiRemoteApi collectionRemoteApi;
@@ -193,38 +199,57 @@ public class CollectionTrackLogController {
         try{
             collectionTrackLogService.addOrUpdateLog(log);
 
-            // --------  将贷后跟踪记录同步到信贷  开始 -------------------
-            RepaymentBizPlanList planList = repaymentBizPlanListService.selectById(log.getRbpId());
-            planList.getAfterId();
-            planList.getBusinessId();
-            Parametertracelog parametertracelog = new Parametertracelog();
-            parametertracelog.setId(log.getXdIndexId());
-            parametertracelog.setCarBusinessId(planList.getBusinessId());
-            parametertracelog.setCarBusinessAfterId( planList.getAfterId());
-            parametertracelog.setTranceContent(log.getContent());
+            try{
+                // --------  将贷后跟踪记录同步到信贷  开始 -------------------
+                RepaymentBizPlanList planList = repaymentBizPlanListService.selectById(log.getRbpId());
+                planList.getAfterId();
+                planList.getBusinessId();
+                Parametertracelog parametertracelog = new Parametertracelog();
+                parametertracelog.setId(log.getXdIndexId());
+                parametertracelog.setCarBusinessId(planList.getBusinessId());
+                parametertracelog.setCarBusinessAfterId( planList.getAfterId());
+                parametertracelog.setTranceContent(log.getContent());
 
-            LoginInfoDto loginInfoDto = loginUserInfoHelper.getUserInfoByUserId(log.getRecorderUser(),null);
-            parametertracelog.setTranceName(loginInfoDto.getBmUserId());
-            parametertracelog.setTranceDate(log.getRecordDate());
-            LoginInfoDto creatUDto = loginUserInfoHelper.getUserInfoByUserId(log.getCreateUser(),null);
-            parametertracelog.setCreateUser(creatUDto.getBmUserId());
-            parametertracelog.setCreateTime(log.getCreateTime());
-            parametertracelog.setIsDelete(0);
-            Result<Integer> ret =  collectionRemoteApi.transferOneCollectionLogToXd(parametertracelog);
+                LoginInfoDto loginInfoDto = loginUserInfoHelper.getUserInfoByUserId(log.getRecorderUser(),null);
+                if(loginInfoDto == null){
+                    parametertracelog.setTranceName("admin");
+                }else{
+                    parametertracelog.setTranceName(loginInfoDto.getBmUserId());
+                }
 
-            if(!ret.getCode().equals("1")){
-                logger.error("将贷后跟踪记录同步到信贷，失败： trackLog："+ JSON.toJSONString(log) +"   失败原因："+ret.getMsg());
-                return Result.error("500","将贷后跟踪记录同步到信贷");
-            }else{
-                log.setXdIndexId(ret.getData());
-                collectionTrackLogService.insertOrUpdate(log);
+                parametertracelog.setTranceDate(log.getRecordDate());
+                LoginInfoDto creatUDto = loginUserInfoHelper.getUserInfoByUserId(log.getCreateUser(),null);
+                if(creatUDto == null){
+                    parametertracelog.setCreateUser("admin");
+                }else{
+                    parametertracelog.setCreateUser(creatUDto.getBmUserId());
+                }
+                parametertracelog.setCreateTime(log.getCreateTime());
+                parametertracelog.setIsDelete(0);
+
+                SysParameter sysParameter =  sysParameterService.selectById(log.getTrackStatusId());
+                parametertracelog.setStatus(Integer.valueOf(log.getTrackStatusId()));
+                parametertracelog.setStatusName(log.getTrackStatusName());
+                Result<Integer> ret =  collectionRemoteApi.transferOneCollectionLogToXd(parametertracelog);
+
+                if(ret == null || !ret.getCode().equals("1")){
+                    String retStr = "ret为空";
+                    if(ret!=null){
+                        retStr =ret.getMsg();
+                    }
+                    logger.error("将贷后跟踪记录同步到信贷，失败： trackLog："+ JSON.toJSONString(log) +"   失败原因："+ retStr);
+                    return Result.error("500","将贷后跟踪记录同步到信贷");
+                }else{
+                    log.setXdIndexId(ret.getData());
+                    collectionTrackLogService.insertOrUpdate(log);
+                }
+
+                // --------  将贷后跟踪记录同步到信贷  结束 -------------------
+            }catch (Exception e){
+                logger.error("贷后跟踪记录数据同步到信贷，失败   parametertracelog："+JSON.toJSONString(log)+"          失败原因："+e.getMessage());
             }
-
-            // --------  将贷后跟踪记录同步到信贷  结束 -------------------
-
-
-
         }catch (Exception ex){
+            ex.printStackTrace();
             logger.error(ex.getMessage());
             return Result.error("500", ex.getMessage());
         }
