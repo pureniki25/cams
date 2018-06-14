@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.hongte.alms.base.service.RepaymentBizPlanService;
 import com.hongte.alms.base.vo.finance.RepaymentSettleListVO;
 import com.hongte.alms.common.result.Result;
@@ -38,13 +40,13 @@ public class SettleController {
 	
 	@GetMapping(value="/listRepaymentSettleListVOs")
 	@ApiOperation(value="还款计划")
-	public Result listRepaymentSettleListVOs(String businessId,String afterId,String planId) {
+	public Result<List<RepaymentSettleListVO>> listRepaymentSettleListVOs(String businessId,String afterId,String planId) {
 		try {
 			logger.info("@listRepaymentSettleListVOs@还款计划--开始[{}]", businessId);
-			Result result = null;
+			Result<List<RepaymentSettleListVO>> result = null;
 			List<RepaymentSettleListVO> list = repaymentBizPlanService.listRepaymentSettleListVOs(businessId,afterId, planId);
 			result = Result.success(list);
-			logger.info("@listRepaymentSettleListVOs@还款计划--结束[{}]", result);
+			logger.info("@listRepaymentSettleListVOs@还款计划--结束[{}]", JSON.toJSONString(result));
 			return result;
 		} catch (Exception e) {
 			logger.error("@listRepaymentSettleListVOs@还款计划--[{}]", e);
