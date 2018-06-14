@@ -241,7 +241,7 @@ public class CollectionTrackLogController {
                     if(ret!=null){
                         retStr =ret.getMsg();
                     }
-                    logger.error("将贷后跟踪记录同步到信贷，失败： trackLog："+ JSON.toJSONString(log) +"   失败原因："+ retStr);
+                    logger.error("将贷后跟踪记录同步到信贷，失败： trackLog："+ JSON.toJSONString(parametertracelog) +"   失败原因："+ retStr);
 //                    return Result.error("500","将贷后跟踪记录同步到信贷");
                 }else{
                     log.setXdIndexId(ret.getData());
