@@ -696,7 +696,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                             collectionStatus.getVisitStaff(),StaffPersonType.VISIT_STAFF.getKey());
                 }catch (Exception e){
                     e.printStackTrace();
-                    logger.error("自动分配电催 月还逾期 第一次分配  数据存储异常 businessID:"+planList.getBusinessId()+
+                    logger.error("自动分配电催 月还逾期 已分配过  数据存储异常 businessID:"+planList.getBusinessId()+
                             "  planListId:"+ planList.getPlanListId());
                 }
 
@@ -705,18 +705,30 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
             /////////  此业务第一次分配 则区分月还逾期与末期逾期 ///////////
             if(ifPlanListIsLast(planList)){//是末期逾期
                 Integer minIndex = getLimitCountIndex(lastPlanVisitPersonlist);
+                try{
                 setAutoBusinessStaff(planList.getBusinessId(),planList.getPlanListId(),
                         // yzl 取上门催收人员
                         lastPlanVisitPersonlist.get(minIndex).getVisitStaff(),
                         StaffPersonType.VISIT_STAFF.getKey());
+                }catch (Exception e){
+                    e.printStackTrace();
+                    logger.error("自动分配电催 末期逾期 第一次分配  数据存储异常 businessID:"+planList.getBusinessId()+
+                            "  planListId:"+ planList.getPlanListId());
+                }
                 lastPlanVisitPersonlist.get(minIndex).setCounts(lastPlanVisitPersonlist.get(minIndex).getCounts()+1);
 
             }else{//是月还逾期
                 Integer minIndex = getLimitCountIndex(monthPlanVisitersonlist);
+                try{
                 setAutoBusinessStaff(planList.getBusinessId(),planList.getPlanListId(),
                         // yzl 取上门催收人员
                         monthPlanVisitersonlist.get(minIndex).getVisitStaff(),
                         StaffPersonType.VISIT_STAFF.getKey());
+                }catch (Exception e){
+                    e.printStackTrace();
+                    logger.error("自动分配电催 月还逾期 第一次分配  数据存储异常 businessID:"+planList.getBusinessId()+
+                            "  planListId:"+ planList.getPlanListId());
+                }
                 monthPlanVisitersonlist.get(minIndex).setCounts(monthPlanVisitersonlist.get(minIndex).getCounts()+1);
             }
         }
