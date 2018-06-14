@@ -295,13 +295,13 @@ public class RepaymentBizPlanServiceImpl extends BaseServiceImpl<RepaymentBizPla
 	@Override
 	public List<RepaymentSettleListVO> listRepaymentSettleListVOs(String businessId,String afterId, String planId) {
 		List<RepaymentSettleListVO> list = repaymentBizPlanMapper.listRepaymentSettleListVOs(businessId, planId);
-//		for (RepaymentSettleListVO repaymentSettleListVO : list) {
-//			BigDecimal factAmount = repaymentSettleListVO.getFactAmount();
-//			BigDecimal planAmount = repaymentSettleListVO.getPlanAmount();
-//			BigDecimal res = factAmount.subtract(planAmount);
-//			repaymentSettleListVO.setLack(res);
-//		}
-		return list;
+		RepaymentSettleListVO finalVO = list.get(list.size()-1) ;
+		List<RepaymentSettleListVO> currents = new ArrayList<>();
+		RepaymentSettleListVO curr = null ;
+		findCurrentPeriod(finalVO, list, currents, curr);
+		//TODO
+		
+		return repaymentBizPlanMapper.listRepaymentSettleListVOs(businessId, planId);
 	}
 	
 	private void findCurrentPeriod(RepaymentSettleListVO finalVO,List<RepaymentSettleListVO> list,List<RepaymentSettleListVO> currents,RepaymentSettleListVO curr) {

@@ -14,7 +14,6 @@
         <result column="customer_name" property="customerName" />
         <result column="phone_number" property="phoneNumber" />
         <result column="bank_card" property="bankCard" />
-
         <result column="remark" property="remark" />
         <result column="merchant_account" property="merchantAccount" />
         <result column="repay_status" property="repayStatus" />
@@ -27,16 +26,15 @@
         <result column="create_user" property="createUser" />
         <result column="update_time" property="updateTime" />
         <result column="update_user" property="updateUser" />
-        <result column="bank_code" property="bankCode" />
-        <result column="bank_name" property="bankName" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        log_id AS logId, original_business_id AS originalBusinessId, after_id AS afterId, merch_order_id AS merchOrderId, third_order_id AS thirdOrderId, current_amount AS currentAmount, identity_card AS identityCard, customer_name AS customerName, phone_number AS phoneNumber, bank_card AS bankCard, remark, merchant_account AS merchantAccount, repay_status AS repayStatus, settlement_type AS settlementType, bind_platform_id AS bindPlatformId, bool_part_repay AS boolPartRepay, bool_last_repay AS boolLastRepay, plan_total_repay_money AS planTotalRepayMoney, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser,bank_code AS bankCode,bank_name AS bankName
+        log_id AS logId, original_business_id AS originalBusinessId, after_id AS afterId, merch_order_id AS merchOrderId, third_order_id AS thirdOrderId, current_amount AS currentAmount, identity_card AS identityCard, customer_name AS customerName, phone_number AS phoneNumber, bank_card AS bankCard, remark, merchant_account AS merchantAccount, repay_status AS repayStatus, settlement_type AS settlementType, bind_platform_id AS bindPlatformId, bool_part_repay AS boolPartRepay, bool_last_repay AS boolLastRepay, plan_total_repay_money AS planTotalRepayMoney, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
     </sql>
-
-
+    
+    
+    
     
     <select id="selectRepaymentLogList" resultType="com.hongte.alms.base.vo.module.RepaymentLogVO"
             parameterType="com.hongte.alms.base.vo.module.RepaymentLogReq">

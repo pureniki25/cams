@@ -12,8 +12,6 @@ import com.hongte.alms.base.entity.BasicCompany;
 import com.hongte.alms.base.entity.IssueSendOutsideLog;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
-import com.hongte.alms.base.entity.RepaymentProjPlanList;
-import com.hongte.alms.base.entity.RepaymentProjPlanListDetail;
 import com.hongte.alms.base.entity.SysUser;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanItemTypeFeeIdEnum;
@@ -36,8 +34,6 @@ import com.hongte.alms.base.service.BasicCompanyService;
 import com.hongte.alms.base.service.IssueSendOutsideLogService;
 import com.hongte.alms.base.service.RepaymentBizPlanListDetailService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
-import com.hongte.alms.base.service.RepaymentProjPlanListDetailService;
-import com.hongte.alms.base.service.RepaymentProjPlanListService;
 import com.hongte.alms.base.service.SysParameterService;
 import com.hongte.alms.base.vo.module.ApplyDerateListSearchReq;
 import com.hongte.alms.base.vo.module.ApplyDerateVo;
@@ -131,12 +127,7 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
     @Autowired
     @Qualifier("RepaymentBizPlanListService")
     RepaymentBizPlanListService repaymentBizPlanListService;
-    @Autowired
-    @Qualifier("RepaymentProjPlanListService")
-	RepaymentProjPlanListService repaymentProjPlanListService;
-    @Autowired
-    @Qualifier("RepaymentProjPlanListDetailService")
-    RepaymentProjPlanListDetailService repaymentProjPlanListDetailService ;
+    
     @Autowired
     @Qualifier("RepaymentBizPlanListDetailService")
     RepaymentBizPlanListDetailService repaymentBizPlanListDetailService;
@@ -298,66 +289,6 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
         
     }
 
-    private void updateRepayPlan(RepaymentBizPlanList planList,List<ApplyDerateType> newTypes) {
-    	BigDecimal derateAmount = new BigDecimal("0");
-    	for (ApplyDerateType applyDerateType : newTypes) {
-			derateAmount = applyDerateType.getDerateMoney().add(derateAmount);
-		}
-    	planList.setDerateAmount(derateAmount);
-    	planList.updateById();
-    	List<RepaymentProjPlanList> projPlanLists = repaymentProjPlanListService.selectList(new EntityWrapper<RepaymentProjPlanList>().eq("plan_list_id", planList.getPlanListId()));
-    	for (RepaymentProjPlanList repaymentProjPlanList : projPlanLists) {
-    		BigDecimal borrowAmount = repaymentProjPlanList.getTotalBorrowAmount();
-    		if (borrowAmount.compareTo(derateAmount)>0) {
-				repaymentProjPlanList.setDerateAmount(derateAmount);
-				repaymentProjPlanList.updateById();
-				break;
-			}else if (borrowAmount.compareTo(derateAmount)==0) {
-				repaymentProjPlanList.setDerateAmount(derateAmount);
-				repaymentProjPlanList.updateById();
-				break;
-			}else {
-				derateAmount = derateAmount.subtract(borrowAmount);
-				repaymentProjPlanList.setDerateAmount(borrowAmount);
-				repaymentProjPlanList.updateById();
-			}
-		}
-    	
-    	for (ApplyDerateType applyDerateType : newTypes) {
-    		RepaymentBizPlanListDetail detail = repaymentBizPlanListDetailService.selectOne(new EntityWrapper<RepaymentBizPlanListDetail>()
-					.eq("plan_list_id", planList.getPlanListId())
-					.eq("fee_id", applyDerateType.getFeeId()));
-    		BigDecimal derateAmount1 = applyDerateType.getDerateMoney();
-    		if (detail!=null) {
-    			
-    			List<RepaymentProjPlanListDetail> selectList = repaymentProjPlanListDetailService.selectList(
-    					new EntityWrapper<RepaymentProjPlanListDetail>().eq("plan_detail_id", detail.getPlanDetailId()));
-				for (RepaymentProjPlanListDetail repaymentProjPlanListDetail : selectList) {
-					BigDecimal borrowAmount = repaymentProjPlanListDetail.getProjPlanAmount();
-		    		if (borrowAmount.compareTo(derateAmount1)>0) {
-		    			repaymentProjPlanListDetail.setDerateAmount(derateAmount1);
-		    			repaymentProjPlanListDetail.updateById();
-						break;
-					}else if (borrowAmount.compareTo(derateAmount1)==0) {
-						repaymentProjPlanListDetail.setDerateAmount(derateAmount1);
-						repaymentProjPlanListDetail.updateById();
-						break;
-					}else {
-						derateAmount1 = derateAmount1.subtract(borrowAmount);
-						repaymentProjPlanListDetail.setDerateAmount(borrowAmount);
-						repaymentProjPlanListDetail.updateById();
-					}
-				}
-    			
-				detail.setDerateAmount(applyDerateType.getDerateMoney());
-				detail.updateById();
-			}
-		}
-    	
-    	
-    	
-    }
-    
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void saveApplyDerateProcessLog(ProcessLogReq req) throws IllegalAccessException, InstantiationException {

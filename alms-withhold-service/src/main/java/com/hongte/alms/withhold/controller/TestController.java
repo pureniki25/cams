@@ -150,7 +150,7 @@ public class TestController {
 		dto.setIdHolder("何灿");
 		dto.setMobile("13071354045");
 		dto.setTransId(merchOrderId);
-		dto.setTxnAmt(500);
+		dto.setTxnAmt((int)(500));
 		dto.setTransSerialNo(merchOrderId);
 		dto.setTradeDate(String.valueOf(Long.parseLong(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()))));
     	
@@ -275,16 +275,27 @@ public class TestController {
     	dto.setMerchantaccount("10000419568");
     	dto.setOrderid(merchOrderId);
     	dto.setTranstime((int) (System.currentTimeMillis()));
-    	dto.setAmount(1);
+    	dto.setAmount((int)1);
     	dto.setProductname("123");
     	dto.setIdentityid("201806081558011369520");
     	dto.setIdentitytype("5");
     	dto.setCard_top("622280");
     	dto.setCard_last("0140");
-    	dto.setCallbackurl("132");
+    	dto.setCallbackurl("");
     	dto.setUserip("172.0.0.1");
 		Result result = eipRemote.directBindPay(dto);
-		
+		if(result.getData()!=null) {
+				String dataJson = JSONObject.toJSONString(result.getData());
+				Map<String, Object> resultMap = JSONObject.parseObject(dataJson, Map.class);
+				String yborderid = (String) resultMap.get("yborderid");
+				if(yborderid!=null) {
+					System.out.println(true);
+				}else {
+					System.out.println(false);
+				}
+			}else {
+				result.getCodeDesc();
+			}
 		return result;
     }
     

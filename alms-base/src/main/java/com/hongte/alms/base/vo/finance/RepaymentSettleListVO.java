@@ -3,7 +3,6 @@
  */
 package com.hongte.alms.base.vo.finance;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -14,12 +13,7 @@ import com.hongte.alms.common.util.DateUtil;
  * @author 王继光
  * 2018年5月29日 下午4:56:05
  */
-public class RepaymentSettleListVO implements Serializable{
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 2141251720743615058L;
+public class RepaymentSettleListVO {
 	private String afterId ;
 	@JsonFormat(pattern="yyyy-MM-dd")
 	private Date repayDate;
@@ -101,7 +95,13 @@ public class RepaymentSettleListVO implements Serializable{
 		this.planAmount = planAmount;
 	}
 	public BigDecimal getLack() {
-		return this.lack ;
+		int diff = DateUtil.getDiffDays(repayDate, new Date());
+		if (diff>0) {
+			this.lack = this.factAmount.subtract(this.planAmount);
+		}else {
+			this.lack = new BigDecimal(0);
+		}
+		return lack;
 	}
 	public void setLack(BigDecimal lack) {
 		this.lack = lack;
