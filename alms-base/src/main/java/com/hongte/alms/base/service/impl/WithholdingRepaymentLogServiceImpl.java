@@ -43,12 +43,17 @@ public class WithholdingRepaymentLogServiceImpl extends BaseServiceImpl<Withhold
 	      for(RepaymentLogVO vo:list) {
 	    	  if(vo.getXdListId()!=null) {//xdListId不为NULL就说明是信贷的单
 	    		  LoginInfoDto loginInfoDto = loginUserInfoHelper.getUserInfoByUserId(null,vo.getUserName());
-		    	     vo.setUserName(loginInfoDto.getUserName());
+	    		  if(loginInfoDto!=null) {
+	    			  vo.setUserName(loginInfoDto.getUserName());
+	    		  }else {
+	    			  vo.setUserName(vo.getUserName());
+	    		  }
+		    	   
 	    	  }else {
 	    		  LoginInfoDto loginInfoDto = loginUserInfoHelper.getUserInfoByUserId(vo.getUserName(),null);
 	    		  if(loginInfoDto!=null) {
 	    			  vo.setUserName(loginInfoDto.getUserName());
-	    		  }else {
+	    		  }else { 
 	    			  vo.setUserName(vo.getUserName());
 	    		  }
 	    	  }   
