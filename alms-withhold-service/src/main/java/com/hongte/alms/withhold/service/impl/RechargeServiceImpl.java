@@ -335,6 +335,29 @@ public class RechargeServiceImpl implements RechargeService {
 			return remoteResult.getCodeDesc();
 		}
 	}
+	
+	
+	
+	/**
+	 * 获取易宝代扣结果
+	 * 
+	 * @param remoteResult
+	 * @return
+	 */
+	private String getYBResultMsg(com.ht.ussp.core.Result remoteResult) {
+		if(remoteResult.getData()!=null) {
+		String dataJson = JSONObject.toJSONString(remoteResult.getData());
+		Map<String, Object> resultMap = JSONObject.parseObject(dataJson, Map.class);
+		String yborderid = (String) resultMap.get("yborderid");
+			if(yborderid!=null) {
+				return "交易成功";
+			}else {
+				return "交易失败";
+			}
+		}else {
+			return remoteResult.getCodeDesc();
+		}
+	}
 
 	// private Result excuteEipRemote(Integer platformId,Integer failCount,Double
 	// amount,BankCardInfo info,String merchOrderId) {
@@ -719,6 +742,26 @@ public class RechargeServiceImpl implements RechargeService {
 		paramMap.put("merchantaccount", merchantaccount);
 		paramMap.put("orderid", log.getLogId());
 		com.ht.ussp.core.Result result = eipRemote.queryOrder(paramMap);
+		String msg=getYBResultMsg(result);
+		if ("0000".equals(result.getReturnCode()) &&msg!=null&&msg.equals("交易成功")) {
+			log.setUpdateTime(new Date());
+			log.setRepayStatus(1);
+			log.setRemark(result.getMsg());
+			withholdingRepaymentLogService.updateById(log);
+			RepaymentBizPlanList list = repaymentBizPlanListService
+					.selectOne(new EntityWrapper<RepaymentBizPlanList>()
+							.eq("orig_business_id", log.getOriginalBusinessId())
+							.eq("after_id", log.getAfterId()));
+			shareProfit(list, log);
+		
+		} else if (!"0000".equals(result.getReturnCode())) {
+			log.setUpdateTime(new Date());
+			log.setRepayStatus(0);
+			log.setRemark(msg);
+			withholdingRepaymentLogService.updateById(log);
+
+		}
+		
 	}
 
 }

@@ -33,7 +33,6 @@ import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.withhold.service.RechargeService;
 import com.hongte.alms.withhold.service.WithholdingService;
-import com.mysql.cj.core.io.BigDecimalValueFactory;
 
 /**
  * @author czs
@@ -50,7 +49,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 	RepaymentBizPlanListService repaymentBizPlanListService;
 
 	@Autowired
-	@Qualifier("basicBusinessService")
+	@Qualifier("BasicBusinessService")
 	BasicBusinessService basicBusinessService;
 
 	@Autowired

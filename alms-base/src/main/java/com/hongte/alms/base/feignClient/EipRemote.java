@@ -197,5 +197,16 @@ public interface EipRemote {
 	@RequestMapping(value = "/eip/td/repayment/advanceShareProfit", headers = { "app=ALMS",
 	"content-type=application/json" }, method = RequestMethod.POST)
 	Result advanceShareProfit(@RequestBody TdAdvanceShareProfitDTO dto);
+	
+	
+	/**
+	 * 你我金融      7.10.2订单查询
+	 * @param orderNo  标ID
+	 * @return
+	 */
+	@RequestMapping(value = "/eip//niiwoo/org/queryApplyOrder", headers = { "app=ALMS",
+	"content-type=application/json" }, method = RequestMethod.POST)
+	Result queryApplyOrder(@RequestBody Map<String, Object> paramMap);
+	
 
 }
