@@ -265,14 +265,14 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 		Date outputDate = null;// 出款日期
 		ExpenseSettleVO vo = cal(original_business_id, preSettleDate);
 		vo.setPrincipal(BigDecimal.valueOf(needPayPrincipal));//剩余本金;
-		if (bizOutputRecord != null) {
-			outputDate = bizOutputRecord.getFactOutputDate();
-		}else {
-			throw new ServiceRuntimeException("找不到合同记录");
-			//ContractDate=DateUtil.getDate("2018-04-03", "yyyy-MM-dd");
-		}
 		if(ContractDate==null) {
-			ContractDate=outputDate;
+			if (bizOutputRecord != null) {
+				outputDate = bizOutputRecord.getFactOutputDate();
+				ContractDate=outputDate;
+			}else {
+				throw new ServiceRuntimeException("找不到合同记录");
+				//ContractDate=DateUtil.getDate("2018-04-03", "yyyy-MM-dd");
+			}
 		}
 		try {
 
