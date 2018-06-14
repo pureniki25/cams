@@ -227,7 +227,6 @@ public class CollectionTrackLogController {
                 parametertracelog.setCreateTime(log.getCreateTime());
                 parametertracelog.setIsDelete(0);
 
-                SysParameter sysParameter =  sysParameterService.selectById(log.getTrackStatusId());
                 parametertracelog.setStatus(Integer.valueOf(log.getTrackStatusId()));
                 parametertracelog.setStatusName(log.getTrackStatusName());
                 Result<Integer> ret =  collectionRemoteApi.transferOneCollectionLogToXd(parametertracelog);

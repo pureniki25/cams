@@ -19,7 +19,7 @@ import io.swagger.annotations.ApiModelProperty;
  * </p>
  *
  * @author 胡伟骞
- * @since 2018-06-11
+ * @since 2018-06-13
  */
 @ApiModel
 @TableName("tb_tdrepay_recharge_log")
@@ -149,23 +149,23 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 	@ApiModelProperty(required= true,value = "流水合计")
 	private BigDecimal resourceAmount;
     /**
-     * 0：只垫付本息，1：全额垫付
-     */
-	@TableField("advance_type")
-	@ApiModelProperty(required= true,value = "0：只垫付本息，1：全额垫付")
-	private Integer advanceType;
-    /**
      * 当期结清状态 0：未结清,1：已结清（目前一点调还垫付接口时使用）
      */
 	@TableField("is_complete")
 	@ApiModelProperty(required= true,value = "当期结清状态 0：未结清,1：已结清（目前一点调还垫付接口时使用）")
 	private Integer isComplete;
     /**
-     * 标的还款计划列表ID（实还流水ID）
+     * 标的还款计划列表ID
      */
 	@TableField("proj_plan_list_id")
-	@ApiModelProperty(required= true,value = "标的还款计划列表ID（实还流水ID）")
+	@ApiModelProperty(required= true,value = "标的还款计划列表ID")
 	private String projPlanListId;
+    /**
+     * 实还流水ID
+     */
+	@TableField("confirm_log_id")
+	@ApiModelProperty(required= true,value = "实还流水ID")
+	private String confirmLogId;
     /**
      * (代充值资金分发接口参数)订单唯一标识
      */
@@ -398,14 +398,6 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 		this.resourceAmount = resourceAmount;
 	}
 
-	public Integer getAdvanceType() {
-		return advanceType;
-	}
-
-	public void setAdvanceType(Integer advanceType) {
-		this.advanceType = advanceType;
-	}
-
 	public Integer getIsComplete() {
 		return isComplete;
 	}
@@ -420,6 +412,14 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 
 	public void setProjPlanListId(String projPlanListId) {
 		this.projPlanListId = projPlanListId;
+	}
+
+	public String getConfirmLogId() {
+		return confirmLogId;
+	}
+
+	public void setConfirmLogId(String confirmLogId) {
+		this.confirmLogId = confirmLogId;
 	}
 
 	public String getRequestNo() {
@@ -546,9 +546,9 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 			", settleType=" + settleType +
 			", factRepayAmount=" + factRepayAmount +
 			", resourceAmount=" + resourceAmount +
-			", advanceType=" + advanceType +
 			", isComplete=" + isComplete +
 			", projPlanListId=" + projPlanListId +
+			", confirmLogId=" + confirmLogId +
 			", requestNo=" + requestNo +
 			", userIp=" + userIp +
 			", oidPartner=" + oidPartner +

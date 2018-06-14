@@ -2,6 +2,11 @@ package com.hongte.alms.base.dto.compliance;
 
 import java.io.Serializable;
 
+/**
+ * 资金分发详细信息参数DTO
+ * @author 胡伟骞
+ *
+ */
 public class DistributeFundDetailDTO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
