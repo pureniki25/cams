@@ -13,8 +13,7 @@ import com.hongte.alms.base.service.RepaymentProjPlanService;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.annotation.JobHandler;
-
-@JobHandler(value = "CalLateFeeJob")
+@JobHandler(value = "calLateFeeJobHandler")
 @Component
 public class CalLateFeeJob extends IJobHandler {
 	
