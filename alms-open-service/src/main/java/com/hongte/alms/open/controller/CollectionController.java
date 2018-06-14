@@ -44,9 +44,15 @@ import javax.validation.Valid;
 @RequestMapping(value = "/collection", method = RequestMethod.POST)
 @Api(value = "collection", description = "贷后系统  催收 对外接口")
 public class  CollectionController {
-	
+
+
+
 	private Logger logger = LoggerFactory.getLogger(CollectionController.class);
-	
+
+	@Value("${bmApi.apiUrl}")
+	String bmApiUrl;
+
+
 	@Autowired
 	@Qualifier("CollectionStatusService")
 	CollectionStatusService collectionStatusService ;
@@ -151,6 +157,7 @@ public class  CollectionController {
 			return Result.error("500", "businessId 不能为空");
 		}
 		logger.info("businessId:"+businessId);
+		logger.info("bmApiUrl:"+bmApiUrl);
 		//撤销设置贷后跟踪状态为关闭
 		Boolean bl=  collectionStatusService.revokeClosedStatus(businessId);
 
@@ -177,7 +184,7 @@ public class  CollectionController {
 	@ResponseBody
 	@Transactional
 	public Result transferOnePhoneSet(@RequestBody @Valid CarBusinessAfter carBusinessAfter, BindingResult bindingResult){
-
+		logger.info("bmApiUrl:"+bmApiUrl);
 		logger.info("同步电催人员 开始 输入的请求信息：[{}]", JSON.toJSONString(carBusinessAfter));
 		if(bindingResult.hasErrors()){
 			String errorStr = ErroInfoUtil.getErroeInfo(bindingResult);
@@ -202,7 +209,7 @@ public class  CollectionController {
 	@ResponseBody
 	@Transactional
 	public Result transferOneVisitStaffSet(@RequestBody @Valid Collection collection, BindingResult bindingResult){
-
+		logger.info("bmApiUrl:"+bmApiUrl);
 		logger.info("同步催收人员 开始 输入的请求信息：[{}]", JSON.toJSONString(collection));
 		if(bindingResult.hasErrors()){
 			String errorStr = ErroInfoUtil.getErroeInfo(bindingResult);
@@ -227,6 +234,7 @@ public class  CollectionController {
 	@ResponseBody
 	@Transactional
 	public Result transferOneCollectionLog(@RequestBody @Valid Parametertracelog parametertracelog, BindingResult bindingResult){
+		logger.info("bmApiUrl:"+bmApiUrl);
 		logger.info("同步贷后跟踪信息 开始 输入的请求信息：[{}]", JSON.toJSONString(parametertracelog));
 		if(bindingResult.hasErrors()){
 			String errorStr = ErroInfoUtil.getErroeInfo(bindingResult);
@@ -247,7 +255,7 @@ public class  CollectionController {
 	@ResponseBody
 	@Transactional
 	public Result deleteByxdId(@RequestBody Integer xdIndexId){
-
+		logger.info("bmApiUrl:"+bmApiUrl);
 		logger.info("删除贷后跟踪信息 开始，参数：" ,xdIndexId);
 
 		Result ret = collectionRemoteApi.deleteByxdId(xdIndexId);
@@ -265,6 +273,7 @@ public class  CollectionController {
 	@ResponseBody
 	@Transactional
 	public Result transferOneVisitSetToXd(@RequestBody @Valid Collection collection, BindingResult bindingResult) throws Exception {
+		logger.info("bmApiUrl:"+bmApiUrl);
 		logger.info("同步催收人员信息到信贷 开始 输入的请求信息：[{}]", JSON.toJSONString(collection));
 
 		if(bindingResult.hasErrors()){
@@ -313,6 +322,8 @@ public class  CollectionController {
 	@ResponseBody
 	@Transactional
 	public Result transferOnePhoneSetToXd(@RequestBody @Valid CarBusinessAfter carBusinessAfter, BindingResult bindingResult) throws Exception {
+
+		logger.info("bmApiUrl:"+bmApiUrl);
 		logger.info("同步电催人员信息到信贷 开始 输入的请求信息：[{}]", JSON.toJSONString(carBusinessAfter));
 
 		if(bindingResult.hasErrors()){
@@ -366,6 +377,7 @@ public class  CollectionController {
 	@ResponseBody
 	@Transactional
 	public Result<Integer> transferOneCollectionLogToXd(@RequestBody @Valid Parametertracelog parametertracelog, BindingResult bindingResult) throws Exception {
+		logger.info("bmApiUrl:"+bmApiUrl);
 		logger.info("同步贷后跟踪信息到信贷 开始 输入的请求信息：[{}]", JSON.toJSONString(parametertracelog));
 		if(bindingResult.hasErrors()){
 			String errorStr = ErroInfoUtil.getErroeInfo(bindingResult);
@@ -413,7 +425,7 @@ public class  CollectionController {
 	public Result deleteXdCollectionLogById(@RequestBody Integer xdIndex) throws Exception {
 		logger.info("根据信贷ID删除信贷贷后跟踪记录 开始 输入的请求信息：[{}]", xdIndex);
 
-
+		logger.info("bmApiUrl:"+bmApiUrl);
 		RequestData requestData = new RequestData();
 		requestData.setData(JSON.toJSONString(xdIndex));
 		requestData.setMethodName("Collection_DeleteColLog");
