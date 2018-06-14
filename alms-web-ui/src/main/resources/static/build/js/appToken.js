@@ -34,7 +34,7 @@ window.layinit = function (cb) {
             htConfig.openBasePath = htConfig.basePath +"open/";
             htConfig.financeBasePath = htConfig.basePath +"finance/";
             htConfig.withholdBasePath = htConfig.basePath +"withhold/";
-            htConfig.platRepayBasePath = htConfig.basePath +"platRepay/";
+            htConfig.platRepayBasePath = htConfig.basePath +"platrepay/";
             htConfig.uiBasePath = htConfig.uiBasePath;
         }
         //axios 访问前处理token问题
