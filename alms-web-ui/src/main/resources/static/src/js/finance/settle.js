@@ -244,7 +244,7 @@ window.layinit(function (htConfig) {
 
                         }
                     }],
-                    data: [{
+                    data: [/* {
                         "moneyPoolId": "73b90613df4943fa8e09935aa2f25f2c",
                         "repaymentCode": null,
                         "bankAccount": " 陈树华招行",
@@ -277,7 +277,7 @@ window.layinit(function (htConfig) {
                         "remark": null,
                         "summary": null,
                         "status": "完成"
-                    }]
+                    } */]
                 },
                 projRepayment: {
                     col: [],
@@ -317,10 +317,10 @@ window.layinit(function (htConfig) {
                     }, {
                         title: '实际还款金额',
                         key: 'factAmount'
-                    }, {
+                    }, /* {
                         title: '提前结清违约金',
                         key: 'penalty'
-                    }, {
+                    }, */ {
                         title: '备注',
                         key: 'remark'
                     }, {

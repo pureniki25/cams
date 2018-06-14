@@ -34,17 +34,6 @@ public class CalLateFeeJob extends IJobHandler {
 	@Qualifier("RepaymentProjPlanListDetailService")
 	RepaymentProjPlanListDetailService repaymentProjPlanListDetailService;
 
-//	@Scheduled(cron = "0 0 2 * * ?")
-//	public void run() {
-//		try {
-//			
-//			LOG.info("@calLateFee@计算滞纳金--开始[{},{}]");
-//			repaymentProjPlanListService.calLateFee();
-//			LOG.info("@calLateFee@计算滞纳金--结束[{}]");
-//		} catch (Exception e) {
-//			LOG.error("计算逾期费用失败", e);
-//		}
-//	}
 
 	@Override
 	public ReturnT<String> execute(String arg0) throws Exception {
