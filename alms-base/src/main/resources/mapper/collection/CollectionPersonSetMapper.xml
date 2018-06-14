@@ -19,48 +19,30 @@
     </sql>
 
     <select id="getCollectionPersonSettingList" resultType="com.hongte.alms.base.vo.module.CollectionStrategyPersonSettingVo" parameterType="com.hongte.alms.base.vo.module.CollectionStrategyPersonSettingReq">
-        SELECT
-        tb_collection_person_set.col_person_id AS id,
-        corp.areaId,
-        corp.areaName,
-        corp.companyId,
-        corp.companyName,
-        detail.group1Users AS collect1Person,
-        detail.group2Users AS collect2Person
-        FROM
+        select
+        colset.col_person_id as id,
+        colset.area_code as areaId,
+        colset.company_code as companyId,
+        colset.business_type as businessType,
+        (select bcom.area_name from tb_basic_company bcom where bcom.area_id = colset.area_code) as areaName,
+        (select bcom.area_name from tb_basic_company bcom where bcom.area_id = colset.company_code) as companyName,
         (
-        SELECT
-        area.areaId,
-        areaName,
-        company.companyId,
-        company.companyName
-        FROM
-        (
-        (
-        SELECT
-        area_id AS areaId,
-        area_name AS areaName
-        FROM
-        tb_basic_company
-        WHERE
-        area_level = 40
-        ) area
-        INNER JOIN (
-        SELECT
-        area_id AS companyId,
-        area_name AS companyName,
-        area_pid AS companyParentId
-        FROM
-        tb_basic_company
-        WHERE
-        area_level = 60
-        ) company ON area.areaId = company.companyParentId
-        )
-        ) corp
-        LEFT JOIN tb_collection_person_set ON corp.areaId = tb_collection_person_set.area_code
-        AND corp.companyId = tb_collection_person_set.company_code
-        LEFT JOIN (
-        SELECT
+        CASE
+        WHEN (select btype.business_type_name from  tb_basic_business_type btype where btype.business_type_id = colset.business_type) IS NULL THEN
+        '全部'
+        ELSE
+        (select btype.business_type_name from  tb_basic_business_type btype where btype.business_type_id = colset.business_type)
+        END
+        ) AS businessTypeName,
+        detail.group1Users as collect1Person,
+        detail.group2Users as collect2Person,
+        detail.group1UserIds as col1Pids,
+        detail.group2UserIds as col2Pids
+
+        from tb_collection_person_set  colset
+        join  tb_basic_company  areaCom on colset.area_code = areaCom.area_id
+        join  tb_basic_company com on colset.company_code = com.area_id
+        join (SELECT
         col_person_id,
         max(
         CASE team
@@ -72,12 +54,28 @@
         ) group1Users,
         max(
         CASE team
+        WHEN 1 THEN
+        userIds
+        ELSE
+        ''
+        END
+        ) group1UserIds,
+        max(
+        CASE team
         WHEN 2 THEN
         users
         ELSE
         ''
         END
-        ) group2Users
+        ) group2Users,
+        max(
+        CASE team
+        WHEN 2 THEN
+        userIds
+        ELSE
+        ''
+        END
+        ) group2UserIds
         FROM
         (
         SELECT
@@ -87,39 +85,37 @@
         tb_sys_user.user_name
         ORDER BY
         tb_sys_user.user_name
-        ) AS users
+        ) AS users,
+        group_concat(
+        tb_sys_user.user_id
+        ORDER BY
+        tb_sys_user.user_id
+        ) AS userIds
         FROM
         tb_collection_person_set_detail
         INNER JOIN tb_sys_user ON tb_collection_person_set_detail.user_id = tb_sys_user.user_id
-        <!--<where>
-            <foreach collection="userNames" item="item" index="index" separator=" OR ">
-                detail.group1Users like '%${item}%'
-            </foreach>
-        </where>-->
         GROUP BY
         tb_collection_person_set_detail.col_person_id,
         tb_collection_person_set_detail.team
         ) AS a
         GROUP BY
-        a.col_person_id
-        ) AS detail ON tb_collection_person_set.col_person_id = detail.col_person_id
+        a.col_person_id) as detail  on detail.col_person_id = colset.col_person_id
+        -- where  areaCom.area_name = '西南片区' and com.area_name='昆明分公司'  and (detail.group1Users like '%张%'  or detail.group2Users like '%a%' )
 
 
 
         <where>
             <if test="areaId !=null and areaId !=''">
-                and  corp.areaId =#{areaId}
+                and  colset.area_code =#{areaId}
             </if>
             <if test="companyId !=null and companyId !='' ">
-                and  corp.companyId = #{companyId}
+                and  colset.company_code = #{companyId}
             </if>
-            <foreach collection="userNames" item="item" index="index" separator=" OR ">
-                detail.group1Users like '%${item}%' OR detail.group2Users like '%${item}%'
-            </foreach>
+            <if test="userName !=null and userName !='' ">
+                and (detail.group1Users like '%${userName}%'  or detail.group2Users like '%${userName}%' )
+            </if>
         </where>
-        ORDER BY
-        corp.areaId,
-        corp.companyId
+
 
     </select>
 

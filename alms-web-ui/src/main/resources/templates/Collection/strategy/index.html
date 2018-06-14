@@ -70,13 +70,13 @@
 
                      
                         <form-item label="人员：" prop="userName">
-                            <i-input v-model="searchForm.userName" placeholder="多个搜索用“/”隔开" ></i-input>
+                            <i-input v-model="searchForm.userName" placeholder="模糊搜索" ></i-input>
                         </form-item>
 
                 </i-form>
                 </i-col>
                 <i-col span="5">
-                    <button class="layui-btn layui-btn-sm" @click="toLoading" v-if="authValid('search')" style="margin-right:10px" ht-auth="personQuery" >
+                    <button class="layui-btn layui-btn-sm" @click="toLoading"  style="margin-right:10px" ht-auth="personQuery" >
                         <span v-if="!loading">
                             <i class="layui-icon">&#xe615;</i>查询</span>
                         <span v-else>
@@ -91,13 +91,14 @@
             </row>
 
             <!-- 表单Grid，使用layerUI的表格组件 开始 -->
-            <row style="padding: 10px">
+            <row >
                 <i-col span="24">
                     <!-- 使用方法渲染模式 -->
                     <table id="listTable" lay-filter="listTable"></table>
                     <div style="display:none" id="barTools">
                         <!--layui-btn layui-btn-xs-->
-                        <a class="layui-btn layui-btn-normal layui-btn-xs" v-if="authValid('singleSet')" lay-event="userSet" ht-auth="singleSet" >设置</a>
+                        <a class="layui-btn layui-btn-normal layui-btn-xs"  lay-event="userSet"  >设置</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs"  lay-event="delete"  >删除</a>
                     </div>
                 </i-col>
             </row>
@@ -295,7 +296,9 @@
                                collectionGroup2Users: [],
                                companyId: [],
                                areaId:'',
-                               businessType:''
+                               businessType:'',
+                               editFalge:'',
+                               oldBizType:''
                            },
                        collectionGroup1AllUsers: [],
                        collectionGroup2AllUsers: []
@@ -370,11 +373,11 @@
                             , id: 'listTable'
 
                             , cols: [[
-                                {
-                                    field: 'companyId',
-                                    title: '分公司Id',
-                                    align:'center',
-                                },
+//                                {
+//                                    field: 'companyId',
+//                                    title: '分公司Id',
+//                                    align:'center',
+//                                },
 
                                 {
                                     field: 'areaName',
@@ -384,7 +387,12 @@
                                     field: 'companyName',
                                     title: '分公司',
                                     align:'center'
-                                }, {
+                                },{
+                                    field: 'businessTypeName',
+                                    title: '业务类型',
+                                    align:'center',
+                                },
+                                {
                                     field: 'collect1Person',
                                     title: '清算一',
                                     align:'center'
@@ -395,7 +403,7 @@
                                 }, {
                                     fixed: 'right',
                                     title: '操作',
-                                    width: 100,
+                                    width: 120,
                                     align: 'center',
                                     toolbar: '#barTools'
                                 }
@@ -470,22 +478,60 @@
                                 showSingleCompanyCollectionUserSetting(companyCode)
 
                             }
+                            //单个设置
                             if(obj.event === 'userSet'){
                                 self.editSingleCompanyCollectionUserSettingModal = true;
+//                                self.editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup1Users=self.selectedRowInfo.col1Pids;
+//                                self.editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup2Users=self.selectedRowInfo.col2Pids;
+
                                 self.editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup1Users=[];
                                 self.editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup2Users=[];
+
+
+                                self.editCompanyCollectionUser.editCompanyCollectionForm.businessType = self.selectedRowInfo.businessType;
+//                                self.editCompanyCollectionUser.editCompanyCollectionForm.areaId = self.selectedRowInfo.areaId;
+//                                self.editCompanyCollectionUser.editCompanyCollectionForm.comId = self.selectedRowInfo.companyId;
+                                self.editCompanyCollectionUser.editCompanyCollectionForm.editFalge = 1;
+                                self.editCompanyCollectionUser.editCompanyCollectionForm.oldBizType = self.selectedRowInfo.businessType;
                                 var url = basePath + "collectionStrategy/company/getClearingPersons";
                                 axios.get(url)
                                     .then(function (result) {
                                         if (result.data.code == "1") {
-                                            self.editCompanyCollectionUser.collectionGroup1AllUsers = result.data.data.sysUser;
-                                            self.editCompanyCollectionUser.collectionGroup2AllUsers = result.data.data.sysUser;
+                                            self.editCompanyCollectionUser.collectionGroup1AllUsers = result.data.data.sysUser1List;
+                                            self.editCompanyCollectionUser.collectionGroup2AllUsers = result.data.data.sysUser2List;
+                                            self.editCompanyCollectionAssignSet.businessTypes = result.data.data.businessType;
                                             self.editCompanyCollectionUser.editCompanyCollectionForm.areaId = obj.data.areaId;
                                             self.editCompanyCollectionUser.editCompanyCollectionForm.companyId[0] = obj.data.companyId;
-
                                         }
                                     })
                             }
+                            //删除
+                            if(obj.event === 'delete'){
+                                obj.data.id;
+
+
+                                var url = basePath + "collectionStrategy/deletePersonSet?id="+obj.data.id;
+                                $.ajax({
+                                    type: "POST",
+                                    url: url,
+                                    contentType: "application/json; charset=utf-8",
+//                                    data: obj.data.id,
+                                    async: false,
+                                    dataType: "json",
+                                    success: function (data) {
+                                        self.$Modal.success({
+                                            title: '',
+                                            content: '操作成功'
+                                        });
+                                        self.toLoading();
+                                    }
+
+                                });
+
+
+
+                            }
+
                         });
 
                         ////////////////////////////////////////////////////////////////////////////////////
@@ -658,10 +704,11 @@
                     axios.get(url)
                         .then(function (result) {
                             if (result.data.code == "1") {
-                                self.editCompanyCollectionAssignSet.collectionGroup1AllUsers = result.data.data.sysUser;
-                                self.editCompanyCollectionAssignSet.collectionGroup2AllUsers = result.data.data.sysUser;
+                                self.editCompanyCollectionAssignSet.collectionGroup1AllUsers = result.data.data.sysUser1List;
+                                self.editCompanyCollectionAssignSet.collectionGroup2AllUsers = result.data.data.sysUser2List;
                                 self.editCompanyCollectionAssignSet.areaList = result.data.data.areaList;
                                 self.editCompanyCollectionAssignSet.companyId = result.data.data.companyList;
+
                             }
                         })
                 },

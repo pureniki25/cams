@@ -10,16 +10,19 @@ import org.springframework.stereotype.Component;
 import com.hongte.alms.base.service.RepaymentProjPlanListDetailService;
 import com.hongte.alms.base.service.RepaymentProjPlanListService;
 import com.hongte.alms.base.service.RepaymentProjPlanService;
+import com.xxl.job.core.biz.model.ReturnT;
+import com.xxl.job.core.handler.IJobHandler;
+import com.xxl.job.core.handler.annotation.JobHandler;
 
-
+@JobHandler(value = "CalLateFeeJob")
 @Component
-public class CalLateFeeJob {
+public class CalLateFeeJob extends IJobHandler {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(CalLateFeeJob.class);
 	
 	@Autowired
 	@Qualifier("RepaymentProjPlanService")
-	RepaymentProjPlanService  repaymentProjPlanService;
+	RepaymentProjPlanService  repaymentProjPlanService; 
 	
 	
 	@Autowired
@@ -31,16 +34,31 @@ public class CalLateFeeJob {
 	@Qualifier("RepaymentProjPlanListDetailService")
 	RepaymentProjPlanListDetailService repaymentProjPlanListDetailService;
 
-	@Scheduled(cron = "0 0 2 * * ?")
-	public void run() {
+//	@Scheduled(cron = "0 0 2 * * ?")
+//	public void run() {
+//		try {
+//			
+//			LOG.info("@calLateFee@计算滞纳金--开始[{},{}]");
+//			repaymentProjPlanListService.calLateFee();
+//			LOG.info("@calLateFee@计算滞纳金--结束[{}]");
+//		} catch (Exception e) {
+//			LOG.error("计算逾期费用失败", e);
+//		}
+//	}
+
+	@Override
+	public ReturnT<String> execute(String arg0) throws Exception {
 		try {
-			
-			LOG.info("@calLateFee@计算滞纳金--开始[{},{}]");
-			repaymentProjPlanListService.calLateFee();
-			LOG.info("@calLateFee@计算滞纳金--结束[{}]");
-		} catch (Exception e) {
-			LOG.error("计算逾期费用失败", e);
-		}
+		
+		LOG.info("@calLateFee@计算滞纳金--开始[{},{}]");
+		repaymentProjPlanListService.calLateFee();
+		LOG.info("@calLateFee@计算滞纳金--结束[{}]");
+		return SUCCESS;
+	} catch (Exception e) {
+		LOG.error("计算逾期费用失败", e);
+		return FAIL;
+	}
+		
 	}
 	
 }

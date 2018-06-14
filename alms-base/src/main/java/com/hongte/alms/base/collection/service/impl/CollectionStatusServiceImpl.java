@@ -858,15 +858,37 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
         for(int i=0;i<phonePersons.size();i++){
             String personName = phonePersons.get(i);
             boolean followFlage = false;
-            for(CollectionStatusCountDto dto :list){
-                if(dto.getPhoneStaff().equals(personName)){
-                    followFlage = true;
-                    break;
+            if(personName == null){
+                break;
+            }
+
+
+
+            for(CollectionStatusCountDto dto :list) {
+
+                switch (pType) {
+                    case PHONE_STAFF:
+                        if(dto.getPhoneStaff() == null){
+                            continue;
+                        }
+                        if (dto.getPhoneStaff().equals(personName)) {
+                            followFlage = true;
+                            break;
+                        }
+                    case VISIT_STAFF:
+                        if(dto.getVisitStaff() == null){
+                            continue;
+                        }
+                        if (dto.getVisitStaff().equals(personName)) {
+                            followFlage = true;
+                            break;
+                        }
                 }
             }
             if(!followFlage){
                 CollectionStatusCountDto dto = new CollectionStatusCountDto();
                 dto.setCounts(0);
+
                 switch (pType){
                     case PHONE_STAFF:
                         dto.setPhoneStaff(personName);
@@ -874,6 +896,9 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                     case VISIT_STAFF:
                         dto.setVisitStaff(personName);
                         break;
+                    default:
+                            break;
+
 
                 }
 

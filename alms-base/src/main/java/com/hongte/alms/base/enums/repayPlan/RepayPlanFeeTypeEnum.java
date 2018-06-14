@@ -21,15 +21,20 @@ public enum RepayPlanFeeTypeEnum implements IEnum {
     OVER_DUE_AMONT_ONLINE(60,"线上滞纳金","2e646c87-5721-11e8-8a00-0242ac110002",5),
     OVER_DUE_AMONT_UNDERLINE(60,"线下滞纳金","3131c075-5721-11e8-8a00-0242ac110002",5),
     PENALTY_AMONT(70,"违约金","79069922-e13a-4229-8656-2a1e19b44879",5)
-    ,PRINCIPAL_PENALTY(70,"本金违约金","bff1558f-5a9f-4f7c-87c9-90322fd09080",5)  //UUID 为随机生成
-    ,SUB_COMPANY_PENALTY(70,"月收服务费违约金","60e4c310-165d-4b59-beb1-66b878a51c48",5)  //UUID 为随机生成
-    ,PLAT_PENALTY(70,"平台服务费违约金","1192f59f-e5ad-4773-b785-8c41b43a4fa6",5)   // UUID 为随机生成
+    ,PRINCIPAL_PENALTY(70,"本金违约金","9883ee39-4448-11e8-b4f8-0242ac110003",5)  //uuid与信贷 固定费用id 一致
+    ,SUB_COMPANY_PENALTY(70,"分公司月收服务费违约金","9e0a6fc1-4448-11e8-b4f8-0242ac110003",5)  //uuid与信贷 固定费用id 一致
+    ,PLAT_PENALTY(70,"平台服务费违约金","a0b666c2-4448-11e8-b4f8-0242ac110003",5)   // uuid与信贷 固定费用id 一致
     ,AGENCY_FEE(80,"中介费","fe27638a-91a8-4555-920e-9c6a535e7781",4),
     DEPOSIT_FEE(90,"押金类费用","3aeef26a-9685-4148-98cb-fa3f88181c67",4)
     ,RUSH_RECEIVABLES(100,"冲应收","d5596127-530f-4083-95c5-01e5a75635aa",6)
     ,REBATE(110,"返点","b8c5c29f-dd2c-4a7c-8520-e1e8eb130021",110)  //UUID为随机生成
 
     ;
+
+//    9883ee39-4448-11e8-b4f8-0242ac110003  提前结清本金违约金
+//9e0a6fc1-4448-11e8-b4f8-0242ac110003  提前结清分公司服务费违约金
+//    a0b666c2-4448-11e8-b4f8-0242ac110003  提前结清平台服务费违约金
+
 
     //110：返点（返点都是不线上分账的）
 
