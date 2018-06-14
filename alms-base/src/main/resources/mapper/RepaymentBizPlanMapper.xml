@@ -84,6 +84,7 @@
 		t.remark,
 		t.afterId,
 		t.repayDate,
+		t.status,
 		t.item10,
 		t.item20,
 		t.item30,
@@ -101,6 +102,7 @@
 			pl.remark as remark,
 			pl.after_id AS afterId,
 			pl.due_date AS repayDate,
+			pl.current_status as status,
 			( SELECT IFNULL( sum( plan_amount ), 0 ) FROM tb_repayment_biz_plan_list_detail WHERE plan_list_id = pl.plan_list_id AND plan_item_type = 10 ) AS item10,
 			( SELECT IFNULL( sum( plan_amount ), 0 ) FROM tb_repayment_biz_plan_list_detail WHERE plan_list_id = pl.plan_list_id AND plan_item_type = 20 ) AS item20,
 			( SELECT IFNULL( sum( plan_amount ), 0 ) FROM tb_repayment_biz_plan_list_detail WHERE plan_list_id = pl.plan_list_id AND plan_item_type = 30 ) AS item30,
@@ -118,7 +120,7 @@
 			AND	p.plan_id = #{planId}
 			</if>
 		ORDER BY
-			pl.after_id) AS t
+			pl.due_date) AS t
 	</select>
 
 

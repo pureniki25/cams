@@ -205,7 +205,11 @@ public class CollectionTrackLogController {
                 planList.getAfterId();
                 planList.getBusinessId();
                 Parametertracelog parametertracelog = new Parametertracelog();
-                parametertracelog.setId(log.getXdIndexId());
+                if(log.getTrackLogId()!=null){
+                    parametertracelog.setId(log.getXdIndexId());
+                }else{
+                    parametertracelog.setId(0);
+                }
                 parametertracelog.setCarBusinessId(planList.getBusinessId());
                 parametertracelog.setCarBusinessAfterId( planList.getAfterId());
                 parametertracelog.setTranceContent(log.getContent());
@@ -229,6 +233,7 @@ public class CollectionTrackLogController {
 
                 parametertracelog.setStatus(Integer.valueOf(log.getTrackStatusId()));
                 parametertracelog.setStatusName(log.getTrackStatusName());
+
                 Result<Integer> ret =  collectionRemoteApi.transferOneCollectionLogToXd(parametertracelog);
 
                 if(ret == null || !ret.getCode().equals("1")){
@@ -236,8 +241,8 @@ public class CollectionTrackLogController {
                     if(ret!=null){
                         retStr =ret.getMsg();
                     }
-                    logger.error("将贷后跟踪记录同步到信贷，失败： trackLog："+ JSON.toJSONString(log) +"   失败原因："+ retStr);
-                    return Result.error("500","将贷后跟踪记录同步到信贷");
+                    logger.error("将贷后跟踪记录同步到信贷，失败： trackLog："+ JSON.toJSONString(parametertracelog) +"   失败原因："+ retStr);
+//                    return Result.error("500","将贷后跟踪记录同步到信贷");
                 }else{
                     log.setXdIndexId(ret.getData());
                     collectionTrackLogService.insertOrUpdate(log);
