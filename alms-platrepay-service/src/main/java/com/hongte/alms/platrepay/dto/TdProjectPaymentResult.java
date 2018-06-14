@@ -3,6 +3,12 @@ package com.hongte.alms.platrepay.dto;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * 团贷网标的还款信息（应还）
+ * 
+ * @author 胡伟骞
+ *
+ */
 public class TdProjectPaymentResult implements Serializable {
 
 	private static final long serialVersionUID = 1L;

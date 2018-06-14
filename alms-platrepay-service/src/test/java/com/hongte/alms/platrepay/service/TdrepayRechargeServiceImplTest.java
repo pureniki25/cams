@@ -30,7 +30,6 @@ public class TdrepayRechargeServiceImplTest {
 	@Test
 	public void testSaveTdrepayRechargeInfo() {
 		TdrepayRechargeInfoVO infoVO = new TdrepayRechargeInfoVO();
-		infoVO.setAdvanceType(1);
 		infoVO.setProjectId("a252b2a9-3141-4ead-a800-e4834cd051f5");
 		infoVO.setAssetType(1);
 		infoVO.setOrigBusinessId("aaaaa");

@@ -3,6 +3,11 @@ package com.hongte.alms.base.dto.compliance;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * 调用 eip 平台资金分发接口参数DTO
+ * @author 胡伟骞
+ *
+ */
 public class DistributeFundDTO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
