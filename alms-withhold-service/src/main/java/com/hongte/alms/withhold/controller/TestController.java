@@ -150,7 +150,7 @@ public class TestController {
 		dto.setIdHolder("何灿");
 		dto.setMobile("13071354045");
 		dto.setTransId(merchOrderId);
-		dto.setTxnAmt(Double.valueOf(500));
+		dto.setTxnAmt(500);
 		dto.setTransSerialNo(merchOrderId);
 		dto.setTradeDate(String.valueOf(Long.parseLong(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()))));
     	
@@ -275,7 +275,7 @@ public class TestController {
     	dto.setMerchantaccount("10000419568");
     	dto.setOrderid(merchOrderId);
     	dto.setTranstime((int) (System.currentTimeMillis()));
-    	dto.setAmount(1.0);
+    	dto.setAmount(1);
     	dto.setProductname("123");
     	dto.setIdentityid("201806081558011369520");
     	dto.setIdentitytype("5");
