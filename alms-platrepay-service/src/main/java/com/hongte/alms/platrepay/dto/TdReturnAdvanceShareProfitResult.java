@@ -3,6 +3,11 @@ package com.hongte.alms.platrepay.dto;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * 团贷网标的还垫付信息（实还）
+ * @author 胡伟骞
+ *
+ */
 public class TdReturnAdvanceShareProfitResult implements Serializable {
 
 	private static final long serialVersionUID = 1L;

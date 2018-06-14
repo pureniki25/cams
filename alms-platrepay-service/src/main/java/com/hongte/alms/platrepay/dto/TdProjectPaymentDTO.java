@@ -3,6 +3,11 @@ package com.hongte.alms.platrepay.dto;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
+/**
+ * 标的还垫付信息每一期的详细信息
+ * @author 胡伟骞
+ *
+ */
 public class TdProjectPaymentDTO implements Serializable {
 
 	private static final long serialVersionUID = 1L;

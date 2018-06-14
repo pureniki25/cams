@@ -12,12 +12,15 @@ import com.baomidou.mybatisplus.annotations.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
+import javax.validation.constraints.NotNull;
+
 /**
  * <p>
  * 
  * </p>
  *
- * @author 胡伟骞
+ * @author 曾坤
  * @since 2018-05-15
  */
 @ApiModel
@@ -28,32 +31,48 @@ public class Parametertracelog extends Model<Parametertracelog> {
 
 	@TableId(value="ID", type= IdType.AUTO)
 	@ApiModelProperty(required= true,value = "")
+	@NotNull(message = "信贷跟踪记录ID(id)不能为空")
 	private Integer id;
 	@TableField("Car_Business_Id")
 	@ApiModelProperty(required= true,value = "")
+	@NotNull(message = "业务ID(carBusinessId)不能为空")
 	private String carBusinessId;
 	@TableField("Car_Business_After_Id")
 	@ApiModelProperty(required= true,value = "")
+	@NotNull(message = "还款计划afterID(carBusinessAfterId)不能为空")
 	private String carBusinessAfterId;
     /**
      * [跟踪记录内容]
      */
 	@TableField("Trance_Content")
 	@ApiModelProperty(required= true,value = "[跟踪记录内容]")
+	@NotNull(message = "跟踪记录内容(tranceContent)不能为空")
 	private String tranceContent;
 	@TableField("Trance_Name")
 	@ApiModelProperty(required= true,value = "")
+	@NotNull(message = "记录者信贷用户ID(tranceName)不能为空")
 	private String tranceName;
 	@TableField("Trance_Date")
 	@ApiModelProperty(required= true,value = "")
 	@JSONField(format="yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+	@NotNull(message = "记录时间(tranceDate)不能为空")
 	private Date tranceDate;
     /**
      * 状态
      */
 	@ApiModelProperty(required= true,value = "状态")
+	@NotNull(message = "状态(status)不能为空")
 	private Integer status;
+
+	/**
+	 * 状态名称
+	 */
+	@ApiModelProperty(required= true,value = "状态名称")
+	@NotNull(message = "状态名称(statusName)不能为空")
+	private String statusName;
+
+
     /**
      * 贷后跟踪状态
      */
@@ -220,5 +239,13 @@ public class Parametertracelog extends Model<Parametertracelog> {
 			", isDelete=" + isDelete +
 			", isTransmissionPlatform=" + isTransmissionPlatform +
 			"}";
+	}
+
+	public String getStatusName() {
+		return statusName;
+	}
+
+	public void setStatusName(String statusName) {
+		this.statusName = statusName;
 	}
 }

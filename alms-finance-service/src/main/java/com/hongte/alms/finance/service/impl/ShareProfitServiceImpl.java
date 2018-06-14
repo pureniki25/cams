@@ -632,7 +632,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			logger.info("还款来源{}金额={}",resource.getRepayAmount());
 			/*每笔还款来源按比例分配金额到标的*/
 			divideMoney(repayAmount, planDto.get());
-			
+			planDto.get().getBizPlanListDtos().get(0).getRepaymentBizPlanList().setFactRepayDate(resource.getRepayDate());
 			BigDecimal surplus = new BigDecimal("0");
 			for (RepaymentProjPlanDto projPlanDto : planDto.get().getProjPlanDtos()) {
 				BigDecimal divideAmount = projPlanDto.getDivideAmount().add(surplus);
