@@ -2,6 +2,7 @@ package com.hongte.alms.core.controller;
 
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -205,7 +206,7 @@ public class CollectionTrackLogController {
                 planList.getAfterId();
                 planList.getBusinessId();
                 Parametertracelog parametertracelog = new Parametertracelog();
-                if(log.getTrackLogId()!=null){
+                if(log.getXdIndexId()!=null){
                     parametertracelog.setId(log.getXdIndexId());
                 }else{
                     parametertracelog.setId(0);
@@ -215,15 +216,15 @@ public class CollectionTrackLogController {
                 parametertracelog.setTranceContent(log.getContent());
 
                 LoginInfoDto loginInfoDto = loginUserInfoHelper.getUserInfoByUserId(log.getRecorderUser(),null);
-                if(loginInfoDto == null){
+                if(loginInfoDto == null || loginInfoDto.getBmUserId()==null){
                     parametertracelog.setTranceName("admin");
                 }else{
                     parametertracelog.setTranceName(loginInfoDto.getBmUserId());
                 }
 
-                parametertracelog.setTranceDate(log.getRecordDate());
+                parametertracelog.setTranceDate(new Date());
                 LoginInfoDto creatUDto = loginUserInfoHelper.getUserInfoByUserId(log.getCreateUser(),null);
-                if(creatUDto == null){
+                if(creatUDto == null||creatUDto.getBmUserId()==null){
                     parametertracelog.setCreateUser("admin");
                 }else{
                     parametertracelog.setCreateUser(creatUDto.getBmUserId());
@@ -235,6 +236,8 @@ public class CollectionTrackLogController {
                 parametertracelog.setStatusName(log.getTrackStatusName());
 
                 Result<Integer> ret =  collectionRemoteApi.transferOneCollectionLogToXd(parametertracelog);
+
+//                logger.info(JSON.toJSONString(parametertracelog));
 
                 if(ret == null || !ret.getCode().equals("1")){
                     String retStr = "ret为空";
