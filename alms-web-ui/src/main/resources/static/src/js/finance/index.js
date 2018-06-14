@@ -386,7 +386,7 @@ window.layinit(function (htConfig) {
             },
             revokeConfirm(p) {
 
-                app.$Model.confirm({
+                app.$Modal.confirm({
                     content:'是否确认取消还款?',
                     onOk(){
                         axios.get(fpath + 'finance/revokeConfirm', {
