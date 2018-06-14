@@ -32,7 +32,7 @@ public class StaffInfoXinDaiSyncJob  {
     @Qualifier("SysJobConfigService")
     private SysJobConfigService sysJobConfigService;
 
-    @Scheduled(cron = "0 0 4 * * ?")
+//    @Scheduled(cron = "0 0 4 * * ?")
 //    @Scheduled(cron = "*/5 * * * * ?")
     public void TransferCollectionTransfer() throws JobExecutionException {
 
@@ -58,7 +58,7 @@ public class StaffInfoXinDaiSyncJob  {
     }
 
 
-    @Scheduled(cron = "0 0 4 * * ?")
+//    @Scheduled(cron = "0 0 4 * * ?")
 //    @Scheduled(cron = "*/5 * * * * ?")
     public void execute() throws JobExecutionException {
 
