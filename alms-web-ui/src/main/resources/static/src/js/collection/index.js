@@ -407,12 +407,12 @@ window.layinit(function(htConfig){
                                 buttons.push(
                                     {
                                         "name": "贷后跟踪记录", click: function (e, currentItem) {
-                                        if (currentItem.statusName == '逾期') {
+                                        // if (currentItem.statusName == '逾期') {
                                             var url = "/collectionUI/staffTrackRecordUI?businessId=" + currentItem.businessId + "&crpId=" + currentItem.crpId
                                             showOneLineOprLayer(url, "贷后跟踪记录");
-                                        } else {
-                                            vm.$Modal.error({content: "逾期的业务才能添加贷后跟踪记录！"})
-                                        }
+                                        // } else {
+                                        //     vm.$Modal.error({content: "逾期的业务才能添加贷后跟踪记录！"})
+                                        // }
 
                                     }
                                     }

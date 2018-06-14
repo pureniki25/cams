@@ -162,7 +162,7 @@ window.layinit(function (htConfig) {
                     align:'center'
                 }
             ]], //设置表头
-            url:basePath + 'collectionTrackLog/selectCollectionTrackLogPage?rbpId='+crpId,
+            url:basePath + 'collectionTrackLog/selectCollectionTrackLogPage?businessId='+businessId,
             //method: 'post' //如果无需自定义HTTP类型，可不加该参数
             //request: {} //如果无需自定义请求参数，可不加该参数
             //response: {} //如果无需自定义数据响应名称，可不加该参数
