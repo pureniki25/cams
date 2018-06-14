@@ -385,27 +385,35 @@ window.layinit(function (htConfig) {
                 app.search()
             },
             revokeConfirm(p) {
-                axios.get(fpath + 'finance/revokeConfirm', {
-                        params: {
-                            businessId: p.businessId,
-                            afterId: p.afterId
-                        }
-                    })
-                    .then(function (res) {
-                        if (res.data.code == '1') {
-                            app.$Message.success({
-                                content: res.data.msg
-                            })
-                            app.search()
-                        } else {
-                            app.$Message.error({
-                                content: res.data.msg
-                            })
-                        }
-                    })
-                    .catch(function (err) {
 
-                    })
+                app.$Model.confirm({
+                    content:'是否确认取消还款?',
+                    onOk(){
+                        axios.get(fpath + 'finance/revokeConfirm', {
+                            params: {
+                                businessId: p.businessId,
+                                afterId: p.afterId
+                            }
+                        })
+                        .then(function (res) {
+                            if (res.data.code == '1') {
+                                app.$Message.success({
+                                    content: res.data.msg
+                                })
+                                app.search()
+                            } else {
+                                app.$Message.error({
+                                    content: res.data.msg
+                                })
+                            }
+                        })
+                        .catch(function (err) {
+                            console.log(err);
+                        })
+                    }
+                })
+
+                
             }
         },
         created: function () {
