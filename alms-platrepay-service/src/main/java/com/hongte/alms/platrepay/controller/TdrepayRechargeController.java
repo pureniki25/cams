@@ -101,8 +101,8 @@ public class TdrepayRechargeController {
 		if (vo.getRechargeAmount() == null) {
 			return Result.error(INVALID_PARAM_CODE, "rechargeAmount" + INVALID_PARAM_DESC);
 		}
-		if (vo.getAdvanceType() == null) {
-			return Result.error(INVALID_PARAM_CODE, "advanceType" + INVALID_PARAM_DESC);
+		if (vo.getConfirmLogId() == null) {
+			return Result.error(INVALID_PARAM_CODE, "confirmLogId" + INVALID_PARAM_DESC);
 		}
 		if (vo.getIsComplete() == null) {
 			return Result.error(INVALID_PARAM_CODE, "isComplete" + INVALID_PARAM_DESC);
@@ -111,7 +111,7 @@ public class TdrepayRechargeController {
 			return Result.error(INVALID_PARAM_CODE, "detailList" + INVALID_PARAM_DESC);
 		}
 
-		if (!StringUtil.isEmpty(vo.getProjPlanListId())) {
+		/*if (!StringUtil.isEmpty(vo.getProjPlanListId())) {
 			int count = tdrepayRechargeLogService.selectCount(
 					new EntityWrapper<TdrepayRechargeLog>().eq("proj_plan_list_id", vo.getProjPlanListId()));
 			if (count > 0) {
@@ -123,7 +123,7 @@ public class TdrepayRechargeController {
 			if (count > 0) {
 				return Result.error(INVALID_PARAM_CODE, "标ID：" + vo.getProjectId() + "，期次：" + vo.getPeriod() + "，重复推送！");
 			}
-		}
+		}*/
 
 		try {
 			tdrepayRechargeService.saveTdrepayRechargeInfo(vo);
