@@ -507,7 +507,7 @@ window.layinit(function (htConfig) {
                     type: 2,
                     title: '手动匹配流水',
                     content: [url],
-                    area: ['80%', '90%'],
+                    area: ['95%', '95%'],
                     success: function (layero, index) {
                         curIndex = index;
                     }
