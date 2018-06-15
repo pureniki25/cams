@@ -38,12 +38,21 @@ public class RepaymentSettleListVO implements Serializable{
 	private String remark ;
 	private String status ;
 	public Integer getRepayYear() {
+		if (repayDate==null) {
+			return null;
+		}
 		return DateUtil.getYear(repayDate);
 	}
 	public Integer getRepayMonth() {
+		if (repayDate==null) {
+			return null;
+		}
 		return DateUtil.getMonth(repayDate);
 	}
 	public Integer getRepayDay() {
+		if (repayDate==null) {
+			return null;
+		}
 		return DateUtil.getDay(repayDate);
 	}
 	public String getAfterId() {

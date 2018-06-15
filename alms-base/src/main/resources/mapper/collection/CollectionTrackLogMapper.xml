@@ -51,7 +51,7 @@
             and  log.rbp_id = #{rbpId}
         </if>
         <if test="businessId !=null and businessId !='' ">
-            and  pList.orig_business_id = #{businessId}
+            and  pList.business_id = #{businessId}
         </if>
         ORDER BY log.record_date DESC,log.record_date DESC
     </select>

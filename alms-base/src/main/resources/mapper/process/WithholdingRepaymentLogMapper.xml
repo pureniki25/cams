@@ -53,7 +53,8 @@ select repay.log_id as logId,repay.original_business_id as originalBusinessId ,r
 	repay.create_time as createTime,
 	repay.repay_status as repayStatus,
 	repay.remark,
-	user.user_name as userName
+	repay.create_user as userName,
+	repay.xd_list_id as xdListId
 	
 	
 

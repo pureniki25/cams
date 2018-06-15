@@ -14,7 +14,7 @@ public class RepaymentLogVO {
     private static final long serialVersionUID = 1L;
 
 
-
+    private String xdListId;
     private String logId;
     @Excel(name = "代扣人", orderNum = "9",  isImportField = "true_st")
 	private String userName;
@@ -72,6 +72,14 @@ public class RepaymentLogVO {
     
 	
 
+
+	public String getXdListId() {
+		return xdListId;
+	}
+
+	public void setXdListId(String xdListId) {
+		this.xdListId = xdListId;
+	}
 
 	public String getCountByBusinessIdAndSuccess() {
 		return countByBusinessIdAndSuccess;

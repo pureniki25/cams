@@ -2,6 +2,7 @@ package com.hongte.alms.core.controller;
 
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -205,21 +206,25 @@ public class CollectionTrackLogController {
                 planList.getAfterId();
                 planList.getBusinessId();
                 Parametertracelog parametertracelog = new Parametertracelog();
-                parametertracelog.setId(log.getXdIndexId());
+                if(log.getXdIndexId()!=null){
+                    parametertracelog.setId(log.getXdIndexId());
+                }else{
+                    parametertracelog.setId(0);
+                }
                 parametertracelog.setCarBusinessId(planList.getBusinessId());
                 parametertracelog.setCarBusinessAfterId( planList.getAfterId());
                 parametertracelog.setTranceContent(log.getContent());
 
                 LoginInfoDto loginInfoDto = loginUserInfoHelper.getUserInfoByUserId(log.getRecorderUser(),null);
-                if(loginInfoDto == null){
+                if(loginInfoDto == null || loginInfoDto.getBmUserId()==null){
                     parametertracelog.setTranceName("admin");
                 }else{
                     parametertracelog.setTranceName(loginInfoDto.getBmUserId());
                 }
 
-                parametertracelog.setTranceDate(log.getRecordDate());
+                parametertracelog.setTranceDate(new Date());
                 LoginInfoDto creatUDto = loginUserInfoHelper.getUserInfoByUserId(log.getCreateUser(),null);
-                if(creatUDto == null){
+                if(creatUDto == null||creatUDto.getBmUserId()==null){
                     parametertracelog.setCreateUser("admin");
                 }else{
                     parametertracelog.setCreateUser(creatUDto.getBmUserId());
@@ -229,15 +234,18 @@ public class CollectionTrackLogController {
 
                 parametertracelog.setStatus(Integer.valueOf(log.getTrackStatusId()));
                 parametertracelog.setStatusName(log.getTrackStatusName());
+
                 Result<Integer> ret =  collectionRemoteApi.transferOneCollectionLogToXd(parametertracelog);
+
+//                logger.info(JSON.toJSONString(parametertracelog));
 
                 if(ret == null || !ret.getCode().equals("1")){
                     String retStr = "ret为空";
                     if(ret!=null){
                         retStr =ret.getMsg();
                     }
-                    logger.error("将贷后跟踪记录同步到信贷，失败： trackLog："+ JSON.toJSONString(log) +"   失败原因："+ retStr);
-                    return Result.error("500","将贷后跟踪记录同步到信贷");
+                    logger.error("将贷后跟踪记录同步到信贷，失败： trackLog："+ JSON.toJSONString(parametertracelog) +"   失败原因："+ retStr);
+//                    return Result.error("500","将贷后跟踪记录同步到信贷");
                 }else{
                     log.setXdIndexId(ret.getData());
                     collectionTrackLogService.insertOrUpdate(log);
