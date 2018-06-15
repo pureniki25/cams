@@ -40,6 +40,10 @@ public class AfterLoanRepaymentServiceImpl implements AfterLoanRepaymentService 
             if(repaymentBizPlanList.getSrcType()!=null && repaymentBizPlanList.getSrcType()==1){
                 return withHoldingClient.repayAssignBank(repaymentBizPlanList.getOrigBusinessId(),afterId,bankCard);
             }else {
+            	   Result result=new Result();
+                   result.setCode("500");
+                   result.setMsg("该业务暂时不支持代扣！");
+                   return result;
 //                return rechargeService.recharge(repaymentBizPlanList.getOrigBusinessId(),afterId,bankCard,null,null,rechargeService.getMerchOrderId(),null);
             }
         }
