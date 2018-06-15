@@ -68,7 +68,6 @@ import com.hongte.alms.base.service.RepaymentResourceService;
 import com.hongte.alms.base.service.WithholdingRepaymentLogService;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.common.util.DateUtil;
-import com.hongte.alms.finance.service.AfterShareProfitService;
 import com.hongte.alms.finance.service.ShareProfitService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 
@@ -129,9 +128,6 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	@Qualifier("WithholdingRepaymentLogService")
 	WithholdingRepaymentLogService withholdingRepaymentLogService;
 	
-	@Autowired
-	@Qualifier("AfterShareProfitService")
-	AfterShareProfitService afterShareProfitService;
 
 	private ThreadLocal<String> businessId = new ThreadLocal<String>();
 	private ThreadLocal<String> orgBusinessId = new ThreadLocal<String>();
