@@ -20,11 +20,15 @@
         <result column="create_user_name" property="createUserName" />
         <result column="update_time" property="updateTime" />
         <result column="update_user" property="updateUser" />
+        <result column="period" property="period" />
+        <result column="repay_source" property="repaySource" />
+        <result column="surplus_use_ref_id" property="surplusUseReFid" />
+        
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        confirm_log_id AS confirmLogId, business_id AS businessId,fact_amount as factAmount,surplus_ref_id as surplusRefId ,surplus_amount as surplusAmount,repay_date as repayDate,create_user_name as createUserName, org_business_id AS orgBusinessId, after_id AS afterId, index, can_revoke AS canRevoke, proj_plan_json AS projPlanJson, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
+        period AS period, repay_source AS repaySource,surplus_use_ref_id AS surplusUseReFid,confirm_log_id AS confirmLogId, business_id AS businessId,fact_amount as factAmount,surplus_ref_id as surplusRefId ,surplus_amount as surplusAmount,repay_date as repayDate,create_user_name as createUserName, org_business_id AS orgBusinessId, after_id AS afterId, index, can_revoke AS canRevoke, proj_plan_json AS projPlanJson, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
     </sql>
 
 </mapper>

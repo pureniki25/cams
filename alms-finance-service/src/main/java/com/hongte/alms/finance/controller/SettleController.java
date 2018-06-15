@@ -3,6 +3,7 @@
  */
 package com.hongte.alms.finance.controller;
 
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -16,9 +17,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
+import com.hongte.alms.base.service.RepaymentBizPlanListDetailService;
+import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.RepaymentBizPlanService;
 import com.hongte.alms.base.vo.finance.RepaymentSettleListVO;
 import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.util.DateUtil;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -38,6 +45,14 @@ public class SettleController {
 	@Qualifier("RepaymentBizPlanService")
 	RepaymentBizPlanService repaymentBizPlanService ;
 	
+	@Qualifier("RepaymentBizPlanListService")
+	@Autowired
+	RepaymentBizPlanListService repaymentBizPlanListService ;
+	
+	@Autowired
+	@Qualifier("RepaymentBizPlanListDetailService")
+	RepaymentBizPlanListDetailService repaymentBizPlanListDetailService;
+	
 	@GetMapping(value="/listRepaymentSettleListVOs")
 	@ApiOperation(value="还款计划")
 	public Result<List<RepaymentSettleListVO>> listRepaymentSettleListVOs(String businessId,String afterId,String planId) {
@@ -50,6 +65,23 @@ public class SettleController {
 			return result;
 		} catch (Exception e) {
 			logger.error("@listRepaymentSettleListVOs@还款计划--[{}]", e);
+			e.printStackTrace();
+			return Result.error("500", "系统异常:还款计划失败");
+		}
+	}
+	
+	@GetMapping(value="/settleInfo")
+	@ApiOperation(value="结清应还信息")
+	public Result<JSONObject> settleInfo(String businessId,String afterId,String planId) {
+		try {
+			logger.info("@settleInfo@结清应还信息--开始[{}]", businessId);
+			Result<JSONObject> result = null;
+			JSONObject res = new JSONObject();
+			List<RepaymentSettleListVO> list = repaymentBizPlanService.listRepaymentSettleListVOs(businessId,afterId, planId);
+			RepaymentBizPlanList curPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", businessId).eq("after_id", afterId));
+			return null ;
+		} catch (Exception e) {
+			logger.error("@settleInfo@结清应还信息--结束[{}]", e);
 			e.printStackTrace();
 			return Result.error("500", "系统异常:还款计划失败");
 		}
