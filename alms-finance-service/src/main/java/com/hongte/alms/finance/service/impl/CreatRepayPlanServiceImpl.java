@@ -1248,7 +1248,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 repaymentProjPlan.setOffLineOutOverDueRateType(projInfoReq.getOffLineOutOverDueRateType());
                 repaymentProjPlan.setOffLineInOverDueRate(projInfoReq.getOffLineInOverDueRate());
                 repaymentProjPlan.setOffLineInOverDueRateType(projInfoReq.getOffLineInOverDueRateType());
-
+                repaymentProjPlan.setQueryFullSuccessDate(projInfoReq.getQueryFullsuccessDate());
 
 
 

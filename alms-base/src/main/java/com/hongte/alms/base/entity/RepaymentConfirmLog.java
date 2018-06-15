@@ -50,7 +50,7 @@ public class RepaymentConfirmLog extends Model<RepaymentConfirmLog> {
 	private String afterId;
 	
 	@TableField("period")
-	private String period;
+	private Integer period;
 	
 	@TableField("repay_source")
 	private Integer repaySource ;
@@ -90,6 +90,8 @@ public class RepaymentConfirmLog extends Model<RepaymentConfirmLog> {
 	@TableField("surplus_ref_id")
 	@ApiModelProperty(required= true,value = "结余表关联id")
 	private String surplusRefId;
+	@TableField("surplus_use_ref_id")
+	private String surplusUseRefId;
 	
     /**
      * 创建时间
@@ -306,14 +308,14 @@ public class RepaymentConfirmLog extends Model<RepaymentConfirmLog> {
 	/**
 	 * @return the period
 	 */
-	public String getPeriod() {
+	public Integer getPeriod() {
 		return period;
 	}
 
 	/**
 	 * @param period the period to set
 	 */
-	public void setPeriod(String period) {
+	public void setPeriod(Integer period) {
 		this.period = period;
 	}
 
@@ -329,5 +331,19 @@ public class RepaymentConfirmLog extends Model<RepaymentConfirmLog> {
 	 */
 	public void setRepaySource(Integer repaySource) {
 		this.repaySource = repaySource;
+	}
+
+	/**
+	 * @return the surplusUseRefId
+	 */
+	public String getSurplusUseRefId() {
+		return surplusUseRefId;
+	}
+
+	/**
+	 * @param surplusUseRefId the surplusUseRefId to set
+	 */
+	public void setSurplusUseRefId(String surplusUseRefId) {
+		this.surplusUseRefId = surplusUseRefId;
 	}
 }
