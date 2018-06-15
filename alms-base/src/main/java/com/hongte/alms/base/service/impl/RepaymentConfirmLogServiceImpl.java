@@ -132,6 +132,14 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 			}
 		}
 		
+		if (log.getSurplusUseRefId()!=null) {
+			AccountantOverRepayLog accountantOverRepayLog = accountantOverRepayLogMapper
+					.selectById(log.getSurplusRefId());
+			if (accountantOverRepayLog != null) {
+				accountantOverRepayLog.deleteById();
+			}
+		}
+		
 		for (RepaymentProjFactRepay factRepay : factRepays) {
 			RepaymentResource resource = new RepaymentResource() ;
 			resource.setResourceId(factRepay.getRepaySourceId());
