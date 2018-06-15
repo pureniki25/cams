@@ -119,8 +119,7 @@ public class CarServiceImpl  implements CarService {
 
 	@Override
 	public List<CarVo> selectCarList(CarReq carReq){
-		String userId = loginUserInfoHelper.getUserId();
-		carReq.setUserId(userId);
+	
 		  List<CarVo> list=carMapper.selectCarPage(carReq);
 		  return list;
 	}
