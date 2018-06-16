@@ -21,9 +21,9 @@ import com.hongte.alms.common.util.ExportFileUtil;
 @RequestMapping("/finance")
 public class FinanceController {
 
-	@RequestMapping("/index")
-	public String index() {
-		return "/finance/index" ;
+	@RequestMapping("/financeOrder")
+	public String financeOrder() {
+		return "/finance/financeOrder" ;
 	}
 
 	@RequestMapping("/manualMatchBankSatements")

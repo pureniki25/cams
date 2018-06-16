@@ -896,9 +896,9 @@ public class FinanceController {
 		List<BasicCompany> company_list = basicCompanyService.selectList(new EntityWrapper<BasicCompany>().eq("area_level",AreaLevel.COMPANY_LEVEL.getKey()));
 		CompanySortByPINYINUtil.sortByPINYIN(company_list);
 		retMap.put("company",(JSONArray) JSON.toJSON(company_list,JsonUtil.getMapping()));
-//		//业务类型
-//		List<BasicBusinessType> btype_list =  basicBusinessTypeService.selectList(new EntityWrapper<BasicBusinessType>().orderBy("business_type_id"));
-//		retMap.put("businessType",(JSONArray) JSON.toJSON(btype_list, JsonUtil.getMapping()));
+		//业务类型
+		List<BasicBusinessType> btype_list =  basicBusinessTypeService.selectList(new EntityWrapper<BasicBusinessType>().orderBy("business_type_id"));
+		retMap.put("businessType",(JSONArray) JSON.toJSON(btype_list, JsonUtil.getMapping()));
 
 		logger.info("@getOrderSetSearchInfo@查找财务人员跟单设置查询相关信息--结束[{}]", JSON.toJSONString(retMap));
 		return Result.success(retMap);

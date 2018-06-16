@@ -1,16 +1,18 @@
-let app
-let table
-var basePath
+/**
+ * 财务跟单管理 js
+ * @author zgh
+ */
+var layer, table, basePath, app;
 
 //从后台获取下拉框数据
 var getSelectsData = function () {
-
     //取区域列表
     axios.get(basePath + 'finance/getOrderSetSearchInfo')
         .then(function (res) {
             if (res.data.code == "1") {
                 app.areaList = res.data.data.area;
                 app.companyList = res.data.data.company;
+                app.businessTypeList = res.data.data.businessType;
             } else {
                 app.$Modal.error({content: '操作失败，消息：' + res.data.msg});
             }
@@ -75,6 +77,7 @@ window.layinit(function (htConfig) {
 })
 
 let data = {
+    loading:false,
     searchForm:{
         userId:'',
         userName:'',
@@ -92,11 +95,59 @@ let data = {
         areaList:[]
     },
     areaList:[],
-    companyList:[]
+    companyList:[],
+    businessTypeList:[],
+    ruleValidate:setSearchFormValidate, //表单验证
 
 }
 
+//查询表单验证
+var setSearchFormValidate = {
+    derateMoneyBegin: [
+        {pattern:/^[0-9]+(.[0-9]{1,2})?$/,   message: '请填写不超过两位小数的数字', trigger: 'blur'},
+        {
+            validator: function (rule, value, callback, source, options) {
+                if(app.searchForm.derateMoneyBegin!=""&& app.searchForm.derateMoneyEnd!=""){
+                    if (parseInt(app.searchForm.derateMoneyBegin) > parseInt(app.searchForm.derateMoneyEnd)) {
+                        callback(new Error('起始值大于结束值'));
+                    } else {
+                        app.searchForm.derateMoneyEnd = app.searchForm.derateMoneyEnd;
+                        callback();//校验通过
+                    }
+                }else{
+                    app.searchForm.derateMoneyEnd =app.searchForm.derateMoneyEnd;
+                    callback();
+                }
+
+            }, trigger: 'blur'
+        }
+    ],
+    derateMoneyEnd: [
+        {pattern:/^[0-9]+(.[0-9]{1,2})?$/,   message: '请填写不超过两位小数的数字', trigger: 'blur'},
+        {
+            validator: function (rule, value, callback, source, options) {
+                if(app.searchForm.derateMoneyBegin!=""&& app.searchForm.derateMoneyEnd!=""){
+                    if (parseInt(app.searchForm.derateMoneyBegin) > parseInt(app.searchForm.derateMoneyEnd)) {
+                        callback(new Error('起始值大于结束值'));
+                    } else {
+                        callback();//校验通过
+                    }
+                }else{
+                    callback();
+                }
+
+            }, trigger: 'blur'
+        }
+    ]
+};
+
+
+
+
+
+
 let methods = {
+    toLoading:function(){},
     search:function(){
         app.tableReload()
     },
@@ -115,7 +166,7 @@ let methods = {
     },
     tableReload:function(){
         let p = {}
-        Object.keys(app.schForm).forEach(function(val,i){
+        Object.keys(app.schForm).forEach(function(val, i){
             console.log(val)
             if(app.schForm[val]!=''){
                 p[val]=app.schForm[val]
