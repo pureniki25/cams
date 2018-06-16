@@ -101,6 +101,13 @@
 				<i-span v-else>设置中...</i-span>
 			</i-button>
 		</div>
+		<div style="margin-top:10px; margin-left:10px">
+			<i-lable>自动代扣：</i-lable>
+			<i-button :loading="autoRepayLoading" @click="autoRepay">
+				<i-span v-if="autoRepayLoading">代扣</i-span>
+				<i-span v-else>代扣中...</i-span>
+			</i-button>
+		</div>
 	</div>
 
 		<!-- <div style="margin-top:10px; margin-left:10px">
