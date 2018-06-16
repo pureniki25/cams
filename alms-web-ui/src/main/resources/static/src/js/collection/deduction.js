@@ -265,6 +265,7 @@ var layer;
                     vm.platformId=result.data.data.platformId;
                     vm.platformId=5;
                     vm.isBankFlag=true;
+                    
                  
                     if(result.data.data.underLineOverDueMoney>0){
                      	vm.ajax_data.planOverDueMoney=result.data.data.underLineOverDueMoney;
@@ -273,7 +274,7 @@ var layer;
                     }
                  	vm.ajax_data.underLineFactOverDueMoney=vm.ajax_data.planOverDueMoney;
 //                    searchRepayLog();
-                 
+                 	doOperate();
                       if(vm.ajax_data.strType==2){
                       	url=basePath+ "RepaymentLogController/searchAfterRepayLog?businessId="+vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId;
                       }else{

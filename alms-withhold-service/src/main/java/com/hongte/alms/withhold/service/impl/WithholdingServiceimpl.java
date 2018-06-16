@@ -83,7 +83,18 @@ public class WithholdingServiceimpl implements WithholdingService {
 			}
 		}
 	}
-
+	@Override
+	public void appWithholding(RepaymentBizPlanList pList) {
+		List<SysParameter> repayStatusList = sysParameterService.selectList(new EntityWrapper<SysParameter>()
+				.eq("param_type", SysParameterEnums.REPAY_DAYS.getKey()).eq("status", 1).orderBy("row_Index"));
+		Integer days = Integer.valueOf(repayStatusList.get(0).getParamValue());
+		if (rechargeService.EnsureAutoPayIsEnabled(pList, days)) {
+			autoRepayPerList(pList);
+		} else {
+			//doto 失败
+		}
+		
+	}
 	/*
 	 * 每一期自动代扣
 	 */
@@ -92,8 +103,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 
 		BasicBusiness basic = basicBusinessService
 				.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", pList.getOrigBusinessId()));
-		CustomerInfoDto customerDto = rechargeService.getCustomerInfo(basic.getCustomerIdentifyCard());
-		List<BankCardInfo> bankCardInfos = customerDto.getList();
+		List<BankCardInfo> bankCardInfos = rechargeService.getCustomerInfo(basic.getCustomerIdentifyCard());
 		BankCardInfo bankCardInfo = rechargeService.getBankCardInfo(bankCardInfos);
 		BankCardInfo ThirtyCardInfo = rechargeService.getThirtyPlatformInfo(bankCardInfos);
 
@@ -597,5 +607,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 				return result;
 		
 	}
+
+
 
 }
