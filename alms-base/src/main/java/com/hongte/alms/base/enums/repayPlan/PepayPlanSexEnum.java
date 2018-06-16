@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * @date: 2018/5/4
  * 性别枚举
  */
-public enum PeayPlanSexEnum implements IEnum {
+public enum PepayPlanSexEnum implements IEnum {
 
 
     MAN(1,"男"),
@@ -18,7 +18,7 @@ public enum PeayPlanSexEnum implements IEnum {
     private Integer value;
     private String desc;
 
-    PeayPlanSexEnum(final int value, final String desc) {
+    PepayPlanSexEnum(final int value, final String desc) {
         this.value = value;
         this.desc = desc;
     }
@@ -37,7 +37,7 @@ public enum PeayPlanSexEnum implements IEnum {
 
 
     public static String nameOf(Integer key){
-        for(PeayPlanSexEnum d : PeayPlanSexEnum.values()){
+        for(PepayPlanSexEnum d : PepayPlanSexEnum.values()){
             if(d.value.equals(key)){
                 return d.desc;
             }
@@ -46,8 +46,8 @@ public enum PeayPlanSexEnum implements IEnum {
 
     }
 
-    public static PeayPlanSexEnum getByKey(Integer key){
-        for(PeayPlanSexEnum d : PeayPlanSexEnum.values()){
+    public static PepayPlanSexEnum getByKey(Integer key){
+        for(PepayPlanSexEnum d : PepayPlanSexEnum.values()){
             if(d.value.equals(key)){
                 return d;
             }
@@ -57,7 +57,7 @@ public enum PeayPlanSexEnum implements IEnum {
     }
 
     public static Integer keyOf(String name){
-        for(PeayPlanSexEnum d : PeayPlanSexEnum.values()){
+        for(PepayPlanSexEnum d : PepayPlanSexEnum.values()){
             if(d.desc.equals(name)){
                 return d.value;
             }

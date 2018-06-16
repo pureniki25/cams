@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * @date: 2018/5/4
  * 还款计划标额外费率信息计算方式枚举
  */
-public enum PeayPlanProjExtRatCalEnum implements IEnum {
+public enum PepayPlanProjExtRatCalEnum implements IEnum {
   //  费用计算方式:1.借款金额*费率值；2剩余本金*费率值;3,1*费率值
 
     BY_BORROW_MONEY(1,"借款金额*费率值"),
@@ -18,7 +18,7 @@ public enum PeayPlanProjExtRatCalEnum implements IEnum {
     private Integer value;
     private String desc;
 
-    PeayPlanProjExtRatCalEnum(final int value, final String desc) {
+    PepayPlanProjExtRatCalEnum(final int value, final String desc) {
         this.value = value;
         this.desc = desc;
     }
@@ -37,7 +37,7 @@ public enum PeayPlanProjExtRatCalEnum implements IEnum {
 
 
     public static String nameOf(Integer key){
-        for(PeayPlanProjExtRatCalEnum d : PeayPlanProjExtRatCalEnum.values()){
+        for(PepayPlanProjExtRatCalEnum d : PepayPlanProjExtRatCalEnum.values()){
             if(d.value.equals(key)){
                 return d.desc;
             }
@@ -46,8 +46,8 @@ public enum PeayPlanProjExtRatCalEnum implements IEnum {
 
     }
 
-    public static PeayPlanProjExtRatCalEnum getByKey(Integer key){
-        for(PeayPlanProjExtRatCalEnum d : PeayPlanProjExtRatCalEnum.values()){
+    public static PepayPlanProjExtRatCalEnum getByKey(Integer key){
+        for(PepayPlanProjExtRatCalEnum d : PepayPlanProjExtRatCalEnum.values()){
             if(d.value.equals(key)){
                 return d;
             }
@@ -57,7 +57,7 @@ public enum PeayPlanProjExtRatCalEnum implements IEnum {
     }
 
     public static Integer keyOf(String name){
-        for(PeayPlanProjExtRatCalEnum d : PeayPlanProjExtRatCalEnum.values()){
+        for(PepayPlanProjExtRatCalEnum d : PepayPlanProjExtRatCalEnum.values()){
             if(d.desc.equals(name)){
                 return d.value;
             }

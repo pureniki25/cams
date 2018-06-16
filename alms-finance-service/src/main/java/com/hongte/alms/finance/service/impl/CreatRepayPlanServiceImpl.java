@@ -717,7 +717,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                         projExtRate.setRateName(RepayPlanFeeTypeEnum.SUB_COMPANY_PENALTY.getDesc());
                         //2倍的月收分公司服务费
                         projExtRate.setRateValue(comPenalty.getFeeValue().multiply(new BigDecimal("2")));
-                        projExtRate.setCalcWay(PeayPlanProjExtRatCalEnum.RATE.getValue());//计算方式
+                        projExtRate.setCalcWay(PepayPlanProjExtRatCalEnum.RATE.getValue());//计算方式
                         projExtRate.setFeeId(RepayPlanFeeTypeEnum.SUB_COMPANY_PENALTY.getUuid()); //费率FeeId
                         projExtRate.setFeeName(RepayPlanFeeTypeEnum.SUB_COMPANY_PENALTY.getDesc()); //费率名
                         projExtRate.setBeginPeroid(1);
@@ -751,7 +751,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                         projExtRate.setRateName(RepayPlanFeeTypeEnum.PLAT_PENALTY.getDesc());
                         //2倍的月收平台服务费
                         projExtRate.setRateValue(comPenalty.getFeeValue().multiply(new BigDecimal("2")));
-                        projExtRate.setCalcWay(PeayPlanProjExtRatCalEnum.RATE.getValue());//计算方式
+                        projExtRate.setCalcWay(PepayPlanProjExtRatCalEnum.RATE.getValue());//计算方式
                         projExtRate.setFeeId(RepayPlanFeeTypeEnum.PLAT_PENALTY.getUuid()); //费率FeeId
                         projExtRate.setFeeName(RepayPlanFeeTypeEnum.PLAT_PENALTY.getDesc()); //费率名
                         projExtRate.setBeginPeroid(1);

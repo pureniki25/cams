@@ -707,7 +707,7 @@ public class CreatRepayPlanServiceImplTest {
         req1.setOnLineOverDueRateType(1); // 线上逾期滞纳金费率类型，1：年利率，2：月利率，3：日利率
 
         req1.setRepayType(RepayPlanRepayIniCalcWayEnum.PRINCIPAL_LAST.getKey()); // 还款方式：1：到期还本息，2：每月付息到期还本，5：等额本息，9：分期还本付息,11:等本等息
-        req1.setSex(PeayPlanSexEnum.MAN.getValue()); // 性别
+        req1.setSex(PepayPlanSexEnum.MAN.getValue()); // 性别
         req1.setCredTypeId(1); // 证件类型
         req1.setBirthday(DateUtil.getDateTime("1987-5-1")); // 生日
         req1.setRiskAssessment("风险评估意见"); // 风险评估意见
