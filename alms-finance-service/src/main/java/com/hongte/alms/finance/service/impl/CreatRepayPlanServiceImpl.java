@@ -1017,7 +1017,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 BigDecimal totalPricipal = new BigDecimal("0");
 
                 for(PrincipleReq principleReq:list){
-                    totalPricipal.add(principleReq.getPrinciple());
+                    totalPricipal =  totalPricipal.add(principleReq.getPrinciple());
                 }
 
                 if(!(totalPricipal.compareTo(projInfoReq.getFullBorrowMoney())== 0)){

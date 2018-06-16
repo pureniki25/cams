@@ -8,8 +8,8 @@ import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.enums.BooleanEnum;
 import com.hongte.alms.base.enums.UserTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.*;
-import com.hongte.alms.base.mapper.BasicBizCustomerMapper;
-import com.hongte.alms.base.mapper.BasicBusinessMapper;
+import com.hongte.alms.base.service.BasicBizCustomerService;
+import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.finance.FinanceServiceApplication;
 import com.hongte.alms.base.RepayPlan.req.*;
@@ -28,7 +28,6 @@ import java.util.*;
 
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertNull;
-import static junit.framework.TestCase.assertTrue;
 
 /**
  * @author zengkun
@@ -47,10 +46,20 @@ public class CreatRepayPlanServiceImplTest {
     @Autowired
     @Qualifier("CreatRepayPlanService")
     CreatRepayPlanService creatRepayPlanService;
+
     @Autowired
-    BasicBusinessMapper basicBusinessMapper ;
+    @Qualifier("BasicBusinessService")
+    BasicBusinessService basicBusinessService;
+
     @Autowired
-	BasicBizCustomerMapper basicBizCustomerMapper ;
+    @Qualifier("BasicBizCustomerService")
+    BasicBizCustomerService basicBizCustomerService;
+
+
+//    @Autowired
+////    BasicBusinessMapper basicBusinessMapper ;
+//    @Autowired
+//	BasicBizCustomerMapper basicBizCustomerMapper ;
 
 //    @Test
     public void creatRepayPlanTest() throws Exception {
@@ -614,7 +623,7 @@ public class CreatRepayPlanServiceImplTest {
     private BusinessBasicInfoReq  creatBusinessBasicInfoReq(String businessId){
 
         BusinessBasicInfoReq  businessBasicInfoReq = new BusinessBasicInfoReq();
-       BasicBusiness business =  basicBusinessMapper.selectById(businessId);
+       BasicBusiness business =  basicBusinessService.selectById(businessId);
         businessBasicInfoReq.setBusinessId(business.getBusinessId());
         businessBasicInfoReq.setOrgBusinessId(business.getBusinessId());
         businessBasicInfoReq.setInputTime(business.getCreateTime());
@@ -761,7 +770,7 @@ public class CreatRepayPlanServiceImplTest {
     	System.out.println(dto);
     }
 
-
+    //
     private void  testJson(){
 //        {
 //            "bizCusInfoReqs": [{
@@ -1254,5 +1263,506 @@ public class CreatRepayPlanServiceImplTest {
 
     }
 
+    //有分期还本付息数据
+    private void testJson1(){
+//        {
+//            "bizCusInfoReqs": [{
+//            "businessLicence": "",
+//                    "companyLegalPerson": "",
+//                    "customerId": "38e2702b-2b64-48e7-b296-3f0a55fadfa4",
+//                    "customerName": "徐友灵",
+//                    "customerType": "个人",
+//                    "identifyCard": "420702198111296306",
+//                    "isReceiptAccount": 0,
+//                    "ismainCustomer": 0,
+//                    "ismainlandResident": 1,
+//                    "legalPersonIdentityCard": "",
+//                    "phoneNumber": "13800001111",
+//                    "registerProvince": "",
+//                    "unifiedCode": ""
+//        }, {
+//            "businessLicence": "",
+//                    "companyLegalPerson": "",
+//                    "customerId": "d6149112-98d1-4433-a890-2ba53b561103",
+//                    "customerName": "胡阳秋",
+//                    "customerType": "个人",
+//                    "identifyCard": "330701197009205794",
+//                    "isReceiptAccount": 0,
+//                    "ismainCustomer": 0,
+//                    "ismainlandResident": 1,
+//                    "legalPersonIdentityCard": "",
+//                    "phoneNumber": "13800008888",
+//                    "registerProvince": "",
+//                    "unifiedCode": ""
+//        }, {
+//            "businessLicence": "",
+//                    "companyLegalPerson": "",
+//                    "customerId": "1c6f0089-41fb-4229-83c5-18c199774a0c",
+//                    "customerName": "郭禄",
+//                    "customerType": "个人",
+//                    "identifyCard": "140624199808290019",
+//                    "isReceiptAccount": 0,
+//                    "ismainCustomer": 1,
+//                    "ismainlandResident": 1,
+//                    "legalPersonIdentityCard": "",
+//                    "phoneNumber": "13800007952",
+//                    "registerProvince": "",
+//                    "unifiedCode": ""
+//        }],
+//            "businessBasicInfoReq": {
+//            "borrowLimit": 36,
+//                    "borrowMoney": 50000.00,
+//                    "borrowRate": 11.0000,
+//                    "borrowRateUnit": 1,
+//                    "businessCtype": "业务信用贷用信",
+//                    "businessId": "TSYD1012018060403",
+//                    "businessStype": "",
+//                    "businessType": 25,
+//                    "companyId": "东莞总部",
+//                    "companyName": "东莞总部",
+//                    "customerId": "1c6f0089-41fb-4229-83c5-18c199774a0c",
+//                    "customerName": "郭禄",
+//                    "districtId": "30f1c8d6-d087-4e72-915f-7b463cb4d740",
+//                    "districtName": "华南片区",
+//                    "inputTime": 1528134383000,
+//                    "isRenewBusiness": 0,
+//                    "issueSplitType": 1,
+//                    "operatorId": "xyd_xdzy",
+//                    "operatorName": "xyd_xdzy",
+//                    "orgBusinessId": "TSYD1012018060403",
+//                    "originalName": "xyd_xdzy",
+//                    "originalUserid": "xyd_xdzy",
+//                    "repaymentTypeId": 5,
+//                    "sourceType": 0
+//        },
+//            "projInfoReqs": [{
+//            "customerId": "1c6f0089-41fb-4229-83c5-18c199774a0c",
+//                    "borrowLimit":3,
+//                    "telNo": "15999795945",
+//                    "overRate":0.01,
+//                    "monthPrincipalAmount":1000.00,
+//                    "address": "广东省东莞市南城区111",
+//                    "agencyAmount": 0.00,
+//                    "agencyId": "3AFAC66B-BBE5-4E5D-A70B-5955090D79F9",
+//                    "agencyRate": 0.0000,
+//                    "amount": 10000.00,
+//                    "aviCreditGrantingAmount": 55693872392.0000,
+//                    "bankAccountNo": "6217000830000123038",
+//                    "bankCity": "东莞市",
+//                    "bankProvice": "广东省",
+//                    "bankType": 4,
+//                    "beginTime": 1528025833000,
+//                    "birthday": 375840000000,
+//                    "borrowAmount": 7300.00,
+//                    "borrowerRate": 73.0000,
+//                    "branchCompanyId": "9BD2E3E7-CB56-4749-B9CE-2BA581AD8203",
+//                    "controlDesc": "",
+//                    "cooperativeTdComAmount": 0.0000,
+//                    "cooperativeTdComRate": 0.00,
+//                    "cooperativeTdComUserId": "",
+//                    "credTypeId": 0,
+//                    "creditorId": "00000000-0000-0000-0000-000000000000",
+//                    "depositAmount": 0.00,
+//                    "enterpriseUserId": "E74D6597-C46A-435B-969D-72AFAAD3E661",
+//                    "extendFlag": 0,
+//                    "freedAmount": 0.00,
+//                    "freedRate": 0.0000,
+//                    "fullBorrowMoney": 10000.00,
+//                    "fundUse": "用于购物消费",
+//                    "guaranteeAmount": 900.00,
+//                    "guaranteeRate": 4.0000,
+//                    "identityCard": "420702198111296306",
+//                    "imageUrl": "upload/Issue/52c1f608-2fec-4b3a-9b1e-b3c0d8f73062/18060406262402.jpg",
+//                    "isHaveCar": 0,
+//                    "isHaveHouse": 0,
+//                    "issueOrder": 3,
+//                    "lowerUnit": 50.00,
+//                    "marriage": "未婚",
+//                    "masterIssueId": "e58ee63d-6ea4-48a3-bbbb-1b6a46989ebf",
+//                    "nickName": "fdefad45578e",
+//                    "offLineInOverDueRate": 0.1,
+//                    "offLineInOverDueRateType": 2,
+//                    "offLineOutOverDueRate": 0.2,
+//                    "offLineOutOverDueRateType": 2,
+//                    "onLineOverDueRate": 0.06,
+//                    "onLineOverDueRateType": 5,
+//                    "openBankName": "东莞分行",
+//                    "orgIssueId": "",
+//                    "periodMonth": 3,
+//                    "plateType": 1,
+//                    "principleReqList": [{
+//                "period":1,
+//                        "principle":2000
+//            },{
+//                "period":2,
+//                        "principle":2000
+//            },{
+//                "period":3,
+//                        "principle":6000
+//            }
+//					],
+//            "projCarInfos": [],
+//            "projFeeInfos": [{
+//                "accountStatus": 0,
+//                        "chargeType": 0,
+//                        "feeDetailReqList": [],
+//                "feeItemId": "424c2302-e6a0-439d-bc57-9a5182005e91",
+//                        "feeItemName": "业主信用贷返点",
+//                        "feeType": 110,
+//                        "feeTypeName": "返点",
+//                        "feeValue": 0.00,
+//                        "isTermRange": 0,
+//                        "repaymentFlag": 1
+//            }, {
+//                "accountStatus": 30,
+//                        "chargeType": 1,
+//                        "feeDetailReqList": [],
+//                "feeItemId": "72f5c955-7a80-4758-a159-779f0e714042",
+//                        "feeItemName": "平台费",
+//                        "feeType": 50,
+//                        "feeTypeName": "团贷网平台费用",
+//                        "feeValue": 900.00,
+//                        "isTermRange": 0,
+//                        "repaymentFlag": 1
+//            }, {
+//                "accountStatus": 20,
+//                        "chargeType": 1,
+//                        "feeDetailReqList": [],
+//                "feeItemId": "74a99887-137e-4e1a-b47b-0003d89d4dd9",
+//                        "feeItemName": "月收分公司服务费",
+//                        "feeType": 30,
+//                        "feeTypeName": "分公司费用",
+//                        "feeValue": 2.00,
+//                        "isTermRange": 0,
+//                        "repaymentFlag": 2
+//            }, {
+//                "accountStatus": 20,
+//                        "chargeType": 2,
+//                        "feeDetailReqList": [],
+//                "feeItemId": "b163247d-41b7-40db-9b59-7c9337a5c659",
+//                        "feeItemName": "分公司服务费",
+//                        "feeType": 30,
+//                        "feeTypeName": "分公司费用",
+//                        "feeValue": 1400.00,
+//                        "isTermRange": 0,
+//                        "repaymentFlag": 1
+//            }, {
+//                "accountStatus": 40,
+//                        "chargeType": 2,
+//                        "feeDetailReqList": [],
+//                "feeItemId": "db58adad-cb24-4b69-abba-26eba989a23f",
+//                        "feeItemName": "担保费",
+//                        "feeType": 40,
+//                        "feeTypeName": "担保公司费用",
+//                        "feeValue": 400.00,
+//                        "isTermRange": 0,
+//                        "repaymentFlag": 1
+//            }],
+//            "projHouseInfos": [],
+//            "projectFrom": 0,
+//                    "projectId": "52c1f699-2fec-4b3a-219b1e-b3c0d8f733062",
+//                    "projectType": 37,
+//                    "queryAuditDate": 1528137111000,
+//                    "queryFullsuccessDate": 1528112233000,
+//                    "rate": 11.00,
+//                    "rateUnitType": 1,
+//                    "realName": "徐友灵",
+//                    "repayType": 9,
+//                    "repaymentAssure": "111",
+//                    "repaymentType": 5,
+//                    "resultContent": "状态说明:0;平台审核时间:2018/6/4 18:31:51;审核结果:",
+//                    "riskAssessment": "111",
+//                    "sex": 2,
+//                    "statusFlag": "4",
+//                    "subCompanyCharge": 1400.00,
+//                    "subCompanyRate": 14.0000,
+//                    "tdStatus": 2,
+//                    "tdUserId": "1446DDC6-9675-46BB-8998-9F11A1E91534",
+//                    "title": "【东莞市】【TDW-YXD20180604004】",
+//                    "titleImageId": "e663d4c7-ba38-4421-a49c-0d5c8cb0cd9b",
+//                    "tuandaiAmount": 900.00,
+//                    "tuandaiRate": 9.0000,
+//                    "userTypeId": 1
+//        }, {
+//            "customerId": "1c6f0089-41fb-4229-83c5-18c199774a0c",
+//                    "borrowLimit":12,
+//                    "telNo": "15999795945",
+//                    "overRate":0.01,
+//                    "monthPrincipalAmount":1000.00,
+//                    "address": "广东省东莞市南城区111",
+//                    "agencyAmount": 0.00,
+//                    "agencyId": "3AFAC66B-BBE5-4E5D-A70B-5955090D79F9",
+//                    "agencyRate": 0.0000,
+//                    "amount": 20000.00,
+//                    "aviCreditGrantingAmount": 55693872392.0000,
+//                    "bankAccountNo": "6227001291082482737",
+//                    "bankCity": "东莞市",
+//                    "bankProvice": "广东省",
+//                    "bankType": 4,
+//                    "beginTime": 1528112295000,
+//                    "birthday": 22636800000,
+//                    "borrowAmount": 14600.00,
+//                    "borrowerRate": 73.0000,
+//                    "branchCompanyId": "9BD2E3E7-CB56-4749-B9CE-2BA581AD8203",
+//                    "controlDesc": "",
+//                    "cooperativeTdComAmount": 0.0000,
+//                    "cooperativeTdComRate": 0.00,
+//                    "cooperativeTdComUserId": "",
+//                    "credTypeId": 0,
+//                    "creditorId": "00000000-0000-0000-0000-000000000000",
+//                    "depositAmount": 0.00,
+//                    "enterpriseUserId": "E74D6597-C46A-435B-969D-72AFAAD3E661",
+//                    "extendFlag": 0,
+//                    "freedAmount": 0.00,
+//                    "freedRate": 0.0000,
+//                    "fullBorrowMoney": 20000.00,
+//                    "fundUse": "用于购物消费",
+//                    "guaranteeAmount": 1800.00,
+//                    "guaranteeRate": 4.0000,
+//                    "identityCard": "330701197009205794",
+//                    "imageUrl": "upload/Issue/7d06117d-43a7-40b2-b25f-c00e6a4fa541/18060406271176.jpg",
+//                    "isHaveCar": 0,
+//                    "isHaveHouse": 0,
+//                    "issueOrder": 2,
+//                    "lowerUnit": 50.00,
+//                    "marriage": "未婚",
+//                    "masterIssueId": "e58ee63d-6ea4-48a3-bbbb-1b6a46989ebf",
+//                    "nickName": "61369f74ea47",
+//                    "offLineInOverDueRate": 0.1,
+//                    "offLineInOverDueRateType": 2,
+//                    "offLineOutOverDueRate": 0.2,
+//                    "offLineOutOverDueRateType": 2,
+//                    "onLineOverDueRate": 0.06,
+//                    "onLineOverDueRateType": 5,
+//                    "openBankName": "东莞分行",
+//                    "orgIssueId": "",
+//                    "periodMonth": 36,
+//                    "plateType": 1,
+//                    "principleReqList": [],
+//            "projCarInfos": [],
+//            "projFeeInfos": [{
+//                "accountStatus": 0,
+//                        "chargeType": 0,
+//                        "feeDetailReqList": [],
+//                "feeItemId": "424c2302-e6a0-439d-bc57-9a5182005e91",
+//                        "feeItemName": "业主信用贷返点",
+//                        "feeType": 110,
+//                        "feeTypeName": "返点",
+//                        "feeValue": 0.00,
+//                        "isTermRange": 0,
+//                        "repaymentFlag": 1
+//            }, {
+//                "accountStatus": 30,
+//                        "chargeType": 1,
+//                        "feeDetailReqList": [],
+//                "feeItemId": "72f5c955-7a80-4758-a159-779f0e714042",
+//                        "feeItemName": "平台费",
+//                        "feeType": 50,
+//                        "feeTypeName": "团贷网平台费用",
+//                        "feeValue": 1800.00,
+//                        "isTermRange": 0,
+//                        "repaymentFlag": 1
+//            }, {
+//                "accountStatus": 20,
+//                        "chargeType": 1,
+//                        "feeDetailReqList": [],
+//                "feeItemId": "74a99887-137e-4e1a-b47b-0003d89d4dd9",
+//                        "feeItemName": "月收分公司服务费",
+//                        "feeType": 30,
+//                        "feeTypeName": "分公司费用",
+//                        "feeValue": 4.00,
+//                        "isTermRange": 0,
+//                        "repaymentFlag": 2
+//            }, {
+//                "accountStatus": 20,
+//                        "chargeType": 2,
+//                        "feeDetailReqList": [],
+//                "feeItemId": "b163247d-41b7-40db-9b59-7c9337a5c659",
+//                        "feeItemName": "分公司服务费",
+//                        "feeType": 30,
+//                        "feeTypeName": "分公司费用",
+//                        "feeValue": 2800.00,
+//                        "isTermRange": 0,
+//                        "repaymentFlag": 1
+//            }, {
+//                "accountStatus": 40,
+//                        "chargeType": 2,
+//                        "feeDetailReqList": [],
+//                "feeItemId": "db58adad-cb24-4b69-abba-26eba989a23f",
+//                        "feeItemName": "担保费",
+//                        "feeType": 40,
+//                        "feeTypeName": "担保公司费用",
+//                        "feeValue": 800.00,
+//                        "isTermRange": 0,
+//                        "repaymentFlag": 1
+//            }],
+//            "projHouseInfos": [],
+//            "projectFrom": 0,
+//                    "projectId": "7d06897d-43a7-40b2-b25f-c00e78a4fa541",
+//                    "projectType": 37,
+//                    "queryAuditDate": 1528137098000,
+//                    "queryFullsuccessDate": 1528112295000,
+//                    "rate": 11.00,
+//                    "rateUnitType": 1,
+//                    "realName": "胡阳秋",
+//                    "repayType": 5,
+//                    "repaymentAssure": "111",
+//                    "repaymentType": 5,
+//                    "resultContent": "状态说明:0;平台审核时间:2018/6/4 18:31:38;审核结果:",
+//                    "riskAssessment": "111",
+//                    "sex": 1,
+//                    "statusFlag": "4",
+//                    "subCompanyCharge": 2800.00,
+//                    "subCompanyRate": 14.0000,
+//                    "tdStatus": 2,
+//                    "tdUserId": "994E62BC-5859-4383-B0B9-D36BDD1E2F0D",
+//                    "title": "【东莞市】【TDW-YXD20180604003】",
+//                    "titleImageId": "0b598fe7-3374-4a8e-8de2-f4fe546a228f",
+//                    "tuandaiAmount": 1800.00,
+//                    "tuandaiRate": 9.0000,
+//                    "userTypeId": 1
+//        }, {
+//            "customerId": "1c6f0089-41fb-4229-83c5-18c199774a0c",
+//                    "borrowLimit":12,
+//                    "telNo": "15999795945",
+//                    "overRate":0.01,
+//                    "monthPrincipalAmount":1000.00,
+//                    "address": "福建省漳州市漳浦县绥安镇礼泉村22号",
+//                    "agencyAmount": 0.00,
+//                    "agencyId": "3AFAC66B-BBE5-4E5D-A70B-5955090D79F9",
+//                    "agencyRate": 0.0000,
+//                    "amount": 20000.00,
+//                    "aviCreditGrantingAmount": 55693872392.0000,
+//                    "bankAccountNo": "6222021001111244952",
+//                    "bankCity": "龙岩市",
+//                    "bankProvice": "福建省",
+//                    "bankType": 2,
+//                    "beginTime": 1528112369000,
+//                    "birthday": 904348800000,
+//                    "borrowAmount": 14600.00,
+//                    "borrowerRate": 73.0000,
+//                    "branchCompanyId": "9BD2E3E7-CB56-4749-B9CE-2BA581AD8203",
+//                    "controlDesc": "",
+//                    "cooperativeTdComAmount": 0.0000,
+//                    "cooperativeTdComRate": 0.00,
+//                    "cooperativeTdComUserId": "",
+//                    "credTypeId": 0,
+//                    "creditorId": "00000000-0000-0000-0000-000000000000",
+//                    "depositAmount": 0.00,
+//                    "enterpriseUserId": "E74D6597-C46A-435B-969D-72AFAAD3E661",
+//                    "extendFlag": 0,
+//                    "freedAmount": 0.00,
+//                    "freedRate": 0.0000,
+//                    "fullBorrowMoney": 20000.00,
+//                    "fundUse": "用于购物消费",
+//                    "guaranteeAmount": 1800.00,
+//                    "guaranteeRate": 4.0000,
+//                    "identityCard": "140624199808290019",
+//                    "imageUrl": "upload/Issue/e58ee63d-6ea4-48a3-bbbb-1b6a46989ebf/18060406255483.jpg",
+//                    "isHaveCar": 0,
+//                    "isHaveHouse": 0,
+//                    "issueOrder": 1,
+//                    "lowerUnit": 50.00,
+//                    "marriage": "未婚",
+//                    "masterIssueId": "e58ee63d-6ea4-48a3-bbbb-1b6a46989ebf",
+//                    "nickName": "7bab5d6c7f05",
+//                    "offLineInOverDueRate": 0.1,
+//                    "offLineInOverDueRateType": 2,
+//                    "offLineOutOverDueRate": 0.2,
+//                    "offLineOutOverDueRateType": 2,
+//                    "onLineOverDueRate": 0.06,
+//                    "onLineOverDueRateType": 5,
+//                    "openBankName": "中国银行福建省总行",
+//                    "orgIssueId": "",
+//                    "periodMonth": 36,
+//                    "plateType": 1,
+//                    "principleReqList": [],
+//            "projCarInfos": [],
+//            "projFeeInfos": [{
+//                "accountStatus": 0,
+//                        "chargeType": 0,
+//                        "feeDetailReqList": [],
+//                "feeItemId": "424c2302-e6a0-439d-bc57-9a5182005e91",
+//                        "feeItemName": "业主信用贷返点",
+//                        "feeType": 110,
+//                        "feeTypeName": "返点",
+//                        "feeValue": 0.00,
+//                        "isTermRange": 0,
+//                        "repaymentFlag": 1
+//            }, {
+//                "accountStatus": 30,
+//                        "chargeType": 1,
+//                        "feeDetailReqList": [],
+//                "feeItemId": "72f5c955-7a80-4758-a159-779f0e714042",
+//                        "feeItemName": "平台费",
+//                        "feeType": 50,
+//                        "feeTypeName": "团贷网平台费用",
+//                        "feeValue": 1800.00,
+//                        "isTermRange": 0,
+//                        "repaymentFlag": 1
+//            }, {
+//                "accountStatus": 20,
+//                        "chargeType": 1,
+//                        "feeDetailReqList": [],
+//                "feeItemId": "74a99887-137e-4e1a-b47b-0003d89d4dd9",
+//                        "feeItemName": "月收分公司服务费",
+//                        "feeType": 30,
+//                        "feeTypeName": "分公司费用",
+//                        "feeValue": 4.00,
+//                        "isTermRange": 0,
+//                        "repaymentFlag": 2
+//            }, {
+//                "accountStatus": 20,
+//                        "chargeType": 2,
+//                        "feeDetailReqList": [],
+//                "feeItemId": "b163247d-41b7-40db-9b59-7c9337a5c659",
+//                        "feeItemName": "分公司服务费",
+//                        "feeType": 30,
+//                        "feeTypeName": "分公司费用",
+//                        "feeValue": 2800.00,
+//                        "isTermRange": 0,
+//                        "repaymentFlag": 1
+//            }, {
+//                "accountStatus": 40,
+//                        "chargeType": 2,
+//                        "feeDetailReqList": [],
+//                "feeItemId": "db58adad-cb24-4b69-abba-26eba989a23f",
+//                        "feeItemName": "担保费",
+//                        "feeType": 40,
+//                        "feeTypeName": "担保公司费用",
+//                        "feeValue": 800.00,
+//                        "isTermRange": 0,
+//                        "repaymentFlag": 1
+//            }],
+//            "projHouseInfos": [],
+//            "projectFrom": 0,
+//                    "projectId": "e58ee63d-645a4-48a3-bbttb-1b6a46989ebf",
+//                    "projectType": 35,
+//                    "queryAuditDate": 1528137136000,
+//                    "queryFullsuccessDate": 1528112369000,
+//                    "rate": 11.00,
+//                    "rateUnitType": 1,
+//                    "realName": "郭禄",
+//                    "repayType": 5,
+//                    "repaymentAssure": "111",
+//                    "repaymentType": 5,
+//                    "resultContent": "状态说明:0;平台审核时间:2018/6/4 18:32:16;审核结果:",
+//                    "riskAssessment": "111",
+//                    "sex": 1,
+//                    "statusFlag": "4",
+//                    "subCompanyCharge": 2800.00,
+//                    "subCompanyRate": 14.0000,
+//                    "tdStatus": 2,
+//                    "tdUserId": "57E738DB-5E6C-4341-861D-03CA6F718344",
+//                    "title": "【东莞市】业务信用贷用信【TDW-CYD20180604002】",
+//                    "titleImageId": "468222ce-ef12-4f6d-bff9-7d41f79ec7ba",
+//                    "tuandaiAmount": 1800.00,
+//                    "tuandaiRate": 9.0000,
+//                    "userTypeId": 1
+//        }],
+//            "rondmode": 0,
+//                "smallNum": 2
+//        }
+    }
 
 }
