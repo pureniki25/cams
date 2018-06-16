@@ -206,7 +206,7 @@ public class PlatformRepaymentController {
             RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService.selectOne(
                     new EntityWrapper<RepaymentBizPlanList>()
                             .eq("business_id", repaymentConfirmLog.getBusinessId())
-                            .eq("orig_business_id", repaymentConfirmLog.getOrgBusinessId())
+//                            .eq("orig_business_id", repaymentConfirmLog.getOrgBusinessId())
                             .eq("after_id", repaymentConfirmLog.getAfterId())
             );
 
@@ -290,9 +290,9 @@ public class PlatformRepaymentController {
                             || RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid().equals(r.getFeeId())) {
                         continue;
                     }
-                    rechargeAmount.add(r.getFactAmount());
-                    factRepayAmount.add(r.getFactAmount());
-                    rechargeAmount.add(r.getFactAmount());
+                    resourceAmount = resourceAmount.add(r.getFactAmount());
+                    factRepayAmount = factRepayAmount.add(r.getFactAmount());
+                    rechargeAmount = rechargeAmount.add(r.getFactAmount());
 
                     TdrepayRechargeDetail detailFee = new TdrepayRechargeDetail();
 
@@ -351,10 +351,11 @@ public class PlatformRepaymentController {
             if ("-500".equals(result.getCode())) {
                 return Result.error("合规还款失败");
             }
-            return Result.success(departmentBankService.listDepartmentBank());
+            //return Result.success(departmentBankService.listDepartmentBank());
+            return Result.success();
         } catch (Exception e) {
-            LOG.error("获取所有的线下还款账户失败", e);
-            return Result.error("500", "获取所有的线下还款账户失败！");
+            LOG.error("通过合化还款接口还款失败.", e);
+            return Result.error("500", "通过合化还款接口还款失败！");
         }
     }
 
