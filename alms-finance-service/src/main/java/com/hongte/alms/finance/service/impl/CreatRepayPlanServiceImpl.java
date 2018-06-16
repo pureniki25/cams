@@ -8,6 +8,7 @@ import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.BizCustomerTypeEnum;
 import com.hongte.alms.base.enums.BooleanEnum;
 import com.hongte.alms.base.enums.BusinessSourceTypeEnum;
+import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.enums.repayPlan.*;
@@ -571,6 +572,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 //            baiscBizExtRateService.delete(new EntityWrapper<BaiscBizExtRate>().eq("business_id",basicBusiness.getBusinessId()));
 //            baiscBizExtRateService.insertBatch(bizExtRates);
 //        }
+
         List<ProjInfoReq>  projInfoReqs = creatRepayPlanReq.getProjInfoReqs();
         //存储标信息
         for(ProjInfoReq projInfoReq:projInfoReqs){
@@ -655,7 +657,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
             }
 
-            //存储标额外的费用信息
+            //////    存储标额外的费用信息   开始   /////////////////////
             List<ProjExtRateReq>  projExtRateReqs = projInfoReq.getProjExtRateReqs();
 //            Map<String,List<ProjExtRateReq>> projExtRateReqMap = projInfoReq.getProjExtRateReqMap();
             //1.如果没有传入数据，则本金违约金、月收服务费违约金、平台服务费违约金 需要写一段代码，设置一个默认的信息进去
@@ -693,9 +695,71 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             }
             if(!sub_company_penalty_in_flage){
                 //未传入月收服务费违约金写入默认配置
+                if(basicBusiness.getBusinessType().equals(BusinessTypeEnum.CREDIT_TYPE.getValue())){//信用贷的业务，默认月收服务费违约金
+                    //如果是信用贷类的业务
+                    List<ProjFeeReq> feeReqs = projInfoReq.getProjFeeInfos();
+                    ProjFeeReq comPenalty = null;
+                    for(ProjFeeReq feeReq:feeReqs ){
+                        //月收的分公司服务费
+                        if(feeReq.getFeeType().equals(RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getValue())
+                                &&feeReq.getChargeType().equals(RepayPlanChargeTypeEnum.BY_MONTH.getKey())){
+                            comPenalty = feeReq;
+                        }
+                    }
+                    //传入了月收分公司服务费，根据月收分公司服务费计算
+                    if(comPenalty!=null){
+                        ProjExtRate projExtRate = new ProjExtRate();
+                        projExtRates.add(projExtRate);
+
+                        projExtRate.setBusinessId(basicBusiness.getBusinessId());
+                        projExtRate.setProjectId(projInfo.getProjectId());
+                        projExtRate.setRateType(RepayPlanFeeTypeEnum.SUB_COMPANY_PENALTY.getValue());
+                        projExtRate.setRateName(RepayPlanFeeTypeEnum.SUB_COMPANY_PENALTY.getDesc());
+                        //2倍的月收分公司服务费
+                        projExtRate.setRateValue(comPenalty.getFeeValue().multiply(new BigDecimal("2")));
+                        projExtRate.setCalcWay(PeayPlanProjExtRatCalEnum.RATE.getValue());//计算方式
+                        projExtRate.setFeeId(RepayPlanFeeTypeEnum.SUB_COMPANY_PENALTY.getUuid()); //费率FeeId
+                        projExtRate.setFeeName(RepayPlanFeeTypeEnum.SUB_COMPANY_PENALTY.getDesc()); //费率名
+                        projExtRate.setBeginPeroid(1);
+                        projExtRate.setEndPeroid(projInfoReq.getPeriodMonth());
+                        projExtRate.setCreateTime(new Date());
+                        projExtRate.setCreateUser(Constant.ADMIN_ID);
+                    }
+                }
             }
             if(!plat_penalty_in_flage){
                 //平台服务费违约金写入默认配置
+                if(basicBusiness.getBusinessType().equals(BusinessTypeEnum.CREDIT_TYPE.getValue())){//信用贷的业务，默认月收服务费违约金
+                    //如果是信用贷类的业务
+                    List<ProjFeeReq> feeReqs = projInfoReq.getProjFeeInfos();
+                    ProjFeeReq comPenalty = null;
+                    for(ProjFeeReq feeReq:feeReqs ){
+                        //月收的分公司服务费
+                        if(feeReq.getFeeType().equals(RepayPlanFeeTypeEnum.PLAT_CHARGE.getValue())
+                                &&feeReq.getChargeType().equals(RepayPlanChargeTypeEnum.BY_MONTH.getKey())){
+                            comPenalty = feeReq;
+                        }
+                    }
+                    //传入了月收平台服务费，根据月收平台服务费计算
+                    if(comPenalty!=null){
+                        ProjExtRate projExtRate = new ProjExtRate();
+                        projExtRates.add(projExtRate);
+
+                        projExtRate.setBusinessId(basicBusiness.getBusinessId());
+                        projExtRate.setProjectId(projInfo.getProjectId());
+                        projExtRate.setRateType(RepayPlanFeeTypeEnum.PLAT_PENALTY.getValue());
+                        projExtRate.setRateName(RepayPlanFeeTypeEnum.PLAT_PENALTY.getDesc());
+                        //2倍的月收平台服务费
+                        projExtRate.setRateValue(comPenalty.getFeeValue().multiply(new BigDecimal("2")));
+                        projExtRate.setCalcWay(PeayPlanProjExtRatCalEnum.RATE.getValue());//计算方式
+                        projExtRate.setFeeId(RepayPlanFeeTypeEnum.PLAT_PENALTY.getUuid()); //费率FeeId
+                        projExtRate.setFeeName(RepayPlanFeeTypeEnum.PLAT_PENALTY.getDesc()); //费率名
+                        projExtRate.setBeginPeroid(1);
+                        projExtRate.setEndPeroid(projInfoReq.getPeriodMonth());
+                        projExtRate.setCreateTime(new Date());
+                        projExtRate.setCreateUser(Constant.ADMIN_ID);
+                    }
+                }
             }
 
             //3.存储传入的标费用信息中类型为一次性收取的费用
@@ -730,12 +794,15 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                         projExtRates.add(projExtRate);
                     }
 
-                    projExtRateService.delete(new EntityWrapper<ProjExtRate>().eq("project_id",projInfoReq.getProjectId()));
-                    if(projExtRates.size()>0){
-                        projExtRateService.insertBatch(projExtRates);
-                    }
+
                 }
             }
+            projExtRateService.delete(new EntityWrapper<ProjExtRate>().eq("project_id",projInfoReq.getProjectId()));
+            if(projExtRates.size()>0){
+                projExtRateService.insertBatch(projExtRates);
+            }
+
+            //////    存储标额外的费用信息   结束   /////////////////////
         }
         /////////   存储传入的相关信息   结束   ////////////
 
@@ -911,6 +978,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
         List<ProjInfoReq>  projInfoReqs = creatRepayPlanReq.getProjInfoReqs();
 
+        ////////   传入的标信息  校验  开始   ///////////////////////////
 
         for(ProjInfoReq projInfoReq :projInfoReqs){
             //标的车辆信息校验
@@ -929,6 +997,42 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     throw  new CreatRepaymentExcepiton("有房产信息的标必须把房产信息列表传入 projId:" +projInfoReq.getProjectId());
                 }
             }
+
+
+            //////   分期还本付息  传入的每期应还本金总和是否与传入的借款金额一致校验   开始
+
+            if(projInfoReq.getRepayType().equals(RepayPlanRepayIniCalcWayEnum.INT_AND_PRIN_EVERYTIME.getKey())){
+                List<PrincipleReq> list = projInfoReq.getPrincipleReqList();
+                if(list == null || list.size() == 0){
+                    logger.error("分期还本付息的标必须把每期应还金额传入  projId:"+projInfoReq.getProjectId()
+                            +"  projInfoReq:"+JSON.toJSONString(projInfoReq));
+                    throw  new CreatRepaymentExcepiton("分期还本付息的标必须把每期应还金额列表（principleReqList）传入 projId:" +projInfoReq.getProjectId());
+                }
+                if(!(projInfoReq.getBorrowLimit().compareTo(list.size())==0)){
+                    logger.error("分期还本付息的标每期应还金额列表（principleReqList）长度应与还款期限（BorrowLimit）一致  projId:"+projInfoReq.getProjectId()
+                            +"  projInfoReq:"+JSON.toJSONString(projInfoReq));
+                    throw  new CreatRepaymentExcepiton("分期还本付息的标必须把每期应还金额列表（principleReqList）长度应与还款期限（BorrowLimit）一致 projId:" +projInfoReq.getProjectId());
+
+                }
+                BigDecimal totalPricipal = new BigDecimal("0");
+
+                for(PrincipleReq principleReq:list){
+                    totalPricipal.add(principleReq.getPrinciple());
+                }
+
+                if(!(totalPricipal.compareTo(projInfoReq.getFullBorrowMoney())== 0)){
+                    logger.error("分期还本付息的标每期应还金额（principleReqList.Principle）总和应与总借款金额（FullBorrowMoney）一致  projId:"+projInfoReq.getProjectId()
+                            +"  projInfoReq:"+JSON.toJSONString(projInfoReq));
+                    throw  new CreatRepaymentExcepiton("分期还本付息的标每期应还金额（principleReqList.Principle）总和应与总借款金额（FullBorrowMoney）一致 projId:" +projInfoReq.getProjectId());
+
+                }
+//                System.out.println(new BigDecimal("1.2").compareTo(new BigDecimal("1.20")) == 0); //输出true
+            }
+
+
+
+
+            /////   分期还本付息  传入的每期应还本金总和是否与传入的借款金额一致校验   结束
 
             //标的额外费用信息校验  开始  ------------------
             List<ProjExtRateReq> projExtRateReqs = projInfoReq.getProjExtRateReqs();
@@ -984,6 +1088,8 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             }
             //标的额外费用信息校验  结束  ------------------
         }
+
+        ////////   传入的标信息  校验  结束   ///////////////////////////
         return true;
     }
 
