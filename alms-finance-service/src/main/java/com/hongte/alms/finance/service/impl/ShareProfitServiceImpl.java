@@ -208,8 +208,13 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 				&& (req.getLogIds() == null || req.getLogIds().isEmpty())) {
 			throw new ServiceRuntimeException("ConfirmRepaymentReq至少要有一个还款来源");
 		}
+		
 		initVariable(req);
-		repayPlanAmount.set(repaymentProjFactRepayService.caluUnpaid(businessId.get(), afterId.get()));
+		BigDecimal unpaid = repaymentProjFactRepayService.caluUnpaid(businessId.get(), afterId.get());
+		if (unpaid.compareTo(new BigDecimal("0"))<=0) {
+			throw new ServiceRuntimeException("不存在未还款项目");
+		}
+		repayPlanAmount.set(unpaid);
 		planDto.set(initRepaymentBizPlanDto(req));
 		sortRepaymentResource(req);
 		if (repayFactAmount.get().compareTo(repayPlanAmount.get()) >= 0) {

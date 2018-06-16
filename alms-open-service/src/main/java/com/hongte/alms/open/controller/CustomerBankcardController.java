@@ -63,7 +63,7 @@ public class CustomerBankcardController {
 			String respStr = withholdingxindaiService.getBankcardInfo(encryptStr);
 			// 返回数据解密
 			ResponseData respData = getRespData(respStr);
-			logger.info("代扣查询接口返回数据:"+respData.getData()+","+respData.getReturnMessage());
+			logger.info("客户银行卡信息接口返回数据:"+respData.getData()+","+respData.getReturnMessage());
 			List<BankCardInfo> bankCardInfos=JSON.parseArray(respData.getData(), BankCardInfo.class);
 			
 		      return bankCardInfos;

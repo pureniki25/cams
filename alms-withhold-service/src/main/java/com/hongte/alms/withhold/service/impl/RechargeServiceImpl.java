@@ -15,6 +15,7 @@ import com.hongte.alms.base.enums.SysParameterEnums;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayResultCodeEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
+import com.hongte.alms.base.feignClient.CustomerInfoXindaiRemoteApi;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.feignClient.dto.BankCardInfo;
 import com.hongte.alms.base.feignClient.dto.BankRechargeReqDto;
@@ -82,7 +83,10 @@ public class RechargeServiceImpl implements RechargeService {
 	@Autowired
 	@Qualifier("BizOutputRecordService")
 	BizOutputRecordService bizOutputRecordService;
-
+	
+    @Autowired
+    CustomerInfoXindaiRemoteApi customerInfoXindaiRemoteApi;
+    
 	@Autowired
 	EipRemote eipRemote;
 
@@ -444,10 +448,16 @@ public class RechargeServiceImpl implements RechargeService {
 	}
 
 	@Override
-	public CustomerInfoDto getCustomerInfo(String identifyCard) {
+	public List<BankCardInfo>  getCustomerInfo(String identifyCard) {
 		CustomerInfoDto dto = new CustomerInfoDto();
+		List<BankCardInfo> bankCardInfos = null;
+		try {
+			bankCardInfos = customerInfoXindaiRemoteApi.getBankcardInfo(identifyCard);
+		} catch (Exception e) {
+			logger.info("获取客户银行卡信息出错"+e);
+		}
 		// todo 调信贷接口
-		return dto;
+		return bankCardInfos;
 	}
 
 	@Override

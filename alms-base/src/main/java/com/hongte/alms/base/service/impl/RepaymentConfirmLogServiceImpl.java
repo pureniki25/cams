@@ -134,7 +134,7 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 		
 		if (log.getSurplusUseRefId()!=null) {
 			AccountantOverRepayLog accountantOverRepayLog = accountantOverRepayLogMapper
-					.selectById(log.getSurplusRefId());
+					.selectById(log.getSurplusUseRefId());
 			if (accountantOverRepayLog != null) {
 				accountantOverRepayLog.deleteById();
 			}

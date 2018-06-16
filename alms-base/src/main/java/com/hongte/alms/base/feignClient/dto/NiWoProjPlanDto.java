@@ -19,7 +19,7 @@ public class NiWoProjPlanDto implements Serializable {
      private long withdrawTime;//格式：1524016406846 毫秒时间戳
      private long withdrawSuccessTime;//1：代扣主卡，2：代扣附属卡 代扣主卡表示自动代扣默认使用的卡
      private String contractUrl;//合同地址，投资完成放款后该字段值，未满标前该字段值为空
-    // private NiWoProjPlanListDetailDto [] repaymentPlan;//还款计划Json数组，订单状态为还款中，已结清才会返回该内容，其它状态该数组为空
+     private NiWoProjPlanListDetailDto [] repaymentPlan;//还款计划Json数组，订单状态为还款中，已结清才会返回该内容，其它状态该数组为空
 	public String getOrderNo() {
 		return orderNo;
 	}
@@ -27,24 +27,6 @@ public class NiWoProjPlanDto implements Serializable {
 		this.orderNo = orderNo;
 	}
 
-	public Integer getOrderStatus() {
-		return orderStatus;
-	}
-	public void setOrderStatus(Integer orderStatus) {
-		this.orderStatus = orderStatus;
-	}
-	public Integer getProjectStatus() {
-		return projectStatus;
-	}
-	public void setProjectStatus(Integer projectStatus) {
-		this.projectStatus = projectStatus;
-	}
-	public Integer getWithdrawStatus() {
-		return withdrawStatus;
-	}
-	public void setWithdrawStatus(Integer withdrawStatus) {
-		this.withdrawStatus = withdrawStatus;
-	}
 	public String getOrderMsg() {
 		return orderMsg;
 	}
@@ -76,12 +58,30 @@ public class NiWoProjPlanDto implements Serializable {
 	public void setContractUrl(String contractUrl) {
 		this.contractUrl = contractUrl;
 	}
-//	public NiWoProjPlanListDetailDto[] getRepaymentPlan() {
-//		return repaymentPlan;
-//	}
-//	public void setRepaymentPlan(NiWoProjPlanListDetailDto[] repaymentPlan) {
-//		this.repaymentPlan = repaymentPlan;
-//	}
+	public NiWoProjPlanListDetailDto[] getRepaymentPlan() {
+		return repaymentPlan;
+	}
+	public void setRepaymentPlan(NiWoProjPlanListDetailDto[] repaymentPlan) {
+		this.repaymentPlan = repaymentPlan;
+	}
+	public Integer getOrderStatus() {
+		return orderStatus;
+	}
+	public void setOrderStatus(Integer orderStatus) {
+		this.orderStatus = orderStatus;
+	}
+	public Integer getProjectStatus() {
+		return projectStatus;
+	}
+	public void setProjectStatus(Integer projectStatus) {
+		this.projectStatus = projectStatus;
+	}
+	public Integer getWithdrawStatus() {
+		return withdrawStatus;
+	}
+	public void setWithdrawStatus(Integer withdrawStatus) {
+		this.withdrawStatus = withdrawStatus;
+	}
 	
 
 
