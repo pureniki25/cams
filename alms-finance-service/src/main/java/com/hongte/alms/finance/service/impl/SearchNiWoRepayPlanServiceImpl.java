@@ -1,6 +1,7 @@
 package com.hongte.alms.finance.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.RepayPlan.dto.*;
 import com.hongte.alms.base.baseException.CreatRepaymentExcepiton;
@@ -60,10 +61,21 @@ public class SearchNiWoRepayPlanServiceImpl  implements SearchNiWoRepayPlanServi
 		Map<String, Object> paramMap = new HashMap<>();
  		paramMap.put("orderNo", projId);
  		Result result=	eipRemote.queryApplyOrder(paramMap);
- 		NiWoProjPlanDto dto=null;
- 		if(result.getData()!=null) {
- 			 dto = JSON.parseObject(result.getData().toString(), NiWoProjPlanDto.class);
- 		}
+ 		HashMap<String,String> map=(HashMap) result.getData();
+ 		NiWoProjPlanDto dto=new NiWoProjPlanDto();
+ 		System.out.println(map.get("orderNo").toString());
+ 		dto.setContractUrl(map.get("orderNo")==null?"":map.get("orderNo").toString());
+ 		dto.setOrderStatus(map.get("orderStatus")==null?0:Integer.valueOf(map.get("orderStatus").toString()));
+ 		dto.setOrderMsg(map.get("orderMsg")==null?"":map.get("orderMsg").toString());
+ 		dto.setContractUrl(map.get("contractUrl")==null?"":map.get("contractUrl").toString());
+ 		dto.setOrderNo(map.get("orderNo")==null?"":map.get("orderNo").toString());
+ 		dto.setProjectStatus(map.get("projectStatus")==null?0:Integer.valueOf(map.get("projectStatus").toString()));
+ 		dto.setWithdrawMsg(map.get("withdrawMsg")==null?"":map.get("withdrawMsg").toString());
+ 		dto.setWithdrawStatus(map.get("withdrawStatus")==null?0:Integer.valueOf(map.get("withdrawStatus").toString()));
+ 		dto.setWithdrawSuccessTime(map.get("withdrawSuccessTime")==null?0:Long.valueOf(map.get("withdrawSuccessTime").toString()));
+ 		dto.setWithdrawTime(map.get("withdrawTime")==null?0:Long.valueOf(map.get("withdrawTime").toString()));
+ 		//dto.setRepaymentPlan(map.get("repaymentPlan"));
+ 		
  		return  dto;
 		
 	}
@@ -72,11 +84,10 @@ public class SearchNiWoRepayPlanServiceImpl  implements SearchNiWoRepayPlanServi
 
 
 	public static void main(String[] args) {
-	//	String str="{orderNo=f4709f216d1042b79109ae1317d72c32, orderStatus=1, projectStatus=3, orderMsg=null, withdrawStatus=0, withdrawMsg=null, withdrawTime=0, withdrawSuccessTime=0, contractUrl=null, repaymentPlan=[]}";
-		String str="{orderNo='f4709f216d1042b79109ae1317d72c32', orderStatus=1, projectStatus=3, orderMsg=null, withdrawStatus=0, withdrawMsg=null, withdrawTime=0, withdrawSuccessTime=0, contractUrl=null}";
-
-		NiWoProjPlanDto dto = JSON.parseObject(str, NiWoProjPlanDto.class);
-		
-		System.out.println(str.length());
+	//	String str="{	"orderNo" = 1, "orderStatus" = 1, "projectStatus" = 3, "orderMsg" = null, "withdrawStatus" = 0, "withdrawMsg" = null, "withdrawTime" = 0, "withdrawSuccessTime" = 0, "contractUrl" = null}} repaymentPlan=[]}";
+//		String str="{orderNo=f4709f216d1042b79109ae1317d72c32, orderStatus=1, projectStatus=3, orderMsg=null, withdrawStatus=0, withdrawMsg=null, withdrawTime=0, withdrawSuccessTime=0, contractUrl=null}";
+//		HashMap<String,HashMap<String,String>> map=str;
+//		
+//		System.out.println(str.length());
 	}
 }
