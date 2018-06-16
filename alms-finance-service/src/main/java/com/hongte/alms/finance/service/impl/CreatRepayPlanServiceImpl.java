@@ -5,10 +5,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.RepayPlan.dto.*;
 import com.hongte.alms.base.baseException.CreatRepaymentExcepiton;
 import com.hongte.alms.base.entity.*;
-import com.hongte.alms.base.enums.BizCustomerTypeEnum;
-import com.hongte.alms.base.enums.BooleanEnum;
-import com.hongte.alms.base.enums.BusinessSourceTypeEnum;
-import com.hongte.alms.base.enums.BusinessTypeEnum;
+import com.hongte.alms.base.enums.*;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.enums.repayPlan.*;
@@ -1087,6 +1084,40 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
             }
             //标的额外费用信息校验  结束  ------------------
+
+
+            //  你我金融的单    传入费用项  大类里面只能包含一个小类 校验  开始  --------------
+//            platformManageFee	平台管理费	decimal	Y	当期应还平台管理费
+//            commissionGuaranteFee	担保服务费	decimal	Y	当期应还担保服务费
+
+            if(projInfoReq.getPlateType().equals(ProjPlatTypeEnum.NIWO_JR.getKey())){
+                List<ProjFeeReq> projFeeReqs = projInfoReq.getProjFeeInfos();
+
+                Map<Integer, List<ProjFeeReq>>  map = new HashMap<>();
+
+                for(ProjFeeReq feeRe: projFeeReqs){
+                    Integer feeType = feeRe.getFeeType();
+                    List<ProjFeeReq> l = map.get(feeType);
+                    if(l==null){
+                        l = new LinkedList<>();
+                        map.put(feeType,l);
+                    }
+                    l.add(feeRe);
+                }
+
+                for(Integer ff: map.keySet()){
+                    if(map.get(ff).size()>1){
+                        logger.error("你我金融的业务，每种费用大项只能有一条子项  projInfo:"+JSON.toJSONString(projInfoReq));
+                        throw  new CreatRepaymentExcepiton("你我金融的业务，每种费用大项只能有一条子项  List:"+JSON.toJSONString(projInfoReq));
+
+                    }
+                }
+            }
+
+
+            //  你我金融的单    传入费用项  大类里面只能包含一个小类 校验  结束  --------------
+
+
         }
 
         ////////   传入的标信息  校验  结束   ///////////////////////////
