@@ -53,13 +53,13 @@ public class SysFinancialOrder extends Model<SysFinancialOrder> {
      * 跟进人的ID
      */
 	@TableField("user_ids")
-	@ApiModelProperty(required= true,value = "跟进人的ID")
+	@ApiModelProperty(required= false,value = "跟进人的ID")
 	private String userIds;
     /**
      * 跟进人的名字
      */
 	@TableField("user_names")
-	@ApiModelProperty(required= true,value = "跟进人的名字")
+	@ApiModelProperty(required= false,value = "跟进人的名字")
 	private String userNames;
     /**
      * 更新人
