@@ -115,7 +115,8 @@ window.layinit(function (htConfig) {
 
         selectedRowInfo:'',//存储当前选中行信息
         edit_modal:false,//控制编辑项选择modal显示的标志位
-        menu_modal:false
+        menu_modal:false,
+        userId:''
     },
 
     methods: {
@@ -195,6 +196,7 @@ window.layinit(function (htConfig) {
                     addInput(ExportForm, "text", "customerName", vm.searchForm.customerName);     //客户名称*/
                     addInput(ExportForm, "text", "licensePlateNumber", vm.searchForm.licensePlateNumber);     //车牌号*/
                     addInput(ExportForm, "text", "model", vm.searchForm.model);     //车辆型号*/
+                    addInput(ExportForm, "text", "userId", vm.userId);     //车辆型号*/
                     ExportForm.submit();
                     document.body.removeChild(ExportForm);
 
@@ -528,13 +530,14 @@ var getSelectsData = function () {
     //取区域列表
     axios.get(basePath+'collection/getALStandingBookVoPageSelectsData')
         .then(function (res) {
-            if (res.data.code == "1") {
+            if (res.data.code == "1") {debugger
                 vm.areaList = res.data.data.area;
                 vm.companyList = res.data.data.company;
                 vm.businessTypeList = res.data.data.businessType;
                 vm.carStatusList = res.data.data.carStatusList;
                 vm.repayStatusList = res.data.data.repayStatusList;
                 vm.collectLevelList = res.data.data.collectLevelList;
+                vm.userId=res.data.data.userId[0];
                 
             } else {
                 vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});

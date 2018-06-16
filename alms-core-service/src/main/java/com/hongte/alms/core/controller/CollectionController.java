@@ -154,8 +154,12 @@ public class CollectionController {
         //催收级别
         List<SysParameter> collectLevelList = sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterTypeEnums.COLLECTION_LEVERS.getKey()).orderBy("row_Index"));
         retMap.put("collectLevelList",(JSONArray) JSON.toJSON(collectLevelList, JsonUtil.getMapping()));
-
-        
+        //userId
+        List<String> userlist=new ArrayList();
+        String userId = loginUserInfoHelper.getUserId();
+        userlist.add(userId);
+        retMap.put("userId",(JSONArray) JSON.toJSON(userlist, JsonUtil.getMapping()));
+ 
         List<SysParameter> carStatusList = sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterTypeEnums.CAR_STATUS.getKey()).orderBy("row_Index"));
         retMap.put("carStatusList",(JSONArray) JSON.toJSON(carStatusList, JsonUtil.getMapping()));
 
