@@ -131,7 +131,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		// 获取所有银行代扣渠道,先扣线上费用
 		List<WithholdingChannel> channels = withholdingChannelService
 				.selectList(new EntityWrapper<WithholdingChannel>().eq("platform_id", PlatformEnum.YH_FORM.getValue())
-						.eq("channel_status", 1).eq("bank_code", bankCardInfo.getBankCode().trim()).orderBy("level"));
+						.eq("channel_status", 1).eq("bank_code", bankCardInfo.getBankCode().trim()).orderBy("channel_level"));
 		WithholdingChannel channel = null;
 		if (channels != null && channels.size() > 0) {
 			channel = channels.get(0);
@@ -270,7 +270,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		// 获取所有第三方代扣渠道
 		List<WithholdingChannel> channels = withholdingChannelService
 				.selectList(new EntityWrapper<WithholdingChannel>().ne("platform_id", PlatformEnum.YH_FORM.getValue())
-						.eq("channel_status", 1).eq("bank_code", thirtyCardInfo.getBankCode().trim()).orderBy("level"));
+						.eq("channel_status", 1).eq("bank_code", thirtyCardInfo.getBankCode().trim()).orderBy("channel_level"));
 		List<ThirdPlatform> thirdPlatforms = thirtyCardInfo.getThirdPlatformList();
 
 		List<WithholdingChannel> newChanels = new ArrayList();
@@ -397,7 +397,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		// 获取所有银行代扣渠道,先扣线上费用
 		List<WithholdingChannel> channels = withholdingChannelService
 				.selectList(new EntityWrapper<WithholdingChannel>().eq("platform_id", PlatformEnum.YH_FORM.getValue())
-						.eq("channel_status", 1).eq("bank_code", bankCardInfo.getBankCode().trim()).orderBy("level"));
+						.eq("channel_status", 1).eq("bank_code", bankCardInfo.getBankCode().trim()).orderBy("channel_level"));
 		WithholdingChannel channel = null;
 		if (channels != null && channels.size() > 0) {
 			channel = channels.get(0);
@@ -491,7 +491,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		// 获取所有第三方代扣渠道
 				List<WithholdingChannel> channels = withholdingChannelService
 						.selectList(new EntityWrapper<WithholdingChannel>().eq("platform_id",platformId)
-								.eq("channel_status", 1).eq("bank_code", thirtyCardInfo.getBankCode().trim()).orderBy("level"));
+								.eq("channel_status", 1).eq("bank_code", thirtyCardInfo.getBankCode().trim()).orderBy("channel_level"));
 				List<ThirdPlatform> thirdPlatforms = thirtyCardInfo.getThirdPlatformList();
 
 				List<WithholdingChannel> newChanels = new ArrayList();

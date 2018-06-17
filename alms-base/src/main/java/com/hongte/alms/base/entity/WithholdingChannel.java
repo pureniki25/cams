@@ -33,6 +33,7 @@ public class WithholdingChannel extends Model<WithholdingChannel> {
     /**
      * 优先级
      */
+	@TableField("channel_level")
 	@ApiModelProperty(required= true,value = "优先级")
 	private Integer level;
     /**
