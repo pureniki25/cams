@@ -8,7 +8,6 @@ import java.util.Map;
  * Created by 张贵宏 on 2018/6/17 10:25
  */
 public class LayTableQuery {
-
     private Map<String, String> search;
     private Integer limit;
     private Integer page;
