@@ -31,7 +31,7 @@ public class LayTableQuery {
     }
 
     public Integer getPage() {
-        return page - 1;
+        return page;
     }
 
     public void setPage(Integer page) {
