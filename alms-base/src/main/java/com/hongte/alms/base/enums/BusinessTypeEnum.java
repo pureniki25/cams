@@ -20,8 +20,9 @@ public enum BusinessTypeEnum implements IEnum {
     CQSZDC_TYPE(12,"车全垫资代采"),
     FPD_TYPE(13,"扶贫贷"),
     QCRZZL_TYPE(14,"汽车融资租赁"),
-    ESC_TYPE(15,"房速贷");
-    
+    ESC_TYPE(15,"二手车商贷"),
+    YD_CAR_TYPE(20,"一点车贷"),
+    CREDIT_TYPE(25,"信用贷");
 
 
     private int value;

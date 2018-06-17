@@ -2,23 +2,32 @@ package com.hongte.alms.base.service.impl;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.AgencyRechargeLog;
+import com.hongte.alms.base.entity.IssueSendOutsideLog;
+import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.mapper.AgencyRechargeLogMapper;
 import com.hongte.alms.base.service.AgencyRechargeLogService;
+import com.hongte.alms.base.service.IssueSendOutsideLogService;
+import com.hongte.alms.base.service.TdrepayRechargeLogService;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
+import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.StringUtil;
+import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.core.Result;
 
 /**
@@ -37,8 +46,18 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 
 	@Autowired
 	private EipRemote eipRemote;
+
+	@Autowired
+	@Qualifier("TdrepayRechargeLogService")
+	private TdrepayRechargeLogService tdrepayRechargeLogService;
 	
+	@Autowired
+	private LoginUserInfoHelper loginUserInfoHelper;
 	
+	@Autowired
+	@Qualifier("IssueSendOutsideLogService")
+	private IssueSendOutsideLogService issueSendOutsideLogService;
+
 
 	@Transactional(rollbackFor = Exception.class)
 	@Override
@@ -94,4 +113,98 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 		}
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public void queryDistributeFund() {
+		List<TdrepayRechargeLog> tdrepayRechargeLogs = tdrepayRechargeLogService
+				.selectList(new EntityWrapper<TdrepayRechargeLog>().eq("process_status", 1));
+		if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
+
+			Map<String, Object> paramMap = new HashMap<>();
+
+			for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
+				paramMap.put("oidPartner", tdrepayRechargeLog.getOidPartner());
+				paramMap.put("batchId", tdrepayRechargeLog.getBatchId());
+				paramMap.put("requestNo", tdrepayRechargeLog.getRequestNo());
+
+				IssueSendOutsideLog issueSendOutsideLog = issueSendOutsideLog(loginUserInfoHelper.getUserId(), paramMap,
+						Constant.INTERFACE_CODE_QUERY_DISTRIBUTE_FUND, Constant.INTERFACE_NAME_QUERY_DISTRIBUTE_FUND,
+						Constant.SYSTEM_CODE_EIP, tdrepayRechargeLog.getProjectId());
+
+				Result result = null;
+				try {
+					// 资金分发订单查询
+					result = eipRemote.queryDistributeFund(paramMap);
+				} catch (Exception e) {
+					issueSendOutsideLog.setReturnJson(e.getMessage());
+					LOG.error(e.getMessage(), e);
+				}
+				
+				if (result != null) {
+					issueSendOutsideLog.setReturnJson(JSONObject.toJSONString(result));
+				}
+				issueSendOutsideLogService.insert(issueSendOutsideLog);
+				
+				if (result != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode()) && result.getData() != null) {
+					String jsonString = JSONObject.toJSONString(result.getData());
+					Map<String, Object> resultMap = JSONObject.parseObject(jsonString, Map.class);
+					
+					String handlerStatus = (String) resultMap.get("handlerStatus");
+					
+					if (StringUtil.notEmpty(handlerStatus)) {
+						switch (handlerStatus) {
+						case "0":
+							tdrepayRechargeLog.setProcessStatus(1);
+							break;
+						case "1":
+							tdrepayRechargeLog.setProcessStatus(1);
+							break;
+						case "2":
+							tdrepayRechargeLog.setProcessStatus(2);
+							break;
+						case "3":
+							tdrepayRechargeLog.setProcessStatus(3);
+							break;
+						case "4":
+							tdrepayRechargeLog.setProcessStatus(3);
+							break;
+						case "500":
+							tdrepayRechargeLog.setProcessStatus(3);
+							break;
+
+						default:
+							break;
+						}
+						tdrepayRechargeLog.setUpdateTime(new Date());
+						tdrepayRechargeLogService.updateById(tdrepayRechargeLog);
+					}
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 记录第三方日志
+	 * 
+	 * @param userId
+	 * @param sendObject
+	 * @param interfaceCode
+	 * @param interfaceName
+	 * @param systemCode
+	 * @param sendKey
+	 * @return
+	 */
+	private IssueSendOutsideLog issueSendOutsideLog(String userId, Object sendObject, String interfaceCode,
+			String interfaceName, String systemCode, String sendKey) {
+		IssueSendOutsideLog issueSendOutsideLog = new IssueSendOutsideLog();
+		issueSendOutsideLog.setCreateTime(new Date());
+		issueSendOutsideLog.setCreateUserId(userId);
+		issueSendOutsideLog.setSendJson(JSONObject.toJSONString(sendObject));
+		issueSendOutsideLog.setInterfacecode(interfaceCode);
+		issueSendOutsideLog.setInterfacename(interfaceName);
+		issueSendOutsideLog.setSystem(systemCode);
+		issueSendOutsideLog.setSendKey(sendKey);
+
+		return issueSendOutsideLog;
+	}
 }
