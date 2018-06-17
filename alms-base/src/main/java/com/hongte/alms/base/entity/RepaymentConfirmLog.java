@@ -58,8 +58,9 @@ public class RepaymentConfirmLog extends Model<RepaymentConfirmLog> {
     /**
      * 日志序号,表示当前是第几次还款确认
      */
+	@TableField("idx")
 	@ApiModelProperty(required= true,value = "日志序号,表示当前是第几次还款确认")
-	private Integer index;
+	private Integer idx;
     /**
      * 能否撤销,代扣和资金分发后的不能撤销
      */
@@ -157,13 +158,6 @@ public class RepaymentConfirmLog extends Model<RepaymentConfirmLog> {
 		this.afterId = afterId;
 	}
 
-	public Integer getIndex() {
-		return index;
-	}
-
-	public void setIndex(Integer index) {
-		this.index = index;
-	}
 
 	public Integer getCanRevoke() {
 		return canRevoke;
@@ -225,7 +219,7 @@ public class RepaymentConfirmLog extends Model<RepaymentConfirmLog> {
 			", businessId=" + businessId +
 			", orgBusinessId=" + orgBusinessId +
 			", afterId=" + afterId +
-			", index=" + index +
+			", idx=" + getIdx() +
 			", canRevoke=" + canRevoke +
 			", projPlanJson=" + projPlanJson +
 			", createTime=" + createTime +
@@ -345,5 +339,19 @@ public class RepaymentConfirmLog extends Model<RepaymentConfirmLog> {
 	 */
 	public void setSurplusUseRefId(String surplusUseRefId) {
 		this.surplusUseRefId = surplusUseRefId;
+	}
+
+	/**
+	 * @return the idx
+	 */
+	public Integer getIdx() {
+		return idx;
+	}
+
+	/**
+	 * @param idx the idx to set
+	 */
+	public void setIdx(Integer idx) {
+		this.idx = idx;
 	}
 }
