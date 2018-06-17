@@ -1031,12 +1031,12 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		repaymentConfirmLog.setCreateUser(loginUserInfoHelper.getUserId());
 		List<RepaymentConfirmLog> repaymentConfirmLogs = repaymentConfirmLog.selectList(new EntityWrapper<>().eq("business_id", businessId.get()).eq("after_id",afterId.get()).orderBy("`index`",false));
 		if (repaymentConfirmLogs==null) {
-			repaymentConfirmLog.setIndex(1);
+			repaymentConfirmLog.setIdx(1);
 		}else {
 			if (repaymentConfirmLogs.size()==0) {
-				repaymentConfirmLog.setIndex(1);
+				repaymentConfirmLog.setIdx(1);
 			}else {
-				repaymentConfirmLog.setIndex(repaymentConfirmLogs.get(0).getIndex()+1);
+				repaymentConfirmLog.setIdx(repaymentConfirmLogs.get(0).getIdx()+1);
 			}
 		}
 		repaymentConfirmLog.setOrgBusinessId(orgBusinessId.get());
