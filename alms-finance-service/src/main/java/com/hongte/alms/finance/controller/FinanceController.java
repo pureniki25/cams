@@ -21,10 +21,7 @@ import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.enums.RepayRegisterState;
 import com.hongte.alms.base.service.*;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
-import com.hongte.alms.base.vo.finance.ConfirmWithholdListVO;
-import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
-import com.hongte.alms.base.vo.finance.CurrPeriodRepaymentInfoVO;
-import com.hongte.alms.base.vo.finance.MoneyPoolManagerVO;
+import com.hongte.alms.base.vo.finance.*;
 import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.DateUtil;
@@ -38,6 +35,8 @@ import com.hongte.alms.finance.service.ShareProfitService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import kafka.utils.Json;
+import kafka.utils.json.JsonArray;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,6 +88,9 @@ public class FinanceController {
     @Autowired
     @Qualifier("BasicCompanyService")
     private BasicCompanyService basicCompanyService;
+    @Autowired
+    @Qualifier("SysUserService")
+    private SysUserService sysUserService;
     @Autowired
     @Qualifier("FinanceService")
     private FinanceService financeService;
@@ -885,6 +887,9 @@ public class FinanceController {
         //业务类型
         List<BasicBusinessType> btype_list = basicBusinessTypeService.selectList(new EntityWrapper<BasicBusinessType>().orderBy("business_type_id"));
         retMap.put("businessType", (JSONArray) JSON.toJSON(btype_list, JsonUtil.getMapping()));
+        //查询用户
+        List<SysUser> users = sysUserService.selectList(new EntityWrapper<>());
+        retMap.put("users",(JSONArray)JSON.toJSON(users, JsonUtil.getMapping()));
 
         logger.info("@getOrderSetSearchInfo@查找财务人员跟单设置查询相关信息--结束[{}]", JSON.toJSONString(retMap));
         return Result.success(retMap);
@@ -925,21 +930,25 @@ public class FinanceController {
             String userName = request.getParameter("userName");
             String areaId = request.getParameter("areaId");
             String companyId = request.getParameter("companyId");
-            String businessType = request.getParameter("businessType");
-            if (StringUtils.isNotBlank(userName)) {
+            String businessTypeId = request.getParameter("businessTypeId");
+           /* if (StringUtils.isNotBlank(userName)) {
                 ew.like("user_names", userName);
             }
-            if (StringUtils.isNotBlank(userName)) {
+            if (StringUtils.isNotBlank(companyId)) {
                 ew.eq("company_id", companyId);
             }
-            if (StringUtils.isNotBlank(userName)) {
+            if (StringUtils.isNotBlank(areaId)) {
                 ew.eq("area_id", areaId);
             }
-            if (StringUtils.isNotBlank(userName)) {
-                ew.eq("business_type", businessType);
-            }
-
-            Page<SysFinancialOrder> page = sysFinancialOrderService.selectPage(new Page<>(query.getPage(), query.getLimit()), ew);
+            if (StringUtils.isNotBlank(businessTypeId)) {
+                ew.eq("business_type_id", Integer.valueOf(businessTypeId));
+            }*/
+            //Page<SysFinancialOrder> page = sysFinancialOrderService.selectPage(new Page<>(query.getPage(), query.getLimit()), ew);
+            Page<SysFinancialOrderVO> page = sysFinancialOrderService.search(
+                    new Page<>(query.getPage(), query.getLimit()),
+                    StringUtils.isBlank(businessTypeId) ? null : Integer.valueOf(businessTypeId),
+                    areaId, companyId, userName
+                    );
             return PageResult.success(page.getRecords(), page.getTotal());
         } catch (Exception ex) {
             logger.error("根据条件获取财务人员跟单设置失败", ex);

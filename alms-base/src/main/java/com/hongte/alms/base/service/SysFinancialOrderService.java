@@ -1,6 +1,8 @@
 package com.hongte.alms.base.service;
 
+import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.entity.SysFinancialOrder;
+import com.hongte.alms.base.vo.finance.SysFinancialOrderVO;
 import com.hongte.alms.common.service.BaseService;
 
 /**
@@ -12,5 +14,13 @@ import com.hongte.alms.common.service.BaseService;
  * @since 2018-05-29
  */
 public interface SysFinancialOrderService extends BaseService<SysFinancialOrder> {
-
+    /**
+     *  自定义分页查询
+     *
+     * @param [page, businessTypeId, areaId, companyId, userName]
+     * @return com.baomidou.mybatisplus.plugins.Page<com.hongte.alms.base.vo.finance.SysFinancialOrderVO>
+     * @author 张贵宏
+     * @date 2018/6/17 15:26
+     */
+    Page<SysFinancialOrderVO> search(Page<SysFinancialOrderVO> page, Integer businessTypeId, String areaId, String companyId , String userName);
 }
