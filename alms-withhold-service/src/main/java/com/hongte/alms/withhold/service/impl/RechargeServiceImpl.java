@@ -285,7 +285,7 @@ public class RechargeServiceImpl implements RechargeService {
 				
 				try {
 					Thread.sleep(5000);
-					getBFResult(log);
+//					getBFResult(log);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -378,7 +378,7 @@ public class RechargeServiceImpl implements RechargeService {
 				}
 				try {
 					Thread.sleep(5000);
-					getBankResult(log);
+//					getBankResult(log);
 				} catch (Exception e) {
 					logger.debug("查询银行代扣结果出错"+e);
 				}
