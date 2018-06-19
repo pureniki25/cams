@@ -24,4 +24,10 @@ public class HomeController {
     public String login(){
         return "/login";
     }
+
+    @RequestMapping("")
+    public String ll(){
+        return index();
+    }
+
 }
