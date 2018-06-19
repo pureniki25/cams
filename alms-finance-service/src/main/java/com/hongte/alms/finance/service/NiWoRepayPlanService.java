@@ -15,7 +15,7 @@ public interface NiWoRepayPlanService {
 	 * @param afterId
 	 * @return
 	 */
-	public NiWoProjPlanDto getNiWoRepayPlan(String projId);
+	public NiWoProjPlanDto sycNiWoRepayPlan(String projId);
 
 
 	/**
@@ -24,5 +24,5 @@ public interface NiWoRepayPlanService {
 	 * @author 陈泽圣 2018年6月19日
 	 * @return
 	 */
-	public NiWoProjPlanDto SearchNiWoRepayPlan();
+	public void SearchNiWoRepayPlan();
 }

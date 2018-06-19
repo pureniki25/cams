@@ -86,9 +86,9 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 	@Qualifier("IssueSendOutsideLogService")
 	IssueSendOutsideLogService issueSendOutsideLogService;
 	
-
+	@Transactional(rollbackFor = Exception.class)
 	@Override
-	public NiWoProjPlanDto getNiWoRepayPlan(String projId) {
+	public NiWoProjPlanDto sycNiWoRepayPlan(String projId) {
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderNo", projId);
 		Result result = eipRemote.queryApplyOrder(paramMap);
@@ -147,9 +147,11 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 				repaymentBizPlanListService.updateById(pList);
 			}
 			projPlan.setPlanStatus(20);// 已结清
+			projPlan.setUpdateTime(new Date());
 			repaymentProjPlanService.updateById(projPlan);
 			RepaymentBizPlan plan = repaymentBizPlanService.selectById(projPlan.getPlanId());
 			plan.setPlanStatus(20);// 已结清
+			plan.setUpdateTime(new Date());
 			repaymentBizPlanService.updateById(plan);
 
 		}
@@ -195,6 +197,8 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 												planDetail.setPlanAmount(detailDto.getPrincipal());
 												projDetail.setProjFactAmount(detailDto.getRepaidPrincipal());
 												planDetail.setFactAmount(detailDto.getRepaidPrincipal());
+												projDetail.setUpdateDate(new Date());
+												planDetail.setUpdateDate(new Date());
 												repaymentProjPlanListDetailService.updateById(projDetail);
 												repaymentBizPlanListDetailService.updateById(planDetail);
 											} else if (RepayPlanFeeTypeEnum.INTEREST.getUuid()
@@ -207,6 +211,8 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 												planDetail.setPlanAmount(detailDto.getInterest());
 												projDetail.setProjFactAmount(detailDto.getRepaidInterest());
 												planDetail.setFactAmount(detailDto.getRepaidInterest());
+												projDetail.setUpdateDate(new Date());
+												planDetail.setUpdateDate(new Date());
 												repaymentProjPlanListDetailService.updateById(projDetail);
 												repaymentBizPlanListDetailService.updateById(planDetail);
 											} else if (RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE.getUuid()
@@ -219,6 +225,8 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 												projDetail
 														.setProjFactAmount(detailDto.getRepaidCommissionGuaranteFee());
 												planDetail.setFactAmount(detailDto.getRepaidCommissionGuaranteFee());
+												projDetail.setUpdateDate(new Date());
+												planDetail.setUpdateDate(new Date());
 												repaymentProjPlanListDetailService.updateById(projDetail);
 												repaymentBizPlanListDetailService.updateById(planDetail);
 											} else if (RepayPlanFeeTypeEnum.PLAT_CHARGE.getUuid()
@@ -230,6 +238,8 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 												planDetail.setPlanAmount(detailDto.getPlatformManageFee());
 												projDetail.setProjFactAmount(detailDto.getRepaidPlatformManageFee());
 												planDetail.setFactAmount(detailDto.getRepaidPlatformManageFee());
+												projDetail.setUpdateDate(new Date());
+												planDetail.setUpdateDate(new Date());
 												repaymentProjPlanListDetailService.updateById(projDetail);
 												repaymentBizPlanListDetailService.updateById(planDetail);
 											} else if (RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid()
@@ -243,6 +253,8 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 												projDetail.setProjFactAmount(detailDto.getRepaidPenalty());
 												planDetail.setFactAmount(detailDto.getRepaidPenalty());
 												repaymentProjPlanListDetailService.updateById(projDetail);
+												projDetail.setUpdateDate(new Date());
+												planDetail.setUpdateDate(new Date());
 												repaymentBizPlanListDetailService.updateById(planDetail);
 											} else if (projDetailcount > 0 && detailDto.getTotalPenalty() != null && detailDto
 													.getTotalPenalty().compareTo(BigDecimal.valueOf(0)) > 0) {
@@ -254,6 +266,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 												planListDetailCopy.setPlanAmount(detailDto.getTotalPenalty());
 												planListDetailCopy.setPlanItemType(60);
 												planListDetailCopy.setPlanItemName("滞纳金");
+												planListDetailCopy.setCreateDate(new Date());
 												repaymentBizPlanListDetailService.insertOrUpdate(planListDetailCopy);
 												
 												
@@ -268,15 +281,26 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 												projDetail.setPlanDetailId(planListDetailCopy.getPlanDetailId());
 												projDetail.setPlanItemName("滞纳金");
 												repaymentProjPlanListDetailService.insertOrUpdate(projDetail);
-											}
+												
 											
-											RecordExceptionLog(dto, projDetail);
+											}
+											if(isDifferent) {
+												RecordExceptionLog(dto, projDetail,null);	
+											}
+								
+											projPlanList.setOverdueDays(BigDecimal.valueOf(getOverDays(detailDto.getRefundDate())));
+											projPlanList.setOverdueAmount(detailDto.getTotalPenalty());
+											pList.setOverdueDays(BigDecimal.valueOf(getOverDays(detailDto.getRefundDate())));
+											pList.setOverdueAmount(detailDto.getTotalPenalty());
+											repaymentProjPlanListService.updateById(projPlanList);
+											repaymentBizPlanListService.updateById(pList);
 										}
 
 									}
 
 								}
-
+								projPlanList.setUpdateTime(new Date());
+								repaymentProjPlanListService.updateById(projPlanList);
 							}
 						}
 
@@ -284,24 +308,36 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 				}
 				
 				RecordLog(dto, repaymentProjPlanListDtos);//用来记录你我金融每个标对应贷后每个标的还款计划的日志
+				projPlan.setUpdateTime(new Date());
+				repaymentProjPlanService.updateById(projPlan);
 			}
 		} catch (Exception e) {
-			logger.info("查询你我金融标的数据时候出错,标的ID为："+projId+"====="+e);
+			logger.info("同步你我金融标的数据时候出错,标的ID为："+projId+"====="+e);
 		}
 
 		return dto;
 
 	}
 	
-	private void RecordExceptionLog(NiWoProjPlanDto dto,RepaymentProjPlanListDetail projDetail) {
+	private void RecordExceptionLog(NiWoProjPlanDto dto,RepaymentProjPlanListDetail projDetail,String projId) {
 		SysExceptionLog log=new SysExceptionLog();
-		String returnJason=JSON.toJSONString(dto);
-		String sendJason=JSON.toJSONString(projDetail);
+		String returnJason="";
+		String sendJason="";
+		if(projDetail!=null&&dto!=null) {
+			 returnJason=JSON.toJSONString(dto);
+			 sendJason=JSON.toJSONString(projDetail);
+			 log.setLogMessage("贷后生成的还款计划与你我金融生成的还款计划不一致");
+			log.setBusinessId(dto.getOrderNo());
+		}else {
+			log.setLogMessage("超过3天没有同步到你我金融标的还款计划");
+			log.setBusinessId(projId);
+		}
+
 		log.setLogDate(new Date());
 		log.setLogLevel("3");
 		log.setSendJason(sendJason);
 		log.setReturnJason(returnJason);
-		log.setBusinessId(dto.getOrderNo());
+	
 		log.setLogType("同步你我金融计划,businessID存储的是标的iD");
 		log.insert();
 		sysExceptionLogService.insertOrUpdate(log);
@@ -325,8 +361,40 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 
 
 	@Override
-	public NiWoProjPlanDto SearchNiWoRepayPlan() {
+	public void SearchNiWoRepayPlan() {
+		//定时查询你我金融的还款计划，未结清、未完全付款的还款计划需要每天查询
+		List<RepaymentProjPlan> projPlans=repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("creat_sys_type", 3).eq("plan_status", 0));
+		for(RepaymentProjPlan repaymentProjPlan:projPlans) {
+			sycNiWoRepayPlan(repaymentProjPlan.getProjectId());
+			//超过3天没有同步到你我金融标的还款计划
+			if(isOver3Days(repaymentProjPlan)) {
+				RecordExceptionLog(null, null,repaymentProjPlan.getProjectId());
+			}
+		}
 		
-		return null;
+	}
+	
+	
+	private boolean isOver3Days(RepaymentProjPlan repaymentProjPlan) {
+		boolean isOver3Days=false;
+		if(DateUtil.getDiffDays(repaymentProjPlan.getUpdateTime(), new Date())>3) {
+			isOver3Days=true;
+		}else {
+			isOver3Days=false;
+		}
+		return isOver3Days;
+		
+	}
+	
+	private Integer getOverDays(Long refundDate) {
+		if(refundDate==null) {
+			return 0;
+		}
+		Date repayDate=new Date(refundDate);
+		Integer days=0;
+		if(new Date().compareTo(repayDate)>0) {
+			days=DateUtil.getDiffDays(repayDate, new Date());
+		}
+		return days;
 	}
 }
