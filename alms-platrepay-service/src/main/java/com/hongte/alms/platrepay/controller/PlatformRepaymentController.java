@@ -217,8 +217,31 @@ public class PlatformRepaymentController {
             vo.setAssetType(1);
             //原业务编号
             vo.setOrigBusinessId(repaymentProjPlan.getOriginalBusinessId());
-            //业务类型
-            vo.setBusinessType(basicBusiness.getBusinessType());
+            //http://wiki.hongte.info/pages/viewpage.action?pageId=3867818
+            //业务类型： 业主信用贷用信 -> 业主贷;  小微企业贷用信 -> 商银贷; tb_tuandai_project_info的project_id与master_issue_id相等则 -> 商贸共借， 业主共借同理
+            //目标类型： 业务类型(1:车易贷展期,2:房速贷展期,3:金融仓储,4:三农金融,9:车易贷,11:房速贷,12车全垫资代采,13:扶贫贷,14:汽车融资租赁,15:二手车商贷,20:一点车贷,25:商贸贷,26:业主贷,27:家装分期,28:商贸共借;29:业主共借)
+            Integer businessType = basicBusiness.getBusinessType();
+            // 25 信用贷 特殊处理
+            if (businessType == 25 ){
+                switch (basicBusiness.getBusinessCtype()){
+                    case "小微企业贷用信":
+                        if(tuandaiProjectInfo.getProjectId().equals(tuandaiProjectInfo.getMasterIssueId())){
+                            businessType = 28;
+                        }else{
+                            businessType = 25;
+                        }
+                        break;
+                    case "业主信用贷用信":
+                        if(tuandaiProjectInfo.getProjectId().equals(tuandaiProjectInfo.getMasterIssueId())){
+                            businessType = 29;
+                        }else{
+                            businessType = 26;
+                        }
+                        break;
+                }
+            }
+            vo.setBusinessType(businessType);
+
             //实还日期
             vo.setFactRepayDate(repaymentConfirmLog.getRepayDate());
             //借款人
