@@ -23,4 +23,24 @@ public interface SysFinancialOrderService extends BaseService<SysFinancialOrder>
      * @date 2018/6/17 15:26
      */
     Page<SysFinancialOrderVO> search(Page<SysFinancialOrderVO> page, Integer businessTypeId, String areaId, String companyId , String userName);
+
+    /**
+     *  保存数据到父子表
+     *
+     * @param [sysFinancialOrderVO]
+     * @return void
+     * @author 张贵宏
+     * @date 2018/6/19 9:42
+     */
+    void save(SysFinancialOrderVO sysFinancialOrderVO);
+
+    /**
+     *  按id删除
+     *
+     * @param [ids]
+     * @return void
+     * @author 张贵宏
+     * @date 2018/6/19 9:44
+     */
+    void delete(Integer id, String userId);
 }

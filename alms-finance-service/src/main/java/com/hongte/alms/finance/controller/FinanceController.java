@@ -33,6 +33,7 @@ import com.hongte.alms.finance.req.OrderSetReq;
 import com.hongte.alms.finance.service.FinanceService;
 import com.hongte.alms.finance.service.ShareProfitService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
+import com.ht.ussp.core.ReturnCodeEnum;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import kafka.utils.Json;
@@ -957,4 +958,36 @@ public class FinanceController {
     }
 
 
+    @RequestMapping("/edit")
+    @ApiOperation("编辑")
+    public Result edit(SysFinancialOrderVO vo) {
+        if(StringUtils.isBlank(vo.getUserId())){
+            return Result.error("参数验证失败");
+        }
+        try{
+
+            if(vo.getId() == null){
+                //新增
+                sysFinancialOrderService.save(vo);
+            }else{
+                //编辑
+            }
+            return  Result.success();
+        }catch (Exception e){
+            logger.error("设置财务人员跟单设置失败", e);
+            return Result.error( e.getMessage());
+        }
+    }
+
+    @RequestMapping("/delete")
+    @ApiOperation(value = "删除")
+    public  Result delete(Integer id, String userId){
+        try{
+            sysFinancialOrderService.delete(id, userId);
+            return Result.success();
+        }catch (Exception e){
+            logger.error(e.getMessage());
+            return Result.error(e.getMessage());
+        }
+    }
 }

@@ -47,7 +47,7 @@ public class SysFinancialOrder extends Model<SysFinancialOrder> {
      */
 	@TableField("business_type_id")
 	@ApiModelProperty(required= true,value = "业务类型ID")
-	private String businessTypeId;
+	private Integer businessTypeId;
     /**
      * 跟进人的ID
      */
@@ -110,11 +110,11 @@ public class SysFinancialOrder extends Model<SysFinancialOrder> {
 		this.companyId = companyId;
 	}
 
-	public String getBusinessTypeId() {
+	public Integer getBusinessTypeId() {
 		return businessTypeId;
 	}
 
-	public void setBusinessTypeId(String businessTypeId) {
+	public void setBusinessTypeId(Integer businessTypeId) {
 		this.businessTypeId = businessTypeId;
 	}
 
