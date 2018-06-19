@@ -180,6 +180,9 @@ window.layinit(function(htConfig) {
 			 * 查询合规化还款主页面列表
 			 */
 			queryComplianceRepaymentData: function(){
+				
+				this.tdrepayRechargeInfoReqList = [];
+				
 				/*
 				 * 合规化还款主页面列表
 				 */
