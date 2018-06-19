@@ -8,7 +8,7 @@
         <result column="business_id" property="businessId" />
         <result column="org_business_id" property="orgBusinessId" />
         <result column="after_id" property="afterId" />
-        <result column="index" property="index" />
+        <result column="idx" property="idx" />
         <result column="can_revoke" property="canRevoke" />
         <result column="proj_plan_json" property="projPlanJson" />
         <result column="repay_date" property="repayDate" />
@@ -28,7 +28,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        period AS period, repay_source AS repaySource,surplus_use_ref_id AS surplusUseReFid,confirm_log_id AS confirmLogId, business_id AS businessId,fact_amount as factAmount,surplus_ref_id as surplusRefId ,surplus_amount as surplusAmount,repay_date as repayDate,create_user_name as createUserName, org_business_id AS orgBusinessId, after_id AS afterId, index, can_revoke AS canRevoke, proj_plan_json AS projPlanJson, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
+        period AS period, repay_source AS repaySource,surplus_use_ref_id AS surplusUseReFid,confirm_log_id AS confirmLogId, business_id AS businessId,fact_amount as factAmount,surplus_ref_id as surplusRefId ,surplus_amount as surplusAmount,repay_date as repayDate,create_user_name as createUserName, org_business_id AS orgBusinessId, after_id AS afterId, idx , can_revoke AS canRevoke, proj_plan_json AS projPlanJson, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
     </sql>
 
 </mapper>

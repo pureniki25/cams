@@ -156,9 +156,9 @@ public class CollectionTrackLogTransferController {
 			if(bmUserId!=null&&!bmUserId.equals("")){
 				dto = loginUserInfoHelper.getUserInfoByUserId("", bmUserId);
 				if(dto==null|| dto.getUserId() == null){
-//						collectionTrackLog.setRecorderUser(Constant.ADMIN_ID);
-					recordErrorInfo(carBusinessId,carBusinessAfterId,
-							NoUser,"1","没有用户信息");
+						collectionTrackLog.setRecorderUser(Constant.ADMIN_ID);
+//					recordErrorInfo(carBusinessId,carBusinessAfterId,
+//							NoUser,"1","没有用户信息");
 				}
 				collectionTrackLog.setRecorderUser(dto.getUserId());
 			}else{

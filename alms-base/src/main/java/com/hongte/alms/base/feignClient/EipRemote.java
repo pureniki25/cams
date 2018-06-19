@@ -217,5 +217,14 @@ public interface EipRemote {
 	"content-type=application/json" }, method = RequestMethod.POST)
 	Result repaymentEarlier(@RequestBody TdDepaymentEarlierDTO dto);
 	
+	/**
+	 * 资金分发订单查询
+	 * @param paramMap
+	 * @return
+	 */
+	@RequestMapping(value = "/eip/td/assetside/queryDistributeFund", headers = { "app=ALMS",
+	"content-type=application/json" }, method = RequestMethod.POST)
+	Result queryDistributeFund(@RequestBody Map<String, Object> paramMap);
+	
 
 }

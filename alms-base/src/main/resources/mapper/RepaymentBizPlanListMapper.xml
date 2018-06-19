@@ -454,10 +454,32 @@
 		    AND t1.plan_list_id = rbpl.plan_list_id) amount,
 		  0 otherFee,
 		  CASE
-		    rbpl.`confirm_flag` 
-		    WHEN 1 
-		    THEN '财务确认已还款' 
-		    ELSE '' 
+		    rbpl.`repay_flag` 
+			    WHEN 6 
+			    THEN '申请展期已还款' 
+			    WHEN 10 
+			    THEN '线下确认已还款' 
+			    WHEN 20 
+			    THEN '自动线下代扣已还款' 
+			    WHEN 21
+			    THEN '人工线下代扣已还款' 
+			    WHEN 30
+			    THEN '自动银行代扣已还款' 
+			    WHEN 31 
+			    THEN '人工银行代扣已还款' 
+			    WHEN 40 
+			    THEN '用户APP主动还款' 
+			    WHEN 50 
+			    THEN '线下财务确认全部结清' 
+			    WHEN 60
+			    THEN '线下代扣全部结清' 
+			    WHEN 70 
+			    THEN '银行代扣全部结清' 
+			    WHEN '' 
+			    THEN '还款中' 
+			    WHEN NULL
+			    THEN '还款中'
+			    ELSE '逾期' 
 		  END confirmFlag 
 		FROM
 		  `tb_repayment_biz_plan_list` rbpl,
@@ -561,27 +583,41 @@
 		  WHERE t1.plan_list_id = t2.plan_list_id 
 		    AND t1.plan_list_id = rbpl.plan_list_id) amount,
 		  (SELECT 
-		    IFNULL(
-		      SUM(
-		        CASE
-		          WHEN t2.plan_item_type = 30 
-		          THEN t2.fact_amount 
-		          ELSE 0 
-		        END
-		      ),
-		      0
-		    ) 
+		    IFNULL(SUM(t2.fact_amount), 0) otherFee 
 		  FROM
 		    `tb_repayment_biz_plan_list` t1,
 		    `tb_repayment_biz_plan_list_detail` t2 
 		  WHERE t1.plan_list_id = t2.plan_list_id 
 		    AND t1.plan_list_id = rbpl.plan_list_id 
-		    AND t2.account_status = 0) otherFee,
+		    AND t2.account_status = 0 
+		    AND t2.plan_item_type NOT IN (10, 20, 30, 50, 60)) otherFee,
 		  CASE
-		    rbpl.`confirm_flag` 
-		    WHEN 1 
-		    THEN '财务确认已还款' 
-		    ELSE '' 
+		    rbpl.`repay_flag` 
+		    WHEN 6 
+		    THEN '申请展期已还款' 
+		    WHEN 10 
+		    THEN '线下确认已还款' 
+		    WHEN 20 
+		    THEN '自动线下代扣已还款' 
+		    WHEN 21
+		    THEN '人工线下代扣已还款' 
+		    WHEN 30
+		    THEN '自动银行代扣已还款' 
+		    WHEN 31 
+		    THEN '人工银行代扣已还款' 
+		    WHEN 40 
+		    THEN '用户APP主动还款' 
+		    WHEN 50 
+		    THEN '线下财务确认全部结清' 
+		    WHEN 60
+		    THEN '线下代扣全部结清' 
+		    WHEN 70 
+		    THEN '银行代扣全部结清' 
+		    WHEN '' 
+		    THEN '还款中' 
+		    WHEN NULL
+		    THEN '还款中'
+		    ELSE '逾期' 
 		  END confirmFlag 
 		FROM
 		  `tb_repayment_biz_plan_list` rbpl,
@@ -770,7 +806,7 @@
 		  AND rppl.`proj_plan_id` = rpp.`proj_plan_id` 
 		  AND rpp.`project_id` = tpi.`project_id` 
 		  AND rppl.`plan_list_id` = #{planListId,jdbcType=VARCHAR} 
-		GROUP BY rppl.`proj_plan_list_id`;
+		GROUP BY rppl.`proj_plan_list_id`
     </select>
     
     <select id="caluBizPlanListUnpaid" resultType="java.math.BigDecimal">
@@ -779,7 +815,7 @@
 		FROM
 			tb_repayment_proj_plan_list_detail 
 		WHERE
-			plan_list_id = #{planListId};
+			plan_list_id = #{planListId}
     </select>
     <select id="caluBizPlanListFactAmount" resultType="java.math.BigDecimal">
 	    SELECT
@@ -787,7 +823,7 @@
 		FROM
 			tb_repayment_proj_plan_list_detail 
 		WHERE
-			plan_list_id = #{planListId};
+			plan_list_id = #{planListId}
     </select>
     <select id="caluBizPlanListPlanAmount" resultType="java.math.BigDecimal">
 	    SELECT
@@ -795,7 +831,7 @@
 		FROM
 			tb_repayment_proj_plan_list_detail 
 		WHERE
-			plan_list_id = #{planListId};
+			plan_list_id = #{planListId}
     </select>
     <select id="listConfirmWithhold" resultType="com.hongte.alms.base.vo.finance.ConfirmWithholdListVO">
     SELECT
