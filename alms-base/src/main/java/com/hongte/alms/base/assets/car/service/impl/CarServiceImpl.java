@@ -119,6 +119,7 @@ public class CarServiceImpl  implements CarService {
 
 	@Override
 	public List<CarVo> selectCarList(CarReq carReq){
+	
 		  List<CarVo> list=carMapper.selectCarPage(carReq);
 		  return list;
 	}

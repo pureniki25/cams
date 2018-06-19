@@ -32,7 +32,8 @@ window.layinit(function (htConfig) {
                 regDate: '',
                 regDateStart: '',
                 regDateEnd: '',
-                status: ''
+                status: '',
+                planListId:''
             },
             table: {
                 col: [{
@@ -202,7 +203,7 @@ window.layinit(function (htConfig) {
                                                         type: 2,
                                                         title: title,
                                                         content: [link],
-                                                        area: ['1600px', '800px'],
+                                                        area: ['95%', '95%'],
                                                         success: function (layero, index) {
                                                             curIndex = index;
                                                         }
@@ -217,7 +218,7 @@ window.layinit(function (htConfig) {
                                                             type: 2,
                                                             title: title,
                                                             content: [url],
-                                                            area: ['1600px', '800px'],
+                                                            area: ['95%', '95%'],
                                                             success: function (layero, index) {
                                                                 curIndex = index;
                                                             }
@@ -229,7 +230,7 @@ window.layinit(function (htConfig) {
                                                             type: 2,
                                                             title: title,
                                                             content: [url],
-                                                            area: ['1600px', '800px'],
+                                                            area: ['95%', '95%'],
                                                             success: function (layero, index) {
                                                                 curIndex = index;
                                                             }
@@ -237,6 +238,18 @@ window.layinit(function (htConfig) {
                                                     }
                                                     if (call == 'planSettle') {
                                                         let url = '/finance/settle?businessId=' + p.row.businessId + '&afterId=' + p.row.afterId + '&planId=' + p.row.planId
+                                                        layer.open({
+                                                            type: 2,
+                                                            title: title,
+                                                            content: [url],
+                                                            area: ['95%', '95%'],
+                                                            success: function (layero, index) {
+                                                                curIndex = index;
+                                                            }
+                                                        })
+                                                    }
+                                                    if (call == 'withhold') {debugger
+                                                        let url = getDeductionUrl(p.row.planListId);
                                                         layer.open({
                                                             type: 2,
                                                             title: title,
@@ -264,6 +277,7 @@ window.layinit(function (htConfig) {
                             let confirmWithhold = initMenuItem('代扣确认', null, 'confirmWithhold')
                             let settle = initMenuItem('财务结清', null, 'settle')
                             let planSettle = initMenuItem('还款计划结清', null, 'planSettle')
+                            let withhold = initMenuItem('支付公司代扣', null, 'withhold')
 
                             if (p.row.srcType == 2) {
                                 menu.push(repayConfirm)
@@ -272,6 +286,7 @@ window.layinit(function (htConfig) {
                                 menu.push(confirmWithhold)
                                 menu.push(planSettle)
                                 menu.push(settle)
+                                   menu.push(withhold)
                             }
                             let poptipContent;
                             if (p.row.srcType == 2) {
@@ -380,6 +395,7 @@ window.layinit(function (htConfig) {
                         })
                     })
             },
+         
             paging: function (page) {
                 app.form.curPage = page;
                 app.search()
@@ -507,5 +523,33 @@ window.layinit(function (htConfig) {
             this.search()
         }
     })
+    
+    
+  //获取执行代扣的URL路径
+    function getDeductionUrl(planListId){debugger
+        var url
+        $.ajax({
+            type : 'GET',
+            async : false,
+            url : cpath +'DeductionController/selectDeductionInfoByPlayListId?planListId='+planListId,
+            headers : {
+                app : 'ALMS',
+                Authorization : "Bearer " + getToken()
+            }, 
+            success : function(data) {debugger
+                var deduction = data.data;
+                url =  '/collectionUI/deductionUI?planListId='+planListId
+                },
+            error : function() {
+                layer.confirm('Navbar error:AJAX请求出错!', function(index) {
+                    top.location.href = loginUrl;
+                    layer.close(index);
+                });
+                return false;
+            }
+        });
+
+        return url;
+    }
     window.app = app ;
 })

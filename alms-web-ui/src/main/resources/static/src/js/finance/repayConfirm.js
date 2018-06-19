@@ -507,7 +507,7 @@ window.layinit(function (htConfig) {
                     type: 2,
                     title: '手动匹配流水',
                     content: [url],
-                    area: ['80%', '90%'],
+                    area: ['95%', '95%'],
                     success: function (layero, index) {
                         curIndex = index;
                     }
@@ -701,11 +701,10 @@ window.layinit(function (htConfig) {
                             .then(function (res) {
                                 if (res.data.code == '1') {
                                     app.handleConfirmRepaymentResult(res)
-                                    parent.app.search()
-
                                     app.$Modal.success({content:'还款确认成功!',onOk(){
                                         var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
                                         parent.layer.close(index);
+                                        parent.app.search()
                                     }})
                                 }else{
                                     app.factRepaymentInfo.surplusFund = 0

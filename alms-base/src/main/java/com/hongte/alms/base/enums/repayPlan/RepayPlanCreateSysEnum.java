@@ -13,6 +13,7 @@ public enum RepayPlanCreateSysEnum implements IEnum {
 
     XINDAI(1,"信贷系统")
     ,ALMS(2,"贷后管理系统")
+    ,NIWOJR(3,"你我金融")
     ;
 
     private Integer value;

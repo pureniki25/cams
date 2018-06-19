@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+    <title>客户还款登记流水</title>
+    <script src="/properties/config.js"></script>
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
+    <!-- iview样式 -->
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
+    <!--@import url("//unpkg.com/iview/dist/styles/iview.css");-->
+    <!--<link rel="stylesheet" type="text/css" href="//unpkg.com/iview/dist/styles/iview.css"/>-->
+    <!-- 引入layui样式 -->
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all"/>
+
+    <!--   <script src="//unpkg.com/vue/dist/vue.js"></script>
+       <script src="//unpkg.com/iview/dist/iview.min.js"></script>-->
+    <!-- 引入vue -->
+    <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+    <!-- iview js -->
+    <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+    <!--引入layui.js-->
+    <script src="/plugins/layui/layui.js"></script>
+    <!--引入axios.js 用于ajax调用-->
+    <script src="/plugins/axios/axios.min.js"></script>
+    <!-- 引入jQuery，必须在appToken.js 之前引入 -->
+    <script src="/build/js/jquery-3.3.1.min.js"></script>
+    <!-- 设置全局请求头:app、Authorization -->
+    <script src="/build/js/appToken.js"></script>
+    <!--引入公共的一些方法-->
+    <script src="/src/js/comm.js"></script>
+
+
+</head>
+<body>
+<!--隐藏元素-->
+<!--<p id="staffType"  th:attr="value=${staffType}"  hidden />-->
+<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+<div id="app" v-cloak>
+
+    <!-- 搜索工具框 开始-->
+    <row style="padding: 10px">
+        <i-col span="24">
+            <Card>
+                <p slot="title">
+                    <Icon type="ios-search"></Icon>
+                    搜索条件
+                </p>
+
+                <div class="layui-btn-group" slot="extra">
+                    <i-button class="layui-btn layui-btn-sm" slot="extra" @click="toLoading">
+                        <span v-if="!loading"><i class="layui-icon">&#xe615;</i>查询</span>
+                        <span v-else><i
+                                class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
+                    </i-button>
+                    <i-button class="layui-btn layui-btn-sm" @click="handleReset('searchForm')">
+                        <span>重置</span>
+                    </i-button>
+                    <i-button class="layui-btn layui-btn-sm" id="exportBtn" @click="clickExport">
+                        <span v-if="!exporting">导出</span>
+                        <span v-else><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>导出中...</span>
+                    </i-button>
+                </div>
+
+
+                <row :gutter="16">
+                    <i-form ref="searchForm" :model="searchForm" label-position="right"
+                            :label-width="100">
+                        <i-col span="8">
+                            <form-item label="登记日期：" prop="regStartTime">
+                                <date-picker type="date" @on-change="regStartTime"
+                                             placeholder="选择日期"
+                                             format="yyyy-MM-dd"
+                                             style="width: 200px"></date-picker>
+                                <span>至</span>
+                                <date-picker type="date" @on-change="regEndTime"
+                                             placeholder="选择日期"
+                                             format="yyyy-MM-dd"
+                                             style="width: 200px"></date-picker>
+                                </span>
+                            </form-item>
+                        </i-col>
+
+                        <i-col span="4">
+                            <form-item label="业务编号：" prop="businessId">
+                                <i-input v-model="searchForm.businessId" placeholder="业务编号"></i-input>
+                            </form-item>
+                        </i-col>
+                        <i-col span="6">
+                            <form-item label="所属分公司：" prop="companyId">
+                                <i-select v-model="searchForm.companyId" clearable filterable>
+                                    <i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{
+                                        item.areaName }}
+                                    </i-option>
+                                </i-select>
+                            </form-item>
+                        </i-col>
+
+                        <i-col span="4">
+                            <form-item label="状态：" prop="state">
+                                <i-select v-model="searchForm.state" filterable style="width: 176px">
+                                    <i-option value="1">未审核</i-option>
+                                    <i-option value="2">已审核</i-option>
+                                    <i-option value="3">拒绝</i-option>
+                                </i-select>
+                            </form-item>
+                        </i-col>
+                        <i-col span="8">
+                            <form-item label="转账日期：" prop="accountStartTime">
+                                <date-picker type="date" @on-change="accountStartTime"
+                                             placeholder="选择日期"
+                                             format="yyyy-MM-dd"
+                                             style="width: 200px"></date-picker>
+                                <span>至</span>
+                                <date-picker type="date" @on-change="accountEndTime"
+                                             placeholder="选择日期"
+                                             format="yyyy-MM-dd"
+                                             style="width: 200px"></date-picker>
+                                </span>
+                            </form-item>
+                        </i-col>
+                        <i-col span="4">
+                            <form-item label="客户姓名：" prop="customerName">
+                                <i-input v-model="searchForm.customerName" placeholder="客户姓名" maxlength="30"
+                                         style="width: 176px"></i-input>
+                            </form-item>
+                        </i-col>
+
+                        <i-col span="6">
+                            <form-item label="转入账号：" prop="bankAccount">
+                                <i-select v-model="searchForm.bankAccount" clearable filterable>
+                                    <i-option v-for="item in bankList" :value="item.accountId" :key="item.accountId">{{
+                                        item.financeName }}
+                                    </i-option>
+                                </I-SELECT>
+                            </form-item>
+
+
+                        </i-col>
+
+
+                        <i-col span="4">
+                            <form-item label="转账金额：" prop="accountMoney">
+                                <i-input v-model="searchForm.accountMoney" placeholder="转账金额" maxlength="30"
+                                         style="width: 176px"></i-input>
+                            </form-item>
+                        </i-col>
+
+                    </i-form>
+                </row>
+            </Card>
+        </i-col>
+    </row>
+    <!-- 搜索工具框 结束-->
+    <!-- 批量操作按钮 开始-->
+    <row style="padding: 10px">
+        <i-col span="24">
+            <!--:loading="saving"-->
+            <div style="float: left;">
+                <i-button type="info"> 审核</i-button>
+                <i-button type="info"> 拒绝</i-button>
+            </div>
+
+            <Upload
+                    :action="upload.url"
+                    :multiple=false
+                    :headers="upload.headers"
+                    :with-credentials=true
+                    :on-success="uploadSuccess"
+                    :format="['xls','xlsx']"
+                    :before-upload="beforeUpLoadFile"
+                    :show-upload-list=false
+                    style="float: left;margin-left: 10px">
+                <i-button type="info" icon="ios-cloud-upload-outline">导入</i-button>
+            </Upload>
+        </i-col>
+    </row>
+
+    <!-- 表单Grid，使用layerUI的表格组件 开始 -->
+    <row style="padding: 10px">
+        <i-col span="24">
+            <!-- 使用方法渲染模式 -->
+            <table id="listTable" lay-filter="listTable"></table>
+            <script type="text/html" id="barTools">
+                <!--layui-btn layui-btn-xs-->
+                <a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="info" ht-auth="detail">审核</a>
+                <a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="business" ht-auth="detail">拒绝</a>
+            </script>
+        </i-col>
+    </row>
+    <!-- 表单Grid，使用layerUI的表格组件 结束 -->
+
+    <!--导出Excel隐藏表单-->
+    <iframe id="frame" name="iframe" style="display:none;"></iframe>
+    <!--导出Excel隐藏表单-->
+
+
+</div>
+
+<script src="/src/js/finance/customerrepayflowlist.js"></script>
+<script>
+
+</script>
+</body>
+</html>
