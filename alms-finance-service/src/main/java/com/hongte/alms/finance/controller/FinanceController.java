@@ -179,7 +179,7 @@ public class FinanceController {
 		r.put("borrowRate", basicBusiness.getBorrowRate());
 		r.put("borrowRateUnit", basicBusiness.getBorrowRateUnit());
 		result = Result.success(r);
-		logger.info("@repayBaseInfo@获取还款基本信息--结束[{}]", result);
+		logger.info("@repayBaseInfo@获取还款基本信息--结束[{}]", JSON.toJSONString(result));
 		return result;
 	}
 
