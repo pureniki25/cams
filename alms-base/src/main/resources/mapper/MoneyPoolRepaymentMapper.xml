@@ -4,36 +4,36 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.MoneyPoolRepayment">
-        <id column="id" property="id" />
-        <result column="money_pool_id" property="moneyPoolId" />
-        <result column="xd_pool_id" property="xdPoolId" />
-        <result column="xd_matching_id" property="xdMatchingId" />
-        <result column="plan_list_id" property="planListId" />
-        <result column="operate_id" property="operateId" />
-        <result column="operate_name" property="operateName" />
-        <result column="claim_date" property="claimDate" />
-        <result column="state" property="state" />
-        <result column="income_type" property="incomeType" />
-        <result column="bank_account" property="bankAccount" />
-        <result column="trade_type" property="tradeType" />
-        <result column="trade_place" property="tradePlace" />
-        <result column="fact_transfer_name" property="factTransferName" />
-        <result column="remark" property="remark" />
-        <result column="pool_list" property="poolList" />
-        <result column="certificate_picture_url" property="certificatePictureUrl" />
-        <result column="is_finance_match" property="isFinanceMatch" />
-        <result column="create_user" property="createUser" />
-        <result column="create_time" property="createTime" />
-        <result column="update_user" property="updateUser" />
-        <result column="update_time" property="updateTime" />
-        <result column="is_deleted" property="isDeleted" />
-        <result column="delete_user" property="deleteUser" />
-        <result column="delete_time" property="deleteTime" />
-        <result column="account_money" property="accountMoney" />
-        <result column="trade_date" property="tradeDate" />
-        <result column="create_user_role" property="createUserRole" />
-        <result column="original_business_id" property="originalBusinessId" />
-        <result column="after_id" property="afterId" />
+        <id column="id" property="id"/>
+        <result column="money_pool_id" property="moneyPoolId"/>
+        <result column="xd_pool_id" property="xdPoolId"/>
+        <result column="xd_matching_id" property="xdMatchingId"/>
+        <result column="plan_list_id" property="planListId"/>
+        <result column="operate_id" property="operateId"/>
+        <result column="operate_name" property="operateName"/>
+        <result column="claim_date" property="claimDate"/>
+        <result column="state" property="state"/>
+        <result column="income_type" property="incomeType"/>
+        <result column="bank_account" property="bankAccount"/>
+        <result column="trade_type" property="tradeType"/>
+        <result column="trade_place" property="tradePlace"/>
+        <result column="fact_transfer_name" property="factTransferName"/>
+        <result column="remark" property="remark"/>
+        <result column="pool_list" property="poolList"/>
+        <result column="certificate_picture_url" property="certificatePictureUrl"/>
+        <result column="is_finance_match" property="isFinanceMatch"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="delete_user" property="deleteUser"/>
+        <result column="delete_time" property="deleteTime"/>
+        <result column="account_money" property="accountMoney"/>
+        <result column="trade_date" property="tradeDate"/>
+        <result column="create_user_role" property="createUserRole"/>
+        <result column="original_business_id" property="originalBusinessId"/>
+        <result column="after_id" property="afterId"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -41,21 +41,21 @@
         id, money_pool_id AS moneyPoolId, xd_pool_id AS xdPoolId, xd_matching_id AS xdMatchingId, plan_list_id AS planListId, operate_id AS operateId, operate_name AS operateName, claim_date AS claimDate, state, income_type AS incomeType, bank_account AS bankAccount, trade_type AS tradeType, trade_place AS tradePlace, fact_transfer_name AS factTransferName, remark, pool_list AS poolList, certificate_picture_url AS certificatePictureUrl, is_finance_match AS isFinanceMatch, create_user AS createUser, create_time AS createTime, update_user AS updateUser, update_time AS updateTime, is_deleted AS isDeleted, delete_user AS deleteUser, delete_time AS deleteTime, account_money AS accountMoney, trade_date AS tradeDate, create_user_role AS createUserRole, original_business_id AS originalBusinessId, after_id AS afterId
     </sql>
 
-	<select id="sumMoneyPoolRepaymentAmountByMprIds" resultType="java.math.BigDecimal">
-		SELECT
-			sum( mpr.account_money ) 
-		FROM
-			tb_money_pool_repayment mpr 
-		WHERE
-			mpr.id IN 
-			<foreach collection="ids" index="index" item="item" open="(" separator="," close=")">  
-		        #{item}  
-		    </foreach> 
-		    AND mpr.is_finance_match = 1
-		    AND ( mpr.is_deleted IS NULL OR mpr.is_deleted = 0 ) 
-	</select>
-	
-	<select id="queryActualPaymentByBusinessId" resultType="com.hongte.alms.base.dto.ActualPaymentSingleLogDTO">
+    <select id="sumMoneyPoolRepaymentAmountByMprIds" resultType="java.math.BigDecimal">
+        SELECT
+        sum( mpr.account_money )
+        FROM
+        tb_money_pool_repayment mpr
+        WHERE
+        mpr.id IN
+        <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND mpr.is_finance_match = 1
+        AND ( mpr.is_deleted IS NULL OR mpr.is_deleted = 0 )
+    </select>
+
+    <select id="queryActualPaymentByBusinessId" resultType="com.hongte.alms.base.dto.ActualPaymentSingleLogDTO">
 		SELECT 
 		  wrl.`after_id` afterId,
 		  IFNULL(wrl.`current_amount`, 0) currentAmount,
@@ -106,4 +106,179 @@
 		  AND mpr.is_finance_match = 1
 		ORDER BY 1
 	</select>
+
+    <select id="getCustomerRepayFlowPageList" parameterType="com.hongte.alms.base.customer.vo.CustomerRepayFlowListReq"
+            resultType="com.hongte.alms.base.customer.vo.CustomerRepayFlowDto">
+        SELECT
+        t.id AS  id,
+        t.create_time AS createTime,
+        t.money_pool_id AS moneyPoolId,
+        t.original_business_id AS originalBusinessId,
+        t.operate_name AS operateName,
+        t.after_id AS afterId,
+        b.company_name AS companyName,
+        t.account_money AS accountMoney,
+        m.total_borrow_amount AS totalBorrowAmount,
+        t.fact_transfer_name AS factTransferName,
+        t.trade_date AS tradeDate,
+        t.trade_type AS tradeType,
+        t.bank_account AS bankAccount,
+        t.state AS state
+        FROM
+        tb_money_pool_repayment t
+        LEFT JOIN tb_basic_business b ON t.original_business_id = b.business_id
+        LEFT JOIN tb_repayment_biz_plan_list m ON t.plan_list_id = m.plan_list_id
+        WHERE 1=1
+        <if test="regStartTime !=null">
+            AND t.create_time &gt;= #{regStartTime}
+        </if>
+        <if test="regEndTime !=null">
+            AND t.create_time &lt;= #{regEndTime}
+        </if>
+        <if test="businessId !=null">
+            AND t.original_business_id LIKE #{businessId}
+        </if>
+        <if test="companyId !=null">
+            AND b.company_id = #{companyId}
+        </if>
+        <if test="state !=null">
+            AND t.state=#{state}
+        </if>
+        <if test="accountStartTime !=null">
+         AND  t.trade_date &gt;=#{accountStartTime}
+        </if>
+        <if test="accountEndTime !=null">
+            AND  t.trade_date &lt;=#{accountEndTime}
+        </if>
+        <if test="customerName !=null">
+            AND  t.operate_name like #{customerName}
+        </if>
+        <if test="bankAccount !=null">
+            AND  t.bank_account like #{bankAccount}
+        </if>
+        <if test="accountMoney !=null">
+            AND  t.account_money like #{accountMoney}
+        </if>
+       limit ${(page-1)*limit} , ${limit}
+    </select>
+
+    <select id="countCustomerRepayFlowList" resultType="int">
+        SELECT
+        count(1)
+        FROM
+        tb_money_pool_repayment t
+        LEFT JOIN tb_basic_business b ON t.original_business_id = b.business_id
+        LEFT JOIN tb_repayment_biz_plan_list m ON t.plan_list_id = m.plan_list_id
+        WHERE 1=1
+        <if test="regStartTime !=null">
+            AND t.create_time &gt;= #{regStartTime}
+        </if>
+        <if test="regEndTime !=null">
+            AND t.create_time &lt;= #{regEndTime}
+        </if>
+        <if test="businessId !=null">
+            AND t.original_business_id LIKE #{businessId}
+        </if>
+        <if test="companyId !=null">
+            AND b.company_id = #{companyId}
+        </if>
+        <if test="state !=null">
+            AND t.state=#{state}
+        </if>
+        <if test="accountStartTime !=null">
+            AND  t.trade_date &gt;=#{accountStartTime}
+        </if>
+        <if test="accountEndTime !=null">
+            AND  t.trade_date &lt;=#{accountEndTime}
+        </if>
+        <if test="customerName !=null">
+            AND  t.operate_name like #{customerName}
+        </if>
+        <if test="bankAccount !=null">
+            AND  t.bank_account like #{bankAccount}
+        </if>
+        <if test="accountMoney !=null">
+            AND  t.account_money like #{accountMoney}
+        </if>
+    </select>
+    <select id="getCustomerRepayFlowList" parameterType="com.hongte.alms.base.customer.vo.CustomerRepayFlowListReq"
+            resultType="com.hongte.alms.base.customer.vo.CustomerRepayFlowExel">
+        SELECT
+        t.id AS  id,
+        t.create_time AS createTime,
+        t.money_pool_id AS moneyPoolId,
+        t.original_business_id AS originalBusinessId,
+        t.operate_name AS operateName,
+        t.after_id AS afterId,
+        b.company_name AS companyName,
+        t.account_money AS accountMoney,
+        m.total_borrow_amount AS totalBorrowAmount,
+        t.fact_transfer_name AS factTransferName,
+        t.trade_date AS tradeDate,
+        t.trade_type AS tradeType,
+        t.bank_account AS bankAccount,
+        t.state AS state
+        FROM
+        tb_money_pool_repayment t
+        LEFT JOIN tb_basic_business b ON t.original_business_id = b.business_id
+        LEFT JOIN tb_repayment_biz_plan_list m ON t.plan_list_id = m.plan_list_id
+        WHERE 1=1
+        <if test="regStartTime !=null">
+            AND t.create_time &gt;= #{regStartTime}
+        </if>
+        <if test="regEndTime !=null">
+            AND t.create_time &lt;= #{regEndTime}
+        </if>
+        <if test="businessId !=null">
+            AND t.original_business_id LIKE #{businessId}
+        </if>
+        <if test="companyId !=null">
+            AND b.company_id = #{companyId}
+        </if>
+        <if test="state !=null">
+            AND t.state=#{state}
+        </if>
+        <if test="accountStartTime !=null">
+            AND  t.trade_date &gt;=#{accountStartTime}
+        </if>
+        <if test="accountEndTime !=null">
+            AND  t.trade_date &lt;=#{accountEndTime}
+        </if>
+        <if test="customerName !=null">
+            AND  t.operate_name like #{customerName}
+        </if>
+        <if test="bankAccount !=null">
+            AND  t.bank_account like #{bankAccount}
+        </if>
+        <if test="accountMoney !=null">
+            AND  t.account_money like #{accountMoney}
+        </if>
+    </select>
+
+    <update id="batchUpdateMoneyPool" >
+        <foreach collection="updateList" separator=";" item="moneyPool">
+            UPDATE tb_money_pool_repayment
+            <set>
+                <if test="moneyPool.accountMoney != null">
+                    account_money  = #{moneyPool.accountMoney},
+                </if>
+                <if test="moneyPool.factTransferName !=null">
+                    fact_transfer_name = #{moneyPool.factTransferName},
+                </if>
+                <if test="moneyPool.bankAccount != null">
+                    bank_account = #{moneyPool.bankAccount},
+                </if>
+                <if test="moneyPool.state != null">
+                    state = #{moneyPool.state},
+                </if>
+                <if test="moneyPool.updateTime != null">
+                    update_time = #{moneyPool.updateTime},
+                </if>
+
+            </set>
+            WHERE id=#{moneyPool.id}
+        </foreach>
+
+    </update>
+
 </mapper>
