@@ -110,10 +110,10 @@ var layer;
 
 	}
 	function withHoldingRecord(){
-		if(vm.ajax_data.issueSplitType==1&&vm.platformId==5){debugger
-			vm.$Modal.error({content: '共借标不能银行代扣'});
-		   return;
-		}
+//		if(vm.ajax_data.issueSplitType==1&&vm.platformId==5){debugger
+//			vm.$Modal.error({content: '共借标不能银行代扣'});
+//		   return;
+//		}
 		var isAmountWithheld="false";
 		if(vm.ajax_data.total<vm.ajax_data.restAmount){
 			isAmountWithheld="true";//部分代扣
