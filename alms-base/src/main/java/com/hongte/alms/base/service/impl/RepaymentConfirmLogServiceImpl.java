@@ -110,7 +110,7 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 	@Transactional(rollbackFor=Exception.class)
 	public Result revokeConfirm(String businessId, String afterId) {
 		/*找还款确认记录*/
-		List<RepaymentConfirmLog> logs = confirmLogMapper.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("business_id", businessId).eq("after_id", afterId).orderBy("`index`",false));
+		List<RepaymentConfirmLog> logs = confirmLogMapper.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("business_id", businessId).eq("after_id", afterId).orderBy("`idx`",false));
 		if (logs==null||logs.size()==0) {
 			return Result.error("500", "找不到任何一条相关的确认还款记录");
 		}

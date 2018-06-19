@@ -19,7 +19,7 @@ window.layinit(function (htConfig) {
                     key: 'afterId'
                 }, {
                     title: '还款日期',
-                    key: 'repayDate'
+                    key: 'dueDate'
                 }, {
                     title: '本金',
                     key: 'item10'
