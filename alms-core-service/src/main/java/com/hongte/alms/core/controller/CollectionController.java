@@ -154,8 +154,12 @@ public class CollectionController {
         //催收级别
         List<SysParameter> collectLevelList = sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterTypeEnums.COLLECTION_LEVERS.getKey()).orderBy("row_Index"));
         retMap.put("collectLevelList",(JSONArray) JSON.toJSON(collectLevelList, JsonUtil.getMapping()));
-
-        
+        //userId
+        List<String> userlist=new ArrayList();
+        String userId = loginUserInfoHelper.getUserId();
+        userlist.add(userId);
+        retMap.put("userId",(JSONArray) JSON.toJSON(userlist, JsonUtil.getMapping()));
+ 
         List<SysParameter> carStatusList = sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterTypeEnums.CAR_STATUS.getKey()).orderBy("row_Index"));
         retMap.put("carStatusList",(JSONArray) JSON.toJSON(carStatusList, JsonUtil.getMapping()));
 
@@ -439,6 +443,18 @@ public class CollectionController {
 
 //    public Result
 
+
+    @ApiOperation(value = "分配所有业务的电催、催收信息")
+    @GetMapping("/setAllBizCollection")
+    public Result setAllBizCollection(){
+        try{
+            collectionStatusService.autoSetBusinessStaff();
+            return Result.success();
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return Result.error("500", "执行电催、催收分配异常:"+ ex.getMessage());
+        }
+    }
 
 
 

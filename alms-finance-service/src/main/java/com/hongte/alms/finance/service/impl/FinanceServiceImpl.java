@@ -191,6 +191,7 @@ public class FinanceServiceImpl implements FinanceService {
 		moneyPoolRepayment.setOperateId(loginUserInfoHelper.getUserId());
 		moneyPoolRepayment.setClaimDate(now);
 		moneyPoolRepayment.setOperateName(loginUserInfoHelper.getLoginInfo().getUserName());
+		moneyPoolRepayment.setOperateId(loginUserInfoHelper.getUserId());
 		moneyPoolRepayment.setIncomeType(moneyPool.getIncomeType());
 		moneyPoolRepayment.setMoneyPoolId(moneyPool.getMoneyPoolId());
 		boolean mrpSaveResult = moneyPoolRepayment.insert();
@@ -263,14 +264,6 @@ public class FinanceServiceImpl implements FinanceService {
 	@Override
 	@Transactional(rollbackFor = ServiceRuntimeException.class)
 	public Result matchBankStatement(List<String> moneyPoolIds, String businessId, String afterId, String mprid) {
-		List<MoneyPoolRepayment> list = moneyPoolRepaymentMapper
-				.selectList(new EntityWrapper<MoneyPoolRepayment>().eq("original_business_id", businessId)
-						.eq("after_id", afterId).in("money_pool_id", moneyPoolIds).eq("is_finance_match", 1));
-
-		if (list != null && list.size() > 0) {
-			return Result.error("500", "已存在匹配的银行流水,不可重复匹配");
-		}
-		Date now = new Date();
 		if (mprid != null) {
 			MoneyPool moneyPool = moneyPoolMapper.selectById(moneyPoolIds.get(0));
 			MoneyPoolRepayment moneyPoolRepayment = moneyPoolRepaymentMapper.selectById(mprid);
@@ -290,7 +283,36 @@ public class FinanceServiceImpl implements FinanceService {
 			moneyPoolRepayment.setIsFinanceMatch(1);
 			moneyPoolRepayment.updateById();
 			return Result.success();
-		} else {
+		}
+		
+		List<MoneyPoolRepayment> list = moneyPoolRepaymentMapper
+				.selectList(new EntityWrapper<MoneyPoolRepayment>().eq("original_business_id", businessId)
+						.eq("after_id", afterId).in("money_pool_id", moneyPoolIds));
+
+		if (list != null && list.size() > 0) {
+			return Result.error("500", "已存在匹配的银行流水,不可重复匹配");
+		}
+		Date now = new Date();
+		/*if (mprid != null) {
+			MoneyPool moneyPool = moneyPoolMapper.selectById(moneyPoolIds.get(0));
+			MoneyPoolRepayment moneyPoolRepayment = moneyPoolRepaymentMapper.selectById(mprid);
+			moneyPoolRepayment.setAccountMoney(moneyPool.getAccountMoney());
+			moneyPoolRepayment.setBankAccount(moneyPool.getAcceptBank());
+			moneyPoolRepayment.setCreateUser(loginUserInfoHelper.getUserId());
+			moneyPoolRepayment.setFactTransferName(moneyPool.getRemitBank());
+			moneyPoolRepayment.setIncomeType(1);
+			moneyPoolRepayment.setRemark(moneyPool.getTradeRemark());
+			moneyPoolRepayment.setMoneyPoolId(moneyPool.getMoneyPoolId());
+			moneyPoolRepayment.setTradeDate(moneyPool.getTradeDate());
+			moneyPoolRepayment.setTradePlace(moneyPool.getTradePlace());
+			moneyPoolRepayment.setTradeType(moneyPool.getTradeType());
+
+			moneyPoolRepayment.setMoneyPoolId(moneyPool.getMoneyPoolId());
+			moneyPoolRepayment.setState(RepayRegisterFinanceStatus.财务指定银行流水.toString());
+			moneyPoolRepayment.setIsFinanceMatch(1);
+			moneyPoolRepayment.updateById();
+			return Result.success();
+		} else {*/
 			List<MoneyPool> moneyPools = moneyPoolMapper.selectBatchIds(moneyPoolIds);
 			RepaymentBizPlanList repaymentBizPlanList = new RepaymentBizPlanList();
 			repaymentBizPlanList.setOrigBusinessId(businessId);
@@ -311,7 +333,7 @@ public class FinanceServiceImpl implements FinanceService {
 				boolean r = moneyPoolRepayment.insert();
 			}
 			return Result.success();
-		}
+//		}
 
 	}
 
@@ -1405,6 +1427,8 @@ public class FinanceServiceImpl implements FinanceService {
 						double onlineLateFee = 0; // 线上滞纳金
 						double surplus = 0; // 结余
 
+						Date factRepayDate = null;	// 实还日期
+						
 						for (RepaymentPlanInfoDTO infoDTO : infoDTOs) {
 							String repayment = infoDTO.getRepayment();
 							if ("计划还款".equals(repayment)) {
@@ -1420,41 +1444,43 @@ public class FinanceServiceImpl implements FinanceService {
 										: (infoDTO.getAmount() - planInfoDTO.getAmount()));
 								infoDTO.setTotal(infoDTO.getTotal() + infoDTO.getSurplus()); // 完成上一步没有加上的结余数据
 								surplus += infoDTO.getSurplus();
+								if (factRepayDate == null) {
+									factRepayDate = infoDTO.getRepaymentDate();
+								}
 							}
 						}
 						
 						double subtotal = accrual + principal + serviceCharge + platformCharge; // 小计
 						double total = subtotal + offlineLateFee + onlineLateFee + surplus; // 还款合计（含滞纳金）
-
+						
 						RepaymentPlanInfoDTO balanceRepayment = new RepaymentPlanInfoDTO(); // 差额
-						balanceRepayment.setAccrual(BigDecimal.valueOf(planInfoDTO.getAccrual() - accrual)
-								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+						balanceRepayment.setRepayment("差额");
 						balanceRepayment.setAfterId(planInfoDTO.getAfterId());
 						balanceRepayment.setConfirmFlag(planInfoDTO.getConfirmFlag());
-						balanceRepayment.setOfflineLateFee(BigDecimal.valueOf(planInfoDTO.getOfflineLateFee() - offlineLateFee)
-								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-						balanceRepayment.setOnlineLateFee(BigDecimal.valueOf(planInfoDTO.getOnlineLateFee() - onlineLateFee)
-								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-						balanceRepayment.setOverdueDays(planInfoDTO.getOverdueDays());
 						balanceRepayment.setPlanListId(planInfoDTO.getPlanListId());
-						balanceRepayment.setPlatformCharge(BigDecimal.valueOf(planInfoDTO.getPlatformCharge() - platformCharge)
-								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-						balanceRepayment.setPrincipal(BigDecimal.valueOf(planInfoDTO.getPrincipal() - principal)
-								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-						balanceRepayment.setSubtotal(BigDecimal.valueOf(planInfoDTO.getSubtotal() - subtotal)
-								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-						balanceRepayment.setTotal(BigDecimal.valueOf(planInfoDTO.getTotal() - total)
-								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-						balanceRepayment.setRepayment("差额");
-						balanceRepayment.setServiceCharge(BigDecimal.valueOf(planInfoDTO.getServiceCharge() - serviceCharge)
-								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+						balanceRepayment.setOverdueDays(planInfoDTO.getOverdueDays());
+						if (factRepayDate != null) {
+							balanceRepayment.setAccrual(BigDecimal.valueOf(planInfoDTO.getAccrual() - accrual)
+									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+							balanceRepayment.setOfflineLateFee(BigDecimal.valueOf(planInfoDTO.getOfflineLateFee() - offlineLateFee)
+									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+							balanceRepayment.setOnlineLateFee(BigDecimal.valueOf(planInfoDTO.getOnlineLateFee() - onlineLateFee)
+									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+							balanceRepayment.setPlatformCharge(BigDecimal.valueOf(planInfoDTO.getPlatformCharge() - platformCharge)
+									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+							balanceRepayment.setPrincipal(BigDecimal.valueOf(planInfoDTO.getPrincipal() - principal)
+									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+							balanceRepayment.setSubtotal(BigDecimal.valueOf(planInfoDTO.getSubtotal() - subtotal)
+									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+							balanceRepayment.setTotal(BigDecimal.valueOf(planInfoDTO.getTotal() - total)
+									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+							balanceRepayment.setServiceCharge(BigDecimal.valueOf(planInfoDTO.getServiceCharge() - serviceCharge)
+									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
 
+						}
 						infoDTOs.add(balanceRepayment);
-
 						resultList.addAll(infoDTOs);
-
 						resultMap.put("resultList", resultList);
-
 					}
 					return resultMap;
 				}
@@ -1627,9 +1653,13 @@ public class FinanceServiceImpl implements FinanceService {
 					dtoPlan.setTotal(dtoPlan.getSubtotal() + dtoPlan.getOnlineLateFee() + dtoPlan.getOfflineLateFee());
 					double planAmount = dtoPlan.getAmount();
 					
+					Date factRepayDate = null; // 实还日期
+					
 					for (RepaymentProjInfoDTO repaymentProjInfoDTO : dtos) {
 
 						if ("实际还款".equals(repaymentProjInfoDTO.getRepayment())) {
+							
+							factRepayDate = repaymentProjInfoDTO.getRepaymentDate();
 							
 							repaymentProjInfoDTO.setSubtotal(repaymentProjInfoDTO.getPrincipal()
 									+ repaymentProjInfoDTO.getAccrual() + repaymentProjInfoDTO.getServiceCharge()
@@ -1656,25 +1686,27 @@ public class FinanceServiceImpl implements FinanceService {
 					RepaymentProjInfoDTO dtoDifference = new RepaymentProjInfoDTO();
 					dtoDifference.setRealName(dtoPlan.getRealName());
 					dtoDifference.setRepayment("差额");
-					dtoDifference.setPrincipal(BigDecimal.valueOf(dtoPlan.getPrincipal() - principal)
-							.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-					dtoDifference.setAccrual(BigDecimal.valueOf(dtoPlan.getAccrual() - accrual)
-							.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-					dtoDifference.setServiceCharge(BigDecimal.valueOf(dtoPlan.getServiceCharge() - serviceCharge)
-							.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-					dtoDifference.setPlatformCharge(BigDecimal.valueOf(dtoPlan.getPlatformCharge() - platformCharge)
-							.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-					dtoDifference.setSubtotal(BigDecimal.valueOf(dtoPlan.getSubtotal() - subtotal)
-							.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-					dtoDifference.setOnlineLateFee(BigDecimal.valueOf(dtoPlan.getOnlineLateFee() - onlineLateFee)
-							.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-					dtoDifference.setOfflineLateFee(BigDecimal.valueOf(dtoPlan.getOfflineLateFee() - offlineLateFee)
-							.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-					dtoDifference.setSurplus(BigDecimal.valueOf(dtoPlan.getSurplus() - surplus)
-							.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-					dtoDifference.setTotal(BigDecimal.valueOf(dtoPlan.getTotal() - total)
-							.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-					
+					if (factRepayDate != null) {
+						dtoDifference.setPrincipal(BigDecimal.valueOf(dtoPlan.getPrincipal() - principal)
+								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+						dtoDifference.setAccrual(BigDecimal.valueOf(dtoPlan.getAccrual() - accrual)
+								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+						dtoDifference.setServiceCharge(BigDecimal.valueOf(dtoPlan.getServiceCharge() - serviceCharge)
+								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+						dtoDifference.setPlatformCharge(BigDecimal.valueOf(dtoPlan.getPlatformCharge() - platformCharge)
+								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+						dtoDifference.setSubtotal(BigDecimal.valueOf(dtoPlan.getSubtotal() - subtotal)
+								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+						dtoDifference.setOnlineLateFee(BigDecimal.valueOf(dtoPlan.getOnlineLateFee() - onlineLateFee)
+								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+						dtoDifference.setOfflineLateFee(BigDecimal.valueOf(dtoPlan.getOfflineLateFee() - offlineLateFee)
+								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+						dtoDifference.setSurplus(BigDecimal.valueOf(dtoPlan.getSurplus() - surplus)
+								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+						dtoDifference.setTotal(BigDecimal.valueOf(dtoPlan.getTotal() - total)
+								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+						
+					}
 					repaymentProjInfoDTOs.add(dtoDifference);
 				}
 				
@@ -1697,8 +1729,8 @@ public class FinanceServiceImpl implements FinanceService {
 							.notIn("plan_item_type", 10, 20, 30, 50, 60).eq("plan_list_id", planListId));
 			if (CollectionUtils.isNotEmpty(details)) {
 				for (RepaymentBizPlanListDetail detail : details) {
-					BigDecimal planAmount = detail.getPlanAmount();
-					resultList.add(detail.getPlanItemName() + ": " + (planAmount == null ? BigDecimal.valueOf(0) : planAmount)
+					BigDecimal factAmount = detail.getFactAmount();
+					resultList.add(detail.getPlanItemName() + ": " + (factAmount == null ? BigDecimal.valueOf(0) : factAmount)
 					.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
 				}
 			}

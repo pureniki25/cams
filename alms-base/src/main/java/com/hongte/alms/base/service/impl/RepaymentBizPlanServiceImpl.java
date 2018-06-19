@@ -13,6 +13,7 @@ import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.WithholdingRecordLog;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanSettleStatusEnum;
+import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.mapper.DeductionMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanMapper;
 import com.hongte.alms.base.process.entity.ProcessLog;
@@ -293,15 +294,36 @@ public class RepaymentBizPlanServiceImpl extends BaseServiceImpl<RepaymentBizPla
 
 
 	@Override
-	public List<RepaymentSettleListVO> listRepaymentSettleListVOs(String businessId, String planId) {
+	public List<RepaymentSettleListVO> listRepaymentSettleListVOs(String businessId,String afterId, String planId) {
 		List<RepaymentSettleListVO> list = repaymentBizPlanMapper.listRepaymentSettleListVOs(businessId, planId);
-		RepaymentSettleListVO finalVO = list.get(list.size()-1) ;
-		List<RepaymentSettleListVO> currents = new ArrayList<>();
-		RepaymentSettleListVO curr = null ;
-		findCurrentPeriod(finalVO, list, currents, curr);
-		//TODO
-		
-		return repaymentBizPlanMapper.listRepaymentSettleListVOs(businessId, planId);
+		if (list==null||list.size()==0) {
+			throw new ServiceRuntimeException("找不到还款计划");
+		}
+		RepaymentSettleListVO finalOne = new RepaymentSettleListVO();
+		finalOne.setAfterId("结清应还");
+		finalOne.setItem10(new BigDecimal("0"));
+		finalOne.setItem20(new BigDecimal("0"));
+		finalOne.setItem30(new BigDecimal("0"));
+		finalOne.setItem50(new BigDecimal("0"));
+		finalOne.setOfflineOverDue(new BigDecimal("0"));
+		finalOne.setOnlineOverDue(new BigDecimal("0"));
+		finalOne.setPlanAmount(new BigDecimal("0"));
+		finalOne.setLack(new BigDecimal("0"));
+		finalOne.setFactAmount(new BigDecimal("0"));
+		finalOne.setPenalty(new BigDecimal("0"));
+		for (RepaymentSettleListVO repaymentSettleListVO : list) {
+			finalOne.setItem10(finalOne.getItem10().add(repaymentSettleListVO.getItem10()));
+			finalOne.setItem20(finalOne.getItem20().add(repaymentSettleListVO.getItem20()));
+			finalOne.setItem30(finalOne.getItem30().add(repaymentSettleListVO.getItem30()));
+			finalOne.setItem50(finalOne.getItem50().add(repaymentSettleListVO.getItem50()));
+			finalOne.setOfflineOverDue(finalOne.getOfflineOverDue().add(repaymentSettleListVO.getOfflineOverDue()));
+			finalOne.setOnlineOverDue(finalOne.getOnlineOverDue().add(repaymentSettleListVO.getOnlineOverDue()));
+			finalOne.setPlanAmount(finalOne.getPlanAmount().add(repaymentSettleListVO.getPlanAmount()));
+			finalOne.setLack(finalOne.getLack().add(repaymentSettleListVO.getLack()));
+			finalOne.setFactAmount(finalOne.getFactAmount().add(repaymentSettleListVO.getFactAmount()));
+		}
+		list.add(finalOne);
+		return list;
 	}
 	
 	private void findCurrentPeriod(RepaymentSettleListVO finalVO,List<RepaymentSettleListVO> list,List<RepaymentSettleListVO> currents,RepaymentSettleListVO curr) {

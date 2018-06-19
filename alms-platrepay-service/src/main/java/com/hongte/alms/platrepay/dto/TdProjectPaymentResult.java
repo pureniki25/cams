@@ -3,6 +3,12 @@ package com.hongte.alms.platrepay.dto;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * 团贷网标的还款信息（应还）
+ * 
+ * @author 胡伟骞
+ *
+ */
 public class TdProjectPaymentResult implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -15,7 +21,7 @@ public class TdProjectPaymentResult implements Serializable {
 	/**
 	 * 还款信息
 	 */
-	private List<TdProjectPaymentDTO> projectPayment;
+	private List<TdProjectPaymentDTO> projectPayments;
 
 	public String getProjectId() {
 		return projectId;
@@ -26,16 +32,16 @@ public class TdProjectPaymentResult implements Serializable {
 	}
 
 	public List<TdProjectPaymentDTO> getProjectPayment() {
-		return projectPayment;
+		return projectPayments;
 	}
 
-	public void setProjectPayment(List<TdProjectPaymentDTO> projectPayment) {
-		this.projectPayment = projectPayment;
+	public void setProjectPayment(List<TdProjectPaymentDTO> projectPayments) {
+		this.projectPayments = projectPayments;
 	}
 
 	@Override
 	public String toString() {
-		return "TdProjectPaymentResult [projectId=" + projectId + ", projectPayment=" + projectPayment + "]";
+		return "TdProjectPaymentResult [projectId=" + projectId + ", projectPayments=" + projectPayments + "]";
 	}
 
 }

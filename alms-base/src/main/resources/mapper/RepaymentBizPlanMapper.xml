@@ -78,19 +78,38 @@
     </select>
 
 	<select id="listRepaymentSettleListVOs" resultType="com.hongte.alms.base.vo.finance.RepaymentSettleListVO">
+		SELECT 
+		t.isDefer,
+		t.period,
+		t.remark,
+		t.afterId,
+		t.repayDate,
+		t.status,
+		t.item10,
+		t.item20,
+		t.item30,
+		t.item50,
+		t.offlineOverDue,
+		t.onlineOverDue,
+		t.planAmount,
+		t.factAmount,
+		(t.factAmount-t.planAmount) as lack
+		FROM (
+		
 		SELECT
 			if(pl.orig_business_id != pl.business_id,true,false) as isDefer,
 			pl.period as period,
 			pl.remark as remark,
 			pl.after_id AS afterId,
 			pl.due_date AS repayDate,
+			pl.current_status as status,
 			( SELECT IFNULL( sum( plan_amount ), 0 ) FROM tb_repayment_biz_plan_list_detail WHERE plan_list_id = pl.plan_list_id AND plan_item_type = 10 ) AS item10,
 			( SELECT IFNULL( sum( plan_amount ), 0 ) FROM tb_repayment_biz_plan_list_detail WHERE plan_list_id = pl.plan_list_id AND plan_item_type = 20 ) AS item20,
 			( SELECT IFNULL( sum( plan_amount ), 0 ) FROM tb_repayment_biz_plan_list_detail WHERE plan_list_id = pl.plan_list_id AND plan_item_type = 30 ) AS item30,
 			( SELECT IFNULL( sum( plan_amount ), 0 ) FROM tb_repayment_biz_plan_list_detail WHERE plan_list_id = pl.plan_list_id AND plan_item_type = 50 ) AS item50,
 			( SELECT IFNULL( sum( plan_amount ), 0 ) FROM tb_repayment_biz_plan_list_detail WHERE plan_list_id = pl.plan_list_id AND fee_id = '3131c075-5721-11e8-8a00-0242ac110002' ) AS offlineOverDue,
 			( SELECT IFNULL( sum( plan_amount ), 0 ) FROM tb_repayment_biz_plan_list_detail WHERE plan_list_id = pl.plan_list_id AND fee_id = '2e646c87-5721-11e8-8a00-0242ac110002' ) AS onlineOverDue,
-			pl.total_borrow_amount AS planAmount,
+			(pl.total_borrow_amount+IFNULL(pl.overdue_amount,0)) AS planAmount,
 			( SELECT IFNULL( sum( fact_amount ), 0 ) FROM tb_repayment_biz_plan_list_detail WHERE plan_list_id = pl.plan_list_id ) AS factAmount 
 		FROM
 			tb_repayment_biz_plan p LEFT JOIN 
@@ -101,7 +120,7 @@
 			AND	p.plan_id = #{planId}
 			</if>
 		ORDER BY
-			pl.after_id
+			pl.due_date) AS t
 	</select>
 
 

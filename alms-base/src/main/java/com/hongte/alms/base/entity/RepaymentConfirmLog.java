@@ -48,11 +48,19 @@ public class RepaymentConfirmLog extends Model<RepaymentConfirmLog> {
 	@TableField("after_id")
 	@ApiModelProperty(required= true,value = "期数")
 	private String afterId;
+	
+	@TableField("period")
+	private Integer period;
+	
+	@TableField("repay_source")
+	private Integer repaySource ;
+	
     /**
      * 日志序号,表示当前是第几次还款确认
      */
+	@TableField("idx")
 	@ApiModelProperty(required= true,value = "日志序号,表示当前是第几次还款确认")
-	private Integer index;
+	private Integer idx;
     /**
      * 能否撤销,代扣和资金分发后的不能撤销
      */
@@ -83,6 +91,8 @@ public class RepaymentConfirmLog extends Model<RepaymentConfirmLog> {
 	@TableField("surplus_ref_id")
 	@ApiModelProperty(required= true,value = "结余表关联id")
 	private String surplusRefId;
+	@TableField("surplus_use_ref_id")
+	private String surplusUseRefId;
 	
     /**
      * 创建时间
@@ -148,13 +158,6 @@ public class RepaymentConfirmLog extends Model<RepaymentConfirmLog> {
 		this.afterId = afterId;
 	}
 
-	public Integer getIndex() {
-		return index;
-	}
-
-	public void setIndex(Integer index) {
-		this.index = index;
-	}
 
 	public Integer getCanRevoke() {
 		return canRevoke;
@@ -216,7 +219,7 @@ public class RepaymentConfirmLog extends Model<RepaymentConfirmLog> {
 			", businessId=" + businessId +
 			", orgBusinessId=" + orgBusinessId +
 			", afterId=" + afterId +
-			", index=" + index +
+			", idx=" + getIdx() +
 			", canRevoke=" + canRevoke +
 			", projPlanJson=" + projPlanJson +
 			", createTime=" + createTime +
@@ -294,5 +297,61 @@ public class RepaymentConfirmLog extends Model<RepaymentConfirmLog> {
 	 */
 	public void setSurplusRefId(String surplusRefId) {
 		this.surplusRefId = surplusRefId;
+	}
+
+	/**
+	 * @return the period
+	 */
+	public Integer getPeriod() {
+		return period;
+	}
+
+	/**
+	 * @param period the period to set
+	 */
+	public void setPeriod(Integer period) {
+		this.period = period;
+	}
+
+	/**
+	 * @return the repaySource
+	 */
+	public Integer getRepaySource() {
+		return repaySource;
+	}
+
+	/**
+	 * @param repaySource the repaySource to set
+	 */
+	public void setRepaySource(Integer repaySource) {
+		this.repaySource = repaySource;
+	}
+
+	/**
+	 * @return the surplusUseRefId
+	 */
+	public String getSurplusUseRefId() {
+		return surplusUseRefId;
+	}
+
+	/**
+	 * @param surplusUseRefId the surplusUseRefId to set
+	 */
+	public void setSurplusUseRefId(String surplusUseRefId) {
+		this.surplusUseRefId = surplusUseRefId;
+	}
+
+	/**
+	 * @return the idx
+	 */
+	public Integer getIdx() {
+		return idx;
+	}
+
+	/**
+	 * @param idx the idx to set
+	 */
+	public void setIdx(Integer idx) {
+		this.idx = idx;
 	}
 }

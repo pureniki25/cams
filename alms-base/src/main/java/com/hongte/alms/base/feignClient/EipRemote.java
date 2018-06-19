@@ -1,22 +1,22 @@
 package com.hongte.alms.base.feignClient;
 
+import java.util.Map;
+
+import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
 import com.hongte.alms.base.dto.RechargeModalDTO;
 import com.hongte.alms.base.dto.compliance.DistributeFundDTO;
 import com.hongte.alms.base.dto.compliance.TdAdvanceShareProfitDTO;
+import com.hongte.alms.base.dto.compliance.TdDepaymentEarlierDTO;
 import com.hongte.alms.base.feignClient.dto.AddProjectTrackReqDto;
 import com.hongte.alms.base.feignClient.dto.BankRechargeReqDto;
 import com.hongte.alms.base.feignClient.dto.BaofuRechargeReqDto;
 import com.hongte.alms.base.feignClient.dto.YiBaoRechargeReqDto;
 import com.hongte.alms.base.vo.comm.SmsVo;
 import com.ht.ussp.core.Result;
-
-import java.util.Map;
-
-import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * @author:喻尊龙
@@ -197,5 +197,34 @@ public interface EipRemote {
 	@RequestMapping(value = "/eip/td/repayment/advanceShareProfit", headers = { "app=ALMS",
 	"content-type=application/json" }, method = RequestMethod.POST)
 	Result advanceShareProfit(@RequestBody TdAdvanceShareProfitDTO dto);
+	
+	
+	/**
+	 * 你我金融      7.10.2订单查询
+	 * @param orderNo  标ID
+	 * @return
+	 */
+	@RequestMapping(value = "/eip//niiwoo/org/queryApplyOrder", headers = { "app=ALMS",
+	"content-type=application/json" }, method = RequestMethod.POST)
+	Result queryApplyOrder(@RequestBody Map<String, Object> paramMap);
+
+	/**
+	 * 提前结清
+	 * @param dto
+	 * @return
+	 */
+	@RequestMapping(value = "/eip/td/repayment/repaymentEarlier", headers = { "app=ALMS",
+	"content-type=application/json" }, method = RequestMethod.POST)
+	Result repaymentEarlier(@RequestBody TdDepaymentEarlierDTO dto);
+	
+	/**
+	 * 资金分发订单查询
+	 * @param paramMap
+	 * @return
+	 */
+	@RequestMapping(value = "/eip/td/assetside/queryDistributeFund", headers = { "app=ALMS",
+	"content-type=application/json" }, method = RequestMethod.POST)
+	Result queryDistributeFund(@RequestBody Map<String, Object> paramMap);
+	
 
 }

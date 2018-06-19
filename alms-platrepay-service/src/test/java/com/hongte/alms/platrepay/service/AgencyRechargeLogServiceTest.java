@@ -28,4 +28,9 @@ public class AgencyRechargeLogServiceTest {
 	public void testQueryRechargeOrder() {
 		agencyRechargeLogService.queryRechargeOrder("171014", "213211212121aswq121a121s", "test");
 	}
+	
+	@Test
+	public void testQueryDistributeFund() {
+		agencyRechargeLogService.queryDistributeFund();
+	}
 }

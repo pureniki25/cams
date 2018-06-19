@@ -1,12 +1,16 @@
 package com.hongte.alms.finance.controller;
 
 
+import com.hongte.alms.base.feignClient.EipRemote;
+import com.hongte.alms.base.feignClient.dto.NiWoProjPlanDto;
 import com.hongte.alms.base.service.SysCityService;
 import com.hongte.alms.base.service.SysCountyService;
 import com.hongte.alms.base.service.SysProvinceService;
 
 import com.hongte.alms.base.vo.module.AreaProvinceItemVo;
 import com.hongte.alms.common.result.Result;
+import com.hongte.alms.finance.service.SearchNiWoRepayPlanService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -15,14 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hongte.alms.base.service.SysProvinceService;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author zengkun
@@ -45,10 +46,15 @@ public class testController {
     @Autowired
     @Qualifier("SysCountyService")
     private SysCountyService countyService;
+    
+    @Autowired
+    @Qualifier("SearchNiWoRepayPlanService")
+    SearchNiWoRepayPlanService  searchNiWoRepayPlanService;
+    
 
     @ApiOperation(value="获取区域信息")
     @GetMapping("getArea")
-    public Result<List<AreaProvinceItemVo>> getArea()
+    public Result<List<AreaProvinceItemVo>> queryApplyOrder()
     {
 //        try {
 //            List<AreaProvinceItemVo> provinceItemList = provinceService.getAreaInfo();
@@ -61,6 +67,16 @@ public class testController {
 //        }
 
         return null;
+    }
+    
+    
+    @ApiOperation(value="获你我金融标的还款计划")
+    @GetMapping("getNiWoRepayPlan")
+    public NiWoProjPlanDto getNiWoRepayPlan(@RequestParam("projId") String projId)
+    {
+    	NiWoProjPlanDto dto=searchNiWoRepayPlanService.getNiWoRepayPlan(projId);
+
+        return dto;
     }
 
 }

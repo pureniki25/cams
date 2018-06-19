@@ -244,7 +244,7 @@ window.layinit(function (htConfig) {
 
                         }
                     }],
-                    data: [{
+                    data: [/* {
                         "moneyPoolId": "73b90613df4943fa8e09935aa2f25f2c",
                         "repaymentCode": null,
                         "bankAccount": " 陈树华招行",
@@ -277,7 +277,7 @@ window.layinit(function (htConfig) {
                         "remark": null,
                         "summary": null,
                         "status": "完成"
-                    }]
+                    } */]
                 },
                 projRepayment: {
                     col: [],
@@ -292,46 +292,154 @@ window.layinit(function (htConfig) {
                         key: 'repayDate'
                     }, {
                         title: '本金',
-                        key: 'item10'
+                        key: 'item10',
+                        render:(h,p)=>{
+                            return h('span',numeral(p.row.item10).format('0,0.00'))
+                        }
                     }, {
                         title: '利息',
-                        key: 'item20'
+                        key: 'item20',
+                        render:(h,p)=>{
+                            return h('span',numeral(p.row.item20).format('0,0.00'))
+                        }
                     }, {
                         title: '分公司服务费',
-                        key: 'item30'
+                        key: 'item30',
+                        render:(h,p)=>{
+                            return h('span',numeral(p.row.item30).format('0,0.00'))
+                        }
                     }, {
                         title: '平台费',
-                        key: 'item50'
+                        key: 'item50',
+                        render:(h,p)=>{
+                            return h('span',numeral(p.row.item50).format('0,0.00'))
+                        }
                     }, {
                         title: '线下滞纳金',
-                        key: 'offlineOverDue'
+                        key: 'offlineOverDue',
+                        render:(h,p)=>{
+                            return h('span',numeral(p.row.offlineOverDue).format('0,0.00'))
+                        }
                     }, {
                         title: '线上滞纳金',
-                        key: 'onlineOverDue'
+                        key: 'onlineOverDue',
+                        render:(h,p)=>{
+                            return h('span',numeral(p.row.onlineOverDue).format('0,0.00'))
+                        }
                     }, {
                         title: '应还合计',
-                        key: 'planAmount'
-                    }, {
-                        title: '差额',
-                        key: 'lack'
+                        key: 'planAmount',
+                        render:(h,p)=>{
+                            return h('span',numeral(p.row.planAmount).format('0,0.00'))
+                        }
                     }, {
                         title: '实际还款金额',
-                        key: 'factAmount'
+                        key: 'factAmount',
+                        render:(h,p)=>{
+                            return h('span',numeral(p.row.factAmount).format('0,0.00'))
+                        }
                     }, {
+                        title: '差额',
+                        key: 'lack',
+                        render:(h,p)=>{
+                            return h('span',numeral(p.row.lack).format('0,0.00'))
+                        }
+                    }, /* {
                         title: '提前结清违约金',
                         key: 'penalty'
-                    }, {
+                    }, */ {
                         title: '备注',
                         key: 'remark'
                     }, {
                         title: '状态',
-                        key: 'status'
+                        key: 'status',
+                        render: (h, p) => {
+                            let s = p.row.status;
+                            let color = 'blue'
+                            let content = s
+                            if (!s) {
+                                return h('span', '')
+                            }
+                            //还款中，逾期，已还款
+                            if(content=='还款中'){
+                                color='green'
+                            }
+                            if(content=='逾期'){
+                                color='#ed3f14'
+                            }
+                            if(content=='已还款'){
+                                color='blue'
+                            }
+                            // '会计确认状态，0或null:待审核;1:已审核;2:已退回;3:已返审核;4:导入;',
+                            return h('Tag', {
+                                props: {
+                                    color: color
+                                }
+                            }, content)
+                        }
                     }, ],
                     data: []
                 }
+            },
+            factRepaymentInfo: {
+                repayDate: '',
+                surplusFund: 0,
+                onlineOverDuel: '',
+                offlineOverDue: '',
+                remark: '',
+                canUseSurplus: 0,
+                moneyPoolAccount: 0,
+                repayAccount: 0,
+                mprIds: []
+            },
+            factRepayPreview: {
+                item10: 0,
+                item20: 0,
+                item30: 0,
+                item50: 0,
+                offlineOverDue: 0,
+                onlineOverDue: 0,
+                subTotal: 0,
+                total: 0,
+                surplus: 0
             }
         },
-        watch: {},
+        watch: {
+            'matchedBankStatement': function (n) {
+                let moneyPoolAccount = 0
+                if (n && n.length > 0) {
+                    n.forEach(element => {
+                        moneyPoolAccount = (moneyPoolAccount*10000+element.accountMoney*10000)/10000
+                        app.factRepaymentInfo.mprIds.push(element.mprId);
+                    });
+                    let o = n[n.length - 1]
+                    app.factRepaymentInfo.repayDate = o.tradeDate
+                }
+                app.factRepaymentInfo.moneyPoolAccount = moneyPoolAccount
+                
+                // app.factRepaymentInfo.repayAccount = parseFloat(app.factRepaymentInfo.moneyPoolAccount.toFixed(2))  + parseFloat(app.factRepaymentInfo.surplusFund.toFixed(2) || 0)
+                app.factRepaymentInfo.repayAccount = (app.factRepaymentInfo.moneyPoolAccount*10000+(app.factRepaymentInfo.surplusFund||0)*10000)/10000
+            },
+            'factRepaymentInfo.useSurplusflag':function(n,o){
+                if(o==''){
+                    return ;
+                }
+                app.factRepaymentInfo.surplusFund = 0
+            },
+            'factRepaymentInfo.surplusFund': function (n) {
+                if ((n||n==0 )&& !isNaN(n)) {
+                    if(n>app.factRepaymentInfo.canUseSurplus){
+                        app.$Modal.warning({content:'可使用结余金额不能大于'+app.factRepaymentInfo.canUseSurplus})
+                        app.factRepaymentInfo.surplusFund = 0
+                        return;
+                    }
+                    app.factRepaymentInfo.repayAccount = (app.factRepaymentInfo.moneyPoolAccount*10000+(app.factRepaymentInfo.surplusFund||0)*10000)/10000
+                }
+            },
+            'factRepaymentInfo.repayAccount': function (n) {
+                app.previewConfirmRepayment()
+            }
+        },
         methods: {
             getBaseInfo() {
                 axios.get(fpath + 'finance/repayBaseInfo', {
@@ -422,7 +530,7 @@ window.layinit(function (htConfig) {
                 })
             },
             listRepayment(){
-                axios.get(fpath+'finance/listRepaymentSettleListVOs?businessId='+businessId+(planId?('&planId='+planId):''))
+                axios.get(fpath+'settle/listRepaymentSettleListVOs?businessId='+businessId+'&afterId='+afterId+(planId?('&planId='+planId):''))
                 .then(function(res){
                     if(res.data.code=='1'){
                         app.table.plan.data = res.data.data
@@ -437,7 +545,25 @@ window.layinit(function (htConfig) {
             closePage(){
                 var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
                 parent.layer.close(index); //再执行关闭   
-            }
+            },
+            getSurplusFund() {
+                axios.get(fpath + 'finance/getSurplusFund?businessId=' + businessId + "&afterId=" + afterId)
+                    .then(function (res) {
+                        if (res.data.code == '1') {
+                            app.factRepaymentInfo.canUseSurplus = res.data.data
+                        } else {
+                            app.$Message.error({
+                                content: res.data.msg
+                            })
+                        }
+                    })
+                    .catch(function (err) {
+                        app.$Message.error({
+                            content: '获取结余信息失败'
+                        })
+                    })
+            },
+            
         },
         created: function () {
             this.getBaseInfo()

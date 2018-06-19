@@ -1,15 +1,11 @@
 package com.hongte.alms.platrepay.controller;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import com.hongte.alms.base.dto.PlatRepayDto;
-import com.hongte.alms.base.entity.BasicBusiness;
-import com.hongte.alms.base.entity.RepaymentProjPlanList;
-import com.hongte.alms.base.entity.TuandaiProjectInfo;
+import com.hongte.alms.base.entity.*;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanPayedTypeEnum;
 import com.hongte.alms.base.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.dto.RechargeModalDTO;
-import com.hongte.alms.base.entity.AgencyRechargeLog;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.CommonUtil;
@@ -70,11 +65,19 @@ public class ToPlatRepayController {
 	@Qualifier("BasicBusinessService")
 	private BasicBusinessService basicBusinessService;
 
+
+	@Autowired
+	@Qualifier("RepaymentProjPlanService")
+	RepaymentProjPlanService repaymentProjPlanService;
+
+	@Autowired
+	@Qualifier("RepaymentBizPlanService")
+	RepaymentBizPlanService repaymentBizPlanService;
+
 	@Autowired
 	@Qualifier("RepaymentProjPlanListService")
 	RepaymentProjPlanListService repaymentProjPlanListService;
 
-	
 
 
 
@@ -84,10 +87,7 @@ public class ToPlatRepayController {
 	public Result reapy(String projectId,String afterId) {
 		LOG.info("@对接合规还款接口 开始 @输入参数 projectId:[{}}  afterId[{}]",projectId,afterId);
 		try {
-			PlatRepayDto platRepayDto = new PlatRepayDto();
-
-			platRepayDto.setProjectId(projectId);
-			platRepayDto.setAfterId(afterId);
+;
 			TuandaiProjectInfo tuandaiProjectInfo = tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("project_id",projectId));
 
 			if(tuandaiProjectInfo == null){
@@ -96,56 +96,48 @@ public class ToPlatRepayController {
 			}
 
 
-			platRepayDto.setAssetType(1);  //业务所属资产端，1、鸿特信息，2、 一点车贷
+
 			BasicBusiness  basicBusiness =  basicBusinessService.selectById(tuandaiProjectInfo.getBusinessId());
-			platRepayDto.setOrigBusinessId(basicBusiness.getSourceBusinessId());
 
-			repaymentProjPlanListService.selectList(new EntityWrapper<RepaymentProjPlanList>().eq("",projectId).eq("",afterId));
+//			repaymentBizPlanService.selectList(new EntityWrapper<>().eq());
+
+			RepaymentProjPlan repaymentProjPlan = repaymentProjPlanService.selectOne(new EntityWrapper<RepaymentProjPlan>().eq("project_id",projectId));
+			if(repaymentProjPlan == null){
+				LOG.error("@对接合规还款接口@  查不到标的还款计划信息 输入参数 projectId:[{}}  ",projectId);
+				return Result.error("500","查不到标的还款计划信息");
+			}
 
 
-//			/**
-//			 * 原业务编号
-//			 */
-//			@TableField("orig_business_id")
-//			@ApiModelProperty(required= true,value = "原业务编号")
-//			private String origBusinessId;
-//			/**
-//			 * 业务类型(1:车易贷展期,2:房速贷展期,3:金融仓储,4:三农金融,9:车易贷,11:房速贷,12车全垫资代采,13:扶贫贷,14:汽车融资租赁,15:二手车商贷,20:一点车贷,25:信用贷)
-//			 */
-//			@TableField("business_type")
-//			@ApiModelProperty(required= true,value = "业务类型(1:车易贷展期,2:房速贷展期,3:金融仓储,4:三农金融,9:车易贷,11:房速贷,12车全垫资代采,13:扶贫贷,14:汽车融资租赁,15:二手车商贷,20:一点车贷,25:信用贷)")
-//			private Integer businessType;
-//			/**
-//			 * 实还日期
-//			 */
-//			@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-//			@TableField("fact_repay_date")
-//			@ApiModelProperty(required= true,value = "实还日期")
-//			private Date factRepayDate;
-//			/**
-//			 * 借款人
-//			 */
-//			@TableField("customer_name")
-//			@ApiModelProperty(required= true,value = "借款人")
-//			private String customerName;
-//			/**
-//			 * 分公司
-//			 */
-//			@TableField("company_name")
-//			@ApiModelProperty(required= true,value = "分公司")
-//			private String companyName;
-//			/**
-//			 * 还款来源，1:线下转账,2:第三方代扣,3:银行代扣,4:APP网关充值,5:协议代扣
-//			 */
-//			@TableField("repay_source")
-//			@ApiModelProperty(required= true,value = "还款来源，1:线下转账,2:第三方代扣,3:银行代扣,4:APP网关充值,5:协议代扣")
-//			private Integer repaySource;
-//			/**
-//			 * 资产端期数
-//			 */
-//			@TableField("after_id")
-//			@ApiModelProperty(required= true,value = "资产端期数")
-//			private String afterId;
+			List<RepaymentProjPlanList> projPlanList =  repaymentProjPlanListService.selectList(new EntityWrapper<RepaymentProjPlanList>().eq("proj_plan_id",repaymentProjPlan.getProjPlanId()).eq("",afterId));
+
+			if(projPlanList==null||projPlanList.size()==0){
+				LOG.error("@对接合规还款接口@  查不到标的还款计划列表信息 输入参数 projectId:[{}}  afterId{[]} ",projectId,afterId);
+				return Result.error("500","查不到标的还款计划列表信息");
+			}
+			if(projPlanList.size()>1){
+				LOG.error("@对接合规还款接口@  查到两条以上标的还款计划列表信息 输入参数 projectId:[{}}  afterId{[]} ",projectId,afterId);
+				return Result.error("500","查到两条以上标的还款计划列表信息");
+			}
+			RepaymentProjPlanList projPList = projPlanList.get(0);
+			if(projPList.getRepayFlag().equals(RepayPlanPayedTypeEnum.PAYING.getValue())||projPList.getRepayFlag().equals(RepayPlanPayedTypeEnum.RENEW_PAY.getValue())){
+				LOG.error("@对接合规还款接口@  此还款标的计划列表未还款 输入参数 projectId:[{}}  afterId{[]}  ",projectId,afterId);
+				return Result.error("500","此还款标的计划列表未还款");
+			}
+
+//			repaymentProjPlanListService.selectList(new EntityWrapper<RepaymentProjPlanList>().eq("",));
+
+			PlatRepayDto platRepayDto = new PlatRepayDto();
+			platRepayDto.setProjectId(projectId);
+			platRepayDto.setAfterId(afterId);
+			platRepayDto.setAssetType(1);  //业务所属资产端，1、鸿特信息，2、 一点车贷
+			platRepayDto.setOrigBusinessId(repaymentProjPlan.getOriginalBusinessId());//原业务编号
+
+			platRepayDto.setBusinessType(basicBusiness.getBusinessType());//业务类型
+			platRepayDto.setFactRepayDate(projPList.getFactRepayDate());//实还日期
+			platRepayDto.setCompanyName(basicBusiness.getCustomerName());//借款人
+			platRepayDto.setCompanyName(basicBusiness.getCompanyName());//分公司
+			platRepayDto.setRepaySource(RepayPlanPayedTypeEnum.getByValue(projPList.getRepayFlag()).getClassifyId());//还款来源，1:线下转账,2:第三方代扣,3:银行代扣,4:APP网关充值,5:协议代扣
+
 //			/**
 //			 * 财务确认时间或成功代扣时间
 //			 */

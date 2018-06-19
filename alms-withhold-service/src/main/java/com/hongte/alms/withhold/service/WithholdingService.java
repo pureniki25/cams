@@ -22,6 +22,11 @@ public interface WithholdingService {
     void withholding();
     
     /**
+     * app代扣操作
+     */
+    void appWithholding(RepaymentBizPlanList pList);
+    
+    /**
      * 手工银行代扣
      * @param handRepayAmount  手工代扣金额
      * 

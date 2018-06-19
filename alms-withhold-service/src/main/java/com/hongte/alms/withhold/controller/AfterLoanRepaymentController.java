@@ -4,6 +4,7 @@ import com.hongte.alms.base.collection.vo.DeductionVo;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.enums.PlatformEnum;
+import com.hongte.alms.base.feignClient.CustomerInfoXindaiRemoteApi;
 import com.hongte.alms.base.feignClient.dto.BankCardInfo;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.withhold.service.AfterLoanRepaymentService;
@@ -43,6 +44,7 @@ public class AfterLoanRepaymentController {
   	@Qualifier("WithholdingService")
     WithholdingService withholdingService;
 
+
     /**
      * 执行代扣
      * @param businessId 业务编号
@@ -74,6 +76,23 @@ public class AfterLoanRepaymentController {
     		 return result;
     	}
     
+    }
+    
+    
+    
+    /**
+     * 自动代扣
+     */
+    @GetMapping("/autoRepay")
+    @ApiOperation(value = "自动代扣")
+    public Result autoRepay(){
+	    try {
+	    	withholdingService.withholding();
+	        return Result.success();
+	    }catch (Exception ex){
+	        ex.printStackTrace();
+	        return Result.error("500", "自动代扣异常:"+ ex.getMessage());
+	    }
     }
     
     /**

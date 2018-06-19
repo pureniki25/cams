@@ -55,7 +55,7 @@ public interface RechargeService {
 	/**
 	 * 根据身份证号码获取客户相关代扣信息
 	 */
-	 CustomerInfoDto getCustomerInfo(String identifyCard);
+	 List<BankCardInfo>  getCustomerInfo(String identifyCard);
 	 
 	 
 	 

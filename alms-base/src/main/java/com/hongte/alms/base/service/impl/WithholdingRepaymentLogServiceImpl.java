@@ -8,6 +8,8 @@ import com.hongte.alms.base.service.WithholdingRepaymentLogService;
 import com.hongte.alms.base.vo.module.RepaymentLogReq;
 import com.hongte.alms.base.vo.module.RepaymentLogVO;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
+import com.ht.ussp.bean.LoginUserInfoHelper;
+import com.ht.ussp.client.dto.LoginInfoDto;
 
 import java.util.List;
 
@@ -28,6 +30,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class WithholdingRepaymentLogServiceImpl extends BaseServiceImpl<WithholdingRepaymentLogMapper, WithholdingRepaymentLog> implements WithholdingRepaymentLogService {
     @Autowired
     WithholdingRepaymentLogMapper withholdingRepaymentLogmapper;
+    
+    @Autowired
+    LoginUserInfoHelper loginUserInfoHelper;
 	@Override
 	public Page<RepaymentLogVO> selectRepaymentLogPage(RepaymentLogReq key) {
 	      Page<RepaymentLogVO> pages = new Page<>();
@@ -35,8 +40,26 @@ public class WithholdingRepaymentLogServiceImpl extends BaseServiceImpl<Withhold
 	      pages.setCurrent(key.getPage());
 
 	      List<RepaymentLogVO> list = withholdingRepaymentLogmapper.selectRepaymentLogList(pages,key);
-	      
-
+	      for(RepaymentLogVO vo:list) {
+	    	  if(vo.getXdListId()!=null) {//xdListId不为NULL就说明是信贷的单
+	    		  LoginInfoDto loginInfoDto = loginUserInfoHelper.getUserInfoByUserId(null,vo.getUserName());
+	    		  if(loginInfoDto!=null) {
+	    			  vo.setUserName(loginInfoDto.getUserName());
+	    		  }else {
+	    			  vo.setUserName(vo.getUserName());
+	    		  }
+		    	   
+	    	  }else {
+	    		  LoginInfoDto loginInfoDto = loginUserInfoHelper.getUserInfoByUserId(vo.getUserName(),null);
+	    		  if(loginInfoDto!=null) {
+	    			  vo.setUserName(loginInfoDto.getUserName());
+	    		  }else { 
+	    			  vo.setUserName(vo.getUserName());
+	    		  }
+	    	  }   
+	    	   
+	      }
+     
 	      pages.setRecords(list);
 		return pages;
 	}

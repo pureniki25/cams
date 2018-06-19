@@ -15,6 +15,7 @@ import com.hongte.alms.base.enums.SysParameterEnums;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayResultCodeEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
+import com.hongte.alms.base.feignClient.CustomerInfoXindaiRemoteApi;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.feignClient.dto.BankCardInfo;
 import com.hongte.alms.base.feignClient.dto.BankRechargeReqDto;
@@ -82,7 +83,10 @@ public class RechargeServiceImpl implements RechargeService {
 	@Autowired
 	@Qualifier("BizOutputRecordService")
 	BizOutputRecordService bizOutputRecordService;
-
+	
+    @Autowired
+    CustomerInfoXindaiRemoteApi customerInfoXindaiRemoteApi;
+    
 	@Autowired
 	EipRemote eipRemote;
 
@@ -132,6 +136,9 @@ public class RechargeServiceImpl implements RechargeService {
 			result.setMsg("当前失败或者执行中次数为:" + failCount + ",超过限制次数，不允许执行。");
 		} else {
 			if (channel.getPlatformId() == PlatformEnum.YB_FORM.getValue()) {
+				SysParameter  thirtyRepayTestResult = sysParameterService.selectOne(
+						new EntityWrapper<SysParameter>().eq("param_type", "thirtyRepayTest")
+								.eq("status", 1).orderBy("param_value"));
 				YiBaoRechargeReqDto dto = new YiBaoRechargeReqDto();
 				dto.setMerchantaccount(merchOrderId);
 				dto.setOrderid(merchOrderId);
@@ -145,9 +152,60 @@ public class RechargeServiceImpl implements RechargeService {
 						bankCardInfo.getBankCardNumber().length() - 4, bankCardInfo.getBankCardNumber().length()));
 				dto.setCallbackurl("172.0.0.1");
 				dto.setUserip("172.0.0.1");
-				eipRemote.directBindPay(dto);
+				
+				/*
+				 * 调用接口前线插入记录 status 代扣状态(1:成功,0:失败;2:处理中)
+				 */
+				Integer status = 2;
+				WithholdingRepaymentLog log = recordRepaymentLog("", status, pList, business, bankCardInfo,
+						channel.getPlatformId(), boolLastRepay, boolPartRepay, merchOrderId, 0,
+						BigDecimal.valueOf(amount));
+				String resultMsg="";
+				com.ht.ussp.core.Result remoteResult=eipRemote.directBindPay(dto);
+				
+				if(thirtyRepayTestResult!=null) {
+					if(thirtyRepayTestResult.getParamValue().equals("0000")) {
+						resultMsg="充值成功";
+						remoteResult.setReturnCode("0000");
+					}else if(thirtyRepayTestResult.getParamValue().equals("1111")){
+						resultMsg="银行卡余额不足";
+						remoteResult.setReturnCode("1111");
+					}else {
+						resultMsg="代扣失败";
+						remoteResult.setReturnCode("9999");
+					}
+				}
+				
+				if (remoteResult.getReturnCode().equals("0000") && resultMsg.equals("充值成功")) {
+					result.setCode("1");
+					result.setMsg(resultMsg);
+					log.setRepayStatus(1);
+					log.setRemark(resultMsg);
+					log.setUpdateTime(new Date());
+					withholdingRepaymentLogService.updateById(log);
+					shareProfit(pList, log);
+				} else if (remoteResult.getReturnCode().equals(RepayResultCodeEnum.YH_HANDLER_EXCEPTION.getValue())) {
+					result.setCode("1");
+					result.setMsg(resultMsg);
+					log.setRepayStatus(2);
+					log.setRemark(resultMsg);
+					log.setUpdateTime(new Date());
+					withholdingRepaymentLogService.updateById(log);
+
+				} else if (!remoteResult.getReturnCode().equals("0000")) {
+					result.setCode("-1");
+					result.setMsg(resultMsg);
+					log.setRepayStatus(0);
+					log.setRemark(resultMsg);
+					log.setUpdateTime(new Date());
+					withholdingRepaymentLogService.updateById(log);
+				
+				}
 			}
 			if (channel.getPlatformId() == PlatformEnum.BF_FORM.getValue()) {
+				SysParameter  thirtyRepayTestResult = sysParameterService.selectOne(
+						new EntityWrapper<SysParameter>().eq("param_type", "thirtyRepayTest")
+								.eq("status", 1).orderBy("param_value"));
 				BaofuRechargeReqDto dto = new BaofuRechargeReqDto();
 				dto.setBizType("0000");
 				dto.setPayCode(bankCardInfo.getBankCode().trim());
@@ -180,6 +238,20 @@ public class RechargeServiceImpl implements RechargeService {
 				}
 
 				String resultMsg = getBFResultMsg(remoteResult);
+				
+				if(thirtyRepayTestResult!=null) {
+					if(thirtyRepayTestResult.getParamValue().equals("0000")) {
+						resultMsg="充值成功";
+						remoteResult.setReturnCode("0000");
+					}else if(thirtyRepayTestResult.getParamValue().equals("1111")){
+						resultMsg="银行卡余额不足";
+						remoteResult.setReturnCode("1111");
+					}else {
+						resultMsg="代扣失败";
+						remoteResult.setReturnCode("9999");
+					}
+				}
+				
 				if (remoteResult.getReturnCode().equals("0000")
 						&& (remoteResult.getReturnCode().equals(RepayResultCodeEnum.BF0000.getValue())||remoteResult.getReturnCode().equals(RepayResultCodeEnum.BF00114.getValue()))) {
 					result.setCode("1");
@@ -213,7 +285,7 @@ public class RechargeServiceImpl implements RechargeService {
 				
 				try {
 					Thread.sleep(5000);
-					getBFResult(log);
+//					getBFResult(log);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -224,6 +296,11 @@ public class RechargeServiceImpl implements RechargeService {
 				List<SysParameter> bankChannels = sysParameterService.selectList(
 						new EntityWrapper<SysParameter>().eq("param_type", SysParameterEnums.BANK_CHANNEL.getKey())
 								.eq("status", 1).orderBy("param_value2"));
+				
+				SysParameter  bankRepayTestResult = sysParameterService.selectOne(
+						new EntityWrapper<SysParameter>().eq("param_type", "bankRepayTest")
+								.eq("status", 1).orderBy("param_value"));
+			
 				/*
 				 * 调用接口前线插入记录 status 代扣状态(1:成功,0:失败;2:处理中)
 				 */
@@ -244,7 +321,7 @@ public class RechargeServiceImpl implements RechargeService {
 					com.ht.ussp.core.Result remoteResult = null;
 					try {
 						remoteResult = eipRemote.bankRecharge(dto);
-						if (result == null) {
+						if (remoteResult == null) {
 							return Result.error("500", "接口银行代扣调用失败！");
 						}
 					} catch (Exception e) {
@@ -255,6 +332,19 @@ public class RechargeServiceImpl implements RechargeService {
 
 					}
 					String resultMsg = getBankResultMsg(remoteResult);
+					
+					if(bankRepayTestResult!=null) {
+						if(bankRepayTestResult.getParamValue().equals("0000")) {
+							resultMsg="充值成功";
+							remoteResult.setReturnCode("0000");
+						}else if(bankRepayTestResult.getParamValue().equals("1111")){
+							resultMsg="银行卡余额不足";
+							remoteResult.setReturnCode("1111");
+						}else {
+							resultMsg="代扣失败";
+							remoteResult.setReturnCode("9999");
+						}
+					}
 					if (remoteResult.getReturnCode().equals("0000") && resultMsg.equals("充值成功")) {
 						result.setCode("1");
 						result.setMsg(resultMsg);
@@ -288,7 +378,7 @@ public class RechargeServiceImpl implements RechargeService {
 				}
 				try {
 					Thread.sleep(5000);
-					getBankResult(log);
+//					getBankResult(log);
 				} catch (Exception e) {
 					logger.debug("查询银行代扣结果出错"+e);
 				}
@@ -331,6 +421,29 @@ public class RechargeServiceImpl implements RechargeService {
 		Map<String, Object> resultMap = JSONObject.parseObject(dataJson, Map.class);
 		String resultMsg = (String) resultMap.get("respMsg");
 		return resultMsg;
+		}else {
+			return remoteResult.getCodeDesc();
+		}
+	}
+	
+	
+	
+	/**
+	 * 获取易宝代扣结果
+	 * 
+	 * @param remoteResult
+	 * @return
+	 */
+	private String getYBResultMsg(com.ht.ussp.core.Result remoteResult) {
+		if(remoteResult.getData()!=null) {
+		String dataJson = JSONObject.toJSONString(remoteResult.getData());
+		Map<String, Object> resultMap = JSONObject.parseObject(dataJson, Map.class);
+		String yborderid = (String) resultMap.get("yborderid");
+			if(yborderid!=null) {
+				return "交易成功";
+			}else {
+				return "交易失败";
+			}
 		}else {
 			return remoteResult.getCodeDesc();
 		}
@@ -421,10 +534,16 @@ public class RechargeServiceImpl implements RechargeService {
 	}
 
 	@Override
-	public CustomerInfoDto getCustomerInfo(String identifyCard) {
+	public List<BankCardInfo>  getCustomerInfo(String identifyCard) {
 		CustomerInfoDto dto = new CustomerInfoDto();
+		List<BankCardInfo> bankCardInfos = null;
+		try {
+			bankCardInfos = customerInfoXindaiRemoteApi.getBankcardInfo(identifyCard);
+		} catch (Exception e) {
+			logger.info("获取客户银行卡信息出错"+e);
+		}
 		// todo 调信贷接口
-		return dto;
+		return bankCardInfos;
 	}
 
 	@Override
@@ -719,6 +838,26 @@ public class RechargeServiceImpl implements RechargeService {
 		paramMap.put("merchantaccount", merchantaccount);
 		paramMap.put("orderid", log.getLogId());
 		com.ht.ussp.core.Result result = eipRemote.queryOrder(paramMap);
+		String msg=getYBResultMsg(result);
+		if ("0000".equals(result.getReturnCode()) &&msg!=null&&msg.equals("交易成功")) {
+			log.setUpdateTime(new Date());
+			log.setRepayStatus(1);
+			log.setRemark(result.getMsg());
+			withholdingRepaymentLogService.updateById(log);
+			RepaymentBizPlanList list = repaymentBizPlanListService
+					.selectOne(new EntityWrapper<RepaymentBizPlanList>()
+							.eq("orig_business_id", log.getOriginalBusinessId())
+							.eq("after_id", log.getAfterId()));
+			shareProfit(list, log);
+		
+		} else if (!"0000".equals(result.getReturnCode())) {
+			log.setUpdateTime(new Date());
+			log.setRepayStatus(0);
+			log.setRemark(msg);
+			withholdingRepaymentLogService.updateById(log);
+
+		}
+		
 	}
 
 }

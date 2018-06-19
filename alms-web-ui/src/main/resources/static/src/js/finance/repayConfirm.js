@@ -42,11 +42,6 @@ window.layinit(function (htConfig) {
                 url: '/finance/manualMatchBankSatements?businessId=' + businessId + "&afterId=" + afterId,
             },
 
-            // style: {
-            //     repayRegList: {},
-            //     matchedBankStatement: {}
-            // },
-
             table: {
                 currPeriodRepayment: {
                     col: [{
@@ -209,13 +204,12 @@ window.layinit(function (htConfig) {
                                 },
                                 on: {
                                     click() {
-                                        console.log(p.row);
                                         let repayDate = moment(p.row.tradeDate).format('YYYY-MM-DD');
                                         let accountMoney = p.row.accountMoney;
                                         let acceptBank = p.row.bankAccount;
                                         let mrpid = p.row.id
-                                        window.parent.app.manualMatchBankSatements.show = true;
-                                        window.parent.app.manualMatchBankSatements.url = '/finance/manualMatchBankSatements?businessId=' +
+                                        app.manualMatchBankSatements.show = true;
+                                        app.manualMatchBankSatements.url = '/finance/manualMatchBankSatements?businessId=' +
                                             businessId + "&afterId=" +
                                             afterId + '&repayDate=' +
                                             repayDate + '&accountMoney=' +
@@ -235,8 +229,8 @@ window.layinit(function (htConfig) {
                                 },
                                 on: {
                                     click() {
-                                        app.rejectModal=true
-                                        app.mprid = p.row.id
+                                        app.repayRegList.rejectModal=true
+                                        app.repayRegList.mprid = p.row.id
                                     }
                                 }
                             }, '拒绝')
@@ -409,6 +403,7 @@ window.layinit(function (htConfig) {
             repayRegList:{
                 remark:'',
                 rejectModal:false,
+                mprid:''
             },
             thisTimeRepaymentInfo: {
                 derate: '',
@@ -453,7 +448,7 @@ window.layinit(function (htConfig) {
                 let moneyPoolAccount = 0
                 if (n && n.length > 0) {
                     n.forEach(element => {
-                        moneyPoolAccount = (moneyPoolAccount*1000+element.accountMoney*1000)/1000
+                        moneyPoolAccount = (moneyPoolAccount*10000+element.accountMoney*10000)/10000
                         app.factRepaymentInfo.mprIds.push(element.mprId);
                     });
                     let o = n[n.length - 1]
@@ -462,7 +457,7 @@ window.layinit(function (htConfig) {
                 app.factRepaymentInfo.moneyPoolAccount = moneyPoolAccount
                 
                 // app.factRepaymentInfo.repayAccount = parseFloat(app.factRepaymentInfo.moneyPoolAccount.toFixed(2))  + parseFloat(app.factRepaymentInfo.surplusFund.toFixed(2) || 0)
-                app.factRepaymentInfo.repayAccount = (app.factRepaymentInfo.moneyPoolAccount*1000+(app.factRepaymentInfo.surplusFund||0)*1000)/1000
+                app.factRepaymentInfo.repayAccount = (app.factRepaymentInfo.moneyPoolAccount*10000+(app.factRepaymentInfo.surplusFund||0)*10000)/10000
             },
             'factRepaymentInfo.useSurplusflag':function(n,o){
                 if(o==''){
@@ -477,41 +472,9 @@ window.layinit(function (htConfig) {
                         app.factRepaymentInfo.surplusFund = 0
                         return;
                     }
-                    app.factRepaymentInfo.repayAccount = (app.factRepaymentInfo.moneyPoolAccount*1000+(app.factRepaymentInfo.surplusFund||0)*1000)/1000
-                    // app.factRepaymentInfo.repayAccount = parseFloat(app.factRepaymentInfo.moneyPoolAccount.toFixed(2)) + parseFloat(app.factRepaymentInfo.surplusFund.toFixed(2) || 0)
+                    app.factRepaymentInfo.repayAccount = (app.factRepaymentInfo.moneyPoolAccount*10000+(app.factRepaymentInfo.surplusFund||0)*10000)/10000
                 }
             },
-            // 'factRepayPreview.offlineOverDue':function(n){
-            //     if(n&&!isNaN(n)){
-            //         if(n>app.thisTimeRepaymentInfo.offlineOverDue){
-            //             app.$Message.warning({content:'线下逾期费不能超过'+app.thisTimeRepaymentInfo.offlineOverDue+'元'});
-            //             app.factRepayPreview.offlineOverDue = 0 ;
-            //             return ;
-            //         }
-            //         app.factRepaymentInfo.offlineOverDue = n ;
-            //         if(app.factRepayPreview.flag){
-            //             app.factRepayPreview.flag = !app.factRepayPreview.flag
-            //             return ;
-            //         }
-            //         app.previewConfirmRepayment()
-            //     }
-            // },
-            // 'factRepayPreview.onlineOverDue':function(n){
-            //     if(n&&!isNaN(n)){
-            //         if(n>app.thisTimeRepaymentInfo.onlineOverDue){
-            //             app.$Message.warning({content:'线上逾期费不能超过'+app.thisTimeRepaymentInfo.onlineOverDue+'元'});
-            //             app.factRepayPreview.onlineOverDue = 0 ;
-            //             return ;
-            //         }
-            //         app.factRepaymentInfo.onlineOverDue = n ;
-            //         if(app.factRepayPreview.flag){
-            //             app.factRepayPreview.flag = !app.factRepayPreview.flag
-            //             return ;
-            //         }
-            //         app.previewConfirmRepayment()
-            //     }
-            // },
-            // thisTimeRepaymentInfo.onlineOverDue
             'factRepaymentInfo.repayAccount': function (n) {
                 app.previewConfirmRepayment()
             }
@@ -544,7 +507,7 @@ window.layinit(function (htConfig) {
                     type: 2,
                     title: '手动匹配流水',
                     content: [url],
-                    area: ['80%', '90%'],
+                    area: ['95%', '95%'],
                     success: function (layero, index) {
                         curIndex = index;
                     }
@@ -625,14 +588,14 @@ window.layinit(function (htConfig) {
                                     } 
                                 });
 
-                                chaer.item10 = (chaer.item10*1000 - e1.item10*1000)/1000
-                                chaer.item20 = (chaer.item20*1000 - e1.item20*1000)/1000
-                                chaer.item30 = (chaer.item30*1000 - e1.item30*1000)/1000
-                                chaer.item50 = (chaer.item50*1000 - e1.item50*1000)/1000
-                                chaer.subTotal = (chaer.subTotal*1000 - e1.subTotal*1000)/1000
-                                chaer.offlineOverDue = (chaer.offlineOverDue*1000 - e1.offlineOverDue*1000)/1000
-                                chaer.onlineOverDue = (chaer.onlineOverDue*1000 - e1.onlineOverDue*1000)/1000
-                                chaer.total = (chaer.total*1000 - e1.total*1000)/1000
+                                chaer.item10 = (chaer.item10*10000 - e1.item10*10000)/10000
+                                chaer.item20 = (chaer.item20*10000 - e1.item20*10000)/10000
+                                chaer.item30 = (chaer.item30*10000 - e1.item30*10000)/10000
+                                chaer.item50 = (chaer.item50*10000 - e1.item50*10000)/10000
+                                chaer.subTotal = (chaer.subTotal*10000 - e1.subTotal*10000)/10000
+                                chaer.offlineOverDue = (chaer.offlineOverDue*10000 - e1.offlineOverDue*10000)/10000
+                                chaer.onlineOverDue = (chaer.onlineOverDue*10000 - e1.onlineOverDue*10000)/10000
+                                chaer.total = (chaer.total*10000 - e1.total*10000)/10000
                             }else {
                                 chaer.item10 = -e1.item10
                                 chaer.item20 = -e1.item20
@@ -706,23 +669,21 @@ window.layinit(function (htConfig) {
                     app.factRepayPreview.total = 0
                     app.factRepayPreview.surplus = 0
                     app.table.projRepayment.data.forEach(e => {
-                        app.factRepayPreview.surplus +=  e.surplus*1000/1000
-                        app.factRepayPreview.item10 = (app.factRepayPreview.item10*1000+e.item10*1000)/1000
-                        app.factRepayPreview.item20 = (app.factRepayPreview.item20*1000+e.item20*1000)/1000
-                        app.factRepayPreview.item30 = (app.factRepayPreview.item30*1000+e.item30*1000)/1000
-                        app.factRepayPreview.item50 = (app.factRepayPreview.item50*1000+e.item50*1000)/1000
-                        app.factRepayPreview.offlineOverDue = (app.factRepayPreview.offlineOverDue*1000+e.offlineOverDue*1000)/1000
-                        app.factRepayPreview.onlineOverDue = (app.factRepayPreview.onlineOverDue*1000+e.onlineOverDue*1000)/1000
-                        app.factRepayPreview.subTotal = (app.factRepayPreview.subTotal*1000+e.subTotal*1000)/1000
-                        app.factRepayPreview.total += (app.factRepayPreview.total*1000+e.total*1000)/1000
+                        app.factRepayPreview.surplus +=  e.surplus*10000/10000
+                        app.factRepayPreview.item10 = (app.factRepayPreview.item10*10000+e.item10*10000)/10000
+                        app.factRepayPreview.item20 = (app.factRepayPreview.item20*10000+e.item20*10000)/10000
+                        app.factRepayPreview.item30 = (app.factRepayPreview.item30*10000+e.item30*10000)/10000
+                        app.factRepayPreview.item50 = (app.factRepayPreview.item50*10000+e.item50*10000)/10000
+                        app.factRepayPreview.offlineOverDue = (app.factRepayPreview.offlineOverDue*10000+e.offlineOverDue*10000)/10000
+                        app.factRepayPreview.onlineOverDue = (app.factRepayPreview.onlineOverDue*10000+e.onlineOverDue*10000)/10000
+                        app.factRepayPreview.subTotal = (app.factRepayPreview.subTotal*10000+e.subTotal*10000)/10000
+                        app.factRepayPreview.total += (app.factRepayPreview.total*10000+e.total*10000)/10000
                     })
 
-                    // app.factRepayPreview.surplus = parseFloat(app.factRepayPreview.surplus.toFixed(2))
-                    // app.factRepayPreview.subTotal = parseFloat(app.factRepayPreview.subTotal.toFixed(2))
-                    app.factRepayPreview.total = (app.factRepayPreview.subTotal*1000 
-                        + app.factRepayPreview.offlineOverDue*1000 
-                        + app.factRepayPreview.onlineOverDue*1000 
-                        + app.factRepayPreview.surplus*1000)/1000
+                    app.factRepayPreview.total = (app.factRepayPreview.subTotal*10000 
+                        + app.factRepayPreview.offlineOverDue*10000 
+                        + app.factRepayPreview.onlineOverDue*10000 
+                        + app.factRepayPreview.surplus*10000)/10000
                 },
                 confirmRepayment() {
                     let param = {};
@@ -740,14 +701,11 @@ window.layinit(function (htConfig) {
                             .then(function (res) {
                                 if (res.data.code == '1') {
                                     app.handleConfirmRepaymentResult(res)
-                                    parent.app.search()
-
                                     app.$Modal.success({content:'还款确认成功!',onOk(){
                                         var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
                                         parent.layer.close(index);
+                                        parent.app.search()
                                     }})
-
-                                    // window.location.reload()
                                 }else{
                                     app.factRepaymentInfo.surplusFund = 0
                                     app.$Message.error({content:res.data.msg})
@@ -785,20 +743,20 @@ window.layinit(function (htConfig) {
             },
             reject() {
                 axios.post(fpath + 'finance/rejectRepayReg', {
-                        mprid: app.mprid,
-                        remark: app.remark
+                        mprid: app.repayRegList.mprid,
+                        remark: app.repayRegList.remark
                     })
                     .then(function (res) {
                         if (res.data.code == '1') {
                             window.location.reload()
                         } else {
-                            window.parent.app.$Message.error({
+                            app.$Message.error({
                                 content: res.data.msg
                             })
                         }
                     })
                     .catch(function (err) {
-                        window.parent.app.$Message.error({
+                        app.$Message.error({
                             content: '拒绝还款登记失败'
                         })
                         console.log(err);
@@ -825,23 +783,6 @@ window.layinit(function (htConfig) {
                         app.table.repayRegList.data = res.data.data
                         app.table.repayRegList.data.push(sum)
     
-                        // let height = 20 ;
-                        // if(app.table.data.length<=2){
-                        //     height = 50
-                        // }
-                        // app.table.data.forEach(e=>{
-                        //     if(e.remark&&e.remark.length>16){
-                        //         if(height*(e.remark.length/16)>height){
-                        //             height = height*(e.remark.length/16)
-                        //         }
-                        //     }
-                        // })
-                        // console.log(height);
-                        // let style = {
-                        //     height: (app.table.data.length ? (app.table.data.length +2) * (height) : 175) + 'px',
-                        //     width: '100%'
-                        // }
-                        // app.handleParentStyle(style)
                     } else {
                         app.$Message.error({
                             content: res.data.msg
@@ -874,22 +815,6 @@ window.layinit(function (htConfig) {
                         }
                         
                         app.table.confirmedRepayment.data.push(sum)
-                        // let height = 20 ;
-
-                        // if(app.table.data.length<=2){
-                        //     height = 50
-                        // }
-                        // app.table.data.forEach(e=>{
-                        //     if(e.remark&&e.remark.length>16){
-                        //         height = height*(e.remark.length/16)
-                        //     }
-                        // })
-                        
-                        // let style = {
-                        //     height: (app.table.data.length ? (app.table.data.length + 2) * (height) : 175) + 'px',
-                        //     width: '100%'
-                        // }
-                        // app.handleParentStyle(style)
                     } else {
                         app.$Message.error({
                             content: res.data.msg
@@ -910,15 +835,15 @@ window.layinit(function (htConfig) {
                             })
                             .then(function (r) {
                                 if (r.data.code == "1") {
-                                    parent.location.reload()
+                                    window.location.reload()
                                 } else {
-                                    parent.app.$Message.error({
+                                    app.$Message.error({
                                         content: r.data.msg
                                     })
                                 }
                             })
                             .catch(function (e) {
-                                parent.app.$Message.error({
+                                app.$Message.error({
                                     content: '取消关联银行流水失败'
                                 })
                             })
@@ -936,15 +861,15 @@ window.layinit(function (htConfig) {
                             })
                             .then(function (r) {
                                 if (r.data.code == "1") {
-                                    parent.location.reload()
+                                    window.location.reload()
                                 } else {
-                                    parent.app.$Message.error({
+                                    app.$Message.error({
                                         content: r.data.msg
                                     })
                                 }
                             })
                             .catch(function (e) {
-                                parent.app.$Message.error({
+                                app.$Message.error({
                                     content: '删除此条流水失败'
                                 })
                             })
@@ -962,12 +887,6 @@ window.layinit(function (htConfig) {
                 })
                 .then(function (res) {
                     if (res.data.code == '1') {
-                        //parent.app.matchedBankStatement.data = res.data.data.slice(0) ;
-                        // res.data.data.forEach(e=>{
-                        //     if(e.status!='完成'&&e.status!='已完成'){
-                        //         app.table.matchedBankStatement.data.push(e)
-                        //     }
-                        // })
                         app.matchedBankStatement.data = res.data.data.slice(0)
                         app.table.matchedBankStatement.data = res.data.data.slice(0);
                         let t = 0;
@@ -981,33 +900,15 @@ window.layinit(function (htConfig) {
 
                         app.table.matchedBankStatement.data.push(sum)
 
-                        // let height = 20 ;
-                        // if(app.table.data.length<=2){
-                        //     height = 50
-                        // }
-                        // app.table.data.forEach(e=>{
-                        //     if(e.remark&&e.remark.length>16){
-                        //         height = height*(e.remark.length/16)
-                        //     }
-                        // })
-
-                        // console.log(res.data.data);
-                        // let style = {
-                        //     height: (app.table.data.length ? (app.table.data.length + 2) * height : 175) + 'px',
-                        //     width: '100%'
-                        // }
-                        // app.handleParentStyle(style)
                     } else {
                         app.$Message.error({
                             content: res.data.msg
                         })
                     }
-                    // app.spinShow = false;
                 }).catch(function (err) {
                     app.$Message.error({
                         content: '获取匹配的款项池银行流水数据失败'
                     })
-                    // app.spinShow = false;
                 })
             }
         },

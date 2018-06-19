@@ -139,7 +139,7 @@ window.layinit(function (htConfig) {
             },
             search: function (page) {
                 if (page) {
-                    this.curPage = 1
+                    this.curPage = page
                 }
                 this.table.data = []
                 this.listMoneyPool()

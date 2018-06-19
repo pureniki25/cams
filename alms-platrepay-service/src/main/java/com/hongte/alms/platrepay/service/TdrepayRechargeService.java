@@ -54,8 +54,17 @@ public interface TdrepayRechargeService {
 	String handleOIdPartner(String rechargeAccountType);
 	
 	/**
+	 * 根据代充值账户类型获取 资产端机构用户名(资产端在团贷网的账户对应的用户名)
+	 * 
+	 * @param businessType
+	 *            业务类型
+	 * @return
+	 */
+	int handleTdUserName(int businessType);
+	
+	/**
 	 * 资产端对团贷网通用合规化还款流程
 	 */
-	void rePayComplianceWithRequirements(String logId);
-
+	void rePayComplianceWithRequirements();
+	
 }

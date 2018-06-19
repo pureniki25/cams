@@ -94,6 +94,22 @@
 				<i-span v-else>计算中...</i-span>
 			</i-button>
 		</div>
+		<div style="margin-top:10px; margin-left:10px">
+			<i-lable>分配贷后跟进人员：</i-lable>
+			<i-button :loading="setCollectionLoading" @click="setCollection">
+				<i-span v-if="!setCollectionLoading">设置</i-span>
+				<i-span v-else>设置中...</i-span>
+			</i-button>
+		</div>
+		<div style="margin-top:10px; margin-left:10px">
+			<i-lable>自动代扣：</i-lable>
+			<i-button :loading="autoRepayLoading" @click="autoRepay">
+				<i-span v-if="!autoRepayLoading">代扣</i-span>
+				<i-span v-else>代扣中...</i-span>
+			</i-button>
+		</div>
+	</div>
+
 		<!-- <div style="margin-top:10px; margin-left:10px">
 			<i-lable>更新代充值处理状态</i-lable>
 			<i-button :loading="updateAgencyRechargeHandleStatusLoading" @click="updateAgencyRecharge">
