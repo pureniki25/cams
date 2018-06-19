@@ -1,6 +1,7 @@
 package com.hongte.alms.core.controller;
 
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
 import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
@@ -22,10 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
@@ -242,6 +240,48 @@ public class CollectionTransferController {
 
 //		return Result.success();
 	}
+
+
+	/**
+	 * 同步一个电催信息
+	 * @param carBusinessAfter
+	 * @return
+	 */
+	@PostMapping("/transferOnePhoneSet")
+	@ResponseBody
+	public Result transferOnePhoneSet(@RequestBody CarBusinessAfter carBusinessAfter){
+		LOGGER.info("同步一个电催信息--开始[{}]" , JSON.toJSONString(carBusinessAfter) );
+
+		boolean bl = transPhoneSet(carBusinessAfter);
+
+		if(bl){
+			LOGGER.info("同步一个电催信息--成功[{}]" );
+			return Result.success();
+		}else{
+			LOGGER.info("同步一个电催信息--失败[{}]" );
+			return Result.error("111111","同步失败");
+		}
+	}
+	/**
+	 * 同步一个催收信息
+	 * @param collection
+	 * @return
+	 */
+	@PostMapping("/transOneCollectSet")
+	@ResponseBody
+	public Result transOneCollectSet(@RequestBody Collection collection){
+		LOGGER.info("同步一个催收信息-开始[{}]" , JSON.toJSONString(collection) );
+		boolean bl =  transCollectSet(collection );
+		if(bl){
+			LOGGER.info("同步一个催收信息--成功[{}]" );
+			return Result.success();
+		}else{
+			LOGGER.info("同步一个催收信息--失败[{}]" );
+			return Result.error("111111","同步失败");
+		}
+	}
+
+
 
 	/**
 	 * 同步电催数据

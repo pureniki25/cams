@@ -164,7 +164,7 @@
 		then '竞买成功后，尾款线上支付'
 		else ''
 		end paymentMethod,<!-- 支付方式 -->
-		det.car_position auctionPosition,<!-- 车辆位置 -->
+		tca.auction_position auctionPosition,<!--交易地点-->
 		tca.remark   remark,<!-- 拍卖备注-->
 
 		tcb.brand_name vehicleBrand ,		<!--车辆品牌 -->
@@ -477,4 +477,39 @@
 
 		</where>	
 	</select>
+
+     <select id="selectBusinessBids" resultType="com.hongte.alms.base.assets.car.vo.BusinessBidsVo">
+		SELECT
+			c.reg_id id,
+			c.rowNum seqNum,
+			c.username userName,
+			c.reg_cert_id idCard,
+			c.reg_tel telephone,
+			c.offer_time bidTime,
+			c.offer_amount bidPrice,
+			c.remark remark,
+			c.is_auction_success isAuctionSuccess
+		FROM
+			(
+				SELECT
+					* ,@i :=@i + 1 rowNum
+				FROM
+					tb_car_auction_reg a,
+					(SELECT @i := 0) AS b
+
+					<where>
+						a.business_id=#{businessId}
+						<if test="keyword!=null and keyword!=''">
+							AND (
+							a.username LIKE "%"#{keyword}"%"
+							OR a.reg_cert_id LIKE "%"#{keyword}"%"
+							OR a.reg_tel LIKE "%"#{keyword}"%"
+							)
+						</if>
+					</where>
+				 ORDER BY
+				 a.offer_time DESC
+			) AS c
+
+	 </select>
 </mapper>

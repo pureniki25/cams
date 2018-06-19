@@ -31,4 +31,6 @@ public interface CarMapper  {
 
 	List<MyBadeCarVo> selectMyBidCarsForApp(Pagination pages, MyBadeCarReq req);
 
+	List<BusinessBidsVo> selectBusinessBids(Pagination pages ,BusinessBidsReq req);
+
 }

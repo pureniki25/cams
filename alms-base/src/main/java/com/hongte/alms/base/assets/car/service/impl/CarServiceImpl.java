@@ -666,4 +666,14 @@ public class CarServiceImpl  implements CarService {
     	}
 		//
 	}
+
+	@Override
+	public Page<BusinessBidsVo> selectBusinessBids(BusinessBidsReq req) {
+		Page<BusinessBidsVo> pages = new Page<>();
+		pages.setCurrent(req.getPage());
+		pages.setSize(req.getLimit());
+		List<BusinessBidsVo> list = carMapper.selectBusinessBids(pages, req);
+		pages.setRecords(list);
+		return pages;
+	}
 }

@@ -33,10 +33,10 @@ public class CollectionTrackLog extends Model<CollectionTrackLog> {
 	@ApiModelProperty(required = true, value = "跟踪记录日志主键")
 	private Integer trackLogId;
 	/**
-	 * 还款计划编号，对应tb_repayment_biz_plan的主键
+	 * 还款计划编号，对应tb_repayment_business_plan_list.plan_list_id
 	 */
 	@TableField("rbp_id")
-	@ApiModelProperty(required = true, value = "还款计划编号，对应tb_repayment_biz_plan的主键")
+	@ApiModelProperty(required = true, value = "还款计划编号，对应tb_repayment_business_plan_list.plan_list_id")
 	private String rbpId;
 	/**
 	 * 记录者UserId

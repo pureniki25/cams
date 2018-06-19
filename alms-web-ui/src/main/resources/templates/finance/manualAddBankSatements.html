@@ -35,9 +35,9 @@
     <!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
     <div id="app" v-cloak>
         <Card >
-            <i-form ref="form" :model="form" label-position="left" label-width="100" :rules="ruleValidate">
+            <i-form ref="form" :model="form" label-position="left" label-width="100" >
                 <form-item prop="repaymentDate" label="还款日期" required>
-                    <date-picker v-model="form.repaymentDate"></date-picker>
+                    <date-picker v-model="form.repaymentDate" @on-change="form.repaymentDate=$event"></date-picker>
                 </form-item>
                 <form-item prop="repaymentMoney" label="还款金额" required>
                     <i-input v-model="form.repaymentMoney" number></i-input>

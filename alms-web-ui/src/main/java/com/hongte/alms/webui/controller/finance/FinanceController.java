@@ -73,4 +73,9 @@ public class FinanceController {
 	public String settle() {
 		return "/finance/settle" ;
 	}
+	
+	@RequestMapping("/moneyPool")
+	public String moneyPool() {
+		return "/finance/moneyPool" ;
+	}
 }

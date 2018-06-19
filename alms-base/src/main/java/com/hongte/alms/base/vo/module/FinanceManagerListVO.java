@@ -77,6 +77,11 @@ public class FinanceManagerListVO {
 	 * 还款金额
 	 */
 	private BigDecimal planRepayAmount;
+	
+	/**
+	 * 已还金额
+	 */
+	private BigDecimal repaidAmount;
 	/**
 	 * 会计确认状态
 	 */
@@ -291,6 +296,20 @@ public class FinanceManagerListVO {
 	 */
 	public void setPeriod(Integer period) {
 		this.period = period;
+	}
+
+	/**
+	 * @return the repaidAmount
+	 */
+	public BigDecimal getRepaidAmount() {
+		return repaidAmount;
+	}
+
+	/**
+	 * @param repaidAmount the repaidAmount to set
+	 */
+	public void setRepaidAmount(BigDecimal repaidAmount) {
+		this.repaidAmount = repaidAmount;
 	}
 
 }

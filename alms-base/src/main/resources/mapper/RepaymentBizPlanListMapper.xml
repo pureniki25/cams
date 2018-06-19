@@ -152,10 +152,10 @@
 				#{accountantConfirmStatus}
 			</if>
 			<if test="areaId != null">
-				AND bc.area_id = #{areaId}
+				AND bc.area_pid = #{areaId}
 			</if>
 			<if test="companyId != null">
-				AND b.company_name = #{companyId}
+				AND (b.company_name = #{companyId} OR b.company_id = #{companyId})
 			</if>
 			<if test="businessType != null ">
 				AND b.business_type = #{businessType}
@@ -188,9 +188,9 @@
 			pl.orig_business_id as orgBusinessId,
 			pl.period as period,
 			pl.after_id as afterId ,
-			b.company_name as dept,
+			b.company_id as dept,
 			b.operator_name as operator,
-			bbc.customer_name as customer,
+			b.customer_name as customer,
 			bbc.phone_number as phoneNumber,
 			b.business_ctype as businessType ,
 			pl.due_date as planRepayDate ,
@@ -213,7 +213,8 @@
 			pl.fact_repay_date as factRepayDate,
 			pl.total_borrow_amount as planRepayAmount,
 			pl.current_status as status ,
-			pl.accountant_confirm_status as financeConfirmStatus
+			pl.accountant_confirm_status as financeConfirmStatus,
+			(SELECT IFNULL(SUM(fact_amount),0) FROM tb_repayment_biz_plan_list_detail where plan_list_id = pl.plan_list_id ) as repaidAmount
 		FROM
 			tb_repayment_biz_plan_list pl
 		JOIN
@@ -238,7 +239,7 @@
 				#{accountantConfirmStatus}
 			</if>
 			<if test="areaId != null">
-				AND bc.area_id = #{areaId}
+				AND bc.area_pid = #{areaId}
 			</if>
 			<if test="companyId != null">
 				AND b.company_name = #{companyId}

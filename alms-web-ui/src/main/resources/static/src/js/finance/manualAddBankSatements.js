@@ -111,7 +111,7 @@ window.layinit(function (htConfig) {
                     app.$Message.error({content:'还款日期不能为空'})
                     return ;
                 }
-                if(!params.repaymentDate.test(/^(?<year>\\d{2,4})-(?<month>\\d{1,2})-(?<day>\\d{1,2})$/)){
+                if(!/^(\d{4})-(\d{2})-(\d{2})$/.test(params.repaymentDate)){
                     app.$Message.error({content:'还款日期格式错误'})
                     return ;
                 }

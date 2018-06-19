@@ -26,4 +26,6 @@ public interface CarService {
 	void againAssess(AuctionAplyVo auctionAplyVo);
 	void auctionSign(Map<String,Object> params);
 	void addReturnReg( @RequestBody Map<String,Object> params);
+
+	Page<BusinessBidsVo> selectBusinessBids(BusinessBidsReq req);
 }
