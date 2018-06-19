@@ -24,7 +24,7 @@ public class AgencyRechargeSchedule {
 	private AgencyRechargeLogService agencyRechargeLogService;
 	
 	@Scheduled(cron = "0 0 0/2 * * ?")
-	public void run() {
+	public void queryRechargeOrder() {
 		try {
 			LOG.info("更新代充值处理状态开始");
 			long start = System.currentTimeMillis();
@@ -36,6 +36,19 @@ public class AgencyRechargeSchedule {
 			}
 			long end = System.currentTimeMillis();
 			LOG.info("更新代充值处理状态结束，耗时：{}", (end - start));
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+	}
+	
+	@Scheduled(cron = "0 0/60 * * * ?")
+	public void queryDistributeFund() {
+		try {
+			LOG.info("资金分发订单查询开始");
+			long start = System.currentTimeMillis();
+			agencyRechargeLogService.queryDistributeFund();
+			long end = System.currentTimeMillis();
+			LOG.info("资金分发订单查询结束，耗时：{}", (end - start));
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 		}
