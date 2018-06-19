@@ -142,7 +142,7 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
      * 生成系统类型：1.信贷生成，2.贷后管理生成
      */
 	@TableField("creat_sys_type")
-	@ApiModelProperty(required= true,value = "生成系统类型：1.信贷生成，2.贷后管理生成")
+	@ApiModelProperty(required= true,value = "生成系统类型：1.信贷生成，2.贷后管理生成 3.你我金融生成")
 	private Integer creatSysType;
     /**
      * 平台标志：1.团贷网，2.你我金融

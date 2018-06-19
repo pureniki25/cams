@@ -133,8 +133,8 @@ public class RepaymentProjPlanListServiceImpl extends
 								if(getOnLineFactAmountSum(projPList.getProjPlanListId())>=getOnLinePlanAmountSum(projPList.getProjPlanListId())) {
 									continue;
 								}
-								// 没有逾期
-								if (isOverDue(new Date(), projPList.getDueDate()) >=0) {
+								// 没有逾期,且不是你我金融生成
+								if (isOverDue(new Date(), projPList.getDueDate()) >=0&&projPList.getCreatSysType()!=3) {
 									continue;
 									// 逾期的当前期
 								} else {
