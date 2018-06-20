@@ -3,6 +3,8 @@ package com.hongte.alms.finance.service.impl;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.hongte.alms.base.customer.vo.CustomerRepayFlowExel;
+import com.hongte.alms.base.customer.vo.CustomerRepayFlowOptReq;
+import com.hongte.alms.base.dto.ConfirmRepaymentReq;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
 import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
@@ -10,6 +12,7 @@ import com.hongte.alms.base.mapper.MoneyPoolRepaymentMapper;
 import com.hongte.alms.common.util.AliyunHelper;
 import com.hongte.alms.common.util.OssResult;
 import com.hongte.alms.finance.service.CustomerRepayFlowService;
+import com.hongte.alms.finance.service.ShareProfitService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
@@ -20,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -35,7 +40,10 @@ public class CustomerRepayFlowServiceImpl implements CustomerRepayFlowService {
 
     private final static String STATE_NOPASS = "未审核";
     private final static String STATE_PASS = "已审核";
+    private final static String STATE_PASS_NUMBER = "2";
+
     private final static String STATE_REJECT = "拒绝";
+    private final static String STATE_REJECT_NUMBER = "3";
 
     @Value("${ht.excel.file.save.path}")
     private String excelSavePath;
@@ -45,6 +53,9 @@ public class CustomerRepayFlowServiceImpl implements CustomerRepayFlowService {
 
     @Autowired
     private MoneyPoolRepaymentMapper moneyPoolRepaymentMapper;
+
+    @Autowired
+    private ShareProfitService shareProfitService;
 
     @Override
     public String customerFlowExcelWorkBook(Workbook workbook) throws Exception {
@@ -122,6 +133,7 @@ public class CustomerRepayFlowServiceImpl implements CustomerRepayFlowService {
     }
 
     @Override
+    @Transactional(rollbackFor = {ServiceRuntimeException.class, Exception.class})
     public void importCustomerFlowExcel(MultipartFile file) throws Exception {
 
         String fileName = file.getName();
@@ -150,7 +162,7 @@ public class CustomerRepayFlowServiceImpl implements CustomerRepayFlowService {
 
         } catch (Exception e) {
             logger.info("上传oss过程失败 {}", e);
-        }finally {
+        } finally {
             try {
                 if (fis != null) {
                     fis.close();
@@ -168,7 +180,7 @@ public class CustomerRepayFlowServiceImpl implements CustomerRepayFlowService {
         List<MoneyPoolRepayment> auditList = new ArrayList<>(); //excel导入审核通过数据
         List<MoneyPoolRepayment> repayList = new ArrayList<>(); //excel导入审核通过需要匹配还款数据
 
-        List<Integer> ids=new ArrayList<>();
+        List<Integer> ids = new ArrayList<>();
 
         if (!CollectionUtils.isEmpty(customerList)) {
             for (CustomerRepayFlowExel customerRepayFlowExel : customerList) {
@@ -176,19 +188,15 @@ public class CustomerRepayFlowServiceImpl implements CustomerRepayFlowService {
 
                 moneyPoolRepayment.setId(Integer.parseInt(customerRepayFlowExel.getId()));
                 //未审核_未关联银行流水", "已审核_财务确认已还款", "拒绝_还款登记被财务拒绝
-                String state = "";
-                if (STATE_NOPASS.equals(customerRepayFlowExel.getState())) {
-                    state = RepayRegisterFinanceStatus.未关联银行流水.toString();
-                } else if (STATE_PASS.equals(customerRepayFlowExel.getState())) {
-                    state = RepayRegisterFinanceStatus.财务确认已还款.toString();
-                } else if (STATE_REJECT.equals(customerRepayFlowExel.getState())) {
-                    state = RepayRegisterFinanceStatus.还款登记被财务拒绝.toString();
-                }
+
                 moneyPoolRepayment.setState(customerRepayFlowExel.getState());
                 moneyPoolRepayment.setAccountMoney(customerRepayFlowExel.getAccountMoney() == null ? null : new BigDecimal(customerRepayFlowExel.getAccountMoney()));
                 moneyPoolRepayment.setBankAccount(customerRepayFlowExel.getBankAccount());
                 moneyPoolRepayment.setFactTransferName(customerRepayFlowExel.getFactTransferName());
                 moneyPoolRepayment.setUpdateTime(new Date());
+
+                moneyPoolRepayment.setOriginalBusinessId(customerRepayFlowExel.getOriginalBusinessId());
+                moneyPoolRepayment.setAfterId(customerRepayFlowExel.getAfterId());
 
                 if (RepayRegisterFinanceStatus.财务确认已还款.toString().equals(customerRepayFlowExel.getState())) {
                     auditList.add(moneyPoolRepayment);
@@ -217,29 +225,14 @@ public class CustomerRepayFlowServiceImpl implements CustomerRepayFlowService {
             //不为空进行自动还款
             if (!CollectionUtils.isEmpty(repayList)) {
                 //自动还款逻辑
-                logger.info("自动还款list==={}",repayList.toString());
-//                Iterator<MoneyPoolRepayment> iterator = updateList.iterator();
-//                while (iterator.hasNext()) {
-//                    for (MoneyPoolRepayment repayMoneyPool : repayList) {
-//                        if (iterator.next().getId().equals(repayMoneyPool.getId())) {
-//                            iterator.remove();
-//                        }
-//                    }
-//                }
-            } else {
-                //取auditList
-                logger.info("自动还款list==={}",auditList.toString());
-//                Iterator<MoneyPoolRepayment> iterator = updateList.iterator();
-//                while (iterator.hasNext()) {
-//                    for (MoneyPoolRepayment repayMoneyPool : auditList) {
-//                        if (iterator.next().getId().equals(repayMoneyPool.getId())) {
-//                            iterator.remove();
-//                        }
-//                    }
-//                }
+                logger.info("自动还款list==={}", repayList.toString());
+                for (MoneyPoolRepayment moneyPoolRepayment : repayList) {
+                    ConfirmRepaymentReq confirmRepaymentReq = new ConfirmRepaymentReq();
+                    confirmRepaymentReq.setBusinessId(moneyPoolRepayment.getOriginalBusinessId());
+                    confirmRepaymentReq.setAfterId(moneyPoolRepayment.getAfterId());
+                    shareProfitService.execute(confirmRepaymentReq, true);
+                }
             }
-
-
         }
 
 
@@ -247,9 +240,44 @@ public class CustomerRepayFlowServiceImpl implements CustomerRepayFlowService {
         moneyPoolRepaymentMapper.batchUpdateMoneyPool(updateList);
 
 
+    }
 
+    @Override
+    public void auditOrRejectCustomerFlow(CustomerRepayFlowOptReq customerRepayFlowOptReq) throws Exception {
+        String idsStr = customerRepayFlowOptReq.getIdsStr();
+        List<Integer> ids = new ArrayList<>();
+        List<MoneyPoolRepayment> updateList = new ArrayList<>();
+        String stateStr = "";
+        if (idsStr.endsWith(",")) {
+            String[] arrStr = idsStr.substring(0, idsStr.length()).split(",");
+            for (String id : arrStr) {
+                ids.add(Integer.parseInt(id));
 
+            }
+            System.out.println(arrStr);
+        } else {
+            ids.add(Integer.parseInt(idsStr));
+        }
+//        List<MoneyPoolRepayment> moneyPoolRepaymentsList = moneyPoolRepaymentMapper.selectBatchIds(ids);
+//        if (!CollectionUtils.isEmpty(moneyPoolRepaymentsList)) {
+//            for (MoneyPoolRepayment moneyPoolRepayment : moneyPoolRepaymentsList) {
+//
+//            }
+//        }
 
+        if (STATE_PASS_NUMBER.equals(customerRepayFlowOptReq.getOpt())) { //审核通过
+            stateStr = RepayRegisterFinanceStatus.财务确认已还款.toString();
+        } else if (STATE_REJECT_NUMBER.equals(customerRepayFlowOptReq.getOpt())) { //拒绝
+            stateStr = RepayRegisterFinanceStatus.还款登记被财务拒绝.toString();
+        }
+
+        for (Integer id : ids) {
+            MoneyPoolRepayment moneyPoolRepayment = new MoneyPoolRepayment();
+            moneyPoolRepayment.setId(id);
+            moneyPoolRepayment.setState(stateStr);
+            updateList.add(moneyPoolRepayment);
+        }
+        moneyPoolRepaymentMapper.batchUpdateMoneyPool(updateList);
     }
 
 

@@ -274,8 +274,8 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		for (TdrepayRechargeInfoVO vo : vos) {
 			Integer repaySource = vo.getRepaySource();
 			Integer processStatus = vo.getProcessStatus();
-			if (repaySource != null && repaySource.intValue() != 1 && repaySource.intValue() != 2
-					&& processStatus != null && (processStatus.intValue() == 1 || processStatus.intValue() == 2)) {
+			if ((repaySource != null && repaySource.intValue() != 1 && repaySource.intValue() != 2)
+					|| (processStatus != null && (processStatus.intValue() == 1 || processStatus.intValue() == 2))) {
 				lstVO.add(vo);
 			}
 		}
@@ -1062,20 +1062,18 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		/*
 		 * 去掉对往期的判断，在前端调用平台还款接口时做验证，如果往期有未结清期，则数据不能通过。
 		 */
-		/*boolean pastPeriodAdvanceFlag = isPastPeriodAdvance(projectId, period, businessType, queryProjectPaymentResult,
-				advanceShareProfitResult);
-
-		if (!pastPeriodAdvanceFlag) {
-
-			for (TdrepayRechargeLog tdrepayRechargeLog : repayChargeLogs) {
-				// 标记处理失败,待定时任务重试
-				tdrepayRechargeLog.setStatus(3);
-				tdrepayRechargeLog.setUpdateTime(new Date());
-				tdrepayRechargeLog.setUpdateUser(loginUserInfoHelper.getUserId());
-			}
-			tdrepayRechargeLogService.updateBatchById(repayChargeLogs);
-			return false;
-		}*/
+		/*
+		 * boolean pastPeriodAdvanceFlag = isPastPeriodAdvance(projectId, period,
+		 * businessType, queryProjectPaymentResult, advanceShareProfitResult);
+		 * 
+		 * if (!pastPeriodAdvanceFlag) {
+		 * 
+		 * for (TdrepayRechargeLog tdrepayRechargeLog : repayChargeLogs) { //
+		 * 标记处理失败,待定时任务重试 tdrepayRechargeLog.setStatus(3);
+		 * tdrepayRechargeLog.setUpdateTime(new Date());
+		 * tdrepayRechargeLog.setUpdateUser(loginUserInfoHelper.getUserId()); }
+		 * tdrepayRechargeLogService.updateBatchById(repayChargeLogs); return false; }
+		 */
 
 		// 2、判断当前期是否有垫付
 		// TODO 待提供判断是否存在垫付未还记录查询接口
@@ -1864,9 +1862,9 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	public static void main(String[] args) {
 		String date = "2020-05-23 00:00:00";
 		Date stringToDate = DateUtil.stringToDate(null, date);
-		
-		String date2=DateUtil.formatDate("yyyy-MM-dd", new Date());
-		Date date3=DateUtil.getDate(date);
+
+		String date2 = DateUtil.formatDate("yyyy-MM-dd", new Date());
+		Date date3 = DateUtil.getDate(date);
 		System.out.println(stringToDate);
 	}
 
