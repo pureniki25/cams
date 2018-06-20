@@ -60,7 +60,7 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
     /**
      * 实还日期
      */
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@JsonFormat(timezone = "GMT+8")
 	@TableField("fact_repay_date")
 	@ApiModelProperty(required= true,value = "实还日期")
 	private Date factRepayDate;
