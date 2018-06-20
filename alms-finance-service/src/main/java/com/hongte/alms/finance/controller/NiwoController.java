@@ -49,7 +49,7 @@ public class NiwoController {
 	
 	
 
-	@GetMapping(value = "/sycRepayPlan")
+	@PostMapping(value = "/sycRepayPlan")
 	@ApiOperation(value = "同步你我金融还款计划")
 	public void sycRepayPlan(String projId) {
 		logger.info("@sycRepayPlan@同步你我金融还款计划--开始[{},{}]");

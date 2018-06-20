@@ -188,7 +188,22 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 	@ApiModelProperty(required= true,value = "满标时间")
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date queryFullSuccessDate;
+	
+    /**
+     * 资产端上标编号
+     */
+	@TableField("request_no")
+	@ApiModelProperty(required= true,value = "资产端上标编号")
+	private String requestNo;
+	
 
+	public String getRequestNo() {
+		return requestNo;
+	}
+
+	public void setRequestNo(String requestNo) {
+		this.requestNo = requestNo;
+	}
 
 	public Integer getOffLineInOverDueRateType() {
 		return offLineInOverDueRateType;
