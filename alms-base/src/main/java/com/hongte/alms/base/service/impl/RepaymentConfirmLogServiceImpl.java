@@ -231,7 +231,7 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 	
 	@Override
 	public List<JSONObject> selectCurrentPeriodConfirmedProjInfo(String businessId, String afterId) {
-		List<RepaymentConfirmLog> list = confirmLogMapper.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("business_id", businessId).eq("after_id", afterId).orderBy("`index`",false)) ;
+		List<RepaymentConfirmLog> list = confirmLogMapper.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("business_id", businessId).eq("after_id", afterId).orderBy("`idx`",false)) ;
 		List<JSONObject> res = new ArrayList<>() ;
 		for (RepaymentConfirmLog repaymentConfirmLog : list) {
 			String json = repaymentConfirmLog.getProjPlanJson();
