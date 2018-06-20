@@ -104,6 +104,11 @@ public class WithholdingServiceimpl implements WithholdingService {
 		BasicBusiness basic = basicBusinessService
 				.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", pList.getOrigBusinessId()));
 		List<BankCardInfo> bankCardInfos = rechargeService.getCustomerInfo(basic.getCustomerIdentifyCard());
+		if(bankCardInfos==null) {
+			logger.debug(
+					"业务编号为" + pList.getOrigBusinessId() + "期数为" + pList.getAfterId() + "代扣失败，没有找到银行代扣和第三方代扣相关绑定信息");
+			return;
+		}
 		BankCardInfo bankCardInfo = rechargeService.getBankCardInfo(bankCardInfos);
 		BankCardInfo ThirtyCardInfo = rechargeService.getThirtyPlatformInfo(bankCardInfos);
 
@@ -287,7 +292,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		}
 		outerloop: for (WithholdingChannel channel : newChanels) {
 			SysBankLimit sysBankLimit = sysBankLimitService.selectOne(
-					new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("status", 1));
+					new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("status", 1).eq("bank_code", channel.getBankCode()));
 			if (sysBankLimit == null) {
 				logger.debug("第三方代扣限额信息platformId:" + channel.getPlatformId() + "无效/不存在");
 				continue;
@@ -520,7 +525,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 				}
 				outerloop: for (WithholdingChannel channel : newChanels) {
 					SysBankLimit sysBankLimit = sysBankLimitService.selectOne(
-							new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("status", 1));
+							new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("status", 1).eq("bank_code", channel.getBankCode()));
 					if (sysBankLimit == null) {
 						logger.info("第三方代扣限额信息platformId:" + channel.getPlatformId() + "无效/不存在");
 						result.setCode("-1");
