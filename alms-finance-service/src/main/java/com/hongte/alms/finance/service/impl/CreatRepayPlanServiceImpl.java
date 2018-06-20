@@ -1386,6 +1386,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 repaymentProjPlan.setOffLineInOverDueRate(projInfoReq.getOffLineInOverDueRate());
                 repaymentProjPlan.setOffLineInOverDueRateType(projInfoReq.getOffLineInOverDueRateType());
                 repaymentProjPlan.setQueryFullSuccessDate(projInfoReq.getQueryFullsuccessDate());
+                repaymentProjPlan.setRequestNo(projInfoReq.getRequestNo());//资产端上标编号
 
 
 
