@@ -77,6 +77,7 @@ public enum RepayPlanSettleStatusEnum implements IEnum {
 
         if(status.equals(RepayPlanSettleStatusEnum.PAYED_EARLY.getValue())
                 ||status.equals(RepayPlanSettleStatusEnum.PAYED.getValue())
+                ||status.equals(RepayPlanSettleStatusEnum.RENEWED.getValue())
                 ||status.equals(RepayPlanSettleStatusEnum.PAYED_LOSS.getValue()) ){
             return  true;
         }else {

@@ -139,7 +139,8 @@
 		</row>
 		<row style="margin-top:1rem">
 			<i-col span='6'>
-				{{ rechargeAccountType }}：代充值存管账号余额为：{{ rechargeAccountBalance }} 元
+				{{ rechargeAccountType }}：代充值存管账号余额为：
+				{{ rechargeAccountBalance?numeral(rechargeAccountBalance).format('0,0.00'):0 }}元
 			</i-col>
 			<i-col span='6'>已勾选待分发金额为：{{ selectAmount }} 元</i-col>
 		</row>
