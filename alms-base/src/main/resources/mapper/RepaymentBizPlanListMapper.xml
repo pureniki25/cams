@@ -863,4 +863,14 @@
 	ORDER BY
 		bpl.after_id
     </select>
+    
+    
+        <select id="getPlanListForCalLateFee" resultType="com.hongte.alms.base.entity.RepaymentBizPlanList">
+	       SELECT plan_list_id AS planListId,plan_id AS planId,business_id AS businessId,orig_business_id AS origBusinessId,period,after_id AS afterId,due_date AS dueDate,total_borrow_amount AS totalBorrowAmount,overdue_amount AS overdueAmount,derate_amount AS derateAmount,overdue_days AS overdueDays,current_status AS currentStatus,current_sub_status AS currentSubStatus,repay_status AS repayStatus,repay_flag AS repayFlag,fact_repay_date AS factRepayDate,finance_comfirm_date AS financeComfirmDate,finance_confirm_user AS financeConfirmUser,finance_confirm_user_name AS financeConfirmUserName,confirm_flag AS confirmFlag,auto_withholding_confirmed_date AS autoWithholdingConfirmedDate,auto_withholding_confirmed_user AS autoWithholdingConfirmedUser,auto_withholding_confirmed_user_name AS autoWithholdingConfirmedUserName,accountant_confirm_status AS accountantConfirmStatus,accountant_confirm_user AS accountantConfirmUser,accountant_confirm_user_name AS accountantConfirmUserName,accountant_confirm_date AS accountantConfirmDate,remark,create_time AS createTime,src_type AS srcType,create_user AS `createUser`,update_time AS updateTime,update_user AS updateUser
+FROM tb_repayment_biz_plan_list
+WHERE (src_type = 2 AND current_status <![CDATA[ <>  ]]> '已还款' AND (current_sub_status <![CDATA[ <>  ]]> '还款待确认' OR current_sub_status IS NULL) AND plan_id = #{planListId}) 
+    
+    </select>
+    
+ 
 </mapper>

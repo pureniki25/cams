@@ -122,4 +122,12 @@ public interface RepaymentBizPlanListMapper extends SuperMapper<RepaymentBizPlan
      * @return
      */
     List<ConfirmWithholdListVO> listConfirmWithhold(String businessId);
+    
+    
+    
+	/**
+	 * 找出符合条件的记录进行滞纳金计算
+	 * @return
+	 */
+	List<RepaymentBizPlanList> getPlanListForCalLateFee(@Param(value = "planListId") String planListId);
 }

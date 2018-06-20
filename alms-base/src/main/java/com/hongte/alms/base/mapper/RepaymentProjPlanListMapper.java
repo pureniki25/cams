@@ -51,4 +51,10 @@ public interface RepaymentProjPlanListMapper extends SuperMapper<RepaymentProjPl
 	 */
 	BigDecimal caluProjPlanListPlanAmount(String projPlanListId);
 	
+	/**
+	 * 找出符合条件的记录进行滞纳金计算
+	 * @return
+	 */
+	List<RepaymentProjPlanList> getProListForCalLateFee(@Param("projListId") String projListId);
+	
 }

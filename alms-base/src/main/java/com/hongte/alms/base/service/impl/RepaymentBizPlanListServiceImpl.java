@@ -207,4 +207,10 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
 	public List<ConfirmWithholdListVO> listConfirmWithhold(String businessId) {
 		return repaymentBizPlanListMapper.listConfirmWithhold(businessId);
 	}
+
+	@Override
+	public List<RepaymentBizPlanList> getPlanListForCalLateFee(String planListId) {
+		
+		return repaymentBizPlanListMapper.getPlanListForCalLateFee(planListId);
+	}
 }
