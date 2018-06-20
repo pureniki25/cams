@@ -71,12 +71,12 @@
                             :label-width="100">
                         <i-col span="8">
                             <form-item label="登记日期：" prop="regStartTime">
-                                <date-picker type="date" @on-change="regStartTime"
+                                <date-picker type="date" v-model="searchForm.regStartTimeV" @on-change="regStartTime"
                                              placeholder="选择日期"
                                              format="yyyy-MM-dd"
                                              style="width: 200px"></date-picker>
                                 <span>至</span>
-                                <date-picker type="date" @on-change="regEndTime"
+                                <date-picker type="date" v-model="searchForm.regEndTimeV"  @on-change="regEndTime"
                                              placeholder="选择日期"
                                              format="yyyy-MM-dd"
                                              style="width: 200px"></date-picker>
@@ -101,7 +101,7 @@
 
                         <i-col span="4">
                             <form-item label="状态：" prop="state">
-                                <i-select v-model="searchForm.state" filterable style="width: 176px">
+                                <i-select     filterable style="width: 176px">
                                     <i-option value="1">未审核</i-option>
                                     <i-option value="2">已审核</i-option>
                                     <i-option value="3">拒绝</i-option>
@@ -110,12 +110,12 @@
                         </i-col>
                         <i-col span="8">
                             <form-item label="转账日期：" prop="accountStartTime">
-                                <date-picker type="date" @on-change="accountStartTime"
+                                <date-picker type="date" v-model="searchForm.accountStartTimeV" @on-change="accountStartTime"
                                              placeholder="选择日期"
                                              format="yyyy-MM-dd"
                                              style="width: 200px"></date-picker>
                                 <span>至</span>
-                                <date-picker type="date" @on-change="accountEndTime"
+                                <date-picker type="date" v-model="searchForm.accountEndTimeV" @on-change="accountEndTime"
                                              placeholder="选择日期"
                                              format="yyyy-MM-dd"
                                              style="width: 200px"></date-picker>
@@ -160,8 +160,8 @@
         <i-col span="24">
             <!--:loading="saving"-->
             <div style="float: left;">
-                <i-button type="info"> 审核</i-button>
-                <i-button type="info"> 拒绝</i-button>
+                <i-button type="info"  @click="auditCustomerFlow"> 审核</i-button>
+                <i-button type="info"  @click="rejectCustomerFlow"> 拒绝</i-button>
             </div>
 
             <Upload
@@ -186,8 +186,8 @@
             <table id="listTable" lay-filter="listTable"></table>
             <script type="text/html" id="barTools">
                 <!--layui-btn layui-btn-xs-->
-                <a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="info" ht-auth="detail">审核</a>
-                <a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="business" ht-auth="detail">拒绝</a>
+                <a class="layui-btn layui-btn-normal layui-btn-xs " id="audit" lay-event="audit" ht-auth="detail">审核</a>
+                <a class="layui-btn layui-btn-normal layui-btn-xs " id="reject" lay-event="reject" ht-auth="detail">拒绝</a>
             </script>
         </i-col>
     </row>

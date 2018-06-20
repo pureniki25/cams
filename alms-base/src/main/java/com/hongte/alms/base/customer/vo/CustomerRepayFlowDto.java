@@ -21,6 +21,8 @@ public class CustomerRepayFlowDto {
 
     private String state;//'状态'
 
+    private String id;
+
     public String getCreateTime() {
         return createTime;
     }
@@ -123,5 +125,13 @@ public class CustomerRepayFlowDto {
 
     public void setState(String state) {
         this.state = state;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

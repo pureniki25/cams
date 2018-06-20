@@ -3,6 +3,7 @@ var table;
 var financePath;
 var basePath;
 var vm;
+var cookie
 var tableColum;
 //从后台获取下拉框数据
 var getSelectsData = function () {
@@ -40,12 +41,16 @@ window.layinit(function (htConfig) {
             bankList: [],
             searchForm: {
                 regStartTime: '', //登记开始时间
+                regStartTimeV: '', //登记开始时间
                 regEndTime: '',      //登记结束时间
+                regEndTimeV: '',      //登记结束时间
                 businessId: '',  //业务编号
                 companyId: '',	//所属分公司
                 state: '',    //状态
                 accountStartTime: '',//转账开始时间
+                accountStartTimeV: '',//转账开始时间
                 accountEndTime: '',//转账结束时间
+                accountEndTimeV: '',//转账结束时间
                 customerName: '',//客户姓名
                 bankAccount: '',//转入账号
                 accountMoney: '',//转账金额
@@ -90,8 +95,9 @@ window.layinit(function (htConfig) {
             init: function () {
                 var self = this;
                 //使用layerUI的表格组件
-                layui.use(['layer', 'table', 'ht_ajax', 'ht_auth', 'ht_config'], function () {
+                layui.use(['layer', 'table', 'ht_ajax', 'ht_auth', 'ht_cookie', 'ht_config'], function () {
                     layer = layui.layer;
+                    cookie = layui.ht_cookie;
                     table = layui.table;
                     //执行渲染
                     table.render({
@@ -129,10 +135,16 @@ window.layinit(function (htConfig) {
                             {
                                 field: 'accountMoney',
                                 title: '转账金额',
+                                templet:function(d){
+                                   return numeral(d.accountMoney).format('0,0.00')
+                                }
                             },
                             {
                                 field: 'totalBorrowAmount',
                                 title: '本期应还金额',
+                                templet:function(d){
+                                    return numeral(d.totalBorrowAmount).format('0,0.00')
+                                }
                             },
                             {
                                 field: 'factTransferName',
@@ -183,24 +195,37 @@ window.layinit(function (htConfig) {
                             //如果是异步请求数据方式，res即为你接口返回的信息。
                             //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
                             self.loading = false;
+
                         }
                     });
                     table.on('tool(listTable)', function (obj) {
                         var selectedRowInfo = obj.data;
-                        if (obj.event === 'edit') {
+
+                        console.log("obj.event", obj.event);
+                        if (obj.event === 'audit') {
                             console.log("选择的行数据：", selectedRowInfo);
-                            self.editRecruitInfo(selectedRowInfo.id);
-                        } else if (obj.event === 'view') {
+                            self.auditCustomerFlow(selectedRowInfo.id);
+                        } else if (obj.event === 'reject') {
                             console.log("选择的行数据：", selectedRowInfo);
-                            self.viewRecruitInfo(selectedRowInfo.id);
+                            self.rejectCustomerFlow(selectedRowInfo.id);
                         }
 
                     });
+
+
                 })
             },
+
             handleReset(name) { // 重置表单
                 var tt = this.$refs[name];
                 tt.resetFields();
+                this.searchForm.accountStartTimeV='';
+                this.searchForm.accountEndTimeV='';
+                this.searchForm.regStartTimeV='';
+                this.searchForm.regEndTimeV='';
+
+
+
                 vm.toLoading();
             },
             ////  ----   单行操作界面显示  结束 -----------------
@@ -211,8 +236,8 @@ window.layinit(function (htConfig) {
                     //     if (valid) {
                     // getData();
                     // vm.exporting = true;
-                    var excelName=encodeURI("客户还款登记流水");
-                    expoertExcel(financePath + "customer/downloadCustomerFlowExcel", vm.searchForm, excelName+".xls");
+                    var excelName = encodeURI("客户还款登记流水");
+                    expoertExcel(financePath + "customer/downloadCustomerFlowExcel", vm.searchForm, excelName + ".xls");
 
                     // vm.exporting = false;
 
@@ -225,59 +250,90 @@ window.layinit(function (htConfig) {
 
             },
 
-            uploadSuccess() {
+            uploadSuccess(response) {
+                if (response.code == '1') {
+                    vm.$Modal.success({content: "导入成功"})
+                } else {
+                    vm.$Modal.error({content: response.msg})
+                }
 
             },
-            // 编辑字段
-            editRecruitInfo: function (id) {
+            // 审核客户流水
+            auditCustomerFlow: function (id) {
                 var self = this;
-                var eidturl = '/recruit/recruitEdit?id=' + id;
-                layer.open({
-                    type: 2,
-                    title: "编辑招聘",
-                    maxmin: true,
-                    area: ['80%', '80%'],
-                    content: eidturl,
-                    end: function () {
-                        self.toLoading();
+
+
+                // console.log(checkStatus.data) //获取选中行的数据
+                // console.log(checkStatus.data.length) //获取选中行数量，可作为是否有选中行的条件
+                // console.log(checkStatus.isAll) //表格是否全选
+                layer.confirm('确认审核通过该流水吗？', {icon: 3, title: '提示'}, function (index) {
+                    var checkStatus = table.checkStatus('listTable'); //test即为基础参数id对应的值
+                    var ids = "";
+                    if (id != '') {
+                        ids = id;
+                    } else {
+                        for (i = 0, len = checkStatus.data.length; i < len; i++) {
+                            ids += checkStatus.data[i].id + ","
+                        }
                     }
+
+                    var url = financePath + "customer/auditOrRejectCustomerFlow";
+
+                    axios.get(url, {params: {idsStr: ids, opt: 2}})
+                        .then(function (res) {
+                            if (res.data.code == '1') {
+                                vm.$Modal.success({content: "审核成功"})
+                                self.toLoading();
+                            } else {
+                                vm.$Modal.error({content: res.data.msg})
+                            }
+                        })
+                        .catch(function (err) {
+                            vm.$Modal.error({content: err.data.msg})
+                        })
+
+
+                    layer.close(index);
                 });
 
 
             },
-            // 预览
-            viewRecruitInfo: function (id) {
+            // 拒绝
+            rejectCustomerFlow: function (id) {
                 var self = this;
-                var viewurl = '/recruit/recruitView?id=' + id;
-                layer.open({
-                    type: 2,
-                    title: "预览",
-                    maxmin: true,
-                    area: ['80%', '80%'],
-                    content: viewurl,
-                    end: function () {
-
+                layer.confirm('确认拒绝该流水吗？', {icon: 3, title: '提示'}, function (index) {
+                    var checkStatus = table.checkStatus('listTable'); //test即为基础参数id对应的值
+                    var ids = "";
+                    console.log("id=",id);
+                    if (id != '') {
+                        ids = id;
+                    } else {
+                        for (i = 0, len = checkStatus.data.length; i < len; i++) {
+                            ids += checkStatus.data[i].id + ","
+                        }
                     }
+                    var url = financePath + "customer/auditOrRejectCustomerFlow";
+
+                    axios.get(url, {params: {idsStr: ids, opt: 3}})
+                        .then(function (res) {
+                            if (res.data.code == '1') {
+                                vm.$Modal.success({content: "拒绝成功"})
+                                self.toLoading();
+                            } else {
+                                vm.$Modal.error({content: res.data.msg})
+                            }
+                        })
+                        .catch(function (err) {
+                            vm.$Modal.error({content: err.data.msg})
+                        })
+
+
+                    layer.close(index);
                 });
 
 
             },
 
-            addRecruit: function () {
-                var self = this;
-                var url = '/recruit/recruitEdit';
-                layer.open({
-                    type: 2,
-                    title: "新增招聘",
-                    maxmin: true,
-                    area: ['80%', '80%'],
-                    content: url,
-                    end: function () {
-                        self.toLoading();
-                    }
-                });
-
-            },
 
             regStartTime: function (starttime) {
                 this.searchForm.regStartTime = starttime;
