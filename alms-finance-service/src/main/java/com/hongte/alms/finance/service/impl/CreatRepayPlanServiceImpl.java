@@ -988,7 +988,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             }
             //标的房产信息校验
             if(projInfoReq.getIsHaveHouse().equals(BooleanEnum.YES.getValue())){
-                if(projInfoReq.getProjHouseInfos()==null || projInfoReq.getProjCarInfos().size()==0){
+                if(projInfoReq.getProjHouseInfos()==null || projInfoReq.getProjHouseInfos().size()==0){
                     logger.error("有房产信息的标必须把房产信息列表传入  projId:"+projInfoReq.getProjectId()
                             +"  projInfoReq:"+JSON.toJSONString(projInfoReq));
                     throw  new CreatRepaymentExcepiton("有房产信息的标必须把房产信息列表传入 projId:" +projInfoReq.getProjectId());
