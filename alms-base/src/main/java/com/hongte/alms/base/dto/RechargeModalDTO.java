@@ -1,6 +1,7 @@
 package com.hongte.alms.base.dto;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 public class RechargeModalDTO implements Serializable {
 
@@ -33,7 +34,7 @@ public class RechargeModalDTO implements Serializable {
 	/**
 	 * 金额，不能少于100
 	 */
-	private Double amount;
+	private BigDecimal amount;
 
 	public String getoIdPartner() {
 		return oIdPartner;
@@ -83,11 +84,11 @@ public class RechargeModalDTO implements Serializable {
 		this.clientIp = clientIp;
 	}
 
-	public Double getAmount() {
+	public BigDecimal getAmount() {
 		return amount;
 	}
 
-	public void setAmount(Double amount) {
+	public void setAmount(BigDecimal amount) {
 		this.amount = amount;
 	}
 

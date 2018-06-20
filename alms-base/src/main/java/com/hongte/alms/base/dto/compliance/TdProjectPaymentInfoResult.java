@@ -1,7 +1,7 @@
 package com.hongte.alms.base.dto.compliance;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -20,7 +20,7 @@ public class TdProjectPaymentInfoResult implements Serializable {
 	/**
 	 * 借款利率
 	 */
-	private BigDecimal interestRate;
+	private Double interestRate;
 	/**
 	 * 借款期限
 	 */
@@ -32,11 +32,11 @@ public class TdProjectPaymentInfoResult implements Serializable {
 	/**
 	 * 借款总额（元）
 	 */
-	private BigDecimal amount;
+	private Double amount;
 	/**
 	 * 应还本息
 	 */
-	private BigDecimal repayAmount;
+	private Double repayAmount;
 	/**
 	 * 应还总期数
 	 */
@@ -48,11 +48,11 @@ public class TdProjectPaymentInfoResult implements Serializable {
 	/**
 	 * 满标日期
 	 */
-	private int projectFullDate;
+	private String projectFullDate;
 	/**
 	 * 审核时间
 	 */
-	private BigDecimal auditDate;
+	private Date auditDate;
 	/**
 	 * 应还明细
 	 */
@@ -66,11 +66,11 @@ public class TdProjectPaymentInfoResult implements Serializable {
 		this.publishUserId = publishUserId;
 	}
 
-	public BigDecimal getInterestRate() {
+	public Double getInterestRate() {
 		return interestRate;
 	}
 
-	public void setInterestRate(BigDecimal interestRate) {
+	public void setInterestRate(Double interestRate) {
 		this.interestRate = interestRate;
 	}
 
@@ -90,19 +90,19 @@ public class TdProjectPaymentInfoResult implements Serializable {
 		this.repaymentType = repaymentType;
 	}
 
-	public BigDecimal getAmount() {
+	public Double getAmount() {
 		return amount;
 	}
 
-	public void setAmount(BigDecimal amount) {
+	public void setAmount(Double amount) {
 		this.amount = amount;
 	}
 
-	public BigDecimal getRepayAmount() {
+	public Double getRepayAmount() {
 		return repayAmount;
 	}
 
-	public void setRepayAmount(BigDecimal repayAmount) {
+	public void setRepayAmount(Double repayAmount) {
 		this.repayAmount = repayAmount;
 	}
 
@@ -122,19 +122,19 @@ public class TdProjectPaymentInfoResult implements Serializable {
 		this.isProjectFull = isProjectFull;
 	}
 
-	public int getProjectFullDate() {
+	public String getProjectFullDate() {
 		return projectFullDate;
 	}
 
-	public void setProjectFullDate(int projectFullDate) {
+	public void setProjectFullDate(String projectFullDate) {
 		this.projectFullDate = projectFullDate;
 	}
 
-	public BigDecimal getAuditDate() {
+	public Date getAuditDate() {
 		return auditDate;
 	}
 
-	public void setAuditDate(BigDecimal auditDate) {
+	public void setAuditDate(Date auditDate) {
 		this.auditDate = auditDate;
 	}
 

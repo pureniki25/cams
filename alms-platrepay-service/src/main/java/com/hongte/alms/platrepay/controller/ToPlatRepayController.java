@@ -340,7 +340,7 @@ public class ToPlatRepayController {
 		String cmOrderNo = UUID.randomUUID().toString();
 
 		RechargeModalDTO dto = new RechargeModalDTO();
-		dto.setAmount(vo.getRechargeAmount());
+		dto.setAmount(BigDecimal.valueOf(vo.getRechargeAmount()).setScale(2, BigDecimal.ROUND_HALF_UP));
 		// 若转账类型为1 对公，则在银行编码后 + "2B"
 		dto.setBankCode("1".equals(vo.getTransferType()) ? vo.getBankCode() + "2B" : vo.getBankCode());
 		dto.setClientIp(clientIp);
