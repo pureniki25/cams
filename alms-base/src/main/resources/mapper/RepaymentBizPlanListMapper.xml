@@ -213,7 +213,10 @@
 		    END as repaymentType,
 		    b.borrow_limit borrowLimit,
 			pl.fact_repay_date as factRepayDate,
-			pl.total_borrow_amount as planRepayAmount,
+			CASE
+			pl.overdue_amount
+			WHEN NULL THEN  pl.total_borrow_amount
+			ELSE (pl.total_borrow_amount+pl.overdue_amount   )  END as planRepayAmount,
 			pl.current_status as status ,
 			CASE
 				pl.repay_status 
