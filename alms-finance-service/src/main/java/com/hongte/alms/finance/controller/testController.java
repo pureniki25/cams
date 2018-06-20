@@ -74,7 +74,7 @@ public class testController {
     @GetMapping("getNiWoRepayPlan")
     public NiWoProjPlanDto getNiWoRepayPlan(@RequestParam("projId") String projId)
     {
-    	NiWoProjPlanDto dto=searchNiWoRepayPlanService.getNiWoRepayPlan(projId);
+    	NiWoProjPlanDto dto=searchNiWoRepayPlanService.sycNiWoRepayPlan(projId);
 
         return dto;
     }

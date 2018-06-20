@@ -46,7 +46,7 @@ import java.util.concurrent.Executor;
  * @since 2018/6/13
  * 
  */
-@Service("SearchNiWoRepayPlanService")
+@Service("NiWoRepayPlanService")
 public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 
 	private static Logger logger = LoggerFactory.getLogger(NiWoRepayPlanServiceImpl.class);
@@ -111,7 +111,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 		// dto.setRepaymentPlan(map.get("repaymentPlan")); todo
 
 		RepaymentProjPlan projPlan = repaymentProjPlanService
-				.selectOne(new EntityWrapper<RepaymentProjPlan>().eq("project_id", projId).eq("creat_sys_type", 3));
+				.selectOne(new EntityWrapper<RepaymentProjPlan>().eq("project_id", projId).eq("plate_type", 2));
 		List<RepaymentProjPlanList> projLists = repaymentProjPlanListService
 				.selectList(new EntityWrapper<RepaymentProjPlanList>().eq("projPlanId", projPlan.getProjPlanId()));
 		List<RepaymentBizPlanList> pLists = repaymentBizPlanListService
