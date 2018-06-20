@@ -9,7 +9,7 @@ import com.hongte.alms.base.service.SysProvinceService;
 
 import com.hongte.alms.base.vo.module.AreaProvinceItemVo;
 import com.hongte.alms.common.result.Result;
-import com.hongte.alms.finance.service.SearchNiWoRepayPlanService;
+import com.hongte.alms.finance.service.NiWoRepayPlanService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -48,8 +48,8 @@ public class testController {
     private SysCountyService countyService;
     
     @Autowired
-    @Qualifier("SearchNiWoRepayPlanService")
-    SearchNiWoRepayPlanService  searchNiWoRepayPlanService;
+    @Qualifier("NiWoRepayPlanService")
+    NiWoRepayPlanService  searchNiWoRepayPlanService;
     
 
     @ApiOperation(value="获取区域信息")
@@ -74,7 +74,7 @@ public class testController {
     @GetMapping("getNiWoRepayPlan")
     public NiWoProjPlanDto getNiWoRepayPlan(@RequestParam("projId") String projId)
     {
-    	NiWoProjPlanDto dto=searchNiWoRepayPlanService.getNiWoRepayPlan(projId);
+    	NiWoProjPlanDto dto=searchNiWoRepayPlanService.sycNiWoRepayPlan(projId);
 
         return dto;
     }

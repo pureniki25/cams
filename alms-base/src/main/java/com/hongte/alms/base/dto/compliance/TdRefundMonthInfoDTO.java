@@ -1,10 +1,10 @@
 package com.hongte.alms.base.dto.compliance;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 /**
  * 团贷网标的还款信息还款计划列表信息
+ * 
  * @author 胡伟骞
  *
  */
@@ -28,11 +28,11 @@ public class TdRefundMonthInfoDTO implements Serializable {
 	/**
 	 * 还款本金
 	 */
-	private BigDecimal amount;
+	private Double amount;
 	/**
 	 * 还款利息
 	 */
-	private BigDecimal interestAmout;
+	private Double interestAmout;
 	/**
 	 * 还款状态
 	 */
@@ -44,7 +44,11 @@ public class TdRefundMonthInfoDTO implements Serializable {
 	/**
 	 * 逾期费用
 	 */
-	private BigDecimal overdueAmount;
+	private Double overdueAmount;
+	/**
+	 * 垫付费用 额外费用，不包含本金利息
+	 */
+	private Double advanceAmount;
 
 	public int getPeriods() {
 		return periods;
@@ -70,19 +74,19 @@ public class TdRefundMonthInfoDTO implements Serializable {
 		this.realityCycDate = realityCycDate;
 	}
 
-	public BigDecimal getAmount() {
+	public Double getAmount() {
 		return amount;
 	}
 
-	public void setAmount(BigDecimal amount) {
+	public void setAmount(Double amount) {
 		this.amount = amount;
 	}
 
-	public BigDecimal getInterestAmout() {
+	public Double getInterestAmout() {
 		return interestAmout;
 	}
 
-	public void setInterestAmout(BigDecimal interestAmout) {
+	public void setInterestAmout(Double interestAmout) {
 		this.interestAmout = interestAmout;
 	}
 
@@ -102,19 +106,28 @@ public class TdRefundMonthInfoDTO implements Serializable {
 		this.overdueDay = overdueDay;
 	}
 
-	public BigDecimal getOverdueAmount() {
+	public Double getOverdueAmount() {
 		return overdueAmount;
 	}
 
-	public void setOverdueAmount(BigDecimal overdueAmount) {
+	public void setOverdueAmount(Double overdueAmount) {
 		this.overdueAmount = overdueAmount;
+	}
+
+	public Double getAdvanceAmount() {
+		return advanceAmount;
+	}
+
+	public void setAdvanceAmount(Double advanceAmount) {
+		this.advanceAmount = advanceAmount;
 	}
 
 	@Override
 	public String toString() {
 		return "TdRefundMonthInfoDTO [periods=" + periods + ", cycDate=" + cycDate + ", realityCycDate="
 				+ realityCycDate + ", amount=" + amount + ", interestAmout=" + interestAmout + ", status=" + status
-				+ ", overdueDay=" + overdueDay + ", overdueAmount=" + overdueAmount + "]";
+				+ ", overdueDay=" + overdueDay + ", overdueAmount=" + overdueAmount + ", advanceAmount=" + advanceAmount
+				+ "]";
 	}
 
 }

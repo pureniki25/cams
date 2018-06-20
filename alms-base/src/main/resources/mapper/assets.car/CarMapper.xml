@@ -161,7 +161,8 @@
 		tca.payment_method paymentMethod,<!-- 支付方式 -->
 		tca.auction_position auctionPosition,<!--交易地点-->
 		tca.remark   remark,<!-- 拍卖备注-->
-        tca.bidder_count bidderCount,<!-- 出价人数量-->
+		(case when tca.auction_start_time&lt;=DATE_FORMAT(now(),'%Y-%m-%d') then  tca.bidder_count
+		else 0 end) bidderCount,<!-- 出价人数量-->
 		tcb.brand_name vehicleBrand ,		<!--车辆品牌 -->
 		case
 		when tcb.origin_place=0 then '国产'
@@ -190,7 +191,8 @@
 		det.transaction_mode transactionMode ,<!-- 交易方式 -->
 		det.car_position position , <!-- 车辆位置 -->
 		det.related_docs file  , <!--提供文件 -->
-		det.remark remarks
+		det.remark remarks,
+		(select trans_price  from tb_car_auction_reg a where a.auction_id=tca.auction_id and a.is_auction_success=true) tranPrice <!--成交价 -->
 		from tb_car_auction tca
 		join tb_car_basic tcb on
 		tca.business_id=tcb.business_id
@@ -202,7 +204,7 @@
 		tb_process_type tpt on tpt.type_id=tp.process_typeid and
 		tpt.type_code='carAuctionAply'
 		<where>
-			tca.status in ('04','05')
+			tca.status in ('04','05') and tca.auction_end_time>=DATE_FORMAT(now(),'%Y-%m-%d')
 			<if test="type !=null  and type!=''">
 				and tca.status =#{type}
 			</if>
@@ -237,7 +239,7 @@
 		tb_process_type tpt on tpt.type_id=tp.process_typeid and
 		tpt.type_code='carAuctionAply'
 		<where>
-			tca.status in ('04','05')
+			tca.status in ('04','05') and tca.auction_end_time>=DATE_FORMAT(now(),'%Y-%m-%d')
 			<if test="type !=null  and type!=''">
 				and tca.status =#{type}
 			</if>

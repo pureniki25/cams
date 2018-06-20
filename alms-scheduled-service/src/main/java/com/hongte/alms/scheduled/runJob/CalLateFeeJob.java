@@ -1,4 +1,4 @@
-package com.hongte.alms.scheduled.job;
+package com.hongte.alms.scheduled.runJob;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -15,11 +15,11 @@ public class NiWoProjPlanDto implements Serializable {
      private Integer projectStatus;//标的状态，订单状态为通过才有信息，0：投资中 1：还款中 2：已结清 3：流标
      private String orderMsg;//订单状态描述，订单处于拒绝状态才有信息
      private Integer withdrawStatus;//0：未提现 1：提现中 2:提现成功 3：提现失败
-     private String withdrawMsg;//格式：1524016406846 毫秒时间戳
+	private String withdrawMsg;//格式：1524016406846 毫秒时间戳
      private long withdrawTime;//格式：1524016406846 毫秒时间戳
      private long withdrawSuccessTime;//1：代扣主卡，2：代扣附属卡 代扣主卡表示自动代扣默认使用的卡
      private String contractUrl;//合同地址，投资完成放款后该字段值，未满标前该字段值为空
-     private NiWoProjPlanListDetailDto [] repaymentPlan;//还款计划Json数组，订单状态为还款中，已结清才会返回该内容，其它状态该数组为空
+     private List<NiWoProjPlanListDetailDto>  repaymentPlans;//还款计划Json数组，订单状态为还款中，已结清才会返回该内容，其它状态该数组为空
 	public String getOrderNo() {
 		return orderNo;
 	}
@@ -58,12 +58,7 @@ public class NiWoProjPlanDto implements Serializable {
 	public void setContractUrl(String contractUrl) {
 		this.contractUrl = contractUrl;
 	}
-	public NiWoProjPlanListDetailDto[] getRepaymentPlan() {
-		return repaymentPlan;
-	}
-	public void setRepaymentPlan(NiWoProjPlanListDetailDto[] repaymentPlan) {
-		this.repaymentPlan = repaymentPlan;
-	}
+
 	public Integer getOrderStatus() {
 		return orderStatus;
 	}
@@ -83,7 +78,12 @@ public class NiWoProjPlanDto implements Serializable {
 		this.withdrawStatus = withdrawStatus;
 	}
 	
-
+    public List<NiWoProjPlanListDetailDto> getRepaymentPlans() {
+		return repaymentPlans;
+	}
+	public void setRepaymentPlan(List<NiWoProjPlanListDetailDto> repaymentPlans) {
+		this.repaymentPlans = repaymentPlans;
+	}
 
 
    

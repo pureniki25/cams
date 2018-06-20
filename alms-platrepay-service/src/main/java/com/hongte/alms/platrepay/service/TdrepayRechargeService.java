@@ -1,10 +1,12 @@
 package com.hongte.alms.platrepay.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.vo.module.ComplianceRepaymentVO;
 import com.hongte.alms.platrepay.vo.TdrepayRechargeInfoVO;
+import com.ht.ussp.core.Result;
 
 /**
  * 资金分发接口
@@ -66,5 +68,13 @@ public interface TdrepayRechargeService {
 	 * 资产端对团贷网通用合规化还款流程
 	 */
 	void rePayComplianceWithRequirements();
+	
+	/**
+	 * 从平台获取标的还款信息、还垫付信息
+	 * @param projectId
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	Map<String, Result> getAdvanceShareProfitAndProjectPayment(String projectId);
 	
 }

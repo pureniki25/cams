@@ -191,6 +191,12 @@ public class AuctionRespVo implements Serializable {
     @ApiModelProperty(value = "出价人数量", name = "bidderCount")
     private Integer bidderCount;
 
+    /**
+     * 成交价
+     */
+    @ApiModelProperty(value = "成交价", name = "tranPrice")
+    private BigDecimal tranPrice;
+
     public String getAuctionId() {
         return auctionId;
     }
@@ -453,6 +459,14 @@ public class AuctionRespVo implements Serializable {
 
     public void setBidderCount(Integer bidderCount) {
         this.bidderCount = bidderCount;
+    }
+
+    public BigDecimal getTranPrice() {
+        return tranPrice;
+    }
+
+    public void setTranPrice(BigDecimal tranPrice) {
+        this.tranPrice = tranPrice;
     }
 
     /**

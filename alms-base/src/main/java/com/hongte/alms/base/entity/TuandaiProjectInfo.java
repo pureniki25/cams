@@ -517,7 +517,34 @@ public class TuandaiProjectInfo extends Model<TuandaiProjectInfo> {
 	@TableField("update_user")
 	@ApiModelProperty(required= true,value = "更新人")
 	private String updateUser;
+	
+	
+    /**
+     * 资产端上标编号
+     */
+	@TableField("request_no")
+	@ApiModelProperty(required= true,value = "资产端上标编号")
+	private String requestNo;
+	
+	
+	
 
+
+	public Boolean getIsBailorWithdraw() {
+		return isBailorWithdraw;
+	}
+
+	public void setIsBailorWithdraw(Boolean isBailorWithdraw) {
+		this.isBailorWithdraw = isBailorWithdraw;
+	}
+
+	public String getRequestNo() {
+		return requestNo;
+	}
+
+	public void setRequestNo(String requestNo) {
+		this.requestNo = requestNo;
+	}
 
 	public String getProjectId() {
 		return projectId;

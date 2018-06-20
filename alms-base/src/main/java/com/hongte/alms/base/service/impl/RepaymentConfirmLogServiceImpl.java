@@ -110,7 +110,7 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 	@Transactional(rollbackFor=Exception.class)
 	public Result revokeConfirm(String businessId, String afterId) {
 		/*找还款确认记录*/
-		List<RepaymentConfirmLog> logs = confirmLogMapper.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("business_id", businessId).eq("after_id", afterId).orderBy("`index`",false));
+		List<RepaymentConfirmLog> logs = confirmLogMapper.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("business_id", businessId).eq("after_id", afterId).orderBy("`idx`",false));
 		if (logs==null||logs.size()==0) {
 			return Result.error("500", "找不到任何一条相关的确认还款记录");
 		}
@@ -231,7 +231,7 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 	
 	@Override
 	public List<JSONObject> selectCurrentPeriodConfirmedProjInfo(String businessId, String afterId) {
-		List<RepaymentConfirmLog> list = confirmLogMapper.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("business_id", businessId).eq("after_id", afterId).orderBy("`index`",false)) ;
+		List<RepaymentConfirmLog> list = confirmLogMapper.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("business_id", businessId).eq("after_id", afterId).orderBy("`idx`",false)) ;
 		List<JSONObject> res = new ArrayList<>() ;
 		for (RepaymentConfirmLog repaymentConfirmLog : list) {
 			String json = repaymentConfirmLog.getProjPlanJson();

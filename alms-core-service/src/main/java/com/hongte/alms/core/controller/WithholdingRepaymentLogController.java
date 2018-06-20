@@ -145,6 +145,7 @@ public class WithholdingRepaymentLogController {
 	           List<RepayLogResp> repayLogResps=new ArrayList();
 	        		   for(int i=0;i< logs.size();i++) {
 	        			   repayLogResp= ClassCopyUtil.copyObject(logs.get(i),RepayLogResp.class);
+	        			   repayLogResp.setUpdateTime(DateUtil.formatDate("yyyy-MM-dd HH:mm:ss", new Date(Long.valueOf(repayLogResp.getUpdateTime()))));
 	    				   repayLogResp.setListId(String.valueOf(i+1));
 	    				   if(repayLogResp.getRepayStatus().equals("1")) {
 	    					   repayLogResp.setRepayStatus("成功");
