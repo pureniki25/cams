@@ -85,7 +85,7 @@
 				期数类型：
 				<i-select v-model="queryConditionModel.settleType" clearable filterable style="width:100px">
       				<i-option :value="1">结清</i-option>
-      				<i-option :value="2">展期结清</i-option>
+      				<i-option :value="2">展期确认</i-option>
       				<i-option :value="0">正常还款</i-option>
   				</i-select>
 			</i-col>
@@ -139,7 +139,8 @@
 		</row>
 		<row style="margin-top:1rem">
 			<i-col span='6'>
-				{{ rechargeAccountType }}：代充值存管账号余额为：{{ rechargeAccountBalance }} 元
+				{{ rechargeAccountType }}：代充值存管账号余额为：
+				{{ rechargeAccountBalance?numeral(rechargeAccountBalance).format('0,0.00'):0 }}元
 			</i-col>
 			<i-col span='6'>已勾选待分发金额为：{{ selectAmount }} 元</i-col>
 		</row>

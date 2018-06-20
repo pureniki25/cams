@@ -2,6 +2,7 @@ package com.hongte.alms.base.service;
 
 import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.RepaymentProjPlanList;
 import com.hongte.alms.base.vo.finance.ConfirmWithholdListVO;
 import com.hongte.alms.common.service.BaseService;
 import com.hongte.alms.common.vo.PageResult;
@@ -115,4 +116,10 @@ public interface RepaymentBizPlanListService extends BaseService<RepaymentBizPla
      * @return
      */
     List<ConfirmWithholdListVO> listConfirmWithhold(String businessId);
+    
+	/**
+	 * 找出符合条件的记录进行滞纳金计算
+	 * @return
+	 */
+	List<RepaymentBizPlanList> getPlanListForCalLateFee(String planListId);
 }
