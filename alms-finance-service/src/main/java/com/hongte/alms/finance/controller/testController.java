@@ -48,7 +48,7 @@ public class testController {
     private SysCountyService countyService;
     
     @Autowired
-    @Qualifier("SearchNiWoRepayPlanService")
+    @Qualifier("NiWoRepayPlanService")
     NiWoRepayPlanService  searchNiWoRepayPlanService;
     
 
