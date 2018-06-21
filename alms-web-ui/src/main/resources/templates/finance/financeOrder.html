@@ -21,7 +21,7 @@
                                 <span v-else><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i> 查询中...</span>
                             </button>
 
-                            <button class="layui-btn layui-btn-sm" @click="showEditDialog">新增</button>
+                            <button class="layui-btn layui-btn-sm" @click="showEditDialog" v-if="authValid('add')">新增</button>
                         </div>
 
                         <Row :gutter="16">
@@ -64,13 +64,14 @@
                     <script type="text/html" id="bar_tools">
                         <!--<a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="detail">查看</a>
                         <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="edit">编辑</a>-->
-                        <a class="layui-btn layui-btn-xs layui-btn-danger " lay-event="del">删除</a>
+                        <a class="layui-btn layui-btn-xs layui-btn-danger " lay-event="del" v-if="authValid('del')">删除</a>
                     </script>
                 </i-col>
             </Row>
 
             <Modal v-model="showDialog" title="编辑" @on-ok="submitEditDialog" @on-cancel="">
-                <i-form ref="edit" :model="edit" :rules="ruleValidate" label-position="right" :label-width="100">
+                <!--<i-form ref="edit" :model="edit" :rules="ruleValidate" label-position="right" :label-width="100">-->
+                <i-form ref="edit" :model="edit" label-position="right" :label-width="100">
                             <!--<input type="hidden" v-model="edit.id" name="id" />-->
                             <Form-item label="跟单人名:" prop="userId">
                                 <!--<i-input v-model="edit.userName"></i-input>-->

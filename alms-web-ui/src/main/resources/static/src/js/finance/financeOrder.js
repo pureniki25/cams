@@ -59,7 +59,7 @@ window.layinit(function (htConfig) {
                 title: '业务类型'
             }, {
                 field: 'userName',
-                title: '出纳',
+                title: '跟单员',
             }, {
                 title: '操作',
                 toolbar: "#bar_tools"
@@ -219,28 +219,41 @@ let methods = {
         this.showDialog = true;
     },
     submitEditDialog: function () {
-        this.$refs['edit'].validate((valid) => {
-            if (valid) {
-                axios.get(basePath + 'finance/edit', {params: this.edit})
-                    .then(res => {
-                        if (res.data.code == '1') {
-                            this.tableReload();
-                            this.showDialog = false;
-                            this.$Modal.success({content:'操作成功!'});
-                            this.$refs['edit'].resetFields();
-                        } else {
-                            this.$Modal.error({content: '操作失败: ' + res.data.msg});
-                        }
-                    }).catch(err => {
-                    vm.$Modal.error({content: '出现异常，请联系管理员!'})
-                });
-                this.$Message.success('提交成功!');
-            } else {
-                this.$Message.error('表单验证失败!');
-            }
-        })
+        // this.$refs['edit'].validate((valid) => {
+        //     if (valid) {
+        //         axios.get(basePath + 'finance/edit', {params: this.edit})
+        //             .then(res => {
+        //                 if (res.data.code == '1') {
+        //                     this.tableReload();
+        //                     this.showDialog = false;
+        //                     this.$Modal.success({content:'操作成功!'});
+        //                     this.$refs['edit'].resetFields();
+        //                 } else {
+        //                     this.$Modal.error({content: '操作失败: ' + res.data.msg});
+        //                 }
+        //             }).catch(err => {
+        //             vm.$Modal.error({content: '出现异常，请联系管理员!'})
+        //         });
+        //         this.$Message.success('提交成功!');
+        //     } else {
+        //         this.showDialog = true;
+        //     }
+        // })
 
 
-
+        axios.get(basePath + 'finance/edit', {params: this.edit})
+            .then(res => {
+                if (res.data.code == '1') {
+                    this.tableReload();
+                    this.showDialog = false;
+                    this.$Modal.success({content:'操作成功!'});
+                    this.$refs['edit'].resetFields();
+                } else {
+                    this.$Modal.error({content: '操作失败: ' + res.data.msg});
+                }
+            }).catch(err => {
+            vm.$Modal.error({content: '出现异常，请联系管理员!'})
+        });
+        // this.$Message.success('提交成功!');
     }
 }
