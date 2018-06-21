@@ -144,14 +144,14 @@ public class RepaymentProjPlanListServiceImpl extends
 									underlineDueDays=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), projPList.getDueDate())));
 									
 									projPList.setOverdueDays(underlineDueDays);
-									BigDecimal underLateFee=getUnderLateFee(projPList,projList, projPlan,underlineDueDays);//线下逾期费
-									underLateFeeSum=underLateFeeSum.add(underLateFee);
+									BigDecimal underLateFee=getUnderLateFee(projPList,projList, projPlan,underlineDueDays).setScale(2, roundingMode);//线下逾期费
+									underLateFeeSum=underLateFeeSum.add(underLateFee).setScale(2, roundingMode);
 									underLineProjDetail=	updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid(), underLateFee);
 									
 									BigDecimal onlineLateFee=BigDecimal.valueOf(0);//线上逾期费
 									if(onlineDueDays.compareTo(BigDecimal.valueOf(0))>0) {//如果线上的逾期天数为0,则不用计算线上滞纳金
-										 onlineLateFee=getOnLineLateFee(projPList, projPlan,onlineDueDays);//线上逾期费
-										onlineLateFeeSum=onlineLateFeeSum.add(onlineLateFee);
+										 onlineLateFee=getOnLineLateFee(projPList, projPlan,onlineDueDays).setScale(2, roundingMode);//线上逾期费
+										onlineLateFeeSum=onlineLateFeeSum.add(onlineLateFee).setScale(2, roundingMode);
 										onLineProjDetail=updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), onlineLateFee);
 									}
 							       
