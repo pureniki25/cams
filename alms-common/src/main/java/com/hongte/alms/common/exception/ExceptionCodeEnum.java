@@ -11,7 +11,12 @@ import java.io.Serializable;
  */
 public enum ExceptionCodeEnum  implements IEnum {
 
-    NULL(250,"对象为空异常")
+    NULL(250,"对象为空异常"),
+    PAREMTER_ERROR(450,"输入参数错误")
+
+
+
+
    ;
 
     private Integer value;
