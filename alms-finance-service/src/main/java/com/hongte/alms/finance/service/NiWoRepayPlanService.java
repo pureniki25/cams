@@ -1,6 +1,7 @@
 package com.hongte.alms.finance.service;
 
-import com.hongte.alms.base.feignClient.dto.NiWoProjPlanDto;
+import java.util.HashMap;
+
 
 /**
  * @author 陈泽圣2018年6月13日 
@@ -9,13 +10,12 @@ public interface NiWoRepayPlanService {
 
 
 	/**
-	 * 根据标ID获取标的信息
+	 * 根据请求编号获取标的信息
 	 * 
 	 * @author 陈泽圣 2018年6月13日
-	 * @param afterId
 	 * @return
 	 */
-	public void sycNiWoRepayPlan(String projId);
+	public void sycNiWoRepayPlan(String orderNo,HashMap<String,Object> niwoMap);
 
 
 	/**

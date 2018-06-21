@@ -88,9 +88,20 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 	
 	@Transactional(rollbackFor = Exception.class)
 	@Override
-	public void sycNiWoRepayPlan(String orderNo) {
+	public void sycNiWoRepayPlan(String orderNo,HashMap<String,Object> niwoMap) {
+		    NiWoProjPlanDto dto=new NiWoProjPlanDto();
 		    //获取你我金融还款计划信息
-		    NiWoProjPlanDto dto=getNiWoRepayPlan(orderNo);
+		if(niwoMap!=null) {
+			  dto=getNiWoRepayPlanByMap(niwoMap, dto);
+			  orderNo=dto.getOrderNo();
+		}
+		if(orderNo!=null&&!orderNo.equals("")) {
+			   dto=getNiWoRepayPlan(orderNo,dto);
+		}
+		  
+		if(dto==null) {
+			logger.info("获取你我金融的标的记录为空,请求编号{request_no}为："+orderNo);
+		}
 			
 			RepaymentProjPlan projPlan = repaymentProjPlanService
 					.selectOne(new EntityWrapper<RepaymentProjPlan>().eq("request_no", orderNo).eq("plate_type", 2));
@@ -346,52 +357,55 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 	}
 
 
-	private  NiWoProjPlanDto getNiWoRepayPlan(String orderNo) {
-		   NiWoProjPlanDto dto=null;
+	
+	
+	private NiWoProjPlanDto getNiWoRepayPlanByMap(HashMap<String, Object> map,NiWoProjPlanDto dto) {
+			dto.setContractUrl(map.get("orderNo") == null ? "" : map.get("orderNo").toString());
+			dto.setOrderStatus(map.get("orderStatus") == null ? 0 : Integer.valueOf(map.get("orderStatus").toString()));
+			dto.setOrderMsg(map.get("orderMsg") == null ? "" : map.get("orderMsg").toString());
+			dto.setContractUrl(map.get("contractUrl") == null ? "" : map.get("contractUrl").toString());
+			dto.setOrderNo(map.get("orderNo") == null ? "" : map.get("orderNo").toString());
+			dto.setProjectStatus(
+					map.get("projectStatus") == null ? 0 : Integer.valueOf(map.get("projectStatus").toString()));
+			dto.setWithdrawMsg(map.get("withdrawMsg") == null ? "" : map.get("withdrawMsg").toString());
+			dto.setWithdrawStatus(
+					map.get("withdrawStatus") == null ? 0 : Integer.valueOf(map.get("withdrawStatus").toString()));
+			dto.setWithdrawSuccessTime(
+					map.get("withdrawSuccessTime") == null ? 0 : Long.valueOf(map.get("withdrawSuccessTime").toString()));
+			dto.setWithdrawTime(map.get("withdrawTime") == null ? 0 : Long.valueOf(map.get("withdrawTime").toString()));
+			Object array=map.get("repaymentPlan")==null?"":map.get("repaymentPlan"); 
+			if(array!=null) {
+				List<NiWoProjPlanListDetailDto>  repaymentPlans=new ArrayList();
+				List<HashMap<String,Object>>  repaymentPlanMaps=(List<HashMap<String,Object>>) array;
+				for(HashMap<String,Object> repaymentPlanMap:repaymentPlanMaps) {
+					NiWoProjPlanListDetailDto detailDto=new NiWoProjPlanListDetailDto();
+					detailDto.setPeriod(repaymentPlanMap.get("period")==null?null:Integer.valueOf(repaymentPlanMap.get("period").toString()));
+					detailDto.setPrincipal(repaymentPlanMap.get("principal")==null?BigDecimal.valueOf(0):BigDecimal.valueOf(Double.valueOf(repaymentPlanMap.get("principal").toString())));
+					detailDto.setInterest(repaymentPlanMap.get("interest")==null?BigDecimal.valueOf(0):BigDecimal.valueOf(Double.valueOf(repaymentPlanMap.get("interest").toString())));
+					detailDto.setPlatformManageFee(repaymentPlanMap.get("platformManageFee")==null?BigDecimal.valueOf(0):BigDecimal.valueOf(Double.valueOf(repaymentPlanMap.get("platformManageFee").toString())));
+					detailDto.setCommissionGuaranteFee(repaymentPlanMap.get("commissionGuaranteFee")==null?BigDecimal.valueOf(0):BigDecimal.valueOf(Double.valueOf(repaymentPlanMap.get("commissionGuaranteFee").toString())));
+					detailDto.setRefundDate(repaymentPlanMap.get("refundDate")==null?Long.valueOf(0):Long.valueOf(repaymentPlanMap.get("refundDate").toString()));
+					detailDto.setRepaidPrincipal(repaymentPlanMap.get("repaidPrincipal")==null?BigDecimal.valueOf(0):BigDecimal.valueOf(Double.valueOf(repaymentPlanMap.get("repaidPrincipal").toString())));
+					detailDto.setRepaidInterest(repaymentPlanMap.get("repaidInterest")==null?BigDecimal.valueOf(0):BigDecimal.valueOf(Double.valueOf(repaymentPlanMap.get("repaidInterest").toString())));
+					detailDto.setRepaidPlatformManageFee(repaymentPlanMap.get("repaidPlatformManageFee")==null?BigDecimal.valueOf(0):BigDecimal.valueOf(Double.valueOf(repaymentPlanMap.get("repaidPlatformManageFee").toString())));
+					detailDto.setRepaidCommissionGuaranteFee(repaymentPlanMap.get("repaidCommissionGuaranteFee")==null?BigDecimal.valueOf(0):BigDecimal.valueOf(Double.valueOf(repaymentPlanMap.get("repaidCommissionGuaranteFee").toString())));
+					detailDto.setTotalPenalty(repaymentPlanMap.get("totalPenalty")==null?BigDecimal.valueOf(0):BigDecimal.valueOf(Double.valueOf(repaymentPlanMap.get("totalPenalty").toString())));
+					detailDto.setRepaidPenalty(repaymentPlanMap.get("repaidPenalty")==null?BigDecimal.valueOf(0):BigDecimal.valueOf(Double.valueOf(repaymentPlanMap.get("repaidPenalty").toString())));
+					repaymentPlans.add(detailDto);		
+				}
+		
+				dto.setRepaymentPlan(repaymentPlans);
+			}
+			return dto;
+		
+	}
+	private  NiWoProjPlanDto getNiWoRepayPlan(String orderNo,NiWoProjPlanDto dto) {
 			Map<String, Object> paramMap = new HashMap<>();
 			paramMap.put("orderNo", orderNo);
 			Result result = eipRemote.queryApplyOrder(paramMap);
 			if(result.getReturnCode().equals("0000")) {
 				HashMap<String, Object> map = (HashMap) result.getData();
-				 dto = new NiWoProjPlanDto();
-				System.out.println(map.get("orderNo").toString());
-				dto.setContractUrl(map.get("orderNo") == null ? "" : map.get("orderNo").toString());
-				dto.setOrderStatus(map.get("orderStatus") == null ? 0 : Integer.valueOf(map.get("orderStatus").toString()));
-				dto.setOrderMsg(map.get("orderMsg") == null ? "" : map.get("orderMsg").toString());
-				dto.setContractUrl(map.get("contractUrl") == null ? "" : map.get("contractUrl").toString());
-				dto.setOrderNo(map.get("orderNo") == null ? "" : map.get("orderNo").toString());
-				dto.setProjectStatus(
-						map.get("projectStatus") == null ? 0 : Integer.valueOf(map.get("projectStatus").toString()));
-				dto.setWithdrawMsg(map.get("withdrawMsg") == null ? "" : map.get("withdrawMsg").toString());
-				dto.setWithdrawStatus(
-						map.get("withdrawStatus") == null ? 0 : Integer.valueOf(map.get("withdrawStatus").toString()));
-				dto.setWithdrawSuccessTime(
-						map.get("withdrawSuccessTime") == null ? 0 : Long.valueOf(map.get("withdrawSuccessTime").toString()));
-				dto.setWithdrawTime(map.get("withdrawTime") == null ? 0 : Long.valueOf(map.get("withdrawTime").toString()));
-				Object array=map.get("repaymentPlan")==null?"":map.get("repaymentPlan"); 
-				if(array!=null) {
-					List<NiWoProjPlanListDetailDto>  repaymentPlans=new ArrayList();
-					List<HashMap<String,Object>>  repaymentPlanMaps=(List<HashMap<String,Object>>) array;
-					for(HashMap<String,Object> repaymentPlanMap:repaymentPlanMaps) {
-						NiWoProjPlanListDetailDto detailDto=new NiWoProjPlanListDetailDto();
-						detailDto.setPeriod(repaymentPlanMap.get("period")==null?null:Integer.valueOf(repaymentPlanMap.get("period").toString()));
-						detailDto.setPrincipal(repaymentPlanMap.get("principal")==null?BigDecimal.valueOf(0):BigDecimal.valueOf(Double.valueOf(repaymentPlanMap.get("principal").toString())));
-						detailDto.setInterest(repaymentPlanMap.get("interest")==null?BigDecimal.valueOf(0):BigDecimal.valueOf(Double.valueOf(repaymentPlanMap.get("interest").toString())));
-						detailDto.setPlatformManageFee(repaymentPlanMap.get("platformManageFee")==null?BigDecimal.valueOf(0):BigDecimal.valueOf(Double.valueOf(repaymentPlanMap.get("platformManageFee").toString())));
-						detailDto.setCommissionGuaranteFee(repaymentPlanMap.get("commissionGuaranteFee")==null?BigDecimal.valueOf(0):BigDecimal.valueOf(Double.valueOf(repaymentPlanMap.get("commissionGuaranteFee").toString())));
-						detailDto.setRefundDate(repaymentPlanMap.get("refundDate")==null?Long.valueOf(0):Long.valueOf(repaymentPlanMap.get("refundDate").toString()));
-						detailDto.setRepaidPrincipal(repaymentPlanMap.get("repaidPrincipal")==null?BigDecimal.valueOf(0):BigDecimal.valueOf(Double.valueOf(repaymentPlanMap.get("repaidPrincipal").toString())));
-						detailDto.setRepaidInterest(repaymentPlanMap.get("repaidInterest")==null?BigDecimal.valueOf(0):BigDecimal.valueOf(Double.valueOf(repaymentPlanMap.get("repaidInterest").toString())));
-						detailDto.setRepaidPlatformManageFee(repaymentPlanMap.get("repaidPlatformManageFee")==null?BigDecimal.valueOf(0):BigDecimal.valueOf(Double.valueOf(repaymentPlanMap.get("repaidPlatformManageFee").toString())));
-						detailDto.setRepaidCommissionGuaranteFee(repaymentPlanMap.get("repaidCommissionGuaranteFee")==null?BigDecimal.valueOf(0):BigDecimal.valueOf(Double.valueOf(repaymentPlanMap.get("repaidCommissionGuaranteFee").toString())));
-						detailDto.setTotalPenalty(repaymentPlanMap.get("totalPenalty")==null?BigDecimal.valueOf(0):BigDecimal.valueOf(Double.valueOf(repaymentPlanMap.get("totalPenalty").toString())));
-						detailDto.setRepaidPenalty(repaymentPlanMap.get("repaidPenalty")==null?BigDecimal.valueOf(0):BigDecimal.valueOf(Double.valueOf(repaymentPlanMap.get("repaidPenalty").toString())));
-						repaymentPlans.add(detailDto);		
-					}
-			
-					dto.setRepaymentPlan(repaymentPlans);
-				}
-			
+				dto=getNiWoRepayPlanByMap(map,dto);
 		}
 			return dto;
 	}
@@ -401,7 +415,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 		//定时查询你我金融的还款计划，未结清、未完全付款的还款计划需要每天查询
 		List<RepaymentProjPlan> projPlans=repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("creat_sys_type", 3).eq("plan_status", 0));
 		for(RepaymentProjPlan repaymentProjPlan:projPlans) {
-			sycNiWoRepayPlan(repaymentProjPlan.getProjectId());
+			sycNiWoRepayPlan(repaymentProjPlan.getRequestNo(),null);
 			//超过3天没有同步到你我金融标的还款计划
 			if(isOver3Days(repaymentProjPlan)) {
 				RecordExceptionLog(null, null,repaymentProjPlan.getProjectId());

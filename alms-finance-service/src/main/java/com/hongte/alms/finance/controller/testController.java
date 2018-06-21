@@ -74,7 +74,7 @@ public class testController {
     @GetMapping("getNiWoRepayPlan")
     public void getNiWoRepayPlan(@RequestParam("projId") String projId)
     {
-    	searchNiWoRepayPlanService.sycNiWoRepayPlan(projId);
+    	searchNiWoRepayPlanService.sycNiWoRepayPlan(projId,null);
 
     }
 

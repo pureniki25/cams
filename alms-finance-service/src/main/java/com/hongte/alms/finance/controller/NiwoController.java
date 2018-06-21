@@ -50,12 +50,20 @@ public class NiwoController {
 	
 
 	@PostMapping(value = "/sycRepayPlan")
-	@ApiOperation(value = "同步你我金融还款计划")
-	public void sycRepayPlan(String projId) {
-		logger.info("@sycRepayPlan@同步你我金融还款计划--开始[{},{}]");
-		niWoRepayPlanService.sycNiWoRepayPlan(projId);
-		logger.info("@sycRepayPlan@同步你我金融还款计划--结束[{}]");
+	@ApiOperation(value = "回调你我金融还款计划")
+	public void sycRepayPlan(HashMap<String,Object> niwoMap) {
+		logger.info("@sycRepayPlan@回调你我金融还款计划--开始[{},{}]");
+		niWoRepayPlanService.sycNiWoRepayPlan(null,niwoMap);
+		logger.info("@sycRepayPlan@回调你我金融还款计划--结束[{}]");
 	}
 
+	
+	@GetMapping(value = "/sycRepayPlanBySearch")
+	@ApiOperation(value = "同步你我金融还款计划")
+	public void sycRepayPlanBySearch() {
+		logger.info("@sycRepayPlanBySearch@同步你我金融还款计划--开始[{},{}]");
+		niWoRepayPlanService.SearchNiWoRepayPlan();
+		logger.info("@sycRepayPlanBySearch@同步你我金融还款计划--结束[{}]");
+	}
 	
 }
