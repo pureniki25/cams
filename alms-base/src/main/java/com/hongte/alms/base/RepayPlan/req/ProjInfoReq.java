@@ -1,5 +1,6 @@
 package com.hongte.alms.base.RepayPlan.req;
 
+import com.baomidou.mybatisplus.annotations.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -542,6 +543,13 @@ public class ProjInfoReq {
     @ApiModelProperty(required= true,value = "平台标志位：1，团贷网； 2，你我金融")
     @NotNull(message="ProjInfoReq 平台标志位(plateType)不能为空")
     private Integer plateType;
+    
+    /**
+     * 资产端上标编号
+     */
+    @ApiModelProperty(required= true,value = "资产端上标编号")
+	private String requestNo;
+	
 //    /**
 //     * 创建日期
 //     */
@@ -563,7 +571,15 @@ public class ProjInfoReq {
 //    @ApiModelProperty(required= true,value = "更新人")
 //    private String updateUser;
 
-    public List<ProjectCarInfoReq> getProjCarInfos() {
+    public String getRequestNo() {
+		return requestNo;
+	}
+
+	public void setRequestNo(String requestNo) {
+		this.requestNo = requestNo;
+	}
+
+	public List<ProjectCarInfoReq> getProjCarInfos() {
         return projCarInfos;
     }
 

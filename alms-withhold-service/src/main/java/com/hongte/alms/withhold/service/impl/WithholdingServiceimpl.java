@@ -104,6 +104,11 @@ public class WithholdingServiceimpl implements WithholdingService {
 		BasicBusiness basic = basicBusinessService
 				.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", pList.getOrigBusinessId()));
 		List<BankCardInfo> bankCardInfos = rechargeService.getCustomerInfo(basic.getCustomerIdentifyCard());
+		if(bankCardInfos==null) {
+			logger.debug(
+					"业务编号为" + pList.getOrigBusinessId() + "期数为" + pList.getAfterId() + "代扣失败，没有找到银行代扣和第三方代扣相关绑定信息");
+			return;
+		}
 		BankCardInfo bankCardInfo = rechargeService.getBankCardInfo(bankCardInfos);
 		BankCardInfo ThirtyCardInfo = rechargeService.getThirtyPlatformInfo(bankCardInfos);
 
@@ -183,6 +188,9 @@ public class WithholdingServiceimpl implements WithholdingService {
 					Integer repayCount = repayMoney.divide(eachMax, RoundingMode.CEILING).intValue();
 					// 余数
 					BigDecimal remainder = repayMoney.divideAndRemainder(eachMax)[1];
+					if(remainder.compareTo(BigDecimal.valueOf(0)) > 0) {
+						repayCount=repayCount+1;
+					}
 					int last = repayCount - 1;
 					Integer boolPartRepay = 1;// 表示本期是否分多笔代扣,0:一次性代扣，1:分多笔代扣
 					Integer boolLastRepay = 0;// 表示本期是否分多笔代扣中的最后一笔代扣，若非多笔代扣，本字段存1。 0:非最后一笔代扣，1:最后一笔代扣
@@ -284,7 +292,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		}
 		outerloop: for (WithholdingChannel channel : newChanels) {
 			SysBankLimit sysBankLimit = sysBankLimitService.selectOne(
-					new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("status", 1));
+					new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("status", 1).eq("bank_code", channel.getBankCode()));
 			if (sysBankLimit == null) {
 				logger.debug("第三方代扣限额信息platformId:" + channel.getPlatformId() + "无效/不存在");
 				continue;
@@ -334,6 +342,9 @@ public class WithholdingServiceimpl implements WithholdingService {
 						Integer repayCount = repayMoney.divide(eachMax, RoundingMode.CEILING).intValue();
 						// 余数
 						BigDecimal remainder = repayMoney.divideAndRemainder(eachMax)[1];
+						if(remainder.compareTo(BigDecimal.valueOf(0)) > 0) {
+							repayCount=repayCount+1;
+						}
 						int last = repayCount - 1;
 						Integer boolPartRepay = 1;// 表示本期是否分多笔代扣,0:一次性代扣，1:分多笔代扣
 						Integer boolLastRepay = 0;// 表示本期是否分多笔代扣中的最后一笔代扣，若非多笔代扣，本字段存1。 0:非最后一笔代扣，1:最后一笔代扣
@@ -451,6 +462,9 @@ public class WithholdingServiceimpl implements WithholdingService {
 					Integer repayCount = repayMoney.divide(eachMax, RoundingMode.CEILING).intValue();
 					// 余数
 					BigDecimal remainder = repayMoney.divideAndRemainder(eachMax)[1];
+					if(remainder.compareTo(BigDecimal.valueOf(0)) > 0) {
+						repayCount=repayCount+1;
+					}
 					int last = repayCount - 1;
 					Integer boolPartRepay = 1;// 表示本期是否分多笔代扣,0:一次性代扣，1:分多笔代扣
 					Integer boolLastRepay = 0;// 表示本期是否分多笔代扣中的最后一笔代扣，若非多笔代扣，本字段存1。 0:非最后一笔代扣，1:最后一笔代扣
@@ -511,7 +525,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 				}
 				outerloop: for (WithholdingChannel channel : newChanels) {
 					SysBankLimit sysBankLimit = sysBankLimitService.selectOne(
-							new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("status", 1));
+							new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("status", 1).eq("bank_code", channel.getBankCode()));
 					if (sysBankLimit == null) {
 						logger.info("第三方代扣限额信息platformId:" + channel.getPlatformId() + "无效/不存在");
 						result.setCode("-1");
@@ -564,6 +578,9 @@ public class WithholdingServiceimpl implements WithholdingService {
 								Integer repayCount = repayMoney.divide(eachMax, RoundingMode.CEILING).intValue();
 								// 余数
 								BigDecimal remainder = repayMoney.divideAndRemainder(eachMax)[1];
+								if(remainder.compareTo(BigDecimal.valueOf(0)) > 0) {
+									repayCount=repayCount+1;
+								}
 								int last = repayCount - 1;
 								Integer boolPartRepay = 1;// 表示本期是否分多笔代扣,0:一次性代扣，1:分多笔代扣
 								Integer boolLastRepay = 0;// 表示本期是否分多笔代扣中的最后一笔代扣，若非多笔代扣，本字段存1。 0:非最后一笔代扣，1:最后一笔代扣
@@ -607,7 +624,6 @@ public class WithholdingServiceimpl implements WithholdingService {
 				return result;
 		
 	}
-
 
 
 }

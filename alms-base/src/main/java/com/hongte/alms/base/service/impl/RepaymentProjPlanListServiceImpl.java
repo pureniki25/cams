@@ -105,17 +105,10 @@ public class RepaymentProjPlanListServiceImpl extends
 			
 			
 			for(RepaymentBizPlan plan:plans) {
-				List<RepaymentBizPlanList> pLists=repaymentBizPlanListService.selectList((new EntityWrapper<RepaymentBizPlanList>()
-							.eq("src_type", 2).ne("current_status", RepayCurrentStatusEnums.已还款.name())
-							.ne("current_sub_status", RepayRegisterFinanceStatus.还款待确认.name()).or().isNull("current_sub_status")).eq("plan_id",
-									plan.getPlanId()));
-				
+				List<RepaymentBizPlanList> pLists=repaymentBizPlanListService.getPlanListForCalLateFee(plan.getPlanId());
 				    for(RepaymentBizPlanList pList:pLists) {
 				    	// 每个业务的还款计划列表对应所有标的还款计划列表
-						List<RepaymentProjPlanList> projList = selectList((new EntityWrapper<RepaymentProjPlanList>()
-								.eq("creat_sys_type", 2).ne("current_status", RepayCurrentStatusEnums.已还款.name())
-								.ne("current_sub_status", RepayRegisterFinanceStatus.还款待确认.name()).or().isNull("current_sub_status")).eq("plan_list_id",
-										pList.getPlanListId()));
+						List<RepaymentProjPlanList> projList = getProListForCalLateFee(pList.getPlanListId());
 						BigDecimal underLateFeeSum=BigDecimal.valueOf(0);//每个业务每期还款计划的线下收费
 						BigDecimal onlineLateFeeSum=BigDecimal.valueOf(0);//每个业务每期还款计划的线上收费
 						
@@ -133,8 +126,8 @@ public class RepaymentProjPlanListServiceImpl extends
 								if(getOnLineFactAmountSum(projPList.getProjPlanListId())>=getOnLinePlanAmountSum(projPList.getProjPlanListId())) {
 									continue;
 								}
-								// 没有逾期
-								if (isOverDue(new Date(), projPList.getDueDate()) >=0) {
+								// 没有逾期,且不是你我金融生成
+								if (isOverDue(new Date(), projPList.getDueDate()) >=0&&projPList.getCreatSysType()!=3) {
 									continue;
 									// 逾期的当前期
 								} else {
@@ -566,6 +559,12 @@ public class RepaymentProjPlanListServiceImpl extends
 				System.out.println(e);
 			}
 			System.out.println("123");
+		}
+
+		@Override
+		public List<RepaymentProjPlanList> getProListForCalLateFee(String projListId) {
+			
+			return repaymentProjPlanListMapper.getProListForCalLateFee(projListId);
 		} 
 		 
 

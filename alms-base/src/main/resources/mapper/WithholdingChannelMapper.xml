@@ -5,7 +5,7 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.WithholdingChannel">
         <id column="channel_id" property="channelId" />
-        <result column="level" property="level" />
+        <result column="channel_level" property="channel_level" />
         <result column="platform_id" property="platformId" />
         <result column="channel_status" property="channelStatus" />
         <result column="fail_times" property="failTimes" />
@@ -17,7 +17,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        channel_id AS channelId, level, platform_id AS platformId, channel_status AS channelStatus, fail_times AS failTimes, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
+        channel_id AS channelId, channel_level, platform_id AS platformId, channel_status AS channelStatus, fail_times AS failTimes, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
     </sql>
 
 </mapper>

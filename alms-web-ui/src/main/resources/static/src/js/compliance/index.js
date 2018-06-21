@@ -180,6 +180,9 @@ window.layinit(function(htConfig) {
 			 * 查询合规化还款主页面列表
 			 */
 			queryComplianceRepaymentData: function(){
+				
+				this.tdrepayRechargeInfoReqList = [];
+				
 				/*
 				 * 合规化还款主页面列表
 				 */
@@ -199,12 +202,12 @@ window.layinit(function(htConfig) {
 			    			align: 'center',
 							width:200
 			    		}, {
-			    			field: 'businessType',
+			    			field: 'businessTypeStr',
 			    			title: '业务类型',
 			    			align: 'center',
 							width:100
 			    		}, {
-			    			field: 'repaySource',
+			    			field: 'repaymentTypeStr',
 			    			title: '还款方式',
 			    			align: 'center',
 							width:100
@@ -219,7 +222,7 @@ window.layinit(function(htConfig) {
 			    			align: 'center',
 							width:100
 			    		}, {
-			    			field: 'factRepayDate',
+			    			field: 'factRepayDateStr',
 			    			title: '实还日期',
 			    			align: 'center',
 							width:100
@@ -229,7 +232,7 @@ window.layinit(function(htConfig) {
 			    			align: 'center',
 							width:100
 			    		},{
-			    			field: 'factRepayDate',
+			    			field: 'periodTypeStr',
 			    			title: '状态',
 			    			align: 'center',
 							width:100
@@ -249,12 +252,12 @@ window.layinit(function(htConfig) {
 			    			align: 'center',
 							width:100
 			    		}, {
-			    			field: 'platStatus',
+			    			field: 'platStatusStr',
 			    			title: '平台状态',
 			    			align: 'center',
 							width:100
 			    		}, {
-			    			field: 'processStatus',
+			    			field: 'processStatusStr',
 			    			title: '分发状态',
 			    			align: 'center',
 							width:100

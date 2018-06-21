@@ -423,8 +423,8 @@ window.layinit(function(htConfig){
                                     {
                                     	
                                         "name": "减免申请", click: function (e, currentItem) {debugger
-                                            if (currentItem.statusName == '已还款'){
-                                            	 vm.$Modal.error({content: '已还款不能发起减免申请！'});
+                                            if (currentItem.statusName == '已还款'||currentItem.statusName == '已结清'){
+                                            	 vm.$Modal.error({content: '已还款或已结清的不能发起减免申请！'});
                                             }else{
 	                                                if (currentItem.afterColStatusName=='已移交法务'){
 	                                              	   vm.$Modal.error({content: '已移交法务的不能发起减免申请！'});

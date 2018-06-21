@@ -116,7 +116,7 @@ public class RechargeController {
 		String cmOrderNo = UUID.randomUUID().toString();
 
 		RechargeModalDTO dto = new RechargeModalDTO();
-		dto.setAmount(vo.getRechargeAmount());
+		dto.setAmount(BigDecimal.valueOf(vo.getRechargeAmount()).setScale(2, BigDecimal.ROUND_HALF_UP));
 		// 若转账类型为1 对公，则在银行编码后 + "2B"
 		dto.setBankCode("1".equals(vo.getTransferType()) ? vo.getBankCode() + "2B" : vo.getBankCode());
 		dto.setClientIp(clientIp);
@@ -189,7 +189,7 @@ public class RechargeController {
 		agencyRechargeLog.setClientIp(clientIp);
 		agencyRechargeLog.setoIdPartner(dto.getoIdPartner());
 		agencyRechargeLog.setRechargeAccountBalance(
-				BigDecimal.valueOf(vo.getRechargeAccountBalance() == null ? 0 : vo.getRechargeAccountBalance()));
+				BigDecimal.valueOf(vo.getRechargeAccountBalance() == null ? 0 : vo.getRechargeAccountBalance()).setScale(2, BigDecimal.ROUND_HALF_UP));
 		agencyRechargeLog.setRechargeAccountType(vo.getRechargeAccountType());
 		agencyRechargeLog
 				.setRechargeAmount(BigDecimal.valueOf(vo.getRechargeAmount() == null ? 0 : vo.getRechargeAmount()));

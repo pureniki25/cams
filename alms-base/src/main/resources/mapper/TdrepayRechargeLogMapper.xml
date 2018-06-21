@@ -60,8 +60,14 @@
 		<if test="repaySource != null">
 			AND t.`repay_source` =  #{repaySource,jdbcType=INTEGER}
 		</if>
-		<if test="settleType != null">
+		<if test="settleType != null and settleType == 0">
 		    AND t.`settle_type` =  #{settleType,jdbcType=INTEGER}
+		</if>
+		<if test="settleType != null and settleType == 1">
+		    AND t.`settle_type` in  (10, 11, 30)
+		</if>
+		<if test="settleType != null and settleType == 2">
+		    AND t.`settle_type` =  20
 		</if>
 		<if test="origBusinessId != null and origBusinessId != ''">
 			AND t.`orig_business_id` =  #{origBusinessId,jdbcType=DATE}

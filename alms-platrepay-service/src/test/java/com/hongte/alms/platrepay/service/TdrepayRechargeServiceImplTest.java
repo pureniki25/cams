@@ -73,5 +73,10 @@ public class TdrepayRechargeServiceImplTest {
 		tdrepayRechargeService.saveTdrepayRechargeInfo(infoVO);
 		
 	}
+	
+	@Test
+	public void testRePayComplianceWithRequirements() {
+		tdrepayRechargeService.rePayComplianceWithRequirements();
+	}
 
 }
