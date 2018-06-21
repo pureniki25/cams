@@ -1399,12 +1399,12 @@ public class FinanceServiceImpl implements FinanceService {
 
 					// 小计：本金+利息+月收分公司服务费+月收平台费
 					repaymentPlanInfoDTO.setSubtotal(
-							BigDecimal.valueOf(accrual + principal + serviceCharge + platformCharge + surplus)
+							BigDecimal.valueOf(accrual + principal + serviceCharge + platformCharge)
 									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
 
-					// 还款合计（含滞纳金）：小计+线上滞纳金+线下滞纳金+结余 -- 结余暂时没有加，到下一步的时候加上
+					// 还款合计（含滞纳金）：小计+线上滞纳金+线下滞纳金+结余 
 					repaymentPlanInfoDTO.setTotal(
-							BigDecimal.valueOf(onlineLateFee + offlineLateFee + repaymentPlanInfoDTO.getSubtotal())
+							BigDecimal.valueOf(onlineLateFee + offlineLateFee + repaymentPlanInfoDTO.getSubtotal() + surplus)
 									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
 
 					String afterId = repaymentPlanInfoDTO.getAfterId();
@@ -1458,7 +1458,8 @@ public class FinanceServiceImpl implements FinanceService {
 								surplus += infoDTO.getSurplus();
 								// infoDTO.setSurplus((infoDTO.getAmount() - planInfoDTO.getAmount()) < 0 ? 0
 								// : (infoDTO.getAmount() - planInfoDTO.getAmount()));
-//								infoDTO.setTotal(infoDTO.getTotal() + infoDTO.getSurplus()); // 完成上一步没有加上的结余数据
+								// infoDTO.setTotal(infoDTO.getTotal() + infoDTO.getSurplus()); //
+								// 完成上一步没有加上的结余数据
 								if (factRepayDate == null) {
 									factRepayDate = infoDTO.getRepaymentDate();
 								}
@@ -1488,7 +1489,8 @@ public class FinanceServiceImpl implements FinanceService {
 									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
 							balanceRepayment.setSubtotal(BigDecimal.valueOf(planInfoDTO.getSubtotal() - subtotal)
 									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-							balanceRepayment.setTotal(BigDecimal.valueOf(planInfoDTO.getTotal() - total)
+							balanceRepayment.setTotal(BigDecimal
+									.valueOf((planInfoDTO.getTotal() - total) > 0 ? planInfoDTO.getTotal() - total : 0)
 									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
 							balanceRepayment
 									.setServiceCharge(BigDecimal.valueOf(planInfoDTO.getServiceCharge() - serviceCharge)
@@ -1720,8 +1722,9 @@ public class FinanceServiceImpl implements FinanceService {
 								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
 						dtoDifference.setSurplus(BigDecimal.valueOf(dtoPlan.getSurplus() - surplus)
 								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-						dtoDifference.setTotal(BigDecimal.valueOf(dtoPlan.getTotal() - total)
-								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+						dtoDifference.setTotal(
+								BigDecimal.valueOf((dtoPlan.getTotal() - total) > 0 ? dtoPlan.getTotal() - total : 0)
+										.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
 
 					}
 					repaymentProjInfoDTOs.add(dtoDifference);
