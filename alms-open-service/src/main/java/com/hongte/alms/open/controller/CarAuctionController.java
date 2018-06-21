@@ -100,58 +100,58 @@ public class CarAuctionController {
 			if(req==null)
 			{
 				logger.error("参数为空,req为null");
-				return Result.error("9999", "传入的参数无效");
+				return Result.error("400", "传入的参数无效");
 			}
 			if(StringUtils.isEmpty(req.getUserId()) )
 			{
 				logger.error("参数为空,userId"+req.getUserId());
-				return Result.error("9999", "传入的参数无效，用户Id必须填写");
+				return Result.error("400", "传入的参数无效，用户Id必须填写");
 			}
 			if(StringUtils.isEmpty(req.getUserName()) )
 			{
 				logger.error("参数为空,userName"+req.getUserName());
-				return Result.error("9999", "传入的参数无效，姓名必须填写");
+				return Result.error("400", "传入的参数无效，姓名必须填写");
 			}
 			if(StringUtils.isEmpty(req.getAuctionId()) )
 			{
 				logger.error("参数为空,auctionId"+req.getAuctionId());
-				return Result.error("9999", "传入的参数无效，拍卖Id必须填写");
+				return Result.error("400", "传入的参数无效，拍卖Id必须填写");
 			}
 			if(req.getAmount()==null )
 			{
 				logger.error("参数为空,amount"+req.getAmount());
-				return Result.error("9999", "传入的参数无效，报价必须填写");
+				return Result.error("400", "传入的参数无效，报价必须填写");
 			}
 			if(StringUtils.isEmpty(req.getTelephone()))
 			{
 				logger.error("参数为空,telephone"+req.getTelephone());
-				return Result.error("9999", "传入的参数无效,手机号码必须填写");
+				return Result.error("400", "传入的参数无效,手机号码必须填写");
 			}
 			if(!StringUtil.isTelephone(req.getTelephone()))
 			{
 				logger.error("手机号码格式不正确,telephone"+req.getTelephone());
-				return Result.error("9999", "传入的参数无效,手机号码格式不正确");
+				return Result.error("400", "传入的参数无效,手机号码格式不正确");
 			}
 			if(StringUtils.isEmpty(req.getIdCard()))
 			{
 				logger.error("参数为空,idCard"+req.getIdCard());
-				return Result.error("9999", "传入的参数无效,身份证必须填写");
+				return Result.error("400", "传入的参数无效,身份证必须填写");
 			}
             if(!StringUtil.isIdCard(req.getIdCard()))
 			{
 				logger.error("身份证格式不正确,idCard"+req.getIdCard());
-				return Result.error("9999", "传入的参数无效,身份证格式不正确");
+				return Result.error("400", "传入的参数无效,身份证格式不正确");
 			}
 			List<CarAuction> auctions=carAuctionService.selectList( new EntityWrapper<CarAuction>().eq("auction_id", req.getAuctionId()).eq("status", "04"));
 			if(auctions==null||auctions.size()!=1) {
 				logger.error("参数为空,auction_id="+req.getAuctionId());
-				return Result.error("9999", "无效的拍卖");
+				return Result.error("400", "无效的拍卖");
 			}
 			CarAuction carAuction=auctions.get(0);
 			if(req.getAmount().compareTo(carAuction.getStartingPrice())==-1)
 			{
 				logger.error("不能小于最低价,amount="+req.getAmount()+"startingPrice"+carAuction.getStartingPrice());
-				return Result.error("9999", "不能小于最低价");
+				return Result.error("400", "不能小于最低价");
 			}
 
 			//判断当前是否还在拍卖时间
@@ -162,20 +162,20 @@ public class CarAuctionController {
 			long currentTime=System.currentTimeMillis();
 			if(!(currentTime>=startTime&&currentTime<endTime)) {
 				logger.error("不在活动时间内,auctionStartTime="+carAuction.getAuctionStartTime()+",auctionEndTime"+carAuction.getAuctionEndTime());
-				return Result.error("9999", "不在活动时间内");
+				return Result.error("400", "不在活动时间内");
 			}
 			//查询竞价记录
 			List<CarAuctionPriceLog> bidLogs=carAuctionPriceLogService.selectList(new EntityWrapper<CarAuctionPriceLog>().eq("auction_id", req.getAuctionId()).eq("user_id", req.getUserId()));
 			if(bidLogs.size()>=3) {
 				logger.error("超过3次竞价,auction_id="+req.getAuctionId()+",reg_tel"+req.getTelephone());
-				return Result.error("9999", "已经超过报价次数，不能报价");
+				return Result.error("400", "已经超过报价次数，不能报价");
 			}
 			for(CarAuctionPriceLog bidLog :bidLogs)
 			{
 				if(bidLog.getPrice().compareTo(req.getAmount())==0)
 				{
 					logger.error("报价重复,auction_id="+req.getAuctionId()+",reg_tel"+req.getTelephone()+",price"+req.getAmount());
-					return Result.error("9999", "与之前报价重复，请修改价格后再报价");
+					return Result.error("400", "与之前报价重复，请修改价格后再报价");
 				}
 			}
 			carAuctionPriceLogService.bid(req);
@@ -192,17 +192,17 @@ public class CarAuctionController {
 		try {
 			if(req==null) {
 				logger.error("参数为空,req为null");
-				return  Result.error("9999", "参数为空,req为null");
+				return  Result.error("400", "参数为空,req为null");
 			}
 			if(StringUtils.isEmpty(req.getUserId()) )
 			{
 				logger.error("参数为空,userId"+req.getUserId());
-				return Result.error("9999", "传入的参数无效，用户Id必须填写");
+				return Result.error("400", "传入的参数无效，用户Id必须填写");
 			}
 			if(StringUtils.isEmpty(req.getAuctionId()) )
 			{
 				logger.error("参数为空,auctionId"+req.getAuctionId());
-				return Result.error("9999", "传入的参数无效，拍卖Id必须填写");
+				return Result.error("400", "传入的参数无效，拍卖Id必须填写");
 			}
          List<CarAuctionPriceLog> bids=carAuctionPriceLogService.selectList(new EntityWrapper<CarAuctionPriceLog>().eq("user_id",req.getUserId()).eq("auction_id",req.getAuctionId()));
          List<MyBidsVo> myBidsList=new ArrayList<MyBidsVo>();
@@ -232,11 +232,11 @@ public class CarAuctionController {
 		try {
 			if(req==null) {
 				logger.error("参数为空,req为null");
-				return PageResult.error(9999, "参数为空,req为null");
+				return PageResult.error(400, "参数为空,req为null");
 			}
 			if(StringUtils.isEmpty(req.getUserId()) ) {
 				logger.error("参数为空,userId" + req.getUserId());
-				return PageResult.error(9999, "传入的参数无效，用户Id必须填写");
+				return PageResult.error(400, "传入的参数无效，用户Id必须填写");
 			}
 			Page<MyBadeCarVo> pages=carService.selectMyBidCarsForApp(req);
 			return PageResult.success(pages.getRecords(),pages.getTotal());

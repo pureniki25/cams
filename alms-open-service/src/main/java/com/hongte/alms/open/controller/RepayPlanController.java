@@ -2,25 +2,42 @@ package com.hongte.alms.open.controller;
 
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.hongte.alms.base.RepayPlan.dto.CarBusinessAfterDetailDto;
 import com.hongte.alms.base.RepayPlan.dto.PlanReturnInfoDto;
+import com.hongte.alms.base.RepayPlan.dto.RepaymentBizPlanDto;
+import com.hongte.alms.base.RepayPlan.dto.RepaymentBizPlanListDto;
 import com.hongte.alms.base.RepayPlan.dto.app.BizDto;
 import com.hongte.alms.base.RepayPlan.dto.app.BizPlanDto;
 import com.hongte.alms.base.RepayPlan.req.CreatRepayPlanReq;
 import com.hongte.alms.base.RepayPlan.req.trial.TrailRepayPlanReq;
+import com.hongte.alms.base.entity.RepaymentBizPlan;
+import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.common.result.Result;
+import com.hongte.alms.open.feignClient.CreatRepayPlanRemoteApi;
+import com.hongte.alms.open.feignClient.financeService.RepayPlanRemoteApi;
+import com.hongte.alms.open.service.CollectionXindaiService;
+import com.hongte.alms.open.util.TripleDESDecrypt;
+import com.hongte.alms.open.util.XinDaiEncryptUtil;
+import com.hongte.alms.open.vo.RepayPlanReq;
+import com.hongte.alms.open.vo.RequestData;
+import com.hongte.alms.open.vo.ResponseData;
+import feign.Feign;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
-import com.hongte.alms.open.feignClient.CreatRepayPlanRemoteApi;
-import com.hongte.alms.open.util.TripleDESDecrypt;
-import com.hongte.alms.open.vo.RepayPlanReq;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * @author zengkun
@@ -30,11 +47,34 @@ import java.util.List;
 @RequestMapping("/RepayPlan")
 @Api(tags = "RepayPlanController", description = "还款计划相关控制器")
 public class RepayPlanController {
-
     Logger  logger = LoggerFactory.getLogger(RepayPlanController.class);
+
+    /**
+     * 信贷系统api地址
+     */
+    @Value(value = "${bmApi.apiUrl:http://127.0.0.1}")
+    private String apiUrl;
 
     @Autowired
     private CreatRepayPlanRemoteApi creatRepayPlanRemoteService;
+    @Autowired
+    private RepayPlanRemoteApi repayPlanRemoteApi;
+
+
+    static final ConcurrentMap<Integer, String> FEE_TYPE_MAP;
+
+    static {
+        //要对费类型进行转换：
+        //从 应还项目所属分类，10：本金，20：利息，30：资产端分公司服务费，40：担保公司费用，50：资金端平台服务费，60：滞纳金，70：违约金，80：中介费，90：押金类费用，100：冲应收
+        //转成 费用类型(  1:本金; 2:利息; 3:服务费; 4:其他费用; 5:违约金;6:冲应收)
+        FEE_TYPE_MAP = Maps.newConcurrentMap();
+        FEE_TYPE_MAP.put(1, "本金");
+        FEE_TYPE_MAP.put(2, "利息");
+        FEE_TYPE_MAP.put(3, "服务费");
+        FEE_TYPE_MAP.put(4, "其他费用");
+        FEE_TYPE_MAP.put(5, "违约金");
+        FEE_TYPE_MAP.put(6, "冲应收");
+    }
 
 
     @ApiOperation(value = "创建还款计划接口,不存储   全字段")
@@ -120,6 +160,208 @@ public class RepayPlanController {
      Result<BizPlanDto> getBizPlanBill(@RequestParam(value = "planId") String planId){
         return creatRepayPlanRemoteService.getBizPlanBill(planId);
     }
+
+
+    /**
+     * 将指定业务的还款计划的变动通过信贷接口推送给信贷系统
+     *
+     * @param repayPlanReq 请求参数对象
+     * @return 响应结果对象
+     * @author 张贵宏
+     * @date 2018/6/21 11:01
+     */
+    @ApiOperation("将指定业务的还款计划的变动通过信贷接口推送给信贷系统")
+    @PostMapping("/pushRepayPlanToLMS")
+    @ResponseBody
+    public Result pushRepayPlanToLMS(@RequestBody RepayPlanReq repayPlanReq) {
+        logger.info("[开始] 还款计划-将指定业务的还款计划的变动通过信贷接口推送给信贷系统：参数repayPlanReq=[{}]", JSON.toJSONString(repayPlanReq));
+        String businessId = repayPlanReq.getBusinessId();
+        String afterId = repayPlanReq.getAfterId();
+        if (repayPlanReq == null || StringUtils.isBlank(businessId)) {
+            return Result.error("业务ID参数缺失");
+        }
+        if (repayPlanReq == null || StringUtils.isBlank(afterId)) {
+            return Result.error("期数ID参数缺失");
+        }
+        try {
+            //1，调用alms-finance-service获取还款计划相关数据
+            Result<PlanReturnInfoDto> planReturnInfoDtoResult = repayPlanRemoteApi.queryRepayPlanByBusinessId(businessId);
+            if (planReturnInfoDtoResult == null || !"1".equals(planReturnInfoDtoResult.getCode()) || planReturnInfoDtoResult.getData() == null) {
+                logger.info("[处理] 还款计划-调用alms-finance-service获取还款计划相关数据失败：result=[{}]", JSON.toJSONString(planReturnInfoDtoResult));
+                return Result.error(planReturnInfoDtoResult.getMsg());
+            }
+
+            //2, 处理接口需要的数据
+            List<RepaymentBizPlanDto> repaymentBizPlanDtos = planReturnInfoDtoResult.getData().getRepaymentBizPlanDtos();
+            for (RepaymentBizPlanDto repaymentBizPlanDto : repaymentBizPlanDtos) {
+                RepaymentBizPlan bizPlan = repaymentBizPlanDto.getRepaymentBizPlan();
+                for (RepaymentBizPlanListDto bizPlanListDto : repaymentBizPlanDto.getBizPlanListDtos()) {
+                    RepaymentBizPlanList bizPlanList = bizPlanListDto.getRepaymentBizPlanList();
+                    if (!afterId.equals(bizPlanList.getAfterId())) {
+                        continue;
+                    }
+                    Map<String, Object> paramMap = Maps.newHashMap();
+                    paramMap.put("businessId", businessId);
+                    paramMap.put("afterId", afterId);
+                    paramMap.put("overdueDays", bizPlanList.getOverdueDays());
+                    paramMap.put("currentStatus", bizPlanList.getCurrentStatus());
+                    //源数据: 已还款类型标记，null或0：还款中，6：申请展期已还款，10：线下确认已还款，20：自动线下代扣已还款，21，人工线下代扣已还款，30：自动银行代扣已还款，31：人工银行代扣已还款，
+                    // 40：用户APP主动还款，50：线下财务确认全部结清，60：线下代扣全部结清，70：银行代扣全部结清
+                    // =>>>>>
+                    //接口需要：0:还款中1:财务确认已还款 2:自动匹配已还款 3:财务确认全部结清,4:财务代扣已还款,5:自动代扣已还款,6:标识展期已还款,7:当期部分已还款,8:用户APP主动还款,9:代扣全部结清
+                    Integer repayFlag = 0;
+                    switch (bizPlanList.getRepayFlag()) {
+                        case 0:
+                            repayFlag = 0;
+                            break;
+                        case 6:
+                            repayFlag = 6;
+                            break;
+                        case 10:
+                            repayFlag = 1;
+                            break;
+                        case 21:
+                        case 31:
+                            repayFlag = 4;
+                            break;
+                        case 30:
+                        case 20:
+                            repayFlag = 5;
+                            break;
+                        case 40:
+                            repayFlag = 8;
+                            break;
+                        case 50:
+                            repayFlag = 3;
+                            break;
+                        case 70:
+                        case 60:
+                            repayFlag = 9;
+                            break;
+                    }
+                    paramMap.put("repayedFlag", repayFlag);
+                    paramMap.put("currentSubStatus", bizPlanList.getCurrentSubStatus());
+                    paramMap.put("factRepayDate", bizPlanList.getFactRepayDate());
+
+                    List<CarBusinessAfterDetailDto> afterDetailDtos = Lists.newArrayList();
+                    BigDecimal planOtherExpenses = BigDecimal.ZERO;
+                    BigDecimal actualOtherExpernses = BigDecimal.ZERO;
+                    for (RepaymentBizPlanListDetail planListDetail : bizPlanListDto.getBizPlanListDetails()) {
+                        switch (planListDetail.getPlanItemType()) {
+                            //本金
+                            case 10:
+                                paramMap.put("factPrincipa", planListDetail.getFactAmount());
+                                break;
+                            //利息
+                            case 20:
+                                paramMap.put("factAccrual", planListDetail.getFactAmount());
+                                break;
+                            //滞纳鑫
+                            case 60:
+                                paramMap.put("currentBreach", planListDetail.getPlanAmount());
+                                paramMap.put("overdueMoney", planListDetail.getFactAmount());
+                                break;
+                            //分公司服务费：资产端分公司服务费
+                            case 30:
+                                paramMap.put("subCompanyServiceFee", planListDetail.getPlanAmount());
+                                paramMap.put("factSubCompanyServiceFee", planListDetail.getFactAmount());
+                                break;
+                            //其它费用
+                            default:
+                                planOtherExpenses = planOtherExpenses.add(planListDetail.getPlanAmount());
+                                actualOtherExpernses = actualOtherExpernses.add(planListDetail.getFactAmount());
+                        }
+
+                        CarBusinessAfterDetailDto afterDetail = new CarBusinessAfterDetailDto();
+                        afterDetail.setBusinessId(planListDetail.getBusinessId());
+                        afterDetail.setBusinessAfterId(bizPlanList.getAfterId());
+                        afterDetail.setFeeId(planListDetail.getFeeId());
+                        //要对费类型进行转换：
+                        //从 应还项目所属分类，10：本金，20：利息，30：资产端分公司服务费，40：担保公司费用，50：资金端平台服务费，60：滞纳金，70：违约金，80：中介费，90：押金类费用，100：冲应收
+                        //转成 费用类型(  1:本金; 2:利息; 3:服务费; 4:其他费用; 5:违约金;6:冲应收)
+                        Integer feeType = 4;
+                        switch (planListDetail.getPlanItemType()) {
+                            case 10:
+                                feeType = 1;
+                                break;
+                            case 20:
+                                feeType = 2;
+                                break;
+                            case 30:
+                                feeType = 3;
+                                break;
+                            case 40:
+                            case 50:
+                            case 60:
+                            case 80:
+                            case 90:
+                                feeType = 4;
+                                break;
+                            case 70:
+                                feeType = 5;
+                                break;
+                            case 100:
+                                feeType = 6;
+                                break;
+                        }
+                        afterDetail.setFeeName(planListDetail.getPlanItemName());
+
+                        afterDetail.setAfterFeeType(feeType);
+                        afterDetail.setFeeName(FEE_TYPE_MAP.get(feeType));
+                        afterDetail.setPlanFeeValue(planListDetail.getPlanAmount());
+                        afterDetail.setActualFeeValue(planListDetail.getFactAmount());
+                        afterDetail.setPlanRepaymentDate(planListDetail.getDueDate());
+                        afterDetail.setActualRepaymentDate(planListDetail.getFactRepayDate());
+                        afterDetail.setDerateAmount(planListDetail.getDerateAmount());
+                        afterDetail.setCreateTime(planListDetail.getCreateDate());
+                        afterDetail.setCreateUser(planListDetail.getCreateUser());
+                        afterDetail.setUpdateTime(planListDetail.getUpdateDate());
+                        afterDetail.setUpdateUser(planListDetail.getUpdateUser());
+                        afterDetailDtos.add(afterDetail);
+                    }
+                    //如果项目中无滞纳鑫则取期数中的滞纳鑫
+                    if (!paramMap.containsKey("currentBreach")) {
+                        paramMap.put("currentBreach", bizPlanList.getOverdueAmount());
+                    }
+                    paramMap.put("remark", bizPlanList.getRemark());
+                    paramMap.put("currentOtherMoney", planOtherExpenses);
+                    paramMap.put("otherMoney", actualOtherExpernses);
+                    paramMap.put("confirmFlag", bizPlanList.getConfirmFlag());
+                    paramMap.put("financeConfirmDate", bizPlanList.getFinanceComfirmDate());
+                    paramMap.put("financeConfirmUser", bizPlanList.getFinanceConfirmUser());
+                    paramMap.put("autoWithholdingConfirmedDate", bizPlanList.getAutoWithholdingConfirmedDate());
+                    paramMap.put("autoWithholdingConfirmedUser", bizPlanList.getAutoWithholdingConfirmedUser());
+                    paramMap.put("accountantConfirmStatus", bizPlanList.getAccountantConfirmStatus());
+                    paramMap.put("accountantConfirmUser", bizPlanList.getAccountantConfirmUser());
+                    paramMap.put("accountantConfirmDate", bizPlanList.getAccountantConfirmDate());
+                    paramMap.put("createTime", bizPlanList.getCreateTime());
+                    paramMap.put("updateTime", bizPlanList.getUpdateTime());
+                    paramMap.put("updateUser", bizPlanList.getUpdateUser());
+                    paramMap.put("carBizDetailDtos", afterDetailDtos);
+
+                    //3，将指定业务的还款计划的变动通过信贷接口推送给信贷系统
+                    RequestData requestData = new RequestData(JSON.toJSONString(paramMap), "Api4Alms_UpdateRepaymentPlan");
+                    String ciphertext = XinDaiEncryptUtil.encryptPostData(JSON.toJSONString(requestData));
+                    CollectionXindaiService collectionXindaiService = Feign.builder().target(CollectionXindaiService.class, apiUrl);
+                    String respStr = collectionXindaiService.updateRepaymentPlan(ciphertext);
+                    // 返回数据解密
+                    ResponseData respData = XinDaiEncryptUtil.getRespData(respStr);
+                    if (respData == null || !"1".equals(respData.getReturnCode()) || respData.getData() == null) {
+                        logger.info("[处理] 还款计划-将指定业务的还款计划的变动通过信贷接口推送给信贷系统失败：result=[{}]", JSON.toJSONString(respData));
+                        return Result.error(respData.getReturnMessage());
+                    }
+                }
+
+            }
+
+            logger.info("[结束] 还款计划-将指定业务的还款计划的变动通过信贷接口推送给信贷系统：参数repayPlanReq=[{}]", JSON.toJSONString(repayPlanReq));
+            return Result.success();
+        } catch (Exception e) {
+            logger.error("[异常] 还款计划-向LMS推送数据异常", e.getMessage());
+            return Result.error(e.getMessage());
+        }
+    }
+
 
 
 //    @RequestMapping(value = "/RepayPlan/getRepayList",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
