@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.hongte.alms.base.dto.compliance.TdProjectPaymentInfoResult;
 import com.hongte.alms.base.entity.BasicCompany;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
@@ -144,7 +145,7 @@ public class TdrepayRechargeController {
 			if (isPastPeriodAdvance(vo, queryProjectPaymentResult, advanceShareProfitResult)) {
 				return Result.error("-99", "该标的号存在往期还垫付未结清记录");
 			}
-			
+
 			tdrepayRechargeService.saveTdrepayRechargeInfo(vo);
 		} catch (ServiceRuntimeException e) {
 			LOG.error(e.getMessage(), e);
@@ -312,7 +313,8 @@ public class TdrepayRechargeController {
 	@ApiOperation(value = "查询合规化还款主页面列表")
 	@GetMapping("/queryComplianceRepaymentData")
 	@ResponseBody
-	public PageResult<List<TdrepayRechargeInfoVO>> queryComplianceRepaymentData(@ModelAttribute ComplianceRepaymentVO vo) {
+	public PageResult<List<TdrepayRechargeInfoVO>> queryComplianceRepaymentData(
+			@ModelAttribute ComplianceRepaymentVO vo) {
 		try {
 			if (vo != null && vo.getConfirmTimeEnd() != null) {
 				vo.setConfirmTimeEnd(DateUtil.addDay2Date(1, vo.getConfirmTimeEnd()));
@@ -323,7 +325,7 @@ public class TdrepayRechargeController {
 			}
 
 			List<TdrepayRechargeLog> list = tdrepayRechargeService.queryComplianceRepaymentData(vo);
-			
+
 			List<TdrepayRechargeInfoVO> resultList = new ArrayList<>();
 			if (CollectionUtils.isNotEmpty(list)) {
 				for (TdrepayRechargeLog tdrepayRechargeLog : list) {
@@ -331,7 +333,7 @@ public class TdrepayRechargeController {
 					if (infoVO != null) {
 						if (infoVO.getBusinessType().intValue() == 25) {
 							infoVO.setBusinessTypeStr("商贸贷");
-						}else {
+						} else {
 							infoVO.setBusinessTypeStr(BusinessTypeEnum.getName(infoVO.getBusinessType()));
 						}
 						infoVO.setRepaymentTypeStr(RepaySourceEnum.getName(infoVO.getRepaySource()));
@@ -356,7 +358,8 @@ public class TdrepayRechargeController {
 							break;
 						}
 						if (StringUtil.notEmpty(infoVO.getPlatStatus())) {
-							infoVO.setPlatformTypeStr(PlatformStatusTypeEnum.getName(Integer.valueOf(infoVO.getPlatStatus())));
+							infoVO.setPlatformTypeStr(
+									PlatformStatusTypeEnum.getName(Integer.valueOf(infoVO.getPlatStatus())));
 						}
 						infoVO.setProcessStatusStr(ProcessStatusTypeEnum.getName(infoVO.getProcessStatus()));
 						infoVO.setFactRepayDateStr(DateUtil.formatDate(infoVO.getFactRepayDate()));
@@ -365,14 +368,14 @@ public class TdrepayRechargeController {
 				}
 				return PageResult.success(resultList, count);
 			}
-			
+
 			return PageResult.success(0);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return PageResult.error(-99, "系统异常，接口调用失败");
 		}
 	}
-	
+
 	@ApiOperation(value = "查询所有分公司")
 	@GetMapping("/queryAllBusinessCompany")
 	@ResponseBody
@@ -403,5 +406,32 @@ public class TdrepayRechargeController {
 			return Result.error("-99", e.getMessage());
 		}
 	}
-	
+
+	@SuppressWarnings("rawtypes")
+	@ApiOperation(value = "标的还款信息查询接口")
+	@PostMapping("/getProjectPayment")
+	@ResponseBody
+	public Result<TdProjectPaymentInfoResult> getProjectPayment(@RequestBody String projectId) {
+		if (StringUtil.isEmpty(projectId)) {
+			return Result.error("-99", "标ID不能为空");
+		}
+		
+		try {
+
+			com.ht.ussp.core.Result result = tdrepayRechargeService.remoteGetProjectPayment(projectId);
+
+			TdProjectPaymentInfoResult tdProjectPaymentInfoResult = null;
+			if (result != null && !Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
+				tdProjectPaymentInfoResult = JSONObject.parseObject(
+						JSONObject.toJSONString(result.getData()), TdProjectPaymentInfoResult.class);
+				
+			}
+
+			return Result.success(tdProjectPaymentInfoResult);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error("-99", e.getMessage());
+		}
+	}
+
 }
