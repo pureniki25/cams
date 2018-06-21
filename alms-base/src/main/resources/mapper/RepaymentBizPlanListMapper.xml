@@ -361,7 +361,7 @@
     </select>
     
     <select id="queryRepaymentPlanInfoByBusinessId" resultType="com.hongte.alms.base.dto.RepaymentPlanInfoDTO">
-		SELECT 
+    SELECT 
 		  rbpl.plan_list_id,
 		  '计划还款' repayment,
 		  rbpl.`after_id` afterId,
@@ -455,39 +455,13 @@
 		  WHERE t1.plan_list_id = t2.plan_list_id 
 		    AND t1.plan_list_id = rbpl.plan_list_id) amount,
 		  0 otherFee,
-		  CASE
-		    rbpl.`repay_flag` 
-			    WHEN 6 
-			    THEN '申请展期已还款' 
-			    WHEN 10 
-			    THEN '线下确认已还款' 
-			    WHEN 20 
-			    THEN '自动线下代扣已还款' 
-			    WHEN 21
-			    THEN '人工线下代扣已还款' 
-			    WHEN 30
-			    THEN '自动银行代扣已还款' 
-			    WHEN 31 
-			    THEN '人工银行代扣已还款' 
-			    WHEN 40 
-			    THEN '用户APP主动还款' 
-			    WHEN 50 
-			    THEN '线下财务确认全部结清' 
-			    WHEN 60
-			    THEN '线下代扣全部结清' 
-			    WHEN 70 
-			    THEN '银行代扣全部结清' 
-			    WHEN '' 
-			    THEN '还款中' 
-			    WHEN NULL
-			    THEN '还款中'
-			    ELSE '逾期' 
-		  END confirmFlag 
+		  0 surplus,
+		  current_status confirmFlag  
 		FROM
 		  `tb_repayment_biz_plan_list` rbpl,
 		  `tb_repayment_biz_plan_list_detail` rbpld 
 		WHERE rbpl.plan_list_id = rbpld.plan_list_id 
-		  AND rbpl.orig_business_id = #{businessId,jdbcType=VARCHAR}
+		  AND rbpl.orig_business_id = #{businessId,jdbcType=VARCHAR} 
 		GROUP BY rbpl.`plan_list_id` 
 		UNION
 		ALL 
@@ -593,34 +567,13 @@
 		    AND t1.plan_list_id = rbpl.plan_list_id 
 		    AND t2.account_status = 0 
 		    AND t2.plan_item_type NOT IN (10, 20, 30, 50, 60)) otherFee,
-		  CASE
-		    rbpl.`repay_flag` 
-		    WHEN 6 
-		    THEN '申请展期已还款' 
-		    WHEN 10 
-		    THEN '线下确认已还款' 
-		    WHEN 20 
-		    THEN '自动线下代扣已还款' 
-		    WHEN 21
-		    THEN '人工线下代扣已还款' 
-		    WHEN 30
-		    THEN '自动银行代扣已还款' 
-		    WHEN 31 
-		    THEN '人工银行代扣已还款' 
-		    WHEN 40 
-		    THEN '用户APP主动还款' 
-		    WHEN 50 
-		    THEN '线下财务确认全部结清' 
-		    WHEN 60
-		    THEN '线下代扣全部结清' 
-		    WHEN 70 
-		    THEN '银行代扣全部结清' 
-		    WHEN '' 
-		    THEN '还款中' 
-		    WHEN NULL
-		    THEN '还款中'
-		    ELSE '逾期' 
-		  END confirmFlag 
+		  (SELECT 
+		    t1.over_repay_money 
+		  FROM
+		    tb_accountant_over_repay_log t1 
+		  WHERE t1.business_id = #{businessId,jdbcType=VARCHAR} 
+		    AND t1.business_after_id = rbpl.after_id) surplus,
+		  current_status confirmFlag 
 		FROM
 		  `tb_repayment_biz_plan_list` rbpl,
 		  `tb_repayment_biz_plan_list_detail` rbpld 

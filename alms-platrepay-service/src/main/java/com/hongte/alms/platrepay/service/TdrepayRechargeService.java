@@ -77,4 +77,12 @@ public interface TdrepayRechargeService {
 	@SuppressWarnings("rawtypes")
 	Map<String, Result> getAdvanceShareProfitAndProjectPayment(String projectId);
 	
+	/**
+	 * 标的还款信息查询接口 assetside/getProjectPayment
+	 * @param projectId
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	Result remoteGetProjectPayment(String projectId);
+	
 }
