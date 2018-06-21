@@ -716,7 +716,7 @@ public class RechargeServiceImpl implements RechargeService {
 	@Override
 	public BankCardInfo getThirtyPlatformInfo(List<BankCardInfo> list) {
 		for (BankCardInfo card : list) {
-			if (card.getPlatformType() == 0 && card.getWithholdingType() == 1) {// 等于第三方银行代扣并且是代扣主卡
+			if (card.getWithholdingType() == 1&&card.getThirdPlatformList().size()>0) {// 等于第三方银行代扣并且是代扣主卡
 				return card;
 			} else {
 				return null;
