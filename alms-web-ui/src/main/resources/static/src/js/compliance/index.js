@@ -162,6 +162,21 @@ window.layinit(function(htConfig) {
 		            }
 		        })
 			},
+			
+			/*
+			 * 当业务类型改变时触发
+			 */
+			onChangeBusinessType: function(value){
+				if (value == 9) {
+					this.rechargeAccountType = '车贷代充值';
+				}else if (value == 11) {
+					this.rechargeAccountType = '房贷代充值';
+				}else if (value == 20) {
+					this.rechargeAccountType = '一点车贷代充值';
+				}
+				this.queryUserAviMoney();
+			},
+			
 			/*
 			 * 拼接银行图片地址
 			 */
