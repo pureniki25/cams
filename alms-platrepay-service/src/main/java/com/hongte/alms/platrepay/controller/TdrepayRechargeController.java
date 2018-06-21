@@ -22,6 +22,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.BasicCompany;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
+import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.service.BasicCompanyService;
 import com.hongte.alms.base.service.IssueSendOutsideLogService;
@@ -36,8 +37,12 @@ import com.hongte.alms.platrepay.dto.TdGuaranteePaymentDTO;
 import com.hongte.alms.platrepay.dto.TdProjectPaymentDTO;
 import com.hongte.alms.platrepay.dto.TdReturnAdvanceShareProfitDTO;
 import com.hongte.alms.platrepay.dto.TdReturnAdvanceShareProfitResult;
+import com.hongte.alms.platrepay.enums.PlatformStatusTypeEnum;
+import com.hongte.alms.platrepay.enums.ProcessStatusTypeEnum;
+import com.hongte.alms.platrepay.enums.RepaySourceEnum;
 import com.hongte.alms.platrepay.service.TdrepayRechargeService;
 import com.hongte.alms.platrepay.vo.TdrepayRechargeInfoVO;
+import com.ht.ussp.util.BeanUtils;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -307,7 +312,7 @@ public class TdrepayRechargeController {
 	@ApiOperation(value = "查询合规化还款主页面列表")
 	@GetMapping("/queryComplianceRepaymentData")
 	@ResponseBody
-	public PageResult<List<TdrepayRechargeLog>> queryComplianceRepaymentData(@ModelAttribute ComplianceRepaymentVO vo) {
+	public PageResult<List<TdrepayRechargeInfoVO>> queryComplianceRepaymentData(@ModelAttribute ComplianceRepaymentVO vo) {
 		try {
 			if (vo != null && vo.getConfirmTimeEnd() != null) {
 				vo.setConfirmTimeEnd(DateUtil.addDay2Date(1, vo.getConfirmTimeEnd()));
@@ -318,16 +323,56 @@ public class TdrepayRechargeController {
 			}
 
 			List<TdrepayRechargeLog> list = tdrepayRechargeService.queryComplianceRepaymentData(vo);
+			
+			List<TdrepayRechargeInfoVO> resultList = new ArrayList<>();
 			if (CollectionUtils.isNotEmpty(list)) {
-				return PageResult.success(list, count);
+				for (TdrepayRechargeLog tdrepayRechargeLog : list) {
+					TdrepayRechargeInfoVO infoVO = BeanUtils.deepCopy(tdrepayRechargeLog, TdrepayRechargeInfoVO.class);
+					if (infoVO != null) {
+						if (infoVO.getBusinessType().intValue() == 25) {
+							infoVO.setBusinessTypeStr("商贸贷");
+						}else {
+							infoVO.setBusinessTypeStr(BusinessTypeEnum.getName(infoVO.getBusinessType()));
+						}
+						infoVO.setRepaymentTypeStr(RepaySourceEnum.getName(infoVO.getRepaySource()));
+						switch (infoVO.getSettleType()) {
+						case 0:
+							infoVO.setPeriodTypeStr("正常还款");
+							break;
+						case 10:
+							infoVO.setPeriodTypeStr("结清");
+							break;
+						case 11:
+							infoVO.setPeriodTypeStr("结清");
+							break;
+						case 30:
+							infoVO.setPeriodTypeStr("结清");
+							break;
+						case 25:
+							infoVO.setPeriodTypeStr("展期确认");
+							break;
+
+						default:
+							break;
+						}
+						if (StringUtil.notEmpty(infoVO.getPlatStatus())) {
+							infoVO.setPlatformTypeStr(PlatformStatusTypeEnum.getName(Integer.valueOf(infoVO.getPlatStatus())));
+						}
+						infoVO.setProcessStatusStr(ProcessStatusTypeEnum.getName(infoVO.getProcessStatus()));
+						infoVO.setFactRepayDateStr(DateUtil.formatDate(infoVO.getFactRepayDate()));
+					}
+					resultList.add(infoVO);
+				}
+				return PageResult.success(resultList, count);
 			}
+			
 			return PageResult.success(0);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return PageResult.error(-99, "系统异常，接口调用失败");
 		}
 	}
-
+	
 	@ApiOperation(value = "查询所有分公司")
 	@GetMapping("/queryAllBusinessCompany")
 	@ResponseBody
@@ -358,4 +403,5 @@ public class TdrepayRechargeController {
 			return Result.error("-99", e.getMessage());
 		}
 	}
+	
 }

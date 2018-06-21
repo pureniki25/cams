@@ -7,7 +7,7 @@
         <id column="id" property="id" />
         <result column="area_id" property="areaId" />
         <result column="company_id" property="companyId" />
-        <result column="business_type" property="businessType" />
+        <result column="business_type_id" property="businessTypeId" />
         <result column="user_ids" property="userIds" />
         <result column="user_names" property="userNames" />
         <result column="update_user" property="updateUser" />
@@ -18,7 +18,32 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, area_id AS areaId, company_id AS companyId, business_type AS businessType, user_ids AS userIds, user_names AS userNames, update_user AS updateUser, update_time AS updateTime, create_user AS createUser, create_time AS createTime
+        id, area_id AS areaId, company_id AS companyId, business_type_id AS businessTypeId, user_ids AS userIds, user_names AS userNames, update_user AS updateUser, update_time AS updateTime, create_user AS createUser, create_time AS createTime
     </sql>
+    
+    <select id="search" resultType="com.hongte.alms.base.vo.finance.SysFinancialOrderVO">
+        select fo.id as id, fo.area_id as areaId, c.area_name as areaName, fo.company_id as companyId, c2.area_name as companyName,
+                fo.business_type_id  as businessTypeId, bt.business_type_name as businessTypeName, fo.update_user as updateUser, fo.update_time as UpdateTime,
+                fo.create_user as createUser, fo.create_time as createTime, fo.user_ids as userIds, fo.user_names as userNames, fou.user_id as userId, fou.user_name as userName
+        from tb_sys_financial_order fo inner join  tb_basic_business_type bt on fo.business_type_id = bt.business_type_id
+                                      left join tb_sys_financial_order_user fou on  fo.id=fou.finance_order_id
+                                      left join tb_basic_company c on c.area_id = fo.area_id
+                                      left join tb_basic_company c2 on c2.area_id = fo.company_id
+        <where>
+                <if test="userName != null and ''!=userName">
+                    fou.user_name like concat('%',#{userName},'%')
+                </if>
+                <if test="areaId != null and ''!=areaId">
+                    and fo.area_id = #{areaId}
+                </if>
+                <if test="companyId != null and ''!=companyId">
+                    and fo.company_id = #{companyId}
+                </if>
+                <if test="businessTypeId != null and ''!=businessTypeId">
+                    and fo.business_type_id = #{businessTypeId}
+                </if>
+        </where>
+        
+    </select>
 
 </mapper>

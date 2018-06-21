@@ -3,21 +3,12 @@
  */
 package com.hongte.alms.webui.controller.finance;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.io.FileUtils;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.hongte.alms.common.util.ExportFileUtil;
@@ -30,9 +21,9 @@ import com.hongte.alms.common.util.ExportFileUtil;
 @RequestMapping("/finance")
 public class FinanceController {
 
-	@RequestMapping("/index")
-	public String index() {
-		return "/finance/index" ;
+	@RequestMapping("/financeOrder")
+	public String financeOrder() {
+		return "/finance/financeOrder" ;
 	}
 
 	@RequestMapping("/manualMatchBankSatements")
@@ -107,7 +98,7 @@ public class FinanceController {
 	 * @return
 	 */
 	@RequestMapping("/orderSet")
-	public String orderSet(){return "/finance/orderSet";	}
+	public String orderSet(){return "financeOrder";	}
 
 
 

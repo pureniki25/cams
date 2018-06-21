@@ -1498,8 +1498,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                             if(feeReq.getChargeType().equals(RepayPlanChargeTypeEnum.BY_MONTH.getKey())){
                                 //最后一期，期初收取的费用不收
                                 if(i==projInfoReq.getPeriodMonth()){
-                                    feeReq.getRepaymentFlag().equals(PepayPlanRepayFlageEnum.BEGIN.getValue());
-                                    continue;
+                                    if(feeReq.getRepaymentFlag().equals(PepayPlanRepayFlageEnum.BEGIN.getValue())){
+                                        continue;
+                                    }
                                 }
 
                                 RepaymentProjPlanListDetail   peroidFeelDetail = creatProjListDetail(projPlanList);

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+        <title>财务跟单设置</title>
+        <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css" />
+        <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css" />
+        <link rel="stylesheet" type="text/css" href="/plugins/layui/css/layui.css" media="all" />
+    </head>
+    <body>
+        <div id="app" v-cloak>
+            <Row  style="padding:10px">
+                <i-col span="24">
+                    <Card>
+                        <p slot="title"><Icon type="ios-search" />搜索条件</p>
+
+                        <div class="layui-btn-group" slot="extra">
+                            <button class="layui-btn layui-btn-sm"  v-if="authValid('search')" @click="tableReload">
+                                <span v-if="!loading"><i class="layui-icon">&#xe615;</i>查询</span>
+                                <span v-else><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i> 查询中...</span>
+                            </button>
+
+                            <button class="layui-btn layui-btn-sm" @click="showEditDialog" v-if="authValid('add')">新增</button>
+                        </div>
+
+                        <Row :gutter="16">
+                            <i-form ref="searchForm" :model="search" :rules="ruleValidate" label-position="right" :label-width="100">
+                                <i-col span="6">
+                                    <Form-item label="跟单人名:" prop="userName">
+                                        <i-input v-model="search.userName"></i-input>
+                                    </Form-item>
+                                </i-col>
+                                <i-col span="6">
+                                    <Form-item label="区  域:" prop="areaId">
+                                        <i-select v-model="search.areaId" clearable filterable>
+                                            <i-option v-for="item in areaList" :value="item.areaId" :key="item.areaId">{{item.areaName}}</i-option>
+                                        </i-select>
+                                    </Form-item>
+                                </i-col>
+                                <i-col span="6">
+                                    <Form-item label="分公司:" prop="companyId">
+                                        <i-select v-model="search.companyId" clearable filterable>
+                                            <i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{item.areaName}}</i-option>
+                                        </i-select>
+                                    </Form-item>
+                                </i-col>
+                                <i-col span="6">
+                                    <Form-item label="业务类型:" prop="businessType">
+                                        <i-select v-model="search.businessTypeId" clearable filterable>
+                                            <i-option v-for="item in businessTypeList" :value="item.businessTypeId" :key="item.businessTypeId">{{item.businessTypeName}}</i-option>
+                                        </i-select>
+                                    </Form-item>
+                                </i-col>
+                            </i-form>
+                        </Row>
+                    </Card>
+                </i-col>
+            </Row>
+
+            <Row style="padding:10px">
+                <i-col span="24">
+                    <table id="main_table" lay-filter="main_table"></table>
+                    <script type="text/html" id="bar_tools">
+                        <!--<a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="detail">查看</a>
+                        <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="edit">编辑</a>-->
+                        <a class="layui-btn layui-btn-xs layui-btn-danger " lay-event="del" v-if="authValid('del')">删除</a>
+                    </script>
+                </i-col>
+            </Row>
+
+            <Modal v-model="showDialog" title="编辑" @on-ok="submitEditDialog" @on-cancel="">
+                <!--<i-form ref="edit" :model="edit" :rules="ruleValidate" label-position="right" :label-width="100">-->
+                <i-form ref="edit" :model="edit" label-position="right" :label-width="100">
+                            <!--<input type="hidden" v-model="edit.id" name="id" />-->
+                            <Form-item label="跟单人名:" prop="userId">
+                                <!--<i-input v-model="edit.userName"></i-input>-->
+                                <i-select v-model="edit.userId" clearable filterable :label-in-value="true" @on-change="setUserName">
+                                    <i-option v-for="item in users" :value="item.userId" :key="item.userId">{{item.userName}}</i-option>
+                                </i-select>
+                            </Form-item>
+                            <Form-item label="区  域:" prop="areaId">
+                                <i-select v-model="edit.areaId" clearable filterable>
+                                    <i-option v-for="item in areaList" :value="item.areaId" :key="item.areaId">{{item.areaName}}</i-option>
+                                </i-select>
+                            </Form-item>
+                            <Form-item label="分公司:" prop="companyId">
+                                <i-select v-model="edit.companyId" clearable filterable>
+                                    <i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{item.areaName}}</i-option>
+                                </i-select>
+                            </Form-item>
+                            <Form-item label="业务类型:" prop="businessTypeId">
+                                <i-select v-model="edit.businessTypeId" clearable filterable>
+                                    <i-option v-for="item in businessTypeList" :value="item.businessTypeId" :key="item.businessTypeId">{{item.businessTypeName}}</i-option>
+                                </i-select>
+                            </Form-item>
+                </i-form>
+            </Modal>
+        </div>
+        <script src="/plugins/vue/vue.min.js"></script>
+        <script src="/plugins/iview/js/iview.js"></script>
+        <script src="/plugins/layui/layui.js"></script>
+        <script src="/plugins/axios/axios.min.js"></script>
+        <script src="/build/js/jquery-3.3.1.min.js"></script>
+        <script src="/properties/config.js"></script>
+        <script src="/build/js/appToken.js"></script>
+        <script src="/src/js/comm.js"></script>
+        <script src="/src/js/finance/financeOrder.js"></script>
+    </body>
+</html>

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
  * @author 曾坤
  * @since 2018-06-10
  */
-@Service
+@Service("SysFinancialOrderUserService")
 public class SysFinancialOrderUserServiceImpl extends BaseServiceImpl<SysFinancialOrderUserMapper, SysFinancialOrderUser> implements SysFinancialOrderUserService {
 
 }
