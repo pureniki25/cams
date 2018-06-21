@@ -1,6 +1,7 @@
 package com.hongte.alms.base.mapper;
 
 import com.hongte.alms.base.collection.vo.CollectionTrackLogVo;
+import com.hongte.alms.base.customer.vo.CustomerRepayFlowDto;
 import com.hongte.alms.base.customer.vo.CustomerRepayFlowExel;
 import com.hongte.alms.base.customer.vo.CustomerRepayFlowListReq;
 import com.hongte.alms.base.dto.ActualPaymentSingleLogDTO;
@@ -37,7 +38,7 @@ public interface MoneyPoolRepaymentMapper extends SuperMapper<MoneyPoolRepayment
 
     List<CustomerRepayFlowExel> getCustomerRepayFlowList(CustomerRepayFlowListReq customerRepayFlowListReq);
 
-    List<CollectionTrackLogVo> getCustomerRepayFlowPageList(CustomerRepayFlowListReq customerRepayFlowListReq);
+    List<CustomerRepayFlowDto> getCustomerRepayFlowPageList(CustomerRepayFlowListReq customerRepayFlowListReq);
 
     int countCustomerRepayFlowList(CustomerRepayFlowListReq customerRepayFlowListReq);
 

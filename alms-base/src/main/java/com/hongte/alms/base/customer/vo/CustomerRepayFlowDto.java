@@ -21,6 +21,8 @@ public class CustomerRepayFlowDto {
 
     private String state;//'状态'
 
+    private String certificatePictureUrl;//凭证
+
     private String id;
 
     public String getCreateTime() {
@@ -125,6 +127,14 @@ public class CustomerRepayFlowDto {
 
     public void setState(String state) {
         this.state = state;
+    }
+
+    public String getCertificatePictureUrl() {
+        return certificatePictureUrl;
+    }
+
+    public void setCertificatePictureUrl(String certificatePictureUrl) {
+        this.certificatePictureUrl = certificatePictureUrl;
     }
 
     public String getId() {

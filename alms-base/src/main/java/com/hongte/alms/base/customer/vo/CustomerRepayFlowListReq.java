@@ -5,6 +5,8 @@ import com.hongte.alms.common.vo.PageRequest;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.math.BigDecimal;
+
 @ApiModel(value="贷后客户还款登记流水查询对象",description="贷后客户还款登记流水查询对象")
 public class CustomerRepayFlowListReq extends PageRequest {
 
@@ -36,7 +38,7 @@ public class CustomerRepayFlowListReq extends PageRequest {
     private String bankAccount;
 
     @ApiModelProperty(required= false,value = "[转账金额]")
-    private String accountMoney;
+    private BigDecimal accountMoney;
 
     public String getRegStartTime() {
         return regStartTime;
@@ -110,11 +112,11 @@ public class CustomerRepayFlowListReq extends PageRequest {
         this.bankAccount = StringUtil.isEmpty(bankAccount) ? null : bankAccount;
     }
 
-    public String getAccountMoney() {
+    public BigDecimal getAccountMoney() {
         return accountMoney;
     }
 
-    public void setAccountMoney(String accountMoney) {
-        this.accountMoney = StringUtil.isEmpty(accountMoney) ? null : accountMoney;
+    public void setAccountMoney(BigDecimal accountMoney) {
+        this.accountMoney = accountMoney;
     }
 }

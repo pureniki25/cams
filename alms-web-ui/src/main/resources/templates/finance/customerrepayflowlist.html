@@ -101,7 +101,7 @@
 
                         <i-col span="4">
                             <form-item label="状态：" prop="state">
-                                <i-select     filterable style="width: 176px">
+                                <i-select v-model="searchForm.state"    filterable style="width: 176px">
                                     <i-option value="1">未审核</i-option>
                                     <i-option value="2">已审核</i-option>
                                     <i-option value="3">拒绝</i-option>
@@ -132,7 +132,7 @@
                         <i-col span="6">
                             <form-item label="转入账号：" prop="bankAccount">
                                 <i-select v-model="searchForm.bankAccount" clearable filterable>
-                                    <i-option v-for="item in bankList" :value="item.accountId" :key="item.accountId">{{
+                                    <i-option v-for="item in bankList" :value="item.financeName" :key="item.accountId">{{
                                         item.financeName }}
                                     </i-option>
                                 </I-SELECT>
@@ -160,8 +160,8 @@
         <i-col span="24">
             <!--:loading="saving"-->
             <div style="float: left;">
-                <i-button type="info"  @click="auditCustomerFlow"> 审核</i-button>
-                <i-button type="info"  @click="rejectCustomerFlow"> 拒绝</i-button>
+                <i-button type="info"  @click="auditCustomerFlow()"> 审核</i-button>
+                <i-button type="info"  @click="rejectCustomerFlow()"> 拒绝</i-button>
             </div>
 
             <Upload
