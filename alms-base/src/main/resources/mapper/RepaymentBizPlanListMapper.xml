@@ -660,7 +660,8 @@
 		    `tb_repayment_proj_plan_list_detail` t2 
 		  WHERE t1.proj_plan_list_id = t2.proj_plan_list_id 
 		    AND t1.proj_plan_list_id = rppl.proj_plan_list_id) amount,
-		  0 otherFee 
+		  0 otherFee,
+		  rppl.current_status confirmFlag
 		FROM
 		  `tb_repayment_proj_plan_list` rppl,
 		  `tb_repayment_proj_plan_list_detail` rppld,
@@ -751,7 +752,8 @@
 		    `tb_repayment_proj_plan_list_detail` t2 
 		  WHERE t1.proj_plan_list_id = t2.proj_plan_list_id 
 		    AND t1.proj_plan_list_id = rppl.proj_plan_list_id) amount,
-		  0 otherFee 
+		  0 otherFee,
+		  rppl.current_status confirmFlag
 		FROM
 		  `tb_repayment_proj_plan_list` rppl,
 		  `tb_repayment_proj_plan_list_detail` rppld,
