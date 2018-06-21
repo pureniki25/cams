@@ -15,7 +15,7 @@ public interface NiWoRepayPlanService {
 	 * @param afterId
 	 * @return
 	 */
-	public NiWoProjPlanDto sycNiWoRepayPlan(String projId);
+	public void sycNiWoRepayPlan(String projId);
 
 
 	/**

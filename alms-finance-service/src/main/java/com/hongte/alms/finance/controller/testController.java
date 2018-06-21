@@ -72,11 +72,10 @@ public class testController {
     
     @ApiOperation(value="获你我金融标的还款计划")
     @GetMapping("getNiWoRepayPlan")
-    public NiWoProjPlanDto getNiWoRepayPlan(@RequestParam("projId") String projId)
+    public void getNiWoRepayPlan(@RequestParam("projId") String projId)
     {
-    	NiWoProjPlanDto dto=searchNiWoRepayPlanService.sycNiWoRepayPlan(projId);
+    	searchNiWoRepayPlanService.sycNiWoRepayPlan(projId);
 
-        return dto;
     }
 
 }
