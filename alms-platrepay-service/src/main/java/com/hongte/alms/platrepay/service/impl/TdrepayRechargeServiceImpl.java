@@ -858,7 +858,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 		Result remoteGetProjectPaymentResult = null;
 		try {
-			remoteGetProjectPaymentResult = remoteGetProjectPayment(repayChargeLogs.get(0).getProjectId());
+			remoteGetProjectPaymentResult = this.remoteGetProjectPayment(repayChargeLogs.get(0).getProjectId());
 		} catch (Exception e) {
 			for (TdrepayRechargeLog tdrepayRechargeLog : repayChargeLogs) {
 				// 标记为处理失败，待下次定时任务重试
@@ -1374,7 +1374,8 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	 * @return
 	 */
 	@SuppressWarnings("rawtypes")
-	private Result remoteGetProjectPayment(String projectId) {
+	@Override
+	public Result remoteGetProjectPayment(String projectId) {
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orgType", 1); // 机构类型 传输任意值
 		paramMap.put("projectId", projectId);

@@ -99,6 +99,14 @@ window.layinit(function (htConfig) {
                     title: '逾期天数',
                     key: 'overdueDays',
                     align: 'center',
+                    render:(h,p)=>{
+                    	if(p.row.repayment=='差额'){
+                    		return ''
+                    	}else{
+                    		return p.row.overdueDays
+                    	}
+                    	
+                    }
                 },
                 {
                 	title: '线上滞纳金',

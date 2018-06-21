@@ -299,8 +299,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 			} else {
 
 				// 本期剩余应还金额
-				BigDecimal repayMoney = pList.getTotalBorrowAmount().add(pList.getOverdueAmount())
-						.subtract(rechargeService.getRestAmount(pList));
+				BigDecimal repayMoney = rechargeService.getRestAmount(pList);
 
 				if (underAmount != null && underAmount.compareTo(BigDecimal.valueOf(0)) > 0) {
 					repayMoney = underAmount;

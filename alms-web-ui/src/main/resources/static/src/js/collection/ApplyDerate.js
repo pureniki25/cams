@@ -695,8 +695,7 @@ var restProcessApprovalInfo = function(){
 var getTotalShouldPay = function () {debugger
 	vm.baseInfoForm.totalBorrowAmount=0;
 	if(vm.applyInfoForm.isSettleFlage=='否'){
-		vm.baseInfoForm.totalBorrowAmount=vm.baseInfoForm.needPayPrincipal+vm.baseInfoForm.needPayInterest+vm.baseInfoForm.needPayService
-        +Number(getOtherFee())+vm.baseInfoForm.preLateFees+vm.baseInfoForm.outsideInterest+vm.baseInfoForm.lackFee+vm.baseInfoForm.needPayPenalty
+		vm.baseInfoForm.totalBorrowAmount=vm.baseInfoForm.needPayPrincipal+vm.baseInfoForm.needPayInterest+vm.baseInfoForm.needPayService+vm.baseInfoForm.needPayPenalty
 	}else{
 		vm.baseInfoForm.totalBorrowAmount=vm.baseInfoForm.needPayPrincipal+vm.baseInfoForm.needPayInterest+vm.baseInfoForm.needPayService
         +Number(getOtherFee())+vm.baseInfoForm.preLateFees+vm.baseInfoForm.outsideInterest+vm.baseInfoForm.lackFee
