@@ -1,16 +1,15 @@
 package com.hongte.alms.base.entity;
 
-import java.io.Serializable;
-
-import com.baomidou.mybatisplus.enums.IdType;
-import java.util.Date;
-import com.baomidou.mybatisplus.annotations.TableId;
-import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableField;
+import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
-import java.io.Serializable;
+import com.baomidou.mybatisplus.enums.IdType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
+import java.io.Serializable;
+import java.util.Date;
 /**
  * <p>
  * 财务跟单设置
@@ -46,20 +45,20 @@ public class SysFinancialOrder extends Model<SysFinancialOrder> {
     /**
      * 业务类型
      */
-	@TableField("business_type")
-	@ApiModelProperty(required= true,value = "业务类型")
-	private String businessType;
+	@TableField("business_type_id")
+	@ApiModelProperty(required= true,value = "业务类型ID")
+	private Integer businessTypeId;
     /**
      * 跟进人的ID
      */
 	@TableField("user_ids")
-	@ApiModelProperty(required= true,value = "跟进人的ID")
+	@ApiModelProperty(required= false,value = "跟进人的ID")
 	private String userIds;
     /**
      * 跟进人的名字
      */
 	@TableField("user_names")
-	@ApiModelProperty(required= true,value = "跟进人的名字")
+	@ApiModelProperty(required= false,value = "跟进人的名字")
 	private String userNames;
     /**
      * 更新人
@@ -111,12 +110,12 @@ public class SysFinancialOrder extends Model<SysFinancialOrder> {
 		this.companyId = companyId;
 	}
 
-	public String getBusinessType() {
-		return businessType;
+	public Integer getBusinessTypeId() {
+		return businessTypeId;
 	}
 
-	public void setBusinessType(String businessType) {
-		this.businessType = businessType;
+	public void setBusinessTypeId(Integer businessTypeId) {
+		this.businessTypeId = businessTypeId;
 	}
 
 	public String getUserIds() {
@@ -178,7 +177,7 @@ public class SysFinancialOrder extends Model<SysFinancialOrder> {
 			", id=" + id +
 			", areaId=" + areaId +
 			", companyId=" + companyId +
-			", businessType=" + businessType +
+			", businessTypeId=" + businessTypeId +
 			", userIds=" + userIds +
 			", userNames=" + userNames +
 			", updateUser=" + updateUser +
