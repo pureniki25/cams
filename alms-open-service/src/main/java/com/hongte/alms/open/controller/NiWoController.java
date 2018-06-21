@@ -10,6 +10,7 @@ import com.hongte.alms.open.feignClient.NiwoRepayPlanRemoteApi;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -28,11 +29,15 @@ public class NiWoController {
 	@Autowired
 	NiwoRepayPlanRemoteApi niwoRepayPlanRemoteApi;
 
+	
 
 	@ApiOperation(value = "你我金融还款计划回调")
 	@PostMapping("/sycRepayPlan")
-	public Result sycRepayPlan(@RequestBody NiWoProjPlanDto dto){
-		System.out.println(dto);
+	public Result sycRepayPlan(@RequestBody HashMap<String, Object> map){
+
+		logger.info("@sycRepayPlan@同步你我金融还款计划--开始[{},{}]");
+		niwoRepayPlanRemoteApi.sycRepayPlan(map);
+		logger.info("@sycRepayPlan@同步你我金融还款计划--结束[{}]");
 		return Result.success("回调成功");
 	}
 	

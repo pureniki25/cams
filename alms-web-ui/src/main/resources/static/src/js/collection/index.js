@@ -400,7 +400,8 @@ window.layinit(function(htConfig){
                         id: 'operate',
                         tableid: 'listTable',
                         onBefore: function (e) {
-                            //console.log('e',e);
+                            console.log('e',e);
+                            debugger
                             var buttons = [];
 
                             if (authValid('trackRecord')) {
@@ -419,66 +420,67 @@ window.layinit(function(htConfig){
                                 )
                             }
                             if (authValid('applyDerate')) {
-                                buttons.push(
-                                    {
-                                    	
-                                        "name": "减免申请", click: function (e, currentItem) {debugger
+                                if(e.statusName != '已还款' && e.statusName != '已结清'
+                                  &&  e.afterColStatusName!='已移交法务' &&
+                                    e.repaymentTypeId!=9 && e.repaymentTypeId!=4){
+                                    buttons.push(
+                                        {
+
+                                            "name": "减免申请", click: function (e, currentItem) {debugger
                                             if (currentItem.statusName == '已还款'||currentItem.statusName == '已结清'){
-                                            	 vm.$Modal.error({content: '已还款或已结清的不能发起减免申请！'});
+                                                vm.$Modal.error({content: '已还款或已结清的不能发起减免申请！'});
                                             }else{
-	                                                if (currentItem.afterColStatusName=='已移交法务'){
-	                                              	   vm.$Modal.error({content: '已移交法务的不能发起减免申请！'});
-	                                                }else{
-		                                            	     if (currentItem.repaymentTypeId==9||currentItem.repaymentTypeId==4){
-		                                                 	   vm.$Modal.error({content: '现在只支持等额本息,先息后本,分期还本付息5年,分期还本付息10年还款方式的减免申请！'});
-			                                                 }else{
-			                                                     var url = '/collectionUI/applyDerateUI?businessId=' + currentItem.businessId + '&crpId=' + currentItem.crpId + "&processStatus=-1"+'&businessTypeId='+currentItem.businessTypeId+"&afterId="+currentItem.afterId
-			                                                     showOneLineOprLayer(url, "减免申请")
-			                                                 }
-	                                                   
-	                                              }
+                                                if (currentItem.afterColStatusName=='已移交法务'){
+                                                    vm.$Modal.error({content: '已移交法务的不能发起减免申请！'});
+                                                }else{
+                                                    if (currentItem.repaymentTypeId==9||currentItem.repaymentTypeId==4){
+                                                        vm.$Modal.error({content: '现在只支持等额本息,先息后本,分期还本付息5年,分期还本付息10年还款方式的减免申请！'});
+                                                    }else{
+                                                        var url = '/collectionUI/applyDerateUI?businessId=' + currentItem.businessId + '&crpId=' + currentItem.crpId + "&processStatus=-1"+'&businessTypeId='+currentItem.businessTypeId+"&afterId="+currentItem.afterId
+                                                        showOneLineOprLayer(url, "减免申请")
+                                                    }
+
+                                                }
                                             }
-                                  
-                                            
-                                           
-                              
-                                 
-                                            
-                                         
-                                    }
-                                    }
-                                )
+                                        }
+                                        }
+                                    )
+                                }
+                                // buttons.push(
+                                //     {
+                                //
+                                //         "name": "减免申请", click: function (e, currentItem) {debugger
+                                //             if (currentItem.statusName == '已还款'||currentItem.statusName == '已结清'){
+                                //             	 vm.$Modal.error({content: '已还款或已结清的不能发起减免申请！'});
+                                //             }else{
+	                             //                    if (currentItem.afterColStatusName=='已移交法务'){
+	                             //                  	   vm.$Modal.error({content: '已移交法务的不能发起减免申请！'});
+	                             //                    }else{
+		                         //                    	     if (currentItem.repaymentTypeId==9||currentItem.repaymentTypeId==4){
+		                         //                         	   vm.$Modal.error({content: '现在只支持等额本息,先息后本,分期还本付息5年,分期还本付息10年还款方式的减免申请！'});
+			                     //                             }else{
+			                     //                                 var url = '/collectionUI/applyDerateUI?businessId=' + currentItem.businessId + '&crpId=' + currentItem.crpId + "&processStatus=-1"+'&businessTypeId='+currentItem.businessTypeId+"&afterId="+currentItem.afterId
+			                     //                                 showOneLineOprLayer(url, "减免申请")
+			                     //                             }
+	                             //
+	                             //                  }
+                                //             }
+                                //     }
+                                //     }
+                                // )
                             }
 
                             if (authValid('deduction')) {
-                                buttons.push(
-                                    {
-                                        "name": "执行代扣", click: function (e, currentItem) {
-                                        if (currentItem.statusName != '已还款') {
-                                            var url = getDeductionUrl(currentItem);
-                                            // var url = '/collectionUI/applyDerateUI?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+"&processStatus=-1"
-                                            showOneLineOprLayer(url, "执行代扣")
-                                        } else {
-                                            vm.$Modal.error({content: '已还款的不能执行代扣！'});
-                                        }
-                                    }
-                                    }
-                                )
-                            }
-                            // if(obj.data.businessTypeId == 9 || obj.data.businessTypeId == 1){
-
-                            if (authValid('dragRegistration')) {
-                                if (e.businessTypeId == 9 || e.businessTypeId == 1) {
-
+                                if(e.statusName != '已还款' && e.statusName != '已结清'){
                                     buttons.push(
                                         {
-                                            "name": "拖车登记", click: function (e, currentItem) {
-                                            // url = getDeductionUrl(currentItem);
-                                            if (currentItem.businessTypeId != 9 && currentItem.businessTypeId != 1) {
-                                                vm.$Modal.error({content: '车贷业务才能拖车登记！'});
+                                            "name": "执行代扣", click: function (e, currentItem) {
+                                            if (currentItem.statusName != '已还款' && currentItem.statusName != '已结清') {
+                                                var url = getDeductionUrl(currentItem);
+                                                // var url = '/collectionUI/applyDerateUI?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+"&processStatus=-1"
+                                                showOneLineOprLayer(url, "执行代扣")
                                             } else {
-                                                var url = '/carUI/dragRegistration?businessId=' + currentItem.businessId
-                                                showOneLineOprLayer(url, "拖车登记")
+                                                vm.$Modal.error({content: '已还款的不能执行代扣！'});
                                             }
                                         }
                                         }
@@ -486,15 +488,39 @@ window.layinit(function(htConfig){
                                 }
 
                             }
+                            // if(obj.data.businessTypeId == 9 || obj.data.businessTypeId == 1){
+
+                            if (authValid('dragRegistration')) {
+                                if (e.businessTypeId == 9 || e.businessTypeId == 1) {
+                                    if(e.statusName != '已还款' && e.statusName != '已结清'){
+                                        buttons.push(
+                                            {
+                                                "name": "拖车登记", click: function (e, currentItem) {
+                                                // url = getDeductionUrl(currentItem);
+                                                if (currentItem.businessTypeId != 9 && currentItem.businessTypeId != 1) {
+                                                    vm.$Modal.error({content: '车贷业务才能拖车登记！'});
+                                                } else {
+                                                    var url = '/carUI/dragRegistration?businessId=' + currentItem.businessId
+                                                    showOneLineOprLayer(url, "拖车登记")
+                                                }
+                                            }
+                                            }
+                                        )
+                                    }
+
+                                }
+                            }
                             if (authValid('repaymentRegister')) {
-                                buttons.push(
-                                    {
-                                        "name": "客户还款登记", click: function (e, currentItem) {
-                                        var url = '/collectionUI/repaymentRegister?businessId=' + currentItem.businessId + '&afterId=' + currentItem.afterId
-                                        showOneLineOprLayer(url, "客户还款登记")
-                                    }
-                                    }
-                                )
+                                // if(e.statusName != '已还款' && e.statusName != '已结清') {
+                                    buttons.push(
+                                        {
+                                            "name": "客户还款登记", click: function (e, currentItem) {
+                                            var url = '/collectionUI/repaymentRegister?businessId=' + currentItem.businessId + '&afterId=' + currentItem.afterId
+                                            showOneLineOprLayer(url, "客户还款登记")
+                                        }
+                                        }
+                                    )
+                                // }
                             }
                             if (authValid('checkFundPool')) {
                                 buttons.push(
@@ -560,20 +586,22 @@ window.layinit(function(htConfig){
                                 )
                             }
                             if (authValid('litigation')) {
-                                buttons.push(
-                                    {
-                                        "name": "移交法务", click: function (e, currentItem) {
-                                        //                            	 var url = '/transferOfLitigation/carLoan?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+"&processStatus=-1"
-                                        var url = ''
-                                        if (currentItem.businessTypeId == 1 || currentItem.businessTypeId == 9) {
-                                            url = '/transferOfLitigation/carLoan?businessId=' + currentItem.businessId + '&crpId=' + currentItem.crpId + "&processStatus=-1";
-                                        } else if (currentItem.businessTypeId == 2 || currentItem.businessTypeId == 11) {
-                                            url = '/transferOfLitigation/houseLoan?businessId=' + currentItem.businessId + '&crpId=' + currentItem.crpId + "&processStatus=-1";
+                                if(e.statusName != '已还款' && e.statusName != '已结清') {
+                                    buttons.push(
+                                        {
+                                            "name": "移交法务", click: function (e, currentItem) {
+                                            //                            	 var url = '/transferOfLitigation/carLoan?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+"&processStatus=-1"
+                                            var url = ''
+                                            if (currentItem.businessTypeId == 1 || currentItem.businessTypeId == 9) {
+                                                url = '/transferOfLitigation/carLoan?businessId=' + currentItem.businessId + '&crpId=' + currentItem.crpId + "&processStatus=-1";
+                                            } else if (currentItem.businessTypeId == 2 || currentItem.businessTypeId == 11) {
+                                                url = '/transferOfLitigation/houseLoan?businessId=' + currentItem.businessId + '&crpId=' + currentItem.crpId + "&processStatus=-1";
+                                            }
+                                            showOneLineOprLayer(url, "移交法务")
                                         }
-                                        showOneLineOprLayer(url, "移交法务")
-                                    }
-                                    }
-                                )
+                                        }
+                                    )
+                                }
                             }
                             buttons.push(
                                     {

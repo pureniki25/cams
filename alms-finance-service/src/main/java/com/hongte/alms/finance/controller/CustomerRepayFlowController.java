@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.collection.vo.CollectionTrackLogVo;
 import com.hongte.alms.base.customer.vo.CustomerRepayFlowExel;
 import com.hongte.alms.base.customer.vo.CustomerRepayFlowListReq;
+import com.hongte.alms.base.customer.vo.CustomerRepayFlowOptReq;
 import com.hongte.alms.base.entity.BasicCompany;
 import com.hongte.alms.base.entity.DepartmentBank;
 import com.hongte.alms.base.enums.AreaLevel;
@@ -62,8 +63,6 @@ public class CustomerRepayFlowController {
     CustomerRepayFlowService customerRepayFlowService;
 
 
-
-
     /**
      * 获取客户还款流水列表
      *
@@ -104,10 +103,10 @@ public class CustomerRepayFlowController {
             result = Result.success(ossUrl);
         } catch (ServiceRuntimeException se) {
             result = Result.error(se.getErrorCode(), se.getMessage());
-            LOGGER.error("====>>>>>导出客户流水excel出错{}",se.getMessage());
+            LOGGER.error("====>>>>>导出客户流水excel出错{}", se.getMessage());
         } catch (Exception e) {
             result = Result.error("500", "导出客户流水出错");
-            LOGGER.error("====>>>>>导出客户流水excel出错{}",e);
+            LOGGER.error("====>>>>>导出客户流水excel出错{}", e);
         }
 
         LOGGER.info("====>>>>>导出客户流水excel结束{}", result);
@@ -141,13 +140,35 @@ public class CustomerRepayFlowController {
         try {
             customerRepayFlowService.importCustomerFlowExcel(file);
 
-            result= Result.success();
+            result = Result.success();
+        } catch (ServiceRuntimeException se) {
+            result = Result.error(se.getErrorCode(), se.getMessage());
+            LOGGER.error("====>>>>>导入客户还款流水出错{}", se.getMessage());
         } catch (Exception e) {
-
             result = Result.error("500", "导入客户流水出错");
-            LOGGER.error("====>>>>>导入客户还款流水出错{}",e);
+            LOGGER.error("====>>>>>导入客户还款流水出错{}", e);
         }
         LOGGER.info("====>>>>>导入客户还款流水excel结束");
+        return result;
+    }
+
+    @ApiOperation(value = "审核/拒绝客户还款流水记录")
+    @RequestMapping("/auditOrRejectCustomerFlow")
+    public Result auditOrRejectCustomerFlow( CustomerRepayFlowOptReq customerRepayFlowOptReq) {
+        LOGGER.info("====>>>>>审核/拒绝客户还款流水记录开始[{}]", customerRepayFlowOptReq);
+        Result result = null;
+        try {
+            customerRepayFlowService.auditOrRejectCustomerFlow(customerRepayFlowOptReq);
+
+            result = Result.success();
+        } catch (ServiceRuntimeException se) {
+            result = Result.error(se.getErrorCode(), se.getMessage());
+            LOGGER.error("====>>>>>审核/拒绝客户还款流水记录{}", se.getMessage());
+        } catch (Exception e) {
+            result = Result.error("500", "审核/拒绝客户还款流水记录出错");
+            LOGGER.error("====>>>>>审核/拒绝客户还款流水记录出错{}", e);
+        }
+        LOGGER.info("====>>>>>审核/拒绝客户还款流水记录结束");
         return result;
     }
 

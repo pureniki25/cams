@@ -72,6 +72,18 @@ public class Result<T> {
 	}
 
 	/**
+	 *  构造请求失败的结果对象<br>
+	 *
+	 * @param msg 结果描述
+	 * @return com.hongte.alms.common.result.Result<T>  请求的结果对象
+	 * @author 张贵宏
+	 * @date 2018/6/14 11:06
+	 */
+	public static <T> Result<T> error(String msg){
+		return error("500", msg);
+	}
+
+	/**
 	 * 构造请求失败的结果对象<br>
 	 * 
 	 * @author 谭荣巧

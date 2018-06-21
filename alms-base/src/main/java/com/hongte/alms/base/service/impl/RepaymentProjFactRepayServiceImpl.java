@@ -50,7 +50,7 @@ public class RepaymentProjFactRepayServiceImpl extends BaseServiceImpl<Repayment
 			//逾期金额
 			BigDecimal overDue = repaymentBizPlanList.getOverdueAmount()==null?new BigDecimal("0"):repaymentBizPlanList.getOverdueAmount();
 
-			//应还金额
+			//整个业务应还金金额
 			unpaid = unpaid.add(planAmount).add(overDue);
 			
 			List<RepaymentProjPlanList> repaymentProjPlanLists = repaymentProjPlanListMapper.selectList(
@@ -64,6 +64,8 @@ public class RepaymentProjFactRepayServiceImpl extends BaseServiceImpl<Repayment
 						new EntityWrapper<RepaymentProjFactRepay>()
 						.eq("proj_plan_list_id", projPlanListId));
 				for (RepaymentProjFactRepay repaymentProjFactRepay : factRepays) {
+
+					//减去实还列表里面每个标，每一项费用的实还金额
 					unpaid = unpaid.subtract(repaymentProjFactRepay.getFactAmount());
 				}
 			}
