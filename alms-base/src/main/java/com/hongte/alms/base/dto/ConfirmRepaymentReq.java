@@ -12,11 +12,17 @@ import java.util.List;
  */
 public class ConfirmRepaymentReq {
 
+	//业务ID
 	private String businessId ;
+	//期数afterId
 	private String afterId ;
+	//线下逾期费
 	private BigDecimal offlineOverDue ;
+	//线上逾期费
 	private BigDecimal onlineOverDue ;
+	//结余金额
 	private BigDecimal surplusFund ;
+	//匹配的流水ID
 	private List<String> mprIds ;
 	//TODO 线下代扣ids
 	// 银行代扣ids
