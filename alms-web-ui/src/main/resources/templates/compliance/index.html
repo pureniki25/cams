@@ -104,7 +104,7 @@
 		    </i-col>
 			<i-col span="3">
 				业务类型：
-				<i-select v-model="queryConditionModel.businessType" clearable filterable style="width:100px">
+				<i-select v-model="queryConditionModel.businessType" @on-change="onChangeBusinessType($event)" clearable filterable style="width:100px">
       				<i-option :value="9">车易贷</i-option>
       				<i-option :value="11">房速贷</i-option>
       				<i-option :value="20">一点车贷</i-option>
