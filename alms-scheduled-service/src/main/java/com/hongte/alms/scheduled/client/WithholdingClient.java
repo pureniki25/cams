@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @Author: 陈泽圣
  * @Date: 2018/6/19
  */
-@FeignClient(value = "alms-scheduled-service")
+@FeignClient(value = "alms-withhold-service")
 public interface WithholdingClient {
 
     @RequestMapping(value = "/repay/searchRepayResult",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)

@@ -741,7 +741,7 @@ window.layinit(function (htConfig) {
 	    		if(vm.carBasic.transferTimes !=null&&vm.carBasic.transferTimes!=''){
 		    		if (!ex.test(vm.carBasic.transferTimes)) {  
 		    			$("#transferTimes").css("border","1px solid #FF3030");
-		    			layer.msg("请输入整整数！",{icon:5,shade: [0.8, '#393D49']});
+		    			layer.msg("请输入整数！",{icon:5,shade: [0.8, '#393D49']});
 		    			return;
 		    		}
 	    		}
@@ -813,16 +813,6 @@ window.layinit(function (htConfig) {
 
                     $("#auctionStartTime").css("border","1px solid #FF3030");
                     return ;
-                }else{
-
-                    var inputDate=new Date(vm.carAuction.auctionStartTime.replace("-", "/").replace("-", "/"));
-
-                    if(inputDate<currentDate){
-                        $("#auctionStartTime").css("border","1px solid #FF3030");
-                        layer.msg("不能小于当前日期！",{icon:5,shade: [0.8, '#393D49']});
-                        return ;
-                    }
-
                 }
                 if(vm.carAuction.auctionEndTime==''||vm.carAuction.auctionEndTime==null){
                     $("#auctionEndTime").css("border","1px solid #FF3030");
