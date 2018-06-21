@@ -52,7 +52,7 @@ public class RepayPlanController {
     /**
      * 信贷系统api地址
      */
-    @Value(value = "${bmApi.apiUrl:http://127.0.0.1}")
+    @Value(value = "${bmApi.apiUrl}")
     private String apiUrl;
 
     @Autowired
@@ -173,7 +173,7 @@ public class RepayPlanController {
     @ApiOperation("将指定业务的还款计划的变动通过信贷接口推送给信贷系统")
     @PostMapping("/updateRepayPlanToLMS")
     @ResponseBody
-    public Result updateRepayPlanToLMS(@RequestBody RepayPlanReq repayPlanReq) {
+    public Result updateRepayPlanToLMS(RepayPlanReq repayPlanReq) {
         logger.info("[开始] 还款计划-将指定业务的还款计划的变动通过信贷接口推送给信贷系统：参数repayPlanReq=[{}]", JSON.toJSONString(repayPlanReq));
         String businessId = repayPlanReq.getBusinessId();
         String afterId = repayPlanReq.getAfterId();
