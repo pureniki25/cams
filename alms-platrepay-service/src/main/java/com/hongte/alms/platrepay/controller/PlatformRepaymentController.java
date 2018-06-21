@@ -48,7 +48,7 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping("/platformRepayment")
 @Api(description = "平台合规化还款服务")
 public class PlatformRepaymentController {
-    private static final Logger LOG = LoggerFactory.getLogger(PlatformRepaymentController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PlatformRepaymentController.class);
 
     @Autowired
     private EipRemote eipRemote;
@@ -138,7 +138,7 @@ public class PlatformRepaymentController {
     @GetMapping("/repayment")
     @ResponseBody
     public Result repayment(String projectId, String afterId, String confirmLogId) {   //TdrepayRechargeInfoVO
-        LOG.info("@对接合规还款接口 开始 @输入参数 projectId:[{}]  afterId[{}]", projectId, afterId);
+        LOGGER.info("@对接合规还款接口 开始 @输入参数 projectId:[{}]  afterId[{}]", projectId, afterId);
         //参数验证
         if (StringUtils.isBlank(projectId)) {
             return Result.error("上标项目编号不能为空");
@@ -154,7 +154,7 @@ public class PlatformRepaymentController {
             //验证这块以后要移除,通用功能不能只针对某一个平台，目前只针对团贷平台. zgh 20180614
             TuandaiProjectInfo tuandaiProjectInfo = tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("project_id", projectId));
             if (tuandaiProjectInfo == null) {
-                LOG.error("@对接合规还款接口@  查不到平台的上标信息 输入参数 projectId:[{}]  ", projectId);
+                LOGGER.error("@对接合规还款接口@  查不到平台的上标信息 输入参数 projectId:[{}]  ", projectId);
                 return Result.error("查不到平台的上标信息");
             }
             //****************************************************
@@ -168,7 +168,7 @@ public class PlatformRepaymentController {
                             .eq("project_id", projectId)
             );
             if (repaymentProjPlan == null) {
-                LOG.error("@对接合规还款接口@  查不到标的还款计划信息 输入参数 projectId:[{}]  ", projectId);
+                LOGGER.error("@对接合规还款接口@  查不到标的还款计划信息 输入参数 projectId:[{}]  ", projectId);
                 return Result.error("查不到标的还款计划信息");
             }
 
@@ -180,11 +180,11 @@ public class PlatformRepaymentController {
             );
 
             if (repaymentProjPlanLists == null || repaymentProjPlanLists.size() == 0) {
-                LOG.error("@对接合规还款接口@  查不到标的还款计划列表信息 输入参数 projectId:[{}]  afterId[{}] ", projectId, afterId);
+                LOGGER.error("@对接合规还款接口@  查不到标的还款计划列表信息 输入参数 projectId:[{}]  afterId[{}] ", projectId, afterId);
                 return Result.error("500", "查不到标的还款计划列表信息");
             }
             if (repaymentProjPlanLists.size() > 1) {
-                LOG.error("@对接合规还款接口@  查到两条以上标的还款计划列表信息 输入参数 projectId:[{}]  afterId[{}] ", projectId, afterId);
+                LOGGER.error("@对接合规还款接口@  查到两条以上标的还款计划列表信息 输入参数 projectId:[{}]  afterId[{}] ", projectId, afterId);
                 return Result.error("500", "查到两条以上标的还款计划列表信息");
             }
             RepaymentProjPlanList repaymentProjPlanList = repaymentProjPlanLists.get(0);
@@ -193,13 +193,13 @@ public class PlatformRepaymentController {
 //            if (repaymentProjPlanList.getRepayFlag().equals(RepayPlanPayedTypeEnum.PAYING.getValue())
 //                    || repaymentProjPlanList.getRepayFlag().equals(RepayPlanPayedTypeEnum.RENEW_PAY.getValue())) {
             if (repaymentProjPlanList.getRepayFlag().equals(RepayPlanPayedTypeEnum.PAYING.getValue())) {
-                LOG.error("@对接合规还款接口@  此还款标的计划列表未还款 输入参数 projectId:[{}]  afterId{[]}  ", projectId, afterId);
+                LOGGER.error("@对接合规还款接口@  此还款标的计划列表未还款 输入参数 projectId:[{}]  afterId{[]}  ", projectId, afterId);
                 return Result.error("500", "此还款标的计划列表未还款");
             }
 
             RepaymentConfirmLog repaymentConfirmLog = repaymentConfirmLogService.selectById(confirmLogId);
             if (repaymentConfirmLog == null) {
-                LOG.error("@对接合规还款接口@ 查不到指定的还款日志记录 输入参数confirmLogId:[{}]", confirmLogId);
+                LOGGER.error("@对接合规还款接口@ 查不到指定的还款日志记录 输入参数confirmLogId:[{}]", confirmLogId);
                 return Result.error("查不到指定的还款日志记录");
             }
 
@@ -363,7 +363,7 @@ public class PlatformRepaymentController {
             vo.setIsComplete(projPlanListStatus);
             vo.setProjPlanListId(repaymentProjPlanList.getProjPlanListId());
             if (StringUtils.isBlank(tuandaiProjectInfo.getTdUserId())) {
-                LOG.error("@对接合规还款接口@ 团贷用户ID(资金端用户ID)为空 project_id:[{}]", projectId);
+                LOGGER.error("@对接合规还款接口@ 团贷用户ID(资金端用户ID)为空 project_id:[{}]", projectId);
                 return Result.error("团贷用户ID(资金端用户ID)为空");
             } else {
                 vo.setTdUserId(tuandaiProjectInfo.getTdUserId());
@@ -377,159 +377,8 @@ public class PlatformRepaymentController {
             //return Result.success(departmentBankService.listDepartmentBank());
             return Result.success();
         } catch (Exception e) {
-            LOG.error("通过合化还款接口还款失败.", e);
+            LOGGER.error("通过合化还款接口还款失败.", e);
             return Result.error("500", "通过合化还款接口还款失败！");
-        }
-    }
-
-
-    @SuppressWarnings("rawtypes")
-    @ApiOperation(value = "查询代充值账户余额")
-    @GetMapping("/queryUserAviMoney")
-    @ResponseBody
-    public Result queryUserAviMoney(@RequestParam("rechargeAccountType") String rechargeAccountType) {
-
-        Map<String, Object> paramMap = new HashMap<>();
-
-        String userId = tdrepayRechargeService.handleAccountType(rechargeAccountType);
-
-        paramMap.put("userId", userId);
-
-        com.ht.ussp.core.Result result = null;
-        try {
-            result = eipRemote.queryUserAviMoney(paramMap);
-        } catch (Exception e) {
-            return Result.error("500", "调用外联平台查询代充值账户余额接口失败！");
-        }
-
-        return Result.success(result);
-    }
-
-    @SuppressWarnings("rawtypes")
-    @ApiOperation(value = "提交充值数据")
-    @PostMapping("/commitRechargeData")
-    @ResponseBody
-    public Result commitRechargeData(@RequestBody RechargeModalVO vo) {
-
-        if (vo == null) {
-            return Result.error("500", "不能空数据！");
-        }
-
-        String clientIp = CommonUtil.getClientIp();
-
-        String rechargeAccountType = vo.getRechargeAccountType();
-
-        String rechargeUserId = tdrepayRechargeService.handleAccountType(rechargeAccountType);
-
-        if (StringUtil.isEmpty(rechargeUserId)) {
-            return Result.error("500", "没有找到代充值账户用户ID");
-        }
-
-        String cmOrderNo = UUID.randomUUID().toString();
-
-        RechargeModalDTO dto = new RechargeModalDTO();
-        dto.setAmount(vo.getRechargeAmount());
-        // 若转账类型为1 对公，则在银行编码后 + "2B"
-        dto.setBankCode("1".equals(vo.getTransferType()) ? vo.getBankCode() + "2B" : vo.getBankCode());
-        dto.setClientIp(clientIp);
-        dto.setChargeType("3"); // 1：网关、2：快捷、3：代充值
-        dto.setCmOrderNo(cmOrderNo);
-        String oIdPartner = tdrepayRechargeService.handleOIdPartner(rechargeAccountType);
-        dto.setoIdPartner(oIdPartner);
-        dto.setRechargeUserId(rechargeUserId);
-
-
-        AgencyRechargeLog agencyRechargeLog = handleAgencyRechargeLog(vo, clientIp, cmOrderNo, dto, oIdPartner);
-
-        agencyRechargeLogService.insert(agencyRechargeLog);
-
-        com.ht.ussp.core.Result result = null;
-
-        try {
-
-            result = eipRemote.agencyRecharge(dto);
-
-            if (result == null) {
-                return Result.error("500", "接口调用失败！");
-            }
-        } catch (Exception e) {
-            agencyRechargeLog.setResultJson(e.getMessage());
-            handleUpdateLogFail(cmOrderNo, agencyRechargeLog);
-            LOG.error("提交充值数据失败", e);
-            return Result.error("500", "提交充值数据失败！");
-        }
-
-        try {
-            if ("0000".equals(result.getReturnCode())) {
-
-                agencyRechargeLog.setResultJson(JSONObject.toJSONString(result));
-                agencyRechargeLog.setUpdateTime(new Date());
-                agencyRechargeLog.setUpdateUser(loginUserInfoHelper.getUserId());
-
-                agencyRechargeLogService.update(agencyRechargeLog,
-                        new EntityWrapper<AgencyRechargeLog>().eq("cm_order_no", cmOrderNo));
-                return Result.success(result);
-            } else {
-                agencyRechargeLog.setResultJson(JSONObject.toJSONString(result));
-                handleUpdateLogFail(cmOrderNo, agencyRechargeLog);
-                return Result.error("500", result.getCodeDesc());
-            }
-        } catch (Exception e) {
-            agencyRechargeLog.setResultJson(e.getMessage());
-            handleUpdateLogFail(cmOrderNo, agencyRechargeLog);
-            LOG.error("提交充值数据失败", e);
-            return Result.error("500", "提交充值数据失败！");
-        }
-
-    }
-
-    private void handleUpdateLogFail(String cmOrderNo, AgencyRechargeLog agencyRechargeLog) {
-        agencyRechargeLog.setUpdateTime(new Date());
-        agencyRechargeLog.setUpdateUser(loginUserInfoHelper.getUserId());
-        agencyRechargeLog.setHandleStatus("3");
-        agencyRechargeLogService.update(agencyRechargeLog,
-                new EntityWrapper<AgencyRechargeLog>().eq("cm_order_no", cmOrderNo));
-    }
-
-    private AgencyRechargeLog handleAgencyRechargeLog(RechargeModalVO vo, String clientIp, String cmOrderNo,
-                                                      RechargeModalDTO dto, String oIdPartner) {
-        AgencyRechargeLog agencyRechargeLog = new AgencyRechargeLog();
-        agencyRechargeLog.setParamJson(JSONObject.toJSONString(vo) + "|" + JSONObject.toJSONString(dto));
-        agencyRechargeLog.setCmOrderNo(cmOrderNo);
-        agencyRechargeLog.setBankCode(vo.getBankCode());
-        agencyRechargeLog.setChargeType(dto.getChargeType());
-        agencyRechargeLog.setClientIp(clientIp);
-        agencyRechargeLog.setoIdPartner(dto.getoIdPartner());
-        agencyRechargeLog.setRechargeAccountBalance(
-                BigDecimal.valueOf(vo.getRechargeAccountBalance() == null ? 0 : vo.getRechargeAccountBalance()));
-        agencyRechargeLog.setRechargeAccountType(vo.getRechargeAccountType());
-        agencyRechargeLog
-                .setRechargeAmount(BigDecimal.valueOf(vo.getRechargeAmount() == null ? 0 : vo.getRechargeAmount()));
-        agencyRechargeLog.setRechargeSourseAccount(vo.getRechargeSourseAccount());
-        agencyRechargeLog.setRechargeUserId(dto.getRechargeUserId());
-        agencyRechargeLog.setTransferType(vo.getTransferType());
-        agencyRechargeLog.setRechargeAccountType(vo.getRechargeAccountType());
-        agencyRechargeLog.setCreateTime(new Date());
-        agencyRechargeLog.setCreateUser(loginUserInfoHelper.getUserId());
-        agencyRechargeLog.setoIdPartner(oIdPartner);
-        return agencyRechargeLog;
-    }
-
-    @SuppressWarnings("rawtypes")
-    @ApiOperation(value = "查询充值订单")
-    @GetMapping("/queryRechargeOrder")
-    @ResponseBody
-    public Result queryRechargeOrder(@RequestParam("oidPartner") String oidPartner,
-                                     @RequestParam("cmOrderNo") String cmOrderNo) {
-        try {
-            if (StringUtil.isEmpty(cmOrderNo) || StringUtil.isEmpty(oidPartner)) {
-                return Result.error("500", "订单号或资产端唯一编号不能为空");
-            }
-            agencyRechargeLogService.queryRechargeOrder(oidPartner, cmOrderNo, loginUserInfoHelper.getUserId());
-            return Result.success();
-        } catch (Exception e) {
-            LOG.error("查询充值订单失败", e);
-            return Result.error("500", "查询充值订单失败！");
         }
     }
 }
