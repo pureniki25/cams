@@ -374,7 +374,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 					map.get("withdrawSuccessTime") == null ? 0 : Long.valueOf(map.get("withdrawSuccessTime").toString()));
 			dto.setWithdrawTime(map.get("withdrawTime") == null ? 0 : Long.valueOf(map.get("withdrawTime").toString()));
 			Object array=map.get("repaymentPlan")==null?"":map.get("repaymentPlan"); 
-			if(array!=null) {
+			if(array!=null&&!array.equals("")) {
 				List<NiWoProjPlanListDetailDto>  repaymentPlans=new ArrayList();
 				List<HashMap<String,Object>>  repaymentPlanMaps=(List<HashMap<String,Object>>) array;
 				for(HashMap<String,Object> repaymentPlanMap:repaymentPlanMaps) {
