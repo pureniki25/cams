@@ -163,6 +163,20 @@ window.layinit(function (htConfig) {
                                 title: '转入账号',
                             },
                             {
+                                field: 'certificatePictureUrl',
+                                title: '转账凭证',
+                                templet: function (d) {
+                                    var content="";
+                                    var url=d.certificatePictureUrl;
+                                    if(url !=null){
+                                        content= "<a href="+url+" style='color:#1E90FF;text-decoration:underline;' target='dialog' width='600'>查看</a>"
+                                    }
+
+                                    return content
+                                }
+                            },
+
+                            {
                                 field: 'state',
                                 title: '状态',
                                 templet: function (d) {
@@ -204,9 +218,18 @@ window.layinit(function (htConfig) {
                         console.log("obj.event", obj.event);
                         if (obj.event === 'audit') {
                             console.log("选择的行数据：", selectedRowInfo);
+                            if(selectedRowInfo.state != '未关联银行流水'){
+                                vm.$Modal.error({content: "只能对未审核的数据进行审核"});
+                                return;
+                            }
                             self.auditCustomerFlow(selectedRowInfo.id);
                         } else if (obj.event === 'reject') {
+
                             console.log("选择的行数据：", selectedRowInfo);
+                            if(selectedRowInfo.state != '未关联银行流水'){
+                                vm.$Modal.error({content: "只能对未审核的数据进行拒绝"});
+                                return;
+                            }
                             self.rejectCustomerFlow(selectedRowInfo.id);
                         }
 
@@ -269,14 +292,16 @@ window.layinit(function (htConfig) {
                 layer.confirm('确认审核通过该流水吗？', {icon: 3, title: '提示'}, function (index) {
                     var checkStatus = table.checkStatus('listTable'); //test即为基础参数id对应的值
                     var ids = "";
-                    if (id != '') {
+                   console.log("id=",id);
+                    if (id != '' && id !=undefined) {
                         ids = id;
+                        console.log("ids=",ids);
                     } else {
                         for (i = 0, len = checkStatus.data.length; i < len; i++) {
                             ids += checkStatus.data[i].id + ","
                         }
+                        console.log("else ids=",ids);
                     }
-
                     var url = financePath + "customer/auditOrRejectCustomerFlow";
 
                     axios.get(url, {params: {idsStr: ids, opt: 2}})
@@ -304,8 +329,8 @@ window.layinit(function (htConfig) {
                 layer.confirm('确认拒绝该流水吗？', {icon: 3, title: '提示'}, function (index) {
                     var checkStatus = table.checkStatus('listTable'); //test即为基础参数id对应的值
                     var ids = "";
-                    console.log("id=",id);
-                    if (id != '') {
+
+                    if (id != '' && id !=undefined) {
                         ids = id;
                     } else {
                         for (i = 0, len = checkStatus.data.length; i < len; i++) {
