@@ -32,6 +32,8 @@ public class RequestData {
 		MethodName = methodName;
 	}
 
+	public RequestData() {
+	}
 
 	public RequestData(String data, String methodName) {
 		Data = data;
