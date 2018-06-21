@@ -1471,9 +1471,7 @@ public class FinanceServiceImpl implements FinanceService {
 						RepaymentPlanInfoDTO balanceRepayment = new RepaymentPlanInfoDTO(); // 差额
 						balanceRepayment.setRepayment("差额");
 						balanceRepayment.setAfterId(planInfoDTO.getAfterId());
-						balanceRepayment.setConfirmFlag(planInfoDTO.getConfirmFlag());
 						balanceRepayment.setPlanListId(planInfoDTO.getPlanListId());
-						balanceRepayment.setOverdueDays(planInfoDTO.getOverdueDays());
 						if (factRepayDate != null) {
 							balanceRepayment.setAccrual(BigDecimal.valueOf(planInfoDTO.getAccrual() - accrual)
 									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
