@@ -8,6 +8,7 @@ public class RepayPlanReq implements Serializable {
 
 	private String businessId;
 	private String repaymentBatchId;
+	private String afterId;
 
 	public String getBusinessId() {
 		return businessId;
@@ -23,6 +24,14 @@ public class RepayPlanReq implements Serializable {
 
 	public void setRepaymentBatchId(String repaymentBatchId) {
 		this.repaymentBatchId = repaymentBatchId;
+	}
+
+	public String getAfterId() {
+		return afterId;
+	}
+
+	public void setAfterId(String afterId) {
+		this.afterId = afterId;
 	}
 
 	@Override
