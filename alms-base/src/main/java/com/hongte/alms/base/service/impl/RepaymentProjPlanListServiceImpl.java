@@ -60,6 +60,9 @@ public class RepaymentProjPlanListServiceImpl extends
 	//进位方式枚举
     private  RoundingMode roundingMode=RoundingMode.HALF_UP;
     
+   //保留小数位数
+    private  Integer smallNum=2;
+    
 	@Autowired
 	RepaymentProjPlanListMapper repaymentProjPlanListMapper;
 	@Autowired
@@ -120,6 +123,7 @@ public class RepaymentProjPlanListServiceImpl extends
 								RepaymentProjPlan projPlan = repaymentProjPlanService
 										.selectOne((new EntityWrapper<RepaymentProjPlan>().eq("creat_sys_type", 2))
 												.eq("proj_plan_id", projPList.getProjPlanId()));
+								getRondModeAndSmallNum(projPlan);//确定进位方式和保留小数位
 								RepaymentProjPlanListDetail underLineProjDetail=null;   //线下费用的Detail
 								RepaymentProjPlanListDetail onLineProjDetail=null;   //线上费用的Detail
 								//如果已经全部收取本期应交的本息服务费费及线上逾期费用后则停止计算滞纳金
@@ -144,14 +148,14 @@ public class RepaymentProjPlanListServiceImpl extends
 									underlineDueDays=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), projPList.getDueDate())));
 									
 									projPList.setOverdueDays(underlineDueDays);
-									BigDecimal underLateFee=getUnderLateFee(projPList,projList, projPlan,underlineDueDays);//线下逾期费
-									underLateFeeSum=underLateFeeSum.add(underLateFee);
+									BigDecimal underLateFee=getUnderLateFee(projPList,projList, projPlan,underlineDueDays).setScale(2, roundingMode);//线下逾期费
+									underLateFeeSum=underLateFeeSum.add(underLateFee).setScale(2, roundingMode);
 									underLineProjDetail=	updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid(), underLateFee);
 									
 									BigDecimal onlineLateFee=BigDecimal.valueOf(0);//线上逾期费
 									if(onlineDueDays.compareTo(BigDecimal.valueOf(0))>0) {//如果线上的逾期天数为0,则不用计算线上滞纳金
-										 onlineLateFee=getOnLineLateFee(projPList, projPlan,onlineDueDays);//线上逾期费
-										onlineLateFeeSum=onlineLateFeeSum.add(onlineLateFee);
+										 onlineLateFee=getOnLineLateFee(projPList, projPlan,onlineDueDays).setScale(2, roundingMode);//线上逾期费
+										onlineLateFeeSum=onlineLateFeeSum.add(onlineLateFee).setScale(2, roundingMode);
 										onLineProjDetail=updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), onlineLateFee);
 									}
 							       
@@ -298,6 +302,36 @@ public class RepaymentProjPlanListServiceImpl extends
 			
 			
 			return projPlan.getDueDate();
+		}
+		
+		
+		/**
+		 * 计算这个标的进位方式和保留小数位
+		 */
+		
+		private void getRondModeAndSmallNum(RepaymentProjPlan projPlan) {
+			//'进位方式标志位 0：进一位，1：不进位，4：四舍五入, 6:银行家舍入法';
+			switch(projPlan.getRondmode()) {
+		    case 0:
+		    	roundingMode=RoundingMode.UP;
+		    	smallNum=projPlan.getSmallNum();
+                break;
+            case 1:
+            	roundingMode=RoundingMode.DOWN;
+            	smallNum=projPlan.getSmallNum();
+                break;
+            case 4:
+            	roundingMode=RoundingMode.HALF_UP ;
+            	smallNum=projPlan.getSmallNum();
+                break;
+            case 6:
+            	roundingMode=RoundingMode.HALF_EVEN;
+            	smallNum=projPlan.getSmallNum();
+                break;
+            default:
+                break;
+			}
+			
 		}
 	    /**
 	     * 计算出日利率

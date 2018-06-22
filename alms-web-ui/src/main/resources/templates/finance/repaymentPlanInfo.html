@@ -71,7 +71,8 @@
 			        			<td v-if="item.repayment == '实际还款'" v-html="addEventForOtherFee(item)"></td>
 			        			<td v-else>{{ item.otherFee }}</td>
 			        			<td>{{ item.subtotal }}</td>
-			        			<td>{{ item.overdueDays }}</td>
+			        			<td v-if="item.repayment == '差额'"></td>
+			        			<td v-else>{{ item.overdueDays }}</td>
 			        			<td>{{ item.onlineLateFee }}</td>
 			        			<td>{{ item.offlineLateFee }}</td>
 			        			<td>{{ item.surplus }}</td>
@@ -166,7 +167,34 @@
 		        </tab-pane>
 		        
 		        <tab-pane label="平台实还" name="platformRealRepayment">
-		        	
+		        	<tabs :animated="true" @on-click="initProjectFunction($event)">
+						<tab-pane v-for="item in projectInfoList" :key="item.projectId" :label="item.realName" :name="item.projectId">
+							<row>
+								<i-col span='6'>标的号：{{ item.projectId }}</i-col>
+								<i-col span='4'>上标金额：{{ item.fullBorrowMoney?numeral(item.fullBorrowMoney).format('0,0.00'):0 }}</i-col>
+								<i-col span='4'>账户余额：{{ platformRepaymentInfoaviMoney?numeral(platformRepaymentInfoaviMoney).format('0,0.00'):0 }}</i-col>
+								<i-col span='10' >
+									结清应还本息平台费：{{ platformPrincipalAndInterestAndPlatformCharge?numeral(platformPrincipalAndInterestAndPlatformCharge).format('0,0.00'):0 }}，
+									本息：{{ platformPrincipalAndInterest?numeral(platformPrincipalAndInterest).format('0,0.00'):0 }}，
+									平台费：{{ platformRepaymentInfoPlatformCharge?numeral(platformRepaymentInfoPlatformCharge).format('0,0.00'):0 }}
+								</i-col>
+							</row>
+							
+							<row style="margin-top:1rem">
+								<p slot="title">
+						            <h3>标的应还计划</h3>
+						        </p>
+						    </row>
+							<i-table border :columns="platformRepaymentInfoColumns" :data="platformRepaymentInfoData" style="margin-top:1rem"></i-table>
+							
+							<row style="margin-top:1rem">
+								<p slot="title">
+						            <h3>标的实还计划</h3>
+						        </p>
+						    </row>
+							<i-table border :columns="platformActualRepaymentInfoColumns" :data="platformActualRepaymentInfoData" style="margin-top:1rem"></i-table>
+						</tab-pane>
+					</tabs>
 		        </tab-pane>
 		        
 		        <tab-pane label="垫付记录" name="advancesRecord"></tab-pane>

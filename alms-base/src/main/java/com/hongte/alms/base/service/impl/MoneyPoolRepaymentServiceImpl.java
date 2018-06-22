@@ -2,6 +2,7 @@ package com.hongte.alms.base.service.impl;
 
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.collection.vo.CollectionTrackLogVo;
+import com.hongte.alms.base.customer.vo.CustomerRepayFlowDto;
 import com.hongte.alms.base.customer.vo.CustomerRepayFlowExel;
 import com.hongte.alms.base.customer.vo.CustomerRepayFlowListReq;
 import com.hongte.alms.base.entity.MoneyPool;
@@ -14,7 +15,9 @@ import com.hongte.alms.base.mapper.MoneyPoolRepaymentMapper;
 import com.hongte.alms.base.service.MoneyPoolRepaymentService;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.StringUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +38,9 @@ public class MoneyPoolRepaymentServiceImpl extends BaseServiceImpl<MoneyPoolRepa
     private MoneyPoolMapper moneyPoolMapper;
     @Autowired
     private MoneyPoolRepaymentMapper moneyPoolRepaymentMapper;
+
+    @Value("${oss.readUrl}")
+    private String ossUrl;
 
     @Override
     @Transactional(rollbackFor = ServiceRuntimeException.class)
@@ -77,8 +83,8 @@ public class MoneyPoolRepaymentServiceImpl extends BaseServiceImpl<MoneyPoolRepa
     }
 
     @Override
-    public Page<CollectionTrackLogVo> getCustomerRepayFlowPageList(CustomerRepayFlowListReq customerRepayFlowListReq) {
-        Page<CollectionTrackLogVo> page = new Page<>();
+    public Page<CustomerRepayFlowDto> getCustomerRepayFlowPageList(CustomerRepayFlowListReq customerRepayFlowListReq) {
+        Page<CustomerRepayFlowDto> page = new Page<>();
         String businessId = customerRepayFlowListReq.getBusinessId();
         if (!StringUtil.isEmpty(businessId)) {
             customerRepayFlowListReq.setBusinessId("%" + businessId + "%");
@@ -102,7 +108,16 @@ public class MoneyPoolRepaymentServiceImpl extends BaseServiceImpl<MoneyPoolRepa
                  customerRepayFlowListReq.setState(RepayRegisterFinanceStatus.还款登记被财务拒绝.toString());
              }
         }
-        List<CollectionTrackLogVo> repayFlowList = moneyPoolRepaymentMapper.getCustomerRepayFlowPageList(customerRepayFlowListReq);
+        List<CustomerRepayFlowDto> repayFlowList = moneyPoolRepaymentMapper.getCustomerRepayFlowPageList(customerRepayFlowListReq);
+
+        if(!CollectionUtils.isEmpty(repayFlowList)){
+            for(CustomerRepayFlowDto customerRepayFlowDto : repayFlowList){
+                if(!StringUtil.isEmpty(customerRepayFlowDto.getCertificatePictureUrl())){
+                    String url=customerRepayFlowDto.getCertificatePictureUrl();
+                    customerRepayFlowDto.setCertificatePictureUrl(ossUrl+url);
+                }
+            }
+        }
         int count = moneyPoolRepaymentMapper.countCustomerRepayFlowList(customerRepayFlowListReq);
         page.setTotal(count);
         page.setRecords(repayFlowList);

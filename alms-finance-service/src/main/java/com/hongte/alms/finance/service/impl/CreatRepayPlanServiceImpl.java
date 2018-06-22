@@ -147,7 +147,6 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
 //        List<CarBusinessAfterDto>  carBizAfterList = new LinkedList<>();
 //        planReturnInfoDto.setCarBusinessAfterDtoList(carBizAfterList);
-
         //设置进位方式枚举和保留的小数位数
         smallNum = creatRepayPlanReq.getSmallNum();
         if(creatRepayPlanReq.getRondmode()==null){
@@ -215,7 +214,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 repaymentProjPlanMap,
                 businessBasicInfo,
                 projPlanDetailTotalMap,
-                projPlanListTotalMap );
+                projPlanListTotalMap,creatRepayPlanReq);
         ////////   计算每个标的还款计划列表   结束 ////////////
 //    //        Map<批次,Map<标还款计划主表Id，Map<标还款计划list表Id，标的还款计划detail列表>>
 //    Map<String,Map<String,Map<String,List<RepaymentProjPlanListDetail>>>> projPlanDetailTotalMap = new HashMap<>();
@@ -1327,7 +1326,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                                      Map<String,List<RepaymentProjPlan>> repaymentProjPlanMap,
                                      BusinessBasicInfoReq  businessBasicInfo,
                                      Map<String,Map<String,Map<String,List<RepaymentProjPlanListDetail>>>> projPlanDetailTotalMap,
-                                     Map<String,Map<String,List<RepaymentProjPlanList>>> projPlanListTotalMap) throws IllegalAccessException, InstantiationException {
+                                     Map<String,Map<String,List<RepaymentProjPlanList>>> projPlanListTotalMap,CreatRepayPlanReq creatRepayPlanReq) throws IllegalAccessException, InstantiationException {
         Integer planIndex = 0;
         for(String beginDay:projInfoReqMap.keySet()){
             planIndex++;
@@ -1387,6 +1386,8 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 repaymentProjPlan.setOffLineInOverDueRateType(projInfoReq.getOffLineInOverDueRateType());
                 repaymentProjPlan.setQueryFullSuccessDate(projInfoReq.getQueryFullsuccessDate());
                 repaymentProjPlan.setRequestNo(projInfoReq.getRequestNo());//资产端上标编号
+                repaymentProjPlan.setRondmode(creatRepayPlanReq.getRondmode());
+                repaymentProjPlan.setSmallNum(creatRepayPlanReq.getSmallNum());
 
 
 

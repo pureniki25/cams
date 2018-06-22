@@ -315,11 +315,17 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		}
 		
 		
-		// 银行代扣
+		// 银行代扣 or 线下代扣
 		if(logIds!=null&&logIds.size()>0) {
 			WithholdingRepaymentLog log=withholdingRepaymentLogService.selectById(logIds.get(0));
+			String repaySource="30";
+			if(log.getBindPlatformId()==PlatformEnum.YH_FORM.getValue()) {//银行代扣
+				repaySource="30";
+			}else {//线下代扣
+				repaySource="20";
+			}
 			RepaymentResource temp=repaymentResourceService.selectOne(new EntityWrapper<RepaymentResource>().eq("business_id", log.getOriginalBusinessId())
-					.eq("after_id", log.getAfterId()).eq("repay_source_ref_id", log.getLogId()).eq("repay_source", "30"));
+					.eq("after_id", log.getAfterId()).eq("repay_source_ref_id", log.getLogId()).eq("repay_source", repaySource));
 			if(temp!=null) {//已经核销过
 				return;
 			}
@@ -345,7 +351,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			repaymentResource.setIsCancelled(0);
 			repaymentResource.setRepayAmount(log.getCurrentAmount());
 			repaymentResource.setRepayDate(log.getCreateTime());
-			repaymentResource.setRepaySource(RepayPlanRepaySrcEnum.BNAK_WITHHOLD.getValue().toString());
+			repaymentResource.setRepaySource(repaySource);
 			if (save.get()) {
 				confirmLog.get().setRepayDate(repaymentResource.getRepayDate());
 				repaymentResource.setRepaySourceRefId(log.getLogId().toString());
@@ -1431,7 +1437,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	 * 在planDto中找出RepaymentProjPlanList
 	 * @author 王继光
 	 * 2018年6月15日 下午7:22:09
-	 * @param
+	 * @param bizPlanListDetail
 	 * @return
 	 */
 	private RepaymentProjPlanList findRepaymentProjPlanList(String projPlanListId) {
@@ -1448,7 +1454,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	 * 在planDto中更新RepaymentProjPlanList
 	 * @author 王继光
 	 * 2018年6月15日 下午7:22:09
-	 * @param
+	 * @param bizPlanListDetail
 	 * @return
 	 */
 	private void updateRepaymentProjPlanListInMem(RepaymentProjPlanList projPlanList) {
@@ -1464,7 +1470,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	 * 在planDto中找出Repaymentbizplanlist
 	 * @author 王继光
 	 * 2018年6月15日 下午7:22:09
-	 * @param
+	 * @param bizPlanListDetail
 	 * @return
 	 */
 	private RepaymentBizPlanList  findRepaymentbizplanlist(String bizPlanListId) {

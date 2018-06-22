@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.collection.vo.CollectionTrackLogVo;
+import com.hongte.alms.base.customer.vo.CustomerRepayFlowDto;
 import com.hongte.alms.base.customer.vo.CustomerRepayFlowExel;
 import com.hongte.alms.base.customer.vo.CustomerRepayFlowListReq;
 import com.hongte.alms.base.customer.vo.CustomerRepayFlowOptReq;
@@ -72,12 +73,12 @@ public class CustomerRepayFlowController {
     @ApiOperation(value = "获取客户还款流水列表")
     @GetMapping("/getCustomerRepayFlowList")
     @ResponseBody
-    public PageResult<List<CollectionTrackLogVo>> getCustomerRepayFlowList(CustomerRepayFlowListReq customerRepayFlowListReq) {
+    public PageResult<List<CustomerRepayFlowDto>> getCustomerRepayFlowList(CustomerRepayFlowListReq customerRepayFlowListReq) {
         LOGGER.info("====>>>>>获取客户还款流水列表开始[{}]", JSON.toJSONString(customerRepayFlowListReq));
 
 
         try {
-            Page<CollectionTrackLogVo> pages = moneyPoolRepaymentService.getCustomerRepayFlowPageList(customerRepayFlowListReq);
+            Page<CustomerRepayFlowDto> pages = moneyPoolRepaymentService.getCustomerRepayFlowPageList(customerRepayFlowListReq);
 
 
             return PageResult.success(pages.getRecords(), pages.getTotal());
