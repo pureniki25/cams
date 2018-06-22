@@ -247,7 +247,7 @@
 				AND pi.real_name = #{customer}
 			</if>
 			<if test="businessId != null">
-				AND pl.orig_business_id = #{businessId}
+				AND pl.orig_business_id like  '${businessId}%'
 			</if>
 			<if test="accountantConfirmStatus != null">
 				AND pl.accountant_confirm_status =
