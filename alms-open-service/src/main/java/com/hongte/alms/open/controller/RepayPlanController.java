@@ -2,6 +2,7 @@ package com.hongte.alms.open.controller;
 
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.hongte.alms.base.RepayPlan.dto.CarBusinessAfterDetailDto;
@@ -45,7 +46,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 @RestController
 @RequestMapping("/RepayPlan")
-@Api(tags = "RepayPlanController", description = "还款计划相关控制器")
+@Api(value = "RepayPlanController", description = "还款计划相关控制器")
 public class RepayPlanController {
     Logger  logger = LoggerFactory.getLogger(RepayPlanController.class);
 
@@ -173,37 +174,39 @@ public class RepayPlanController {
     @ApiOperation("将指定业务的还款计划的变动通过信贷接口推送给信贷系统")
     @PostMapping("/updateRepayPlanToLMS")
     @ResponseBody
-    public Result updateRepayPlanToLMS(RepayPlanReq repayPlanReq) {
+    public Result updateRepayPlanToLMS(@RequestBody RepayPlanReq repayPlanReq) {
         logger.info("[开始] 还款计划-将指定业务的还款计划的变动通过信贷接口推送给信贷系统：参数repayPlanReq=[{}]", JSON.toJSONString(repayPlanReq));
         String businessId = repayPlanReq.getBusinessId();
-        String afterId = repayPlanReq.getAfterId();
+        //String afterId = repayPlanReq.getAfterId();
         if (repayPlanReq == null || StringUtils.isBlank(businessId)) {
             return Result.error("业务ID参数缺失");
         }
-        if (repayPlanReq == null || StringUtils.isBlank(afterId)) {
-            return Result.error("期数ID参数缺失");
-        }
+//        if (repayPlanReq == null || StringUtils.isBlank(afterId)) {
+//            return Result.error("期数ID参数缺失");
+//        }
         try {
             //1，调用alms-finance-service获取还款计划相关数据
-            Result<PlanReturnInfoDto> planReturnInfoDtoResult = repayPlanRemoteApi.queryRepayPlanByBusinessId(businessId);
+            Result<PlanReturnInfoDto> planReturnInfoDtoResult = repayPlanRemoteApi.queryRepayPlanByBusinessId(repayPlanReq);
             if (planReturnInfoDtoResult == null || !"1".equals(planReturnInfoDtoResult.getCode()) || planReturnInfoDtoResult.getData() == null) {
                 logger.info("[处理] 还款计划-调用alms-finance-service获取还款计划相关数据失败：result=[{}]", JSON.toJSONString(planReturnInfoDtoResult));
                 return Result.error(planReturnInfoDtoResult.getMsg());
             }
 
             //2, 处理接口需要的数据
+            //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            List<Map<String, Object>> paramMapList = Lists.newArrayList();
             List<RepaymentBizPlanDto> repaymentBizPlanDtos = planReturnInfoDtoResult.getData().getRepaymentBizPlanDtos();
             for (RepaymentBizPlanDto repaymentBizPlanDto : repaymentBizPlanDtos) {
                 RepaymentBizPlan bizPlan = repaymentBizPlanDto.getRepaymentBizPlan();
                 for (RepaymentBizPlanListDto bizPlanListDto : repaymentBizPlanDto.getBizPlanListDtos()) {
                     RepaymentBizPlanList bizPlanList = bizPlanListDto.getRepaymentBizPlanList();
-                    if (!afterId.equals(bizPlanList.getAfterId())) {
-                        continue;
-                    }
+//                    if (!afterId.equals(bizPlanList.getAfterId())) {
+//                        continue;
+//                    }
                     Map<String, Object> paramMap = Maps.newHashMap();
-                    paramMap.put("businessId", businessId);
-                    paramMap.put("afterId", afterId);
-                    paramMap.put("overdueDays", bizPlanList.getOverdueDays());
+                    paramMap.put("businessId", bizPlanList.getBusinessId());
+                    paramMap.put("afterId", bizPlanList.getAfterId());
+                    paramMap.put("overdueDays", bizPlanList.getOverdueDays() != null ? bizPlanList.getOverdueDays().intValue() : 0);
                     paramMap.put("currentStatus", bizPlanList.getCurrentStatus());
                     //源数据: 已还款类型标记，null或0：还款中，6：申请展期已还款，10：线下确认已还款，20：自动线下代扣已还款，21，人工线下代扣已还款，30：自动银行代扣已还款，31：人工银行代扣已还款，
                     // 40：用户APP主动还款，50：线下财务确认全部结清，60：线下代扣全部结清，70：银行代扣全部结清
@@ -339,25 +342,32 @@ public class RepayPlanController {
                     paramMap.put("updateUser", bizPlanList.getUpdateUser());
                     paramMap.put("carBizDetailDtos", afterDetailDtos);
 
-                    //3，将指定业务的还款计划的变动通过信贷接口推送给信贷系统
-                    RequestData requestData = new RequestData(JSON.toJSONString(paramMap), "Api4Alms_UpdateRepaymentPlan");
-                    String ciphertext = XinDaiEncryptUtil.encryptPostData(JSON.toJSONString(requestData));
-                    CollectionXindaiService collectionXindaiService = Feign.builder().target(CollectionXindaiService.class, apiUrl);
-                    String respStr = collectionXindaiService.updateRepaymentPlan(ciphertext);
-                    // 返回数据解密
-                    ResponseData respData = XinDaiEncryptUtil.getRespData(respStr);
-                    if (respData == null || !"1".equals(respData.getReturnCode()) || respData.getData() == null) {
-                        logger.info("[处理] 还款计划-将指定业务的还款计划的变动通过信贷接口推送给信贷系统失败：result=[{}]", JSON.toJSONString(respData));
-                        return Result.error(respData.getReturnMessage());
-                    }
+                    paramMapList.add(paramMap);
                 }
 
+
+            }
+
+            //3，将指定业务的还款计划的变动通过信贷接口推送给信贷系统
+            JSON.DEFFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+            //RequestData requestData = new RequestData(JSON.toJSONString(paramMapList, SerializerFeature.WriteDateUseDateFormat), "Api4Alms_UpdateRepaymentPlan");
+            RequestData requestData = new RequestData(
+                    JSON.toJSONString(paramMapList, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteNullStringAsEmpty,
+                            SerializerFeature.WriteDateUseDateFormat), "Api4Alms_UpdateRepaymentPlan");
+            String ciphertext = XinDaiEncryptUtil.encryptPostData(JSON.toJSONString(requestData));
+            CollectionXindaiService collectionXindaiService = Feign.builder().target(CollectionXindaiService.class, apiUrl);
+            String respStr = collectionXindaiService.updateRepaymentPlan(ciphertext);
+            // 返回数据解密
+            ResponseData respData = XinDaiEncryptUtil.getRespData(respStr);
+            if (respData == null || !"1".equals(respData.getReturnCode())) {
+                logger.info("[处理] 还款计划-将指定业务的还款计划的变动通过信贷接口推送给信贷系统失败：result=[{}]", JSON.toJSONString(respData));
+                return Result.error(respData.getReturnMessage());
             }
 
             logger.info("[结束] 还款计划-将指定业务的还款计划的变动通过信贷接口推送给信贷系统：参数repayPlanReq=[{}]", JSON.toJSONString(repayPlanReq));
             return Result.success();
         } catch (Exception e) {
-            logger.error("[异常] 还款计划-向LMS推送数据异常", e.getMessage());
+            logger.error("[异常] 还款计划-向LMS推送数据异常", e);
             return Result.error(e.getMessage());
         }
     }
