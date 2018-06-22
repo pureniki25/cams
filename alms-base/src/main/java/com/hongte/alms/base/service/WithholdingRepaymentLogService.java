@@ -2,6 +2,8 @@ package com.hongte.alms.base.service;
 
 import java.util.List;
 
+import com.hongte.alms.base.customer.vo.BankWithholdFlowReq;
+import com.hongte.alms.base.customer.vo.BankWithholdFlowVo;
 import org.apache.ibatis.annotations.Param;
 
 import com.baomidou.mybatisplus.plugins.Page;
@@ -61,4 +63,10 @@ public interface WithholdingRepaymentLogService extends BaseService<WithholdingR
       */
      List<WithholdingRepaymentLog> selectRepaymentLogForResult();
 
+    /**
+     * 银行代扣流水列表
+     * @param bankWithholdFlowReq
+     * @return
+     */
+    Page<BankWithholdFlowVo> getBankWithholdFlowPageList(BankWithholdFlowReq bankWithholdFlowReq);
 }

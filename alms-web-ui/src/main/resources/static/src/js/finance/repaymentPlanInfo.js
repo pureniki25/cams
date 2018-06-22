@@ -315,6 +315,8 @@ window.layinit(function (htConfig) {
             	
             	firstProjectId: '', // 第一个projectId
             	firstTdUserId: '', // 第一个tdUserId
+            	
+            	distributeFundRecordList: [], // 资金分发记录
         },
         methods: {
         	/*
@@ -343,7 +345,9 @@ window.layinit(function (htConfig) {
 						this.returnAdvanceShareProfit(this.firstProjectId);
 					}
 				}else if (event == 'fundDistributionRecord') {
-					
+					if (this.firstProjectId != '') {
+						this.queryDistributeFundRecord(this.firstProjectId);
+					}
 				}
             },
             /*
@@ -355,6 +359,10 @@ window.layinit(function (htConfig) {
             
             initAdvancePaymentFunction: function(event){
             	this.getProjectPayment(event);
+            },
+            
+            initDistributeFundRecordFunction: function(event){
+            	this.queryDistributeFundRecord(event);
             },
             /*
              * 根据业务编号获取业务维度的还款计划信息
@@ -545,10 +553,12 @@ window.layinit(function (htConfig) {
 			getProjectInfoByBusinessId: function(){
 				axios.get(platRepayBasePath +"tdrepayRecharge/getProjectInfoByBusinessId?businessId=" + businessId)
     	        .then(function (res) {
-    	            if (res.data.data != null && res.data.code == 1 && res.data.data.length > 0) {
+    	            if (res.data.data != null && res.data.code == 1) {
     	            	app.projectInfoList = res.data.data;
-	            		app.firstProjectId = res.data.data[0].projectId;
-	            		app.firstTdUserId = res.data.data[0].tdUserId;
+    	            	if (res.data.data.length > 0) {
+    	            		app.firstProjectId = res.data.data[0].projectId;
+    	            		app.firstTdUserId = res.data.data[0].tdUserId;
+						}
     	            } else {
     	            	app.$Modal.error({content: res.data.msg });
     	            }
@@ -596,6 +606,23 @@ window.layinit(function (htConfig) {
     	        .then(function (res) {
     	            if (res.data.data != null && res.data.code == 1) {
     	            	app.advancePaymentInfoData = res.data.data;
+    	            } else {
+    	            	app.$Modal.error({content: res.data.msg });
+    	            }
+    	        })
+    	        .catch(function (error) {
+    	        	app.$Modal.error({content: '接口调用异常!'});
+    	        });
+			},
+			
+			/*
+			 * 查询资金分发记录
+			 */
+			queryDistributeFundRecord: function(projectId){
+				axios.get(platRepayBasePath +"tdrepayRecharge/queryDistributeFundRecord?projectId=" + projectId)
+    	        .then(function (res) {
+    	            if (res.data.data != null && res.data.code == 1 && res.data.data.length > 0) {
+    	            	app.distributeFundRecordList = res.data.data;
     	            } else {
     	            	app.$Modal.error({content: res.data.msg });
     	            }
