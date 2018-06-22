@@ -52,10 +52,13 @@ import com.hongte.alms.platrepay.dto.TdReturnAdvanceShareProfitDTO;
 import com.hongte.alms.platrepay.dto.TdReturnAdvanceShareProfitResult;
 import com.hongte.alms.platrepay.dto.TdrepayProjectInfoDTO;
 import com.hongte.alms.platrepay.dto.TdrepayProjectPeriodInfoDTO;
+import com.hongte.alms.platrepay.enums.ProcessStatusTypeEnum;
 import com.hongte.alms.platrepay.service.TdrepayRechargeService;
+import com.hongte.alms.platrepay.vo.DistributeFundRecordVO;
 import com.hongte.alms.platrepay.vo.TdrepayRechargeInfoVO;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.core.Result;
+import com.ht.ussp.util.BeanUtils;
 
 @Service("TdrepayRechargeService")
 public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
@@ -1858,6 +1861,30 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		issueSendOutsideLog.setSendKey(sendKey);
 
 		return issueSendOutsideLog;
+	}
+
+	@Override
+	public List<DistributeFundRecordVO> queryDistributeFundRecord(String projectId) {
+		try {
+			List<DistributeFundRecordVO> distributeFundRecordVOs = new ArrayList<>();
+			List<TdrepayRechargeLog> tdrepayRechargeLogs = tdrepayRechargeLogService
+					.selectList(new EntityWrapper<TdrepayRechargeLog>().eq("project_id", projectId).orderBy("period"));
+			if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
+				for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
+					DistributeFundRecordVO vo = BeanUtils.deepCopy(tdrepayRechargeLog, DistributeFundRecordVO.class);
+					vo.setProcessStatusStr(ProcessStatusTypeEnum.getName(tdrepayRechargeLog.getProcessStatus()));
+					vo.setCreateTimeStr(DateUtil.formatDate(vo.getCreateTime()));
+					vo.setFactRepayDateStr(DateUtil.formatDate(vo.getFactRepayDate()));
+					vo.setDetails(tdrepayRechargeDetailService.selectList(
+							new EntityWrapper<TdrepayRechargeDetail>().eq("log_id", tdrepayRechargeLog.getLogId())));
+					distributeFundRecordVOs.add(vo);
+				}
+			}
+			return distributeFundRecordVOs;
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			throw new ServiceRuntimeException("系统异常，查询资金分发记录失败");
+		}
 	}
 
 	public static void main(String[] args) {

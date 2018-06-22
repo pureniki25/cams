@@ -50,6 +50,16 @@ public class TdRefundMonthInfoDTO implements Serializable {
 	 */
 	private Double advanceAmount;
 
+	/**
+	 * 应还总额
+	 */
+	private Double total;
+
+	/**
+	 * 还款状态
+	 */
+	private String statusStr;
+
 	public int getPeriods() {
 		return periods;
 	}
@@ -122,12 +132,28 @@ public class TdRefundMonthInfoDTO implements Serializable {
 		this.advanceAmount = advanceAmount;
 	}
 
+	public Double getTotal() {
+		return total;
+	}
+
+	public void setTotal(Double total) {
+		this.total = total;
+	}
+
+	public String getStatusStr() {
+		return statusStr;
+	}
+
+	public void setStatusStr(String statusStr) {
+		this.statusStr = statusStr;
+	}
+
 	@Override
 	public String toString() {
 		return "TdRefundMonthInfoDTO [periods=" + periods + ", cycDate=" + cycDate + ", realityCycDate="
 				+ realityCycDate + ", amount=" + amount + ", interestAmout=" + interestAmout + ", status=" + status
 				+ ", overdueDay=" + overdueDay + ", overdueAmount=" + overdueAmount + ", advanceAmount=" + advanceAmount
-				+ "]";
+				+ ", total=" + total + ", statusStr=" + statusStr + "]";
 	}
 
 }

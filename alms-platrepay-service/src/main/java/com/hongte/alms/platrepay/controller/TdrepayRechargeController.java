@@ -2,6 +2,7 @@ package com.hongte.alms.platrepay.controller;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,23 +12,29 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.dto.compliance.TdProjectPaymentInfoResult;
+import com.hongte.alms.base.dto.compliance.TdRefundMonthInfoDTO;
 import com.hongte.alms.base.entity.BasicCompany;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
+import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
+import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.service.BasicCompanyService;
 import com.hongte.alms.base.service.IssueSendOutsideLogService;
 import com.hongte.alms.base.service.TdrepayRechargeLogService;
+import com.hongte.alms.base.service.TuandaiProjectInfoService;
 import com.hongte.alms.base.vo.module.ComplianceRepaymentVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.Constant;
@@ -47,6 +54,7 @@ import com.ht.ussp.util.BeanUtils;
 
 import io.swagger.annotations.ApiOperation;
 
+//@CrossOrigin
 @Controller
 @RequestMapping("/tdrepayRecharge")
 public class TdrepayRechargeController {
@@ -71,6 +79,13 @@ public class TdrepayRechargeController {
 	@Autowired
 	@Qualifier("IssueSendOutsideLogService")
 	private IssueSendOutsideLogService issueSendOutsideLogService;
+
+	@Autowired
+	@Qualifier("TuandaiProjectInfoService")
+	private TuandaiProjectInfoService tuandaiProjectInfoService;
+
+	@Autowired
+	private EipRemote eipRemote;
 
 	@SuppressWarnings("rawtypes")
 	@ApiOperation(value = "代充值资金分发参数接入接口")
@@ -407,27 +422,196 @@ public class TdrepayRechargeController {
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@ApiOperation(value = "标的还款信息查询接口")
-	@PostMapping("/getProjectPayment")
+	@GetMapping("/getProjectPayment")
 	@ResponseBody
-	public Result<TdProjectPaymentInfoResult> getProjectPayment(@RequestBody String projectId) {
+	public Result<Map<String, Object>> getProjectPayment(@RequestParam("projectId") String projectId) {
 		if (StringUtil.isEmpty(projectId)) {
 			return Result.error("-99", "标ID不能为空");
 		}
-		
+
 		try {
 
 			com.ht.ussp.core.Result result = tdrepayRechargeService.remoteGetProjectPayment(projectId);
 
+			Map<String, Object> paramMap = new HashMap<>();
+			Map<String, Object> paramMap2 = new HashMap<>();
+			Map<String, Object> resultMap = new HashMap<>();
+			paramMap.put("projectId", projectId);
+
+			TuandaiProjectInfo info = tuandaiProjectInfoService.selectById(projectId);
+
+			paramMap2.put("userId", info.getTdUserId());
+			com.ht.ussp.core.Result resultActual = eipRemote.queryProjectPayment(paramMap);
+			com.ht.ussp.core.Result resultEarlier = eipRemote.queryRepaymentEarlier(paramMap);
+			com.ht.ussp.core.Result resultUserAviMoney = eipRemote.queryUserAviMoney(paramMap2);
+
+			List<TdProjectPaymentDTO> tdProjectPaymentDTOs = null;
+
 			TdProjectPaymentInfoResult tdProjectPaymentInfoResult = null;
-			if (result != null && !Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
-				tdProjectPaymentInfoResult = JSONObject.parseObject(
-						JSONObject.toJSONString(result.getData()), TdProjectPaymentInfoResult.class);
-				
+			if (result != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
+				tdProjectPaymentInfoResult = JSONObject.parseObject(JSONObject.toJSONString(result.getData()),
+						TdProjectPaymentInfoResult.class);
+				List<TdRefundMonthInfoDTO> periodsList = tdProjectPaymentInfoResult.getPeriodsList();
+				if (tdProjectPaymentInfoResult != null && CollectionUtils.isNotEmpty(periodsList)) {
+					for (TdRefundMonthInfoDTO tdRefundMonthInfoDTO : periodsList) {
+						Double amount = tdRefundMonthInfoDTO.getAmount() == null ? 0 : tdRefundMonthInfoDTO.getAmount();
+						Double interestAmout = tdRefundMonthInfoDTO.getInterestAmout() == null ? 0
+								: tdRefundMonthInfoDTO.getInterestAmout();
+						Double overdueAmount = tdRefundMonthInfoDTO.getOverdueAmount() == null ? 0
+								: tdRefundMonthInfoDTO.getOverdueAmount();
+						Double advanceAmount = tdRefundMonthInfoDTO.getAdvanceAmount() == null ? 0
+								: tdRefundMonthInfoDTO.getAdvanceAmount();
+						tdRefundMonthInfoDTO
+								.setTotal(BigDecimal.valueOf(amount + interestAmout + overdueAmount + advanceAmount)
+										.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+
+						switch (tdRefundMonthInfoDTO.getStatus()) {
+						case 1:
+							tdRefundMonthInfoDTO.setStatusStr("已还款");
+							break;
+						case 2:
+							tdRefundMonthInfoDTO.setStatusStr("逾期");
+							break;
+						case 3:
+							tdRefundMonthInfoDTO.setStatusStr("待还款");
+							break;
+
+						default:
+							break;
+						}
+
+					}
+				}
+
+				resultMap.put("periodsList", periodsList);
+
+				if (resultActual != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(resultActual.getReturnCode())
+						&& resultActual.getData() != null) {
+
+					JSONObject parseObject = (JSONObject) JSONObject.toJSON(resultActual.getData());
+					if (parseObject.get("projectPayments") != null) {
+						tdProjectPaymentDTOs = JSONObject.parseArray(
+								JSONObject.toJSONString(parseObject.get("projectPayments")), TdProjectPaymentDTO.class);
+					}
+				}
+
+				if (resultEarlier != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(resultEarlier.getReturnCode())
+						&& resultEarlier.getData() != null) {
+					resultMap.putAll(
+							JSONObject.parseObject(JSONObject.toJSONString(resultEarlier.getData()), Map.class));
+				}
+
+				if (resultUserAviMoney != null
+						&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(resultUserAviMoney.getReturnCode())
+						&& resultUserAviMoney.getData() != null) {
+					resultMap.put("aviMoney",
+							JSONObject.parseObject(JSONObject.toJSONString(resultUserAviMoney.getData()), Map.class));
+				}
 			}
 
-			return Result.success(tdProjectPaymentInfoResult);
+			if (CollectionUtils.isNotEmpty(tdProjectPaymentDTOs)) {
+				for (TdProjectPaymentDTO tdProjectPaymentDTO : tdProjectPaymentDTOs) {
+					switch (tdProjectPaymentDTO.getStatus()) {
+					case 0:
+						tdProjectPaymentDTO.setStatusStrActual("已结清");
+						break;
+					case 1:
+						tdProjectPaymentDTO.setStatusStrActual("逾期");
+						break;
+
+					default:
+						break;
+					}
+				}
+			}
+
+			resultMap.put("tdProjectPaymentDTOs", tdProjectPaymentDTOs);
+			return Result.success(resultMap);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error("-99", e.getMessage());
+		}
+	}
+
+	@ApiOperation(value = "根据业务ID获取标信息")
+	@GetMapping("/getProjectInfoByBusinessId")
+	@ResponseBody
+	public Result<List<TuandaiProjectInfo>> getProjectInfoByBusinessId(@RequestParam("businessId") String businessId) {
+		if (StringUtil.isEmpty(businessId)) {
+			return Result.error("-99", "业务编号不能为空");
+		}
+
+		try {
+			return Result.success(tuandaiProjectInfoService
+					.selectList(new EntityWrapper<TuandaiProjectInfo>().eq("business_id", businessId)));
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error("-99", e.getMessage());
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	@ApiOperation(value = "根据标ID获取垫付记录")
+	@GetMapping("/returnAdvanceShareProfit")
+	@ResponseBody
+	public Result<List<TdReturnAdvanceShareProfitDTO>> returnAdvanceShareProfit(
+			@RequestParam("projectId") String projectId) {
+		if (StringUtil.isEmpty(projectId)) {
+			return Result.error("-99", "标ID不能为空");
+		}
+
+		try {
+			Map<String, Object> paramMap = new HashMap<>();
+			paramMap.put("projectId", projectId);
+
+			com.ht.ussp.core.Result result = eipRemote.returnAdvanceShareProfit(paramMap);
+
+			if (result != null && result.getData() != null
+					&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
+				TdReturnAdvanceShareProfitResult returnAdvanceShareProfitResult = JSONObject
+						.parseObject(JSONObject.toJSONString(result.getData()), TdReturnAdvanceShareProfitResult.class);
+				List<TdReturnAdvanceShareProfitDTO> returnAdvanceShareProfits = returnAdvanceShareProfitResult.getReturnAdvanceShareProfits();
+				
+				if (CollectionUtils.isNotEmpty(returnAdvanceShareProfits)) {
+					for (TdReturnAdvanceShareProfitDTO tdReturnAdvanceShareProfitDTO : returnAdvanceShareProfits) {
+						switch (tdReturnAdvanceShareProfitDTO.getStatus()) {
+						case 1:
+							tdReturnAdvanceShareProfitDTO.setStatusStrActual("已结清");
+							break;
+						case 2:
+							tdReturnAdvanceShareProfitDTO.setStatusStrActual("未结清");
+							break;
+
+						default:
+							break;
+						}
+					}
+				}
+				
+				return Result.success(returnAdvanceShareProfits);
+			} else {
+				return Result.error("-99", "查询平台还垫付信息接口失败");
+			}
+
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error("-99", e.getMessage());
+		}
+	}
+	
+	@SuppressWarnings("rawtypes")
+	@ApiOperation(value = "查询资金分发记录")
+	@GetMapping("/queryDistributeFundRecord")
+	@ResponseBody
+	public Result queryDistributeFundRecord(@RequestParam("projectId") String projectId) {
+		try {
+			if (StringUtil.isEmpty(projectId)) {
+				return Result.error("-99", "标ID不能为空");
+			}
+			
+			return Result.success(tdrepayRechargeService.queryDistributeFundRecord(projectId));
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return Result.error("-99", e.getMessage());

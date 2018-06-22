@@ -71,7 +71,8 @@
 			        			<td v-if="item.repayment == '实际还款'" v-html="addEventForOtherFee(item)"></td>
 			        			<td v-else>{{ item.otherFee }}</td>
 			        			<td>{{ item.subtotal }}</td>
-			        			<td>{{ item.overdueDays }}</td>
+			        			<td v-if="item.repayment == '差额'"></td>
+			        			<td v-else>{{ item.overdueDays }}</td>
 			        			<td>{{ item.onlineLateFee }}</td>
 			        			<td>{{ item.offlineLateFee }}</td>
 			        			<td>{{ item.surplus }}</td>
@@ -166,12 +167,92 @@
 		        </tab-pane>
 		        
 		        <tab-pane label="平台实还" name="platformRealRepayment">
-		        	
+		        	<tabs :animated="true" @on-click="initProjectFunction($event)">
+						<tab-pane v-for="item in projectInfoList" :key="item.projectId" :label="item.realName" :name="item.projectId">
+							<row>
+								<i-col span='6'>标的号：{{ item.projectId }}</i-col>
+								<i-col span='4'>上标金额：{{ item.fullBorrowMoney?numeral(item.fullBorrowMoney).format('0,0.00'):0 }}</i-col>
+								<i-col span='4'>账户余额：{{ platformRepaymentInfoaviMoney?numeral(platformRepaymentInfoaviMoney).format('0,0.00'):0 }}</i-col>
+								<i-col span='10' >
+									结清应还本息平台费：{{ platformPrincipalAndInterestAndPlatformCharge?numeral(platformPrincipalAndInterestAndPlatformCharge).format('0,0.00'):0 }}，
+									本息：{{ platformPrincipalAndInterest?numeral(platformPrincipalAndInterest).format('0,0.00'):0 }}，
+									平台费：{{ platformRepaymentInfoPlatformCharge?numeral(platformRepaymentInfoPlatformCharge).format('0,0.00'):0 }}
+								</i-col>
+							</row>
+							
+							<row style="margin-top:1rem">
+								<p slot="title">
+						            <h3>标的应还计划</h3>
+						        </p>
+						    </row>
+							<i-table border :columns="platformRepaymentInfoColumns" :data="platformRepaymentInfoData" style="margin-top:1rem"></i-table>
+							
+							<row style="margin-top:1rem">
+								<p slot="title">
+						            <h3>标的实还计划</h3>
+						        </p>
+						    </row>
+							<i-table border :columns="platformActualRepaymentInfoColumns" :data="platformActualRepaymentInfoData" style="margin-top:1rem"></i-table>
+						</tab-pane>
+					</tabs>
 		        </tab-pane>
 		        
-		        <tab-pane label="垫付记录" name="advancesRecord"></tab-pane>
+		        <tab-pane label="垫付记录" name="advancesRecord">
+		        	<tabs :animated="true" @on-click="initAdvancePaymentFunction($event)">
+						<tab-pane v-for="item in projectInfoList" :key="item.projectId" :label="item.realName" :name="item.projectId">
+							<row>
+								<i-col span='6'>标的号：{{ item.projectId }}</i-col>
+								<i-col span='4'>上标金额：{{ item.fullBorrowMoney?numeral(item.fullBorrowMoney).format('0,0.00'):0 }}</i-col>
+							</row>
+							<i-table border :columns="advancePaymentInfoColumns" :data="advancePaymentInfoData" style="margin-top:1rem"></i-table>
+						</tab-pane>
+					</tabs>
+		        </tab-pane>
 		        
-		        <tab-pane label="资金分发记录" name="fundDistributionRecord"></tab-pane>
+		        <tab-pane label="资金分发记录" name="fundDistributionRecord">
+		        	<tabs :animated="true" @on-click="initDistributeFundRecordFunction">
+						<tab-pane v-for="item in projectInfoList" :key="item.projectId" :label="item.realName" :name="item.projectId">
+							<row>
+								<i-col span='6'>标的号：{{ item.projectId }}</i-col>
+								<i-col span='4'>上标金额：{{ item.fullBorrowMoney?numeral(item.fullBorrowMoney).format('0,0.00'):0 }}</i-col>
+								<i-col span='4'>客户姓名：{{ item.realName }}</i-col>
+							</row>
+							
+							<table class="layui-table">
+						        <thead>
+						            <tr>
+						                <th>期数</th>
+						                <th>实收日期</th>
+						                <th>实收金额</th>
+						                <th>资金分发日期</th>
+						                <th>资金分发金额</th>
+						                <th>资金分发费用项</th>
+						                <th>费用项金额</th>
+						                <th>处理结果</th>
+						                <th>备注</th>
+						            </tr>
+						        </thead>
+						        <tbody>
+						            <tr v-for='(item, index) in distributeFundRecordList' :key='index'>
+						                <td style="text-align:center">{{ item.period }}</td>
+						                <td style="text-align:center">{{ item.factRepayDateStr }}</td>
+						                <td style="text-align:center">{{ item.factRepayAmount?numeral(item.factRepayAmount).format('0,0.00'):0 }}</td>
+						                <td style="text-align:center">{{ item.createTimeStr }}</td>
+						                <td style="text-align:center">{{ item.rechargeAmount?numeral(item.rechargeAmount).format('0,0.00'):0 }}</td>
+						                <td class="td">
+						                    <div class="receive-inner-div" v-for='(subItem, subIndex) in item.details' :key='subIndex'>{{ subItem.feeName }}</div>
+						                </td>
+						                <td class="td">
+						                    <div class="receive-inner-div"  v-for='(subItem, subIndex) in item.details' :key='subIndex'>{{ subItem.feeValue?numeral(subItem.feeValue).format('0,0.00'):0 }}</div>
+						                </td>
+						                <td style="text-align:center">{{ item.processStatusStr }}</td>
+						                <td style="text-align:center">{{ item.remark }}</td>
+						            </tr>
+						        </tbody>
+						    </table>
+						</tab-pane>
+					</tabs>
+		        </tab-pane>
 		    </tabs>
 		</Card>
 	</div>

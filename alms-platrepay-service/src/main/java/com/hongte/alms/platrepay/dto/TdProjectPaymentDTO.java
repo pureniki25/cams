@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 
 /**
  * 标的还垫付信息每一期的详细信息
+ * 
  * @author 胡伟骞
  *
  */
@@ -19,6 +20,10 @@ public class TdProjectPaymentDTO implements Serializable {
 	 * 还款状态 1 已结清 0逾期
 	 */
 	private int status;
+	/**
+	 * 还款状态
+	 */
+	private String statusStrActual;
 	/**
 	 * 还款日期 yyyy-MM-dd
 	 */
@@ -79,6 +84,14 @@ public class TdProjectPaymentDTO implements Serializable {
 
 	public void setStatus(int status) {
 		this.status = status;
+	}
+
+	public String getStatusStrActual() {
+		return statusStrActual;
+	}
+
+	public void setStatusStrActual(String statusStrActual) {
+		this.statusStrActual = statusStrActual;
 	}
 
 	public String getAddDate() {
@@ -171,12 +184,12 @@ public class TdProjectPaymentDTO implements Serializable {
 
 	@Override
 	public String toString() {
-		return "TdProjectPaymentDTO [period=" + period + ", status=" + status + ", addDate=" + addDate
-				+ ", totalAmount=" + totalAmount + ", principalAndInterest=" + principalAndInterest + ", tuandaiAmount="
-				+ tuandaiAmount + ", orgAmount=" + orgAmount + ", guaranteeAmount=" + guaranteeAmount
-				+ ", arbitrationAmount=" + arbitrationAmount + ", agencyAmount=" + agencyAmount + ", penaltyAmount="
-				+ penaltyAmount + ", borrowerPayment=" + borrowerPayment + ", guaranteePayment=" + guaranteePayment
-				+ "]";
+		return "TdProjectPaymentDTO [period=" + period + ", status=" + status + ", statusStrActual=" + statusStrActual
+				+ ", addDate=" + addDate + ", totalAmount=" + totalAmount + ", principalAndInterest="
+				+ principalAndInterest + ", tuandaiAmount=" + tuandaiAmount + ", orgAmount=" + orgAmount
+				+ ", guaranteeAmount=" + guaranteeAmount + ", arbitrationAmount=" + arbitrationAmount
+				+ ", agencyAmount=" + agencyAmount + ", penaltyAmount=" + penaltyAmount + ", borrowerPayment="
+				+ borrowerPayment + ", guaranteePayment=" + guaranteePayment + "]";
 	}
 
 }
