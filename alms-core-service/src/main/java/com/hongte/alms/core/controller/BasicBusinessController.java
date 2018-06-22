@@ -4,16 +4,11 @@ package com.hongte.alms.core.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.hongte.alms.base.entity.BasicBusiness;
-import com.hongte.alms.base.entity.CarDrag;
-import com.hongte.alms.base.entity.CarReturnReg;
-import com.hongte.alms.base.entity.SysParameter;
+import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
-import com.hongte.alms.base.service.BasicBusinessService;
-import com.hongte.alms.base.service.CarDragService;
-import com.hongte.alms.base.service.CarReturnRegService;
-import com.hongte.alms.base.service.SysParameterService;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanSettleStatusEnum;
+import com.hongte.alms.base.service.*;
 import com.hongte.alms.base.vo.module.BasicBusinessVo;
 import com.hongte.alms.base.vo.module.LiquidationVO;
 import com.hongte.alms.base.vo.module.LitigationVO;
@@ -52,6 +47,12 @@ public class BasicBusinessController {
     BasicBusinessService basicBusinessService;
 
     @Autowired
+    @Qualifier("RepaymentBizPlanService")
+    RepaymentBizPlanService repaymentBizPlanService;
+
+
+
+    @Autowired
     @Qualifier("SysParameterService")
     SysParameterService sysParameterService;
     
@@ -77,6 +78,16 @@ public class BasicBusinessController {
 
             List<SysParameter> repartmentType = sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterTypeEnums.REPAYMENT_TYPE.getKey()).eq("param_value",business.getRepaymentTypeId()));
             List<SysParameter> unit = sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterTypeEnums.BORROW_LIMIT_UNIT.getKey()).eq("param_value",business.getBorrowLimitUnit()));
+
+            //根据业务还款计划判断业务还款状态
+            List<RepaymentBizPlan> plans =  repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",business.getBusinessId()));
+            vo.setStatus("已结清");
+            for(RepaymentBizPlan plan: plans){
+                if(plan.getPlanStatus().equals(RepayPlanSettleStatusEnum.REPAYINF.getValue())){
+                    vo.setStatus("还款中");
+                    break;
+                }
+            }
 
 
             if(repartmentType.size()>0){

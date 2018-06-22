@@ -87,6 +87,14 @@ window.layinit(function (htConfig) {
                 this.modalAction= '新增'
                 this.editLogForm.ifSendToPlat = '否'
             },
+            addShow(){
+                if(this.businessInfForm.status=="还款中"){
+                    return true;
+                }else{
+                    return false;
+                }
+
+            },
             initConditionDescList:function(){
  			   axios.get(basePath + 'businessParameter/queryConditionDesc')
                 .then(function (res) {
@@ -225,6 +233,7 @@ var getBusinessData = function () {
                 vm.businessInfForm.borrowMoney = res.data.data.borrowMoney;
                 vm.businessInfForm.repaymentType = res.data.data.repaymentTypeName;
                 vm.businessInfForm.borrowLimit = res.data.data.borrowLimitStr;
+                vm.businessInfForm.status = res.data.data.status;
                 vm.statusList = res.data.data.collectionTackLogStatu;
 
 

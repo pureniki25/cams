@@ -21,6 +21,9 @@ public class BasicBusinessVo extends BasicBusiness{
     //贷后跟踪记录的状态
     private List<SysParameter> collectionTackLogStatu;
 
+    //还款状态：还款中，已结清
+    private String status;
+
 
 
 
@@ -56,5 +59,13 @@ public class BasicBusinessVo extends BasicBusiness{
 
     public void setCollectionTackLogStatu(List<SysParameter> collectionTackLogStatu) {
         this.collectionTackLogStatu = collectionTackLogStatu;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
