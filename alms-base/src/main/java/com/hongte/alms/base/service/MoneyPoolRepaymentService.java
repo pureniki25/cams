@@ -2,6 +2,7 @@ package com.hongte.alms.base.service;
 
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.collection.vo.CollectionTrackLogVo;
+import com.hongte.alms.base.customer.vo.CustomerRepayFlowDto;
 import com.hongte.alms.base.customer.vo.CustomerRepayFlowExel;
 import com.hongte.alms.base.customer.vo.CustomerRepayFlowListReq;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
@@ -34,5 +35,5 @@ public interface MoneyPoolRepaymentService extends BaseService<MoneyPoolRepaymen
 	 */
 	List<CustomerRepayFlowExel> getCustomerRepayFlowList(CustomerRepayFlowListReq customerRepayFlowListReq);
 
-    Page<CollectionTrackLogVo> getCustomerRepayFlowPageList(CustomerRepayFlowListReq customerRepayFlowListReq);
+    Page<CustomerRepayFlowDto> getCustomerRepayFlowPageList(CustomerRepayFlowListReq customerRepayFlowListReq);
 }

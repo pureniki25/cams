@@ -124,6 +124,7 @@
         t.trade_date AS tradeDate,
         t.trade_type AS tradeType,
         t.bank_account AS bankAccount,
+        t.certificate_picture_url AS certificatePictureUrl,
         t.state AS state
         FROM
         tb_money_pool_repayment t
@@ -155,10 +156,10 @@
             AND  t.operate_name like #{customerName}
         </if>
         <if test="bankAccount !=null">
-            AND  t.bank_account like #{bankAccount}
+            AND  t.bank_account = #{bankAccount}
         </if>
         <if test="accountMoney !=null">
-            AND  t.account_money like #{accountMoney}
+            AND  t.account_money = #{accountMoney}
         </if>
        limit ${(page-1)*limit} , ${limit}
     </select>
@@ -196,10 +197,10 @@
             AND  t.operate_name like #{customerName}
         </if>
         <if test="bankAccount !=null">
-            AND  t.bank_account like #{bankAccount}
+            AND  t.bank_account = #{bankAccount}
         </if>
         <if test="accountMoney !=null">
-            AND  t.account_money like #{accountMoney}
+            AND  t.account_money = #{accountMoney}
         </if>
     </select>
     <select id="getCustomerRepayFlowList" parameterType="com.hongte.alms.base.customer.vo.CustomerRepayFlowListReq"
@@ -249,10 +250,10 @@
             AND  t.operate_name like #{customerName}
         </if>
         <if test="bankAccount !=null">
-            AND  t.bank_account like #{bankAccount}
+            AND  t.bank_account = #{bankAccount}
         </if>
         <if test="accountMoney !=null">
-            AND  t.account_money like #{accountMoney}
+            AND  t.account_money = #{accountMoney}
         </if>
     </select>
 
