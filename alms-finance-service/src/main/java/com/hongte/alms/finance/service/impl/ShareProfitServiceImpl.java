@@ -283,15 +283,20 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			}
 		}
 		
-		
-		// 银行代扣 or 线下代扣
+
+		// repaySource {20：自动线下代扣已还款，21，人工线下代扣已还款，30：自动银行代扣已还款，31：人工银行代扣已还款}
 		if(logIds!=null&&logIds.size()>0) {
 			WithholdingRepaymentLog log=withholdingRepaymentLogService.selectById(logIds.get(0));
 			String repaySource="30";
-			if(log.getBindPlatformId()==PlatformEnum.YH_FORM.getValue()) {//银行代扣
+			if(log.getBindPlatformId()==PlatformEnum.YH_FORM.getValue()&&log.getCreateUser().equals("auto_run")) {//自动银行代扣已还款
 				repaySource="30";
-			}else {//线下代扣
+			}else if(log.getBindPlatformId()==PlatformEnum.YH_FORM.getValue()&&(!log.getCreateUser().equals("auto_run"))) {//人工银行代扣已还款
+				repaySource="31";
+			}else if(log.getBindPlatformId()!=PlatformEnum.YH_FORM.getValue()&&log.getCreateUser().equals("auto_run")) {//20：自动线下代扣已还款
 				repaySource="20";
+			}
+			else if(log.getBindPlatformId()!=PlatformEnum.YH_FORM.getValue()&&(!log.getCreateUser().equals("auto_run"))){//21，人工线下代扣已还款
+				repaySource="21";
 			}
 			RepaymentResource temp=repaymentResourceService.selectOne(new EntityWrapper<RepaymentResource>().eq("business_id", log.getOriginalBusinessId())
 					.eq("after_id", log.getAfterId()).eq("repay_source_ref_id", log.getLogId()).eq("repay_source", repaySource));
@@ -330,6 +335,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			repaymentResources.get().add(repaymentResource);
 			
 		}
+		
 		if (surplus != null && surplus.compareTo(new BigDecimal("0")) > 0) {
 			BigDecimal canUseSurplus = accountantOverRepayLogService.caluCanUse(businessId.get(), null);
 			if (surplus.compareTo(canUseSurplus) > 0) {
