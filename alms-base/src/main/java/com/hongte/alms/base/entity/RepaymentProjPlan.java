@@ -196,6 +196,37 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 	@ApiModelProperty(required= true,value = "资产端上标编号")
 	private String requestNo;
 	
+	/**
+     * 进位方式标志位 0：进一位，1：不进位，4：四舍五入, 6:银行家舍入法
+     */
+	@TableField("rondmode")
+	@ApiModelProperty(required= true,value = "进位方式标志位 ")
+	private Integer rondmode;
+	
+	/**
+     * 计算保留的小数位数
+     */
+	@TableField("small_num")
+	@ApiModelProperty(required= true,value = "保留的小数位数")
+	private Integer smallNum;
+
+	
+
+	public Integer getRondmode() {
+		return rondmode;
+	}
+
+	public void setRondmode(Integer rondmode) {
+		this.rondmode = rondmode;
+	}
+
+	public Integer getSmallNum() {
+		return smallNum;
+	}
+
+	public void setSmallNum(Integer smallNum) {
+		this.smallNum = smallNum;
+	}
 
 	public String getRequestNo() {
 		return requestNo;
