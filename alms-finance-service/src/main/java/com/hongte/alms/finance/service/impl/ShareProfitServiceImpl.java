@@ -7,6 +7,7 @@ import java.util.*;
 
 import com.hongte.alms.base.RepayPlan.dto.*;
 import com.hongte.alms.base.entity.*;
+import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanRepaySrcEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -254,15 +255,24 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			lackAmount.set(repayPlanAmount.get().subtract(repayFactAmount.get()));
 			logger.info("lackAmount={}",lackAmount.get());
 		}
-		//计算标在业务中的占比
-		caluProportion(planDto.get());
+
 		//分配线上输入的滞纳金
-//		divideOveryDueMoneyNew(req.getOfflineOverDue(), planDto.get(), false);
-//		divideOveryDueMoneyNew(req.getOnlineOverDue(), planDto.get(), true);
-		divideOveryDueMoney(req.getOfflineOverDue(), planDto.get(), false);
-		divideOveryDueMoney(req.getOnlineOverDue(), planDto.get(), true);
+		divideOveryDueMoneyNew(req.getOfflineOverDue(), planDto.get(), false);
+		divideOveryDueMoneyNew(req.getOnlineOverDue(), planDto.get(), true);
+
 		//填充信息
-		fill();
+		fillNew();
+
+		///////   就的分润方法  均分  开始 ==========
+		//计算标在业务中的占比
+//		caluProportion(planDto.get());
+		//分配线上输入的滞纳金
+//		divideOveryDueMoney(req.getOfflineOverDue(), planDto.get(), false);
+//		divideOveryDueMoney(req.getOnlineOverDue(), planDto.get(), true);
+		//填充信息
+//		fill();
+		///////   就的分润方法  均分  结束 ==========
+
 		if (save) {
 			updateStatus();
 		}
@@ -319,7 +329,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		if(logIds!=null&&logIds.size()>0) {
 			WithholdingRepaymentLog log=withholdingRepaymentLogService.selectById(logIds.get(0));
 			String repaySource="30";
-			if(log.getBindPlatformId()==PlatformEnum.YH_FORM.getValue()) {//银行代扣
+			if(log.getBindPlatformId()== PlatformEnum.YH_FORM.getValue()) {//银行代扣
 				repaySource="30";
 			}else {//线下代扣
 				repaySource="20";
@@ -942,9 +952,12 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	private void fillNew() {
 		RepaymentBizPlanDto dto = planDto.get();
 
+		//上一次还款是否成功的标志位
+		boolean lastPaySuc = true;
 
 		//1.优先还  界面设置的线上滞纳金
 		for (int i = 0; i < dto.getProjPlanDtos().size(); i++) {
+			if(lastPaySuc == false) return;
 			RepaymentProjPlanDto  repaymentProjPlanDto = dto.getProjPlanDtos().get(i);
 			String projectId = repaymentProjPlanDto.getTuandaiProjectInfo().getProjectId();
 			CurrPeriodProjDetailVO currPeriodProjDetailVO = getCurrPeriodProjDetailVO(projectId);
@@ -963,20 +976,81 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 								repaymentProjPlanListDetailDto.getRepaymentProjPlanListDetail();
 
 						//找到线上滞纳金这一费用项
-						if(detail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
-//							payOneFeeDetail
+						if(detail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
+							 boolean bl = payOneFeeDetail( detail, currPeriodProjDetailVO, onLineOverDue);
+							 if(bl && realPayedAmount.get()!=null){
+								 onLineOverDue = onLineOverDue.divide(realPayedAmount.get());
+							 }else{
+							 	lastPaySuc = false;
+							 	break;
+							 }
 						}
-
 					}
 				}
-
 			}
 		}
 
 		//2.再还 界面设置的线下滞纳金
+		for (int i = 0; i < dto.getProjPlanDtos().size(); i++) {
+			if(lastPaySuc == false) return;
+			RepaymentProjPlanDto  repaymentProjPlanDto = dto.getProjPlanDtos().get(i);
+			String projectId = repaymentProjPlanDto.getTuandaiProjectInfo().getProjectId();
+			CurrPeriodProjDetailVO currPeriodProjDetailVO = getCurrPeriodProjDetailVO(projectId);
+
+			if(repaymentProjPlanDto.getOfflineOverDue()!=null &&
+					repaymentProjPlanDto.getOfflineOverDue().compareTo(new BigDecimal("0"))>0){
+				//需要还的线下滞纳金
+				BigDecimal onLineOverDue = repaymentProjPlanDto.getOfflineOverDue();
+				List<RepaymentProjPlanListDto> repaymentProjPlanListDtos = repaymentProjPlanDto.getProjPlanListDtos();
+				//遍历标的还款计划
+				for(RepaymentProjPlanListDto repaymentProjPlanListDto:repaymentProjPlanListDtos){
+					List<RepaymentProjPlanListDetailDto> repaymentProjPlanListDetailDtos = repaymentProjPlanListDto.getRepaymentProjPlanListDetailDtos();
+					//遍历这个标的每一期还款计划，费用细项
+					for(RepaymentProjPlanListDetailDto repaymentProjPlanListDetailDto: repaymentProjPlanListDetailDtos){
+						RepaymentProjPlanListDetail detail =
+								repaymentProjPlanListDetailDto.getRepaymentProjPlanListDetail();
+						//找到线下滞纳金这一费用项
+						if(detail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
+							boolean bl = payOneFeeDetail( detail, currPeriodProjDetailVO, onLineOverDue);
+							if(bl && realPayedAmount.get()!=null){
+								onLineOverDue = onLineOverDue.divide(realPayedAmount.get());
+								if(onLineOverDue.compareTo(new BigDecimal("0"))<0){
+									logger.error("还线上滞纳金还多了：repaymentProjPlanDto:[{}]",JSON.toJSONString(repaymentProjPlanDto));
+								}
+							}else{
+								lastPaySuc = false;
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
 
 		//3.最后按核销顺序还金额
+		for (int i = 0; i < dto.getProjPlanDtos().size(); i++) {
+			if(lastPaySuc == false) return;
+			RepaymentProjPlanDto  repaymentProjPlanDto = dto.getProjPlanDtos().get(i);
+			String projectId = repaymentProjPlanDto.getTuandaiProjectInfo().getProjectId();
+			CurrPeriodProjDetailVO currPeriodProjDetailVO = getCurrPeriodProjDetailVO(projectId);
 
+
+			List<RepaymentProjPlanListDto> repaymentProjPlanListDtos = repaymentProjPlanDto.getProjPlanListDtos();
+			//遍历标的还款计划
+			for(RepaymentProjPlanListDto repaymentProjPlanListDto:repaymentProjPlanListDtos){
+				List<RepaymentProjPlanListDetailDto> repaymentProjPlanListDetailDtos = repaymentProjPlanListDto.getRepaymentProjPlanListDetailDtos();
+//					//遍历这个标的每一期还款计划，费用细项
+				for(RepaymentProjPlanListDetailDto repaymentProjPlanListDetailDto: repaymentProjPlanListDetailDtos){
+					RepaymentProjPlanListDetail detail =
+							repaymentProjPlanListDetailDto.getRepaymentProjPlanListDetail();
+					boolean bl = payOneFeeDetail( detail, currPeriodProjDetailVO,null);
+					if(!bl){
+						lastPaySuc = false;
+						break;
+					}
+				}
+			}
+		}
 	}
 
 
@@ -1025,6 +1099,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			curalDivideAmount.set(curalDivideAmount.get().subtract(unpaid));
 			logger.info("divideAmount变为{}",curalDivideAmount);
 			createProjFactRepay(money, detail, currPeriodProjDetailVO,curalResource.get());
+			realPayed = money;
 		} else if (c == 0) {
 			logger.info("divideAmount等于unpaid");
 			logger.info("@@从divideAmount={}分unpaid={}到{}",curalDivideAmount,unpaid,detail.getPlanItemName());
@@ -1032,6 +1107,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			logger.info("divideAmount变为null",detail.getPlanItemName());
 			//创建实还流水
 			createProjFactRepay(money, detail, currPeriodProjDetailVO,curalResource.get());
+			realPayed = money;
 			//上一条还款来源的可用金额已用完，找下一条还款来源来用
 			curalDivideAmount = null;
 			setNewRepaymentResource(resourceIndex.get()+1);
@@ -1043,20 +1119,18 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			createProjFactRepay(money, detail, currPeriodProjDetailVO,curalResource.get());
 			curalDivideAmount = null;
 			boolean setBl =  setNewRepaymentResource(resourceIndex.get()+1);
-
-			//剩余未还完的
+			realPayed = money;
+			// 如果成功取到下一条还款流水  剩余未还完的继续还
 			if(setBl){
-
+				boolean pRet = payOneFeeDetail(detail,currPeriodProjDetailVO,unpaid);
+				if(pRet && realPayedAmount.get() != null){
+					realPayed =realPayed.add(realPayedAmount.get());
+				}
 			}
 		}
 
-
 		realPayedAmount.set(realPayed);
-
 		return true;
-
-
-
 	}
 
 	/**
