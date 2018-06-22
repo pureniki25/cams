@@ -54,7 +54,7 @@ import com.ht.ussp.util.BeanUtils;
 
 import io.swagger.annotations.ApiOperation;
 
-//@CrossOrigin
+@CrossOrigin
 @Controller
 @RequestMapping("/tdrepayRecharge")
 public class TdrepayRechargeController {
@@ -439,9 +439,9 @@ public class TdrepayRechargeController {
 			Map<String, Object> paramMap2 = new HashMap<>();
 			Map<String, Object> resultMap = new HashMap<>();
 			paramMap.put("projectId", projectId);
-			
+
 			TuandaiProjectInfo info = tuandaiProjectInfoService.selectById(projectId);
-			
+
 			paramMap2.put("userId", info.getTdUserId());
 			com.ht.ussp.core.Result resultActual = eipRemote.queryProjectPayment(paramMap);
 			com.ht.ussp.core.Result resultEarlier = eipRemote.queryRepaymentEarlier(paramMap);
@@ -499,12 +499,15 @@ public class TdrepayRechargeController {
 
 				if (resultEarlier != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(resultEarlier.getReturnCode())
 						&& resultEarlier.getData() != null) {
-					resultMap.putAll(JSONObject.parseObject(JSONObject.toJSONString(resultEarlier.getData()), Map.class));
+					resultMap.putAll(
+							JSONObject.parseObject(JSONObject.toJSONString(resultEarlier.getData()), Map.class));
 				}
-				
-				if (resultUserAviMoney != null  && Constant.REMOTE_EIP_SUCCESS_CODE.equals(resultUserAviMoney.getReturnCode())
+
+				if (resultUserAviMoney != null
+						&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(resultUserAviMoney.getReturnCode())
 						&& resultUserAviMoney.getData() != null) {
-					resultMap.put("aviMoney", JSONObject.parseObject(JSONObject.toJSONString(resultUserAviMoney.getData()), Map.class));
+					resultMap.put("aviMoney",
+							JSONObject.parseObject(JSONObject.toJSONString(resultUserAviMoney.getData()), Map.class));
 				}
 			}
 
@@ -543,6 +546,55 @@ public class TdrepayRechargeController {
 		try {
 			return Result.success(tuandaiProjectInfoService
 					.selectList(new EntityWrapper<TuandaiProjectInfo>().eq("business_id", businessId)));
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error("-99", e.getMessage());
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	@ApiOperation(value = "根据标ID获取垫付记录")
+	@GetMapping("/returnAdvanceShareProfit")
+	@ResponseBody
+	public Result<List<TdReturnAdvanceShareProfitDTO>> returnAdvanceShareProfit(
+			@RequestParam("projectId") String projectId) {
+		if (StringUtil.isEmpty(projectId)) {
+			return Result.error("-99", "标ID不能为空");
+		}
+
+		try {
+			Map<String, Object> paramMap = new HashMap<>();
+			paramMap.put("projectId", projectId);
+
+			com.ht.ussp.core.Result result = eipRemote.returnAdvanceShareProfit(paramMap);
+
+			if (result != null && result.getData() != null
+					&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
+				TdReturnAdvanceShareProfitResult returnAdvanceShareProfitResult = JSONObject
+						.parseObject(JSONObject.toJSONString(result.getData()), TdReturnAdvanceShareProfitResult.class);
+				List<TdReturnAdvanceShareProfitDTO> returnAdvanceShareProfits = returnAdvanceShareProfitResult.getReturnAdvanceShareProfits();
+				
+				if (CollectionUtils.isNotEmpty(returnAdvanceShareProfits)) {
+					for (TdReturnAdvanceShareProfitDTO tdReturnAdvanceShareProfitDTO : returnAdvanceShareProfits) {
+						switch (tdReturnAdvanceShareProfitDTO.getStatus()) {
+						case 1:
+							tdReturnAdvanceShareProfitDTO.setStatusStrActual("已结清");
+							break;
+						case 2:
+							tdReturnAdvanceShareProfitDTO.setStatusStrActual("未结清");
+							break;
+
+						default:
+							break;
+						}
+					}
+				}
+				
+				return Result.success(returnAdvanceShareProfits);
+			} else {
+				return Result.error("-99", "查询平台还垫付信息接口失败");
+			}
+
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return Result.error("-99", e.getMessage());
