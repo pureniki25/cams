@@ -45,8 +45,28 @@ window.layinit(function(htConfig) {
 		},
 
 		methods : {
+			/*
+			 * 标的还款信息查询接口
+			 */
 			getProjectPayment: function(projectId){
 				axios.get(basePath +"tdrepayRecharge/getProjectPayment?projectId=" + projectId)
+    	        .then(function (res) {
+    	            if (res.data.data != null && res.data.code == 1) {
+    	            	vm.platformRepaymentInfoData = res.data.data.resultList;
+    	            } else {
+    	            	vm.$Modal.error({content: res.data.msg });
+    	            }
+    	        })
+    	        .catch(function (error) {
+    	        	vm.$Modal.error({content: '接口调用异常!'});
+    	        });
+			},
+			
+			/*
+			 * 根据业务ID获取标信息
+			 */
+			getProjectInfoByBusinessId: function(businessId){
+				axios.get(basePath +"tdrepayRecharge/getProjectInfoByBusinessId?businessId=" + projectId)
     	        .then(function (res) {
     	            if (res.data.data != null && res.data.code == 1) {
     	            	vm.platformRepaymentInfoData = res.data.data.resultList;
@@ -61,7 +81,7 @@ window.layinit(function(htConfig) {
 		},
 
 		mounted: function() {
-			
+			this.getProjectInfoByBusinessId(businessId);
 		},
 
 	});
