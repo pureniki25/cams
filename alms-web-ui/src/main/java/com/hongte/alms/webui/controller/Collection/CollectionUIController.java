@@ -177,4 +177,16 @@ public class CollectionUIController {
    public String afterDetail(){
        return "/Collection/afterDetail";
    }
+
+    //代扣渠道列表
+    @RequestMapping("withholdChannel")
+    public String withholdChannel(){
+        return "/Collection/withholdChannelList";
+    }
+
+    //代扣渠道列表
+    @RequestMapping("withholdLimit")
+    public String withholdLimit(){
+        return "/Collection/withholdChannelList";
+    }
 }

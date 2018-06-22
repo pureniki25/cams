@@ -20,4 +20,34 @@
         channel_id AS channelId, channel_level, platform_id AS platformId, channel_status AS channelStatus, fail_times AS failTimes, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
     </sql>
 
+    <select id="getWithholdChannelPageList" parameterType="com.hongte.alms.base.vo.withhold.WithholdChannelListReq" resultType="com.hongte.alms.base.vo.withhold.WithholdChannelListVo">
+        SELECT
+            t1.channel_level AS channelLevel,
+            t1.channel_id AS channelId,
+            t2.platform_name AS platformName,
+            t1.channel_status AS channelStatus,
+            t1.fail_times AS failTimes
+        FROM
+            tb_withholding_channel t1
+        LEFT JOIN tb_withholding_platform t2 ON t1.platform_id = t2.platform_id
+        WHERE 1=1
+        <if test=" platformId !=null">
+           AND t2.platform_id=#{platformId}
+        </if>
+        limit ${(page-1)*limit} , ${limit}
+
+    </select>
+    <select id="countWithholdChannelPageList" resultType="int">
+        SELECT
+        count(1)
+        FROM
+        tb_withholding_channel t1
+        LEFT JOIN tb_withholding_platform t2 ON t1.platform_id = t2.platform_id
+        WHERE 1=1
+        <if test=" platformId !=null">
+            AND t2.platform_id=#{platformId}
+        </if>
+    </select>
+
+
 </mapper>

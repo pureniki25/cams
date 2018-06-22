@@ -44,7 +44,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/customer")
 @Api(tags = "CustomerRepayFlowController", description = "客户还款登记流水", hidden = true)
-@RefreshScope
 public class CustomerRepayFlowController {
     private static final Logger LOGGER = LoggerFactory.getLogger(CustomerRepayFlowController.class);
 
