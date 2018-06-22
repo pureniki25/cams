@@ -242,11 +242,71 @@ window.layinit(function (htConfig) {
             		key: 'statusStrActual',
             		align: 'center',
             	},
+        	],
+        	/*
+        	 * 平台标的实还计划
+        	 */
+        	platformActualRepaymentInfoData:[],
+        	
+        	/*
+             * 垫付记录表头
+             */
+        	advancePaymentInfoColumns:[
+            	{
+            		title: '期数',
+            		key: 'period',
+            		align: 'center',
+            	},
+            	{
+            		title: '还款日期',
+            		key: 'refundDate',
+            		align: 'center',
+            	},
+            	{
+            		title: '还款总金额',
+            		key: 'totalAmount',
+            		align: 'center',
+            	},
+            	{
+            		title: '本息',
+            		key: 'principalAndInterest',
+            		align: 'center',
+            	},
+            	{
+            		title: '平台服务费',
+            		key: 'tuandaiAmount',
+            		align: 'center',
+            	},
+            	{
+            		title: '资产端服务费',
+            		key: 'orgAmount',
+            		align: 'center',
+            	},
+            	{
+            		title: '担保公司服务费',
+            		key: 'guaranteeAmount',
+            		align: 'center',
+            	},
+            	{
+            		title: '仲裁服务费',
+            		key: 'arbitrationAmount',
+            		align: 'center',
+            	},
+            	{
+            		title: '逾期费用',
+            		key: 'overDueAmount',
+            		align: 'center',
+            	},
+            	{
+            		title: '状态',
+            		key: 'statusStrActual',
+            		align: 'center',
+            	},
             	],
             	/*
-            	 * 平台标的实还计划
+            	 * 垫付记录数据
             	 */
-            	platformActualRepaymentInfoData:[],
+            	advancePaymentInfoData:[],
             	
             	platformPrincipalAndInterest: '',	// 平台本息
             	platformPrincipalAndInterestAndPlatformCharge: '',	// 平台费用合计
@@ -279,7 +339,9 @@ window.layinit(function (htConfig) {
 						this.getProjectPayment(this.firstProjectId);
 					}
 				}else if (event == 'advancesRecord') {
-					
+					if (this.firstProjectId != '') {
+						this.returnAdvanceShareProfit(this.firstProjectId);
+					}
 				}else if (event == 'fundDistributionRecord') {
 					
 				}
@@ -288,6 +350,10 @@ window.layinit(function (htConfig) {
              * 标的初始化方法
              */
             initProjectFunction: function(event){
+            	this.getProjectPayment(event);
+            },
+            
+            initAdvancePaymentFunction: function(event){
             	this.getProjectPayment(event);
             },
             /*
@@ -514,6 +580,22 @@ window.layinit(function (htConfig) {
     	            	app.platformPrincipalAndInterest = res.data.data.principal + res.data.data.interest;
     	            	app.platformRepaymentInfoPlatformCharge = res.data.data.platformCharge;
     	            	app.platformPrincipalAndInterestAndPlatformCharge = res.data.data.principal + res.data.data.interest + res.data.data.platformCharge;
+    	            } else {
+    	            	app.$Modal.error({content: res.data.msg });
+    	            }
+    	        })
+    	        .catch(function (error) {
+    	        	app.$Modal.error({content: '接口调用异常!'});
+    	        });
+			},
+			/*
+			 * 根据标ID获取垫付记录
+			 */
+			returnAdvanceShareProfit: function(projectId){
+				axios.get(platRepayBasePath +"tdrepayRecharge/returnAdvanceShareProfit?projectId=" + projectId)
+    	        .then(function (res) {
+    	            if (res.data.data != null && res.data.code == 1) {
+    	            	app.advancePaymentInfoData = res.data.data;
     	            } else {
     	            	app.$Modal.error({content: res.data.msg });
     	            }
