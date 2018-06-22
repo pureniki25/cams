@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.vo.module.ComplianceRepaymentVO;
+import com.hongte.alms.platrepay.vo.DistributeFundRecordVO;
 import com.hongte.alms.platrepay.vo.TdrepayRechargeInfoVO;
 import com.ht.ussp.core.Result;
 
@@ -84,5 +85,12 @@ public interface TdrepayRechargeService {
 	 */
 	@SuppressWarnings("rawtypes")
 	Result remoteGetProjectPayment(String projectId);
+	
+	/**
+	 * 查询资金分发记录
+	 * @param projectId
+	 * @return
+	 */
+	List<DistributeFundRecordVO> queryDistributeFundRecord(String projectId);
 	
 }

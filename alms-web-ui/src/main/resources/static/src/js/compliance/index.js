@@ -339,7 +339,14 @@ window.layinit(function(htConfig) {
 				axios.post(basePath + 'tdrepayRecharge/userDistributeFund', vm.tdrepayRechargeInfoReqList)
 				.then(function(result){
 					if (result.data.code == "1") {
-						
+						vm.$Modal.success(
+							{   
+								content: '执行成功',
+								onOk: () => {
+									vm.queryComplianceRepaymentData();
+			                    },
+		                    }
+						);
 					} else {
 						vm.$Modal.error({ content: result.data.msg });
 					}

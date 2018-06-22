@@ -600,5 +600,22 @@ public class TdrepayRechargeController {
 			return Result.error("-99", e.getMessage());
 		}
 	}
+	
+	@SuppressWarnings("rawtypes")
+	@ApiOperation(value = "查询资金分发记录")
+	@GetMapping("/queryDistributeFundRecord")
+	@ResponseBody
+	public Result queryDistributeFundRecord(@RequestParam("projectId") String projectId) {
+		try {
+			if (StringUtil.isEmpty(projectId)) {
+				return Result.error("-99", "标ID不能为空");
+			}
+			
+			return Result.success(tdrepayRechargeService.queryDistributeFundRecord(projectId));
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error("-99", e.getMessage());
+		}
+	}
 
 }
