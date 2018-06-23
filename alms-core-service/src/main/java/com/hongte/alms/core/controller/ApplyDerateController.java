@@ -451,8 +451,8 @@ public class ApplyDerateController {
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			logger.error(ex.getMessage());
-			return Result.error("500", ex.getMessage());
+			logger.error("房贷:获取提前结清违约金出错"+ex);
+			return Result.error("500", ex.toString());
 		}
 
 	}
@@ -504,8 +504,8 @@ public class ApplyDerateController {
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			logger.error(ex.getMessage());
-			return Result.error("500", ex.getMessage());
+			logger.error("车贷:获取提前结清违约金"+ex.toString());
+			return Result.error("500", ex.toString());
 		}
 
 	}
