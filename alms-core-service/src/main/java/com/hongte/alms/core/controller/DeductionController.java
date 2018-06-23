@@ -144,6 +144,7 @@ public class DeductionController {
             //执行代扣信息
             DeductionVo deductionVo=  deductionService.selectDeductionInfoByPlanListId(planListId);
             deductionVo.setBankCardInfo(bankCardInfo);
+            deductionVo.setIdentifyCard(bankCardInfo.getIdentityNo());
             deductionVo.setStrType(business.getSrcType());
             if(deductionVo!=null) {
             	if(istLastPeriod(planList)) {
