@@ -274,9 +274,11 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 				//ContractDate=DateUtil.getDate("2018-04-03", "yyyy-MM-dd");
 			}
 		}
+		logger.info("出款日期："+ContractDate);
 		try {
 
 			if (businessTypeId.equals(BusinessTypeEnum.FSD_TYPE.getValue().toString())) {// 房贷
+				logger.info("计算提前违约金开始==========11111111111111");
 				// 无月收平台服务费
 				if (platformCount ==0) {
 					Date date1 = dateFormat.parse("2017-03-01");
@@ -319,7 +321,9 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 						}
 						// 出款日期在2017年6月5日至今 ,并且分公司服务费是按月收取的，提前还款违约金为:剩余本金*0.5%*剩余还款期数
 						if (outputDate.compareTo(date4) > 0 && monthCompanyAmount > 0) {
+							logger.info("计算提前违约金结束==========2222222");
 							preLateFees = vo.getPrincipal().doubleValue() * 0.005 * Integer.valueOf(restPeriods);
+							logger.info("计算提前违约金结束==========2222222");
 						}
 					} else {
 						preLateFees = Double.valueOf(0);
@@ -449,6 +453,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 			e.printStackTrace();
 		}
 		vo.setPenalty(BigDecimal.valueOf(preLateFees));
+		logger.info("计算提前违约金结束==========11111111111111");
 		return vo;
 	}
 
