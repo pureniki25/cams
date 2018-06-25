@@ -19,6 +19,7 @@ import com.hongte.alms.common.util.StringUtil;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.LoginInfoDto;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -395,6 +396,7 @@ public class CollectionTransferController {
 
 	}
 
+	@ApiModelProperty("同步上门催收数据")
 	@GetMapping("/transferVisit")
 	@ResponseBody
 	public Result transferVisitCollection(){
