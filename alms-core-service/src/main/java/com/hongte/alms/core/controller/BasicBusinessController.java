@@ -49,6 +49,11 @@ public class BasicBusinessController {
     @Qualifier("RepaymentBizPlanService")
     RepaymentBizPlanService repaymentBizPlanService;
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> c58df3dc5dc038ac638b79c2f0e2c1305dfda5c9
     @Autowired
     @Qualifier("SysParameterService")
     SysParameterService sysParameterService;

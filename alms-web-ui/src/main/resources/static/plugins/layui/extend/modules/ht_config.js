@@ -18,6 +18,7 @@ layui.define(function (exports) {
         , loadBtnAndTabUrl: base + "uc/auth/loadBtnAndTab"
         , loginUrl: base + "uaa/auth/login"
         , refreshTokenUrl: base + "uaa/auth/token"
+        , loadSelfinfoUrl: base + "uc/user/in/selfinfo"   //查询用户个人信息
         ,instanceId:instanceId
 
         //--------------   切换是否使用网关 --------------

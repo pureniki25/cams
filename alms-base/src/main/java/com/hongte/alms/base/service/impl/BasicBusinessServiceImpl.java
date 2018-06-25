@@ -274,9 +274,11 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 				//ContractDate=DateUtil.getDate("2018-04-03", "yyyy-MM-dd");
 			}
 		}
+		logger.info("出款日期："+ContractDate);
 		try {
 
 			if (businessTypeId.equals(BusinessTypeEnum.FSD_TYPE.getValue().toString())) {// 房贷
+				logger.info("计算提前违约金开始==========11111111111111");
 				// 无月收平台服务费
 				if (platformCount ==0) {
 					Date date1 = dateFormat.parse("2017-03-01");
@@ -285,19 +287,19 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 					Date date4 = dateFormat.parse("2017-06-05");
 					if (repayType.equals(RepayTypeEnum.EQUAL_AMOUNT_INTEREST.getValue().toString())) {
 						// 出款日期在2017年3月之前并且分公司服务费是一次性收取的，提前还款违约金为0
-						if (outputDate.compareTo(date1) < 0 && monthCompanyAmount == 0) {
+						if (ContractDate.compareTo(date1) < 0 && monthCompanyAmount == 0) {
 							preLateFees=Double.valueOf(0);
 						}
 						// 出款日期在2017年3月和2017年12月4日之间并且分公司服务费是按月收取的，提前还款违约金为:分公司服务费剩余的还款期数综合，但是不超过剩余本金的6%；超过的按6%收取
-						if (outputDate.compareTo(date1) > 0 && outputDate.compareTo(date2) <= 0
+						if (ContractDate.compareTo(date1) > 0 && ContractDate.compareTo(date2) <= 0
 								&& monthCompanyAmount > 0) {
 							preLateFees = vo.getPenalty().doubleValue();
 						}
 						// 出款日期在2017年12月5日至今
 						// ,并且分公司服务费是按月收取的，提前还款违约金为:借款日起半年内结清，收取剩余本金的4%，超过半年不足1年的收取2%，超过一年结清的不收取
-						if (outputDate.compareTo(date3) > 0 && monthCompanyAmount > 0) {
+						if (ContractDate.compareTo(date3) > 0 && monthCompanyAmount > 0) {
 							Calendar c = Calendar.getInstance();
-							c.setTime(outputDate);
+							c.setTime(ContractDate);
 							c.add(Calendar.MONTH, 6);
 							Date halfYeahDate = c.getTime();
 							c.add(Calendar.MONTH, 6);
@@ -314,12 +316,14 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 
 					} else if (repayType.equals(String.valueOf(RepayTypeEnum.FIRST_INTEREST.getValue().toString()))||repayType.equals(String.valueOf(RepayTypeEnum.EXPIRY_INTEREST.getValue().toString()))) {// 先息后本
 						// 出款日期在2017年6月5日之前 ,并且分公司服务费是按月收取的，提前还款违约金为:0
-						if (outputDate.compareTo(date4) < 0 && monthCompanyAmount > 0) {
+						if (ContractDate.compareTo(date4) < 0 && monthCompanyAmount > 0) {
 							preLateFees = Double.valueOf(0);
 						}
 						// 出款日期在2017年6月5日至今 ,并且分公司服务费是按月收取的，提前还款违约金为:剩余本金*0.5%*剩余还款期数
-						if (outputDate.compareTo(date4) > 0 && monthCompanyAmount > 0) {
+						if (ContractDate.compareTo(date4) > 0 && monthCompanyAmount > 0) {
+							logger.info("计算提前违约金结束==========2222222");
 							preLateFees = vo.getPrincipal().doubleValue() * 0.005 * Integer.valueOf(restPeriods);
+							logger.info("计算提前违约金结束==========2222222");
 						}
 					} else {
 						preLateFees = Double.valueOf(0);
@@ -449,6 +453,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 			e.printStackTrace();
 		}
 		vo.setPenalty(BigDecimal.valueOf(preLateFees));
+		logger.info("计算提前违约金结束==========11111111111111");
 		return vo;
 	}
 

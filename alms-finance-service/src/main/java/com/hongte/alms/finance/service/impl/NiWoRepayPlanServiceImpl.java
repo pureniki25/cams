@@ -333,7 +333,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 												repaymentBizPlanListService.updateById(pList);
 												
 												BigDecimal planAmountSum=getPlanAmountSum(planDetails);//当前期计划要还的总金额
-												BigDecimal afterRepayAmountSum=getPlanAmountSum(planDetails);//当前期已还总金额
+												BigDecimal afterRepayAmountSum=getRepayAmountSum(planDetails);//当前期已还总金额
 												
 												/*	
 												 * 同步完你我金融的当前期还款计划之后，如果当前期已还总金额等于当前期计划要还的总金额，并且同步之后的当前期已还总金额大于同步之前的当前期已还总金额
