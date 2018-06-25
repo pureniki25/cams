@@ -40,8 +40,6 @@ public class CollectionTransferController {
 
 	private static Boolean runningFlage = false;
 
-
-
 	@Autowired
 	@Qualifier("CollectionService")
 	private CollectionService collectionService;
