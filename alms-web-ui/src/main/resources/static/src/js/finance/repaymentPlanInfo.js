@@ -358,7 +358,7 @@ window.layinit(function (htConfig) {
             },
             
             initAdvancePaymentFunction: function(event){
-            	this.getProjectPayment(event);
+            	this.returnAdvanceShareProfit(event);
             },
             
             initDistributeFundRecordFunction: function(event){
@@ -621,7 +621,7 @@ window.layinit(function (htConfig) {
 			queryDistributeFundRecord: function(projectId){
 				axios.get(platRepayBasePath +"tdrepayRecharge/queryDistributeFundRecord?projectId=" + projectId)
     	        .then(function (res) {
-    	            if (res.data.data != null && res.data.code == 1 && res.data.data.length > 0) {
+    	            if (res.data.data != null && res.data.code == 1) {
     	            	app.distributeFundRecordList = res.data.data;
     	            } else {
     	            	app.$Modal.error({content: res.data.msg });
