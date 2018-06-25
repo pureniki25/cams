@@ -10,11 +10,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Api(tags = "CustomerRepayFlowController", description = "客户还款登记流水列表页")
 public class CustomerRepayFlowController {
     /**
-     * 合规化还款管理主页
+     * 客户还款流水主页
      * @return
      */
     @RequestMapping("/flowList")
     public String flowList() {
-        return "/finance/customerrepayflowlist";
+        return "/finance/customerRepayFlowList";
     }
+
+    /**
+     * 客户还款流水主页
+     * @return
+     */
+    @RequestMapping("/bankFlow")
+    public String bankFlow() {
+        return "/finance/bankWithholdRepayFlowList";
+    }
+
 }

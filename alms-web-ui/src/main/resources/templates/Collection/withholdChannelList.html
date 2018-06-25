@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+    <title>代扣渠道列表</title>
+    <script src="/properties/config.js"></script>
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
+    <!-- iview样式 -->
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
+    <!--@import url("//unpkg.com/iview/dist/styles/iview.css");-->
+    <!--<link rel="stylesheet" type="text/css" href="//unpkg.com/iview/dist/styles/iview.css"/>-->
+    <!-- 引入layui样式 -->
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all"/>
+
+    <!--   <script src="//unpkg.com/vue/dist/vue.js"></script>
+       <script src="//unpkg.com/iview/dist/iview.min.js"></script>-->
+    <!-- 引入vue -->
+    <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+    <!-- iview js -->
+    <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+    <!--引入layui.js-->
+    <script src="/plugins/layui/layui.js"></script>
+    <!--引入axios.js 用于ajax调用-->
+    <script src="/plugins/axios/axios.min.js"></script>
+    <!-- 引入jQuery，必须在appToken.js 之前引入 -->
+    <script src="/build/js/jquery-3.3.1.min.js"></script>
+    <!-- 设置全局请求头:app、Authorization -->
+    <script src="/build/js/appToken.js"></script>
+    <!--引入公共的一些方法-->
+    <script src="/src/js/comm.js"></script>
+
+
+</head>
+<body>
+<!--隐藏元素-->
+<!--<p id="staffType"  th:attr="value=${staffType}"  hidden />-->
+<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+<div id="app" v-cloak>
+
+    <!-- 搜索工具框 开始-->
+    <row style="padding: 10px">
+        <i-col span="24">
+            <Card>
+                <p slot="title">
+                    <Icon type="ios-search"></Icon>
+                    搜索条件
+                </p>
+
+                <div class="layui-btn-group" slot="extra">
+                    <i-button class="layui-btn layui-btn-sm" slot="extra" @click="toLoading" v-if="authValid('search')">
+                        <span v-if="!loading"><i class="layui-icon">&#xe615;</i>查询</span>
+                        <span v-else><i
+                                class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
+                    </i-button>
+                    <i-button class="layui-btn layui-btn-sm"  v-if="authValid('reset')" @click="handleReset('searchForm')">
+                        <span>重置</span>
+                    </i-button>
+                    <i-button class="layui-btn layui-btn-sm"  v-if="authValid('reset')" @click="handleReset('searchForm')">
+                        <span>新增</span>
+                    </i-button>
+                </div>
+
+
+                <row :gutter="16">
+                    <i-form ref="searchForm" :model="searchForm" label-position="right"
+                            :label-width="100">
+
+
+
+                        <i-col span="6">
+                            <form-item label="渠道：" prop="platformId">
+                                <i-select v-model="searchForm.platformId" clearable filterable>
+                                    <i-option v-for="item in platformType" :value="item.platformId" :key="item.platformId">{{
+                                        item.platformName }}
+                                    </i-option>
+                                </i-select>
+                            </form-item>
+                        </i-col>
+
+
+                    </i-form>
+                </row>
+            </Card>
+        </i-col>
+    </row>
+    <!-- 搜索工具框 结束-->
+
+    <!-- 表单Grid，使用layerUI的表格组件 开始 -->
+    <row style="padding: 10px">
+        <i-col span="24">
+            <!-- 使用方法渲染模式 -->
+            <table id="listTable" lay-filter="listTable"></table>
+            <script type="text/html" id="barTools">
+                <!--layui-btn layui-btn-xs-->
+                <a class="layui-btn layui-btn-normal layui-btn-xs " id="edit" lay-event="edit" ht-auth="edit">编辑</a>
+            </script>
+        </i-col>
+    </row>
+    <!-- 表单Grid，使用layerUI的表格组件 结束 -->
+
+
+
+
+</div>
+
+<script src="/src/js/collection/withholdChannelList.js"></script>
+<script>
+
+</script>
+</body>
+</html>

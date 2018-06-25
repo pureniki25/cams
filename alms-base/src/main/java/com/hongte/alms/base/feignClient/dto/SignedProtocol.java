@@ -9,7 +9,7 @@ import java.util.List;
  * 客户银行卡存管信息
  * @date: 2018/6/4
  */
-public class SignedProtocolList implements Serializable {
+public class SignedProtocol implements Serializable {
 	 private static final long serialVersionUID = -4095682638492039883L;
      private Integer channelType;
      private String channelName;

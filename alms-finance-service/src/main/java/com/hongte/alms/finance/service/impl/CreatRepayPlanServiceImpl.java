@@ -1095,6 +1095,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 Map<Integer, List<ProjFeeReq>>  map = new HashMap<>();
 
                 for(ProjFeeReq feeRe: projFeeReqs){
+                	if(feeRe.getChargeType()==RepayPlanChargeTypeEnum.ONE_TIME.getKey()) {
+                		continue;
+                	}
                     Integer feeType = feeRe.getFeeType();
                     List<ProjFeeReq> l = map.get(feeType);
                     if(l==null){

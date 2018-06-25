@@ -21,6 +21,7 @@ import com.hongte.alms.base.feignClient.dto.BankCardInfo;
 import com.hongte.alms.base.feignClient.dto.BankRechargeReqDto;
 import com.hongte.alms.base.feignClient.dto.BaofuRechargeReqDto;
 import com.hongte.alms.base.feignClient.dto.CustomerInfoDto;
+import com.hongte.alms.base.feignClient.dto.SignedProtocol;
 import com.hongte.alms.base.feignClient.dto.ThirdPlatform;
 import com.hongte.alms.base.feignClient.dto.YiBaoRechargeReqDto;
 import com.hongte.alms.base.service.BasicBusinessService;
@@ -293,9 +294,10 @@ public class RechargeServiceImpl implements RechargeService {
 				
 			}
 			if (channel.getPlatformId() == PlatformEnum.YH_FORM.getValue()) {
-				List<SysParameter> bankChannels = sysParameterService.selectList(
-						new EntityWrapper<SysParameter>().eq("param_type", SysParameterEnums.BANK_CHANNEL.getKey())
-								.eq("status", 1).orderBy("param_value2"));
+			  List<SignedProtocol> signedProtocolList= bankCardInfo.getSignedProtocolList();
+//				List<SysParameter> bankChannels = sysParameterService.selectList(
+//						new EntityWrapper<SysParameter>().eq("param_type", SysParameterEnums.BANK_CHANNEL.getKey())
+//								.eq("status", 1).orderBy("param_value2"));
 				
 				SysParameter  bankRepayTestResult = sysParameterService.selectOne(
 						new EntityWrapper<SysParameter>().eq("param_type", "bankRepayTest")
@@ -310,9 +312,9 @@ public class RechargeServiceImpl implements RechargeService {
 						BigDecimal.valueOf(amount));
 
 				BankRechargeReqDto dto = new BankRechargeReqDto();
-				for (SysParameter param : bankChannels) {// 需要循环子渠道
+				for (SignedProtocol signedProtocol : signedProtocolList) {// 需要循环签约子渠道
 					dto.setAmount(amount);
-					dto.setChannelType(param.getParamValue());// 子渠道
+					dto.setChannelType(signedProtocol.getChannelType().toString());// 子渠道
 					dto.setRechargeUserId(bankCardInfo.getPlatformUserID());
 					dto.setCmOrderNo(merchOrderId);
 					dto.setOidPartner(oidPartner);
