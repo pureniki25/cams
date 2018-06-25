@@ -50,11 +50,18 @@ public class DeductionVo {
     private BankCardInfo bankCardInfo;
     private BasicBusiness business;
     private RepaymentBizPlanList pList;
+    private boolean isCanUseThirty;//是否可以用第三方嗲口
     
     
     
-    
-    public BigDecimal getRepayAmount() {
+ 
+	public boolean isCanUseThirty() {
+		return isCanUseThirty;
+	}
+	public void setCanUseThirty(boolean isCanUseThirty) {
+		this.isCanUseThirty = isCanUseThirty;
+	}
+	public BigDecimal getRepayAmount() {
 		return repayAmount;
 	}
 	public void setRepayAmount(BigDecimal repayAmount) {

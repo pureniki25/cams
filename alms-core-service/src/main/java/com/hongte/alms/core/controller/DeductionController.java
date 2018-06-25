@@ -22,6 +22,7 @@ import com.hongte.alms.base.entity.WithholdingPlatform;
 import com.hongte.alms.base.entity.WithholdingRecordLog;
 import com.hongte.alms.base.entity.WithholdingRepaymentLog;
 import com.hongte.alms.base.enums.AreaLevel;
+import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.process.entity.Process;
@@ -50,6 +51,8 @@ import com.hongte.alms.common.util.EasyPoiExcelExportUtil;
 import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.vo.PageRequest;
 import com.hongte.alms.common.vo.PageResult;
+import com.mysql.cj.core.io.BigDecimalValueFactory;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -163,6 +166,24 @@ public class DeductionController {
             	BigDecimal underLineOverDueMoney=BigDecimal.valueOf(Double.valueOf(map.get("underLineOverDueMoney").toString()));
             	deductionVo.setOnLineOverDueMoney(onLineOverDueMoney);
             	deductionVo.setUnderLineOverDueMoney(underLineOverDueMoney);
+            	
+            	//查看当前期银行代扣的总金额
+        		List<WithholdingRepaymentLog> bankList=withholdingRepaymentLogService.selectList(new EntityWrapper<WithholdingRepaymentLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).ne("repay_status", 0).eq("bind_platform_id", PlatformEnum.YH_FORM.getValue()));
+        		BigDecimal bankRepayAmountSum=BigDecimal.valueOf(0);
+        		for(WithholdingRepaymentLog log:bankList) {
+        			bankRepayAmountSum=bankRepayAmountSum.add(log.getCurrentAmount()==null?BigDecimal.valueOf(0):log.getCurrentAmount());
+        		}
+        		//线上费用
+        		BigDecimal onLineAmount=BigDecimal.valueOf(deductionVo.getTotal()).subtract(underLineOverDueMoney);
+        		//如果是线上部分还款的话，不能使用第三方代扣线下费用
+        		if(bankRepayAmountSum.compareTo(BigDecimal.valueOf(0))>0&&bankRepayAmountSum.compareTo(onLineAmount)<0) {
+        			deductionVo.setCanUseThirty(false);
+        		}else {
+        			deductionVo.setCanUseThirty(true);
+        		}
+            	
+            	
+            	
             	//查看是否共借标，共借标不能银行代扣
         		//deductionVo.setIssueSplitType(business.getIssueSplitType());
             	if(business.getSrcType()!=null&&business.getSrcType()==2) {
