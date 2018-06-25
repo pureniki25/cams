@@ -521,14 +521,23 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         basicBusiness.setAssetId("ht_xindai");//默认为鸿特信贷中心
         basicBusiness.setSrcType(RepayPlanCreateSysEnum.ALMS.getValue());
         BasicBusiness  oldBasicBusiness = basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id",basicBusiness.getBusinessId()));
+        String isMainCustomerIdentityCard="";//主借款人身份证号码
+        for(int i=0;i<creatRepayPlanReq.getBizCusInfoReqs().size();i++) {
+        	if(creatRepayPlanReq.getBizCusInfoReqs().get(i).getIsmainCustomer()==1) {
+        		isMainCustomerIdentityCard=creatRepayPlanReq.getBizCusInfoReqs().get(i).getIdentifyCard();
+        	}
+        	
+        }
         if(oldBasicBusiness!=null){
             basicBusiness.setCreateUser(oldBasicBusiness.getCreateUser());
             basicBusiness.setCreateTime(oldBasicBusiness.getCreateTime());
             basicBusiness.setUpdateTime(new Date());
+            basicBusiness.setCustomerIdentifyCard(isMainCustomerIdentityCard);
             basicBusiness.setUpdateUser(Constant.ADMIN_ID);
         }else{
             basicBusiness.setCreateUser(Constant.ADMIN_ID);
             basicBusiness.setCreateTime(new Date());
+            basicBusiness.setCustomerIdentifyCard(isMainCustomerIdentityCard);
         }
         basicBusinessService.insertOrUpdate(basicBusiness);
 
@@ -1095,6 +1104,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 Map<Integer, List<ProjFeeReq>>  map = new HashMap<>();
 
                 for(ProjFeeReq feeRe: projFeeReqs){
+                	if(feeRe.getChargeType()==RepayPlanChargeTypeEnum.ONE_TIME.getKey()) {
+                		continue;
+                	}
                     Integer feeType = feeRe.getFeeType();
                     List<ProjFeeReq> l = map.get(feeType);
                     if(l==null){

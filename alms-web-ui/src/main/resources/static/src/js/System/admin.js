@@ -11,7 +11,8 @@ window.layinit(function (htConfig) {
 	   el: '#app',
 	   data: {
 		   // --- 按钮控制标识 start---
-		   syncCollectionLoading:false,
+		   syncCollectionLoading:false,  //同步电催分配数据的加载标志位
+           syncVisitCollectionLoading:false,  //同步上门催收分配数据的加载标志位
            synOneListColLoading:false,
            setUserPermissonsLoading:false,
            fiveLevelClassifyLoading:false,
@@ -28,7 +29,7 @@ window.layinit(function (htConfig) {
 
 	   },
 	   methods: {
-		   // 同步催收数据
+		   // 同步电催催收数据
 		   syncCollection:function(){
 			   this.syncCollectionLoading = true;
 			   axios.get(basePath +"alms/transfer",{timeout: 0})
@@ -47,6 +48,26 @@ window.layinit(function (htConfig) {
 		            vm.$Modal.error({content: '接口调用异常!'});
 		        });
 		   },
+           // 同步上门催收数据
+           syncVisitCollection:function(){
+               this.syncVisitCollectionLoading = true;
+               axios.get(basePath +"alms/transferVisit",{timeout: 0})
+                   .then(function (res) {
+                       vm.syncVisitCollectionLoading = false;
+                       if (res.data.data != null && res.data.code == 1) {
+                           vm.$Modal.success({
+                               content: res.data.msg
+                           });
+                       } else {
+                           vm.$Modal.error({content: res.data.msg });
+                       }
+                   })
+                   .catch(function (error) {
+                       vm.syncVisitCollectionLoading = false;
+                       vm.$Modal.error({content: '接口调用异常!'});
+                   });
+           },
+
 		   // 同步指定还款计划催收数据
 		   syncOneCollection:function(){
 			   this.synOneListColLoading = true;

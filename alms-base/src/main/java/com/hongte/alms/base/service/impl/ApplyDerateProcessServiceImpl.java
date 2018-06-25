@@ -493,7 +493,7 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
 				log.setReturnJsonDecrypt(JSON.toJSONString(respData));
 				log.setSystem("xindai");
 				log.setSendUrl(xindaiAplUrlUrl);
-				
+
 				issueSendOutsideLogService.insert(log);
 			}
 		});

@@ -57,6 +57,12 @@
                 </dl>
             </li>
             <li class="layui-nav-item">
+                <!-- 显示当前登录的用户名 -->
+                <a href="javascript:;" id="userName">
+                </a>
+            </li>
+            <li class="layui-nav-item">
+
             	<a href="javascript:;" id="changePwd">
                     <i class="fa fa-cog" aria-hidden="true"></i>
                    修改密码
@@ -155,6 +161,13 @@
              cookie.deleteRefreshToken();
              top.location.href = config.loginPath;
          });
+         //填充用户名
+        $.get(config.loadSelfinfoUrl, null, function (result) {
+            //表单数据填充
+            if (result.result) {
+                $("#userName").html(result.result.userName);
+            }
+        });
          
          $("#changePwd").on("click", function () {
              top.location.href = changePwdPath+"\?token="+cookie.getToken()+"&urls="+config.loginPath;

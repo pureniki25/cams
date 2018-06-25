@@ -57,6 +57,7 @@ var layer;
                     planAllAmount:"",//应还总额
                     repayAllAmount:"",//已还总额
                     restAmount:"",
+                    repayAmount:"",//本次代扣金额
                     repayingAmount:'',//代扣中金额
                     issueSplitType:'',
                     business:[],

@@ -41,7 +41,7 @@ public class TransferFailLog extends Model<TransferFailLog> {
 	private Integer failReason;
 
 	/**
-	 * 同步的类型：null/1:电催 催收数据同步； 2: 贷后跟踪记录同步
+	 * 同步的类型：null 电催 1：催收数据同步； 2: 贷后跟踪记录同步
 	 */
 	@TableField("trans_type")
 	@ApiModelProperty(required= true,value = "同步的类型：null/1:电催 催收数据同步； 2: 贷后跟踪记录同步")

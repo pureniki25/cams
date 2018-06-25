@@ -1,7 +1,12 @@
 package com.hongte.alms.core.controller;
 
 import java.util.List;
+import java.util.concurrent.Executor;
 
+import com.hongte.alms.base.collection.entity.Collection;
+import com.hongte.alms.common.exception.ExceptionCodeEnum;
+import com.hongte.alms.common.util.ListUtil;
+import io.swagger.annotations.ApiModelProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,15 +45,161 @@ public class AdminController {
 	@Qualifier("AdminService")
 	private AdminService adminService;
 
+	//设置用户权限对应关系的标志位
+	private  static Boolean setUserPermissionFlage = false;
+
+	//异步执行线程1执行标志位
+	private  static Boolean setUserPThread1Execute = false;
+	//异步执行线程2执行标志位
+	private  static Boolean setUserPThread2Execute = false;
+	//异步执行线程3执行标志位
+	private  static Boolean setUserPThread3Execute = false;
+	//异步执行线程4执行标志位
+	private  static Boolean setUserPThread4Execute = false;
+	//异步执行线程5执行标志位
+	private  static Boolean setUserPThread5Execute = false;
+
+	@Autowired
+	Executor executor;
+
+	@ApiModelProperty("设置所有用户的用户可访问业务对应关系")
 	@SuppressWarnings("rawtypes")
 	@RequestMapping("/userPermission")
 	public Result userPermission() {
 		try {
+			if(setUserPermissionFlage){
+				return Result.error(ExceptionCodeEnum.RUNING.getValue().toString(),"设置程序执行中，请等待");
+			}
+			setUserPermissionFlage = true;
 			List<SysUser> list = sysUserService.selectList(new EntityWrapper<SysUser>());
 
-			for (SysUser user : list) {
-				sysUserPermissionService.setUserPermissons(user.getUserId());
+			if(list!=null&& list.size()>0){
+				List<List<SysUser>>  averageList = ListUtil.averageAssign(list,5);
+
+				//第一条线程
+				List<SysUser>  list1 = averageList.get(0);
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+						setUserPThread1Execute=true;
+						try{
+							for (SysUser user : list1) {
+								sysUserPermissionService.setUserPermissons(user.getUserId());
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("设置用户业务对应关系信息异常："+e.getMessage());
+						}
+						setUserPThread1Execute =false;
+						if(!setUserPThread1Execute&& !setUserPThread2Execute&& !setUserPThread3Execute &&  !setUserPThread4Execute && !setUserPThread5Execute
+								){
+							setUserPermissionFlage =false;
+						}
+					}
+				});
+
+				//第二条线程
+				List<SysUser> list2 = averageList.get(1);
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+						setUserPThread2Execute=true;
+						try{
+							for (SysUser user : list2) {
+								sysUserPermissionService.setUserPermissons(user.getUserId());
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("设置用户业务对应关系信息异常："+e.getMessage());
+						}
+						setUserPThread2Execute =false;
+						if(!setUserPThread1Execute&& !setUserPThread2Execute&& !setUserPThread3Execute &&  !setUserPThread4Execute && !setUserPThread5Execute
+								){
+							setUserPermissionFlage =false;
+						}
+					}
+				});
+
+
+				//第三条线程
+				List<SysUser>  list3 = averageList.get(2);
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+						setUserPThread3Execute=true;
+						try{
+							for (SysUser user : list3) {
+								sysUserPermissionService.setUserPermissons(user.getUserId());
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("设置用户业务对应关系信息异常："+e.getMessage());
+						}
+						setUserPThread3Execute =false;
+						if(!setUserPThread1Execute&& !setUserPThread2Execute&& !setUserPThread3Execute &&  !setUserPThread4Execute && !setUserPThread5Execute
+								){
+							setUserPermissionFlage =false;
+						}
+					}
+				});
+
+				//第四条线程
+				List<SysUser>  list4 = averageList.get(3);
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+						setUserPThread4Execute=true;
+						try{
+							for (SysUser user : list4) {
+								sysUserPermissionService.setUserPermissons(user.getUserId());
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("设置用户业务对应关系信息异常："+e.getMessage());
+						}
+						setUserPThread4Execute =false;
+						if(!setUserPThread1Execute&& !setUserPThread2Execute&& !setUserPThread3Execute &&  !setUserPThread4Execute && !setUserPThread5Execute
+								){
+							setUserPermissionFlage =false;
+						}
+					}
+				});
+
+
+				//第五条线程
+				List<SysUser>   list5 = averageList.get(4);
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+						setUserPThread5Execute=true;
+						try{
+							for (SysUser user : list5) {
+								sysUserPermissionService.setUserPermissons(user.getUserId());
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("设置用户业务对应关系信息异常："+e.getMessage());
+						}
+						setUserPThread5Execute =false;
+						if(!setUserPThread1Execute&& !setUserPThread2Execute&& !setUserPThread3Execute &&  !setUserPThread4Execute && !setUserPThread5Execute
+								){
+							setUserPermissionFlage =false;
+						}
+					}
+				});
+
+
+			}else{
+				setUserPermissionFlage = false;
 			}
+
+//			for (SysUser user : list) {
+//				sysUserPermissionService.setUserPermissons(user.getUserId());
+//			}
+
+			Thread.sleep(10*1000);
+
+
 			return Result.success();
 		} catch (Exception e) {
 			LOGGER.error("--AdminController--设置所有用户可访问业务对照关系失败！", e);

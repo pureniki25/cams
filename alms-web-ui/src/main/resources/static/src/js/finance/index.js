@@ -249,6 +249,12 @@ window.layinit(function (htConfig) {
                                                         })
                                                     }
                                                     if (call == 'withhold') {debugger
+                                                    	 if (p.row.status == '已还款') {
+                                                             app.$Message.warning({
+                                                                 content: '已还款不能代扣'
+                                                             });
+                                                             return;
+                                                         }
                                                         let url = getDeductionUrl(p.row.planListId);
                                                         layer.open({
                                                             type: 2,

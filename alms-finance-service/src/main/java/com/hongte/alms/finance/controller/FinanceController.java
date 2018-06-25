@@ -3,38 +3,8 @@
  */
 package com.hongte.alms.finance.controller;
 
-import java.io.File;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
-import com.hongte.alms.base.entity.*;
-import com.hongte.alms.base.service.*;
-import com.hongte.alms.finance.req.OrderSetReq;
-import io.swagger.annotations.Api;
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-
+import cn.afterturn.easypoi.excel.ExcelImportUtil;
+import cn.afterturn.easypoi.excel.entity.ImportParams;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -44,15 +14,14 @@ import com.hongte.alms.base.dto.ConfirmRepaymentReq;
 import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.base.dto.MoneyPoolManagerReq;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
+import com.hongte.alms.base.dto.core.LayTableQuery;
+import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.AreaLevel;
 import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.enums.RepayRegisterState;
+import com.hongte.alms.base.service.*;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
-import com.hongte.alms.base.vo.finance.ConfirmWithholdListVO;
-import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
-import com.hongte.alms.base.vo.finance.CurrPeriodRepaymentInfoVO;
-import com.hongte.alms.base.vo.finance.MoneyPoolManagerVO;
-import com.hongte.alms.base.vo.finance.RepaymentSettleListVO;
+import com.hongte.alms.base.vo.finance.*;
 import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.DateUtil;
@@ -60,16 +29,27 @@ import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.finance.req.MoneyPoolReq;
+import com.hongte.alms.finance.req.OrderSetReq;
 import com.hongte.alms.finance.service.FinanceService;
 import com.hongte.alms.finance.service.ShareProfitService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
-import com.ht.ussp.util.ExcelUtils;
-
-import cn.afterturn.easypoi.excel.ExcelImportUtil;
-import cn.afterturn.easypoi.excel.entity.ImportParams;
-import feign.Feign;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * @author 王继光 2018年4月27日 下午6:00:37
@@ -106,6 +86,9 @@ public class FinanceController {
 	@Autowired
 	@Qualifier("BasicCompanyService")
 	private BasicCompanyService basicCompanyService;
+    @Autowired
+    @Qualifier("SysUserService")
+    private SysUserService sysUserService;
 	@Autowired
 	@Qualifier("FinanceService")
 	private FinanceService financeService;
@@ -886,22 +869,25 @@ public class FinanceController {
 	@GetMapping("/getOrderSetSearchInfo")
 	public Result getOrderSetSearchInfo(){
 
-		logger.info("@getOrderSetSearchInfo@查找财务人员跟单设置查询相关信息--开始[]");
-		Result result = null;
-		Map<String,JSONArray> retMap = new HashMap<String,JSONArray>();
-		//区域
-		List<BasicCompany> area_list = basicCompanyService.selectList(new EntityWrapper<BasicCompany>().eq("area_level",AreaLevel.AREA_LEVEL.getKey()));
-		retMap.put("area", (JSONArray) JSON.toJSON(area_list,JsonUtil.getMapping()));
-		//公司
-		List<BasicCompany> company_list = basicCompanyService.selectList(new EntityWrapper<BasicCompany>().eq("area_level",AreaLevel.COMPANY_LEVEL.getKey()));
-		CompanySortByPINYINUtil.sortByPINYIN(company_list);
-		retMap.put("company",(JSONArray) JSON.toJSON(company_list,JsonUtil.getMapping()));
-//		//业务类型
-//		List<BasicBusinessType> btype_list =  basicBusinessTypeService.selectList(new EntityWrapper<BasicBusinessType>().orderBy("business_type_id"));
-//		retMap.put("businessType",(JSONArray) JSON.toJSON(btype_list, JsonUtil.getMapping()));
+        logger.info("@getOrderSetSearchInfo@查找财务人员跟单设置查询相关信息--开始[]");
+        Result result = null;
+        Map<String, JSONArray> retMap = new HashMap<String, JSONArray>();
+        //区域
+        List<BasicCompany> area_list = basicCompanyService.selectList(new EntityWrapper<BasicCompany>().eq("area_level", AreaLevel.AREA_LEVEL.getKey()));
+        retMap.put("area", (JSONArray) JSON.toJSON(area_list, JsonUtil.getMapping()));
+        //公司
+        List<BasicCompany> company_list = basicCompanyService.selectList(new EntityWrapper<BasicCompany>().eq("area_level", AreaLevel.COMPANY_LEVEL.getKey()));
+        CompanySortByPINYINUtil.sortByPINYIN(company_list);
+        retMap.put("company", (JSONArray) JSON.toJSON(company_list, JsonUtil.getMapping()));
+        //业务类型
+        List<BasicBusinessType> btype_list = basicBusinessTypeService.selectList(new EntityWrapper<BasicBusinessType>().orderBy("business_type_id"));
+        retMap.put("businessType", (JSONArray) JSON.toJSON(btype_list, JsonUtil.getMapping()));
+        //查询用户
+        List<SysUser> users = sysUserService.selectList(new EntityWrapper<>());
+        retMap.put("users", (JSONArray) JSON.toJSON(users, JsonUtil.getMapping()));
 
-		logger.info("@getOrderSetSearchInfo@查找财务人员跟单设置查询相关信息--结束[{}]", JSON.toJSONString(retMap));
-		return Result.success(retMap);
+        logger.info("@getOrderSetSearchInfo@查找财务人员跟单设置查询相关信息--结束[{}]", JSON.toJSONString(retMap));
+        return Result.success(retMap);
 
 	}
 
@@ -932,6 +918,73 @@ public class FinanceController {
 	}
 
 
+	@RequestMapping("/search")
+	@ApiOperation("查询")
+	public PageResult search(ServletRequest request, LayTableQuery query) {
+		try {
+			EntityWrapper<SysFinancialOrder> ew = new EntityWrapper<>();
 
+			String userName = request.getParameter("userName");
+			String areaId = request.getParameter("areaId");
+			String companyId = request.getParameter("companyId");
+			String businessTypeId = request.getParameter("businessTypeId");
+           /* if (StringUtils.isNotBlank(userName)) {
+                ew.like("user_names", userName);
+            }
+            if (StringUtils.isNotBlank(companyId)) {
+                ew.eq("company_id", companyId);
+            }
+            if (StringUtils.isNotBlank(areaId)) {
+                ew.eq("area_id", areaId);
+            }
+            if (StringUtils.isNotBlank(businessTypeId)) {
+                ew.eq("business_type_id", Integer.valueOf(businessTypeId));
+            }*/
+			//Page<SysFinancialOrder> page = sysFinancialOrderService.selectPage(new Page<>(query.getPage(), query.getLimit()), ew);
+			Page<SysFinancialOrderVO> page = sysFinancialOrderService.search(
+					new Page<>(query.getPage(), query.getLimit()),
+					StringUtils.isBlank(businessTypeId) ? null : Integer.valueOf(businessTypeId),
+					areaId, companyId, userName
+			);
+			return PageResult.success(page.getRecords(), page.getTotal());
+		} catch (Exception ex) {
+			logger.error("根据条件获取财务人员跟单设置失败", ex);
+			return PageResult.error(500, ex.getMessage());
+		}
+	}
+
+
+	@RequestMapping("/edit")
+	@ApiOperation("编辑")
+	public Result edit(SysFinancialOrderVO vo) {
+		if(StringUtils.isBlank(vo.getUserId())){
+			return Result.error("参数验证失败");
+		}
+		try{
+
+			if(vo.getId() == null){
+				//新增
+				sysFinancialOrderService.save(vo);
+			}else{
+				//编辑
+			}
+			return  Result.success();
+		}catch (Exception e){
+			logger.error("设置财务人员跟单设置失败", e);
+			return Result.error( e.getMessage());
+		}
+	}
+
+	@RequestMapping("/delete")
+	@ApiOperation(value = "删除")
+	public  Result delete(Integer id, String userId){
+		try{
+			sysFinancialOrderService.delete(id, userId);
+			return Result.success();
+		}catch (Exception e){
+			logger.error(e.getMessage());
+			return Result.error(e.getMessage());
+		}
+	}
 
 }

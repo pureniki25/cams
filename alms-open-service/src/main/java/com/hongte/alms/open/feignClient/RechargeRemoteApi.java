@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.hongte.alms.common.result.Result;
 
-@FeignClient(value = "alms-platRepay-service")
+@FeignClient(value = "alms-platrepay-service")
 public interface RechargeRemoteApi {
 
 	/**

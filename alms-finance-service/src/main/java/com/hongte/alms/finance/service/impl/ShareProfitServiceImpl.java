@@ -2,12 +2,15 @@ package com.hongte.alms.finance.service.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 import com.hongte.alms.base.RepayPlan.dto.*;
 import com.hongte.alms.base.entity.*;
-import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanRepaySrcEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.dto.ConfirmRepaymentReq;
+import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.enums.RepayCurrentStatusEnums;
 import com.hongte.alms.base.enums.RepayedFlag;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
@@ -324,15 +328,20 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			}
 		}
 		
-		
-		// 银行代扣 or 线下代扣
+
+		// repaySource {20：自动线下代扣已还款，21，人工线下代扣已还款，30：自动银行代扣已还款，31：人工银行代扣已还款}
 		if(logIds!=null&&logIds.size()>0) {
 			WithholdingRepaymentLog log=withholdingRepaymentLogService.selectById(logIds.get(0));
 			String repaySource="30";
-			if(log.getBindPlatformId()== PlatformEnum.YH_FORM.getValue()) {//银行代扣
+			if(log.getBindPlatformId()==PlatformEnum.YH_FORM.getValue()&&log.getCreateUser().equals("auto_run")) {//自动银行代扣已还款
 				repaySource="30";
-			}else {//线下代扣
+			}else if(log.getBindPlatformId()==PlatformEnum.YH_FORM.getValue()&&(!log.getCreateUser().equals("auto_run"))) {//人工银行代扣已还款
+				repaySource="31";
+			}else if(log.getBindPlatformId()!=PlatformEnum.YH_FORM.getValue()&&log.getCreateUser().equals("auto_run")) {//20：自动线下代扣已还款
 				repaySource="20";
+			}
+			else if(log.getBindPlatformId()!=PlatformEnum.YH_FORM.getValue()&&(!log.getCreateUser().equals("auto_run"))){//21，人工线下代扣已还款
+				repaySource="21";
 			}
 			RepaymentResource temp=repaymentResourceService.selectOne(new EntityWrapper<RepaymentResource>().eq("business_id", log.getOriginalBusinessId())
 					.eq("after_id", log.getAfterId()).eq("repay_source_ref_id", log.getLogId()).eq("repay_source", repaySource));
@@ -371,6 +380,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			repaymentResources.get().add(repaymentResource);
 			
 		}
+
 		if (surplus != null && surplus.compareTo(new BigDecimal("0")) > 0) {
 			BigDecimal canUseSurplus = accountantOverRepayLogService.caluCanUse(businessId.get(), null);
 			if (surplus.compareTo(canUseSurplus) > 0) {

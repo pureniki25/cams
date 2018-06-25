@@ -47,6 +47,10 @@ public class TdReturnAdvanceShareProfitDTO implements Serializable {
 	 * 结清状态 1 已结清 0 未结清
 	 */
 	private int status;
+	/**
+	 * 结清状态 1 已结清 0 未结清
+	 */
+	private String statusStrActual;
 
 	public int getPeriod() {
 		return period;
@@ -128,12 +132,21 @@ public class TdReturnAdvanceShareProfitDTO implements Serializable {
 		this.status = status;
 	}
 
+	public String getStatusStrActual() {
+		return statusStrActual;
+	}
+
+	public void setStatusStrActual(String statusStrActual) {
+		this.statusStrActual = statusStrActual;
+	}
+
 	@Override
 	public String toString() {
 		return "TdReturnAdvanceShareProfitDTO [period=" + period + ", refundDate=" + refundDate + ", totalAmount="
 				+ totalAmount + ", principalAndInterest=" + principalAndInterest + ", tuandaiAmount=" + tuandaiAmount
 				+ ", orgAmount=" + orgAmount + ", guaranteeAmount=" + guaranteeAmount + ", arbitrationAmount="
-				+ arbitrationAmount + ", overDueAmount=" + overDueAmount + ", status=" + status + "]";
+				+ arbitrationAmount + ", overDueAmount=" + overDueAmount + ", status=" + status + ", statusStrActual="
+				+ statusStrActual + "]";
 	}
 
 }

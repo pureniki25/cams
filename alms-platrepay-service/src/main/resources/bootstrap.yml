@@ -2,7 +2,7 @@ server:
   port: 30631
 spring:
   application:
-    name: alms-platRepay-service
+    name: alms-platrepay-service
   cloud:
     config:
       #name: alms-core-service,base,rabbitmq,mongo,redis

@@ -9,10 +9,13 @@ import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.BizCustomerTypeEnum;
 import com.hongte.alms.base.enums.BooleanEnum;
 import com.hongte.alms.base.enums.BusinessSourceTypeEnum;
+import com.hongte.alms.base.enums.MsgCodeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.EipRemote;
+import com.hongte.alms.base.feignClient.MsgRemote;
 import com.hongte.alms.base.feignClient.dto.BankCardInfo;
+import com.hongte.alms.base.feignClient.dto.MsgRequestDto;
 import com.hongte.alms.base.feignClient.dto.NiWoProjPlanDto;
 import com.hongte.alms.base.feignClient.dto.NiWoProjPlanListDetailDto;
 import com.hongte.alms.base.enums.repayPlan.*;
@@ -86,6 +89,24 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 	@Qualifier("IssueSendOutsideLogService")
 	IssueSendOutsideLogService issueSendOutsideLogService;
 	
+	@Autowired
+	@Qualifier("BasicBizCustomerService")
+	BasicBizCustomerService basicBizCustomerService;
+	
+	@Autowired
+	@Qualifier("SysMsgTemplateService")
+	SysMsgTemplateService sysMsgTemplateService;
+	
+	@Autowired
+    Executor executor;
+	
+	
+	@Autowired
+    MsgRemote msgRemote;
+	
+	
+	
+	
 	@Transactional(rollbackFor = Exception.class)
 	@Override
 	public void sycNiWoRepayPlan(String orderNo,HashMap<String,Object> niwoMap) {
@@ -109,8 +130,9 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 				logger.info("你我金融的标的请求编号在贷后找不到对应的还款计划记录,请求编号{request_no}为："+orderNo);
 				return;
 			}
+			//Business
 			List<RepaymentProjPlanList> projLists = repaymentProjPlanListService
-					.selectList(new EntityWrapper<RepaymentProjPlanList>().eq("projPlanId", projPlan.getProjPlanId()));
+					.selectList(new EntityWrapper<RepaymentProjPlanList>().eq("proj_plan_id", projPlan.getProjPlanId()));
 			List<RepaymentBizPlanList> pLists = repaymentBizPlanListService
 					.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", projPlan.getPlanId()));
 			projPlan.setCreatSysType(3);//标志为你我金融的还款计划
@@ -160,14 +182,16 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 					for (RepaymentProjPlanList projPlanList : projLists) {
 						for (RepaymentBizPlanList pList : pLists) {
 							for (NiWoProjPlanListDetailDto detailDto : dto.getRepaymentPlans()) {
-								if (projPlanList.getPeriod() == pList.getPeriod()
-										&& detailDto.getPeriod() == projPlanList.getPeriod()) {
+								if (projPlanList.getPeriod() == pList.getPeriod()&& detailDto.getPeriod() == projPlanList.getPeriod()) {
+									
 									List<RepaymentProjPlanListDetail> projDetails = repaymentProjPlanListDetailService
 											.selectList(new EntityWrapper<RepaymentProjPlanListDetail>()
 													.eq("proj_plan_list_id", projPlanList.getProjPlanListId()));
 									List<RepaymentBizPlanListDetail> planDetails = repaymentBizPlanListDetailService
 											.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id",
 													pList.getPlanListId()));
+									//同步之前先计算当前期已经实还的金额
+									BigDecimal beforeRepayAmountSum=getRepayAmountSum(planDetails);
 									// 看标有没有滞纳金明细
 									Integer projDetailcount = repaymentBizPlanListDetailService
 											.selectCount(new EntityWrapper<RepaymentBizPlanListDetail>()
@@ -183,7 +207,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 									repaymentProjPlanListDtos.add(projPlanListDto);
 									for (RepaymentProjPlanListDetail projDetail : projDetails) {
 										for (RepaymentBizPlanListDetail planDetail : planDetails) {
-											if (projDetail.getFeeId() == planDetail.getFeeId()) {
+											if (projDetail.getFeeId().equals(planDetail.getFeeId())) {
 												boolean isDifferent=false;
 												if (RepayPlanFeeTypeEnum.PRINCIPAL.getUuid()
 														.equals(projDetail.getFeeId())) { // 本金
@@ -239,6 +263,19 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													planDetail.setUpdateDate(new Date());
 													repaymentProjPlanListDetailService.updateById(projDetail);
 													repaymentBizPlanListDetailService.updateById(planDetail);
+												} else if (RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getUuid()
+														.equals(projDetail.getFeeId())) {// //分公司服务费
+													if(projDetail.getProjPlanAmount().compareTo(detailDto.getPlatformManageFee())!=0) {//贷后应还的和你我金融应还的金额不一致，计入异常日志表
+														isDifferent=true;
+													}
+													projDetail.setProjPlanAmount(detailDto.getShouldConsultingFee());
+													planDetail.setPlanAmount(detailDto.getShouldConsultingFee());
+													projDetail.setProjFactAmount(detailDto.getRepaidConsultingFee());
+													planDetail.setFactAmount(detailDto.getRepaidConsultingFee());
+													projDetail.setUpdateDate(new Date());
+													planDetail.setUpdateDate(new Date());
+													repaymentProjPlanListDetailService.updateById(projDetail);
+													repaymentBizPlanListDetailService.updateById(planDetail);
 												} else if (RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid()
 														.equals(projDetail.getFeeId())
 														&& detailDto.getTotalPenalty() != null && detailDto
@@ -287,17 +324,40 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 									
 												projPlanList.setOverdueDays(BigDecimal.valueOf(getOverDays(detailDto.getRefundDate())));
 												projPlanList.setOverdueAmount(detailDto.getTotalPenalty());
+												projPlanList.setUpdateTime(new Date());
+												repaymentProjPlanListService.updateById(projPlanList);
 												pList.setOverdueDays(BigDecimal.valueOf(getOverDays(detailDto.getRefundDate())));
 												pList.setOverdueAmount(detailDto.getTotalPenalty());
+												pList.setUpdateTime(new Date());
 												repaymentProjPlanListService.updateById(projPlanList);
 												repaymentBizPlanListService.updateById(pList);
+												
+												BigDecimal planAmountSum=getPlanAmountSum(planDetails);//当前期计划要还的总金额
+												BigDecimal afterRepayAmountSum=getRepayAmountSum(planDetails);//当前期已还总金额
+												
+												/*	
+												 * 同步完你我金融的当前期还款计划之后，如果当前期已还总金额等于当前期计划要还的总金额，并且同步之后的当前期已还总金额大于同步之前的当前期已还总金额
+											     *说明需要发成功代扣的短信
+												 */
+												if(afterRepayAmountSum.compareTo(planAmountSum)==0&&afterRepayAmountSum.compareTo(beforeRepayAmountSum)>0) {
+													BigDecimal repayMoney=afterRepayAmountSum.subtract(beforeRepayAmountSum);
+													//异步发送短信
+													executor.execute(new Runnable() {
+														@Override
+														public void run() {
+															logger.info("你我金融-发送短信开始==================");
+															sendSuccessSms(pList.getOrigBusinessId(), planAmountSum, repayMoney);
+															logger.info("你我金融-发送短信结束==================");
+														}
+													});
+													
+												}
 											}
 
 										}
 
 									}
-									projPlanList.setUpdateTime(new Date());
-									repaymentProjPlanListService.updateById(projPlanList);
+								
 								}
 							}
 
@@ -391,6 +451,8 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 					detailDto.setRepaidCommissionGuaranteFee(repaymentPlanMap.get("repaidCommissionGuaranteFee")==null?BigDecimal.valueOf(0):BigDecimal.valueOf(Double.valueOf(repaymentPlanMap.get("repaidCommissionGuaranteFee").toString())));
 					detailDto.setTotalPenalty(repaymentPlanMap.get("totalPenalty")==null?BigDecimal.valueOf(0):BigDecimal.valueOf(Double.valueOf(repaymentPlanMap.get("totalPenalty").toString())));
 					detailDto.setRepaidPenalty(repaymentPlanMap.get("repaidPenalty")==null?BigDecimal.valueOf(0):BigDecimal.valueOf(Double.valueOf(repaymentPlanMap.get("repaidPenalty").toString())));
+					detailDto.setShouldConsultingFee(repaymentPlanMap.get("shouldConsultingFee")==null?BigDecimal.valueOf(0):BigDecimal.valueOf(Double.valueOf(repaymentPlanMap.get("shouldConsultingFee").toString())));
+					detailDto.setRepaidConsultingFee(repaymentPlanMap.get("repaidConsultingFee")==null?BigDecimal.valueOf(0):BigDecimal.valueOf(Double.valueOf(repaymentPlanMap.get("repaidConsultingFee").toString())));
 					repaymentPlans.add(detailDto);		
 				}
 		
@@ -446,5 +508,65 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 			days=DateUtil.getDiffDays(repayDate, new Date());
 		}
 		return days;
+	}
+	
+	private BigDecimal getRepayAmountSum(List<RepaymentBizPlanListDetail> planDetails) {
+		BigDecimal sum=BigDecimal.valueOf(0);
+		for(RepaymentBizPlanListDetail detail:planDetails) {
+			sum=sum.add(detail.getFactAmount()==null?BigDecimal.valueOf(0):detail.getFactAmount());
+		}
+		return sum;
+		
+	}
+	
+	
+	private BigDecimal getPlanAmountSum(List<RepaymentBizPlanListDetail> planDetails) {
+		BigDecimal sum=BigDecimal.valueOf(0);
+		for(RepaymentBizPlanListDetail detail:planDetails) {
+			
+			sum=sum.add(detail.getPlanAmount()==null?BigDecimal.valueOf(0):detail.getPlanAmount());
+		}
+		return sum;
+		
+	}
+	
+	/**
+	 * 发送扣款成功短信
+	 * @return 
+	 */
+	private void sendSuccessSms(String businessId,BigDecimal planAmount,BigDecimal repayAmount) {
+		BasicBizCustomer basicBizCustomer=basicBizCustomerService.selectOne(new EntityWrapper<BasicBizCustomer>().eq("business_id",businessId).eq("ismain_customer", 1));
+		if(basicBizCustomer!=null) {
+			if(StringUtil.isEmpty(basicBizCustomer.getPhoneNumber())) {
+				logger.info("你我金融-发送短信时找不到客户手机号码");
+				return;
+			}
+		}else {
+			logger.info("你我金融-发送短信时找不到客户信息");
+			return;
+		}
+		String templateCode=MsgCodeEnum.NIWO_REPAY_SUCCESS.getValue();
+		SysMsgTemplate sysMsgTemplate=sysMsgTemplateService.selectOne(new EntityWrapper<SysMsgTemplate>().eq("template_code", templateCode));
+
+	
+		if(sysMsgTemplate==null) {
+			logger.info("你我金融-发送扣款成功短信模板为空");
+			return;
+		}
+		Long msgModeId=Long.valueOf(sysMsgTemplate.getTemplateId());
+		MsgRequestDto dto=new MsgRequestDto();
+		dto.setApp("alms");
+		dto.setMsgTitle("贷后你我金融扣款成功提示");
+		dto.setMsgModelId(msgModeId);
+		dto.setMsgTo(basicBizCustomer.getPhoneNumber());
+		//组装发送短信内容的Json数据
+		JSONObject data = new JSONObject() ;
+		data.put("name", basicBizCustomer.getCustomerName());
+		data.put("planAmount", planAmount);
+		data.put("factAmount", repayAmount);
+		dto.setMsgBody(data);
+		String jason=JSON.toJSONString(dto);
+		msgRemote.sendRequest(jason);
+		
 	}
 }
