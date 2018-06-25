@@ -2,12 +2,7 @@ package com.hongte.alms.finance.service.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import com.hongte.alms.base.RepayPlan.dto.*;
 import com.hongte.alms.base.entity.*;
@@ -54,6 +49,7 @@ import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.finance.service.ShareProfitService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
+import sun.applet.Main;
 
 /**
  * @author 王继光 2018年5月24日 下午2:46:52
@@ -117,6 +113,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	private ThreadLocal<String> orgBusinessId = new ThreadLocal<String>();
 	private ThreadLocal<String> afterId = new ThreadLocal<String>();
 	private ThreadLocal<List<CurrPeriodProjDetailVO>> projListDetails = new ThreadLocal<List<CurrPeriodProjDetailVO>>();
+	//还款来源列表
 	private ThreadLocal<List<RepaymentResource>> repaymentResources = new ThreadLocal<List<RepaymentResource>>();
 	//业务还款计划dto
 	private ThreadLocal<RepaymentBizPlanDto> planDto = new ThreadLocal<RepaymentBizPlanDto>();
@@ -151,8 +148,32 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	private ThreadLocal<List<RepaymentProjPlanListBak>> repaymentProjPlanListBaks = new ThreadLocal<List<RepaymentProjPlanListBak>>();
 	private ThreadLocal<List<RepaymentProjPlanListDetailBak>> repaymentProjPlanListDetailBaks = new ThreadLocal<List<RepaymentProjPlanListDetailBak>>();
 	
-	private ThreadLocal<List<Integer>> repaySource = new ThreadLocal<List<Integer>>();
+//	private ThreadLocal<List<Integer>> repaySource = new ThreadLocal<List<Integer>>();
+	//调用来源的标志位
+	private  ThreadLocal<Integer> callFlage = new  ThreadLocal<Integer>();
 	private ThreadLocal<List<RepaymentProjPlanListDetail>> updatedProjPlanDetails = new ThreadLocal<List<RepaymentProjPlanListDetail>>();
+
+
+	/////////    还款过程中相关变量（payOneFeeDetail  函数中赋值）  开始  zk ///////////////////////
+
+	//当前用到第几条还款来源的标志位
+	private ThreadLocal<Integer>  resourceIndex = new ThreadLocal<>();
+	//当前用于分账的还款来源
+	private ThreadLocal<RepaymentResource> curalResource = new ThreadLocal<>();
+	//当前用于分账的金额（对应还款来源）
+	private ThreadLocal<BigDecimal> curalDivideAmount = new ThreadLocal<>();
+	//本次调用实还金额
+	private  ThreadLocal<BigDecimal>  realPayedAmount = new ThreadLocal<>();
+
+
+	/////////    还款过程中相关变量 （payOneFeeDetail  函数中赋值）  结束  zk ///////////////////////
+
+
+
+
+
+
+
 	private void initVariable(ConfirmRepaymentReq req) {
 		businessId.set(req.getBusinessId());
 		afterId.set(req.getAfterId());
@@ -164,7 +185,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		moneyPoolAmount.set(new BigDecimal("0"));
 		surplusAmount.set(new BigDecimal("0"));
 		lackAmount.set(new BigDecimal("0"));
-		repaySource.set(req.getRepaySource());
+//		repaySource.set(req.getRepaySource());
+
+		callFlage.set(req.getCallFlage());
 		updatedProjPlanDetails.set(new ArrayList<>());
 		confirmLog.set(createConfirmLog());
 		repaymentBizPlanListDetailBaks.set(new ArrayList<>());
@@ -193,7 +216,10 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 				&& (req.getLogIds() == null || req.getLogIds().isEmpty())) {
 			throw new ServiceRuntimeException("ConfirmRepaymentReq至少要有一个还款来源");
 		}
-		
+		if(req.getCallFlage()== null){
+			throw  new  ServiceRuntimeException("ConfirmRepaymentReq.callFlage 不能为空");
+		}
+
 		initVariable(req);
 		BigDecimal unpaid = repaymentProjFactRepayService.caluUnpaid(businessId.get(), afterId.get());
 		if (unpaid.compareTo(new BigDecimal("0"))<=0) {
@@ -228,10 +254,24 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			lackAmount.set(repayPlanAmount.get().subtract(repayFactAmount.get()));
 			logger.info("lackAmount={}",lackAmount.get());
 		}
+
+		//分配线上输入的滞纳金
+		divideOveryDueMoneyNew(req.getOfflineOverDue(), planDto.get(), false);
+		divideOveryDueMoneyNew(req.getOnlineOverDue(), planDto.get(), true);
+
+		//填充信息  新的分润方法，按标从小到大，到主借标的顺序分
+//		fillNew();
+
+		///////   旧的分润方法  均分  开始 ==========
+		//计算标在业务中的占比
 		caluProportion(planDto.get());
+//		分配线上输入的滞纳金
 		divideOveryDueMoney(req.getOfflineOverDue(), planDto.get(), false);
 		divideOveryDueMoney(req.getOnlineOverDue(), planDto.get(), true);
+//		填充信息
 		fill();
+		///////   旧的分润方法  均分  结束 ==========
+
 		if (save) {
 			updateStatus();
 		}
@@ -335,7 +375,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			repaymentResources.get().add(repaymentResource);
 			
 		}
-		
+
 		if (surplus != null && surplus.compareTo(new BigDecimal("0")) > 0) {
 			BigDecimal canUseSurplus = accountantOverRepayLogService.caluCanUse(businessId.get(), null);
 			if (surplus.compareTo(canUseSurplus) > 0) {
@@ -633,6 +673,36 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	}
 
 	/**
+	 * 计算每个标的分配的金额
+	 * 按照先小标，后大标，最后主借标的规则分配
+	 * @param money
+	 * @param dto
+	 */
+	private void divideMoneyNew(BigDecimal money, RepaymentBizPlanDto dto){
+		BigDecimal moneyCopy = money;
+
+		for (int i = 0; i < dto.getProjPlanDtos().size(); i++) {
+			RepaymentProjPlanDto repaymentProjPlanDto = dto.getProjPlanDtos().get(i);
+			if (i == dto.getProjPlanDtos().size() - 1) {
+				repaymentProjPlanDto.setDivideAmount(moneyCopy);
+			}else{
+				//1.计算应还金额
+
+
+				//2.计算实还金额
+
+
+				//3.计算本次还款应还金额
+
+			}
+
+		}
+
+
+
+	}
+
+	/**
 	 * 计算每个标的分配下来的滞纳金金额
 	 * 
 	 * @author 王继光 2018年5月24日 下午9:27:27
@@ -665,6 +735,90 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			}
 		}
 	}
+
+	/**
+	 * 计算每个标分配下来的滞纳金金额
+	 * 按照先小标，后大标，最后主借标的顺序进行分配
+	 * @param money
+	 * @param dto
+	 * @param online
+	 */
+	private void divideOveryDueMoneyNew(BigDecimal money, RepaymentBizPlanDto dto, boolean online) {
+		if (money == null) {
+			return;
+		}
+		//待分配的金额
+		BigDecimal moneyCopy = money;
+		for (int i = 0; i < dto.getProjPlanDtos().size(); i++) {
+			RepaymentProjPlanDto repaymentProjPlanDto = dto.getProjPlanDtos().get(i);
+
+			//如果还有待分配的滞纳金，则继续分配
+			if(moneyCopy.compareTo(new BigDecimal("0"))>0){
+				//如果是最后一期，则将剩余的所有滞纳金分配到最后一期
+				if (i == dto.getProjPlanDtos().size() - 1) {
+					if (online) {
+						repaymentProjPlanDto.setOnlineOverDue(moneyCopy);
+					} else {
+						repaymentProjPlanDto.setOfflineOverDue(moneyCopy);
+					}
+				}else{
+					List<RepaymentProjPlanListDetailDto> detailDtos = repaymentProjPlanDto.getProjPlanListDtos().get(0).getRepaymentProjPlanListDetailDtos();
+					//计划中应还的滞纳金
+					BigDecimal planOverDue = new BigDecimal("0");
+					//实际已还的滞纳金
+					BigDecimal payedOverDue = new BigDecimal("0");
+					//本次应还的滞纳金
+					BigDecimal showPayOverDue = new BigDecimal("0");
+					//这次分配到的滞纳金
+					BigDecimal dmoney = null;
+					//计算这个标应还的滞纳金
+					if(online){
+						for(RepaymentProjPlanListDetailDto detailDto:detailDtos){
+							if(detailDto.getRepaymentProjPlanListDetail().getFeeId().
+									equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())){
+								planOverDue.add(detailDto.getRepaymentProjPlanListDetail().getProjPlanAmount());
+								for(RepaymentProjFactRepay repaymentProjFactRepay :detailDto.getRepaymentProjFactRepays()){
+									payedOverDue.add(repaymentProjFactRepay.getFactAmount());
+								}
+							}
+						}
+						showPayOverDue = payedOverDue.subtract(payedOverDue);
+						//如果应还的滞纳金比剩余的少
+						if(showPayOverDue.compareTo(moneyCopy)<0){
+							dmoney = showPayOverDue;
+						}else{
+							dmoney = moneyCopy;
+						}
+						repaymentProjPlanDto.setOnlineOverDue(dmoney);
+						moneyCopy = moneyCopy.add(dmoney);
+
+					}else{
+						for(RepaymentProjPlanListDetailDto detailDto:detailDtos){
+							if(detailDto.getRepaymentProjPlanListDetail().getFeeId().
+									equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())){
+								planOverDue.add(detailDto.getRepaymentProjPlanListDetail().getProjPlanAmount());
+								for(RepaymentProjFactRepay repaymentProjFactRepay :detailDto.getRepaymentProjFactRepays()){
+									payedOverDue.add(repaymentProjFactRepay.getFactAmount());
+								}
+							}
+						}
+						showPayOverDue = payedOverDue.subtract(payedOverDue);
+						//如果应还的滞纳金比剩余的少
+						if(showPayOverDue.compareTo(moneyCopy)<0){
+							dmoney = showPayOverDue;
+						}else{
+							dmoney = moneyCopy;
+						}
+						repaymentProjPlanDto.setOfflineOverDue(dmoney);
+						moneyCopy = moneyCopy.add(dmoney);
+					}
+				}
+			} else{
+				break;
+			}
+		}
+	}
+
 
 	private CurrPeriodProjDetailVO getCurrPeriodProjDetailVO(String projectId) {
 		for (CurrPeriodProjDetailVO currPeriodProjDetailVO : projListDetails.get()) {
@@ -796,6 +950,220 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		}
 
 	}
+
+	/**
+	 * 分配规则变更，重新写
+	 */
+	private void fillNew() {
+		RepaymentBizPlanDto dto = planDto.get();
+
+		//上一次还款是否成功的标志位
+		boolean lastPaySuc = true;
+
+		//1.优先还  界面设置的线上滞纳金
+		for (int i = 0; i < dto.getProjPlanDtos().size(); i++) {
+			if(lastPaySuc == false) return;
+			RepaymentProjPlanDto  repaymentProjPlanDto = dto.getProjPlanDtos().get(i);
+			String projectId = repaymentProjPlanDto.getTuandaiProjectInfo().getProjectId();
+			CurrPeriodProjDetailVO currPeriodProjDetailVO = getCurrPeriodProjDetailVO(projectId);
+
+			if(repaymentProjPlanDto.getOnlineOverDue()!=null &&
+					repaymentProjPlanDto.getOnlineOverDue().compareTo(new BigDecimal("0"))>0){
+				//需要还的线上滞纳金
+				BigDecimal onLineOverDue = repaymentProjPlanDto.getOnlineOverDue();
+				List<RepaymentProjPlanListDto> repaymentProjPlanListDtos = repaymentProjPlanDto.getProjPlanListDtos();
+				//遍历标的还款计划
+				for(RepaymentProjPlanListDto repaymentProjPlanListDto:repaymentProjPlanListDtos){
+					List<RepaymentProjPlanListDetailDto> repaymentProjPlanListDetailDtos = repaymentProjPlanListDto.getRepaymentProjPlanListDetailDtos();
+					//遍历这个标的每一期还款计划，费用细项
+					for(RepaymentProjPlanListDetailDto repaymentProjPlanListDetailDto: repaymentProjPlanListDetailDtos){
+						RepaymentProjPlanListDetail detail =
+								repaymentProjPlanListDetailDto.getRepaymentProjPlanListDetail();
+
+						//找到线上滞纳金这一费用项
+						if(detail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
+							 boolean bl = payOneFeeDetail( detail, currPeriodProjDetailVO, onLineOverDue);
+							 if(bl && realPayedAmount.get()!=null){
+								 onLineOverDue = onLineOverDue.divide(realPayedAmount.get());
+							 }else{
+							 	lastPaySuc = false;
+							 	break;
+							 }
+						}
+					}
+				}
+			}
+		}
+
+		//2.再还 界面设置的线下滞纳金
+		for (int i = 0; i < dto.getProjPlanDtos().size(); i++) {
+			if(lastPaySuc == false) return;
+			RepaymentProjPlanDto  repaymentProjPlanDto = dto.getProjPlanDtos().get(i);
+			String projectId = repaymentProjPlanDto.getTuandaiProjectInfo().getProjectId();
+			CurrPeriodProjDetailVO currPeriodProjDetailVO = getCurrPeriodProjDetailVO(projectId);
+
+			if(repaymentProjPlanDto.getOfflineOverDue()!=null &&
+					repaymentProjPlanDto.getOfflineOverDue().compareTo(new BigDecimal("0"))>0){
+				//需要还的线下滞纳金
+				BigDecimal onLineOverDue = repaymentProjPlanDto.getOfflineOverDue();
+				List<RepaymentProjPlanListDto> repaymentProjPlanListDtos = repaymentProjPlanDto.getProjPlanListDtos();
+				//遍历标的还款计划
+				for(RepaymentProjPlanListDto repaymentProjPlanListDto:repaymentProjPlanListDtos){
+					List<RepaymentProjPlanListDetailDto> repaymentProjPlanListDetailDtos = repaymentProjPlanListDto.getRepaymentProjPlanListDetailDtos();
+					//遍历这个标的每一期还款计划，费用细项
+					for(RepaymentProjPlanListDetailDto repaymentProjPlanListDetailDto: repaymentProjPlanListDetailDtos){
+						RepaymentProjPlanListDetail detail =
+								repaymentProjPlanListDetailDto.getRepaymentProjPlanListDetail();
+						//找到线下滞纳金这一费用项
+						if(detail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
+							boolean bl = payOneFeeDetail( detail, currPeriodProjDetailVO, onLineOverDue);
+							if(bl && realPayedAmount.get()!=null){
+								onLineOverDue = onLineOverDue.divide(realPayedAmount.get());
+								if(onLineOverDue.compareTo(new BigDecimal("0"))<0){
+									logger.error("还线上滞纳金还多了：repaymentProjPlanDto:[{}]",JSON.toJSONString(repaymentProjPlanDto));
+								}
+							}else{
+								lastPaySuc = false;
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		//3.最后按核销顺序还金额
+		for (int i = 0; i < dto.getProjPlanDtos().size(); i++) {
+			if(lastPaySuc == false) return;
+			RepaymentProjPlanDto  repaymentProjPlanDto = dto.getProjPlanDtos().get(i);
+			String projectId = repaymentProjPlanDto.getTuandaiProjectInfo().getProjectId();
+			CurrPeriodProjDetailVO currPeriodProjDetailVO = getCurrPeriodProjDetailVO(projectId);
+
+
+			List<RepaymentProjPlanListDto> repaymentProjPlanListDtos = repaymentProjPlanDto.getProjPlanListDtos();
+			//遍历标的还款计划
+			for(RepaymentProjPlanListDto repaymentProjPlanListDto:repaymentProjPlanListDtos){
+				List<RepaymentProjPlanListDetailDto> repaymentProjPlanListDetailDtos = repaymentProjPlanListDto.getRepaymentProjPlanListDetailDtos();
+//					//遍历这个标的每一期还款计划，费用细项
+				for(RepaymentProjPlanListDetailDto repaymentProjPlanListDetailDto: repaymentProjPlanListDetailDtos){
+					RepaymentProjPlanListDetail detail =
+							repaymentProjPlanListDetailDto.getRepaymentProjPlanListDetail();
+					boolean bl = payOneFeeDetail( detail, currPeriodProjDetailVO,null);
+					if(!bl){
+						lastPaySuc = false;
+						break;
+					}
+				}
+			}
+		}
+	}
+
+
+	/**
+	 * 还一个费用详情的费用
+	 * @param  detail   本次还的费用项
+	 * @param currPeriodProjDetailVO  当前还的标的详情
+	 * @param   maxPayMoney  本次调用可还的最大金额
+	 * @return   boolean
+	 *
+	 */
+	private boolean payOneFeeDetail(RepaymentProjPlanListDetail detail,
+								 CurrPeriodProjDetailVO currPeriodProjDetailVO,BigDecimal maxPayMoney){
+
+		realPayedAmount.set(null);
+		Integer rIdex = resourceIndex.get();
+		if(rIdex==null || rIdex <0){
+			boolean bl= setNewRepaymentResource(0);
+			if(!bl) return bl;
+		}
+
+		//本次调用此方法实还金额总和
+		BigDecimal realPayed = new BigDecimal(0);
+
+		//当前用于分账的还款来源
+//		RepaymentResource curalResource = rResources.get(resourceIndex);
+//		//当前用于分账的金额（对应还款来源）
+//		BigDecimal curalDivideAmount = curalResource.getRepayAmount();
+		//未支付金额
+		BigDecimal unpaid = detail.getProjPlanAmount()
+				.subtract(detail.getDerateAmount()==null?new BigDecimal("0"):detail.getDerateAmount())
+				.subtract(detail.getProjFactAmount());
+		//如果有最大金额限制，则取未支付金额和最大限制金额的小值
+		if(maxPayMoney!=null){
+			if(maxPayMoney.compareTo(unpaid)<0){
+				unpaid = maxPayMoney;
+			}
+		}
+		//实还金额
+		BigDecimal money = new BigDecimal("0");
+		int c = curalDivideAmount.get().compareTo(unpaid);
+		if (c > 0) {
+			logger.info("divideAmount大于unpaid");
+			logger.info("@@从divideAmount={}分unpaid={}到{}",curalDivideAmount,unpaid,detail.getPlanItemName());
+			money = unpaid;
+			curalDivideAmount.set(curalDivideAmount.get().subtract(unpaid));
+			logger.info("divideAmount变为{}",curalDivideAmount);
+			createProjFactRepay(money, detail, currPeriodProjDetailVO,curalResource.get());
+			realPayed = money;
+		} else if (c == 0) {
+			logger.info("divideAmount等于unpaid");
+			logger.info("@@从divideAmount={}分unpaid={}到{}",curalDivideAmount,unpaid,detail.getPlanItemName());
+			money = unpaid;
+			logger.info("divideAmount变为null",detail.getPlanItemName());
+			//创建实还流水
+			createProjFactRepay(money, detail, currPeriodProjDetailVO,curalResource.get());
+			realPayed = money;
+			//上一条还款来源的可用金额已用完，找下一条还款来源来用
+			curalDivideAmount = null;
+			setNewRepaymentResource(resourceIndex.get()+1);
+		} else {
+			logger.info("divideAmount少于unpaid");
+			logger.info("@@从divideAmount={}分unpaid={}到{}",curalDivideAmount,curalDivideAmount,detail.getPlanItemName());
+			money = curalDivideAmount.get();
+			unpaid = unpaid.subtract(money);
+			createProjFactRepay(money, detail, currPeriodProjDetailVO,curalResource.get());
+			curalDivideAmount = null;
+			boolean setBl =  setNewRepaymentResource(resourceIndex.get()+1);
+			realPayed = money;
+			// 如果成功取到下一条还款流水  剩余未还完的继续还
+			if(setBl){
+				boolean pRet = payOneFeeDetail(detail,currPeriodProjDetailVO,unpaid);
+				if(pRet && realPayedAmount.get() != null){
+					realPayed =realPayed.add(realPayedAmount.get());
+				}
+			}
+		}
+
+		realPayedAmount.set(realPayed);
+		return true;
+	}
+
+	/**
+	 * 设置新的还款来源信息，成功获取并设置则返回true，没有还款来源了，返回false
+	 * @param reIndex
+	 */
+	private boolean setNewRepaymentResource(Integer  reIndex){
+		List<RepaymentResource> rResources = repaymentResources.get();
+
+		//超出了还款来源列表的长度，则返回false
+		if(reIndex>rResources.size()-1){
+			curalResource.set(null);
+			curalDivideAmount.set(null);
+			return false;
+		}
+
+		resourceIndex.set(reIndex);
+		RepaymentResource resource = rResources.get(reIndex);
+		curalResource.set(resource);
+		curalDivideAmount.set(resource.getRepayAmount());
+
+		return true;
+	}
+
+
+
+
+
 
 	/**
 	 * 将填充到实还的资金拷贝一份填充到CurrPeriodProjDetailVO
@@ -1406,4 +1774,78 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		
 		
 	}
+
+	public static void main(String[] args){
+
+
+		List<RepaymentProjPlanDto> repaymentProjPlanDtos =  new LinkedList<>();
+
+		RepaymentProjPlanDto repaymentProjPlanDto1 = new RepaymentProjPlanDto();
+		TuandaiProjectInfo tuandaiProjectInfo1 = new TuandaiProjectInfo();
+		repaymentProjPlanDto1.setTuandaiProjectInfo(tuandaiProjectInfo1);
+		tuandaiProjectInfo1.setMasterIssueId("1111111");
+		tuandaiProjectInfo1.setProjectId("111112");
+		tuandaiProjectInfo1.setQueryFullSuccessDate(new Date());
+		RepaymentProjPlan repaymentProjPlan1 = new RepaymentProjPlan();
+		repaymentProjPlan1.setBorrowMoney(new BigDecimal("100"));
+		repaymentProjPlanDto1.setRepaymentProjPlan(repaymentProjPlan1);
+		repaymentProjPlanDtos.add(repaymentProjPlanDto1);
+
+
+
+
+
+		RepaymentProjPlanDto repaymentProjPlanDto3 = new RepaymentProjPlanDto();
+		TuandaiProjectInfo tuandaiProjectInfo3 = new TuandaiProjectInfo();
+		repaymentProjPlanDto3.setTuandaiProjectInfo(tuandaiProjectInfo3);
+		tuandaiProjectInfo3.setMasterIssueId("1111111");
+		tuandaiProjectInfo3.setProjectId("1111113");
+		tuandaiProjectInfo3.setQueryFullSuccessDate(new Date());
+		RepaymentProjPlan repaymentProjPlan3 = new RepaymentProjPlan();
+		repaymentProjPlan3.setBorrowMoney(new BigDecimal("20"));
+		repaymentProjPlanDto3.setRepaymentProjPlan(repaymentProjPlan3);
+		repaymentProjPlanDtos.add(repaymentProjPlanDto3);
+
+		RepaymentProjPlanDto repaymentProjPlanDto2 = new RepaymentProjPlanDto();
+		TuandaiProjectInfo tuandaiProjectInfo2 = new TuandaiProjectInfo();
+		repaymentProjPlanDto2.setTuandaiProjectInfo(tuandaiProjectInfo2);
+		tuandaiProjectInfo2.setMasterIssueId("1111111");
+		tuandaiProjectInfo2.setProjectId("1111111");
+		tuandaiProjectInfo2.setQueryFullSuccessDate(new Date());
+		RepaymentProjPlan repaymentProjPlan2 = new RepaymentProjPlan();
+		repaymentProjPlan2.setBorrowMoney(new BigDecimal("10"));
+		repaymentProjPlanDto2.setRepaymentProjPlan(repaymentProjPlan2);
+		repaymentProjPlanDtos.add(repaymentProjPlanDto2);
+
+		Collections.sort(repaymentProjPlanDtos,new Comparator<RepaymentProjPlanDto>(){
+		//排序规则说明   需补充
+		@Override
+		public int compare(RepaymentProjPlanDto arg0, RepaymentProjPlanDto arg1) {
+			if (arg0.getTuandaiProjectInfo().getMasterIssueId().equals(arg0.getTuandaiProjectInfo().getProjectId())) {
+				return 1;
+			}
+			if (arg0.getRepaymentProjPlan().getBorrowMoney().compareTo(arg1.getRepaymentProjPlan().getBorrowMoney())<0) {
+				return -1;
+			}
+			if (arg0.getTuandaiProjectInfo().getQueryFullSuccessDate().before(arg1.getTuandaiProjectInfo().getQueryFullSuccessDate())) {
+				return -1;
+			}
+
+			return 0;
+		}
+	});
+		logger.info(JSON.toJSONString(repaymentProjPlanDtos));
+		for (RepaymentProjPlanDto repaymentProjPlanDto : repaymentProjPlanDtos) {
+
+			logger.info("满标时间{}"+DateUtil.formatDate(repaymentProjPlanDto.getTuandaiProjectInfo().getQueryFullSuccessDate()));
+			logger.info("借款金额{}"+repaymentProjPlanDto.getRepaymentProjPlan().getBorrowMoney());
+			logger.info("是否主借标{}"+repaymentProjPlanDto.getTuandaiProjectInfo().getMasterIssueId().equals(repaymentProjPlanDto.getTuandaiProjectInfo().getProjectId()));
+
+		}
+
+
+	}
+//	public static
+
+
 }

@@ -744,11 +744,11 @@ public class FinanceController {
 			List<Integer> list=new ArrayList<Integer>();
 			List<Integer> logIds=new ArrayList<Integer>();
 			logIds.add(logId);
-			list.add(30);//还款来源银行代扣
+//			list.add(30);//还款来源银行代扣
 			req.setLogIds(logIds);
 			req.setAfterId(afterId);
 			req.setBusinessId(businessId);
-			req.setRepaySource(list);
+//			req.setRepaySource(list);
 			shareProfitService.execute(req, true);
               result.success(1);
 		} catch (Exception ex) {
