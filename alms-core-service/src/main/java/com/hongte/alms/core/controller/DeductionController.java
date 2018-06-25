@@ -124,13 +124,13 @@ public class DeductionController {
         	try {
         		bankCardInfos=customerInfoXindaiRemoteApi.getBankcardInfo(business.getCustomerIdentifyCard());
         		if(bankCardInfos!=null&&bankCardInfos.size()>0) {
-        			
-        			for(int i=0;i<bankCardInfos.size();i++) {
-        				//看看是否有对应资金端的ID
-        				if(bankCardInfos.get(i).getPlatformType()==business.getOutputPlatformId()) {
-        					bankCardInfo=bankCardInfos.get(i);
-        				}
-        			}
+        			bankCardInfo=bankCardInfos.get(0);
+//        			for(int i=0;i<bankCardInfos.size();i++) {
+//        				//看看是否有对应资金端的ID
+//        				if(bankCardInfos.get(i).getPlatformType()==business.getOutputPlatformId()) {
+//        					bankCardInfo=bankCardInfos.get(i);
+//        				}
+//        			}
         		}else {
         			return Result.error("-1", "该客户找不到对应银行卡信息");
         		}
@@ -144,6 +144,7 @@ public class DeductionController {
             //执行代扣信息
             DeductionVo deductionVo=  deductionService.selectDeductionInfoByPlanListId(planListId);
             deductionVo.setBankCardInfo(bankCardInfo);
+            deductionVo.setIdentifyCard(bankCardInfo.getIdentityNo());
             deductionVo.setStrType(business.getSrcType());
             if(deductionVo!=null) {
             	if(istLastPeriod(planList)) {
@@ -163,8 +164,8 @@ public class DeductionController {
             	deductionVo.setOnLineOverDueMoney(onLineOverDueMoney);
             	deductionVo.setUnderLineOverDueMoney(underLineOverDueMoney);
             	//查看是否共借标，共借标不能银行代扣
-        		deductionVo.setIssueSplitType(business.getIssueSplitType());
-            	if(business.getSrcType()==2) {
+        		//deductionVo.setIssueSplitType(business.getIssueSplitType());
+            	if(business.getSrcType()!=null&&business.getSrcType()==2) {
             	   	//还款成功和还款中的数据
 	        		List<WithholdingRepaymentLog> loglist=withholdingRepaymentLogService.selectList(new EntityWrapper<WithholdingRepaymentLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).ne("repay_status", 0));
 	        		//还款中的数据

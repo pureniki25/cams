@@ -405,7 +405,7 @@ public class ApplyDerateController {
 	public Result<Map<String, Object>> getHousePreLateFees(@RequestParam("crpId") String crpId,
 			@RequestParam(value = "afterId") String afterId, @RequestParam(value = "businessId") String businessId,
 			@RequestParam(value = "repaymentTypeId") String repaymentTypeId,@RequestParam(value = "restPeriods") String restPeriods,@RequestParam(value = "needPayPrincipal") String needPayPrincipal) {
-
+		logger.info("@getHousePreLateFees@房贷:获取提前结清违约金开始==========");
 		Map<String, Object> retMap = new HashMap<>();
 		ExpenseSettleVO vo=null;
 		try {
@@ -430,10 +430,10 @@ public class ApplyDerateController {
 				}
 			}
 
-
+			logger.info("获取房贷逾期费率开始==========");
 	        //获取房贷逾期费率
 	        List<SysParameter> sysParameters =  sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type","houseRate").eq("status",1).orderBy("row_Index"));
-	 
+	        logger.info("获取房贷逾期费率结束==========");
 			// 应付提前结清违约金
 			
 				retMap.put("preLateFees", JSON.toJSON(vo.getPenalty(), JsonUtil.getMapping()));// 提前还款违约金
@@ -445,14 +445,14 @@ public class ApplyDerateController {
                 	 retMap.put("houseRate",  JSON.toJSON(0.002, JsonUtil.getMapping()));//房贷逾期费率
                 }
             
-
+            	logger.info("@getHousePreLateFees@房贷:获取提前结清违约金结束==========");
 
 			return Result.success(retMap);
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			logger.error(ex.getMessage());
-			return Result.error("500", ex.getMessage());
+			logger.error("房贷:获取提前结清违约金出错"+ex);
+			return Result.error("500", ex.toString());
 		}
 
 	}
@@ -504,8 +504,8 @@ public class ApplyDerateController {
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			logger.error(ex.getMessage());
-			return Result.error("500", ex.getMessage());
+			logger.error("车贷:获取提前结清违约金"+ex.toString());
+			return Result.error("500", ex.toString());
 		}
 
 	}
