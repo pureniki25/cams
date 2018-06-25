@@ -25,9 +25,6 @@ public class BasicBusinessVo extends BasicBusiness{
     private String status;
 
 
-    //还款状态：还款中，已结清
-    private String status;
-
 
 
 
