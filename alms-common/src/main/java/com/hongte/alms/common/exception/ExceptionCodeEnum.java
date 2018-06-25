@@ -12,6 +12,7 @@ import java.io.Serializable;
 public enum ExceptionCodeEnum  implements IEnum {
 
     NULL(250,"对象为空异常")
+    ,RUNING(300,"程序执行中，请完成本次执行后再触发")
    ;
 
     private Integer value;

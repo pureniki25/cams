@@ -657,6 +657,8 @@ public class CollectionTransferController {
 //				for (Collection collection : collectionList) {
 //					transCollectSet(collection);
 //				}
+			}else{
+				runningFlage  = false;
 			}
 
 
