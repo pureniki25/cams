@@ -184,7 +184,10 @@ public class DeductionController {
 	        			deductionVo.setRepayAllAmount(repayAmount);
 	        			deductionVo.setRepayingAmount(repayingAmount);
 	        			deductionVo.setRestAmount(BigDecimal.valueOf(deductionVo.getTotal()).subtract(repayAmount));
+	        			deductionVo.setRepayAmount(deductionVo.getRestAmount());
 	        			deductionVo.setTotal(deductionVo.getTotal()-deductionVo.getRepayingAmount().doubleValue());
+	        		}else {
+	        			deductionVo.setRepayAmount(BigDecimal.valueOf(deductionVo.getTotal()));
 	        		}
 	                return Result.success(deductionVo);
             	}else {
@@ -206,7 +209,10 @@ public class DeductionController {
 	        			deductionVo.setRepayAllAmount(repayAmount);
 	        			deductionVo.setRepayingAmount(repayingAmount);
 	        			deductionVo.setRestAmount(BigDecimal.valueOf(deductionVo.getTotal()).subtract(repayAmount));
+	        			deductionVo.setRepayAmount(deductionVo.getRestAmount());
 	        			deductionVo.setTotal(deductionVo.getTotal()-deductionVo.getRepayingAmount().doubleValue());
+	        		}else {
+	        			deductionVo.setRepayAmount(BigDecimal.valueOf(deductionVo.getTotal()));
 	        		}
 	                return Result.success(deductionVo);
             	}
