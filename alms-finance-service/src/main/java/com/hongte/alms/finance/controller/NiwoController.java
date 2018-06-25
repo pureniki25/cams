@@ -66,4 +66,27 @@ public class NiwoController {
 		logger.info("@sycRepayPlanBySearch@同步你我金融还款计划--结束[{}]");
 	}
 	
+	
+	
+	@GetMapping(value = "/sendFailMsg")
+	@ApiOperation(value = "你我金融发送扣款失败短信")
+	public void sendFailMsg() {
+		logger.info("@sendFailMsg@你我金融发送扣款失败短信--开始[{},{}]");
+		niWoRepayPlanService.calFailMsg();
+		logger.info("@sendFailMsg@你我金融发送扣款失败短信--结束[{}]");
+	}
+	
+	
+	
+	@GetMapping(value = "/sendRemindMsg")
+	@ApiOperation(value = "你我金融发送还款提醒短信")
+	public void sendRemindMsg() {
+		logger.info("@sendRemindMsg@你我金融发送还款提醒短信--开始[{},{}]");
+		niWoRepayPlanService.sendRepayRemindMsg(15);
+		niWoRepayPlanService.sendRepayRemindMsg(1);
+		niWoRepayPlanService.sendSettleRemindMsg(1);
+		niWoRepayPlanService.sendSettleRemindMsg(15);
+		logger.info("@sendRemindMsg@你我金融发送还款提醒短信--结束[{}]");
+	}
+	
 }
