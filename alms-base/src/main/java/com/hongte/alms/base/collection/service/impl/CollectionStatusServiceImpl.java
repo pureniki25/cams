@@ -264,17 +264,22 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
             collectionLogService.insert(log);
 
 
-            //刷新相关跟单人员的用户设置
-            //1.旧的那个跟单人的permission刷新
-            if(oldStaffUserId!=null){
-                sysUserPermissionService.setUserPermissons(oldStaffUserId);
+            //信贷历史数据导入则不刷新跟单人的权限信息
+            if(setWayEnum.getKey()!= CollectionSetWayEnum.XINDAI_LOG.getKey()){
+                //刷新相关跟单人员的用户设置
+                //1.旧的那个跟单人的permission刷新
+                if(oldStaffUserId!=null){
+                    sysUserPermissionService.setUserPermissons(oldStaffUserId);
+                }
+
+                //2.新的那个跟单人的permission刷新
+                if(staffType.equals(CollectionStatusEnum.PHONE_STAFF.getPageStr())
+                        || staffType.equals(CollectionStatusEnum.COLLECTING.getPageStr())) {
+                    sysUserPermissionService.setUserPermissons(staffUserId);
+                }
             }
 
-            //2.新的那个跟单人的permission刷新
-            if(staffType.equals(CollectionStatusEnum.PHONE_STAFF.getPageStr())
-                    || staffType.equals(CollectionStatusEnum.COLLECTING.getPageStr())) {
-                sysUserPermissionService.setUserPermissons(staffUserId);
-            }
+
         }
         return true;
     }

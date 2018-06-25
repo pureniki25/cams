@@ -20,6 +20,7 @@ import com.hongte.alms.base.service.SysParameterService;
 import com.hongte.alms.base.service.TransferFailLogService;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.Constant;
+import com.hongte.alms.common.util.ListUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.LoginInfoDto;
@@ -33,6 +34,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.concurrent.Executor;
 
 /**
  * @author:曾坤
@@ -46,6 +48,17 @@ public class CollectionTrackLogTransferController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CollectionTrackLogTransferController.class);
 
 	private static Boolean runningFlage = false;
+
+	//异步执行线程1执行标志位
+	private  static Boolean thread1Execute = false;
+	//异步执行线程2执行标志位
+	private  static Boolean thread2Execute = false;
+	//异步执行线程3执行标志位
+	private  static Boolean thread3Execute = false;
+	//异步执行线程4执行标志位
+	private  static Boolean thread4Execute = false;
+	//异步执行线程5执行标志位
+	private  static Boolean thread5Execute = false;
 
 	@Autowired
 	private LoginUserInfoHelper loginUserInfoHelper;
@@ -75,6 +88,9 @@ public class CollectionTrackLogTransferController {
 	@Qualifier("SysParameterService")
 	SysParameterService sysParameterService;
 
+	@Autowired
+	Executor executor;
+
 	@GetMapping("/transfer")
 	@ResponseBody
 	public Result transferCollectionTransfer() {
@@ -87,24 +103,141 @@ public class CollectionTrackLogTransferController {
 
 		try{
 			List<Parametertracelog> parametertracelogs = parametertracelogService.selectUnTransParametertracelogs();
-
 			if(parametertracelogs!=null){
-				for(Parametertracelog parametertracelog:parametertracelogs){
+			List<List<Parametertracelog>>  averageList = ListUtil.averageAssign(parametertracelogs,5);
 
-					transferOneCollectionLog(parametertracelog);
+
+			Integer index =0;
+
+			//第一条线程
+			List<Parametertracelog>  list1 = averageList.get(0);
+			executor.execute(new Runnable() {
+				@Override
+				public void run() {
+					thread1Execute=true;
+					try{
+						for (Parametertracelog parametertracelog: list1) {
+							transferOneCollectionLog(parametertracelog);
+						}
+					}catch(Exception e){
+						e.printStackTrace();
+						LOGGER.error("同步历史贷后跟踪数据异常"+e.getMessage());
+					}
+					thread1Execute =false;
+					if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute){
+						runningFlage =false;
+					}
 				}
+			});
+
+			//第二条线程
+			List<Parametertracelog>  list2 = averageList.get(1);
+			executor.execute(new Runnable() {
+				@Override
+				public void run() {
+					thread2Execute=true;
+					try{
+						for (Parametertracelog parametertracelog: list2) {
+							transferOneCollectionLog(parametertracelog);
+						}
+					}catch(Exception e){
+						e.printStackTrace();
+						LOGGER.error("同步历史贷后跟踪数据异常"+e.getMessage());
+					}
+					thread2Execute =false;
+					if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute){
+						runningFlage =false;
+					}
+				}
+			});
+
+
+			//第三条线程
+			List<Parametertracelog>  list3 = averageList.get(2);
+			executor.execute(new Runnable() {
+				@Override
+				public void run() {
+					thread3Execute=true;
+					try{
+						for (Parametertracelog parametertracelog: list3) {
+							transferOneCollectionLog(parametertracelog);;
+						}
+					}catch(Exception e){
+						e.printStackTrace();
+						LOGGER.error("同步历史贷后跟踪数据异常"+e.getMessage());
+					}
+					thread3Execute =false;
+					if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute){
+						runningFlage =false;
+					}
+				}
+			});
+
+			//第四条线程
+			List<Parametertracelog>  list4 = averageList.get(3);
+			executor.execute(new Runnable() {
+				@Override
+				public void run() {
+					thread4Execute=true;
+					try{
+						for (Parametertracelog parametertracelog: list4) {
+							transferOneCollectionLog(parametertracelog);;
+						}
+					}catch(Exception e){
+						e.printStackTrace();
+						LOGGER.error("同步历史贷后跟踪数据异常"+e.getMessage());
+					}
+					thread4Execute =false;
+					if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute){
+						runningFlage =false;
+					}
+				}
+			});
+
+
+			//第五条线程
+			List<Parametertracelog>  list5 = averageList.get(4);
+			executor.execute(new Runnable() {
+				@Override
+				public void run() {
+					thread5Execute=true;
+					try{
+						for (Parametertracelog parametertracelog: list5) {
+							transferOneCollectionLog(parametertracelog);;
+						}
+					}catch(Exception e){
+						e.printStackTrace();
+						LOGGER.error("同步历史贷后跟踪数据异常"+e.getMessage());
+					}
+					thread5Execute =false;
+					if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute){
+						runningFlage =false;
+					}
+				}
+			});
+
+
+//				for(Parametertracelog parametertracelog:parametertracelogs){
+//
+//					transferOneCollectionLog(parametertracelog);
+//				}
+				Thread.sleep(5*1000);
+			}else{
+				runningFlage =false;
 			}
 
 		}catch (Exception e){
 			e.printStackTrace();
-			LOGGER.error("同步历史贷后跟踪记录，查询列表异常"+e.getMessage());
+			LOGGER.error("同步历史贷后跟踪数据异常"+e.getMessage());
 			recordErrorInfo(UUID.randomUUID().toString(),"default_1",
 					Exception,"","查询列表异常");
 			return Result.error("200","同步历史贷后跟踪记录，查询列表异常");
 		}
 
-		LOGGER.error("完成一次历史贷后跟踪记录同步");
-		runningFlage = false;
+
+
+		LOGGER.error("开始一次历史贷后跟踪记录同步（异步执行）");
+//		runningFlage = false;
 		return Result.success();
 
 	}
@@ -134,7 +267,7 @@ public class CollectionTrackLogTransferController {
 //			}
 
 			List<RepaymentBizPlanList> planLists =  repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().
-					eq("business_id",carBusinessId).
+					eq("orig_business_id",carBusinessId).
 					eq("after_id",carBusinessAfterId));
 
 			if(planLists == null ||planLists.size() == 0){
@@ -159,8 +292,9 @@ public class CollectionTrackLogTransferController {
 						collectionTrackLog.setRecorderUser(Constant.ADMIN_ID);
 //					recordErrorInfo(carBusinessId,carBusinessAfterId,
 //							NoUser,"1","没有用户信息");
+				}else{
+					collectionTrackLog.setRecorderUser(dto.getUserId());
 				}
-				collectionTrackLog.setRecorderUser(dto.getUserId());
 			}else{
 				collectionTrackLog.setRecorderUser(Constant.ADMIN_ID);
 			}

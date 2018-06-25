@@ -51,11 +51,11 @@ window.layinit(function(htConfig){
             searchForm: {
                 areaId:'',  //区域ID
                 companyId:'', //分公司ID
-                 showRepayDateBegin:'', //应还日期  开始
-                 showRepayDateEnd:'',  //应还日期 结束
+                showRepayDateBegin:'', //应还日期  开始
+                showRepayDateEnd:'',  //应还日期 结束
                 showRepayDateRange:'',//应还日期 区间 包含开始和结束时间
-                 realRepayDateBegin:'', //实还日期 开始
-                 realRepayDateEnd:'', //实还日期 结束
+                realRepayDateBegin:'', //实还日期 开始
+                realRepayDateEnd:'', //实还日期 结束
                 realRepayDateRange:'',//实还日期  区间 包含开始和结束时间
 //                delayDaysBegin:0,    //逾期天数 开始
                 delayDaysBegin:'',    //逾期天数 开始
@@ -73,7 +73,7 @@ window.layinit(function(htConfig){
                 repayStatus:'',      //还款状态
                 customerName:'',  //客户名称
                 peroidStatus:'' //期数状态,首期/本金期/末期
-        
+
             },
             areaList:'',//area_array,   //区域列表
             companyList: '',//company_array,  //公司列表
@@ -101,7 +101,7 @@ window.layinit(function(htConfig){
                         var dateObj = getData();
 
                         table.reload('listTable', {
-                        	url: basePath + 'collection/selectALStandingBookVoPage',
+                            url: basePath + 'collection/selectALStandingBookVoPage',
                             where: {
                                 areaId:vm.searchForm.areaId,  //区域ID
                                 companyId:vm.searchForm.companyId, //分公司ID
@@ -178,18 +178,18 @@ window.layinit(function(htConfig){
 
             ////  ----   单行操作界面显示  结束 -----------------
             clickExport() {//导出Excel表格
-            	
-                layui.use(['layer', 'table','ht_config'], function () {debugger
-                vm.$refs['searchForm'].validate((valid) => {
-		                    if (valid) {debugger
-		                        getData();
-		                        vm.exporting = true;
-		                        expoertExcel(basePath + "collection/saveExcel",vm.searchForm,"贷后管理.xlsx");
 
-		                        vm.exporting = false;
-		
-		                    }
-		                })
+                layui.use(['layer', 'table','ht_config'], function () {debugger
+                    vm.$refs['searchForm'].validate((valid) => {
+                        if (valid) {debugger
+                            getData();
+                            vm.exporting = true;
+                            expoertExcel(basePath + "collection/saveExcel",vm.searchForm,"贷后管理.xlsx");
+
+                            vm.exporting = false;
+
+                        }
+                    })
                 });
             }
         },
@@ -198,7 +198,7 @@ window.layinit(function(htConfig){
 
         }
     });
-  //为表单添加输入
+    //为表单添加输入
     var addInput = function(form, type,name,value){
         var input=document.createElement("input");
         input.type=type;
@@ -292,22 +292,22 @@ window.layinit(function(htConfig){
                     align: 'right',
                     templet:function(d){
                         let styel = 'background-color: #CCCC00;background-image: none !important;text-shadow: none !important;display: inline-block;padding: 2px 4px;font-size: 11.844px;font-weight: bold;line-height: 14px;color: #fff;text-shadow: 0 -1px 0 rgba(0,0,0,0.25);white-space: nowrap;vertical-align: baseline;'
-                        res = '' 
-                        let firstPeriod = '<span style="'+styel+'">首期</span>' 
-                        let benjinPeriod = '<span style="'+styel+'">本金期</span>' 
-                        let lastPeriod = '<span style="'+styel+'">末期</span>' 
+                        res = ''
+                        let firstPeriod = '<span style="'+styel+'">首期</span>'
+                        let benjinPeriod = '<span style="'+styel+'">本金期</span>'
+                        let lastPeriod = '<span style="'+styel+'">末期</span>'
                         let isZQ = d.afterId.indexOf('ZQ')>-1?true:false;
                         if(d.periods==1&&!isZQ){
                             res+=firstPeriod
                         }
-                        if(d.repaymentTypeId==2&&d.borrowLimit==d.periods){
+                        if((d.repaymentTypeId==2 ||d.repaymentTypeId==1) &&d.borrowLimit+1==d.periods){
                             res+=benjinPeriod
                         }
-                        if(d.repaymentTypeId==5&&d.borrowLimit==d.periods){
+                        if(d.borrowLimit+1==d.periods){
                             res+=lastPeriod
                         }
-                        res += numeral(d.totalBorrowAmount).format('0,0.00')+'' 
-                        return res 
+                        res += numeral(d.totalBorrowAmount).format('0,0.00')+''
+                        return res
                     }
                 }, {
 
@@ -409,8 +409,8 @@ window.layinit(function(htConfig){
                                     {
                                         "name": "贷后跟踪记录", click: function (e, currentItem) {
                                         // if (currentItem.statusName == '逾期') {
-                                            var url = "/collectionUI/staffTrackRecordUI?businessId=" + currentItem.businessId + "&crpId=" + currentItem.crpId
-                                            showOneLineOprLayer(url, "贷后跟踪记录");
+                                        var url = "/collectionUI/staffTrackRecordUI?businessId=" + currentItem.businessId + "&crpId=" + currentItem.crpId
+                                        showOneLineOprLayer(url, "贷后跟踪记录");
                                         // } else {
                                         //     vm.$Modal.error({content: "逾期的业务才能添加贷后跟踪记录！"})
                                         // }
@@ -421,7 +421,7 @@ window.layinit(function(htConfig){
                             }
                             if (authValid('applyDerate')) {
                                 if(e.statusName != '已还款' && e.statusName != '已结清'
-                                  &&  e.afterColStatusName!='已移交法务' &&
+                                    &&  e.afterColStatusName!='已移交法务' &&
                                     e.repaymentTypeId!=9 && e.repaymentTypeId!=4){
                                     buttons.push(
                                         {
@@ -453,17 +453,17 @@ window.layinit(function(htConfig){
                                 //             if (currentItem.statusName == '已还款'||currentItem.statusName == '已结清'){
                                 //             	 vm.$Modal.error({content: '已还款或已结清的不能发起减免申请！'});
                                 //             }else{
-	                             //                    if (currentItem.afterColStatusName=='已移交法务'){
-	                             //                  	   vm.$Modal.error({content: '已移交法务的不能发起减免申请！'});
-	                             //                    }else{
-		                         //                    	     if (currentItem.repaymentTypeId==9||currentItem.repaymentTypeId==4){
-		                         //                         	   vm.$Modal.error({content: '现在只支持等额本息,先息后本,分期还本付息5年,分期还本付息10年还款方式的减免申请！'});
-			                     //                             }else{
-			                     //                                 var url = '/collectionUI/applyDerateUI?businessId=' + currentItem.businessId + '&crpId=' + currentItem.crpId + "&processStatus=-1"+'&businessTypeId='+currentItem.businessTypeId+"&afterId="+currentItem.afterId
-			                     //                                 showOneLineOprLayer(url, "减免申请")
-			                     //                             }
-	                             //
-	                             //                  }
+                                //                    if (currentItem.afterColStatusName=='已移交法务'){
+                                //                  	   vm.$Modal.error({content: '已移交法务的不能发起减免申请！'});
+                                //                    }else{
+                                //                    	     if (currentItem.repaymentTypeId==9||currentItem.repaymentTypeId==4){
+                                //                         	   vm.$Modal.error({content: '现在只支持等额本息,先息后本,分期还本付息5年,分期还本付息10年还款方式的减免申请！'});
+                                //                             }else{
+                                //                                 var url = '/collectionUI/applyDerateUI?businessId=' + currentItem.businessId + '&crpId=' + currentItem.crpId + "&processStatus=-1"+'&businessTypeId='+currentItem.businessTypeId+"&afterId="+currentItem.afterId
+                                //                                 showOneLineOprLayer(url, "减免申请")
+                                //                             }
+                                //
+                                //                  }
                                 //             }
                                 //     }
                                 //     }
@@ -512,14 +512,14 @@ window.layinit(function(htConfig){
                             }
                             if (authValid('repaymentRegister')) {
                                 // if(e.statusName != '已还款' && e.statusName != '已结清') {
-                                    buttons.push(
-                                        {
-                                            "name": "客户还款登记", click: function (e, currentItem) {
-                                            var url = '/collectionUI/repaymentRegister?businessId=' + currentItem.businessId + '&afterId=' + currentItem.afterId
-                                            showOneLineOprLayer(url, "客户还款登记")
-                                        }
-                                        }
-                                    )
+                                buttons.push(
+                                    {
+                                        "name": "客户还款登记", click: function (e, currentItem) {
+                                        var url = '/collectionUI/repaymentRegister?businessId=' + currentItem.businessId + '&afterId=' + currentItem.afterId
+                                        showOneLineOprLayer(url, "客户还款登记")
+                                    }
+                                    }
+                                )
                                 // }
                             }
                             if (authValid('checkFundPool')) {
@@ -604,14 +604,14 @@ window.layinit(function(htConfig){
                                 }
                             }
                             buttons.push(
-                                    {
-                                        "name": "贷后详情", click: function (e, currentItem) {
-                                             var url = '/collectionUI/afterDetail?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+'&businessTypeId='+currentItem.businessTypeId
-                                            showOneLineOprLayer(url, "贷后详情")
-                                    
-                                    }
-                                    }
-                                )
+                                {
+                                    "name": "贷后详情", click: function (e, currentItem) {
+                                    var url = '/collectionUI/afterDetail?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+'&businessTypeId='+currentItem.businessTypeId
+                                    showOneLineOprLayer(url, "贷后详情")
+
+                                }
+                                }
+                            )
                             return buttons;
                         }
                     });
@@ -633,45 +633,45 @@ window.layinit(function(htConfig){
 //        	return url;
 //        }
 
-        //监听工具条
-        table.on('tool(listTable)', function (obj) {
-            // vm.selectedRowInfo = obj.data;
-            if (obj.event === 'operate') {
+    //监听工具条
+    table.on('tool(listTable)', function (obj) {
+        // vm.selectedRowInfo = obj.data;
+        if (obj.event === 'operate') {
 
-            }else  if(obj.event ==='info'){
-                if(obj.data.businessTypeId == 9 || obj.data.businessTypeId == 1){
-                   //车贷  车贷展期
-                    axios.get(basePath + 'api/getXindaiAfterView?businessId='+obj.data.businessId+"&businessAfterId="+obj.data.afterId)
-                        .then(function (res) {
-                            if (res.data.code == "1") {
-                                showOneLineOprLayer(res.data.data,"车贷详情");
-                            } else {
-                                vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
-                            }
-                        })
-                        .catch(function (error) {
-                            vm.$Modal.error({content: '接口调用异常!'});
-                        });
-                }else if(obj.data.businessTypeId == 11 || obj.data.businessTypeId == 2){
-                    //房贷
-                    axios.get(basePath + 'api/getXindaiAfterView?businessId='+obj.data.businessId+"&businessAfterId="+obj.data.afterId)
-                        .then(function (res) {
-                            if (res.data.code == "1") {
-                                showOneLineOprLayer(res.data.data,"房贷详情");
-                            } else {
-                                vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
-                            }
-                        })
-                        .catch(function (error) {
-                            vm.$Modal.error({content: '接口调用异常!'});
-                        });
-                }
-
-                // vm.menu_modal = false;
+        }else  if(obj.event ==='info'){
+            if(obj.data.businessTypeId == 9 || obj.data.businessTypeId == 1){
+                //车贷  车贷展期
+                axios.get(basePath + 'api/getXindaiAfterView?businessId='+obj.data.businessId+"&businessAfterId="+obj.data.afterId)
+                    .then(function (res) {
+                        if (res.data.code == "1") {
+                            showOneLineOprLayer(res.data.data,"车贷详情");
+                        } else {
+                            vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
+                        }
+                    })
+                    .catch(function (error) {
+                        vm.$Modal.error({content: '接口调用异常!'});
+                    });
+            }else if(obj.data.businessTypeId == 11 || obj.data.businessTypeId == 2){
+                //房贷
+                axios.get(basePath + 'api/getXindaiAfterView?businessId='+obj.data.businessId+"&businessAfterId="+obj.data.afterId)
+                    .then(function (res) {
+                        if (res.data.code == "1") {
+                            showOneLineOprLayer(res.data.data,"房贷详情");
+                        } else {
+                            vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
+                        }
+                    })
+                    .catch(function (error) {
+                        vm.$Modal.error({content: '接口调用异常!'});
+                    });
             }
-        });
 
- })
+            // vm.menu_modal = false;
+        }
+    });
+
+})
 
 function getMousePos(event) {
     var e =  window.event;
@@ -841,7 +841,7 @@ var canOpenLayer = function () {
         if(checkStatus.data[i].statusName=='已还款'){
             return "已还款的业务不能设置电催/催收！"
         }
-        
+
     }
     return null;
 }
@@ -864,29 +864,29 @@ var getData = function(){
         realRepayDateEnd:''
     }
     if(vm.searchForm.showRepayDateRange.length>0){debugger
-      	if(vm.searchForm.showRepayDateRange[0]!=null){
-      	   dataObject.showRepayDateBegin = vm.searchForm.showRepayDateRange[0].getTime();
-      	   vm.searchForm.showRepayDateBegin=vm.searchForm.showRepayDateRange[0].getTime();
-      	}
-      	
-    	if(vm.searchForm.showRepayDateRange[1]!=null){
-       	   
-       	   var date =vm.searchForm.showRepayDateRange[1];
-           dataObject.showRepayDateEnd=date.getTime();
-      	   vm.searchForm.showRepayDateEnd=date.getTime();
-       	}
-     
+        if(vm.searchForm.showRepayDateRange[0]!=null){
+            dataObject.showRepayDateBegin = vm.searchForm.showRepayDateRange[0].getTime();
+            vm.searchForm.showRepayDateBegin=vm.searchForm.showRepayDateRange[0].getTime();
+        }
+
+        if(vm.searchForm.showRepayDateRange[1]!=null){
+
+            var date =vm.searchForm.showRepayDateRange[1];
+            dataObject.showRepayDateEnd=date.getTime();
+            vm.searchForm.showRepayDateEnd=date.getTime();
+        }
+
     }
     if(vm.searchForm.realRepayDateRange.length>0){
-      	if(vm.searchForm.realRepayDateRange[0]!=null){
-      	  dataObject.realRepayDateBegin = vm.searchForm.realRepayDateRange[0].getTime();
-      	  vm.searchForm.realRepayDateBegin=vm.searchForm.realRepayDateRange[0].getTime();
-      	}
-      	if(vm.searchForm.realRepayDateRange[1]!=null){
-          	   var date =vm.searchForm.realRepayDateRange[1];
-              dataObject.realRepayDateEnd=date.getTime();
-          	  vm.searchForm.realRepayDateEnd=date.getTime();
-        	}
+        if(vm.searchForm.realRepayDateRange[0]!=null){
+            dataObject.realRepayDateBegin = vm.searchForm.realRepayDateRange[0].getTime();
+            vm.searchForm.realRepayDateBegin=vm.searchForm.realRepayDateRange[0].getTime();
+        }
+        if(vm.searchForm.realRepayDateRange[1]!=null){
+            var date =vm.searchForm.realRepayDateRange[1];
+            dataObject.realRepayDateEnd=date.getTime();
+            vm.searchForm.realRepayDateEnd=date.getTime();
+        }
     }
     return dataObject;
 }
@@ -912,11 +912,11 @@ function getDeductionUrl(currentItem){
         headers : {
             app : 'ALMS',
             Authorization : "Bearer " + getToken()
-        }, 
+        },
         success : function(data) {
             var deduction = data.data;
             url =  '/collectionUI/deductionUI?planListId='+currentItem.crpId
-            },
+        },
         error : function() {
             layer.confirm('Navbar error:AJAX请求出错!', function(index) {
                 top.location.href = loginUrl;
