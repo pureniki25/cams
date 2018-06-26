@@ -123,6 +123,7 @@ public class RepaymentProjPlanListServiceImpl extends
 								RepaymentProjPlan projPlan = repaymentProjPlanService
 										.selectOne((new EntityWrapper<RepaymentProjPlan>().eq("creat_sys_type", 2))
 												.eq("proj_plan_id", projPList.getProjPlanId()));
+							
 								getRondModeAndSmallNum(projPlan);//确定进位方式和保留小数位
 								RepaymentProjPlanListDetail underLineProjDetail=null;   //线下费用的Detail
 								RepaymentProjPlanListDetail onLineProjDetail=null;   //线上费用的Detail
@@ -311,6 +312,10 @@ public class RepaymentProjPlanListServiceImpl extends
 		
 		private void getRondModeAndSmallNum(RepaymentProjPlan projPlan) {
 			//'进位方式标志位 0：进一位，1：不进位，4：四舍五入, 6:银行家舍入法';
+			if(projPlan.getRondmode()==null||projPlan.getSmallNum()==null) {
+				projPlan.setRondmode(4);
+				projPlan.setSmallNum(2);
+			}
 			switch(projPlan.getRondmode()) {
 		    case 0:
 		    	roundingMode=RoundingMode.UP;
@@ -393,11 +398,12 @@ public class RepaymentProjPlanListServiceImpl extends
 	     * @return
 	     */
 	    private BigDecimal principalAndInterest(String projId,Integer period){
+	    	
 	    	Map<String, Object> paramMap = new HashMap<>();
 			paramMap.put("projectId", projId);
 			Result result=null;
 		 try {
-			 result = eipRemote.advanceShareProfit(paramMap);
+			 result = eipRemote.queryProjectPayment(paramMap);
 			if(result==null) {
 				logger.debug("调查询平台垫付记录接口出错");
 			}
@@ -406,14 +412,15 @@ public class RepaymentProjPlanListServiceImpl extends
 		 }
 		 if(result!=null&&result.getReturnCode().equals("0000")) {
 			 HashMap<String,HashMap<String,String>> map=(HashMap) result.getData();
-				List<HashMap<String,String>> list=(List<HashMap<String, String>>) map.get("returnAdvanceShareProfits");
+				List<HashMap<String,Map>> list=(List<HashMap<String, Map>>) map.get("projectPayments");
 				String principalAndInterest="";
 				if(list.size()!=0){
 					for(int i=0;i<list.size();i++) {
 						String periods=String.valueOf(list.get(i).get("period"));
 						if(period.equals(periods))
 						{
-							principalAndInterest= String.valueOf(list.get(i).get("principalAndInterest"));
+							HashMap subMap=(HashMap) list.get(i).get("guaranteePayment");
+							principalAndInterest= subMap.get("principalAndInterest").toString();
 						}
 					}
 				}
