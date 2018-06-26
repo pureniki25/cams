@@ -8,10 +8,10 @@ spring:
       name: alms-web-ui,base,rabbitmq,mongo,redis
       discovery:
         service-id: ussp-config-app
-        enabled: true
-      enabled: true
+        enabled: false
+      enabled: false
     bus:
-      enabled: true
+      enabled: false
 eureka:
   instance:
     prefer-ip-address: true

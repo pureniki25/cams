@@ -2,29 +2,63 @@ package com.hongte.alms.finance.service.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
-import com.hongte.alms.base.RepayPlan.dto.*;
-import com.hongte.alms.base.entity.*;
-import com.hongte.alms.base.enums.repayPlan.RepayPlanRepaySrcEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.hongte.alms.base.RepayPlan.dto.RepaymentBizPlanDto;
+import com.hongte.alms.base.RepayPlan.dto.RepaymentBizPlanListDto;
+import com.hongte.alms.base.RepayPlan.dto.RepaymentProjPlanDto;
+import com.hongte.alms.base.RepayPlan.dto.RepaymentProjPlanListDetailDto;
+import com.hongte.alms.base.RepayPlan.dto.RepaymentProjPlanListDto;
 import com.hongte.alms.base.dto.ConfirmRepaymentReq;
+import com.hongte.alms.base.entity.AccountantOverRepayLog;
+import com.hongte.alms.base.entity.BasicBusiness;
+import com.hongte.alms.base.entity.MoneyPoolRepayment;
+import com.hongte.alms.base.entity.RepaymentBizPlan;
+import com.hongte.alms.base.entity.RepaymentBizPlanBak;
+import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.RepaymentBizPlanListBak;
+import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
+import com.hongte.alms.base.entity.RepaymentBizPlanListDetailBak;
+import com.hongte.alms.base.entity.RepaymentConfirmLog;
+import com.hongte.alms.base.entity.RepaymentProjFactRepay;
+import com.hongte.alms.base.entity.RepaymentProjPlan;
+import com.hongte.alms.base.entity.RepaymentProjPlanBak;
+import com.hongte.alms.base.entity.RepaymentProjPlanList;
+import com.hongte.alms.base.entity.RepaymentProjPlanListBak;
+import com.hongte.alms.base.entity.RepaymentProjPlanListDetail;
+import com.hongte.alms.base.entity.RepaymentProjPlanListDetailBak;
+import com.hongte.alms.base.entity.RepaymentResource;
+import com.hongte.alms.base.entity.SysApiCallFailureRecord;
+import com.hongte.alms.base.entity.TuandaiProjectInfo;
+import com.hongte.alms.base.entity.WithholdingRepaymentLog;
+import com.hongte.alms.base.enums.AlmsServiceNameEnums;
 import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.enums.RepayCurrentStatusEnums;
 import com.hongte.alms.base.enums.RepayedFlag;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanRepaySrcEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.enums.repayPlan.SectionRepayStatusEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
+import com.hongte.alms.base.feignClient.PlatformRepaymentFeignClient;
 import com.hongte.alms.base.mapper.AccountantOverRepayLogMapper;
 import com.hongte.alms.base.mapper.ApplyDerateProcessMapper;
 import com.hongte.alms.base.mapper.ApplyDerateTypeMapper;
@@ -42,14 +76,20 @@ import com.hongte.alms.base.mapper.RepaymentResourceMapper;
 import com.hongte.alms.base.mapper.TuandaiProjectInfoMapper;
 import com.hongte.alms.base.process.mapper.ProcessMapper;
 import com.hongte.alms.base.service.AccountantOverRepayLogService;
+import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.RepaymentProjFactRepayService;
+import com.hongte.alms.base.service.RepaymentProjPlanListService;
+import com.hongte.alms.base.service.RepaymentProjPlanService;
 import com.hongte.alms.base.service.RepaymentResourceService;
+import com.hongte.alms.base.service.SysApiCallFailureRecordService;
+import com.hongte.alms.base.service.TuandaiProjectInfoService;
 import com.hongte.alms.base.service.WithholdingRepaymentLogService;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
+import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.finance.service.ShareProfitService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
-import sun.applet.Main;
 
 /**
  * @author 王继光 2018年5月24日 下午2:46:52
@@ -91,8 +131,6 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	MoneyPoolRepaymentMapper moneyPoolRepaymentMapper;
 	@Autowired
 	LoginUserInfoHelper loginUserInfoHelper;
-	
-	
 
 	@Autowired
 	@Qualifier("AccountantOverRepayLogService")
@@ -103,21 +141,42 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	@Autowired
 	@Qualifier("RepaymentResourceService")
 	RepaymentResourceService repaymentResourceService;
-	
+
 	@Autowired
 	@Qualifier("WithholdingRepaymentLogService")
 	WithholdingRepaymentLogService withholdingRepaymentLogService;
+
+	@Autowired
+	private PlatformRepaymentFeignClient platformRepaymentFeignClient;
+
+	@Autowired
+	@Qualifier("RepaymentProjPlanListService")
+	private RepaymentProjPlanListService repaymentProjPlanListService;
+
+	@Autowired
+	@Qualifier("RepaymentProjPlanService")
+	private RepaymentProjPlanService repaymentProjPlanService;
+
+	@Autowired
+	@Qualifier("BasicBusinessService")
+	private BasicBusinessService basicBusinessService;
+
+	@Autowired
+	@Qualifier("TuandaiProjectInfoService")
+	private TuandaiProjectInfoService tuandaiProjectInfoService;
 	
+	@Autowired
+	@Qualifier("SysApiCallFailureRecordService")
+	private SysApiCallFailureRecordService sysApiCallFailureRecordService;
 
 	private ThreadLocal<String> businessId = new ThreadLocal<String>();
 	private ThreadLocal<String> orgBusinessId = new ThreadLocal<String>();
 	private ThreadLocal<String> afterId = new ThreadLocal<String>();
 	private ThreadLocal<List<CurrPeriodProjDetailVO>> projListDetails = new ThreadLocal<List<CurrPeriodProjDetailVO>>();
-	//还款来源列表
 	private ThreadLocal<List<RepaymentResource>> repaymentResources = new ThreadLocal<List<RepaymentResource>>();
-	//业务还款计划dto
+	// 业务还款计划dto
 	private ThreadLocal<RepaymentBizPlanDto> planDto = new ThreadLocal<RepaymentBizPlanDto>();
-	
+
 	/**
 	 * 总应还金额（减去实还后的金额）
 	 */
@@ -147,7 +206,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	private ThreadLocal<List<RepaymentProjPlanBak>> repaymentProjPlanBaks = new ThreadLocal<List<RepaymentProjPlanBak>>();
 	private ThreadLocal<List<RepaymentProjPlanListBak>> repaymentProjPlanListBaks = new ThreadLocal<List<RepaymentProjPlanListBak>>();
 	private ThreadLocal<List<RepaymentProjPlanListDetailBak>> repaymentProjPlanListDetailBaks = new ThreadLocal<List<RepaymentProjPlanListDetailBak>>();
-	
+
 //	private ThreadLocal<List<Integer>> repaySource = new ThreadLocal<List<Integer>>();
 	//调用来源的标志位
 	private  ThreadLocal<Integer> callFlage = new  ThreadLocal<Integer>();
@@ -194,12 +253,11 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		repaymentProjPlanBaks.set(new ArrayList<>());
 		repaymentProjPlanListBaks.set(new ArrayList<>());
 		repaymentProjPlanListDetailBaks.set(new ArrayList<>());
-		
-		
+
 	}
 
 	@Override
-	@Transactional(rollbackFor = {ServiceRuntimeException.class,Exception.class})
+	@Transactional(rollbackFor = { ServiceRuntimeException.class, Exception.class })
 	public List<CurrPeriodProjDetailVO> execute(ConfirmRepaymentReq req, boolean save) {
 		this.save.set(save);
 		if (req == null) {
@@ -211,8 +269,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		if (req.getAfterId() == null) {
 			throw new ServiceRuntimeException("ConfirmRepaymentReq.afterId 不能为空");
 		}
-		if ((req.getMprIds() == null||req.getMprIds().isEmpty()) 
-				&&( req.getSurplusFund() == null || req.getSurplusFund().equals(new BigDecimal("0")))
+		if ((req.getMprIds() == null || req.getMprIds().isEmpty())
+				&& (req.getSurplusFund() == null || req.getSurplusFund().equals(new BigDecimal("0")))
 				&& (req.getLogIds() == null || req.getLogIds().isEmpty())) {
 			throw new ServiceRuntimeException("ConfirmRepaymentReq至少要有一个还款来源");
 		}
@@ -222,19 +280,19 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 
 		initVariable(req);
 		BigDecimal unpaid = repaymentProjFactRepayService.caluUnpaid(businessId.get(), afterId.get());
-		if (unpaid.compareTo(new BigDecimal("0"))<=0) {
+		if (unpaid.compareTo(new BigDecimal("0")) <= 0) {
 			throw new ServiceRuntimeException("不存在未还款项目");
 		}
-		//设置应还金额
+		// 设置应还金额
 		repayPlanAmount.set(unpaid);
-		//设置业务还款计划信息
+		// 设置业务还款计划信息
 		planDto.set(initRepaymentBizPlanDto(req));
 		sortRepaymentResource(req);
 		if (repayFactAmount.get().compareTo(repayPlanAmount.get()) >= 0) {
 			surplusAmount.set(repayFactAmount.get().subtract(repayPlanAmount.get()));
-			logger.info("surplusAmount={}",surplusAmount.get());
-			if (surplusAmount.get().compareTo(new BigDecimal("0"))>0&&this.save.get()) {
-				AccountantOverRepayLog accountantOverRepayLog = new AccountantOverRepayLog() ;
+			logger.info("surplusAmount={}", surplusAmount.get());
+			if (surplusAmount.get().compareTo(new BigDecimal("0")) > 0 && this.save.get()) {
+				AccountantOverRepayLog accountantOverRepayLog = new AccountantOverRepayLog();
 				accountantOverRepayLog.setBusinessAfterId(req.getAfterId());
 				accountantOverRepayLog.setBusinessId(req.getBusinessId());
 				accountantOverRepayLog.setCreateTime(new Date());
@@ -252,7 +310,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			}
 		} else {
 			lackAmount.set(repayPlanAmount.get().subtract(repayFactAmount.get()));
-			logger.info("lackAmount={}",lackAmount.get());
+			logger.info("lackAmount={}", lackAmount.get());
 		}
 
 		//分配线上输入的滞纳金
@@ -260,16 +318,16 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		divideOveryDueMoneyNew(req.getOnlineOverDue(), planDto.get(), true);
 
 		//填充信息  新的分润方法，按标从小到大，到主借标的顺序分
-		fillNew();
+//		fillNew();
 
 		///////   旧的分润方法  均分  开始 ==========
-//		//计算标在业务中的占比
-//		caluProportion(planDto.get());
-////		分配线上输入的滞纳金
-//		divideOveryDueMoney(req.getOfflineOverDue(), planDto.get(), false);
-//		divideOveryDueMoney(req.getOnlineOverDue(), planDto.get(), true);
-////		填充信息
-//		fill();
+		//计算标在业务中的占比
+		caluProportion(planDto.get());
+//		分配线上输入的滞纳金
+		divideOveryDueMoney(req.getOfflineOverDue(), planDto.get(), false);
+		divideOveryDueMoney(req.getOnlineOverDue(), planDto.get(), true);
+//		填充信息
+		fill();
 		///////   旧的分润方法  均分  结束 ==========
 
 		if (save) {
@@ -287,23 +345,21 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	 * @return
 	 */
 	private void sortRepaymentResource(ConfirmRepaymentReq req) {
-		//线下代扣流水ID列表
+		// 线下代扣流水ID列表
 		List<String> mprids = req.getMprIds();
-		//结余金额
+		// 结余金额
 		BigDecimal surplus = req.getSurplusFund();
-		//代扣银行流水ID
-		List<Integer> logIds= req.getLogIds();
+		// 代扣银行流水ID
+		List<Integer> logIds = req.getLogIds();
 
-		//处理线下转账
+		// 处理线下转账
 		if (mprids != null && mprids.size() > 0) {
 			List<MoneyPoolRepayment> moneyPoolRepayments = moneyPoolRepaymentMapper.selectBatchIds(mprids);
 			for (MoneyPoolRepayment moneyPoolRepayment : moneyPoolRepayments) {
-				//增加总实还金额
+				// 增加总实还金额
 				repayFactAmount.set(repayFactAmount.get().add(moneyPoolRepayment.getAccountMoney()));
-				;
-				//增加银行流水还的金额
+				// 增加银行流水还的金额
 				moneyPoolAmount.set(moneyPoolAmount.get().add(moneyPoolRepayment.getAccountMoney()));
-				;
 				RepaymentResource repaymentResource = new RepaymentResource();
 				repaymentResource.setAfterId(moneyPoolRepayment.getAfterId());
 				repaymentResource.setBusinessId(moneyPoolRepayment.getOriginalBusinessId());
@@ -322,7 +378,6 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 				repaymentResources.get().add(repaymentResource);
 			}
 		}
-		
 
 		// repaySource {20：自动线下代扣已还款，21，人工线下代扣已还款，30：自动银行代扣已还款，31：人工银行代扣已还款}
 		if(logIds!=null&&logIds.size()>0) {
@@ -1033,14 +1088,12 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		}
 
 		//3.最后按核销顺序还金额
-		String lastProjectId = null;
 		for (int i = 0; i < dto.getProjPlanDtos().size(); i++) {
 			if(lastPaySuc == false) return;
 			RepaymentProjPlanDto  repaymentProjPlanDto = dto.getProjPlanDtos().get(i);
 			String projectId = repaymentProjPlanDto.getTuandaiProjectInfo().getProjectId();
-			lastProjectId = projectId;
 			CurrPeriodProjDetailVO currPeriodProjDetailVO = getCurrPeriodProjDetailVO(projectId);
-			currPeriodProjDetailVO.setSurplus(new BigDecimal("0"));
+
 
 			List<RepaymentProjPlanListDto> repaymentProjPlanListDtos = repaymentProjPlanDto.getProjPlanListDtos();
 			//遍历标的还款计划
@@ -1057,24 +1110,6 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 					}
 				}
 			}
-		}
-		//结余
-		BigDecimal surplusFund = new BigDecimal("0");
-		//如果最后一次还款都还足了，就计算结余
-		if(lastPaySuc == true){
-			surplusFund = surplusFund.add(curalDivideAmount.get());
-			boolean setBl = true;
-			while(setBl == true){
-				setBl =  setNewRepaymentResource(resourceIndex.get()+1);
-				if(setBl){
-					surplusFund = surplusFund.add(curalDivideAmount.get());
-				}
-			}
-		}
-		//将结余设置到最后一个标上
-		if(lastProjectId!=null){
-			CurrPeriodProjDetailVO lastPeriodProjDetailVO = getCurrPeriodProjDetailVO(lastProjectId);
-			lastPeriodProjDetailVO.setSurplus(surplusFund);
 		}
 	}
 
@@ -1134,7 +1169,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			createProjFactRepay(money, detail, currPeriodProjDetailVO,curalResource.get());
 			realPayed = money;
 			//上一条还款来源的可用金额已用完，找下一条还款来源来用
-			curalDivideAmount.set(null);
+			curalDivideAmount = null;
 			setNewRepaymentResource(resourceIndex.get()+1);
 		} else {
 			logger.info("divideAmount少于unpaid");
@@ -1142,7 +1177,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			money = curalDivideAmount.get();
 			unpaid = unpaid.subtract(money);
 			createProjFactRepay(money, detail, currPeriodProjDetailVO,curalResource.get());
-			curalDivideAmount.set(null);
+			curalDivideAmount = null;
 			boolean setBl =  setNewRepaymentResource(resourceIndex.get()+1);
 			realPayed = money;
 			// 如果成功取到下一条还款流水  剩余未还完的继续还
@@ -1766,35 +1801,83 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		confirmLog.get().setPeriod(planDto.get().getBizPlanListDtos().get(0).getRepaymentBizPlanList().getPeriod());
 		confirmLog.get().insert();
 		
-		repaymentBizPlanBak.get().setConfirmLogId(confirmLog.get().getConfirmLogId());
+		String confirmLogId = confirmLog.get().getConfirmLogId();
+		repaymentBizPlanBak.get().setConfirmLogId(confirmLogId);
 		repaymentBizPlanBak.get().insert();
-		repaymentBizPlanListBak.get().setConfirmLogId(confirmLog.get().getConfirmLogId());
+		repaymentBizPlanListBak.get().setConfirmLogId(confirmLogId);
 		repaymentBizPlanListBak.get().insert();
 		
 		for (RepaymentBizPlanListDetailBak planListDetailBak  : repaymentBizPlanListDetailBaks.get()) {
-			planListDetailBak.setConfirmLogId(confirmLog.get().getConfirmLogId());
+			planListDetailBak.setConfirmLogId(confirmLogId);
 			planListDetailBak.insert();
 		}
 		
 		for (RepaymentProjPlanBak projPlanBak : repaymentProjPlanBaks.get()) {
-			projPlanBak.setConfirmLogId(confirmLog.get().getConfirmLogId());
+			projPlanBak.setConfirmLogId(confirmLogId);
 			projPlanBak.insert();
 		}
 		
 		for (RepaymentProjPlanListBak projPlanListBak : repaymentProjPlanListBaks.get()) {
-			projPlanListBak.setConfirmLogId(confirmLog.get().getConfirmLogId());
+			projPlanListBak.setConfirmLogId(confirmLogId);
 			projPlanListBak.insert();
 		}
 		
 		for (RepaymentProjPlanListDetailBak projPlanListDetailBak : repaymentProjPlanListDetailBaks.get()) {
-			projPlanListDetailBak.setConfirmLogId(confirmLog.get().getConfirmLogId());
+			projPlanListDetailBak.setConfirmLogId(confirmLogId);
 			projPlanListDetailBak.insert();
 		}
 		
-		
-		
+		logger.info("调用平台合规化还款接口开始，confirmLogId：{}", confirmLogId);
+		tdrepayRecharge(confirmLogId);
+		logger.info("调用平台合规化还款接口结束");
 	}
 
+	private void tdrepayRecharge(String confirmLogId) {
+		
+		SysApiCallFailureRecord record = new SysApiCallFailureRecord();
+		try {
+			record.setModuleName(AlmsServiceNameEnums.FINANCE.getName());
+			record.setApiCode(Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT);
+			record.setApiName(Constant.INTERFACE_NAME_PLATREPAY_REPAYMENT);
+			record.setRefId(confirmLogId);
+			record.setCreateUser(loginUserInfoHelper.getUserId());
+			record.setCraeteTime(new Date());
+			
+			Result result = null;
+			String busId = this.businessId.get();
+			
+			RepaymentProjPlanList repaymentProjPlanList = repaymentProjPlanListService
+					.selectOne(new EntityWrapper<RepaymentProjPlanList>().eq("orig_business_id", busId)
+							.eq("after_id", this.afterId.get()));
+			
+			RepaymentProjPlan plan = null;
+			
+			if (repaymentProjPlanList != null) {
+				plan = repaymentProjPlanService.selectById(repaymentProjPlanList.getProjPlanId());
+			}
+			
+			if (plan != null) {
+				
+				Map<String, Object> paramMap = new HashMap<>();
+				paramMap.put("confirmLogId", confirmLogId);
+				paramMap.put("businessId", busId);
+				paramMap.put("projectId", plan.getProjectId());
+				
+				record.setApiParamCiphertext(JSONObject.toJSONString(paramMap));
+				
+				// 平台合规化还款接口
+				result = platformRepaymentFeignClient.repayment(paramMap);
+				if (result != null) {
+					record.setApiReturnInfo(JSONObject.toJSONString(result));
+				}
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			record.setApiReturnInfo(e.getMessage());
+		}
+		sysApiCallFailureRecordService.insert(record);
+	}
+	
 	public static void main(String[] args){
 
 
@@ -1866,6 +1949,4 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 
 	}
 //	public static
-
-
 }

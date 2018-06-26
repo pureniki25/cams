@@ -467,7 +467,7 @@ public class FinanceController {
 	}
 	
 	@PostMapping(value="/previewConfirmRepayment")
-	@ApiOperation(value="预览确认还款拆标情况")
+	@ApiOperation(value="确认还款拆标情况并存储")
 	public Result previewConfirmRepayment(@RequestBody ConfirmRepaymentReq req) {
 		Result result ;
 		logger.info("@previewConfirmRepayment@预览确认还款拆标情况--开始[{}]",req);
