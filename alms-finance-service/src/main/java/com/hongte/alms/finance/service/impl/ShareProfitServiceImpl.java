@@ -260,16 +260,16 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		divideOveryDueMoneyNew(req.getOnlineOverDue(), planDto.get(), true);
 
 		//填充信息  新的分润方法，按标从小到大，到主借标的顺序分
-//		fillNew();
+		fillNew();
 
 		///////   旧的分润方法  均分  开始 ==========
-		//计算标在业务中的占比
-		caluProportion(planDto.get());
-//		分配线上输入的滞纳金
-		divideOveryDueMoney(req.getOfflineOverDue(), planDto.get(), false);
-		divideOveryDueMoney(req.getOnlineOverDue(), planDto.get(), true);
-//		填充信息
-		fill();
+//		//计算标在业务中的占比
+//		caluProportion(planDto.get());
+////		分配线上输入的滞纳金
+//		divideOveryDueMoney(req.getOfflineOverDue(), planDto.get(), false);
+//		divideOveryDueMoney(req.getOnlineOverDue(), planDto.get(), true);
+////		填充信息
+//		fill();
 		///////   旧的分润方法  均分  结束 ==========
 
 		if (save) {
@@ -1033,12 +1033,14 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		}
 
 		//3.最后按核销顺序还金额
+		String lastProjectId = null;
 		for (int i = 0; i < dto.getProjPlanDtos().size(); i++) {
 			if(lastPaySuc == false) return;
 			RepaymentProjPlanDto  repaymentProjPlanDto = dto.getProjPlanDtos().get(i);
 			String projectId = repaymentProjPlanDto.getTuandaiProjectInfo().getProjectId();
+			lastProjectId = projectId;
 			CurrPeriodProjDetailVO currPeriodProjDetailVO = getCurrPeriodProjDetailVO(projectId);
-
+			currPeriodProjDetailVO.setSurplus(new BigDecimal("0"));
 
 			List<RepaymentProjPlanListDto> repaymentProjPlanListDtos = repaymentProjPlanDto.getProjPlanListDtos();
 			//遍历标的还款计划
@@ -1055,6 +1057,24 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 					}
 				}
 			}
+		}
+		//结余
+		BigDecimal surplusFund = new BigDecimal("0");
+		//如果最后一次还款都还足了，就计算结余
+		if(lastPaySuc == true){
+			surplusFund = surplusFund.add(curalDivideAmount.get());
+			boolean setBl = true;
+			while(setBl == true){
+				setBl =  setNewRepaymentResource(resourceIndex.get()+1);
+				if(setBl){
+					surplusFund = surplusFund.add(curalDivideAmount.get());
+				}
+			}
+		}
+		//将结余设置到最后一个标上
+		if(lastProjectId!=null){
+			CurrPeriodProjDetailVO lastPeriodProjDetailVO = getCurrPeriodProjDetailVO(lastProjectId);
+			lastPeriodProjDetailVO.setSurplus(surplusFund);
 		}
 	}
 
@@ -1114,7 +1134,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			createProjFactRepay(money, detail, currPeriodProjDetailVO,curalResource.get());
 			realPayed = money;
 			//上一条还款来源的可用金额已用完，找下一条还款来源来用
-			curalDivideAmount = null;
+			curalDivideAmount.set(null);
 			setNewRepaymentResource(resourceIndex.get()+1);
 		} else {
 			logger.info("divideAmount少于unpaid");
@@ -1122,7 +1142,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			money = curalDivideAmount.get();
 			unpaid = unpaid.subtract(money);
 			createProjFactRepay(money, detail, currPeriodProjDetailVO,curalResource.get());
-			curalDivideAmount = null;
+			curalDivideAmount.set(null);
 			boolean setBl =  setNewRepaymentResource(resourceIndex.get()+1);
 			realPayed = money;
 			// 如果成功取到下一条还款流水  剩余未还完的继续还
