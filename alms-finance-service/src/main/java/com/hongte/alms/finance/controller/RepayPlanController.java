@@ -577,6 +577,10 @@ public class RepayPlanController {
 	    		  continue;
 	    	  }
 	    	  BasicBusinessType type=basicBusinessTypeService.selectOne(new EntityWrapper<BasicBusinessType>().eq("business_type_id", business.getBusinessType()));
+	    	  if(type==null) {
+	    		  logger.info("businessId{},找不到对应的业务类型",business.getBusinessId());
+	    		  continue;
+	    	  }
 	    	  List<BizOutputRecord> outputRecords=bizOutputRecordService.selectList(new EntityWrapper<BizOutputRecord>().eq("business_id", business.getBusinessId()).orderBy("fact_output_date"));
 	    	  Date outputDate=null;
 	    	  if(outputRecords!=null&&outputRecords.size()>0) {

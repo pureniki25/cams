@@ -215,8 +215,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 										for (RepaymentBizPlanListDetail planDetail : planDetails) {
 											if (projDetail.getFeeId().equals(planDetail.getFeeId())) {
 												boolean isDifferent=false;
-												if (RepayPlanFeeTypeEnum.PRINCIPAL.getUuid()
-														.equals(projDetail.getFeeId())) { // 本金
+												if (RepayPlanFeeTypeEnum.PRINCIPAL.getValue()==projDetail.getPlanItemType()) { // 本金
 													if(projDetail.getProjPlanAmount().compareTo(detailDto.getPrincipal())!=0) {//贷后应还的和你我金融应还的金额不一致，计入异常日志表
 														isDifferent=true;
 													}
@@ -228,8 +227,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													planDetail.setUpdateDate(new Date());
 													repaymentProjPlanListDetailService.updateById(projDetail);
 													repaymentBizPlanListDetailService.updateById(planDetail);
-												} else if (RepayPlanFeeTypeEnum.INTEREST.getUuid()
-														.equals(projDetail.getFeeId())) { // 利息
+												} else if (RepayPlanFeeTypeEnum.INTEREST.getValue()==projDetail.getPlanItemType()) { // 利息
 													if(projDetail.getProjPlanAmount().compareTo(detailDto.getInterest())!=0) {//贷后应还的和你我金融应还的金额不一致，计入异常日志表
 														isDifferent=true;
 													
@@ -242,8 +240,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													planDetail.setUpdateDate(new Date());
 													repaymentProjPlanListDetailService.updateById(projDetail);
 													repaymentBizPlanListDetailService.updateById(planDetail);
-												} else if (RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE.getUuid()
-														.equals(projDetail.getFeeId())) {// 担保服务费
+												} else if (RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE.getValue()==projDetail.getPlanItemType()) {// 担保服务费
 													if(projDetail.getProjPlanAmount().compareTo(detailDto.getCommissionGuaranteFee())!=0) {//贷后应还的和你我金融应还的金额不一致，计入异常日志表
 														isDifferent=true;
 													}
@@ -256,8 +253,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													planDetail.setUpdateDate(new Date());
 													repaymentProjPlanListDetailService.updateById(projDetail);
 													repaymentBizPlanListDetailService.updateById(planDetail);
-												} else if (RepayPlanFeeTypeEnum.PLAT_CHARGE.getUuid()
-														.equals(projDetail.getFeeId())) {// //平台管理费
+												} else if (RepayPlanFeeTypeEnum.PLAT_CHARGE.getValue()==projDetail.getPlanItemType()) {// //平台管理费
 													if(projDetail.getProjPlanAmount().compareTo(detailDto.getPlatformManageFee())!=0) {//贷后应还的和你我金融应还的金额不一致，计入异常日志表
 														isDifferent=true;
 													}
@@ -269,8 +265,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													planDetail.setUpdateDate(new Date());
 													repaymentProjPlanListDetailService.updateById(projDetail);
 													repaymentBizPlanListDetailService.updateById(planDetail);
-												} else if (RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getUuid()
-														.equals(projDetail.getFeeId())) {// //分公司服务费
+												} else if (RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getValue()==projDetail.getPlanItemType()) {// //分公司服务费
 													if(projDetail.getProjPlanAmount().compareTo(detailDto.getPlatformManageFee())!=0) {//贷后应还的和你我金融应还的金额不一致，计入异常日志表
 														isDifferent=true;
 													}
@@ -282,8 +277,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													planDetail.setUpdateDate(new Date());
 													repaymentProjPlanListDetailService.updateById(projDetail);
 													repaymentBizPlanListDetailService.updateById(planDetail);
-												} else if (RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid()
-														.equals(projDetail.getFeeId())
+												} else if (RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getValue()==projDetail.getPlanItemType()
 														&& detailDto.getTotalPenalty() != null && detailDto
 																.getTotalPenalty().compareTo(BigDecimal.valueOf(0)) > 0) {// 逾期滞纳金
 													
@@ -340,7 +334,12 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 												
 												BigDecimal planAmountSum=getPlanAmountSum(planDetails);//当前期计划要还的总金额
 												BigDecimal afterRepayAmountSum=getRepayAmountSum(planDetails);//当前期已还总金额
-												
+												pList.setTotalBorrowAmount(planAmountSum);;
+												projPlanList.setTotalBorrowAmount(planAmountSum);
+												pList.setUpdateTime(new Date());
+												projPlanList.setUpdateTime(new Date());
+												repaymentProjPlanListService.updateById(projPlanList);
+												repaymentBizPlanListService.updateById(pList);
 												/*	
 												 * 同步完你我金融的当前期还款计划之后，如果当前期已还总金额等于当前期计划要还的总金额，并且同步之后的当前期已还总金额大于同步之前的当前期已还总金额
 											     *说明需要发成功代扣的短信

@@ -1303,7 +1303,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         Map<String,List<ProjInfoReq>>  projInfoReqMap = new HashMap<>();
         for (ProjInfoReq projInfoReq:tuandaiProjReqInfos){
             Date fullTime = projInfoReq.getQueryFullsuccessDate();
-            String fullTimeStr =  DateUtil.formatDate(fullTime);
+            String fullTimeStr =  UUID.randomUUID().toString();
             List<ProjInfoReq>  batchProj =projInfoReqMap.get(fullTimeStr);
             if(batchProj == null){
                 batchProj = new LinkedList<>();
@@ -1741,6 +1741,10 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         BigDecimal monthRate = getMonthRate(rate,rateUnit);
 
         switch (repayType){
+            case PAY_LAST:  //到期还本息
+            calcPrincipalLast(fullBorrowMoney,monthRate
+            ,periodMonth,retMap);
+            break;
             case PRINCIPAL_LAST:  //先息后本
                 calcPrincipalLast(fullBorrowMoney,monthRate
                 ,periodMonth,retMap);
