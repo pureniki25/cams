@@ -10,7 +10,11 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum MsgCodeEnum implements IEnum {
    
-    NIWO_REPAY_SUCCESS("niwo_repay_success","你我金融代扣成功短信代码");
+    NIWO_REPAY_SUCCESS("niwo_repay_success","你我金融代扣成功短信代码"),
+    NIWO_REPAY_FAIL("niwo_repay_fail","你我金融代扣失败短信代码"),
+    NIWO_REPAY_REMIND("niwo_repay_remind","你我金融还款提醒"),
+    NIWO_SETTLE_REMIND("niwo_repay_remind","你我金融结清提醒");
+    
 
     private String value;
     private String desc;

@@ -3,53 +3,25 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
-import com.hongte.alms.base.collection.service.CollectionLogService;
-import com.hongte.alms.base.collection.service.CollectionStatusService;
-import com.hongte.alms.base.collection.service.PhoneUrgeService;
-import com.hongte.alms.base.collection.vo.AfterLoanStandingBookReq;
-import com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo;
+
 import com.hongte.alms.base.collection.vo.DeductionVo;
-import com.hongte.alms.base.entity.ApplyDerateProcess;
 import com.hongte.alms.base.entity.BasicBusiness;
-import com.hongte.alms.base.entity.BasicBusinessType;
-import com.hongte.alms.base.entity.BasicCompany;
-import com.hongte.alms.base.entity.InfoSms;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
-import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.SysBank;
-import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.entity.WithholdingPlatform;
 import com.hongte.alms.base.entity.WithholdingRecordLog;
 import com.hongte.alms.base.entity.WithholdingRepaymentLog;
-import com.hongte.alms.base.enums.AreaLevel;
-import com.hongte.alms.base.enums.SysParameterTypeEnums;
+import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
-import com.hongte.alms.base.process.entity.Process;
-import com.hongte.alms.base.process.entity.ProcessLog;
-import com.hongte.alms.base.process.entity.ProcessTypeStep;
-import com.hongte.alms.base.process.enums.ProcessTypeEnums;
-import com.hongte.alms.base.process.service.ProcessLogService;
-import com.hongte.alms.base.process.service.ProcessService;
-import com.hongte.alms.base.process.service.ProcessTypeService;
-import com.hongte.alms.base.process.service.ProcessTypeStepService;
-import com.hongte.alms.base.vo.module.ApplyDerateProcessReq;
-import com.hongte.alms.base.process.vo.ProcessLogReq;
-import com.hongte.alms.base.process.vo.ProcessLogVo;
+
 import com.hongte.alms.base.service.*;
-import com.hongte.alms.base.vo.module.ApplyDerateListSearchReq;
-import com.hongte.alms.base.vo.module.ApplyDerateVo;
 import com.hongte.alms.base.vo.module.BankLimitReq;
 import com.hongte.alms.base.vo.module.BankLimitVO;
-import com.hongte.alms.base.vo.module.BusinessInfoForApplyDerateVo;
-import com.hongte.alms.base.vo.module.InfoSmsListSearchReq;
-import com.hongte.alms.base.vo.module.InfoSmsListSearchVO;
+
 import com.hongte.alms.common.result.Result;
-import com.hongte.alms.common.util.ClassCopyUtil;
-import com.hongte.alms.common.util.Constant;
-import com.hongte.alms.common.util.EasyPoiExcelExportUtil;
 import com.hongte.alms.common.util.JsonUtil;
-import com.hongte.alms.common.vo.PageRequest;
 import com.hongte.alms.common.vo.PageResult;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -163,6 +135,24 @@ public class DeductionController {
             	BigDecimal underLineOverDueMoney=BigDecimal.valueOf(Double.valueOf(map.get("underLineOverDueMoney").toString()));
             	deductionVo.setOnLineOverDueMoney(onLineOverDueMoney);
             	deductionVo.setUnderLineOverDueMoney(underLineOverDueMoney);
+            	
+            	//查看当前期银行代扣的总金额
+        		List<WithholdingRepaymentLog> bankList=withholdingRepaymentLogService.selectList(new EntityWrapper<WithholdingRepaymentLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).ne("repay_status", 0).eq("bind_platform_id", PlatformEnum.YH_FORM.getValue()));
+        		BigDecimal bankRepayAmountSum=BigDecimal.valueOf(0);
+        		for(WithholdingRepaymentLog log:bankList) {
+        			bankRepayAmountSum=bankRepayAmountSum.add(log.getCurrentAmount()==null?BigDecimal.valueOf(0):log.getCurrentAmount());
+        		}
+        		//线上费用
+        		BigDecimal onLineAmount=BigDecimal.valueOf(deductionVo.getTotal()).subtract(underLineOverDueMoney);
+        		//如果是线上部分还款的话，不能使用第三方代扣线下费用
+        		if(bankRepayAmountSum.compareTo(BigDecimal.valueOf(0))>0&&bankRepayAmountSum.compareTo(onLineAmount)<0) {
+        			deductionVo.setCanUseThirty(false);
+        		}else {
+        			deductionVo.setCanUseThirty(true);
+        		}
+            	
+            	
+            	
             	//查看是否共借标，共借标不能银行代扣
         		//deductionVo.setIssueSplitType(business.getIssueSplitType());
             	if(business.getSrcType()!=null&&business.getSrcType()==2) {
@@ -184,7 +174,10 @@ public class DeductionController {
 	        			deductionVo.setRepayAllAmount(repayAmount);
 	        			deductionVo.setRepayingAmount(repayingAmount);
 	        			deductionVo.setRestAmount(BigDecimal.valueOf(deductionVo.getTotal()).subtract(repayAmount));
+	        			deductionVo.setRepayAmount(deductionVo.getRestAmount());
 	        			deductionVo.setTotal(deductionVo.getTotal()-deductionVo.getRepayingAmount().doubleValue());
+	        		}else {
+	        			deductionVo.setRepayAmount(BigDecimal.valueOf(deductionVo.getTotal()));
 	        		}
 	                return Result.success(deductionVo);
             	}else {
@@ -206,7 +199,10 @@ public class DeductionController {
 	        			deductionVo.setRepayAllAmount(repayAmount);
 	        			deductionVo.setRepayingAmount(repayingAmount);
 	        			deductionVo.setRestAmount(BigDecimal.valueOf(deductionVo.getTotal()).subtract(repayAmount));
+	        			deductionVo.setRepayAmount(deductionVo.getRestAmount());
 	        			deductionVo.setTotal(deductionVo.getTotal()-deductionVo.getRepayingAmount().doubleValue());
+	        		}else {
+	        			deductionVo.setRepayAmount(BigDecimal.valueOf(deductionVo.getTotal()));
 	        		}
 	                return Result.success(deductionVo);
             	}

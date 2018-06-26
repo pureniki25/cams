@@ -10,7 +10,8 @@ public enum CollectionSetWayEnum {
 	MANUAL_SET(1,"界面手动设置"),
 	AUTO_SET(2,"定时器自动设置"),
 	XINDAI_CALL(3,"信贷回调"),
-	XINDAI_LOG(4,"信贷历史数据导入")
+	XINDAI_LOG(4,"信贷历史数据导入"),
+	XINDAI_LOG_ONE(5,"信贷单个历史数据导入")
 	;
 
 	private Integer key; // 数据保存的值

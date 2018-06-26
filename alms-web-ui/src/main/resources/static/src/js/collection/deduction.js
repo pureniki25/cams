@@ -57,8 +57,10 @@ var layer;
                     planAllAmount:"",//应还总额
                     repayAllAmount:"",//已还总额
                     restAmount:"",
+                    repayAmount:"",//本次代扣金额
                     repayingAmount:'',//代扣中金额
                     issueSplitType:'',
+                    isCanUseThirty:'',
                     business:[],
                     bankCardInfo:[],
                     pList:[]
@@ -129,7 +131,10 @@ var layer;
 		   vm.$Modal.error({content:"本次代扣线下逾期费不能大于线下逾期费"});
 		   return;
 			   }
-	 
+	    if(vm.ajax_data.canUseThirty==false&&vm.platformId!=5){debugger//如果是第三方代扣，但是第三方代扣标识为false，
+	    	 vm.$Modal.error({content:"银行部分代扣情况下，没有还清线上费用不能用第三方平台代扣线下费用"});
+	    	return;
+	    }
 	   //贷后生成的走贷后的代扣接口,否则走信贷的代扣接口
 	   if(vm.ajax_data.strType==2){debugger
 		   vm.ajax_data.platformId=vm.platformId;
@@ -376,7 +381,7 @@ var layer;
 	vm.ajax_data.total=vm.ajax_data.planPrincipal+vm.ajax_data.planAccrual+vm.ajax_data.planServiceCharge+vm.ajax_data.platformCharge+Number(vm.ajax_data.onLineOverDueMoney)+Number(vm.ajax_data.underLineFactOverDueMoney)-vm.ajax_data.repayAllAmount;
 	var total=vm.ajax_data.total;
 	vm.ajax_data.total=total.toFixed(2);
-	
+	vm.ajax_data.repayAmount=total.toFixed(2);
 	return vm.ajax_data.total;
 	}
 

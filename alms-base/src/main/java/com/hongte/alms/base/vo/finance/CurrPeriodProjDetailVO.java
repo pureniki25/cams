@@ -107,7 +107,8 @@ public class CurrPeriodProjDetailVO {
 				.add(getItem30() == null ? new BigDecimal("0") : getItem30())
 				.add(getItem50() == null ? new BigDecimal("0") : getItem50())
 				.add(getOfflineOverDue() == null ? new BigDecimal("0") : getOfflineOverDue())
-				.add(getOnlineOverDue() == null ? new BigDecimal("0") : getOnlineOverDue());
+				.add(getOnlineOverDue() == null ? new BigDecimal("0") : getOnlineOverDue())
+				.add(getSurplus() == null ? new BigDecimal("0") : getSurplus());
 		return total;
 	}
 

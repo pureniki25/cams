@@ -642,6 +642,7 @@ window.layinit(function (htConfig) {
                 param.businessId = businessId;
                 param.afterId = afterId;
                 param = Object.assign(app.factRepaymentInfo, param);
+                param.callFlage = 10
 
                 axios.post(fpath + 'finance/previewConfirmRepayment', param)
                     .then(function (res) {
@@ -719,8 +720,14 @@ window.layinit(function (htConfig) {
                     
                     
             },
-            onOfflineOverDueChange(e){
+            onOverDueChange(e){
                 console.log(e.target.value);
+                //调用预览还款的计算方法
+                previewConfirmRepayment();
+
+            },
+            onsurplusFoundChange(e){
+
             },
             getBaseInfo(){
                 axios.get(fpath + 'finance/repayBaseInfo', {

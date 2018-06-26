@@ -245,7 +245,7 @@ public class CustomerRepayFlowServiceImpl implements CustomerRepayFlowService {
                     confirmRepaymentReq.setMprIds(mr);
                     List<Integer> repaySource = new ArrayList<>(1);
                     repaySource.add(10); //10：线下转账，20：线下代扣，30：银行代扣,11:用往期结余还款
-                    confirmRepaymentReq.setRepaySource(repaySource);
+                    confirmRepaymentReq.setCallFlage(10);
                     shareProfitService.execute(confirmRepaymentReq, true);
                 }
             }
@@ -302,7 +302,7 @@ public class CustomerRepayFlowServiceImpl implements CustomerRepayFlowService {
                                         confirmRepaymentReq.setMprIds(mr);
                                         List<Integer> repaySource = new ArrayList<>(1);
                                         repaySource.add(10); //10：线下转账，20：线下代扣，30：银行代扣,11:用往期结余还款
-                                        confirmRepaymentReq.setRepaySource(repaySource);
+                                        confirmRepaymentReq.setCallFlage(10);
                                         shareProfitService.execute(confirmRepaymentReq, true);
                                     }
 

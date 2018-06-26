@@ -484,7 +484,7 @@ public class FinanceController {
 	}
 	
 	@PostMapping(value="/confirmRepayment")
-	@ApiOperation(value="确认还款拆标情况并存储")
+	@ApiOperation(value="预览确认还款拆标情况")
 	public Result confirmRepayment(@RequestBody ConfirmRepaymentReq req) {
 		Result result ;
 		logger.info("@confirmRepayment@确认还款拆标情况--开始[{}]",req);
