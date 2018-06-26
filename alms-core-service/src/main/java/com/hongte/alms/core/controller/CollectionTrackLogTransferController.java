@@ -93,7 +93,7 @@ public class CollectionTrackLogTransferController {
 	public Result transferCollectionTransfer() {
 
 		if(runningFlage){
-		  return Result.error("111111","同步程序执行中，请执行完再访问");
+			return Result.error("111111","同步程序执行中，请执行完再访问");
 		}
 
 		runningFlage = true;
@@ -101,117 +101,117 @@ public class CollectionTrackLogTransferController {
 		try{
 			List<Parametertracelog> parametertracelogs = parametertracelogService.selectUnTransParametertracelogs();
 			if(parametertracelogs!=null){
-			List<List<Parametertracelog>>  averageList = ListUtil.averageAssign(parametertracelogs,5);
+				List<List<Parametertracelog>>  averageList = ListUtil.averageAssign(parametertracelogs,5);
 
 
-			Integer index =0;
+				Integer index =0;
 
-			//第一条线程
-			List<Parametertracelog>  list1 = averageList.get(0);
-			executor.execute(new Runnable() {
-				@Override
-				public void run() {
-					thread1Execute=true;
-					try{
-						for (Parametertracelog parametertracelog: list1) {
-							transferOneCollectionLog(parametertracelog);
+				//第一条线程
+				List<Parametertracelog>  list1 = averageList.get(0);
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+						thread1Execute=true;
+						try{
+							for (Parametertracelog parametertracelog: list1) {
+								transferOneCollectionLog(parametertracelog);
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("同步历史贷后跟踪数据异常"+e.getMessage());
 						}
-					}catch(Exception e){
-						e.printStackTrace();
-						LOGGER.error("同步历史贷后跟踪数据异常"+e.getMessage());
-					}
-					thread1Execute =false;
-					if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute){
-						runningFlage =false;
-					}
-				}
-			});
-
-			//第二条线程
-			List<Parametertracelog>  list2 = averageList.get(1);
-			executor.execute(new Runnable() {
-				@Override
-				public void run() {
-					thread2Execute=true;
-					try{
-						for (Parametertracelog parametertracelog: list2) {
-							transferOneCollectionLog(parametertracelog);
+						thread1Execute =false;
+						if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute){
+							runningFlage =false;
 						}
-					}catch(Exception e){
-						e.printStackTrace();
-						LOGGER.error("同步历史贷后跟踪数据异常"+e.getMessage());
 					}
-					thread2Execute =false;
-					if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute){
-						runningFlage =false;
-					}
-				}
-			});
+				});
 
-
-			//第三条线程
-			List<Parametertracelog>  list3 = averageList.get(2);
-			executor.execute(new Runnable() {
-				@Override
-				public void run() {
-					thread3Execute=true;
-					try{
-						for (Parametertracelog parametertracelog: list3) {
-							transferOneCollectionLog(parametertracelog);;
+				//第二条线程
+				List<Parametertracelog>  list2 = averageList.get(1);
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+						thread2Execute=true;
+						try{
+							for (Parametertracelog parametertracelog: list2) {
+								transferOneCollectionLog(parametertracelog);
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("同步历史贷后跟踪数据异常"+e.getMessage());
 						}
-					}catch(Exception e){
-						e.printStackTrace();
-						LOGGER.error("同步历史贷后跟踪数据异常"+e.getMessage());
-					}
-					thread3Execute =false;
-					if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute){
-						runningFlage =false;
-					}
-				}
-			});
-
-			//第四条线程
-			List<Parametertracelog>  list4 = averageList.get(3);
-			executor.execute(new Runnable() {
-				@Override
-				public void run() {
-					thread4Execute=true;
-					try{
-						for (Parametertracelog parametertracelog: list4) {
-							transferOneCollectionLog(parametertracelog);;
+						thread2Execute =false;
+						if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute){
+							runningFlage =false;
 						}
-					}catch(Exception e){
-						e.printStackTrace();
-						LOGGER.error("同步历史贷后跟踪数据异常"+e.getMessage());
 					}
-					thread4Execute =false;
-					if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute){
-						runningFlage =false;
-					}
-				}
-			});
+				});
 
 
-			//第五条线程
-			List<Parametertracelog>  list5 = averageList.get(4);
-			executor.execute(new Runnable() {
-				@Override
-				public void run() {
-					thread5Execute=true;
-					try{
-						for (Parametertracelog parametertracelog: list5) {
-							transferOneCollectionLog(parametertracelog);;
+				//第三条线程
+				List<Parametertracelog>  list3 = averageList.get(2);
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+						thread3Execute=true;
+						try{
+							for (Parametertracelog parametertracelog: list3) {
+								transferOneCollectionLog(parametertracelog);;
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("同步历史贷后跟踪数据异常"+e.getMessage());
 						}
-					}catch(Exception e){
-						e.printStackTrace();
-						LOGGER.error("同步历史贷后跟踪数据异常"+e.getMessage());
+						thread3Execute =false;
+						if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute){
+							runningFlage =false;
+						}
 					}
-					thread5Execute =false;
-					if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute){
-						runningFlage =false;
+				});
+
+				//第四条线程
+				List<Parametertracelog>  list4 = averageList.get(3);
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+						thread4Execute=true;
+						try{
+							for (Parametertracelog parametertracelog: list4) {
+								transferOneCollectionLog(parametertracelog);;
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("同步历史贷后跟踪数据异常"+e.getMessage());
+						}
+						thread4Execute =false;
+						if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute){
+							runningFlage =false;
+						}
 					}
-				}
-			});
+				});
+
+
+				//第五条线程
+				List<Parametertracelog>  list5 = averageList.get(4);
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+						thread5Execute=true;
+						try{
+							for (Parametertracelog parametertracelog: list5) {
+								transferOneCollectionLog(parametertracelog);;
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("同步历史贷后跟踪数据异常"+e.getMessage());
+						}
+						thread5Execute =false;
+						if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute){
+							runningFlage =false;
+						}
+					}
+				});
 
 
 //				for(Parametertracelog parametertracelog:parametertracelogs){
@@ -286,7 +286,7 @@ public class CollectionTrackLogTransferController {
 			if(bmUserId!=null&&!bmUserId.equals("")){
 				dto = loginUserInfoHelper.getUserInfoByUserId("", bmUserId);
 				if(dto==null|| dto.getUserId() == null){
-						collectionTrackLog.setRecorderUser(Constant.ADMIN_ID);
+					collectionTrackLog.setRecorderUser(Constant.ADMIN_ID);
 //					recordErrorInfo(carBusinessId,carBusinessAfterId,
 //							NoUser,"1","没有用户信息");
 				}else{
