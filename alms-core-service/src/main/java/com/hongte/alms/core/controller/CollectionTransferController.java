@@ -108,7 +108,7 @@ public class CollectionTransferController {
 	public Result transferCollection() {
 
 		if(runningFlage){
-		  return Result.error("111111","同步程序执行中，请执行完再访问");
+			return Result.error("111111","同步程序执行中，请执行完再访问");
 		}
 
 		runningFlage = true;
@@ -232,7 +232,7 @@ public class CollectionTransferController {
 							}
 						}catch(Exception e){
 							e.printStackTrace();
-								LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
+							LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
 						}
 						thread5Execute =false;
 						if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute
@@ -452,7 +452,7 @@ public class CollectionTransferController {
 			}
 
 			//同步所有的催收信息
-			 collectionList = collectionService.selectList(new EntityWrapper<Collection>());
+			collectionList = collectionService.selectList(new EntityWrapper<Collection>());
 
 			if (!CollectionUtils.isEmpty(collectionList)) {
 				List<List<Collection>>  averageList = ListUtil.averageAssign(collectionList,10);
@@ -992,34 +992,34 @@ public class CollectionTransferController {
 	@ResponseBody
 	public Result setCollectionStatus(String businessId,String afterId){
 
-        CarBusinessAfter businessAfter = carBusinessAfterService.selectOne(new EntityWrapper<CarBusinessAfter>().eq("car_business_id",businessId).eq("car_business_after_id",afterId));
-        Collection collection = null;
-        Boolean phoneRet;
-        if(businessAfter!=null){
-            phoneRet = transPhoneSet(businessAfter,CollectionSetWayEnum.XINDAI_LOG_ONE);
+		CarBusinessAfter businessAfter = carBusinessAfterService.selectOne(new EntityWrapper<CarBusinessAfter>().eq("car_business_id",businessId).eq("car_business_after_id",afterId));
+		Collection collection = null;
+		Boolean phoneRet;
+		if(businessAfter!=null){
+			phoneRet = transPhoneSet(businessAfter,CollectionSetWayEnum.XINDAI_LOG_ONE);
 //            if(phoneRet){
 //                return Result.success();
 //            }else {
 //                return Result.error("111","存储电催失败");
 //            }
-        }
+		}
 // else{
-            collection = collectionService.selectOne(new EntityWrapper<Collection>().eq("business_id",businessId).eq("after_id",afterId));
-            Boolean colRet;
-            if(collection!=null){
-                colRet = transCollectSet(collection);
+		collection = collectionService.selectOne(new EntityWrapper<Collection>().eq("business_id",businessId).eq("after_id",afterId));
+		Boolean colRet;
+		if(collection!=null){
+			colRet = transCollectSet(collection);
 //                if(ret){
 //                    return Result.success();
 //                }else {
 //                    return Result.error("112","存储催收失败");
 //                }
-            }
+		}
 //        }
 
 
-        if(businessAfter==null && collection == null){
-            return Result.error("113","找不到信贷的历史电催或催收数据");
-        }
+		if(businessAfter==null && collection == null){
+			return Result.error("113","找不到信贷的历史电催或催收数据");
+		}
 
 
 
@@ -1122,7 +1122,7 @@ public class CollectionTransferController {
 	 * @return
 	 * Map<>:crpId userId staffType
 	 */
-		private Map<String, String>  getStatus(String businessId,String afterId,String status,String bmUserId,Integer transType) {
+	private Map<String, String>  getStatus(String businessId,String afterId,String status,String bmUserId,Integer transType) {
 
 		Map<String, String> map = new HashMap<>();
 
@@ -1195,7 +1195,7 @@ public class CollectionTransferController {
 //			log.setCollectionUser("admin");
 //			collectionStatus = 350;
 		} else if ("推迟移交法务".equals(status)) {
-				staffType = CollectionStatusEnum.DELAY_TO_LAW.getPageStr();
+			staffType = CollectionStatusEnum.DELAY_TO_LAW.getPageStr();
 //			log.setCollectionUser("admin");
 //			collectionStatus = 400;
 		} else {
