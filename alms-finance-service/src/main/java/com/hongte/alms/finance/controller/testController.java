@@ -96,13 +96,14 @@ public class testController {
 		MsgRequestDto dto=new MsgRequestDto();
 		dto.setApp("alms");
 		dto.setMsgTitle("贷后你我金融扣款成功提示");
-		dto.setMsgModelId(Long.valueOf("201806230131"));
-		dto.setMsgTo("15999706761");
+		dto.setMsgModelId(Long.valueOf("201806260001"));
+		dto.setMsgTo("17665237459");
 		//组装发送短信内容的Json数据
 		JSONObject data = new JSONObject() ;
 		data.put("name", "测试");
-		data.put("planAmount", 500);
-		data.put("factAmount", 100);
+		data.put("date", "2018年6月1日");
+		data.put("borrowAmount", 3500);
+		data.put("tailCardNum", "0124");
 		dto.setMsgBody(data);
 		String jason=JSON.toJSONString(dto);
 		msgRemote.sendRequest(jason);
