@@ -475,7 +475,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 	@Override
 	public void SearchNiWoRepayPlan() {
 		//定时查询你我金融的还款计划，未结清、未完全付款的还款计划需要每天查询
-		List<RepaymentProjPlan> projPlans=repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("creat_sys_type", 3).eq("plan_status", 0));
+		List<RepaymentProjPlan> projPlans=repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("plate_type", 2).eq("plan_status", 0));
 		for(RepaymentProjPlan repaymentProjPlan:projPlans) {
 			sycNiWoRepayPlan(repaymentProjPlan.getRequestNo(),null);
 			//超过3天没有同步到你我金融标的还款计划
@@ -569,4 +569,75 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 		msgRemote.sendRequest(jason);
 		
 	}
+
+
+
+
+
+	@Override
+	public void calFailMsg() {
+		List<RepaymentProjPlanList> projPlanLists=repaymentProjPlanListService.selectList(new EntityWrapper<RepaymentProjPlanList>().eq("plate_type", 2).ne("current_status", "已还款").eq("due_date", DateUtil.getDate(DateUtil.formatDate(new Date()))));
+		for(RepaymentProjPlanList projPlanList:projPlanLists) {
+			//todo 发短信
+		
+		}
+		
+	}
+
+
+
+
+
+	@Override
+	public void sendRepayRemindMsg(Integer days) {
+		   Date dueDate=DateUtil.getDate(DateUtil.formatDate(DateUtil.addDay2Date(days, new Date())));
+		   List<RepaymentProjPlanList>  lists=repaymentProjPlanListService.selectList(new EntityWrapper<RepaymentProjPlanList>().eq("current_status","还款中").eq("due_date", dueDate).eq("plate_type", 2));
+		   for(RepaymentProjPlanList projPlanList:lists) {
+				//todo 发短信
+			
+			}
+	}
+
+
+
+
+
+	@Override
+	public void sendSettleRemindMsg(Integer days) { 
+		  Date dueDate=DateUtil.getDate(DateUtil.formatDate(DateUtil.addDay2Date(days, new Date())));
+		  List<RepaymentProjPlanList>  lists=repaymentProjPlanListService.selectList(new EntityWrapper<RepaymentProjPlanList>().eq("current_status","还款中").eq("due_date", dueDate).eq("plate_type", 2).orderBy("due_date",false));
+   		//筛选是最后一期的还款记录
+			for(Iterator<RepaymentProjPlanList> it = lists.iterator();it.hasNext();) {
+				RepaymentProjPlanList list=it.next();
+				if(!istLastPeriod(list)) {
+					it.remove();
+				}
+			}
+			
+			 for(RepaymentProjPlanList projPlanList:lists) {
+					//todo 发短信
+				
+				}
+		
+	}
+	
+	public boolean istLastPeriod(RepaymentProjPlanList projList) {
+		boolean isLast=false;
+		List<RepaymentProjPlanList> projLists=repaymentProjPlanListService.selectList(new EntityWrapper<RepaymentProjPlanList>().eq("proj_plan_id", projList.getProjPlanId()));
+		RepaymentProjPlanList lastProjList=projLists.stream().max(new Comparator<RepaymentProjPlanList>() {
+			@Override
+			public int compare(RepaymentProjPlanList o1, RepaymentProjPlanList o2) {
+				return o1.getDueDate().compareTo(o2.getDueDate());
+			}
+		}).get();
+		
+		if(projList.getPlanListId().equals(lastProjList.getPlanListId())) {
+			isLast=true;
+		}
+		return isLast;
+	}
+
+	
+	
+	
 }
