@@ -1,4 +1,4 @@
-package com.hongte.alms.platrepay.vo;
+package com.hongte.alms.base.vo.compliance;
 
 import java.util.List;
 

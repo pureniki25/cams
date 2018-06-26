@@ -41,6 +41,9 @@ import com.hongte.alms.base.service.IssueSendOutsideLogService;
 import com.hongte.alms.base.service.TdrepayAdvanceLogService;
 import com.hongte.alms.base.service.TdrepayRechargeDetailService;
 import com.hongte.alms.base.service.TdrepayRechargeLogService;
+import com.hongte.alms.base.service.TdrepayRechargeService;
+import com.hongte.alms.base.vo.compliance.DistributeFundRecordVO;
+import com.hongte.alms.base.vo.compliance.TdrepayRechargeInfoVO;
 import com.hongte.alms.base.vo.module.ComplianceRepaymentVO;
 import com.hongte.alms.common.util.CommonUtil;
 import com.hongte.alms.common.util.Constant;
@@ -53,9 +56,6 @@ import com.hongte.alms.platrepay.dto.TdReturnAdvanceShareProfitResult;
 import com.hongte.alms.platrepay.dto.TdrepayProjectInfoDTO;
 import com.hongte.alms.platrepay.dto.TdrepayProjectPeriodInfoDTO;
 import com.hongte.alms.platrepay.enums.ProcessStatusTypeEnum;
-import com.hongte.alms.platrepay.service.TdrepayRechargeService;
-import com.hongte.alms.platrepay.vo.DistributeFundRecordVO;
-import com.hongte.alms.platrepay.vo.TdrepayRechargeInfoVO;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.core.Result;
 import com.ht.ussp.util.BeanUtils;
@@ -630,7 +630,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	}
 
 	@Override
-	public void rePayComplianceWithRequirements() {
+	public void repayComplianceWithRequirements() {
 		/*
 		 * 读取待处理和处理失败的，且资金分发成功的数据
 		 */

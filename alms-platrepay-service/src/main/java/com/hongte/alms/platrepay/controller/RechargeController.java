@@ -28,16 +28,16 @@ import com.hongte.alms.base.entity.DepartmentBank;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.service.AgencyRechargeLogService;
 import com.hongte.alms.base.service.DepartmentBankService;
+import com.hongte.alms.base.service.TdrepayRechargeService;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.CommonUtil;
 import com.hongte.alms.common.util.StringUtil;
-import com.hongte.alms.platrepay.service.TdrepayRechargeService;
 import com.hongte.alms.platrepay.vo.RechargeModalVO;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 
 import io.swagger.annotations.ApiOperation;
 
-@CrossOrigin
+//@CrossOrigin
 @RestController
 @RequestMapping("/recharge")
 public class RechargeController {

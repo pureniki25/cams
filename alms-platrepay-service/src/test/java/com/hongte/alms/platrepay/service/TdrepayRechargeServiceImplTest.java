@@ -15,9 +15,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.alibaba.fastjson.JSONObject;
 import com.hongte.alms.base.entity.TdrepayRechargeDetail;
+import com.hongte.alms.base.service.TdrepayRechargeService;
+import com.hongte.alms.base.vo.compliance.TdrepayRechargeInfoVO;
 import com.hongte.alms.platrepay.PlatRepayServiceApplication;
-import com.hongte.alms.platrepay.service.TdrepayRechargeService;
-import com.hongte.alms.platrepay.vo.TdrepayRechargeInfoVO;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = PlatRepayServiceApplication.class)
@@ -76,7 +76,7 @@ public class TdrepayRechargeServiceImplTest {
 	
 	@Test
 	public void testRePayComplianceWithRequirements() {
-		tdrepayRechargeService.rePayComplianceWithRequirements();
+		tdrepayRechargeService.repayComplianceWithRequirements();
 	}
 
 }
