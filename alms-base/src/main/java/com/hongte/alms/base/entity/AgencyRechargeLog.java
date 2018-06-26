@@ -18,7 +18,7 @@ import io.swagger.annotations.ApiModelProperty;
  * </p>
  *
  * @author 胡伟骞
- * @since 2018-06-06
+ * @since 2018-06-25
  */
 @ApiModel
 @TableName("tb_agency_recharge_log")
@@ -62,6 +62,12 @@ public class AgencyRechargeLog extends Model<AgencyRechargeLog> {
 	@TableField("bank_code")
 	@ApiModelProperty(required= true,value = "(代充值参数)银行编码")
 	private String bankCode;
+    /**
+     * 充值来源账户卡号
+     */
+	@TableField("bank_account")
+	@ApiModelProperty(required= true,value = "充值来源账户卡号")
+	private String bankAccount;
     /**
      * 代充值账户余额
      */
@@ -190,6 +196,14 @@ public class AgencyRechargeLog extends Model<AgencyRechargeLog> {
 		this.bankCode = bankCode;
 	}
 
+	public String getBankAccount() {
+		return bankAccount;
+	}
+
+	public void setBankAccount(String bankAccount) {
+		this.bankAccount = bankAccount;
+	}
+
 	public BigDecimal getRechargeAccountBalance() {
 		return rechargeAccountBalance;
 	}
@@ -308,6 +322,7 @@ public class AgencyRechargeLog extends Model<AgencyRechargeLog> {
 			", rechargeAmount=" + rechargeAmount +
 			", rechargeSourseAccount=" + rechargeSourseAccount +
 			", bankCode=" + bankCode +
+			", bankAccount=" + bankAccount +
 			", rechargeAccountBalance=" + rechargeAccountBalance +
 			", cmOrderNo=" + cmOrderNo +
 			", oIdPartner=" + oIdPartner +

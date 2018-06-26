@@ -1887,13 +1887,4 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		}
 	}
 
-	public static void main(String[] args) {
-		String date = "2020-05-23 00:00:00";
-		Date stringToDate = DateUtil.stringToDate(null, date);
-
-		String date2 = DateUtil.formatDate("yyyy-MM-dd", new Date());
-		Date date3 = DateUtil.getDate(date);
-		System.out.println(stringToDate);
-	}
-
 }

@@ -52,6 +52,30 @@
 			    display: flex;
    				 flex-wrap: wrap;
 		}
+		
+        .marginRight {
+            margin-right: 25px;
+        }
+
+        .ivu-card-head {
+            border-bottom: 1px solid #e9eaec;
+            padding: 14px 16px;
+            line-height: 1;
+            background-color: rgba(204, 235, 248, 1);
+            color: #3598DC
+        }
+        
+        .layui-table th, .layui-table td.td {
+			padding:0 !important;
+		}
+		.layui-table th, .layui-table td .receive-inner-div{
+			line-height: 40px;
+			border-bottom:1px solid #ccc;
+			text-align:center;
+		}
+		.layui-table th, .layui-table td .receive-inner-div:last-child {
+			border-bottom:none;
+		}
 	</style>
 </head>
 <body>
@@ -221,6 +245,78 @@
                 <button class="layui-btn layui-btn-danger" @click="closeModal">关闭</button>
             </div>
    		</row>
+	</Modal>
+	
+	<Modal v-model="infoFlag" width="1600">
+		<Card>
+            <div slot="title" >
+                <span>业务编号:</span>
+                <span class="marginRight">{{ infoBasicData.businessId }}</span>
+                <span>标的编号:</span>
+                <span class="marginRight">{{ infoBasicData.projectId }}</span>
+                <span>客户姓名:</span>
+                <span class="marginRight">{{ infoBasicData.customerName }}</span>
+                <span>标的金额:</span>
+                <span class="marginRight">{{infoBasicData.amount?numeral(infoBasicData.amount).format('0,0.00') + '元' : ''}}</span>
+            </div>
+            
+	        <tabs value="fundDistributionRecord" :animated="true" @on-click="initFunction($event)">
+				<tab-pane label="资金分发记录" name="fundDistributionRecord">
+					<table class="layui-table">
+				        <thead>
+				            <tr>
+				                <th>期数</th>
+				                <th>实收日期</th>
+				                <th>实收金额</th>
+				                <th>资金分发日期</th>
+				                <th>资金分发金额</th>
+				                <th>资金分发费用项</th>
+				                <th>费用项金额</th>
+				                <th>处理结果</th>
+				                <th>备注</th>
+				            </tr>
+				        </thead>
+				        <tbody>
+				            <tr v-for='(item, index) in distributeFundRecordList' :key='index'>
+				                <td style="text-align:center">{{ item.period }}</td>
+				                <td style="text-align:center">{{ item.factRepayDateStr }}</td>
+				                <td style="text-align:center">{{ item.factRepayAmount?numeral(item.factRepayAmount).format('0,0.00'):0 }}</td>
+				                <td style="text-align:center">{{ item.createTimeStr }}</td>
+				                <td style="text-align:center">{{ item.rechargeAmount?numeral(item.rechargeAmount).format('0,0.00'):0 }}</td>
+				                <td>
+				                    <div class="receive-inner-div" v-for='(subItem, subIndex) in item.details' :key='subIndex'>{{ subItem.feeName }}</div>
+				                </td>
+				                <td>
+				                    <div class="receive-inner-div"  v-for='(subItem, subIndex) in item.details' :key='subIndex'>{{ subItem.feeValue?numeral(subItem.feeValue).format('0,0.00'):0 }}</div>
+				                </td>
+				                <td style="text-align:center">{{ item.processStatusStr }}</td>
+				                <td style="text-align:center">{{ item.remark }}</td>
+				            </tr>
+				        </tbody>
+				    </table>
+				</tab-pane>
+				
+				<tab-pane label="平台实还" name="platformRealRepayment">
+					<row style="margin-top:1rem">
+						<p slot="title">
+				            <h3>标的应还计划</h3>
+				        </p>
+				    </row>
+					<i-table border :columns="platformRepaymentInfoColumns" :data="platformRepaymentInfoData" style="margin-top:1rem"></i-table>
+					
+					<row style="margin-top:1rem">
+						<p slot="title">
+				            <h3>标的实还计划</h3>
+				        </p>
+				    </row>
+					<i-table border :columns="platformActualRepaymentInfoColumns" :data="platformActualRepaymentInfoData" style="margin-top:1rem"></i-table>
+				</tab-pane>
+				
+				<tab-pane label="垫付记录" name="advancesRecord">
+					<i-table border :columns="advancePaymentInfoColumns" :data="advancePaymentInfoData" style="margin-top:1rem"></i-table>
+				</tab-pane>
+			</tabs>
+        </Card>
 	</Modal>
 </div>
 <script src="/src/js/compliance/index.js" ></script>

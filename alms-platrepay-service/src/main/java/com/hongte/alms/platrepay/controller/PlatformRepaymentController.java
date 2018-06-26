@@ -135,10 +135,17 @@ public class PlatformRepaymentController {
      * @date 2018/6/14 10:30
      */
     @ApiOperation(value = "对接合规还款接口")
-    @GetMapping("/repayment")
+    @PostMapping("/repayment")
     @ResponseBody
-    public Result repayment(String projectId, String afterId, String confirmLogId) {   //TdrepayRechargeInfoVO
-        LOGGER.info("@对接合规还款接口 开始 @输入参数 projectId:[{}]  afterId[{}]", projectId, afterId);
+    public Result repayment(@RequestBody Map<String, Object> paramMap) {   //TdrepayRechargeInfoVO
+    	if (paramMap == null || paramMap.isEmpty()) {
+			return Result.error("参数不能为空");
+		}
+    	String projectId = (String) paramMap.get("projectId");
+    	String afterId = (String) paramMap.get("afterId");
+    	String confirmLogId = (String) paramMap.get("confirmLogId");
+    	
+    	LOGGER.info("@对接合规还款接口 开始 @输入参数 projectId:[{}]  afterId[{}]", projectId, afterId);
         //参数验证
         if (StringUtils.isBlank(projectId)) {
             return Result.error("上标项目编号不能为空");
@@ -228,7 +235,7 @@ public class PlatformRepaymentController {
                         if(tuandaiProjectInfo.getProjectId().equals(tuandaiProjectInfo.getMasterIssueId())){
                             businessType = 28;
                         }else{
-                            businessType = 25;
+                            businessType = 30;
                         }
                         break;
                     case "业主信用贷用信":
