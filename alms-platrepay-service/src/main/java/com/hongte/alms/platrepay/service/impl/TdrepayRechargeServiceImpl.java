@@ -630,7 +630,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	}
 
 	@Override
-	public void rePayComplianceWithRequirements() {
+	public void repayComplianceWithRequirements() {
 		/*
 		 * 读取待处理和处理失败的，且资金分发成功的数据
 		 */
