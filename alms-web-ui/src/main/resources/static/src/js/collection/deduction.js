@@ -378,7 +378,7 @@ var layer;
 	var total=0;
 		vm.ajax_data.total=0;
 	
-	vm.ajax_data.total=vm.ajax_data.planPrincipal+vm.ajax_data.planAccrual+vm.ajax_data.planServiceCharge+vm.ajax_data.platformCharge+Number(vm.ajax_data.onLineOverDueMoney)+Number(vm.ajax_data.underLineFactOverDueMoney)-vm.ajax_data.repayAllAmount;
+	vm.ajax_data.total=vm.ajax_data.planPrincipal+vm.ajax_data.planAccrual+vm.ajax_data.planServiceCharge+vm.ajax_data.platformCharge+Number(vm.ajax_data.onLineOverDueMoney)+Number(vm.ajax_data.underLineOverDueMoney)-vm.ajax_data.repayAllAmount;
 	var total=vm.ajax_data.total;
 	vm.ajax_data.total=total.toFixed(2);
 	vm.ajax_data.repayAmount=total.toFixed(2);
