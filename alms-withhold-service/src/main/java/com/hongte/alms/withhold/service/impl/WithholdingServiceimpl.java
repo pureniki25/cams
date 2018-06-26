@@ -19,6 +19,7 @@ import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.SysBankLimit;
 import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.entity.WithholdingChannel;
+import com.hongte.alms.base.entity.WithholdingRepaymentLog;
 import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.enums.SysParameterEnums;
 import com.hongte.alms.base.feignClient.dto.BankCardInfo;
@@ -29,6 +30,7 @@ import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.SysBankLimitService;
 import com.hongte.alms.base.service.SysParameterService;
 import com.hongte.alms.base.service.WithholdingChannelService;
+import com.hongte.alms.base.service.WithholdingRepaymentLogService;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.withhold.service.RechargeService;
@@ -67,6 +69,11 @@ public class WithholdingServiceimpl implements WithholdingService {
 	@Autowired
 	@Qualifier("SysParameterService")
 	SysParameterService sysParameterService;
+	
+
+	@Autowired
+	@Qualifier("WithholdingRepaymentLogService")
+	WithholdingRepaymentLogService withholdingRepaymentLogService;
 
 	@Override
 	public void withholding() {
@@ -111,8 +118,8 @@ public class WithholdingServiceimpl implements WithholdingService {
 		}
 		BankCardInfo bankCardInfo = rechargeService.getBankCardInfo(bankCardInfos);
 		BankCardInfo ThirtyCardInfo = rechargeService.getThirtyPlatformInfo(bankCardInfos);
-
-		if (bankCardInfo != null) {
+		BigDecimal thirtyRepayAmount=getThirtyRepayAmount(pList);
+		if (bankCardInfo != null&&thirtyRepayAmount.compareTo(BigDecimal.valueOf(0))==0) {
 //			if(bankCardInfo.getSignedProtocolList().size()>0) {
 //				// 银行代扣
 //				BankCharge(basic, bankCardInfo, pList, bankCardInfos);
@@ -121,7 +128,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 //			}
 			
 			BankCharge(basic, bankCardInfo, pList, bankCardInfos);
-		} else if (ThirtyCardInfo != null && bankCardInfo == null) {// 第三方代扣
+		} else if (ThirtyCardInfo != null && (bankCardInfo == null||(bankCardInfo != null&&thirtyRepayAmount.compareTo(BigDecimal.valueOf(0))>0))) {// 第三方代扣
 			ThirdRepaymentCharge(basic, ThirtyCardInfo, pList, null);
 		} else {
 			logger.debug(
@@ -635,5 +642,12 @@ public class WithholdingServiceimpl implements WithholdingService {
 		
 	}
 
-
+   private BigDecimal getThirtyRepayAmount(RepaymentBizPlanList pList) {
+	   BigDecimal repayAmount=BigDecimal.valueOf(0);
+	   List<WithholdingRepaymentLog> logs=withholdingRepaymentLogService.selectList(new EntityWrapper<WithholdingRepaymentLog>().eq("original_business_id", pList.getOrigBusinessId()).ne("bind_platform_id",PlatformEnum.YH_FORM).eq("after_id", pList.getAfterId()));
+	   for(WithholdingRepaymentLog log:logs) {
+		   repayAmount=repayAmount.add(log.getCurrentAmount()==null?BigDecimal.valueOf(0):log.getCurrentAmount());
+	   }
+	return repayAmount;
+   }
 }
