@@ -189,7 +189,9 @@
 
         <row style="padding: 10px"> 
             <i-col span="24">
-                <i-button  type="success"  @click="withHolding()" >代扣</i-button>
+                   <span v-if="!loading">
+                <i-button  type="success"  @click="withHolding()" >代扣</i-button></span>
+                  <span v-else> <i-button  type="success" disabled >代扣执行中····</i-button></span>
 <!--  <i-button  type="success"  @click="alert('系统升级中')" >代扣</i-button>  -->
 <!--                 <i-button  type="info"  @click="withHoldingWithout()" >代扣(不含逾期费)</i-button>   -->
                   <i-button  type="info"  @click="bankLimit()" >代扣额度表</i-button>
