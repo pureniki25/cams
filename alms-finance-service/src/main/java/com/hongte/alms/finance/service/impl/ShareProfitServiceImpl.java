@@ -319,16 +319,16 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		divideOveryDueMoneyNew(req.getOnlineOverDue(), planDto.get(), true);
 
 		//填充信息  新的分润方法，按标从小到大，到主借标的顺序分
-//		fillNew();
+      fillNew();
 
 		///////   旧的分润方法  均分  开始 ==========
 		//计算标在业务中的占比
-		caluProportion(planDto.get());
+		//caluProportion(planDto.get());
 //		分配线上输入的滞纳金
-		divideOveryDueMoney(req.getOfflineOverDue(), planDto.get(), false);
-		divideOveryDueMoney(req.getOnlineOverDue(), planDto.get(), true);
+//		divideOveryDueMoney(req.getOfflineOverDue(), planDto.get(), false);
+//		divideOveryDueMoney(req.getOnlineOverDue(), planDto.get(), true);
 //		填充信息
-		fill();
+		//fill();
 		///////   旧的分润方法  均分  结束 ==========
 
 		if (save) {
