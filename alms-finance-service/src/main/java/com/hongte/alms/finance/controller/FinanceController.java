@@ -17,6 +17,7 @@ import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.dto.core.LayTableQuery;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.AreaLevel;
+import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.enums.RepayRegisterState;
 import com.hongte.alms.base.service.*;
@@ -119,6 +120,10 @@ public class FinanceController {
 	@Qualifier("SysFinancialOrderService")
 	@Autowired
 	private SysFinancialOrderService sysFinancialOrderService;
+	
+	@Autowired
+	@Qualifier("WithholdingRepaymentLogService")
+	WithholdingRepaymentLogService withholdingRepaymentLogService;
 
 
 	@Value("${oss.readUrl}")
@@ -739,10 +744,24 @@ public class FinanceController {
 	@PostMapping("/shareProfit")
 	public Result shareProfit(@RequestParam("businessId") String businessId,@RequestParam("afterId") String afterId,@RequestParam("logId") Integer logId){
 		Result result=new Result();
+		WithholdingRepaymentLog log=withholdingRepaymentLogService.selectById(logId);
+	
 		try {
 			ConfirmRepaymentReq req=new ConfirmRepaymentReq();
 			List<Integer> list=new ArrayList<Integer>();
 			List<Integer> logIds=new ArrayList<Integer>();
+			
+			if(log.getBindPlatformId()==PlatformEnum.YH_FORM.getValue()&&log.getCreateUser().equals("auto_run")) {//自动银行代扣已还款
+				req.setCallFlage(30);
+			}else if(log.getBindPlatformId()==PlatformEnum.YH_FORM.getValue()&&(!log.getCreateUser().equals("auto_run"))) {//人工银行代扣已还款
+				req.setCallFlage(31);
+			}else if(log.getBindPlatformId()!=PlatformEnum.YH_FORM.getValue()&&log.getCreateUser().equals("auto_run")) {//20：自动线下代扣已还款
+				req.setCallFlage(20);
+			}else if(log.getBindPlatformId()!=PlatformEnum.YH_FORM.getValue()&&(!log.getCreateUser().equals("auto_run"))){//21，人工线下代扣已还款
+				req.setCallFlage(21);
+			}
+			
+			
 			logIds.add(logId);
 //			list.add(30);//还款来源银行代扣
 			req.setLogIds(logIds);
