@@ -71,7 +71,16 @@
         LEFT JOIN tb_basic_business as business ON plan.original_business_id = business.business_id
         LEFT JOIN tb_basic_company as company ON business.company_id = company.area_id
         LEFT JOIN tb_basic_business_type as  b_type ON business.business_type = b_type.business_type_id
-        LEFT JOIN tb_collection_status as  col_status ON pList.plan_list_id = col_status.crp_id
+        <choose>
+            <!--  为电催专员  限制只查看分配给自己的期数-->
+            <when test="userType!=null">
+                JOIN tb_collection_status as  col_status ON pList.plan_list_id = col_status.crp_id
+            </when>
+            <otherwise>
+                LEFT JOIN tb_collection_status as  col_status ON pList.plan_list_id = col_status.crp_id
+            </otherwise>
+        </choose>
+
           JOIN tb_sys_user_permission as permission  ON  permission.business_id = pList.orig_business_id
           left JOIN tb_five_level_classify_business_change_log as changeLog  ON  changeLog.orig_business_id = business.business_id
           and changeLog.valid_status = '1'
@@ -92,6 +101,12 @@
             <if test="companyId !=null and companyId !=''">
                 and business.company_id = #{companyId}
             </if>-->
+
+            <!-- 1:电催专员  限制只查看分配给自己的期数-->
+            <if test="userType!=null">
+                <![CDATA[ and col_status.phone_staff = #{userId}]]>
+            </if>
+
             <!--          /*应还日期 开始*/ -->
             <if test="showRepayDateBegin !=null ">
                 <![CDATA[ and pList.due_date >= #{showRepayDateBegin,jdbcType=TIMESTAMP}]]>
