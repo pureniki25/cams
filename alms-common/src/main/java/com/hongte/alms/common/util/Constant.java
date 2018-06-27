@@ -173,7 +173,7 @@ public class Constant {
 
 
 	//*********调用api接口失败记录相关 OPEN模块 *********//
-	public static  final String INTERFACE_CODE_OPEN_REPAYPLAN_UPDATEREPAYPLANTOLMS = "/RepayPlan/updateRepayPlanToLMS";
-	public static  final String INTERFACE_NAME_OPEN_REPAYPLAN_UPDATEREPAYPLANTOLMS = "将指定业务的还款计划的变动通过信贷接口推送给信贷系统";
+	public static final String INTERFACE_CODE_OPEN_REPAYPLAN_UPDATEREPAYPLANTOLMS = "/RepayPlan/updateRepayPlanToLMS";
+	public static final String INTERFACE_NAME_OPEN_REPAYPLAN_UPDATEREPAYPLANTOLMS = "将指定业务的还款计划的变动通过信贷接口推送给信贷系统";
 
 }

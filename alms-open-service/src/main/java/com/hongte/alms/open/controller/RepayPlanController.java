@@ -279,10 +279,10 @@ public class RepayPlanController {
                                 break;
                             //其它费用
                             default:
-                                if(planListDetail.getPlanAmount() != null) {
+                                if (planListDetail.getPlanAmount() != null) {
                                     planOtherExpenses = planOtherExpenses.add(planListDetail.getPlanAmount());
                                 }
-                                if(planListDetail.getFactAmount() != null) {
+                                if (planListDetail.getFactAmount() != null) {
                                     actualOtherExpernses = actualOtherExpernses.add(planListDetail.getFactAmount());
                                 }
                         }
@@ -379,7 +379,7 @@ public class RepayPlanController {
                     //接口调用失败记录写入数据库以便定时生推
                     sysApiCallFailureRecordService.save(AlmsServiceNameEnums.OPEN, Constant.INTERFACE_CODE_OPEN_REPAYPLAN_UPDATEREPAYPLANTOLMS, Constant.INTERFACE_NAME_OPEN_REPAYPLAN_UPDATEREPAYPLANTOLMS,
                             businessId, paramStr, ciphertext, JSON.toJSONString(respData), apiUrl, this.getClass().getSimpleName());
-                }catch (ServiceRuntimeException e){
+                } catch (ServiceRuntimeException e) {
                     logger.info("[处理] 还款计划-记录接口调用日志失败");
                 }
 
