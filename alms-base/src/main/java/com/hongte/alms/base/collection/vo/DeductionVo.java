@@ -43,17 +43,31 @@ public class DeductionVo {
     private BigDecimal  planAllAmount;//应还总额
     private BigDecimal  repayAllAmount;//已还总额
     private BigDecimal  restAmount;//剩余应还总额
+    private BigDecimal  repayAmount;//本次代扣金额
     private BigDecimal  repayingAmount;//代扣中的金额
     private Integer issueSplitType;//标识是否P2P拆标业务，0：非P2P拆标业务，1：P2P拆标业务
     private Integer strType;//来源类型：1.信贷生成，2.贷后管理生成
     private BankCardInfo bankCardInfo;
     private BasicBusiness business;
     private RepaymentBizPlanList pList;
+    private boolean isCanUseThirty;//是否可以用第三方嗲口
     
     
     
-    
-    public BasicBusiness getBusiness() {
+ 
+	public boolean isCanUseThirty() {
+		return isCanUseThirty;
+	}
+	public void setCanUseThirty(boolean isCanUseThirty) {
+		this.isCanUseThirty = isCanUseThirty;
+	}
+	public BigDecimal getRepayAmount() {
+		return repayAmount;
+	}
+	public void setRepayAmount(BigDecimal repayAmount) {
+		this.repayAmount = repayAmount;
+	}
+	public BasicBusiness getBusiness() {
 		return business;
 	}
 	public void setBusiness(BasicBusiness business) {

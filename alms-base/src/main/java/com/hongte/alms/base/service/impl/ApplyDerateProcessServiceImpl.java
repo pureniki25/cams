@@ -493,7 +493,7 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
 				log.setReturnJsonDecrypt(JSON.toJSONString(respData));
 				log.setSystem("xindai");
 				log.setSendUrl(xindaiAplUrlUrl);
-				
+
 				issueSendOutsideLogService.insert(log);
 			}
 		});
@@ -521,6 +521,10 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
         key.setUserId(userId);
 
         List<ApplyDerateVo> list = applyDerateProcessMap.selectApplyDerateList(pages,key);
+        for(ApplyDerateVo vo:list) {
+        	String realPayAmount=applyDerateProcessMap.getFactRepayAmountSum(vo.getBusinessId()).toString();
+        	vo.setRealPayMoney(realPayAmount);
+        }
 
         pages.setRecords(setApplyDerateVoListInfo(list));
 

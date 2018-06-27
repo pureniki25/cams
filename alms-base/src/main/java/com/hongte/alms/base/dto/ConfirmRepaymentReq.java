@@ -3,6 +3,7 @@
  */
 package com.hongte.alms.base.dto;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -29,7 +30,14 @@ public class ConfirmRepaymentReq {
 	private List<Integer> logIds;
  	private String remark ;
 	//10：线下转账，20：线下代扣，30：银行代扣,11:用往期结余还款
-	private List<Integer> repaySource ;
+//	private List<Integer> repaySource ;
+
+	/**
+	 * 调用方标志位  10：财务人员还款确认（线下转账），20：自动线下代扣，21：人工线下代扣，30：自动银行代扣，31：人工银行代扣
+	 */
+	@NotNull(message = "调用方标志位(callFlage) 不能为空")
+	private Integer callFlage;
+
 	
 	public List<Integer> getLogIds() {
 		return logIds;
@@ -85,17 +93,24 @@ public class ConfirmRepaymentReq {
 	public void setMprIds(List<String> mprIds) {
 		this.mprIds = mprIds;
 	}
-	/**
-	 * @return the repaySource
-	 */
-	public List<Integer> getRepaySource() {
-		return repaySource;
+//	/**
+//	 * @return the repaySource
+//	 */
+//	public List<Integer> getRepaySource() {
+//		return repaySource;
+//	}
+//	/**
+//	 * @param repaySource the repaySource to set
+//	 */
+//	public void setRepaySource(List<Integer> repaySource) {
+//		this.repaySource = repaySource;
+//	}
+
+	public Integer getCallFlage() {
+		return callFlage;
 	}
-	/**
-	 * @param repaySource the repaySource to set
-	 */
-	public void setRepaySource(List<Integer> repaySource) {
-		this.repaySource = repaySource;
+
+	public void setCallFlage(Integer callFlage) {
+		this.callFlage = callFlage;
 	}
-	
 }

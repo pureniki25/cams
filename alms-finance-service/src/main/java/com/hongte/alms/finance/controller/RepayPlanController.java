@@ -16,8 +16,10 @@ import com.hongte.alms.base.RepayPlan.req.trial.TrailRepayPlanReq;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.BasicBusinessType;
 import com.hongte.alms.base.entity.BizOutputRecord;
+import com.hongte.alms.base.entity.CarBasic;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.enums.RepayTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanBorrowLimitUnitEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanSettleStatusEnum;
@@ -25,6 +27,7 @@ import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.BasicBusinessTypeService;
 import com.hongte.alms.base.service.BizOutputRecordService;
+import com.hongte.alms.base.service.CarBasicService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.RepaymentBizPlanService;
 import com.hongte.alms.base.vo.module.api.RepayLogResp;
@@ -95,6 +98,10 @@ public class RepayPlanController {
     @Autowired
     @Qualifier("BizOutputRecordService")
     BizOutputRecordService bizOutputRecordService;
+    
+    @Autowired
+    @Qualifier("CarBasicService")
+    CarBasicService carBasicService;
 
     private static Validator validator;
 
@@ -572,18 +579,32 @@ public class RepayPlanController {
            return Result.error("9889","未找到对应的还款计划信息");
        }else {
 	       for(RepaymentBizPlanList list:lists) {
-	    	  BasicBusiness business= basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", list.getOrigBusinessId()));
+	    	   List<RepaymentBizPlanList> totalList=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", list.getOrigBusinessId()));
+	    	   Integer totalPeriods=totalList.size();//总期数
+	    	   BasicBusiness business= basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", list.getOrigBusinessId()));
 	    	  if(business==null) {
 	    		  continue;
 	    	  }
 	    	  BasicBusinessType type=basicBusinessTypeService.selectOne(new EntityWrapper<BasicBusinessType>().eq("business_type_id", business.getBusinessType()));
+	    	  if(type==null) {
+	    		  logger.info("businessId{},找不到对应的业务类型",business.getBusinessId());
+	    		  continue;
+	    	  }
+	    	
 	    	  List<BizOutputRecord> outputRecords=bizOutputRecordService.selectList(new EntityWrapper<BizOutputRecord>().eq("business_id", business.getBusinessId()).orderBy("fact_output_date"));
 	    	  Date outputDate=null;
 	    	  if(outputRecords!=null&&outputRecords.size()>0) {
 	    		  outputDate=outputRecords.get(0).getFactOutputDate();
 	    	  }
 	    	
-	    	  BizPlanListMessageDto message=new BizPlanListMessageDto(list.getBusinessId(), business.getCustomerName(), business.getCustomerIdentifyCard(), type.getBusinessTypeName(), outputDate, list.getTotalBorrowAmount(), list.getPeriod(), business.getBorrowMoney(), list.getDueDate());
+	    	  BizPlanListMessageDto message=new BizPlanListMessageDto(list.getBusinessId(), business.getCustomerName(), business.getCustomerIdentifyCard(), type.getBusinessTypeName(), outputDate, list.getTotalBorrowAmount(), list.getPeriod(), business.getBorrowMoney(), list.getDueDate(),totalPeriods);
+	    	  CarBasic carBasic=null;
+	    	  if(type.getBusinessTypeId()==BusinessTypeEnum.CYD_TYPE.getValue()||type.getBusinessTypeId()==BusinessTypeEnum.CYDZQ_TYPE.getValue()) {//如果是车贷的话，要关联车牌号码
+	    		  carBasic=carBasicService.selectOne(new EntityWrapper<CarBasic>().eq("business_id", list.getOrigBusinessId()));
+	    	  }
+	    	  if(carBasic!=null) {
+	    		  message.setCarNumber(carBasic.getLicensePlateNumber());
+	    	  }
 	    	  messages.add(message);
 	       }   
        }

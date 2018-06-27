@@ -98,6 +98,12 @@ public class WithholdingChannel extends Model<WithholdingChannel> {
 	@ApiModelProperty(required= true,value = "更新用户")
 	private String updateUser;
 
+	/**
+	 * 备注
+	 */
+	@TableField("remark")
+	@ApiModelProperty(required= false,value = "备注")
+	private String remark;
 
 	public Integer getChannelId() {
 		return channelId;
@@ -192,18 +198,29 @@ public class WithholdingChannel extends Model<WithholdingChannel> {
 		this.bankCode = bankCode;
 	}
 
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark ==null ? "" : remark;
+	}
+
 	@Override
 	public String toString() {
 		return "WithholdingChannel{" +
-			", channelId=" + channelId +
-			", level=" + level +
-			", platformId=" + platformId +
-			", channelStatus=" + channelStatus +
-			", failTimes=" + failTimes +
-			", createTime=" + createTime +
-			", createUser=" + createUser +
-			", updateTime=" + updateTime +
-			", updateUser=" + updateUser +
-			"}";
+				"channelId=" + channelId +
+				", level=" + level +
+				", platformId=" + platformId +
+				", subPlatformId='" + subPlatformId + '\'' +
+				", bankCode='" + bankCode + '\'' +
+				", channelStatus=" + channelStatus +
+				", failTimes=" + failTimes +
+				", createTime=" + createTime +
+				", createUser='" + createUser + '\'' +
+				", updateTime=" + updateTime +
+				", updateUser='" + updateUser + '\'' +
+				", remark='" + remark + '\'' +
+				'}';
 	}
 }

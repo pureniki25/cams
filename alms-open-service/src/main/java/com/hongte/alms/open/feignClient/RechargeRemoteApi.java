@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.hongte.alms.common.result.Result;
 
-@FeignClient(value = "alms-platRepay-service")
+@FeignClient(value = "alms-platrepay-service")
 public interface RechargeRemoteApi {
 
 	/**
@@ -21,7 +21,7 @@ public interface RechargeRemoteApi {
 	@RequestMapping(value = "/recharge/callBackAgencyRecharge", headers = { "app=ALMS",
 			"content-type=application/json" }, method = RequestMethod.POST)
 	Result callBackAgencyRecharge(Map<String, Object> paramMap);
-	
+
 	/**
 	 * 资金分发回调接口
 	 * 
@@ -30,7 +30,7 @@ public interface RechargeRemoteApi {
 	 */
 	@SuppressWarnings("rawtypes")
 	@RequestMapping(value = "/recharge/callBackDistributeFund", headers = { "app=ALMS",
-	"content-type=application/json" }, method = RequestMethod.POST)
+			"content-type=application/json" }, method = RequestMethod.POST)
 	Result callBackDistributeFund(Map<String, Object> paramMap);
 
 }

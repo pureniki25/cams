@@ -16,6 +16,9 @@ public interface FinanceClient {
     void sycRepayPlanBySearch();
 
 
-
-
+    @RequestMapping(value = "/niwoController/sendFailMsg",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
+    void sendFailMsg();
+    
+    @RequestMapping(value = "/niwoController/sendRemindMsg",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
+    void sendRemindMsg();
 }

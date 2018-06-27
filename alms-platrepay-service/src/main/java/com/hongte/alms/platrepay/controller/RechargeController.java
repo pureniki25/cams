@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,15 +28,16 @@ import com.hongte.alms.base.entity.DepartmentBank;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.service.AgencyRechargeLogService;
 import com.hongte.alms.base.service.DepartmentBankService;
+import com.hongte.alms.base.service.TdrepayRechargeService;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.CommonUtil;
 import com.hongte.alms.common.util.StringUtil;
-import com.hongte.alms.platrepay.service.TdrepayRechargeService;
 import com.hongte.alms.platrepay.vo.RechargeModalVO;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 
 import io.swagger.annotations.ApiOperation;
 
+//@CrossOrigin
 @RestController
 @RequestMapping("/recharge")
 public class RechargeController {
@@ -200,6 +202,7 @@ public class RechargeController {
 		agencyRechargeLog.setCreateTime(new Date());
 		agencyRechargeLog.setCreateUser(loginUserInfoHelper.getUserId());
 		agencyRechargeLog.setoIdPartner(oIdPartner);
+		agencyRechargeLog.setBankAccount(vo.getBankAccount());
 		return agencyRechargeLog;
 	}
 

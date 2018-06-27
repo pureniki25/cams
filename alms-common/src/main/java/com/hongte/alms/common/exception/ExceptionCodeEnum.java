@@ -17,6 +17,7 @@ public enum ExceptionCodeEnum  implements IEnum {
 
 
 
+    ,RUNING(300,"程序执行中，请完成本次执行后再触发")
    ;
 
     private Integer value;

@@ -31,6 +31,19 @@ window.layinit(function(htConfig) {
 			rechargeAccountBalance: 0, // 代充值账户余额
 			allBusinessCompanyList: [], // 所有分公司
 			tdrepayRechargeInfoReqList: [], // 
+			infoFlag: false,	// 详情弹窗控制
+			repaymentProjPlan: '', // 标还款计划信息
+			projectId:'', // 标ID
+				
+			/*
+			 *  详情基础信息
+			 */
+			infoBasicData:{
+				businessId: '',
+				projectId: '',
+				customerName: '',
+				amount: 0,
+			},
 			
 			/*
 			 * 合规化还款主页面查询条件
@@ -71,6 +84,173 @@ window.layinit(function(htConfig) {
 				rechargeAccountBalance: '', //代充值账户余额
 				bankAccount: '', // 银行账号
 			},
+			
+			/*
+    		 * 平台标的应还计划
+    		 */
+    		platformRepaymentInfoColumns:[
+        		{
+                    title: '期数',
+                    key: 'periods',
+                    align: 'center',
+                },
+                {
+                    title: '应还日期',
+                    key: 'cycDate',
+                    align: 'center',
+                },
+                {
+                    title: '应还合计',
+                    key: 'total',
+                    align: 'center',
+                },
+                {
+                    title: '还款本金',
+                    key: 'amount',
+                    align: 'center',
+                },
+                {
+                    title: '还款利息',
+                    key: 'interestAmout',
+                    align: 'center',
+                },
+                {
+                    title: '还款状态（借款人还款状态）',
+                    key: 'statusStr',
+                    align: 'center',
+                },
+            ],
+            /*
+    		 * 平台标的应还计划
+    		 */
+            platformRepaymentInfoData:[],
+            
+            /*
+             * 平台标的实还计划
+             */
+            platformActualRepaymentInfoColumns:[
+            	{
+            		title: '期数',
+            		key: 'period',
+            		align: 'center',
+            	},
+            	{
+            		title: '实还日期',
+            		key: 'addDate',
+            		align: 'center',
+            	},
+            	{
+            		title: '还款合计',
+            		key: 'totalAmount',
+            		align: 'center',
+            	},
+            	{
+            		title: '还款本息',
+            		key: 'principalAndInterest',
+            		align: 'center',
+            	},
+            	{
+            		title: '平台费',
+            		key: 'tuandaiAmount',
+            		align: 'center',
+            	},
+            	{
+            		title: '资产端服务费',
+            		key: 'orgAmount',
+            		align: 'center',
+            	},
+            	{
+            		title: '担保公司服务费',
+            		key: 'guaranteeAmount',
+            		align: 'center',
+            	},
+            	{
+            		title: '仲裁服务费',
+            		key: 'arbitrationAmount',
+            		align: 'center',
+            	},
+            	{
+            		title: '中介服务费',
+            		key: 'agencyAmount',
+            		align: 'center',
+            	},
+            	{
+            		title: '滞纳金',
+            		key: 'penaltyAmount',
+            		align: 'center',
+            	},
+            	{
+            		title: '还款状态（借款人还款状态）',
+            		key: 'statusStrActual',
+            		align: 'center',
+            	},
+        	],
+        	/*
+        	 * 平台标的实还计划
+        	 */
+        	platformActualRepaymentInfoData:[],
+        	
+        	/*
+             * 垫付记录表头
+             */
+        	advancePaymentInfoColumns:[
+	        	{
+	        		title: '期数',
+	        		key: 'period',
+	        		align: 'center',
+	        	},
+	        	{
+	        		title: '还款日期',
+	        		key: 'refundDate',
+	        		align: 'center',
+	        	},
+	        	{
+	        		title: '还款总金额',
+	        		key: 'totalAmount',
+	        		align: 'center',
+	        	},
+	        	{
+	        		title: '本息',
+	        		key: 'principalAndInterest',
+	        		align: 'center',
+	        	},
+	        	{
+	        		title: '平台服务费',
+	        		key: 'tuandaiAmount',
+	        		align: 'center',
+	        	},
+	        	{
+	        		title: '资产端服务费',
+	        		key: 'orgAmount',
+	        		align: 'center',
+	        	},
+	        	{
+	        		title: '担保公司服务费',
+	        		key: 'guaranteeAmount',
+	        		align: 'center',
+	        	},
+	        	{
+	        		title: '仲裁服务费',
+	        		key: 'arbitrationAmount',
+	        		align: 'center',
+	        	},
+	        	{
+	        		title: '逾期费用',
+	        		key: 'overDueAmount',
+	        		align: 'center',
+	        	},
+	        	{
+	        		title: '状态',
+	        		key: 'statusStrActual',
+	        		align: 'center',
+	        	},
+        	],
+        	/*
+        	 * 垫付记录数据
+        	 */
+        	advancePaymentInfoData:[],
+        	
+        	distributeFundRecordList: [], // 资金分发记录
 
 		},
 
@@ -81,6 +261,13 @@ window.layinit(function(htConfig) {
 			openRechargeModal: function(){
 				this.listAllDepartmentBank();
 				this.rechargeModal = true;
+			},
+			/*
+			 * 打开详情弹窗
+			 */
+			openInfoModal: function(data){
+				this.getInfoBasicData(data);
+				this.infoFlag = true;
 			},
 			/*
 			 * 获取所有线下还款账户
@@ -109,12 +296,12 @@ window.layinit(function(htConfig) {
 				}
 				axios.get(basePath + 'recharge/queryUserAviMoney?rechargeAccountType=' + rechargeAccountType, {timeout: 0})
 				.then(function(result){
-					if (result.data.code == "1") {
+					if (result.data.code == "1" && result.data.data.data != null) {
 						vm.rechargeModalForm.rechargeAccountBalance = result.data.data.data.aviMoney;
 						vm.rechargeAccountBalance = result.data.data.data.aviMoney;
 					} else {
 						vm.rechargeModalForm.rechargeAccountBalance = '';
-						vm.$Modal.error({ content: result.data.msg });
+						vm.$Modal.error({ content: '没有查到对应的账户余额' });
 					}
 				}).catch(function (error) {
 					vm.rechargeModalForm.rechargeAccountBalance = '';
@@ -167,12 +354,30 @@ window.layinit(function(htConfig) {
 			 * 当业务类型改变时触发
 			 */
 			onChangeBusinessType: function(value){
-				if (value == 9) {
+				if (value == 1) {
+					this.rechargeAccountType = '车贷代充值';
+				}else if (value == 2) {
+					this.rechargeAccountType = '房贷代充值';
+				}else if (value == 3) {
+					this.rechargeAccountType = '房贷代充值';
+				}else if (value == 4) {
+					this.rechargeAccountType = '房贷代充值';
+				}else if (value == 9) {
 					this.rechargeAccountType = '车贷代充值';
 				}else if (value == 11) {
 					this.rechargeAccountType = '房贷代充值';
+				}else if (value == 12) {
+					this.rechargeAccountType = '车贷代充值';
+				}else if (value == 13) {
+					this.rechargeAccountType = '扶贫贷代充值';
+				}else if (value == 14) {
+					this.rechargeAccountType = '车贷代充值';
+				}else if (value == 15) {
+					this.rechargeAccountType = '车贷代充值';
 				}else if (value == 20) {
 					this.rechargeAccountType = '一点车贷代充值';
+				}else {
+					this.rechargeAccountType = '信用贷代充值';
 				}
 				this.queryUserAviMoney();
 			},
@@ -353,7 +558,96 @@ window.layinit(function(htConfig) {
 				}).catch(function (error) {
 					vm.$Modal.error({content: '接口调用异常!'});
             	});
-			}
+			},
+			
+			/*
+			 * 赋值详情信息基础信息
+			 */
+			getInfoBasicData: function(data){
+				vm.infoBasicData.businessId = data.origBusinessId;
+				vm.infoBasicData.projectId = data.projectId;
+				vm.infoBasicData.customerName = data.customerName;
+				
+				/*
+				 * 根据标ID获取对应的标还款计划信息
+				 */
+				axios.get(basePath + 'tdrepayRecharge/queryRepaymentProjPlan?projectId=' + data.projectId)
+				.then(function(result){
+					if (result.data.code == "1") {
+						vm.repaymentProjPlan = result.data.data;
+						vm.infoBasicData.amount = result.data.data.borrowMoney;
+					} else {
+						vm.$Modal.error({ content: result.data.msg });
+					}
+				}).catch(function (error) {
+					vm.$Modal.error({content: '接口调用异常!'});
+            	});
+			},
+			
+			/*
+             * 初始化方法
+             */
+            initFunction: function(event){
+            	if (event == 'platformRealRepayment') {
+					this.getProjectPayment();
+				}else if (event == 'advancesRecord') {
+					this.returnAdvanceShareProfit();
+				}else if (event == 'fundDistributionRecord') {
+					this.queryDistributeFundRecord();
+				}
+            },
+            
+			/*
+			 * 根据标ID获取垫付记录
+			 */
+			returnAdvanceShareProfit: function(){
+				axios.get(basePath +"tdrepayRecharge/returnAdvanceShareProfit?projectId=" + this.projectId)
+    	        .then(function (res) {
+    	            if (res.data.data != null && res.data.code == 1) {
+    	            	vm.advancePaymentInfoData = res.data.data;
+    	            } else {
+    	            	vm.$Modal.error({content: res.data.msg });
+    	            }
+    	        })
+    	        .catch(function (error) {
+    	        	vm.$Modal.error({content: '接口调用异常!'});
+    	        });
+			},
+			
+			/*
+			 * 标的还款信息查询接口
+			 */
+			getProjectPayment: function(){
+				axios.get(basePath +"tdrepayRecharge/getProjectPayment?projectId=" + this.projectId)
+    	        .then(function (res) {
+    	            if (res.data.data != null && res.data.code == 1) {
+    	            	vm.platformRepaymentInfoData = res.data.data.periodsList;
+    	            	vm.platformActualRepaymentInfoData = res.data.data.tdProjectPaymentDTOs;
+    	            } else {
+    	            	vm.$Modal.error({content: res.data.msg });
+    	            }
+    	        })
+    	        .catch(function (error) {
+    	        	vm.$Modal.error({content: '接口调用异常!'});
+    	        });
+			},
+			
+			/*
+			 * 查询资金分发记录
+			 */
+			queryDistributeFundRecord: function(){
+				axios.get(basePath +"tdrepayRecharge/queryDistributeFundRecord?projectId=" + this.projectId)
+    	        .then(function (res) {
+    	            if (res.data.data != null && res.data.code == 1) {
+    	            	vm.distributeFundRecordList = res.data.data;
+    	            } else {
+    	            	vm.$Modal.error({content: res.data.msg });
+    	            }
+    	        })
+    	        .catch(function (error) {
+    	        	vm.$Modal.error({content: '接口调用异常!'});
+    	        });
+			},
 		},
 
 		mounted: function() {
@@ -365,10 +659,11 @@ window.layinit(function(htConfig) {
 	});
 	
 	table.on('tool(complianceRepaymentData)', function (obj) {
-		let data = obj.data;
 		let event = obj.event;
 		if (event == 'info') {
-			
+			vm.projectId = obj.data.projectId;
+			vm.queryDistributeFundRecord();
+			vm.openInfoModal(obj.data);
 		}
 	});
 	

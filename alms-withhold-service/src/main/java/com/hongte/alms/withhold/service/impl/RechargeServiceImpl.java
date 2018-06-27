@@ -295,9 +295,9 @@ public class RechargeServiceImpl implements RechargeService {
 			}
 			if (channel.getPlatformId() == PlatformEnum.YH_FORM.getValue()) {
 			  List<SignedProtocol> signedProtocolList= bankCardInfo.getSignedProtocolList();
-//				List<SysParameter> bankChannels = sysParameterService.selectList(
-//						new EntityWrapper<SysParameter>().eq("param_type", SysParameterEnums.BANK_CHANNEL.getKey())
-//								.eq("status", 1).orderBy("param_value2"));
+				List<SysParameter> bankChannels = sysParameterService.selectList(
+						new EntityWrapper<SysParameter>().eq("param_type", SysParameterEnums.BANK_CHANNEL.getKey())
+								.eq("status", 1).orderBy("param_value2"));
 				
 				SysParameter  bankRepayTestResult = sysParameterService.selectOne(
 						new EntityWrapper<SysParameter>().eq("param_type", "bankRepayTest")
@@ -312,9 +312,9 @@ public class RechargeServiceImpl implements RechargeService {
 						BigDecimal.valueOf(amount));
 
 				BankRechargeReqDto dto = new BankRechargeReqDto();
-				for (SignedProtocol signedProtocol : signedProtocolList) {// 需要循环签约子渠道
+				for (SysParameter bankChannel : bankChannels) {// 需要循环签约子渠道
 					dto.setAmount(amount);
-					dto.setChannelType(signedProtocol.getChannelType().toString());// 子渠道
+					dto.setChannelType(bankChannel.getParamValue());// 子渠道
 					dto.setRechargeUserId(bankCardInfo.getPlatformUserID());
 					dto.setCmOrderNo(merchOrderId);
 					dto.setOidPartner(oidPartner);

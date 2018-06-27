@@ -1,7 +1,14 @@
 package com.hongte.alms.finance.controller;
 
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.hongte.alms.base.entity.SysMsgTemplate;
+import com.hongte.alms.base.enums.MsgCodeEnum;
 import com.hongte.alms.base.feignClient.EipRemote;
+import com.hongte.alms.base.feignClient.MsgRemote;
+import com.hongte.alms.base.feignClient.dto.MsgRequestDto;
 import com.hongte.alms.base.feignClient.dto.NiWoProjPlanDto;
 import com.hongte.alms.base.service.SysCityService;
 import com.hongte.alms.base.service.SysCountyService;
@@ -51,6 +58,8 @@ public class testController {
     @Qualifier("NiWoRepayPlanService")
     NiWoRepayPlanService  searchNiWoRepayPlanService;
     
+    @Autowired
+    MsgRemote msgRemote;
 
     @ApiOperation(value="获取区域信息")
     @GetMapping("getArea")
@@ -72,9 +81,32 @@ public class testController {
     
     @ApiOperation(value="获你我金融标的还款计划")
     @GetMapping("getNiWoRepayPlan")
-    public void getNiWoRepayPlan(@RequestParam("projId") String projId)
+    public void getNiWoRepayPlan(@RequestParam("requesetNo") String requesetNo)
     {
-    	searchNiWoRepayPlanService.sycNiWoRepayPlan(projId,null);
+     	searchNiWoRepayPlanService.sycNiWoRepayPlan(requesetNo,null);
+
+    }
+    
+    
+    @ApiOperation(value="测试短信")
+    @GetMapping("testMsg")
+    public void testMsg()
+    {
+    
+		MsgRequestDto dto=new MsgRequestDto();
+		dto.setApp("alms");
+		dto.setMsgTitle("贷后你我金融扣款成功提示");
+		dto.setMsgModelId(Long.valueOf("201806260001"));
+		dto.setMsgTo("17665237459");
+		//组装发送短信内容的Json数据
+		JSONObject data = new JSONObject() ;
+		data.put("name", "测试");
+		data.put("date", "2018年6月1日");
+		data.put("borrowAmount", 3500);
+		data.put("tailCardNum", "0124");
+		dto.setMsgBody(data);
+		String jason=JSON.toJSONString(dto);
+		msgRemote.sendRequest(jason);
 
     }
 

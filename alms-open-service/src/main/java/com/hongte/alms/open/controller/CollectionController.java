@@ -7,7 +7,9 @@ import com.alibaba.fastjson.JSON;
 import com.hongte.alms.base.collection.entity.Collection;
 import com.hongte.alms.base.collection.entity.Parametertracelog;
 import com.hongte.alms.base.entity.CarBusinessAfter;
+import com.hongte.alms.base.entity.IssueSendOutsideLog;
 import com.hongte.alms.base.service.CarBasicService;
+import com.hongte.alms.base.service.IssueSendOutsideLogService;
 import com.hongte.alms.common.util.ErroInfoUtil;
 import com.hongte.alms.open.feignClient.CollectionRemoteApi;
 import com.hongte.alms.open.service.CollectionXindaiService;
@@ -15,6 +17,7 @@ import com.hongte.alms.open.service.WithHoldingXinDaiService;
 import com.hongte.alms.open.util.XinDaiEncryptUtil;
 import com.hongte.alms.open.vo.RequestData;
 import com.hongte.alms.open.vo.ResponseData;
+import com.ht.ussp.bean.LoginUserInfoHelper;
 import feign.Feign;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -35,6 +38,8 @@ import com.hongte.alms.common.result.Result;
 import io.swagger.annotations.Api;
 
 import javax.validation.Valid;
+import java.util.Date;
+import java.util.concurrent.Executor;
 
 /**
  * @author 王继光
@@ -71,6 +76,16 @@ public class  CollectionController {
 	@Value(value="${bmApi.apiUrl:http://127.0.0.1}")
 	private String apiUrl;
 
+	@Autowired
+	private Executor executor;
+
+	@Autowired
+	private LoginUserInfoHelper loginUserInfoHelper;
+
+	@Autowired
+	@Qualifier("IssueSendOutsideLogService")
+	IssueSendOutsideLogService issueSendOutsideLogService;
+
 	/**
 	 * 财务确认结清，信贷调用此接口  更新贷后相关状态
 	 * @param businessId
@@ -103,6 +118,27 @@ public class  CollectionController {
 
 		//设置车辆管理状态为已结清
 		Boolean retBl = carBasicService.updateCarStatusToSettled(businessId);
+
+		executor.execute(new Runnable() {
+			@Override
+			public void run() {
+
+				IssueSendOutsideLog log=new IssueSendOutsideLog();
+				log.setCreateTime(new Date());
+				log.setCreateUserId(loginUserInfoHelper.getUserId());
+				log.setInterfacecode("open_CollectionController_update");
+				log.setInterfacename("信贷业务结清更新贷后相关状态");
+				log.setSendJsonEncrypt(businessId);
+				log.setSendJson(JSON.toJSONString(businessId));
+				log.setReturnJson(JSON.toJSONString(retBl));
+				log.setReturnJsonDecrypt(JSON.toJSONString(retBl));
+				log.setSystem("xindai");
+				log.setSendUrl("/collection/update");
+
+				issueSendOutsideLogService.insert(log);
+			}
+		});
+
 
 		if(bl && retBl){
 			logger.info("信贷确认结清调用  更新成功 ，businessId:"+businessId);
@@ -148,7 +184,7 @@ public class  CollectionController {
 	 * @param businessId
 	 * @return
 	 */
-	@ApiOperation(value = "财务撤销结清，信贷调用此接口   更新贷后相关状态")
+	@ApiOperation(value = "财务撤销结清撤销，信贷调用此接口   更新贷后相关状态")
 	@PostMapping("/settleRevoke")
 	@ResponseBody
 	@Transactional
@@ -164,6 +200,28 @@ public class  CollectionController {
 
 		//撤销设置车辆状态为关闭
 		Boolean retBl = carBasicService.revokeCarStatus(businessId);
+
+
+		executor.execute(new Runnable() {
+			@Override
+			public void run() {
+
+				IssueSendOutsideLog log=new IssueSendOutsideLog();
+				log.setCreateTime(new Date());
+				log.setCreateUserId(loginUserInfoHelper.getUserId());
+				log.setInterfacecode("open_CollectionController_settleRevoke");
+				log.setInterfacename("信贷财务撤销结清撤销");
+				log.setSendJsonEncrypt(businessId);
+				log.setSendJson(JSON.toJSONString(businessId));
+				log.setReturnJson(JSON.toJSONString(retBl));
+				log.setReturnJsonDecrypt(JSON.toJSONString(retBl));
+				log.setSystem("xindai");
+				log.setSendUrl("/collection/settleRevoke");
+
+				issueSendOutsideLogService.insert(log);
+			}
+		});
+
 
 		if(bl && retBl){
 			return Result.success(businessId);
@@ -189,10 +247,49 @@ public class  CollectionController {
 		if(bindingResult.hasErrors()){
 			String errorStr = ErroInfoUtil.getErroeInfo(bindingResult);
 			logger.info("同步电催人员 接口,输入参数校验错误：" ,errorStr);
+			executor.execute(new Runnable() {
+				@Override
+				public void run() {
+
+					IssueSendOutsideLog log=new IssueSendOutsideLog();
+					log.setCreateTime(new Date());
+					log.setCreateUserId(loginUserInfoHelper.getUserId());
+					log.setInterfacecode("open_CollectionController_transferOnePhoneSet");
+					log.setInterfacename("同步电催人员 接口");
+					log.setSendJsonEncrypt("");
+					log.setSendJson(JSON.toJSONString(carBusinessAfter));
+					log.setReturnJson(JSON.toJSONString(errorStr));
+					log.setReturnJsonDecrypt("");
+					log.setSystem("xindai");
+					log.setSendUrl("/collection/setPhoneStaff");
+
+					issueSendOutsideLogService.insert(log);
+				}
+			});
 			return Result.error("500","输入参数校验错误："+errorStr);
 		}
 
 		Result ret = collectionRemoteApi.transferOnePhoneSet(carBusinessAfter);
+
+		executor.execute(new Runnable() {
+			@Override
+			public void run() {
+
+				IssueSendOutsideLog log=new IssueSendOutsideLog();
+				log.setCreateTime(new Date());
+				log.setCreateUserId(loginUserInfoHelper.getUserId());
+				log.setInterfacecode("open_CollectionController_transferOnePhoneSet");
+				log.setInterfacename("同步电催人员 接口");
+				log.setSendJsonEncrypt("");
+				log.setSendJson(JSON.toJSONString(carBusinessAfter));
+				log.setReturnJson(JSON.toJSONString(ret));
+				log.setReturnJsonDecrypt("");
+				log.setSystem("xindai");
+				log.setSendUrl("/collection/setPhoneStaff");
+
+				issueSendOutsideLogService.insert(log);
+			}
+		});
 
 		logger.info("同步电催人员 结束，结果：" ,ret.getMsg());
 
@@ -214,9 +311,48 @@ public class  CollectionController {
 		if(bindingResult.hasErrors()){
 			String errorStr = ErroInfoUtil.getErroeInfo(bindingResult);
 			logger.info("同步催收人员 接口,输入参数校验错误：" ,errorStr);
+			executor.execute(new Runnable() {
+				@Override
+				public void run() {
+
+					IssueSendOutsideLog log=new IssueSendOutsideLog();
+					log.setCreateTime(new Date());
+					log.setCreateUserId(loginUserInfoHelper.getUserId());
+					log.setInterfacecode("open_CollectionController_transferOneVisitStaffSet");
+					log.setInterfacename("同步催收人员 接口");
+					log.setSendJsonEncrypt("");
+					log.setSendJson(JSON.toJSONString(collection));
+					log.setReturnJson(JSON.toJSONString(errorStr));
+					log.setReturnJsonDecrypt("");
+					log.setSystem("xindai");
+					log.setSendUrl("/collection/transferOneVisitStaffSet");
+
+					issueSendOutsideLogService.insert(log);
+				}
+			});
 			return Result.error("500","输入参数校验错误："+errorStr);
 		}
 		Result ret = collectionRemoteApi.transOneCollectSet(collection);
+
+		executor.execute(new Runnable() {
+			@Override
+			public void run() {
+
+				IssueSendOutsideLog log=new IssueSendOutsideLog();
+				log.setCreateTime(new Date());
+				log.setCreateUserId(loginUserInfoHelper.getUserId());
+				log.setInterfacecode("open_CollectionController_transferOneVisitStaffSet");
+				log.setInterfacename("同步催收人员 接口");
+				log.setSendJsonEncrypt("");
+				log.setSendJson(JSON.toJSONString(collection));
+				log.setReturnJson(JSON.toJSONString(ret));
+				log.setReturnJsonDecrypt("");
+				log.setSystem("xindai");
+				log.setSendUrl("/collection/transferOneVisitStaffSet");
+
+				issueSendOutsideLogService.insert(log);
+			}
+		});
 
 		logger.info("同步催收人员 结束，结果：" ,ret.getMsg());
 
@@ -239,12 +375,51 @@ public class  CollectionController {
 		if(bindingResult.hasErrors()){
 			String errorStr = ErroInfoUtil.getErroeInfo(bindingResult);
 			logger.info("同步贷后跟踪信息 接口,输入参数校验错误：" ,errorStr);
+			executor.execute(new Runnable() {
+				@Override
+				public void run() {
+
+					IssueSendOutsideLog log=new IssueSendOutsideLog();
+					log.setCreateTime(new Date());
+					log.setCreateUserId(loginUserInfoHelper.getUserId());
+					log.setInterfacecode("open_CollectionController_transferOneCollectionLog");
+					log.setInterfacename("同步贷后跟踪信息 接口");
+					log.setSendJsonEncrypt("");
+					log.setSendJson(JSON.toJSONString(parametertracelog));
+					log.setReturnJson(JSON.toJSONString(errorStr));
+					log.setReturnJsonDecrypt("");
+					log.setSystem("xindai");
+					log.setSendUrl("/collection/transferOneCollectionLog");
+
+					issueSendOutsideLogService.insert(log);
+				}
+			});
 			return Result.error("500","输入参数校验错误："+errorStr);
 		}
 
 		Result ret = collectionRemoteApi.transferOneCollectionLog(parametertracelog);
+		executor.execute(new Runnable() {
+			@Override
+			public void run() {
 
+				IssueSendOutsideLog log=new IssueSendOutsideLog();
+				log.setCreateTime(new Date());
+				log.setCreateUserId(loginUserInfoHelper.getUserId());
+				log.setInterfacecode("open_CollectionController_transferOneCollectionLog");
+				log.setInterfacename("同步贷后跟踪信息 接口");
+				log.setSendJsonEncrypt("");
+				log.setSendJson(JSON.toJSONString(parametertracelog));
+				log.setReturnJson(JSON.toJSONString(ret));
+				log.setReturnJsonDecrypt("");
+				log.setSystem("xindai");
+				log.setSendUrl("/collection/transferOneCollectionLog");
+
+				issueSendOutsideLogService.insert(log);
+			}
+		});
 		logger.info("同步贷后跟踪信息 结束，结果：" ,ret.getMsg());
+
+
 
 		return ret;
 	}
@@ -259,6 +434,25 @@ public class  CollectionController {
 		logger.info("删除贷后跟踪信息 开始，参数：" ,xdIndexId);
 
 		Result ret = collectionRemoteApi.deleteByxdId(xdIndexId);
+		executor.execute(new Runnable() {
+			@Override
+			public void run() {
+
+				IssueSendOutsideLog log=new IssueSendOutsideLog();
+				log.setCreateTime(new Date());
+				log.setCreateUserId(loginUserInfoHelper.getUserId());
+				log.setInterfacecode("open_CollectionController_deleteByxdId");
+				log.setInterfacename("删除贷后跟踪信息 接口");
+				log.setSendJsonEncrypt("");
+				log.setSendJson(JSON.toJSONString(xdIndexId));
+				log.setReturnJson(JSON.toJSONString(ret));
+				log.setReturnJsonDecrypt("");
+				log.setSystem("xindai");
+				log.setSendUrl("/collection/deleteByxdId");
+
+				issueSendOutsideLogService.insert(log);
+			}
+		});
 
 		logger.info("删除贷后跟踪信息 结束，结果：" ,ret.getMsg());
 
@@ -279,21 +473,64 @@ public class  CollectionController {
 		if(bindingResult.hasErrors()){
 			String errorStr = ErroInfoUtil.getErroeInfo(bindingResult);
 			logger.info("同步催收人员信息到信贷 接口,输入参数校验错误：" ,JSON.toJSONString(errorStr));
+
+			executor.execute(new Runnable() {
+				@Override
+				public void run() {
+
+					IssueSendOutsideLog log=new IssueSendOutsideLog();
+					log.setCreateTime(new Date());
+					log.setCreateUserId(loginUserInfoHelper.getUserId());
+					log.setInterfacecode("open_CollectionController_transferOneVisitSetToXd");
+					log.setInterfacename("删除贷后跟踪信息 接口");
+					log.setSendJsonEncrypt("");
+					log.setSendJson(JSON.toJSONString(collection));
+					log.setReturnJson(JSON.toJSONString(errorStr));
+					log.setReturnJsonDecrypt("");
+					log.setSystem("xindai");
+					log.setSendUrl("/collection/transferOneVisitSetToXd");
+
+					issueSendOutsideLogService.insert(log);
+				}
+			});
+
 			return Result.error("500","输入参数校验错误："+errorStr);
 		}
 
 		RequestData requestData = new RequestData();
 		requestData.setData(JSON.toJSONString(collection));
 		requestData.setMethodName("Collection_VisitSetTrans");
-		String encryptStr = JSON.toJSONString(requestData);
+		String tem1 =JSON.toJSONString(requestData);
 		// 请求数据加密
-		encryptStr = XinDaiEncryptUtil.encryptPostData(encryptStr);
+		String encryptStr = XinDaiEncryptUtil.encryptPostData(tem1);
 			/* http://172.16.200.104:8084/apites是信贷接口域名，这里本机配置的，需要配置成自己的 */
 		CollectionXindaiService collectionXindaiService = Feign.builder().target(CollectionXindaiService.class,
 				apiUrl);
 		String respStr = collectionXindaiService.transferOneVisitSet(encryptStr);
 		// 返回数据解密
 		ResponseData respData = XinDaiEncryptUtil.getRespData(respStr);
+
+
+		executor.execute(new Runnable() {
+			@Override
+			public void run() {
+
+				IssueSendOutsideLog log=new IssueSendOutsideLog();
+				log.setCreateTime(new Date());
+				log.setCreateUserId(loginUserInfoHelper.getUserId());
+				log.setInterfacecode("open_CollectionController_transferOneVisitSetToXd");
+				log.setInterfacename("删除贷后跟踪信息 接口");
+				log.setSendJsonEncrypt(encryptStr);
+				log.setSendJson(JSON.toJSONString(collection));
+				log.setReturnJson(JSON.toJSONString(respData));
+				log.setReturnJsonDecrypt(respStr);
+				log.setSystem("xindai");
+				log.setSendUrl("/collection/transferOneVisitSetToXd");
+
+				issueSendOutsideLogService.insert(log);
+			}
+		});
+
 //
 //			String encryptStr = JSON.toJSONString(collection);
 //			// 请求数据加密

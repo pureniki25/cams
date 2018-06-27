@@ -1,7 +1,12 @@
 package com.hongte.alms.base.service;
 
+import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.entity.SysBankLimit;
+import com.hongte.alms.base.vo.withhold.WithholdLimitListReq;
+import com.hongte.alms.base.vo.withhold.WithholdLimitListVo;
 import com.hongte.alms.common.service.BaseService;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +18,13 @@ import com.hongte.alms.common.service.BaseService;
  */
 public interface SysBankLimitService extends BaseService<SysBankLimit> {
 
+    Page<WithholdLimitListVo> getWithholdLimitPageList(WithholdLimitListReq withholdLimitListReq) throws Exception;
+
+    void addOrEditWithholdChannel(SysBankLimit sysBankLimit) throws Exception;
+
+    SysBankLimit getWithholdLimit(String limitId) throws Exception;
+
+    void updateWithholdLimitStatus(String limitId,int status)  throws Exception;
+
+    List<SysBankLimit> getSysBankLimitByPlatformId(int platformId)  throws Exception;
 }

@@ -1,41 +1,51 @@
 package com.hongte.alms.platrepay.controller;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.hongte.alms.base.entity.*;
-import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
-import com.hongte.alms.base.enums.repayPlan.RepayPlanPayedTypeEnum;
-import com.hongte.alms.base.service.*;
-import com.hongte.alms.platrepay.vo.TdrepayRechargeInfoVO;
-import io.swagger.annotations.Api;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.hongte.alms.base.dto.RechargeModalDTO;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.hongte.alms.base.entity.BasicBusiness;
+import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.RepaymentConfirmLog;
+import com.hongte.alms.base.entity.RepaymentProjFactRepay;
+import com.hongte.alms.base.entity.RepaymentProjPlan;
+import com.hongte.alms.base.entity.RepaymentProjPlanList;
+import com.hongte.alms.base.entity.TdrepayRechargeDetail;
+import com.hongte.alms.base.entity.TuandaiProjectInfo;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanPayedTypeEnum;
 import com.hongte.alms.base.feignClient.EipRemote;
+import com.hongte.alms.base.service.AgencyRechargeLogService;
+import com.hongte.alms.base.service.BasicBusinessService;
+import com.hongte.alms.base.service.DepartmentBankService;
+import com.hongte.alms.base.service.RepaymentBizPlanListService;
+import com.hongte.alms.base.service.RepaymentBizPlanService;
+import com.hongte.alms.base.service.RepaymentConfirmLogService;
+import com.hongte.alms.base.service.RepaymentProjFactRepayService;
+import com.hongte.alms.base.service.RepaymentProjPlanListService;
+import com.hongte.alms.base.service.RepaymentProjPlanService;
+import com.hongte.alms.base.service.TdrepayRechargeService;
+import com.hongte.alms.base.service.TuandaiProjectInfoService;
+import com.hongte.alms.base.vo.compliance.TdrepayRechargeInfoVO;
 import com.hongte.alms.common.result.Result;
-import com.hongte.alms.common.util.CommonUtil;
-import com.hongte.alms.common.util.StringUtil;
-import com.hongte.alms.platrepay.service.TdrepayRechargeService;
-import com.hongte.alms.platrepay.vo.RechargeModalVO;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 /**
@@ -135,10 +145,17 @@ public class PlatformRepaymentController {
      * @date 2018/6/14 10:30
      */
     @ApiOperation(value = "对接合规还款接口")
-    @GetMapping("/repayment")
+    @PostMapping("/repayment")
     @ResponseBody
-    public Result repayment(String projectId, String afterId, String confirmLogId) {   //TdrepayRechargeInfoVO
-        LOGGER.info("@对接合规还款接口 开始 @输入参数 projectId:[{}]  afterId[{}]", projectId, afterId);
+    public Result repayment(@RequestBody Map<String, Object> paramMap) {   //TdrepayRechargeInfoVO
+    	if (paramMap == null || paramMap.isEmpty()) {
+			return Result.error("参数不能为空");
+		}
+    	String projectId = (String) paramMap.get("projectId");
+    	String afterId = (String) paramMap.get("afterId");
+    	String confirmLogId = (String) paramMap.get("confirmLogId");
+    	
+    	LOGGER.info("@对接合规还款接口 开始 @输入参数 projectId:[{}]  afterId[{}]", projectId, afterId);
         //参数验证
         if (StringUtils.isBlank(projectId)) {
             return Result.error("上标项目编号不能为空");
@@ -192,7 +209,7 @@ public class PlatformRepaymentController {
             //判断是否已经到款，到款后再还款到平台
 //            if (repaymentProjPlanList.getRepayFlag().equals(RepayPlanPayedTypeEnum.PAYING.getValue())
 //                    || repaymentProjPlanList.getRepayFlag().equals(RepayPlanPayedTypeEnum.RENEW_PAY.getValue())) {
-            if (repaymentProjPlanList.getRepayFlag().equals(RepayPlanPayedTypeEnum.PAYING.getValue())) {
+            if (repaymentProjPlanList.getRepayFlag() == null || repaymentProjPlanList.getRepayFlag().equals(RepayPlanPayedTypeEnum.PAYING.getValue())) {
                 LOGGER.error("@对接合规还款接口@  此还款标的计划列表未还款 输入参数 projectId:[{}]  afterId{[]}  ", projectId, afterId);
                 return Result.error("500", "此还款标的计划列表未还款");
             }
@@ -228,7 +245,7 @@ public class PlatformRepaymentController {
                         if(tuandaiProjectInfo.getProjectId().equals(tuandaiProjectInfo.getMasterIssueId())){
                             businessType = 28;
                         }else{
-                            businessType = 25;
+                            businessType = 30;
                         }
                         break;
                     case "业主信用贷用信":

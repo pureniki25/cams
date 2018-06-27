@@ -23,7 +23,7 @@ var layer;
         vm = new Vue({
         	el: '#app',
         	data:{
-        		
+        		loading: false,
         		isBankFlag:false,
         		ajax_data:{
                     businessId:""	, //业务编号
@@ -57,8 +57,10 @@ var layer;
                     planAllAmount:"",//应还总额
                     repayAllAmount:"",//已还总额
                     restAmount:"",
+                    repayAmount:"",//本次代扣金额
                     repayingAmount:'',//代扣中金额
                     issueSplitType:'',
+                    isCanUseThirty:'',
                     business:[],
                     bankCardInfo:[],
                     pList:[]
@@ -114,6 +116,7 @@ var layer;
 //			vm.$Modal.error({content: '共借标不能银行代扣'});
 //		   return;
 //		}
+	    vm.loading = true;
 		var isAmountWithheld="false";
 		if(vm.ajax_data.total<vm.ajax_data.restAmount){
 			isAmountWithheld="true";//部分代扣
@@ -129,7 +132,10 @@ var layer;
 		   vm.$Modal.error({content:"本次代扣线下逾期费不能大于线下逾期费"});
 		   return;
 			   }
-	 
+	    if(vm.ajax_data.canUseThirty==false&&vm.platformId!=5){debugger//如果是第三方代扣，但是第三方代扣标识为false，
+	    	 vm.$Modal.error({content:"银行部分代扣情况下，没有还清线上费用不能用第三方平台代扣线下费用"});
+	    	return;
+	    }
 	   //贷后生成的走贷后的代扣接口,否则走信贷的代扣接口
 	   if(vm.ajax_data.strType==2){debugger
 		   vm.ajax_data.platformId=vm.platformId;
@@ -140,7 +146,7 @@ var layer;
                 data: JSON.stringify(vm.ajax_data),
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
-              
+                	   vm.loading = false;
                     if(data.code=='1'){
                     	vm.$Modal.success({content:"执行成功，请稍后查询结果"});
 		             }else{
@@ -148,9 +154,11 @@ var layer;
 		             }
                 },
                 error: function (message) {
+                	   vm.loading = false;
                 	 layer.confirm('Navbar error:AJAX请求出错!', function(index) {
  		                top.location.href = loginUrl;
  		                layer.close(index);
+ 		                
  		            });
  		            return false;
                 }
@@ -166,7 +174,7 @@ var layer;
 		            Authorization : "Bearer " + getToken()
 		        },
 		        success : function(data) {debugger
-		      
+		       	   vm.loading = false;
 		             if(data.code=='1'){
 		            	 vm.$Modal.success({content:data.data});
 		             }else{
@@ -174,6 +182,7 @@ var layer;
 		             }
 		        },
 		        error : function() {
+		       	   vm.loading = false;
 		            layer.confirm('Navbar error:AJAX请求出错!', function(index) {
 		                top.location.href = loginUrl;
 		                layer.close(index);
@@ -259,7 +268,7 @@ var layer;
                           vm.$Modal.error({content: '没有找到数据'});
                           return;
                       }
-                  
+                    vm.loading = false;
                     vm.ajax_data=result.data.data; 
                     vm.details=result.data.data.details;
                     vm.platformId=result.data.data.platformId;
@@ -373,10 +382,10 @@ var layer;
 	var total=0;
 		vm.ajax_data.total=0;
 	
-	vm.ajax_data.total=vm.ajax_data.planPrincipal+vm.ajax_data.planAccrual+vm.ajax_data.planServiceCharge+vm.ajax_data.platformCharge+Number(vm.ajax_data.onLineOverDueMoney)+Number(vm.ajax_data.underLineFactOverDueMoney)-vm.ajax_data.repayAllAmount;
+	vm.ajax_data.total=vm.ajax_data.planPrincipal+vm.ajax_data.planAccrual+vm.ajax_data.planServiceCharge+vm.ajax_data.platformCharge+Number(vm.ajax_data.onLineOverDueMoney)+Number(vm.ajax_data.underLineOverDueMoney)-vm.ajax_data.repayAllAmount;
 	var total=vm.ajax_data.total;
 	vm.ajax_data.total=total.toFixed(2);
-	
+	vm.ajax_data.repayAmount=total.toFixed(2);
 	return vm.ajax_data.total;
 	}
 

@@ -30,13 +30,45 @@ window.layinit(function (htConfig) {
     vm = new Vue({
         el: '#app',
 
-        data: {
-            platformType:[],
-            loading: false,
-            searchForm: {
-                platformId: '', //渠道类型
+        data() {
+            const validateChannelNumber = (rule, value, callback) => {
+                if (!value) {
+                    return callback(new Error('不能为空'));
+                } else if (!Number.isInteger(value)) {
+                    callback(new Error('必须为数字'));
+                }
 
-            },
+            };
+            return {
+                withHoldChanelModel: false,
+                platformType: [],
+                loading: false,
+                searchForm: {
+                    platformId: '', //渠道类型
+
+                },
+                withHoldChanelForm: {
+                    platformId: '', //渠道类型
+                    state: 1,
+                    failTimes: '',
+                    remark: '',
+                    channelLevel: '',
+                    channelId: '',
+                },
+
+                withHoldChanelValidate: {
+                    platformId: [
+                        {required: true, type: 'number', message: '渠道不能为空且必须为数字', trigger: 'blur'},
+                    ],
+                    failTimes: [
+                        {required: true, type: 'number', message: '每日失败次数不为空且必须为数字', trigger: 'blur'},
+                    ],
+                    channelLevel: [
+                        {required: true, type: 'number', message: '代扣优先级不为空且必须为数字', trigger: 'blur'},
+                    ],
+                }
+            }
+
 
         },
 
@@ -73,7 +105,7 @@ window.layinit(function (htConfig) {
 
                             {
                                 field: 'channelLevel',
-                                title: '渠道优先级'
+                                title: '代扣优先级'
                             },
                             {
                                 field: 'channelId',
@@ -122,9 +154,9 @@ window.layinit(function (htConfig) {
 
                         console.log("obj.event", obj.event);
                         if (obj.event === 'edit') {
-                            console.log("选择的行数据：", selectedRowInfo);
+                            console.log("选择的行数据：", selectedRowInfo.channelId);
 
-                            // self.editWithholdChannel(selectedRowInfo.id);
+                            self.editWithholdChannel(selectedRowInfo.channelId);
                         }
                     });
 
@@ -137,8 +169,83 @@ window.layinit(function (htConfig) {
                 tt.resetFields();
                 vm.toLoading();
             },
+            editWithholdChannel(id) {
+                vm.withHoldChanelModel = true;
+                axios.get(basePath + 'withholdManage/getWithholdChannel?channelId=' + id)
+                    .then(function (res) {
+                        if (res.data.code == "1") {
+                            var data = res.data.data;
+                            vm.withHoldChanelForm.platformId = data.platformId;
+                            vm.withHoldChanelForm.state = data.channelStatus;
+                            vm.withHoldChanelForm.failTimes = data.failTimes;
+                            vm.withHoldChanelForm.remark = data.remark;
+                            vm.withHoldChanelForm.channelId = data.channelId;
+                            vm.withHoldChanelForm.channelLevel = data.level;
+                        }
+                    })
+                    .catch(function (error) {
+                        vm.$Modal.error({content: '接口调用异常!'});
+                    });
+            },
+            addHoldChannel(name) {
+                // console.log("addHoldChannel",addHoldChannel);
+                this.$refs[name].resetFields();
+                vm.withHoldChanelModel = true;
+            },
+            submitHoldChanel(name) {
+                var platformId = vm.withHoldChanelForm.platformId;
+                var channelStatus = vm.withHoldChanelForm.state;
+                var failTimes = vm.withHoldChanelForm.failTimes;
+                var remark = vm.withHoldChanelForm.remark;
+                var channelId = vm.withHoldChanelForm.channelId;
+                var level = vm.withHoldChanelForm.channelLevel;
+
+                console.log("platformId", typeof platformId);
+                console.log("channelStatus", typeof channelStatus);
+                console.log("failTimes", typeof failTimes);
+                console.log("channelLevel", typeof channelLevel);
+                this.$refs[name].validate((valid) => {
+                    if (valid) {
+                        //提交
+                        axios.get(basePath + 'withholdManage/addOrEditWithholdChannel',
+                            {
+                                params: {
+                                    platformId: platformId,
+                                    channelStatus: channelStatus,
+                                    failTimes: failTimes,
+                                    remark: remark,
+                                    channelId: channelId,
+                                    level: level
+                                }
+                            })
+                            .then(function (res) {
+                                if (res.data.code == "1") {
+                                    console.log(res)
+                                    vm.$Modal.success({
+                                        title: '',
+                                        content: '操作成功'
+                                    });
+                                    vm.withHoldChanelModel = false;
+                                    vm.toLoading();
+                                } else {
+                                    vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
+                                }
+                            })
+                            .catch(function (error) {
+                                vm.$Modal.error({content: '接口调用异常!'});
+                            });
+
+                    } else {
 
 
+                    }
+                })
+            },
+            cancelHoldChanel(name) {
+                this.withHoldChanelModel = false;
+                this.$refs[name].resetFields();
+                vm.toLoading();
+            }
 
 
         },

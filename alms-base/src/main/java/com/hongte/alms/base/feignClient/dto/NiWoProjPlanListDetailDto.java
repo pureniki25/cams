@@ -23,6 +23,21 @@ public class NiWoProjPlanListDetailDto implements Serializable {
      private BigDecimal repaidCommissionGuaranteFee;//当期已还平台管理费
      private BigDecimal totalPenalty;//当前期总罚息
      private BigDecimal repaidPenalty;//当前期已还罚息
+     private BigDecimal shouldConsultingFee;//当前应还咨询服务费
+     private BigDecimal repaidConsultingFee;//当前已还咨询服务费
+     
+	public BigDecimal getShouldConsultingFee() {
+		return shouldConsultingFee;
+	}
+	public void setShouldConsultingFee(BigDecimal shouldConsultingFee) {
+		this.shouldConsultingFee = shouldConsultingFee;
+	}
+	public BigDecimal getRepaidConsultingFee() {
+		return repaidConsultingFee;
+	}
+	public void setRepaidConsultingFee(BigDecimal repaidConsultingFee) {
+		this.repaidConsultingFee = repaidConsultingFee;
+	}
 	public Integer getPeriod() {
 		return period;
 	}

@@ -245,7 +245,7 @@ public class CustomerRepayFlowServiceImpl implements CustomerRepayFlowService {
                     confirmRepaymentReq.setMprIds(mr);
                     List<Integer> repaySource = new ArrayList<>(1);
                     repaySource.add(10); //10：线下转账，20：线下代扣，30：银行代扣,11:用往期结余还款
-                    confirmRepaymentReq.setRepaySource(repaySource);
+                    confirmRepaymentReq.setCallFlage(10);
                     shareProfitService.execute(confirmRepaymentReq, true);
                 }
             }
@@ -290,7 +290,7 @@ public class CustomerRepayFlowServiceImpl implements CustomerRepayFlowService {
                         String currentStatus = repaymentBizPlanList.getCurrentStatus();
                         if ("还款中".equals(currentStatus) || "逾期".equals(currentStatus)) {
                             String planId = repaymentBizPlanList.getPlanId();
-                            List<RepaymentBizPlanList> list = repaymentBizPlanListMapper.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", planId).orderBy("period", false));
+                            List<RepaymentBizPlanList> list = repaymentBizPlanListMapper.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", planId).orderBy("period", true));
                             if (!CollectionUtils.isEmpty(list)) {
                                 for (RepaymentBizPlanList repaymentBizPlan : list) {
                                     if ("还款中".equals(repaymentBizPlan.getCurrentStatus()) || "逾期".equals(repaymentBizPlan.getCurrentStatus())) {
@@ -302,7 +302,7 @@ public class CustomerRepayFlowServiceImpl implements CustomerRepayFlowService {
                                         confirmRepaymentReq.setMprIds(mr);
                                         List<Integer> repaySource = new ArrayList<>(1);
                                         repaySource.add(10); //10：线下转账，20：线下代扣，30：银行代扣,11:用往期结余还款
-                                        confirmRepaymentReq.setRepaySource(repaySource);
+                                        confirmRepaymentReq.setCallFlage(10);
                                         shareProfitService.execute(confirmRepaymentReq, true);
                                     }
 

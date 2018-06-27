@@ -14,10 +14,12 @@ import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.collection.entity.Collection;
 import com.hongte.alms.base.service.*;
 import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.util.ListUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.LoginInfoDto;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +28,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.concurrent.Executor;
 
 /**
  * @author:曾坤
@@ -39,6 +42,28 @@ public class CollectionTransferController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CollectionTransferController.class);
 
 	private static Boolean runningFlage = false;
+
+
+	//异步执行线程1执行标志位
+	private  static Boolean thread1Execute = false;
+	//异步执行线程2执行标志位
+	private  static Boolean thread2Execute = false;
+	//异步执行线程3执行标志位
+	private  static Boolean thread3Execute = false;
+	//异步执行线程4执行标志位
+	private  static Boolean thread4Execute = false;
+	//异步执行线程5执行标志位
+	private  static Boolean thread5Execute = false;
+	//异步执行线程6执行标志位
+	private  static Boolean thread6Execute = false;
+	//异步执行线程7执行标志位
+	private  static Boolean thread7Execute = false;
+	//异步执行线程8执行标志位
+	private  static Boolean thread8Execute = false;
+	//异步执行线程9执行标志位
+	private  static Boolean thread9Execute = false;
+	//异步执行线程10执行标志位
+	private  static Boolean thread10Execute = false;
 
 	@Autowired
 	@Qualifier("CollectionService")
@@ -74,12 +99,16 @@ public class CollectionTransferController {
 	@Qualifier("CarBusinessAfterService")
 	private CarBusinessAfterService  carBusinessAfterService;
 
+	@Autowired
+	Executor executor;
+
+	@ApiModelProperty("同步电催数据")
 	@GetMapping("/transfer")
 	@ResponseBody
 	public Result transferCollection() {
 
 		if(runningFlage){
-		  return Result.error("111111","同步程序执行中，请执行完再访问");
+			return Result.error("111111","同步程序执行中，请执行完再访问");
 		}
 
 		runningFlage = true;
@@ -91,9 +120,264 @@ public class CollectionTransferController {
 
 			List<CarBusinessAfter>  afterList = carBusinessAfterService.queryNotTransferCollectionLog();
 			if (!CollectionUtils.isEmpty(afterList)) {
-				for (CarBusinessAfter carBusinessAfter : afterList) {
-					transPhoneSet(carBusinessAfter);
-				}
+
+				List<List<CarBusinessAfter>>  averageList = ListUtil.averageAssign(afterList,10);
+
+				Integer index =0;
+
+				//第一条线程
+				List<CarBusinessAfter>  list1 = averageList.get(0);
+				thread1Execute=true;
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+
+						try{
+							for (CarBusinessAfter carBusinessAfter : list1) {
+								transPhoneSet(carBusinessAfter,null);
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
+						}
+						thread1Execute =false;
+						if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute
+								&& !thread6Execute && !thread7Execute&& !thread8Execute && !thread9Execute && !thread10Execute){
+							runningFlage =false;
+						}
+					}
+				});
+
+				//第二条线程
+				List<CarBusinessAfter>  list2 = averageList.get(1);
+				thread2Execute=true;
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+
+						try{
+							for (CarBusinessAfter carBusinessAfter : list2) {
+								transPhoneSet(carBusinessAfter,null);
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
+						}
+						thread2Execute =false;
+						if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute
+								&& !thread6Execute && !thread7Execute&& !thread8Execute && !thread9Execute && !thread10Execute){
+							runningFlage =false;
+						}
+					}
+				});
+
+
+				//第三条线程
+				List<CarBusinessAfter>  list3 = averageList.get(2);
+				thread3Execute=true;
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+
+						try{
+							for (CarBusinessAfter carBusinessAfter : list3) {
+								transPhoneSet(carBusinessAfter,null);
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
+						}
+						thread3Execute =false;
+						if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute
+								&& !thread6Execute && !thread7Execute&& !thread8Execute && !thread9Execute && !thread10Execute){
+							runningFlage =false;
+						}
+					}
+				});
+
+				//第四条线程
+				List<CarBusinessAfter>  list4 = averageList.get(3);
+				thread4Execute=true;
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+
+						try{
+							for (CarBusinessAfter carBusinessAfter : list4) {
+								transPhoneSet(carBusinessAfter,null);
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
+						}
+						thread4Execute =false;
+						if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute
+								&& !thread6Execute && !thread7Execute&& !thread8Execute && !thread9Execute && !thread10Execute){
+							runningFlage =false;
+						}
+					}
+				});
+
+
+				//第五条线程
+				List<CarBusinessAfter>  list5 = averageList.get(4);
+				thread5Execute=true;
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+
+						try{
+							for (CarBusinessAfter carBusinessAfter : list5) {
+								transPhoneSet(carBusinessAfter,null);
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
+						}
+						thread5Execute =false;
+						if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute
+								&& !thread6Execute && !thread7Execute&& !thread8Execute && !thread9Execute && !thread10Execute){
+							runningFlage =false;
+						}
+					}
+				});
+
+				//第六条线程
+				List<CarBusinessAfter>  list6 = averageList.get(5);
+				thread6Execute=true;
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+
+						try{
+							for (CarBusinessAfter carBusinessAfter : list6) {
+								transPhoneSet(carBusinessAfter,null);
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
+						}
+						thread6Execute =false;
+						if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute
+								&& !thread6Execute && !thread7Execute&& !thread8Execute && !thread9Execute && !thread10Execute){
+							runningFlage =false;
+						}
+					}
+				});
+
+
+				//第七条线程
+				List<CarBusinessAfter>  list7 = averageList.get(6);
+				thread7Execute=true;
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+
+						try{
+							for (CarBusinessAfter carBusinessAfter : list7) {
+								transPhoneSet(carBusinessAfter,null);
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
+						}
+						thread7Execute =false;
+						if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute
+								&& !thread6Execute && !thread7Execute&& !thread8Execute && !thread9Execute && !thread10Execute){
+							runningFlage =false;
+						}
+					}
+				});
+
+				//第八条线程
+				List<CarBusinessAfter>  list8 = averageList.get(7);
+				thread8Execute=true;
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+
+						try{
+							for (CarBusinessAfter carBusinessAfter : list8) {
+								transPhoneSet(carBusinessAfter,null);
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
+						}
+						thread8Execute =false;
+						if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute
+								&& !thread6Execute && !thread7Execute&& !thread8Execute && !thread9Execute && !thread10Execute){
+							runningFlage =false;
+						}
+					}
+				});
+
+				//第九条线程
+				List<CarBusinessAfter>  list9 = averageList.get(8);
+				thread9Execute=true;
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+
+						try{
+							for (CarBusinessAfter carBusinessAfter : list9) {
+								transPhoneSet(carBusinessAfter,null);
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
+						}
+						thread9Execute =false;
+						if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute
+								&& !thread6Execute && !thread7Execute&& !thread8Execute && !thread9Execute && !thread10Execute){
+							runningFlage =false;
+						}
+					}
+				});
+
+				//第十条线程
+				List<CarBusinessAfter>  list10 = averageList.get(9);
+				thread10Execute=true;
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+
+						try{
+							for (CarBusinessAfter carBusinessAfter : list10) {
+								transPhoneSet(carBusinessAfter,null);
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
+						}
+						thread10Execute =false;
+						if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute
+								&& !thread6Execute && !thread7Execute&& !thread8Execute && !thread9Execute && !thread10Execute){
+							runningFlage =false;
+						}
+					}
+				});
+
+
+				Thread.sleep(10*1000);
+
+				//等待5条线程都执行完
+//				while(runningFlage){
+////					if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute){
+////						runningFlage =false;
+////					}
+//					Thread.sleep(5*1000);
+//				}
+
+
+
+
+//				for (CarBusinessAfter carBusinessAfter : afterList) {
+//					transPhoneSet(carBusinessAfter);
+//
+//
+//
+//				}
 //				continue;
 			}
 
@@ -117,16 +401,305 @@ public class CollectionTransferController {
 			LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
 			return Result.error("111111","同步历史电催数据异常"+e.getMessage());
 		}
+		LOGGER.error("开始一次电催数据同步（异步执行）");
+//		runningFlage = false;
+		return Result.success();
 
+	}
+
+	@ApiModelProperty("同步指定业务或期数的电催数据")
+	@GetMapping("/transferOneCollection")
+	@ResponseBody
+	public Result transferOneCollection(String businessId, String afterId){
+
+		List<CarBusinessAfter>  afterList = null;
+		if(afterId!=null){
+			afterList = carBusinessAfterService.selectList(
+					new EntityWrapper<CarBusinessAfter>().
+							eq("car_business_id",businessId)
+							.eq("car_business_after_id",afterId));
+		}else{
+			afterList = carBusinessAfterService.selectList(
+					new EntityWrapper<CarBusinessAfter>().
+							eq("car_business_id",businessId));
+		}
+
+		if(afterList!=null){
+			for (CarBusinessAfter carBusinessAfter : afterList) {
+				boolean bl = transPhoneSet(carBusinessAfter,CollectionSetWayEnum.XINDAI_LOG_ONE);
+			}
+		}
+
+
+		return Result.success();
+
+	}
+
+
+
+	@ApiModelProperty("同步上门催收数据")
+	@GetMapping("/transferVisit")
+	@ResponseBody
+	public Result transferVisitCollection(){
 		try{
-			//2.历史催收数据同步
+			//历史催收数据同步
+			runningFlage = true;
+			//1.同步有设置催收人员的collection
+			List<Collection> collectionList  = collectionService.selectList(new EntityWrapper<Collection>().isNotNull("collection_user"));
+			for(Collection collection:collectionList){
+				collection.setStatus("催收中");
+				transCollectSet(collection);
+			}
 
-			List<Collection> collectionList = collectionService.queryNotTransferCollection();
+			//同步所有的催收信息
+			collectionList = collectionService.selectList(new EntityWrapper<Collection>());
 
 			if (!CollectionUtils.isEmpty(collectionList)) {
-				for (Collection collection : collectionList) {
-					transCollectSet(collection);
-				}
+				List<List<Collection>>  averageList = ListUtil.averageAssign(collectionList,10);
+
+
+				Integer index =0;
+
+				//第一条线程
+				List<Collection>  list1 = averageList.get(0);
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+						thread1Execute=true;
+						try{
+							for (Collection collection : list1) {
+								transCollectSet(collection);
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
+						}
+						thread1Execute =false;
+						if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute
+								&& !thread6Execute && !thread7Execute&& !thread8Execute && !thread9Execute && !thread10Execute){
+							runningFlage =false;
+						}
+					}
+				});
+
+				//第二条线程
+				List<Collection>  list2 = averageList.get(1);
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+						thread2Execute=true;
+						try{
+							for (Collection collection : list2) {
+								transCollectSet(collection);
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
+						}
+						thread2Execute =false;
+						if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute
+								&& !thread6Execute && !thread7Execute&& !thread8Execute && !thread9Execute && !thread10Execute){
+							runningFlage =false;
+						}
+					}
+				});
+
+
+				//第三条线程
+				List<Collection>  list3 = averageList.get(2);
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+						thread3Execute=true;
+						try{
+							for (Collection collection : list3) {
+								transCollectSet(collection);
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
+						}
+						thread3Execute =false;
+						if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute
+								&& !thread6Execute && !thread7Execute&& !thread8Execute && !thread9Execute && !thread10Execute){
+							runningFlage =false;
+						}
+					}
+				});
+
+				//第四条线程
+				List<Collection>  list4 = averageList.get(3);
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+						thread4Execute=true;
+						try{
+							for (Collection collection : list4) {
+								transCollectSet(collection);
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
+						}
+						thread4Execute =false;
+						if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute
+								&& !thread6Execute && !thread7Execute&& !thread8Execute && !thread9Execute && !thread10Execute){
+							runningFlage =false;
+						}
+					}
+				});
+
+
+				//第五条线程
+				List<Collection>  list5 = averageList.get(4);
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+						thread5Execute=true;
+						try{
+							for (Collection collection : list5) {
+								transCollectSet(collection);
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
+						}
+						thread5Execute =false;
+						if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute
+								&& !thread6Execute && !thread7Execute&& !thread8Execute && !thread9Execute && !thread10Execute){
+							runningFlage =false;
+						}
+					}
+				});
+
+				//第六条线程
+				List<Collection>  list6 = averageList.get(5);
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+						thread6Execute=true;
+						try{
+							for (Collection collection : list6) {
+								transCollectSet(collection);
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
+						}
+						thread6Execute =false;
+						if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute
+								&& !thread6Execute && !thread7Execute&& !thread8Execute && !thread9Execute && !thread10Execute){
+							runningFlage =false;
+						}
+					}
+				});
+
+
+				//第七条线程
+				List<Collection>  list7 = averageList.get(6);
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+						thread7Execute=true;
+						try{
+							for (Collection collection : list7) {
+								transCollectSet(collection);
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
+						}
+						thread7Execute =false;
+						if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute
+								&& !thread6Execute && !thread7Execute&& !thread8Execute && !thread9Execute && !thread10Execute){
+							runningFlage =false;
+						}
+					}
+				});
+
+				//第八条线程
+				List<Collection>  list8 = averageList.get(7);
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+						thread8Execute=true;
+						try{
+							for (Collection collection : list8) {
+								transCollectSet(collection);
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
+						}
+						thread8Execute =false;
+						if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute
+								&& !thread6Execute && !thread7Execute&& !thread8Execute && !thread9Execute && !thread10Execute){
+							runningFlage =false;
+						}
+					}
+				});
+
+				//第九条线程
+				List<Collection>  list9 = averageList.get(8);
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+						thread9Execute=true;
+						try{
+							for (Collection collection : list9) {
+								transCollectSet(collection);
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
+						}
+						thread9Execute =false;
+						if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute
+								&& !thread6Execute && !thread7Execute&& !thread8Execute && !thread9Execute && !thread10Execute){
+							runningFlage =false;
+						}
+					}
+				});
+
+				//第十条线程
+				List<Collection>  list10 = averageList.get(9);
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+						thread10Execute=true;
+						try{
+							for (Collection collection : list10) {
+								transCollectSet(collection);
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
+						}
+						thread10Execute =false;
+						if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute
+								&& !thread6Execute && !thread7Execute&& !thread8Execute && !thread9Execute && !thread10Execute){
+							runningFlage =false;
+						}
+					}
+				});
+
+
+				Thread.sleep(60*1000);
+
+				//等待5条线程都执行完
+//				while(true){
+////					if(thread1Execute&& thread2Execute&& thread3Execute &&  thread4Execute && thread5Execute){
+////						break;
+////					}
+//					Thread.sleep(5*1000);
+//				}
+
+
+//				for (Collection collection : collectionList) {
+//					transCollectSet(collection);
+//				}
+			}else{
+				runningFlage  = false;
 			}
 
 
@@ -159,8 +732,8 @@ public class CollectionTransferController {
 
 
 
-		LOGGER.error("完成一次数据同步");
-		runningFlage = false;
+		LOGGER.error("开始一次上门催收数据同步（异步执行）");
+//		runningFlage = false;
 		return Result.success();
 
 //
@@ -240,6 +813,16 @@ public class CollectionTransferController {
 	}
 
 
+	private  void deleteErrorInfo(String businessId,String afterId,Integer transType){
+
+		TransferFailLog transferFailLog = transferFailLogService.selectOne(new EntityWrapper<TransferFailLog>()
+				.eq("business_id", businessId).eq("after_id", afterId).eq("trans_type",transType));
+		if(transferFailLog !=null){
+			transferFailLogService.deleteById(transferFailLog.getId());
+		}
+	}
+
+
 	/**
 	 * 同步一个电催信息
 	 * @param carBusinessAfter
@@ -250,7 +833,7 @@ public class CollectionTransferController {
 	public Result transferOnePhoneSet(@RequestBody CarBusinessAfter carBusinessAfter){
 		LOGGER.info("同步一个电催信息--开始[{}]" , JSON.toJSONString(carBusinessAfter) );
 
-		boolean bl = transPhoneSet(carBusinessAfter);
+		boolean bl = transPhoneSet(carBusinessAfter,null);
 
 		if(bl){
 			LOGGER.info("同步一个电催信息--成功[{}]" );
@@ -286,12 +869,19 @@ public class CollectionTransferController {
 	 * @param carBusinessAfter
 	 * @return
 	 */
-	private boolean transPhoneSet(CarBusinessAfter carBusinessAfter){
+	private boolean transPhoneSet(CarBusinessAfter carBusinessAfter,CollectionSetWayEnum setWayEnum){
 
 		try {
+			if(setWayEnum == null){
+				setWayEnum =CollectionSetWayEnum.XINDAI_LOG;
+			}
+			//没有设置电催人员的数据不需要同步
+			if(carBusinessAfter.getCollectionUser() == null|| carBusinessAfter.getCollectionUser().equals("")){
+				return true;
+			}
 			Map<String, String> mapInfo = getStatus(carBusinessAfter.getCarBusinessId(),
 					carBusinessAfter.getCarBusinessAfterId(),
-					"电催", carBusinessAfter.getCollectionUser());
+					"电催", carBusinessAfter.getCollectionUser(),null);
 			if (mapInfo == null) {
 				return false;
 			}
@@ -308,9 +898,13 @@ public class CollectionTransferController {
 					"信贷历史数据导入",
 					mapInfo.get("staffType"), CollectionSetWayEnum.XINDAI_LOG);
 
+			deleteErrorInfo(carBusinessAfter.getCarBusinessId(),carBusinessAfter.getCarBusinessAfterId(),null);
+
+
 		} catch (Exception e) {
 			e.printStackTrace();
-			recordErrorInfo(carBusinessAfter.getCarBusinessId(), carBusinessAfter.getCarBusinessAfterId(), DoubleList, "电催", "G查出两条以上还款计划数据");
+			LOGGER.error(e.getMessage());
+			recordErrorInfo(carBusinessAfter.getCarBusinessId(), carBusinessAfter.getCarBusinessAfterId(), Exception, "电催", "捕捉到异常信息",null);
 			return false;
 		}
 		return true;
@@ -327,7 +921,7 @@ public class CollectionTransferController {
 		try {
 			Map<String, String> mapInfo = getStatus(collection.getBusinessId(),
 					collection.getAfterId(),
-					collection.getStatus(), collection.getCollectionUser());
+					collection.getStatus(), collection.getCollectionUser(),1);
 			if (mapInfo == null) {
 				return false;
 			}
@@ -359,10 +953,17 @@ public class CollectionTransferController {
 						staffType, CollectionSetWayEnum.XINDAI_LOG);
 			}
 
+			deleteErrorInfo(collection.getBusinessId(),collection.getAfterId(),1);
 
-		} catch (Exception e) {
+
+		}catch (RuntimeException re){
+			re.printStackTrace();
+			recordErrorInfo(collection.getBusinessId(), collection.getAfterId(), RUNException, collection.getStatus(), "历史催收数据同步  报异常",1);
+
+		}catch (Exception e) {
 			e.printStackTrace();
-			recordErrorInfo(collection.getBusinessId(), collection.getAfterId(), Exception, collection.getStatus(), "历史催收数据同步  报异常");
+
+			recordErrorInfo(collection.getBusinessId(), collection.getAfterId(), Exception, collection.getStatus(), "历史催收数据同步  报异常",1);
 			return false;
 		}
 		return true;
@@ -391,34 +992,34 @@ public class CollectionTransferController {
 	@ResponseBody
 	public Result setCollectionStatus(String businessId,String afterId){
 
-        CarBusinessAfter businessAfter = carBusinessAfterService.selectOne(new EntityWrapper<CarBusinessAfter>().eq("car_business_id",businessId).eq("car_business_after_id",afterId));
-        Collection collection = null;
-        Boolean phoneRet;
-        if(businessAfter!=null){
-            phoneRet = transPhoneSet(businessAfter);
+		CarBusinessAfter businessAfter = carBusinessAfterService.selectOne(new EntityWrapper<CarBusinessAfter>().eq("car_business_id",businessId).eq("car_business_after_id",afterId));
+		Collection collection = null;
+		Boolean phoneRet;
+		if(businessAfter!=null){
+			phoneRet = transPhoneSet(businessAfter,CollectionSetWayEnum.XINDAI_LOG_ONE);
 //            if(phoneRet){
 //                return Result.success();
 //            }else {
 //                return Result.error("111","存储电催失败");
 //            }
-        }
+		}
 // else{
-            collection = collectionService.selectOne(new EntityWrapper<Collection>().eq("business_id",businessId).eq("after_id",afterId));
-            Boolean colRet;
-            if(collection!=null){
-                colRet = transCollectSet(collection);
+		collection = collectionService.selectOne(new EntityWrapper<Collection>().eq("business_id",businessId).eq("after_id",afterId));
+		Boolean colRet;
+		if(collection!=null){
+			colRet = transCollectSet(collection);
 //                if(ret){
 //                    return Result.success();
 //                }else {
 //                    return Result.error("112","存储催收失败");
 //                }
-            }
+		}
 //        }
 
 
-        if(businessAfter==null && collection == null){
-            return Result.error("113","找不到信贷的历史电催或催收数据");
-        }
+		if(businessAfter==null && collection == null){
+			return Result.error("113","找不到信贷的历史电催或催收数据");
+		}
 
 
 
@@ -490,18 +1091,20 @@ public class CollectionTransferController {
 	private  static  final  Integer NoUser=2;//没有用户信息
 	private  static  final  Integer NoStatusEnum=3;//状态信息不匹配
 	private  static  final  Integer Exception=5;//catch到异常
-	private void recordErrorInfo(String businessId ,String afterId,Integer reson,String status,String failReson){
+	private  static  final  Integer RUNException = 6; //catch到运行时异常
+	private void recordErrorInfo(String businessId ,String afterId,Integer reson,String status,String failReson ,Integer transType){
 		TransferFailLog failLog = new TransferFailLog();
 		failLog.setBusinessId(businessId);
 		failLog.setAfterId(afterId);
 		failLog.setFailReason(reson);
+		failLog.setTransType(transType);
 		List<TransferFailLog> transferFailLogs = transferFailLogService.selectList(new EntityWrapper<TransferFailLog>()
-				.eq("business_id", businessId).eq("after_id", afterId));
+				.eq("business_id", businessId).eq("after_id", afterId).eq("trans_type",transType));
 		LOGGER.error("信贷历史催收数据导入错误，"+failReson +"  businessID:"+businessId+"     afterId:"+afterId+"   status:"+status);
 		TransferFailLog transferFailLog = null;
 		if(transferFailLogs!=null&&transferFailLogs.size()>0){
 			for(TransferFailLog log :transferFailLogs ){
-				if(log.getTransType()==null){
+				if(log.getTransType()==null || log.getTransType()==1){
 					transferFailLog = log;
 				}
 			}
@@ -519,7 +1122,7 @@ public class CollectionTransferController {
 	 * @return
 	 * Map<>:crpId userId staffType
 	 */
-	private Map<String, String>  getStatus(String businessId,String afterId,String status,String bmUserId) {
+	private Map<String, String>  getStatus(String businessId,String afterId,String status,String bmUserId,Integer transType) {
 
 		Map<String, String> map = new HashMap<>();
 
@@ -528,11 +1131,11 @@ public class CollectionTransferController {
 						.eq("after_id", afterId));
 		RepaymentBizPlanList repaymentBizPlanList = l.size()>0?l.get(0):null;
 		if(l.size()>1){
-			recordErrorInfo(businessId ,afterId, DoubleList,status,"查出两条以上还款计划数据");
+			recordErrorInfo(businessId ,afterId, DoubleList,status,"查出两条以上还款计划数据",transType);
 			return null;
 		}
 		if (repaymentBizPlanList == null) {
-			recordErrorInfo(businessId ,afterId, NoList,status,"无还款计划数据");
+			recordErrorInfo(businessId ,afterId, NoList,status,"无还款计划数据",transType);
 			return null;
 		}
 		map.put("crpId",repaymentBizPlanList.getPlanListId());
@@ -543,7 +1146,7 @@ public class CollectionTransferController {
 			dto = loginUserInfoHelper.getUserInfoByUserId("", bmUserId);
 		}
 		if(dto ==null){
-			recordErrorInfo(businessId ,afterId, NoUser,status,"没有用户信息");
+			recordErrorInfo(businessId ,afterId, NoUser,status,"没有用户信息",transType);
 			return null;
 		}
 
@@ -553,7 +1156,7 @@ public class CollectionTransferController {
 		if("电催".equals(status) ||"催收中".equals(status)||"催款中".equals(status)){
 			if (StringUtil.isEmpty(dto.getUserId())) {
 				if("电催".equals(status)){
-					recordErrorInfo(businessId ,afterId, NoUser,status,"没有用户信息");
+					recordErrorInfo(businessId ,afterId, NoUser,status,"没有用户信息",transType);
 					return null;
 				}else{
 					map.put("userId","");
@@ -592,11 +1195,11 @@ public class CollectionTransferController {
 //			log.setCollectionUser("admin");
 //			collectionStatus = 350;
 		} else if ("推迟移交法务".equals(status)) {
-				staffType = CollectionStatusEnum.DELAY_TO_LAW.getPageStr();
+			staffType = CollectionStatusEnum.DELAY_TO_LAW.getPageStr();
 //			log.setCollectionUser("admin");
 //			collectionStatus = 400;
 		} else {
-			recordErrorInfo(businessId ,afterId, NoStatusEnum,status,"状态信息不匹配");
+			recordErrorInfo(businessId ,afterId, NoStatusEnum,status,"状态信息不匹配",transType);
 			return null;
 
 		}

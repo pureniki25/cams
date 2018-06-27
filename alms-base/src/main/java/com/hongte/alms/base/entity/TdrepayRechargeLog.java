@@ -52,10 +52,10 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 	@ApiModelProperty(required= true,value = "原业务编号")
 	private String origBusinessId;
     /**
-     * 业务类型(1:车易贷展期,2:房速贷展期,3:金融仓储,4:三农金融,9:车易贷,11:房速贷,12车全垫资代采,13:扶贫贷,14:汽车融资租赁,15:二手车商贷,20:一点车贷,25:信用贷)
+     * 业务类型(1:车易贷展期,2:房速贷展期,3:金融仓储,4:三农金融,9:车易贷,11:房速贷,12车全垫资代采,13:扶贫贷,14:汽车融资租赁,15:二手车商贷,20:一点车贷, 26:业主贷,27:家装分期,28:商贸共借;29:业主共借,30:商贸贷)
      */
 	@TableField("business_type")
-	@ApiModelProperty(required= true,value = "业务类型(1:车易贷展期,2:房速贷展期,3:金融仓储,4:三农金融,9:车易贷,11:房速贷,12车全垫资代采,13:扶贫贷,14:汽车融资租赁,15:二手车商贷,20:一点车贷,25:信用贷)")
+	@ApiModelProperty(required= true,value = "业务类型(1:车易贷展期,2:房速贷展期,3:金融仓储,4:三农金融,9:车易贷,11:房速贷,12车全垫资代采,13:扶贫贷,14:汽车融资租赁,15:二手车商贷,20:一点车贷, 26:业主贷,27:家装分期,28:商贸共借;29:业主共借,30:商贸贷)")
 	private Integer businessType;
     /**
      * 实还日期
