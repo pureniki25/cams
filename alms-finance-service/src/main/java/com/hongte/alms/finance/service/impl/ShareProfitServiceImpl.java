@@ -1089,10 +1089,12 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		}
 
 		//3.最后按核销顺序还金额
+		String lastProjectId = null;
 		for (int i = 0; i < dto.getProjPlanDtos().size(); i++) {
 			if(lastPaySuc == false) return;
 			RepaymentProjPlanDto  repaymentProjPlanDto = dto.getProjPlanDtos().get(i);
 			String projectId = repaymentProjPlanDto.getTuandaiProjectInfo().getProjectId();
+			lastProjectId = projectId;
 			CurrPeriodProjDetailVO currPeriodProjDetailVO = getCurrPeriodProjDetailVO(projectId);
 
 
@@ -1112,6 +1114,27 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 				}
 			}
 		}
+
+
+		//结余
+		BigDecimal surplusFund = new BigDecimal("0");
+		//如果最后一次还款都还足了，就计算结余
+		if(lastPaySuc == true){
+			surplusFund = surplusFund.add(curalDivideAmount.get());
+			boolean setBl = true;
+			while(setBl == true){
+				setBl =  setNewRepaymentResource(resourceIndex.get()+1);
+				if(setBl){
+					surplusFund = surplusFund.add(curalDivideAmount.get());
+				}
+			}
+		}
+		//将结余设置到最后一个标
+		if(lastProjectId!=null){
+			CurrPeriodProjDetailVO lastPeriodProjDetailVO = getCurrPeriodProjDetailVO(lastProjectId);
+			lastPeriodProjDetailVO.setSurplus(surplusFund);
+		}
+
 	}
 
 
@@ -1161,6 +1184,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			logger.info("divideAmount变为{}",curalDivideAmount);
 			createProjFactRepay(money, detail, currPeriodProjDetailVO,curalResource.get());
 			realPayed = money;
+			realPayedAmount.set(realPayed);
+			return true;
 		} else if (c == 0) {
 			logger.info("divideAmount等于unpaid");
 			logger.info("@@从divideAmount={}分unpaid={}到{}",curalDivideAmount,unpaid,detail.getPlanItemName());
@@ -1172,6 +1197,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			//上一条还款来源的可用金额已用完，找下一条还款来源来用
 			curalDivideAmount.set(null);
 			setNewRepaymentResource(resourceIndex.get()+1);
+			realPayedAmount.set(realPayed);
+			return false;
 		} else {
 			logger.info("divideAmount少于unpaid");
 			logger.info("@@从divideAmount={}分unpaid={}到{}",curalDivideAmount,curalDivideAmount,detail.getPlanItemName());
@@ -1187,11 +1214,15 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 				if(pRet && realPayedAmount.get() != null){
 					realPayed =realPayed.add(realPayedAmount.get());
 				}
+				realPayedAmount.set(realPayed);
+				return pRet;
+			}else{//取不到下一条流水
+				realPayedAmount.set(realPayed);
+				return false;
 			}
 		}
 
-		realPayedAmount.set(realPayed);
-		return true;
+
 	}
 
 	/**
