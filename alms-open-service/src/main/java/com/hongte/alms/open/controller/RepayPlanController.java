@@ -16,7 +16,11 @@ import com.hongte.alms.base.RepayPlan.req.trial.TrailRepayPlanReq;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
+import com.hongte.alms.base.enums.AlmsServiceNameEnums;
+import com.hongte.alms.base.exception.ServiceRuntimeException;
+import com.hongte.alms.base.service.SysApiCallFailureRecordService;
 import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.open.feignClient.CreatRepayPlanRemoteApi;
 import com.hongte.alms.open.feignClient.financeService.RepayPlanRemoteApi;
 import com.hongte.alms.open.service.CollectionXindaiService;
@@ -32,6 +36,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
@@ -60,6 +65,9 @@ public class RepayPlanController {
     private CreatRepayPlanRemoteApi creatRepayPlanRemoteService;
     @Autowired
     private RepayPlanRemoteApi repayPlanRemoteApi;
+    @Autowired
+    @Qualifier("SysApiCallFailureRecordService")
+    private SysApiCallFailureRecordService sysApiCallFailureRecordService;
 
 
     static final ConcurrentMap<Integer, String> FEE_TYPE_MAP;
@@ -271,8 +279,12 @@ public class RepayPlanController {
                                 break;
                             //其它费用
                             default:
-                                planOtherExpenses = planOtherExpenses.add(planListDetail.getPlanAmount());
-                                actualOtherExpernses = actualOtherExpernses.add(planListDetail.getFactAmount());
+                                if (planListDetail.getPlanAmount() != null) {
+                                    planOtherExpenses = planOtherExpenses.add(planListDetail.getPlanAmount());
+                                }
+                                if (planListDetail.getFactAmount() != null) {
+                                    actualOtherExpernses = actualOtherExpernses.add(planListDetail.getFactAmount());
+                                }
                         }
 
                         CarBusinessAfterDetailDto afterDetail = new CarBusinessAfterDetailDto();
@@ -351,9 +363,10 @@ public class RepayPlanController {
             //3，将指定业务的还款计划的变动通过信贷接口推送给信贷系统
             JSON.DEFFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
             //RequestData requestData = new RequestData(JSON.toJSONString(paramMapList, SerializerFeature.WriteDateUseDateFormat), "Api4Alms_UpdateRepaymentPlan");
+            String paramStr = JSON.toJSONString(paramMapList, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteNullStringAsEmpty,
+                    SerializerFeature.WriteDateUseDateFormat);
             RequestData requestData = new RequestData(
-                    JSON.toJSONString(paramMapList, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteNullStringAsEmpty,
-                            SerializerFeature.WriteDateUseDateFormat), "Api4Alms_UpdateRepaymentPlan");
+                    paramStr, "Api4Alms_UpdateRepaymentPlan");
             String ciphertext = XinDaiEncryptUtil.encryptPostData(JSON.toJSONString(requestData));
             CollectionXindaiService collectionXindaiService = Feign.builder().target(CollectionXindaiService.class, apiUrl);
             String respStr = collectionXindaiService.updateRepaymentPlan(ciphertext);
@@ -361,6 +374,15 @@ public class RepayPlanController {
             ResponseData respData = XinDaiEncryptUtil.getRespData(respStr);
             if (respData == null || !"1".equals(respData.getReturnCode())) {
                 logger.info("[处理] 还款计划-将指定业务的还款计划的变动通过信贷接口推送给信贷系统失败：result=[{}]", JSON.toJSONString(respData));
+
+                try {
+                    //接口调用失败记录写入数据库以便定时生推
+                    sysApiCallFailureRecordService.save(AlmsServiceNameEnums.OPEN, Constant.INTERFACE_CODE_OPEN_REPAYPLAN_UPDATEREPAYPLANTOLMS, Constant.INTERFACE_NAME_OPEN_REPAYPLAN_UPDATEREPAYPLANTOLMS,
+                            businessId, paramStr, ciphertext, JSON.toJSONString(respData), apiUrl, this.getClass().getSimpleName());
+                } catch (ServiceRuntimeException e) {
+                    logger.info("[处理] 还款计划-记录接口调用日志失败");
+                }
+
                 return Result.error(respData.getReturnMessage());
             }
 
