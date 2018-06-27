@@ -88,6 +88,7 @@ import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.DateUtil;
+import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.finance.service.ShareProfitService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 
@@ -1841,7 +1842,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			record.setApiCode(Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT);
 			record.setApiName(Constant.INTERFACE_NAME_PLATREPAY_REPAYMENT);
 			record.setRefId(confirmLogId);
-			record.setCreateUser(loginUserInfoHelper.getUserId());
+			record.setCreateUser(StringUtil.isEmpty(loginUserInfoHelper.getUserId()) ? "null" : loginUserInfoHelper.getUserId());
 			record.setCraeteTime(new Date());
 			record.setTargetUrl(Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT);
 			

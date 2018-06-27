@@ -4,6 +4,10 @@ import com.hongte.alms.base.entity.SysApiCallFailureRecord;
 import com.hongte.alms.base.mapper.SysApiCallFailureRecordMapper;
 import com.hongte.alms.base.service.SysApiCallFailureRecordService;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -16,5 +20,13 @@ import org.springframework.stereotype.Service;
  */
 @Service("SysApiCallFailureRecordService")
 public class SysApiCallFailureRecordServiceImpl extends BaseServiceImpl<SysApiCallFailureRecordMapper, SysApiCallFailureRecord> implements SysApiCallFailureRecordService {
+
+	@Autowired
+	private SysApiCallFailureRecordMapper sysApiCallFailureRecordMapper;
+
+	@Override
+	public List<SysApiCallFailureRecord> queryCallFailedDataByApiCode(String apiCode) {
+		return sysApiCallFailureRecordMapper.queryCallFailedDataByApiCode(apiCode);
+	}
 
 }

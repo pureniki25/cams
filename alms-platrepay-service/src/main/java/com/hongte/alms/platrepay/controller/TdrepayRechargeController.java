@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -635,6 +636,19 @@ public class TdrepayRechargeController {
 				return null;
 			}
 			return Result.success(repaymentProjPlans.get(0));
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error("-99", e.getMessage());
+		}
+	}
+	
+	@ApiOperation(value = "资产端对团贷网通用合规化还款流程")
+	@PostMapping("/repayComplianceWithRequirements")
+	@ResponseBody
+	public Result<RepaymentProjPlan> repayComplianceWithRequirements() {
+		try {
+			tdrepayRechargeService.repayComplianceWithRequirements();
+			return Result.success();
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return Result.error("-99", e.getMessage());
