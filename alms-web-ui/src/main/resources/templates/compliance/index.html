@@ -129,9 +129,22 @@
 			<i-col span="3">
 				业务类型：
 				<i-select v-model="queryConditionModel.businessType" @on-change="onChangeBusinessType($event)" clearable filterable style="width:100px">
+      				<i-option :value="1">车易贷展期</i-option>
+      				<i-option :value="2">房速贷展期</i-option>
+      				<i-option :value="3">金融仓储</i-option>
+      				<i-option :value="4">三农金融</i-option>
       				<i-option :value="9">车易贷</i-option>
       				<i-option :value="11">房速贷</i-option>
+      				<i-option :value="12">车全垫资代采</i-option>
+      				<i-option :value="13">扶贫贷</i-option>
+      				<i-option :value="14">汽车融资租赁</i-option>
+      				<i-option :value="15">二手车商贷</i-option>
       				<i-option :value="20">一点车贷</i-option>
+      				<i-option :value="26">业主贷</i-option>
+      				<i-option :value="27">家装分期</i-option>
+      				<i-option :value="28">商贸共借</i-option>
+      				<i-option :value="29">业主共借</i-option>
+      				<i-option :value="30">商贸贷</i-option>
   				</i-select>
 			</i-col>
 			<i-col span="3">
@@ -191,6 +204,7 @@
                             <i-option value="车全业务代充值">车全业务代充值账户</i-option>
                             <i-option value="二手车业务代充值">二手车业务代充值账户</i-option>
                             <i-option value="一点车贷代充值">一点车贷代充值账户</i-option>
+                            <i-option value="信用贷代充值">信用贷代充值账户</i-option>
 		  				</i-select>
 		  				<span style="color: red">
 		  					{{rechargeModalForm.rechargeAccountBalance && 

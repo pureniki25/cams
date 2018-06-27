@@ -296,12 +296,12 @@ window.layinit(function(htConfig) {
 				}
 				axios.get(basePath + 'recharge/queryUserAviMoney?rechargeAccountType=' + rechargeAccountType, {timeout: 0})
 				.then(function(result){
-					if (result.data.code == "1") {
+					if (result.data.code == "1" && result.data.data.data != null) {
 						vm.rechargeModalForm.rechargeAccountBalance = result.data.data.data.aviMoney;
 						vm.rechargeAccountBalance = result.data.data.data.aviMoney;
 					} else {
 						vm.rechargeModalForm.rechargeAccountBalance = '';
-						vm.$Modal.error({ content: result.data.msg });
+						vm.$Modal.error({ content: '没有查到对应的账户余额' });
 					}
 				}).catch(function (error) {
 					vm.rechargeModalForm.rechargeAccountBalance = '';
@@ -354,12 +354,30 @@ window.layinit(function(htConfig) {
 			 * 当业务类型改变时触发
 			 */
 			onChangeBusinessType: function(value){
-				if (value == 9) {
+				if (value == 1) {
+					this.rechargeAccountType = '车贷代充值';
+				}else if (value == 2) {
+					this.rechargeAccountType = '房贷代充值';
+				}else if (value == 3) {
+					this.rechargeAccountType = '房贷代充值';
+				}else if (value == 4) {
+					this.rechargeAccountType = '房贷代充值';
+				}else if (value == 9) {
 					this.rechargeAccountType = '车贷代充值';
 				}else if (value == 11) {
 					this.rechargeAccountType = '房贷代充值';
+				}else if (value == 12) {
+					this.rechargeAccountType = '车贷代充值';
+				}else if (value == 13) {
+					this.rechargeAccountType = '扶贫贷代充值';
+				}else if (value == 14) {
+					this.rechargeAccountType = '车贷代充值';
+				}else if (value == 15) {
+					this.rechargeAccountType = '车贷代充值';
 				}else if (value == 20) {
 					this.rechargeAccountType = '一点车贷代充值';
+				}else {
+					this.rechargeAccountType = '信用贷代充值';
 				}
 				this.queryUserAviMoney();
 			},
