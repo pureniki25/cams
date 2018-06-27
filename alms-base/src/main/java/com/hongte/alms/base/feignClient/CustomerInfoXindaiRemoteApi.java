@@ -26,7 +26,7 @@ public interface CustomerInfoXindaiRemoteApi {
      * 根据身份证号码获取客户银行卡信息
      */
     @RequestMapping(value = "/CustomerBankcardController/getBankcardInfo",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
-    List<BankCardInfo> getBankcardInfo(@RequestParam("identityCard") String identityCard) throws Exception;
+    Result getBankcardInfo(@RequestParam("identityCard") String identityCard) throws Exception;
 
 
     }

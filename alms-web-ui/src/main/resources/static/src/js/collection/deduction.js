@@ -283,6 +283,7 @@ var layer;
                     }
                  	vm.ajax_data.underLineFactOverDueMoney=vm.ajax_data.planOverDueMoney;
 //                    searchRepayLog();
+                 	vm.platformId='5';
                  	doOperate();
                       if(vm.ajax_data.strType==2){
                       	url=basePath+ "RepaymentLogController/searchAfterRepayLog?businessId="+vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId;
@@ -354,7 +355,7 @@ var layer;
 		                   	           	}
 		                   	       	}
                    	            	vm.ajax_data.repayAllAmount=repayMoney;
-                   	            	getTotalShouldPay();
+                   	            	//getTotalShouldPay();
                                 vm.loading = false;
                             }
                         });
@@ -420,8 +421,10 @@ var layer;
 	var doOperate = function () {debugger
         if(vm.platformId=='5'){debugger
         	vm.isBankFlag=true;
-        	vm.ajax_data.underLineFactOverDueMoney=0;
         	vm.ajax_data.total=getTotalShouldPay();
+        	vm.ajax_data.repayAmount=vm.ajax_data.repayAmount-vm.ajax_data.planOverDueMoney;
+        	vm.ajax_data.repayAmount=vm.ajax_data.repayAmount.toFixed(2);
+       
         }else{
         	vm.isBankFlag=false;
         	vm.ajax_data.total=getTotalShouldPay();
