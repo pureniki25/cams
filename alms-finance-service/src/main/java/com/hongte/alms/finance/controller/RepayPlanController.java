@@ -572,7 +572,9 @@ public class RepayPlanController {
            return Result.error("9889","未找到对应的还款计划信息");
        }else {
 	       for(RepaymentBizPlanList list:lists) {
-	    	  BasicBusiness business= basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", list.getOrigBusinessId()));
+	    	   List<RepaymentBizPlanList> totalList=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", list.getOrigBusinessId()));
+	    	   Integer totalPeriods=totalList.size();//总期数
+	    	   BasicBusiness business= basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", list.getOrigBusinessId()));
 	    	  if(business==null) {
 	    		  continue;
 	    	  }
@@ -587,7 +589,7 @@ public class RepayPlanController {
 	    		  outputDate=outputRecords.get(0).getFactOutputDate();
 	    	  }
 	    	
-	    	  BizPlanListMessageDto message=new BizPlanListMessageDto(list.getBusinessId(), business.getCustomerName(), business.getCustomerIdentifyCard(), type.getBusinessTypeName(), outputDate, list.getTotalBorrowAmount(), list.getPeriod(), business.getBorrowMoney(), list.getDueDate());
+	    	  BizPlanListMessageDto message=new BizPlanListMessageDto(list.getBusinessId(), business.getCustomerName(), business.getCustomerIdentifyCard(), type.getBusinessTypeName(), outputDate, list.getTotalBorrowAmount(), list.getPeriod(), business.getBorrowMoney(), list.getDueDate(),totalPeriods);
 	    	  messages.add(message);
 	       }   
        }

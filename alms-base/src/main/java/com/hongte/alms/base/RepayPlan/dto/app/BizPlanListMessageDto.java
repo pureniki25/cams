@@ -21,13 +21,22 @@ public class BizPlanListMessageDto implements Serializable {
 	private Date date;// 出款日期
 	private BigDecimal balance;// 借款金额
 	private Integer periods;// 期数
+	private Integer totalPeriods;//总期数
 	private BigDecimal amount;// 应还金额
 	private Date cycDate;// 应还日期
 
 	
 	
+	public Integer getTotalPeriods() {
+		return totalPeriods;
+	}
+
+	public void setTotalPeriods(Integer totalPeriods) {
+		this.totalPeriods = totalPeriods;
+	}
+
 	public BizPlanListMessageDto(String businessId, String name, String cardId, String type, Date date,
-			BigDecimal balance, Integer periods, BigDecimal amount, Date cycDate) {
+			BigDecimal balance, Integer periods, BigDecimal amount, Date cycDate,Integer totalPeriods) {
 		super();
 		this.businessId = businessId;
 		this.name = name;
@@ -38,6 +47,7 @@ public class BizPlanListMessageDto implements Serializable {
 		this.periods = periods;
 		this.amount = amount;
 		this.cycDate = cycDate;
+		this.totalPeriods=totalPeriods;
 	}
 
 	public String getBusinessId() {
