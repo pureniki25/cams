@@ -123,6 +123,7 @@ public class RepaymentProjPlanListServiceImpl extends
 								RepaymentProjPlan projPlan = repaymentProjPlanService
 										.selectOne((new EntityWrapper<RepaymentProjPlan>().eq("creat_sys_type", 2))
 												.eq("proj_plan_id", projPList.getProjPlanId()));
+							
 								getRondModeAndSmallNum(projPlan);//确定进位方式和保留小数位
 								RepaymentProjPlanListDetail underLineProjDetail=null;   //线下费用的Detail
 								RepaymentProjPlanListDetail onLineProjDetail=null;   //线上费用的Detail
@@ -135,6 +136,9 @@ public class RepaymentProjPlanListServiceImpl extends
 									continue;
 									// 逾期的当前期
 								} else {
+									
+									
+									
 									logger.info("===============：planListid:"+pList.getPlanListId()+"逾期费用计算开始===============");
 									//获取平台对应标对应期的还款日期,取晚的日期
 									Date platformDueDate=getPlatformDuedate(projPlan.getProjectId(), projPList.getPeriod().toString());
@@ -311,6 +315,10 @@ public class RepaymentProjPlanListServiceImpl extends
 		
 		private void getRondModeAndSmallNum(RepaymentProjPlan projPlan) {
 			//'进位方式标志位 0：进一位，1：不进位，4：四舍五入, 6:银行家舍入法';
+			if(projPlan.getRondmode()==null||projPlan.getSmallNum()==null) {
+				projPlan.setRondmode(4);
+				projPlan.setSmallNum(2);
+			}
 			switch(projPlan.getRondmode()) {
 		    case 0:
 		    	roundingMode=RoundingMode.UP;
@@ -392,41 +400,41 @@ public class RepaymentProjPlanListServiceImpl extends
 	     * 获取平台垫付的本息
 	     * @return
 	     */
-	    private BigDecimal principalAndInterest(String projId,Integer period){
-	    	Map<String, Object> paramMap = new HashMap<>();
-			paramMap.put("projectId", projId);
-			Result result=null;
-		 try {
-			 result = eipRemote.advanceShareProfit(paramMap);
-			if(result==null) {
-				logger.debug("调查询平台垫付记录接口出错");
+	private BigDecimal principalAndInterest(String projId, Integer period) {
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("projectId", projId);
+		Result result = null;
+		try {
+			result = eipRemote.queryProjectPayment(paramMap);
+			if (result == null) {
+				logger.info("调查询平台垫付记录接口出错");
 			}
-		 }catch(Exception e) {
-				logger.debug("调查询平台垫付记录接口出错"+e);
-		 }
-		 if(result!=null&&result.getReturnCode().equals("0000")) {
-			 HashMap<String,HashMap<String,String>> map=(HashMap) result.getData();
-				List<HashMap<String,String>> list=(List<HashMap<String, String>>) map.get("returnAdvanceShareProfits");
-				String principalAndInterest="";
-				if(list.size()!=0){
-					for(int i=0;i<list.size();i++) {
-						String periods=String.valueOf(list.get(i).get("period"));
-						if(period.equals(periods))
-						{
-							principalAndInterest= String.valueOf(list.get(i).get("principalAndInterest"));
+
+			if (result != null && result.getReturnCode().equals("0000")) {
+				HashMap<String, HashMap<String, String>> map = (HashMap) result.getData();
+				List<HashMap<String, Object>> list = (List<HashMap<String, Object>>) map.get("projectPayments");
+				Double principalAndInterest = 0.0;
+				if (list.size() != 0) {
+					for (int i = 0; i < list.size(); i++) {
+						String periods = String.valueOf(list.get(i).get("period"));
+						if (period.toString().equals(periods)) {
+							principalAndInterest = (Double) list.get(i).get("principalAndInterest");
 						}
 					}
 				}
-				if(StringUtil.isEmpty(principalAndInterest)) {
+				if (principalAndInterest == 0) {
 					return BigDecimal.valueOf(0);
-				}else {
+				} else {
 					return BigDecimal.valueOf(Double.valueOf(principalAndInterest));
 				}
-		 }else {
-			 return BigDecimal.valueOf(0);
-		 }
-			
-	    }
+			} else {
+				return BigDecimal.valueOf(0);
+			}
+		} catch (Exception e) {
+			logger.error("获取平台垫付的本息" + e);
+		}
+		return BigDecimal.valueOf(0);
+	}
 	    
 	    /**
 	     * 剩余本金

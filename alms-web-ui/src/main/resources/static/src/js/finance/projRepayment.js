@@ -25,6 +25,10 @@ let projRepayment = {
             title:'线上逾期费',
             key:'onlineOverDue'
         },{
+            title:'结余',
+            key:'surplus'
+        },
+        {
             title:'合计',
             key:'total'
         }

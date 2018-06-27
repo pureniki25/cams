@@ -25,4 +25,30 @@ public interface NiWoRepayPlanService {
 	 * @return
 	 */
 	public void SearchNiWoRepayPlan();
+	
+	
+	
+	/**若你我金融还款日当日5pm没有返回更新的还款计划，则触发扣款失败提示；
+	 * 
+	 */
+	
+	public void calFailMsg();
+	
+	
+	
+	/**还款提醒，提前7天/1天提醒
+	 * 
+	 */
+	
+	public void sendRepayRemindMsg(Integer days);
+	
+	
+	
+	/**结清提醒，提前15天/1天提醒
+	 * 
+	 */
+	
+	public void sendSettleRemindMsg(Integer days);
+		
+	
 }

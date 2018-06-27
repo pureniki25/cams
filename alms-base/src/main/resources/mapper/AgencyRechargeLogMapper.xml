@@ -10,6 +10,7 @@
         <result column="recharge_amount" property="rechargeAmount" />
         <result column="recharge_sourse_account" property="rechargeSourseAccount" />
         <result column="bank_code" property="bankCode" />
+        <result column="bank_account" property="bankAccount" />
         <result column="recharge_account_balance" property="rechargeAccountBalance" />
         <result column="cm_order_no" property="cmOrderNo" />
         <result column="oId_partner" property="oIdPartner" />
@@ -27,7 +28,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, recharge_account_type AS rechargeAccountType, transfer_type AS transferType, recharge_amount AS rechargeAmount, recharge_sourse_account AS rechargeSourseAccount, bank_code AS bankCode, recharge_account_balance AS rechargeAccountBalance, cm_order_no AS cmOrderNo, oId_partner AS oIdPartner, recharge_user_id AS rechargeUserId, charge_type AS chargeType, client_ip AS clientIp, handle_status AS handleStatus, param_json AS paramJson, result_json AS resultJson, create_user AS createUser, create_time AS createTime, update_user AS updateUser, update_time AS updateTime
+        id, recharge_account_type AS rechargeAccountType, transfer_type AS transferType, recharge_amount AS rechargeAmount, recharge_sourse_account AS rechargeSourseAccount, bank_code AS bankCode, bank_account AS bankAccount, recharge_account_balance AS rechargeAccountBalance, cm_order_no AS cmOrderNo, oId_partner AS oIdPartner, recharge_user_id AS rechargeUserId, charge_type AS chargeType, client_ip AS clientIp, handle_status AS handleStatus, param_json AS paramJson, result_json AS resultJson, create_user AS createUser, create_time AS createTime, update_user AS updateUser, update_time AS updateTime
     </sql>
 
 </mapper>

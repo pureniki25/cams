@@ -97,6 +97,12 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 	@Qualifier("SysMsgTemplateService")
 	SysMsgTemplateService sysMsgTemplateService;
 	
+	
+	
+	@Autowired
+	@Qualifier("TuandaiProjectInfoService")
+	TuandaiProjectInfoService tuandaiProjectInfoService;
+	
 	@Autowired
     Executor executor;
 	
@@ -209,8 +215,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 										for (RepaymentBizPlanListDetail planDetail : planDetails) {
 											if (projDetail.getFeeId().equals(planDetail.getFeeId())) {
 												boolean isDifferent=false;
-												if (RepayPlanFeeTypeEnum.PRINCIPAL.getUuid()
-														.equals(projDetail.getFeeId())) { // 本金
+												if (RepayPlanFeeTypeEnum.PRINCIPAL.getValue()==projDetail.getPlanItemType()) { // 本金
 													if(projDetail.getProjPlanAmount().compareTo(detailDto.getPrincipal())!=0) {//贷后应还的和你我金融应还的金额不一致，计入异常日志表
 														isDifferent=true;
 													}
@@ -222,8 +227,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													planDetail.setUpdateDate(new Date());
 													repaymentProjPlanListDetailService.updateById(projDetail);
 													repaymentBizPlanListDetailService.updateById(planDetail);
-												} else if (RepayPlanFeeTypeEnum.INTEREST.getUuid()
-														.equals(projDetail.getFeeId())) { // 利息
+												} else if (RepayPlanFeeTypeEnum.INTEREST.getValue()==projDetail.getPlanItemType()) { // 利息
 													if(projDetail.getProjPlanAmount().compareTo(detailDto.getInterest())!=0) {//贷后应还的和你我金融应还的金额不一致，计入异常日志表
 														isDifferent=true;
 													
@@ -236,8 +240,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													planDetail.setUpdateDate(new Date());
 													repaymentProjPlanListDetailService.updateById(projDetail);
 													repaymentBizPlanListDetailService.updateById(planDetail);
-												} else if (RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE.getUuid()
-														.equals(projDetail.getFeeId())) {// 担保服务费
+												} else if (RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE.getValue()==projDetail.getPlanItemType()) {// 担保服务费
 													if(projDetail.getProjPlanAmount().compareTo(detailDto.getCommissionGuaranteFee())!=0) {//贷后应还的和你我金融应还的金额不一致，计入异常日志表
 														isDifferent=true;
 													}
@@ -250,8 +253,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													planDetail.setUpdateDate(new Date());
 													repaymentProjPlanListDetailService.updateById(projDetail);
 													repaymentBizPlanListDetailService.updateById(planDetail);
-												} else if (RepayPlanFeeTypeEnum.PLAT_CHARGE.getUuid()
-														.equals(projDetail.getFeeId())) {// //平台管理费
+												} else if (RepayPlanFeeTypeEnum.PLAT_CHARGE.getValue()==projDetail.getPlanItemType()) {// //平台管理费
 													if(projDetail.getProjPlanAmount().compareTo(detailDto.getPlatformManageFee())!=0) {//贷后应还的和你我金融应还的金额不一致，计入异常日志表
 														isDifferent=true;
 													}
@@ -263,8 +265,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													planDetail.setUpdateDate(new Date());
 													repaymentProjPlanListDetailService.updateById(projDetail);
 													repaymentBizPlanListDetailService.updateById(planDetail);
-												} else if (RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getUuid()
-														.equals(projDetail.getFeeId())) {// //分公司服务费
+												} else if (RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getValue()==projDetail.getPlanItemType()) {// //分公司服务费
 													if(projDetail.getProjPlanAmount().compareTo(detailDto.getPlatformManageFee())!=0) {//贷后应还的和你我金融应还的金额不一致，计入异常日志表
 														isDifferent=true;
 													}
@@ -276,8 +277,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													planDetail.setUpdateDate(new Date());
 													repaymentProjPlanListDetailService.updateById(projDetail);
 													repaymentBizPlanListDetailService.updateById(planDetail);
-												} else if (RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid()
-														.equals(projDetail.getFeeId())
+												} else if (RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getValue()==projDetail.getPlanItemType()
 														&& detailDto.getTotalPenalty() != null && detailDto
 																.getTotalPenalty().compareTo(BigDecimal.valueOf(0)) > 0) {// 逾期滞纳金
 													
@@ -334,13 +334,24 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 												
 												BigDecimal planAmountSum=getPlanAmountSum(planDetails);//当前期计划要还的总金额
 												BigDecimal afterRepayAmountSum=getRepayAmountSum(planDetails);//当前期已还总金额
-												
+												pList.setTotalBorrowAmount(planAmountSum);;
+												projPlanList.setTotalBorrowAmount(planAmountSum);
+												pList.setUpdateTime(new Date());
+												projPlanList.setUpdateTime(new Date());
+												repaymentProjPlanListService.updateById(projPlanList);
+												repaymentBizPlanListService.updateById(pList);
 												/*	
 												 * 同步完你我金融的当前期还款计划之后，如果当前期已还总金额等于当前期计划要还的总金额，并且同步之后的当前期已还总金额大于同步之前的当前期已还总金额
 											     *说明需要发成功代扣的短信
 												 */
 												if(afterRepayAmountSum.compareTo(planAmountSum)==0&&afterRepayAmountSum.compareTo(beforeRepayAmountSum)>0) {
 													BigDecimal repayMoney=afterRepayAmountSum.subtract(beforeRepayAmountSum);
+													if(afterRepayAmountSum.compareTo(planAmountSum)==0) {//当期已还款
+														pList.setCurrentStatus("已还款");
+														projPlanList.setCurrentStatus("已还款");
+														repaymentProjPlanListService.updateById(projPlanList);
+														repaymentBizPlanListService.updateById(pList);
+													}
 													//异步发送短信
 													executor.execute(new Runnable() {
 														@Override
@@ -468,6 +479,9 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 			if(result.getReturnCode().equals("0000")) {
 				HashMap<String, Object> map = (HashMap) result.getData();
 				dto=getNiWoRepayPlanByMap(map,dto);
+		}else {
+			logger.info(result.getCodeDesc());
+			return null;
 		}
 			return dto;
 	}
@@ -475,7 +489,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 	@Override
 	public void SearchNiWoRepayPlan() {
 		//定时查询你我金融的还款计划，未结清、未完全付款的还款计划需要每天查询
-		List<RepaymentProjPlan> projPlans=repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("creat_sys_type", 3).eq("plan_status", 0));
+		List<RepaymentProjPlan> projPlans=repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("plate_type", 2).eq("plan_status", 0));
 		for(RepaymentProjPlan repaymentProjPlan:projPlans) {
 			sycNiWoRepayPlan(repaymentProjPlan.getRequestNo(),null);
 			//超过3天没有同步到你我金融标的还款计划
@@ -535,16 +549,9 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 	 * @return 
 	 */
 	private void sendSuccessSms(String businessId,BigDecimal planAmount,BigDecimal repayAmount) {
-		BasicBizCustomer basicBizCustomer=basicBizCustomerService.selectOne(new EntityWrapper<BasicBizCustomer>().eq("business_id",businessId).eq("ismain_customer", 1));
-		if(basicBizCustomer!=null) {
-			if(StringUtil.isEmpty(basicBizCustomer.getPhoneNumber())) {
-				logger.info("你我金融-发送短信时找不到客户手机号码");
-				return;
-			}
-		}else {
-			logger.info("你我金融-发送短信时找不到客户信息");
-			return;
-		}
+		TuandaiProjectInfo tuandaiProjectInfo=tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("business_id",businessId));
+		
+	
 		String templateCode=MsgCodeEnum.NIWO_REPAY_SUCCESS.getValue();
 		SysMsgTemplate sysMsgTemplate=sysMsgTemplateService.selectOne(new EntityWrapper<SysMsgTemplate>().eq("template_code", templateCode));
 
@@ -558,10 +565,10 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 		dto.setApp("alms");
 		dto.setMsgTitle("贷后你我金融扣款成功提示");
 		dto.setMsgModelId(msgModeId);
-		dto.setMsgTo(basicBizCustomer.getPhoneNumber());
+		dto.setMsgTo(tuandaiProjectInfo.getTelNo());
 		//组装发送短信内容的Json数据
 		JSONObject data = new JSONObject() ;
-		data.put("name", basicBizCustomer.getCustomerName());
+		data.put("name", tuandaiProjectInfo.getRealName());
 		data.put("planAmount", planAmount);
 		data.put("factAmount", repayAmount);
 		dto.setMsgBody(data);
@@ -569,4 +576,172 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 		msgRemote.sendRequest(jason);
 		
 	}
+
+
+
+
+
+	@Override
+	public void calFailMsg() {
+		List<RepaymentProjPlanList> projPlanLists=repaymentProjPlanListService.selectList(new EntityWrapper<RepaymentProjPlanList>().eq("plate_type", 2).ne("current_status", "已还款").eq("due_date", DateUtil.getDate(DateUtil.formatDate(new Date()))));
+
+		String templateCode=MsgCodeEnum.NIWO_REPAY_FAIL.getValue();
+		SysMsgTemplate sysMsgTemplate=sysMsgTemplateService.selectOne(new EntityWrapper<SysMsgTemplate>().eq("template_code", templateCode));
+
+	
+		if(sysMsgTemplate==null) {
+			logger.info("你我金融-发送扣款失败短信模板为空");
+			return;
+		}
+		
+		for(RepaymentProjPlanList projPlanList:projPlanLists) {
+			RepaymentProjPlan repaymentProjPlan=repaymentProjPlanService.selectOne(new EntityWrapper<RepaymentProjPlan>().eq("proj_plan_id", projPlanList.getProjPlanId()));
+			TuandaiProjectInfo tuandaiProjectInfo=tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("business_id", projPlanList.getOrigBusinessId()));
+			Date borrowDate=null;
+			if(tuandaiProjectInfo.getQueryFullSuccessDate()!=null) {
+				borrowDate=tuandaiProjectInfo.getQueryFullSuccessDate();
+			}else {
+				borrowDate=tuandaiProjectInfo.getCreateTime();
+			}
+			Long msgModeId=Long.valueOf(sysMsgTemplate.getTemplateId());
+			MsgRequestDto dto=new MsgRequestDto();
+			dto.setApp("alms");
+			dto.setMsgTitle("贷后你我金融扣款失败提示");
+			dto.setMsgModelId(msgModeId);
+			dto.setMsgTo(tuandaiProjectInfo.getTelNo());
+			//组装发送短信内容的Json数据
+			JSONObject data = new JSONObject() ;
+			data.put("name", tuandaiProjectInfo.getRealName());
+			data.put("date", DateUtil.getChinaDay(borrowDate));
+			data.put("borrowAmount", repaymentProjPlan.getBorrowMoney());
+			data.put("tailCardNum", tuandaiProjectInfo.getBankAccountNo().substring(tuandaiProjectInfo.getBankAccountNo().length()-4, tuandaiProjectInfo.getBankAccountNo().length()));
+			dto.setMsgBody(data);
+			String jason=JSON.toJSONString(dto);
+			msgRemote.sendRequest(jason);
+			
+			
+		}
+		
+		
+	}
+
+
+
+
+
+	@Override
+	public void sendRepayRemindMsg(Integer days) {
+		   Date dueDate=DateUtil.getDate(DateUtil.formatDate(DateUtil.addDay2Date(days, new Date())));
+		   
+			String templateCode=MsgCodeEnum.NIWO_REPAY_REMIND.getValue();
+			SysMsgTemplate sysMsgTemplate=sysMsgTemplateService.selectOne(new EntityWrapper<SysMsgTemplate>().eq("template_code", templateCode));
+
+		
+			if(sysMsgTemplate==null) {
+				logger.info("你我金融-还款提醒短信模板为空");
+				return;
+			}
+		   List<RepaymentProjPlanList>  lists=repaymentProjPlanListService.selectList(new EntityWrapper<RepaymentProjPlanList>().eq("current_status","还款中").eq("due_date", dueDate).eq("plate_type", 2));
+		   for(RepaymentProjPlanList projPlanList:lists) {
+				RepaymentProjPlan repaymentProjPlan=repaymentProjPlanService.selectOne(new EntityWrapper<RepaymentProjPlan>().eq("proj_plan_id", projPlanList.getProjPlanId()));
+			   TuandaiProjectInfo tuandaiProjectInfo=tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("business_id", projPlanList.getOrigBusinessId()));
+				Date borrowDate=null;
+				if(tuandaiProjectInfo.getQueryFullSuccessDate()!=null) {
+					borrowDate=tuandaiProjectInfo.getQueryFullSuccessDate();
+				}else {
+					borrowDate=tuandaiProjectInfo.getCreateTime();
+				}
+				Long msgModeId=Long.valueOf(sysMsgTemplate.getTemplateId());
+				MsgRequestDto dto=new MsgRequestDto();
+				dto.setApp("alms");
+				dto.setMsgTitle("贷后你我金融还款提醒");
+				dto.setMsgModelId(msgModeId);
+				dto.setMsgTo(tuandaiProjectInfo.getTelNo());
+				//组装发送短信内容的Json数据
+				JSONObject data = new JSONObject() ;
+				data.put("name", tuandaiProjectInfo.getRealName());
+				data.put("date", DateUtil.getChinaDay(borrowDate));
+				data.put("borrowAmount", repaymentProjPlan.getBorrowMoney());
+				data.put("period", projPlanList.getPeriod());
+				data.put("amount", projPlanList.getTotalBorrowAmount());
+				data.put("tailCardNum", tuandaiProjectInfo.getBankAccountNo().substring(tuandaiProjectInfo.getBankAccountNo().length()-4, tuandaiProjectInfo.getBankAccountNo().length()));
+				dto.setMsgBody(data);
+				String jason=JSON.toJSONString(dto);
+				msgRemote.sendRequest(jason);
+			   
+			}
+	}
+
+
+
+
+
+	@Override
+	public void sendSettleRemindMsg(Integer days) { 
+		  Date dueDate=DateUtil.getDate(DateUtil.formatDate(DateUtil.addDay2Date(days, new Date())));
+		  List<RepaymentProjPlanList>  lists=repaymentProjPlanListService.selectList(new EntityWrapper<RepaymentProjPlanList>().eq("current_status","还款中").eq("due_date", dueDate).eq("plate_type", 2).orderBy("due_date",false));
+   		
+			String templateCode=MsgCodeEnum.NIWO_SETTLE_REMIND.getValue();
+			SysMsgTemplate sysMsgTemplate=sysMsgTemplateService.selectOne(new EntityWrapper<SysMsgTemplate>().eq("template_code", templateCode));
+
+		
+			if(sysMsgTemplate==null) {
+				logger.info("你我金融-结清提醒短信模板为空");
+				return;
+			}
+		  
+		  //筛选是最后一期的还款记录
+			for(Iterator<RepaymentProjPlanList> it = lists.iterator();it.hasNext();) {
+				RepaymentProjPlanList list=it.next();
+				if(!istLastPeriod(list)) {
+					it.remove();
+				}
+			}
+			
+			 for(RepaymentProjPlanList projPlanList:lists) {
+					   RepaymentProjPlan repaymentProjPlan=repaymentProjPlanService.selectOne(new EntityWrapper<RepaymentProjPlan>().eq("proj_plan_id", projPlanList.getProjPlanId()));
+					   TuandaiProjectInfo tuandaiProjectInfo=tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("business_id", projPlanList.getOrigBusinessId()));
+						Date borrowDate=null;
+						if(tuandaiProjectInfo.getQueryFullSuccessDate()!=null) {
+							borrowDate=tuandaiProjectInfo.getQueryFullSuccessDate();
+						}else {
+							borrowDate=tuandaiProjectInfo.getCreateTime();
+						}
+						Long msgModeId=Long.valueOf(sysMsgTemplate.getTemplateId());
+						MsgRequestDto dto=new MsgRequestDto();
+						dto.setApp("alms");
+						dto.setMsgTitle("贷后你我金融还款提醒");
+						dto.setMsgModelId(msgModeId);
+						dto.setMsgTo(tuandaiProjectInfo.getTelNo());
+						//组装发送短信内容的Json数据
+						JSONObject data = new JSONObject() ;
+						data.put("name", tuandaiProjectInfo.getRealName());
+						data.put("date", DateUtil.getChinaDay(borrowDate));
+						data.put("borrowAmount", repaymentProjPlan.getBorrowMoney());
+						data.put("dueDate",projPlanList.getDueDate() );
+						dto.setMsgBody(data);
+						String jason=JSON.toJSONString(dto);
+						msgRemote.sendRequest(jason);
+				
+				}
+		
+	}
+	
+	public boolean istLastPeriod(RepaymentProjPlanList projList) {
+		boolean isLast=false;
+		List<RepaymentProjPlanList> projLists=repaymentProjPlanListService.selectList(new EntityWrapper<RepaymentProjPlanList>().eq("proj_plan_id", projList.getProjPlanId()));
+		RepaymentProjPlanList lastProjList=projLists.stream().max(new Comparator<RepaymentProjPlanList>() {
+			@Override
+			public int compare(RepaymentProjPlanList o1, RepaymentProjPlanList o2) {
+				return o1.getDueDate().compareTo(o2.getDueDate());
+			}
+		}).get();
+		
+		if(projList.getPlanListId().equals(lastProjList.getPlanListId())) {
+			isLast=true;
+		}
+		return isLast;
+	}
+
+	
 }

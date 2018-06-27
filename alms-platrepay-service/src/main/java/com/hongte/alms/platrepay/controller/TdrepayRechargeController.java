@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +25,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.dto.compliance.TdProjectPaymentInfoResult;
 import com.hongte.alms.base.dto.compliance.TdRefundMonthInfoDTO;
 import com.hongte.alms.base.entity.BasicCompany;
+import com.hongte.alms.base.entity.RepaymentProjPlan;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
@@ -33,8 +33,12 @@ import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.service.BasicCompanyService;
 import com.hongte.alms.base.service.IssueSendOutsideLogService;
+import com.hongte.alms.base.service.RepaymentProjPlanService;
 import com.hongte.alms.base.service.TdrepayRechargeLogService;
+import com.hongte.alms.base.service.TdrepayRechargeService;
 import com.hongte.alms.base.service.TuandaiProjectInfoService;
+import com.hongte.alms.base.vo.compliance.DistributeFundRecordVO;
+import com.hongte.alms.base.vo.compliance.TdrepayRechargeInfoVO;
 import com.hongte.alms.base.vo.module.ComplianceRepaymentVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.Constant;
@@ -48,8 +52,6 @@ import com.hongte.alms.platrepay.dto.TdReturnAdvanceShareProfitResult;
 import com.hongte.alms.platrepay.enums.PlatformStatusTypeEnum;
 import com.hongte.alms.platrepay.enums.ProcessStatusTypeEnum;
 import com.hongte.alms.platrepay.enums.RepaySourceEnum;
-import com.hongte.alms.platrepay.service.TdrepayRechargeService;
-import com.hongte.alms.platrepay.vo.TdrepayRechargeInfoVO;
 import com.ht.ussp.util.BeanUtils;
 
 import io.swagger.annotations.ApiOperation;
@@ -83,6 +85,10 @@ public class TdrepayRechargeController {
 	@Autowired
 	@Qualifier("TuandaiProjectInfoService")
 	private TuandaiProjectInfoService tuandaiProjectInfoService;
+
+	@Autowired
+	@Qualifier("RepaymentProjPlanService")
+	private RepaymentProjPlanService repaymentProjPlanService;
 
 	@Autowired
 	private EipRemote eipRemote;
@@ -346,11 +352,7 @@ public class TdrepayRechargeController {
 				for (TdrepayRechargeLog tdrepayRechargeLog : list) {
 					TdrepayRechargeInfoVO infoVO = BeanUtils.deepCopy(tdrepayRechargeLog, TdrepayRechargeInfoVO.class);
 					if (infoVO != null) {
-						if (infoVO.getBusinessType().intValue() == 25) {
-							infoVO.setBusinessTypeStr("商贸贷");
-						} else {
-							infoVO.setBusinessTypeStr(BusinessTypeEnum.getName(infoVO.getBusinessType()));
-						}
+						infoVO.setBusinessTypeStr(BusinessTypeEnum.getName(infoVO.getBusinessType()));
 						infoVO.setRepaymentTypeStr(RepaySourceEnum.getName(infoVO.getRepaySource()));
 						switch (infoVO.getSettleType()) {
 						case 0:
@@ -572,8 +574,9 @@ public class TdrepayRechargeController {
 					&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
 				TdReturnAdvanceShareProfitResult returnAdvanceShareProfitResult = JSONObject
 						.parseObject(JSONObject.toJSONString(result.getData()), TdReturnAdvanceShareProfitResult.class);
-				List<TdReturnAdvanceShareProfitDTO> returnAdvanceShareProfits = returnAdvanceShareProfitResult.getReturnAdvanceShareProfits();
-				
+				List<TdReturnAdvanceShareProfitDTO> returnAdvanceShareProfits = returnAdvanceShareProfitResult
+						.getReturnAdvanceShareProfits();
+
 				if (CollectionUtils.isNotEmpty(returnAdvanceShareProfits)) {
 					for (TdReturnAdvanceShareProfitDTO tdReturnAdvanceShareProfitDTO : returnAdvanceShareProfits) {
 						switch (tdReturnAdvanceShareProfitDTO.getStatus()) {
@@ -589,7 +592,7 @@ public class TdrepayRechargeController {
 						}
 					}
 				}
-				
+
 				return Result.success(returnAdvanceShareProfits);
 			} else {
 				return Result.error("-99", "查询平台还垫付信息接口失败");
@@ -600,18 +603,38 @@ public class TdrepayRechargeController {
 			return Result.error("-99", e.getMessage());
 		}
 	}
-	
-	@SuppressWarnings("rawtypes")
+
 	@ApiOperation(value = "查询资金分发记录")
 	@GetMapping("/queryDistributeFundRecord")
 	@ResponseBody
-	public Result queryDistributeFundRecord(@RequestParam("projectId") String projectId) {
+	public Result<List<DistributeFundRecordVO>> queryDistributeFundRecord(@RequestParam("projectId") String projectId) {
 		try {
 			if (StringUtil.isEmpty(projectId)) {
 				return Result.error("-99", "标ID不能为空");
 			}
-			
+
 			return Result.success(tdrepayRechargeService.queryDistributeFundRecord(projectId));
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error("-99", e.getMessage());
+		}
+	}
+
+	@ApiOperation(value = "查询资金分发记录")
+	@GetMapping("/queryRepaymentProjPlan")
+	@ResponseBody
+	public Result<RepaymentProjPlan> queryRepaymentProjPlan(@RequestParam("projectId") String projectId) {
+		try {
+			if (StringUtil.isEmpty(projectId)) {
+				return Result.error("-99", "标ID不能为空");
+			}
+
+			List<RepaymentProjPlan> repaymentProjPlans = repaymentProjPlanService
+					.selectList(new EntityWrapper<RepaymentProjPlan>().eq("project_id", projectId));
+			if (CollectionUtils.isEmpty(repaymentProjPlans)) {
+				return null;
+			}
+			return Result.success(repaymentProjPlans.get(0));
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return Result.error("-99", e.getMessage());

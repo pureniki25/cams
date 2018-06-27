@@ -37,6 +37,11 @@ public interface ApplyDerateProcessMapper extends SuperMapper<ApplyDerateProcess
     List<ApplyDerateVo> selectApplyDerateList(ApplyDerateListSearchReq key);
     
     String queryCurrentStatusByCondition(@Param(value="businessId") String businessId, @Param(value="planListId") String planListId);
-
+    /**
+     * 查询该业务实还金额总和
+     * @param businessId
+     * @return
+     */
+    Double getFactRepayAmountSum(@Param(value="businessId") String businessId);
 
 }

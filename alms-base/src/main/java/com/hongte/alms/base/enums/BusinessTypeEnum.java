@@ -26,7 +26,8 @@ public enum BusinessTypeEnum implements IEnum {
     PROPRIETOR_TYPE(26,"业主贷"),
     INSTALMENT_CREDIT_TYPE(27,"家装分期"),
     COMMERCE_COMPANY_TYPE(28,"商贸共借"),
-    PROPRIETOR_COMPANY_TYPE(29,"业主共借");
+    PROPRIETOR_COMPANY_TYPE(29,"业主共借"),
+	COMMERCE_TYPE(30,"商贸贷");
 
 
     private int value;

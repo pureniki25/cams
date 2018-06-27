@@ -102,12 +102,13 @@ public class CollectionTransferController {
 	@Autowired
 	Executor executor;
 
+	@ApiModelProperty("同步电催数据")
 	@GetMapping("/transfer")
 	@ResponseBody
 	public Result transferCollection() {
 
 		if(runningFlage){
-		  return Result.error("111111","同步程序执行中，请执行完再访问");
+			return Result.error("111111","同步程序执行中，请执行完再访问");
 		}
 
 		runningFlage = true;
@@ -126,13 +127,14 @@ public class CollectionTransferController {
 
 				//第一条线程
 				List<CarBusinessAfter>  list1 = averageList.get(0);
+				thread1Execute=true;
 				executor.execute(new Runnable() {
 					@Override
 					public void run() {
-						thread1Execute=true;
+
 						try{
 							for (CarBusinessAfter carBusinessAfter : list1) {
-								transPhoneSet(carBusinessAfter);
+								transPhoneSet(carBusinessAfter,null);
 							}
 						}catch(Exception e){
 							e.printStackTrace();
@@ -148,13 +150,14 @@ public class CollectionTransferController {
 
 				//第二条线程
 				List<CarBusinessAfter>  list2 = averageList.get(1);
+				thread2Execute=true;
 				executor.execute(new Runnable() {
 					@Override
 					public void run() {
-						thread2Execute=true;
+
 						try{
 							for (CarBusinessAfter carBusinessAfter : list2) {
-								transPhoneSet(carBusinessAfter);
+								transPhoneSet(carBusinessAfter,null);
 							}
 						}catch(Exception e){
 							e.printStackTrace();
@@ -171,13 +174,14 @@ public class CollectionTransferController {
 
 				//第三条线程
 				List<CarBusinessAfter>  list3 = averageList.get(2);
+				thread3Execute=true;
 				executor.execute(new Runnable() {
 					@Override
 					public void run() {
-						thread3Execute=true;
+
 						try{
 							for (CarBusinessAfter carBusinessAfter : list3) {
-								transPhoneSet(carBusinessAfter);
+								transPhoneSet(carBusinessAfter,null);
 							}
 						}catch(Exception e){
 							e.printStackTrace();
@@ -193,13 +197,14 @@ public class CollectionTransferController {
 
 				//第四条线程
 				List<CarBusinessAfter>  list4 = averageList.get(3);
+				thread4Execute=true;
 				executor.execute(new Runnable() {
 					@Override
 					public void run() {
-						thread4Execute=true;
+
 						try{
 							for (CarBusinessAfter carBusinessAfter : list4) {
-								transPhoneSet(carBusinessAfter);
+								transPhoneSet(carBusinessAfter,null);
 							}
 						}catch(Exception e){
 							e.printStackTrace();
@@ -216,13 +221,14 @@ public class CollectionTransferController {
 
 				//第五条线程
 				List<CarBusinessAfter>  list5 = averageList.get(4);
+				thread5Execute=true;
 				executor.execute(new Runnable() {
 					@Override
 					public void run() {
-						thread5Execute=true;
+
 						try{
 							for (CarBusinessAfter carBusinessAfter : list5) {
-								transPhoneSet(carBusinessAfter);
+								transPhoneSet(carBusinessAfter,null);
 							}
 						}catch(Exception e){
 							e.printStackTrace();
@@ -238,13 +244,14 @@ public class CollectionTransferController {
 
 				//第六条线程
 				List<CarBusinessAfter>  list6 = averageList.get(5);
+				thread6Execute=true;
 				executor.execute(new Runnable() {
 					@Override
 					public void run() {
-						thread6Execute=true;
+
 						try{
 							for (CarBusinessAfter carBusinessAfter : list6) {
-								transPhoneSet(carBusinessAfter);
+								transPhoneSet(carBusinessAfter,null);
 							}
 						}catch(Exception e){
 							e.printStackTrace();
@@ -261,13 +268,14 @@ public class CollectionTransferController {
 
 				//第七条线程
 				List<CarBusinessAfter>  list7 = averageList.get(6);
+				thread7Execute=true;
 				executor.execute(new Runnable() {
 					@Override
 					public void run() {
-						thread7Execute=true;
+
 						try{
 							for (CarBusinessAfter carBusinessAfter : list7) {
-								transPhoneSet(carBusinessAfter);
+								transPhoneSet(carBusinessAfter,null);
 							}
 						}catch(Exception e){
 							e.printStackTrace();
@@ -283,13 +291,14 @@ public class CollectionTransferController {
 
 				//第八条线程
 				List<CarBusinessAfter>  list8 = averageList.get(7);
+				thread8Execute=true;
 				executor.execute(new Runnable() {
 					@Override
 					public void run() {
-						thread8Execute=true;
+
 						try{
 							for (CarBusinessAfter carBusinessAfter : list8) {
-								transPhoneSet(carBusinessAfter);
+								transPhoneSet(carBusinessAfter,null);
 							}
 						}catch(Exception e){
 							e.printStackTrace();
@@ -305,13 +314,14 @@ public class CollectionTransferController {
 
 				//第九条线程
 				List<CarBusinessAfter>  list9 = averageList.get(8);
+				thread9Execute=true;
 				executor.execute(new Runnable() {
 					@Override
 					public void run() {
-						thread9Execute=true;
+
 						try{
 							for (CarBusinessAfter carBusinessAfter : list9) {
-								transPhoneSet(carBusinessAfter);
+								transPhoneSet(carBusinessAfter,null);
 							}
 						}catch(Exception e){
 							e.printStackTrace();
@@ -327,13 +337,14 @@ public class CollectionTransferController {
 
 				//第十条线程
 				List<CarBusinessAfter>  list10 = averageList.get(9);
+				thread10Execute=true;
 				executor.execute(new Runnable() {
 					@Override
 					public void run() {
-						thread10Execute=true;
+
 						try{
 							for (CarBusinessAfter carBusinessAfter : list10) {
-								transPhoneSet(carBusinessAfter);
+								transPhoneSet(carBusinessAfter,null);
 							}
 						}catch(Exception e){
 							e.printStackTrace();
@@ -348,15 +359,15 @@ public class CollectionTransferController {
 				});
 
 
-				Thread.sleep(60*1000);
+				Thread.sleep(10*1000);
 
 				//等待5条线程都执行完
-				while(true){
-//					if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute){
-//						runningFlage =false;
-//					}
-					Thread.sleep(5*1000);
-				}
+//				while(runningFlage){
+////					if(!thread1Execute&& !thread2Execute&& !thread3Execute &&  !thread4Execute && !thread5Execute){
+////						runningFlage =false;
+////					}
+//					Thread.sleep(5*1000);
+//				}
 
 
 
@@ -396,6 +407,36 @@ public class CollectionTransferController {
 
 	}
 
+	@ApiModelProperty("同步指定业务或期数的电催数据")
+	@GetMapping("/transferOneCollection")
+	@ResponseBody
+	public Result transferOneCollection(String businessId, String afterId){
+
+		List<CarBusinessAfter>  afterList = null;
+		if(afterId!=null){
+			afterList = carBusinessAfterService.selectList(
+					new EntityWrapper<CarBusinessAfter>().
+							eq("car_business_id",businessId)
+							.eq("car_business_after_id",afterId));
+		}else{
+			afterList = carBusinessAfterService.selectList(
+					new EntityWrapper<CarBusinessAfter>().
+							eq("car_business_id",businessId));
+		}
+
+		if(afterList!=null){
+			for (CarBusinessAfter carBusinessAfter : afterList) {
+				boolean bl = transPhoneSet(carBusinessAfter,CollectionSetWayEnum.XINDAI_LOG_ONE);
+			}
+		}
+
+
+		return Result.success();
+
+	}
+
+
+
 	@ApiModelProperty("同步上门催收数据")
 	@GetMapping("/transferVisit")
 	@ResponseBody
@@ -411,7 +452,7 @@ public class CollectionTransferController {
 			}
 
 			//同步所有的催收信息
-			 collectionList = collectionService.selectList(new EntityWrapper<Collection>());
+			collectionList = collectionService.selectList(new EntityWrapper<Collection>());
 
 			if (!CollectionUtils.isEmpty(collectionList)) {
 				List<List<Collection>>  averageList = ListUtil.averageAssign(collectionList,10);
@@ -792,7 +833,7 @@ public class CollectionTransferController {
 	public Result transferOnePhoneSet(@RequestBody CarBusinessAfter carBusinessAfter){
 		LOGGER.info("同步一个电催信息--开始[{}]" , JSON.toJSONString(carBusinessAfter) );
 
-		boolean bl = transPhoneSet(carBusinessAfter);
+		boolean bl = transPhoneSet(carBusinessAfter,null);
 
 		if(bl){
 			LOGGER.info("同步一个电催信息--成功[{}]" );
@@ -828,9 +869,12 @@ public class CollectionTransferController {
 	 * @param carBusinessAfter
 	 * @return
 	 */
-	private boolean transPhoneSet(CarBusinessAfter carBusinessAfter){
+	private boolean transPhoneSet(CarBusinessAfter carBusinessAfter,CollectionSetWayEnum setWayEnum){
 
 		try {
+			if(setWayEnum == null){
+				setWayEnum =CollectionSetWayEnum.XINDAI_LOG;
+			}
 			//没有设置电催人员的数据不需要同步
 			if(carBusinessAfter.getCollectionUser() == null|| carBusinessAfter.getCollectionUser().equals("")){
 				return true;
@@ -948,34 +992,34 @@ public class CollectionTransferController {
 	@ResponseBody
 	public Result setCollectionStatus(String businessId,String afterId){
 
-        CarBusinessAfter businessAfter = carBusinessAfterService.selectOne(new EntityWrapper<CarBusinessAfter>().eq("car_business_id",businessId).eq("car_business_after_id",afterId));
-        Collection collection = null;
-        Boolean phoneRet;
-        if(businessAfter!=null){
-            phoneRet = transPhoneSet(businessAfter);
+		CarBusinessAfter businessAfter = carBusinessAfterService.selectOne(new EntityWrapper<CarBusinessAfter>().eq("car_business_id",businessId).eq("car_business_after_id",afterId));
+		Collection collection = null;
+		Boolean phoneRet;
+		if(businessAfter!=null){
+			phoneRet = transPhoneSet(businessAfter,CollectionSetWayEnum.XINDAI_LOG_ONE);
 //            if(phoneRet){
 //                return Result.success();
 //            }else {
 //                return Result.error("111","存储电催失败");
 //            }
-        }
+		}
 // else{
-            collection = collectionService.selectOne(new EntityWrapper<Collection>().eq("business_id",businessId).eq("after_id",afterId));
-            Boolean colRet;
-            if(collection!=null){
-                colRet = transCollectSet(collection);
+		collection = collectionService.selectOne(new EntityWrapper<Collection>().eq("business_id",businessId).eq("after_id",afterId));
+		Boolean colRet;
+		if(collection!=null){
+			colRet = transCollectSet(collection);
 //                if(ret){
 //                    return Result.success();
 //                }else {
 //                    return Result.error("112","存储催收失败");
 //                }
-            }
+		}
 //        }
 
 
-        if(businessAfter==null && collection == null){
-            return Result.error("113","找不到信贷的历史电催或催收数据");
-        }
+		if(businessAfter==null && collection == null){
+			return Result.error("113","找不到信贷的历史电催或催收数据");
+		}
 
 
 
@@ -1151,7 +1195,7 @@ public class CollectionTransferController {
 //			log.setCollectionUser("admin");
 //			collectionStatus = 350;
 		} else if ("推迟移交法务".equals(status)) {
-				staffType = CollectionStatusEnum.DELAY_TO_LAW.getPageStr();
+			staffType = CollectionStatusEnum.DELAY_TO_LAW.getPageStr();
 //			log.setCollectionUser("admin");
 //			collectionStatus = 400;
 		} else {

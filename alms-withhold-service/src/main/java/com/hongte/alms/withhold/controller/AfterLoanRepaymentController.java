@@ -72,7 +72,7 @@ public class AfterLoanRepaymentController {
     		Result result=withholdingService.handBankRecharge(deuctionVo.getBusiness(), deuctionVo.getBankCardInfo(), deuctionVo.getpList(), BigDecimal.valueOf(deuctionVo.getTotal()));
     	    return result;
     	}else {
-    		Result result=withholdingService.handThirdRepaymentCharge(deuctionVo.getBusiness(), deuctionVo.getBankCardInfo(), deuctionVo.getpList(), deuctionVo.getPlatformId(),BigDecimal.valueOf(deuctionVo.getTotal()));
+    		Result result=withholdingService.handThirdRepaymentCharge(deuctionVo.getBusiness(), deuctionVo.getBankCardInfo(), deuctionVo.getpList(), deuctionVo.getPlatformId(),deuctionVo.getRepayAmount());
     		 return result;
     	}
     
