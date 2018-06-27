@@ -46,7 +46,8 @@ public class CustomerBankcardController {
 
 	@ApiOperation(value = "获取客户银行卡信息")
 	@GetMapping("/getBankcardInfo")
-	public List<BankCardInfo> getBankcardInfo(@RequestParam("identityCard") String identityCard) {
+	public Result getBankcardInfo(@RequestParam("identityCard") String identityCard) {
+		    Result result=new Result();
 		try {
 
 			RequestData requestData = new RequestData();
@@ -64,14 +65,20 @@ public class CustomerBankcardController {
 			// 返回数据解密
 			ResponseData respData = getRespData(respStr);
 			logger.info("客户根据身份证号:"+identityCard+"获取银行卡信息，接口返回数据:"+respData.getData()+","+respData.getReturnMessage());
-			List<BankCardInfo> bankCardInfos=JSON.parseArray(respData.getData(), BankCardInfo.class);
-			
-		      return bankCardInfos;
+			if(respData.getReturnCode().equals("1")) {
+				result.setData(respData.getData());
+				result.setCode("1");
+				result.setMsg(respData.getReturnMessage());
+			}else {
+				result.setData(null);
+				result.setCode("-1");
+				result.setMsg(respData.getReturnMessage());
+			}
+		     
 		} catch (Exception ex) {
 			logger.error(ex.getMessage());
 		}
-		return null;
-
+		 return result;
 	}
 
 	

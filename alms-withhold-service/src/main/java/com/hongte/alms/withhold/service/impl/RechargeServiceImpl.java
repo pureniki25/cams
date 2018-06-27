@@ -1,5 +1,6 @@
 package com.hongte.alms.withhold.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.AgencyRechargeLog;
@@ -540,7 +541,10 @@ public class RechargeServiceImpl implements RechargeService {
 		CustomerInfoDto dto = new CustomerInfoDto();
 		List<BankCardInfo> bankCardInfos = null;
 		try {
-			bankCardInfos = customerInfoXindaiRemoteApi.getBankcardInfo(identifyCard);
+		Result result = customerInfoXindaiRemoteApi.getBankcardInfo(identifyCard);
+		if(result.getCode().equals("1")) {
+			 bankCardInfos=JSON.parseArray(result.getData().toString(), BankCardInfo.class);
+		}
 		} catch (Exception e) {
 			logger.info("获取客户银行卡信息出错"+e);
 		}

@@ -82,7 +82,8 @@ public class DeductionController {
     @Autowired
     CustomerInfoXindaiRemoteApi customerInfoXindaiRemoteApi;
     
-    @ApiOperation(value = "根据Plan_list_id查找代扣信息")
+    @SuppressWarnings({ "rawtypes", "unused" })
+	@ApiOperation(value = "根据Plan_list_id查找代扣信息")
     @GetMapping("/selectDeductionInfoByPlayListId")
     @ResponseBody
     public Result<DeductionVo> selectDeductionInfoByPlayListId(
@@ -94,22 +95,20 @@ public class DeductionController {
         	List<BankCardInfo> bankCardInfos=null;
         	BankCardInfo bankCardInfo=null;
         	try {
-        		bankCardInfos=customerInfoXindaiRemoteApi.getBankcardInfo(business.getCustomerIdentifyCard());
-        		if(bankCardInfos!=null&&bankCardInfos.size()>0) {
-        			bankCardInfo=bankCardInfos.get(0);
-//        			for(int i=0;i<bankCardInfos.size();i++) {
-//        				//看看是否有对应资金端的ID
-//        				if(bankCardInfos.get(i).getPlatformType()==business.getOutputPlatformId()) {
-//        					bankCardInfo=bankCardInfos.get(i);
-//        				}
-//        			}
-        		}else {
-        			return Result.error("-1", "该客户找不到对应银行卡信息");
-        		}
+				Result result=customerInfoXindaiRemoteApi.getBankcardInfo(business.getCustomerIdentifyCard());
+				if(result.getCode().equals("1")) {
+					 bankCardInfos=JSON.parseArray(result.getData().toString(), BankCardInfo.class);
+					if(bankCardInfos!=null&&bankCardInfos.size()>0) {
+	        			bankCardInfo=bankCardInfos.get(0);
+
+	        		}else {
+	        			return Result.error("-1", "该客户找不到对应银行卡信息");
+	        		}
+				}else {
+					return Result.error("-1", result.getMsg());
+				}
+        	
         		
-        		if(bankCardInfo==null) {
-        			return Result.error("-1", "该客户信息找不到对应业务的资金端类型");
-        		}
         	} catch (Exception e) {
         		return Result.error("-1", "调用信贷获取客户银行卡信息接口出错");
         	}
