@@ -56,7 +56,7 @@ import io.swagger.annotations.ApiOperation;
  * @author 王继光
  * @since 2018-02-28
  */
-@CrossOrigin
+//@CrossOrigin
 @RestController
 @RequestMapping("/moneyPool")
 @Api(tags = "MoneyPoolController", description = "财务款项池相关接口")
