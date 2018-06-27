@@ -4,15 +4,15 @@ var financePath;
 var basePath;
 var vm;
 var cookie
-var tableColum;
 //从后台获取下拉框数据
 var getSelectsData = function () {
 
     //取区域列表
-    axios.get(basePath + 'withholdManage/getWithholdChannelType')
+    axios.get(basePath + 'withholdManage/getWithholdLimitType')
         .then(function (res) {
             if (res.data.code == "1") {
                 vm.platformType = res.data.data.platformType;
+                vm.bankType = res.data.data.bankType;
             } else {
                 vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
             }
@@ -40,31 +40,44 @@ window.layinit(function (htConfig) {
 
             };
             return {
-                withHoldChanelModel: false,
+                withHoldLimitModel: false,
                 platformType: [],
+                bankType: [],
                 loading: false,
                 searchForm: {
                     platformId: '', //渠道类型
+                    bankCode: '', //银行类型
 
                 },
-                withHoldChanelForm: {
+                withHoldLimitForm: {
                     platformId: '', //渠道类型
-                    state: 1,
-                    failTimes: '',
-                    remark: '',
-                    channelLevel: '',
-                    channelId: '',
+                    bankCode:'',
+                    dayLimit:'',
+                    onceLimit:'',
+                    monthLimit:'',
+                    status: "1",
+                    limitId:'',
+
                 },
 
-                withHoldChanelValidate: {
+                withHoldLimitValidate: {
                     platformId: [
                         {required: true, type: 'number', message: '渠道不能为空且必须为数字', trigger: 'blur'},
                     ],
-                    failTimes: [
-                        {required: true, type: 'number', message: '每日失败次数不为空且必须为数字', trigger: 'blur'},
+                    bankCode: [
+                        {required: true, type: 'string', message: '银行名称不为空且必须为数字', trigger: 'blur'},
                     ],
-                    channelLevel: [
-                        {required: true, type: 'number', message: '代扣优先级不为空且必须为数字', trigger: 'blur'},
+                    dayLimit: [
+                        {required: true, type: 'number', message: '单日限额不为空且必须为数字', trigger: 'blur'},
+                    ],
+                    onceLimit: [
+                        {required: true, type: 'number', message: '单笔限额不为空且必须为数字', trigger: 'blur'},
+                    ],
+                    monthLimit: [
+                        {required: true, type: 'number', message: '单月限额不为空且必须为数字', trigger: 'blur'},
+                    ],
+                    status: [
+                        {required: true, type: 'string', message: '状态不能为空', trigger: 'blur'},
                     ],
                 }
             }
@@ -83,6 +96,7 @@ window.layinit(function (htConfig) {
                 table.reload('listTable', {
                     where: {
                         platformId: vm.searchForm.platformId, //登记开始时间
+                        bankCode: vm.searchForm.bankCode, //登记开始时间
                     }
                     , page: {
                         curr: 1 //重新从第 1 页开始
@@ -104,33 +118,38 @@ window.layinit(function (htConfig) {
                         , cols: [[
 
                             {
-                                field: 'channelLevel',
-                                title: '代扣优先级'
-                            },
-                            {
-                                field: 'channelId',
-                                title: '编号'
-                            },
-                            {
                                 field: 'platformName',
-                                title: '渠道名称',
+                                title: '渠道名称'
                             },
                             {
-                                field: 'channelStatus',
-                                title: '渠道状态',
+                                field: 'bankName',
+                                title: '银行名称'
+                            },
+                            {
+                                field: 'onceLimit',
+                                title: '单笔限额',
+                            },
+                            {
+                                field: 'dayLimit',
+                                title: '单日限额',
+                            },
+                            {
+                                field: 'monthLimit',
+                                title: '单月限额',
+                            },
+
+                            {
+                                field: 'status',
+                                title: '启用状态',
                                 templet: function (d) {
                                     var content = "";
-                                    if (d.channelStatus == 0) {
+                                    if (d.status == 0) {
                                         content = '停用'
-                                    } else if (d.channelStatus == 1) {
+                                    } else if (d.status == 1) {
                                         content = '启用'
                                     }
                                     return content
                                 }
-                            },
-                            {
-                                field: 'failTimes',
-                                title: '每日失败最大次数',
                             },
                             {
                                 fixed: 'right',
@@ -140,7 +159,7 @@ window.layinit(function (htConfig) {
                                 toolbar: '#barTools'
                             }
                         ]], //设置表头
-                        url: basePath + 'withholdManage/getWithholdChannelPageList',
+                        url: basePath + 'withholdManage/getWithholdLimitPageList',
                         page: true,
                         done: function (res, curr, count) {
                             //数据渲染完的回调。你可以借此做一些其它的操作
@@ -154,68 +173,102 @@ window.layinit(function (htConfig) {
 
                         console.log("obj.event", obj.event);
                         if (obj.event === 'edit') {
-                            console.log("选择的行数据：", selectedRowInfo.channelId);
+                            console.log("选择的行数据：", selectedRowInfo.limitId);
 
-                            self.editWithholdChannel(selectedRowInfo.channelId);
+                            self.editWithholdLimit(selectedRowInfo.limitId);
                         }
+                        if (obj.event === 'shutdown') {
+                            console.log("选择的行数据：", selectedRowInfo.limitId);
+                            layer.confirm('确认停用该额度吗？', {icon: 3, title: '提示'}, function (index) {
+                                self.shutdownLimit(selectedRowInfo.limitId,0);
+                                layer.close(index);
+                            })
+
+                        }else if(obj.event === 'start'){
+                            console.log("选择的行数据：", selectedRowInfo.limitId);
+                            layer.confirm('确认启用该额度吗？', {icon: 3, title: '提示'}, function (index) {
+                                self.shutdownLimit(selectedRowInfo.limitId,1);
+                                layer.close(index);
+                            })
+                        }
+
                     });
 
 
                 })
             },
-
-            handleReset(name) { // 重置表单
-                var tt = this.$refs[name];
-                tt.resetFields();
-                vm.toLoading();
-            },
-            editWithholdChannel(id) {
-                vm.withHoldChanelModel = true;
-                axios.get(basePath + 'withholdManage/getWithholdChannel?channelId=' + id)
+            shutdownLimit(id,status){
+                axios.get(basePath + 'withholdManage/updateWithholdLimitStatus?limitId=' + id+"&status="+status)
                     .then(function (res) {
                         if (res.data.code == "1") {
-                            var data = res.data.data;
-                            vm.withHoldChanelForm.platformId = data.platformId;
-                            vm.withHoldChanelForm.state = data.channelStatus;
-                            vm.withHoldChanelForm.failTimes = data.failTimes;
-                            vm.withHoldChanelForm.remark = data.remark;
-                            vm.withHoldChanelForm.channelId = data.channelId;
-                            vm.withHoldChanelForm.channelLevel = data.level;
+                            vm.$Modal.success({content: '停用成功!'});
+                            vm.toLoading();
                         }
                     })
                     .catch(function (error) {
                         vm.$Modal.error({content: '接口调用异常!'});
                     });
             },
-            addHoldChannel(name) {
+            handleReset(name) { // 重置表单
+                var tt = this.$refs[name];
+                tt.resetFields();
+                vm.toLoading();
+            },
+            editWithholdLimit(id) {
+                vm.withHoldLimitModel = true;
+                axios.get(basePath + 'withholdManage/getWithholdLimit?limitId=' + id)
+                    .then(function (res) {
+                        if (res.data.code == "1") {
+                            var data = res.data.data;
+                            vm.withHoldLimitForm.platformId = data.platformId;
+                            vm.withHoldLimitForm.status = data.status.toString();
+                            vm.withHoldLimitForm.bankCode = data.bankCode;
+                            vm.withHoldLimitForm.dayLimit = data.dayLimit;
+                            vm.withHoldLimitForm.onceLimit = data.onceLimit;
+                            vm.withHoldLimitForm.monthLimit = data.monthLimit;
+                            vm.withHoldLimitForm.limitId = data.limitId;
+                        }
+                    })
+                    .catch(function (error) {
+                        vm.$Modal.error({content: '接口调用异常!'});
+                    });
+            },
+            addHoldLimit(name) {
                 // console.log("addHoldChannel",addHoldChannel);
                 this.$refs[name].resetFields();
-                vm.withHoldChanelModel = true;
+                vm.withHoldLimitModel = true;
             },
-            submitHoldChanel(name) {
-                var platformId = vm.withHoldChanelForm.platformId;
-                var channelStatus = vm.withHoldChanelForm.state;
-                var failTimes = vm.withHoldChanelForm.failTimes;
-                var remark = vm.withHoldChanelForm.remark;
-                var channelId = vm.withHoldChanelForm.channelId;
-                var level = vm.withHoldChanelForm.channelLevel;
+            submitHoldLimit(name) {
+
+
+                var platformId =  vm.withHoldLimitForm.platformId;
+                var status =   vm.withHoldLimitForm.status ;
+                var bankCode =   vm.withHoldLimitForm.bankCode ;
+                var dayLimit =   vm.withHoldLimitForm.dayLimit ;
+                var onceLimit =   vm.withHoldLimitForm.onceLimit ;
+                var monthLimit =  vm.withHoldLimitForm.monthLimit ;
+                var limitId =  vm.withHoldLimitForm.limitId ;
 
                 console.log("platformId", typeof platformId);
-                console.log("channelStatus", typeof channelStatus);
-                console.log("failTimes", typeof failTimes);
-                console.log("channelLevel", typeof channelLevel);
+                console.log("status", typeof status);
+                console.log("bankCode", typeof bankCode);
+                console.log("dayLimit", typeof dayLimit);
+                console.log("onceLimit", typeof onceLimit);
+                console.log("monthLimit", typeof monthLimit);
+                console.log("limitId", typeof limitId);
                 this.$refs[name].validate((valid) => {
                     if (valid) {
                         //提交
-                        axios.get(basePath + 'withholdManage/addOrEditWithholdChannel',
+                        axios.get(basePath + 'withholdManage/addOrEditWithholdLimit',
                             {
                                 params: {
                                     platformId: platformId,
-                                    channelStatus: channelStatus,
-                                    failTimes: failTimes,
-                                    remark: remark,
-                                    channelId: channelId,
-                                    level: level
+                                    status: status,
+                                    bankCode: bankCode,
+                                    dayLimit: dayLimit,
+                                    onceLimit: onceLimit,
+                                    monthLimit: monthLimit,
+                                    limitId: limitId
                                 }
                             })
                             .then(function (res) {
@@ -225,7 +278,7 @@ window.layinit(function (htConfig) {
                                         title: '',
                                         content: '操作成功'
                                     });
-                                    vm.withHoldChanelModel = false;
+                                    vm.withHoldLimitModel = false;
                                     vm.toLoading();
                                 } else {
                                     vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
@@ -241,8 +294,8 @@ window.layinit(function (htConfig) {
                     }
                 })
             },
-            cancelHoldChanel(name) {
-                this.withHoldChanelModel = false;
+            cancelHoldLimit(name) {
+                this.withHoldLimitModel = false;
                 this.$refs[name].resetFields();
                 vm.toLoading();
             }

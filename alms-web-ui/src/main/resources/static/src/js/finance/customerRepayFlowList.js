@@ -379,4 +379,23 @@ window.layinit(function (htConfig) {
             this.init();
         }
     });
+
+   var
+       delayDaysBegin: [
+        {pattern: /^[0-9]*$/, message: '请输入数字',trigger: 'blur'  },
+        {
+            validator: function (rule, value, callback, source, options) {
+                if(vm.searchForm.delayDaysBegin!=""&& vm.searchForm.delayDaysEnd!=""){
+                    if (parseInt(vm.searchForm.delayDaysBegin) > parseInt(vm.searchForm.delayDaysEnd)) {
+                        callback(new Error('起始值大于结束值'));
+                    } else {
+                        callback();//校验通过
+                    }
+                }else{
+                    callback();
+                }
+
+            }, trigger: 'blur'
+        }
+    ],
 });

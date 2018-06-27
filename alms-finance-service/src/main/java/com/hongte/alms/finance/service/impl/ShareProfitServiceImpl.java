@@ -1827,13 +1827,10 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			projPlanListDetailBak.insert();
 		}
 		
-		if(callFlage.get().intValue()==10||callFlage.get().intValue()==20||callFlage.get().intValue()==21) {
-			logger.info("调用平台合规化还款接口开始，confirmLogId：{}", confirmLogId);
-			tdrepayRecharge(confirmLogId);
-			logger.info("调用平台合规化还款接口结束");
-		}
+		logger.info("调用平台合规化还款接口开始，confirmLogId：{}", confirmLogId);
+		tdrepayRecharge(confirmLogId);
+		logger.info("调用平台合规化还款接口结束");
 		
-
 	}
 
 	private void tdrepayRecharge(String confirmLogId) {
