@@ -1843,6 +1843,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			record.setRefId(confirmLogId);
 			record.setCreateUser(loginUserInfoHelper.getUserId());
 			record.setCraeteTime(new Date());
+			record.setTargetUrl(Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT);
 			
 			Result result = null;
 			String busId = this.businessId.get();
@@ -1864,7 +1865,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 				paramMap.put("businessId", busId);
 				paramMap.put("projectId", plan.getProjectId());
 				
-				record.setApiParamCiphertext(JSONObject.toJSONString(paramMap));
+				record.setApiParamPlaintext(JSONObject.toJSONString(paramMap));
 				
 				// 平台合规化还款接口
 				result = platformRepaymentFeignClient.repayment(paramMap);
