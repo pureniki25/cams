@@ -1862,7 +1862,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 				
 				Map<String, Object> paramMap = new HashMap<>();
 				paramMap.put("confirmLogId", confirmLogId);
-				paramMap.put("businessId", busId);
+				paramMap.put("afterId", this.afterId.get());
 				paramMap.put("projectId", plan.getProjectId());
 				
 				record.setApiParamPlaintext(JSONObject.toJSONString(paramMap));
