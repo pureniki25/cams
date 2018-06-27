@@ -1,7 +1,12 @@
 package com.hongte.alms.base.mapper;
 
 import com.hongte.alms.base.entity.SysBankLimit;
+import com.hongte.alms.base.vo.withhold.WithholdChannelListVo;
+import com.hongte.alms.base.vo.withhold.WithholdLimitListReq;
+import com.hongte.alms.base.vo.withhold.WithholdLimitListVo;
 import com.hongte.alms.common.mapper.SuperMapper;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +18,7 @@ import com.hongte.alms.common.mapper.SuperMapper;
  */
 public interface SysBankLimitMapper extends SuperMapper<SysBankLimit> {
 
+    List<WithholdLimitListVo> getWithholdLimitPageList(WithholdLimitListReq withholdLimitListReq);
+
+    int countWithholdLimitPageList(WithholdLimitListReq withholdLimitListReq);
 }

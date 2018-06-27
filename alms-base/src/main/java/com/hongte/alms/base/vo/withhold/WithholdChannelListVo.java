@@ -12,4 +12,5 @@ public class WithholdChannelListVo {
     private String channelStatus;//渠道状态
 
     private Integer failTimes;//每日失败最大次数
+
 }

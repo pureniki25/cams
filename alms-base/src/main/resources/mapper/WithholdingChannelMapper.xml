@@ -34,6 +34,7 @@
         <if test=" platformId !=null">
            AND t2.platform_id=#{platformId}
         </if>
+        ORDER BY t1.create_time desc
         limit ${(page-1)*limit} , ${limit}
 
     </select>

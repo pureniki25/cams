@@ -14,6 +14,7 @@ import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -41,7 +42,21 @@ public class WithholdingChannelServiceImpl extends BaseServiceImpl<WithholdingCh
     }
 
     @Override
-    public void addOrEditWithholdChannel(WithholdChannelOptReq withholdChannelOptReq) throws Exception {
+    public void addOrEditWithholdChannel(WithholdingChannel withholdingChannel) throws Exception {
 
+        if(withholdingChannel.getChannelId() !=null){ //编辑
+            withholdingChannel.setUpdateTime(new Date());
+            withholdingChannelMapper.updateById(withholdingChannel);
+        }else {  //新增
+            withholdingChannel.setUpdateTime(new Date());
+            withholdingChannel.setCreateTime(new Date());
+            withholdingChannelMapper.insert(withholdingChannel);
+        }
+
+    }
+
+    @Override
+    public WithholdingChannel getWithholdChannel(int channelId) {
+        return withholdingChannelMapper.selectById(channelId);
     }
 }

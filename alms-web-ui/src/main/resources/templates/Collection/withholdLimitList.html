@@ -6,7 +6,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
-    <title>代扣渠道列表</title>
+    <title>代扣额度管理</title>
     <script src="/properties/config.js"></script>
     <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
     <!-- iview样式 -->
@@ -59,7 +59,7 @@
                     <i-button class="layui-btn layui-btn-sm"  v-if="authValid('reset')" @click="handleReset('searchForm')">
                         <span>重置</span>
                     </i-button>
-                    <i-button class="layui-btn layui-btn-sm"  v-if="authValid('add')" @click="addHoldChannel('withHoldChanelForm')">
+                    <i-button class="layui-btn layui-btn-sm"  v-if="authValid('add')" @click="addHoldLimit('withHoldLimitForm')">
                         <span>新增</span>
                     </i-button>
                 </div>
@@ -80,6 +80,15 @@
                                 </i-select>
                             </form-item>
                         </i-col>
+                        <i-col span="6">
+                            <form-item label="银行：" prop="bankCode">
+                                <i-select v-model="searchForm.bankCode" clearable filterable>
+                                    <i-option v-for="item in bankType" :value="item.bankCode" :key="item.bankCode">{{
+                                        item.bankName }}
+                                    </i-option>
+                                </i-select>
+                            </form-item>
+                        </i-col>
 
 
                     </i-form>
@@ -91,44 +100,50 @@
     <row style="padding: 10px">
 
         <Modal
-                v-model="withHoldChanelModel"
+                v-model="withHoldLimitModel"
                 title="新增渠道"
                 :mask-closable="false">
-            <i-form ref="withHoldChanelForm" :model="withHoldChanelForm" :rules="withHoldChanelValidate" :label-width="150">
+            <i-form ref="withHoldLimitForm" :model="withHoldLimitForm" :rules="withHoldLimitValidate" :label-width="150">
                 <form-item label="渠道：" prop="platformId">
-                    <i-select v-model="withHoldChanelForm.platformId" clearable filterable >
+                    <i-select v-model="withHoldLimitForm.platformId" clearable filterable style="width: 200px"  >
                         <i-option v-for="item in platformType" :value="item.platformId" :key="item.platformId">{{
                             item.platformName }}
                         </i-option>
                     </i-select>
                 </form-item>
-                <form-item label="代扣优先级：" prop="channelLevel">
-                    <i-input v-model="withHoldChanelForm.channelLevel" placeholder="代扣优先级" maxlength="30"
-                             style="width: 176px" number ></i-input>
+                <form-item label="银行名称：" prop="bankCode">
+                    <i-select v-model="withHoldLimitForm.bankCode" clearable filterable style="width: 200px"  >
+                        <i-option v-for="item in bankType" :value="item.bankCode" :key="item.bankCode">{{
+                            item.bankName }}
+                        </i-option>
+                    </i-select>
                 </form-item>
-                <form-item label="渠道状态：" prop="state">
-                    <radio-group v-model="withHoldChanelForm.state" number>
-                        <radio label=1 >启用</radio>
-                        <radio label=0 >停用</radio>
-                    </radio-group>
+                <form-item label="单日限额：" prop="dayLimit">
+                    <i-input v-model="withHoldLimitForm.dayLimit" placeholder="单日限额"
+                             style="width: 200px" number ></i-input>
                 </form-item>
-
-                <form-item label="每日失败次数：" prop="failTimes">
-                    <i-input v-model="withHoldChanelForm.failTimes" placeholder="失败次数" maxlength="30"
-                             style="width: 176px" number ></i-input>
+                <form-item label="单笔限额：" prop="onceLimit">
+                    <i-input v-model="withHoldLimitForm.onceLimit" placeholder="单笔限额"
+                             style="width: 200px" number ></i-input>
                 </form-item>
-                <form-item label="备注：" prop="remark">
-                    <i-input v-model="withHoldChanelForm.remark" placeholder="备注" maxlength="300"
-                             style="width: 176px" ></i-input>
+                <form-item label="单月限额：" prop="monthLimit">
+                    <i-input v-model="withHoldLimitForm.monthLimit" placeholder="单月限额"
+                             style="width: 200px" number ></i-input>
+                </form-item>
+                <form-item label="启用状态：" prop="status">
+                    <i-select v-model="withHoldLimitForm.status" placeholder="请选择" style="width: 200px">
+                        <i-option value="1">启用</i-option>
+                        <i-option value="0">关闭</i-option>
+                    </i-select>
                 </form-item>
 
             </i-form>
 
             <div slot="footer" style="text-align:left">
-                <i-button type="primary" @click="submitHoldChanel('withHoldChanelForm')">
+                <i-button type="primary" @click="submitHoldLimit('withHoldLimitForm')">
                     <span>提交</span>
                 </i-button>
-                <i-button type="ghost" @click="cancelHoldChanel('withHoldChanelForm')"
+                <i-button type="ghost" @click="cancelHoldLimit('withHoldLimitForm')"
                           style="margin-left: 8px;background-color:rgba(255, 153, 0, 1);color:#ffffff">关闭
                 </i-button>
             </div>
@@ -141,10 +156,6 @@
         <i-col span="24">
             <!-- 使用方法渲染模式 -->
             <table id="listTable" lay-filter="listTable"></table>
-            <script type="text/html" id="barTools">
-                <!--layui-btn layui-btn-xs-->
-                <a class="layui-btn layui-btn-normal layui-btn-xs " id="edit" lay-event="edit" ht-auth="edit">编辑</a>
-            </script>
         </i-col>
     </row>
     <!-- 表单Grid，使用layerUI的表格组件 结束 -->
@@ -154,9 +165,17 @@
 
 </div>
 
-<script src="/src/js/collection/withholdChannelList.js"></script>
-<script>
-
+<script src="/src/js/collection/withholdLimitList.js"></script>
+<script type="text/html" id="barTools">
+    <!--layui-btn layui-btn-xs-->
+    <a class="layui-btn layui-btn-normal layui-btn-xs " id="edit" lay-event="edit" ht-auth="edit">编辑</a>
+    <!--<a class="layui-btn layui-btn-normal layui-btn-xs " id="shutdown" lay-event="shutdown" ht-auth="shutdown">停用</a>-->
+    <!-- 这里同样支持 laytpl 语法，如： -->
+    {{#  if(d.status == 1){ }}
+    <a class="layui-btn layui-btn-normal layui-btn-xs " id="shutdown" lay-event="shutdown" ht-auth="shutdown">停用</a>
+    {{#  } else if(d.status == 0){  }}
+    <a class="layui-btn layui-btn-normal layui-btn-xs " id="start" lay-event="start" ht-auth="start">启用</a>
+    {{# } }}
 </script>
 </body>
 </html>

@@ -184,9 +184,9 @@ public class CollectionUIController {
         return "/Collection/withholdChannelList";
     }
 
-    //代扣渠道列表
+    //代扣额度列表
     @RequestMapping("withholdLimit")
     public String withholdLimit(){
-        return "/Collection/withholdChannelList";
+        return "/Collection/withholdLimitList";
     }
 }

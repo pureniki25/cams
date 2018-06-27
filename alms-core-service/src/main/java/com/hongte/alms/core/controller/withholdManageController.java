@@ -5,17 +5,15 @@ import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.customer.vo.CustomerRepayFlowDto;
-import com.hongte.alms.base.entity.BasicCompany;
-import com.hongte.alms.base.entity.DepartmentBank;
-import com.hongte.alms.base.entity.WithholdingPlatform;
+import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.AreaLevel;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
+import com.hongte.alms.base.service.SysBankLimitService;
+import com.hongte.alms.base.service.SysBankService;
 import com.hongte.alms.base.service.WithholdingChannelService;
 import com.hongte.alms.base.service.WithholdingPlatformService;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
-import com.hongte.alms.base.vo.withhold.WithholdChannelListReq;
-import com.hongte.alms.base.vo.withhold.WithholdChannelListVo;
-import com.hongte.alms.base.vo.withhold.WithholdChannelOptReq;
+import com.hongte.alms.base.vo.withhold.*;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.vo.PageResult;
@@ -49,13 +47,22 @@ public class withholdManageController {
     @Qualifier("WithholdingPlatformService")
     private WithholdingPlatformService withholdingPlatformService;
 
+    @Autowired
+    @Qualifier("SysBankLimitService")
+    private SysBankLimitService sysBankLimitService;
+
+
+    @Autowired
+    @Qualifier("SysBankService")
+    private SysBankService sysBankService;
+
     @ApiOperation(value = "新增/编辑代扣渠道")
     @RequestMapping("/addOrEditWithholdChannel")
-    public Result addOrEditWithholdChannel(WithholdChannelOptReq withholdChannelOptReq) {
-        LOGGER.info("====>>>>>新增/编辑代扣渠道开始[{}]", withholdChannelOptReq);
+    public Result addOrEditWithholdChannel(WithholdingChannel withholdingChannel) {
+        LOGGER.info("====>>>>>新增/编辑代扣渠道开始[{}]", withholdingChannel);
         Result result = null;
         try {
-            withholdingChannelService.addOrEditWithholdChannel(withholdChannelOptReq);
+            withholdingChannelService.addOrEditWithholdChannel(withholdingChannel);
 
             result = Result.success();
         } catch (ServiceRuntimeException se) {
@@ -66,6 +73,26 @@ public class withholdManageController {
             LOGGER.error("====>>>>>新增/编辑代扣渠道出错{}", e);
         }
         LOGGER.info("====>>>>>新增/编辑代扣渠道结束");
+        return result;
+    }
+
+    @ApiOperation(value = "获取单个代扣渠道信息")
+    @RequestMapping("/getWithholdChannel")
+    public Result getWithholdChannel(int channelId) {
+        LOGGER.info("====>>>>>获取单个代扣渠道信息开始[{}]", channelId);
+        Result result = null;
+        try {
+            WithholdingChannel withholdingChannel = withholdingChannelService.getWithholdChannel(channelId);
+
+            result = Result.success(withholdingChannel);
+        } catch (ServiceRuntimeException se) {
+            result = Result.error(se.getErrorCode(), se.getMessage());
+            LOGGER.error("====>>>>>获取单个代扣渠道信息出错{}", se.getMessage());
+        } catch (Exception e) {
+            result = Result.error("500", "执行异常");
+            LOGGER.error("====>>>>>获取单个代扣渠道信息出错{}", e);
+        }
+        LOGGER.info("====>>>>>获取单个代扣渠道信息结束");
         return result;
     }
 
@@ -105,5 +132,128 @@ public class withholdManageController {
         LOGGER.info("====>>>>>获取渠道选项列表结束");
         return Result.success(retMap);
     }
+
+
+    @ApiOperation(value = "获取代扣额度列表")
+    @GetMapping("/getWithholdLimitPageList")
+    @ResponseBody
+    public PageResult<List<WithholdLimitListVo>> getWithholdLimitPageList(WithholdLimitListReq withholdLimitListReq) {
+        LOGGER.info("====>>>>>获取代扣额度列表开始[{}]", JSON.toJSONString(withholdLimitListReq));
+        PageResult pageResult = null;
+
+        try {
+            Page<WithholdLimitListVo> pages = sysBankLimitService.getWithholdLimitPageList(withholdLimitListReq);
+            pageResult = PageResult.success(pages.getRecords(), pages.getTotal());
+
+
+        } catch (Exception ex) {
+            LOGGER.error(ex.getMessage());
+            pageResult = PageResult.error(500, "执行异常");
+        }
+        LOGGER.info("====>>>>>获取代扣额度列表结束[{}]", JSON.toJSONString(pageResult));
+        return pageResult;
+    }
+
+    @ApiOperation(value = "获取额度选项列表")
+    @GetMapping("/getWithholdLimitType")
+    @ResponseBody
+    public Result<Map<String, JSONArray>> getWithholdLimitType() {
+        LOGGER.info("====>>>>>获取额度选项列表开始");
+        Map<String, JSONArray> retMap = new HashMap<String, JSONArray>();
+
+        //渠道列表
+        List<WithholdingPlatform> platformList = withholdingPlatformService.selectList(new EntityWrapper<WithholdingPlatform>().eq("platform_status", 1));
+
+        retMap.put("platformType", (JSONArray) JSON.toJSON(platformList, JsonUtil.getMapping()));
+
+        //渠道列表
+        List<SysBank> sysBankList = sysBankService.selectList(new EntityWrapper<SysBank>());
+
+        retMap.put("bankType", (JSONArray) JSON.toJSON(sysBankList, JsonUtil.getMapping()));
+
+
+        LOGGER.info("====>>>>>获取额度选项列表结束");
+        return Result.success(retMap);
+    }
+
+    @ApiOperation(value = "新增/编辑代扣额度信息")
+    @RequestMapping("/addOrEditWithholdLimit")
+    public Result addOrEditWithholdLimit(SysBankLimit sysBankLimit) {
+        LOGGER.info("====>>>>>新增/编辑代扣额度信息开始[{}]", sysBankLimit);
+        Result result = null;
+        try {
+            sysBankLimitService.addOrEditWithholdChannel(sysBankLimit);
+
+            result = Result.success();
+        } catch (ServiceRuntimeException se) {
+            result = Result.error(se.getErrorCode(), se.getMessage());
+            LOGGER.error("====>>>>>新增/编辑代扣额度信息出错{}", se.getMessage());
+        } catch (Exception e) {
+            result = Result.error("500", "执行异常");
+            LOGGER.error("====>>>>>新增/编辑代扣额度信息出错{}", e);
+        }
+        LOGGER.info("====>>>>>新增/编辑代扣额度信息结束");
+        return result;
+    }
+
+    @ApiOperation(value = "获取单个代扣额度信息")
+    @RequestMapping("/getWithholdLimit")
+    public Result getWithholdLimit(String limitId) {
+        LOGGER.info("====>>>>>获取单个代扣额度信息开始[{}]", limitId);
+        Result result = null;
+        try {
+            SysBankLimit sysBankLimit = sysBankLimitService.getWithholdLimit(limitId);
+
+            result = Result.success(sysBankLimit);
+        } catch (ServiceRuntimeException se) {
+            result = Result.error(se.getErrorCode(), se.getMessage());
+            LOGGER.error("====>>>>>获取单个代扣额度信息出错{}", se.getMessage());
+        } catch (Exception e) {
+            result = Result.error("500", "执行异常");
+            LOGGER.error("====>>>>>获取单个代扣额度信息出错{}", e);
+        }
+        LOGGER.info("====>>>>>获取单个代扣额度信息结束");
+        return result;
+    }
+
+    @ApiOperation(value = "更新单个代扣额度信息状态")
+    @RequestMapping("/updateWithholdLimitStatus")
+    public Result updateWithholdLimitStatus(String limitId, int status) {
+        LOGGER.info("====>>>>>更新单个代扣额度信息状态开始[{}]", limitId);
+        Result result = null;
+        try {
+            sysBankLimitService.updateWithholdLimitStatus(limitId, status);
+
+            result = Result.success();
+        } catch (ServiceRuntimeException se) {
+            result = Result.error(se.getErrorCode(), se.getMessage());
+            LOGGER.error("====>>>>>更新单个代扣额度信息状态出错{}", se.getMessage());
+        } catch (Exception e) {
+            result = Result.error("500", "执行异常");
+            LOGGER.error("====>>>>>更新单个代扣额度信息状态出错{}", e);
+        }
+        LOGGER.info("====>>>>>更新单个代扣额度信息状态结束");
+        return result;
+    }
+
+    @ApiOperation(value = "按照代扣渠道查询代扣额度接口，用于代扣服务")
+    @RequestMapping("/getSysBankLimitByPlatformId")
+    public Result getSysBankLimitByPlatformId(int platformId) {
+        LOGGER.info("====>>>>>查询代扣额度开始[{}]", platformId);
+        Result result = null;
+        try {
+            List<SysBankLimit> sysBankLimitList = sysBankLimitService.getSysBankLimitByPlatformId(platformId);
+            result = Result.success(sysBankLimitList);
+        } catch (ServiceRuntimeException se) {
+            result = Result.error(se.getErrorCode(), se.getMessage());
+            LOGGER.error("====>>>>>查询代扣额度出错{}", se.getMessage());
+        } catch (Exception e) {
+            result = Result.error("500", "执行异常");
+            LOGGER.error("====>>>>>查询代扣额度出错{}", e);
+        }
+        LOGGER.info("====>>>>>查询代扣额度结束");
+        return result;
+    }
+
 
 }

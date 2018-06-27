@@ -20,5 +20,7 @@ public interface WithholdingChannelService extends BaseService<WithholdingChanne
 
     Page<WithholdChannelListVo> getWithholdChannelPageList(WithholdChannelListReq withholdChannelListReq) throws Exception;
 
-    void addOrEditWithholdChannel(WithholdChannelOptReq withholdChannelOptReq) throws Exception;
+    void addOrEditWithholdChannel(WithholdingChannel withholdingChannel) throws Exception;
+
+    WithholdingChannel getWithholdChannel(int channelId);
 }
