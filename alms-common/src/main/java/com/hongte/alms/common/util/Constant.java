@@ -151,11 +151,11 @@ public class Constant {
 	 */
 	public static final String INTERFACE_NAME_QUERY_DISTRIBUTE_FUND = "请求EIP资金分发订单查询接口";
 	/**
-	 * 资金分发订单查询
+	 * 调用platrepay 服务的平台还款接口
 	 */
 	public static final String INTERFACE_CODE_PLATREPAY_REPAYMENT = "/platformRepayment/repayment";
 	/**
-	 * 资金分发订单查询
+	 * 调用platrepay 服务的平台还款接口
 	 */
 	public static final String INTERFACE_NAME_PLATREPAY_REPAYMENT = "平台合规化还款接口";
 	/**
