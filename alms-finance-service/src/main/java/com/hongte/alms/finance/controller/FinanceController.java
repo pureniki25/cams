@@ -751,6 +751,7 @@ public class FinanceController {
 			List<Integer> list=new ArrayList<Integer>();
 			List<Integer> logIds=new ArrayList<Integer>();
 			
+			//调用方标志位  10：财务人员还款确认（线下转账），20：自动线下代扣，21：人工线下代扣，30：自动银行代扣，31：人工银行代扣
 			if(log.getBindPlatformId()==PlatformEnum.YH_FORM.getValue()&&log.getCreateUser().equals("auto_run")) {//自动银行代扣已还款
 				req.setCallFlage(30);
 			}else if(log.getBindPlatformId()==PlatformEnum.YH_FORM.getValue()&&(!log.getCreateUser().equals("auto_run"))) {//人工银行代扣已还款
