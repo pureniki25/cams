@@ -48,6 +48,21 @@
 		   	</i-button>
     	</div>
     	<div style="margin-top:10px; margin-left:10px">
+			<i-lable>同步指定电催催收数据：</i-lable>
+			业务ID：
+			<div class="layui-inline">
+				<input v-model="oneCollectionBId" class="layui-input" name="id" id="oneCollectionBId">
+			</div>
+			还款计划期数：
+			<div class="layui-inline">
+				<input v-model="oneCollectionAfterId" class="layui-input" name="id" id="oneCollectionAfterId">
+			</div>
+			<i-button :loading="synOneCollectionLoading" @click="transferOneCollection">
+				<i-span v-if="!synOneCollectionLoading">同步指定电催数据</i-span>
+				<i-span v-else>同步中...</i-span>
+			</i-button>
+		</div>
+		<div style="margin-top:10px; margin-left:10px">
 		   	<i-lable>同步上门催收数据：</i-lable>
 		   	<i-button :loading="syncVisitCollectionLoading" @click="syncVisitCollection">
 		   		<i-span v-if="!syncVisitCollectionLoading">同步</i-span>
@@ -65,7 +80,7 @@
                 <input v-model="onePListCollogAfterId" class="layui-input" name="id" id="onePListCollogAfterId">
             </div>
 		   	<i-button :loading="synOneListColLoading" @click="syncOneCollection">
-		   		<i-span v-if="!synOneListColLoading">同步一个还款计划</i-span>
+				<i-span v-if="!synOneListColLoading">同步指定催收数据</i-span>
 		   		<i-span v-else>同步中...</i-span>
 		   	</i-button>
     	</div>
@@ -80,6 +95,22 @@
 		   	<i-lable>设置指定用户可访问业务对照关系：</i-lable>
 		   	<i-button @click="setSingleUserPermissons">执行</i-button>
     	</div>
+		<div style="margin-top:10px; margin-left:10px">
+			<i-lable>根据用户Id设置指定用户可访问业务对照关系：</i-lable>
+			用户Id/用户名：
+			<div class="layui-inline">
+				<input v-model="userId" class="layui-input" name="id" id="userId">
+			</div>
+			<i-button @click="setSingleUserPermissonsByUserId">执行</i-button>
+		</div>
+		<div style="margin-top:10px; margin-left:10px">
+			<i-lable>根据用户Id设置指定用户可访问业务对照关系：</i-lable>
+			用户Id/用户名：
+			<div class="layui-inline">
+				<input v-model="userId" class="layui-input" name="id" id="userId">
+			</div>
+			<i-button @click="setSingleUserPermissonsByUserId">执行</i-button>
+		</div>
     	<div style="margin-top:10px; margin-left:10px">
 		   	<i-lable>五级分类设置：</i-lable>
 		   	<i-button :loading="fiveLevelClassifyLoading" @click="fiveLevelClassify">

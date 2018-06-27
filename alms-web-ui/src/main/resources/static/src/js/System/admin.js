@@ -12,6 +12,7 @@ window.layinit(function (htConfig) {
 	   data: {
 		   // --- 按钮控制标识 start---
 		   syncCollectionLoading:false,  //同步电催分配数据的加载标志位
+           synOneCollectionLoading:false, //同步指定电催分配数据的加载标志位
            syncVisitCollectionLoading:false,  //同步上门催收分配数据的加载标志位
            synOneListColLoading:false,
            setUserPermissonsLoading:false,
@@ -25,6 +26,11 @@ window.layinit(function (htConfig) {
 
 		   onePListCollogBId:"",
            onePListCollogAfterId:"",
+
+           //同步指定电催信息的业务Id
+           oneCollectionBId:"",
+           //同步指定电催信息的afterId
+           oneCollectionAfterId:""
 
 
 	   },
@@ -45,9 +51,32 @@ window.layinit(function (htConfig) {
 		        })
 		        .catch(function (error) {
 		        	vm.syncCollectionLoading = false;
-		            vm.$Modal.error({content: '接口调用异常!'});
-		        });
-		   },
+                    vm.$Modal.error({content: '接口调用异常!'});
+                });
+           },
+           // 同步指定电催催收数据
+           transferOneCollection:function(){
+               this.synOneCollectionLoading = true;
+               var url = basePath +"alms/transferOneCollection?businessId="+vm.oneCollectionBId
+               if(vm.oneCollectionAfterId!=null &&vm.oneCollectionAfterId!=''){
+                   url = url+"&afterId="+vm.oneCollectionAfterId;
+               }
+               axios.get(url,{timeout: 0})
+                   .then(function (res) {
+                       vm.synOneCollectionLoading = false;
+                       if (res.data.data != null && res.data.code == 1) {
+                           vm.$Modal.success({
+                               content: res.data.msg
+                           });
+                       } else {
+                           vm.$Modal.error({content: res.data.msg });
+                       }
+                   })
+                   .catch(function (error) {
+                       vm.synOneCollectionLoading = false;
+                       vm.$Modal.error({content: '接口调用异常!'});
+                   });
+           },
            // 同步上门催收数据
            syncVisitCollection:function(){
                this.syncVisitCollectionLoading = true;
@@ -134,6 +163,10 @@ window.layinit(function (htConfig) {
                    content: '/system/admin/setSingleUserPermissons'
                });
 		   },
+           setSingleUserPermissonsByUserId:function(){
+
+
+           },
            // 同步贷后跟踪记录
            syncTrackLog:function(){
                this.syncTrackLogLoading = true;

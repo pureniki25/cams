@@ -21,12 +21,9 @@ import com.hongte.alms.base.service.TransferFailLogService;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.ListUtil;
-import com.hongte.alms.common.util.StringUtil;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.LoginInfoDto;
-import com.sun.org.apache.regexp.internal.RE;
 import io.swagger.annotations.Api;
-import io.swagger.models.auth.In;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -306,7 +303,7 @@ public class CollectionTrackLogTransferController {
 				recordDate = new Date();
 			}
 			collectionTrackLog.setRecordDate(recordDate);
-			Integer defaultStatus =8;
+			Integer defaultStatus =6;  //默认标志为疏忽行为
 			if(parametertracelog.getStatus()!=null){
 				defaultStatus = parametertracelog.getStatus();
 			}
