@@ -136,6 +136,9 @@ public class RepaymentProjPlanListServiceImpl extends
 									continue;
 									// 逾期的当前期
 								} else {
+									
+									
+									
 									logger.info("===============：planListid:"+pList.getPlanListId()+"逾期费用计算开始===============");
 									//获取平台对应标对应期的还款日期,取晚的日期
 									Date platformDueDate=getPlatformDuedate(projPlan.getProjectId(), projPList.getPeriod().toString());
@@ -398,7 +401,6 @@ public class RepaymentProjPlanListServiceImpl extends
 	     * @return
 	     */
 	    private BigDecimal principalAndInterest(String projId,Integer period){
-	    	
 	    	Map<String, Object> paramMap = new HashMap<>();
 			paramMap.put("projectId", projId);
 			Result result=null;
@@ -412,19 +414,18 @@ public class RepaymentProjPlanListServiceImpl extends
 		 }
 		 if(result!=null&&result.getReturnCode().equals("0000")) {
 			 HashMap<String,HashMap<String,String>> map=(HashMap) result.getData();
-				List<HashMap<String,Map>> list=(List<HashMap<String, Map>>) map.get("projectPayments");
-				String principalAndInterest="";
+				List<HashMap<String,Object>> list=(List<HashMap<String, Object>>) map.get("projectPayments");
+				Double principalAndInterest=0.0;
 				if(list.size()!=0){
 					for(int i=0;i<list.size();i++) {
 						String periods=String.valueOf(list.get(i).get("period"));
-						if(period.equals(periods))
+						if(period.toString().equals(periods))
 						{
-							HashMap subMap=(HashMap) list.get(i).get("guaranteePayment");
-							principalAndInterest= subMap.get("principalAndInterest").toString();
+							principalAndInterest= (Double) list.get(i).get("principalAndInterest");
 						}
 					}
 				}
-				if(StringUtil.isEmpty(principalAndInterest)) {
+				if(principalAndInterest==0) {
 					return BigDecimal.valueOf(0);
 				}else {
 					return BigDecimal.valueOf(Double.valueOf(principalAndInterest));
