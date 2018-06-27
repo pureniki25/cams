@@ -351,7 +351,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 												 * 同步完你我金融的当前期还款计划之后，如果当前期已还总金额等于当前期计划要还的总金额，并且同步之后的当前期已还总金额大于同步之前的当前期已还总金额
 											     *说明需要发成功代扣的短信
 												 */
-												if(afterRepayAmountSum.compareTo(planAmountSum)==0&&afterRepayAmountSum.compareTo(beforeRepayAmountSum)>0) {
+												if(afterRepayAmountSum.compareTo(planAmountSum)==0&&afterRepayAmountSum.compareTo(beforeRepayAmountSum)>0&&(!pList.getCurrentStatus().equals("已还款"))) {
 													BigDecimal repayMoney=afterRepayAmountSum.subtract(beforeRepayAmountSum);
 													if(afterRepayAmountSum.compareTo(planAmountSum)==0) {//当期已还款
 														pList.setCurrentStatus("已还款");
