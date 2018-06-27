@@ -1170,7 +1170,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			createProjFactRepay(money, detail, currPeriodProjDetailVO,curalResource.get());
 			realPayed = money;
 			//上一条还款来源的可用金额已用完，找下一条还款来源来用
-			curalDivideAmount = null;
+			curalDivideAmount.set(null);
 			setNewRepaymentResource(resourceIndex.get()+1);
 		} else {
 			logger.info("divideAmount少于unpaid");
@@ -1178,7 +1178,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			money = curalDivideAmount.get();
 			unpaid = unpaid.subtract(money);
 			createProjFactRepay(money, detail, currPeriodProjDetailVO,curalResource.get());
-			curalDivideAmount = null;
+			curalDivideAmount.set(null);
 			boolean setBl =  setNewRepaymentResource(resourceIndex.get()+1);
 			realPayed = money;
 			// 如果成功取到下一条还款流水  剩余未还完的继续还
