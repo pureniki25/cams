@@ -1,7 +1,5 @@
 package com.hongte.alms.base.service;
 
-import java.util.List;
-
 import com.hongte.alms.base.entity.SysApiCallFailureRecord;
 import com.hongte.alms.common.service.BaseService;
 
@@ -15,5 +13,4 @@ import com.hongte.alms.common.service.BaseService;
  */
 public interface SysApiCallFailureRecordService extends BaseService<SysApiCallFailureRecord> {
 
-	List<SysApiCallFailureRecord> queryCallFailedDataByApiCode(String apiCode);
 }
