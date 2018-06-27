@@ -400,41 +400,41 @@ public class RepaymentProjPlanListServiceImpl extends
 	     * 获取平台垫付的本息
 	     * @return
 	     */
-	    private BigDecimal principalAndInterest(String projId,Integer period){
-	    	Map<String, Object> paramMap = new HashMap<>();
-			paramMap.put("projectId", projId);
-			Result result=null;
-		 try {
-			 result = eipRemote.queryProjectPayment(paramMap);
-			if(result==null) {
-				logger.debug("调查询平台垫付记录接口出错");
+	private BigDecimal principalAndInterest(String projId, Integer period) {
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("projectId", projId);
+		Result result = null;
+		try {
+			result = eipRemote.queryProjectPayment(paramMap);
+			if (result == null) {
+				logger.info("调查询平台垫付记录接口出错");
 			}
-		 }catch(Exception e) {
-				logger.debug("调查询平台垫付记录接口出错"+e);
-		 }
-		 if(result!=null&&result.getReturnCode().equals("0000")) {
-			 HashMap<String,HashMap<String,String>> map=(HashMap) result.getData();
-				List<HashMap<String,Object>> list=(List<HashMap<String, Object>>) map.get("projectPayments");
-				Double principalAndInterest=0.0;
-				if(list.size()!=0){
-					for(int i=0;i<list.size();i++) {
-						String periods=String.valueOf(list.get(i).get("period"));
-						if(period.toString().equals(periods))
-						{
-							principalAndInterest= (Double) list.get(i).get("principalAndInterest");
+
+			if (result != null && result.getReturnCode().equals("0000")) {
+				HashMap<String, HashMap<String, String>> map = (HashMap) result.getData();
+				List<HashMap<String, Object>> list = (List<HashMap<String, Object>>) map.get("projectPayments");
+				Double principalAndInterest = 0.0;
+				if (list.size() != 0) {
+					for (int i = 0; i < list.size(); i++) {
+						String periods = String.valueOf(list.get(i).get("period"));
+						if (period.toString().equals(periods)) {
+							principalAndInterest = (Double) list.get(i).get("principalAndInterest");
 						}
 					}
 				}
-				if(principalAndInterest==0) {
+				if (principalAndInterest == 0) {
 					return BigDecimal.valueOf(0);
-				}else {
+				} else {
 					return BigDecimal.valueOf(Double.valueOf(principalAndInterest));
 				}
-		 }else {
-			 return BigDecimal.valueOf(0);
-		 }
-			
-	    }
+			} else {
+				return BigDecimal.valueOf(0);
+			}
+		} catch (Exception e) {
+			logger.error("获取平台垫付的本息" + e);
+		}
+		return BigDecimal.valueOf(0);
+	}
 	    
 	    /**
 	     * 剩余本金
