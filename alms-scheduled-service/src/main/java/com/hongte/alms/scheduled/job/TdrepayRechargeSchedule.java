@@ -63,6 +63,10 @@ public class TdrepayRechargeSchedule {
 				.queryCallFailedDataByApiCode(Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT);
 		if (CollectionUtils.isNotEmpty(records)) {
 			for (SysApiCallFailureRecord record : records) {
+				if (record.getRetrySuccess() != null && record.getRetrySuccess().intValue() == 1) {
+					continue;
+				}
+				Integer retryCount = record.getRetryCount();
 				String apiParamPlaintext = record.getApiParamPlaintext();
 				if (StringUtil.notEmpty(apiParamPlaintext)) {
 					Map paramMap = JSONObject.parseObject(apiParamPlaintext, Map.class);
@@ -79,6 +83,7 @@ public class TdrepayRechargeSchedule {
 					} else {
 						record.setRetrySuccess(0);
 					}
+					record.setRetryCount(++retryCount);
 					record.setCreateUser("定时任务");
 					record.setCraeteTime(new Date());
 					sysApiCallFailureRecordService.insert(record);
