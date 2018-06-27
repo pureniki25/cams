@@ -22,11 +22,20 @@ public class BizPlanListMessageDto implements Serializable {
 	private BigDecimal balance;// 借款金额
 	private Integer periods;// 期数
 	private Integer totalPeriods;//总期数
+	private String carNumber;//如果是车易贷，返回车牌号
 	private BigDecimal amount;// 应还金额
 	private Date cycDate;// 应还日期
 
 	
 	
+	public String getCarNumber() {
+		return carNumber;
+	}
+
+	public void setCarNumber(String carNumber) {
+		this.carNumber = carNumber;
+	}
+
 	public Integer getTotalPeriods() {
 		return totalPeriods;
 	}
