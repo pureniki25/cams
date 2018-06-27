@@ -125,7 +125,7 @@ public class DeductionController {
             	if(bankCardInfo!=null) {
             		deductionVo.setPhoneNumber(bankCardInfo.getMobilePhone());
             		deductionVo.setBankCard(bankCardInfo.getBankCardNumber());
-            		deductionVo.setBankName(bankCardInfo.getBankCardName());
+            		deductionVo.setBankName(bankCardInfo.getBankName());
             		deductionVo.setPlatformId(5);
             		deductionVo.setBusiness(business);
             		deductionVo.setpList(planList);
