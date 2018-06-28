@@ -26,18 +26,18 @@
     <sql id="Base_Column_List">
         id, module_name AS moduleName, api_name AS apiName, api_code AS apiCode, ref_id AS refId, api_param_plaintext AS apiParamPlaintext, api_param_ciphertext AS apiParamCiphertext, api_return_info AS apiReturnInfo, target_url AS targetUrl, retry_count AS retryCount, retry_time AS retryTime, retry_success AS retrySuccess, create_user AS createUser, craete_time AS craeteTime, update_user AS updateUser, update_time AS updateTime
     </sql>
-    
-    <select id="queryCallFailedDataByApiCode" resultMap="BaseResultMap">
-	    SELECT 
-		  <include refid="Base_Column_List"/> 
+
+    <!--<select id="queryCallFailedDataByApiCode" resultMap="Base_Column_List" >-->
+    <select id="queryCallFailedDataByApiCode" resultType="com.hongte.alms.base.entity.SysApiCallFailureRecord">
+        SELECT
+        <include refid="Base_Column_List"/>
 		FROM
 		  (SELECT 
 		    t.*,
 		    MAX(t.`retry_count`) cnt 
 		  FROM
-		    tb_sys_api_call_failure_record t 
-		  WHERE t.`retry_success` = 0 
-		    AND t.`api_code` = #{apiCode,jdbcType=VARCHAR}
+        (select * from tb_sys_api_call_failure_record order by ref_id, retry_count desc) t
+        WHERE t.`api_code` = #{apiCode,jdbcType=VARCHAR} and t.`module_name` = #{moduleName, jdbcType=VARCHAR}
 		  GROUP BY t.`ref_id`) tab
 		WHERE tab.cnt <![CDATA[ < ]]> 5 
     </select>

@@ -1,11 +1,10 @@
 package com.hongte.alms.base.mapper;
 
-import java.util.List;
-
-import org.apache.ibatis.annotations.Param;
-
 import com.hongte.alms.base.entity.SysApiCallFailureRecord;
 import com.hongte.alms.common.mapper.SuperMapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * <p>
@@ -22,5 +21,5 @@ public interface SysApiCallFailureRecordMapper extends SuperMapper<SysApiCallFai
 	 * 
 	 * @return
 	 */
-	List<SysApiCallFailureRecord> queryCallFailedDataByApiCode(@Param(value = "apiCode") String apiCode);
+	List<SysApiCallFailureRecord> queryCallFailedDataByApiCode(@Param(value = "apiCode") String apiCode, @Param(value = "moduleName") String moduleName);
 }
