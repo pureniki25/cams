@@ -47,7 +47,19 @@
         b_type.business_type_name AS businessTypeName,
         business.borrow_money AS borrowMoney,
         pList.total_borrow_amount as totalBorrowAmount,
-        pList.overdue_days as delayDays,
+        -- pList.overdue_days as delayDays,
+        (
+            <![CDATA[
+              case
+                WHEN pList.due_date is null then 0
+                WHEN plist.due_date>now() THEN 0
+                WHEN plist.fact_repay_date is null then to_days(now())- to_days(plist.due_date)
+                WHEN plist.fact_repay_date<plist.due_date THEN 0
+                ELSE  to_days(plist.fact_repay_date)- to_days(plist.due_date)
+            ]]>
+
+        )as delayDays,
+
         pList.due_date as dueDate,
         pList.fact_repay_date AS repaymentDate,
         col_status.phone_staff AS phoneStaffId,
