@@ -1,9 +1,14 @@
 package com.hongte.alms.scheduled.job;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
+import com.alibaba.fastjson.JSONObject;
+import com.hongte.alms.base.entity.SysApiCallFailureRecord;
+import com.hongte.alms.base.enums.AlmsServiceNameEnums;
+import com.hongte.alms.base.feignClient.PlatformRepaymentFeignClient;
+import com.hongte.alms.base.service.SysApiCallFailureRecordService;
+import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.util.Constant;
+import com.hongte.alms.common.util.StringUtil;
+import com.hongte.alms.scheduled.client.TdrepayRechargeFeignClient;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,14 +17,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.alibaba.fastjson.JSONObject;
-import com.hongte.alms.base.entity.SysApiCallFailureRecord;
-import com.hongte.alms.base.feignClient.PlatformRepaymentFeignClient;
-import com.hongte.alms.base.service.SysApiCallFailureRecordService;
-import com.hongte.alms.common.result.Result;
-import com.hongte.alms.common.util.Constant;
-import com.hongte.alms.common.util.StringUtil;
-import com.hongte.alms.scheduled.client.TdrepayRechargeFeignClient;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class TdrepayRechargeSchedule {
@@ -60,7 +60,7 @@ public class TdrepayRechargeSchedule {
 
 		// 根据ref_id分组，查找调用失败，且次数小于5次的，且次数最大的一条数据
 		List<SysApiCallFailureRecord> records = sysApiCallFailureRecordService
-				.queryCallFailedDataByApiCode(Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT);
+				.queryCallFailedDataByApiCode(Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT, AlmsServiceNameEnums.FINANCE.getName());
 		if (CollectionUtils.isNotEmpty(records)) {
 			for (SysApiCallFailureRecord record : records) {
 				if (record.getRetrySuccess() != null && record.getRetrySuccess().intValue() == 1) {
