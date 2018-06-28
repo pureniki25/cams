@@ -354,7 +354,7 @@ var layer;
 		                   	           		}
 		                   	           	}
 		                   	       	}
-                   	            	vm.ajax_data.repayAllAmount=repayMoney;
+                   	            	//vm.ajax_data.repayAllAmount=repayMoney;
                    	            	//getTotalShouldPay();
                                 vm.loading = false;
                             }
