@@ -671,7 +671,8 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 				data.put("borrowAmount", repaymentProjPlan.getBorrowMoney());
 				data.put("period", projPlanList.getPeriod());
 				data.put("amount", projPlanList.getTotalBorrowAmount());
-				data.put("tailCardNum", tuandaiProjectInfo.getBankAccountNo().substring(tuandaiProjectInfo.getBankAccountNo().length()-4, tuandaiProjectInfo.getBankAccountNo().length()));
+				data.put("dueDate", DateUtil.getChinaDay(projPlanList.getDueDate()));
+				data.put("tailCardNo", tuandaiProjectInfo.getBankAccountNo().substring(tuandaiProjectInfo.getBankAccountNo().length()-4, tuandaiProjectInfo.getBankAccountNo().length()));
 				dto.setMsgBody(data);
 				String jason=JSON.toJSONString(dto);
 				msgRemote.sendRequest(jason);
@@ -725,7 +726,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 						data.put("name", tuandaiProjectInfo.getRealName());
 						data.put("date", DateUtil.getChinaDay(borrowDate));
 						data.put("borrowAmount", repaymentProjPlan.getBorrowMoney());
-						data.put("dueDate",projPlanList.getDueDate() );
+						data.put("dueDate",DateUtil.getChinaDay(projPlanList.getDueDate()));
 						dto.setMsgBody(data);
 						String jason=JSON.toJSONString(dto);
 						msgRemote.sendRequest(jason);
