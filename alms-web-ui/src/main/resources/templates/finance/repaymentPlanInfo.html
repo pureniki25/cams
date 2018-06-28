@@ -76,7 +76,7 @@
 			        			<td>{{ item.onlineLateFee }}</td>
 			        			<td>{{ item.offlineLateFee }}</td>
 			        			<td>{{ item.surplus }}</td>
-			        			<td>{{ item.total }}</td>
+			        			<td>{{ numeral(item.total).format('0,0.00')}}</td>
 			        			<td>{{ item.confirmFlag }}</td>
 			        		</tr>
 			        	</tbody>
