@@ -717,7 +717,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 						Long msgModeId=Long.valueOf(sysMsgTemplate.getTemplateId());
 						MsgRequestDto dto=new MsgRequestDto();
 						dto.setApp("alms");
-						dto.setMsgTitle("贷后你我金融还款提醒");
+						dto.setMsgTitle("贷后你我金融结清提醒");
 						dto.setMsgModelId(msgModeId);
 						dto.setMsgTo(tuandaiProjectInfo.getTelNo());
 						//组装发送短信内容的Json数据
