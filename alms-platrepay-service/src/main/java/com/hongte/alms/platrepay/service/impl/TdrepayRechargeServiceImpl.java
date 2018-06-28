@@ -655,7 +655,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 					List<TdrepayRechargeLog> rechargeLogs = periodDataEntry.getValue();
 
 					// 按照createTime从小到大排序，优先处理最早传入的数据
-					sortChargeLogListByCreateTime(rechargeLogs);
+					sortChargeLogListByConfirmTime(rechargeLogs);
 
 					if (differentiateSettleData(rechargeLogs)) {
 
@@ -1442,15 +1442,15 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	 * 
 	 * @param rechargeLogs
 	 */
-	private void sortChargeLogListByCreateTime(List<TdrepayRechargeLog> rechargeLogs) {
+	private void sortChargeLogListByConfirmTime(List<TdrepayRechargeLog> rechargeLogs) {
 		if (rechargeLogs != null && rechargeLogs.size() > 1) {
 			Collections.sort(rechargeLogs, new Comparator<TdrepayRechargeLog>() {
 
 				@Override
 				public int compare(TdrepayRechargeLog o1, TdrepayRechargeLog o2) {
-					if (o1.getCreateTime().before(o2.getCreateTime())) {
+					if (o1.getConfirmTime().before(o2.getConfirmTime())) {
 						return -1;
-					} else if (o1.getCreateTime().after(o2.getCreateTime())) {
+					} else if (o1.getConfirmTime().after(o2.getConfirmTime())) {
 						return 1;
 					} else {
 						return 0;
