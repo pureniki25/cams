@@ -1,7 +1,7 @@
 package com.hongte.alms.base.service.impl;
 
 import com.baomidou.mybatisplus.plugins.Page;
-import com.hongte.alms.base.customer.vo.BankWithholdFlowReq;
+import com.hongte.alms.base.customer.vo.WithholdFlowReq;
 import com.hongte.alms.base.customer.vo.BankWithholdFlowVo;
 import com.hongte.alms.base.entity.WithholdingRepaymentLog;
 import com.hongte.alms.base.mapper.WithholdingRepaymentLogMapper;
@@ -96,13 +96,18 @@ public class WithholdingRepaymentLogServiceImpl extends BaseServiceImpl<Withhold
     }
 
     @Override
-    public Page<BankWithholdFlowVo> getBankWithholdFlowPageList(BankWithholdFlowReq bankWithholdFlowReq) {
+    public Page<BankWithholdFlowVo> getBankWithholdFlowPageList(WithholdFlowReq bankWithholdFlowReq) {
         Page<BankWithholdFlowVo> page = new Page<>();
         List<BankWithholdFlowVo> withholdFlowList = withholdingRepaymentLogmapper.getBankWithholdFlowPageList(bankWithholdFlowReq);
         int count = withholdingRepaymentLogmapper.countBankWithholdFlowPageList(bankWithholdFlowReq);
         page.setTotal(count);
         page.setRecords(withholdFlowList);
         return page;
+    }
+
+    @Override
+    public Page<BankWithholdFlowVo> getBfWithholdFlowPageList(WithholdFlowReq withholdFlowReq) {
+        return null;
     }
 
 }

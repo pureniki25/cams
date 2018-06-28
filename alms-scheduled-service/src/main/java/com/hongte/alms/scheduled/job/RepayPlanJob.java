@@ -44,11 +44,11 @@ public class RepayPlanJob {
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     //@Scheduled(cron = "0/1 * * * * ?")
-    @Scheduled(cron = "0 0/1 * * * ?")
+    //@Scheduled(cron = "0 0/1 * * * ?")
+    @Scheduled(cron = "0 0/60 * * * ?")
     public void updateRepayPlanToLMS() {
         LOGGER.info("定时将指定业务的还款计划的变动通过信贷接口推送给信贷系统失败的记录重试");
         long start = System.currentTimeMillis();
-
         // 根据ref_id分组，查找调用失败，且次数小于5次的，且次数最大的一条数据
         List<SysApiCallFailureRecord> records = sysApiCallFailureRecordService
                 .queryCallFailedDataByApiCode(Constant.INTERFACE_CODE_OPEN_REPAYPLAN_UPDATEREPAYPLANTOLMS, AlmsServiceNameEnums.OPEN.getName());

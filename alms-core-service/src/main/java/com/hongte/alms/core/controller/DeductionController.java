@@ -8,6 +8,7 @@ import com.hongte.alms.base.collection.vo.DeductionVo;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.SysBank;
 import com.hongte.alms.base.entity.WithholdingPlatform;
 import com.hongte.alms.base.entity.WithholdingRecordLog;
@@ -84,6 +85,11 @@ public class DeductionController {
     @Qualifier("MoneyPoolRepaymentService")
     MoneyPoolRepaymentService moneyPoolRepaymentService;
     
+    
+    @Autowired
+    @Qualifier("RepaymentBizPlanListDetailService")
+    RepaymentBizPlanListDetailService  repaymentBizPlanListDetailService;
+    
     @Autowired
     CustomerInfoXindaiRemoteApi customerInfoXindaiRemoteApi;
     
@@ -137,7 +143,6 @@ public class DeductionController {
                 Map<String, Object> map=basicBusinessService.getOverDueMoney(planListId, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid());
             	BigDecimal onLineOverDueMoney=BigDecimal.valueOf(Double.valueOf(map.get("onLineOverDueMoney").toString()));
             	BigDecimal underLineOverDueMoney=BigDecimal.valueOf(Double.valueOf(map.get("underLineOverDueMoney").toString()));
-            	BigDecimal underLinRepayMoney=BigDecimal.valueOf(0);//线下转账金额
             	deductionVo.setOnLineOverDueMoney(onLineOverDueMoney);
             	deductionVo.setUnderLineOverDueMoney(underLineOverDueMoney);
             
@@ -163,21 +168,17 @@ public class DeductionController {
             	if(business.getSrcType()!=null&&business.getSrcType()==2) {
             	   	//还款成功和还款中的数据
 	        		List<WithholdingRepaymentLog> loglist=withholdingRepaymentLogService.selectList(new EntityWrapper<WithholdingRepaymentLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).ne("repay_status", 0));
+	        		BigDecimal factAmountSum=getPerListFactAmountSum(planList);
 	        		//还款中的数据
 	        		List<WithholdingRepaymentLog> repayingList=withholdingRepaymentLogService.selectList(new EntityWrapper<WithholdingRepaymentLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).eq("repay_status", 2));
-	        		List<MoneyPoolRepayment> moneyPoolRepayments =moneyPoolRepaymentService.selectList(new EntityWrapper<MoneyPoolRepayment>().eq("plan_list_id", planList.getPlanListId()).eq("is_finance_match", 1).eq("income_type", 1));
-	            	for(MoneyPoolRepayment vo:moneyPoolRepayments) {
-	            		underLinRepayMoney=underLinRepayMoney.add(vo.getAccountMoney());
-	            	}
 	        	
-	        		BigDecimal repayAmount=BigDecimal.valueOf(0);
+	        		BigDecimal repayAmount=factAmountSum;
 	        		BigDecimal repayingAmount=BigDecimal.valueOf(0);
-	        		for(WithholdingRepaymentLog log:loglist) {
-	        			repayAmount=repayAmount.add(log.getCurrentAmount()).add(underLinRepayMoney);
-	        		}
+	        	
 	        		for(WithholdingRepaymentLog log:repayingList) {
 	        			repayingAmount=repayingAmount.add(log.getCurrentAmount());
 	        		}
+	        		repayAmount=repayAmount.add(repayingAmount);//已经还款的金额
 	        		if(loglist!=null&&loglist.size()>0) {
 	        			deductionVo.setRepayAllAmount(repayAmount);
 	        			deductionVo.setRepayingAmount(repayingAmount);
@@ -194,15 +195,15 @@ public class DeductionController {
 	        		//还款中的数据
 	        		List<WithholdingRecordLog> repayingList=withholdingRecordLogService.selectList(new EntityWrapper<WithholdingRecordLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).eq("repay_status", 2));
 	        		
-	        	
-	        		BigDecimal repayAmount=BigDecimal.valueOf(0);
+	          		BigDecimal factAmountSum=getPerListFactAmountSum(planList);
+	          		BigDecimal repayAmount=factAmountSum;
 	        		BigDecimal repayingAmount=BigDecimal.valueOf(0);
-	        		for(WithholdingRecordLog log:loglist) {
-	        			repayAmount=repayAmount.add(log.getCurrentAmount());
-	        		}
+	        	
+	        	
 	        		for(WithholdingRecordLog log:repayingList) {
 	        			repayingAmount=repayingAmount.add(log.getCurrentAmount());
 	        		}
+	        		repayAmount=repayAmount.add(repayingAmount);//已经还款的金额
 	        		if(loglist!=null&&loglist.size()>0) {
 	        			deductionVo.setRepayAllAmount(repayAmount);
 	        			deductionVo.setRepayingAmount(repayingAmount);
@@ -310,6 +311,16 @@ public class DeductionController {
 		}
 		return isLast;
 	}	
+	
+	private BigDecimal getPerListFactAmountSum(RepaymentBizPlanList pList) {
+		List<RepaymentBizPlanListDetail> details=repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", pList.getPlanListId()));
+		BigDecimal factAmountSum=BigDecimal.valueOf(0);
+		for(RepaymentBizPlanListDetail detail:details) {
+			factAmountSum=factAmountSum.add(detail.getFactAmount()==null?BigDecimal.valueOf(0):detail.getFactAmount());
+		}
+		return factAmountSum;
+		
+	}
    
 
    }
