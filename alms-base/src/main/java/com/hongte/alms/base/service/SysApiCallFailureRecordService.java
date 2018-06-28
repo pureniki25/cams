@@ -16,7 +16,7 @@ import java.util.List;
  */
 public interface SysApiCallFailureRecordService extends BaseService<SysApiCallFailureRecord> {
 
-    List<SysApiCallFailureRecord> queryCallFailedDataByApiCode(String apiCode);
+    List<SysApiCallFailureRecord> queryCallFailedDataByApiCode(String apiCode, String moduleName);
 
     /**
      * 新增保存 API调用失败记录

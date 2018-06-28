@@ -36,8 +36,8 @@
 		    t.*,
 		    MAX(t.`retry_count`) cnt 
 		  FROM
-		    tb_sys_api_call_failure_record t 
-		  WHERE t.`api_code` = #{apiCode,jdbcType=VARCHAR}
+        (select * from tb_sys_api_call_failure_record order by ref_id, retry_count desc) t
+        WHERE t.`api_code` = #{apiCode,jdbcType=VARCHAR} and t.`module_name` = #{moduleName, jdbcType=VARCHAR}
 		  GROUP BY t.`ref_id`) tab
 		WHERE tab.cnt <![CDATA[ < ]]> 5 
     </select>

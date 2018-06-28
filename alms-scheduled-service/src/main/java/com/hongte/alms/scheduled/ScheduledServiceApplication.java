@@ -38,6 +38,11 @@ public class ScheduledServiceApplication {
 		return new RestTemplate();
 	}
 
+	@Bean
+	public RestTemplate restTemplateNoLoadBalanced() {
+		return new RestTemplate();
+	}
+
 	public static void main(String[] args) {
 		SpringApplication.run(ScheduledServiceApplication.class, args);
 		System.err.println("ヾ(◍°∇°◍)ﾉﾞ    scheduled-service启动成功      ヾ(◍°∇°◍)ﾉﾞ\n");
