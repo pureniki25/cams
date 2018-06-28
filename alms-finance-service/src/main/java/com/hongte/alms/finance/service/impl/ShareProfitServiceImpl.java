@@ -254,7 +254,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		repaymentProjPlanBaks.set(new ArrayList<>());
 		repaymentProjPlanListBaks.set(new ArrayList<>());
 		repaymentProjPlanListDetailBaks.set(new ArrayList<>());
-
+		resourceIndex.set(null);
 	}
 
 	@Override

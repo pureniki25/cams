@@ -21,32 +21,28 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/customer")
-@Api(tags = "BankWithholdFlowController", description = "银行代扣流水", hidden = true)
-public class BankWithholdFlowController {
-
+@Api(tags = "BfWithholdFlowController", description = "宝付代扣流水", hidden = true)
+public class BfWithholdFlowController {
     private static final Logger LOGGER = LoggerFactory.getLogger(CustomerRepayFlowController.class);
 
     @Autowired
     @Qualifier("WithholdingRepaymentLogService")
     private WithholdingRepaymentLogService withholdingRepaymentLogService;
     /**
-     * 获取客户
+     * 宝付代扣流水列表
      *
-     * @param bankWithholdFlowReq
+     * @param withholdFlowReq
      * @return
      */
-    @ApiOperation(value = "银行代扣流水列表")
-    @GetMapping("/getBankWithholdFlowList")
+    @ApiOperation(value = "宝付代扣流水列表")
+    @GetMapping("/getBfWithholdFlowPageList")
     @ResponseBody
-    public PageResult<List<BankWithholdFlowVo>> getBankWithholdFlowList(WithholdFlowReq bankWithholdFlowReq) {
-        LOGGER.info("====>>>>>银行代扣流水列表开始[{}]", JSON.toJSONString(bankWithholdFlowReq));
+    public PageResult<List<BankWithholdFlowVo>> getBfWithholdFlowPageList(WithholdFlowReq withholdFlowReq) {
+        LOGGER.info("====>>>>>宝付代扣流水列表[{}]", JSON.toJSONString(withholdFlowReq));
 
 
         try {
-            Page<BankWithholdFlowVo> pages = withholdingRepaymentLogService.getBankWithholdFlowPageList(bankWithholdFlowReq);
-
-
-
+            Page<BankWithholdFlowVo> pages = withholdingRepaymentLogService.getBfWithholdFlowPageList(withholdFlowReq);
 
             return PageResult.success(pages.getRecords(), pages.getTotal());
         } catch (Exception ex) {
@@ -54,4 +50,6 @@ public class BankWithholdFlowController {
             return PageResult.error(500, "数据库访问异常");
         }
     }
+
+
 }
