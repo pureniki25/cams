@@ -64,10 +64,10 @@ public class AfterLoanRepaymentServiceImpl implements AfterLoanRepaymentService 
                  return result;
             }
         }else {
-        Result result=new Result();
-        result.setCode("500");
-        result.setMsg("找不到到对应的业务单号！");
-        return result;
+            Result result=new Result();
+            result.setCode("500");
+            result.setMsg("找不到到对应的业务单号！");
+            return result;
        }
     }
 }
