@@ -82,7 +82,7 @@ public class NiwoController {
 	@ApiOperation(value = "你我金融发送还款提醒短信")
 	public void sendRemindMsg() {
 		logger.info("@sendRemindMsg@你我金融发送还款提醒短信--开始[{},{}]");
-		niWoRepayPlanService.sendRepayRemindMsg(15);
+		niWoRepayPlanService.sendRepayRemindMsg(7);
 		niWoRepayPlanService.sendRepayRemindMsg(1);
 		niWoRepayPlanService.sendSettleRemindMsg(1);
 		niWoRepayPlanService.sendSettleRemindMsg(15);
