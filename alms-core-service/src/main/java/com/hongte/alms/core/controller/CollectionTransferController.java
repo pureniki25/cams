@@ -65,6 +65,9 @@ public class CollectionTransferController {
 	//异步执行线程10执行标志位
 	private  static Boolean thread10Execute = false;
 
+	//同步单个用户的催收数据执行标志位
+	private  static Boolean oneUserColRunning = false;
+
 	@Autowired
 	@Qualifier("CollectionService")
 	private CollectionService collectionService;
@@ -436,6 +439,38 @@ public class CollectionTransferController {
 	}
 
 
+	@ApiModelProperty("同步指定业务或期数的电催数据")
+	@GetMapping("/transferOneUserCollection")
+	@ResponseBody
+	public Result transferOneUserCollection(String userId){
+
+		if(oneUserColRunning){
+			return Result.error("111111","同步程序执行中，请执行完再访问");
+		}
+		if(userId!=null){
+			List<CarBusinessAfter>  afterList = carBusinessAfterService.selectList(
+					new EntityWrapper<CarBusinessAfter>().
+							eq("collection_user",userId));
+			executor.execute(new Runnable() {
+				@Override
+				public void run() {
+					oneUserColRunning = true;
+					try{
+						for (CarBusinessAfter carBusinessAfter : afterList) {
+							boolean bl = transPhoneSet(carBusinessAfter,CollectionSetWayEnum.XINDAI_LOG);
+						}
+					}catch(Exception e){
+						e.printStackTrace();
+						LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
+					}
+					oneUserColRunning=false;
+				}
+			});
+		}
+
+		return Result.success();
+
+	}
 
 	@ApiModelProperty("同步上门催收数据")
 	@GetMapping("/transferVisit")

@@ -13,6 +13,7 @@ window.layinit(function (htConfig) {
 		   // --- 按钮控制标识 start---
 		   syncCollectionLoading:false,  //同步电催分配数据的加载标志位
            synOneCollectionLoading:false, //同步指定电催分配数据的加载标志位
+           synOneUserCollectionLoading:false, //同步指定用户电催分配数据的加载标志位
            syncVisitCollectionLoading:false,  //同步上门催收分配数据的加载标志位
            synOneListColLoading:false,
            setUserPermissonsLoading:false,
@@ -30,7 +31,10 @@ window.layinit(function (htConfig) {
            //同步指定电催信息的业务Id
            oneCollectionBId:"",
            //同步指定电催信息的afterId
-           oneCollectionAfterId:""
+           oneCollectionAfterId:"",
+
+           //同步指定用户的电催信息用户信贷Id
+           oneColUserXDId:""
 
 
 	   },
@@ -74,6 +78,26 @@ window.layinit(function (htConfig) {
                    })
                    .catch(function (error) {
                        vm.synOneCollectionLoading = false;
+                       vm.$Modal.error({content: '接口调用异常!'});
+                   });
+           },
+           // 同步指定用户电催催收数据
+           transferOneCollection:function(){
+               this.synOneUserCollectionLoading = true;
+               var url = basePath +"alms/transferOneUserCollection?userId="+vm.oneColUserXDId
+               axios.get(url,{timeout: 0})
+                   .then(function (res) {
+                       vm.synOneUserCollectionLoading = false;
+                       if (res.data.data != null && res.data.code == 1) {
+                           vm.$Modal.success({
+                               content: res.data.msg
+                           });
+                       } else {
+                           vm.$Modal.error({content: res.data.msg });
+                       }
+                   })
+                   .catch(function (error) {
+                       vm.synOneUserCollectionLoading = false;
                        vm.$Modal.error({content: '接口调用异常!'});
                    });
            },
