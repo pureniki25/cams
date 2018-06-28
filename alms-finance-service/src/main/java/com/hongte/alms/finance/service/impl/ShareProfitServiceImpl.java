@@ -1930,24 +1930,26 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			projPlanListDetailBak.insert();
 		}
 
-		logger.info("调用平台合规化还款接口开始，confirmLogId：{}", confirmLogId);
-
+		String afterId = this.afterId.get();
+		String businessId = this.businessId.get();
 		executor.execute(new Runnable() {
 			@Override
 			public void run() {
+				logger.info("调用平台合规化还款接口开始，confirmLogId：{}", confirmLogId);
 				try {
-					Thread.sleep(5000);
-					tdrepayRecharge(confirmLogId);
+					Thread.sleep(2000);
+					tdrepayRecharge(confirmLogId, businessId, afterId);
 				} catch (InterruptedException e) {
 					logger.error(e.getMessage(), e);
+					Thread.currentThread().interrupt();
 				}
+				logger.info("调用平台合规化还款接口结束");
 			}
 		});
-		logger.info("调用平台合规化还款接口结束");
 
 	}
 
-	private void tdrepayRecharge(String confirmLogId) {
+	private void tdrepayRecharge(String confirmLogId, String busId, String afterId) {
 
 		SysApiCallFailureRecord record = new SysApiCallFailureRecord();
 		try {
@@ -1961,11 +1963,10 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			record.setTargetUrl(Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT);
 
 			Result result = null;
-			String busId = this.businessId.get();
 
 			RepaymentProjPlanList repaymentProjPlanList = repaymentProjPlanListService
 					.selectOne(new EntityWrapper<RepaymentProjPlanList>().eq("orig_business_id", busId).eq("after_id",
-							this.afterId.get()));
+							afterId));
 
 			RepaymentProjPlan plan = null;
 
@@ -1977,7 +1978,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 
 				Map<String, Object> paramMap = new HashMap<>();
 				paramMap.put("confirmLogId", confirmLogId);
-				paramMap.put("afterId", this.afterId.get());
+				paramMap.put("afterId", afterId);
 				paramMap.put("projectId", plan.getProjectId());
 
 				record.setApiParamPlaintext(JSONObject.toJSONString(paramMap));
