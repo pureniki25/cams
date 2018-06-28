@@ -57,11 +57,11 @@ public class AfterLoanRepaymentServiceImpl implements AfterLoanRepaymentService 
             if(repaymentBizPlanList.getSrcType()!=null && repaymentBizPlanList.getSrcType()==1){
                 return withHoldingClient.repayAssignBank(repaymentBizPlanList.getOrigBusinessId(),afterId,bankCard);
             }else {
-       		 withholdingService.appWithholding(repaymentBizPlanList);
-       		 Result result=new Result();
-             result.setCode("0000");
-             result.setMsg("执行成功");
-       		 return result;
+                 withholdingService.appWithholding(repaymentBizPlanList);
+                 Result result=new Result();
+                 result.setCode("0000");
+                 result.setMsg("执行成功");
+                 return result;
             }
         }else {
         Result result=new Result();
