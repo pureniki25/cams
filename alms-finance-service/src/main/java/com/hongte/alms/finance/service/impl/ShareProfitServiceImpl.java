@@ -1932,21 +1932,17 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 
 		logger.info("调用平台合规化还款接口开始，confirmLogId：{}", confirmLogId);
 
-		try {
-			executor.execute(new Runnable() {
-				@Override
-				public void run() {
-					int count = 0;
-					while (count < 1) {
-						count = repaymentConfirmLogService
-								.selectCount(new EntityWrapper<RepaymentConfirmLog>().eq("confirm_log_id", confirmLogId));
-					}
+		executor.execute(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(5000);
 					tdrepayRecharge(confirmLogId);
+				} catch (InterruptedException e) {
+					logger.error(e.getMessage(), e);
 				}
-			});
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-		}
+			}
+		});
 		logger.info("调用平台合规化还款接口结束");
 
 	}
