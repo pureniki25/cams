@@ -34,12 +34,13 @@ public class RepayPlanJob {
 
 
     /**
-     * 平台还款调度任务
+     * 定时将指定业务的还款计划的变动通过信贷接口推送给信贷系统失败的记录重试
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
-    @Scheduled(cron = "0 0/60 * * * ?")
-    public void platformRepayment() {
-        LOGGER.info("平台还款调度任务");
+    //@Scheduled(cron = "0/1 * * * * ?")
+    @Scheduled(cron = "0 0/1 * * * ?")
+    public void updateRepayPlanToLMS() {
+        LOGGER.info("定时将指定业务的还款计划的变动通过信贷接口推送给信贷系统失败的记录重试");
         long start = System.currentTimeMillis();
 
         // 根据ref_id分组，查找调用失败，且次数小于5次的，且次数最大的一条数据
@@ -78,6 +79,6 @@ public class RepayPlanJob {
         }
 
         long end = System.currentTimeMillis();
-        LOGGER.info("平台还款调度任务，耗时：{}", (end - start));
+        LOGGER.info("定时将指定业务的还款计划的变动通过信贷接口推送给信贷系统失败的记录重试，耗时：{}", (end - start));
     }
 }
