@@ -239,7 +239,7 @@
     </select>
 
 
-    <select id="getBankWithholdFlowPageList" parameterType="com.hongte.alms.base.customer.vo.BankWithholdFlowReq"
+    <select id="getBankWithholdFlowPageList" parameterType="com.hongte.alms.base.customer.vo.WithholdFlowReq"
             resultType="com.hongte.alms.base.customer.vo.BankWithholdFlowVo">
         SELECT
         t1.merch_order_id AS merchOrderId,
