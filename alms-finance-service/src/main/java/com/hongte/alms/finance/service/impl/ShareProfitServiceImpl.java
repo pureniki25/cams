@@ -328,7 +328,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 //		divideOveryDueMoney(req.getOfflineOverDue(), planDto.get(), false);
 //		divideOveryDueMoney(req.getOnlineOverDue(), planDto.get(), true);
 //		填充信息
-		//fill();
+		fill();
 		///////   旧的分润方法  均分  结束 ==========
 
 		if (save) {
