@@ -1952,6 +1952,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	private void tdrepayRecharge(String confirmLogId, String busId, String afterId) {
 
 		SysApiCallFailureRecord record = new SysApiCallFailureRecord();
+		Result result = null;
 		try {
 			record.setModuleName(AlmsServiceNameEnums.FINANCE.getName());
 			record.setApiCode(Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT);
@@ -1961,8 +1962,6 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 					StringUtil.isEmpty(loginUserInfoHelper.getUserId()) ? "null" : loginUserInfoHelper.getUserId());
 			record.setCraeteTime(new Date());
 			record.setTargetUrl(Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT);
-
-			Result result = null;
 
 			RepaymentProjPlanList repaymentProjPlanList = repaymentProjPlanListService
 					.selectOne(new EntityWrapper<RepaymentProjPlanList>().eq("orig_business_id", busId).eq("after_id",
@@ -1993,7 +1992,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			logger.error(e.getMessage(), e);
 			record.setApiReturnInfo(e.getMessage());
 		}
-		sysApiCallFailureRecordService.insert(record);
+		if (result == null || !"1".equals(result.getCode())) {
+			sysApiCallFailureRecordService.insert(record);
+		}
 	}
 
 	public static void main(String[] args) {
