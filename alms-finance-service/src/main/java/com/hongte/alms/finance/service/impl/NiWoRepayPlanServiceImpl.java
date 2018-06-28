@@ -616,7 +616,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 		
 		for(RepaymentProjPlanList projPlanList:projPlanLists) {
 			RepaymentProjPlan repaymentProjPlan=repaymentProjPlanService.selectOne(new EntityWrapper<RepaymentProjPlan>().eq("proj_plan_id", projPlanList.getProjPlanId()));
-			TuandaiProjectInfo tuandaiProjectInfo=tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("business_id", projPlanList.getOrigBusinessId()));
+			TuandaiProjectInfo tuandaiProjectInfo=tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("project_id", repaymentProjPlan.getProjectId()));
 			Date borrowDate=null;
 			if(tuandaiProjectInfo.getQueryFullSuccessDate()!=null) {
 				borrowDate=tuandaiProjectInfo.getQueryFullSuccessDate();
@@ -664,7 +664,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 		   List<RepaymentProjPlanList>  lists=repaymentProjPlanListService.selectList(new EntityWrapper<RepaymentProjPlanList>().eq("current_status","还款中").eq("due_date", dueDate).eq("plate_type", 2));
 		   for(RepaymentProjPlanList projPlanList:lists) {
 				RepaymentProjPlan repaymentProjPlan=repaymentProjPlanService.selectOne(new EntityWrapper<RepaymentProjPlan>().eq("proj_plan_id", projPlanList.getProjPlanId()));
-			   TuandaiProjectInfo tuandaiProjectInfo=tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("business_id", projPlanList.getOrigBusinessId()));
+			   TuandaiProjectInfo tuandaiProjectInfo=tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("project_id", repaymentProjPlan.getProjectId()));
 				Date borrowDate=null;
 				if(tuandaiProjectInfo.getQueryFullSuccessDate()!=null) {
 					borrowDate=tuandaiProjectInfo.getQueryFullSuccessDate();
@@ -721,7 +721,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 			
 			 for(RepaymentProjPlanList projPlanList:lists) {
 					   RepaymentProjPlan repaymentProjPlan=repaymentProjPlanService.selectOne(new EntityWrapper<RepaymentProjPlan>().eq("proj_plan_id", projPlanList.getProjPlanId()));
-					   TuandaiProjectInfo tuandaiProjectInfo=tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("business_id", projPlanList.getOrigBusinessId()));
+					   TuandaiProjectInfo tuandaiProjectInfo=tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("project_id", repaymentProjPlan.getProjectId()));
 						Date borrowDate=null;
 						if(tuandaiProjectInfo.getQueryFullSuccessDate()!=null) {
 							borrowDate=tuandaiProjectInfo.getQueryFullSuccessDate();
