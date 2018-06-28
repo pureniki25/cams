@@ -94,7 +94,7 @@
 		    MAX(t4.`drag_date`) 
 		  FROM
 		    tb_car_drag t4 
-		  WHERE t1.`business_id` = t4.`business_id`) dragDate,
+		  WHERE t4.`business_id` = #{businessId,jdbcType=VARCHAR}) dragDate,
 		  t1.`operator_name` operatorName,
 		  IFNULL(t5.fact_principal, 0) factPrincipal,
 		  IFNULL(t5.fact_accrual, 0) factAccrual,
@@ -102,19 +102,31 @@
 		  IFNULL(t5.surplusServiceCharge, 0) surplusServiceCharge,
 		  t5.fact_repay_date factRepayDate,
 		  t5.due_date _dueDate,
-		  t6.output_user_name outputUserName,
-		  t6.fact_output_date factOutputDate,
 		  (SELECT 
-		    fact_output_money 
+		    tt1.output_user_name 
 		  FROM
-		    (SELECT 
-		      a.business_id,
-		      SUM(IFNULL(a.fact_output_money, 0)) fact_output_money 
-		    FROM
-		      tb_biz_output_record a 
-		    WHERE a.withdraw_type IN (0, 1, 4) 
-		    GROUP BY a.business_id) tab 
-		  WHERE tab.business_id = t1.business_id) factOutputMoney 
+		    tb_biz_output_record tt1 
+		  WHERE (
+		      IFNULL(tt1.withdraw_type, 0) = 0 
+		      OR IFNULL(tt1.withdraw_type, 0) = 1
+		    ) 
+		    AND tt1.business_id = #{businessId,jdbcType=VARCHAR}) outputUserName,
+		  (SELECT 
+		    MIN(fact_output_date) 
+		  FROM
+		    tb_biz_output_record tt1 
+		  WHERE (
+		      IFNULL(tt1.withdraw_type, 0) = 0 
+		      OR IFNULL(tt1.withdraw_type, 0) = 1
+		    ) 
+		    AND tt1.business_id = #{businessId,jdbcType=VARCHAR}) factOutputDate,
+		  (SELECT 
+		    SUM(IFNULL(a.fact_output_money, 0)) fact_output_money 
+		  FROM
+		    tb_biz_output_record a 
+		  WHERE a.withdraw_type IN (0, 1, 4) 
+		    AND a.business_id = #{businessId,jdbcType=VARCHAR}
+		  GROUP BY a.business_id) factOutputMoney 
 		FROM
 		  tb_basic_business t1,
 		  tb_car_basic t2,
@@ -135,7 +147,8 @@
 		    (SELECT 
 		      tab2.`original_business_id` business_id,
 		      MAX(tab1.fact_repay_date) fact_repay_date,
-		      MIN(tab1.due_date) due_date,	-- 最小应还日期
+		      MIN(tab1.due_date) due_date,
+		      -- 最小应还日期 
 		      SUM(
 		        CASE
 		          WHEN tab3.plan_item_type = 10 
@@ -177,26 +190,10 @@
 		      tb_repayment_biz_plan_list_detail tab3 
 		    WHERE tab1.`plan_id` = tab2.`plan_id` 
 		      AND tab1.`plan_list_id` = tab3.`plan_list_id` 
-		      AND IFNULL(tab1.repay_flag,0) != 6
-		      AND tab2.`original_business_id` = #{businessId,jdbcType=VARCHAR}) tab) t5,
-		  (SELECT 
-		    MIN(fact_output_date) fact_output_date,
-		    tab.output_user_name,
-		    tab.business_id 
-		  FROM
-		    (SELECT 
-		      tt1.business_id,
-		      tt1.fact_output_date,
-		      tt1.output_user_name 
-		    FROM
-		      tb_biz_output_record tt1 
-		    WHERE IFNULL(tt1.withdraw_type, 0) = 0 
-		      OR IFNULL(tt1.withdraw_type, 0) = 1) tab 
-		  GROUP BY tab.business_id,
-		    tab.output_user_name) t6 
+		      AND IFNULL(tab1.repay_flag, 0) != 6 
+		      AND tab2.`original_business_id` = #{businessId,jdbcType=VARCHAR}) tab) t5 
 		WHERE t1.`business_id` = t2.`business_id` 
 		  AND t1.`business_id` = t3.`business_id` 
-		  AND t1.`business_id` = t6.`business_id` 
 		  AND t2.`last_detection_id` = t3.`id` 
 		  AND t1.`business_id` = #{businessId,jdbcType=VARCHAR}	limit 1
 	</select>
