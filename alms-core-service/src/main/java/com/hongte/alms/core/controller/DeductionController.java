@@ -180,12 +180,13 @@ public class DeductionController {
 	        		}
 	        		repayAmount=repayAmount.add(repayingAmount);//已经还款的金额
 	        		if(loglist!=null&&loglist.size()>0) {
-	        			deductionVo.setRepayAllAmount(repayAmount);
+	        			deductionVo.setRepayAllAmount(factAmountSum.add(repayingAmount));
 	        			deductionVo.setRepayingAmount(repayingAmount);
 	        			deductionVo.setRestAmount(BigDecimal.valueOf(deductionVo.getTotal()).subtract(repayAmount));
 	        			deductionVo.setRepayAmount(deductionVo.getRestAmount());
 	        			deductionVo.setTotal(deductionVo.getTotal()-deductionVo.getRepayingAmount().doubleValue());
 	        		}else {
+	        			deductionVo.setRepayAllAmount(factAmountSum);
 	        			deductionVo.setRepayAmount(BigDecimal.valueOf(deductionVo.getTotal()));
 	        		}
 	                return Result.success(deductionVo);
@@ -205,7 +206,7 @@ public class DeductionController {
 	        		}
 	        		repayAmount=repayAmount.add(repayingAmount);//已经还款的金额
 	        		if(loglist!=null&&loglist.size()>0) {
-	        			deductionVo.setRepayAllAmount(repayAmount);
+	        			deductionVo.setRepayAllAmount(factAmountSum.add(repayingAmount));
 	        			deductionVo.setRepayingAmount(repayingAmount);
 	        			deductionVo.setRestAmount(BigDecimal.valueOf(deductionVo.getTotal()).subtract(repayAmount));
 	        			deductionVo.setRepayAmount(deductionVo.getRestAmount());
