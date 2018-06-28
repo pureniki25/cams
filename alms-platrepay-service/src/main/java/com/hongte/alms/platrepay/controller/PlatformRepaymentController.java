@@ -146,7 +146,7 @@ public class PlatformRepaymentController {
         try {
             //****************************************************
             //验证这块以后要移除,通用功能不能只针对某一个平台，目前只针对团贷平台. zgh 20180614
-            TuandaiProjectInfo tuandaiProjectInfo = tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("project_id", projectId));
+            TuandaiProjectInfo tuandaiProjectInfo = tuandaiProjectInfoService.selectById(projectId);
             if (tuandaiProjectInfo == null) {
                 LOGGER.error("@对接合规还款接口@  查不到平台的上标信息 输入参数 projectId:[{}]  ", projectId);
                 return Result.error("查不到平台的上标信息");
