@@ -111,8 +111,6 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
     MsgRemote msgRemote;
 	
 	
-	
-	
 	@Transactional(rollbackFor = Exception.class)
 	@Override
 	public void sycNiWoRepayPlan(String orderNo,HashMap<String,Object> niwoMap) {
@@ -156,11 +154,47 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 					repaymentProjPlanListDto.setProjPlanListDetails(projListDetails);
 					repaymentProjPlanListDto.setRepaymentProjPlanList(projPlanList);
 					repaymentProjPlanListDtos.add(repaymentProjPlanListDto);
+					
 					for (RepaymentProjPlanListDetail detail : projListDetails) {
-						detail.setProjFactAmount(detail.getProjPlanAmount());
-						detail.setUpdateDate(new Date());
-						repaymentProjPlanListDetailService.updateById(detail); 
+						for (NiWoProjPlanListDetailDto detailDto : dto.getRepaymentPlans()) {
+							 if(detail.getPeriod()==detailDto.getPeriod()) {
+									// 看标有没有滞纳金明细
+									Integer projDetailcount = repaymentProjPlanListDetailService
+											.selectCount(new EntityWrapper<RepaymentProjPlanListDetail>()
+													.eq("proj_plan_list_id", projPlanList.getProjPlanListId())
+													.eq("fee_id", RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid()));
+									if(projDetailcount==0&&detailDto.getTotalPenalty().compareTo(BigDecimal.valueOf(0))>0) {
+										try {
+										RepaymentProjPlanListDetail projListDetail = ClassCopyUtil.copyObject(detail,
+												RepaymentProjPlanListDetail.class);
+										projListDetail.setProjPlanDetailId(UUID.randomUUID().toString());
+										projListDetail.setFeeId(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid());
+										projListDetail.setProjPlanAmount(detailDto.getTotalPenalty());
+										projListDetail.setPlanItemType(60);
+										projListDetail.setPlanDetailId(projListDetail.getPlanDetailId());
+										projListDetail.setProjFactAmount(detailDto.getRepaidPenalty());
+										projListDetail.setPlanItemName("线上滞纳金");
+										projListDetail.setCreatSysType(3);
+										repaymentProjPlanListDetailService.insertOrUpdate(projListDetail);
+										projPlanList.setOverdueAmount(detailDto.getTotalPenalty());
+										projPlanList.setOverdueDays(BigDecimal.valueOf(getOverDays(detailDto.getRefundDate())));
+										projPlanList.setDueDate(new Date(detailDto.getRefundDate()));
+										}catch(Exception e) {
+											logger.info("你我金融更新滞纳金错误"+e);
+										}
+								
+										
+									}
+									detail.setProjFactAmount(detail.getProjPlanAmount());
+									detail.setUpdateDate(new Date());
+								
+									repaymentProjPlanListDetailService.updateById(detail); 
+							 }
+					
+					 }
 					}
+					
+					 
 					projPlanList.setCurrentStatus("已还款");
 					projPlanList.setRepayFlag(1);// 1：已还款 你我金融的单，还款后标志为1
 					projPlanList.setUpdateTime(new Date());
@@ -172,9 +206,41 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 					List<RepaymentBizPlanListDetail> pListDetails = repaymentBizPlanListDetailService.selectList(
 							new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", pList.getPlanListId()));
 					for (RepaymentBizPlanListDetail pListDetail : pListDetails) {
-						pListDetail.setFactAmount(pListDetail.getPlanAmount());
-						pListDetail.setUpdateDate(new Date());
-						repaymentBizPlanListDetailService.updateById(pListDetail);
+						for (NiWoProjPlanListDetailDto detailDto : dto.getRepaymentPlans()) {
+						
+							
+						 if(pListDetail.getPeriod()==detailDto.getPeriod()) {
+								// 看计划有没有滞纳金明细
+								Integer planDetailCount = repaymentBizPlanListDetailService
+										.selectCount(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id",
+												pList.getPlanListId()).eq("fee_id", RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid()));
+								
+								if(planDetailCount==0&&detailDto.getTotalPenalty().compareTo(BigDecimal.valueOf(0))>0) {//证明有滞纳金
+									try {
+										RepaymentBizPlanListDetail planListDetailCopy = ClassCopyUtil.copyObject(pListDetail,
+												RepaymentBizPlanListDetail.class);
+										planListDetailCopy.setPlanDetailId(UUID.randomUUID().toString());
+										planListDetailCopy.setFeeId(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid());
+										planListDetailCopy.setPlanAmount(detailDto.getTotalPenalty());
+										planListDetailCopy.setPlanItemType(60);
+										planListDetailCopy.setPlanItemName("线上滞纳金");
+										planListDetailCopy.setFactAmount(detailDto.getRepaidPenalty());
+										planListDetailCopy.setCreateDate(new Date());
+										repaymentBizPlanListDetailService.insertOrUpdate(planListDetailCopy);
+										pList.setOverdueAmount(detailDto.getTotalPenalty());
+										pList.setDueDate(new Date(detailDto.getRefundDate()));
+										pList.setOverdueDays(BigDecimal.valueOf(getOverDays(detailDto.getRefundDate())));
+									}catch(Exception e) {
+										logger.info("你我金融更新滞纳金错误"+e);
+									}
+							
+									
+								}
+							pListDetail.setFactAmount(pListDetail.getPlanAmount());
+							pListDetail.setUpdateDate(new Date());
+							repaymentBizPlanListDetailService.updateById(pListDetail);
+					   }
+					 }
 					}
 					pList.setCurrentStatus("已还款");
 					pList.setRepayFlag(1);// 1：已还款 你我金融的单，还款后标志为1
@@ -215,12 +281,14 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 									List<RepaymentBizPlanListDetail> planDetails = repaymentBizPlanListDetailService
 											.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id",
 													pList.getPlanListId()));
-									//同步之前先计算当前期已经实还的金额
+							
+								    //同步之前先计算当前期已经实还的金额
 									BigDecimal beforeRepayAmountSum=getRepayAmountSum(planDetails);
 									// 看标有没有滞纳金明细
-									Integer projDetailcount = repaymentBizPlanListDetailService
-											.selectCount(new EntityWrapper<RepaymentBizPlanListDetail>()
-													.eq("plan_list_id", pList.getPlanListId())
+									// 看标有没有滞纳金明细
+									Integer projDetailcount = repaymentProjPlanListDetailService
+											.selectCount(new EntityWrapper<RepaymentProjPlanListDetail>()
+													.eq("proj_plan_list_id", projPlanList.getProjPlanListId())
 													.eq("fee_id", RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid()));
 									// 看计划有没有滞纳金明细
 									Integer planDetailCount = repaymentBizPlanListDetailService
@@ -230,11 +298,20 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 									projPlanListDto.setRepaymentProjPlanList(projPlanList);
 									projPlanListDto.setProjPlanListDetails(projDetails);
 									repaymentProjPlanListDtos.add(projPlanListDto);
+								
 									for (RepaymentProjPlanListDetail projDetail : projDetails) {
 										for (RepaymentBizPlanListDetail planDetail : planDetails) {
-											if (projDetail.getFeeId().equals(planDetail.getFeeId())) {
+											if (projDetail.getPeriod()==planDetail.getPeriod()&&projDetail.getPeriod()==detailDto.getPeriod()) {
+												
+												//担保费用项数目
+											    int guaranteFeeCount=repaymentProjPlanListDetailService.selectCount(new EntityWrapper<RepaymentProjPlanListDetail>().eq("plan_item_type", RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE.getValue()).eq("proj_plan_list_id", projPlanList.getProjPlanListId()));
+												//平台费用项数目
+											    int platformFeeCount=repaymentProjPlanListDetailService.selectCount(new EntityWrapper<RepaymentProjPlanListDetail>().eq("plan_item_type", RepayPlanFeeTypeEnum.PLAT_CHARGE.getValue()).eq("proj_plan_list_id", projPlanList.getProjPlanListId()));
+												//公司服务费用项数目
+											    int companyFeeCount=repaymentProjPlanListDetailService.selectCount(new EntityWrapper<RepaymentProjPlanListDetail>().eq("plan_item_type", RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getValue()).eq("proj_plan_list_id", projPlanList.getProjPlanListId()));
+
 												boolean isDifferent=false;
-												if (RepayPlanFeeTypeEnum.PRINCIPAL.getValue()==projDetail.getPlanItemType()) { // 本金
+												if (RepayPlanFeeTypeEnum.PRINCIPAL.getValue()==projDetail.getPlanItemType()&&RepayPlanFeeTypeEnum.PRINCIPAL.getValue()==planDetail.getPlanItemType()) { // 本金
 													if(projDetail.getProjPlanAmount().compareTo(detailDto.getPrincipal())!=0) {//贷后应还的和你我金融应还的金额不一致，计入异常日志表
 														isDifferent=true;
 													}
@@ -247,7 +324,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													planDetail.setUpdateDate(new Date());
 													repaymentProjPlanListDetailService.updateById(projDetail);
 													repaymentBizPlanListDetailService.updateById(planDetail);
-												} else if (RepayPlanFeeTypeEnum.INTEREST.getValue()==projDetail.getPlanItemType()) { // 利息
+												} else if (RepayPlanFeeTypeEnum.INTEREST.getValue()==projDetail.getPlanItemType()&&RepayPlanFeeTypeEnum.INTEREST.getValue()==planDetail.getPlanItemType()) { // 利息
 													if(projDetail.getProjPlanAmount().compareTo(detailDto.getInterest())!=0) {//贷后应还的和你我金融应还的金额不一致，计入异常日志表
 														isDifferent=true;
 													
@@ -261,7 +338,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													planDetail.setUpdateDate(new Date());
 													repaymentProjPlanListDetailService.updateById(projDetail);
 													repaymentBizPlanListDetailService.updateById(planDetail);
-												} else if (RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE.getValue()==projDetail.getPlanItemType()) {// 担保服务费
+												} else if (RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE.getValue()==projDetail.getPlanItemType()&&RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE.getValue()==planDetail.getPlanItemType()) {// 担保服务费
 													if(projDetail.getProjPlanAmount().compareTo(detailDto.getCommissionGuaranteFee())!=0) {//贷后应还的和你我金融应还的金额不一致，计入异常日志表
 														isDifferent=true;
 													}
@@ -275,7 +352,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													planDetail.setUpdateDate(new Date());
 													repaymentProjPlanListDetailService.updateById(projDetail);
 													repaymentBizPlanListDetailService.updateById(planDetail);
-												} else if (RepayPlanFeeTypeEnum.PLAT_CHARGE.getValue()==projDetail.getPlanItemType()) {// //平台管理费
+												}else if (RepayPlanFeeTypeEnum.PLAT_CHARGE.getValue()==projDetail.getPlanItemType()&&RepayPlanFeeTypeEnum.PLAT_CHARGE.getValue()==planDetail.getPlanItemType()) {// //平台管理费
 													if(projDetail.getProjPlanAmount().compareTo(detailDto.getPlatformManageFee())!=0) {//贷后应还的和你我金融应还的金额不一致，计入异常日志表
 														isDifferent=true;
 													}
@@ -288,7 +365,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													planDetail.setUpdateDate(new Date());
 													repaymentProjPlanListDetailService.updateById(projDetail);
 													repaymentBizPlanListDetailService.updateById(planDetail);
-												} else if (RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getValue()==projDetail.getPlanItemType()) {// //分公司服务费
+												} else if (RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getValue()==projDetail.getPlanItemType()&&RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getValue()==planDetail.getPlanItemType()) {// //分公司服务费
 													if(projDetail.getProjPlanAmount().compareTo(detailDto.getPlatformManageFee())!=0) {//贷后应还的和你我金融应还的金额不一致，计入异常日志表
 														isDifferent=true;
 													}
@@ -301,7 +378,8 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													planDetail.setUpdateDate(new Date());
 													repaymentProjPlanListDetailService.updateById(projDetail);
 													repaymentBizPlanListDetailService.updateById(planDetail);
-												} else if (RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getValue()==projDetail.getPlanItemType()
+												
+												}else if (RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getValue()==projDetail.getPlanItemType()&&RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getValue()==planDetail.getPlanItemType()
 														&& detailDto.getTotalPenalty() != null && detailDto
 																.getTotalPenalty().compareTo(BigDecimal.valueOf(0)) > 0) {// 逾期滞纳金
 													projDetail.setProjPlanAmount(detailDto.getTotalPenalty());
@@ -313,7 +391,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													planDetail.setPlanAmount(detailDto.getTotalPenalty());
 													repaymentProjPlanListDetailService.updateById(projDetail);
 													repaymentBizPlanListDetailService.updateById(planDetail);
-												} else if (projDetailcount > 0 && detailDto.getTotalPenalty() != null && detailDto
+												} else if (projDetailcount ==0 && detailDto.getTotalPenalty() != null && detailDto
 														.getTotalPenalty().compareTo(BigDecimal.valueOf(0)) > 0) {
 													RepaymentBizPlanListDetail planTemp=planDetails.get(0);
 													RepaymentBizPlanListDetail planListDetailCopy = ClassCopyUtil.copyObject(planTemp,
@@ -322,7 +400,8 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													planListDetailCopy.setFeeId(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid());
 													planListDetailCopy.setPlanAmount(detailDto.getTotalPenalty());
 													planListDetailCopy.setPlanItemType(60);
-													planListDetailCopy.setPlanItemName("滞纳金");
+													planListDetailCopy.setPlanItemName("线上滞纳金");
+													planListDetailCopy.setFactAmount(detailDto.getRepaidPenalty());
 													planListDetailCopy.setCreateDate(new Date());
 													repaymentBizPlanListDetailService.insertOrUpdate(planListDetailCopy);
 													
@@ -336,11 +415,94 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													projListDetail.setProjPlanAmount(detailDto.getTotalPenalty());
 													projListDetail.setPlanItemType(60);
 													projListDetail.setPlanDetailId(planListDetailCopy.getPlanDetailId());
+													projListDetail.setProjFactAmount(detailDto.getRepaidPenalty());
 													projListDetail.setPlanItemName("滞纳金");
 													projListDetail.setCreatSysType(3);
+													projListDetail.setCreateDate(new Date());
 													repaymentProjPlanListDetailService.insertOrUpdate(projDetail);
 													
 												
+												}
+												
+												 if(guaranteFeeCount==0&&detailDto.getCommissionGuaranteFee().compareTo(BigDecimal.valueOf(0))>0){//如果担保费用项为0，记录异常，新增担保费用项
+													isDifferent=true;
+													RepaymentProjPlanListDetail projPlanListDetailCopy = ClassCopyUtil.copyObject(projDetail,
+															RepaymentProjPlanListDetail.class);
+													RepaymentBizPlanListDetail planListDetailCopy = ClassCopyUtil.copyObject(planDetail,
+															RepaymentBizPlanListDetail.class);
+													projPlanListDetailCopy.setProjPlanDetailId(UUID.randomUUID().toString());
+													projPlanListDetailCopy.setFeeId(RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE.getUuid());
+													projPlanListDetailCopy.setPlanItemName(RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE.getDesc());
+													projPlanListDetailCopy.setPlanItemType(RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE.getValue());
+													projPlanListDetailCopy.setPlanDetailId(projPlanListDetailCopy.getPlanDetailId());
+													projPlanListDetailCopy.setCreatSysType(3);
+													projPlanListDetailCopy.setProjPlanAmount(detailDto.getCommissionGuaranteFee());
+													projPlanListDetailCopy.setProjFactAmount(detailDto.getRepaidCommissionGuaranteFee());
+													projPlanListDetailCopy.setCreateDate(new Date());
+				
+													planListDetailCopy.setPlanDetailId(UUID.randomUUID().toString());
+													planListDetailCopy.setFeeId(RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE.getUuid());
+													planListDetailCopy.setPlanItemName(RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE.getDesc());
+													planListDetailCopy.setPlanItemType(RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE.getValue());
+													planListDetailCopy.setPlanAmount(detailDto.getCommissionGuaranteFee());
+													planListDetailCopy.setFactAmount(detailDto.getRepaidCommissionGuaranteFee());
+													planListDetailCopy.setCreateDate(new Date());
+													
+													
+													repaymentBizPlanListDetailService.insertOrUpdate(planListDetailCopy);
+													repaymentProjPlanListDetailService.insertOrUpdate(projPlanListDetailCopy);
+												}
+												if(platformFeeCount==0&&detailDto.getPlatformManageFee().compareTo(BigDecimal.valueOf(0))>0) {//如果平台管理费用项为0，记录异常，新增平台管理费用项
+													isDifferent=true;
+													RepaymentProjPlanListDetail projPlanListDetailCopy = ClassCopyUtil.copyObject(projDetail,
+															RepaymentProjPlanListDetail.class);
+													RepaymentBizPlanListDetail planListDetailCopy = ClassCopyUtil.copyObject(planDetail,
+															RepaymentBizPlanListDetail.class);
+													projPlanListDetailCopy.setProjPlanDetailId(UUID.randomUUID().toString());
+													projPlanListDetailCopy.setFeeId(RepayPlanFeeTypeEnum.PLAT_CHARGE.getUuid());
+													projPlanListDetailCopy.setPlanItemName(RepayPlanFeeTypeEnum.PLAT_CHARGE.getDesc());
+													projPlanListDetailCopy.setPlanItemType(RepayPlanFeeTypeEnum.PLAT_CHARGE.getValue());
+													projPlanListDetailCopy.setPlanDetailId(projPlanListDetailCopy.getPlanDetailId());
+													projPlanListDetailCopy.setCreatSysType(3);
+													projPlanListDetailCopy.setProjPlanAmount(detailDto.getPlatformManageFee());
+													projPlanListDetailCopy.setProjFactAmount(detailDto.getRepaidPlatformManageFee());
+													projPlanListDetailCopy.setCreateDate(new Date());
+													
+													planListDetailCopy.setPlanDetailId(UUID.randomUUID().toString());
+													planListDetailCopy.setFeeId(RepayPlanFeeTypeEnum.PLAT_CHARGE.getUuid());
+													planListDetailCopy.setPlanItemName(RepayPlanFeeTypeEnum.PLAT_CHARGE.getDesc());
+													planListDetailCopy.setPlanItemType(RepayPlanFeeTypeEnum.PLAT_CHARGE.getValue());
+													planListDetailCopy.setPlanAmount(detailDto.getPlatformManageFee());
+													planListDetailCopy.setFactAmount(detailDto.getRepaidPlatformManageFee());
+													planListDetailCopy.setCreateDate(new Date());
+													repaymentBizPlanListDetailService.insertOrUpdate(planListDetailCopy);
+													repaymentProjPlanListDetailService.insertOrUpdate(projPlanListDetailCopy);
+												}
+												if(companyFeeCount==0&&detailDto.getShouldConsultingFee().compareTo(BigDecimal.valueOf(0))>0) { //如果分公司服务费用项为0，记录异常，新增分公司服务费用项
+													isDifferent=true;
+													RepaymentProjPlanListDetail projPlanListDetailCopy = ClassCopyUtil.copyObject(projDetail,
+															RepaymentProjPlanListDetail.class);
+													RepaymentBizPlanListDetail planListDetailCopy = ClassCopyUtil.copyObject(planDetail,
+															RepaymentBizPlanListDetail.class);
+													projPlanListDetailCopy.setProjPlanDetailId(UUID.randomUUID().toString());
+													projPlanListDetailCopy.setFeeId(RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getUuid());
+													projPlanListDetailCopy.setPlanItemName(RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getDesc());
+													projPlanListDetailCopy.setPlanItemType(RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getValue());
+													projPlanListDetailCopy.setPlanDetailId(projPlanListDetailCopy.getPlanDetailId());
+													projPlanListDetailCopy.setCreatSysType(3);
+													projPlanListDetailCopy.setProjPlanAmount(detailDto.getShouldConsultingFee());
+													projPlanListDetailCopy.setProjFactAmount(detailDto.getRepaidConsultingFee());
+													projPlanListDetailCopy.setCreateDate(new Date());
+													
+													planListDetailCopy.setPlanDetailId(UUID.randomUUID().toString());
+													planListDetailCopy.setFeeId(RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getUuid());
+													planListDetailCopy.setPlanItemName(RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getDesc());
+													planListDetailCopy.setPlanItemType(RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getValue());
+													planListDetailCopy.setPlanAmount(detailDto.getShouldConsultingFee());
+													planListDetailCopy.setFactAmount(detailDto.getRepaidConsultingFee());
+													planListDetailCopy.setCreateDate(new Date());
+													repaymentBizPlanListDetailService.insertOrUpdate(planListDetailCopy);
+													repaymentProjPlanListDetailService.insertOrUpdate(projPlanListDetailCopy);
 												}
 												if(isDifferent) {
 													RecordExceptionLog(dto, projDetail,null);	
@@ -352,7 +514,11 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 										}
 
 									}
+								
 									
+							
+								 
+								   
 									projPlanList.setOverdueDays(BigDecimal.valueOf(getOverDays(detailDto.getRefundDate())));
 									projPlanList.setDueDate(new Date(detailDto.getRefundDate()));
 									projPlanList.setOverdueAmount(detailDto.getTotalPenalty());
@@ -423,7 +589,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 		}
 		
 
-
+ 
 	
 	
 	private void RecordExceptionLog(NiWoProjPlanDto dto,RepaymentProjPlanListDetail projDetail,String projId) {
@@ -435,6 +601,9 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 			 sendJason=JSON.toJSONString(projDetail);
 			 log.setLogMessage("贷后生成的还款计划与你我金融生成的还款计划不一致");
 			log.setBusinessId(dto.getOrderNo());
+		}else if(projDetail==null){
+			 log.setLogMessage("贷后生成的还款计划与你我金融生成的还款计划不一致");
+				log.setBusinessId(dto.getOrderNo());
 		}else {
 			log.setLogMessage("超过3天没有同步到你我金融标的还款计划");
 			log.setBusinessId(projId);
@@ -782,5 +951,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 		return isLast;
 	}
 
-	
+	public static void main(String[] args) {
+		System.out.println(new Date(Long.valueOf("1532448000000")));
+	}
 }

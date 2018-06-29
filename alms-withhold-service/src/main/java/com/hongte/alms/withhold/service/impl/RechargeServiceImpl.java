@@ -313,9 +313,9 @@ public class RechargeServiceImpl implements RechargeService {
 						BigDecimal.valueOf(amount));
 
 				BankRechargeReqDto dto = new BankRechargeReqDto();
-				for (SysParameter bankChannel : bankChannels) {// 需要循环签约子渠道
+				for (SignedProtocol signedProtocol : signedProtocolList) {// 需要循环签约子渠道
 					dto.setAmount(amount);
-					dto.setChannelType(bankChannel.getParamValue());// 子渠道
+					dto.setChannelType(signedProtocol.getChannelType().toString());// 子渠道
 					dto.setRechargeUserId(bankCardInfo.getPlatformUserID());
 					dto.setCmOrderNo(merchOrderId);
 					dto.setOidPartner(oidPartner);

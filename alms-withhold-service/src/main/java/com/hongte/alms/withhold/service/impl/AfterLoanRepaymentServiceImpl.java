@@ -1,5 +1,6 @@
 package com.hongte.alms.withhold.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
@@ -48,14 +49,21 @@ public class AfterLoanRepaymentServiceImpl implements AfterLoanRepaymentService 
      * @param businessId 业务单号
      * @param afterId 期数
      * @param bankCard 银行卡号
-     * @return
+     * @return 返回代扣结果
      */
     @Override
     public Result submitAutoRepay(String businessId, String afterId, String bankCard) {
     	RepaymentBizPlanList repaymentBizPlanList=repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id",businessId).eq("after_id",afterId));
     	if(repaymentBizPlanList!=null){
-            if(repaymentBizPlanList.getSrcType()!=null && repaymentBizPlanList.getSrcType()==1){
-                return withHoldingClient.repayAssignBank(repaymentBizPlanList.getOrigBusinessId(),afterId,bankCard);
+    		//判断是否贷后代扣
+            if(repaymentBizPlanList.getSrcType()==null || repaymentBizPlanList.getSrcType().intValue()==1){
+                Result result = withHoldingClient.repayAssignBank(repaymentBizPlanList.getOrigBusinessId(),afterId,bankCard);
+                Object object = JSON.parse(result.getData().toString());
+                Result resultObj=new Result();
+                resultObj.setCode(result.getCode());
+                resultObj.setMsg(result.getMsg());
+                resultObj.setData(object);
+                return resultObj;
             }else {
                  withholdingService.appWithholding(repaymentBizPlanList);
                  Result result=new Result();
@@ -66,7 +74,7 @@ public class AfterLoanRepaymentServiceImpl implements AfterLoanRepaymentService 
         }else {
             Result result=new Result();
             result.setCode("500");
-            result.setMsg("找不到到对应的业务单号！");
+            result.setMsg("找不到对应的业务单号！");
             return result;
        }
     }
