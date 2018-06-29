@@ -84,12 +84,12 @@ public class DeductionController {
     @Autowired
     @Qualifier("MoneyPoolRepaymentService")
     MoneyPoolRepaymentService moneyPoolRepaymentService;
-    
-    
+
+
     @Autowired
     @Qualifier("RepaymentBizPlanListDetailService")
     RepaymentBizPlanListDetailService  repaymentBizPlanListDetailService;
-    
+
     @Autowired
     CustomerInfoXindaiRemoteApi customerInfoXindaiRemoteApi;
     
@@ -118,8 +118,8 @@ public class DeductionController {
 				}else {
 					return Result.error("-1", result.getMsg());
 				}
-        	
-        		
+
+
         	} catch (Exception e) {
         		return Result.error("-1", "调用信贷获取客户银行卡信息接口出错");
         	}
@@ -145,7 +145,7 @@ public class DeductionController {
             	BigDecimal underLineOverDueMoney=BigDecimal.valueOf(Double.valueOf(map.get("underLineOverDueMoney").toString()));
             	deductionVo.setOnLineOverDueMoney(onLineOverDueMoney);
             	deductionVo.setUnderLineOverDueMoney(underLineOverDueMoney);
-            
+
             	//查看当前期银行代扣的总金额
         		List<WithholdingRepaymentLog> bankList=withholdingRepaymentLogService.selectList(new EntityWrapper<WithholdingRepaymentLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).ne("repay_status", 0).eq("bind_platform_id", PlatformEnum.YH_FORM.getValue()));
         		BigDecimal bankRepayAmountSum=BigDecimal.valueOf(0);
@@ -160,9 +160,9 @@ public class DeductionController {
         		}else {
         			deductionVo.setCanUseThirty(true);
         		}
-            	
-            	
-            	
+
+
+
             	//查看是否共借标，共借标不能银行代扣
         		//deductionVo.setIssueSplitType(business.getIssueSplitType());
             	if(business.getSrcType()!=null&&business.getSrcType()==2) {
@@ -174,7 +174,7 @@ public class DeductionController {
 	        	
 	        		BigDecimal repayAmount=factAmountSum;
 	        		BigDecimal repayingAmount=BigDecimal.valueOf(0);
-	        	
+
 	        		for(WithholdingRepaymentLog log:repayingList) {
 	        			repayingAmount=repayingAmount.add(log.getCurrentAmount());
 	        		}
@@ -199,8 +199,8 @@ public class DeductionController {
 	          		BigDecimal factAmountSum=getPerListFactAmountSum(planList);
 	          		BigDecimal repayAmount=factAmountSum;
 	        		BigDecimal repayingAmount=BigDecimal.valueOf(0);
-	        	
-	        	
+
+
 	        		for(WithholdingRecordLog log:repayingList) {
 	        			repayingAmount=repayingAmount.add(log.getCurrentAmount());
 	        		}
@@ -312,7 +312,7 @@ public class DeductionController {
 		}
 		return isLast;
 	}	
-	
+
 	private BigDecimal getPerListFactAmountSum(RepaymentBizPlanList pList) {
 		List<RepaymentBizPlanListDetail> details=repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", pList.getPlanListId()));
 		BigDecimal factAmountSum=BigDecimal.valueOf(0);
@@ -320,9 +320,9 @@ public class DeductionController {
 			factAmountSum=factAmountSum.add(detail.getFactAmount()==null?BigDecimal.valueOf(0):detail.getFactAmount());
 		}
 		return factAmountSum;
-		
+
 	}
-   
+
 
    }
    

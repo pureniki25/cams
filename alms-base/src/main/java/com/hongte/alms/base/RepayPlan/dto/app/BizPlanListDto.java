@@ -26,6 +26,11 @@ public class BizPlanListDto  implements Serializable {
 
     private BigDecimal derateAmount;//减免金额
 
+    private BigDecimal  factPayAmount;//实还金额
+
+
+
+
     @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     private Date payDate;  //实还日期
 
@@ -130,5 +135,13 @@ public class BizPlanListDto  implements Serializable {
 
     public void setDerateAmount(BigDecimal derateAmount) {
         this.derateAmount = derateAmount;
+    }
+
+    public BigDecimal getFactPayAmount() {
+        return factPayAmount;
+    }
+
+    public void setFactPayAmount(BigDecimal factPayAmount) {
+        this.factPayAmount = factPayAmount;
     }
 }

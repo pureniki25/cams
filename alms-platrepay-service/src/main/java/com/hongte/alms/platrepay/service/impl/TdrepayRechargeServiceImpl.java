@@ -193,6 +193,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		rechargeLog.setFactRepayAmount(vo.getFactRepayAmount());
 		rechargeLog.setRechargeAmount(vo.getRechargeAmount());
 		rechargeLog.setIsComplete(vo.getIsComplete());
+		rechargeLog.setTdUserId(vo.getTdUserId());
 
 		if (StringUtil.notEmpty(vo.getProjPlanListId())) {
 			rechargeLog.setProjPlanListId(vo.getProjPlanListId());

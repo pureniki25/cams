@@ -3,6 +3,7 @@ package com.hongte.alms.finance.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.google.common.collect.Maps;
 import com.hongte.alms.base.RepayPlan.dto.*;
 import com.hongte.alms.base.dto.ConfirmRepaymentReq;
 import com.hongte.alms.base.entity.*;
@@ -15,6 +16,7 @@ import com.hongte.alms.base.enums.repayPlan.RepayPlanRepaySrcEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.enums.repayPlan.SectionRepayStatusEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
+import com.hongte.alms.base.feignClient.AlmsOpenServiceFeignClient;
 import com.hongte.alms.base.feignClient.PlatformRepaymentFeignClient;
 import com.hongte.alms.base.mapper.*;
 import com.hongte.alms.base.process.mapper.ProcessMapper;
@@ -79,6 +81,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	MoneyPoolRepaymentMapper moneyPoolRepaymentMapper;
 	@Autowired
 	LoginUserInfoHelper loginUserInfoHelper;
+
 	@Autowired
 	Executor executor;
 
@@ -102,6 +105,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 
 	@Autowired
 	private PlatformRepaymentFeignClient platformRepaymentFeignClient;
+
+	@Autowired
+	private AlmsOpenServiceFeignClient almsOpenServiceFeignClient;
 
 	@Autowired
 	@Qualifier("RepaymentProjPlanListService")
@@ -585,7 +591,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		}
 
 		Collections.sort(repaymentProjPlanDtos, new Comparator<RepaymentProjPlanDto>() {
-			// 排序规则说明 需补充
+			// 排序规则说明 需补充 从小标到大标，再到主借标
+			//同等
 			@Override
 			public int compare(RepaymentProjPlanDto arg0, RepaymentProjPlanDto arg1) {
 				if (arg0.getTuandaiProjectInfo().getMasterIssueId()
@@ -1091,7 +1098,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 					RepaymentProjPlanListDetail detail = repaymentProjPlanListDetailDto
 							.getRepaymentProjPlanListDetail();
 					boolean bl = payOneFeeDetail(detail, currPeriodProjDetailVO, null);
-					if (!bl) {
+					if (!bl && realPayedAmount.get() != null) {
 						lastPaySuc = false;
 						break;
 					}
@@ -1911,8 +1918,47 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 
 
 		//下面要触发往信贷更新还未计划数据，直接调用open中的接口方法。 张贵宏 2018.06.28
-
+		executor.execute(() -> {
+			logger.info("触发往信贷更新还未计划数据开始，businessId:[{}]", businessId);
+			updateRepayPlanToLMS(businessId);
+			logger.info("触发往信贷更新还未计划数据结束，businessId:[{}]", businessId);
+		});
 	}
+
+
+	/*
+	 *  还款计划相关数据有变更后需要向信贷系统推送最新数据
+	 *
+	 * @param businessId 业务id
+	 * @return void
+	 * @author 张贵宏
+	 * @date 2018/6/28 17:32
+	 */
+	private void updateRepayPlanToLMS(String businessId) {
+		Result result = null;
+		Map<String, Object> paramMap = Maps.newHashMap();
+		paramMap.put("businessId", businessId);
+		try {
+
+			result = almsOpenServiceFeignClient.updateRepayPlanToLMS(paramMap);
+			if (result == null || !"1".equals(result.getCode())) {
+
+				sysApiCallFailureRecordService.save(
+						AlmsServiceNameEnums.FINANCE,
+						Constant.INTERFACE_CODE_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
+						Constant.INTERFACE_NAME_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
+						businessId, JSON.toJSONString(paramMap), null, JSON.toJSONString(result), null, loginUserInfoHelper.getUserId());
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			sysApiCallFailureRecordService.save(
+					AlmsServiceNameEnums.FINANCE,
+					Constant.INTERFACE_CODE_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
+					Constant.INTERFACE_NAME_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
+					businessId, JSON.toJSONString(paramMap), null, e.getMessage(), null, loginUserInfoHelper.getUserId());
+		}
+	}
+
 
 	private void tdrepayRecharge(String confirmLogId, String busId, String afterId) {
 
