@@ -1495,16 +1495,16 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	 */
 	private void setRepayConfirmedFlag(RepaymentBizPlanList bizjPlanList) {
 		RepaymentResource repaymentResource = repaymentResources.get().get(repaymentResources.get().size() - 1);
-		if (repaymentResource.getRepaySource().equals(10)) {
+		if (repaymentResource.getRepaySource().equals("10")) {
 			bizjPlanList.setRepayFlag(RepayedFlag.CONFIRM_OFFLINE_REPAYED.getKey());
 		}
-		if (repaymentResource.getRepaySource().equals(11)) {
+		if (repaymentResource.getRepaySource().equals("11")) {
 			bizjPlanList.setRepayFlag(RepayedFlag.CONFIRM_OFFLINE_REPAYED.getKey());
 		}
-		if (repaymentResource.getRepaySource().equals(20)) {
+		if (repaymentResource.getRepaySource().equals("20")) {
 			bizjPlanList.setRepayFlag(RepayedFlag.AUTO_WITHHOLD_OFFLINE_REPAYED.getKey());
 		}
-		if (repaymentResource.getRepaySource().equals(30)) {
+		if (repaymentResource.getRepaySource().equals("30")) {
 			bizjPlanList.setRepayFlag(RepayedFlag.AUTO_BANK_WITHHOLD_REPAYED.getKey());
 		}
 	}
