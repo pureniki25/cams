@@ -95,11 +95,11 @@
             </if>
             <!--             /*减免金额 开始*/-->
             <if test="derateMoneyBegin !=null ">
-                <![CDATA[ and derate.derate_money >= #{derateMoneyBegin}]]>
+                <![CDATA[ and derate.derate_money_total >= #{derateMoneyBegin}]]>
             </if>
             <!--       /*减免金额 结束*/ -->
             <if test="derateMoneyEnd !=null ">
-                <![CDATA[ and derate.derate_money <= #{derateMoneyEnd}]]>
+                <![CDATA[ and derate.derate_money_total <= #{derateMoneyEnd}]]>
             </if>
             <if test="userId !=null and userId !=''">
                 and permission.user_id = #{userId}
