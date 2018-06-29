@@ -1,5 +1,6 @@
 package com.hongte.alms.withhold.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
@@ -48,7 +49,7 @@ public class AfterLoanRepaymentServiceImpl implements AfterLoanRepaymentService 
      * @param businessId 业务单号
      * @param afterId 期数
      * @param bankCard 银行卡号
-     * @return 代扣结果
+     * @return 返回代扣结果
      */
     @Override
     public Result submitAutoRepay(String businessId, String afterId, String bankCard) {
@@ -56,7 +57,13 @@ public class AfterLoanRepaymentServiceImpl implements AfterLoanRepaymentService 
     	if(repaymentBizPlanList!=null){
     		//判断是否贷后代扣
             if(repaymentBizPlanList.getSrcType()==null || repaymentBizPlanList.getSrcType().intValue()==1){
-                return withHoldingClient.repayAssignBank(repaymentBizPlanList.getOrigBusinessId(),afterId,bankCard);
+                Result result = withHoldingClient.repayAssignBank(repaymentBizPlanList.getOrigBusinessId(),afterId,bankCard);
+                Object object = JSON.parse(result.getData().toString());
+                Result resultObj=new Result();
+                resultObj.setCode(result.getCode());
+                resultObj.setMsg(result.getMsg());
+                resultObj.setData(object);
+                return resultObj;
             }else {
                  withholdingService.appWithholding(repaymentBizPlanList);
                  Result result=new Result();
