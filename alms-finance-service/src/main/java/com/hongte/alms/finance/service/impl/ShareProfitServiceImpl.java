@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -187,6 +188,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 
 	private void initVariable(ConfirmRepaymentReq req) {
 		businessId.set(req.getBusinessId());
+		orgBusinessId.set(selectOrgBusinessId(req));
 		afterId.set(req.getAfterId());
 		remark.set(req.getRemark());
 		projListDetails.set(new ArrayList<>());
@@ -210,6 +212,18 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		curalResource.set(null);
 		curalDivideAmount.set(null);
 		realPayedAmount.set(null);
+	}
+
+
+	public String selectOrgBusinessId(ConfirmRepaymentReq req){
+		String orgBusinessId=null;
+		List<RepaymentBizPlanList> repaymentBizPlanLists = repaymentBizPlanListMapper
+				.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", req.getBusinessId())
+						.eq("after_id", req.getAfterId()).orderBy("after_id"));
+		if(!CollectionUtils.isEmpty(repaymentBizPlanLists)){
+			orgBusinessId=repaymentBizPlanLists.get(0).getOrigBusinessId();
+		}
+		return orgBusinessId;
 	}
 
 	@Override
@@ -328,6 +342,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 				repaymentResource.setRepayDate(moneyPoolRepayment.getTradeDate());
 				repaymentResource.setRepaySource(RepayPlanRepaySrcEnum.OFFLINE_TRANSFER.getValue().toString());
 				repaymentResource.setRepaySourceRefId(moneyPoolRepayment.getId().toString());
+				repaymentResource.setConfirmLogId(confirmLog.get().getConfirmLogId());
 				if (save.get()) {
 					confirmLog.get().setRepayDate(repaymentResource.getRepayDate());
 					repaymentResource.insert();
@@ -426,6 +441,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			repaymentResource.setIsCancelled(0);
 			repaymentResource.setRepayAmount(req.getSurplusFund());
 			repaymentResource.setRepayDate(new Date());
+			//11:用往期结余还款',
 			repaymentResource.setRepaySource("11");
 			if (save.get()) {
 				repaymentResource.setRepaySourceRefId(accountantOverRepayLog.getId().toString());
@@ -828,7 +844,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 								}
 							}
 						}
-						showPayOverDue = payedOverDue.subtract(payedOverDue);
+						showPayOverDue = planOverDue.subtract(payedOverDue);
 						// 如果应还的滞纳金比剩余的少
 						if (showPayOverDue.compareTo(moneyCopy) < 0) {
 							dmoney = showPayOverDue;
@@ -1514,6 +1530,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		}
 		repaymentConfirmLog.setOrgBusinessId(orgBusinessId.get());
 		repaymentConfirmLog.setProjPlanJson(JSON.toJSONString(projListDetails.get()));
+		repaymentConfirmLog.setRepaySource(callFlage.get());
+
 		return repaymentConfirmLog;
 	}
 

@@ -431,7 +431,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													projPlanListDetailCopy.setPlanItemType(RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE.getValue());
 													projPlanListDetailCopy.setPlanDetailId(projPlanListDetailCopy.getPlanDetailId());
 													projPlanListDetailCopy.setCreatSysType(3);
-													projPlanListDetailCopy.setProjFactAmount(detailDto.getCommissionGuaranteFee());
+													projPlanListDetailCopy.setProjPlanAmount(detailDto.getCommissionGuaranteFee());
 													projPlanListDetailCopy.setProjFactAmount(detailDto.getRepaidCommissionGuaranteFee());
 													projPlanListDetailCopy.setCreateDate(new Date());
 				
@@ -459,7 +459,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													projPlanListDetailCopy.setPlanItemType(RepayPlanFeeTypeEnum.PLAT_CHARGE.getValue());
 													projPlanListDetailCopy.setPlanDetailId(projPlanListDetailCopy.getPlanDetailId());
 													projPlanListDetailCopy.setCreatSysType(3);
-													projPlanListDetailCopy.setProjFactAmount(detailDto.getPlatformManageFee());
+													projPlanListDetailCopy.setProjPlanAmount(detailDto.getPlatformManageFee());
 													projPlanListDetailCopy.setProjFactAmount(detailDto.getRepaidPlatformManageFee());
 													projPlanListDetailCopy.setCreateDate(new Date());
 													
@@ -485,7 +485,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													projPlanListDetailCopy.setPlanItemType(RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getValue());
 													projPlanListDetailCopy.setPlanDetailId(projPlanListDetailCopy.getPlanDetailId());
 													projPlanListDetailCopy.setCreatSysType(3);
-													projPlanListDetailCopy.setProjFactAmount(detailDto.getShouldConsultingFee());
+													projPlanListDetailCopy.setProjPlanAmount(detailDto.getShouldConsultingFee());
 													projPlanListDetailCopy.setProjFactAmount(detailDto.getRepaidConsultingFee());
 													projPlanListDetailCopy.setCreateDate(new Date());
 													
@@ -493,8 +493,8 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													planListDetailCopy.setFeeId(RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getUuid());
 													planListDetailCopy.setPlanItemName(RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getDesc());
 													planListDetailCopy.setPlanItemType(RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getValue());
-													planListDetailCopy.setPlanAmount(detailDto.getPlatformManageFee());
-													planListDetailCopy.setFactAmount(detailDto.getRepaidPlatformManageFee());
+													planListDetailCopy.setPlanAmount(detailDto.getShouldConsultingFee());
+													planListDetailCopy.setFactAmount(detailDto.getRepaidConsultingFee());
 													planListDetailCopy.setCreateDate(new Date());
 													repaymentBizPlanListDetailService.insertOrUpdate(planListDetailCopy);
 													repaymentProjPlanListDetailService.insertOrUpdate(projPlanListDetailCopy);
