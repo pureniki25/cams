@@ -575,7 +575,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		}
 
 		Collections.sort(repaymentProjPlanDtos, new Comparator<RepaymentProjPlanDto>() {
-			// 排序规则说明 需补充
+			// 排序规则说明 需补充 从小标到大标，再到主借标
+			//同等
 			@Override
 			public int compare(RepaymentProjPlanDto arg0, RepaymentProjPlanDto arg1) {
 				if (arg0.getTuandaiProjectInfo().getMasterIssueId()
@@ -806,7 +807,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 								}
 							}
 						}
-						showPayOverDue = payedOverDue.subtract(payedOverDue);
+						showPayOverDue = planOverDue.subtract(payedOverDue);
 						// 如果应还的滞纳金比剩余的少
 						if (showPayOverDue.compareTo(moneyCopy) < 0) {
 							dmoney = showPayOverDue;
@@ -1010,7 +1011,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 						if (detail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
 							boolean bl = payOneFeeDetail(detail, currPeriodProjDetailVO, onLineOverDue);
 							if (bl && realPayedAmount.get() != null) {
-								onLineOverDue = onLineOverDue.divide(realPayedAmount.get());
+								onLineOverDue = onLineOverDue.subtract(realPayedAmount.get());
 							} else {
 								lastPaySuc = false;
 								break;
@@ -1046,7 +1047,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 						if (detail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
 							boolean bl = payOneFeeDetail(detail, currPeriodProjDetailVO, onLineOverDue);
 							if (bl && realPayedAmount.get() != null) {
-								onLineOverDue = onLineOverDue.divide(realPayedAmount.get());
+								onLineOverDue = onLineOverDue.subtract(realPayedAmount.get());
 								if (onLineOverDue.compareTo(new BigDecimal("0")) < 0) {
 									logger.error("还线上滞纳金还多了：repaymentProjPlanDto:[{}]",
 											JSON.toJSONString(repaymentProjPlanDto));
@@ -1081,7 +1082,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 					RepaymentProjPlanListDetail detail = repaymentProjPlanListDetailDto
 							.getRepaymentProjPlanListDetail();
 					boolean bl = payOneFeeDetail(detail, currPeriodProjDetailVO, null);
-					if (!bl) {
+					if (!bl && realPayedAmount.get() != null) {
 						lastPaySuc = false;
 						break;
 					}

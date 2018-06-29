@@ -27,7 +27,7 @@ window.layinit = function (cb) {
             htConfig.withholdBasePath = htConfig.withholdBasePath;
             htConfig.platRepayBasePath = htConfig.platRepayBasePath;
             htConfig.uiBasePath = htConfig.uiBasePath;
-        axios.defaults.headers.common['userId'] = htConfig.defaultUser;
+            axios.defaults.headers.common['userId'] = htConfig.defaultUser;
         }else{
             // htConfig.basePath =  htConfig.basePath +"core/"
             htConfig.coreBasePath = htConfig.basePath +"core/";
@@ -40,7 +40,8 @@ window.layinit = function (cb) {
         //axios 访问前处理token问题
         axios.interceptors.request.use(function (config) {
             layui.ht_ajax.validationAndRefreshToken()
-            axios.defaults.headers.common['Authorization'] = 'Bearer ' + getToken();
+           // axios.defaults.headers.common['Authorization'] = 'Bearer ' + getToken();
+            config.headers.Authorization = 'Bearer ' + getToken();
             return config;
         }, function (error) {
             // 对请求错误做些什么
@@ -115,8 +116,8 @@ var authValid = function(param) {
 
 
 	getAuth();
-    for (var i = 0; i < allAuth.length; i++) {
-        if(menuCode == undefined){
+	for (var i = 0; i < allAuth.length; i++) {
+	    if(menuCode == undefined){
             if (allAuth[i].resContent == param){
                 return true;
             }
@@ -126,7 +127,7 @@ var authValid = function(param) {
             }
         }
 
-    }
+	}
 	return false;
 }
 

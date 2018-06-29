@@ -282,7 +282,7 @@ public class ApplyDerateController {
 				}
 
 				// 只是为了页面填充表格效果
-				if (otherDerateTypeList.size() % 3 > 0) {
+				if (CollectionUtils.isNotEmpty(otherDerateTypeList) && (otherDerateTypeList.size() % 3) > 0) {
 					int length = otherDerateTypeList.size() % 3;
 					length = 3 - length;
 					for (int i = 0; i < length; i++) {

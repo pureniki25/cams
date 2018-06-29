@@ -65,6 +65,9 @@ public class CollectionTransferController {
 	//异步执行线程10执行标志位
 	private  static Boolean thread10Execute = false;
 
+	//同步单个用户的催收数据执行标志位
+	private  static Boolean oneUserColRunning = false;
+
 	@Autowired
 	@Qualifier("CollectionService")
 	private CollectionService collectionService;
@@ -436,6 +439,41 @@ public class CollectionTransferController {
 	}
 
 
+	@ApiModelProperty("同步指定业务或期数的电催数据")
+	@GetMapping("/transferOneUserCollection")
+	@ResponseBody
+	public Result transferOneUserCollection(String userId){
+
+		if(oneUserColRunning){
+			return Result.error("111111","同步程序执行中，请执行完再访问");
+		}
+		if(userId!=null){
+			List<CarBusinessAfter>  afterList = carBusinessAfterService.selectList(
+					new EntityWrapper<CarBusinessAfter>().
+							eq("collection_user",userId));
+			if(afterList!=null && afterList.size()>0){
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+						oneUserColRunning = true;
+						try{
+							for (CarBusinessAfter carBusinessAfter : afterList) {
+								boolean bl = transPhoneSet(carBusinessAfter,CollectionSetWayEnum.XINDAI_LOG);
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
+						}
+						oneUserColRunning=false;
+					}
+				});
+			}
+
+		}
+
+		return Result.success();
+
+	}
 
 	@ApiModelProperty("同步上门催收数据")
 	@GetMapping("/transferVisit")
@@ -736,80 +774,7 @@ public class CollectionTransferController {
 //		runningFlage = false;
 		return Result.success();
 
-//
-//		int count = collectionService.queryNotTransferCollectionCount();
-//		for (int i = 0; i <= count / 100 + 1; i++) {
-//
-//			CollectionReq req = new CollectionReq();
-//			req.setOffSet(i * 100);
-//			req.setPageSize(100);
-//
-//			List<Collection> collectionList = collectionService.queryNotTransferCollection(req);
-//
-//			if (CollectionUtils.isEmpty(collectionList)) {
-//				continue;
-//			}
-//
-//			for (Collection collection : collectionList) {
-//				Map<String, Object> map = getStatus(collection);
-//				if (map == null) {
-//					continue;
-//				}
-//				try{
-//					transferAlmsStatus(map,collection.getBusinessId() ,collection.getAfterId());
-//				}catch (Exception e){
-//
-//					e.printStackTrace();
-//					LOGGER.error("导入数据异常：collection   ， businessID:"+collection.getBusinessId()+"     afterId:"+collection.getAfterId()+  e.getMessage());
-//				}
-//
-////				CollectionStatus collectionStatus = (CollectionStatus) map.get("status");
-////				CollectionLog collectionLog = (CollectionLog) map.get("log");
-////
-////                CollectionStatus status = collectionStatusService.selectOne(new EntityWrapper<CollectionStatus>().eq("business_id",collectionStatus.getBusinessId()).eq("crp_id",collectionStatus.getCrpId()));
-////                if(status == null){
-////                    collectionStatusService.insertOrUpdate(collectionStatus);
-////                    transferFailLogService.delete(new EntityWrapper<TransferFailLog>().eq("business_id",collection.getBusinessId()).eq("after_id",collection.getAfterId()));
-////                }
-////                CollectionLog log = collectionLogService.selectOne(new EntityWrapper<CollectionLog>().eq("business_id",collectionLog.getBusinessId()).eq("crp_id",collectionLog.getCrpId()));
-////                if(log == null){
-////                    collectionLogService.insertOrUpdate(collectionLog);
-////                    transferFailLogService.delete(new EntityWrapper<TransferFailLog>().eq("business_id",collection.getBusinessId()).eq("after_id",collection.getAfterId()));
-////                }
-//
-//			}
-//		}
-//
-//		count = collectionLogXdService.queryNotTransferCollectionLogCount();
-//		for (int i = 0; i <= count / 100 + 1; i++) {
-//
-//			CollectionReq req = new CollectionReq();
-//			req.setOffSet(i * 100);
-//			req.setPageSize(100);
-//
-//			List<CollectionLogXd> xdList = collectionLogXdService.queryNotTransferCollectionLog(req);
-//
-//			if (CollectionUtils.isEmpty(xdList)) {
-//				continue;
-//			}
-//
-//			for (CollectionLogXd collectionLogXd : xdList) {
-//				Map<String, Object> map = getStatus(collectionLogXd);
-//				if (map == null) {
-//					continue;
-//				}
-//				try{
-//					transferAlmsStatus(map,collectionLogXd.getBusinessId() ,collectionLogXd.getAfterId());
-//				}catch (Exception e){
-//
-//					e.printStackTrace();
-//					LOGGER.error("导入数据异常：collectionLogXd   ， businessID:"+collectionLogXd.getBusinessId()+"     afterId:"+collectionLogXd.getAfterId()+  e.getMessage());
-//				}
-//			}
-//
-//		}
 
-//		return Result.success();
 	}
 
 
