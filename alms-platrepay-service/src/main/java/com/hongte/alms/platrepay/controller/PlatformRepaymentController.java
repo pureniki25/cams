@@ -255,6 +255,10 @@ public class PlatformRepaymentController {
             vo.setCompanyName(basicBusiness.getCompanyName());
             //处理转换 还款来源，10：线下转账，11:用往期结余还款(归类到线下转账吧),20：线下代扣，30：银行代扣
             //到接口 还款来源，1:线下转账,2:第三方代扣,3:银行代扣,4:APP网关充值,5:协议代扣
+            if (repaymentConfirmLog.getRepaySource() == null) {
+                LOGGER.error("@对接合规还款接口@ 指定的还款日志记录的还款来源为空 输入参数confirmLogId:[{}]", confirmLogId);
+                return Result.error("指定的还款日志记录的还款来源为空");
+            }
             vo.setRepaySource(RepayPlanPayedTypeEnum.getByValue(repaymentConfirmLog.getRepaySource()).getClassifyId());
             vo.setConfirmTime(repaymentBizPlanList.getFinanceComfirmDate());
             vo.setAfterId(afterId);
