@@ -10,9 +10,13 @@ import com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo;
 import com.hongte.alms.base.collection.vo.StaffBusinessVo;
 import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.entity.SysUser;
+import com.hongte.alms.base.entity.SysUserRole;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
+import com.hongte.alms.base.enums.SysRoleEnums;
+import com.hongte.alms.base.enums.UserTypeEnum;
 import com.hongte.alms.base.service.BasicCompanyService;
 import com.hongte.alms.base.service.SysParameterService;
+import com.hongte.alms.base.service.SysUserRoleService;
 import com.hongte.alms.base.service.SysUserService;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.ht.ussp.bean.LoginUserInfoHelper;
@@ -51,6 +55,11 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
     @Autowired
     @Qualifier("SysUserService")
     SysUserService sysUserService;
+
+    @Autowired
+    @Qualifier("SysUserRoleService")
+    SysUserRoleService sysUserRoleService;
+
 
     @Autowired
     @Qualifier("BasicCompanyService")
@@ -233,6 +242,20 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
 
         String userId = loginUserInfoHelper.getUserId();
         req.setUserId(userId);
+
+        if(userId!=null){
+            List<SysUserRole> list = sysUserRoleService.selectList(new EntityWrapper<SysUserRole>().eq("user_id",userId));
+            //有且只有一个角色，
+            if(list!=null&&list.size()==1){
+                //为清算一
+                if(list.get(0).getRoleCode().equals(SysRoleEnums.HD_LIQ_COMMISSIONER.getKey())){
+                    //设置用户类型为1：电催专员
+                    req.setUserType(1);
+                }
+            }
+        }
+
+
         //设置只能查询已分配的任务
         //查找用户跟进的业务ID
         if(req.getJustCheckMine()!=null && req.getJustCheckMine()) {
