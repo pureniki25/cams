@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -152,6 +151,9 @@ public class TdrepayRechargeController {
 		}
 		if (vo.getIsComplete() == null) {
 			return Result.error(INVALID_PARAM_CODE, "isComplete" + INVALID_PARAM_DESC);
+		}
+		if (vo.getConfirmTime() == null) {
+			return Result.error(INVALID_PARAM_CODE, "confirmTime" + INVALID_PARAM_DESC);
 		}
 		if (CollectionUtils.isEmpty(vo.getDetailList())) {
 			return Result.error(INVALID_PARAM_CODE, "detailList" + INVALID_PARAM_DESC);
@@ -654,5 +656,17 @@ public class TdrepayRechargeController {
 			return Result.error("-99", e.getMessage());
 		}
 	}
+	
+//	@ApiOperation(value = "查看充值记录")
+//	@PostMapping("/queryRechargeRecord")
+//	@ResponseBody
+//	public Result<AgencyRechargeLogVO> queryRechargeRecord(@RequestBody RechargeRecordReq vo) {
+//		try {
+//			return Result.success();
+//		} catch (Exception e) {
+//			LOG.error(e.getMessage(), e);
+//			return Result.error("-99", e.getMessage());
+//		}
+//	}
 
 }
