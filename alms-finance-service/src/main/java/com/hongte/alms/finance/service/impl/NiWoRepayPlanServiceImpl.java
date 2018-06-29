@@ -177,6 +177,8 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 										projListDetail.setCreatSysType(3);
 										repaymentProjPlanListDetailService.insertOrUpdate(projListDetail);
 										projPlanList.setOverdueAmount(detailDto.getTotalPenalty());
+										projPlanList.setOverdueDays(BigDecimal.valueOf(getOverDays(detailDto.getRefundDate())));
+										projPlanList.setDueDate(new Date(detailDto.getRefundDate()));
 										}catch(Exception e) {
 											logger.info("你我金融更新滞纳金错误"+e);
 										}
@@ -226,6 +228,8 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 										planListDetailCopy.setCreateDate(new Date());
 										repaymentBizPlanListDetailService.insertOrUpdate(planListDetailCopy);
 										pList.setOverdueAmount(detailDto.getTotalPenalty());
+										pList.setDueDate(new Date(detailDto.getRefundDate()));
+										pList.setOverdueDays(BigDecimal.valueOf(getOverDays(detailDto.getRefundDate())));
 									}catch(Exception e) {
 										logger.info("你我金融更新滞纳金错误"+e);
 									}
@@ -947,5 +951,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 		return isLast;
 	}
 
-	
+	public static void main(String[] args) {
+		System.out.println(new Date(Long.valueOf("1532448000000")));
+	}
 }
