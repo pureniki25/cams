@@ -142,6 +142,18 @@ public class ApplyDerateProcess extends Model<ApplyDerateProcess> {
 	@TableField("is_settle")
 	@ApiModelProperty(required= true,value = "是否结清标志位: 0 不结清， 1结清")
 	private Integer isSettle;
+	
+	@TableField("derate_money_total")
+	@ApiModelProperty(required= false,value = "减免总金额-统计字段")
+	private BigDecimal derateMoneyTotal;
+
+	public BigDecimal getDerateMoneyTotal() {
+		return derateMoneyTotal;
+	}
+
+	public void setDerateMoneyTotal(BigDecimal derateMoneyTotal) {
+		this.derateMoneyTotal = derateMoneyTotal;
+	}
 
 	public BigDecimal getOutsideInterest() {
 		return outsideInterest;

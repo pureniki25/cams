@@ -196,6 +196,8 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
         applyInfo.setUpdateUser(loginUserInfoHelper.getUserId());
 
         insertOrUpdate(applyInfo);
+        //设置总金额，解决查询 减免金额范围问题
+        setDerateMoneyTotal(applyInfo);
         RepaymentBizPlanList pList= repaymentBizPlanListService.selectById(crpId);
         //减免金额        
         ApplyDerateType applyDerateType = null;
@@ -209,10 +211,8 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
         		List<RepaymentBizPlanListDetail> list=new ArrayList();
         		if(applyDerateType.getFeeId()==null) {
         			 list=repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", req.getCrpId()).eq("business_id", pList.getBusinessId()).isNull("fee_id"));
-		
         		}else {
             		  list=repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", req.getCrpId()).eq("business_id", pList.getBusinessId()).eq("fee_id", applyDerateType.getFeeId()));
-
         		}
         		if(list!=null&&list.size()>0) {
         			//减免金额不能大于费用项应还金额
@@ -246,8 +246,6 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
 	        		//applyDerateType.setBeforeDerateMoney(detail.getPlanAmount());
 	        		applyDerateType.setCreateUser(loginUserInfoHelper.getUserId());
         		}
-        		
-        	
         	}
         
         	applyDerateType.setUpdateTime(new Date());
@@ -257,7 +255,7 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
         }
   
         applyDerateTypeService.insertOrUpdateBatch(newTypes);
-        
+        //for(applyDerateProcessMap)
       //新增的时候
         if(otherFeeEditFlage.equals("0")) {
 		        //保存其他费用
@@ -297,6 +295,18 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
     }
         
     }
+    
+    //设置申请总金额
+    private void setDerateMoneyTotal(ApplyDerateProcess applyDerateProcess){
+            List<ApplyDerateType> applyTypeVoList= applyDerateTypeService.selectList(new EntityWrapper<ApplyDerateType>().eq("apply_derate_process_id", applyDerateProcess.getApplyDerateProcessId()));
+            //减免管理显示减免费用项名称,和计算减免金额
+            BigDecimal derateMoney=BigDecimal.valueOf(0);	
+            for(int i=0;i<applyTypeVoList.size();i++) {
+            	derateMoney=derateMoney.add(applyTypeVoList.get(i).getDerateMoney());
+            }
+            applyDerateProcess.setDerateMoneyTotal(derateMoney);
+            insertOrUpdate(applyDerateProcess);
+      }
 
     private void updateRepayPlan(RepaymentBizPlanList planList,List<ApplyDerateType> newTypes) {
     	BigDecimal derateAmount = new BigDecimal("0");
@@ -527,7 +537,6 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
         }
 
         pages.setRecords(setApplyDerateVoListInfo(list));
-
 
         return pages;
     }
