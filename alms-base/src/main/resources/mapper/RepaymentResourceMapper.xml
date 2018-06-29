@@ -9,6 +9,7 @@
         <result column="org_business_id" property="orgBusinessId" />
         <result column="after_id" property="afterId" />
         <result column="repay_date" property="repayDate" />
+        <result column="confirm_log_id" property="confirmLogId" />
         <result column="repay_amount" property="repayAmount" />
         <result column="repay_source" property="repaySource" />
         <result column="repay_source_ref_id" property="repaySourceRefId" />
@@ -21,7 +22,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        resource_id AS resourceId, business_id AS businessId, org_business_id AS orgBusinessId, after_id AS afterId, repay_date AS repayDate, repay_amount AS repayAmount, repay_source AS repaySource, repay_source_ref_id AS repaySourceRefId, is_cancelled AS isCancelled, create_user AS createUser, create_date AS createDate, update_user AS updateUser, udpate_time AS udpateTime
+        resource_id AS resourceId, business_id AS businessId, org_business_id AS orgBusinessId, after_id AS afterId, repay_date AS repayDate,confirm_log_id AS confirmLogId, repay_amount AS repayAmount, repay_source AS repaySource, repay_source_ref_id AS repaySourceRefId, is_cancelled AS isCancelled, create_user AS createUser, create_date AS createDate, update_user AS updateUser, udpate_time AS udpateTime
     </sql>
 
 </mapper>

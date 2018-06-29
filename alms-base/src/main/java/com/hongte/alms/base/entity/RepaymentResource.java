@@ -55,6 +55,15 @@ public class RepaymentResource extends Model<RepaymentResource> {
 	@TableField("repay_date")
 	@ApiModelProperty(required= true,value = "还款日期")
 	private Date repayDate;
+
+	/**
+	 * 还款确认Id
+	 */
+	@TableField("confirm_log_id")
+	@ApiModelProperty(required= true,value = "还款确认Id")
+	private String confirmLogId;
+
+
     /**
      * 还款金额,单位:元
      */
@@ -150,6 +159,14 @@ public class RepaymentResource extends Model<RepaymentResource> {
 
 	public Date getRepayDate() {
 		return repayDate;
+	}
+
+	public String getConfirmLogId() {
+		return confirmLogId;
+	}
+
+	public void setConfirmLogId(String confirmLogId) {
+		this.confirmLogId = confirmLogId;
 	}
 
 	public void setRepayDate(Date repayDate) {
