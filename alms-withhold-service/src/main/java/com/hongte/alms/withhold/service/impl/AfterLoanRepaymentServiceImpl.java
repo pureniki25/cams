@@ -54,7 +54,7 @@ public class AfterLoanRepaymentServiceImpl implements AfterLoanRepaymentService 
     public Result submitAutoRepay(String businessId, String afterId, String bankCard) {
     	RepaymentBizPlanList repaymentBizPlanList=repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id",businessId).eq("after_id",afterId));
     	if(repaymentBizPlanList!=null){
-            if(repaymentBizPlanList.getSrcType()!=null && repaymentBizPlanList.getSrcType()==1){
+            if(repaymentBizPlanList.getSrcType()==null || repaymentBizPlanList.getSrcType().intValue()==1){
                 return withHoldingClient.repayAssignBank(repaymentBizPlanList.getOrigBusinessId(),afterId,bankCard);
             }else {
                  withholdingService.appWithholding(repaymentBizPlanList);
