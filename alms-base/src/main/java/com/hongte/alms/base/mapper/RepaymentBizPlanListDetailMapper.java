@@ -1,5 +1,9 @@
 package com.hongte.alms.base.mapper;
 
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Param;
+
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.common.mapper.SuperMapper;
 
@@ -13,4 +17,6 @@ import com.hongte.alms.common.mapper.SuperMapper;
  */
 public interface RepaymentBizPlanListDetailMapper extends SuperMapper<RepaymentBizPlanListDetail> {
 
+	Map<String,Object> totalRepaymentFactAmount(@Param(value="origBusinessId") String origBusinessId);
+	
 }
