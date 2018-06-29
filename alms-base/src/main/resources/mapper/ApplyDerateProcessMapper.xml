@@ -30,6 +30,7 @@
             parameterType="com.hongte.alms.base.vo.module.ApplyDerateListSearchReq">
 
         select
+        pList.orig_business_id as origBusinessId,
         derate.apply_derate_process_id as applyDerateProcessId,
         business.business_id AS businessId,
         pList.period as  periods,
@@ -46,7 +47,7 @@
  
 
   
-<!--           a.realPay as realPayMoney, -->
+    <!--       a.realPay as realPayMoney, -->
         derate.create_time as derateTime
         
         
@@ -55,7 +56,7 @@
         from tb_apply_derate_process  as derate
         LEFT JOIN tb_repayment_biz_plan_list  as pList ON   derate.crp_id = pList.plan_list_id
         LEFT  JOIN  tb_repayment_biz_plan as plan ON  pList.plan_id = plan.plan_id
-        LEFT JOIN tb_basic_business as business ON plan.original_business_id = business.business_id
+        LEFT JOIN tb_basic_business as business ON plan.business_id = business.business_id
         LEFT JOIN tb_basic_business_type as  b_type ON business.business_type = b_type.business_type_id
         LEFT JOIN tb_basic_company as company ON business.company_id = company.area_id
         LEFT JOIN tb_process as process ON derate.process_id = process.process_id
@@ -121,13 +122,13 @@
 		  AND a.`original_business_id` = #{businessId,jdbcType=VARCHAR}  
 		  AND b.`plan_list_id` = #{planListId,jdbcType=VARCHAR} 
 	</select>
-	
-	
-	
+
+
+
 	<select id="getFactRepayAmountSum" resultType="java.lang.Double">
 	select      sum(ifnull(pDetail.fact_amount,0)) as realPay from tb_repayment_biz_plan_list_detail pDetail join
 	 tb_repayment_biz_plan_list b on pDetail.plan_list_id=b.plan_list_id where  b.orig_business_id=#{businessId,jdbcType=VARCHAR}
-	  
+
 	</select>
 
 </mapper>
