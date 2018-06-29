@@ -93,6 +93,10 @@ public class PlatformRepaymentController {
     @Qualifier("RepaymentBizPlanListService")
     RepaymentBizPlanListService repaymentBizPlanListService;
 
+    @Autowired
+    @Qualifier("RepaymentResourceService")
+    RepaymentResourceService repaymentResourceService;
+
     static final ConcurrentMap<Integer, String> FEE_TYPE_MAP;
     static {
 
@@ -288,6 +292,18 @@ public class PlatformRepaymentController {
             //标的还款计划结清状态
             vo.setSettleType(projPlanStatus);
 
+            //流水合计
+            BigDecimal resourceAmount = BigDecimal.ZERO;
+            List<RepaymentResource> repaymentResources = repaymentResourceService.selectList(new EntityWrapper<RepaymentResource>().eq("confirm_log_id", confirmLogId));
+            if (repaymentResources != null && repaymentResources.size() > 0) {
+                for (RepaymentResource repaymentResource : repaymentResources) {
+                    if (repaymentResource.getRepayAmount() != null) {
+                        resourceAmount = resourceAmount.add(repaymentResource.getRepayAmount());
+                    }
+                }
+            }
+            vo.setResourceAmount(resourceAmount);
+
             //计算费用: proj_fact_repay中要按project_id分组来进行计算,不要按期数计算
             List<RepaymentProjFactRepay> projFactRepays = repaymentProjFactRepayService.selectList(
                     new EntityWrapper<RepaymentProjFactRepay>()
@@ -295,8 +311,7 @@ public class PlatformRepaymentController {
                             .eq("project_id", projectId)
             );
             if (projFactRepays != null && projFactRepays.size() > 0) {
-                //流水合计
-                BigDecimal resourceAmount = BigDecimal.ZERO;
+
                 //实收总金额
                 BigDecimal factRepayAmount = BigDecimal.ZERO;
                 //充值金额
@@ -314,7 +329,7 @@ public class PlatformRepaymentController {
                             || RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid().equals(r.getFeeId())) {
                         continue;
                     }
-                    resourceAmount = resourceAmount.add(r.getFactAmount());
+                    //resourceAmount = resourceAmount.add(r.getFactAmount());
                     factRepayAmount = factRepayAmount.add(r.getFactAmount());
                     rechargeAmount = rechargeAmount.add(r.getFactAmount());
 
@@ -343,9 +358,11 @@ public class PlatformRepaymentController {
                     detailFee.setFeeValue(r.getFactAmount());
                     detailFeeList.add(detailFee);
                 }
-                vo.setResourceAmount(resourceAmount);
                 vo.setFactRepayAmount(factRepayAmount);
                 vo.setRechargeAmount(rechargeAmount);
+
+
+                //vo.setResourceAmount(resourceAmount);
                 vo.setDetailList(detailFeeList);
             }
 

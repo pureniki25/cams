@@ -533,27 +533,29 @@
 		  bba.`last_review_user_name`,
 		  bb.`borrow_rate`,
 		  bb.`borrow_limit`,
-		  CASE
-		    fsd.notarization_type 
-		    WHEN '1' 
-		    THEN '办理委托公证' 
-		    WHEN '2' 
-		    THEN '强制执行公证' 
-		    WHEN '5' 
-		    THEN '办理声明公证' 
-		    WHEN '6' 
-		    THEN '办理证件公证' 
-		    WHEN '7' 
-		    THEN '核实原公证书' 
-		    ELSE '其他' 
-		  END notarization_type,
-		  bb.company_name
+		  (SELECT 
+		    CASE
+		      fsd.notarization_type 
+		      WHEN '1' 
+		      THEN '办理委托公证' 
+		      WHEN '2' 
+		      THEN '强制执行公证' 
+		      WHEN '5' 
+		      THEN '办理声明公证' 
+		      WHEN '6' 
+		      THEN '办理证件公证' 
+		      WHEN '7' 
+		      THEN '核实原公证书' 
+		      ELSE '其他' 
+		    END 
+		  FROM
+		    tb_fsd_non_standard_measure fsd 
+		  WHERE bb.business_id = fsd.business_id) notarization_type,
+		  bb.company_name 
 		FROM
 		  tb_basic_business bb,
-		  tb_basic_business_approve bba,
-		  tb_fsd_non_standard_measure fsd
+		  tb_basic_business_approve bba 
 		WHERE bb.business_id = bba.business_id 
-		  AND bb.business_id = fsd.business_id
 		  AND bb.business_id = #{businessId,jdbcType=VARCHAR}
 	</select>
 
