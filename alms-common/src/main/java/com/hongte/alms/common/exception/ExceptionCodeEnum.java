@@ -14,10 +14,8 @@ public enum ExceptionCodeEnum  implements IEnum {
     NULL(250,"对象为空异常"),
     PAREMTER_ERROR(450,"输入参数错误")
 
-
-
-
     ,RUNING(300,"程序执行中，请完成本次执行后再触发")
+    ,NO_USER(350,"没找到用户信息")
    ;
 
     private Integer value;

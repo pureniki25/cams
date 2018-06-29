@@ -15,6 +15,7 @@ window.layinit(function (htConfig) {
            synOneCollectionLoading:false, //同步指定电催分配数据的加载标志位
            synOneUserCollectionLoading:false, //同步指定用户电催分配数据的加载标志位
            syncVisitCollectionLoading:false,  //同步上门催收分配数据的加载标志位
+           setSuserPByUidloanding:false,  //根据用户Id设置单个用户可访问的业务加载标志位
            synOneListColLoading:false,
            setUserPermissonsLoading:false,
            fiveLevelClassifyLoading:false,
@@ -190,7 +191,22 @@ window.layinit(function (htConfig) {
                });
 		   },
            setSingleUserPermissonsByUserId:function(){
-
+               this.setSuserPByUidloanding = true;
+               axios.get(basePath +"sys/admin/singleUserPermission?userId=" + vm.userId,{timeout: 0})
+                   .then(function (res) {
+                       vm.setSuserPByUidloanding = false;
+                       if (res.data.data != null && res.data.code == 1) {
+                           vm.$Modal.success({
+                               content: res.data.msg
+                           });
+                       } else {
+                           vm.$Modal.error({content: res.data.msg });
+                       }
+                   })
+                   .catch(function (error) {
+                       vm.syncTrackLogLoading = false;
+                       vm.$Modal.error({content: '接口调用异常!'});
+                   });
 
            },
            // 同步贷后跟踪记录

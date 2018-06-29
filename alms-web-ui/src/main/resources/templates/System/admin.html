@@ -112,7 +112,10 @@
 			<div class="layui-inline">
 				<input v-model="userId" class="layui-input" name="id" id="userId">
 			</div>
-			<i-button @click="setSingleUserPermissonsByUserId">执行</i-button>
+			<i-button :loading="setSuserPByUidloanding" @click="setSingleUserPermissonsByUserId">
+				<i-span v-if="!setSuserPByUidloanding">执行</i-span>
+				<i-span v-else>执行中...</i-span>
+			</i-button>
 		</div>
 
     	<div style="margin-top:10px; margin-left:10px">
