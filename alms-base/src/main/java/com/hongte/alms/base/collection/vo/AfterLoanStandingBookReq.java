@@ -89,8 +89,16 @@ public class AfterLoanStandingBookReq extends PageRequest {
     private String[]  crpIdsArray;  //还款计划ID数组  用于数据库查询
     
     @ApiModelProperty(value="只看我跟进的业务标志位",name="justCheckMine",dataType = "int")
-    private Boolean justCheckMine ;
-    
+    private Boolean justCheckMine =false;
+
+
+    @ApiModelProperty(value="用户类型：1，电催专员",name="userType",dataType = "int")
+    private Integer userType = null ;
+
+
+
+
+
     private List<String> customerIds; //客户ID列表
 
     private List<String> commIds;//公司ID列表
@@ -344,4 +352,11 @@ public class AfterLoanStandingBookReq extends PageRequest {
 		this.justCheckMine = justCheckMine;
 	}
 
+    public Integer getUserType() {
+        return userType;
+    }
+
+    public void setUserType(Integer userType) {
+        this.userType = userType;
+    }
 }
