@@ -451,21 +451,24 @@ public class CollectionTransferController {
 			List<CarBusinessAfter>  afterList = carBusinessAfterService.selectList(
 					new EntityWrapper<CarBusinessAfter>().
 							eq("collection_user",userId));
-			executor.execute(new Runnable() {
-				@Override
-				public void run() {
-					oneUserColRunning = true;
-					try{
-						for (CarBusinessAfter carBusinessAfter : afterList) {
-							boolean bl = transPhoneSet(carBusinessAfter,CollectionSetWayEnum.XINDAI_LOG);
+			if(afterList!=null && afterList.size()>0){
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+						oneUserColRunning = true;
+						try{
+							for (CarBusinessAfter carBusinessAfter : afterList) {
+								boolean bl = transPhoneSet(carBusinessAfter,CollectionSetWayEnum.XINDAI_LOG);
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+							LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
 						}
-					}catch(Exception e){
-						e.printStackTrace();
-						LOGGER.error("同步历史电催数据异常,列表查询异常"+e.getMessage());
+						oneUserColRunning=false;
 					}
-					oneUserColRunning=false;
-				}
-			});
+				});
+			}
+
 		}
 
 		return Result.success();

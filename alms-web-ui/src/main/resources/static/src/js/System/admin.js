@@ -34,8 +34,10 @@ window.layinit(function (htConfig) {
            oneCollectionAfterId:"",
 
            //同步指定用户的电催信息用户信贷Id
-           oneColUserXDId:""
+           oneColUserXDId:"",
 
+           //设置指定用户的权限对照关系用户Id（UC的用户ID）
+           userId:""
 
 	   },
 	   methods: {
@@ -82,7 +84,7 @@ window.layinit(function (htConfig) {
                    });
            },
            // 同步指定用户电催催收数据
-           transferOneCollection:function(){
+           transferOneUserCollection:function(){
                this.synOneUserCollectionLoading = true;
                var url = basePath +"alms/transferOneUserCollection?userId="+vm.oneColUserXDId
                axios.get(url,{timeout: 0})
