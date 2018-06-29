@@ -47,39 +47,39 @@ public class CustomerBankcardController {
 	@ApiOperation(value = "获取客户银行卡信息")
 	@GetMapping("/getBankcardInfo")
 	public Result getBankcardInfo(@RequestParam("identityCard") String identityCard) {
-		    Result result=new Result();
-		try {
+	    Result result=new Result();
+	try {
 
-			RequestData requestData = new RequestData();
-			JSONObject data = new JSONObject() ;
-			data.put("identityCard", identityCard);
-			requestData.setData(JSON.toJSONString(data));
-			requestData.setMethodName("BankCard_GetBankCardByIdCard");
-			String encryptStr = JSON.toJSONString(requestData);
-			// 请求数据加密
-			encryptStr = encryptPostData(encryptStr);
-			WithHoldingXinDaiService withholdingxindaiService = Feign.builder().target(WithHoldingXinDaiService.class,
-					apiUrl);
-			
-			String respStr = withholdingxindaiService.getBankcardInfo(encryptStr);
-			// 返回数据解密
-			ResponseData respData = getRespData(respStr);
-			logger.info("客户根据身份证号:"+identityCard+"获取银行卡信息，接口返回数据:"+respData.getData()+","+respData.getReturnMessage());
-			if(respData.getReturnCode().equals("1")) {
-				result.setData(respData.getData());
-				result.setCode("1");
-				result.setMsg(respData.getReturnMessage());
-			}else {
-				result.setData(null);
-				result.setCode("-1");
-				result.setMsg(respData.getReturnMessage());
-			}
-		     
-		} catch (Exception ex) {
-			logger.error(ex.getMessage());
+		RequestData requestData = new RequestData();
+		JSONObject data = new JSONObject() ;
+		data.put("identityCard", identityCard);
+		requestData.setData(JSON.toJSONString(data));
+		requestData.setMethodName("BankCard_GetBankCardByIdCard");
+		String encryptStr = JSON.toJSONString(requestData);
+		// 请求数据加密
+		encryptStr = encryptPostData(encryptStr);
+		WithHoldingXinDaiService withholdingxindaiService = Feign.builder().target(WithHoldingXinDaiService.class,
+				apiUrl);
+
+		String respStr = withholdingxindaiService.getBankcardInfo(encryptStr);
+		// 返回数据解密
+		ResponseData respData = getRespData(respStr);
+		logger.info("客户根据身份证号:"+identityCard+"获取银行卡信息，接口返回数据:"+respData.getData()+","+respData.getReturnMessage());
+		if(respData.getReturnCode().equals("1")) {
+			result.setData(respData.getData());
+			result.setCode("1");
+			result.setMsg(respData.getReturnMessage());
+		}else {
+			result.setData(null);
+			result.setCode("-1");
+			result.setMsg(respData.getReturnMessage());
 		}
-		 return result;
+
+	} catch (Exception ex) {
+		logger.error("获取银行卡信息接口出错:"+ex);
 	}
+	 return result;
+}
 
 	
 	// 返回数据解密

@@ -172,8 +172,12 @@ public class Constant {
 	public static final String REMOTE_EIP_SUCCESS_CODE = "0000";
 
 
-	//*********调用api接口失败记录相关 OPEN模块 *********//
+	//*********调用api接口失败记录相关 OPEN模块  zgh *********//
 	public static final String INTERFACE_CODE_OPEN_REPAYPLAN_UPDATEREPAYPLANTOLMS = "/RepayPlan/updateRepayPlanToLMS";
 	public static final String INTERFACE_NAME_OPEN_REPAYPLAN_UPDATEREPAYPLANTOLMS = "将指定业务的还款计划的变动通过信贷接口推送给信贷系统";
+
+	//*********调用api接口失败记录相关 Finance模块 zgh *********//
+	public static final String INTERFACE_CODE_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT = "/finance/previewConfirmRepayment";
+	public static final String INTERFACE_NAME_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT = "确认还款拆标情况并存储";
 
 }
