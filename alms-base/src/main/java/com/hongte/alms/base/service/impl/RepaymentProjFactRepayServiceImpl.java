@@ -52,7 +52,7 @@ public class RepaymentProjFactRepayServiceImpl extends BaseServiceImpl<Repayment
 
 			//整个业务应还金金额
 			unpaid = unpaid.add(planAmount).add(overDue);
-			
+			//标的还款计划列表
 			List<RepaymentProjPlanList> repaymentProjPlanLists = repaymentProjPlanListMapper.selectList(
 					new EntityWrapper<RepaymentProjPlanList>()
 					.eq("plan_list_id", planListId)
@@ -60,6 +60,7 @@ public class RepaymentProjFactRepayServiceImpl extends BaseServiceImpl<Repayment
 			
 			for (RepaymentProjPlanList repaymentProjPlanList : repaymentProjPlanLists) {
 				String projPlanListId = repaymentProjPlanList.getProjPlanListId() ;
+				//标实还明细列表
 				List<RepaymentProjFactRepay> factRepays = repaymentProjFactRepayMapper.selectList(
 						new EntityWrapper<RepaymentProjFactRepay>()
 						.eq("proj_plan_list_id", projPlanListId));
