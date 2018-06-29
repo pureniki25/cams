@@ -48,7 +48,7 @@ public class AfterLoanRepaymentServiceImpl implements AfterLoanRepaymentService 
      * @param businessId 业务单号
      * @param afterId 期数
      * @param bankCard 银行卡号
-     * @return 代扣结果
+     * @return 返回代扣结果
      */
     @Override
     public Result submitAutoRepay(String businessId, String afterId, String bankCard) {
