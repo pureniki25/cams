@@ -38,7 +38,9 @@ import com.hongte.alms.base.service.RepaymentProjPlanService;
 import com.hongte.alms.base.service.TdrepayRechargeLogService;
 import com.hongte.alms.base.service.TdrepayRechargeService;
 import com.hongte.alms.base.service.TuandaiProjectInfoService;
+import com.hongte.alms.base.vo.compliance.AgencyRechargeLogVO;
 import com.hongte.alms.base.vo.compliance.DistributeFundRecordVO;
+import com.hongte.alms.base.vo.compliance.RechargeRecordReq;
 import com.hongte.alms.base.vo.compliance.TdrepayRechargeInfoVO;
 import com.hongte.alms.base.vo.module.ComplianceRepaymentVO;
 import com.hongte.alms.common.result.Result;
@@ -152,6 +154,9 @@ public class TdrepayRechargeController {
 		}
 		if (vo.getIsComplete() == null) {
 			return Result.error(INVALID_PARAM_CODE, "isComplete" + INVALID_PARAM_DESC);
+		}
+		if (vo.getConfirmTime() == null) {
+			return Result.error(INVALID_PARAM_CODE, "confirmTime" + INVALID_PARAM_DESC);
 		}
 		if (CollectionUtils.isEmpty(vo.getDetailList())) {
 			return Result.error(INVALID_PARAM_CODE, "detailList" + INVALID_PARAM_DESC);
@@ -648,6 +653,18 @@ public class TdrepayRechargeController {
 	public Result<RepaymentProjPlan> repayComplianceWithRequirements() {
 		try {
 			tdrepayRechargeService.repayComplianceWithRequirements();
+			return Result.success();
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error("-99", e.getMessage());
+		}
+	}
+	
+	@ApiOperation(value = "查看充值记录")
+	@PostMapping("/queryRechargeRecord")
+	@ResponseBody
+	public Result<AgencyRechargeLogVO> queryRechargeRecord(@RequestBody RechargeRecordReq vo) {
+		try {
 			return Result.success();
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
