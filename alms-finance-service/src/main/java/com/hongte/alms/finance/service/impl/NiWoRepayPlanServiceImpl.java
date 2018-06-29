@@ -176,6 +176,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 										projListDetail.setPlanItemName("线上滞纳金");
 										projListDetail.setCreatSysType(3);
 										repaymentProjPlanListDetailService.insertOrUpdate(projListDetail);
+										projPlanList.setOverdueAmount(detailDto.getTotalPenalty());
 										}catch(Exception e) {
 											logger.info("你我金融更新滞纳金错误"+e);
 										}
@@ -184,6 +185,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 									}
 									detail.setProjFactAmount(detail.getProjPlanAmount());
 									detail.setUpdateDate(new Date());
+								
 									repaymentProjPlanListDetailService.updateById(detail); 
 							 }
 					
@@ -223,7 +225,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 										planListDetailCopy.setFactAmount(detailDto.getRepaidPenalty());
 										planListDetailCopy.setCreateDate(new Date());
 										repaymentBizPlanListDetailService.insertOrUpdate(planListDetailCopy);
-										
+										pList.setOverdueAmount(detailDto.getTotalPenalty());
 									}catch(Exception e) {
 										logger.info("你我金融更新滞纳金错误"+e);
 									}
