@@ -660,16 +660,16 @@ public class TdrepayRechargeController {
 		}
 	}
 	
-	@ApiOperation(value = "查看充值记录")
-	@PostMapping("/queryRechargeRecord")
-	@ResponseBody
-	public Result<AgencyRechargeLogVO> queryRechargeRecord(@RequestBody RechargeRecordReq vo) {
-		try {
-			return Result.success();
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-			return Result.error("-99", e.getMessage());
-		}
-	}
+//	@ApiOperation(value = "查看充值记录")
+//	@PostMapping("/queryRechargeRecord")
+//	@ResponseBody
+//	public Result<AgencyRechargeLogVO> queryRechargeRecord(@RequestBody RechargeRecordReq vo) {
+//		try {
+//			return Result.success();
+//		} catch (Exception e) {
+//			LOG.error(e.getMessage(), e);
+//			return Result.error("-99", e.getMessage());
+//		}
+//	}
 
 }
