@@ -1,5 +1,6 @@
 package com.hongte.alms.finance.controller;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
@@ -13,23 +14,13 @@ import com.hongte.alms.base.RepayPlan.req.trial.TrailBizInfoReq;
 import com.hongte.alms.base.RepayPlan.req.trial.TrailProjFeeReq;
 import com.hongte.alms.base.RepayPlan.req.trial.TrailProjInfoReq;
 import com.hongte.alms.base.RepayPlan.req.trial.TrailRepayPlanReq;
-import com.hongte.alms.base.entity.BasicBusiness;
-import com.hongte.alms.base.entity.BasicBusinessType;
-import com.hongte.alms.base.entity.BizOutputRecord;
-import com.hongte.alms.base.entity.CarBasic;
-import com.hongte.alms.base.entity.RepaymentBizPlan;
-import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.enums.RepayTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanBorrowLimitUnitEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanSettleStatusEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
-import com.hongte.alms.base.service.BasicBusinessService;
-import com.hongte.alms.base.service.BasicBusinessTypeService;
-import com.hongte.alms.base.service.BizOutputRecordService;
-import com.hongte.alms.base.service.CarBasicService;
-import com.hongte.alms.base.service.RepaymentBizPlanListService;
-import com.hongte.alms.base.service.RepaymentBizPlanService;
+import com.hongte.alms.base.service.*;
 import com.hongte.alms.base.vo.module.api.RepayLogResp;
 
 import com.hongte.alms.common.exception.ExceptionCodeEnum;
@@ -62,6 +53,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.Valid;
+import javax.xml.soap.Detail;
 
 /**
  * @author zengkun
@@ -85,7 +77,14 @@ public class RepayPlanController {
     @Autowired
     @Qualifier("RepaymentBizPlanListService")
     RepaymentBizPlanListService repaymentBizPlanListService;
-    
+
+
+    @Autowired
+    @Qualifier("RepaymentBizPlanListDetailService")
+    RepaymentBizPlanListDetailService repaymentBizPlanListDetailService;
+
+
+
     @Autowired
     @Qualifier("BasicBusinessService")
     BasicBusinessService basicBusinessService;
@@ -725,11 +724,22 @@ public class RepayPlanController {
         bizPlanDto.setPayingPeroids(payingPeroids);
 
         for (RepaymentBizPlanList bizPlanList:bizPlanLists){
+            BizPlanListDto bizPlanListDto = new BizPlanListDto(bizPlanList);
+            List<RepaymentBizPlanListDetail> detials = repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id",bizPlanList.getPlanListId()));
+            BigDecimal realPay = new BigDecimal("0");
+            if(detials!=null&&detials.size()>0){
+                for(RepaymentBizPlanListDetail detail:detials){
+                    if(detail.getFactAmount()!=null){
+                        realPay.add(detail.getFactAmount());
+                    }
+                }
+            }
+            bizPlanListDto.setFactPayAmount(realPay);
+
             if(bizPlanList.getCurrentStatus().equals(RepayPlanStatus.REPAYED.getName())){
-                BizPlanListDto bizPlanListDto = new BizPlanListDto(bizPlanList);
+
                 payedPeroids.add(bizPlanListDto);
             }else {
-                BizPlanListDto bizPlanListDto = new BizPlanListDto(bizPlanList);
                 payingPeroids.add(bizPlanListDto);
             }
         }

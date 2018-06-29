@@ -132,6 +132,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 			
 			RepaymentProjPlan projPlan = repaymentProjPlanService
 					.selectOne(new EntityWrapper<RepaymentProjPlan>().eq("request_no", orderNo).eq("plate_type", 2));
+	
 			if(projPlan==null) {
 				logger.info("你我金融的标的请求编号在贷后找不到对应的还款计划记录,请求编号{request_no}为："+orderNo);
 				return;
@@ -143,10 +144,18 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 					.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", projPlan.getPlanId()));
 			projPlan.setCreatSysType(3);//标志为你我金融的还款计划
 			if (dto.getProjectStatus() == 2) {// 已结清
+				
+				 NiWoProjPlanDto dtoTemp=dto;
+				List<RepaymentProjPlanListDto> repaymentProjPlanListDtos=new ArrayList();
 				for (RepaymentProjPlanList projPlanList : projLists) {
+					RepaymentProjPlanListDto  repaymentProjPlanListDto=new RepaymentProjPlanListDto();
 					List<RepaymentProjPlanListDetail> projListDetails = repaymentProjPlanListDetailService
 							.selectList(new EntityWrapper<RepaymentProjPlanListDetail>().eq("proj_plan_list_id",
 									projPlanList.getProjPlanListId()));
+					//封装好同步你我金融还款计划前，贷后的还款计划镜像
+					repaymentProjPlanListDto.setProjPlanListDetails(projListDetails);
+					repaymentProjPlanListDto.setRepaymentProjPlanList(projPlanList);
+					repaymentProjPlanListDtos.add(repaymentProjPlanListDto);
 					for (RepaymentProjPlanListDetail detail : projListDetails) {
 						detail.setProjFactAmount(detail.getProjPlanAmount());
 						detail.setUpdateDate(new Date());
@@ -158,7 +167,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 					projPlanList.setCreatSysType(3);
 					repaymentProjPlanListService.updateById(projPlanList);
 				}
-
+				
 				for (RepaymentBizPlanList pList : pLists) {
 					List<RepaymentBizPlanListDetail> pListDetails = repaymentBizPlanListDetailService.selectList(
 							new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", pList.getPlanListId()));
@@ -179,6 +188,15 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 				plan.setPlanStatus(20);// 已结清
 				plan.setUpdateTime(new Date());
 				repaymentBizPlanService.updateById(plan);
+				//记录同步你我金融还款计划日志
+				executor.execute(new Runnable() {
+					
+					@Override
+					public void run() {
+						RecordLog(dtoTemp, repaymentProjPlanListDtos);
+					}
+				});
+			
 
 			}
 			
