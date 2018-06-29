@@ -30,6 +30,7 @@
             parameterType="com.hongte.alms.base.vo.module.ApplyDerateListSearchReq">
 
         select
+        pList.orig_business_id as origBusinessId,
         derate.apply_derate_process_id as applyDerateProcessId,
         business.business_id AS businessId,
         pList.period as  periods,
@@ -46,7 +47,7 @@
  
 
   
-          a.realPay as realPayMoney,
+    <!--       a.realPay as realPayMoney, -->
         derate.create_time as derateTime
         
         
@@ -61,14 +62,14 @@
         LEFT JOIN tb_process as process ON derate.process_id = process.process_id
         JOIN tb_sys_user_permission as permission  ON  permission.business_id = business.business_id
         
-            LEFT JOIN 
+           <!--  LEFT JOIN 
 		  
 		 ( select      orig_business_id,  pDetail.plan_list_id, sum(ifnull(pDetail.fact_amount,0)) as realPay from tb_repayment_biz_plan_list_detail pDetail join
 		 tb_repayment_biz_plan_list b on pDetail.plan_list_id=b.plan_list_id group by b.orig_business_id
 		 ) a 
 		 
 		 on a.orig_business_id=pList.orig_business_id
-
+ -->
         <where>
             process.status = 2 and process.process_result = 1
 
