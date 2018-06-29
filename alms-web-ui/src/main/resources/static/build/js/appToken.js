@@ -117,9 +117,16 @@ var authValid = function(param) {
 
 	getAuth();
 	for (var i = 0; i < allAuth.length; i++) {
-		if (allAuth[i].resContent == param&&  menuCode == allAuth[i].resParent) {
-			return true;
-		}
+	    if(menuCode == undefined){
+            if (allAuth[i].resContent == param){
+                return true;
+            }
+        }else{
+            if (allAuth[i].resContent == param&&  menuCode == allAuth[i].resParent) {
+                return true;
+            }
+        }
+
 	}
 	return false;
 }
