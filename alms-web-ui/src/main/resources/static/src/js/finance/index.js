@@ -92,7 +92,7 @@ window.layinit(function (htConfig) {
                             if (p.row.periods == 1 && !isZQ) {
                                 res.push(firstPeriod)
                             }
-                            if (p.row.repaymentTypeId == 2 && p.row.borrowLimit == p.row.periods) {
+                            if (p.row.repaymentTypeId == 2 && p.row.borrowLimit+1 == p.row.periods) {
                                 res.push(benjinPeriod)
                             }
                             if (p.row.repaymentTypeId == 5 && p.row.borrowLimit == p.row.periods) {

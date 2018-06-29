@@ -8,9 +8,9 @@ package com.hongte.alms.base.process.enums;
 public enum ProcessApproveResult {
 
 
-//	流程结果，1：通过， 0：不通过',
+//	流程结果，1：通过， 2：不通过',
 	PASS(1,"通过"),
-	REFUSE(0,"不通过");
+	REFUSE(2,"不通过");
 
 
 //	(0:运行中,1:开始,2:结束,3:注销)

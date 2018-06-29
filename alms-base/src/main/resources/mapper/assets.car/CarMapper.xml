@@ -204,17 +204,21 @@
 		tb_process_type tpt on tpt.type_id=tp.process_typeid and
 		tpt.type_code='carAuctionAply'
 		<where>
-			tca.status in ('04','05') and tca.auction_end_time>=DATE_FORMAT(now(),'%Y-%m-%d')
+			tca.status in ('04','05')
 			<if test="type !=null  and type!=''">
 				and tca.status =#{type}
-			</if>
-			<if test="auctionId !=null  and auctionId !=''">
-				and tca.auction_id  =#{auctionId}
 			</if>
 			<if test="vehicleBrand !=null and vehicleBrand !='' and  carModel !=null and carModel !=''">
 				and (tcb.brand_name LIKE "%"#{vehicleBrand}"%" or tcb.model LIKE "%"#{carModel}"%")
 			</if>
-
+			<choose>
+				<when test="auctionId !=null  and auctionId !=''">
+					and tca.auction_id  =#{auctionId}
+				</when>
+				<otherwise>
+					and tca.auction_end_time>=DATE_FORMAT(now(),'%Y-%m-%d')
+				</otherwise>
+			</choose>
 		</where>
 		order BY tca.auction_end_time DESC
 		limit ${(page-1) * limit},   #{limit}
@@ -239,17 +243,21 @@
 		tb_process_type tpt on tpt.type_id=tp.process_typeid and
 		tpt.type_code='carAuctionAply'
 		<where>
-			tca.status in ('04','05') and tca.auction_end_time>=DATE_FORMAT(now(),'%Y-%m-%d')
+			tca.status in ('04','05')
 			<if test="type !=null  and type!=''">
 				and tca.status =#{type}
 			</if>
-			<if test="auctionId !=null  and auctionId !=''">
-				and tca.auction_id  =#{auctionId}
-			</if>
 			<if test="vehicleBrand !=null and vehicleBrand !='' and  carModel !=null and carModel !=''">
-			    and (tcb.brand_name LIKE "%"#{vehicleBrand}"%" or tcb.model LIKE "%"#{carModel}"%")
+				and (tcb.brand_name LIKE "%"#{vehicleBrand}"%" or tcb.model LIKE "%"#{carModel}"%")
 			</if>
-
+			<choose>
+				<when test="auctionId !=null  and auctionId !=''">
+					and tca.auction_id  =#{auctionId}
+				</when>
+				<otherwise>
+					and tca.auction_end_time>=DATE_FORMAT(now(),'%Y-%m-%d')
+				</otherwise>
+			</choose>
 		</where>
 	</select>
 	<select id="selectBiddersPageForApp" resultType="com.hongte.alms.base.assets.car.vo.AuctionBidderVo">

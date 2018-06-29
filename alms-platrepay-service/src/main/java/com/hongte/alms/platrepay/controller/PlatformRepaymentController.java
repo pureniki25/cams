@@ -1,52 +1,29 @@
 package com.hongte.alms.platrepay.controller;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
-
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.hongte.alms.base.entity.*;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanPayedTypeEnum;
+import com.hongte.alms.base.feignClient.EipRemote;
+import com.hongte.alms.base.service.*;
+import com.hongte.alms.base.vo.compliance.TdrepayRechargeInfoVO;
+import com.hongte.alms.common.result.Result;
+import com.ht.ussp.bean.LoginUserInfoHelper;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.hongte.alms.base.entity.BasicBusiness;
-import com.hongte.alms.base.entity.RepaymentBizPlanList;
-import com.hongte.alms.base.entity.RepaymentConfirmLog;
-import com.hongte.alms.base.entity.RepaymentProjFactRepay;
-import com.hongte.alms.base.entity.RepaymentProjPlan;
-import com.hongte.alms.base.entity.RepaymentProjPlanList;
-import com.hongte.alms.base.entity.TdrepayRechargeDetail;
-import com.hongte.alms.base.entity.TuandaiProjectInfo;
-import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
-import com.hongte.alms.base.enums.repayPlan.RepayPlanPayedTypeEnum;
-import com.hongte.alms.base.feignClient.EipRemote;
-import com.hongte.alms.base.service.AgencyRechargeLogService;
-import com.hongte.alms.base.service.BasicBusinessService;
-import com.hongte.alms.base.service.DepartmentBankService;
-import com.hongte.alms.base.service.RepaymentBizPlanListService;
-import com.hongte.alms.base.service.RepaymentBizPlanService;
-import com.hongte.alms.base.service.RepaymentConfirmLogService;
-import com.hongte.alms.base.service.RepaymentProjFactRepayService;
-import com.hongte.alms.base.service.RepaymentProjPlanListService;
-import com.hongte.alms.base.service.RepaymentProjPlanService;
-import com.hongte.alms.base.service.TdrepayRechargeService;
-import com.hongte.alms.base.service.TuandaiProjectInfoService;
-import com.hongte.alms.base.vo.compliance.TdrepayRechargeInfoVO;
-import com.hongte.alms.common.result.Result;
-import com.ht.ussp.bean.LoginUserInfoHelper;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * 平台合规化还款服务控制器
@@ -116,6 +93,10 @@ public class PlatformRepaymentController {
     @Qualifier("RepaymentBizPlanListService")
     RepaymentBizPlanListService repaymentBizPlanListService;
 
+    @Autowired
+    @Qualifier("RepaymentResourceService")
+    RepaymentResourceService repaymentResourceService;
+
     static final ConcurrentMap<Integer, String> FEE_TYPE_MAP;
     static {
 
@@ -169,7 +150,7 @@ public class PlatformRepaymentController {
         try {
             //****************************************************
             //验证这块以后要移除,通用功能不能只针对某一个平台，目前只针对团贷平台. zgh 20180614
-            TuandaiProjectInfo tuandaiProjectInfo = tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("project_id", projectId));
+            TuandaiProjectInfo tuandaiProjectInfo = tuandaiProjectInfoService.selectById(projectId);
             if (tuandaiProjectInfo == null) {
                 LOGGER.error("@对接合规还款接口@  查不到平台的上标信息 输入参数 projectId:[{}]  ", projectId);
                 return Result.error("查不到平台的上标信息");
@@ -209,10 +190,17 @@ public class PlatformRepaymentController {
             //判断是否已经到款，到款后再还款到平台
 //            if (repaymentProjPlanList.getRepayFlag().equals(RepayPlanPayedTypeEnum.PAYING.getValue())
 //                    || repaymentProjPlanList.getRepayFlag().equals(RepayPlanPayedTypeEnum.RENEW_PAY.getValue())) {
-            if (repaymentProjPlanList.getRepayFlag() == null || repaymentProjPlanList.getRepayFlag().equals(RepayPlanPayedTypeEnum.PAYING.getValue())) {
-                LOGGER.error("@对接合规还款接口@  此还款标的计划列表未还款 输入参数 projectId:[{}]  afterId{[]}  ", projectId, afterId);
-                return Result.error("500", "此还款标的计划列表未还款");
-            }
+//            if (repaymentProjPlanList.getRepayFlag() == null || repaymentProjPlanList.getRepayFlag().equals(RepayPlanPayedTypeEnum.PAYING.getValue())) {
+//                LOGGER.error("@对接合规还款接口@  此还款标的计划列表未还款 输入参数 projectId:[{}]  afterId{[]}  ", projectId, afterId);
+//                return Result.error("500", "此还款标的计划列表未还款");
+//            }
+
+            //临时取消已还款状态验证
+
+//            if (!"已还款".equals(repaymentProjPlanList.getCurrentStatus())) {
+//                LOGGER.error("@对接合规还款接口@  此还款标的计划列表未还款 输入参数 projectId:[{}]  afterId{[]}  ", projectId, afterId);
+//                return Result.error("500", "此还款标的计划列表未还款");
+//            }
 
             RepaymentConfirmLog repaymentConfirmLog = repaymentConfirmLogService.selectById(confirmLogId);
             if (repaymentConfirmLog == null) {
@@ -267,6 +255,10 @@ public class PlatformRepaymentController {
             vo.setCompanyName(basicBusiness.getCompanyName());
             //处理转换 还款来源，10：线下转账，11:用往期结余还款(归类到线下转账吧),20：线下代扣，30：银行代扣
             //到接口 还款来源，1:线下转账,2:第三方代扣,3:银行代扣,4:APP网关充值,5:协议代扣
+            if (repaymentConfirmLog.getRepaySource() == null) {
+                LOGGER.error("@对接合规还款接口@ 指定的还款日志记录的还款来源为空 输入参数confirmLogId:[{}]", confirmLogId);
+                return Result.error("指定的还款日志记录的还款来源为空");
+            }
             vo.setRepaySource(RepayPlanPayedTypeEnum.getByValue(repaymentConfirmLog.getRepaySource()).getClassifyId());
             vo.setConfirmTime(repaymentBizPlanList.getFinanceComfirmDate());
             vo.setAfterId(afterId);
@@ -304,6 +296,18 @@ public class PlatformRepaymentController {
             //标的还款计划结清状态
             vo.setSettleType(projPlanStatus);
 
+            //流水合计
+            BigDecimal resourceAmount = BigDecimal.ZERO;
+            List<RepaymentResource> repaymentResources = repaymentResourceService.selectList(new EntityWrapper<RepaymentResource>().eq("confirm_log_id", confirmLogId));
+            if (repaymentResources != null && repaymentResources.size() > 0) {
+                for (RepaymentResource repaymentResource : repaymentResources) {
+                    if (repaymentResource.getRepayAmount() != null) {
+                        resourceAmount = resourceAmount.add(repaymentResource.getRepayAmount());
+                    }
+                }
+            }
+            vo.setResourceAmount(resourceAmount);
+
             //计算费用: proj_fact_repay中要按project_id分组来进行计算,不要按期数计算
             List<RepaymentProjFactRepay> projFactRepays = repaymentProjFactRepayService.selectList(
                     new EntityWrapper<RepaymentProjFactRepay>()
@@ -311,8 +315,7 @@ public class PlatformRepaymentController {
                             .eq("project_id", projectId)
             );
             if (projFactRepays != null && projFactRepays.size() > 0) {
-                //流水合计
-                BigDecimal resourceAmount = BigDecimal.ZERO;
+
                 //实收总金额
                 BigDecimal factRepayAmount = BigDecimal.ZERO;
                 //充值金额
@@ -330,7 +333,7 @@ public class PlatformRepaymentController {
                             || RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid().equals(r.getFeeId())) {
                         continue;
                     }
-                    resourceAmount = resourceAmount.add(r.getFactAmount());
+                    //resourceAmount = resourceAmount.add(r.getFactAmount());
                     factRepayAmount = factRepayAmount.add(r.getFactAmount());
                     rechargeAmount = rechargeAmount.add(r.getFactAmount());
 
@@ -359,9 +362,11 @@ public class PlatformRepaymentController {
                     detailFee.setFeeValue(r.getFactAmount());
                     detailFeeList.add(detailFee);
                 }
-                vo.setResourceAmount(resourceAmount);
                 vo.setFactRepayAmount(factRepayAmount);
                 vo.setRechargeAmount(rechargeAmount);
+
+
+                //vo.setResourceAmount(resourceAmount);
                 vo.setDetailList(detailFeeList);
             }
 

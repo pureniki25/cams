@@ -49,6 +49,6 @@ Configuration:
     Logger: # 为com.xjj包配置特殊的Log级别，方便调试
       - name: com.xjj
         additivity: false
-        level: info
+        level: ERROR
         AppenderRef:
           - ref: CONSOLE

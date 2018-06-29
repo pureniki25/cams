@@ -132,6 +132,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 			
 			RepaymentProjPlan projPlan = repaymentProjPlanService
 					.selectOne(new EntityWrapper<RepaymentProjPlan>().eq("request_no", orderNo).eq("plate_type", 2));
+	
 			if(projPlan==null) {
 				logger.info("你我金融的标的请求编号在贷后找不到对应的还款计划记录,请求编号{request_no}为："+orderNo);
 				return;
@@ -143,10 +144,18 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 					.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", projPlan.getPlanId()));
 			projPlan.setCreatSysType(3);//标志为你我金融的还款计划
 			if (dto.getProjectStatus() == 2) {// 已结清
+				
+				 NiWoProjPlanDto dtoTemp=dto;
+				List<RepaymentProjPlanListDto> repaymentProjPlanListDtos=new ArrayList();
 				for (RepaymentProjPlanList projPlanList : projLists) {
+					RepaymentProjPlanListDto  repaymentProjPlanListDto=new RepaymentProjPlanListDto();
 					List<RepaymentProjPlanListDetail> projListDetails = repaymentProjPlanListDetailService
 							.selectList(new EntityWrapper<RepaymentProjPlanListDetail>().eq("proj_plan_list_id",
 									projPlanList.getProjPlanListId()));
+					//封装好同步你我金融还款计划前，贷后的还款计划镜像
+					repaymentProjPlanListDto.setProjPlanListDetails(projListDetails);
+					repaymentProjPlanListDto.setRepaymentProjPlanList(projPlanList);
+					repaymentProjPlanListDtos.add(repaymentProjPlanListDto);
 					for (RepaymentProjPlanListDetail detail : projListDetails) {
 						detail.setProjFactAmount(detail.getProjPlanAmount());
 						detail.setUpdateDate(new Date());
@@ -158,7 +167,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 					projPlanList.setCreatSysType(3);
 					repaymentProjPlanListService.updateById(projPlanList);
 				}
-
+				
 				for (RepaymentBizPlanList pList : pLists) {
 					List<RepaymentBizPlanListDetail> pListDetails = repaymentBizPlanListDetailService.selectList(
 							new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", pList.getPlanListId()));
@@ -179,6 +188,15 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 				plan.setPlanStatus(20);// 已结清
 				plan.setUpdateTime(new Date());
 				repaymentBizPlanService.updateById(plan);
+				//记录同步你我金融还款计划日志
+				executor.execute(new Runnable() {
+					
+					@Override
+					public void run() {
+						RecordLog(dtoTemp, repaymentProjPlanListDtos);
+					}
+				});
+			
 
 			}
 			
@@ -328,52 +346,65 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													RecordExceptionLog(dto, projDetail,null);	
 												}
 									
-												projPlanList.setOverdueDays(BigDecimal.valueOf(getOverDays(detailDto.getRefundDate())));
-												projPlanList.setOverdueAmount(detailDto.getTotalPenalty());
-												projPlanList.setUpdateTime(new Date());
-												projPlanList.setCreatSysType(3);
-												repaymentProjPlanListService.updateById(projPlanList);
-												pList.setOverdueDays(BigDecimal.valueOf(getOverDays(detailDto.getRefundDate())));
-												pList.setOverdueAmount(detailDto.getTotalPenalty());
-												pList.setUpdateTime(new Date());
-												repaymentProjPlanListService.updateById(projPlanList);
-												repaymentBizPlanListService.updateById(pList);
-												
-												BigDecimal planAmountSum=getPlanAmountSum(planDetails);//当前期计划要还的总金额
-												BigDecimal afterRepayAmountSum=getRepayAmountSum(planDetails);//当前期已还总金额
-												pList.setTotalBorrowAmount(planAmountSum);;
-												projPlanList.setTotalBorrowAmount(planAmountSum);
-												pList.setUpdateTime(new Date());
-												projPlanList.setUpdateTime(new Date());
-												repaymentProjPlanListService.updateById(projPlanList);
-												repaymentBizPlanListService.updateById(pList);
-												/*	
-												 * 同步完你我金融的当前期还款计划之后，如果当前期已还总金额等于当前期计划要还的总金额，并且同步之后的当前期已还总金额大于同步之前的当前期已还总金额
-											     *说明需要发成功代扣的短信
-												 */
-												if(afterRepayAmountSum.compareTo(planAmountSum)==0&&afterRepayAmountSum.compareTo(beforeRepayAmountSum)>0&&(!pList.getCurrentStatus().equals("已还款"))) {
-													BigDecimal repayMoney=afterRepayAmountSum.subtract(beforeRepayAmountSum);
-													if(afterRepayAmountSum.compareTo(planAmountSum)==0) {//当期已还款
-														pList.setCurrentStatus("已还款");
-														pList.setFactRepayDate(new Date());
-														projPlanList.setCurrentStatus("已还款");
-														projPlanList.setFactRepayDate(new Date());
-														repaymentProjPlanListService.updateById(projPlanList);
-														repaymentBizPlanListService.updateById(pList);
-													}
-												           try {
-															logger.info("你我金融-发送短信开始==================");
-															sendSuccessSms(pList.getOrigBusinessId(), planAmountSum, repayMoney);
-															logger.info("你我金融-发送短信结束==================");
-												           }catch(Exception e) {
-												        	   logger.error("你我金融-发送短信出错"+e);  
-												           }
-													
-												}
+											
 											}
 
 										}
 
+									}
+									
+									projPlanList.setOverdueDays(BigDecimal.valueOf(getOverDays(detailDto.getRefundDate())));
+									projPlanList.setDueDate(new Date(detailDto.getRefundDate()));
+									projPlanList.setOverdueAmount(detailDto.getTotalPenalty());
+									projPlanList.setUpdateTime(new Date());
+									projPlanList.setCreatSysType(3);
+									repaymentProjPlanListService.updateById(projPlanList);
+									pList.setOverdueDays(BigDecimal.valueOf(getOverDays(detailDto.getRefundDate())));
+									pList.setDueDate(new Date(detailDto.getRefundDate()));
+									pList.setOverdueAmount(detailDto.getTotalPenalty());
+									pList.setUpdateTime(new Date());
+									repaymentProjPlanListService.updateById(projPlanList);
+									repaymentBizPlanListService.updateById(pList);
+									
+									BigDecimal planAmountSum=getPlanAmountSum(planDetails);//当前期计划要还的总金额
+									BigDecimal afterRepayAmountSum=getRepayAmountSum(planDetails);//当前期已还总金额
+									pList.setTotalBorrowAmount(planAmountSum);;
+									projPlanList.setTotalBorrowAmount(planAmountSum);
+									pList.setUpdateTime(new Date());
+									projPlanList.setUpdateTime(new Date());
+									repaymentProjPlanListService.updateById(projPlanList);
+									repaymentBizPlanListService.updateById(pList);
+									/*	
+									 * 同步完你我金融的当前期还款计划之后，如果当前期已还总金额等于当前期计划要还的总金额，并且同步之后的当前期已还总金额大于同步之前的当前期已还总金额
+								     *说明需要发成功代扣的短信
+									 */
+									if(afterRepayAmountSum.compareTo(planAmountSum)==0&&afterRepayAmountSum.compareTo(beforeRepayAmountSum)>0&&(!pList.getCurrentStatus().equals("已还款"))) {
+										BigDecimal repayMoney=afterRepayAmountSum.subtract(beforeRepayAmountSum);
+										if(afterRepayAmountSum.compareTo(planAmountSum)==0) {//当期已还款
+											pList.setCurrentStatus("已还款");
+											pList.setFactRepayDate(new Date());
+											projPlanList.setCurrentStatus("已还款");
+											projPlanList.setFactRepayDate(new Date());
+											for(RepaymentProjPlanListDetail projDetail : projDetails) {
+												projDetail.setFactRepayDate(new Date());
+												repaymentProjPlanListDetailService.updateById(projDetail);
+											}
+											for(RepaymentBizPlanListDetail planDetail : planDetails) {
+												planDetail.setFactRepayDate(new Date());
+												repaymentBizPlanListDetailService.updateById(planDetail);
+											}
+											
+											repaymentProjPlanListService.updateById(projPlanList);
+											repaymentBizPlanListService.updateById(pList);
+										}
+									           try {
+												logger.info("你我金融-发送短信开始==================");
+												sendSuccessSms(pList.getOrigBusinessId(), planAmountSum, repayMoney);
+												logger.info("你我金融-发送短信结束==================");
+									           }catch(Exception e) {
+									        	   logger.error("你我金融-发送短信出错"+e);  
+									           }
+										
 									}
 								
 								}
@@ -603,7 +634,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 		
 		for(RepaymentProjPlanList projPlanList:projPlanLists) {
 			RepaymentProjPlan repaymentProjPlan=repaymentProjPlanService.selectOne(new EntityWrapper<RepaymentProjPlan>().eq("proj_plan_id", projPlanList.getProjPlanId()));
-			TuandaiProjectInfo tuandaiProjectInfo=tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("business_id", projPlanList.getOrigBusinessId()));
+			TuandaiProjectInfo tuandaiProjectInfo=tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("project_id", repaymentProjPlan.getProjectId()));
 			Date borrowDate=null;
 			if(tuandaiProjectInfo.getQueryFullSuccessDate()!=null) {
 				borrowDate=tuandaiProjectInfo.getQueryFullSuccessDate();
@@ -651,7 +682,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 		   List<RepaymentProjPlanList>  lists=repaymentProjPlanListService.selectList(new EntityWrapper<RepaymentProjPlanList>().eq("current_status","还款中").eq("due_date", dueDate).eq("plate_type", 2));
 		   for(RepaymentProjPlanList projPlanList:lists) {
 				RepaymentProjPlan repaymentProjPlan=repaymentProjPlanService.selectOne(new EntityWrapper<RepaymentProjPlan>().eq("proj_plan_id", projPlanList.getProjPlanId()));
-			   TuandaiProjectInfo tuandaiProjectInfo=tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("business_id", projPlanList.getOrigBusinessId()));
+			   TuandaiProjectInfo tuandaiProjectInfo=tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("project_id", repaymentProjPlan.getProjectId()));
 				Date borrowDate=null;
 				if(tuandaiProjectInfo.getQueryFullSuccessDate()!=null) {
 					borrowDate=tuandaiProjectInfo.getQueryFullSuccessDate();
@@ -671,7 +702,8 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 				data.put("borrowAmount", repaymentProjPlan.getBorrowMoney());
 				data.put("period", projPlanList.getPeriod());
 				data.put("amount", projPlanList.getTotalBorrowAmount());
-				data.put("tailCardNum", tuandaiProjectInfo.getBankAccountNo().substring(tuandaiProjectInfo.getBankAccountNo().length()-4, tuandaiProjectInfo.getBankAccountNo().length()));
+				data.put("dueDate", DateUtil.getChinaDay(projPlanList.getDueDate()));
+				data.put("tailCardNo", tuandaiProjectInfo.getBankAccountNo().substring(tuandaiProjectInfo.getBankAccountNo().length()-4, tuandaiProjectInfo.getBankAccountNo().length()));
 				dto.setMsgBody(data);
 				String jason=JSON.toJSONString(dto);
 				msgRemote.sendRequest(jason);
@@ -707,7 +739,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 			
 			 for(RepaymentProjPlanList projPlanList:lists) {
 					   RepaymentProjPlan repaymentProjPlan=repaymentProjPlanService.selectOne(new EntityWrapper<RepaymentProjPlan>().eq("proj_plan_id", projPlanList.getProjPlanId()));
-					   TuandaiProjectInfo tuandaiProjectInfo=tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("business_id", projPlanList.getOrigBusinessId()));
+					   TuandaiProjectInfo tuandaiProjectInfo=tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("project_id", repaymentProjPlan.getProjectId()));
 						Date borrowDate=null;
 						if(tuandaiProjectInfo.getQueryFullSuccessDate()!=null) {
 							borrowDate=tuandaiProjectInfo.getQueryFullSuccessDate();
@@ -725,7 +757,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 						data.put("name", tuandaiProjectInfo.getRealName());
 						data.put("date", DateUtil.getChinaDay(borrowDate));
 						data.put("borrowAmount", repaymentProjPlan.getBorrowMoney());
-						data.put("dueDate",projPlanList.getDueDate() );
+						data.put("dueDate",DateUtil.getChinaDay(projPlanList.getDueDate()));
 						dto.setMsgBody(data);
 						String jason=JSON.toJSONString(dto);
 						msgRemote.sendRequest(jason);

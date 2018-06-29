@@ -1,55 +1,12 @@
 package com.hongte.alms.finance.service.impl;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.Executor;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.hongte.alms.base.RepayPlan.dto.RepaymentBizPlanDto;
-import com.hongte.alms.base.RepayPlan.dto.RepaymentBizPlanListDto;
-import com.hongte.alms.base.RepayPlan.dto.RepaymentProjPlanDto;
-import com.hongte.alms.base.RepayPlan.dto.RepaymentProjPlanListDetailDto;
-import com.hongte.alms.base.RepayPlan.dto.RepaymentProjPlanListDto;
+import com.google.common.collect.Maps;
+import com.hongte.alms.base.RepayPlan.dto.*;
 import com.hongte.alms.base.dto.ConfirmRepaymentReq;
-import com.hongte.alms.base.entity.AccountantOverRepayLog;
-import com.hongte.alms.base.entity.BasicBusiness;
-import com.hongte.alms.base.entity.MoneyPoolRepayment;
-import com.hongte.alms.base.entity.RepaymentBizPlan;
-import com.hongte.alms.base.entity.RepaymentBizPlanBak;
-import com.hongte.alms.base.entity.RepaymentBizPlanList;
-import com.hongte.alms.base.entity.RepaymentBizPlanListBak;
-import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
-import com.hongte.alms.base.entity.RepaymentBizPlanListDetailBak;
-import com.hongte.alms.base.entity.RepaymentConfirmLog;
-import com.hongte.alms.base.entity.RepaymentProjFactRepay;
-import com.hongte.alms.base.entity.RepaymentProjPlan;
-import com.hongte.alms.base.entity.RepaymentProjPlanBak;
-import com.hongte.alms.base.entity.RepaymentProjPlanList;
-import com.hongte.alms.base.entity.RepaymentProjPlanListBak;
-import com.hongte.alms.base.entity.RepaymentProjPlanListDetail;
-import com.hongte.alms.base.entity.RepaymentProjPlanListDetailBak;
-import com.hongte.alms.base.entity.RepaymentResource;
-import com.hongte.alms.base.entity.SysApiCallFailureRecord;
-import com.hongte.alms.base.entity.TuandaiProjectInfo;
-import com.hongte.alms.base.entity.WithholdingRepaymentLog;
+import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.AlmsServiceNameEnums;
 import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.enums.RepayCurrentStatusEnums;
@@ -59,33 +16,11 @@ import com.hongte.alms.base.enums.repayPlan.RepayPlanRepaySrcEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.enums.repayPlan.SectionRepayStatusEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
+import com.hongte.alms.base.feignClient.AlmsOpenServiceFeignClient;
 import com.hongte.alms.base.feignClient.PlatformRepaymentFeignClient;
-import com.hongte.alms.base.mapper.AccountantOverRepayLogMapper;
-import com.hongte.alms.base.mapper.ApplyDerateProcessMapper;
-import com.hongte.alms.base.mapper.ApplyDerateTypeMapper;
-import com.hongte.alms.base.mapper.BasicBusinessMapper;
-import com.hongte.alms.base.mapper.MoneyPoolMapper;
-import com.hongte.alms.base.mapper.MoneyPoolRepaymentMapper;
-import com.hongte.alms.base.mapper.RepaymentBizPlanListDetailMapper;
-import com.hongte.alms.base.mapper.RepaymentBizPlanListMapper;
-import com.hongte.alms.base.mapper.RepaymentBizPlanMapper;
-import com.hongte.alms.base.mapper.RepaymentProjFactRepayMapper;
-import com.hongte.alms.base.mapper.RepaymentProjPlanListDetailMapper;
-import com.hongte.alms.base.mapper.RepaymentProjPlanListMapper;
-import com.hongte.alms.base.mapper.RepaymentProjPlanMapper;
-import com.hongte.alms.base.mapper.RepaymentResourceMapper;
-import com.hongte.alms.base.mapper.TuandaiProjectInfoMapper;
+import com.hongte.alms.base.mapper.*;
 import com.hongte.alms.base.process.mapper.ProcessMapper;
-import com.hongte.alms.base.service.AccountantOverRepayLogService;
-import com.hongte.alms.base.service.BasicBusinessService;
-import com.hongte.alms.base.service.RepaymentConfirmLogService;
-import com.hongte.alms.base.service.RepaymentProjFactRepayService;
-import com.hongte.alms.base.service.RepaymentProjPlanListService;
-import com.hongte.alms.base.service.RepaymentProjPlanService;
-import com.hongte.alms.base.service.RepaymentResourceService;
-import com.hongte.alms.base.service.SysApiCallFailureRecordService;
-import com.hongte.alms.base.service.TuandaiProjectInfoService;
-import com.hongte.alms.base.service.WithholdingRepaymentLogService;
+import com.hongte.alms.base.service.*;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.Constant;
@@ -93,6 +28,17 @@ import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.finance.service.ShareProfitService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.*;
+import java.util.concurrent.Executor;
 
 /**
  * @author 王继光 2018年5月24日 下午2:46:52
@@ -134,6 +80,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	MoneyPoolRepaymentMapper moneyPoolRepaymentMapper;
 	@Autowired
 	LoginUserInfoHelper loginUserInfoHelper;
+
 	@Autowired
 	Executor executor;
 
@@ -157,6 +104,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 
 	@Autowired
 	private PlatformRepaymentFeignClient platformRepaymentFeignClient;
+
+	@Autowired
+	private AlmsOpenServiceFeignClient almsOpenServiceFeignClient;
 
 	@Autowired
 	@Qualifier("RepaymentProjPlanListService")
@@ -334,7 +284,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		// divideOveryDueMoney(req.getOfflineOverDue(), planDto.get(), false);
 		// divideOveryDueMoney(req.getOnlineOverDue(), planDto.get(), true);
 		// 填充信息
-		fill();
+		//fill();
 		/////// 旧的分润方法 均分 结束 ==========
 
 		if (save) {
@@ -625,7 +575,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		}
 
 		Collections.sort(repaymentProjPlanDtos, new Comparator<RepaymentProjPlanDto>() {
-			// 排序规则说明 需补充
+			// 排序规则说明 需补充 从小标到大标，再到主借标
+			//同等
 			@Override
 			public int compare(RepaymentProjPlanDto arg0, RepaymentProjPlanDto arg1) {
 				if (arg0.getTuandaiProjectInfo().getMasterIssueId()
@@ -856,7 +807,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 								}
 							}
 						}
-						showPayOverDue = payedOverDue.subtract(payedOverDue);
+						showPayOverDue = planOverDue.subtract(payedOverDue);
 						// 如果应还的滞纳金比剩余的少
 						if (showPayOverDue.compareTo(moneyCopy) < 0) {
 							dmoney = showPayOverDue;
@@ -1060,7 +1011,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 						if (detail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
 							boolean bl = payOneFeeDetail(detail, currPeriodProjDetailVO, onLineOverDue);
 							if (bl && realPayedAmount.get() != null) {
-								onLineOverDue = onLineOverDue.divide(realPayedAmount.get());
+								onLineOverDue = onLineOverDue.subtract(realPayedAmount.get());
 							} else {
 								lastPaySuc = false;
 								break;
@@ -1096,7 +1047,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 						if (detail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
 							boolean bl = payOneFeeDetail(detail, currPeriodProjDetailVO, onLineOverDue);
 							if (bl && realPayedAmount.get() != null) {
-								onLineOverDue = onLineOverDue.divide(realPayedAmount.get());
+								onLineOverDue = onLineOverDue.subtract(realPayedAmount.get());
 								if (onLineOverDue.compareTo(new BigDecimal("0")) < 0) {
 									logger.error("还线上滞纳金还多了：repaymentProjPlanDto:[{}]",
 											JSON.toJSONString(repaymentProjPlanDto));
@@ -1131,7 +1082,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 					RepaymentProjPlanListDetail detail = repaymentProjPlanListDetailDto
 							.getRepaymentProjPlanListDetail();
 					boolean bl = payOneFeeDetail(detail, currPeriodProjDetailVO, null);
-					if (!bl) {
+					if (!bl && realPayedAmount.get() != null) {
 						lastPaySuc = false;
 						break;
 					}
@@ -1930,26 +1881,71 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			projPlanListDetailBak.insert();
 		}
 
-		logger.info("调用平台合规化还款接口开始，confirmLogId：{}", confirmLogId);
-
+		String afterId = this.afterId.get();
+		String businessId = this.businessId.get();
 		executor.execute(new Runnable() {
 			@Override
 			public void run() {
+				logger.info("调用平台合规化还款接口开始，confirmLogId：{}", confirmLogId);
 				try {
-					Thread.sleep(5000);
-					tdrepayRecharge(confirmLogId);
+					Thread.sleep(2000);
+					tdrepayRecharge(confirmLogId, businessId, afterId);
 				} catch (InterruptedException e) {
 					logger.error(e.getMessage(), e);
+					Thread.currentThread().interrupt();
 				}
+				logger.info("调用平台合规化还款接口结束");
 			}
 		});
-		logger.info("调用平台合规化还款接口结束");
 
+
+		//下面要触发往信贷更新还未计划数据，直接调用open中的接口方法。 张贵宏 2018.06.28
+		executor.execute(() -> {
+			logger.info("触发往信贷更新还未计划数据开始，businessId:[{}]", businessId);
+			updateRepayPlanToLMS(businessId);
+			logger.info("触发往信贷更新还未计划数据结束，businessId:[{}]", businessId);
+		});
 	}
 
-	private void tdrepayRecharge(String confirmLogId) {
+
+	/*
+	 *  还款计划相关数据有变更后需要向信贷系统推送最新数据
+	 *
+	 * @param businessId 业务id
+	 * @return void
+	 * @author 张贵宏
+	 * @date 2018/6/28 17:32
+	 */
+	private void updateRepayPlanToLMS(String businessId) {
+		Result result = null;
+		Map<String, Object> paramMap = Maps.newHashMap();
+		paramMap.put("businessId", businessId);
+		try {
+
+			result = almsOpenServiceFeignClient.updateRepayPlanToLMS(paramMap);
+			if (result == null || !"1".equals(result.getCode())) {
+
+				sysApiCallFailureRecordService.save(
+						AlmsServiceNameEnums.FINANCE,
+						Constant.INTERFACE_CODE_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
+						Constant.INTERFACE_NAME_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
+						businessId, JSON.toJSONString(paramMap), null, JSON.toJSONString(result), null, loginUserInfoHelper.getUserId());
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			sysApiCallFailureRecordService.save(
+					AlmsServiceNameEnums.FINANCE,
+					Constant.INTERFACE_CODE_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
+					Constant.INTERFACE_NAME_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
+					businessId, JSON.toJSONString(paramMap), null, e.getMessage(), null, loginUserInfoHelper.getUserId());
+		}
+	}
+
+
+	private void tdrepayRecharge(String confirmLogId, String busId, String afterId) {
 
 		SysApiCallFailureRecord record = new SysApiCallFailureRecord();
+		Result result = null;
 		try {
 			record.setModuleName(AlmsServiceNameEnums.FINANCE.getName());
 			record.setApiCode(Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT);
@@ -1960,12 +1956,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			record.setCraeteTime(new Date());
 			record.setTargetUrl(Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT);
 
-			Result result = null;
-			String busId = this.businessId.get();
-
 			RepaymentProjPlanList repaymentProjPlanList = repaymentProjPlanListService
 					.selectOne(new EntityWrapper<RepaymentProjPlanList>().eq("orig_business_id", busId).eq("after_id",
-							this.afterId.get()));
+							afterId));
 
 			RepaymentProjPlan plan = null;
 
@@ -1977,7 +1970,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 
 				Map<String, Object> paramMap = new HashMap<>();
 				paramMap.put("confirmLogId", confirmLogId);
-				paramMap.put("afterId", this.afterId.get());
+				paramMap.put("afterId", afterId);
 				paramMap.put("projectId", plan.getProjectId());
 
 				record.setApiParamPlaintext(JSONObject.toJSONString(paramMap));
@@ -1992,7 +1985,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			logger.error(e.getMessage(), e);
 			record.setApiReturnInfo(e.getMessage());
 		}
-		sysApiCallFailureRecordService.insert(record);
+		if (result == null || !"1".equals(result.getCode())) {
+			sysApiCallFailureRecordService.insert(record);
+		}
 	}
 
 	public static void main(String[] args) {

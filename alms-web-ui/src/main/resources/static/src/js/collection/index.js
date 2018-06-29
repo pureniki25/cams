@@ -300,12 +300,13 @@ window.layinit(function(htConfig){
                         if(d.periods==1&&!isZQ){
                             res+=firstPeriod
                         }
-                        if((d.repaymentTypeId==2 ||d.repaymentTypeId==1) &&d.borrowLimit+1==d.periods){
+                        if((d.repaymentTypeId==2 ) &&d.borrowLimit+1==d.periods){
                             res+=benjinPeriod
                         }
-                        if(d.borrowLimit+1==d.periods){
+                        if((d.repaymentTypeId == 5)  && d.borrowLimit==d.periods){
                             res+=lastPeriod
                         }
+
                         res += numeral(d.totalBorrowAmount).format('0,0.00')+''
                         return res
                     }
