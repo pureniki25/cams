@@ -440,7 +440,8 @@ window.layinit(function (htConfig) {
                 onlineOverDue: 0,
                 subTotal: 0,
                 total: 0,
-                surplus: 0
+                surplus: 0,
+                mprIds: []
             }
         },
         watch: {
@@ -695,40 +696,39 @@ window.layinit(function (htConfig) {
                     app.$Message.error({content: '不能提交没匹配流水且没使用结余金额的还款确认'})
                     return;
                 }
-                var repayAccount=app.factRepaymentInfo.repayAccount;
-                var total=app.factRepayPreview.total;
-                console.log("repayAccount=",repayAccount );
+                var repayAccount = app.factRepaymentInfo.repayAccount;
+                var total = app.factRepayPreview.total;
+                console.log("repayAccount=", repayAccount);
                 console.log("total=", total);
 
-                if(repayAccount<total){
+                if (repayAccount < total) {
                     app.$Message.error({content: '实还明细金额不能大于还款来源金额'})
                     return;
                 }
 
-                app.$Modal.confirm({
-                    content: '确认本次还款?',
-                    onOk() {
-                        axios.post(fpath + 'finance/confirmRepayment', param)
-                            .then(function (res) {
-                                if (res.data.code == '1') {
-                                    app.handleConfirmRepaymentResult(res)
-                                    app.$Modal.success({
-                                        content: '还款确认成功!', onOk() {
-                                            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
-                                            parent.layer.close(index);
-                                            parent.app.search()
-                                        }
-                                    })
-                                } else {
-                                    app.factRepaymentInfo.surplusFund = 0
-                                    app.$Message.error({content: res.data.msg})
-                                }
-                            })
-                            .catch(function (err) {
-                                console.log(err);
-                            })
-                    }
+                layer.confirm('确认本次还款?', {icon: 3, title: '提示'}, function (index) {
+                    axios.post(fpath + 'finance/confirmRepayment', param)
+                        .then(function (res) {
+                            if (res.data.code == '1') {
+                                app.handleConfirmRepaymentResult(res)
+                                app.$Modal.success({
+                                    content: '还款确认成功!', onOk: function () {
+                                        var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                                        parent.layer.close(index);
+                                        parent.app.search()
+                                    }
+                                })
+                            } else {
+                                app.factRepaymentInfo.surplusFund = 0
+                                app.$Message.error({content: res.data.msg})
+                            }
+                        })
+                        .catch(function (err) {
+                            console.log(err);
+                        })
+                    layer.close(index);
                 })
+
 
 
             },
@@ -737,6 +737,31 @@ window.layinit(function (htConfig) {
                 //调用预览还款的计算方法
                 previewConfirmRepayment();
 
+            },
+            previewConfirmOverDueRepayment() {
+                let param = {};
+                param.businessId = businessId;
+                param.afterId = afterId;
+                app.factRepayPreview.mprIds=app.factRepaymentInfo.mprIds
+                param = Object.assign(app.factRepayPreview, param);
+                param.callFlage = 10
+
+                axios.post(fpath + 'finance/previewConfirmRepayment', param)
+                    .then(function (res) {
+                        if (res.data.code == '1') {
+                            app.handleConfirmRepaymentResult(res)
+                        } else {
+                            app.factRepaymentInfo.surplusFund = 0
+                            app.$Message.error({content: res.data.msg})
+                        }
+                    })
+                    .catch(function (err) {
+                        console.log(err);
+                    })
+            },
+            onOfflineOverDueChange(e){
+                // console.log("1111",e.target.value);
+                // app.previewConfirmOverDueRepayment();
             },
             onsurplusFoundChange(e) {
 

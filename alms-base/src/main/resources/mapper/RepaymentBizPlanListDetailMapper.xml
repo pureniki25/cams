@@ -31,5 +31,18 @@
     <sql id="Base_Column_List">
          plan_detail_id AS planDetailId, plan_list_id AS planListId, business_id AS businessId, period, share_profit_index AS shareProfitIndex, plan_amount AS planAmount, plan_rate AS planRate, fee_id AS feeId, plan_item_name AS planItemName,derate_amount as derateAmount, plan_item_type AS planItemType, account_status AS accountStatus, fact_amount AS factAmount, repay_source AS repaySource, fact_repay_date AS factRepayDate, due_date AS dueDate, create_date AS createDate, src_type AS srcType, create_user AS createUser, update_date AS updateDate, update_user AS updateUser
     </sql>
+    
+    <!-- 更具还款计划计算减免总金额 -->
+    <select id="totalRepaymentFactAmount" resultType="java.util.Map" >
+    	SELECT
+          orig_business_id,
+          pDetail.plan_list_id,
+          SUM(IFNULL(pDetail.fact_amount,0)) AS realPay
+          FROM tb_repayment_biz_plan_list_detail pDetail
+               JOIN tb_repayment_biz_plan_list b
+                 ON pDetail.plan_list_id = b.plan_list_id
+                 where orig_business_id = #{origBusinessId,jdbcType=VARCHAR}
+                 GROUP BY b.orig_business_id
+	</select>
 
 </mapper>

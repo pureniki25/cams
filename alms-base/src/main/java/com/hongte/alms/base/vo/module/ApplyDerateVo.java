@@ -43,8 +43,17 @@ public class ApplyDerateVo {
     private String derateTime			;		//减免时间
 
     private String applyDerateProcessId;//减免流程ID
+    private String origBusinessId;//还款计划所属原业务编号
     
-    public String getApplyDerateProcessId() {
+    public String getOrigBusinessId() {
+		return origBusinessId;
+	}
+
+	public void setOrigBusinessId(String origBusinessId) {
+		this.origBusinessId = origBusinessId;
+	}
+
+	public String getApplyDerateProcessId() {
 		return applyDerateProcessId;
 	}
 

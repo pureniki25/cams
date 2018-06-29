@@ -18,6 +18,7 @@ import com.hongte.alms.base.entity.SysUser;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanItemTypeFeeIdEnum;
 import com.hongte.alms.base.mapper.ApplyDerateProcessMapper;
+import com.hongte.alms.base.mapper.RepaymentBizPlanListDetailMapper;
 import com.hongte.alms.base.process.entity.*;
 import com.hongte.alms.base.process.entity.Process;
 import com.hongte.alms.base.process.enums.ProcessApproveResult;
@@ -69,6 +70,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -153,6 +155,9 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
     @Qualifier("SysUserService")
     SysUserService sysUserService; 
     
+    @Autowired
+    RepaymentBizPlanListDetailMapper pepaymentBizPlanListDetailMapper;
+
     @Autowired
     Executor executor;
     
@@ -531,10 +536,14 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
         key.setUserId(userId);
 
         List<ApplyDerateVo> list = applyDerateProcessMap.selectApplyDerateList(pages,key);
-        for(ApplyDerateVo vo:list) {
-        	String realPayAmount=applyDerateProcessMap.getFactRepayAmountSum(vo.getBusinessId()).toString();
-        	vo.setRealPayMoney(realPayAmount);
-        }
+
+        //add by liuzq for 计算减免总额计算
+        list.forEach(e->{
+        	String origBusinessId = e.getOrigBusinessId();
+        	Map<String,Object> map = pepaymentBizPlanListDetailMapper.totalRepaymentFactAmount(origBusinessId);
+        	String realPayMoney = map.get("realPay")+"";
+        	e.setRealPayMoney(realPayMoney);
+        });
 
         pages.setRecords(setApplyDerateVoListInfo(list));
 
