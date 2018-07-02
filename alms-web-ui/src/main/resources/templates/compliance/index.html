@@ -261,7 +261,7 @@
    		</row>
 	</Modal>
 	
-	<Modal v-model="infoFlag" width="1600">
+	<Modal v-model="infoFlag" width="1600" @on-visible-change="openInfoTabModal">
 		<Card>
             <div slot="title" >
                 <span>业务编号:</span>
