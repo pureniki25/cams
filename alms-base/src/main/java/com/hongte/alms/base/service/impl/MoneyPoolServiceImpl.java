@@ -345,6 +345,8 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 		moneyPoolRepayment.setState(RepayRegisterFinanceStatus.未关联银行流水.toString());	
 		moneyPoolRepayment.setOriginalBusinessId(registerInfoDTO.getBusinessId());
 		moneyPoolRepayment.setAfterId(registerInfoDTO.getAfterId());
+		//update by liuzq for 设置实际还款时间
+		moneyPoolRepayment.setClaimDate(new Date());
 		boolean result = moneyPoolRepayment.insert();
 		if (result) {
 			ResponseData responseData = callRemoteService(new MoneyPoolRepaymentXindaiDTO(moneyPoolRepayment, registerInfoDTO.getBusinessId(), registerInfoDTO.getAfterId()), XINDAI_ADDORUPDATE);
