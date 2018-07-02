@@ -37,6 +37,7 @@ window.layinit(function(htConfig) {
 			rechargeRecordFlag: false, // 查看充值记录弹窗控制
 			rechargeAccountBalanceFlag: false, // 查看代充值账户余额弹窗控制
 			queryRechargeAccountBalanceLoading: false, // 查看代充值账户余额按钮加载状态控制
+			infoTabValue:'fundDistributionRecord',//详情tab值
 				
 			/*
 			 *  详情基础信息
@@ -378,13 +379,19 @@ window.layinit(function(htConfig) {
 				this.infoFlag = true;
 			},
 			/*
-			 * 打开详情弹窗
+			 * 打开充值记录弹窗
 			 */
 			openRechargeRecordModal: function(data){
 				if (this.bankAccountList.length == 0) {
 					this.listAllDepartmentBank();
 				}
 				this.rechargeRecordFlag = true;
+			},
+			/*
+			 * 打开充值记录弹窗
+			 */
+			openInfoTabModal: function(){
+				this.initFunction(this.infoTabValue);
 			},
 			/*
 			 * 获取所有线下还款账户
@@ -701,6 +708,7 @@ window.layinit(function(htConfig) {
              * 初始化方法
              */
             initFunction: function(event){
+            	this.infoTabValue = event;
             	if (event == 'platformRealRepayment') {
 					this.getProjectPayment();
 				}else if (event == 'advancesRecord') {
