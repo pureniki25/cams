@@ -34,6 +34,9 @@ window.layinit(function(htConfig) {
 			infoFlag: false,	// 详情弹窗控制
 			repaymentProjPlan: '', // 标还款计划信息
 			projectId:'', // 标ID
+			rechargeRecordFlag: false, // 查看充值记录弹窗控制
+			rechargeAccountBalanceFlag: false, // 查看代充值账户余额弹窗控制
+			queryRechargeAccountBalanceLoading: false, // 查看代充值账户余额按钮加载状态控制
 				
 			/*
 			 *  详情基础信息
@@ -83,6 +86,27 @@ window.layinit(function(htConfig) {
 				bankCode: '', // 选择银行
 				rechargeAccountBalance: '', //代充值账户余额
 				bankAccount: '', // 银行账号
+			},
+			
+			/*
+			 * 查询充值记录model
+			 */
+			queryRechargeRecordModel: {
+				rechargeAccountType: '', // 代充值账户
+				cmOrderNo:'', // 代充值订单号
+				rechargeSourseAccount:'', //充值来源账户
+				createTimeStart:'', //创建时间 开始
+				createTimeEnd:'',// 创建时间 结束
+			},
+			/*
+			 * 初始化查询充值记录model
+			 */
+			initQueryRechargeRecordModel: {
+				rechargeAccountType: '', // 代充值账户
+				cmOrderNo:'', // 代充值订单号
+				rechargeSourseAccount:'', //充值来源账户
+				createTimeStart:'', //创建时间 开始
+				createTimeEnd:'',// 创建时间 结束
 			},
 			
 			/*
@@ -251,6 +275,88 @@ window.layinit(function(htConfig) {
         	advancePaymentInfoData:[],
         	
         	distributeFundRecordList: [], // 资金分发记录
+        	
+        	/*
+             * 查看充值记录表头
+             */
+        	queryRechargeRecordColumns:[
+	        	{
+	        		title: '订单号',
+	        		key: 'cmOrderNo',
+	        		align: 'center',
+	        	},
+	        	{
+	        		title: '代充值账户',
+	        		key: 'rechargeAccountType',
+	        		align: 'center',
+	        	},
+	        	{
+	        		title: '代充值银行',
+	        		key: 'bankName',
+	        		align: 'center',
+	        	},
+	        	{
+	        		title: '充值来源银行',
+	        		key: 'rechargeSourseAccount',
+	        		align: 'center',
+	        	},
+	        	{
+	        		title: '充值来源银行卡(后4位)',
+	        		key: 'subBankAccount',
+	        		align: 'center',
+	        	},
+	        	{
+	        		title: '充值金额(元)',
+	        		key: 'rechargeAmount',
+	        		align: 'center',
+	        	},
+	        	{
+	        		title: '状态',
+	        		key: 'handleStatusStr',
+	        		align: 'center',
+	        	},
+	        	{
+	        		title: '创建人',
+	        		key: 'createUsername',
+	        		align: 'center',
+	        	},
+	        	{
+	        		title: '创建时间',
+	        		key: 'createTime',
+	        		align: 'center',
+	        	},
+        	],
+        	
+        	/*
+        	 * 查看充值记录数据
+        	 */
+        	queryRechargeRecordData:[],
+        	
+        	/*
+             * 查看所有代充值账户余额表头
+             */
+        	queryRechargeAccountBalanceColumns:[
+	        	{
+	        		title: '序号',
+	        		key: 'num',
+	        		align: 'center',
+	        	},
+	        	{
+	        		title: '账户名称',
+	        		key: 'rechargeAccountType',
+	        		align: 'center',
+	        	},
+	        	{
+	        		title: '余额',
+	        		key: 'balance',
+	        		align: 'center',
+	        	},
+        	],
+        	
+        	/*
+        	 * 查看所有代充值账户余额数据
+        	 */
+        	queryRechargeAccountBalanceData:[],
 
 		},
 
@@ -259,7 +365,9 @@ window.layinit(function(htConfig) {
 			 * 打开代充值账户充值弹窗
 			 */
 			openRechargeModal: function(){
-				this.listAllDepartmentBank();
+				if (this.bankAccountList.length == 0) {
+					this.listAllDepartmentBank();
+				}
 				this.rechargeModal = true;
 			},
 			/*
@@ -268,6 +376,15 @@ window.layinit(function(htConfig) {
 			openInfoModal: function(data){
 				this.getInfoBasicData(data);
 				this.infoFlag = true;
+			},
+			/*
+			 * 打开详情弹窗
+			 */
+			openRechargeRecordModal: function(data){
+				if (this.bankAccountList.length == 0) {
+					this.listAllDepartmentBank();
+				}
+				this.rechargeRecordFlag = true;
 			},
 			/*
 			 * 获取所有线下还款账户
@@ -393,7 +510,9 @@ window.layinit(function(htConfig) {
 			 */
 			closeModal: function(){
 				vm.rechargeModalForm = vm.initRechargeModalForm;
+				vm.queryRechargeRecordModel = vm.initQueryRechargeRecordModel;
 				this.rechargeModal = false;
+				this.rechargeRecordFlag = false;
 			},
 			
 			/*
@@ -510,12 +629,6 @@ window.layinit(function(htConfig) {
 			    			this.ComplianceRepaymentData = res.data;
 			    		}
 			    })
-			},
-			/*
-			 * 查看对应记录的费用明细
-			 */
-			queryFeeDetails: function(){
-				
 			},
 			/*
 			 * 查询所有分公司
@@ -646,6 +759,48 @@ window.layinit(function(htConfig) {
     	        })
     	        .catch(function (error) {
     	        	vm.$Modal.error({content: '接口调用异常!'});
+    	        });
+			},
+			
+			/*
+			 * 查看充值记录
+			 */
+			queryRechargeRecord:function(){
+				axios.post(basePath + 'tdrepayRecharge/queryRechargeRecord', vm.queryRechargeRecordModel)
+				.then(function(result){
+					if (result.data.code == 0) {
+						vm.queryRechargeRecordModel = vm.initQueryRechargeRecordModel;
+						vm.queryRechargeRecordData = result.data.data;
+						
+					} else {
+						vm.$Modal.error({ content: result.data.msg });
+					}
+				}).catch(function (error) {
+					vm.$Modal.error({content: '接口调用异常!'});
+            	});
+			},
+			
+			/*
+			 * 查询所有代充值账户余额
+			 */
+			queryRechargeAccountBalance: function(){
+				vm.queryRechargeAccountBalanceLoading = true;
+				axios.get(basePath +"tdrepayRecharge/queryRechargeAccountBalance")
+    	        .then(function (res) {
+    	        	vm.rechargeAccountBalanceFlag = true;
+    	            if (res.data.data != null && res.data.code == 1) {
+    	            	vm.queryRechargeAccountBalanceData = res.data.data;
+    	            	vm.queryRechargeAccountBalanceLoading = false;
+    	            } else {
+    	            	vm.$Modal.error({content: res.data.msg });
+    	            	vm.rechargeAccountBalanceFlag = false;
+    	            	vm.queryRechargeAccountBalanceLoading = false;
+    	            }
+    	        })
+    	        .catch(function (error) {
+    	        	vm.$Modal.error({content: '接口调用异常!'});
+    	        	vm.rechargeAccountBalanceFlag = false;
+    	        	vm.queryRechargeAccountBalanceLoading = false;
     	        });
 			},
 		},
