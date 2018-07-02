@@ -12,6 +12,7 @@ import com.hongte.alms.base.enums.BusinessSourceTypeEnum;
 import com.hongte.alms.base.enums.MsgCodeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
+import com.hongte.alms.base.feignClient.AlmsOpenServiceFeignClient;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.feignClient.MsgRemote;
 import com.hongte.alms.base.feignClient.dto.BankCardInfo;
@@ -110,6 +111,9 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 	@Autowired
     MsgRemote msgRemote;
 	
+	@Autowired
+	AlmsOpenServiceFeignClient almsOpenServiceFeignClient;
+	
 	
 	@Transactional(rollbackFor = Exception.class)
 	@Override
@@ -136,7 +140,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 				return;
 			}
 			//Business
-			List<RepaymentProjPlanList> projLists = repaymentProjPlanListService
+			List<RepaymentProjPlanList> projLists = repaymentProjPlanListService 
 					.selectList(new EntityWrapper<RepaymentProjPlanList>().eq("proj_plan_id", projPlan.getProjPlanId()));
 			List<RepaymentBizPlanList> pLists = repaymentBizPlanListService
 					.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", projPlan.getPlanId()));
@@ -262,6 +266,12 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 					@Override
 					public void run() {
 						RecordLog(dtoTemp, repaymentProjPlanListDtos);
+						//同步还款计划同信贷系统
+						Map<String, Object> paramMap = new HashMap<>();
+						paramMap.put("afterId", "");
+						paramMap.put("businessId", repaymentProjPlanListDtos.get(0).getRepaymentProjPlanList().getBusinessId());
+						paramMap.put("repaymentBatchId", "");
+						almsOpenServiceFeignClient.updateRepayPlanToLMS(paramMap);
 					}
 				});
 			
@@ -271,6 +281,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 			
 			try {
 				if (dto.getProjectStatus() == 1) {// 还款中
+					 NiWoProjPlanDto dtoTemp=dto;
 					List<RepaymentProjPlanListDto> repaymentProjPlanListDtos=new ArrayList();//用来记录你我金融每个标对应贷后每个标的还款计划的日志
 					for (RepaymentProjPlanList projPlanList : projLists) {
 						for (RepaymentBizPlanList pList : pLists) {
@@ -567,7 +578,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 										}
 									           try {
 												logger.info("你我金融-发送短信开始==================");
-												sendSuccessSms(pList.getOrigBusinessId(), planAmountSum, repayMoney);
+												sendSuccessSms(projPlanList.getProjPlanId(), planAmountSum, repayMoney);
 												logger.info("你我金融-发送短信结束==================");
 									           }catch(Exception e) {
 									        	   logger.error("你我金融-发送短信出错"+e);  
@@ -580,10 +591,22 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 
 						}
 					}
-					
-					RecordLog(dto, repaymentProjPlanListDtos);//用来记录你我金融每个标对应贷后每个标的还款计划的日志
 					projPlan.setUpdateTime(new Date());
 					repaymentProjPlanService.updateById(projPlan);
+					executor.execute(new Runnable() {
+						@Override
+						public void run() {
+							RecordLog(dtoTemp, repaymentProjPlanListDtos);//用来记录你我金融每个标对应贷后每个标的还款计划的日志
+							//同步还款计划同信贷系统
+							Map<String, Object> paramMap = new HashMap<>();
+							paramMap.put("afterId", "");
+							paramMap.put("businessId", repaymentProjPlanListDtos.get(0).getRepaymentProjPlanList().getBusinessId());
+							paramMap.put("repaymentBatchId", "");
+							almsOpenServiceFeignClient.updateRepayPlanToLMS(paramMap);							
+						}
+					});
+				
+			
 				}
 			} catch (Exception e) {
 				logger.info("同步你我金融标的数据时候出错,上标编号的ID为："+orderNo+"====="+e);
@@ -757,8 +780,10 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 	 * 发送扣款成功短信
 	 * @return 
 	 */
-	private void sendSuccessSms(String businessId,BigDecimal planAmount,BigDecimal repayAmount) {
-		TuandaiProjectInfo tuandaiProjectInfo=tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("business_id",businessId));
+	private void sendSuccessSms(String projPlanListId,BigDecimal planAmount,BigDecimal repayAmount) {
+		RepaymentProjPlan repaymentProjPlan=repaymentProjPlanService.selectOne(new EntityWrapper<RepaymentProjPlan>().eq("proj_plan_id", projPlanListId));
+		
+		TuandaiProjectInfo tuandaiProjectInfo=tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("project_id", repaymentProjPlan.getProjectId()));
 		
 	
 		String templateCode=MsgCodeEnum.NIWO_REPAY_SUCCESS.getValue();
