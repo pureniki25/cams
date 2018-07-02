@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <!--suppress ALL -->
 <html lang="zh-cn">
@@ -7,7 +6,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
-    <title >短信管理</title>
+    <title>短信管理</title>
     <script src="/properties/config.js"></script>
     <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
     <!-- iview样式 -->
@@ -51,65 +50,73 @@
                     搜索条件
                 </p>
                 <!--右上侧按钮列表-->
-                <!-- <i-button v-if="authValid('search')" slot="extra" type="info" :loading="loading" icon="ios-search" @click="toLoading" style="margin-right:10px">
-                    <span v-if="!loading">查询</span>
-                    <span v-else>查询中...</span>
-                </i-button> -->
 
-                <button class="layui-btn layui-btn-sm" slot="extra" @click="toLoading" v-if="authValid('search')" >
+                <button class="layui-btn layui-btn-sm" slot="extra" @click="toLoading" v-if="authValid('search')">
                     <span v-if="!loading"><i class="layui-icon">&#xe615;</i>查询</span>
-                    <span v-else><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
+                    <span v-else><i
+                            class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
                 </button>
-<!--                <i-button slot="extra"  @click="handleReset('searchForm')" style="margin-right:10px">
-                    <span>重置</span>
-                </i-button>-->
-          
+                <!--                <i-button slot="extra"  @click="handleReset('searchForm')" style="margin-right:10px">
+                                    <span>重置</span>
+                                </i-button>-->
+
 
                 <row :gutter="16">
-                    <i-form ref="searchForm"  :model="searchForm"   :rules="ruleValidate" label-position="right" :label-width="100">
+                    <i-form ref="searchForm" :model="searchForm" :rules="ruleValidate" label-position="right"
+                            :label-width="100">
                         <i-col span="6">
-                            <form-item label="关键字："   prop="keyName">
-                                <i-input v-model="searchForm.keyName"  placeholder="请输入业务编号,短信接收人,接收手机号码"></i-input>
+                            <form-item label="关键字：" prop="keyName">
+                                <i-input v-model="searchForm.keyName" placeholder="请输入业务编号,短信接收人,接收手机号码"></i-input>
                             </form-item>
                         </i-col>
-                
+
                         <i-col span="6">
                             <form-item label="短信类型：" prop="smsType">
-                                <i-select v-model="searchForm.smsType" clearable filterable >
-                                        <i-option v-for="item in smsTypeList" :value="item.paramValue" :key="item.paramValue">{{ item.paramTypeName }}</i-option>
-                                </i-select>
-                            </form-item>
-                        </i-col>
-                   <i-col span="6">
-                            <form-item label="分公司：" prop="companyId">
-                                <i-select v-model="searchForm.companyId" clearable filterable >
-                                    <i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{ item.areaName }}</i-option>
+                                <i-select v-model="searchForm.smsType" clearable filterable>
+                                    <i-option v-for="item in smsTypeList" :value="item.paramValue"
+                                              :key="item.paramValue">{{ item.paramTypeName }}
+                                    </i-option>
                                 </i-select>
                             </form-item>
                         </i-col>
                         <i-col span="6">
-                            <form-item label="发送时间："   prop="sendDateRange">
-                                <date-picker type="daterange"  v-model="searchForm.sendDateRange" placement="bottom-end" placeholder="选择日期" style="width: 200px"></date-picker>
+                            <form-item label="分公司：" prop="companyId">
+                                <i-select v-model="searchForm.companyId" clearable filterable>
+                                    <i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{
+                                        item.areaName }}
+                                    </i-option>
+                                </i-select>
                             </form-item>
                         </i-col>
-                        
-                            <i-col span="6">
+                        <i-col span="6">
+                            <form-item label="发送时间：" prop="sendDateRange">
+                                <date-picker type="daterange" v-model="searchForm.sendDateRange" placement="bottom-end"
+                                             placeholder="选择日期" style="width: 200px"></date-picker>
+                            </form-item>
+                        </i-col>
+
+                        <i-col span="6">
                             <form-item label="状态：" prop="status">
-                                <i-select v-model="searchForm.status" clearable filterable >
+                                <i-select v-model="searchForm.status" clearable filterable>
                                     <i-option value="成功" :key="1">成功</i-option>
-                                       <i-option value="失败" :key="2">失败</i-option>
+                                    <i-option value="失败" :key="2">失败</i-option>
                                 </i-select>
                             </form-item>
                         </i-col>
 
                     </i-form>
                 </row>
+                <div style="text-align: center">
+                    <button class="layui-btn layui-btn-sm" v-if="authValid('search')" :loading="loading" @click="toLoading">
+                        <span v-if="!loading"><i class="layui-icon">&#xe615;</i>查询</span>
+                        <span v-else><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
+                    </button>
+                </div>
+
             </Card>
         </i-col>
     </row>
     <!-- 搜索工具框 结束-->
-
-
 
 
     <!-- 表单Grid，使用layerUI的表格组件 开始 -->
@@ -120,7 +127,7 @@
             <script type="text/html" id="barTools">
                 <!--layui-btn layui-btn-xs-->
                 <a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="info" ht-auth="detail">短信详情</a>
-             <a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="business" ht-auth="detail">业务详情</a>
+                <a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="business" ht-auth="detail">业务详情</a>
             </script>
         </i-col>
     </row>
@@ -131,24 +138,23 @@
     <!--导出Excel隐藏表单-->
 
 
-
     <!--单行操作按钮Modal-->
-<!--    <Modal  ref="edit_modal" v-model="edit_modal" title="选择操作">
-        <row>
-            <i-button type="info" @click="showCollectionStackLog()">贷后跟踪记录</i-button>
-            <i-button type="info" @click="showApplyDerate()">减免申请</i-button>
-        </row>
-        <row>
+    <!--    <Modal  ref="edit_modal" v-model="edit_modal" title="选择操作">
+            <row>
+                <i-button type="info" @click="showCollectionStackLog()">贷后跟踪记录</i-button>
+                <i-button type="info" @click="showApplyDerate()">减免申请</i-button>
+            </row>
+            <row>
 
-        </row>
-        <div slot="footer">
-        </div>
-    </Modal>-->
+            </row>
+            <div slot="footer">
+            </div>
+        </Modal>-->
 
 
 </div>
 
-<script src="/src/js/collection/infoSms.js" ></script>
+<script src="/src/js/collection/infoSms.js"></script>
 <script>
 
 </script>
