@@ -3,16 +3,11 @@ package com.hongte.alms.finance.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.hongte.alms.base.entity.SysMsgTemplate;
-import com.hongte.alms.base.enums.MsgCodeEnum;
-import com.hongte.alms.base.feignClient.EipRemote;
+
 import com.hongte.alms.base.feignClient.MsgRemote;
 import com.hongte.alms.base.feignClient.dto.MsgRequestDto;
-import com.hongte.alms.base.feignClient.dto.NiWoProjPlanDto;
 import com.hongte.alms.base.service.SysCityService;
 import com.hongte.alms.base.service.SysCountyService;
-import com.hongte.alms.base.service.SysProvinceService;
 
 import com.hongte.alms.base.vo.module.AreaProvinceItemVo;
 import com.hongte.alms.common.result.Result;
@@ -42,9 +37,9 @@ import java.util.List;
 public class testController {
     private Logger logger = LoggerFactory.getLogger(testController.class);
 
-    @Autowired
-    @Qualifier("SysProvinceService")
-    private SysProvinceService provinceService;
+//    @Autowired
+//    @Qualifier("SysProvinceService")
+//    private SysProvinceService provinceService;
 
     @Autowired
     @Qualifier("SysCityService")
