@@ -116,7 +116,7 @@
 
         <where>
             1=1
-            and IFNULL(pList.repay_flag,0) != 6
+            and pList.repay_flag <> 6
 --             sys_param.param_type = 2
             <!--   改用列表 IN查询 这两个先屏蔽
             <if test="areaId !=null and areaId !=''">
