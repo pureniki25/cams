@@ -28,6 +28,7 @@ import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.finance.service.ShareProfitService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
+import com.ht.ussp.client.dto.LoginInfoDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -302,7 +303,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		/////// 旧的分润方法 均分 结束 ==========
 
 		if (save) {
-			updateStatus();
+			updateStatus(req);
 		}
 		System.out.println(JSON.toJSONString(projListDetails));
 		return projListDetails.get();
@@ -1332,7 +1333,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 	 * 
 	 * @author 王继光 2018年6月15日 下午8:26:42
 	 */
-	public void updateInMem() {
+	public void updateInMem(ConfirmRepaymentReq req) {
 		for (RepaymentProjPlanListDetail detail : updatedProjPlanDetails.get()) {
 			RepaymentBizPlanListDetail planListDetail = findRepaymentBizPlanListDetail(detail.getPlanDetailId());
 			if (planListDetail == null) {
@@ -1378,7 +1379,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			bizPlanList.setRemark(remark.get());
 
 			BigDecimal bplFactAmount = sumBizPlanListFactAmount(bizPlanList.getPlanListId());
-			;
+
 			if (bplFactAmount.compareTo(
 					bizPlanList.getTotalBorrowAmount().add(bizPlanList.getOverdueAmount() == null ? new BigDecimal("0")
 							: bizPlanList.getOverdueAmount())) >= 0) {
@@ -1386,6 +1387,14 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 				bizPlanList.setCurrentSubStatus(RepayPlanStatus.REPAYED.getName());
 				bizPlanList.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
 				setRepayConfirmedFlag(bizPlanList);
+				if(req.getReqFlag() !=null && req.getReqFlag() == 1){ //财务确认还款确认还款
+					bizPlanList.setFinanceComfirmDate(new Date());
+					LoginInfoDto loginInfo = loginUserInfoHelper.getLoginInfo();
+					if(loginInfo !=null){
+						bizPlanList.setFinanceConfirmUser(loginInfo.getUserId());
+						bizPlanList.setFinanceConfirmUserName(loginInfo.getUserName());
+					}
+				}
 			} else {
 				bizPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
 				bizPlanList.setCurrentSubStatus(RepayPlanStatus.REPAYING.getName());
@@ -1761,7 +1770,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 
 	}
 
-	private void updateStatus() {
+	private void updateStatus(ConfirmRepaymentReq req) {
 		// RepaymentBizPlanListDto planListDto =
 		// planDto.get().getBizPlanListDtos().get(0);
 		// RepaymentBizPlanList planList = planListDto.getRepaymentBizPlanList();
@@ -1866,7 +1875,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		// planList.setFinanceConfirmUserName(loginUserInfoHelper.getLoginInfo()==null?"手动代扣":loginUserInfoHelper.getLoginInfo().getUserName());
 		// planList.updateById();
 		// updateProjPlanStatus();
-		updateInMem();
+		updateInMem(req);
 		confirmLog.get().setFactAmount(repayFactAmount.get());
 		// confirmLog.get().setRepayDate(planList.getFactRepayDate());
 		confirmLog.get().setProjPlanJson(JSON.toJSONString(projListDetails.get()));
