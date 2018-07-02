@@ -190,7 +190,8 @@ public class MoneyPoolRepaymentXindaiDTO implements Serializable{
 		super();
 		SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		this.id = repayment.getXdMatchingId()==null?null:repayment.getXdMatchingId();
-		this.moneyPoolId = repayment.getXdPoolId();
+		//update by liuzq for 修改moneyPoolId默认值为0
+		this.moneyPoolId = repayment.getXdPoolId()==null?0:repayment.getXdPoolId();
 		this.business_id = businessId;
 		this.afterbusiness_id = afterId;
 		this.operate_id = repayment.getOperateId();
