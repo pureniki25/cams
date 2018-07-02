@@ -55,6 +55,12 @@ public class AfterLoanRepaymentServiceImpl implements AfterLoanRepaymentService 
     public Result submitAutoRepay(String businessId, String afterId, String bankCard) {
     	RepaymentBizPlanList repaymentBizPlanList=repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id",businessId).eq("after_id",afterId));
     	if(repaymentBizPlanList!=null){
+    		if(repaymentBizPlanList.getCurrentStatus()!=null && repaymentBizPlanList.getCurrentStatus().equals("已还款")) {
+    			Result result=new Result();
+                result.setCode("0000");
+                result.setMsg("该期已还款不可进行代扣！");
+                return result;
+    		}
     		//判断是否贷后代扣
             if(repaymentBizPlanList.getSrcType()==null || repaymentBizPlanList.getSrcType().intValue()==1){
                 Result result = withHoldingClient.repayAssignBank(repaymentBizPlanList.getOrigBusinessId(),afterId,bankCard);
