@@ -104,8 +104,10 @@
           	tb_sys_user_permission
           </if>
           as permission  ON  permission.business_id = pList.orig_business_id
-          left JOIN tb_five_level_classify_business_change_log as changeLog  ON  changeLog.orig_business_id = business.business_id
-          and changeLog.valid_status = '1'
+          left JOIN 
+          ( SELECT  class_name,orig_business_id FROM 
+  			tb_five_level_classify_business_change_log WHERE valid_status = '1' )
+          as changeLog  ON  changeLog.orig_business_id = business.business_id
 --         LEFT JOIN tb_sys_user as phoneUser ON  col_status.phone_staff = phoneUser.user_id
 --         LEFT JOIN tb_sys_user as visitUser ON  col_status.visit_staff = visitUser.user_id
 --         LEFT JOIN tb_sys_parameter as sys_param  ON  col_status.collection_status = sys_param.param_value
