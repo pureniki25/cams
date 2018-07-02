@@ -3,8 +3,10 @@ package com.hongte.alms.base.service;
 import java.util.List;
 import java.util.Map;
 
+import com.hongte.alms.base.entity.AgencyRechargeLog;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.vo.compliance.DistributeFundRecordVO;
+import com.hongte.alms.base.vo.compliance.RechargeRecordReq;
 import com.hongte.alms.base.vo.compliance.TdrepayRechargeInfoVO;
 import com.hongte.alms.base.vo.module.ComplianceRepaymentVO;
 import com.ht.ussp.core.Result;
@@ -92,5 +94,19 @@ public interface TdrepayRechargeService {
 	 * @return
 	 */
 	List<DistributeFundRecordVO> queryDistributeFundRecord(String projectId);
+	
+	/**
+	 * 查询充值记录
+	 * @param req
+	 * @return
+	 */
+	List<AgencyRechargeLog> queryRechargeRecord(RechargeRecordReq req);
+	
+	/**
+	 * 查询充值记录
+	 * @param req
+	 * @return
+	 */
+	int countRechargeRecord(RechargeRecordReq req);
 	
 }

@@ -361,7 +361,7 @@
     </select>
     
     <select id="queryRepaymentPlanInfoByBusinessId" resultType="com.hongte.alms.base.dto.RepaymentPlanInfoDTO">
-    SELECT 
+    	SELECT 
 		  rbpl.plan_list_id,
 		  '计划还款' repayment,
 		  rbpl.`after_id` afterId,
@@ -417,7 +417,7 @@
 		      SUM(
 		        CASE
 		          WHEN t2.plan_item_type = 60 
-		          THEN t2.plan_amount 
+		          THEN t2.plan_amount - t2.`derate_amount` 
 		          ELSE 0 
 		        END
 		      ),
@@ -447,6 +447,24 @@
 		  WHERE t1.plan_list_id = t2.plan_list_id 
 		    AND t2.fee_id = '3131c075-5721-11e8-8a00-0242ac110002' 
 		    AND t1.plan_list_id = rbpl.plan_list_id) offlineLateFee,
+		  -- 线下减免金额
+		  (SELECT 
+		    IFNULL(SUM(t2.derate_amount), 0) 
+		  FROM
+		    `tb_repayment_biz_plan_list` t1,
+		    `tb_repayment_biz_plan_list_detail` t2 
+		  WHERE t1.plan_list_id = t2.plan_list_id 
+		    AND t2.fee_id = '3131c075-5721-11e8-8a00-0242ac110002' 
+		    AND t1.plan_list_id = rbpl.plan_list_id) offlineDerateAmount,
+		  -- 线上减免金额
+		  (SELECT 
+		    IFNULL(SUM(t2.derate_amount), 0) 
+		  FROM
+		    `tb_repayment_biz_plan_list` t1,
+		    `tb_repayment_biz_plan_list_detail` t2 
+		  WHERE t1.plan_list_id = t2.plan_list_id 
+		    AND t2.fee_id = '2e646c87-5721-11e8-8a00-0242ac110002' 
+		    AND t1.plan_list_id = rbpl.plan_list_id) onlineDerateAmount,
 		  (SELECT 
 		    IFNULL(SUM(t2.plan_amount), 0) 
 		  FROM
@@ -456,7 +474,7 @@
 		    AND t1.plan_list_id = rbpl.plan_list_id) amount,
 		  0 otherFee,
 		  0 surplus,
-		  current_status confirmFlag  
+		  current_status confirmFlag 
 		FROM
 		  `tb_repayment_biz_plan_list` rbpl,
 		  `tb_repayment_biz_plan_list_detail` rbpld 
@@ -551,6 +569,8 @@
 		  WHERE t1.plan_list_id = t2.plan_list_id 
 		    AND t2.fee_id = '3131c075-5721-11e8-8a00-0242ac110002' 
 		    AND t1.plan_list_id = rbpl.plan_list_id) offlineLateFee,
+		  0 offlineDerateAmount,
+		  0 onlineDerateAmount,
 		  (SELECT 
 		    IFNULL(SUM(t2.fact_amount), 0) 
 		  FROM
@@ -568,7 +588,7 @@
 		    AND t2.account_status = 0 
 		    AND t2.plan_item_type NOT IN (10, 20, 30, 50, 60)) otherFee,
 		  (SELECT 
-		    t1.over_repay_money 
+		    IFNULL(SUM(t1.over_repay_money), 0) 
 		  FROM
 		    tb_accountant_over_repay_log t1 
 		  WHERE t1.business_id = #{businessId,jdbcType=VARCHAR} 
@@ -653,6 +673,24 @@
 		  WHERE t1.proj_plan_list_id = t2.proj_plan_list_id 
 		    AND t2.fee_id = '3131c075-5721-11e8-8a00-0242ac110002' 
 		    AND t1.proj_plan_list_id = rppl.proj_plan_list_id) offlineLateFee,
+          -- 线上减免金额
+		  (SELECT 
+		    IFNULL(SUM(t2.derate_amount), 0) 
+		  FROM
+		    `tb_repayment_proj_plan_list` t1,
+		    `tb_repayment_proj_plan_list_detail` t2 
+		  WHERE t1.proj_plan_list_id = t2.proj_plan_list_id 
+		    AND t2.fee_id = '2e646c87-5721-11e8-8a00-0242ac110002' 
+		    AND t1.proj_plan_list_id = rppl.proj_plan_list_id) onlineDerateAmount,
+		    -- 线下减免金额
+		  (SELECT 
+		    IFNULL(SUM(t2.derate_amount), 0) 
+		  FROM
+		    `tb_repayment_proj_plan_list` t1,
+		    `tb_repayment_proj_plan_list_detail` t2 
+		  WHERE t1.proj_plan_list_id = t2.proj_plan_list_id 
+		    AND t2.fee_id = '3131c075-5721-11e8-8a00-0242ac110002' 
+		    AND t1.proj_plan_list_id = rppl.proj_plan_list_id) offlineDerateAmount,
 		  (SELECT 
 		    IFNULL(SUM(t2.proj_plan_amount), 0) 
 		  FROM

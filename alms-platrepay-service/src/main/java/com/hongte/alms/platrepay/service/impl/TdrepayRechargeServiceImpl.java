@@ -30,12 +30,14 @@ import com.hongte.alms.base.dto.compliance.TdAdvanceShareProfitDTO;
 import com.hongte.alms.base.dto.compliance.TdDepaymentEarlierDTO;
 import com.hongte.alms.base.dto.compliance.TdProjectPaymentInfoResult;
 import com.hongte.alms.base.dto.compliance.TdRefundMonthInfoDTO;
+import com.hongte.alms.base.entity.AgencyRechargeLog;
 import com.hongte.alms.base.entity.IssueSendOutsideLog;
 import com.hongte.alms.base.entity.TdrepayAdvanceLog;
 import com.hongte.alms.base.entity.TdrepayRechargeDetail;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.EipRemote;
+import com.hongte.alms.base.mapper.AgencyRechargeLogMapper;
 import com.hongte.alms.base.mapper.TdrepayRechargeLogMapper;
 import com.hongte.alms.base.service.IssueSendOutsideLogService;
 import com.hongte.alms.base.service.TdrepayAdvanceLogService;
@@ -43,6 +45,7 @@ import com.hongte.alms.base.service.TdrepayRechargeDetailService;
 import com.hongte.alms.base.service.TdrepayRechargeLogService;
 import com.hongte.alms.base.service.TdrepayRechargeService;
 import com.hongte.alms.base.vo.compliance.DistributeFundRecordVO;
+import com.hongte.alms.base.vo.compliance.RechargeRecordReq;
 import com.hongte.alms.base.vo.compliance.TdrepayRechargeInfoVO;
 import com.hongte.alms.base.vo.module.ComplianceRepaymentVO;
 import com.hongte.alms.common.util.CommonUtil;
@@ -86,6 +89,9 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 	@Autowired
 	private TdrepayRechargeLogMapper tdrepayRechargeLogMapper;
+	
+	@Autowired
+	private AgencyRechargeLogMapper agencyRechargeLogMapper;
 
 	@Autowired
 	private EipRemote eipRemote;
@@ -364,6 +370,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		 */
 		IssueSendOutsideLog outsideLog = new IssueSendOutsideLog();
 		outsideLog.setSystem(Constant.SYSTEM_CODE_EIP);
+		outsideLog.setSendKey(batchId);
 
 		List<TdrepayRechargeLog> tdrepayRechargeLogs = new LinkedList<>();
 		for (TdrepayRechargeInfoVO vo : rechargeInfoVOs) {
@@ -1888,4 +1895,13 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		}
 	}
 
+	@Override
+	public List<AgencyRechargeLog> queryRechargeRecord(RechargeRecordReq req) {
+		return agencyRechargeLogMapper.queryRechargeRecord(req);
+	}
+	
+	@Override
+	public int countRechargeRecord(RechargeRecordReq req) {
+		return agencyRechargeLogMapper.countRechargeRecord(req);
+	}
 }
