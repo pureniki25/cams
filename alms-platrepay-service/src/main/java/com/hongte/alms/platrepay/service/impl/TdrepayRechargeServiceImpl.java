@@ -194,6 +194,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		rechargeLog.setAfterId(vo.getAfterId());
 		rechargeLog.setPeriod(vo.getPeriod());
 		rechargeLog.setSettleType(vo.getSettleType());
+		rechargeLog.setConfirmLogId(vo.getConfirmLogId());
 		rechargeLog.setConfirmTime(vo.getConfirmTime());
 		rechargeLog.setResourceAmount(vo.getResourceAmount());
 		rechargeLog.setFactRepayAmount(vo.getFactRepayAmount());
