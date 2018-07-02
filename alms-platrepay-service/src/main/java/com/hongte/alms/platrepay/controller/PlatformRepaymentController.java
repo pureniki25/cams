@@ -231,16 +231,16 @@ public class PlatformRepaymentController {
                 switch (basicBusiness.getBusinessCtype()){
                     case "小微企业贷用信":
                         if(tuandaiProjectInfo.getProjectId().equals(tuandaiProjectInfo.getMasterIssueId())){
-                            businessType = 28;
-                        }else{
                             businessType = 30;
+                        }else{
+                            businessType = 28;
                         }
                         break;
                     case "业主信用贷用信":
                         if(tuandaiProjectInfo.getProjectId().equals(tuandaiProjectInfo.getMasterIssueId())){
-                            businessType = 29;
-                        }else{
                             businessType = 26;
+                        }else{
+                            businessType = 29;
                         }
                         break;
                 }
