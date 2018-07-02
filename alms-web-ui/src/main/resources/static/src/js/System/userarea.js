@@ -1,7 +1,8 @@
 let app
 let dateStart
 let dateEnd
-let table 
+let table
+let tableIns
 window.layinit(function (htConfig) {
     let _htConfig = htConfig
     basePath = htConfig.coreBasePath
@@ -16,7 +17,7 @@ window.layinit(function (htConfig) {
 
     })
 
-    table.render({
+    tableIns = table.render({
         elem: "#userarea",
         height: 600 //容器高度
         ,
@@ -105,7 +106,7 @@ let methods = {
                 p[val]=app.schForm[val]
             }
         });
-        table.reload('userarea',{
+        tableIns.reload({
             where:p,
             page:{curr:1}
         })
