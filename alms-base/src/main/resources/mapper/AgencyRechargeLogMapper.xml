@@ -30,5 +30,42 @@
     <sql id="Base_Column_List">
         id, recharge_account_type AS rechargeAccountType, transfer_type AS transferType, recharge_amount AS rechargeAmount, recharge_sourse_account AS rechargeSourseAccount, bank_code AS bankCode, bank_account AS bankAccount, recharge_account_balance AS rechargeAccountBalance, cm_order_no AS cmOrderNo, oId_partner AS oIdPartner, recharge_user_id AS rechargeUserId, charge_type AS chargeType, client_ip AS clientIp, handle_status AS handleStatus, param_json AS paramJson, result_json AS resultJson, create_user AS createUser, create_time AS createTime, update_user AS updateUser, update_time AS updateTime
     </sql>
+    
+    <sql id="queryRechargeRecordCondition">
+    	1 = 1 
+		<if test="rechargeAccountType != null and rechargeAccountType != ''">
+			AND t.`recharge_account_type` =  #{rechargeAccountType,jdbcType=DATE}
+		</if>
+		<if test="cmOrderNo != null and cmOrderNo != ''">
+			AND t.`cm_order_no` =  #{cmOrderNo,jdbcType=DATE}
+		</if>
+		<if test="rechargeSourseAccount != null and rechargeSourseAccount != ''">
+			AND t.`recharge_sourse_account` =  #{rechargeSourseAccount,jdbcType=DATE}
+		</if>
+		<if test="createTimeStart != null">
+			AND t.`create_time` <![CDATA[ >= ]]>  #{createTimeStart,jdbcType=INTEGER}
+		</if>
+		<if test="createTimeEnd != null">
+		    AND t.`create_time` <![CDATA[ < ]]> #{createTimeEnd,jdbcType=INTEGER}
+		</if>
+    </sql>
+    
+    <select id="queryRechargeRecord" resultType="com.hongte.alms.base.entity.AgencyRechargeLog">
+		SELECT <include refid="Base_Column_List"/>
+		FROM
+		  `tb_agency_recharge_log` t 
+		WHERE
+			<include refid="queryRechargeRecordCondition"/>
+		ORDER BY t.`create_time`
+		LIMIT ${(page-1) * limit}, ${limit}
+	</select>
+	
+    <select id="countRechargeRecord" resultType="int">
+		SELECT count(1)
+		FROM
+		  `tb_agency_recharge_log` t 
+		WHERE
+			 <include refid="queryRechargeRecordCondition"/>
+	</select>
 
 </mapper>

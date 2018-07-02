@@ -211,7 +211,19 @@ public class AdminController {
 	@RequestMapping("/singleUserPermission")
 	public Result singleUserPermission(@Param(value = "userId") String userId) {
 		try {
-			sysUserPermissionService.setUserPermissons(userId);
+
+
+			List<SysUser> ll = sysUserService.selectList(new EntityWrapper<SysUser>().eq("user_id",userId).or("user_name",userId));
+
+			if(ll!=null && ll.size()>0){
+				for(SysUser su:ll){
+					sysUserPermissionService.setUserPermissons(su.getUserId());
+				}
+			}else{
+				return Result.error(ExceptionCodeEnum.NO_USER.getValue().toString(), ExceptionCodeEnum.NO_USER.getDesc());
+			}
+
+
 			return Result.success();
 		} catch (Exception e) {
 			LOGGER.error("--AdminController--设置所指定用户户可访问业务对照关系失败！ 用户ID："+userId, e);

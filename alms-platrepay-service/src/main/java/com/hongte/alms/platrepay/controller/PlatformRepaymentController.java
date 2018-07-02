@@ -258,9 +258,15 @@ public class PlatformRepaymentController {
             if (repaymentConfirmLog.getRepaySource() == null) {
                 LOGGER.error("@对接合规还款接口@ 指定的还款日志记录的还款来源为空 输入参数confirmLogId:[{}]", confirmLogId);
                 return Result.error("指定的还款日志记录的还款来源为空");
+            } else {
+                vo.setRepaySource(RepayPlanPayedTypeEnum.getByValue(repaymentConfirmLog.getRepaySource()).getClassifyId());
             }
-            vo.setRepaySource(RepayPlanPayedTypeEnum.getByValue(repaymentConfirmLog.getRepaySource()).getClassifyId());
-            vo.setConfirmTime(repaymentBizPlanList.getFinanceComfirmDate());
+            if (repaymentBizPlanList.getFinanceComfirmDate() == null) {
+                LOGGER.error("@对接合规还款接口@ 财务确认还款操作日期为空 输入参数plan_list_id:[{}]", repaymentBizPlanList.getPlanListId());
+                return Result.error("财务确认还款操作日期为空");
+            } else {
+                vo.setConfirmTime(repaymentBizPlanList.getFinanceComfirmDate());
+            }
             vo.setAfterId(afterId);
             vo.setPeriod(repaymentConfirmLog.getPeriod());
 

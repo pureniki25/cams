@@ -1393,8 +1393,8 @@ public class FinanceServiceImpl implements FinanceService {
 					double principal = repaymentPlanInfoDTO.getPrincipal();
 					double serviceCharge = repaymentPlanInfoDTO.getServiceCharge();
 					double platformCharge = repaymentPlanInfoDTO.getPlatformCharge();
-					double offlineLateFee = repaymentPlanInfoDTO.getOfflineLateFee();
-					double onlineLateFee = repaymentPlanInfoDTO.getOnlineLateFee();
+					double offlineLateFee = repaymentPlanInfoDTO.getOfflineLateFee() - repaymentPlanInfoDTO.getOfflineDerateAmount();
+					double onlineLateFee = repaymentPlanInfoDTO.getOnlineLateFee() - repaymentPlanInfoDTO.getOnlineDerateAmount();
 					double surplus = repaymentPlanInfoDTO.getSurplus(); // 结余
 
 					// 小计：本金+利息+月收分公司服务费+月收平台费
@@ -1528,8 +1528,8 @@ public class FinanceServiceImpl implements FinanceService {
 					double principal = repaymentProjInfoDTO.getPrincipal();
 					double serviceCharge = repaymentProjInfoDTO.getServiceCharge();
 					double platformCharge = repaymentProjInfoDTO.getPlatformCharge();
-					double offlineLateFee = repaymentProjInfoDTO.getOfflineLateFee();
-					double onlineLateFee = repaymentProjInfoDTO.getOnlineLateFee();
+					double offlineLateFee = repaymentProjInfoDTO.getOfflineLateFee() - repaymentProjInfoDTO.getOfflineDerateAmount();
+					double onlineLateFee = repaymentProjInfoDTO.getOnlineLateFee() - repaymentProjInfoDTO.getOnlineDerateAmount();
 
 					repaymentProjInfoDTO
 							.setSubtotal(BigDecimal.valueOf(accrual + principal + serviceCharge + platformCharge)

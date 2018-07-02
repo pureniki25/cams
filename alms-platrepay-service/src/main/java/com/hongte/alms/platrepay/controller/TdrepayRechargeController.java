@@ -25,11 +25,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.dto.compliance.TdProjectPaymentInfoResult;
 import com.hongte.alms.base.dto.compliance.TdRefundMonthInfoDTO;
+import com.hongte.alms.base.entity.AgencyRechargeLog;
 import com.hongte.alms.base.entity.BasicCompany;
 import com.hongte.alms.base.entity.RepaymentProjPlan;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
+import com.hongte.alms.base.enums.BankEnum;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
+import com.hongte.alms.base.enums.RechargeAccountTypeEnums;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.service.BasicCompanyService;
@@ -38,7 +41,9 @@ import com.hongte.alms.base.service.RepaymentProjPlanService;
 import com.hongte.alms.base.service.TdrepayRechargeLogService;
 import com.hongte.alms.base.service.TdrepayRechargeService;
 import com.hongte.alms.base.service.TuandaiProjectInfoService;
+import com.hongte.alms.base.vo.compliance.AgencyRechargeLogVO;
 import com.hongte.alms.base.vo.compliance.DistributeFundRecordVO;
+import com.hongte.alms.base.vo.compliance.RechargeRecordReq;
 import com.hongte.alms.base.vo.compliance.TdrepayRechargeInfoVO;
 import com.hongte.alms.base.vo.module.ComplianceRepaymentVO;
 import com.hongte.alms.common.result.Result;
@@ -53,6 +58,7 @@ import com.hongte.alms.platrepay.dto.TdReturnAdvanceShareProfitResult;
 import com.hongte.alms.platrepay.enums.PlatformStatusTypeEnum;
 import com.hongte.alms.platrepay.enums.ProcessStatusTypeEnum;
 import com.hongte.alms.platrepay.enums.RepaySourceEnum;
+import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.util.BeanUtils;
 
 import io.swagger.annotations.ApiOperation;
@@ -90,6 +96,9 @@ public class TdrepayRechargeController {
 	@Autowired
 	@Qualifier("RepaymentProjPlanService")
 	private RepaymentProjPlanService repaymentProjPlanService;
+
+	@Autowired
+	private LoginUserInfoHelper loginUserInfoHelper;
 
 	@Autowired
 	private EipRemote eipRemote;
@@ -152,6 +161,9 @@ public class TdrepayRechargeController {
 		}
 		if (vo.getIsComplete() == null) {
 			return Result.error(INVALID_PARAM_CODE, "isComplete" + INVALID_PARAM_DESC);
+		}
+		if (vo.getConfirmTime() == null) {
+			return Result.error(INVALID_PARAM_CODE, "confirmTime" + INVALID_PARAM_DESC);
 		}
 		if (CollectionUtils.isEmpty(vo.getDetailList())) {
 			return Result.error(INVALID_PARAM_CODE, "detailList" + INVALID_PARAM_DESC);
@@ -641,7 +653,7 @@ public class TdrepayRechargeController {
 			return Result.error("-99", e.getMessage());
 		}
 	}
-	
+
 	@ApiOperation(value = "资产端对团贷网通用合规化还款流程")
 	@PostMapping("/repayComplianceWithRequirements")
 	@ResponseBody
@@ -649,6 +661,102 @@ public class TdrepayRechargeController {
 		try {
 			tdrepayRechargeService.repayComplianceWithRequirements();
 			return Result.success();
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error("-99", e.getMessage());
+		}
+	}
+
+	@ApiOperation(value = "查看充值记录")
+	@PostMapping("/queryRechargeRecord")
+	@ResponseBody
+	public PageResult<List<AgencyRechargeLogVO>> queryRechargeRecord(@RequestBody RechargeRecordReq req) {
+		try {
+
+			if (req != null && req.getCreateTimeEnd() != null) {
+				req.setCreateTimeEnd(DateUtil.addDay2Date(1, req.getCreateTimeEnd()));
+			}
+			int count = tdrepayRechargeService.countRechargeRecord(req);
+			if (count == 0) {
+				return PageResult.success(count);
+			}
+
+			List<AgencyRechargeLogVO> agencyRechargeLogVOs = new ArrayList<>();
+
+			List<AgencyRechargeLog> agencyRechargeLogs = tdrepayRechargeService.queryRechargeRecord(req);
+			if (CollectionUtils.isNotEmpty(agencyRechargeLogs)) {
+				for (AgencyRechargeLog agencyRechargeLog : agencyRechargeLogs) {
+					AgencyRechargeLogVO vo = BeanUtils.deepCopy(agencyRechargeLog, AgencyRechargeLogVO.class);
+					if (vo != null) {
+						vo.setBankName(BankEnum.getName(agencyRechargeLog.getBankCode()));
+						String bankAccount = agencyRechargeLog.getBankAccount();
+						vo.setSubBankAccount(StringUtil.isEmpty(bankAccount) ? bankAccount
+								: bankAccount.substring(bankAccount.length() - 4, bankAccount.length()));
+						switch (agencyRechargeLog.getHandleStatus()) {
+						case "1":
+							vo.setHandleStatusStr("处理中");
+							break;
+						case "2":
+							vo.setHandleStatusStr("充值成功");
+							break;
+						case "3":
+							vo.setHandleStatusStr("充值失败");
+							break;
+
+						default:
+							break;
+						}
+						vo.setCreateUsername(loginUserInfoHelper.getLoginInfo().getUserName());
+						agencyRechargeLogVOs.add(vo);
+					}
+				}
+				return PageResult.success(agencyRechargeLogVOs, count);
+			}
+			return PageResult.success(0);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return PageResult.error(-99, e.getMessage());
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	@ApiOperation(value = "查询代充值账户余额")
+	@GetMapping("/queryRechargeAccountBalance")
+	@ResponseBody
+	public Result<List<Map<String, Object>>> queryRechargeAccountBalance() {
+		try {
+
+			Map<String, Object> paramMap = new HashMap<>();
+			
+			List<Map<String, Object>> resultList = new ArrayList<>();
+
+
+			List<String> listName = RechargeAccountTypeEnums.listName();
+
+			int num = 1;
+			
+			for (String rechargeAccountType : listName) {
+				
+				Map<String, Object> resultMap = new HashMap<>();
+
+				paramMap.put("userId", tdrepayRechargeService.handleAccountType(rechargeAccountType));
+
+				com.ht.ussp.core.Result result = eipRemote.queryUserAviMoney(paramMap);
+
+				resultMap.put("rechargeAccountType", rechargeAccountType);
+				resultMap.put("num", num++);
+				
+				if (result != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode()) && result.getData() != null) {
+					JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(result.getData()));
+					resultMap.put("balance", jsonObject.get("aviMoney"));
+				}else {
+					resultMap.put("balance", "查询" + rechargeAccountType + "账户余额失败");
+				}
+				
+				resultList.add(resultMap);
+			}
+
+			return Result.success(resultList);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return Result.error("-99", e.getMessage());

@@ -23,6 +23,7 @@ public class RepaymentPlanInfoDTO implements Serializable {
 	/**
 	 * 还款日期：应还日期/实际还款日期
 	 */
+	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
 	private Date repaymentDate;
 	/**
 	 * 本金：本期应还本金
@@ -60,6 +61,14 @@ public class RepaymentPlanInfoDTO implements Serializable {
 	 * 线下滞纳金 ：应还线下滞纳金 逾期天数× 线下滞纳金费率
 	 */
 	private double offlineLateFee;
+	/**
+	 * 线上减免金额
+	 */
+	private double onlineDerateAmount;
+	/**
+	 * 线下减免金额
+	 */
+	private double offlineDerateAmount;
 	/**
 	 * 结余：应还为0，实际实收结余费用项
 	 */
@@ -101,7 +110,6 @@ public class RepaymentPlanInfoDTO implements Serializable {
 		this.afterId = afterId;
 	}
 
-	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
 	public Date getRepaymentDate() {
 		return repaymentDate;
 	}
@@ -182,6 +190,22 @@ public class RepaymentPlanInfoDTO implements Serializable {
 		this.offlineLateFee = offlineLateFee;
 	}
 
+	public double getOnlineDerateAmount() {
+		return onlineDerateAmount;
+	}
+
+	public void setOnlineDerateAmount(double onlineDerateAmount) {
+		this.onlineDerateAmount = onlineDerateAmount;
+	}
+
+	public double getOfflineDerateAmount() {
+		return offlineDerateAmount;
+	}
+
+	public void setOfflineDerateAmount(double offlineDerateAmount) {
+		this.offlineDerateAmount = offlineDerateAmount;
+	}
+
 	public double getSurplus() {
 		return surplus;
 	}
@@ -198,14 +222,6 @@ public class RepaymentPlanInfoDTO implements Serializable {
 		this.total = total;
 	}
 
-	public String getConfirmFlag() {
-		return confirmFlag;
-	}
-
-	public void setConfirmFlag(String confirmFlag) {
-		this.confirmFlag = confirmFlag;
-	}
-
 	public double getAmount() {
 		return amount;
 	}
@@ -214,14 +230,23 @@ public class RepaymentPlanInfoDTO implements Serializable {
 		this.amount = amount;
 	}
 
+	public String getConfirmFlag() {
+		return confirmFlag;
+	}
+
+	public void setConfirmFlag(String confirmFlag) {
+		this.confirmFlag = confirmFlag;
+	}
+
 	@Override
 	public String toString() {
 		return "RepaymentPlanInfoDTO [planListId=" + planListId + ", repayment=" + repayment + ", afterId=" + afterId
 				+ ", repaymentDate=" + repaymentDate + ", principal=" + principal + ", accrual=" + accrual
 				+ ", serviceCharge=" + serviceCharge + ", platformCharge=" + platformCharge + ", otherFee=" + otherFee
 				+ ", subtotal=" + subtotal + ", overdueDays=" + overdueDays + ", onlineLateFee=" + onlineLateFee
-				+ ", offlineLateFee=" + offlineLateFee + ", surplus=" + surplus + ", total=" + total + ", amount="
-				+ amount + ", confirmFlag=" + confirmFlag + "]";
+				+ ", offlineLateFee=" + offlineLateFee + ", onlineDerateAmount=" + onlineDerateAmount
+				+ ", offlineDerateAmount=" + offlineDerateAmount + ", surplus=" + surplus + ", total=" + total
+				+ ", amount=" + amount + ", confirmFlag=" + confirmFlag + "]";
 	}
 
 }
