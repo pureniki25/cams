@@ -263,7 +263,7 @@ public class PlatformRepaymentController {
             }
             if (repaymentBizPlanList.getFinanceComfirmDate() == null) {
                 LOGGER.error("@对接合规还款接口@ 财务确认还款操作日期为空 输入参数plan_list_id:[{}]", repaymentBizPlanList.getPlanListId());
-                return Result.error("财务确认还款操作日期为空");
+                //return Result.error("财务确认还款操作日期为空");
             } else {
                 vo.setConfirmTime(repaymentBizPlanList.getFinanceComfirmDate());
             }
@@ -307,7 +307,8 @@ public class PlatformRepaymentController {
             List<RepaymentResource> repaymentResources = repaymentResourceService.selectList(new EntityWrapper<RepaymentResource>().eq("confirm_log_id", confirmLogId));
             if (repaymentResources != null && repaymentResources.size() > 0) {
                 for (RepaymentResource repaymentResource : repaymentResources) {
-                    if (repaymentResource.getRepayAmount() != null) {
+                    //排除用 11:用往期结余还款的流水
+                    if (repaymentResource.getRepayAmount() != null && repaymentResource.getIsCancelled() == 0 && !"11".equals(repaymentResource.getRepaySource())) {
                         resourceAmount = resourceAmount.add(repaymentResource.getRepayAmount());
                     }
                 }
@@ -330,17 +331,17 @@ public class PlatformRepaymentController {
                 List<TdrepayRechargeDetail> detailFeeList = Lists.newArrayList();
 
 
-                /**
-                 * 累计费用，线下（资产公司）的滞纳金排除在外，注意用value和uuid去区分.  OVER_DUE_AMONT_UNDERLINE(60,"线下滞纳金","3131c075-5721-11e8-8a00-0242ac110002",5)
-                 * {@link com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum }
-                 */
                 for (RepaymentProjFactRepay r : projFactRepays) {
+                    //实还金额应该包含滞纳金
+                    factRepayAmount = factRepayAmount.add(r.getFactAmount());
+
+                    //累计费用，线下（资产公司）的滞纳金排除在外，注意用value和uuid去区分.  OVER_DUE_AMONT_UNDERLINE(60,"线下滞纳金","3131c075-5721-11e8-8a00-0242ac110002",5)
                     if (RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getValue().equals(r.getPlanItemType())
                             || RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid().equals(r.getFeeId())) {
                         continue;
                     }
                     //resourceAmount = resourceAmount.add(r.getFactAmount());
-                    factRepayAmount = factRepayAmount.add(r.getFactAmount());
+
                     rechargeAmount = rechargeAmount.add(r.getFactAmount());
 
                     TdrepayRechargeDetail detailFee = new TdrepayRechargeDetail();

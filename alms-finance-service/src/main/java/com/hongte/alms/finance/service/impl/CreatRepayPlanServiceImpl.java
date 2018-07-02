@@ -469,7 +469,25 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public PlanReturnInfoDto creatAndSaveRepayPlan(CreatRepayPlanReq creatRepayPlanReq) throws IllegalAccessException, InstantiationException {
+        //异步存储调用此接口传入的参数
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                IssueSendOutsideLog log=new IssueSendOutsideLog();
+                log.setCreateTime(new Date());
+                log.setCreateUserId(Constant.ADMIN_ID);
+                log.setInterfacecode("CreatRepayPlanService_creatAndSaveRepayPlan");
+                log.setInterfacename("创建并存储还款计划");
+                log.setSendJsonEncrypt(creatRepayPlanReq.getBusinessBasicInfoReq().getBusinessId());
+                log.setSendJson(JSON.toJSONString(creatRepayPlanReq));
+                log.setReturnJson(null);
+//                log.setReturnJsonDecrypt(JSON.toJSONString(dtos));
+                log.setSystem("");
+                log.setSendUrl("");
 
+                issueSendOutsideLogService.insert(log);
+            }
+        });
 
         //判断是否重传
         checkResave(creatRepayPlanReq);
