@@ -377,16 +377,16 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 
 			RepaymentResource repaymentResource = new RepaymentResource();
 			repaymentResource.setAfterId(log.getAfterId());
-			List<BasicBusiness> basicBusiness = basicBusinessMapper.selectList(
-					new EntityWrapper<BasicBusiness>().eq("source_business_id", log.getOriginalBusinessId()));
-			List<RepaymentBizPlanList> ll = repaymentBizPlanListMapper
-					.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("after_id", log.getAfterId())
-							.eq("orig_business_id", log.getOriginalBusinessId()));
-			if (ll == null || ll.size() == 0) {
-
-			} else if (ll.size() > 1) {
-
-			}
+//			List<BasicBusiness> basicBusiness = basicBusinessMapper.selectList(
+//					new EntityWrapper<BasicBusiness>().eq("source_business_id", log.getOriginalBusinessId()));
+//			List<RepaymentBizPlanList> ll = repaymentBizPlanListMapper
+//					.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("after_id", log.getAfterId())
+//							.eq("orig_business_id", log.getOriginalBusinessId()));
+//			if (ll == null || ll.size() == 0) {
+//
+//			} else if (ll.size() > 1) {
+//
+//			}
 			repaymentResource.setBusinessId(log.getOriginalBusinessId());
 			repaymentResource.setOrgBusinessId(log.getOriginalBusinessId());
 			repaymentResource.setCreateDate(new Date());
@@ -1003,6 +1003,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		// 上一次还款是否成功的标志位
 		boolean lastPaySuc = true;
 
+		/*
 		// 1.优先还 界面设置的线上滞纳金
 		for (int i = 0; i < dto.getProjPlanDtos().size(); i++) {
 			if (lastPaySuc == false)
@@ -1079,6 +1080,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 				}
 			}
 		}
+		*/
 
 		// 3.最后按核销顺序还金额
 		String lastProjectId = null;
@@ -1399,8 +1401,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 					}
 				}
 			} else {
-				bizPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
-				bizPlanList.setCurrentSubStatus(RepayPlanStatus.REPAYING.getName());
+
+//				bizPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
+//				bizPlanList.setCurrentSubStatus(RepayPlanStatus.REPAYING.getName());
 				projPlanList.setRepayFlag(null);
 				if (bplFactAmount.compareTo(bizPlanList.getTotalBorrowAmount()) >= 0) {
 					bizPlanList.setRepayStatus(SectionRepayStatusEnum.ONLINE_REPAID.getKey());
