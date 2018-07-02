@@ -391,7 +391,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			repaymentResource.setCreateDate(new Date());
 			if (loginUserInfoHelper != null && loginUserInfoHelper.getUserId() != null) {
 				repaymentResource.setCreateUser(loginUserInfoHelper.getUserId());
-			} else {
+			} else { 
 				repaymentResource.setCreateUser("admin");
 			}
 
@@ -402,6 +402,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			if (save.get()) {
 				confirmLog.get().setRepayDate(repaymentResource.getRepayDate());
 				repaymentResource.setRepaySourceRefId(log.getLogId().toString());
+				repaymentResource.setConfirmLogId(confirmLog.get().getConfirmLogId());
 				repaymentResource.insert();
 			}
 			repayFactAmount.set(repayFactAmount.get().add(log.getCurrentAmount()));
@@ -1338,8 +1339,10 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			if (planListDetail == null) {
 				throw new ServiceRuntimeException("找不到对应的planListDetail");
 			}
-			planListDetail.setFactAmount(detail.getProjFactAmount().add(
-					planListDetail.getFactAmount() == null ? new BigDecimal("0") : planListDetail.getFactAmount()));
+//			planListDetail.setFactAmount(detail.getProjFactAmount().add(
+//					planListDetail.getFactAmount() == null ? new BigDecimal("0") : planListDetail.getFactAmount()));
+			
+			planListDetail.setFactAmount(detail.getProjFactAmount());
 			planListDetail.setFactRepayDate(detail.getFactRepayDate());
 			planListDetail.setRepaySource(detail.getRepaySource());
 			planListDetail.setUpdateDate(new Date());
@@ -1947,7 +1950,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 						AlmsServiceNameEnums.FINANCE,
 						Constant.INTERFACE_CODE_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
 						Constant.INTERFACE_NAME_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
-						businessId, JSON.toJSONString(paramMap), null, JSON.toJSONString(result), null, loginUserInfoHelper.getUserId());
+						businessId, JSON.toJSONString(paramMap), null, JSON.toJSONString(result), null, loginUserInfoHelper.getUserId() == null ? "null" : loginUserInfoHelper.getUserId());
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -1955,7 +1958,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 					AlmsServiceNameEnums.FINANCE,
 					Constant.INTERFACE_CODE_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
 					Constant.INTERFACE_NAME_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
-					businessId, JSON.toJSONString(paramMap), null, e.getMessage(), null, loginUserInfoHelper.getUserId());
+					businessId, JSON.toJSONString(paramMap), null, e.getMessage(), null, loginUserInfoHelper.getUserId() == null ? "null" : loginUserInfoHelper.getUserId());
 		}
 	}
 
