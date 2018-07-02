@@ -107,7 +107,6 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
 
 
         List<AfterLoanStandingBookVo> list = phoneUrgeMapper.selectAfterLoadStanding(pages,req);
-
         setExtInfo(list);
 
 //        pages.setRecords(setInfoForAfterLoanStandingBookVo(list));

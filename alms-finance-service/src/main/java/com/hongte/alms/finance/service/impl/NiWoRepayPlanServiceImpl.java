@@ -198,6 +198,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 					projPlanList.setCurrentStatus("已还款");
 					projPlanList.setRepayFlag(1);// 1：已还款 你我金融的单，还款后标志为1
 					projPlanList.setUpdateTime(new Date());
+					projPlanList.setFactRepayDate(new Date());
 					projPlanList.setCreatSysType(3);
 					repaymentProjPlanListService.updateById(projPlanList);
 				}
@@ -244,6 +245,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 					}
 					pList.setCurrentStatus("已还款");
 					pList.setRepayFlag(1);// 1：已还款 你我金融的单，还款后标志为1
+					pList.setFactRepayDate(new Date());
 					pList.setUpdateTime(new Date());
 					repaymentBizPlanListService.updateById(pList);
 				}

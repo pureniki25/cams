@@ -94,7 +94,16 @@
             </otherwise>
         </choose>
 
-          JOIN tb_sys_user_permission as permission  ON  permission.business_id = pList.orig_business_id
+          JOIN 
+          <if test="userId !=null">
+	         (SELECT user_id,business_id  FROM 
+	         tb_sys_user_permission WHERE user_id = #{userId}
+	         )
+          </if>
+          <if test="userId ==null">
+          	tb_sys_user_permission
+          </if>
+          as permission  ON  permission.business_id = pList.orig_business_id
           left JOIN tb_five_level_classify_business_change_log as changeLog  ON  changeLog.orig_business_id = business.business_id
           and changeLog.valid_status = '1'
 --         LEFT JOIN tb_sys_user as phoneUser ON  col_status.phone_staff = phoneUser.user_id
@@ -256,16 +265,6 @@
         order BY  pList.due_date 
 
     </select>
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     
        <select id="selectRepayManage" resultType="com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo"
