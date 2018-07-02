@@ -385,8 +385,12 @@ var layer;
 	
 	vm.ajax_data.total=vm.ajax_data.planPrincipal+vm.ajax_data.planAccrual+vm.ajax_data.planServiceCharge+vm.ajax_data.platformCharge+Number(vm.ajax_data.onLineOverDueMoney)+Number(vm.ajax_data.underLineOverDueMoney)-vm.ajax_data.repayAllAmount;
 	var total=vm.ajax_data.total;
+	if(total<0){
+		total=0;
+	}
 	vm.ajax_data.total=total.toFixed(2);
 	vm.ajax_data.repayAmount=total.toFixed(2);
+
 	return vm.ajax_data.total;
 	}
 
@@ -423,6 +427,9 @@ var layer;
         	vm.isBankFlag=true;
         	vm.ajax_data.total=getTotalShouldPay();
         	vm.ajax_data.repayAmount=vm.ajax_data.repayAmount-vm.ajax_data.planOverDueMoney;
+        	if(	vm.ajax_data.repayAmount<0){
+        		vm.ajax_data.repayAmount=0;
+        	}
         	vm.ajax_data.repayAmount=vm.ajax_data.repayAmount.toFixed(2);
        
         }else{
