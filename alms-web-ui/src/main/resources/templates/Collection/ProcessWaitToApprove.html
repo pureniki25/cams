@@ -53,12 +53,7 @@
                     <span v-else>查询中...</span>
                 </i-button> -->
 
-                <button class="layui-btn layui-btn-sm" slot="extra" @click="toLoading" v-if="authValid('search')">
-                    <span v-if="!loading">
-                        <i class="layui-icon">&#xe615;</i>查询</span>
-                    <span v-else>
-                        <i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
-                </button>
+
                     
                 <!--查询表单内容-->
                 <row :gutter="16">
@@ -110,6 +105,14 @@
                         </i-col>
                     </i-form>
                 </row>
+                <div style="text-align: center;">
+                    <button  class="layui-btn layui-btn-sm"  @click="toLoading" v-if="authValid('search')">
+                    <span v-if="!loading">
+                        <i class="layui-icon">&#xe615;</i>查询</span>
+                        <span v-else>
+                        <i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
+                    </button>
+                </div>
             </Card>
         </i-col>
     </row>

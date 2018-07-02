@@ -120,14 +120,14 @@ public class WithholdingServiceimpl implements WithholdingService {
 		BankCardInfo ThirtyCardInfo = rechargeService.getThirtyPlatformInfo(bankCardInfos);
 		BigDecimal thirtyRepayAmount=getThirtyRepayAmount(pList);
 		if (bankCardInfo != null&&thirtyRepayAmount.compareTo(BigDecimal.valueOf(0))==0) {
-//			if(bankCardInfo.getSignedProtocolList().size()>0) {
-//				// 银行代扣
-//				BankCharge(basic, bankCardInfo, pList, bankCardInfos);
-//			}else if(ThirtyCardInfo != null&&bankCardInfo.getSignedProtocolList().size()==0) {
-//				ThirdRepaymentCharge(basic, ThirtyCardInfo, pList, null);// 第三方代扣
-//			}
+			if(bankCardInfo.getSignedProtocolList().size()>0) {
+				// 银行代扣
+				BankCharge(basic, bankCardInfo, pList, bankCardInfos);
+			}else if(ThirtyCardInfo != null&&bankCardInfo.getSignedProtocolList().size()==0) {
+				ThirdRepaymentCharge(basic, ThirtyCardInfo, pList, null);// 第三方代扣
+			}
 			
-			BankCharge(basic, bankCardInfo, pList, bankCardInfos);
+			//BankCharge(basic, bankCardInfo, pList, bankCardInfos);
 		} else if (ThirtyCardInfo != null && (bankCardInfo == null||(bankCardInfo != null&&thirtyRepayAmount.compareTo(BigDecimal.valueOf(0))>0))) {// 第三方代扣
 			ThirdRepaymentCharge(basic, ThirtyCardInfo, pList, null);
 		} else {
@@ -325,7 +325,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 					if (sysBankLimit.getHasOnceLimit() == 0 || sysBankLimit.getOnceLimit().compareTo(repayMoney) > 0) {
 						Integer boolPartRepay = 0;// 表示本期是否分多笔代扣,0:一次性代扣，1:分多笔代扣
 						Integer boolLastRepay = 1;// 表示本期是否分多笔代扣中的最后一笔代扣，若非多笔代扣，本字段存1。 0:非最后一笔代扣，1:最后一笔代扣
-						if (pList.getTotalBorrowAmount().add(pList.getOverdueAmount())
+						if (pList.getTotalBorrowAmount().add(pList.getOverdueAmount()==null?BigDecimal.valueOf(0):pList.getOverdueAmount())
 								.subtract(sysBankLimit.getOnceLimit()).compareTo(BigDecimal.valueOf(0)) > 0) {
 							boolPartRepay = 1;
 
@@ -414,7 +414,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		
 		
 		Result result=new Result();
-//		if(bankCardInfo.getSignedProtocolList()!=null&&bankCardInfo.getSignedProtocolList().size()>0) {
+		if(bankCardInfo.getSignedProtocolList()!=null&&bankCardInfo.getSignedProtocolList().size()>0) {
 				BigDecimal onlineAmount = rechargeService.getOnlineAmount(pList);
 				BigDecimal underAmount = rechargeService.getUnderlineAmount(pList);
 				Integer platformId = (Integer) PlatformEnum.YH_FORM.getValue();
@@ -507,10 +507,10 @@ public class WithholdingServiceimpl implements WithholdingService {
 						}
 					}
 				}
-//		}else {
-//			result.setCode("-1");
-//	    	result.setMsg("找不到签约成功的协议代扣渠道");
-//		}
+		}else {
+			result.setCode("-1");
+	    	result.setMsg("找不到签约成功的协议代扣渠道");
+		}
 		return result;
 	}
 

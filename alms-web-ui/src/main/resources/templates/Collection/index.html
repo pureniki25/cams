@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <!--suppress ALL -->
 <html lang="zh-cn">
@@ -7,7 +6,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
-    <title >贷后管理</title>
+    <title>贷后管理</title>
     <script src="/properties/config.js"></script>
     <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
     <!-- iview样式 -->
@@ -51,19 +50,6 @@
                     搜索条件
                 </p>
 
-                <div class="layui-btn-group"  slot="extra" >
-                    <button class="layui-btn layui-btn-sm" @click="toLoading" v-if="authValid('search')" >
-                        <span v-if="!loading"><i class="layui-icon">&#xe615;</i>查询</span>
-                        <span v-else><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
-                    </button>
-                    <button class="layui-btn layui-btn-sm"  v-if="authValid('reset')" @click="handleReset('searchForm')" >
-                        <span>重置</span>
-                    </button>
-                    <button class="layui-btn layui-btn-sm" id="exportBtn" v-if="authValid('export')" @click="clickExport" >
-                        <span v-if="!exporting">导出</span>
-                        <span v-else><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>导出中...</span>
-                    </button>
-                </div>
 
                 <!--右上侧按钮列表-->
                 <!-- <i-button v-if="authValid('search')" slot="extra" type="info" :loading="loading" icon="ios-search" @click="toLoading" style="margin-right:10px">
@@ -81,25 +67,32 @@
 
                 <!--查询表单内容-->
                 <row :gutter="16">
-                    <i-form ref="searchForm"  :model="searchForm"   :rules="ruleValidate" label-position="right" :label-width="100">
+                    <i-form ref="searchForm" :model="searchForm" :rules="ruleValidate" label-position="right"
+                            :label-width="100">
                         <i-col span="6">
                             <form-item label="区域：" prop="areaId">
-                                <i-select v-model="searchForm.areaId" clearable  filterable >
-                                    <i-option v-for="item in areaList" :value="item.areaId" :key="item.areaId">{{ item.areaName }}</i-option>
+                                <i-select v-model="searchForm.areaId" clearable filterable>
+                                    <i-option v-for="item in areaList" :value="item.areaId" :key="item.areaId">{{
+                                        item.areaName }}
+                                    </i-option>
                                 </i-select>
                             </form-item>
                         </i-col>
                         <!--companyId:'',     style="width:200px" //公司ID-->
                         <i-col span="6">
                             <form-item label="分公司：" prop="companyId">
-                                <i-select v-model="searchForm.companyId" clearable filterable >
-                                    <i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{ item.areaName }}</i-option>
+                                <i-select v-model="searchForm.companyId" clearable filterable>
+                                    <i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{
+                                        item.areaName }}
+                                    </i-option>
                                 </i-select>
                             </form-item>
                         </i-col>
                         <i-col span="6">
-                            <form-item label="应还日期："   prop="showRepayDateRange">
-                                <date-picker type="daterange"  v-model="searchForm.showRepayDateRange" placement="bottom-end" placeholder="选择日期" style="width: 200px"></date-picker>
+                            <form-item label="应还日期：" prop="showRepayDateRange">
+                                <date-picker type="daterange" v-model="searchForm.showRepayDateRange"
+                                             placement="bottom-end" placeholder="选择日期"
+                                             style="width: 200px"></date-picker>
 
                                 <!--<date-picker  v-model="searchForm.showRepayDateBegin" type="date" placeholder="Select date"   style="width: 200px"></date-picker>-->
                             </form-item>
@@ -110,8 +103,10 @@
                         <!--</form-item>-->
                         <!--</i-col>-->
                         <i-col span="6">
-                            <form-item label="实还日期："  prop="realRepayDateRange">
-                                <date-picker type="daterange"  v-model="searchForm.realRepayDateRange" placement="bottom-end" placeholder="选择日期" style="width: 200px"></date-picker>
+                            <form-item label="实还日期：" prop="realRepayDateRange">
+                                <date-picker type="daterange" v-model="searchForm.realRepayDateRange"
+                                             placement="bottom-end" placeholder="选择日期"
+                                             style="width: 200px"></date-picker>
                                 <!--<date-picker  v-model="searchForm.realRepayDateBegin" type="date" placeholder="Select date"   style="width: 200px"></date-picker>-->
                             </form-item>
 
@@ -122,37 +117,47 @@
                                                     </form-item>
                                                 </i-col>-->
                         <i-col span="6">
-                            <form-item label="逾期天数："   prop="delayDaysBegin">
-                                <i-input v-model="searchForm.delayDaysBegin"></i-input>
-                            </form-item>
-
+                            <i-col span="14">
+                                <form-item label="逾期天数：" prop="delayDaysBegin">
+                                    <i-input  v-model="searchForm.delayDaysBegin"></i-input>
+                                </form-item>
+                            </i-col>
+                            <i-col span="10">
+                                <form-item label="至" prop="delayDaysEnd" label-width="50">
+                                    <i-input   v-model="searchForm.delayDaysEnd"></i-input>
+                                </form-item>
+                            </i-col>
                         </i-col>
-                        <i-col span="6">
-                            <form-item label="至"   prop="delayDaysEnd">
-                                <i-input v-model="searchForm.delayDaysEnd"></i-input>
-                            </form-item>
-                        </i-col>
+                        <!--<i-col span="6">-->
+                            <!--<form-item label="至" prop="delayDaysEnd">-->
+                                <!--<i-input v-model="searchForm.delayDaysEnd"></i-input>-->
+                            <!--</form-item>-->
+                        <!--</i-col>-->
                         <i-col span="6">
                             <form-item label="催收级别：" prop="collectLevel">
-                                <i-select v-model="searchForm.collectLevel" clearable filterable >
-                                    <i-option v-for="item in collectLevelList" :value="item.paramValue" :key="item.paramValue">{{ item.paramName }}</i-option>
+                                <i-select v-model="searchForm.collectLevel" clearable filterable>
+                                    <i-option v-for="item in collectLevelList" :value="item.paramValue"
+                                              :key="item.paramValue">{{ item.paramName }}
+                                    </i-option>
                                 </i-select>
                             </form-item>
                         </i-col>
                         <i-col span="6">
-                            <form-item label="业务获取："  prop="operatorName">
+                            <form-item label="业务获取：" prop="operatorName">
                                 <i-input v-model="searchForm.operatorName"></i-input>
                             </form-item>
                         </i-col>
                         <i-col span="6">
-                            <form-item label="业务编号："  prop="businessId">
+                            <form-item label="业务编号：" prop="businessId">
                                 <i-input v-model="searchForm.businessId"></i-input>
                             </form-item>
                         </i-col>
                         <i-col span="6">
                             <form-item label="业务类型：" prop="businessType">
-                                <i-select v-model="searchForm.businessType" clearable filterable >
-                                    <i-option v-for="item in businessTypeList" :value="item.businessTypeId" :key="item.businessTypeId">{{ item.businessTypeName }}</i-option>
+                                <i-select v-model="searchForm.businessType" clearable filterable>
+                                    <i-option v-for="item in businessTypeList" :value="item.businessTypeId"
+                                              :key="item.businessTypeId">{{ item.businessTypeName }}
+                                    </i-option>
                                 </i-select>
                             </form-item>
                         </i-col>
@@ -180,27 +185,32 @@
                         <i-col span="6">
                             <form-item label="还款状态：" prop="repayStatus">
                                 <i-select v-model="searchForm.repayStatus" clearable filterable style="width:200px">
-                                    <i-option v-for="item in repayStatusList" :value="item.paramName" :key="item.paramName">{{ item.paramName }}</i-option>
+                                    <i-option v-for="item in repayStatusList" :value="item.paramName"
+                                              :key="item.paramName">{{ item.paramName }}
+                                    </i-option>
                                 </i-select>
                             </form-item>
                         </i-col>
                         <!--businessStatus:'',          //业务状态-->
                         <i-col span="6">
                             <form-item label="业务状态：" prop="businessStatus">
-                                <i-select v-model="searchForm.businessStatus" clearable filterable  style="width:200px">
-                                    <i-option v-for="item in businessStatusList" :value="item.paramValue" :key="item.paramValue">{{ item.paramName }}</i-option>
+                                <i-select v-model="searchForm.businessStatus" clearable filterable style="width:200px">
+                                    <i-option v-for="item in businessStatusList" :value="item.paramValue"
+                                              :key="item.paramValue">{{ item.paramName }}
+                                    </i-option>
                                 </i-select>
                             </form-item>
                         </i-col>
-                        
+
                         <i-col span="6">
                             <form-item label="业务类别：" prop="businessClassName">
-                                <i-select v-model="searchForm.businessClassName" clearable filterable  style="width:200px">
-                                    <i-option value="正常类" >正常类</i-option>
-                                    <i-option value="关注类" >关注类</i-option>
-                                    <i-option value="次级类" >次级类</i-option>
-                                    <i-option value="可疑类" >可疑类</i-option>
-                                    <i-option value="损失类" >损失类</i-option>
+                                <i-select v-model="searchForm.businessClassName" clearable filterable
+                                          style="width:200px">
+                                    <i-option value="正常类">正常类</i-option>
+                                    <i-option value="关注类">关注类</i-option>
+                                    <i-option value="次级类">次级类</i-option>
+                                    <i-option value="可疑类">可疑类</i-option>
+                                    <i-option value="损失类">损失类</i-option>
                                 </i-select>
                             </form-item>
                         </i-col>
@@ -214,6 +224,21 @@
 
                     </i-form>
                 </row>
+
+                <div style="text-align: center;">
+                    <button class="layui-btn layui-btn-sm" @click="toLoading" v-if="authValid('search')">
+                        <span v-if="!loading"><i class="layui-icon">&#xe615;</i>查询</span>
+                        <span v-else><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
+                    </button>
+                    <button class="layui-btn layui-btn-sm" v-if="authValid('reset')" @click="handleReset('searchForm')">
+                        <span>重置</span>
+                    </button>
+                    <button class="layui-btn layui-btn-sm" id="exportBtn" v-if="authValid('export')"
+                            @click="clickExport">
+                        <span v-if="!exporting">导出</span>
+                        <span v-else><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>导出中...</span>
+                    </button>
+                </div>
             </Card>
         </i-col>
     </row>
@@ -225,8 +250,8 @@
             <!--:loading="saving"-->
             <i-button v-if="authValid('setPhone')" type="info" @click="showSetPhoneStaff()"> 分配电催</i-button>
             <i-button v-if="authValid('setVisit')" type="info" @click="showSetVisitStaff()"> 移交催收</i-button>
-<!--            <i-button type="info" @click="showSetOutsideCommission()"> 委外受理</i-button>
-            <i-button type="info" @click="showTestCalculation()"> 结清试算</i-button>-->
+            <!--            <i-button type="info" @click="showSetOutsideCommission()"> 委外受理</i-button>
+                        <i-button type="info" @click="showTestCalculation()"> 结清试算</i-button>-->
 
         </i-col>
     </row>
@@ -241,7 +266,7 @@
             <script type="text/html" id="barTools">
                 <!--layui-btn layui-btn-xs-->
                 <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="operate" id="operate">操作</a>
-                <a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="info"   ht-auth="detail">详情</a>
+                <a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="info" ht-auth="detail">详情</a>
             </script>
         </i-col>
     </row>
@@ -253,56 +278,54 @@
     <!--导出Excel隐藏表单-->
 
 
-
-
     <!--设置电催Modal-->
     <!--<Modal   ref="menu_modal"   v-model="menu_modal" title="菜单管理">-->
-<!--    <Modal v-model="menu_modal" title="设置电催"
-           :styles="{left:'0px',top:'10px',width:'1300px',height:'1000px'}"
-           :mask-closable="false">
-        &lt;!&ndash;<row>&ndash;&gt;
-            <iframe src="setPhoneStaffUI" width="1250px" height="1000px" ></iframe>
-        &lt;!&ndash;</row>&ndash;&gt;
-        <div slot="footer">
-            &lt;!&ndash;<i-button type="error" size="large" long :loading="modal_loading" @click="del">Delete</i-button>&ndash;&gt;
-        </div>
-    </Modal>-->
+    <!--    <Modal v-model="menu_modal" title="设置电催"
+               :styles="{left:'0px',top:'10px',width:'1300px',height:'1000px'}"
+               :mask-closable="false">
+            &lt;!&ndash;<row>&ndash;&gt;
+                <iframe src="setPhoneStaffUI" width="1250px" height="1000px" ></iframe>
+            &lt;!&ndash;</row>&ndash;&gt;
+            <div slot="footer">
+                &lt;!&ndash;<i-button type="error" size="large" long :loading="modal_loading" @click="del">Delete</i-button>&ndash;&gt;
+            </div>
+        </Modal>-->
 
     <!--单行操作按钮Modal-->
-   <!-- <Modal  ref="edit_modal" v-model="edit_modal" title="选择操作">
-        <row>
-            <i-button type="info" @click="showCollectionStackLog()">贷后跟踪记录</i-button>
-            </i-col>
-            <i-col span="6">
-            <i-button type="info" @click="showApplyDerate()">减免申请</i-button>
+    <!-- <Modal  ref="edit_modal" v-model="edit_modal" title="选择操作">
+         <row>
+             <i-button type="info" @click="showCollectionStackLog()">贷后跟踪记录</i-button>
+             </i-col>
+             <i-col span="6">
+             <i-button type="info" @click="showApplyDerate()">减免申请</i-button>
+              <i-button type="info" @click="showDeduction()">执行代扣</i-button>
+             <i-button type="info" @click="showCarLoanData()">移交法务诉讼（车）</i-button>
+             <i-button type="info" @click="showHouseLoanData()">移交法务诉讼（房）</i-button>
+
+             </i-col>
+             <i-col span="6">
              <i-button type="info" @click="showDeduction()">执行代扣</i-button>
-            <i-button type="info" @click="showCarLoanData()">移交法务诉讼（车）</i-button>
-            <i-button type="info" @click="showHouseLoanData()">移交法务诉讼（房）</i-button>
+             </i-col>
+             <i-col span="6">
+             <i-button type="info" @click="showdragRegistration()">拖车登记</i-button>
+             </i-col>
+             <i-col span="6">
+             <i-button type="info" @click="showRepaymentRegister()">还款登记</i-button>
+             </i-col>
+             <i-col span="6">
+             <i-button type="info" @click="showCheckFundPool()">查看款项池</i-button>
+             </i-col>
+         </row>
+         <row>
 
-            </i-col>
-            <i-col span="6">
-            <i-button type="info" @click="showDeduction()">执行代扣</i-button>
-            </i-col>
-            <i-col span="6">
-            <i-button type="info" @click="showdragRegistration()">拖车登记</i-button>
-            </i-col>
-            <i-col span="6">
-            <i-button type="info" @click="showRepaymentRegister()">还款登记</i-button>
-            </i-col>
-            <i-col span="6">
-            <i-button type="info" @click="showCheckFundPool()">查看款项池</i-button>
-            </i-col>
-        </row>
-        <row>
-
-        </row>
-        <div slot="footer">
-        </div>
-    </Modal>-->
+         </row>
+         <div slot="footer">
+         </div>
+     </Modal>-->
 
 
 </div>
-<script src="/src/js/collection/index.js" ></script>
+<script src="/src/js/collection/index.js"></script>
 <script>
 
 </script>
