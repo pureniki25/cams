@@ -730,7 +730,7 @@ public class RepayPlanController {
             if(detials!=null&&detials.size()>0){
                 for(RepaymentBizPlanListDetail detail:detials){
                     if(detail.getFactAmount()!=null){
-                        realPay.add(detail.getFactAmount());
+                        realPay =  realPay.add(detail.getFactAmount());
                     }
                 }
             }
