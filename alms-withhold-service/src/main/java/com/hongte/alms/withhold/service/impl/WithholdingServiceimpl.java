@@ -325,7 +325,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 					if (sysBankLimit.getHasOnceLimit() == 0 || sysBankLimit.getOnceLimit().compareTo(repayMoney) > 0) {
 						Integer boolPartRepay = 0;// 表示本期是否分多笔代扣,0:一次性代扣，1:分多笔代扣
 						Integer boolLastRepay = 1;// 表示本期是否分多笔代扣中的最后一笔代扣，若非多笔代扣，本字段存1。 0:非最后一笔代扣，1:最后一笔代扣
-						if (pList.getTotalBorrowAmount().add(pList.getOverdueAmount())
+						if (pList.getTotalBorrowAmount().add(pList.getOverdueAmount()==null?BigDecimal.valueOf(0):pList.getOverdueAmount())
 								.subtract(sysBankLimit.getOnceLimit()).compareTo(BigDecimal.valueOf(0)) > 0) {
 							boolPartRepay = 1;
 

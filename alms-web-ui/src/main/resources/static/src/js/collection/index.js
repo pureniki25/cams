@@ -300,7 +300,7 @@ window.layinit(function(htConfig){
                         if(d.periods==1&&!isZQ){
                             res+=firstPeriod
                         }
-                        if((d.repaymentTypeId==2 ) &&d.borrowLimit+1==d.periods){
+                        if((d.repaymentTypeId==2 ) &&d.borrowLimit==d.periods){
                             res+=benjinPeriod
                         }
                         if((d.repaymentTypeId == 5)  && d.borrowLimit==d.periods){
@@ -402,7 +402,6 @@ window.layinit(function(htConfig){
                         tableid: 'listTable',
                         onBefore: function (e) {
                             console.log('e',e);
-                            debugger
                             var buttons = [];
 
                             if (authValid('trackRecord')) {
