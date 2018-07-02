@@ -529,10 +529,10 @@ public class TdrepayRechargeController {
 			if (CollectionUtils.isNotEmpty(tdProjectPaymentDTOs)) {
 				for (TdProjectPaymentDTO tdProjectPaymentDTO : tdProjectPaymentDTOs) {
 					switch (tdProjectPaymentDTO.getStatus()) {
-					case 0:
+					case 1:
 						tdProjectPaymentDTO.setStatusStrActual("已结清");
 						break;
-					case 1:
+					case 0:
 						tdProjectPaymentDTO.setStatusStrActual("逾期");
 						break;
 
