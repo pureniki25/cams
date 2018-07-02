@@ -307,7 +307,8 @@ public class PlatformRepaymentController {
             List<RepaymentResource> repaymentResources = repaymentResourceService.selectList(new EntityWrapper<RepaymentResource>().eq("confirm_log_id", confirmLogId));
             if (repaymentResources != null && repaymentResources.size() > 0) {
                 for (RepaymentResource repaymentResource : repaymentResources) {
-                    if (repaymentResource.getRepayAmount() != null && repaymentResource.getIsCancelled() == 0) {
+                    //排除用 11:用往期结余还款的流水
+                    if (repaymentResource.getRepayAmount() != null && repaymentResource.getIsCancelled() == 0 && !"11".equals(repaymentResource.getRepaySource())) {
                         resourceAmount = resourceAmount.add(repaymentResource.getRepayAmount());
                     }
                 }
