@@ -72,22 +72,7 @@ transition: border .2s ease-in-out,background .2s ease-in-out,box-shadow .2s eas
                     <Icon type="ios-search"></Icon>
                     搜索条件
                 </p>
-                <div class="layui-btn-group" slot="extra">
-                    <button class="layui-btn layui-btn-sm" @click="toLoading" v-if="authValid('search')">
-                        <span v-if="!loading">
-                            <i class="layui-icon">&#xe615;</i>查询</span>
-                        <span v-else>
-                            <i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
-                    </button>
-                    <button class="layui-btn layui-btn-sm" v-if="authValid('reset')" @click="handleReset('searchForm')">
-                        <span>重置</span>
-                    </button>
-                    <button class="layui-btn layui-btn-sm"  v-if="authValid('export')" @click="clickExport">
-                        <span v-if="!exporting">导出</span>
-                        <span v-else>
-                            <i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>导出中...</span>
-                    </button>
-                </div>
+
 
                 <!--右上侧按钮列表-->
                 <!-- <i-button v-if="authValid('search')" slot="extra" type="info" :loading="loading" icon="ios-search" @click="toLoading" style="margin-right:10px">
@@ -164,6 +149,22 @@ transition: border .2s ease-in-out,background .2s ease-in-out,box-shadow .2s eas
                         </i-col>
                     </i-form>
                 </row>
+                <div style="text-align: center">
+                    <button class="layui-btn layui-btn-sm" @click="toLoading" v-if="authValid('search')">
+                        <span v-if="!loading">
+                            <i class="layui-icon">&#xe615;</i>查询</span>
+                        <span v-else>
+                            <i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
+                    </button>
+                    <button class="layui-btn layui-btn-sm" v-if="authValid('reset')" @click="handleReset('searchForm')">
+                        <span>重置</span>
+                    </button>
+                    <button class="layui-btn layui-btn-sm"  v-if="authValid('export')" @click="clickExport">
+                        <span v-if="!exporting">导出</span>
+                        <span v-else>
+                            <i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>导出中...</span>
+                    </button>
+                </div>
             </Card>
         </i-col>
     </row>

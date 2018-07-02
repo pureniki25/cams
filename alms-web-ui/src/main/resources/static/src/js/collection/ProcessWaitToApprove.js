@@ -110,7 +110,7 @@ window.layinit(function (htConfig) {
                     type: 2,
                     title: title,
                     maxmin: true,
-                    area: ['1250px', '800px'],
+                    area: ['80%', '80%'],
                     content:url
                 });
             }
@@ -245,7 +245,7 @@ window.layinit(function (htConfig) {
                             type: 2,
                             title: title,
                             maxmin: true,
-                            area: ['1250px', '800px'],
+                            area: ['80%', '80%'],
                             content:url
                         });
                     }

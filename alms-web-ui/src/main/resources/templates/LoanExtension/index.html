@@ -4,18 +4,18 @@
 <!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
     <title>展期管理</title>
     <script src="/properties/config.js"></script>
-    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css" />
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
     <!-- iview样式 -->
-    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css" />
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
     <!--@import url("//unpkg.com/iview/dist/styles/iview.css");-->
     <!--<link rel="stylesheet" type="text/css" href="//unpkg.com/iview/dist/styles/iview.css"/>-->
     <!-- 引入layui样式 -->
-    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all"/>
 
     <!--   <script src="//unpkg.com/vue/dist/vue.js"></script>
        <script src="//unpkg.com/iview/dist/iview.min.js"></script>-->
@@ -36,82 +36,127 @@
 </head>
 
 <body>
-    <!--隐藏元素-->
-    <!--<p id="staffType"  th:attr="value=${staffType}"  hidden />-->
-    <!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
-    <div id="app" v-cloak>
-        <Card  >
-            <span slot="title">展期管理</span>
+<!--隐藏元素-->
+<!--<p id="staffType"  th:attr="value=${staffType}"  hidden />-->
+<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+<div id="app" v-cloak>
+    <!-- 搜索工具框 开始-->
+    <row style="padding: 10px">
+        <i-col span="24">
+
+            <Card>
+                <span slot="title">搜索条件</span>
                 <!-- <i-button  v-if="authValid('search')" slot="extra" type="primary" icon="search" @click="search">搜索</i-button> -->
-                <button class="layui-btn layui-btn-sm" slot="extra" @click="search" v-if="authValid('search')">
-                    <span >
+
+
+                <row :gutter="16">
+                    <i-form ref="schForm" :model="schForm" label-position="right" autocomplete="off" label-width="100"
+                            inline>
+                        <Row>
+                            <i-col span="6">
+                                <form-item label="展期申请日期">
+                                    <Date-picker type="date" placeholder="开始时间" :value.sync="schForm.dateStart"
+                                                 v-model="schForm.dateStart" @on-change="onDateStartChange"
+                                                 :options="dateStartOption"></Date-picker>
+                                    <!--<span>至</span>-->
+                                    <!--<Date-picker type="date" placeholder="结束时间" :value.sync="schForm.dateEnd"-->
+                                    <!--v-model="schForm.dateEnd" @on-change="onDateEndChange"-->
+                                    <!--:options="dateEndOption"></Date-picker>-->
+                                </form-item>
+                            </i-col>
+                            <i-col span="6">
+                                <form-item label="至">
+                                    <Date-picker type="date" placeholder="结束时间" :value.sync="schForm.dateEnd"
+                                                 v-model="schForm.dateEnd" @on-change="onDateEndChange"
+                                                 :options="dateEndOption"></Date-picker>
+                                </form-item>
+                            </i-col>
+                            <i-col span="6">
+                                <form-item label="分公司">
+                                    <i-select :model.sync="schForm.deptId" v-model="schForm.deptId" filterable
+                                              clearable=true
+                                              placeholder="请选择分公司" style="width:200px">
+                                        <i-option v-for="item in deptIds" :value="item.orgCode">{{item.orgNameCn}}
+                                        </i-option>
+                                    </i-select>
+                                </form-item>
+                            </i-col>
+                            <i-col span="6">
+                                <form-item label="业务编号">
+                                    <i-input type="text" :value.sync="schForm.businessId"
+                                             v-model="schForm.businessId"></i-input>
+                                </form-item>
+                            </i-col>
+                        </Row>
+                        <Row>
+                            <i-col span="6">
+                                <form-item label="业务获取">
+                                    <i-input type="text" :value.sync="schForm.salesman"
+                                             v-model="schForm.salesman"></i-input>
+                                </form-item>
+                            </i-col>
+                            <i-col span="6">
+                                <form-item label="客户名称">
+                                    <i-input type="text" :value.sync="schForm.customer"
+                                             v-model="schForm.customer"></i-input>
+                                </form-item>
+                            </i-col>
+                            <i-col span="6">
+                                <form-item label="业务类型">
+                                    <i-select :model.sync="schForm.businessType" clearable=true
+                                              v-model="schForm.businessType"
+                                              placeholder="请选择业务类型" style="width:200px">
+                                        <i-option v-for="item in businessTypes" :value="item.value">{{item.label}}
+                                        </i-option>
+                                    </i-select>
+                                </form-item>
+                            </i-col>
+                            <i-col span="6">
+                                <form-item label="展期编号">
+                                    <i-input type="text" :value.sync="schForm.extensionId"
+                                             v-model="schForm.extensionId"></i-input>
+                                </form-item>
+                            </i-col>
+                            <Form-item>
+
+                                <!-- <Tooltip content="重置搜索条件">
+                                    <i-button type="ghost" style="margin-left: 8px" icon="refresh" @click="resetForm" >重置</i-button>
+                                </Tooltip> -->
+                            </Form-item>
+                        </Row>
+                    </i-form>
+                </row>
+                <div style="text-align: center;">
+                    <button class="layui-btn layui-btn-sm" @click="search" v-if="authValid('search')">
+                    <span>
                         <i class="layui-icon">&#xe615;</i>查询</span>
-                </button>
-
-
-        <i-form ref="schForm" :model="schForm" label-position="right" autocomplete="off" label-width="100" inline>
+                    </button>
+                </div>
+            </Card>
             <Row>
                 <i-col span="24">
-                    <form-item label="展期申请日期">
-                        <Date-picker type="date" placeholder="开始时间" :value.sync="schForm.dateStart" v-model="schForm.dateStart" @on-change="onDateStartChange" :options="dateStartOption" ></Date-picker>
-                        <span>至</span>
-                        <Date-picker type="date" placeholder="结束时间" :value.sync="schForm.dateEnd" v-model="schForm.dateEnd" @on-change="onDateEndChange" :options="dateEndOption"></Date-picker>
-                    </form-item>
-                    <form-item label="分公司">
-                        <i-select :model.sync="schForm.deptId" v-model="schForm.deptId" filterable clearable=true placeholder="请选择分公司" style="width:200px">
-                            <i-option v-for="item in deptIds" :value="item.orgCode" >{{item.orgNameCn}}</i-option>
-                        </i-select>
-                    </form-item>
-                    <form-item label="业务编号">
-                        <i-input type="text" :value.sync="schForm.businessId" v-model="schForm.businessId" ></i-input>
-                    </form-item>
+                    <table id="loanExt" lay-filter="loanExt"></table>
+                    <script type="text/html" id="toolbar">
+                        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="check" ht-auth="viewDetail">查看</a>
+                    </script>
                 </i-col>
             </Row>
-            <Row>
-                <form-item label="业务获取">
-                    <i-input type="text" :value.sync="schForm.salesman" v-model="schForm.salesman" ></i-input>
-                </form-item>
-                <form-item label="客户名称">
-                        <i-input type="text" :value.sync="schForm.customer" v-model="schForm.customer" ></i-input>
-                </form-item>
-                <form-item label="业务类型">
-                    <i-select :model.sync="schForm.businessType" clearable=true v-model="schForm.businessType" placeholder="请选择业务类型" style="width:200px" >
-                        <i-option  v-for="item in businessTypes" :value="item.value" >{{item.label}}</i-option>
-                    </i-select>
-                </form-item>
-                <form-item label="展期编号">
-                    <i-input type="text" :value.sync="schForm.extensionId" v-model="schForm.extensionId" ></i-input>
-                </form-item>
-                <Form-item>
-                        
-                        <!-- <Tooltip content="重置搜索条件">
-                            <i-button type="ghost" style="margin-left: 8px" icon="refresh" @click="resetForm" >重置</i-button>
-                        </Tooltip> -->
-                </Form-item>
-            </Row>
-        </i-form>
 
-        <Row>
-            <i-col span="24">
-                <table id="loanExt" lay-filter="loanExt"></table>
-                <script type="text/html" id="toolbar">
-                    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="check" ht-auth="viewDetail">查看</a>
-                  </script>
-            </i-col>
-        </Row>
+            <Modal v-model="loanDetailModal.show" width="90%" :style="{top: '20px'}">
+                <iframe id="show-iframe" style="width: 100%;height:50rem" frameborder=0 name="showHere" scrolling=auto
+                        :src="loanDetailModal.url"></iframe>
+                <div slot="footer"></div>
+            </Modal>
 
-        <Modal v-model="loanDetailModal.show" width="90%" :style="{top: '20px'}" >
-            <iframe id="show-iframe" style="width: 100%;height:50rem"  frameborder=0 name="showHere" scrolling=auto :src="loanDetailModal.url"></iframe>
-            <div slot="footer"></div>
-        </Modal>
-    </Card>
-    </div>
-    <script src="/src/js/numeral.min.js" ></script>
-    <script src="/src/js/moment.min.js" ></script>
-    <script src="/src/js/LoanExtension/index.js"></script>
-    <script>
+        </i-col>
+    </row>
+</div>
+<script src="/src/js/numeral.min.js"></script>
+<script src="/src/js/moment.min.js"></script>
+<script src="/src/js/LoanExtension/index.js"></script>
+<script>
 
-    </script>
+</script>
 </body>
 
 </html>

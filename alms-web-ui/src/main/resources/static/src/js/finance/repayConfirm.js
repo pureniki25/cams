@@ -483,6 +483,8 @@ window.layinit(function (htConfig) {
         methods: {
             closePage() {
                 var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                console.log("index1==",index);
+                console.log("name==",window.name);
                 parent.layer.close(index);
             },
             closeModal: function (target) {
@@ -691,6 +693,7 @@ window.layinit(function (htConfig) {
                 let param = {};
                 param.businessId = businessId;
                 param.afterId = afterId;
+                param.reqFlag=1;
                 param = Object.assign(app.factRepaymentInfo, param);
                 if ((!param.mprIds || param.mprIds == '') && (!param.surplusFund || param.surplusFund == 0)) {
                     app.$Message.error({content: '不能提交没匹配流水且没使用结余金额的还款确认'})
@@ -710,9 +713,10 @@ window.layinit(function (htConfig) {
                     axios.post(fpath + 'finance/confirmRepayment', param)
                         .then(function (res) {
                             if (res.data.code == '1') {
-                                app.handleConfirmRepaymentResult(res)
+                                app.handleConfirmRepaymentResult(res);
+
                                 app.$Modal.success({
-                                    content: '还款确认成功!', onOk: function () {
+                                    content: '还款确认成功!', onOk() {
                                         var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
                                         parent.layer.close(index);
                                         parent.app.search()
@@ -738,31 +742,7 @@ window.layinit(function (htConfig) {
                 previewConfirmRepayment();
 
             },
-            previewConfirmOverDueRepayment() {
-                let param = {};
-                param.businessId = businessId;
-                param.afterId = afterId;
-                app.factRepayPreview.mprIds=app.factRepaymentInfo.mprIds
-                param = Object.assign(app.factRepayPreview, param);
-                param.callFlage = 10
 
-                axios.post(fpath + 'finance/previewConfirmRepayment', param)
-                    .then(function (res) {
-                        if (res.data.code == '1') {
-                            app.handleConfirmRepaymentResult(res)
-                        } else {
-                            app.factRepaymentInfo.surplusFund = 0
-                            app.$Message.error({content: res.data.msg})
-                        }
-                    })
-                    .catch(function (err) {
-                        console.log(err);
-                    })
-            },
-            onOfflineOverDueChange(e){
-                // console.log("1111",e.target.value);
-                // app.previewConfirmOverDueRepayment();
-            },
             onsurplusFoundChange(e) {
 
             },

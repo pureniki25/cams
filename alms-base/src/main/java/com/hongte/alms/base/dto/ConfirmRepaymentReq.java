@@ -32,6 +32,8 @@ public class ConfirmRepaymentReq {
 	//10：线下转账，20：线下代扣，30：银行代扣,11:用往期结余还款
 //	private List<Integer> repaySource ;
 
+	// 1 财务确认还款 默认为null
+	private Integer reqFlag;
 	/**
 	 * 调用方标志位  10：财务人员还款确认（线下转账），20：自动线下代扣，21：人工线下代扣，30：自动银行代扣，31：人工银行代扣
 	 */
@@ -112,5 +114,13 @@ public class ConfirmRepaymentReq {
 
 	public void setCallFlage(Integer callFlage) {
 		this.callFlage = callFlage;
+	}
+
+	public Integer getReqFlag() {
+		return reqFlag;
+	}
+
+	public void setReqFlag(Integer reqFlag) {
+		this.reqFlag = reqFlag;
 	}
 }
