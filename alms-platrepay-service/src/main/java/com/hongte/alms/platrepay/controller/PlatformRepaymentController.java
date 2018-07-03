@@ -400,7 +400,7 @@ public class PlatformRepaymentController {
             vo.setConfirmLogId(confirmLogId);
 
             Result result = tdrepayRechargeController.accessTdrepayReCharge(vo);
-            if ("-500".equals(result.getCode())) {
+            if (!"1".equals(result.getCode())) {
                 return Result.error("合规还款失败");
             }
             //return Result.success(departmentBankService.listDepartmentBank());
