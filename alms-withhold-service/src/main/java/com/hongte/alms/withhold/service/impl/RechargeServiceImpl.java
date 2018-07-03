@@ -611,11 +611,14 @@ public class RechargeServiceImpl implements RechargeService {
 	public BigDecimal getRestAmount(RepaymentBizPlanList list) {
 		List<WithholdingRepaymentLog> logs = withholdingRepaymentLogService.selectList(
 				new EntityWrapper<WithholdingRepaymentLog>().eq("original_business_id", list.getOrigBusinessId())
-						.eq("after_id", list.getAfterId()).ne("repay_status", "失败"));
+						.eq("after_id", list.getAfterId()).eq("repay_status", "2"));//处理中的数据
 		BigDecimal hasRepayAmount = BigDecimal.valueOf(0);
 		for (WithholdingRepaymentLog log : logs) {
 			hasRepayAmount = hasRepayAmount.add(log.getCurrentAmount());
 		}
+		
+		hasRepayAmount=hasRepayAmount.add(getPerListFactAmountSum(list));
+		
 		BigDecimal restAmount = null;
 		if(list.getOverdueAmount()!=null) {
 			 restAmount = list.getTotalBorrowAmount().add(list.getOverdueAmount()).subtract(hasRepayAmount);
@@ -661,7 +664,7 @@ public class RechargeServiceImpl implements RechargeService {
 	public Integer getBankRepaySuccessCount(RepaymentBizPlanList list) {
 		List<WithholdingRepaymentLog> logs = withholdingRepaymentLogService.selectList(
 				new EntityWrapper<WithholdingRepaymentLog>().eq("original_business_id", list.getOrigBusinessId())
-						.eq("after_id", list.getAfterId()).ne("repay_status", "成功"));
+						.eq("after_id", list.getAfterId()).ne("repay_status", "1"));//处理成功数据
 
 		return logs.size();
 	}
@@ -865,5 +868,18 @@ public class RechargeServiceImpl implements RechargeService {
 		}
 		
 	}
+	/**
+	 * 获取每期实还金额
+	 * @param pList
+	 * @return
+	 */
+	private BigDecimal getPerListFactAmountSum(RepaymentBizPlanList pList) {
+		List<RepaymentBizPlanListDetail> details=repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", pList.getPlanListId()));
+		BigDecimal factAmountSum=BigDecimal.valueOf(0);
+		for(RepaymentBizPlanListDetail detail:details) {
+			factAmountSum=factAmountSum.add(detail.getFactAmount()==null?BigDecimal.valueOf(0):detail.getFactAmount());
+		}
+		return factAmountSum;
 
+	}
 }

@@ -296,8 +296,6 @@ var layer;
                      	vm.ajax_data.onLineOverDueMoney=result.data.data.onLineOverDueMoney;
                
                     }
-                 	vm.ajax_data.underLineFactOverDueMoney=vm.ajax_data.planOverDueMoney;
-//                    searchRepayLog();
                  	vm.platformId='5';
                  	doOperate();
                       if(vm.ajax_data.strType==2){
