@@ -125,17 +125,32 @@ var layer;
 		}
 	   if(vm.ajax_data.total>vm.ajax_data.restAmount){debugger
 		   vm.$Modal.error({content:"代扣金额不能大于本次最大可代扣金额"});
+	   vm.loading = false;
 	   return;
 	   }
 		   
 	   if(vm.ajax_data.underLineFactOverDueMoney>vm.ajax_data.planOverDueMoney){
 		   vm.$Modal.error({content:"本次代扣线下逾期费不能大于线下逾期费"});
+		   vm.loading = false;
 		   return;
 			   }
 	    if(vm.ajax_data.canUseThirty==false&&vm.platformId!=5){debugger//如果是第三方代扣，但是第三方代扣标识为false，
 	    	 vm.$Modal.error({content:"银行部分代扣情况下，没有还清线上费用不能用第三方平台代扣线下费用"});
+	        vm.loading = false;
 	    	return;
 	    }
+		   vm.ajax_data.platformId=vm.platformId;
+	       if(vm.ajax_data.platformId=='5'&&vm.ajax_data.underLineFactOverDueMoney>0&&vm.ajax_data.repayAmount==0){
+	    		vm.$Modal.error({content:"线下逾期费大于0不能银行代扣"});
+	    		  vm.loading = false;
+	    		return;
+	       }
+	       
+	       if(vm.ajax_data.repayAmount==0){
+	    		vm.$Modal.error({content:"本期应该金额为0不能代扣"});
+	    		  vm.loading = false;
+	    		return;
+	       }
 	   //贷后生成的走贷后的代扣接口,否则走信贷的代扣接口
 	   if(vm.ajax_data.strType==2){debugger
 		   vm.ajax_data.platformId=vm.platformId;
@@ -145,7 +160,7 @@ var layer;
                 url: url,
                 data: JSON.stringify(vm.ajax_data),
                 contentType: "application/json; charset=utf-8",
-                success: function (data) {
+                success: function (data) {debugger
                 	   vm.loading = false;
                     if(data.code=='1'){
                     	vm.$Modal.success({content:"执行成功，请稍后查询结果"});
@@ -385,8 +400,12 @@ var layer;
 	
 	vm.ajax_data.total=vm.ajax_data.planPrincipal+vm.ajax_data.planAccrual+vm.ajax_data.planServiceCharge+vm.ajax_data.platformCharge+Number(vm.ajax_data.onLineOverDueMoney)+Number(vm.ajax_data.underLineOverDueMoney)-vm.ajax_data.repayAllAmount;
 	var total=vm.ajax_data.total;
+	if(total<0){
+		total=0;
+	}
 	vm.ajax_data.total=total.toFixed(2);
 	vm.ajax_data.repayAmount=total.toFixed(2);
+
 	return vm.ajax_data.total;
 	}
 
@@ -423,6 +442,9 @@ var layer;
         	vm.isBankFlag=true;
         	vm.ajax_data.total=getTotalShouldPay();
         	vm.ajax_data.repayAmount=vm.ajax_data.repayAmount-vm.ajax_data.planOverDueMoney;
+        	if(	vm.ajax_data.repayAmount<0){
+        		vm.ajax_data.repayAmount=0;
+        	}
         	vm.ajax_data.repayAmount=vm.ajax_data.repayAmount.toFixed(2);
        
         }else{

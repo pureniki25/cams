@@ -1,5 +1,6 @@
 package com.hongte.alms.base.service.impl;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 
 import java.util.Date;
@@ -9,10 +10,12 @@ import java.util.List;
 import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
 import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.RepaymentResource;
 import com.hongte.alms.base.enums.RepayCurrentStatusEnums;
 import com.hongte.alms.base.enums.RepayedFlag;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListMapper;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
+import com.hongte.alms.base.service.RepaymentResourceService;
 import com.hongte.alms.base.vo.finance.ConfirmWithholdListVO;
 import com.hongte.alms.base.vo.module.FinanceManagerListVO;
 import com.hongte.alms.base.dto.FinanceManagerListReq;
@@ -23,6 +26,7 @@ import com.hongte.alms.common.vo.PageResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,6 +41,12 @@ import java.util.List;
  */
 @Service("RepaymentBizPlanListService")
 public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBizPlanListMapper, RepaymentBizPlanList> implements RepaymentBizPlanListService {
+	
+	
+	@Autowired
+	@Qualifier("RepaymentResourceService")
+	RepaymentResourceService repaymentResourceService;
+	
 	private static Logger logger = LoggerFactory.getLogger(RepaymentBizPlanListServiceImpl.class);
     @Autowired
     RepaymentBizPlanListMapper repaymentBizPlanListMapper;
@@ -80,7 +90,15 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
 		int count = repaymentBizPlanListMapper.conutFinanceManagerList(req);
 		List<FinanceManagerListVO> list = repaymentBizPlanListMapper.selectFinanceMangeList(req);
 		for (FinanceManagerListVO financeManagerListVO : list) {
-			/*未代扣确认的不能代扣*/
+		    RepaymentResource repaymentResource=repaymentResourceService.selectOne(new EntityWrapper<RepaymentResource>().eq("org_business_id", financeManagerListVO.getOrgBusinessId()).eq("after_id", financeManagerListVO.getAfterId()));	
+			if(repaymentResource!=null) {
+				if(repaymentResource.getRepaySource().equals("30")||repaymentResource.getRepaySource().equals("31")) {//银行代扣
+					financeManagerListVO.setBankRepay(true);
+				}
+			}else {//为空代表没有代扣过
+				financeManagerListVO.setBankRepay(false);
+			}
+		    /*未代扣确认的不能代扣*/
 			if (financeManagerListVO.getConfirmFlag()==null||financeManagerListVO.getConfirmFlag().equals(0)) {
 				financeManagerListVO.setCanWithhold(false);
 				continue;
