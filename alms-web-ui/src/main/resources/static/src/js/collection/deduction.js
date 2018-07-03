@@ -396,7 +396,7 @@ var layer;
 	var total=0;
 		vm.ajax_data.total=0;
 	
-	vm.ajax_data.total=vm.ajax_data.planPrincipal+vm.ajax_data.planAccrual+vm.ajax_data.planServiceCharge+vm.ajax_data.platformCharge+Number(vm.ajax_data.onLineOverDueMoney)+Number(vm.ajax_data.underLineOverDueMoney)-vm.ajax_data.repayAllAmount;
+	vm.ajax_data.total=vm.ajax_data.planPrincipal+vm.ajax_data.planAccrual+vm.ajax_data.planServiceCharge+vm.ajax_data.platformCharge+Number(vm.ajax_data.onLineOverDueMoney)+Number(vm.ajax_data.underLineOverDueMoney)
 	var total=vm.ajax_data.total;
 	if(total<0){
 		total=0;
@@ -416,7 +416,7 @@ var layer;
         var self = this;  
         var reqStr =basePath+ "DeductionController/getDeductionPlatformInfo"
         axios.get(reqStr)
-            .then(function (result) {debugger
+            .then(function (result) {debugger	
                 if (result.data.code == "1") {
                 	
           
