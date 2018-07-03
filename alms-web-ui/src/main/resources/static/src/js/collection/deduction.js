@@ -396,7 +396,7 @@ var layer;
 	var total=0;
 		vm.ajax_data.total=0;
 	
-	vm.ajax_data.total=vm.ajax_data.planPrincipal+vm.ajax_data.planAccrual+vm.ajax_data.planServiceCharge+vm.ajax_data.platformCharge+Number(vm.ajax_data.onLineOverDueMoney)+Number(vm.ajax_data.underLineOverDueMoney)-vm.ajax_data.repayAllAmount;
+	vm.ajax_data.total=vm.ajax_data.planPrincipal+vm.ajax_data.planAccrual+vm.ajax_data.planServiceCharge+vm.ajax_data.platformCharge+Number(vm.ajax_data.onLineOverDueMoney)+Number(vm.ajax_data.underLineFactOverDueMoney)
 	var total=vm.ajax_data.total;
 	if(total<0){
 		total=0;
@@ -416,7 +416,7 @@ var layer;
         var self = this;  
         var reqStr =basePath+ "DeductionController/getDeductionPlatformInfo"
         axios.get(reqStr)
-            .then(function (result) {debugger
+            .then(function (result) {debugger	
                 if (result.data.code == "1") {
                 	
           
@@ -437,6 +437,7 @@ var layer;
 	}
 	var doOperate = function () {debugger
         if(vm.platformId=='5'){debugger
+        	vm.ajax_data.underLineFactOverDueMoney=0;
         	vm.isBankFlag=true;
         	vm.ajax_data.total=getTotalShouldPay();
         	vm.ajax_data.repayAmount=vm.ajax_data.repayAmount-vm.ajax_data.planOverDueMoney;
@@ -447,7 +448,9 @@ var layer;
        
         }else{
         	vm.isBankFlag=false;
+        	vm.ajax_data.underLineFactOverDueMoney=	vm.ajax_data.planOverDueMoney;
         	vm.ajax_data.total=getTotalShouldPay();
+      
         }
 	}
 	

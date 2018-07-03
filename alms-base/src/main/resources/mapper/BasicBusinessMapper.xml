@@ -536,9 +536,9 @@
 
 	<!-- 获取线上逾期费和线下逾期费-->
 	<select id="getOverDueMoney" resultType="map">
-			select sum((case when pDetail.fee_id=#{onLineFeeId,jdbcType=VARCHAR} then pDetail.plan_amount else 0 end )) as onLineOverDueMoney, 
-		 sum((case when pDetail.fee_id=#{underLineFeeId,jdbcType=VARCHAR} then pDetail.plan_amount else 0 end )) as underLineOverDueMoney,
-		  sum((case when pDetail.fee_id=#{underLineFeeId,jdbcType=VARCHAR} then (pDetail.plan_amount-pDetail.fact_amount) else 0 end )) as underLineFactOverDueMoney
+			select sum((case when pDetail.fee_id=#{onLineFeeId,jdbcType=VARCHAR} then (ifnull(pDetail.plan_amount,0)-ifnull(pDetail.fact_amount,0)) else 0 end )) as onLineOverDueMoney, 
+		 sum((case when pDetail.fee_id=#{underLineFeeId,jdbcType=VARCHAR} then (ifnull(pDetail.plan_amount,0)-ifnull(pDetail.fact_amount,0)) else 0 end )) as underLineOverDueMoney,
+		  sum((case when pDetail.fee_id=#{underLineFeeId,jdbcType=VARCHAR} then (ifnull(pDetail.plan_amount,0)-ifnull(pDetail.fact_amount,0)) else 0 end )) as underLineFactOverDueMoney
 		from tb_repayment_biz_plan_list pList 
 		
 		left join tb_repayment_biz_plan_list_detail pDetail
