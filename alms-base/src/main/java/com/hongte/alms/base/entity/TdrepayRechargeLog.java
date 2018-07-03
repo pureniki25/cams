@@ -19,7 +19,7 @@ import io.swagger.annotations.ApiModelProperty;
  * </p>
  *
  * @author 胡伟骞
- * @since 2018-06-13
+ * @since 2018-07-03
  */
 @ApiModel
 @TableName("tb_tdrepay_recharge_log")
@@ -52,15 +52,15 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 	@ApiModelProperty(required= true,value = "原业务编号")
 	private String origBusinessId;
     /**
-     * 业务类型(1:车易贷展期,2:房速贷展期,3:金融仓储,4:三农金融,9:车易贷,11:房速贷,12车全垫资代采,13:扶贫贷,14:汽车融资租赁,15:二手车商贷,20:一点车贷, 26:业主贷,27:家装分期,28:商贸共借;29:业主共借,30:商贸贷)
+     * 业务类型(1:车易贷展期,2:房速贷展期,3:金融仓储,4:三农金融,9:车易贷,11:房速贷,12车全垫资代采,13:扶贫贷,14:汽车融资租赁,15:二手车商贷,20:一点车贷,25:商贸贷,26:业主贷,27:家装分期,28:商贸共借;29:业主共借)
      */
 	@TableField("business_type")
-	@ApiModelProperty(required= true,value = "业务类型(1:车易贷展期,2:房速贷展期,3:金融仓储,4:三农金融,9:车易贷,11:房速贷,12车全垫资代采,13:扶贫贷,14:汽车融资租赁,15:二手车商贷,20:一点车贷, 26:业主贷,27:家装分期,28:商贸共借;29:业主共借,30:商贸贷)")
+	@ApiModelProperty(required= true,value = "业务类型(1:车易贷展期,2:房速贷展期,3:金融仓储,4:三农金融,9:车易贷,11:房速贷,12车全垫资代采,13:扶贫贷,14:汽车融资租赁,15:二手车商贷,20:一点车贷,25:商贸贷,26:业主贷,27:家装分期,28:商贸共借;29:业主共借)")
 	private Integer businessType;
     /**
      * 实还日期
      */
-	@JsonFormat(timezone = "GMT+8")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@TableField("fact_repay_date")
 	@ApiModelProperty(required= true,value = "实还日期")
 	private Date factRepayDate;
@@ -196,6 +196,12 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 	@TableField("platform_repay_status")
 	@ApiModelProperty(required= true,value = "平台还款状态(1：待还款，2：已还款 3、已垫付 4：逾期)")
 	private Integer platformRepayStatus;
+    /**
+     * 是否撤销确认还款（1、否；2、是）
+     */
+	@TableField("is_valid")
+	@ApiModelProperty(required= true,value = "是否撤销确认还款（1、否；2、是）")
+	private Integer isValid;
     /**
      * 分发状态（0：待分发，1：分发处理中，2：分发成功，3，分发失败）
      */
@@ -462,6 +468,14 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 		this.platformRepayStatus = platformRepayStatus;
 	}
 
+	public Integer getIsValid() {
+		return isValid;
+	}
+
+	public void setIsValid(Integer isValid) {
+		this.isValid = isValid;
+	}
+
 	public Integer getProcessStatus() {
 		return processStatus;
 	}
@@ -554,6 +568,7 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 			", oidPartner=" + oidPartner +
 			", platStatus=" + platStatus +
 			", platformRepayStatus=" + platformRepayStatus +
+			", isValid=" + isValid +
 			", processStatus=" + processStatus +
 			", status=" + status +
 			", remark=" + remark +
