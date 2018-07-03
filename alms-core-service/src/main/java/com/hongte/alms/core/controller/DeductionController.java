@@ -148,16 +148,13 @@ public class DeductionController {
             	deductionVo.setOnLineOverDueMoney(onLineOverDueMoney);
             	deductionVo.setUnderLineOverDueMoney(underLineOverDueMoney);
             	deductionVo.setUnderLineFactOverDueMoney(underLineFactOverDueMoney);
-            	//查看当前期银行代扣的总金额
-        		List<WithholdingRepaymentLog> bankList=withholdingRepaymentLogService.selectList(new EntityWrapper<WithholdingRepaymentLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).ne("repay_status", 0).eq("bind_platform_id", PlatformEnum.YH_FORM.getValue()));
-        		BigDecimal bankRepayAmountSum=BigDecimal.valueOf(0);
-        		for(WithholdingRepaymentLog log:bankList) {
-        			bankRepayAmountSum=bankRepayAmountSum.add(log.getCurrentAmount()==null?BigDecimal.valueOf(0):log.getCurrentAmount());
-        		}
+            	//查看当前期还款的总金额
+        	
+        		BigDecimal factAmountSum=getPerListFactAmountSum(planList);
         		//线上费用
         		BigDecimal onLineAmount=BigDecimal.valueOf(deductionVo.getTotal()).subtract(underLineOverDueMoney);
         		//如果是线上部分还款的话，不能使用第三方代扣线下费用
-        		if(bankRepayAmountSum.compareTo(BigDecimal.valueOf(0))>0&&bankRepayAmountSum.compareTo(onLineAmount)<0) {
+        		if(factAmountSum.compareTo(BigDecimal.valueOf(0))>0&&factAmountSum.compareTo(onLineAmount)<0) {
         			deductionVo.setCanUseThirty(false);
         		}else {
         			deductionVo.setCanUseThirty(true);
@@ -170,7 +167,7 @@ public class DeductionController {
             	if(business.getSrcType()!=null&&business.getSrcType()==2) {
             	   	//还款成功和还款中的数据
 	        		List<WithholdingRepaymentLog> loglist=withholdingRepaymentLogService.selectList(new EntityWrapper<WithholdingRepaymentLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).ne("repay_status", 0));
-	        		BigDecimal factAmountSum=getPerListFactAmountSum(planList);
+	        		 factAmountSum=getPerListFactAmountSum(planList);
 	        		//还款中的数据
 	        		List<WithholdingRepaymentLog> repayingList=withholdingRepaymentLogService.selectList(new EntityWrapper<WithholdingRepaymentLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).eq("repay_status", 2));
 	        	
@@ -198,7 +195,7 @@ public class DeductionController {
 	        		//还款中的数据
 	        		List<WithholdingRecordLog> repayingList=withholdingRecordLogService.selectList(new EntityWrapper<WithholdingRecordLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).eq("repay_status", 2));
 	        		
-	          		BigDecimal factAmountSum=getPerListFactAmountSum(planList);
+	          		 factAmountSum=getPerListFactAmountSum(planList);
 	          		BigDecimal repayAmount=factAmountSum;
 	        		BigDecimal repayingAmount=BigDecimal.valueOf(0);
 

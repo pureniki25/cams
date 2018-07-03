@@ -147,7 +147,7 @@ var layer;
 	       }
 	       
 	       if(vm.ajax_data.repayAmount==0){
-	    		vm.$Modal.error({content:"本期应该金额为0不能代扣"});
+	    		vm.$Modal.error({content:"本期应还金额为0不能代扣"});
 	    		  vm.loading = false;
 	    		return;
 	       }
@@ -163,7 +163,7 @@ var layer;
                 success: function (data) {debugger
                 	   vm.loading = false;
                     if(data.code=='1'){
-                    	vm.$Modal.success({content:"执行成功，请稍后查询结果"});
+                    	vm.$Modal.success({content:"执行代扣金额"+vm.ajax_data.repayAmount+"元成功，请稍后查询结果"});
 		             }else{
 		                 vm.$Modal.error({content:data.msg});
 		             }
@@ -179,7 +179,7 @@ var layer;
                 }
             });
 	   }else{
-		    var url=openPath+ "WithHoldingController/withholding?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId+"&total="+vm.ajax_data.total+"&planOverDueMoney="+vm.ajax_data.underLineFactOverDueMoney+"&platformId="+vm.platformId+"&type=0"+"&nowdate="+vm.ajax_data.nowdate+"&isAmountWithheld="+isAmountWithheld
+		    var url=openPath+ "WithHoldingController/withholding?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId+"&total="+vm.ajax_data.repayAmount+"&planOverDueMoney="+vm.ajax_data.underLineFactOverDueMoney+"&platformId="+vm.platformId+"&type=0"+"&nowdate="+vm.ajax_data.nowdate+"&isAmountWithheld="+isAmountWithheld
 		    $.ajax({
 		        type : 'GET',
 		        async : false,
@@ -191,7 +191,7 @@ var layer;
 		        success : function(data) {debugger
 		       	   vm.loading = false;
 		             if(data.code=='1'){
-		            	 vm.$Modal.success({content:data.data});
+		                   	vm.$Modal.success({content:"执行代扣金额"+vm.ajax_data.repayAmount+"元成功，请稍后查询结果"});
 		             }else{
 		                 vm.$Modal.error({content:data.data});
 		             }

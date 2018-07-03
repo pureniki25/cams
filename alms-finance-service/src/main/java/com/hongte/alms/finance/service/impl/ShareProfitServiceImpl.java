@@ -501,6 +501,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             repaymentResource.setIsCancelled(0);
             repaymentResource.setRepayAmount(req.getSurplusFund());
             repaymentResource.setRepayDate(new Date());
+            repaymentResource.setConfirmLogId(financeBaseDto.getConfirmLog().getConfirmLogId());
             //11:用往期结余还款',
             repaymentResource.setRepaySource("11");
             if (financeBaseDto.getSave()) {

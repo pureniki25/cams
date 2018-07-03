@@ -81,7 +81,7 @@
                 <i-table :columns="table.col" :data="table.data" stripe :loading="table.loading"></i-table>
             </Content>
             <Footer style="text-align: center;width: 100%" >
-                <Page :total="table.total" show-total @on-change="paging" ></Page>
+                <Page :total="table.total"  ref="pages" show-total @on-change="paging" ></Page>
             </Footer>
         </layout>
 

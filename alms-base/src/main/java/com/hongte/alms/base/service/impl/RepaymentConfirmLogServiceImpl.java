@@ -23,6 +23,7 @@ import com.hongte.alms.base.entity.RepaymentResource;
 import com.hongte.alms.base.enums.RepayedFlag;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.SectionRepayStatusEnum;
+import com.hongte.alms.base.feignClient.PlatformRepaymentFeignClient;
 import com.hongte.alms.base.mapper.AccountantOverRepayLogMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanBakMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListBakMapper;
@@ -106,6 +107,9 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 	MoneyPoolService moneyPoolService ;
 	@Autowired
 	AccountantOverRepayLogMapper accountantOverRepayLogMapper;
+
+	@Autowired
+	private PlatformRepaymentFeignClient platformRepaymentFeignClient;
 	@Override
 	@Transactional(rollbackFor=Exception.class)
 	public Result revokeConfirm(String businessId, String afterId) {
@@ -119,6 +123,11 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 		if (log.getCanRevoke().equals(0)) {
 			return Result.error("500", "该还款记录不能被撤销");
 		}
+
+
+//		platformRepaymentFeignClient.queryTdrepayRechargeRecord(log.getConfirmLogId(),);
+
+
 		/*找实还明细记录*/
 		List<RepaymentProjFactRepay> factRepays = repaymentProjFactRepayMapper
 				.selectList(new EntityWrapper<RepaymentProjFactRepay>().eq("confirm_log_id", log.getConfirmLogId())

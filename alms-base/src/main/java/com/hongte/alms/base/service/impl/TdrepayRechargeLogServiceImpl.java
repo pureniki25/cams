@@ -8,11 +8,14 @@ import com.hongte.alms.base.service.TdrepayRechargeLogService;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.StringUtil;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +32,9 @@ public class TdrepayRechargeLogServiceImpl extends BaseServiceImpl<TdrepayRechar
 		implements TdrepayRechargeLogService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TdrepayRechargeLogServiceImpl.class);
+	
+	@Autowired
+	private TdrepayRechargeLogMapper tdrepayRechargeLogMapper;
 
 	@Transactional(rollbackFor = Exception.class)
 	@Override
@@ -95,6 +101,14 @@ public class TdrepayRechargeLogServiceImpl extends BaseServiceImpl<TdrepayRechar
 		}
 		tdrepayRechargeLog.setProcessStatus(status);
 		return tdrepayRechargeLog;
+	}
+	
+	@Override
+	public List<Map<String, Object>> queryTdrepayRechargeRecord(String projectId, String confirmLogId) {
+		if (StringUtil.isEmpty(projectId)) {
+			return Collections.emptyList();
+		}
+		return tdrepayRechargeLogMapper.queryTdrepayRechargeRecord(projectId, confirmLogId);
 	}
 
 }
