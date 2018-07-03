@@ -635,9 +635,19 @@ public class RepayPlanController {
             throw  new MyException(ExceptionCodeEnum.NULL.getValue().toString(),"找不到业务信息，业务ID："+businessId);
         }
 
-        //业务类型
-        List<BasicBusinessType>  types =basicBusinessTypeService.selectList(new EntityWrapper<BasicBusinessType>().eq("business_type_id",business.getBusinessType()));
-        bizDto.setBusinessType((types!=null&&types.size()>0)?types.get(0).getBusinessTypeName():null);
+
+        //有子类型则显示子类型（信用贷的按此处理）
+
+        if(business.getBusinessType().equals(25)){
+            bizDto.setBusinessType(business.getBusinessCtype());
+        }else{
+            //业务类型
+            List<BasicBusinessType>  types =basicBusinessTypeService.selectList(new EntityWrapper<BasicBusinessType>().eq("business_type_id",business.getBusinessType()));
+            bizDto.setBusinessType((types!=null&&types.size()>0)?types.get(0).getBusinessTypeName():null);
+        }
+
+
+
         //还款方式
         bizDto.setRepayWay(RepayTypeEnum.nameOf(business.getRepaymentTypeId()));
         //借款总金额
