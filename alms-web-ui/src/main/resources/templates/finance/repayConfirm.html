@@ -272,7 +272,7 @@
                                 结余暂收:
                             </td>
                             <td>
-                                <i-input number=true v-model="factRepaymentInfo.surplusFund" :disabled="!factRepaymentInfo.useSurplusflag" style="text-align: right"></i-input>
+                                <i-input number=true v-model="factRepaymentInfo.surplusFund" :disabled="!factRepaymentInfo.useSurplusflag" @on-enter="surplusFundEnter($event)" style="text-align: right"></i-input>
                             </td>
                             <td style="width: 200px">
                                 <span>结余暂收可用金额{{factRepaymentInfo.canUseSurplus}}元</span>
