@@ -147,7 +147,7 @@ var layer;
 	       }
 	       
 	       if(vm.ajax_data.repayAmount==0){
-	    		vm.$Modal.error({content:"本期应该金额为0不能代扣"});
+	    		vm.$Modal.error({content:"本期应还金额为0不能代扣"});
 	    		  vm.loading = false;
 	    		return;
 	       }
