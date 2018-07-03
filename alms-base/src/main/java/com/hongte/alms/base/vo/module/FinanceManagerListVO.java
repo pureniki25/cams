@@ -104,10 +104,26 @@ public class FinanceManagerListVO {
 	 * 代扣确认状态
 	 */
 	private Integer confirmFlag ;
+	
+	/**
+	 * 是否线上代扣
+	 */
+	private boolean bankRepay; 
 	/**
 	 * 来源类型：1.信贷生成，2.贷后管理生成
 	 */
+	
 	private Integer srcType;
+	
+
+	public boolean isBankRepay() {
+		return bankRepay;
+	}
+
+	public void setBankRepay(boolean bankRepay) {
+		this.bankRepay = bankRepay;
+	}
+
 	public String getBusinessId() {
 		return businessId;
 	}
