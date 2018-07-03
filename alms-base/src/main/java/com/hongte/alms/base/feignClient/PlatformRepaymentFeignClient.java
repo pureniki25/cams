@@ -22,4 +22,13 @@ public interface PlatformRepaymentFeignClient {
 	"content-type=application/json" }, method = RequestMethod.POST)
 	Result repayment(@RequestBody Map<String, Object> paramMap);
 
+	/**
+	 * 查询资金分发状态接口
+	 * @param projectId 标的ID
+	 * @param confirmLogId 实还流水ID
+	 * @return
+	 */
+//	@RequestMapping(value = "/tdrepayRecharge/queryTdrepayRechargeRecord", headers = { "app=ALMS","content-type=application/json" })
+//	public Result queryTdrepayRechargeRecord(String projectId, String confirmLogId);
+
 }
