@@ -1464,7 +1464,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                             : projPlanList.getOverdueAmount())) >= 0) {
                 projPlanList.setCurrentStatus(RepayPlanStatus.REPAYED.getName());
                 projPlanList.setCurrentSubStatus(RepayPlanStatus.REPAYED.getName());
-                setRepayConfirmedFlag(projPlanList);
+                setRepayConfirmedFlagPro(projPlanList,financeBaseDto);
             } else {
                 projPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
                 projPlanList.setCurrentSubStatus(RepayPlanStatus.REPAYING.getName());
@@ -1487,7 +1487,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                 bizPlanList.setCurrentStatus(RepayPlanStatus.REPAYED.getName());
                 bizPlanList.setCurrentSubStatus(RepayPlanStatus.REPAYED.getName());
                 bizPlanList.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
-                setRepayConfirmedFlag(bizPlanList);
+                setRepayConfirmedFlagBiz(bizPlanList,financeBaseDto);
                 if (req.getReqFlag() != null && req.getReqFlag() == 1) { //财务确认还款确认还款
                     bizPlanList.setFinanceComfirmDate(new Date());
                     LoginInfoDto loginInfo = loginUserInfoHelper.getLoginInfo();
@@ -1512,6 +1512,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         }
     }
 
+    /*
     public void update(RepaymentProjPlanListDetail detail) {
         RepaymentBizPlanListDetail planListDetail = repaymentBizPlanListDetailMapper
                 .selectList(
@@ -1535,7 +1536,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         BigDecimal pjlFactAmount = repaymentProjPlanListMapper
                 .caluProjPlanListFactAmount(projPlanList.getProjPlanListId());
 
-		/* 如果实还大于应还+逾期 */
+//		 如果实还大于应还+逾期
         if (pjlFactAmount.compareTo(
                 projPlanList.getTotalBorrowAmount().add(projPlanList.getOverdueAmount() == null ? new BigDecimal("0")
                         : projPlanList.getOverdueAmount())) >= 0) {
@@ -1575,6 +1576,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             }
         }
     }
+    */
 
     /**
      * 设置还款确认状态
@@ -1582,18 +1584,19 @@ public class ShareProfitServiceImpl implements ShareProfitService {
      * @param projPlanList
      * @author 王继光 2018年6月15日 上午11:29:49
      */
-    private void setRepayConfirmedFlag(RepaymentProjPlanList projPlanList) {
-        RepaymentResource repaymentResource = repaymentResources.get().get(repaymentResources.get().size() - 1);
-        if (repaymentResource.getRepaySource().equals(10)) {
+    private void setRepayConfirmedFlagPro(RepaymentProjPlanList projPlanList,FinanceBaseDto financeBaseDto) {
+        List<RepaymentResource> repaymentResources = financeBaseDto.getRepaymentResources();
+        RepaymentResource repaymentResource =  repaymentResources.get(repaymentResources.size() - 1);
+        if (repaymentResource.getRepaySource().equals("10")) {
             projPlanList.setRepayFlag(RepayedFlag.CONFIRM_OFFLINE_REPAYED.getKey());
         }
-        if (repaymentResource.getRepaySource().equals(11)) {
+        if (repaymentResource.getRepaySource().equals("11")) {
             projPlanList.setRepayFlag(RepayedFlag.CONFIRM_OFFLINE_REPAYED.getKey());
         }
-        if (repaymentResource.getRepaySource().equals(20)) {
+        if (repaymentResource.getRepaySource().equals("20")) {
             projPlanList.setRepayFlag(RepayedFlag.AUTO_WITHHOLD_OFFLINE_REPAYED.getKey());
         }
-        if (repaymentResource.getRepaySource().equals(30)) {
+        if (repaymentResource.getRepaySource().equals("30")) {
             projPlanList.setRepayFlag(RepayedFlag.AUTO_BANK_WITHHOLD_REPAYED.getKey());
         }
     }
@@ -1603,8 +1606,10 @@ public class ShareProfitServiceImpl implements ShareProfitService {
      *
      * @author 王继光 2018年6月15日 上午11:29:49
      */
-    private void setRepayConfirmedFlag(RepaymentBizPlanList bizjPlanList) {
-        RepaymentResource repaymentResource = repaymentResources.get().get(repaymentResources.get().size() - 1);
+    private void setRepayConfirmedFlagBiz(RepaymentBizPlanList bizjPlanList,FinanceBaseDto financeBaseDto) {
+        List<RepaymentResource> repaymentResources = financeBaseDto.getRepaymentResources();
+        RepaymentResource repaymentResource =  repaymentResources.get(repaymentResources.size() - 1);
+//        RepaymentResource repaymentResource = repaymentResources.get().get(repaymentResources.get().size() - 1);
         if (repaymentResource.getRepaySource().equals("10")) {
             bizjPlanList.setRepayFlag(RepayedFlag.CONFIRM_OFFLINE_REPAYED.getKey());
         }
