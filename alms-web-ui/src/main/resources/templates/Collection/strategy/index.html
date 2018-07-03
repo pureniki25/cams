@@ -118,7 +118,7 @@
                         </form-item>
                 
                     <form-item label="清算1：" prop="collectionGroup1Users">
-                        <i-select v-model="editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup1Users" multiple clearable filterable >
+                        <i-select v-model="editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup1Users" multiple filterable >
                             <i-option v-for="item in editCompanyCollectionUser.collectionGroup1AllUsers" :value="item.userId" :key="item.userId">{{ item.userName }}</i-option>
                         </i-select>
                     </form-item>
@@ -469,8 +469,6 @@
                             }
                         });
 
-
-
                         //监听工具条
                         table.on('tool(listTable)', function (obj) {
                             self.selectedRowInfo = obj.data;
@@ -483,11 +481,9 @@
                                 self.editSingleCompanyCollectionUserSettingModal = true;
 //                                self.editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup1Users=self.selectedRowInfo.col1Pids;
 //                                self.editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup2Users=self.selectedRowInfo.col2Pids;
-
-                                self.editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup1Users=[];
-                                self.editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup2Users=[];
-
-
+								console.log(self.selectedRowInfo.col1Pids);
+								self.editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup1Users=['陈小春'];
+								
                                 self.editCompanyCollectionUser.editCompanyCollectionForm.businessType = self.selectedRowInfo.businessType;
 //                                self.editCompanyCollectionUser.editCompanyCollectionForm.areaId = self.selectedRowInfo.areaId;
 //                                self.editCompanyCollectionUser.editCompanyCollectionForm.comId = self.selectedRowInfo.companyId;
@@ -502,6 +498,9 @@
                                             self.editCompanyCollectionAssignSet.businessTypes = result.data.data.businessType;
                                             self.editCompanyCollectionUser.editCompanyCollectionForm.areaId = obj.data.areaId;
                                             self.editCompanyCollectionUser.editCompanyCollectionForm.companyId[0] = obj.data.companyId;
+                                        	
+                                            self.editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup1Users=obj.data.col1Pids==null?[]:obj.data.col1Pids.split(",");
+                                            self.editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup2Users=obj.data.col2Pids==null?[]:obj.data.col2Pids.split(",");
                                         }
                                     })
                             }
