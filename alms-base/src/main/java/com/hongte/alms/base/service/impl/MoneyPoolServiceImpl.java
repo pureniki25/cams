@@ -39,6 +39,7 @@ import com.hongte.alms.common.vo.ResponseData;
 import com.hongte.alms.common.vo.ResponseEncryptData;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 
+import com.ht.ussp.client.dto.LoginInfoDto;
 import feign.Feign;
 
 import java.math.BigDecimal;
@@ -91,6 +92,8 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 	RepaymentConfirmLogMapper confirmLogMapper;
 	@Autowired
 	LoginUserInfoHelper loginUserInfoHelper ;
+
+
 	@Override
 	public List<MoneyPoolVO> listMoneyPool(String businessId, String afterId) {
 		return null;
@@ -349,6 +352,13 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 		moneyPoolRepayment.setClaimDate(new Date());
 		boolean result = moneyPoolRepayment.insert();
 		if (result) {
+			//update by zengkun for 设置更新用户为信贷的用户
+			LoginInfoDto loginInfoDto =loginUserInfoHelper.getUserInfoByUserId(registerInfoDTO.getUserId(),null);
+			if(loginInfoDto!=null&&loginInfoDto.getBmUserId()!=null){
+				moneyPoolRepayment.setCreateUser(loginInfoDto.getBmUserId());
+			}else{
+				moneyPoolRepayment.setCreateUser("admin");
+			}
 			ResponseData responseData = callRemoteService(new MoneyPoolRepaymentXindaiDTO(moneyPoolRepayment, registerInfoDTO.getBusinessId(), registerInfoDTO.getAfterId()), XINDAI_ADDORUPDATE);
 			if (responseData==null) {
 				throw new RuntimeException();
