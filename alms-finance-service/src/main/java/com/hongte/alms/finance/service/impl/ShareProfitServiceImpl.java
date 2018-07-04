@@ -1631,10 +1631,10 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             bizjPlanList.setRepayFlag(RepayedFlag.AUTO_BANK_WITHHOLD_REPAYED.getKey());
         }
         if (repaymentResource.getRepaySource().equals("31")) {
-            projPlanList.setRepayFlag(RepayedFlag.MANUA_BANKL_WITHHOLD_REPAYED.getKey());
+        	bizjPlanList.setRepayFlag(RepayedFlag.MANUA_BANKL_WITHHOLD_REPAYED.getKey());
         }
         if (repaymentResource.getRepaySource().equals("21")) {
-            projPlanList.setRepayFlag(RepayedFlag.MANUAL_WITHHOLD_OFFLINE_REPAYED.getKey());
+        	bizjPlanList.setRepayFlag(RepayedFlag.MANUAL_WITHHOLD_OFFLINE_REPAYED.getKey());
         }
     }
 
