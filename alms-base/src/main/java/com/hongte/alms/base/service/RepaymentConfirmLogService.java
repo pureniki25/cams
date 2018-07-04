@@ -25,7 +25,7 @@ public interface RepaymentConfirmLogService extends BaseService<RepaymentConfirm
      * @param afterId
      * @return
      */
-    public Result revokeConfirm(String businessId,String afterId);
+    public Result revokeConfirm(String businessId,String afterId) throws Exception;
     
     /**
      * 本期已确认还款标的信息
