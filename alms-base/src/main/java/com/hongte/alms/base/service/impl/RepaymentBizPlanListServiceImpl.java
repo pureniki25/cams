@@ -119,13 +119,13 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
         for (FinanceManagerListVO financeManagerListVO : list) {
             businessSet.add(financeManagerListVO.getBusinessId());
             RepaymentResource repaymentResource = repaymentResourceService.selectOne(new EntityWrapper<RepaymentResource>().eq("org_business_id", financeManagerListVO.getOrgBusinessId()).eq("after_id", financeManagerListVO.getAfterId()));
-            if (repaymentResource != null) {
-                if (repaymentResource.getRepaySource().equals("30") || repaymentResource.getRepaySource().equals("31")) {//银行代扣
-                    financeManagerListVO.setBankRepay(true);
-                }
-            } else {//为空代表没有代扣过
-                financeManagerListVO.setBankRepay(false);
-            }
+//            if (repaymentResource != null) {
+//                if (repaymentResource.getRepaySource().equals("30") || repaymentResource.getRepaySource().equals("31")) {//银行代扣
+//                    financeManagerListVO.setBankRepay(true);
+//                }
+//            } else {//为空代表没有代扣过
+//                financeManagerListVO.setBankRepay(false);
+//            }
             /*未代扣确认的不能代扣*/
 //			if (financeManagerListVO.getConfirmFlag()==null||financeManagerListVO.getConfirmFlag().equals(0)) {
 //				financeManagerListVO.setCanWithhold(false);
