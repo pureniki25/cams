@@ -327,7 +327,23 @@
 				</tab-pane>
 				
 				<tab-pane label="垫付记录" name="advancesRecord">
-					<i-table border :columns="advancePaymentInfoColumns" :data="advancePaymentInfoData" style="margin-top:1rem"></i-table>
+					<row style="margin-top:1rem">
+						<p slot="title">
+				            <h3>还垫付记录</h3>
+				        </p>
+				    </row>
+					<row style="margin-top:1rem">
+						<i-table border :columns="advancePaymentInfoColumns" :data="advancePaymentInfoData" style="margin-top:1rem"></i-table>
+					</row>
+					
+					<row style="margin-top:1rem">
+						<p slot="title">
+				            <h3>担保公司垫付记录</h3>
+				        </p>
+				    </row>
+					<row style="margin-top:1rem">
+						<i-table border :columns="queryGuaranteePaymentColumns" :data="queryGuaranteePaymentData" style="margin-top:1rem"></i-table>
+					</row>
 				</tab-pane>
 			</tabs>
         </Card>
@@ -377,9 +393,6 @@
    		<row style="margin-top:1rem">
    			<i-table border :columns="queryRechargeRecordColumns" :data="queryRechargeRecordData" ref="rechargeRecord"></i-table>
    		</row>
-   		<!-- <Content style="margin-top:1rem">
-            <i-table border :columns="queryRechargeRecordColumns" :data="queryRechargeRecordData" ref="rechargeRecord"></i-table>
-        </Content> -->
         <Footer style="text-align: center;width: 100%" >
             <Page :total="rechargeRecordTotal"  ref="pages" show-total @on-change="paging" ></Page>
         </Footer>
@@ -389,9 +402,6 @@
    		<row style="margin-top:1rem">
    			<i-table border :columns="queryRechargeAccountBalanceColumns" :data="queryRechargeAccountBalanceData"></i-table>
    		</row>
-	</Modal>
-	
-	<Modal v-model="principalAndInterestFlag" title="还款本息" width="70%">
 	</Modal>
 </div>
 <script src="/src/js/compliance/index.js" ></script>
