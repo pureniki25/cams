@@ -365,6 +365,7 @@ window.layinit(function (htConfig) {
         },
         methods: {
             search: function () {
+            	
                 let params = {}
 
                 Object.keys(this.form).forEach(element => {
@@ -405,6 +406,7 @@ window.layinit(function (htConfig) {
             },
          
             paging: function (page) {
+            	   this.$refs['pages'].currentPage = page;
                 app.form.curPage = page;
                 app.search()
             },

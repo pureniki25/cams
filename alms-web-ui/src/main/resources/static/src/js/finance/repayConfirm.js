@@ -466,16 +466,16 @@ window.layinit(function (htConfig) {
                 }
                 app.factRepaymentInfo.surplusFund = 0
             },
-            'factRepaymentInfo.surplusFund': function (n) {
-                if ((n || n == 0 ) && !isNaN(n)) {
-                    if (n > app.factRepaymentInfo.canUseSurplus) {
-                        app.$Modal.warning({content: '可使用结余金额不能大于' + app.factRepaymentInfo.canUseSurplus})
-                        app.factRepaymentInfo.surplusFund = 0
-                        return;
-                    }
-                    app.factRepaymentInfo.repayAccount = (app.factRepaymentInfo.moneyPoolAccount * 10000 + (app.factRepaymentInfo.surplusFund || 0) * 10000) / 10000
-                }
-            },
+            // 'factRepaymentInfo.surplusFund': function (n) {
+            //     if ((n || n == 0 ) && !isNaN(n)) {
+            //         if (n > app.factRepaymentInfo.canUseSurplus) {
+            //             app.$Modal.warning({content: '可使用结余金额不能大于' + app.factRepaymentInfo.canUseSurplus})
+            //             app.factRepaymentInfo.surplusFund = 0
+            //             return;
+            //         }
+            //         app.factRepaymentInfo.repayAccount = (app.factRepaymentInfo.moneyPoolAccount * 10000 + (app.factRepaymentInfo.surplusFund || 0) * 10000) / 10000
+            //     }
+            // },
             'factRepaymentInfo.repayAccount': function (n) {
                 app.previewConfirmRepayment()
             }
@@ -693,7 +693,6 @@ window.layinit(function (htConfig) {
                 let param = {};
                 param.businessId = businessId;
                 param.afterId = afterId;
-                param.reqFlag=1;
                 param = Object.assign(app.factRepaymentInfo, param);
                 if ((!param.mprIds || param.mprIds == '') && (!param.surplusFund || param.surplusFund == 0)) {
                     app.$Message.error({content: '不能提交没匹配流水且没使用结余金额的还款确认'})
@@ -742,7 +741,17 @@ window.layinit(function (htConfig) {
                 previewConfirmRepayment();
 
             },
-
+            surplusFundEnter(e){
+              var n= e.target.value;
+                if ((n || n == 0 ) && !isNaN(n)) {
+                    if (n > app.factRepaymentInfo.canUseSurplus) {
+                        app.$Modal.warning({content: '可使用结余金额不能大于' + app.factRepaymentInfo.canUseSurplus})
+                        app.factRepaymentInfo.surplusFund = 0
+                        return;
+                    }
+                    app.factRepaymentInfo.repayAccount = (app.factRepaymentInfo.moneyPoolAccount * 10000 + (app.factRepaymentInfo.surplusFund || 0) * 10000) / 10000
+                }
+            },
             onsurplusFoundChange(e) {
 
             },
