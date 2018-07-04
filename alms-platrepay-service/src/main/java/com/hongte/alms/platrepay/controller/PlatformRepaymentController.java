@@ -294,7 +294,7 @@ public class PlatformRepaymentController {
 
             if (repaymentBizPlanList.getFinanceComfirmDate() == null) {
                 LOGGER.error("@对接合规还款接口@ 财务确认还款操作日期为空 输入参数plan_list_id:[{}]", repaymentBizPlanList.getPlanListId());
-                //return Result.error("财务确认还款操作日期为空");
+                return Result.error("财务确认还款操作日期为空");
             } else {
                 vo.setConfirmTime(repaymentBizPlanList.getFinanceComfirmDate());
             }
@@ -331,6 +331,9 @@ public class PlatformRepaymentController {
                     }*/
                     if (repaymentProjPlanList.getDueDate().before(repaymentBizPlanList.getFactRepayDate())) {
                         projPlanStatus = 11;
+                    } else {
+                        LOGGER.error("@对接合规还款接口@  标的计划结清状态值错误 输入参数 projectId:[{}]  afterId[{}] ", projectId, afterId);
+                        return Result.error("500", "标的计划结清状态值错误");
                     }
                     break;
             }
