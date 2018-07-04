@@ -331,6 +331,9 @@ public class PlatformRepaymentController {
                     }*/
                     if (repaymentProjPlanList.getDueDate().before(repaymentBizPlanList.getFactRepayDate())) {
                         projPlanStatus = 11;
+                    } else {
+                        LOGGER.error("@对接合规还款接口@  标的计划结清状态值错误 输入参数 projectId:[{}]  afterId[{}] ", projectId, afterId);
+                        return Result.error("500", "标的计划结清状态值错误");
                     }
                     break;
             }
