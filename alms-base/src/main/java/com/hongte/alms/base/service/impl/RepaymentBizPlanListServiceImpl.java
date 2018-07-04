@@ -164,6 +164,9 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
         try {
             Map<String, Map<String, BigDecimal>> map = new HashMap<>();
             for (FinanceManagerListVO financeManagerListVO : list) {
+                financeManagerListVO.setCanWithhold(false);
+                financeManagerListVO.setCanWithholdDesc(Constant.CANWITHHOLD_NO);
+
                 for (String businessId : businessSet) {
                     if (financeManagerListVO.getBusinessId().equals(businessId)) {
                      BigDecimal planRepayAmount=financeManagerListVO.getPlanRepayAmount();
@@ -190,6 +193,7 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
 
                            List<BankCardInfo> bankList= jsonObject.toJavaList(BankCardInfo.class);
                             if (bankList !=null) {
+                                financeManagerListVO.setCanWithhold(true); //有绑定平台可以进行代扣
                                 String bankCode = bankList.get(0).getBankCode();
                                 //查询单笔最高金额
                                 BigDecimal onceLimit = sysBankLimitService.selectOnceLimit(bankCode);

@@ -53,6 +53,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -70,6 +72,7 @@ import org.springframework.util.CollectionUtils;
 @Service("RepaymentConfirmLogService")
 public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentConfirmLogMapper, RepaymentConfirmLog> implements RepaymentConfirmLogService {
 
+    private static Logger logger = LoggerFactory.getLogger(RepaymentConfirmLogServiceImpl.class);
     @Autowired
     RepaymentConfirmLogMapper confirmLogMapper;
     @Autowired
@@ -148,11 +151,13 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
             platformRepaymentReq.setProjectId(repaymentProjFactRepay.getProjectId());
             platformRepaymentReq.setConfirmLogId(repaymentBizPlanList.getPlanListId());
             Result<List<PlatformRepaymentDto>> listResult = platformRepaymentFeignClient.queryTdrepayRechargeRecord(platformRepaymentReq);
+            logger.info("=========查询是否有资金分发结果{}",JSON.toJSONString(listResult));
+
             if(listResult.getCode() =="1"){
                 List<PlatformRepaymentDto> data = listResult.getData();
                 if(!CollectionUtils.isEmpty(data)){
                     for(PlatformRepaymentDto platformRepaymentDto : data){
-                        if(log.getConfirmLogId().equals(platformRepaymentDto.getConfirmLogId())){
+                        if(repaymentBizPlanList.getPlanListId().equals(platformRepaymentDto.getConfirmLogId())){ //planlistId相等
                             if(platformRepaymentDto.getProcessStatus()==1 || platformRepaymentDto.getProcessStatus()==2){
                                 return Result.error("500", "已分发记录不能被撤销");
                             }
