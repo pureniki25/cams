@@ -6,6 +6,7 @@ import com.hongte.alms.base.vo.withhold.WithholdLimitListReq;
 import com.hongte.alms.base.vo.withhold.WithholdLimitListVo;
 import com.hongte.alms.common.service.BaseService;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -27,4 +28,8 @@ public interface SysBankLimitService extends BaseService<SysBankLimit> {
     void updateWithholdLimitStatus(String limitId,int status)  throws Exception;
 
     List<SysBankLimit> getSysBankLimitByPlatformId(int platformId)  throws Exception;
+
+    BigDecimal selectOnceLimit(String bankCode);
+
+    BigDecimal selectMaxDayLimit(String bankCode);
 }

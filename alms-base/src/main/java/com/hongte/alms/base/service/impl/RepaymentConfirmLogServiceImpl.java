@@ -129,6 +129,9 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
         }
 
 
+        List<RepaymentBizPlanList> repaymentBizPlanLists = repaymentBizPlanListMapper.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId));
+
+
 		/*找实还明细记录*/
         List<RepaymentProjFactRepay> factRepays = repaymentProjFactRepayMapper
                 .selectList(new EntityWrapper<RepaymentProjFactRepay>().eq("confirm_log_id", log.getConfirmLogId())
@@ -136,9 +139,11 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 
         if (factRepays != null) {
             RepaymentProjFactRepay repaymentProjFactRepay = factRepays.get(0);
+            RepaymentBizPlanList repaymentBizPlanList= repaymentBizPlanLists.get(0);
+
             PlatformRepaymentReq platformRepaymentReq=new PlatformRepaymentReq();
             platformRepaymentReq.setProjectId(repaymentProjFactRepay.getProjectId());
-            platformRepaymentReq.setConfirmLogId(log.getConfirmLogId());
+            platformRepaymentReq.setConfirmLogId(repaymentBizPlanList.getPlanListId());
             Result<List<PlatformRepaymentDto>> listResult = platformRepaymentFeignClient.queryTdrepayRechargeRecord(platformRepaymentReq);
             if(listResult.getCode() =="1"){
                 List<PlatformRepaymentDto> data = listResult.getData();

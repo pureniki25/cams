@@ -181,9 +181,9 @@ public class Constant {
 	public static final String INTERFACE_NAME_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT = "确认还款拆标情况并存储";
 
 
-	private static final String CANWITHHOLD_NO="该卡当前不支持代扣，请及时更换";
-	private static final String CANWITHHOLD_YES_1="限额足够，可一次代扣";
-	private static final String CANWITHHOLD_YES_2="单次限额不够，本次还款需要代扣%s次，可一次代扣";
-	private static final String CANWITHHOLD_YES_3="代扣限额不足，请换卡";
+	public static final String CANWITHHOLD_NO="该卡当前不支持代扣，请及时更换";
+	public static final String CANWITHHOLD_YES_1="限额足够，可一次代扣";
+	public static final String CANWITHHOLD_YES_2="单次限额不够，本次还款需要代扣%s次，可一次代扣";
+	public static final String CANWITHHOLD_YES_3="代扣限额不足，请换卡";
 
 }
