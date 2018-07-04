@@ -250,12 +250,12 @@ window.layinit(function (htConfig) {
                                                     }
                                              
                                                     if (call == 'withhold') {debugger
-//                                                    	 if (p.row.status == '已还款') {
-//                                                             app.$Message.warning({
-//                                                                 content: '已还款不能代扣'
-//                                                             });
-//                                                             return;
-//                                                         }
+                                                    	 if (p.row.status == '已还款') {
+                                                             app.$Message.warning({
+                                                                 content: '已还款不能代扣'
+                                                             });
+                                                             return;
+                                                         }
 			                                         
                                                         let url = getDeductionUrl(p.row.planListId);
                                                         layer.open({
@@ -411,12 +411,12 @@ window.layinit(function (htConfig) {
                 app.search()
             },
             revokeConfirm(p) {debugger
-             	 if (p.bankRepay== true) {
-                     app.$Message.warning({
-                         content: '银行代扣不能撤销'
-                     });
-                     return;
-                 }
+//             	 if (p.bankRepay== true) {
+//                     app.$Message.warning({
+//                         content: '银行代扣不能撤销'
+//                     });
+//                     return;
+//                 }
                 app.$Modal.confirm({
                     content:'是否确认取消还款?',
                     onOk(){
