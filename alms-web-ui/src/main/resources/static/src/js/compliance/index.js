@@ -64,6 +64,7 @@ window.layinit(function(htConfig) {
 				businessType: '', // 业务类型
 				platStatus: '', // 平台状态
 				companyName: '', // 分公司
+				page: 1, // 当前页
 			},
 			
 			/*
@@ -100,6 +101,8 @@ window.layinit(function(htConfig) {
 				rechargeSourseAccount:'', //充值来源账户
 				createTimeStart:'', //创建时间 开始
 				createTimeEnd:'',// 创建时间 结束
+				page: 1,
+                limit: 10,
 			},
 			/*
 			 * 初始化查询充值记录model
@@ -346,6 +349,7 @@ window.layinit(function(htConfig) {
         	 * 查看充值记录数据
         	 */
         	queryRechargeRecordData:[],
+        	rechargeRecordTotal: 0, // 充值记录总数
         	
         	/*
              * 查看所有代充值账户余额表头
@@ -654,9 +658,31 @@ window.layinit(function(htConfig) {
 			    		done: (res, curr, count) => {
 			    			this.selectAmount = 0;
 			    			this.ComplianceRepaymentData = res.data;
+			    			this.queryConditionModel.page = curr;
 			    		}
 			    })
 			},
+			
+			/*
+			 * 导出资金分发数据
+			 */
+			exportComplianceRepaymentData: function(){
+				postDownLoadFile({
+					url: basePath + 'tdrepayRecharge/exportComplianceRepaymentData',
+					data: vm.queryConditionModel,
+					method: 'post'
+				});
+			},
+			
+			/*
+			 * 导出充值记录
+			 */
+			exportRechargeRecordData: function(){
+				this.$refs.rechargeRecord.exportCsv({
+                    filename: '充值记录'
+                });
+			},
+			
 			/*
 			 * 查询所有分公司
 			 */
@@ -796,10 +822,11 @@ window.layinit(function(htConfig) {
 			queryRechargeRecord:function(){
 				axios.post(basePath + 'tdrepayRecharge/queryRechargeRecord', vm.queryRechargeRecordModel)
 				.then(function(result){
+					console.log(result);
 					if (result.data.code == 0) {
 						vm.queryRechargeRecordModel = vm.initQueryRechargeRecordModel;
 						vm.queryRechargeRecordData = result.data.data;
-						
+						vm.rechargeRecordTotal = result.data.count;
 					} else {
 						vm.$Modal.error({ content: result.data.msg });
 					}
@@ -830,6 +857,15 @@ window.layinit(function(htConfig) {
     	        	vm.rechargeAccountBalanceFlag = false;
     	        	vm.queryRechargeAccountBalanceLoading = false;
     	        });
+			},
+			
+			/*
+			 * 查看充值记录分页
+			 */
+			paging: function (page) {
+         	  	this.$refs['pages'].currentPage = page;
+	            this.queryRechargeRecordModel.page = page;
+	            this.queryRechargeRecord();
 			},
 		},
 

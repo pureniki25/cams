@@ -17,7 +17,7 @@ public class BusinessCustomerInfoReq {
      * 客户ID，资产端主键
      */
     @ApiModelProperty(required= true,value = "客户ID，资产端主键")
-    @NotNull(message = "BusinessCustomerInfoReq 客户ID，资产端主键(customerId)不能为空")
+    //@NotNull(message = "BusinessCustomerInfoReq 客户ID，资产端主键(customerId)不能为空")
     private String customerId;
 
     /**
