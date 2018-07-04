@@ -901,6 +901,20 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             throw  new CreatRepaymentExcepiton("请填写业务用户信息");
         }
 
+        //个人用户或者主借款人必须传入customerId
+        for(BusinessCustomerInfoReq businessCustomerInfoReq: bizCusInfoReqs){
+            if(businessCustomerInfoReq.getIsmainCustomer().compareTo(1)==0){
+                if(businessCustomerInfoReq.getCustomerId() == null){
+                    throw  new CreatRepaymentExcepiton("主借款人必须填写用户Id(customerId)");
+                }
+            }
+            if(businessCustomerInfoReq.getCustomerType().equals("个人")){
+                if(businessCustomerInfoReq.getCustomerId() == null){
+                    throw  new CreatRepaymentExcepiton("个人用户必须填写用户Id(customerId)");
+                }
+            }
+        }
+
 
         //判断是否有主借人  开始
         Boolean mainBorrowPersonFlage = false;
