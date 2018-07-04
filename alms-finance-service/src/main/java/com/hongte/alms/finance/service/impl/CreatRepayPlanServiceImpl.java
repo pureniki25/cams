@@ -1416,7 +1416,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 repaymentProjPlan.setBorrowRateUnit(projInfoReq.getRateUnitType());//利率类型
                 repaymentProjPlan.setBorrowLimit(projInfoReq.getPeriodMonth());//借款期限
                 repaymentProjPlan.setBorrowLimitUnit(RepayPlanBorrowLimitUnitEnum.MONTH.getValue());//借款期限单位
-                repaymentProjPlan.setPlanStatus(RepayPlanStatus.REPAYING.getKey());//还款计划状态
+                repaymentProjPlan.setPlanStatus(RepayPlanSettleStatusEnum.REPAYINF.getValue());//还款计划状态
                 repaymentProjPlan.setIsDefer(RepayPlanIsDeferEnum.NO.getValue());//是否展期还款计划
                 repaymentProjPlan.setCreateTime(new Date());
                 repaymentProjPlan.setCreateUser(Constant.ADMIN_ID);
