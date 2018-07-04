@@ -101,6 +101,10 @@ public class FinanceManagerListVO {
 	private boolean canWithhold;
 
 	/**
+	 * 是否支持代扣描述
+	 */
+	private String canWithholdDesc;
+	/**
 	 * 代扣确认状态
 	 */
 	private Integer confirmFlag ;
@@ -365,4 +369,11 @@ public class FinanceManagerListVO {
 		this.repayStatus = repayStatus;
 	}
 
+	public String getCanWithholdDesc() {
+		return canWithholdDesc;
+	}
+
+	public void setCanWithholdDesc(String canWithholdDesc) {
+		this.canWithholdDesc = canWithholdDesc;
+	}
 }

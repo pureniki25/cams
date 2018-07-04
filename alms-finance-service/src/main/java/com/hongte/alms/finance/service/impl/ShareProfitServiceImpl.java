@@ -1479,6 +1479,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             RepaymentBizPlanList bizPlanList = findRepaymentbizplanlist(projPlanList.getPlanListId(), financeBaseDto);
             bizPlanList.setFactRepayDate(financeBaseDto.getConfirmLog().getRepayDate());
             bizPlanList.setRemark(financeBaseDto.getRemark());
+            bizPlanList.setFinanceComfirmDate(new Date());
 
             BigDecimal bplFactAmount = sumBizPlanListFactAmount(bizPlanList.getPlanListId(), financeBaseDto);
 
@@ -1489,7 +1490,6 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                 bizPlanList.setCurrentSubStatus(RepayPlanStatus.REPAYED.getName());
                 bizPlanList.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
                 setRepayConfirmedFlagBiz(bizPlanList, financeBaseDto);
-                bizPlanList.setFinanceComfirmDate(new Date());
                 LoginInfoDto loginInfo = loginUserInfoHelper.getLoginInfo();
                 if (loginInfo != null) {
                     bizPlanList.setFinanceConfirmUser(loginInfo.getUserId());
@@ -1501,7 +1501,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             } else {
 
 //				bizPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
-//				bizPlanList.setCurrentSubStatus(RepayPlanStatus.REPAYING.getName());
+				bizPlanList.setCurrentSubStatus(RepayPlanStatus.PARTAIL.getName());
                 projPlanList.setRepayFlag(null);
                 if (bplFactAmount.compareTo(bizPlanList.getTotalBorrowAmount()) >= 0) {
                     bizPlanList.setRepayStatus(SectionRepayStatusEnum.ONLINE_REPAID.getKey());
