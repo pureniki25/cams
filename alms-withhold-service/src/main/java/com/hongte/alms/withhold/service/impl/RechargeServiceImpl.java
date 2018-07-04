@@ -633,7 +633,7 @@ public class RechargeServiceImpl implements RechargeService {
 	public BigDecimal getOnlineAmount(RepaymentBizPlanList list) {
 		List<RepaymentBizPlanListDetail> details = repaymentBizPlanListDetailService
 				.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("fee_id",
-						RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE));
+						RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid()).eq("plan_list_id", list.getPlanListId()));
 		BigDecimal underAmount = BigDecimal.valueOf(0);
 		BigDecimal onlineAmount=BigDecimal.valueOf(0);
 		for (RepaymentBizPlanListDetail detail : details) {
@@ -652,7 +652,7 @@ public class RechargeServiceImpl implements RechargeService {
 	public BigDecimal getUnderlineAmount(RepaymentBizPlanList list) {
 		List<RepaymentBizPlanListDetail> details = repaymentBizPlanListDetailService
 				.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("fee_id",
-						RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE));
+						RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid()).eq("plan_list_id", list.getPlanListId()));
 		BigDecimal underAmount = BigDecimal.valueOf(0);
 		for (RepaymentBizPlanListDetail detail : details) {
 			underAmount = underAmount.add(detail.getPlanAmount());
