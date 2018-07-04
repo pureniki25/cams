@@ -440,12 +440,10 @@ var layer;
         	vm.ajax_data.underLineFactOverDueMoney=0;
         	vm.isBankFlag=true;
         	vm.ajax_data.total=getTotalShouldPay();
-        	vm.ajax_data.repayAmount=vm.ajax_data.repayAmount-vm.ajax_data.planOverDueMoney;
         	if(	vm.ajax_data.repayAmount<0){
         		vm.ajax_data.repayAmount=0;
         	}
-        	vm.ajax_data.repayAmount=vm.ajax_data.repayAmount.toFixed(2);
-       
+        	
         }else{
         	vm.isBankFlag=false;
         	vm.ajax_data.underLineFactOverDueMoney=	vm.ajax_data.planOverDueMoney;
