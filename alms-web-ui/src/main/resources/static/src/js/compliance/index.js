@@ -38,6 +38,8 @@ window.layinit(function(htConfig) {
 			rechargeAccountBalanceFlag: false, // 查看代充值账户余额弹窗控制
 			queryRechargeAccountBalanceLoading: false, // 查看代充值账户余额按钮加载状态控制
 			infoTabValue:'fundDistributionRecord',//详情tab值
+			principalAndInterestFlag:false,// 还款本息弹窗控制
+			principalAndInterestList:[], // 还款本息
 				
 			/*
 			 *  详情基础信息
@@ -173,6 +175,18 @@ window.layinit(function(htConfig) {
             		title: '还款本息',
             		key: 'principalAndInterest',
             		align: 'center',
+//            		render:(h,p)=>{
+//                		return h('a',{
+//                    		style:{
+//                    			textDecoration:'underline'
+//                    		},
+//                    		on:{
+//                    			click:function(){
+//									vm.openPrincipalAndInterest(p.row.period);
+//                    			}
+//                    		}
+//                    	},p.row.principalAndInterest)
+//                    },
             	},
             	{
             		title: '平台费',
@@ -358,7 +372,7 @@ window.layinit(function(htConfig) {
         	 * 查看所有代充值账户余额数据
         	 */
         	queryRechargeAccountBalanceData:[],
-
+        	
 		},
 
 		methods : {
@@ -392,6 +406,12 @@ window.layinit(function(htConfig) {
 			 */
 			openInfoTabModal: function(){
 				this.initFunction(this.infoTabValue);
+			},
+			/*
+			 * 打开还款本息弹窗
+			 */
+			openPrincipalAndInterest: function(period){
+				this.principalAndInterestFlag = true;
 			},
 			/*
 			 * 获取所有线下还款账户
@@ -563,7 +583,7 @@ window.layinit(function(htConfig) {
 			    			align: 'center',
 							width:100
 			    		}, {
-			    			field: 'period',
+			    			field: 'afterId',
 			    			title: '还款期数',
 			    			align: 'center',
 							width:100
@@ -598,7 +618,7 @@ window.layinit(function(htConfig) {
 			    			align: 'center',
 							width:100
 			    		}, {
-			    			field: 'platStatusStr',
+			    			field: 'platformTypeStr',
 			    			title: '平台状态',
 			    			align: 'center',
 							width:100

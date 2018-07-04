@@ -108,17 +108,12 @@
 		  t.`after_id` afterId,
 		  t.`period`,
 		  t.`confirm_log_id` confirmLogId,
-		  CASE t.`is_valid`
-		  WHEN 1
-		  THEN '未撤销'
-		  ELSE '已撤销'
-		  END isValid
+		  t.`process_status` processStatus
 		FROM
 		  tb_tdrepay_recharge_log t 
 		WHERE t.`project_id` = #{projectId,jdbcType=VARCHAR}
 		  AND t.`confirm_log_id` = #{confirmLogId,jdbcType=VARCHAR}
 		  AND t.`is_valid` = 1 
-		  AND t.`process_status` IN (0, 3)
 	</select>
 
 </mapper>

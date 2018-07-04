@@ -764,17 +764,18 @@ public class TdrepayRechargeController {
 	}
 
 	@ApiOperation(value = "查询资金分发记录状态")
-	@GetMapping("/queryTdrepayRechargeRecord")
+	@PostMapping("/queryTdrepayRechargeRecord")
 	@ResponseBody
-	public Result<List<Map<String, Object>>> queryTdrepayRechargeRecord(@RequestParam("projectId") String projectId,
-			@RequestParam("confirmLogId") String confirmLogId) {
+	public Result<List<Map<String, Object>>> queryTdrepayRechargeRecord(@RequestBody Map<String, Object> paramMap) {
 
-		if (StringUtil.isEmpty(projectId) || StringUtil.isEmpty(confirmLogId)) {
+		if (paramMap == null || StringUtil.isEmpty((String) paramMap.get("projectId"))
+				|| StringUtil.isEmpty((String) paramMap.get("confirmLogId"))) {
 			return Result.error("-99", "标的ID或者实还流水ID不能为空");
 		}
 
 		try {
-			return Result.success(tdrepayRechargeLogService.queryTdrepayRechargeRecord(projectId, confirmLogId));
+			return Result.success(tdrepayRechargeLogService.queryTdrepayRechargeRecord(
+					(String) paramMap.get("projectId"), (String) paramMap.get("confirmLogId")));
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return Result.error("-99", "系统异常");
@@ -784,28 +785,29 @@ public class TdrepayRechargeController {
 
 	@SuppressWarnings("rawtypes")
 	@ApiOperation(value = "撤销资金分发")
-	@GetMapping("/revokeTdrepayRecharge")
+	@PostMapping("/revokeTdrepayRecharge")
 	@ResponseBody
-	public Result revokeTdrepayRecharge(@RequestParam("projectId") String projectId,
-			@RequestParam("confirmLogId") String confirmLogId) {
+	public Result revokeTdrepayRecharge(@RequestBody Map<String, Object> paramMap) {
 
-		if (StringUtil.isEmpty(projectId) || StringUtil.isEmpty(confirmLogId)) {
+		if (paramMap == null || StringUtil.isEmpty((String) paramMap.get("projectId"))
+				|| StringUtil.isEmpty((String) paramMap.get("confirmLogId"))) {
 			return Result.error("-99", "标的ID或者实还流水ID不能为空");
 		}
 
 		try {
 			Integer[] processStatus = { 0, 3 };
 
-			TdrepayRechargeLog tdrepayRechargeLog = tdrepayRechargeLogService
-					.selectOne(new EntityWrapper<TdrepayRechargeLog>().eq("project_id", projectId)
-							.eq("confirm_log_id", confirmLogId).in("process_status", processStatus).eq("is_valid", 1));
-			
+			TdrepayRechargeLog tdrepayRechargeLog = tdrepayRechargeLogService.selectOne(
+					new EntityWrapper<TdrepayRechargeLog>().eq("project_id", (String) paramMap.get("projectId"))
+							.eq("confirm_log_id", (String) paramMap.get("confirmLogId"))
+							.in("process_status", processStatus).eq("is_valid", 1));
+
 			if (tdrepayRechargeLog != null) {
 				tdrepayRechargeLog.setIsValid(2);
 				tdrepayRechargeLogService.updateById(tdrepayRechargeLog);
 				return Result.success();
-			}else {
-				return Result.error("-99", "没有找到对应的数据");
+			} else {
+				return Result.error("-99", "没有找到对应的数据，撤销资金分发失败");
 			}
 
 		} catch (Exception e) {
