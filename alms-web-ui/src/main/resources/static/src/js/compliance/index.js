@@ -38,8 +38,6 @@ window.layinit(function(htConfig) {
 			rechargeAccountBalanceFlag: false, // 查看代充值账户余额弹窗控制
 			queryRechargeAccountBalanceLoading: false, // 查看代充值账户余额按钮加载状态控制
 			infoTabValue:'fundDistributionRecord',//详情tab值
-			principalAndInterestFlag:false,// 还款本息弹窗控制
-			principalAndInterestList:[], // 还款本息
 				
 			/*
 			 *  详情基础信息
@@ -178,18 +176,6 @@ window.layinit(function(htConfig) {
             		title: '还款本息',
             		key: 'principalAndInterest',
             		align: 'center',
-//            		render:(h,p)=>{
-//                		return h('a',{
-//                    		style:{
-//                    			textDecoration:'underline'
-//                    		},
-//                    		on:{
-//                    			click:function(){
-//									vm.openPrincipalAndInterest(p.row.period);
-//                    			}
-//                    		}
-//                    	},p.row.principalAndInterest)
-//                    },
             	},
             	{
             		title: '平台费',
@@ -377,6 +363,72 @@ window.layinit(function(htConfig) {
         	 */
         	queryRechargeAccountBalanceData:[],
         	
+        	/*
+        	 * 查看担保公司垫付记录表头
+        	 */
+        	queryGuaranteePaymentColumns:[
+        		{
+        			title: '期数',
+        			key: 'period',
+        			align: 'center',
+        		},
+        		{
+        			title: '还款状态',
+        			key: 'status',
+        			align: 'center',
+        		},
+        		{
+        			title: '还款日期',
+        			key: 'addDate',
+        			align: 'center',
+        		},
+        		{
+        			title: '本金利息',
+        			key: 'principalAndInterest',
+        			align: 'center',
+        		},
+        		{
+        			title: '滞纳金',
+        			key: 'penaltyAmount',
+        			align: 'center',
+        		},
+        		{
+        			title: '实还平台服务费',
+        			key: 'tuandaiAmount',
+        			align: 'center',
+        		},
+        		{
+        			title: '实还资产端服务费',
+        			key: 'orgAmount',
+        			align: 'center',
+        		},
+        		{
+        			title: '实还担保公司服务费',
+        			key: 'guaranteeAmount',
+        			align: 'center',
+        		},
+        		{
+        			title: '实还仲裁服务费',
+        			key: 'arbitrationAmount',
+        			align: 'center',
+        		},
+        		{
+        			title: '实还中介服务费',
+        			key: 'agencyAmount',
+        			align: 'center',
+        		},
+        		{
+        			title: '合计',
+        			key: 'total',
+        			align: 'center',
+        		},
+        	],
+        		
+    		/*
+    		 * 查看担保公司垫付记录数据
+    		 */
+    		queryGuaranteePaymentData:[],
+        	
 		},
 
 		methods : {
@@ -410,12 +462,6 @@ window.layinit(function(htConfig) {
 			 */
 			openInfoTabModal: function(){
 				this.initFunction(this.infoTabValue);
-			},
-			/*
-			 * 打开还款本息弹窗
-			 */
-			openPrincipalAndInterest: function(period){
-				this.principalAndInterestFlag = true;
 			},
 			/*
 			 * 获取所有线下还款账户
@@ -771,7 +817,8 @@ window.layinit(function(htConfig) {
 				axios.get(basePath +"tdrepayRecharge/returnAdvanceShareProfit?projectId=" + this.projectId)
     	        .then(function (res) {
     	            if (res.data.data != null && res.data.code == 1) {
-    	            	vm.advancePaymentInfoData = res.data.data;
+    	            	vm.advancePaymentInfoData = res.data.data.returnAdvanceShareProfits;
+    	            	vm.queryGuaranteePaymentData = res.data.data.tdGuaranteePaymentVOs;
     	            } else {
     	            	vm.$Modal.error({content: res.data.msg });
     	            }
