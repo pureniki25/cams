@@ -160,11 +160,11 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
                 List<PlatformRepaymentDto> data = listResult.getData();
                 if(!CollectionUtils.isEmpty(data)){
                     for(PlatformRepaymentDto platformRepaymentDto : data){
-//                        if(repaymentBizPlanList.getPlanListId().equals(platformRepaymentDto.getConfirmLogId())){ //planlistId相等
+                        if(repaymentBizPlanList.getPlanListId().equals(platformRepaymentDto.getConfirmLogId())){ //planlistId相等
                             if(platformRepaymentDto.getProcessStatus()==1 || platformRepaymentDto.getProcessStatus()==2){
                                 throw new ServiceRuntimeException("已分发记录不能被撤销");
                             }
-//                        }
+                        }
                     }
                 }
             }
