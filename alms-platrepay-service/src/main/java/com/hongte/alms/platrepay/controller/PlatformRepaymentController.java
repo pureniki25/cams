@@ -294,7 +294,7 @@ public class PlatformRepaymentController {
 
             if (repaymentBizPlanList.getFinanceComfirmDate() == null) {
                 LOGGER.error("@对接合规还款接口@ 财务确认还款操作日期为空 输入参数plan_list_id:[{}]", repaymentBizPlanList.getPlanListId());
-                //return Result.error("财务确认还款操作日期为空");
+                return Result.error("财务确认还款操作日期为空");
             } else {
                 vo.setConfirmTime(repaymentBizPlanList.getFinanceComfirmDate());
             }
