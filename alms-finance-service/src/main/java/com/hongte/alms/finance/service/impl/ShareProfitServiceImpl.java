@@ -1479,6 +1479,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             RepaymentBizPlanList bizPlanList = findRepaymentbizplanlist(projPlanList.getPlanListId(), financeBaseDto);
             bizPlanList.setFactRepayDate(financeBaseDto.getConfirmLog().getRepayDate());
             bizPlanList.setRemark(financeBaseDto.getRemark());
+            bizPlanList.setFinanceComfirmDate(new Date());
 
             BigDecimal bplFactAmount = sumBizPlanListFactAmount(bizPlanList.getPlanListId(), financeBaseDto);
 
@@ -1489,7 +1490,6 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                 bizPlanList.setCurrentSubStatus(RepayPlanStatus.REPAYED.getName());
                 bizPlanList.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
                 setRepayConfirmedFlagBiz(bizPlanList, financeBaseDto);
-                bizPlanList.setFinanceComfirmDate(new Date());
                 LoginInfoDto loginInfo = loginUserInfoHelper.getLoginInfo();
                 if (loginInfo != null) {
                     bizPlanList.setFinanceConfirmUser(loginInfo.getUserId());
@@ -1501,7 +1501,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             } else {
 
 //				bizPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
-//				bizPlanList.setCurrentSubStatus(RepayPlanStatus.REPAYING.getName());
+				bizPlanList.setCurrentSubStatus(RepayPlanStatus.PARTAIL.getName());
                 projPlanList.setRepayFlag(null);
                 if (bplFactAmount.compareTo(bizPlanList.getTotalBorrowAmount()) >= 0) {
                     bizPlanList.setRepayStatus(SectionRepayStatusEnum.ONLINE_REPAID.getKey());
@@ -1601,6 +1601,12 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         if (repaymentResource.getRepaySource().equals("30")) {
             projPlanList.setRepayFlag(RepayedFlag.AUTO_BANK_WITHHOLD_REPAYED.getKey());
         }
+        if (repaymentResource.getRepaySource().equals("31")) {
+            projPlanList.setRepayFlag(RepayedFlag.MANUA_BANKL_WITHHOLD_REPAYED.getKey());
+        }
+        if (repaymentResource.getRepaySource().equals("21")) {
+            projPlanList.setRepayFlag(RepayedFlag.MANUAL_WITHHOLD_OFFLINE_REPAYED.getKey());
+        }
     }
 
     /**
@@ -1623,6 +1629,12 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         }
         if (repaymentResource.getRepaySource().equals("30")) {
             bizjPlanList.setRepayFlag(RepayedFlag.AUTO_BANK_WITHHOLD_REPAYED.getKey());
+        }
+        if (repaymentResource.getRepaySource().equals("31")) {
+        	bizjPlanList.setRepayFlag(RepayedFlag.MANUA_BANKL_WITHHOLD_REPAYED.getKey());
+        }
+        if (repaymentResource.getRepaySource().equals("21")) {
+        	bizjPlanList.setRepayFlag(RepayedFlag.MANUAL_WITHHOLD_OFFLINE_REPAYED.getKey());
         }
     }
 

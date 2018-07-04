@@ -647,7 +647,7 @@ var showData=function(){debugger
     	
     	var restPeriods=vm.baseInfoForm.borrowLimit-vm.baseInfoForm.periods;
     	//获取提前结清违约金和往期少交费用
-        axios.get(basePath + "ApplyDerateController/getHousePreLateFees?crpId="+crpId+"&repaymentTypeId="+vm.baseInfoForm.repaymentTypeId+"&afterId="+afterId+"&businessId=" + vm.baseInfoForm.zqBusinessId+"&restPeriods="+restPeriods+"&needPayPrincipal="+vm.baseInfoForm.needPayPrincipal
+        axios.get(basePath + "ApplyDerateController/getHousePreLateFees?crpId="+crpId+"&repaymentTypeId="+vm.baseInfoForm.repaymentTypeId+"&afterId="+afterId+"&businessId=" + vm.baseInfoForm.businessId+"&restPeriods="+restPeriods+"&needPayPrincipal="+vm.baseInfoForm.needPayPrincipal
         ).then(function(res){
             if(res.data.code=='1'){
                 vm.baseInfoForm.preLateFees = res.data.data.preLateFees
