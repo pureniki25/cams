@@ -266,8 +266,9 @@ public class PlatformRepaymentController {
             //实还日期
             //vo.setFactRepayDate(repaymentConfirmLog.getRepayDate());
             vo.setFactRepayDate(repaymentBizPlanList.getFactRepayDate());
-            //借款人
-            vo.setCustomerName(basicBusiness.getCustomerName());
+            //借款人,平台只关心标的的每个共借款人姓名
+            //vo.setCustomerName(basicBusiness.getCustomerName());
+            vo.setCustomerName(tuandaiProjectInfo.getRealName());
             //分公司
             vo.setCompanyName(basicBusiness.getCompanyName());
 
