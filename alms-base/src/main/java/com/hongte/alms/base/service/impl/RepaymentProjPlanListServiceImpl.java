@@ -26,6 +26,7 @@ import com.hongte.alms.common.util.ClassCopyUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.ht.ussp.core.Result;
 import com.ht.ussp.util.DateUtil;
+import com.mysql.cj.core.io.BigDecimalValueFactory;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -127,6 +128,10 @@ public class RepaymentProjPlanListServiceImpl extends
 								getRondModeAndSmallNum(projPlan);//确定进位方式和保留小数位
 								RepaymentProjPlanListDetail underLineProjDetail=null;   //线下费用的Detail
 								RepaymentProjPlanListDetail onLineProjDetail=null;   //线上费用的Detail
+								
+//								if(projPList.getProjPlanListId().equals("f0bc7a22-c45e-4f9f-8ac8-ec2a993cc2c1")) {
+//									  System.out.println("STOP");	
+//									} 
 								//如果已经全部收取本期应交的本息服务费费及线上逾期费用后则停止计算滞纳金
 								if(getOnLineFactAmountSum(projPList.getProjPlanListId())>=getOnLinePlanAmountSum(projPList.getProjPlanListId())) {
 									continue;
@@ -145,7 +150,12 @@ public class RepaymentProjPlanListServiceImpl extends
 									BigDecimal onlineDueDays=BigDecimal.valueOf(0);//线上逾期天数
 									BigDecimal underlineDueDays=BigDecimal.valueOf(0);//线下逾期天数
 									if(platformDueDate!=null&&platformDueDate.compareTo(projPList.getDueDate())>0) {
-										onlineDueDays=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), platformDueDate)));
+										if(isOverDue(new Date(), platformDueDate)>=0) {
+											onlineDueDays=BigDecimal.valueOf(0);
+										}else {
+											onlineDueDays=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), platformDueDate)));
+										}
+									
 									}else {
 										onlineDueDays=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), projPList.getDueDate())));
 									}
@@ -157,12 +167,17 @@ public class RepaymentProjPlanListServiceImpl extends
 									underLineProjDetail=	updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid(), underLateFee);
 									
 									BigDecimal onlineLateFee=BigDecimal.valueOf(0);//线上逾期费
+								
 									if(onlineDueDays.compareTo(BigDecimal.valueOf(0))>0) {//如果线上的逾期天数为0,则不用计算线上滞纳金
 										 onlineLateFee=getOnLineLateFee(projPList, projPlan,onlineDueDays).setScale(2, roundingMode);//线上逾期费
 										onlineLateFeeSum=onlineLateFeeSum.add(onlineLateFee).setScale(2, roundingMode);
 										onLineProjDetail=updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), onlineLateFee);
+									}else {
+										 onlineLateFee=BigDecimal.valueOf(0);
+										onlineLateFeeSum=onlineLateFeeSum.add(onlineLateFee).setScale(2, roundingMode);
+										onLineProjDetail=updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), onlineLateFee);
 									}
-							       
+							        
 									projPList.setOverdueAmount(underLateFee.add(onlineLateFee));
 									projPList.setCurrentStatus(RepayCurrentStatusEnums.逾期.name());
 									updateById(projPList);
@@ -188,7 +203,7 @@ public class RepaymentProjPlanListServiceImpl extends
 				    }
 			
 			}
-
+ 
 			/**
 			// 每个业务对应所有贷后生成的标的还款计划
 			List<RepaymentProjPlan> projPlans = repaymentProjPlanService
