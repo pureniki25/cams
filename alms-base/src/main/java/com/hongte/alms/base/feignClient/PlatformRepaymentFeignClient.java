@@ -1,7 +1,10 @@
 package com.hongte.alms.base.feignClient;
 
+import java.util.List;
 import java.util.Map;
 
+import com.hongte.alms.base.dto.PlatformRepaymentDto;
+import com.hongte.alms.base.dto.PlatformRepaymentReq;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.hongte.alms.common.result.Result;
 
-@FeignClient(value = "alms-platrepay-service")
+@FeignClient(value = "alms-platrepay-service",url="http://192.168.13.151:30631")
 public interface PlatformRepaymentFeignClient {
 
 	/**
@@ -24,11 +27,10 @@ public interface PlatformRepaymentFeignClient {
 
 	/**
 	 * 查询资金分发状态接口
-	 * @param projectId 标的ID
-	 * @param confirmLogId 实还流水ID
+	 *
 	 * @return
 	 */
-//	@RequestMapping(value = "/tdrepayRecharge/queryTdrepayRechargeRecord", headers = { "app=ALMS","content-type=application/json" })
-//	public Result queryTdrepayRechargeRecord(String projectId, String confirmLogId);
+	@RequestMapping(value = "/tdrepayRecharge/queryTdrepayRechargeRecord", headers = { "app=ALMS","content-type=application/json" })
+	public Result<List<PlatformRepaymentDto>> queryTdrepayRechargeRecord(@RequestBody PlatformRepaymentReq platformRepaymentReq);
 
 }
