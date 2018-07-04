@@ -349,7 +349,7 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 		moneyPoolRepayment.setOriginalBusinessId(registerInfoDTO.getBusinessId());
 		moneyPoolRepayment.setAfterId(registerInfoDTO.getAfterId());
 		//update by liuzq for 设置实际还款时间
-		moneyPoolRepayment.setClaimDate(new Date());
+		moneyPoolRepayment.setClaimDate(DateUtil.getDate(registerInfoDTO.getRepaymentDate()));
 		boolean result = moneyPoolRepayment.insert();
 		if (result) {
 			//update by zengkun for 设置更新用户为信贷的用户
