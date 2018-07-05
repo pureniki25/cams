@@ -39,6 +39,6 @@ public class Test {
 	
 	@org.junit.Test
 	public void Test() {
-		Result result = confirmLogService.revokeConfirm("TDF1012018032101", "1-01");
+//		Result result = confirmLogService.revokeConfirm("TDF1012018032101", "1-01");
 	}
 }
