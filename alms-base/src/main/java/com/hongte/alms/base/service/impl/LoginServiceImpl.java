@@ -95,7 +95,7 @@ public class LoginServiceImpl implements LoginService {
             SysRole role = new SysRole();
             role.setRoleName(boa.getRoleNameCn());
             role.setRoleCode(boa.getRoleCode());
-            role.setRoleAreaType(1);
+            role.setRoleAreaType(2);//将角色初始设置为区域性的
             if(sysRoleService.selectOne(new EntityWrapper<SysRole>().eq("role_code",boa.getRoleCode())) == null){
                 sysRoleList.add(role);
             }

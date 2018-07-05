@@ -473,7 +473,6 @@
 		  WHERE t1.plan_list_id = t2.plan_list_id 
 		    AND t1.plan_list_id = rbpl.plan_list_id) amount,
 		  0 otherFee,
-		  0 surplus,
 		  current_status confirmFlag 
 		FROM
 		  `tb_repayment_biz_plan_list` rbpl,
@@ -587,12 +586,6 @@
 		    AND t1.plan_list_id = rbpl.plan_list_id 
 		    AND t2.account_status = 0 
 		    AND t2.plan_item_type NOT IN (10, 20, 30, 50, 60)) otherFee,
-		  (SELECT 
-		    IFNULL(SUM(t1.over_repay_money), 0) 
-		  FROM
-		    tb_accountant_over_repay_log t1 
-		  WHERE t1.business_id = #{businessId,jdbcType=VARCHAR} 
-		    AND t1.business_after_id = rbpl.after_id) surplus,
 		  current_status confirmFlag 
 		FROM
 		  `tb_repayment_biz_plan_list` rbpl,
