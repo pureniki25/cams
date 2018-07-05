@@ -29,7 +29,7 @@
             parameterType="com.hongte.alms.base.collection.vo.AfterLoanStandingBookReq">
 
         select
-        business.business_id AS businessId,
+        pList.orig_business_id AS businessId,
         pList.period as  periods,
         pList.after_id as  afterId,
 

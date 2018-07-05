@@ -3,6 +3,7 @@ package com.hongte.alms.platrepay.controller;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +59,7 @@ import com.hongte.alms.platrepay.dto.TdReturnAdvanceShareProfitResult;
 import com.hongte.alms.platrepay.enums.PlatformStatusTypeEnum;
 import com.hongte.alms.platrepay.enums.ProcessStatusTypeEnum;
 import com.hongte.alms.platrepay.enums.RepaySourceEnum;
+import com.hongte.alms.platrepay.vo.TdGuaranteePaymentVO;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.util.BeanUtils;
 
@@ -571,8 +573,7 @@ public class TdrepayRechargeController {
 	@ApiOperation(value = "根据标ID获取垫付记录")
 	@GetMapping("/returnAdvanceShareProfit")
 	@ResponseBody
-	public Result<List<TdReturnAdvanceShareProfitDTO>> returnAdvanceShareProfit(
-			@RequestParam("projectId") String projectId) {
+	public Result<Map<String, Object>> returnAdvanceShareProfit(@RequestParam("projectId") String projectId) {
 		if (StringUtil.isEmpty(projectId)) {
 			return Result.error("-99", "标ID不能为空");
 		}
@@ -581,10 +582,15 @@ public class TdrepayRechargeController {
 			Map<String, Object> paramMap = new HashMap<>();
 			paramMap.put("projectId", projectId);
 
+			Map<String, Object> resultMap = new HashMap<>();
+
 			com.ht.ussp.core.Result result = eipRemote.returnAdvanceShareProfit(paramMap);
+			com.ht.ussp.core.Result queryProjectPaymentResult = eipRemote.queryProjectPayment(paramMap);
 
 			if (result != null && result.getData() != null
-					&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
+					&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())
+					&& queryProjectPaymentResult != null
+					&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(queryProjectPaymentResult.getReturnCode())) {
 				TdReturnAdvanceShareProfitResult returnAdvanceShareProfitResult = JSONObject
 						.parseObject(JSONObject.toJSONString(result.getData()), TdReturnAdvanceShareProfitResult.class);
 				List<TdReturnAdvanceShareProfitDTO> returnAdvanceShareProfits = returnAdvanceShareProfitResult
@@ -606,7 +612,64 @@ public class TdrepayRechargeController {
 					}
 				}
 
-				return Result.success(returnAdvanceShareProfits);
+				// 标的还款信息
+				List<TdProjectPaymentDTO> tdProjectPaymentDTOs = null;
+				if (queryProjectPaymentResult.getData() != null) {
+
+					JSONObject parseObject = (JSONObject) JSONObject.toJSON(queryProjectPaymentResult.getData());
+					if (parseObject.get("projectPayments") != null) {
+						tdProjectPaymentDTOs = JSONObject.parseArray(
+								JSONObject.toJSONString(parseObject.get("projectPayments")), TdProjectPaymentDTO.class);
+					}
+				}
+
+				List<TdGuaranteePaymentVO> tdGuaranteePaymentVOs = new LinkedList<>();
+				if (CollectionUtils.isNotEmpty(tdProjectPaymentDTOs)) {
+					for (TdProjectPaymentDTO tdProjectPaymentDTO : tdProjectPaymentDTOs) {
+						TdGuaranteePaymentDTO guaranteePayment = tdProjectPaymentDTO.getGuaranteePayment();
+						if (guaranteePayment != null) {
+							TdGuaranteePaymentVO vo = BeanUtils.deepCopy(guaranteePayment, TdGuaranteePaymentVO.class);
+							if (vo != null) {
+								vo.setPeriod(tdProjectPaymentDTO.getPeriod());
+								switch (tdProjectPaymentDTO.getStatus()) {
+								case 1:
+									vo.setStatus("已结清");
+									break;
+								case 0:
+									vo.setStatus("逾期");
+									break;
+
+								default:
+									break;
+								}
+
+								vo.setAddDate(tdProjectPaymentDTO.getAddDate());
+								double principalAndInterest = vo.getPrincipalAndInterest() == null ? 0
+										: vo.getPrincipalAndInterest().doubleValue();
+								double penaltyAmount = vo.getPenaltyAmount() == null ? 0
+										: vo.getPenaltyAmount().doubleValue();
+								double tuandaiAmount = vo.getTuandaiAmount() == null ? 0
+										: vo.getTuandaiAmount().doubleValue();
+								double orgAmount = vo.getOrgAmount() == null ? 0 : vo.getOrgAmount().doubleValue();
+								double guaranteeAmount = vo.getGuaranteeAmount() == null ? 0
+										: vo.getGuaranteeAmount().doubleValue();
+								double arbitrationAmount = vo.getArbitrationAmount() == null ? 0
+										: vo.getArbitrationAmount().doubleValue();
+								double agencyAmount = vo.getAgencyAmount() == null ? 0
+										: vo.getAgencyAmount().doubleValue();
+
+								vo.setTotal(principalAndInterest + penaltyAmount + tuandaiAmount + orgAmount
+										+ guaranteeAmount + arbitrationAmount + agencyAmount);
+								tdGuaranteePaymentVOs.add(vo);
+							}
+						}
+					}
+				}
+
+				resultMap.put("returnAdvanceShareProfits", returnAdvanceShareProfits);
+				resultMap.put("tdGuaranteePaymentVOs", tdGuaranteePaymentVOs);
+
+				return Result.success(resultMap);
 			} else {
 				return Result.error("-99", "查询平台还垫付信息接口失败");
 			}
@@ -727,16 +790,15 @@ public class TdrepayRechargeController {
 		try {
 
 			Map<String, Object> paramMap = new HashMap<>();
-			
-			List<Map<String, Object>> resultList = new ArrayList<>();
 
+			List<Map<String, Object>> resultList = new ArrayList<>();
 
 			List<String> listName = RechargeAccountTypeEnums.listName();
 
 			int num = 1;
-			
+
 			for (String rechargeAccountType : listName) {
-				
+
 				Map<String, Object> resultMap = new HashMap<>();
 
 				paramMap.put("userId", tdrepayRechargeService.handleAccountType(rechargeAccountType));
@@ -745,14 +807,15 @@ public class TdrepayRechargeController {
 
 				resultMap.put("rechargeAccountType", rechargeAccountType);
 				resultMap.put("num", num++);
-				
-				if (result != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode()) && result.getData() != null) {
+
+				if (result != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())
+						&& result.getData() != null) {
 					JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(result.getData()));
 					resultMap.put("balance", jsonObject.get("aviMoney"));
-				}else {
+				} else {
 					resultMap.put("balance", "查询" + rechargeAccountType + "账户余额失败");
 				}
-				
+
 				resultList.add(resultMap);
 			}
 
@@ -761,6 +824,60 @@ public class TdrepayRechargeController {
 			LOG.error(e.getMessage(), e);
 			return Result.error("-99", e.getMessage());
 		}
+	}
+
+	@ApiOperation(value = "查询资金分发记录状态")
+	@PostMapping("/queryTdrepayRechargeRecord")
+	@ResponseBody
+	public Result<List<Map<String, Object>>> queryTdrepayRechargeRecord(@RequestBody Map<String, Object> paramMap) {
+
+		if (paramMap == null || StringUtil.isEmpty((String) paramMap.get("projectId"))
+				|| StringUtil.isEmpty((String) paramMap.get("confirmLogId"))) {
+			return Result.error("-99", "标的ID或者实还流水ID不能为空");
+		}
+
+		try {
+			return Result.success(tdrepayRechargeLogService.queryTdrepayRechargeRecord(
+					(String) paramMap.get("projectId"), (String) paramMap.get("confirmLogId")));
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error("-99", "系统异常");
+		}
+
+	}
+
+	@SuppressWarnings("rawtypes")
+	@ApiOperation(value = "撤销资金分发")
+	@PostMapping("/revokeTdrepayRecharge")
+	@ResponseBody
+	public Result revokeTdrepayRecharge(@RequestBody Map<String, Object> paramMap) {
+
+		if (paramMap == null || StringUtil.isEmpty((String) paramMap.get("projectId"))
+				|| StringUtil.isEmpty((String) paramMap.get("confirmLogId"))) {
+			return Result.error("-99", "标的ID或者实还流水ID不能为空");
+		}
+
+		try {
+			Integer[] processStatus = { 0, 3 };
+
+			TdrepayRechargeLog tdrepayRechargeLog = tdrepayRechargeLogService.selectOne(
+					new EntityWrapper<TdrepayRechargeLog>().eq("project_id", (String) paramMap.get("projectId"))
+							.eq("confirm_log_id", (String) paramMap.get("confirmLogId"))
+							.in("process_status", processStatus).eq("is_valid", 1));
+
+			if (tdrepayRechargeLog != null) {
+				tdrepayRechargeLog.setIsValid(2);
+				tdrepayRechargeLogService.updateById(tdrepayRechargeLog);
+				return Result.success();
+			} else {
+				return Result.error("-99", "没有找到对应的数据，撤销资金分发失败");
+			}
+
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error("-99", "系统异常");
+		}
+
 	}
 
 }

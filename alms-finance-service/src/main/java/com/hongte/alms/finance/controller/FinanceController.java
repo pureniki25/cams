@@ -20,6 +20,7 @@ import com.hongte.alms.base.enums.AreaLevel;
 import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.enums.RepayRegisterState;
+import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.service.*;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
 import com.hongte.alms.base.vo.finance.*;
@@ -669,7 +670,9 @@ public class FinanceController {
 			result = confrimLogService.revokeConfirm(businessId, afterId);
 			logger.info("@revokeConfirm@撤销还款确认--结束[{}]", result);
 			return result;
-		} catch (Exception e) {
+		}  catch (ServiceRuntimeException se) {
+			return Result.error("500", se.getMessage());
+		}catch (Exception e) {
 			logger.error("撤销还款确认失败--[{}]", e);
 			return Result.error("-500", "系统异常:撤销还款确认失败");
 		}
@@ -743,6 +746,7 @@ public class FinanceController {
 	@ApiOperation(value = "分润")
 	@PostMapping("/shareProfit")
 	public Result shareProfit(@RequestParam("businessId") String businessId,@RequestParam("afterId") String afterId,@RequestParam("logId") Integer logId){
+		logger.info("@shareProfit@自动代扣核销--开始[{}{}{}]", businessId,afterId,logId);
 		Result result=new Result();
 		WithholdingRepaymentLog log=withholdingRepaymentLogService.selectById(logId);
 	
@@ -771,6 +775,7 @@ public class FinanceController {
 //			req.setRepaySource(list);
 			shareProfitService.execute(req, true);
               result.success(1);
+      		logger.info("@shareProfit@自动代扣核销--开始[{}{}{}]", businessId,afterId,logId);
 		} catch (Exception ex) {
 			logger.error("分润出现异常"+ex);
 			return Result.error("-1","分润出现异常"+ex);
@@ -938,6 +943,25 @@ public class FinanceController {
 	}
 
 
+    @ApiOperation(value = "获取区域信息")
+    @GetMapping("/company/getCompanyAreaList")
+    @ResponseBody
+    public Result<Map<String, JSONArray>> getCompanyAreaList(@RequestParam("id") String id) {
+        int type;
+        if ("1".equals(id)) {//区域
+            type = AreaLevel.AREA_LEVEL.getKey();
+        } else {//分公司
+            type = AreaLevel.COMPANY_LEVEL.getKey();
+        }
+        Map<String, JSONArray> retMap = new HashMap<String, JSONArray>();
+        //区域
+        List<BasicCompany> area_list = basicCompanyService.selectList(new EntityWrapper<BasicCompany>().eq("area_level", type));
+        retMap.put("area", (JSONArray) JSON.toJSON(area_list, JsonUtil.getMapping()));
+
+        return Result.success(retMap);
+    }
+
+
 	@RequestMapping("/search")
 	@ApiOperation("查询")
 	public PageResult search(ServletRequest request, LayTableQuery query) {
@@ -976,18 +1000,13 @@ public class FinanceController {
 
 	@RequestMapping("/edit")
 	@ApiOperation("编辑")
-	public Result edit(SysFinancialOrderVO vo) {
-		if(StringUtils.isBlank(vo.getUserId())){
+    public Result edit(@RequestBody SysFinancialOrderReq vo) {
+        if (vo.getCompanyId() == null || vo.getCompanyId().size() == 0 || vo.getBusinessType() == null || vo.getBusinessType().size() == 0 || vo.getCollectionGroup1Users() == null || vo.getCollectionGroup1Users().size() == 0) {
 			return Result.error("参数验证失败");
 		}
 		try{
-
-			if(vo.getId() == null){
-				//新增
-				sysFinancialOrderService.save(vo);
-			}else{
-				//编辑
-			}
+            //新增
+            sysFinancialOrderService.save(vo);
 			return  Result.success();
 		}catch (Exception e){
 			logger.error("设置财务人员跟单设置失败", e);
@@ -995,11 +1014,24 @@ public class FinanceController {
 		}
 	}
 
-	@RequestMapping("/delete")
+	/*@RequestMapping("/delete")
 	@ApiOperation(value = "删除")
 	public  Result delete(Integer id, String userId){
 		try{
 			sysFinancialOrderService.delete(id, userId);
+			return Result.success();
+		}catch (Exception e){
+			logger.error(e.getMessage());
+			return Result.error(e.getMessage());
+		}
+	}*/
+
+
+	@RequestMapping("/delete")
+	@ApiOperation(value = "删除")
+    public Result delete(Integer id) {
+		try{
+            sysFinancialOrderService.delete(id);
 			return Result.success();
 		}catch (Exception e){
 			logger.error(e.getMessage());

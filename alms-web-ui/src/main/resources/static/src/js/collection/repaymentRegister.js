@@ -187,7 +187,7 @@ window.layinit(function (htConfig) {
                 if (ef.moneyPoolId) {
                     o.moneyPoolId = ef.moneyPoolId
                 }
-                o.repaymentDate = moment(ef.repaymentDate).format('YYYY-MM-DD')
+                o.repaymentDate = moment(ef.repaymentDate).format('YYYY-MM-DD HH:mm:ss')
                 o.repaymentMoney = ef.repaymentMoney
                 o.factRepaymentUser = ef.realRepaymentUser
                 o.tradePlace = ef.tradePlace

@@ -10,7 +10,6 @@
 
 
 
-	
 		select
 
 		pList.plan_list_id as planListId,
@@ -20,12 +19,13 @@
 		plan.borrow_limit_unit as borrowLimitUnit,
 		business.customer_name as customerName,
 
-		c.plan_principal as planPrincipal,
-		plan_platform_charge as platformCharge,
+		c.plan_principal-c.fact_principal as planPrincipal,
+		
+		plan_platform_charge-fact_platform_charge as platformCharge,
 		pList.after_id as afterId,
 
-		plan_accrual as planAccrual,
-		plan_guarantee_charge as planGuaranteeCharge,
+		plan_accrual-fact_accrual as planAccrual,
+		plan_guarantee_charge-fact_guarantee_charge as planGuaranteeCharge,
 		c.plan_liquidated_damages+c.plan_agency_fee+c.plan_deposit_fee+c.plan_reducing_debtors
 		as otherFee,
 		c.plan_liquidated_damages+c.plan_agency_fee+c.plan_deposit_fee+c.plan_reducing_debtors+
@@ -33,8 +33,8 @@
 		as total,
 		business.borrow_money as borrowMoney,
 
-		c.plan_service_charge as planServiceCharge,
-		c.plan_overdue_money as planOverDueMoney,
+		c.plan_service_charge-c.fact_service_charge as planServiceCharge,
+		c.plan_overdue_money-c.fact_overdue_money as planOverDueMoney,
 		pList.due_date as nowdate,
 		repayment.repayment_type_name as repaymentTypeName,
 		business.operator_name as operatorName,
@@ -59,65 +59,64 @@
 		left join tb_basic_repayment_type as repayment on
 		repayment.repayment_type_id=business.repayment_type_id
 
-
-		left join(
+			left join(
 		select t1.plan_list_id,
 		-- 应还本金总额
-		sum(case when t1.plan_item_type =10 then t1.plan_amount else 0 end)
+		sum(case when t1.plan_item_type =10 then (t1.plan_amount) else 0 end)
 		`plan_principal`,
 		-- 实还本金总额
 		sum(case when t1.plan_item_type =10 then t1.fact_amount else 0 end)
 		`fact_principal`,
 		-- 应还利息总额
-		sum(case when t1.plan_item_type =20 then t1.plan_amount else 0 end)
+		sum(case when t1.plan_item_type =20 then (t1.plan_amount) else 0 end)
 		`plan_accrual`,
 		-- 实还利息总额
 		sum(case when t1.plan_item_type =20 then t1.fact_amount else 0 end)
 		`fact_accrual`,
 		-- 应还资产端分公司服务费总额
-		sum(case when t1.plan_item_type =30 then t1.plan_amount else 0 end)
+		sum(case when t1.plan_item_type =30 then (t1.plan_amount) else 0 end)
 		`plan_service_charge`,
 		-- 实还资产端分公司服务费总额
 		sum(case when t1.plan_item_type =30 then t1.fact_amount else 0 end)
 		`fact_service_charge`,
 		-- 应还担保公司费用总额
-		sum(case when t1.plan_item_type =40 then t1.plan_amount else 0 end)
+		sum(case when t1.plan_item_type =40 then (t1.plan_amount) else 0 end)
 		`plan_guarantee_charge`,
 		-- 实还担保公司费用总额
 		sum(case when t1.plan_item_type =40 then t1.fact_amount else 0 end)
 		`fact_guarantee_charge`,
 		-- 应还资金端平台费总额
-		sum(case when t1.plan_item_type =50 then t1.plan_amount else 0 end)
+		sum(case when t1.plan_item_type =50 then (t1.plan_amount) else 0 end)
 		`plan_platform_charge`,
 		-- 实还资金端平台费总额
 		sum(case when t1.plan_item_type =50 then t1.fact_amount else 0 end)
 		`fact_platform_charge`,
 		-- 应还逾期费用总额
-		sum(case when t1.plan_item_type =60 then t1.plan_amount else 0 end)
+		sum(case when t1.plan_item_type =60 then (t1.plan_amount) else 0 end)
 		`plan_overdue_money`,
 		-- 实还逾期费用总额
 		sum(case when t1.plan_item_type =60 then t1.fact_amount else 0 end)
 		`fact_overdue_money`,
 		-- 应还违约金总额
-		sum(case when t1.plan_item_type =70 then t1.plan_amount else 0 end)
+		sum(case when t1.plan_item_type =70 then (t1.plan_amount) else 0 end)
 		`plan_liquidated_damages`,
 		-- 实还违约金总额
 		sum(case when t1.plan_item_type =70 then t1.fact_amount else 0 end)
 		`fact_liquidated_damages`,
 		-- 应还中介费总额
-		sum(case when t1.plan_item_type =80 then t1.plan_amount else 0 end)
+		sum(case when t1.plan_item_type =80 then (t1.plan_amount) else 0 end)
 		`plan_agency_fee`,
 		-- 实还中介费总额
 		sum(case when t1.plan_item_type =80 then t1.fact_amount else 0 end)
 		`fact_agency_fee`,
 		-- 应还押金总额
-		sum(case when t1.plan_item_type =90 then t1.plan_amount else 0 end)
+		sum(case when t1.plan_item_type =90 then (t1.plan_amount) else 0 end)
 		`plan_deposit_fee`,
 		-- 实还押金总额
 		sum(case when t1.plan_item_type =90 then t1.fact_amount else 0 end)
 		`fact_deposit_fee`,
 		-- 应还冲应收总额
-		sum(case when t1.plan_item_type =100 then t1.plan_amount else 0 end)
+		sum(case when t1.plan_item_type =100 then (t1.plan_amount) else 0 end)
 		`plan_reducing_debtors`,
 			-- 应还总额
 		sum(ifnull(t1.plan_amount,0))

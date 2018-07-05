@@ -2,6 +2,7 @@ package com.hongte.alms.finance.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.plugins.Page;
+import com.hongte.alms.base.customer.vo.BfWithholdFlowVo;
 import com.hongte.alms.base.customer.vo.WithholdFlowReq;
 import com.hongte.alms.base.customer.vo.BankWithholdFlowVo;
 import com.hongte.alms.base.service.WithholdingRepaymentLogService;
@@ -37,12 +38,12 @@ public class BfWithholdFlowController {
     @ApiOperation(value = "宝付代扣流水列表")
     @GetMapping("/getBfWithholdFlowPageList")
     @ResponseBody
-    public PageResult<List<BankWithholdFlowVo>> getBfWithholdFlowPageList(WithholdFlowReq withholdFlowReq) {
+    public PageResult<List<BfWithholdFlowVo>> getBfWithholdFlowPageList(WithholdFlowReq withholdFlowReq) {
         LOGGER.info("====>>>>>宝付代扣流水列表[{}]", JSON.toJSONString(withholdFlowReq));
 
 
         try {
-            Page<BankWithholdFlowVo> pages = withholdingRepaymentLogService.getBfWithholdFlowPageList(withholdFlowReq);
+            Page<BfWithholdFlowVo> pages = withholdingRepaymentLogService.getBfWithholdFlowPageList(withholdFlowReq);
 
             return PageResult.success(pages.getRecords(), pages.getTotal());
         } catch (Exception ex) {

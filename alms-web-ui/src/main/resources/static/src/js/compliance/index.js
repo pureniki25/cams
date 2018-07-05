@@ -1,4 +1,5 @@
 var basePath;
+var coreBasePath;
 var vm;
 var table;
 
@@ -16,6 +17,7 @@ var rechargeModalFormRules = {
 
 window.layinit(function(htConfig) {
 	basePath = htConfig.platRepayBasePath;
+	coreBasePath = htConfig.coreBasePath;
 	table = layui.table;
 
 	vm = new Vue({
@@ -62,6 +64,7 @@ window.layinit(function(htConfig) {
 				businessType: '', // 业务类型
 				platStatus: '', // 平台状态
 				companyName: '', // 分公司
+				page: 1, // 当前页
 			},
 			
 			/*
@@ -98,6 +101,8 @@ window.layinit(function(htConfig) {
 				rechargeSourseAccount:'', //充值来源账户
 				createTimeStart:'', //创建时间 开始
 				createTimeEnd:'',// 创建时间 结束
+				page: 1,
+                limit: 10,
 			},
 			/*
 			 * 初始化查询充值记录model
@@ -332,6 +337,7 @@ window.layinit(function(htConfig) {
         	 * 查看充值记录数据
         	 */
         	queryRechargeRecordData:[],
+        	rechargeRecordTotal: 0, // 充值记录总数
         	
         	/*
              * 查看所有代充值账户余额表头
@@ -358,7 +364,73 @@ window.layinit(function(htConfig) {
         	 * 查看所有代充值账户余额数据
         	 */
         	queryRechargeAccountBalanceData:[],
-
+        	
+        	/*
+        	 * 查看担保公司垫付记录表头
+        	 */
+        	queryGuaranteePaymentColumns:[
+        		{
+        			title: '期数',
+        			key: 'period',
+        			align: 'center',
+        		},
+        		{
+        			title: '还款状态',
+        			key: 'status',
+        			align: 'center',
+        		},
+        		{
+        			title: '还款日期',
+        			key: 'addDate',
+        			align: 'center',
+        		},
+        		{
+        			title: '本金利息',
+        			key: 'principalAndInterest',
+        			align: 'center',
+        		},
+        		{
+        			title: '滞纳金',
+        			key: 'penaltyAmount',
+        			align: 'center',
+        		},
+        		{
+        			title: '实还平台服务费',
+        			key: 'tuandaiAmount',
+        			align: 'center',
+        		},
+        		{
+        			title: '实还资产端服务费',
+        			key: 'orgAmount',
+        			align: 'center',
+        		},
+        		{
+        			title: '实还担保公司服务费',
+        			key: 'guaranteeAmount',
+        			align: 'center',
+        		},
+        		{
+        			title: '实还仲裁服务费',
+        			key: 'arbitrationAmount',
+        			align: 'center',
+        		},
+        		{
+        			title: '实还中介服务费',
+        			key: 'agencyAmount',
+        			align: 'center',
+        		},
+        		{
+        			title: '合计',
+        			key: 'total',
+        			align: 'center',
+        		},
+        	],
+        		
+    		/*
+    		 * 查看担保公司垫付记录数据
+    		 */
+    		queryGuaranteePaymentData:[],
+        	
 		},
 
 		methods : {
@@ -563,7 +635,7 @@ window.layinit(function(htConfig) {
 			    			align: 'center',
 							width:100
 			    		}, {
-			    			field: 'period',
+			    			field: 'afterId',
 			    			title: '还款期数',
 			    			align: 'center',
 							width:100
@@ -598,7 +670,7 @@ window.layinit(function(htConfig) {
 			    			align: 'center',
 							width:100
 			    		}, {
-			    			field: 'platStatusStr',
+			    			field: 'platformTypeStr',
 			    			title: '平台状态',
 			    			align: 'center',
 							width:100
@@ -634,9 +706,31 @@ window.layinit(function(htConfig) {
 			    		done: (res, curr, count) => {
 			    			this.selectAmount = 0;
 			    			this.ComplianceRepaymentData = res.data;
+			    			this.queryConditionModel.page = curr;
 			    		}
 			    })
 			},
+			
+			/*
+			 * 导出资金分发数据
+			 */
+			exportComplianceRepaymentData: function(){
+				postDownLoadFile({
+					url: coreBasePath + 'downLoadController/exportComplianceRepaymentData',
+					data: vm.queryConditionModel,
+					method: 'post'
+				});
+			},
+			
+			/*
+			 * 导出充值记录
+			 */
+			exportRechargeRecordData: function(){
+				this.$refs.rechargeRecord.exportCsv({
+                    filename: '充值记录'
+                });
+			},
+			
 			/*
 			 * 查询所有分公司
 			 */
@@ -725,7 +819,8 @@ window.layinit(function(htConfig) {
 				axios.get(basePath +"tdrepayRecharge/returnAdvanceShareProfit?projectId=" + this.projectId)
     	        .then(function (res) {
     	            if (res.data.data != null && res.data.code == 1) {
-    	            	vm.advancePaymentInfoData = res.data.data;
+    	            	vm.advancePaymentInfoData = res.data.data.returnAdvanceShareProfits;
+    	            	vm.queryGuaranteePaymentData = res.data.data.tdGuaranteePaymentVOs;
     	            } else {
     	            	vm.$Modal.error({content: res.data.msg });
     	            }
@@ -776,10 +871,11 @@ window.layinit(function(htConfig) {
 			queryRechargeRecord:function(){
 				axios.post(basePath + 'tdrepayRecharge/queryRechargeRecord', vm.queryRechargeRecordModel)
 				.then(function(result){
+					console.log(result);
 					if (result.data.code == 0) {
 						vm.queryRechargeRecordModel = vm.initQueryRechargeRecordModel;
 						vm.queryRechargeRecordData = result.data.data;
-						
+						vm.rechargeRecordTotal = result.data.count;
 					} else {
 						vm.$Modal.error({ content: result.data.msg });
 					}
@@ -810,6 +906,15 @@ window.layinit(function(htConfig) {
     	        	vm.rechargeAccountBalanceFlag = false;
     	        	vm.queryRechargeAccountBalanceLoading = false;
     	        });
+			},
+			
+			/*
+			 * 查看充值记录分页
+			 */
+			paging: function (page) {
+         	  	this.$refs['pages'].currentPage = page;
+	            this.queryRechargeRecordModel.page = page;
+	            this.queryRechargeRecord();
 			},
 		},
 

@@ -117,7 +117,7 @@
 				<i-button type="primary" @click="queryComplianceRepaymentData">查询</i-button>
 			</i-col>
 			<i-col span="1">
-				<i-button type="primary" @click="">导出</i-button>
+				<i-button type="primary" @click="exportComplianceRepaymentData"><Icon type="ios-download-outline"></Icon>导出</i-button>
 			</i-col>
 	    </row>
 	    
@@ -292,7 +292,7 @@
 				        </thead>
 				        <tbody>
 				            <tr v-for='(item, index) in distributeFundRecordList' :key='index'>
-				                <td style="text-align:center">{{ item.period }}</td>
+				                <td style="text-align:center">{{ item.afterId }}</td>
 				                <td style="text-align:center">{{ item.factRepayDateStr }}</td>
 				                <td style="text-align:center">{{ item.factRepayAmount?numeral(item.factRepayAmount).format('0,0.00'):0 }}</td>
 				                <td style="text-align:center">{{ item.createTimeStr }}</td>
@@ -327,7 +327,23 @@
 				</tab-pane>
 				
 				<tab-pane label="垫付记录" name="advancesRecord">
-					<i-table border :columns="advancePaymentInfoColumns" :data="advancePaymentInfoData" style="margin-top:1rem"></i-table>
+					<row style="margin-top:1rem">
+						<p slot="title">
+				            <h3>还垫付记录</h3>
+				        </p>
+				    </row>
+					<row style="margin-top:1rem">
+						<i-table border :columns="advancePaymentInfoColumns" :data="advancePaymentInfoData" style="margin-top:1rem"></i-table>
+					</row>
+					
+					<row style="margin-top:1rem">
+						<p slot="title">
+				            <h3>担保公司垫付记录</h3>
+				        </p>
+				    </row>
+					<row style="margin-top:1rem">
+						<i-table border :columns="queryGuaranteePaymentColumns" :data="queryGuaranteePaymentData" style="margin-top:1rem"></i-table>
+					</row>
 				</tab-pane>
 			</tabs>
         </Card>
@@ -363,10 +379,10 @@
 		    		@on-change="queryRechargeRecordModel.createTimeStart=$event[0];queryRechargeRecordModel.createTimeEnd=$event[1]" clearable />
 			</i-col>
 			<i-col span="1">
-				<i-button type="primary" @click="queryRechargeRecord">查询</i-button>
+				<i-button type="primary" @click="paging(1)">查询</i-button>
 			</i-col>
 			<i-col span="1">
-				<i-button type="primary" @click="">导出</i-button>
+				<i-button type="primary" @click="exportRechargeRecordData"><Icon type="ios-download-outline"></Icon>导出</i-button>
 			</i-col>
 		</row>
 		<row slot="footer" >
@@ -375,8 +391,11 @@
             </div>
    		</row>
    		<row style="margin-top:1rem">
-   			<i-table border :columns="queryRechargeRecordColumns" :data="queryRechargeRecordData"></i-table>
+   			<i-table border :columns="queryRechargeRecordColumns" :data="queryRechargeRecordData" ref="rechargeRecord"></i-table>
    		</row>
+        <Footer style="text-align: center;width: 100%" >
+            <Page :total="rechargeRecordTotal"  ref="pages" show-total @on-change="paging" ></Page>
+        </Footer>
 	</Modal>
 	
 	<Modal v-model="rechargeAccountBalanceFlag" width="1000" title="代充值账户余额">

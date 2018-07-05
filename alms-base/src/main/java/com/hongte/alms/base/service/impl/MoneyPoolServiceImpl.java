@@ -39,6 +39,7 @@ import com.hongte.alms.common.vo.ResponseData;
 import com.hongte.alms.common.vo.ResponseEncryptData;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 
+import com.ht.ussp.client.dto.LoginInfoDto;
 import feign.Feign;
 
 import java.math.BigDecimal;
@@ -91,6 +92,8 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 	RepaymentConfirmLogMapper confirmLogMapper;
 	@Autowired
 	LoginUserInfoHelper loginUserInfoHelper ;
+
+
 	@Override
 	public List<MoneyPoolVO> listMoneyPool(String businessId, String afterId) {
 		return null;
@@ -101,6 +104,7 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 		return moneyPoolMapper.listMatchedMoneyPool( businessId,  afterId , notConfirmed);
 	}
 
+/*
 	@Override
 	@Transactional(rollbackFor=Exception.class)
 	public Boolean saveRepaymentRegisterInfo(RepaymentRegisterInfoDTO registerInfoDTO) {
@@ -129,10 +133,19 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 				moneyPoolRepayment.setState(nMoneyPool.getFinanceStatus());
 				moneyPoolRepayment.setTradePlace(registerInfoDTO.getTradePlace());
 				moneyPoolRepayment.setTradeType(registerInfoDTO.getTradeType());
-				
+				//  update by zengkun 2018-7-4 添加还款时间
+				moneyPoolRepayment.setTradeDate(DateUtil.getDateTime(registerInfoDTO.getRepaymentDate()));
 				Integer moneyPoolRepaymentRows = moneyPoolRepaymentMapper.insert(moneyPoolRepayment) ;
 				if (moneyPoolRows==1&&moneyPoolRepaymentRows==1) {
-					
+
+					//update by zengkun for 设置更新用户为信贷的用户
+					LoginInfoDto loginInfoDto =loginUserInfoHelper.getUserInfoByUserId(registerInfoDTO.getUserId(),null);
+					if(loginInfoDto!=null&&loginInfoDto.getBmUserId()!=null){
+						moneyPoolRepayment.setCreateUser(loginInfoDto.getBmUserId());
+					}else{
+						moneyPoolRepayment.setCreateUser("admin");
+					}
+
 					
 					ResponseData responseData = callRemoteService(new MoneyPoolRepaymentXindaiDTO(moneyPoolRepayment,registerInfoDTO.getBusinessId(),registerInfoDTO.getAfterId()), XINDAI_ADDORUPDATE);
 					if (responseData==null) {
@@ -215,6 +228,7 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 		} 
 		return result ;
 	}
+*/
 
 	@Override
 	public Boolean deleteRepaymentRegeisterInfo(String moneyPoolId,String userId) {
@@ -346,10 +360,20 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 		moneyPoolRepayment.setOriginalBusinessId(registerInfoDTO.getBusinessId());
 		moneyPoolRepayment.setAfterId(registerInfoDTO.getAfterId());
 		//update by liuzq for 设置实际还款时间
-		moneyPoolRepayment.setClaimDate(new Date());
+		moneyPoolRepayment.setTradeDate(DateUtil.getDate(registerInfoDTO.getRepaymentDate()));
+		moneyPoolRepayment.setTradePlace(registerInfoDTO.getTradePlace());
 		boolean result = moneyPoolRepayment.insert();
 		if (result) {
-			ResponseData responseData = callRemoteService(new MoneyPoolRepaymentXindaiDTO(moneyPoolRepayment, registerInfoDTO.getBusinessId(), registerInfoDTO.getAfterId()), XINDAI_ADDORUPDATE);
+			//update by zengkun for 设置更新用户为信贷的用户
+
+			MoneyPoolRepaymentXindaiDTO xindaiDTO = new MoneyPoolRepaymentXindaiDTO(moneyPoolRepayment, registerInfoDTO.getBusinessId(), registerInfoDTO.getAfterId());
+			LoginInfoDto loginInfoDto =loginUserInfoHelper.getUserInfoByUserId(registerInfoDTO.getUserId(),null);
+			if(loginInfoDto!=null&&loginInfoDto.getBmUserId()!=null){
+				xindaiDTO.setCreate_user(loginInfoDto.getBmUserId());
+			}else{
+				xindaiDTO.setCreate_user("admin");
+			}
+			ResponseData responseData = callRemoteService(xindaiDTO, XINDAI_ADDORUPDATE);
 			if (responseData==null) {
 				throw new RuntimeException();
 			}
@@ -388,7 +412,17 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 		boolean result = moneyPoolRepayment.updateAllColumnById();
 		
 		if (result) {
-			ResponseData responseData = callRemoteService(new MoneyPoolRepaymentXindaiDTO(moneyPoolRepayment, registerInfoDTO.getBusinessId(), registerInfoDTO.getAfterId()), XINDAI_ADDORUPDATE);
+			// update by zengkun 2018-7-4  开始
+			MoneyPoolRepaymentXindaiDTO xindaiDTO = new MoneyPoolRepaymentXindaiDTO(moneyPoolRepayment, registerInfoDTO.getBusinessId(), registerInfoDTO.getAfterId());
+			LoginInfoDto loginInfoDto= loginUserInfoHelper.getUserInfoByUserId(moneyPoolRepayment.getUpdateUser(),null);
+			if(loginInfoDto!=null&& loginInfoDto.getBmUserId()!=null){
+				xindaiDTO.setUpdate_user(loginInfoDto.getBmUserId());
+			}else{
+				xindaiDTO.setUpdate_user("admin");
+			}
+			// update by zengkun 2018-7-4  结束
+
+			ResponseData responseData = callRemoteService(xindaiDTO, XINDAI_ADDORUPDATE);
 			if (responseData==null) {
 				throw new RuntimeException();
 			}
@@ -432,6 +466,15 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 
 		boolean result = moneyPoolRepayment.deleteById();
 		if (result) {
+			// update by zengkun 2018-7-4  开始
+			LoginInfoDto loginInfoDto= loginUserInfoHelper.getUserInfoByUserId(loginUserInfoHelper.getUserId(),null);
+			if(loginInfoDto!=null&& loginInfoDto.getBmUserId()!=null){
+				moneyPoolRepayment.setUpdateUser(loginInfoDto.getBmUserId());
+			}else{
+				moneyPoolRepayment.setUpdateUser("admin");
+			}
+			// update by zengkun 2018-7-4  结束
+
 			ResponseData responseData = callRemoteService(new MoneyPoolRepaymentXindaiDTO(moneyPoolRepayment, registerInfoDTO.getBusinessId(), registerInfoDTO.getAfterId()), XINDAI_DEL);
 			if (responseData==null) {
 				throw new RuntimeException();

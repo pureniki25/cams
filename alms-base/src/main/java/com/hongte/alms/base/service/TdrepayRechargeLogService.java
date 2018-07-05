@@ -1,5 +1,8 @@
 package com.hongte.alms.base.service;
 
+import java.util.List;
+import java.util.Map;
+
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.common.service.BaseService;
 
@@ -26,4 +29,12 @@ public interface TdrepayRechargeLogService extends BaseService<TdrepayRechargeLo
 	 *            订单状态
 	 */
 	void callBackDistributeFund(String oIdPartner, String batchId, String requestNo, String orderStatus);
+	
+	/**
+	 * 查询资金分发记录状态
+	 * @param projectId
+	 * @param confirmLogId
+	 * @return
+	 */
+	List<Map<String, Object>> queryTdrepayRechargeRecord(String projectId, String confirmLogId);
 }

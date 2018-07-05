@@ -37,7 +37,7 @@ public class DeductionVo {
     private String repaymentTypeName;//还款方式
     private String  operatorName;//业务主办人
     private Integer platformId;
-    
+    private BigDecimal underLineFactOverDueMoney;//实际应还线下逾期费
     private BigDecimal underLineOverDueMoney;//线下逾期费
     private BigDecimal onLineOverDueMoney;//线上逾期费
     private BigDecimal  planAllAmount;//应还总额
@@ -55,6 +55,12 @@ public class DeductionVo {
     
     
  
+	public BigDecimal getUnderLineFactOverDueMoney() {
+		return underLineFactOverDueMoney;
+	}
+	public void setUnderLineFactOverDueMoney(BigDecimal underLineFactOverDueMoney) {
+		this.underLineFactOverDueMoney = underLineFactOverDueMoney;
+	}
 	public boolean isCanUseThirty() {
 		return isCanUseThirty;
 	}

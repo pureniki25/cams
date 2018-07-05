@@ -24,26 +24,58 @@
     <select id="search" resultType="com.hongte.alms.base.vo.finance.SysFinancialOrderVO">
         select fo.id as id, fo.area_id as areaId, c.area_name as areaName, fo.company_id as companyId, c2.area_name as companyName,
                 fo.business_type_id  as businessTypeId, bt.business_type_name as businessTypeName, fo.update_user as updateUser, fo.update_time as UpdateTime,
-                fo.create_user as createUser, fo.create_time as createTime, fo.user_ids as userIds, fo.user_names as userNames, fou.user_id as userId, fou.user_name as userName
-        from tb_sys_financial_order fo inner join  tb_basic_business_type bt on fo.business_type_id = bt.business_type_id
-                                      left join tb_sys_financial_order_user fou on  fo.id=fou.finance_order_id
-                                      left join tb_basic_company c on c.area_id = fo.area_id
-                                      left join tb_basic_company c2 on c2.area_id = fo.company_id
+        fo.create_user as createUser, fo.create_time as createTime,
+        fou.user_ids AS userIds, fou.user_names AS userNames
+        from tb_sys_financial_order fo inner join tb_basic_business_type bt on fo.business_type_id = bt.business_type_id
+        left join (
+        select finance_order_id, group_concat(user_id order by user_id) as user_ids, group_concat(user_name order by
+        user_name) as user_names
+        from tb_sys_financial_order_user group by finance_order_id
+        ) as fou on fo.id=fou.finance_order_id
+        left join tb_basic_company c on c.area_id = fo.area_id
+        left join tb_basic_company c2 on c2.area_id = fo.company_id
         <where>
-                <if test="userName != null and ''!=userName">
-                    fou.user_name like concat('%',#{userName},'%')
-                </if>
-                <if test="areaId != null and ''!=areaId">
-                    and fo.area_id = #{areaId}
-                </if>
-                <if test="companyId != null and ''!=companyId">
-                    and fo.company_id = #{companyId}
-                </if>
-                <if test="businessTypeId != null and ''!=businessTypeId">
-                    and fo.business_type_id = #{businessTypeId}
-                </if>
+            <if test="userName != null and ''!=userName">
+                fou.user_names like '%${userName}%'
+            </if>
+            <if test="areaId != null and ''!=areaId">
+                and fo.area_id = #{areaId}
+            </if>
+            <if test="companyId != null and ''!=companyId">
+                and fo.company_id = #{companyId}
+            </if>
+            <if test="businessTypeId != null and ''!=businessTypeId">
+                and fo.business_type_id = #{businessTypeId}
+            </if>
         </where>
-        
+
+    </select>
+
+    <select id="search_bak" resultType="com.hongte.alms.base.vo.finance.SysFinancialOrderVO">
+        select fo.id as id, fo.area_id as areaId, c.area_name as areaName, fo.company_id as companyId, c2.area_name as
+        companyName,
+        fo.business_type_id as businessTypeId, bt.business_type_name as businessTypeName, fo.update_user as updateUser,
+        fo.update_time as UpdateTime,
+        fo.create_user as createUser, fo.create_time as createTime, fo.user_ids as userIds, fo.user_names as userNames, fou.user_id as userId, fou.user_name as userName
+        from tb_sys_financial_order fo inner join  tb_basic_business_type bt on fo.business_type_id = bt.business_type_id
+        left join tb_sys_financial_order_user fou on  fo.id=fou.finance_order_id
+        left join tb_basic_company c on c.area_id = fo.area_id
+        left join tb_basic_company c2 on c2.area_id = fo.company_id
+        <where>
+            <if test="userName != null and ''!=userName">
+                fou.user_name like concat('%',#{userName},'%')
+            </if>
+            <if test="areaId != null and ''!=areaId">
+                and fo.area_id = #{areaId}
+            </if>
+            <if test="companyId != null and ''!=companyId">
+                and fo.company_id = #{companyId}
+            </if>
+            <if test="businessTypeId != null and ''!=businessTypeId">
+                and fo.business_type_id = #{businessTypeId}
+            </if>
+        </where>
+
     </select>
 
 </mapper>

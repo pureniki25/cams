@@ -89,7 +89,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 	@Autowired
 	private TdrepayRechargeLogMapper tdrepayRechargeLogMapper;
-	
+
 	@Autowired
 	private AgencyRechargeLogMapper agencyRechargeLogMapper;
 
@@ -663,7 +663,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 					// 同 period 数据集合，已按照period从小到大排序
 					List<TdrepayRechargeLog> rechargeLogs = periodDataEntry.getValue();
 
-					// 按照createTime从小到大排序，优先处理最早传入的数据
+					// 按照实还日期从小到大排序，优先处理最早传入的数据
 					sortChargeLogListByConfirmTime(rechargeLogs);
 
 					if (differentiateSettleData(rechargeLogs)) {
@@ -1447,7 +1447,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	}
 
 	/**
-	 * list 按照createTime进行排序
+	 * list 按照FactRepayDate进行排序
 	 * 
 	 * @param rechargeLogs
 	 */
@@ -1457,9 +1457,9 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 				@Override
 				public int compare(TdrepayRechargeLog o1, TdrepayRechargeLog o2) {
-					if (o1.getConfirmTime().before(o2.getConfirmTime())) {
+					if (o1.getFactRepayDate().before(o2.getFactRepayDate())) {
 						return -1;
-					} else if (o1.getConfirmTime().after(o2.getConfirmTime())) {
+					} else if (o1.getFactRepayDate().after(o2.getFactRepayDate())) {
 						return 1;
 					} else {
 						return 0;
@@ -1562,7 +1562,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			}
 		}
 
-		paramDTO.setTotalAmount(BigDecimal.valueOf(totalAmount));
+		paramDTO.setTotalAmount(BigDecimal.valueOf(totalAmount).setScale(2, BigDecimal.ROUND_HALF_UP));
 
 		/*
 		 * 2、开始调用偿还垫付接口
@@ -1614,7 +1614,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		lstStatus.add(0); // 未处理
 		lstStatus.add(3); // 处理失败
 		List<TdrepayRechargeLog> rechargeLogs = tdrepayRechargeLogService
-				.selectList(new EntityWrapper<TdrepayRechargeLog>().eq("process_status", 2)// 分发成功
+				.selectList(new EntityWrapper<TdrepayRechargeLog>().eq("process_status", 2).eq("is_valid", 1)// 分发成功
 						.in("status", lstStatus));
 
 		if (CollectionUtils.isEmpty(rechargeLogs)) {
@@ -1678,6 +1678,8 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 				|| !Constant.REMOTE_EIP_SUCCESS_CODE.equals(queryProjectPaymentResult.getReturnCode())
 				|| advanceShareProfitResult == null
 				|| !Constant.REMOTE_EIP_SUCCESS_CODE.equals(advanceShareProfitResult.getReturnCode())) {
+			LOG.info("从平台获取标的还款信息或还垫付信息异常，返回结果垫付信息：{} --- 还垫付信息：{}", queryProjectPaymentResult,
+					advanceShareProfitResult);
 			throw new ServiceRuntimeException("从平台获取标的还款信息或还垫付信息异常");
 		}
 
@@ -1877,7 +1879,8 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		try {
 			List<DistributeFundRecordVO> distributeFundRecordVOs = new ArrayList<>();
 			List<TdrepayRechargeLog> tdrepayRechargeLogs = tdrepayRechargeLogService
-					.selectList(new EntityWrapper<TdrepayRechargeLog>().eq("project_id", projectId).orderBy("period"));
+					.selectList(new EntityWrapper<TdrepayRechargeLog>().eq("project_id", projectId).eq("is_valid", 1)
+							.orderBy("after_id", false));
 			if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
 				for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
 					DistributeFundRecordVO vo = BeanUtils.deepCopy(tdrepayRechargeLog, DistributeFundRecordVO.class);
@@ -1900,7 +1903,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	public List<AgencyRechargeLog> queryRechargeRecord(RechargeRecordReq req) {
 		return agencyRechargeLogMapper.queryRechargeRecord(req);
 	}
-	
+
 	@Override
 	public int countRechargeRecord(RechargeRecordReq req) {
 		return agencyRechargeLogMapper.countRechargeRecord(req);

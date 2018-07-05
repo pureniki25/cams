@@ -12,6 +12,7 @@ import com.hongte.alms.common.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -82,6 +83,16 @@ public class SysBankLimitServiceImpl extends BaseServiceImpl<SysBankLimitMapper,
     @Override
     public List<SysBankLimit> getSysBankLimitByPlatformId(int platformId) throws Exception {
         return sysBankLimitMapper.selectList(new EntityWrapper<SysBankLimit>().eq("platform_id",platformId));
+    }
+
+    @Override
+    public BigDecimal selectOnceLimit(String bankCode) {
+        return sysBankLimitMapper.selectOnceLimit(bankCode);
+    }
+
+    @Override
+    public BigDecimal selectMaxDayLimit(String bankCode) {
+        return sysBankLimitMapper.selectMaxDayLimit(bankCode);
     }
 
 }

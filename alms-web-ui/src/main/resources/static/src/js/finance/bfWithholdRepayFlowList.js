@@ -59,19 +59,23 @@ window.layinit(function (htConfig) {
 
                             {
                                 field: 'merchOrderId',
-                                title: '请求流水号'
+                                title: '宝付订单号'
                             },
                             {
-                                field: 'platformName',
-                                title: '支付公司'
+                                field: 'thirdOrderId',
+                                title: '商户支付订单号'
                             },
                             {
-                                field: 'currentAmount',
-                                title: '代扣金额',
+                                field: 'merchantAccount',
+                                title: '商户号',
+                            },
+                            {
+                                field: 'bankCode',
+                                title: '终端号',
                             },
                             {
                                 field: 'repayStatus',
-                                title: '订单状态',
+                                title: '交易类型',
                                 templet: function (d) {
                                     var content = "";
                                     if (d.repayStatus == 0) {
@@ -85,25 +89,16 @@ window.layinit(function (htConfig) {
                                 }
                             },
                             {
-                                field: 'afterId',
-                                title: '平台会员编号',
-                            },
-                            {
-                                field: 'bankCode',
-                                title: '银行编码',
+                                field: 'currentAmount',
+                                title: '金额(元)',
                             },
                             {
                                 field: 'createTime',
-                                title: '请求时间',
-
-                            },
-                            {
-                                field: 'updateTime',
-                                title: '完成时间',
+                                title: '清算日期',
 
                             }
                         ]], //设置表头
-                        url: financePath + 'customer/getBankWithholdFlowList',
+                        url: financePath + 'customer/getBfWithholdFlowPageList',
                         page: true,
                         done: function (res, curr, count) {
                             //数据渲染完的回调。你可以借此做一些其它的操作

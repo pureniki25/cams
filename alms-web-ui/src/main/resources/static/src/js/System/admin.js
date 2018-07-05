@@ -1,4 +1,5 @@
 var basePath;
+var platRepayBasePath;
 var vm;
 
 window.layinit(function (htConfig) {
@@ -24,6 +25,7 @@ window.layinit(function (htConfig) {
            updateAgencyRechargeHandleStatusLoading:false, // 更新代充值处理状态
            setCollectionLoading:false, //分配贷后跟进人员  标志位
            autoRepayLoading:false,
+           tdrepyChargeLoading:false,	// 合规化还款加载标识
 		   // --- 按钮控制标识 end---
 
 		   onePListCollogBId:"",
@@ -284,6 +286,25 @@ window.layinit(function (htConfig) {
                        vm.autoRepayLoading = false;
                        vm.$Modal.error({content: '接口调用异常!'});
                    });
+           },
+           // 合规化还款
+           tdrepyCharge:function(){
+        	   this.tdrepyChargeLoading = true;
+        	   axios.post(platRepayBasePath +"tdrepayRecharge/repayComplianceWithRequirements")
+        	   .then(function (res) {
+        		   vm.tdrepyChargeLoading = false;
+        		   if (res.data.data != null && res.data.code == 1) {
+        			   vm.$Modal.success({
+        				   content: res.data.msg
+        			   });
+        		   } else {
+        			   vm.$Modal.error({content: res.data.msg });
+        		   }
+        	   })
+        	   .catch(function (error) {
+        		   vm.tdrepyChargeLoading = false;
+        		   vm.$Modal.error({content: '接口调用异常!'});
+        	   });
            }
 
 

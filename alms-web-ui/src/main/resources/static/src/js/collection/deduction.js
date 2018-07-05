@@ -147,7 +147,7 @@ var layer;
 	       }
 	       
 	       if(vm.ajax_data.repayAmount==0){
-	    		vm.$Modal.error({content:"本期应该金额为0不能代扣"});
+	    		vm.$Modal.error({content:"本期应还金额为0不能代扣"});
 	    		  vm.loading = false;
 	    		return;
 	       }
@@ -163,7 +163,7 @@ var layer;
                 success: function (data) {debugger
                 	   vm.loading = false;
                     if(data.code=='1'){
-                    	vm.$Modal.success({content:"执行成功，请稍后查询结果"});
+                    	vm.$Modal.success({content:"执行代扣金额"+vm.ajax_data.repayAmount+"元成功，请稍后查询结果"});
 		             }else{
 		                 vm.$Modal.error({content:data.msg});
 		             }
@@ -179,7 +179,7 @@ var layer;
                 }
             });
 	   }else{
-		    var url=openPath+ "WithHoldingController/withholding?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId+"&total="+vm.ajax_data.total+"&planOverDueMoney="+vm.ajax_data.underLineFactOverDueMoney+"&platformId="+vm.platformId+"&type=0"+"&nowdate="+vm.ajax_data.nowdate+"&isAmountWithheld="+isAmountWithheld
+		    var url=openPath+ "WithHoldingController/withholding?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId+"&total="+vm.ajax_data.repayAmount+"&planOverDueMoney="+vm.ajax_data.underLineFactOverDueMoney+"&platformId="+vm.platformId+"&type=0"+"&nowdate="+vm.ajax_data.nowdate+"&isAmountWithheld="+isAmountWithheld
 		    $.ajax({
 		        type : 'GET',
 		        async : false,
@@ -191,7 +191,7 @@ var layer;
 		        success : function(data) {debugger
 		       	   vm.loading = false;
 		             if(data.code=='1'){
-		            	 vm.$Modal.success({content:data.data});
+		                   	vm.$Modal.success({content:"执行代扣金额"+vm.ajax_data.repayAmount+"元成功，请稍后查询结果"});
 		             }else{
 		                 vm.$Modal.error({content:data.data});
 		             }
@@ -296,8 +296,6 @@ var layer;
                      	vm.ajax_data.onLineOverDueMoney=result.data.data.onLineOverDueMoney;
                
                     }
-                 	vm.ajax_data.underLineFactOverDueMoney=vm.ajax_data.planOverDueMoney;
-//                    searchRepayLog();
                  	vm.platformId='5';
                  	doOperate();
                       if(vm.ajax_data.strType==2){
@@ -398,7 +396,7 @@ var layer;
 	var total=0;
 		vm.ajax_data.total=0;
 	
-	vm.ajax_data.total=vm.ajax_data.planPrincipal+vm.ajax_data.planAccrual+vm.ajax_data.planServiceCharge+vm.ajax_data.platformCharge+Number(vm.ajax_data.onLineOverDueMoney)+Number(vm.ajax_data.underLineOverDueMoney)-vm.ajax_data.repayAllAmount;
+	vm.ajax_data.total=vm.ajax_data.planPrincipal+vm.ajax_data.planAccrual+vm.ajax_data.planServiceCharge+vm.ajax_data.platformCharge+Number(vm.ajax_data.onLineOverDueMoney)+Number(vm.ajax_data.underLineFactOverDueMoney)
 	var total=vm.ajax_data.total;
 	if(total<0){
 		total=0;
@@ -418,7 +416,7 @@ var layer;
         var self = this;  
         var reqStr =basePath+ "DeductionController/getDeductionPlatformInfo"
         axios.get(reqStr)
-            .then(function (result) {debugger
+            .then(function (result) {debugger	
                 if (result.data.code == "1") {
                 	
           
@@ -439,17 +437,18 @@ var layer;
 	}
 	var doOperate = function () {debugger
         if(vm.platformId=='5'){debugger
+        	vm.ajax_data.underLineFactOverDueMoney=0;
         	vm.isBankFlag=true;
         	vm.ajax_data.total=getTotalShouldPay();
-        	vm.ajax_data.repayAmount=vm.ajax_data.repayAmount-vm.ajax_data.planOverDueMoney;
         	if(	vm.ajax_data.repayAmount<0){
         		vm.ajax_data.repayAmount=0;
         	}
-        	vm.ajax_data.repayAmount=vm.ajax_data.repayAmount.toFixed(2);
-       
+        	
         }else{
         	vm.isBankFlag=false;
+        	vm.ajax_data.underLineFactOverDueMoney=	vm.ajax_data.planOverDueMoney;
         	vm.ajax_data.total=getTotalShouldPay();
+      
         }
 	}
 	

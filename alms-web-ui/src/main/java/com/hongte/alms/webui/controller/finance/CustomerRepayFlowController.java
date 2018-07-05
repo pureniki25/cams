@@ -19,12 +19,31 @@ public class CustomerRepayFlowController {
     }
 
     /**
-     * 客户还款流水主页
+     * 银行还款流水主页
      * @return
      */
     @RequestMapping("/bankFlow")
     public String bankFlow() {
         return "/finance/bankWithholdRepayFlowList";
+    }
+
+
+    /**
+     * 宝付流水
+     * @return
+     */
+    @RequestMapping("/bfFlow")
+    public String bfFlow() {
+        return "/finance/bfWithholdRepayFlowList";
+    }
+
+    /**
+     * 易宝流水
+     * @return
+     */
+    @RequestMapping("/ybFlow")
+    public String ybFlow() {
+        return "/finance/ybWithholdRepayFlowList";
     }
 
 }
