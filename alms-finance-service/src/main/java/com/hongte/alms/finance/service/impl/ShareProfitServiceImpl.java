@@ -1277,10 +1277,10 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             // 上一条还款来源的可用金额已用完，找下一条还款来源来用
 //            curalDivideAmount.set(null);
             financeBaseDto.setCuralDivideAmount(null);
-            setNewRepaymentResource(financeBaseDto.getResourceIndex() + 1, financeBaseDto);
+            boolean setBl = setNewRepaymentResource(financeBaseDto.getResourceIndex() + 1, financeBaseDto);
             financeBaseDto.setRealPayedAmount(realPayed);
 //            realPayedAmount.set(realPayed);
-            return false;
+            return setBl ;
         } else {
             logger.info("divideAmount少于unpaid");
             logger.info("@@从divideAmount={}分unpaid={}到{}", curalDivideAmount, curalDivideAmount,

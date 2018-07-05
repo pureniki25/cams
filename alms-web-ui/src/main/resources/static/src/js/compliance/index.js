@@ -1,4 +1,5 @@
 var basePath;
+var coreBasePath;
 var vm;
 var table;
 
@@ -16,6 +17,7 @@ var rechargeModalFormRules = {
 
 window.layinit(function(htConfig) {
 	basePath = htConfig.platRepayBasePath;
+	coreBasePath = htConfig.coreBasePath;
 	table = layui.table;
 
 	vm = new Vue({
@@ -714,7 +716,7 @@ window.layinit(function(htConfig) {
 			 */
 			exportComplianceRepaymentData: function(){
 				postDownLoadFile({
-					url: basePath + 'tdrepayRecharge/exportComplianceRepaymentData',
+					url: coreBasePath + 'downLoadController/exportComplianceRepaymentData',
 					data: vm.queryConditionModel,
 					method: 'post'
 				});
