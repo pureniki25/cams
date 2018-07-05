@@ -6,7 +6,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
-    <title>银行代扣流水</title>
+    <title>宝付代扣流水</title>
     <script src="/properties/config.js"></script>
     <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
     <!-- iview样式 -->
@@ -65,8 +65,8 @@
                 <row :gutter="16">
                     <i-form ref="searchForm" :model="searchForm" label-position="right"
                             :label-width="100">
-                        <i-col span="8">
-                            <form-item label="完成日期：" prop="startTime">
+                        <i-col span="16">
+                            <form-item label="查询日期：" prop="startTime">
                                 <date-picker type="date" v-model="searchForm.startTimeV" @on-change="startTime"
                                              placeholder="选择日期"
                                              format="yyyy-MM-dd"

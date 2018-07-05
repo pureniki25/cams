@@ -254,6 +254,7 @@
         tb_withholding_repayment_log t1
         LEFT JOIN tb_withholding_platform t2 ON t1.bind_platform_id = t2.platform_id
         WHERE 1=1
+        AND t1.bind_platform_id=5
         <if test="startTime !=null and startTime !=''">
             AND t1.update_time &gt;=#{startTime}
         </if>
@@ -269,6 +270,7 @@
         tb_withholding_repayment_log t1
         LEFT JOIN tb_withholding_platform t2 ON t1.bind_platform_id = t2.platform_id
         WHERE 1=1
+        AND t1.bind_platform_id=5
         <if test="startTime !=null and startTime !=''">
             AND t1.update_time &gt;=#{startTime}
         </if>
@@ -276,5 +278,82 @@
             AND t1.update_time &lt;=#{endTime}
         </if>
     </select>
+
+    <select id="getBfWithholdFlowPageList" parameterType="com.hongte.alms.base.customer.vo.WithholdFlowReq"
+            resultType="com.hongte.alms.base.customer.vo.BfWithholdFlowVo">
+        SELECT
+        t1.merch_order_id AS merchOrderId,
+        t1.third_order_id AS thirdOrderId,
+        t1.current_amount AS currentAmount,
+        t1.repay_status AS repayStatus,
+        t1.merchant_account AS merchantAccount,
+        t1.bank_code AS bankCode,
+        t1.create_time AS createTime,
+        t1.update_time AS updateTime
+        FROM
+        tb_withholding_repayment_log t1
+        WHERE 1=1
+        AND t1.bind_platform_id=3
+        <if test="startTime !=null and startTime !=''">
+            AND t1.update_time &gt;=#{startTime}
+        </if>
+        <if test="endTime !=null and endTime !=''">
+            AND t1.update_time &lt;=#{endTime}
+        </if>
+        limit ${(page-1)*limit} , ${limit}
+    </select>
+    <select id="countBfWithholdFlowPageList" resultType="int">
+        SELECT
+        count(1)
+        FROM
+        tb_withholding_repayment_log t1
+        WHERE 1=1
+        AND t1.bind_platform_id=3
+        <if test="startTime !=null and startTime !=''">
+            AND t1.update_time &gt;=#{startTime}
+        </if>
+        <if test="endTime !=null and endTime !=''">
+            AND t1.update_time &lt;=#{endTime}
+        </if>
+    </select>
+
+
+    <select id="getYbWithholdFlowPageList" parameterType="com.hongte.alms.base.customer.vo.WithholdFlowReq"
+            resultType="com.hongte.alms.base.customer.vo.YbWithholdFlowVo">
+        SELECT
+        t1.merch_order_id AS merchOrderId,
+        t1.third_order_id AS thirdOrderId,
+        t1.current_amount AS currentAmount,
+        t1.repay_status AS repayStatus,
+        t1.merchant_account AS merchantAccount,
+        t1.bank_code AS bankCode,
+        t1.create_time AS createTime
+        FROM
+        tb_withholding_repayment_log t1
+        WHERE 1=1
+        AND (t1.bind_platform_id is NULL OR t1.bind_platform_id=0)
+        <if test="startTime !=null and startTime !=''">
+            AND t1.update_time &gt;=#{startTime}
+        </if>
+        <if test="endTime !=null and endTime !=''">
+            AND t1.update_time &lt;=#{endTime}
+        </if>
+        limit ${(page-1)*limit} , ${limit}
+    </select>
+    <select id="countYbWithholdFlowPageList" resultType="int">
+        SELECT
+        count(1)
+        FROM
+        tb_withholding_repayment_log t1
+        WHERE 1=1
+        AND (t1.bind_platform_id is NULL OR t1.bind_platform_id=0)
+        <if test="startTime !=null and startTime !=''">
+            AND t1.update_time &gt;=#{startTime}
+        </if>
+        <if test="endTime !=null and endTime !=''">
+            AND t1.update_time &lt;=#{endTime}
+        </if>
+    </select>
+
 
 </mapper>
