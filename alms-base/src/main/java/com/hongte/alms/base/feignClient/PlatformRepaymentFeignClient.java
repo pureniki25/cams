@@ -33,4 +33,12 @@ public interface PlatformRepaymentFeignClient {
 	@RequestMapping(value = "/tdrepayRecharge/queryTdrepayRechargeRecord", headers = { "app=ALMS","content-type=application/json" })
 	public Result<List<PlatformRepaymentDto>> queryTdrepayRechargeRecord(@RequestBody PlatformRepaymentReq platformRepaymentReq);
 
+	/**
+	 * 撤销资金分发接口
+	 *
+	 * @return
+	 */
+	@RequestMapping(value = "/tdrepayRecharge/revokeTdrepayRecharge", headers = { "app=ALMS","content-type=application/json" })
+	public Result revokeTdrepayRecharge(@RequestBody PlatformRepaymentReq platformRepaymentReq);
+
 }

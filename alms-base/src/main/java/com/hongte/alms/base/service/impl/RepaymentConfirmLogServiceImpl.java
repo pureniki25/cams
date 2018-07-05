@@ -144,19 +144,18 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
                 .selectList(new EntityWrapper<RepaymentProjFactRepay>().eq("confirm_log_id", log.getConfirmLogId())
                         .orderBy("proj_plan_list_id"));
 
+            PlatformRepaymentReq platformRepaymentReq=new PlatformRepaymentReq();
         if (factRepays != null) {
             RepaymentProjFactRepay repaymentProjFactRepay = factRepays.get(0);
             RepaymentBizPlanList repaymentBizPlanList= repaymentBizPlanLists.get(0);
 
-            PlatformRepaymentReq platformRepaymentReq=new PlatformRepaymentReq();
             platformRepaymentReq.setProjectId(repaymentProjFactRepay.getProjectId());
             platformRepaymentReq.setConfirmLogId(repaymentBizPlanList.getPlanListId());
             Result<List<PlatformRepaymentDto>> listResult = platformRepaymentFeignClient.queryTdrepayRechargeRecord(platformRepaymentReq);
 
 
             logger.info("=========查询是否有资金分发结果{}",JSON.toJSONString(listResult));
-
-            if(listResult.getCode() =="1"){
+            if("1".equals(listResult.getCode())){
                 List<PlatformRepaymentDto> data = listResult.getData();
                 if(!CollectionUtils.isEmpty(data)){
                     for(PlatformRepaymentDto platformRepaymentDto : data){
@@ -272,6 +271,15 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
                     .eq("confirm_log_id", repaymentBizPlanBak.getConfirmLogId()));
         }
         log.deleteById();
+
+        //撤销成功 通知分发中心
+        try{
+            Result revokeListResult = platformRepaymentFeignClient.revokeTdrepayRecharge(platformRepaymentReq);
+            logger.info("=========通知分发中心已经撤销{}",JSON.toJSONString(revokeListResult));
+        }catch (Exception e){
+            logger.error("=========通知分发中心已经撤销出错{}",e);
+        }
+
         return Result.success();
     }
 

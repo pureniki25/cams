@@ -7,8 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +21,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
@@ -46,8 +42,6 @@ import com.hongte.alms.base.service.RepaymentProjPlanService;
 import com.hongte.alms.base.service.TdrepayRechargeLogService;
 import com.hongte.alms.base.service.TdrepayRechargeService;
 import com.hongte.alms.base.service.TuandaiProjectInfoService;
-import com.hongte.alms.base.util.ExcelData;
-import com.hongte.alms.base.util.ExcelUtils;
 import com.hongte.alms.base.vo.compliance.AgencyRechargeLogVO;
 import com.hongte.alms.base.vo.compliance.DistributeFundRecordVO;
 import com.hongte.alms.base.vo.compliance.RechargeRecordReq;
@@ -886,120 +880,4 @@ public class TdrepayRechargeController {
 
 	}
 
-	/**
-	 * 导出资金分发数据
-	 * 
-	 * @param infoVOs
-	 */
-	@ApiOperation(value = "导出资金分发数据")
-	@PostMapping("/exportComplianceRepaymentData")
-	@ResponseBody
-	public void exportComplianceRepaymentData(@ModelAttribute ComplianceRepaymentVO vo) {
-
-		try {
-
-			ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder
-					.getRequestAttributes();
-			HttpServletResponse response = requestAttributes.getResponse();
-			ExcelData data = new ExcelData();
-			data.setName("资金分发数据");
-			// 表头
-			List<String> titles = new ArrayList<>();
-			titles.add("业务编号");
-			titles.add("业务类型");
-			titles.add("还款方式");
-			titles.add("借款人");
-			titles.add("还款期数");
-			titles.add("实还日期");
-			titles.add("分公司");
-			titles.add("状态");
-			titles.add("流水合计");
-			titles.add("实收总额");
-			titles.add("充值金额");
-			titles.add("平台状态");
-			titles.add("分发状态");
-			titles.add("备注");
-			data.setTitles(titles);
-
-			if (vo != null && vo.getConfirmTimeEnd() != null) {
-				vo.setConfirmTimeEnd(DateUtil.addDay2Date(1, vo.getConfirmTimeEnd()));
-			}
-			int count = tdrepayRechargeService.countComplianceRepaymentData(vo);
-			if (count == 0) {
-				// 生成本地
-				ExcelUtils.exportExcel(response, "资金分发数据.xls", data);
-			}
-
-			List<TdrepayRechargeLog> list = tdrepayRechargeService.queryComplianceRepaymentData(vo);
-
-			List<TdrepayRechargeInfoVO> infoVOs = new ArrayList<>();
-			if (CollectionUtils.isNotEmpty(list)) {
-				for (TdrepayRechargeLog tdrepayRechargeLog : list) {
-					TdrepayRechargeInfoVO infoVO = BeanUtils.deepCopy(tdrepayRechargeLog, TdrepayRechargeInfoVO.class);
-					if (infoVO != null) {
-						infoVO.setBusinessTypeStr(BusinessTypeEnum.getName(infoVO.getBusinessType()));
-						infoVO.setRepaymentTypeStr(RepaySourceEnum.getName(infoVO.getRepaySource()));
-						switch (infoVO.getSettleType()) {
-						case 0:
-							infoVO.setPeriodTypeStr("正常还款");
-							break;
-						case 10:
-							infoVO.setPeriodTypeStr("结清");
-							break;
-						case 11:
-							infoVO.setPeriodTypeStr("结清");
-							break;
-						case 30:
-							infoVO.setPeriodTypeStr("结清");
-							break;
-						case 25:
-							infoVO.setPeriodTypeStr("展期确认");
-							break;
-
-						default:
-							break;
-						}
-						if (StringUtil.notEmpty(infoVO.getPlatStatus())) {
-							infoVO.setPlatformTypeStr(
-									PlatformStatusTypeEnum.getName(Integer.valueOf(infoVO.getPlatStatus())));
-						}
-						infoVO.setProcessStatusStr(ProcessStatusTypeEnum.getName(infoVO.getProcessStatus()));
-						infoVO.setFactRepayDateStr(DateUtil.formatDate(infoVO.getFactRepayDate()));
-					}
-					infoVOs.add(infoVO);
-				}
-			}
-
-			List<List<Object>> rows = new ArrayList<>();
-			if (CollectionUtils.isNotEmpty(infoVOs)) {
-				for (TdrepayRechargeInfoVO infoVO : infoVOs) {
-					List<Object> row = new ArrayList<>();
-					row.add(infoVO.getOrigBusinessId());
-					row.add(infoVO.getBusinessTypeStr());
-					row.add(infoVO.getRepaymentTypeStr());
-					row.add(infoVO.getCustomerName());
-					row.add(infoVO.getAfterId());
-					row.add(infoVO.getFactRepayDateStr());
-					row.add(infoVO.getCompanyName());
-					row.add(infoVO.getPeriodTypeStr());
-					row.add(infoVO.getResourceAmount());
-					row.add(infoVO.getFactRepayAmount());
-					row.add(infoVO.getRechargeAmount());
-					row.add(infoVO.getPlatformTypeStr());
-					row.add(infoVO.getProcessStatusStr());
-					row.add(infoVO.getRemark());
-					rows.add(row);
-				}
-			}
-
-			data.setRows(rows);
-
-			// 生成本地
-			ExcelUtils.exportExcel(response, "资金分发数据.xlsx", data);
-
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-			throw new ServiceRuntimeException(e.getMessage(), e);
-		}
-	}
 }
