@@ -290,7 +290,7 @@ window.layinit(function (htConfig) {
            // 合规化还款
            tdrepyCharge:function(){
         	   this.tdrepyChargeLoading = true;
-        	   axios.get(platRepayBasePath +"tdrepayRecharge/repayComplianceWithRequirements",{timeout: 0})
+        	   axios.post(platRepayBasePath +"tdrepayRecharge/repayComplianceWithRequirements")
         	   .then(function (res) {
         		   vm.tdrepyChargeLoading = false;
         		   if (res.data.data != null && res.data.code == 1) {
