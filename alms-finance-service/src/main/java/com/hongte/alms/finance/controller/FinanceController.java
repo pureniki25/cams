@@ -20,6 +20,7 @@ import com.hongte.alms.base.enums.AreaLevel;
 import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.enums.RepayRegisterState;
+import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.service.*;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
 import com.hongte.alms.base.vo.finance.*;
@@ -669,7 +670,9 @@ public class FinanceController {
 			result = confrimLogService.revokeConfirm(businessId, afterId);
 			logger.info("@revokeConfirm@撤销还款确认--结束[{}]", result);
 			return result;
-		} catch (Exception e) {
+		}  catch (ServiceRuntimeException se) {
+			return Result.error("500", se.getMessage());
+		}catch (Exception e) {
 			logger.error("撤销还款确认失败--[{}]", e);
 			return Result.error("-500", "系统异常:撤销还款确认失败");
 		}

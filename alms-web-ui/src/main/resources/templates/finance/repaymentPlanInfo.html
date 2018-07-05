@@ -27,12 +27,13 @@
 	<div id="app" v-cloak>
 		<Card> 
 			<row> 
-				<i-col span="5">合同编号：{{ baseInfo.businessId }}</i-col>
-				<i-col span="3">客户姓名：{{ baseInfo.customer }}</i-col> 
+				<i-col span="4">合同编号：{{ baseInfo.businessId }}</i-col>
+				<i-col span="4">客户姓名：{{ baseInfo.customer }}</i-col> 
 				<i-col span="4">手机号码：{{ baseInfo.phoneNumber }}</i-col>
-				<i-col span="4">还款方式：{{ baseInfo.repaymentType }}</i-col> 
-				<i-col span="4">借款金额：{{ baseInfo.borrowMoney }}</i-col>
-				<i-col span="4">借款期限：{{ baseInfo.borrowLimit }}</i-col> 
+				<i-col span="3">还款方式：{{ baseInfo.repaymentType }}</i-col> 
+				<i-col span="3">借款金额：{{baseInfo.borrowMoney?numeral(baseInfo.borrowMoney).format('0,0.00'):0}}</i-col>
+				<i-col span="3">借款期限：{{ baseInfo.borrowLimit }}</i-col> 
+				<i-col span="3">结余：{{businessSurplus?numeral(businessSurplus).format('0,0.00'):0}}</i-col> 
 			</row>
 		</Card>
 		
@@ -64,18 +65,18 @@
 		        				<td>{{ item.afterId }}</td>
 			        			<td v-html="addEventForType(item)"></td>
 			        			<td>{{ item.repaymentDate }}</td>
-			        			<td>{{ item.principal }}</td>
-			        			<td>{{ item.accrual }}</td>
-			        			<td>{{ item.serviceCharge }}</td>
-			        			<td>{{ item.platformCharge }}</td>
+			        			<td>{{ numeral(item.principal).format('0,0.00')}}</td>
+			        			<td>{{ numeral(item.accrual).format('0,0.00')}}</td>
+			        			<td>{{ numeral(item.serviceCharge).format('0,0.00')}}</td>
+			        			<td>{{ numeral(item.platformCharge).format('0,0.00')}}</td>
 			        			<td v-if="item.repayment == '实际还款'" v-html="addEventForOtherFee(item)"></td>
-			        			<td v-else>{{ item.otherFee }}</td>
-			        			<td>{{ item.subtotal }}</td>
+			        			<td v-else>{{ numeral(item.otherFee).format('0,0.00')}}</td>
+			        			<td>{{ numeral(item.subtotal).format('0,0.00')}}</td>
 			        			<td v-if="item.repayment == '差额'"></td>
 			        			<td v-else>{{ item.overdueDays }}</td>
-			        			<td>{{ item.onlineLateFee }}</td>
-			        			<td>{{ item.offlineLateFee }}</td>
-			        			<td>{{ item.surplus }}</td>
+			        			<td>{{ numeral(item.onlineLateFee).format('0,0.00')}}</td>
+			        			<td>{{ numeral(item.offlineLateFee).format('0,0.00')}}</td>
+			        			<td>{{ numeral(item.surplus).format('0,0.00')}}</td>
 			        			<td>{{ numeral(item.total).format('0,0.00')}}</td>
 			        			<td>{{ item.confirmFlag }}</td>
 			        		</tr>
@@ -204,7 +205,23 @@
 								<i-col span='6'>标的号：{{ item.projectId }}</i-col>
 								<i-col span='4'>上标金额：{{ item.fullBorrowMoney?numeral(item.fullBorrowMoney).format('0,0.00'):0 }}</i-col>
 							</row>
-							<i-table border :columns="advancePaymentInfoColumns" :data="advancePaymentInfoData" style="margin-top:1rem"></i-table>
+							<row style="margin-top:1rem">
+								<p slot="title">
+						            <h3>还垫付记录</h3>
+						        </p>
+						    </row>
+							<row style="margin-top:1rem">
+								<i-table border :columns="advancePaymentInfoColumns" :data="advancePaymentInfoData" style="margin-top:1rem"></i-table>
+							</row>
+							
+							<row style="margin-top:1rem">
+								<p slot="title">
+						            <h3>担保公司垫付记录</h3>
+						        </p>
+						    </row>
+							<row style="margin-top:1rem">
+								<i-table border :columns="queryGuaranteePaymentColumns" :data="queryGuaranteePaymentData" style="margin-top:1rem"></i-table>
+							</row>
 						</tab-pane>
 					</tabs>
 		        </tab-pane>

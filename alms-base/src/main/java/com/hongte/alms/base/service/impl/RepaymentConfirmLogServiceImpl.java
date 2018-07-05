@@ -25,6 +25,7 @@ import com.hongte.alms.base.entity.RepaymentResource;
 import com.hongte.alms.base.enums.RepayedFlag;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.SectionRepayStatusEnum;
+import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.PlatformRepaymentFeignClient;
 import com.hongte.alms.base.mapper.AccountantOverRepayLogMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanBakMapper;
@@ -53,6 +54,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -70,6 +73,7 @@ import org.springframework.util.CollectionUtils;
 @Service("RepaymentConfirmLogService")
 public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentConfirmLogMapper, RepaymentConfirmLog> implements RepaymentConfirmLogService {
 
+    private static Logger logger = LoggerFactory.getLogger(RepaymentConfirmLogServiceImpl.class);
     @Autowired
     RepaymentConfirmLogMapper confirmLogMapper;
     @Autowired
@@ -116,7 +120,7 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Result revokeConfirm(String businessId, String afterId) {
+    public Result revokeConfirm(String businessId, String afterId) throws Exception{
         /*找还款确认记录*/
         List<RepaymentConfirmLog> logs = confirmLogMapper.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("business_id", businessId).eq("after_id", afterId).orderBy("`idx`", false));
         if (logs == null || logs.size() == 0) {
@@ -132,6 +136,9 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
         }
 
 
+        List<RepaymentBizPlanList> repaymentBizPlanLists = repaymentBizPlanListMapper.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId));
+
+
 		/*找实还明细记录*/
         List<RepaymentProjFactRepay> factRepays = repaymentProjFactRepayMapper
                 .selectList(new EntityWrapper<RepaymentProjFactRepay>().eq("confirm_log_id", log.getConfirmLogId())
@@ -139,24 +146,28 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 
         if (factRepays != null) {
             RepaymentProjFactRepay repaymentProjFactRepay = factRepays.get(0);
+            RepaymentBizPlanList repaymentBizPlanList= repaymentBizPlanLists.get(0);
+
             PlatformRepaymentReq platformRepaymentReq=new PlatformRepaymentReq();
             platformRepaymentReq.setProjectId(repaymentProjFactRepay.getProjectId());
-            platformRepaymentReq.setConfirmLogId(log.getConfirmLogId());
+            platformRepaymentReq.setConfirmLogId(repaymentBizPlanList.getPlanListId());
             Result<List<PlatformRepaymentDto>> listResult = platformRepaymentFeignClient.queryTdrepayRechargeRecord(platformRepaymentReq);
+
+
+            logger.info("=========查询是否有资金分发结果{}",JSON.toJSONString(listResult));
+
             if(listResult.getCode() =="1"){
                 List<PlatformRepaymentDto> data = listResult.getData();
                 if(!CollectionUtils.isEmpty(data)){
                     for(PlatformRepaymentDto platformRepaymentDto : data){
-                        if(log.getConfirmLogId().equals(platformRepaymentDto.getConfirmLogId())){
+                        if(repaymentBizPlanList.getPlanListId().equals(platformRepaymentDto.getConfirmLogId())){ //planlistId相等
                             if(platformRepaymentDto.getProcessStatus()==1 || platformRepaymentDto.getProcessStatus()==2){
-                                return Result.error("500", "已分发记录不能被撤销");
+                                throw new ServiceRuntimeException("已分发记录不能被撤销");
                             }
                         }
                     }
                 }
             }
-
-
         }
 		/*找结余记录*/
         if (log.getSurplusRefId() != null) {
