@@ -1401,7 +1401,7 @@ public class FinanceServiceImpl implements FinanceService {
 							- repaymentPlanInfoDTO.getOfflineDerateAmount();
 					double onlineLateFee = repaymentPlanInfoDTO.getOnlineLateFee()
 							- repaymentPlanInfoDTO.getOnlineDerateAmount();
-					double surplus = 0; // 结余
+					double surplus = repaymentPlanInfoDTO.getSurplus(); // 结余
 
 					// 小计：本金+利息+月收分公司服务费+月收平台费
 					repaymentPlanInfoDTO
@@ -1410,7 +1410,7 @@ public class FinanceServiceImpl implements FinanceService {
 
 					// 还款合计（含滞纳金）：小计+线上滞纳金+线下滞纳金+结余
 					repaymentPlanInfoDTO.setTotal(
-							BigDecimal.valueOf(onlineLateFee + offlineLateFee + repaymentPlanInfoDTO.getSubtotal())
+							BigDecimal.valueOf(onlineLateFee + offlineLateFee + repaymentPlanInfoDTO.getSubtotal() + surplus)
 									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
 
 					String afterId = repaymentPlanInfoDTO.getAfterId();
@@ -1463,9 +1463,9 @@ public class FinanceServiceImpl implements FinanceService {
 								// platformCharge += infoDTO.getPlatformCharge();
 								// onlineLateFee += infoDTO.getOnlineLateFee();
 								// surplus += infoDTO.getSurplus();
-								infoDTO.setSurplus((infoDTO.getAmount() - planInfoDTO.getAmount()) < 0 ? 0
-										: BigDecimal.valueOf((infoDTO.getAmount() - planInfoDTO.getAmount()))
-												.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+//								infoDTO.setSurplus((infoDTO.getAmount() - planInfoDTO.getAmount()) < 0 ? 0
+//										: BigDecimal.valueOf((infoDTO.getAmount() - planInfoDTO.getAmount()))
+//												.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
 								// infoDTO.setTotal(infoDTO.getTotal() + infoDTO.getSurplus());
 								// 完成上一步没有加上的结余数据
 								// if (factRepayDate == null) {

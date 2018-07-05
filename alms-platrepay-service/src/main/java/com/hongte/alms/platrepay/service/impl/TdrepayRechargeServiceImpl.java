@@ -1562,7 +1562,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			}
 		}
 
-		paramDTO.setTotalAmount(BigDecimal.valueOf(totalAmount));
+		paramDTO.setTotalAmount(BigDecimal.valueOf(totalAmount).setScale(2, BigDecimal.ROUND_HALF_UP));
 
 		/*
 		 * 2、开始调用偿还垫付接口
@@ -1880,7 +1880,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			List<DistributeFundRecordVO> distributeFundRecordVOs = new ArrayList<>();
 			List<TdrepayRechargeLog> tdrepayRechargeLogs = tdrepayRechargeLogService
 					.selectList(new EntityWrapper<TdrepayRechargeLog>().eq("project_id", projectId).eq("is_valid", 1)
-							.orderBy("period"));
+							.orderBy("after_id", false));
 			if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
 				for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
 					DistributeFundRecordVO vo = BeanUtils.deepCopy(tdrepayRechargeLog, DistributeFundRecordVO.class);
