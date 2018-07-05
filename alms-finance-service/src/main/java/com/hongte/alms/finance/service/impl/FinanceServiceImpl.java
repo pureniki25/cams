@@ -70,6 +70,7 @@ import com.hongte.alms.base.mapper.RepaymentProjPlanListDetailMapper;
 import com.hongte.alms.base.mapper.RepaymentProjPlanListMapper;
 import com.hongte.alms.base.mapper.RepaymentProjPlanMapper;
 import com.hongte.alms.base.mapper.RepaymentResourceMapper;
+import com.hongte.alms.base.mapper.TransferOfLitigationMapper;
 import com.hongte.alms.base.mapper.TuandaiProjectInfoMapper;
 import com.hongte.alms.base.process.entity.Process;
 import com.hongte.alms.base.process.mapper.ProcessMapper;
@@ -143,6 +144,9 @@ public class FinanceServiceImpl implements FinanceService {
 	@Autowired
 	@Qualifier("RepaymentProjPlanListDetailService")
 	private RepaymentProjPlanListDetailService repaymentProjPlanListDetailService;
+	
+	@Autowired
+	private TransferOfLitigationMapper transferOfLitigationMapper;
 
 	private static final String SEND_DATA_PLATFORM_SPLIT_SYMBOL = "\\t";
 
@@ -1393,16 +1397,18 @@ public class FinanceServiceImpl implements FinanceService {
 					double principal = repaymentPlanInfoDTO.getPrincipal();
 					double serviceCharge = repaymentPlanInfoDTO.getServiceCharge();
 					double platformCharge = repaymentPlanInfoDTO.getPlatformCharge();
-					double offlineLateFee = repaymentPlanInfoDTO.getOfflineLateFee() - repaymentPlanInfoDTO.getOfflineDerateAmount();
-					double onlineLateFee = repaymentPlanInfoDTO.getOnlineLateFee() - repaymentPlanInfoDTO.getOnlineDerateAmount();
+					double offlineLateFee = repaymentPlanInfoDTO.getOfflineLateFee()
+							- repaymentPlanInfoDTO.getOfflineDerateAmount();
+					double onlineLateFee = repaymentPlanInfoDTO.getOnlineLateFee()
+							- repaymentPlanInfoDTO.getOnlineDerateAmount();
 					double surplus = repaymentPlanInfoDTO.getSurplus(); // 结余
 
 					// 小计：本金+利息+月收分公司服务费+月收平台费
-					repaymentPlanInfoDTO.setSubtotal(
-							BigDecimal.valueOf(accrual + principal + serviceCharge + platformCharge)
+					repaymentPlanInfoDTO
+							.setSubtotal(BigDecimal.valueOf(accrual + principal + serviceCharge + platformCharge)
 									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
 
-					// 还款合计（含滞纳金）：小计+线上滞纳金+线下滞纳金+结余 
+					// 还款合计（含滞纳金）：小计+线上滞纳金+线下滞纳金+结余
 					repaymentPlanInfoDTO.setTotal(
 							BigDecimal.valueOf(onlineLateFee + offlineLateFee + repaymentPlanInfoDTO.getSubtotal() + surplus)
 									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
@@ -1433,73 +1439,83 @@ public class FinanceServiceImpl implements FinanceService {
 						List<RepaymentPlanInfoDTO> infoDTOs = entry.getValue();
 
 						RepaymentPlanInfoDTO planInfoDTO = new RepaymentPlanInfoDTO(); // 计划还款
+						RepaymentPlanInfoDTO factInfoDTO = new RepaymentPlanInfoDTO(); // 实际还款
 
-						double accrual = 0; // 利息
-						double offlineLateFee = 0; // 线下滞纳金
-						double principal = 0; // 本金
-						double serviceCharge = 0; // 月收分公司服务费
-						double platformCharge = 0; // 月收平台费
-						double onlineLateFee = 0; // 线上滞纳金
-						double surplus = 0; // 结余
+						// double accrual = 0; // 利息
+						// double offlineLateFee = 0; // 线下滞纳金
+						// double principal = 0; // 本金
+						// double serviceCharge = 0; // 月收分公司服务费
+						// double platformCharge = 0; // 月收平台费
+						// double onlineLateFee = 0; // 线上滞纳金
+						// double surplus = 0; // 结余
 
-						Date factRepayDate = null; // 实还日期
+						// Date factRepayDate = null; // 实还日期
 
 						for (RepaymentPlanInfoDTO infoDTO : infoDTOs) {
 							String repayment = infoDTO.getRepayment();
 							if ("计划还款".equals(repayment)) {
 								planInfoDTO = infoDTO; // infoDTOs.get(0) 根据sql取数规则，必定为计划还款
 							} else if ("实际还款".equals(repayment)) {
-								accrual += infoDTO.getAccrual();
-								offlineLateFee += infoDTO.getOfflineLateFee();
-								principal += infoDTO.getPrincipal();
-								serviceCharge += infoDTO.getServiceCharge();
-								platformCharge += infoDTO.getPlatformCharge();
-								onlineLateFee += infoDTO.getOnlineLateFee();
-								surplus += infoDTO.getSurplus();
-								// infoDTO.setSurplus((infoDTO.getAmount() - planInfoDTO.getAmount()) < 0 ? 0
-								// : (infoDTO.getAmount() - planInfoDTO.getAmount()));
-								// infoDTO.setTotal(infoDTO.getTotal() + infoDTO.getSurplus()); //
+								// accrual += infoDTO.getAccrual();
+								// offlineLateFee += infoDTO.getOfflineLateFee();
+								// principal += infoDTO.getPrincipal();
+								// serviceCharge += infoDTO.getServiceCharge();
+								// platformCharge += infoDTO.getPlatformCharge();
+								// onlineLateFee += infoDTO.getOnlineLateFee();
+								// surplus += infoDTO.getSurplus();
+//								infoDTO.setSurplus((infoDTO.getAmount() - planInfoDTO.getAmount()) < 0 ? 0
+//										: BigDecimal.valueOf((infoDTO.getAmount() - planInfoDTO.getAmount()))
+//												.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+								// infoDTO.setTotal(infoDTO.getTotal() + infoDTO.getSurplus());
 								// 完成上一步没有加上的结余数据
-								if (factRepayDate == null) {
-									factRepayDate = infoDTO.getRepaymentDate();
-								}
+								// if (factRepayDate == null) {
+								// factRepayDate = infoDTO.getRepaymentDate();
+								// }
+								factInfoDTO = infoDTO;
 							}
 						}
 
-						double subtotal = accrual + principal + serviceCharge + platformCharge; // 小计
-						double total = subtotal + offlineLateFee + onlineLateFee + surplus; // 还款合计（含滞纳金）
+						// double subtotal = accrual + principal + serviceCharge + platformCharge; // 小计
+						// double total = subtotal + offlineLateFee + onlineLateFee + surplus; //
+						// 还款合计（含滞纳金）
 
 						RepaymentPlanInfoDTO balanceRepayment = new RepaymentPlanInfoDTO(); // 差额
 						balanceRepayment.setRepayment("差额");
 						balanceRepayment.setAfterId(planInfoDTO.getAfterId());
 						balanceRepayment.setPlanListId(planInfoDTO.getPlanListId());
-						if (factRepayDate != null) {
-							balanceRepayment.setAccrual(BigDecimal.valueOf(planInfoDTO.getAccrual() - accrual)
+						if (factInfoDTO.getRepaymentDate() != null) {
+							balanceRepayment
+									.setAccrual(BigDecimal.valueOf(planInfoDTO.getAccrual() - factInfoDTO.getAccrual())
+											.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+							balanceRepayment.setOfflineLateFee(BigDecimal
+									.valueOf(planInfoDTO.getOfflineLateFee() - factInfoDTO.getOfflineLateFee())
 									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-							balanceRepayment.setOfflineLateFee(
-									BigDecimal.valueOf(planInfoDTO.getOfflineLateFee() - offlineLateFee)
+							balanceRepayment.setOnlineLateFee(
+									BigDecimal.valueOf(planInfoDTO.getOnlineLateFee() - factInfoDTO.getOnlineLateFee())
+											.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+							balanceRepayment.setPlatformCharge(BigDecimal
+									.valueOf(planInfoDTO.getPlatformCharge() - factInfoDTO.getPlatformCharge())
+									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+							balanceRepayment.setPrincipal(
+									BigDecimal.valueOf(planInfoDTO.getPrincipal() - factInfoDTO.getPrincipal())
+											.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+							balanceRepayment.setSubtotal(
+									BigDecimal.valueOf(planInfoDTO.getSubtotal() - factInfoDTO.getSubtotal())
 											.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
 							balanceRepayment
-									.setOnlineLateFee(BigDecimal.valueOf(planInfoDTO.getOnlineLateFee() - onlineLateFee)
-											.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-							balanceRepayment.setPlatformCharge(
-									BigDecimal.valueOf(planInfoDTO.getPlatformCharge() - platformCharge)
-											.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-							balanceRepayment.setPrincipal(BigDecimal.valueOf(planInfoDTO.getPrincipal() - principal)
-									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-							balanceRepayment.setSubtotal(BigDecimal.valueOf(planInfoDTO.getSubtotal() - subtotal)
-									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-							balanceRepayment.setTotal(BigDecimal
-									.valueOf((planInfoDTO.getTotal() - total) > 0 ? planInfoDTO.getTotal() - total : 0)
-									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-							balanceRepayment
-									.setServiceCharge(BigDecimal.valueOf(planInfoDTO.getServiceCharge() - serviceCharge)
+									.setTotal(BigDecimal.valueOf((planInfoDTO.getTotal() - factInfoDTO.getTotal()) > 0
+											? planInfoDTO.getTotal() - factInfoDTO.getTotal()
+											: 0).setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+							balanceRepayment.setServiceCharge(
+									BigDecimal.valueOf(planInfoDTO.getServiceCharge() - factInfoDTO.getServiceCharge())
 											.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
 
 						}
+						
 						infoDTOs.add(balanceRepayment);
 						resultList.addAll(infoDTOs);
 						resultMap.put("resultList", resultList);
+						resultMap.put("businessSurplus", transferOfLitigationMapper.queryOverRepayMoneyByBusinessId(businessId));
 					}
 					return resultMap;
 				}
@@ -1528,8 +1544,10 @@ public class FinanceServiceImpl implements FinanceService {
 					double principal = repaymentProjInfoDTO.getPrincipal();
 					double serviceCharge = repaymentProjInfoDTO.getServiceCharge();
 					double platformCharge = repaymentProjInfoDTO.getPlatformCharge();
-					double offlineLateFee = repaymentProjInfoDTO.getOfflineLateFee() - repaymentProjInfoDTO.getOfflineDerateAmount();
-					double onlineLateFee = repaymentProjInfoDTO.getOnlineLateFee() - repaymentProjInfoDTO.getOnlineDerateAmount();
+					double offlineLateFee = repaymentProjInfoDTO.getOfflineLateFee()
+							- repaymentProjInfoDTO.getOfflineDerateAmount();
+					double onlineLateFee = repaymentProjInfoDTO.getOnlineLateFee()
+							- repaymentProjInfoDTO.getOnlineDerateAmount();
 
 					repaymentProjInfoDTO
 							.setSubtotal(BigDecimal.valueOf(accrual + principal + serviceCharge + platformCharge)

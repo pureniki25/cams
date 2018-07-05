@@ -2,8 +2,10 @@ package com.hongte.alms.base.mapper;
 
 import java.util.List;
 
+import com.hongte.alms.base.customer.vo.BfWithholdFlowVo;
 import com.hongte.alms.base.customer.vo.WithholdFlowReq;
 import com.hongte.alms.base.customer.vo.BankWithholdFlowVo;
+import com.hongte.alms.base.customer.vo.YbWithholdFlowVo;
 import org.apache.ibatis.annotations.Param;
 
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
@@ -78,4 +80,28 @@ public interface WithholdingRepaymentLogMapper extends SuperMapper<WithholdingRe
      * @return
      */
     int countBankWithholdFlowPageList(WithholdFlowReq bankWithholdFlowReq);
+
+    /**
+     * 宝付代扣记录流水
+     * @return
+     */
+    List<BfWithholdFlowVo> getBfWithholdFlowPageList(WithholdFlowReq withholdFlowReq);
+
+    /**
+     * 统计宝付代扣记录流水
+     * @return
+     */
+    int countBfWithholdFlowPageList(WithholdFlowReq withholdFlowReq);
+
+    /**
+     * 易宝代扣记录流水
+     * @return
+     */
+    List<YbWithholdFlowVo> getYbWithholdFlowPageList(WithholdFlowReq withholdFlowReq);
+
+    /**
+     * 统计易宝代扣记录流水
+     * @return
+     */
+    int countYbWithholdFlowPageList(WithholdFlowReq withholdFlowReq);
 }

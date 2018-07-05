@@ -137,7 +137,7 @@ public class MoneyPoolController {
 		}
 	}*/
 
-	@ApiOperation(value = "新增/编辑 还款登记(若参数有moneyPoolId，则为编辑，否则为新增)")
+/*	@ApiOperation(value = "新增/编辑 还款登记(若参数有moneyPoolId，则为编辑，否则为新增)")
 	@GetMapping("/save")
 	@ResponseBody
 	public Result saveRepaymentRegisterInfo(RepaymentRegisterInfoDTO repayInfo) {
@@ -156,7 +156,7 @@ public class MoneyPoolController {
 		} finally {
 			return result;
 		}
-	}
+	}*/
 
 	@ApiOperation(value = "新增 还款登记")
 	@PostMapping("/addCustomerRepayment")

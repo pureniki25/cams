@@ -292,7 +292,7 @@
 				        </thead>
 				        <tbody>
 				            <tr v-for='(item, index) in distributeFundRecordList' :key='index'>
-				                <td style="text-align:center">{{ item.period }}</td>
+				                <td style="text-align:center">{{ item.afterId }}</td>
 				                <td style="text-align:center">{{ item.factRepayDateStr }}</td>
 				                <td style="text-align:center">{{ item.factRepayAmount?numeral(item.factRepayAmount).format('0,0.00'):0 }}</td>
 				                <td style="text-align:center">{{ item.createTimeStr }}</td>

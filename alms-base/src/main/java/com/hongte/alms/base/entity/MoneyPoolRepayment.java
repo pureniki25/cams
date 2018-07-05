@@ -80,6 +80,7 @@ public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
 	 */
 	@TableField("claim_date")
 	@ApiModelProperty(required = true, value = "领取时间")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
 	private Date claimDate;
 	/**
 	 * 状态
@@ -196,7 +197,7 @@ public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
 	 */
 	@TableField("trade_date")
 	@ApiModelProperty(required = true, value = "转入时间")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
 	private Date tradeDate;
 	/**
 	 * 创建人角色,客户/财务
@@ -556,7 +557,6 @@ public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
 		if (repayInfo.getTradeType() != null && !repayInfo.getTradeType().equals("")) {
 			this.tradeType = repayInfo.getTradeType();
 		}
-
 
 		if (this.state.equals(RepayRegisterFinanceStatus.还款登记被拒绝.toString())
 				|| this.state.equals(RepayRegisterFinanceStatus.还款待确认.toString())

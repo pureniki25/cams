@@ -445,7 +445,7 @@ window.layinit(function (htConfig) {
                         .then(function (res) {
                             if (res.data.code == '1') {
                                 app.$Message.success({
-                                    content: res.data.msg
+                                    content: "撤销还款成功!"
                                 })
                                 app.search()
                             } else {
