@@ -3,6 +3,7 @@ package com.hongte.alms.platrepay.controller;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -64,6 +65,7 @@ import com.hongte.alms.platrepay.dto.TdReturnAdvanceShareProfitResult;
 import com.hongte.alms.platrepay.enums.PlatformStatusTypeEnum;
 import com.hongte.alms.platrepay.enums.ProcessStatusTypeEnum;
 import com.hongte.alms.platrepay.enums.RepaySourceEnum;
+import com.hongte.alms.platrepay.vo.TdGuaranteePaymentVO;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.util.BeanUtils;
 
@@ -577,8 +579,7 @@ public class TdrepayRechargeController {
 	@ApiOperation(value = "根据标ID获取垫付记录")
 	@GetMapping("/returnAdvanceShareProfit")
 	@ResponseBody
-	public Result<List<TdReturnAdvanceShareProfitDTO>> returnAdvanceShareProfit(
-			@RequestParam("projectId") String projectId) {
+	public Result<Map<String, Object>> returnAdvanceShareProfit(@RequestParam("projectId") String projectId) {
 		if (StringUtil.isEmpty(projectId)) {
 			return Result.error("-99", "标ID不能为空");
 		}
@@ -587,10 +588,15 @@ public class TdrepayRechargeController {
 			Map<String, Object> paramMap = new HashMap<>();
 			paramMap.put("projectId", projectId);
 
+			Map<String, Object> resultMap = new HashMap<>();
+
 			com.ht.ussp.core.Result result = eipRemote.returnAdvanceShareProfit(paramMap);
+			com.ht.ussp.core.Result queryProjectPaymentResult = eipRemote.queryProjectPayment(paramMap);
 
 			if (result != null && result.getData() != null
-					&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
+					&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())
+					&& queryProjectPaymentResult != null
+					&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(queryProjectPaymentResult.getReturnCode())) {
 				TdReturnAdvanceShareProfitResult returnAdvanceShareProfitResult = JSONObject
 						.parseObject(JSONObject.toJSONString(result.getData()), TdReturnAdvanceShareProfitResult.class);
 				List<TdReturnAdvanceShareProfitDTO> returnAdvanceShareProfits = returnAdvanceShareProfitResult
@@ -612,7 +618,64 @@ public class TdrepayRechargeController {
 					}
 				}
 
-				return Result.success(returnAdvanceShareProfits);
+				// 标的还款信息
+				List<TdProjectPaymentDTO> tdProjectPaymentDTOs = null;
+				if (queryProjectPaymentResult.getData() != null) {
+
+					JSONObject parseObject = (JSONObject) JSONObject.toJSON(queryProjectPaymentResult.getData());
+					if (parseObject.get("projectPayments") != null) {
+						tdProjectPaymentDTOs = JSONObject.parseArray(
+								JSONObject.toJSONString(parseObject.get("projectPayments")), TdProjectPaymentDTO.class);
+					}
+				}
+
+				List<TdGuaranteePaymentVO> tdGuaranteePaymentVOs = new LinkedList<>();
+				if (CollectionUtils.isNotEmpty(tdProjectPaymentDTOs)) {
+					for (TdProjectPaymentDTO tdProjectPaymentDTO : tdProjectPaymentDTOs) {
+						TdGuaranteePaymentDTO guaranteePayment = tdProjectPaymentDTO.getGuaranteePayment();
+						if (guaranteePayment != null) {
+							TdGuaranteePaymentVO vo = BeanUtils.deepCopy(guaranteePayment, TdGuaranteePaymentVO.class);
+							if (vo != null) {
+								vo.setPeriod(tdProjectPaymentDTO.getPeriod());
+								switch (tdProjectPaymentDTO.getStatus()) {
+								case 1:
+									vo.setStatus("已结清");
+									break;
+								case 0:
+									vo.setStatus("逾期");
+									break;
+
+								default:
+									break;
+								}
+
+								vo.setAddDate(tdProjectPaymentDTO.getAddDate());
+								double principalAndInterest = vo.getPrincipalAndInterest() == null ? 0
+										: vo.getPrincipalAndInterest().doubleValue();
+								double penaltyAmount = vo.getPenaltyAmount() == null ? 0
+										: vo.getPenaltyAmount().doubleValue();
+								double tuandaiAmount = vo.getTuandaiAmount() == null ? 0
+										: vo.getTuandaiAmount().doubleValue();
+								double orgAmount = vo.getOrgAmount() == null ? 0 : vo.getOrgAmount().doubleValue();
+								double guaranteeAmount = vo.getGuaranteeAmount() == null ? 0
+										: vo.getGuaranteeAmount().doubleValue();
+								double arbitrationAmount = vo.getArbitrationAmount() == null ? 0
+										: vo.getArbitrationAmount().doubleValue();
+								double agencyAmount = vo.getAgencyAmount() == null ? 0
+										: vo.getAgencyAmount().doubleValue();
+
+								vo.setTotal(principalAndInterest + penaltyAmount + tuandaiAmount + orgAmount
+										+ guaranteeAmount + arbitrationAmount + agencyAmount);
+								tdGuaranteePaymentVOs.add(vo);
+							}
+						}
+					}
+				}
+
+				resultMap.put("returnAdvanceShareProfits", returnAdvanceShareProfits);
+				resultMap.put("tdGuaranteePaymentVOs", tdGuaranteePaymentVOs);
+
+				return Result.success(resultMap);
 			} else {
 				return Result.error("-99", "查询平台还垫付信息接口失败");
 			}
@@ -822,47 +885,49 @@ public class TdrepayRechargeController {
 		}
 
 	}
-	
+
 	/**
 	 * 导出资金分发数据
+	 * 
 	 * @param infoVOs
 	 */
 	@ApiOperation(value = "导出资金分发数据")
 	@PostMapping("/exportComplianceRepaymentData")
 	@ResponseBody
 	public void exportComplianceRepaymentData(@ModelAttribute ComplianceRepaymentVO vo) {
-		
+
 		try {
-			
-			ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+
+			ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder
+					.getRequestAttributes();
 			HttpServletResponse response = requestAttributes.getResponse();
 			ExcelData data = new ExcelData();
 			data.setName("资金分发数据");
-	        // 表头
-	        List<String> titles = new ArrayList<>();
-	        titles.add("业务编号");
-	        titles.add("业务类型");
-	        titles.add("还款方式");
-	        titles.add("借款人");
-	        titles.add("还款期数");
-	        titles.add("实还日期");
-	        titles.add("分公司");
-	        titles.add("状态");
-	        titles.add("流水合计");
-	        titles.add("实收总额");
-	        titles.add("充值金额");
-	        titles.add("平台状态");
-	        titles.add("分发状态");
-	        titles.add("备注");
-	        data.setTitles(titles);
-			
+			// 表头
+			List<String> titles = new ArrayList<>();
+			titles.add("业务编号");
+			titles.add("业务类型");
+			titles.add("还款方式");
+			titles.add("借款人");
+			titles.add("还款期数");
+			titles.add("实还日期");
+			titles.add("分公司");
+			titles.add("状态");
+			titles.add("流水合计");
+			titles.add("实收总额");
+			titles.add("充值金额");
+			titles.add("平台状态");
+			titles.add("分发状态");
+			titles.add("备注");
+			data.setTitles(titles);
+
 			if (vo != null && vo.getConfirmTimeEnd() != null) {
 				vo.setConfirmTimeEnd(DateUtil.addDay2Date(1, vo.getConfirmTimeEnd()));
 			}
 			int count = tdrepayRechargeService.countComplianceRepaymentData(vo);
 			if (count == 0) {
-				//生成本地
-		        ExcelUtils.exportExcel(response,"资金分发数据.xls",data);
+				// 生成本地
+				ExcelUtils.exportExcel(response, "资金分发数据.xls", data);
 			}
 
 			List<TdrepayRechargeLog> list = tdrepayRechargeService.queryComplianceRepaymentData(vo);
@@ -904,9 +969,9 @@ public class TdrepayRechargeController {
 					infoVOs.add(infoVO);
 				}
 			}
-			
-	        List<List<Object>> rows = new ArrayList<>();
-	        if (CollectionUtils.isNotEmpty(infoVOs)) {
+
+			List<List<Object>> rows = new ArrayList<>();
+			if (CollectionUtils.isNotEmpty(infoVOs)) {
 				for (TdrepayRechargeInfoVO infoVO : infoVOs) {
 					List<Object> row = new ArrayList<>();
 					row.add(infoVO.getOrigBusinessId());
@@ -926,12 +991,12 @@ public class TdrepayRechargeController {
 					rows.add(row);
 				}
 			}
- 
-	        data.setRows(rows);
- 
-	        //生成本地
-	        ExcelUtils.exportExcel(response,"资金分发数据.xlsx",data);
-			
+
+			data.setRows(rows);
+
+			// 生成本地
+			ExcelUtils.exportExcel(response, "资金分发数据.xlsx", data);
+
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			throw new ServiceRuntimeException(e.getMessage(), e);

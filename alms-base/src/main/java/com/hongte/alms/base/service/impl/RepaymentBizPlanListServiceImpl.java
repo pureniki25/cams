@@ -1,6 +1,7 @@
 package com.hongte.alms.base.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
@@ -17,6 +18,7 @@ import com.hongte.alms.base.entity.SysBankLimit;
 import com.hongte.alms.base.enums.RepayCurrentStatusEnums;
 import com.hongte.alms.base.enums.RepayedFlag;
 import com.hongte.alms.base.feignClient.XindaiFeign;
+import com.hongte.alms.base.feignClient.dto.BankCardInfo;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListMapper;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
@@ -119,13 +121,13 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
         for (FinanceManagerListVO financeManagerListVO : list) {
             businessSet.add(financeManagerListVO.getBusinessId());
             RepaymentResource repaymentResource = repaymentResourceService.selectOne(new EntityWrapper<RepaymentResource>().eq("org_business_id", financeManagerListVO.getOrgBusinessId()).eq("after_id", financeManagerListVO.getAfterId()));
-            if (repaymentResource != null) {
-                if (repaymentResource.getRepaySource().equals("30") || repaymentResource.getRepaySource().equals("31")) {//银行代扣
-                    financeManagerListVO.setBankRepay(true);
-                }
-            } else {//为空代表没有代扣过
-                financeManagerListVO.setBankRepay(false);
-            }
+//            if (repaymentResource != null) {
+//                if (repaymentResource.getRepaySource().equals("30") || repaymentResource.getRepaySource().equals("31")) {//银行代扣
+//                    financeManagerListVO.setBankRepay(true);
+//                }
+//            } else {//为空代表没有代扣过
+//                financeManagerListVO.setBankRepay(false);
+//            }
             /*未代扣确认的不能代扣*/
 //			if (financeManagerListVO.getConfirmFlag()==null||financeManagerListVO.getConfirmFlag().equals(0)) {
 //				financeManagerListVO.setCanWithhold(false);
@@ -158,13 +160,16 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
 
 
         }
-        /*
+
         try {
             Map<String, Map<String, BigDecimal>> map = new HashMap<>();
             for (FinanceManagerListVO financeManagerListVO : list) {
+                financeManagerListVO.setCanWithhold(false);
+                financeManagerListVO.setCanWithholdDesc(Constant.CANWITHHOLD_NO);
+
                 for (String businessId : businessSet) {
                     if (financeManagerListVO.getBusinessId().equals(businessId)) {
-                        financeManagerListVO.getBorrowMoney();
+                     BigDecimal planRepayAmount=financeManagerListVO.getPlanRepayAmount();
                         //查询身份证信息
                         BasicBusiness basicBusiness = basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", businessId));
                         String identityCard = basicBusiness.getCustomerIdentifyCard();
@@ -184,15 +189,31 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
                         logger.info("客户根据身份证号:" + identityCard + "获取银行卡信息，接口返回数据:" + respData.getData() + "," + respData.getReturnMessage());
                         if (respData.getData() != null) {
 
-                            JSONObject jsonObject = JSON.parseObject(respData.getData());
-                            if (jsonObject.containsKey("bankCode")) {
-                                String bankCode = jsonObject.getString("bankCode");
+                            JSONArray jsonObject = JSON.parseArray(respData.getData());
+
+                           List<BankCardInfo> bankList= jsonObject.toJavaList(BankCardInfo.class);
+                            if (bankList !=null) {
+                                financeManagerListVO.setCanWithhold(true); //有绑定平台可以进行代扣
+                                String bankCode = bankList.get(0).getBankCode();
                                 //查询单笔最高金额
                                 BigDecimal onceLimit = sysBankLimitService.selectOnceLimit(bankCode);
                                 //查询单日最高金额
                                 BigDecimal dayLimit = sysBankLimitService.selectMaxDayLimit(bankCode);
 
-//                                if()
+                                //若未绑定代扣平台取“否”，鼠标移到否时需提示文案为“该卡当前不支持代扣，请及时更换”
+                                //若为”是“则需情况进行文案提示：
+                                // A.该卡单次代扣限额>=本次还款金额，提示“限额足够，可一次代扣”；
+                                // B.该卡单次代扣限额<本次还款金额<=单日代扣限额，提示“单次限额不够，本次还款需要代扣x次。X=本次还款金额/单笔代扣额度 进1一次
+                                // C.卡单日代扣限额<本次还款金额，提示“代扣限额不足，请换卡”
+                                //planRepayAmount
+                                if(planRepayAmount.compareTo(onceLimit)<=0){
+                                    financeManagerListVO.setCanWithholdDesc(Constant.CANWITHHOLD_YES_1);
+                                }else if(planRepayAmount.compareTo(onceLimit)>0 && planRepayAmount.compareTo(dayLimit)<=0){
+                                    BigDecimal divide = planRepayAmount.divide(onceLimit).setScale(0, BigDecimal.ROUND_UP);
+                                    financeManagerListVO.setCanWithholdDesc(String.format(Constant.CANWITHHOLD_YES_2,divide.intValue()));
+                                }else if(planRepayAmount.compareTo(dayLimit)>0){
+                                    financeManagerListVO.setCanWithholdDesc(Constant.CANWITHHOLD_YES_3);
+                                }
                             }
                         }
                     }
@@ -203,7 +224,7 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
         } catch (Exception e) {
             logger.error("获取绑卡信息失败{}", e.getMessage());
         }
-*/
+        logger.info("=======财务列表list{}",JSON.toJSONString(list));
         return PageResult.success(list, count);
     }
 

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.hongte.alms.common.result.Result;
 
-@FeignClient(value = "alms-platrepay-service",url="http://192.168.13.151:30631")
+@FeignClient(value = "alms-platrepay-service")
 public interface PlatformRepaymentFeignClient {
 
 	/**
