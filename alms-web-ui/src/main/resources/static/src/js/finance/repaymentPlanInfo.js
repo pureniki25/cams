@@ -673,8 +673,8 @@ window.layinit(function (htConfig) {
 				axios.get(platRepayBasePath +"tdrepayRecharge/returnAdvanceShareProfit?projectId=" + projectId)
     	        .then(function (res) {
     	            if (res.data.data != null && res.data.code == 1) {
-    	            	vm.advancePaymentInfoData = res.data.data.returnAdvanceShareProfits;
-    	            	vm.queryGuaranteePaymentData = res.data.data.tdGuaranteePaymentVOs;
+    	            	app.advancePaymentInfoData = res.data.data.returnAdvanceShareProfits;
+    	            	app.queryGuaranteePaymentData = res.data.data.tdGuaranteePaymentVOs;
     	            } else {
     	            	app.$Modal.error({content: res.data.msg });
     	            }
