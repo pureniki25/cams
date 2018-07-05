@@ -746,6 +746,7 @@ public class FinanceController {
 	@ApiOperation(value = "分润")
 	@PostMapping("/shareProfit")
 	public Result shareProfit(@RequestParam("businessId") String businessId,@RequestParam("afterId") String afterId,@RequestParam("logId") Integer logId){
+		logger.info("@shareProfit@自动代扣核销--开始[{}{}{}]", businessId,afterId,logId);
 		Result result=new Result();
 		WithholdingRepaymentLog log=withholdingRepaymentLogService.selectById(logId);
 	
@@ -774,6 +775,7 @@ public class FinanceController {
 //			req.setRepaySource(list);
 			shareProfitService.execute(req, true);
               result.success(1);
+      		logger.info("@shareProfit@自动代扣核销--开始[{}{}{}]", businessId,afterId,logId);
 		} catch (Exception ex) {
 			logger.error("分润出现异常"+ex);
 			return Result.error("-1","分润出现异常"+ex);
