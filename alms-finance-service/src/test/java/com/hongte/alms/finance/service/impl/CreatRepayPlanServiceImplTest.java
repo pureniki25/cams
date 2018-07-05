@@ -766,7 +766,7 @@ public class CreatRepayPlanServiceImplTest {
 
     @Test
     public void testQueryRepayPlanByBusinessId() {
-    	PlanReturnInfoDto dto = creatRepayPlanService.queryRepayPlanByBusinessId("TSYD1012018051901");
+    	PlanReturnInfoDto dto = creatRepayPlanService.queryRepayPlanByBusinessId("TDF1012018052402");
     	System.out.println(dto);
     }
 
