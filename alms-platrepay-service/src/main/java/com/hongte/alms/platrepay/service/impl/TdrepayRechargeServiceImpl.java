@@ -1562,7 +1562,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			}
 		}
 
-		paramDTO.setTotalAmount(BigDecimal.valueOf(totalAmount));
+		paramDTO.setTotalAmount(BigDecimal.valueOf(totalAmount).setScale(2, BigDecimal.ROUND_HALF_UP));
 
 		/*
 		 * 2、开始调用偿还垫付接口
