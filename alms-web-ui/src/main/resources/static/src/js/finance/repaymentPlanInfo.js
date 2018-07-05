@@ -22,6 +22,7 @@ window.layinit(function (htConfig) {
         	repayDifferenceFlag: false, 	// 差额弹窗控制标识
         	repayOtherFeeFlag: false, // 其他费用弹窗控制标识(业务维度)
         	repayProjOtherFeeFlag: false, // 其他费用弹窗控制标识（标维度）
+        	businessSurplus:0, // 用户账户结余
         	
         	// -- 实还流水 --
         	actualPaymentRecordList: [],
@@ -373,6 +374,7 @@ window.layinit(function (htConfig) {
         	        .then(function (res) {
         	            if (res.data.data != null && res.data.code == 1) {
         	            	app.bizRepaymentPlanList = res.data.data.resultList;
+        	            	app.businessSurplus = res.data.data.businessSurplus;
         	            } else {
         	            	app.$Modal.error({content: res.data.msg });
         	            }

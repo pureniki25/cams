@@ -70,6 +70,7 @@ import com.hongte.alms.base.mapper.RepaymentProjPlanListDetailMapper;
 import com.hongte.alms.base.mapper.RepaymentProjPlanListMapper;
 import com.hongte.alms.base.mapper.RepaymentProjPlanMapper;
 import com.hongte.alms.base.mapper.RepaymentResourceMapper;
+import com.hongte.alms.base.mapper.TransferOfLitigationMapper;
 import com.hongte.alms.base.mapper.TuandaiProjectInfoMapper;
 import com.hongte.alms.base.process.entity.Process;
 import com.hongte.alms.base.process.mapper.ProcessMapper;
@@ -143,6 +144,9 @@ public class FinanceServiceImpl implements FinanceService {
 	@Autowired
 	@Qualifier("RepaymentProjPlanListDetailService")
 	private RepaymentProjPlanListDetailService repaymentProjPlanListDetailService;
+	
+	@Autowired
+	private TransferOfLitigationMapper transferOfLitigationMapper;
 
 	private static final String SEND_DATA_PLATFORM_SPLIT_SYMBOL = "\\t";
 
@@ -1507,9 +1511,11 @@ public class FinanceServiceImpl implements FinanceService {
 											.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
 
 						}
+						
 						infoDTOs.add(balanceRepayment);
 						resultList.addAll(infoDTOs);
 						resultMap.put("resultList", resultList);
+						resultMap.put("businessSurplus", transferOfLitigationMapper.queryOverRepayMoneyByBusinessId(businessId));
 					}
 					return resultMap;
 				}
