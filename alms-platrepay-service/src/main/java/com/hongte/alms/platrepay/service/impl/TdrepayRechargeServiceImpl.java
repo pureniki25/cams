@@ -1678,6 +1678,8 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 				|| !Constant.REMOTE_EIP_SUCCESS_CODE.equals(queryProjectPaymentResult.getReturnCode())
 				|| advanceShareProfitResult == null
 				|| !Constant.REMOTE_EIP_SUCCESS_CODE.equals(advanceShareProfitResult.getReturnCode())) {
+			LOG.info("从平台获取标的还款信息或还垫付信息异常，返回结果垫付信息：{} --- 还垫付信息：{}", queryProjectPaymentResult,
+					advanceShareProfitResult);
 			throw new ServiceRuntimeException("从平台获取标的还款信息或还垫付信息异常");
 		}
 

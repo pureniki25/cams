@@ -6,6 +6,7 @@ import com.hongte.alms.base.vo.withhold.WithholdLimitListReq;
 import com.hongte.alms.base.vo.withhold.WithholdLimitListVo;
 import com.hongte.alms.common.mapper.SuperMapper;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -21,4 +22,8 @@ public interface SysBankLimitMapper extends SuperMapper<SysBankLimit> {
     List<WithholdLimitListVo> getWithholdLimitPageList(WithholdLimitListReq withholdLimitListReq);
 
     int countWithholdLimitPageList(WithholdLimitListReq withholdLimitListReq);
+
+    BigDecimal selectOnceLimit(String bankCode);
+
+    BigDecimal selectMaxDayLimit(String bankCode);
 }

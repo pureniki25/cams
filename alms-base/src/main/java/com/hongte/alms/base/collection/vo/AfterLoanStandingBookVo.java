@@ -3,6 +3,8 @@ package com.hongte.alms.base.collection.vo;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.jeecgframework.poi.excel.annotation.Excel;
 import org.jeecgframework.poi.excel.annotation.ExcelTarget;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
@@ -16,6 +18,8 @@ import java.util.Date;
 //@Table(name = "t_user")
 @ExcelTarget("afterLoanStandingBookVo")
 public class AfterLoanStandingBookVo implements java.io.Serializable  {
+
+    private Logger logger = LoggerFactory.getLogger(AfterLoanStandingBookVo.class);
 
     @Excel(name = "业务编号", orderNum = "1",  isImportField = "true_st")
     private String businessId; //业务编号
@@ -359,10 +363,23 @@ public class AfterLoanStandingBookVo implements java.io.Serializable  {
 	 */
 	public void setPeroidStatus() {
 		String res = "" ;
+
+
+
 		boolean isZQ = this.afterId.indexOf("ZQ")>-1?true:false;
 		if (getPeriods().equals(new Integer(1))&&!isZQ) {
 			res = res.concat("首期");
 		}
+        if(getRepaymentTypeId() ==null || getBorrowLimit() == null ||getPeriods()== null ){
+                logger.error("getRepaymentTypeId ,getBorrowLimit,getPeriods 其中一项为空。 ");
+            if(getBusinessId() !=null){
+                logger.error("getBusinessId 为："+getBusinessId());
+            }
+            if(getAfterId()!=null){
+                logger.error("getAfterId 为："+getAfterId());
+            }
+            return;
+        }
 		if (getRepaymentTypeId().equals(new Integer(2))&&getBorrowLimit().equals(getPeriods())) {
 			if (res.length()>0) {
 				res = res.concat("/");

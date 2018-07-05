@@ -173,7 +173,23 @@ window.layinit(function (htConfig) {
                         title: '是否支持代扣',
                         key: 'canWithhold',
                         render: (h, p) => {
-                            return h('span', (p.row.canWithhold && p.row.canWithhold == true ? '支持代扣' : '不支持代扣'));
+                            // return h('span', (p.row.canWithhold && p.row.canWithhold == true ? '支持代扣' : '不支持代扣'));
+                            return h('p', [
+                                h('Tooltip', {
+                                    props: {
+                                        placement: 'top',
+                                        transfer: true
+                                    }
+                                }, [//这个中括号表示是Tooltip标签的子标签
+                                    (p.row.canWithhold && p.row.canWithhold == true ? '是' : '否'),//表格列显示文字
+                                    h('p', {
+                                        slot: 'content',
+                                        style: {
+                                            whiteSpace: 'normal'
+                                        }
+                                    }, p.row.canWithholdDesc)
+                                ])
+                            ]);
                         }
                     },
                     {
@@ -250,12 +266,12 @@ window.layinit(function (htConfig) {
                                                     }
                                              
                                                     if (call == 'withhold') {debugger
-//                                                    	 if (p.row.status == '已还款') {
-//                                                             app.$Message.warning({
-//                                                                 content: '已还款不能代扣'
-//                                                             });
-//                                                             return;
-//                                                         }
+                                                    	 if (p.row.status == '已还款') {
+                                                             app.$Message.warning({
+                                                                 content: '已还款不能代扣'
+                                                             });
+                                                             return;
+                                                         }
 			                                         
                                                         let url = getDeductionUrl(p.row.planListId);
                                                         layer.open({
@@ -411,12 +427,12 @@ window.layinit(function (htConfig) {
                 app.search()
             },
             revokeConfirm(p) {debugger
-             	 if (p.bankRepay== true) {
-                     app.$Message.warning({
-                         content: '银行代扣不能撤销'
-                     });
-                     return;
-                 }
+//             	 if (p.bankRepay== true) {
+//                     app.$Message.warning({
+//                         content: '银行代扣不能撤销'
+//                     });
+//                     return;
+//                 }
                 app.$Modal.confirm({
                     content:'是否确认取消还款?',
                     onOk(){

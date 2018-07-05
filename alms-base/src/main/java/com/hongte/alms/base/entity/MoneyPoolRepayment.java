@@ -3,6 +3,7 @@ package com.hongte.alms.base.entity;
 import java.io.Serializable;
 
 import com.baomidou.mybatisplus.enums.IdType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
@@ -149,18 +150,21 @@ public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
 	 */
 	@TableField("create_time")
 	@ApiModelProperty(required = true, value = "创建时间")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createTime;
 	/**
 	 * 更新人
 	 */
 	@TableField("update_user")
 	@ApiModelProperty(required = true, value = "更新人")
+
 	private String updateUser;
 	/**
 	 * 更新时间
 	 */
 	@TableField("update_time")
 	@ApiModelProperty(required = true, value = "更新时间")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date updateTime;
 	/**
 	 * 记录是否被删除，1已删除，0或null未删除
@@ -179,6 +183,7 @@ public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
 	 */
 	@TableField("delete_time")
 	@ApiModelProperty(required = true, value = "删除时间")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date deleteTime;
 	/**
 	 * 记账金额(元)
@@ -191,6 +196,7 @@ public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
 	 */
 	@TableField("trade_date")
 	@ApiModelProperty(required = true, value = "转入时间")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date tradeDate;
 	/**
 	 * 创建人角色,客户/财务
@@ -544,11 +550,13 @@ public class MoneyPoolRepayment extends Model<MoneyPoolRepayment> {
 			this.tradePlace = repayInfo.getTradePlace();
 		}
 		if (repayInfo.getUserId() != null && !repayInfo.getUserId().equals("")) {
-			this.createUser = repayInfo.getUserId();
+			this.updateUser = repayInfo.getUserId();
 		}
+		this.updateTime=new Date();
 		if (repayInfo.getTradeType() != null && !repayInfo.getTradeType().equals("")) {
 			this.tradeType = repayInfo.getTradeType();
 		}
+
 
 		if (this.state.equals(RepayRegisterFinanceStatus.还款登记被拒绝.toString())
 				|| this.state.equals(RepayRegisterFinanceStatus.还款待确认.toString())

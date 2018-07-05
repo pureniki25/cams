@@ -90,7 +90,7 @@
 		  `tb_tdrepay_recharge_log` t 
 		WHERE
 			<include refid="ComplianceRepaymentDataCondition"/>
-		ORDER BY t.`confirm_time`
+		ORDER BY t.`confirm_time` DESC
 		LIMIT ${(page-1) * limit}, ${limit}
 	</select>
 	
@@ -113,7 +113,7 @@
 		  tb_tdrepay_recharge_log t 
 		WHERE t.`project_id` = #{projectId,jdbcType=VARCHAR}
 		  AND t.`confirm_log_id` = #{confirmLogId,jdbcType=VARCHAR}
-		  AND t.`is_valid` = 1 
+		  AND t.`is_valid` = 1
 	</select>
 
 </mapper>

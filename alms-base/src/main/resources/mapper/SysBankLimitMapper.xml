@@ -66,4 +66,14 @@
         </if>
     </select>
 
+    <select id="selectOnceLimit" resultType="BigDecimal">
+            select max(once_limit) from tb_sys_bank_limit t where 1=1
+            AND  t.bank_code=#{bankCode}
+    </select>
+    <select id="selectMaxDayLimit" resultType="BigDecimal">
+        select max(day_limit) from tb_sys_bank_limit t where 1=1
+        AND  t.bank_code=#{bankCode}
+    </select>
+
+
 </mapper>
