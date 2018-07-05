@@ -1880,7 +1880,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			List<DistributeFundRecordVO> distributeFundRecordVOs = new ArrayList<>();
 			List<TdrepayRechargeLog> tdrepayRechargeLogs = tdrepayRechargeLogService
 					.selectList(new EntityWrapper<TdrepayRechargeLog>().eq("project_id", projectId).eq("is_valid", 1)
-							.orderBy("period"));
+							.orderBy("after_id", false));
 			if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
 				for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
 					DistributeFundRecordVO vo = BeanUtils.deepCopy(tdrepayRechargeLog, DistributeFundRecordVO.class);
