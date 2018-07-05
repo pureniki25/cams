@@ -196,7 +196,7 @@ public class MoneyPoolRepaymentXindaiDTO implements Serializable{
 		this.afterbusiness_id = afterId;
 		this.operate_id = repayment.getOperateId();
 		this.operate_name = repayment.getOperateName();
-		this.claimDate = repayment.getClaimDate() == null ? null : dateTimeFormat.format(repayment.getClaimDate());
+		this.claimDate = dateTimeFormat.format(repayment.getTradeDate());
 		this.state = repayment.getState();
 		this.reserve_1 = repayment.getAccountMoney() == null ? null : repayment.getAccountMoney().toString();
 		this.income_type = repayment.getIncomeType();
