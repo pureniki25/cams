@@ -134,7 +134,7 @@ window.layinit(function (htConfig) {
                 },
                 {
                 	title: '状态',
-                    key: 'confirmFlag',
+                    key: 'confirmFlagStr',
                     align: 'center',
                 },
         	],

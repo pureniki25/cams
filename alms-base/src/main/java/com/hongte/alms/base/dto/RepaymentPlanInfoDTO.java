@@ -84,7 +84,11 @@ public class RepaymentPlanInfoDTO implements Serializable {
 	/**
 	 * 财务确认状态
 	 */
-	private String confirmFlag;
+	private int confirmFlag;
+	/**
+	 * 财务确认状态
+	 */
+	private String confirmFlagStr;
 
 	public String getPlanListId() {
 		return planListId;
@@ -230,12 +234,20 @@ public class RepaymentPlanInfoDTO implements Serializable {
 		this.amount = amount;
 	}
 
-	public String getConfirmFlag() {
+	public int getConfirmFlag() {
 		return confirmFlag;
 	}
 
-	public void setConfirmFlag(String confirmFlag) {
+	public void setConfirmFlag(int confirmFlag) {
 		this.confirmFlag = confirmFlag;
+	}
+
+	public String getConfirmFlagStr() {
+		return confirmFlagStr;
+	}
+
+	public void setConfirmFlagStr(String confirmFlagStr) {
+		this.confirmFlagStr = confirmFlagStr;
 	}
 
 	@Override
@@ -246,7 +258,7 @@ public class RepaymentPlanInfoDTO implements Serializable {
 				+ ", subtotal=" + subtotal + ", overdueDays=" + overdueDays + ", onlineLateFee=" + onlineLateFee
 				+ ", offlineLateFee=" + offlineLateFee + ", onlineDerateAmount=" + onlineDerateAmount
 				+ ", offlineDerateAmount=" + offlineDerateAmount + ", surplus=" + surplus + ", total=" + total
-				+ ", amount=" + amount + ", confirmFlag=" + confirmFlag + "]";
+				+ ", amount=" + amount + ", confirmFlag=" + confirmFlag + ", confirmFlagStr=" + confirmFlagStr + "]";
 	}
 
 }
