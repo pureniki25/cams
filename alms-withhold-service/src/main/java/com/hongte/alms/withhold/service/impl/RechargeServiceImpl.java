@@ -636,7 +636,6 @@ public class RechargeServiceImpl implements RechargeService {
 		log.setBoolLastRepay(boolLastRepay);
 		log.setBoolPartRepay(boolPartRepay);
 		log.setCreateTime(new Date());
-		log.setCreateUser(loginUserInfoHelper.getUserId());
 		log.setIdentityCard(business.getCustomerIdentifyCard());
 		log.setMerchOrderId(merchOrderId);
 		log.setOriginalBusinessId(business.getBusinessId());
@@ -657,7 +656,9 @@ public class RechargeServiceImpl implements RechargeService {
 		log.setUpdateTime(new Date());
 		if (loginUserInfoHelper != null && !StringUtil.isEmpty(loginUserInfoHelper.getUserId())) {
 			log.setUpdateUser(loginUserInfoHelper.getUserId());
+			log.setCreateUser(loginUserInfoHelper.getUserId());
 		} else {
+			log.setCreateUser("auto_run");
 			log.setUpdateUser("auto_run");
 		}
 
