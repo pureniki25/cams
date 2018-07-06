@@ -617,7 +617,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		int orgType = -1;
 
 		switch (businessType) {
-		case 25:
+		case 30:
 			orgType = 0;
 			break;
 		case 26:
