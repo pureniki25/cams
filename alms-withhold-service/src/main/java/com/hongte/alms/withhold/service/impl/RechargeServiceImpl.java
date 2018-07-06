@@ -834,15 +834,19 @@ public class RechargeServiceImpl implements RechargeService {
 	private boolean isApplyDerate(RepaymentBizPlanList list) {
 		boolean isApplyDerate;
 		ApplyDerateProcess applyDerateProcess=applyDerateProcessService.selectOne(new EntityWrapper<ApplyDerateProcess>().eq("crp_id", list.getPlanListId()));
-		
-		applyDerateProcess.getProcessId();
-		int i=processService.selectCount(new EntityWrapper<Process>().eq("process_result", 1));//减免申请成功通过记录条数
-		int j=processService.selectCount(new EntityWrapper<Process>().isNull("process_result").ne("status", 2).ne("status", 3));//减免申请中的记录条数
-		if((i+j)>0) {
-			isApplyDerate=true;
+		if(applyDerateProcess!=null) {
+			applyDerateProcess.getProcessId();
+			int i=processService.selectCount(new EntityWrapper<Process>().eq("process_result", 1));//减免申请成功通过记录条数
+			int j=processService.selectCount(new EntityWrapper<Process>().isNull("process_result").ne("status", 2).ne("status", 3));//减免申请中的记录条数
+			if((i+j)>0) {
+				isApplyDerate=true;
+			}else {
+				isApplyDerate=false;
+			}
 		}else {
 			isApplyDerate=false;
 		}
+	
 		return isApplyDerate;
 	}
 	
