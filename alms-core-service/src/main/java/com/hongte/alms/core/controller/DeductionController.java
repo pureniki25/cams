@@ -153,12 +153,18 @@ public class DeductionController {
             	//查看当前期还款的总金额
         	
         		BigDecimal factAmountSum=BigDecimal.valueOf(0);
-        		boolean isBankRepay=false;//是否含有银行代扣
+        		boolean isBankRepay=false;//是否含有银行代扣,否则就是含有第三方
                 List<RepaymentConfirmLog> comfirmLogs=repaymentConfirmLogService.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("org_business_id", planList.getOrigBusinessId()).eq("after_id", planList.getAfterId()));
         		for(RepaymentConfirmLog log:comfirmLogs) {
         			factAmountSum=factAmountSum.add(log.getFactAmount());
         			if(log.getRepaySource()==31||log.getRepaySource()==30) {
         				isBankRepay=true;
+        				deductionVo.setCanUseBank(isBankRepay);
+        			}
+        			
+        			if(log.getRepaySource()==21||log.getRepaySource()==20) {
+        				isBankRepay=false;
+        				deductionVo.setCanUseBank(isBankRepay);
         			}
         		}
         		

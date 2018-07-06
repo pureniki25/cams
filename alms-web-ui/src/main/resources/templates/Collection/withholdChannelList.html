@@ -96,7 +96,7 @@
                 :mask-closable="false">
             <i-form ref="withHoldChanelForm" :model="withHoldChanelForm" :rules="withHoldChanelValidate" :label-width="150">
                 <form-item label="渠道类型：" prop="platformId">
-                    <i-select v-model="withHoldChanelForm.platformId" clearable filterable @on-change="platformOnChange($event)" >
+                    <i-select v-model="withHoldChanelForm.platformId" clearable filterable  @on-change="platformOnChange($event)" >
                         <i-option v-for="item in platformType" :value="item.platformId" :key="item.platformId">{{
                             item.platformName }}
                         </i-option>
@@ -104,11 +104,11 @@
                 </form-item>
                 <form-item label="银行代扣渠道编号：" prop="subPlatformId">
                     <i-input v-model="withHoldChanelForm.subPlatformId" placeholder="银行代扣渠道编号" maxlength="30"
-                             style="width: 176px" :disabled="false" ></i-input>
+                             style="width: 176px" :disabled="disabledFlag" ></i-input>
                 </form-item>
                 <form-item label="银行代扣渠道名称：" prop="subPlatformName">
-                    <i-input v-model="withHoldChanelForm.subPlatformName" placeholder="银行代扣渠道名称" maxlength="30"
-                             style="width: 176px" :disabled="false" ></i-input>
+                    <i-input v-model="withHoldChanelForm.subPlatformName"  ref="subPlatformName" placeholder="银行代扣渠道名称" maxlength="30"
+                             style="width: 176px" :disabled="disabledFlag" ></i-input>
                 </form-item>
 
                 <form-item label="代扣优先级：" prop="channelLevel">
