@@ -480,7 +480,8 @@
 		  WHEN '还款中' 
 		  THEN 0
 		  ELSE -1 
-		  END  confirmFlag 
+		  END  confirmFlag,
+		  '' confirmFlagStr
 		FROM
 		  `tb_repayment_biz_plan_list` rbpl,
 		  `tb_repayment_biz_plan_list_detail` rbpld 
@@ -607,7 +608,8 @@
 		  WHEN '还款中' 
 		  THEN 0
 		  ELSE -1 
-		  END  confirmFlag 
+		  END  confirmFlag,
+		  rbpl.remark confirmFlagStr
 		FROM
 		  `tb_repayment_biz_plan_list` rbpl,
 		  `tb_repayment_biz_plan_list_detail` rbpld 
@@ -817,7 +819,8 @@
 		  WHEN '还款中' 
 		  THEN 0
 		  ELSE -1 
-		  END confirmFlag
+		  END confirmFlag,
+		  rppl.remark confirmFlagStr
 		FROM
 		  `tb_repayment_proj_plan_list` rppl,
 		  `tb_repayment_proj_plan_list_detail` rppld,
