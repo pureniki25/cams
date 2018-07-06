@@ -140,6 +140,125 @@ window.layinit(function (htConfig) {
         	],
         	// 还款计划表头  -- end --
         	
+        	// 还款计划表头  -- start --
+        	repayBizPlanColumns: [
+        		{
+        			title: '期数',
+        			key: 'afterId',
+        			align: 'center',
+        			width: 100,
+        		},
+        		{
+        			title: '还款类型',
+        			key: 'repayment',
+        			align: 'center',
+        			width: 100,
+        		},
+        		{
+        			title: '还款日期',
+        			key: 'repaymentDate',
+        			align: 'center',
+        			width: 100,
+        		},
+        		{
+        			title: '本金',
+        			key: 'principal',
+        			align: 'center',
+        			width: 100,
+        		},
+        		{
+        			title: '利息',
+        			key: 'accrual',
+        			align: 'center',
+        			width: 100,
+        		},
+        		{
+        			title: '月收分公司服务费',
+        			key: 'serviceCharge',
+        			align: 'center',
+        			width: 100,
+        		},
+        		{
+        			title: '月收平台费',
+        			key: 'platformCharge',
+        			align: 'center',
+        			width: 100,
+        		},
+        		{
+        			title: '其他费用',
+        			key: 'otherFee',
+        			align: 'center',
+        			width: 100,
+        			render:(h,p)=>{
+        				if(p.row.repayment=='实际还款'){
+        					return h('a',{
+        						style:{
+        							textDecoration:'underline'
+        						},
+        						on:{
+        							click:function(){
+    									app.openRepayOtherFee(p.row.planListId)
+        							}
+        						}
+        					},p.row.otherFee)
+        				}else{
+        					return p.row.otherFee
+        				}
+        				
+        			}
+        		},
+        		{
+        			title: '小计',
+        			key: 'subtotal',
+        			align: 'center',
+        			width: 100,
+        		},
+        		{
+        			title: '逾期天数',
+        			key: 'overdueDays',
+        			align: 'center',
+        			width: 100,
+        			render:(h,p)=>{
+        				if(p.row.repayment=='差额'){
+        					return ''
+        				}else{
+        					return p.row.overdueDays
+        				}
+        				
+        			}
+        		},
+        		{
+        			title: '线上滞纳金',
+        			key: 'onlineLateFee',
+        			align: 'center',
+        			width: 100,
+        		},
+        		{
+        			title: '线下滞纳金',
+        			key: 'offlineLateFee',
+        			align: 'center',
+        			width: 100,
+        		},
+        		{
+        			title: '结余',
+        			key: 'surplus',
+        			align: 'center',
+        			width: 100,
+        		},
+        		{
+        			title: '还款合计（含滞纳金）',
+        			key: 'total',
+        			align: 'center',
+        			width: 100,
+        		},
+        		{
+        			title: '状态',
+        			key: 'confirmFlagStr',
+        			width: 500,
+        		},
+        		],
+        		// 还款计划表头  -- end --
+        	
         	repayPlanColumnsData: [], // 计划还款数据
     		repayActualColumnsData: [], // 实际还款数据
     		repayDifferenceColumnsData: [], // 差额数据

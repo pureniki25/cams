@@ -8,9 +8,12 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import lombok.Data;
+
 /**
  * @author 王继光 2018年5月3日 下午3:10:11
  */
+@Data
 public class FinanceManagerListVO {
 
 	// 业务编号 期数 部门 主办 客户姓名 业务类型 还款日期 还款登记日期 还款金额 会计确认状态 状态 是否支持代扣
@@ -41,6 +44,11 @@ public class FinanceManagerListVO {
 	 * 客户姓名
 	 */
 	private String customer;
+	
+	/**
+	 * 是否主借款人
+	 */
+	private Boolean ismainCustomer ; 
 	/**
 	 * 业务类型
 	 */
@@ -120,260 +128,4 @@ public class FinanceManagerListVO {
 	private Integer srcType;
 	
 
-	public boolean isBankRepay() {
-		return bankRepay;
-	}
-
-	public void setBankRepay(boolean bankRepay) {
-		this.bankRepay = bankRepay;
-	}
-
-	public String getBusinessId() {
-		return businessId;
-	}
-
-	public void setBusinessId(String businessId) {
-		this.businessId = businessId;
-	}
-
-	public String getAfterId() {
-		return afterId;
-	}
-
-	public void setAfterId(String afterId) {
-		this.afterId = afterId;
-	}
-
-	public String getDept() {
-		return dept;
-	}
-
-	public void setDept(String dept) {
-		this.dept = dept;
-	}
-
-	public String getOperator() {
-		return operator;
-	}
-
-	public void setOperator(String operator) {
-		this.operator = operator;
-	}
-
-	public String getCustomer() {
-		return customer;
-	}
-
-	public void setCustomer(String customer) {
-		this.customer = customer;
-	}
-
-	public String getBusinessType() {
-		return businessType;
-	}
-
-	public void setBusinessType(String businessType) {
-		this.businessType = businessType;
-	}
-
-	public Date getPlanRepayDate() {
-		return planRepayDate;
-	}
-
-	public void setPlanRepayDate(Date planRepayDate) {
-		this.planRepayDate = planRepayDate;
-	}
-
-	public Date getFactRepayDate() {
-		return factRepayDate;
-	}
-
-	public void setFactRepayDate(Date factRepayDate) {
-		this.factRepayDate = factRepayDate;
-	}
-
-	public BigDecimal getPlanRepayAmount() {
-		return planRepayAmount;
-	}
-
-	public void setPlanRepayAmount(BigDecimal planRepayAmount) {
-		this.planRepayAmount = planRepayAmount;
-	}
-
-	public String getFinanceConfirmStatus() {
-		return financeConfirmStatus;
-	}
-
-	public void setFinanceConfirmStatus(String financeConfirmStatus) {
-		this.financeConfirmStatus = financeConfirmStatus;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
-	}
-
-	public boolean isCanWithhold() {
-		return canWithhold;
-	}
-
-	public void setCanWithhold(boolean canWithhold) {
-		this.canWithhold = canWithhold;
-	}
-
-	/**
-	 * @return the planListId
-	 */
-	public String getPlanListId() {
-		return planListId;
-	}
-
-	/**
-	 * @param planListId
-	 *            the planListId to set
-	 */
-	public void setPlanListId(String planListId) {
-		this.planListId = planListId;
-	}
-
-	public String getBorrowMoney() {
-		return borrowMoney;
-	}
-
-	public void setBorrowMoney(String borrowMoney) {
-		this.borrowMoney = borrowMoney;
-	}
-
-	public String getRepaymentType() {
-		return repaymentType;
-	}
-
-	public void setRepaymentType(String repaymentType) {
-		this.repaymentType = repaymentType;
-	}
-
-	public String getBorrowLimit() {
-		return borrowLimit;
-	}
-
-	public void setBorrowLimit(String borrowLimit) {
-		this.borrowLimit = borrowLimit;
-	}
-
-	public String getPhoneNumber() {
-		return phoneNumber;
-	}
-
-	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = phoneNumber;
-	}
-
-	/**
-	 * @return the planId
-	 */
-	public String getPlanId() {
-		return planId;
-	}
-
-	/**
-	 * @param planId the planId to set
-	 */
-	public void setPlanId(String planId) {
-		this.planId = planId;
-	}
-
-	/**
-	 * @return the confirmFlag
-	 */
-	public Integer getConfirmFlag() {
-		return confirmFlag;
-	}
-
-	/**
-	 * @param confirmFlag the confirmFlag to set
-	 */
-	public void setConfirmFlag(Integer confirmFlag) {
-		this.confirmFlag = confirmFlag;
-	}
-
-	/**
-	 * @return the orgBusinessId
-	 */
-	public String getOrgBusinessId() {
-		return orgBusinessId;
-	}
-
-	/**
-	 * @param orgBusinessId the orgBusinessId to set
-	 */
-	public void setOrgBusinessId(String orgBusinessId) {
-		this.orgBusinessId = orgBusinessId;
-	}
-
-	/**
-	 * @return the period
-	 */
-	public Integer getPeriod() {
-		return period;
-	}
-
-	/**
-	 * @param period the period to set
-	 */
-	public void setPeriod(Integer period) {
-		this.period = period;
-	}
-
-	/**
-	 * @return the repaidAmount
-	 */
-	public BigDecimal getRepaidAmount() {
-		return repaidAmount;
-	}
-
-	/**
-	 * @param repaidAmount the repaidAmount to set
-	 */
-	public void setRepaidAmount(BigDecimal repaidAmount) {
-		this.repaidAmount = repaidAmount;
-	}
-
-	/**
-	 * @return the srcType
-	 */
-	public Integer getSrcType() {
-		return srcType;
-	}
-
-	/**
-	 * @param srcType the srcType to set
-	 */
-	public void setSrcType(Integer srcType) {
-		this.srcType = srcType;
-	}
-
-	/**
-	 * @return the repayStatus
-	 */
-	public String getRepayStatus() {
-		return repayStatus;
-	}
-
-	/**
-	 * @param repayStatus the repayStatus to set
-	 */
-	public void setRepayStatus(String repayStatus) {
-		this.repayStatus = repayStatus;
-	}
-
-	public String getCanWithholdDesc() {
-		return canWithholdDesc;
-	}
-
-	public void setCanWithholdDesc(String canWithholdDesc) {
-		this.canWithholdDesc = canWithholdDesc;
-	}
 }

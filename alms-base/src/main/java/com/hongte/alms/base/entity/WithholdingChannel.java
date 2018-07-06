@@ -50,10 +50,19 @@ public class WithholdingChannel extends Model<WithholdingChannel> {
 	@TableField("sub_platform_id")
 	@ApiModelProperty(required= true,value = "银行代扣平台子渠道")
 	private String subPlatformId;
-	
-	
-	
-	 /**
+
+
+	/**
+	 * 银行代扣平台子渠道名称
+	 */
+	@TableField("sub_platform_name")
+	@ApiModelProperty(required= true,value = "银行代扣平台子渠道名称")
+	private String subPlatformName;
+
+
+
+
+	/**
      * 银行代码
      */
 	@TableField("bank_code")
@@ -177,6 +186,14 @@ public class WithholdingChannel extends Model<WithholdingChannel> {
 		this.updateUser = updateUser;
 	}
 
+	public String getSubPlatformName() {
+		return subPlatformName;
+	}
+
+	public void setSubPlatformName(String subPlatformName) {
+		this.subPlatformName = subPlatformName;
+	}
+
 	@Override
 	protected Serializable pkVal() {
 		return this.channelId;
@@ -213,6 +230,7 @@ public class WithholdingChannel extends Model<WithholdingChannel> {
 				", level=" + level +
 				", platformId=" + platformId +
 				", subPlatformId='" + subPlatformId + '\'' +
+				", subPlatformName='" + subPlatformName + '\'' +
 				", bankCode='" + bankCode + '\'' +
 				", channelStatus=" + channelStatus +
 				", failTimes=" + failTimes +

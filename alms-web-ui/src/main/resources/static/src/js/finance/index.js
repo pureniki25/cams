@@ -57,6 +57,13 @@ window.layinit(function (htConfig) {
                         key: 'customer'
                     },
                     {
+                        title:'是否主借款人',
+                        key:'ismainCustomer',
+                        render:(h,p)=>{
+                            return h('span',p.row.ismainCustomer?'是':'否')
+                        }
+                    },
+                    {
                         title: '业务类型',
                         key: 'businessType'
                     },
@@ -139,6 +146,7 @@ window.layinit(function (htConfig) {
                     {
                         title: '状态',
                         key: 'status',
+                        width:200,
                         render: (h, p) => {
                             var s1 = p.row.planRepayDate;
                             s1 = new Date(s1.replace(/-/g, "/"));
@@ -207,7 +215,7 @@ window.layinit(function (htConfig) {
                                             click: function () {
                                                 if (link) {
 
-                                                    if (p.row.status == '已还款') {
+                                                    if (p.row.status == '全部已还款') {
                                                         app.$Message.warning({
                                                             content: '当前计划已还款'
                                                         });

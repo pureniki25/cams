@@ -51,15 +51,30 @@ public class DeductionVo {
     private BasicBusiness business;
     private RepaymentBizPlanList pList;
     private boolean isCanUseThirty;//是否可以用第三方代扣
-    private boolean canUseBank;//是否可以用银行代扣
+    private boolean haveBankRepay;//是否含有银行代扣
+    private boolean haveThirtyRepay;//是否含有用电放代扣
+    private boolean haveUnderRepay;//是否含有线下转账
     
     
  
-	public boolean isCanUseBank() {
-		return canUseBank;
+	
+	public boolean isHaveBankRepay() {
+		return haveBankRepay;
 	}
-	public void setCanUseBank(boolean canUseBank) {
-		this.canUseBank = canUseBank;
+	public void setHaveBankRepay(boolean haveBankRepay) {
+		this.haveBankRepay = haveBankRepay;
+	}
+	public boolean isHaveThirtyRepay() {
+		return haveThirtyRepay;
+	}
+	public void setHaveThirtyRepay(boolean haveThirtyRepay) {
+		this.haveThirtyRepay = haveThirtyRepay;
+	}
+	public boolean isHaveUnderRepay() {
+		return haveUnderRepay;
+	}
+	public void setHaveUnderRepay(boolean haveUnderRepay) {
+		this.haveUnderRepay = haveUnderRepay;
 	}
 	public BigDecimal getUnderLineFactOverDueMoney() {
 		return underLineFactOverDueMoney;

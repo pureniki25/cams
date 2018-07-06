@@ -192,7 +192,8 @@
 			pl.after_id as afterId ,
 			b.company_id as dept,
 			b.operator_name as operator,
-			b.customer_name as customer,
+			bbc.customer_name as customer,
+			bbc.ismain_customer as ismainCustomer,
 			bbc.phone_number as phoneNumber,
 			b.business_ctype as businessType ,
 			pl.due_date as planRepayDate ,
@@ -220,9 +221,9 @@
 			CASE
 				pl.repay_status 
 				WHEN 1 THEN '部分还款' 
-				WHEN 2 THEN '部分还款' 
-				WHEN 3 THEN pl.current_status
-				ELSE NULL
+				WHEN 2 THEN '线上已还款' 
+				WHEN 3 THEN '全部已还款'
+				ELSE '未还款'
 			END 
 				as repayStatus,
 			pl.accountant_confirm_status as financeConfirmStatus,
@@ -230,16 +231,20 @@
 			b.src_type as srcType
 		FROM
 			tb_repayment_biz_plan_list pl
-		JOIN
+		JOIN 
 			tb_basic_business b ON b.business_id = pl.orig_business_id
-		LEFT JOIN
-			tb_basic_business_customer bbc ON b.business_id = bbc.business_id
-		LEFT JOIN
+		LEFT JOIN 
 			tb_basic_company bc ON bc.area_id = b.company_id
-		LEFT JOIN
-			tb_tuandai_project_info pi ON pi.business_id = pl.business_id
-		LEFT JOIN
-			tb_money_pool_repayment mpr ON mpr.plan_list_id = pl.plan_list_id
+		left join 
+			tb_repayment_proj_plan_list rppl ON pl.plan_list_id = rppl.plan_list_id
+		left join 
+			tb_repayment_proj_plan rpp ON rppl.proj_plan_id = rpp.proj_plan_id
+		LEFT JOIN 
+			tb_tuandai_project_info pi ON rpp.project_id = pi.project_id
+		LEFT JOIN 
+			tb_basic_biz_customer bbc ON pi.customer_id = bbc.customer_id
+		LEFT JOIN 
+			tb_money_pool_repayment mpr ON mpr.plan_list_id = pl.plan_list_id 
 		<where>
 			1 = 1
 			<if test="customer != null">
@@ -480,7 +485,8 @@
 		  WHEN '还款中' 
 		  THEN 0
 		  ELSE -1 
-		  END  confirmFlag 
+		  END  confirmFlag,
+		  '' confirmFlagStr
 		FROM
 		  `tb_repayment_biz_plan_list` rbpl,
 		  `tb_repayment_biz_plan_list_detail` rbpld 
@@ -607,7 +613,8 @@
 		  WHEN '还款中' 
 		  THEN 0
 		  ELSE -1 
-		  END  confirmFlag 
+		  END  confirmFlag,
+		  rbpl.remark confirmFlagStr
 		FROM
 		  `tb_repayment_biz_plan_list` rbpl,
 		  `tb_repayment_biz_plan_list_detail` rbpld 
@@ -817,7 +824,8 @@
 		  WHEN '还款中' 
 		  THEN 0
 		  ELSE -1 
-		  END confirmFlag
+		  END confirmFlag,
+		  rppl.remark confirmFlagStr
 		FROM
 		  `tb_repayment_proj_plan_list` rppl,
 		  `tb_repayment_proj_plan_list_detail` rppld,
