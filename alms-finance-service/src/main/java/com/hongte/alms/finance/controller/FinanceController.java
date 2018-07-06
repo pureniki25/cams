@@ -1037,4 +1037,21 @@ public class FinanceController {
 		}
 	}
 
+	@RequestMapping("/lastRepayConfirm")
+	@ApiOperation(value="查询上次还款来源")
+	public Result lastRepayConfirm(String businessId,String afterId) {
+		try {
+			logger.info("@lastRepayConfirm@查询上次还款来源--开始[{}]");
+			List<RepaymentConfirmLog> list = confrimLogService.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("org_business_id", businessId).eq("after_id",afterId).orderBy("idx",false));
+			if (list==null||list.size()==0) {
+				logger.info("@lastRepayConfirm@查询上次还款来源--结束[0]");
+				return Result.success(0);
+			}
+			logger.info("@lastRepayConfirm@查询上次还款来源--结束[{}]",list.get(0).getRepaySource());
+			return Result.success(list.get(0).getRepaySource());
+		} catch (Exception e) {
+			logger.info("@lastRepayConfirm@查询上次还款来源--结束[{}]",e.getMessage());
+			return Result.error("查询上次还款来源异常");
+		}
+	}
 }

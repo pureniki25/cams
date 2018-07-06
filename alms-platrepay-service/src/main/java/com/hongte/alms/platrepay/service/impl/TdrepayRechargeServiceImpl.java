@@ -307,9 +307,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	 */
 	@SuppressWarnings("rawtypes")
 	private void handleSendDistributeFundResult(List<TdrepayRechargeInfoVO> vos, String userId, Result result) {
-		if (result != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
-			updateTdrepayRechargeLogProcessStatus(vos, 2, userId);
-		} else {
+		if (result == null || !Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
 			updateTdrepayRechargeLogProcessStatus(vos, 3, userId);
 		}
 	}
@@ -617,7 +615,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		int orgType = -1;
 
 		switch (businessType) {
-		case 25:
+		case 30:
 			orgType = 0;
 			break;
 		case 26:

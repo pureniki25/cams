@@ -1394,12 +1394,6 @@ public class FinanceServiceImpl implements FinanceService {
 
 				for (RepaymentPlanInfoDTO repaymentPlanInfoDTO : repaymentPlanInfoDTOs) {
 					
-					repaymentPlanInfoDTO.setConfirmFlagStr(RepayPlanPayedTypeEnum.descOf(repaymentPlanInfoDTO.getConfirmFlag()));
-					
-					if (repaymentPlanInfoDTO.getConfirmFlag() == -1) {
-						repaymentPlanInfoDTO.setConfirmFlagStr("逾期");
-					}
-
 					double accrual = repaymentPlanInfoDTO.getAccrual();
 					double principal = repaymentPlanInfoDTO.getPrincipal();
 					double serviceCharge = repaymentPlanInfoDTO.getServiceCharge();
@@ -1461,6 +1455,11 @@ public class FinanceServiceImpl implements FinanceService {
 						for (RepaymentPlanInfoDTO infoDTO : infoDTOs) {
 							String repayment = infoDTO.getRepayment();
 							if ("计划还款".equals(repayment)) {
+								infoDTO.setConfirmFlagStr(RepayPlanPayedTypeEnum.descOf(infoDTO.getConfirmFlag()));
+								
+								if (infoDTO.getConfirmFlag() == -1) {
+									infoDTO.setConfirmFlagStr("逾期");
+								}
 								planInfoDTO = infoDTO; // infoDTOs.get(0) 根据sql取数规则，必定为计划还款
 							} else if ("实际还款".equals(repayment)) {
 								// accrual += infoDTO.getAccrual();
@@ -1605,10 +1604,6 @@ public class FinanceServiceImpl implements FinanceService {
 			if (CollectionUtils.isNotEmpty(repaymentProjInfoDTOs)) {
 
 				for (RepaymentProjInfoDTO repaymentProjInfoDTO : repaymentProjInfoDTOs) {
-					repaymentProjInfoDTO.setConfirmFlagStr(RepayPlanPayedTypeEnum.descOf(repaymentProjInfoDTO.getConfirmFlag()));
-					if (repaymentProjInfoDTO.getConfirmFlag() == -1) {
-						repaymentProjInfoDTO.setConfirmFlagStr("逾期");
-					}
 					String projPlanListId = repaymentProjInfoDTO.getProjPlanListId();
 					RepaymentProjInfoDTO dto = mapPlanDTO.get(projPlanListId);
 

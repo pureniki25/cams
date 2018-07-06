@@ -40,6 +40,7 @@ window.layinit(function (htConfig) {
 
             };
             return {
+                disabledFlag: true,
                 withHoldChanelModel: false,
                 platformType: [],
                 loading: false,
@@ -54,6 +55,8 @@ window.layinit(function (htConfig) {
                     remark: '',
                     channelLevel: '',
                     channelId: '',
+                    subPlatformId:'',
+                    subPlatformName:''
                 },
 
                 withHoldChanelValidate: {
@@ -181,11 +184,22 @@ window.layinit(function (htConfig) {
                             vm.withHoldChanelForm.remark = data.remark;
                             vm.withHoldChanelForm.channelId = data.channelId;
                             vm.withHoldChanelForm.channelLevel = data.level;
+                            vm.withHoldChanelForm.subPlatformId = data.subPlatformId;
+                            vm.withHoldChanelForm.subPlatformName = data.subPlatformName;
                         }
                     })
                     .catch(function (error) {
                         vm.$Modal.error({content: '接口调用异常!'});
                     });
+            },
+            platformOnChange(e){
+
+                if(e ==5){
+                    this.disabledFlag = false;
+                }else {
+                    this.disabledFlag = true;
+                }
+
             },
             addHoldChannel(name) {
                 // console.log("addHoldChannel",addHoldChannel);
@@ -199,6 +213,8 @@ window.layinit(function (htConfig) {
                 var remark = vm.withHoldChanelForm.remark;
                 var channelId = vm.withHoldChanelForm.channelId;
                 var level = vm.withHoldChanelForm.channelLevel;
+                var subPlatformId = vm.withHoldChanelForm.subPlatformId;
+                var subPlatformName = vm.withHoldChanelForm.subPlatformName;
 
                 console.log("platformId", typeof platformId);
                 console.log("channelStatus", typeof channelStatus);
@@ -215,7 +231,9 @@ window.layinit(function (htConfig) {
                                     failTimes: failTimes,
                                     remark: remark,
                                     channelId: channelId,
-                                    level: level
+                                    level: level,
+                                    subPlatformId: subPlatformId,
+                                    subPlatformName: subPlatformName
                                 }
                             })
                             .then(function (res) {

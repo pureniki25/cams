@@ -658,7 +658,7 @@ public class RechargeServiceImpl implements RechargeService {
 		if (loginUserInfoHelper != null && !StringUtil.isEmpty(loginUserInfoHelper.getUserId())) {
 			log.setUpdateUser(loginUserInfoHelper.getUserId());
 		} else {
-			log.setUpdateUser("admin");
+			log.setUpdateUser("auto_run");
 		}
 
 		log.setCurrentAmount(currentAmount);// 本次代扣金额
@@ -785,11 +785,14 @@ public class RechargeServiceImpl implements RechargeService {
 		}
 		
 		RepaymentProjPlanList projPList=repaymentProjPlanListService.selectOne(new EntityWrapper<RepaymentProjPlanList>().eq("plan_list_id", pList.getPlanListId()));
-		if(projPList.getPlateType()==2) {//你我金融的不代扣
-			result.setCode("-1");
-			result.setMsg("你我金融的不能自动代扣");
-			return result;
+		if(projPList!=null) {
+			if(projPList.getPlateType()==2) {//你我金融的不代扣
+				result.setCode("-1");
+				result.setMsg("你我金融的不能自动代扣");
+				return result;
+			}
 		}
+		
 	
 		
 //		RepaymentBizPlanList next = repaymentBizPlanListService
@@ -834,15 +837,19 @@ public class RechargeServiceImpl implements RechargeService {
 	private boolean isApplyDerate(RepaymentBizPlanList list) {
 		boolean isApplyDerate;
 		ApplyDerateProcess applyDerateProcess=applyDerateProcessService.selectOne(new EntityWrapper<ApplyDerateProcess>().eq("crp_id", list.getPlanListId()));
-		
-		applyDerateProcess.getProcessId();
-		int i=processService.selectCount(new EntityWrapper<Process>().eq("process_result", 1));//减免申请成功通过记录条数
-		int j=processService.selectCount(new EntityWrapper<Process>().isNull("process_result").ne("status", 2).ne("status", 3));//减免申请中的记录条数
-		if((i+j)>0) {
-			isApplyDerate=true;
+		if(applyDerateProcess!=null) {
+			applyDerateProcess.getProcessId();
+			int i=processService.selectCount(new EntityWrapper<Process>().eq("process_result", 1));//减免申请成功通过记录条数
+			int j=processService.selectCount(new EntityWrapper<Process>().isNull("process_result").ne("status", 2).ne("status", 3));//减免申请中的记录条数
+			if((i+j)>0) {
+				isApplyDerate=true;
+			}else {
+				isApplyDerate=false;
+			}
 		}else {
 			isApplyDerate=false;
 		}
+	
 		return isApplyDerate;
 	}
 	

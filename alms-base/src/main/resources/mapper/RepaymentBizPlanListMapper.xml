@@ -220,9 +220,9 @@
 			CASE
 				pl.repay_status 
 				WHEN 1 THEN '部分还款' 
-				WHEN 2 THEN '部分还款' 
-				WHEN 3 THEN pl.current_status
-				ELSE NULL
+				WHEN 2 THEN '线上已还款' 
+				WHEN 3 THEN '全部已还款'
+				ELSE '未还款'
 			END 
 				as repayStatus,
 			pl.accountant_confirm_status as financeConfirmStatus,
@@ -356,7 +356,7 @@
 	     <include refid="Base_Column_List"/>
        from tb_repayment_biz_plan_list   
 	  
-	  where confirm_flag=1   <![CDATA[ and (date_sub(curdate(),interval #{days} day)<=due_date) and  due_date<=curdate()]]>     <![CDATA[ and    `current_status`  <>'已还款' ]]> and src_type=2
+	  where confirm_flag=1   <![CDATA[  and  due_date<=curdate()]]>     <![CDATA[ and    `current_status`  <>'已还款' ]]> and src_type=2
 	  
     </select>
     
@@ -480,7 +480,8 @@
 		  WHEN '还款中' 
 		  THEN 0
 		  ELSE -1 
-		  END  confirmFlag 
+		  END  confirmFlag,
+		  '' confirmFlagStr
 		FROM
 		  `tb_repayment_biz_plan_list` rbpl,
 		  `tb_repayment_biz_plan_list_detail` rbpld 
@@ -607,7 +608,8 @@
 		  WHEN '还款中' 
 		  THEN 0
 		  ELSE -1 
-		  END  confirmFlag 
+		  END  confirmFlag,
+		  rbpl.remark confirmFlagStr
 		FROM
 		  `tb_repayment_biz_plan_list` rbpl,
 		  `tb_repayment_biz_plan_list_detail` rbpld 
@@ -737,7 +739,7 @@
 		  rppl.`proj_plan_list_id` projPlanListId,
 		  '实际还款' repayment,
 		  rppl.`after_id` afterId,
-		  rppl.`due_date` repaymentDate,
+		  rppl.`fact_repay_date` repaymentDate,
 		  rpp.`project_id`,
 		  tpi.`real_name`,
 		  -- 实还本金总额
@@ -817,7 +819,8 @@
 		  WHEN '还款中' 
 		  THEN 0
 		  ELSE -1 
-		  END confirmFlag
+		  END confirmFlag,
+		  rppl.remark confirmFlagStr
 		FROM
 		  `tb_repayment_proj_plan_list` rppl,
 		  `tb_repayment_proj_plan_list_detail` rppld,
