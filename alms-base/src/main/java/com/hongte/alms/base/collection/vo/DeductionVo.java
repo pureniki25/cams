@@ -50,11 +50,17 @@ public class DeductionVo {
     private BankCardInfo bankCardInfo;
     private BasicBusiness business;
     private RepaymentBizPlanList pList;
-    private boolean isCanUseThirty;//是否可以用第三方嗲口
-    
+    private boolean isCanUseThirty;//是否可以用第三方代扣
+    private boolean canUseBank;//是否可以用银行代扣
     
     
  
+	public boolean isCanUseBank() {
+		return canUseBank;
+	}
+	public void setCanUseBank(boolean canUseBank) {
+		this.canUseBank = canUseBank;
+	}
 	public BigDecimal getUnderLineFactOverDueMoney() {
 		return underLineFactOverDueMoney;
 	}
