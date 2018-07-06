@@ -2,6 +2,7 @@ package com.hongte.alms.base.service;
 
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.entity.SysFinancialOrder;
+import com.hongte.alms.base.vo.finance.SysFinancialOrderReq;
 import com.hongte.alms.base.vo.finance.SysFinancialOrderVO;
 import com.hongte.alms.common.service.BaseService;
 
@@ -32,7 +33,7 @@ public interface SysFinancialOrderService extends BaseService<SysFinancialOrder>
      * @author 张贵宏
      * @date 2018/6/19 9:42
      */
-    void save(SysFinancialOrderVO sysFinancialOrderVO);
+    void save(SysFinancialOrderReq sysFinancialOrderVO);
 
     /**
      *  按id删除
@@ -42,5 +43,5 @@ public interface SysFinancialOrderService extends BaseService<SysFinancialOrder>
      * @author 张贵宏
      * @date 2018/6/19 9:44
      */
-    void delete(Integer id, String userId);
+    void delete(Integer id);
 }

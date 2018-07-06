@@ -473,7 +473,14 @@
 		  WHERE t1.plan_list_id = t2.plan_list_id 
 		    AND t1.plan_list_id = rbpl.plan_list_id) amount,
 		  0 otherFee,
-		  current_status confirmFlag 
+		  0 surplus,
+		  CASE rbpl.`current_status`
+		  WHEN '已还款' 
+		  THEN rbpl.`repay_flag`
+		  WHEN '还款中' 
+		  THEN 0
+		  ELSE -1 
+		  END  confirmFlag 
 		FROM
 		  `tb_repayment_biz_plan_list` rbpl,
 		  `tb_repayment_biz_plan_list_detail` rbpld 
@@ -586,7 +593,21 @@
 		    AND t1.plan_list_id = rbpl.plan_list_id 
 		    AND t2.account_status = 0 
 		    AND t2.plan_item_type NOT IN (10, 20, 30, 50, 60)) otherFee,
-		  current_status confirmFlag 
+		  (SELECT 
+		    IFNULL(SUM(t.over_repay_money), 0) over_repay_money_1 
+		  FROM
+		    `tb_accountant_over_repay_log` t 
+		  WHERE t.freeze_status != 1 
+		    AND t.money_type = 1 
+		    AND t.business_id = #{businessId,jdbcType=VARCHAR} 
+		    AND t.business_after_id = rbpl.after_id) surplus,
+		  CASE rbpl.`current_status`
+		  WHEN '已还款' 
+		  THEN rbpl.`repay_flag`
+		  WHEN '还款中' 
+		  THEN 0
+		  ELSE -1 
+		  END  confirmFlag 
 		FROM
 		  `tb_repayment_biz_plan_list` rbpl,
 		  `tb_repayment_biz_plan_list_detail` rbpld 
@@ -692,7 +713,13 @@
 		  WHERE t1.proj_plan_list_id = t2.proj_plan_list_id 
 		    AND t1.proj_plan_list_id = rppl.proj_plan_list_id) amount,
 		  0 otherFee,
-		  rppl.current_status confirmFlag
+		  CASE rppl.`current_status`
+		  WHEN '已还款' 
+		  THEN rppl.`repay_flag`
+		  WHEN '还款中' 
+		  THEN 0
+		  ELSE -1 
+		  END confirmFlag
 		FROM
 		  `tb_repayment_proj_plan_list` rppl,
 		  `tb_repayment_proj_plan_list_detail` rppld,
@@ -710,7 +737,7 @@
 		  rppl.`proj_plan_list_id` projPlanListId,
 		  '实际还款' repayment,
 		  rppl.`after_id` afterId,
-		  rppl.`due_date` repaymentDate,
+		  rppl.`fact_repay_date` repaymentDate,
 		  rpp.`project_id`,
 		  tpi.`real_name`,
 		  -- 实还本金总额
@@ -784,7 +811,13 @@
 		  WHERE t1.proj_plan_list_id = t2.proj_plan_list_id 
 		    AND t1.proj_plan_list_id = rppl.proj_plan_list_id) amount,
 		  0 otherFee,
-		  rppl.current_status confirmFlag
+		  CASE rppl.`current_status`
+		  WHEN '已还款' 
+		  THEN rppl.`repay_flag`
+		  WHEN '还款中' 
+		  THEN 0
+		  ELSE -1 
+		  END confirmFlag
 		FROM
 		  `tb_repayment_proj_plan_list` rppl,
 		  `tb_repayment_proj_plan_list_detail` rppld,

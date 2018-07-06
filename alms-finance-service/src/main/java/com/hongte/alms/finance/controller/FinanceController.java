@@ -943,6 +943,25 @@ public class FinanceController {
 	}
 
 
+    @ApiOperation(value = "获取区域信息")
+    @GetMapping("/company/getCompanyAreaList")
+    @ResponseBody
+    public Result<Map<String, JSONArray>> getCompanyAreaList(@RequestParam("id") String id) {
+        int type;
+        if ("1".equals(id)) {//区域
+            type = AreaLevel.AREA_LEVEL.getKey();
+        } else {//分公司
+            type = AreaLevel.COMPANY_LEVEL.getKey();
+        }
+        Map<String, JSONArray> retMap = new HashMap<String, JSONArray>();
+        //区域
+        List<BasicCompany> area_list = basicCompanyService.selectList(new EntityWrapper<BasicCompany>().eq("area_level", type));
+        retMap.put("area", (JSONArray) JSON.toJSON(area_list, JsonUtil.getMapping()));
+
+        return Result.success(retMap);
+    }
+
+
 	@RequestMapping("/search")
 	@ApiOperation("查询")
 	public PageResult search(ServletRequest request, LayTableQuery query) {
@@ -981,18 +1000,13 @@ public class FinanceController {
 
 	@RequestMapping("/edit")
 	@ApiOperation("编辑")
-	public Result edit(SysFinancialOrderVO vo) {
-		if(StringUtils.isBlank(vo.getUserId())){
+    public Result edit(@RequestBody SysFinancialOrderReq vo) {
+        if (vo.getCompanyId() == null || vo.getCompanyId().size() == 0 || vo.getBusinessType() == null || vo.getBusinessType().size() == 0 || vo.getCollectionGroup1Users() == null || vo.getCollectionGroup1Users().size() == 0) {
 			return Result.error("参数验证失败");
 		}
 		try{
-
-			if(vo.getId() == null){
-				//新增
-				sysFinancialOrderService.save(vo);
-			}else{
-				//编辑
-			}
+            //新增
+            sysFinancialOrderService.save(vo);
 			return  Result.success();
 		}catch (Exception e){
 			logger.error("设置财务人员跟单设置失败", e);
@@ -1000,7 +1014,7 @@ public class FinanceController {
 		}
 	}
 
-	@RequestMapping("/delete")
+	/*@RequestMapping("/delete")
 	@ApiOperation(value = "删除")
 	public  Result delete(Integer id, String userId){
 		try{
@@ -1010,6 +1024,36 @@ public class FinanceController {
 			logger.error(e.getMessage());
 			return Result.error(e.getMessage());
 		}
+	}*/
+
+
+	@RequestMapping("/delete")
+	@ApiOperation(value = "删除")
+    public Result delete(Integer id) {
+		try{
+            sysFinancialOrderService.delete(id);
+			return Result.success();
+		}catch (Exception e){
+			logger.error(e.getMessage());
+			return Result.error(e.getMessage());
+		}
 	}
 
+	@RequestMapping("/lastRepayConfirm")
+	@ApiOperation(value="查询上次还款来源")
+	public Result lastRepayConfirm(String businessId,String afterId) {
+		try {
+			logger.info("@lastRepayConfirm@查询上次还款来源--开始[{}]");
+			List<RepaymentConfirmLog> list = confrimLogService.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("org_business_id", businessId).eq("after_id",afterId).orderBy("idx",false));
+			if (list==null||list.size()==0) {
+				logger.info("@lastRepayConfirm@查询上次还款来源--结束[0]");
+				return Result.success(0);
+			}
+			logger.info("@lastRepayConfirm@查询上次还款来源--结束[{}]",list.get(0).getRepaySource());
+			return Result.success(list.get(0).getRepaySource());
+		} catch (Exception e) {
+			logger.info("@lastRepayConfirm@查询上次还款来源--结束[{}]",e.getMessage());
+			return Result.error("查询上次还款来源异常");
+		}
+	}
 }

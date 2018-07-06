@@ -9,6 +9,7 @@ import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
+import com.hongte.alms.base.entity.RepaymentConfirmLog;
 import com.hongte.alms.base.entity.SysBank;
 import com.hongte.alms.base.entity.WithholdingPlatform;
 import com.hongte.alms.base.entity.WithholdingRecordLog;
@@ -23,6 +24,7 @@ import com.hongte.alms.base.vo.module.BankLimitVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.vo.PageResult;
+import com.mysql.cj.core.io.BigDecimalValueFactory;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -81,6 +83,9 @@ public class DeductionController {
     @Qualifier("SysBankService")
     SysBankService sysBankService;
     
+    @Autowired
+    @Qualifier("RepaymentConfirmLogService")
+    RepaymentConfirmLogService repaymentConfirmLogService;
     @Autowired
     @Qualifier("MoneyPoolRepaymentService")
     MoneyPoolRepaymentService moneyPoolRepaymentService;
@@ -150,11 +155,20 @@ public class DeductionController {
             	deductionVo.setUnderLineFactOverDueMoney(underLineFactOverDueMoney);
             	//查看当前期还款的总金额
         	
-        		BigDecimal factAmountSum=getPerListFactAmountSum(planList);
+        		BigDecimal factAmountSum=BigDecimal.valueOf(0);
+        		boolean isBankRepay=false;//是否含有银行嗲口
+                List<RepaymentConfirmLog> comfirmLogs=repaymentConfirmLogService.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("org_business_id", planList.getOrigBusinessId()).eq("after_id", planList.getAfterId()));
+        		for(RepaymentConfirmLog log:comfirmLogs) {
+        			factAmountSum=factAmountSum.add(log.getFactAmount());
+        			if(log.getRepaySource()==31||log.getRepaySource()==30) {
+        				isBankRepay=true;
+        			}
+        		}
+        		
         		//线上费用
         		BigDecimal onLineAmount=BigDecimal.valueOf(deductionVo.getTotal()).subtract(underLineOverDueMoney);
-        		//如果是线上部分还款的话，不能使用第三方代扣线下费用
-        		if(factAmountSum.compareTo(BigDecimal.valueOf(0))>0&&factAmountSum.compareTo(onLineAmount)<0) {
+        		//如果是银行代扣线上部分还款的话，不能使用第三方代扣线下费用
+        		if(factAmountSum.compareTo(BigDecimal.valueOf(0))>0&&factAmountSum.compareTo(onLineAmount)<0&&isBankRepay==true) {
         			deductionVo.setCanUseThirty(false);
         		}else {
         			deductionVo.setCanUseThirty(true);

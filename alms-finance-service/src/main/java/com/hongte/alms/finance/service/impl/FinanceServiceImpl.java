@@ -53,6 +53,7 @@ import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.enums.RepayRegisterState;
 import com.hongte.alms.base.enums.RepayedFlag;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanPayedTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.mapper.AccountantOverRepayLogMapper;
@@ -1392,6 +1393,12 @@ public class FinanceServiceImpl implements FinanceService {
 				Map<String, List<RepaymentPlanInfoDTO>> map = new TreeMap<>();
 
 				for (RepaymentPlanInfoDTO repaymentPlanInfoDTO : repaymentPlanInfoDTOs) {
+					
+					repaymentPlanInfoDTO.setConfirmFlagStr(RepayPlanPayedTypeEnum.descOf(repaymentPlanInfoDTO.getConfirmFlag()));
+					
+					if (repaymentPlanInfoDTO.getConfirmFlag() == -1) {
+						repaymentPlanInfoDTO.setConfirmFlagStr("逾期");
+					}
 
 					double accrual = repaymentPlanInfoDTO.getAccrual();
 					double principal = repaymentPlanInfoDTO.getPrincipal();
@@ -1401,7 +1408,7 @@ public class FinanceServiceImpl implements FinanceService {
 							- repaymentPlanInfoDTO.getOfflineDerateAmount();
 					double onlineLateFee = repaymentPlanInfoDTO.getOnlineLateFee()
 							- repaymentPlanInfoDTO.getOnlineDerateAmount();
-					double surplus = 0; // 结余
+					double surplus = repaymentPlanInfoDTO.getSurplus(); // 结余
 
 					// 小计：本金+利息+月收分公司服务费+月收平台费
 					repaymentPlanInfoDTO
@@ -1410,7 +1417,7 @@ public class FinanceServiceImpl implements FinanceService {
 
 					// 还款合计（含滞纳金）：小计+线上滞纳金+线下滞纳金+结余
 					repaymentPlanInfoDTO.setTotal(
-							BigDecimal.valueOf(onlineLateFee + offlineLateFee + repaymentPlanInfoDTO.getSubtotal())
+							BigDecimal.valueOf(onlineLateFee + offlineLateFee + repaymentPlanInfoDTO.getSubtotal() + surplus)
 									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
 
 					String afterId = repaymentPlanInfoDTO.getAfterId();
@@ -1463,9 +1470,9 @@ public class FinanceServiceImpl implements FinanceService {
 								// platformCharge += infoDTO.getPlatformCharge();
 								// onlineLateFee += infoDTO.getOnlineLateFee();
 								// surplus += infoDTO.getSurplus();
-								infoDTO.setSurplus((infoDTO.getAmount() - planInfoDTO.getAmount()) < 0 ? 0
-										: BigDecimal.valueOf((infoDTO.getAmount() - planInfoDTO.getAmount()))
-												.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+//								infoDTO.setSurplus((infoDTO.getAmount() - planInfoDTO.getAmount()) < 0 ? 0
+//										: BigDecimal.valueOf((infoDTO.getAmount() - planInfoDTO.getAmount()))
+//												.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
 								// infoDTO.setTotal(infoDTO.getTotal() + infoDTO.getSurplus());
 								// 完成上一步没有加上的结余数据
 								// if (factRepayDate == null) {
@@ -1539,6 +1546,8 @@ public class FinanceServiceImpl implements FinanceService {
 			if (CollectionUtils.isNotEmpty(repaymentProjInfoDTOs)) {
 
 				for (RepaymentProjInfoDTO repaymentProjInfoDTO : repaymentProjInfoDTOs) {
+					
+					repaymentProjInfoDTO.setConfirmFlagStr(RepayPlanPayedTypeEnum.descOf(repaymentProjInfoDTO.getConfirmFlag()));
 
 					double accrual = repaymentProjInfoDTO.getAccrual();
 					double principal = repaymentProjInfoDTO.getPrincipal();
@@ -1581,6 +1590,10 @@ public class FinanceServiceImpl implements FinanceService {
 
 			if (CollectionUtils.isNotEmpty(planDTOs)) {
 				for (RepaymentProjInfoDTO repaymentProjInfoDTO : planDTOs) {
+					repaymentProjInfoDTO.setConfirmFlagStr(RepayPlanPayedTypeEnum.descOf(repaymentProjInfoDTO.getConfirmFlag()));
+					if (repaymentProjInfoDTO.getConfirmFlag() == -1) {
+						repaymentProjInfoDTO.setConfirmFlagStr("逾期");
+					}
 					String projPlanListId = repaymentProjInfoDTO.getProjPlanListId();
 					RepaymentProjInfoDTO dto = mapPlanDTO.get(projPlanListId);
 					if (dto == null) {
@@ -1592,6 +1605,10 @@ public class FinanceServiceImpl implements FinanceService {
 			if (CollectionUtils.isNotEmpty(repaymentProjInfoDTOs)) {
 
 				for (RepaymentProjInfoDTO repaymentProjInfoDTO : repaymentProjInfoDTOs) {
+					repaymentProjInfoDTO.setConfirmFlagStr(RepayPlanPayedTypeEnum.descOf(repaymentProjInfoDTO.getConfirmFlag()));
+					if (repaymentProjInfoDTO.getConfirmFlag() == -1) {
+						repaymentProjInfoDTO.setConfirmFlagStr("逾期");
+					}
 					String projPlanListId = repaymentProjInfoDTO.getProjPlanListId();
 					RepaymentProjInfoDTO dto = mapPlanDTO.get(projPlanListId);
 

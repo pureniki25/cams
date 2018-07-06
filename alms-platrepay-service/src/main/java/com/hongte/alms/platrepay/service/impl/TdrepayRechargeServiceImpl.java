@@ -1527,14 +1527,18 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 			switch (feeType) {
 			case 10: // 本金
-				paramDTO.setPrincipalAndInterest(feeValue);
-				tdrepayAdvanceLog.setPrincipalAndInterest(feeValue);
+				BigDecimal principalInterest1 = BigDecimal
+						.valueOf(principalAndInterestDouble + (feeValue == null ? 0 : doubleFeeValue))
+						.setScale(2, BigDecimal.ROUND_HALF_UP);
+				paramDTO.setPrincipalAndInterest(principalInterest1);
+				tdrepayAdvanceLog.setPrincipalAndInterest(principalInterest1);
 				break;
 			case 20: // 利息
-				BigDecimal principalInterest = BigDecimal
-						.valueOf(principalAndInterestDouble + (feeValue == null ? 0 : doubleFeeValue));
-				paramDTO.setPrincipalAndInterest(principalInterest);
-				tdrepayAdvanceLog.setPrincipalAndInterest(principalInterest);
+				BigDecimal principalInterest2 = BigDecimal
+						.valueOf(principalAndInterestDouble + (feeValue == null ? 0 : doubleFeeValue))
+						.setScale(2, BigDecimal.ROUND_HALF_UP);
+				paramDTO.setPrincipalAndInterest(principalInterest2);
+				tdrepayAdvanceLog.setPrincipalAndInterest(principalInterest2);
 				break;
 			case 30: // 平台服务费
 				paramDTO.setTuandaiAmount(feeValue);
@@ -1562,7 +1566,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			}
 		}
 
-		paramDTO.setTotalAmount(BigDecimal.valueOf(totalAmount));
+		paramDTO.setTotalAmount(BigDecimal.valueOf(totalAmount).setScale(2, BigDecimal.ROUND_HALF_UP));
 
 		/*
 		 * 2、开始调用偿还垫付接口
@@ -1880,7 +1884,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			List<DistributeFundRecordVO> distributeFundRecordVOs = new ArrayList<>();
 			List<TdrepayRechargeLog> tdrepayRechargeLogs = tdrepayRechargeLogService
 					.selectList(new EntityWrapper<TdrepayRechargeLog>().eq("project_id", projectId).eq("is_valid", 1)
-							.orderBy("period"));
+							.orderBy("after_id", false));
 			if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
 				for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
 					DistributeFundRecordVO vo = BeanUtils.deepCopy(tdrepayRechargeLog, DistributeFundRecordVO.class);

@@ -2,6 +2,7 @@ package com.hongte.alms.base.util;
 
 import java.awt.Color;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.util.List;
 
@@ -113,7 +114,11 @@ public class ExcelUtils {
 			for (Object cellData : rowData) {
 				Cell cell = dataRow.createCell(colIndex);
 				if (cellData != null) {
-					cell.setCellValue(cellData.toString());
+					if (cellData instanceof BigDecimal) {
+						cell.setCellValue(Double.parseDouble(cellData.toString()));
+					}else {
+						cell.setCellValue(cellData.toString());
+					}
 				} else {
 					cell.setCellValue("");
 				}

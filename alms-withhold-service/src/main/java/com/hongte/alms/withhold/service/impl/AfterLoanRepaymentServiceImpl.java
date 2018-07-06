@@ -4,17 +4,22 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.WithholdingRepaymentLog;
 import com.hongte.alms.base.feignClient.CustomerInfoXindaiRemoteApi;
 import com.hongte.alms.base.feignClient.dto.BankCardInfo;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
+import com.hongte.alms.base.service.WithholdingRepaymentLogService;
+import com.hongte.alms.base.vo.withhold.Data;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.withhold.feignClient.WithHoldingClient;
 import com.hongte.alms.withhold.service.AfterLoanRepaymentService;
 import com.hongte.alms.withhold.service.RechargeService;
 import com.hongte.alms.withhold.service.WithholdingService;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -44,6 +49,10 @@ public class AfterLoanRepaymentServiceImpl implements AfterLoanRepaymentService 
     
     @Autowired
     CustomerInfoXindaiRemoteApi customerInfoXindaiRemoteApi;
+    
+    @Autowired
+    @Qualifier("WithholdingRepaymentLogService")
+    WithholdingRepaymentLogService withholdingRepaymentLogService;
     /**
      * 执行代扣
      * @param businessId 业务单号
@@ -66,20 +75,35 @@ public class AfterLoanRepaymentServiceImpl implements AfterLoanRepaymentService 
                 Result result = withHoldingClient.repayAssignBank(repaymentBizPlanList.getOrigBusinessId(),afterId,bankCard);
                 Object object = JSON.parse(result.getData().toString());
                 Result resultObj=new Result();
-                resultObj.setCode(result.getCode());
+                resultObj.setCode("0");
                 resultObj.setMsg(result.getMsg());
                 resultObj.setData(object);
                 return resultObj;
             }else {
-                 withholdingService.appWithholding(repaymentBizPlanList);
-                 Result result=new Result();
-                 result.setCode("0000");
-                 result.setMsg("执行成功");
-                 return result;
+                 Result result=withholdingService.appWithholding(repaymentBizPlanList);
+                
+                 Data data=new Data();
+                 if(result.getCode().equals("1")) {//成功
+                	 data.setType(1);
+                	 data.setMsg(result.getMsg());
+                 }else if(result.getCode().equals("2")) {//
+                	 data.setType(2);
+                	 data.setMsg(result.getMsg());
+                 }else {
+                	 data.setType(3);
+                	 data.setMsg(result.getMsg());
+                 }
+                 Object object = JSON.parse(data.toString());
+                 Result resultObj=new Result();
+                 resultObj.setCode("0");
+                 resultObj.setMsg("执行成功");
+                 resultObj.setData(object);
+                 
+                 return resultObj;
             }
         }else {
             Result result=new Result();
-            result.setCode("500");
+            result.setCode("-1");
             result.setMsg("找不到对应的业务单号！");
             return result;
        }

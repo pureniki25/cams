@@ -2,6 +2,7 @@ package com.hongte.alms.core.controller;
 
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -201,9 +202,9 @@ public class DownLoadController  implements Serializable {
 					row.add(infoVO.getFactRepayDateStr());
 					row.add(infoVO.getCompanyName());
 					row.add(infoVO.getPeriodTypeStr());
-					row.add(infoVO.getResourceAmount());
-					row.add(infoVO.getFactRepayAmount());
-					row.add(infoVO.getRechargeAmount());
+					row.add(infoVO.getResourceAmount() == null ? BigDecimal.valueOf(0) : infoVO.getResourceAmount());
+					row.add(infoVO.getFactRepayAmount() == null ? BigDecimal.valueOf(0) : infoVO.getResourceAmount());
+					row.add(infoVO.getRechargeAmount() == null ? BigDecimal.valueOf(0) : infoVO.getResourceAmount());
 					row.add(infoVO.getPlatformTypeStr());
 					row.add(infoVO.getProcessStatusStr());
 					row.add(infoVO.getRemark());
