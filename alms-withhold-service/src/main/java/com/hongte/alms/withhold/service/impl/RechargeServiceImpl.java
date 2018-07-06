@@ -658,7 +658,7 @@ public class RechargeServiceImpl implements RechargeService {
 		if (loginUserInfoHelper != null && !StringUtil.isEmpty(loginUserInfoHelper.getUserId())) {
 			log.setUpdateUser(loginUserInfoHelper.getUserId());
 		} else {
-			log.setUpdateUser("admin");
+			log.setUpdateUser("auto_run");
 		}
 
 		log.setCurrentAmount(currentAmount);// 本次代扣金额
