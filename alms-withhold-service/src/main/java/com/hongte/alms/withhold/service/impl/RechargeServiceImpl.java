@@ -784,7 +784,12 @@ public class RechargeServiceImpl implements RechargeService {
 			result.setMsg("发起过减免申请,不能自动代扣");
 			return result;
 		}
-		
+       if(isRepaying(pList)) {
+    		//判断是否有处理中的代扣记录
+			result.setCode("-1");
+			result.setMsg("有处理中的代扣记录,不能自动代扣");
+			return result;
+       }
 		RepaymentProjPlanList projPList=repaymentProjPlanListService.selectOne(new EntityWrapper<RepaymentProjPlanList>().eq("plan_list_id", pList.getPlanListId()));
 		if(projPList!=null) {
 			if(projPList.getPlateType()==2) {//你我金融的不代扣
@@ -1044,5 +1049,15 @@ public class RechargeServiceImpl implements RechargeService {
 		}
 		return factAmountSum;
 
+	}
+
+	@Override
+	public boolean isRepaying(RepaymentBizPlanList pList) {
+		boolean isRepaying=false;
+		int i=withholdingRepaymentLogService.selectCount(new EntityWrapper<WithholdingRepaymentLog>().eq("original_business_id", pList.getOrigBusinessId()).eq("after_id", pList.getAfterId()).eq("repay_status", 2));
+		if(i>0) {
+			isRepaying=true;
+		}
+		return false;
 	}
 }
