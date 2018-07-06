@@ -215,7 +215,7 @@ window.layinit(function (htConfig) {
                                             click: function () {
                                                 if (link) {
 
-                                                    if (p.row.status == '全部已还款') {
+                                                    if (p.row.status == '已还款') {
                                                         app.$Message.warning({
                                                             content: '当前计划已还款'
                                                         });
