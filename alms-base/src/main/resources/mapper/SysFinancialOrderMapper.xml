@@ -48,7 +48,7 @@
                 and fo.business_type_id = #{businessTypeId}
             </if>
         </where>
-
+        order by areaName, companyName
     </select>
 
     <select id="search_bak" resultType="com.hongte.alms.base.vo.finance.SysFinancialOrderVO">

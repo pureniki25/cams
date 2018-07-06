@@ -16,10 +16,7 @@ import com.hongte.alms.base.dto.MoneyPoolManagerReq;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.dto.core.LayTableQuery;
 import com.hongte.alms.base.entity.*;
-import com.hongte.alms.base.enums.AreaLevel;
-import com.hongte.alms.base.enums.PlatformEnum;
-import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
-import com.hongte.alms.base.enums.RepayRegisterState;
+import com.hongte.alms.base.enums.*;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.service.*;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
@@ -908,7 +905,8 @@ public class FinanceController {
         List<BasicBusinessType> btype_list = basicBusinessTypeService.selectList(new EntityWrapper<BasicBusinessType>().orderBy("business_type_id"));
         retMap.put("businessType", (JSONArray) JSON.toJSON(btype_list, JsonUtil.getMapping()));
         //查询用户
-        List<SysUser> users = sysUserService.selectList(new EntityWrapper<>());
+        //List<SysUser> users = sysUserService.selectList(new EntityWrapper<>());
+        List<SysUser> users = sysUserService.selectUsersByRole(SysRoleEnums.DH_CASHIER.getKey());
         retMap.put("users", (JSONArray) JSON.toJSON(users, JsonUtil.getMapping()));
 
         logger.info("@getOrderSetSearchInfo@查找财务人员跟单设置查询相关信息--结束[{}]", JSON.toJSONString(retMap));
