@@ -1527,14 +1527,18 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 			switch (feeType) {
 			case 10: // 本金
-				paramDTO.setPrincipalAndInterest(feeValue);
-				tdrepayAdvanceLog.setPrincipalAndInterest(feeValue);
+				BigDecimal principalInterest1 = BigDecimal
+						.valueOf(principalAndInterestDouble + (feeValue == null ? 0 : doubleFeeValue))
+						.setScale(2, BigDecimal.ROUND_HALF_UP);
+				paramDTO.setPrincipalAndInterest(principalInterest1);
+				tdrepayAdvanceLog.setPrincipalAndInterest(principalInterest1);
 				break;
 			case 20: // 利息
-				BigDecimal principalInterest = BigDecimal
-						.valueOf(principalAndInterestDouble + (feeValue == null ? 0 : doubleFeeValue));
-				paramDTO.setPrincipalAndInterest(principalInterest);
-				tdrepayAdvanceLog.setPrincipalAndInterest(principalInterest);
+				BigDecimal principalInterest2 = BigDecimal
+						.valueOf(principalAndInterestDouble + (feeValue == null ? 0 : doubleFeeValue))
+						.setScale(2, BigDecimal.ROUND_HALF_UP);
+				paramDTO.setPrincipalAndInterest(principalInterest2);
+				tdrepayAdvanceLog.setPrincipalAndInterest(principalInterest2);
 				break;
 			case 30: // 平台服务费
 				paramDTO.setTuandaiAmount(feeValue);

@@ -474,7 +474,13 @@
 		    AND t1.plan_list_id = rbpl.plan_list_id) amount,
 		  0 otherFee,
 		  0 surplus,
-		  current_status confirmFlag 
+		  CASE rbpl.`current_status`
+		  WHEN '已还款' 
+		  THEN rbpl.`repay_flag`
+		  WHEN '还款中' 
+		  THEN 0
+		  ELSE -1 
+		  END  confirmFlag 
 		FROM
 		  `tb_repayment_biz_plan_list` rbpl,
 		  `tb_repayment_biz_plan_list_detail` rbpld 
@@ -595,7 +601,13 @@
 		    AND t.money_type = 1 
 		    AND t.business_id = #{businessId,jdbcType=VARCHAR} 
 		    AND t.business_after_id = rbpl.after_id) surplus,
-		  current_status confirmFlag 
+		  CASE rbpl.`current_status`
+		  WHEN '已还款' 
+		  THEN rbpl.`repay_flag`
+		  WHEN '还款中' 
+		  THEN 0
+		  ELSE -1 
+		  END  confirmFlag 
 		FROM
 		  `tb_repayment_biz_plan_list` rbpl,
 		  `tb_repayment_biz_plan_list_detail` rbpld 
@@ -701,7 +713,13 @@
 		  WHERE t1.proj_plan_list_id = t2.proj_plan_list_id 
 		    AND t1.proj_plan_list_id = rppl.proj_plan_list_id) amount,
 		  0 otherFee,
-		  rppl.current_status confirmFlag
+		  CASE rppl.`current_status`
+		  WHEN '已还款' 
+		  THEN rppl.`repay_flag`
+		  WHEN '还款中' 
+		  THEN 0
+		  ELSE -1 
+		  END confirmFlag
 		FROM
 		  `tb_repayment_proj_plan_list` rppl,
 		  `tb_repayment_proj_plan_list_detail` rppld,
@@ -719,7 +737,7 @@
 		  rppl.`proj_plan_list_id` projPlanListId,
 		  '实际还款' repayment,
 		  rppl.`after_id` afterId,
-		  rppl.`due_date` repaymentDate,
+		  rppl.`fact_repay_date` repaymentDate,
 		  rpp.`project_id`,
 		  tpi.`real_name`,
 		  -- 实还本金总额
@@ -793,7 +811,13 @@
 		  WHERE t1.proj_plan_list_id = t2.proj_plan_list_id 
 		    AND t1.proj_plan_list_id = rppl.proj_plan_list_id) amount,
 		  0 otherFee,
-		  rppl.current_status confirmFlag
+		  CASE rppl.`current_status`
+		  WHEN '已还款' 
+		  THEN rppl.`repay_flag`
+		  WHEN '还款中' 
+		  THEN 0
+		  ELSE -1 
+		  END confirmFlag
 		FROM
 		  `tb_repayment_proj_plan_list` rppl,
 		  `tb_repayment_proj_plan_list_detail` rppld,

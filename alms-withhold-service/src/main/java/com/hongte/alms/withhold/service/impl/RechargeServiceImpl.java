@@ -4,10 +4,14 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.AgencyRechargeLog;
+import com.hongte.alms.base.entity.ApplyDerateProcess;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.BizOutputRecord;
+import com.hongte.alms.base.entity.MoneyPoolRepayment;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
+import com.hongte.alms.base.entity.RepaymentConfirmLog;
+import com.hongte.alms.base.entity.RepaymentProjPlanList;
 import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.entity.WithholdingChannel;
 import com.hongte.alms.base.entity.WithholdingRepaymentLog;
@@ -25,10 +29,15 @@ import com.hongte.alms.base.feignClient.dto.CustomerInfoDto;
 import com.hongte.alms.base.feignClient.dto.SignedProtocol;
 import com.hongte.alms.base.feignClient.dto.ThirdPlatform;
 import com.hongte.alms.base.feignClient.dto.YiBaoRechargeReqDto;
+import com.hongte.alms.base.process.service.ProcessService;
+import com.hongte.alms.base.service.ApplyDerateProcessService;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.BizOutputRecordService;
+import com.hongte.alms.base.service.MoneyPoolRepaymentService;
 import com.hongte.alms.base.service.RepaymentBizPlanListDetailService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
+import com.hongte.alms.base.service.RepaymentConfirmLogService;
+import com.hongte.alms.base.service.RepaymentProjPlanListService;
 import com.hongte.alms.base.service.SysParameterService;
 import com.hongte.alms.base.service.WithholdingChannelService;
 import com.hongte.alms.base.service.WithholdingRepaymentLogService;
@@ -41,7 +50,7 @@ import com.hongte.alms.withhold.feignClient.FinanceClient;
 import com.hongte.alms.withhold.service.RechargeService;
 import com.hongte.alms.withhold.service.RedisService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
-
+import com.hongte.alms.base.process.entity.Process;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -50,6 +59,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +73,11 @@ import org.springframework.stereotype.Service;
 public class RechargeServiceImpl implements RechargeService {
 	private static Logger logger = LoggerFactory.getLogger(RechargeServiceImpl.class);
 
+	
+	
+	@Autowired
+	@Qualifier("MoneyPoolRepaymentService")
+	MoneyPoolRepaymentService moneyPoolRepaymentService;
 	@Autowired
 	@Qualifier("RepaymentBizPlanListService")
 	RepaymentBizPlanListService repaymentBizPlanListService;
@@ -73,10 +89,18 @@ public class RechargeServiceImpl implements RechargeService {
 	@Autowired
 	@Qualifier("BasicBusinessService")
 	BasicBusinessService basicBusinessService;
+	
+	@Autowired
+	@Qualifier("RepaymentProjPlanListService")
+	RepaymentProjPlanListService repaymentProjPlanListService;
 
 	@Autowired
 	@Qualifier("WithholdingRepaymentLogService")
 	WithholdingRepaymentLogService withholdingRepaymentLogService;
+	
+	@Autowired
+	@Qualifier("ApplyDerateProcessService")
+	ApplyDerateProcessService applyDerateProcessService;
 
 	@Autowired
 	@Qualifier("withholdingChannelService")
@@ -85,6 +109,14 @@ public class RechargeServiceImpl implements RechargeService {
 	@Autowired
 	@Qualifier("BizOutputRecordService")
 	BizOutputRecordService bizOutputRecordService;
+	
+	@Autowired
+	@Qualifier("ProcessService")
+	ProcessService processService;
+	
+	@Autowired
+	@Qualifier("RepaymentConfirmLogService")
+	RepaymentConfirmLogService repaymentConfirmLogService;
 	
     @Autowired
     CustomerInfoXindaiRemoteApi customerInfoXindaiRemoteApi;
@@ -172,6 +204,9 @@ public class RechargeServiceImpl implements RechargeService {
 					}else if(thirtyRepayTestResult.getParamValue().equals("1111")){
 						resultMsg="银行卡余额不足";
 						remoteResult.setReturnCode("1111");
+					}else if(thirtyRepayTestResult.getParamValue().equals("2222")){
+						resultMsg="处理中";
+						remoteResult.setReturnCode("EIP_TD_HANDLER_EXECEPTION");
 					}else {
 						resultMsg="代扣失败";
 						remoteResult.setReturnCode("9999");
@@ -187,7 +222,7 @@ public class RechargeServiceImpl implements RechargeService {
 					withholdingRepaymentLogService.updateById(log);
 					shareProfit(pList, log);
 				} else if (remoteResult.getReturnCode().equals(RepayResultCodeEnum.YH_HANDLER_EXCEPTION.getValue())) {
-					result.setCode("1");
+					result.setCode("2");
 					result.setMsg(resultMsg);
 					log.setRepayStatus(2);
 					log.setRemark(resultMsg);
@@ -248,6 +283,9 @@ public class RechargeServiceImpl implements RechargeService {
 					}else if(thirtyRepayTestResult.getParamValue().equals("1111")){
 						resultMsg="银行卡余额不足";
 						remoteResult.setReturnCode("1111");
+					}else if(thirtyRepayTestResult.getParamValue().equals("2222")){
+						resultMsg="处理中";
+						remoteResult.setReturnCode("EIP_BAOFU_BF00115");
 					}else {
 						resultMsg="代扣失败";
 						remoteResult.setReturnCode("9999");
@@ -269,7 +307,7 @@ public class RechargeServiceImpl implements RechargeService {
 						|| remoteResult.getReturnCode().equals(RepayResultCodeEnum.BF00115.getValue())
 						|| remoteResult.getReturnCode().equals(RepayResultCodeEnum.BF00144.getValue())
 						|| remoteResult.getReturnCode().equals(RepayResultCodeEnum.BF00202.getValue())) {
-					result.setCode("1");
+					result.setCode("2");
 					result.setMsg(resultMsg);
 					log.setRepayStatus(2);
 					log.setRemark(resultMsg);
@@ -343,6 +381,9 @@ public class RechargeServiceImpl implements RechargeService {
 						}else if(bankRepayTestResult.getParamValue().equals("1111")){
 							resultMsg="银行卡余额不足";
 							remoteResult.setReturnCode("1111");
+						}else if(bankRepayTestResult.getParamValue().equals("2222")){
+							resultMsg="处理中";
+							remoteResult.setReturnCode("EIP_TD_HANDLER_EXECEPTION");
 						}else {
 							resultMsg="代扣失败";
 							remoteResult.setReturnCode("9999");
@@ -358,7 +399,7 @@ public class RechargeServiceImpl implements RechargeService {
 						shareProfit(pList, log);
 						break;
 					} else if (remoteResult.getReturnCode().equals(RepayResultCodeEnum.YH_HANDLER_EXCEPTION.getValue())) {
-						result.setCode("1");
+						result.setCode("2");
 						result.setMsg(resultMsg);
 						log.setRepayStatus(2);
 						log.setRemark(resultMsg);
@@ -518,6 +559,24 @@ public class RechargeServiceImpl implements RechargeService {
 	// return result;
 	//
 	// }
+	
+	
+	/**
+	 * 判断当前期有没有客户还款登记
+	 * 
+	 */
+	
+	private boolean isSign(RepaymentBizPlanList pList) {
+		boolean isSign = false;
+		int i=moneyPoolRepaymentService.selectCount(new EntityWrapper<MoneyPoolRepayment>().eq("original_business_id", pList.getOrigBusinessId()).eq("after_id", pList.getAfterId()).ne("is_deleted", 1));
+		if(i>0) {
+			isSign=true;
+		}else {
+			isSign=false;
+		}
+		return isSign;
+	}
+	
 	@Override
 	public boolean istLastPeriod(RepaymentBizPlanList pList) {
 		boolean isLast = false;
@@ -670,47 +729,138 @@ public class RechargeServiceImpl implements RechargeService {
 	}
 
 	@Override
-	public boolean EnsureAutoPayIsEnabled(RepaymentBizPlanList pList, Integer days) {
+	public Result EnsureAutoPayIsEnabled(RepaymentBizPlanList pList, Integer days) {
+		Result result=new Result();
+		result.setCode("1");
 		BizOutputRecord record = bizOutputRecordService
 				.selectOne(new EntityWrapper<BizOutputRecord>().eq("business_id", pList.getBusinessId()));
-		if (DateUtil.getDiff(new Date(), pList.getDueDate()) > 30) {
-			// msg = "超出三十天不自动代扣";
-			return false;
-		}
+//		if (DateUtil.getDiff(new Date(), pList.getDueDate()) > 30) {
+//			// msg = "超出三十天不自动代扣";
+//			result.setCode("-1");
+//			result.setMsg("超出三十天不自动代扣");
+//			return result;
+//		}
 		if (DateUtil.getDiff(new Date(), record.getFactOutputDate()) > 0)
 
 		{
 			// msg = "借款日期大于当前日期";
-			return false;
+			result.setCode("-1");
+			result.setMsg("借款日期大于当前日期");
+			return result;
 		}
 		if (pList.getPeriod() == 0)
 
 		{
 			// msg = "自动代扣取消展期00期代扣";
-			return false;
+			result.setCode("-1");
+			result.setMsg("自动代扣取消展期第0期代扣");
+			return result;
 		}
 
 		if (istLastPeriod(pList)) {
 			// msg="最后一期不能自动代扣"
-			return false;
+			result.setCode("-1");
+			result.setMsg("最后一期不能自动代扣");
+			return result;
 		}
-		RepaymentBizPlanList next = repaymentBizPlanListService
-				.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", pList.getBusinessId())
-						.eq("plan_id", pList.getPlanId()).eq("period", pList.getPeriod() + 1));
-
-		if (next != null) {
-			Date nowDate = new Date();
-			days = 0 - days;
-			Date before30Days = DateUtil.getDate(DateUtil.formatDate(DateUtil.addDay2Date(days, nowDate)));
-			if (next.getDueDate().compareTo(before30Days) >= 0 && next.getDueDate().compareTo(nowDate) <= 0) {
-				// msg = "下一期还款时间开始停止自动代扣上一期";
-				return false;
-			}
-
+		
+		if(isSign(pList)) {
+			// msg="客户还款登记了不能自动代扣"
+			result.setCode("-1");
+			result.setMsg("客户还款登记了不能自动代扣");
+			return result;
 		}
-		return true;
+		if(isUnderRepay(pList)) {
+			// 判断是否含有线下转账，如果有，不能自动代扣
+			result.setCode("-1");
+			result.setMsg("含有线下转账，不能自动代扣");
+			return result;
+		}
+		
+		if(isApplyDerate(pList)) {
+			//判断是否发起过减免申请,发起过的不能自动代扣
+			result.setCode("-1");
+			result.setMsg("发起过减免申请,不能自动代扣");
+			return result;
+		}
+		
+		RepaymentProjPlanList projPList=repaymentProjPlanListService.selectOne(new EntityWrapper<RepaymentProjPlanList>().eq("plan_list_id", pList.getPlanListId()));
+		if(projPList.getPlateType()==2) {//你我金融的不代扣
+			result.setCode("-1");
+			result.setMsg("你我金融的不能自动代扣");
+			return result;
+		}
+	
+		
+//		RepaymentBizPlanList next = repaymentBizPlanListService
+//				.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", pList.getBusinessId())
+//						.eq("plan_id", pList.getPlanId()).eq("period", pList.getPeriod() + 1));
+//
+//		if (next != null) {
+//			Date nowDate = new Date();
+//			days = 0 - days;
+//			Date before30Days = DateUtil.getDate(DateUtil.formatDate(DateUtil.addDay2Date(days, nowDate)));
+//			if (next.getDueDate().compareTo(before30Days) >= 0 && next.getDueDate().compareTo(nowDate) <= 0) {
+//				// msg = "下一期还款时间开始停止自动代扣上一期";
+//				return false;
+//			}
+
+//		}
+		return result;
 	}
 
+	/**
+	 * 获取该还款计划最早一期没有还的代扣 
+	 */
+	@Override
+	public RepaymentBizPlanList getEarlyPeriod(RepaymentBizPlanList list) {
+		
+		List<RepaymentBizPlanList> repaymentBizPlanLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", list.getPlanId()));
+		//到了应该还日期的期数集合
+		List<RepaymentBizPlanList> dueDateLists=repaymentBizPlanLists.stream().filter(a->a.getDueDate().compareTo(new Date())<=1).collect(Collectors.toList());
+		//还没有还款的到了应该还日期的期数集合
+		List<RepaymentBizPlanList> notRepayLists=repaymentBizPlanLists.stream().filter(a->(!a.getCurrentStatus().equals("已还款"))).collect(Collectors.toList());
+		//期数从小到大排序
+		Optional<RepaymentBizPlanList> min=notRepayLists.stream().min((a1,a2)->a1.getPeriod().compareTo(a2.getPeriod()));
+		RepaymentBizPlanList minRepayBizPlanList=min.get();
+		return minRepayBizPlanList;
+		
+	}
+	
+	/**
+	 * 判断是否发起过减免申请
+	 */
+	
+	private boolean isApplyDerate(RepaymentBizPlanList list) {
+		boolean isApplyDerate;
+		ApplyDerateProcess applyDerateProcess=applyDerateProcessService.selectOne(new EntityWrapper<ApplyDerateProcess>().eq("crp_id", list.getPlanListId()));
+		
+		applyDerateProcess.getProcessId();
+		int i=processService.selectCount(new EntityWrapper<Process>().eq("process_result", 1));//减免申请成功通过记录条数
+		int j=processService.selectCount(new EntityWrapper<Process>().isNull("process_result").ne("status", 2).ne("status", 3));//减免申请中的记录条数
+		if((i+j)>0) {
+			isApplyDerate=true;
+		}else {
+			isApplyDerate=false;
+		}
+		return isApplyDerate;
+	}
+	
+	/**
+	 * 判断是否含有线下转账，如果有，不能自动代扣
+	 * 
+	 */
+	private boolean isUnderRepay(RepaymentBizPlanList list) {
+		boolean isUnderRepay=false;
+		int i=repaymentConfirmLogService.selectCount(new EntityWrapper<RepaymentConfirmLog>().eq("org_business_id", list.getOrigBusinessId()).eq("after_id", list.getAfterId()).eq("repay_source", 10));
+		if(i>0) {
+			isUnderRepay=true;
+		}else {
+			isUnderRepay=false;
+		}
+		return isUnderRepay;
+	}
+	
 	@Override
 	public Result shareProfit(RepaymentBizPlanList list, WithholdingRepaymentLog log) {
 		

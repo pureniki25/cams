@@ -49,7 +49,7 @@ public interface RechargeService {
 	   * @param days 周期天数
 	   */
 	
-	 boolean EnsureAutoPayIsEnabled(RepaymentBizPlanList pList,Integer days);
+	 Result EnsureAutoPayIsEnabled(RepaymentBizPlanList pList,Integer days);
 	
 	
 	/**
@@ -147,5 +147,11 @@ public interface RechargeService {
 	 * 易宝代扣结果查询
 	 */
 	 void getYBResult(WithholdingRepaymentLog log);
+	 
+	 
+	 /**
+		 * 获取该还款计划最早一期没有还的代扣 
+		 */
+	RepaymentBizPlanList getEarlyPeriod(RepaymentBizPlanList list);
 }
 

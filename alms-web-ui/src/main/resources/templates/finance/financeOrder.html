@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+    <title>财务跟单设置</title>
+    <script src="/properties/config.js"></script>
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
+    <!-- iview样式 -->
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
+    <!--@import url("//unpkg.com/iview/dist/styles/iview.css");-->
+    <!--<link rel="stylesheet" type="text/css" href="//unpkg.com/iview/dist/styles/iview.css"/>-->
+    <!-- 引入layui样式 -->
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all"/>
+
+    <!--   <script src="//unpkg.com/vue/dist/vue.js"></script>
+       <script src="//unpkg.com/iview/dist/iview.min.js"></script>-->
+    <!-- 引入vue -->
+    <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+    <!-- iview js -->
+    <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+    <!--引入layui.js-->
+    <script src="/plugins/layui/layui.js"></script>
+    <!--引入axios.js 用于ajax调用-->
+    <script src="/plugins/axios/axios.min.js"></script>
+    <!-- 引入jQuery，必须在appToken.js 之前引入 -->
+    <script src="/build/js/jquery-3.3.1.min.js"></script>
+    <!-- 设置全局请求头:app、Authorization -->
+    <script src="/build/js/appToken.js"></script>
+    <!--引入公共的一些方法-->
+    <script src="/src/js/comm.js"></script>
+
+</head>
+<body>
+<!--隐藏元素-->
+<!--<p id="staffType"  th:attr="value=${staffType}"  hidden />-->
+<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+<div id="app" v-cloak>
+    <!--查询表单内容-->
+    <row :gutter="16" style="margin-top:10px; padding:10px">
+        <i-col span="3">
+            <button class="layui-btn layui-btn-sm" @click="assignSet" v-if="authValid('assignSet')"
+                    style="margin-left:15px" ht-auth="assignSet">
+                        <span>
+                            分配设置</span>
+            </button>
+            <!-- <i-button v-if="authValid('assignSet')" type="success" style="margin-left:15px" @click="assignSet"  ht-auth="assignSet">分配设置</i-button> -->
+        </i-col>
+        <i-col span="16">
+            <i-form ref="searchForm" :model="searchForm" label-position="right" :label-width="100" inline>
+
+                <form-item label="区域：" prop="areaId">
+                    <i-select v-model="searchForm.areaId" clearable filterable>
+                        <i-option v-for="item in areaList" :value="item.areaId" :key="item.areaId">{{ item.areaName }}
+                        </i-option>
+                    </i-select>
+                </form-item>
+
+
+                <form-item label="分公司：" prop="companyId">
+                    <i-select v-model="searchForm.companyId" clearable filterable>
+                        <i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{ item.areaName
+                            }}
+                        </i-option>
+                    </i-select>
+                </form-item>
+
+
+                <form-item label="跟单人员：" prop="userName">
+                    <i-input v-model="searchForm.userName" placeholder="模糊搜索"></i-input>
+                </form-item>
+
+            </i-form>
+        </i-col>
+        <i-col span="5">
+            <button class="layui-btn layui-btn-sm" @click="toLoading" style="margin-right:10px" ht-auth="personQuery">
+                        <span v-if="!loading">
+                            <i class="layui-icon">&#xe615;</i>查询</span>
+                <span v-else>
+                            <i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
+            </button>
+        </i-col>
+
+    </row>
+
+    <!-- 表单Grid，使用layerUI的表格组件 开始 -->
+    <row>
+        <i-col span="24">
+            <!-- 使用方法渲染模式 -->
+            <table id="listTable" lay-filter="listTable"></table>
+            <div style="display:none" id="barTools">
+                <!--layui-btn layui-btn-xs-->
+                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="userSet">设置</a>
+                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
+            </div>
+        </i-col>
+    </row>
+    <!-- 表单Grid，使用layerUI的表格组件 结束 -->
+
+    <Modal
+            v-model="editSingleCompanyCollectionUserSettingModal"
+            title="设置"
+            @on-ok="saveSingleCompanyCollectionUserSetting"
+            @on-cancel="toLoading">
+        <i-form ref="editCompanyCollectionUser.editCompanyCollectionForm"
+                :model="editCompanyCollectionUser.editCompanyCollectionForm" :label-width="100">
+
+            <form-item label="业务类型：">
+                <i-select v-model="editCompanyCollectionUser.editCompanyCollectionForm.businessType" multiple clearable
+                          filterable disabled>
+                    <i-option v-for="item in editCompanyCollectionAssignSet.businessTypes" :value="item.businessTypeId"
+                              :key="item.businessTypeId">{{ item.businessTypeName }}
+                    </i-option>
+                </i-select>
+            </form-item>
+
+            <form-item label="跟单人名：" prop="collectionGroup1Users">
+                <i-select v-model="editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup1Users" multiple
+                          filterable>
+                    <i-option v-for="item in editCompanyCollectionAssignSet.collectionGroup1AllUsers"
+                              :value="item.userId" :key="item.userId">{{ item.userName }}
+                    </i-option>
+                </i-select>
+            </form-item>
+        </i-form>
+    </Modal>
+
+    <!--
+        分配设置
+    -->
+    <Modal
+            v-model="assignSetModal"
+            title="分配设置"
+            @on-ok="saveBatchPerson"
+            @on-cancel="toLoading">
+        <i-form ref="editCompanyCollectionAssignSet.editCompanyCollectionForm"
+                :model="editCompanyCollectionAssignSet.editCompanyCollectionForm" :label-width="100">
+            <form-item label="区域：" prop="areaName">
+                <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.areaName" multiple clearable
+                          filterable style="width: 80%">
+                    <i-option v-for="item in editCompanyCollectionAssignSet.areaList" :value="item.areaId"
+                              :key="item.areaId">{{ item.areaName }}
+                    </i-option>
+                </i-select>
+                <i-span @click="selectArea">选择</i-span>
+            </form-item>
+
+            <form-item label="分公司：" prop="companyName">
+                <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId" multiple
+                          clearable filterable style="width: 80%">
+                    <i-option v-for="item in editCompanyCollectionAssignSet.companyId" :value="item.areaId"
+                              :key="item.areaId">{{ item.areaName }}
+                    </i-option>
+                </i-select>
+            </form-item>
+            <form-item label="业务类型：" prop="businessType">
+                <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.businessType" multiple
+                          clearable filterable style="width: 80%">
+                    <i-option v-for="item in editCompanyCollectionAssignSet.businessTypes" :value="item.businessTypeId"
+                              :key="item.businessTypeId">{{ item.businessTypeName }}
+                    </i-option>
+                </i-select>
+            </form-item>
+
+            <form-item label="跟单人名：" prop="collectionGroup1Users">
+                <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.collectionGroup1Users"
+                          multiple clearable filterable style="width: 80%">
+                    <i-option v-for="item in editCompanyCollectionAssignSet.collectionGroup1AllUsers"
+                              :value="item.userId" :key="item.userId">{{ item.userName }}
+                    </i-option>
+                </i-select>
+            </form-item>
+        </i-form>
+    </Modal>
+
+    <!--
+    区域城市选择模块
+    -->
+    <Modal
+            v-model="selectAreaAndCity"
+            title="选择分公司"
+            @on-ok="confirmSelect"
+            @on-cancel="">
+        <div class="layui-row layui-col-space20">
+            <div class="layui-col-md5">
+                <tree :data="areaAndCity.allAreas" @on-check-change="showCitys" @on-select-change="selectChild"
+                      ref="tree"></tree>
+            </div>
+            <div class="layui-col-md6">
+                <checkbox-group v-model="areaAndCity.currentSelectedCitys" @on-change="getAllSelectedCitys">
+                    <checkbox v-for="item in areaAndCity.allCitys" :label="item.areaId" @on-change="">
+                        {{item.areaName}}
+                    </checkbox>
+                </checkbox-group>
+            </div>
+        </div>
+
+    </Modal>
+
+
+</div>
+
+
+<script>
+    var vm;
+    var areaId;
+    window.layinit(function (htConfig) {
+        var _htConfig = htConfig;
+        basePath = _htConfig.coreBasePath;
+        fbasePath = _htConfig.financeBasePath;
+        vm = new Vue({
+            el: '#app',
+            data: {
+                options3: {
+                    disabledDate(date) {
+                        return date && date.valueOf() < Date.now() - 86400000;
+                    }
+                },
+                searchForm:
+                    {
+                        areaId: '',
+                        companyId: '',
+                        userName: '',
+                        businessTyps: ''
+                    },
+                loading: false,
+                areaList: [],
+                companyList: [],
+                selectedRowInfo: [],
+                editSingleCompanyCollectionUserSettingModal: false,
+                editSingleCompanyCollectionTimeSettingModal: false,
+                assignSetModal: false,
+                selectAreaAndCity: false,
+                editCompanyCollectionUser:
+                    {
+                        editCompanyCollectionForm:
+                            {
+                                collectionGroup1Users: [],
+                                collectionGroup2Users: [],
+                                companyId: [],
+                                areaId: '',
+                                businessType: [],
+                                editFalge: '',
+                                oldBizType: ''
+                            },
+                        collectionGroup1AllUsers: [],
+                        collectionGroup2AllUsers: []
+                    },
+                editCompanyCollectionTime:
+                    {
+                        editCompanyCollectionForm:
+                            {
+                                overDueDays: '',
+                                startTime: '',
+                                note: '',
+                                colTimeId: ''
+                            }
+                    },
+                editCompanyCollectionAssignSet:
+                    {
+                        editCompanyCollectionForm:
+                            {
+                                areaName: [],
+                                companyId: [],
+                                businessType: [],
+                                collectionGroup1Users: [],
+                                collectionGroup2Users: []
+                            },
+                        collectionGroup1AllUsers: [],
+                        collectionGroup2AllUsers: [],
+                        areaList: [],
+                        companyId: [],
+                        businessTypes: []
+                    },
+                areaAndCity:
+                    {
+                        allAreas: [{
+                            title: '鸿特信息咨询有限公司',
+                            loading: false,
+                            children: [],
+                            expand: true
+                        }],
+                        test: "",
+                        allCitys: [],
+                        allSelectedAreas: [],
+                        allSelectedCitys: [],
+                        selectedCitys: [],
+                        currentSelectedCitys: [],
+                        allSelectedCityGroup: [],
+                        currentCitys1: [],
+                        currentCitys2: [],
+                        currentCitys3: [],
+                        currentCitys4: [],
+                        currentCitys5: [],
+                        currentCitys6: [],
+                        currentCitys7: [],
+                        currentAreaId: ""
+                    },
+                index: '0',
+                ruleValidate: validateOpt
+            },
+            computed: {},
+            methods: {
+
+                init: function () {
+                    var self = this;
+                    //self.getBusinessTypes();
+                    //self.getCompanyAreaList();
+                    //self.getCompanyList();
+                    self.getSelectsData();
+                    //使用layerUI的表格组件
+                    layui.use(['layer', 'table', 'ht_ajax', 'ht_auth', 'ht_config'], function () {
+                        layer = layui.layer;
+                        table = layui.table;
+                        //执行渲染
+                        table.render({
+                            elem: '#listTable' //指定原始表格元素选择器（推荐id选择器）
+                            , id: 'listTable'
+                            , cols: [
+                                [{
+                                    field: 'areaName',
+                                    title: '区域'
+                                }, {
+                                    field: 'companyName',
+                                    title: '分公司',
+                                }, {
+                                    field: 'businessTypeName',
+                                    title: '业务类型'
+                                }, {
+                                    field: 'userNames',
+                                    title: '跟单员',
+                                }, {
+                                    title: '操作',
+                                    toolbar: "#barTools"
+                                }]
+                            ], //设置表头
+                            url: fbasePath + 'finance/search',
+                            page: true,
+                            done: function (res, curr, count) {
+                                //数据渲染完的回调。你可以借此做一些其它的操作
+                                //如果是异步请求数据方式，res即为你接口返回的信息。
+                                //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
+                                self.loading = false;
+                            }
+                        });
+
+
+                        //监听工具条
+                        table.on('tool(listTable)', function (obj) {
+                            self.selectedRowInfo = obj.data;
+                            if (obj.event === 'edit') {
+                                showSingleCompanyCollectionUserSetting(companyCode)
+
+                            }
+                            //单个设置
+                            if (obj.event === 'userSet') {
+                                self.editSingleCompanyCollectionUserSettingModal = true;
+                                self.editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup1Users = obj.data.userIds == null ? [] : obj.data.userIds.split(",");
+                                self.editCompanyCollectionUser.editCompanyCollectionForm.areaId = obj.data.areaId;
+                                self.editCompanyCollectionUser.editCompanyCollectionForm.companyId[0] = obj.data.companyId;
+                                //console.log(typeof self.selectedRowInfo.businessTypeId)
+                                //self.editCompanyCollectionUser.editCompanyCollectionForm.businessType[0] = String(self.selectedRowInfo.businessTypeId);
+                                //self.editCompanyCollectionUser.editCompanyCollectionForm.businessType[0] = self.selectedRowInfo.businessTypeId;
+                                self.editCompanyCollectionUser.editCompanyCollectionForm.businessType = [];
+                                self.editCompanyCollectionUser.editCompanyCollectionForm.businessType.push(self.selectedRowInfo.businessTypeId);
+                                self.editCompanyCollectionUser.editCompanyCollectionForm.editFalge = 1;
+                                self.editCompanyCollectionUser.editCompanyCollectionForm.oldBizType = self.selectedRowInfo.businessTypeId;
+                                //self.editCompanyCollectionUser.collectionGroup1AllUsers = self.editCompanyCollectionAssignSet.collectionGroup1AllUsers;
+                                /*
+                                                                var url = basePath + "collectionStrategy/company/getClearingPersons";
+                                                                axios.get(url)
+                                                                    .then(function (result) {
+                                                                        if (result.data.code == "1") {
+                                                                            self.editCompanyCollectionUser.collectionGroup1AllUsers = result.data.data.sysUser1List;
+                                                                            self.editCompanyCollectionUser.collectionGroup2AllUsers = result.data.data.sysUser2List;
+                                                                            self.editCompanyCollectionAssignSet.businessTypes = result.data.data.businessType;
+                                                                            self.editCompanyCollectionUser.editCompanyCollectionForm.areaId = obj.data.areaId;
+                                                                            self.editCompanyCollectionUser.editCompanyCollectionForm.companyId[0] = obj.data.companyId;
+
+                                                                            self.editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup1Users=obj.data.col1Pids==null?[]:obj.data.col1Pids.split(",");
+                                                                            self.editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup2Users=obj.data.col2Pids==null?[]:obj.data.col2Pids.split(",");
+                                                                        }
+                                                                    })*/
+                            }
+                            //删除
+                            if (obj.event === 'delete') {
+                                let data = obj.data;
+                                let event = obj.event;
+                                layer.confirm('确定要删除?', function (index) {
+                                    self.delete(data.id, data.userId);
+                                    layer.close(index);
+                                });
+                            }
+
+                        });
+
+                        ////////////////////////////////////////////////////////////////////////////////////
+
+                        ///////////////////////////////////////////////////////////////////////////////////
+
+                        //监听工具条
+                        table.on('tool(timeListTable)', function (obj) {
+                            self.selectedRowInfo = obj.data;
+                            if (obj.event === 'timeSet') {
+                                self.editSingleCompanyCollectionTimeSettingModal = true;
+                                self.editCompanyCollectionTime.editCompanyCollectionForm.colTimeId = obj.data.colTimeId;
+                            }
+                        });
+
+                    });
+
+                },
+                toLoading: function () {
+                    if (table == null) {
+                        return;
+                    }
+                    var self = this;
+                    self.loading = true;
+                    table.reload('listTable', {
+                        where: {
+
+                            areaId: self.searchForm.areaId,  //区域ID
+                            companyId: self.searchForm.companyId, //分公司ID
+                            userName: self.searchForm.userName,  //业务类型
+                        }
+                        , page: {
+                            curr: 1 //重新从第 1 页开始
+                        }
+                    });
+
+                    self.areaAndCity.currentSelectedCitys = [];
+                    self.areaAndCity.currentCitys1 = [];
+                    self.areaAndCity.currentCitys2 = [];
+                    self.areaAndCity.currentCitys3 = [];
+                    self.areaAndCity.currentCitys4 = [];
+                    self.areaAndCity.currentCitys5 = [];
+                    self.areaAndCity.currentCitys6 = [];
+                    self.areaAndCity.currentCitys7 = [];
+
+                },
+                toLoadingTime: function () {
+                    if (table == null) {
+                        return;
+                    }
+                    var self = this;
+                    self.loading = true;
+                    table.reload('timeListTable');
+                },
+                getCompanyAreaList: function () {
+                    var self = this;
+                    var url = basePath + "collectionStrategy/company/getCompanyAreaList?id=1";
+                    axios.get(url)
+                        .then(function (result) {
+                            if (result.data.code == "1") {
+                                self.areaList = result.data.data.area;
+                            }
+                        })
+                },
+                getCompanyList: function () {
+                    var self = this;
+                    var url = basePath + "collectionStrategy/company/getCompanyAreaList?id=2";
+                    axios.get(url)
+                        .then(function (result) {
+                            if (result.data.code == "1") {
+                                self.companyList = result.data.data.area;
+                            }
+                        })
+                },
+                getCollectionGroup1AllUsers: function () {
+                    if (this.editCompanyCollectionUser.collectionGroup1AllUsers.length > 0) {
+                        return;
+                    }
+
+                    var url = basePath + "users/getUsers";
+                    axios.get(url)
+                        .then(function (result) {
+                            if (result.data.code == "1") {
+                                self.collectionGroup1AllUsers = result.data.data;
+                            }
+                        })
+
+                },
+                getCollectionGroup2AllUsers: function () {
+                    if (this.editCompanyCollectionUser.collectionGroup2AllUsers.length > 0) {
+                        return;
+                    }
+                    var url = basePath + "users/getUsers";
+
+                    axios.get(url)
+                        .then(function (result) {
+                            if (result.data.code == "1") {
+                                self.collectionGroup2AllUsers = result.data.data;
+                            }
+                        })
+                },
+                saveSingleCompanyCollectionUserSetting: function () {
+                    var self = this;
+                    var url = fbasePath + "finance/edit";
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(self.editCompanyCollectionUser.editCompanyCollectionForm),
+                        async: false,
+                        dataType: "json",
+                        success: function (data) {
+                            self.toLoading();
+                        }
+
+                    });
+                },
+                saveTimeSet: function () {
+                    var self = this;
+                    var url = basePath + "collectionStrategy/saveTimeSet";
+
+                    vm.$refs['editCompanyCollectionTime.editCompanyCollectionForm'].validate((valid) => {
+                        if (valid) {
+                            $.ajax({
+                                type: "POST",
+                                url: url,
+                                contentType: "application/json; charset=utf-8",
+                                data: JSON.stringify(self.editCompanyCollectionTime.editCompanyCollectionForm),
+                                async: false,
+                                dataType: "json",
+                                success: function (data) {
+                                    self.toLoadingTime();
+                                }
+
+                            });
+                        } else {
+                            vm.$Message.error({content: '表单校验失败!'});
+                        }
+                    })
+
+
+                },
+                showSingleCompanyCollectionUserSetting: function (companyId) {
+                    this.editCompanyCollectionUser.editCompanyCollectionForm.companyId = companyId;
+                    this.getCollectionGroup1AllUsers();
+                    this.getCollectionGroup2AllUsers();
+                    var url = basePath + "collectionStrategy/getSingleCompanyCollectionUserSetting";
+
+                    axios.get(url)
+                        .then(function (result) {
+                            if (result.data.code == "1") {
+                                self.collectionGroup2AllUsers = result.data.data;
+                            }
+                        })
+                    this.editSingleCompanyCollectionUserSettingModal = true;
+
+                },
+                assignSet: function () {
+                    var self = this;
+                    self.assignSetModal = true;
+
+                    self.editCompanyCollectionAssignSet.editCompanyCollectionForm.areaName = [];
+                    self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId = [];
+                    self.editCompanyCollectionAssignSet.editCompanyCollectionForm.businessType = [];
+                    self.editCompanyCollectionAssignSet.editCompanyCollectionForm.collectionGroup1Users = [];
+                    self.editCompanyCollectionAssignSet.editCompanyCollectionForm.collectionGroup2Users = [];
+
+                    /*var url = basePath + "collectionStrategy/company/getClearingPersons";
+                    axios.get(url)
+                        .then(function (result) {
+                            if (result.data.code == "1") {
+                                self.editCompanyCollectionAssignSet.collectionGroup1AllUsers = result.data.data.sysUser1List;
+                                self.editCompanyCollectionAssignSet.collectionGroup2AllUsers = result.data.data.sysUser2List;
+                                self.editCompanyCollectionAssignSet.areaList = result.data.data.areaList;
+                                self.editCompanyCollectionAssignSet.companyId = result.data.data.companyList;
+
+                            }
+                        })*/
+                },
+                selectArea: function () {
+                    console.log("选择开始===========")
+                    var self = this;
+                    self.selectAreaAndCity = true;
+                    self.areaAndCity.allCitys = [];
+
+                    var formData = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.areaName;// 表单区域
+                    var treeData = self.areaAndCity.allAreas[0].children;// 下拉区域
+
+                    self.getArea();
+                },
+                saveBatchPerson: function () {
+                    var self = this;
+                    var url = fbasePath + "finance/edit";
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(self.editCompanyCollectionAssignSet.editCompanyCollectionForm),
+                        async: false,
+                        dataType: "json",
+                        success: function (data) {
+                            self.toLoading();
+                        }
+
+                    });
+                },
+                getArea: function () {
+                    var self = this;
+                    var url = basePath + "collectionStrategy/getAreaList";
+                    $.ajax({
+                        type: "GET",
+                        url: url,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (data) {
+                            self.areaAndCity.allAreas[0].children = data.data;
+                            areaId = self.areaAndCity.allAreas[0].children[0].areaId;
+                            self.getCompany(areaId);
+                        }
+
+                    });
+                },
+                getCompany: function (areaPid) {
+
+                    var self = this;
+                    console.log("==========>>>>>>>>>>", self.areaAndCity.test);
+                    var url = basePath + "collectionStrategy/getCompanyList?areaPid=" + areaPid;
+                    $.ajax({
+                        type: "GET",
+                        url: url,
+                        contentType: "application/json; charset=utf-8",
+//                        async: true,
+                        dataType: "json",
+                        success: function (data) {
+                            self.areaAndCity.allCitys = data.data;
+                            var formDate = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId;
+                            for (var i = 0; i < formDate.length; i++) {
+                                var exit = self.areaAndCity.allCitys.indexOf(formDate[i]) != -1;
+                                if (exit) {
+                                    self.areaAndCity.currentSelectedCitys.push(formDate[i]);
+                                }
+                            }
+                        }
+
+                    });
+                },
+                getSelectsData: function () {
+                    var self = this;
+                    //取区域列表
+                    axios.get(fbasePath + 'finance/getOrderSetSearchInfo')
+                        .then(function (res) {
+                            if (res.data.code == "1") {
+                                // vm.areaList = res.data.data.area;
+                                // vm.companyList = res.data.data.company;
+                                // vm.businessTypeList = res.data.data.businessType;
+                                // vm.users = res.data.data.users;
+
+                                self.editCompanyCollectionAssignSet.collectionGroup1AllUsers = res.data.data.users;
+                                self.editCompanyCollectionAssignSet.areaList = res.data.data.area;
+                                self.editCompanyCollectionAssignSet.companyId = res.data.data.company;
+                                self.editCompanyCollectionAssignSet.businessTypes = res.data.data.businessType;
+                                self.areaList = res.data.data.area;
+                                self.companyList = res.data.data.company;
+                            } else {
+                                self.$Modal.error({content: '操作失败，消息：' + res.data.msg});
+                            }
+                        })
+                        .catch(function (error) {
+                            self.$Modal.error({content: '接口调用异常!'});
+                        });
+                },
+                showCitys: function (data) {
+
+                    var self = this;
+
+
+                    var index = (function () {
+                        if (event.target.className === "ivu-checkbox-input") return $(event.target).parents('li').find('ul').index($(event.target).parents('ul')[0]);
+                    })();
+                    //保存已选中的区域,清除取消勾选的区域
+                    var selectedData = self.$refs.tree.getCheckedNodes();
+
+                    self.areaAndCity.allSelectedAreas = [];
+                    for (var i = 0; i < selectedData.length; i++) {
+                        self.areaAndCity.allSelectedAreas.push(selectedData[i].areaId);
+                    }
+                    this.getCompany(this.areaAndCity.allAreas[0].children[index].areaId);
+                    self.index = index;
+
+                    if (selectedData.length > 0) {
+                        for (var i = 0; i < selectedData.length; i++) {
+                            var areaId = selectedData[i].areaId;
+                            //判断当前树节点是否被选中
+                            if (self.areaAndCity.allAreas[0].children[index].areaId == areaId) {//当前点击的节点id在已被选中的树节点id中，则为已选中
+                                //已被选中
+                                if (index == 0) {
+                                    self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys1;
+                                } else if (index == 1) {
+                                    self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys2;
+                                } else if (index == 2) {
+                                    self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys3;
+                                } else if (index == 3) {
+                                    self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys4;
+                                } else if (index == 4) {
+                                    self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys5;
+                                } else if (index == 5) {
+                                    self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys6;
+                                } else if (index == 6) {
+                                    self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys7;
+                                }
+                            } else {
+                                if (index == 0) {
+                                    self.areaAndCity.currentSelectedCitys = [];
+                                    self.areaAndCity.currentCitys1 = [];
+                                } else if (index == 1) {
+                                    self.areaAndCity.currentSelectedCitys = [];
+                                    self.areaAndCity.currentCitys2 = [];
+                                } else if (index == 2) {
+                                    self.areaAndCity.currentSelectedCitys = [];
+                                    self.areaAndCity.currentCitys3 = [];
+                                } else if (index == 3) {
+                                    self.areaAndCity.currentSelectedCitys = [];
+                                    self.areaAndCity.currentCitys4 = [];
+                                } else if (index == 4) {
+                                    self.areaAndCity.currentSelectedCitys = [];
+                                    self.areaAndCity.currentCitys5 = [];
+                                } else if (index == 5) {
+                                    self.areaAndCity.currentSelectedCitys = [];
+                                    self.areaAndCity.currentCitys6 = [];
+                                } else if (index == 6) {
+                                    self.areaAndCity.currentSelectedCitys = [];
+                                    self.areaAndCity.currentCitys7 = [];
+                                }
+                            }
+                        }
+                    } else {
+                        self.areaAndCity.currentSelectedCitys = [];
+                        self.areaAndCity.currentCitys1 = [];
+                        self.areaAndCity.currentCitys2 = [];
+                        self.areaAndCity.currentCitys3 = [];
+                        self.areaAndCity.currentCitys4 = [];
+                        self.areaAndCity.currentCitys5 = [];
+                        self.areaAndCity.currentCitys6 = [];
+                        self.areaAndCity.currentCitys7 = [];
+                    }
+
+                },
+                getAllSelectedCitys: function (data) {
+                    var self = this;
+                    var index = self.index;
+
+
+                    if (data.length > 0) {
+                        self.areaAndCity.allAreas[0].children[index].checked = true;
+                        var exit = self.areaAndCity.allSelectedAreas.indexOf(self.areaAndCity.allAreas[0].children[index].areaId) != -1;
+                        if (!exit) {
+                            self.areaAndCity.allSelectedAreas.push(self.areaAndCity.allAreas[0].children[index].areaId);
+                        }
+
+                    } else {
+                        self.areaAndCity.allAreas[0].children[index].checked = false;
+                        self.areaAndCity.allSelectedAreas.splice(index, 1);
+                    }
+
+                    console.log("所有被选中的区域：======", self.areaAndCity.allSelectedAreas);
+
+
+                    if (index == 0) {
+                        self.areaAndCity.currentCitys1 = [];
+                        self.areaAndCity.currentCitys1 = data;
+
+                    } else if (index == 1) {
+                        self.areaAndCity.currentCitys2 = [];
+                        self.areaAndCity.currentCitys2 = data;
+                    } else if (index == 2) {
+                        self.areaAndCity.currentCitys3 = [];
+                        self.areaAndCity.currentCitys3 = data;
+                    } else if (index == 3) {
+                        self.areaAndCity.currentCitys4 = [];
+                        self.areaAndCity.currentCitys4 = data;
+                    } else if (index == 4) {
+                        self.areaAndCity.currentCitys5 = [];
+                        self.areaAndCity.currentCitys5 = data;
+                    } else if (index == 5) {
+                        self.areaAndCity.currentCitys6 = [];
+                        self.areaAndCity.currentCitys6 = data;
+                    } else if (index == 6) {
+                        self.areaAndCity.currentCitys7 = [];
+                        self.areaAndCity.currentCitys7 = data;
+                    }
+                    console.log("第1组", self.areaAndCity.currentCitys1);
+                    console.log("第2组", self.areaAndCity.currentCitys2);
+                    console.log("第3组", self.areaAndCity.currentCitys3);
+                    console.log("第4组", self.areaAndCity.currentCitys4);
+                    console.log("第5组", self.areaAndCity.currentCitys5);
+                    console.log("第6组", self.areaAndCity.currentCitys6);
+                    console.log("第7组", self.areaAndCity.currentCitys7);
+
+
+                },
+                confirmSelect: function () {
+                    var self = this;
+                    self.editCompanyCollectionAssignSet.editCompanyCollectionForm.areaName = self.areaAndCity.allSelectedAreas;
+                    self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId = [];
+                    for (var i = 0; i < self.areaAndCity.currentCitys1.length; i++) {
+                        var exit = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.indexOf(self.areaAndCity.currentCitys1[i]) != -1;
+                        if (!exit) {
+                            self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys1[i]);
+                        }
+
+                    }
+                    for (var i = 0; i < self.areaAndCity.currentCitys2.length; i++) {
+                        var exit = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.indexOf(self.areaAndCity.currentCitys2[i]) != -1;
+                        if (!exit) {
+                            self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys2[i]);
+                        }
+                    }
+                    for (var i = 0; i < self.areaAndCity.currentCitys3.length; i++) {
+                        var exit = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.indexOf(self.areaAndCity.currentCitys3[i]) != -1;
+                        if (!exit) {
+                            self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys3[i]);
+                        }
+                    }
+                    for (var i = 0; i < self.areaAndCity.currentCitys4.length; i++) {
+                        var exit = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.indexOf(self.areaAndCity.currentCitys4[i]) != -1;
+                        if (!exit) {
+                            self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys4[i]);
+                        }
+                    }
+                    for (var i = 0; i < self.areaAndCity.currentCitys5.length; i++) {
+                        var exit = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.indexOf(self.areaAndCity.currentCitys5[i]) != -1;
+                        if (!exit) {
+                            self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys5[i]);
+                        }
+                    }
+                    for (var i = 0; i < self.areaAndCity.currentCitys6.length; i++) {
+                        var exit = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.indexOf(self.areaAndCity.currentCitys6[i]) != -1;
+                        if (!exit) {
+                            self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys6[i]);
+                        }
+                    }
+                    for (var i = 0; i < self.areaAndCity.currentCitys7.length; i++) {
+                        var exit = self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.indexOf(self.areaAndCity.currentCitys7[i]) != -1;
+                        if (!exit) {
+                            self.editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId.push(self.areaAndCity.currentCitys7[i]);
+                        }
+                    }
+
+                },
+                selectChild: function (data) {
+                    var self = this;
+                    var indexqj = self.index;
+                    var num = self.areaAndCity.allAreas[0].children.indexOf(data[0]);
+
+                    if (data.length > 0) {
+
+
+                        self.index = num;
+                        if (num == 0) {
+                            self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys1;
+                        } else if (num == 1) {
+                            self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys2;
+                        } else if (num == 2) {
+                            self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys3;
+                        } else if (num == 3) {
+                            self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys4;
+                        } else if (num == 4) {
+                            self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys5;
+                        } else if (num == 5) {
+                            self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys6;
+                        } else if (num == 6) {
+                            self.areaAndCity.currentSelectedCitys = self.areaAndCity.currentCitys7;
+                        }
+
+                        this.getCompany(data[0].areaId);
+                    }
+
+
+                },
+                getBusinessTypes: function () {
+                    var self = this;
+                    //业务类型
+                    axios.get(basePath + 'collection/getALStandingBookVoPageSelectsData')
+                        .then(function (res) {
+                            if (res.data.code == "1") {
+
+                                self.editCompanyCollectionAssignSet.businessTypes = res.data.data.businessType;
+
+
+                            } else {
+                                vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
+                            }
+                        })
+                        .catch(function (error) {
+                            vm.$Modal.error({content: '接口调用异常!'});
+                        });
+
+                },
+                test: function () {
+                    var self = this;
+                    self.selectAreaAndCity = true;
+                },
+                delete: function (id, userId) {
+                    axios.get(fbasePath + 'finance/delete', {params: {id: id, userId: userId}})
+                        .then(function (res) {
+                            if (res.data.code == '1') {
+                                // self.$Modal.success({
+                                //     title: '',
+                                //     content: '操作成功'
+                                // });
+                                vm.toLoading();
+                            } else {
+                                vm.$Modal.error({content: '删除失败!'})
+                            }
+                        })
+                        .catch(function (err) {
+                            vm.$Modal.error({content: '出现异常，请联系管理员!'})
+                        })
+                },
+
+            },
+            mounted: function () {
+                this.init();
+
+            }
+
+        })
+    });
+
+    //表单验证配置参数
+    var validateOpt = {
+        overDueDays: [
+            {required: true, message: '请输入逾期天数', trigger: 'blur'},
+            {
+                validator: function (rule, value, callback, source, options) {
+                    var reg = /^\+?[1-9]\d*$/;
+                    if (!reg.test(vm.editCompanyCollectionTime.editCompanyCollectionForm.overDueDays)) {
+                        callback(new Error('逾期天数只能输入正整数'));
+                    } else {
+                        callback();//校验通过
+                    }
+
+                }, trigger: 'blur'
+            }
+        ],
+        startTime: [
+            {required: true, type: 'date', message: '请选择开始时间', trigger: 'change'}
+        ]
+    };
+</script>
+</body>
+</html>

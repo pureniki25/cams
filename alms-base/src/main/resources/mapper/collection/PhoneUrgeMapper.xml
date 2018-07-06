@@ -114,7 +114,7 @@
 --         LEFT JOIN tb_sys_parameter  as sys_param ON  col_status.collection_status = sys_param.param_value
 
         <where>
-            pList.repay_flag != 6
+            (pList.repay_flag != 6 or pList.repay_flag is null)
 --          sys_param.param_type = 2
             <!--   改用列表 IN查询 这两个先屏蔽
             <if test="areaId !=null and areaId !=''">
