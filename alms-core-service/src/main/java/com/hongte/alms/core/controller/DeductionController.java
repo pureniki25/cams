@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.plugins.Page;
 
 import com.hongte.alms.base.collection.vo.DeductionVo;
 import com.hongte.alms.base.entity.BasicBusiness;
-import com.hongte.alms.base.entity.MoneyPoolRepayment;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentConfirmLog;
@@ -14,7 +13,6 @@ import com.hongte.alms.base.entity.SysBank;
 import com.hongte.alms.base.entity.WithholdingPlatform;
 import com.hongte.alms.base.entity.WithholdingRecordLog;
 import com.hongte.alms.base.entity.WithholdingRepaymentLog;
-import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 
 import com.hongte.alms.base.service.*;
@@ -24,7 +22,6 @@ import com.hongte.alms.base.vo.module.BankLimitVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.vo.PageResult;
-import com.mysql.cj.core.io.BigDecimalValueFactory;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -156,7 +153,7 @@ public class DeductionController {
             	//查看当前期还款的总金额
         	
         		BigDecimal factAmountSum=BigDecimal.valueOf(0);
-        		boolean isBankRepay=false;//是否含有银行嗲口
+        		boolean isBankRepay=false;//是否含有银行代扣
                 List<RepaymentConfirmLog> comfirmLogs=repaymentConfirmLogService.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("org_business_id", planList.getOrigBusinessId()).eq("after_id", planList.getAfterId()));
         		for(RepaymentConfirmLog log:comfirmLogs) {
         			factAmountSum=factAmountSum.add(log.getFactAmount());
