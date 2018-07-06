@@ -53,6 +53,7 @@ import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.enums.RepayRegisterState;
 import com.hongte.alms.base.enums.RepayedFlag;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanPayedTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.mapper.AccountantOverRepayLogMapper;
@@ -1392,6 +1393,12 @@ public class FinanceServiceImpl implements FinanceService {
 				Map<String, List<RepaymentPlanInfoDTO>> map = new TreeMap<>();
 
 				for (RepaymentPlanInfoDTO repaymentPlanInfoDTO : repaymentPlanInfoDTOs) {
+					
+					repaymentPlanInfoDTO.setConfirmFlagStr(RepayPlanPayedTypeEnum.descOf(repaymentPlanInfoDTO.getConfirmFlag()));
+					
+					if (repaymentPlanInfoDTO.getConfirmFlag() == -1) {
+						repaymentPlanInfoDTO.setConfirmFlagStr("逾期");
+					}
 
 					double accrual = repaymentPlanInfoDTO.getAccrual();
 					double principal = repaymentPlanInfoDTO.getPrincipal();
@@ -1539,6 +1546,8 @@ public class FinanceServiceImpl implements FinanceService {
 			if (CollectionUtils.isNotEmpty(repaymentProjInfoDTOs)) {
 
 				for (RepaymentProjInfoDTO repaymentProjInfoDTO : repaymentProjInfoDTOs) {
+					
+					repaymentProjInfoDTO.setConfirmFlagStr(RepayPlanPayedTypeEnum.descOf(repaymentProjInfoDTO.getConfirmFlag()));
 
 					double accrual = repaymentProjInfoDTO.getAccrual();
 					double principal = repaymentProjInfoDTO.getPrincipal();
@@ -1581,6 +1590,10 @@ public class FinanceServiceImpl implements FinanceService {
 
 			if (CollectionUtils.isNotEmpty(planDTOs)) {
 				for (RepaymentProjInfoDTO repaymentProjInfoDTO : planDTOs) {
+					repaymentProjInfoDTO.setConfirmFlagStr(RepayPlanPayedTypeEnum.descOf(repaymentProjInfoDTO.getConfirmFlag()));
+					if (repaymentProjInfoDTO.getConfirmFlag() == -1) {
+						repaymentProjInfoDTO.setConfirmFlagStr("逾期");
+					}
 					String projPlanListId = repaymentProjInfoDTO.getProjPlanListId();
 					RepaymentProjInfoDTO dto = mapPlanDTO.get(projPlanListId);
 					if (dto == null) {
@@ -1592,6 +1605,10 @@ public class FinanceServiceImpl implements FinanceService {
 			if (CollectionUtils.isNotEmpty(repaymentProjInfoDTOs)) {
 
 				for (RepaymentProjInfoDTO repaymentProjInfoDTO : repaymentProjInfoDTOs) {
+					repaymentProjInfoDTO.setConfirmFlagStr(RepayPlanPayedTypeEnum.descOf(repaymentProjInfoDTO.getConfirmFlag()));
+					if (repaymentProjInfoDTO.getConfirmFlag() == -1) {
+						repaymentProjInfoDTO.setConfirmFlagStr("逾期");
+					}
 					String projPlanListId = repaymentProjInfoDTO.getProjPlanListId();
 					RepaymentProjInfoDTO dto = mapPlanDTO.get(projPlanListId);
 
