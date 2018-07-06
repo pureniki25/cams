@@ -737,7 +737,7 @@
 		  rppl.`proj_plan_list_id` projPlanListId,
 		  '实际还款' repayment,
 		  rppl.`after_id` afterId,
-		  rppl.`due_date` repaymentDate,
+		  rppl.`fact_repay_date` repaymentDate,
 		  rpp.`project_id`,
 		  tpi.`real_name`,
 		  -- 实还本金总额
