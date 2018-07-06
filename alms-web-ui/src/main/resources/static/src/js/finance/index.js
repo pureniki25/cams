@@ -139,6 +139,7 @@ window.layinit(function (htConfig) {
                     {
                         title: '状态',
                         key: 'status',
+                        width:200,
                         render: (h, p) => {
                             var s1 = p.row.planRepayDate;
                             s1 = new Date(s1.replace(/-/g, "/"));
