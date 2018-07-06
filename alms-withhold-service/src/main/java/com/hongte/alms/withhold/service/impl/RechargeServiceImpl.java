@@ -785,11 +785,14 @@ public class RechargeServiceImpl implements RechargeService {
 		}
 		
 		RepaymentProjPlanList projPList=repaymentProjPlanListService.selectOne(new EntityWrapper<RepaymentProjPlanList>().eq("plan_list_id", pList.getPlanListId()));
-		if(projPList.getPlateType()==2) {//你我金融的不代扣
-			result.setCode("-1");
-			result.setMsg("你我金融的不能自动代扣");
-			return result;
+		if(projPList!=null) {
+			if(projPList.getPlateType()==2) {//你我金融的不代扣
+				result.setCode("-1");
+				result.setMsg("你我金融的不能自动代扣");
+				return result;
+			}
 		}
+		
 	
 		
 //		RepaymentBizPlanList next = repaymentBizPlanListService
