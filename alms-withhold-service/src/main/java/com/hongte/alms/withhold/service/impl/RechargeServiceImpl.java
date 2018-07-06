@@ -204,6 +204,9 @@ public class RechargeServiceImpl implements RechargeService {
 					}else if(thirtyRepayTestResult.getParamValue().equals("1111")){
 						resultMsg="银行卡余额不足";
 						remoteResult.setReturnCode("1111");
+					}else if(thirtyRepayTestResult.getParamValue().equals("2222")){
+						resultMsg="处理中";
+						remoteResult.setReturnCode("EIP_TD_HANDLER_EXECEPTION");
 					}else {
 						resultMsg="代扣失败";
 						remoteResult.setReturnCode("9999");
@@ -280,6 +283,9 @@ public class RechargeServiceImpl implements RechargeService {
 					}else if(thirtyRepayTestResult.getParamValue().equals("1111")){
 						resultMsg="银行卡余额不足";
 						remoteResult.setReturnCode("1111");
+					}else if(thirtyRepayTestResult.getParamValue().equals("2222")){
+						resultMsg="处理中";
+						remoteResult.setReturnCode("EIP_BAOFU_BF00115");
 					}else {
 						resultMsg="代扣失败";
 						remoteResult.setReturnCode("9999");
@@ -375,6 +381,9 @@ public class RechargeServiceImpl implements RechargeService {
 						}else if(bankRepayTestResult.getParamValue().equals("1111")){
 							resultMsg="银行卡余额不足";
 							remoteResult.setReturnCode("1111");
+						}else if(bankRepayTestResult.getParamValue().equals("2222")){
+							resultMsg="处理中";
+							remoteResult.setReturnCode("EIP_TD_HANDLER_EXECEPTION");
 						}else {
 							resultMsg="代扣失败";
 							remoteResult.setReturnCode("9999");
