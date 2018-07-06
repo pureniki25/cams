@@ -54,6 +54,8 @@ window.layinit(function (htConfig) {
                     remark: '',
                     channelLevel: '',
                     channelId: '',
+                    subPlatformId:'',
+                    subPlatformName:''
                 },
 
                 withHoldChanelValidate: {
@@ -186,6 +188,13 @@ window.layinit(function (htConfig) {
                     .catch(function (error) {
                         vm.$Modal.error({content: '接口调用异常!'});
                     });
+            },
+            platformOnChange(e){
+                var value= e.target.value;
+                if(value ==5){
+
+                }
+
             },
             addHoldChannel(name) {
                 // console.log("addHoldChannel",addHoldChannel);

@@ -95,17 +95,27 @@
                 title="新增渠道"
                 :mask-closable="false">
             <i-form ref="withHoldChanelForm" :model="withHoldChanelForm" :rules="withHoldChanelValidate" :label-width="150">
-                <form-item label="渠道：" prop="platformId">
-                    <i-select v-model="withHoldChanelForm.platformId" clearable filterable >
+                <form-item label="渠道类型：" prop="platformId">
+                    <i-select v-model="withHoldChanelForm.platformId" clearable filterable @on-change="platformOnChange($event)" >
                         <i-option v-for="item in platformType" :value="item.platformId" :key="item.platformId">{{
                             item.platformName }}
                         </i-option>
                     </i-select>
                 </form-item>
+                <form-item label="银行代扣渠道编号：" prop="subPlatformId">
+                    <i-input v-model="withHoldChanelForm.subPlatformId" placeholder="银行代扣渠道编号" maxlength="30"
+                             style="width: 176px" :disabled="false" ></i-input>
+                </form-item>
+                <form-item label="银行代扣渠道名称：" prop="subPlatformName">
+                    <i-input v-model="withHoldChanelForm.subPlatformName" placeholder="银行代扣渠道名称" maxlength="30"
+                             style="width: 176px" :disabled="false" ></i-input>
+                </form-item>
+
                 <form-item label="代扣优先级：" prop="channelLevel">
                     <i-input v-model="withHoldChanelForm.channelLevel" placeholder="代扣优先级" maxlength="30"
                              style="width: 176px" number ></i-input>
                 </form-item>
+
                 <form-item label="渠道状态：" prop="state">
                     <radio-group v-model="withHoldChanelForm.state" number>
                         <radio label=1 >启用</radio>
