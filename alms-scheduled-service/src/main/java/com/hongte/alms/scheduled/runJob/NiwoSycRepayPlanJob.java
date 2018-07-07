@@ -15,6 +15,12 @@ import com.hongte.alms.scheduled.client.WithholdingClient;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.annotation.JobHandler;
+
+/**
+ * 
+ * @author czs
+ * 每天每隔半小时同步你我金融还款计划
+ */
 @JobHandler(value = "NiwoSycRepayPlanJobHandler")
 @Component
 public class NiwoSycRepayPlanJob extends IJobHandler {

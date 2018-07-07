@@ -87,6 +87,7 @@ public class DeductionController {
     @Qualifier("MoneyPoolRepaymentService")
     MoneyPoolRepaymentService moneyPoolRepaymentService;
 
+ 
 
     @Autowired
     @Qualifier("RepaymentBizPlanListDetailService")
@@ -125,6 +126,9 @@ public class DeductionController {
         	} catch (Exception e) {
         		return Result.error("-1", "调用信贷获取客户银行卡信息接口出错");
         	}
+        	
+      
+        	
             //执行代扣信息
             DeductionVo deductionVo=  deductionService.selectDeductionInfoByPlanListId(planListId);
             deductionVo.setBankCardInfo(bankCardInfo);
@@ -156,6 +160,8 @@ public class DeductionController {
         		boolean isHaveBankRepay=false;//是否含有银行代扣
         		boolean isHaveThirtyRepay=false;//是否含有第三方
         		boolean isHaveUnderRepay=false;//是否含有线下
+        		boolean isRepaying=isRepaying(planList);//判断是否有代扣中的记录
+        		deductionVo.setRepaying(isRepaying);
                 List<RepaymentConfirmLog> comfirmLogs=repaymentConfirmLogService.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("org_business_id", planList.getOrigBusinessId()).eq("after_id", planList.getAfterId()));
         		for(RepaymentConfirmLog log:comfirmLogs) {
         			factAmountSum=factAmountSum.add(log.getFactAmount());
@@ -345,7 +351,14 @@ public class DeductionController {
 
 	}
 
-
+	private boolean isRepaying(RepaymentBizPlanList pList) {
+		boolean isRepaying=false;
+		int i=withholdingRepaymentLogService.selectCount(new EntityWrapper<WithholdingRepaymentLog>().eq("original_business_id", pList.getOrigBusinessId()).eq("after_id", pList.getAfterId()).eq("repay_status", 2));
+		if(i>0) {
+			isRepaying=true;
+		}
+		return false;
+	}
    }
    
 
