@@ -24,7 +24,7 @@ public class FinanceManagerListVO {
 	private String planListId;
 	/**
 	 * 业务编号
-	 */
+	 */	
 	private String businessId;
 	private String orgBusinessId;
 	/**

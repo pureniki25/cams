@@ -44,7 +44,13 @@
 
         business.customer_name AS customerName,
         business.business_type AS businessTypeId,
-        b_type.business_type_name AS businessTypeName,
+        (
+        case
+          WHEN business.business_ctype='汽车融资租赁' then business.business_ctype
+          ELSE b_type.business_type_name
+        end
+        )
+         AS businessTypeName,
         business.borrow_money AS borrowMoney,
         pList.total_borrow_amount as totalBorrowAmount,
        -- pList.overdue_days as delayDays,
@@ -164,7 +170,17 @@
             </if>
             <!--   /*//业务类型*/ -->
             <if test="businessType !=null ">
-                and business.business_type = #{businessType}
+
+                <choose>
+                    <!--  汽车融资租赁 则根据子查询来查  -->
+                    <when test="businessType=14">
+                        and business.business_type = 9 and business.business_ctype='汽车融资租赁'
+                    </when>
+                    <otherwise>
+                        and business.business_type = #{businessType}
+                    </otherwise>
+                </choose>
+
             </if>
             <!--   /*//业务状态（贷后状态）*/ -->
             <if test="businessStatus !=null">

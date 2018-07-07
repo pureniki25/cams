@@ -780,6 +780,21 @@ public class FinanceController {
 		return result;
 	}
 	
+	@ApiOperation(value = "网关充值快捷充值核心接口")
+	@PostMapping("/recharge")
+	public Result recharge(@RequestBody ConfirmRepaymentReq req){
+		logger.info("@recharge@网关充值快捷充值核心接口--开始[{}]", req);
+		Result result=new Result();
+		try {
+			List<CurrPeriodProjDetailVO> list = shareProfitService.execute(req, true);
+			logger.info("@recharge@网关充值快捷充值核心接口--结束[{}]", list);
+			return result.success(list);
+		} catch (Exception ex) {
+			logger.error("分润出现异常"+ex);
+			return Result.error("-1","分润出现异常"+ex);
+		}
+	}
+	
 	@ApiOperation(value = "删除财务新增的银行流水")
 	@GetMapping("/deleteMoneyPool")
 	public Result deleteMoneyPool(String mprId) {

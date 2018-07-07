@@ -357,7 +357,7 @@ public class DeductionController {
 		if(i>0) {
 			isRepaying=true;
 		}
-		return false;
+		return isRepaying;
 	}
    }
    

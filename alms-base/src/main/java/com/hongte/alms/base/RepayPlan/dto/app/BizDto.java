@@ -31,6 +31,11 @@ public class BizDto  implements Serializable {
     private Date inputTime;//进件日期
 
 
+    private Integer plateType;//平台类型：1、团贷网；2、你我金融
+
+    private String identityCard;//身份证编码（主借款人的）
+
+
 //
 //    	`borrow_limit` INT(11) NOT NULL COMMENT '借款期限',
 //            `borrow_limit_unit` INT(11) NOT NULL COMMENT '借款期限单位，1：月，2：天',
@@ -150,5 +155,21 @@ public class BizDto  implements Serializable {
 
     public void setInputTime(Date inputTime) {
         this.inputTime = inputTime;
+    }
+
+    public Integer getPlateType() {
+        return plateType;
+    }
+
+    public void setPlateType(Integer plateType) {
+        this.plateType = plateType;
+    }
+
+    public String getIdentityCard() {
+        return identityCard;
+    }
+
+    public void setIdentityCard(String identityCard) {
+        this.identityCard = identityCard;
     }
 }
