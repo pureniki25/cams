@@ -2,14 +2,19 @@ package com.hongte.alms.withhold.service;
 
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
+import com.alibaba.fastjson.JSON;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.RepaymentProjPlanListDetail;
+import com.hongte.alms.base.entity.SysExceptionLog;
 import com.hongte.alms.base.entity.WithholdingChannel;
 import com.hongte.alms.base.entity.WithholdingRepaymentLog;
 import com.hongte.alms.base.feignClient.dto.BankCardInfo;
 import com.hongte.alms.base.feignClient.dto.CustomerInfoDto;
+import com.hongte.alms.base.feignClient.dto.NiWoProjPlanDto;
 import com.hongte.alms.common.result.Result;
 
 /**
@@ -31,9 +36,10 @@ public interface RechargeService {
      * @param platformId 代扣平台ID,ID为空是,默认客户银行卡号绑定的平台代扣
      * @param merchOrderId 生成商户订单号
      * @param bankCardInfo 为null时默认为手动代扣
+     * @param appType ,代扣来源：1.app_run(APP代扣) 2.auto_run(自动代扣)
      * @return
      */
-    Result recharge(BasicBusiness business, RepaymentBizPlanList pList,Double amount,Integer boolLastRepay,Integer boolPartRepay,BankCardInfo bankCardInfo,WithholdingChannel channel);
+    Result recharge(BasicBusiness business, RepaymentBizPlanList pList,Double amount,Integer boolLastRepay,Integer boolPartRepay,BankCardInfo bankCardInfo,WithholdingChannel channel,String appType);
     
     
 
@@ -80,7 +86,7 @@ public interface RechargeService {
 	 * boolPartRepay：表示本期是否分多笔代扣中的最后一笔代扣，若非多笔代扣，本字段存1。  0:非最后一笔代扣，1:最后一笔代扣
 	 */
 		
-	 WithholdingRepaymentLog recordRepaymentLog(String resultMsg,Integer status,RepaymentBizPlanList list,BasicBusiness business,BankCardInfo dto,Integer platformId,Integer boolLastRepay,Integer boolPartRepay,String merchOrderId,Integer settlementType,BigDecimal currentAmount);
+	 WithholdingRepaymentLog recordRepaymentLog(String resultMsg,Integer status,RepaymentBizPlanList list,BasicBusiness business,BankCardInfo dto,Integer platformId,Integer boolLastRepay,Integer boolPartRepay,String merchOrderId,Integer settlementType,BigDecimal currentAmount,String appType);
 		
      /**
 	  * 查询每期扣除处理中和成功代扣的金额，得出剩余未还金额
@@ -162,5 +168,15 @@ public interface RechargeService {
 		 * 获取该还款计划最早一期没有还的代扣 
 		 */
 	RepaymentBizPlanList getEarlyPeriod(RepaymentBizPlanList list);
+	
+	/**
+	 * 记录异常日志
+	 * @param dto
+	 */
+	
+	 void RecordExceptionLog(String OriginalBusinessId,String afterId,String msg);
+	 
+	 
+
 }
 

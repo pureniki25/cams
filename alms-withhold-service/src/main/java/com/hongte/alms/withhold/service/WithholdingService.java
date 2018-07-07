@@ -23,6 +23,7 @@ public interface WithholdingService {
     
     /**
      * app代扣操作
+     * type
      */
     Result appWithholding(RepaymentBizPlanList pList);
     

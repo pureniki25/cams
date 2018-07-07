@@ -12,6 +12,7 @@ import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentConfirmLog;
 import com.hongte.alms.base.entity.RepaymentProjPlanList;
+import com.hongte.alms.base.entity.SysExceptionLog;
 import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.entity.WithholdingChannel;
 import com.hongte.alms.base.entity.WithholdingRepaymentLog;
@@ -38,6 +39,7 @@ import com.hongte.alms.base.service.RepaymentBizPlanListDetailService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.RepaymentConfirmLogService;
 import com.hongte.alms.base.service.RepaymentProjPlanListService;
+import com.hongte.alms.base.service.SysExceptionLogService;
 import com.hongte.alms.base.service.SysParameterService;
 import com.hongte.alms.base.service.WithholdingChannelService;
 import com.hongte.alms.base.service.WithholdingRepaymentLogService;
@@ -52,6 +54,7 @@ import com.hongte.alms.withhold.service.RedisService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.hongte.alms.base.process.entity.Process;
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -118,6 +121,10 @@ public class RechargeServiceImpl implements RechargeService {
 	@Qualifier("RepaymentConfirmLogService")
 	RepaymentConfirmLogService repaymentConfirmLogService;
 	
+	@Autowired
+	@Qualifier("SysExceptionLogService")
+	SysExceptionLogService sysExceptionLogService;
+	
     @Autowired
     CustomerInfoXindaiRemoteApi customerInfoXindaiRemoteApi;
     
@@ -151,7 +158,7 @@ public class RechargeServiceImpl implements RechargeService {
 
 	@Override
 	public Result recharge(BasicBusiness business, RepaymentBizPlanList pList, Double amount, Integer boolLastRepay,
-			Integer boolPartRepay, BankCardInfo bankCardInfo, WithholdingChannel channel) {
+			Integer boolPartRepay, BankCardInfo bankCardInfo, WithholdingChannel channel,String appType) {
 
 		Result result = new Result();
 		// 获取商户订单号
@@ -193,7 +200,7 @@ public class RechargeServiceImpl implements RechargeService {
 				Integer status = 2;
 				WithholdingRepaymentLog log = recordRepaymentLog("", status, pList, business, bankCardInfo,
 						channel.getPlatformId(), boolLastRepay, boolPartRepay, merchOrderId, 0,
-						BigDecimal.valueOf(amount));
+						BigDecimal.valueOf(amount),appType);
 				String resultMsg="";
 				com.ht.ussp.core.Result remoteResult=eipRemote.directBindPay(dto);
 				
@@ -263,7 +270,7 @@ public class RechargeServiceImpl implements RechargeService {
 				Integer status = 2;
 				WithholdingRepaymentLog log = recordRepaymentLog("", status, pList, business, bankCardInfo,
 						channel.getPlatformId(), boolLastRepay, boolPartRepay, merchOrderId, 0,
-						BigDecimal.valueOf(amount));
+						BigDecimal.valueOf(amount),appType);
 				com.ht.ussp.core.Result remoteResult = null;
 				try {
 					remoteResult = eipRemote.baofuRecharge(dto);
@@ -348,7 +355,7 @@ public class RechargeServiceImpl implements RechargeService {
 				Integer status = 2;
 				WithholdingRepaymentLog log = recordRepaymentLog("", status, pList, business, bankCardInfo,
 						channel.getPlatformId(), boolLastRepay, boolPartRepay, merchOrderId, 0,
-						BigDecimal.valueOf(amount));
+						BigDecimal.valueOf(amount),appType);
 
 				BankRechargeReqDto dto = new BankRechargeReqDto();
 				for (SignedProtocol signedProtocol : signedProtocolList) {// 需要循环签约子渠道
@@ -628,7 +635,7 @@ public class RechargeServiceImpl implements RechargeService {
 
 	public WithholdingRepaymentLog recordRepaymentLog(String msg, Integer status, RepaymentBizPlanList list,
 			BasicBusiness business, BankCardInfo dto, Integer platformId, Integer boolLastRepay, Integer boolPartRepay,
-			String merchOrderId, Integer settlementType, BigDecimal currentAmount) {
+			String merchOrderId, Integer settlementType, BigDecimal currentAmount,String appType) {
 		WithholdingRepaymentLog log = new WithholdingRepaymentLog();
 		log.setAfterId(list.getAfterId());
 		log.setBankCard(dto.getBankCardNumber());
@@ -658,8 +665,8 @@ public class RechargeServiceImpl implements RechargeService {
 			log.setUpdateUser(loginUserInfoHelper.getUserId());
 			log.setCreateUser(loginUserInfoHelper.getUserId());
 		} else {
-			log.setCreateUser("auto_run");
-			log.setUpdateUser("auto_run");
+			log.setCreateUser(appType);
+			log.setUpdateUser(appType);
 		}
 
 		log.setCurrentAmount(currentAmount);// 本次代扣金额
@@ -747,6 +754,7 @@ public class RechargeServiceImpl implements RechargeService {
 			// msg = "借款日期大于当前日期";
 			result.setCode("-1");
 			result.setMsg("借款日期大于当前日期");
+			RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
 			return result;
 		}
 		if (pList.getPeriod() == 0)
@@ -755,6 +763,7 @@ public class RechargeServiceImpl implements RechargeService {
 			// msg = "自动代扣取消展期00期代扣";
 			result.setCode("-1");
 			result.setMsg("自动代扣取消展期第0期代扣");
+			RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
 			return result;
 		}
 
@@ -762,6 +771,7 @@ public class RechargeServiceImpl implements RechargeService {
 			// msg="最后一期不能自动代扣"
 			result.setCode("-1");
 			result.setMsg("最后一期不能自动代扣");
+			RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
 			return result;
 		}
 		
@@ -769,12 +779,14 @@ public class RechargeServiceImpl implements RechargeService {
 			// msg="客户还款登记了不能自动代扣"
 			result.setCode("-1");
 			result.setMsg("客户还款登记了不能自动代扣");
+			RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
 			return result;
 		}
 		if(isUnderRepay(pList)) {
 			// 判断是否含有线下转账，如果有，不能自动代扣
 			result.setCode("-1");
 			result.setMsg("含有线下转账，不能自动代扣");
+			RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
 			return result;
 		}
 		
@@ -782,12 +794,14 @@ public class RechargeServiceImpl implements RechargeService {
 			//判断是否发起过减免申请,发起过的不能自动代扣
 			result.setCode("-1");
 			result.setMsg("发起过减免申请,不能自动代扣");
+			RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
 			return result;
 		}
        if(isRepaying(pList)) {
     		//判断是否有处理中的代扣记录
 			result.setCode("-1");
 			result.setMsg("有处理中的代扣记录,不能自动代扣");
+			RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
 			return result;
        }
 		RepaymentProjPlanList projPList=repaymentProjPlanListService.selectOne(new EntityWrapper<RepaymentProjPlanList>().eq("plan_list_id", pList.getPlanListId()));
@@ -795,6 +809,7 @@ public class RechargeServiceImpl implements RechargeService {
 			if(projPList.getPlateType()==2) {//你我金融的不代扣
 				result.setCode("-1");
 				result.setMsg("你我金融的不能自动代扣");
+				RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
 				return result;
 			}
 		}
@@ -1063,6 +1078,22 @@ public class RechargeServiceImpl implements RechargeService {
 		}
 		return isRepaying;
 	}
-	
+
+	@Override
+	public void RecordExceptionLog(String OriginalBusinessId,String afterId, String msg) {
+		String errorMsg=MessageFormat.format("自动代扣跳出:businessId:{0},afterId:{1},{2}",OriginalBusinessId,afterId,msg);
+		SysExceptionLog log=new SysExceptionLog();
+		log.setLogDate(new Date());
+		log.setLogLevel("1");
+		log.setLogger(afterId);
+		log.setBusinessId(OriginalBusinessId);
+		log.setLogMessage(errorMsg);
+		log.setLogType("自动代扣");
+		log.insert();
+		sysExceptionLogService.insertOrUpdate(log);
+		
+	}
+
+
 
 }
