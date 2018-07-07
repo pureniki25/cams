@@ -191,6 +191,7 @@
 			b.business_ctype as businessType ,
 			pl.due_date as planRepayDate ,
 			b.borrow_money as borrowMoney,
+			bbc.phone_number as phoneNumber,
 			CASE
 			    repayment_type_id 
 			    WHEN 1 
@@ -224,6 +225,7 @@
 		FROM
 		tb_repayment_biz_plan_list pl
 		JOIN tb_basic_business b ON b.business_id = pl.orig_business_id
+		LEFT JOIN tb_basic_biz_customer bbc ON bbc.business_id = b.business_id
 		LEFT JOIN tb_basic_company bc ON bc.area_id = b.company_id
 		LEFT JOIN tb_money_pool_repayment mpr ON mpr.plan_list_id = pl.plan_list_id 
 		<where>
@@ -351,6 +353,7 @@
 		  rbpl.plan_list_id,
 		  '计划还款' repayment,
 		  rbpl.`after_id` afterId,
+		  rbpl.period,
 		  rbpl.`due_date` repaymentDate,
 		  -- 应还本金总额
 		  IFNULL(
@@ -475,13 +478,15 @@
 		  `tb_repayment_biz_plan_list_detail` rbpld 
 		WHERE rbpl.plan_list_id = rbpld.plan_list_id 
 		  AND rbpl.orig_business_id = #{businessId,jdbcType=VARCHAR} 
-		GROUP BY rbpl.`plan_list_id` 
+		-- GROUP BY rbpl.`plan_list_id`
+		  GROUP BY rbpl.period 
 		UNION
 		ALL 
 		SELECT 
 		  rbpl.plan_list_id,
 		  '实际还款' repayment,
 		  rbpl.`after_id` afterId,
+		  rbpl.period,
 		  rbpl.`fact_repay_date` repaymentDate,
 		  -- 实还本金总额
 		  IFNULL(
@@ -605,7 +610,8 @@
 		  `tb_repayment_biz_plan_list_detail` rbpld 
 		WHERE rbpl.plan_list_id = rbpld.plan_list_id 
 		  AND rbpl.orig_business_id = #{businessId,jdbcType=VARCHAR} 
-		GROUP BY rbpl.`plan_list_id` 
+		-- GROUP BY rbpl.`plan_list_id`
+		  GROUP BY rbpl.period 
     </select>
     
     <select id="queryPlanRepaymentProjInfoByPlanListId" resultType="com.hongte.alms.base.dto.RepaymentProjInfoDTO">
