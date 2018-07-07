@@ -1,6 +1,8 @@
 package com.hongte.alms.scheduled.runJob;
 
 import org.slf4j.Logger;
+
+
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -14,6 +16,13 @@ import com.hongte.alms.scheduled.client.WithholdingClient;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.annotation.JobHandler;
+
+/**
+ * 
+ * @author czs
+ *自动代扣任务，每天下午1点和晚上9点执行
+ */
+
 @JobHandler(value = "autoRechargeJobHandler")
 @Component
 public class AutoRechargeJob extends IJobHandler {
