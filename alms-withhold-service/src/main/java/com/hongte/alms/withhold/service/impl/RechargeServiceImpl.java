@@ -867,6 +867,9 @@ public class RechargeServiceImpl implements RechargeService {
 		boolean isUnderRepay=false;
 		int i=repaymentConfirmLogService.selectCount(new EntityWrapper<RepaymentConfirmLog>().eq("org_business_id", list.getOrigBusinessId()).eq("after_id", list.getAfterId()).eq("repay_source", 10));
 		if(i>0) {
+			if(list.getRepayStatus()!=null&&list.getRepayStatus()==2) {//线上已还完也可以自动代扣
+				isUnderRepay=false;
+			}
 			isUnderRepay=true;
 		}else {
 			isUnderRepay=false;
