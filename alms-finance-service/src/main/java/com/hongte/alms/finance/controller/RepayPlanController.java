@@ -102,6 +102,10 @@ public class RepayPlanController {
     @Qualifier("CarBasicService")
     CarBasicService carBasicService;
 
+    @Autowired
+    @Qualifier("TuandaiProjectInfoService")
+    TuandaiProjectInfoService tuandaiProjectInfoService;
+
     private static Validator validator;
 
     //初始化
@@ -634,6 +638,17 @@ public class RepayPlanController {
         if(business ==null){
             throw  new MyException(ExceptionCodeEnum.NULL.getValue().toString(),"找不到业务信息，业务ID："+businessId);
         }
+
+        List<TuandaiProjectInfo> ll= tuandaiProjectInfoService.selectList(new EntityWrapper<TuandaiProjectInfo>().eq("business_id",businessId));
+
+        if(ll!=null&&ll.size()>0){
+            bizDto.setPlateType(ll.get(0).getPlateType());
+            //你我金融的单 返回主借款人的
+            if(bizDto.getPlateType().equals(2)){
+                bizDto.setIdentityCard(business.getCustomerIdentifyCard());
+            }
+        }
+
 
 
         //有子类型则显示子类型（信用贷的按此处理）

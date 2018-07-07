@@ -612,8 +612,9 @@
                         dataType: "json",
                         success: function (data) {
                             self.areaAndCity.allAreas[0].children = data.data;
-                            areaId = self.areaAndCity.allAreas[0].children[0].areaId;
-                            self.getCompany(areaId);
+                            //self.areaAndCity.allAreas[0].selected = true;
+                            //areaId = self.areaAndCity.allAreas[0].children[0].areaId;
+                            //self.getCompany(areaId);
                         }
 
                     });

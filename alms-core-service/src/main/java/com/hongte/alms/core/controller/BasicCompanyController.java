@@ -10,7 +10,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -48,5 +51,29 @@ public class BasicCompanyController {
 
     }
 
+
+    /**
+     * 获取所有分公司信息
+     *
+     * @return
+     * @author 张贵宏
+     */
+    @ApiOperation(value = "获取所有分公司信息")
+    @RequestMapping("findAllBranchCompany")
+    public Result<List<BasicCompany>> findAllBranchCompany() {
+        return Result.success(basicCompanyService.selectList(new EntityWrapper<BasicCompany>().eq("area_level", AreaLevel.COMPANY_LEVEL.getKey())));
+    }
+
+    /**
+     * 获取所有区域信息
+     *
+     * @return
+     * @author 张贵宏
+     */
+    @ApiOperation(value = "获取所有区域信息")
+    @RequestMapping("findAllAreaCompany")
+    public Result<List<BasicCompany>> findAllAreaCompany() {
+        return Result.success(basicCompanyService.selectList(new EntityWrapper<BasicCompany>().eq("area_level", AreaLevel.AREA_LEVEL.getKey())));
+    }
 }
 

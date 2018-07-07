@@ -21,6 +21,10 @@ public class RepaymentPlanInfoDTO implements Serializable {
 	 */
 	private String afterId;
 	/**
+	 * 平台期次
+	 */
+	private String period;
+	/**
 	 * 还款日期：应还日期/实际还款日期
 	 */
 	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
@@ -112,6 +116,14 @@ public class RepaymentPlanInfoDTO implements Serializable {
 
 	public void setAfterId(String afterId) {
 		this.afterId = afterId;
+	}
+
+	public String getPeriod() {
+		return period;
+	}
+
+	public void setPeriod(String period) {
+		this.period = period;
 	}
 
 	public Date getRepaymentDate() {
@@ -253,10 +265,10 @@ public class RepaymentPlanInfoDTO implements Serializable {
 	@Override
 	public String toString() {
 		return "RepaymentPlanInfoDTO [planListId=" + planListId + ", repayment=" + repayment + ", afterId=" + afterId
-				+ ", repaymentDate=" + repaymentDate + ", principal=" + principal + ", accrual=" + accrual
-				+ ", serviceCharge=" + serviceCharge + ", platformCharge=" + platformCharge + ", otherFee=" + otherFee
-				+ ", subtotal=" + subtotal + ", overdueDays=" + overdueDays + ", onlineLateFee=" + onlineLateFee
-				+ ", offlineLateFee=" + offlineLateFee + ", onlineDerateAmount=" + onlineDerateAmount
+				+ ", period=" + period + ", repaymentDate=" + repaymentDate + ", principal=" + principal + ", accrual="
+				+ accrual + ", serviceCharge=" + serviceCharge + ", platformCharge=" + platformCharge + ", otherFee="
+				+ otherFee + ", subtotal=" + subtotal + ", overdueDays=" + overdueDays + ", onlineLateFee="
+				+ onlineLateFee + ", offlineLateFee=" + offlineLateFee + ", onlineDerateAmount=" + onlineDerateAmount
 				+ ", offlineDerateAmount=" + offlineDerateAmount + ", surplus=" + surplus + ", total=" + total
 				+ ", amount=" + amount + ", confirmFlag=" + confirmFlag + ", confirmFlagStr=" + confirmFlagStr + "]";
 	}
