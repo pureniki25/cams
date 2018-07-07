@@ -16,10 +16,7 @@ import com.hongte.alms.base.dto.MoneyPoolManagerReq;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.dto.core.LayTableQuery;
 import com.hongte.alms.base.entity.*;
-import com.hongte.alms.base.enums.AreaLevel;
-import com.hongte.alms.base.enums.PlatformEnum;
-import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
-import com.hongte.alms.base.enums.RepayRegisterState;
+import com.hongte.alms.base.enums.*;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.service.*;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
@@ -783,6 +780,21 @@ public class FinanceController {
 		return result;
 	}
 	
+	@ApiOperation(value = "网关充值快捷充值核心接口")
+	@PostMapping("/recharge")
+	public Result recharge(@RequestBody ConfirmRepaymentReq req){
+		logger.info("@recharge@网关充值快捷充值核心接口--开始[{}]", req);
+		Result result=new Result();
+		try {
+			List<CurrPeriodProjDetailVO> list = shareProfitService.execute(req, true);
+			logger.info("@recharge@网关充值快捷充值核心接口--结束[{}]", list);
+			return result.success(list);
+		} catch (Exception ex) {
+			logger.error("分润出现异常"+ex);
+			return Result.error("-1","分润出现异常"+ex);
+		}
+	}
+	
 	@ApiOperation(value = "删除财务新增的银行流水")
 	@GetMapping("/deleteMoneyPool")
 	public Result deleteMoneyPool(String mprId) {
@@ -908,7 +920,8 @@ public class FinanceController {
         List<BasicBusinessType> btype_list = basicBusinessTypeService.selectList(new EntityWrapper<BasicBusinessType>().orderBy("business_type_id"));
         retMap.put("businessType", (JSONArray) JSON.toJSON(btype_list, JsonUtil.getMapping()));
         //查询用户
-        List<SysUser> users = sysUserService.selectList(new EntityWrapper<>());
+        //List<SysUser> users = sysUserService.selectList(new EntityWrapper<>());
+        List<SysUser> users = sysUserService.selectUsersByRole(SysRoleEnums.DH_CASHIER.getKey());
         retMap.put("users", (JSONArray) JSON.toJSON(users, JsonUtil.getMapping()));
 
         logger.info("@getOrderSetSearchInfo@查找财务人员跟单设置查询相关信息--结束[{}]", JSON.toJSONString(retMap));
