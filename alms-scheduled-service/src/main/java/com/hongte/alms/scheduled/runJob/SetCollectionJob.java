@@ -12,7 +12,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
-
+/**
+ * 
+ * @author zk
+ * 每天自动分配催收
+ */
 @JobHandler(value = "setCollectionHandler")
 @Component
 public class SetCollectionJob extends IJobHandler  {
