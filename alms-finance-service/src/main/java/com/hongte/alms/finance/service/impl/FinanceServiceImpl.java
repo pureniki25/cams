@@ -55,6 +55,7 @@ import com.hongte.alms.base.enums.RepayedFlag;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanPayedTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
+import com.hongte.alms.base.enums.repayPlan.SectionRepayStatusEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.mapper.AccountantOverRepayLogMapper;
 import com.hongte.alms.base.mapper.ApplyDerateProcessMapper;
@@ -1455,12 +1456,23 @@ public class FinanceServiceImpl implements FinanceService {
 						for (RepaymentPlanInfoDTO infoDTO : infoDTOs) {
 							String repayment = infoDTO.getRepayment();
 							if ("计划还款".equals(repayment)) {
-								infoDTO.setConfirmFlagStr(RepayPlanPayedTypeEnum.descOf(infoDTO.getConfirmFlag()));
-								
-								if (infoDTO.getConfirmFlag() == -1) {
-									infoDTO.setConfirmFlagStr("逾期");
-								}
 								planInfoDTO = infoDTO; // infoDTOs.get(0) 根据sql取数规则，必定为计划还款
+								int confirmFlag = planInfoDTO.getConfirmFlag();
+								switch (confirmFlag) {
+								case -1:
+									planInfoDTO.setConfirmFlagStr("逾期");
+									break;
+								case 1:
+									planInfoDTO.setConfirmFlagStr(SectionRepayStatusEnum.getName(confirmFlag));
+									break;
+								case 2:
+									planInfoDTO.setConfirmFlagStr(SectionRepayStatusEnum.getName(confirmFlag));
+									break;
+
+								default:
+									planInfoDTO.setConfirmFlagStr(RepayPlanPayedTypeEnum.descOf(confirmFlag));
+									break;
+								}
 							} else if ("实际还款".equals(repayment)) {
 								// accrual += infoDTO.getAccrual();
 								// offlineLateFee += infoDTO.getOfflineLateFee();

@@ -479,13 +479,15 @@
 		    AND t1.plan_list_id = rbpl.plan_list_id) amount,
 		  0 otherFee,
 		  0 surplus,
-		  CASE rbpl.`current_status`
-		  WHEN '已还款' 
-		  THEN rbpl.`repay_flag`
-		  WHEN '还款中' 
-		  THEN 0
-		  ELSE -1 
-		  END  confirmFlag,
+		  CASE
+		    rbpl.`current_status` 
+		    WHEN '已还款' 
+		    THEN rbpl.`repay_flag` 
+		    WHEN '还款中' 
+		    THEN IFNULL(rbpl.repay_status, 0) 
+		    WHEN '逾期' 
+		    THEN IFNULL(rbpl.repay_status, - 1) 
+		  END confirmFlag,
 		  '' confirmFlagStr
 		FROM
 		  `tb_repayment_biz_plan_list` rbpl,
@@ -607,13 +609,15 @@
 		    AND t.money_type = 1 
 		    AND t.business_id = #{businessId,jdbcType=VARCHAR} 
 		    AND t.business_after_id = rbpl.after_id) surplus,
-		  CASE rbpl.`current_status`
-		  WHEN '已还款' 
-		  THEN rbpl.`repay_flag`
-		  WHEN '还款中' 
-		  THEN 0
-		  ELSE -1 
-		  END  confirmFlag,
+		  CASE
+		    rbpl.`current_status` 
+		    WHEN '已还款' 
+		    THEN rbpl.`repay_flag` 
+		    WHEN '还款中' 
+		    THEN IFNULL(rbpl.repay_status, 0)
+		    WHEN '逾期'
+		    THEN IFNULL(rbpl.repay_status, -1)
+		  END confirmFlag,
 		  rbpl.remark confirmFlagStr
 		FROM
 		  `tb_repayment_biz_plan_list` rbpl,

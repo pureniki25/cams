@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -54,6 +55,7 @@ import com.hongte.alms.common.util.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
+//@CrossOrigin
 @RestController
 @RequestMapping("/transferOfLitigation")
 @Api(tags = "TransferOfLitigationControllerApi", description = "诉讼移交API", hidden = true)
@@ -173,7 +175,7 @@ public class TransferOfLitigationController {
 			}
 		} catch (Exception e) {
 			LOG.error("获取车贷诉讼相关数据异常!!!", e);
-			return Result.error("500", "系统异常");
+			return Result.error("500", e.getMessage());
 		}
 	}
 
@@ -216,7 +218,7 @@ public class TransferOfLitigationController {
 			return Result.success(resultMap);
 		} catch (Exception e) {
 			LOG.error("-- queryTransferLitigationData -- 获取房贷诉讼相关数据异常！！！", e);
-			return Result.error("500", "系统异常");
+			return Result.error("500", e.getMessage());
 		}
 	}
 
