@@ -40,10 +40,19 @@ public interface RechargeService {
     /**
      * 
      * 判断每期还款计划是否为最后一期
-     * @param projPlanList
+     * @param pList
      * @return
      */
 	boolean istLastPeriod(RepaymentBizPlanList pList);
+	
+
+    /**
+     * 
+     * 判断每期还款计划有没有代扣处理中的数据
+     * @param pList
+     * @return
+     */
+	boolean isRepaying(RepaymentBizPlanList pList);
 	  /**
 	   * 是否可以执行自动代扣
 	   * @param days 周期天数

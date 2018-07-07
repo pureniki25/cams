@@ -15,6 +15,11 @@ import com.hongte.alms.scheduled.client.WithholdingClient;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.annotation.JobHandler;
+/**
+ * 
+ * @author czs
+ *你我金融还款计划，当天扣款失败时候统一在晚上9点发送扣款失败短信
+ */
 @JobHandler(value = "NiwoSendFailMsgJobHandler")
 @Component
 public class NiwoSendFailMsgJob extends IJobHandler {

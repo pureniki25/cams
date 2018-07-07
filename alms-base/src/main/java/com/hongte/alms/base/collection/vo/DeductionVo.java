@@ -54,10 +54,16 @@ public class DeductionVo {
     private boolean haveBankRepay;//是否含有银行代扣
     private boolean haveThirtyRepay;//是否含有用电放代扣
     private boolean haveUnderRepay;//是否含有线下转账
-    
+    private boolean repaying;//是否有代扣中的记录
     
  
 	
+	public boolean isRepaying() {
+		return repaying;
+	}
+	public void setRepaying(boolean repaying) {
+		this.repaying = repaying;
+	}
 	public boolean isHaveBankRepay() {
 		return haveBankRepay;
 	}

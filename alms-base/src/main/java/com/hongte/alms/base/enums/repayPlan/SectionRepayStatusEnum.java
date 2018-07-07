@@ -24,4 +24,14 @@ public enum SectionRepayStatusEnum {
 	public String getName() {
 		return name;
 	}
+	
+	public static String getName(int value) {  
+		SectionRepayStatusEnum[] sectionRepayStatusEnums = values();  
+        for (SectionRepayStatusEnum sectionRepayStatusEnum : sectionRepayStatusEnums) {  
+            if (sectionRepayStatusEnum.getKey().intValue() == value) {  
+                return sectionRepayStatusEnum.getName();  
+            }  
+        }  
+        return null;  
+    } 
 }

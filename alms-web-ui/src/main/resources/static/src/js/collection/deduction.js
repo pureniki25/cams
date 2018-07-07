@@ -64,6 +64,7 @@ var layer;
                     haveBankRepay:'',
                     haveThirtyRepay:'',
                     haveUnderRepay:'',
+                    repaying:'',
                     business:[],
                     bankCardInfo:[],
                     pList:[]
@@ -144,6 +145,12 @@ var layer;
 	    }
 	    if(vm.ajax_data.haveThirtyRepay==true&&vm.platformId==5){debugger
 	    	 vm.$Modal.error({content:"第三方代扣和银行代扣不能混合代扣"});
+	        vm.loading = false;
+	    	return;
+	    }
+	    
+	    if(vm.ajax_data.repaying==true){debugger
+	    	 vm.$Modal.error({content:"有代扣处理中的记录，不能再代扣"});
 	        vm.loading = false;
 	    	return;
 	    }

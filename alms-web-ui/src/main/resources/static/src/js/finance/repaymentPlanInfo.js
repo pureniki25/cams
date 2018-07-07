@@ -254,7 +254,7 @@ window.layinit(function (htConfig) {
         		{
         			title: '状态',
         			key: 'confirmFlagStr',
-        			width: 500,
+        			width: 800,
         		},
         		],
         		// 还款计划表头  -- end --

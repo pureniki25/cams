@@ -6,6 +6,7 @@ package com.hongte.alms.base.enums;
  * 系统角色枚举
  */
 public enum SysRoleEnums {
+    DH_CASHIER("DH_CASHIER", "出纳组"),
 	DH_LOAN_COMMISSIONER ("DH_LOAN_COMMISSIONER","车辆拍卖申请专员"),
 	HD_GENERAL_COMMISSIO ("HD_GENERAL_COMMISSIO"	,"综合管理专员"/*,false*/)      ,//HD_GENERAL_COMMISSIO
 	HD_ASSET_COMMISSIONE ("HD_ASSET_COMMISSIONE"	,"资产管理专员"/*,true*/)      ,  //清算二

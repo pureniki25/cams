@@ -636,7 +636,6 @@ public class RechargeServiceImpl implements RechargeService {
 		log.setBoolLastRepay(boolLastRepay);
 		log.setBoolPartRepay(boolPartRepay);
 		log.setCreateTime(new Date());
-		log.setCreateUser(loginUserInfoHelper.getUserId());
 		log.setIdentityCard(business.getCustomerIdentifyCard());
 		log.setMerchOrderId(merchOrderId);
 		log.setOriginalBusinessId(business.getBusinessId());
@@ -657,7 +656,9 @@ public class RechargeServiceImpl implements RechargeService {
 		log.setUpdateTime(new Date());
 		if (loginUserInfoHelper != null && !StringUtil.isEmpty(loginUserInfoHelper.getUserId())) {
 			log.setUpdateUser(loginUserInfoHelper.getUserId());
+			log.setCreateUser(loginUserInfoHelper.getUserId());
 		} else {
+			log.setCreateUser("auto_run");
 			log.setUpdateUser("auto_run");
 		}
 
@@ -783,7 +784,12 @@ public class RechargeServiceImpl implements RechargeService {
 			result.setMsg("发起过减免申请,不能自动代扣");
 			return result;
 		}
-		
+       if(isRepaying(pList)) {
+    		//判断是否有处理中的代扣记录
+			result.setCode("-1");
+			result.setMsg("有处理中的代扣记录,不能自动代扣");
+			return result;
+       }
 		RepaymentProjPlanList projPList=repaymentProjPlanListService.selectOne(new EntityWrapper<RepaymentProjPlanList>().eq("plan_list_id", pList.getPlanListId()));
 		if(projPList!=null) {
 			if(projPList.getPlateType()==2) {//你我金融的不代扣
@@ -861,6 +867,9 @@ public class RechargeServiceImpl implements RechargeService {
 		boolean isUnderRepay=false;
 		int i=repaymentConfirmLogService.selectCount(new EntityWrapper<RepaymentConfirmLog>().eq("org_business_id", list.getOrigBusinessId()).eq("after_id", list.getAfterId()).eq("repay_source", 10));
 		if(i>0) {
+			if(list.getRepayStatus()!=null&&list.getRepayStatus()==2) {//线上已还完也可以自动代扣
+				isUnderRepay=false;
+			}
 			isUnderRepay=true;
 		}else {
 			isUnderRepay=false;
@@ -1044,4 +1053,16 @@ public class RechargeServiceImpl implements RechargeService {
 		return factAmountSum;
 
 	}
+
+	@Override
+	public boolean isRepaying(RepaymentBizPlanList pList) {
+		boolean isRepaying=false;
+		int i=withholdingRepaymentLogService.selectCount(new EntityWrapper<WithholdingRepaymentLog>().eq("original_business_id", pList.getOrigBusinessId()).eq("after_id", pList.getAfterId()).eq("repay_status", 2));
+		if(i>0) {
+			isRepaying=true;
+		}
+		return isRepaying;
+	}
+	
+
 }
