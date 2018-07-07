@@ -1456,7 +1456,14 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                 throw new ServiceRuntimeException("找不到对应的projPlanList");
             }
             projPlanList.setFactRepayDate(financeBaseDto.getConfirmLog().getRepayDate());
-            projPlanList.setRemark(financeBaseDto.getRemark());
+            if (!StringUtil.isEmpty(financeBaseDto.getRemark())) {
+            	if (StringUtil.isEmpty(projPlanList.getRemark())) {
+    				projPlanList.setRemark(financeBaseDto.getRemark());
+    			}else {
+    				projPlanList.setRemark(projPlanList.getRemark().concat("\r\n").concat(financeBaseDto.getRemark()));
+    			}
+			}
+            
             BigDecimal pjlFactAmount = sumProjPlanListFactAmountInMem(projPlanList.getProjPlanListId(), financeBaseDto);
 
 			/* 如果实还大于应还+逾期 */
@@ -1478,7 +1485,13 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 
             RepaymentBizPlanList bizPlanList = findRepaymentbizplanlist(projPlanList.getPlanListId(), financeBaseDto);
             bizPlanList.setFactRepayDate(financeBaseDto.getConfirmLog().getRepayDate());
-            bizPlanList.setRemark(financeBaseDto.getRemark());
+			if (!StringUtil.isEmpty(financeBaseDto.getRemark())) {
+				if (StringUtil.isEmpty(bizPlanList.getRemark())) {
+					bizPlanList.setRemark(financeBaseDto.getRemark());
+				} else {
+					bizPlanList.setRemark(bizPlanList.getRemark().concat("\r\n").concat(financeBaseDto.getRemark()));
+				}
+			}
             bizPlanList.setFinanceComfirmDate(new Date());
 
             BigDecimal bplFactAmount = sumBizPlanListFactAmount(bizPlanList.getPlanListId(), financeBaseDto);

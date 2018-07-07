@@ -15,6 +15,11 @@ import com.hongte.alms.scheduled.client.WithholdingClient;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.annotation.JobHandler;
+/**
+ * 
+ * @author czs
+ * 你我金融业务，发送还款提醒短信，每天定时发送
+ */
 @JobHandler(value = "NiwoSendRemindMsgJobHandler")
 @Component
 public class NiwoSendRemindMsgJob extends IJobHandler {
