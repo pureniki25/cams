@@ -444,6 +444,7 @@
 		    `tb_repayment_biz_plan_list_detail` t2 
 		  WHERE t1.plan_list_id = t2.plan_list_id 
 		    AND t2.fee_id != '2e646c87-5721-11e8-8a00-0242ac110002' 
+		    AND t2.plan_item_type = 60
 		    AND t1.plan_list_id = rbpl.plan_list_id) offlineDerateAmount,
 		  -- 线上减免金额
 		  (SELECT 
@@ -684,6 +685,7 @@
 		    `tb_repayment_proj_plan_list_detail` t2 
 		  WHERE t1.proj_plan_list_id = t2.proj_plan_list_id 
 		    AND t2.fee_id != '2e646c87-5721-11e8-8a00-0242ac110002' 
+		    AND t2.plan_item_type = 60
 		    AND t1.proj_plan_list_id = rppl.proj_plan_list_id) offlineLateFee,
           -- 线上减免金额
 		  (SELECT 
@@ -702,6 +704,7 @@
 		    `tb_repayment_proj_plan_list_detail` t2 
 		  WHERE t1.proj_plan_list_id = t2.proj_plan_list_id 
 		    AND t2.fee_id != '2e646c87-5721-11e8-8a00-0242ac110002' 
+		    AND t2.plan_item_type = 60
 		    AND t1.proj_plan_list_id = rppl.proj_plan_list_id) offlineDerateAmount,
 		  (SELECT 
 		    IFNULL(SUM(t2.proj_plan_amount), 0) 
@@ -800,6 +803,7 @@
 		    `tb_repayment_proj_plan_list_detail` t2 
 		  WHERE t1.proj_plan_list_id = t2.proj_plan_list_id 
 		    AND t2.fee_id != '2e646c87-5721-11e8-8a00-0242ac110002' 
+		    AND t2.plan_item_type = 60
 		    AND t1.proj_plan_list_id = rppl.proj_plan_list_id) offlineLateFee,
 		  (SELECT 
 		    IFNULL(SUM(t2.proj_plan_amount), 0) 
