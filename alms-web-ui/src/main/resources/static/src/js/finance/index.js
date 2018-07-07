@@ -57,13 +57,6 @@ window.layinit(function (htConfig) {
                         key: 'customer'
                     },
                     {
-                        title:'是否主借款人',
-                        key:'ismainCustomer',
-                        render:(h,p)=>{
-                            return h('span',p.row.ismainCustomer?'是':'否')
-                        }
-                    },
-                    {
                         title: '业务类型',
                         key: 'businessType'
                     },

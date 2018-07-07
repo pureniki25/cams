@@ -131,15 +131,10 @@
 		SELECT
 			count(distinct pl.plan_list_id)
 		FROM
-			tb_repayment_biz_plan_list pl
-		JOIN
-			tb_basic_business b ON b.business_id = pl.orig_business_id
-		LEFT JOIN
-			tb_basic_company bc ON bc.area_id = b.company_id
-		LEFT JOIN
-			tb_tuandai_project_info pi ON pi.business_id = pl.business_id
-		LEFT JOIN
-			tb_money_pool_repayment mpr ON mpr.plan_list_id = pl.plan_list_id
+		tb_repayment_biz_plan_list pl
+		JOIN tb_basic_business b ON b.business_id = pl.orig_business_id
+		LEFT JOIN tb_basic_company bc ON bc.area_id = b.company_id
+		LEFT JOIN tb_money_pool_repayment mpr ON mpr.plan_list_id = pl.plan_list_id 
 		<where>
 			1 = 1
 			<if test="customer != null">
@@ -192,9 +187,7 @@
 			pl.after_id as afterId ,
 			b.company_id as dept,
 			b.operator_name as operator,
-			bbc.customer_name as customer,
-			bbc.ismain_customer as ismainCustomer,
-			bbc.phone_number as phoneNumber,
+			b.customer_name as customer,
 			b.business_ctype as businessType ,
 			pl.due_date as planRepayDate ,
 			b.borrow_money as borrowMoney,
@@ -219,32 +212,20 @@
 			ELSE (pl.total_borrow_amount+pl.overdue_amount   )  END as planRepayAmount,
 			pl.current_status as status ,
 			CASE
-				pl.repay_status 
-				WHEN 1 THEN '部分还款' 
-				WHEN 2 THEN '线上已还款' 
-				WHEN 3 THEN '全部已还款'
-				ELSE '未还款'
-			END 
-				as repayStatus,
+				when (pl.src_type = 1) then pl.current_status
+				when (pl.src_type = 2 and pl.repay_status = 1) then '部分还款'
+				when (pl.src_type = 2 and pl.repay_status = 2) then '线上已还款'
+				when (pl.src_type = 2 and pl.repay_status = 3) then '全部已还款'
+				when (pl.src_type = 2 and pl.repay_status is null ) then '未还款'
+			END AS repayStatus,
 			pl.accountant_confirm_status as financeConfirmStatus,
 			(SELECT IFNULL(SUM(fact_amount),0) FROM tb_repayment_biz_plan_list_detail where plan_list_id = pl.plan_list_id ) as repaidAmount,
 			b.src_type as srcType
 		FROM
-			tb_repayment_biz_plan_list pl
-		JOIN 
-			tb_basic_business b ON b.business_id = pl.orig_business_id
-		LEFT JOIN 
-			tb_basic_company bc ON bc.area_id = b.company_id
-		left join 
-			tb_repayment_proj_plan_list rppl ON pl.plan_list_id = rppl.plan_list_id
-		left join 
-			tb_repayment_proj_plan rpp ON rppl.proj_plan_id = rpp.proj_plan_id
-		LEFT JOIN 
-			tb_tuandai_project_info pi ON rpp.project_id = pi.project_id
-		LEFT JOIN 
-			tb_basic_biz_customer bbc ON pi.customer_id = bbc.customer_id
-		LEFT JOIN 
-			tb_money_pool_repayment mpr ON mpr.plan_list_id = pl.plan_list_id 
+		tb_repayment_biz_plan_list pl
+		JOIN tb_basic_business b ON b.business_id = pl.orig_business_id
+		LEFT JOIN tb_basic_company bc ON bc.area_id = b.company_id
+		LEFT JOIN tb_money_pool_repayment mpr ON mpr.plan_list_id = pl.plan_list_id 
 		<where>
 			1 = 1
 			<if test="customer != null">
