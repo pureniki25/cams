@@ -106,7 +106,7 @@
 		  AND mpr.income_type IN (1, 2)
 		  AND mpr.is_finance_match = 1
 		  AND mpr.state = '财务确认已还款'
-		ORDER BY 1
+		ORDER BY 1, 4
 	</select>
 
     <select id="getCustomerRepayFlowPageList" parameterType="com.hongte.alms.base.customer.vo.CustomerRepayFlowListReq"
