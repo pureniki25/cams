@@ -1585,26 +1585,10 @@ public class FinanceServiceImpl implements FinanceService {
 
 			List<RepaymentProjInfoDTO> repaymentProjInfoDTOs = repaymentBizPlanListMapper
 					.queryActualRepaymentProjInfoByPlanListId(planListId);
-//			List<RepaymentProjInfoDTO> planDTOs = repaymentBizPlanListMapper
-//					.queryPlanRepaymentProjInfoByPlanListId(planListId);
-
-//			Map<String, RepaymentProjInfoDTO> mapPlanDTO = new HashMap<>();
-//
-//			if (CollectionUtils.isNotEmpty(planDTOs)) {
-//				for (RepaymentProjInfoDTO repaymentProjInfoDTO : planDTOs) {
-//					String projPlanListId = repaymentProjInfoDTO.getProjPlanListId();
-//					RepaymentProjInfoDTO dto = mapPlanDTO.get(projPlanListId);
-//					if (dto == null) {
-//						mapPlanDTO.put(projPlanListId, repaymentProjInfoDTO);
-//					}
-//				}
-//			}
 
 			if (CollectionUtils.isNotEmpty(repaymentProjInfoDTOs)) {
 
 				for (RepaymentProjInfoDTO repaymentProjInfoDTO : repaymentProjInfoDTOs) {
-//					String projPlanListId = repaymentProjInfoDTO.getProjPlanListId();
-//					RepaymentProjInfoDTO dto = mapPlanDTO.get(projPlanListId);
 
 					double accrual = repaymentProjInfoDTO.getAccrual();
 					double principal = repaymentProjInfoDTO.getPrincipal();
@@ -1612,11 +1596,6 @@ public class FinanceServiceImpl implements FinanceService {
 					double platformCharge = repaymentProjInfoDTO.getPlatformCharge();
 					double offlineLateFee = repaymentProjInfoDTO.getOfflineLateFee();
 					double onlineLateFee = repaymentProjInfoDTO.getOnlineLateFee();
-
-//					double surplus = (repaymentProjInfoDTO.getAmount() - dto.getAmount()) < 0 ? 0
-//							: (repaymentProjInfoDTO.getAmount() - dto.getAmount());
-
-//					repaymentProjInfoDTO.setSurplus(surplus);
 
 					repaymentProjInfoDTO
 							.setSubtotal(BigDecimal.valueOf(accrual + principal + serviceCharge + platformCharge)
@@ -1683,59 +1662,18 @@ public class FinanceServiceImpl implements FinanceService {
 
 				for (Entry<String, List<RepaymentProjInfoDTO>> entry : map.entrySet()) {
 
-					/*double principal = 0;
-					double accrual = 0;
-					double serviceCharge = 0;
-					double platformCharge = 0;
-					double subtotal = 0;
-					double onlineLateFee = 0;
-					double offlineLateFee = 0;
-					double surplus = 0;
-					double total = 0;
-					double amount = 0;*/
-
 					List<RepaymentProjInfoDTO> dtos = entry.getValue();
 					RepaymentProjInfoDTO dtoPlan = dtos.get(0);
 					RepaymentProjInfoDTO dtoAccrual = dtos.get(1);
 					dtoPlan.setSubtotal(dtoPlan.getPrincipal() + dtoPlan.getAccrual() + dtoPlan.getServiceCharge()
 							+ dtoPlan.getPlatformCharge());
 					dtoPlan.setTotal(dtoPlan.getSubtotal() + dtoPlan.getOnlineLateFee() + dtoPlan.getOfflineLateFee());
-//					double planAmount = dtoPlan.getAmount();
 					
 					dtoAccrual.setSubtotal(dtoAccrual.getPrincipal() + dtoAccrual.getAccrual() + dtoAccrual.getServiceCharge()
 					+ dtoAccrual.getPlatformCharge());
 					dtoAccrual.setTotal(dtoAccrual.getSubtotal() + dtoAccrual.getOnlineLateFee() + dtoAccrual.getOfflineLateFee());
-//					double accrualAmount = dtoAccrual.getAmount();
 
 					Date factRepayDate = dtoAccrual.getRepaymentDate(); // 实还日期
-
-					/*for (RepaymentProjInfoDTO repaymentProjInfoDTO : dtos) {
-
-						if ("实际还款".equals(repaymentProjInfoDTO.getRepayment())) {
-
-							factRepayDate = repaymentProjInfoDTO.getRepaymentDate();
-
-							repaymentProjInfoDTO.setSubtotal(repaymentProjInfoDTO.getPrincipal()
-									+ repaymentProjInfoDTO.getAccrual() + repaymentProjInfoDTO.getServiceCharge()
-									+ repaymentProjInfoDTO.getPlatformCharge());
-
-							repaymentProjInfoDTO.setTotal(repaymentProjInfoDTO.getSubtotal()
-									+ repaymentProjInfoDTO.getOnlineLateFee() + repaymentProjInfoDTO.getOfflineLateFee()
-									+ (repaymentProjInfoDTO.getAmount() - planAmount));
-
-							principal += repaymentProjInfoDTO.getPrincipal();
-							accrual += repaymentProjInfoDTO.getAccrual();
-							serviceCharge += repaymentProjInfoDTO.getServiceCharge();
-							platformCharge += repaymentProjInfoDTO.getPlatformCharge();
-							subtotal += repaymentProjInfoDTO.getSubtotal();
-							onlineLateFee += repaymentProjInfoDTO.getOnlineLateFee();
-							offlineLateFee += repaymentProjInfoDTO.getOfflineLateFee();
-							amount += repaymentProjInfoDTO.getAmount();
-						}
-					}*/
-
-//					surplus = amount - planAmount;
-//					total = subtotal + onlineLateFee + offlineLateFee + surplus;
 
 					RepaymentProjInfoDTO dtoDifference = new RepaymentProjInfoDTO();
 					dtoDifference.setRealName(dtoPlan.getRealName());

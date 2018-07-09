@@ -28,6 +28,7 @@ import com.hongte.alms.base.dto.compliance.TdProjectPaymentInfoResult;
 import com.hongte.alms.base.dto.compliance.TdRefundMonthInfoDTO;
 import com.hongte.alms.base.entity.AgencyRechargeLog;
 import com.hongte.alms.base.entity.BasicCompany;
+import com.hongte.alms.base.entity.IssueSendOutsideLog;
 import com.hongte.alms.base.entity.RepaymentProjPlan;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
@@ -102,7 +103,7 @@ public class TdrepayRechargeController {
 
 	@Autowired
 	private LoginUserInfoHelper loginUserInfoHelper;
-	
+
 	@Autowired
 	@Qualifier("AgencyRechargeLogService")
 	private AgencyRechargeLogService agencyRechargeLogService;
@@ -369,9 +370,39 @@ public class TdrepayRechargeController {
 
 			List<TdrepayRechargeInfoVO> resultList = new ArrayList<>();
 			if (CollectionUtils.isNotEmpty(list)) {
+
+				Map<String, IssueSendOutsideLog> batchIdMap = new HashMap<>();
+
+				for (TdrepayRechargeLog tdrepayRechargeLog : list) {
+					String batchId = tdrepayRechargeLog.getBatchId();
+					if (StringUtil.isEmpty(batchId)) {
+						continue;
+					}
+					IssueSendOutsideLog issueSendOutsideLog = batchIdMap.get(batchId);
+					if (issueSendOutsideLog == null) {
+						issueSendOutsideLog = issueSendOutsideLogService
+								.selectOne(new EntityWrapper<IssueSendOutsideLog>()
+										.eq("Interfacecode", Constant.INTERFACE_CODE_SEND_DISTRIBUTE_FUND)
+										.eq("send_key", batchId));
+						if (issueSendOutsideLog != null) {
+							batchIdMap.put(batchId, issueSendOutsideLog);
+						}else {
+							batchIdMap.put(batchId, new IssueSendOutsideLog());
+						}
+					}
+				}
+
 				for (TdrepayRechargeLog tdrepayRechargeLog : list) {
 					TdrepayRechargeInfoVO infoVO = BeanUtils.deepCopy(tdrepayRechargeLog, TdrepayRechargeInfoVO.class);
 					if (infoVO != null) {
+						IssueSendOutsideLog issueSendOutsideLog = batchIdMap.get(infoVO.getBatchId());
+						if (issueSendOutsideLog != null) {
+							JSONObject parseObject = JSONObject.parseObject(issueSendOutsideLog.getReturnJson());
+							if (parseObject != null) {
+								infoVO.setRemark(parseObject.getString("codeDesc"));
+							}
+						}
+
 						infoVO.setBusinessTypeStr(BusinessTypeEnum.getName(infoVO.getBusinessType()));
 						infoVO.setRepaymentTypeStr(RepaySourceEnum.getName(infoVO.getRepaySource()));
 						switch (infoVO.getSettleType()) {
@@ -700,7 +731,7 @@ public class TdrepayRechargeController {
 			return Result.error("-99", e.getMessage());
 		}
 	}
-	
+
 	@SuppressWarnings("rawtypes")
 	@ApiOperation(value = "查询资金分发处理状态")
 	@GetMapping("/queryDistributeFund")
@@ -898,7 +929,7 @@ public class TdrepayRechargeController {
 		}
 
 	}
-	
+
 	@ApiOperation(value = "查询所有业务类型")
 	@GetMapping("/queryBusinessTypes")
 	@ResponseBody
@@ -906,12 +937,12 @@ public class TdrepayRechargeController {
 		try {
 			List<Map<String, Object>> resultList = new LinkedList<>();
 			BusinessTypeEnum[] businessTypeEnums = BusinessTypeEnum.values();
-			
+
 			for (BusinessTypeEnum businessTypeEnum : businessTypeEnums) {
 				if (businessTypeEnum.value() == 25) {
 					continue;
 				}
-				Map<String, Object> resultMap = new HashMap<>(); 
+				Map<String, Object> resultMap = new HashMap<>();
 				resultMap.put("value", businessTypeEnum.value());
 				resultMap.put("name", businessTypeEnum.getName());
 				resultList.add(resultMap);
