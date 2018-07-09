@@ -676,7 +676,10 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                 if (arg0.getTuandaiProjectInfo().getQueryFullSuccessDate()
                         .before(arg1.getTuandaiProjectInfo().getQueryFullSuccessDate())) {
                     return -1;
-                }
+                }else if (arg0.getTuandaiProjectInfo().getQueryFullSuccessDate()
+                        .after(arg1.getTuandaiProjectInfo().getQueryFullSuccessDate())) {
+					return 1;
+				}
                 return 0;
             }
 
@@ -695,21 +698,27 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                 if (arg0.getProjAmount()
                         .compareTo(arg1.getProjAmount()) < 0) {
                     return -1;
-                }
+                }else if (arg0.getProjAmount().compareTo(arg1.getProjAmount())>0) {
+					return 1;
+				}
                 if (arg0.getQueryFullSuccessDate()
                         .before(arg1.getQueryFullSuccessDate())) {
                     return -1;
-                }
+                }else if (arg0.getQueryFullSuccessDate()
+                        .after(arg1.getQueryFullSuccessDate())) {
+					return 1;
+				}
                 return 0;
             }
 
         });
         for (RepaymentProjPlanDto repaymentProjPlanDto2 : repaymentProjPlanDtos) {
             logger.info("满标时间{}"
-                    + DateUtil.formatDate(repaymentProjPlanDto2.getTuandaiProjectInfo().getQueryFullSuccessDate()));
+                    + DateUtil.formatDate("yyyy-MM-dd HH:mm:ss",repaymentProjPlanDto2.getTuandaiProjectInfo().getQueryFullSuccessDate()));
             logger.info("借款金额{}" + repaymentProjPlanDto2.getRepaymentProjPlan().getBorrowMoney());
             logger.info("是否主借标{}" + repaymentProjPlanDto2.getTuandaiProjectInfo().getMasterIssueId()
                     .equals(repaymentProjPlanDto2.getTuandaiProjectInfo().getProjectId()));
+            logger.info("借款人{}",repaymentProjPlanDto2.getTuandaiProjectInfo().getRealName());
 
         }
         repaymentBizPlanDto.setProjPlanDtos(repaymentProjPlanDtos);
