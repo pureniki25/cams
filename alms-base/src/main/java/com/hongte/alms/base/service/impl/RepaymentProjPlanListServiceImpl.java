@@ -484,7 +484,13 @@ public class RepaymentProjPlanListServiceImpl extends
 					List<RepaymentProjPlanListDetail> projDetailList = repaymentProjPlanListDetailService
 							.selectList(new EntityWrapper<RepaymentProjPlanListDetail>().eq("proj_plan_list_id",
 									projPList.getProjPlanListId()));
+					
+					List<RepaymentProjPlanListDetail> feeIdLists = repaymentProjPlanListDetailService
+							.selectList(new EntityWrapper<RepaymentProjPlanListDetail>().eq("plan_list_id",
+									projPList.getPlanListId()).eq("fee_id", feeId));
+					
 					if (projDetailList != null && projDetailList.size() > 0) {
+					
 						RepaymentProjPlanListDetail temp = projDetailList.get(0);
 						projDetail = ClassCopyUtil.copyObject(temp,
 								RepaymentProjPlanListDetail.class);
@@ -492,7 +498,18 @@ public class RepaymentProjPlanListServiceImpl extends
 						projDetail.setFeeId(feeId);
 						projDetail.setProjPlanAmount(lateFee);
 						projDetail.setPlanItemType(60);
-						projDetail.setPlanDetailId(UUID.randomUUID().toString());
+						String planDetailId="";
+						for(RepaymentProjPlanListDetail detail:feeIdLists) {
+							if(detail.getFeeId().equals(feeId)) {
+								planDetailId=detail.getPlanDetailId();
+							}
+						}
+						if(StringUtil.isEmpty(planDetailId)) {
+							projDetail.setPlanDetailId(UUID.randomUUID().toString());
+						}else {
+							projDetail.setPlanDetailId(planDetailId);
+						}
+						 
 						projDetail.setPlanItemName("滞纳金");
 						repaymentProjPlanListDetailService.insertOrUpdate(projDetail);
 					}
