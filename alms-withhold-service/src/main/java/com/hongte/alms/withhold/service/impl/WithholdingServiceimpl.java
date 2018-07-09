@@ -83,7 +83,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		Integer days = Integer.valueOf(repayStatusList.get(0).getParamValue());
 		List<RepaymentBizPlanList> pLists = repaymentBizPlanListService.selectAutoRepayList(days);// 查询一个周期内(30天)要代扣的记录
 		for (RepaymentBizPlanList pList : pLists) {
-			if(pList.getPlanListId().equals("eade4d51-580a-4aac-ba9c-a35d8be6315d")) {
+			if(pList.getPlanListId().equals("c1c6b403-7c9a-4431-988a-4fb55d71ff40")) {
 				System.out.println("STOP");
 			}
 			//获取该还款计划最早一期没有还的代扣
@@ -180,7 +180,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		} else {
 			// 本期线上剩余应还金额,剩余应还金额减去线下金额
 			BigDecimal repayMoney = rechargeService.getRestAmount(pList).subtract(underAmount);
-	
+			logger.info("期线上剩余应还金额:" + repayMoney);
 			// 应还金额大于0
 			if (repayMoney.compareTo(BigDecimal.valueOf(0)) > 0) {
 				// 当第一次扣款额度没有超过银行每次的扣款额度时候，尝试一次性扣款
@@ -225,6 +225,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 					if(remainder.compareTo(BigDecimal.valueOf(0)) > 0) {
 						repayCount=repayCount+1;
 					}
+					logger.info("本次代扣每笔限额:{0},代扣次数:{1},余数:{2}" ,eachMax,repayCount,remainder);					
 					int last = repayCount - 1;
 					Integer boolPartRepay = 1;// 表示本期是否分多笔代扣,0:一次性代扣，1:分多笔代扣
 					Integer boolLastRepay = 0;// 表示本期是否分多笔代扣中的最后一笔代扣，若非多笔代扣，本字段存1。 0:非最后一笔代扣，1:最后一笔代扣
@@ -236,6 +237,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 						} else {
 							currentAmount = eachMax;
 						}
+					
 						 result = rechargeService.recharge(basic, pList, currentAmount.doubleValue(),
 								boolLastRepay, boolPartRepay, bankCardInfo, channel,appType);
 						if (result.getCode().equals("1")) {
@@ -348,7 +350,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 					repayMoney = underAmount;
 				}
 				
-			
+				logger.info("期线上剩余应还金额:" + repayMoney);
 				// 如果应还金额大于0
 				if (repayMoney.compareTo(BigDecimal.valueOf(0)) > 0) {
 
@@ -381,12 +383,15 @@ public class WithholdingServiceimpl implements WithholdingService {
 
 						// 第三方代扣，非一次性扣款
 					} else {
+						
 						// 获取代扣每次最高额
 						BigDecimal eachMax = sysBankLimit.getOnceLimit();
 						// 代扣次数
 						Integer repayCount = repayMoney.divide(eachMax, RoundingMode.CEILING).intValue();
 						// 余数
+						
 						BigDecimal remainder = repayMoney.divideAndRemainder(eachMax)[1];
+						logger.info("本次代扣每笔限额:{0},代扣次数:{1},余数:{2}" ,eachMax,repayCount,remainder);	
 						if(remainder.compareTo(BigDecimal.valueOf(0)) > 0) {
 							repayCount=repayCount+1;
 						}
