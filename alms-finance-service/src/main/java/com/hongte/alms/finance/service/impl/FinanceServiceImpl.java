@@ -18,7 +18,6 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.UUID;
 
-import com.hongte.alms.finance.req.FinanceSettleReq;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +38,6 @@ import com.hongte.alms.base.dto.ActualPaymentSingleLogDTO;
 import com.hongte.alms.base.dto.RepaymentPlanInfoDTO;
 import com.hongte.alms.base.dto.RepaymentProjInfoDTO;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
-import com.hongte.alms.base.dto.compliance.TdRefundMonthInfoDTO;
 import com.hongte.alms.base.entity.ApplyDerateProcess;
 import com.hongte.alms.base.entity.ApplyDerateType;
 import com.hongte.alms.base.entity.MoneyPool;
@@ -90,6 +88,7 @@ import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
+import com.hongte.alms.finance.req.FinanceSettleReq;
 import com.hongte.alms.finance.service.FinanceService;
 import com.hongte.alms.finance.util.kafka.KafkaUtils;
 import com.ht.ussp.bean.LoginUserInfoHelper;
@@ -1708,6 +1707,7 @@ public class FinanceServiceImpl implements FinanceService {
 					dtoAccrual.setTotal(dtoAccrual.getSubtotal() + dtoAccrual.getOnlineLateFee() + dtoAccrual.getOfflineLateFee());
 //					double accrualAmount = dtoAccrual.getAmount();
 
+					Date factRepayDate = dtoAccrual.getRepaymentDate(); // 实还日期
 
 					/*for (RepaymentProjInfoDTO repaymentProjInfoDTO : dtos) {
 
@@ -1740,25 +1740,27 @@ public class FinanceServiceImpl implements FinanceService {
 					RepaymentProjInfoDTO dtoDifference = new RepaymentProjInfoDTO();
 					dtoDifference.setRealName(dtoPlan.getRealName());
 					dtoDifference.setRepayment("差额");
-					dtoDifference.setPrincipal(BigDecimal.valueOf(dtoPlan.getPrincipal() - dtoAccrual.getPrincipal())
-							.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-					dtoDifference.setAccrual(BigDecimal.valueOf(dtoPlan.getAccrual() - dtoAccrual.getAccrual())
-							.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-					dtoDifference.setServiceCharge(BigDecimal.valueOf(dtoPlan.getServiceCharge() - dtoAccrual.getServiceCharge())
-							.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-					dtoDifference.setPlatformCharge(BigDecimal.valueOf(dtoPlan.getPlatformCharge() - dtoAccrual.getPlatformCharge())
-							.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-					dtoDifference.setSubtotal(BigDecimal.valueOf(dtoPlan.getSubtotal() - dtoAccrual.getSubtotal())
-							.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-					dtoDifference.setOnlineLateFee(BigDecimal.valueOf(dtoPlan.getOnlineLateFee() - dtoAccrual.getOnlineLateFee())
-							.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-					dtoDifference.setOfflineLateFee(BigDecimal.valueOf(dtoPlan.getOfflineLateFee() - dtoAccrual.getOfflineLateFee())
-							.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-					dtoDifference.setSurplus(0);
-					dtoDifference.setTotal(
-							BigDecimal.valueOf((dtoPlan.getTotal() - dtoAccrual.getTotal()) > 0 ? dtoPlan.getTotal() - dtoAccrual.getTotal() : 0)
-									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+					if (factRepayDate != null) {
+						dtoDifference.setPrincipal(BigDecimal.valueOf(dtoPlan.getPrincipal() - dtoAccrual.getPrincipal())
+								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+						dtoDifference.setAccrual(BigDecimal.valueOf(dtoPlan.getAccrual() - dtoAccrual.getAccrual())
+								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+						dtoDifference.setServiceCharge(BigDecimal.valueOf(dtoPlan.getServiceCharge() - dtoAccrual.getServiceCharge())
+								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+						dtoDifference.setPlatformCharge(BigDecimal.valueOf(dtoPlan.getPlatformCharge() - dtoAccrual.getPlatformCharge())
+								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+						dtoDifference.setSubtotal(BigDecimal.valueOf(dtoPlan.getSubtotal() - dtoAccrual.getSubtotal())
+								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+						dtoDifference.setOnlineLateFee(BigDecimal.valueOf(dtoPlan.getOnlineLateFee() - dtoAccrual.getOnlineLateFee())
+								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+						dtoDifference.setOfflineLateFee(BigDecimal.valueOf(dtoPlan.getOfflineLateFee() - dtoAccrual.getOfflineLateFee())
+								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+						dtoDifference.setSurplus(0);
+						dtoDifference.setTotal(
+								BigDecimal.valueOf((dtoPlan.getTotal() - dtoAccrual.getTotal()) > 0 ? dtoPlan.getTotal() - dtoAccrual.getTotal() : 0)
+										.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
 
+					}
 					repaymentProjInfoDTOs.add(dtoDifference);
 				}
 
