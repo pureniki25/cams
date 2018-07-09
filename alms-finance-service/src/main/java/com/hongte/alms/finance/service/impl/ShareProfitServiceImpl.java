@@ -644,7 +644,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             currPeriodProjDetailVO.setProjAmount(repaymentProjPlanDto.getRepaymentProjPlan().getBorrowMoney());
             currPeriodProjDetailVO.setProject(tuandaiProjectInfo.getProjectId());
             currPeriodProjDetailVO.setUserName(tuandaiProjectInfo.getRealName());
-
+            currPeriodProjDetailVO.setMaster(tuandaiProjectInfo.getMasterIssueId().equals(tuandaiProjectInfo.getProjectId()));
+            currPeriodProjDetailVO.setQueryFullSuccessDate(tuandaiProjectInfo.getQueryFullSuccessDate());
             List<CurrPeriodProjDetailVO> projListDetails = financeBaseDto.getProjListDetails();
             projListDetails.add(currPeriodProjDetailVO);
 
@@ -681,6 +682,28 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 
         });
 
+        Collections.sort(financeBaseDto.getProjListDetails(), new Comparator<CurrPeriodProjDetailVO>() {
+            // 排序规则说明 需补充 从小标到大标，再到主借标
+            //同等
+            @Override
+            public int compare(CurrPeriodProjDetailVO arg0, CurrPeriodProjDetailVO arg1) {
+                if (arg0.isMaster()) {
+                    return 1;
+                }else if (arg1.isMaster()) {
+                    return -1;
+				}
+                if (arg0.getProjAmount()
+                        .compareTo(arg1.getProjAmount()) < 0) {
+                    return -1;
+                }
+                if (arg0.getQueryFullSuccessDate()
+                        .before(arg1.getQueryFullSuccessDate())) {
+                    return -1;
+                }
+                return 0;
+            }
+
+        });
         for (RepaymentProjPlanDto repaymentProjPlanDto2 : repaymentProjPlanDtos) {
             logger.info("满标时间{}"
                     + DateUtil.formatDate(repaymentProjPlanDto2.getTuandaiProjectInfo().getQueryFullSuccessDate()));

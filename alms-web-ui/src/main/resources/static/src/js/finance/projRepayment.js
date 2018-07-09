@@ -2,7 +2,10 @@ let projRepayment = {
     col:[
         {
             title:'借款人',
-            key:'userName'
+            key:'userName',
+            render:(h,p)=>{
+                return h('span',p.row.master?p.row.userName+'(主)':p.row.userName)
+            }
         },{
             title:'上标金额',
             key:'projAmount'
