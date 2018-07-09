@@ -117,7 +117,7 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 	@Override
 	public void queryDistributeFund() {
 		List<TdrepayRechargeLog> tdrepayRechargeLogs = tdrepayRechargeLogService
-				.selectList(new EntityWrapper<TdrepayRechargeLog>().eq("process_status", 1));
+				.selectList(new EntityWrapper<TdrepayRechargeLog>().eq("process_status", 1).eq("is_valid", 1));
 		if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
 
 			Map<String, Object> paramMap = new HashMap<>();
