@@ -1,6 +1,7 @@
 package com.hongte.alms.withhold.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
@@ -20,6 +21,8 @@ import com.hongte.alms.withhold.service.WithholdingService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.enterprise.inject.New;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -73,11 +76,18 @@ public class AfterLoanRepaymentServiceImpl implements AfterLoanRepaymentService 
     		//判断是否贷后代扣
             if(repaymentBizPlanList.getSrcType()==null || repaymentBizPlanList.getSrcType().intValue()==1){
                 Result result = withHoldingClient.repayAssignBank(repaymentBizPlanList.getOrigBusinessId(),afterId,bankCard);
-                Object object = JSON.parse(result.getData().toString());
+                JSONObject resultObject=null;
+                if(result.getData()==null) {
+                	resultObject=new JSONObject();
+                	resultObject.put("type", 3);
+                	resultObject.put("mgs", result.getMsg());
+                }else {
+                	resultObject = JSON.parseObject(result.getData().toString());
+				}
                 Result resultObj=new Result();
                 resultObj.setCode("0");
                 resultObj.setMsg(result.getMsg());
-                resultObj.setData(object);
+                resultObj.setData(resultObject);
                 return resultObj;
             }else {
                  Result result=withholdingService.appWithholding(repaymentBizPlanList);

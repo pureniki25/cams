@@ -1461,7 +1461,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 //			planListDetail.setFactAmount(detail.getProjFactAmount().add(
 //					planListDetail.getFactAmount() == null ? new BigDecimal("0") : planListDetail.getFactAmount()));
 
-            planListDetail.setFactAmount(detail.getProjFactAmount());
+            planListDetail.setFactAmount(detail.getProjFactAmount().add(planListDetail.getFactAmount()==null?BigDecimal.ZERO:planListDetail.getFactAmount()));
             planListDetail.setFactRepayDate(detail.getFactRepayDate());
             planListDetail.setRepaySource(detail.getRepaySource());
             planListDetail.setUpdateDate(new Date());

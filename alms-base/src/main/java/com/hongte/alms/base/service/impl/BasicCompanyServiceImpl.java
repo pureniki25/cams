@@ -2,12 +2,11 @@ package com.hongte.alms.base.service.impl;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.BasicCompany;
-import com.hongte.alms.base.entity.SysOrg;
 import com.hongte.alms.base.entity.SysRole;
 import com.hongte.alms.base.enums.AreaLevel;
+import com.hongte.alms.base.enums.RoleAreaMethodEnum;
 import com.hongte.alms.base.enums.SysRoleAreaTypeEnums;
 import com.hongte.alms.base.mapper.BasicCompanyMapper;
-import com.hongte.alms.base.mapper.SysModuleMapper;
 import com.hongte.alms.base.service.BasicCompanyService;
 import com.hongte.alms.base.service.SysRoleService;
 import com.hongte.alms.base.service.SysUserAreaService;
@@ -18,7 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -63,7 +65,9 @@ public class BasicCompanyServiceImpl extends BaseServiceImpl<BasicCompanyMapper,
     }
     public Map<String,BasicCompany>  selectCompanysMapByAreaId(List<String> areas){
         Integer count= 0;
+        //已经匹配的是分公司
         Map<String,BasicCompany> comMap = new HashMap<String,BasicCompany>();
+        //已经匹配的不是分公司
         List<String>  aas = new LinkedList<>();
         for(String a:areas){
             BasicCompany company = selectById(a);
@@ -220,6 +224,8 @@ public class BasicCompanyServiceImpl extends BaseServiceImpl<BasicCompanyMapper,
 
         //确认用户拥有的权限访问数据的区域类型
         SysRoleAreaTypeEnums userAreaTypeEnums = SysRoleAreaTypeEnums.ONLY_SELF;
+        //是否是财务跟单这设置控制访问数据方式
+        RoleAreaMethodEnum roleAreaMethodEnum = RoleAreaMethodEnum.NULL_Area;
         //用户拥有的只访问自己跟进业务的角色Map
 //        List<SysRole> onlySelfRoleList = new LinkedList<>();
         Map<String,SysRole> onlySelfRoleMap = new HashMap<>();
@@ -238,6 +244,12 @@ public class BasicCompanyServiceImpl extends BaseServiceImpl<BasicCompanyMapper,
                     onlySelfRoleMap.put(role.getRoleCode(),role);
                 }
             }
+
+           /*
+            if(RoleAreaMethodEnum.FINANCIAL_ORDER.value().equals(role.getRoleAreaMethod())){
+                roleAreaMethodEnum = RoleAreaMethodEnum.FINANCIAL_ORDER;
+            }*/
+            roleAreaMethodEnum = RoleAreaMethodEnum.valueOf(role.getRoleAreaMethod());
         }
 
         Map<String,BasicCompany> companys = new HashMap<>();
@@ -250,6 +262,7 @@ public class BasicCompanyServiceImpl extends BaseServiceImpl<BasicCompanyMapper,
                 }
                 break;
             case AREA:
+                //查出已经匹配好的用户分公司信息
                 List<String> userAreas = sysUserAreaService.selectUserAreas(userId);
                 //没有配置的区域
                 if(userAreas.size()==0){
@@ -260,6 +273,7 @@ public class BasicCompanyServiceImpl extends BaseServiceImpl<BasicCompanyMapper,
 //                    if(loginUserInfoHelper.getLoginInfo())
                 }
                 //根据用户区域信息 整理出排重的公司列表
+                //根据配置好的用户区域信息查询是分公司及其所有子公司区域 zgh
                 companys  = selectCompanysMapByAreaId(userAreas);
 
                 //根据用户的组织结构取用户可访问的公司

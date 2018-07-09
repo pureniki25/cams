@@ -36,7 +36,7 @@
         left join tb_basic_company c2 on c2.area_id = fo.company_id
         <where>
             <if test="userName != null and ''!=userName">
-                fou.user_names like '%${userName}%'
+                (fou.user_names like '%${userName}%' or fou.user_ids like '%${userName}%')
             </if>
             <if test="areaId != null and ''!=areaId">
                 and fo.area_id = #{areaId}

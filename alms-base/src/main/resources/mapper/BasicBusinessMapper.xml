@@ -269,10 +269,20 @@
 
 	</select>
 
+    <select id="findBusinessIds" resultType="java.lang.String">
+        select business_id as businessId
+        from tb_basic_business
+        WHERE 1=1
+        <if test="companyId != null">
+            AND company_id = #{companyId}
+        </if>
+        <if test="businessType != null">
+            AND business_type = #{businessType}
+        </if>
+    </select>
 
 
-
-	<!-- 一次性收取的分公司费用 -->
+    <!-- 一次性收取的分公司费用 -->
 	<select id="getPreCharge" resultType="java.lang.Double">
   select sum(fee+fee2+fee3) 
   from (
