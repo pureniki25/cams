@@ -663,10 +663,11 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             //同等
             @Override
             public int compare(RepaymentProjPlanDto arg0, RepaymentProjPlanDto arg1) {
-                if (arg0.getTuandaiProjectInfo().getMasterIssueId()
-                        .equals(arg0.getTuandaiProjectInfo().getProjectId())) {
+                if (arg0.getTuandaiProjectInfo().getMasterIssueId().equals(arg0.getTuandaiProjectInfo().getProjectId())) {
                     return 1;
-                }
+                }else if (arg1.getTuandaiProjectInfo().getMasterIssueId().equals(arg1.getTuandaiProjectInfo().getProjectId())) {
+                    return -1;
+				}
                 if (arg0.getRepaymentProjPlan().getBorrowMoney()
                         .compareTo(arg1.getRepaymentProjPlan().getBorrowMoney()) < 0) {
                     return -1;
@@ -675,7 +676,6 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                         .before(arg1.getTuandaiProjectInfo().getQueryFullSuccessDate())) {
                     return -1;
                 }
-
                 return 0;
             }
 
