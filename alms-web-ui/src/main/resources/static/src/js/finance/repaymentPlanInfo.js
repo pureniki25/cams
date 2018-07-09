@@ -153,6 +153,25 @@ window.layinit(function (htConfig) {
         			key: 'repayment',
         			align: 'center',
         			width: 100,
+        			render:(h,p)=>{
+    					return h('a',{
+    						style:{
+    							textDecoration:'underline'
+    						},
+    						on:{
+    							click:function(){
+    								if (p.row.repayment=='计划还款') {
+    									app.openRepayPlan(p.row.planListId);
+									}else if (p.row.repayment=='实际还款') {
+										app.openRepayActual(p.row.planListId);
+									}else {
+										app.openRepayDifference(p.row.planListId);
+									}
+    							}
+    						}
+    					},p.row.repayment)
+        				
+        			}
         		},
         		{
         			title: '还款日期',

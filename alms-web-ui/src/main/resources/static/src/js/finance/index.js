@@ -139,7 +139,7 @@ window.layinit(function (htConfig) {
                     {
                         title: '状态',
                         key: 'status',
-                        width:200,
+                        width:120,
                         render: (h, p) => {
                             var s1 = p.row.planRepayDate;
                             s1 = new Date(s1.replace(/-/g, "/"));
@@ -162,6 +162,10 @@ window.layinit(function (htConfig) {
                             }
                             if (p.row.status == '已还款') {
                                 color = 'green'
+                            }
+
+                            if(p.row.status == '逾期' && p.row.repayStatus == '未还款'){
+                                content = '逾期'
                             }
                             return h('Tag', {
                                 props: {
