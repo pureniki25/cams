@@ -11,17 +11,18 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        role_code AS roleCode, role_name AS roleName, role_area_type AS roleAreaType
+        role_code AS roleCode, role_name AS roleName, role_area_type AS roleAreaType, role_area_method as roleAreaMethod
     </sql>
 
     <sql id="Table_Column_List">
-        role.role_code AS roleCode, role.role_name AS roleName, role.role_area_type AS roleAreaType
+        role.role_code AS roleCode, role.role_name AS roleName, role.role_area_type AS roleAreaType, role.role_area_method as roleAreaMethod
     </sql>
 
     <select id="getUserRoles" resultType="com.hongte.alms.base.entity.SysRole" parameterType="String" >
 
         SELECT
-        role.role_code as role_code,role.role_name as role_name,role.role_area_type AS  role_area_type
+        role.role_code as role_code,role.role_name as role_name,role.role_area_type AS role_area_type,
+        role.role_area_method as roleAreaMethod
         <!--      <include refid="Table_Column_List"></include>  -->
         FROM  tb_sys_role role
         JOIN tb_sys_user_role uRole  ON role.role_code = uRole.role_code

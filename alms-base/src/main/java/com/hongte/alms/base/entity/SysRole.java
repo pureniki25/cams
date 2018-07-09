@@ -1,14 +1,13 @@
 package com.hongte.alms.base.entity;
 
-import java.io.Serializable;
-
-import com.baomidou.mybatisplus.annotations.TableId;
-import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableField;
+import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
-import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
+import java.io.Serializable;
 /**
  * <p>
  * 系统权限表
@@ -35,6 +34,9 @@ public class SysRole extends Model<SysRole> {
 	@TableField("role_area_type")
 	@ApiModelProperty(required= true,value = "权限区域控制类型")
 	private Integer roleAreaType;
+    @TableField("role_area_method")
+    @ApiModelProperty(required = true, value = "区域性取值方式")
+    private Integer roleAreaMethod;
 
 
 	public String getRoleCode() {
@@ -60,6 +62,14 @@ public class SysRole extends Model<SysRole> {
 	public void setRoleAreaType(Integer roleAreaType) {
 		this.roleAreaType = roleAreaType;
 	}
+
+    public Integer getRoleAreaMethod() {
+        return roleAreaMethod;
+    }
+
+    public void setRoleAreaMethod(Integer roleAreaMethod) {
+        this.roleAreaMethod = roleAreaMethod;
+    }
 
 	@Override
 	protected Serializable pkVal() {
