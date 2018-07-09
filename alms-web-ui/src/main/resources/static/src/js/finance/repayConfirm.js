@@ -81,7 +81,7 @@ window.layinit(function (htConfig) {
                                             title: '线下逾期费',
                                             key: 'offlineOverDue'
                                         }, {
-                                            title: '减免金额',
+                                            title: '线上逾期费',
                                             key: 'onlineOverDue'
                                         }, {
                                             title: '合计（含滞纳金）',
