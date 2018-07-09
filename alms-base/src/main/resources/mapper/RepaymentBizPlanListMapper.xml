@@ -139,10 +139,10 @@
 			1 = 1
 			<if test="customer != null">
 				<!-- AND b.customer_name = #{customer} -->
-				AND pi.real_name = #{customer}
+				AND b.customer_name like '${customer}%' 
 			</if>
 			<if test="businessId != null">
-				AND pl.orig_business_id = #{businessId}
+				AND pl.orig_business_id like  '${businessId}%'
 			</if>
 			<if test="accountantConfirmStatus != null">
 				AND pl.accountant_confirm_status =
@@ -152,7 +152,7 @@
 				AND bc.area_pid = #{areaId}
 			</if>
 			<if test="companyId != null">
-				AND (b.company_name = #{companyId} OR b.company_id = #{companyId})
+				AND b.company_name = #{companyId}
 			</if>
 			<if test="businessType != null ">
 				AND b.business_type = #{businessType}
@@ -231,7 +231,7 @@
 			1 = 1
 			<if test="customer != null">
 				<!-- AND b.customer_name = #{customer} -->
-				AND pi.real_name like '${customer}%' 
+				AND b.customer_name like '${customer}%' 
 			</if>
 			<if test="businessId != null">
 				AND pl.orig_business_id like  '${businessId}%'
