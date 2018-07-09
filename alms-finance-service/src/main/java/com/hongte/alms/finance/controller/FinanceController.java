@@ -337,6 +337,7 @@ public class FinanceController {
 	public PageResult getFinanceMangerList(FinanceManagerListReq req) {
 		logger.info("@getFinanceMangerList@获取财务管理列表数据--开始[{}]", req);
 		logger.info("@getFinanceMangerList@获取财务管理列表数据--user[{}]", loginUserInfoHelper.getUserId());
+		req.setUserId(loginUserInfoHelper.getUserId());
 		PageResult pageResult = repaymentBizPlanListService.selectByFinanceManagerListReq(req);
 		logger.info("@getFinanceMangerList@获取财务管理列表数据--结束[{}]", pageResult);
 		return pageResult;
