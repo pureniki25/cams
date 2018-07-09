@@ -56,6 +56,11 @@ public class FinanceManagerListReq {
 	 * 贷后状态
 	 */
 	private String status ;
+	
+	/**
+	 * 当前操作人
+	 */
+	private String userId ;
 	public String getCustomer() {
 		return customer;
 	}
@@ -157,5 +162,17 @@ public class FinanceManagerListReq {
 	 */
 	public void setAreaId(String areaId) {
 		this.areaId = areaId;
+	}
+	/**
+	 * @return the userId
+	 */
+	public String getUserId() {
+		return userId;
+	}
+	/**
+	 * @param userId the userId to set
+	 */
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 }

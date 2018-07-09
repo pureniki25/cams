@@ -10,6 +10,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
+import com.hongte.alms.base.customer.vo.CustomerRepayFlowExel;
 import com.hongte.alms.base.dto.ConfirmRepaymentReq;
 import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.base.dto.MoneyPoolManagerReq;
@@ -27,6 +28,7 @@ import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.common.vo.PageResult;
+import com.hongte.alms.finance.req.FinanceSettleReq;
 import com.hongte.alms.finance.req.MoneyPoolReq;
 import com.hongte.alms.finance.req.OrderSetReq;
 import com.hongte.alms.finance.service.FinanceService;
@@ -35,6 +37,9 @@ import com.ht.ussp.bean.LoginUserInfoHelper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.jeecgframework.poi.excel.ExcelExportUtil;
+import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -331,6 +336,8 @@ public class FinanceController {
 	@ApiOperation(value = "获取财务管理列表数据")
 	public PageResult getFinanceMangerList(FinanceManagerListReq req) {
 		logger.info("@getFinanceMangerList@获取财务管理列表数据--开始[{}]", req);
+		logger.info("@getFinanceMangerList@获取财务管理列表数据--user[{}]", loginUserInfoHelper.getUserId());
+		req.setUserId(loginUserInfoHelper.getUserId());
 		PageResult pageResult = repaymentBizPlanListService.selectByFinanceManagerListReq(req);
 		logger.info("@getFinanceMangerList@获取财务管理列表数据--结束[{}]", pageResult);
 		return pageResult;
@@ -772,7 +779,7 @@ public class FinanceController {
 //			req.setRepaySource(list);
 			shareProfitService.execute(req, true);
               result.success(1);
-      		logger.info("@shareProfit@自动代扣核销--开始[{}{}{}]", businessId,afterId,logId);
+      		logger.info("@shareProfit@自动代扣核销--结束[{}{}{}]", businessId,afterId,logId);
 		} catch (Exception ex) {
 			logger.error("分润出现异常"+ex);
 			return Result.error("-1","分润出现异常"+ex);
@@ -1069,4 +1076,29 @@ public class FinanceController {
 			return Result.error("查询上次还款来源异常");
 		}
 	}
+
+	@RequestMapping("/financeSettle")
+	@ApiOperation(value="资金结清")
+	public Result financeSettle(FinanceSettleReq financeSettleReq){
+		logger.info("@financeSettle@资金结算开始[{}]");
+		Result result = null;
+		try {
+			financeService.financeSettle(financeSettleReq);
+
+
+
+
+			result = Result.success();
+		} catch (ServiceRuntimeException se) {
+			result = Result.error(se.getErrorCode(), se.getMessage());
+			logger.error("@financeSettle@资金结清出错{}", se.getMessage());
+		} catch (Exception e) {
+			result = Result.error("500", "资金结清出错");
+			logger.error("@financeSettle@资金结清出错{}", e);
+		}
+
+		logger.info("@financeSettle@资金结清结束{}", result);
+		return result;
+	}
+
 }
