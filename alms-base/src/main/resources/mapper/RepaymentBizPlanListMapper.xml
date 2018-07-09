@@ -137,6 +137,7 @@
 		LEFT JOIN tb_money_pool_repayment mpr ON mpr.plan_list_id = pl.plan_list_id 
 		<where>
 			1 = 1
+			 and b.business_id in (select business_id from tb_sys_user_permission where user_id = #{userId} ) 
 			<if test="customer != null">
 				<!-- AND b.customer_name = #{customer} -->
 				AND b.customer_name like '${customer}%' 
@@ -231,6 +232,7 @@
 
 		<where>
 			1 = 1
+			 and b.business_id in (select business_id from tb_sys_user_permission where user_id = #{userId} ) 
 			<if test="customer != null">
 				<!-- AND b.customer_name = #{customer} -->
 				AND b.customer_name like '${customer}%' 
