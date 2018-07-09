@@ -779,7 +779,7 @@ public class FinanceController {
 //			req.setRepaySource(list);
 			shareProfitService.execute(req, true);
               result.success(1);
-      		logger.info("@shareProfit@自动代扣核销--开始[{}{}{}]", businessId,afterId,logId);
+      		logger.info("@shareProfit@自动代扣核销--结束[{}{}{}]", businessId,afterId,logId);
 		} catch (Exception ex) {
 			logger.error("分润出现异常"+ex);
 			return Result.error("-1","分润出现异常"+ex);

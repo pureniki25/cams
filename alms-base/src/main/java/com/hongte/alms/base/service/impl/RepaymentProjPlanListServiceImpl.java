@@ -116,6 +116,9 @@ public class RepaymentProjPlanListServiceImpl extends
 						BigDecimal underLateFeeSum=BigDecimal.valueOf(0);//每个业务每期还款计划的线下收费
 						BigDecimal onlineLateFeeSum=BigDecimal.valueOf(0);//每个业务每期还款计划的线上收费
 						
+						if(pList.getPlanListId().equals("095118d7-633d-4f1c-82ef-4699563fffb6")) {
+							System.out.println("stop");
+						}
 						
 						
 							for (RepaymentProjPlanList projPList : projList) {
@@ -192,7 +195,7 @@ public class RepaymentProjPlanListServiceImpl extends
 				
 								BigDecimal days=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), pList.getDueDate())));//每个业务每期款还计划的逾期天数
 								pList.setOverdueDays(days);
-								pList.setOverdueAmount(underLateFeeSum.add(onlineLateFeeSum));
+								pList.setOverdueAmount(getPlanListOverAmountSum(pList));
 								pList.setCurrentStatus(RepayCurrentStatusEnums.逾期.name());
 								repaymentBizPlanListService.updateById(pList);
 								logger.info("===============：planListid:"+pList.getPlanListId()+"逾期费用计算结束===============");
@@ -203,7 +206,8 @@ public class RepaymentProjPlanListServiceImpl extends
 				    }
 			
 			}
- 
+			
+		
 			/**
 			// 每个业务对应所有贷后生成的标的还款计划
 			List<RepaymentProjPlan> projPlans = repaymentProjPlanService
@@ -238,6 +242,19 @@ public class RepaymentProjPlanListServiceImpl extends
   */
 		}
      
+	}
+    
+    /**
+     * 
+     * 获取每期planList的滞纳金总和
+     */
+	private BigDecimal getPlanListOverAmountSum(RepaymentBizPlanList pList) {
+		BigDecimal overAmountSum=BigDecimal.valueOf(0);
+		List<RepaymentProjPlanListDetail>  lists=repaymentProjPlanListDetailService.selectList(new EntityWrapper<RepaymentProjPlanListDetail>().eq("plan_list_id", pList.getPlanListId()).eq("plan_item_type", 60)); 
+		for(RepaymentProjPlanListDetail detail:lists) {
+			overAmountSum=overAmountSum.add(detail.getProjPlanAmount()==null?BigDecimal.valueOf(0):detail.getProjPlanAmount());
+		}
+		return overAmountSum;
 	}
 
 	/**
