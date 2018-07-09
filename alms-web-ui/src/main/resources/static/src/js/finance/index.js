@@ -163,6 +163,10 @@ window.layinit(function (htConfig) {
                             if (p.row.status == '已还款') {
                                 color = 'green'
                             }
+
+                            if(p.row.status == '逾期' && p.row.repayStatus == '未还款'){
+                                content = '逾期'
+                            }
                             return h('Tag', {
                                 props: {
                                     color: color
