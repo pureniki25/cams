@@ -18,6 +18,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.UUID;
 
+import com.hongte.alms.finance.req.FinanceSettleReq;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1917,6 +1918,15 @@ public class FinanceServiceImpl implements FinanceService {
 			logger.error("根据业务编号查找实还流水失败，业务编号：{}；抛出异常{}", businessId, e);
 			throw new ServiceRuntimeException(e.getMessage(), e);
 		}
+	}
+
+	@Override
+	public void financeSettle(FinanceSettleReq financeSettleReq) throws Exception {
+		//通过业务ID查询还款计划 查询出所有需要还的金额
+
+
+
+
 	}
 
 }
