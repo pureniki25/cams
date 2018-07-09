@@ -40,6 +40,7 @@ window.layinit(function(htConfig) {
 			rechargeAccountBalanceFlag: false, // 查看代充值账户余额弹窗控制
 			queryRechargeAccountBalanceLoading: false, // 查看代充值账户余额按钮加载状态控制
 			infoTabValue:'fundDistributionRecord',//详情tab值
+			businessTypeList:[], // 业务类型集合
 				
 			/*
 			 *  详情基础信息
@@ -572,6 +573,8 @@ window.layinit(function(htConfig) {
 					this.rechargeAccountType = '车贷代充值';
 				}else if (value == 20) {
 					this.rechargeAccountType = '一点车贷代充值';
+				}else if (value == 35) {
+					this.rechargeAccountType = '房贷代充值';
 				}else {
 					this.rechargeAccountType = '信用贷代充值';
 				}
@@ -709,6 +712,29 @@ window.layinit(function(htConfig) {
 			    			this.queryConditionModel.page = curr;
 			    		}
 			    })
+			},
+			
+			/*
+			 * 查询资金分发处理状态
+			 */
+			queryDistributeFund: function(){
+				axios.get(basePath + 'tdrepayRecharge/queryDistributeFund')
+				.then(function(result){
+					if (result.data.code == "1") {
+						vm.$Modal.success(
+							{   
+								content: '执行成功',
+								onOk: () => {
+									vm.queryComplianceRepaymentData();
+			                    },
+		                    }
+						);
+					} else {
+						vm.$Modal.error({ content: result.data.msg });
+					}
+				}).catch(function (error) {
+					vm.$Modal.error({content: '接口调用异常!'});
+            	});
 			},
 			
 			/*
@@ -909,6 +935,21 @@ window.layinit(function(htConfig) {
 			},
 			
 			/*
+			 * 查询所有业务类型集合
+			 */
+			queryBusinessTypes: function(){
+				axios.get(basePath +"tdrepayRecharge/queryBusinessTypes")
+				.then(function (res) {
+					if (res.data.data != null && res.data.code == 1) {
+						vm.businessTypeList = res.data.data;
+					}
+				})
+				.catch(function (error) {
+					vm.$Modal.error({content: '接口调用异常!'});
+				});
+			},
+			
+			/*
 			 * 查看充值记录分页
 			 */
 			paging: function (page) {
@@ -919,6 +960,7 @@ window.layinit(function(htConfig) {
 		},
 
 		mounted: function() {
+			this.queryBusinessTypes();
 			this.queryUserAviMoney();
 			this.queryAllBusinessCompany();
 			this.queryComplianceRepaymentData();
