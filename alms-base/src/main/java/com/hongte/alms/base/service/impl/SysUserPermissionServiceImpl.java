@@ -108,9 +108,9 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
                 }
             }
 
-            if (RoleAreaMethodEnum.FINANCIAL_ORDER.value().equals(role.getRoleAreaMethod())) {
+            /*if (RoleAreaMethodEnum.FINANCIAL_ORDER.value().equals(role.getRoleAreaMethod())) {
                 roleAreaMethodEnum = RoleAreaMethodEnum.FINANCIAL_ORDER;
-            }
+            }*/
             roleAreaMethodEnum = RoleAreaMethodEnum.valueOf(role.getRoleAreaMethod());
         }
 

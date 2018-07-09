@@ -347,7 +347,7 @@
 	     <include refid="Base_Column_List"/>
        from tb_repayment_biz_plan_list   
 	  
-	  where confirm_flag=1   <![CDATA[  and  due_date<=curdate()]]>     <![CDATA[ and    `current_status`  <>'已还款' ]]> and src_type=2
+	  where confirm_flag=1   <![CDATA[  and  due_date<=curdate()]]>     <![CDATA[ and    `current_status`  <>'已还款' ]]> and src_type=2 order by period desc
 	  
     </select>
     
