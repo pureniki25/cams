@@ -36,6 +36,7 @@ import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.enums.RechargeAccountTypeEnums;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.EipRemote;
+import com.hongte.alms.base.service.AgencyRechargeLogService;
 import com.hongte.alms.base.service.BasicCompanyService;
 import com.hongte.alms.base.service.IssueSendOutsideLogService;
 import com.hongte.alms.base.service.RepaymentProjPlanService;
@@ -101,6 +102,10 @@ public class TdrepayRechargeController {
 
 	@Autowired
 	private LoginUserInfoHelper loginUserInfoHelper;
+	
+	@Autowired
+	@Qualifier("AgencyRechargeLogService")
+	private AgencyRechargeLogService agencyRechargeLogService;
 
 	@Autowired
 	private EipRemote eipRemote;
@@ -695,8 +700,22 @@ public class TdrepayRechargeController {
 			return Result.error("-99", e.getMessage());
 		}
 	}
+	
+	@SuppressWarnings("rawtypes")
+	@ApiOperation(value = "查询资金分发处理状态")
+	@GetMapping("/queryDistributeFund")
+	@ResponseBody
+	public Result queryDistributeFund() {
+		try {
+			agencyRechargeLogService.queryDistributeFund();
+			return Result.success();
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error("-99", e.getMessage());
+		}
+	}
 
-	@ApiOperation(value = "查询资金分发记录")
+	@ApiOperation(value = "获取标还款计划")
 	@GetMapping("/queryRepaymentProjPlan")
 	@ResponseBody
 	public Result<RepaymentProjPlan> queryRepaymentProjPlan(@RequestParam("projectId") String projectId) {
@@ -878,6 +897,31 @@ public class TdrepayRechargeController {
 			return Result.error("-99", "系统异常");
 		}
 
+	}
+	
+	@ApiOperation(value = "查询所有业务类型")
+	@GetMapping("/queryBusinessTypes")
+	@ResponseBody
+	public Result<List<Map<String, Object>>> queryBusinessTypes() {
+		try {
+			List<Map<String, Object>> resultList = new LinkedList<>();
+			BusinessTypeEnum[] businessTypeEnums = BusinessTypeEnum.values();
+			
+			for (BusinessTypeEnum businessTypeEnum : businessTypeEnums) {
+				if (businessTypeEnum.value() == 25) {
+					continue;
+				}
+				Map<String, Object> resultMap = new HashMap<>(); 
+				resultMap.put("value", businessTypeEnum.value());
+				resultMap.put("name", businessTypeEnum.getName());
+				resultList.add(resultMap);
+			}
+
+			return Result.success(resultList);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error("-99", e.getMessage());
+		}
 	}
 
 }
