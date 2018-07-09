@@ -4,6 +4,7 @@
 package com.hongte.alms.base.vo.finance;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * @author 王继光 2018年5月14日 下午8:42:42
@@ -22,6 +23,7 @@ public class CurrPeriodProjDetailVO {
 	private BigDecimal total = new BigDecimal("0");
 	private BigDecimal surplus = new BigDecimal("0");
 	private String project ;
+	private Date queryFullSuccessDate ;
 
 	public String getUserName() {
 		return userName;
@@ -150,5 +152,19 @@ public class CurrPeriodProjDetailVO {
 	 */
 	public void setSurplus(BigDecimal surplus) {
 		this.surplus = surplus;
+	}
+
+	/**
+	 * @return the queryFullSuccessDate
+	 */
+	public Date getQueryFullSuccessDate() {
+		return queryFullSuccessDate;
+	}
+
+	/**
+	 * @param queryFullSuccessDate the queryFullSuccessDate to set
+	 */
+	public void setQueryFullSuccessDate(Date queryFullSuccessDate) {
+		this.queryFullSuccessDate = queryFullSuccessDate;
 	}
 }
