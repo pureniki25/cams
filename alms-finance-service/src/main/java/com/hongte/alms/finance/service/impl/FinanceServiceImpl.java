@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,7 @@ import com.hongte.alms.base.dto.ActualPaymentSingleLogDTO;
 import com.hongte.alms.base.dto.RepaymentPlanInfoDTO;
 import com.hongte.alms.base.dto.RepaymentProjInfoDTO;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
+import com.hongte.alms.base.dto.compliance.TdRefundMonthInfoDTO;
 import com.hongte.alms.base.entity.ApplyDerateProcess;
 import com.hongte.alms.base.entity.ApplyDerateType;
 import com.hongte.alms.base.entity.MoneyPool;
@@ -1391,7 +1393,7 @@ public class FinanceServiceImpl implements FinanceService {
 
 			if (CollectionUtils.isNotEmpty(repaymentPlanInfoDTOs)) {
 
-				Map<String, List<RepaymentPlanInfoDTO>> map = new TreeMap<>();
+				Map<String, List<RepaymentPlanInfoDTO>> map = new LinkedHashMap<>();
 
 				for (RepaymentPlanInfoDTO repaymentPlanInfoDTO : repaymentPlanInfoDTOs) {
 					
@@ -1434,24 +1436,15 @@ public class FinanceServiceImpl implements FinanceService {
 				if (!map.isEmpty()) {
 
 					List<RepaymentPlanInfoDTO> resultList = new ArrayList<>();
+					
+					Double businessSurplus = transferOfLitigationMapper.queryOverRepayMoneyByBusinessId(businessId);
 
 					for (Entry<String, List<RepaymentPlanInfoDTO>> entry : map.entrySet()) {
 
-						// 每一个 infoDTOs 只可能有一个应还数据，可能有多个实还数据
 						List<RepaymentPlanInfoDTO> infoDTOs = entry.getValue();
 
 						RepaymentPlanInfoDTO planInfoDTO = new RepaymentPlanInfoDTO(); // 计划还款
 						RepaymentPlanInfoDTO factInfoDTO = new RepaymentPlanInfoDTO(); // 实际还款
-
-						// double accrual = 0; // 利息
-						// double offlineLateFee = 0; // 线下滞纳金
-						// double principal = 0; // 本金
-						// double serviceCharge = 0; // 月收分公司服务费
-						// double platformCharge = 0; // 月收平台费
-						// double onlineLateFee = 0; // 线上滞纳金
-						// double surplus = 0; // 结余
-
-						// Date factRepayDate = null; // 实还日期
 
 						for (RepaymentPlanInfoDTO infoDTO : infoDTOs) {
 							String repayment = infoDTO.getRepayment();
@@ -1474,27 +1467,10 @@ public class FinanceServiceImpl implements FinanceService {
 									break;
 								}
 							} else if ("实际还款".equals(repayment)) {
-								// accrual += infoDTO.getAccrual();
-								// offlineLateFee += infoDTO.getOfflineLateFee();
-								// principal += infoDTO.getPrincipal();
-								// serviceCharge += infoDTO.getServiceCharge();
-								// platformCharge += infoDTO.getPlatformCharge();
-								// onlineLateFee += infoDTO.getOnlineLateFee();
-								// surplus += infoDTO.getSurplus();
-//								infoDTO.setSurplus((infoDTO.getAmount() - planInfoDTO.getAmount()) < 0 ? 0
-//										: BigDecimal.valueOf((infoDTO.getAmount() - planInfoDTO.getAmount()))
-//												.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-								// infoDTO.setTotal(infoDTO.getTotal() + infoDTO.getSurplus());
-								// 完成上一步没有加上的结余数据
-								// if (factRepayDate == null) {
-								// factRepayDate = infoDTO.getRepaymentDate();
-								// }
 								factInfoDTO = infoDTO;
 							}
 						}
 
-						// double subtotal = accrual + principal + serviceCharge + platformCharge; // 小计
-						// double total = subtotal + offlineLateFee + onlineLateFee + surplus; //
 						// 还款合计（含滞纳金）
 
 						RepaymentPlanInfoDTO balanceRepayment = new RepaymentPlanInfoDTO(); // 差额
@@ -1533,7 +1509,7 @@ public class FinanceServiceImpl implements FinanceService {
 						infoDTOs.add(balanceRepayment);
 						resultList.addAll(infoDTOs);
 						resultMap.put("resultList", resultList);
-						resultMap.put("businessSurplus", transferOfLitigationMapper.queryOverRepayMoneyByBusinessId(businessId));
+						resultMap.put("businessSurplus", businessSurplus);
 					}
 					return resultMap;
 				}

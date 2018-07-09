@@ -19,6 +19,7 @@
         <result column="overdue_days" property="overdueDays" />
         <result column="current_status" property="currentStatus" />
         <result column="current_sub_status" property="currentSubStatus" />
+        <result column="repay_status" property="repayStatus" />
         <result column="repay_flag" property="repayFlag" />
         <result column="fact_repay_date" property="factRepayDate" />
         <result column="remark" property="remark" />
@@ -33,7 +34,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        proj_plan_list_id AS projPlanListId, proj_plan_id AS projPlanId, plan_list_id AS planListId, plan_id AS planId, business_id AS businessId, orig_business_id AS origBusinessId, period, after_id AS afterId, due_date AS dueDate, total_borrow_amount AS totalBorrowAmount, overdue_amount AS overdueAmount, derate_amount AS derateAmount, overdue_days AS overdueDays, current_status AS currentStatus, current_sub_status AS currentSubStatus, repay_flag AS repayFlag, fact_repay_date AS factRepayDate, remark, creat_sys_type AS creatSysType, plate_type AS plateType, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser, confirm_log_id AS confirmLogId
+        proj_plan_list_id AS projPlanListId, proj_plan_id AS projPlanId, plan_list_id AS planListId, plan_id AS planId,repay_status as repayStatus, business_id AS businessId, orig_business_id AS origBusinessId, period, after_id AS afterId, due_date AS dueDate, total_borrow_amount AS totalBorrowAmount, overdue_amount AS overdueAmount, derate_amount AS derateAmount, overdue_days AS overdueDays, current_status AS currentStatus, current_sub_status AS currentSubStatus, repay_flag AS repayFlag, fact_repay_date AS factRepayDate, remark, creat_sys_type AS creatSysType, plate_type AS plateType, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser, confirm_log_id AS confirmLogId
     </sql>
 
 </mapper>

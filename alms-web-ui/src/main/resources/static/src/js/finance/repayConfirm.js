@@ -684,10 +684,10 @@ window.layinit(function (htConfig) {
                     app.factRepayPreview.total += (app.factRepayPreview.total * 10000 + e.total * 10000) / 10000
                 })
 
-                /* app.factRepayPreview.total = (app.factRepayPreview.subTotal * 10000
-                    + app.factRepayPreview.offlineOverDue * 10000
-                    + app.factRepayPreview.onlineOverDue * 10000
-                    + app.factRepayPreview.surplus * 10000) / 10000 */
+                 app.factRepayPreview.total = (app.factRepayPreview.subTotal * 100000
+                    + app.factRepayPreview.offlineOverDue * 100000
+                    + app.factRepayPreview.onlineOverDue * 100000
+                    + app.factRepayPreview.surplus * 100000) / 100000 
             },
             confirmRepayment() {
                 let param = {};
