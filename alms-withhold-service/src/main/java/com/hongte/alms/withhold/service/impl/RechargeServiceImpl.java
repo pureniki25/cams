@@ -667,13 +667,19 @@ public class RechargeServiceImpl implements RechargeService {
 		}
 
 		log.setUpdateTime(new Date());
-		if (loginUserInfoHelper != null && !StringUtil.isEmpty(loginUserInfoHelper.getUserId())) {
-			log.setUpdateUser(loginUserInfoHelper.getUserId());
-			log.setCreateUser(loginUserInfoHelper.getUserId());
-		} else {
+		if(StringUtil.isEmpty(appType)) {
+			if (loginUserInfoHelper != null && !StringUtil.isEmpty(loginUserInfoHelper.getUserId())) {
+				log.setUpdateUser(loginUserInfoHelper.getUserId());
+				log.setCreateUser(loginUserInfoHelper.getUserId());
+			} else {
+				log.setCreateUser(appType);
+				log.setUpdateUser(appType);
+			}
+		}else {
 			log.setCreateUser(appType);
 			log.setUpdateUser(appType);
 		}
+	
 
 		log.setCurrentAmount(currentAmount);// 本次代扣金额
 		withholdingRepaymentLogService.insertOrUpdate(log);
