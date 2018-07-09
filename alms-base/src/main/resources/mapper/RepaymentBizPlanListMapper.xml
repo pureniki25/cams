@@ -139,10 +139,10 @@
 			1 = 1
 			<if test="customer != null">
 				<!-- AND b.customer_name = #{customer} -->
-				AND pi.real_name = #{customer}
+				AND b.customer_name like '${customer}%' 
 			</if>
 			<if test="businessId != null">
-				AND pl.orig_business_id = #{businessId}
+				AND pl.orig_business_id like  '${businessId}%'
 			</if>
 			<if test="accountantConfirmStatus != null">
 				AND pl.accountant_confirm_status =
@@ -152,7 +152,7 @@
 				AND bc.area_pid = #{areaId}
 			</if>
 			<if test="companyId != null">
-				AND (b.company_name = #{companyId} OR b.company_id = #{companyId})
+				AND b.company_name = #{companyId}
 			</if>
 			<if test="businessType != null ">
 				AND b.business_type = #{businessType}
@@ -233,7 +233,7 @@
 			1 = 1
 			<if test="customer != null">
 				<!-- AND b.customer_name = #{customer} -->
-				AND pi.real_name like '${customer}%' 
+				AND b.customer_name like '${customer}%' 
 			</if>
 			<if test="businessId != null">
 				AND pl.orig_business_id like  '${businessId}%'
@@ -718,13 +718,16 @@
 		  WHERE t1.proj_plan_list_id = t2.proj_plan_list_id 
 		    AND t1.proj_plan_list_id = rppl.proj_plan_list_id) amount,
 		  0 otherFee,
-		  CASE rppl.`current_status`
-		  WHEN '已还款' 
-		  THEN rppl.`repay_flag`
-		  WHEN '还款中' 
-		  THEN 0
-		  ELSE -1 
-		  END confirmFlag
+		  CASE
+		    rppl.`current_status` 
+		    WHEN '已还款' 
+		    THEN rppl.`repay_flag` 
+		    WHEN '还款中' 
+		    THEN IFNULL(rppl.repay_status, 0)
+		    WHEN '逾期'
+		    THEN IFNULL(rppl.repay_status, -1)
+		  END confirmFlag,
+		  '' confirmFlagStr
 		FROM
 		  `tb_repayment_proj_plan_list` rppl,
 		  `tb_repayment_proj_plan_list_detail` rppld,
@@ -817,12 +820,14 @@
 		  WHERE t1.proj_plan_list_id = t2.proj_plan_list_id 
 		    AND t1.proj_plan_list_id = rppl.proj_plan_list_id) amount,
 		  0 otherFee,
-		  CASE rppl.`current_status`
-		  WHEN '已还款' 
-		  THEN rppl.`repay_flag`
-		  WHEN '还款中' 
-		  THEN 0
-		  ELSE -1 
+		  CASE
+		    rppl.`current_status` 
+		    WHEN '已还款' 
+		    THEN rppl.`repay_flag` 
+		    WHEN '还款中' 
+		    THEN IFNULL(rppl.repay_status, 0)
+		    WHEN '逾期'
+		    THEN IFNULL(rppl.repay_status, -1)
 		  END confirmFlag,
 		  rppl.remark confirmFlagStr
 		FROM
