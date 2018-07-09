@@ -37,15 +37,16 @@ public class AutoRechargeJob extends IJobHandler {
 
 	@Override
 	public ReturnT<String> execute(String arg0) throws Exception {
-		try {
+	
 		
 		LOG.info("@AutoRecharge@自动代扣--开始[{},{}]");
+		try {
 		withholdingClient.autoRepay();
 		LOG.info("@AutoRecharge@自动代扣--结束[{}]");
 		return SUCCESS;
 	} catch (Exception e) {
 		LOG.error("自动代扣失败", e);
-		return FAIL;
+		return SUCCESS;
 	}
 		
 	}

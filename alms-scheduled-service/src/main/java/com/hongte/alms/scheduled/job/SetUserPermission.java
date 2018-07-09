@@ -24,7 +24,7 @@ import java.util.List;
  * @author zengkun
  * @since 2018/2/7
  */
-@Component
+//@Component
 public class SetUserPermission implements   BaseJob {
 
    private  static Logger logger = LoggerFactory.getLogger(SetUserPermission.class);
@@ -59,7 +59,7 @@ public class SetUserPermission implements   BaseJob {
 //    @Scheduled(cron = "0 0/10 * * * ? ")
 
     //每天凌晨3点执行一次
-    @Scheduled(cron = "0 0 3 * * ?")
+//    @Scheduled(cron = "0 0 3 * * ?")
     public  void job(){
 
         if(runningFlage){

@@ -1515,7 +1515,10 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     prinDetail.setPlanItemName(RepayPlanFeeTypeEnum.PRINCIPAL.getDesc());//应还项目名称
                     prinDetail.setPlanItemType(RepayPlanFeeTypeEnum.PRINCIPAL.getValue());//应还项目所属分类
                     prinDetail.setAccountStatus(RepayPlanAccountStatusEnum.DIVISION_TO_PLAT.getValue());//分账标记
-
+                    //分润顺序项
+                    Integer shareProfitIndex =  profitItemSetService.getLevel(businessBasicInfo.getBusinessType().toString(),prinDetail.getPlanItemType(),prinDetail.getFeeId())
+                            .get("feeLevel");
+                    prinDetail.setShareProfitIndex(shareProfitIndex);
 
                     addDetialToMap(  repaymentProjPlanListDetailPeriorMap,
                             projdetailListMap,
@@ -1530,7 +1533,10 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     iniDetail.setPlanItemName(RepayPlanFeeTypeEnum.INTEREST.getDesc());//应还项目名称
                     iniDetail.setPlanItemType(RepayPlanFeeTypeEnum.INTEREST.getValue());//应还项目所属分类
                     iniDetail.setAccountStatus(RepayPlanAccountStatusEnum.DIVISION_TO_PLAT.getValue());//分账标记
-
+                    //分润顺序项
+                    Integer inishareProfitIndex =  profitItemSetService.getLevel(businessBasicInfo.getBusinessType().toString(),iniDetail.getPlanItemType(),iniDetail.getFeeId())
+                            .get("feeLevel");
+                    iniDetail.setShareProfitIndex(inishareProfitIndex);
                     addDetialToMap(  repaymentProjPlanListDetailPeriorMap,
                             projdetailListMap,
                             RepayPlanFeeTypeEnum.INTEREST.getUuid(), iniDetail,i,
@@ -1555,6 +1561,10 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                                 peroidFeelDetail.setPlanItemName(feeReq.getFeeTypeName());//应还项目名称
                                 peroidFeelDetail.setPlanItemType(feeReq.getFeeType());//应还项目所属分类
                                 peroidFeelDetail.setAccountStatus(feeReq.getAccountStatus());//分账标记
+                                //分润顺序项
+                                Integer itemshareProfitIndex =  profitItemSetService.getLevel(businessBasicInfo.getBusinessType().toString(),peroidFeelDetail.getPlanItemType(),peroidFeelDetail.getFeeId())
+                                        .get("feeLevel");
+                                peroidFeelDetail.setShareProfitIndex(itemshareProfitIndex);
                                 if(feeReq.getIsTermRange().equals(BooleanEnum.YES.getValue())){
                                     //是分段收费  需要从分段收费信息列表中
 
@@ -2006,10 +2016,6 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         projPlanListDetail.setCreateUser(Constant.ADMIN_ID);
         projPlanListDetail.setCreatSysType(projPlanList.getCreatSysType()); //创建系统标志
         projPlanListDetail.setPlateType(projPlanList.getPlateType()); //平台类型标志
-        //分润顺序项
-        Integer shareProfitIndex =  profitItemSetService.getLevel(projPlanListDetail.getBusinessId(),projPlanListDetail.getPlanItemType(),projPlanListDetail.getFeeId())
-                .get("feeLevel");
-        projPlanListDetail.setShareProfitIndex(shareProfitIndex);
         projPlanListDetail.setDueDate(projPlanList.getDueDate());
         return projPlanListDetail;
     }

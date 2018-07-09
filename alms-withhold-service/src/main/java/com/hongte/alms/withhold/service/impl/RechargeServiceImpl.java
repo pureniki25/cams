@@ -175,6 +175,7 @@ public class RechargeServiceImpl implements RechargeService {
 			result.setData(null);
 			result.setCode("-1");
 			result.setMsg("当前失败或者执行中次数为:" + failCount + ",超过限制次数，不允许执行。");
+			RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
 		} else {
 			//********************************易宝代扣开始*********************************************//
 			if (channel.getPlatformId() == PlatformEnum.YB_FORM.getValue()) {
