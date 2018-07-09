@@ -1586,26 +1586,26 @@ public class FinanceServiceImpl implements FinanceService {
 
 			List<RepaymentProjInfoDTO> repaymentProjInfoDTOs = repaymentBizPlanListMapper
 					.queryActualRepaymentProjInfoByPlanListId(planListId);
-			List<RepaymentProjInfoDTO> planDTOs = repaymentBizPlanListMapper
-					.queryPlanRepaymentProjInfoByPlanListId(planListId);
+//			List<RepaymentProjInfoDTO> planDTOs = repaymentBizPlanListMapper
+//					.queryPlanRepaymentProjInfoByPlanListId(planListId);
 
-			Map<String, RepaymentProjInfoDTO> mapPlanDTO = new HashMap<>();
-
-			if (CollectionUtils.isNotEmpty(planDTOs)) {
-				for (RepaymentProjInfoDTO repaymentProjInfoDTO : planDTOs) {
-					String projPlanListId = repaymentProjInfoDTO.getProjPlanListId();
-					RepaymentProjInfoDTO dto = mapPlanDTO.get(projPlanListId);
-					if (dto == null) {
-						mapPlanDTO.put(projPlanListId, repaymentProjInfoDTO);
-					}
-				}
-			}
+//			Map<String, RepaymentProjInfoDTO> mapPlanDTO = new HashMap<>();
+//
+//			if (CollectionUtils.isNotEmpty(planDTOs)) {
+//				for (RepaymentProjInfoDTO repaymentProjInfoDTO : planDTOs) {
+//					String projPlanListId = repaymentProjInfoDTO.getProjPlanListId();
+//					RepaymentProjInfoDTO dto = mapPlanDTO.get(projPlanListId);
+//					if (dto == null) {
+//						mapPlanDTO.put(projPlanListId, repaymentProjInfoDTO);
+//					}
+//				}
+//			}
 
 			if (CollectionUtils.isNotEmpty(repaymentProjInfoDTOs)) {
 
 				for (RepaymentProjInfoDTO repaymentProjInfoDTO : repaymentProjInfoDTOs) {
-					String projPlanListId = repaymentProjInfoDTO.getProjPlanListId();
-					RepaymentProjInfoDTO dto = mapPlanDTO.get(projPlanListId);
+//					String projPlanListId = repaymentProjInfoDTO.getProjPlanListId();
+//					RepaymentProjInfoDTO dto = mapPlanDTO.get(projPlanListId);
 
 					double accrual = repaymentProjInfoDTO.getAccrual();
 					double principal = repaymentProjInfoDTO.getPrincipal();
@@ -1614,16 +1614,16 @@ public class FinanceServiceImpl implements FinanceService {
 					double offlineLateFee = repaymentProjInfoDTO.getOfflineLateFee();
 					double onlineLateFee = repaymentProjInfoDTO.getOnlineLateFee();
 
-					double surplus = (repaymentProjInfoDTO.getAmount() - dto.getAmount()) < 0 ? 0
-							: (repaymentProjInfoDTO.getAmount() - dto.getAmount());
+//					double surplus = (repaymentProjInfoDTO.getAmount() - dto.getAmount()) < 0 ? 0
+//							: (repaymentProjInfoDTO.getAmount() - dto.getAmount());
 
-					repaymentProjInfoDTO.setSurplus(surplus);
+//					repaymentProjInfoDTO.setSurplus(surplus);
 
 					repaymentProjInfoDTO
 							.setSubtotal(BigDecimal.valueOf(accrual + principal + serviceCharge + platformCharge)
 									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
 					repaymentProjInfoDTO.setTotal(BigDecimal
-							.valueOf(onlineLateFee + offlineLateFee + repaymentProjInfoDTO.getSubtotal() + surplus)
+							.valueOf(onlineLateFee + offlineLateFee + repaymentProjInfoDTO.getSubtotal())
 							.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
 
 				}
@@ -1684,7 +1684,7 @@ public class FinanceServiceImpl implements FinanceService {
 
 				for (Entry<String, List<RepaymentProjInfoDTO>> entry : map.entrySet()) {
 
-					double principal = 0;
+					/*double principal = 0;
 					double accrual = 0;
 					double serviceCharge = 0;
 					double platformCharge = 0;
@@ -1693,18 +1693,23 @@ public class FinanceServiceImpl implements FinanceService {
 					double offlineLateFee = 0;
 					double surplus = 0;
 					double total = 0;
-					double amount = 0;
+					double amount = 0;*/
 
 					List<RepaymentProjInfoDTO> dtos = entry.getValue();
 					RepaymentProjInfoDTO dtoPlan = dtos.get(0);
+					RepaymentProjInfoDTO dtoAccrual = dtos.get(1);
 					dtoPlan.setSubtotal(dtoPlan.getPrincipal() + dtoPlan.getAccrual() + dtoPlan.getServiceCharge()
 							+ dtoPlan.getPlatformCharge());
 					dtoPlan.setTotal(dtoPlan.getSubtotal() + dtoPlan.getOnlineLateFee() + dtoPlan.getOfflineLateFee());
-					double planAmount = dtoPlan.getAmount();
+//					double planAmount = dtoPlan.getAmount();
+					
+					dtoAccrual.setSubtotal(dtoAccrual.getPrincipal() + dtoAccrual.getAccrual() + dtoAccrual.getServiceCharge()
+					+ dtoAccrual.getPlatformCharge());
+					dtoAccrual.setTotal(dtoAccrual.getSubtotal() + dtoAccrual.getOnlineLateFee() + dtoAccrual.getOfflineLateFee());
+//					double accrualAmount = dtoAccrual.getAmount();
 
-					Date factRepayDate = null; // 实还日期
 
-					for (RepaymentProjInfoDTO repaymentProjInfoDTO : dtos) {
+					/*for (RepaymentProjInfoDTO repaymentProjInfoDTO : dtos) {
 
 						if ("实际还款".equals(repaymentProjInfoDTO.getRepayment())) {
 
@@ -1727,36 +1732,33 @@ public class FinanceServiceImpl implements FinanceService {
 							offlineLateFee += repaymentProjInfoDTO.getOfflineLateFee();
 							amount += repaymentProjInfoDTO.getAmount();
 						}
-					}
+					}*/
 
-					surplus = amount - planAmount;
-					total = subtotal + onlineLateFee + offlineLateFee + surplus;
+//					surplus = amount - planAmount;
+//					total = subtotal + onlineLateFee + offlineLateFee + surplus;
 
 					RepaymentProjInfoDTO dtoDifference = new RepaymentProjInfoDTO();
 					dtoDifference.setRealName(dtoPlan.getRealName());
 					dtoDifference.setRepayment("差额");
-					if (factRepayDate != null) {
-						dtoDifference.setPrincipal(BigDecimal.valueOf(dtoPlan.getPrincipal() - principal)
-								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-						dtoDifference.setAccrual(BigDecimal.valueOf(dtoPlan.getAccrual() - accrual)
-								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-						dtoDifference.setServiceCharge(BigDecimal.valueOf(dtoPlan.getServiceCharge() - serviceCharge)
-								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-						dtoDifference.setPlatformCharge(BigDecimal.valueOf(dtoPlan.getPlatformCharge() - platformCharge)
-								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-						dtoDifference.setSubtotal(BigDecimal.valueOf(dtoPlan.getSubtotal() - subtotal)
-								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-						dtoDifference.setOnlineLateFee(BigDecimal.valueOf(dtoPlan.getOnlineLateFee() - onlineLateFee)
-								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-						dtoDifference.setOfflineLateFee(BigDecimal.valueOf(dtoPlan.getOfflineLateFee() - offlineLateFee)
-								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-						dtoDifference.setSurplus(BigDecimal.valueOf(dtoPlan.getSurplus() - surplus)
-								.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-						dtoDifference.setTotal(
-								BigDecimal.valueOf((dtoPlan.getTotal() - total) > 0 ? dtoPlan.getTotal() - total : 0)
-										.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+					dtoDifference.setPrincipal(BigDecimal.valueOf(dtoPlan.getPrincipal() - dtoAccrual.getPrincipal())
+							.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+					dtoDifference.setAccrual(BigDecimal.valueOf(dtoPlan.getAccrual() - dtoAccrual.getAccrual())
+							.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+					dtoDifference.setServiceCharge(BigDecimal.valueOf(dtoPlan.getServiceCharge() - dtoAccrual.getServiceCharge())
+							.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+					dtoDifference.setPlatformCharge(BigDecimal.valueOf(dtoPlan.getPlatformCharge() - dtoAccrual.getPlatformCharge())
+							.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+					dtoDifference.setSubtotal(BigDecimal.valueOf(dtoPlan.getSubtotal() - dtoAccrual.getSubtotal())
+							.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+					dtoDifference.setOnlineLateFee(BigDecimal.valueOf(dtoPlan.getOnlineLateFee() - dtoAccrual.getOnlineLateFee())
+							.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+					dtoDifference.setOfflineLateFee(BigDecimal.valueOf(dtoPlan.getOfflineLateFee() - dtoAccrual.getOfflineLateFee())
+							.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+					dtoDifference.setSurplus(0);
+					dtoDifference.setTotal(
+							BigDecimal.valueOf((dtoPlan.getTotal() - dtoAccrual.getTotal()) > 0 ? dtoPlan.getTotal() - dtoAccrual.getTotal() : 0)
+									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
 
-					}
 					repaymentProjInfoDTOs.add(dtoDifference);
 				}
 
