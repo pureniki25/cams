@@ -4,7 +4,7 @@ let projRepayment = {
             title:'借款人',
             key:'userName',
             render:(h,p)=>{
-                return h('span',p.row.master?p.row.userName+'(主)':p.row.userName)
+                return h('span',p.row.master?p.row.userName+'(主借)':p.row.userName)
             }
         },{
             title:'上标金额',
