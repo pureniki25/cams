@@ -38,7 +38,7 @@ public class CollectionTimeSet extends Model<CollectionTimeSet> {
      */
 	@TableField("col_type")
 	@ApiModelProperty(required= true,value = "移交类型（1：移交清算一（电催），2：移交清算二（上门催收），3：移交法务诉讼）")
-	private ColTypeEnum colType;
+	private Integer colType;
     /**
      * 逾期天数
      */
@@ -80,11 +80,11 @@ public class CollectionTimeSet extends Model<CollectionTimeSet> {
 		this.colTimeId = colTimeId;
 	}
 
-	public ColTypeEnum getColType() {
+	public Integer getColType() {
 		return colType;
 	}
 
-	public void setColType(ColTypeEnum colType) {
+	public void setColType(Integer colType) {
 		this.colType = colType;
 	}
 

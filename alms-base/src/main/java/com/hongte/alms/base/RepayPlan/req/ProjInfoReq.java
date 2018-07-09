@@ -44,6 +44,7 @@ public class ProjInfoReq {
 
 
     @ApiModelProperty(value = "标的的额外费用信息列表")
+    @Valid
     private  List<ProjExtRateReq> projExtRateReqs;
 
     //标的额外费用，按feeId分好分类

@@ -1,12 +1,12 @@
 package com.hongte.alms.base.service;
 
 import com.hongte.alms.base.dto.UserPermissionBusinessDto;
+import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.vo.billing.CarLoanBilVO;
 import com.hongte.alms.base.vo.module.BusinessInfoForApplyDerateVo;
 import com.hongte.alms.base.vo.module.ExpenseSettleVO;
 import com.hongte.alms.base.vo.module.LiquidationVO;
 import com.hongte.alms.base.vo.module.LitigationVO;
-import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.common.service.BaseService;
 import org.apache.ibatis.annotations.Param;
 
@@ -54,6 +54,16 @@ public interface BasicBusinessService extends BaseService<BasicBusiness> {
 	 * @return
 	 */
 	BigDecimal getPreChargeAndPreFees(String original_business_id);
+
+    /**
+     * 查询所有业务ID
+     *
+     * @param companyId    分公司ID
+     * @param businessType 业务类型
+     * @return 业务ID集合
+     * @author 张贵宏
+     */
+    List<String> findBusinessIds(String companyId, Integer businessType);
 
 	/**
 	 * 结清最终缴纳的金额
