@@ -176,6 +176,7 @@ public class RechargeServiceImpl implements RechargeService {
 			result.setCode("-1");
 			result.setMsg("当前失败或者执行中次数为:" + failCount + ",超过限制次数，不允许执行。");
 		} else {
+			//********************************易宝代扣开始*********************************************//
 			if (channel.getPlatformId() == PlatformEnum.YB_FORM.getValue()) {
 				SysParameter  thirtyRepayTestResult = sysParameterService.selectOne(
 						new EntityWrapper<SysParameter>().eq("param_type", "thirtyRepayTest")
@@ -246,6 +247,9 @@ public class RechargeServiceImpl implements RechargeService {
 				
 				}
 			}
+			
+			
+			//********************************宝付代扣开始*********************************************//
 			if (channel.getPlatformId() == PlatformEnum.BF_FORM.getValue()) {
 				SysParameter  thirtyRepayTestResult = sysParameterService.selectOne(
 						new EntityWrapper<SysParameter>().eq("param_type", "thirtyRepayTest")
@@ -339,6 +343,7 @@ public class RechargeServiceImpl implements RechargeService {
 				}
 				
 			}
+			//********************************银行代扣开始*********************************************//
 			if (channel.getPlatformId() == PlatformEnum.YH_FORM.getValue()) {
 			  List<SignedProtocol> signedProtocolList= bankCardInfo.getSignedProtocolList();
 				List<SysParameter> bankChannels = sysParameterService.selectList(
@@ -839,7 +844,7 @@ public class RechargeServiceImpl implements RechargeService {
 	@Override
 	public RepaymentBizPlanList getEarlyPeriod(RepaymentBizPlanList list) {
 		
-		List<RepaymentBizPlanList> repaymentBizPlanLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", list.getPlanId()));
+		List<RepaymentBizPlanList> repaymentBizPlanLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", list.getPlanId()).eq("confirm_flag", 1));
 		//到了应该还日期的期数集合
 		List<RepaymentBizPlanList> dueDateLists=repaymentBizPlanLists.stream().filter(a->a.getDueDate().compareTo(new Date())<=1).collect(Collectors.toList());
 		//还没有还款的到了应该还日期的期数集合
