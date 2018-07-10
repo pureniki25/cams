@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.google.common.collect.Lists;
 import com.hongte.alms.base.entity.SysProvince;
 import com.hongte.alms.base.service.SysProvinceService;
+import com.hongte.alms.common.result.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -40,14 +41,15 @@ public class SysProvinceController {
      */
     @ApiOperation(value = "查询所有省份")
     @RequestMapping("/findAll")
-    public List<SysProvince> findAll(){
+    public Result findAll() {
         List<SysProvince> provinces = Lists.newArrayList();
         try {
             provinces =  sysProvinceService.selectList(new EntityWrapper<SysProvince>().orderBy("name",true));
+            return Result.success(provinces);
         }catch (Exception ex){
             LOGGER.error(ex.getMessage(), ex);
+            return Result.error(ex.getMessage());
         }
-        return provinces;
     }
 
 }

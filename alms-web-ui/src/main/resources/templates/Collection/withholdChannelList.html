@@ -50,19 +50,17 @@
                     搜索条件
                 </p>
 
-                <div class="layui-btn-group" slot="extra">
-                    <i-button class="layui-btn layui-btn-sm" slot="extra" @click="toLoading" v-if="authValid('search')">
-                        <span v-if="!loading"><i class="layui-icon">&#xe615;</i>查询</span>
-                        <span v-else><i
-                                class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
-                    </i-button>
-                    <i-button class="layui-btn layui-btn-sm"  v-if="authValid('reset')" @click="handleReset('searchForm')">
-                        <span>重置</span>
-                    </i-button>
-                    <i-button class="layui-btn layui-btn-sm"  v-if="authValid('add')" @click="addHoldChannel('withHoldChanelForm')">
-                        <span>新增</span>
-                    </i-button>
-                </div>
+                <i-button type="primary" slot="extra" @click="toLoading" v-if="authValid('search')" style="margin-right:10px">
+                    <span v-if="!loading">查询</span>
+                    <span v-else>查询中...</span>
+                </i-button>
+                <i-button type="primary" slot="extra" v-if="authValid('reset')" @click="handleReset('searchForm')" style="margin-right:10px">
+                    <span>重置</span>
+                </i-button>
+                <i-button type="primary" slot="extra" v-if="authValid('add')" style="margin-right:10px"
+                          @click="addHoldChannel('withHoldChanelForm')">
+                    <span>新增</span>
+                </i-button>
 
 
                 <row :gutter="16">
@@ -70,11 +68,11 @@
                             :label-width="100">
 
 
-
                         <i-col span="6">
                             <form-item label="渠道：" prop="platformId">
                                 <i-select v-model="searchForm.platformId" clearable filterable>
-                                    <i-option v-for="item in platformType" :value="item.platformId" :key="item.platformId">{{
+                                    <i-option v-for="item in platformType" :value="item.platformId"
+                                              :key="item.platformId">{{
                                         item.platformName }}
                                     </i-option>
                                 </i-select>
@@ -94,9 +92,11 @@
                 v-model="withHoldChanelModel"
                 title="新增渠道"
                 :mask-closable="false">
-            <i-form ref="withHoldChanelForm" :model="withHoldChanelForm" :rules="withHoldChanelValidate" :label-width="150">
+            <i-form ref="withHoldChanelForm" :model="withHoldChanelForm" :rules="withHoldChanelValidate"
+                    :label-width="150">
                 <form-item label="渠道类型：" prop="platformId">
-                    <i-select v-model="withHoldChanelForm.platformId" clearable filterable  @on-change="platformOnChange($event)" >
+                    <i-select v-model="withHoldChanelForm.platformId" clearable filterable
+                              @on-change="platformOnChange($event)">
                         <i-option v-for="item in platformType" :value="item.platformId" :key="item.platformId">{{
                             item.platformName }}
                         </i-option>
@@ -104,32 +104,33 @@
                 </form-item>
                 <form-item label="银行代扣渠道编号：" prop="subPlatformId">
                     <i-input v-model="withHoldChanelForm.subPlatformId" placeholder="银行代扣渠道编号" maxlength="30"
-                             style="width: 176px" :disabled="disabledFlag" ></i-input>
+                             style="width: 176px" :disabled="disabledFlag"></i-input>
                 </form-item>
                 <form-item label="银行代扣渠道名称：" prop="subPlatformName">
-                    <i-input v-model="withHoldChanelForm.subPlatformName"  ref="subPlatformName" placeholder="银行代扣渠道名称" maxlength="30"
-                             style="width: 176px" :disabled="disabledFlag" ></i-input>
+                    <i-input v-model="withHoldChanelForm.subPlatformName" ref="subPlatformName" placeholder="银行代扣渠道名称"
+                             maxlength="30"
+                             style="width: 176px" :disabled="disabledFlag"></i-input>
                 </form-item>
 
                 <form-item label="代扣优先级：" prop="channelLevel">
                     <i-input v-model="withHoldChanelForm.channelLevel" placeholder="代扣优先级" maxlength="30"
-                             style="width: 176px" number ></i-input>
+                             style="width: 176px" number></i-input>
                 </form-item>
 
                 <form-item label="渠道状态：" prop="state">
                     <radio-group v-model="withHoldChanelForm.state" number>
-                        <radio label=1 >启用</radio>
-                        <radio label=0 >停用</radio>
+                        <radio label=1>启用</radio>
+                        <radio label=0>停用</radio>
                     </radio-group>
                 </form-item>
 
                 <form-item label="每日失败次数：" prop="failTimes">
                     <i-input v-model="withHoldChanelForm.failTimes" placeholder="失败次数" maxlength="30"
-                             style="width: 176px" number ></i-input>
+                             style="width: 176px" number></i-input>
                 </form-item>
                 <form-item label="备注：" prop="remark">
                     <i-input v-model="withHoldChanelForm.remark" placeholder="备注" maxlength="300"
-                             style="width: 176px" ></i-input>
+                             style="width: 176px"></i-input>
                 </form-item>
 
             </i-form>
@@ -158,8 +159,6 @@
         </i-col>
     </row>
     <!-- 表单Grid，使用layerUI的表格组件 结束 -->
-
-
 
 
 </div>
