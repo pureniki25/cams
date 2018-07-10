@@ -956,21 +956,4 @@ public class TdrepayRechargeController {
 		}
 	}
 	
-	@ApiOperation(value = "标的还款信息查询接口")
-	@GetMapping("/remoteGetProjectPayment")
-	@ResponseBody
-	public Result<com.ht.ussp.core.Result> remoteGetProjectPayment(@RequestParam("projectId") String projectId) {
-		if (StringUtil.isEmpty(projectId)) {
-			return Result.error("-99", "标ID不能为空");
-		}
-
-		try {
-			com.ht.ussp.core.Result result = tdrepayRechargeService.remoteGetProjectPayment(projectId);
-			return Result.success(result);
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-			return Result.error("-99", e.getMessage());
-		}
-	}
-
 }
