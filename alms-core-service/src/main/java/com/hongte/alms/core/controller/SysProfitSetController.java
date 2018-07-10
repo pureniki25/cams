@@ -107,7 +107,7 @@ public class SysProfitSetController {
         //项目费用类型
 		    Result result = new Result<>();
             List<RepaymentBizPlanListDetail> list=repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_item_type", itemType).groupBy("fee_id"));
-            List<ProfitFeeSet> feeTypeList=  profitFeeSetService.selectList(new EntityWrapper<ProfitFeeSet>().eq("profit_item_set_id", profitItemSetId));
+            List<ProfitFeeSet> feeTypeList=  profitFeeSetService.selectList(new EntityWrapper<ProfitFeeSet>().eq("profit_item_set_id", profitItemSetId).groupBy("fee_id"));
         	if(feeTypeList.size()>0) {
 	    		result.setCode("1");
 	    		result.setData(feeTypeList);
