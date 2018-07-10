@@ -35,7 +35,7 @@ public class ProfitFeeSetServiceImpl extends BaseServiceImpl<ProfitFeeSetMapper,
 			feeSet.setProfitFeeSetId(UUID.randomUUID().toString());
 			feeSet.setProfitItemSetId(profitItemSetId);
 			feeSet.setBusinessTypeId(businessTypeId);
-			feeSet.setFeeId(item.getFeeId());
+			feeSet.setFeeId(item.getFeeId()==null?"null":item.getFeeId());
 			feeSet.setFeeLevel(Integer.valueOf(item.getShareProfitIndex()));
 			feeSet.setUpdateTime(new Date());
 			feeSet.setUpdateUserId(loginUserInfoHelper.getUserId());

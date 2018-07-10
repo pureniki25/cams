@@ -111,7 +111,7 @@ window.layinit(function (htConfig) {
                                 title: '代扣优先级'
                             },
                             {
-                                field: 'channelId',
+                                field: 'subPlatformId',
                                 title: '编号'
                             },
                             {

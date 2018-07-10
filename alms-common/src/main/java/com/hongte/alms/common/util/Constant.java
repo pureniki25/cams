@@ -9,9 +9,9 @@ public class Constant {
 	// Excel存储文件夹名字
 	// public static final String EXCEL_FILE_NAME = "excelTemp//";
 
-	public static final String DEV_DEFAULT_USER = "devDefaultUser";
-	public static final String DEFAULT_SYS_USER = "sysAutoSet";
-	public static final String SYS_DEFAULT_USER = "sysDefaultUser";
+//	public static final String DEV_DEFAULT_USER = "devDefaultUser";
+//	public static final String DEFAULT_SYS_USER = "sysAutoSet";
+//	public static final String SYS_DEFAULT_USER = "sysDefaultUser";
 	public static final String ADMIN_ID = "0111130000";
 
 	// 申请减免的流程类型ID

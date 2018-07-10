@@ -562,20 +562,21 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         List<BusinessCustomerInfoReq> bizCusInfoReqs = creatRepayPlanReq.getBizCusInfoReqs();
         //存储业务客户信息
         List<BasicBizCustomer> bizCustomers = new LinkedList<>();
+        //先删除旧的客户信息，再重新写入 zk 2018-7-10
+        basicBizCustomerService.delete(new EntityWrapper<BasicBizCustomer>().eq("business_id",basicBusiness.getBusinessId()));
         for(BusinessCustomerInfoReq bCustInfo:bizCusInfoReqs){
             BasicBizCustomer bizCusInfo =  ClassCopyUtil.copy(bCustInfo,BusinessCustomerInfoReq.class,BasicBizCustomer.class);
             bizCusInfo.setBusinessId(basicBusiness.getBusinessId());
             bizCusInfo.setCreateUser(Constant.ADMIN_ID);
             bizCusInfo.setCreateTime(new Date());
-            List<BasicBizCustomer> customerList =  basicBizCustomerService.selectList(
-                    new EntityWrapper<BasicBizCustomer>().eq("business_id",businessBasicInfoReq.getBusinessId())
-                            .eq("customer_id",bCustInfo.getCustomerId()).eq("identify_card",bCustInfo.getIdentifyCard()));
-            if(customerList.size()>0){
-                BasicBizCustomer oldCustomerInfo =customerList.get(0);
-                bizCusInfo.setId(oldCustomerInfo.getId());
-            }
-
-            basicBizCustomerService.insertOrUpdate(bizCusInfo);
+//            List<BasicBizCustomer> customerList =  basicBizCustomerService.selectList(
+//                    new EntityWrapper<BasicBizCustomer>().eq("business_id",businessBasicInfoReq.getBusinessId())
+//                            .eq("customer_id",bCustInfo.getCustomerId()).eq("identify_card",bCustInfo.getIdentifyCard()));
+//            if(customerList.size()>0){
+//                BasicBizCustomer oldCustomerInfo =customerList.get(0);
+//                bizCusInfo.setId(oldCustomerInfo.getId());
+//            }
+             basicBizCustomerService.insert(bizCusInfo);
         }
 //        basicBizCustomerService.delete(new EntityWrapper<BasicBizCustomer>().eq("business_id",basicBusiness.getBusinessId()));
 //        basicBizCustomerService.insertBatch(bizCustomers);
@@ -918,24 +919,29 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
         //判断是否有主借人  开始
         Boolean mainBorrowPersonFlage = false;
+        Integer mainCount=0;
         for(BusinessCustomerInfoReq bizCusInfoReq:bizCusInfoReqs){
             if(bizCusInfoReq.getIsmainCustomer().equals(BooleanEnum.YES.getValue())){
                 mainBorrowPersonFlage = true;
-                break;
+                mainCount ++;
+//                break;
             }
         }
-        if(!mainBorrowPersonFlage){
-            List<BasicBizCustomer> customerList =  basicBizCustomerService.selectList(
-                    new EntityWrapper<BasicBizCustomer>().eq("business_id",businessBasicInfoReq.getBusinessId()));
-            for(BasicBizCustomer basicBizCustomer:customerList){
-                if(basicBizCustomer.getIsmainCustomer().equals(BooleanEnum.YES.getValue())){
-                    mainBorrowPersonFlage = true;
-                    break;
-                }
-            }
-        }
+//        if(!mainBorrowPersonFlage){
+//            List<BasicBizCustomer> customerList =  basicBizCustomerService.selectList(
+//                    new EntityWrapper<BasicBizCustomer>().eq("business_id",businessBasicInfoReq.getBusinessId()));
+//            for(BasicBizCustomer basicBizCustomer:customerList){
+//                if(basicBizCustomer.getIsmainCustomer().equals(BooleanEnum.YES.getValue())){
+//                    mainBorrowPersonFlage = true;
+//                    break;
+//                }
+//            }
+//        }
         if(!mainBorrowPersonFlage){
             throw  new  CreatRepaymentExcepiton("业务用户信息列表中没有主借人信息");
+        }
+        if(mainCount>1){
+            throw  new  CreatRepaymentExcepiton("一个业务只能有一个主借人");
         }
         //判断是否有主借人  结束
 
@@ -1516,8 +1522,10 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     prinDetail.setPlanItemType(RepayPlanFeeTypeEnum.PRINCIPAL.getValue());//应还项目所属分类
                     prinDetail.setAccountStatus(RepayPlanAccountStatusEnum.DIVISION_TO_PLAT.getValue());//分账标记
                     //分润顺序项
+                    logger.info("分润顺序获取开始==============businessType:{0},itemType:{1},feeId:{2}",businessBasicInfo.getBusinessType().toString(),prinDetail.getPlanItemType(),prinDetail.getFeeId());
                     Integer shareProfitIndex =  profitItemSetService.getLevel(businessBasicInfo.getBusinessType().toString(),prinDetail.getPlanItemType(),prinDetail.getFeeId())
                             .get("feeLevel");
+                    logger.info("分润顺序获取结束==============shareProfitIndex:{0}",shareProfitIndex);
                     prinDetail.setShareProfitIndex(shareProfitIndex);
 
                     addDetialToMap(  repaymentProjPlanListDetailPeriorMap,

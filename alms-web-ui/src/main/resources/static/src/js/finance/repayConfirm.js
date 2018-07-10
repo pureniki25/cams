@@ -76,7 +76,7 @@ window.layinit(function (htConfig) {
                                             key: 'item50'
                                         }, {
                                             title: '小计',
-                                            key: 'subTotal'
+                                            key: 'subtotal'
                                         }, {
                                             title: '线下逾期费',
                                             key: 'offlineOverDue'
