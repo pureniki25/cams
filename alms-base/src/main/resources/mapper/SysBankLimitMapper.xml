@@ -45,7 +45,6 @@
         <if test="bankCode !=null and bankCode !=''">
             AND t1.bank_code=#{bankCode}
         </if>
-        GROUP BY t1.platform_id
         ORDER BY t1.create_time desc
         limit ${(page-1)*limit} , ${limit}
     </select>
