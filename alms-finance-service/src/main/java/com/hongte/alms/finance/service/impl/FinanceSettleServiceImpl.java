@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.RepayPlan.dto.RepaymentBizPlanListDto;
 import com.hongte.alms.base.RepayPlan.dto.RepaymentProjPlanListDto;
 import com.hongte.alms.base.entity.*;
+import com.hongte.alms.base.enums.RepayCurrentStatusEnums;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.mapper.*;
 import com.hongte.alms.base.process.mapper.ProcessMapper;
@@ -110,6 +111,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService{
 
                 BigDecimal totalBorrowAmount = repaymentBizPlanList.getTotalBorrowAmount();
                 BigDecimal overdueAmount = repaymentBizPlanList.getOverdueAmount();
+                BigDecimal derateAmount = repaymentBizPlanList.getDerateAmount();//减免
                 shouldReturnAmount = shouldReturnAmount.add(totalBorrowAmount).add(overdueAmount);  //计算所有的应还
 
                 //组装还款计划对象
@@ -130,8 +132,8 @@ public class FinanceSettleServiceImpl implements FinanceSettleService{
             for (RepaymentProjPlanList repaymentProjPlanList : repaymentProjPlanListList) {
                 BigDecimal totalBorrowAmount = repaymentProjPlanList.getTotalBorrowAmount();
                 BigDecimal overdueAmount = repaymentProjPlanList.getOverdueAmount();
-
-                shouldProjReturnAmount = shouldProjReturnAmount.add(totalBorrowAmount).add(overdueAmount);
+                BigDecimal derateAmount = repaymentProjPlanList.getDerateAmount();//减免金额
+                shouldProjReturnAmount = shouldProjReturnAmount.add(totalBorrowAmount).add(overdueAmount).subtract(derateAmount); //所有应还
 
                 //标的还款计划
                 RepaymentProjPlanListDto repaymentProjPlanListDto = new RepaymentProjPlanListDto();
@@ -178,9 +180,29 @@ public class FinanceSettleServiceImpl implements FinanceSettleService{
         } else {
             //======================================开始进行结清操作
 
+           RepaymentConfirmLog repaymentConfirmLog=new RepaymentConfirmLog();
 
-            if(!CollectionUtils.isEmpty(projDtoListList)){
-//                for()
+
+            if(CollectionUtils.isNotEmpty(projDtoListList)){
+                for(RepaymentProjPlanListDto repaymentProjPlanListDto : projDtoListList){
+
+                    RepaymentProjPlanList repaymentProjPlanList = repaymentProjPlanListDto.getRepaymentProjPlanList();
+                    String currentStatus = repaymentProjPlanList.getCurrentStatus();
+                    if(RepayCurrentStatusEnums.还款中.equals(currentStatus) || RepayCurrentStatusEnums.逾期.equals(currentStatus)){
+
+                    }
+
+
+                    List<RepaymentProjPlanListDetail> projPlanListDetails = repaymentProjPlanListDto.getProjPlanListDetails();
+//                    RepaymentProjFactRepay repaymentProjFactRepay=new RepaymentProjFactRepay();
+//                    repaymentProjFactRepay.setAfterId();
+                    if(CollectionUtils.isNotEmpty(projPlanListDetails)){
+
+                        for(RepaymentProjPlanListDetail repaymentProjPlanListDetail : projPlanListDetails){
+
+                        }
+                    }
+                }
 
 
             }

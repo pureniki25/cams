@@ -25,7 +25,7 @@
     <select id="getWithholdChannelPageList" parameterType="com.hongte.alms.base.vo.withhold.WithholdChannelListReq" resultType="com.hongte.alms.base.vo.withhold.WithholdChannelListVo">
         SELECT
             t1.channel_level AS channelLevel,
-            t1.channel_id AS channelId,
+            IFNULL(t1.sub_platform_id,t2.platform_id) AS subPlatformId,
             IFNULL(t1.sub_platform_name,t2.platform_name) AS platformName,
             t1.channel_status AS channelStatus,
             t1.fail_times AS failTimes
