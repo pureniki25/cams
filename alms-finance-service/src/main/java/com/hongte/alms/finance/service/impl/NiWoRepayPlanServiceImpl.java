@@ -136,7 +136,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 					.selectOne(new EntityWrapper<RepaymentProjPlan>().eq("request_no", orderNo).eq("plate_type", 2));
 	
 			if(projPlan==null) {
-				logger.info("你我金融的标的请求编号在贷后找不到对应的还款计划记录,请求编号{request_no}为："+orderNo);
+				logger.info("你我金融的标的请求编号在贷后找不到对应的还款计划记录,请求编号为{0}为："+orderNo);
 				return;
 			}
 			//Business
