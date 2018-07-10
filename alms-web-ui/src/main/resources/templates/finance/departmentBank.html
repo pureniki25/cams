@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+        <title>还款账号管理</title>
+        <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css" />
+        <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css" />
+        <link rel="stylesheet" type="text/css" href="/plugins/layui/css/layui.css" media="all" />
+    </head>
+    <body>
+        <div id="app" v-cloak>
+            <Row  style="padding:10px">
+                <i-col span="24">
+                    <Card>
+                        <p slot="title"><Icon type="ios-search" />搜索条件</p>
+
+                        <div class="layui-btn-group" slot="extra">
+                            <button class="layui-btn layui-btn-sm" v-if="authValid('search')" @click="search" ht-auth="search">
+                                <span v-if="!loading">  <i class="layui-icon">&#xe615;</i>查询</span>
+                                <span v-else><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
+                            </button>
+
+                            <button class="layui-btn layui-btn-sm" @click="showEditModal" v-if="authValid('add')">新增</button>
+                        </div>
+
+                        <Row :gutter="0">
+                            <i-form ref="searchForm" :model="searchForm" rules="ruleValidate" label-position="right" label-width="100">
+                                <i-col span="6">
+                                    <Form-item label="分公司:" prop="repayment_name">
+                                        <i-select v-model="searchForm.condition.EQ_dept_id" clearable filterable>
+                                            <!--<i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{item.areaName}}</i-option>-->
+                                            <i-option v-for="item in companyList" :value="item.areaName" :key="item.areaName">{{item.areaName}}</i-option>
+                                        </i-select>
+                                    </Form-item>
+                                </i-col>
+                                <i-col span="6">
+                                    <Form-item label="账户名:" prop="repayment_name">
+                                        <i-input v-model="searchForm.condition.EQ_repayment_name"></i-input>
+                                    </Form-item>
+                                </i-col>
+                               <!-- <i-co span="12"></i-co>-->
+                            </i-form>
+                        </Row>
+                    </Card>
+                </i-col>
+            </Row>
+
+            <Row style="padding:10px">
+                <i-col span="24">
+                    <!--<table id="main_table" lay-filter="main_table"></table>
+                    <script type="text/html" id="bar_tools">
+                        &lt;!&ndash;<a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="detail">查看</a>
+                        <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="edit">编辑</a>&ndash;&gt;
+                        <a class="layui-btn layui-btn-xs layui-btn-danger " lay-event="del" v-if="authValid('del')">删除</a>
+                    </script>-->
+                    <i-table :columns="table.col" :data="table.data" :loading="table.loading" stripe></i-table>
+                    <p style="text-align: center; margin-top: 20px;"><Page :total="table.total" :page-size="searchForm.size" @on-change="paging" :current="searchForm.current" show-total></Page></p>
+                </i-col>
+            </Row>
+
+            <Row style="padding: 10px;">
+                <i-col span="24">
+                    <Modal title="编辑" closable=false mask-closable>
+                        <i-form :model="edit" label-position="right" label-width="100">
+                            <input type="hidden" name="id" v-model="id" />
+                            <Form-item label="财务导入流水账号：">
+                                <i-input v-model="editForm.financeName" ></i-input>
+                            </Form-item>
+                            <Form-item label="银行账户名：">
+                                <i-input v-model="editForm.repaymentName" ></i-input>
+                            </Form-item>
+                            <Form-item label="银行卡账号：">
+                                <i-input v-model="editForm.repaymentId" ></i-input>
+                            </Form-item>
+                            <Form-item label="开户行：">
+                                <i-select v-model="editForm.repaymentBank" clearable filterable></i-select>
+                            </Form-item>
+                            <Form-item label="支行名称：">
+                                <i-input v-model="editForm.repaymentSubBank" ></i-input>
+                            </Form-item>
+                            <Form-item label="账户类型：">
+                                <Radio-group :model.sync="editForm.mainType">
+                                    <Radio value="1">个人</Radio>
+                                    <Radio value="2">企业</Radio>
+                                </Radio-group>
+                            </Form-item>
+                            <Form-item label="账户主体编码：">
+                                <i-input v-model="editForm.mainId" ></i-input>
+                            </Form-item>
+                            <Form-item label="银行卡归属地：">
+                                <i-select v-model="editForm.bankProvince" clearable filterable>
+                                    <i-option v-for="province in provinces" :value="name" :key="name">{{name}}</i-option>
+                                </i-select>
+                                <i-select v-model="editForm.bankCity" clearable filterable>
+                                    <i-option v-for="city in cities" :value="name" :key="name">{{name}}</i-option>
+                                </i-select>
+                            </Form-item>
+                            <Form-item label="银行预留手机号:">
+                                <i-input v-model="editForm.phoneNumber" ></i-input>
+                            </Form-item>
+                            <Form-item label="关联分公司：">
+                                <i-select v-model="editForm.dept_id" clearable filterable>
+                                    <i-option v-for="company in companies" :value="areaName" :key="areaName">{{areaName}}</i-option>
+                                </i-select>
+                            </Form-item>
+                            <Form-item label="：">
+
+                            </Form-item>
+                        </i-form>
+                    </Modal>
+                </i-col>
+            </Row>
+
+        </div>
+        <script src="/plugins/vue/vue.min.js"></script>
+        <script src="/plugins/iview/js/iview.js"></script>
+        <script src="/plugins/layui/layui.js"></script>
+        <script src="/plugins/axios/axios.min.js"></script>
+        <script src="/build/js/jquery-3.3.1.min.js"></script>
+        <script src="/properties/config.js"></script>
+        <script src="/build/js/appToken.js"></script>
+        <script src="/src/js/comm.js"></script>
+        <script src="/src/js/finance/departmentBank.js"></script>
+    </body>
+</html>
