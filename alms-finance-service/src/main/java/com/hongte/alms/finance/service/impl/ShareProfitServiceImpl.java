@@ -508,6 +508,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 //            repayFactAmount.set(repayFactAmount.get().add(req.getSurplusFund()));
 //            repaymentResources.get().add(repaymentResource);
         }
+        
+        
+        //TODO 充值记录转 RepaymentResource
 
     }
 
