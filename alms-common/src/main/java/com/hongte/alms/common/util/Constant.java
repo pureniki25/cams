@@ -186,13 +186,13 @@ public class Constant {
 	public static final String CANWITHHOLD_YES_2="单次限额不够，本次还款需要代扣%s次，可一次代扣";
 	public static final String CANWITHHOLD_YES_3="代扣限额不足，请换卡";
 	
-	public static final String CAR_LOAN = "车贷代充值";
-	public static final String HOUSE_LOAN = "房贷代充值";
-	public static final String POVERTY_ALLEVIATION_LOAN = "扶贫贷代充值";
-	public static final String QUICK_LOAN = "闪贷业务代充值";
-	public static final String CHE_QUAN_LOAN = "车全业务代充值";
-	public static final String ER_SHOU_CHE_LOAN = "二手车业务代充值";
-	public static final String YI_DIAN_LOAN = "一点车贷代充值";
-	public static final String CREDIT_LOAN = "信用贷代充值";
+	public static final String CAR_LOAN = "车贷";
+	public static final String HOUSE_LOAN = "房贷";
+	public static final String POVERTY_ALLEVIATION_LOAN = "扶贫贷";
+	public static final String QUICK_LOAN = "闪贷业务";
+	public static final String CHE_QUAN_LOAN = "车全业务";
+	public static final String ER_SHOU_CHE_LOAN = "二手车业务";
+	public static final String YI_DIAN_LOAN = "一点车贷";
+	public static final String CREDIT_LOAN = "信用贷";
 
 }

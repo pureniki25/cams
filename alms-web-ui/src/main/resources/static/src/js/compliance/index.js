@@ -29,7 +29,7 @@ window.layinit(function(htConfig) {
 			selectAmountList: [], // 已勾选待分发金额集合
 			selectAmount: 0, // 已勾选待分发金额
 			ComplianceRepaymentData:[],// 储存查询到的数据
-			rechargeAccountType: '车贷代充值', // 代充值账户类型
+			rechargeAccountType: '车贷', // 代充值账户类型
 			rechargeAccountBalance: 0, // 代充值账户余额
 			allBusinessCompanyList: [], // 所有分公司
 			tdrepayRechargeInfoReqList: [], // 
@@ -552,31 +552,31 @@ window.layinit(function(htConfig) {
 			 */
 			onChangeBusinessType: function(value){
 				if (value == 1) {
-					this.rechargeAccountType = '车贷代充值';
+					this.rechargeAccountType = '车贷';
 				}else if (value == 2) {
-					this.rechargeAccountType = '房贷代充值';
+					this.rechargeAccountType = '房贷';
 				}else if (value == 3) {
-					this.rechargeAccountType = '房贷代充值';
+					this.rechargeAccountType = '房贷';
 				}else if (value == 4) {
-					this.rechargeAccountType = '房贷代充值';
+					this.rechargeAccountType = '房贷';
 				}else if (value == 9) {
-					this.rechargeAccountType = '车贷代充值';
+					this.rechargeAccountType = '车贷';
 				}else if (value == 11) {
-					this.rechargeAccountType = '房贷代充值';
+					this.rechargeAccountType = '房贷';
 				}else if (value == 12) {
-					this.rechargeAccountType = '车贷代充值';
+					this.rechargeAccountType = '车贷';
 				}else if (value == 13) {
-					this.rechargeAccountType = '扶贫贷代充值';
+					this.rechargeAccountType = '扶贫贷';
 				}else if (value == 14) {
-					this.rechargeAccountType = '车贷代充值';
+					this.rechargeAccountType = '车贷';
 				}else if (value == 15) {
-					this.rechargeAccountType = '车贷代充值';
+					this.rechargeAccountType = '车贷';
 				}else if (value == 20) {
-					this.rechargeAccountType = '一点车贷代充值';
+					this.rechargeAccountType = '一点车贷';
 				}else if (value == 35) {
-					this.rechargeAccountType = '房贷代充值';
+					this.rechargeAccountType = '房贷';
 				}else {
-					this.rechargeAccountType = '信用贷代充值';
+					this.rechargeAccountType = '信用贷';
 				}
 				this.queryUserAviMoney();
 			},
