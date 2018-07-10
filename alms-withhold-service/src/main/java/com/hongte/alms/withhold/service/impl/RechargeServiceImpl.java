@@ -743,7 +743,7 @@ public class RechargeServiceImpl implements RechargeService {
 	public Integer getBankRepaySuccessCount(RepaymentBizPlanList list) {
 		List<WithholdingRepaymentLog> logs = withholdingRepaymentLogService.selectList(
 				new EntityWrapper<WithholdingRepaymentLog>().eq("original_business_id", list.getOrigBusinessId())
-						.eq("after_id", list.getAfterId()).ne("repay_status", "1"));//处理成功数据
+						.eq("after_id", list.getAfterId()).ne("repay_status", 0).eq("bind_platform_id", PlatformEnum.YH_FORM.getValue()));//处理成功数据
 
 		return logs.size();
 	}
