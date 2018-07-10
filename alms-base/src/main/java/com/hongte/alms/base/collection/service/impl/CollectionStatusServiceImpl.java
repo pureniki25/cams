@@ -114,7 +114,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
         String  userId= loginUserInfoHelper.getUserId();
         if(userId ==null){
-            userId = Constant.DEFAULT_SYS_USER;
+            userId = Constant.ADMIN_ID;
         }
 //        String  userId= "programer_zk";
 
