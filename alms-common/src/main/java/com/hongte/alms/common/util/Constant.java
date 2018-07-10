@@ -194,5 +194,11 @@ public class Constant {
 	public static final String ER_SHOU_CHE_LOAN = "二手车业务";
 	public static final String YI_DIAN_LOAN = "一点车贷";
 	public static final String CREDIT_LOAN = "信用贷";
+	
+	/**
+	 * 线上线下部分分界线,参考tb_repayment_biz_plan_list_detail.share_profit_index和tb_repayment_proj_plan_list_detail.share_profit_index <br/>
+	 * 1200以下是线上部分费用,超过1200是线下部分费用
+	 */
+	public static final Integer ONLINE_OFFLINE_FEE_BOUNDARY = 1200 ;
 
 }
