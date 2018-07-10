@@ -88,6 +88,7 @@
         from tb_repayment_biz_plan_list  as pList
         LEFT JOIN tb_repayment_biz_plan as plan ON pList.plan_id = plan.plan_id
         LEFT JOIN tb_basic_business as business ON plan.original_business_id = business.business_id
+        LEFT JOIN tb_basic_biz_customer as customer ON customer.business_id = business.business_id
         LEFT JOIN tb_basic_company as company ON business.company_id = company.area_id
         LEFT JOIN tb_basic_business_type as  b_type ON business.business_type = b_type.business_type_id
         <choose>
@@ -121,6 +122,7 @@
 
         <where>
             (pList.repay_flag != 6 or pList.repay_flag is null)
+            and customer.ismain_customer =1
 --          sys_param.param_type = 2
             <!--   改用列表 IN查询 这两个先屏蔽
             <if test="areaId !=null and areaId !=''">
@@ -234,6 +236,16 @@
             <if test="customerName !=null  and customerName !=''  ">
                 and business.customer_name  LIKE '%${customerName}%'
             </if>
+            <!--   /*//身份证号*/ -->
+            <if test="identifyCard !=null  and identifyCard !=''  ">
+                and business.customer_identify_card  LIKE '%${identifyCard}%'
+            </if>
+            <!--   /*//手机号*/ -->
+            <if test="phoneNumber !=null  and phoneNumber !=''  ">
+                and customer.phone_number  LIKE '%${phoneNumber}%'
+            </if>
+
+
             <!--   /*//还款计划ID数组*/ -->
             <if test="crpIdsArray !=null">
                 and pList.plan_list_id  IN
