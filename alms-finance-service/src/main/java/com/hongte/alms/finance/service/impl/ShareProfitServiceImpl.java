@@ -1872,11 +1872,14 @@ public class ShareProfitServiceImpl implements ShareProfitService {
     private BigDecimal sumProjPlanListFactAmountInMem(String projPlanListId, FinanceBaseDto financeBaseDto) {
         BigDecimal res = new BigDecimal("0");
         for (RepaymentProjPlanDto projPlanDto : financeBaseDto.getPlanDto().getProjPlanDtos()) {
-            for (RepaymentProjPlanListDto projPlanListDto : projPlanDto.getProjPlanListDtos()) {
-                for (RepaymentProjPlanListDetail projPlanListDetail : projPlanListDto.getProjPlanListDetails()) {
-                    res = res.add(projPlanListDetail.getProjFactAmount() == null ? new BigDecimal("0")
-                            : projPlanListDetail.getProjFactAmount());
-                }
+        	for (RepaymentProjPlanListDto projPlanListDto : projPlanDto.getProjPlanListDtos()) {
+        		String projPlanListIdc = projPlanListDto.getRepaymentProjPlanList().getProjPlanListId();
+        		if (projPlanListId.equals(projPlanListIdc)) {
+        			for (RepaymentProjPlanListDetail projPlanListDetail : projPlanListDto.getProjPlanListDetails()) {
+                        res = res.add(projPlanListDetail.getProjFactAmount() == null ? new BigDecimal("0")
+                                : projPlanListDetail.getProjFactAmount());
+                    }
+				}
             }
         }
         return res;
