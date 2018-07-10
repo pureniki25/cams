@@ -1,4 +1,7 @@
 package com.hongte.alms.finance.service;
 
-public class FinanceSettleService {
+import com.hongte.alms.finance.req.FinanceSettleReq;
+
+public interface FinanceSettleService {
+    void financeSettle(FinanceSettleReq financeSettleReq);
 }

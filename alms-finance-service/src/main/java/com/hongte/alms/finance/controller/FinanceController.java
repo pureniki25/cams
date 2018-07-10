@@ -1075,28 +1075,5 @@ public class FinanceController {
 		}
 	}
 
-	@RequestMapping("/financeSettle")
-	@ApiOperation(value="资金结清")
-	public Result financeSettle(FinanceSettleReq financeSettleReq){
-		logger.info("@financeSettle@资金结算开始[{}]");
-		Result result = null;
-		try {
-			financeService.financeSettle(financeSettleReq);
-
-
-
-
-			result = Result.success();
-		} catch (ServiceRuntimeException se) {
-			result = Result.error(se.getErrorCode(), se.getMessage());
-			logger.error("@financeSettle@资金结清出错{}", se.getMessage());
-		} catch (Exception e) {
-			result = Result.error("500", "资金结清出错");
-			logger.error("@financeSettle@资金结清出错{}", e);
-		}
-
-		logger.info("@financeSettle@资金结清结束{}", result);
-		return result;
-	}
 
 }
