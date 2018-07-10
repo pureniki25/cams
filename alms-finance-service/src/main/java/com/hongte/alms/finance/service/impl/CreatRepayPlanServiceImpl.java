@@ -1517,8 +1517,10 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     prinDetail.setPlanItemType(RepayPlanFeeTypeEnum.PRINCIPAL.getValue());//应还项目所属分类
                     prinDetail.setAccountStatus(RepayPlanAccountStatusEnum.DIVISION_TO_PLAT.getValue());//分账标记
                     //分润顺序项
+                    logger.info("分润顺序获取开始==============businessType:{0},itemType:{1},feeId:{2}",businessBasicInfo.getBusinessType().toString(),prinDetail.getPlanItemType(),prinDetail.getFeeId());
                     Integer shareProfitIndex =  profitItemSetService.getLevel(businessBasicInfo.getBusinessType().toString(),prinDetail.getPlanItemType(),prinDetail.getFeeId())
                             .get("feeLevel");
+                    logger.info("分润顺序获取结束==============shareProfitIndex:{0}",shareProfitIndex);
                     prinDetail.setShareProfitIndex(shareProfitIndex);
 
                     addDetialToMap(  repaymentProjPlanListDetailPeriorMap,
