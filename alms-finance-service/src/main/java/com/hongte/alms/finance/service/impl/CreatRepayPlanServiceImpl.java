@@ -562,20 +562,21 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         List<BusinessCustomerInfoReq> bizCusInfoReqs = creatRepayPlanReq.getBizCusInfoReqs();
         //存储业务客户信息
         List<BasicBizCustomer> bizCustomers = new LinkedList<>();
+        //先删除旧的客户信息，再重新写入 zk 2018-7-10
+        basicBizCustomerService.delete(new EntityWrapper<BasicBizCustomer>().eq("business_id",basicBusiness.getBusinessId()));
         for(BusinessCustomerInfoReq bCustInfo:bizCusInfoReqs){
             BasicBizCustomer bizCusInfo =  ClassCopyUtil.copy(bCustInfo,BusinessCustomerInfoReq.class,BasicBizCustomer.class);
             bizCusInfo.setBusinessId(basicBusiness.getBusinessId());
             bizCusInfo.setCreateUser(Constant.ADMIN_ID);
             bizCusInfo.setCreateTime(new Date());
-            List<BasicBizCustomer> customerList =  basicBizCustomerService.selectList(
-                    new EntityWrapper<BasicBizCustomer>().eq("business_id",businessBasicInfoReq.getBusinessId())
-                            .eq("customer_id",bCustInfo.getCustomerId()).eq("identify_card",bCustInfo.getIdentifyCard()));
-            if(customerList.size()>0){
-                BasicBizCustomer oldCustomerInfo =customerList.get(0);
-                bizCusInfo.setId(oldCustomerInfo.getId());
-            }
-
-            basicBizCustomerService.insertOrUpdate(bizCusInfo);
+//            List<BasicBizCustomer> customerList =  basicBizCustomerService.selectList(
+//                    new EntityWrapper<BasicBizCustomer>().eq("business_id",businessBasicInfoReq.getBusinessId())
+//                            .eq("customer_id",bCustInfo.getCustomerId()).eq("identify_card",bCustInfo.getIdentifyCard()));
+//            if(customerList.size()>0){
+//                BasicBizCustomer oldCustomerInfo =customerList.get(0);
+//                bizCusInfo.setId(oldCustomerInfo.getId());
+//            }
+             basicBizCustomerService.insert(bizCusInfo);
         }
 //        basicBizCustomerService.delete(new EntityWrapper<BasicBizCustomer>().eq("business_id",basicBusiness.getBusinessId()));
 //        basicBizCustomerService.insertBatch(bizCustomers);
