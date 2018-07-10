@@ -131,6 +131,10 @@ public class ShareProfitServiceImpl implements ShareProfitService {
     @Autowired
     @Qualifier("SysApiCallFailureRecordService")
     private SysApiCallFailureRecordService sysApiCallFailureRecordService;
+    
+    @Autowired
+    @Qualifier("AgencyRechargeLogService")
+    private AgencyRechargeLogService agencyRechargeLogService;
 
     private ThreadLocal<String> businessId = new ThreadLocal<String>();
     private ThreadLocal<String> orgBusinessId = new ThreadLocal<String>();
@@ -511,9 +515,43 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         }
         
         
-        //TODO 充值记录转 RepaymentResource
-
+        // 充值记录转 RepaymentResource
+		handleAgencyRechargeLog(financeBaseDto);
+        
     }
+
+    /**
+     *  充值记录转 RepaymentResource
+     * @param financeBaseDto
+     */
+	private void handleAgencyRechargeLog(FinanceBaseDto financeBaseDto) {
+		List<AgencyRechargeLog> agencyRechargeLogs = agencyRechargeLogService
+				.selectList(new EntityWrapper<AgencyRechargeLog>().eq("handle_status", 2).eq("charge_type", 2));
+		if (CollectionUtils.isEmpty(agencyRechargeLogs)) {
+			return;
+		}
+		
+		for (AgencyRechargeLog agencyRechargeLog : agencyRechargeLogs) {
+			RepaymentResource repaymentResource = new RepaymentResource();
+            repaymentResource.setAfterId(agencyRechargeLog.getAfterId());
+            repaymentResource.setBusinessId(agencyRechargeLog.getOrigBusinessId());
+            repaymentResource.setOrgBusinessId(agencyRechargeLog.getOrigBusinessId());
+            repaymentResource.setCreateDate(new Date());
+            repaymentResource.setCreateUser(financeBaseDto.getUserId());
+            repaymentResource.setRepayAmount(agencyRechargeLog.getRechargeAmount());
+            repaymentResource.setRepayDate(agencyRechargeLog.getCreateTime());
+            repaymentResource.setConfirmLogId(financeBaseDto.getConfirmLog().getConfirmLogId());
+            //50:APP快捷充值
+            repaymentResource.setRepaySource("50");
+            if (financeBaseDto.getSave()) {
+                repaymentResource.setRepaySourceRefId(agencyRechargeLog.getCmOrderNo());
+                repaymentResource.insert();
+            }
+//            BigDecimal reamount = financeBaseDto.getRepayFactAmount();
+            financeBaseDto.setRepayFactAmount(financeBaseDto.getRepayFactAmount().add(agencyRechargeLog.getRechargeAmount()));
+            financeBaseDto.getRepaymentResources().add(repaymentResource);
+		}
+	}
 
     /**
      * 查找并关联业务有关的还款计划
