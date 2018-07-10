@@ -50,7 +50,7 @@ public class CollectionTrackLogVo extends CollectionTrackLog  {
             this.setRecordDate(new Date());
         }
         if(this.getRecorderUser()==null) {
-            this.setRecorderUser(Constant.DEV_DEFAULT_USER);
+            this.setRecorderUser(Constant.ADMIN_ID);
         }
 /*        if(this.getTrackLogId()==null){
             this.setTrackLogId(UUID.randomUUID().toString());

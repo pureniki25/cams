@@ -320,9 +320,9 @@ public class CollectionTrackLogTransferController {
 			collectionTrackLog.setIsSend(0);//是否传输平台，0：否，1：是
 			collectionTrackLog.setContent(parametertracelog.getTranceContent()==null?"":parametertracelog.getTranceContent());//记录内容
 			collectionTrackLog.setCreateTime(new Date());
-			collectionTrackLog.setCreateUser(Constant.SYS_DEFAULT_USER);
+			collectionTrackLog.setCreateUser(Constant.ADMIN_ID);
 			collectionTrackLog.setUpdateTime(new Date());
-			collectionTrackLog.setUpdateUser(Constant.SYS_DEFAULT_USER);
+			collectionTrackLog.setUpdateUser(Constant.ADMIN_ID);
 			collectionTrackLog.setUniqueId(UUID.randomUUID().toString());
 			collectionTrackLog.setXdIndexId(parametertracelog.getId());
 
