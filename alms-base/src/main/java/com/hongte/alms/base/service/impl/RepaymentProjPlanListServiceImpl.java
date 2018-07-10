@@ -496,6 +496,8 @@ public class RepaymentProjPlanListServiceImpl extends
  			RepaymentProjPlanListDetail projDetail = repaymentProjPlanListDetailService.selectOne(
 					new EntityWrapper<RepaymentProjPlanListDetail>().eq("proj_plan_list_id", projPList.getProjPlanListId())
 							.eq("fee_id", feeId));
+ 			
+ 			BasicBusiness business=basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", projPList.getOrigBusinessId()));
 			try {
 				if (projDetail != null) {
 					projDetail.setProjPlanAmount(lateFee);
@@ -518,6 +520,7 @@ public class RepaymentProjPlanListServiceImpl extends
 						projDetail.setProjPlanDetailId(UUID.randomUUID().toString());
 						projDetail.setFeeId(feeId);
 						projDetail.setProjPlanAmount(lateFee);
+						projDetail.setShareProfitIndex(profitItemSetService.getLevel(business.getBusinessType().toString(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getValue().intValue(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid()).get("feeLevel"));
 						projDetail.setPlanItemType(60);
 						String planDetailId="";
 						for(RepaymentProjPlanListDetail detail:feeIdLists) {
