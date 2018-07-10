@@ -372,23 +372,22 @@ public class PlatformRepaymentController {
                 BigDecimal rechargeAmount = BigDecimal.ZERO;
 
                 List<TdrepayRechargeDetail> detailFeeList = Lists.newArrayList();
-
-
                 for (RepaymentProjFactRepay r : projFactRepays) {
                     //实还金额应该包含滞纳金
                     factRepayAmount = factRepayAmount.add(r.getFactAmount());
 
                     //累计费用，线下（资产公司）的滞纳金排除在外，注意用value和uuid去区分.  OVER_DUE_AMONT_UNDERLINE(60,"线下滞纳金","3131c075-5721-11e8-8a00-0242ac110002",5)
-                    if (RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getValue().equals(r.getPlanItemType())
+                    /*if (RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getValue().equals(r.getPlanItemType())
                             || RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid().equals(r.getFeeId())) {
+                        continue;
+                    } */
+                    if (RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid().equals(r.getFeeId())) {
                         continue;
                     }
                     //resourceAmount = resourceAmount.add(r.getFactAmount());
-
                     rechargeAmount = rechargeAmount.add(r.getFactAmount());
 
                     TdrepayRechargeDetail detailFee = new TdrepayRechargeDetail();
-
                     //要对费类型进行转换：
                     //从 应还项目所属分类，10：本金，20：利息，30：资产端分公司服务费，40：担保公司费用，50：资金端平台服务费，60：滞纳金，70：违约金，80：中介费，90：押金类费用，100：冲应收
                     //转成 费用类型(10:本金,20:利息;30:平台服务费;40:资产端服务费;50:担保公司服务费;60:仲裁服务费;70:逾期费用（罚息）;80: 中介服务费)
