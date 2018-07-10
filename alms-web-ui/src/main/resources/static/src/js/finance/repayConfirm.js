@@ -591,14 +591,14 @@ window.layinit(function (htConfig) {
                                         // chaer.onlineOverDue += element.onlineOverDue ? element.onlineOverDue : 0
                                         // chaer.total += element.total ? element.total : 0
 
-                                        chaer.item10 = accAdd(chare.item10,element.item10 ? element.item10 : 0)
-                                        chaer.item20 = accAdd(chare.item20,element.item20 ? element.item20 : 0)
-                                        chaer.item30 = accAdd(chare.item30,element.item30 ? element.item30 : 0)
-                                        chaer.item50 = accAdd(chare.item50,element.item50 ? element.item50 : 0)
-                                        chaer.subTotal = accAdd(chare.subTotal,element.subTotal ? element.subTotal : 0)
-                                        chaer.offlineOverDue = accAdd(chare.offlineOverDue,element.offlineOverDue ? element.offlineOverDue : 0)
-                                        chaer.onlineOverDue = accAdd(chare.onlineOverDue,element.onlineOverDue ? element.onlineOverDue : 0)
-                                        chaer.total = accAdd(chare.total,element.total ? element.total : 0)
+                                        chaer.item10 = accAdd(chaer.item10,element.item10 ? element.item10 : 0)
+                                        chaer.item20 = accAdd(chaer.item20,element.item20 ? element.item20 : 0)
+                                        chaer.item30 = accAdd(chaer.item30,element.item30 ? element.item30 : 0)
+                                        chaer.item50 = accAdd(chaer.item50,element.item50 ? element.item50 : 0)
+                                        chaer.subTotal = accAdd(chaer.subTotal,element.subTotal ? element.subTotal : 0)
+                                        chaer.offlineOverDue = accAdd(chaer.offlineOverDue,element.offlineOverDue ? element.offlineOverDue : 0)
+                                        chaer.onlineOverDue = accAdd(chaer.onlineOverDue,element.onlineOverDue ? element.onlineOverDue : 0)
+                                        chaer.total = accAdd(chaer.total,element.total ? element.total : 0)
                                     }
                                 });
 
