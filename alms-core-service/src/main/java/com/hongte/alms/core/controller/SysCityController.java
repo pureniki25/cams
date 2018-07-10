@@ -7,6 +7,7 @@ import com.hongte.alms.base.entity.SysCity;
 import com.hongte.alms.base.entity.SysProvince;
 import com.hongte.alms.base.service.SysCityService;
 import com.hongte.alms.base.service.SysProvinceService;
+import com.hongte.alms.common.result.Result;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,14 +45,15 @@ public class SysCityController {
      */
     @ApiOperation(value = "查询所有城市")
     @RequestMapping("/findAll")
-    public List<SysCity> findAll(){
+    public Result findAll() {
         List<SysCity> cities = Lists.newArrayList();
         try {
             cities =  sysCityService.selectList(new EntityWrapper<SysCity>().orderBy("name", true));
+            return Result.success(cities);
         }catch (Exception ex){
             LOGGER.error(ex.getMessage(), ex);
+            return Result.error(ex.getMessage());
         }
-        return cities;
     }
 
     /**
@@ -60,14 +62,15 @@ public class SysCityController {
      */
     @ApiOperation(value = "按省id查城市")
     @RequestMapping("/findAllByProvinceId")
-    public List<SysCity> findAllByProvinceId(String provinceId){
+    public Result findAllByProvinceId(String provinceId) {
         List<SysCity> cities = Lists.newArrayList();
         try {
             cities =  sysCityService.selectList(new EntityWrapper<SysCity>().eq("province_id", provinceId).orderBy("name",true));
+            return Result.success(cities);
         }catch (Exception ex){
             LOGGER.error(ex.getMessage(), ex);
+            return Result.error(ex.getMessage());
         }
-        return cities;
     }
 
     /**
@@ -76,17 +79,18 @@ public class SysCityController {
      */
     @ApiOperation(value = "按省名查城市")
     @RequestMapping("/findAllByProvinceName")
-    public List<SysCity> findAllByProvinceName(String provinceName){
+    public Result findAllByProvinceName(String provinceName) {
         List<SysCity> cities = Lists.newArrayList();
         try {
             SysProvince province = sysProvinceService.selectOne(new EntityWrapper<SysProvince>().eq("name",provinceName));
             if(province != null) {
                 cities = sysCityService.selectList(new EntityWrapper<SysCity>().eq("province_id", province.getId()).orderBy("name", true));
             }
+            return Result.success(cities);
         }catch (Exception ex){
             LOGGER.error(ex.getMessage(), ex);
+            return Result.error(ex.getMessage());
         }
-        return cities;
     }
 }
 
