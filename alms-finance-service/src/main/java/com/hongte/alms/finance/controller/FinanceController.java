@@ -336,8 +336,6 @@ public class FinanceController {
 	@ApiOperation(value = "获取财务管理列表数据")
 	public PageResult getFinanceMangerList(FinanceManagerListReq req) {
 		logger.info("@getFinanceMangerList@获取财务管理列表数据--开始[{}]", req);
-		logger.info("@getFinanceMangerList@获取财务管理列表数据--user[{}]", loginUserInfoHelper.getUserId());
-		req.setUserId(loginUserInfoHelper.getUserId());
 		PageResult pageResult = repaymentBizPlanListService.selectByFinanceManagerListReq(req);
 		logger.info("@getFinanceMangerList@获取财务管理列表数据--结束[{}]", pageResult);
 		return pageResult;
@@ -779,7 +777,7 @@ public class FinanceController {
 //			req.setRepaySource(list);
 			shareProfitService.execute(req, true);
               result.success(1);
-      		logger.info("@shareProfit@自动代扣核销--结束[{}{}{}]", businessId,afterId,logId);
+      		logger.info("@shareProfit@自动代扣核销--开始[{}{}{}]", businessId,afterId,logId);
 		} catch (Exception ex) {
 			logger.error("分润出现异常"+ex);
 			return Result.error("-1","分润出现异常"+ex);
@@ -1077,28 +1075,5 @@ public class FinanceController {
 		}
 	}
 
-	@RequestMapping("/financeSettle")
-	@ApiOperation(value="资金结清")
-	public Result financeSettle(FinanceSettleReq financeSettleReq){
-		logger.info("@financeSettle@资金结算开始[{}]");
-		Result result = null;
-		try {
-			financeService.financeSettle(financeSettleReq);
-
-
-
-
-			result = Result.success();
-		} catch (ServiceRuntimeException se) {
-			result = Result.error(se.getErrorCode(), se.getMessage());
-			logger.error("@financeSettle@资金结清出错{}", se.getMessage());
-		} catch (Exception e) {
-			result = Result.error("500", "资金结清出错");
-			logger.error("@financeSettle@资金结清出错{}", e);
-		}
-
-		logger.info("@financeSettle@资金结清结束{}", result);
-		return result;
-	}
 
 }

@@ -12,9 +12,10 @@ public class FinanceSettleReq {
     @NotNull(message="业务id不能为空")
     private String businessId ;
     //必填,期数afterId
-    @NotNull(message="还款计划期数afterId不能为空")
-    private String afterId ;
+//    @NotNull(message="还款计划期数afterId不能为空")
+//    private String afterId ;
 
+    private String planId;
 
     //线下转账必填项,匹配的流水ID
     private List<String> mprIds;

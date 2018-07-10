@@ -50,19 +50,17 @@
                     搜索条件
                 </p>
 
-                <div class="layui-btn-group" slot="extra">
-                    <i-button class="layui-btn layui-btn-sm" slot="extra" @click="toLoading" v-if="authValid('search')">
-                        <span v-if="!loading"><i class="layui-icon">&#xe615;</i>查询</span>
-                        <span v-else><i
-                                class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
-                    </i-button>
-                    <i-button class="layui-btn layui-btn-sm"  v-if="authValid('reset')" @click="handleReset('searchForm')">
-                        <span>重置</span>
-                    </i-button>
-                    <i-button class="layui-btn layui-btn-sm"  v-if="authValid('add')" @click="addHoldLimit('withHoldLimitForm')">
-                        <span>新增</span>
-                    </i-button>
-                </div>
+                <i-button type="primary" slot="extra" @click="toLoading" v-if="authValid('search')" style="margin-right:10px">
+                    <span v-if="!loading">查询</span>
+                    <span v-else>查询中...</span>
+                </i-button>
+                <i-button type="primary" slot="extra" v-if="authValid('reset')" @click="handleReset('searchForm')" style="margin-right:10px">
+                    <span>重置</span>
+                </i-button>
+                <i-button type="primary" slot="extra" v-if="authValid('add')"
+                          @click="addHoldLimit('withHoldLimitForm')" style="margin-right:10px">
+                    <span>新增</span>
+                </i-button>
 
 
                 <row :gutter="16">
@@ -70,11 +68,11 @@
                             :label-width="100">
 
 
-
                         <i-col span="6">
                             <form-item label="渠道：" prop="platformId">
                                 <i-select v-model="searchForm.platformId" clearable filterable>
-                                    <i-option v-for="item in platformType" :value="item.platformId" :key="item.platformId">{{
+                                    <i-option v-for="item in platformType" :value="item.platformId"
+                                              :key="item.platformId">{{
                                         item.platformName }}
                                     </i-option>
                                 </i-select>
@@ -103,16 +101,17 @@
                 v-model="withHoldLimitModel"
                 title="新增渠道"
                 :mask-closable="false">
-            <i-form ref="withHoldLimitForm" :model="withHoldLimitForm" :rules="withHoldLimitValidate" :label-width="150">
+            <i-form ref="withHoldLimitForm" :model="withHoldLimitForm" :rules="withHoldLimitValidate"
+                    :label-width="150">
                 <form-item label="渠道：" prop="platformId">
-                    <i-select v-model="withHoldLimitForm.platformId" clearable filterable style="width: 200px"  >
+                    <i-select v-model="withHoldLimitForm.platformId" clearable filterable style="width: 200px">
                         <i-option v-for="item in platformType" :value="item.platformId" :key="item.platformId">{{
                             item.platformName }}
                         </i-option>
                     </i-select>
                 </form-item>
                 <form-item label="银行名称：" prop="bankCode">
-                    <i-select v-model="withHoldLimitForm.bankCode" clearable filterable style="width: 200px"  >
+                    <i-select v-model="withHoldLimitForm.bankCode" clearable filterable style="width: 200px">
                         <i-option v-for="item in bankType" :value="item.bankCode" :key="item.bankCode">{{
                             item.bankName }}
                         </i-option>
@@ -120,15 +119,15 @@
                 </form-item>
                 <form-item label="单日限额：" prop="dayLimit">
                     <i-input v-model="withHoldLimitForm.dayLimit" placeholder="单日限额"
-                             style="width: 200px" number ></i-input>
+                             style="width: 200px" number></i-input>
                 </form-item>
                 <form-item label="单笔限额：" prop="onceLimit">
                     <i-input v-model="withHoldLimitForm.onceLimit" placeholder="单笔限额"
-                             style="width: 200px" number ></i-input>
+                             style="width: 200px" number></i-input>
                 </form-item>
                 <form-item label="单月限额：" prop="monthLimit">
                     <i-input v-model="withHoldLimitForm.monthLimit" placeholder="单月限额"
-                             style="width: 200px" number ></i-input>
+                             style="width: 200px" number></i-input>
                 </form-item>
                 <form-item label="启用状态：" prop="status">
                     <i-select v-model="withHoldLimitForm.status" placeholder="请选择" style="width: 200px">
@@ -159,8 +158,6 @@
         </i-col>
     </row>
     <!-- 表单Grid，使用layerUI的表格组件 结束 -->
-
-
 
 
 </div>
