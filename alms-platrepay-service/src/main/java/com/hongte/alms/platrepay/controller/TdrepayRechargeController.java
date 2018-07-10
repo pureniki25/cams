@@ -361,6 +361,7 @@ public class TdrepayRechargeController {
 			if (vo != null && vo.getConfirmTimeEnd() != null) {
 				vo.setConfirmTimeEnd(DateUtil.addDay2Date(1, vo.getConfirmTimeEnd()));
 			}
+			vo.setUserId(loginUserInfoHelper.getUserId());
 			int count = tdrepayRechargeService.countComplianceRepaymentData(vo);
 			if (count == 0) {
 				return PageResult.success(count);
@@ -638,7 +639,7 @@ public class TdrepayRechargeController {
 						case 1:
 							tdReturnAdvanceShareProfitDTO.setStatusStrActual("已结清");
 							break;
-						case 2:
+						case 0:
 							tdReturnAdvanceShareProfitDTO.setStatusStrActual("未结清");
 							break;
 
@@ -949,6 +950,23 @@ public class TdrepayRechargeController {
 			}
 
 			return Result.success(resultList);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error("-99", e.getMessage());
+		}
+	}
+	
+	@ApiOperation(value = "标的还款信息查询接口")
+	@GetMapping("/remoteGetProjectPayment")
+	@ResponseBody
+	public Result<com.ht.ussp.core.Result> remoteGetProjectPayment(@RequestParam("projectId") String projectId) {
+		if (StringUtil.isEmpty(projectId)) {
+			return Result.error("-99", "标ID不能为空");
+		}
+
+		try {
+			com.ht.ussp.core.Result result = tdrepayRechargeService.remoteGetProjectPayment(projectId);
+			return Result.success(result);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return Result.error("-99", e.getMessage());
