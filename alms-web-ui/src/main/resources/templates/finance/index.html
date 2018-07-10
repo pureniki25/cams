@@ -40,17 +40,17 @@
                         </i-select>
                     </form-item> -->
                     <form-item label="区域">
-                        <i-select v-model="form.areaId" placeholder="请选择" filterable style="width: 180px" clearable>
+                        <i-select v-model="form.areaId" placeholder="请选择" filterable style="width: 180px;text-align: left" clearable>
                             <i-option v-for="item in areaList" :value="item.areaId" :key="item.areaId" >{{item.areaName}}</i-option>
                         </i-select>
                     </form-item>
                     <form-item label="分公司">
-                        <i-select v-model="form.companyId" placeholder="请选择" filterable style="width: 180px" clearable>
+                        <i-select v-model="form.companyId" placeholder="请选择" filterable style="width: 180px;text-align: left" clearable>
                             <i-option v-for="item in companys" :value="item.areaId" :key="item.areaId" >{{item.areaName}}</i-option>
                         </i-select>
                     </form-item>
                     <form-item label="业务类型">
-                        <i-select v-model="form.businessType" placeholder="请选择" filterable clearable>
+                        <i-select v-model="form.businessType" placeholder="请选择" style="width: 180px;text-align: left" filterable clearable>
                             <i-option v-for="item in businessTypes" :value="item.businessTypeId" >{{item.businessTypeName}}</i-option>
                         </i-select>
                     </form-item>
@@ -61,7 +61,7 @@
                         <date-picker type="daterange" split-panels format="yyyy-MM-dd" placeholder="还款登记日期" @on-change="form.regDateStart=$event[0];form.regDateEnd=$event[1];console.log($event);" clearable></date-picker>
                     </form-item>
                     <form-item label="还款状态">
-                        <i-select v-model="form.status" placeholder="请选择" filterable clearable>
+                        <i-select v-model="form.status" placeholder="请选择" filterable clearable style="width: 180px;text-align: left">
                             <!-- <i-option v-for="item in collectionStatus" :value="item.paramValue" >{{item.paramName}}</i-option> -->
                             <i-option value="还款中">还款中</i-option>
                             <i-option value="逾期">逾期</i-option>

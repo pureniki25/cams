@@ -71,7 +71,7 @@
 		    AND t.`settle_type` =  20
 		</if>
 		<if test="origBusinessId != null and origBusinessId != ''">
-			AND t.`orig_business_id` =  #{origBusinessId,jdbcType=DATE}
+			AND t.`orig_business_id` =  #{origBusinessId,jdbcType=VARCHAR}
 		</if>
 		<if test="businessType != null">
 			AND t.`business_type` =  #{businessType,jdbcType=INTEGER}
@@ -80,7 +80,10 @@
 		    AND t.`plat_status` =  #{platStatus,jdbcType=INTEGER}
 		</if>
 		<if test="companyName != null and companyName != ''">
-			AND t.`company_name` =  #{companyName,jdbcType=DATE}
+			AND t.`company_name` = #{companyName,jdbcType=VARCHAR}
+		</if>
+		<if test="userId != null and userId != ''">
+			AND t.`orig_business_id` IN (SELECT sup.business_id FROM `tb_sys_user_permission` sup WHERE sup.`user_id` = #{userId,jdbcType=VARCHAR})
 		</if>
     </sql>
     
