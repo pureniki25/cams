@@ -449,7 +449,8 @@ window.layinit(function (htConfig) {
                 let moneyPoolAccount = 0
                 if (n && n.length > 0) {
                     n.forEach(element => {
-                        moneyPoolAccount = (moneyPoolAccount * 10000 + element.accountMoney * 10000) / 10000
+                        // moneyPoolAccount = (moneyPoolAccount * 10000 + element.accountMoney * 10000) / 10000
+                        moneyPoolAccount = accAdd(moneyPoolAccount,element.accountMoney)
                         app.factRepaymentInfo.mprIds.push(element.mprId);
                     });
                     let o = n[n.length - 1]
@@ -458,7 +459,8 @@ window.layinit(function (htConfig) {
                 app.factRepaymentInfo.moneyPoolAccount = moneyPoolAccount
 
                 // app.factRepaymentInfo.repayAccount = parseFloat(app.factRepaymentInfo.moneyPoolAccount.toFixed(2))  + parseFloat(app.factRepaymentInfo.surplusFund.toFixed(2) || 0)
-                app.factRepaymentInfo.repayAccount = (app.factRepaymentInfo.moneyPoolAccount * 10000 + (app.factRepaymentInfo.surplusFund || 0) * 10000) / 10000
+                // app.factRepaymentInfo.repayAccount = (app.factRepaymentInfo.moneyPoolAccount * 10000 + (app.factRepaymentInfo.surplusFund || 0) * 10000) / 10000
+                app.factRepaymentInfo.repayAccount = accAdd(app.factRepaymentInfo.moneyPoolAccount,(app.factRepaymentInfo.surplusFund || 0))
             },
             'factRepaymentInfo.useSurplusflag': function (n, o) {
                 if (o == '') {
@@ -580,34 +582,52 @@ window.layinit(function (htConfig) {
                             if (res.data.data.length > 1) {
                                 res.data.data.forEach((element, index) => {
                                     if (index > 0) {
-                                        chaer.item10 += element.item10 ? element.item10 : 0
-                                        chaer.item20 += element.item20 ? element.item20 : 0
-                                        chaer.item30 += element.item30 ? element.item30 : 0
-                                        chaer.item50 += element.item50 ? element.item50 : 0
-                                        chaer.subTotal += element.subTotal ? element.subTotal : 0
-                                        chaer.offlineOverDue += element.offlineOverDue ? element.offlineOverDue : 0
-                                        chaer.onlineOverDue += element.onlineOverDue ? element.onlineOverDue : 0
-                                        chaer.total += element.total ? element.total : 0
+                                        // chaer.item10 += element.item10 ? element.item10 : 0
+                                        // chaer.item20 += element.item20 ? element.item20 : 0
+                                        // chaer.item30 += element.item30 ? element.item30 : 0
+                                        // chaer.item50 += element.item50 ? element.item50 : 0
+                                        // chaer.subTotal += element.subTotal ? element.subTotal : 0
+                                        // chaer.offlineOverDue += element.offlineOverDue ? element.offlineOverDue : 0
+                                        // chaer.onlineOverDue += element.onlineOverDue ? element.onlineOverDue : 0
+                                        // chaer.total += element.total ? element.total : 0
+
+                                        chaer.item10 = accAdd(chare.item10,element.item10 ? element.item10 : 0)
+                                        chaer.item20 = accAdd(chare.item20,element.item20 ? element.item20 : 0)
+                                        chaer.item30 = accAdd(chare.item30,element.item30 ? element.item30 : 0)
+                                        chaer.item50 = accAdd(chare.item50,element.item50 ? element.item50 : 0)
+                                        chaer.subTotal = accAdd(chare.subTotal,element.subTotal ? element.subTotal : 0)
+                                        chaer.offlineOverDue = accAdd(chare.offlineOverDue,element.offlineOverDue ? element.offlineOverDue : 0)
+                                        chaer.onlineOverDue = accAdd(chare.onlineOverDue,element.onlineOverDue ? element.onlineOverDue : 0)
+                                        chaer.total = accAdd(chare.total,element.total ? element.total : 0)
                                     }
                                 });
 
-                                chaer.item10 = (chaer.item10 * 10000 - e1.item10 * 10000) / 10000
-                                chaer.item20 = (chaer.item20 * 10000 - e1.item20 * 10000) / 10000
-                                chaer.item30 = (chaer.item30 * 10000 - e1.item30 * 10000) / 10000
-                                chaer.item50 = (chaer.item50 * 10000 - e1.item50 * 10000) / 10000
-                                chaer.subTotal = (chaer.subTotal * 10000 - e1.subTotal * 10000) / 10000
-                                chaer.offlineOverDue = (chaer.offlineOverDue * 10000 - e1.offlineOverDue * 10000) / 10000
-                                chaer.onlineOverDue = (chaer.onlineOverDue * 10000 - e1.onlineOverDue * 10000) / 10000
-                                chaer.total = (chaer.total * 10000 - e1.total * 10000) / 10000
+                                // chaer.item10 = (chaer.item10 * 10000 - e1.item10 * 10000) / 10000
+                                // chaer.item20 = (chaer.item20 * 10000 - e1.item20 * 10000) / 10000
+                                // chaer.item30 = (chaer.item30 * 10000 - e1.item30 * 10000) / 10000
+                                // chaer.item50 = (chaer.item50 * 10000 - e1.item50 * 10000) / 10000
+                                // chaer.subTotal = (chaer.subTotal * 10000 - e1.subTotal * 10000) / 10000
+                                // chaer.offlineOverDue = (chaer.offlineOverDue * 10000 - e1.offlineOverDue * 10000) / 10000
+                                // chaer.onlineOverDue = (chaer.onlineOverDue * 10000 - e1.onlineOverDue * 10000) / 10000
+                                // chaer.total = (chaer.total * 10000 - e1.total * 10000) / 10000
+
+                                chaer.item10 = accSub(chaer.item10 , e1.item10 )
+                                chaer.item20 = accSub(chaer.item20 , e1.item20 )
+                                chaer.item30 = accSub(chaer.item30 , e1.item30 )
+                                chaer.item50 = accSub(chaer.item50 , e1.item50 )
+                                chaer.subTotal = accSub(chaer.subTotal , e1.subTotal )
+                                chaer.offlineOverDue = accSub(chaer.offlineOverDue , e1.offlineOverDue )
+                                chaer.onlineOverDue = accSub(chaer.onlineOverDue , e1.onlineOverDue )
+                                chaer.total = accSub(chaer.total , e1.total )
                             } else {
-                                chaer.item10 = -e1.item10
-                                chaer.item20 = -e1.item20
-                                chaer.item30 = -e1.item30
-                                chaer.item50 = -e1.item50
-                                chaer.subTotal = -e1.subTotal
-                                chaer.offlineOverDue = -e1.offlineOverDue
-                                chaer.onlineOverDue = -e1.onlineOverDue
-                                chaer.total = -e1.total
+                                chaer.item10 = accSub(0 , e1.item10 )
+                                chaer.item20 = accSub(0 , e1.item20 )
+                                chaer.item30 = accSub(0 , e1.item30 )
+                                chaer.item50 = accSub(0 , e1.item50 )
+                                chaer.subTotal = accSub(0 , e1.subTotal )
+                                chaer.offlineOverDue = accSub(0 , e1.offlineOverDue )
+                                chaer.onlineOverDue = accSub(0 , e1.onlineOverDue )
+                                chaer.total = accSub(0 , e1.total )
                             }
 
                             app.table.currPeriodRepayment.data.push(chaer)
@@ -673,21 +693,31 @@ window.layinit(function (htConfig) {
                 app.factRepayPreview.total = 0
                 app.factRepayPreview.surplus = 0
                 app.table.projRepayment.data.forEach(e => {
-                    app.factRepayPreview.surplus += e.surplus * 10000 / 10000
-                    app.factRepayPreview.item10 = (app.factRepayPreview.item10 * 10000 + e.item10 * 10000) / 10000
-                    app.factRepayPreview.item20 = (app.factRepayPreview.item20 * 10000 + e.item20 * 10000) / 10000
-                    app.factRepayPreview.item30 = (app.factRepayPreview.item30 * 10000 + e.item30 * 10000) / 10000
-                    app.factRepayPreview.item50 = (app.factRepayPreview.item50 * 10000 + e.item50 * 10000) / 10000
-                    app.factRepayPreview.offlineOverDue = (app.factRepayPreview.offlineOverDue * 10000 + e.offlineOverDue * 10000) / 10000
-                    app.factRepayPreview.onlineOverDue = (app.factRepayPreview.onlineOverDue * 10000 + e.onlineOverDue * 10000) / 10000
-                    app.factRepayPreview.subTotal = (app.factRepayPreview.subTotal * 10000 + e.subTotal * 10000) / 10000
-                    app.factRepayPreview.total += (app.factRepayPreview.total * 10000 + e.total * 10000) / 10000
-                })
+                    // app.factRepayPreview.surplus += e.surplus * 10000 / 10000
+                    // app.factRepayPreview.item10 = (app.factRepayPreview.item10 * 10000 + e.item10 * 10000) / 10000
+                    // app.factRepayPreview.item20 = (app.factRepayPreview.item20 * 10000 + e.item20 * 10000) / 10000
+                    // app.factRepayPreview.item30 = (app.factRepayPreview.item30 * 10000 + e.item30 * 10000) / 10000
+                    // app.factRepayPreview.item50 = (app.factRepayPreview.item50 * 10000 + e.item50 * 10000) / 10000
+                    // app.factRepayPreview.offlineOverDue = (app.factRepayPreview.offlineOverDue * 10000 + e.offlineOverDue * 10000) / 10000
+                    // app.factRepayPreview.onlineOverDue = (app.factRepayPreview.onlineOverDue * 10000 + e.onlineOverDue * 10000) / 10000
+                    // app.factRepayPreview.subTotal = (app.factRepayPreview.subTotal * 10000 + e.subTotal * 10000) / 10000
+                    // app.factRepayPreview.total += (app.factRepayPreview.total * 10000 + e.total * 10000) / 10000
 
-                 app.factRepayPreview.total = (app.factRepayPreview.subTotal * 100000
-                    + app.factRepayPreview.offlineOverDue * 100000
-                    + app.factRepayPreview.onlineOverDue * 100000
-                    + app.factRepayPreview.surplus * 100000) / 100000 
+                    app.factRepayPreview.surplus = accAdd(app.factRepayPreview.surplus,e.surplus)
+                    app.factRepayPreview.item10 = accAdd(app.factRepayPreview.surplus,e.surplus)
+                    app.factRepayPreview.item20 = accAdd(app.factRepayPreview.item20,e.item20)
+                    app.factRepayPreview.item30 = accAdd(app.factRepayPreview.item30,e.item30)
+                    app.factRepayPreview.item50 = accAdd(app.factRepayPreview.item50,e.item50)
+                    app.factRepayPreview.offlineOverDue = accAdd(app.factRepayPreview.offlineOverDue,e.offlineOverDue)
+                    app.factRepayPreview.onlineOverDue = accAdd(app.factRepayPreview.onlineOverDue,e.onlineOverDue)
+                    app.factRepayPreview.subTotal = accAdd(app.factRepayPreview.subTotal,e.subTotal)
+                    app.factRepayPreview.total = accAdd(app.factRepayPreview.total,e.total)
+                })
+                app.factRepayPreview.total = accAdd(accAdd(app.factRepayPreview.subTotal,app.factRepayPreview.offlineOverDue),accAdd(app.factRepayPreview.onlineOverDue,app.factRepayPreview.surplus))
+                //  app.factRepayPreview.total = (app.factRepayPreview.subTotal * 100000
+                //     + app.factRepayPreview.offlineOverDue * 100000
+                //     + app.factRepayPreview.onlineOverDue * 100000
+                //     + app.factRepayPreview.surplus * 100000) / 100000 
             },
             confirmRepayment() {
                 let param = {};
