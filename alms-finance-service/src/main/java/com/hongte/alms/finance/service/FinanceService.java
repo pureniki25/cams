@@ -140,5 +140,4 @@ public interface FinanceService {
 	 */
     Map<String, Object> queryActualPaymentByBusinessId(String businessId);
 
-    void financeSettle(FinanceSettleReq financeSettleReq) throws Exception;
 }

@@ -11,7 +11,6 @@ import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.service.*;
 import com.hongte.alms.base.vo.compliance.TdrepayRechargeInfoVO;
 import com.hongte.alms.common.result.Result;
-import com.ht.ussp.bean.LoginUserInfoHelper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -40,9 +39,6 @@ public class PlatformRepaymentController {
 
     @Autowired
     private EipRemote eipRemote;
-
-    @Autowired
-    private LoginUserInfoHelper loginUserInfoHelper;
 
     @Autowired
     @Qualifier("AgencyRechargeLogService")
@@ -99,6 +95,7 @@ public class PlatformRepaymentController {
     RepaymentResourceService repaymentResourceService;
 
     static final ConcurrentMap<Integer, String> FEE_TYPE_MAP;
+
     static {
 
         //要对费类型进行转换：
@@ -119,9 +116,6 @@ public class PlatformRepaymentController {
     /**
      * 对接合规还款接口
      *
-     * @param projectId    上标项目编号
-     * @param afterId      总批次期数，唯一，对应信贷系统的还款计划编号
-     * @param confirmLogId 还款确认日志记录
      * @return com.hongte.alms.common.result.Result  Rest接口请求结果对象
      * @author 张贵宏
      * @date 2018/6/14 10:30
@@ -130,14 +124,14 @@ public class PlatformRepaymentController {
     @PostMapping("/repayment")
     @ResponseBody
     public Result repayment(@RequestBody Map<String, Object> paramMap) {   //TdrepayRechargeInfoVO
-    	if (paramMap == null || paramMap.isEmpty()) {
-			return Result.error("参数不能为空");
-		}
-    	String projectId = (String) paramMap.get("projectId");
-    	String afterId = (String) paramMap.get("afterId");
+        if (paramMap == null || paramMap.isEmpty()) {
+            return Result.error("参数不能为空");
+        }
+        String projectId = (String) paramMap.get("projectId");
+        String afterId = (String) paramMap.get("afterId");
         //String confirmLogId = (String) paramMap.get("confirmLogId");
-    	
-    	LOGGER.info("@对接合规还款接口 开始 @输入参数 projectId:[{}]  afterId[{}]", projectId, afterId);
+
+        LOGGER.info("@对接合规还款接口 开始 @输入参数 projectId:[{}]  afterId[{}]", projectId, afterId);
         //参数验证
         if (StringUtils.isBlank(projectId)) {
             return Result.error("上标项目编号不能为空");
@@ -166,6 +160,7 @@ public class PlatformRepaymentController {
                     new EntityWrapper<RepaymentProjPlan>()
                             .eq("project_id", projectId)
             );
+            //RepaymentProjPlan projectPlan = repaymentProjPlanService.selectById(repaymentProjPlanList.getProjPlanId());
             if (repaymentProjPlan == null) {
                 LOGGER.error("@对接合规还款接口@  查不到标的还款计划信息 输入参数 projectId:[{}]  ", projectId);
                 return Result.error("查不到标的还款计划信息");
@@ -187,6 +182,7 @@ public class PlatformRepaymentController {
                 return Result.error("500", "查到两条以上标的还款计划列表信息");
             }
             RepaymentProjPlanList repaymentProjPlanList = repaymentProjPlanLists.get(0);
+
 
 /*            RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService.selectOne(
                     new EntityWrapper<RepaymentBizPlanList>()
@@ -231,8 +227,6 @@ public class PlatformRepaymentController {
             }*/
 
 
-
-
             TdrepayRechargeInfoVO vo = new TdrepayRechargeInfoVO();
             vo.setProjectId(projectId);
             //业务所属资产端，1、鸿特信息，2、 一点车贷
@@ -244,19 +238,19 @@ public class PlatformRepaymentController {
             //目标类型： 业务类型(1:车易贷展期,2:房速贷展期,3:金融仓储,4:三农金融,9:车易贷,11:房速贷,12车全垫资代采,13:扶贫贷,14:汽车融资租赁,15:二手车商贷,20:一点车贷,25:商贸贷,26:业主贷,27:家装分期,28:商贸共借;29:业主共借)
             Integer businessType = basicBusiness.getBusinessType();
             // 25 信用贷 特殊处理
-            if (businessType == 25 ){
-                switch (basicBusiness.getBusinessCtype()){
+            if (businessType == 25) {
+                switch (basicBusiness.getBusinessCtype()) {
                     case "小微企业贷用信":
-                        if(tuandaiProjectInfo.getProjectId().equals(tuandaiProjectInfo.getMasterIssueId())){
+                        if (tuandaiProjectInfo.getProjectId().equals(tuandaiProjectInfo.getMasterIssueId())) {
                             businessType = 30;
-                        }else{
+                        } else {
                             businessType = 28;
                         }
                         break;
                     case "业主信用贷用信":
-                        if(tuandaiProjectInfo.getProjectId().equals(tuandaiProjectInfo.getMasterIssueId())){
+                        if (tuandaiProjectInfo.getProjectId().equals(tuandaiProjectInfo.getMasterIssueId())) {
                             businessType = 26;
-                        }else{
+                        } else {
                             businessType = 29;
                         }
                         break;
@@ -318,26 +312,31 @@ public class PlatformRepaymentController {
                 case 30:
                     projPlanStatus = 30;
                     break;
-                //case 50: projPlanStatus = 11; break;
-                default:
-                    //查标的还款期数信息并验证
-                    /*RepaymentProjPlanList lastRepaymentProjPlanList = repaymentProjPlanListService.selectOne(
-                            new EntityWrapper<RepaymentProjPlanList>()
-                                    .eq("proj_plan_id", repaymentProjPlan.getProjPlanId())
-                                    .orderBy("period", false)
-                    );
-                    if (lastRepaymentProjPlanList != null && lastRepaymentProjPlanList.getDueDate() != null && repaymentConfirmLog.getRepayDate() != null) {
-                        if (lastRepaymentProjPlanList.getDueDate().before(repaymentConfirmLog.getRepayDate())) {
-                            projPlanStatus = 11;
-                        }
-                    }*/
-                    if (repaymentProjPlanList.getDueDate().before(repaymentBizPlanList.getFactRepayDate())) {
-                        projPlanStatus = 11;
-                    } else {
-                        LOGGER.error("@对接合规还款接口@  标的计划结清状态值错误 输入参数 projectId:[{}]  afterId[{}] ", projectId, afterId);
-                        return Result.error("500", "标的计划结清状态值错误");
-                    }
+                case 50:
+                    projPlanStatus = 20;
                     break;
+                default:
+                    LOGGER.error("@对接合规还款接口@  标的计划结清状态值plan_status:[{}]错误 输入参数 projectId:[{}]  afterId[{}] ", repaymentProjPlan.getPlanStatus(), projectId, afterId);
+                    return Result.error("500", "标的计划结清状态值错误");
+//                default:
+//                    //查标的还款期数信息并验证
+//                    RepaymentProjPlanList lastRepaymentProjPlanList = repaymentProjPlanListService.selectOne(
+//                            new EntityWrapper<RepaymentProjPlanList>()
+//                                    .eq("proj_plan_id", repaymentProjPlan.getProjPlanId())
+//                                    .orderBy("period", false)
+//                    );
+//                    if (lastRepaymentProjPlanList != null && lastRepaymentProjPlanList.getDueDate() != null && repaymentConfirmLog.getRepayDate() != null) {
+//                        if (lastRepaymentProjPlanList.getDueDate().before(repaymentConfirmLog.getRepayDate())) {
+//                            projPlanStatus = 11;
+//                        }
+//                    }*//*
+//                    if (repaymentProjPlanList.getDueDate().before(repaymentBizPlanList.getFactRepayDate())) {
+//                        projPlanStatus = 11;
+//                    } else {
+//                        LOGGER.error("@对接合规还款接口@  标的计划结清状态值错误 输入参数 projectId:[{}]  afterId[{}] ", projectId, afterId);
+//                        return Result.error("500", "标的计划结清状态值错误");
+//                    }
+//                    break;
             }
             //标的还款计划结清状态
             vo.setSettleType(projPlanStatus);
@@ -373,37 +372,50 @@ public class PlatformRepaymentController {
                 BigDecimal rechargeAmount = BigDecimal.ZERO;
 
                 List<TdrepayRechargeDetail> detailFeeList = Lists.newArrayList();
-
-
                 for (RepaymentProjFactRepay r : projFactRepays) {
                     //实还金额应该包含滞纳金
                     factRepayAmount = factRepayAmount.add(r.getFactAmount());
 
                     //累计费用，线下（资产公司）的滞纳金排除在外，注意用value和uuid去区分.  OVER_DUE_AMONT_UNDERLINE(60,"线下滞纳金","3131c075-5721-11e8-8a00-0242ac110002",5)
-                    if (RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getValue().equals(r.getPlanItemType())
+                    /*if (RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getValue().equals(r.getPlanItemType())
                             || RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid().equals(r.getFeeId())) {
+                        continue;
+                    } */
+                    if (RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid().equals(r.getFeeId())) {
                         continue;
                     }
                     //resourceAmount = resourceAmount.add(r.getFactAmount());
-
                     rechargeAmount = rechargeAmount.add(r.getFactAmount());
 
                     TdrepayRechargeDetail detailFee = new TdrepayRechargeDetail();
-
                     //要对费类型进行转换：
                     //从 应还项目所属分类，10：本金，20：利息，30：资产端分公司服务费，40：担保公司费用，50：资金端平台服务费，60：滞纳金，70：违约金，80：中介费，90：押金类费用，100：冲应收
                     //转成 费用类型(10:本金,20:利息;30:平台服务费;40:资产端服务费;50:担保公司服务费;60:仲裁服务费;70:逾期费用（罚息）;80: 中介服务费)
                     Integer feeType = 10;
-                    switch (r.getPlanItemType()){
-                        case 10: feeType = 10; break;
-                        case 20: feeType = 20; break;
-                        case 30: feeType = 40; break;
-                        case 40: feeType = 50; break;
-                        case 50: feeType = 30; break;
-                        case 60: feeType = 70; break;
+                    switch (r.getPlanItemType()) {
+                        case 10:
+                            feeType = 10;
+                            break;
+                        case 20:
+                            feeType = 20;
+                            break;
+                        case 30:
+                            feeType = 40;
+                            break;
+                        case 40:
+                            feeType = 50;
+                            break;
+                        case 50:
+                            feeType = 30;
+                            break;
+                        case 60:
+                            feeType = 70;
+                            break;
                         //case 70: planItemType = ?; break;
-                        case 80: feeType = 80; break;
-                       //case 90: planItemType = ?; break;
+                        case 80:
+                            feeType = 80;
+                            break;
+                        //case 90: planItemType = ?; break;
                         //case 100: planItemType = ?; break;
                         default:
                             return Result.error("没有对应的费用类型给接口");
@@ -423,15 +435,23 @@ public class PlatformRepaymentController {
 
 
             //当期还款状态，目前只有三种，分别为 还款中，逾期，已还款 => 当期结清状态 0：未结清,1：已结清
+            //如果 current_status为 还款中，逾期则继续判断repay_status==> 2:线上已还款,3:全部已还款 则为结清
             Integer projPlanListStatus = 0;
             switch (repaymentProjPlanList.getCurrentStatus()) {
                 case "还款中":
                 case "逾期":
-                    projPlanListStatus = 0;
+                    if (repaymentBizPlanList.getRepayStatus() == 2 || repaymentBizPlanList.getRepayStatus() == 3) {
+                        projPlanListStatus = 1;
+                    } else {
+                        projPlanListStatus = 0;
+                    }
                     break;
                 case "已还款":
                     projPlanListStatus = 1;
                     break;
+                default:
+                    LOGGER.error("@对接合规还款接口@  标的计划本期状态值current_status:[{}]错误 输入参数 projectId:[{}]  afterId[{}] ", repaymentProjPlanList.getCurrentStatus(), projectId, afterId);
+                    return Result.error("500", "标的计划本期状态值错误");
             }
             vo.setIsComplete(projPlanListStatus);
             vo.setProjPlanListId(repaymentProjPlanList.getProjPlanListId());
