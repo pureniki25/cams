@@ -911,19 +911,22 @@ public class TdrepayRechargeController {
 		try {
 			Integer[] processStatus = { 0, 3 };
 
-			TdrepayRechargeLog tdrepayRechargeLog = tdrepayRechargeLogService.selectOne(
+			List<TdrepayRechargeLog> tdrepayRechargeLogs = tdrepayRechargeLogService.selectList(
 					new EntityWrapper<TdrepayRechargeLog>().eq("project_id", (String) paramMap.get("projectId"))
 							.eq("confirm_log_id", (String) paramMap.get("confirmLogId"))
 							.in("process_status", processStatus).eq("is_valid", 1));
-
-			if (tdrepayRechargeLog != null) {
-				tdrepayRechargeLog.setIsValid(2);
-				tdrepayRechargeLogService.updateById(tdrepayRechargeLog);
+			
+			if (!CollectionUtils.isEmpty(tdrepayRechargeLogs)) {
+				
+				for (TdrepayRechargeLog rechargeLog : tdrepayRechargeLogs) {
+					rechargeLog.setIsValid(2);
+				}
+				
+				tdrepayRechargeLogService.updateBatchById(tdrepayRechargeLogs);
 				return Result.success();
-			} else {
+			}else {
 				return Result.error("-99", "没有找到对应的数据，撤销资金分发失败");
 			}
-
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return Result.error("-99", "系统异常");
