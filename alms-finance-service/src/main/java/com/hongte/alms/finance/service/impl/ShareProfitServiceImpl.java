@@ -2404,8 +2404,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             projPlanListDetailBak.setConfirmLogId(confirmLogId);
             projPlanListDetailBak.insert();
         }
-
-        String afterId = financeBaseDto.getAfterId();
+        List<RepaymentProjPlanList>  ptojPlanList = removeDuplicateProjPlist(financeBaseDto.getCurTimeRepaidProjPlanList());
+//        String afterId = financeBaseDto.getAfterId();
         String businessId = financeBaseDto.getBusinessId();
         executor.execute(new Runnable() {
             @Override
@@ -2415,11 +2415,11 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                     //睡一下，让还款的信息先存完。
                     try{
                         Thread.sleep(1000);
-                    }catch (Exception e){
+                    }catch (InterruptedException e){
                         logger.error(e.getMessage(), e);
                     }
-                    tdrepayRecharge(confirmLogId, businessId, afterId);
-                } catch (InterruptedException e) {
+                    tdrepayRecharge(ptojPlanList);
+                } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                     Thread.currentThread().interrupt();
                 }
@@ -2440,6 +2440,18 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             updateRepayPlanToLMS(businessId);
             logger.info("触发往信贷更新还未计划数据结束，businessId:[{}]", businessId);
         });
+    }
+
+    private static ArrayList<RepaymentProjPlanList> removeDuplicateProjPlist(List<RepaymentProjPlanList> projPlanLists) {
+        Set<RepaymentProjPlanList> set = new TreeSet<RepaymentProjPlanList>(new Comparator<RepaymentProjPlanList>() {
+            @Override
+            public int compare(RepaymentProjPlanList o1, RepaymentProjPlanList o2) {
+                //字符串,则按照asicc码升序排列
+                return o1.getProjPlanId().compareTo(o2.getProjPlanId());
+            }
+        });
+        set.addAll(projPlanLists);
+        return new ArrayList<RepaymentProjPlanList>(set);
     }
 
 

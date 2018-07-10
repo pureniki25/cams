@@ -187,7 +187,7 @@ public class PlatformRepaymentController {
             //查标的还款计划
             RepaymentProjPlan repaymentProjPlan = repaymentProjPlanService.selectOne(
                     new EntityWrapper<RepaymentProjPlan>()
-                            .eq("project_id", repaymentProjPlanList.getProjPlanId())
+                            .eq("proj_plan_id", repaymentProjPlanList.getProjPlanId())
             );
             if (repaymentProjPlan == null) {
                 LOGGER.error("@对接合规还款接口@  查不到标的还款计划信息 输入参数 projPlanListId:[{}]  ", projPlanListId);
@@ -382,7 +382,7 @@ public class PlatformRepaymentController {
                             .eq("project_id", projectId)
             );*/
             List<RepaymentProjFactRepay> projFactRepays = repaymentProjFactRepayService.selectList(
-                    new EntityWrapper<RepaymentProjFactRepay>().eq("proj_plan_list_id", repaymentBizPlanList.getPlanListId())
+                    new EntityWrapper<RepaymentProjFactRepay>().eq("proj_plan_list_id", repaymentProjPlanList.getProjPlanListId())
             );
             if (projFactRepays != null && projFactRepays.size() > 0) {
 
