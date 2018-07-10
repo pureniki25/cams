@@ -237,7 +237,7 @@
             </if>
             <!--   /*//身份证号*/ -->
             <if test="identifyCard !=null  and identifyCard !=''  ">
-                and business.customer_identify_card  LIKE '%${identifyCard}%'
+                and customer.identify_card  LIKE '%${identifyCard}%'
             </if>
             <!--   /*//手机号*/ -->
             <if test="phoneNumber !=null  and phoneNumber !=''  ">
