@@ -436,11 +436,16 @@ public class PlatformRepaymentController {
 
 
             //当期还款状态，目前只有三种，分别为 还款中，逾期，已还款 => 当期结清状态 0：未结清,1：已结清
+            //如果 current_status为 还款中，逾期则继续判断repay_status==> 2:线上已还款,3:全部已还款 则为结清
             Integer projPlanListStatus = 0;
             switch (repaymentProjPlanList.getCurrentStatus()) {
                 case "还款中":
                 case "逾期":
-                    projPlanListStatus = 0;
+                    if (repaymentBizPlanList.getRepayStatus() == 2 || repaymentBizPlanList.getRepayStatus() == 3) {
+                        projPlanListStatus = 1;
+                    } else {
+                        projPlanListStatus = 0;
+                    }
                     break;
                 case "已还款":
                     projPlanListStatus = 1;
