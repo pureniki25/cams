@@ -28,6 +28,7 @@ import com.hongte.alms.base.dto.compliance.TdProjectPaymentInfoResult;
 import com.hongte.alms.base.dto.compliance.TdRefundMonthInfoDTO;
 import com.hongte.alms.base.entity.AgencyRechargeLog;
 import com.hongte.alms.base.entity.BasicCompany;
+import com.hongte.alms.base.entity.IssueSendOutsideLog;
 import com.hongte.alms.base.entity.RepaymentProjPlan;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
@@ -102,7 +103,7 @@ public class TdrepayRechargeController {
 
 	@Autowired
 	private LoginUserInfoHelper loginUserInfoHelper;
-	
+
 	@Autowired
 	@Qualifier("AgencyRechargeLogService")
 	private AgencyRechargeLogService agencyRechargeLogService;
@@ -360,6 +361,7 @@ public class TdrepayRechargeController {
 			if (vo != null && vo.getConfirmTimeEnd() != null) {
 				vo.setConfirmTimeEnd(DateUtil.addDay2Date(1, vo.getConfirmTimeEnd()));
 			}
+			vo.setUserId(loginUserInfoHelper.getUserId());
 			int count = tdrepayRechargeService.countComplianceRepaymentData(vo);
 			if (count == 0) {
 				return PageResult.success(count);
@@ -369,9 +371,39 @@ public class TdrepayRechargeController {
 
 			List<TdrepayRechargeInfoVO> resultList = new ArrayList<>();
 			if (CollectionUtils.isNotEmpty(list)) {
+
+				Map<String, IssueSendOutsideLog> batchIdMap = new HashMap<>();
+
+				for (TdrepayRechargeLog tdrepayRechargeLog : list) {
+					String batchId = tdrepayRechargeLog.getBatchId();
+					if (StringUtil.isEmpty(batchId)) {
+						continue;
+					}
+					IssueSendOutsideLog issueSendOutsideLog = batchIdMap.get(batchId);
+					if (issueSendOutsideLog == null) {
+						issueSendOutsideLog = issueSendOutsideLogService
+								.selectOne(new EntityWrapper<IssueSendOutsideLog>()
+										.eq("Interfacecode", Constant.INTERFACE_CODE_SEND_DISTRIBUTE_FUND)
+										.eq("send_key", batchId));
+						if (issueSendOutsideLog != null) {
+							batchIdMap.put(batchId, issueSendOutsideLog);
+						}else {
+							batchIdMap.put(batchId, new IssueSendOutsideLog());
+						}
+					}
+				}
+
 				for (TdrepayRechargeLog tdrepayRechargeLog : list) {
 					TdrepayRechargeInfoVO infoVO = BeanUtils.deepCopy(tdrepayRechargeLog, TdrepayRechargeInfoVO.class);
 					if (infoVO != null) {
+						IssueSendOutsideLog issueSendOutsideLog = batchIdMap.get(infoVO.getBatchId());
+						if (issueSendOutsideLog != null) {
+							JSONObject parseObject = JSONObject.parseObject(issueSendOutsideLog.getReturnJson());
+							if (parseObject != null) {
+								infoVO.setRemark(parseObject.getString("codeDesc"));
+							}
+						}
+
 						infoVO.setBusinessTypeStr(BusinessTypeEnum.getName(infoVO.getBusinessType()));
 						infoVO.setRepaymentTypeStr(RepaySourceEnum.getName(infoVO.getRepaySource()));
 						switch (infoVO.getSettleType()) {
@@ -607,7 +639,7 @@ public class TdrepayRechargeController {
 						case 1:
 							tdReturnAdvanceShareProfitDTO.setStatusStrActual("已结清");
 							break;
-						case 2:
+						case 0:
 							tdReturnAdvanceShareProfitDTO.setStatusStrActual("未结清");
 							break;
 
@@ -700,7 +732,7 @@ public class TdrepayRechargeController {
 			return Result.error("-99", e.getMessage());
 		}
 	}
-	
+
 	@SuppressWarnings("rawtypes")
 	@ApiOperation(value = "查询资金分发处理状态")
 	@GetMapping("/queryDistributeFund")
@@ -898,7 +930,7 @@ public class TdrepayRechargeController {
 		}
 
 	}
-	
+
 	@ApiOperation(value = "查询所有业务类型")
 	@GetMapping("/queryBusinessTypes")
 	@ResponseBody
@@ -906,18 +938,35 @@ public class TdrepayRechargeController {
 		try {
 			List<Map<String, Object>> resultList = new LinkedList<>();
 			BusinessTypeEnum[] businessTypeEnums = BusinessTypeEnum.values();
-			
+
 			for (BusinessTypeEnum businessTypeEnum : businessTypeEnums) {
 				if (businessTypeEnum.value() == 25) {
 					continue;
 				}
-				Map<String, Object> resultMap = new HashMap<>(); 
+				Map<String, Object> resultMap = new HashMap<>();
 				resultMap.put("value", businessTypeEnum.value());
 				resultMap.put("name", businessTypeEnum.getName());
 				resultList.add(resultMap);
 			}
 
 			return Result.success(resultList);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error("-99", e.getMessage());
+		}
+	}
+	
+	@ApiOperation(value = "标的还款信息查询接口")
+	@GetMapping("/remoteGetProjectPayment")
+	@ResponseBody
+	public Result<com.ht.ussp.core.Result> remoteGetProjectPayment(@RequestParam("projectId") String projectId) {
+		if (StringUtil.isEmpty(projectId)) {
+			return Result.error("-99", "标ID不能为空");
+		}
+
+		try {
+			com.ht.ussp.core.Result result = tdrepayRechargeService.remoteGetProjectPayment(projectId);
+			return Result.success(result);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return Result.error("-99", e.getMessage());

@@ -72,6 +72,8 @@ window.layinit(function(htConfig){
 //                repayStatus:'逾期',      //还款状态
                 repayStatus:'',      //还款状态
                 customerName:'',  //客户名称
+                identifyCard:'', //身份证号
+                phoneNumber:'', //手机号
                 peroidStatus:'' //期数状态,首期/本金期/末期
 
             },
@@ -125,6 +127,8 @@ window.layinit(function(htConfig){
                                 businessClassName:vm.searchForm.businessClassName,   //业务状态
                                 repayStatus:vm.searchForm.repayStatus,      //还款状态
                                 customerName:vm.searchForm.customerName,  //客户名称
+                                identifyCard:vm.searchForm.identifyCard, //身份证号
+                                phoneNumber:vm.searchForm.phoneNumber, //手机号
                                 peroidStatus:vm.searchForm.peroidStatus,  //期数状态
                             }
                             , page: {
