@@ -526,7 +526,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
      */
 	private void handleAgencyRechargeLog(FinanceBaseDto financeBaseDto) {
 		List<AgencyRechargeLog> agencyRechargeLogs = agencyRechargeLogService
-				.selectList(new EntityWrapper<AgencyRechargeLog>().eq("handle_status", 2).eq("charge_type", 2));
+				.selectList(new EntityWrapper<AgencyRechargeLog>().eq("handle_status", "2").eq("charge_type", "3"));
 		if (CollectionUtils.isEmpty(agencyRechargeLogs)) {
 			return;
 		}
