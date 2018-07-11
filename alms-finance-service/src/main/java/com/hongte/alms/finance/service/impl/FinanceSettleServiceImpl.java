@@ -190,13 +190,9 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                     RepaymentProjPlanList repaymentProjPlanList = repaymentProjPlanListDto.getRepaymentProjPlanList();
                     String currentStatus = repaymentProjPlanList.getCurrentStatus();
                     if (RepayCurrentStatusEnums.还款中.equals(currentStatus) || RepayCurrentStatusEnums.逾期.equals(currentStatus)) {
-                        List<RepaymentProjPlanListDetail> projPlanListDetails = repaymentProjPlanListDto.getProjPlanListDetails();
-
+                        List<RepaymentProjPlanListDetail> projPlanListDetails = repaymentProjPlanListDto.getProjPlanListDetails(); //需要还款的详情
 
                         String projPlanListId = repaymentProjPlanList.getProjPlanListId(); //标的还款计划列表ID
-
-                        //通过标的还款计划查询他的实还信息
-//                        repaymentProjFactRepayMapper.selectList(new EntityWrapper<>().eq(""))
 
 
 //                    RepaymentProjFactRepay repaymentProjFactRepay=new RepaymentProjFactRepay();
@@ -205,6 +201,34 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
                             for (RepaymentProjPlanListDetail repaymentProjPlanListDetail : projPlanListDetails) {
 
+                                BigDecimal projPlanAmount = repaymentProjPlanListDetail.getProjPlanAmount();//标应还金额
+
+                                BigDecimal derateAmount = repaymentProjPlanListDetail.getDerateAmount();//减免金额
+
+                                String projPlanDetailId = repaymentProjPlanListDetail.getProjPlanDetailId();
+                                //通过标的还款计划详情ID查询他的单个费用项实还信息
+                                List<RepaymentProjFactRepay> repaymentProjFactRepayList = repaymentProjFactRepayMapper.selectList(new EntityWrapper<RepaymentProjFactRepay>().eq("proj_plan_detail_id", projPlanDetailId));
+
+                                if (CollectionUtils.isNotEmpty(repaymentProjFactRepayList)) { //单个费用项存在实还信息
+                                    //单个费用项进行累加
+                                    BigDecimal proJone = BigDecimal.ZERO;
+
+                                    for (RepaymentProjFactRepay repaymentProjFactRepay : repaymentProjFactRepayList) {
+                                        BigDecimal factAmount = repaymentProjFactRepay.getFactAmount();
+                                        proJone = proJone.add(factAmount);
+                                    }
+
+                                  //如果已还的小于应还减去减免 则需新增记录
+                                    if(projPlanAmount.subtract(derateAmount) .compareTo(proJone) >0){
+
+                                    }
+
+
+
+
+                                } else {  //不存在实还
+
+                                }
                             }
                         }
 
