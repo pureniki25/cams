@@ -29,7 +29,7 @@ public class SyncDaihouJob extends IJobHandler {
 		XxlJobLogger.log("@SyncDaihouJob@同步贷后数据--结束[{}]");
 		return SUCCESS;
 	} catch (Exception e) {
-		LOG.error("同步代扣结果失败", e);
+		LOG.error("同步贷后数据失败", e);
 		return FAIL;
 	}
 		
