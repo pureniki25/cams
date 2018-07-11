@@ -21,7 +21,7 @@ public class SyncDaihouJob extends IJobHandler {
 	
 	@Override
 	public ReturnT<String> execute(String arg0) throws Exception {
-		try {
+	try {
 		XxlJobLogger.log("@SyncDaihouJob@同步贷后数据--开始[{},{}]");
 		LOG.info("@SyncDaihouJob@同步贷后数据--开始[{},{}]");
 		syncDaihouClient.SynchDaihouData();
