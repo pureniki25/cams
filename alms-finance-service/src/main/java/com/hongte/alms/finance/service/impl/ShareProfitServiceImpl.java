@@ -1649,6 +1649,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			            
 			            RepaymentBizPlanListSynch synch = new RepaymentBizPlanListSynch() ;
 		                synch.setPlanListId(bizPlanList.getPlanListId());
+		                synch = repaymentBizPlanListSynchMapper.selectOne(synch) ;
 		                synch.setCurrentStatus(bizPlanList.getCurrentStatus());
 		                synch.setCurrentSubStatus(bizPlanList.getCurrentSubStatus());
 		                synch.setRepayStatus(bizPlanList.getRepayStatus());
@@ -1656,7 +1657,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		                synch.setFinanceConfirmUser(bizPlanList.getFinanceConfirmUser());
 		                synch.setFinanceConfirmUserName(bizPlanList.getFinanceConfirmUserName());
 		                synch.setFactAmountExt(bplFactAmount);
-		                repaymentBizPlanListSynchMapper.updateById(synch);
+		                repaymentBizPlanListSynchMapper.updateAllColumnById(synch);
 					}
 				}
 			}

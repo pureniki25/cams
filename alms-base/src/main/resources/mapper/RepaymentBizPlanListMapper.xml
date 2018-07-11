@@ -337,12 +337,13 @@
 					WHEN ISNULL(pl.overdue_amount) THEN pl.total_borrow_amount
 					ELSE pl.total_borrow_amount + pl.overdue_amount
 				END AS planRepayAmount, pl.current_status AS STATUS
-				, CASE pl.repay_status
-					WHEN 1 THEN '部分还款'
-					WHEN 2 THEN '部分还款'
-					WHEN 3 THEN pl.current_status
-					ELSE NULL
-				END AS repayStatus, pl.accountant_confirm_status AS financeConfirmStatus
+				, CASE
+				when (pl.src_type = 1) then pl.current_status
+				when (pl.src_type = 2 and pl.repay_status = 1) then '部分还款'
+				when (pl.src_type = 2 and pl.repay_status = 2) then '线上已还款'
+				when (pl.src_type = 2 and pl.repay_status = 3) then '全部已还款'
+				when (pl.src_type = 2 and pl.repay_status is null ) then '未还款'
+			END AS repayStatus, pl.accountant_confirm_status AS financeConfirmStatus
 				,pl.fact_amount_ext AS repaidAmount, pl.src_type AS srcType
 			FROM tb_repayment_biz_plan_list_synch pl
 		<where>
