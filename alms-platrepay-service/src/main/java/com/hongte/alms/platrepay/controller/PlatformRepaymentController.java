@@ -209,16 +209,17 @@ public class PlatformRepaymentController {
                             .eq("after_id", repaymentConfirmLog.getAfterId())
             );*/
 
-            RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService.selectOne(
+          /*  RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService.selectOne(
                     new EntityWrapper<RepaymentBizPlanList>()
                             .eq("business_id", repaymentProjPlanList.getBusinessId())
-//                            .eq("orig_business_id", repaymentConfirmLog.getOrgBusinessId())
                             .eq("after_id", repaymentProjPlanList.getAfterId())
-            );
+            );*/
+
+            RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("plan_list_id", repaymentProjPlanList.getPlanListId()));
 
             //部分还款状态子状态,null:未还款,1:部分还款,2:线上已还款,3:全部已还款
             //新需求： 资产端内部在分润后将还款状态改为线上已还款之后，再调用合规化还款接口去给资金端还款
-            if (repaymentBizPlanList.getRepayStatus() != 2 && repaymentBizPlanList.getRepayStatus() != 3) {
+            if (repaymentProjPlanList.getRepayStatus() != 2 && repaymentProjPlanList.getRepayStatus() != 3) {
                 LOGGER.error("@对接合规还款接口@  应该在还完线上部分后再调用合规化还款接口 输入参数 projPlanListId:[{}]  ", projPlanListId);
                 return Result.error("500", "应该在还完线上部分后再调用合规化还款接口");
             }
@@ -278,14 +279,21 @@ public class PlatformRepaymentController {
 
             //实还日期
             //vo.setFactRepayDate(repaymentConfirmLog.getRepayDate());
-            vo.setFactRepayDate(repaymentBizPlanList.getFactRepayDate());
+            vo.setFactRepayDate(repaymentProjPlanList.getFactRepayDate());
             //借款人,平台只关心标的的每个共借款人姓名
             //vo.setCustomerName(basicBusiness.getCustomerName());
             vo.setCustomerName(tuandaiProjectInfo.getRealName());
             //分公司
             vo.setCompanyName(basicBusiness.getCompanyName());
             //还款来源
-            vo.setRepaySource(RepayPlanPayedTypeEnum.getByValue(repaymentProjPlanList.getRepayFlag()).getClassifyId());
+            //处理转换 还款来源，10：线下转账，11:用往期结余还款(归类到线下转账吧),20：线下代扣，30：银行代扣
+            //到接口 还款来源，1:线下转账,2:第三方代扣,3:银行代扣,4:APP网关充值,5:协议代扣
+            if (repaymentProjPlanList.getRepayFlag() == null) {
+                LOGGER.error("@对接合规还款接口@ 指定的标期数的已还款类型标记为null 输入参数projPlanListId:[{}]", projPlanListId);
+                return Result.error("指定的标期数的已还款类型标记为null");
+            } else {
+                vo.setRepaySource(RepayPlanPayedTypeEnum.getByValue(repaymentProjPlanList.getRepayFlag()).getClassifyId());
+            }
 
             //取还款确认日志的最后一次的来源做为整个业务的还款来源
             //处理转换 还款来源，10：线下转账，11:用往期结余还款(归类到线下转账吧),20：线下代扣，30：银行代扣
@@ -314,9 +322,9 @@ public class PlatformRepaymentController {
             } else {
                 vo.setConfirmTime(repaymentBizPlanList.getFinanceComfirmDate());
             }
-            vo.setAfterId(repaymentBizPlanList.getAfterId());
+            vo.setAfterId(repaymentProjPlanList.getAfterId());
 //            vo.setPeriod(repaymentConfirmLog.getPeriod());
-            vo.setPeriod(repaymentBizPlanList.getPeriod());
+            vo.setPeriod(repaymentProjPlanList.getPeriod());
 
             //处理标的计划结清状态
             //还款计划状态，0:还款中，10:提前结清，20:已结清，30:亏损结清，50:已申请展期  => 0：非结清，10：正常结清，11：逾期结清，20：展期原标结清，30：坏账结清
@@ -461,7 +469,7 @@ public class PlatformRepaymentController {
             switch (repaymentProjPlanList.getCurrentStatus()) {
                 case "还款中":
                 case "逾期":
-                    if (repaymentBizPlanList.getRepayStatus() == 2 || repaymentBizPlanList.getRepayStatus() == 3) {
+                    if (repaymentProjPlanList.getRepayStatus() == 2 || repaymentProjPlanList.getRepayStatus() == 3) {
                         projPlanListStatus = 1;
                     } else {
                         projPlanListStatus = 0;
@@ -483,7 +491,8 @@ public class PlatformRepaymentController {
                 vo.setTdUserId(tuandaiProjectInfo.getTdUserId());
             }
             //vo.setConfirmLogId(confirmLogId);
-            vo.setConfirmLogId(repaymentBizPlanList.getPlanListId());
+            //vo.setConfirmLogId(repaymentBizPlanList.getPlanListId());
+            vo.setConfirmLogId(repaymentProjPlanList.getProjPlanListId());
 
             Result result = tdrepayRechargeController.accessTdrepayReCharge(vo);
             if (!"1".equals(result.getCode())) {

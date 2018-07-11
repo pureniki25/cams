@@ -1095,16 +1095,11 @@ public class FinanceController {
 	@ApiOperation(value = "检查前面的还款计划是否有未还垫付")
 	public Result checkLastRepay(String businessId, String afterId) {
 		logger.info("@checkLastRepay@检查前面的还款计划是否有未还垫付--开始[{}{}]",businessId,afterId);
-		RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService.selectOne(
-				new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", businessId).eq("after_id", afterId));
 		List<TuandaiProjectInfo> list = tuandaiProjectInfoService
 				.selectList(new EntityWrapper<TuandaiProjectInfo>().eq("business_id", businessId));
 		for (TuandaiProjectInfo tuandaiProjectInfo : list) {
 			Map<String, Object> paramMap = new HashMap<>();
 			paramMap.put("projectId", tuandaiProjectInfo.getProjectId());
-
-			Map<String, Object> resultMap = new HashMap<>();
-
 			com.ht.ussp.core.Result result = eipRemote.returnAdvanceShareProfit(paramMap);
 
 			if (result != null && result.getData() != null

@@ -136,6 +136,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
     @Qualifier("AgencyRechargeLogService")
     private AgencyRechargeLogService agencyRechargeLogService;
 
+    @Autowired
+	private RepaymentBizPlanListSynchMapper repaymentBizPlanListSynchMapper ;
+    
     private ThreadLocal<String> businessId = new ThreadLocal<String>();
     private ThreadLocal<String> orgBusinessId = new ThreadLocal<String>();
     private ThreadLocal<String> afterId = new ThreadLocal<String>();
@@ -516,7 +519,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         
         
         // 充值记录转 RepaymentResource
-		handleAgencyRechargeLog(financeBaseDto);
+        if (financeBaseDto.getCallFlage()==40||financeBaseDto.getCallFlage()==50) {
+        	handleAgencyRechargeLog(financeBaseDto);
+		}
         
     }
 
@@ -1147,84 +1152,6 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         // 上一次还款是否成功的标志位
         boolean lastPaySuc = true;
 
-		/*
-        // 1.优先还 界面设置的线上滞纳金
-		for (int i = 0; i < dto.getProjPlanDtos().size(); i++) {
-			if (lastPaySuc == false)
-				return;
-			RepaymentProjPlanDto repaymentProjPlanDto = dto.getProjPlanDtos().get(i);
-			String projectId = repaymentProjPlanDto.getTuandaiProjectInfo().getProjectId();
-			CurrPeriodProjDetailVO currPeriodProjDetailVO = getCurrPeriodProjDetailVO(projectId);
-
-			if (repaymentProjPlanDto.getOnlineOverDue() != null
-					&& repaymentProjPlanDto.getOnlineOverDue().compareTo(new BigDecimal("0")) > 0) {
-				// 需要还的线上滞纳金
-				BigDecimal onLineOverDue = repaymentProjPlanDto.getOnlineOverDue();
-				List<RepaymentProjPlanListDto> repaymentProjPlanListDtos = repaymentProjPlanDto.getProjPlanListDtos();
-				// 遍历标的还款计划
-				for (RepaymentProjPlanListDto repaymentProjPlanListDto : repaymentProjPlanListDtos) {
-					List<RepaymentProjPlanListDetailDto> repaymentProjPlanListDetailDtos = repaymentProjPlanListDto
-							.getRepaymentProjPlanListDetailDtos();
-					// 遍历这个标的每一期还款计划，费用细项
-					for (RepaymentProjPlanListDetailDto repaymentProjPlanListDetailDto : repaymentProjPlanListDetailDtos) {
-						RepaymentProjPlanListDetail detail = repaymentProjPlanListDetailDto
-								.getRepaymentProjPlanListDetail();
-
-						// 找到线上滞纳金这一费用项
-						if (detail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
-							boolean bl = payOneFeeDetail(detail, currPeriodProjDetailVO, onLineOverDue);
-							if (bl && realPayedAmount.get() != null) {
-								onLineOverDue = onLineOverDue.subtract(realPayedAmount.get());
-							} else {
-								lastPaySuc = false;
-								break;
-							}
-						}
-					}
-				}
-			}
-		}
-
-		// 2.再还 界面设置的线下滞纳金
-		for (int i = 0; i < dto.getProjPlanDtos().size(); i++) {
-			if (lastPaySuc == false)
-				return;
-			RepaymentProjPlanDto repaymentProjPlanDto = dto.getProjPlanDtos().get(i);
-			String projectId = repaymentProjPlanDto.getTuandaiProjectInfo().getProjectId();
-			CurrPeriodProjDetailVO currPeriodProjDetailVO = getCurrPeriodProjDetailVO(projectId);
-
-			if (repaymentProjPlanDto.getOfflineOverDue() != null
-					&& repaymentProjPlanDto.getOfflineOverDue().compareTo(new BigDecimal("0")) > 0) {
-				// 需要还的线下滞纳金
-				BigDecimal onLineOverDue = repaymentProjPlanDto.getOfflineOverDue();
-				List<RepaymentProjPlanListDto> repaymentProjPlanListDtos = repaymentProjPlanDto.getProjPlanListDtos();
-				// 遍历标的还款计划
-				for (RepaymentProjPlanListDto repaymentProjPlanListDto : repaymentProjPlanListDtos) {
-					List<RepaymentProjPlanListDetailDto> repaymentProjPlanListDetailDtos = repaymentProjPlanListDto
-							.getRepaymentProjPlanListDetailDtos();
-					// 遍历这个标的每一期还款计划，费用细项
-					for (RepaymentProjPlanListDetailDto repaymentProjPlanListDetailDto : repaymentProjPlanListDetailDtos) {
-						RepaymentProjPlanListDetail detail = repaymentProjPlanListDetailDto
-								.getRepaymentProjPlanListDetail();
-						// 找到线下滞纳金这一费用项
-						if (detail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
-							boolean bl = payOneFeeDetail(detail, currPeriodProjDetailVO, onLineOverDue);
-							if (bl && realPayedAmount.get() != null) {
-								onLineOverDue = onLineOverDue.subtract(realPayedAmount.get());
-								if (onLineOverDue.compareTo(new BigDecimal("0")) < 0) {
-									logger.error("还线上滞纳金还多了：repaymentProjPlanDto:[{}]",
-											JSON.toJSONString(repaymentProjPlanDto));
-								}
-							} else {
-								lastPaySuc = false;
-								break;
-							}
-						}
-					}
-				}
-			}
-		}
-		*/
 
         // 3.最后按核销顺序还金额（先还核销顺序小于1200的费用）
         String lastProjectId = null;
@@ -1651,13 +1578,6 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			                throw new ServiceRuntimeException("找不到对应的projPlanList");
 			            }
 			            projPlanList.setFactRepayDate(financeBaseDto.getConfirmLog().getRepayDate());
-//			            if (!StringUtil.isEmpty(financeBaseDto.getRemark())) {
-//			            	if (StringUtil.isEmpty(projPlanList.getRemark())) {
-//			    				projPlanList.setRemark(financeBaseDto.getRemark());
-//			    			}else {
-//			    				projPlanList.setRemark(projPlanList.getRemark().concat("\r\n").concat(financeBaseDto.getRemark()));
-//			    			}
-//						}
 			            
 			            BigDecimal pjlFactAmount = sumProjPlanListFactAmountInMem(projPlanList.getProjPlanListId(), financeBaseDto);
 			            BigDecimal pjlOnlineAmount = sumProjPlanListOnlinePartAmountInMem(projPlanList.getProjPlanListId(),financeBaseDto);
@@ -1693,13 +1613,6 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 
 			            RepaymentBizPlanList bizPlanList = findRepaymentbizplanlist(projPlanList.getPlanListId(), financeBaseDto);
 			            bizPlanList.setFactRepayDate(financeBaseDto.getConfirmLog().getRepayDate());
-//						if (!StringUtil.isEmpty(financeBaseDto.getRemark())) {
-//							if (StringUtil.isEmpty(bizPlanList.getRemark())) {
-//								bizPlanList.setRemark(financeBaseDto.getRemark());
-//							} else {
-//								bizPlanList.setRemark(bizPlanList.getRemark().concat("\r\n").concat(financeBaseDto.getRemark()));
-//							}
-//						}
 			            bizPlanList.setFinanceComfirmDate(new Date());
 
 			            BigDecimal bplFactAmount = sumBizPlanListFactAmount(bizPlanList.getPlanListId(), financeBaseDto);
@@ -1719,6 +1632,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			                    bizPlanList.setFinanceConfirmUser(Constant.ADMIN_ID);
 			                    bizPlanList.setFinanceConfirmUserName("admin");
 			                }
+			                
 			            } else {
 
 //							bizPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
@@ -1732,6 +1646,17 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			            }
 			            bizPlanList.updateAllColumnById();
 			            updateRepaymentBizPlanList(bizPlanList, financeBaseDto);
+			            
+			            RepaymentBizPlanListSynch synch = new RepaymentBizPlanListSynch() ;
+		                synch.setPlanListId(bizPlanList.getPlanListId());
+		                synch.setCurrentStatus(bizPlanList.getCurrentStatus());
+		                synch.setCurrentSubStatus(bizPlanList.getCurrentSubStatus());
+		                synch.setRepayStatus(bizPlanList.getRepayStatus());
+		                synch.setRepayFlag(bizPlanList.getRepayFlag());
+		                synch.setFinanceConfirmUser(bizPlanList.getFinanceConfirmUser());
+		                synch.setFinanceConfirmUserName(bizPlanList.getFinanceConfirmUserName());
+		                synch.setFactAmountExt(bplFactAmount);
+		                repaymentBizPlanListSynchMapper.updateById(synch);
 					}
 				}
 			}
