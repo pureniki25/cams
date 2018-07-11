@@ -27,6 +27,7 @@
             t1.channel_level AS channelLevel,
             IFNULL(t1.sub_platform_id,t2.platform_id) AS subPlatformId,
             IFNULL(t1.sub_platform_name,t2.platform_name) AS platformName,
+            t1.channel_id AS channelId,
             t1.channel_status AS channelStatus,
             t1.fail_times AS failTimes
         FROM

@@ -99,7 +99,7 @@
 
         <Modal
                 v-model="withHoldLimitModel"
-                title="新增渠道"
+                :title="subTitle"
                 :mask-closable="false">
             <i-form ref="withHoldLimitForm" :model="withHoldLimitForm" :rules="withHoldLimitValidate"
                     :label-width="150">

@@ -21,7 +21,21 @@ window.layinit(function (htConfig) {
             matchedBankStatement: [],
             factRepayPreview: {},
             factRepaymentInfo: {},
-            thisTimeRepaymentInfo: {},
+            thisTimeRepaymentInfo: {
+                repayDate: '',
+                item10: '',
+                item20: '',
+                item30: '',
+                item50: '',
+                subtotal: '',
+                overDays: '',
+                offlineOverDue: '',
+                onlineOverDue: '',
+                penalty: '',
+                derate: '',
+                planRepayBalance: '',
+                total: '',
+            },
             table: {
                 reg: {
                     col: [{
@@ -563,12 +577,45 @@ window.layinit(function (htConfig) {
                         })
                     })
             },
+            getSettleInfo() {
+                axios.get(fpath + 'settle/settleInfo?businessId=' + businessId + "&afterId=" + afterId +(planId?('&planId='+planId):''))
+                    .then(function (res) {
+                        if (res.data.code == '1') {
+                            let data = res.data.data;
+                            app.thisTimeRepaymentInfo.repayDate = data.repayPlanDate
+                            app.thisTimeRepaymentInfo.item10 = data.item10
+                            app.thisTimeRepaymentInfo.item20 = data.item20
+                            app.thisTimeRepaymentInfo.item30 = data.item30
+                            app.thisTimeRepaymentInfo.item50 = data.item50
+                            app.thisTimeRepaymentInfo.subtotal = data.subtotal
+                            app.thisTimeRepaymentInfo.overDays = data.overDueDays
+                            app.thisTimeRepaymentInfo.offlineOverDue = data.offlineOverDue
+                            app.thisTimeRepaymentInfo.onlineOverDue = data.onlineOverDue
+                            app.thisTimeRepaymentInfo.penalty = data.penalty
+                            app.thisTimeRepaymentInfo.derate = data.derate
+                            app.thisTimeRepaymentInfo.planRepayBalance = data.planRepayBalance
+                            app.thisTimeRepaymentInfo.total = data.total
+
+                            console.log(res.data);
+                        } else {
+                            app.$Message.error({
+                                content: res.data.msg
+                            })
+                        }
+                    })
+                    .catch(function (err) {
+                        app.$Message.error({
+                            content: '获取结清应还信息失败'
+                        })
+                    })
+            },
             
         },
         created: function () {
             this.getBaseInfo()
             this.getMatched()
             this.listRepayment()
+            this.getSettleInfo()
         }
     })
 })
