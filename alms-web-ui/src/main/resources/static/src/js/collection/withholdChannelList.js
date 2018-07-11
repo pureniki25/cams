@@ -198,14 +198,8 @@ window.layinit(function (htConfig) {
 
                 if(e ==5){
                     this.disabledFlag = false;
-                }else if(e==3) {
+                }else {
                     this.disabledFlag = true;
-                    vm.withHoldChanelForm.subPlatformId=3;
-                    vm.withHoldChanelForm.subPlatformName='宝付代扣';
-                }else if(e==0){
-                    this.disabledFlag = true;
-                    vm.withHoldChanelForm.subPlatformId=0;
-                    vm.withHoldChanelForm.subPlatformName='易宝代扣';
                 }
 
             },
