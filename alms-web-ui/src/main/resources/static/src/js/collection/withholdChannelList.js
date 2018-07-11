@@ -208,6 +208,7 @@ window.layinit(function (htConfig) {
                 this.$refs[name].resetFields();
                 vm.title="新增渠道";
                 vm.withHoldChanelModel = true;
+                vm.withHoldChanelForm.channelId='';
             },
             submitHoldChanel(name) {
                 var platformId = vm.withHoldChanelForm.platformId;
@@ -224,6 +225,7 @@ window.layinit(function (htConfig) {
                 console.log("channelStatus", typeof channelStatus);
                 console.log("failTimes", typeof failTimes);
                 console.log("channelLevel", typeof channelLevel);
+                console.log("channelId", typeof channelId);
                 this.$refs[name].validate((valid) => {
                     if (valid) {
                         //提交
