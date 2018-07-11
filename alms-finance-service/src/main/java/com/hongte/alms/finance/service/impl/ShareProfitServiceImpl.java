@@ -2464,6 +2464,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                 logger.error(e.getMessage(), e);
                 record.setApiReturnInfo(e.getMessage());
             }
+            logger.info("平台合规化还款接口返回结果：{}", JSONObject.toJSONString(result));
             sysApiCallFailureRecordService.updateById(record);
             if (result == null || !"1".equals(result.getCode())) {
                 sysApiCallFailureRecordService.insert(record);
