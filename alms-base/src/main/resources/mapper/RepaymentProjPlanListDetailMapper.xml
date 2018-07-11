@@ -52,4 +52,19 @@
 			ppld.plan_item_type,
 			ppld.fee_id
 	</select>
+	
+	<select id="calcBizPlanListUnpaid" resultType="java.math.BigDecimal">
+		SELECT
+			IFNULL(sum(proj_plan_amount-IFNULL(proj_fact_amount,0)),0)
+		FROM
+			tb_repayment_proj_plan_list_detail 
+		WHERE
+			plan_list_id = #{bizPlanListId} 
+			<if test="planItemType != null">
+				AND plan_item_type = #{planItemType} 
+			</if>
+			<if test="feeId != null">
+				AND fee_id = #{feeId}
+			</if>
+	</select>
 </mapper>

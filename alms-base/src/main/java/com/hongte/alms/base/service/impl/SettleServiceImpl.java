@@ -5,6 +5,7 @@ package com.hongte.alms.base.service.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +13,18 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.hongte.alms.base.entity.ProjExtRate;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
+import com.hongte.alms.base.exception.ServiceRuntimeException;
+import com.hongte.alms.base.mapper.ProjExtRateMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListDetailMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListMapper;
+import com.hongte.alms.base.mapper.RepaymentProjPlanListDetailMapper;
 import com.hongte.alms.base.service.SettleService;
+import com.hongte.alms.base.vo.finance.SettleInfoVO;
+import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
 
 /**
@@ -27,7 +36,12 @@ public class SettleServiceImpl implements SettleService {
 	RepaymentBizPlanListMapper repaymentBizPlanListMapper;
 
 	@Autowired
+	RepaymentProjPlanListDetailMapper repaymentProjPlanListDetailMapper ;
+	@Autowired
 	RepaymentBizPlanListDetailMapper repaymentBizPlanListDetailMapper ;
+	
+	@Autowired
+	ProjExtRateMapper projExtRateMapper ;
 	@Override
 	public JSONObject settleInfo(String businessId, String afterId, String planId) {
 		EntityWrapper<RepaymentBizPlanList> planListEW = new EntityWrapper<>();
@@ -50,8 +64,113 @@ public class SettleServiceImpl implements SettleService {
 		List<JSONObject> derateList = new ArrayList<>();
 		List<JSONObject> lackList = new ArrayList<>();
 		for (RepaymentBizPlanList repaymentBizPlanList : planLists) {
+			
 		}
 		return null;
+	}
+
+	@Override
+	public SettleInfoVO settleInfoVO(String businessId, String afterId, String planId) {
+		RepaymentBizPlanList cur = new RepaymentBizPlanList() ;
+		cur.setOrigBusinessId(businessId);cur.setAfterId(afterId);
+		cur = repaymentBizPlanListMapper.selectOne(cur);
+		if (cur==null) {
+			throw new ServiceRuntimeException("找不到当前期还款计划");
+		}
+		SettleInfoVO infoVO = new SettleInfoVO() ;
+		infoVO.setRepayPlanDate(cur.getDueDate());
+		int diff = DateUtil.getDiffDays(cur.getDueDate(), new Date());
+		if (diff>0&&cur.getCurrentStatus().equals(RepayPlanStatus.OVERDUE.getName())) {
+			infoVO.setOverDueDays(diff);
+		}
+		List<RepaymentBizPlanList> selectNextPlanLists = selectNextPlanLists(cur, planId);
+		calcCurPeriod(cur,infoVO);
+		for (RepaymentBizPlanList repaymentBizPlanList : selectNextPlanLists) {
+			BigDecimal item10 = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList.getPlanListId(), "10", null);
+			BigDecimal item20 = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList.getPlanListId(), "20", null);
+			BigDecimal item30 = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList.getPlanListId(), "30", null);
+			BigDecimal item50 = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList.getPlanListId(), "50", null);
+			BigDecimal item60online = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList.getPlanListId(), "60", RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid());
+			BigDecimal item60offline = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList.getPlanListId(), "60", RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid());
+			
+			infoVO.setItem10(infoVO.getItem10().add(item10));
+			infoVO.setItem20(infoVO.getItem20().add(item20));
+			infoVO.setItem30(infoVO.getItem30().add(item30));
+			infoVO.setItem50(infoVO.getItem50().add(item50));
+			infoVO.setOfflineOverDue(infoVO.getOfflineOverDue().add(item60offline));
+			infoVO.setOnlineOverDue(infoVO.getOnlineOverDue().add(item60online));
+		}
+		
+		infoVO.setDerates(repaymentBizPlanListDetailMapper.selectLastPlanListDerateFees(businessId,cur.getDueDate(), planId));
+		infoVO.setLackFees(repaymentBizPlanListDetailMapper.selectLastPlanListLackFees(businessId,cur.getDueDate(), planId));
+		
+		projExtRateMapper.selectList(new EntityWrapper<>());
+		
+		infoVO.setSubtotal(infoVO.getSubtotal().add(infoVO.getItem10()).add(infoVO.getItem20()).add(infoVO.getItem30()).add(infoVO.getItem50()));
+		infoVO.setTotal(infoVO.getTotal().add(infoVO.getSubtotal()).add(infoVO.getOfflineOverDue()).add(infoVO.getOnlineOverDue()).add(infoVO.getDerate()).add(infoVO.getPlanRepayBalance()));
+		
+		return infoVO;
+	}
+	
+	/**
+	 * 计算当前期未还金额
+	 * @author 王继光
+	 * 2018年7月7日 下午4:33:49
+	 * @param repaymentBizPlanList
+	 * @param infoVO
+	 */
+	private void calcCurPeriod(RepaymentBizPlanList repaymentBizPlanList,SettleInfoVO infoVO) {
+		BigDecimal item10 = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList.getPlanListId(), "10", null);
+		BigDecimal item20 = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList.getPlanListId(), "20", null);
+		BigDecimal item30 = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList.getPlanListId(), "30", null);
+		BigDecimal item50 = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList.getPlanListId(), "50", null);
+		BigDecimal item60online = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList.getPlanListId(), "60", RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid());
+		BigDecimal item60offline = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList.getPlanListId(), "60", RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid());
+		
+		infoVO.setItem10(infoVO.getItem10().add(item10));
+		infoVO.setItem20(infoVO.getItem20().add(item20));
+		infoVO.setItem30(infoVO.getItem30().add(item30));
+		infoVO.setItem50(infoVO.getItem50().add(item50));
+		infoVO.setOfflineOverDue(infoVO.getOfflineOverDue().add(item60offline));
+		infoVO.setOnlineOverDue(infoVO.getOnlineOverDue().add(item60online));
+	}
+	
+	/**
+	 * 查找往期还款计划
+	 * @author 王继光
+	 * 2018年7月5日 下午6:23:48
+	 * @param cur
+	 * @param planId
+	 * @return
+	 */
+	private List<RepaymentBizPlanList> selectLastPlanLists(RepaymentBizPlanList cur, String planId){
+		EntityWrapper<RepaymentBizPlanList> planListEW = new EntityWrapper<>();
+		planListEW.eq("orig_business_id", cur.getOrigBusinessId()).eq("after_id", cur.getAfterId());
+		planListEW.lt("due_date", cur.getDueDate());
+		if (!StringUtil.isEmpty(planId)) {
+			planListEW.eq("plan_id", planId);
+		}
+		planListEW.orderBy("due_date");
+		return repaymentBizPlanListMapper.selectList(planListEW);
+	}
+	
+	/**
+	 * 查询往后的还款计划
+	 * @author 王继光
+	 * 2018年7月5日 下午6:25:18
+	 * @param cur
+	 * @param planId
+	 * @return
+	 */
+	private List<RepaymentBizPlanList> selectNextPlanLists(RepaymentBizPlanList cur,String planId){
+		EntityWrapper<RepaymentBizPlanList> planListEW = new EntityWrapper<>();
+		planListEW.eq("orig_business_id", cur.getOrigBusinessId());
+		planListEW.gt("due_date", cur.getDueDate());
+		if (!StringUtil.isEmpty(planId)) {
+			planListEW.eq("plan_id", planId);
+		}
+		planListEW.orderBy("due_date");
+		return repaymentBizPlanListMapper.selectList(planListEW);
 	}
 
 }

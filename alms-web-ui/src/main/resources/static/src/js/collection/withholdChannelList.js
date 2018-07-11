@@ -42,6 +42,7 @@ window.layinit(function (htConfig) {
             return {
                 disabledFlag: true,
                 withHoldChanelModel: false,
+                title:'',
                 platformType: [],
                 loading: false,
                 searchForm: {
@@ -173,6 +174,7 @@ window.layinit(function (htConfig) {
                 vm.toLoading();
             },
             editWithholdChannel(id) {
+                vm.title="编辑渠道";
                 vm.withHoldChanelModel = true;
                 axios.get(basePath + 'withholdManage/getWithholdChannel?channelId=' + id)
                     .then(function (res) {
@@ -204,7 +206,9 @@ window.layinit(function (htConfig) {
             addHoldChannel(name) {
                 // console.log("addHoldChannel",addHoldChannel);
                 this.$refs[name].resetFields();
+                vm.title="新增渠道";
                 vm.withHoldChanelModel = true;
+                vm.withHoldChanelForm.channelId='';
             },
             submitHoldChanel(name) {
                 var platformId = vm.withHoldChanelForm.platformId;
@@ -216,10 +220,12 @@ window.layinit(function (htConfig) {
                 var subPlatformId = vm.withHoldChanelForm.subPlatformId;
                 var subPlatformName = vm.withHoldChanelForm.subPlatformName;
 
+
                 console.log("platformId", typeof platformId);
                 console.log("channelStatus", typeof channelStatus);
                 console.log("failTimes", typeof failTimes);
                 console.log("channelLevel", typeof channelLevel);
+                console.log("channelId", typeof channelId);
                 this.$refs[name].validate((valid) => {
                     if (valid) {
                         //提交

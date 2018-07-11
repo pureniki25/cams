@@ -76,4 +76,9 @@ public class FinanceBaseDto {
     private String userId;
 
     private String userName;
+    
+    /**
+     * 本次还款已完成的标的还款计划
+     */
+    private List<RepaymentProjPlanList> curTimeRepaidProjPlanList ;
 }

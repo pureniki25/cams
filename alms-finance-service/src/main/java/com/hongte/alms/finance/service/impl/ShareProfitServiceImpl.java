@@ -239,7 +239,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         financeBaseDto.setRepaymentProjPlanBaks(new ArrayList<>());
         financeBaseDto.setRepaymentProjPlanListBaks(new ArrayList<>());
         financeBaseDto.setRepaymentProjPlanListDetailBaks(new ArrayList<>());
-
+        financeBaseDto.setCurTimeRepaidProjPlanList(new ArrayList<>());
         LoginInfoDto loginInfo = loginUserInfoHelper.getLoginInfo();
         if (loginInfo != null) {
             financeBaseDto.setUserId(loginInfo.getUserId());
@@ -1660,7 +1660,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 //						}
 			            
 			            BigDecimal pjlFactAmount = sumProjPlanListFactAmountInMem(projPlanList.getProjPlanListId(), financeBaseDto);
-			            BigDecimal pjlOnlineAmount = sumProjPlanListOnlineAmountInMem(projPlanList.getProjPlanListId(),financeBaseDto);
+			            BigDecimal pjlOnlineAmount = sumProjPlanListOnlinePartAmountInMem(projPlanList.getProjPlanListId(),financeBaseDto);
 						/* 如果实还大于应还+逾期 */
 			            if (pjlFactAmount.compareTo(projPlanList.getTotalBorrowAmount()
 			                    .add(projPlanList.getOverdueAmount() == null ? BigDecimal.ZERO
@@ -1668,14 +1668,16 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			                projPlanList.setCurrentStatus(RepayPlanStatus.REPAYED.getName());
 			                projPlanList.setCurrentSubStatus(RepayPlanStatus.REPAYED.getName());
 			                projPlanList.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
+			                financeBaseDto.getCurTimeRepaidProjPlanList().add(projPlanList);
 			                setRepayConfirmedFlagPro(projPlanList, financeBaseDto);
 			            } else {
 			                projPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
 			                projPlanList.setCurrentSubStatus(RepayPlanStatus.REPAYING.getName());
 			                projPlanList.setRepayFlag(null);
 			                
-			                if (pjlFactAmount.compareTo(projPlanList.getTotalBorrowAmount().add(pjlOnlineAmount)) >= 0) {
+			                if (pjlFactAmount.compareTo(pjlOnlineAmount) >= 0) {
 			                	projPlanList.setRepayStatus(SectionRepayStatusEnum.ONLINE_REPAID.getKey());
+                                financeBaseDto.getCurTimeRepaidProjPlanList().add(projPlanList);
 			                } else {
 			                	projPlanList.setRepayStatus(SectionRepayStatusEnum.SECTION_REPAID.getKey());
 			                }
@@ -1701,7 +1703,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			            bizPlanList.setFinanceComfirmDate(new Date());
 
 			            BigDecimal bplFactAmount = sumBizPlanListFactAmount(bizPlanList.getPlanListId(), financeBaseDto);
-			            BigDecimal bplOnlineAmount = sumBizPlanListOnlineAmount(bizPlanList.getPlanListId(),financeBaseDto);
+			            BigDecimal bplOnlineAmount = sumBizPlanListOnlinePartAmount(bizPlanList.getPlanListId(),financeBaseDto);
 			            if (bplFactAmount.compareTo(
 			                    bizPlanList.getTotalBorrowAmount().add(bizPlanList.getOverdueAmount() == null ? new BigDecimal("0")
 			                            : bizPlanList.getOverdueAmount())) >= 0) {
@@ -1721,8 +1723,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 
 //							bizPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
 							bizPlanList.setCurrentSubStatus(RepayPlanStatus.PARTAIL.getName());
-			                projPlanList.setRepayFlag(null);
-			                if (bplFactAmount.compareTo(bizPlanList.getTotalBorrowAmount().add(bplOnlineAmount)) >= 0) {
+							bizPlanList.setRepayFlag(null);
+			                if (bplFactAmount.compareTo(bplOnlineAmount) >= 0) {
 			                    bizPlanList.setRepayStatus(SectionRepayStatusEnum.ONLINE_REPAID.getKey());
 			                } else {
 			                    bizPlanList.setRepayStatus(SectionRepayStatusEnum.SECTION_REPAID.getKey());
@@ -2054,14 +2056,14 @@ public class ShareProfitServiceImpl implements ShareProfitService {
      * @param financeBaseDto
      * @return
      */
-    private BigDecimal sumProjPlanListOnlineAmountInMem(String projPlanListId, FinanceBaseDto financeBaseDto) {
+    private BigDecimal sumProjPlanListOnlinePartAmountInMem(String projPlanListId, FinanceBaseDto financeBaseDto) {
         BigDecimal res = new BigDecimal("0");
         for (RepaymentProjPlanDto projPlanDto : financeBaseDto.getPlanDto().getProjPlanDtos()) {
         	for (RepaymentProjPlanListDto projPlanListDto : projPlanDto.getProjPlanListDtos()) {
         		String projPlanListIdc = projPlanListDto.getRepaymentProjPlanList().getProjPlanListId();
         		if (projPlanListId.equals(projPlanListIdc)) {
         			for (RepaymentProjPlanListDetail projPlanListDetail : projPlanListDto.getProjPlanListDetails()) {
-        				if (projPlanListDetail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
+        				if (projPlanListDetail.getShareProfitIndex()<Constant.ONLINE_OFFLINE_FEE_BOUNDARY) {
         					res = res.add(projPlanListDetail.getProjPlanAmount() == null ? new BigDecimal("0")
         							: projPlanListDetail.getProjPlanAmount());
 						}
@@ -2161,23 +2163,20 @@ public class ShareProfitServiceImpl implements ShareProfitService {
     }
     
     /**
-     * 计算bizPlanList线上滞纳金
+     * 计算bizPlanList线上部分总金额
      * @author 王继光
      * 2018年7月10日 下午4:35:32
      * @param bizPlanListId
      * @param financeBaseDto
      * @return
      */
-    private BigDecimal sumBizPlanListOnlineAmount(String bizPlanListId, FinanceBaseDto financeBaseDto) {
+    private BigDecimal sumBizPlanListOnlinePartAmount(String bizPlanListId, FinanceBaseDto financeBaseDto) {
         BigDecimal res = new BigDecimal("0");
         for (RepaymentBizPlanListDto bizPlanListDto : financeBaseDto.getPlanDto().getBizPlanListDtos()) {
             for (RepaymentBizPlanListDetail bizPlanListDetail : bizPlanListDto.getBizPlanListDetails()) {
-                if (bizPlanListDetail.getPlanListId().equals(bizPlanListId)) {
-                	if (bizPlanListDetail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
+                if (bizPlanListDetail.getShareProfitIndex() < Constant.ONLINE_OFFLINE_FEE_BOUNDARY) {
                 		 res = res.add(bizPlanListDetail.getPlanAmount() == null ? new BigDecimal("0")
                                  : bizPlanListDetail.getPlanAmount());
-					}
-                   
                 }
             }
         }
@@ -2406,17 +2405,22 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             projPlanListDetailBak.setConfirmLogId(confirmLogId);
             projPlanListDetailBak.insert();
         }
-
-        String afterId = financeBaseDto.getAfterId();
+        List<RepaymentProjPlanList>  ptojPlanList = removeDuplicateProjPlist(financeBaseDto.getCurTimeRepaidProjPlanList());
+//        String afterId = financeBaseDto.getAfterId();
         String businessId = financeBaseDto.getBusinessId();
         executor.execute(new Runnable() {
             @Override
             public void run() {
                 logger.info("调用平台合规化还款接口开始，confirmLogId：{}", confirmLogId);
                 try {
-                    Thread.sleep(2000);
-                    tdrepayRecharge(confirmLogId, businessId, afterId);
-                } catch (InterruptedException e) {
+                    //睡一下，让还款的信息先存完。
+                    try{
+                        Thread.sleep(1000);
+                    }catch (InterruptedException e){
+                        logger.error(e.getMessage(), e);
+                    }
+                    tdrepayRecharge(ptojPlanList);
+                } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                     Thread.currentThread().interrupt();
                 }
@@ -2428,9 +2432,27 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         //下面要触发往信贷更新还未计划数据，直接调用open中的接口方法。 张贵宏 2018.06.28
         executor.execute(() -> {
             logger.info("触发往信贷更新还未计划数据开始，businessId:[{}]", businessId);
+            //睡一下，让还款的信息先存完。
+            try{
+                Thread.sleep(1000);
+            }catch (Exception e){
+                logger.error(e.getMessage(), e);
+            }
             updateRepayPlanToLMS(businessId);
             logger.info("触发往信贷更新还未计划数据结束，businessId:[{}]", businessId);
         });
+    }
+
+    private static ArrayList<RepaymentProjPlanList> removeDuplicateProjPlist(List<RepaymentProjPlanList> projPlanLists) {
+        Set<RepaymentProjPlanList> set = new TreeSet<RepaymentProjPlanList>(new Comparator<RepaymentProjPlanList>() {
+            @Override
+            public int compare(RepaymentProjPlanList o1, RepaymentProjPlanList o2) {
+                //字符串,则按照asicc码升序排列
+                return o1.getProjPlanId().compareTo(o2.getProjPlanId());
+            }
+        });
+        set.addAll(projPlanLists);
+        return new ArrayList<RepaymentProjPlanList>(set);
     }
 
 
@@ -2468,52 +2490,61 @@ public class ShareProfitServiceImpl implements ShareProfitService {
     }
 
 
-    private void tdrepayRecharge(String confirmLogId, String busId, String afterId) {
+    private void tdrepayRecharge(List<RepaymentProjPlanList> projPlanLists) {
 
-        SysApiCallFailureRecord record = new SysApiCallFailureRecord();
-        Result result = null;
-        try {
-            record.setModuleName(AlmsServiceNameEnums.FINANCE.getName());
-            record.setApiCode(Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT);
-            record.setApiName(Constant.INTERFACE_NAME_PLATREPAY_REPAYMENT);
-            record.setRefId(confirmLogId);
-            record.setCreateUser(
-                    StringUtil.isEmpty(loginUserInfoHelper.getUserId()) ? "null" : loginUserInfoHelper.getUserId());
-            record.setCraeteTime(new Date());
-            record.setTargetUrl(Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT);
+        if(projPlanLists==null||projPlanLists.size()==0){
+            return;
+        }
+//        //睡一下，让还款的信息先存完。
+//        try {
+//            Thread.sleep(500);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+        for(RepaymentProjPlanList repaymentProjPlanList : projPlanLists){
+            SysApiCallFailureRecord record = new SysApiCallFailureRecord();
+            Result result = null;
+            try {
+                record.setModuleName(AlmsServiceNameEnums.FINANCE.getName());
+                record.setApiCode(Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT);
+                record.setApiName(Constant.INTERFACE_NAME_PLATREPAY_REPAYMENT);
+                record.setRefId(repaymentProjPlanList.getProjPlanListId());
+                record.setCreateUser(
+                        StringUtil.isEmpty(loginUserInfoHelper.getUserId()) ? "null" : loginUserInfoHelper.getUserId());
+                record.setCraeteTime(new Date());
+                record.setTargetUrl(Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT);
 
-            RepaymentProjPlanList repaymentProjPlanList = repaymentProjPlanListService
-                    .selectOne(new EntityWrapper<RepaymentProjPlanList>().eq("orig_business_id", busId).eq("after_id",
-                            afterId));
+                RepaymentProjPlan plan = null;
 
-            RepaymentProjPlan plan = null;
-
-            if (repaymentProjPlanList != null) {
-                plan = repaymentProjPlanService.selectById(repaymentProjPlanList.getProjPlanId());
-            }
-
-            if (plan != null) {
-
-                Map<String, Object> paramMap = new HashMap<>();
-                paramMap.put("confirmLogId", confirmLogId);
-                paramMap.put("afterId", afterId);
-                paramMap.put("projectId", plan.getProjectId());
-
-                record.setApiParamPlaintext(JSONObject.toJSONString(paramMap));
-
-                // 平台合规化还款接口
-                result = platformRepaymentFeignClient.repayment(paramMap);
-                if (result != null) {
-                    record.setApiReturnInfo(JSONObject.toJSONString(result));
+                if (repaymentProjPlanList != null) {
+                    plan = repaymentProjPlanService.selectById(repaymentProjPlanList.getProjPlanId());
                 }
+
+                if (plan != null) {
+
+                    Map<String, Object> paramMap = new HashMap<>();
+                    paramMap.put("projPlanListId",repaymentProjPlanList.getProjPlanListId());
+
+
+                    record.setApiParamPlaintext(JSONObject.toJSONString(paramMap));
+//                    sysApiCallFailureRecordService.insert(record);
+
+                    // 平台合规化还款接口
+                    result = platformRepaymentFeignClient.repayment(paramMap);
+                    if (result != null) {
+                        record.setApiReturnInfo(JSONObject.toJSONString(result));
+                    }
+                }
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                record.setApiReturnInfo(e.getMessage());
             }
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            record.setApiReturnInfo(e.getMessage());
+            sysApiCallFailureRecordService.updateById(record);
+            if (result == null || !"1".equals(result.getCode())) {
+                sysApiCallFailureRecordService.insert(record);
+            }
         }
-        if (result == null || !"1".equals(result.getCode())) {
-            sysApiCallFailureRecordService.insert(record);
-        }
+
     }
 
     public static void main(String[] args) {

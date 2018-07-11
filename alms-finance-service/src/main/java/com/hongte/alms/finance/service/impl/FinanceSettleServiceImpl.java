@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service("FinanceSettleService")
-public class FinanceSettleServiceImpl implements FinanceSettleService{
+public class FinanceSettleServiceImpl implements FinanceSettleService {
     private static Logger logger = LoggerFactory.getLogger(FinanceSettleServiceImpl.class);
     @Autowired
     BasicBusinessMapper basicBusinessMapper;
@@ -105,14 +105,15 @@ public class FinanceSettleServiceImpl implements FinanceSettleService{
         List<RepaymentProjPlanListDto> projDtoListList = new ArrayList<>();
 
         //查询本次业务下的所有还款计划 计算应还项
-        List<RepaymentBizPlanList> repaymentBizPlanListList = repaymentBizPlanListMapper.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("plan_id",planId));
+        List<RepaymentBizPlanList> repaymentBizPlanListList = repaymentBizPlanListMapper.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("plan_id", planId));
         if (!CollectionUtils.isEmpty(repaymentBizPlanListList)) {
             for (RepaymentBizPlanList repaymentBizPlanList : repaymentBizPlanListList) {
 
                 BigDecimal totalBorrowAmount = repaymentBizPlanList.getTotalBorrowAmount();
                 BigDecimal overdueAmount = repaymentBizPlanList.getOverdueAmount();
                 BigDecimal derateAmount = repaymentBizPlanList.getDerateAmount();//减免
-                shouldReturnAmount = shouldReturnAmount.add(totalBorrowAmount).add(overdueAmount);  //计算所有的应还
+
+                shouldReturnAmount = shouldReturnAmount.add(totalBorrowAmount).add(overdueAmount).subtract(derateAmount);  //计算所有的应还
 
                 //组装还款计划对象
                 RepaymentBizPlanListDto repaymentBizPlanListDto = new RepaymentBizPlanListDto();
@@ -127,7 +128,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService{
         }
 
         //查询本次业务下的所有还款计划 计算应还项
-        List<RepaymentProjPlanList> repaymentProjPlanListList = repaymentProjPlanListMapper.selectList(new EntityWrapper<RepaymentProjPlanList>().eq("business_id", businessId).eq("plan_id",planId));
+        List<RepaymentProjPlanList> repaymentProjPlanListList = repaymentProjPlanListMapper.selectList(new EntityWrapper<RepaymentProjPlanList>().eq("business_id", businessId).eq("plan_id", planId));
         if (!CollectionUtils.isEmpty(repaymentProjPlanListList)) {
             for (RepaymentProjPlanList repaymentProjPlanList : repaymentProjPlanListList) {
                 BigDecimal totalBorrowAmount = repaymentProjPlanList.getTotalBorrowAmount();
@@ -180,28 +181,60 @@ public class FinanceSettleServiceImpl implements FinanceSettleService{
         } else {
             //======================================开始进行结清操作
 
-           RepaymentConfirmLog repaymentConfirmLog=new RepaymentConfirmLog();
+            RepaymentConfirmLog repaymentConfirmLog = new RepaymentConfirmLog();
 
 
-            if(CollectionUtils.isNotEmpty(projDtoListList)){
-                for(RepaymentProjPlanListDto repaymentProjPlanListDto : projDtoListList){
+            if (CollectionUtils.isNotEmpty(projDtoListList)) {
+                for (RepaymentProjPlanListDto repaymentProjPlanListDto : projDtoListList) {
 
                     RepaymentProjPlanList repaymentProjPlanList = repaymentProjPlanListDto.getRepaymentProjPlanList();
                     String currentStatus = repaymentProjPlanList.getCurrentStatus();
-                    if(RepayCurrentStatusEnums.还款中.equals(currentStatus) || RepayCurrentStatusEnums.逾期.equals(currentStatus)){
+                    if (RepayCurrentStatusEnums.还款中.equals(currentStatus) || RepayCurrentStatusEnums.逾期.equals(currentStatus)) {
+                        List<RepaymentProjPlanListDetail> projPlanListDetails = repaymentProjPlanListDto.getProjPlanListDetails(); //需要还款的详情
 
-                    }
+                        String projPlanListId = repaymentProjPlanList.getProjPlanListId(); //标的还款计划列表ID
 
 
-                    List<RepaymentProjPlanListDetail> projPlanListDetails = repaymentProjPlanListDto.getProjPlanListDetails();
 //                    RepaymentProjFactRepay repaymentProjFactRepay=new RepaymentProjFactRepay();
 //                    repaymentProjFactRepay.setAfterId();
-                    if(CollectionUtils.isNotEmpty(projPlanListDetails)){
+                        if (CollectionUtils.isNotEmpty(projPlanListDetails)) {
 
-                        for(RepaymentProjPlanListDetail repaymentProjPlanListDetail : projPlanListDetails){
+                            for (RepaymentProjPlanListDetail repaymentProjPlanListDetail : projPlanListDetails) {
 
+                                BigDecimal projPlanAmount = repaymentProjPlanListDetail.getProjPlanAmount();//标应还金额
+
+                                BigDecimal derateAmount = repaymentProjPlanListDetail.getDerateAmount();//减免金额
+
+                                String projPlanDetailId = repaymentProjPlanListDetail.getProjPlanDetailId();
+                                //通过标的还款计划详情ID查询他的单个费用项实还信息
+                                List<RepaymentProjFactRepay> repaymentProjFactRepayList = repaymentProjFactRepayMapper.selectList(new EntityWrapper<RepaymentProjFactRepay>().eq("proj_plan_detail_id", projPlanDetailId));
+
+                                if (CollectionUtils.isNotEmpty(repaymentProjFactRepayList)) { //单个费用项存在实还信息
+                                    //单个费用项进行累加
+                                    BigDecimal proJone = BigDecimal.ZERO;
+
+                                    for (RepaymentProjFactRepay repaymentProjFactRepay : repaymentProjFactRepayList) {
+                                        BigDecimal factAmount = repaymentProjFactRepay.getFactAmount();
+                                        proJone = proJone.add(factAmount);
+                                    }
+
+                                  //如果已还的小于应还减去减免 则需新增记录
+                                    if(projPlanAmount.subtract(derateAmount) .compareTo(proJone) >0){
+
+                                    }
+
+
+
+
+                                } else {  //不存在实还
+
+                                }
+                            }
                         }
+
                     }
+
+
                 }
 
 
