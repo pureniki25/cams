@@ -191,6 +191,14 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                     String currentStatus = repaymentProjPlanList.getCurrentStatus();
                     if (RepayCurrentStatusEnums.还款中.equals(currentStatus) || RepayCurrentStatusEnums.逾期.equals(currentStatus)) {
                         List<RepaymentProjPlanListDetail> projPlanListDetails = repaymentProjPlanListDto.getProjPlanListDetails();
+
+
+                        String projPlanListId = repaymentProjPlanList.getProjPlanListId(); //标的还款计划列表ID
+
+                        //通过标的还款计划查询他的实还信息
+//                        repaymentProjFactRepayMapper.selectList(new EntityWrapper<>().eq(""))
+
+
 //                    RepaymentProjFactRepay repaymentProjFactRepay=new RepaymentProjFactRepay();
 //                    repaymentProjFactRepay.setAfterId();
                         if (CollectionUtils.isNotEmpty(projPlanListDetails)) {
