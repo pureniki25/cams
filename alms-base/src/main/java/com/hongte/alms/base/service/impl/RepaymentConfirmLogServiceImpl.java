@@ -252,7 +252,7 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
             RepaymentBizPlanListDetail detail = new RepaymentBizPlanListDetail(repaymentBizPlanListDetailBak);
             repaymentBizPlanListDetailMapper.deleteById(detail.getPlanDetailId());
             detail.insert();
-            bplFactAmount = bplFactAmount.add(detail.getFactAmount());
+            bplFactAmount = bplFactAmount.add(detail.getFactAmount()==null?BigDecimal.ZERO:detail.getFactAmount());
             repaymentBizPlanListDetailBak.delete(new EntityWrapper<>()
                     .eq("plan_detail_id", repaymentBizPlanListDetailBak.getPlanDetailId())
                     .eq("confirm_log_id", repaymentBizPlanListDetailBak.getConfirmLogId()));
@@ -265,6 +265,7 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
             
             RepaymentBizPlanListSynch synch = new RepaymentBizPlanListSynch() ;
             synch.setPlanListId(list.getPlanListId());
+            synch = repaymentBizPlanListSynchMapper.selectOne(synch) ;
             synch.setCurrentStatus(list.getCurrentStatus());
             synch.setCurrentSubStatus(list.getCurrentSubStatus());
             synch.setRepayStatus(list.getRepayStatus());
@@ -272,7 +273,7 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
             synch.setFinanceConfirmUser(list.getFinanceConfirmUser());
             synch.setFinanceConfirmUserName(list.getFinanceConfirmUserName());
             synch.setFactAmountExt(bplFactAmount);
-            repaymentBizPlanListSynchMapper.updateById(synch);
+            repaymentBizPlanListSynchMapper.updateAllColumnById(synch);
             
             repaymentBizPlanListBak.delete(new EntityWrapper<>()
                     .eq("plan_list_id", repaymentBizPlanListBak.getPlanListId())
