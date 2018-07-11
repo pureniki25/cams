@@ -1534,8 +1534,24 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 						for (RepaymentProjFactRepay repaymentProjFactRepay : list) {
 							factAmount = repaymentProjFactRepay.getFactAmount().add(factAmount);
 						}
-						feeDetails.append(factAmount.setScale(2, RoundingMode.HALF_UP)).append(planListDetail.getPlanItemName()).append(" ");
+						feeDetails.append(factAmount.setScale(2, RoundingMode.HALF_UP));
+						if (planListDetail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
+							feeDetails.append("线上滞纳金").append(" ");
+						}else if (planListDetail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
+							feeDetails.append("线下滞纳金").append(" ");
+						}else {
+							feeDetails.append(planListDetail.getPlanItemName()).append(" ");
+						}
 						factTotalAmount = factTotalAmount.add(factAmount);
+					}else {
+						feeDetails.append(BigDecimal.ZERO.setScale(2));
+						if (planListDetail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
+							feeDetails.append("线上滞纳金").append(" ");
+						}else if (planListDetail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
+							feeDetails.append("线下滞纳金").append(" ");
+						}else {
+							feeDetails.append(planListDetail.getPlanItemName()).append(" ");
+						}
 					}
 				}
 			}
@@ -2077,14 +2093,26 @@ public class ShareProfitServiceImpl implements ShareProfitService {
      */
     private BigDecimal sumBizPlanListFactAmount(String bizPlanListId, FinanceBaseDto financeBaseDto) {
         BigDecimal res = new BigDecimal("0");
-        for (RepaymentBizPlanListDto bizPlanListDto : financeBaseDto.getPlanDto().getBizPlanListDtos()) {
+        
+        for (RepaymentProjPlanDto projPlanDto : financeBaseDto.getPlanDto().getProjPlanDtos()) {
+			for (RepaymentProjPlanListDto projPlanListDto : projPlanDto.getProjPlanListDtos()) {
+				if (projPlanListDto.getRepaymentProjPlanList().getPlanListId().equals(bizPlanListId)) {
+					for (RepaymentProjPlanListDetail projPlanListDetail : projPlanListDto.getProjPlanListDetails()) {
+						res = res.add(projPlanListDetail.getProjFactAmount() == null ? new BigDecimal("0")
+	                            : projPlanListDetail.getProjFactAmount());
+					}
+				}
+			}
+		}
+        
+        /*for (RepaymentBizPlanListDto bizPlanListDto : financeBaseDto.getPlanDto().getBizPlanListDtos()) {
             for (RepaymentBizPlanListDetail bizPlanListDetail : bizPlanListDto.getBizPlanListDetails()) {
                 if (bizPlanListDetail.getPlanListId().equals(bizPlanListId)) {
                     res = res.add(bizPlanListDetail.getFactAmount() == null ? new BigDecimal("0")
                             : bizPlanListDetail.getFactAmount());
                 }
             }
-        }
+        }*/
         return res;
     }
     
@@ -2419,6 +2447,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
     private void tdrepayRecharge(List<RepaymentProjPlanList> projPlanLists) {
 
         if(projPlanLists==null||projPlanLists.size()==0){
+        	logger.info("开始调用平台合规化还款接口，参数：{}", projPlanLists);
             return;
         }
 //        //睡一下，让还款的信息先存完。
@@ -2465,6 +2494,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                 logger.error(e.getMessage(), e);
                 record.setApiReturnInfo(e.getMessage());
             }
+            logger.info("平台合规化还款接口返回结果：{}", JSONObject.toJSONString(result));
             sysApiCallFailureRecordService.updateById(record);
             if (result == null || !"1".equals(result.getCode())) {
                 sysApiCallFailureRecordService.insert(record);

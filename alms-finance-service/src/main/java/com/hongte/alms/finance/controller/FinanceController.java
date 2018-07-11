@@ -20,6 +20,7 @@ import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.*;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.EipRemote;
+import com.hongte.alms.base.feignClient.dto.TdProjectPaymentDTO;
 import com.hongte.alms.base.feignClient.dto.TdReturnAdvanceShareProfitDTO;
 import com.hongte.alms.base.feignClient.dto.TdReturnAdvanceShareProfitResult;
 import com.hongte.alms.base.feignClient.dto.TdrepayProjectInfoDTO;
@@ -1097,27 +1098,39 @@ public class FinanceController {
 		logger.info("@checkLastRepay@检查前面的还款计划是否有未还垫付--开始[{}{}]",businessId,afterId);
 		List<TuandaiProjectInfo> list = tuandaiProjectInfoService
 				.selectList(new EntityWrapper<TuandaiProjectInfo>().eq("business_id", businessId));
+		RepaymentBizPlanList bizPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", businessId).eq("after_id", afterId));
 		for (TuandaiProjectInfo tuandaiProjectInfo : list) {
 			Map<String, Object> paramMap = new HashMap<>();
 			paramMap.put("projectId", tuandaiProjectInfo.getProjectId());
-			com.ht.ussp.core.Result result = eipRemote.returnAdvanceShareProfit(paramMap);
-
+			com.ht.ussp.core.Result result = eipRemote.queryProjectPayment(paramMap);
+			
+			
+			
+			
 			if (result != null && result.getData() != null
 					&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
 
-				TdReturnAdvanceShareProfitResult returnAdvanceShareProfitResult = JSONObject
-						.parseObject(JSONObject.toJSONString(result.getData()), TdReturnAdvanceShareProfitResult.class);
-				List<TdReturnAdvanceShareProfitDTO> returnAdvanceShareProfits = returnAdvanceShareProfitResult
-						.getReturnAdvanceShareProfits();
-				
-				if(org.springframework.util.CollectionUtils.isEmpty(returnAdvanceShareProfits)) {
-					return Result.success();
-				}
-				for (TdReturnAdvanceShareProfitDTO tdReturnAdvanceShareProfitDTO : returnAdvanceShareProfits) {
-					if (tdReturnAdvanceShareProfitDTO.getStatus()==0) {
-						return Result.error("0", "往期存在垫付未结清记录");
+				if (result.getData() != null) {
+					// 标的还款信息
+					List<TdProjectPaymentDTO> tdProjectPaymentDTOs = null;
+					JSONObject parseObject = (JSONObject) JSONObject.toJSON(result.getData());
+					if (parseObject.get("projectPayments") != null) {
+						tdProjectPaymentDTOs = JSONObject.parseArray(
+								JSONObject.toJSONString(parseObject.get("projectPayments")), TdProjectPaymentDTO.class);
+						
+						for (TdProjectPaymentDTO tdProjectPaymentDTO : tdProjectPaymentDTOs) {
+							if (tdProjectPaymentDTO.getStatus()==0 && tdProjectPaymentDTO.getPeriod() != bizPlanList.getPeriod()) {
+								
+								return Result.error("0", "往期存在垫付未结清记录");
+							}
+						}
 					}
+					
+					
 				}
+				
+				
+				
 			}
 		}
 		return Result.success();

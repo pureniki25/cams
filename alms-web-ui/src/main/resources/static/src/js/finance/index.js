@@ -18,6 +18,7 @@ window.layinit(function (htConfig) {
             companyList: [],
             businessTypes: [],
             collectionStatus: [],
+            lastRepayDianfuweijieqing:false,
             form: {
                 curPage: 1,
                 pageSize: 10,
@@ -219,7 +220,6 @@ window.layinit(function (htConfig) {
                                                         return;
                                                     }
                                                     let lastRepayConfirm = true
-                                                    let lastRepayDianfuweijieqing = false
                                                     $.ajax({
                                                         type : 'GET',
                                                         async : false,
@@ -270,8 +270,8 @@ window.layinit(function (htConfig) {
                                                         app.$Message.warning({content:'上次自动代扣的业务此次不能线下还款'})
                                                         return ;
                                                     }
-                                                    app.checkLastRepay(p.row.businessId,p.row.afterId,lastRepayDianfuweijieqing);
-                                                    if(lastRepayDianfuweijieqing){
+                                                    app.checkLastRepay(p.row.businessId,p.row.afterId);
+                                                    if(app.lastRepayDianfuweijieqing){
                                                         app.$Message.warning({content:'往期存在垫付未结清记录'})
                                                         return ;
                                                     }
@@ -334,8 +334,8 @@ window.layinit(function (htConfig) {
                                                              return;
                                                          }
                                                         let lastRepayDianfuweijieqing = false
-                                                        app.checkLastRepay(p.row.businessId,p.row.afterId,lastRepayDianfuweijieqing);
-                                                        if(lastRepayDianfuweijieqing){
+                                                        app.checkLastRepay(p.row.businessId,p.row.afterId);
+                                                        if(app.lastRepayDianfuweijieqing){
                                                              app.$Message.warning({content:'往期存在垫付未结清记录'})
                                                              return ;
                                                          }
@@ -528,7 +528,8 @@ window.layinit(function (htConfig) {
 
                 
             },
-            checkLastRepay(businessId,afterId,res){
+            checkLastRepay(businessId,afterId){
+                let t  ;
                 $.ajax({
                     type : 'GET',
                     async : false,
@@ -540,9 +541,9 @@ window.layinit(function (htConfig) {
                     success : function(data) {
                             console.log(data);
                             if(data.code=='1'){
-                                res = false 
+                                app.lastRepayDianfuweijieqing = false 
                             }else{
-                                res = true
+                                app.lastRepayDianfuweijieqing = true
                             }
                         },
                     error : function() {
