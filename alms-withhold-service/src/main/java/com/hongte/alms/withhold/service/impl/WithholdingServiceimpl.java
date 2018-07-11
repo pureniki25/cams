@@ -83,7 +83,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		Integer days = Integer.valueOf(repayStatusList.get(0).getParamValue());
 		List<RepaymentBizPlanList> pLists = repaymentBizPlanListService.selectAutoRepayList(days);// 查询一个周期内(30天)要代扣的记录
 		for (RepaymentBizPlanList pList : pLists) {
-			if(pList.getPlanListId().equals("c1c6b403-7c9a-4431-988a-4fb55d71ff40")) {
+			if(pList.getPlanListId().equals("d6b2973f-edf9-42e1-8412-ce43409acccf")) {
 				System.out.println("STOP");
 			}
 			//获取该还款计划最早一期没有还的代扣
@@ -166,7 +166,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		// 获取所有银行代扣渠道,先扣线上费用
 		List<WithholdingChannel> channels = withholdingChannelService
 				.selectList(new EntityWrapper<WithholdingChannel>().eq("platform_id", PlatformEnum.YH_FORM.getValue())
-						.eq("channel_status", 1).eq("bank_code", bankCardInfo.getBankCode().trim()).orderBy("channel_level"));
+						.eq("channel_status", 1).orderBy("channel_level"));
 		WithholdingChannel channel = null;
 		if (channels != null && channels.size() > 0) {
 			channel = channels.get(0);
@@ -281,7 +281,8 @@ public class WithholdingServiceimpl implements WithholdingService {
 			Integer successCount = rechargeService.getBankRepaySuccessCount(pList);
 			if (successCount > 0) {// 如果当前期在银行代扣成功过,就不能用第三方代扣,直接条出
 				result.setCode("-1");
-				result.setMsg("当前期在银行代扣成功过,就不能用第三方代扣");
+				result.setMsg("当前期在银行代扣存在成功记录或处理中记录,暂不能用第三方代扣");
+				rechargeService.RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
 				return result;
 			}
 
@@ -323,7 +324,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		// 获取所有第三方代扣渠道
 		List<WithholdingChannel> channels = withholdingChannelService
 				.selectList(new EntityWrapper<WithholdingChannel>().ne("platform_id", PlatformEnum.YH_FORM.getValue())
-						.eq("channel_status", 1).eq("bank_code", thirtyCardInfo.getBankCode().trim()).orderBy("channel_level"));
+						.eq("channel_status", 1).orderBy("channel_level"));
 		List<ThirdPlatform> thirdPlatforms = thirtyCardInfo.getThirdPlatformList();
 
 		List<WithholdingChannel> newChanels = new ArrayList();
@@ -337,7 +338,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		}
 		outerloop: for (WithholdingChannel channel : newChanels) {
 			SysBankLimit sysBankLimit = sysBankLimitService.selectOne(
-					new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("status", 1).eq("bank_code", channel.getBankCode()));
+					new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("status", 1).eq("bank_code", thirtyCardInfo.getBankCode().trim()));
 			if (sysBankLimit == null) {
 				logger.debug("第三方代扣限额信息platformId:" + channel.getPlatformId() + "无效/不存在");
 				continue;
@@ -463,7 +464,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 				// 获取所有银行代扣渠道,先扣线上费用
 				List<WithholdingChannel> channels = withholdingChannelService
 						.selectList(new EntityWrapper<WithholdingChannel>().eq("platform_id", PlatformEnum.YH_FORM.getValue())
-								.eq("channel_status", 1).eq("bank_code", bankCardInfo.getBankCode().trim()).orderBy("channel_level"));
+								.eq("channel_status", 1).orderBy("channel_level"));
 				WithholdingChannel channel = null;
 				if (channels != null && channels.size() > 0) {
 					channel = channels.get(0);
@@ -564,7 +565,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		// 获取所有第三方代扣渠道
 				List<WithholdingChannel> channels = withholdingChannelService
 						.selectList(new EntityWrapper<WithholdingChannel>().eq("platform_id",platformId)
-								.eq("channel_status", 1).eq("bank_code", thirtyCardInfo.getBankCode().trim()).orderBy("channel_level"));
+								.eq("channel_status", 1).orderBy("channel_level"));
 				List<ThirdPlatform> thirdPlatforms = thirtyCardInfo.getThirdPlatformList();
 
 				List<WithholdingChannel> newChanels = new ArrayList();
@@ -584,7 +585,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 				}
 				outerloop: for (WithholdingChannel channel : newChanels) {
 					SysBankLimit sysBankLimit = sysBankLimitService.selectOne(
-							new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("status", 1).eq("bank_code", channel.getBankCode()));
+							new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("status", 1).eq("bank_code", thirtyCardInfo.getBankCode()));
 					if (sysBankLimit == null) {
 						logger.info("第三方代扣限额信息platformId:" + channel.getPlatformId() + "无效/不存在");
 						result.setCode("-1");
