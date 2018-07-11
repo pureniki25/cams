@@ -520,8 +520,10 @@ public class RepaymentProjPlanListServiceImpl extends
 						projDetail.setProjPlanDetailId(UUID.randomUUID().toString());
 						projDetail.setFeeId(feeId);
 						projDetail.setProjPlanAmount(lateFee);
-						projDetail.setShareProfitIndex(profitItemSetService.getLevel(business.getBusinessType().toString(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getValue().intValue(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid()).get("feeLevel"));
-						projDetail.setPlanItemType(60);
+						if(feeId.equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
+						  projDetail.setShareProfitIndex(profitItemSetService.getLevel(business.getBusinessType().toString(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getValue().intValue(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid()).get("feeLevel"));
+						}
+					     projDetail.setPlanItemType(60);
 						String planDetailId="";
 						for(RepaymentProjPlanListDetail detail:feeIdLists) {
 							if(detail.getFeeId().equals(feeId)) {
@@ -575,7 +577,9 @@ public class RepaymentProjPlanListServiceImpl extends
 						copy.setPlanDetailId(projDetail.getPlanDetailId());
 						copy.setFeeId(feeId);
 						copy.setPlanAmount(lateFee);
-						copy.setShareProfitIndex(profitItemSetService.getLevel(business.getBusinessType().toString(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getValue().intValue(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid()).get("feeLevel"));
+					    if(feeId.equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
+						  copy.setShareProfitIndex(profitItemSetService.getLevel(business.getBusinessType().toString(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getValue().intValue(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid()).get("feeLevel"));
+					    }
 						copy.setPlanItemType(60);
 						copy.setPlanItemName("滞纳金");
 						repaymentBizPlanListDetailService.insertOrUpdate(copy);
