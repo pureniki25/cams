@@ -221,34 +221,36 @@ public class RepayPlanController {
                     // =>>>>>
                     //接口需要：0:还款中1:财务确认已还款 2:自动匹配已还款 3:财务确认全部结清,4:财务代扣已还款,5:自动代扣已还款,6:标识展期已还款,7:当期部分已还款,8:用户APP主动还款,9:代扣全部结清
                     Integer repayFlag = 0;
-                    switch (bizPlanList.getRepayFlag()) {
-                        case 0:
-                            repayFlag = 0;
-                            break;
-                        case 6:
-                            repayFlag = 6;
-                            break;
-                        case 10:
-                            repayFlag = 1;
-                            break;
-                        case 21:
-                        case 31:
-                            repayFlag = 4;
-                            break;
-                        case 30:
-                        case 20:
-                            repayFlag = 5;
-                            break;
-                        case 40:
-                            repayFlag = 8;
-                            break;
-                        case 50:
-                            repayFlag = 3;
-                            break;
-                        case 70:
-                        case 60:
-                            repayFlag = 9;
-                            break;
+                    if (bizPlanList.getRepayFlag() != null) {
+                        switch (bizPlanList.getRepayFlag()) {
+                            case 0:
+                                repayFlag = 0;
+                                break;
+                            case 6:
+                                repayFlag = 6;
+                                break;
+                            case 10:
+                                repayFlag = 1;
+                                break;
+                            case 21:
+                            case 31:
+                                repayFlag = 4;
+                                break;
+                            case 30:
+                            case 20:
+                                repayFlag = 5;
+                                break;
+                            case 40:
+                                repayFlag = 8;
+                                break;
+                            case 50:
+                                repayFlag = 3;
+                                break;
+                            case 70:
+                            case 60:
+                                repayFlag = 9;
+                                break;
+                        }
                     }
                     paramMap.put("repayedFlag", repayFlag);
                     paramMap.put("currentSubStatus", bizPlanList.getCurrentSubStatus());

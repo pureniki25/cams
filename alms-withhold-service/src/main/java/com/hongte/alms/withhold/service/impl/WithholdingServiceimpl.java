@@ -85,7 +85,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		Integer days = Integer.valueOf(repayStatusList.get(0).getParamValue());
 		List<RepaymentBizPlanList> pLists = repaymentBizPlanListService.selectAutoRepayList(days);// 查询一个周期内(30天)要代扣的记录
 //		for (RepaymentBizPlanList pList : pLists) {
-//			if(pList.getPlanListId().equals("cf258859-f6b9-47af-8cd7-bc1426144d16")) {
+//			if(pList.getPlanListId().equals("ac6c5617-c5d5-4c9f-9b2b-9cb5ecad6d36")) {
 //				System.out.println("STOP");
 //			}
 //			//获取该还款计划最早一期没有还的代扣
@@ -155,14 +155,23 @@ public class WithholdingServiceimpl implements WithholdingService {
 		BankCardInfo ThirtyCardInfo = rechargeService.getThirtyPlatformInfo(bankCardInfos);
 		BigDecimal thirtyRepayAmount=getThirtyRepayAmount(pList);
 		if (bankCardInfo != null&&thirtyRepayAmount.compareTo(BigDecimal.valueOf(0))==0) {
-			if(bankCardInfo.getSignedProtocolList().size()>0) {
-				// 银行代扣
+			//判断是否开启协议代扣开关
+			SysParameter  aggreeSwitch = sysParameterService.selectOne(
+					new EntityWrapper<SysParameter>().eq("param_type", "agreement_withholding")
+							.eq("status", 1).orderBy("param_value"));
+			if(aggreeSwitch.getParamValue().equals("1")) {
+				if(bankCardInfo.getSignedProtocolList().size()>0) {
+					// 银行代扣
+					result=BankCharge(basic, bankCardInfo, pList, bankCardInfos,appType);
+				}else if(ThirtyCardInfo != null&&bankCardInfo.getSignedProtocolList().size()==0) {
+					result=ThirdRepaymentCharge(basic, ThirtyCardInfo, pList, null,appType);// 第三方代扣
+				}
+			}else {
 				result=BankCharge(basic, bankCardInfo, pList, bankCardInfos,appType);
-			}else if(ThirtyCardInfo != null&&bankCardInfo.getSignedProtocolList().size()==0) {
-				result=ThirdRepaymentCharge(basic, ThirtyCardInfo, pList, null,appType);// 第三方代扣
 			}
+		
 			
-			//BankCharge(basic, bankCardInfo, pList, bankCardInfos);
+		
 		} else if (ThirtyCardInfo != null && (bankCardInfo == null||(bankCardInfo != null&&thirtyRepayAmount.compareTo(BigDecimal.valueOf(0))>0))) {// 第三方代扣
 			result=ThirdRepaymentCharge(basic, ThirtyCardInfo, pList, null,appType);
 		} else {

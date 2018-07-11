@@ -231,13 +231,20 @@ public class TransferOfLitigationController {
 	@ResponseBody
 	public Result<String> saveTransferLitigationHouse(@RequestBody  Map<String, Object> req) {
 		try {
+			
 			List<FileVo> files = JsonUtil.map2objList(req.get("reqRegFiles"), FileVo.class);
 			List<TransferLitigationHouse> house = JsonUtil.map2objList(req.get("houseData"), TransferLitigationHouse.class);
 			if (CollectionUtils.isEmpty(house)) {
-				Result.error("500", "参数不能为空");
+				return Result.error("500", "参数不能为空");
 			}
 			
-			transferOfLitigationService.saveTransferLitigationHouse(house.get(0), sendUrl, files);
+			TransferLitigationHouse transferLitigationHouse = house.get(0);
+			Result result = litigationFeignClient.isImportLitigation(transferLitigationHouse.getBusinessId());
+			if (result != null && "1".equals(result.getCode()) && (Boolean) result.getData()) {
+				return Result.error("-99", "该业务编号已移交诉讼系统！");
+			}
+			
+			transferOfLitigationService.saveTransferLitigationHouse(transferLitigationHouse, sendUrl, files);
 			return Result.success();
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage(), ex);
@@ -254,12 +261,12 @@ public class TransferOfLitigationController {
 			List<FileVo> files = JsonUtil.map2objList(req.get("reqRegFiles"), FileVo.class);
 			List<TransferLitigationCar> cars = JsonUtil.map2objList(req.get("houseData"), TransferLitigationCar.class);
 			if (CollectionUtils.isEmpty(cars)) {
-				Result.error("500", "参数不能为空");
+				return Result.error("500", "参数不能为空");
 			}
 			TransferLitigationCar transferLitigationCar = cars.get(0);
 			Result result = litigationFeignClient.isImportLitigation(transferLitigationCar.getBusinessId());
 			if (result != null && "1".equals(result.getCode()) && (Boolean) result.getData()) {
-				Result.error("-99", "该业务编号已移交诉讼系统！");
+				return Result.error("-99", "该业务编号已移交诉讼系统！");
 			}
 			StringBuilder houseAddress = new StringBuilder();
 			List<LinkedHashMap<String, Object>> componentOptions = (List<LinkedHashMap<String, Object>>) req

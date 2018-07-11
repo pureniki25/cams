@@ -247,7 +247,7 @@ public class PlatformRepaymentController {
 
 
             TdrepayRechargeInfoVO vo = new TdrepayRechargeInfoVO();
-            vo.setProjectId(repaymentProjPlanList.getProjPlanListId());
+            vo.setProjectId(repaymentProjPlan.getProjectId());
             //业务所属资产端，1、鸿特信息，2、 一点车贷
             vo.setAssetType(1);
             //原业务编号

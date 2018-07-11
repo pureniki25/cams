@@ -1,6 +1,7 @@
 package com.hongte.alms.base.collection.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.collection.dto.CollectionStatusCountDto;
 import com.hongte.alms.base.collection.entity.*;
@@ -16,6 +17,7 @@ import com.hongte.alms.base.entity.CarBusinessAfter;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.feignClient.CollectionSynceToXindaiRemoteApi;
+import com.hongte.alms.base.feignClient.LitigationFeignClient;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.RepaymentBizPlanService;
 import com.hongte.alms.base.service.SysUserPermissionService;
@@ -94,6 +96,9 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
     @Autowired
     @Qualifier("SysUserPermissionService")
     SysUserPermissionService sysUserPermissionService;
+    
+    @Autowired
+	private LitigationFeignClient litigationFeignClient;
 
     /**
      * 设置电催/人员(界面手动设置)
@@ -763,12 +768,24 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
             RepaymentBizPlan repaymentBizPlan =  repaymentBizPlanService.selectById(planList.getPlanId());
 
             try{
-                //调用移交诉讼接口
-                transferLitigationService.sendTransferLitigationData(
-                        repaymentBizPlan.getOriginalBusinessId(),sendUrl);
+            	String originalBusinessId = repaymentBizPlan.getOriginalBusinessId();
+            	Result result = litigationFeignClient.isImportLitigation(originalBusinessId);
+            	logger.info("调用诉讼系统查询接口，参数：{}；返回信息：{}", originalBusinessId, JSONObject.toJSONString(result));
+            	// 调用诉讼系统查询接口，若调用失败或者非成功状态，则这条数据暂时不处理
+    			if (result == null || !"1".equals(result.getCode())) {
+    				continue;
+    			}else {
+    				// 若调用成功，且状态是true，说明移交过法务
+					if (!(Boolean) result.getData()) {
+						//调用移交诉讼接口
+	    				transferLitigationService.sendTransferLitigationData(
+	    						originalBusinessId,sendUrl);
+					}
+				}
+    			
                 //修改状态
                 setBussinessAfterStatus(
-                        repaymentBizPlan.getOriginalBusinessId(),
+                        originalBusinessId,
                         planList.getPlanListId(),
                         "自动移交法务",
                         CollectionStatusEnum.TO_LAW_WORK,
@@ -777,7 +794,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                 List<StaffBusinessVo> voList = new LinkedList<>();
                 StaffBusinessVo vo  = new StaffBusinessVo();
                 vo.setCrpId(planList.getPlanListId());
-                vo.setBusinessId(repaymentBizPlan.getOriginalBusinessId());
+                vo.setBusinessId(originalBusinessId);
                 voList.add(vo);
 
                 //同步贷后状态到信贷
