@@ -1094,6 +1094,7 @@ public class FinanceController {
 	@RequestMapping("/checkLastRepay")
 	@ApiOperation(value = "检查前面的还款计划是否有未还垫付")
 	public Result checkLastRepay(String businessId, String afterId) {
+		logger.info("@checkLastRepay@检查前面的还款计划是否有未还垫付--开始[{}{}]",businessId,afterId);
 		RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService.selectOne(
 				new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", businessId).eq("after_id", afterId));
 		List<TuandaiProjectInfo> list = tuandaiProjectInfoService
@@ -1113,8 +1114,17 @@ public class FinanceController {
 						.parseObject(JSONObject.toJSONString(result.getData()), TdReturnAdvanceShareProfitResult.class);
 				List<TdReturnAdvanceShareProfitDTO> returnAdvanceShareProfits = returnAdvanceShareProfitResult
 						.getReturnAdvanceShareProfits();
+				
+				if(org.springframework.util.CollectionUtils.isEmpty(returnAdvanceShareProfits)) {
+					return Result.success();
+				}
+				for (TdReturnAdvanceShareProfitDTO tdReturnAdvanceShareProfitDTO : returnAdvanceShareProfits) {
+					if (tdReturnAdvanceShareProfitDTO.getStatus()==0) {
+						return Result.error("0", "往期存在垫付未结清记录");
+					}
+				}
 			}
 		}
-		return null;
+		return Result.success();
 	}
 }
