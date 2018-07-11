@@ -219,6 +219,7 @@ window.layinit(function (htConfig) {
                                                         return;
                                                     }
                                                     let lastRepayConfirm = true
+                                                    let lastRepayDianfuweijieqing = false
                                                     $.ajax({
                                                         type : 'GET',
                                                         async : false,
@@ -243,8 +244,8 @@ window.layinit(function (htConfig) {
                                                             console.log(data);
                                                         }
                                                     });
-
-                                                    $.ajax({
+                                                    
+                                                    /* $.ajax({
                                                         type : 'GET',
                                                         async : false,
                                                         url : fpath+'finance/checkLastRepay?businessId='+p.row.businessId+'&afterId='+p.row.afterId,
@@ -255,22 +256,23 @@ window.layinit(function (htConfig) {
                                                         success : function(data) {
                                                                 console.log(data);
                                                                 if(data.code=='1'){
-                                                                    if(data.data==0||data.data==10||data.data==11||data.data==21||data.data==31){
-                                                                        lastRepayConfirm = true ;
-                                                                    }else{
-                                                                        lastRepayConfirm = false ;
-                                                                    }
+                                                                    lastRepayDianfuweijieqing = false 
                                                                 }else{
-                                                                    app.$Message.error({content:data.msg})
+                                                                    lastRepayDianfuweijieqing = true
                                                                 }
                                                             },
                                                         error : function() {
                                                             console.log(data);
                                                         }
-                                                    });
+                                                    }); */
 
                                                     if(!lastRepayConfirm){
                                                         app.$Message.warning({content:'上次自动代扣的业务此次不能线下还款'})
+                                                        return ;
+                                                    }
+                                                    app.checkLastRepay(p.row.businessId,p.row.afterId,lastRepayDianfuweijieqing);
+                                                    if(lastRepayDianfuweijieqing){
+                                                        app.$Message.warning({content:'往期存在垫付未结清记录'})
                                                         return ;
                                                     }
                                                     // window.location.href = link ;
@@ -331,7 +333,12 @@ window.layinit(function (htConfig) {
                                                              });
                                                              return;
                                                          }
-			                                         
+                                                        let lastRepayDianfuweijieqing = false
+                                                        app.checkLastRepay(p.row.businessId,p.row.afterId,lastRepayDianfuweijieqing);
+                                                        if(lastRepayDianfuweijieqing){
+                                                             app.$Message.warning({content:'往期存在垫付未结清记录'})
+                                                             return ;
+                                                         }
                                                         let url = getDeductionUrl(p.row.planListId);
                                                         layer.open({
                                                             type: 2,
@@ -521,14 +528,27 @@ window.layinit(function (htConfig) {
 
                 
             },
-            checkLastRepay(businessId){
-                axios.get(fpath+'finance/checkLastRepay?businessId='+businessId)
-                .then(function(res){
-
-                })
-                .catch(function(err){
-
-                })
+            checkLastRepay(businessId,afterId,res){
+                $.ajax({
+                    type : 'GET',
+                    async : false,
+                    url : fpath+'finance/checkLastRepay?businessId='+businessId+'&afterId='+afterId,
+                    headers : {
+                        app : 'ALMS',
+                        Authorization : "Bearer " + getToken()
+                    }, 
+                    success : function(data) {
+                            console.log(data);
+                            if(data.code=='1'){
+                                res = false 
+                            }else{
+                                res = true
+                            }
+                        },
+                    error : function() {
+                        console.log(data);
+                    }
+                });
             }
         },
         created: function () {

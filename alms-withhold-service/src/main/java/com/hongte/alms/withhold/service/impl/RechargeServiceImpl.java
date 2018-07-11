@@ -627,8 +627,9 @@ public class RechargeServiceImpl implements RechargeService {
 	
 	private boolean isSign(RepaymentBizPlanList pList) {
 		boolean isSign = false;
-		int i=moneyPoolRepaymentService.selectCount(new EntityWrapper<MoneyPoolRepayment>().eq("original_business_id", pList.getOrigBusinessId()).eq("after_id", pList.getAfterId()).ne("is_deleted", 1));
-		if(i>0) {
+		int i=moneyPoolRepaymentService.selectCount(new EntityWrapper<MoneyPoolRepayment>().eq("original_business_id", pList.getOrigBusinessId()).eq("after_id", pList.getAfterId()).eq("is_deleted", 0));
+		int j=moneyPoolRepaymentService.selectCount(new EntityWrapper<MoneyPoolRepayment>().eq("original_business_id", pList.getOrigBusinessId()).eq("after_id", pList.getAfterId()).isNotNull("is_deleted"));
+		if(i+1>0) {
 			isSign=true;
 		}else {
 			isSign=false;

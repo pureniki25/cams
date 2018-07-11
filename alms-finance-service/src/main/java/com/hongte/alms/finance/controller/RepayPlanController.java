@@ -545,7 +545,7 @@ public class RepayPlanController {
         BizPlanDto  bizPlanDto  = getBizPlanDtoByBizPlan(bizPlan);
         bizPlanDto.setBusinessType(bizDto.getBusinessType());
         bizPlanDto.setRepayWay(bizDto.getRepayWay());
-        bizPlanDto.setBorrowMoney(bizDto.getBorrowMoney());
+        bizPlanDto.setBorrowMoney(tuandaiProjectInfo.getFullBorrowMoney());
         bizPlanDto.setBorrowLimit(bizDto.getBorrowLimit());
         bizPlanDto.setBorrowLimitUnit(bizDto.getBorrowLimitUnit());
         bizPlanDto.setInputTime(tuandaiProjectInfo.getQueryFullSuccessDate());
@@ -650,7 +650,7 @@ public class RepayPlanController {
             throw  new MyException(ExceptionCodeEnum.NULL.getValue().toString(),"找不到业务信息，业务ID："+businessId);
         }
 
-        List<TuandaiProjectInfo> ll= tuandaiProjectInfoService.selectList(new EntityWrapper<TuandaiProjectInfo>().eq("business_id",businessId));
+        List<TuandaiProjectInfo> ll= tuandaiProjectInfoService.selectList(new EntityWrapper<TuandaiProjectInfo>().eq("business_id",businessId).orderBy("queryFullsuccessDate",false));
 
         if(ll!=null&&ll.size()>0){
             bizDto.setPlateType(ll.get(0).getPlateType());
@@ -683,7 +683,12 @@ public class RepayPlanController {
         //借款期限单位
         bizDto.setBorrowLimitUnit(RepayPlanBorrowLimitUnitEnum.nameOf(business.getBorrowLimitUnit()));
         //进件日期
-        bizDto.setInputTime(business.getInputTime());
+        if(ll!=null&&ll.size()>0){
+            bizDto.setInputTime(ll.get(0).getQueryFullSuccessDate());
+        }else{
+            bizDto.setInputTime(business.getInputTime());
+        }
+
 
 
         List<RepaymentBizPlan> bizPlans = repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",businessId));
