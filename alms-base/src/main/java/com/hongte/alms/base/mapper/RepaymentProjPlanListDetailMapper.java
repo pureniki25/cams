@@ -1,7 +1,10 @@
 package com.hongte.alms.base.mapper;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.ibatis.annotations.Param;
 
 import com.hongte.alms.base.entity.RepaymentProjPlanListDetail;
 import com.hongte.alms.common.mapper.SuperMapper;
@@ -24,4 +27,13 @@ public interface RepaymentProjPlanListDetailMapper extends SuperMapper<Repayment
 	 * @return Map[(projPlanDetailId(string),feeId(string),planItemName(string),planItemType(string),residueAmount(bigdecimal))]
 	 */
 	public List<Map<String, Object>> selectProjDetailResidueAmount(String projPlanListId) ;
+	
+	/**
+	 * 计算某期还款计划某项未还金额
+	 * @author 王继光
+	 * 2018年7月5日 下午7:41:01
+	 * @param bizPlanListId
+	 * @return
+	 */
+	public BigDecimal calcBizPlanListUnpaid(@Param("bizPlanListId")String bizPlanListId,@Param("planItemType")String planItemType,@Param("feeId")String feeId);
 }
