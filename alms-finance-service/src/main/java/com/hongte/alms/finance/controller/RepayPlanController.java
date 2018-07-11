@@ -545,7 +545,7 @@ public class RepayPlanController {
         BizPlanDto  bizPlanDto  = getBizPlanDtoByBizPlan(bizPlan);
         bizPlanDto.setBusinessType(bizDto.getBusinessType());
         bizPlanDto.setRepayWay(bizDto.getRepayWay());
-        bizPlanDto.setBorrowMoney(bizDto.getBorrowMoney());
+        bizPlanDto.setBorrowMoney(tuandaiProjectInfo.getFullBorrowMoney());
         bizPlanDto.setBorrowLimit(bizDto.getBorrowLimit());
         bizPlanDto.setBorrowLimitUnit(bizDto.getBorrowLimitUnit());
         bizPlanDto.setInputTime(tuandaiProjectInfo.getQueryFullSuccessDate());
