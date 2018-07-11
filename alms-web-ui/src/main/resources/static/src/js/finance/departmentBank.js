@@ -69,6 +69,7 @@ let data = {
     exporting: false, //导出标志位
     submitLoading: false,
     editModal: false,
+    editModalLoading: true,
     detailModal: false,
     companies: [],
     provinces: [],
@@ -108,7 +109,17 @@ let data = {
         //mainId: [{required: true, message: '请选择业务类型', trigger: 'blur'}],
         //bankProvinceCity: [{required: true, message: '请选择业务类型', trigger: 'blur'}],
         //phoneNumber: [{required: true, message: '请选择业务类型', trigger: 'blur'}],
-        deptIds: [{required: true, message: '请至少关联一个分公司', trigger: 'blur'}],
+        // deptIds: [{required: true, message: '请至少关联一个分公司', trigger: 'blur'}],
+        deptIds:[{
+            validator:function(rule, value, callback, source, options){
+                if(vm.editForm.deptIds.length == 0 ){
+                    callback(new Error('请至少关联一个分公司'));
+                }else{
+                    callback();
+                }
+            },
+            trigger:'blur'
+        }]
     },
     table: {
         col: [{
@@ -261,14 +272,6 @@ let methods = {
         this.search();
     },
     search() {
-        /*let p = {}
-        Object.keys(vm.schForm).forEach(function(val, i){
-            console.log(val)
-            if(vm.schForm[val]!=''){
-                p[val]=vm.schForm[val]
-            }
-        });*/
-
         /* table.reload('main_table', {
              where: vm.search,
              page: {curr: 1}
@@ -293,6 +296,10 @@ let methods = {
         // self.loading =  false;
     },
     handleSubmit (name) {
+        setTimeout(() => {
+            this.editModal = false;
+        }, 2000);
+
         this.$refs[name].validate((valid) => {
             if (valid) {
                 this.$Message.success('Success!');
@@ -302,30 +309,31 @@ let methods = {
         })
     },
     submitEditForm() {
-        // this.$refs['editForm'].validate( valid => {
-        //     if(valid){
-        //         this.$Message.success('Success..');
-        //     }else{
-        //         this.$Message.success('Success..');
-        //     }
-        // });
-        // return;
-
         var self = this;
-        axios.post(basePath + 'departmentBank/edit', self.editForm)
-            .then(res => {
-                if (!!res.data && res.data.code == '1') {
-                    self.search();
-                    self.hideEditModal();
-                    //self.editModal = false;
-                    //self.$refs['editForm'].resetFields();
-                } else {
-                    self.$Modal.error({content: '请求接口失败,消息:' + res.data.msg})
-                }
-            })
-            .catch(err => {
-                self.$Modal.error({content: '操作失败!'})
-            });
+        this.$refs['editForm'].validate( valid => {
+            if(valid){
+                axios.post(basePath + 'departmentBank/edit', self.editForm)
+                    .then(res => {
+                        if (!!res.data && res.data.code == '1') {
+                            self.search();
+                            self.hideEditModal();
+                            this.editModalLoading = true;
+                        } else {
+                            self.$Modal.error({content: '请求接口失败,消息:' + res.data.msg})
+                        }
+                    })
+                    .catch(err => {
+                        self.$Modal.error({content: '操作失败!'})
+                    });
+            }else{
+                setTimeout(() => {
+                    this.editModalLoading = false;
+                    this.$nextTick(() => {
+                        this.editModalLoading = true;
+                    });
+                }, 1000);
+            }
+        });
     },
     edit(row) {
         this.$refs['editForm'].resetFields();

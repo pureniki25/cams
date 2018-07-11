@@ -28,12 +28,26 @@ public class AgencyRechargeSchedule {
 		try {
 			LOG.info("更新代充值处理状态开始");
 			long start = System.currentTimeMillis();
-			List<AgencyRechargeLog> logs = agencyRechargeLogService.selectList(new EntityWrapper<AgencyRechargeLog>().eq("handle_status", "1"));
+			List<AgencyRechargeLog> logs = agencyRechargeLogService.selectList(new EntityWrapper<AgencyRechargeLog>().eq("handle_status", "1").eq("charge_type", "3"));
 			if (CollectionUtils.isNotEmpty(logs)) {
 				for (AgencyRechargeLog agencyRechargeLog : logs) {
 					agencyRechargeLogService.queryRechargeOrder(agencyRechargeLog.getoIdPartner(), agencyRechargeLog.getCmOrderNo(), "贷后定时任务");
 				}
 			}
+			long end = System.currentTimeMillis();
+			LOG.info("更新代充值处理状态结束，耗时：{}", (end - start));
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+	}
+	
+	@Scheduled(cron = "0 0 0/2 * * ?")
+	public void queryQuickRechargeOrder() {
+		try {
+			LOG.info("更新快捷充值处理状态开始");
+			long start = System.currentTimeMillis();
+			List<AgencyRechargeLog> logs = agencyRechargeLogService.selectList(new EntityWrapper<AgencyRechargeLog>().eq("handle_status", "1").eq("charge_type", "2"));
+			agencyRechargeLogService.queryQuickRechargeOrder(logs, "贷后定时任务");
 			long end = System.currentTimeMillis();
 			LOG.info("更新代充值处理状态结束，耗时：{}", (end - start));
 		} catch (Exception e) {
