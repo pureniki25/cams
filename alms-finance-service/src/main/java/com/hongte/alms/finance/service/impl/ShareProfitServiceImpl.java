@@ -1677,6 +1677,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			                
 			                if (pjlFactAmount.compareTo(pjlOnlineAmount) >= 0) {
 			                	projPlanList.setRepayStatus(SectionRepayStatusEnum.ONLINE_REPAID.getKey());
+                                financeBaseDto.getCurTimeRepaidProjPlanList().add(projPlanList);
 			                } else {
 			                	projPlanList.setRepayStatus(SectionRepayStatusEnum.SECTION_REPAID.getKey());
 			                }
@@ -2526,7 +2527,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 
 
                     record.setApiParamPlaintext(JSONObject.toJSONString(paramMap));
-                    sysApiCallFailureRecordService.insert(record);
+//                    sysApiCallFailureRecordService.insert(record);
 
                     // 平台合规化还款接口
                     result = platformRepaymentFeignClient.repayment(paramMap);
@@ -2539,9 +2540,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                 record.setApiReturnInfo(e.getMessage());
             }
             sysApiCallFailureRecordService.updateById(record);
-//            if (result == null || !"1".equals(result.getCode())) {
-//                sysApiCallFailureRecordService.insert(record);
-//            }
+            if (result == null || !"1".equals(result.getCode())) {
+                sysApiCallFailureRecordService.insert(record);
+            }
         }
 
     }
