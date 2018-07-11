@@ -31,16 +31,9 @@ window.layinit(function (htConfig) {
         el: '#app',
 
         data() {
-            const validateChannelNumber = (rule, value, callback) => {
-                if (!value) {
-                    return callback(new Error('不能为空'));
-                } else if (!Number.isInteger(value)) {
-                    callback(new Error('必须为数字'));
-                }
-
-            };
             return {
                 withHoldLimitModel: false,
+                subTitle:'',
                 platformType: [],
                 bankType: [],
                 loading: false,
@@ -215,6 +208,7 @@ window.layinit(function (htConfig) {
                 vm.toLoading();
             },
             editWithholdLimit(id) {
+                vm.subTitle="编辑额度";
                 vm.withHoldLimitModel = true;
                 axios.get(basePath + 'withholdManage/getWithholdLimit?limitId=' + id)
                     .then(function (res) {
@@ -236,6 +230,7 @@ window.layinit(function (htConfig) {
             addHoldLimit(name) {
                 // console.log("addHoldChannel",addHoldChannel);
                 this.$refs[name].resetFields();
+                vm.subTitle="新增额度";
                 vm.withHoldLimitModel = true;
             },
             submitHoldLimit(name) {

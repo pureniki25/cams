@@ -110,7 +110,8 @@
 		      IFNULL(tt1.withdraw_type, 0) = 0 
 		      OR IFNULL(tt1.withdraw_type, 0) = 1
 		    ) 
-		    AND tt1.business_id = #{businessId,jdbcType=VARCHAR}) outputUserName,
+		    AND tt1.business_id = #{businessId,jdbcType=VARCHAR}
+		  LIMIT 1) outputUserName,
 		  (SELECT 
 		    MIN(fact_output_date) 
 		  FROM

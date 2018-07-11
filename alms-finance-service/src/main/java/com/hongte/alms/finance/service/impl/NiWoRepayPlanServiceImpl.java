@@ -136,7 +136,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 					.selectOne(new EntityWrapper<RepaymentProjPlan>().eq("request_no", orderNo).eq("plate_type", 2));
 	
 			if(projPlan==null) {
-				logger.info("你我金融的标的请求编号在贷后找不到对应的还款计划记录,请求编号{request_no}为："+orderNo);
+				logger.info("你我金融的标的请求编号在贷后找不到对应的还款计划记录,请求编号为{0}为："+orderNo);
 				return;
 			}
 			//Business
@@ -533,6 +533,10 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 								 
 								   
 									projPlanList.setOverdueDays(BigDecimal.valueOf(getOverDays(detailDto.getRefundDate())));
+									if(getOverDays(detailDto.getRefundDate())>0) {
+										projPlanList.setCurrentStatus("逾期");
+										pList.setCurrentStatus("逾期");
+									}
 									projPlanList.setDueDate(new Date(detailDto.getRefundDate()));
 									projPlanList.setOverdueAmount(detailDto.getTotalPenalty());
 									projPlanList.setUpdateTime(new Date());

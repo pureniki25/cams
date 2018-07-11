@@ -126,7 +126,7 @@
     </select>-->
     <!-- AND cStatus.crp_id = planList.plan_list_id -->
 
-    <select id="conutFinanceManagerList" resultType="int"
+    <select id="conutFinanceManagerListBak" resultType="int"
 		parameterType="com.hongte.alms.base.dto.FinanceManagerListReq">
 		SELECT
 			count(distinct pl.plan_list_id)
@@ -173,8 +173,53 @@
 		</where>
 
 	</select>
+	
+	
+	<select id="conutFinanceManagerList" resultType="int"
+		parameterType="com.hongte.alms.base.dto.FinanceManagerListReq">
+		SELECT
+			count(distinct pl.plan_list_id)
+		FROM
+			tb_repayment_biz_plan_list_synch pl
+		<where>
+			1 = 1
+			<if test="customer != null">
+				<!-- AND b.customer_name = #{customer} -->
+				AND pl.customer_name_ext = #{customer}
+			</if>
+			<if test="businessId != null">
+				AND pl.orig_business_id = #{businessId}
+			</if>
+			<if test="accountantConfirmStatus != null">
+				AND pl.accountant_confirm_status =
+				#{accountantConfirmStatus}
+			</if>
+			<if test="areaId != null">
+				AND pl.area_pid_ext = #{areaId}
+			</if>
+			<if test="companyId != null">
+				AND (pl.company_name_ext = #{companyId} OR pl.company_id_ext = #{companyId})
+			</if>
+			<if test="businessType != null ">
+				AND pl.business_type_ext = #{businessType}
+			</if>
+			<if test="repayDate != null">
+				AND DATE_FORMAT(pl.due_date,'%Y-%m-%d') = #{repayDate}
+			</if>
+			<if test="regDateStart != null ">
+				AND pl.trade_date_ext &gt;= #{regDateStart}
+			</if>
+			<if test="regDateEnd != null ">
+				AND pl.trade_date_ext &lt;= #{regDateEnd}
+			</if>
+			<if test="status != null ">
+				AND pl.current_status = #{status}
+			</if>
+		</where>
 
-	<select id="selectFinanceMangeList"
+	</select>
+
+	<select id="selectFinanceMangeList_bak"
 		resultType="com.hongte.alms.base.vo.module.FinanceManagerListVO"
 		parameterType="com.hongte.alms.base.dto.FinanceManagerListReq">
 		SELECT
@@ -261,6 +306,75 @@
 			</if>
 			<if test="regDateEnd != null ">
 				AND mpr.trade_date &lt;= #{regDateEnd}
+			</if>
+			<if test="status != null ">
+				AND pl.current_status = #{status}
+			</if>
+		</where>
+		order by pl.due_date
+		limit ${(curPage-1)*pageSize} , ${pageSize}
+	</select>
+	
+	
+	<select id="selectFinanceMangeList"
+		resultType="com.hongte.alms.base.vo.module.FinanceManagerListVO"
+		parameterType="com.hongte.alms.base.dto.FinanceManagerListReq">
+			SELECT DISTINCT pl.plan_id AS planId, pl.confirm_flag AS confirmFlag, pl.plan_list_id AS planListId, pl.business_id AS businessId, pl.orig_business_id AS orgBusinessId
+				, pl.period AS period, pl.after_id AS afterId, 
+				pl.company_id_ext AS dept, 
+				pl.operator_name_ext AS operator, 
+				pl.customer_name_ext AS customer
+				, pl.phone_number_ext AS phoneNumber, pl.business_ctype_ext AS businessType, pl.due_date AS planRepayDate, pl.borrow_money_ext AS borrowMoney
+				, CASE repayment_type_id_ext
+					WHEN 1 THEN '先息后本'
+					WHEN 2 THEN '先息后本'
+					WHEN 4 THEN '等本等息'
+					WHEN 5 THEN '等额本息'
+					WHEN 9 THEN '分期还本付息'
+					ELSE ''
+				END AS repaymentType, pl.borrow_limit_ext AS borrowLimit, pl.fact_repay_date AS factRepayDate
+				, CASE 
+					WHEN ISNULL(pl.overdue_amount) THEN pl.total_borrow_amount
+					ELSE pl.total_borrow_amount + pl.overdue_amount
+				END AS planRepayAmount, pl.current_status AS STATUS
+				, CASE pl.repay_status
+					WHEN 1 THEN '部分还款'
+					WHEN 2 THEN '部分还款'
+					WHEN 3 THEN pl.current_status
+					ELSE NULL
+				END AS repayStatus, pl.accountant_confirm_status AS financeConfirmStatus
+				,pl.fact_amount_ext AS repaidAmount, pl.src_type AS srcType
+			FROM tb_repayment_biz_plan_list_synch pl
+		<where>
+			1 = 1
+			<if test="customer != null">
+				<!-- AND b.customer_name = #{customer} -->
+				AND pl.customer_name_ext like '${customer}%' 
+			</if>
+			<if test="businessId != null">
+				AND pl.orig_business_id like  '${businessId}%'
+			</if>
+			<if test="accountantConfirmStatus != null">
+				AND pl.accountant_confirm_status =
+				#{accountantConfirmStatus}
+			</if>
+			<if test="areaId != null">
+				AND pl.area_pid_ext = #{areaId}
+			</if>
+			<if test="companyId != null">
+				AND pl.company_name_ext = #{companyId}
+			</if>
+			<if test="businessType != null ">
+				AND pl.business_type_ext = #{businessType}
+			</if>
+			<if test="repayDate != null">
+				AND DATE_FORMAT(pl.due_date,'%Y-%m-%d') = #{repayDate}
+			</if>
+			<if test="regDateStart != null ">
+				AND pl.trade_date &gt;= #{regDateStart}
+			</if>
+			<if test="regDateEnd != null ">
+				AND pl.trade_date &lt;= #{regDateEnd}
 			</if>
 			<if test="status != null ">
 				AND pl.current_status = #{status}
