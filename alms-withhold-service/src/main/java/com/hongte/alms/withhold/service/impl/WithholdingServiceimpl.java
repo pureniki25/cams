@@ -190,6 +190,13 @@ public class WithholdingServiceimpl implements WithholdingService {
 		List<WithholdingChannel> channels = withholdingChannelService
 				.selectList(new EntityWrapper<WithholdingChannel>().eq("platform_id", PlatformEnum.YH_FORM.getValue())
 						.eq("channel_status", 1).orderBy("channel_level"));
+		
+		if(channels.size()==0) {
+			result.setCode("-1");
+	    	result.setMsg("没有找到可用的银行代扣渠道");
+			rechargeService.RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
+	    	return result;
+		}
 		WithholdingChannel channel = null;
 		if (channels != null && channels.size() > 0) {
 			channel = channels.get(0);
@@ -348,6 +355,13 @@ public class WithholdingServiceimpl implements WithholdingService {
 		List<WithholdingChannel> channels = withholdingChannelService
 				.selectList(new EntityWrapper<WithholdingChannel>().ne("platform_id", PlatformEnum.YH_FORM.getValue())
 						.eq("channel_status", 1).orderBy("channel_level"));
+		
+		if(channels.size()==0) {
+			result.setCode("-1");
+	    	result.setMsg("没有找到可用的第三方代扣渠道");
+			rechargeService.RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
+	    	return result;
+		}
 		List<ThirdPlatform> thirdPlatforms = thirtyCardInfo.getThirdPlatformList();
 
 		List<WithholdingChannel> newChanels = new ArrayList();
@@ -480,7 +494,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		
 		
 		Result result=new Result();
-		if(bankCardInfo.getSignedProtocolList()!=null&&bankCardInfo.getSignedProtocolList().size()>0) {
+	
 				BigDecimal onlineAmount = rechargeService.getOnlineAmount(pList);
 				BigDecimal underAmount = rechargeService.getUnderlineAmount(pList);
 				Integer platformId = (Integer) PlatformEnum.YH_FORM.getValue();
@@ -488,6 +502,11 @@ public class WithholdingServiceimpl implements WithholdingService {
 				List<WithholdingChannel> channels = withholdingChannelService
 						.selectList(new EntityWrapper<WithholdingChannel>().eq("platform_id", PlatformEnum.YH_FORM.getValue())
 								.eq("channel_status", 1).orderBy("channel_level"));
+				if(channels.size()==0) {
+					result.setCode("-1");
+			    	result.setMsg("没有找到可用的银行代扣渠道");
+			    	return result;
+				}
 				WithholdingChannel channel = null;
 				if (channels != null && channels.size() > 0) {
 					channel = channels.get(0);
@@ -573,10 +592,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 						}
 					}
 				}
-		}else {
-			result.setCode("-1");
-	    	result.setMsg("找不到签约成功的协议代扣渠道");
-		}
+	
 		return result;
 	}
 
@@ -589,6 +605,11 @@ public class WithholdingServiceimpl implements WithholdingService {
 				List<WithholdingChannel> channels = withholdingChannelService
 						.selectList(new EntityWrapper<WithholdingChannel>().eq("platform_id",platformId)
 								.eq("channel_status", 1).orderBy("channel_level"));
+				if(channels.size()==0) {
+					result.setCode("-1");
+			    	result.setMsg("没有找到可用的第三方代扣渠道");
+			    	return result;
+				}
 				List<ThirdPlatform> thirdPlatforms = thirtyCardInfo.getThirdPlatformList();
 
 				List<WithholdingChannel> newChanels = new ArrayList();

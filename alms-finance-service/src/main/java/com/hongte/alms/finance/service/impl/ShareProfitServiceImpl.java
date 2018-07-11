@@ -2447,6 +2447,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
     private void tdrepayRecharge(List<RepaymentProjPlanList> projPlanLists) {
 
         if(projPlanLists==null||projPlanLists.size()==0){
+        	logger.info("开始调用平台合规化还款接口，参数：{}", projPlanLists);
             return;
         }
 //        //睡一下，让还款的信息先存完。
