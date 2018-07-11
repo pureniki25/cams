@@ -636,7 +636,7 @@ var showData=function(){debugger
                     	getPreLateFees();
                     }
                   }else{
-                    vm.$Modal.error({content: res.data.msg });
+                    vm.$Modal.error({content:"基础数据不完整，未能获取出款记录，无法发起减免" });
                   }
                 }).catch(function(error){
                 	vm.isCarFlag=true;
