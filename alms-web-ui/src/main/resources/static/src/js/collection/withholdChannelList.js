@@ -198,14 +198,8 @@ window.layinit(function (htConfig) {
 
                 if(e ==5){
                     this.disabledFlag = false;
-                }else if(e==3) {
+                }else {
                     this.disabledFlag = true;
-                    vm.withHoldChanelForm.subPlatformId=3;
-                    vm.withHoldChanelForm.subPlatformName='宝付代扣';
-                }else if(e==0){
-                    this.disabledFlag = true;
-                    vm.withHoldChanelForm.subPlatformId=0;
-                    vm.withHoldChanelForm.subPlatformName='易宝代扣';
                 }
 
             },
@@ -214,6 +208,7 @@ window.layinit(function (htConfig) {
                 this.$refs[name].resetFields();
                 vm.title="新增渠道";
                 vm.withHoldChanelModel = true;
+                vm.withHoldChanelForm.channelId='';
             },
             submitHoldChanel(name) {
                 var platformId = vm.withHoldChanelForm.platformId;
@@ -230,6 +225,7 @@ window.layinit(function (htConfig) {
                 console.log("channelStatus", typeof channelStatus);
                 console.log("failTimes", typeof failTimes);
                 console.log("channelLevel", typeof channelLevel);
+                console.log("channelId", typeof channelId);
                 this.$refs[name].validate((valid) => {
                     if (valid) {
                         //提交

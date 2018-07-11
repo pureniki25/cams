@@ -1,5 +1,6 @@
 package com.hongte.alms.base.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -15,11 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.hongte.alms.base.dto.ConfirmRepaymentReq;
 import com.hongte.alms.base.entity.AgencyRechargeLog;
 import com.hongte.alms.base.entity.IssueSendOutsideLog;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.EipRemote;
+import com.hongte.alms.base.feignClient.FinanceFeignClient;
 import com.hongte.alms.base.mapper.AgencyRechargeLogMapper;
 import com.hongte.alms.base.service.AgencyRechargeLogService;
 import com.hongte.alms.base.service.IssueSendOutsideLogService;
@@ -50,14 +53,16 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 	@Autowired
 	@Qualifier("TdrepayRechargeLogService")
 	private TdrepayRechargeLogService tdrepayRechargeLogService;
-	
+
 	@Autowired
 	private LoginUserInfoHelper loginUserInfoHelper;
-	
+
 	@Autowired
 	@Qualifier("IssueSendOutsideLogService")
 	private IssueSendOutsideLogService issueSendOutsideLogService;
-
+	
+	@Autowired
+	private FinanceFeignClient financeFeignClient;
 
 	@Transactional(rollbackFor = Exception.class)
 	@Override
@@ -91,16 +96,21 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 			paramMap.put("oidPartner", oidPartner);
 			paramMap.put("cmOrderNo", cmOrderNo);
 			Result result = eipRemote.queryRechargeOrder(paramMap);
+			String resultJson = JSONObject.toJSONString(result);
+			LOG.info("查询快捷代充值订单，cmOrderNo = {}；返回结果：{}", cmOrderNo, resultJson);
 			if (result == null) {
 				throw new ServiceRuntimeException("调用外联平台接口失败！");
 			}
-			if ("0000".equals(result.getReturnCode())) {
-				String dataJson = JSONObject.toJSONString(result.getData());
-				Map<String, Object> resultMap = JSONObject.parseObject(dataJson, Map.class);
-				String status = (String) resultMap.get("status");
-				String orderId = (String) resultMap.get("orderId");
-				String message = (String) resultMap.get("message");
-				LOG.info("查询订单充值，状态：{}，订单号：{}，消息：{}", status, orderId, message);
+
+			String dataJson = JSONObject.toJSONString(result.getData());
+			Map<String, Object> resultMap = JSONObject.parseObject(dataJson, Map.class);
+			String status = (String) resultMap.get("status");
+			String orderId = (String) resultMap.get("orderId");
+			String message = (String) resultMap.get("message");
+
+			LOG.info("查询订单充值，状态：{}，订单号：{}，消息：{}", status, orderId, message);
+
+			if (Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
 				AgencyRechargeLog log = new AgencyRechargeLog();
 				log.setHandleStatus(status);
 				log.setUpdateTime(new Date());
@@ -139,18 +149,19 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 					issueSendOutsideLog.setReturnJson(e.getMessage());
 					LOG.error(e.getMessage(), e);
 				}
-				
+
 				if (result != null) {
 					issueSendOutsideLog.setReturnJson(JSONObject.toJSONString(result));
 				}
 				issueSendOutsideLogService.insert(issueSendOutsideLog);
-				
-				if (result != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode()) && result.getData() != null) {
+
+				if (result != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())
+						&& result.getData() != null) {
 					String jsonString = JSONObject.toJSONString(result.getData());
 					Map<String, Object> resultMap = JSONObject.parseObject(jsonString, Map.class);
-					
+
 					String handlerStatus = (String) resultMap.get("handlerStatus");
-					
+
 					if (StringUtil.notEmpty(handlerStatus)) {
 						switch (handlerStatus) {
 						case "0":
@@ -182,7 +193,7 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 			}
 		}
 	}
-	
+
 	/**
 	 * 记录第三方日志
 	 * 
@@ -206,5 +217,75 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 		issueSendOutsideLog.setSendKey(sendKey);
 
 		return issueSendOutsideLog;
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	public void queryQuickRechargeOrder(List<AgencyRechargeLog> logs, String updateUser) {
+		List<AgencyRechargeLog> failLogs = new ArrayList<>();
+		if (CollectionUtils.isNotEmpty(logs)) {
+			for (AgencyRechargeLog agencyRechargeLog : logs) {
+				Map<String, Object> paramMap = new HashMap<>();
+				paramMap.put("oidPartner", agencyRechargeLog.getoIdPartner());
+				paramMap.put("cmOrderNo", agencyRechargeLog.getCmOrderNo());
+
+				Result result = null;
+				try {
+					result = eipRemote.queryRechargeOrder(paramMap);
+					String resultJson = JSONObject.toJSONString(result);
+					LOG.info("查询快捷代充值订单，cmOrderNo = {}；返回结果：{}", agencyRechargeLog.getCmOrderNo(), resultJson);
+				} catch (Exception e) {
+					LOG.error("调用外联平台接口失败！cmOrderNo = {}", agencyRechargeLog.getCmOrderNo());
+					LOG.error(e.getMessage(), e);
+				}
+
+				if (result == null) {
+					LOG.info("调用外联平台接口失败！cmOrderNo = {}", agencyRechargeLog.getCmOrderNo());
+					failLogs.add(agencyRechargeLog);
+					continue;
+				}
+
+				String dataJson = JSONObject.toJSONString(result.getData());
+				Map<String, Object> resultMap = JSONObject.parseObject(dataJson, Map.class);
+				String status = (String) resultMap.get("status");
+				String orderId = (String) resultMap.get("orderId");
+				String message = (String) resultMap.get("message");
+
+				LOG.info("查询订单充值，状态：{}，订单号：{}，消息：{}", status, orderId, message);
+
+				if (Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
+					agencyRechargeLog.setHandleStatus(status);
+					agencyRechargeLog.setUpdateTime(new Date());
+					agencyRechargeLog.setUpdateUser(updateUser);
+				} else {
+					failLogs.add(agencyRechargeLog);
+				}
+			}
+			logs.removeAll(failLogs);
+			
+			if (CollectionUtils.isNotEmpty(logs)) {
+				this.updateBatchById(logs);
+				
+				// 调用核销接口
+				for (AgencyRechargeLog agencyRechargeLog : logs) {
+					if (!"2".equals(agencyRechargeLog.getHandleStatus())) {
+						continue;
+					}
+					ConfirmRepaymentReq req = new ConfirmRepaymentReq();
+					req.setBusinessId(agencyRechargeLog.getOrigBusinessId());
+					req.setAfterId(agencyRechargeLog.getAfterId());
+					List<String> rechargeIds = new ArrayList<>();
+					rechargeIds.add(agencyRechargeLog.getCmOrderNo());
+					req.setRechargeIds(rechargeIds);
+					req.setCallFlage(50);
+					com.hongte.alms.common.result.Result result = financeFeignClient.recharge(req);
+					if (result == null || !"1".equals(result.getCode())) {
+						agencyRechargeLog.setHandleStatus("1");
+						this.updateById(agencyRechargeLog);
+					}
+				}
+			}
+		}
 	}
 }

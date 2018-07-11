@@ -75,6 +75,11 @@ public class RepayPlanController {
     RepaymentBizPlanService repaymentBizPlanService;
 
     @Autowired
+    @Qualifier("RepaymentProjPlanService")
+    RepaymentProjPlanService repaymentProjPlanService;
+
+
+    @Autowired
     @Qualifier("RepaymentBizPlanListService")
     RepaymentBizPlanListService repaymentBizPlanListService;
 
@@ -525,6 +530,11 @@ public class RepayPlanController {
 
        RepaymentBizPlan bizPlan =  repaymentBizPlanService.selectById(planId);
 
+        TuandaiProjectInfo tuandaiProjectInfo = tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("business_after_guid",bizPlan.getRepaymentBatchId()));
+       if(tuandaiProjectInfo == null){
+           return Result.error("9889","未找到对应的标信息");
+       }
+
 
        if(bizPlan ==null){
            return Result.error("9889","未找到对应的还款计划");
@@ -535,10 +545,11 @@ public class RepayPlanController {
         BizPlanDto  bizPlanDto  = getBizPlanDtoByBizPlan(bizPlan);
         bizPlanDto.setBusinessType(bizDto.getBusinessType());
         bizPlanDto.setRepayWay(bizDto.getRepayWay());
-        bizPlanDto.setBorrowMoney(bizDto.getBorrowMoney());
+        bizPlanDto.setBorrowMoney(tuandaiProjectInfo.getFullBorrowMoney());
         bizPlanDto.setBorrowLimit(bizDto.getBorrowLimit());
         bizPlanDto.setBorrowLimitUnit(bizDto.getBorrowLimitUnit());
-        bizPlanDto.setInputTime(bizDto.getInputTime());
+        bizPlanDto.setInputTime(tuandaiProjectInfo.getQueryFullSuccessDate());
+
         logger.info("根据还款计划ID查找出此还款计划的详情账单信息 结束，返回数据：[{}]", JSON.toJSONString(bizPlanDto));
 
        return  Result.success(bizPlanDto);
@@ -639,7 +650,7 @@ public class RepayPlanController {
             throw  new MyException(ExceptionCodeEnum.NULL.getValue().toString(),"找不到业务信息，业务ID："+businessId);
         }
 
-        List<TuandaiProjectInfo> ll= tuandaiProjectInfoService.selectList(new EntityWrapper<TuandaiProjectInfo>().eq("business_id",businessId));
+        List<TuandaiProjectInfo> ll= tuandaiProjectInfoService.selectList(new EntityWrapper<TuandaiProjectInfo>().eq("business_id",businessId).orderBy("queryFullsuccessDate",false));
 
         if(ll!=null&&ll.size()>0){
             bizDto.setPlateType(ll.get(0).getPlateType());
@@ -672,7 +683,12 @@ public class RepayPlanController {
         //借款期限单位
         bizDto.setBorrowLimitUnit(RepayPlanBorrowLimitUnitEnum.nameOf(business.getBorrowLimitUnit()));
         //进件日期
-        bizDto.setInputTime(business.getInputTime());
+        if(ll!=null&&ll.size()>0){
+            bizDto.setInputTime(ll.get(0).getQueryFullSuccessDate());
+        }else{
+            bizDto.setInputTime(business.getInputTime());
+        }
+
 
 
         List<RepaymentBizPlan> bizPlans = repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",businessId));
