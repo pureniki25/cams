@@ -533,6 +533,10 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 								 
 								   
 									projPlanList.setOverdueDays(BigDecimal.valueOf(getOverDays(detailDto.getRefundDate())));
+									if(getOverDays(detailDto.getRefundDate())>0) {
+										projPlanList.setCurrentStatus("逾期");
+										pList.setCurrentStatus("逾期");
+									}
 									projPlanList.setDueDate(new Date(detailDto.getRefundDate()));
 									projPlanList.setOverdueAmount(detailDto.getTotalPenalty());
 									projPlanList.setUpdateTime(new Date());
