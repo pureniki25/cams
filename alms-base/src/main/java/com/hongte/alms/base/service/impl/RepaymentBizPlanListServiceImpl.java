@@ -110,9 +110,85 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
     public String queryRepaymentBizPlanListByConditions(String businessId, String afterId) {
         return repaymentBizPlanListMapper.queryRepaymentBizPlanListByConditions(businessId, afterId);
     }
-
+    
     @Override
     public PageResult selectByFinanceManagerListReq(FinanceManagerListReq req) {
+        int count = repaymentBizPlanListMapper.conutFinanceManagerList(req);
+        Set<String> businessSet = new HashSet<>();
+
+        List<FinanceManagerListVO> list = repaymentBizPlanListMapper.selectFinanceMangeList(req);
+        for (FinanceManagerListVO financeManagerListVO : list) {
+            businessSet.add(financeManagerListVO.getBusinessId());
+        }
+
+        try {
+            for (FinanceManagerListVO financeManagerListVO : list) {
+                financeManagerListVO.setCanWithhold(false);
+                financeManagerListVO.setCanWithholdDesc(Constant.CANWITHHOLD_NO);
+
+                for (String businessId : businessSet) {
+                    if (financeManagerListVO.getBusinessId().equals(businessId)) {
+                     BigDecimal planRepayAmount=financeManagerListVO.getPlanRepayAmount();
+                        //查询身份证信息
+                        BasicBusiness basicBusiness = basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", businessId));
+                        String identityCard = basicBusiness.getCustomerIdentifyCard();
+                        RequestData requestData = new RequestData();
+                        JSONObject data = new JSONObject();
+                        data.put("identityCard", identityCard);
+                        requestData.setData(JSON.toJSONString(data));
+                        requestData.setMethodName("BankCard_GetBankCardByIdCard");
+                        String encryptStr = JSON.toJSONString(requestData);
+                        // 请求数据加密
+                        encryptStr = encryptPostData(encryptStr);
+                        XindaiFeign XindaiFeignService = Feign.builder().target(XindaiFeign.class, apiUrl);
+
+                        String respStr = XindaiFeignService.getBankcardInfo(encryptStr);
+                        // 返回数据解密
+                        ResponseData respData = getRespData(respStr);
+                        logger.info("客户根据身份证号:" + identityCard + "获取银行卡信息，接口返回数据:" + respData.getData() + "," + respData.getReturnMessage());
+                        if (respData.getData() != null) {
+
+                           JSONArray jsonObject = JSON.parseArray(respData.getData());
+
+                           List<BankCardInfo> bankList= jsonObject.toJavaList(BankCardInfo.class);
+                            if (bankList !=null) {
+                                financeManagerListVO.setCanWithhold(true); //有绑定平台可以进行代扣
+                                String bankCode = bankList.get(0).getBankCode();
+                                //查询单笔最高金额
+                                BigDecimal onceLimit = sysBankLimitService.selectOnceLimit(bankCode);
+                                //查询单日最高金额
+                                BigDecimal dayLimit = sysBankLimitService.selectMaxDayLimit(bankCode);
+
+                                //若未绑定代扣平台取“否”，鼠标移到否时需提示文案为“该卡当前不支持代扣，请及时更换”
+                                //若为”是“则需情况进行文案提示：
+                                // A.该卡单次代扣限额>=本次还款金额，提示“限额足够，可一次代扣”；
+                                // B.该卡单次代扣限额<本次还款金额<=单日代扣限额，提示“单次限额不够，本次还款需要代扣x次。X=本次还款金额/单笔代扣额度 进1一次
+                                // C.卡单日代扣限额<本次还款金额，提示“代扣限额不足，请换卡”
+                                //planRepayAmount
+                                if(planRepayAmount.compareTo(onceLimit)<=0){
+                                    financeManagerListVO.setCanWithholdDesc(Constant.CANWITHHOLD_YES_1);
+                                }else if(planRepayAmount.compareTo(onceLimit)>0 && planRepayAmount.compareTo(dayLimit)<=0){
+                                    BigDecimal divide = planRepayAmount.divide(onceLimit).setScale(0, BigDecimal.ROUND_UP);
+                                    financeManagerListVO.setCanWithholdDesc(String.format(Constant.CANWITHHOLD_YES_2,divide.intValue()));
+                                }else if(planRepayAmount.compareTo(dayLimit)>0){
+                                    financeManagerListVO.setCanWithholdDesc(Constant.CANWITHHOLD_YES_3);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+
+        } catch (Exception e) {
+            logger.error("获取绑卡信息失败{}", e.getMessage());
+        }
+        logger.info("=======财务列表list{}",JSON.toJSONString(list));
+        return PageResult.success(list, count);
+    }
+
+
+    public PageResult selectByFinanceManagerListReqBak(FinanceManagerListReq req) {
         int count = repaymentBizPlanListMapper.conutFinanceManagerList(req);
         List<String> businessList = new ArrayList<>();
         Set<String> businessSet = new HashSet();
@@ -189,7 +265,7 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
                         logger.info("客户根据身份证号:" + identityCard + "获取银行卡信息，接口返回数据:" + respData.getData() + "," + respData.getReturnMessage());
                         if (respData.getData() != null) {
 
-                            JSONArray jsonObject = JSON.parseArray(respData.getData());
+                           JSONArray jsonObject = JSON.parseArray(respData.getData());
 
                            List<BankCardInfo> bankList= jsonObject.toJavaList(BankCardInfo.class);
                             if (bankList !=null) {

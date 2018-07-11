@@ -48,6 +48,14 @@ public class WithholdingChannelServiceImpl extends BaseServiceImpl<WithholdingCh
     public void addOrEditWithholdChannel(WithholdingChannel withholdingChannel) throws Exception {
 
         String subPlatformId = withholdingChannel.getSubPlatformId();
+        Integer platformId = withholdingChannel.getPlatformId();
+        if(platformId == 0){//易宝代扣
+            withholdingChannel.setSubPlatformId("010");
+            withholdingChannel.setSubPlatformName("易宝代扣");
+        }else if(platformId == 3){ //宝付代扣
+            withholdingChannel.setSubPlatformId("310");
+            withholdingChannel.setSubPlatformName("宝付代扣");
+        }
         if (!StringUtil.isEmpty(subPlatformId)) {
             int count = withholdingChannelMapper.selectCount(new EntityWrapper<WithholdingChannel>().eq("sub_platform_id", subPlatformId));
 
