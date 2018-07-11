@@ -42,6 +42,7 @@ window.layinit(function (htConfig) {
             return {
                 disabledFlag: true,
                 withHoldChanelModel: false,
+                title:'',
                 platformType: [],
                 loading: false,
                 searchForm: {
@@ -173,6 +174,7 @@ window.layinit(function (htConfig) {
                 vm.toLoading();
             },
             editWithholdChannel(id) {
+                vm.title="编辑渠道";
                 vm.withHoldChanelModel = true;
                 axios.get(basePath + 'withholdManage/getWithholdChannel?channelId=' + id)
                     .then(function (res) {
@@ -196,14 +198,21 @@ window.layinit(function (htConfig) {
 
                 if(e ==5){
                     this.disabledFlag = false;
-                }else {
+                }else if(e==3) {
                     this.disabledFlag = true;
+                    vm.withHoldChanelForm.subPlatformId=3;
+                    vm.withHoldChanelForm.subPlatformName='宝付代扣';
+                }else if(e==0){
+                    this.disabledFlag = true;
+                    vm.withHoldChanelForm.subPlatformId=0;
+                    vm.withHoldChanelForm.subPlatformName='易宝代扣';
                 }
 
             },
             addHoldChannel(name) {
                 // console.log("addHoldChannel",addHoldChannel);
                 this.$refs[name].resetFields();
+                vm.title="新增渠道";
                 vm.withHoldChanelModel = true;
             },
             submitHoldChanel(name) {
@@ -215,6 +224,7 @@ window.layinit(function (htConfig) {
                 var level = vm.withHoldChanelForm.channelLevel;
                 var subPlatformId = vm.withHoldChanelForm.subPlatformId;
                 var subPlatformName = vm.withHoldChanelForm.subPlatformName;
+
 
                 console.log("platformId", typeof platformId);
                 console.log("channelStatus", typeof channelStatus);

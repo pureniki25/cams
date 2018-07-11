@@ -126,11 +126,11 @@ let methods = {
 	                            });
 		            		   app.add_modal=false
 		            	   }else{
-		            		   vm.$Modal.error({content: '操作失败，消息：' + res.msg});
+		            		   app.$Modal.error({content: '操作失败，消息：' + res.msg});
 		            	   }
 		               },
 		               error: function (message) {
-		            	   vm.$Modal.error({content: '接口调用异常!'});
+		            	   app.$Modal.error({content: '接口调用异常!'});
 		                   console.error(message);
 		               }
 		           });
@@ -179,11 +179,11 @@ let methods = {
                             });
 	            		   app.fee_add_modal=false
 	            	   }else{
-	            		   vm.$Modal.error({content: '操作失败，消息：' + res.msg});
+	            		   app.$Modal.error({content: '操作失败，消息：' + res.msg});
 	            	   }
 	               },
 	               error: function (message) {
-	            	   vm.$Modal.error({content: '接口调用异常!'});
+	            	   app.$Modal.error({content: '接口调用异常!'});
 	                   console.error(message);
 	               }
 	           });

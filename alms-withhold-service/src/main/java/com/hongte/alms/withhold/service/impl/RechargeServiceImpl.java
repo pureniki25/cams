@@ -8,12 +8,14 @@ import com.hongte.alms.base.entity.ApplyDerateProcess;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.BizOutputRecord;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
+import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentConfirmLog;
 import com.hongte.alms.base.entity.RepaymentProjPlanList;
 import com.hongte.alms.base.entity.SysExceptionLog;
 import com.hongte.alms.base.entity.SysParameter;
+import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.base.entity.WithholdingChannel;
 import com.hongte.alms.base.entity.WithholdingRepaymentLog;
 import com.hongte.alms.base.enums.PlatformEnum;
@@ -37,10 +39,13 @@ import com.hongte.alms.base.service.BizOutputRecordService;
 import com.hongte.alms.base.service.MoneyPoolRepaymentService;
 import com.hongte.alms.base.service.RepaymentBizPlanListDetailService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
+import com.hongte.alms.base.service.RepaymentBizPlanService;
 import com.hongte.alms.base.service.RepaymentConfirmLogService;
 import com.hongte.alms.base.service.RepaymentProjPlanListService;
+import com.hongte.alms.base.service.SendMessageService;
 import com.hongte.alms.base.service.SysExceptionLogService;
 import com.hongte.alms.base.service.SysParameterService;
+import com.hongte.alms.base.service.TuandaiProjectInfoService;
 import com.hongte.alms.base.service.WithholdingChannelService;
 import com.hongte.alms.base.service.WithholdingRepaymentLogService;
 import com.hongte.alms.common.result.Result;
@@ -155,6 +160,18 @@ public class RechargeServiceImpl implements RechargeService {
 
 	@Autowired
 	LoginUserInfoHelper loginUserInfoHelper;
+	
+	@Autowired
+	@Qualifier("SendMessageService")
+	SendMessageService sendMessageService;
+	
+	@Autowired
+	@Qualifier("TuandaiProjectInfoService")
+	TuandaiProjectInfoService tuandaiProjectInfoService;
+	
+	@Autowired
+	@Qualifier("RepaymentBizPlanService")
+	RepaymentBizPlanService repaymentBizPlanService;
 
 	@Override
 	public Result recharge(BasicBusiness business, RepaymentBizPlanList pList, Double amount, Integer boolLastRepay,
@@ -170,6 +187,20 @@ public class RechargeServiceImpl implements RechargeService {
 				.selectRepaymentLogForAutoRepay(business.getBusinessId(), pList.getAfterId(), channel.getPlatformId());
 		failCount = logs.size();
 		Integer maxFailCount = channel.getFailTimes();
+		
+		//获取借款日期
+		TuandaiProjectInfo tuandaiProjectInfo = tuandaiProjectInfoService.selectOne(
+				new EntityWrapper<TuandaiProjectInfo>().eq("business_id", pList.getOrigBusinessId()));
+		Date borrowDate = null;
+		if (tuandaiProjectInfo.getQueryFullSuccessDate() != null) {
+			borrowDate = tuandaiProjectInfo.getQueryFullSuccessDate();
+		} else {
+			borrowDate = tuandaiProjectInfo.getCreateTime();
+		}
+		
+		
+		//获取还款计划的借款金额
+		RepaymentBizPlan plan=repaymentBizPlanService.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("plan_id", pList.getPlanId()));
 
 		if (failCount >= maxFailCount) {
 			result.setData(null);
@@ -230,6 +261,9 @@ public class RechargeServiceImpl implements RechargeService {
 					log.setUpdateTime(new Date());
 					withholdingRepaymentLogService.updateById(log);
 					shareProfit(pList, log);
+					//sms
+					sendMessageService.sendAfterRepaySuccessSms(bankCardInfo.getMobilePhone(), bankCardInfo.getBankCardName(),borrowDate, plan.getBorrowMoney(), pList.getPeriod(), pList.getTotalBorrowAmount().add(pList.getOverdueAmount()==null?BigDecimal.valueOf(0):pList.getOverdueAmount()), BigDecimal.valueOf(amount));
+	
 				} else if (remoteResult.getReturnCode().equals(RepayResultCodeEnum.YH_HANDLER_EXCEPTION.getValue())) {
 					result.setCode("2");
 					result.setMsg(resultMsg);
@@ -245,7 +279,10 @@ public class RechargeServiceImpl implements RechargeService {
 					log.setRemark(resultMsg);
 					log.setUpdateTime(new Date());
 					withholdingRepaymentLogService.updateById(log);
-				
+					
+					//sms
+					sendMessageService.sendAfterRepayFailSms(bankCardInfo.getMobilePhone(), bankCardInfo.getBankCardName(),borrowDate, plan.getBorrowMoney(), pList.getPeriod());
+		
 				}
 			}
 			
@@ -313,6 +350,8 @@ public class RechargeServiceImpl implements RechargeService {
 					log.setUpdateTime(new Date());
 					withholdingRepaymentLogService.updateById(log);
 					shareProfit(pList, log);
+					sendMessageService.sendAfterRepaySuccessSms(bankCardInfo.getMobilePhone(), bankCardInfo.getBankCardName(),borrowDate, plan.getBorrowMoney(), pList.getPeriod(), pList.getTotalBorrowAmount().add(pList.getOverdueAmount()==null?BigDecimal.valueOf(0):pList.getOverdueAmount()), BigDecimal.valueOf(amount));
+
 				} else if (remoteResult.getReturnCode().equals(RepayResultCodeEnum.BF00100.getValue())
 						|| remoteResult.getReturnCode().equals(RepayResultCodeEnum.BF00112.getValue())
 						|| remoteResult.getReturnCode().equals(RepayResultCodeEnum.BF00113.getValue())
@@ -333,6 +372,9 @@ public class RechargeServiceImpl implements RechargeService {
 					log.setRemark(resultMsg);
 					log.setUpdateTime(new Date());
 					withholdingRepaymentLogService.updateById(log);
+					//sms
+					sendMessageService.sendAfterRepayFailSms(bankCardInfo.getMobilePhone(), bankCardInfo.getBankCardName(),borrowDate, plan.getBorrowMoney(), pList.getPeriod());
+		
 				}
 				
 				try {
@@ -410,6 +452,7 @@ public class RechargeServiceImpl implements RechargeService {
 						log.setUpdateTime(new Date());
 						withholdingRepaymentLogService.updateById(log);
 						shareProfit(pList, log);
+						sendMessageService.sendAfterRepaySuccessSms(bankCardInfo.getMobilePhone(), bankCardInfo.getBankCardName(),borrowDate, plan.getBorrowMoney(), pList.getPeriod(), pList.getTotalBorrowAmount().add(pList.getOverdueAmount()==null?BigDecimal.valueOf(0):pList.getOverdueAmount()), BigDecimal.valueOf(amount));
 						break;
 					} else if (remoteResult.getReturnCode().equals(RepayResultCodeEnum.YH_HANDLER_EXCEPTION.getValue())) {
 						result.setCode("2");
@@ -428,6 +471,9 @@ public class RechargeServiceImpl implements RechargeService {
 						log.setUpdateTime(new Date());
 						withholdingRepaymentLogService.updateById(log);
 						// 失败，重试其他子渠道
+						
+						//sms
+						sendMessageService.sendAfterRepayFailSms(bankCardInfo.getMobilePhone(), bankCardInfo.getBankCardName(),borrowDate, plan.getBorrowMoney(), pList.getPeriod());
 						continue;
 					}
 					
