@@ -139,6 +139,7 @@ window.layinit(function (htConfig) {
                     {
                         title: '状态',
                         key: 'status',
+                        width:120,
                         render: (h, p) => {
                             var s1 = p.row.planRepayDate;
                             s1 = new Date(s1.replace(/-/g, "/"));
@@ -161,6 +162,10 @@ window.layinit(function (htConfig) {
                             }
                             if (p.row.status == '已还款') {
                                 color = 'green'
+                            }
+
+                            if(p.row.status == '逾期' && p.row.repayStatus == '未还款'){
+                                content = '逾期'
                             }
                             return h('Tag', {
                                 props: {
@@ -213,7 +218,61 @@ window.layinit(function (htConfig) {
                                                         });
                                                         return;
                                                     }
+                                                    let lastRepayConfirm = true
+                                                    $.ajax({
+                                                        type : 'GET',
+                                                        async : false,
+                                                        url : fpath +'finance/lastRepayConfirm?businessId='+p.row.businessId+'&afterId='+p.row.afterId,
+                                                        headers : {
+                                                            app : 'ALMS',
+                                                            Authorization : "Bearer " + getToken()
+                                                        }, 
+                                                        success : function(data) {
+                                                                console.log(data);
+                                                                if(data.code=='1'){
+                                                                    if(data.data==0||data.data==10||data.data==11||data.data==21||data.data==31){
+                                                                        lastRepayConfirm = true ;
+                                                                    }else{
+                                                                        lastRepayConfirm = false ;
+                                                                    }
+                                                                }else{
+                                                                    app.$Message.error({content:data.msg})
+                                                                }
+                                                            },
+                                                        error : function() {
+                                                            console.log(data);
+                                                        }
+                                                    });
 
+                                                    $.ajax({
+                                                        type : 'GET',
+                                                        async : false,
+                                                        url : fpath+'finance/checkLastRepay?businessId='+p.row.businessId+'&afterId='+p.row.afterId,
+                                                        headers : {
+                                                            app : 'ALMS',
+                                                            Authorization : "Bearer " + getToken()
+                                                        }, 
+                                                        success : function(data) {
+                                                                console.log(data);
+                                                                if(data.code=='1'){
+                                                                    if(data.data==0||data.data==10||data.data==11||data.data==21||data.data==31){
+                                                                        lastRepayConfirm = true ;
+                                                                    }else{
+                                                                        lastRepayConfirm = false ;
+                                                                    }
+                                                                }else{
+                                                                    app.$Message.error({content:data.msg})
+                                                                }
+                                                            },
+                                                        error : function() {
+                                                            console.log(data);
+                                                        }
+                                                    });
+
+                                                    if(!lastRepayConfirm){
+                                                        app.$Message.warning({content:'上次自动代扣的业务此次不能线下还款'})
+                                                        return ;
+                                                    }
                                                     // window.location.href = link ;
                                                     layer.open({
                                                         type: 2,
@@ -461,6 +520,15 @@ window.layinit(function (htConfig) {
                 })
 
                 
+            },
+            checkLastRepay(businessId){
+                axios.get(fpath+'finance/checkLastRepay?businessId='+businessId)
+                .then(function(res){
+
+                })
+                .catch(function(err){
+
+                })
             }
         },
         created: function () {

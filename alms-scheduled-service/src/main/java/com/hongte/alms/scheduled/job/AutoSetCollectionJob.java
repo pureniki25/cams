@@ -18,7 +18,7 @@ import java.util.Date;
  * @since 2018/3/8
  * 自动移交催收的定时任务
  */
-@Component
+//@Component
 public class AutoSetCollectionJob {
 
     private static Logger logger = LoggerFactory.getLogger(AutoSetCollectionJob.class);
@@ -66,7 +66,7 @@ public class AutoSetCollectionJob {
     //每10分钟执行一次
 //    @Scheduled(cron = "0 0/10 * * * ? ")
     //每天凌晨2点执行一次
-    @Scheduled(cron = "0 0 2 * * ?")
+//    @Scheduled(cron = "0 0 2 * * ?")
     public  void job(){
 
         if(runningFlage){

@@ -8,6 +8,7 @@ import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentProjPlan;
 import com.hongte.alms.base.entity.RepaymentProjPlanList;
 import com.hongte.alms.base.entity.RepaymentProjPlanListDetail;
+import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.enums.RepayCurrentStatusEnums;
 import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanBorrowRateUnitEnum;
@@ -15,6 +16,7 @@ import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.mapper.RepaymentProjPlanListMapper;
 import com.hongte.alms.base.service.BasicBusinessService;
+import com.hongte.alms.base.service.ProfitItemSetService;
 import com.hongte.alms.base.service.RepaymentBizPlanListDetailService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.RepaymentBizPlanService;
@@ -63,7 +65,9 @@ public class RepaymentProjPlanListServiceImpl extends
     
    //保留小数位数
     private  Integer smallNum=2;
-    
+	@Autowired
+	@Qualifier("ProfitItemSetService")
+	ProfitItemSetService profitItemSetService;
 	@Autowired
 	RepaymentProjPlanListMapper repaymentProjPlanListMapper;
 	@Autowired
@@ -116,6 +120,9 @@ public class RepaymentProjPlanListServiceImpl extends
 						BigDecimal underLateFeeSum=BigDecimal.valueOf(0);//每个业务每期还款计划的线下收费
 						BigDecimal onlineLateFeeSum=BigDecimal.valueOf(0);//每个业务每期还款计划的线上收费
 						
+						if(pList.getPlanListId().equals("095118d7-633d-4f1c-82ef-4699563fffb6")) {
+							System.out.println("stop");
+						}
 						
 						
 							for (RepaymentProjPlanList projPList : projList) {
@@ -192,7 +199,7 @@ public class RepaymentProjPlanListServiceImpl extends
 				
 								BigDecimal days=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), pList.getDueDate())));//每个业务每期款还计划的逾期天数
 								pList.setOverdueDays(days);
-								pList.setOverdueAmount(underLateFeeSum.add(onlineLateFeeSum));
+								pList.setOverdueAmount(getPlanListOverAmountSum(pList));
 								pList.setCurrentStatus(RepayCurrentStatusEnums.逾期.name());
 								repaymentBizPlanListService.updateById(pList);
 								logger.info("===============：planListid:"+pList.getPlanListId()+"逾期费用计算结束===============");
@@ -203,7 +210,8 @@ public class RepaymentProjPlanListServiceImpl extends
 				    }
 			
 			}
- 
+			
+		
 			/**
 			// 每个业务对应所有贷后生成的标的还款计划
 			List<RepaymentProjPlan> projPlans = repaymentProjPlanService
@@ -238,6 +246,19 @@ public class RepaymentProjPlanListServiceImpl extends
   */
 		}
      
+	}
+    
+    /**
+     * 
+     * 获取每期planList的滞纳金总和
+     */
+	private BigDecimal getPlanListOverAmountSum(RepaymentBizPlanList pList) {
+		BigDecimal overAmountSum=BigDecimal.valueOf(0);
+		List<RepaymentProjPlanListDetail>  lists=repaymentProjPlanListDetailService.selectList(new EntityWrapper<RepaymentProjPlanListDetail>().eq("plan_list_id", pList.getPlanListId()).eq("plan_item_type", 60)); 
+		for(RepaymentProjPlanListDetail detail:lists) {
+			overAmountSum=overAmountSum.add(detail.getProjPlanAmount()==null?BigDecimal.valueOf(0):detail.getProjPlanAmount());
+		}
+		return overAmountSum;
 	}
 
 	/**
@@ -475,6 +496,8 @@ public class RepaymentProjPlanListServiceImpl extends
  			RepaymentProjPlanListDetail projDetail = repaymentProjPlanListDetailService.selectOne(
 					new EntityWrapper<RepaymentProjPlanListDetail>().eq("proj_plan_list_id", projPList.getProjPlanListId())
 							.eq("fee_id", feeId));
+ 			
+ 			BasicBusiness business=basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", projPList.getOrigBusinessId()));
 			try {
 				if (projDetail != null) {
 					projDetail.setProjPlanAmount(lateFee);
@@ -484,15 +507,35 @@ public class RepaymentProjPlanListServiceImpl extends
 					List<RepaymentProjPlanListDetail> projDetailList = repaymentProjPlanListDetailService
 							.selectList(new EntityWrapper<RepaymentProjPlanListDetail>().eq("proj_plan_list_id",
 									projPList.getProjPlanListId()));
+					
+					List<RepaymentProjPlanListDetail> feeIdLists = repaymentProjPlanListDetailService
+							.selectList(new EntityWrapper<RepaymentProjPlanListDetail>().eq("plan_list_id",
+									projPList.getPlanListId()).eq("fee_id", feeId));
+					
 					if (projDetailList != null && projDetailList.size() > 0) {
+					
 						RepaymentProjPlanListDetail temp = projDetailList.get(0);
 						projDetail = ClassCopyUtil.copyObject(temp,
 								RepaymentProjPlanListDetail.class);
 						projDetail.setProjPlanDetailId(UUID.randomUUID().toString());
 						projDetail.setFeeId(feeId);
 						projDetail.setProjPlanAmount(lateFee);
-						projDetail.setPlanItemType(60);
-						projDetail.setPlanDetailId(UUID.randomUUID().toString());
+						if(feeId.equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
+						  projDetail.setShareProfitIndex(profitItemSetService.getLevel(business.getBusinessType().toString(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getValue().intValue(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid()).get("feeLevel"));
+						}
+					     projDetail.setPlanItemType(60);
+						String planDetailId="";
+						for(RepaymentProjPlanListDetail detail:feeIdLists) {
+							if(detail.getFeeId().equals(feeId)) {
+								planDetailId=detail.getPlanDetailId();
+							}
+						}
+						if(StringUtil.isEmpty(planDetailId)) {
+							projDetail.setPlanDetailId(UUID.randomUUID().toString());
+						}else {
+							projDetail.setPlanDetailId(planDetailId);
+						}
+						 
 						projDetail.setPlanItemName("滞纳金");
 						repaymentProjPlanListDetailService.insertOrUpdate(projDetail);
 					}
@@ -517,6 +560,8 @@ public class RepaymentProjPlanListServiceImpl extends
 			RepaymentBizPlanListDetail pDetail = repaymentBizPlanListDetailService.selectOne(
 					new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", pList.getPlanListId())
 							.eq("fee_id", feeId));
+			
+			BasicBusiness business=basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", pList.getOrigBusinessId()));
 			try {
 				if (pDetail != null) {
 					pDetail.setPlanAmount(lateFee);
@@ -532,6 +577,9 @@ public class RepaymentProjPlanListServiceImpl extends
 						copy.setPlanDetailId(projDetail.getPlanDetailId());
 						copy.setFeeId(feeId);
 						copy.setPlanAmount(lateFee);
+					    if(feeId.equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
+						  copy.setShareProfitIndex(profitItemSetService.getLevel(business.getBusinessType().toString(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getValue().intValue(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid()).get("feeLevel"));
+					    }
 						copy.setPlanItemType(60);
 						copy.setPlanItemName("滞纳金");
 						repaymentBizPlanListDetailService.insertOrUpdate(copy);
@@ -608,16 +656,7 @@ public class RepaymentProjPlanListServiceImpl extends
 			
 		}
 		
-		public static void main(String[] args) {
-			String str="";
-			try {
-			str.subSequence(5, 6);
-			}catch(Exception e) {
-				System.out.println(e);
-			}
-			System.out.println("123");
-		}
-
+	
 		@Override
 		public List<RepaymentProjPlanList> getProListForCalLateFee(String projListId) {
 			

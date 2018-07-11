@@ -29,7 +29,7 @@ window.layinit(function(htConfig) {
 			selectAmountList: [], // 已勾选待分发金额集合
 			selectAmount: 0, // 已勾选待分发金额
 			ComplianceRepaymentData:[],// 储存查询到的数据
-			rechargeAccountType: '车贷代充值', // 代充值账户类型
+			rechargeAccountType: '车贷', // 代充值账户类型
 			rechargeAccountBalance: 0, // 代充值账户余额
 			allBusinessCompanyList: [], // 所有分公司
 			tdrepayRechargeInfoReqList: [], // 
@@ -40,6 +40,7 @@ window.layinit(function(htConfig) {
 			rechargeAccountBalanceFlag: false, // 查看代充值账户余额弹窗控制
 			queryRechargeAccountBalanceLoading: false, // 查看代充值账户余额按钮加载状态控制
 			infoTabValue:'fundDistributionRecord',//详情tab值
+			businessTypeList:[], // 业务类型集合
 				
 			/*
 			 *  详情基础信息
@@ -551,29 +552,31 @@ window.layinit(function(htConfig) {
 			 */
 			onChangeBusinessType: function(value){
 				if (value == 1) {
-					this.rechargeAccountType = '车贷代充值';
+					this.rechargeAccountType = '车贷';
 				}else if (value == 2) {
-					this.rechargeAccountType = '房贷代充值';
+					this.rechargeAccountType = '房贷';
 				}else if (value == 3) {
-					this.rechargeAccountType = '房贷代充值';
+					this.rechargeAccountType = '房贷';
 				}else if (value == 4) {
-					this.rechargeAccountType = '房贷代充值';
+					this.rechargeAccountType = '房贷';
 				}else if (value == 9) {
-					this.rechargeAccountType = '车贷代充值';
+					this.rechargeAccountType = '车贷';
 				}else if (value == 11) {
-					this.rechargeAccountType = '房贷代充值';
+					this.rechargeAccountType = '房贷';
 				}else if (value == 12) {
-					this.rechargeAccountType = '车贷代充值';
+					this.rechargeAccountType = '车贷';
 				}else if (value == 13) {
-					this.rechargeAccountType = '扶贫贷代充值';
+					this.rechargeAccountType = '扶贫贷';
 				}else if (value == 14) {
-					this.rechargeAccountType = '车贷代充值';
+					this.rechargeAccountType = '车贷';
 				}else if (value == 15) {
-					this.rechargeAccountType = '车贷代充值';
+					this.rechargeAccountType = '车贷';
 				}else if (value == 20) {
-					this.rechargeAccountType = '一点车贷代充值';
+					this.rechargeAccountType = '一点车贷';
+				}else if (value == 35) {
+					this.rechargeAccountType = '房贷';
 				}else {
-					this.rechargeAccountType = '信用贷代充值';
+					this.rechargeAccountType = '信用贷';
 				}
 				this.queryUserAviMoney();
 			},
@@ -709,6 +712,29 @@ window.layinit(function(htConfig) {
 			    			this.queryConditionModel.page = curr;
 			    		}
 			    })
+			},
+			
+			/*
+			 * 查询资金分发处理状态
+			 */
+			queryDistributeFund: function(){
+				axios.get(basePath + 'tdrepayRecharge/queryDistributeFund')
+				.then(function(result){
+					if (result.data.code == "1") {
+						vm.$Modal.success(
+							{   
+								content: '执行成功',
+								onOk: () => {
+									vm.queryComplianceRepaymentData();
+			                    },
+		                    }
+						);
+					} else {
+						vm.$Modal.error({ content: result.data.msg });
+					}
+				}).catch(function (error) {
+					vm.$Modal.error({content: '接口调用异常!'});
+            	});
 			},
 			
 			/*
@@ -909,6 +935,21 @@ window.layinit(function(htConfig) {
 			},
 			
 			/*
+			 * 查询所有业务类型集合
+			 */
+			queryBusinessTypes: function(){
+				axios.get(basePath +"tdrepayRecharge/queryBusinessTypes")
+				.then(function (res) {
+					if (res.data.data != null && res.data.code == 1) {
+						vm.businessTypeList = res.data.data;
+					}
+				})
+				.catch(function (error) {
+					vm.$Modal.error({content: '接口调用异常!'});
+				});
+			},
+			
+			/*
 			 * 查看充值记录分页
 			 */
 			paging: function (page) {
@@ -919,6 +960,7 @@ window.layinit(function(htConfig) {
 		},
 
 		mounted: function() {
+			this.queryBusinessTypes();
 			this.queryUserAviMoney();
 			this.queryAllBusinessCompany();
 			this.queryComplianceRepaymentData();

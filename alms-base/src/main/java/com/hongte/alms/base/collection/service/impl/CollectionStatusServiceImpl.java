@@ -114,7 +114,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
         String  userId= loginUserInfoHelper.getUserId();
         if(userId ==null){
-            userId = Constant.DEFAULT_SYS_USER;
+            userId = Constant.ADMIN_ID;
         }
 //        String  userId= "programer_zk";
 
@@ -152,14 +152,14 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                             status.setUpdateUser(Constant.ADMIN_ID);
                             break;
                         case MANUAL_SET:
-                            status.setUpdateUser(loginUserInfoHelper.getUserId()==null?Constant.SYS_DEFAULT_USER:loginUserInfoHelper.getUserId());
+                            status.setUpdateUser(loginUserInfoHelper.getUserId()==null?Constant.ADMIN_ID:loginUserInfoHelper.getUserId());
                             break;
                     }
                     CollectionLog log = new CollectionLog();
                     log.setBusinessId(status.getBusinessId());
                     log.setCrpId(status.getCrpId());
                     log.setAfterStatus(CollectionStatusEnum.getByPageStr(staffType).getKey());
-                    log.setCollectionUser("".equals(staffUserId)?Constant.SYS_DEFAULT_USER:staffUserId);
+                    log.setCollectionUser("".equals(staffUserId)?Constant.ADMIN_ID:staffUserId);
                     log.setCreateTime(new Date());
                     log.setCreateUser(status.getUpdateUser());
                     log.setUpdateTime(new Date());
@@ -251,7 +251,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
             CollectionLog log = new CollectionLog();
             log.setAfterStatus(afterStatus);
             log.setBusinessId(vo.getBusinessId());
-            log.setCollectionUser("".equals(staffUserId)?Constant.SYS_DEFAULT_USER:staffUserId);
+            log.setCollectionUser("".equals(staffUserId)?Constant.ADMIN_ID:staffUserId);
             log.setCrpId(vo.getCrpId());
             log.setUpdateUser(userId);
             log.setCreateUser(userId);

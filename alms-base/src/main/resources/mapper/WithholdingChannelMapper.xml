@@ -7,6 +7,8 @@
         <id column="channel_id" property="channelId" />
         <result column="channel_level" property="channel_level" />
         <result column="platform_id" property="platformId" />
+        <result column="sub_platform_id" property="subPlatformId" />
+        <result column="sub_platform_name" property="subPlatformName" />
         <result column="channel_status" property="channelStatus" />
         <result column="fail_times" property="failTimes" />
         <result column="create_time" property="createTime" />
@@ -17,14 +19,15 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        channel_id AS channelId, channel_level, platform_id AS platformId, channel_status AS channelStatus, fail_times AS failTimes, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
+        channel_id AS channelId, channel_level, platform_id AS platformId,sub_platform_id AS subPlatformId, sub_platform_name AS subPlatformName,  channel_status AS channelStatus, fail_times AS failTimes, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
     </sql>
 
     <select id="getWithholdChannelPageList" parameterType="com.hongte.alms.base.vo.withhold.WithholdChannelListReq" resultType="com.hongte.alms.base.vo.withhold.WithholdChannelListVo">
         SELECT
             t1.channel_level AS channelLevel,
+            IFNULL(t1.sub_platform_id,t2.platform_id) AS subPlatformId,
+            IFNULL(t1.sub_platform_name,t2.platform_name) AS platformName,
             t1.channel_id AS channelId,
-            t2.platform_name AS platformName,
             t1.channel_status AS channelStatus,
             t1.fail_times AS failTimes
         FROM

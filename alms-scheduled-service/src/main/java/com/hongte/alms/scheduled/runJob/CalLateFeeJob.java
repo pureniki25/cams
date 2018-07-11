@@ -13,6 +13,12 @@ import com.hongte.alms.base.service.RepaymentProjPlanService;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.annotation.JobHandler;
+
+/**
+ * 
+ * @author czs
+ *滞纳金计算任务每晚凌晨2点执行
+ */
 @JobHandler(value = "calLateFeeJobHandler")
 @Component
 public class CalLateFeeJob extends IJobHandler {

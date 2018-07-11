@@ -6,14 +6,13 @@ import com.baomidou.mybatisplus.plugins.Page;
 
 import com.hongte.alms.base.collection.vo.DeductionVo;
 import com.hongte.alms.base.entity.BasicBusiness;
-import com.hongte.alms.base.entity.MoneyPoolRepayment;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
+import com.hongte.alms.base.entity.RepaymentConfirmLog;
 import com.hongte.alms.base.entity.SysBank;
 import com.hongte.alms.base.entity.WithholdingPlatform;
 import com.hongte.alms.base.entity.WithholdingRecordLog;
 import com.hongte.alms.base.entity.WithholdingRepaymentLog;
-import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 
 import com.hongte.alms.base.service.*;
@@ -82,9 +81,13 @@ public class DeductionController {
     SysBankService sysBankService;
     
     @Autowired
+    @Qualifier("RepaymentConfirmLogService")
+    RepaymentConfirmLogService repaymentConfirmLogService;
+    @Autowired
     @Qualifier("MoneyPoolRepaymentService")
     MoneyPoolRepaymentService moneyPoolRepaymentService;
 
+ 
 
     @Autowired
     @Qualifier("RepaymentBizPlanListDetailService")
@@ -123,6 +126,9 @@ public class DeductionController {
         	} catch (Exception e) {
         		return Result.error("-1", "调用信贷获取客户银行卡信息接口出错");
         	}
+        	
+      
+        	
             //执行代扣信息
             DeductionVo deductionVo=  deductionService.selectDeductionInfoByPlanListId(planListId);
             deductionVo.setBankCardInfo(bankCardInfo);
@@ -150,11 +156,34 @@ public class DeductionController {
             	deductionVo.setUnderLineFactOverDueMoney(underLineFactOverDueMoney);
             	//查看当前期还款的总金额
         	
-        		BigDecimal factAmountSum=getPerListFactAmountSum(planList);
+        		BigDecimal factAmountSum=BigDecimal.valueOf(0);
+        		boolean isHaveBankRepay=false;//是否含有银行代扣
+        		boolean isHaveThirtyRepay=false;//是否含有第三方
+        		boolean isHaveUnderRepay=false;//是否含有线下
+        		boolean isRepaying=isRepaying(planList);//判断是否有代扣中的记录
+        		deductionVo.setRepaying(isRepaying);
+                List<RepaymentConfirmLog> comfirmLogs=repaymentConfirmLogService.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("org_business_id", planList.getOrigBusinessId()).eq("after_id", planList.getAfterId()));
+        		for(RepaymentConfirmLog log:comfirmLogs) {
+        			factAmountSum=factAmountSum.add(log.getFactAmount());
+        			if(log.getRepaySource()==31||log.getRepaySource()==30) {
+        				isHaveBankRepay=true;
+        				deductionVo.setHaveBankRepay(isHaveBankRepay);
+        			}
+        			
+        			if(log.getRepaySource()==21||log.getRepaySource()==20) {
+        				isHaveThirtyRepay=true;
+        				deductionVo.setHaveThirtyRepay(isHaveThirtyRepay);
+        			}
+        			if(log.getRepaySource()==10) {
+        				isHaveUnderRepay=true;
+        				deductionVo.setHaveUnderRepay(isHaveUnderRepay);
+        			}
+        		}
+        		
         		//线上费用
         		BigDecimal onLineAmount=BigDecimal.valueOf(deductionVo.getTotal()).subtract(underLineOverDueMoney);
-        		//如果是线上部分还款的话，不能使用第三方代扣线下费用
-        		if(factAmountSum.compareTo(BigDecimal.valueOf(0))>0&&factAmountSum.compareTo(onLineAmount)<0) {
+        		//如果是银行代扣线上部分还款的话，不能使用第三方代扣线下费用
+        		if(factAmountSum.compareTo(BigDecimal.valueOf(0))>0&&factAmountSum.compareTo(onLineAmount)<0&&isHaveBankRepay==true) {
         			deductionVo.setCanUseThirty(false);
         		}else {
         			deductionVo.setCanUseThirty(true);
@@ -322,7 +351,14 @@ public class DeductionController {
 
 	}
 
-
+	private boolean isRepaying(RepaymentBizPlanList pList) {
+		boolean isRepaying=false;
+		int i=withholdingRepaymentLogService.selectCount(new EntityWrapper<WithholdingRepaymentLog>().eq("original_business_id", pList.getOrigBusinessId()).eq("after_id", pList.getAfterId()).eq("repay_status", 2));
+		if(i>0) {
+			isRepaying=true;
+		}
+		return isRepaying;
+	}
    }
    
 

@@ -23,8 +23,9 @@ public interface WithholdingService {
     
     /**
      * app代扣操作
+     * type
      */
-    void appWithholding(RepaymentBizPlanList pList);
+    Result appWithholding(RepaymentBizPlanList pList);
     
     /**
      * 手工银行代扣

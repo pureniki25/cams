@@ -40,6 +40,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.Executor;
 
@@ -130,6 +131,10 @@ public class ShareProfitServiceImpl implements ShareProfitService {
     @Autowired
     @Qualifier("SysApiCallFailureRecordService")
     private SysApiCallFailureRecordService sysApiCallFailureRecordService;
+    
+    @Autowired
+    @Qualifier("AgencyRechargeLogService")
+    private AgencyRechargeLogService agencyRechargeLogService;
 
     private ThreadLocal<String> businessId = new ThreadLocal<String>();
     private ThreadLocal<String> orgBusinessId = new ThreadLocal<String>();
@@ -228,12 +233,13 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 
         financeBaseDto.setProjListDetails(new ArrayList<>());
         financeBaseDto.setRepaymentResources(new ArrayList<>());
-        financeBaseDto.setUpdatedProjPlanDetails(new ArrayList<>());
+//        financeBaseDto.setUpdatedProjPlanDetails(new HashSet<>());
+        financeBaseDto.setProjFactRepays(new HashMap<>());
         financeBaseDto.setRepaymentBizPlanListDetailBaks(new ArrayList<>());
         financeBaseDto.setRepaymentProjPlanBaks(new ArrayList<>());
         financeBaseDto.setRepaymentProjPlanListBaks(new ArrayList<>());
         financeBaseDto.setRepaymentProjPlanListDetailBaks(new ArrayList<>());
-
+        financeBaseDto.setCurTimeRepaidProjPlanList(new ArrayList<>());
         LoginInfoDto loginInfo = loginUserInfoHelper.getLoginInfo();
         if (loginInfo != null) {
             financeBaseDto.setUserId(loginInfo.getUserId());
@@ -258,6 +264,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
     @Override
     @Transactional(rollbackFor = {ServiceRuntimeException.class, Exception.class})
     public List<CurrPeriodProjDetailVO> execute(ConfirmRepaymentReq req, boolean save) {
+    	logger.info("请求内容={}",JSONObject.toJSONString(req));
+    	
 //        this.save.set(save);
         if (req == null) {
             throw new ServiceRuntimeException("ConfirmRepaymentReq 不能为空");
@@ -369,7 +377,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         BigDecimal surplus = req.getSurplusFund();
         // 代扣银行流水ID
         List<Integer> logIds = req.getLogIds();
-
+        // 网关充值快捷充值ids
+        List<String> rechargeIds = req.getRechargeIds();
         // 处理线下转账
         if (mprids != null && mprids.size() > 0) {
             List<MoneyPoolRepayment> moneyPoolRepayments = moneyPoolRepaymentMapper.selectBatchIds(mprids);
@@ -429,16 +438,6 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 
             RepaymentResource repaymentResource = new RepaymentResource();
             repaymentResource.setAfterId(log.getAfterId());
-//			List<BasicBusiness> basicBusiness = basicBusinessMapper.selectList(
-//					new EntityWrapper<BasicBusiness>().eq("source_business_id", log.getOriginalBusinessId()));
-//			List<RepaymentBizPlanList> ll = repaymentBizPlanListMapper
-//					.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("after_id", log.getAfterId())
-//							.eq("orig_business_id", log.getOriginalBusinessId()));
-//			if (ll == null || ll.size() == 0) {
-//
-//			} else if (ll.size() > 1) {
-//
-//			}
             repaymentResource.setBusinessId(log.getOriginalBusinessId());
             repaymentResource.setOrgBusinessId(log.getOriginalBusinessId());
             repaymentResource.setCreateDate(new Date());
@@ -462,10 +461,6 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             BigDecimal amount = financeBaseDto.getRepayFactAmount().add(log.getCurrentAmount());
             financeBaseDto.setRepayFactAmount(amount);
             financeBaseDto.getRepaymentResources().add(repaymentResource);
-
-//            repayFactAmount.set(repayFactAmount.get().add(log.getCurrentAmount()));
-//            repaymentResources.get().add(repaymentResource);
-
         }
 
         if (surplus != null && surplus.compareTo(new BigDecimal("0")) > 0) {
@@ -518,8 +513,45 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 //            repayFactAmount.set(repayFactAmount.get().add(req.getSurplusFund()));
 //            repaymentResources.get().add(repaymentResource);
         }
-
+        
+        
+        // 充值记录转 RepaymentResource
+		handleAgencyRechargeLog(financeBaseDto);
+        
     }
+
+    /**
+     *  充值记录转 RepaymentResource
+     * @param financeBaseDto
+     */
+	private void handleAgencyRechargeLog(FinanceBaseDto financeBaseDto) {
+		List<AgencyRechargeLog> agencyRechargeLogs = agencyRechargeLogService
+				.selectList(new EntityWrapper<AgencyRechargeLog>().eq("handle_status", 2).eq("charge_type", 2));
+		if (CollectionUtils.isEmpty(agencyRechargeLogs)) {
+			return;
+		}
+		
+		for (AgencyRechargeLog agencyRechargeLog : agencyRechargeLogs) {
+			RepaymentResource repaymentResource = new RepaymentResource();
+            repaymentResource.setAfterId(agencyRechargeLog.getAfterId());
+            repaymentResource.setBusinessId(agencyRechargeLog.getOrigBusinessId());
+            repaymentResource.setOrgBusinessId(agencyRechargeLog.getOrigBusinessId());
+            repaymentResource.setCreateDate(new Date());
+            repaymentResource.setCreateUser(financeBaseDto.getUserId());
+            repaymentResource.setRepayAmount(agencyRechargeLog.getRechargeAmount());
+            repaymentResource.setRepayDate(agencyRechargeLog.getCreateTime());
+            repaymentResource.setConfirmLogId(financeBaseDto.getConfirmLog().getConfirmLogId());
+            //50:APP快捷充值
+            repaymentResource.setRepaySource("50");
+            if (financeBaseDto.getSave()) {
+                repaymentResource.setRepaySourceRefId(agencyRechargeLog.getCmOrderNo());
+                repaymentResource.insert();
+            }
+//            BigDecimal reamount = financeBaseDto.getRepayFactAmount();
+            financeBaseDto.setRepayFactAmount(financeBaseDto.getRepayFactAmount().add(agencyRechargeLog.getRechargeAmount()));
+            financeBaseDto.getRepaymentResources().add(repaymentResource);
+		}
+	}
 
     /**
      * 查找并关联业务有关的还款计划
@@ -657,7 +689,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             currPeriodProjDetailVO.setProjAmount(repaymentProjPlanDto.getRepaymentProjPlan().getBorrowMoney());
             currPeriodProjDetailVO.setProject(tuandaiProjectInfo.getProjectId());
             currPeriodProjDetailVO.setUserName(tuandaiProjectInfo.getRealName());
-
+            currPeriodProjDetailVO.setMaster(tuandaiProjectInfo.getMasterIssueId().equals(tuandaiProjectInfo.getProjectId()));
+            currPeriodProjDetailVO.setQueryFullSuccessDate(tuandaiProjectInfo.getQueryFullSuccessDate());
             List<CurrPeriodProjDetailVO> projListDetails = financeBaseDto.getProjListDetails();
             projListDetails.add(currPeriodProjDetailVO);
 
@@ -676,10 +709,11 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             //同等
             @Override
             public int compare(RepaymentProjPlanDto arg0, RepaymentProjPlanDto arg1) {
-                if (arg0.getTuandaiProjectInfo().getMasterIssueId()
-                        .equals(arg0.getTuandaiProjectInfo().getProjectId())) {
+                if (arg0.getTuandaiProjectInfo().getMasterIssueId().equals(arg0.getTuandaiProjectInfo().getProjectId())) {
                     return 1;
-                }
+                }else if (arg1.getTuandaiProjectInfo().getMasterIssueId().equals(arg1.getTuandaiProjectInfo().getProjectId())) {
+                    return -1;
+				}
                 if (arg0.getRepaymentProjPlan().getBorrowMoney()
                         .compareTo(arg1.getRepaymentProjPlan().getBorrowMoney()) < 0) {
                     return -1;
@@ -687,19 +721,49 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                 if (arg0.getTuandaiProjectInfo().getQueryFullSuccessDate()
                         .before(arg1.getTuandaiProjectInfo().getQueryFullSuccessDate())) {
                     return -1;
-                }
-
+                }else if (arg0.getTuandaiProjectInfo().getQueryFullSuccessDate()
+                        .after(arg1.getTuandaiProjectInfo().getQueryFullSuccessDate())) {
+					return 1;
+				}
                 return 0;
             }
 
         });
 
+        Collections.sort(financeBaseDto.getProjListDetails(), new Comparator<CurrPeriodProjDetailVO>() {
+            // 排序规则说明 需补充 从小标到大标，再到主借标
+            //同等
+            @Override
+            public int compare(CurrPeriodProjDetailVO arg0, CurrPeriodProjDetailVO arg1) {
+                if (arg0.isMaster()) {
+                    return 1;
+                }else if (arg1.isMaster()) {
+                    return -1;
+				}
+                if (arg0.getProjAmount()
+                        .compareTo(arg1.getProjAmount()) < 0) {
+                    return -1;
+                }else if (arg0.getProjAmount().compareTo(arg1.getProjAmount())>0) {
+					return 1;
+				}
+                if (arg0.getQueryFullSuccessDate()
+                        .before(arg1.getQueryFullSuccessDate())) {
+                    return -1;
+                }else if (arg0.getQueryFullSuccessDate()
+                        .after(arg1.getQueryFullSuccessDate())) {
+					return 1;
+				}
+                return 0;
+            }
+
+        });
         for (RepaymentProjPlanDto repaymentProjPlanDto2 : repaymentProjPlanDtos) {
             logger.info("满标时间{}"
-                    + DateUtil.formatDate(repaymentProjPlanDto2.getTuandaiProjectInfo().getQueryFullSuccessDate()));
+                    + DateUtil.formatDate("yyyy-MM-dd HH:mm:ss",repaymentProjPlanDto2.getTuandaiProjectInfo().getQueryFullSuccessDate()));
             logger.info("借款金额{}" + repaymentProjPlanDto2.getRepaymentProjPlan().getBorrowMoney());
             logger.info("是否主借标{}" + repaymentProjPlanDto2.getTuandaiProjectInfo().getMasterIssueId()
                     .equals(repaymentProjPlanDto2.getTuandaiProjectInfo().getProjectId()));
+            logger.info("借款人{}",repaymentProjPlanDto2.getTuandaiProjectInfo().getRealName());
 
         }
         repaymentBizPlanDto.setProjPlanDtos(repaymentProjPlanDtos);
@@ -1162,7 +1226,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		}
 		*/
 
-        // 3.最后按核销顺序还金额
+        // 3.最后按核销顺序还金额（先还核销顺序小于1200的费用）
         String lastProjectId = null;
         for (int i = 0; i < dto.getProjPlanDtos().size(); i++) {
             if (lastPaySuc == false)
@@ -1182,6 +1246,40 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                 for (RepaymentProjPlanListDetailDto repaymentProjPlanListDetailDto : repaymentProjPlanListDetailDtos) {
                     RepaymentProjPlanListDetail detail = repaymentProjPlanListDetailDto
                             .getRepaymentProjPlanListDetail();
+                    if(detail.getShareProfitIndex().compareTo(1200)>=0){
+                        continue;
+                    }
+                    boolean bl = payOneFeeDetail(detail, currPeriodProjDetailVO, null, financeBaseDto);
+                    if (!bl && financeBaseDto.getRealPayedAmount() != null) {
+                        lastPaySuc = false;
+                        break;
+                    }
+                }
+            }
+        }
+
+        //再还核销顺序大于等于1200的费用项
+        for (int i = 0; i < dto.getProjPlanDtos().size(); i++) {
+            if (lastPaySuc == false)
+                return;
+            RepaymentProjPlanDto repaymentProjPlanDto = dto.getProjPlanDtos().get(i);
+            String projectId = repaymentProjPlanDto.getTuandaiProjectInfo().getProjectId();
+            lastProjectId = projectId;
+            List<CurrPeriodProjDetailVO> projListDetails = financeBaseDto.getProjListDetails();
+            CurrPeriodProjDetailVO currPeriodProjDetailVO = getCurrPeriodProjDetailVO(projectId, projListDetails);
+
+            List<RepaymentProjPlanListDto> repaymentProjPlanListDtos = repaymentProjPlanDto.getProjPlanListDtos();
+            // 遍历标的还款计划
+            for (RepaymentProjPlanListDto repaymentProjPlanListDto : repaymentProjPlanListDtos) {
+                List<RepaymentProjPlanListDetailDto> repaymentProjPlanListDetailDtos = repaymentProjPlanListDto
+                        .getRepaymentProjPlanListDetailDtos();
+                // //遍历这个标的每一期还款计划，费用细项
+                for (RepaymentProjPlanListDetailDto repaymentProjPlanListDetailDto : repaymentProjPlanListDetailDtos) {
+                    RepaymentProjPlanListDetail detail = repaymentProjPlanListDetailDto
+                            .getRepaymentProjPlanListDetail();
+                    if(detail.getShareProfitIndex().compareTo(1200)<0){
+                        continue;
+                    }
                     boolean bl = payOneFeeDetail(detail, currPeriodProjDetailVO, null, financeBaseDto);
                     if (!bl && financeBaseDto.getRealPayedAmount() != null) {
                         lastPaySuc = false;
@@ -1413,12 +1511,14 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         if (financeBaseDto.getSave()) {
             fact.setProjPlanDetailRepayId(UUID.randomUUID().toString());
             fact.insert();
+            addProjFactRepays(financeBaseDto,detail.getPlanDetailId(),fact);
+            
             detail.setRepaySource(Integer.valueOf(resource.getRepaySource()));
             detail.setFactRepayDate(resource.getRepayDate());
             detail.setUpdateDate(new Date());
             detail.setUpdateUser(loginUserInfoHelper.getUserId());
             detail.updateById();
-            financeBaseDto.getUpdatedProjPlanDetails().add(detail);
+//            financeBaseDto.getUpdatedProjPlanDetails().add(detail);
 //            updatedProjPlanDetails.get().add(detail);
             // update(detail);
         }
@@ -1427,14 +1527,215 @@ public class ShareProfitServiceImpl implements ShareProfitService {
     }
 
     /**
+     * 将RepaymentProjFactRepay保存在内存中
+     * @author 王继光
+     * 2018年7月9日 下午9:59:35
+     * @param financeBaseDto
+     * @param bizPlanListDetailId
+     * @param fact
+     */
+    private void addProjFactRepays(FinanceBaseDto financeBaseDto,String bizPlanListDetailId,RepaymentProjFactRepay fact) {
+    	List<RepaymentProjFactRepay> list = financeBaseDto.getProjFactRepays().get(bizPlanListDetailId);
+    	if (list==null) {
+			list = new ArrayList<>();
+		}
+    	list.add(fact);
+    	financeBaseDto.getProjFactRepays().put(bizPlanListDetailId, list);
+    }
+    /**
+     * 更新备注
+     * @author 王继光
+     * 2018年7月10日 下午3:18:25
+     * @param financeBaseDto
+     */
+    private void updateRemark (FinanceBaseDto financeBaseDto) {
+    	RepaymentBizPlanList  bizPlanList = financeBaseDto.getPlanDto().getBizPlanListDtos().get(0).getRepaymentBizPlanList();
+    	if (!StringUtil.isEmpty(financeBaseDto.getRemark())) {
+        	if (StringUtil.isEmpty(bizPlanList.getRemark())) {
+        		bizPlanList.setRemark(financeBaseDto.getRemark());
+			}else {
+				bizPlanList.setRemark(bizPlanList.getRemark().concat("\r\n").concat(financeBaseDto.getRemark()));
+			}
+		}else {
+			
+			StringBuffer feeDetails = new StringBuffer();
+			BigDecimal factTotalAmount = BigDecimal.ZERO ;
+			RepaymentResource lastOne = financeBaseDto.getRepaymentResources().get(financeBaseDto.getRepaymentResources().size()-1);
+			StringBuffer repayWay = new StringBuffer();
+			String repayDate = DateUtil.formatDate(lastOne.getRepayDate());
+            
+			switch (lastOne.getRepaySource()) {
+			case "10":
+			case "11":
+				repayWay.append("线下还款");
+				break;
+			case "20":
+				repayWay.append("自动线下代扣");
+				WithholdingRepaymentLog log = withholdingRepaymentLogService.selectById(lastOne.getRepaySourceRefId());
+				if (log.getBindPlatformId().equals(0)) {
+					repayWay.append("(易宝代扣)");
+				}
+				if (log.getBindPlatformId().equals(0)) {
+					repayWay.append("(宝付代扣)");
+				}
+				break;
+			case "21":
+				repayWay.append("人工线下代扣");
+				WithholdingRepaymentLog log1 = withholdingRepaymentLogService.selectById(lastOne.getRepaySourceRefId());
+				if (log1.getBindPlatformId().equals(0)) {
+					repayWay.append("(易宝代扣)");
+				}
+				if (log1.getBindPlatformId().equals(0)) {
+					repayWay.append("(宝付代扣)");
+				}
+				break;
+			case "30":
+				repayWay.append("自动银行代扣");
+				break;
+			case "31":
+				repayWay.append("人工银行代扣");
+				break;
+			default:
+				break;
+			}
+
+			for (RepaymentBizPlanListDto planListDto : financeBaseDto.getPlanDto().getBizPlanListDtos()) {
+				for (RepaymentBizPlanListDetail planListDetail : planListDto.getBizPlanListDetails()) {
+					List<RepaymentProjFactRepay> list = financeBaseDto.getProjFactRepays().get(planListDetail.getPlanDetailId());
+					if (list != null && !list.isEmpty()) {
+						BigDecimal factAmount = BigDecimal.ZERO;
+						for (RepaymentProjFactRepay repaymentProjFactRepay : list) {
+							factAmount = repaymentProjFactRepay.getFactAmount().add(factAmount);
+						}
+						feeDetails.append(factAmount.setScale(2, RoundingMode.HALF_UP)).append(planListDetail.getPlanItemName()).append(" ");
+						factTotalAmount = factTotalAmount.add(factAmount);
+					}
+				}
+			}
+			//{0}=日期,{1}=扣款方式,{2}=扣款总额,{3}=明细
+			String remark = MessageFormat.format("{0}{1}{2}元,费用明细:{3}",repayDate,repayWay.toString(),factTotalAmount.setScale(2, RoundingMode.HALF_UP),feeDetails.toString());
+			if (StringUtil.isEmpty(bizPlanList.getRemark())) {
+        		bizPlanList.setRemark(remark);
+			}else {
+				bizPlanList.setRemark(bizPlanList.getRemark().concat("\r\n").concat(remark));
+			}
+		}
+    	
+    	bizPlanList.updateAllColumnById();
+    }
+    /**
      * 在内存中更新数据
      *
      * @author 王继光 2018年6月15日 下午8:26:42
      */
     public void updateInMem(ConfirmRepaymentReq req, FinanceBaseDto financeBaseDto) {
-        List<RepaymentProjPlanListDetail> updatedProjPlanDetails = financeBaseDto.getUpdatedProjPlanDetails();
+//        Set<RepaymentProjPlanListDetail> updatedProjPlanDetails = financeBaseDto.getUpdatedProjPlanDetails();
 
-        for (RepaymentProjPlanListDetail detail : updatedProjPlanDetails) {
+        for (RepaymentBizPlanListDto planListDto : financeBaseDto.getPlanDto().getBizPlanListDtos()) {
+			for (RepaymentBizPlanListDetail planListDetail : planListDto.getBizPlanListDetails()) {
+				List<RepaymentProjFactRepay> list = financeBaseDto.getProjFactRepays().get(planListDetail.getPlanDetailId());
+				if (list!=null&&!list.isEmpty()) {
+					for (RepaymentProjFactRepay repaymentProjFactRepay : list) {
+						planListDetail.setFactAmount(repaymentProjFactRepay.getFactAmount().add(planListDetail.getFactAmount()==null?BigDecimal.ZERO:planListDetail.getFactAmount()));
+//			            planListDetail.setFactAmount(detail.getProjFactAmount());
+			            planListDetail.setFactRepayDate(repaymentProjFactRepay.getFactRepayDate());
+			            planListDetail.setRepaySource(repaymentProjFactRepay.getRepaySource());
+			            planListDetail.setUpdateDate(new Date());
+			            planListDetail.setUpdateUser(financeBaseDto.getUserId());
+			            planListDetail.updateById();
+			            updateRepaymentBizPlanListDetailInMem(planListDetail, financeBaseDto);
+
+			            RepaymentProjPlanList projPlanList = findRepaymentProjPlanList(repaymentProjFactRepay.getProjPlanListId(), financeBaseDto);
+
+			            if (projPlanList == null) {
+			                throw new ServiceRuntimeException("找不到对应的projPlanList");
+			            }
+			            projPlanList.setFactRepayDate(financeBaseDto.getConfirmLog().getRepayDate());
+//			            if (!StringUtil.isEmpty(financeBaseDto.getRemark())) {
+//			            	if (StringUtil.isEmpty(projPlanList.getRemark())) {
+//			    				projPlanList.setRemark(financeBaseDto.getRemark());
+//			    			}else {
+//			    				projPlanList.setRemark(projPlanList.getRemark().concat("\r\n").concat(financeBaseDto.getRemark()));
+//			    			}
+//						}
+			            
+			            BigDecimal pjlFactAmount = sumProjPlanListFactAmountInMem(projPlanList.getProjPlanListId(), financeBaseDto);
+			            BigDecimal pjlOnlineAmount = sumProjPlanListOnlinePartAmountInMem(projPlanList.getProjPlanListId(),financeBaseDto);
+						/* 如果实还大于应还+逾期 */
+			            if (pjlFactAmount.compareTo(projPlanList.getTotalBorrowAmount()
+			                    .add(projPlanList.getOverdueAmount() == null ? BigDecimal.ZERO
+			                            : projPlanList.getOverdueAmount())) >= 0) {
+			                projPlanList.setCurrentStatus(RepayPlanStatus.REPAYED.getName());
+			                projPlanList.setCurrentSubStatus(RepayPlanStatus.REPAYED.getName());
+			                projPlanList.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
+			                financeBaseDto.getCurTimeRepaidProjPlanList().add(projPlanList);
+			                setRepayConfirmedFlagPro(projPlanList, financeBaseDto);
+			            } else {
+			                projPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
+			                projPlanList.setCurrentSubStatus(RepayPlanStatus.REPAYING.getName());
+			                projPlanList.setRepayFlag(null);
+			                
+			                if (pjlFactAmount.compareTo(pjlOnlineAmount) >= 0) {
+			                	projPlanList.setRepayStatus(SectionRepayStatusEnum.ONLINE_REPAID.getKey());
+			                } else {
+			                	projPlanList.setRepayStatus(SectionRepayStatusEnum.SECTION_REPAID.getKey());
+			                }
+			                
+			            }
+			            projPlanList.setUpdateTime(new Date());
+			            projPlanList.setUpdateUser(financeBaseDto.getUserId());
+			            
+			            
+			            
+			            projPlanList.updateAllColumnById();
+			            updateRepaymentProjPlanListInMem(projPlanList, financeBaseDto);
+
+			            RepaymentBizPlanList bizPlanList = findRepaymentbizplanlist(projPlanList.getPlanListId(), financeBaseDto);
+			            bizPlanList.setFactRepayDate(financeBaseDto.getConfirmLog().getRepayDate());
+//						if (!StringUtil.isEmpty(financeBaseDto.getRemark())) {
+//							if (StringUtil.isEmpty(bizPlanList.getRemark())) {
+//								bizPlanList.setRemark(financeBaseDto.getRemark());
+//							} else {
+//								bizPlanList.setRemark(bizPlanList.getRemark().concat("\r\n").concat(financeBaseDto.getRemark()));
+//							}
+//						}
+			            bizPlanList.setFinanceComfirmDate(new Date());
+
+			            BigDecimal bplFactAmount = sumBizPlanListFactAmount(bizPlanList.getPlanListId(), financeBaseDto);
+			            BigDecimal bplOnlineAmount = sumBizPlanListOnlinePartAmount(bizPlanList.getPlanListId(),financeBaseDto);
+			            if (bplFactAmount.compareTo(
+			                    bizPlanList.getTotalBorrowAmount().add(bizPlanList.getOverdueAmount() == null ? new BigDecimal("0")
+			                            : bizPlanList.getOverdueAmount())) >= 0) {
+			                bizPlanList.setCurrentStatus(RepayPlanStatus.REPAYED.getName());
+			                bizPlanList.setCurrentSubStatus(RepayPlanStatus.REPAYED.getName());
+			                bizPlanList.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
+			                setRepayConfirmedFlagBiz(bizPlanList, financeBaseDto);
+			                LoginInfoDto loginInfo = loginUserInfoHelper.getLoginInfo();
+			                if (loginInfo != null) {
+			                    bizPlanList.setFinanceConfirmUser(loginInfo.getUserId());
+			                    bizPlanList.setFinanceConfirmUserName(loginInfo.getUserName());
+			                } else {
+			                    bizPlanList.setFinanceConfirmUser(Constant.ADMIN_ID);
+			                    bizPlanList.setFinanceConfirmUserName("admin");
+			                }
+			            } else {
+
+//							bizPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
+							bizPlanList.setCurrentSubStatus(RepayPlanStatus.PARTAIL.getName());
+							bizPlanList.setRepayFlag(null);
+			                if (bplFactAmount.compareTo(bplOnlineAmount) >= 0) {
+			                    bizPlanList.setRepayStatus(SectionRepayStatusEnum.ONLINE_REPAID.getKey());
+			                } else {
+			                    bizPlanList.setRepayStatus(SectionRepayStatusEnum.SECTION_REPAID.getKey());
+			                }
+			            }
+			            bizPlanList.updateAllColumnById();
+			            updateRepaymentBizPlanList(bizPlanList, financeBaseDto);
+					}
+				}
+			}
+		}
+        /*for (RepaymentProjPlanListDetail detail : updatedProjPlanDetails) {
             RepaymentBizPlanListDetail planListDetail = findRepaymentBizPlanListDetail(detail.getPlanDetailId(), financeBaseDto);
             if (planListDetail == null) {
                 throw new ServiceRuntimeException("找不到对应的planListDetail");
@@ -1442,7 +1743,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 //			planListDetail.setFactAmount(detail.getProjFactAmount().add(
 //					planListDetail.getFactAmount() == null ? new BigDecimal("0") : planListDetail.getFactAmount()));
 
-            planListDetail.setFactAmount(detail.getProjFactAmount());
+            planListDetail.setFactAmount(detail.getProjFactAmount().add(planListDetail.getFactAmount()==null?BigDecimal.ZERO:planListDetail.getFactAmount()));
+//            planListDetail.setFactAmount(detail.getProjFactAmount());
             planListDetail.setFactRepayDate(detail.getFactRepayDate());
             planListDetail.setRepaySource(detail.getRepaySource());
             planListDetail.setUpdateDate(new Date());
@@ -1456,20 +1758,34 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                 throw new ServiceRuntimeException("找不到对应的projPlanList");
             }
             projPlanList.setFactRepayDate(financeBaseDto.getConfirmLog().getRepayDate());
-            projPlanList.setRemark(financeBaseDto.getRemark());
+            if (!StringUtil.isEmpty(financeBaseDto.getRemark())) {
+            	if (StringUtil.isEmpty(projPlanList.getRemark())) {
+    				projPlanList.setRemark(financeBaseDto.getRemark());
+    			}else {
+    				projPlanList.setRemark(projPlanList.getRemark().concat("\r\n").concat(financeBaseDto.getRemark()));
+    			}
+			}
+            
             BigDecimal pjlFactAmount = sumProjPlanListFactAmountInMem(projPlanList.getProjPlanListId(), financeBaseDto);
 
-			/* 如果实还大于应还+逾期 */
+			 如果实还大于应还+逾期 
             if (pjlFactAmount.compareTo(projPlanList.getTotalBorrowAmount()
-                    .add(projPlanList.getOverdueAmount() == null ? new BigDecimal("0")
+                    .add(projPlanList.getOverdueAmount() == null ? BigDecimal.ZERO
                             : projPlanList.getOverdueAmount())) >= 0) {
                 projPlanList.setCurrentStatus(RepayPlanStatus.REPAYED.getName());
                 projPlanList.setCurrentSubStatus(RepayPlanStatus.REPAYED.getName());
+                projPlanList.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
                 setRepayConfirmedFlagPro(projPlanList, financeBaseDto);
             } else {
                 projPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
                 projPlanList.setCurrentSubStatus(RepayPlanStatus.REPAYING.getName());
                 projPlanList.setRepayFlag(null);
+                if (pjlFactAmount.compareTo(projPlanList.getTotalBorrowAmount()) >= 0) {
+                	projPlanList.setRepayStatus(SectionRepayStatusEnum.ONLINE_REPAID.getKey());
+                } else {
+                	projPlanList.setRepayStatus(SectionRepayStatusEnum.SECTION_REPAID.getKey());
+                }
+                
             }
             projPlanList.setUpdateTime(new Date());
             projPlanList.setUpdateUser(financeBaseDto.getUserId());
@@ -1478,7 +1794,13 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 
             RepaymentBizPlanList bizPlanList = findRepaymentbizplanlist(projPlanList.getPlanListId(), financeBaseDto);
             bizPlanList.setFactRepayDate(financeBaseDto.getConfirmLog().getRepayDate());
-            bizPlanList.setRemark(financeBaseDto.getRemark());
+			if (!StringUtil.isEmpty(financeBaseDto.getRemark())) {
+				if (StringUtil.isEmpty(bizPlanList.getRemark())) {
+					bizPlanList.setRemark(financeBaseDto.getRemark());
+				} else {
+					bizPlanList.setRemark(bizPlanList.getRemark().concat("\r\n").concat(financeBaseDto.getRemark()));
+				}
+			}
             bizPlanList.setFinanceComfirmDate(new Date());
 
             BigDecimal bplFactAmount = sumBizPlanListFactAmount(bizPlanList.getPlanListId(), financeBaseDto);
@@ -1511,7 +1833,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             }
             bizPlanList.updateAllColumnById();
             updateRepaymentBizPlanList(bizPlanList, financeBaseDto);
-        }
+        }*/
     }
 
     /*
@@ -1580,6 +1902,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
     }
     */
 
+    
     /**
      * 设置还款确认状态
      *
@@ -1711,11 +2034,40 @@ public class ShareProfitServiceImpl implements ShareProfitService {
     private BigDecimal sumProjPlanListFactAmountInMem(String projPlanListId, FinanceBaseDto financeBaseDto) {
         BigDecimal res = new BigDecimal("0");
         for (RepaymentProjPlanDto projPlanDto : financeBaseDto.getPlanDto().getProjPlanDtos()) {
-            for (RepaymentProjPlanListDto projPlanListDto : projPlanDto.getProjPlanListDtos()) {
-                for (RepaymentProjPlanListDetail projPlanListDetail : projPlanListDto.getProjPlanListDetails()) {
-                    res = res.add(projPlanListDetail.getProjFactAmount() == null ? new BigDecimal("0")
-                            : projPlanListDetail.getProjFactAmount());
-                }
+        	for (RepaymentProjPlanListDto projPlanListDto : projPlanDto.getProjPlanListDtos()) {
+        		String projPlanListIdc = projPlanListDto.getRepaymentProjPlanList().getProjPlanListId();
+        		if (projPlanListId.equals(projPlanListIdc)) {
+        			for (RepaymentProjPlanListDetail projPlanListDetail : projPlanListDto.getProjPlanListDetails()) {
+                        res = res.add(projPlanListDetail.getProjFactAmount() == null ? new BigDecimal("0")
+                                : projPlanListDetail.getProjFactAmount());
+                    }
+				}
+            }
+        }
+        return res;
+    }
+    
+    /**
+     * 计算projPlanList应还线上滞纳金
+     * @author 王继光
+     * 2018年7月10日 下午4:31:52
+     * @param projPlanListId
+     * @param financeBaseDto
+     * @return
+     */
+    private BigDecimal sumProjPlanListOnlinePartAmountInMem(String projPlanListId, FinanceBaseDto financeBaseDto) {
+        BigDecimal res = new BigDecimal("0");
+        for (RepaymentProjPlanDto projPlanDto : financeBaseDto.getPlanDto().getProjPlanDtos()) {
+        	for (RepaymentProjPlanListDto projPlanListDto : projPlanDto.getProjPlanListDtos()) {
+        		String projPlanListIdc = projPlanListDto.getRepaymentProjPlanList().getProjPlanListId();
+        		if (projPlanListId.equals(projPlanListIdc)) {
+        			for (RepaymentProjPlanListDetail projPlanListDetail : projPlanListDto.getProjPlanListDetails()) {
+        				if (projPlanListDetail.getShareProfitIndex()<Constant.ONLINE_OFFLINE_FEE_BOUNDARY) {
+        					res = res.add(projPlanListDetail.getProjPlanAmount() == null ? new BigDecimal("0")
+        							: projPlanListDetail.getProjPlanAmount());
+						}
+                    }
+				}
             }
         }
         return res;
@@ -1803,6 +2155,27 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                 if (bizPlanListDetail.getPlanListId().equals(bizPlanListId)) {
                     res = res.add(bizPlanListDetail.getFactAmount() == null ? new BigDecimal("0")
                             : bizPlanListDetail.getFactAmount());
+                }
+            }
+        }
+        return res;
+    }
+    
+    /**
+     * 计算bizPlanList线上部分总金额
+     * @author 王继光
+     * 2018年7月10日 下午4:35:32
+     * @param bizPlanListId
+     * @param financeBaseDto
+     * @return
+     */
+    private BigDecimal sumBizPlanListOnlinePartAmount(String bizPlanListId, FinanceBaseDto financeBaseDto) {
+        BigDecimal res = new BigDecimal("0");
+        for (RepaymentBizPlanListDto bizPlanListDto : financeBaseDto.getPlanDto().getBizPlanListDtos()) {
+            for (RepaymentBizPlanListDetail bizPlanListDetail : bizPlanListDto.getBizPlanListDetails()) {
+                if (bizPlanListDetail.getShareProfitIndex() < Constant.ONLINE_OFFLINE_FEE_BOUNDARY) {
+                		 res = res.add(bizPlanListDetail.getPlanAmount() == null ? new BigDecimal("0")
+                                 : bizPlanListDetail.getPlanAmount());
                 }
             }
         }
@@ -1996,7 +2369,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         // planList.updateById();
         // updateProjPlanStatus();
         updateInMem(req, financeBaseDto);
-
+        updateRemark(financeBaseDto);
         RepaymentConfirmLog confirmLog = financeBaseDto.getConfirmLog();
         confirmLog.setFactAmount(financeBaseDto.getRepayFactAmount());
         // confirmLog.get().setRepayDate(planList.getFactRepayDate());

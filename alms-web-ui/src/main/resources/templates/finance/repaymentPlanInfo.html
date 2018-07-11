@@ -40,7 +40,8 @@
 		<Card>
 			<tabs value="repaymentPlan" :animated="true" @on-click="initFunction($event)">
 		        <tab-pane label="还款计划" name="repaymentPlan">
-		        	<table class="layui-table">
+		        	<i-table height="600" border :columns="repayBizPlanColumns" :data="bizRepaymentPlanList"></i-table>
+		        	<!-- <table class="layui-table" rules="all" style="width:2000px; height:100px; text-align:center">
 		        		<thead>
 			        		<tr>
 			        			<td>期数</td>
@@ -78,10 +79,10 @@
 			        			<td>{{ numeral(item.offlineLateFee).format('0,0.00')}}</td>
 			        			<td>{{ numeral(item.surplus).format('0,0.00')}}</td>
 			        			<td>{{ numeral(item.total).format('0,0.00')}}</td>
-			        			<td>{{ item.confirmFlag }}</td>
+			        			<td>{{ item.confirmFlagStr }}</td>
 			        		</tr>
 			        	</tbody>
-		        	</table>
+		        	</table> -->
 		        	
 		        	<Modal v-model="repayPlanFlag" title="计划还款" width="1600">
 		        		<i-table border :columns="repayPlanColumns" :data="repayPlanColumnsData"></i-table>

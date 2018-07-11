@@ -35,6 +35,7 @@ import com.hongte.alms.base.entity.IssueSendOutsideLog;
 import com.hongte.alms.base.entity.TdrepayAdvanceLog;
 import com.hongte.alms.base.entity.TdrepayRechargeDetail;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
+import com.hongte.alms.base.enums.RechargeBusinessTypeEnums;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.mapper.AgencyRechargeLogMapper;
@@ -307,9 +308,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	 */
 	@SuppressWarnings("rawtypes")
 	private void handleSendDistributeFundResult(List<TdrepayRechargeInfoVO> vos, String userId, Result result) {
-		if (result != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
-			updateTdrepayRechargeLogProcessStatus(vos, 2, userId);
-		} else {
+		if (result == null || !Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
 			updateTdrepayRechargeLogProcessStatus(vos, 3, userId);
 		}
 	}
@@ -351,7 +350,8 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		DistributeFundDTO dto = new DistributeFundDTO();
 		String batchId = UUID.randomUUID().toString();
 		dto.setBatchId(batchId);
-		String rechargeAccountType = getRechargeAccountTypeByBusinessType(businessType);
+		String rechargeAccountType = RechargeBusinessTypeEnums.getName(businessType);
+		
 		String oIdPartner = handleOIdPartner(rechargeAccountType);
 		dto.setOidPartner(oIdPartner);
 		String clientIp = CommonUtil.getClientIp();
@@ -482,53 +482,6 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		return map;
 	}
 
-	/**
-	 * 根据业务类型获取代充值账户类型
-	 * 
-	 * @param businessType
-	 *            业务类型
-	 * @return
-	 */
-	private String getRechargeAccountTypeByBusinessType(Integer businessType) {
-
-		String rechargeAccountType = "";
-
-		if (businessType == null) {
-			return rechargeAccountType;
-		}
-
-		switch (businessType) {
-		case 9:
-			rechargeAccountType = "车贷代充值";
-			break;
-		case 11:
-			rechargeAccountType = "房贷代充值";
-			break;
-		case 20:
-			rechargeAccountType = "一点车贷代充值";
-			break;
-		case 25:
-			rechargeAccountType = "信用贷代充值";
-			break;
-		case 26:
-			rechargeAccountType = "信用贷代充值";
-			break;
-		case 27:
-			rechargeAccountType = "信用贷代充值";
-			break;
-		case 28:
-			rechargeAccountType = "信用贷代充值";
-			break;
-		case 29:
-			rechargeAccountType = "信用贷代充值";
-			break;
-		default:
-			rechargeAccountType = "";
-			break;
-		}
-		return rechargeAccountType;
-
-	}
 
 	@Override
 	public String handleAccountType(String rechargeAccountType) {
@@ -540,28 +493,28 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		}
 
 		switch (rechargeAccountType) {
-		case "车贷代充值":
+		case Constant.CAR_LOAN:
 			userId = carLoanUserId;
 			break;
-		case "房贷代充值":
+		case Constant.HOUSE_LOAN:
 			userId = houseLoanUserId;
 			break;
-		case "扶贫贷代充值":
+		case Constant.POVERTY_ALLEVIATION_LOAN:
 			userId = reliefLoanUserId;
 			break;
-		case "闪贷业务代充值":
+		case Constant.QUICK_LOAN:
 			userId = quickLoanUserId;
 			break;
-		case "车全业务代充值":
+		case Constant.CHE_QUAN_LOAN:
 			userId = carBusinessUserId;
 			break;
-		case "二手车业务代充值":
+		case Constant.ER_SHOU_CHE_LOAN:
 			userId = secondHandCarLoanUserId;
 			break;
-		case "一点车贷代充值":
+		case Constant.YI_DIAN_LOAN:
 			userId = yiDianCarLoanUserId;
 			break;
-		case "信用贷代充值":
+		case Constant.CREDIT_LOAN:
 			userId = creditLoanUserId;
 			break;
 		default:
@@ -581,28 +534,28 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		}
 
 		switch (rechargeAccountType) {
-		case "车贷代充值":
+		case Constant.CAR_LOAN:
 			oIdPartner = carLoanOidPartner;
 			break;
-		case "房贷代充值":
+		case Constant.HOUSE_LOAN:
 			oIdPartner = houseLoanOidPartner;
 			break;
-		case "扶贫贷代充值":
+		case Constant.POVERTY_ALLEVIATION_LOAN:
 			oIdPartner = reliefLoanOidPartner;
 			break;
-		case "闪贷业务代充值":
+		case Constant.QUICK_LOAN:
 			oIdPartner = quickLoanOidPartner;
 			break;
-		case "车全业务代充值":
+		case Constant.CHE_QUAN_LOAN:
 			oIdPartner = carBusinessOidPartner;
 			break;
-		case "二手车业务代充值":
+		case Constant.ER_SHOU_CHE_LOAN:
 			oIdPartner = secondHandCarLoanOidPartner;
 			break;
-		case "一点车贷代充值":
+		case Constant.YI_DIAN_LOAN:
 			oIdPartner = yiDianCarLoanOidPartner;
 			break;
-		case "信用贷代充值":
+		case Constant.CREDIT_LOAN:
 			oIdPartner = creditLoanOidPartner;
 			break;
 		default:
@@ -617,7 +570,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		int orgType = -1;
 
 		switch (businessType) {
-		case 25:
+		case 30:
 			orgType = 0;
 			break;
 		case 26:
@@ -1527,14 +1480,18 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 			switch (feeType) {
 			case 10: // 本金
-				paramDTO.setPrincipalAndInterest(feeValue);
-				tdrepayAdvanceLog.setPrincipalAndInterest(feeValue);
+				BigDecimal principalInterest1 = BigDecimal
+						.valueOf(principalAndInterestDouble + (feeValue == null ? 0 : doubleFeeValue))
+						.setScale(2, BigDecimal.ROUND_HALF_UP);
+				paramDTO.setPrincipalAndInterest(principalInterest1);
+				tdrepayAdvanceLog.setPrincipalAndInterest(principalInterest1);
 				break;
 			case 20: // 利息
-				BigDecimal principalInterest = BigDecimal
-						.valueOf(principalAndInterestDouble + (feeValue == null ? 0 : doubleFeeValue));
-				paramDTO.setPrincipalAndInterest(principalInterest);
-				tdrepayAdvanceLog.setPrincipalAndInterest(principalInterest);
+				BigDecimal principalInterest2 = BigDecimal
+						.valueOf(principalAndInterestDouble + (feeValue == null ? 0 : doubleFeeValue))
+						.setScale(2, BigDecimal.ROUND_HALF_UP);
+				paramDTO.setPrincipalAndInterest(principalInterest2);
+				tdrepayAdvanceLog.setPrincipalAndInterest(principalInterest2);
 				break;
 			case 30: // 平台服务费
 				paramDTO.setTuandaiAmount(feeValue);

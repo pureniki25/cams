@@ -129,22 +129,7 @@
 			<i-col span="3">
 				业务类型：
 				<i-select v-model="queryConditionModel.businessType" @on-change="onChangeBusinessType($event)" clearable filterable style="width:100px">
-      				<i-option :value="1">车易贷展期</i-option>
-      				<i-option :value="2">房速贷展期</i-option>
-      				<i-option :value="3">金融仓储</i-option>
-      				<i-option :value="4">三农金融</i-option>
-      				<i-option :value="9">车易贷</i-option>
-      				<i-option :value="11">房速贷</i-option>
-      				<i-option :value="12">车全垫资代采</i-option>
-      				<i-option :value="13">扶贫贷</i-option>
-      				<i-option :value="14">汽车融资租赁</i-option>
-      				<i-option :value="15">二手车商贷</i-option>
-      				<i-option :value="20">一点车贷</i-option>
-      				<i-option :value="26">业主贷</i-option>
-      				<i-option :value="27">家装分期</i-option>
-      				<i-option :value="28">商贸共借</i-option>
-      				<i-option :value="29">业主共借</i-option>
-      				<i-option :value="30">商贸贷</i-option>
+					<i-option v-for="item in businessTypeList" :value="item.value" :key="item.value">{{ item.name }}</i-option>
   				</i-select>
 			</i-col>
 			<i-col span="3">
@@ -162,7 +147,7 @@
   				</i-select>
 			</i-col>
 			<i-col span="2">
-				<i-button type="primary" @click="queryComplianceRepaymentData">刷新资金分发状态</i-button>
+				<i-button type="primary" @click="queryDistributeFund">刷新资金分发状态</i-button>
 			</i-col>
 	    </row>
     </Card>
@@ -197,14 +182,14 @@
 					<i-col>
 						<i-select v-model="rechargeModalForm.rechargeAccountType" clearable filterable style="width:200px" 
 									@on-change="rechargeModalForm.rechargeAccountType == '' ? '' : queryUserAviMoney()">
-                            <i-option value="车贷代充值">车贷代充值账户</i-option>
-                            <i-option value="房贷代充值">房贷代充值账户</i-option>
-                            <i-option value="扶贫贷代充值">扶贫贷代充值账户</i-option>
-                            <i-option value="闪贷业务代充值">闪贷业务代充值账户</i-option>
-                            <i-option value="车全业务代充值">车全业务代充值账户</i-option>
-                            <i-option value="二手车业务代充值">二手车业务代充值账户</i-option>
-                            <i-option value="一点车贷代充值">一点车贷代充值账户</i-option>
-                            <i-option value="信用贷代充值">信用贷代充值账户</i-option>
+                            <i-option value="车贷">车贷代充值账户</i-option>
+                            <i-option value="房贷">房贷代充值账户</i-option>
+                            <i-option value="扶贫贷">扶贫贷代充值账户</i-option>
+                            <i-option value="闪贷业务">闪贷业务代充值账户</i-option>
+                            <i-option value="车全业务">车全业务代充值账户</i-option>
+                            <i-option value="二手车业务">二手车业务代充值账户</i-option>
+                            <i-option value="一点车贷">一点车贷代充值账户</i-option>
+                            <i-option value="信用贷">信用贷代充值账户</i-option>
 		  				</i-select>
 		  				<span style="color: red">
 		  					{{rechargeModalForm.rechargeAccountBalance && 
@@ -354,14 +339,14 @@
 			<i-col span="6">
 				选择代充值账户：
 				<i-select v-model="queryRechargeRecordModel.rechargeAccountType" clearable filterable style="width: 200px">
-                       <i-option value="车贷代充值">车贷代充值账户</i-option>
-                       <i-option value="房贷代充值">房贷代充值账户</i-option>
-                       <i-option value="扶贫贷代充值">扶贫贷代充值账户</i-option>
-                       <i-option value="闪贷业务代充值">闪贷业务代充值账户</i-option>
-                       <i-option value="车全业务代充值">车全业务代充值账户</i-option>
-                       <i-option value="二手车业务代充值">二手车业务代充值账户</i-option>
-                       <i-option value="一点车贷代充值">一点车贷代充值账户</i-option>
-                       <i-option value="信用贷代充值">信用贷代充值账户</i-option>
+                       <i-option value="车贷">车贷代充值账户</i-option>
+                       <i-option value="房贷">房贷代充值账户</i-option>
+                       <i-option value="扶贫贷">扶贫贷代充值账户</i-option>
+                       <i-option value="闪贷业务">闪贷业务代充值账户</i-option>
+                       <i-option value="车全业务">车全业务代充值账户</i-option>
+                       <i-option value="二手车业务">二手车业务代充值账户</i-option>
+                       <i-option value="一点车贷">一点车贷代充值账户</i-option>
+                       <i-option value="信用贷">信用贷代充值账户</i-option>
 				</i-select>
 			</i-col>
 			<i-col span="6">

@@ -1,19 +1,21 @@
 package com.hongte.alms.scheduled.runJob;
 
 import org.slf4j.Logger;
+
+
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import com.hongte.alms.base.service.RepaymentProjPlanListDetailService;
-import com.hongte.alms.base.service.RepaymentProjPlanListService;
-import com.hongte.alms.base.service.RepaymentProjPlanService;
 import com.hongte.alms.scheduled.client.WithholdingClient;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.annotation.JobHandler;
+
+/**
+ * 
+ * @author czs
+ * 同步代扣结果定时任务，每天每隔10分钟执行
+ */
 @JobHandler(value = "syncRechargeResultJobHandler")
 @Component
 public class SyncRechargeResultJob extends IJobHandler {

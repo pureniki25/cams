@@ -16,6 +16,7 @@ import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.base.vo.finance.CurrPeriodRepaymentInfoVO;
 import com.hongte.alms.base.vo.module.MatchedMoneyPoolVO;
 import com.hongte.alms.common.result.Result;
+import com.hongte.alms.finance.req.FinanceSettleReq;
 
 /**
  * @author 王继光 2018年5月7日 下午6:03:32
@@ -138,5 +139,5 @@ public interface FinanceService {
 	 * 根据业务编号查找实还流水
 	 */
     Map<String, Object> queryActualPaymentByBusinessId(String businessId);
-    
+
 }

@@ -293,13 +293,9 @@ window.layinit(function (htConfig) {
         	   axios.post(platRepayBasePath +"tdrepayRecharge/repayComplianceWithRequirements")
         	   .then(function (res) {
         		   vm.tdrepyChargeLoading = false;
-        		   if (res.data.data != null && res.data.code == 1) {
-        			   vm.$Modal.success({
-        				   content: res.data.msg
-        			   });
-        		   } else {
-        			   vm.$Modal.error({content: res.data.msg });
-        		   }
+    			   vm.$Modal.success({
+    				   content: res.data.msg
+    			   });
         	   })
         	   .catch(function (error) {
         		   vm.tdrepyChargeLoading = false;

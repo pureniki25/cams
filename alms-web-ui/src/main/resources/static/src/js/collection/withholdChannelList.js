@@ -40,7 +40,9 @@ window.layinit(function (htConfig) {
 
             };
             return {
+                disabledFlag: true,
                 withHoldChanelModel: false,
+                title:'',
                 platformType: [],
                 loading: false,
                 searchForm: {
@@ -54,6 +56,8 @@ window.layinit(function (htConfig) {
                     remark: '',
                     channelLevel: '',
                     channelId: '',
+                    subPlatformId:'',
+                    subPlatformName:''
                 },
 
                 withHoldChanelValidate: {
@@ -108,7 +112,7 @@ window.layinit(function (htConfig) {
                                 title: '代扣优先级'
                             },
                             {
-                                field: 'channelId',
+                                field: 'subPlatformId',
                                 title: '编号'
                             },
                             {
@@ -170,6 +174,7 @@ window.layinit(function (htConfig) {
                 vm.toLoading();
             },
             editWithholdChannel(id) {
+                vm.title="编辑渠道";
                 vm.withHoldChanelModel = true;
                 axios.get(basePath + 'withholdManage/getWithholdChannel?channelId=' + id)
                     .then(function (res) {
@@ -181,15 +186,33 @@ window.layinit(function (htConfig) {
                             vm.withHoldChanelForm.remark = data.remark;
                             vm.withHoldChanelForm.channelId = data.channelId;
                             vm.withHoldChanelForm.channelLevel = data.level;
+                            vm.withHoldChanelForm.subPlatformId = data.subPlatformId;
+                            vm.withHoldChanelForm.subPlatformName = data.subPlatformName;
                         }
                     })
                     .catch(function (error) {
                         vm.$Modal.error({content: '接口调用异常!'});
                     });
             },
+            platformOnChange(e){
+
+                if(e ==5){
+                    this.disabledFlag = false;
+                }else if(e==3) {
+                    this.disabledFlag = true;
+                    vm.withHoldChanelForm.subPlatformId=3;
+                    vm.withHoldChanelForm.subPlatformName='宝付代扣';
+                }else if(e==0){
+                    this.disabledFlag = true;
+                    vm.withHoldChanelForm.subPlatformId=0;
+                    vm.withHoldChanelForm.subPlatformName='易宝代扣';
+                }
+
+            },
             addHoldChannel(name) {
                 // console.log("addHoldChannel",addHoldChannel);
                 this.$refs[name].resetFields();
+                vm.title="新增渠道";
                 vm.withHoldChanelModel = true;
             },
             submitHoldChanel(name) {
@@ -199,6 +222,9 @@ window.layinit(function (htConfig) {
                 var remark = vm.withHoldChanelForm.remark;
                 var channelId = vm.withHoldChanelForm.channelId;
                 var level = vm.withHoldChanelForm.channelLevel;
+                var subPlatformId = vm.withHoldChanelForm.subPlatformId;
+                var subPlatformName = vm.withHoldChanelForm.subPlatformName;
+
 
                 console.log("platformId", typeof platformId);
                 console.log("channelStatus", typeof channelStatus);
@@ -215,7 +241,9 @@ window.layinit(function (htConfig) {
                                     failTimes: failTimes,
                                     remark: remark,
                                     channelId: channelId,
-                                    level: level
+                                    level: level,
+                                    subPlatformId: subPlatformId,
+                                    subPlatformName: subPlatformName
                                 }
                             })
                             .then(function (res) {

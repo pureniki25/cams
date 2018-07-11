@@ -48,7 +48,7 @@ public class WithHoldLogController {
         Page<WithholdingRepaymentLog> pages = new Page<>();
 
         Wrapper<WithholdingRepaymentLog> wrapper = new EntityWrapper<>();
-        wrapper.eq("identity_card",withHoldLogReq.getIdentifyCard());
+        wrapper.eq("identity_card",withHoldLogReq.getIdentifyCard()).orderBy("log_id", false);
 
 
         pages.setCurrent(withHoldLogReq.getPage());

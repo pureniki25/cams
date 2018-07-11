@@ -1,10 +1,10 @@
 package com.hongte.alms.base.mapper;
 
 import com.hongte.alms.base.dto.UserPermissionBusinessDto;
+import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.vo.module.BusinessInfoForApplyDerateVo;
 import com.hongte.alms.base.vo.module.LiquidationVO;
 import com.hongte.alms.base.vo.module.LitigationVO;
-import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.common.mapper.SuperMapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -121,6 +121,16 @@ public interface BasicBusinessMapper extends SuperMapper<BasicBusiness> {
 	 * 车贷移交法务信息
 	 */
 	List<LitigationVO> selectLitigationCarVO(@Param("crpId") String crpId);
+
+    /**
+     * 查询所有业务ID
+     *
+     * @param companyId    分公司ID
+     * @param businessType 业务类型
+     * @return 业务ID集合
+     * @author 张贵宏
+     */
+    List<String> findBusinessIds(@Param("companyId") String companyId, @Param("businessType") Integer businessType);
 }
 
 

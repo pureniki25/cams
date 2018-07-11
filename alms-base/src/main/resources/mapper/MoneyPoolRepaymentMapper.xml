@@ -105,7 +105,8 @@
 		  AND lst.orig_business_id = #{businessId,jdbcType=VARCHAR}
 		  AND mpr.income_type IN (1, 2)
 		  AND mpr.is_finance_match = 1
-		ORDER BY 1
+		  AND mpr.state = '财务确认已还款'
+		ORDER BY 1, 4
 	</select>
 
     <select id="getCustomerRepayFlowPageList" parameterType="com.hongte.alms.base.customer.vo.CustomerRepayFlowListReq"
@@ -115,7 +116,7 @@
         t.create_time AS createTime,
         t.money_pool_id AS moneyPoolId,
         t.original_business_id AS originalBusinessId,
-        t.operate_name AS operateName,
+        b.customer_name AS operateName,
         t.after_id AS afterId,
         b.company_name AS companyName,
         t.account_money AS accountMoney,
@@ -128,8 +129,8 @@
         t.state AS state
         FROM
         tb_money_pool_repayment t
+        INNER JOIN tb_repayment_biz_plan_list m ON t.original_business_id = m.orig_business_id AND t.after_id = m.after_id AND m.src_type = 2
         LEFT JOIN tb_basic_business b ON t.original_business_id = b.business_id
-        LEFT JOIN tb_repayment_biz_plan_list m ON t.plan_list_id = m.plan_list_id
         WHERE 1=1
         <if test="regStartTime !=null">
             AND t.create_time &gt;= #{regStartTime}
@@ -169,8 +170,8 @@
         count(1)
         FROM
         tb_money_pool_repayment t
+        INNER JOIN tb_repayment_biz_plan_list m ON t.original_business_id = m.orig_business_id AND t.after_id = m.after_id AND m.src_type = 2
         LEFT JOIN tb_basic_business b ON t.original_business_id = b.business_id
-        LEFT JOIN tb_repayment_biz_plan_list m ON t.plan_list_id = m.plan_list_id
         WHERE 1=1
         <if test="regStartTime !=null">
             AND t.create_time &gt;= #{regStartTime}
@@ -210,7 +211,7 @@
         t.create_time AS createTime,
         t.money_pool_id AS moneyPoolId,
         t.original_business_id AS originalBusinessId,
-        t.operate_name AS operateName,
+        b.customer_name AS operateName,
         t.after_id AS afterId,
         b.company_name AS companyName,
         t.account_money AS accountMoney,
@@ -222,8 +223,8 @@
         t.state AS state
         FROM
         tb_money_pool_repayment t
+        INNER JOIN tb_repayment_biz_plan_list m ON t.original_business_id = m.orig_business_id AND t.after_id = m.after_id AND m.src_type = 2
         LEFT JOIN tb_basic_business b ON t.original_business_id = b.business_id
-        LEFT JOIN tb_repayment_biz_plan_list m ON t.plan_list_id = m.plan_list_id
         WHERE 1=1
         <if test="regStartTime !=null">
             AND t.create_time &gt;= #{regStartTime}

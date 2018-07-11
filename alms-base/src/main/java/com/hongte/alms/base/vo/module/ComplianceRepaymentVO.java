@@ -54,6 +54,11 @@ public class ComplianceRepaymentVO extends PageRequest implements Serializable {
 	 */
 	private int isExport;
 
+	/**
+	 * 用户ID
+	 */
+	private String userId;
+
 	public Date getConfirmTimeStart() {
 		return confirmTimeStart;
 	}
@@ -134,12 +139,20 @@ public class ComplianceRepaymentVO extends PageRequest implements Serializable {
 		this.isExport = isExport;
 	}
 
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
 	@Override
 	public String toString() {
 		return "ComplianceRepaymentVO [confirmTimeStart=" + confirmTimeStart + ", confirmTimeEnd=" + confirmTimeEnd
 				+ ", processStatus=" + processStatus + ", repaySource=" + repaySource + ", settleType=" + settleType
 				+ ", origBusinessId=" + origBusinessId + ", businessType=" + businessType + ", platStatus=" + platStatus
-				+ ", companyName=" + companyName + ", isExport=" + isExport + "]";
+				+ ", companyName=" + companyName + ", isExport=" + isExport + ", userId=" + userId + "]";
 	}
 
 }

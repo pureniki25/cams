@@ -1,62 +1,35 @@
 package com.hongte.alms.base.service.impl;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.ibatis.annotations.Param;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.dto.UserPermissionBusinessDto;
-import com.hongte.alms.base.entity.BasicBusiness;
-import com.hongte.alms.base.entity.BizOutputRecord;
-import com.hongte.alms.base.entity.Doc;
-import com.hongte.alms.base.entity.DocType;
-import com.hongte.alms.base.entity.RenewalBusiness;
-import com.hongte.alms.base.entity.RepaymentBizPlan;
-import com.hongte.alms.base.entity.RepaymentBizPlanList;
-import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
-import com.hongte.alms.base.entity.SysParameter;
+import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.enums.RepayTypeEnum;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
-import com.hongte.alms.base.mapper.BasicBusinessMapper;
-import com.hongte.alms.base.mapper.BizOutputRecordMapper;
-import com.hongte.alms.base.mapper.RenewalBusinessMapper;
-import com.hongte.alms.base.mapper.RepaymentBizPlanListDetailMapper;
-import com.hongte.alms.base.mapper.RepaymentBizPlanListMapper;
-import com.hongte.alms.base.mapper.RepaymentBizPlanMapper;
-import com.hongte.alms.base.mapper.TransferOfLitigationMapper;
+import com.hongte.alms.base.mapper.*;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.BizOutputRecordService;
 import com.hongte.alms.base.service.ExpenseSettleService;
 import com.hongte.alms.base.service.SysParameterService;
 import com.hongte.alms.base.vo.billing.CarLoanBilVO;
-import com.hongte.alms.base.vo.module.BusinessInfoForApplyDerateVo;
-import com.hongte.alms.base.vo.module.ExpenseSettleRepaymentPlanVO;
-import com.hongte.alms.base.vo.module.ExpenseSettleVO;
-import com.hongte.alms.base.vo.module.LiquidationVO;
-import com.hongte.alms.base.vo.module.LitigationVO;
+import com.hongte.alms.base.vo.module.*;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
+import org.apache.ibatis.annotations.Param;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * <p>
@@ -183,6 +156,25 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 		}
 		return sList;
 	}
+
+    /**
+     * 查询所有业务ID
+     *
+     * @param companyId    分公司ID
+     * @param businessType 业务类型
+     * @return 业务ID集合
+     * @author 张贵宏
+     */
+    @Override
+    public List<String> findBusinessIds(String companyId, Integer businessType) {
+        //EntityWrapper<BasicBusiness> ew = new EntityWrapper<>();
+		/*BasicBusiness basicBusiness = new BasicBusiness();
+		basicBusiness.setCompanyId(companyId);
+		basicBusiness.setBusinessType(businessType);
+		basicBusiness.selectAll();*/
+        return basicBusinessMapper.findBusinessIds(companyId, businessType);
+    }
+
 
 	/**
 	 * 结清最终缴纳的金额

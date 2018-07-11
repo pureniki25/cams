@@ -83,6 +83,11 @@ public class AfterLoanStandingBookReq extends PageRequest {
     @ApiModelProperty(value="客户名称",name="customerName",dataType = "String")
     private String  customerName;  //客户名称
 
+    @ApiModelProperty(value="身份证号",name="identifyCard",dataType = "String")
+    private String  identifyCard; //身份证号
+
+    @ApiModelProperty(value="手机号",name="phoneNumber",dataType = "String")
+    private String  phoneNumber; //手机号
 
     @ApiModelProperty(value="还款计划ID多个ID以逗号分隔",name="crpIds",dataType = "String")
     private String  crpIds;  //还款计划ID字符串  用于接收界面传参
@@ -358,5 +363,21 @@ public class AfterLoanStandingBookReq extends PageRequest {
 
     public void setUserType(Integer userType) {
         this.userType = userType;
+    }
+
+    public String getIdentifyCard() {
+        return identifyCard;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setIdentifyCard(String identifyCard) {
+        this.identifyCard = identifyCard;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }

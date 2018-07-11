@@ -299,7 +299,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
         log.setApproveUserId(loginUserInfoHelper.getUserId());
         log.setCurrentStep(process.getCurrentStep());
         log.setNextStep(currentStep.getNextStep());
-        log.setCreateUser(Constant.DEV_DEFAULT_USER);
+        log.setCreateUser(loginUserInfoHelper.getUserId());
         log.setCreateTime(new Date());
         processLogService.insert(log);
         
@@ -358,7 +358,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
             if(sysUser!=null){
                 copySend.setReceiveUserName(sysUser.getUserName());
             }else{
-                copySend.setReceiveUserName(Constant.DEV_DEFAULT_USER);
+                copySend.setReceiveUserName(Constant.ADMIN_ID);
             }
             processLogCopySendService.insert(copySend);
         }
@@ -480,7 +480,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
         log.setApproveUserId(loginUserInfoHelper.getUserId());
         log.setCurrentStep(process.getCurrentStep());
         log.setNextStep(currentStep.getNextStep());
-        log.setCreateUser(Constant.DEV_DEFAULT_USER);
+        log.setCreateUser(loginUserInfoHelper.getUserId());
         log.setCreateTime(new Date());
         processLogService.insert(log);
 
@@ -494,7 +494,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
             if(sysUser!=null){
                 copySend.setReceiveUserName(sysUser.getUserName());
             }else{
-                copySend.setReceiveUserName(Constant.DEV_DEFAULT_USER);
+                copySend.setReceiveUserName(Constant.ADMIN_ID);
             }
             processLogCopySendService.insert(copySend);
         }
@@ -1153,7 +1153,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
         log.setApproveUserId(loginUserInfoHelper.getUserId());
         log.setCurrentStep(process.getCurrentStep());
         log.setNextStep(currentStep.getNextStep());
-        log.setCreateUser(Constant.DEV_DEFAULT_USER);
+        log.setCreateUser(loginUserInfoHelper.getUserId());
         log.setCreateTime(new Date());
         log.setActionDesc(req.getRemark());
         log.setIsPass(req.getIsPass());
@@ -1166,7 +1166,8 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
             copySend.setProcessLogId(log.getProcessLogId());
             copySend.setProcessSendId(UUID.randomUUID().toString());
             copySend.setReceiveUserId(req.getSendUserIds()[i]);
-            copySend.setReceiveUserName(Constant.DEV_DEFAULT_USER);
+            LoginInfoDto infoDto = loginUserInfoHelper.getUserInfoByUserId(req.getSendUserIds()[i],null);
+            copySend.setReceiveUserName(infoDto!=null?infoDto.getUserName():Constant.ADMIN_ID);
             processLogCopySendService.insert(copySend);
         }
 

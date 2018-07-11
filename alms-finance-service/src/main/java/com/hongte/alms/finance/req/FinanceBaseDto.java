@@ -7,6 +7,8 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Data
 public class FinanceBaseDto {
@@ -53,8 +55,13 @@ public class FinanceBaseDto {
 
     // 调用来源的标志位
     private Integer callFlage;
-    private List<RepaymentProjPlanListDetail> updatedProjPlanDetails;
-
+    private Set<RepaymentProjPlanListDetail> updatedProjPlanDetails;
+    /**
+     * 新增还款金额list
+     * Map<plan_list_detail_id, List<RepaymentProjFactRepay>>
+     */
+    private Map<String, List<RepaymentProjFactRepay>> projFactRepays ;
+    
     ///////// 还款过程中相关变量（payOneFeeDetail 函数中赋值） 开始 zk ///////////////////////
 
     // 当前用到第几条还款来源的标志位
@@ -69,4 +76,9 @@ public class FinanceBaseDto {
     private String userId;
 
     private String userName;
+    
+    /**
+     * 本次还款已完成的标的还款计划
+     */
+    private List<RepaymentProjPlanList> curTimeRepaidProjPlanList ;
 }

@@ -18,7 +18,7 @@ import io.swagger.annotations.ApiModelProperty;
  * </p>
  *
  * @author 胡伟骞
- * @since 2018-06-25
+ * @since 2018-07-09
  */
 @ApiModel
 @TableName("tb_agency_recharge_log")
@@ -32,6 +32,18 @@ public class AgencyRechargeLog extends Model<AgencyRechargeLog> {
 	@TableId(value="id", type= IdType.AUTO)
 	@ApiModelProperty(required= true,value = "主键ID")
 	private Integer id;
+    /**
+     * 原业务编号
+     */
+	@TableField("orig_business_id")
+	@ApiModelProperty(required= true,value = "原业务编号")
+	private String origBusinessId;
+    /**
+     * 资产端期数
+     */
+	@TableField("after_id")
+	@ApiModelProperty(required= true,value = "资产端期数")
+	private String afterId;
     /**
      * (代充值参数)代充值账户类型
      */
@@ -154,6 +166,22 @@ public class AgencyRechargeLog extends Model<AgencyRechargeLog> {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public String getOrigBusinessId() {
+		return origBusinessId;
+	}
+
+	public void setOrigBusinessId(String origBusinessId) {
+		this.origBusinessId = origBusinessId;
+	}
+
+	public String getAfterId() {
+		return afterId;
+	}
+
+	public void setAfterId(String afterId) {
+		this.afterId = afterId;
 	}
 
 	public String getRechargeAccountType() {
@@ -317,6 +345,8 @@ public class AgencyRechargeLog extends Model<AgencyRechargeLog> {
 	public String toString() {
 		return "AgencyRechargeLog{" +
 			", id=" + id +
+			", origBusinessId=" + origBusinessId +
+			", afterId=" + afterId +
 			", rechargeAccountType=" + rechargeAccountType +
 			", transferType=" + transferType +
 			", rechargeAmount=" + rechargeAmount +

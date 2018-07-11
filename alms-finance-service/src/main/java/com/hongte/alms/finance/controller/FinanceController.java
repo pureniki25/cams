@@ -10,17 +10,16 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
+import com.hongte.alms.base.customer.vo.CustomerRepayFlowExel;
 import com.hongte.alms.base.dto.ConfirmRepaymentReq;
 import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.base.dto.MoneyPoolManagerReq;
 import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.dto.core.LayTableQuery;
 import com.hongte.alms.base.entity.*;
-import com.hongte.alms.base.enums.AreaLevel;
-import com.hongte.alms.base.enums.PlatformEnum;
-import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
-import com.hongte.alms.base.enums.RepayRegisterState;
+import com.hongte.alms.base.enums.*;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
+import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.service.*;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
 import com.hongte.alms.base.vo.finance.*;
@@ -30,6 +29,7 @@ import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.common.vo.PageResult;
+import com.hongte.alms.finance.req.FinanceSettleReq;
 import com.hongte.alms.finance.req.MoneyPoolReq;
 import com.hongte.alms.finance.req.OrderSetReq;
 import com.hongte.alms.finance.service.FinanceService;
@@ -38,6 +38,9 @@ import com.ht.ussp.bean.LoginUserInfoHelper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.jeecgframework.poi.excel.ExcelExportUtil;
+import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,7 +128,13 @@ public class FinanceController {
 	@Autowired
 	@Qualifier("WithholdingRepaymentLogService")
 	WithholdingRepaymentLogService withholdingRepaymentLogService;
+	
+	@Autowired
+	@Qualifier("TuandaiProjectInfoService")
+	TuandaiProjectInfoService tuandaiProjectInfoService ;
 
+	@Autowired
+	EipRemote eipRemote ;
 
 	@Value("${oss.readUrl}")
 	private String ossReadUrl ;
@@ -334,6 +343,7 @@ public class FinanceController {
 	@ApiOperation(value = "获取财务管理列表数据")
 	public PageResult getFinanceMangerList(FinanceManagerListReq req) {
 		logger.info("@getFinanceMangerList@获取财务管理列表数据--开始[{}]", req);
+		req.setUserId(loginUserInfoHelper.getUserId());
 		PageResult pageResult = repaymentBizPlanListService.selectByFinanceManagerListReq(req);
 		logger.info("@getFinanceMangerList@获取财务管理列表数据--结束[{}]", pageResult);
 		return pageResult;
@@ -783,6 +793,21 @@ public class FinanceController {
 		return result;
 	}
 	
+	@ApiOperation(value = "网关充值快捷充值核心接口")
+	@PostMapping("/recharge")
+	public Result recharge(@RequestBody ConfirmRepaymentReq req){
+		logger.info("@recharge@网关充值快捷充值核心接口--开始[{}]", req);
+		Result result=new Result();
+		try {
+			List<CurrPeriodProjDetailVO> list = shareProfitService.execute(req, true);
+			logger.info("@recharge@网关充值快捷充值核心接口--结束[{}]", list);
+			return result.success(list);
+		} catch (Exception ex) {
+			logger.error("分润出现异常"+ex);
+			return Result.error("-1","分润出现异常"+ex);
+		}
+	}
+	
 	@ApiOperation(value = "删除财务新增的银行流水")
 	@GetMapping("/deleteMoneyPool")
 	public Result deleteMoneyPool(String mprId) {
@@ -908,7 +933,8 @@ public class FinanceController {
         List<BasicBusinessType> btype_list = basicBusinessTypeService.selectList(new EntityWrapper<BasicBusinessType>().orderBy("business_type_id"));
         retMap.put("businessType", (JSONArray) JSON.toJSON(btype_list, JsonUtil.getMapping()));
         //查询用户
-        List<SysUser> users = sysUserService.selectList(new EntityWrapper<>());
+        //List<SysUser> users = sysUserService.selectList(new EntityWrapper<>());
+        List<SysUser> users = sysUserService.selectUsersByRole(SysRoleEnums.DH_CASHIER.getKey());
         retMap.put("users", (JSONArray) JSON.toJSON(users, JsonUtil.getMapping()));
 
         logger.info("@getOrderSetSearchInfo@查找财务人员跟单设置查询相关信息--结束[{}]", JSON.toJSONString(retMap));
@@ -1039,4 +1065,36 @@ public class FinanceController {
 		}
 	}
 
+	@RequestMapping("/lastRepayConfirm")
+	@ApiOperation(value="查询上次还款来源")
+	public Result lastRepayConfirm(String businessId,String afterId) {
+		try {
+			logger.info("@lastRepayConfirm@查询上次还款来源--开始[{}]");
+			List<RepaymentConfirmLog> list = confrimLogService.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("org_business_id", businessId).eq("after_id",afterId).orderBy("idx",false));
+			if (list==null||list.size()==0) {
+				logger.info("@lastRepayConfirm@查询上次还款来源--结束[0]");
+				return Result.success(0);
+			}
+			logger.info("@lastRepayConfirm@查询上次还款来源--结束[{}]",list.get(0).getRepaySource());
+			return Result.success(list.get(0).getRepaySource());
+		} catch (Exception e) {
+			logger.info("@lastRepayConfirm@查询上次还款来源--结束[{}]",e.getMessage());
+			return Result.error("查询上次还款来源异常");
+		}
+	}
+
+
+	@RequestMapping("/checkLastRepay")
+	@ApiOperation(value="检查前面的还款计划是否有未还垫付")
+	public Result checkLastRepay(String businessId) {
+		List<TuandaiProjectInfo> list = tuandaiProjectInfoService.selectList(new EntityWrapper<TuandaiProjectInfo>().eq("business_id",businessId));
+		for (TuandaiProjectInfo tuandaiProjectInfo : list) {
+			Map<String, Object> paramMap = new HashMap<>();
+		    paramMap.put("orgType", 1); // 机构类型 传输任意值
+		    paramMap.put("projectId", tuandaiProjectInfo.getProjectId());
+			com.ht.ussp.core.Result res = eipRemote.getProjectPayment(paramMap);
+			logger.info(JSON.toJSONString(res));
+		}
+		return null ;
+	}
 }

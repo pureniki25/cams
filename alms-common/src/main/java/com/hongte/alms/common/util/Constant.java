@@ -9,9 +9,9 @@ public class Constant {
 	// Excel存储文件夹名字
 	// public static final String EXCEL_FILE_NAME = "excelTemp//";
 
-	public static final String DEV_DEFAULT_USER = "devDefaultUser";
-	public static final String DEFAULT_SYS_USER = "sysAutoSet";
-	public static final String SYS_DEFAULT_USER = "sysDefaultUser";
+//	public static final String DEV_DEFAULT_USER = "devDefaultUser";
+//	public static final String DEFAULT_SYS_USER = "sysAutoSet";
+//	public static final String SYS_DEFAULT_USER = "sysDefaultUser";
 	public static final String ADMIN_ID = "0111130000";
 
 	// 申请减免的流程类型ID
@@ -185,5 +185,20 @@ public class Constant {
 	public static final String CANWITHHOLD_YES_1="限额足够，可一次代扣";
 	public static final String CANWITHHOLD_YES_2="单次限额不够，本次还款需要代扣%s次，可一次代扣";
 	public static final String CANWITHHOLD_YES_3="代扣限额不足，请换卡";
+	
+	public static final String CAR_LOAN = "车贷";
+	public static final String HOUSE_LOAN = "房贷";
+	public static final String POVERTY_ALLEVIATION_LOAN = "扶贫贷";
+	public static final String QUICK_LOAN = "闪贷业务";
+	public static final String CHE_QUAN_LOAN = "车全业务";
+	public static final String ER_SHOU_CHE_LOAN = "二手车业务";
+	public static final String YI_DIAN_LOAN = "一点车贷";
+	public static final String CREDIT_LOAN = "信用贷";
+	
+	/**
+	 * 线上线下部分分界线,参考tb_repayment_biz_plan_list_detail.share_profit_index和tb_repayment_proj_plan_list_detail.share_profit_index <br/>
+	 * 1200以下是线上部分费用,超过1200是线下部分费用
+	 */
+	public static final Integer ONLINE_OFFLINE_FEE_BOUNDARY = 1200 ;
 
 }

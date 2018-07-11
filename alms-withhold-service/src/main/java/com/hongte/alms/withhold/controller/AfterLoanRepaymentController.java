@@ -11,11 +11,14 @@ import com.hongte.alms.withhold.service.AfterLoanRepaymentService;
 import com.hongte.alms.withhold.service.RechargeService;
 import com.hongte.alms.withhold.service.RedisService;
 import com.hongte.alms.withhold.service.WithholdingService;
+import com.hongte.alms.withhold.service.impl.WithholdingServiceimpl;
 
 import io.swagger.annotations.ApiOperation;
 
 import java.math.BigDecimal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -31,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value= "/repay")
 public class AfterLoanRepaymentController {
-
+	private static Logger logger = LoggerFactory.getLogger(AfterLoanRepaymentController.class);
     @Autowired
     private AfterLoanRepaymentService afterLoanRepaymentService;
     
@@ -87,7 +90,9 @@ public class AfterLoanRepaymentController {
     @ApiOperation(value = "自动代扣")
     public Result autoRepay(){
 	    try {
+	  		logger.info("@autoRepay@自动代扣--开始");
 	    	withholdingService.withholding();
+			logger.info("@autoRepay@自动代扣--结束");
 	        return Result.success();
 	    }catch (Exception ex){
 	        ex.printStackTrace();

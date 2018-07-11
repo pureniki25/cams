@@ -28,6 +28,7 @@ import com.hongte.alms.base.dto.compliance.TdProjectPaymentInfoResult;
 import com.hongte.alms.base.dto.compliance.TdRefundMonthInfoDTO;
 import com.hongte.alms.base.entity.AgencyRechargeLog;
 import com.hongte.alms.base.entity.BasicCompany;
+import com.hongte.alms.base.entity.IssueSendOutsideLog;
 import com.hongte.alms.base.entity.RepaymentProjPlan;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
@@ -36,6 +37,7 @@ import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.enums.RechargeAccountTypeEnums;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.EipRemote;
+import com.hongte.alms.base.service.AgencyRechargeLogService;
 import com.hongte.alms.base.service.BasicCompanyService;
 import com.hongte.alms.base.service.IssueSendOutsideLogService;
 import com.hongte.alms.base.service.RepaymentProjPlanService;
@@ -101,6 +103,10 @@ public class TdrepayRechargeController {
 
 	@Autowired
 	private LoginUserInfoHelper loginUserInfoHelper;
+
+	@Autowired
+	@Qualifier("AgencyRechargeLogService")
+	private AgencyRechargeLogService agencyRechargeLogService;
 
 	@Autowired
 	private EipRemote eipRemote;
@@ -355,6 +361,7 @@ public class TdrepayRechargeController {
 			if (vo != null && vo.getConfirmTimeEnd() != null) {
 				vo.setConfirmTimeEnd(DateUtil.addDay2Date(1, vo.getConfirmTimeEnd()));
 			}
+			vo.setUserId(loginUserInfoHelper.getUserId());
 			int count = tdrepayRechargeService.countComplianceRepaymentData(vo);
 			if (count == 0) {
 				return PageResult.success(count);
@@ -364,9 +371,39 @@ public class TdrepayRechargeController {
 
 			List<TdrepayRechargeInfoVO> resultList = new ArrayList<>();
 			if (CollectionUtils.isNotEmpty(list)) {
+
+				Map<String, IssueSendOutsideLog> batchIdMap = new HashMap<>();
+
+				for (TdrepayRechargeLog tdrepayRechargeLog : list) {
+					String batchId = tdrepayRechargeLog.getBatchId();
+					if (StringUtil.isEmpty(batchId)) {
+						continue;
+					}
+					IssueSendOutsideLog issueSendOutsideLog = batchIdMap.get(batchId);
+					if (issueSendOutsideLog == null) {
+						issueSendOutsideLog = issueSendOutsideLogService
+								.selectOne(new EntityWrapper<IssueSendOutsideLog>()
+										.eq("Interfacecode", Constant.INTERFACE_CODE_SEND_DISTRIBUTE_FUND)
+										.eq("send_key", batchId));
+						if (issueSendOutsideLog != null) {
+							batchIdMap.put(batchId, issueSendOutsideLog);
+						}else {
+							batchIdMap.put(batchId, new IssueSendOutsideLog());
+						}
+					}
+				}
+
 				for (TdrepayRechargeLog tdrepayRechargeLog : list) {
 					TdrepayRechargeInfoVO infoVO = BeanUtils.deepCopy(tdrepayRechargeLog, TdrepayRechargeInfoVO.class);
 					if (infoVO != null) {
+						IssueSendOutsideLog issueSendOutsideLog = batchIdMap.get(infoVO.getBatchId());
+						if (issueSendOutsideLog != null) {
+							JSONObject parseObject = JSONObject.parseObject(issueSendOutsideLog.getReturnJson());
+							if (parseObject != null) {
+								infoVO.setRemark(parseObject.getString("codeDesc"));
+							}
+						}
+
 						infoVO.setBusinessTypeStr(BusinessTypeEnum.getName(infoVO.getBusinessType()));
 						infoVO.setRepaymentTypeStr(RepaySourceEnum.getName(infoVO.getRepaySource()));
 						switch (infoVO.getSettleType()) {
@@ -602,7 +639,7 @@ public class TdrepayRechargeController {
 						case 1:
 							tdReturnAdvanceShareProfitDTO.setStatusStrActual("已结清");
 							break;
-						case 2:
+						case 0:
 							tdReturnAdvanceShareProfitDTO.setStatusStrActual("未结清");
 							break;
 
@@ -696,7 +733,21 @@ public class TdrepayRechargeController {
 		}
 	}
 
-	@ApiOperation(value = "查询资金分发记录")
+	@SuppressWarnings("rawtypes")
+	@ApiOperation(value = "查询资金分发处理状态")
+	@GetMapping("/queryDistributeFund")
+	@ResponseBody
+	public Result queryDistributeFund() {
+		try {
+			agencyRechargeLogService.queryDistributeFund();
+			return Result.success();
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error("-99", e.getMessage());
+		}
+	}
+
+	@ApiOperation(value = "获取标还款计划")
 	@GetMapping("/queryRepaymentProjPlan")
 	@ResponseBody
 	public Result<RepaymentProjPlan> queryRepaymentProjPlan(@RequestParam("projectId") String projectId) {
@@ -860,19 +911,22 @@ public class TdrepayRechargeController {
 		try {
 			Integer[] processStatus = { 0, 3 };
 
-			TdrepayRechargeLog tdrepayRechargeLog = tdrepayRechargeLogService.selectOne(
+			List<TdrepayRechargeLog> tdrepayRechargeLogs = tdrepayRechargeLogService.selectList(
 					new EntityWrapper<TdrepayRechargeLog>().eq("project_id", (String) paramMap.get("projectId"))
 							.eq("confirm_log_id", (String) paramMap.get("confirmLogId"))
 							.in("process_status", processStatus).eq("is_valid", 1));
-
-			if (tdrepayRechargeLog != null) {
-				tdrepayRechargeLog.setIsValid(2);
-				tdrepayRechargeLogService.updateById(tdrepayRechargeLog);
+			
+			if (!CollectionUtils.isEmpty(tdrepayRechargeLogs)) {
+				
+				for (TdrepayRechargeLog rechargeLog : tdrepayRechargeLogs) {
+					rechargeLog.setIsValid(2);
+				}
+				
+				tdrepayRechargeLogService.updateBatchById(tdrepayRechargeLogs);
 				return Result.success();
-			} else {
+			}else {
 				return Result.error("-99", "没有找到对应的数据，撤销资金分发失败");
 			}
-
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return Result.error("-99", "系统异常");
@@ -880,4 +934,29 @@ public class TdrepayRechargeController {
 
 	}
 
+	@ApiOperation(value = "查询所有业务类型")
+	@GetMapping("/queryBusinessTypes")
+	@ResponseBody
+	public Result<List<Map<String, Object>>> queryBusinessTypes() {
+		try {
+			List<Map<String, Object>> resultList = new LinkedList<>();
+			BusinessTypeEnum[] businessTypeEnums = BusinessTypeEnum.values();
+
+			for (BusinessTypeEnum businessTypeEnum : businessTypeEnums) {
+				if (businessTypeEnum.value() == 25) {
+					continue;
+				}
+				Map<String, Object> resultMap = new HashMap<>();
+				resultMap.put("value", businessTypeEnum.value());
+				resultMap.put("name", businessTypeEnum.getName());
+				resultList.add(resultMap);
+			}
+
+			return Result.success(resultList);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error("-99", e.getMessage());
+		}
+	}
+	
 }
