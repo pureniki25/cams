@@ -19,6 +19,7 @@ import com.hongte.alms.base.dto.core.LayTableQuery;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.*;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
+import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.service.*;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
 import com.hongte.alms.base.vo.finance.*;
@@ -127,7 +128,13 @@ public class FinanceController {
 	@Autowired
 	@Qualifier("WithholdingRepaymentLogService")
 	WithholdingRepaymentLogService withholdingRepaymentLogService;
+	
+	@Autowired
+	@Qualifier("TuandaiProjectInfoService")
+	TuandaiProjectInfoService tuandaiProjectInfoService ;
 
+	@Autowired
+	EipRemote eipRemote ;
 
 	@Value("${oss.readUrl}")
 	private String ossReadUrl ;
@@ -1077,4 +1084,17 @@ public class FinanceController {
 	}
 
 
+	@RequestMapping("/checkLastRepay")
+	@ApiOperation(value="检查前面的还款计划是否有未还垫付")
+	public Result checkLastRepay(String businessId) {
+		List<TuandaiProjectInfo> list = tuandaiProjectInfoService.selectList(new EntityWrapper<TuandaiProjectInfo>().eq("business_id",businessId));
+		for (TuandaiProjectInfo tuandaiProjectInfo : list) {
+			Map<String, Object> paramMap = new HashMap<>();
+		    paramMap.put("orgType", 1); // 机构类型 传输任意值
+		    paramMap.put("projectId", tuandaiProjectInfo.getProjectId());
+			com.ht.ussp.core.Result res = eipRemote.getProjectPayment(paramMap);
+			logger.info(JSON.toJSONString(res));
+		}
+		return null ;
+	}
 }

@@ -23,9 +23,12 @@ import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.service.RepaymentBizPlanListDetailService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.RepaymentBizPlanService;
+import com.hongte.alms.base.service.SettleService;
 import com.hongte.alms.base.vo.finance.RepaymentSettleListVO;
+import com.hongte.alms.base.vo.finance.SettleInfoVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.DateUtil;
+import com.hongte.alms.common.util.StringUtil;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -53,6 +56,10 @@ public class SettleController {
 	@Qualifier("RepaymentBizPlanListDetailService")
 	RepaymentBizPlanListDetailService repaymentBizPlanListDetailService;
 	
+	@Qualifier("SettleService")
+	@Autowired
+	SettleService settleService ;
+	
 	@GetMapping(value="/listRepaymentSettleListVOs")
 	@ApiOperation(value="还款计划")
 	public Result<List<RepaymentSettleListVO>> listRepaymentSettleListVOs(String businessId,String afterId,String planId) {
@@ -72,14 +79,15 @@ public class SettleController {
 	
 	@GetMapping(value="/settleInfo")
 	@ApiOperation(value="结清应还信息")
-	public Result<JSONObject> settleInfo(String businessId,String afterId,String planId) {
+	public Result<SettleInfoVO> settleInfo(String businessId,String afterId,String planId) {
 		try {
 			logger.info("@settleInfo@结清应还信息--开始[{}]", businessId);
-			Result<JSONObject> result = null;
-			JSONObject res = new JSONObject();
-			List<RepaymentSettleListVO> list = repaymentBizPlanService.listRepaymentSettleListVOs(businessId,afterId, planId);
-			RepaymentBizPlanList curPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", businessId).eq("after_id", afterId));
-			return null ;
+			if (StringUtil.isEmpty(planId)) {
+				planId = null ;
+			}
+			SettleInfoVO infoVO = settleService.settleInfoVO(businessId, afterId, planId);
+			logger.error("@settleInfo@结清应还信息--结束[{}]", JSONObject.toJSONString(infoVO));
+			return Result.success(infoVO);
 		} catch (Exception e) {
 			logger.error("@settleInfo@结清应还信息--结束[{}]", e);
 			e.printStackTrace();

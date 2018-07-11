@@ -45,4 +45,54 @@
                  GROUP BY b.orig_business_id
 	</select>
 
+	<select id="selectLastPlanListLackFees" resultType="com.hongte.alms.base.vo.finance.SettleFeesVO">
+		
+		SELECT
+			plan_item_name,
+			plan_item_type,
+			fee_id,
+			amount 
+		FROM
+			(
+		SELECT
+			plan_item_name ,
+			plan_item_type,
+			fee_id,
+			sum( plan_amount - IFNULL( fact_amount, 0 ) ) AS amount 
+		FROM
+			tb_repayment_biz_plan_list_detail 
+		WHERE
+			plan_list_id IN ( SELECT plan_list_id FROM tb_repayment_biz_plan_list WHERE orig_business_id = #{businessId} AND due_date &lt; #{dueDate}
+			<if test="planId != null">
+			AND plan_id = #{planId}
+			</if> ) 
+		GROUP BY
+			fee_id 
+			) as tmp where amount != 0;
+	</select>
+	
+	<select id="selectLastPlanListDerateFees" resultType="com.hongte.alms.base.vo.finance.SettleFeesVO">
+		SELECT
+			plan_item_name,
+			plan_item_type,
+			fee_id,
+			amount 
+		FROM
+			(
+		SELECT
+			plan_item_name ,
+			plan_item_type,
+			fee_id,
+			sum( derate_amount )  as amount
+		FROM
+			tb_repayment_biz_plan_list_detail 
+		WHERE
+			plan_list_id IN ( SELECT plan_list_id FROM tb_repayment_biz_plan_list WHERE orig_business_id = #{businessId} AND due_date &lt; #{dueDate}
+			<if test="planId != null">
+			AND plan_id = #{planId}
+			</if> ) 
+		GROUP BY
+			fee_id 
+			) as tmp where amount != 0;
+	</select>
 </mapper>
