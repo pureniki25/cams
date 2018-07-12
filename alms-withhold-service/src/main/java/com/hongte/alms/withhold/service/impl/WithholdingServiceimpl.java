@@ -526,7 +526,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 				if (sysBankLimit == null) {
 					logger.info("银行代扣限额信息platformId:{0},bankCode:{1},无效/不存在",channel.getPlatformId(),bankCardInfo.getBankName());
 					result.setCode("-1");
-			    	result.setMsg("银行代扣限额信息platformId:"+channel.getPlatformId()+",bankCode:"+bankCardInfo.getBankCode()+",无效/不存在");
+			    	result.setMsg("银行代扣限额信息platformId:"+channel.getPlatformId()+",bankCode:"+bankCardInfo.getBankName()+",无效/不存在");
 					return result;
 				} else {
 					// 本期线上剩余应还金额,剩余应还金额减去线下金额
@@ -645,7 +645,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 					if (sysBankLimit == null) {
 						logger.info("第三方代扣限额信息platformId:{0},bankCode:{1},无效/不存在",channel.getPlatformId(),thirtyCardInfo.getBankName());
 						result.setCode("-1");
-					 	result.setMsg("第三方代扣限额信息platformId:"+channel.getPlatformId()+",bankCode:"+thirtyCardInfo.getBankCode()+",无效/不存在");
+					 	result.setMsg("第三方代扣限额信息platformId:"+channel.getPlatformId()+",bankCode:"+thirtyCardInfo.getBankName()+",无效/不存在");
 						continue;
 					} else {
 
