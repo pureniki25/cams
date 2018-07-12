@@ -74,6 +74,10 @@ public class PlatformRepaymentController {
     @Qualifier("RepaymentProjPlanListService")
     RepaymentProjPlanListService repaymentProjPlanListService;
 
+//    @Autowired
+//    @Qualifier("RepaymentProjFactRepayService")
+//    RepaymentProjFactRepayService repaymentProjFactRepayService;
+
     //@Qualifier("TdrepayRechargeController")
     @Autowired
     TdrepayRechargeController tdrepayRechargeController;
@@ -215,6 +219,7 @@ public class PlatformRepaymentController {
                             .eq("after_id", repaymentProjPlanList.getAfterId())
             );*/
 
+
             RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("plan_list_id", repaymentProjPlanList.getPlanListId()));
 
             //部分还款状态子状态,null:未还款,1:部分还款,2:线上已还款,3:全部已还款
@@ -288,12 +293,25 @@ public class PlatformRepaymentController {
             //还款来源
             //处理转换 还款来源，10：线下转账，11:用往期结余还款(归类到线下转账吧),20：线下代扣，30：银行代扣
             //到接口 还款来源，1:线下转账,2:第三方代扣,3:银行代扣,4:APP网关充值,5:协议代扣
-            if (repaymentProjPlanList.getRepayFlag() == null) {
-                LOGGER.error("@对接合规还款接口@ 指定的标期数的已还款类型标记为null 输入参数projPlanListId:[{}]", projPlanListId);
-                return Result.error("指定的标期数的已还款类型标记为null");
-            } else {
-                vo.setRepaySource(RepayPlanPayedTypeEnum.getByValue(repaymentProjPlanList.getRepayFlag()).getClassifyId());
+//            if (repaymentProjPlanList.getRepayFlag() == null) {
+//                LOGGER.error("@对接合规还款接口@ 指定的标期数的已还款类型标记为null 输入参数projPlanListId:[{}]", projPlanListId);
+//                return Result.error("指定的标期数的已还款类型标记为null");
+//            } else {
+//                vo.setRepaySource(RepayPlanPayedTypeEnum.getByValue(repaymentProjPlanList.getRepayFlag()).getClassifyId());
+//            }
+
+            List<RepaymentProjFactRepay> repayll =
+                    repaymentProjFactRepayService.selectList(
+                            new EntityWrapper<RepaymentProjFactRepay>().
+                                    eq("proj_plan_list_id",projPlanListId).
+                                    orderBy("create_date",false));
+            if(repayll==null || repayll.size()==0 ){
+                LOGGER.error("@对接合规还款接口@ 查询实还流水为空 输入参数projPlanListId:[{}]", projPlanListId);
+                return Result.error("查询实还流水为空");
             }
+
+            vo.setRepaySource(RepayPlanPayedTypeEnum.getByValue(repayll.get(0).getRepaySource()).getClassifyId());
+
 
             //取还款确认日志的最后一次的来源做为整个业务的还款来源
             //处理转换 还款来源，10：线下转账，11:用往期结余还款(归类到线下转账吧),20：线下代扣，30：银行代扣
