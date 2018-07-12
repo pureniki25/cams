@@ -69,6 +69,7 @@ let data = {
     exporting: false, //导出标志位
     submitLoading: false,
     editModal: false,
+    editModalTitle: '新增',
     editModalLoading: true,
     detailModal: false,
     companies: [],
@@ -190,6 +191,7 @@ let methods = {
         this.editModal = true;
     },
     hideEditModal() {
+        this.editModalTitle = '新增';
         this.editModal = false;
         this.$refs['editForm'].resetFields();
     },
@@ -253,20 +255,20 @@ let methods = {
                 self.$Modal.error({content: '操作失败!'});
             })
     },
-    delete(id, userId) {
-        var self = this;
-        axios.get(basePath + 'finance/delete', {params: {id: id, userId: userId}})
-            .then(res => {
-                if (res.data.code == '1') {
-                    self.tableReload()
-                } else {
-                    self.$Modal.error({content: '删除失败!'})
-                }
-            })
-            .catch(err => {
-                self.$Modal.error({content: '出现异常，请联系管理员!'})
-            })
-    },
+    // delete(id, userId) {
+    //     var self = this;
+    //     axios.get(basePath + 'departmentBank/delete', {params: {id: id, userId: userId}})
+    //         .then(res => {
+    //             if (res.data.code == '1') {
+    //                 self.search()
+    //             } else {
+    //                 self.$Modal.error({content: '删除失败!'})
+    //             }
+    //         })
+    //         .catch(err => {
+    //             self.$Modal.error({content: '出现异常，请联系管理员!'})
+    //         })
+    // },
     paging(current) {
         this.searchForm.current = current;
         this.search();
@@ -296,19 +298,6 @@ let methods = {
         );
         // self.loading =  false;
     },
-    handleSubmit (name) {
-        setTimeout(() => {
-            this.editModal = false;
-        }, 2000);
-
-        this.$refs[name].validate((valid) => {
-            if (valid) {
-                this.$Message.success('Success!');
-            } else {
-                this.$Message.error('Fail!');
-            }
-        })
-    },
     submitEditForm() {
         var self = this;
         this.$refs['editForm'].validate( valid => {
@@ -337,6 +326,7 @@ let methods = {
         });
     },
     edit(row) {
+        this.editModalTitle = '编辑';
         this.$refs['editForm'].resetFields();
         Object.assign(this.editForm, row);
         this.editForm.deptIds = !!row.deptId ? row.deptId.split(',') : [];
