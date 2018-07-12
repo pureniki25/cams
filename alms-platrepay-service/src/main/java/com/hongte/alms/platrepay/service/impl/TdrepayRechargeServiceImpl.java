@@ -208,7 +208,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		}
 		
 		// 若还款来源为银行代扣、或者网关充值，不需要手动资金分发，直接赋值成功
-		if (vo.getRepaySource().intValue() == 3 && vo.getRepaySource().intValue() == 4) {
+		if (vo.getRepaySource().intValue() == 3 || vo.getRepaySource().intValue() == 4) {
 			rechargeLog.setProcessStatus(2);
 		}else {
 			rechargeLog.setProcessStatus(0); // 分发状态（0：待分发，1：分发处理中，2：分发成功，3，分发失败）
@@ -1208,7 +1208,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 						dto.setPrincipalAndInterest(BigDecimal.valueOf(principalAndInterest3));
 						dto.setStatus(1);
 						dto.setTuandaiAmount(BigDecimal.valueOf(tuandaiAmount3));
-//						dto.setOrgType(handleTdUserName(businessType));
+						dto.setOrgType(handleTdUserName(businessType));
 						dto.setOrgAmount(BigDecimal.valueOf(orgAmount3));
 						dto.setGuaranteeAmount(BigDecimal.valueOf(guaranteeAmount3));
 						dto.setArbitrationAmount(BigDecimal.valueOf(arbitrationAmount3));
@@ -1447,7 +1447,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		// 还垫付日志记录
 		TdrepayAdvanceLog tdrepayAdvanceLog = new TdrepayAdvanceLog();
 
-//		paramDTO.setOrgType(handleTdUserName(tdrepayRechargeLog.getBusinessType()));
+		paramDTO.setOrgType(handleTdUserName(tdrepayRechargeLog.getBusinessType()));
 
 		// 期次
 		Integer period = tdrepayRechargeLog.getPeriod();
