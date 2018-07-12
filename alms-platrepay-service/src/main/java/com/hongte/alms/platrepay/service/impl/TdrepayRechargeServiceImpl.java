@@ -1208,7 +1208,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 						dto.setPrincipalAndInterest(BigDecimal.valueOf(principalAndInterest3));
 						dto.setStatus(1);
 						dto.setTuandaiAmount(BigDecimal.valueOf(tuandaiAmount3));
-						dto.setOrgType(handleTdUserName(businessType));
+//						dto.setOrgType(handleTdUserName(businessType));
 						dto.setOrgAmount(BigDecimal.valueOf(orgAmount3));
 						dto.setGuaranteeAmount(BigDecimal.valueOf(guaranteeAmount3));
 						dto.setArbitrationAmount(BigDecimal.valueOf(arbitrationAmount3));
@@ -1447,7 +1447,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		// 还垫付日志记录
 		TdrepayAdvanceLog tdrepayAdvanceLog = new TdrepayAdvanceLog();
 
-		paramDTO.setOrgType(handleTdUserName(tdrepayRechargeLog.getBusinessType()));
+//		paramDTO.setOrgType(handleTdUserName(tdrepayRechargeLog.getBusinessType()));
 
 		// 期次
 		Integer period = tdrepayRechargeLog.getPeriod();

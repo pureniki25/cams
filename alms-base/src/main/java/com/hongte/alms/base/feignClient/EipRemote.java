@@ -235,5 +235,14 @@ public interface EipRemote {
 	"content-type=application/json" }, method = RequestMethod.POST)
 	Result queryRepaymentEarlier(@RequestBody Map<String, Object> paramMap);
 	
+	/**
+	 * 查询标的还款计划
+	 * @param paramMap
+	 * @return
+	 */
+	@RequestMapping(value = "/eip/td/repayment/queryRepaymentSchedule", headers = { "app=ALMS",
+	"content-type=application/json" }, method = RequestMethod.POST)
+	Result queryRepaymentSchedule(@RequestBody Map<String, Object> paramMap);
+	
 
 }
