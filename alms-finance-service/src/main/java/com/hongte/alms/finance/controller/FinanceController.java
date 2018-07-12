@@ -142,6 +142,9 @@ public class FinanceController {
 	TuandaiProjectInfoService tuandaiProjectInfoService ;
 
 	@Autowired
+	@Qualifier("RepaymentProjPlanService")
+	RepaymentProjPlanService repaymentProjPlanService ;
+	@Autowired
 	EipRemote eipRemote ;
 
 	@Value("${oss.readUrl}")
@@ -1096,16 +1099,13 @@ public class FinanceController {
 	@ApiOperation(value = "检查前面的还款计划是否有未还垫付")
 	public Result checkLastRepay(String businessId, String afterId) {
 		logger.info("@checkLastRepay@检查前面的还款计划是否有未还垫付--开始[{}{}]",businessId,afterId);
-		List<TuandaiProjectInfo> list = tuandaiProjectInfoService
-				.selectList(new EntityWrapper<TuandaiProjectInfo>().eq("business_id", businessId));
-		RepaymentBizPlanList bizPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", businessId).eq("after_id", afterId));
-		for (TuandaiProjectInfo tuandaiProjectInfo : list) {
+		RepaymentBizPlanList cur = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", businessId).eq("after_id", afterId));
+		List<RepaymentProjPlan> selectList = repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("plan_id", cur.getPlanId()));
+		
+		for (RepaymentProjPlan projPlan : selectList) {
 			Map<String, Object> paramMap = new HashMap<>();
-			paramMap.put("projectId", tuandaiProjectInfo.getProjectId());
+			paramMap.put("projectId", projPlan.getProjectId());
 			com.ht.ussp.core.Result result = eipRemote.queryProjectPayment(paramMap);
-			
-			
-			
 			
 			if (result != null && result.getData() != null
 					&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
@@ -1119,7 +1119,7 @@ public class FinanceController {
 								JSONObject.toJSONString(parseObject.get("projectPayments")), TdProjectPaymentDTO.class);
 						
 						for (TdProjectPaymentDTO tdProjectPaymentDTO : tdProjectPaymentDTOs) {
-							if (tdProjectPaymentDTO.getStatus()==0 && tdProjectPaymentDTO.getPeriod() != bizPlanList.getPeriod()) {
+							if (tdProjectPaymentDTO.getStatus()==0 && tdProjectPaymentDTO.getPeriod() != cur.getPeriod()) {
 								
 								return Result.error("0", "往期存在垫付未结清记录");
 							}
