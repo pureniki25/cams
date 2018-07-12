@@ -443,7 +443,7 @@ public class RechargeServiceImpl implements RechargeService {
 					}else {
 						dto.setChannelType(((WithholdingChannel)channelObject).getSubPlatformId().toString());// 子渠道
 					}
-					logger.info("============================银行代扣，调用的子渠道是:{0}=====================================",dto.getChannelType());
+					logger.info("============================银行代扣，调用的子渠道是:"+dto.getChannelType()+"=====================================");
 					dto.setRechargeUserId(bankCardInfo.getPlatformUserID());
 					dto.setCmOrderNo(merchOrderId);
 					dto.setOidPartner(oidPartner);
