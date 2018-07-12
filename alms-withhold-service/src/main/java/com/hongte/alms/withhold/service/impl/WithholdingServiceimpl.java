@@ -524,7 +524,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 				SysBankLimit sysBankLimit = sysBankLimitService.selectOne(
 						new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("bank_code", bankCardInfo.getBankCode().trim()).eq("status", 1));
 				if (sysBankLimit == null) {
-					logger.info("银行代扣限额信息platformId:{0},bankCode:{1},无效/不存在",channel.getPlatformId(),bankCardInfo.getBankCode());
+					logger.info("银行代扣限额信息platformId:{0},bankCode:{1},无效/不存在",channel.getPlatformId(),bankCardInfo.getBankName());
 					result.setCode("-1");
 			    	result.setMsg("银行代扣限额信息platformId:"+channel.getPlatformId()+",bankCode:"+bankCardInfo.getBankCode()+",无效/不存在");
 					return result;
@@ -643,7 +643,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 					SysBankLimit sysBankLimit = sysBankLimitService.selectOne(
 							new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("status", 1).eq("bank_code", thirtyCardInfo.getBankCode()));
 					if (sysBankLimit == null) {
-						logger.info("第三方代扣限额信息platformId:{0},bankCode:{1},无效/不存在",channel.getPlatformId(),thirtyCardInfo.getBankCode());
+						logger.info("第三方代扣限额信息platformId:{0},bankCode:{1},无效/不存在",channel.getPlatformId(),thirtyCardInfo.getBankName());
 						result.setCode("-1");
 					 	result.setMsg("第三方代扣限额信息platformId:"+channel.getPlatformId()+",bankCode:"+thirtyCardInfo.getBankCode()+",无效/不存在");
 						continue;
