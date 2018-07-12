@@ -575,7 +575,7 @@ public class RepaymentProjPlanListServiceImpl extends
 					if (pDetails != null && pDetails.size() > 0) {
 						RepaymentBizPlanListDetail temp = pDetails.get(0);
 						RepaymentBizPlanListDetail copy = ClassCopyUtil.copyObject(temp,
-								RepaymentBizPlanListDetail.class);
+								RepaymentBizPlanListDetail.class); 
 						copy.setPlanDetailId(projDetail.getPlanDetailId());
 						copy.setFeeId(feeId);
 						copy.setPlanAmount(lateFee);
