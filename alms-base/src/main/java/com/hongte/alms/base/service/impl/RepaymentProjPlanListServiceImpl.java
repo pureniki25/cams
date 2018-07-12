@@ -582,6 +582,9 @@ public class RepaymentProjPlanListServiceImpl extends
 					    if(feeId.equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
 						  copy.setShareProfitIndex(profitItemSetService.getLevel(business.getBusinessType().toString(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getValue().intValue(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid()).get("feeLevel"));
 					    }
+					    if(feeId.equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
+							  copy.setShareProfitIndex(profitItemSetService.getLevel(business.getBusinessType().toString(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getValue().intValue(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid()).get("feeLevel"));
+						    }
 						copy.setPlanItemType(60);
 						copy.setPlanItemName("滞纳金");
 						repaymentBizPlanListDetailService.insertOrUpdate(copy);
