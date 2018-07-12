@@ -219,6 +219,7 @@ public class PlatformRepaymentController {
                             .eq("after_id", repaymentProjPlanList.getAfterId())
             );*/
 
+
             RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("plan_list_id", repaymentProjPlanList.getPlanListId()));
 
             //部分还款状态子状态,null:未还款,1:部分还款,2:线上已还款,3:全部已还款
