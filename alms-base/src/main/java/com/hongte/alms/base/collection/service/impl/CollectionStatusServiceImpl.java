@@ -16,6 +16,7 @@ import com.hongte.alms.base.collection.vo.StaffBusinessVo;
 import com.hongte.alms.base.entity.CarBusinessAfter;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.SysUserPermission;
 import com.hongte.alms.base.feignClient.CollectionSynceToXindaiRemoteApi;
 import com.hongte.alms.base.feignClient.LitigationFeignClient;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
@@ -186,22 +187,23 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                     collectionLogService.insertBatch(logs);
                 }
             }
-        }else if(staffType.equals(CollectionStatusEnum.PHONE_STAFF.getPageStr())
-                || staffType.equals(CollectionStatusEnum.COLLECTING.getPageStr())){
-            //如果是设置电催或者催收 判断业务是否已经拖车登记/关闭/移交法务
-            for(StaffBusinessVo vo:voList){
-                List<CollectionStatus> list = selectList(new EntityWrapper<CollectionStatus>().eq("business_id",vo.getBusinessId()));
-                for(CollectionStatus status:list) {
-                    if (status.getCollectionStatus().equals(CollectionStatusEnum.TO_LAW_WORK.getKey())
-                    ||status.getCollectionStatus().equals(CollectionStatusEnum.CLOSED.getKey())
-                    ||status.getCollectionStatus().equals(CollectionStatusEnum.TRAILER_REG.getKey())){
-                        String statStr = CollectionStatusEnum.getByKey(status.getCollectionStatus()).getName();
-                        logger.error("此业务已"+statStr+"，不能再设置催收或者电催！  businessId:"+ status.getBusinessId()+"     crpId:"+status.getCrpId());
-                        throw  new  RuntimeException("此业务已"+statStr+"，不能再设置催收或者电催！");
-                    }
-                }
-            }
         }
+//        else if(staffType.equals(CollectionStatusEnum.PHONE_STAFF.getPageStr())
+//                || staffType.equals(CollectionStatusEnum.COLLECTING.getPageStr())){
+//            //如果是设置电催或者催收 判断业务是否已经拖车登记/关闭/移交法务
+//            for(StaffBusinessVo vo:voList){
+//                List<CollectionStatus> list = selectList(new EntityWrapper<CollectionStatus>().eq("business_id",vo.getBusinessId()));
+//                for(CollectionStatus status:list) {
+//                    if (status.getCollectionStatus().equals(CollectionStatusEnum.TO_LAW_WORK.getKey())
+//                    ||status.getCollectionStatus().equals(CollectionStatusEnum.CLOSED.getKey())
+//                    ||status.getCollectionStatus().equals(CollectionStatusEnum.TRAILER_REG.getKey())){
+//                        String statStr = CollectionStatusEnum.getByKey(status.getCollectionStatus()).getName();
+//                        logger.error("此业务已"+statStr+"，不能再设置催收或者电催！  businessId:"+ status.getBusinessId()+"     crpId:"+status.getCrpId());
+//                        throw  new  RuntimeException("此业务已"+statStr+"，不能再设置催收或者电催！");
+//                    }
+//                }
+//            }
+//        }
 
 
         Integer setTypeStatus = CollectionStatusEnum.getByPageStr(staffType).getKey();
@@ -274,13 +276,26 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                 //刷新相关跟单人员的用户设置
                 //1.旧的那个跟单人的permission刷新
                 if(oldStaffUserId!=null){
-                    sysUserPermissionService.setUserPermissons(oldStaffUserId);
+                    List<SysUserPermission>  lsys = sysUserPermissionService.selectList(new EntityWrapper<SysUserPermission>().eq("business_id",status.getBusinessId()).eq("user_id",oldStaffUserId));
+                    if(lsys!=null && lsys.size()>0){
+                        sysUserPermissionService.delete(new EntityWrapper<SysUserPermission>().eq("business_id",status.getBusinessId()).eq("user_id",oldStaffUserId));
+                    }
+//                    sysUserPermissionService.setUserPermissons(oldStaffUserId);
                 }
 
                 //2.新的那个跟单人的permission刷新
                 if(staffType.equals(CollectionStatusEnum.PHONE_STAFF.getPageStr())
                         || staffType.equals(CollectionStatusEnum.COLLECTING.getPageStr())) {
-                    sysUserPermissionService.setUserPermissons(staffUserId);
+//                    sysUserPermissionService.setUserPermissons(staffUserId);
+
+                    List<SysUserPermission>  lsys = sysUserPermissionService.selectList(new EntityWrapper<SysUserPermission>().eq("business_id",status.getBusinessId()).eq("user_id",staffUserId));
+                    if(lsys == null || lsys.size()==0){
+                        SysUserPermission temp = new SysUserPermission();
+                        temp.setUserId(staffUserId);
+                        temp.setBusinessId(status.getBusinessId());
+                        sysUserPermissionService.insert(temp);
+
+                    }
                 }
             }
 
@@ -415,13 +430,60 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
      */
     public Integer getCurrentColStatu(CollectionStatus status,Integer setTypeStatus){
 //        Integer collectionStatus = CollectionStatusEnum.getByPageStr(staffType).getKey();
+        List<CollectionStatus> list = selectList(new EntityWrapper<CollectionStatus>().eq("business_id",status.getBusinessId()));
+        Integer bizStauts = null;
+        for(CollectionStatus bizColStatus:list) {
+            if(bizStauts==null){
+                bizStauts = bizColStatus.getCollectionStatus();
+            }else {
+                //历史的催收状态为已关闭，则直接置位为已关闭
+                if(bizColStatus.getCollectionStatus().equals(CollectionStatusEnum.CLOSED.getKey())){
+                    bizStauts = bizColStatus.getCollectionStatus();
+                }else if(bizColStatus.getCollectionStatus().equals(CollectionStatusEnum.TO_LAW_WORK.getKey())){
+                    //历史的催收状态为“已移交诉讼”，则非“已关闭”的状态置位为“已移交法务”
+                    if(!bizStauts.equals(CollectionStatusEnum.CLOSED.getKey())){
+                        bizStauts = bizColStatus.getCollectionStatus();
+                    }
+                }else if(bizColStatus.getCollectionStatus().equals(CollectionStatusEnum.TRAILER_REG.getKey())){
+                    //历史的催收状态为“已拖车登记”，则非“已关闭”，非“已移交法务”的状态置位为“已拖车登记”
+                    if(!bizStauts.equals(CollectionStatusEnum.CLOSED.getKey())
+                            &&!bizStauts.equals(CollectionStatusEnum.TO_LAW_WORK.getKey())){
+                        bizStauts = bizColStatus.getCollectionStatus();
+                    }
+                }else if(bizColStatus.getCollectionStatus().equals(CollectionStatusEnum.COLLECTING.getKey())){
+                    //历史的催收状态为“催收中”，则非“已关闭”，非“已移交法务”,非“已拖车登记”的状态置位为“催收中”
+                    if(!bizStauts.equals(CollectionStatusEnum.CLOSED.getKey())
+                            &&!bizStauts.equals(CollectionStatusEnum.TO_LAW_WORK.getKey())
+                            &&!bizStauts.equals(CollectionStatusEnum.TRAILER_REG.getKey())){
+                        bizStauts = bizColStatus.getCollectionStatus();
+                    }
+                }else{
+                    //历史的催收状态为“电催”，则非“已关闭”，非“已移交法务”,非“已拖车登记”，非“催收中”的状态置位为“电催”
+                    if(!bizStauts.equals(CollectionStatusEnum.CLOSED.getKey())
+                            &&!bizStauts.equals(CollectionStatusEnum.TO_LAW_WORK.getKey())
+                            &&!bizStauts.equals(CollectionStatusEnum.TRAILER_REG.getKey())
+                            &&!bizStauts.equals(CollectionStatusEnum.COLLECTING.getKey())){
+                        bizStauts = bizColStatus.getCollectionStatus();
+                    }
+                }
 
-        if(status.getCollectionStatus()==null){
+            }
+//            if (status.getCollectionStatus().equals(CollectionStatusEnum.TO_LAW_WORK.getKey())
+//                    ||status.getCollectionStatus().equals(CollectionStatusEnum.CLOSED.getKey())
+//                    ||status.getCollectionStatus().equals(CollectionStatusEnum.TRAILER_REG.getKey())){
+//                String statStr = CollectionStatusEnum.getByKey(status.getCollectionStatus()).getName();
+//                logger.error("此业务已"+statStr+"，不能再设置催收或者电催！  businessId:"+ status.getBusinessId()+"     crpId:"+status.getCrpId());
+//                throw  new  RuntimeException("此业务已"+statStr+"，不能再设置催收或者电催！");
+//            }
+        }
+
+
+        if(bizStauts==null){
             return setTypeStatus;
-        }else if(status.getCollectionStatus().equals(CollectionStatusEnum.CLOSED.getKey())){
+        }else if(bizStauts.equals(CollectionStatusEnum.CLOSED.getKey())){
             //当前状态已经是已关闭的，则不刷新状态
             return  status.getCollectionStatus();
-        }else if(status.getCollectionStatus().equals(CollectionStatusEnum.TO_LAW_WORK.getKey())){
+        }else if(bizStauts.equals(CollectionStatusEnum.TO_LAW_WORK.getKey())){
             //当前状态是已移交诉讼
             if(setTypeStatus.equals(CollectionStatusEnum.CLOSED.getKey())){
                 //设置的状态为 关闭 才刷新状态
@@ -429,7 +491,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
             }else{
                 return status.getCollectionStatus();
             }
-        }else if (status.getCollectionStatus().equals(CollectionStatusEnum.TRAILER_REG.getKey())){
+        }else if (bizStauts.equals(CollectionStatusEnum.TRAILER_REG.getKey())){
             //当前状态为已拖车登记
             if(setTypeStatus.equals(CollectionStatusEnum.CLOSED.getKey())
                     || setTypeStatus.equals(CollectionStatusEnum.TO_LAW_WORK.getKey())){
@@ -438,8 +500,8 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
             }else{
                 return status.getCollectionStatus();
             }
-        }else if (status.getCollectionStatus().equals(CollectionStatusEnum.COLLECTING.getKey())){
-            //当前状态为已拖车登记
+        }else if (bizStauts.equals(CollectionStatusEnum.COLLECTING.getKey())){
+            //当前状态为催收中
             if(setTypeStatus.equals(CollectionStatusEnum.CLOSED.getKey())
                     || setTypeStatus.equals(CollectionStatusEnum.TO_LAW_WORK.getKey())
                     ||setTypeStatus.equals(CollectionStatusEnum.TRAILER_REG.getKey()) ){

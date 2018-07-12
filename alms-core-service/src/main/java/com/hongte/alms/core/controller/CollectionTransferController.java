@@ -798,7 +798,7 @@ public class CollectionTransferController {
 	public Result transferOnePhoneSet(@RequestBody CarBusinessAfter carBusinessAfter){
 		LOGGER.info("同步一个电催信息--开始[{}]" , JSON.toJSONString(carBusinessAfter) );
 
-		boolean bl = transPhoneSet(carBusinessAfter,null);
+		boolean bl = transPhoneSet(carBusinessAfter,CollectionSetWayEnum.XINDAI_CALL);
 
 		if(bl){
 			LOGGER.info("同步一个电催信息--成功[{}]" );
