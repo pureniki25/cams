@@ -51,7 +51,7 @@ public class NiwoController {
 
 	@PostMapping(value = "/sycRepayPlan")
 	@ApiOperation(value = "回调你我金融还款计划")
-	public void sycRepayPlan(HashMap<String,Object> niwoMap) {
+	public void sycRepayPlan(@RequestBody HashMap<String,Object> niwoMap) {
 		logger.info("@sycRepayPlan@回调你我金融还款计划--开始[{},{}]");
 		niWoRepayPlanService.sycNiWoRepayPlan(null,niwoMap);
 		logger.info("@sycRepayPlan@回调你我金融还款计划--结束[{}]");

@@ -124,12 +124,13 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 			  dto=getNiWoRepayPlanByMap(niwoMap, dto);
 			  orderNo=dto.getOrderNo();
 		}
-		if(orderNo!=null&&!orderNo.equals("")) {
+		if(orderNo!=null&&!orderNo.equals("")&&niwoMap==null) {
 			   dto=getNiWoRepayPlan(orderNo,dto);
 		}
 		  
 		if(dto==null) {
 			logger.info("获取你我金融的标的记录为空,请求编号{request_no}为："+orderNo);
+			return;
 		}
 			
 			RepaymentProjPlan projPlan = repaymentProjPlanService
@@ -533,7 +534,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 								 
 								   
 									projPlanList.setOverdueDays(BigDecimal.valueOf(getOverDays(detailDto.getRefundDate())));
-									if(getOverDays(detailDto.getRefundDate())>0) {
+									if(getOverDays(detailDto.getRefundDate())>0&&(!projPlanList.getCurrentStatus().equals("已还款"))) {
 										projPlanList.setCurrentStatus("逾期");
 										pList.setCurrentStatus("逾期");
 									}
