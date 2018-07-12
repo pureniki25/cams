@@ -436,13 +436,14 @@ public class RechargeServiceImpl implements RechargeService {
 
 				BankRechargeReqDto dto = new BankRechargeReqDto();
 				for (Object channelObject : channles) {// 需要循环签约子渠道
+	
 					dto.setAmount(amount);
 					if(aggreeSwitch.getParamValue().equals("1")) {
 						dto.setChannelType(((SignedProtocol)channelObject).getChannelType().toString());// 子渠道
 					}else {
 						dto.setChannelType(((WithholdingChannel)channelObject).getSubPlatformId().toString());// 子渠道
 					}
-				
+					logger.info("============================银行代扣，调用的子渠道是:{0}=====================================",dto.getChannelType());
 					dto.setRechargeUserId(bankCardInfo.getPlatformUserID());
 					dto.setCmOrderNo(merchOrderId);
 					dto.setOidPartner(oidPartner);
