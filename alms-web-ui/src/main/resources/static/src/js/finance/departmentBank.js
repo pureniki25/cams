@@ -279,6 +279,7 @@ let methods = {
         var self = this;
         //self.loading =  true;
         //self.table.loading = true;
+        this.searchForm.current = 1;
         axios.post(basePath + 'departmentBank/search', this.searchForm).then(res => {
                 self.table.loading = false;
                 if (!!res.data && res.data.code == 0) {
