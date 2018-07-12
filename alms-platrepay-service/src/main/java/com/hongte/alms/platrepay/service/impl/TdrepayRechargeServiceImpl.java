@@ -206,8 +206,13 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		if (StringUtil.notEmpty(vo.getProjPlanListId())) {
 			rechargeLog.setProjPlanListId(vo.getProjPlanListId());
 		}
-
-		rechargeLog.setProcessStatus(0); // 分发状态（0：待分发，1：分发处理中，2：分发成功，3，分发失败）
+		
+		// 若还款来源为银行代扣、或者网关充值，不需要手动资金分发，直接赋值成功
+		if (vo.getRepaySource().intValue() == 3 && vo.getRepaySource().intValue() == 4) {
+			rechargeLog.setProcessStatus(2);
+		}else {
+			rechargeLog.setProcessStatus(0); // 分发状态（0：待分发，1：分发处理中，2：分发成功，3，分发失败）
+		}
 		rechargeLog.setCreateTime(new Date());
 		rechargeLog.setCreateUser(loginUserInfoHelper.getUserId());
 
@@ -1839,11 +1844,42 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 					.selectList(new EntityWrapper<TdrepayRechargeLog>().eq("project_id", projectId).eq("is_valid", 1)
 							.orderBy("after_id", false));
 			if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
+				
+				Map<String, IssueSendOutsideLog> batchIdMap = new HashMap<>();
+				
+				for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
+					String batchId = tdrepayRechargeLog.getBatchId();
+					if (StringUtil.isEmpty(batchId)) {
+						continue;
+					}
+					IssueSendOutsideLog issueSendOutsideLog = batchIdMap.get(batchId);
+					if (issueSendOutsideLog == null) {
+						issueSendOutsideLog = issueSendOutsideLogService
+								.selectOne(new EntityWrapper<IssueSendOutsideLog>()
+										.eq("Interfacecode", Constant.INTERFACE_CODE_SEND_DISTRIBUTE_FUND)
+										.eq("send_key", batchId));
+						if (issueSendOutsideLog != null) {
+							batchIdMap.put(batchId, issueSendOutsideLog);
+						}else {
+							batchIdMap.put(batchId, new IssueSendOutsideLog());
+						}
+					}
+					
+				}
+
+				
 				for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
 					DistributeFundRecordVO vo = BeanUtils.deepCopy(tdrepayRechargeLog, DistributeFundRecordVO.class);
 					vo.setProcessStatusStr(ProcessStatusTypeEnum.getName(tdrepayRechargeLog.getProcessStatus()));
 					vo.setCreateTimeStr(DateUtil.formatDate(vo.getCreateTime()));
 					vo.setFactRepayDateStr(DateUtil.formatDate(vo.getFactRepayDate()));
+					IssueSendOutsideLog issueSendOutsideLog = batchIdMap.get(tdrepayRechargeLog.getBatchId());
+					if (issueSendOutsideLog != null) {
+						JSONObject parseObject = JSONObject.parseObject(issueSendOutsideLog.getReturnJson());
+						if (parseObject != null) {
+							vo.setRemark(parseObject.getString("codeDesc"));
+						}
+					}
 					vo.setDetails(tdrepayRechargeDetailService.selectList(
 							new EntityWrapper<TdrepayRechargeDetail>().eq("log_id", tdrepayRechargeLog.getLogId())));
 					distributeFundRecordVOs.add(vo);

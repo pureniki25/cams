@@ -183,6 +183,7 @@
 			tb_repayment_biz_plan_list_synch pl
 		<where>
 			1 = 1
+			 and pl.business_id in (select business_id from tb_sys_user_permission where user_id = #{userId} ) 
 			<if test="customer != null">
 				<!-- AND b.customer_name = #{customer} -->
 				AND pl.customer_name_ext = #{customer}
@@ -348,6 +349,7 @@
 			FROM tb_repayment_biz_plan_list_synch pl
 		<where>
 			1 = 1
+			 and pl.business_id in (select business_id from tb_sys_user_permission where user_id = #{userId} ) 
 			<if test="customer != null">
 				<!-- AND b.customer_name = #{customer} -->
 				AND pl.customer_name_ext like '${customer}%' 
