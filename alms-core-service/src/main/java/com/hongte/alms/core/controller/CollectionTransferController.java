@@ -861,7 +861,7 @@ public class CollectionTransferController {
 			collectionStatusService.setBusinessStaff(
 					voList, mapInfo.get("userId"),
 					"信贷历史数据导入",
-					mapInfo.get("staffType"), CollectionSetWayEnum.XINDAI_LOG);
+					mapInfo.get("staffType"), setWayEnum);
 
 			deleteErrorInfo(carBusinessAfter.getCarBusinessId(),carBusinessAfter.getCarBusinessAfterId(),null);
 
@@ -1092,8 +1092,8 @@ public class CollectionTransferController {
 		Map<String, String> map = new HashMap<>();
 
 		List<RepaymentBizPlanList>  l  = repaymentBizPlanListService
-				.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", businessId)
-						.eq("after_id", afterId));
+				.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", businessId.trim())
+						.eq("after_id", afterId.trim()));
 		RepaymentBizPlanList repaymentBizPlanList = l.size()>0?l.get(0):null;
 		if(l.size()>1){
 			recordErrorInfo(businessId ,afterId, DoubleList,status,"查出两条以上还款计划数据",transType);
