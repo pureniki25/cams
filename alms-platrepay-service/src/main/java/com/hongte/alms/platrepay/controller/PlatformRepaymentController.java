@@ -450,7 +450,6 @@ public class PlatformRepaymentController {
                                 }
                                 //if(key.equals("otherAmount")){  planRepaymentMap.put("", value); }
                             }
-                            break;
                         }
                     }
                 }
@@ -520,11 +519,11 @@ public class PlatformRepaymentController {
                                     if (key.equals("principalAndInterest")) {
                                         //本金
                                         if (planRepaymentMap.containsKey("10")) {
-                                            guaranteePaymentMap.put("10", planRepaymentMap.get("amount"));
+                                            guaranteePaymentMap.put("10", planRepaymentMap.get("10"));
                                         }
                                         //利息
                                         if (planRepaymentMap.containsKey("20")) {
-                                            guaranteePaymentMap.put("20", planRepaymentMap.get("interestAmount"));
+                                            guaranteePaymentMap.put("20", planRepaymentMap.get("20"));
                                         }
                                     }
                                 }
@@ -633,9 +632,19 @@ public class PlatformRepaymentController {
 
                     //费用
                     if (byGuaranteePayment) {
-                        detailFee.setFeeValue(guaranteePaymentMap.get(feeType));
+                        if(planRepaymentMap.containsKey(feeType.toString())) {
+                            detailFee.setFeeValue(guaranteePaymentMap.get(feeType.toString()));
+                        }else{
+                            detailFee.setFeeValue(r.getFactAmount());
+                            guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount.add(r.getFactAmount());
+                        }
                     } else {
-                        detailFee.setFeeValue(planRepaymentMap.get(feeType));
+                        if(planRepaymentMap.containsKey(feeType.toString())) {
+                            detailFee.setFeeValue(planRepaymentMap.get(feeType.toString()));
+                        }else{
+                            detailFee.setFeeValue(r.getFactAmount());
+                            planRepaymentRechargeAmount = planRepaymentRechargeAmount.add(r.getFactAmount());
+                        }
                     }
                     detailFeeList.add(detailFee);
                 }
