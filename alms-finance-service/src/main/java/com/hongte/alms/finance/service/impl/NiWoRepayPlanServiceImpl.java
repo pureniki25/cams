@@ -261,7 +261,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 					 NiWoProjPlanDto dtoTemp=dto;
 					List<RepaymentProjPlanListDto> repaymentProjPlanListDtos=new ArrayList();//用来记录你我金融每个标对应贷后每个标的还款计划的日志
 					for (RepaymentProjPlanList projPlanList : projLists) {
-						for (RepaymentBizPlanList pList : pLists) {
+						RepaymentBizPlanList pList=repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("plan_list_id", projPlanList.getPlanListId()));
 							for (NiWoProjPlanListDetailDto detailDto : dto.getRepaymentPlans()) {
 								if (projPlanList.getPeriod() == pList.getPeriod()&& detailDto.getPeriod() == projPlanList.getPeriod()) {
 									
@@ -311,8 +311,8 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													projDetail.setCreatSysType(3);
 													repaymentProjPlanListDetailService.updateById(projDetail);
 													planDetail.setSrcType(3);
-													planDetail.setFactAmount(getPlanListDetaiFactRepayAmount(projDetails, RepayPlanFeeTypeEnum.PRINCIPAL));
-													planDetail.setPlanAmount(getPlanListDetaiPlanRepayAmount(projDetails, RepayPlanFeeTypeEnum.PRINCIPAL));
+													planDetail.setFactAmount(getPlanListDetaiFactRepayAmount(projDetail, RepayPlanFeeTypeEnum.PRINCIPAL));
+													planDetail.setPlanAmount(getPlanListDetaiPlanRepayAmount(projDetail, RepayPlanFeeTypeEnum.PRINCIPAL));
 													planDetail.setUpdateDate(new Date());
 													repaymentBizPlanListDetailService.updateById(planDetail);
 												} else if (RepayPlanFeeTypeEnum.INTEREST.getValue()==projDetail.getPlanItemType()&&RepayPlanFeeTypeEnum.INTEREST.getValue()==planDetail.getPlanItemType()) { // 利息
@@ -326,8 +326,8 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													projDetail.setCreatSysType(3);
 													repaymentProjPlanListDetailService.updateById(projDetail);
 													planDetail.setSrcType(3);
-													planDetail.setFactAmount(getPlanListDetaiFactRepayAmount(projDetails, RepayPlanFeeTypeEnum.INTEREST));
-													planDetail.setPlanAmount(getPlanListDetaiPlanRepayAmount(projDetails, RepayPlanFeeTypeEnum.INTEREST));
+													planDetail.setFactAmount(getPlanListDetaiFactRepayAmount(projDetail, RepayPlanFeeTypeEnum.INTEREST));
+													planDetail.setPlanAmount(getPlanListDetaiPlanRepayAmount(projDetail, RepayPlanFeeTypeEnum.INTEREST));
 													planDetail.setUpdateDate(new Date());
 													repaymentBizPlanListDetailService.updateById(planDetail);
 												} else if (RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE.getValue()==projDetail.getPlanItemType()&&RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE.getValue()==planDetail.getPlanItemType()) {// 担保服务费
@@ -340,8 +340,8 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													projDetail.setUpdateDate(new Date());
 													repaymentProjPlanListDetailService.updateById(projDetail);
 													planDetail.setSrcType(3);
-													planDetail.setFactAmount(getPlanListDetaiFactRepayAmount(projDetails, RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE));
-													planDetail.setPlanAmount(getPlanListDetaiPlanRepayAmount(projDetails, RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE));
+													planDetail.setFactAmount(getPlanListDetaiFactRepayAmount(projDetail, RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE));
+													planDetail.setPlanAmount(getPlanListDetaiPlanRepayAmount(projDetail, RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE));
 													planDetail.setUpdateDate(new Date());
 													repaymentBizPlanListDetailService.updateById(planDetail);
 												}else if (RepayPlanFeeTypeEnum.PLAT_CHARGE.getValue()==projDetail.getPlanItemType()&&RepayPlanFeeTypeEnum.PLAT_CHARGE.getValue()==planDetail.getPlanItemType()) {// //平台管理费
@@ -354,8 +354,8 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													projDetail.setUpdateDate(new Date());
 													repaymentProjPlanListDetailService.updateById(projDetail);
 													planDetail.setSrcType(3);
-													planDetail.setFactAmount(getPlanListDetaiFactRepayAmount(projDetails, RepayPlanFeeTypeEnum.PLAT_CHARGE));
-													planDetail.setPlanAmount(getPlanListDetaiPlanRepayAmount(projDetails, RepayPlanFeeTypeEnum.PLAT_CHARGE));
+													planDetail.setFactAmount(getPlanListDetaiFactRepayAmount(projDetail, RepayPlanFeeTypeEnum.PLAT_CHARGE));
+													planDetail.setPlanAmount(getPlanListDetaiPlanRepayAmount(projDetail, RepayPlanFeeTypeEnum.PLAT_CHARGE));
 													planDetail.setUpdateDate(new Date());
 													repaymentBizPlanListDetailService.updateById(planDetail);
 												} else if (RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getValue()==projDetail.getPlanItemType()&&RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getValue()==planDetail.getPlanItemType()) {// //分公司服务费
@@ -368,8 +368,8 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													projDetail.setUpdateDate(new Date());
 													repaymentProjPlanListDetailService.updateById(projDetail);
 													planDetail.setSrcType(3);
-													planDetail.setFactAmount(getPlanListDetaiFactRepayAmount(projDetails, RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE));
-													planDetail.setPlanAmount(getPlanListDetaiPlanRepayAmount(projDetails, RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE));
+													planDetail.setFactAmount(getPlanListDetaiFactRepayAmount(projDetail, RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE));
+													planDetail.setPlanAmount(getPlanListDetaiPlanRepayAmount(projDetail, RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE));
 													planDetail.setUpdateDate(new Date());
 													repaymentBizPlanListDetailService.updateById(planDetail);
 												
@@ -383,8 +383,8 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													repaymentProjPlanListDetailService.updateById(projDetail);
 													planDetail.setUpdateDate(new Date());
 													planDetail.setSrcType(3);
-													planDetail.setFactAmount(getPlanListDetaiFactRepayAmount(projDetails, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE));
-													planDetail.setPlanAmount(getPlanListDetaiPlanRepayAmount(projDetails, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE));
+													planDetail.setFactAmount(getPlanListDetaiFactRepayAmount(projDetail, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE));
+													planDetail.setPlanAmount(getPlanListDetaiPlanRepayAmount(projDetail, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE));
 													repaymentBizPlanListDetailService.updateById(planDetail);
 												} else if (projDetailcount ==0 && detailDto.getTotalPenalty() != null && detailDto
 														.getTotalPenalty().compareTo(BigDecimal.valueOf(0)) > 0) {
@@ -405,8 +405,8 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 														repaymentProjPlanListDetailService.insertOrUpdate(projDetail);
 														
 														
-														repaymentBizPlanListDetail.setPlanAmount(getPlanListDetaiPlanRepayAmount(projDetails, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE));
-														repaymentBizPlanListDetail.setFactAmount(getPlanListDetaiFactRepayAmount(projDetails, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE));
+														repaymentBizPlanListDetail.setPlanAmount(getPlanListDetaiPlanRepayAmount(projDetail, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE));
+														repaymentBizPlanListDetail.setFactAmount(getPlanListDetaiFactRepayAmount(projDetail, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE));
 														repaymentBizPlanListDetail.setUpdateDate(new Date());
 														repaymentBizPlanListDetailService.insertOrUpdate(repaymentBizPlanListDetail);
 														
@@ -465,8 +465,8 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 														projPlanListDetailCopy.setCreateDate(new Date());
 														repaymentProjPlanListDetailService.insertOrUpdate(projPlanListDetailCopy);
 														
-														repaymentBizPlanListDetail.setPlanAmount(getPlanListDetaiPlanRepayAmount(projDetails, RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE));
-														repaymentBizPlanListDetail.setFactAmount(getPlanListDetaiFactRepayAmount(projDetails, RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE));
+														repaymentBizPlanListDetail.setPlanAmount(getPlanListDetaiPlanRepayAmount(projDetail, RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE));
+														repaymentBizPlanListDetail.setFactAmount(getPlanListDetaiFactRepayAmount(projDetail, RepayPlanFeeTypeEnum.BOND_COMPANY_CHARGE));
 														repaymentBizPlanListDetail.setUpdateDate(new Date());
 														repaymentBizPlanListDetailService.insertOrUpdate(repaymentBizPlanListDetail);
 													}else {
@@ -526,8 +526,8 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 														projPlanListDetailCopy.setCreateDate(new Date());
 														repaymentProjPlanListDetailService.insertOrUpdate(projPlanListDetailCopy);
 														
-														repaymentBizPlanListDetail.setPlanAmount(getPlanListDetaiPlanRepayAmount(projDetails, RepayPlanFeeTypeEnum.PLAT_CHARGE));
-														repaymentBizPlanListDetail.setFactAmount(getPlanListDetaiFactRepayAmount(projDetails, RepayPlanFeeTypeEnum.PLAT_CHARGE));
+														repaymentBizPlanListDetail.setPlanAmount(getPlanListDetaiPlanRepayAmount(projDetail, RepayPlanFeeTypeEnum.PLAT_CHARGE));
+														repaymentBizPlanListDetail.setFactAmount(getPlanListDetaiFactRepayAmount(projDetail, RepayPlanFeeTypeEnum.PLAT_CHARGE));
 														repaymentBizPlanListDetail.setUpdateDate(new Date());
 														repaymentBizPlanListDetailService.insertOrUpdate(repaymentBizPlanListDetail);
 														
@@ -579,8 +579,8 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 														projPlanListDetailCopy.setCreateDate(new Date());
 														repaymentProjPlanListDetailService.insertOrUpdate(projPlanListDetailCopy);
 														
-														repaymentBizPlanListDetail.setPlanAmount(getPlanListDetaiPlanRepayAmount(projDetails, RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE));
-														repaymentBizPlanListDetail.setFactAmount(getPlanListDetaiFactRepayAmount(projDetails, RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE));
+														repaymentBizPlanListDetail.setPlanAmount(getPlanListDetaiPlanRepayAmount(projDetail, RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE));
+														repaymentBizPlanListDetail.setFactAmount(getPlanListDetaiFactRepayAmount(projDetail, RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE));
 														repaymentBizPlanListDetail.setUpdateDate(new Date());
 														repaymentBizPlanListDetailService.insertOrUpdate(repaymentBizPlanListDetail);
 													}else {
@@ -642,7 +642,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 									repaymentProjPlanListService.updateById(projPlanList);
 									pList.setOverdueDays(BigDecimal.valueOf(getOverDays(detailDto.getRefundDate())));
 									pList.setDueDate(new Date(detailDto.getRefundDate()));
-									pList.setOverdueAmount(getPlanListDetaiPlanRepayAmount(projDetails, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE));
+									pList.setOverdueAmount(getPlanListDetaiPlanRepayAmount(projDetails.get(0), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE));
 									pList.setUpdateTime(new Date());
 									repaymentProjPlanListService.updateById(projPlanList);
 									repaymentBizPlanListService.updateById(pList);
@@ -696,7 +696,6 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 								}
 							}
 
-						}
 					}
 					projPlan.setUpdateTime(new Date());
 					repaymentProjPlanService.updateById(projPlan);
@@ -735,7 +734,8 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 	 * @param 获取每个detail里的某个费用项的实还金额
 	 * @return
 	 */
-	private BigDecimal getPlanListDetaiFactRepayAmount(List<RepaymentProjPlanListDetail> list,RepayPlanFeeTypeEnum repayPlanFeeTypeEnum) {
+	private BigDecimal getPlanListDetaiFactRepayAmount(RepaymentProjPlanListDetail detail,RepayPlanFeeTypeEnum repayPlanFeeTypeEnum) {
+		List<RepaymentProjPlanListDetail> list=repaymentProjPlanListDetailService.selectList(new EntityWrapper<RepaymentProjPlanListDetail>().eq("plan_list_id", detail.getPlanListId()));
 		 List<RepaymentProjPlanListDetail> filterList= list.stream() .filter(a -> repayPlanFeeTypeEnum.getValue()==a.getPlanItemType()).collect(Collectors.toList());
 		 BigDecimal factRepayAmount=filterList.stream().map(RepaymentProjPlanListDetail::getProjFactAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
 		 return factRepayAmount;
@@ -746,8 +746,9 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 	 * @param 获取每个detail里的某个费用项的应还金额
 	 * @return
 	 */
-	private BigDecimal getPlanListDetaiPlanRepayAmount(List<RepaymentProjPlanListDetail> list,RepayPlanFeeTypeEnum repayPlanFeeTypeEnum) {
-		 List<RepaymentProjPlanListDetail> filterList= list.stream() .filter(a -> repayPlanFeeTypeEnum.getValue()==a.getPlanItemType()).collect(Collectors.toList());
+	private BigDecimal getPlanListDetaiPlanRepayAmount(RepaymentProjPlanListDetail detail,RepayPlanFeeTypeEnum repayPlanFeeTypeEnum) {
+		List<RepaymentProjPlanListDetail> list=repaymentProjPlanListDetailService.selectList(new EntityWrapper<RepaymentProjPlanListDetail>().eq("plan_list_id", detail.getPlanListId()));
+		List<RepaymentProjPlanListDetail> filterList= list.stream() .filter(a -> repayPlanFeeTypeEnum.getValue()==a.getPlanItemType()).collect(Collectors.toList());
 		 BigDecimal factRepayAmount=filterList.stream().map(RepaymentProjPlanListDetail::getProjPlanAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
 		 return factRepayAmount;
 	}
