@@ -18,11 +18,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * <p>
@@ -51,8 +51,9 @@ public class SysFinancialOrderServiceImpl extends BaseServiceImpl<SysFinancialOr
     @Qualifier("SysUserPermissionService")
     private SysUserPermissionService sysUserPermissionService;
 
-    @Autowired
-    private Executor executor;
+    //@Autowired
+    //private Executor executor;
+    private static final Executor executor = Executors.newCachedThreadPool();
 
 
     /**
