@@ -636,12 +636,14 @@ public class PlatformRepaymentController {
                             detailFee.setFeeValue(guaranteePaymentMap.get(feeType.toString()));
                         }else{
                             detailFee.setFeeValue(r.getFactAmount());
+                            guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount.add(r.getFactAmount());
                         }
                     } else {
                         if(planRepaymentMap.containsKey(feeType.toString())) {
                             detailFee.setFeeValue(planRepaymentMap.get(feeType.toString()));
                         }else{
                             detailFee.setFeeValue(r.getFactAmount());
+                            planRepaymentRechargeAmount = planRepaymentRechargeAmount.add(r.getFactAmount());
                         }
                     }
                     detailFeeList.add(detailFee);
