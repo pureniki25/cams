@@ -4,11 +4,10 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.annotations.Param;
-
 import com.hongte.alms.base.entity.RepaymentProjPlan;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.common.mapper.SuperMapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -29,7 +28,7 @@ public interface RepaymentProjPlanMapper extends SuperMapper<RepaymentProjPlan> 
 	 * @return
 	 */
 	public List<Map<String,Object>> selectProjPlanProjectInfo(String businessId);
-	
+
 	/**
 	 * 根据project查询剩余本金
 	 * @author 王继光
@@ -39,4 +38,6 @@ public interface RepaymentProjPlanMapper extends SuperMapper<RepaymentProjPlan> 
 	 * @return
 	 */
 	public BigDecimal sumProjectItem10Unpaid(@Param("projectId")String projectId,@Param("planId") String planId);
+
+	public  BigDecimal countRepayPlanAmount(@Param("businessId") String businessId,@Param("planId") String planId);
 }

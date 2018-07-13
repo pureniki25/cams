@@ -77,10 +77,10 @@ window.layinit(function (htConfig) {
         },
         methods:{
             onDateStartChange:function(date){
-                dateStart = date
+                app.schForm.dateStart = date
             },
             onDateEndChange:function(date){
-                dateEnd = date
+                app.schForm.dateEnd = date
             },
             resetForm:function(){
                 this.$ref['schForm'].resetFields()

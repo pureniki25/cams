@@ -22,7 +22,7 @@
     <!-- 引入vue -->
     <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
     <!-- iview js -->
-    <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+    <script type="text/javascript" src="/plugins/iview/2.13.1/js/iview.min.js"></script>
     <!--引入layui.js-->
     <script src="/plugins/layui/layui.js"></script>
     <!--引入axios.js 用于ajax调用-->
@@ -55,7 +55,7 @@
                         <Row>
                             <i-col span="6">
                                 <form-item label="展期申请日期">
-                                    <Date-picker type="date" placeholder="开始时间" :value.sync="schForm.dateStart"
+                                    <Date-picker type="date" placeholder="开始时间" 
                                                  v-model="schForm.dateStart" @on-change="onDateStartChange"
                                                  :options="dateStartOption"></Date-picker>
                                     <!--<span>至</span>-->
@@ -66,7 +66,7 @@
                             </i-col>
                             <i-col span="6">
                                 <form-item label="至">
-                                    <Date-picker type="date" placeholder="结束时间" :value.sync="schForm.dateEnd"
+                                    <Date-picker type="date" placeholder="结束时间" 
                                                  v-model="schForm.dateEnd" @on-change="onDateEndChange"
                                                  :options="dateEndOption"></Date-picker>
                                 </form-item>
