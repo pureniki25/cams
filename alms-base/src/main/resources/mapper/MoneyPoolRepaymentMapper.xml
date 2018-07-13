@@ -154,7 +154,7 @@
             AND  t.trade_date &lt;=#{accountEndTime}
         </if>
         <if test="customerName !=null">
-            AND  t.operate_name like #{customerName}
+            AND  b.customer_name like #{customerName}
         </if>
         <if test="bankAccount !=null">
             AND  t.bank_account = #{bankAccount}
@@ -195,7 +195,7 @@
             AND  t.trade_date &lt;=#{accountEndTime}
         </if>
         <if test="customerName !=null">
-            AND  t.operate_name like #{customerName}
+            AND   b.customer_name like #{customerName}
         </if>
         <if test="bankAccount !=null">
             AND  t.bank_account = #{bankAccount}
@@ -248,7 +248,7 @@
             AND  t.trade_date &lt;=#{accountEndTime}
         </if>
         <if test="customerName !=null">
-            AND  t.operate_name like #{customerName}
+            AND   b.customer_name like #{customerName}
         </if>
         <if test="bankAccount !=null">
             AND  t.bank_account = #{bankAccount}
