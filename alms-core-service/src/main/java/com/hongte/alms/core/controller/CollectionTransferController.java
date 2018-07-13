@@ -68,6 +68,10 @@ public class CollectionTransferController {
 	//同步单个用户的催收数据执行标志位
 	private  static Boolean oneUserColRunning = false;
 
+	//同步失败的电催数据
+	private static Boolean syncFailPhoneSetRunning = false;
+
+
 	@Autowired
 	@Qualifier("CollectionService")
 	private CollectionService collectionService;
@@ -104,6 +108,11 @@ public class CollectionTransferController {
 
 	@Autowired
 	Executor executor;
+
+
+	@Autowired
+	@Qualifier("IssueSendOutsideLogService")
+	IssueSendOutsideLogService issueSendOutsideLogService;
 
 	@ApiModelProperty("同步电催数据")
 	@GetMapping("/transfer")
@@ -808,6 +817,40 @@ public class CollectionTransferController {
 			return Result.error("111111","同步失败");
 		}
 	}
+
+
+	@GetMapping("/transferFailPhoneSetInfo")
+	@ResponseBody
+	public Result transferFailPhoneSetInfo(){
+		if(syncFailPhoneSetRunning){
+			return Result.error("111111","同步程序执行中");
+		}
+		syncFailPhoneSetRunning = true;
+		try{
+			LOGGER.info("@AutoRecharge@重新同步同步失败的电催人员信息--开始[{},{}]");
+			List<IssueSendOutsideLog> outsideLogList= issueSendOutsideLogService.selectList(
+					new EntityWrapper<IssueSendOutsideLog>()
+							.eq("send_url","/collection/setPhoneStaff")
+							.eq("return_json","{\"code\":\"111111\",\"msg\":\"同步失败\"}"));
+
+			for(IssueSendOutsideLog issueSendOutsideLog:outsideLogList){
+				String json= issueSendOutsideLog.getSendJson();
+				CarBusinessAfter carBusinessAfter = JSON.parseObject(json,CarBusinessAfter.class);
+				Result result =transferOnePhoneSet(carBusinessAfter);
+				issueSendOutsideLog.setReturnJson(JSON.toJSONString(result));
+				issueSendOutsideLog.setCreateTime(new Date());
+				issueSendOutsideLogService.updateById(issueSendOutsideLog);
+			}
+
+			LOGGER.info("@AutoRecharge@重新同步同步失败的电催人员信息--结束[{}]");
+		}catch(Exception e){
+			LOGGER.error(e.getMessage(),e);
+		}
+		syncFailPhoneSetRunning = false;
+		return Result.success();
+	}
+
+
 	/**
 	 * 同步一个催收信息
 	 * @param collection

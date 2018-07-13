@@ -23,7 +23,7 @@ import java.util.List;
  * @since 2018/7/12
  * 定时任务，用于更新失败的电催分配数据
  */
-@JobHandler(value = "SyncUpdateFailCollectionInfoJob")
+@JobHandler(value = "SyncUpdateFailCollectionInfoJobHandler")
 @Component
 public class SyncUpdateFailCollectionInfoJob extends IJobHandler {
 

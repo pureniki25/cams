@@ -19,10 +19,7 @@ import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.SysUserPermission;
 import com.hongte.alms.base.feignClient.CollectionSynceToXindaiRemoteApi;
 import com.hongte.alms.base.feignClient.LitigationFeignClient;
-import com.hongte.alms.base.service.RepaymentBizPlanListService;
-import com.hongte.alms.base.service.RepaymentBizPlanService;
-import com.hongte.alms.base.service.SysUserPermissionService;
-import com.hongte.alms.base.service.TransferOfLitigationService;
+import com.hongte.alms.base.service.*;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.Constant;
@@ -100,6 +97,10 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
     
     @Autowired
 	private LitigationFeignClient litigationFeignClient;
+
+    @Autowired
+    @Qualifier("SysUserRoleService")
+    SysUserRoleService sysUserRoleService;
 
     /**
      * 设置电催/人员(界面手动设置)
