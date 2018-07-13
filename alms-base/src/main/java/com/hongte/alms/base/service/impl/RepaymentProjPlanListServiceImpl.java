@@ -99,7 +99,6 @@ public class RepaymentProjPlanListServiceImpl extends
     EipRemote eipRemote;
 	
     @Override
-    @Transactional(rollbackFor = Exception.class)
 	public void calLateFee() {
 		// 所有业务贷后生成的业务
 		List<BasicBusiness> basicBusiness = basicBusinessService
@@ -120,7 +119,7 @@ public class RepaymentProjPlanListServiceImpl extends
 						BigDecimal underLateFeeSum=BigDecimal.valueOf(0);//每个业务每期还款计划的线下收费
 						BigDecimal onlineLateFeeSum=BigDecimal.valueOf(0);//每个业务每期还款计划的线上收费
 						
-						if(pList.getPlanListId().equals("095118d7-633d-4f1c-82ef-4699563fffb6")) {
+						if(pList.getPlanListId().equals("b1422cee-b579-479e-8f80-c2b1c5f24f43")) {
 							System.out.println("stop");
 						}
 						
@@ -523,6 +522,9 @@ public class RepaymentProjPlanListServiceImpl extends
 						if(feeId.equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
 						  projDetail.setShareProfitIndex(profitItemSetService.getLevel(business.getBusinessType().toString(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getValue().intValue(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid()).get("feeLevel"));
 						}
+						if(feeId.equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
+							  projDetail.setShareProfitIndex(profitItemSetService.getLevel(business.getBusinessType().toString(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getValue().intValue(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid()).get("feeLevel"));
+						}
 					     projDetail.setPlanItemType(60);
 						String planDetailId="";
 						for(RepaymentProjPlanListDetail detail:feeIdLists) {
@@ -573,13 +575,16 @@ public class RepaymentProjPlanListServiceImpl extends
 					if (pDetails != null && pDetails.size() > 0) {
 						RepaymentBizPlanListDetail temp = pDetails.get(0);
 						RepaymentBizPlanListDetail copy = ClassCopyUtil.copyObject(temp,
-								RepaymentBizPlanListDetail.class);
+								RepaymentBizPlanListDetail.class); 
 						copy.setPlanDetailId(projDetail.getPlanDetailId());
 						copy.setFeeId(feeId);
 						copy.setPlanAmount(lateFee);
 					    if(feeId.equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
 						  copy.setShareProfitIndex(profitItemSetService.getLevel(business.getBusinessType().toString(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getValue().intValue(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid()).get("feeLevel"));
 					    }
+					    if(feeId.equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
+							  copy.setShareProfitIndex(profitItemSetService.getLevel(business.getBusinessType().toString(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getValue().intValue(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid()).get("feeLevel"));
+						    }
 						copy.setPlanItemType(60);
 						copy.setPlanItemName("滞纳金");
 						repaymentBizPlanListDetailService.insertOrUpdate(copy);

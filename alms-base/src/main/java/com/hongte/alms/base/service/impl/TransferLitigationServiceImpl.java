@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
@@ -261,6 +262,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		return houseLoanData;
 	}
 
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	@Override
 	public TransferOfLitigationVO sendTransferLitigationData(String businessId, String sendUrl) {
 		TransferOfLitigationVO transferLitigationData = null;
@@ -268,6 +270,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		if (StringUtil.isEmpty(businessId)) {
 			return transferLitigationData;
 		}
+		TransferLitigationLog transferLitigationLog = new TransferLitigationLog();
 		try {
 			// 查询基础信息
 			transferLitigationData = transferOfLitigationMapper.queryTransferLitigationData(businessId);
@@ -277,6 +280,11 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			if (transferLitigationData == null || businessType == null) {
 				throw new ServiceRuntimeException("没有找到相关数据，发送诉讼系统失败！");
 			}
+			
+			transferLitigationLog.setBusinessId(businessId);
+			transferLitigationLog.setCreateTime(new Date());
+			transferLitigationLog.setCreateUser(transferLitigationData.getCreateUserId());
+			transferLitigationLog.setSendJson(JSON.toJSONString(transferLitigationData));
 			
 			transferLitigationData.setLitigationBorrowerDetailedList(transferOfLitigationMapper.queryLitigationBorrowerDetailed(businessId));
 
@@ -294,7 +302,10 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			}
 			
 			litigationResponse = sendLitigation(transferLitigationData, sendUrl);
+			transferLitigationLog.setResultJson(JSON.toJSONString(litigationResponse));
 			if (litigationResponse != null) {
+				transferLitigationLog.setResultCode(litigationResponse.getCode());
+				transferLitigationLog.setResultMsg(litigationResponse.getMsg());
 				if (litigationResponse.getCode() == 1) {
 					LitigationResponseData data = litigationResponse.getData();
 					if (!data.isImportSuccess()) {
@@ -307,19 +318,12 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				LOG.info("businessId：" + businessId + "，发送诉讼系统失败！！没有消息返回");
 				throw new ServiceRuntimeException("businessId：" + businessId + "，发送诉讼系统失败！！没有消息返回");
 			}
-			TransferLitigationLog transferLitigationLog = new TransferLitigationLog();
-			transferLitigationLog.setBusinessId(businessId);
-			transferLitigationLog.setCreateTime(new Date());
-			transferLitigationLog.setCreateUser(transferLitigationData.getCreateUserId());
-			transferLitigationLog.setSendJson(JSON.toJSONString(transferLitigationData));
-			transferLitigationLog.setResultCode(litigationResponse.getCode());
-			transferLitigationLog.setResultMsg(litigationResponse.getMsg());
-			transferLitigationLog.setResultJson(JSON.toJSONString(litigationResponse));
-			transferLitigationLogService.insert(transferLitigationLog);
+			
 		} catch (Exception e) {
 			LOG.error("发送诉讼系统失败！！！", e);
 			throw new ServiceRuntimeException(e.getMessage(), e);
 		}
+		transferLitigationLogService.insert(transferLitigationLog);
 
 		return transferLitigationData;
 	}
@@ -952,4 +956,9 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			}
 			return isLast;
 		}	
+		
+		public static void main(String[] args) {
+			String jsonString = JSONObject.toJSONString(null);
+			System.out.println(jsonString);
+		}
 }
