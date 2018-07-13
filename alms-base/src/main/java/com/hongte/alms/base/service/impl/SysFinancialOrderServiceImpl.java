@@ -111,9 +111,6 @@ public class SysFinancialOrderServiceImpl extends BaseServiceImpl<SysFinancialOr
                 //同步用户权限
                 if (financialOrderUsers != null && financialOrderUsers.size() > 0) {
                     for (SysFinancialOrderUser orderUser : financialOrderUsers) {
-                        if (StringUtils.isBlank(orderUser.getUserId())) {
-                            continue;
-                        }
                         syncUserPermission(orderUser.getUserId());
                     }
                 }
@@ -168,9 +165,6 @@ public class SysFinancialOrderServiceImpl extends BaseServiceImpl<SysFinancialOr
         //同步用户权限
         if (financialOrderUsers != null && financialOrderUsers.size() > 0) {
             for (SysFinancialOrderUser orderUser : financialOrderUsers) {
-                if (StringUtils.isBlank(orderUser.getUserId())) {
-                    continue;
-                }
                 syncUserPermission(orderUser.getUserId());
             }
         }
