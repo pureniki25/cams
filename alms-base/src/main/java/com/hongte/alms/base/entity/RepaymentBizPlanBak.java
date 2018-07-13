@@ -140,6 +140,13 @@ public class RepaymentBizPlanBak extends Model<RepaymentBizPlanBak> {
 	@ApiModelProperty(required= true,value = "还款记录id")
 	private String confirmLogId;
 
+	/**
+	 * 还款记录id
+	 */
+	@TableField("settle_log_id")
+	@ApiModelProperty(required= true,value = "还款记录id")
+	private String settleLogId;
+
 
 	public String getPlanId() {
 		return planId;
@@ -296,6 +303,14 @@ public class RepaymentBizPlanBak extends Model<RepaymentBizPlanBak> {
 	@Override
 	protected Serializable pkVal() {
 		return this.planId;
+	}
+
+	public String getSettleLogId() {
+		return settleLogId;
+	}
+
+	public void setSettleLogId(String settleLogId) {
+		this.settleLogId = settleLogId;
 	}
 
 	@Override

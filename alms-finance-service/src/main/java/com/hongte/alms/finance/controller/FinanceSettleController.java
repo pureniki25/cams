@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,7 +26,7 @@ public class FinanceSettleController {
     private FinanceSettleService financeSettleService;
     @RequestMapping("/financeSettle")
     @ApiOperation(value="资金结清")
-    public Result financeSettle(FinanceSettleReq financeSettleReq){
+    public Result financeSettle(@RequestBody FinanceSettleReq financeSettleReq){
         logger.info("@financeSettle@资金结算开始[{}]");
         Result result = null;
         try {

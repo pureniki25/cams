@@ -1,11 +1,13 @@
 package com.hongte.alms.base.mapper;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
 import com.hongte.alms.base.entity.RepaymentProjPlan;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.common.mapper.SuperMapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -26,5 +28,6 @@ public interface RepaymentProjPlanMapper extends SuperMapper<RepaymentProjPlan> 
 	 * @return
 	 */
 	public List<Map<String,Object>> selectProjPlanProjectInfo(String businessId);
-	
+
+	public  BigDecimal countRepayPlanAmount(@Param("businessId") String businessId,@Param("planId") String planId);
 }

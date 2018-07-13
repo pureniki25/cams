@@ -2,6 +2,9 @@ package com.hongte.alms.base.service;
 
 import com.hongte.alms.base.entity.RepaymentProjPlan;
 import com.hongte.alms.common.service.BaseService;
+import org.apache.ibatis.annotations.Param;
+
+import java.math.BigDecimal;
 
 /**
  * <p>
@@ -12,5 +15,4 @@ import com.hongte.alms.common.service.BaseService;
  * @since 2018-05-03
  */
 public interface RepaymentProjPlanService extends BaseService<RepaymentProjPlan> {
-
 }
