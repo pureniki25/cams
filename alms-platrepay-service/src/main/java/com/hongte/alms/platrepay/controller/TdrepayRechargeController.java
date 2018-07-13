@@ -751,8 +751,8 @@ public class TdrepayRechargeController {
 								double agencyAmount = vo.getAgencyAmount() == null ? 0
 										: vo.getAgencyAmount().doubleValue();
 
-								vo.setTotal(principalAndInterest + penaltyAmount + tuandaiAmount + orgAmount
-										+ guaranteeAmount + arbitrationAmount + agencyAmount);
+								vo.setTotal(BigDecimal.valueOf(principalAndInterest + penaltyAmount + tuandaiAmount + orgAmount
+										+ guaranteeAmount + arbitrationAmount + agencyAmount).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
 								tdGuaranteePaymentVOs.add(vo);
 							}
 						}
