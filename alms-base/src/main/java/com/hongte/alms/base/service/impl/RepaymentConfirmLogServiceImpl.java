@@ -24,6 +24,7 @@ import com.hongte.alms.base.entity.RepaymentProjPlanListBak;
 import com.hongte.alms.base.entity.RepaymentProjPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentProjPlanListDetailBak;
 import com.hongte.alms.base.entity.RepaymentResource;
+import com.hongte.alms.base.entity.SysApiCallFailureRecord;
 import com.hongte.alms.base.enums.RepayedFlag;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.SectionRepayStatusEnum;
@@ -49,6 +50,7 @@ import com.hongte.alms.base.mapper.RepaymentProjPlanMapper;
 import com.hongte.alms.base.mapper.RepaymentResourceMapper;
 import com.hongte.alms.base.service.MoneyPoolService;
 import com.hongte.alms.base.service.RepaymentConfirmLogService;
+import com.hongte.alms.base.service.SysApiCallFailureRecordService;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
@@ -128,6 +130,9 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
     @Autowired
 	RepaymentConfirmPlatRepayLogMapper repaymentConfirmPlatRepayLogMapper ;
     
+    @Autowired
+    @Qualifier("SysApiCallFailureRecordService")
+	SysApiCallFailureRecordService sysApiCallFailureRecordService ;
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Result revokeConfirm(String businessId, String afterId) throws Exception{
@@ -296,9 +301,13 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
         }
         
         /*删除合规化还款调用记录 开始*/
-        repaymentConfirmPlatRepayLogMapper.delete(new EntityWrapper<RepaymentConfirmPlatRepayLog>().eq("confirm_log_id", log.getConfirmLogId()));
+        List<RepaymentConfirmPlatRepayLog> repaymentConfirmPlatRepayLogs = repaymentConfirmPlatRepayLogMapper.selectList(new EntityWrapper<RepaymentConfirmPlatRepayLog>().eq("confirm_log_id", log.getConfirmLogId()));
+        for (RepaymentConfirmPlatRepayLog repaymentConfirmPlatRepayLog : repaymentConfirmPlatRepayLogs) {
+        	String projPlanListId = repaymentConfirmPlatRepayLog.getProjPlanListId() ;
+        	sysApiCallFailureRecordService.delete(new EntityWrapper<SysApiCallFailureRecord>().eq("ref_id", projPlanListId)) ;
+        	repaymentConfirmPlatRepayLog.deleteById();
+		}
         /*删除合规化还款调用记录 结束*/
-        
         log.deleteById();
 
         //撤销成功 通知分发中心
