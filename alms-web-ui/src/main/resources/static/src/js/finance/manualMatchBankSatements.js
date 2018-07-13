@@ -30,7 +30,7 @@ window.layinit(function (htConfig) {
                     },
                     {
                         title: '款项码',
-                        key: 'code'
+                        key: 'payCode'
                     },
                     {
                         title: '转入账号',
