@@ -166,6 +166,13 @@ public class RepaymentProjFactRepay extends Model<RepaymentProjFactRepay> {
 	private String updateUser;
 
 
+	/**
+	 * 结清确认日志id
+	 */
+	@TableField("settle_log_id")
+	@ApiModelProperty(required= false,value = "结清还款确认日志id")
+	private String settleLogId;
+
 	public String getProjPlanDetailRepayId() {
 		return projPlanDetailRepayId;
 	}
@@ -313,6 +320,14 @@ public class RepaymentProjFactRepay extends Model<RepaymentProjFactRepay> {
 	@Override
 	protected Serializable pkVal() {
 		return this.projPlanDetailRepayId;
+	}
+
+	public String getSettleLogId() {
+		return settleLogId;
+	}
+
+	public void setSettleLogId(String settleLogId) {
+		this.settleLogId = settleLogId;
 	}
 
 	@Override

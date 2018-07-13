@@ -185,6 +185,11 @@ public class RepaymentProjPlanBak extends Model<RepaymentProjPlanBak> {
 	@ApiModelProperty(required= true,value = "")
 	private String confirmLogId;
 
+	@TableField("settle_log_id")
+	@ApiModelProperty(required= false,value = "")
+	private String settleLogId;
+
+
 
 	public String getProjPlanId() {
 		return projPlanId;
@@ -405,6 +410,14 @@ public class RepaymentProjPlanBak extends Model<RepaymentProjPlanBak> {
 	@Override
 	protected Serializable pkVal() {
 		return this.projPlanId;
+	}
+
+	public String getSettleLogId() {
+		return settleLogId;
+	}
+
+	public void setSettleLogId(String settleLogId) {
+		this.settleLogId = settleLogId;
 	}
 
 	@Override
