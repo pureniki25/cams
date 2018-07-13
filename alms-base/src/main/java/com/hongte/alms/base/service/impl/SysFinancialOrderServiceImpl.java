@@ -108,7 +108,6 @@ public class SysFinancialOrderServiceImpl extends BaseServiceImpl<SysFinancialOr
                 //先删除再增加
                 sysFinancialOrderUserService.delete(new EntityWrapper<SysFinancialOrderUser>().eq("finance_order_id", financialOrder.getId()));
                 //同步用户权限
-                //同步用户权限
                 if (financialOrderUsers != null && financialOrderUsers.size() > 0) {
                     for (SysFinancialOrderUser orderUser : financialOrderUsers) {
                         if (StringUtils.isBlank(orderUser.getUserId())) {
