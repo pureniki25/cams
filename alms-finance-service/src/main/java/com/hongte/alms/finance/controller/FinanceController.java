@@ -899,7 +899,9 @@ public class FinanceController {
 					if (i==j) {
 						continue;
 					}
-					if (list.get(i).getPayCode().equals(list.get(j).getPayCode())) {
+					if (list.get(i).getPayCode()!=null
+							&&list.get(j).getPayCode()!=null
+							&&list.get(i).getPayCode().equals(list.get(j).getPayCode())) {
 						result = Result.error("500", "款项编码重复,请修改:"+list.get(i).getPayCode());
 						logger.info("@importExcel@导入银行流水Excel--结束[{}]",result);
 						return result;
