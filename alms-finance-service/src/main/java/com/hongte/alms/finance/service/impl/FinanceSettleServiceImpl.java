@@ -1,14 +1,9 @@
 package com.hongte.alms.finance.service.impl;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.hongte.alms.base.RepayPlan.dto.RepaymentBizPlanDto;
-import com.hongte.alms.base.RepayPlan.dto.RepaymentBizPlanListDto;
-import com.hongte.alms.base.RepayPlan.dto.RepaymentProjPlanDto;
-import com.hongte.alms.base.RepayPlan.dto.RepaymentProjPlanListDto;
+import com.hongte.alms.base.RepayPlan.dto.*;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.RepayCurrentStatusEnums;
-import com.hongte.alms.base.enums.repayPlan.RepayPlanSettleStatusEnum;
-import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.mapper.*;
 import com.hongte.alms.base.process.mapper.ProcessMapper;
 import com.hongte.alms.base.service.RepaymentBizPlanListDetailService;
@@ -128,10 +123,136 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     }
 
 
-    public void ss(){
+    public void ss(FinanceSettleBaseDto financeSettleBaseDto, FinanceSettleReq financeSettleReq) {
+        String businessId = financeSettleReq.getBusinessId();
+        String planIdReq = financeSettleReq.getPlanId();
+        String uuid = financeSettleBaseDto.getUuid();
+        List<RepaymentBizPlan> repaymentBizPlans = repaymentBizPlanMapper.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id", businessId).eq("plan_id", planIdReq).orderBy("create_time"));
+        if (CollectionUtils.isNotEmpty(repaymentBizPlans)) {
+            for (RepaymentBizPlan repaymentBizPlan : repaymentBizPlans) {
+                String planId = repaymentBizPlan.getPlanId();
+
+                List<RepaymentProjPlan> repaymentProjPlans = repaymentProjPlanMapper.selectList(new EntityWrapper<RepaymentProjPlan>().eq("plan_id", planId));
+                if (CollectionUtils.isNotEmpty(repaymentProjPlans)) {
+                    List<RepaymentSettleSortDto> settleSortList = new ArrayList<>();
+                    for (RepaymentProjPlan repaymentProjPlan : repaymentProjPlans) {
+                        RepaymentSettleSortDto repaymentSettleSortDto = new RepaymentSettleSortDto();
+                        repaymentSettleSortDto.setRepaymentProjPlan(repaymentProjPlan);
+                        String projectId = repaymentProjPlan.getProjectId();
+
+                        //填充团贷网平台业务上标信息
+                        TuandaiProjectInfo tuandaiProjectInfo = tuandaiProjectInfoMapper.selectById(projectId);
+                        repaymentSettleSortDto.setTuandaiProjectInfo(tuandaiProjectInfo);
+                        settleSortList.add(repaymentSettleSortDto);
+                    }
+
+                    if (CollectionUtils.isNotEmpty(settleSortList)) {
+                        settleSort(settleSortList);
+
+
+                        for (RepaymentSettleSortDto repaymentSettleSortDto : settleSortList) {
+                            RepaymentProjPlan repaymentProjPlan = repaymentSettleSortDto.getRepaymentProjPlan();
+                            String projPlanId = repaymentProjPlan.getProjPlanId();
+
+                            //标的还款计划列表
+                            List<String> planListIds = new ArrayList<>();
+                            List<RepaymentProjPlanList> repaymentProjPlanLists = repaymentProjPlanListMapper.selectList(new EntityWrapper<RepaymentProjPlanList>().eq("proj_plan_id", projPlanId));
+                            if (CollectionUtils.isNotEmpty(repaymentProjPlanLists)) {
+                                for (RepaymentProjPlanList repaymentProjPlanList : repaymentProjPlanLists) {
+                                    String planListId = repaymentProjPlanList.getPlanListId();
+                                    String projPlanListId = repaymentProjPlanList.getProjPlanListId();
+                                    if (!planListIds.contains(planListId)) {
+                                        planListIds.add(planListId);
+                                    }
+
+                                    RepaymentSettlePlanListDetailDto repaymentSettlePlanListDetailDto=new RepaymentSettlePlanListDetailDto();
+                                    //标的还款计划列表
+                                    List<String> planListDetailIds = new ArrayList<>();
+                                    List<RepaymentProjPlanListDetail> repaymentProjPlanListDetails = repaymentProjPlanListDetailMapper.selectList(new EntityWrapper<RepaymentProjPlanListDetail>().eq("proj_plan_list_id", projPlanListId));
+                                    //填充标的还款计划列表
+                                    repaymentSettlePlanListDetailDto.setRepaymentProjPlanListDetails(repaymentProjPlanListDetails);
+
+                                    if(CollectionUtils.isNotEmpty(repaymentProjPlanListDetails)){
+                                        for(RepaymentProjPlanListDetail repaymentProjPlanListDetail : repaymentProjPlanListDetails){
+                                            String planDetailId = repaymentProjPlanListDetail.getPlanDetailId();
+                                            if (!planListDetailIds.contains(planDetailId)) {
+                                                planListDetailIds.add(planDetailId);
+                                            }
+                                        }
+                                        //查询业务还款详情计划
+                                        if (planListDetailIds != null && planListDetailIds.size() == 1) {
+                                            String planListDetailId = planListDetailIds.get(0);
+                                            RepaymentBizPlanListDetail repaymentBizPlanListDetail = repaymentBizPlanListDetailMapper.selectById(planListDetailId);
+                                            repaymentSettlePlanListDetailDto.setRepaymentBizPlanListDetail(repaymentBizPlanListDetail);
+                                        }
+                                    }
+
+                                   //====================================进行详情记录的结清开始
+                                    settleCanceMoney(repaymentSettlePlanListDetailDto);
+                                    //====================================进行详情记录的结清结束
+                                }
+
+                                //查询业务还款计划
+                                if (planListIds != null && planListIds.size() == 1) {
+                                    String planListId = planListIds.get(0);
+                                    RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListMapper.selectById(planListId);
+
+
+                                }
+                            }
+
+
+                        }
+
+                    }
+                }
+
+
+            }
+        }
+    }
+
+    public void settleCanceMoney(RepaymentSettlePlanListDetailDto repaymentSettlePlanListDetailDto){
+        List<RepaymentProjPlanListDetail> repaymentProjPlanListDetails = repaymentSettlePlanListDetailDto.getRepaymentProjPlanListDetails();
+
+        if(CollectionUtils.isNotEmpty(repaymentProjPlanListDetails)){
+
+        }
+        RepaymentBizPlanListDetail repaymentBizPlanListDetail = repaymentSettlePlanListDetailDto.getRepaymentBizPlanListDetail();
+
+
+
 
     }
 
+    //拆分还款的规则应优先还共借标的，在还主借标的，若有多个共借标，则有优先还上标金额较小的标的，若共借标中的金额先等，则优先还满标时间较早的标的。
+    public void settleSort(List<RepaymentSettleSortDto> repaymentSettleSortDto) {
+        Collections.sort(repaymentSettleSortDto, new Comparator<RepaymentSettleSortDto>() {
+            // 排序规则说明 需补充 从小标到大标，再到主借标
+            //同等
+            @Override
+            public int compare(RepaymentSettleSortDto arg0, RepaymentSettleSortDto arg1) {
+                if (arg0.getTuandaiProjectInfo().getMasterIssueId().equals(arg0.getTuandaiProjectInfo().getProjectId())) {
+                    return 1;
+                } else if (arg1.getTuandaiProjectInfo().getMasterIssueId().equals(arg1.getTuandaiProjectInfo().getProjectId())) {
+                    return -1;
+                }
+                if (arg0.getRepaymentProjPlan().getBorrowMoney()
+                        .compareTo(arg1.getRepaymentProjPlan().getBorrowMoney()) < 0) {
+                    return -1;
+                }
+                if (arg0.getTuandaiProjectInfo().getQueryFullSuccessDate()
+                        .before(arg1.getTuandaiProjectInfo().getQueryFullSuccessDate())) {
+                    return -1;
+                } else if (arg0.getTuandaiProjectInfo().getQueryFullSuccessDate()
+                        .after(arg1.getTuandaiProjectInfo().getQueryFullSuccessDate())) {
+                    return 1;
+                }
+                return 0;
+            }
+
+        });
+    }
 
 
     public void cancelProjMoney(FinanceSettleBaseDto financeSettleBaseDto) {
@@ -144,10 +265,10 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         if (CollectionUtils.isNotEmpty(planDtoList)) {
             for (RepaymentBizPlanDto repaymentBizPlanDto : planDtoList) {
                 List<RepaymentProjPlanDto> projPlanDtos = repaymentBizPlanDto.getProjPlanDtos();
-                settleSort(projPlanDtos);//排序
+//                settleSort(projPlanDtos);//排序
                 for (RepaymentProjPlanDto repaymentProjPlanDto : projPlanDtos) {
 
-                    Boolean flag=true;//是否已结清
+                    Boolean flag = true;//是否已结清
                     List<RepaymentProjPlanListDto> projPlanListDtos = repaymentProjPlanDto.getProjPlanListDtos();
                     RepaymentProjPlan repaymentProjPlan = repaymentProjPlanDto.getRepaymentProjPlan();
 
@@ -183,8 +304,8 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                             if (moneyPoolAmount.compareTo(unpaid) > 0 || moneyPoolAmount.compareTo(unpaid) == 0) {  //所有还完才进行更改状态
                                 repaymentProjPlanList.setCurrentStatus(RepayCurrentStatusEnums.已还款.toString());
                                 repaymentProjPlanListMapper.updateById(repaymentProjPlanList);
-                            }else {
-                                flag=false;//
+                            } else {
+                                flag = false;//
                             }
                             List<RepaymentProjPlanListDetail> projPlanListDetails = repaymentProjPlanListDto.getProjPlanListDetails();
                             if (CollectionUtils.isNotEmpty(projPlanListDetails)) {
@@ -254,35 +375,6 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         }
     }
 
-    //拆分还款的规则应优先还共借标的，在还主借标的，若有多个共借标，则有优先还上标金额较小的标的，若共借标中的金额先等，则优先还满标时间较早的标的。
-
-    public void settleSort(List<RepaymentProjPlanDto> repaymentProjPlanDtos) {
-        Collections.sort(repaymentProjPlanDtos, new Comparator<RepaymentProjPlanDto>() {
-            // 排序规则说明 需补充 从小标到大标，再到主借标
-            //同等
-            @Override
-            public int compare(RepaymentProjPlanDto arg0, RepaymentProjPlanDto arg1) {
-                if (arg0.getTuandaiProjectInfo().getMasterIssueId().equals(arg0.getTuandaiProjectInfo().getProjectId())) {
-                    return 1;
-                } else if (arg1.getTuandaiProjectInfo().getMasterIssueId().equals(arg1.getTuandaiProjectInfo().getProjectId())) {
-                    return -1;
-                }
-                if (arg0.getRepaymentProjPlan().getBorrowMoney()
-                        .compareTo(arg1.getRepaymentProjPlan().getBorrowMoney()) < 0) {
-                    return -1;
-                }
-                if (arg0.getTuandaiProjectInfo().getQueryFullSuccessDate()
-                        .before(arg1.getTuandaiProjectInfo().getQueryFullSuccessDate())) {
-                    return -1;
-                } else if (arg0.getTuandaiProjectInfo().getQueryFullSuccessDate()
-                        .after(arg1.getTuandaiProjectInfo().getQueryFullSuccessDate())) {
-                    return 1;
-                }
-                return 0;
-            }
-
-        });
-    }
 
     public void insertRepaymentSettleLog(FinanceSettleBaseDto financeSettleBaseDto, FinanceSettleReq
             financeSettleReq) {
