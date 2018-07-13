@@ -1024,6 +1024,14 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         ////////   传入的标信息  校验  开始   ///////////////////////////
 
         for(ProjInfoReq projInfoReq :projInfoReqs){
+        	
+        	
+        	  if(projInfoReq.getUserTypeId()==1){
+                  if(projInfoReq.getTdUserId() == null){
+                      throw  new CreatRepaymentExcepiton("个人用户必须填写资金端用户ID(tdUserId)");
+                  }
+              }
+        	
             //标的车辆信息校验
             if(projInfoReq.getIsHaveCar().equals(BooleanEnum.YES.getValue())){
                 if(projInfoReq.getProjCarInfos()==null|| projInfoReq.getProjCarInfos().size()==0){

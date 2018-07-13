@@ -42,7 +42,7 @@
 	FROM
 	    tb_renewal_business trb
 	        LEFT JOIN
-	    tb_basic_business tbb ON tbb.business_id = trb.original_business_id
+	    tb_basic_business tbb ON tbb.business_id = trb.renewal_business_id
 	        LEFT JOIN
 	    tb_basic_business_type tbbt ON tbbt.business_type_id = tbb.business_type
 	        LEFT JOIN
@@ -89,7 +89,7 @@
 	FROM
 			    tb_renewal_business trb
 	        LEFT JOIN
-	    tb_basic_business tbb ON tbb.business_id = trb.original_business_id
+	    tb_basic_business tbb ON tbb.business_id = trb.renewal_business_id
 	        LEFT JOIN
 	    tb_basic_business_type tbbt ON tbbt.business_type_id = tbb.business_type
 
