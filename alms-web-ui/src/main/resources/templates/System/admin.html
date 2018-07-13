@@ -74,6 +74,13 @@
 			</i-button>
 		</div>
 		<div style="margin-top:10px; margin-left:10px">
+			<i-lable>同步信贷调用失败的数据：</i-lable>
+			<i-button :loading="synXindaiFailPhoneSetLoading" @click="syncSindaiFailPhoneSet">
+				<i-span v-if="!synXindaiFailPhoneSetLoading">同步</i-span>
+				<i-span v-else>同步中...</i-span>
+			</i-button>
+		</div>
+		<div style="margin-top:10px; margin-left:10px">
 		   	<i-lable>同步上门催收数据：</i-lable>
 		   	<i-button :loading="syncVisitCollectionLoading" @click="syncVisitCollection">
 		   		<i-span v-if="!syncVisitCollectionLoading">同步</i-span>

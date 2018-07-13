@@ -85,6 +85,11 @@ public class ShareProfitServiceImpl implements ShareProfitService {
     @Autowired
     LoginUserInfoHelper loginUserInfoHelper;
 
+
+    @Autowired
+    @Qualifier("RepaymentConfirmPlatRepayLogService")
+    RepaymentConfirmPlatRepayLogService repaymentConfirmPlatRepayLogService;
+
     @Autowired
     Executor executor;
 
@@ -2361,6 +2366,38 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         }
         List<RepaymentProjPlanList>  ptojPlanList = removeDuplicateProjPlist(financeBaseDto.getCurTimeRepaidProjPlanList());
 //        String afterId = financeBaseDto.getAfterId();
+        //排除掉已经推送过数据给合规化还款模块的标的还款计划list
+//        for(RepaymentProjPlanList projPlanList: ptojPlanList){
+//            List<RepaymentConfirmPlatRepayLog>  ll= repaymentConfirmPlatRepayLogService.selectList
+//                    (new EntityWrapper<RepaymentConfirmPlatRepayLog>().
+//                            eq("proj_plan_list_id",projPlanList.getProjPlanListId()));
+//            if(ll!=null && ll.size()>0){
+//                ptojPlanList.remove(projPlanList);
+//            }
+//        }
+        Iterator<RepaymentProjPlanList> iter = ptojPlanList.iterator();
+        while(iter.hasNext()){
+            RepaymentProjPlanList  projPlanList = iter.next();
+            List<RepaymentConfirmPlatRepayLog>  ll= repaymentConfirmPlatRepayLogService.selectList
+                    (new EntityWrapper<RepaymentConfirmPlatRepayLog>().
+                            eq("proj_plan_list_id",projPlanList.getProjPlanListId()));
+            if(ll!=null && ll.size()>0){
+                iter.remove();
+            }
+        }
+
+
+        //将本次推送的标还款计划listId记录下来
+        for(RepaymentProjPlanList projPlanList: ptojPlanList){
+            RepaymentConfirmPlatRepayLog log = new RepaymentConfirmPlatRepayLog();
+            log.setConfirmLogId(confirmLogId);
+            log.setProjPlanListId(projPlanList.getProjPlanListId());
+            log.setCreateTime(new Date());
+            log.setCreateUser(loginUserInfoHelper.getUserId()==null?Constant.ADMIN_ID:loginUserInfoHelper.getUserId());
+            repaymentConfirmPlatRepayLogService.insert(log);
+        }
+
+
         String businessId = financeBaseDto.getBusinessId();
         executor.execute(new Runnable() {
             @Override
@@ -2495,7 +2532,6 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                 record.setApiReturnInfo(e.getMessage());
             }
             logger.info("平台合规化还款接口返回结果：{}", JSONObject.toJSONString(result));
-            sysApiCallFailureRecordService.updateById(record);
             if (result == null || !"1".equals(result.getCode())) {
                 sysApiCallFailureRecordService.insert(record);
             }

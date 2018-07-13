@@ -4,6 +4,7 @@ import com.hongte.alms.base.collection.entity.CollectionStatus;
 import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
 import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
 import com.hongte.alms.base.collection.vo.StaffBusinessVo;
+import com.hongte.alms.base.entity.CarBusinessAfter;
 import com.hongte.alms.common.service.BaseService;
 
 import java.util.List;
@@ -101,5 +102,15 @@ public interface CollectionStatusService extends BaseService<CollectionStatus> {
      * @return
      */
     public boolean  revokeClosedStatus(String businessId);
+
+
+//    /**
+//     *
+//     * @param carBusinessAfter
+//     * @return
+//     */
+//    public boolean refreshByXinDaiPhoneUser(CarBusinessAfter carBusinessAfter);
+//
+
 
 }
