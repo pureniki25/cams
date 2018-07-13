@@ -649,7 +649,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 									
 									BigDecimal planAmountSum=getPlanAmountSum(projDetails);//当前期计划要还的总金额
 									BigDecimal afterRepayAmountSum=getRepayAmountSum(projDetails);//当前期已还总金额
-									pList.setTotalBorrowAmount(planAmountSum);;
+									pList.setTotalBorrowAmount(getPlanAllPlanRepayAmount(pList).subtract(pList.getOverdueAmount()));
 									projPlanList.setTotalBorrowAmount(planAmountSum);
 									pList.setUpdateTime(new Date());
 									projPlanList.setUpdateTime(new Date());
@@ -728,6 +728,17 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 		List<RepaymentBizPlanListDetail> repaymentBizPlanListDetails= repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", list.getPlanListId()));
 		BigDecimal factRepayAmount=repaymentBizPlanListDetails.stream().map(RepaymentBizPlanListDetail::getFactAmount).reduce(BigDecimal.ZERO,BigDecimal::add);
 		 return factRepayAmount;
+	}
+	
+	/**
+	 * 
+	 * @param 获取每个pList里的所有费用项的应还金额
+	 * @return
+	 */
+	private BigDecimal getPlanAllPlanRepayAmount(RepaymentBizPlanList list) {
+		List<RepaymentBizPlanListDetail> repaymentBizPlanListDetails= repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", list.getPlanListId()));
+		BigDecimal planRepayAmount=repaymentBizPlanListDetails.stream().map(RepaymentBizPlanListDetail::getPlanAmount).reduce(BigDecimal.ZERO,BigDecimal::add);
+		 return planRepayAmount;
 	}
 	/**
 	 * 
@@ -903,6 +914,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 	
 	
 	private BigDecimal getPlanAmountSum(List<RepaymentProjPlanListDetail> projDetails) {
+		
 		BigDecimal sum=BigDecimal.valueOf(0);
 		for(RepaymentProjPlanListDetail detail:projDetails) {
 			
