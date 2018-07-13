@@ -4,7 +4,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,19 +84,40 @@ public class WithholdingServiceimpl implements WithholdingService {
 				.eq("param_type", SysParameterEnums.REPAY_DAYS.getKey()).eq("status", 1).orderBy("row_Index"));
 		Integer days = Integer.valueOf(repayStatusList.get(0).getParamValue());
 		List<RepaymentBizPlanList> pLists = repaymentBizPlanListService.selectAutoRepayList(days);// 查询一个周期内(30天)要代扣的记录
-		for (RepaymentBizPlanList pList : pLists) {
-			if(pList.getPlanListId().equals("d6b2973f-edf9-42e1-8412-ce43409acccf")) {
-				System.out.println("STOP");
-			}
-			//获取该还款计划最早一期没有还的代扣
-			pList=rechargeService.getEarlyPeriod(pList);
-			// 是否符合自动代扣规则
-			if (rechargeService.EnsureAutoPayIsEnabled(pList, days).getCode().equals("1")) {
-				autoRepayPerList(pList,WithholdTypeEnum.AUTORUN.getValue().toString());
-			} else {
-				continue;
-			}
-		}
+//		for (RepaymentBizPlanList pList : pLists) {
+//			if(pList.getPlanListId().equals("af996e99-bb65-427d-ad91-cc5d36f2d509")) {
+//				System.out.println("STOP");
+//			}
+//			//获取该还款计划最早一期没有还的代扣
+//			pList=rechargeService.getEarlyPeriod(pList);
+//			// 是否符合自动代扣规则
+//			if (rechargeService.EnsureAutoPayIsEnabled(pList, days).getCode().equals("1")) {
+//				autoRepayPerList(pList,WithholdTypeEnum.AUTORUN.getValue().toString());
+//			} else {
+//				continue;
+//			}
+//		}
+		//把集合按planId分组
+	    Map<String, List<RepaymentBizPlanList>> map =pLists.stream().collect(Collectors.groupingBy(RepaymentBizPlanList::getPlanId));
+	    map.values().stream().forEach(lists -> {
+	    	executor.execute(new Runnable() {
+				@Override
+				public void run() {
+					for(RepaymentBizPlanList pList:lists) {
+		        		//获取该还款计划最早一期没有还的代扣
+		    			pList=rechargeService.getEarlyPeriod(pList);
+		    			// 是否符合自动代扣规则
+		    			if (rechargeService.EnsureAutoPayIsEnabled(pList, days).getCode().equals("1")) {
+		    				autoRepayPerList(pList,WithholdTypeEnum.AUTORUN.getValue().toString());
+		    			} else {
+		    				continue; 
+		    			}
+		        	}					
+				}
+			});
+        
+        });
+	    
 	}
 	@Override
 	public Result appWithholding(RepaymentBizPlanList pList) {
@@ -132,14 +155,23 @@ public class WithholdingServiceimpl implements WithholdingService {
 		BankCardInfo ThirtyCardInfo = rechargeService.getThirtyPlatformInfo(bankCardInfos);
 		BigDecimal thirtyRepayAmount=getThirtyRepayAmount(pList);
 		if (bankCardInfo != null&&thirtyRepayAmount.compareTo(BigDecimal.valueOf(0))==0) {
-			if(bankCardInfo.getSignedProtocolList().size()>0) {
-				// 银行代扣
+			//判断是否开启协议代扣开关
+			SysParameter  aggreeSwitch = sysParameterService.selectOne(
+					new EntityWrapper<SysParameter>().eq("param_type", "agreement_withholding")
+							.eq("status", 1).orderBy("param_value"));
+			if(aggreeSwitch.getParamValue().equals("1")) {
+				if(bankCardInfo.getSignedProtocolList().size()>0) {
+					// 银行代扣
+					result=BankCharge(basic, bankCardInfo, pList, bankCardInfos,appType);
+				}else if(ThirtyCardInfo != null&&bankCardInfo.getSignedProtocolList().size()==0) {
+					result=ThirdRepaymentCharge(basic, ThirtyCardInfo, pList, null,appType);// 第三方代扣
+				}
+			}else {
 				result=BankCharge(basic, bankCardInfo, pList, bankCardInfos,appType);
-			}else if(ThirtyCardInfo != null&&bankCardInfo.getSignedProtocolList().size()==0) {
-				result=ThirdRepaymentCharge(basic, ThirtyCardInfo, pList, null,appType);// 第三方代扣
 			}
+		
 			
-			//BankCharge(basic, bankCardInfo, pList, bankCardInfos);
+		
 		} else if (ThirtyCardInfo != null && (bankCardInfo == null||(bankCardInfo != null&&thirtyRepayAmount.compareTo(BigDecimal.valueOf(0))>0))) {// 第三方代扣
 			result=ThirdRepaymentCharge(basic, ThirtyCardInfo, pList, null,appType);
 		} else {
@@ -167,6 +199,13 @@ public class WithholdingServiceimpl implements WithholdingService {
 		List<WithholdingChannel> channels = withholdingChannelService
 				.selectList(new EntityWrapper<WithholdingChannel>().eq("platform_id", PlatformEnum.YH_FORM.getValue())
 						.eq("channel_status", 1).orderBy("channel_level"));
+		
+		if(channels.size()==0) {
+			result.setCode("-1");
+	    	result.setMsg("没有找到可用的银行代扣渠道");
+			rechargeService.RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
+	    	return result;
+		}
 		WithholdingChannel channel = null;
 		if (channels != null && channels.size() > 0) {
 			channel = channels.get(0);
@@ -325,6 +364,13 @@ public class WithholdingServiceimpl implements WithholdingService {
 		List<WithholdingChannel> channels = withholdingChannelService
 				.selectList(new EntityWrapper<WithholdingChannel>().ne("platform_id", PlatformEnum.YH_FORM.getValue())
 						.eq("channel_status", 1).orderBy("channel_level"));
+		
+		if(channels.size()==0) {
+			result.setCode("-1");
+	    	result.setMsg("没有找到可用的第三方代扣渠道");
+			rechargeService.RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
+	    	return result;
+		}
 		List<ThirdPlatform> thirdPlatforms = thirtyCardInfo.getThirdPlatformList();
 
 		List<WithholdingChannel> newChanels = new ArrayList();
@@ -457,7 +503,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		
 		
 		Result result=new Result();
-		if(bankCardInfo.getSignedProtocolList()!=null&&bankCardInfo.getSignedProtocolList().size()>0) {
+	
 				BigDecimal onlineAmount = rechargeService.getOnlineAmount(pList);
 				BigDecimal underAmount = rechargeService.getUnderlineAmount(pList);
 				Integer platformId = (Integer) PlatformEnum.YH_FORM.getValue();
@@ -465,6 +511,11 @@ public class WithholdingServiceimpl implements WithholdingService {
 				List<WithholdingChannel> channels = withholdingChannelService
 						.selectList(new EntityWrapper<WithholdingChannel>().eq("platform_id", PlatformEnum.YH_FORM.getValue())
 								.eq("channel_status", 1).orderBy("channel_level"));
+				if(channels.size()==0) {
+					result.setCode("-1");
+			    	result.setMsg("没有找到可用的银行代扣渠道");
+			    	return result;
+				}
 				WithholdingChannel channel = null;
 				if (channels != null && channels.size() > 0) {
 					channel = channels.get(0);
@@ -473,7 +524,10 @@ public class WithholdingServiceimpl implements WithholdingService {
 				SysBankLimit sysBankLimit = sysBankLimitService.selectOne(
 						new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("bank_code", bankCardInfo.getBankCode().trim()).eq("status", 1));
 				if (sysBankLimit == null) {
-					logger.debug("银行代扣限额信息platformId:" + channel.getPlatformId() + "无效/不存在");
+					logger.info("银行代扣限额信息platformId:{0},bankCode:{1},无效/不存在",channel.getPlatformId(),bankCardInfo.getBankName());
+					result.setCode("-1");
+			    	result.setMsg("银行代扣限额信息platformId:"+channel.getPlatformId()+",bankCode:"+bankCardInfo.getBankName()+",无效/不存在");
+					return result;
 				} else {
 					// 本期线上剩余应还金额,剩余应还金额减去线下金额
 					BigDecimal repayMoney = rechargeService.getRestAmount(pList).subtract(underAmount);
@@ -550,10 +604,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 						}
 					}
 				}
-		}else {
-			result.setCode("-1");
-	    	result.setMsg("找不到签约成功的协议代扣渠道");
-		}
+	
 		return result;
 	}
 
@@ -566,6 +617,11 @@ public class WithholdingServiceimpl implements WithholdingService {
 				List<WithholdingChannel> channels = withholdingChannelService
 						.selectList(new EntityWrapper<WithholdingChannel>().eq("platform_id",platformId)
 								.eq("channel_status", 1).orderBy("channel_level"));
+				if(channels.size()==0) {
+					result.setCode("-1");
+			    	result.setMsg("没有找到可用的第三方代扣渠道");
+			    	return result;
+				}
 				List<ThirdPlatform> thirdPlatforms = thirtyCardInfo.getThirdPlatformList();
 
 				List<WithholdingChannel> newChanels = new ArrayList();
@@ -587,9 +643,9 @@ public class WithholdingServiceimpl implements WithholdingService {
 					SysBankLimit sysBankLimit = sysBankLimitService.selectOne(
 							new EntityWrapper<SysBankLimit>().eq("platform_id", channel.getPlatformId()).eq("status", 1).eq("bank_code", thirtyCardInfo.getBankCode()));
 					if (sysBankLimit == null) {
-						logger.info("第三方代扣限额信息platformId:" + channel.getPlatformId() + "无效/不存在");
+						logger.info("第三方代扣限额信息platformId:{0},bankCode:{1},无效/不存在",channel.getPlatformId(),thirtyCardInfo.getBankName());
 						result.setCode("-1");
-						result.setMsg("第三方代扣限额信息platformId:" + channel.getPlatformId() + "无效/不存在");
+					 	result.setMsg("第三方代扣限额信息platformId:"+channel.getPlatformId()+",bankCode:"+thirtyCardInfo.getBankName()+",无效/不存在");
 						continue;
 					} else {
 

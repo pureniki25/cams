@@ -13,6 +13,7 @@ import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListBak;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetailBak;
+import com.hongte.alms.base.entity.RepaymentBizPlanListSynch;
 import com.hongte.alms.base.entity.RepaymentConfirmLog;
 import com.hongte.alms.base.entity.RepaymentProjFactRepay;
 import com.hongte.alms.base.entity.RepaymentProjPlan;
@@ -33,6 +34,7 @@ import com.hongte.alms.base.mapper.RepaymentBizPlanListBakMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListDetailBakMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListDetailMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListMapper;
+import com.hongte.alms.base.mapper.RepaymentBizPlanListSynchMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanMapper;
 import com.hongte.alms.base.mapper.RepaymentConfirmLogMapper;
 import com.hongte.alms.base.mapper.RepaymentProjFactRepayMapper;
@@ -118,6 +120,8 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
     @Autowired
     private PlatformRepaymentFeignClient platformRepaymentFeignClient;
 
+    @Autowired
+	RepaymentBizPlanListSynchMapper repaymentBizPlanListSynchMapper ;
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Result revokeConfirm(String businessId, String afterId) throws Exception{
@@ -243,11 +247,12 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
                     .eq("proj_plan_id", repaymentProjPlanBak.getProjPlanId())
                     .eq("confirm_log_id", repaymentProjPlanBak.getConfirmLogId()));
         }
-
+        BigDecimal bplFactAmount = BigDecimal.ZERO ;
         for (RepaymentBizPlanListDetailBak repaymentBizPlanListDetailBak : selectList3) {
             RepaymentBizPlanListDetail detail = new RepaymentBizPlanListDetail(repaymentBizPlanListDetailBak);
             repaymentBizPlanListDetailMapper.deleteById(detail.getPlanDetailId());
             detail.insert();
+            bplFactAmount = bplFactAmount.add(detail.getFactAmount()==null?BigDecimal.ZERO:detail.getFactAmount());
             repaymentBizPlanListDetailBak.delete(new EntityWrapper<>()
                     .eq("plan_detail_id", repaymentBizPlanListDetailBak.getPlanDetailId())
                     .eq("confirm_log_id", repaymentBizPlanListDetailBak.getConfirmLogId()));
@@ -257,6 +262,19 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
             RepaymentBizPlanList list = new RepaymentBizPlanList(repaymentBizPlanListBak);
             repaymentBizPlanListMapper.deleteById(list.getPlanListId());
             list.insert();
+            
+            RepaymentBizPlanListSynch synch = new RepaymentBizPlanListSynch() ;
+            synch.setPlanListId(list.getPlanListId());
+            synch = repaymentBizPlanListSynchMapper.selectOne(synch) ;
+            synch.setCurrentStatus(list.getCurrentStatus());
+            synch.setCurrentSubStatus(list.getCurrentSubStatus());
+            synch.setRepayStatus(list.getRepayStatus());
+            synch.setRepayFlag(list.getRepayFlag());
+            synch.setFinanceConfirmUser(list.getFinanceConfirmUser());
+            synch.setFinanceConfirmUserName(list.getFinanceConfirmUserName());
+            synch.setFactAmountExt(bplFactAmount);
+            repaymentBizPlanListSynchMapper.updateAllColumnById(synch);
+            
             repaymentBizPlanListBak.delete(new EntityWrapper<>()
                     .eq("plan_list_id", repaymentBizPlanListBak.getPlanListId())
                     .eq("confirm_log_id", repaymentBizPlanListBak.getConfirmLogId()));

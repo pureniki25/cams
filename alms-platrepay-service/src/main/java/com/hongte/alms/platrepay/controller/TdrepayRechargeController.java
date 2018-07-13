@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.hongte.alms.base.dto.compliance.TdPlatformPlanRepaymentDTO;
 import com.hongte.alms.base.dto.compliance.TdProjectPaymentInfoResult;
 import com.hongte.alms.base.dto.compliance.TdRefundMonthInfoDTO;
 import com.hongte.alms.base.entity.AgencyRechargeLog;
@@ -111,7 +112,7 @@ public class TdrepayRechargeController {
 	@Autowired
 	private EipRemote eipRemote;
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@ApiOperation(value = "代充值资金分发参数接入接口")
 	@PostMapping("/accessTdrepayReCharge")
 	@ResponseBody
@@ -178,6 +179,61 @@ public class TdrepayRechargeController {
 		}
 
 		try {
+			// 根据标ID和期数查询资金分发记录，与平台当期应还金额对比，若大于平台金额，则不允许资金分发
+			List<TdrepayRechargeLog> rechargeLogs = tdrepayRechargeLogService
+					.selectList(new EntityWrapper<TdrepayRechargeLog>().eq("project_id", vo.getProjectId())
+							.eq("after_id", vo.getAfterId()).eq("is_valid", 1));
+			double rechargeAmount = vo.getRechargeAmount().doubleValue();
+			if (CollectionUtils.isNotEmpty(rechargeLogs)) {
+				for (TdrepayRechargeLog rechargeLog : rechargeLogs) {
+					rechargeAmount += rechargeLog.getRechargeAmount().doubleValue();
+				}
+			}
+
+			Map<String, Object> paramMap = new HashMap<>();
+			paramMap.put("projectId", vo.getProjectId());
+			com.ht.ussp.core.Result result = eipRemote.queryRepaymentSchedule(paramMap);
+			LOG.info("查询平台标的还款计划，标id：{}；接口返回数据：{}", vo.getProjectId(), JSONObject.toJSONString(result));
+
+			if (result != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())
+					&& result.getData() != null) {
+				Map map = JSONObject.parseObject(JSONObject.toJSONString(result.getData()), Map.class);
+				if (map != null && map.get("repaymentScheduleList") != null) {
+					List<TdPlatformPlanRepaymentDTO> dtos = JSONObject.parseArray(
+							JSONObject.toJSONString(map.get("repaymentScheduleList")),
+							TdPlatformPlanRepaymentDTO.class);
+					if (CollectionUtils.isNotEmpty(dtos)) {
+						TdPlatformPlanRepaymentDTO dto = new TdPlatformPlanRepaymentDTO();
+						for (TdPlatformPlanRepaymentDTO tdPlatformPlanRepaymentDTO : dtos) {
+							if (tdPlatformPlanRepaymentDTO.getPeriod() == vo.getPeriod()) {
+								dto = tdPlatformPlanRepaymentDTO;
+								continue;
+							}
+						}
+						double amount = dto.getAmount() == null ? 0 : dto.getAmount().doubleValue();
+						double interestAmount = dto.getInterestAmount() == null ? 0
+								: dto.getInterestAmount().doubleValue();
+						double depositAmount = dto.getDepositAmount() == null ? 0
+								: dto.getDepositAmount().doubleValue();
+						double guaranteeAmount = dto.getGuaranteeAmount() == null ? 0
+								: dto.getGuaranteeAmount().doubleValue();
+						double arbitrationAmount = dto.getArbitrationAmount() == null ? 0
+								: dto.getArbitrationAmount().doubleValue();
+						double orgAmount = dto.getOrgAmount() == null ? 0 : dto.getOrgAmount().doubleValue();
+						double tuandaiAmount = dto.getTuandaiAmount() == null ? 0
+								: dto.getTuandaiAmount().doubleValue();
+						double agencyAmount = dto.getAgencyAmount() == null ? 0 : dto.getAgencyAmount().doubleValue();
+						double otherAmount = dto.getOtherAmount() == null ? 0 : dto.getOtherAmount().doubleValue();
+						double total = amount + interestAmount + depositAmount + guaranteeAmount + arbitrationAmount
+								+ orgAmount + tuandaiAmount + agencyAmount + otherAmount;
+						if (rechargeAmount > total) {
+							return Result.error("-99",
+									"累计充值金额大于平台应还金额" + BigDecimal.valueOf(total).setScale(2, BigDecimal.ROUND_HALF_UP));
+						}
+					}
+				}
+			}
+
 			// 根据projectId查询平台还垫付信息
 			Map<String, com.ht.ussp.core.Result> resultMap = tdrepayRechargeService
 					.getAdvanceShareProfitAndProjectPayment(vo.getProjectId());
@@ -387,7 +443,7 @@ public class TdrepayRechargeController {
 										.eq("send_key", batchId));
 						if (issueSendOutsideLog != null) {
 							batchIdMap.put(batchId, issueSendOutsideLog);
-						}else {
+						} else {
 							batchIdMap.put(batchId, new IssueSendOutsideLog());
 						}
 					}
@@ -915,16 +971,16 @@ public class TdrepayRechargeController {
 					new EntityWrapper<TdrepayRechargeLog>().eq("project_id", (String) paramMap.get("projectId"))
 							.eq("confirm_log_id", (String) paramMap.get("confirmLogId"))
 							.in("process_status", processStatus).eq("is_valid", 1));
-			
+
 			if (!CollectionUtils.isEmpty(tdrepayRechargeLogs)) {
-				
+
 				for (TdrepayRechargeLog rechargeLog : tdrepayRechargeLogs) {
 					rechargeLog.setIsValid(2);
 				}
-				
+
 				tdrepayRechargeLogService.updateBatchById(tdrepayRechargeLogs);
 				return Result.success();
-			}else {
+			} else {
 				return Result.error("-99", "没有找到对应的数据，撤销资金分发失败");
 			}
 		} catch (Exception e) {
@@ -958,5 +1014,5 @@ public class TdrepayRechargeController {
 			return Result.error("-99", e.getMessage());
 		}
 	}
-	
+
 }

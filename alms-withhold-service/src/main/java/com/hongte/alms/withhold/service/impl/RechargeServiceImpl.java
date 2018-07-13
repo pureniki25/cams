@@ -111,7 +111,7 @@ public class RechargeServiceImpl implements RechargeService {
 	ApplyDerateProcessService applyDerateProcessService;
 
 	@Autowired
-	@Qualifier("withholdingChannelService")
+	@Qualifier("WithholdingChannelService")
 	WithholdingChannelService withholdingChannelService;
 
 	@Autowired
@@ -172,6 +172,11 @@ public class RechargeServiceImpl implements RechargeService {
 	@Autowired
 	@Qualifier("RepaymentBizPlanService")
 	RepaymentBizPlanService repaymentBizPlanService;
+	
+	
+	
+	
+	
 
 	@Override
 	public Result recharge(BasicBusiness business, RepaymentBizPlanList pList, Double amount, Integer boolLastRepay,
@@ -199,6 +204,9 @@ public class RechargeServiceImpl implements RechargeService {
 		}
 		
 		
+		
+		
+		
 		//获取还款计划的借款金额
 		RepaymentBizPlan plan=repaymentBizPlanService.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("plan_id", pList.getPlanId()));
 
@@ -208,7 +216,7 @@ public class RechargeServiceImpl implements RechargeService {
 			result.setMsg("当前失败或者执行中次数为:" + failCount + ",超过限制次数，不允许执行。");
 			RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
 		} else {
-			//********************************易宝代扣开始*********************************************//
+			//****************************************************************易宝代扣开始*****************************************************************************//
 			if (channel.getPlatformId() == PlatformEnum.YB_FORM.getValue()) {
 				SysParameter  thirtyRepayTestResult = sysParameterService.selectOne(
 						new EntityWrapper<SysParameter>().eq("param_type", "thirtyRepayTest")
@@ -287,7 +295,7 @@ public class RechargeServiceImpl implements RechargeService {
 			}
 			
 			
-			//********************************宝付代扣开始*********************************************//
+			//*********************************************************************宝付代扣开始******************************************************************//
 			if (channel.getPlatformId() == PlatformEnum.BF_FORM.getValue()) {
 				SysParameter  thirtyRepayTestResult = sysParameterService.selectOne(
 						new EntityWrapper<SysParameter>().eq("param_type", "thirtyRepayTest")
@@ -386,12 +394,33 @@ public class RechargeServiceImpl implements RechargeService {
 				}
 				
 			}
-			//********************************银行代扣开始*********************************************//
+			//**********************************************************************银行代扣开始****************************************************************************//
 			if (channel.getPlatformId() == PlatformEnum.YH_FORM.getValue()) {
-			  List<SignedProtocol> signedProtocolList= bankCardInfo.getSignedProtocolList();
-				List<SysParameter> bankChannels = sysParameterService.selectList(
-						new EntityWrapper<SysParameter>().eq("param_type", SysParameterEnums.BANK_CHANNEL.getKey())
-								.eq("status", 1).orderBy("param_value2"));
+				
+				
+				//判断是否开启协议代扣开关
+				SysParameter  aggreeSwitch = sysParameterService.selectOne(
+						new EntityWrapper<SysParameter>().eq("param_type", "agreement_withholding")
+								.eq("status", 1).orderBy("param_value"));
+				
+				List channles=null;
+				if(aggreeSwitch.getParamValue().equals("1")) {
+					channles= bankCardInfo.getSignedProtocolList();
+					if(channles.size()==0) {
+						result.setCode("-1");
+						result.setMsg("没有找到相关协议代扣渠道");
+						RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
+						return result;
+					}
+				}else {
+				  channles= withholdingChannelService.selectList(new EntityWrapper<WithholdingChannel>().eq("platform_id", PlatformEnum.YH_FORM.getValue()).eq("channel_status", 1).orderBy("channel_level", false));
+					if(channles.size()==0) {
+						result.setCode("-1");
+						result.setMsg("没有找到相关代扣渠道");
+						RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
+						return result;
+					}
+				}
 				
 				SysParameter  bankRepayTestResult = sysParameterService.selectOne(
 						new EntityWrapper<SysParameter>().eq("param_type", "bankRepayTest")
@@ -406,9 +435,15 @@ public class RechargeServiceImpl implements RechargeService {
 						BigDecimal.valueOf(amount),appType);
 
 				BankRechargeReqDto dto = new BankRechargeReqDto();
-				for (SignedProtocol signedProtocol : signedProtocolList) {// 需要循环签约子渠道
+				for (Object channelObject : channles) {// 需要循环签约子渠道
+	
 					dto.setAmount(amount);
-					dto.setChannelType(signedProtocol.getChannelType().toString());// 子渠道
+					if(aggreeSwitch.getParamValue().equals("1")) {
+						dto.setChannelType(((SignedProtocol)channelObject).getChannelType().toString());// 子渠道
+					}else {
+						dto.setChannelType(((WithholdingChannel)channelObject).getSubPlatformId().toString());// 子渠道
+					}
+					logger.info("============================银行代扣，调用的子渠道是:"+dto.getChannelType()+"=====================================");
 					dto.setRechargeUserId(bankCardInfo.getPlatformUserID());
 					dto.setCmOrderNo(merchOrderId);
 					dto.setOidPartner(oidPartner);
@@ -627,8 +662,9 @@ public class RechargeServiceImpl implements RechargeService {
 	
 	private boolean isSign(RepaymentBizPlanList pList) {
 		boolean isSign = false;
-		int i=moneyPoolRepaymentService.selectCount(new EntityWrapper<MoneyPoolRepayment>().eq("original_business_id", pList.getOrigBusinessId()).eq("after_id", pList.getAfterId()).ne("is_deleted", 1));
-		if(i>0) {
+		int i=moneyPoolRepaymentService.selectCount(new EntityWrapper<MoneyPoolRepayment>().eq("original_business_id", pList.getOrigBusinessId()).eq("after_id", pList.getAfterId()).eq("is_deleted", 0));
+		int j=moneyPoolRepaymentService.selectCount(new EntityWrapper<MoneyPoolRepayment>().eq("original_business_id", pList.getOrigBusinessId()).eq("after_id", pList.getAfterId()).isNull("is_deleted"));
+		if((i+j)>0) {
 			isSign=true;
 		}else {
 			isSign=false;

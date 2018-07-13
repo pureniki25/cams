@@ -9,12 +9,14 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.ProjExtRate;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.RepaymentProjPlan;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
@@ -22,6 +24,8 @@ import com.hongte.alms.base.mapper.ProjExtRateMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListDetailMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListMapper;
 import com.hongte.alms.base.mapper.RepaymentProjPlanListDetailMapper;
+import com.hongte.alms.base.mapper.RepaymentProjPlanMapper;
+import com.hongte.alms.base.service.RepaymentProjPlanService;
 import com.hongte.alms.base.service.SettleService;
 import com.hongte.alms.base.vo.finance.SettleInfoVO;
 import com.hongte.alms.common.util.DateUtil;
@@ -42,6 +46,13 @@ public class SettleServiceImpl implements SettleService {
 	
 	@Autowired
 	ProjExtRateMapper projExtRateMapper ;
+	
+	@Autowired
+	@Qualifier("RepaymentProjPlanService")
+	RepaymentProjPlanService repaymentProjPlanService ;
+	
+	@Autowired
+	RepaymentProjPlanMapper repaymentProjPlanMapper ;
 	@Override
 	public JSONObject settleInfo(String businessId, String afterId, String planId) {
 		EntityWrapper<RepaymentBizPlanList> planListEW = new EntityWrapper<>();
@@ -104,12 +115,49 @@ public class SettleServiceImpl implements SettleService {
 		infoVO.setDerates(repaymentBizPlanListDetailMapper.selectLastPlanListDerateFees(businessId,cur.getDueDate(), planId));
 		infoVO.setLackFees(repaymentBizPlanListDetailMapper.selectLastPlanListLackFees(businessId,cur.getDueDate(), planId));
 		
-		projExtRateMapper.selectList(new EntityWrapper<>());
+		infoVO.setPenalty(calcPenalty(cur, planId));
 		
 		infoVO.setSubtotal(infoVO.getSubtotal().add(infoVO.getItem10()).add(infoVO.getItem20()).add(infoVO.getItem30()).add(infoVO.getItem50()));
 		infoVO.setTotal(infoVO.getTotal().add(infoVO.getSubtotal()).add(infoVO.getOfflineOverDue()).add(infoVO.getOnlineOverDue()).add(infoVO.getDerate()).add(infoVO.getPlanRepayBalance()));
 		
 		return infoVO;
+	}
+	
+	/**
+	 * 计算提前还款违约金
+	 * @author 王继光
+	 * 2018年7月11日 下午10:06:09
+	 * @param bizPlanList
+	 * @param planId
+	 * @return
+	 */
+	private BigDecimal calcPenalty(RepaymentBizPlanList bizPlanList,String planId) {
+		List<ProjExtRate> extRates = projExtRateMapper
+				.selectList(new EntityWrapper<ProjExtRate>().eq("business_id", bizPlanList.getOrigBusinessId())
+						.ge("begin_peroid", bizPlanList.getPeriod()).le("end_peroid", bizPlanList.getPeriod()));
+		BigDecimal penalty = BigDecimal.ZERO;
+		for (ProjExtRate projExtRate : extRates) {
+			switch (projExtRate.getCalcWay()) {
+			//根据计算方式不同分别计算
+			case 1:
+				//1.借款金额*费率值
+				RepaymentProjPlan projPlan = repaymentProjPlanService.selectOne(new EntityWrapper<RepaymentProjPlan>().eq("project_id", projExtRate.getProjectId()));
+				penalty = penalty.add(projPlan.getBorrowMoney().multiply(projExtRate.getRateValue())) ;
+				break;
+			case 2:
+				//2剩余本金*费率值
+				BigDecimal upaid = repaymentProjPlanMapper.sumProjectItem10Unpaid(projExtRate.getProjectId(), planId);
+				penalty = penalty.add(upaid.multiply(projExtRate.getRateValue())) ;
+				break;
+			case 3:
+				//3.1*费率值'
+				penalty = penalty.add(projExtRate.getRateValue());
+				break;
+			default:
+				break;
+			}
+		}
+		return penalty;
 	}
 	
 	/**

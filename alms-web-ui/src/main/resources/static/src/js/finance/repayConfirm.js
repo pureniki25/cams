@@ -704,7 +704,7 @@ window.layinit(function (htConfig) {
                     // app.factRepayPreview.total += (app.factRepayPreview.total * 10000 + e.total * 10000) / 10000
 
                     app.factRepayPreview.surplus = accAdd(app.factRepayPreview.surplus,e.surplus)
-                    app.factRepayPreview.item10 = accAdd(app.factRepayPreview.surplus,e.surplus)
+                    app.factRepayPreview.item10 = accAdd(app.factRepayPreview.item10,e.item10)
                     app.factRepayPreview.item20 = accAdd(app.factRepayPreview.item20,e.item20)
                     app.factRepayPreview.item30 = accAdd(app.factRepayPreview.item30,e.item30)
                     app.factRepayPreview.item50 = accAdd(app.factRepayPreview.item50,e.item50)

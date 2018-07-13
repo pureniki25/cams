@@ -25,7 +25,7 @@
             module_id AS moduleId, module_name AS moduleName, module_url AS moduleUrl, module_pid AS modulePid, module_level AS moduleLevel, module_desc AS moduleDesc, module_status AS moduleStatus, device_type AS deviceType, module_order AS moduleOrder, module_icon AS moduleIcon, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
         </sql>-->
 
-    <select id="selectAfterLoadStanding" resultType="com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo"
+    <select id="selectAfterLoadStandingBak" resultType="com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo"
             parameterType="com.hongte.alms.base.collection.vo.AfterLoanStandingBookReq">
 
         select
@@ -288,10 +288,233 @@
 				and business.repayment_type_id = 5 and pList.plan_list_id = (select pl.plan_list_id from tb_repayment_biz_plan_list pl where pl.plan_id = pList.plan_id order by pl.due_date desc limit 1 ) 
 			</if> -->
         </where>
+        order BY  pList.due_date 
+    </select>
+    
+	   
+	<select id="selectAfterLoadStanding" resultType="com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo"
+            parameterType="com.hongte.alms.base.collection.vo.AfterLoanStandingBookReq">
+        select
+        pList.orig_business_id AS businessId,
+        pList.period as  periods,
+        pList.after_id as  afterId,
+
+        pList.district_id_ext as districtId,
+        pList.district_name_ext AS  districtAreaName,
+        pList.company_id_ext as companyId,
+        pList.company_name_ext as companyName,
+        pList.operator_id_ext AS operatorId,
+        pList.operator_name_ext AS operatorName,
+
+        pList.customer_name_ext AS customerName,
+        pList.business_type_ext AS businessTypeId,
+        (
+        case
+          WHEN pList.business_ctype_ext='汽车融资租赁' then pList.business_ctype_ext
+          ELSE pList.business_type_name_ext
+        end
+        )
+         AS businessTypeName,
+        pList.borrow_money_ext AS borrowMoney,
+        pList.total_borrow_amount as totalBorrowAmount,
+        (
+        <![CDATA[
+              case
+                WHEN pList.due_date is null then 0
+                WHEN pList.due_date>now() THEN 0
+                WHEN pList.fact_repay_date is null then to_days(now())- to_days(pList.due_date)
+                WHEN pList.fact_repay_date<pList.due_date THEN 0
+                ELSE  to_days(pList.fact_repay_date)- to_days(pList.due_date)
+                end
+            ]]>
+
+        )as delayDays,
+
+        pList.due_date as dueDate,
+        pList.fact_repay_date AS repaymentDate,
+        col_status.phone_staff AS phoneStaffId,
+
+        col_status.visit_staff AS  visitStaffId,
+
+        pList.plan_list_id AS  crpId,
+        (case when pList.plan_status_ext = 10 or pList.plan_status_ext = 20 OR  pList.plan_status_ext =30 then '已结清' else pList.current_status end)as statusName,
+        col_status.collection_status as colStatus,
+
+		pList.borrow_limit_ext as borrowLimit ,
+		pList.repayment_type_id_ext as repaymentTypeId ,
+		pList.class_name_ext className
+        from tb_repayment_biz_plan_list_synch  as pList
+        LEFT JOIN (select * from  tb_basic_biz_customer as customer where customer.ismain_customer=1 group by customer.business_id ) as customer ON customer.business_id = pList.business_id_ext
+        <choose>
+            <!--  为电催专员  限制只查看分配给自己的期数-->
+            <when test="userType!=null">
+                JOIN tb_collection_status as  col_status ON pList.plan_list_id = col_status.crp_id
+            </when>
+            <otherwise>
+                LEFT JOIN tb_collection_status as  col_status ON pList.plan_list_id = col_status.crp_id
+            </otherwise>
+        </choose>
+          JOIN 
+          <if test="userId !=null">
+	         (SELECT user_id,business_id  FROM 
+	         tb_sys_user_permission WHERE user_id = #{userId}
+	         )
+          </if>
+          <if test="userId ==null">
+          	tb_sys_user_permission
+          </if>
+          as permission  ON  permission.business_id = pList.orig_business_id
+        <where>
+            (pList.repay_flag != 6 or pList.repay_flag is null)
+
+            <!-- 1:电催专员  限制只查看分配给自己的期数-->
+            <if test="userType!=null">
+                <![CDATA[ and col_status.phone_staff = #{userId}]]>
+            </if>
+
+            <!--          /*应还日期 开始*/ -->
+            <if test="showRepayDateBegin !=null ">
+                <![CDATA[ and pList.due_date >= #{showRepayDateBegin,jdbcType=TIMESTAMP}]]>
+            </if>
+            <!--            /*应还日期 结束*/ -->
+            <if test="showRepayDateEnd !=null ">
+                <![CDATA[ and pList.due_date <= #{showRepayDateEnd,jdbcType=TIMESTAMP}]]>
+            </if>
+            <!--          /*实还日期 开始*/  -->
+            <if test="realRepayDateBegin !=null ">
+                <![CDATA[ and pList.fact_repay_date >= #{realRepayDateBegin,jdbcType=TIMESTAMP}]]>
+
+            </if>
+            <!--            /*实还日期 结束*/ -->
+            <if test="realRepayDateEnd !=null ">
+                <![CDATA[ and pList.fact_repay_date <= #{realRepayDateEnd,jdbcType=TIMESTAMP}]]>
+            </if>
+            <!--             /*逾期天数 开始*/-->
+            <if test="delayDaysBegin !=null ">
+                <![CDATA[ and pList.overdue_days >= #{delayDaysBegin}]]>
+            </if>
+            <!--       /*逾期天数 结束*/ -->
+            <if test="delayDaysEnd !=null ">
+                <![CDATA[ and pList.overdue_days < #{delayDaysEnd}]]>
+            </if>
+            <!--          /*//业务获取*/ -->
+            <if test="operatorName !=null and operatorName !='' ">
+                and pList.operator_name_ext LIKE '%${operatorName}%'
+            </if>
+            <!--         /*//业务编号*/ -->
+            <if test="businessId !=null and businessId !='' ">
+                and pList.business_id_ext  LIKE '%${businessId}%'
+            </if>
+            <!--   /*//业务类型*/ -->
+            <if test="businessType !=null ">
+                <choose>
+                    <!--  汽车融资租赁 则根据子查询来查  -->
+                    <when test="businessType == 14">
+                        and pList.business_type_ext = 9 and pList.business_ctype_ext='汽车融资租赁'
+                    </when>
+                    <otherwise>
+                        and pList.business_type_ext = #{businessType}
+                    </otherwise>
+                </choose>
+            </if>
+            <!--   /*//业务状态（贷后状态）*/ -->
+            <if test="businessStatus !=null">
+                and col_status.collection_status = #{businessStatus}
+            </if>
+            <!--   /*//业务状态（贷后状态）*/ -->
+            <if test="businessClassName !=null and businessClassName != ''">
+                and pList.class_name_ext = #{businessClassName}
+            </if>
+           <!--   /*//还款状态*/ -->
+            <if test="repayStatus !=null and repayStatus !='' and  repayStatus !='已结清'">
+                and pList.current_status = #{repayStatus}
+            </if>
+            <if test="repayStatus !=null and repayStatus =='已结清' ">
+                and (pList.plan_status = 10 or pList.plan_status = 20 OR  pList.plan_status =30)
+            </if>
+            <!--   /*//清算一用户ID列表*/ -->
+            <if test="liquidationOneUIds !=null ">
+                and col_status.phone_staff  IN
+                <foreach collection="liquidationOneUIds" item="userId" index="index"
+                         open="(" close=")" separator=",">
+                    #{userId}
+                </foreach>
+            </if>
+            <!--   /*//清算二用户ID列表*/ -->
+            <if test="liquidationTowUIds !=null ">
+                and col_status.visit_staff  IN
+                <foreach collection="liquidationTowUIds" item="userId" index="index"
+                         open="(" close=")" separator=",">
+                    #{userId}
+                </foreach>
+            </if>
+            <!--   /*//用户ID列表*/ -->
+            <if test="customerIds !=null ">
+                and pList.customer_id_ext IN
+                <foreach collection="customerIds" item="customerId" index="index"
+                         open="(" close=")" separator=",">
+                    #{customerId}
+                </foreach>
+            </if>
+            <!--   /*//分公司列表*/ -->
+            <if test="commIds !=null ">
+                and pList.company_id_ext IN
+                <foreach collection="commIds" item="commId" index="index"
+                         open="(" close=")" separator=",">
+                    #{commId}
+                </foreach>
+            </if>
+            <!--   /*//客户名称*/ -->
+            <if test="customerName !=null  and customerName !=''  ">
+                and pList.customer_name_ext  LIKE '%${customerName}%'
+            </if>
+            <!--   /*//身份证号*/ -->
+            <if test="identifyCard !=null  and identifyCard !=''  ">
+                and customer.identify_card  LIKE '%${identifyCard}%'
+            </if>
+            <!--   /*//手机号*/ -->
+            <if test="phoneNumber !=null  and phoneNumber !=''  ">
+                and customer.phone_number  LIKE '%${phoneNumber}%'
+            </if>
+            <!--   /*//还款计划ID数组*/ -->
+            <if test="crpIdsArray !=null">
+                and pList.plan_list_id  IN
+                <foreach collection="crpIdsArray" item="crpId" index="index"
+                         open="(" close=")" separator=",">
+                    #{crpId}
+                </foreach>
+            </if>
+           <!--   /*//当前登录用户ID*/ -->
+            <if test="userId !=null">
+                and permission.user_id = #{userId}
+            </if>
+
+            <!--  设置跟进业务组 -->
+            <if test="businessIds !=null">
+                and pList.business_id_ext  IN
+                <foreach collection="businessIds" item="bizId" index="index"
+                         open="(" close=")" separator=",">
+                    #{bizId}
+                </foreach>
+            </if>
+			<!-- 期数状态 -->
+			<if test="peroidStatus != null and peroidStatus == '首期' " >
+				and pList.is_defer != 1 and pList.period = 1
+			</if>
+			
+			<!-- 期数状态 -->
+			<if test="peroidStatus != null and peroidStatus == '本金期' " >
+				 and pList.repayment_type_id_ext = 2 and pList.borrow_limit_ext = pList.period
+			</if>
+			<!-- 期数状态 -->
+			<if test="peroidStatus != null and peroidStatus == '末期' " >
+				and pList.repayment_type_id_ext = 5 and pList.borrow_limit_ext = pList.period
+			</if>
+        </where>
 
         order BY  pList.due_date 
 
-    </select>
+    	</select>
     
     
        <select id="selectRepayManage" resultType="com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo"
@@ -337,7 +560,6 @@
         from tb_repayment_biz_plan_list  as pList
        JOIN tb_repayment_biz_plan as plan ON pList.plan_id = plan.plan_id
         JOIN tb_basic_business as business ON plan.original_business_id = business.business_id
-      left JOIN tb_basic_company as company ON business.company_id = company.area_id
          left JOIN tb_basic_business_type as  b_type ON business.business_type = b_type.business_type_id
 --          JOIN tb_sys_user_permission as permission  ON  permission.business_id = business.business_id
 --         LEFT JOIN tb_sys_user as phoneUser ON  col_status.phone_staff = phoneUser.user_id
@@ -350,15 +572,7 @@
             1=1
             and IFNULL(pList.repay_flag,0) != 6
             and (plan.plan_status=0 or plan.plan_status=50)
-            <!--   改用列表 IN查询 这两个先屏蔽
-            <if test="areaId !=null and areaId !=''">
-                and business.company_id IN (SELECT area_id FROM tb_basic_company WHERE district_id = #{areaId})
-            </if>
-            <if test="companyId !=null and companyId !=''">
-                and business.company_id = #{companyId}
-            </if>-->
             <!--          /*应还日期 开始*/ -->
-            
                <if test="keyName !=null and keyName !=''">
                 and ((business.operator_name LIKE '%${keyName}%') or (business.business_id  LIKE '%${keyName}%') or (business.customer_name  LIKE '%${keyName}%') )
             </if>
