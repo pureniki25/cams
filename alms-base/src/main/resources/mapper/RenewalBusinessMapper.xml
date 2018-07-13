@@ -54,7 +54,7 @@
 	<where>
 		1=1
 		<if test="loanExtReq.dateStart !=null and loanExtReq.dateStart !=''">
-        	AND trb.create_time &gt;= #{loanExtReq.dataStart}
+        	AND trb.create_time &gt;= #{loanExtReq.dateStart}
         </if>
         <if test="loanExtReq.dateEnd !=null and loanExtReq.dateEnd !=''">
         	AND trb.create_time &lt;= #{loanExtReq.dateEnd}
@@ -96,7 +96,7 @@
 	<where>
 		1=1
 		<if test="loanExtReq.dateStart !=null and loanExtReq.dateStart !=''">
-        	AND trb.create_time &gt;= #{loanExtReq.dataStart}
+        	AND trb.create_time &gt;= #{loanExtReq.dateStart}
         </if>
         <if test="loanExtReq.dateEnd !=null and loanExtReq.dateEnd !=''">
         	AND trb.create_time &lt;= #{loanExtReq.dateEnd}
