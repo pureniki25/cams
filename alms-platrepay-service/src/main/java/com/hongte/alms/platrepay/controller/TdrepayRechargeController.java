@@ -112,7 +112,7 @@ public class TdrepayRechargeController {
 	@Autowired
 	private EipRemote eipRemote;
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes" })
 	@ApiOperation(value = "代充值资金分发参数接入接口")
 	@PostMapping("/accessTdrepayReCharge")
 	@ResponseBody
@@ -207,7 +207,7 @@ public class TdrepayRechargeController {
 						for (TdPlatformPlanRepaymentDTO tdPlatformPlanRepaymentDTO : dtos) {
 							if (tdPlatformPlanRepaymentDTO.getPeriod() == vo.getPeriod()) {
 								dto = tdPlatformPlanRepaymentDTO;
-								continue;
+								break;
 							}
 						}
 						double amount = dto.getAmount() == null ? 0 : dto.getAmount().doubleValue();
@@ -226,7 +226,7 @@ public class TdrepayRechargeController {
 						double otherAmount = dto.getOtherAmount() == null ? 0 : dto.getOtherAmount().doubleValue();
 						double total = amount + interestAmount + depositAmount + guaranteeAmount + arbitrationAmount
 								+ orgAmount + tuandaiAmount + agencyAmount + otherAmount;
-						if (rechargeAmount > total) {
+						if (rechargeAmount > BigDecimal.valueOf(total).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()) {
 							return Result.error("-99",
 									"累计充值金额大于平台应还金额" + BigDecimal.valueOf(total).setScale(2, BigDecimal.ROUND_HALF_UP));
 						}
