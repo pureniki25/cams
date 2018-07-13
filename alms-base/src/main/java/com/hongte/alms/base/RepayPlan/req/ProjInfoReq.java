@@ -357,7 +357,7 @@ public class ProjInfoReq {
      * 团贷用户ID(资金端用户ID)
      */
     @ApiModelProperty(required= true,value = "团贷用户ID(资金端用户ID)")
-    @NotNull(message="ProjInfoReq 团贷用户ID(tdUserId)不能为空")
+//    @NotNull(message="ProjInfoReq 团贷用户ID(tdUserId)不能为空")
     private String tdUserId;
     /**
      * 客户类型 1:个人 2:企业

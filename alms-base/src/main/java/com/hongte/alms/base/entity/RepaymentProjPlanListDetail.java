@@ -291,6 +291,9 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
 	}
 
 	public BigDecimal getProjFactAmount() {
+		if(projFactAmount==null) {
+			return BigDecimal.valueOf(0);
+		}
 		return projFactAmount;
 	}
 

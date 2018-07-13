@@ -112,7 +112,7 @@ public class TdrepayRechargeController {
 	@Autowired
 	private EipRemote eipRemote;
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes" })
 	@ApiOperation(value = "代充值资金分发参数接入接口")
 	@PostMapping("/accessTdrepayReCharge")
 	@ResponseBody
@@ -180,7 +180,7 @@ public class TdrepayRechargeController {
 
 		try {
 			// 根据标ID和期数查询资金分发记录，与平台当期应还金额对比，若大于平台金额，则不允许资金分发
-			List<TdrepayRechargeLog> rechargeLogs = tdrepayRechargeLogService
+			/*List<TdrepayRechargeLog> rechargeLogs = tdrepayRechargeLogService
 					.selectList(new EntityWrapper<TdrepayRechargeLog>().eq("project_id", vo.getProjectId())
 							.eq("after_id", vo.getAfterId()).eq("is_valid", 1));
 			double rechargeAmount = vo.getRechargeAmount().doubleValue();
@@ -207,7 +207,7 @@ public class TdrepayRechargeController {
 						for (TdPlatformPlanRepaymentDTO tdPlatformPlanRepaymentDTO : dtos) {
 							if (tdPlatformPlanRepaymentDTO.getPeriod() == vo.getPeriod()) {
 								dto = tdPlatformPlanRepaymentDTO;
-								continue;
+								break;
 							}
 						}
 						double amount = dto.getAmount() == null ? 0 : dto.getAmount().doubleValue();
@@ -226,13 +226,13 @@ public class TdrepayRechargeController {
 						double otherAmount = dto.getOtherAmount() == null ? 0 : dto.getOtherAmount().doubleValue();
 						double total = amount + interestAmount + depositAmount + guaranteeAmount + arbitrationAmount
 								+ orgAmount + tuandaiAmount + agencyAmount + otherAmount;
-						if (rechargeAmount > total) {
+						if (rechargeAmount > BigDecimal.valueOf(total).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()) {
 							return Result.error("-99",
 									"累计充值金额大于平台应还金额" + BigDecimal.valueOf(total).setScale(2, BigDecimal.ROUND_HALF_UP));
 						}
 					}
 				}
-			}
+			}*/
 
 			// 根据projectId查询平台还垫付信息
 			Map<String, com.ht.ussp.core.Result> resultMap = tdrepayRechargeService
@@ -751,8 +751,8 @@ public class TdrepayRechargeController {
 								double agencyAmount = vo.getAgencyAmount() == null ? 0
 										: vo.getAgencyAmount().doubleValue();
 
-								vo.setTotal(principalAndInterest + penaltyAmount + tuandaiAmount + orgAmount
-										+ guaranteeAmount + arbitrationAmount + agencyAmount);
+								vo.setTotal(BigDecimal.valueOf(principalAndInterest + penaltyAmount + tuandaiAmount + orgAmount
+										+ guaranteeAmount + arbitrationAmount + agencyAmount).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
 								tdGuaranteePaymentVOs.add(vo);
 							}
 						}

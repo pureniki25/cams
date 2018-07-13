@@ -15,6 +15,7 @@ import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetailBak;
 import com.hongte.alms.base.entity.RepaymentBizPlanListSynch;
 import com.hongte.alms.base.entity.RepaymentConfirmLog;
+import com.hongte.alms.base.entity.RepaymentConfirmPlatRepayLog;
 import com.hongte.alms.base.entity.RepaymentProjFactRepay;
 import com.hongte.alms.base.entity.RepaymentProjPlan;
 import com.hongte.alms.base.entity.RepaymentProjPlanBak;
@@ -37,6 +38,7 @@ import com.hongte.alms.base.mapper.RepaymentBizPlanListMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListSynchMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanMapper;
 import com.hongte.alms.base.mapper.RepaymentConfirmLogMapper;
+import com.hongte.alms.base.mapper.RepaymentConfirmPlatRepayLogMapper;
 import com.hongte.alms.base.mapper.RepaymentProjFactRepayMapper;
 import com.hongte.alms.base.mapper.RepaymentProjPlanBakMapper;
 import com.hongte.alms.base.mapper.RepaymentProjPlanListBakMapper;
@@ -122,6 +124,10 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 
     @Autowired
 	RepaymentBizPlanListSynchMapper repaymentBizPlanListSynchMapper ;
+    
+    @Autowired
+	RepaymentConfirmPlatRepayLogMapper repaymentConfirmPlatRepayLogMapper ;
+    
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Result revokeConfirm(String businessId, String afterId) throws Exception{
@@ -288,6 +294,11 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
                     .eq("plan_id", repaymentBizPlanBak.getPlanId())
                     .eq("confirm_log_id", repaymentBizPlanBak.getConfirmLogId()));
         }
+        
+        /*删除合规化还款调用记录 开始*/
+        repaymentConfirmPlatRepayLogMapper.delete(new EntityWrapper<RepaymentConfirmPlatRepayLog>().eq("confirm_log_id", log.getConfirmLogId()));
+        /*删除合规化还款调用记录 结束*/
+        
         log.deleteById();
 
         //撤销成功 通知分发中心

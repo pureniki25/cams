@@ -30,8 +30,8 @@ public class RenewalBusinessServiceImpl extends BaseServiceImpl<RenewalBusinessM
 	@Override
 	public Page<LoanExtListVO> listLoanExt(LoanExtListReq req) {
 		Page<LoanExtListVO> page = new Page<>(req.getPage(),req.getLimit());
-		List<LoanExtListVO> count = renewalBusinessMapper.listLoanExtCount(req);
-		page.setTotal(count.size());
+		int count = renewalBusinessMapper.listLoanExtCount(req);
+		page.setTotal(count);
 		List<LoanExtListVO> list = renewalBusinessMapper.listLoanExt(req);
 		page.setRecords(list);
 		return page;

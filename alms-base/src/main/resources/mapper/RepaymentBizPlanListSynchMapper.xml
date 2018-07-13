@@ -337,7 +337,7 @@
   </update>
   
   <update id="updateBasicBusinessCustomer">
-	  	UPDATE tb_repayment_biz_plan_list_synch t1,tb_basic_business_customer t2 SET 
+	  	UPDATE tb_repayment_biz_plan_list_synch t1,tb_basic_biz_customer t2 SET 
 		t1.phone_number_ext = t2.phone_number
 		WHERE 
 		t1.business_id_ext = t2.business_id 
