@@ -180,7 +180,7 @@ public class TdrepayRechargeController {
 
 		try {
 			// 根据标ID和期数查询资金分发记录，与平台当期应还金额对比，若大于平台金额，则不允许资金分发
-			List<TdrepayRechargeLog> rechargeLogs = tdrepayRechargeLogService
+			/*List<TdrepayRechargeLog> rechargeLogs = tdrepayRechargeLogService
 					.selectList(new EntityWrapper<TdrepayRechargeLog>().eq("project_id", vo.getProjectId())
 							.eq("after_id", vo.getAfterId()).eq("is_valid", 1));
 			double rechargeAmount = vo.getRechargeAmount().doubleValue();
@@ -232,7 +232,7 @@ public class TdrepayRechargeController {
 						}
 					}
 				}
-			}
+			}*/
 
 			// 根据projectId查询平台还垫付信息
 			Map<String, com.ht.ussp.core.Result> resultMap = tdrepayRechargeService
