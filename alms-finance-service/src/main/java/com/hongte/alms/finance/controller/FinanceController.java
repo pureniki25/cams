@@ -517,7 +517,8 @@ public class FinanceController {
 		logger.info("@confirmRepayment@确认还款拆标情况--开始[{}]",req);
 		try {
 			List<CurrPeriodProjDetailVO> detailVOs = shareService.execute(req, true);
-			moneyPoolService.confirmRepaidUpdateMoneyPool(req);
+			/*以下注释代码移到ShareProfitServiceImpl.sortRepaymentResource内*/
+//			moneyPoolService.confirmRepaidUpdateMoneyPool(req);
 			result = Result.success(detailVOs);
 			Thread t = new Thread(new Runnable() {
 				
