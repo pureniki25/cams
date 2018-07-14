@@ -241,7 +241,7 @@ public class CustomerRepayFlowServiceImpl implements CustomerRepayFlowService {
                     confirmRepaymentReq.setBusinessId(moneyPoolRepayment.getOriginalBusinessId());
                     confirmRepaymentReq.setAfterId(moneyPoolRepayment.getAfterId());
                     List<String> mr = new ArrayList<>(1);
-                    mr.add(moneyPoolRepayment.getMoneyPoolId());
+                    mr.add(String.valueOf(moneyPoolRepayment.getId()));
                     confirmRepaymentReq.setMprIds(mr);
                     List<Integer> repaySource = new ArrayList<>(1);
                     repaySource.add(10); //10：线下转账，20：线下代扣，30：银行代扣,11:用往期结余还款
@@ -298,7 +298,7 @@ public class CustomerRepayFlowServiceImpl implements CustomerRepayFlowService {
                                         confirmRepaymentReq.setBusinessId(repaymentBizPlan.getBusinessId());
                                         confirmRepaymentReq.setAfterId(repaymentBizPlan.getAfterId());
                                         List<String> mr = new ArrayList<>(1);
-                                        mr.add(moneyPoolRepayment.getMoneyPoolId());
+                                        mr.add(String.valueOf(moneyPoolRepayment.getId()));
                                         confirmRepaymentReq.setMprIds(mr);
                                         List<Integer> repaySource = new ArrayList<>(1);
                                         repaySource.add(10); //10：线下转账，20：线下代扣，30：银行代扣,11:用往期结余还款
