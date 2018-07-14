@@ -9,7 +9,9 @@ public enum SysRoleAreaTypeEnums {
 
 	OVERALL(1,"全局的角色")
 	,AREA(2,"区域的角色")
-	,ONLY_SELF(3,"只查看自己跟进的")
+	,ONLY_SELF(3,"只查看自己跟进的")  //根据电催、催收设置
+	,SEE_CAR_BUSINESS(4,"只查看车贷业务")
+	,SEE_HOURSE_BUSINESS(5,"只查看房贷业务")
 	;
 
 
