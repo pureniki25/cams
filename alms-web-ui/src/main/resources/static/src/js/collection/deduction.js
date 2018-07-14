@@ -120,7 +120,13 @@ var layer;
 //			vm.$Modal.error({content: '共借标不能银行代扣'});
 //		   return;
 //		}
+		
 	    vm.loading = true;
+	    if(vm.platformId==''){debugger
+			   vm.$Modal.error({content:"代扣平台不能为空"});
+		   vm.loading = false;
+		   return;
+		   }
 		var isAmountWithheld="false";
 		if(vm.ajax_data.total<vm.ajax_data.restAmount){
 			isAmountWithheld="true";//部分代扣
