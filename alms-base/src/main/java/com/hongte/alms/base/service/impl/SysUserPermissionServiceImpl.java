@@ -138,16 +138,38 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
             }
 
         }
-        List<String>  businessIds = new LinkedList<>();
+//        DH_MANGER(1,"贷后管理页")
+//                ,FINANCE_MANAGER(2,"财务管理页面")
+//                ,DERATE_MANAGER(3,"减免管理页面")
+//        	,PROCESS_MANAGER(4,"审批查询界面")
+
+        //贷后管理页面   可见的业务列表
+        List<String>  dhManagerBusinessIds = new LinkedList<>();
+
+        //财务管理页面  可见的业务列表
+        List<String> financeManagerBusinessIds = new LinkedList<>();
+
+        //减免管理页面  可见的业务列表
+        List<String> derateManagerBusinessIds = new LinkedList<>();
+
+        //审批查询页面  可见的业务列表
+        List<String> processManagerBusinessIds = new LinkedList<>();
+
+
         if(hasOverAllRole){
             //拥有全局性角色
-            businessIds = basicBusinessService.selectAllBusinessIds();
+            dhManagerBusinessIds = basicBusinessService.selectAllBusinessIds();
+            financeManagerBusinessIds = dhManagerBusinessIds;
+            derateManagerBusinessIds = dhManagerBusinessIds;
+            processManagerBusinessIds = dhManagerBusinessIds;
         }else{
             if(hasAreaRole){
                 //拥有区域性角色
                 Map<String,BasicCompany> companyIds  = basicCompanyService.selectAreaUserCanSeeCompany(userId);
                 List<String>  tempBizs = basicBusinessService.selectCompanysBusinessIds(new LinkedList<>(companyIds.keySet()));
-                businessIds.addAll(tempBizs);
+                dhManagerBusinessIds.addAll(tempBizs);
+                derateManagerBusinessIds.addAll(tempBizs);
+
             }
 
             if(hasFinanceOrderSetAreaRole){
@@ -158,7 +180,7 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
                 if (financialOrderVOPage != null && financialOrderVOPage.getRecords() != null && financialOrderVOPage.getRecords().size() > 0) {
                     for (SysFinancialOrderVO fo : financialOrderVOPage.getRecords()) {
                         List<String> tempBusinessIds = basicBusinessService.findBusinessIds(fo.getCompanyId(), fo.getBusinessTypeId());
-                        businessIds.addAll(tempBusinessIds);
+                        financeManagerBusinessIds.addAll(tempBusinessIds);
                     }
                 }
             }
@@ -166,18 +188,18 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
             if(hasSeeCarBizRole){
                 //拥有车贷业务查看角色(车贷出纳)
                 List<String>  tempBizs = basicBusinessService.selectCarBusinessIds();
-                businessIds.addAll(tempBizs);
+                derateManagetBusinessIds.addAll(tempBizs);
             }
 
             if(hasSeeHourseBizRole){
                 //拥有房贷业务查看角色(房贷出纳)
                 List<String>  tempBizs = basicBusinessService.selectHouseBusinessIds();
-                businessIds.addAll(tempBizs);
+                derateManagetBusinessIds.addAll(tempBizs);
             }
 
             //查找用户跟进的业务ID(根据催收分配表  tb_collection_status 来查找)
             List<String> followBids =  collectionStatusService.selectFollowBusinessIds(userId);
-            businessIds.addAll(followBids);
+            dhManagerBusinessIds.addAll(followBids);
 
         }
         //去除重复的业务Id
