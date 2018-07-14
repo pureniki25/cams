@@ -131,6 +131,21 @@ public interface BasicBusinessMapper extends SuperMapper<BasicBusiness> {
      * @author 张贵宏
      */
     List<String> findBusinessIds(@Param("companyId") String companyId, @Param("businessType") Integer businessType);
+
+
+	/**
+	 * 查询所有业务Id
+	 * @return
+	 */
+	List<String> selectAllBusinessIds();
+
+	/**
+	 * 根据业务类型列表查出业务列表
+	 * @return
+	 */
+	List<String> selectBusinessIdsByBizType(@Param("bizTypes") List<Integer> bizTypes);
+
+
 }
 
 

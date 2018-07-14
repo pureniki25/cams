@@ -37,6 +37,10 @@ window.layinit(function (htConfig) {
                         return "区域性";
                     }else  if(d.roleAreaType == 3){
                         return "只查看自己跟进";
+                    }else  if(d.roleAreaType == 4){
+                        return "只查看车贷业务";
+                    }else  if(d.roleAreaType == 5){
+                        return "只查看房贷业务";
                     }else{
                         return "未定义的类型";
                     }

@@ -43,4 +43,11 @@ public interface BasicCompanyService extends BaseService<BasicCompany> {
     public List<String> selectSearchComids(List<String> areas, List<String> comIds);
 
     public Map<String, BasicCompany> selectUserCanSeeCompany(String userId);
+
+    /**
+     * 根据用户区域配置查询出用户可看的公司列表
+     * @param userId
+     * @return
+     */
+    public Map<String,BasicCompany> selectAreaUserCanSeeCompany(String userId);
 }

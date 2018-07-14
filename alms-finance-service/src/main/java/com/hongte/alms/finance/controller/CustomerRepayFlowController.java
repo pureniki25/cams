@@ -91,34 +91,34 @@ public class CustomerRepayFlowController {
         }
     }
 
+//    @ApiOperation(value = "导出客户流水excel")
+//    @PostMapping("/downloadCustomerFlowExcel")
+//    @ResponseBody
+//    public Result downloadCustomerFlowExcel(CustomerRepayFlowListReq customerRepayFlowListReq) {
+//        LOGGER.info("====>>>>>导出客户流水excel开始[{}]", JSON.toJSONString(customerRepayFlowListReq));
+//        Result result = null;
+//        try {
+//
+//            List<CustomerRepayFlowExel> customerRepayFlowList = moneyPoolRepaymentService.getCustomerRepayFlowList(customerRepayFlowListReq);
+//            Workbook workbook = ExcelExportUtil.exportExcel(new ExportParams(), CustomerRepayFlowExel.class, customerRepayFlowList);
+//
+//
+//            String ossUrl = customerRepayFlowService.customerFlowExcelWorkBook(workbook);
+//            result = Result.success(ossUrl);
+//        } catch (ServiceRuntimeException se) {
+//            result = Result.error(se.getErrorCode(), se.getMessage());
+//            LOGGER.error("====>>>>>导出客户流水excel出错{}", se.getMessage());
+//        } catch (Exception e) {
+//            result = Result.error("500", "导出客户流水出错");
+//            LOGGER.error("====>>>>>导出客户流水excel出错{}", e);
+//        }
+//
+//        LOGGER.info("====>>>>>导出客户流水excel结束{}", result);
+//        return result;
+//    }
+
     @ApiOperation(value = "导出客户流水excel")
     @PostMapping("/downloadCustomerFlowExcel")
-    @ResponseBody
-    public Result downloadCustomerFlowExcel(CustomerRepayFlowListReq customerRepayFlowListReq) {
-        LOGGER.info("====>>>>>导出客户流水excel开始[{}]", JSON.toJSONString(customerRepayFlowListReq));
-        Result result = null;
-        try {
-
-            List<CustomerRepayFlowExel> customerRepayFlowList = moneyPoolRepaymentService.getCustomerRepayFlowList(customerRepayFlowListReq);
-            Workbook workbook = ExcelExportUtil.exportExcel(new ExportParams(), CustomerRepayFlowExel.class, customerRepayFlowList);
-
-
-            String ossUrl = customerRepayFlowService.customerFlowExcelWorkBook(workbook);
-            result = Result.success(ossUrl);
-        } catch (ServiceRuntimeException se) {
-            result = Result.error(se.getErrorCode(), se.getMessage());
-            LOGGER.error("====>>>>>导出客户流水excel出错{}", se.getMessage());
-        } catch (Exception e) {
-            result = Result.error("500", "导出客户流水出错");
-            LOGGER.error("====>>>>>导出客户流水excel出错{}", e);
-        }
-
-        LOGGER.info("====>>>>>导出客户流水excel结束{}", result);
-        return result;
-    }
-
-    @ApiOperation(value = "导出客户流水excel")
-    @PostMapping("/downloadExcel")
     @ResponseBody
     public void downloadExcel(CustomerRepayFlowListReq customerRepayFlowListReq, HttpServletResponse response) {
         LOGGER.info("====>>>>>导出客户流水excel开始[{}]", JSON.toJSONString(customerRepayFlowListReq));
