@@ -148,8 +148,7 @@ public class RechargeServiceImpl implements RechargeService {
 	@Value("${tuandai_org_username}")
 	private String orgUserName;
 
-	@Value("${tuandai_org_userid}")
-	private String rechargeUserId;
+
 
 	@Value("${yibao.merchantaccount}")
 	private String merchantaccount;
@@ -1244,8 +1243,8 @@ public class RechargeServiceImpl implements RechargeService {
 	public void getYBResult(WithholdingRepaymentLog log) {
 		YiBaoRechargeReqDto dto = new YiBaoRechargeReqDto();
 		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("merchantaccount", merchantaccount);
-		paramMap.put("orderid", log.getLogId());
+		paramMap.put("merchantaccount", log.getMerchantAccount());
+		paramMap.put("orderid", log.getMerchOrderId());
 		//获取借款日期
 		TuandaiProjectInfo tuandaiProjectInfo = tuandaiProjectInfoService.selectOne(
 				new EntityWrapper<TuandaiProjectInfo>().eq("business_id", log.getOriginalBusinessId()));

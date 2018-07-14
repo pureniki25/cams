@@ -275,4 +275,35 @@ public class AliyunHelper {
 	public String getReadUrl() {
 		return readUrl;
 	}
+
+	public void downObjectGbk(String downloadFile, String key, HttpServletResponse response) {
+		try {
+			// 创建OSSClient实例
+			initOSSClient();
+
+			OSSObject ossObject = ossClient.getObject(ossBucketName, key);
+			BufferedInputStream in = new BufferedInputStream(ossObject.getObjectContent());
+
+			BufferedOutputStream out = new BufferedOutputStream(response.getOutputStream());
+
+			// 通知浏览器以附件形式下载
+			response.setHeader("Content-Disposition",
+					"attachment;filename=" +new String(downloadFile.getBytes("gbk"), "iso8859-1")+".xls" );
+			response.setHeader("Content-Type", "application/octet-stream");
+
+			byte[] car = new byte[1024];
+			int count = 0;
+			while ((count = in.read(car)) != -1) {
+				out.write(car, 0, count);
+
+			}
+			out.flush();
+			out.close();
+			in.close();
+			ossClient.shutdown();
+		} catch (Exception e) {
+			LOGGER.error("下载附件失败！", e);
+			throw new ServiceException("下载附件失败！", e);
+		}
+	}
 }
