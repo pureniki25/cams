@@ -327,7 +327,6 @@
                 ELSE  to_days(pList.fact_repay_date)- to_days(pList.due_date)
                 end
             ]]>
-
         )as delayDays,
 
         pList.due_date as dueDate,

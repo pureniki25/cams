@@ -15,7 +15,6 @@ import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetailBak;
 import com.hongte.alms.base.entity.RepaymentBizPlanListSynch;
 import com.hongte.alms.base.entity.RepaymentConfirmLog;
-import com.hongte.alms.base.entity.RepaymentConfirmPlatRepayLog;
 import com.hongte.alms.base.entity.RepaymentProjFactRepay;
 import com.hongte.alms.base.entity.RepaymentProjPlan;
 import com.hongte.alms.base.entity.RepaymentProjPlanBak;
