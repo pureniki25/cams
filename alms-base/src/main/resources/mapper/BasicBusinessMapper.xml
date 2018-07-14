@@ -281,6 +281,29 @@
         </if>
     </select>
 
+    <select id="selectAllBusinessIds" resultType="java.lang.String">
+        select business_id as businessId
+        from tb_basic_business
+        WHERE 1=1
+    </select>
+
+
+	<select id="selectBusinessIdsByBizType" resultType="java.lang.String">
+		select business_id as businessId
+		from tb_basic_business
+		WHERE 1=1
+		<if test="bizTypes !=null">
+			AND  business_type IN
+			<foreach collection="bizTypes" item="bizType" index="index"
+					 open="(" close=")" separator=",">
+				#{bizType}
+			</foreach>
+		</if>
+
+
+	</select>
+
+
 
     <!-- 一次性收取的分公司费用 -->
 	<select id="getPreCharge" resultType="java.lang.Double">

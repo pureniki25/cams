@@ -214,6 +214,31 @@ public class BasicCompanyServiceImpl extends BaseServiceImpl<BasicCompanyMapper,
     }
 
 
+    /**
+     * 根据用户区域配置查询出用户可看的公司列表
+     * @param userId
+     * @return
+     */
+    public Map<String,BasicCompany> selectAreaUserCanSeeCompany(String userId){
+        Map<String,BasicCompany> companys = new HashMap<>();
+        //查出已经匹配好的用户分公司信息
+        List<String> userAreas = sysUserAreaService.selectUserAreas(userId);
+        //没有配置的区域
+        if(userAreas.size()==0){
+//            LoginInfoDto  loginInfoDto = loginUserInfoHelper.getLoginInfo();
+//            if(loginInfoDto!=null){
+//                String OrgCode = loginInfoDto.getDdOrgCode();
+//            }
+//                    if(loginUserInfoHelper.getLoginInfo())
+            return companys;
+        }
+        //根据用户区域信息 整理出排重的公司列表
+        //根据配置好的用户区域信息查询是分公司及其所有子公司区域 zgh
+        companys  = selectCompanysMapByAreaId(userAreas);
+
+        return companys;
+    }
+
 
 //    @Override
     public Map<String, BasicCompany> selectUserCanSeeCompany(String userId) {
