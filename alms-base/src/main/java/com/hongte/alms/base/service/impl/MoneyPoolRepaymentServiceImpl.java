@@ -78,6 +78,18 @@ public class MoneyPoolRepaymentServiceImpl extends BaseServiceImpl<MoneyPoolRepa
         if (!StringUtil.isEmpty(customerName)) {
             customerRepayFlowListReq.setCustomerName("%" + customerName + "%");
         }
+        // 1 未审核 2 已审核 3 拒绝
+        //未审核_未关联银行流水", "审核_财务确认已还款", "拒绝_还款登记被财务拒绝
+        String state=customerRepayFlowListReq.getState();
+        if(!StringUtil.isEmpty(state)){
+            if("1".equals(state)){
+                customerRepayFlowListReq.setState(RepayRegisterFinanceStatus.未关联银行流水.toString());
+            }else if("2".equals(state)){
+                customerRepayFlowListReq.setState(RepayRegisterFinanceStatus.财务确认已还款.toString());
+            }else if("3".equals(state)){
+                customerRepayFlowListReq.setState(RepayRegisterFinanceStatus.还款登记被财务拒绝.toString());
+            }
+        }
         return moneyPoolRepaymentMapper.getCustomerRepayFlowList(customerRepayFlowListReq);
 
     }

@@ -24,6 +24,19 @@ var getSelectsData = function () {
             vm.$Modal.error({content: '接口调用异常!'});
         });
 }
+var postDownLoadFile = function (options) {
+    var config = $.extend(true, {method: 'post'}, options);
+    var $iframe = $('<iframe id="down-file-iframe" />');
+    var $form = $('<form target="down-file-iframe" method="' + config.method + '" />');
+    $form.attr('action', config.url);
+    for (var key in config.data) {
+        $form.append('<input type="hidden" name="' + key + '" value="' + config.data[key] + '" />');
+    }
+    $iframe.append($form);
+    $(document.body).append($iframe);
+    $form[0].submit();
+    $iframe.remove();
+}
 window.layinit(function (htConfig) {
     var _htConfig = htConfig;
     financePath = _htConfig.financeBasePath;
@@ -135,14 +148,14 @@ window.layinit(function (htConfig) {
                             {
                                 field: 'accountMoney',
                                 title: '转账金额',
-                                templet:function(d){
-                                   return numeral(d.accountMoney).format('0,0.00')
+                                templet: function (d) {
+                                    return numeral(d.accountMoney).format('0,0.00')
                                 }
                             },
                             {
                                 field: 'totalBorrowAmount',
                                 title: '本期应还金额',
-                                templet:function(d){
+                                templet: function (d) {
                                     return numeral(d.totalBorrowAmount).format('0,0.00')
                                 }
                             },
@@ -166,10 +179,10 @@ window.layinit(function (htConfig) {
                                 field: 'certificatePictureUrl',
                                 title: '转账凭证',
                                 templet: function (d) {
-                                    var content="";
-                                    var url=d.certificatePictureUrl;
-                                    if(url !=null){
-                                        content= "<a href="+url+" style='color:#1E90FF;text-decoration:underline;' target='dialog' width='600'>查看</a>"
+                                    var content = "";
+                                    var url = d.certificatePictureUrl;
+                                    if (url != null) {
+                                        content = "<a href=" + url + " style='color:#1E90FF;text-decoration:underline;' target='dialog' width='600'>查看</a>"
                                     }
 
                                     return content
@@ -218,7 +231,7 @@ window.layinit(function (htConfig) {
                         console.log("obj.event", obj.event);
                         if (obj.event === 'audit') {
                             console.log("选择的行数据：", selectedRowInfo);
-                            if(selectedRowInfo.state != '未关联银行流水'){
+                            if (selectedRowInfo.state != '未关联银行流水') {
                                 vm.$Modal.error({content: "只能对未审核的数据进行审核"});
                                 return;
                             }
@@ -226,7 +239,7 @@ window.layinit(function (htConfig) {
                         } else if (obj.event === 'reject') {
 
                             console.log("选择的行数据：", selectedRowInfo);
-                            if(selectedRowInfo.state != '未关联银行流水'){
+                            if (selectedRowInfo.state != '未关联银行流水') {
                                 vm.$Modal.error({content: "只能对未审核的数据进行拒绝"});
                                 return;
                             }
@@ -242,32 +255,48 @@ window.layinit(function (htConfig) {
             handleReset(name) { // 重置表单
                 var tt = this.$refs[name];
                 tt.resetFields();
-                this.searchForm.accountStartTimeV='';
-                this.searchForm.accountEndTimeV='';
-                this.searchForm.regStartTimeV='';
-                this.searchForm.regEndTimeV='';
-
+                this.searchForm.accountStartTimeV = '';
+                this.searchForm.accountEndTimeV = '';
+                this.searchForm.regStartTimeV = '';
+                this.searchForm.regEndTimeV = '';
 
 
                 vm.toLoading();
             },
             ////  ----   单行操作界面显示  结束 -----------------
-            clickExport() {//导出Excel表格
+            clickExport: function () {//导出Excel表格
+                var self = this;
+                console.log("vm", self.searchForm);
+                console.log("self.searchForm.state=", self.searchForm.state);
 
-                layui.use(['layer', 'table', 'ht_config'], function () {
-                    // vm.$refs['searchForm'].validate((valid) => {
-                    //     if (valid) {
-                    // getData();
-                    // vm.exporting = true;
-                    var excelName = encodeURI("客户还款登记流水");
-                    expoertExcel(financePath + "customer/downloadCustomerFlowExcel", vm.searchForm, excelName + ".xls");
+                var cookie = layui.ht_cookie;
 
-                    // vm.exporting = false;
+                // layui.use(['layer', 'table', 'ht_config'], function () {
+                //     // vm.$refs['searchForm'].validate((valid) => {
+                //     //     if (valid) {
+                //     // getData();
+                //     // vm.exporting = true;
+                //     var excelName = "客户还款流水";
+                //     expoertExcel(financePath + "customer/downloadCustomerFlowExcel", self.searchForm, excelName + ".xls");
+                //
+                //     // vm.exporting = false;
+                //
+                //     // }
+                //     // })
+                // });
 
-                    // }
-                    // })
-                });
+                postDownLoadFile({
+                    url: financePath + "customer/downloadExcel",
+                    data: self.searchForm,
+                    method: 'post',
+                    headers: {
+                        app:"ALMS",
+                        Authorization:"Bearer "+cookie.getToken()
+                    },
+                })
             },
+
+
             beforeUpLoadFile() {//导入Excel表格
 
 
@@ -292,15 +321,15 @@ window.layinit(function (htConfig) {
                 layer.confirm('确认审核通过该流水吗？', {icon: 3, title: '提示'}, function (index) {
                     var checkStatus = table.checkStatus('listTable'); //test即为基础参数id对应的值
                     var ids = "";
-                   console.log("id=",id);
-                    if (id != '' && id !=undefined) {
+                    console.log("id=", id);
+                    if (id != '' && id != undefined) {
                         ids = id;
-                        console.log("ids=",ids);
+                        console.log("ids=", ids);
                     } else {
                         for (i = 0, len = checkStatus.data.length; i < len; i++) {
                             ids += checkStatus.data[i].id + ","
                         }
-                        console.log("else ids=",ids);
+                        console.log("else ids=", ids);
                     }
                     var url = financePath + "customer/auditOrRejectCustomerFlow";
 
@@ -330,7 +359,7 @@ window.layinit(function (htConfig) {
                     var checkStatus = table.checkStatus('listTable'); //test即为基础参数id对应的值
                     var ids = "";
 
-                    if (id != '' && id !=undefined) {
+                    if (id != '' && id != undefined) {
                         ids = id;
                     } else {
                         for (i = 0, len = checkStatus.data.length; i < len; i++) {
@@ -380,21 +409,21 @@ window.layinit(function (htConfig) {
         }
     });
 
-   // var  delayDaysBegin: [
-   //      {pattern: '/^[0-9]*$/', message: '请输入数字',trigger: 'blur'  },
-   //      {
-   //          validator: function (rule, value, callback, source, options) {
-   //              if(vm.searchForm.delayDaysBegin!=""&& vm.searchForm.delayDaysEnd!=""){
-   //                  if (parseInt(vm.searchForm.delayDaysBegin) > parseInt(vm.searchForm.delayDaysEnd)) {
-   //                      callback(new Error('起始值大于结束值'));
-   //                  } else {
-   //                      callback();//校验通过
-   //                  }
-   //              }else{
-   //                  callback();
-   //              }
-   //
-   //          }, trigger: 'blur'
-   //      }
-   //  ],
+    // var  delayDaysBegin: [
+    //      {pattern: '/^[0-9]*$/', message: '请输入数字',trigger: 'blur'  },
+    //      {
+    //          validator: function (rule, value, callback, source, options) {
+    //              if(vm.searchForm.delayDaysBegin!=""&& vm.searchForm.delayDaysEnd!=""){
+    //                  if (parseInt(vm.searchForm.delayDaysBegin) > parseInt(vm.searchForm.delayDaysEnd)) {
+    //                      callback(new Error('起始值大于结束值'));
+    //                  } else {
+    //                      callback();//校验通过
+    //                  }
+    //              }else{
+    //                  callback();
+    //              }
+    //
+    //          }, trigger: 'blur'
+    //      }
+    //  ],
 });

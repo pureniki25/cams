@@ -15,6 +15,7 @@ import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetailBak;
 import com.hongte.alms.base.entity.RepaymentBizPlanListSynch;
 import com.hongte.alms.base.entity.RepaymentConfirmLog;
+import com.hongte.alms.base.entity.RepaymentConfirmPlatRepayLog;
 import com.hongte.alms.base.entity.RepaymentProjFactRepay;
 import com.hongte.alms.base.entity.RepaymentProjPlan;
 import com.hongte.alms.base.entity.RepaymentProjPlanBak;
@@ -23,6 +24,7 @@ import com.hongte.alms.base.entity.RepaymentProjPlanListBak;
 import com.hongte.alms.base.entity.RepaymentProjPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentProjPlanListDetailBak;
 import com.hongte.alms.base.entity.RepaymentResource;
+import com.hongte.alms.base.entity.SysApiCallFailureRecord;
 import com.hongte.alms.base.enums.RepayedFlag;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.SectionRepayStatusEnum;
@@ -37,6 +39,7 @@ import com.hongte.alms.base.mapper.RepaymentBizPlanListMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListSynchMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanMapper;
 import com.hongte.alms.base.mapper.RepaymentConfirmLogMapper;
+import com.hongte.alms.base.mapper.RepaymentConfirmPlatRepayLogMapper;
 import com.hongte.alms.base.mapper.RepaymentProjFactRepayMapper;
 import com.hongte.alms.base.mapper.RepaymentProjPlanBakMapper;
 import com.hongte.alms.base.mapper.RepaymentProjPlanListBakMapper;
@@ -47,6 +50,7 @@ import com.hongte.alms.base.mapper.RepaymentProjPlanMapper;
 import com.hongte.alms.base.mapper.RepaymentResourceMapper;
 import com.hongte.alms.base.service.MoneyPoolService;
 import com.hongte.alms.base.service.RepaymentConfirmLogService;
+import com.hongte.alms.base.service.SysApiCallFailureRecordService;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
@@ -54,7 +58,9 @@ import com.hongte.alms.common.util.DateUtil;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,6 +128,13 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 
     @Autowired
 	RepaymentBizPlanListSynchMapper repaymentBizPlanListSynchMapper ;
+    
+    @Autowired
+	RepaymentConfirmPlatRepayLogMapper repaymentConfirmPlatRepayLogMapper ;
+    
+    @Autowired
+    @Qualifier("SysApiCallFailureRecordService")
+	SysApiCallFailureRecordService sysApiCallFailureRecordService ;
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Result revokeConfirm(String businessId, String afterId) throws Exception{
@@ -149,28 +162,34 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
                         .orderBy("proj_plan_list_id"));
 
             PlatformRepaymentReq platformRepaymentReq=new PlatformRepaymentReq();
+            Set<String> projectIds = new HashSet<>() ;
         if (factRepays != null) {
-            RepaymentProjFactRepay repaymentProjFactRepay = factRepays.get(0);
-            RepaymentBizPlanList repaymentBizPlanList= repaymentBizPlanLists.get(0);
+        	for (RepaymentProjFactRepay repaymentProjFactRepay : factRepays) {
+				projectIds.add(repaymentProjFactRepay.getProjectId());
+			}
+        	for (String projectId : projectIds) {
+                RepaymentBizPlanList repaymentBizPlanList= repaymentBizPlanLists.get(0);
 
-            platformRepaymentReq.setProjectId(repaymentProjFactRepay.getProjectId());
-            platformRepaymentReq.setConfirmLogId(repaymentBizPlanList.getPlanListId());
-            Result<List<PlatformRepaymentDto>> listResult = platformRepaymentFeignClient.queryTdrepayRechargeRecord(platformRepaymentReq);
+                platformRepaymentReq.setProjectId(projectId);
+                platformRepaymentReq.setPlanListId(repaymentBizPlanList.getPlanListId());
+                Result<List<PlatformRepaymentDto>> listResult = platformRepaymentFeignClient.queryTdrepayRechargeRecord(platformRepaymentReq);
 
 
-            logger.info("=========查询是否有资金分发结果{}",JSON.toJSONString(listResult));
-            if("1".equals(listResult.getCode())){
-                List<PlatformRepaymentDto> data = listResult.getData();
-                if(!CollectionUtils.isEmpty(data)){
-                    for(PlatformRepaymentDto platformRepaymentDto : data){
-                        if(repaymentBizPlanList.getPlanListId().equals(platformRepaymentDto.getConfirmLogId())){ //planlistId相等
-                            if(platformRepaymentDto.getProcessStatus()==1 || platformRepaymentDto.getProcessStatus()==2){
-                                throw new ServiceRuntimeException("已分发记录不能被撤销");
+                logger.info("=========查询是否有资金分发结果{}",JSON.toJSONString(listResult));
+                if("1".equals(listResult.getCode())){
+                    List<PlatformRepaymentDto> data = listResult.getData();
+                    if(!CollectionUtils.isEmpty(data)){
+                        for(PlatformRepaymentDto platformRepaymentDto : data){
+                            if(repaymentBizPlanList.getPlanListId().equals(platformRepaymentDto.getConfirmLogId())){ //planlistId相等
+                                if(platformRepaymentDto.getProcessStatus()==1 || platformRepaymentDto.getProcessStatus()==2){
+                                    throw new ServiceRuntimeException("已分发记录不能被撤销");
+                                }
                             }
                         }
                     }
                 }
-            }
+			}
+            
         }
 		/*找结余记录*/
         if (log.getSurplusRefId() != null) {
@@ -288,15 +307,31 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
                     .eq("plan_id", repaymentBizPlanBak.getPlanId())
                     .eq("confirm_log_id", repaymentBizPlanBak.getConfirmLogId()));
         }
+        
+        /*删除合规化还款调用记录 开始*/
+        for (String projectId : projectIds) {
+        	//撤销成功 通知分发中心
+            try{
+            	platformRepaymentReq.setProjectId(projectId);
+                Result revokeListResult = platformRepaymentFeignClient.revokeTdrepayRecharge(platformRepaymentReq);
+                logger.info("=========通知分发中心已经撤销{}",JSON.toJSONString(revokeListResult));
+            }catch (Exception e){
+                logger.error("=========通知分发中心已经撤销出错{}",e);
+                throw new ServiceRuntimeException("通知分发中心已经撤销出错");
+            }
+		}
+        
+        
+        List<RepaymentConfirmPlatRepayLog> repaymentConfirmPlatRepayLogs = repaymentConfirmPlatRepayLogMapper.selectList(new EntityWrapper<RepaymentConfirmPlatRepayLog>().eq("confirm_log_id", log.getConfirmLogId()));
+        for (RepaymentConfirmPlatRepayLog repaymentConfirmPlatRepayLog : repaymentConfirmPlatRepayLogs) {
+        	String projPlanListId = repaymentConfirmPlatRepayLog.getProjPlanListId() ;
+        	sysApiCallFailureRecordService.delete(new EntityWrapper<SysApiCallFailureRecord>().eq("ref_id", projPlanListId)) ;
+        	repaymentConfirmPlatRepayLog.deleteById();
+		}
+        /*删除合规化还款调用记录 结束*/
         log.deleteById();
 
-        //撤销成功 通知分发中心
-        try{
-            Result revokeListResult = platformRepaymentFeignClient.revokeTdrepayRecharge(platformRepaymentReq);
-            logger.info("=========通知分发中心已经撤销{}",JSON.toJSONString(revokeListResult));
-        }catch (Exception e){
-            logger.error("=========通知分发中心已经撤销出错{}",e);
-        }
+       
 
         return Result.success();
     }

@@ -45,60 +45,51 @@ public class RepaymentBizPlanListSynchController {
 	
 	@PostMapping("/synchDaihouData")
 	@ApiOperation(value = "贷后数据同步")
-	public Result<Integer> SynchDaihouData() {
-		
-//		msgThreadAsync.execute(new Runnable() {
-//			@Override
-//			public void run() {
-//			}
-//		});
-		Long startLongDate = new Date().getTime();
-		Long endLongDate = new Date().getTime();
-		if (logger.isDebugEnabled()) {
-			logger.debug("entering SynchDaihouData() 开始同步"+startLongDate);
-		}
-		//1循环取10000条插入
-		synchRepaymentBizPlanListAdd();
-		//2处理删除
-		synchRepaymentBizPlanListDel();
-		//3处理更新
-		//3-1处理tb_repayment_biz_plan_list表更新
-		synchRepaymentBizPlanList();
-		
-		//3-4处理tb_repayment_biz_plan表更新
-		//3-2处理tb_basic_businessg表更新
-		synchRepaymentBizPlan();
-		synchBasicBusinessg();
-		
-		//3-3处理tb_collection_status表更新
-		synchCollectionStatus();
-		
-		//3-5处理tb_five_level_classify_business_change_log表更新
-		synchFiveLevelClassifyBusinessChangeLog();
-		
-		//3-6处理tb_repayment_biz_plan表更新   
-		//synchBasicBusinessCustomer();
-		
-		//3-7处理tb_repayment_biz_plan_list_detail表更新
-		synchRepaymentBizPlanListDetail();
-		
-		//3-8处理tb_basic_company表更新
-		synchBasicCompany();
-		
-		//3-9处理tb_tuandai_project_info表更新
-		synchTuandaiProjectInfo();
-		
-		//3-10处理tb_money_pool_repayment表更新
-		synchMoneyPoolRepayment();
-		
-		//3-11处理
-		
-		endLongDate = new Date().getTime();
-		if (logger.isDebugEnabled()) {
-			logger.debug("exiting SynchDaihouData() 同步结束 "+endLongDate);
-			logger.info("同步结束,耗时："+(endLongDate-startLongDate));
-		}
-		System.err.println("同步结束,耗时："+(endLongDate-startLongDate));
+	public Result<Integer> synchDaihouData() {
+		msgThreadAsync.execute(new Runnable() {
+			@Override
+			public void run() {
+				Long startLongDate = new Date().getTime();
+				// 1循环取10000条插入
+				synchRepaymentBizPlanListAdd();
+				// 2处理删除
+				synchRepaymentBizPlanListDel();
+				// 3处理更新
+				// 3-1处理tb_repayment_biz_plan_list表更新
+				synchRepaymentBizPlanList();
+
+				// 3-4处理tb_repayment_biz_plan表更新
+				// 3-2处理tb_basic_businessg表更新
+				synchRepaymentBizPlan();
+				synchBasicBusinessg();
+
+				// 3-3处理tb_collection_status表更新
+				synchCollectionStatus();
+
+				// 3-5处理tb_five_level_classify_business_change_log表更新
+				synchFiveLevelClassifyBusinessChangeLog();
+
+				// 3-6处理tb_repayment_biz_plan表更新
+				synchBasicBusinessCustomer();
+
+				// 3-7处理tb_repayment_biz_plan_list_detail表更新
+				synchRepaymentBizPlanListDetail();
+
+				// 3-8处理tb_basic_company表更新
+				synchBasicCompany();
+
+				// 3-9处理tb_tuandai_project_info表更新
+				synchTuandaiProjectInfo();
+
+				// 3-10处理tb_money_pool_repayment表更新
+				synchMoneyPoolRepayment();
+
+				// 3-11处理
+				Long endLongDate = new Date().getTime();
+				System.err.println("同步结束,耗时：" + (endLongDate - startLongDate));
+			}
+		});
+
 		return Result.success();
 	}
 

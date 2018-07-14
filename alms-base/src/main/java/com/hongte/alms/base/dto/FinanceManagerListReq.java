@@ -61,6 +61,11 @@ public class FinanceManagerListReq {
 	 * 当前操作人
 	 */
 	private String userId ;
+	
+	/**
+	 * 电话号码
+	 */
+	private String phoneNumber;
 	public String getCustomer() {
 		return customer;
 	}
@@ -175,4 +180,12 @@ public class FinanceManagerListReq {
 	public void setUserId(String userId) {
 		this.userId = userId;
 	}
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
+	
+	
 }

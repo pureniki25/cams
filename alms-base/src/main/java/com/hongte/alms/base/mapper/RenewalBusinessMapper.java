@@ -19,5 +19,5 @@ import com.hongte.alms.common.mapper.SuperMapper;
  */
 public interface RenewalBusinessMapper extends SuperMapper<RenewalBusiness> {
 	public List<LoanExtListVO> listLoanExt(@Param("loanExtReq")LoanExtListReq req);
-	public List<LoanExtListVO> listLoanExtCount(@Param("loanExtReq")LoanExtListReq req);
+	public int listLoanExtCount(@Param("loanExtReq")LoanExtListReq req);
 }
