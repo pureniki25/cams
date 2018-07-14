@@ -85,6 +85,20 @@ public class DownLoadController  implements Serializable {
 		LOG.info("@文件下载@下载Excel文件--结束[{}]","");
     }
 
+	@ApiOperation(value = "下载Excel GBK编码文件接口")
+	@RequestMapping("downLoadExcelGBK")
+	public void downLoadExcelGBK(@RequestParam("downloadFile") String downloadFile, @RequestParam("docUrl") String docUrl) {
+		LOG.info("@文件下载@下载Excel GBK文件--开始[{}]" , downloadFile);
+		ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder
+				.getRequestAttributes();
+		HttpServletResponse response = requestAttributes.getResponse();
+		docService.downloadGbk(downloadFile, docUrl, response);
+		//删除文件
+		ossClient.deleteObject(docUrl);
+		LOG.info("@文件下载@下载Excel GBK文件--结束[{}]","");
+	}
+
+
     @RequestMapping(value = "/download", method = RequestMethod.GET)
 	public void download(@RequestParam("downloadFile") String downloadFile, @RequestParam("docUrl") String docUrl) {
 		LOG.info("@文件下载@下载附件--开始[{}]" , downloadFile);
@@ -109,7 +123,7 @@ public class DownLoadController  implements Serializable {
     /**
 	 * 导出资金分发数据
 	 * 
-	 * @param infoVOs
+	 * @param
 	 */
 	@ApiOperation(value = "导出资金分发数据")
 	@PostMapping("/exportComplianceRepaymentData")

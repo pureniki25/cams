@@ -107,7 +107,7 @@ public class CustomerRepayFlowServiceImpl implements CustomerRepayFlowService {
             } else {
                 msg = "上传OSS不成功";
             }
-
+            tempFile.deleteOnExit();
 
         } catch (IOException e) {
             logger.error(e.getMessage());
