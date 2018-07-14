@@ -11,6 +11,7 @@ import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.service.*;
 import com.hongte.alms.base.vo.compliance.TdrepayRechargeInfoVO;
 import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.util.Constant;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -400,7 +401,7 @@ public class PlatformRepaymentController {
             BigDecimal planRepaymentRechargeAmount = BigDecimal.ZERO;
             Map<String, BigDecimal> planRepaymentMap = Maps.newHashMap();
             com.ht.ussp.core.Result ret = eipRemote.queryRepaymentSchedule(params);
-            if ("0000".equals(ret.getReturnCode()) && ret.getData() != null) {
+            if (Constant.REMOTE_EIP_SUCCESS_CODE.equals(ret.getReturnCode()) && ret.getData() != null) {
                 Map<String, Map<String, Object>> retMap = (Map<String, Map<String, Object>>) ret.getData();
                 if (retMap.containsKey("repaymentScheduleList")) {
                     List<Map<String, Object>> retList = (List<Map<String, Object>>) retMap.get("repaymentScheduleList");
@@ -454,12 +455,12 @@ public class PlatformRepaymentController {
                     }
                 }
             } else {
-                LOGGER.error("@对接合规还款接口@  通过外联平台eip调用团贷查询标的还款计划信息错误 输入参数 projectId:[{}]  afterId[{}] ", projPlan.getProjectId(), bizPlanList.getAfterId());
-                return Result.error("500", "通过外联平台eip调用团贷查询标的还款计划信息错误");
+                LOGGER.error("@对接合规还款接口@  通过外联平台eip(查询标的还款计划:/repayment/queryRepaymentSchedule)调用团贷查询标的还款计划错误 输入参数 projectPlanId:[{}] projectId:[{}]  afterId[{}] ", projPlanListId, projPlan.getProjectId(), bizPlanList.getAfterId());
+                return Result.error("500", "通过外联平台eip(查询标的还款计划:/repayment/queryRepaymentSchedule)调用团贷查询标的还款计划错误");
             }
             if (planRepaymentMap.size() == 0) {
-                LOGGER.error("@对接合规还款接口@  通过外联平台eip调用团贷查询标的还款计划信息错误，没有查到本期结果数据. 输入参数 projectId:[{}]  afterId[{}] ", projPlan.getProjectId(), bizPlanList.getAfterId());
-                return Result.error("500", "通过外联平台eip调用团贷查询标的还款计划信息错误，没有查到本期结果数据.");
+                LOGGER.error("@对接合规还款接口@  通过外联平台eip(查询标的还款计划:/repayment/queryRepaymentSchedule)调用团贷查询标的还款计划错误，没有查到本期结果数据. 输入参数 projectPlanId:[{}]  projectId:[{}]  afterId[{}] ", projPlanListId, projPlan.getProjectId(), bizPlanList.getAfterId());
+                return Result.error("500", "通过外联平台eip(查询标的还款计划:/repayment/queryRepaymentSchedule)调用团贷查询标的还款计划错误，没有查到本期结果数据.");
             }
 
             //三, 是否以垫付接口为准,否则以计划接口为准
@@ -468,13 +469,13 @@ public class PlatformRepaymentController {
             Map<String, BigDecimal> guaranteePaymentMap = Maps.newHashMap();
             //通过外联平台eip调用团贷标的还款计划信息查询接口：/repayment/queryProjectPayment
             com.ht.ussp.core.Result ret2 = eipRemote.queryProjectPayment(params);
-            if ("0000".equals(ret2.getReturnCode()) && ret2.getData() != null) {
+            if (Constant.REMOTE_EIP_SUCCESS_CODE.equals(ret2.getReturnCode()) && ret2.getData() != null) {
                 Map<String, Map<String, Object>> retMap = (Map<String, Map<String, Object>>) ret2.getData();
 
                 if (retMap.containsKey("projectPayments")) {
                     List<Map<String, Object>> retList = (List<Map<String, Object>>) retMap.get("projectPayments");
                     if (retList != null && retList.size() > 0) {
-
+                        //循环如果没有查询到本期的垫付记录按标还款计划来填值
                         for (Map<String, Object> map : retList) {
                             if (map.containsKey("period") && (projPlanList.getPeriod() != (Integer) map.get("period"))) {
                                 continue;
@@ -534,12 +535,13 @@ public class PlatformRepaymentController {
                     }
                 }
             } else {
-                LOGGER.error("@对接合规还款接口@  通过外联平台eip调用团贷标的还款计划信息查询接口错误 输入参数 projectId:[{}]  afterId[{}] ", projPlan.getProjectId(), bizPlanList.getAfterId());
-                return Result.error("500", "通过外联平台eip调用团贷标的还款计划信息查询接口错误");
+                LOGGER.error("@对接合规还款接口@  通过外联平台eip(标的还款信息查询接口:/repayment/queryProjectPayment)调用团贷标的标的还款信息查询接口错误 输入参数 projectPlanId:[{}] projectId:[{}]  afterId[{}] ", projPlanListId, projPlan.getProjectId(), bizPlanList.getAfterId());
+                return Result.error("500", "通过外联平台eip调用团贷标的还款信息查询接口错误");
             }
-            if (planRepaymentMap.size() == 0) {
-                LOGGER.error("@对接合规还款接口@  通过外联平台eip调用团贷标的还款计划信息查询接口错误，没有查到本期结果数据. 输入参数 projectId:[{}]  afterId[{}] ", projPlan.getProjectId(), bizPlanList.getAfterId());
-                return Result.error("500", "通过外联平台eip调用团贷标的还款计划信息查询接口错误，没有查到本期结果数据.");
+            if (guaranteePaymentMap.size() == 0) {
+                /*LOGGER.error("@对接合规还款接口@  通过外联平台eip调用团贷标的还款计划信息查询接口错误，没有查到本期结果数据. 输入参数projectPlanId:[{}] projectId:[{}]  afterId[{}] ", projPlanListId, projPlan.getProjectId(), bizPlanList.getAfterId());
+                return Result.error("500", "通过外联平台eip调用团贷标的还款计划信息查询接口错误，没有查到本期结果数据.");*/
+                //循环如果没有查询到本期的垫付记录按标还款计划来填值
             }
 
 
