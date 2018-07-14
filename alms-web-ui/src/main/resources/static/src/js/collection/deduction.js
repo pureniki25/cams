@@ -185,6 +185,9 @@ var layer;
                 	   vm.loading = false;
                     if(data.code=='1'){
                     	vm.$Modal.success({content:"执行代扣金额"+vm.ajax_data.repayAmount+"元成功，请稍后查询结果"});
+
+                        location.reload();
+
 		             }else{
 		                 vm.$Modal.error({content:data.msg});
 		             }
@@ -213,8 +216,13 @@ var layer;
 		       	   vm.loading = false;
 		             if(data.code=='1'){
 		                   	vm.$Modal.success({content:"执行代扣金额"+vm.ajax_data.repayAmount+"元成功，请稍后查询结果"});
+
+                            location.reload();
+
 		             }else{
 		                 vm.$Modal.error({content:data.data});
+		                 
+		                 
 		             }
 		        },
 		        error : function() {

@@ -322,4 +322,12 @@ public class DocServiceImpl extends BaseServiceImpl<DocMapper, Doc> implements D
     	ossClient.downObject(downloadFile, key, response);
 	}
 
+    @Override
+    public void downloadGbk(String downloadFile, String key, HttpServletResponse response) {
+        ossClient.downObjectGbk(downloadFile, key, response);
+    }
+
+
+
+
 }
