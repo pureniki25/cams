@@ -144,6 +144,10 @@ public class ShareProfitServiceImpl implements ShareProfitService {
     @Autowired
 	private RepaymentBizPlanListSynchMapper repaymentBizPlanListSynchMapper ;
     
+    @Autowired
+    @Qualifier("MoneyPoolService")
+	MoneyPoolService moneyPoolService ;
+    
     private ThreadLocal<String> businessId = new ThreadLocal<String>();
     private ThreadLocal<String> orgBusinessId = new ThreadLocal<String>();
     private ThreadLocal<String> afterId = new ThreadLocal<String>();
@@ -427,6 +431,10 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                 financeBaseDto.getRepaymentResources().add(repaymentResource);
 //                repaymentResources.get().add(repaymentResource);
             }
+            
+            if (financeBaseDto.getSave()) {
+            	moneyPoolService.confirmRepaidUpdateMoneyPool(req);
+			}
         }
 
         // repaySource {20：自动线下代扣已还款，21，人工线下代扣已还款，30：自动银行代扣已还款，31：人工银行代扣已还款}
