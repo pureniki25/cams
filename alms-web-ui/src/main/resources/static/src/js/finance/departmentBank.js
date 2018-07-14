@@ -143,6 +143,9 @@ let data = {
             title: '支行名',
             key: 'repaymentSubBank'
         }, {
+            title: '分公司',
+            key: 'deptId'
+        }, {
             title: '更新时间',
             key: 'updateTime'
         }, {
@@ -158,7 +161,21 @@ let data = {
                             size: 'small'
                         },
                         style: {
-                            marginRight: '5px'
+                            marginRight: '10px'
+                        },
+                        on: {
+                            click: () => {
+                                vm.detail(params.row)
+                            }
+                        }
+                    }, '详情'),
+                    h('Button', {
+                        props: {
+                            type: '',
+                            size: 'small'
+                        },
+                        style: {
+                            marginRight: '10px'
                         },
                         on: {
                             click: () => {
@@ -167,16 +184,14 @@ let data = {
                         }
                     }, '编辑'),
                     h('Button', {
-                        props: {
-                            type: '',
-                            size: 'small'
-                        },
+                        props: {type: '', size: 'small'},
+                        style: {marginRight: '10px'},
                         on: {
                             click: () => {
-                                vm.detail(params.row)
+                                vm.delete(params.row);
                             }
                         }
-                    }, '详情')
+                    }, '删除')
                 ]);
             }
         }],
@@ -255,20 +270,7 @@ let methods = {
                 self.$Modal.error({content: '操作失败!'});
             })
     },
-    // delete(id, userId) {
-    //     var self = this;
-    //     axios.get(basePath + 'departmentBank/delete', {params: {id: id, userId: userId}})
-    //         .then(res => {
-    //             if (res.data.code == '1') {
-    //                 self.search()
-    //             } else {
-    //                 self.$Modal.error({content: '删除失败!'})
-    //             }
-    //         })
-    //         .catch(err => {
-    //             self.$Modal.error({content: '出现异常，请联系管理员!'})
-    //         })
-    // },
+
     paging(current) {
         this.searchForm.current = current;
         this.search();
@@ -335,5 +337,25 @@ let methods = {
     detail(row) {
         Object.assign(this.editForm, row);
         this.showDetailModal();
-    }
+    },
+    delete(row) {
+        var self = this;
+        this.$Modal.confirm({
+            title: '提示',
+            content: '确定要删除吗?',
+            onOk: () => {
+                axios.get(basePath + 'departmentBank/delete', {params: {id: row.accountId}})
+                    .then(res => {
+                        if (res.data.code == '1') {
+                            self.search()
+                        } else {
+                            self.$Modal.error({content: '请求接口失败,消息:' + res.data.msg})
+                        }
+                    })
+                    .catch(err => {
+                        self.$Modal.error({content: '操作失败!'})
+                    })
+            }
+        });
+    },
 }
