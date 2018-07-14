@@ -286,7 +286,7 @@ window.layinit(function (htConfig) {
                 // });
 
                 postDownLoadFile({
-                    url: financePath + "customer/downloadExcel",
+                    url: financePath + "customer/downloadCustomerFlowExcel",
                     data: self.searchForm,
                     method: 'post',
                     headers: {
