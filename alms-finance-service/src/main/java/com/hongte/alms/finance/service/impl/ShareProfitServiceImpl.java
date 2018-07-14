@@ -10,6 +10,7 @@ import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.AlmsServiceNameEnums;
 import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.enums.RepayCurrentStatusEnums;
+import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.enums.RepayedFlag;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanRepaySrcEnum;
@@ -403,6 +404,11 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         if (mprids != null && mprids.size() > 0) {
             List<MoneyPoolRepayment> moneyPoolRepayments = moneyPoolRepaymentMapper.selectBatchIds(mprids);
             for (MoneyPoolRepayment moneyPoolRepayment : moneyPoolRepayments) {
+            	
+            	if (moneyPoolRepayment.getState().equals(RepayRegisterFinanceStatus.财务确认已还款.toString())) {
+					throw new ServiceRuntimeException("已还款的银行流水不能再还款,请重新检查");
+				}
+            	
                 // 增加总实还金额
                 BigDecimal repayFactAmount = financeBaseDto.getRepayFactAmount().add(moneyPoolRepayment.getAccountMoney());
                 financeBaseDto.setRepayFactAmount(repayFactAmount);
