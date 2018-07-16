@@ -47,8 +47,8 @@ public class WithholdingFlowRecordServiceImpl extends BaseServiceImpl<Withholdin
         WithholdingFlowRecord oldWithholdingFlowRecord = new WithholdingFlowRecord();
         try {
             int count = oldWithholdingFlowRecord.selectCount(new EntityWrapper<WithholdingFlowRecord>().eq("liquidation_date", new SimpleDateFormat("yyyy-MM-dd").parse(settleDate)));
-            if(count > 0){
-                throw  new RuntimeException(String.format("指定结清日期[%s]的[%s]条数据已经导入过，请勿重复导入", settleDate, count));
+            if (count > 0) {
+                throw new RuntimeException(String.format("指定结清日期[%s]的[%s]条数据已经导入过，请勿重复导入", settleDate, count));
             }
         } catch (ParseException e) {
             e.printStackTrace();
@@ -73,7 +73,7 @@ public class WithholdingFlowRecordServiceImpl extends BaseServiceImpl<Withholdin
             is = new ByteArrayInputStream(restr);
             String filePath = System.getProperty("java.io.tmpdir") + File.separator + "baofu" + File.separator + settleDate + ".zip";    //存在本地的路径（自行设置）
             File targetFile = new File(filePath);
-            if(!targetFile.getParentFile().exists()){
+            if (!targetFile.getParentFile().exists()) {
                 targetFile.getParentFile().mkdirs();
             }
             //创建文件
@@ -97,12 +97,12 @@ public class WithholdingFlowRecordServiceImpl extends BaseServiceImpl<Withholdin
                     BufferedReader br = new BufferedReader(new InputStreamReader(zipFile.getInputStream(zipEnt)));
                     String line = null;
                     while ((line = br.readLine()) != null) {
-                        if(line.contains("商户号")){
+                        if (line.contains("商户号")) {
                             continue;
                         }
                         //开始处理文件内容
                         String[] cols = line.split("\\|");
-                        if(cols.length <= 8 ){
+                        if (cols.length <= 8) {
                             //跳过不需要的数据
                             continue;
                         }
@@ -111,7 +111,9 @@ public class WithholdingFlowRecordServiceImpl extends BaseServiceImpl<Withholdin
                             flow.setWithholdingPlatform((Integer) PlatformEnum.BF_FORM.getValue());
                             flow.setMerchantNo(cols[0]);
                             flow.setTerminalNo(cols[1]);
-                            flow.setTradeType(Constant.TRADE_TYPE_MAP_BAOFU.get(cols[2]) + Constant.TRADE_SUB_TYPE_MAP_BAOFU.get(cols[3]));
+                            //flow.setTradeType(Constant.TRADE_TYPE_MAP_BAOFU.get(cols[2]) + Constant.TRADE_SUB_TYPE_MAP_BAOFU.get(cols[3]));
+                            flow.setTradeType(Constant.TRADE_TYPE_MAP_BAOFU.get(cols[2]));
+                            flow.setWithholdingStatus(Constant.TRADE_SUB_TYPE_MAP_BAOFU.get(cols[3]));
                             flow.setTradeOrderNo(cols[4]);
                             flow.setMerchantOrderNo(cols[5]);
                             try {
@@ -132,19 +134,19 @@ public class WithholdingFlowRecordServiceImpl extends BaseServiceImpl<Withholdin
                 zipIs.closeEntry();
             }
 
-            if(targetFile.exists()) {
+            if (targetFile.exists()) {
                 targetFile.delete();
             }
         } catch (IOException ex) {
-            try{
-                if(is != null) is.close();
-                if(os != null) os.close();
-                if(zipIs != null) zipIs.close();
-                if(zipFile != null) zipFile.close();
-            }catch (IOException e) {
+            try {
+                if (is != null) is.close();
+                if (os != null) os.close();
+                if (zipIs != null) zipIs.close();
+                if (zipFile != null) zipFile.close();
+            } catch (IOException e) {
                 e.getStackTrace();
             }
-            log.error("@WithholdingFlowRecordServiceImpl@导入宝付代扣流水失败 解析宝付流水zip文件失败.msg:[{}]",ex.getMessage(), ex);
+            log.error("@WithholdingFlowRecordServiceImpl@导入宝付代扣流水失败 解析宝付流水zip文件失败.msg:[{}]", ex.getMessage(), ex);
         }
     }
 }

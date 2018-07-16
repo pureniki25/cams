@@ -112,8 +112,8 @@ public class WithholdingFlowRecord extends Model<WithholdingFlowRecord> {
      * 代扣状态(1:成功,0:失败;2:处理中)
      */
 	@TableField("withholding_status")
-	@ApiModelProperty(required= true,value = "代扣状态(1:成功,0:失败;2:处理中)")
-	private Integer withholdingStatus;
+	@ApiModelProperty(required= true,value = "代扣状态(代扣状态:成功、退款、撤销")
+	private String withholdingStatus;
     /**
      * 客户身份证号码
      */
@@ -281,11 +281,11 @@ public class WithholdingFlowRecord extends Model<WithholdingFlowRecord> {
 		this.liquidationDate = liquidationDate;
 	}
 
-	public Integer getWithholdingStatus() {
+	public String getWithholdingStatus() {
 		return withholdingStatus;
 	}
 
-	public void setWithholdingStatus(Integer withholdingStatus) {
+	public void setWithholdingStatus(String withholdingStatus) {
 		this.withholdingStatus = withholdingStatus;
 	}
 
