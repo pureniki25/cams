@@ -57,6 +57,7 @@ public class WithholdingFlowRecordServiceImpl extends BaseServiceImpl<Withholdin
         InputStream is = null;
         ZipInputStream zipIs = null;
         ZipFile zipFile = null;
+        File targetFile = null;
         try {
             //1.通过eip请求宝付接口拿数据
             Map<String, Object> paramMap = Maps.newHashMap();
@@ -72,7 +73,7 @@ public class WithholdingFlowRecordServiceImpl extends BaseServiceImpl<Withholdin
             //把获取的zip文件的byte放入输入流
             is = new ByteArrayInputStream(restr);
             String filePath = System.getProperty("java.io.tmpdir") + File.separator + "baofu" + File.separator + settleDate + ".zip";    //存在本地的路径（自行设置）
-            File targetFile = new File(filePath);
+            targetFile = new File(filePath);
             if (!targetFile.getParentFile().exists()) {
                 targetFile.getParentFile().mkdirs();
             }
@@ -134,19 +135,21 @@ public class WithholdingFlowRecordServiceImpl extends BaseServiceImpl<Withholdin
                 zipIs.closeEntry();
             }
 
-            if (targetFile.exists()) {
-                targetFile.delete();
-            }
+
         } catch (IOException ex) {
+            log.error("@WithholdingFlowRecordServiceImpl@导入宝付代扣流水失败 解析宝付流水zip文件失败.msg:[{}]", ex.getMessage(), ex);
+        } finally {
             try {
                 if (is != null) is.close();
                 if (os != null) os.close();
                 if (zipIs != null) zipIs.close();
                 if (zipFile != null) zipFile.close();
+                if (targetFile!=null && targetFile.exists()) {
+                    targetFile.delete();
+                }
             } catch (IOException e) {
                 e.getStackTrace();
             }
-            log.error("@WithholdingFlowRecordServiceImpl@导入宝付代扣流水失败 解析宝付流水zip文件失败.msg:[{}]", ex.getMessage(), ex);
         }
     }
 }
