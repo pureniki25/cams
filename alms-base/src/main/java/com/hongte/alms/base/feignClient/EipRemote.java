@@ -269,15 +269,15 @@ public interface EipRemote {
 	
 	
 	
-	/**
-	 * 快钱支付
-	 * @param paramMap
-	 * @return
-	 */
-	@RequestMapping(value = "/eip/kq/pay", headers = { "app=ALMS",
-	"content-type=application/json" }, method = RequestMethod.POST)
-	Result pay(@RequestBody  KuaiQianRechargeReqDto kuaiQianRechargeReqDto);
-	
+//	/**
+//	 * 快钱支付
+//	 * @param paramMap
+//	 * @return
+//	 */
+//	@RequestMapping(value = "/eip/kq/pay", headers = { "app=ALMS",
+//	"content-type=application/json" }, method = RequestMethod.POST)
+//	Result pay(@RequestBody  KuaiQianRechargeReqDto kuaiQianRechargeReqDto);
+//	
 	/**
 	 * 宝付对账文件下载
 	 * @param paramMap
