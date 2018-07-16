@@ -48,4 +48,6 @@ public interface DocService extends BaseService<Doc> {
 	 *            文件路径
 	 */
 	void download(String downloadFile, String fileUrl, HttpServletResponse response);
+
+	void downloadGbk(String downloadFile, String docUrl, HttpServletResponse response);
 }

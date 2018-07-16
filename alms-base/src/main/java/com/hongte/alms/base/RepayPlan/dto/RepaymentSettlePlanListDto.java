@@ -8,7 +8,11 @@ import java.util.List;
 
 @Data
 public class RepaymentSettlePlanListDto {
+
+    private  List<String> projPlanId;
     private RepaymentBizPlanList repaymentBizPlanList;
 
     private List<RepaymentProjPlanList> repaymentProjPlanLists;
+
+    private List<RepaymentSettlePlanListDetailDto> planListDetails;
 }

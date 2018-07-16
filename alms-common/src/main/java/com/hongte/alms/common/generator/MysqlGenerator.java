@@ -1,20 +1,6 @@
 package com.hongte.alms.common.generator;
 
-import com.baomidou.mybatisplus.enums.FieldFill;
-import com.baomidou.mybatisplus.generator.AutoGenerator;
-import com.baomidou.mybatisplus.generator.InjectionConfig;
-import com.baomidou.mybatisplus.generator.config.*;
-import com.baomidou.mybatisplus.generator.config.converts.MySqlTypeConvert;
-import com.baomidou.mybatisplus.generator.config.po.TableFill;
-import com.baomidou.mybatisplus.generator.config.po.TableInfo;
-import com.baomidou.mybatisplus.generator.config.rules.DbColumnType;
-import com.baomidou.mybatisplus.generator.config.rules.DbType;
-import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
-import com.baomidou.mybatisplus.mapper.BaseMapper;
-import com.hongte.alms.common.service.BaseService;
-
-import java.io.File;
-import java.util.*;
+import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
 
 /**
  *code is far away from bug with the animal protecting
@@ -47,11 +33,11 @@ public class MysqlGenerator {
         String dburl = "jdbc:mysql://172.16.200.113:3306/hongte_alms?characterEncoding=utf8";
 //        String tableName="tb_basic_company";//本次需要生成的表名
 //        String tableName="tb_collection_status";//本次需要生成的表名
-        String tableName="tb_repayment_settle_log";//本次需要生成的表名
+        String tableName="tb_withholding_flow_record";//本次需要生成的表名
         //1 设定生成配置
         GeneratorConfig inputConfig = new GeneratorConfig(
 //                "黄咏康",
-                "lxq",
+                "张贵宏",
                 //{自定义}包模块名
                 "com.hongte.alms.",
                 //父类包路径(指SuperMapper，BaseService的包路径)

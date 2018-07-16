@@ -22,6 +22,7 @@ window.layinit(function (htConfig) {
             selections: [],
             curPage: 1,
             pageSize: 10,
+            submitLoading:false,
             table: {
                 col: [{
                         type: 'selection',
@@ -148,10 +149,12 @@ window.layinit(function (htConfig) {
                 this.selections = selections;
             },
             submit: function () {
+                app.submitLoading = true
                 if (this.selections.length == 0) {
                     this.$Message.warning({
                         content: '未选择需要匹配的流水'
                     })
+                    app.submitLoading = false 
                     return;
                 }
                 let params = {
@@ -159,13 +162,14 @@ window.layinit(function (htConfig) {
                     businessId: this.businessId,
                     afterId: this.afterId
                 }
-
+                
                 let mprid = getQueryStr('mprid')
                 if(mprid&&mprid.length>0){
                     if(params.array.length>1){
                         app.$Message.error({
                             content:'只能匹配1条流水,请重新检查'
                         })
+                        app.submitLoading = false 
                         return;
                     }
                     params.mprid = mprid
@@ -178,7 +182,9 @@ window.layinit(function (htConfig) {
                         app.$Message.error({content:res.data.msg})
                     }
                     console.log(res.data);
+                    app.submitLoading = false 
                 }).catch(function (err) {
+                    app.submitLoading = false 
                     console.log(err);
                 })
             },

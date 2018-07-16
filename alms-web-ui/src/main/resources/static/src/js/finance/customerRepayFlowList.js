@@ -24,19 +24,7 @@ var getSelectsData = function () {
             vm.$Modal.error({content: '接口调用异常!'});
         });
 }
-var postDownLoadFile = function (options) {
-    var config = $.extend(true, {method: 'post'}, options);
-    var $iframe = $('<iframe id="down-file-iframe" />');
-    var $form = $('<form target="down-file-iframe" method="' + config.method + '" />');
-    $form.attr('action', config.url);
-    for (var key in config.data) {
-        $form.append('<input type="hidden" name="' + key + '" value="' + config.data[key] + '" />');
-    }
-    $iframe.append($form);
-    $(document.body).append($iframe);
-    $form[0].submit();
-    $iframe.remove();
-}
+
 window.layinit(function (htConfig) {
     var _htConfig = htConfig;
     financePath = _htConfig.financeBasePath;
@@ -269,38 +257,56 @@ window.layinit(function (htConfig) {
                 console.log("vm", self.searchForm);
                 console.log("self.searchForm.state=", self.searchForm.state);
 
-                var cookie = layui.ht_cookie;
 
-                // layui.use(['layer', 'table', 'ht_config'], function () {
-                //     // vm.$refs['searchForm'].validate((valid) => {
-                //     //     if (valid) {
-                //     // getData();
-                //     // vm.exporting = true;
-                //     var excelName = "客户还款流水";
-                //     expoertExcel(financePath + "customer/downloadCustomerFlowExcel", self.searchForm, excelName + ".xls");
-                //
-                //     // vm.exporting = false;
-                //
-                //     // }
-                //     // })
-                // });
+                var fileName = "客户还款登记流水";
 
-                postDownLoadFile({
-                    url: financePath + "customer/downloadCustomerFlowExcel",
-                    data: self.searchForm,
-                    method: 'post',
-                    headers: {
-                        app:"ALMS",
-                        Authorization:"Bearer "+cookie.getToken()
+                var url = financePath + "customer/downloadCustomerFlowExcel";
+                var data = JSON.stringify(self.searchForm);
+                console.log("data",data);
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    contentType: "application/json; charset=utf-8",
+                    async: false,
+                    data: data,
+                    dataType: "json",
+                    success: function (result) {
+                        console.log("结果：========", result);
+                        if (result.code == "1") {
+                            var docUrl = result.data;
+                            console.log(docUrl);
+                            var ExportForm = document.createElement("FORM");
+                            document.body.appendChild(ExportForm);
+                            ExportForm.method = "GET";
+                            ExportForm.action = basePath + "downLoadController/downLoadExcelGBK";
+                            addInput(ExportForm, "text", "docUrl", docUrl);
+                            addInput(ExportForm, "text", "downloadFile", fileName);
+                            ExportForm.submit();
+
+
+                            document.body.removeChild(ExportForm);
+                            vm.$Modal.success({
+                                title: '',
+                                content: '操作成功'
+                            });
+                        } else {
+                            vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
+                        }
                     },
-                })
+                    error: function (result) {
+                        vm.$Message.error('接口调用异常!');
+                    }
+
+                });
+
             },
 
 
             beforeUpLoadFile() {//导入Excel表格
 
 
-            },
+            }
+            ,
 
             uploadSuccess(response) {
                 if (response.code == '1') {
@@ -309,28 +315,37 @@ window.layinit(function (htConfig) {
                     vm.$Modal.error({content: response.msg})
                 }
 
-            },
-            // 审核客户流水
+            }
+            ,
+// 审核客户流水
             auditCustomerFlow: function (id) {
                 var self = this;
 
-
+                var checkStatus = table.checkStatus('listTable'); //test即为基础参数id对应的值
+                var ids = "";
+                console.log("id=", id);
+                if (id != '' && id != undefined) {
+                    ids = id;
+                    console.log("ids=", ids);
+                } else {
+                    var flag=false;
+                    for (i = 0, len = checkStatus.data.length; i < len; i++) {
+                        ids += checkStatus.data[i].id + ","
+                        if(checkStatus.data[i].state != '未关联银行流水'){
+                            flag=true;
+                        }
+                    }
+                    if (flag) {
+                        vm.$Modal.error({content: "只能对未审核的数据进行拒绝"});
+                        return;
+                    }
+                    console.log("else ids=", ids);
+                }
                 // console.log(checkStatus.data) //获取选中行的数据
                 // console.log(checkStatus.data.length) //获取选中行数量，可作为是否有选中行的条件
                 // console.log(checkStatus.isAll) //表格是否全选
                 layer.confirm('确认审核通过该流水吗？', {icon: 3, title: '提示'}, function (index) {
-                    var checkStatus = table.checkStatus('listTable'); //test即为基础参数id对应的值
-                    var ids = "";
-                    console.log("id=", id);
-                    if (id != '' && id != undefined) {
-                        ids = id;
-                        console.log("ids=", ids);
-                    } else {
-                        for (i = 0, len = checkStatus.data.length; i < len; i++) {
-                            ids += checkStatus.data[i].id + ","
-                        }
-                        console.log("else ids=", ids);
-                    }
+
                     var url = financePath + "customer/auditOrRejectCustomerFlow";
 
                     axios.get(url, {params: {idsStr: ids, opt: 2}})
@@ -351,21 +366,31 @@ window.layinit(function (htConfig) {
                 });
 
 
-            },
+            }
+            ,
             // 拒绝
             rejectCustomerFlow: function (id) {
                 var self = this;
-                layer.confirm('确认拒绝该流水吗？', {icon: 3, title: '提示'}, function (index) {
-                    var checkStatus = table.checkStatus('listTable'); //test即为基础参数id对应的值
-                    var ids = "";
+                var checkStatus = table.checkStatus('listTable'); //test即为基础参数id对应的值
+                var ids = "";
 
-                    if (id != '' && id != undefined) {
-                        ids = id;
-                    } else {
-                        for (i = 0, len = checkStatus.data.length; i < len; i++) {
-                            ids += checkStatus.data[i].id + ","
+                if (id != '' && id != undefined) {
+                    ids = id;
+                } else {
+                    var flag=false;
+                    for (i = 0, len = checkStatus.data.length; i < len; i++) {
+                        ids += checkStatus.data[i].id + ","
+                        if(checkStatus.data[i].state != '未关联银行流水'){
+                            flag=true;
                         }
                     }
+                    if (flag) {
+                        vm.$Modal.error({content: "只能对未审核的数据进行拒绝"});
+                        return;
+                    }
+                }
+                layer.confirm('确认拒绝该流水吗？', {icon: 3, title: '提示'}, function (index) {
+
                     var url = financePath + "customer/auditOrRejectCustomerFlow";
 
                     axios.get(url, {params: {idsStr: ids, opt: 3}})
@@ -386,18 +411,22 @@ window.layinit(function (htConfig) {
                 });
 
 
-            },
+            }
+            ,
 
 
             regStartTime: function (starttime) {
                 this.searchForm.regStartTime = starttime;
-            },
+            }
+            ,
             regEndTime: function (endtime) {
                 this.searchForm.regEndTime = endtime;
-            },
+            }
+            ,
             accountStartTime: function (starttime) {
                 this.searchForm.accountStartTime = starttime;
-            },
+            }
+            ,
             accountEndTime: function (endtime) {
                 this.searchForm.accountEndTime = endtime;
             }
@@ -407,23 +436,25 @@ window.layinit(function (htConfig) {
         mounted: function () {
             this.init();
         }
-    });
+    })
+    ;
 
-    // var  delayDaysBegin: [
-    //      {pattern: '/^[0-9]*$/', message: '请输入数字',trigger: 'blur'  },
-    //      {
-    //          validator: function (rule, value, callback, source, options) {
-    //              if(vm.searchForm.delayDaysBegin!=""&& vm.searchForm.delayDaysEnd!=""){
-    //                  if (parseInt(vm.searchForm.delayDaysBegin) > parseInt(vm.searchForm.delayDaysEnd)) {
-    //                      callback(new Error('起始值大于结束值'));
-    //                  } else {
-    //                      callback();//校验通过
-    //                  }
-    //              }else{
-    //                  callback();
-    //              }
-    //
-    //          }, trigger: 'blur'
-    //      }
-    //  ],
-});
+// var  delayDaysBegin: [
+//      {pattern: '/^[0-9]*$/', message: '请输入数字',trigger: 'blur'  },
+//      {
+//          validator: function (rule, value, callback, source, options) {
+//              if(vm.searchForm.delayDaysBegin!=""&& vm.searchForm.delayDaysEnd!=""){
+//                  if (parseInt(vm.searchForm.delayDaysBegin) > parseInt(vm.searchForm.delayDaysEnd)) {
+//                      callback(new Error('起始值大于结束值'));
+//                  } else {
+//                      callback();//校验通过
+//                  }
+//              }else{
+//                  callback();
+//              }
+//
+//          }, trigger: 'blur'
+//      }
+//  ],
+})
+;
