@@ -127,7 +127,7 @@ public class RepaymentResource extends Model<RepaymentResource> {
 	/**
 	 * 结清还款确认Id
 	 */
-//	@TableField("settle_log_id")
+	@TableField(value="settle_log_id",exist=false)
 	@ApiModelProperty(required= true,value = "结清还款确认Id")
 	private String settleLogId;
 

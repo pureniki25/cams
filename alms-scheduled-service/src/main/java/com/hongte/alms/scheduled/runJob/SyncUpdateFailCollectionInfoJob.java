@@ -14,6 +14,7 @@ import com.xxl.job.core.handler.annotation.JobHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -23,7 +24,7 @@ import java.util.List;
  * @since 2018/7/12
  * 定时任务，用于更新失败的电催分配数据
  */
-@JobHandler(value = "SyncUpdateFailCollectionInfoJobHandler")
+@JobHandler(value = "syncUpdateFailCollectionInfoJobHandler")
 @Component
 public class SyncUpdateFailCollectionInfoJob extends IJobHandler {
 
@@ -32,6 +33,7 @@ public class SyncUpdateFailCollectionInfoJob extends IJobHandler {
 
 
     @Autowired
+    @Qualifier("IssueSendOutsideLogService")
     IssueSendOutsideLogService issueSendOutsideLogService;
 
 
@@ -48,7 +50,7 @@ public class SyncUpdateFailCollectionInfoJob extends IJobHandler {
             List<IssueSendOutsideLog> outsideLogList= issueSendOutsideLogService.selectList(
                     new EntityWrapper<IssueSendOutsideLog>()
                             .eq("send_url","/collection/setPhoneStaff")
-                            .eq("return_json","{\"code\":\"111111\",\"msg\":\"同步失败\"}"));
+                            .eq("return_json","{\"code\":\"111111\",\"msg\":\"同步失败\"}").orderBy("create_time"));
 
             for(IssueSendOutsideLog issueSendOutsideLog:outsideLogList){
                 String json= issueSendOutsideLog.getSendJson();
