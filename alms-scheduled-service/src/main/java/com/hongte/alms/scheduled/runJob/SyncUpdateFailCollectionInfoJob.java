@@ -50,7 +50,7 @@ public class SyncUpdateFailCollectionInfoJob extends IJobHandler {
             List<IssueSendOutsideLog> outsideLogList= issueSendOutsideLogService.selectList(
                     new EntityWrapper<IssueSendOutsideLog>()
                             .eq("send_url","/collection/setPhoneStaff")
-                            .eq("return_json","{\"code\":\"111111\",\"msg\":\"同步失败\"}"));
+                            .eq("return_json","{\"code\":\"111111\",\"msg\":\"同步失败\"}").orderBy("create_time"));
 
             for(IssueSendOutsideLog issueSendOutsideLog:outsideLogList){
                 String json= issueSendOutsideLog.getSendJson();
