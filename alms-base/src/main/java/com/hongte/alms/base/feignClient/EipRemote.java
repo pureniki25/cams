@@ -14,7 +14,6 @@ import com.hongte.alms.base.dto.compliance.TdDepaymentEarlierDTO;
 import com.hongte.alms.base.feignClient.dto.AddProjectTrackReqDto;
 import com.hongte.alms.base.feignClient.dto.BankRechargeReqDto;
 import com.hongte.alms.base.feignClient.dto.BaofuRechargeReqDto;
-import com.hongte.alms.base.feignClient.dto.KuaiQianRechargeReqDto;
 import com.hongte.alms.base.feignClient.dto.YiBaoRechargeReqDto;
 import com.hongte.alms.base.vo.comm.SmsVo;
 import com.ht.ussp.core.Result;
