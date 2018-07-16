@@ -67,21 +67,31 @@ public class DepartmentBankController {
         try {
             if (StringUtils.isBlank(departmentBankVO.getAccountId())) {
                 //新增
-                DepartmentBank departmentBank = new DepartmentBank();
+                /*DepartmentBank departmentBank = new DepartmentBank();
                 BeanUtil.copyProperties(departmentBankVO, departmentBank);
                 if (departmentBankVO.getDeptIds() != null && departmentBankVO.getDeptIds().size() > 0) {
                     departmentBank.setDeptId(StringUtils.join(departmentBankVO.getDeptIds(),","));
                 }
                 departmentBank.setCreateUser(loginUserInfoHelper.getUserId());
                 departmentBank.setCreateTime(new Date());
-                departmentBank.insert();
+                departmentBank.insert();*/
+
+                //新增
+                if (departmentBankVO.getDeptIds() != null && departmentBankVO.getDeptIds().size() > 0) {
+                    departmentBankVO.getDeptIds().forEach(deptId -> {
+                        DepartmentBank departmentBank = new DepartmentBank();
+                        BeanUtil.copyProperties(departmentBankVO, departmentBank);
+                        departmentBank.setDeptId(deptId);
+                        departmentBank.setCreateUser(loginUserInfoHelper.getUserId());
+                        departmentBank.setCreateTime(new Date());
+                        departmentBank.insert();
+                    });
+
+                }
+
             } else {
                 //更新
-                //先从数据库查旧数据
-                /*DepartmentBank departmentBank = new DepartmentBank();
-                departmentBank.setAccountId(departmentBankVO.getAccountId());
-                departmentBank.selectById();*/
-                DepartmentBank departmentBank = departmentBankService.selectById(departmentBankVO.getAccountId());
+                /*DepartmentBank departmentBank = departmentBankService.selectById(departmentBankVO.getAccountId());
 
                 BeanUtil.copyProperties(departmentBankVO, departmentBank, new CopyOptions() {{
                     setIgnoreNullValue(true);
@@ -91,15 +101,51 @@ public class DepartmentBankController {
                 }
                 departmentBank.setUpdateUser(loginUserInfoHelper.getUserId());
                 departmentBank.setUpdateTime(new Date());
-                departmentBank.updateById();
-            }
+                departmentBank.updateById();*/
 
+                DepartmentBank departmentBank = departmentBankService.selectById(departmentBankVO.getAccountId());
+                if (departmentBankVO.getDeptIds() != null && departmentBankVO.getDeptIds().size() > 0) {
+                    departmentBankVO.getDeptIds().forEach(deptId -> {
+                        if (deptId.equals(departmentBank.getDeptId())) {
+                            //更新本次
+                            BeanUtil.copyProperties(departmentBankVO, departmentBank, new CopyOptions() {{
+                                setIgnoreNullValue(true);
+                            }});
+                            departmentBank.setDeptId(deptId);
+                            departmentBank.setUpdateUser(loginUserInfoHelper.getUserId());
+                            departmentBank.setUpdateTime(new Date());
+                            departmentBank.updateById();
+                        } else {
+                            //新增另外的
+                            DepartmentBank newDeptBank = new DepartmentBank();
+                            BeanUtil.copyProperties(departmentBank, newDeptBank);
+                            newDeptBank.setAccountId(null);
+                            newDeptBank.setDeptId(deptId);
+                            newDeptBank.setCreateUser(loginUserInfoHelper.getUserId());
+                            newDeptBank.setCreateTime(new Date());
+                            newDeptBank.insert();
+                        }
+                    });
+                }
+            }
             return Result.success();
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage(), ex);
             return Result.error(ex.getMessage());
         }
 
+    }
+
+    @ApiOperation(value = "删除")
+    @RequestMapping("/delete")
+    public Result delete(String id) {
+        try {
+            departmentBankService.deleteById(id);
+            return Result.success();
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            return Result.error(e.getMessage());
+        }
     }
 
 }
