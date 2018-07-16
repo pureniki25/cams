@@ -19,6 +19,7 @@ import java.util.Date;
  * @author 张贵宏
  * @since 2018-07-16
  */
+
 @ApiModel
 @TableName("tb_withholding_flow_record")
 public class WithholdingFlowRecord extends Model<WithholdingFlowRecord> {
