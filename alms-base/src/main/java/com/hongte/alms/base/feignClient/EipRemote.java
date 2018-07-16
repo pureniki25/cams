@@ -244,7 +244,6 @@ public interface EipRemote {
 	@RequestMapping(value = "/eip/td/repayment/queryRepaymentSchedule", headers = { "app=ALMS",
 	"content-type=application/json" }, method = RequestMethod.POST)
 	Result queryRepaymentSchedule(@RequestBody Map<String, Object> paramMap);
-	
 
 	/**
 	 * 快钱签约申请
@@ -280,5 +279,11 @@ public interface EipRemote {
 	"content-type=application/json" }, method = RequestMethod.POST)
 	Result pay(@RequestBody  KuaiQianRechargeReqDto kuaiQianRechargeReqDto);
 	
-	
+	/**
+	 * 宝付对账文件下载
+	 * @param paramMap
+	 * @return
+	 */
+	@RequestMapping(value ="/eip/baofu/loadFile", headers = {"app=ALMS","content-type=application/json"})
+	Result baoFuLoadFile(@RequestBody Map<String,Object> paramMap);
 }

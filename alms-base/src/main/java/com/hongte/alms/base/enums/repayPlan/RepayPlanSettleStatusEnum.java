@@ -15,6 +15,7 @@ public enum RepayPlanSettleStatusEnum implements IEnum {
     PAYED_EARLY(10,"提前结清"),
     PAYED(20,"已结清"),
     PAYED_LOSS(30,"亏损结清"),
+    PAYED_BAD(31,"坏账结清"),
     RENEWED(50,"已申请展期");
 
     private Integer value;

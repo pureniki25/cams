@@ -17,6 +17,17 @@ import com.hongte.alms.common.mapper.SuperMapper;
  * @since 2018-04-08
  */
 public interface ApplyDerateTypeMapper extends SuperMapper<ApplyDerateType> {
-    ApplyTypeVo getApplyTypeVo(@Param(value="processId") String processId);
-   List<ApplyDerateType> getApplyTypeByBusinessIdAndCrpId(@Param(value="businessId") String businessId,@Param(value="planListId") String planListId);
+	ApplyTypeVo getApplyTypeVo(@Param(value = "processId") String processId);
+
+	List<ApplyDerateType> getApplyTypeByBusinessIdAndCrpId(@Param(value = "businessId") String businessId,
+			@Param(value = "planListId") String planListId);
+
+	/**
+	 * 根据planlistid查找未使用过,且减免流程审批通过,且不用于结清的减免项
+	 * 
+	 * @author 王继光 2018年7月13日 下午9:22:38
+	 * @param planListId
+	 * @return
+	 */
+	List<ApplyDerateType> listBizPlanListUnusedDerate(String planListId);
 }

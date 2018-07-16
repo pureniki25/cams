@@ -20,6 +20,10 @@ public class FinanceSettleReq {
     //线下转账必填项,匹配的流水ID
     private List<String> mprIds;
 
+    /**
+     * 是否预览模式,true=预览,数据不存入数据库,false=保存,数据存入数据库
+     */
+    private Boolean preview ;
 
 
 }
