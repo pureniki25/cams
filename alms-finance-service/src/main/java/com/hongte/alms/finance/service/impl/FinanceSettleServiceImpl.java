@@ -5,6 +5,8 @@ import com.hongte.alms.base.RepayPlan.dto.*;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.RepayCurrentStatusEnums;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanPayedTypeEnum;
+import com.hongte.alms.base.enums.repayPlan.SectionRepayStatusEnum;
 import com.hongte.alms.base.mapper.*;
 import com.hongte.alms.base.process.mapper.ProcessMapper;
 import com.hongte.alms.base.service.RepaymentBizPlanListDetailService;
@@ -808,5 +810,106 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 //        curalDivideAmount.set(resource.getRepayAmount());
 
         return true;
+    }
+    
+    /**
+     * 更新还款计划状态并持久化
+     * @author 王继光
+     * 2018年7月16日 上午10:43:30
+     * @param dto
+     */
+    private void updateStatus(FinanceSettleBaseDto dto,FinanceSettleReq req) {
+    	if (req.getPreview()) {
+			return ;
+		}
+    	
+    	List<RepaymentBizPlanDto> planDtoList = dto.getPlanDtoList();
+    	for (RepaymentBizPlanDto repaymentBizPlanDto : planDtoList) {
+			//先更新标的
+    		updateProjPlanList(repaymentBizPlanDto.getProjPlanDtos());
+    		//再更新业务
+    		updateBizPlanList(repaymentBizPlanDto.getBizPlanListDtos());
+		}
+    }
+    
+    private void updateProjPlanList(List<RepaymentProjPlanDto> projPlanDtos) {
+    	for (RepaymentProjPlanDto repaymentProjPlanDto : projPlanDtos) {
+    		RepaymentProjPlan repaymentProjPlan = repaymentProjPlanDto.getRepaymentProjPlan();
+    		boolean deficitSettle = false ;
+			List<RepaymentProjPlanListDto> projPlanListDtos = repaymentProjPlanDto.getProjPlanListDtos();
+			for (RepaymentProjPlanListDto projPlanListDto : projPlanListDtos) {
+				RepaymentProjPlanList projPlanList = projPlanListDto.getRepaymentProjPlanList();
+				BigDecimal projPlanAmount = projPlanList.getTotalBorrowAmount() ;
+				BigDecimal projFactAmount = BigDecimal.ZERO ;
+				BigDecimal projOverAmount = projPlanList.getOverdueAmount()!=null?projPlanList.getOverdueAmount():BigDecimal.ZERO;
+				BigDecimal projDerateAmout = projPlanList.getDerateAmount()!=null?projPlanList.getDerateAmount():BigDecimal.ZERO;
+				
+				List<RepaymentProjPlanListDetail> projPlanListDetails = projPlanListDto.getProjPlanListDetails();
+				for (RepaymentProjPlanListDetail projPlanListDetail : projPlanListDetails) {
+					projFactAmount = projFactAmount.add(projPlanListDetail.getProjFactAmount()==null?BigDecimal.ZERO:projPlanListDetail.getProjFactAmount());
+				}
+				Collections.sort(projPlanListDetails, new Comparator<RepaymentProjPlanListDetail>() {
+					@Override
+					public int compare(RepaymentProjPlanListDetail arg0, RepaymentProjPlanListDetail arg1) {
+						if (arg0.getFactRepayDate().before(arg1.getFactRepayDate())) {
+							return -1 ;
+						}
+						if (arg0.getFactRepayDate().after(arg1.getFactRepayDate())) {
+							return 1 ;
+						}
+						return 0;
+					}
+				});
+				projPlanList.setFactRepayDate(projPlanListDetails.get(0).getFactRepayDate());
+				if (projPlanAmount.add(projOverAmount).compareTo(projDerateAmout.add(projFactAmount)) <= 0) {
+					projPlanList.setCurrentStatus(RepayCurrentStatusEnums.已还款.toString());
+					projPlanList.setCurrentSubStatus(RepayCurrentStatusEnums.已还款.toString());
+					projPlanList.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
+				}else {
+					projPlanList.setRepayFlag(RepayPlanPayedTypeEnum.OFFLINE_CHECK_SETTLE.getValue());
+					deficitSettle = true ;
+				}
+				
+			}
+			
+			
+			if (deficitSettle) {
+			}
+    	}
+    }
+    
+    private void updateBizPlanList(List<RepaymentBizPlanListDto>  bizPlanListDtos) {
+    	for (RepaymentBizPlanListDto repaymentBizPlanListDto : bizPlanListDtos) {
+			List<RepaymentBizPlanListDetail> bizPlanListDetails = repaymentBizPlanListDto.getBizPlanListDetails();
+			RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListDto.getRepaymentBizPlanList() ;
+			BigDecimal planAmount = repaymentBizPlanList.getTotalBorrowAmount() ;
+			BigDecimal planFactAmount = BigDecimal.ZERO ;
+			BigDecimal planOverAmount = repaymentBizPlanList.getOverdueAmount()!=null?repaymentBizPlanList.getOverdueAmount():BigDecimal.ZERO;
+			BigDecimal planDerateAmout = repaymentBizPlanList.getDerateAmount()!=null?repaymentBizPlanList.getDerateAmount():BigDecimal.ZERO;
+			
+			for (RepaymentBizPlanListDetail repaymentBizPlanListDetail : bizPlanListDetails) {
+				planFactAmount = planFactAmount.add(repaymentBizPlanListDetail.getFactAmount()==null?BigDecimal.ZERO:repaymentBizPlanListDetail.getFactAmount());
+			}
+			Collections.sort(bizPlanListDetails, new Comparator<RepaymentBizPlanListDetail>() {
+				@Override
+				public int compare(RepaymentBizPlanListDetail arg0, RepaymentBizPlanListDetail arg1) {
+					if (arg0.getFactRepayDate().before(arg1.getFactRepayDate())) {
+						return -1 ;
+					}
+					if (arg0.getFactRepayDate().after(arg1.getFactRepayDate())) {
+						return 1 ;
+					}
+					return 0;
+				}
+			});
+			repaymentBizPlanList.setFactRepayDate(bizPlanListDetails.get(0).getFactRepayDate());
+			if (planAmount.add(planOverAmount).compareTo(planDerateAmout.add(planFactAmount)) <= 0) {
+				repaymentBizPlanList.setCurrentStatus(RepayCurrentStatusEnums.已还款.toString());
+				repaymentBizPlanList.setCurrentSubStatus(RepayCurrentStatusEnums.已还款.toString());
+				repaymentBizPlanList.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
+			}else {
+				repaymentBizPlanList.setRepayFlag(RepayPlanPayedTypeEnum.OFFLINE_CHECK_SETTLE.getValue());
+			}
+		}
     }
 }

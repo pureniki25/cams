@@ -56,5 +56,9 @@ public class FinanceSettleBaseDto {
     private String businessId;
     private String planId;
 
+    /**
+     * 当前期标志实体,根据此实体判断是否提前结清
+     */
+    private RepaymentBizPlanList curPeriod ;
 
 }
