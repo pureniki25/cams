@@ -185,7 +185,7 @@ var layer;
                 	   vm.loading = false;
                     if(data.code=='1'){
                     	vm.$Modal.success({content:"执行代扣金额"+vm.ajax_data.repayAmount+"元成功，请稍后查询结果"});
-
+                    	sleep(3000);
                         location.reload();
 
 		             }else{
@@ -216,7 +216,7 @@ var layer;
 		       	   vm.loading = false;
 		             if(data.code=='1'){
 		                   	vm.$Modal.success({content:"执行代扣金额"+vm.ajax_data.repayAmount+"元成功，请稍后查询结果"});
-
+		                	sleep(3000);
                             location.reload();
 
 		             }else{
@@ -480,4 +480,13 @@ var layer;
       
         }
 	}
+
+	function sleep(numberMillis) {
+		var now = new Date();
+		var exitTime = now.getTime() + numberMillis;
+		while (true) {
+			now = new Date();
+			if (now.getTime() > exitTime)
+			return;
+		
 	
