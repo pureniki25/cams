@@ -349,7 +349,7 @@ public class PlatformRepaymentController {
             vo.setPeriod(projPlanList.getPeriod());
 
             //处理标的计划结清状态
-            //还款计划状态，0:还款中，10:提前结清，20:已结清，30:亏损结清，50:已申请展期  => 0：非结清，10：正常结清，11：逾期结清，20：展期原标结清，30：坏账结清
+            //还款计划状态，0:还款中，10:提前结清，20:已结清，30:亏损结清，40:坏账结清, 50:已申请展期  => 0：非结清，10：正常结清，11：逾期结清，20：展期原标结清，30：坏账结清
             Integer tempProjPlanStatus = 0;
             switch (projPlan.getPlanStatus()) {
                 case 0:
@@ -360,6 +360,7 @@ public class PlatformRepaymentController {
                     tempProjPlanStatus = 10;
                     break;
                 case 30:
+                case 40:
                     tempProjPlanStatus = 30;
                     break;
                 case 50:
