@@ -3,8 +3,10 @@ package com.hongte.alms.finance.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.google.common.collect.Maps;
 import com.hongte.alms.base.RepayPlan.dto.*;
 import com.hongte.alms.base.entity.*;
+import com.hongte.alms.base.enums.AlmsServiceNameEnums;
 import com.hongte.alms.base.enums.MsgCodeEnum;
 import com.hongte.alms.base.feignClient.AlmsOpenServiceFeignClient;
 import com.hongte.alms.base.feignClient.EipRemote;
@@ -15,7 +17,9 @@ import com.hongte.alms.base.feignClient.dto.NiWoProjPlanListDetailDto;
 import com.hongte.alms.base.enums.repayPlan.*;
 import com.hongte.alms.base.service.*;
 import com.hongte.alms.common.util.ClassCopyUtil;
+import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.finance.service.NiWoRepayPlanService;
+import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.core.Result;
 import com.hongte.alms.common.util.DateUtil;
 
@@ -84,11 +88,16 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 	@Qualifier("SysMsgTemplateService")
 	SysMsgTemplateService sysMsgTemplateService;
 	
-	
+	@Autowired
+	@Qualifier("SysApiCallFailureRecordService")
+	SysApiCallFailureRecordService sysApiCallFailureRecordService;
 	
 	@Autowired
 	@Qualifier("TuandaiProjectInfoService")
 	TuandaiProjectInfoService tuandaiProjectInfoService;
+	
+	@Autowired
+	LoginUserInfoHelper loginUserInfoHelper;
 	
 	@Autowired
     Executor executor;
@@ -222,11 +231,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 					public void run() {
 						RecordLog(dtoTemp, repaymentProjPlanListDtos);
 						//同步还款计划同信贷系统
-						Map<String, Object> paramMap = new HashMap<>();
-						paramMap.put("afterId", "");
-						paramMap.put("businessId", repaymentProjPlanListDtos.get(0).getRepaymentProjPlanList().getBusinessId());
-						paramMap.put("repaymentBatchId", "");
-						almsOpenServiceFeignClient.updateRepayPlanToLMS(paramMap);
+						updateRepayPlanToLMS(repaymentProjPlanListDtos.get(0).getRepaymentProjPlanList().getOrigBusinessId());
 					}
 				});
 			
@@ -684,11 +689,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 						public void run() {
 							RecordLog(dtoTemp, repaymentProjPlanListDtos);//用来记录你我金融每个标对应贷后每个标的还款计划的日志
 							//同步还款计划同信贷系统
-							Map<String, Object> paramMap = new HashMap<>();
-							paramMap.put("afterId", "");
-							paramMap.put("businessId", repaymentProjPlanListDtos.get(0).getRepaymentProjPlanList().getBusinessId());
-							paramMap.put("repaymentBatchId", "");
-							almsOpenServiceFeignClient.updateRepayPlanToLMS(paramMap);							
+							updateRepayPlanToLMS(repaymentProjPlanListDtos.get(0).getRepaymentProjPlanList().getOrigBusinessId());							
 						}
 					});
 				
@@ -1119,6 +1120,32 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 		}
 		return isLast;
 	}
+	
+	
+    private void updateRepayPlanToLMS(String businessId) {
+    	com.hongte.alms.common.result.Result result = null;
+        Map<String, Object> paramMap = Maps.newHashMap();
+        paramMap.put("businessId", businessId);
+        try {
+
+        	  result = almsOpenServiceFeignClient.updateRepayPlanToLMS(paramMap);
+            if (result == null || !"1".equals(result.getCode())) {
+
+                sysApiCallFailureRecordService.save(
+                        AlmsServiceNameEnums.FINANCE,
+                        Constant.INTERFACE_CODE_FINANCE_NIWOCONTROLLER_SYCREPAYPLAN,
+                        Constant.INTERFACE_NAME_FINANCE_NIWOCONTROLLER_SYCREPAYPLAN,
+                        businessId, JSON.toJSONString(paramMap), null, JSON.toJSONString(result), null, loginUserInfoHelper.getUserId() == null ? "null" : loginUserInfoHelper.getUserId());
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            sysApiCallFailureRecordService.save(
+                    AlmsServiceNameEnums.FINANCE,
+                    Constant.INTERFACE_CODE_FINANCE_NIWOCONTROLLER_SYCREPAYPLAN,
+                    Constant.INTERFACE_NAME_FINANCE_NIWOCONTROLLER_SYCREPAYPLAN,
+                    businessId, JSON.toJSONString(paramMap), null, e.getMessage(), null, loginUserInfoHelper.getUserId() == null ? "null" : loginUserInfoHelper.getUserId());
+        }
+    }
 
 	public static void main(String[] args) {
 		System.out.println(new Date(Long.valueOf("1532448000000")));
