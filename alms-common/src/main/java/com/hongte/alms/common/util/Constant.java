@@ -182,6 +182,10 @@ public class Constant {
 	//*********调用api接口失败记录相关 Finance模块 zgh *********//
 	public static final String INTERFACE_CODE_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT = "/finance/previewConfirmRepayment";
 	public static final String INTERFACE_NAME_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT = "确认还款拆标情况并存储";
+	
+	public static final String INTERFACE_CODE_FINANCE_NIWOCONTROLLER_SYCREPAYPLAN = "/niwoController/sycRepayPlan";
+	public static final String INTERFACE_NAME_FINANCE_NIWOCONTROLLER_SYCREPAYPLAN = "同步你我金融还款计划";
+
 
 
 	public static final String CANWITHHOLD_NO="该卡当前不支持代扣，请及时更换";

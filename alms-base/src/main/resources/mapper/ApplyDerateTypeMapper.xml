@@ -65,5 +65,27 @@ on process.apply_derate_process_id=type.apply_derate_process_id
         </where>
 
     </select> 
+    
+    <select id="listBizPlanListUnusedDerate" resultType="com.hongte.alms.base.entity.ApplyDerateType">
+    	SELECT
+			adt.apply_derate_type_id AS applyDerateTypeId,
+			adt.apply_derate_process_id AS applyDerateProcessId,
+			adt.derate_type AS derateType,
+			adt.derate_money AS derateMoney,
+			adt.create_time AS createTime,
+			adt.create_user AS createUser,
+			adt.update_time AS updateTime,
+			adt.update_user AS updateUser,
+			adt.fee_id as feeId			 
+		FROM
+			tb_apply_derate_process adp
+			LEFT JOIN tb_process p ON p.process_id = adp.process_id
+			LEFT JOIN tb_apply_derate_type adt ON adt.apply_derate_process_id = adp.apply_derate_process_id 
+		WHERE
+			p.process_result = 1 
+			AND adp.is_settle = 0 
+			AND adp.crp_id = #{planListId}
+			AND apply_derate_type_id NOT IN ( SELECT apply_derate_type_id FROM tb_derate_use_log GROUP BY apply_derate_type_id )
+    </select>
  
 </mapper>

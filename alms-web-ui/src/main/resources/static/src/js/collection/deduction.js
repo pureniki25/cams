@@ -115,22 +115,22 @@ var layer;
 	    });
 
 	}
-	function withHoldingRecord(){
+	function withHoldingRecord(){debugger
 //		if(vm.ajax_data.issueSplitType==1&&vm.platformId==5){debugger
 //			vm.$Modal.error({content: '共借标不能银行代扣'});
 //		   return;
 //		}
 		
 	    vm.loading = true;
-	    if(vm.platformId==''){debugger
+	    if(vm.platformId===''){
 			   vm.$Modal.error({content:"代扣平台不能为空"});
 		   vm.loading = false;
 		   return;
 		   }
 		var isAmountWithheld="false";
-		if(vm.ajax_data.total<vm.ajax_data.restAmount){
+		if(vm.ajax_data.repayAmount<vm.ajax_data.restAmount){
 			isAmountWithheld="true";//部分代扣
-		}else if(vm.ajax_data.total=vm.ajax_data.restAmount){
+		}else if(vm.ajax_data.repayAmount=vm.ajax_data.restAmount){
 			isAmountWithheld="false";//全部代扣
 		}
 	   if(vm.ajax_data.total>vm.ajax_data.restAmount){debugger
@@ -328,10 +328,10 @@ var layer;
                       if(vm.ajax_data.strType==2){
                       	url=basePath+ "RepaymentLogController/searchAfterRepayLog?businessId="+vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId;
                       }else{
-                      	url:openPath+ "WithHoldingController/searchRepayLog?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId;
+                      	url=openPath+ "WithHoldingController/searchRepayLog?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId;
                       }
                     //使用layerUI的表格组件
-                    layui.use(['layer', 'table','ht_ajax', 'ht_auth', 'ht_config'], function () {
+                    layui.use(['layer', 'table','ht_ajax', 'ht_auth', 'ht_config'], function () {debugger
                         layer = layui.layer;
                         table = layui.table;
                         // var config = layui.ht_config;

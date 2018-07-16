@@ -13,4 +13,9 @@ import com.hongte.alms.common.service.BaseService;
  */
 public interface WithholdingFlowRecordService extends BaseService<WithholdingFlowRecord> {
 
+    /**
+     * 导入宝付流水
+     * @param settleDate 清算日期YYYY-MM-DD
+     */
+    void importWidthholdingFlowFromBaoFu(String settleDate);
 }

@@ -155,7 +155,6 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 
         List<RepaymentBizPlanList> repaymentBizPlanLists = repaymentBizPlanListMapper.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId));
 
-
 		/*找实还明细记录*/
         List<RepaymentProjFactRepay> factRepays = repaymentProjFactRepayMapper
                 .selectList(new EntityWrapper<RepaymentProjFactRepay>().eq("confirm_log_id", log.getConfirmLogId())
@@ -331,23 +330,33 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 //            }
 //		}
         
-        for (PlatformRepaymentReq req : platformRepaymentReqs) {
-        	//撤销成功 通知分发中心
-            try{
-                Result revokeListResult = platformRepaymentFeignClient.revokeTdrepayRecharge(req);
-                if (!"1".equals(revokeListResult.getCode())) {
-                	logger.error("通知分发中心撤销失败："+revokeListResult.getMsg());
-				}
-                logger.info("=========通知分发中心已经撤销{}",JSON.toJSONString(revokeListResult));
-            }catch (Exception e){
-                logger.error("=========通知分发中心已经撤销出错{}",e);
-                throw new ServiceRuntimeException("通知分发中心已经撤销出错");
-            }
-		}
+        
         
         List<RepaymentConfirmPlatRepayLog> repaymentConfirmPlatRepayLogs = repaymentConfirmPlatRepayLogMapper.selectList(new EntityWrapper<RepaymentConfirmPlatRepayLog>().eq("confirm_log_id", log.getConfirmLogId()));
         for (RepaymentConfirmPlatRepayLog repaymentConfirmPlatRepayLog : repaymentConfirmPlatRepayLogs) {
         	String projPlanListId = repaymentConfirmPlatRepayLog.getProjPlanListId() ;
+        	RepaymentProjPlanList projPlanList2 = new RepaymentProjPlanList();
+        	projPlanList2.setProjPlanListId(projPlanListId);
+        	projPlanList2 = repaymentProjPlanListMapper.selectOne(projPlanList2) ;
+        	RepaymentProjPlan projPlan = new RepaymentProjPlan() ;
+        	projPlan.setProjPlanId(projPlanList2.getProjPlanId());
+        	projPlan = repaymentProjPlanMapper.selectOne(projPlan) ;
+            	//撤销成功 通知分发中心
+                try{
+                	PlatformRepaymentReq req = new PlatformRepaymentReq() ;
+                	req.setConfirmLogId(projPlanListId);
+                	req.setProjectId(projPlan.getProjectId());
+                    Result revokeListResult = platformRepaymentFeignClient.revokeTdrepayRecharge(req);
+                    if (!"1".equals(revokeListResult.getCode())) {
+                    	logger.error("通知分发中心撤销失败："+revokeListResult.getMsg());
+    				}
+                    logger.info("=========通知分发中心已经撤销{}",JSON.toJSONString(revokeListResult));
+                }catch (Exception e){
+                    logger.error("=========通知分发中心已经撤销出错{}",e);
+                    throw new ServiceRuntimeException("通知分发中心已经撤销出错");
+                }
+        	
+        	
         	sysApiCallFailureRecordService.delete(new EntityWrapper<SysApiCallFailureRecord>().eq("ref_id", projPlanListId)) ;
         	repaymentConfirmPlatRepayLog.deleteById();
 		}
