@@ -7,17 +7,16 @@ import com.hongte.alms.base.dto.ConfirmRepaymentReq;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.RepayCurrentStatusEnums;
 import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
-import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
-import com.hongte.alms.base.enums.repayPlan.RepayPlanRepaySrcEnum;
-import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
-import com.hongte.alms.base.enums.repayPlan.SectionRepayStatusEnum;
+import com.hongte.alms.base.enums.repayPlan.*;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.mapper.*;
 import com.hongte.alms.base.process.mapper.ProcessMapper;
 import com.hongte.alms.base.service.RepaymentBizPlanListDetailService;
 import com.hongte.alms.base.service.RepaymentConfirmLogService;
 import com.hongte.alms.base.service.RepaymentProjPlanListDetailService;
+import com.hongte.alms.base.service.SettleService;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
+import com.hongte.alms.base.vo.finance.SettleInfoVO;
 import com.hongte.alms.finance.req.FinanceBaseDto;
 import com.hongte.alms.finance.req.FinanceSettleBaseDto;
 import com.hongte.alms.finance.req.FinanceSettleReq;
@@ -731,17 +730,17 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         stringListMap.put(bizPlanListDetailId, list);
 
         financeSettleBaseDto.getProjFactRepays().put(planId, stringListMap);
-    }
 
-        financeBaseDto.setResourceIndex(reIndex);
-//        resourceIndex.set(reIndex);
-        RepaymentResource resource = rResources.get(reIndex);
-        financeBaseDto.setCuralResource(resource);
-//        curalResource.set(resource);
-        financeBaseDto.setCuralDivideAmount(resource.getRepayAmount());
-//        curalDivideAmount.set(resource.getRepayAmount());
 
-        return true;
+//        financeBaseDto.setResourceIndex(reIndex);
+////        resourceIndex.set(reIndex);
+//        RepaymentResource resource = rResources.get(reIndex);
+//        financeBaseDto.setCuralResource(resource);
+////        curalResource.set(resource);
+//        financeBaseDto.setCuralDivideAmount(resource.getRepayAmount());
+////        curalDivideAmount.set(resource.getRepayAmount());
+//
+//        return true;
     }
 
     /**
