@@ -1,5 +1,8 @@
 package com.hongte.alms.common.util;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * @author zengkun
  * @since 2018/2/2
@@ -200,5 +203,67 @@ public class Constant {
 	 * 1200以下是线上部分费用,超过1200是线下部分费用
 	 */
 	public static final Integer ONLINE_OFFLINE_FEE_BOUNDARY = 1200 ;
+
+
+    /**
+     * 宝付
+     */
+    public static Map<String, String> TRADE_TYPE_MAP_BAOFU = null;
+
+    static {
+        TRADE_TYPE_MAP_BAOFU = new ConcurrentHashMap<>();
+        //支付
+        TRADE_TYPE_MAP_BAOFU.put("00313", "卡类");
+        TRADE_TYPE_MAP_BAOFU.put("01311", "B2C");
+        TRADE_TYPE_MAP_BAOFU.put("01311", "B2B");
+        TRADE_TYPE_MAP_BAOFU.put("01311", "Wap");
+        TRADE_TYPE_MAP_BAOFU.put("06311", "银联手机支付（插件支付）");
+        TRADE_TYPE_MAP_BAOFU.put("04311", "认证支付API");
+        TRADE_TYPE_MAP_BAOFU.put("03311", "认证支付PC");
+        TRADE_TYPE_MAP_BAOFU.put("05311", " 认证支付WAP");
+        TRADE_TYPE_MAP_BAOFU.put("08311", "认证支付SDK");
+        TRADE_TYPE_MAP_BAOFU.put("09311", "委托还款");
+        TRADE_TYPE_MAP_BAOFU.put("10311", "代扣");
+        TRADE_TYPE_MAP_BAOFU.put("14311", "分账产品-API类");
+        TRADE_TYPE_MAP_BAOFU.put("15311", "分账产品-代扣");
+        TRADE_TYPE_MAP_BAOFU.put("16311", "分账产品-认证SDK");
+        TRADE_TYPE_MAP_BAOFU.put("17311", "分账产品-认证WAP");
+        TRADE_TYPE_MAP_BAOFU.put("18311", "分账产品-认证PC");
+        TRADE_TYPE_MAP_BAOFU.put("19311", "分账产品-快捷");
+        TRADE_TYPE_MAP_BAOFU.put("31311", "分账产品-协议支付");
+        TRADE_TYPE_MAP_BAOFU.put("20311", "非实时代扣");
+        TRADE_TYPE_MAP_BAOFU.put("21311", " 分账产品-非实时代扣");
+        TRADE_TYPE_MAP_BAOFU.put("04317", "分账产品-分账不过账");
+        TRADE_TYPE_MAP_BAOFU.put("06317", "协议支付分账-不过账");
+        TRADE_TYPE_MAP_BAOFU.put("13311", "支付宝支付");
+        TRADE_TYPE_MAP_BAOFU.put("12311", "微信支付");
+        TRADE_TYPE_MAP_BAOFU.put("11311", "快捷支付");
+        TRADE_TYPE_MAP_BAOFU.put("30311", "协议支付");
+        TRADE_TYPE_MAP_BAOFU.put("07311", "账户");
+        TRADE_TYPE_MAP_BAOFU.put("22311", "转账支付");
+        //充值
+        TRADE_TYPE_MAP_BAOFU.put("01301", "B2C网银");
+        TRADE_TYPE_MAP_BAOFU.put("01301", "B2B网银");
+        TRADE_TYPE_MAP_BAOFU.put("01301", "线下打款");
+        TRADE_TYPE_MAP_BAOFU.put("01301", "快捷");
+        TRADE_TYPE_MAP_BAOFU.put("30511", "手续费账户");
+        //转账
+        TRADE_TYPE_MAP_BAOFU.put("00105", "转账到银行");
+        TRADE_TYPE_MAP_BAOFU.put("00104", "转账到账户");
+        //提现
+        TRADE_TYPE_MAP_BAOFU.put("00101", "普通提现");
+        //服务认证
+        TRADE_TYPE_MAP_BAOFU.put("01341", "银行卡验证");
+        TRADE_TYPE_MAP_BAOFU.put("01351", "身份证验证");
+    }
+
+    public static Map<String, String> TRADE_SUB_TYPE_MAP_BAOFU = null;
+
+    static {
+        TRADE_SUB_TYPE_MAP_BAOFU = new ConcurrentHashMap<>();
+        TRADE_SUB_TYPE_MAP_BAOFU.put("00", "成功");
+        TRADE_SUB_TYPE_MAP_BAOFU.put("01", "退款");
+        TRADE_SUB_TYPE_MAP_BAOFU.put("02", "撤销");
+    }
 
 }
