@@ -246,8 +246,8 @@
    		</row>
 	</Modal>
 	
-	<Modal v-model="infoFlag" width="1600" @on-visible-change="openInfoTabModal">
-		<Card>
+	<Modal v-model="infoFlag" width="95%" @on-visible-change="openInfoTabModal">
+		<Card style="margin-top:1.5rem">
             <div slot="title" >
                 <span>业务编号:</span>
                 <span class="marginRight">{{ infoBasicData.businessId }}</span>
@@ -261,6 +261,8 @@
             
 	        <tabs value="fundDistributionRecord" :animated="true" @on-click="initFunction($event)">
 				<tab-pane label="资金分发记录" name="fundDistributionRecord">
+					<div style="width:100%; height:600px; overflow-y:scroll;">
+					
 					<table class="layui-table">
 				        <thead>
 				            <tr>
@@ -293,6 +295,7 @@
 				            </tr>
 				        </tbody>
 				    </table>
+				    </div>
 				</tab-pane>
 				
 				<tab-pane label="平台实还" name="platformRealRepayment">
@@ -334,7 +337,7 @@
         </Card>
 	</Modal>
 	
-	<Modal v-model="rechargeRecordFlag" width="1600" title="充值记录">
+	<Modal v-model="rechargeRecordFlag" width="90%" title="充值记录">
 		<row>
 			<i-col span="6">
 				选择代充值账户：
@@ -352,13 +355,13 @@
 			<i-col span="6">
 				充值订单号：<i-input v-model="queryRechargeRecordModel.cmOrderNo" style="width: 200px"/>
 			</i-col>
-			<i-col span="6">
+			<i-col span="5">
 				充值来源账户：
 				<i-select v-model="queryRechargeRecordModel.rechargeSourseAccount" clearable filterable style="width: 200px">
       				<i-option v-for="(item, index) in bankAccountList" :value="item.financeName" :key="item.accountId">{{item.financeName}}</i-option>
   				</i-select>
 			</i-col>
-			<i-col span="4">
+			<i-col span="5">
 				创建日期：
 		    	<date-picker type="daterange" split-panels format="yyyy-MM-dd" placeholder="创建日期" 
 		    		@on-change="queryRechargeRecordModel.createTimeStart=$event[0];queryRechargeRecordModel.createTimeEnd=$event[1]" clearable />
