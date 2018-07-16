@@ -23,6 +23,7 @@ public enum RechargeBusinessTypeEnums implements IEnum {
     ER_SHOU_CAR(15,Constant.ER_SHOU_CHE_LOAN),
     YI_DIAN_CAR(20,Constant.YI_DIAN_LOAN),
     OWNER_LOAN(26,Constant.CREDIT_LOAN),
+    YEZHU_LOAN(25,Constant.CREDIT_LOAN),
     OWNER_GONGJIE(27,Constant.CREDIT_LOAN),
     JIA_ZHUANG(28,Constant.CREDIT_LOAN),
     BUSINESS_GONGJIE(29,Constant.CREDIT_LOAN),
