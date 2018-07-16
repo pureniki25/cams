@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.enums.IdType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
@@ -36,6 +38,19 @@ public class SysUserPermission extends Model<SysUserPermission> {
 	@ApiModelProperty(required= true,value = "用户编号")
 	private String userId;
 
+	/**
+	 * 页面类型：1.贷后管理页，2.财务管理页面，3.减免管理页面
+	 */
+	@TableField("page_type")
+	@ApiModelProperty(required= true,value = "页面类型：1.贷后管理页，2.财务管理页面，3.减免管理页面")
+	private Integer pageType;
+	/**
+	 * 自增主键
+	 */
+	@TableId(value="id", type= IdType.AUTO)
+	@ApiModelProperty(required= true,value = "自增主键")
+	private Integer id;
+
 
 	public String getBusinessId() {
 		return businessId;
@@ -64,5 +79,21 @@ public class SysUserPermission extends Model<SysUserPermission> {
 			", businessId=" + businessId +
 			", userId=" + userId +
 			"}";
+	}
+
+	public Integer getPageType() {
+		return pageType;
+	}
+
+	public void setPageType(Integer pageType) {
+		this.pageType = pageType;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
 	}
 }
