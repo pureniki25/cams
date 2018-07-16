@@ -171,7 +171,7 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
                 RepaymentBizPlanList repaymentBizPlanList= repaymentBizPlanLists.get(0);
 
                 platformRepaymentReq.setProjectId(projectId);
-                platformRepaymentReq.setPlanListId(repaymentBizPlanList.getPlanListId());
+                platformRepaymentReq.setConfirmLogId(repaymentBizPlanList.getPlanListId());
                 Result<List<PlatformRepaymentDto>> listResult = platformRepaymentFeignClient.queryTdrepayRechargeRecord(platformRepaymentReq);
 
 

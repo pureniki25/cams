@@ -6,5 +6,5 @@ import lombok.Data;
 public class PlatformRepaymentReq {
 
     private  String projectId;
-    private  String planListId;
+    private  String confirmLogId;
 }
