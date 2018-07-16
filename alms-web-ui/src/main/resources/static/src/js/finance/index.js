@@ -365,8 +365,8 @@ window.layinit(function (htConfig) {
                             //let businessAllSettle = initMenuItem('业务全部结清确认', '/ssssxx')
                             let revokeConfirm = initMenuItem('撤销还款确认', null, 'revokeConfirm')
                             let confirmWithhold = initMenuItem('代扣确认', null, 'confirmWithhold')
-                            // let settle = initMenuItem('财务结清', null, 'settle')
-                            // let planSettle = initMenuItem('还款计划结清', null, 'planSettle')
+                            let settle = initMenuItem('财务结清', null, 'settle')
+                            let planSettle = initMenuItem('还款计划结清', null, 'planSettle')
                             let withhold = initMenuItem('支付公司代扣', null, 'withhold')
 
                             if (p.row.srcType == 2) {
@@ -374,8 +374,8 @@ window.layinit(function (htConfig) {
                                 //menu.push(businessAllSettle)
                                 menu.push(revokeConfirm)
                                 menu.push(confirmWithhold)
-                                menu.push(planSettle)
-                                menu.push(settle)
+                                // menu.push(planSettle)
+                                // menu.push(settle)
                                    menu.push(withhold)
                             }
                             let poptipContent;
