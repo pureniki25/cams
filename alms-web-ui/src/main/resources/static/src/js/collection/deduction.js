@@ -128,9 +128,9 @@ var layer;
 		   return;
 		   }
 		var isAmountWithheld="false";
-		if(vm.ajax_data.total<vm.ajax_data.restAmount){
+		if(vm.ajax_data.repayAmount<vm.ajax_data.restAmount){
 			isAmountWithheld="true";//部分代扣
-		}else if(vm.ajax_data.total=vm.ajax_data.restAmount){
+		}else if(vm.ajax_data.repayAmount=vm.ajax_data.restAmount){
 			isAmountWithheld="false";//全部代扣
 		}
 	   if(vm.ajax_data.total>vm.ajax_data.restAmount){debugger
