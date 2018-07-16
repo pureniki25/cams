@@ -24,6 +24,7 @@ var getSelectsData = function () {
             vm.$Modal.error({content: '接口调用异常!'});
         });
 }
+
 window.layinit(function (htConfig) {
     var _htConfig = htConfig;
     financePath = _htConfig.financeBasePath;
@@ -135,14 +136,14 @@ window.layinit(function (htConfig) {
                             {
                                 field: 'accountMoney',
                                 title: '转账金额',
-                                templet:function(d){
-                                   return numeral(d.accountMoney).format('0,0.00')
+                                templet: function (d) {
+                                    return numeral(d.accountMoney).format('0,0.00')
                                 }
                             },
                             {
                                 field: 'totalBorrowAmount',
                                 title: '本期应还金额',
-                                templet:function(d){
+                                templet: function (d) {
                                     return numeral(d.totalBorrowAmount).format('0,0.00')
                                 }
                             },
@@ -166,10 +167,10 @@ window.layinit(function (htConfig) {
                                 field: 'certificatePictureUrl',
                                 title: '转账凭证',
                                 templet: function (d) {
-                                    var content="";
-                                    var url=d.certificatePictureUrl;
-                                    if(url !=null){
-                                        content= "<a href="+url+" style='color:#1E90FF;text-decoration:underline;' target='dialog' width='600'>查看</a>"
+                                    var content = "";
+                                    var url = d.certificatePictureUrl;
+                                    if (url != null) {
+                                        content = "<a href=" + url + " style='color:#1E90FF;text-decoration:underline;' target='dialog' width='600'>查看</a>"
                                     }
 
                                     return content
@@ -218,7 +219,7 @@ window.layinit(function (htConfig) {
                         console.log("obj.event", obj.event);
                         if (obj.event === 'audit') {
                             console.log("选择的行数据：", selectedRowInfo);
-                            if(selectedRowInfo.state != '未关联银行流水'){
+                            if (selectedRowInfo.state != '未关联银行流水') {
                                 vm.$Modal.error({content: "只能对未审核的数据进行审核"});
                                 return;
                             }
@@ -226,7 +227,7 @@ window.layinit(function (htConfig) {
                         } else if (obj.event === 'reject') {
 
                             console.log("选择的行数据：", selectedRowInfo);
-                            if(selectedRowInfo.state != '未关联银行流水'){
+                            if (selectedRowInfo.state != '未关联银行流水') {
                                 vm.$Modal.error({content: "只能对未审核的数据进行拒绝"});
                                 return;
                             }
@@ -242,36 +243,70 @@ window.layinit(function (htConfig) {
             handleReset(name) { // 重置表单
                 var tt = this.$refs[name];
                 tt.resetFields();
-                this.searchForm.accountStartTimeV='';
-                this.searchForm.accountEndTimeV='';
-                this.searchForm.regStartTimeV='';
-                this.searchForm.regEndTimeV='';
-
+                this.searchForm.accountStartTimeV = '';
+                this.searchForm.accountEndTimeV = '';
+                this.searchForm.regStartTimeV = '';
+                this.searchForm.regEndTimeV = '';
 
 
                 vm.toLoading();
             },
             ////  ----   单行操作界面显示  结束 -----------------
-            clickExport() {//导出Excel表格
+            clickExport: function () {//导出Excel表格
+                var self = this;
+                console.log("vm", self.searchForm);
+                console.log("self.searchForm.state=", self.searchForm.state);
 
-                layui.use(['layer', 'table', 'ht_config'], function () {
-                    // vm.$refs['searchForm'].validate((valid) => {
-                    //     if (valid) {
-                    // getData();
-                    // vm.exporting = true;
-                    var excelName = encodeURI("客户还款登记流水");
-                    expoertExcel(financePath + "customer/downloadCustomerFlowExcel", vm.searchForm, excelName + ".xls");
 
-                    // vm.exporting = false;
+                var fileName = "客户还款登记流水";
 
-                    // }
-                    // })
+                var url = financePath + "customer/downloadCustomerFlowExcel";
+                var data = JSON.stringify(self.searchForm);
+                console.log("data",data);
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    contentType: "application/json; charset=utf-8",
+                    async: false,
+                    data: data,
+                    dataType: "json",
+                    success: function (result) {
+                        console.log("结果：========", result);
+                        if (result.code == "1") {
+                            var docUrl = result.data;
+                            console.log(docUrl);
+                            var ExportForm = document.createElement("FORM");
+                            document.body.appendChild(ExportForm);
+                            ExportForm.method = "GET";
+                            ExportForm.action = basePath + "downLoadController/downLoadExcelGBK";
+                            addInput(ExportForm, "text", "docUrl", docUrl);
+                            addInput(ExportForm, "text", "downloadFile", fileName);
+                            ExportForm.submit();
+
+
+                            document.body.removeChild(ExportForm);
+                            vm.$Modal.success({
+                                title: '',
+                                content: '操作成功'
+                            });
+                        } else {
+                            vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
+                        }
+                    },
+                    error: function (result) {
+                        vm.$Message.error('接口调用异常!');
+                    }
+
                 });
+
             },
+
+
             beforeUpLoadFile() {//导入Excel表格
 
 
-            },
+            }
+            ,
 
             uploadSuccess(response) {
                 if (response.code == '1') {
@@ -280,8 +315,9 @@ window.layinit(function (htConfig) {
                     vm.$Modal.error({content: response.msg})
                 }
 
-            },
-            // 审核客户流水
+            }
+            ,
+// 审核客户流水
             auditCustomerFlow: function (id) {
                 var self = this;
 
@@ -292,15 +328,23 @@ window.layinit(function (htConfig) {
                 layer.confirm('确认审核通过该流水吗？', {icon: 3, title: '提示'}, function (index) {
                     var checkStatus = table.checkStatus('listTable'); //test即为基础参数id对应的值
                     var ids = "";
-                   console.log("id=",id);
-                    if (id != '' && id !=undefined) {
+                    console.log("id=", id);
+                    if (id != '' && id != undefined) {
                         ids = id;
-                        console.log("ids=",ids);
+                        console.log("ids=", ids);
                     } else {
+                        var flag=false;
                         for (i = 0, len = checkStatus.data.length; i < len; i++) {
                             ids += checkStatus.data[i].id + ","
+                            if(checkStatus.data[i].state != '未关联银行流水'){
+                                flag=true;
+                            }
                         }
-                        console.log("else ids=",ids);
+                        if (flag) {
+                            vm.$Modal.error({content: "只能对未审核的数据进行拒绝"});
+                            return;
+                        }
+                        console.log("else ids=", ids);
                     }
                     var url = financePath + "customer/auditOrRejectCustomerFlow";
 
@@ -322,7 +366,8 @@ window.layinit(function (htConfig) {
                 });
 
 
-            },
+            }
+            ,
             // 拒绝
             rejectCustomerFlow: function (id) {
                 var self = this;
@@ -330,11 +375,19 @@ window.layinit(function (htConfig) {
                     var checkStatus = table.checkStatus('listTable'); //test即为基础参数id对应的值
                     var ids = "";
 
-                    if (id != '' && id !=undefined) {
+                    if (id != '' && id != undefined) {
                         ids = id;
                     } else {
+                        var flag=false;
                         for (i = 0, len = checkStatus.data.length; i < len; i++) {
                             ids += checkStatus.data[i].id + ","
+                            if(checkStatus.data[i].state != '未关联银行流水'){
+                                flag=true;
+                            }
+                        }
+                        if (flag) {
+                            vm.$Modal.error({content: "只能对未审核的数据进行拒绝"});
+                            return;
                         }
                     }
                     var url = financePath + "customer/auditOrRejectCustomerFlow";
@@ -357,18 +410,22 @@ window.layinit(function (htConfig) {
                 });
 
 
-            },
+            }
+            ,
 
 
             regStartTime: function (starttime) {
                 this.searchForm.regStartTime = starttime;
-            },
+            }
+            ,
             regEndTime: function (endtime) {
                 this.searchForm.regEndTime = endtime;
-            },
+            }
+            ,
             accountStartTime: function (starttime) {
                 this.searchForm.accountStartTime = starttime;
-            },
+            }
+            ,
             accountEndTime: function (endtime) {
                 this.searchForm.accountEndTime = endtime;
             }
@@ -378,23 +435,25 @@ window.layinit(function (htConfig) {
         mounted: function () {
             this.init();
         }
-    });
+    })
+    ;
 
-   // var  delayDaysBegin: [
-   //      {pattern: '/^[0-9]*$/', message: '请输入数字',trigger: 'blur'  },
-   //      {
-   //          validator: function (rule, value, callback, source, options) {
-   //              if(vm.searchForm.delayDaysBegin!=""&& vm.searchForm.delayDaysEnd!=""){
-   //                  if (parseInt(vm.searchForm.delayDaysBegin) > parseInt(vm.searchForm.delayDaysEnd)) {
-   //                      callback(new Error('起始值大于结束值'));
-   //                  } else {
-   //                      callback();//校验通过
-   //                  }
-   //              }else{
-   //                  callback();
-   //              }
-   //
-   //          }, trigger: 'blur'
-   //      }
-   //  ],
-});
+// var  delayDaysBegin: [
+//      {pattern: '/^[0-9]*$/', message: '请输入数字',trigger: 'blur'  },
+//      {
+//          validator: function (rule, value, callback, source, options) {
+//              if(vm.searchForm.delayDaysBegin!=""&& vm.searchForm.delayDaysEnd!=""){
+//                  if (parseInt(vm.searchForm.delayDaysBegin) > parseInt(vm.searchForm.delayDaysEnd)) {
+//                      callback(new Error('起始值大于结束值'));
+//                  } else {
+//                      callback();//校验通过
+//                  }
+//              }else{
+//                  callback();
+//              }
+//
+//          }, trigger: 'blur'
+//      }
+//  ],
+})
+;

@@ -120,7 +120,13 @@ var layer;
 //			vm.$Modal.error({content: '共借标不能银行代扣'});
 //		   return;
 //		}
+		
 	    vm.loading = true;
+	    if(vm.platformId==''){debugger
+			   vm.$Modal.error({content:"代扣平台不能为空"});
+		   vm.loading = false;
+		   return;
+		   }
 		var isAmountWithheld="false";
 		if(vm.ajax_data.total<vm.ajax_data.restAmount){
 			isAmountWithheld="true";//部分代扣
@@ -179,6 +185,9 @@ var layer;
                 	   vm.loading = false;
                     if(data.code=='1'){
                     	vm.$Modal.success({content:"执行代扣金额"+vm.ajax_data.repayAmount+"元成功，请稍后查询结果"});
+
+                        location.reload();
+
 		             }else{
 		                 vm.$Modal.error({content:data.msg});
 		             }
@@ -207,8 +216,13 @@ var layer;
 		       	   vm.loading = false;
 		             if(data.code=='1'){
 		                   	vm.$Modal.success({content:"执行代扣金额"+vm.ajax_data.repayAmount+"元成功，请稍后查询结果"});
+
+                            location.reload();
+
 		             }else{
 		                 vm.$Modal.error({content:data.data});
+		                 
+		                 
 		             }
 		        },
 		        error : function() {

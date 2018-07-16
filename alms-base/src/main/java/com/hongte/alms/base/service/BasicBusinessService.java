@@ -48,6 +48,24 @@ public interface BasicBusinessService extends BaseService<BasicBusiness> {
 	List<String> selectCompanysBusinessIds(List<String> companyIds);
 
 	/**
+	 * 选择所有业务的业务Id
+	 * @return
+	 */
+	List<String> selectAllBusinessIds();
+
+	/**
+	 * 选择车贷业务的业务Id
+	 * @return
+	 */
+	List<String> selectCarBusinessIds();
+
+	/**
+	 * 选择房贷业务的业务Id
+	 * @return
+	 */
+	List<String> selectHouseBusinessIds();
+
+	/**
 	 * 前置费用:一次性收取的分公司费用+ 期初收取的月收分公司服务费+平台费+担保费
 	 * 
 	 * @param original_business_id

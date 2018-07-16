@@ -157,6 +157,46 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 		return sList;
 	}
 
+
+	@Override
+	public List<String> selectAllBusinessIds(){
+		return basicBusinessMapper.selectAllBusinessIds();
+	}
+
+	/**
+	 * 选择车贷业务的业务Id
+	 * @return
+	 */
+	@Override
+	public List<String> selectCarBusinessIds(){
+
+		List<Integer> bizTypes = new LinkedList<>();
+		bizTypes.add(BusinessTypeEnum.CYD_TYPE.value()); //车易贷
+		bizTypes.add(BusinessTypeEnum.CYDZQ_TYPE.value()); //车易贷展期
+		bizTypes.add(BusinessTypeEnum.QCRZZL_TYPE.value()); //汽车融资租赁
+		bizTypes.add(BusinessTypeEnum.ESC_TYPE.value()); //二手车商贷
+		bizTypes.add(BusinessTypeEnum.YD_CAR_TYPE.value()); //一点车贷
+		bizTypes.add(BusinessTypeEnum.CQSZDC_TYPE.value()); //车全垫资代采
+
+		return basicBusinessMapper.selectBusinessIdsByBizType(bizTypes);
+	}
+
+	/**
+	 * 选择房贷业务的业务Id
+	 * @return
+	 */
+	@Override
+	public List<String> selectHouseBusinessIds(){
+		List<Integer> bizTypes = new LinkedList<>();
+		bizTypes.add(BusinessTypeEnum.FSDZQ_TYPE.value()); //房速贷展期
+		bizTypes.add(BusinessTypeEnum.FSD_TYPE.value()); //房速贷
+		bizTypes.add(BusinessTypeEnum.YOU_FANG_TYPE.value()); //优房贷
+
+
+		return basicBusinessMapper.selectBusinessIdsByBizType(bizTypes);
+	}
+
+
     /**
      * 查询所有业务ID
      *
@@ -223,7 +263,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 	/**
 	 * 月收平台服务费的业务
 	 * 
-	 * @param original_business_id
+	 * @param crpId
 	 * @return
 	 */
 	@Override
@@ -234,7 +274,7 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 	/**
 	 * 月收公司服务费的业务
 	 * 
-	 * @param original_business_id
+	 * @param crpId
 	 * @returnfmn
 	 */
 	@Override

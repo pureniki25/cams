@@ -2,10 +2,13 @@ package com.hongte.alms.base.service.impl;
 
 import java.beans.Transient;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,62 +102,125 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
 	@Autowired
 	private UcAppRemote ucAppRemote;
     
-    /**
-     * 根据用户ID设置用户可访问的区域信息
+   /**
+     *根据用户ID设置用户可访问的区域信息
      * @param userId
      */
     @Transient
     public void setUserPermissons(String userId){
+
+//        List<SysUserRole> userRoles = sysUserRoleService.selectList(new EntityWrapper<SysUserRole>().eq("user_id",userId));
+//
+//        List<String> roleCodes = new LinkedList<String>();
+//
+//        for( SysUserRole uRole: userRoles){
+//            roleCodes.add(uRole.getRoleCode());
+//        }
+//
+//        List<SysRole> roles = sysRoleService.selectList(new EntityWrapper<SysRole>().in("role_code",roleCodes));
+
         //查出用户权限列表
         List<SysRole> roles = sysRoleService.getUserRoles(userId);
+
+        //拥有全局性角色标志位
+        Boolean hasOverAllRole = false;
+
+        //拥有区域性角色标志位
+        Boolean hasAreaRole = false;
+
+        //拥有财务跟单设置区域性角色标志位
+        Boolean  hasFinanceOrderSetAreaRole = false;
+
+        //拥有车贷业务查看角色标志位(车贷出纳)
+        Boolean hasSeeCarBizRole = false;
+
+        //拥有房贷业务查看角色标志位(房贷出纳)
+        Boolean hasSeeHourseBizRole =false;
+
+
 
         //确认用户拥有的权限访问数据的区域类型
         SysRoleAreaTypeEnums userAreaTypeEnums = SysRoleAreaTypeEnums.ONLY_SELF;
 
         RoleAreaMethodEnum roleAreaMethodEnum = RoleAreaMethodEnum.NULL_Area;
         for(SysRole role: roles){
+            //全局性
             if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.OVERALL.getKey())){
-                userAreaTypeEnums = SysRoleAreaTypeEnums.OVERALL;
+                hasOverAllRole = true;
             }
+            //区域性
             if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.AREA.getKey())){
-                if(userAreaTypeEnums == SysRoleAreaTypeEnums.ONLY_SELF){
-                    userAreaTypeEnums = SysRoleAreaTypeEnums.AREA;
+                if(role.getRoleAreaMethod().equals(RoleAreaMethodEnum.FINANCIAL_ORDER.value())){
+                    //拥有财务跟单设置区域性角色标
+                    hasFinanceOrderSetAreaRole = true;
+                }else{
+                    //根据用户区域设置区域性角色
+                    hasAreaRole = true;
                 }
             }
-            roleAreaMethodEnum = RoleAreaMethodEnum.valueOf(role.getRoleAreaMethod());
+            //查看车贷业务
+            if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.SEE_CAR_BUSINESS.getKey())){
+                hasSeeCarBizRole = true;
+            }
+
+            //查看房贷业务
+            if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.SEE_HOURSE_BUSINESS.getKey())){
+                hasSeeHourseBizRole = true;
+            }
+
         }
+        List<String>  businessIds = new LinkedList<>();
+        if(hasOverAllRole){
+            //拥有全局性角色
+            businessIds = basicBusinessService.selectAllBusinessIds();
+        }else{
+            if(hasAreaRole){
+                //拥有区域性角色
+                Map<String,BasicCompany> companyIds  = basicCompanyService.selectAreaUserCanSeeCompany(userId);
+                List<String>  tempBizs = basicBusinessService.selectCompanysBusinessIds(new LinkedList<>(companyIds.keySet()));
+                businessIds.addAll(tempBizs);
+            }
 
-        //根据统一用户平台的树来找
-        //根据信贷的树来找
-       Map<String,BasicCompany> companyIds  =  basicCompanyService.selectUserCanSeeCompany(userId);
-       List<String>  businessIds = basicBusinessService.selectCompanysBusinessIds(new LinkedList<>(companyIds.keySet()));
-
-        //角色权限是否为区域下的财务跟单配置权限 zgh
-        if (SysRoleAreaTypeEnums.AREA.equals(userAreaTypeEnums) && RoleAreaMethodEnum.FINANCIAL_ORDER.equals(roleAreaMethodEnum)) {
-            //如果有设置按跟单方式处理，则清除原区域性的权限
-            businessIds.clear();
-
-            //查找本用户id在财务跟单设置中配置的可访问的business zgh
-            //从财务跟单配置中查询本用户可访问的分公司id及业务类型
-            Page<SysFinancialOrderVO> financialOrderVOPage = sysFinancialOrderService.search(new Page<>(1, Integer.MAX_VALUE), null, null, null, userId);
-            if (financialOrderVOPage != null && financialOrderVOPage.getRecords() != null && !financialOrderVOPage.getRecords().isEmpty()) {
-                for (SysFinancialOrderVO fo : financialOrderVOPage.getRecords()) {
-                    List<String> tempBusinessIds = basicBusinessService.findBusinessIds(fo.getCompanyId(), fo.getBusinessTypeId());
-                    businessIds.addAll(tempBusinessIds);
+            if(hasFinanceOrderSetAreaRole){
+                //拥有财务跟单设置区域性角色
+                //查找本用户id在财务跟单设置中配置的可访问的business zgh
+                //从财务跟单配置中查询本用户可访问的分公司id及业务类型
+                Page<SysFinancialOrderVO> financialOrderVOPage = sysFinancialOrderService.search(new Page<>(1, Integer.MAX_VALUE), null, null, null, userId);
+                if (financialOrderVOPage != null && financialOrderVOPage.getRecords() != null && financialOrderVOPage.getRecords().size() > 0) {
+                    for (SysFinancialOrderVO fo : financialOrderVOPage.getRecords()) {
+                        List<String> tempBusinessIds = basicBusinessService.findBusinessIds(fo.getCompanyId(), fo.getBusinessTypeId());
+                        businessIds.addAll(tempBusinessIds);
+                    }
                 }
             }
-        }
 
-        //查找用户跟进的业务ID
-        List<String> followBids =  collectionStatusService.selectFollowBusinessIds(userId);
-        businessIds.addAll(followBids);
+            if(hasSeeCarBizRole){
+                //拥有车贷业务查看角色(车贷出纳)
+                List<String>  tempBizs = basicBusinessService.selectCarBusinessIds();
+                businessIds.addAll(tempBizs);
+            }
+
+            if(hasSeeHourseBizRole){
+                //拥有房贷业务查看角色(房贷出纳)
+                List<String>  tempBizs = basicBusinessService.selectHouseBusinessIds();
+                businessIds.addAll(tempBizs);
+            }
+
+            //查找用户跟进的业务ID(根据催收分配表  tb_collection_status 来查找)
+            List<String> followBids =  collectionStatusService.selectFollowBusinessIds(userId);
+            businessIds.addAll(followBids);
+
+        }
+        //去除重复的业务Id
+        businessIds = removeDuplicateBizIds(businessIds);
+
 
         //删除原来用户的可看业务信息
         sysUserPermissionService.delete(new EntityWrapper<SysUserPermission>().eq("user_id",userId));
 
         List<SysUserPermission> permissions = new LinkedList<>();
         Map<String,String> tempMap = new HashMap<>();
-        if(businessIds!=null&& !businessIds.isEmpty()){
+        if(businessIds!=null&& businessIds.size()>0){
             for(String businessId:businessIds){
                 if(tempMap.get(businessId)==null){
                     tempMap.put(businessId,userId);
@@ -166,11 +232,23 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
             }
         }
         //新增对应关系
-        if(!permissions.isEmpty()){
-            sysUserPermissionService.insertBatch(permissions,10000);
+        if(permissions.size()>0){
+            sysUserPermissionService.insertBatch(permissions);
         }
     }
-    
+
+
+    private static ArrayList<String> removeDuplicateBizIds(List<String> businessIds) {
+        Set<String> set = new TreeSet<String>(new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                //字符串,则按照asicc码升序排列
+                return o1.compareTo(o2);
+            }
+        });
+        set.addAll(businessIds);
+        return new ArrayList<String>(set);
+    }
     
 	/**
 	 * @Title: updateUserPermision  

@@ -344,7 +344,7 @@ window.layinit(function (htConfig) {
                                                             type: 2,
                                                             title: title,
                                                             content: [url],
-                                                            area: ['1600px', '800px'],
+                                                            area: ['95%', '95%'],
                                                             success: function (layero, index) {
                                                                 curIndex = index;
                                                             }
@@ -645,7 +645,7 @@ window.layinit(function (htConfig) {
     })
     
     
-  //获取执行代扣的URL路径
+  //获取执行代扣的URL路径 
     function getDeductionUrl(planListId){debugger
         var url
         $.ajax({

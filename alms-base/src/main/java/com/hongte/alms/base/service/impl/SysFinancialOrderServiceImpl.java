@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -51,8 +50,9 @@ public class SysFinancialOrderServiceImpl extends BaseServiceImpl<SysFinancialOr
     @Qualifier("SysUserPermissionService")
     private SysUserPermissionService sysUserPermissionService;
 
-    @Autowired
+    //@Autowired
     private Executor executor;
+    //private static final Executor executor = Executors.newCachedThreadPool();
 
 
     /**
@@ -110,9 +110,6 @@ public class SysFinancialOrderServiceImpl extends BaseServiceImpl<SysFinancialOr
                 //同步用户权限
                 if (financialOrderUsers != null && financialOrderUsers.size() > 0) {
                     for (SysFinancialOrderUser orderUser : financialOrderUsers) {
-                        if (StringUtils.isBlank(orderUser.getUserId())) {
-                            continue;
-                        }
                         syncUserPermission(orderUser.getUserId());
                     }
                 }
@@ -167,9 +164,6 @@ public class SysFinancialOrderServiceImpl extends BaseServiceImpl<SysFinancialOr
         //同步用户权限
         if (financialOrderUsers != null && financialOrderUsers.size() > 0) {
             for (SysFinancialOrderUser orderUser : financialOrderUsers) {
-                if (StringUtils.isBlank(orderUser.getUserId())) {
-                    continue;
-                }
                 syncUserPermission(orderUser.getUserId());
             }
         }

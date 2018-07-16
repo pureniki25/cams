@@ -18,37 +18,6 @@ public class SelfBoaInUserInfo {
     public SelfBoaInUserInfo() {
 	}
 
-	public SelfBoaInUserInfo(String userId, String userName, String email, String idNo, String mobile, String orgCode,
-			String orgName, String orgNameCh, String rootOrgCode, String rootOrgName, String rootOrgNameCh,
-			String orgPath, String orgType, List<String> positionCodes, List<String> positionNames,
-			List<String> positionNameChs, List<String> roleCodes, List<String> roleNames, List<String> roleNameChs,
-			String jobNumber, String appCode, String appName, String status) {
-		super();
-		this.userId = userId;
-		this.userName = userName;
-		this.email = email;
-		this.idNo = idNo;
-		this.mobile = mobile;
-		this.orgCode = orgCode;
-		this.orgName = orgName;
-		this.orgNameCh = orgNameCh;
-		this.rootOrgCode = rootOrgCode;
-		this.rootOrgName = rootOrgName;
-		this.rootOrgNameCh = rootOrgNameCh;
-		this.orgPath = orgPath;
-		this.orgType = orgType;
-		this.positionCodes = positionCodes;
-		this.positionNames = positionNames;
-		this.positionNameChs = positionNameChs;
-		this.roleCodes = roleCodes;
-		this.roleNames = roleNames;
-		this.roleNameChs = roleNameChs;
-		this.jobNumber = jobNumber;
-		this.appCode = appCode;
-		this.appName = appName;
-		this.status = status;
-	}
-
 	@ApiModelProperty(value = "用户ID", dataType = "string")
     String userId;
 
@@ -115,42 +84,10 @@ public class SelfBoaInUserInfo {
     @ApiModelProperty(value = "系统名称", dataType = "string")
     String appName;
     
-  //状态: 0 正常  2离职
+    //状态: 0 正常  2离职
     @ApiModelProperty(value = "用户状态", dataType = "string")
     String status;
-    public SelfBoaInUserInfo(String userId, String userName, String email,
-            String idNo, String mobile, String orgCode, String orgName, String orgNameCh,
-            String rootOrgCode, String rootOrgName, String rootOrgNameCh, String orgPath,
-            String orgType,String jobNumber) {
-        this.userId = userId;
-        this.userName = userName;
-        this.email = email;
-        this.idNo = idNo;
-        this.mobile = mobile;
-        this.orgCode = orgCode;
-        this.orgName = orgName;
-        this.orgNameCh = orgNameCh;
-        this.rootOrgCode = rootOrgCode;
-        this.rootOrgName = rootOrgName;
-        this.rootOrgNameCh = rootOrgNameCh;
-        this.orgPath = orgPath;
-        this.orgType = orgType;
-        this.jobNumber = jobNumber;
-    }
     
-    public SelfBoaInUserInfo(String userId, String userName, String email,
-            String idNo, String mobile, String orgCode, String jobNumber,String appCode,String status ) {
-        this.userId = userId;
-        this.userName = userName;
-        this.email = email;
-        this.idNo = idNo;
-        this.mobile = mobile;
-        this.orgCode = orgCode;
-        this.jobNumber = jobNumber;
-        this.appCode = appCode;
-        this.status = status;
-    }
-
 	public String getUserId() {
 		return userId;
 	}

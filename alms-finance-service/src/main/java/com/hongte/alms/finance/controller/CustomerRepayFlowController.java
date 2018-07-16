@@ -36,9 +36,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 
 @RestController
@@ -90,7 +94,7 @@ public class CustomerRepayFlowController {
     @ApiOperation(value = "导出客户流水excel")
     @PostMapping("/downloadCustomerFlowExcel")
     @ResponseBody
-    public Result downloadCustomerFlowExcel(CustomerRepayFlowListReq customerRepayFlowListReq) {
+    public Result downloadCustomerFlowExcel(@RequestBody  CustomerRepayFlowListReq customerRepayFlowListReq) {
         LOGGER.info("====>>>>>导出客户流水excel开始[{}]", JSON.toJSONString(customerRepayFlowListReq));
         Result result = null;
         try {
@@ -112,6 +116,70 @@ public class CustomerRepayFlowController {
         LOGGER.info("====>>>>>导出客户流水excel结束{}", result);
         return result;
     }
+
+//    @ApiOperation(value = "导出客户流水excel")
+//    @PostMapping("/downloadCustomerFlowExcel")
+//    @ResponseBody
+//    public void downloadExcel(CustomerRepayFlowListReq customerRepayFlowListReq, HttpServletResponse response) {
+//        LOGGER.info("====>>>>>导出客户流水excel开始[{}]", JSON.toJSONString(customerRepayFlowListReq));
+//
+//        InputStream in = null;
+//        OutputStream out = null;
+//        try {
+//            List<CustomerRepayFlowExel> customerRepayFlowList = moneyPoolRepaymentService.getCustomerRepayFlowList(customerRepayFlowListReq);
+//            Workbook workbook = ExcelExportUtil.exportExcel(new ExportParams(), CustomerRepayFlowExel.class, customerRepayFlowList);
+//
+//            String prefix = UUID.randomUUID().toString();
+//            String suffix = ".xls";
+//            File tempFile = File.createTempFile(prefix, suffix);
+//
+//            LOGGER.info("临时文件所在的本地路径：" + tempFile.getCanonicalPath());
+//
+//            FileOutputStream os = new FileOutputStream(tempFile);
+//
+//            workbook.write(os);
+//            os.close();
+//            in = new BufferedInputStream(new FileInputStream(tempFile));
+//
+//            out = new BufferedOutputStream(response.getOutputStream());
+//            String downloadFile = "客户还款登记流水";
+//            response.setCharacterEncoding("utf-8");//设置编码集,文件名不会发生中文乱码
+//            response.setHeader("Content-Disposition", "attachment;filename=" +new String(downloadFile.getBytes("gbk"), "iso8859-1")+".xls");
+//            response.setHeader("Content-type", "application/octet-stream");
+//
+//
+//            byte[] car = new byte[1024];
+//            int count = 0;
+//            while ((count = in.read(car)) != -1) {
+//                out.write(car, 0, count);
+//
+//            }
+//            tempFile.deleteOnExit();
+//
+//        } catch (Exception e) {
+//            if (e instanceof IOException) {
+//                e.printStackTrace();
+//                LOGGER.error("文件下载发生异常!", e);
+//            } else if (e instanceof UnsupportedEncodingException) {
+//                e.printStackTrace();
+//                LOGGER.error("设置编码格式发生异常!", e);
+//            } else {
+//                e.printStackTrace();
+//                LOGGER.error("文件下载发生异常!", e);
+//            }
+//        } finally {
+//            try {
+//                in.close();
+//                out.flush();
+//                out.close();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        LOGGER.info("====>>>>>导出客户流水excel结束{}");
+//    }
+
 
     @ApiOperation(value = "获取客户还款流水列表请求参数列表")
     @GetMapping("/getCustomerRepayFlowSelectsData")
@@ -154,7 +222,7 @@ public class CustomerRepayFlowController {
 
     @ApiOperation(value = "审核/拒绝客户还款流水记录")
     @RequestMapping("/auditOrRejectCustomerFlow")
-    public Result auditOrRejectCustomerFlow( CustomerRepayFlowOptReq customerRepayFlowOptReq) {
+    public Result auditOrRejectCustomerFlow(CustomerRepayFlowOptReq customerRepayFlowOptReq) {
         LOGGER.info("====>>>>>审核/拒绝客户还款流水记录开始[{}]", customerRepayFlowOptReq);
         Result result = null;
         try {

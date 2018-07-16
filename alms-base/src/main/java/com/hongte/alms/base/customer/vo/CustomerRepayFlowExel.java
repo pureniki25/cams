@@ -4,6 +4,7 @@ import org.jeecgframework.poi.excel.annotation.Excel;
 import org.jeecgframework.poi.excel.annotation.ExcelTarget;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 @ExcelTarget("customerRepayFlowExel")
 public class CustomerRepayFlowExel implements Serializable {
@@ -27,10 +28,10 @@ public class CustomerRepayFlowExel implements Serializable {
     @Excel(name = "所属分公司", orderNum = "7", isImportField = "true_st")
     private String companyName;//'所属分公司'
     @Excel(name = "转账金额", orderNum = "8", isImportField = "true_st")
-    private String accountMoney;//'转账金额'
+    private Double accountMoney;//'转账金额'
 
     @Excel(name = "本期应还金额", orderNum = "9", isImportField = "true_st")
-    private String totalBorrowAmount;//'本期应还金额'
+    private Double totalBorrowAmount;//'本期应还金额'
     @Excel(name = "实际转账人", orderNum = "10", isImportField = "true_st")
     private String factTransferName;//'实际转账人'
     @Excel(name = "转账日期", orderNum = "11", isImportField = "true_st")
@@ -100,19 +101,19 @@ public class CustomerRepayFlowExel implements Serializable {
         this.companyName = companyName;
     }
 
-    public String getAccountMoney() {
+    public Double getAccountMoney() {
         return accountMoney;
     }
 
-    public void setAccountMoney(String accountMoney) {
+    public void setAccountMoney(Double accountMoney) {
         this.accountMoney = accountMoney;
     }
 
-    public String getTotalBorrowAmount() {
+    public Double getTotalBorrowAmount() {
         return totalBorrowAmount;
     }
 
-    public void setTotalBorrowAmount(String totalBorrowAmount) {
+    public void setTotalBorrowAmount(Double totalBorrowAmount) {
         this.totalBorrowAmount = totalBorrowAmount;
     }
 
