@@ -49,6 +49,7 @@ import com.hongte.alms.base.service.TuandaiProjectInfoService;
 import com.hongte.alms.base.service.WithholdingChannelService;
 import com.hongte.alms.base.service.WithholdingRepaymentLogService;
 import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.util.CommonUtil;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.MerchOrderUtil;
 import com.hongte.alms.common.util.StringUtil;
@@ -210,25 +211,26 @@ public class RechargeServiceImpl implements RechargeService {
 			if (channel.getPlatformId() == PlatformEnum.YB_FORM.getValue()) {
 			
 				YiBaoRechargeReqDto dto = new YiBaoRechargeReqDto();
-				dto.setMerchantaccount(merchOrderId);
+				dto.setMerchantaccount(merchantaccount);
 				dto.setOrderid(merchOrderId);
-				dto.setTranstime(Integer.valueOf(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date())));
+				dto.setTranstime((int) (System.currentTimeMillis()));
 				dto.setAmount((int)(amount * 100));// 易宝代扣要转换单位:分
 				dto.setProductname("");
 				dto.setIdentityid(bankCardInfo.getIdentityNo());
-				dto.setIdentitytype("01");
+				dto.setIdentitytype("5");
 				dto.setCard_top(bankCardInfo.getBankCardNumber().substring(0, 6));
 				dto.setCard_last(bankCardInfo.getBankCardNumber().substring(
 						bankCardInfo.getBankCardNumber().length() - 4, bankCardInfo.getBankCardNumber().length()));
-				dto.setCallbackurl("172.0.0.1");
-				dto.setUserip("172.0.0.1");
+				dto.setCallbackurl("http://alms.hongte.info");
+				dto.setUserip(CommonUtil.getClientIp());
+				dto.setProductname(merchOrderId);
 				
 				/*
 				 * 调用接口前线插入记录 status 代扣状态(1:成功,0:失败;2:处理中)
 				 */
 				Integer status = 2;
 				WithholdingRepaymentLog log = recordRepaymentLog("", status, pList, business, bankCardInfo,
-						channel.getPlatformId(), boolLastRepay, boolPartRepay, merchOrderId, 0,
+						channel.getPlatformId(), boolLastRepay, boolPartRepay, merchOrderId,merchantaccount, 0,
 						BigDecimal.valueOf(amount),appType);
 				String resultMsg="";
 				com.ht.ussp.core.Result remoteResult=null;
@@ -248,7 +250,7 @@ public class RechargeServiceImpl implements RechargeService {
 									.eq("status", 1).orderBy("param_value"));
 				if(thirtyRepayTestResult!=null) {
 					if(thirtyRepayTestResult.getParamValue().equals("0000")) {
-						resultMsg="充值成功";
+						resultMsg="交易成功";
 						remoteResult.setReturnCode("0000");
 					}else if(thirtyRepayTestResult.getParamValue().equals("1111")){
 						resultMsg="银行卡余额不足";
@@ -321,7 +323,7 @@ public class RechargeServiceImpl implements RechargeService {
 				 */
 				Integer status = 2;
 				WithholdingRepaymentLog log = recordRepaymentLog("", status, pList, business, bankCardInfo,
-						channel.getPlatformId(), boolLastRepay, boolPartRepay, merchOrderId, 0,
+						channel.getPlatformId(), boolLastRepay, boolPartRepay, merchOrderId,"", 0,
 						BigDecimal.valueOf(amount),appType);
 				com.ht.ussp.core.Result remoteResult = null;
 				try {
@@ -431,7 +433,7 @@ public class RechargeServiceImpl implements RechargeService {
 				 */
 				Integer status = 2;
 				WithholdingRepaymentLog log = recordRepaymentLog("", status, pList, business, bankCardInfo,
-						channel.getPlatformId(), boolLastRepay, boolPartRepay, merchOrderId, 0,
+						channel.getPlatformId(), boolLastRepay, boolPartRepay, merchOrderId,"", 0,
 						BigDecimal.valueOf(amount),appType);
 
 				BankRechargeReqDto dto = new BankRechargeReqDto();
@@ -448,7 +450,7 @@ public class RechargeServiceImpl implements RechargeService {
 					dto.setCmOrderNo(merchOrderId);
 					dto.setOidPartner(oidPartner);
 					dto.setOrgUserName(orgUserName);
-					dto.setUserIP("127.0.0.1");
+					dto.setUserIP(CommonUtil.getClientIp());
 					com.ht.ussp.core.Result remoteResult = null;
 					try {
 						remoteResult = eipRemote.bankRecharge(dto);
@@ -600,7 +602,7 @@ public class RechargeServiceImpl implements RechargeService {
 		String dataJson = JSONObject.toJSONString(remoteResult.getData());
 		Map<String, Object> resultMap = JSONObject.parseObject(dataJson, Map.class);
 		String yborderid = (String) resultMap.get("yborderid");
-			if(StringUtil.isEmpty(yborderid)) {
+			if(!StringUtil.isEmpty(yborderid)) {
 				return "交易成功";
 			}else {
 				return remoteResult.getCodeDesc();
@@ -746,7 +748,7 @@ public class RechargeServiceImpl implements RechargeService {
 
 	public WithholdingRepaymentLog recordRepaymentLog(String msg, Integer status, RepaymentBizPlanList list,
 			BasicBusiness business, BankCardInfo dto, Integer platformId, Integer boolLastRepay, Integer boolPartRepay,
-			String merchOrderId, Integer settlementType, BigDecimal currentAmount,String appType) {
+			String merchOrderId,String merchAccount ,Integer settlementType, BigDecimal currentAmount,String appType) {
 		WithholdingRepaymentLog log = new WithholdingRepaymentLog();
 		log.setAfterId(list.getAfterId());
 		log.setBankCard(dto.getBankCardNumber());
@@ -759,6 +761,7 @@ public class RechargeServiceImpl implements RechargeService {
 		log.setOriginalBusinessId(business.getBusinessId());
 		log.setPhoneNumber(dto.getMobilePhone());
 		log.setCustomerName(dto.getBankCardName());
+		log.setMerchantAccount(merchAccount);
 		log.setRepayStatus(status);
 		log.setRemark(msg);
 		log.setThirdOrderId(merchOrderId);
@@ -1123,7 +1126,11 @@ public class RechargeServiceImpl implements RechargeService {
 			log.setUpdateTime(new Date());
 			withholdingRepaymentLogService.updateById(log);
 			shareProfit(pList, log);
+			try {
 			sendMessageService.sendAfterRepaySuccessSms(log.getPhoneNumber(),log.getCustomerName(),borrowDate, plan.getBorrowMoney(), pList.getPeriod(), pList.getTotalBorrowAmount().add(pList.getOverdueAmount()==null?BigDecimal.valueOf(0):pList.getOverdueAmount()),log.getCurrentAmount());
+			}catch(Exception e) {
+				logger.error("银行代扣成功短信发送错误,logId:{0}",log.getLogId());
+			}
 		} else if (result.getReturnCode().equals(RepayResultCodeEnum.YH_HANDLER_EXCEPTION.getValue())||result.getReturnCode().equals("INTERNAL_ERROR")) {
 			log.setRepayStatus(2);
 			log.setRemark(result.getReturnCode()+"："+result.getMsg());
@@ -1142,10 +1149,12 @@ public class RechargeServiceImpl implements RechargeService {
 			log.setRemark(result.getMsg());
 			log.setUpdateTime(new Date());
 			withholdingRepaymentLogService.updateById(log);
-			
+			try {
 			//sms
 			sendMessageService.sendAfterRepayFailSms(log.getPhoneNumber(),log.getCustomerName(),borrowDate, plan.getBorrowMoney(), pList.getPeriod());
-			
+			}catch(Exception e) {
+				logger.error("银行代扣失败短信发送错误,logId:{0}",log.getLogId());
+			}
 		}
 		
 	}
@@ -1213,8 +1222,11 @@ public class RechargeServiceImpl implements RechargeService {
 			log.setUpdateTime(new Date());
 			withholdingRepaymentLogService.updateById(log);
 			shareProfit(pList, log);
+			try {
 			sendMessageService.sendAfterRepaySuccessSms(log.getPhoneNumber(),log.getCustomerName(),borrowDate, plan.getBorrowMoney(), pList.getPeriod(), pList.getTotalBorrowAmount().add(pList.getOverdueAmount()==null?BigDecimal.valueOf(0):pList.getOverdueAmount()),log.getCurrentAmount());
-			
+			}catch(Exception e) {
+				logger.error("宝付代扣成功短信发送错误,logId:{0}",log.getLogId());
+			}
 
 		} else if (result.getReturnCode().equals(RepayResultCodeEnum.BF00100.getValue())
 				|| result.getReturnCode().equals(RepayResultCodeEnum.BF00112.getValue())
@@ -1232,8 +1244,11 @@ public class RechargeServiceImpl implements RechargeService {
 			log.setRemark(result.getMsg());
 			log.setUpdateTime(new Date());
 			withholdingRepaymentLogService.updateById(log);
+			try {
 			sendMessageService.sendAfterRepayFailSms(log.getPhoneNumber(),log.getCustomerName(),borrowDate, plan.getBorrowMoney(), pList.getPeriod());
-
+			}catch(Exception e) {
+				logger.error("宝付代扣失败短信发送错误,logId:{0}",log.getLogId());
+			}
 		}
 
 		
@@ -1269,8 +1284,11 @@ public class RechargeServiceImpl implements RechargeService {
 			log.setUpdateTime(new Date());
 			withholdingRepaymentLogService.updateById(log);
 			shareProfit(pList, log);
+			try {
 			sendMessageService.sendAfterRepaySuccessSms(log.getPhoneNumber(),log.getCustomerName(),borrowDate, plan.getBorrowMoney(), pList.getPeriod(), pList.getTotalBorrowAmount().add(pList.getOverdueAmount()==null?BigDecimal.valueOf(0):pList.getOverdueAmount()),log.getCurrentAmount());
-
+			}catch(Exception e) {
+				logger.error("易宝代扣成功短信发送错误,logId:{0}",log.getLogId());
+			}
 
 		} else if (msg.contains("系统异常")) {
 			log.setRepayStatus(2);
@@ -1283,8 +1301,11 @@ public class RechargeServiceImpl implements RechargeService {
 			log.setRemark(msg);
 			log.setUpdateTime(new Date());
 			withholdingRepaymentLogService.updateById(log);
+			try {
 			sendMessageService.sendAfterRepayFailSms(log.getPhoneNumber(),log.getCustomerName(),borrowDate, plan.getBorrowMoney(), pList.getPeriod());
-
+			}catch(Exception e) {
+				logger.error("易宝代扣失败短信发送错误,logId:{0}",log.getLogId());
+			}
 		}
 		
 	}
