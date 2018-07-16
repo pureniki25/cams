@@ -321,31 +321,31 @@ window.layinit(function (htConfig) {
             auditCustomerFlow: function (id) {
                 var self = this;
 
-
+                var checkStatus = table.checkStatus('listTable'); //test即为基础参数id对应的值
+                var ids = "";
+                console.log("id=", id);
+                if (id != '' && id != undefined) {
+                    ids = id;
+                    console.log("ids=", ids);
+                } else {
+                    var flag=false;
+                    for (i = 0, len = checkStatus.data.length; i < len; i++) {
+                        ids += checkStatus.data[i].id + ","
+                        if(checkStatus.data[i].state != '未关联银行流水'){
+                            flag=true;
+                        }
+                    }
+                    if (flag) {
+                        vm.$Modal.error({content: "只能对未审核的数据进行拒绝"});
+                        return;
+                    }
+                    console.log("else ids=", ids);
+                }
                 // console.log(checkStatus.data) //获取选中行的数据
                 // console.log(checkStatus.data.length) //获取选中行数量，可作为是否有选中行的条件
                 // console.log(checkStatus.isAll) //表格是否全选
                 layer.confirm('确认审核通过该流水吗？', {icon: 3, title: '提示'}, function (index) {
-                    var checkStatus = table.checkStatus('listTable'); //test即为基础参数id对应的值
-                    var ids = "";
-                    console.log("id=", id);
-                    if (id != '' && id != undefined) {
-                        ids = id;
-                        console.log("ids=", ids);
-                    } else {
-                        var flag=false;
-                        for (i = 0, len = checkStatus.data.length; i < len; i++) {
-                            ids += checkStatus.data[i].id + ","
-                            if(checkStatus.data[i].state != '未关联银行流水'){
-                                flag=true;
-                            }
-                        }
-                        if (flag) {
-                            vm.$Modal.error({content: "只能对未审核的数据进行拒绝"});
-                            return;
-                        }
-                        console.log("else ids=", ids);
-                    }
+
                     var url = financePath + "customer/auditOrRejectCustomerFlow";
 
                     axios.get(url, {params: {idsStr: ids, opt: 2}})
@@ -371,25 +371,26 @@ window.layinit(function (htConfig) {
             // 拒绝
             rejectCustomerFlow: function (id) {
                 var self = this;
-                layer.confirm('确认拒绝该流水吗？', {icon: 3, title: '提示'}, function (index) {
-                    var checkStatus = table.checkStatus('listTable'); //test即为基础参数id对应的值
-                    var ids = "";
+                var checkStatus = table.checkStatus('listTable'); //test即为基础参数id对应的值
+                var ids = "";
 
-                    if (id != '' && id != undefined) {
-                        ids = id;
-                    } else {
-                        var flag=false;
-                        for (i = 0, len = checkStatus.data.length; i < len; i++) {
-                            ids += checkStatus.data[i].id + ","
-                            if(checkStatus.data[i].state != '未关联银行流水'){
-                                flag=true;
-                            }
-                        }
-                        if (flag) {
-                            vm.$Modal.error({content: "只能对未审核的数据进行拒绝"});
-                            return;
+                if (id != '' && id != undefined) {
+                    ids = id;
+                } else {
+                    var flag=false;
+                    for (i = 0, len = checkStatus.data.length; i < len; i++) {
+                        ids += checkStatus.data[i].id + ","
+                        if(checkStatus.data[i].state != '未关联银行流水'){
+                            flag=true;
                         }
                     }
+                    if (flag) {
+                        vm.$Modal.error({content: "只能对未审核的数据进行拒绝"});
+                        return;
+                    }
+                }
+                layer.confirm('确认拒绝该流水吗？', {icon: 3, title: '提示'}, function (index) {
+
                     var url = financePath + "customer/auditOrRejectCustomerFlow";
 
                     axios.get(url, {params: {idsStr: ids, opt: 3}})
