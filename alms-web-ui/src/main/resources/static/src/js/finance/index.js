@@ -411,7 +411,7 @@ window.layinit(function (htConfig) {
                                             type: 2,
                                             title: '计划详情',
                                             content: url,
-                                            area: ['1600px', '800px'],
+                                            area: ['95%', '95%'],
                                             success: function (layero, index) {
                                                 console.log(layero, index);
                                             }

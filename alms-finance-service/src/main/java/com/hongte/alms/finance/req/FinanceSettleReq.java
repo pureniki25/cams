@@ -13,7 +13,7 @@ public class FinanceSettleReq {
     private String businessId ;
     //必填,期数afterId
 //    @NotNull(message="还款计划期数afterId不能为空")
-//    private String afterId ;
+    private String afterId ;
 
     private String planId;
 

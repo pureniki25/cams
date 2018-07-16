@@ -84,15 +84,15 @@
 			        	</tbody>
 		        	</table> -->
 		        	
-		        	<Modal v-model="repayPlanFlag" title="计划还款" width="1600">
+		        	<Modal v-model="repayPlanFlag" title="计划还款" width="100%">
 		        		<i-table border :columns="repayPlanColumns" :data="repayPlanColumnsData"></i-table>
 					</Modal>
 					
-		        	<Modal v-model="repayActualFlag" title="实际还款" width="1600">
+		        	<Modal v-model="repayActualFlag" title="实际还款" width="100%">
 		        		<i-table border :columns="repayPlanColumns" :data="repayActualColumnsData"></i-table>
 					</Modal>
 					
-		        	<Modal v-model="repayDifferenceFlag" title="差额" width="1600">
+		        	<Modal v-model="repayDifferenceFlag" title="差额" width="100%">
 		        		<i-table border :columns="repayPlanColumns" :data="repayDifferenceColumnsData"></i-table>
 					</Modal>
 					

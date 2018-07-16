@@ -124,6 +124,13 @@ public class RepaymentResource extends Model<RepaymentResource> {
 	@TableField(exist=false)
 	private BigDecimal dOnlineOverDue ;
 
+	/**
+	 * 结清还款确认Id
+	 */
+	@TableField("settle_log_id")
+	@ApiModelProperty(required= true,value = "结清还款确认Id")
+	private String settleLogId;
+
 
 	public String getResourceId() {
 		return resourceId;
@@ -287,5 +294,13 @@ public class RepaymentResource extends Model<RepaymentResource> {
 	 */
 	public void setdOnlineOverDue(BigDecimal dOnlineOverDue) {
 		this.dOnlineOverDue = dOnlineOverDue;
+	}
+
+	public String getSettleLogId() {
+		return settleLogId;
+	}
+
+	public void setSettleLogId(String settleLogId) {
+		this.settleLogId = settleLogId;
 	}
 }
