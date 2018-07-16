@@ -188,13 +188,13 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
             if(hasSeeCarBizRole){
                 //拥有车贷业务查看角色(车贷出纳)
                 List<String>  tempBizs = basicBusinessService.selectCarBusinessIds();
-                derateManagetBusinessIds.addAll(tempBizs);
+                derateManagerBusinessIds.addAll(tempBizs);
             }
 
             if(hasSeeHourseBizRole){
                 //拥有房贷业务查看角色(房贷出纳)
                 List<String>  tempBizs = basicBusinessService.selectHouseBusinessIds();
-                derateManagetBusinessIds.addAll(tempBizs);
+                derateManagerBusinessIds.addAll(tempBizs);
             }
 
             //查找用户跟进的业务ID(根据催收分配表  tb_collection_status 来查找)
@@ -203,7 +203,10 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
 
         }
         //去除重复的业务Id
-        businessIds = removeDuplicateBizIds(businessIds);
+        dhManagerBusinessIds = removeDuplicateBizIds(dhManagerBusinessIds);
+        financeManagerBusinessIds = removeDuplicateBizIds(financeManagerBusinessIds);
+        derateManagerBusinessIds = removeDuplicateBizIds(derateManagerBusinessIds);
+        processManagerBusinessIds = removeDuplicateBizIds(processManagerBusinessIds);
 
 
         //删除原来用户的可看业务信息
@@ -211,17 +214,17 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
 
         List<SysUserPermission> permissions = new LinkedList<>();
         Map<String,String> tempMap = new HashMap<>();
-        if(businessIds!=null&& businessIds.size()>0){
-            for(String businessId:businessIds){
-                if(tempMap.get(businessId)==null){
-                    tempMap.put(businessId,userId);
-                    SysUserPermission permission = new SysUserPermission();
-                    permission.setBusinessId(businessId);
-                    permission.setUserId(userId);
-                    permissions.add(permission);
-                }
-            }
-        }
+//        if(businessIds!=null&& businessIds.size()>0){
+//            for(String businessId:businessIds){
+//                if(tempMap.get(businessId)==null){
+//                    tempMap.put(businessId,userId);
+//                    SysUserPermission permission = new SysUserPermission();
+//                    permission.setBusinessId(businessId);
+//                    permission.setUserId(userId);
+//                    permissions.add(permission);
+//                }
+//            }
+//        }
         //新增对应关系
         if(permissions.size()>0){
             sysUserPermissionService.insertBatch(permissions);
