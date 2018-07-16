@@ -28,6 +28,7 @@ import com.hongte.alms.finance.service.FinanceSettleService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.LoginInfoDto;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -133,7 +134,6 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         shareBizSettleMoney(financeSettleBaseDto, financeSettleReq);
 
 
-
     }
 
 
@@ -206,31 +206,32 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                 repaymentBizPlanBaks.add(repaymentBizPlanBak);
 
 
-                List<RepaymentBizPlanList> repaymentBizPlanListList = repaymentBizPlanListMapper.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", planId));
+                List<RepaymentBizPlanList> repaymentBizPlanListList = repaymentBizPlanListMapper.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", planId).orderBy("period"));
 
                 if (CollectionUtils.isNotEmpty(repaymentBizPlanListList)) {
                     List<RepaymentBizPlanListBak> repaymentBizPlanListBaks = financeSettleBaseDto.getRepaymentBizPlanListBaks();
                     List<RepaymentBizPlanListDto> bizPlanListDtos = new ArrayList<>();
                     for (RepaymentBizPlanList repaymentBizPlanList : repaymentBizPlanListList) {
 
-                        RepaymentBizPlanListDto repaymentBizPlanListDto = new RepaymentBizPlanListDto();
-                        repaymentBizPlanListDto.setRepaymentBizPlanList(repaymentBizPlanList);
-
-
-                        RepaymentBizPlanListBak repaymentBizPlanListBak = new RepaymentBizPlanListBak();
-                        BeanUtils.copyProperties(repaymentBizPlanList, repaymentBizPlanListBak);
-                        repaymentBizPlanListBaks.add(repaymentBizPlanListBak);
-
-                        String planListId = repaymentBizPlanList.getPlanListId();
-
                         String currentStatus = repaymentBizPlanList.getCurrentStatus(); //标的还款状态
 
                         if (RepayCurrentStatusEnums.还款中.toString().equals(currentStatus) || RepayCurrentStatusEnums.逾期.toString().equals(currentStatus)) {
+                            RepaymentBizPlanListDto repaymentBizPlanListDto = new RepaymentBizPlanListDto();
+                            repaymentBizPlanListDto.setRepaymentBizPlanList(repaymentBizPlanList);
+
+
+                            RepaymentBizPlanListBak repaymentBizPlanListBak = new RepaymentBizPlanListBak();
+                            BeanUtils.copyProperties(repaymentBizPlanList, repaymentBizPlanListBak);
+                            repaymentBizPlanListBaks.add(repaymentBizPlanListBak);
+
+                            String planListId = repaymentBizPlanList.getPlanListId();
+
+
                             List<RepaymentBizPlanListDetail> repaymentBizPlanListDetailList = repaymentBizPlanListDetailMapper.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", planListId));
 
+                                repaymentBizPlanListDto.setBizPlanListDetails(repaymentBizPlanListDetailList);
                             if (CollectionUtils.isNotEmpty(repaymentBizPlanListDetailList)) {
                                 List<RepaymentBizPlanListDetailBak> repaymentBizPlanListDetailBaks = financeSettleBaseDto.getRepaymentBizPlanListDetailBaks();
-                                repaymentBizPlanListDto.setBizPlanListDetails(repaymentBizPlanListDetailList);
 
                                 for (RepaymentBizPlanListDetail repaymentBizPlanListDetail : repaymentBizPlanListDetailList) {
 
@@ -239,9 +240,8 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                                     repaymentBizPlanListDetailBaks.add(repaymentBizPlanListDetailBak);
                                 }
                             }
+                            bizPlanListDtos.add(repaymentBizPlanListDto);
                         }
-
-                        bizPlanListDtos.add(repaymentBizPlanListDto);
                     }
                     repaymentBizPlanDto.setBizPlanListDtos(bizPlanListDtos);
                 }
@@ -530,7 +530,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     /**
      * 填充biz业务还款计划
      */
-    public void shareBizSettleMoney( FinanceSettleBaseDto financeSettleBaseDto,FinanceSettleReq req) {
+    public void shareBizSettleMoney(FinanceSettleBaseDto financeSettleBaseDto, FinanceSettleReq req) {
         List<RepaymentBizPlanDto> planDtoList = financeSettleBaseDto.getPlanDtoList();
         if (CollectionUtils.isNotEmpty(planDtoList)) {
             for (RepaymentBizPlanDto repaymentBizPlanDto : planDtoList) {
@@ -562,7 +562,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                             planListDetail.setFactAmount(projFactAmount);
                             planListDetail.setUpdateDate(new Date());
                             planListDetail.setUpdateUser(financeSettleBaseDto.getUserId());
-                            planListDetail.updateById();
+//                            planListDetail.updateById();
                         }
 
 
@@ -708,7 +708,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         detail.setFactRepayDate(resource.getRepayDate());
         detail.setUpdateDate(new Date());
         detail.setUpdateUser(loginUserInfoHelper.getUserId());
-        detail.updateById();
+//        detail.updateById();
 
 
         return fact;
@@ -725,6 +725,9 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     private void addProjFactRepays(FinanceSettleBaseDto financeSettleBaseDto, String bizPlanListDetailId, RepaymentProjFactRepay fact) {
         String planId = financeSettleBaseDto.getPlanId(); //planId
         Map<String, List<RepaymentProjFactRepay>> stringListMap = financeSettleBaseDto.getProjFactRepays().get(planId);
+        if (MapUtils.isEmpty(stringListMap)) {
+            stringListMap = new HashMap<>();
+        }
         List<RepaymentProjFactRepay> list = stringListMap.get(bizPlanListDetailId);
         if (list == null) {
             list = new ArrayList<>();
@@ -732,6 +735,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         list.add(fact);
         stringListMap.put(bizPlanListDetailId, list);
 
+        financeSettleBaseDto.getProjFactRepays().put(planId, stringListMap);
     }
 
 
