@@ -6,10 +6,23 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class FinanceSettleBaseDto {
+
+
+    private String businessId;
+    private String orgBusinessId;
+    private String planId;
+    private String afterId;
+    private String userId;
+    private String projectId;
+
+    private String userName;
+    private String uuid;
 
 
     /**
@@ -43,18 +56,28 @@ public class FinanceSettleBaseDto {
     private List<RepaymentProjPlanListDetailBak> repaymentProjPlanListDetailBaks=new ArrayList<>();
 
 
+    /**
+     * 新增还款金额list  按planId
+     * Map<plan_list_detail_id, List<RepaymentProjFactRepay>>
+     */
+    private Map<String,Map<String, List<RepaymentProjFactRepay>>> projFactRepays =new HashMap<>();
 
-    private List<RepaymentResource> repaymentResources;
-
-    private String userId;
-
-    private String userName;
+    // 调用来源的标志位
+    private Integer callFlage;
 
 
-    private String uuid;
+    // 当前用到第几条还款来源的标志位
+    private Integer resourceIndex=0;
+    // 当前用于分账的还款来源
+    private RepaymentResource curalResource;
+    // 当前用于分账的金额（对应还款来源）
+    private BigDecimal curalDivideAmount = BigDecimal.ZERO;
+    // 本次调用实还金额
+    private BigDecimal realPayedAmount ;
 
-    private String businessId;
-    private String planId;
+    private List<RepaymentResource> repaymentResources=new ArrayList<>();
+
+
 
 
 }
