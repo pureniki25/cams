@@ -237,7 +237,7 @@ public class WithholdingFlowRecordServiceImpl extends BaseServiceImpl<Withholdin
                 }
             }
         } catch (Exception ex) {
-            log.error("@WithholdingFlowRecordServiceImpl@导入易宝代扣流水失败 解析易宝流水zip文件失败.msg:[{}]", ex.getMessage(), ex);
+            log.error("@WithholdingFlowRecordServiceImpl@导入易宝代扣流水失败.msg:[{}]", ex.getMessage(), ex);
         }
     }
 }
