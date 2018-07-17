@@ -89,7 +89,7 @@ public interface SendMessageService {
       * @param dueDate 还款日期
       * @param repayAmount 应还金额
      */
-	void sendAfterBindingRepayRemindSms(String phone,String name,Date date,BigDecimal borrowAmount,BigDecimal repayAmount,Integer period,Date dueDate);
+	void sendAfterBindingRepayRemindSms(String phone,String name,Date date,BigDecimal borrowAmount,BigDecimal repayAmount,Integer period,Date dueDate,String tailNum);
 	
 	
 	
@@ -102,7 +102,7 @@ public interface SendMessageService {
       * @param borrowAmount 借款金额
       * @param dueDate 还款日期 
      */
-	void sendAfterBindingSettleRemindSms(String phone,String name,Date date,BigDecimal borrowAmount,Date dueDate);
+	void sendAfterBindingSettleRemindSms(String phone,String name,Date date,BigDecimal borrowAmount,Date dueDate,String tailNum);
 	
 	
    /**

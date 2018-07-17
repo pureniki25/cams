@@ -1,31 +1,15 @@
 package com.hongte.alms.withhold.controller;
 
-import com.hongte.alms.base.collection.vo.DeductionVo;
-import com.hongte.alms.base.entity.BasicBusiness;
-import com.hongte.alms.base.entity.RepaymentBizPlanList;
-import com.hongte.alms.base.enums.PlatformEnum;
-import com.hongte.alms.base.feignClient.CustomerInfoXindaiRemoteApi;
-import com.hongte.alms.base.feignClient.dto.BankCardInfo;
-import com.hongte.alms.base.service.SendMessageService;
-import com.hongte.alms.common.result.Result;
 import com.hongte.alms.withhold.service.AfterLoanRepaymentService;
 import com.hongte.alms.withhold.service.RechargeService;
-import com.hongte.alms.withhold.service.RedisService;
+import com.hongte.alms.withhold.service.SmsService;
 import com.hongte.alms.withhold.service.WithholdingService;
-import com.hongte.alms.withhold.service.impl.WithholdingServiceimpl;
-
 import io.swagger.annotations.ApiOperation;
-
-import java.math.BigDecimal;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,21 +32,34 @@ public class SmsController {
     @Autowired
   	@Qualifier("WithholdingService")
     WithholdingService withholdingService;
-    
+
     @Autowired
-  	@Qualifier("SendMessageService")
-    SendMessageService sendMessageService;
-
-
+  	@Qualifier("SmsService")
+    SmsService smsService;
  
     /**
-     * 查询代扣结果
- 
+     * 发送逾期提醒(逾期的第1~3天)
+     * 单笔还款，还款日前7天/1天提醒
      */
     @GetMapping("/sendSms")
     @ApiOperation(value = "发送短信")
     public void searchRepayResult(){
-    	rechargeService.getReturnResult();
+    	//******************逾期提醒(逾期的第1~3天)*****************//
+//    	smsService.sendOverDueRemindMsg(1);
+//    	smsService.sendOverDueRemindMsg(2);
+//    	smsService.sendOverDueRemindMsg(3);
+//    	//******************单笔还款，还款日前7天/1天提醒*****************//
+//    	smsService.sendOneRemindMsg(1);
+//     	smsService.sendOneRemindMsg(7);
+//    	//******************多笔还款，还款日前15天/1天提醒*****************//
+//     	smsService.sendMutiplyRemindMsg(15);
+     	smsService.sendMutiplyRemindMsg(1);
+//      	//******************单笔结清，结清日前15天/1天提醒*****************//
+//     	smsService.sendOneSettleRemindMsg(15);
+//     	smsService.sendOneSettleRemindMsg(1);
+
+
+    	
     }
 
 

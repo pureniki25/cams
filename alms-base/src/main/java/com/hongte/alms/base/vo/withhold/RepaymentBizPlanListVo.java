@@ -204,20 +204,34 @@ public class RepaymentBizPlanListVo extends Model<RepaymentBizPlanListVo> {
 	/**
 	 * 借款日期
 	 */
-	private Date date;
+	private String date;
 	
 	
 	/**
 	 * 本期应还金额
 	 */
 	private BigDecimal repayAmount;
+	
+
+	/**
+	 * 本还款计划的借款金额
+	 */
+	private BigDecimal borrowAmount;
 
 
-	public Date getDate() {
+	public BigDecimal getBorrowAmount() {
+		return borrowAmount;
+	}
+
+	public void setBorrowAmount(BigDecimal borrowAmount) {
+		this.borrowAmount = borrowAmount;
+	}
+
+	public String getDate() {
 		return date;
 	}
 
-	public void setDate(Date date) {
+	public void setDate(String date) {
 		this.date = date;
 	}
 
