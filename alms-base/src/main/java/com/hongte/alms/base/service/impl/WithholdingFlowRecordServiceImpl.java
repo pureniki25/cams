@@ -12,6 +12,7 @@ import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.SecurityUtil;
 import com.ht.ussp.core.Result;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,9 +47,14 @@ public class WithholdingFlowRecordServiceImpl extends BaseServiceImpl<Withholdin
         //如果已经导入了当天数据则不再重复导入
         WithholdingFlowRecord oldWithholdingFlowRecord = new WithholdingFlowRecord();
         try {
-            int count = oldWithholdingFlowRecord.selectCount(new EntityWrapper<WithholdingFlowRecord>().eq("liquidation_date", new SimpleDateFormat("yyyy-MM-dd").parse(settleDate)));
+            int count = oldWithholdingFlowRecord.selectCount(
+                    new EntityWrapper<WithholdingFlowRecord>()
+                            .eq("liquidation_date", new SimpleDateFormat("yyyy-MM-dd").parse(settleDate))
+                            .eq("withholding_platform", (Integer) PlatformEnum.BF_FORM.getValue())
+
+            );
             if (count > 0) {
-                throw new RuntimeException(String.format("指定结清日期[%s]的[%s]条数据已经导入过，请勿重复导入", settleDate, count));
+                throw new RuntimeException(String.format("@WithholdingFlowRecordServiceImpl@导入宝付代扣流水失败 宝付指定结清日期[%s]的[%s]条数据已经导入过，请勿重复导入", settleDate, count));
             }
         } catch (ParseException e) {
             e.printStackTrace();
@@ -103,7 +109,7 @@ public class WithholdingFlowRecordServiceImpl extends BaseServiceImpl<Withholdin
                         }
                         //开始处理文件内容
                         String[] cols = line.split("\\|");
-                        if (cols.length <= 8) {
+                        if (cols.length < 14) {
                             //跳过不需要的数据
                             continue;
                         }
@@ -144,12 +150,94 @@ public class WithholdingFlowRecordServiceImpl extends BaseServiceImpl<Withholdin
                 if (os != null) os.close();
                 if (zipIs != null) zipIs.close();
                 if (zipFile != null) zipFile.close();
-                if (targetFile!=null && targetFile.exists()) {
+                if (targetFile != null && targetFile.exists()) {
                     targetFile.delete();
                 }
             } catch (IOException e) {
                 e.getStackTrace();
             }
+        }
+    }
+
+    @Transactional
+    @Override
+    public void importWidthholdingFlowFromYiBao(String settleDate) {
+        //如果已经导入了当天数据则不再重复导入
+        WithholdingFlowRecord oldWithholdingFlowRecord = new WithholdingFlowRecord();
+        try {
+            int count = oldWithholdingFlowRecord.selectCount(
+                    new EntityWrapper<WithholdingFlowRecord>()
+                            .eq("liquidation_date", new SimpleDateFormat("yyyy-MM-dd").parse(settleDate))
+                            .eq("withholding_platform", (Integer) PlatformEnum.YB_FORM.getValue())
+
+            );
+            if (count > 0) {
+                throw new RuntimeException(String.format("@WithholdingFlowRecordServiceImpl@导入易宝代扣流水失败 易宝指定结清日期[%s]的[%s]条数据已经导入过，请勿重复导入", settleDate, count));
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        try {
+            //1.通过eip请求易宝接口拿数据
+            Map<String, Object> paramMap = Maps.newHashMap();
+            paramMap.put("startdate", settleDate);
+            paramMap.put("enddate", settleDate);
+            Result rslt = eipRemote.yiBaoPayClearData(paramMap);
+            if (!Constant.REMOTE_EIP_SUCCESS_CODE.equals(rslt.getReturnCode())) {
+                log.error("@WithholdingFlowRecordServiceImpl@导入易宝代扣流水失败 调用eip下载易宝流水文件失败.msg:[{}]", rslt.getMsg());
+                throw new RuntimeException("调用eip下载易宝流水文件失败");
+            }
+            //进行base64解码，解密后为byte类型
+            String retstr = rslt.getData().toString();
+            String[] rows = retstr.split("\\r\\n|\\n");
+            /*Pattern pattern = Pattern.compile("\\r\\n|\\n");
+            Matcher matcher = pattern.matcher(retstr);
+            while (matcher.find()){
+                System.out.println(matcher.group(0));
+            }*/
+            if (rows.length == 0)
+                return;
+            for (String row : rows) {
+                if (StringUtils.isBlank(row)) {
+                    //处理到空行截止
+                    break;
+                }
+                if (row.contains("商户账户编号")) {
+                    continue;
+                }
+                //开始处理文件内容
+                String[] cols = row.split(",");
+                if (cols.length > 0) {
+                    WithholdingFlowRecord flow = new WithholdingFlowRecord();
+                    flow.setWithholdingPlatform((Integer) PlatformEnum.YB_FORM.getValue());
+                    flow.setMerchantNo(cols[0]);
+                    try {
+                        flow.setLiquidationDate(new SimpleDateFormat("yyyy-MM-dd").parse(cols[1]));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        flow.setTradeDate(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(cols[3]));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    flow.setTradeOrderNo(cols[4]);
+                    flow.setTradeWaterNo(cols[5]);
+                    flow.setAmount(new BigDecimal(cols[7]));
+                    flow.setTradeType(cols[8]);
+                    //接口没有状态，默认为成功
+                    flow.setWithholdingStatus("成功");
+                    flow.setServiceCharge(new BigDecimal(cols[9]));
+                    flow.setProductName(cols[12]);
+                    flow.setPaymentCardType(cols[13]);
+                    flow.setPaymentCardNo(cols[14]);
+                    flow.setImportTime(new Date());
+                    flow.setImportSystem(this.getClass().getSimpleName());
+                    flow.insert();
+                }
+            }
+        } catch (Exception ex) {
+            log.error("@WithholdingFlowRecordServiceImpl@导入易宝代扣流水失败 解析易宝流水zip文件失败.msg:[{}]", ex.getMessage(), ex);
         }
     }
 }
