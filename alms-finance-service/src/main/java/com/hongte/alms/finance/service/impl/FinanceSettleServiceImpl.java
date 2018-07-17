@@ -142,12 +142,12 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         //开始业务的结清
         shareBizSettleMoney(financeSettleBaseDto, financeSettleReq);
 
-
+/*更新状态*/
+        updateStatus(financeSettleBaseDto, financeSettleReq);
         return financeSettleBaseDto.getCurrPeriodProjDetailVOList();
 
 
-        /*更新状态*/
-        updateStatus(financeSettleBaseDto, financeSettleReq);
+
     }
 
     /**
@@ -1009,8 +1009,8 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     		updateBizPlanList(repaymentBizPlanDto.getBizPlanListDtos(), dto, repaymentBizPlanDto);
 		}
 
-    	for (Entry<String, Map<String, List<RepaymentProjFactRepay>>> mpe : dto.getProjFactRepays().entrySet()) {
-    		for (Entry<String, List<RepaymentProjFactRepay>> mpe1 : mpe.getValue().entrySet()) {
+    	for (Map.Entry<String, Map<String, List<RepaymentProjFactRepay>>> mpe : dto.getProjFactRepays().entrySet()) {
+    		for (Map.Entry<String, List<RepaymentProjFactRepay>> mpe1 : mpe.getValue().entrySet()) {
 				for (RepaymentProjFactRepay factRepay : mpe1.getValue()) {
 					factRepay.setSettleLogId(dto.getRepaymentSettleLog().getSettleLogId());
 					factRepay.updateAllColumnById();
