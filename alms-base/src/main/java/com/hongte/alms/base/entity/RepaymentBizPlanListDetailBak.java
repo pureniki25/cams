@@ -155,6 +155,10 @@ public class RepaymentBizPlanListDetailBak extends Model<RepaymentBizPlanListDet
 	private String confirmLogId;
 
 
+	@TableField("settle_log_id")
+	@ApiModelProperty(required=true,value="结清记录关联id")
+	private String settleLogId ;
+	
 	public String getPlanDetailId() {
 		return planDetailId;
 	}
@@ -395,5 +399,13 @@ public class RepaymentBizPlanListDetailBak extends Model<RepaymentBizPlanListDet
 		setSrcType(pld.getSrcType());
 		setUpdateDate(pld.getUpdateDate());
 		setUpdateUser(pld.getUpdateUser());
+	}
+
+	public String getSettleLogId() {
+		return settleLogId;
+	}
+
+	public void setSettleLogId(String settleLogId) {
+		this.settleLogId = settleLogId;
 	}
 }
