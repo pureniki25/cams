@@ -174,6 +174,11 @@ public class Constant {
 	 */
 	public static final String REMOTE_EIP_SUCCESS_CODE = "0000";
 
+	/**
+	 * 调用LMS信贷系统接口成功状态码
+	 */
+	public static final String LMS_SUCCESS_CODE = "1";
+
 
 	//*********调用api接口失败记录相关 OPEN模块  zgh *********//
 	public static final String INTERFACE_CODE_OPEN_REPAYPLAN_UPDATEREPAYPLANTOLMS = "/RepayPlan/updateRepayPlanToLMS";
@@ -210,10 +215,9 @@ public class Constant {
 
 
     /**
-     * 宝付
+     * 宝付交易类型
      */
     public static Map<String, String> TRADE_TYPE_MAP_BAOFU = null;
-
     static {
         TRADE_TYPE_MAP_BAOFU = new ConcurrentHashMap<>();
         //支付
@@ -260,9 +264,10 @@ public class Constant {
         TRADE_TYPE_MAP_BAOFU.put("01341", "银行卡验证");
         TRADE_TYPE_MAP_BAOFU.put("01351", "身份证验证");
     }
-
+	/**
+	 * 宝付交易子类型
+	 */
     public static Map<String, String> TRADE_SUB_TYPE_MAP_BAOFU = null;
-
     static {
         TRADE_SUB_TYPE_MAP_BAOFU = new ConcurrentHashMap<>();
         TRADE_SUB_TYPE_MAP_BAOFU.put("00", "成功");
