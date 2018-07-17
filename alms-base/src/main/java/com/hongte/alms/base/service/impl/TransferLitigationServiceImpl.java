@@ -8,9 +8,15 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
-import com.hongte.alms.base.collection.vo.StaffBusinessVo;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +35,7 @@ import com.hongte.alms.base.assets.car.vo.FileVo;
 import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
 import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
 import com.hongte.alms.base.collection.service.CollectionStatusService;
+import com.hongte.alms.base.collection.vo.StaffBusinessVo;
 import com.hongte.alms.base.entity.Doc;
 import com.hongte.alms.base.entity.DocTmp;
 import com.hongte.alms.base.entity.DocType;
@@ -62,9 +69,10 @@ import com.hongte.alms.base.service.TransferLitigationLogService;
 import com.hongte.alms.base.service.TransferOfLitigationService;
 import com.hongte.alms.base.vo.billing.CarLoanBilVO;
 import com.hongte.alms.base.vo.billing.PreviousFeesVO;
+import com.hongte.alms.base.vo.litigation.BusinessCar;
 import com.hongte.alms.base.vo.litigation.BusinessHouse;
+import com.hongte.alms.base.vo.litigation.LitigationBorrowerDetailed;
 import com.hongte.alms.base.vo.litigation.LitigationResponse;
-import com.hongte.alms.base.vo.litigation.LitigationResponseData;
 import com.hongte.alms.base.vo.litigation.TransferOfLitigationVO;
 import com.hongte.alms.base.vo.litigation.house.HouseLoanVO;
 import com.hongte.alms.base.vo.litigation.house.HousePlanInfo;
@@ -132,18 +140,18 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	@Autowired
 	@Qualifier("CollectionStatusService")
 	private CollectionStatusService collectionStatusService;
-	
+
 	@Autowired
 	@Qualifier("TransferLitigationLogService")
 	private TransferLitigationLogService transferLitigationLogService;
-	
+
 	@Autowired
 	@Qualifier("RepaymentBizPlanListService")
 	RepaymentBizPlanListService repaymentBizPlanListService;
-	
+
 	@Value("${ht.billing.west.part.business:''}")
 	private String westPartBusiness;
-	
+
 	@Value("${ht.applyderate.company:''}")
 	private String companyNames;
 
@@ -152,7 +160,6 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		if (StringUtil.isEmpty(businessId)) {
 			return null;
 		}
-
 
 		Map<String, Object> resultMap = transferOfLitigationMapper.getOverDueDatys(businessId);
 		if (resultMap == null) {
@@ -164,22 +171,20 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		int overdueDays = DateUtil.getDiffDays(factRepayDate == null ? dueDate : factRepayDate, new Date());
 		resultMap.put("overdueDays", overdueDays < 0 ? 0 : overdueDays);
 
-	
-
 		return resultMap;
 	}
+
 	@Override
 	public Map<String, Object> queryCarLoanData(String businessId) {
 		if (StringUtil.isEmpty(businessId)) {
 			return null;
 		}
 
-
 		Map<String, Object> resultMap = transferOfLitigationMapper.queryCarLoanData(businessId);
 		if (resultMap == null) {
 			return resultMap;
 		}
-		
+
 		List<RepaymentBizPlanList> repaymentBizPlanLists = repaymentBizPlanListService
 				.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", businessId)
 						.eq("current_status", RepayPlanStatus.REPAYED.getName()).ne("repay_flag", 6)
@@ -262,13 +267,13 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		return houseLoanData;
 	}
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	@Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = Exception.class)
 	@Override
-	public TransferOfLitigationVO sendTransferLitigationData(String businessId, String sendUrl) {
+	public LitigationResponse sendTransferLitigationData(String businessId, String sendUrl) {
 		TransferOfLitigationVO transferLitigationData = null;
 		LitigationResponse litigationResponse = null;
 		if (StringUtil.isEmpty(businessId)) {
-			return transferLitigationData;
+			return litigationResponse;
 		}
 		TransferLitigationLog transferLitigationLog = new TransferLitigationLog();
 		try {
@@ -280,52 +285,64 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			if (transferLitigationData == null || businessType == null) {
 				throw new ServiceRuntimeException("没有找到相关数据，发送诉讼系统失败！");
 			}
-			
+
 			transferLitigationLog.setBusinessId(businessId);
 			transferLitigationLog.setCreateTime(new Date());
 			transferLitigationLog.setCreateUser(transferLitigationData.getCreateUserId());
 			transferLitigationLog.setSendJson(JSON.toJSONString(transferLitigationData));
-			
-			transferLitigationData.setLitigationBorrowerDetailedList(transferOfLitigationMapper.queryLitigationBorrowerDetailed(businessId));
+
+			List<LitigationBorrowerDetailed> litigationBorrowerDetaileds = transferOfLitigationMapper
+					.queryLitigationBorrowerDetailed(businessId);
+			if (CollectionUtils.isEmpty(litigationBorrowerDetaileds)) {
+				throw new ServiceRuntimeException("没有找到借款人明细，发送诉讼系统失败！");
+			}
+			transferLitigationData.setLitigationBorrowerDetailedList(litigationBorrowerDetaileds);
 
 			transferLitigationData.setCreateUserId(loginUserInfoHelper.getUserId());
 			// 判断业务类型，根据业务类型查询对应的房贷或车贷数据
 			if (businessType == 1 || businessType == 9) {
 				transferLitigationData.setBusinessTypeGroup(XIAO_DAI_CAR);
-				transferLitigationData
-						.setCarList(transferOfLitigationMapper.queryTransferLitigationCarData(businessId));
+				List<BusinessCar> businessCars = transferOfLitigationMapper.queryTransferLitigationCarData(businessId);
+				if (CollectionUtils.isEmpty(businessCars)) {
+					throw new ServiceRuntimeException("没有找到车辆信息，发送诉讼系统失败！");
+				}
+				transferLitigationData.setCarList(businessCars);
 			}
 			if (businessType == 2 || businessType == 11) {
 				transferLitigationData.setBusinessTypeGroup(XIAO_DAI_HOUSE);
 
-				transferLitigationData.setHouseList(assembleBusinessHouse(businessId));
+				List<BusinessHouse> businessHouses = assembleBusinessHouse(businessId);
+				if (CollectionUtils.isEmpty(businessHouses)) {
+					throw new ServiceRuntimeException("没有找到房屋信息，发送诉讼系统失败！");
+				}
+				transferLitigationData.setHouseList(businessHouses);
 			}
-			
+
 			litigationResponse = sendLitigation(transferLitigationData, sendUrl);
-			transferLitigationLog.setResultJson(JSON.toJSONString(litigationResponse));
-			if (litigationResponse != null) {
+			String returnJson = JSONObject.toJSONString(litigationResponse);
+			transferLitigationLog.setResultJson(returnJson);
+			if (litigationResponse != null && litigationResponse.getCode() == 1
+					&& litigationResponse.getData().isImportSuccess()) {
 				transferLitigationLog.setResultCode(litigationResponse.getCode());
 				transferLitigationLog.setResultMsg(litigationResponse.getMsg());
-				if (litigationResponse.getCode() == 1) {
-					LitigationResponseData data = litigationResponse.getData();
-					if (!data.isImportSuccess()) {
-						LOG.info("businessId：" + businessId + "，发送诉讼系统失败！！诉讼系统返回信息：" + data.toString());
-						throw new ServiceRuntimeException(data.getMessage());
-					}
-					LOG.info("businessId：" + businessId + "，发送诉讼系统成功！诉讼系统返回信息：" + data.toString());
-				}
+				LOG.info("businessId：{}，发送诉讼系统成功！诉讼系统返回信息：{}", businessId, returnJson);
+				transferLitigationLogService.insert(transferLitigationLog);
 			} else {
-				LOG.info("businessId：" + businessId + "，发送诉讼系统失败！！没有消息返回");
-				throw new ServiceRuntimeException("businessId：" + businessId + "，发送诉讼系统失败！！没有消息返回");
+				LOG.info("businessId：{}，发送诉讼系统成功！诉讼系统返回信息：{}", businessId, returnJson);
+				transferLitigationLogService.insert(transferLitigationLog);
+				throw new ServiceRuntimeException("businessId：" + businessId + "，发送诉讼系统失败！诉讼系统返回信息：" + returnJson);
 			}
-			
+
+		} catch (ServiceRuntimeException e) {
+			throw new ServiceRuntimeException(e.getMessage(), e);
 		} catch (Exception e) {
-			LOG.error("发送诉讼系统失败！！！", e);
+			LOG.error(e.getMessage(), e);
+			transferLitigationLog.setResultJson(e.getMessage());
+			transferLitigationLogService.insert(transferLitigationLog);
 			throw new ServiceRuntimeException(e.getMessage(), e);
 		}
-		transferLitigationLogService.insert(transferLitigationLog);
 
-		return transferLitigationData;
+		return litigationResponse;
 	}
 
 	private List<BusinessHouse> assembleBusinessHouse(String businessId) {
@@ -352,7 +369,8 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			businessHouse.setFourthMortgageType(fsdHouse.getFourthMortgageType());
 			businessHouse.setFourthMortgageYear(str2Integer(fsdHouse.getFourthMortgageYear()));
 			businessHouse.setFsdBankName(fsdHouse.getHousePledgedBank());
-			businessHouse.setHouseAddress(fsdHouse.getHouseSheng() + fsdHouse.getHouseCity() + fsdHouse.getHouseXian() + fsdHouse.getHouseAddress());
+			businessHouse.setHouseAddress(fsdHouse.getHouseSheng() + fsdHouse.getHouseCity() + fsdHouse.getHouseXian()
+					+ fsdHouse.getHouseAddress());
 			businessHouse.setHouseArea(fsdHouse.getHouseArea());
 			businessHouse.setHouseBelong(fsdHouse.getHouseBelong());
 			businessHouse.setHouseName(fsdHouse.getHouseName());
@@ -539,10 +557,10 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		}
 		// 获取车贷基础信息
 		String businessId = carLoanBilVO.getBusinessId();
-		
+
 		Date billDate = carLoanBilVO.getBillDate(); // 预计结清日期
 		Map<String, Object> resultMap = queryCarLoanData(businessId);
-		
+
 		List<String> lstWestPartBusiness = Arrays.asList(westPartBusiness.split(","));
 		List<String> lstcompanyNames = Arrays.asList(companyNames.split(","));
 		double innerLateFees = 0; // 期内滞纳金
@@ -553,42 +571,47 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		double receivableTotal = 0; // 应收合计
 		boolean preLateFeesFlag = false;
 		double overRepayMoney = transferOfLitigationMapper.queryOverRepayMoneyByBusinessId(businessId); // 结余
-		double refundMoney = transferOfLitigationMapper.queryRefundMoneyByBusinessId(businessId);	// 押金转还款金额
+		double refundMoney = transferOfLitigationMapper.queryRefundMoneyByBusinessId(businessId); // 押金转还款金额
 		double borrowMoney = ((BigDecimal) resultMap.get("borrowMoney")).doubleValue(); // 借款金额
 		double innerLate = carLoanBilVO.getInnerLateFees(); // 期内滞纳金计算费率
 
 		if (resultMap != null && !resultMap.isEmpty()) {
 
-
 			Map<String, Object> maxPeriodMap = transferOfLitigationMapper.queryMaxDueDateByBusinessId(businessId); // 合同到期日
 			Date maxDueDate = (Date) maxPeriodMap.get("maxDueDate");
 			String companyName = (String) resultMap.get("companyName");
-			
+
 			int countOverdue = transferOfLitigationMapper.countOverdueByBusinessId(businessId);
 			String repaymentTypeId = (String) resultMap.get("repaymentTypeId"); // 还款类型
 			double borrowRate = ((BigDecimal) resultMap.get("borrowRate")).doubleValue() * 0.01; // 年利率
-			double monthBorrowRate = borrowRate / 12;	// 月利率
+			double monthBorrowRate = borrowRate / 12; // 月利率
 			double balanceDue = 0; // 往期少交费用合计
-			if (!billDate.after(maxDueDate)) {	// 若 billDate 早于 maxDueDate  取dueDate比billDate大的最近的一期
+			if (!billDate.after(maxDueDate)) { // 若 billDate 早于 maxDueDate 取dueDate比billDate大的最近的一期
 				// 当期的 利息、服务费、担保公司费用、平台费
-				resultMap.putAll(transferOfLitigationMapper.queryCarLoanFees(businessId, billDate)); 
+				resultMap.putAll(transferOfLitigationMapper.queryCarLoanFees(businessId, billDate));
 				// 查询往期少交费用明细
-//				List<PreviousFeesVO> previousFees = setMatchingRepaymentPlanAccrual("等额本息", setPreviosFees(businessId, billDate, borrowMoney, innerLate), monthBorrowRate);
+				// List<PreviousFeesVO> previousFees = setMatchingRepaymentPlanAccrual("等额本息",
+				// setPreviosFees(businessId, billDate, borrowMoney, innerLate),
+				// monthBorrowRate);
 				List<PreviousFeesVO> previousFees = setPreviosFees(businessId, billDate, borrowMoney, innerLate);
 				resultMap.put("previousFees", previousFees);
 				// 往期少交费用合计
-//				Double balanceDue = transferOfLitigationMapper.queryBalanceDueByBillDate(businessId, billDate);
+				// Double balanceDue =
+				// transferOfLitigationMapper.queryBalanceDueByBillDate(businessId, billDate);
 				balanceDue = setMatchingRepaymentPlanAccrualBalanceDue(resultMap, previousFees);
 				resultMap.put("balanceDue", balanceDue);
-			}else {// 若 billDate 晚于 maxDueDate
-				// 当期的 利息、服务费、担保公司费用、平台费 取最后一期
-				resultMap.putAll(transferOfLitigationMapper.queryCarLoanFees(businessId, maxDueDate)); 
+			} else {// 若 billDate 晚于 maxDueDate
+					// 当期的 利息、服务费、担保公司费用、平台费 取最后一期
+				resultMap.putAll(transferOfLitigationMapper.queryCarLoanFees(businessId, maxDueDate));
 				// 查询往期少交费用明细
-//				List<PreviousFeesVO> previousFees = setMatchingRepaymentPlanAccrual("等额本息", setPreviosFees(businessId, maxDueDate, borrowMoney, innerLate), monthBorrowRate);
+				// List<PreviousFeesVO> previousFees = setMatchingRepaymentPlanAccrual("等额本息",
+				// setPreviosFees(businessId, maxDueDate, borrowMoney, innerLate),
+				// monthBorrowRate);
 				List<PreviousFeesVO> previousFees = setPreviosFees(businessId, maxDueDate, borrowMoney, innerLate);
 				resultMap.put("previousFees", previousFees);
 				// 往期少交费用合计
-//				Double balanceDue = transferOfLitigationMapper.queryBalanceDueByBillDate(businessId, maxDueDate);
+				// Double balanceDue =
+				// transferOfLitigationMapper.queryBalanceDueByBillDate(businessId, maxDueDate);
 				balanceDue = setMatchingRepaymentPlanAccrualBalanceDue(resultMap, previousFees);
 				resultMap.put("balanceDue", balanceDue);
 			}
@@ -598,9 +621,10 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			double lastPlanServiceCharge = ((BigDecimal) maxPeriodMap.get("planServiceCharge")).doubleValue(); // 最后一期应还服务费
 			double lastGuaranteeCharge = ((BigDecimal) maxPeriodMap.get("plan_guarantee_charge")).doubleValue(); // 最后一期担保公司费用
 			double lastPlatformCharge = ((BigDecimal) maxPeriodMap.get("plan_platform_charge")).doubleValue(); // 最后一期平台费
-			
-//			long isPreCharge = (long) resultMap.get("isPreCharge"); // 是否服务费一次性收取业务
-//			long isPreServiceFees = (long) resultMap.get("isPreServiceFees"); // 是否分公司服务费前置收取
+
+			// long isPreCharge = (long) resultMap.get("isPreCharge"); // 是否服务费一次性收取业务
+			// long isPreServiceFees = (long) resultMap.get("isPreServiceFees"); //
+			// 是否分公司服务费前置收取
 			double planAccrual = ((BigDecimal) resultMap.get("planAccrual")).doubleValue(); // 本期应还利息
 			double planServiceCharge = ((BigDecimal) resultMap.get("planServiceCharge")).doubleValue(); // 本期应还服务费
 			double planPlatformCharge = ((BigDecimal) resultMap.get("planPlatformCharge")).doubleValue(); // 本期应还平台费
@@ -611,13 +635,13 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			double otherFees = carLoanBilVO.getOtherFees(); // 其他费用
 			double attorneyFees = carLoanBilVO.getAttorneyFees(); // 律师
 			Date curDueDate = (Date) resultMap.get("curDueDate");
-			
+
 			int overdueDays = 0; // 逾期天数
 			if (curDueDate != null) {
-				overdueDays = DateUtil.getDiffDays(curDueDate, billDate); 
+				overdueDays = DateUtil.getDiffDays(curDueDate, billDate);
 			}
 			overdueDays = overdueDays < 0 ? 0 : overdueDays;
-			
+
 			String curCurrentStatus = (String) resultMap.get("curCurrentStatus");
 			if (RepayPlanStatus.OVERDUE.getName().equals(curCurrentStatus)) {
 				int diffDays = DateUtil.getDiffDays(curDueDate, billDate);
@@ -627,11 +651,10 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			int curPeriod = (int) resultMap.get("curPeriod"); // // 当前期数
 			String _planId = resultMap.get("_planId").toString(); // // 当前期ID
 			String _planListId = resultMap.get("_planListId").toString(); // // 当前期List_ID
-			
-			
-			if(carLoanBilVO.getCurrentPriod()!=null) {//如果不为null,说明是减免申请调用此方法获取减免结清时候的提前违约金
-				curPeriod=carLoanBilVO.getCurrentPriod();
-				planAccrual=carLoanBilVO.getNeedPayInterest();
+
+			if (carLoanBilVO.getCurrentPriod() != null) {// 如果不为null,说明是减免申请调用此方法获取减免结清时候的提前违约金
+				curPeriod = carLoanBilVO.getCurrentPriod();
+				planAccrual = carLoanBilVO.getNeedPayInterest();
 			}
 			long totalPeriod = (long) resultMap.get("totalPeriod"); // 总还款期数
 
@@ -644,7 +667,8 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			double outside = carLoanBilVO.getOutsideInterest(); // 期外逾期利息计算费率
 			int preLateFeeType = carLoanBilVO.getPreLateFees(); // 提前还款违约金类型
 
-			if (outputPlatformId == 1 && countOverdue > 0 && CollectionUtils.isNotEmpty(lstWestPartBusiness) && lstWestPartBusiness.contains(companyName)) {
+			if (outputPlatformId == 1 && countOverdue > 0 && CollectionUtils.isNotEmpty(lstWestPartBusiness)
+					&& lstWestPartBusiness.contains(companyName)) {
 				overdueDefault = borrowMoney * 0.2;
 			}
 
@@ -662,12 +686,12 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				} else {
 					int i = (overdueDays / 30) <= 1 ? 1 : (overdueDays / 30);
 					int j = overdueDays % 30;
-					if (i >=1) { // 若 i 大于 1，说明超过30天, 期外逾期费 = 剩余本金 * 费率 * i + 剩余本金 * 费率 / 30 * j
+					if (i >= 1) { // 若 i 大于 1，说明超过30天, 期外逾期费 = 剩余本金 * 费率 * i + 剩余本金 * 费率 / 30 * j
 						if (j > 0 && j < 15) {
 							outsideInterest = surplusPrincipal * outside * i + surplusPrincipal * outside / 30 * j;
-						}else if (j >= 15) {
+						} else if (j >= 15) {
 							outsideInterest = surplusPrincipal * outside * (i + 1);
-						}else {
+						} else {
 							outsideInterest = surplusPrincipal * outside * i;
 						}
 					}
@@ -678,7 +702,8 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				// 判断是否分公司服务费前置收取 isPreServiceFees == 1， 是 isPreServiceFees == 0 否
 				if ("到期还本息".equals(repaymentTypeId) || "每月付息到期还本".equals(repaymentTypeId)) {
 					if (outputPlatformId == 1) {
-						if (countOverdue > 0 && CollectionUtils.isNotEmpty(lstWestPartBusiness) && lstWestPartBusiness.contains(companyName)) {
+						if (countOverdue > 0 && CollectionUtils.isNotEmpty(lstWestPartBusiness)
+								&& lstWestPartBusiness.contains(companyName)) {
 							overdueDefault = borrowMoney * 0.2;
 						}
 						preLateFees = 0;
@@ -693,12 +718,12 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 						} else {
 							int i = (overdueDays / 30) <= 1 ? 1 : (overdueDays / 30);
 							int j = overdueDays % 30;
-							if (i >=1) { // 若 i 大于 1，说明超过30天, 期外逾期费 = 剩余本金 * 费率 * i + 剩余本金 * 费率 / 30 * j
+							if (i >= 1) { // 若 i 大于 1，说明超过30天, 期外逾期费 = 剩余本金 * 费率 * i + 剩余本金 * 费率 / 30 * j
 								if (j > 0 && j < 15) {
 									outsideInterest = borrowMoney * outside * i + borrowMoney * outside / 30 * j;
-								}else if (j >= 15) {
+								} else if (j >= 15) {
 									outsideInterest = borrowMoney * outside * (i + 1);
-								}else {
+								} else {
 									outsideInterest = borrowMoney * outside * i;
 								}
 							}
@@ -710,52 +735,55 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				}
 
 			} else {
-				
-				List<RepaymentBizPlanListDetail> listDetails = transferOfLitigationMapper.querySurplusServiceChargeByBusinessId(businessId, billDate);
-				
+
+				List<RepaymentBizPlanListDetail> listDetails = transferOfLitigationMapper
+						.querySurplusServiceChargeByBusinessId(businessId, billDate);
+
 				double surplusSerCharge = 0;
-				
+
 				if (CollectionUtils.isNotEmpty(listDetails)) {
-					
+
 					for (RepaymentBizPlanListDetail detail : listDetails) {
 						if (detail.getPlanListId().equals(_planListId)) {
 							continue;
 						}
-						BigDecimal planAmount = (detail.getPlanAmount() == null ? BigDecimal.valueOf(0) : detail.getPlanAmount());
-						BigDecimal factAmount = (detail.getFactAmount() == null ? BigDecimal.valueOf(0) : detail.getFactAmount());
+						BigDecimal planAmount = (detail.getPlanAmount() == null ? BigDecimal.valueOf(0)
+								: detail.getPlanAmount());
+						BigDecimal factAmount = (detail.getFactAmount() == null ? BigDecimal.valueOf(0)
+								: detail.getFactAmount());
 						surplusSerCharge += (planAmount.doubleValue() - factAmount.doubleValue());
 					}
 				}
-				
+
 				if ("到期还本息".equals(repaymentTypeId) || "每月付息到期还本".equals(repaymentTypeId)) {
-					
+
 					if (outputPlatformId == 1) {
-						RepaymentBizPlanList pList=new RepaymentBizPlanList();
+						RepaymentBizPlanList pList = new RepaymentBizPlanList();
 						pList.setPlanId(_planId);
 						pList.setPlanListId(_planListId);
-						if(istLastPeriod(pList)) {
-							preLateFees=0;
-						}else {
+						if (istLastPeriod(pList)) {
+							preLateFees = 0;
+						} else {
 							preLateFees = surplusSerCharge;
 							preLateFees = preLateFees > borrowMoney * 0.06 ? borrowMoney * 0.06 : preLateFees;
 						}
-					
+
 					}
 				} else if ("等额本息".equals(repaymentTypeId)) {
-					//planAccrual = surplusPrincipal * monthBorrowRate;
+					// planAccrual = surplusPrincipal * monthBorrowRate;
 					if (outputPlatformId == 0) {
 						if (companyName.equals("厦门分公司")) {
 							preLateFees = 0;
-					
-						}else if(companyName.equals("保定分公司")) {
-							if((totalPeriod - curPeriod)<6) {
-								preLateFees=preLateFees = surplusPrincipal * 0.005 * (totalPeriod - curPeriod);
-							}else {
-								preLateFees=preLateFees = surplusPrincipal * 0.005 *6;
-						    }
-					    }else {
-							preLateFeesFlag = true;	// 提前还款违约金标识，非上标业务，等额本息为true
-							
+
+						} else if (companyName.equals("保定分公司")) {
+							if ((totalPeriod - curPeriod) < 6) {
+								preLateFees = preLateFees = surplusPrincipal * 0.005 * (totalPeriod - curPeriod);
+							} else {
+								preLateFees = preLateFees = surplusPrincipal * 0.005 * 6;
+							}
+						} else {
+							preLateFeesFlag = true; // 提前还款违约金标识，非上标业务，等额本息为true
+
 							switch (preLateFeeType) {
 							case 1:
 								// 一个月利息
@@ -772,28 +800,36 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 							default:
 								break;
 							}
-					    }
+						}
 					} else if (outputPlatformId == 1) {
 						preLateFees = surplusSerCharge;
 						preLateFees = preLateFees > borrowMoney * 0.06 ? borrowMoney * 0.06 : preLateFees;
 					}
-					
+
 				}
 			}
 
-			receivableTotal = surplusPrincipal + planAccrual + planServiceCharge + planPlatformCharge + planGuaranteeCharge
-					+ innerLateFees + outsideInterest + preLateFees + balanceDue + parkingFees + gpsFees + dragFees
-					+ otherFees + attorneyFees + overdueDefault;
+			receivableTotal = surplusPrincipal + planAccrual + planServiceCharge + planPlatformCharge
+					+ planGuaranteeCharge + innerLateFees + outsideInterest + preLateFees + balanceDue + parkingFees
+					+ gpsFees + dragFees + otherFees + attorneyFees + overdueDefault;
 			squaredUp = receivableTotal - overRepayMoney - refundMoney;
-			resultMap.put("innerLateFees", BigDecimal.valueOf(innerLateFees).setScale(2, RoundingMode.HALF_UP).doubleValue());
-			resultMap.put("outsideInterest", BigDecimal.valueOf(outsideInterest).setScale(2, RoundingMode.HALF_UP).doubleValue());
-			resultMap.put("preLateFees", BigDecimal.valueOf(preLateFees).setScale(2, RoundingMode.HALF_UP).doubleValue());
-			resultMap.put("planAccrual", BigDecimal.valueOf(planAccrual).setScale(2, RoundingMode.HALF_UP).doubleValue());
-			resultMap.put("receivableTotal", BigDecimal.valueOf(receivableTotal).setScale(2, RoundingMode.HALF_UP).doubleValue());
+			resultMap.put("innerLateFees",
+					BigDecimal.valueOf(innerLateFees).setScale(2, RoundingMode.HALF_UP).doubleValue());
+			resultMap.put("outsideInterest",
+					BigDecimal.valueOf(outsideInterest).setScale(2, RoundingMode.HALF_UP).doubleValue());
+			resultMap.put("preLateFees",
+					BigDecimal.valueOf(preLateFees).setScale(2, RoundingMode.HALF_UP).doubleValue());
+			resultMap.put("planAccrual",
+					BigDecimal.valueOf(planAccrual).setScale(2, RoundingMode.HALF_UP).doubleValue());
+			resultMap.put("receivableTotal",
+					BigDecimal.valueOf(receivableTotal).setScale(2, RoundingMode.HALF_UP).doubleValue());
 			resultMap.put("squaredUp", BigDecimal.valueOf(squaredUp).setScale(2, RoundingMode.HALF_UP).doubleValue());
-			resultMap.put("overdueDefault", BigDecimal.valueOf(overdueDefault).setScale(2, RoundingMode.HALF_UP).doubleValue());
-			resultMap.put("overRepayMoney", BigDecimal.valueOf(overRepayMoney).setScale(2, RoundingMode.HALF_UP).doubleValue());
-			resultMap.put("refundMoney", BigDecimal.valueOf(refundMoney).setScale(2, RoundingMode.HALF_UP).doubleValue());
+			resultMap.put("overdueDefault",
+					BigDecimal.valueOf(overdueDefault).setScale(2, RoundingMode.HALF_UP).doubleValue());
+			resultMap.put("overRepayMoney",
+					BigDecimal.valueOf(overRepayMoney).setScale(2, RoundingMode.HALF_UP).doubleValue());
+			resultMap.put("refundMoney",
+					BigDecimal.valueOf(refundMoney).setScale(2, RoundingMode.HALF_UP).doubleValue());
 			resultMap.put("preLateFeesFlag", preLateFeesFlag);
 		}
 
@@ -806,7 +842,8 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		if (CollectionUtils.isNotEmpty(previousFees)) {
 			resultMap.put("previousFees", previousFees);
 			for (PreviousFeesVO vo : previousFees) {
-				balanceDue += vo.getPreviousLateFees() + vo.getPreviousPlanAccrual() + vo.getPreviousPlanServiceCharge();
+				balanceDue += vo.getPreviousLateFees() + vo.getPreviousPlanAccrual()
+						+ vo.getPreviousPlanServiceCharge();
 			}
 		}
 		return balanceDue;
@@ -815,19 +852,19 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	private List<PreviousFeesVO> setPreviosFees(String businessId, Date date, double borrowMoney, double innerLate) {
 		List<PreviousFeesVO> previousFees = transferOfLitigationMapper.queryPreviousFees(businessId, date);
 		if (CollectionUtils.isNotEmpty(previousFees)) {
-			
+
 			List<PreviousFeesVO> feesVOs = new ArrayList<>();
-			
+
 			for (PreviousFeesVO previousFeesVO : previousFees) {
-				
+
 				if (!RepayPlanStatus.OVERDUE.getName().equals(previousFeesVO.getCurrentStatus())) {
 					feesVOs.add(previousFeesVO);
 				}
-				
+
 			}
-			
+
 			previousFees.removeAll(feesVOs);
-			
+
 			if (!previousFees.isEmpty()) {
 				for (PreviousFeesVO previousFeesVO : previousFees) {
 					if (previousFees.indexOf(previousFeesVO) == 0) {
@@ -836,7 +873,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 							int diffDays = DateUtil.getDiffDays(previousFeesVO.getDueDate(), date);
 							previousFeesVO.setPreviousLateFees(borrowMoney * diffDays * innerLate);
 						}
-					}else {
+					} else {
 						previousFeesVO.setPreviousLateFees(0);
 					}
 				}
@@ -851,16 +888,20 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		}
 		return previousFees;
 	}
-	
-	private List<PreviousFeesVO> setMatchingRepaymentPlanAccrual(String repaymentTypeId, List<PreviousFeesVO> previousFees, double monthBorrowRate){
+
+	private List<PreviousFeesVO> setMatchingRepaymentPlanAccrual(String repaymentTypeId,
+			List<PreviousFeesVO> previousFees, double monthBorrowRate) {
 		if (CollectionUtils.isNotEmpty(previousFees)) {
 			String businessId = previousFees.get(0).getBusinessId();
 			String repaymentType = transferOfLitigationMapper.queryRepaymentTypeByBusinessId(businessId);
-			Double surplusPrincipal = transferOfLitigationMapper.queryMatchingRepaymentPlanAccrualSurplusPrincipal(businessId);
+			Double surplusPrincipal = transferOfLitigationMapper
+					.queryMatchingRepaymentPlanAccrualSurplusPrincipal(businessId);
 			if (repaymentTypeId.equals(repaymentType)) {
 				for (PreviousFeesVO previousFeesVO : previousFees) {
-					if (RepayPlanStatus.OVERDUE.getName().equals(previousFeesVO.getCurrentStatus()) && surplusPrincipal != null) {
-						previousFeesVO.setPreviousPlanAccrual(BigDecimal.valueOf(surplusPrincipal * monthBorrowRate).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+					if (RepayPlanStatus.OVERDUE.getName().equals(previousFeesVO.getCurrentStatus())
+							&& surplusPrincipal != null) {
+						previousFeesVO.setPreviousPlanAccrual(BigDecimal.valueOf(surplusPrincipal * monthBorrowRate)
+								.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
 					}
 				}
 			}
@@ -887,13 +928,14 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				// 更新贷后状态为 移交诉讼
 				collectionStatusService.setBussinessAfterStatus(req.getBusinessId(), req.getCrpId(), "",
 						CollectionStatusEnum.TO_LAW_WORK, CollectionSetWayEnum.MANUAL_SET);
-				//同时更新信贷的贷后状态
+				// 同时更新信贷的贷后状态
 				List<StaffBusinessVo> voList = new LinkedList<>();
-				StaffBusinessVo vo  = new StaffBusinessVo();
+				StaffBusinessVo vo = new StaffBusinessVo();
 				vo.setCrpId(req.getCrpId());
 				vo.setBusinessId(req.getBusinessId());
 				voList.add(vo);
-				collectionStatusService.SyncBusinessColStatusToXindai(voList,null,"界面设置移交诉讼",CollectionStatusEnum.TO_LAW_WORK.getPageStr());
+				collectionStatusService.SyncBusinessColStatusToXindai(voList, null, "界面设置移交诉讼",
+						CollectionStatusEnum.TO_LAW_WORK.getPageStr());
 			}
 		} catch (Exception e) {
 			LOG.error("---saveCarProcessApprovalResult--- 存储房贷审批结果信息失败！", e);
@@ -921,44 +963,48 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				// 更新贷后状态为 移交诉讼
 				collectionStatusService.setBussinessAfterStatus(req.getBusinessId(), req.getCrpId(), "",
 						CollectionStatusEnum.TO_LAW_WORK, CollectionSetWayEnum.MANUAL_SET);
-				//同时更新信贷的贷后状态
+				// 同时更新信贷的贷后状态
 				List<StaffBusinessVo> voList = new LinkedList<>();
-				StaffBusinessVo vo  = new StaffBusinessVo();
+				StaffBusinessVo vo = new StaffBusinessVo();
 				vo.setCrpId(req.getCrpId());
 				vo.setBusinessId(req.getBusinessId());
 				voList.add(vo);
-				collectionStatusService.SyncBusinessColStatusToXindai(voList,null,"界面设置移交诉讼",CollectionStatusEnum.TO_LAW_WORK.getPageStr());
+				collectionStatusService.SyncBusinessColStatusToXindai(voList, null, "界面设置移交诉讼",
+						CollectionStatusEnum.TO_LAW_WORK.getPageStr());
 			}
 		} catch (Exception e) {
 			LOG.error("---saveHouseProcessApprovalResult--- 存储房贷审批结果信息失败！", e);
 			throw new ServiceRuntimeException(e.getMessage(), e);
 		}
 	}
-	   /**
-	    * 
-	    * 判断每期还款计划是否为最后一期
-	    * @param projPlanList
-	    * @return
-	    */
-		private boolean istLastPeriod(RepaymentBizPlanList pList) {
-			boolean isLast=false;
-			List<RepaymentBizPlanList> pLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", pList.getPlanId()));
-			RepaymentBizPlanList lastpList=pLists.stream().max(new Comparator<RepaymentBizPlanList>() {
-			
-				@Override
-				public int compare(RepaymentBizPlanList o1, RepaymentBizPlanList o2) {
-					return o1.getDueDate().compareTo(o2.getDueDate());
-				}
-			}).get();
-			
-			if(pList.getPlanListId().equals(lastpList.getPlanListId())) {
-				isLast=true;
+
+	/**
+	 * 
+	 * 判断每期还款计划是否为最后一期
+	 * 
+	 * @param projPlanList
+	 * @return
+	 */
+	private boolean istLastPeriod(RepaymentBizPlanList pList) {
+		boolean isLast = false;
+		List<RepaymentBizPlanList> pLists = repaymentBizPlanListService
+				.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", pList.getPlanId()));
+		RepaymentBizPlanList lastpList = pLists.stream().max(new Comparator<RepaymentBizPlanList>() {
+
+			@Override
+			public int compare(RepaymentBizPlanList o1, RepaymentBizPlanList o2) {
+				return o1.getDueDate().compareTo(o2.getDueDate());
 			}
-			return isLast;
-		}	
-		
-		public static void main(String[] args) {
-			String jsonString = JSONObject.toJSONString(null);
-			System.out.println(jsonString);
+		}).get();
+
+		if (pList.getPlanListId().equals(lastpList.getPlanListId())) {
+			isLast = true;
 		}
+		return isLast;
+	}
+
+	public static void main(String[] args) {
+		String jsonString = JSONObject.toJSONString(null);
+		System.out.println(jsonString);
+	}
 }

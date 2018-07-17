@@ -103,6 +103,12 @@ public class WithholdingFlowRecord extends Model<WithholdingFlowRecord> {
 	@TableField("payment_card_type")
 	@ApiModelProperty(required= true,value = "支付卡类型")
 	private String paymentCardType;
+	/**
+     * 支付卡号
+     */
+	@TableField("payment_card_no")
+	@ApiModelProperty(required= true,value = "支付卡号")
+	private String paymentCardNo;
     /**
      * 清算日期
      */
@@ -360,6 +366,14 @@ public class WithholdingFlowRecord extends Model<WithholdingFlowRecord> {
 
 	public void setImportSystem(String importSystem) {
 		this.importSystem = importSystem;
+	}
+
+	public String getPaymentCardNo() {
+		return paymentCardNo;
+	}
+
+	public void setPaymentCardNo(String paymentCardNo) {
+		this.paymentCardNo = paymentCardNo;
 	}
 
 	@Override

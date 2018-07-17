@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -46,7 +45,7 @@ import com.hongte.alms.base.service.TransferLitigationHouseService;
 import com.hongte.alms.base.service.TransferOfLitigationService;
 import com.hongte.alms.base.vo.billing.CarLoanBilVO;
 import com.hongte.alms.base.vo.litigation.HouseAdressVO;
-import com.hongte.alms.base.vo.litigation.TransferOfLitigationVO;
+import com.hongte.alms.base.vo.litigation.LitigationResponse;
 import com.hongte.alms.base.vo.litigation.house.HouseLoanVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.DateUtil;
@@ -368,9 +367,9 @@ public class TransferOfLitigationController {
 	@ApiOperation(value = "移交诉讼API")
 	@GetMapping("/queryTransferLitigationData")
 	@ResponseBody
-	public Result<TransferOfLitigationVO> queryTransferLitigationData(@RequestParam String businessId) {
+	public Result<LitigationResponse> queryTransferLitigationData(@RequestParam String businessId) {
 		try {
-			TransferOfLitigationVO litigationData = transferOfLitigationService.sendTransferLitigationData(businessId, sendUrl);
+			LitigationResponse litigationData = transferOfLitigationService.sendTransferLitigationData(businessId, sendUrl);
 			if (litigationData != null) {
 				return Result.success(litigationData);
 			} else {
