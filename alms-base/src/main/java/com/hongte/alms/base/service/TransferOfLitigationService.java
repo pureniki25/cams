@@ -8,7 +8,7 @@ import com.hongte.alms.base.entity.TransferLitigationCar;
 import com.hongte.alms.base.entity.TransferLitigationHouse;
 import com.hongte.alms.base.process.vo.ProcessLogReq;
 import com.hongte.alms.base.vo.billing.CarLoanBilVO;
-import com.hongte.alms.base.vo.litigation.TransferOfLitigationVO;
+import com.hongte.alms.base.vo.litigation.LitigationResponse;
 import com.hongte.alms.base.vo.litigation.house.HouseLoanVO;
 
 public interface TransferOfLitigationService {
@@ -38,7 +38,7 @@ public interface TransferOfLitigationService {
 	 * @param businessId 业务编号
 	 * @return
 	 */
-	TransferOfLitigationVO sendTransferLitigationData(String businessId, String sendUrl);
+	LitigationResponse sendTransferLitigationData(String businessId, String sendUrl);
 	
 	/**
      * 保存房贷移交法务信息
