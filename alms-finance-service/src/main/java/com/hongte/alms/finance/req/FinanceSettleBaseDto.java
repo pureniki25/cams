@@ -88,5 +88,10 @@ public class FinanceSettleBaseDto {
      * 提前结清标志位
      */
     private Boolean preSettle ;
+    
+    /**
+     * 是否预览
+     */
+    private Boolean preview ;
 
 }
