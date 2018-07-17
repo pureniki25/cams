@@ -29,9 +29,9 @@ public class RepaymentSettleLog extends Model<RepaymentSettleLog> {
     /**
      * 还款结清日志主键ID
      */
-	@TableId(value="settle_log_id", type= IdType.AUTO)
+	@TableId(value="settle_log_id")
 	@ApiModelProperty(required= true,value = "还款结清日志主键ID")
-	private Long settleLogId;
+	private String settleLogId;
     /**
      * 业务id
      */
@@ -50,6 +50,13 @@ public class RepaymentSettleLog extends Model<RepaymentSettleLog> {
 	@TableField("plan_id")
 	@ApiModelProperty(required= true,value = "所属还款计划编号(外键，对应tb_repayment_biz_plan.plan_id)")
 	private String planId;
+	
+	/**
+	 * 结清期(本次结清的所在期数,对应tb_repayment_biz_plan_list.plan_list_id)
+	 */
+	@TableField("plan_list_id")
+	@ApiModelProperty(required=true,value="结清期(本次结清的所在期数,对应tb_repayment_biz_plan_list.plan_list_id)")
+	private String planListId;
     /**
      * 还款时间
      */
@@ -118,11 +125,11 @@ public class RepaymentSettleLog extends Model<RepaymentSettleLog> {
 	private String createUserName;
 
 
-	public Long getSettleLogId() {
+	public String getSettleLogId() {
 		return settleLogId;
 	}
 
-	public void setSettleLogId(Long settleLogId) {
+	public void setSettleLogId(String settleLogId) {
 		this.settleLogId = settleLogId;
 	}
 
@@ -262,5 +269,13 @@ public class RepaymentSettleLog extends Model<RepaymentSettleLog> {
 			", updateUser=" + updateUser +
 			", createUserName=" + createUserName +
 			"}";
+	}
+
+	public String getPlanListId() {
+		return planListId;
+	}
+
+	public void setPlanListId(String planListId) {
+		this.planListId = planListId;
 	}
 }

@@ -195,6 +195,7 @@ public class RepayPlanController {
         try {
             //1，调用alms-finance-service获取还款计划相关数据
             Result<PlanReturnInfoDto> planReturnInfoDtoResult = repayPlanRemoteApi.queryRepayPlanByBusinessId(repayPlanReq);
+            logger.info(JSON.toJSONString(planReturnInfoDtoResult));
             if (planReturnInfoDtoResult == null || !"1".equals(planReturnInfoDtoResult.getCode()) || planReturnInfoDtoResult.getData() == null) {
                 logger.info("[处理] 还款计划-调用alms-finance-service获取还款计划相关数据失败：result=[{}]", JSON.toJSONString(planReturnInfoDtoResult));
                 return Result.error(planReturnInfoDtoResult.getMsg());
@@ -271,7 +272,7 @@ public class RepayPlanController {
                             case 20:
                                 paramMap.put("factAccrual", planListDetail.getFactAmount());
                                 break;
-                            //滞纳鑫
+                            //滞纳金
                             case 60:
                                 paramMap.put("currentBreach", planListDetail.getPlanAmount());
                                 paramMap.put("overdueMoney", planListDetail.getFactAmount());

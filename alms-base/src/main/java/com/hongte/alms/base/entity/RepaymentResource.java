@@ -63,7 +63,7 @@ public class RepaymentResource extends Model<RepaymentResource> {
 	@ApiModelProperty(required= true,value = "还款确认Id")
 	private String confirmLogId;
 
-
+	
     /**
      * 还款金额,单位:元
      */
@@ -127,7 +127,7 @@ public class RepaymentResource extends Model<RepaymentResource> {
 	/**
 	 * 结清还款确认Id
 	 */
-	@TableField(value="settle_log_id",exist=false)
+	@TableField(value="settle_log_id")
 	@ApiModelProperty(required= true,value = "结清还款确认Id")
 	private String settleLogId;
 

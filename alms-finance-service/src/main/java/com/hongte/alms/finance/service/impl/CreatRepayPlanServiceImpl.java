@@ -394,17 +394,21 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 //本期应还本金
                 BigDecimal currentPrinciple = null;
 
-
+                //本期应还利息
                 BigDecimal currentAccrual = null;
+                //本期应还分公司服务费
+                BigDecimal currentSerivceFee = new BigDecimal(0).setScale(smallNum ,  roundingMode);;
                 BigDecimal otherFee = new BigDecimal(0).setScale(smallNum ,  roundingMode);
                 for(RepaymentBizPlanListDetail repaymentBizPlanListDetail:repaymentBizPlanListDetails){
                     if(repaymentBizPlanListDetail.getPlanItemType().equals(RepayPlanFeeTypeEnum.INTEREST.getValue())){
                         currentAccrual =repaymentBizPlanListDetail.getPlanAmount();
                     }else if(repaymentBizPlanListDetail.getPlanItemType().equals(RepayPlanFeeTypeEnum.PRINCIPAL.getValue())){
                         currentPrinciple = repaymentBizPlanListDetail.getPlanAmount();
+                    }else if(repaymentBizPlanListDetail.getPlanItemType().equals(RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getValue())){
+                        currentSerivceFee = currentSerivceFee.add(repaymentBizPlanListDetail.getPlanAmount());
                     }
                     else {
-                        otherFee.add(repaymentBizPlanListDetail.getPlanAmount());
+                        otherFee = otherFee.add(repaymentBizPlanListDetail.getPlanAmount());
                     }
                 }
                 if(currentPrinciple == null){
@@ -421,6 +425,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 bizAfterDto.setCurrentAccrual(currentAccrual.toPlainString());//本期应还利息
                 bizAfterDto.setBorrowDate(repaymentBizPlanList.getDueDate());//还款日期
                 bizAfterDto.setCarBusinessAfterType("还款中");//[还款状态分类]：还款中，已还款，逾期
+                bizAfterDto.setRepayService(currentSerivceFee);//本期应还分公司服务费
                 bizAfterDto.setOtherMoney(otherFee.toPlainString()); //其他费用
 //                bizAfterDto.setCreatedate(new Date());
                 bizAfterDto.setRepayedFlag(0);
