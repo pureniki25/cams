@@ -12,5 +12,6 @@ public class WithholdFlowReq extends PageRequest {
     private String startTime;
     @ApiModelProperty(value="结束时间",name="endTime",required = false)
     private String endTime;
-
+    /*@ApiModelProperty(value = "代扣平台", name = "withholdingPlatform", required = false)
+    private Integer withholdingPlatform;*/
 }

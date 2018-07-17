@@ -221,7 +221,7 @@ public class WithholdingFlowRecordServiceImpl extends BaseServiceImpl<Withholdin
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
-                    flow.setTradeOrderNo(cols[4]);
+                    flow.setMerchantOrderNo(cols[4]);
                     flow.setTradeWaterNo(cols[5]);
                     flow.setAmount(new BigDecimal(cols[7]));
                     flow.setTradeType(cols[8]);
