@@ -167,6 +167,18 @@
 				<i-span v-else>执行中...</i-span>
 			</i-button>
 		</div>
+		<div style="margin-top:10px; margin-left:10px">
+			<i-lable>同步指定业务的还款计划到信贷系统：</i-lable>
+			业务ID：
+			<div class="layui-inline">
+				<input v-model="oneRepayPlanBId" class="layui-input" name="id" id="oneRepayPlanBId">
+			</div>
+			<i-button :loading="oneRepayPlanPushing" @click="pushOneBizRepayPlanToXD">
+				<i-span v-if="!oneRepayPlanPushing">执行</i-span>
+				<i-span v-else>执行中...</i-span>
+			</i-button>
+		</div>
+
 	</div>
 
 <!-- <div style="margin-top:10px; margin-left:10px">
