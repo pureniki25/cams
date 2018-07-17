@@ -22,4 +22,11 @@ public interface ShareProfitService {
 	 * @param save,true=保存分润后数据,false=不保存分润后数据
 	 */
 	public  List<CurrPeriodProjDetailVO>  execute(ConfirmRepaymentReq req,boolean save);
+
+
+	/**
+	 * 更新还款计划信息到信贷系统
+	 * @param businessId
+	 */
+	public void updateRepayPlanToLMS(String businessId);
 }

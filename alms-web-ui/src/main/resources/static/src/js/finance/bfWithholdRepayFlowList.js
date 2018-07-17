@@ -56,28 +56,32 @@ window.layinit(function (htConfig) {
                         elem: '#listTable' //指定原始表格元素选择器（推荐id选择器）
                         , id: 'listTable'
                         , cols: [[
-
                             {
-                                field: 'merchOrderId',
+                                // field: 'merchOrderId',
+                                field: 'tradeOrderNo',
                                 title: '宝付订单号'
                             },
                             {
-                                field: 'thirdOrderId',
+                                // field: 'thirdOrderId',
+                                field: 'merchantOrderNo',
                                 title: '商户支付订单号'
                             },
                             {
-                                field: 'merchantAccount',
+                                // field: 'merchantAccount',
+                                field: 'merchantNo',
                                 title: '商户号',
                             },
                             {
-                                field: 'bankCode',
+                                // field: 'bankCode',
+                                field: 'terminalNo',
                                 title: '终端号',
                             },
                             {
-                                field: 'repayStatus',
+                                // field: 'repayStatus',
+                                field: 'tradeType',
                                 title: '交易类型',
                                 templet: function (d) {
-                                    var content = "";
+                                   /*  var content = "";
                                     if (d.repayStatus == 0) {
                                         content = '代扣失败'
                                     } else if (d.repayStatus == 1) {
@@ -85,15 +89,18 @@ window.layinit(function (htConfig) {
                                     } else if (d.repayStatus == 2) {
                                         content = '处理中'
                                     }
-                                    return content
+                                    return content */
+                                    return d.tradeType + d.withholdingStatus;
                                 }
                             },
                             {
-                                field: 'currentAmount',
+                                // field: 'currentAmount',
+                                field: 'amount',
                                 title: '金额(元)',
                             },
                             {
-                                field: 'createTime',
+                                // field: 'createTime',
+                                field: 'liquidationDate',
                                 title: '清算日期',
 
                             }

@@ -18,6 +18,7 @@ import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.enums.RepayTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanBorrowLimitUnitEnum;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanCreateSysEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanSettleStatusEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.service.*;
@@ -25,6 +26,7 @@ import com.hongte.alms.base.vo.module.api.RepayLogResp;
 
 import com.hongte.alms.common.exception.ExceptionCodeEnum;
 import com.hongte.alms.common.exception.MyException;
+import com.hongte.alms.finance.service.ShareProfitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,6 +112,12 @@ public class RepayPlanController {
     @Autowired
     @Qualifier("TuandaiProjectInfoService")
     TuandaiProjectInfoService tuandaiProjectInfoService;
+
+
+    @Autowired
+    @Qualifier("ShareProfitService")
+    ShareProfitService shareProfitService;
+
 
     private static Validator validator;
 
@@ -270,6 +278,32 @@ public class RepayPlanController {
         logger.info("@还款计划@创建还款计划并将还款计划及业务和上标信息存储到数据库 接口--结束[{}]" , JSON.toJSONString(creatRepayPlanReq));
         return  Result.success(planReturnInfoDto);
     }
+
+    @ApiOperation(value = "将一个业务还款计划同步到信贷 接口")
+    @GetMapping("/pushOneBizRepayPlanToXD")
+    @ResponseBody
+    public Result pushOneBizRepayPlanToXD(String businessId){
+
+       BasicBusiness  basicBusiness =  basicBusinessService.selectById(businessId);
+
+       if(basicBusiness == null ){
+           return Result.error(ExceptionCodeEnum.NULL.getValue().toString(),"没有这个还款计划");
+       }
+       if( !basicBusiness.getSrcType().equals(RepayPlanCreateSysEnum.ALMS.getValue())){
+           return Result.error(ExceptionCodeEnum.NOT_THIS_SYS.getValue().toString(),"这个业务不是贷后系统生成的业务，不可同步");
+       }
+
+        try{
+            shareProfitService.updateRepayPlanToLMS(businessId);
+        }catch (Exception e){
+            return Result.error(ExceptionCodeEnum.EXCEPTION.getValue().toString(),e.getMessage());
+        }
+
+        return Result.success();
+    }
+
+
+
 
 //    @ApiOperation(value = "测试时间转换")
 //    @PostMapping("/testTime")

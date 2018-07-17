@@ -228,6 +228,9 @@ public class RepaymentBizPlanListBak extends Model<RepaymentBizPlanListBak> {
 	@ApiModelProperty(required= true,value = "还款记录id")
 	private String confirmLogId;
 
+	@TableField("settle_log_id")
+	@ApiModelProperty(required=true,value="结清记录关联id")
+	private String settleLogId;
 
 	public String getPlanListId() {
 		return planListId;
@@ -589,5 +592,19 @@ public class RepaymentBizPlanListBak extends Model<RepaymentBizPlanListBak> {
 		setTotalBorrowAmount(pl.getTotalBorrowAmount());
 		setUpdateTime(pl.getUpdateTime());
 		setUpdateUser(pl.getUpdateUser());
+	}
+
+	/**
+	 * @return the settleLogId
+	 */
+	public String getSettleLogId() {
+		return settleLogId;
+	}
+
+	/**
+	 * @param settleLogId the settleLogId to set
+	 */
+	public void setSettleLogId(String settleLogId) {
+		this.settleLogId = settleLogId;
 	}
 }

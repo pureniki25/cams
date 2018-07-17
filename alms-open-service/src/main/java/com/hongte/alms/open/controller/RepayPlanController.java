@@ -195,6 +195,7 @@ public class RepayPlanController {
         try {
             //1，调用alms-finance-service获取还款计划相关数据
             Result<PlanReturnInfoDto> planReturnInfoDtoResult = repayPlanRemoteApi.queryRepayPlanByBusinessId(repayPlanReq);
+            logger.info(JSON.toJSONString(planReturnInfoDtoResult));
             if (planReturnInfoDtoResult == null || !"1".equals(planReturnInfoDtoResult.getCode()) || planReturnInfoDtoResult.getData() == null) {
                 logger.info("[处理] 还款计划-调用alms-finance-service获取还款计划相关数据失败：result=[{}]", JSON.toJSONString(planReturnInfoDtoResult));
                 return Result.error(planReturnInfoDtoResult.getMsg());
@@ -257,6 +258,8 @@ public class RepayPlanController {
                     paramMap.put("factRepayDate", bizPlanList.getFactRepayDate());
 
                     List<CarBusinessAfterDetailDto> afterDetailDtos = Lists.newArrayList();
+                    BigDecimal subCompanyServiceFeeTotal = BigDecimal.ZERO;
+                    BigDecimal factSubCompanyServiceFeeTotal = BigDecimal.ZERO;
                     BigDecimal planOtherExpenses = BigDecimal.ZERO;
                     BigDecimal actualOtherExpernses = BigDecimal.ZERO;
                     for (RepaymentBizPlanListDetail planListDetail : bizPlanListDto.getBizPlanListDetails()) {
@@ -269,15 +272,18 @@ public class RepayPlanController {
                             case 20:
                                 paramMap.put("factAccrual", planListDetail.getFactAmount());
                                 break;
-                            //滞纳鑫
+                            //滞纳金
                             case 60:
                                 paramMap.put("currentBreach", planListDetail.getPlanAmount());
                                 paramMap.put("overdueMoney", planListDetail.getFactAmount());
                                 break;
                             //分公司服务费：资产端分公司服务费
                             case 30:
-                                paramMap.put("subCompanyServiceFee", planListDetail.getPlanAmount());
-                                paramMap.put("factSubCompanyServiceFee", planListDetail.getFactAmount());
+                                //paramMap.put("subCompanyServiceFee", planListDetail.getPlanAmount());
+                                //paramMap.put("factSubCompanyServiceFee", planListDetail.getFactAmount());
+                                //可能有多个分公司服务费，要循环累加
+                                subCompanyServiceFeeTotal = subCompanyServiceFeeTotal.add(planListDetail.getPlanAmount());
+                                factSubCompanyServiceFeeTotal = factSubCompanyServiceFeeTotal.add(planListDetail.getFactAmount());
                                 break;
                             //其它费用
                             default:
@@ -341,6 +347,8 @@ public class RepayPlanController {
                         paramMap.put("currentBreach", bizPlanList.getOverdueAmount());
                     }
                     paramMap.put("remark", bizPlanList.getRemark());
+                    paramMap.put("subCompanyServiceFee", subCompanyServiceFeeTotal);
+                    paramMap.put("factSubCompanyServiceFee", factSubCompanyServiceFeeTotal);
                     paramMap.put("currentOtherMoney", planOtherExpenses);
                     paramMap.put("otherMoney", actualOtherExpernses);
                     paramMap.put("confirmFlag", bizPlanList.getConfirmFlag());
@@ -374,16 +382,17 @@ public class RepayPlanController {
             String respStr = collectionXindaiService.updateRepaymentPlan(ciphertext);
             // 返回数据解密
             ResponseData respData = XinDaiEncryptUtil.getRespData(respStr);
-            if (respData == null || !"1".equals(respData.getReturnCode())) {
+            if (respData == null || !Constant.LMS_SUCCESS_CODE.equals(respData.getReturnCode())) {
                 logger.info("[处理] 还款计划-将指定业务的还款计划的变动通过信贷接口推送给信贷系统失败：result=[{}]", JSON.toJSONString(respData));
-
+                /*
+                // 这里不再记录失败记录，让调用方去记录，避免微服务导致的多次调用 
                 try {
                     //接口调用失败记录写入数据库以便定时生推
                     sysApiCallFailureRecordService.save(AlmsServiceNameEnums.OPEN, Constant.INTERFACE_CODE_OPEN_REPAYPLAN_UPDATEREPAYPLANTOLMS, Constant.INTERFACE_NAME_OPEN_REPAYPLAN_UPDATEREPAYPLANTOLMS,
                             businessId, paramStr, ciphertext, JSON.toJSONString(respData), apiUrl + "api/ltgproject/dod", this.getClass().getSimpleName());
                 } catch (ServiceRuntimeException e) {
                     logger.info("[处理] 还款计划-记录接口调用日志失败");
-                }
+                } */
 
                 return Result.error(respData.getReturnMessage());
             }

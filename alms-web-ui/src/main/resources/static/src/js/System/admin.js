@@ -2,11 +2,14 @@ var basePath;
 var platRepayBasePath;
 var vm;
 
+
 window.layinit(function (htConfig) {
     basePath = htConfig.coreBasePath;
     financeBasePath=htConfig.financeBasePath;
     platRepayBasePath=htConfig.platRepayBasePath;
     withholdBasePath=htConfig.withholdBasePath;
+
+
 
 	vm = new Vue({
 	   el: '#app',
@@ -18,7 +21,7 @@ window.layinit(function (htConfig) {
            syncVisitCollectionLoading:false,  //同步上门催收分配数据的加载标志位
            synXindaiFailPhoneSetLoading:false, //同步信贷调用失败的电催设置加载标志位
            setSuserPByUidloanding:false,  //根据用户Id设置单个用户可访问的业务加载标志位
-
+           oneRepayPlanPushing:false,//根据业务id推送贷后的还款计划信息到信贷加载标志位
 
            synOneListColLoading:false,
            setUserPermissonsLoading:false,
@@ -43,10 +46,35 @@ window.layinit(function (htConfig) {
            oneColUserXDId:"",
 
            //设置指定用户的权限对照关系用户Id（UC的用户ID）
-           userId:""
+           userId:"",
+
+           //同步指定业务的还款计划到信贷系统 业务Id
+           oneRepayPlanBId:""
+
+
 
 	   },
 	   methods: {
+	       //推送指定业务的还款计划到信贷
+           pushOneBizRepayPlanToXD:function(){
+               this.oneRepayPlanPushing = true;
+               axios.get(financeBasePath +"RepayPlan/pushOneBizRepayPlanToXD?businessId="+vm.oneRepayPlanBId)
+                   .then(function (res) {
+                       vm.oneRepayPlanPushing = false;
+                       if (res.data.data != null && res.data.code == 1) {
+                           vm.$Modal.success({
+                               content: res.data.msg
+                           });
+                       } else {
+                           vm.$Modal.error({content: res.data.msg });
+                       }
+                   })
+                   .catch(function (error) {
+                       vm.oneRepayPlanPushing = false;
+                       vm.$Modal.error({content: '接口调用异常!'});
+                   });
+           },
+
 		   // 同步电催催收数据
 		   syncCollection:function(){
 			   this.syncCollectionLoading = true;

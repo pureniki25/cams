@@ -89,6 +89,16 @@ public class FinanceSettleBaseDto {
      * 当前期标志实体,根据此实体判断是否提前结清
      */
     private RepaymentBizPlanList curPeriod ;
+    
+    /**
+     * 提前结清标志位
+     */
+    private Boolean preSettle ;
+    
+    /**
+     * 是否预览
+     */
+    private Boolean preview ;
 
   //页面填充Dto
    private List<CurrPeriodProjDetailVO> currPeriodProjDetailVOList=new ArrayList<>();
