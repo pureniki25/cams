@@ -285,4 +285,13 @@ public interface EipRemote {
 	 */
 	@RequestMapping(value ="/eip/baofu/loadFile", headers = {"app=ALMS","content-type=application/json"})
 	Result baoFuLoadFile(@RequestBody Map<String,Object> paramMap);
+
+
+	/**
+	 * 获取易宝消费清算对账单
+	 * @param paramMap
+	 * @return
+	 */
+	@RequestMapping(value = "/eip/yepay/query/payClearData", headers = {"app=ALMS","content-type=application/json"})
+	Result yiBaoPayClearData(@RequestBody Map<String,Object> paramMap);
 }

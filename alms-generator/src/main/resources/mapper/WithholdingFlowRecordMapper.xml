@@ -17,6 +17,7 @@
         <result column="amount" property="amount" />
         <result column="service_charge" property="serviceCharge" />
         <result column="payment_card_type" property="paymentCardType" />
+        <result column="payment_card_no" property="paymentCardNo" />
         <result column="liquidation_date" property="liquidationDate" />
         <result column="withholding_status" property="withholdingStatus" />
         <result column="identity_card" property="identityCard" />
@@ -32,7 +33,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, withholding_platform AS withholdingPlatform, merchant_no AS merchantNo, terminal_no AS terminalNo, trade_type AS tradeType, product_name AS productName, merchant_order_no AS merchantOrderNo, trade_order_no AS tradeOrderNo, trade_water_no AS tradeWaterNo, trade_date AS tradeDate, amount, service_charge AS serviceCharge, payment_card_type AS paymentCardType, liquidation_date AS liquidationDate, withholding_status AS withholdingStatus, identity_card AS identityCard, customer_name AS customerName, phone_number AS phoneNumber, bank_card AS bankCard, remark, bank_code AS bankCode, bank_name AS bankName, import_time AS importTime, import_system AS importSystem
+        id, withholding_platform AS withholdingPlatform, merchant_no AS merchantNo, terminal_no AS terminalNo, trade_type AS tradeType, product_name AS productName, merchant_order_no AS merchantOrderNo, trade_order_no AS tradeOrderNo, trade_water_no AS tradeWaterNo, trade_date AS tradeDate, amount, service_charge AS serviceCharge, payment_card_type AS paymentCardType,payment_card_no AS paymentCardNo, liquidation_date AS liquidationDate, withholding_status AS withholdingStatus, identity_card AS identityCard, customer_name AS customerName, phone_number AS phoneNumber, bank_card AS bankCard, remark, bank_code AS bankCode, bank_name AS bankName, import_time AS importTime, import_system AS importSystem
     </sql>
 
 </mapper>

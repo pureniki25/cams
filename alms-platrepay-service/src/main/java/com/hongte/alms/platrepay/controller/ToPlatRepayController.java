@@ -22,6 +22,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.dto.RechargeModalDTO;
 import com.hongte.alms.base.entity.AgencyRechargeLog;
+import com.hongte.alms.base.enums.RechargeBusinessTypeEnums;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.service.AgencyRechargeLogService;
 import com.hongte.alms.base.service.BasicBusinessService;
@@ -83,6 +84,24 @@ public class ToPlatRepayController {
 	@Autowired
 	@Qualifier("RepaymentProjPlanListService")
 	RepaymentProjPlanListService repaymentProjPlanListService;
+	
+	
+	@SuppressWarnings("rawtypes")
+	@ApiOperation(value = "银行代扣对应的业务资产端唯一编号")
+	@GetMapping("/getOIdPartner")
+	@ResponseBody
+	public Result getOIdPartner(@RequestParam("businessType") Integer businessType) {
+
+        String rechargeAccountType = RechargeBusinessTypeEnums.getName(businessType);
+		
+		String oIdPartner = tdrepayRechargeService.handleOIdPartner(rechargeAccountType);
+		if(!StringUtil.isEmpty(oIdPartner)) {
+			return Result.success(oIdPartner);
+		}else {
+			return Result.error("获取资产端唯一编号失败");
+		}
+		
+	}
 
 	@SuppressWarnings("rawtypes")
 	@ApiOperation(value = "查询代充值账户余额")

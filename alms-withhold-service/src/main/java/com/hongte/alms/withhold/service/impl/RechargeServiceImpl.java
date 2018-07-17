@@ -25,6 +25,7 @@ import com.hongte.alms.base.enums.repayPlan.RepayResultCodeEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.CustomerInfoXindaiRemoteApi;
 import com.hongte.alms.base.feignClient.EipRemote;
+import com.hongte.alms.base.feignClient.PlatformRepaymentFeignClient;
 import com.hongte.alms.base.feignClient.dto.BankCardInfo;
 import com.hongte.alms.base.feignClient.dto.BankRechargeReqDto;
 import com.hongte.alms.base.feignClient.dto.BaofuRechargeReqDto;
@@ -172,6 +173,10 @@ public class RechargeServiceImpl implements RechargeService {
 	@Autowired
 	@Qualifier("RepaymentBizPlanService")
 	RepaymentBizPlanService repaymentBizPlanService;
+	
+	
+	@Autowired
+	PlatformRepaymentFeignClient platformRepaymentFeignClient;
 	
 	
 	
@@ -432,8 +437,18 @@ public class RechargeServiceImpl implements RechargeService {
 				 * 调用接口前线插入记录 status 代扣状态(1:成功,0:失败;2:处理中)
 				 */
 				Integer status = 2;
+				com.hongte.alms.common.result.Result merchAccountResult=platformRepaymentFeignClient.getOIdPartner(business.getBusinessType());
+				String merchAccount="";
+				if(merchAccountResult.getCode().equals("1")) {
+					merchAccount=(String) merchAccountResult.getData();
+				}else {
+					logger.error("获取资产端唯一编号失败,pListId:{0}",pList.getPlanListId());
+					result.setCode("-1");
+					result.setMsg("获取资产端唯一编号失败,pListId:"+pList.getPlanListId());
+					return result;
+				}
 				WithholdingRepaymentLog log = recordRepaymentLog("", status, pList, business, bankCardInfo,
-						channel.getPlatformId(), boolLastRepay, boolPartRepay, merchOrderId,"", 0,
+						channel.getPlatformId(), boolLastRepay, boolPartRepay, merchOrderId,merchAccount, 0,
 						BigDecimal.valueOf(amount),appType);
 
 				BankRechargeReqDto dto = new BankRechargeReqDto();
@@ -448,7 +463,7 @@ public class RechargeServiceImpl implements RechargeService {
 					logger.info("============================银行代扣，调用的子渠道是:"+dto.getChannelType()+"=====================================");
 					dto.setRechargeUserId(bankCardInfo.getPlatformUserID());
 					dto.setCmOrderNo(merchOrderId);
-					dto.setOidPartner(oidPartner);
+					dto.setOidPartner(merchAccount);
 					dto.setOrgUserName(orgUserName);
 					dto.setUserIP(CommonUtil.getClientIp());
 					com.ht.ussp.core.Result remoteResult = null;
