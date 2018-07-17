@@ -2477,7 +2477,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
      * @author 张贵宏
      * @date 2018/6/28 17:32
      */
-    private void updateRepayPlanToLMS(String businessId) {
+    @Override
+    public void updateRepayPlanToLMS(String businessId) {
         Result result = null;
         Map<String, Object> paramMap = Maps.newHashMap();
         paramMap.put("businessId", businessId);

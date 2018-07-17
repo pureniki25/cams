@@ -16,6 +16,8 @@ public enum ExceptionCodeEnum  implements IEnum {
 
     ,RUNING(300,"程序执行中，请完成本次执行后再触发")
     ,NO_USER(350,"没找到用户信息")
+    ,NOT_THIS_SYS(400,"不是这个系统的业务")
+    ,EXCEPTION(500,"系统异常")
    ;
 
     private Integer value;
