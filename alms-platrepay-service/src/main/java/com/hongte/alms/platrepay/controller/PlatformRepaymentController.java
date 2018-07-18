@@ -457,7 +457,7 @@ public class PlatformRepaymentController {
                 }
             } else {
                 LOGGER.error("@对接合规还款接口@  通过外联平台eip(查询标的还款计划:/repayment/queryRepaymentSchedule)调用团贷查询标的还款计划错误 输入参数 projectPlanId:[{}] projectId:[{}]  afterId[{}] ", projPlanListId, projPlan.getProjectId(), bizPlanList.getAfterId());
-                return Result.error("500", "通过外联平台eip(查询标的还款计划:/repayment/queryRepaymentSchedule)调用团贷查询标的还款计划错误");
+                return Result.error("500", "通过外联平台eip(查询标的还款计划:/repayment/queryRepaymentSchedule)调用团贷查询标的还款计划错误, returnCode:"+ ret.getReturnCode()+",msg:"+ret.getMsg()+",codeDesc:"+ret.getCodeDesc());
             }
             if (planRepaymentMap.size() == 0) {
                 LOGGER.error("@对接合规还款接口@  通过外联平台eip(查询标的还款计划:/repayment/queryRepaymentSchedule)调用团贷查询标的还款计划错误，没有查到本期结果数据. 输入参数 projectPlanId:[{}]  projectId:[{}]  afterId[{}] ", projPlanListId, projPlan.getProjectId(), bizPlanList.getAfterId());
@@ -537,7 +537,7 @@ public class PlatformRepaymentController {
                 }
             } else {
                 LOGGER.error("@对接合规还款接口@  通过外联平台eip(标的还款信息查询接口:/repayment/queryProjectPayment)调用团贷标的标的还款信息查询接口错误 输入参数 projectPlanId:[{}] projectId:[{}]  afterId[{}] ", projPlanListId, projPlan.getProjectId(), bizPlanList.getAfterId());
-                return Result.error("500", "通过外联平台eip调用团贷标的还款信息查询接口错误");
+                return Result.error("500", "通过外联平台eip调用团贷标的还款信息查询接口错误, returnCode:"+ ret2.getReturnCode()+",msg:"+ret2.getMsg()+",codeDesc:"+ret2.getCodeDesc());
             }
             if (guaranteePaymentMap.size() == 0) {
                 /*LOGGER.error("@对接合规还款接口@  通过外联平台eip调用团贷标的还款计划信息查询接口错误，没有查到本期结果数据. 输入参数projectPlanId:[{}] projectId:[{}]  afterId[{}] ", projPlanListId, projPlan.getProjectId(), bizPlanList.getAfterId());
@@ -705,8 +705,10 @@ public class PlatformRepaymentController {
                 LOGGER.error("@对接合规还款接口@ 调用代充值资金分发参数接入接口失败 vo:[{}]", JSON.toJSONString(vo));
                 return Result.error("合规还款失败:" + result.getMsg());
             }
+            LOGGER.info("@对接合规还款接口@ 调用代充值资金分发成功 vo:[{}]", JSON.toJSONString(vo));
+            
             //return Result.success(departmentBankService.listDepartmentBank());
-            return Result.success();
+            return Result.success(JSON.toJSONString(vo));
         } catch (Exception e) {
             LOGGER.error("通过合化还款接口还款失败.", e);
             return Result.error("500", "通过合化还款接口还款失败！" + e.getMessage());

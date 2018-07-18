@@ -58,23 +58,27 @@ window.layinit(function (htConfig) {
                         , cols: [[
 
                             {
-                                field: 'merchantAccount',
+                                // field: 'merchantAccount',
+                                field: 'merchantNo',
                                 title: '易宝商户号',
                             },
                             {
-                                field: 'merchOrderId',
+                                // field: 'merchOrderId',
+                                field: 'merchantOrderNo',
                                 title: '商户订单号'
                             },
                             {
-                                field: 'thirdOrderId',
+                                // field: 'thirdOrderId',
+                                field: 'tradeWaterNo',
                                 title: '易宝付交易流水号'
                             },
 
                             {
-                                field: 'repayStatus',
+                                // field: 'repayStatus',
+                                field: 'tradeType',
                                 title: '交易类型',
                                 templet: function (d) {
-                                    var content = "";
+                                    /* var content = "";
                                     if (d.repayStatus == 0) {
                                         content = '代扣失败'
                                     } else if (d.repayStatus == 1) {
@@ -82,11 +86,14 @@ window.layinit(function (htConfig) {
                                     } else if (d.repayStatus == 2) {
                                         content = '处理中'
                                     }
-                                    return content
+                                    return content */
+
+                                    return d.tradeType + d.withholdingStatus;
                                 }
                             },
                             {
-                                field: 'currentAmount',
+                                // field: 'currentAmount',
+                                field: 'amount',
                                 title: '代扣金额',
                             }
                         ]], //设置表头

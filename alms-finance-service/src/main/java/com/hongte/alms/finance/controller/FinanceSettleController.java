@@ -1,6 +1,7 @@
 package com.hongte.alms.finance.controller;
 
 import com.hongte.alms.base.exception.ServiceRuntimeException;
+import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.finance.req.FinanceSettleReq;
 import com.hongte.alms.finance.service.FinanceSettleService;
@@ -13,6 +14,8 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RefreshScope
@@ -30,12 +33,8 @@ public class FinanceSettleController {
         logger.info("@financeSettle@资金结算开始[{}]");
         Result result = null;
         try {
-            financeSettleService.financeSettle(financeSettleReq);
-
-
-
-
-            result = Result.success();
+            List<CurrPeriodProjDetailVO> currVo = financeSettleService.financeSettle(financeSettleReq);
+            result = Result.success(currVo);
         } catch (ServiceRuntimeException se) {
             result = Result.error(se.getErrorCode(), se.getMessage());
             logger.error("@financeSettle@资金结清出错{}", se.getMessage());

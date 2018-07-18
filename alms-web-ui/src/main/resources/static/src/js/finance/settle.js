@@ -20,7 +20,17 @@ window.layinit(function (htConfig) {
             curIndex: {},
             matchedBankStatement: [],
             factRepayPreview: {},
-            factRepaymentInfo: {},
+            factRepaymentInfo: {
+                repayDate: '',
+                surplusFund: 0,
+                onlineOverDuel: '',
+                offlineOverDue: '',
+                remark: '',
+                canUseSurplus: 0,
+                moneyPoolAccount: 0,
+                repayAccount: 0,
+                mprIds: []
+            },
             thisTimeRepaymentInfo: {
                 repayDate: '',
                 item10: '',
@@ -125,7 +135,7 @@ window.layinit(function (htConfig) {
                                             type: 2,
                                             title: '手动匹配流水',
                                             content: [url, 'no'],
-                                            area: ['1600px', '800px'],
+                                            area: ['95%','95%'],
                                             success: function (layero, index) {
                                                 curIndex = index;
                                             }
@@ -224,6 +234,7 @@ window.layinit(function (htConfig) {
                         }
                     }, {
                         title: '操作',
+                        width:150,
                         render: (h, p) => {
 
                             if (p.row.moneyPoolId != '合计' && !p.row.status == '完成') {
@@ -252,51 +263,39 @@ window.layinit(function (htConfig) {
                                     },
                                     '取消关联'
                                 )
-                            } else {
-                                return h('span', '')
+                            } else if (p.row.moneyPoolId != '合计' && p.row.status == '已领取') {
+                                return h('div', [
+                                    h('i-button', {
+                                        props: {
+                                            size: 'small'
+                                        },
+                                        on: {
+                                            click() {
+                                                app.openEditBankStatementModal(p.row.mprId)
+                                            }
+                                        },
+                                        style: {
+                                            marginRight: '10px'
+                                        }
+                                    }, '编辑流水'),
+                                    h('i-button', {
+                                        props: {
+                                            size: 'small'
+                                        },
+                                        on: {
+                                            click() {
+                                                app.deleteMoneyPool(p)
+                                            }
+                                        }
+                                    }, '删除')
+                                ])
                             }
 
                         }
                     }],
-                    data: [/* {
-                        "moneyPoolId": "73b90613df4943fa8e09935aa2f25f2c",
-                        "repaymentCode": null,
-                        "bankAccount": " 陈树华招行",
-                        "tradeDate": "2018-05-22",
-                        "tradeType": "转账",
-                        "tradePlace": null,
-                        "accountMoney": 2500.00,
-                        "remark": null,
-                        "summary": null,
-                        "status": "完成"
-                    }, {
-                        "moneyPoolId": "4939b7bc86154b789c1f5b21fcc56e78",
-                        "repaymentCode": null,
-                        "bankAccount": " 陈树华招行",
-                        "tradeDate": "2018-05-22",
-                        "tradeType": "转账",
-                        "tradePlace": null,
-                        "accountMoney": 257.51,
-                        "remark": null,
-                        "summary": null,
-                        "status": "完成"
-                    }, {
-                        "moneyPoolId": "0b53e114dd4f4443bc68c8db061271e5",
-                        "repaymentCode": null,
-                        "bankAccount": " 陈树华招行",
-                        "tradeDate": "2018-05-20",
-                        "tradeType": "转账",
-                        "tradePlace": null,
-                        "accountMoney": 2500.00,
-                        "remark": null,
-                        "summary": null,
-                        "status": "完成"
-                    } */]
-                },
-                projRepayment: {
-                    col: [],
                     data: []
                 },
+                projRepayment: projRepayment,
                 plan: {
                     col: [{
                         title: '期数',
@@ -423,16 +422,14 @@ window.layinit(function (htConfig) {
                 let moneyPoolAccount = 0
                 if (n && n.length > 0) {
                     n.forEach(element => {
-                        moneyPoolAccount = (moneyPoolAccount*10000+element.accountMoney*10000)/10000
+                        moneyPoolAccount = accAdd(moneyPoolAccount,element.accountMoney)
                         app.factRepaymentInfo.mprIds.push(element.mprId);
                     });
                     let o = n[n.length - 1]
                     app.factRepaymentInfo.repayDate = o.tradeDate
                 }
                 app.factRepaymentInfo.moneyPoolAccount = moneyPoolAccount
-                
-                // app.factRepaymentInfo.repayAccount = parseFloat(app.factRepaymentInfo.moneyPoolAccount.toFixed(2))  + parseFloat(app.factRepaymentInfo.surplusFund.toFixed(2) || 0)
-                app.factRepaymentInfo.repayAccount = (app.factRepaymentInfo.moneyPoolAccount*10000+(app.factRepaymentInfo.surplusFund||0)*10000)/10000
+                app.factRepaymentInfo.repayAccount = accAdd(app.factRepaymentInfo.moneyPoolAccount,(app.factRepaymentInfo.surplusFund||0))
             },
             'factRepaymentInfo.useSurplusflag':function(n,o){
                 if(o==''){
@@ -447,11 +444,11 @@ window.layinit(function (htConfig) {
                         app.factRepaymentInfo.surplusFund = 0
                         return;
                     }
-                    app.factRepaymentInfo.repayAccount = (app.factRepaymentInfo.moneyPoolAccount*10000+(app.factRepaymentInfo.surplusFund||0)*10000)/10000
+                    app.factRepaymentInfo.repayAccount = accAdd(app.factRepaymentInfo.moneyPoolAccount,(app.factRepaymentInfo.surplusFund||0))
                 }
             },
             'factRepaymentInfo.repayAccount': function (n) {
-                app.previewConfirmRepayment()
+                app.previewSettle()
             }
         },
         methods: {
@@ -476,6 +473,39 @@ window.layinit(function (htConfig) {
                         app.spinShow = false
                     })
             },
+            getRepayRegList() {
+                axios.get(cpath + 'moneyPool/checkMoneyPool', {
+                    params: {
+                        businessId: businessId,
+                        afterId: afterId,
+                        isMatched: false,
+                    }
+                })
+                    .then(function (res) {
+                        if (res.data.code == '1') {
+                            let sumMoney = 0;
+                            res.data.data.forEach(element => {
+                                sumMoney = accAdd(sumMoney,element.accountMoney)
+                            });
+                            let sum = {
+                                moneyPoolId: '合计',
+                                accountMoney: sumMoney
+                            }
+                            app.table.reg.data = res.data.data
+                            app.table.reg.data.push(sum)
+
+                        } else {
+                            app.$Message.error({
+                                content: res.data.msg
+                            })
+                        }
+                    }).catch(function (err) {
+                    console.log(err);
+                    app.$Message.error({
+                        content: '获取登记还款信息列表数据失败'
+                    })
+                })
+            },
             getMatched() {
                 axios.get(cpath + 'moneyPool/checkMoneyPool', {
                         params: {
@@ -497,7 +527,7 @@ window.layinit(function (htConfig) {
                             // app.table.matched.data = res.data.data.slice(0);
                             let t = 0;
                             app.table.matched.data.forEach(element => {
-                                t += element.accountMoney
+                                t = accAdd(t,element.accountMoney)
                             });
                             let sum = {
                                 moneyPoolId: '合计',
@@ -519,13 +549,24 @@ window.layinit(function (htConfig) {
                         app.spinShow = false;
                     })
             },
+            surplusFundEnter(e){
+                var n= e.target.value;
+                  if ((n || n == 0 ) && !isNaN(n)) {
+                      if (n > app.factRepaymentInfo.canUseSurplus) {
+                          app.$Modal.warning({content: '可使用结余金额不能大于' + app.factRepaymentInfo.canUseSurplus})
+                          app.factRepaymentInfo.surplusFund = 0
+                          return;
+                      }
+                      app.factRepaymentInfo.repayAccount = accAdd(app.factRepaymentInfo.moneyPoolAccount,(app.factRepaymentInfo.surplusFund || 0))
+                  }
+              },
             openMatchBankStatementModal(p) {
                 let url = '/finance/manualMatchBankSatements?businessId=' + businessId + "&afterId=" + afterId;
                 layer.open({
                     type: 2,
                     title: '手动匹配流水',
                     content: [url, 'no'],
-                    area: ['1600px', '800px'],
+                    area: ['95%','95%'],
                     success: function (layero, index) {
                         curIndex = index;
                     }
@@ -536,8 +577,20 @@ window.layinit(function (htConfig) {
                 layer.open({
                     type: 2,
                     title: '手动新增流水',
-                    content: [url, 'no'],
-                    area: ['1600px', '800px'],
+                    content: [url],
+                    area: ['40%','90%'],
+                    success: function (layero, index) {
+                        curIndex = index;
+                    }
+                })
+            },
+            openEditBankStatementModal(mprid) {
+                let url = '/finance/manualAddBankSatements?businessId=' + businessId + "&afterId=" + afterId + "&mprid=" + mprid;
+                layer.open({
+                    type: 2,
+                    title: '手动编辑流水',
+                    content: [url],
+                    area: ['40%', '90%'],
                     success: function (layero, index) {
                         curIndex = index;
                     }
@@ -609,10 +662,69 @@ window.layinit(function (htConfig) {
                         })
                     })
             },
+            settle(params,cb){
+                axios.post(fpath+'finance/financeSettle',params)
+                .then(function(res){
+                    cb(res)
+                })
+                .catch(function(err){
+                    app.$Message.error({content:'结清功能异常'})
+                })
+            },
+            handleSettleResult(res){
+                app.table.projRepayment.data = res.data.data
+                app.factRepayPreview.flag = true
+                app.factRepayPreview.item10 = 0
+                app.factRepayPreview.item20 = 0
+                app.factRepayPreview.item30 = 0
+                app.factRepayPreview.item50 = 0
+                app.factRepayPreview.offlineOverDue = 0
+                app.factRepayPreview.onlineOverDue = 0
+                app.factRepayPreview.subTotal = 0
+                app.factRepayPreview.total = 0
+                app.factRepayPreview.surplus = 0
+                app.table.projRepayment.data.forEach(e => {
+                    app.factRepayPreview.surplus = accAdd(app.factRepayPreview.surplus,e.surplus)
+                    app.factRepayPreview.item10 = accAdd(app.factRepayPreview.item10,e.item10)
+                    app.factRepayPreview.item20 = accAdd(app.factRepayPreview.item20,e.item20)
+                    app.factRepayPreview.item30 = accAdd(app.factRepayPreview.item30,e.item30)
+                    app.factRepayPreview.item50 = accAdd(app.factRepayPreview.item50,e.item50)
+                    app.factRepayPreview.offlineOverDue = accAdd(app.factRepayPreview.offlineOverDue,e.offlineOverDue)
+                    app.factRepayPreview.onlineOverDue = accAdd(app.factRepayPreview.onlineOverDue,e.onlineOverDue)
+                    app.factRepayPreview.subTotal = accAdd(app.factRepayPreview.subTotal,e.subTotal)
+                    app.factRepayPreview.total = accAdd(app.factRepayPreview.total,e.total)
+                })
+                app.factRepayPreview.total = accAdd(accAdd(app.factRepayPreview.subTotal,app.factRepayPreview.offlineOverDue),accAdd(app.factRepayPreview.onlineOverDue,app.factRepayPreview.surplus))
+            },
+            previewSettle(){
+                let params = {}
+                params.businessId = businessId
+                params.afterId = afterId
+                if(planId){
+                    params.planId = planId
+                }
+                params.preview=true
+
+                params = Object.assign(app.factRepaymentInfo, params);
+                app.settle(params,app.handleSettleResult)
+            },
+            submitSettle(){
+                let params = {}
+                params.businessId = businessId
+                params.afterId = afterId
+                if(planId){
+                    params.planId = planId
+                }
+                params.preview=false
+
+                params = Object.assign(app.factRepaymentInfo, params);
+                app.settle(params,app.handleSettleResult)
+            }
             
         },
         created: function () {
             this.getBaseInfo()
+            this.getRepayRegList()
             this.getMatched()
             this.listRepayment()
             this.getSettleInfo()

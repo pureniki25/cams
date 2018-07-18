@@ -15,12 +15,14 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.SysMsgTemplate;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.base.enums.MsgCodeEnum;
 import com.hongte.alms.base.feignClient.MsgRemote;
 import com.hongte.alms.base.feignClient.dto.MsgRequestDto;
+import com.hongte.alms.base.service.RepaymentBizPlanService;
 import com.hongte.alms.base.service.RepaymentProjPlanService;
 import com.hongte.alms.base.service.SendMessageService;
 import com.hongte.alms.base.service.SysMsgTemplateService;
@@ -56,6 +58,10 @@ public class SendMessageServiceImpl implements SendMessageService {
 	@Autowired
 	@Qualifier("RepaymentProjPlanService")
 	RepaymentProjPlanService repaymentProjPlanService;
+	
+	@Autowired
+	@Qualifier("RepaymentBizPlanService")
+	RepaymentBizPlanService repaymentBizPlanService;
 	
 	@Override
 	public void sendAfterRepaySuccessSms(String phone,String name, Date date, BigDecimal borrowAmount, Integer period,
@@ -189,11 +195,16 @@ public class SendMessageServiceImpl implements SendMessageService {
 		List<RepaymentBizPlanListVo> pListVos = new ArrayList();
 		BigDecimal totalAmount = BigDecimal.valueOf(0);// 合计应还金额
 		Date dueDate = new Date();
-		for (RepaymentBizPlanList pList : pLists) {
-			vo = new RepaymentBizPlanListVo(pList);
+		for (int i=0;i<pLists.size();i++) {
+			vo = new RepaymentBizPlanListVo(pLists.get(0));
+			RepaymentBizPlan plan=repaymentBizPlanService.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("plan_id", pLists.get(0).getPlanId()));
+			vo.setPeriod(i+1);
+			vo.setDate(DateUtil.getChinaDay(borrowDate));
+			vo.setBorrowAmount(plan.getBorrowMoney());
 			vo.setRepayAmount(vo.getTotalBorrowAmount()
 					.add(vo.getOverdueAmount() == null ? BigDecimal.valueOf(0) : vo.getOverdueAmount()));
-			totalAmount.add(vo.getRepayAmount());
+			totalAmount=totalAmount.add(vo.getRepayAmount());
+			pListVos.add(vo);
 		}
 		Long msgModeId = Long.valueOf(sysMsgTemplate.getTemplateId());
 		MsgRequestDto dto = new MsgRequestDto();
@@ -206,7 +217,7 @@ public class SendMessageServiceImpl implements SendMessageService {
 		data.put("name", name);
 		data.put("list", pListVos);
 		data.put("totalAmount", totalAmount);
-		data.put("dueDate", DateUtil.getChinaDay(dueDate));
+		data.put("dueDate", DateUtil.getChinaDay(pLists.get(0).getDueDate()));
 		data.put("tailNumber", tailNumber);
 		dto.setMsgBody(data);
 		String jason = JSON.toJSONString(dto);
@@ -274,7 +285,7 @@ public class SendMessageServiceImpl implements SendMessageService {
 
 	@Override
 	public void sendAfterBindingRepayRemindSms(String phone, String name, Date date, BigDecimal borrowAmount,
-			BigDecimal repayAmount, Integer period, Date dueDate) {
+			BigDecimal repayAmount, Integer period, Date dueDate,String tailNum) {
 		String templateCode=MsgCodeEnum.AFTER_BINDING_REPAY_REMIND.getValue();
 		SysMsgTemplate sysMsgTemplate=sysMsgTemplateService.selectOne(new EntityWrapper<SysMsgTemplate>().eq("template_code", templateCode));
 
@@ -297,6 +308,7 @@ public class SendMessageServiceImpl implements SendMessageService {
 		data.put("dueDate", DateUtil.getChinaDay(dueDate));
 		data.put("repayAmount",repayAmount);
 		data.put("period", period);
+		data.put("tailNumber", tailNum);
 		dto.setMsgBody(data);
 		String jason=JSON.toJSONString(dto);
 		msgRemote.sendRequest(jason);				
@@ -304,7 +316,7 @@ public class SendMessageServiceImpl implements SendMessageService {
 
 	@Override
 	public void sendAfterBindingSettleRemindSms(String phone, String name, Date date, BigDecimal borrowAmount,
-			Date dueDate) {
+			Date dueDate,String tailNum) {
 		String templateCode=MsgCodeEnum.AFTER_BINDING_SETTLE_REMIND.getValue();
 		SysMsgTemplate sysMsgTemplate=sysMsgTemplateService.selectOne(new EntityWrapper<SysMsgTemplate>().eq("template_code", templateCode));
 
@@ -325,6 +337,7 @@ public class SendMessageServiceImpl implements SendMessageService {
 		data.put("date",  DateUtil.getChinaDay(date));
 		data.put("borrowAmount", borrowAmount);
 		data.put("dueDate", DateUtil.getChinaDay(dueDate));
+		data.put("tailNumber", tailNum);
 		dto.setMsgBody(data);
 		String jason=JSON.toJSONString(dto);
 		msgRemote.sendRequest(jason);	

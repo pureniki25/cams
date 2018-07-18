@@ -186,10 +186,10 @@
 			 and pl.business_id in (select business_id from tb_sys_user_permission where user_id = #{userId} ) 
 			<if test="customer != null">
 				<!-- AND b.customer_name = #{customer} -->
-				AND pl.customer_name_ext = #{customer}
+				AND pl.customer_name_ext like '${customer}%' 
 			</if>
 			<if test="businessId != null">
-				AND pl.orig_business_id = #{businessId}
+				AND pl.orig_business_id like  '${businessId}%'
 			</if>
 			<if test="accountantConfirmStatus != null">
 				AND pl.accountant_confirm_status =
@@ -199,7 +199,7 @@
 				AND pl.area_pid_ext = #{areaId}
 			</if>
 			<if test="companyId != null">
-				AND (pl.company_name_ext = #{companyId} OR pl.company_id_ext = #{companyId})
+				AND pl.company_name_ext = #{companyId}
 			</if>
 			<if test="businessType != null ">
 				AND pl.business_type_ext = #{businessType}
@@ -208,10 +208,10 @@
 				AND DATE_FORMAT(pl.due_date,'%Y-%m-%d') = #{repayDate}
 			</if>
 			<if test="regDateStart != null ">
-				AND pl.trade_date_ext &gt;= #{regDateStart}
+				AND pl.trade_date &gt;= #{regDateStart}
 			</if>
 			<if test="regDateEnd != null ">
-				AND pl.trade_date_ext &lt;= #{regDateEnd}
+				AND pl.trade_date &lt;= #{regDateEnd}
 			</if>
 			<if test="status != null ">
 				AND pl.current_status = #{status}
