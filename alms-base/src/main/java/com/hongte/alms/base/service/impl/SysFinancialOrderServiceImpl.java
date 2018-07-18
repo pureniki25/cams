@@ -50,10 +50,8 @@ public class SysFinancialOrderServiceImpl extends BaseServiceImpl<SysFinancialOr
     @Qualifier("SysUserPermissionService")
     private SysUserPermissionService sysUserPermissionService;
 
-    //@Autowired
+    @Autowired
     private Executor executor;
-    //private static final Executor executor = Executors.newCachedThreadPool();
-
 
     /**
      * 自定义分页查询

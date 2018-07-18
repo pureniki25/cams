@@ -2,6 +2,7 @@ package com.hongte.alms.finance.req;
 
 import com.hongte.alms.base.RepayPlan.dto.RepaymentBizPlanDto;
 import com.hongte.alms.base.entity.*;
+import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -16,14 +17,16 @@ public class FinanceSettleBaseDto {
 
     private String businessId;
     private String orgBusinessId;
-    private String planId;
-    private String afterId;
     private String userId;
-    private String projectId;
+
 
     private String userName;
     private String uuid;
-
+     //临时变量
+    private String projPlanId;
+    private String planId;
+    private String afterId;
+    private String projectId;
 
     /**
      * 总应还金额（减去实还后的金额）
@@ -62,6 +65,9 @@ public class FinanceSettleBaseDto {
      */
     private Map<String,Map<String, List<RepaymentProjFactRepay>>> projFactRepays =new HashMap<>();
 
+
+    private Map<String, CurrPeriodProjDetailVO> webFactRepays=new HashMap<>();
+
     // 调用来源的标志位
     private Integer callFlage;
 
@@ -93,5 +99,8 @@ public class FinanceSettleBaseDto {
      * 是否预览
      */
     private Boolean preview ;
+
+  //页面填充Dto
+   private List<CurrPeriodProjDetailVO> currPeriodProjDetailVOList=new ArrayList<>();
 
 }
