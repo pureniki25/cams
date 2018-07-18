@@ -36,4 +36,17 @@
         id, withholding_platform AS withholdingPlatform, merchant_no AS merchantNo, terminal_no AS terminalNo, trade_type AS tradeType, product_name AS productName, merchant_order_no AS merchantOrderNo, trade_order_no AS tradeOrderNo, trade_water_no AS tradeWaterNo, trade_date AS tradeDate, amount, service_charge AS serviceCharge, payment_card_type AS paymentCardType,payment_card_no AS paymentCardNo, liquidation_date AS liquidationDate, withholding_status AS withholdingStatus, identity_card AS identityCard, customer_name AS customerName, phone_number AS phoneNumber, bank_card AS bankCard, remark, bank_code AS bankCode, bank_name AS bankName, import_time AS importTime, import_system AS importSystem
     </sql>
 
+    <select id="querySummary" parameterType="com.hongte.alms.base.customer.vo.WithholdFlowReq" resultType="com.hongte.alms.base.vo.withhold.WithholdingFlowRecordSummaryVo">
+        select count(1) as totalNumber, sum(amount) as totalAmount, sum(service_charge) as totalServiceCharge from tb_withholding_flow_record
+        where 1=1
+        <if test="withholdingPlatform != null ">
+            and withholding_platform = #{withholdingPlatform}
+        </if>
+        <if test="startTime !=null and startTime != ''">
+            and liquidation_date &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime !=''">
+            and liquidation_date &lt;= #{endTime}
+        </if>
+    </select>
 </mapper>

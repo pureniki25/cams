@@ -10,7 +10,7 @@
     <script src="/properties/config.js"></script>
     <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
     <!-- iview样式 -->
-    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/2.13.1/css/iview.css" />
     <!--@import url("//unpkg.com/iview/dist/styles/iview.css");-->
     <!--<link rel="stylesheet" type="text/css" href="//unpkg.com/iview/dist/styles/iview.css"/>-->
     <!-- 引入layui样式 -->
@@ -21,7 +21,7 @@
     <!-- 引入vue -->
     <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
     <!-- iview js -->
-    <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+    <script type="text/javascript" src="/plugins/iview/2.13.1/js/iview.min.js"></script>
     <!--引入layui.js-->
     <script src="/plugins/layui/layui.js"></script>
     <!--引入axios.js 用于ajax调用-->
@@ -67,12 +67,12 @@
                             :label-width="100">
                         <i-col span="16">
                             <form-item label="查询日期：" prop="startTime">
-                                <date-picker type="date" v-model="searchForm.startTimeV" @on-change="startTime"
+                                <date-picker type="date" v-model="searchForm.startTime" @on-change="startTime"
                                              placeholder="选择日期"
                                              format="yyyy-MM-dd"
                                              style="width: 200px"></date-picker>
                                 <span>至</span>
-                                <date-picker type="date" v-model="searchForm.endTimeV"  @on-change="endTime"
+                                <date-picker type="date" v-model="searchForm.endTime"  @on-change="endTime"
                                              placeholder="选择日期"
                                              format="yyyy-MM-dd"
                                              style="width: 200px"></date-picker>
@@ -93,6 +93,7 @@
     <row style="padding: 10px">
         <i-col span="24">
             <!-- 使用方法渲染模式 -->
+            <p>交易总笔数：{{summary.totalNumber}}, &nbsp;&nbsp;交易总金额（元）：{{numeral(summary.totalAmount).format('0,0.00')}},  &nbsp;&nbsp;手续费合计（元）：{{numeral(summary.totalServiceCharge).format('0,0.00')}}</p>
             <table id="listTable" lay-filter="listTable"></table>
         </i-col>
     </row>
@@ -105,6 +106,7 @@
 
 </div>
 
+<script src="/src/js/numeral.min.js"></script>
 <script src="/src/js/finance/bfWithholdRepayFlowList.js"></script>
 <script>
 

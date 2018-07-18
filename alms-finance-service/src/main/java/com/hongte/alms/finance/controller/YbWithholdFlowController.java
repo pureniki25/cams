@@ -11,6 +11,8 @@ import com.hongte.alms.base.service.WithholdingRepaymentLogService;
 import com.hongte.alms.common.vo.PageResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,8 +57,10 @@ public class YbWithholdFlowController {
             // withholdingRepaymentLogService.getYbWithholdFlowPageList(withholdFlowReq);
             EntityWrapper<WithholdingFlowRecord> ew = new EntityWrapper<>();
             ew.eq("withholding_platform", PlatformEnum.YB_FORM.getValue());
-            ew.ge("liquidation_date", withholdFlowReq.getStartTime());
-            ew.le("liquidation_date", withholdFlowReq.getEndTime());
+            if (StringUtils.isNotBlank(withholdFlowReq.getStartTime()))
+                ew.ge("liquidation_date", withholdFlowReq.getStartTime());
+            if (StringUtils.isNotBlank(withholdFlowReq.getEndTime()))
+                ew.le("liquidation_date", withholdFlowReq.getEndTime());
 
             Page<WithholdingFlowRecord> pages = new Page<>(withholdFlowReq.getPage(), withholdFlowReq.getLimit());
             withholdingFlowRecordService.selectByPage(pages, ew);
