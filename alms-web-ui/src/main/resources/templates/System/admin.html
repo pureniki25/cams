@@ -178,6 +178,18 @@
 				<i-span v-else>执行中...</i-span>
 			</i-button>
 		</div>
+		<div style="margin-top:10px; margin-left:10px">
+			<i-lable>重试平台还款接口到资金分发：</i-lable>
+			标的期数ID：
+			<div class="layui-inline">
+				<input v-model="retryRepaymentProjPlanListId" class="layui-input" name="id" id="retryRepaymentProjPlanListId">
+			</div>
+			<i-button :loading="retryRepaymentLoading" @click="retryRepayment">
+				<i-span v-if="!retryRepaymentLoading">执行</i-span>
+				<i-span v-else>执行中...</i-span>
+			</i-button>
+			（注：若填写标的期数ID，则重试当期；否则重发全部未成功数据）
+		</div>
 
 	</div>
 

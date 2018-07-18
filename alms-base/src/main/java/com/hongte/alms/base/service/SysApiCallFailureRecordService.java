@@ -1,10 +1,10 @@
 package com.hongte.alms.base.service;
 
+import java.util.List;
+
 import com.hongte.alms.base.entity.SysApiCallFailureRecord;
 import com.hongte.alms.base.enums.AlmsServiceNameEnums;
 import com.hongte.alms.common.service.BaseService;
-
-import java.util.List;
 
 /**
  * <p>
@@ -16,6 +16,12 @@ import java.util.List;
  */
 public interface SysApiCallFailureRecordService extends BaseService<SysApiCallFailureRecord> {
 
+	/**
+	 * 根据apicode查找调用失败的数据
+	 * @param apiCode
+	 * @param moduleName
+	 * @return
+	 */
     List<SysApiCallFailureRecord> queryCallFailedDataByApiCode(String apiCode, String moduleName);
 
     /**
@@ -34,5 +40,13 @@ public interface SysApiCallFailureRecordService extends BaseService<SysApiCallFa
      */
     void save(AlmsServiceNameEnums moduleName, String apiCode, String apiName, String refId, String apiParamPlaintext,
               String apiParamCiphertext, String apiReturnInfo, String targetUrl, String createUser);
+    
+    /**
+     * 查询重试次数5次以上的，且未重试成功的数据
+     * @param apiCode
+     * @param moduleName
+     * @return
+     */
+    List<SysApiCallFailureRecord> queryRetryMaxCntFailData(String apiCode, String moduleName, String refId);
 
 }
