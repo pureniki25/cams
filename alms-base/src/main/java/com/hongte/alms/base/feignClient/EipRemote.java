@@ -14,6 +14,7 @@ import com.hongte.alms.base.dto.compliance.TdDepaymentEarlierDTO;
 import com.hongte.alms.base.feignClient.dto.AddProjectTrackReqDto;
 import com.hongte.alms.base.feignClient.dto.BankRechargeReqDto;
 import com.hongte.alms.base.feignClient.dto.BaofuRechargeReqDto;
+import com.hongte.alms.base.feignClient.dto.KuaiQianRechargeReqDto;
 import com.hongte.alms.base.feignClient.dto.YiBaoRechargeReqDto;
 import com.hongte.alms.base.vo.comm.SmsVo;
 import com.ht.ussp.core.Result;
@@ -269,15 +270,15 @@ public interface EipRemote {
 	
 	
 	
-//	/**
-//	 * 快钱支付
-//	 * @param paramMap
-//	 * @return
-//	 */
-//	@RequestMapping(value = "/eip/kq/pay", headers = { "app=ALMS",
-//	"content-type=application/json" }, method = RequestMethod.POST)
-//	Result pay(@RequestBody  KuaiQianRechargeReqDto kuaiQianRechargeReqDto);
-//	
+	/**
+	 * 快钱支付
+	 * @param paramMap
+	 * @return
+	 */
+	@RequestMapping(value = "/eip/kq/pay", headers = { "app=ALMS",
+	"content-type=application/json" }, method = RequestMethod.POST)
+	Result pay(@RequestBody  Map<String,Object> paramMap);
+	
 	/**
 	 * 宝付对账文件下载
 	 * @param paramMap
@@ -294,4 +295,5 @@ public interface EipRemote {
 	 */
 	@RequestMapping(value = "/eip/yepay/query/payClearData", headers = {"app=ALMS","content-type=application/json"})
 	Result yiBaoPayClearData(@RequestBody Map<String,Object> paramMap);
+
 }

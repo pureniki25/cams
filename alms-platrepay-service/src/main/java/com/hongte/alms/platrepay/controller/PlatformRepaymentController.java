@@ -721,8 +721,10 @@ public class PlatformRepaymentController {
                 LOGGER.error("@对接合规还款接口@ 调用代充值资金分发参数接入接口失败 vo:[{}]", JSON.toJSONString(vo));
                 return Result.error("合规还款失败:" + result.getMsg());
             }
+            LOGGER.info("@对接合规还款接口@ 调用代充值资金分发成功 vo:[{}]", JSON.toJSONString(vo));
+            
             //return Result.success(departmentBankService.listDepartmentBank());
-            return Result.success();
+            return Result.success(JSON.toJSONString(vo));
         } catch (Exception e) {
             LOGGER.error("通过合化还款接口还款失败.", e);
             return Result.error("500", "通过合化还款接口还款失败！" + e.getMessage());
