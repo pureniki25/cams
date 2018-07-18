@@ -32,6 +32,7 @@ window.layinit(function (htConfig) {
            setCollectionLoading:false, //分配贷后跟进人员  标志位
            autoRepayLoading:false,
            tdrepyChargeLoading:false,	// 合规化还款加载标识
+           retryRepaymentLoading:false,	// 重试平台还款接口加载标识
 		   // --- 按钮控制标识 end---
 
 		   onePListCollogBId:"",
@@ -49,7 +50,10 @@ window.layinit(function (htConfig) {
            userId:"",
 
            //同步指定业务的还款计划到信贷系统 业务Id
-           oneRepayPlanBId:""
+           oneRepayPlanBId:"",
+        	   
+    	   //重试平台还款接口projPlanListId
+           retryRepaymentProjPlanListId:"" 
 
 
 
@@ -351,7 +355,22 @@ window.layinit(function (htConfig) {
         		   vm.tdrepyChargeLoading = false;
         		   vm.$Modal.error({content: '接口调用异常!'});
         	   });
-           }
+           },
+           // 合规化还款
+           retryRepayment:function(){
+        	   this.retryRepaymentLoading = true;
+        	   axios.get(platRepayBasePath +"platformRepayment/retryRepayment?projPlanListId=" + vm.retryRepaymentProjPlanListId)
+        	   .then(function (res) {
+        		   vm.retryRepaymentLoading = false;
+        		   vm.$Modal.success({
+        			   content: res.data.msg
+        		   });
+        	   })
+        	   .catch(function (error) {
+        		   vm.retryRepaymentLoading = false;
+        		   vm.$Modal.error({content: '接口调用异常!'});
+        	   });
+           },
 
 
 

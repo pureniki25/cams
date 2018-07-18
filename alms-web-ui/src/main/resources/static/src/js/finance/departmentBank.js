@@ -283,79 +283,79 @@ let methods = {
         var self = this;
         //self.loading =  true;
         //self.table.loading = true;
-        this.searchForm.current = 1;
         axios.post(basePath + 'departmentBank/search', this.searchForm).then(res => {
-                self.table.loading = false;
-                if (!!res.data && res.data.code == 0) {
-                    self.table.data = res.data.data;
-                    self.table.total = res.data.count;
+            self.table.loading = false;
+            if (!!res.data && res.data.code == 0) {
+                self.table.data = res.data.data;
+                self.table.total = res.data.count;
+            } else {
+                self.$Message.error({content: res.data.msg})
+            }
+        }
+    ).catch(err => {
+        self.table.loading = false;
+        self.$Message.error({content: err})
+    }
+);
+// self.loading =  false;
+},
+submitEditForm() {
+    var self = this;
+    this.$refs['editForm'].validate( valid => {
+        if(valid){
+            axios.post(basePath + 'departmentBank/edit', self.editForm)
+            .then(res => {
+                if (!!res.data && res.data.code == '1') {
+                    self.search();
+                    self.hideEditModal();
+                    this.editModalLoading = true;
                 } else {
-                    self.$Message.error({content: res.data.msg})
+                    self.$Modal.error({content: '请求接口失败,消息:' + res.data.msg})
                 }
-            }
-        ).catch(err => {
-                self.table.loading = false;
-                self.$Message.error({content: err})
-            }
-        );
-        // self.loading =  false;
-    },
-    submitEditForm() {
-        var self = this;
-        this.$refs['editForm'].validate( valid => {
-            if(valid){
-                axios.post(basePath + 'departmentBank/edit', self.editForm)
-                    .then(res => {
-                        if (!!res.data && res.data.code == '1') {
-                            self.search();
-                            self.hideEditModal();
-                            this.editModalLoading = true;
-                        } else {
-                            self.$Modal.error({content: '请求接口失败,消息:' + res.data.msg})
-                        }
-                    })
-                    .catch(err => {
-                        self.$Modal.error({content: '操作失败!'})
-                    });
-            }else{
-                setTimeout(() => {
-                    this.editModalLoading = false;
-                    this.$nextTick(() => {
-                        this.editModalLoading = true;
-                    });
-                }, 1000);
-            }
-        });
-    },
-    edit(row) {
-        this.editModalTitle = '编辑';
-        this.$refs['editForm'].resetFields();
-        Object.assign(this.editForm, row);
-        this.editForm.deptIds = !!row.deptId ? row.deptId.split(',') : [];
-        this.showEditModal();
-    },
-    detail(row) {
-        Object.assign(this.editForm, row);
-        this.showDetailModal();
-    },
-    delete(row) {
-        var self = this;
-        this.$Modal.confirm({
-            title: '提示',
-            content: '确定要删除吗?',
-            onOk: () => {
-                axios.get(basePath + 'departmentBank/delete', {params: {id: row.accountId}})
-                    .then(res => {
-                        if (res.data.code == '1') {
-                            self.search()
-                        } else {
-                            self.$Modal.error({content: '请求接口失败,消息:' + res.data.msg})
-                        }
-                    })
-                    .catch(err => {
-                        self.$Modal.error({content: '操作失败!'})
-                    })
-            }
-        });
-    },
+            })
+            .catch(err => {
+                self.$Modal.error({content: '操作失败!'})
+            });
+        }else{
+            setTimeout(() => {
+                this.editModalLoading = false;
+                this.$nextTick(() => {
+                    this.editModalLoading = true;
+                });
+            }, 1000);
+        }
+    });
+},
+edit(row) {
+    this.editModalTitle = '编辑';
+    this.$refs['editForm'].resetFields();
+    Object.assign(this.editForm, row);
+    this.editForm.deptIds = !!row.deptId ? row.deptId.split(',') : [];
+    this.showEditModal();
+},
+detail(row) {
+    Object.assign(this.editForm, row);
+    this.showDetailModal();
+},
+delete(row) {
+    var self = this;
+    this.$Modal.confirm({
+        title: '提示',
+        content: '确定要删除吗?',
+        onOk: () => {
+            axios.get(basePath + 'departmentBank/delete', {params: {id: row.accountId}})
+            .then(res => {
+                if (!!res.data && res.data.code == '1') {
+                    this.searchForm.current = 1;
+                    self.search()
+                } else {
+                    self.$Modal.error({content: '请求接口失败,消息:' + res.data.msg})
+                }
+            })
+            .catch(err => {
+                self.$Modal.error({content: '操作失败!'})
+            })
+        }
+    });
+},
 }

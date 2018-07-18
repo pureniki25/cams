@@ -578,38 +578,44 @@ window.layinit(function(htConfig){
                             }
 
                             if (authValid('carLoanBilling')) {
-                                buttons.push(
-                                    {
-                                        "name": "结清试算", click: function (e, currentItem) {
-                                        // var url = '/transferOfLitigation/carLoanBilling?businessId='+currentItem.businessId
-                                        var url = ''
-                                        if (currentItem.businessTypeId == 1 || currentItem.businessTypeId == 9) {
-                                            url = '/transferOfLitigation/carLoanBilling?businessId=' + currentItem.businessId;
-                                        } else if (currentItem.businessTypeId == 2 || currentItem.businessTypeId == 11) {
-                                            url = '/expenseSettle/houseLoan?businessId=' + currentItem.businessId;
-                                        }
-                                        showOneLineOprLayer(url, "结清试算")
-                                    }
-                                    }
-                                )
+                            	if (e.businessTypeId == 1 || e.businessTypeId == 9
+                            			|| e.businessTypeId == 2 || e.businessTypeId == 11) {
+                            		buttons.push(
+                            				{
+                            					"name": "结清试算", click: function (e, currentItem) {
+                            						// var url = '/transferOfLitigation/carLoanBilling?businessId='+currentItem.businessId
+                            						var url = ''
+                            							if (currentItem.businessTypeId == 1 || currentItem.businessTypeId == 9) {
+                            								url = '/transferOfLitigation/carLoanBilling?businessId=' + currentItem.businessId;
+                            							} else if (currentItem.businessTypeId == 2 || currentItem.businessTypeId == 11) {
+                            								url = '/expenseSettle/houseLoan?businessId=' + currentItem.businessId;
+                            							}
+                            						showOneLineOprLayer(url, "结清试算")
+                            					}
+                            				}
+                            		)
+                            	}
                             }
                             if (authValid('litigation')) {
-                                if(e.statusName != '已还款' && e.statusName != '已结清') {
-                                    buttons.push(
-                                        {
-                                            "name": "移交法务", click: function (e, currentItem) {
-                                            //                            	 var url = '/transferOfLitigation/carLoan?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+"&processStatus=-1"
-                                            var url = ''
-                                            if (currentItem.businessTypeId == 1 || currentItem.businessTypeId == 9) {
-                                                url = '/transferOfLitigation/carLoan?businessId=' + currentItem.businessId + '&crpId=' + currentItem.crpId + "&processStatus=-1";
-                                            } else if (currentItem.businessTypeId == 2 || currentItem.businessTypeId == 11) {
-                                                url = '/transferOfLitigation/houseLoan?businessId=' + currentItem.businessId + '&crpId=' + currentItem.crpId + "&processStatus=-1";
-                                            }
-                                            showOneLineOprLayer(url, "移交法务")
-                                        }
-                                        }
-                                    )
-                                }
+                            	if (e.businessTypeId == 1 || e.businessTypeId == 9
+                            			|| e.businessTypeId == 2 || e.businessTypeId == 11) {
+                            		if(e.statusName != '已还款' && e.statusName != '已结清') {
+                            			buttons.push(
+                            					{
+                            						"name": "移交法务", click: function (e, currentItem) {
+                            							//                            	 var url = '/transferOfLitigation/carLoan?businessId='+currentItem.businessId+'&crpId='+currentItem.crpId+"&processStatus=-1"
+                            							var url = ''
+                            								if (currentItem.businessTypeId == 1 || currentItem.businessTypeId == 9) {
+                            									url = '/transferOfLitigation/carLoan?businessId=' + currentItem.businessId + '&crpId=' + currentItem.crpId + "&processStatus=-1";
+                            								} else if (currentItem.businessTypeId == 2 || currentItem.businessTypeId == 11) {
+                            									url = '/transferOfLitigation/houseLoan?businessId=' + currentItem.businessId + '&crpId=' + currentItem.crpId + "&processStatus=-1";
+                            								}
+                            							showOneLineOprLayer(url, "移交法务")
+                            						}
+                            					}
+                            			)
+                            		}
+                            	}
                             }
                             buttons.push(
                                 {

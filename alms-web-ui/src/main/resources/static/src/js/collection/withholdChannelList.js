@@ -42,7 +42,7 @@ window.layinit(function (htConfig) {
             return {
                 disabledFlag: true,
                 withHoldChanelModel: false,
-                title:'',
+                title: '',
                 platformType: [],
                 loading: false,
                 searchForm: {
@@ -56,8 +56,8 @@ window.layinit(function (htConfig) {
                     remark: '',
                     channelLevel: '',
                     channelId: '',
-                    subPlatformId:'',
-                    subPlatformName:''
+                    subPlatformId: '',
+                    subPlatformName: ''
                 },
 
                 withHoldChanelValidate: {
@@ -161,7 +161,13 @@ window.layinit(function (htConfig) {
                             console.log("选择的行数据：", selectedRowInfo.channelId);
 
                             self.editWithholdChannel(selectedRowInfo.channelId);
+                        } else if (obj.event === 'delete') {
+                            console.log("选择的行数据：", selectedRowInfo.channelId);
+
+                            self.deleteWithholdChannel(selectedRowInfo.channelId);
                         }
+
+
                     });
 
 
@@ -174,7 +180,7 @@ window.layinit(function (htConfig) {
                 vm.toLoading();
             },
             editWithholdChannel(id) {
-                vm.title="编辑渠道";
+                vm.title = "编辑渠道";
                 vm.withHoldChanelModel = true;
                 axios.get(basePath + 'withholdManage/getWithholdChannel?channelId=' + id)
                     .then(function (res) {
@@ -194,11 +200,30 @@ window.layinit(function (htConfig) {
                         vm.$Modal.error({content: '接口调用异常!'});
                     });
             },
-            platformOnChange(e){
+            deleteWithholdChannel(id) {
+                var self = this;
+                layer.confirm('确认需要删除该渠道吗？', {icon: 3, title: '提示'}, function (index) {
+                    var url = basePath + "withholdManage/delWithholdChannel?channelId=" + id;
+                    axios.get(url)
+                        .then(function (res) {
+                            if (res.data.code == '1') {
+                                vm.$Modal.success({content: "删除成功"})
+                                self.toLoading();
+                            } else {
+                                vm.$Modal.error({content: res.data.msg})
+                            }
+                        })
+                        .catch(function (err) {
+                            vm.$Modal.error({content: err.data.msg})
+                        })
+                    layer.close(index);
+                });
+            },
+            platformOnChange(e) {
 
-                if(e ==5){
+                if (e == 5) {
                     this.disabledFlag = false;
-                }else {
+                } else {
                     this.disabledFlag = true;
                 }
 
@@ -206,9 +231,9 @@ window.layinit(function (htConfig) {
             addHoldChannel(name) {
                 // console.log("addHoldChannel",addHoldChannel);
                 this.$refs[name].resetFields();
-                vm.title="新增渠道";
+                vm.title = "新增渠道";
                 vm.withHoldChanelModel = true;
-                vm.withHoldChanelForm.channelId='';
+                vm.withHoldChanelForm.channelId = '';
             },
             submitHoldChanel(name) {
                 var platformId = vm.withHoldChanelForm.platformId;

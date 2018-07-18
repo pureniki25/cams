@@ -43,7 +43,7 @@ public class ProfitItemSetServiceImpl extends BaseServiceImpl<ProfitItemSetMappe
 	@Qualifier("ProfitFeeSetService")
 	ProfitFeeSetService profitFeeSetService;
 
-    private final  Integer  initLevel = 1200;
+    private final  Integer  initLevel = 1000;
 
 	@Override
 	public void saveItemTypes(List<SysParameter> itemTypes, Integer businessTypeId) {

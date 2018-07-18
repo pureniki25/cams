@@ -52,4 +52,9 @@ public class SysApiCallFailureRecordServiceImpl extends BaseServiceImpl<SysApiCa
             throw new ServiceRuntimeException("保存失败");
         }
     }
+    
+    @Override
+    public List<SysApiCallFailureRecord> queryRetryMaxCntFailData(String apiCode, String moduleName, String refId) {
+    	return sysApiCallFailureRecordMapper.queryRetryMaxCntFailData(apiCode, moduleName, refId);
+    }
 }

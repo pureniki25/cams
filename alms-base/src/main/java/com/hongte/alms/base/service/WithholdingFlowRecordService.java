@@ -1,6 +1,9 @@
 package com.hongte.alms.base.service;
 
+import com.hongte.alms.base.customer.vo.WithholdFlowReq;
 import com.hongte.alms.base.entity.WithholdingFlowRecord;
+import com.hongte.alms.base.enums.PlatformEnum;
+import com.hongte.alms.base.vo.withhold.WithholdingFlowRecordSummaryVo;
 import com.hongte.alms.common.service.BaseService;
 
 /**
@@ -24,4 +27,10 @@ public interface WithholdingFlowRecordService extends BaseService<WithholdingFlo
      * @param settleDate 清算日期YYYY-MM-DD
      */
     void importWidthholdingFlowFromYiBao(String settleDate);
+
+
+    /**
+     * 查询汇总数据
+     */
+    WithholdingFlowRecordSummaryVo querySummary(WithholdFlowReq withholdFlowReq);
 }

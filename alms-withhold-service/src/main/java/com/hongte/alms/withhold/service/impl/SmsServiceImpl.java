@@ -73,7 +73,13 @@ public class SmsServiceImpl implements SmsService{
     	  for(RepaymentBizPlanList pList:overDueLists) {
     		  List<RepaymentBizPlanList> pLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", pList.getPlanId()));
     		  BasicBizCustomer customer=basicBizCustomerService.selectOne(new EntityWrapper<BasicBizCustomer>().eq("business_id", pList.getBusinessId()));
+    			if(customer==null) {
+    				logger.error("找不到该客户信息:business_id{0}:"+pList.getBusinessId());
+    				continue;
+    			}
+    			logger.info("发送逾期提醒短信开始====================:business_id{0},pListId{1}:",pList.getBusinessId(),pList.getPlanListId());
     		  sendMessageService.sendAfterOverdueRemindSms(customer.getPhoneNumber(), customer.getCustomerName(), pList.getPeriod(), pLists.size());
+    			logger.info("发送逾期提醒短信结束====================:business_id{0},pListId{1}:",pList.getBusinessId(),pList.getPlanListId());
     	  }
 		
 	}
@@ -102,12 +108,16 @@ public class SmsServiceImpl implements SmsService{
 			}
 		  
 		  for(RepaymentBizPlanList pList:remindLists) {
-    		  List<RepaymentBizPlanList> pLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", pList.getPlanId()));
     		  RepaymentBizPlan plan=repaymentBizPlanService.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("plan_id", pList.getPlanId()));
     		  BasicBizCustomer customer=basicBizCustomerService.selectOne(new EntityWrapper<BasicBizCustomer>().eq("business_id", pList.getBusinessId()));
     		  BasicBusiness business=basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", pList.getBusinessId()));
     			TuandaiProjectInfo tuandaiProjectInfo=tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("business_id", plan.getBusinessId()));
     			Date borrowDate=null;
+    			
+    			if(customer==null) {
+    				logger.error("找不到该客户信息:business_id{0}:"+plan.getBusinessId());
+    				continue;
+    			}
     			if(tuandaiProjectInfo!=null) {
     				if(tuandaiProjectInfo.getQueryFullSuccessDate()!=null) {
 	    				borrowDate=tuandaiProjectInfo.getQueryFullSuccessDate();
@@ -132,13 +142,15 @@ public class SmsServiceImpl implements SmsService{
  					if(bankCardInfos!=null&&bankCardInfos.size()>0) {
  	        			bankCardInfo=bankCardInfos.get(0);
  	        		}
+ 					logger.info("发送单笔还款提醒短信开始====================:business_id{0},pListId{1}:",pList.getBusinessId(),pList.getPlanListId());
     				//绑卡
     		 		sendMessageService.sendAfterBindingRepayRemindSms(customer.getPhoneNumber(), customer.getCustomerName(),borrowDate,plan.getBorrowMoney(), pList.getTotalBorrowAmount().add(pList.getOverdueAmount()==null?BigDecimal.valueOf(0):pList.getOverdueAmount()),pList.getPeriod(), pList.getDueDate(),bankCardInfo.getBankCardNumber().substring(bankCardInfo.getBankCardNumber().length()-4, bankCardInfo.getBankCardNumber().length()));
     			}else {
     				//未绑卡
     		 		sendMessageService.sendAfterUnbondRepayRemindSms(customer.getPhoneNumber(), customer.getCustomerName(),borrowDate,plan.getBorrowMoney(), pList.getTotalBorrowAmount().add(pList.getOverdueAmount()==null?BigDecimal.valueOf(0):pList.getOverdueAmount()),pList.getPeriod(), pList.getDueDate());
-    	    		
+    			
     			}
+    			logger.info("发送单笔还款提醒短信结束====================:business_id{0},pListId{1}:",pList.getBusinessId(),pList.getPlanListId());
    	  }
 	}
 
@@ -169,6 +181,10 @@ public class SmsServiceImpl implements SmsService{
 	    		  BasicBusiness business=basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", pList.getBusinessId()));
 	    			TuandaiProjectInfo tuandaiProjectInfo=tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("business_id", plan.getBusinessId()));
 	    			Date borrowDate=null;
+	    			if(customer==null) {
+	    				logger.error("找不到该客户信息:business_id{0}:"+plan.getBusinessId());
+	    				continue;
+	    			}
 	    			if(tuandaiProjectInfo!=null) {
 	    				if(tuandaiProjectInfo.getQueryFullSuccessDate()!=null) {
 		    				borrowDate=tuandaiProjectInfo.getQueryFullSuccessDate();
@@ -193,6 +209,7 @@ public class SmsServiceImpl implements SmsService{
 	 					if(bankCardInfos!=null&&bankCardInfos.size()>0) {
 	 	        			bankCardInfo=bankCardInfos.get(0);
 	 	        		}
+	 					logger.info("发送多笔还款提醒短信开始====================:business_id{0}:",plan.getBusinessId());
 	    				//绑卡
 	    		 		sendMessageService.sendAfterBindingMutipleRepayRemindSms(bankCardInfo.getMobilePhone(), bankCardInfo.getBankCardName(), pLists, bankCardInfo.getBankCardNumber().substring(bankCardInfo.getBankCardNumber().length()-4, bankCardInfo.getBankCardNumber().length()));
 	    			}else {
@@ -200,6 +217,7 @@ public class SmsServiceImpl implements SmsService{
 	    		 		sendMessageService.sendAfterUnbondMutipleRepayRemindSms(customer.getPhoneNumber(), customer.getCustomerName(), pLists);;
 	    	    		
 	    			}
+	    			logger.info("发送多笔还款提醒短信结束====================:business_id{0}:",plan.getBusinessId());
 	   	  }
 			
 			
@@ -252,6 +270,10 @@ public class SmsServiceImpl implements SmsService{
     		  BasicBusiness business=basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", pList.getBusinessId()));
     			TuandaiProjectInfo tuandaiProjectInfo=tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("business_id", plan.getBusinessId()));
     			Date borrowDate=null;
+    			if(customer==null) {
+    				logger.error("找不到该客户信息:business_id{0}:"+plan.getBusinessId());
+    				continue;
+    			}
     			if(tuandaiProjectInfo!=null) {
     				if(tuandaiProjectInfo.getQueryFullSuccessDate()!=null) {
 	    				borrowDate=tuandaiProjectInfo.getQueryFullSuccessDate();
@@ -276,6 +298,7 @@ public class SmsServiceImpl implements SmsService{
  					if(bankCardInfos!=null&&bankCardInfos.size()>0) {
  	        			bankCardInfo=bankCardInfos.get(0);
  	        		}
+ 					logger.info("发送单笔结清提醒短信开始====================:business_id{0},pListId{1}:",pList.getBusinessId(),pList.getPlanListId());
     				//绑卡
     		 		sendMessageService.sendAfterBindingSettleRemindSms(customer.getPhoneNumber(), customer.getCustomerName(),borrowDate,plan.getBorrowMoney(), pList.getDueDate(),bankCardInfo.getBankCardNumber().substring(bankCardInfo.getBankCardNumber().length()-4, bankCardInfo.getBankCardNumber().length()));
     			}else {
@@ -283,6 +306,7 @@ public class SmsServiceImpl implements SmsService{
     		 		sendMessageService.sendAfterUnbondSettleRemindSms(customer.getPhoneNumber(), customer.getCustomerName(),borrowDate,plan.getBorrowMoney(), pList.getDueDate());
     	    		
     			}
+    			logger.info("发送单笔结清提醒短信开始====================:business_id{0},pListId{1}:",pList.getBusinessId(),pList.getPlanListId());
    	  }
 		
 	}
