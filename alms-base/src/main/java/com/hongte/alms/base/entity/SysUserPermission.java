@@ -28,7 +28,7 @@ public class SysUserPermission extends Model<SysUserPermission> {
     /**
      * 业务编号
      */
-    @TableId("business_id")
+    @TableField("business_id")
 	@ApiModelProperty(required= true,value = "业务编号")
 	private String businessId;
     /**
@@ -70,7 +70,7 @@ public class SysUserPermission extends Model<SysUserPermission> {
 
 	@Override
 	protected Serializable pkVal() {
-		return this.businessId;
+		return this.id;
 	}
 
 	@Override

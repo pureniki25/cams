@@ -15,10 +15,7 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(value = "SelfBoaInUserInfo", description = "用户个人信息")
 public class SelfBoaInUserInfo {
 
-    public SelfBoaInUserInfo() {
-	}
-
-	@ApiModelProperty(value = "用户ID", dataType = "string")
+    @ApiModelProperty(value = "用户ID", dataType = "string")
     String userId;
 
     @ApiModelProperty(value = "用户名", dataType = "string")
@@ -58,22 +55,10 @@ public class SelfBoaInUserInfo {
     String orgType;
 
     @ApiModelProperty(value = "岗位编码", dataType = "string")
-    List<String> positionCodes = new ArrayList<String>();
-
-    @ApiModelProperty(value = "岗位名称", dataType = "string")
-    List<String> positionNames = new ArrayList<String>();
-
-    @ApiModelProperty(value = "岗位名称中文", dataType = "string")
-    List<String> positionNameChs = new ArrayList<String>();
+    List  positionCodes = new ArrayList();
 
     @ApiModelProperty(value = "角色编码", dataType = "string")
-    List<String> roleCodes = new ArrayList<String>();
-
-    @ApiModelProperty(value = "角色英文名", dataType = "string")
-    List<String> roleNames = new ArrayList<String>();
-
-    @ApiModelProperty(value = "角色中文名", dataType = "string")
-    List<String> roleNameChs = new ArrayList<String>();
+    List<BoaInRoleInfo>  roleCodes = new ArrayList<>();
 
     @ApiModelProperty(value = "工号", dataType = "string")
     String jobNumber;
@@ -87,7 +72,7 @@ public class SelfBoaInUserInfo {
     //状态: 0 正常  2离职
     @ApiModelProperty(value = "用户状态", dataType = "string")
     String status;
-    
+
 	public String getUserId() {
 		return userId;
 	}
@@ -192,52 +177,20 @@ public class SelfBoaInUserInfo {
 		this.orgType = orgType;
 	}
 
-	public List<String> getPositionCodes() {
+	public List getPositionCodes() {
 		return positionCodes;
 	}
 
-	public void setPositionCodes(List<String> positionCodes) {
+	public void setPositionCodes(List positionCodes) {
 		this.positionCodes = positionCodes;
 	}
 
-	public List<String> getPositionNames() {
-		return positionNames;
-	}
-
-	public void setPositionNames(List<String> positionNames) {
-		this.positionNames = positionNames;
-	}
-
-	public List<String> getPositionNameChs() {
-		return positionNameChs;
-	}
-
-	public void setPositionNameChs(List<String> positionNameChs) {
-		this.positionNameChs = positionNameChs;
-	}
-
-	public List<String> getRoleCodes() {
+	public List<BoaInRoleInfo> getRoleCodes() {
 		return roleCodes;
 	}
 
-	public void setRoleCodes(List<String> roleCodes) {
+	public void setRoleCodes(List<BoaInRoleInfo> roleCodes) {
 		this.roleCodes = roleCodes;
-	}
-
-	public List<String> getRoleNames() {
-		return roleNames;
-	}
-
-	public void setRoleNames(List<String> roleNames) {
-		this.roleNames = roleNames;
-	}
-
-	public List<String> getRoleNameChs() {
-		return roleNameChs;
-	}
-
-	public void setRoleNameChs(List<String> roleNameChs) {
-		this.roleNameChs = roleNameChs;
 	}
 
 	public String getJobNumber() {

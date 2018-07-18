@@ -16,11 +16,11 @@ public class ExecutorConfig {
     /** Set the ThreadPoolExecutor's maximum pool size.
      *线程池维护线程的最大数量
      * */
-    private int maxPoolSize = 200;
+    private int maxPoolSize = 100;
     /** Set the capacity for the ThreadPoolExecutor's BlockingQueue.
      *队列最大长度
      * */
-    private int queueCapacity = 10;
+    private int queueCapacity = 999999;
     
     
     
