@@ -248,7 +248,7 @@ public class SendMessageServiceImpl implements SendMessageService {
 		data.put("borrowAmount", borrowAmount);
 		data.put("repayAmount", repayAmount);
 		data.put("period", period);
-		data.put("dueDate", dueDate);
+		data.put("dueDate", DateUtil.getChinaDay(dueDate));
 		dto.setMsgBody(data);
 		String jason=JSON.toJSONString(dto);
 		msgRemote.sendRequest(jason);
