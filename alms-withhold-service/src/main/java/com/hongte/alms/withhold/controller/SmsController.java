@@ -49,10 +49,10 @@ public class SmsController {
     	smsService.sendOverDueRemindMsg(2);
     	smsService.sendOverDueRemindMsg(3);
 //    	//******************单笔还款，还款日前7天/1天提醒*****************//
-    	smsService.sendOneRemindMsg(1);
+    	smsService.sendOneRemindMsg(1); 
      	smsService.sendOneRemindMsg(7);
-//    	//******************多笔还款，还款日前15天/1天提醒*****************//
-     	smsService.sendMutiplyRemindMsg(15);
+//    	//******************多笔还款，还款日前7天/1天提醒*****************//
+     	smsService.sendMutiplyRemindMsg(7);
      	smsService.sendMutiplyRemindMsg(1);
 //      	//******************单笔结清，结清日前15天/1天提醒*****************//
      	smsService.sendOneSettleRemindMsg(15);
