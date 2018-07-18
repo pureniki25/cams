@@ -15,6 +15,8 @@ public class BankWithholdFlowVo {
     private String createTime; //请求时间
     private String updateTime;//完成时间
 
+    private String merchantAccount;//平台会员编号
+
 
 
 }
