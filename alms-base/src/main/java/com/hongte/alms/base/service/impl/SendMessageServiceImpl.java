@@ -311,7 +311,9 @@ public class SendMessageServiceImpl implements SendMessageService {
 		data.put("tailNumber", tailNum);
 		dto.setMsgBody(data);
 		String jason=JSON.toJSONString(dto);
-		msgRemote.sendRequest(jason);				
+		logger.info("调用单笔还款提醒开始================name:"+name);
+		msgRemote.sendRequest(jason);
+		logger.info("调用单笔还款提醒结束================name:"+name);
 	}
 
 	@Override
