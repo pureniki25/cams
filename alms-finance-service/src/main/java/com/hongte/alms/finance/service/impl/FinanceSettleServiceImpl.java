@@ -36,6 +36,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
+
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -126,6 +128,11 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         String uuid = UUID.randomUUID().toString();
         financeSettleBaseDto.setUuid(uuid);
 
+        financeSettleBaseDto.setBusinessId(financeSettleReq.getBusinessId());
+        financeSettleBaseDto.setAfterId(financeSettleReq.getAfterId());
+        financeSettleBaseDto.setOrgBusinessId(financeSettleReq.getBusinessId());
+        financeSettleBaseDto.setPlanId(financeSettleReq.getPlanId());
+        
         /*创建结清记录*/
         createSettleLog(financeSettleBaseDto,financeSettleReq);
         /*计算结余金额*/
@@ -157,7 +164,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
      * @param dto
      */
     private void calcSurplus(FinanceSettleBaseDto dto,FinanceSettleReq req) {
-    	SettleInfoVO settleInfoVO = settleService.settleInfoVO(dto.getBusinessId(), dto.getAfterId(), dto.getPlanId());
+    	SettleInfoVO settleInfoVO = settleService.settleInfoVO(req.getBusinessId(), req.getAfterId(), req.getPlanId());
     	if (dto.getRepayFactAmount().compareTo(settleInfoVO.getTotal())>0) {
     		BigDecimal surplus = dto.getRepayFactAmount().subtract(settleInfoVO.getTotal()) ;
     		AccountantOverRepayLog accountantOverRepayLog = new AccountantOverRepayLog();
@@ -220,6 +227,8 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     	log.setPlanId(dto.getPlanId());
     	log.setPlanListId(cur.getPlanListId());
     	log.setSettleLogId(dto.getUuid());
+    	
+    	dto.setRepaymentSettleLog(log);
     }
     //拆分还款的规则应优先还共借标的，在还主借标的，若有多个共借标，则有优先还上标金额较小的标的，若共借标中的金额先等，则优先还满标时间较早的标的。
     public void settleSort(List<RepaymentProjPlanDto> repaymentProjPlanDtos) {
