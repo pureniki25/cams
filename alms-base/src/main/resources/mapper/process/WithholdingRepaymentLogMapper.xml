@@ -246,7 +246,7 @@
         t2.platform_name AS platformName,
         t1.current_amount AS currentAmount,
         t1.repay_status AS repayStatus,
-        -- 平台会员编号
+        IF(t1.xd_list_id is  null,t1.merchant_account,'') AS merchantAccount,
         t1.bank_code AS bankCode,
         t1.create_time AS createTime,
         t1.update_time AS updateTime
@@ -261,6 +261,7 @@
         <if test="endTime !=null and endTime !=''">
             AND t1.update_time &lt;=#{endTime}
         </if>
+        ORDER BY t1.create_time DESC
         limit ${(page-1)*limit} , ${limit}
     </select>
     <select id="countBankWithholdFlowPageList" resultType="int">
