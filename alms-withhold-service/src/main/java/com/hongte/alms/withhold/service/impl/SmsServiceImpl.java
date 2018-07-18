@@ -148,8 +148,9 @@ public class SmsServiceImpl implements SmsService{
     			}else {
     				//未绑卡
     		 		sendMessageService.sendAfterUnbondRepayRemindSms(customer.getPhoneNumber(), customer.getCustomerName(),borrowDate,plan.getBorrowMoney(), pList.getTotalBorrowAmount().add(pList.getOverdueAmount()==null?BigDecimal.valueOf(0):pList.getOverdueAmount()),pList.getPeriod(), pList.getDueDate());
-    				logger.info("发送单笔还款提醒短信结束====================:business_id{0},pListId{1}:",pList.getBusinessId(),pList.getPlanListId());
+    			
     			}
+    			logger.info("发送单笔还款提醒短信结束====================:business_id{0},pListId{1}:",pList.getBusinessId(),pList.getPlanListId());
    	  }
 	}
 
