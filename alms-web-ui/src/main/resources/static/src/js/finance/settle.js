@@ -234,6 +234,7 @@ window.layinit(function (htConfig) {
                         }
                     }, {
                         title: '操作',
+                        width:150,
                         render: (h, p) => {
 
                             if (p.row.moneyPoolId != '合计' && !p.row.status == '完成') {
@@ -262,18 +263,39 @@ window.layinit(function (htConfig) {
                                     },
                                     '取消关联'
                                 )
-                            } else {
-                                return h('span', '')
+                            } else if (p.row.moneyPoolId != '合计' && p.row.status == '已领取') {
+                                return h('div', [
+                                    h('i-button', {
+                                        props: {
+                                            size: 'small'
+                                        },
+                                        on: {
+                                            click() {
+                                                app.openEditBankStatementModal(p.row.mprId)
+                                            }
+                                        },
+                                        style: {
+                                            marginRight: '10px'
+                                        }
+                                    }, '编辑流水'),
+                                    h('i-button', {
+                                        props: {
+                                            size: 'small'
+                                        },
+                                        on: {
+                                            click() {
+                                                app.deleteMoneyPool(p)
+                                            }
+                                        }
+                                    }, '删除')
+                                ])
                             }
 
                         }
                     }],
                     data: []
                 },
-                projRepayment: {
-                    col: [],
-                    data: []
-                },
+                projRepayment: projRepayment,
                 plan: {
                     col: [{
                         title: '期数',
@@ -451,6 +473,39 @@ window.layinit(function (htConfig) {
                         app.spinShow = false
                     })
             },
+            getRepayRegList() {
+                axios.get(cpath + 'moneyPool/checkMoneyPool', {
+                    params: {
+                        businessId: businessId,
+                        afterId: afterId,
+                        isMatched: false,
+                    }
+                })
+                    .then(function (res) {
+                        if (res.data.code == '1') {
+                            let sumMoney = 0;
+                            res.data.data.forEach(element => {
+                                sumMoney = accAdd(sumMoney,element.accountMoney)
+                            });
+                            let sum = {
+                                moneyPoolId: '合计',
+                                accountMoney: sumMoney
+                            }
+                            app.table.reg.data = res.data.data
+                            app.table.reg.data.push(sum)
+
+                        } else {
+                            app.$Message.error({
+                                content: res.data.msg
+                            })
+                        }
+                    }).catch(function (err) {
+                    console.log(err);
+                    app.$Message.error({
+                        content: '获取登记还款信息列表数据失败'
+                    })
+                })
+            },
             getMatched() {
                 axios.get(cpath + 'moneyPool/checkMoneyPool', {
                         params: {
@@ -617,7 +672,29 @@ window.layinit(function (htConfig) {
                 })
             },
             handleSettleResult(res){
-                console.log(res);
+                app.table.projRepayment.data = res.data.data
+                app.factRepayPreview.flag = true
+                app.factRepayPreview.item10 = 0
+                app.factRepayPreview.item20 = 0
+                app.factRepayPreview.item30 = 0
+                app.factRepayPreview.item50 = 0
+                app.factRepayPreview.offlineOverDue = 0
+                app.factRepayPreview.onlineOverDue = 0
+                app.factRepayPreview.subTotal = 0
+                app.factRepayPreview.total = 0
+                app.factRepayPreview.surplus = 0
+                app.table.projRepayment.data.forEach(e => {
+                    app.factRepayPreview.surplus = accAdd(app.factRepayPreview.surplus,e.surplus)
+                    app.factRepayPreview.item10 = accAdd(app.factRepayPreview.item10,e.item10)
+                    app.factRepayPreview.item20 = accAdd(app.factRepayPreview.item20,e.item20)
+                    app.factRepayPreview.item30 = accAdd(app.factRepayPreview.item30,e.item30)
+                    app.factRepayPreview.item50 = accAdd(app.factRepayPreview.item50,e.item50)
+                    app.factRepayPreview.offlineOverDue = accAdd(app.factRepayPreview.offlineOverDue,e.offlineOverDue)
+                    app.factRepayPreview.onlineOverDue = accAdd(app.factRepayPreview.onlineOverDue,e.onlineOverDue)
+                    app.factRepayPreview.subTotal = accAdd(app.factRepayPreview.subTotal,e.subTotal)
+                    app.factRepayPreview.total = accAdd(app.factRepayPreview.total,e.total)
+                })
+                app.factRepayPreview.total = accAdd(accAdd(app.factRepayPreview.subTotal,app.factRepayPreview.offlineOverDue),accAdd(app.factRepayPreview.onlineOverDue,app.factRepayPreview.surplus))
             },
             previewSettle(){
                 let params = {}
@@ -647,6 +724,7 @@ window.layinit(function (htConfig) {
         },
         created: function () {
             this.getBaseInfo()
+            this.getRepayRegList()
             this.getMatched()
             this.listRepayment()
             this.getSettleInfo()
