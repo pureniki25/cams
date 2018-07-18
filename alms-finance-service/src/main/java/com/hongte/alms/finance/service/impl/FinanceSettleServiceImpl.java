@@ -146,9 +146,16 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         //开始业务的结清
         shareBizSettleMoney(financeSettleBaseDto, financeSettleReq);
 
-/*更新状态*/
+        /*更新状态*/
         updateStatus(financeSettleBaseDto, financeSettleReq);
         return financeSettleBaseDto.getCurrPeriodProjDetailVOList();
+
+
+    }
+
+    //进行结清操作
+    private void canceSettleMoney(FinanceSettleBaseDto financeSettleBaseDto, FinanceSettleReq financeSettleReq){
+        //通过传入的期次号进行
 
 
     }
