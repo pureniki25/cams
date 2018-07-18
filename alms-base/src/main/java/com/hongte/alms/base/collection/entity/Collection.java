@@ -54,7 +54,7 @@ public class Collection extends Model<Collection> {
      */
 	@TableField("collection_user")
 	@ApiModelProperty(required= true,value = "[催收业务员]")
-	@NotNull(message = "催收业务员(collectionUser)不能为空")
+//	@NotNull(message = "催收业务员(collectionUser)不能为空")
 	private String collectionUser;
     /**
      * [分配给催收业务员时所写的备注]
@@ -83,14 +83,13 @@ public class Collection extends Model<Collection> {
      */
 	@TableField("update_user")
 	@ApiModelProperty(value = "[更新人]")
-	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
-	@JSONField(format="yyyy-MM-dd HH:mm:ss")
 	private String updateUser;
     /**
      * [更新时间]
      */
 	@TableField("update_time")
 	@ApiModelProperty(value = "[更新时间]")
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	@JSONField(format="yyyy-MM-dd HH:mm:ss")
 	private Date updateTime;
     /**
