@@ -130,7 +130,7 @@ var layer;
 		var isAmountWithheld="false";
 		if(vm.ajax_data.repayAmount<vm.ajax_data.restAmount){
 			isAmountWithheld="true";//部分代扣
-		}else if(vm.ajax_data.repayAmount=vm.ajax_data.restAmount){
+		}else if(vm.ajax_data.repayAmount==vm.ajax_data.restAmount){
 			isAmountWithheld="false";//全部代扣
 		}
 	   if(vm.ajax_data.repayAmount>vm.ajax_data.restAmount){debugger
@@ -470,12 +470,17 @@ var layer;
         	if(	vm.ajax_data.repayAmount<0){
         		vm.ajax_data.repayAmount=0;
         	}
+        	if(vm.ajax_data.restAmount<0){
+        		vm.ajax_data.restAmount=0;
+        	}
         	
         }else{
         	vm.isBankFlag=false;
         	vm.ajax_data.underLineFactOverDueMoney=	vm.ajax_data.planOverDueMoney;
         	vm.ajax_data.total=getTotalShouldPay();
-      
+        	if(vm.ajax_data.restAmount<0){
+        		vm.ajax_data.restAmount=0;
+        	}
         }
 	}
 
