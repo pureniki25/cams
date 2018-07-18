@@ -2,8 +2,6 @@ package com.hongte.alms.finance.service.impl;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.RepayPlan.dto.*;
-import com.hongte.alms.base.collection.entity.Collection;
-import com.hongte.alms.base.dto.ConfirmRepaymentReq;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.RepayCurrentStatusEnums;
 import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
@@ -22,7 +20,6 @@ import com.hongte.alms.base.vo.finance.SettleInfoVO;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
-import com.hongte.alms.finance.req.FinanceBaseDto;
 import com.hongte.alms.finance.req.FinanceSettleBaseDto;
 import com.hongte.alms.finance.req.FinanceSettleReq;
 import com.hongte.alms.finance.service.FinanceSettleService;
@@ -36,7 +33,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 
 import java.math.BigDecimal;
 import java.util.*;
