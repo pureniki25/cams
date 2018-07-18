@@ -28,6 +28,6 @@ public class KuaiQianRechargeReqDto implements Serializable {
       private String customerId;
       private String payToken;
       private String tr3Url;
-      private ExtMap extMap;
+//      private ExtMap extMap;
     
 }
