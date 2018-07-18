@@ -96,6 +96,28 @@ public class withholdManageController {
         return result;
     }
 
+
+    @ApiOperation(value = "删除单个代扣渠道信息")
+    @RequestMapping("/delWithholdChannel")
+    public Result delWithholdChannel(int channelId) {
+        LOGGER.info("====>>>>>删除单个代扣渠道信息开始[{}]", channelId);
+        Result result = null;
+        try {
+             withholdingChannelService.delWithholdChannel(channelId);
+
+            result = Result.success();
+        } catch (ServiceRuntimeException se) {
+            result = Result.error(se.getErrorCode(), se.getMessage());
+            LOGGER.error("====>>>>>删除单个代扣渠道信息出错{}", se.getMessage());
+        } catch (Exception e) {
+            result = Result.error("500", "执行异常");
+            LOGGER.error("====>>>>>删除单个代扣渠道信息出错{}", e);
+        }
+        LOGGER.info("====>>>>>删除单个代扣渠道信息结束");
+        return result;
+    }
+
+
     @ApiOperation(value = "获取代扣渠道列表")
     @GetMapping("/getWithholdChannelPageList")
     @ResponseBody

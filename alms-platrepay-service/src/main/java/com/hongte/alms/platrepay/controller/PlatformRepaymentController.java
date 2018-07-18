@@ -1,10 +1,12 @@
 package com.hongte.alms.platrepay.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.hongte.alms.base.entity.*;
+import com.hongte.alms.base.enums.AlmsServiceNameEnums;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanPayedTypeEnum;
 import com.hongte.alms.base.feignClient.EipRemote;
@@ -12,8 +14,12 @@ import com.hongte.alms.base.service.*;
 import com.hongte.alms.base.vo.compliance.TdrepayRechargeInfoVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.Constant;
+import com.ht.ussp.bean.LoginUserInfoHelper;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +28,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
@@ -32,6 +40,7 @@ import java.util.concurrent.ConcurrentMap;
  * @author 张贵宏
  * @date 2018/6/14 10:37
  */
+//@CrossOrigin
 @RestController
 @RequestMapping("/platformRepayment")
 @Api(description = "平台合规化还款服务")
@@ -74,6 +83,10 @@ public class PlatformRepaymentController {
     @Autowired
     @Qualifier("RepaymentProjPlanListService")
     RepaymentProjPlanListService repaymentProjPlanListService;
+    
+    @Autowired
+    @Qualifier("SysApiCallFailureRecordService")
+    private SysApiCallFailureRecordService sysApiCallFailureRecordService;
 
 //    @Autowired
 //    @Qualifier("RepaymentProjFactRepayService")
@@ -98,6 +111,9 @@ public class PlatformRepaymentController {
     @Autowired
     @Qualifier("RepaymentResourceService")
     RepaymentResourceService repaymentResourceService;
+    
+    @Autowired
+    private LoginUserInfoHelper loginUserInfoHelper;
 
     static final ConcurrentMap<Integer, String> FEE_TYPE_MAP;
 
@@ -714,4 +730,50 @@ public class PlatformRepaymentController {
             return Result.error("500", "通过合化还款接口还款失败！" + e.getMessage());
         }
     }
+    
+	@SuppressWarnings("rawtypes")
+	@ApiOperation(value = "对接合规还款接口")
+	@GetMapping("/retryRepayment")
+	@ResponseBody
+	public Result retryRepayment(@RequestParam("projPlanListId") String projPlanListId) {
+		try {
+			List<SysApiCallFailureRecord> sysApiCallFailureRecords = sysApiCallFailureRecordService
+					.queryRetryMaxCntFailData(Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT,
+							AlmsServiceNameEnums.FINANCE.getName(), projPlanListId);
+			if (CollectionUtils.isEmpty(sysApiCallFailureRecords)) {
+				return Result.success();
+			}
+			Map<String, Object> paramMap = new HashMap<>();
+			for (SysApiCallFailureRecord sysApiCallFailureRecord : sysApiCallFailureRecords) {
+				if (sysApiCallFailureRecord.getRetrySuccess() == 1) {
+					continue;
+				}
+				paramMap.put("refId", sysApiCallFailureRecord.getRefId());
+				Result result = repayment(paramMap);
+				SysApiCallFailureRecord record = new SysApiCallFailureRecord();
+				record.setApiCode(sysApiCallFailureRecord.getApiCode());
+				record.setApiName(sysApiCallFailureRecord.getApiName());
+				record.setApiParamCiphertext(sysApiCallFailureRecord.getApiParamCiphertext());
+				record.setApiParamPlaintext(sysApiCallFailureRecord.getApiParamPlaintext());
+				record.setApiReturnInfo(JSONObject.toJSONString(result));
+				record.setModuleName(sysApiCallFailureRecord.getModuleName());
+				record.setRefId(sysApiCallFailureRecord.getRefId());
+				record.setRetryCount(sysApiCallFailureRecord.getRetryCount() + 1);
+				record.setRetryTime(new Date());
+				record.setTargetUrl(sysApiCallFailureRecord.getTargetUrl());
+				record.setUpdateTime(new Date());
+				record.setUpdateUser(loginUserInfoHelper.getUserId());
+				if (result != null && "1".equals(result.getCode())) {
+					record.setRetrySuccess(1);
+				} else {
+					record.setRetrySuccess(0);
+				}
+				sysApiCallFailureRecordService.insert(record);
+			}
+			return Result.success();
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage(), e);
+			return Result.error("-99", e.getMessage());
+		}
+	}
 }

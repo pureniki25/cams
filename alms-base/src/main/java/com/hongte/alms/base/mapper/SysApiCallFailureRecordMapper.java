@@ -21,5 +21,16 @@ public interface SysApiCallFailureRecordMapper extends SuperMapper<SysApiCallFai
 	 * 
 	 * @return
 	 */
-	List<SysApiCallFailureRecord> queryCallFailedDataByApiCode(@Param(value = "apiCode") String apiCode, @Param(value = "moduleName") String moduleName);
+	List<SysApiCallFailureRecord> queryCallFailedDataByApiCode(@Param(value = "apiCode") String apiCode,
+			@Param(value = "moduleName") String moduleName);
+
+	/**
+	 * 查询重试次数5次以上的，且未重试成功的数据
+	 * 
+	 * @param apiCode
+	 * @param moduleName
+	 * @return
+	 */
+	List<SysApiCallFailureRecord> queryRetryMaxCntFailData(@Param(value = "apiCode") String apiCode,
+			@Param(value = "moduleName") String moduleName, @Param(value = "refId") String refId);
 }

@@ -85,7 +85,7 @@ window.layinit(function (htConfig) {
                                 }
                             },
                             {
-                                field: 'afterId',
+                                field: 'merchantAccount',
                                 title: '平台会员编号',
                             },
                             {

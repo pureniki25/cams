@@ -49,10 +49,10 @@ public class WithholdingChannelServiceImpl extends BaseServiceImpl<WithholdingCh
 
         String subPlatformId = withholdingChannel.getSubPlatformId();
         Integer platformId = withholdingChannel.getPlatformId();
-        if(platformId == 0){//易宝代扣
+        if (platformId == 0) {//易宝代扣
             withholdingChannel.setSubPlatformId("010");
             withholdingChannel.setSubPlatformName("易宝代扣");
-        }else if(platformId == 3){ //宝付代扣
+        } else if (platformId == 3) { //宝付代扣
             withholdingChannel.setSubPlatformId("310");
             withholdingChannel.setSubPlatformName("宝付代扣");
         }
@@ -62,10 +62,10 @@ public class WithholdingChannelServiceImpl extends BaseServiceImpl<WithholdingCh
             if (withholdingChannel.getChannelId() != null) {
                 WithholdingChannel withholdingChannelHistory = withholdingChannelMapper.selectById(withholdingChannel.getChannelId());
                 String subPlatformIdHistory = withholdingChannelHistory.getSubPlatformId();
-                if(count>0 && !subPlatformId.equals(subPlatformIdHistory) ){
+                if (count > 0 && !subPlatformId.equals(subPlatformIdHistory)) {
                     throw new ServiceRuntimeException("不能修改为已存在的渠道");
                 }
-            }else {
+            } else {
                 if (count > 0) {
                     throw new ServiceRuntimeException("不能新增已存在的渠道");
                 }
@@ -87,5 +87,10 @@ public class WithholdingChannelServiceImpl extends BaseServiceImpl<WithholdingCh
     @Override
     public WithholdingChannel getWithholdChannel(int channelId) {
         return withholdingChannelMapper.selectById(channelId);
+    }
+
+    @Override
+    public void delWithholdChannel(int channelId) {
+        withholdingChannelMapper.deleteById(channelId);
     }
 }

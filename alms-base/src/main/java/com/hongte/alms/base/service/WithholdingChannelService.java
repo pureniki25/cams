@@ -23,4 +23,6 @@ public interface WithholdingChannelService extends BaseService<WithholdingChanne
     void addOrEditWithholdChannel(WithholdingChannel withholdingChannel) throws Exception;
 
     WithholdingChannel getWithholdChannel(int channelId);
+
+    void delWithholdChannel(int channelId);
 }
