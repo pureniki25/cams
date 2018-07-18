@@ -446,18 +446,18 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         // repaySource {20：自动线下代扣已还款，21，人工线下代扣已还款，30：自动银行代扣已还款，31：人工银行代扣已还款}
         if (logIds != null && logIds.size() > 0) {
             WithholdingRepaymentLog log = withholdingRepaymentLogService.selectById(logIds.get(0));
-            String repaySource = "30";
+            String repaySource = RepayPlanRepaySrcEnum.BNAK_WITHHOLD.getValue().toString();
             if (log.getBindPlatformId() == PlatformEnum.YH_FORM.getValue() && log.getCreateUser().equals("auto_run")) {// 自动银行代扣已还款
-                repaySource = "30";
+                repaySource = RepayPlanRepaySrcEnum.BNAK_WITHHOLD.getValue().toString();
             } else if (log.getBindPlatformId() == PlatformEnum.YH_FORM.getValue()
                     && (!log.getCreateUser().equals("auto_run"))) {// 人工银行代扣已还款
-                repaySource = "31";
+                repaySource = RepayPlanRepaySrcEnum.BNAK_WITHHOLD_MAN.getValue().toString();
             } else if (log.getBindPlatformId() != PlatformEnum.YH_FORM.getValue()
                     && log.getCreateUser().equals("auto_run")) {// 20：自动线下代扣已还款
-                repaySource = "20";
+                repaySource = RepayPlanRepaySrcEnum.OFFLINE_WITHHOLD.getValue().toString();
             } else if (log.getBindPlatformId() != PlatformEnum.YH_FORM.getValue()
                     && (!log.getCreateUser().equals("auto_run"))) {// 21，人工线下代扣已还款
-                repaySource = "21";
+                repaySource = RepayPlanRepaySrcEnum.OFFLINE_WITHHOLD_MAN.getValue().toString();
             }
             RepaymentResource temp = repaymentResourceService.selectOne(new EntityWrapper<RepaymentResource>()
                     .eq("business_id", log.getOriginalBusinessId()).eq("after_id", log.getAfterId())
@@ -528,7 +528,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             repaymentResource.setRepayDate(new Date());
             repaymentResource.setConfirmLogId(financeBaseDto.getConfirmLog().getConfirmLogId());
             //11:用往期结余还款',
-            repaymentResource.setRepaySource("11");
+            repaymentResource.setRepaySource(RepayPlanRepaySrcEnum.SURPLUS_REPAY.getValue().toString());
             if (financeBaseDto.getSave()) {
                 repaymentResource.setRepaySourceRefId(accountantOverRepayLog.getId().toString());
                 repaymentResource.insert();
@@ -546,7 +546,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         
         
         // 充值记录转 RepaymentResource
-        if (financeBaseDto.getCallFlage()==40||financeBaseDto.getCallFlage()==50) {
+        //RepayPlanRepaySrcEnum.PC_GATEWAY.getValue().equals(financeBaseDto.getCallFlage())
+        if (RepayPlanRepaySrcEnum.APP_FAST_CHARGE.getValue().equals(financeBaseDto.getCallFlage())) {
         	handleAgencyRechargeLog(financeBaseDto);
 		}
         
@@ -574,7 +575,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             repaymentResource.setRepayDate(agencyRechargeLog.getCreateTime());
             repaymentResource.setConfirmLogId(financeBaseDto.getConfirmLog().getConfirmLogId());
             //50:APP快捷充值
-            repaymentResource.setRepaySource("50");
+            repaymentResource.setRepaySource(RepayPlanRepaySrcEnum.APP_FAST_CHARGE.getValue().toString());
             if (financeBaseDto.getSave()) {
                 repaymentResource.setRepaySourceRefId(agencyRechargeLog.getCmOrderNo());
                 repaymentResource.insert();
