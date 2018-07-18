@@ -837,7 +837,8 @@ window.layinit(function (htConfig) {
                         if (res.data.code == '1') {
                             let sumMoney = 0;
                             res.data.data.forEach(element => {
-                                sumMoney += element.accountMoney
+                                sumMoney = accAdd(sumMoney,element.accountMoney)
+                                // sumMoney += element.accountMoney
                             });
                             let sum = {
                                 moneyPoolId: '合计',

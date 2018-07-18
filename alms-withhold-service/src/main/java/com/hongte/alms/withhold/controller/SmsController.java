@@ -45,18 +45,18 @@ public class SmsController {
     @ApiOperation(value = "发送短信")
     public void searchRepayResult(){
     	//******************逾期提醒(逾期的第1~3天)*****************//
-//    	smsService.sendOverDueRemindMsg(1);
-//    	smsService.sendOverDueRemindMsg(2);
-//    	smsService.sendOverDueRemindMsg(3);
+    	smsService.sendOverDueRemindMsg(1);
+    	smsService.sendOverDueRemindMsg(2);
+    	smsService.sendOverDueRemindMsg(3);
 //    	//******************单笔还款，还款日前7天/1天提醒*****************//
-//    	smsService.sendOneRemindMsg(1);
-//     	smsService.sendOneRemindMsg(7);
+    	smsService.sendOneRemindMsg(1);
+     	smsService.sendOneRemindMsg(7);
 //    	//******************多笔还款，还款日前15天/1天提醒*****************//
-//     	smsService.sendMutiplyRemindMsg(15);
+     	smsService.sendMutiplyRemindMsg(15);
      	smsService.sendMutiplyRemindMsg(1);
 //      	//******************单笔结清，结清日前15天/1天提醒*****************//
-//     	smsService.sendOneSettleRemindMsg(15);
-//     	smsService.sendOneSettleRemindMsg(1);
+     	smsService.sendOneSettleRemindMsg(15);
+     	smsService.sendOneSettleRemindMsg(1);
 
 
     	
