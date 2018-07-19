@@ -44,17 +44,20 @@ window.layinit(function (htConfig) {
                         curr: 1 //重新从第 1 页开始
                     }
                 });
-                //请求汇总数据
-                axios.get(financePath + 'customer/queryBfWithholdFlowSummary', {params:vm.searchForm} )
-                    .then(res => {
-                        if (!!res.data && res.data.code == '1') {
-                            this.summary = res.data.data;
-                        } else {
-                            this.$Modal.error({ content: '请求接口失败,消息:' + res.data.msg })
-                        }
-                    }).catch(err => {
-                        this.$Modal.error({ content: '操作失败' });
-                    });
+               this.querySummary();
+            },
+            querySummary(){
+                 //请求汇总数据
+                 axios.get(financePath + 'customer/queryBfWithholdFlowSummary', {params:vm.searchForm} )
+                 .then(res => {
+                     if (!!res.data && res.data.code == '1') {
+                         this.summary = res.data.data;
+                     } else {
+                         this.$Modal.error({ content: '请求接口失败,消息:' + res.data.msg })
+                     }
+                 }).catch(err => {
+                     this.$Modal.error({ content: '操作失败' });
+                 });
             },
             ////  ----   单行操作界面显示  结束 -----------------
             init: function () {
@@ -121,6 +124,7 @@ window.layinit(function (htConfig) {
                         url: financePath + 'customer/getBfWithholdFlowPageList',
                         page: true,
                         done: function (res, curr, count) {
+                            vm.querySummary();
                             //数据渲染完的回调。你可以借此做一些其它的操作
                             //如果是异步请求数据方式，res即为你接口返回的信息。
                             //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
