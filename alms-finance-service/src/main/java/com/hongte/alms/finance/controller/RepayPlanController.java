@@ -843,16 +843,19 @@ public class RepayPlanController {
         //根据标的结清和展期情况，设置业务的结清和展期情况
         Boolean isOver = true;
         Boolean hasDeffer =false;
-        for(BizPlanDto bizPlanDto :bizDto.getPlanDtoList()){
-            if(!bizPlanDto.getIsOver()){
-                //其中一个还款计划未结清，则整个业务未结清
-                isOver =false;
-            }
-            if(bizPlanDto.getHasDeffer()){
-                //其中一个还款计划申请展期，则整个业务标志为申请展期
-                hasDeffer = true;
+        if(bizDto.getPlanDtoList()!=null) {
+            for(BizPlanDto bizPlanDto :bizDto.getPlanDtoList()){
+                if(!bizPlanDto.getIsOver()){
+                    //其中一个还款计划未结清，则整个业务未结清
+                    isOver =false;
+                }
+                if(bizPlanDto.getHasDeffer()){
+                    //其中一个还款计划申请展期，则整个业务标志为申请展期
+                    hasDeffer = true;
+                }
             }
         }
+
         bizDto.setOver(isOver);
         bizDto.setHasDeffer(hasDeffer);
 
