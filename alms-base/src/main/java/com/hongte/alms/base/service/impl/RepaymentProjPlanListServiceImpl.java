@@ -1,6 +1,7 @@
 package com.hongte.alms.base.service.impl;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.hongte.alms.base.RepayPlan.dto.RepaymentSettleMoneyDto;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
@@ -668,12 +669,11 @@ public class RepaymentProjPlanListServiceImpl extends
 			return repaymentProjPlanListMapper.getProListForCalLateFee(projListId);
 		}
 
-		@Override
-		public void calLateFeePerPlanList(RepaymentBizPlanList pList, Date factRepayDate) {
-			// TODO Auto-generated method stub
-			
-		} 
-		 
+	@Override
+	public List<RepaymentSettleMoneyDto> selectProjPlanMoney(int flag, String businessId, Integer period,String planId) {
+		return repaymentProjPlanListMapper.selectProjPlanMoney(flag,businessId,period,planId);
+	}
+
 
 } 
 
