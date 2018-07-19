@@ -865,10 +865,14 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 		//定时查询你我金融的还款计划，未结清、未完全付款的还款计划需要每天查询
 		List<RepaymentProjPlan> projPlans=repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("plate_type", 2).eq("plan_status", 0));
 		for(RepaymentProjPlan repaymentProjPlan:projPlans) {
-			sycNiWoRepayPlan(repaymentProjPlan.getRequestNo(),null);
-			//超过3天没有同步到你我金融标的还款计划
-			if(isOver3Days(repaymentProjPlan)) {
-				RecordExceptionLog(null, null,repaymentProjPlan.getProjectId());
+			try {
+				sycNiWoRepayPlan(repaymentProjPlan.getRequestNo(),null);
+				//超过3天没有同步到你我金融标的还款计划
+				if(isOver3Days(repaymentProjPlan)) {
+					RecordExceptionLog(null, null,repaymentProjPlan.getProjectId());
+				}
+			}catch(Exception e) {
+				logger.error("同步你我金融还款计划出错,requestNo:"+repaymentProjPlan.getRequestNo());
 			}
 		}
 		
