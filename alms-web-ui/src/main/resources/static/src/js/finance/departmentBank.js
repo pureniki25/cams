@@ -154,45 +154,56 @@ let data = {
             fixed: 'right',
             align: 'center',
             render: (h, params) => {
-                return h('div', [
-                    h('Button', {
-                        props: {
-                            type: '',
-                            size: 'small'
-                        },
-                        style: {
-                            marginRight: '10px'
-                        },
-                        on: {
-                            click: () => {
-                                vm.detail(params.row)
-                            }
+                let detail = h('Button', {
+                    props: {
+                        type: '',
+                        size: 'small'
+                    },
+                    style: {
+                        marginRight: '10px'
+                    },
+                    on: {
+                        click: () => {
+                            vm.detail(params.row)
                         }
-                    }, '详情'),
-                    h('Button', {
-                        props: {
-                            type: '',
-                            size: 'small'
-                        },
-                        style: {
-                            marginRight: '10px'
-                        },
-                        on: {
-                            click: () => {
-                                vm.edit(params.row);
-                            }
+                    }
+                }, '详情');
+
+                let edit = h('Button', {
+                    props: {
+                        type: '',
+                        size: 'small'
+                    },
+                    style: {
+                        marginRight: '10px'
+                    },
+                    on: {
+                        click: () => {
+                            vm.edit(params.row);
                         }
-                    }, '编辑'),
-                    h('Button', {
-                        props: {type: '', size: 'small'},
-                        style: {marginRight: '10px'},
-                        on: {
-                            click: () => {
-                                vm.delete(params.row);
-                            }
+                    },
+                }, '编辑');
+
+                let del = h('Button', {
+                    props: {type: '', size: 'small'},
+                    style: {marginRight: '10px'},
+                    on: {
+                        click: () => {
+                            vm.delete(params.row);
                         }
-                    }, '删除')
-                ]);
+                    }
+                }, '删除');
+
+                let btnArr = [];
+                btnArr.push(detail);
+
+                if( authValid('edit') ){
+                    btnArr.push(edit);
+                }
+                if(authValid('delete')){
+                    btnArr.push(del);
+                }
+                return h('div', btnArr);
             }
         }],
         data: [],
