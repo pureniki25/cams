@@ -3,6 +3,8 @@
  */
 package com.hongte.alms.base.service;
 
+import java.util.Date;
+
 import com.alibaba.fastjson.JSONObject;
 import com.hongte.alms.base.vo.finance.SettleInfoVO;
 
@@ -28,5 +30,5 @@ public interface SettleService {
 	 * @param planId
 	 * @return
 	 */
-	public SettleInfoVO settleInfoVO (String businessId ,String afterId,String planId);
+	public SettleInfoVO settleInfoVO (String businessId ,String afterId,String planId,Date factRepayDate);
 }
