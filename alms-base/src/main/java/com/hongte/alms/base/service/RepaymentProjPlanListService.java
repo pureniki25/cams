@@ -1,9 +1,11 @@
 package com.hongte.alms.base.service;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentProjPlanList;
 import com.hongte.alms.common.service.BaseService;
 
@@ -27,6 +29,15 @@ public interface RepaymentProjPlanListService extends BaseService<RepaymentProjP
 	 * @return
 	 */
 	List<RepaymentProjPlanList> getProListForCalLateFee(String projListId);
+	
+	
+	
+	
+	/**
+	 * 计算每个pList的滞纳金
+	 */
+	
+	void calLateFeePerPlanList(RepaymentBizPlanList pList,Date factRepayDate);
 	
 
 }

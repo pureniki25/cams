@@ -666,6 +666,12 @@ public class RepaymentProjPlanListServiceImpl extends
 		public List<RepaymentProjPlanList> getProListForCalLateFee(String projListId) {
 			
 			return repaymentProjPlanListMapper.getProListForCalLateFee(projListId);
+		}
+
+		@Override
+		public void calLateFeePerPlanList(RepaymentBizPlanList pList, Date factRepayDate) {
+			// TODO Auto-generated method stub
+			
 		} 
 		 
 
