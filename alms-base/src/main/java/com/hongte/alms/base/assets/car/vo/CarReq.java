@@ -40,6 +40,8 @@ public class CarReq extends PageRequest {
     private String  model;
 
     private String userId;
+    
+    private Integer needPermission = 1;
 
 	public String getUserId() {
 		return userId;
@@ -121,6 +123,14 @@ public class CarReq extends PageRequest {
 
 	public void setModel(String model) {
 		this.model = model;
+	}
+
+	public Integer getNeedPermission() {
+		return needPermission;
+	}
+
+	public void setNeedPermission(Integer needPermission) {
+		this.needPermission = needPermission;
 	}
    
 }

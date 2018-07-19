@@ -22,7 +22,7 @@ public class SysRole extends Model<SysRole> {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId("role_code")
+    @TableField("role_code")
 	@ApiModelProperty(required= true,value = "")
 	private String roleCode;
 	@TableField("role_name")
@@ -37,14 +37,35 @@ public class SysRole extends Model<SysRole> {
     @TableField("role_area_method")
     @ApiModelProperty(required = true, value = "区域性取值方式")
     private Integer roleAreaMethod;
-
+    @TableField("page_type")
+    @ApiModelProperty(required = true, value = "页面类型")
+    private Integer pageType;
+    @TableId("id")
+    @ApiModelProperty(required = true, value = "页面类型")
+    private Integer id;
 
 	public String getRoleCode() {
 		return roleCode;
 	}
 
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
 	public void setRoleCode(String roleCode) {
 		this.roleCode = roleCode;
+	}
+
+	public Integer getPageType() {
+		return pageType;
+	}
+
+	public void setPageType(Integer pageType) {
+		this.pageType = pageType;
 	}
 
 	public String getRoleName() {
@@ -73,7 +94,7 @@ public class SysRole extends Model<SysRole> {
 
 	@Override
 	protected Serializable pkVal() {
-		return this.roleCode;
+		return this.id;
 	}
 
 	@Override

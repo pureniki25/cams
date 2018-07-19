@@ -1,6 +1,7 @@
 package com.hongte.alms.base.collection.service.impl;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.collection.mapper.PhoneUrgeMapper;
 import com.hongte.alms.base.collection.service.CollectionStatusService;
@@ -20,6 +21,7 @@ import com.hongte.alms.base.service.SysUserRoleService;
 import com.hongte.alms.base.service.SysUserService;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.ht.ussp.bean.LoginUserInfoHelper;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -103,16 +105,13 @@ public class PhoneUrgeServiceImpl extends BaseServiceImpl<PhoneUrgeMapper, Staff
         		return pages;
 			}
 		}
-
-
-
+        
         List<AfterLoanStandingBookVo> list = phoneUrgeMapper.selectAfterLoadStanding(pages,req);
         setExtInfo(list);
-
-//        pages.setRecords(setInfoForAfterLoanStandingBookVo(list));
+        
+//      pages.setRecords(setInfoForAfterLoanStandingBookVo(list));
         pages.setRecords(list);
         return pages;
-
     }
 
     public List<AfterLoanStandingBookVo>  setExtInfo(List<AfterLoanStandingBookVo> list){
