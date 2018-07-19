@@ -60,7 +60,22 @@ public class BasicBusinessType extends Model<BasicBusinessType> {
 	@TableField("update_user")
 	@ApiModelProperty(required= true,value = "更新用户")
 	private String updateUser;
+	
+	/**
+	 * 信贷业务类型ID
+	 */
+	@TableField("xd_business_type_id")
+	private String xdBusinessTypeId;
+	
 
+
+	public String getXdBusinessTypeId() {
+		return xdBusinessTypeId;
+	}
+
+	public void setXdBusinessTypeId(String xdBusinessTypeId) {
+		this.xdBusinessTypeId = xdBusinessTypeId;
+	}
 
 	public Integer getBusinessTypeId() {
 		return businessTypeId;
