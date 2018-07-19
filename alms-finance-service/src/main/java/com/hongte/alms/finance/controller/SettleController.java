@@ -79,13 +79,17 @@ public class SettleController {
 	
 	@GetMapping(value="/settleInfo")
 	@ApiOperation(value="结清应还信息")
-	public Result<SettleInfoVO> settleInfo(String businessId,String afterId,String planId) {
+	public Result<SettleInfoVO> settleInfo(String businessId,String afterId,String planId,String factRepayDate) {
 		try {
 			logger.info("@settleInfo@结清应还信息--开始[{}]", businessId);
 			if (StringUtil.isEmpty(planId)) {
 				planId = null ;
 			}
-			SettleInfoVO infoVO = settleService.settleInfoVO(businessId, afterId, planId);
+			Date repayDate = null ;
+			if (!StringUtil.isEmpty(factRepayDate)) {
+				repayDate = DateUtil.getDate(factRepayDate);
+			}
+			SettleInfoVO infoVO = settleService.settleInfoVO(businessId, afterId, planId,repayDate);
 			logger.error("@settleInfo@结清应还信息--结束[{}]", JSONObject.toJSONString(infoVO));
 			return Result.success(infoVO);
 		} catch (Exception e) {

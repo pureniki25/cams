@@ -32,7 +32,7 @@
     <script src="/build/js/appToken.js"></script>
     <!--引入公共的一些方法-->
     <script src="/src/js/comm.js"></script>
-
+    <!-- <script src="/plugins/layui/extend/modules/ht_auth.js"></script> -->
 </head>
 <body>
 <!--隐藏元素-->
@@ -76,7 +76,7 @@
             </i-form>
         </i-col>
         <i-col span="5">
-            <button class="layui-btn layui-btn-sm" @click="toLoading" style="margin-right:10px" ht-auth="personQuery">
+            <button class="layui-btn layui-btn-sm" @click="toLoading" style="margin-right:10px"  v-if="authValid('personQuery')" ht-auth="personQuery">
                         <span v-if="!loading">
                             <i class="layui-icon">&#xe615;</i>查询</span>
                 <span v-else>
@@ -92,10 +92,12 @@
             <!-- 使用方法渲染模式 -->
             <table id="listTable" lay-filter="listTable"></table>
             <div style="display:none" id="barTools">
+                    <!-- <script type="text/html" id="barTools"> -->
                 <!--layui-btn layui-btn-xs-->
-                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="userSet">设置</a>
-                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
+                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="userSet" v-if="authValid('singleSet')">设置</a>
+                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete"  v-if="authValid('del')">删除</a>
             </div>
+                    <!-- </script> -->
         </i-col>
     </row>
     <!-- 表单Grid，使用layerUI的表格组件 结束 -->

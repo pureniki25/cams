@@ -429,26 +429,26 @@ public class FinanceServiceImpl implements FinanceService {
 				continue;
 			}
 			if (repaymentBizPlanListDetail.getPlanItemType().equals(30)) {
-				t.put("item30", repaymentBizPlanListDetail.getPlanAmount());
+				t.put("item30", repaymentBizPlanListDetail.getPlanAmount().add(t.getBigDecimal("item30")));
 				subtotal = subtotal.add(repaymentBizPlanListDetail.getPlanAmount());
 				total = total.add(repaymentBizPlanListDetail.getPlanAmount());
 				continue;
 			}
 			if (repaymentBizPlanListDetail.getPlanItemType().equals(50)) {
-				t.put("item50", repaymentBizPlanListDetail.getPlanAmount());
+				t.put("item50", repaymentBizPlanListDetail.getPlanAmount().add(t.getBigDecimal("item50")));
 				subtotal = subtotal.add(repaymentBizPlanListDetail.getPlanAmount());
 				total = total.add(repaymentBizPlanListDetail.getPlanAmount());
 				continue;
 			}
 			if (repaymentBizPlanListDetail.getPlanItemType().equals(60) && repaymentBizPlanListDetail.getFeeId()
 					.equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
-				t.put("onlineOverDue", repaymentBizPlanListDetail.getPlanAmount());
+				t.put("onlineOverDue", repaymentBizPlanListDetail.getPlanAmount().add(t.getBigDecimal("onlineOverDue")));
 				total = total.add(repaymentBizPlanListDetail.getPlanAmount());
 				continue;
 			}
 			if (repaymentBizPlanListDetail.getPlanItemType().equals(60) && repaymentBizPlanListDetail.getFeeId()
 					.equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
-				t.put("offlineOverDue", repaymentBizPlanListDetail.getPlanAmount());
+				t.put("offlineOverDue", repaymentBizPlanListDetail.getPlanAmount().add(t.getBigDecimal("offlineOverDue")));
 				total = total.add(repaymentBizPlanListDetail.getPlanAmount());
 				continue;
 			}
@@ -493,26 +493,26 @@ public class FinanceServiceImpl implements FinanceService {
 					continue;
 				}
 				if (repaymentProjPlanListDetail.getPlanItemType().equals(30)) {
-					proj.put("item30", repaymentProjPlanListDetail.getProjPlanAmount());
+					proj.put("item30", repaymentProjPlanListDetail.getProjPlanAmount().add(proj.getBigDecimal("item30")));
 					proj.put("subTotal", proj.getBigDecimal("subTotal").add(repaymentProjPlanListDetail.getProjPlanAmount()));
 					proj.put("total", proj.getBigDecimal("total").add(repaymentProjPlanListDetail.getProjPlanAmount()));
 					continue;
 				}
 				if (repaymentProjPlanListDetail.getPlanItemType().equals(50)) {
-					proj.put("item50", repaymentProjPlanListDetail.getProjPlanAmount());
+					proj.put("item50", repaymentProjPlanListDetail.getProjPlanAmount().add(proj.getBigDecimal("item50")));
 					proj.put("subTotal", proj.getBigDecimal("subTotal").add(repaymentProjPlanListDetail.getProjPlanAmount()));
 					proj.put("total", proj.getBigDecimal("total").add(repaymentProjPlanListDetail.getProjPlanAmount()));
 					continue;
 				}
 				if (repaymentProjPlanListDetail.getPlanItemType().equals(60) && repaymentProjPlanListDetail.getFeeId()
 						.equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
-					proj.put("onlineOverDue", repaymentProjPlanListDetail.getProjPlanAmount());
+					proj.put("onlineOverDue", repaymentProjPlanListDetail.getProjPlanAmount().add(proj.getBigDecimal("onlineOverDue")));
 					proj.put("total", proj.getBigDecimal("total").add(repaymentProjPlanListDetail.getProjPlanAmount()));
 					continue;
 				}
 				if (repaymentProjPlanListDetail.getPlanItemType().equals(60) && repaymentProjPlanListDetail.getFeeId()
 						.equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
-					proj.put("offlineOverDue", repaymentProjPlanListDetail.getProjPlanAmount());
+					proj.put("offlineOverDue", repaymentProjPlanListDetail.getProjPlanAmount().add(proj.getBigDecimal("offlineOverDue")));
 					proj.put("total", proj.getBigDecimal("total").add(repaymentProjPlanListDetail.getProjPlanAmount()));
 					continue;
 				}

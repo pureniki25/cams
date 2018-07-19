@@ -19,9 +19,12 @@ window.layinit(function (htConfig) {
             searchForm: {
                 startTime: '', //完成日期开始时间
                 endTime: '', //完成日期开始时间
-
             },
-
+            summary: {
+                totalNumber: 0.00,
+                totalAmount: 0.00,
+                totalServiceCharge: 0.00
+            }
         },
 
         methods: {
@@ -36,12 +39,25 @@ window.layinit(function (htConfig) {
                     where: {
                         startTime: vm.searchForm.startTime, //登记开始时间
                         endTime: vm.searchForm.endTime,      //登记结束时间
-
                     }
                     , page: {
                         curr: 1 //重新从第 1 页开始
                     }
                 });
+               this.querySummary();
+            },
+            querySummary(){
+                 //请求汇总数据
+                 axios.get(financePath + 'customer/queryBfWithholdFlowSummary', {params:vm.searchForm} )
+                 .then(res => {
+                     if (!!res.data && res.data.code == '1') {
+                         this.summary = res.data.data;
+                     } else {
+                         this.$Modal.error({ content: '请求接口失败,消息:' + res.data.msg })
+                     }
+                 }).catch(err => {
+                     this.$Modal.error({ content: '操作失败' });
+                 });
             },
             ////  ----   单行操作界面显示  结束 -----------------
             init: function () {
@@ -81,15 +97,15 @@ window.layinit(function (htConfig) {
                                 field: 'tradeType',
                                 title: '交易类型',
                                 templet: function (d) {
-                                   /*  var content = "";
-                                    if (d.repayStatus == 0) {
-                                        content = '代扣失败'
-                                    } else if (d.repayStatus == 1) {
-                                        content = '代扣成功'
-                                    } else if (d.repayStatus == 2) {
-                                        content = '处理中'
-                                    }
-                                    return content */
+                                    /*  var content = "";
+                                     if (d.repayStatus == 0) {
+                                         content = '代扣失败'
+                                     } else if (d.repayStatus == 1) {
+                                         content = '代扣成功'
+                                     } else if (d.repayStatus == 2) {
+                                         content = '处理中'
+                                     }
+                                     return content */
                                     return d.tradeType + d.withholdingStatus;
                                 }
                             },
@@ -108,11 +124,11 @@ window.layinit(function (htConfig) {
                         url: financePath + 'customer/getBfWithholdFlowPageList',
                         page: true,
                         done: function (res, curr, count) {
+                            vm.querySummary();
                             //数据渲染完的回调。你可以借此做一些其它的操作
                             //如果是异步请求数据方式，res即为你接口返回的信息。
                             //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
                             self.loading = false;
-
                         }
                     });
 
@@ -125,8 +141,8 @@ window.layinit(function (htConfig) {
                 tt.resetFields();
                 this.searchForm.startTime = '';
                 this.searchForm.endTime = '';
-                this.searchForm.startTimeV = '';
-                this.searchForm.endTimeV = '';
+                // this.searchForm.startTimeV = '';
+                // this.searchForm.endTimeV = '';
 
 
                 vm.toLoading();

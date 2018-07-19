@@ -19,7 +19,6 @@ window.layinit(function (htConfig) {
             searchForm: {
                 startTime: '', //完成日期开始时间
                 endTime: '', //完成日期开始时间
-
             },
 
         },
@@ -117,8 +116,8 @@ window.layinit(function (htConfig) {
                 tt.resetFields();
                 this.searchForm.startTime = '';
                 this.searchForm.endTime = '';
-                this.searchForm.startTimeV = '';
-                this.searchForm.endTimeV = '';
+                // this.searchForm.startTimeV = '';
+                // this.searchForm.endTimeV = '';
 
 
                 vm.toLoading();

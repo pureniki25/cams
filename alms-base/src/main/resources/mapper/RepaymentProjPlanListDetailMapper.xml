@@ -67,4 +67,20 @@
 				AND fee_id = #{feeId}
 			</if>
 	</select>
+	
+	<select id="calcUnpaidPrincipal" resultType="java.math.BigDecimal" >
+	SELECT
+		IFNULL( sum( rpld.proj_plan_amount - IFNULL( rpld.proj_fact_amount, 0 ) ), 0 ) 
+	FROM
+		tb_repayment_proj_plan_list_detail rpld
+		LEFT JOIN tb_repayment_proj_plan_list rppl ON rppl.proj_plan_list_id = rpld.proj_plan_list_id 
+	WHERE
+		rppl.business_id = #{businessId}
+		AND rpld.plan_item_type = 10 
+		<if test="planId != null">
+			AND rpld.plan_id = #{planId}
+		</if>
+	ORDER BY
+		rpld.due_date
+	</select>
 </mapper>

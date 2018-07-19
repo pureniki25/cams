@@ -40,60 +40,18 @@
 		<Card>
 			<tabs value="repaymentPlan" :animated="true" @on-click="initFunction($event)">
 		        <tab-pane label="还款计划" name="repaymentPlan">
-		        	<i-table height="600" border :columns="repayBizPlanColumns" :data="bizRepaymentPlanList"></i-table>
-		        	<!-- <table class="layui-table" rules="all" style="width:2000px; height:100px; text-align:center">
-		        		<thead>
-			        		<tr>
-			        			<td>期数</td>
-			        			<td>类型</td>
-			        			<td>还款日期</td>
-			        			<td>本金</td>
-			        			<td>利息</td>
-			        			<td>月收分公司服务费</td>
-			        			<td>月收平台费</td>
-			        			<td>其他费用</td>
-			        			<td>小计</td>
-			        			<td>逾期天数</td>
-			        			<td>线上滞纳金</td>
-			        			<td>线下滞纳金</td>
-			        			<td>结余</td>
-			        			<td>还款合计（含滞纳金）</td>
-			        			<td>状态</td>
-			        		</tr>
-			        	</thead>
-		        		<tbody v-for="(item, index) in bizRepaymentPlanList">
-			        		<tr>
-		        				<td>{{ item.afterId }}</td>
-			        			<td v-html="addEventForType(item)"></td>
-			        			<td>{{ item.repaymentDate }}</td>
-			        			<td>{{ numeral(item.principal).format('0,0.00')}}</td>
-			        			<td>{{ numeral(item.accrual).format('0,0.00')}}</td>
-			        			<td>{{ numeral(item.serviceCharge).format('0,0.00')}}</td>
-			        			<td>{{ numeral(item.platformCharge).format('0,0.00')}}</td>
-			        			<td v-if="item.repayment == '实际还款'" v-html="addEventForOtherFee(item)"></td>
-			        			<td v-else>{{ numeral(item.otherFee).format('0,0.00')}}</td>
-			        			<td>{{ numeral(item.subtotal).format('0,0.00')}}</td>
-			        			<td v-if="item.repayment == '差额'"></td>
-			        			<td v-else>{{ item.overdueDays }}</td>
-			        			<td>{{ numeral(item.onlineLateFee).format('0,0.00')}}</td>
-			        			<td>{{ numeral(item.offlineLateFee).format('0,0.00')}}</td>
-			        			<td>{{ numeral(item.surplus).format('0,0.00')}}</td>
-			        			<td>{{ numeral(item.total).format('0,0.00')}}</td>
-			        			<td>{{ item.confirmFlagStr }}</td>
-			        		</tr>
-			        	</tbody>
-		        	</table> -->
+		        	<i-table height="580" highlight-row border :columns="repayBizPlanColumns" :data="bizRepaymentPlanList"></i-table>
 		        	
 		        	<Modal v-model="repayPlanFlag" title="计划还款" width="100%">
-		        		<i-table border :columns="repayPlanColumns" :data="repayPlanColumnsData"></i-table>
+		        		<i-table highlight-row border :columns="repayPlanColumns" :data="repayPlanColumnsData"></i-table>
 					</Modal>
 					
 		        	<Modal v-model="repayActualFlag" title="实际还款" width="100%">
-		        		<i-table border :columns="repayPlanColumns" :data="repayActualColumnsData"></i-table>
+		        		<i-table highlight-row border :columns="repayPlanColumns" :data="repayActualColumnsData"></i-table>
 					</Modal>
 					
 		        	<Modal v-model="repayDifferenceFlag" title="差额" width="100%">
-		        		<i-table border :columns="repayPlanColumns" :data="repayDifferenceColumnsData"></i-table>
+		        		<i-table highlight-row border :columns="repayPlanColumns" :data="repayDifferenceColumnsData"></i-table>
 					</Modal>
 					
 		        	<Modal v-model="repayOtherFeeFlag" title="其他费用" width="30%">
@@ -187,14 +145,14 @@
 						            <h3>标的应还计划</h3>
 						        </p>
 						    </row>
-							<i-table border :columns="platformRepaymentInfoColumns" :data="platformRepaymentInfoData" style="margin-top:1rem"></i-table>
+							<i-table highlight-row border :columns="platformRepaymentInfoColumns" :data="platformRepaymentInfoData" style="margin-top:1rem"></i-table>
 							
 							<row style="margin-top:1rem">
 								<p slot="title">
 						            <h3>标的实还计划</h3>
 						        </p>
 						    </row>
-							<i-table border :columns="platformActualRepaymentInfoColumns" :data="platformActualRepaymentInfoData" style="margin-top:1rem"></i-table>
+							<i-table highlight-row border :columns="platformActualRepaymentInfoColumns" :data="platformActualRepaymentInfoData" style="margin-top:1rem"></i-table>
 						</tab-pane>
 					</tabs>
 		        </tab-pane>
@@ -212,7 +170,7 @@
 						        </p>
 						    </row>
 							<row style="margin-top:1rem">
-								<i-table border :columns="advancePaymentInfoColumns" :data="advancePaymentInfoData" style="margin-top:1rem"></i-table>
+								<i-table highlight-row border :columns="advancePaymentInfoColumns" :data="advancePaymentInfoData" style="margin-top:1rem"></i-table>
 							</row>
 							
 							<row style="margin-top:1rem">
@@ -221,7 +179,7 @@
 						        </p>
 						    </row>
 							<row style="margin-top:1rem">
-								<i-table border :columns="queryGuaranteePaymentColumns" :data="queryGuaranteePaymentData" style="margin-top:1rem"></i-table>
+								<i-table highlight-row border :columns="queryGuaranteePaymentColumns" :data="queryGuaranteePaymentData" style="margin-top:1rem"></i-table>
 							</row>
 						</tab-pane>
 					</tabs>

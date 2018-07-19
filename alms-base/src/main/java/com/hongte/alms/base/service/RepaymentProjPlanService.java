@@ -1,10 +1,12 @@
 package com.hongte.alms.base.service;
 
-import com.hongte.alms.base.entity.RepaymentProjPlan;
-import com.hongte.alms.common.service.BaseService;
-import org.apache.ibatis.annotations.Param;
+import java.util.Date;
+import java.util.List;
 
-import java.math.BigDecimal;
+import com.hongte.alms.base.entity.RepaymentProjPlan;
+import com.hongte.alms.base.entity.RepaymentProjPlanList;
+import com.hongte.alms.common.service.BaseService;
+
 
 /**
  * <p>
@@ -15,4 +17,8 @@ import java.math.BigDecimal;
  * @since 2018-05-03
  */
 public interface RepaymentProjPlanService extends BaseService<RepaymentProjPlan> {
+	
+	
+	RepaymentProjPlanList findCurrentPeriod(Date settleDate, List<RepaymentProjPlanList> projPlanLists);
+	
 }

@@ -302,6 +302,11 @@ window.layinit(function (htConfig) {
                                                         })
                                                     }
                                                     if (call == 'settle') {
+                                                        app.checkLastRepay(p.row.businessId,p.row.afterId);
+                                                        if(app.lastRepayDianfuweijieqing){
+                                                            app.$Message.warning({content:'往期存在垫付未结清记录'})
+                                                            return ;
+                                                        }
                                                         let url = '/finance/settle?businessId=' + p.row.businessId + '&afterId=' + p.row.afterId
                                                         layer.open({
                                                             type: 2,
@@ -314,6 +319,11 @@ window.layinit(function (htConfig) {
                                                         })
                                                     }
                                                     if (call == 'planSettle') {
+                                                        app.checkLastRepay(p.row.businessId,p.row.afterId);
+                                                        if(app.lastRepayDianfuweijieqing){
+                                                            app.$Message.warning({content:'往期存在垫付未结清记录'})
+                                                            return ;
+                                                        }
                                                         let url = '/finance/settle?businessId=' + p.row.businessId + '&afterId=' + p.row.afterId + '&planId=' + p.row.planId
                                                         layer.open({
                                                             type: 2,
@@ -372,8 +382,8 @@ window.layinit(function (htConfig) {
                                 menu.push(repayConfirm)
                                 menu.push(revokeConfirm)
                                 menu.push(confirmWithhold)
-                                menu.push(planSettle)
-                                menu.push(settle)
+                                /* menu.push(planSettle)
+                                menu.push(settle) */
                                    menu.push(withhold)
                             }
                             let poptipContent;

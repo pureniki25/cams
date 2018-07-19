@@ -9,6 +9,7 @@ import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.AlmsServiceNameEnums;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanPayedTypeEnum;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanRepaySrcEnum;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.service.*;
 import com.hongte.alms.base.vo.compliance.TdrepayRechargeInfoVO;
@@ -111,7 +112,12 @@ public class PlatformRepaymentController {
     @Autowired
     @Qualifier("RepaymentResourceService")
     RepaymentResourceService repaymentResourceService;
-    
+
+
+    @Autowired
+    @Qualifier("RepaymentConfirmPlatRepayLogService")
+    RepaymentConfirmPlatRepayLogService   repaymentConfirmPlatRepayLogService;
+
     @Autowired
     private LoginUserInfoHelper loginUserInfoHelper;
 
@@ -317,8 +323,11 @@ public class PlatformRepaymentController {
 //                vo.setRepaySource(RepayPlanPayedTypeEnum.getByValue(repaymentProjPlanList.getRepayFlag()).getClassifyId());
 //            }
 
+
+
+
             //部分还款状态子状态,null:未还款,1:部分还款,2:线上已还款,3:全部已还款
-            //新需求： 资产端内部在分润后将还款状态改为线上已还款之后，再调用合规化还款接口去给资金端还款，如果repay_status为2线上已还款时repayFlog是没有值的
+            //新需求： 资产端内部在分润后将还款状态改为线上已还款之后，再调用合规化还款接口去给资金端还款，如果 repay_status为2线上已还款时repayFlog是没有值的
             //所以要从实还流水中查还款来源
             List<RepaymentProjFactRepay> projFactRepayList =
                     repaymentProjFactRepayService.selectList(
@@ -330,7 +339,7 @@ public class PlatformRepaymentController {
                 return Result.error("查询实还流水为空");
             }
 
-            vo.setRepaySource(RepayPlanPayedTypeEnum.getByValue(projFactRepayList.get(0).getRepaySource()).getClassifyId());
+            vo.setRepaySource(RepayPlanRepaySrcEnum.getByValue(projFactRepayList.get(0).getRepaySource()).getPlatRepayVal());
 
 
             //取还款确认日志的最后一次的来源做为整个业务的还款来源

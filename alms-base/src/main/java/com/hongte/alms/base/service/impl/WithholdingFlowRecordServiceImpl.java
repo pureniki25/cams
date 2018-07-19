@@ -2,11 +2,13 @@ package com.hongte.alms.base.service.impl;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.google.common.collect.Maps;
+import com.hongte.alms.base.customer.vo.WithholdFlowReq;
 import com.hongte.alms.base.entity.WithholdingFlowRecord;
 import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.mapper.WithholdingFlowRecordMapper;
 import com.hongte.alms.base.service.WithholdingFlowRecordService;
+import com.hongte.alms.base.vo.withhold.WithholdingFlowRecordSummaryVo;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.SecurityUtil;
@@ -40,6 +42,8 @@ import java.util.zip.ZipInputStream;
 public class WithholdingFlowRecordServiceImpl extends BaseServiceImpl<WithholdingFlowRecordMapper, WithholdingFlowRecord> implements WithholdingFlowRecordService {
     @Autowired
     private EipRemote eipRemote;
+    @Autowired
+    private WithholdingFlowRecordMapper  withholdingFlowRecordMapper;
 
     @Transactional
     @Override
@@ -109,7 +113,7 @@ public class WithholdingFlowRecordServiceImpl extends BaseServiceImpl<Withholdin
                         }
                         //开始处理文件内容
                         String[] cols = line.split("\\|");
-                        if (cols.length < 14) {
+                        if (cols.length <=8 ) {
                             //跳过不需要的数据
                             continue;
                         }
@@ -240,4 +244,9 @@ public class WithholdingFlowRecordServiceImpl extends BaseServiceImpl<Withholdin
             log.error("@WithholdingFlowRecordServiceImpl@导入易宝代扣流水失败.msg:[{}]", ex.getMessage(), ex);
         }
     }
+
+	@Override
+	public WithholdingFlowRecordSummaryVo querySummary(WithholdFlowReq withholdFlowReq) {
+		return withholdingFlowRecordMapper.querySummary(withholdFlowReq);
+	}
 }

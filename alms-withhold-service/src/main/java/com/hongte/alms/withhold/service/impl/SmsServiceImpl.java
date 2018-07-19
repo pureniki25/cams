@@ -72,7 +72,7 @@ public class SmsServiceImpl implements SmsService{
     	  List<RepaymentBizPlanList> overDueLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("current_status","逾期").eq("due_date", dueDate).eq("src_type", 2));
     	  for(RepaymentBizPlanList pList:overDueLists) {
     		  List<RepaymentBizPlanList> pLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", pList.getPlanId()));
-    		  BasicBizCustomer customer=basicBizCustomerService.selectOne(new EntityWrapper<BasicBizCustomer>().eq("business_id", pList.getBusinessId()));
+    		  BasicBizCustomer customer=basicBizCustomerService.selectOne(new EntityWrapper<BasicBizCustomer>().eq("business_id", pList.getBusinessId()).eq("ismain_customer", 1));
     			if(customer==null) {
     				logger.error("找不到该客户信息:business_id{0}:"+pList.getBusinessId());
     				continue;
@@ -109,7 +109,7 @@ public class SmsServiceImpl implements SmsService{
 		  
 		  for(RepaymentBizPlanList pList:remindLists) {
     		  RepaymentBizPlan plan=repaymentBizPlanService.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("plan_id", pList.getPlanId()));
-    		  BasicBizCustomer customer=basicBizCustomerService.selectOne(new EntityWrapper<BasicBizCustomer>().eq("business_id", pList.getBusinessId()));
+    		  BasicBizCustomer customer=basicBizCustomerService.selectOne(new EntityWrapper<BasicBizCustomer>().eq("business_id", pList.getBusinessId()).eq("ismain_customer", 1));
     		  BasicBusiness business=basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", pList.getBusinessId()));
     			TuandaiProjectInfo tuandaiProjectInfo=tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("business_id", plan.getBusinessId()));
     			Date borrowDate=null;
@@ -148,8 +148,9 @@ public class SmsServiceImpl implements SmsService{
     			}else {
     				//未绑卡
     		 		sendMessageService.sendAfterUnbondRepayRemindSms(customer.getPhoneNumber(), customer.getCustomerName(),borrowDate,plan.getBorrowMoney(), pList.getTotalBorrowAmount().add(pList.getOverdueAmount()==null?BigDecimal.valueOf(0):pList.getOverdueAmount()),pList.getPeriod(), pList.getDueDate());
-    				logger.info("发送单笔还款提醒短信结束====================:business_id{0},pListId{1}:",pList.getBusinessId(),pList.getPlanListId());
+    			
     			}
+    			logger.info("发送单笔还款提醒短信结束====================:business_id{0},pListId{1}:",pList.getBusinessId(),pList.getPlanListId());
    	  }
 	}
 
@@ -265,7 +266,7 @@ public class SmsServiceImpl implements SmsService{
 		  for(RepaymentBizPlanList pList:remindLists) {
     		  List<RepaymentBizPlanList> pLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", pList.getPlanId()));
     		  RepaymentBizPlan plan=repaymentBizPlanService.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("plan_id", pList.getPlanId()));
-    		  BasicBizCustomer customer=basicBizCustomerService.selectOne(new EntityWrapper<BasicBizCustomer>().eq("business_id", pList.getBusinessId()));
+    		  BasicBizCustomer customer=basicBizCustomerService.selectOne(new EntityWrapper<BasicBizCustomer>().eq("business_id", pList.getBusinessId()).eq("ismain_customer", 1));
     		  BasicBusiness business=basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", pList.getBusinessId()));
     			TuandaiProjectInfo tuandaiProjectInfo=tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("business_id", plan.getBusinessId()));
     			Date borrowDate=null;
