@@ -2,6 +2,7 @@ package com.hongte.alms.base.RepayPlan.dto.app;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.RepaymentProjPlanList;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -54,6 +55,19 @@ public class BizPlanListDto  implements Serializable {
         this.status = planList.getCurrentStatus();
         this.overdueAmount = planList.getOverdueAmount();
         this.derateAmount =planList.getDerateAmount();
+//        this.payedAmount = planList.getF
+    }
+    
+    
+    public  BizPlanListDto(RepaymentProjPlanList projPlanList){
+        this.afterId = projPlanList.getAfterId();
+        this.period = projPlanList.getPeriod();
+        this.dueDate = projPlanList.getDueDate();
+        this.totalAmount = projPlanList.getTotalBorrowAmount();
+        this.payDate = projPlanList.getFactRepayDate();
+        this.status = projPlanList.getCurrentStatus();
+        this.overdueAmount = projPlanList.getOverdueAmount();
+        this.derateAmount =projPlanList.getDerateAmount();
 //        this.payedAmount = planList.getF
     }
 
