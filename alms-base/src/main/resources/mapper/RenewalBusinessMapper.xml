@@ -75,6 +75,11 @@
         <if test="loanExtReq.extensionId !=null and loanExtReq.extensionId !=''">
               	AND trb.renewal_business_id like '%${loanExtReq.extensionId}%'
         </if>
+        <if test="userId !=null  and userId != '' and needPermission == 1">
+               and trb.original_business_id in (
+				select business_id from tb_sys_user_permission where user_id = #{userId}    	
+               )
+         </if>
     </where>
 	ORDER BY trb.create_time desc
 	LIMIT ${(loanExtReq.page-1) * loanExtReq.limit}, #{loanExtReq.limit,jdbcType=DECIMAL}
@@ -118,6 +123,11 @@
         <if test="loanExtReq.extensionId !=null and loanExtReq.extensionId !=''">
               	AND trb.renewal_business_id like '%${loanExtReq.extensionId}%'
         </if>
+        <if test="userId !=null  and userId != '' and needPermission == 1">
+               and trb.original_business_id in (
+				select business_id from tb_sys_user_permission where user_id = #{userId}    	
+               )
+         </if>
     </where>
 	</select>
 </mapper>

@@ -207,7 +207,7 @@ public class CollectionController {
             
             Wrapper<SysUserRole> wrapperSysUserRole = new EntityWrapper<SysUserRole>();
             wrapperSysUserRole.eq("user_id",loginUserInfoHelper.getUserId());
-            wrapperSysUserRole.and(" role_code in (SELECT role_code FROM tb_sys_role WHERE role_area_type = 1) ");
+            wrapperSysUserRole.and(" role_code in (SELECT role_code FROM tb_sys_role WHERE role_area_type = 1 AND page_type = 1 ) ");
             List<SysUserRole> userRoles = sysUserRoleService.selectList(wrapperSysUserRole);
             if(null != userRoles && !userRoles.isEmpty()) {
             	req.setNeedPermission(0);//全局用户 不需要验证权限
@@ -240,6 +240,14 @@ public class CollectionController {
     public PageResult<List<AfterLoanStandingBookVo>> selectRepayManage(@ModelAttribute AfterLoanStandingBookReq req){
 
         try{
+	    	 Wrapper<SysUserRole> wrapperSysUserRole = new EntityWrapper<>();
+	         wrapperSysUserRole.eq("user_id",loginUserInfoHelper.getUserId());
+	         wrapperSysUserRole.and(" role_code in (SELECT role_code FROM tb_sys_role WHERE role_area_type = 1 AND page_type = 4 ) ");
+	         List<SysUserRole> userRoles = sysUserRoleService.selectList(wrapperSysUserRole);
+	         if(null != userRoles && !userRoles.isEmpty()) {
+	         	req.setNeedPermission(0);//全局用户 不需要验证权限
+	         }
+        	
             long startTime = System.currentTimeMillis();
             List<String> companyIds= sysUserAreaService.selectUserAreas(loginUserInfoHelper.getUserId());
             if(companyIds.size()>0) {

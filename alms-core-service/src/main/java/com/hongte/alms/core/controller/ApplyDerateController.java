@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.assets.car.vo.FileVo;
 import com.hongte.alms.base.collection.service.CollectionLogService;
@@ -23,6 +24,7 @@ import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.SysParameter;
+import com.hongte.alms.base.entity.SysUserRole;
 import com.hongte.alms.base.enums.AreaLevel;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
@@ -190,6 +192,10 @@ public class ApplyDerateController {
 	@Autowired
 	// @Qualifier("loginUserInfoHelper")
 	LoginUserInfoHelper loginUserInfoHelper;
+	
+    @Autowired
+    @Qualifier("SysUserRoleService")
+    SysUserRoleService sysUserRoleService;
 	
 	@Value(value="${bmApi.apiUrl:http://127.0.0.1}")
 	private String apiUrl;
@@ -673,6 +679,14 @@ public class ApplyDerateController {
 	public PageResult<List<ApplyDerateVo>> selectApplyDeratVoPage(@ModelAttribute ApplyDerateListSearchReq req) {
 
 		try {
+			Wrapper<SysUserRole> wrapperSysUserRole = new EntityWrapper<SysUserRole>();
+            wrapperSysUserRole.eq("user_id",loginUserInfoHelper.getUserId());
+            wrapperSysUserRole.and(" role_code in (SELECT role_code FROM tb_sys_role WHERE role_area_type = 1 AND page_type = 3 ) ");
+            List<SysUserRole> userRoles = sysUserRoleService.selectList(wrapperSysUserRole);
+            if(null != userRoles && !userRoles.isEmpty()) {
+            	req.setNeedPermission(0);//全局用户 不需要验证权限
+            }
+			
 			Page<ApplyDerateVo> pages = applyDerateProcessService.selectApplyDeratePage(req);
 			return PageResult.success(pages.getRecords(), pages.getTotal());
 		} catch (Exception ex) {

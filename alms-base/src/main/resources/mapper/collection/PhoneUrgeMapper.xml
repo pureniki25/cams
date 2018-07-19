@@ -625,7 +625,12 @@
             <if test="customerName !=null  and customerName !=''  ">
                 and business.customer_name  LIKE '%${customerName}%'
             </if>
-     
+     		
+     		<if test="userId !=null and userId != '' and needPermission == 1">
+                and business.business_id in (
+					select business_id from tb_sys_user_permission where user_id = #{userId}    	
+                )
+            </if>
 	
         </where>
          

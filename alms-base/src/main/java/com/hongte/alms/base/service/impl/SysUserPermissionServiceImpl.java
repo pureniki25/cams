@@ -3,7 +3,6 @@ package com.hongte.alms.base.service.impl;
 import java.beans.Transient;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +13,7 @@ import java.util.concurrent.Executor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONObject;
@@ -42,6 +42,7 @@ import com.hongte.alms.base.service.SysUserRoleService;
 import com.hongte.alms.base.service.SysUserService;
 import com.hongte.alms.base.vo.finance.SysFinancialOrderVO;
 import com.hongte.alms.base.vo.user.BoaInRoleInfo;
+import com.hongte.alms.base.vo.user.MyPermissionIdsInfo;
 import com.hongte.alms.base.vo.user.SelfBoaInUserInfo;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.ht.ussp.bean.LoginUserInfoHelper;
@@ -58,17 +59,11 @@ import com.ht.ussp.client.dto.LoginInfoDto;
 @Service("SysUserPermissionService")
 public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermissionMapper, SysUserPermission> implements SysUserPermissionService {
 
-	private final String appCode = "ALMS";
-	private enum pageType{
-		managePage,financePage,deratePage,processPage
-	};
-	private EnumMap<pageType, Integer> pageTypeMap= new EnumMap<>(pageType.class);
-	{
-		pageTypeMap.put(pageType.managePage, 1);
-		pageTypeMap.put(pageType.financePage, 2);
-		pageTypeMap.put(pageType.deratePage, 3);
-		pageTypeMap.put(pageType.processPage, 4);
-	}
+	//@Value("${ht.alms.default.pagePermission}")
+	private String pagePermission = "{\"hasOverAllRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeHourseBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasAreaRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeCarBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasMyFollowUp \":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasFinanceOrderSetAreaRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false}}";
+	
+	//@Value("${ht.appCode}")
+	private String appCode = "ALMS";
 	
     @Autowired
     @Qualifier("SysRoleService")
@@ -115,7 +110,7 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
     
 	@Autowired
 	private UcAppRemote ucAppRemote;
-	
+    
     @Autowired
     private Executor msgThreadAsync;
     
@@ -125,147 +120,74 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
      */
     @Transient
     public void setUserPermissons(String userId){
-
-//        List<SysUserRole> userRoles = sysUserRoleService.selectList(new EntityWrapper<SysUserRole>().eq("user_id",userId));
-//
-//        List<String> roleCodes = new LinkedList<String>();
-//
-//        for( SysUserRole uRole: userRoles){
-//            roleCodes.add(uRole.getRoleCode());
-//        }
-//
-//        List<SysRole> roles = sysRoleService.selectList(new EntityWrapper<SysRole>().in("role_code",roleCodes));
-
-        //查出用户权限列表
-        List<SysRole> roles = sysRoleService.getUserRoles(userId);
-
-        //拥有全局性角色标志位
-        Boolean hasOverAllRole = false;
-
-        //拥有区域性角色标志位
-        Boolean hasAreaRole = false;
-
-        //拥有财务跟单设置区域性角色标志位
-        Boolean  hasFinanceOrderSetAreaRole = false;
-
-        //拥有车贷业务查看角色标志位(车贷出纳)
-        Boolean hasSeeCarBizRole = false;
-
-        //拥有房贷业务查看角色标志位(房贷出纳)
-        Boolean hasSeeHourseBizRole =false;
-
-        //确认用户拥有的权限访问数据的区域类型
-        SysRoleAreaTypeEnums userAreaTypeEnums = SysRoleAreaTypeEnums.ONLY_SELF;
-
-        RoleAreaMethodEnum roleAreaMethodEnum = RoleAreaMethodEnum.NULL_Area;
-        for(SysRole role: roles){
-            //全局性
-            if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.OVERALL.getKey())){
-                hasOverAllRole = true;
-            }else {
-            //区域性
-	            if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.AREA.getKey())){
-	                if(role.getRoleAreaMethod().equals(RoleAreaMethodEnum.FINANCIAL_ORDER.value())){
-	                    //拥有财务跟单设置区域性角色标
-	                    hasFinanceOrderSetAreaRole = true;
-	                }else{
-	                    //根据用户区域设置区域性角色
-	                    hasAreaRole = true;
-	                }
-	            }
-	            
-	            //查看车贷业务
-	            if(role.getPageType().equals(SysRoleAreaTypeEnums.SEE_CAR_BUSINESS.getKey())){
-	                hasSeeCarBizRole = true;
-	            }
-	
-	            //查看房贷业务
-	            if(role.getPageType().equals(SysRoleAreaTypeEnums.SEE_HOURSE_BUSINESS.getKey())){
-	                hasSeeHourseBizRole = true;
-	            }
-            }
-
-        }
-
-        //贷后管理页面   可见的业务列表
-        List<String>  dhManagerBusinessIds = new LinkedList<>();
-
-        //财务管理页面  可见的业务列表
-        List<String> financeManagerBusinessIds = new LinkedList<>();
-
-        //减免管理页面  可见的业务列表
-        List<String> derateManagerBusinessIds = new LinkedList<>();
-
-        //审批查询页面  可见的业务列表
-        List<String> processManagerBusinessIds = new LinkedList<>();
-
-        if(hasOverAllRole){
-            //拥有全局性角色
-            dhManagerBusinessIds = basicBusinessService.selectAllBusinessIds();
-            financeManagerBusinessIds = dhManagerBusinessIds;
-            derateManagerBusinessIds = dhManagerBusinessIds;
-            processManagerBusinessIds = dhManagerBusinessIds;
-        }else{
-            if(hasAreaRole){
-                //拥有区域性角色
+    	
+    	JSONObject pagePermissionJSONObject = JSONObject.parseObject(pagePermission);
+    	pagePermissionJSONObject.getJSONObject("pageName").get("page0");
+    	
+    	updatePagePermission(pagePermissionJSONObject,userId);
+    	MyPermissionIdsInfo myPermissionIdsInfo = new MyPermissionIdsInfo();
+    	
+    	for(String key : pagePermissionJSONObject.keySet()){
+    		JSONObject pagePermission = pagePermissionJSONObject.getJSONObject(key);
+    		switch (key) {
+			case "hasOverAllRole":
+				
+				break;
+			case "hasAreaRole":
+				//拥有区域性角色
                 Map<String,BasicCompany> companyIds  = basicCompanyService.selectAreaUserCanSeeCompany(userId);
-                List<String>  tempBizs = basicBusinessService.selectCompanysBusinessIds(new LinkedList<>(companyIds.keySet()));
-                dhManagerBusinessIds.addAll(tempBizs);
-                derateManagerBusinessIds.addAll(tempBizs);
-            }
-
-            if(hasFinanceOrderSetAreaRole){
-                //拥有财务跟单设置区域性角色
+                List<String> tempBizs = basicBusinessService.selectCompanysBusinessIds(new LinkedList<>(companyIds.keySet()));
+                myPermissionIdsInfo.updatePagePermissionList(tempBizs,pagePermission);
+                break;
+			case "hasFinanceOrderSetAreaRole":
+				//拥有财务跟单设置区域性角色
                 //查找本用户id在财务跟单设置中配置的可访问的business zgh
                 //从财务跟单配置中查询本用户可访问的分公司id及业务类型
                 Page<SysFinancialOrderVO> financialOrderVOPage = sysFinancialOrderService.search(new Page<>(1, Integer.MAX_VALUE), null, null, null, userId);
                 if (financialOrderVOPage != null && financialOrderVOPage.getRecords() != null && financialOrderVOPage.getRecords().size() > 0) {
                     for (SysFinancialOrderVO fo : financialOrderVOPage.getRecords()) {
                         List<String> tempBusinessIds = basicBusinessService.findBusinessIds(fo.getCompanyId(), fo.getBusinessTypeId());
-                        financeManagerBusinessIds.addAll(tempBusinessIds);
+                        myPermissionIdsInfo.updatePagePermissionList(tempBusinessIds,pagePermission);
                     }
                 }
-            }
-
-            if(hasSeeCarBizRole){
-                //拥有车贷业务查看角色(车贷出纳)
-                List<String>  tempBizs = basicBusinessService.selectCarBusinessIds();
-                derateManagerBusinessIds.addAll(tempBizs);
-            }
-
-            if(hasSeeHourseBizRole){
-                //拥有房贷业务查看角色(房贷出纳)
-                List<String>  tempBizs = basicBusinessService.selectHouseBusinessIds();
-                derateManagerBusinessIds.addAll(tempBizs);
-            }
-
-            //查找用户跟进的业务ID(根据催收分配表  tb_collection_status 来查找)
-            List<String> followBids =  collectionStatusService.selectFollowBusinessIds(userId);
-            dhManagerBusinessIds.addAll(followBids);
-        }
-        //去除重复的业务Id
-        dhManagerBusinessIds = removeDuplicateBizIds(dhManagerBusinessIds);
-        financeManagerBusinessIds = removeDuplicateBizIds(financeManagerBusinessIds);
-        derateManagerBusinessIds = removeDuplicateBizIds(derateManagerBusinessIds);
-        processManagerBusinessIds = removeDuplicateBizIds(processManagerBusinessIds);
+				break;
+			case "hasSeeCarBizRole":
+				//拥有车贷业务查看角色(车贷出纳)
+                List<String>  tempCarBizs = basicBusinessService.selectCarBusinessIds();
+                myPermissionIdsInfo.updatePagePermissionList(tempCarBizs,pagePermission);
+				break;
+			case "hasSeeHourseBizRole":
+				//拥有房贷业务查看角色(房贷出纳)
+                List<String>  tempHourseBizs = basicBusinessService.selectHouseBusinessIds();
+                myPermissionIdsInfo.updatePagePermissionList(tempHourseBizs,pagePermission);
+				break;
+			case "hasMyFollowUp":
+				//查找用户跟进的业务ID(根据催收分配表  tb_collection_status 来查找)
+	            List<String> followBids =  collectionStatusService.selectFollowBusinessIds(userId);
+	            myPermissionIdsInfo.updatePagePermissionList(followBids,pagePermission);
+				break;
+			default:
+				break;
+			}
+    	}
 
         //删除原来用户的可看业务信息
         sysUserPermissionService.delete(new EntityWrapper<SysUserPermission>().eq("user_id",userId));
 
+        //组装权限数据到permissions
         List<SysUserPermission> permissions = new ArrayList<>();
-        if(hasAreaRole) {
-        	permissions = fillSysUserPermission(permissions,dhManagerBusinessIds,userId,pageTypeMap.get(pageType.managePage));
-        }
-		if(hasSeeCarBizRole || hasSeeHourseBizRole || hasAreaRole) {
-			permissions = fillSysUserPermission(permissions,derateManagerBusinessIds,userId,pageTypeMap.get(pageType.deratePage));
-		}
-		if(hasFinanceOrderSetAreaRole) {
-			permissions = fillSysUserPermission(permissions,financeManagerBusinessIds,userId,pageTypeMap.get(pageType.financePage));
-		}
-          
-        //新增对应关系
+        fillSysUserPermission(permissions, removeDuplicateBizIds(myPermissionIdsInfo.getPage1List()), userId, 1);
+        fillSysUserPermission(permissions, removeDuplicateBizIds(myPermissionIdsInfo.getPage2List()), userId, 2);
+        fillSysUserPermission(permissions, removeDuplicateBizIds(myPermissionIdsInfo.getPage3List()), userId, 3);
+        fillSysUserPermission(permissions, removeDuplicateBizIds(myPermissionIdsInfo.getPage4List()), userId, 4);
+        fillSysUserPermission(permissions, removeDuplicateBizIds(myPermissionIdsInfo.getPage5List()), userId, 5);
+        fillSysUserPermission(permissions, removeDuplicateBizIds(myPermissionIdsInfo.getPage6List()), userId, 6);
+        fillSysUserPermission(permissions, removeDuplicateBizIds(myPermissionIdsInfo.getPage7List()), userId, 7);
+        fillSysUserPermission(permissions, removeDuplicateBizIds(myPermissionIdsInfo.getPage8List()), userId, 8);
+        fillSysUserPermission(permissions, removeDuplicateBizIds(myPermissionIdsInfo.getPage9List()), userId, 9);
+        
+        //新增对应关系,多线程插入
         if(!permissions.isEmpty()){
-        	//sysUserPermissionService.insertBatch(permissions,10000);
         	for(int i = 0;i < permissions.size();i=i+10000) {
 				int j = i+10000;
 				if(j >= permissions.size() ) {
@@ -282,14 +204,55 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
         }
     }
 
-    private List<SysUserPermission> fillSysUserPermission(List<SysUserPermission> permissions,List<String> derateManagerBusinessIds,String userId,int pageType) {
+
+	private JSONObject updatePagePermission(JSONObject pagePermissionJSONObject,String userId) {
+    	 //查出用户权限列表
+        List<SysRole> roles = sysRoleService.getUserRoles(userId);
+
+        for(SysRole role: roles){
+            //全局性
+        	String jsonKey = "page"+role.getPageType();
+            if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.OVERALL.getKey())){
+            	pagePermissionJSONObject.getJSONObject("hasOverAllRole").put(jsonKey, true);
+            } else {
+            //区域性
+	            if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.AREA.getKey())){
+                    //根据用户区域设置区域性角色
+                	pagePermissionJSONObject.getJSONObject("hasAreaRole").put(jsonKey, true);
+	            }
+            
+	            if(role.getRoleAreaMethod().equals(SysRoleAreaTypeEnums.SEE_FINANCE_BUSINESS.getKey())){
+	                //拥有财务跟单设置区域性角色标
+	            	pagePermissionJSONObject.getJSONObject("hasFinanceOrderSetAreaRole").put(jsonKey, true);
+	            }
+	            
+	            //查看车贷业务
+	            if(role.getPageType().equals(SysRoleAreaTypeEnums.SEE_CAR_BUSINESS.getKey())){
+	            	pagePermissionJSONObject.getJSONObject("hasSeeCarBizRole").put(jsonKey, true);
+	            }
+	
+	            //查看房贷业务
+	            if(role.getPageType().equals(SysRoleAreaTypeEnums.SEE_HOURSE_BUSINESS.getKey())){
+	            	pagePermissionJSONObject.getJSONObject("hasSeeHourseBizRole").put(jsonKey, true);
+	            }
+	            
+	            //查看自己跟进
+	            if(role.getPageType().equals(SysRoleAreaTypeEnums.ONLY_SELF.getKey())){
+	            	pagePermissionJSONObject.getJSONObject("hasMyFollowUp").put(jsonKey, true);
+	            }
+            }
+
+        }
+        return pagePermissionJSONObject;
+    }
+
+	private List<SysUserPermission> fillSysUserPermission(List<SysUserPermission> permissions,List<String> derateManagerBusinessIds,String userId,int pageType) {
     	for(String businessId:derateManagerBusinessIds){
 	          SysUserPermission permission = new SysUserPermission();
 	          permission.setBusinessId(businessId);
 	          permission.setUserId(userId);
 	          permission.setPageType(pageType);
 	          permissions.add(permission);
-	         //System.err.println(JSONObject.toJSONString(permissions));
     	}
     	return permissions;
     }
@@ -456,6 +419,7 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
 		userInfo.setUserId(userId);
 		userInfo.setUserName(sysUser.getUserName());
 		userInfo.setOrgCode(sysUser.getOrgCode());
+		userInfo.setRoleCodes(ucAppRemote.getUserRole(userId));
 		updateUserPermision(userInfo);
 	}
 
@@ -467,7 +431,9 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
 		userInfo.setUserId(userId);
 		userInfo.setUserName(sysUser.getUserName());
 		userInfo.setOrgCode(sysUser.getOrgCode());
+		userInfo.setRoleCodes(ucAppRemote.getUserRole(userId));
 		updateUserPermision(userInfo);
 	}
 
 }
+

@@ -35,6 +35,8 @@ public class ApplyDerateListSearchReq extends PageRequest{
 //    private String   derateMoneyEndStr	;  //减免金额 结束
 
     private String userId;
+    
+    private Integer needPermission = 1; 
 
     public String getUserId() {
         return userId;
@@ -117,6 +119,14 @@ public class ApplyDerateListSearchReq extends PageRequest{
         this.derateMoneyEnd = derateMoneyEnd;
     }
 
+	public Integer getNeedPermission() {
+		return needPermission;
+	}
+
+	public void setNeedPermission(Integer needPermission) {
+		this.needPermission = needPermission;
+	}
+    
 //    public String getDerateMoneyBeginStr() {
 //        return derateMoneyBeginStr;
 //    }

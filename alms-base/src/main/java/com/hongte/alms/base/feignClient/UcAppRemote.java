@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.hongte.alms.base.vo.user.BoaInRoleInfoDto;
+import com.hongte.alms.base.vo.user.BoaInRoleInfo;
 import com.hongte.alms.base.vo.user.SelfBoaInUserInfo;
 import com.ht.ussp.core.Result;
 
@@ -28,6 +28,6 @@ public interface UcAppRemote {
 	
 	@RequestMapping(value = "/userrole/getUserRole", headers = { "app=ALMS",
 	"content-type=application/json" }, method = RequestMethod.GET)
-	List<BoaInRoleInfoDto> getUserRole(@RequestParam(value="userId") String userId);
+	List<BoaInRoleInfo> getUserRole(@RequestParam(value="userId") String userId);
 	
 }

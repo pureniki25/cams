@@ -48,6 +48,14 @@ public class SysRole extends Model<SysRole> {
 		return roleCode;
 	}
 
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
 	public void setRoleCode(String roleCode) {
 		this.roleCode = roleCode;
 	}

@@ -7,16 +7,19 @@ package com.hongte.alms.base.enums;
  */
 public enum SysUPermissionPageTypeEnums {
 
-	DH_MANGER(1,"贷后管理页")
-	,FINANCE_MANAGER(2,"财务管理页面")
-	,DERATE_MANAGER(3,"减免管理页面")
-	,PROCESS_MANAGER(4,"审批查询界面")
+	DAIHOU(1,"贷后管理列表")
+	,CAR(2,"车辆管理列表")
+	,DERATE(3,"减免管理列表")
+	,WITHHOLD(4,"代扣管理列表")
+	,WITHHOLD_QUERY(5,"代扣查询列表")
+	,AUDIT(6,"审批查询列表")
+	,DEFER(7,"展期管理列表")
+	,MESSAGE(8,"消息管理列表")
+	,FINANCE(9,"财务管理列表")
 	;
-
 
 	private Integer key; // 数据保存的值
 	private String name; // 名称
-
 
 	private SysUPermissionPageTypeEnums(Integer key, String name ) {
 		this.name = name;
@@ -31,17 +34,15 @@ public enum SysUPermissionPageTypeEnums {
 			}
 		}
 		return null;
-
 	}
 
 	public static SysUPermissionPageTypeEnums getByKey(String key){
 		for(SysUPermissionPageTypeEnums d : SysUPermissionPageTypeEnums.values()){
-			if(d.key.equals(key)){
+			if(d.key == Integer.parseInt(key)){
 				return d;
 			}
 		}
 		return null;
-
 	}
 
 	public static Integer keyOf(String name){
@@ -58,15 +59,8 @@ public enum SysUPermissionPageTypeEnums {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public Integer getKey() {
 		return key;
 	}
 
-	public void setKey(Integer key) {
-		this.key = key;
-	}
 }

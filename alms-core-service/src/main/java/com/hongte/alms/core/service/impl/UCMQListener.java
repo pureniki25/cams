@@ -98,7 +98,7 @@ public class UCMQListener {
 		JSONObject addInfoObj = jsonObject.getJSONObject("addUserRole");
 		sysUserPermissionService.addUserRole(addInfoObj.getString("userId"));
 	}
-
+ 
 	private void delUserRole(JSONObject jsonObject) {
 		JSONObject delInfoObj = jsonObject.getJSONObject("delUserRole");
 		sysUserPermissionService.delUserRole(delInfoObj.getString("userId"));

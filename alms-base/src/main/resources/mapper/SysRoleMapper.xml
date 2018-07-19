@@ -22,7 +22,7 @@
 
         SELECT
         role.role_code as role_code,role.role_name as role_name,role.role_area_type AS role_area_type,
-        role.role_area_method as roleAreaMethod
+        role.role_area_method as roleAreaMethod,role.page_type AS page_type
         <!--      <include refid="Table_Column_List"></include>  -->
         FROM  tb_sys_role role
         JOIN tb_sys_user_role uRole  ON role.role_code = uRole.role_code
