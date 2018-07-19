@@ -530,7 +530,7 @@ public class RepayPlanController {
        List<BizDto> bizDtos = new LinkedList<>();
 
        for(String businessId:businessIds){
-           BizDto bizDto =getBizDtoByBizId(businessId);
+           BizDto bizDto =getBizDtoByBizId(businessId,req.getIsSettle());
            bizDtos.add(bizDto);
        }
         bizDtos=getPageList(bizDtos, req.getPageSize(), req.getCurPageNo());
@@ -594,7 +594,7 @@ public class RepayPlanController {
 
 
         //业务基本的还款计划信息
-        BizDto bizDto =getBizDtoByBizId(businessId);
+        BizDto bizDto =getBizDtoByBizId(businessId,null);
 
         List<RepaymentBizPlan> bizPlans = repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("original_business_id",businessId));
 
@@ -617,7 +617,7 @@ public class RepayPlanController {
         List<BizDto> renewBizDtos = new LinkedList<>();
         bizDto.setRenewBizs(renewBizDtos);
         for(String renewBizId:bizPlanMap.keySet()){
-            BizDto renewBizDto =getBizDtoByBizId(renewBizId);
+            BizDto renewBizDto =getBizDtoByBizId(renewBizId,null);
             renewBizDtos.add(renewBizDto);
         }
 
@@ -649,7 +649,7 @@ public class RepayPlanController {
            return Result.error("9889","未找到对应的还款计划");
        }
 
-        BizDto bizDto =  getBizDtoByBizId(bizPlan.getBusinessId());
+        BizDto bizDto =  getBizDtoByBizId(bizPlan.getBusinessId(),null);
 
         BizPlanDto  bizPlanDto  = getBizPlanDtoByBizPlan(bizPlan);
         bizPlanDto.setBusinessType(bizDto.getBusinessType());
@@ -749,7 +749,7 @@ public class RepayPlanController {
      * @param businessId
      * @return
      */
-    private BizDto getBizDtoByBizId(String businessId){
+    private BizDto getBizDtoByBizId(String businessId,Integer isSettle){
         BizDto bizDto = new BizDto();
 
         BasicBusiness business = basicBusinessService.selectById(businessId);
@@ -802,12 +802,24 @@ public class RepayPlanController {
         }else{
             bizDto.setInputTime(business.getInputTime());
         }
-
-
-
-        List<RepaymentBizPlan> bizPlans = repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",businessId));
-        List<RepaymentProjPlan> projPlans = repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("business_id",businessId));
-        if(bizPlans!=null && bizPlans.size()>0){
+        List<RepaymentProjPlan> projPlans=null;
+        List<RepaymentBizPlan> bizPlans=null;
+        if(isNiwoFlag) {
+        	  if(isSettle!=null&&isSettle==1) {//过滤结清数据
+        	    projPlans = repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("business_id",businessId).ne("plan_status", 10).ne("plan_status", 20).ne("plan_status", 30));
+        	  }else {
+        	 	projPlans = repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("business_id",businessId));
+        	  }
+        }else {
+        	 if(isSettle!=null&&isSettle==1) {//过滤结清数据
+        	     bizPlans = repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",businessId).ne("plan_status", 10).ne("plan_status", 20).eq("plan_status", 30));
+         	  }else {
+         	     bizPlans = repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",businessId));
+         	  }
+      	
+        }
+        
+        if((bizPlans!=null && bizPlans.size()>0)||(projPlans!=null&&projPlans.size()>0)){
             List<BizPlanDto> bizPlanDtos = new LinkedList<>();
             bizDto.setPlanDtoList(bizPlanDtos);
      
