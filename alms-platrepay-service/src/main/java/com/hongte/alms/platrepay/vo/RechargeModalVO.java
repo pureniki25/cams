@@ -13,7 +13,7 @@ public class RechargeModalVO implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * 充值账户类型（1、车贷；2、房贷；3、扶贫贷；4、闪贷业务；5、车全业务；6、二手车业务；7、一点车贷；8、信用贷）
+	 * 充值账户类型（1、车贷；2、房贷；3、扶贫贷；4、车全业务；5、二手车业务；6、一点车贷；7、商贸贷；8、业主贷；9、家装分期；10、商贸贷共借；11、业主贷共借）
 	 */
 	private String rechargeAccountType;
 	/**

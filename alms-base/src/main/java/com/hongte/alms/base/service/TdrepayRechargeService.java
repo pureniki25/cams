@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.hongte.alms.base.entity.AgencyRechargeLog;
+import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.vo.compliance.DistributeFundRecordVO;
 import com.hongte.alms.base.vo.compliance.RechargeRecordReq;
@@ -41,22 +42,11 @@ public interface TdrepayRechargeService {
 	void tdrepayRecharge(List<TdrepayRechargeInfoVO> vos);
 
 	/**
-	 * 根据代充值账户类型获取 出款方账号
-	 * 
+	 * 根据代充值账户类型获取参数配置
 	 * @param rechargeAccountType
-	 *            代充值账户类型
 	 * @return
 	 */
-	String handleAccountType(String rechargeAccountType);
-
-	/**
-	 * 根据代充值账户类型获取 资产端账户唯一编号
-	 * 
-	 * @param rechargeAccountType
-	 *            代充值账户类型
-	 * @return
-	 */
-	String handleOIdPartner(String rechargeAccountType);
+	SysParameter queryRechargeAccountSysParams(String rechargeAccountType);
 	
 	/**
 	 * 根据代充值账户类型获取 资产端机构用户名(资产端在团贷网的账户对应的用户名)

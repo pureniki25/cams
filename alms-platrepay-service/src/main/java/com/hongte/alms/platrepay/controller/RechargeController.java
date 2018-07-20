@@ -3,8 +3,11 @@ package com.hongte.alms.platrepay.controller;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -25,7 +28,8 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.dto.RechargeModalDTO;
 import com.hongte.alms.base.entity.AgencyRechargeLog;
 import com.hongte.alms.base.entity.DepartmentBank;
-import com.hongte.alms.base.enums.RechargeAccountTypeEnums;
+import com.hongte.alms.base.entity.SysParameter;
+import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.service.AgencyRechargeLogService;
 import com.hongte.alms.base.service.DepartmentBankService;
@@ -43,12 +47,12 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping("/recharge")
 public class RechargeController {
 	private static final Logger LOG = LoggerFactory.getLogger(RechargeController.class);
-	
+
 	private static final String INVALID_PARAM_CODE = "-9999";
 	private static final String INVALID_PARAM_DESC = " Parameters cannot be null";
 
 	@Autowired
-	private EipRemote eipRemote;
+	private EipRemote eipRemote; 
 
 	@Autowired
 	private LoginUserInfoHelper loginUserInfoHelper;
@@ -56,7 +60,7 @@ public class RechargeController {
 	@Autowired
 	@Qualifier("AgencyRechargeLogService")
 	private AgencyRechargeLogService agencyRechargeLogService;
-	
+
 	@Autowired
 	@Qualifier("TdrepayRechargeService")
 	private TdrepayRechargeService tdrepayRechargeService;
@@ -77,6 +81,47 @@ public class RechargeController {
 		}
 	}
 
+	@ApiOperation(value = "获取所有代充值账户类型")
+	@GetMapping("/queryRechargeAccountTypes")
+	@ResponseBody
+	public Result<List<Map<String, Object>>> queryRechargeAccountTypes() {
+		try {
+			List<Map<String, Object>> resultList = new LinkedList<>();
+			Set<Integer> rechargeAccountIdSet = new HashSet<>();
+			BusinessTypeEnum[] businessTypeEnums = BusinessTypeEnum.values();
+			for (BusinessTypeEnum businessTypeEnum : businessTypeEnums) {
+				if (businessTypeEnum.rechargeAccountId() == -1) {
+					continue;
+				}
+				rechargeAccountIdSet.add(businessTypeEnum.rechargeAccountId());
+			}
+
+			for (Integer rechargeAccountId : rechargeAccountIdSet) {
+				Map<String, Object> resultMap = new HashMap<>();
+				resultMap.put("rechargeAccountId", rechargeAccountId);
+				resultMap.put("rechargeAccountName",
+						BusinessTypeEnum.getRechargeAccountNameByRechargeAccountId(rechargeAccountId));
+				resultList.add(resultMap);
+			}
+			return Result.success(resultList);
+		} catch (Exception e) {
+			LOG.error("获取所有的线下还款账户失败", e);
+			return Result.error("500", "获取所有的线下还款账户失败！");
+		}
+	}
+	
+	@ApiOperation(value = "根据业务类型ID获取所有代充值账户类型")
+	@GetMapping("/queryRechargeAccountTypeByBusinessType")
+	@ResponseBody
+	public Result<String> queryRechargeAccountTypeByBusinessType(@RequestParam("businessType") Integer businessType) {
+		try {
+			return Result.success(BusinessTypeEnum.getRechargeAccountName(businessType));
+		} catch (Exception e) {
+			LOG.error("获取所有的线下还款账户失败", e);
+			return Result.error("500", "获取所有的线下还款账户失败！");
+		}
+	}
+
 	@SuppressWarnings("rawtypes")
 	@ApiOperation(value = "查询代充值账户余额")
 	@GetMapping("/queryUserAviMoney")
@@ -85,17 +130,23 @@ public class RechargeController {
 
 		Map<String, Object> paramMap = new HashMap<>();
 
-		String userId = tdrepayRechargeService.handleAccountType(rechargeAccountType);
+		
+		SysParameter sysParameter = tdrepayRechargeService.queryRechargeAccountSysParams(rechargeAccountType);
+		if (sysParameter == null) {
+			return Result.error("没有找到代充值账户的参数配置");
+		}
+
+		String userId = sysParameter.getParamValue();
 
 		paramMap.put("userId", userId);
-		
+
 		com.ht.ussp.core.Result result = null;
 		try {
 			result = eipRemote.queryUserAviMoney(paramMap);
 		} catch (Exception e) {
 			return Result.error("500", "调用外联平台查询代充值账户余额接口失败！");
 		}
-		
+
 		return Result.success(result);
 	}
 
@@ -106,7 +157,7 @@ public class RechargeController {
 	public Result commitRechargeData(@RequestBody RechargeModalVO vo) {
 
 		if (vo == null) {
-			return Result.error("500", "不能空数据！");
+			return Result.error("不能空数据！");
 		}
 
 		vo.setClientIp(CommonUtil.getClientIp());
@@ -114,24 +165,27 @@ public class RechargeController {
 
 		String rechargeAccountType = vo.getRechargeAccountType();
 
-		String rechargeUserId = tdrepayRechargeService.handleAccountType(rechargeAccountType);
-
-		String oIdPartner = tdrepayRechargeService.handleOIdPartner(rechargeAccountType);
-		if (StringUtil.isEmpty(rechargeUserId)) {
-			return Result.error("500", "没有找到代充值账户用户ID");
+		SysParameter sysParameter = tdrepayRechargeService.queryRechargeAccountSysParams(rechargeAccountType);
+		if (sysParameter == null) {
+			return Result.error("没有找到代充值账户的参数配置");
 		}
-		
+
+		String rechargeUserId = sysParameter.getParamValue();
+		String oIdPartner = sysParameter.getParamValue2();
+
 		vo.setRechargeUserId(rechargeUserId);
 		vo.setOperator(loginUserInfoHelper.getUserId());
 
-		Result rechargeAmount = rechargeAmount(vo, oIdPartner);
-		LOG.info(JSONObject.toJSONString(rechargeAmount));
-		return rechargeAmount;
+		Result reuslt = rechargeAmount(vo, oIdPartner);
+		String resultJson = JSONObject.toJSONString(reuslt);
+		LOG.info("平台代充值接口返回结果：{}", resultJson);
+		return reuslt;
 
 	}
 
 	/**
 	 * 充值金额
+	 * 
 	 * @param vo
 	 * @param clientIp
 	 * @param rechargeUserId
@@ -152,15 +206,14 @@ public class RechargeController {
 		dto.setoIdPartner(oIdPartner);
 		dto.setRechargeUserId(vo.getRechargeUserId());
 
-		
 		AgencyRechargeLog agencyRechargeLog = handleAgencyRechargeLog(vo, cmOrderNo, dto, oIdPartner);
-		
+
 		agencyRechargeLogService.insert(agencyRechargeLog);
-		
+
 		com.ht.ussp.core.Result result = null;
-		
+
 		try {
-			
+
 			result = eipRemote.agencyRecharge(dto);
 
 			if (result == null) {
@@ -171,15 +224,15 @@ public class RechargeController {
 			handleUpdateLogFail(cmOrderNo, agencyRechargeLog);
 			LOG.error("提交充值数据失败", e);
 			return Result.error("500", "提交充值数据失败！");
-		}		
-		
+		}
+
 		try {
 			if ("0000".equals(result.getReturnCode())) {
-				
+
 				agencyRechargeLog.setResultJson(JSONObject.toJSONString(result));
 				agencyRechargeLog.setUpdateTime(new Date());
 				agencyRechargeLog.setUpdateUser(loginUserInfoHelper.getUserId());
-				
+
 				agencyRechargeLogService.update(agencyRechargeLog,
 						new EntityWrapper<AgencyRechargeLog>().eq("cm_order_no", cmOrderNo));
 				return Result.success(result);
@@ -204,8 +257,8 @@ public class RechargeController {
 				new EntityWrapper<AgencyRechargeLog>().eq("cm_order_no", cmOrderNo));
 	}
 
-	private AgencyRechargeLog handleAgencyRechargeLog(RechargeModalVO vo, String cmOrderNo,
-			RechargeModalDTO dto, String oIdPartner) {
+	private AgencyRechargeLog handleAgencyRechargeLog(RechargeModalVO vo, String cmOrderNo, RechargeModalDTO dto,
+			String oIdPartner) {
 		AgencyRechargeLog agencyRechargeLog = new AgencyRechargeLog();
 		agencyRechargeLog.setOrigBusinessId(vo.getOrigBusinessId());
 		agencyRechargeLog.setAfterId(vo.getAfterId());
@@ -216,7 +269,8 @@ public class RechargeController {
 		agencyRechargeLog.setClientIp(vo.getClientIp());
 		agencyRechargeLog.setoIdPartner(dto.getoIdPartner());
 		agencyRechargeLog.setRechargeAccountBalance(
-				BigDecimal.valueOf(vo.getRechargeAccountBalance() == null ? 0 : vo.getRechargeAccountBalance()).setScale(2, BigDecimal.ROUND_HALF_UP));
+				BigDecimal.valueOf(vo.getRechargeAccountBalance() == null ? 0 : vo.getRechargeAccountBalance())
+						.setScale(2, BigDecimal.ROUND_HALF_UP));
 		agencyRechargeLog.setRechargeAccountType(vo.getRechargeAccountType());
 		agencyRechargeLog
 				.setRechargeAmount(BigDecimal.valueOf(vo.getRechargeAmount() == null ? 0 : vo.getRechargeAmount()));
@@ -248,7 +302,7 @@ public class RechargeController {
 			return Result.error("500", "查询充值订单失败！");
 		}
 	}
-	
+
 	@SuppressWarnings("rawtypes")
 	@ApiOperation(value = "对外提供充值接口")
 	@PostMapping("/rechargeAmount")
@@ -259,9 +313,9 @@ public class RechargeController {
 			if (vo == null) {
 				return Result.error(INVALID_PARAM_CODE, INVALID_PARAM_DESC);
 			}
-			
+
 			LOG.info("接收参数：{}", vo);
-			
+
 			if (StringUtil.isEmpty(vo.getRechargeAccountType())) {
 				return Result.error(INVALID_PARAM_CODE, "rechargeAccountType" + INVALID_PARAM_DESC);
 			}
@@ -293,15 +347,20 @@ public class RechargeController {
 				return Result.error(INVALID_PARAM_CODE, "operator" + INVALID_PARAM_DESC);
 			}
 
-			String oIdPartner = tdrepayRechargeService.handleOIdPartner(RechargeAccountTypeEnums.getName(Integer.valueOf(vo.getRechargeAccountType())));
-			
+			SysParameter sysParameter = tdrepayRechargeService.queryRechargeAccountSysParams(vo.getRechargeAccountType());
+			if (sysParameter == null) {
+				return Result.error("没有找到代充值账户的参数配置，请检查充值账户类型是否正确");
+			}
+
+			String oIdPartner = sysParameter.getParamValue2();
+
 			if (StringUtil.isEmpty(oIdPartner)) {
 				return Result.error(INVALID_PARAM_CODE, "找不到对应的商户号，请检查充值账户类型是否正确");
 			}
 			return rechargeAmount(vo, oIdPartner);
 		} catch (Exception e) {
 			LOG.error("查询充值订单失败", e);
-			return Result.error("500", "查询充值订单失败！");
+			return Result.error("查询充值订单失败！");
 		}
 	}
 }
