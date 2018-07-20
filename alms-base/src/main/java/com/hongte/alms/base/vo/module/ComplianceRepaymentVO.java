@@ -58,6 +58,8 @@ public class ComplianceRepaymentVO extends PageRequest implements Serializable {
 	 * 用户ID
 	 */
 	private String userId;
+	
+	private Integer needPermission = 1;
 
 	public Date getConfirmTimeStart() {
 		return confirmTimeStart;
@@ -145,6 +147,14 @@ public class ComplianceRepaymentVO extends PageRequest implements Serializable {
 
 	public void setUserId(String userId) {
 		this.userId = userId;
+	}
+	
+	public Integer getNeedPermission() {
+		return needPermission;
+	}
+
+	public void setNeedPermission(Integer needPermission) {
+		this.needPermission = needPermission;
 	}
 
 	@Override
