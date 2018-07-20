@@ -39,5 +39,12 @@ public interface SysParameterService extends BaseService<SysParameter> {
 
 
     Map<String,SysParameter> selectParameterMap(SysParameterTypeEnums enums);
+    
+    /**
+     * 根据代充值账户类型获取参数配置
+     * @param rechargeAccountType
+     * @return
+     */
+    SysParameter queryRechargeAccountSysParams(String rechargeAccountType);
 
 }

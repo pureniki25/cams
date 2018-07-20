@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +31,7 @@ import com.hongte.alms.base.dto.compliance.TdProjectPaymentInfoResult;
 import com.hongte.alms.base.dto.compliance.TdRefundMonthInfoDTO;
 import com.hongte.alms.base.entity.AgencyRechargeLog;
 import com.hongte.alms.base.entity.IssueSendOutsideLog;
+import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.entity.TdrepayAdvanceLog;
 import com.hongte.alms.base.entity.TdrepayRechargeDetail;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
@@ -41,6 +41,7 @@ import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.mapper.AgencyRechargeLogMapper;
 import com.hongte.alms.base.mapper.TdrepayRechargeLogMapper;
 import com.hongte.alms.base.service.IssueSendOutsideLogService;
+import com.hongte.alms.base.service.SysParameterService;
 import com.hongte.alms.base.service.TdrepayAdvanceLogService;
 import com.hongte.alms.base.service.TdrepayRechargeDetailService;
 import com.hongte.alms.base.service.TdrepayRechargeLogService;
@@ -93,43 +94,13 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 	@Autowired
 	private AgencyRechargeLogMapper agencyRechargeLogMapper;
+	
+	@Autowired
+	@Qualifier("SysParameterService")
+	private SysParameterService sysParameterService;
 
 	@Autowired
 	private EipRemote eipRemote;
-
-	@Value("${recharge.account.car.loan}")
-	private String carLoanUserId;
-	@Value("${recharge.account.house.loan}")
-	private String houseLoanUserId;
-	@Value("${recharge.account.relief.loan}")
-	private String reliefLoanUserId;
-	@Value("${recharge.account.quick.loan}")
-	private String quickLoanUserId;
-	@Value("${recharge.account.car.business}")
-	private String carBusinessUserId;
-	@Value("${recharge.account.second.hand.car.loan}")
-	private String secondHandCarLoanUserId;
-	@Value("${recharge.account.yi.dian.car.loan}")
-	private String yiDianCarLoanUserId;
-	@Value("${recharge.account.credit.loan}")
-	private String creditLoanUserId;
-
-	@Value("${recharge.account.car.loan.oid.partner}")
-	private String carLoanOidPartner;
-	@Value("${recharge.account.house.loan.oid.partner}")
-	private String houseLoanOidPartner;
-	@Value("${recharge.account.relief.loan.oid.partner}")
-	private String reliefLoanOidPartner;
-	@Value("${recharge.account.quick.loan.oid.partner}")
-	private String quickLoanOidPartner;
-	@Value("${recharge.account.car.business.loan.oid.partner}")
-	private String carBusinessOidPartner;
-	@Value("${recharge.account.second.hand.car.loan.oid.partner}")
-	private String secondHandCarLoanOidPartner;
-	@Value("${recharge.account.yi.dian.car.loan.oid.partner}")
-	private String yiDianCarLoanOidPartner;
-	@Value("${recharge.account.credit.loan.oid.partner}")
-	private String creditLoanOidPartner;
 
 	@SuppressWarnings("rawtypes")
 	@Transactional(rollbackFor = Exception.class)
@@ -357,11 +328,18 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		dto.setBatchId(batchId);
 		String rechargeAccountType = RechargeBusinessTypeEnums.getName(businessType);
 		
-		String oIdPartner = handleOIdPartner(rechargeAccountType);
+		SysParameter sysParameter = this.queryRechargeAccountSysParams(rechargeAccountType);
+		if (sysParameter == null) {
+			return Result.buildFail();
+		}
+		
+		String oIdPartner = sysParameter.getParamValue2();
 		dto.setOidPartner(oIdPartner);
 		String clientIp = CommonUtil.getClientIp();
 		dto.setUserIP(clientIp);
-		String logUserId = handleAccountType(rechargeAccountType);
+		
+		
+		String logUserId = sysParameter.getParamValue();
 		dto.setUserId(logUserId);
 
 		/*
@@ -487,87 +465,12 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		return map;
 	}
 
-
 	@Override
-	public String handleAccountType(String rechargeAccountType) {
-
-		String userId = null;
-
+	public SysParameter queryRechargeAccountSysParams(String rechargeAccountType) {
 		if (StringUtil.isEmpty(rechargeAccountType)) {
-			return userId;
+			return null;
 		}
-
-		switch (rechargeAccountType) {
-		case Constant.CAR_LOAN:
-			userId = carLoanUserId;
-			break;
-		case Constant.HOUSE_LOAN:
-			userId = houseLoanUserId;
-			break;
-		case Constant.POVERTY_ALLEVIATION_LOAN:
-			userId = reliefLoanUserId;
-			break;
-		case Constant.QUICK_LOAN:
-			userId = quickLoanUserId;
-			break;
-		case Constant.CHE_QUAN_LOAN:
-			userId = carBusinessUserId;
-			break;
-		case Constant.ER_SHOU_CHE_LOAN:
-			userId = secondHandCarLoanUserId;
-			break;
-		case Constant.YI_DIAN_LOAN:
-			userId = yiDianCarLoanUserId;
-			break;
-		case Constant.CREDIT_LOAN:
-			userId = creditLoanUserId;
-			break;
-		default:
-			userId = "";
-			break;
-		}
-		return userId;
-	}
-
-	@Override
-	public String handleOIdPartner(String rechargeAccountType) {
-
-		String oIdPartner = null;
-
-		if (StringUtil.isEmpty(rechargeAccountType)) {
-			return oIdPartner;
-		}
-
-		switch (rechargeAccountType) {
-		case Constant.CAR_LOAN:
-			oIdPartner = carLoanOidPartner;
-			break;
-		case Constant.HOUSE_LOAN:
-			oIdPartner = houseLoanOidPartner;
-			break;
-		case Constant.POVERTY_ALLEVIATION_LOAN:
-			oIdPartner = reliefLoanOidPartner;
-			break;
-		case Constant.QUICK_LOAN:
-			oIdPartner = quickLoanOidPartner;
-			break;
-		case Constant.CHE_QUAN_LOAN:
-			oIdPartner = carBusinessOidPartner;
-			break;
-		case Constant.ER_SHOU_CHE_LOAN:
-			oIdPartner = secondHandCarLoanOidPartner;
-			break;
-		case Constant.YI_DIAN_LOAN:
-			oIdPartner = yiDianCarLoanOidPartner;
-			break;
-		case Constant.CREDIT_LOAN:
-			oIdPartner = creditLoanOidPartner;
-			break;
-		default:
-			oIdPartner = "";
-			break;
-		}
-		return oIdPartner;
+		return sysParameterService.queryRechargeAccountSysParams(rechargeAccountType);
 	}
 
 	@Override
