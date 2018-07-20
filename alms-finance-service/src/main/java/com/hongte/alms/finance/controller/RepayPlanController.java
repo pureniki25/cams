@@ -812,7 +812,7 @@ public class RepayPlanController {
         	  }
         }else {
         	 if(isSettle!=null&&isSettle==1) {//过滤结清数据
-        	     bizPlans = repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",businessId).ne("plan_status", 10).ne("plan_status", 20).eq("plan_status", 30));
+        	     bizPlans = repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",businessId).ne("plan_status", 10).ne("plan_status", 20).ne("plan_status", 30));
          	  }else {
          	     bizPlans = repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",businessId));
          	  }
