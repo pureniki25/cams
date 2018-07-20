@@ -145,7 +145,7 @@ window.layinit(function (htConfig) {
                                 }
                             },
                             {
-                                fixed: 'right',
+                                // fixed: 'right',
                                 title: '操作',
                                 width: 178,
                                 align: 'left',
@@ -188,6 +188,11 @@ window.layinit(function (htConfig) {
                     });
 
 
+                    table.on('renderComplete(listTable)', function (obj) {
+                        layui.ht_auth.render("auth_scope");
+                    });
+
+                    layui.ht_auth.render('auth_scope');
                 })
             },
             shutdownLimit(id,status){

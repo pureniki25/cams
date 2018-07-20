@@ -48,10 +48,10 @@
                 </i-col>
             </row>
             <table id="role" lay-filter="role"></table>
-            <script type="text/html" id="barTools">
+            <div style="display: none; " id="barTools">
                 <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
                 <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</a>
-            </script>
+            </div>
 
             <Modal v-model="editModal.show">
                 <Card title="权限设置">
