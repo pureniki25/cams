@@ -43,7 +43,6 @@ public class LoginServiceImpl implements LoginService {
     @Qualifier("SysUserPermissionService")
     private SysUserPermissionService sysUserPermissionService;
 
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void saveloginInfo() {
@@ -56,8 +55,9 @@ public class LoginServiceImpl implements LoginService {
 //            sysUserPermissionService.setUserPermissons(dto.getUserId());
 //            return;
 //        }
-    
-        boolean fresh = false;//判断是否刷新任务设置
+       
+        //update by liuzq 权限优化，不需要在此刷新权限
+/*        boolean fresh = false;//判断是否刷新任务设置
         SysUser sysUser = sysUserService.selectOne(new EntityWrapper<SysUser>().eq("user_id",dto.getUserId()));
         if(sysUser == null){
             System.out.println(dto.getOrgCode()+":"+dto.getUserId()+":"+dto.getUserName());
@@ -122,7 +122,7 @@ public class LoginServiceImpl implements LoginService {
                 sysUserPermissionService.setUserPermissons(dto.getUserId());
                 return;
             }
-        }
+        }*/
 
     }
 

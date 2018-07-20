@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
 import com.hongte.alms.base.collection.enums.StaffPersonType;
@@ -116,6 +117,10 @@ public class CollectionController {
 
     @Autowired
     CollectionSynceToXindaiRemoteApi collectionRemoteApi;
+    
+    @Autowired
+    @Qualifier("SysUserRoleService")
+    SysUserRoleService sysUserRoleService;
 
 //    private final StorageService storageService;
 //
@@ -199,6 +204,15 @@ public class CollectionController {
 			}*/
             if(req.getRepayStatus()!=null&&req.getRepayStatus().equals(""))req.setRepayStatus(null);
             long startTime = System.currentTimeMillis();
+            
+            Wrapper<SysUserRole> wrapperSysUserRole = new EntityWrapper<SysUserRole>();
+            wrapperSysUserRole.eq("user_id",loginUserInfoHelper.getUserId());
+            wrapperSysUserRole.and(" role_code in (SELECT role_code FROM tb_sys_role WHERE role_area_type = 1 AND page_type = 1 ) ");
+            List<SysUserRole> userRoles = sysUserRoleService.selectList(wrapperSysUserRole);
+            if(null != userRoles && !userRoles.isEmpty()) {
+            	req.setNeedPermission(0);//全局用户 不需要验证权限
+            }
+            
             Page<AfterLoanStandingBookVo> pages = phoneUrgeService.selectAfterLoanStandingBookPage(req);
 //            System.out.println(JSON.toJSONString(pages));
             long end = System.currentTimeMillis();
@@ -226,6 +240,14 @@ public class CollectionController {
     public PageResult<List<AfterLoanStandingBookVo>> selectRepayManage(@ModelAttribute AfterLoanStandingBookReq req){
 
         try{
+	    	 Wrapper<SysUserRole> wrapperSysUserRole = new EntityWrapper<>();
+	         wrapperSysUserRole.eq("user_id",loginUserInfoHelper.getUserId());
+	         wrapperSysUserRole.and(" role_code in (SELECT role_code FROM tb_sys_role WHERE role_area_type = 1 AND page_type = 4 ) ");
+	         List<SysUserRole> userRoles = sysUserRoleService.selectList(wrapperSysUserRole);
+	         if(null != userRoles && !userRoles.isEmpty()) {
+	         	req.setNeedPermission(0);//全局用户 不需要验证权限
+	         }
+        	
             long startTime = System.currentTimeMillis();
             List<String> companyIds= sysUserAreaService.selectUserAreas(loginUserInfoHelper.getUserId());
             if(companyIds.size()>0) {

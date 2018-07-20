@@ -448,7 +448,7 @@ public class RechargeServiceImpl implements RechargeService {
 					return result;
 				}
 				WithholdingRepaymentLog log = recordRepaymentLog("", status, pList, business, bankCardInfo,
-						channel.getPlatformId(), boolLastRepay, boolPartRepay, merchOrderId,merchAccount, 0,
+						channel.getPlatformId(), boolLastRepay, boolPartRepay, merchOrderId,bankCardInfo.getPlatformUserID(), 0,
 						BigDecimal.valueOf(amount),appType);
 
 				BankRechargeReqDto dto = new BankRechargeReqDto();
@@ -763,7 +763,7 @@ public class RechargeServiceImpl implements RechargeService {
 
 	public WithholdingRepaymentLog recordRepaymentLog(String msg, Integer status, RepaymentBizPlanList list,
 			BasicBusiness business, BankCardInfo dto, Integer platformId, Integer boolLastRepay, Integer boolPartRepay,
-			String merchOrderId,String merchAccount ,Integer settlementType, BigDecimal currentAmount,String appType) {
+			String merchOrderId,String PlatformUserID ,Integer settlementType, BigDecimal currentAmount,String appType) {
 		WithholdingRepaymentLog log = new WithholdingRepaymentLog();
 		log.setAfterId(list.getAfterId());
 		log.setBankCard(dto.getBankCardNumber());
@@ -776,7 +776,7 @@ public class RechargeServiceImpl implements RechargeService {
 		log.setOriginalBusinessId(business.getBusinessId());
 		log.setPhoneNumber(dto.getMobilePhone());
 		log.setCustomerName(dto.getBankCardName());
-		log.setMerchantAccount(merchAccount);
+		log.setMerchantAccount(PlatformUserID);
 		log.setRepayStatus(status);
 		log.setRemark(msg);
 		log.setThirdOrderId(merchOrderId);

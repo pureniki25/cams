@@ -48,7 +48,7 @@ public class FinanceSettleBaseDto {
 
 //    private RepaymentBizPlanDto planDto=new RepaymentBizPlanDto();// 业务还款计划dto
 
-    private List<RepaymentBizPlanDto> planDtoList=new ArrayList<>();
+    private RepaymentBizPlanDto planDto;
 
     private RepaymentSettleLog repaymentSettleLog;
     private List<RepaymentBizPlanBak> repaymentBizPlanBaks=new ArrayList<>();

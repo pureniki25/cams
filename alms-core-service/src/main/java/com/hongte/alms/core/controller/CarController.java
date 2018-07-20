@@ -1,12 +1,11 @@
 package com.hongte.alms.core.controller;
 
-
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.assets.car.enums.CarStatusEnums;
 import com.hongte.alms.base.assets.car.service.CarService;
 import com.hongte.alms.base.assets.car.vo.*;
-import com.hongte.alms.base.assets.car.vo.AuctionsReq;
 import com.hongte.alms.base.baseException.AlmsBaseExcepiton;
 import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
 import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
@@ -17,7 +16,6 @@ import com.hongte.alms.base.enums.AuctionStatusEnums;
 import com.hongte.alms.base.process.entity.Process;
 import com.hongte.alms.base.process.entity.ProcessLog;
 import com.hongte.alms.base.process.entity.ProcessType;
-import com.hongte.alms.base.process.entity.ProcessTypeStep;
 import com.hongte.alms.base.process.enums.ProcessStatusEnums;
 import com.hongte.alms.base.process.enums.ProcessTypeEnums;
 import com.hongte.alms.base.process.service.ProcessLogService;
@@ -26,7 +24,6 @@ import com.hongte.alms.base.process.service.ProcessTypeService;
 import com.hongte.alms.base.process.service.ProcessTypeStepService;
 import com.hongte.alms.base.process.vo.ProcessSaveReq;
 import com.hongte.alms.base.service.BasicBusinessService;
-import com.hongte.alms.base.service.BizOutputPlanService;
 import com.hongte.alms.base.service.BizOutputRecordService;
 import com.hongte.alms.base.service.CarAuctionBidderService;
 import com.hongte.alms.base.service.CarAuctionRegService;
@@ -45,8 +42,7 @@ import com.hongte.alms.base.service.RepaymentBizPlanService;
 import com.hongte.alms.base.service.SysCityService;
 import com.hongte.alms.base.service.SysCountyService;
 import com.hongte.alms.base.service.SysProvinceService;
-import com.hongte.alms.base.vo.module.doc.DocUploadRequest;
-import com.hongte.alms.base.vo.module.doc.UpLoadResult;
+import com.hongte.alms.base.service.SysUserRoleService;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.EasyPoiExcelExportUtil;
 import com.hongte.alms.common.util.JsonUtil;
@@ -55,7 +51,6 @@ import com.hongte.alms.core.vo.modules.car.CarDragDoc;
 import com.hongte.alms.core.vo.modules.car.CarDragRegistrationBusinessVo;
 import com.hongte.alms.core.vo.modules.car.CarDragRegistrationInfo;
 import com.ht.ussp.bean.LoginUserInfoHelper;
-import com.ht.ussp.client.dto.BoaInRoleInfoDto;
 import com.ht.ussp.client.dto.LoginInfoDto;
 import com.ht.ussp.util.BeanUtils;
 import com.ht.ussp.util.DateUtil;
@@ -73,9 +68,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileNotFoundException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -196,6 +189,10 @@ public class CarController {
     @Autowired
     @Qualifier("CarAuctionBidderService")
     private CarAuctionBidderService carAuctionBidderService;
+    
+    @Autowired
+    @Qualifier("SysUserRoleService")
+    private SysUserRoleService sysUserRoleService;
 
 
     @Autowired
@@ -344,7 +341,14 @@ public class CarController {
     public PageResult<List<CarVo>> selectCarPage(@ModelAttribute CarReq req){
 
         try{
-
+        	 Wrapper<SysUserRole> wrapperSysUserRole = new EntityWrapper<SysUserRole>();
+             wrapperSysUserRole.eq("user_id",loginUserInfoHelper.getUserId());
+             wrapperSysUserRole.and(" role_code in (SELECT role_code FROM tb_sys_role WHERE role_area_type = 1 AND page_type = 2 ) ");
+             List<SysUserRole> userRoles = sysUserRoleService.selectList(wrapperSysUserRole);
+             if(null != userRoles && !userRoles.isEmpty()) {
+             	req.setNeedPermission(0);//全局用户 不需要验证权限
+             }
+        	
         	Page<CarVo>  page=carService.selectCarPage(req);
             return PageResult.success(page.getRecords(),page.getTotal());
         }catch (Exception ex){

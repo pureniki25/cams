@@ -1,7 +1,5 @@
 package com.hongte.alms.core.controller;
 
-
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -84,13 +82,19 @@ public class RepaymentBizPlanListSynchController {
 				// 3-10处理tb_money_pool_repayment表更新
 				synchMoneyPoolRepayment();
 
-				// 3-11处理
+				// 3-11处理tb_basic_business_type表更新
+				updateBasicBusinessType();
 				Long endLongDate = new Date().getTime();
 				System.err.println("同步结束,耗时：" + (endLongDate - startLongDate));
 			}
 		});
 
 		return Result.success();
+	}
+
+
+	protected void updateBasicBusinessType() {
+		repaymentBizPlanListSynchService.updateBasicBusinessType();
 	}
 
 

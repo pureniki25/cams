@@ -1,5 +1,6 @@
 package com.hongte.alms.base.mapper;
 
+import com.hongte.alms.base.RepayPlan.dto.RepaymentSettleMoneyDto;
 import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.base.dto.RepaymentPlanInfoDTO;
 import com.hongte.alms.base.dto.RepaymentProjInfoDTO;
@@ -130,4 +131,6 @@ public interface RepaymentBizPlanListMapper extends SuperMapper<RepaymentBizPlan
 	 * @return
 	 */
 	List<RepaymentBizPlanList> getPlanListForCalLateFee(@Param(value = "planListId") String planListId);
+
+    List<RepaymentSettleMoneyDto> selectProjPlanMoney(int flage, String businessId, Integer period);
 }

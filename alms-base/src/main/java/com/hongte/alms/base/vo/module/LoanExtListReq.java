@@ -1,7 +1,5 @@
 package com.hongte.alms.base.vo.module;
 
-import java.util.Date;
-
 import com.hongte.alms.common.vo.PageRequest;
 
 import io.swagger.annotations.ApiModel;
@@ -18,4 +16,6 @@ public class LoanExtListReq extends PageRequest{
 	private String customer ;
 	private String businessType ;
 	private String extensionId ;
+	private Integer needPermission = 1;
+	private String userId;
 }

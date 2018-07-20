@@ -9,8 +9,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.Page;
-import com.hongte.alms.base.customer.vo.CustomerRepayFlowExel;
 import com.hongte.alms.base.dto.ConfirmRepaymentReq;
 import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.base.dto.MoneyPoolManagerReq;
@@ -18,13 +18,10 @@ import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.dto.core.LayTableQuery;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.*;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.feignClient.dto.TdProjectPaymentDTO;
-import com.hongte.alms.base.feignClient.dto.TdReturnAdvanceShareProfitDTO;
-import com.hongte.alms.base.feignClient.dto.TdReturnAdvanceShareProfitResult;
-import com.hongte.alms.base.feignClient.dto.TdrepayProjectInfoDTO;
-import com.hongte.alms.base.feignClient.dto.TdrepayProjectPeriodInfoDTO;
 import com.hongte.alms.base.service.*;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
 import com.hongte.alms.base.vo.finance.*;
@@ -35,7 +32,6 @@ import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.common.vo.PageResult;
-import com.hongte.alms.finance.req.FinanceSettleReq;
 import com.hongte.alms.finance.req.MoneyPoolReq;
 import com.hongte.alms.finance.req.OrderSetReq;
 import com.hongte.alms.finance.service.FinanceService;
@@ -46,9 +42,6 @@ import io.swagger.annotations.ApiOperation;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.jeecgframework.poi.excel.ExcelExportUtil;
-import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -146,6 +139,10 @@ public class FinanceController {
 	RepaymentProjPlanService repaymentProjPlanService ;
 	@Autowired
 	EipRemote eipRemote ;
+	
+    @Autowired
+    @Qualifier("SysUserRoleService")
+    SysUserRoleService sysUserRoleService;
 
 	@Value("${oss.readUrl}")
 	private String ossReadUrl ;
@@ -355,6 +352,15 @@ public class FinanceController {
 	public PageResult getFinanceMangerList(FinanceManagerListReq req) {
 		logger.info("@getFinanceMangerList@获取财务管理列表数据--开始[{}]", req);
 		req.setUserId(loginUserInfoHelper.getUserId());
+		
+		 Wrapper<SysUserRole> wrapperSysUserRole = new EntityWrapper<>();
+         wrapperSysUserRole.eq("user_id",loginUserInfoHelper.getUserId());
+         wrapperSysUserRole.and(" role_code in (SELECT role_code FROM tb_sys_role WHERE role_area_type = 1 AND page_type = 9 ) ");
+         List<SysUserRole> userRoles = sysUserRoleService.selectList(wrapperSysUserRole);
+         if(null != userRoles && !userRoles.isEmpty()) {
+         	req.setNeedPermission(0);//全局用户 不需要验证权限
+         }
+		
 		PageResult pageResult = repaymentBizPlanListService.selectByFinanceManagerListReq(req);
 		logger.info("@getFinanceMangerList@获取财务管理列表数据--结束[{}]", pageResult);
 		return pageResult;
@@ -735,6 +741,8 @@ public class FinanceController {
 				planList.setAutoWithholdingConfirmedDate(new Date());
 				planList.setAutoWithholdingConfirmedUser(loginUserInfoHelper.getUserId());
 				planList.setAutoWithholdingConfirmedUserName(loginUserInfoHelper.getLoginInfo().getUserName());
+				planList.setUpdateTime(new Date());
+				planList.setUpdateUser(loginUserInfoHelper.getUserId());
 				planList.updateById();
 			}
 
@@ -742,6 +750,51 @@ public class FinanceController {
 			return Result.success();
 		} catch (Exception e) {
 			logger.error("@confirmWithhold@代扣确认失败--[{}]", e);
+			e.printStackTrace();
+			return Result.error("-500", "系统异常:代扣确认失败");
+		}
+	}
+	
+	@GetMapping(value="/cancelWithholdConfirm")
+	@ApiOperation(value="取消代扣确认")
+	public Result cancelWithholdConfirm(String businessId, String afterId) {
+		try {
+			logger.info("@cancelWithholdConfirm@取消代扣确认--开始[{}]", businessId);
+			Result result = null;
+
+			EntityWrapper<RepaymentBizPlanList> ew = new EntityWrapper<RepaymentBizPlanList>();
+			ew.eq("business_id", businessId);
+			ew.eq("after_id", afterId);
+			ew.eq("confirm_flag", 1);
+			List<RepaymentBizPlanList> list = repaymentBizPlanListService.selectList(ew);
+			if (CollectionUtils.isEmpty(list)) {
+				logger.info("@cancelWithholdConfirm@取消代扣确认--结束[{}]", result);
+				return Result.error("500","找不到对应且符合条件的期数");
+			}
+			for (RepaymentBizPlanList planList : list) {
+				int diff = DateUtil.getDiffDays(new Date(), planList.getDueDate());
+				if (diff<0) {
+					logger.info("@cancelWithholdConfirm@取消代扣确认--结束[{}]", result);
+					return Result.error("500","应还日期小于当前日期,取消代扣确认失败");
+				}
+				if (RepayPlanStatus.REPAYED.getName().equals(planList.getCurrentStatus())) {
+					logger.info("@cancelWithholdConfirm@取消代扣确认--结束[{}]", result);
+					return Result.error("500","已还款的期数不能取消代扣确认");
+				}
+				
+				planList.setConfirmFlag(0);
+				planList.setAutoWithholdingConfirmedDate(null);
+				planList.setAutoWithholdingConfirmedUser(null);
+				planList.setAutoWithholdingConfirmedUserName(null);
+				planList.setUpdateTime(new Date());
+				planList.setUpdateUser(loginUserInfoHelper.getUserId());
+				planList.updateById();
+			}
+
+			logger.info("@cancelWithholdConfirm@取消代扣确认--结束[{}]", result);
+			return Result.success();
+		} catch (Exception e) {
+			logger.error("@cancelWithholdConfirm@取消代扣确认--异常[{}]", e);
 			e.printStackTrace();
 			return Result.error("-500", "系统异常:代扣确认失败");
 		}
@@ -849,6 +902,16 @@ public class FinanceController {
 		return result;
 	}
 
+	private boolean inDepartmentBank(String account,List<DepartmentBank> list) {
+		boolean res = false ;
+		for (DepartmentBank departmentBank : list) {
+			if (account.equals(departmentBank.getFinanceName())) {
+				res = true ;
+				break ;
+			}
+		}
+		return res ;
+	}
 	@RequestMapping("/importExcel")
 	public Result importExcel(@RequestParam("file") MultipartFile file,
             HttpServletRequest request)  {
@@ -863,11 +926,16 @@ public class FinanceController {
 				logger.info("@importExcel@导入银行流水Excel--结束[{}]",result);
 				return result;
 			}
+			
+			List<DepartmentBank> departmentBanks = departmentBankService.listDepartmentBank();
 			List<MoneyPool> moneyPools = new ArrayList<>();
 			for (MoneyPoolExcelEntity entity : list) {
 				MoneyPool moneyPool = entity.transform();
 				if (moneyPool==null) {
 					continue;
+				}
+				if (!inDepartmentBank(moneyPool.getAcceptBank(),departmentBanks)) {
+					throw new ServiceRuntimeException("500","部分数据转入账号异常与数据库不匹配");
 				}
 				
 				if (!StringUtil.isEmpty(entity.getPayCode())) {
@@ -922,7 +990,10 @@ public class FinanceController {
 		}catch (Exception e) {
 			logger.info("@importExcel@导入银行流水Excel--Exception[{}]",e.getMessage());
 			e.printStackTrace();
-			result = Result.error("500", e.getMessage());
+			result = Result.error("500",  e.getMessage());
+			return result;
+		}catch(NoClassDefFoundError e) {
+			result = Result.error("500",  "文件错误");
 			return result;
 		}
 		

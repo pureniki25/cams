@@ -152,11 +152,11 @@
         <i-col span="24">
             <!-- 使用方法渲染模式 -->
             <table id="listTable" lay-filter="listTable"></table>
-            <script type="text/html" id="barTools">
+            <div style="display: none; " id="barTools">
                 <!--layui-btn layui-btn-xs-->
-                <a class="layui-btn layui-btn-normal layui-btn-xs " id="edit" lay-event="edit" ht-auth="edit">编辑</a>
-                <a class="layui-btn layui-btn-normal layui-btn-xs " id="delete" lay-event="delete" ht-auth="delete">删除</a>
-            </script>
+                <a class="layui-btn layui-btn-normal layui-btn-xs " id="edit" lay-event="edit" ht-auth="edit" v-if="authValid('edit')">编辑</a>
+                <a class="layui-btn layui-btn-normal layui-btn-xs " id="delete" lay-event="delete" ht-auth="delete" v-if="authValid('delete')">删除</a>
+            </div>
         </i-col>
     </row>
     <!-- 表单Grid，使用layerUI的表格组件 结束 -->

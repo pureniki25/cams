@@ -34,6 +34,8 @@ public class RepaymentLogReq extends PageRequest{
     @ApiModelProperty(value="用户ID",name="userId",example="test" ,dataType = "String")
     private String   userId; //用户Id
     
+    private Integer needPermission = 1;
+    
     
 	public String getBusinessTypeId() {
 		return businessTypeId;
@@ -107,6 +109,17 @@ public class RepaymentLogReq extends PageRequest{
 	public void setDateEnd(Date dateEnd) {
 		this.dateEnd = dateEnd;
 	}
+
+	public Integer getNeedPermission() {
+		return needPermission;
+	}
+
+
+	public void setNeedPermission(Integer needPermission) {
+		this.needPermission = needPermission;
+	}
+
+
 
 	@ApiModelProperty(value="代扣时间",name="dateEnd",example="test" ,dataType = "java.util.Date")
     private Date    dateEnd		; //发送时间 结束
