@@ -902,6 +902,16 @@ public class FinanceController {
 		return result;
 	}
 
+	private boolean inDepartmentBank(String account,List<DepartmentBank> list) {
+		boolean res = false ;
+		for (DepartmentBank departmentBank : list) {
+			if (account.equals(departmentBank.getFinanceName())) {
+				res = true ;
+				break ;
+			}
+		}
+		return res ;
+	}
 	@RequestMapping("/importExcel")
 	public Result importExcel(@RequestParam("file") MultipartFile file,
             HttpServletRequest request)  {
@@ -916,11 +926,16 @@ public class FinanceController {
 				logger.info("@importExcel@导入银行流水Excel--结束[{}]",result);
 				return result;
 			}
+			
+			List<DepartmentBank> departmentBanks = departmentBankService.listDepartmentBank();
 			List<MoneyPool> moneyPools = new ArrayList<>();
 			for (MoneyPoolExcelEntity entity : list) {
 				MoneyPool moneyPool = entity.transform();
 				if (moneyPool==null) {
 					continue;
+				}
+				if (!inDepartmentBank(moneyPool.getAcceptBank(),departmentBanks)) {
+					throw new ServiceRuntimeException("500","部分数据转入账号异常与数据库不匹配");
 				}
 				
 				if (!StringUtil.isEmpty(entity.getPayCode())) {
@@ -975,7 +990,7 @@ public class FinanceController {
 		}catch (Exception e) {
 			logger.info("@importExcel@导入银行流水Excel--Exception[{}]",e.getMessage());
 			e.printStackTrace();
-			result = Result.error("500",  "文件错误");
+			result = Result.error("500",  e.getMessage());
 			return result;
 		}catch(NoClassDefFoundError e) {
 			result = Result.error("500",  "文件错误");
