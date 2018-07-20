@@ -33,13 +33,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.collection.vo.AfterLoanStandingBookReq;
 import com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo;
 import com.hongte.alms.base.entity.ApplyDerateProcess;
 import com.hongte.alms.base.entity.InfoSms;
+import com.hongte.alms.base.entity.SysUserRole;
 import com.hongte.alms.base.entity.WithholdingRepaymentLog;
 import com.hongte.alms.base.enums.PlatformEnum;
+import com.hongte.alms.base.service.SysUserRoleService;
 import com.hongte.alms.base.service.WithholdingRecordLogService;
 import com.hongte.alms.base.service.WithholdingRepaymentLogService;
 import com.hongte.alms.base.vo.module.InfoSmsListSearchReq;
@@ -81,6 +84,10 @@ public class WithholdingRepaymentLogController {
 	    StorageService storageService;
 	  @Autowired
       LoginUserInfoHelper loginUserInfoHelper;
+	  
+	    @Autowired
+	    @Qualifier("SysUserRoleService")
+	    SysUserRoleService sysUserRoleService;
 
 	    /**
 	     * 获取分页短信查询列表
@@ -109,6 +116,14 @@ public class WithholdingRepaymentLogController {
 	                calendar.set(Calendar.SECOND, 0);
 	                req.setDateEnd(calendar.getTime());
 	        	}
+	        	
+	        	 Wrapper<SysUserRole> wrapperSysUserRole = new EntityWrapper<>();
+	             wrapperSysUserRole.eq("user_id",loginUserInfoHelper.getUserId());
+	             wrapperSysUserRole.and(" role_code in (SELECT role_code FROM tb_sys_role WHERE role_area_type = 1 AND page_type = 5 ) ");
+	             List<SysUserRole> userRoles = sysUserRoleService.selectList(wrapperSysUserRole);
+	             if(null != userRoles && !userRoles.isEmpty()) {
+	             	req.setNeedPermission(0);//全局用户 不需要验证权限
+	             }
 
 	        	req.setUserId(loginUserInfoHelper.getUserId());
 	            Page<RepaymentLogVO> pages = withholdingRepaymentlogService.selectRepaymentLogPage(req);

@@ -96,13 +96,8 @@ public class AfterLoanStandingBookReq extends PageRequest {
     @ApiModelProperty(value="只看我跟进的业务标志位",name="justCheckMine",dataType = "int")
     private Boolean justCheckMine =false;
 
-
     @ApiModelProperty(value="用户类型：1，电催专员",name="userType",dataType = "int")
     private Integer userType = null ;
-
-
-
-
 
     private List<String> customerIds; //客户ID列表
 
@@ -111,6 +106,8 @@ public class AfterLoanStandingBookReq extends PageRequest {
     private List<String>  businessIds;//业务ID列表
 
     private String userId;//用户ID
+    
+    private Integer needPermission = 1;
 
     public String getKeyName() {
 		return keyName;
@@ -380,4 +377,13 @@ public class AfterLoanStandingBookReq extends PageRequest {
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
+
+	public Integer getNeedPermission() {
+		return needPermission;
+	}
+
+	public void setNeedPermission(Integer needPermission) {
+		this.needPermission = needPermission;
+	}
+    
 }

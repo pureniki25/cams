@@ -390,5 +390,11 @@
 	)
   </update>
   
+  <update id="updateBasicBusinessType">
+	UPDATE tb_repayment_biz_plan_list_synch t1,tb_basic_business_type t2 SET 
+	t1.business_type_name_ext = t2.business_type_name
+	WHERE t1.business_type_ext = t2.business_type_id
+	AND IFNULL(t1.business_type_name_ext,0) != IFNULL(t2.business_type_name,0)
+  </update>
   
 </mapper>

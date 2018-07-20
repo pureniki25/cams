@@ -1,6 +1,7 @@
 package com.hongte.alms.base.service;
 
 import com.hongte.alms.base.entity.SysUserPermission;
+import com.hongte.alms.base.vo.user.SelfBoaInUserInfo;
 import com.hongte.alms.common.service.BaseService;
 
 /**
@@ -18,5 +19,17 @@ public interface SysUserPermissionService extends BaseService<SysUserPermission>
      * @param userId
      */
     void setUserPermissons(String userId);
+
+	void updateUserPermision(SelfBoaInUserInfo userInfo);
+
+	void delAppUser(String userId);
+
+	void updateUserOrg(String userId);
+
+	void addAppUser(String userId);
+
+	void addUserRole(String userId);
+
+	void delUserRole(String userId);
 
 }

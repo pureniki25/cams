@@ -5,6 +5,7 @@ package com.hongte.alms.core.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.collection.service.CollectionLogService;
 import com.hongte.alms.base.collection.service.CollectionStatusService;
@@ -16,6 +17,7 @@ import com.hongte.alms.base.entity.BasicBusinessType;
 import com.hongte.alms.base.entity.BasicCompany;
 import com.hongte.alms.base.entity.InfoSms;
 import com.hongte.alms.base.entity.SysParameter;
+import com.hongte.alms.base.entity.SysUserRole;
 import com.hongte.alms.base.enums.AreaLevel;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
 import com.hongte.alms.base.process.entity.Process;
@@ -99,6 +101,10 @@ public class InfoController {
  
 
     @Autowired
+    @Qualifier("SysUserRoleService")
+    SysUserRoleService sysUserRoleService;
+
+    @Autowired
     LoginUserInfoHelper loginUserInfoHelper;
 
 
@@ -155,6 +161,14 @@ public class InfoController {
 //                }
 //            }
 //            req.setCompanyIds(companys);
+        	 Wrapper<SysUserRole> wrapperSysUserRole = new EntityWrapper<>();
+             wrapperSysUserRole.eq("user_id",loginUserInfoHelper.getUserId());
+             wrapperSysUserRole.and(" role_code in (SELECT role_code FROM tb_sys_role WHERE role_area_type = 1 AND page_type = 8 ) ");
+             List<SysUserRole> userRoles = sysUserRoleService.selectList(wrapperSysUserRole);
+             if(null != userRoles && !userRoles.isEmpty()) {
+             	req.setNeedPermission(0);//全局用户 不需要验证权限
+             }
+        	
            	req.setUserId(loginUserInfoHelper.getUserId());
            	
             Page<InfoSmsListSearchVO> pages = infoSmsService.selectInfoSmsPage(req);

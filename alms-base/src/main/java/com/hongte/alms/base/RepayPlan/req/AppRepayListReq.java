@@ -44,5 +44,13 @@ public class AppRepayListReq {
     @NotNull(message = "每页记录数(pageSize)不能为空")
     @ApiModelProperty(value = "每页记录数")
     private Integer pageSize;
+    
+    
+    /**
+     * 是否过滤结清数据 1：过滤  其他：返回全部
+     */ 
+    @ApiModelProperty(value = "是否过滤结清数据")
+    private Integer isSettle;
+
 
 }

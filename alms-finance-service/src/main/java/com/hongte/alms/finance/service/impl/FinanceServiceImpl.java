@@ -429,26 +429,26 @@ public class FinanceServiceImpl implements FinanceService {
 				continue;
 			}
 			if (repaymentBizPlanListDetail.getPlanItemType().equals(30)) {
-				t.put("item30", repaymentBizPlanListDetail.getPlanAmount());
+				t.put("item30", repaymentBizPlanListDetail.getPlanAmount().add(t.getBigDecimal("item30")));
 				subtotal = subtotal.add(repaymentBizPlanListDetail.getPlanAmount());
 				total = total.add(repaymentBizPlanListDetail.getPlanAmount());
 				continue;
 			}
 			if (repaymentBizPlanListDetail.getPlanItemType().equals(50)) {
-				t.put("item50", repaymentBizPlanListDetail.getPlanAmount());
+				t.put("item50", repaymentBizPlanListDetail.getPlanAmount().add(t.getBigDecimal("item50")));
 				subtotal = subtotal.add(repaymentBizPlanListDetail.getPlanAmount());
 				total = total.add(repaymentBizPlanListDetail.getPlanAmount());
 				continue;
 			}
 			if (repaymentBizPlanListDetail.getPlanItemType().equals(60) && repaymentBizPlanListDetail.getFeeId()
 					.equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
-				t.put("onlineOverDue", repaymentBizPlanListDetail.getPlanAmount());
+				t.put("onlineOverDue", repaymentBizPlanListDetail.getPlanAmount().add(t.getBigDecimal("onlineOverDue")));
 				total = total.add(repaymentBizPlanListDetail.getPlanAmount());
 				continue;
 			}
 			if (repaymentBizPlanListDetail.getPlanItemType().equals(60) && repaymentBizPlanListDetail.getFeeId()
 					.equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
-				t.put("offlineOverDue", repaymentBizPlanListDetail.getPlanAmount());
+				t.put("offlineOverDue", repaymentBizPlanListDetail.getPlanAmount().add(t.getBigDecimal("offlineOverDue")));
 				total = total.add(repaymentBizPlanListDetail.getPlanAmount());
 				continue;
 			}
@@ -560,11 +560,11 @@ public class FinanceServiceImpl implements FinanceService {
 				continue;
 			}
 			if (rd.getPlanItemType().equals(30)) {
-				c.setItem30(rd.getPlanAmount().subtract(calFactRepay(30, null, businessId, afterId)));
+				c.setItem30(rd.getPlanAmount().subtract(calFactRepay(30, null, businessId, afterId)).add(c.getItem30()));
 				continue;
 			}
 			if (rd.getPlanItemType().equals(50)) {
-				c.setItem50(rd.getPlanAmount().subtract(calFactRepay(50, null, businessId, afterId)));
+				c.setItem50(rd.getPlanAmount().subtract(calFactRepay(50, null, businessId, afterId)).add(c.getItem50()));
 				continue;
 			}
 			if (rd.getPlanItemType().equals(60)

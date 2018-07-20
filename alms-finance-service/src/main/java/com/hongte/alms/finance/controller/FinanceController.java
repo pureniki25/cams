@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.customer.vo.CustomerRepayFlowExel;
 import com.hongte.alms.base.dto.ConfirmRepaymentReq;
@@ -146,6 +147,10 @@ public class FinanceController {
 	RepaymentProjPlanService repaymentProjPlanService ;
 	@Autowired
 	EipRemote eipRemote ;
+	
+    @Autowired
+    @Qualifier("SysUserRoleService")
+    SysUserRoleService sysUserRoleService;
 
 	@Value("${oss.readUrl}")
 	private String ossReadUrl ;
@@ -355,6 +360,15 @@ public class FinanceController {
 	public PageResult getFinanceMangerList(FinanceManagerListReq req) {
 		logger.info("@getFinanceMangerList@获取财务管理列表数据--开始[{}]", req);
 		req.setUserId(loginUserInfoHelper.getUserId());
+		
+		 Wrapper<SysUserRole> wrapperSysUserRole = new EntityWrapper<>();
+         wrapperSysUserRole.eq("user_id",loginUserInfoHelper.getUserId());
+         wrapperSysUserRole.and(" role_code in (SELECT role_code FROM tb_sys_role WHERE role_area_type = 1 AND page_type = 9 ) ");
+         List<SysUserRole> userRoles = sysUserRoleService.selectList(wrapperSysUserRole);
+         if(null != userRoles && !userRoles.isEmpty()) {
+         	req.setNeedPermission(0);//全局用户 不需要验证权限
+         }
+		
 		PageResult pageResult = repaymentBizPlanListService.selectByFinanceManagerListReq(req);
 		logger.info("@getFinanceMangerList@获取财务管理列表数据--结束[{}]", pageResult);
 		return pageResult;

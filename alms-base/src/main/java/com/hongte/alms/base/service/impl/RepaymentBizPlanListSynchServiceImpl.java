@@ -101,4 +101,10 @@ public class RepaymentBizPlanListSynchServiceImpl extends BaseServiceImpl<Repaym
 		
 	}
 
+	@Override
+	public void updateBasicBusinessType() {
+		repaymentBizPlanListSynchMapper.updateBasicBusinessType();
+		
+	}
+
 }

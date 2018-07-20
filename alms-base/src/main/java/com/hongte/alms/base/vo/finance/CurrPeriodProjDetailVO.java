@@ -13,11 +13,17 @@ public class CurrPeriodProjDetailVO {
 	private boolean master;
 	private String userName;
 	private BigDecimal projAmount = new BigDecimal("0");
+	//本金
 	private BigDecimal item10 = new BigDecimal("0");
+	//利息
 	private BigDecimal item20 = new BigDecimal("0");
+	//分公司服务费
 	private BigDecimal item30 = new BigDecimal("0");
+	//月收平台费
 	private BigDecimal item50 = new BigDecimal("0");
+	//线下滞纳金
 	private BigDecimal offlineOverDue = new BigDecimal("0");
+	//线上滞纳金
 	private BigDecimal onlineOverDue = new BigDecimal("0");
 	private BigDecimal subTotal = new BigDecimal("0");
 	private BigDecimal total = new BigDecimal("0");

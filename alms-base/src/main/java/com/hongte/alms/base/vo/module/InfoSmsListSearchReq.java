@@ -34,7 +34,7 @@ public class InfoSmsListSearchReq extends PageRequest{
 	
     private String   userId		; //用户ID
 	
-	
+	private Integer needPermission = 1;
 	
     public List<String> getCompanyIds() {
 		return companyIds;
@@ -78,6 +78,13 @@ public class InfoSmsListSearchReq extends PageRequest{
 	public void setSendDateEnd(Date sendDateEnd) {
 		this.sendDateEnd = sendDateEnd;
 	}
+	public Integer getNeedPermission() {
+		return needPermission;
+	}
+	public void setNeedPermission(Integer needPermission) {
+		this.needPermission = needPermission;
+	}
+
 	@ApiModelProperty(value="发送时间",name="sendDateEnd",example="test" ,dataType = "java.util.Date")
     private Date    sendDateEnd		; //发送时间 结束
 	   public String getUserId() {

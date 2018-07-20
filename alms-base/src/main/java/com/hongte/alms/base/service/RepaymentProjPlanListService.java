@@ -2,6 +2,7 @@ package com.hongte.alms.base.service;
 
 import java.util.List;
 
+import com.hongte.alms.base.RepayPlan.dto.RepaymentSettleMoneyDto;
 import org.apache.ibatis.annotations.Param;
 
 import com.hongte.alms.base.entity.RepaymentProjPlanList;
@@ -27,6 +28,7 @@ public interface RepaymentProjPlanListService extends BaseService<RepaymentProjP
 	 * @return
 	 */
 	List<RepaymentProjPlanList> getProListForCalLateFee(String projListId);
-	
 
+
+    List<RepaymentSettleMoneyDto> selectProjPlanMoney(int i, String businessId, Integer period,String planId);
 }

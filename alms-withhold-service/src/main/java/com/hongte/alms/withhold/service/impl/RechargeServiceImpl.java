@@ -507,7 +507,7 @@ public class RechargeServiceImpl implements RechargeService {
 						log.setUpdateTime(new Date());
 						withholdingRepaymentLogService.updateById(log);
 						break;
-					} else if (remoteResult.getReturnCode().equals(RepayResultCodeEnum.YH_HANDLER_EXCEPTION.getValue())||remoteResult.getReturnCode().equals("INTERNAL_ERROR")) {
+					} else if (remoteResult.getReturnCode().equals(RepayResultCodeEnum.YH_HANDLER_EXCEPTION.getValue())||remoteResult.getReturnCode().equals("INTERNAL_ERROR")||remoteResult.getReturnCode().equals(RepayResultCodeEnum.YH_HANDLER_TIMEOU.getValue())) {
 						result.setCode("2");
 						result.setMsg(resultMsg);
 						log.setRepayStatus(2);
@@ -1071,14 +1071,18 @@ public class RechargeServiceImpl implements RechargeService {
 	public void getReturnResult() {
 		List<WithholdingRepaymentLog> losgs = withholdingRepaymentLogService.selectRepaymentLogForResult();
 		for (WithholdingRepaymentLog log : losgs) {
-			if (log.getBindPlatformId() == PlatformEnum.YH_FORM.getValue()) {
-				getBankResult(log);
-			}
-			if (log.getBindPlatformId() == PlatformEnum.BF_FORM.getValue()) {
-				getBFResult(log);
-			}
-			if (log.getBindPlatformId() == PlatformEnum.YB_FORM.getValue()) {
-				getYBResult(log);
+			try {
+				if (log.getBindPlatformId() == PlatformEnum.YH_FORM.getValue()) {
+					getBankResult(log);
+				}
+				if (log.getBindPlatformId() == PlatformEnum.BF_FORM.getValue()) {
+					getBFResult(log);
+				}
+				if (log.getBindPlatformId() == PlatformEnum.YB_FORM.getValue()) {
+					getYBResult(log);
+				}
+			}catch(Exception e) {
+				logger.error("代扣结果同步出错,logId:"+log.getLogId());
 			}
 		}
 	}
@@ -1146,13 +1150,13 @@ public class RechargeServiceImpl implements RechargeService {
 			}catch(Exception e) {
 				logger.error("银行代扣成功短信发送错误,logId:{0}",log.getLogId());
 			}
-		} else if (result.getReturnCode().equals(RepayResultCodeEnum.YH_HANDLER_EXCEPTION.getValue())||result.getReturnCode().equals("INTERNAL_ERROR")) {
+		} else if (result.getReturnCode().equals(RepayResultCodeEnum.YH_HANDLER_EXCEPTION.getValue())||result.getReturnCode().equals("INTERNAL_ERROR")||result.getReturnCode().equals(RepayResultCodeEnum.YH_HANDLER_TIMEOU.getValue())) {
 			log.setRepayStatus(2);
 			log.setRemark(result.getReturnCode()+"："+result.getMsg());
 			log.setUpdateTime(new Date());
 			withholdingRepaymentLogService.updateById(log);
 
-		} else if(result.getMsg().contains("服务调用异常")){
+		} else if(result.getMsg()!=null&&result.getMsg().contains("服务调用异常")){
 			log.setRepayStatus(2);
 			log.setRemark(result.getMsg());
 			log.setUpdateTime(new Date());
