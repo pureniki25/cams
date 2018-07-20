@@ -698,7 +698,6 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
             //2.存储传入的额外费用
             if(projExtRateReqs!=null&&projExtRateReqs.size()>0){
-//                for()
 
                 for(ProjExtRateReq projExtRateReq: projExtRateReqs){
                     ProjExtRate projExtRate = ClassCopyUtil.copyObject(projExtRateReq,ProjExtRate.class);
@@ -707,6 +706,8 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     projExtRate.setProjectId(projInfoReq.getProjectId());
                     projExtRate.setCreateTime(new Date());
                     projExtRate.setCreateUser(Constant.ADMIN_ID);
+                    projExtRate.setBeginPeroid(projExtRateReq.getPeriod());
+                    projExtRate.setEndPeroid(projExtRateReq.getPeriod());
                     if(projExtRateReq.getFeeId().equals(RepayPlanFeeTypeEnum.PRINCIPAL_PENALTY.getUuid())){
                         principal_penalty_in_flage = true;
                     }
@@ -750,7 +751,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                         projExtRate.setFeeId(RepayPlanFeeTypeEnum.SUB_COMPANY_PENALTY.getUuid()); //费率FeeId
                         projExtRate.setFeeName(RepayPlanFeeTypeEnum.SUB_COMPANY_PENALTY.getDesc()); //费率名
                         projExtRate.setBeginPeroid(1);
-                        projExtRate.setEndPeroid(projInfoReq.getPeriodMonth());
+                        projExtRate.setEndPeroid(projInfoReq.getPeriodMonth()-1);//最后一期不用收取违约金
                         projExtRate.setCreateTime(new Date());
                         projExtRate.setCreateUser(Constant.ADMIN_ID);
                     }
@@ -784,7 +785,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                         projExtRate.setFeeId(RepayPlanFeeTypeEnum.PLAT_PENALTY.getUuid()); //费率FeeId
                         projExtRate.setFeeName(RepayPlanFeeTypeEnum.PLAT_PENALTY.getDesc()); //费率名
                         projExtRate.setBeginPeroid(1);
-                        projExtRate.setEndPeroid(projInfoReq.getPeriodMonth());
+                        projExtRate.setEndPeroid(projInfoReq.getPeriodMonth()-1);//最后一期不用收取违约金
                         projExtRate.setCreateTime(new Date());
                         projExtRate.setCreateUser(Constant.ADMIN_ID);
                     }
@@ -818,8 +819,8 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                         }
 
                     }else {
-                        projExtRate.setBeginPeroid(1);
-                        projExtRate.setEndPeroid(projInfoReq.getPeriodMonth());
+                        projExtRate.setBeginPeroid(0);
+                        projExtRate.setEndPeroid(0);
                         projExtRates.add(projExtRate);
                     }
 
@@ -1114,32 +1115,32 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 Collections.sort(rateReqs, new Comparator<ProjExtRateReq>() {
                     @Override
                     public int compare(ProjExtRateReq o1, ProjExtRateReq o2) {
-                        if(o1.getBeginPeroid().compareTo(o2.getBeginPeroid())==0){
-                            return Integer.valueOf(o1.getBeginPeroid().compareTo(o2.getBeginPeroid()));
+                        if(o1.getPeriod().compareTo(o2.getPeriod())==0){
+                            return Integer.valueOf(o1.getPeriod().compareTo(o2.getPeriod()));
                         }else{
-                            return o1.getBeginPeroid().compareTo(o2.getBeginPeroid());
+                            return o1.getPeriod().compareTo(o2.getPeriod());
                         }
                     }
                 });
                 //判断开始结束时间是否是连续的
-                Integer lastEndPeriod=0;
-                for(ProjExtRateReq projExtRateReq:rateReqs){
-                    Integer beginPeroid = projExtRateReq.getBeginPeroid();
-                    if(!(beginPeroid-lastEndPeriod==1)){
-                        logger.error("额外费率期数设置不连续  List:"+JSON.toJSONString(rateReqs)
-                                +"  ProjExtRateReq:"+JSON.toJSONString(projExtRateReq));
-                        throw  new CreatRepaymentExcepiton("额外费率期数设置不连续 List:"+JSON.toJSONString(rateReqs)
-                                +"  ProjExtRateReq:"+JSON.toJSONString(projExtRateReq));
-                    }
-                    lastEndPeriod = projExtRateReq.getEndPeroid();
-                }
-                if(lastEndPeriod!=projInfoReq.getPeriodMonth()){
-                    logger.error("额外费率期数设置不足  List:"+JSON.toJSONString(rateReqs)
-                            +"  标的期数:"+projInfoReq.getPeriodMonth());
-                    throw  new CreatRepaymentExcepiton("额外费率期数设置不足  List:"+JSON.toJSONString(rateReqs)
-                            +"  标的期数:"+projInfoReq.getPeriodMonth());
-
-                }
+//                Integer lastEndPeriod=0;
+//                for(ProjExtRateReq projExtRateReq:rateReqs){
+//                    Integer beginPeroid = projExtRateReq.getBeginPeroid();
+//                    if(!(beginPeroid-lastEndPeriod==1)){
+//                        logger.error("额外费率期数设置不连续  List:"+JSON.toJSONString(rateReqs)
+//                                +"  ProjExtRateReq:"+JSON.toJSONString(projExtRateReq));
+//                        throw  new CreatRepaymentExcepiton("额外费率期数设置不连续 List:"+JSON.toJSONString(rateReqs)
+//                                +"  ProjExtRateReq:"+JSON.toJSONString(projExtRateReq));
+//                    }
+//                    lastEndPeriod = projExtRateReq.getEndPeroid();
+//                }
+//                if(lastEndPeriod!=projInfoReq.getPeriodMonth()){
+//                    logger.error("额外费率期数设置不足  List:"+JSON.toJSONString(rateReqs)
+//                            +"  标的期数:"+projInfoReq.getPeriodMonth());
+//                    throw  new CreatRepaymentExcepiton("额外费率期数设置不足  List:"+JSON.toJSONString(rateReqs)
+//                            +"  标的期数:"+projInfoReq.getPeriodMonth());
+//
+//                }
 
             }
             //标的额外费用信息校验  结束  ------------------

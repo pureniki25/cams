@@ -38,7 +38,14 @@ public class ProjExtRateReq {
     /**
      * 费用计算方式
      */
-    @ApiModelProperty(required= true,value = "费用计算方式:1.借款金额*费率值；2剩余本金*费率值;3,1*费率值")
+    @ApiModelProperty(required= true,value = "费用计算方式:" +
+            "1.借款金额*费率值；" +
+            "2剩余本金*费率值;" +
+            "3,1*费率值"
+            +"4.剩余的平台服务费合计"
+            +"5.费率值*月收分公司服务费"
+            +"6.费率值*月收平台服务费"
+            +"（剩余本金*费率值）- 分公司服务费违约金 - 平台服务费违约金[2018-7-20 增加费用计算方式定义]")
     @NotNull(message = "费用计算方式(calcWay)不能为空")
     private Integer calcWay;
 
@@ -54,21 +61,9 @@ public class ProjExtRateReq {
     private String feeName;
 
 
-    /**
-     * 开始期数
-     */
-    @ApiModelProperty(required= true,value = "开始期数")
-    @NotNull(message = "开始期数(beginPeroid)不能为空")
-    private Integer beginPeroid;
-
-
-    /**
-     * 结束期数
-     */
-    @ApiModelProperty(required= true,value = "结束期数")
-    @NotNull(message = "结束期数(endPeroid)不能为空")
-    private  Integer  endPeroid;
-
+    @ApiModelProperty(required= true,value = "期数")
+    @NotNull(message = "期数(period)不能为空")
+    private Integer period;
 
 
     public Integer getRateType() {
@@ -121,19 +116,11 @@ public class ProjExtRateReq {
         this.calcWay = calcWay;
     }
 
-    public Integer getBeginPeroid() {
-        return beginPeroid;
+    public Integer getPeriod() {
+        return period;
     }
 
-    public void setBeginPeroid(Integer beginPeroid) {
-        this.beginPeroid = beginPeroid;
-    }
-
-    public Integer getEndPeroid() {
-        return endPeroid;
-    }
-
-    public void setEndPeroid(Integer endPeroid) {
-        this.endPeroid = endPeroid;
+    public void setPeriod(Integer period) {
+        this.period = period;
     }
 }
