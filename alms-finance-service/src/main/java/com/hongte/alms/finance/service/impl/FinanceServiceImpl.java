@@ -560,11 +560,11 @@ public class FinanceServiceImpl implements FinanceService {
 				continue;
 			}
 			if (rd.getPlanItemType().equals(30)) {
-				c.setItem30(rd.getPlanAmount().subtract(calFactRepay(30, null, businessId, afterId)).add(c.getItem30()));
+				c.setItem30(rd.getPlanAmount().subtract(calFactRepay(30, rd.getFeeId(), businessId, afterId)).add(c.getItem30()));
 				continue;
 			}
 			if (rd.getPlanItemType().equals(50)) {
-				c.setItem50(rd.getPlanAmount().subtract(calFactRepay(50, null, businessId, afterId)).add(c.getItem50()));
+				c.setItem50(rd.getPlanAmount().subtract(calFactRepay(50, rd.getFeeId(), businessId, afterId)).add(c.getItem50()));
 				continue;
 			}
 			if (rd.getPlanItemType().equals(60)
