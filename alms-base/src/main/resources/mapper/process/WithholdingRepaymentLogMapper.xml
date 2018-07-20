@@ -97,7 +97,7 @@
             
 			<if test="userId !=null and userId != '' and needPermission == 1">
                 and repay.original_business_id in (
-					select business_id from tb_sys_user_permission where user_id = #{userId}    	
+					select business_id from tb_sys_user_permission where page_type = 5 and user_id = #{userId}    	
                 )
             </if>
             <!-- and user.user_id=#{userId} -->
