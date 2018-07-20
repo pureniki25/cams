@@ -739,7 +739,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     //传入了月收分公司服务费，根据月收分公司服务费计算
                     if(comPenalty!=null){
                         ProjExtRate projExtRate = new ProjExtRate();
-                        projExtRates.add(projExtRate);
+//                        projExtRates.add(projExtRate);
 
                         projExtRate.setBusinessId(basicBusiness.getBusinessId());
                         projExtRate.setProjectId(projInfo.getProjectId());
@@ -747,13 +747,30 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                         projExtRate.setRateName(RepayPlanFeeTypeEnum.SUB_COMPANY_PENALTY.getDesc());
                         //2倍的月收分公司服务费
                         projExtRate.setRateValue(comPenalty.getFeeValue().multiply(new BigDecimal("2")));
-                        projExtRate.setCalcWay(PepayPlanProjExtRatCalEnum.RATE.getValue());//计算方式
+                        projExtRate.setCalcWay(PepayPlanProjExtRatCalEnum.RATE_VALUE.getValue());//计算方式
                         projExtRate.setFeeId(RepayPlanFeeTypeEnum.SUB_COMPANY_PENALTY.getUuid()); //费率FeeId
                         projExtRate.setFeeName(RepayPlanFeeTypeEnum.SUB_COMPANY_PENALTY.getDesc()); //费率名
                         projExtRate.setBeginPeroid(1);
                         projExtRate.setEndPeroid(projInfoReq.getPeriodMonth()-1);//最后一期不用收取违约金
                         projExtRate.setCreateTime(new Date());
                         projExtRate.setCreateUser(Constant.ADMIN_ID);
+                        //如果是分段收费的
+                        if(comPenalty.getIsTermRange().equals(BooleanEnum.YES.getValue())){
+                            List<ProjFeeDetailReq>  comPenaltyDetailReqs = comPenalty.getFeeDetailReqList();
+                            for(ProjFeeDetailReq projFeeDetailReq: comPenaltyDetailReqs){
+                                ProjExtRate projExtRate1 = ClassCopyUtil.copyObject(projExtRate,ProjExtRate.class);
+                                projExtRate1.setBeginPeroid(projFeeDetailReq.getPeroid());
+                                projExtRate1.setEndPeroid(projFeeDetailReq.getPeroid());
+                                //2倍的月收分公司服务费
+                                projExtRate1.setRateValue(projFeeDetailReq.getFeeValue().multiply(new BigDecimal("2")));
+                                projExtRates.add(projExtRate1);
+                            }
+
+                        }else{
+                            projExtRate.setBeginPeroid(1);
+                            projExtRate.setEndPeroid(projInfoReq.getPeriodMonth()-1);//最后一期不用收取违约金
+                            projExtRates.add(projExtRate);
+                        }
                     }
                 }
             }
@@ -762,32 +779,49 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 if(basicBusiness.getBusinessType().equals(BusinessTypeEnum.CREDIT_TYPE.getValue())){//信用贷的业务，默认月收服务费违约金
                     //如果是信用贷类的业务
                     List<ProjFeeReq> feeReqs = projInfoReq.getProjFeeInfos();
-                    ProjFeeReq comPenalty = null;
+                    ProjFeeReq platPenalty = null;
                     for(ProjFeeReq feeReq:feeReqs ){
-                        //月收的分公司服务费
+                        //月收的平台服务费
                         if(feeReq.getFeeType().equals(RepayPlanFeeTypeEnum.PLAT_CHARGE.getValue())
                                 &&feeReq.getChargeType().equals(RepayPlanChargeTypeEnum.BY_MONTH.getKey())){
-                            comPenalty = feeReq;
+                            platPenalty = feeReq;
                         }
                     }
                     //传入了月收平台服务费，根据月收平台服务费计算
-                    if(comPenalty!=null){
+                    if(platPenalty!=null){
                         ProjExtRate projExtRate = new ProjExtRate();
-                        projExtRates.add(projExtRate);
+
 
                         projExtRate.setBusinessId(basicBusiness.getBusinessId());
                         projExtRate.setProjectId(projInfo.getProjectId());
                         projExtRate.setRateType(RepayPlanFeeTypeEnum.PLAT_PENALTY.getValue());
                         projExtRate.setRateName(RepayPlanFeeTypeEnum.PLAT_PENALTY.getDesc());
                         //2倍的月收平台服务费
-                        projExtRate.setRateValue(comPenalty.getFeeValue().multiply(new BigDecimal("2")));
-                        projExtRate.setCalcWay(PepayPlanProjExtRatCalEnum.RATE.getValue());//计算方式
+                        projExtRate.setRateValue(platPenalty.getFeeValue().multiply(new BigDecimal("2")));
+                        projExtRate.setCalcWay(PepayPlanProjExtRatCalEnum.RATE_VALUE.getValue());//计算方式
                         projExtRate.setFeeId(RepayPlanFeeTypeEnum.PLAT_PENALTY.getUuid()); //费率FeeId
                         projExtRate.setFeeName(RepayPlanFeeTypeEnum.PLAT_PENALTY.getDesc()); //费率名
-                        projExtRate.setBeginPeroid(1);
-                        projExtRate.setEndPeroid(projInfoReq.getPeriodMonth()-1);//最后一期不用收取违约金
+//                        projExtRate.setBeginPeroid(1);
+//                        projExtRate.setEndPeroid(projInfoReq.getPeriodMonth()-1);//最后一期不用收取违约金
                         projExtRate.setCreateTime(new Date());
                         projExtRate.setCreateUser(Constant.ADMIN_ID);
+                        //如果是分段收费的
+                        if(platPenalty.getIsTermRange().equals(BooleanEnum.YES.getValue())){
+                            List<ProjFeeDetailReq>  comPenaltyDetailReqs = platPenalty.getFeeDetailReqList();
+                            for(ProjFeeDetailReq projFeeDetailReq: comPenaltyDetailReqs){
+                                ProjExtRate projExtRate1 = ClassCopyUtil.copyObject(projExtRate,ProjExtRate.class);
+                                projExtRate1.setBeginPeroid(projFeeDetailReq.getPeroid());
+                                projExtRate1.setEndPeroid(projFeeDetailReq.getPeroid());
+                                //2倍的月收平台服务费
+                                projExtRate1.setRateValue(projFeeDetailReq.getFeeValue().multiply(new BigDecimal("2")));
+                                projExtRates.add(projExtRate1);
+                            }
+
+                        }else{
+                            projExtRate.setBeginPeroid(1);
+                            projExtRate.setEndPeroid(projInfoReq.getPeriodMonth()-1);//最后一期不用收取违约金
+                            projExtRates.add(projExtRate);
+                        }
                     }
                 }
             }
@@ -802,7 +836,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     projExtRate.setRateType(projFeeReq.getFeeType());
                     projExtRate.setRateName(projFeeReq.getFeeTypeName());
                     projExtRate.setRateValue(projFeeReq.getFeeValue());
-                    projExtRate.setCalcWay(RepayPlanExtRateCalcWayEnum.RATE_VALUE.getKey());
+                    projExtRate.setCalcWay(PepayPlanProjExtRatCalEnum.RATE_VALUE.getValue());
                     projExtRate.setFeeId(projFeeReq.getFeeItemId());
                     projExtRate.setFeeName(projFeeReq.getFeeItemName());
                     projExtRate.setCreateUser(Constant.ADMIN_ID);
