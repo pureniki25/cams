@@ -532,6 +532,9 @@ public class RepayPlanController {
 
        for(String businessId:businessIds){
            BizDto bizDto =getBizDtoByBizId(businessId,req.getIsSettle());
+           if(bizDto.getPlanDtoList()==null) {
+        	   continue;
+           }
            bizDtos.add(bizDto);
        }
         bizDtos=getPageList(bizDtos, req.getPageSize(), req.getCurPageNo());
