@@ -11,7 +11,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.Page;
-import com.hongte.alms.base.customer.vo.CustomerRepayFlowExel;
 import com.hongte.alms.base.dto.ConfirmRepaymentReq;
 import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.base.dto.MoneyPoolManagerReq;
@@ -23,10 +22,6 @@ import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.feignClient.dto.TdProjectPaymentDTO;
-import com.hongte.alms.base.feignClient.dto.TdReturnAdvanceShareProfitDTO;
-import com.hongte.alms.base.feignClient.dto.TdReturnAdvanceShareProfitResult;
-import com.hongte.alms.base.feignClient.dto.TdrepayProjectInfoDTO;
-import com.hongte.alms.base.feignClient.dto.TdrepayProjectPeriodInfoDTO;
 import com.hongte.alms.base.service.*;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
 import com.hongte.alms.base.vo.finance.*;
@@ -37,7 +32,6 @@ import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.common.vo.PageResult;
-import com.hongte.alms.finance.req.FinanceSettleReq;
 import com.hongte.alms.finance.req.MoneyPoolReq;
 import com.hongte.alms.finance.req.OrderSetReq;
 import com.hongte.alms.finance.service.FinanceService;
@@ -45,13 +39,9 @@ import com.hongte.alms.finance.service.ShareProfitService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.jeecgframework.poi.excel.ExcelExportUtil;
-import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -985,7 +975,10 @@ public class FinanceController {
 		}catch (Exception e) {
 			logger.info("@importExcel@导入银行流水Excel--Exception[{}]",e.getMessage());
 			e.printStackTrace();
-			result = Result.error("500", e.getMessage());
+			result = Result.error("500",  "文件错误");
+			return result;
+		}catch(NoClassDefFoundError e) {
+			result = Result.error("500",  "文件错误");
 			return result;
 		}
 		
