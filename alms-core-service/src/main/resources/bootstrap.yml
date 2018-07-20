@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: alms-core-service
+  rabbitmq:
+    virtual-host: /uc
   cloud:
     config:
       name: alms-core-service,base,rabbitmq,mongo,redis
@@ -13,6 +15,7 @@ spring:
       enabled: false
     bus:
       enabled: false
+ 
 eureka:
   instance:
     prefer-ip-address: true
@@ -21,3 +24,4 @@ eureka:
 #        defaultZone: http://192.168.12.101:30101/eureka/  # 配置注册中心url
         defaultZone: http://172.16.200.110:30101/eureka/  # 配置注册中心url
 
+      
