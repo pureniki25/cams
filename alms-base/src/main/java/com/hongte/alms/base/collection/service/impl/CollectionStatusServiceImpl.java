@@ -277,11 +277,11 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                 //刷新相关跟单人员的用户设置
                 //1.旧的那个跟单人的permission刷新
                 if(oldStaffUserId!=null){
-                    List<SysUserPermission>  lsys = sysUserPermissionService.selectList(new EntityWrapper<SysUserPermission>().eq("business_id",status.getBusinessId()).eq("user_id",oldStaffUserId));
-                    if(lsys!=null && lsys.size()>0){
-                        sysUserPermissionService.delete(new EntityWrapper<SysUserPermission>().eq("business_id",status.getBusinessId()).eq("user_id",oldStaffUserId));
-                    }
-//                    sysUserPermissionService.setUserPermissons(oldStaffUserId);
+//                    List<SysUserPermission>  lsys = sysUserPermissionService.selectList(new EntityWrapper<SysUserPermission>().eq("business_id",status.getBusinessId()).eq("user_id",oldStaffUserId));
+//                    if(lsys!=null && lsys.size()>0){
+//                        sysUserPermissionService.delete(new EntityWrapper<SysUserPermission>().eq("business_id",status.getBusinessId()).eq("user_id",oldStaffUserId));
+//                    }
+                    sysUserPermissionService.setUserPermissons(oldStaffUserId);
                 }
 
                 //2.新的那个跟单人的permission刷新

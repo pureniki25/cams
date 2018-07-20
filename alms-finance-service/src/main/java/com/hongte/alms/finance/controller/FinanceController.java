@@ -11,7 +11,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.Page;
-import com.hongte.alms.base.customer.vo.CustomerRepayFlowExel;
 import com.hongte.alms.base.dto.ConfirmRepaymentReq;
 import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.base.dto.MoneyPoolManagerReq;
@@ -23,10 +22,6 @@ import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.feignClient.dto.TdProjectPaymentDTO;
-import com.hongte.alms.base.feignClient.dto.TdReturnAdvanceShareProfitDTO;
-import com.hongte.alms.base.feignClient.dto.TdReturnAdvanceShareProfitResult;
-import com.hongte.alms.base.feignClient.dto.TdrepayProjectInfoDTO;
-import com.hongte.alms.base.feignClient.dto.TdrepayProjectPeriodInfoDTO;
 import com.hongte.alms.base.service.*;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
 import com.hongte.alms.base.vo.finance.*;
@@ -37,7 +32,6 @@ import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.common.vo.PageResult;
-import com.hongte.alms.finance.req.FinanceSettleReq;
 import com.hongte.alms.finance.req.MoneyPoolReq;
 import com.hongte.alms.finance.req.OrderSetReq;
 import com.hongte.alms.finance.service.FinanceService;
@@ -45,13 +39,9 @@ import com.hongte.alms.finance.service.ShareProfitService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.jeecgframework.poi.excel.ExcelExportUtil;
-import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -912,6 +902,16 @@ public class FinanceController {
 		return result;
 	}
 
+	private boolean inDepartmentBank(String account,List<DepartmentBank> list) {
+		boolean res = false ;
+		for (DepartmentBank departmentBank : list) {
+			if (account.equals(departmentBank.getFinanceName())) {
+				res = true ;
+				break ;
+			}
+		}
+		return res ;
+	}
 	@RequestMapping("/importExcel")
 	public Result importExcel(@RequestParam("file") MultipartFile file,
             HttpServletRequest request)  {
@@ -926,11 +926,16 @@ public class FinanceController {
 				logger.info("@importExcel@导入银行流水Excel--结束[{}]",result);
 				return result;
 			}
+			
+			List<DepartmentBank> departmentBanks = departmentBankService.listDepartmentBank();
 			List<MoneyPool> moneyPools = new ArrayList<>();
 			for (MoneyPoolExcelEntity entity : list) {
 				MoneyPool moneyPool = entity.transform();
 				if (moneyPool==null) {
 					continue;
+				}
+				if (!inDepartmentBank(moneyPool.getAcceptBank(),departmentBanks)) {
+					throw new ServiceRuntimeException("500","部分数据转入账号异常与数据库不匹配");
 				}
 				
 				if (!StringUtil.isEmpty(entity.getPayCode())) {
@@ -985,7 +990,10 @@ public class FinanceController {
 		}catch (Exception e) {
 			logger.info("@importExcel@导入银行流水Excel--Exception[{}]",e.getMessage());
 			e.printStackTrace();
-			result = Result.error("500", e.getMessage());
+			result = Result.error("500",  e.getMessage());
+			return result;
+		}catch(NoClassDefFoundError e) {
+			result = Result.error("500",  "文件错误");
 			return result;
 		}
 		
