@@ -19,6 +19,7 @@ import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.dto.core.LayTableQuery;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.*;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.feignClient.dto.TdProjectPaymentDTO;
@@ -44,6 +45,7 @@ import com.hongte.alms.finance.service.ShareProfitService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -749,6 +751,8 @@ public class FinanceController {
 				planList.setAutoWithholdingConfirmedDate(new Date());
 				planList.setAutoWithholdingConfirmedUser(loginUserInfoHelper.getUserId());
 				planList.setAutoWithholdingConfirmedUserName(loginUserInfoHelper.getLoginInfo().getUserName());
+				planList.setUpdateTime(new Date());
+				planList.setUpdateUser(loginUserInfoHelper.getUserId());
 				planList.updateById();
 			}
 
@@ -756,6 +760,51 @@ public class FinanceController {
 			return Result.success();
 		} catch (Exception e) {
 			logger.error("@confirmWithhold@代扣确认失败--[{}]", e);
+			e.printStackTrace();
+			return Result.error("-500", "系统异常:代扣确认失败");
+		}
+	}
+	
+	@GetMapping(value="/cancelWithholdConfirm")
+	@ApiOperation(value="取消代扣确认")
+	public Result cancelWithholdConfirm(String businessId, String afterId) {
+		try {
+			logger.info("@cancelWithholdConfirm@取消代扣确认--开始[{}]", businessId);
+			Result result = null;
+
+			EntityWrapper<RepaymentBizPlanList> ew = new EntityWrapper<RepaymentBizPlanList>();
+			ew.eq("business_id", businessId);
+			ew.eq("after_id", afterId);
+			ew.eq("confirm_flag", 1);
+			List<RepaymentBizPlanList> list = repaymentBizPlanListService.selectList(ew);
+			if (CollectionUtils.isEmpty(list)) {
+				logger.info("@cancelWithholdConfirm@取消代扣确认--结束[{}]", result);
+				return Result.error("500","找不到对应且符合条件的期数");
+			}
+			for (RepaymentBizPlanList planList : list) {
+				int diff = DateUtil.getDiffDays(new Date(), planList.getDueDate());
+				if (diff<0) {
+					logger.info("@cancelWithholdConfirm@取消代扣确认--结束[{}]", result);
+					return Result.error("500","应还日期小于当前日期,取消代扣确认失败");
+				}
+				if (RepayPlanStatus.REPAYED.getName().equals(planList.getCurrentStatus())) {
+					logger.info("@cancelWithholdConfirm@取消代扣确认--结束[{}]", result);
+					return Result.error("500","已还款的期数不能取消代扣确认");
+				}
+				
+				planList.setConfirmFlag(0);
+				planList.setAutoWithholdingConfirmedDate(null);
+				planList.setAutoWithholdingConfirmedUser(null);
+				planList.setAutoWithholdingConfirmedUserName(null);
+				planList.setUpdateTime(new Date());
+				planList.setUpdateUser(loginUserInfoHelper.getUserId());
+				planList.updateById();
+			}
+
+			logger.info("@cancelWithholdConfirm@取消代扣确认--结束[{}]", result);
+			return Result.success();
+		} catch (Exception e) {
+			logger.error("@cancelWithholdConfirm@取消代扣确认--异常[{}]", e);
 			e.printStackTrace();
 			return Result.error("-500", "系统异常:代扣确认失败");
 		}
