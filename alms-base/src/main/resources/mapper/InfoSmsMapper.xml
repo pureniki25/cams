@@ -100,7 +100,7 @@ LEFT JOIN tb_basic_business_type AS b_type ON business.business_type = b_type.bu
         <if test="userId !=null  and userId != '' and needPermission == 1">
        <!--  and user.user_id=#{userId} -->
                 and sms.original_business_id in (
-					select business_id from tb_sys_user_permission where user_id = #{userId}    	
+					select business_id from tb_sys_user_permission where page_type = 8 and user_id = #{userId}    	
                 )
         </if>
 

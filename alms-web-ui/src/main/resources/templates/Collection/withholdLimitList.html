@@ -39,7 +39,7 @@
 <!--隐藏元素-->
 <!--<p id="staffType"  th:attr="value=${staffType}"  hidden />-->
 <!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
-<div id="app" v-cloak>
+<div id="app" v-cloak lay-filter="auth_scope">
 
     <!-- 搜索工具框 开始-->
     <row style="padding: 10px">
@@ -163,7 +163,7 @@
 </div>
 
 <script src="/src/js/collection/withholdLimitList.js"></script>
-<script type="text/html" id="barTools">
+<div style="display: none; " id="barTools">
     <!--layui-btn layui-btn-xs-->
     <a class="layui-btn layui-btn-normal layui-btn-xs " id="edit" lay-event="edit" ht-auth="edit">编辑</a>
     <!--<a class="layui-btn layui-btn-normal layui-btn-xs " id="shutdown" lay-event="shutdown" ht-auth="shutdown">停用</a>-->
@@ -171,8 +171,8 @@
     {{#  if(d.status == 1){ }}
     <a class="layui-btn layui-btn-normal layui-btn-xs " id="shutdown" lay-event="shutdown" ht-auth="shutdown">停用</a>
     {{#  } else if(d.status == 0){  }}
-    <a class="layui-btn layui-btn-normal layui-btn-xs " id="start" lay-event="start" ht-auth="start">启用</a>
+    <a class="layui-btn layui-btn-normal layui-btn-xs " id="start" lay-event="start" ht-auth="start" >启用</a>
     {{# } }}
-</script>
+</div>
 </body>
 </html>
