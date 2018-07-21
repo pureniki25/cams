@@ -44,7 +44,7 @@ public class UCMQListener {
      * @param     参数  mq返回的消息
      * @return void    返回类型  
      */
-    @RabbitListener(queues = UC_NODELAY)
+    @RabbitListener(queues = UC_NODELAY,containerFactory="ucContainerFactory")
     @RabbitHandler
     public void userInfoAndPermissionSynch(Message message) {
 		String text = "";
