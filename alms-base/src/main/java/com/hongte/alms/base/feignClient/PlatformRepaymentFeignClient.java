@@ -49,6 +49,6 @@ public interface PlatformRepaymentFeignClient {
 	 * @return
 	 */
 	@RequestMapping(value = "/toPlatRepay/getOIdPartner", headers = { "app=ALMS","content-type=application/json" })
-	public Result getOIdPartner(@RequestParam("businessType") Integer businessType);
+	public Result<Map<String, Object>> getOIdPartner(@RequestParam("businessType") Integer businessType);
 
 }
