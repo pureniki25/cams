@@ -1,6 +1,10 @@
 package com.hongte.alms.base.service.impl;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.hongte.alms.base.RepayPlan.dto.RepaymentBizPlanDto;
+import com.hongte.alms.base.RepayPlan.dto.RepaymentProjPlanDto;
+import com.hongte.alms.base.RepayPlan.dto.RepaymentProjPlanListDetailDto;
+import com.hongte.alms.base.RepayPlan.dto.RepaymentProjPlanListDto;
 import com.hongte.alms.base.RepayPlan.dto.RepaymentSettleMoneyDto;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
@@ -9,9 +13,7 @@ import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentProjPlan;
 import com.hongte.alms.base.entity.RepaymentProjPlanList;
 import com.hongte.alms.base.entity.RepaymentProjPlanListDetail;
-import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.enums.RepayCurrentStatusEnums;
-import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanBorrowRateUnitEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.feignClient.EipRemote;
@@ -29,7 +31,6 @@ import com.hongte.alms.common.util.ClassCopyUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.ht.ussp.core.Result;
 import com.ht.ussp.util.DateUtil;
-import com.mysql.cj.core.io.BigDecimalValueFactory;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -45,7 +46,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * <p>
@@ -128,83 +128,7 @@ public class RepaymentProjPlanListServiceImpl extends
 							for (RepaymentProjPlanList projPList : projList) {
 							
 								// 每个表的还款计划列表对应所的标的还款计划
-								RepaymentProjPlan projPlan = repaymentProjPlanService
-										.selectOne((new EntityWrapper<RepaymentProjPlan>().eq("creat_sys_type", 2))
-												.eq("proj_plan_id", projPList.getProjPlanId()));
-							
-								getRondModeAndSmallNum(projPlan);//确定进位方式和保留小数位
-								RepaymentProjPlanListDetail underLineProjDetail=null;   //线下费用的Detail
-								RepaymentProjPlanListDetail onLineProjDetail=null;   //线上费用的Detail
-								
-//								if(projPList.getProjPlanListId().equals("f0bc7a22-c45e-4f9f-8ac8-ec2a993cc2c1")) {
-//									  System.out.println("STOP");	
-//									} 
-								//如果已经全部收取本期应交的本息服务费费及线上逾期费用后则停止计算滞纳金
-								if(getOnLineFactAmountSum(projPList.getProjPlanListId())>=getOnLinePlanAmountSum(projPList.getProjPlanListId())) {
-									continue;
-								}
-								// 没有逾期,且不是你我金融生成
-								if (isOverDue(new Date(), projPList.getDueDate()) >=0&&projPList.getCreatSysType()!=3) {
-									continue;
-									// 逾期的当前期
-								} else {
-									
-									
-									
-									logger.info("===============：planListid:"+pList.getPlanListId()+"逾期费用计算开始===============");
-									//获取平台对应标对应期的还款日期,取晚的日期
-									Date platformDueDate=getPlatformDuedate(projPlan.getProjectId(), projPList.getPeriod().toString());
-									BigDecimal onlineDueDays=BigDecimal.valueOf(0);//线上逾期天数
-									BigDecimal underlineDueDays=BigDecimal.valueOf(0);//线下逾期天数
-									if(platformDueDate!=null&&platformDueDate.compareTo(projPList.getDueDate())>0) {
-										if(isOverDue(new Date(), platformDueDate)>=0) {
-											onlineDueDays=BigDecimal.valueOf(0);
-										}else {
-											onlineDueDays=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), platformDueDate)));
-										}
-									
-									}else {
-										onlineDueDays=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), projPList.getDueDate())));
-									}
-									underlineDueDays=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), projPList.getDueDate())));
-									
-									projPList.setOverdueDays(underlineDueDays);
-									BigDecimal underLateFee=getUnderLateFee(projPList,projList, projPlan,underlineDueDays).setScale(2, roundingMode);//线下逾期费
-									underLateFeeSum=underLateFeeSum.add(underLateFee).setScale(2, roundingMode);
-									underLineProjDetail=	updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid(), underLateFee);
-									
-									BigDecimal onlineLateFee=BigDecimal.valueOf(0);//线上逾期费
-								
-									if(onlineDueDays.compareTo(BigDecimal.valueOf(0))>0) {//如果线上的逾期天数为0,则不用计算线上滞纳金
-										 onlineLateFee=getOnLineLateFee(projPList, projPlan,onlineDueDays).setScale(2, roundingMode);//线上逾期费
-										onlineLateFeeSum=onlineLateFeeSum.add(onlineLateFee).setScale(2, roundingMode);
-										onLineProjDetail=updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), onlineLateFee);
-									}else {
-										 onlineLateFee=BigDecimal.valueOf(0);
-										onlineLateFeeSum=onlineLateFeeSum.add(onlineLateFee).setScale(2, roundingMode);
-										onLineProjDetail=updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), onlineLateFee);
-									}
-							        
-									projPList.setOverdueAmount(underLateFee.add(onlineLateFee));
-									projPList.setCurrentStatus(RepayCurrentStatusEnums.逾期.name());
-									updateById(projPList);
-									logger.info("逾期费用===============：projListId:"+projPList.getProjPlanListId()+"线下逾期费:"+underLateFee+",线上逾期费:"+onlineLateFee+"==============");
-								}
-								
-								//更新还款计划业务表
-								updateOrInsertPlanDetail(pList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid(), underLateFeeSum,underLineProjDetail);//每个业务每期还款计划的线下收费
-								if(onLineProjDetail!=null) {//线上逾期费不为0
-									updateOrInsertPlanDetail(pList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), onlineLateFeeSum,onLineProjDetail);//每个业务每期还款计划的线上收费
-								}
-				
-								BigDecimal days=BigDecimal.valueOf(Math.abs(isOverDue(new Date(), pList.getDueDate())));//每个业务每期款还计划的逾期天数
-								pList.setOverdueDays(days);
-								pList.setOverdueAmount(getPlanListOverAmountSum(pList));
-								pList.setCurrentStatus(RepayCurrentStatusEnums.逾期.name());
-								repaymentBizPlanListService.updateById(pList);
-								logger.info("===============：planListid:"+pList.getPlanListId()+"逾期费用计算结束===============");
-							}
-							
+								calLateFeeForPerPList(pList);
 							
 							
 				    }
@@ -244,6 +168,7 @@ public class RepaymentProjPlanListServiceImpl extends
 				}
 			}
   */
+		 }
 		}
      
 	}
@@ -301,7 +226,7 @@ public class RepaymentProjPlanListServiceImpl extends
 	     * @param projPlan
 	     * @return
 	     */
-		private BigDecimal getUnderLateFee(RepaymentProjPlanList projPlanList,List<RepaymentProjPlanList> projPlanLists,RepaymentProjPlan projPlan,BigDecimal days) {
+		private BigDecimal getUnderLateFee(RepaymentProjPlanList projPlanList,List<RepaymentProjPlanList> projPlanLists,RepaymentProjPlan projPlan,BigDecimal days,Date nowDate) {
 			System.out.println("================="+projPlan.getOriginalBusinessId()+"====================");
 			BigDecimal restPricipal=getRestPrincipal(projPlanList, projPlan);
 			BigDecimal principalAndInterest=BigDecimal.valueOf(getPrincipalAndinterestPeriod(projPlanList.getProjPlanListId()));
@@ -309,7 +234,7 @@ public class RepaymentProjPlanListServiceImpl extends
 		   List<RepaymentProjPlanList> list=selectList(new EntityWrapper<RepaymentProjPlanList>().eq("proj_plan_id", projPlan.getProjPlanId()));
 			Date lastDate=getLastDueDate(list);
 			    //期外
-			    if(new Date().compareTo(lastDate)>0) {
+			    if(nowDate.compareTo(lastDate)>0) {
 			    	underLatefee=getLateFee(projPlan.getOffLineOutOverDueRate(), projPlan.getOffLineOutOverDueRateType(), projPlan.getBorrowMoney(), restPricipal, principalAndInterest,projPlan.getProjectId(),projPlanList.getPeriod());
 			    	
 			    	
@@ -672,6 +597,123 @@ public class RepaymentProjPlanListServiceImpl extends
 	@Override
 	public List<RepaymentSettleMoneyDto> selectProjPlanMoney(int flag, String businessId, Integer period,String planId) {
 		return repaymentProjPlanListMapper.selectProjPlanMoney(flag,businessId,period,planId);
+	}
+
+	@Override
+	public RepaymentBizPlanList calLateFeeForPerPList(RepaymentBizPlanList pList) {
+		Date nowDate=new Date();
+		if(pList.getFactRepayDate()!=null) {
+			nowDate=pList.getFactRepayDate();
+		}
+		
+    	// 每个业务的还款计划列表对应所有标的还款计划列表
+		List<RepaymentProjPlanList> projList = getProListForCalLateFee(pList.getPlanListId());
+		BigDecimal underLateFeeSum=BigDecimal.valueOf(0);//每个业务每期还款计划的线下收费
+		BigDecimal onlineLateFeeSum=BigDecimal.valueOf(0);//每个业务每期还款计划的线上收费
+		
+		
+			for (RepaymentProjPlanList projPList : projList) {
+			
+				// 每个表的还款计划列表对应所的标的还款计划
+				RepaymentProjPlan projPlan = repaymentProjPlanService
+						.selectOne((new EntityWrapper<RepaymentProjPlan>().eq("creat_sys_type", 2))
+								.eq("proj_plan_id", projPList.getProjPlanId()));
+			
+				getRondModeAndSmallNum(projPlan);//确定进位方式和保留小数位
+				RepaymentProjPlanListDetail underLineProjDetail=null;   //线下费用的Detail
+				RepaymentProjPlanListDetail onLineProjDetail=null;   //线上费用的Detail
+				
+//				if(projPList.getProjPlanListId().equals("f0bc7a22-c45e-4f9f-8ac8-ec2a993cc2c1")) {
+//					  System.out.println("STOP");	
+//					} 
+				//如果已经全部收取本期应交的本息服务费费及线上逾期费用后则停止计算滞纳金
+				if(getOnLineFactAmountSum(projPList.getProjPlanListId())>=getOnLinePlanAmountSum(projPList.getProjPlanListId())) {
+					continue;
+				}
+				// 没有逾期,且不是你我金融生成
+				if (isOverDue(nowDate, projPList.getDueDate()) >=0&&projPList.getCreatSysType()!=3) {
+					continue;
+					// 逾期的当前期
+				} else {
+					
+					
+					
+					logger.info("===============：planListid:"+pList.getPlanListId()+"逾期费用计算开始===============");
+					//获取平台对应标对应期的还款日期,取晚的日期
+					Date platformDueDate=getPlatformDuedate(projPlan.getProjectId(), projPList.getPeriod().toString());
+					BigDecimal onlineDueDays=BigDecimal.valueOf(0);//线上逾期天数
+					BigDecimal underlineDueDays=BigDecimal.valueOf(0);//线下逾期天数
+					if(platformDueDate!=null&&platformDueDate.compareTo(projPList.getDueDate())>0) {
+						if(isOverDue(nowDate, platformDueDate)>=0) {
+							onlineDueDays=BigDecimal.valueOf(0);
+						}else {
+							onlineDueDays=BigDecimal.valueOf(Math.abs(isOverDue(nowDate, platformDueDate)));
+						}
+					
+					}else {
+						onlineDueDays=BigDecimal.valueOf(Math.abs(isOverDue(nowDate, projPList.getDueDate())));
+					}
+					underlineDueDays=BigDecimal.valueOf(Math.abs(isOverDue(nowDate, projPList.getDueDate())));
+					
+					projPList.setOverdueDays(underlineDueDays);
+					BigDecimal underLateFee=getUnderLateFee(projPList,projList, projPlan,underlineDueDays,nowDate).setScale(2, roundingMode);//线下逾期费
+					underLateFeeSum=underLateFeeSum.add(underLateFee).setScale(2, roundingMode);
+					underLineProjDetail=	updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid(), underLateFee);
+					
+					BigDecimal onlineLateFee=BigDecimal.valueOf(0);//线上逾期费
+				
+					if(onlineDueDays.compareTo(BigDecimal.valueOf(0))>0) {//如果线上的逾期天数为0,则不用计算线上滞纳金
+						 onlineLateFee=getOnLineLateFee(projPList, projPlan,onlineDueDays).setScale(2, roundingMode);//线上逾期费
+						onlineLateFeeSum=onlineLateFeeSum.add(onlineLateFee).setScale(2, roundingMode);
+						onLineProjDetail=updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), onlineLateFee);
+					}else {
+						 onlineLateFee=BigDecimal.valueOf(0);
+						onlineLateFeeSum=onlineLateFeeSum.add(onlineLateFee).setScale(2, roundingMode);
+						onLineProjDetail=updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), onlineLateFee);
+					}
+			        
+					projPList.setOverdueAmount(underLateFee.add(onlineLateFee));
+					projPList.setCurrentStatus(RepayCurrentStatusEnums.逾期.name());
+					updateById(projPList);
+					logger.info("逾期费用===============：projListId:"+projPList.getProjPlanListId()+"线下逾期费:"+underLateFee+",线上逾期费:"+onlineLateFee+"==============");
+				}
+				
+				//更新还款计划业务表
+				updateOrInsertPlanDetail(pList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid(), underLateFeeSum,underLineProjDetail);//每个业务每期还款计划的线下收费
+				if(onLineProjDetail!=null) {//线上逾期费不为0
+					updateOrInsertPlanDetail(pList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), onlineLateFeeSum,onLineProjDetail);//每个业务每期还款计划的线上收费
+				}
+
+				BigDecimal days=BigDecimal.valueOf(Math.abs(isOverDue(nowDate, pList.getDueDate())));//每个业务每期款还计划的逾期天数
+				pList.setOverdueDays(days);
+				pList.setOverdueAmount(getPlanListOverAmountSum(pList));
+				pList.setCurrentStatus(RepayCurrentStatusEnums.逾期.name());
+				repaymentBizPlanListService.updateById(pList);
+				logger.info("===============：planListid:"+pList.getPlanListId()+"逾期费用计算结束===============");
+			}
+			
+			
+		return pList;
+	}
+
+	@Override
+	public RepaymentBizPlanDto updateLateFee(RepaymentBizPlanDto dto) {
+		RepaymentBizPlanList pList=calLateFeeForPerPList(dto.getBizPlanListDtos().get(0).getRepaymentBizPlanList());
+		dto.getBizPlanListDtos().get(0).setRepaymentBizPlanList(pList);
+		List<RepaymentBizPlanListDetail> details=repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", pList.getPlanListId()));
+		dto.getBizPlanListDtos().get(0).setBizPlanListDetails(details);
+		
+		for(RepaymentProjPlanDto projDto: dto.getProjPlanDtos()) {
+			for(RepaymentProjPlanListDto projListDto:projDto.getProjPlanListDtos()) {
+				if(projListDto.getRepaymentProjPlanList().getPeriod()==pList.getPeriod()) {
+					for(RepaymentProjPlanListDetailDto projDetailDto:projListDto.getRepaymentProjPlanListDetailDtos()) {
+						RepaymentProjPlanListDetail repaymentProjPlanListDetail=repaymentProjPlanListDetailService.selectOne(new EntityWrapper<RepaymentProjPlanListDetail>().eq("proj_plan_detail_id", projDetailDto.getRepaymentProjPlanListDetail().getProjPlanDetailId()));
+						projDetailDto.setRepaymentProjPlanListDetail(repaymentProjPlanListDetail);
+					}
+				}
+			}
+		}
+		return dto;
 	}
 
 

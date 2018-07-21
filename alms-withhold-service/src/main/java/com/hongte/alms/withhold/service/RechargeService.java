@@ -147,7 +147,7 @@ public interface RechargeService {
 	/**
 	 * 银行代扣结果查询
 	 */
-	 void getBankResult(WithholdingRepaymentLog log);
+	 void getBankResult(WithholdingRepaymentLog log,String oidPartner);
 	 
 	 
 	 
