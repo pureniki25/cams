@@ -4,6 +4,7 @@
 package com.hongte.alms.base.vo.finance;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
 
@@ -94,5 +95,19 @@ public class SettleInfoVO {
 		for (SettleFeesVO settleFeesVO : list) {
 			this.planRepayBalance = this.planRepayBalance.add(settleFeesVO.getAmount());
 		}
+	}
+	
+	public SettleInfoVO() {
+		this.item10.setScale(2, RoundingMode.HALF_UP);
+		this.item20.setScale(2, RoundingMode.HALF_UP);
+		this.item30.setScale(2, RoundingMode.HALF_UP);
+		this.item50.setScale(2, RoundingMode.HALF_UP);
+		this.subtotal.setScale(2, RoundingMode.HALF_UP);
+		this.offlineOverDue.setScale(2, RoundingMode.HALF_UP);
+		this.onlineOverDue.setScale(2, RoundingMode.HALF_UP);
+		this.penalty.setScale(2, RoundingMode.HALF_UP);
+		this.derate.setScale(2, RoundingMode.HALF_UP);
+		this.planRepayBalance.setScale(2, RoundingMode.HALF_UP);
+		this.total.setScale(2, RoundingMode.HALF_UP);
 	}
 }
