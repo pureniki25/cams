@@ -11,6 +11,7 @@ window.layinit(function (htConfig) {
     let cpath = htConfig.coreBasePath;
     let fpath = htConfig.financeBasePath;
     let layer = layui.layer;
+    let lastRepayDate ;
     let curIndex;
     app = new Vue({
         el: "#app",
@@ -295,7 +296,49 @@ window.layinit(function (htConfig) {
                     }],
                     data: []
                 },
-                projRepayment: projRepayment,
+                projRepayment: {
+                    col:[
+                        {
+                            title:'借款人',
+                            key:'userName',
+                            render:(h,p)=>{
+                                return h('span',p.row.master?p.row.userName+'(主借)':p.row.userName)
+                            }
+                        },{
+                            title:'上标金额',
+                            key:'projAmount'
+                        },{
+                            title:'本金',
+                            key:'item10'
+                        },{
+                            title:'利息',
+                            key:'item20'
+                        },{
+                            title:'月收分公司服务费',
+                            key:'item30'
+                        },{
+                            title:'月收平台费',
+                            key:'item50'
+                        },{
+                            title:'线下逾期费',
+                            key:'offlineOverDue'
+                        },{
+                            title:'线上逾期费',
+                            key:'onlineOverDue'
+                        },{
+                            title:'结余',
+                            key:'surplus'
+                        },{
+                            title:'提前结清违约金',
+                            key:'penalty'
+                        },
+                        {
+                            title:'合计',
+                            key:'total'
+                        }
+                    ],
+                    data:[]
+                },
                 plan: {
                     col: [{
                         title: '期数',
@@ -414,7 +457,8 @@ window.layinit(function (htConfig) {
                 onlineOverDue: 0,
                 subTotal: 0,
                 total: 0,
-                surplus: 0
+                surplus: 0,
+                penalty:0
             }
         },
         watch: {
@@ -427,6 +471,7 @@ window.layinit(function (htConfig) {
                     });
                     let o = n[n.length - 1]
                     app.factRepaymentInfo.repayDate = o.tradeDate
+                    lastRepayDate = o.tradeDate
                 }
                 app.factRepaymentInfo.moneyPoolAccount = moneyPoolAccount
                 app.factRepaymentInfo.repayAccount = accAdd(app.factRepaymentInfo.moneyPoolAccount,(app.factRepaymentInfo.surplusFund||0))
@@ -631,10 +676,15 @@ window.layinit(function (htConfig) {
                     })
             },
             getSettleInfo() {
-                axios.get(fpath + 'settle/settleInfo?businessId=' + businessId + "&afterId=" + afterId +(planId?('&planId='+planId):''))
+                axios.get(fpath + 'settle/settleInfo?businessId=' 
+                + businessId + "&afterId=" 
+                + afterId 
+                +(planId?('&planId='+planId):'')
+                +(lastRepayDate?('&factRepayDate='+lastRepayDate):''))
                     .then(function (res) {
                         if (res.data.code == '1') {
                             let data = res.data.data;
+                            
                             app.thisTimeRepaymentInfo.repayDate = data.repayPlanDate
                             app.thisTimeRepaymentInfo.item10 = data.item10
                             app.thisTimeRepaymentInfo.item20 = data.item20

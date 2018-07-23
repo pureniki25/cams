@@ -11,5 +11,5 @@ import java.util.List;
 public interface FinanceSettleService {
     List<CurrPeriodProjDetailVO> financeSettle(FinanceSettleReq financeSettleReq);
     void makeRepaymentPlanAllPlan(FinanceSettleBaseDto financeSettleBaseDto, FinanceSettleReq financeSettleReq);
-    SettleInfoVO settleInfoVO(String businessId, String afterId, String planId,Date factRepayDate) ;
+    SettleInfoVO settleInfoVO(FinanceSettleReq financeSettleReq) ;
 }

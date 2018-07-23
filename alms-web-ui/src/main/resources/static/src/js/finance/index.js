@@ -382,8 +382,8 @@ window.layinit(function (htConfig) {
                                 menu.push(repayConfirm)
                                 menu.push(revokeConfirm)
                                 menu.push(confirmWithhold)
-                                /* menu.push(planSettle)
-                                menu.push(settle) */
+                                menu.push(planSettle)
+                                menu.push(settle)
                                    menu.push(withhold)
                             }
                             let poptipContent;
