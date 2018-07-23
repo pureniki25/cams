@@ -729,7 +729,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         }
         Boolean preview = financeSettleBaseDto.getPreview();
 
-        if (preview) { //保存操作
+        if (!preview) { //保存操作
             repaymentSettleLogDetailMapper.insert(repaymentSettleLogDetail);
 
             RepaymentProjPlanListDetail repaymentProjPlanListDetail = new RepaymentProjPlanListDetail();
@@ -1861,7 +1861,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 		infoVO.setItem30(item30);
 		infoVO.setItem50(item50);
 		
-		repaymentBizPlanList = repaymentProjPlanListService.calLateFeeForPerPList(repaymentBizPlanList);
+		repaymentBizPlanList = repaymentProjPlanListService.calLateFeeForPerPList(repaymentBizPlanList,1);
 		BigDecimal item60offline = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList.getPlanListId(), "60", RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid());
 		BigDecimal item60online = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList.getPlanListId(), "60", RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid());
 		//TODO 要调用滞纳金计算
