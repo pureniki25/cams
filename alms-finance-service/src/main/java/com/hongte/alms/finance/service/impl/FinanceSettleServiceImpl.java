@@ -428,7 +428,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
 
         //通过当期的业务list 调用滞纳金生成接口 单独开启事务  数据库字段滞纳金已更新
-        RepaymentBizPlanList repaymentBizPlanList = repaymentProjPlanListService.calLateFeeForPerPList(repaymentBizPlanListNow);
+        RepaymentBizPlanList repaymentBizPlanList = repaymentProjPlanListService.calLateFeeForPerPList(repaymentBizPlanListNow,1);
 
         //先通过应还时间排序  先还后还的分好类
         //再通过标的还款顺序进行分类
