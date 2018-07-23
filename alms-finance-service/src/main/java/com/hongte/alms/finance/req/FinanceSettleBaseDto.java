@@ -103,4 +103,6 @@ public class FinanceSettleBaseDto {
   //页面填充Dto
    private List<CurrPeriodProjDetailVO> currPeriodProjDetailVOList=new ArrayList<>();
 
+   private List<RepaymentSettleLogDetail> repaymentSettleLogDetailList=new ArrayList<>();
+
 }
