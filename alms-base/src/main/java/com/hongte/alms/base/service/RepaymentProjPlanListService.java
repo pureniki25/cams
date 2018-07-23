@@ -40,7 +40,6 @@ public interface RepaymentProjPlanListService extends BaseService<RepaymentProjP
 
 	RepaymentBizPlanList calLateFeeForPerPList(RepaymentBizPlanList pList);
 
-    List<RepaymentSettleMoneyDto> selectProjPlanMoney(int i, String businessId, Integer period,String planId);
 
 
     /**
