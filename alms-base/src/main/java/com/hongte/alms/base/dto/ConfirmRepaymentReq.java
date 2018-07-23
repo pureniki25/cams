@@ -5,6 +5,8 @@ package com.hongte.alms.base.dto;
 
 import javax.validation.constraints.NotNull;
 
+import com.hongte.alms.base.entity.MoneyPool;
+
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -38,6 +40,16 @@ public class ConfirmRepaymentReq {
 	//网关充值/快捷充值必填项,充值记录ids
 	private List<String> rechargeIds;
 
+	/*审批调用专用设置*/
+	/**
+	 * 客户还款登记流水-审批标志位
+	 */
+	private boolean shenpibiaozhi ;
+	/**
+	 * 审批流水
+	 */
+	private MoneyPool moneyPool ;
+	/*审批调用专用设置*/
 	/**
 	 * 调用方标志位  10：财务人员还款确认（线下转账），20：自动线下代扣，21：人工线下代扣，30：自动银行代扣，31：人工银行代扣;40:PC网关充值;50:APP快捷充值;
 	 */

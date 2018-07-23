@@ -2,6 +2,7 @@ package com.hongte.alms.base.service.impl;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.SysParameter;
+import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.enums.SysParameterStautsEnums;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
 import com.hongte.alms.base.mapper.SysParameterMapper;
@@ -58,6 +59,13 @@ public class SysParameterServiceImpl extends BaseServiceImpl<SysParameterMapper,
             parameterMap.put(parameter.getParamValue(),parameter);
         }
         return parameterMap;
+    }
+    
+    @Override
+    public SysParameter queryRechargeAccountSysParams(String rechargeAccountType) {
+    	return super.selectOne(new EntityWrapper<SysParameter>()
+				.eq("param_type", BusinessTypeEnum.getRechargeAccountIdByRechargeAccountName(rechargeAccountType))
+				.eq("param_type_name", rechargeAccountType).eq("param_name", rechargeAccountType));
     }
 
 }

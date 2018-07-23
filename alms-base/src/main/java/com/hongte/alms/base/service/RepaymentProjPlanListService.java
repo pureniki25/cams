@@ -3,9 +3,11 @@ package com.hongte.alms.base.service;
 import java.util.Date;
 import java.util.List;
 
+import com.hongte.alms.base.RepayPlan.dto.RepaymentBizPlanDto;
 import com.hongte.alms.base.RepayPlan.dto.RepaymentSettleMoneyDto;
 import org.apache.ibatis.annotations.Param;
 
+import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentProjPlanList;
 import com.hongte.alms.common.service.BaseService;
 
@@ -29,6 +31,25 @@ public interface RepaymentProjPlanListService extends BaseService<RepaymentProjP
 	 * @return
 	 */
 	List<RepaymentProjPlanList> getProListForCalLateFee(String projListId);
+
+	/**
+	 * 计算每期pList得滞纳金
+	 * @param pList
+	 * @return
+	 */
+
+	RepaymentBizPlanList calLateFeeForPerPList(RepaymentBizPlanList pList);
+
+    List<RepaymentSettleMoneyDto> selectProjPlanMoney(int i, String businessId, Integer period,String planId);
+
+
+    /**
+     * 提前结清重新计算滞纳金
+     * @param dto
+     * @param pList
+     * @return
+     */
+    RepaymentBizPlanDto updateLateFee(RepaymentBizPlanDto dto);
 
 
 }

@@ -3,9 +3,11 @@ package com.hongte.alms.platrepay.controller;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -24,18 +26,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.hongte.alms.base.dto.compliance.TdPlatformPlanRepaymentDTO;
 import com.hongte.alms.base.dto.compliance.TdProjectPaymentInfoResult;
 import com.hongte.alms.base.dto.compliance.TdRefundMonthInfoDTO;
 import com.hongte.alms.base.entity.AgencyRechargeLog;
 import com.hongte.alms.base.entity.BasicCompany;
 import com.hongte.alms.base.entity.IssueSendOutsideLog;
 import com.hongte.alms.base.entity.RepaymentProjPlan;
+import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.base.enums.BankEnum;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
-import com.hongte.alms.base.enums.RechargeAccountTypeEnums;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.service.AgencyRechargeLogService;
@@ -900,15 +901,26 @@ public class TdrepayRechargeController {
 
 			List<Map<String, Object>> resultList = new ArrayList<>();
 
-			List<String> listName = RechargeAccountTypeEnums.listName();
+			Set<String> nameSet = new HashSet<>();
+			BusinessTypeEnum[] businessTypeEnums = BusinessTypeEnum.values(); 
+			for (BusinessTypeEnum businessTypeEnum : businessTypeEnums) {
+				nameSet.add(businessTypeEnum.rechargeAccountName());
+			}
 
 			int num = 1;
 
-			for (String rechargeAccountType : listName) {
+			for (String rechargeAccountType : nameSet) {
 
 				Map<String, Object> resultMap = new HashMap<>();
 
-				paramMap.put("userId", tdrepayRechargeService.handleAccountType(rechargeAccountType));
+				SysParameter sysParameter = tdrepayRechargeService.queryRechargeAccountSysParams(rechargeAccountType);
+				if (sysParameter == null) {
+					continue;
+				}
+
+				String userId = sysParameter.getParamValue();
+				
+				paramMap.put("userId", userId);
 
 				com.ht.ussp.core.Result result = eipRemote.queryUserAviMoney(paramMap);
 

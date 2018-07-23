@@ -151,7 +151,7 @@ let data = {
         }, {
             title: '操作',
             key: 'action',
-            fixed: 'right',
+            // fixed: 'right',
             align: 'center',
             render: (h, params) => {
                 let detail = h('Button', {
@@ -284,9 +284,13 @@ let methods = {
 
     paging(current) {
         this.searchForm.current = current;
-        this.search();
+        this.searchData();
     },
-    search() {
+    search(){
+        this.searchForm.current = 1;
+        this.searchData();
+    },
+    searchData() {
         /* table.reload('main_table', {
              where: vm.search,
              page: {curr: 1}
@@ -357,7 +361,7 @@ delete(row) {
             axios.get(basePath + 'departmentBank/delete', {params: {id: row.accountId}})
             .then(res => {
                 if (!!res.data && res.data.code == '1') {
-                    this.searchForm.current = 1;
+                    
                     self.search()
                 } else {
                     self.$Modal.error({content: '请求接口失败,消息:' + res.data.msg})

@@ -61,7 +61,7 @@
 
 
             <Modal :title="editModalTitle" v-model="editModal" :loading="editModalLoading" @on-ok="submitEditForm"
-                   @on-cancel="hideEditModal">
+                   @on-cancel="hideEditModal" :styles="{top: '5px'}">
                         <i-form ref="editForm" :model="editForm" :rules="ruleValidate" label-position="right" label-width="150">
                             <!--<input type="hidden" v-model="editForm.accountId"/>-->
                             <Form-item label="财务导入流水账号：" prop="financeName">

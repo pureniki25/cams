@@ -540,11 +540,23 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 		if (req.getMprIds()==null||req.getMprIds().size()==0) {
 			return ;
 		}
+		
+		
 		List<MoneyPoolRepayment> moneyPoolRepayments = moneyPoolRepaymentMapper.selectBatchIds(req.getMprIds());
 		for (MoneyPoolRepayment mpr : moneyPoolRepayments) {
 			mpr.setLastState(mpr.getState());
 			mpr.setState(RepayRegisterFinanceStatus.财务确认已还款.toString());
-			MoneyPool moneyPool = moneyPoolMapper.selectById(mpr.getMoneyPoolId());
+			
+			MoneyPool moneyPool = null ;
+			if (req.isShenpibiaozhi()) {
+				if (req.getMprIds().size()>1) {
+					throw new ServiceRuntimeException("500", "客户还款登记流水审批失败:传入的mprid多于1个");
+				}
+				moneyPool = req.getMoneyPool();
+			}else {
+				moneyPool = moneyPoolMapper.selectById(mpr.getMoneyPoolId());
+			}
+			
 			moneyPool.setLastStatus(moneyPool.getStatus());
 			moneyPool.setLastFinanceStatus(moneyPool.getFinanceStatus());
 			moneyPool.setStatus(RepayRegisterState.完成.toString());

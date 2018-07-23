@@ -122,7 +122,6 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
     public void setUserPermissons(String userId){
     	
     	JSONObject pagePermissionJSONObject = JSONObject.parseObject(pagePermission);
-    	pagePermissionJSONObject.getJSONObject("pageName").get("page0");
     	
     	updatePagePermission(pagePermissionJSONObject,userId);
     	MyPermissionIdsInfo myPermissionIdsInfo = new MyPermissionIdsInfo();
