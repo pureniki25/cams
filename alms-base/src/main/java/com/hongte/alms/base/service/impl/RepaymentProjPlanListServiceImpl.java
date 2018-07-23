@@ -132,7 +132,7 @@ public class RepaymentProjPlanListServiceImpl extends
 							for (RepaymentProjPlanList projPList : projList) {
 							
 								// 每个表的还款计划列表对应所的标的还款计划
-								calLateFeeForPerPList(pList);
+								calLateFeeForPerPList(pList,null);
 							
 							
 				    }
@@ -601,9 +601,9 @@ public class RepaymentProjPlanListServiceImpl extends
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = Exception.class)
 	@Override
-	public RepaymentBizPlanList calLateFeeForPerPList(RepaymentBizPlanList pList) {
+	public RepaymentBizPlanList calLateFeeForPerPList(RepaymentBizPlanList pList,Integer type) {
 		Date nowDate=new Date();
-		if(pList.getFactRepayDate()!=null) {
+		if(pList.getFactRepayDate()!=null&&type!=null&&type==1) {
 			nowDate=pList.getFactRepayDate();
 		}
 		
@@ -699,7 +699,7 @@ public class RepaymentProjPlanListServiceImpl extends
 
 	@Override
 	public RepaymentBizPlanDto updateLateFee(RepaymentBizPlanDto dto) {
-		RepaymentBizPlanList pList=calLateFeeForPerPList(dto.getBizPlanListDtos().get(0).getRepaymentBizPlanList());
+		RepaymentBizPlanList pList=calLateFeeForPerPList(dto.getBizPlanListDtos().get(0).getRepaymentBizPlanList(),1);
 		dto.getBizPlanListDtos().get(0).setRepaymentBizPlanList(pList);
 		List<RepaymentBizPlanListDetail> details=repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", pList.getPlanListId()));
 		dto.getBizPlanListDtos().get(0).setBizPlanListDetails(details);
