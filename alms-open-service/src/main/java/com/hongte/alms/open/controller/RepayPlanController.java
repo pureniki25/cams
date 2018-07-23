@@ -17,6 +17,7 @@ import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.enums.AlmsServiceNameEnums;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.service.SysApiCallFailureRecordService;
 import com.hongte.alms.common.result.Result;
@@ -302,34 +303,35 @@ public class RepayPlanController {
                         //要对费类型进行转换：
                         //从 应还项目所属分类，10：本金，20：利息，30：资产端分公司服务费，40：担保公司费用，50：资金端平台服务费，60：滞纳金，70：违约金，80：中介费，90：押金类费用，100：冲应收
                         //转成 费用类型(  1:本金; 2:利息; 3:服务费; 4:其他费用; 5:违约金;6:冲应收)
-                        Integer feeType = 4;
-                        switch (planListDetail.getPlanItemType()) {
-                            case 10:
-                                feeType = 1;
-                                break;
-                            case 20:
-                                feeType = 2;
-                                break;
-                            case 30:
-                                feeType = 3;
-                                break;
-                            case 40:
-                            case 50:
-                            case 60:
-                            case 80:
-                            case 90:
-                                feeType = 4;
-                                break;
-                            case 70:
-                                feeType = 5;
-                                break;
-                            case 100:
-                                feeType = 6;
-                                break;
-                        }
-                        afterDetail.setFeeName(planListDetail.getPlanItemName());
-
+                        // Integer feeType = 4;
+                        // switch (planListDetail.getPlanItemType()) {
+                        //     case 10:
+                        //         feeType = 1;
+                        //         break;
+                        //     case 20:
+                        //         feeType = 2;
+                        //         break;
+                        //     case 30:
+                        //         feeType = 3;
+                        //         break;
+                        //     case 40:
+                        //     case 50:
+                        //     case 60:
+                        //     case 80:
+                        //     case 90:
+                        //         feeType = 4;
+                        //         break;
+                        //     case 70:
+                        //         feeType = 5;
+                        //         break;
+                        //     case 100:
+                        //         feeType = 6;
+                        //         break;
+                        // }
+                        //afterDetail.setAfterFeeType(feeType);
+                        Integer feeType =RepayPlanFeeTypeEnum.getByKey(planListDetail.getPlanItemType()).getXd_value();
                         afterDetail.setAfterFeeType(feeType);
+                        afterDetail.setFeeName(planListDetail.getPlanItemName());
                         afterDetail.setFeeName(FEE_TYPE_MAP.get(feeType));
                         afterDetail.setPlanFeeValue(planListDetail.getPlanAmount());
                         afterDetail.setActualFeeValue(planListDetail.getFactAmount());
