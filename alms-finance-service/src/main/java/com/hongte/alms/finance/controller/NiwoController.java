@@ -86,6 +86,9 @@ public class NiwoController {
 		niWoRepayPlanService.sendRepayRemindMsg(1);
 		niWoRepayPlanService.sendSettleRemindMsg(1);
 		niWoRepayPlanService.sendSettleRemindMsg(15);
+		niWoRepayPlanService.sendOverDueRemindMsg(1);
+		niWoRepayPlanService.sendOverDueRemindMsg(15);
+		niWoRepayPlanService.sendOverDueRemindMsg(16);
 		logger.info("@sendRemindMsg@你我金融发送还款提醒短信--结束[{}]");
 	}
 	

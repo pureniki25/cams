@@ -49,6 +49,13 @@ public interface NiWoRepayPlanService {
 	 */
 	
 	public void sendSettleRemindMsg(Integer days);
-		
+	
+
+	/**逾期提醒，逾期提醒
+	 * 
+	 */
+	
+	public void sendOverDueRemindMsg(Integer days);
+
 	
 }
