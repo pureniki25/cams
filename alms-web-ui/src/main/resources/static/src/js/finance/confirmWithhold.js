@@ -48,6 +48,9 @@ window.layinit(function (htConfig) {
                                     if (p.row.status == '待确认') {
                                         app.openConfirmModal(p)
                                     }
+                                    if(p.row.status == '已确认'){
+                                        app.openCancelWithholdModal(p)
+                                    }
                                 }
                             },
                             props: {
@@ -130,6 +133,34 @@ window.layinit(function (htConfig) {
 
                     })
             },
+            cancelWithholdConfirm(o){
+                let p = {
+                    businessId: businessId
+                }
+                if (o) {
+                    p.afterId = o.row.afterId
+                }else{
+                    return ;
+                }
+                axios.get(fpath + 'finance/cancelWithholdConfirm', {
+                        params: p
+                    })
+                    .then(function (res) {
+                        if (res.data.code == "1") {
+                            app.listData()
+                        } else {
+                            app.$Message.error({
+                                content: res.data.msg
+                            })
+                        }
+                    })
+                    .catch(function (err) {
+                        app.$Message.error({
+                            content: err
+                        })
+
+                    })
+            },
             openConfirmModal(p) {
                 let desc = '是否对' + businessId + '业务的代扣金额进行确认?'
                 if (p) {
@@ -140,6 +171,15 @@ window.layinit(function (htConfig) {
                     content: desc,
                     onOk: function () {
                         app.confirmWithhold(p)
+                    }
+                })
+            },
+            openCancelWithholdModal(p){
+                let desc = '是否取消' + businessId +'-'+p.row.afterId+ '业务的代扣确认?'
+                app.$Modal.confirm({
+                    content: desc,
+                    onOk: function () {
+                        app.cancelWithholdConfirm(p)
                     }
                 })
             },
