@@ -729,7 +729,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         }
         Boolean preview = financeSettleBaseDto.getPreview();
 
-        if (preview) { //保存操作
+        if (!preview) { //保存操作
             repaymentSettleLogDetailMapper.insert(repaymentSettleLogDetail);
 
             RepaymentProjPlanListDetail repaymentProjPlanListDetail = new RepaymentProjPlanListDetail();
@@ -1819,7 +1819,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 	private BigDecimal calcPenalty(RepaymentBizPlanList bizPlanList,String planId) {
 		List<ProjExtRate> extRates = projExtRateMapper
 				.selectList(new EntityWrapper<ProjExtRate>().eq("business_id", bizPlanList.getOrigBusinessId())
-						.ge("begin_peroid", bizPlanList.getPeriod()).le("end_peroid", bizPlanList.getPeriod()));
+						.le("begin_peroid", bizPlanList.getPeriod()).ge("end_peroid", bizPlanList.getPeriod()));
 		BigDecimal penalty = BigDecimal.ZERO;
 		for (ProjExtRate projExtRate : extRates) {
 			switch (projExtRate.getCalcWay()) {
@@ -1861,10 +1861,12 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 		infoVO.setItem30(item30);
 		infoVO.setItem50(item50);
 		
-		
+		repaymentBizPlanList = repaymentProjPlanListService.calLateFeeForPerPList(repaymentBizPlanList,1);
+		BigDecimal item60offline = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList.getPlanListId(), "60", RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid());
+		BigDecimal item60online = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList.getPlanListId(), "60", RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid());
 		//TODO 要调用滞纳金计算
-		/*infoVO.setOfflineOverDue(infoVO.getOfflineOverDue().add(item60offline));
-		infoVO.setOnlineOverDue(infoVO.getOnlineOverDue().add(item60online));*/
+		infoVO.setOfflineOverDue(infoVO.getOfflineOverDue().add(item60offline));
+		infoVO.setOnlineOverDue(infoVO.getOnlineOverDue().add(item60online));
 	}
 	
 	/**

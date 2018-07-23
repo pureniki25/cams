@@ -369,13 +369,13 @@ public class FinanceServiceImpl implements FinanceService {
 			moneyPoolRepayment.setMoneyPoolId(null);
 			moneyPoolRepayment.setUpdateTime(now);
 			moneyPoolRepayment.setUpdateUser(loginUserInfoHelper.getUserId());
-			boolean mprUpdateRes = moneyPoolRepayment.updateById();
+			boolean mprUpdateRes = moneyPoolRepayment.updateAllColumnById();
 			if (!mprUpdateRes) {
 				return Result.error("500", "更新还款登记数据失败");
 			}
 			moneyPool.setFinanceStatus(RepayRegisterFinanceStatus.未关联银行流水.toString());
 			moneyPool.setStatus(RepayRegisterState.待领取.toString());
-			boolean mpUpdateRes = moneyPool.updateById();
+			boolean mpUpdateRes = moneyPool.updateAllColumnById();
 			if (!mpUpdateRes) {
 				return Result.error("500", "更新银行流水数据失败");
 			}
