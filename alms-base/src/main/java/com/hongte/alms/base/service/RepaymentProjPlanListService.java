@@ -1,5 +1,6 @@
 package com.hongte.alms.base.service;
 
+import java.util.Date;
 import java.util.List;
 
 import com.hongte.alms.base.RepayPlan.dto.RepaymentSettleMoneyDto;
@@ -30,5 +31,4 @@ public interface RepaymentProjPlanListService extends BaseService<RepaymentProjP
 	List<RepaymentProjPlanList> getProListForCalLateFee(String projListId);
 
 
-    List<RepaymentSettleMoneyDto> selectProjPlanMoney(int i, String businessId, Integer period,String planId);
 }

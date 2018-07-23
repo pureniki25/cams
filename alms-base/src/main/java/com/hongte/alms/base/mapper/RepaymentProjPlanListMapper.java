@@ -1,6 +1,7 @@
 package com.hongte.alms.base.mapper;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 import com.hongte.alms.base.RepayPlan.dto.RepaymentSettleMoneyDto;
@@ -58,12 +59,5 @@ public interface RepaymentProjPlanListMapper extends SuperMapper<RepaymentProjPl
 	 */
 	List<RepaymentProjPlanList> getProListForCalLateFee(@Param("projListId") String projListId);
 
-	/**
-	 * 结清期 前面和后面的详情金额查询
-	 * @param flag
-	 * @param businessId
-	 * @param period
-	 * @return
-	 */
-    List<RepaymentSettleMoneyDto> selectProjPlanMoney(@Param("flag") int flag,@Param("businessId")  String businessId,@Param("period")  Integer period,@Param("planId") String planId);
+
 }

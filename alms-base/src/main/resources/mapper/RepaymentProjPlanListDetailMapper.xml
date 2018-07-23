@@ -78,7 +78,7 @@
 		rppl.business_id = #{businessId}
 		AND rpld.plan_item_type = 10 
 		<if test="planId != null">
-			AND rpld.plan_id = #{planId}
+			AND rppl.plan_id = #{planId}
 		</if>
 	ORDER BY
 		rpld.due_date

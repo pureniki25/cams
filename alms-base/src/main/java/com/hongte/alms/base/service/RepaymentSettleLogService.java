@@ -1,7 +1,10 @@
 package com.hongte.alms.base.service;
 
+import com.hongte.alms.base.RepayPlan.dto.RepaymentSettleMoneyDto;
 import com.hongte.alms.base.entity.RepaymentSettleLog;
 import com.hongte.alms.common.service.BaseService;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,6 @@ import com.hongte.alms.common.service.BaseService;
  */
 public interface RepaymentSettleLogService extends BaseService<RepaymentSettleLog> {
 
+
+    List<RepaymentSettleMoneyDto> selectProjPlanMoney(String businessId, String planId);
 }

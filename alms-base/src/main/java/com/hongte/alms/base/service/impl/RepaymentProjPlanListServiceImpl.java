@@ -669,10 +669,7 @@ public class RepaymentProjPlanListServiceImpl extends
 			return repaymentProjPlanListMapper.getProListForCalLateFee(projListId);
 		}
 
-	@Override
-	public List<RepaymentSettleMoneyDto> selectProjPlanMoney(int flag, String businessId, Integer period,String planId) {
-		return repaymentProjPlanListMapper.selectProjPlanMoney(flag,businessId,period,planId);
-	}
+
 
 
 } 
