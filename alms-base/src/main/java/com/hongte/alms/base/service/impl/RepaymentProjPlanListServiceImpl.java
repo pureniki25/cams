@@ -46,6 +46,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * <p>
@@ -69,6 +71,8 @@ public class RepaymentProjPlanListServiceImpl extends
 	@Autowired
 	@Qualifier("ProfitItemSetService")
 	ProfitItemSetService profitItemSetService;
+	
+	
 	@Autowired
 	RepaymentProjPlanListMapper repaymentProjPlanListMapper;
 	@Autowired
@@ -594,11 +598,8 @@ public class RepaymentProjPlanListServiceImpl extends
 			return repaymentProjPlanListMapper.getProListForCalLateFee(projListId);
 		}
 
-	@Override
-	public List<RepaymentSettleMoneyDto> selectProjPlanMoney(int flag, String businessId, Integer period,String planId) {
-		return repaymentProjPlanListMapper.selectProjPlanMoney(flag,businessId,period,planId);
-	}
 
+	@Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = Exception.class)
 	@Override
 	public RepaymentBizPlanList calLateFeeForPerPList(RepaymentBizPlanList pList) {
 		Date nowDate=new Date();
@@ -715,6 +716,7 @@ public class RepaymentProjPlanListServiceImpl extends
 		}
 		return dto;
 	}
+	
 
 
 } 
