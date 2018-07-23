@@ -69,6 +69,8 @@ public class RepaymentProjPlanListServiceImpl extends
 	@Autowired
 	@Qualifier("ProfitItemSetService")
 	ProfitItemSetService profitItemSetService;
+	
+	
 	@Autowired
 	RepaymentProjPlanListMapper repaymentProjPlanListMapper;
 	@Autowired
@@ -594,10 +596,7 @@ public class RepaymentProjPlanListServiceImpl extends
 			return repaymentProjPlanListMapper.getProListForCalLateFee(projListId);
 		}
 
-	@Override
-	public List<RepaymentSettleMoneyDto> selectProjPlanMoney(int flag, String businessId, Integer period,String planId) {
-		return repaymentProjPlanListMapper.selectProjPlanMoney(flag,businessId,period,planId);
-	}
+
 
 	@Override
 	public RepaymentBizPlanList calLateFeeForPerPList(RepaymentBizPlanList pList) {
@@ -715,6 +714,7 @@ public class RepaymentProjPlanListServiceImpl extends
 		}
 		return dto;
 	}
+	
 
 
 } 
