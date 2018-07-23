@@ -184,7 +184,32 @@
 WHERE (creat_sys_type = 2 AND plate_type!=2 and current_status <![CDATA[ <>  ]]> '已还款'  AND plan_list_id = #{projListId} AND( current_sub_status <![CDATA[ <>  ]]> '还款待确认' OR current_sub_status IS NULL))
 
 	</select>
-
+    <select id="selectProjPlanMoney" resultType="com.hongte.alms.base.RepayPlan.dto.RepaymentSettleMoneyDto">
+        SELECT
+        SUM(t3.proj_plan_amount) - SUM(t3.derate_amount) - SUM(IFNULL(t3.proj_fact_amount, 0.00)) AS money,
+        t1.proj_plan_id AS projPlanId,
+        t3.plan_item_type AS planItemType,
+        t2.repay_status AS repayStatus
+        FROM
+        tb_repayment_proj_plan t1
+        INNER JOIN tb_repayment_proj_plan_list t2 ON t1.proj_plan_id = t2.proj_plan_id
+        INNER JOIN tb_repayment_proj_plan_list_detail t3 ON t2.proj_plan_list_id = t3.proj_plan_list_id
+        WHERE 1 = 1
+        <if test="businessId !=null">
+            AND t1.business_id =#{businessId}
+        </if>
+        <if test="flag ==1">
+            AND t2.period &lt; #{period}
+        </if>
+        <if test="flag ==2">
+            AND t2.period &gt; #{period}
+			AND t3.plan_item_type=10
+        </if>
+        <if test="planId !=null">
+            AND t2.plan_id =#{planId}
+        </if>
+        GROUP BY t1.proj_plan_id, t3.plan_item_type
+    </select>
 
 
 </mapper>
