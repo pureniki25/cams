@@ -495,10 +495,12 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
         for (RepaymentSettleMoneyDto repaymentSettleMoneyDto : repaymentSettleMoneyDtoOder) {
             String projPlanId = repaymentSettleMoneyDto.getProjPlanId();
+            int isMast = repaymentSettleMoneyDto.getIsMast();
             Map<String, CurrPeriodProjDetailVO> webFactRepays = financeSettleBaseDto.getWebFactRepays();
             if (MapUtils.isNotEmpty(webFactRepays)) {
                 CurrPeriodProjDetailVO currPeriodProjDetailVO = webFactRepays.get(projPlanId);
                 if (currPeriodProjDetailVO != null) {
+                    currPeriodProjDetailVO.setMaster(isMast==1 ? true : false);
                     currPeriodProjDetailVOList.add(currPeriodProjDetailVO);
                 }
 
