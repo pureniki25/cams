@@ -184,7 +184,6 @@
 WHERE (creat_sys_type = 2 AND plate_type!=2 and current_status <![CDATA[ <>  ]]> '已还款'  AND plan_list_id = #{projListId} AND( current_sub_status <![CDATA[ <>  ]]> '还款待确认' OR current_sub_status IS NULL))
 
 	</select>
-
     <select id="selectProjPlanMoney" resultType="com.hongte.alms.base.RepayPlan.dto.RepaymentSettleMoneyDto">
         SELECT
         SUM(t3.proj_plan_amount) - SUM(t3.derate_amount) - SUM(IFNULL(t3.proj_fact_amount, 0.00)) AS money,

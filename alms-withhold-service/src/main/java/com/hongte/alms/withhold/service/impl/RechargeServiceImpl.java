@@ -18,6 +18,7 @@ import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.base.entity.WithholdingChannel;
 import com.hongte.alms.base.entity.WithholdingRepaymentLog;
+import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.enums.SysParameterEnums;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
@@ -437,10 +438,14 @@ public class RechargeServiceImpl implements RechargeService {
 				 * 调用接口前线插入记录 status 代扣状态(1:成功,0:失败;2:处理中)
 				 */
 				Integer status = 2;
-				com.hongte.alms.common.result.Result merchAccountResult=platformRepaymentFeignClient.getOIdPartner(business.getBusinessType());
-				String merchAccount="";
+				com.hongte.alms.common.result.Result merchAccountResult=platformRepaymentFeignClient.getOIdPartner(getBankSubBusinessType(business));
+				String oIdPartner="";
+				String tdUserName="";
 				if(merchAccountResult.getCode().equals("1")) {
-					merchAccount=(String) merchAccountResult.getData();
+					Map map= (Map) merchAccountResult.getData();
+					oIdPartner=map.get("oIdPartner").toString();
+					tdUserName=map.get("tdUserName").toString();
+					
 				}else {
 					logger.error("获取资产端唯一编号失败,pListId:{0}",pList.getPlanListId());
 					result.setCode("-1");
@@ -463,8 +468,8 @@ public class RechargeServiceImpl implements RechargeService {
 					logger.info("============================银行代扣，调用的子渠道是:"+dto.getChannelType()+"=====================================");
 					dto.setRechargeUserId(bankCardInfo.getPlatformUserID());
 					dto.setCmOrderNo(merchOrderId);
-					dto.setOidPartner(merchAccount);
-					dto.setOrgUserName(orgUserName);
+					dto.setOidPartner(oIdPartner);
+					dto.setOrgUserName(tdUserName);
 					dto.setUserIP(CommonUtil.getClientIp());
 					com.ht.ussp.core.Result remoteResult = null;
 					try {
@@ -542,7 +547,7 @@ public class RechargeServiceImpl implements RechargeService {
 				}
 				try {
 					Thread.sleep(5000);
-					getBankResult(log);
+					getBankResult(log,oIdPartner);
 				} catch (Exception e) {
 					logger.debug("查询银行代扣结果出错"+e);
 				}
@@ -553,6 +558,26 @@ public class RechargeServiceImpl implements RechargeService {
 
 	}
 
+	
+	
+	/**
+	 * 获取业务子类型
+	 */
+	private Integer getBankSubBusinessType(BasicBusiness business) {
+		Integer businessType=business.getBusinessType();
+		if(business.getBusinessType()==BusinessTypeEnum.CREDIT_TYPE.getValue()&&business.getBusinessCtype()!=null&&business.getBusinessCtype().equals("业主信用贷用信")) {
+			 businessType=26;
+			 return businessType;
+		}
+		if(business.getBusinessType()==BusinessTypeEnum.CREDIT_TYPE.getValue()&&business.getBusinessCtype()!=null&&business.getBusinessCtype().equals("小微企业贷用信")) {
+			 businessType=30; 
+			return businessType;
+		}
+		
+		return businessType;
+		
+	}
+	
 	/**
 	 * 获取银行代扣结果
 	 * 
@@ -1073,7 +1098,18 @@ public class RechargeServiceImpl implements RechargeService {
 		for (WithholdingRepaymentLog log : losgs) {
 			try {
 				if (log.getBindPlatformId() == PlatformEnum.YH_FORM.getValue()) {
-					getBankResult(log);
+					BasicBusiness business=basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", log.getOriginalBusinessId()));
+					com.hongte.alms.common.result.Result merchAccountResult=platformRepaymentFeignClient.getOIdPartner(business.getBusinessType());
+					String oIdPartner="";
+					if(merchAccountResult.getCode().equals("1")) {
+						Map map= (Map) merchAccountResult.getData();
+						oIdPartner=map.get("oIdPartner").toString();
+						
+					}else {
+						logger.error("获取资产端唯一编号失败,logId:{0}",log.getLogId());
+						continue;
+					}
+					getBankResult(log,oIdPartner);
 				}
 				if (log.getBindPlatformId() == PlatformEnum.BF_FORM.getValue()) {
 					getBFResult(log);
@@ -1088,7 +1124,7 @@ public class RechargeServiceImpl implements RechargeService {
 	}
 
 	@Override
-	public void getBankResult(WithholdingRepaymentLog log) {
+	public void getBankResult(WithholdingRepaymentLog log,String oidPartner) {
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("oidPartner", oidPartner);
 		paramMap.put("cmOrderNo", log.getMerchOrderId());

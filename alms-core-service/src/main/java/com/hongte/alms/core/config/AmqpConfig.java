@@ -17,7 +17,7 @@ import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 
 import com.rabbitmq.client.ConnectionFactory;
 
-@Configuration
+//@Configuration
 public class AmqpConfig {
 
     public final static String ALMS_DAIHOU = "alms.daihou_synch";
@@ -89,14 +89,6 @@ public class AmqpConfig {
         rabbitMessagingTemplate.setMessageConverter(jackson2Converter());
         rabbitMessagingTemplate.setRabbitTemplate(rabbitTemplate);
         return rabbitMessagingTemplate;
-    }
-    
-    
-    @Bean
-    public ConnectionFactory connectionFactory() {
-    	ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("/uc");
-        return factory;
     }
 
 }

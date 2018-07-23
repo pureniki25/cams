@@ -23,7 +23,7 @@ public enum BusinessTypeEnum implements IEnum {
     QCRZZL_TYPE(14, "汽车融资租赁", -1, Constant.BLANK_STR),	// 没有对应的充值账户，充值账户ID设置-1，充值账户名称设置"
     ESC_TYPE(15, "二手车商贷", 5, Constant.ER_SHOU_CHE_LOAN),
     YD_CAR_TYPE(20, "一点车贷", 6, Constant.YI_DIAN_LOAN),
-    CREDIT_TYPE(25, "信用贷", -1, Constant.BLANK_STR),	// 没有对应的充值账户，充值账户ID设置-1，充值账户名称设置"
+    CREDIT_TYPE(25, "信用贷", -1, Constant.CREDIT_LOAN),	// 没有对应的充值账户，充值账户ID设置-1，充值账户名称设置"
     PROPRIETOR_TYPE(26, "业主贷", 8, Constant.PROPRIETOR_LOAN),
     INSTALMENT_CREDIT_TYPE(27, "家装分期", 9, Constant.INSTALMENT_CREDIT_LOAN),
     COMMERCE_COMPANY_TYPE(28, "商贸共借", 10, Constant.COMMERCE_COMPANY_LOAN),

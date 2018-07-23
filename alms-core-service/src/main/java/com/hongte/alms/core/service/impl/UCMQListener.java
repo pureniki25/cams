@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONObject;
 import com.hongte.alms.base.service.SysUserPermissionService;
-import com.hongte.alms.base.vo.user.SelfBoaInUserInfo;
 
 /**
  * @ClassName: UCMQListener  
@@ -44,7 +43,7 @@ public class UCMQListener {
      * @param     参数  mq返回的消息
      * @return void    返回类型  
      */
-    @RabbitListener(queues = UC_NODELAY)
+    @RabbitListener(queues = UC_NODELAY,containerFactory="ucContainerFactory")
     @RabbitHandler
     public void userInfoAndPermissionSynch(Message message) {
 		String text = "";
@@ -54,25 +53,31 @@ public class UCMQListener {
 			text = new String(message.getBody());
 			logger.error("发送对象编码错误",e);
 		}
-		JSONObject jsonObject=JSONObject.parseObject(text);
-		if(jsonObject.containsKey(UC_ADD_USER)) {
-			addAppUser(jsonObject);
-		}
 		
-		if(jsonObject.containsKey(UC_DEL_USER)) {
-			delAppUser(jsonObject);
-		}
-		
-		if(jsonObject.containsKey(UC_UPDATE_ORG)) {
-			updateUserOrg(jsonObject);
-		}
-		
-		if(jsonObject.containsKey(UC_ADD_ROLE)) {
-			addUserRole(jsonObject);
-		}
-		
-		if(jsonObject.containsKey(UC_DEL_ROLE)) {
-			delUserRole(jsonObject);
+		try {
+			JSONObject jsonObject=JSONObject.parseObject(text);
+			if(jsonObject.containsKey(UC_ADD_USER)) {
+				addAppUser(jsonObject);
+			}
+			
+			if(jsonObject.containsKey(UC_DEL_USER)) {
+				delAppUser(jsonObject);
+			}
+			
+			if(jsonObject.containsKey(UC_UPDATE_ORG)) {
+				updateUserOrg(jsonObject);
+			}
+			
+			if(jsonObject.containsKey(UC_ADD_ROLE)) {
+				addUserRole(jsonObject);
+			}
+			
+			if(jsonObject.containsKey(UC_DEL_ROLE)) {
+				delUserRole(jsonObject);
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
 		}
 		
     }
