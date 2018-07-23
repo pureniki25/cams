@@ -17,6 +17,10 @@ public enum MsgCodeEnum implements IEnum {
     NIWO_REPAY_REMIND("niwo_repay_remind","你我金融还款提醒"),
     NIWO_SETTLE_REMIND("niwo_settle_remind","你我金融结清提醒"),
     
+    NIWO_OVERDUE_ONEDAY_REMIND("niwo_overdue_oneDay_remind","你我金融逾期提醒(逾期1天)"),
+    NIWO_OVERDUE_FIFTEENDAY_REMIND("niwo_overdue_fifteenDay_remind","你我金融逾期提醒(逾期15天)"),
+    NIWO_OVERDUE_SIXTEENDAY_REMIND("niwo_overdue_sixteenDay_remind","你我金融逾期提醒(逾期16天)"),
+    
 	//********************贷后短信模板*****************************//
 	
 	AFTER_REPAY_SUCCESS("after_repay_success","扣款成功短信通知(贷后)"),

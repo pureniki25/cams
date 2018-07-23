@@ -1151,7 +1151,56 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
         }
     }
 
-	public static void main(String[] args) {
-		System.out.println(new Date(Long.valueOf("1532448000000")));
+
+	@Override
+	public void sendOverDueRemindMsg(Integer days) {
+	
+		   
+					String templateCode="";
+					
+					
+					if(days==1) {
+						templateCode=MsgCodeEnum.NIWO_OVERDUE_ONEDAY_REMIND.getValue();
+					}else if(days==15) {
+						templateCode=MsgCodeEnum.NIWO_OVERDUE_FIFTEENDAY_REMIND.getValue();
+					}else if(days==16) {
+						templateCode=MsgCodeEnum.NIWO_OVERDUE_SIXTEENDAY_REMIND.getValue();
+					}
+					    days=0-days;
+					   Date dueDate=DateUtil.getDate(DateUtil.formatDate(DateUtil.addDay2Date(days, new Date())));
+					
+					SysMsgTemplate sysMsgTemplate=sysMsgTemplateService.selectOne(new EntityWrapper<SysMsgTemplate>().eq("template_code", templateCode));
+
+				
+					if(sysMsgTemplate==null) {
+						logger.info("你我金融-逾期提醒短信模板为空");
+						return;
+					}
+				   List<RepaymentProjPlanList>  lists=repaymentProjPlanListService.selectList(new EntityWrapper<RepaymentProjPlanList>().eq("current_status","逾期").eq("due_date", dueDate).eq("plate_type", 2));
+				   for(RepaymentProjPlanList projPlanList:lists) {
+						RepaymentProjPlan repaymentProjPlan=repaymentProjPlanService.selectOne(new EntityWrapper<RepaymentProjPlan>().eq("proj_plan_id", projPlanList.getProjPlanId()));
+					   TuandaiProjectInfo tuandaiProjectInfo=tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("project_id", repaymentProjPlan.getProjectId()));
+						Date borrowDate=null;
+						if(tuandaiProjectInfo.getQueryFullSuccessDate()!=null) {
+							borrowDate=tuandaiProjectInfo.getQueryFullSuccessDate();
+						}else {
+							borrowDate=tuandaiProjectInfo.getCreateTime();
+						}
+						Long msgModeId=Long.valueOf(sysMsgTemplate.getTemplateId());
+						MsgRequestDto dto=new MsgRequestDto();
+						dto.setApp("alms");
+						dto.setMsgTitle("你我金融逾期提醒");
+						dto.setMsgModelId(msgModeId);
+						dto.setMsgTo(tuandaiProjectInfo.getTelNo());
+						//组装发送短信内容的Json数据
+						JSONObject data = new JSONObject() ;
+						data.put("today", DateUtil.getChinaDay(new Date()));
+						data.put("totalAmount", projPlanList.getTotalBorrowAmount().add(projPlanList.getOverdueAmount()==null?BigDecimal.valueOf(0):projPlanList.getOverdueAmount()));
+						dto.setMsgBody(data);
+						String jason=JSON.toJSONString(dto);
+						msgRemote.sendRequest(jason);
+					   
+					}
+		
 	}
 }

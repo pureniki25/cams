@@ -18,6 +18,7 @@ import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.base.entity.WithholdingChannel;
 import com.hongte.alms.base.entity.WithholdingRepaymentLog;
+import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.enums.SysParameterEnums;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
@@ -437,7 +438,7 @@ public class RechargeServiceImpl implements RechargeService {
 				 * 调用接口前线插入记录 status 代扣状态(1:成功,0:失败;2:处理中)
 				 */
 				Integer status = 2;
-				com.hongte.alms.common.result.Result merchAccountResult=platformRepaymentFeignClient.getOIdPartner(business.getBusinessType());
+				com.hongte.alms.common.result.Result merchAccountResult=platformRepaymentFeignClient.getOIdPartner(getBankSubBusinessType(business));
 				String oIdPartner="";
 				String tdUserName="";
 				if(merchAccountResult.getCode().equals("1")) {
@@ -557,6 +558,26 @@ public class RechargeServiceImpl implements RechargeService {
 
 	}
 
+	
+	
+	/**
+	 * 获取业务子类型
+	 */
+	private Integer getBankSubBusinessType(BasicBusiness business) {
+		Integer businessType=business.getBusinessType();
+		if(business.getBusinessType()==BusinessTypeEnum.CREDIT_TYPE.getValue()&&business.getBusinessCtype()!=null&&business.getBusinessCtype().equals("业主信用贷用信")) {
+			 businessType=26;
+			 return businessType;
+		}
+		if(business.getBusinessType()==BusinessTypeEnum.CREDIT_TYPE.getValue()&&business.getBusinessCtype()!=null&&business.getBusinessCtype().equals("小微企业贷用信")) {
+			 businessType=30; 
+			return businessType;
+		}
+		
+		return businessType;
+		
+	}
+	
 	/**
 	 * 获取银行代扣结果
 	 * 

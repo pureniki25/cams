@@ -35,10 +35,11 @@ public interface RepaymentProjPlanListService extends BaseService<RepaymentProjP
 	/**
 	 * 计算每期pList得滞纳金
 	 * @param pList
+	 * @param type 1:结清重算 ,其他
 	 * @return
 	 */
 
-	RepaymentBizPlanList calLateFeeForPerPList(RepaymentBizPlanList pList);
+	RepaymentBizPlanList calLateFeeForPerPList(RepaymentBizPlanList pList,Integer type);
 
 
 
