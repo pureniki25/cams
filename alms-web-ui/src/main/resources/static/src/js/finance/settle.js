@@ -11,7 +11,6 @@ window.layinit(function (htConfig) {
     let cpath = htConfig.coreBasePath;
     let fpath = htConfig.financeBasePath;
     let layer = layui.layer;
-    let lastRepayDate ;
     let curIndex;
     app = new Vue({
         el: "#app",
@@ -238,7 +237,7 @@ window.layinit(function (htConfig) {
                         width:150,
                         render: (h, p) => {
 
-                            if (p.row.moneyPoolId != '合计' && !p.row.status == '完成') {
+                            if (p.row.moneyPoolId != '合计' && p.row.status == '待领取') {
                                 return h('i-button', {
                                         on: {
                                             click: function () {
@@ -471,7 +470,6 @@ window.layinit(function (htConfig) {
                     });
                     let o = n[n.length - 1]
                     app.factRepaymentInfo.repayDate = o.tradeDate
-                    lastRepayDate = o.tradeDate
                 }
                 app.factRepaymentInfo.moneyPoolAccount = moneyPoolAccount
                 app.factRepaymentInfo.repayAccount = accAdd(app.factRepaymentInfo.moneyPoolAccount,(app.factRepaymentInfo.surplusFund||0))
@@ -679,8 +677,7 @@ window.layinit(function (htConfig) {
                 axios.get(fpath + 'settle/settleInfo?businessId=' 
                 + businessId + "&afterId=" 
                 + afterId 
-                +(planId?('&planId='+planId):'')
-                +(lastRepayDate?('&factRepayDate='+lastRepayDate):''))
+                +(planId?('&planId='+planId):''))
                     .then(function (res) {
                         if (res.data.code == '1') {
                             let data = res.data.data;
@@ -759,6 +756,7 @@ window.layinit(function (htConfig) {
                 app.settle(params,app.handleSettleResult)
             },
             submitSettle(){
+                
                 let params = {}
                 params.businessId = businessId
                 params.afterId = afterId
@@ -768,7 +766,23 @@ window.layinit(function (htConfig) {
                 params.preview=false
 
                 params = Object.assign(app.factRepaymentInfo, params);
-                app.settle(params,app.handleSettleResult)
+
+                if(app.thisTimeRepaymentInfo.item10>app.factRepayPreview.item10){
+                    app.$Modal.confirm({
+                        content:'确认 亏损结清 ?',
+                        onOk:function(){
+                            params.deficit = true ;
+                            app.settle(params,app.handleSettleResult)
+                        },
+                        onCancel:function(){
+                            location.reload()
+                        }
+                    })
+                }else{
+                    app.settle(params,app.handleSettleResult)
+                }
+                
+
             }
             
         },
