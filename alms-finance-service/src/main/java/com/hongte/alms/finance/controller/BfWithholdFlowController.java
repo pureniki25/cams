@@ -65,6 +65,8 @@ public class BfWithholdFlowController {
             if (StringUtils.isNotBlank(withholdFlowReq.getEndTime()))
                 ew.le("liquidation_date", withholdFlowReq.getEndTime());
 
+            ew.orderBy("liquidation_date", false);
+
             // 查分页数据
             Page<WithholdingFlowRecord> pages = new Page<>(withholdFlowReq.getPage(), withholdFlowReq.getLimit());
             withholdingFlowRecordService.selectByPage(pages, ew);

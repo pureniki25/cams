@@ -33,7 +33,8 @@ public class MysqlGenerator {
         String dburl = "jdbc:mysql://172.16.200.113:3306/hongte_alms?characterEncoding=utf8";
 //        String tableName="tb_basic_company";//本次需要生成的表名
 //        String tableName="tb_collection_status";//本次需要生成的表名
-        String tableName="tb_withholding_flow_record";//本次需要生成的表名
+       // String tableName="tb_withholding_flow_record";//本次需要生成的表名
+        String tableName="";//本次需要生成的表名
         //1 设定生成配置
         GeneratorConfig inputConfig = new GeneratorConfig(
 //                "黄咏康",
