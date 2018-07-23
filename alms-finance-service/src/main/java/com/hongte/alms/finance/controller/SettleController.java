@@ -23,12 +23,12 @@ import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.service.RepaymentBizPlanListDetailService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.RepaymentBizPlanService;
-import com.hongte.alms.base.service.SettleService;
 import com.hongte.alms.base.vo.finance.RepaymentSettleListVO;
 import com.hongte.alms.base.vo.finance.SettleInfoVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
+import com.hongte.alms.finance.service.FinanceSettleService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -56,9 +56,9 @@ public class SettleController {
 	@Qualifier("RepaymentBizPlanListDetailService")
 	RepaymentBizPlanListDetailService repaymentBizPlanListDetailService;
 	
-	@Qualifier("SettleService")
 	@Autowired
-	SettleService settleService ;
+	@Qualifier("FinanceSettleService")
+	FinanceSettleService financeSettleService ;
 	
 	@GetMapping(value="/listRepaymentSettleListVOs")
 	@ApiOperation(value="还款计划")
@@ -89,7 +89,7 @@ public class SettleController {
 			if (!StringUtil.isEmpty(factRepayDate)) {
 				repayDate = DateUtil.getDate(factRepayDate);
 			}
-			SettleInfoVO infoVO = settleService.settleInfoVO(businessId, afterId, planId,repayDate);
+			SettleInfoVO infoVO = financeSettleService.settleInfoVO(businessId, afterId, planId,repayDate);
 			logger.error("@settleInfo@结清应还信息--结束[{}]", JSONObject.toJSONString(infoVO));
 			return Result.success(infoVO);
 		} catch (Exception e) {
