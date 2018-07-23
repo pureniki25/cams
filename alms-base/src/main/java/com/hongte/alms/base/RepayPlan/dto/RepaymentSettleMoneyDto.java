@@ -23,5 +23,7 @@ public class RepaymentSettleMoneyDto {
     private BigDecimal projFactAmount;
     private BigDecimal money; //差额
 
-    private int isMast;// 0共借标 1 主借标
+    private String planListId;
+    private String planDetailId;
+
 }

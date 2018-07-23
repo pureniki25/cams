@@ -96,7 +96,7 @@ public class FinanceSettleBaseDto {
     private Boolean preSettle ;
     
     /**
-     * 是否预览
+     * 是否预览  true 预览 false 保存
      */
     private Boolean preview ;
 

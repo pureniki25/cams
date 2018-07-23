@@ -33,8 +33,10 @@
         t3.business_id AS businessId,
         t3.plan_id AS planId,
         t3.after_id AS afterId,
+        t3.plan_list_id AS planListId,
         IFNULL(t3.repay_status,0) AS repayStatus,
         t4.proj_plan_detail_id AS projPlanDetailId,
+        t4.plan_detail_id AS planDetailId,
         t4.share_profit_index AS shareProfitIndex,
         t4.plan_item_type AS planItemType,
         t4.plan_item_name AS planItemName,
@@ -59,11 +61,13 @@
     </select>
 
 
-    <select id="orderSettleProj" resultType="com.hongte.alms.base.RepayPlan.dto.RepaymentSettleMoneyDto">
+    <select id="orderSettleProj" resultType="com.hongte.alms.base.RepayPlan.dto.RepaymentSettleProjDto">
         (SELECT
         t1.proj_plan_id AS projPlanId,
         t1.business_id AS businessId,
         t1.plan_id AS planId,
+        t2.full_borrow_money AS  projMoney,
+        t2.real_name AS userName,
         0 AS isMast
         FROM
         tb_repayment_proj_plan t1
@@ -79,6 +83,8 @@
         t1.proj_plan_id AS projPlanId,
         t1.business_id AS businessId,
         t1.plan_id AS planId,
+        t2.full_borrow_money AS  projMoney,
+        t2.real_name AS userName,
         0 AS isMast
         FROM
         tb_repayment_proj_plan t1
