@@ -170,10 +170,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
      * 2018年7月17日 下午3:10:03
      */
     private void calcSurplus(FinanceSettleBaseDto dto, FinanceSettleReq req) {
-        SettleInfoVO settleInfoVO = settleInfoVO(req.getBusinessId()
-                , req.getAfterId()
-                , req.getPlanId()
-                , dto.getRepaymentResources().get(dto.getRepaymentResources().size() - 1).getRepayDate());
+        SettleInfoVO settleInfoVO = settleInfoVO(req);
         if (dto.getRepayFactAmount().compareTo(settleInfoVO.getTotal()) > 0) {
             BigDecimal surplus = dto.getRepayFactAmount().subtract(settleInfoVO.getTotal());
             AccountantOverRepayLog accountantOverRepayLog = new AccountantOverRepayLog();
@@ -1739,31 +1736,36 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     }
     
     @Override
-	public SettleInfoVO settleInfoVO(String businessId, String afterId, String planId,Date factRepayDate) {
+	public SettleInfoVO settleInfoVO(FinanceSettleReq req) {
 		RepaymentBizPlanList cur = new RepaymentBizPlanList() ;
-		cur.setOrigBusinessId(businessId);cur.setAfterId(afterId);
+		cur.setOrigBusinessId(req.getBusinessId());cur.setAfterId(req.getAfterId());
 		cur = repaymentBizPlanListMapper.selectOne(cur);
 		if (cur==null) {
 			throw new ServiceRuntimeException("找不到当前期还款计划");
 		}
 		SettleInfoVO infoVO = new SettleInfoVO() ;
-		
-		infoVO.setItem10(repaymentProjPlanListDetailMapper.calcUnpaidPrincipal(businessId, planId));
+		Date settleDate = null ;
+		if (!StringUtil.isEmpty(req.getSettleDate())) {
+			settleDate = DateUtil.getDate(req.getSettleDate());
+			int diff = DateUtil.getDiffDays(cur.getDueDate(), settleDate);
+			if (diff>0&&cur.getCurrentStatus().equals(RepayPlanStatus.OVERDUE.getName())) {
+				infoVO.setOverDueDays(diff);
+			}
+		}
+			
+		infoVO.setItem10(repaymentProjPlanListDetailMapper.calcUnpaidPrincipal(req.getBusinessId(), req.getPlanId()));
 		Date today = new Date() ;
-		calcCurPeriod(cur,infoVO,factRepayDate==null?today:factRepayDate);
+		calcCurPeriod(cur,infoVO,req.getSettleDate()==null?today:DateUtil.getDate(req.getSettleDate()));
 		
 		
 		
 		infoVO.setRepayPlanDate(cur.getDueDate());
-		int diff = DateUtil.getDiffDays(cur.getDueDate(), factRepayDate==null?today:factRepayDate);
-		if (diff>0&&cur.getCurrentStatus().equals(RepayPlanStatus.OVERDUE.getName())) {
-			infoVO.setOverDueDays(diff);
-		}
 		
-		infoVO.setDerates(repaymentBizPlanListDetailMapper.selectLastPlanListDerateFees(businessId,cur.getDueDate(), planId));
-		infoVO.setLackFees(repaymentBizPlanListDetailMapper.selectLastPlanListLackFees(businessId,cur.getDueDate(), planId));
 		
-		infoVO.setPenalty(calcPenalty(cur, planId));
+		infoVO.setDerates(repaymentBizPlanListDetailMapper.selectLastPlanListDerateFees(req.getBusinessId(),cur.getDueDate(), req.getPlanId()));
+		infoVO.setLackFees(repaymentBizPlanListDetailMapper.selectLastPlanListLackFees(req.getBusinessId(),cur.getDueDate(), req.getPlanId()));
+		
+		infoVO.setPenalty(calcPenalty(cur, req.getPlanId()));
 		
 		infoVO.setSubtotal(infoVO.getSubtotal().add(infoVO.getItem10()).add(infoVO.getItem20()).add(infoVO.getItem30()).add(infoVO.getItem50()));
 		infoVO.setTotal(infoVO.getTotal().add(infoVO.getSubtotal()).add(infoVO.getOfflineOverDue()).add(infoVO.getOnlineOverDue()).add(infoVO.getDerate()).add(infoVO.getPlanRepayBalance()));

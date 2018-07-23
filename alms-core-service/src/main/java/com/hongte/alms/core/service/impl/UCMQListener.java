@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONObject;
 import com.hongte.alms.base.service.SysUserPermissionService;
-import com.hongte.alms.base.vo.user.SelfBoaInUserInfo;
 
 /**
  * @ClassName: UCMQListener  
