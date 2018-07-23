@@ -53,25 +53,31 @@ public class UCMQListener {
 			text = new String(message.getBody());
 			logger.error("发送对象编码错误",e);
 		}
-		JSONObject jsonObject=JSONObject.parseObject(text);
-		if(jsonObject.containsKey(UC_ADD_USER)) {
-			addAppUser(jsonObject);
-		}
 		
-		if(jsonObject.containsKey(UC_DEL_USER)) {
-			delAppUser(jsonObject);
-		}
-		
-		if(jsonObject.containsKey(UC_UPDATE_ORG)) {
-			updateUserOrg(jsonObject);
-		}
-		
-		if(jsonObject.containsKey(UC_ADD_ROLE)) {
-			addUserRole(jsonObject);
-		}
-		
-		if(jsonObject.containsKey(UC_DEL_ROLE)) {
-			delUserRole(jsonObject);
+		try {
+			JSONObject jsonObject=JSONObject.parseObject(text);
+			if(jsonObject.containsKey(UC_ADD_USER)) {
+				addAppUser(jsonObject);
+			}
+			
+			if(jsonObject.containsKey(UC_DEL_USER)) {
+				delAppUser(jsonObject);
+			}
+			
+			if(jsonObject.containsKey(UC_UPDATE_ORG)) {
+				updateUserOrg(jsonObject);
+			}
+			
+			if(jsonObject.containsKey(UC_ADD_ROLE)) {
+				addUserRole(jsonObject);
+			}
+			
+			if(jsonObject.containsKey(UC_DEL_ROLE)) {
+				delUserRole(jsonObject);
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
 		}
 		
     }
