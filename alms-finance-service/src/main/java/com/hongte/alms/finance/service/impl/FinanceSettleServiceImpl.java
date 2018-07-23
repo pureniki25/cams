@@ -1743,12 +1743,14 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 		if (cur==null) {
 			throw new ServiceRuntimeException("找不到当前期还款计划");
 		}
+		
+		List<MoneyPoolRepayment> moneyPoolRepayments = moneyPoolRepaymentMapper.selectList(new EntityWrapper<MoneyPoolRepayment>().eq("plan_list_id", cur.getPlanListId()).eq("is_finance_match", 1).orderBy("trade_date",false));
 		SettleInfoVO infoVO = new SettleInfoVO() ;
 		Date settleDate = null ;
-		if (!StringUtil.isEmpty(req.getSettleDate())) {
-			settleDate = DateUtil.getDate(req.getSettleDate());
-		}else {
+		if (CollectionUtils.isEmpty(moneyPoolRepayments)) {
 			settleDate = new Date();
+		}else {
+			settleDate = moneyPoolRepayments.get(0).getTradeDate() ;
 		}
 
 		int diff = DateUtil.getDiffDays(cur.getDueDate(), settleDate);
