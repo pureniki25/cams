@@ -362,6 +362,7 @@ public class RepayPlanController {
                     paramMap.put("accountantConfirmUser", bizPlanList.getAccountantConfirmUser());
                     paramMap.put("accountantConfirmDate", bizPlanList.getAccountantConfirmDate());
                     paramMap.put("createTime", bizPlanList.getCreateTime());
+                    paramMap.put("dueDate", bizPlanList.getDueDate());
                     paramMap.put("updateTime", bizPlanList.getUpdateTime());
                     paramMap.put("updateUser", bizPlanList.getUpdateUser());
                     paramMap.put("carBizDetailDtos", afterDetailDtos);
