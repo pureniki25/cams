@@ -10,7 +10,7 @@ import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.annotation.JobHandler;
 import com.xxl.job.core.log.XxlJobLogger;
-@JobHandler(value = "syncDaihouJob")
+@JobHandler(value = "syncUserInfoAndPermissionJob")
 @Component
 public class SyncUserInfoAndPermissionJob extends IJobHandler {
 	

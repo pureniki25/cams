@@ -504,7 +504,15 @@ public class RepayPlanController {
     @ResponseBody
    public Result<List<BizDto>> getRepayList(@RequestBody @Validated  AppRepayListReq req){
     	List<String> needBusinessTypes=req.getBusinessTypes();
-    	List<BasicBusiness> basicBusinessList=basicBusinessService.selectList(new EntityWrapper<BasicBusiness>().eq("customer_identify_card", req.getIdentifyCard()));
+    	List<TuandaiProjectInfo> infos=tuandaiProjectInfoService.selectList(new EntityWrapper<TuandaiProjectInfo>().eq("identity_card", req.getIdentifyCard()));
+    	
+    	List<BasicBusiness> basicBusinessList=new ArrayList();
+    	for(TuandaiProjectInfo info:infos) {
+    		BasicBusiness business=basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", info.getBusinessId()));
+    		if(business!=null) {
+    			basicBusinessList.add(business);
+    		}
+    	}
     	for(Iterator<BasicBusiness> it=basicBusinessList.iterator();it.hasNext();) {
     		BasicBusiness business=it.next();
     		BasicBusinessType businessType=basicBusinessTypeService.selectOne(new EntityWrapper<BasicBusinessType>().eq("business_type_id", business.getBusinessType()));
@@ -829,15 +837,15 @@ public class RepayPlanController {
         List<RepaymentBizPlan> bizPlans=null;
         if(isNiwoFlag) {
         	  if(isSettle!=null&&isSettle==1) {//过滤结清数据
-        	    projPlans = repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("business_id",businessId).ne("plan_status", 10).ne("plan_status", 20).ne("plan_status", 30));
+        	    projPlans = repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("business_id",businessId).ne("plan_status", 10).ne("plan_status", 20).ne("plan_status", 30).orderBy("query_full_success_date"));
         	  }else {
-        	 	projPlans = repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("business_id",businessId));
+        	 	projPlans = repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("business_id",businessId).orderBy("query_full_success_date"));
         	  }
         }else {
         	 if(isSettle!=null&&isSettle==1) {//过滤结清数据
-        	     bizPlans = repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",businessId).ne("plan_status", 10).ne("plan_status", 20).ne("plan_status", 30));
+        	     bizPlans = repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",businessId).ne("plan_status", 10).ne("plan_status", 20).ne("plan_status", 30).orderBy("create_time"));
          	  }else {
-         	     bizPlans = repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",businessId));
+         	     bizPlans = repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",businessId).orderBy("create_time"));
          	  }
       	
         }

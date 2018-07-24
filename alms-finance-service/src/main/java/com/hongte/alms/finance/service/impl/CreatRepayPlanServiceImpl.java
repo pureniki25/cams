@@ -1349,8 +1349,8 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                         BigDecimal planAmount = new BigDecimal(0);
                         for(RepaymentProjPlanListDetail pDetail: projpDetials){
                             BigDecimal pPAmount = pDetail.getProjPlanAmount();
-                            planAmount = planAmount.add(pPAmount);
                             pPAmount=  pPAmount.setScale(smallNum,roundingMode);
+                            planAmount = planAmount.add(pPAmount);
                             pDetail.setProjPlanAmount(pPAmount);
                         }
                         planAmount = planAmount.setScale(smallNum,roundingMode);
@@ -1556,7 +1556,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     List<RepaymentProjPlanListDetail>  priodListDetails = new LinkedList<>();
                     //创建还款计划list
                     RepaymentProjPlanList  projPlanList =  creatRepaymentProjPlanList(repaymentProjPlan,i,planIndex);// new RepaymentProjPlanList();
-                    Date date = DateUtil.addMonth2Date(i,projInfoReq.getQueryFullsuccessDate());
+                    Date date = DateUtil.addMonth2Date(i,projInfoReq.getBeginTime());
                     date = DateUtil.addDay2Date(-1,date);
                     projPlanList.setDueDate(DateUtil.getDayStart(date));
                     //将标的第i期写入还款计划map
@@ -2475,30 +2475,30 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 //        System.out.println(periodStr);
 
         //---------  还款本息   测试   开始----------//
-        Integer periodMonth = 36;
-        BigDecimal fullBorrowMoney = new BigDecimal(20000);
-        BigDecimal rate =new BigDecimal(11);
-//        Integer periodMonth = 12;
-//        BigDecimal fullBorrowMoney = new BigDecimal(120000);
-//        BigDecimal rate =new BigDecimal(12);
-
-        RepayPlanBorrowRateUnitEnum rateUnit = RepayPlanBorrowRateUnitEnum.YEAR_RATE;
-//        RepayPlanRepayIniCalcWayEnum repayType = RepayPlanRepayIniCalcWayEnum.INT_AND_PRIN_AVERAGE;//等本等息
-//        RepayPlanRepayIniCalcWayEnum repayType = RepayPlanRepayIniCalcWayEnum.PRINCIPAL_LAST;//先息后本
-        RepayPlanRepayIniCalcWayEnum repayType = RepayPlanRepayIniCalcWayEnum.INT_AND_PRIN_EQUAL; //等额本息
-//        RepayPlanRepayIniCalcWayEnum repayType = RepayPlanRepayIniCalcWayEnum.INT_AND_PRIN_EVERYTIME; //分期还本付息
-
-
-
-
-        CreatRepayPlanServiceImpl impl = new CreatRepayPlanServiceImpl();
-        impl.smallNum = 3;
-        List<PrincipleReq> principleMap = new LinkedList<>();
-
-        Map<Integer,Map<String,BigDecimal>> map = impl.calculateRepayPrinAndIni(periodMonth,fullBorrowMoney,rate,rateUnit,repayType,principleMap);
-
-
-        System.out.println(JSON.toJSONString(map));
+//        Integer periodMonth = 36;
+//        BigDecimal fullBorrowMoney = new BigDecimal(20000);
+//        BigDecimal rate =new BigDecimal(11);
+////        Integer periodMonth = 12;
+////        BigDecimal fullBorrowMoney = new BigDecimal(120000);
+////        BigDecimal rate =new BigDecimal(12);
+//
+//        RepayPlanBorrowRateUnitEnum rateUnit = RepayPlanBorrowRateUnitEnum.YEAR_RATE;
+////        RepayPlanRepayIniCalcWayEnum repayType = RepayPlanRepayIniCalcWayEnum.INT_AND_PRIN_AVERAGE;//等本等息
+////        RepayPlanRepayIniCalcWayEnum repayType = RepayPlanRepayIniCalcWayEnum.PRINCIPAL_LAST;//先息后本
+//        RepayPlanRepayIniCalcWayEnum repayType = RepayPlanRepayIniCalcWayEnum.INT_AND_PRIN_EQUAL; //等额本息
+////        RepayPlanRepayIniCalcWayEnum repayType = RepayPlanRepayIniCalcWayEnum.INT_AND_PRIN_EVERYTIME; //分期还本付息
+//
+//
+//
+//
+//        CreatRepayPlanServiceImpl impl = new CreatRepayPlanServiceImpl();
+//        impl.smallNum = 3;
+//        List<PrincipleReq> principleMap = new LinkedList<>();
+//
+//        Map<Integer,Map<String,BigDecimal>> map = impl.calculateRepayPrinAndIni(periodMonth,fullBorrowMoney,rate,rateUnit,repayType,principleMap);
+//
+//
+//        System.out.println(JSON.toJSONString(map));
 
 
 //        BigDecimal ttt = new BigDecimal("2.1111589965");
@@ -2510,7 +2510,12 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 //        BigDecimal big1 = new BigDecimal(100);
 //        BigDecimal big2 = new BigDecimal(50);
 //        System.out.println(big2.divide(big1));
+    	RoundingMode roundingMode=RoundingMode.UP;
+    	BigDecimal rate=BigDecimal.valueOf(11);
+    	BigDecimal  monthRate = rate.divide(new BigDecimal(12),10,roundingMode);
+    	System.out.println(monthRate);
     }
+
 
 	
 }
