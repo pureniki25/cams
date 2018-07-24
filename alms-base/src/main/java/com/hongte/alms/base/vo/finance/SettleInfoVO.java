@@ -97,7 +97,19 @@ public class SettleInfoVO {
 		}
 	}
 	
-	public SettleInfoVO() {
+	/**
+	 * 提前结清违约金
+	 */
+	private List<SettleFeesVO> penaltyFees ;
+	
+	public void setPenaltyFees(List<SettleFeesVO> list) {
+		this.penaltyFees = list ;
+		for (SettleFeesVO settleFeesVO : list) {
+			this.penalty = this.penalty.add(settleFeesVO.getAmount()).setScale(2, RoundingMode.HALF_UP);
+		}
+	}
+	
+	/*public SettleInfoVO() {
 		this.item10.setScale(2, RoundingMode.HALF_UP);
 		this.item20.setScale(2, RoundingMode.HALF_UP);
 		this.item30.setScale(2, RoundingMode.HALF_UP);
@@ -109,5 +121,5 @@ public class SettleInfoVO {
 		this.derate.setScale(2, RoundingMode.HALF_UP);
 		this.planRepayBalance.setScale(2, RoundingMode.HALF_UP);
 		this.total.setScale(2, RoundingMode.HALF_UP);
-	}
+	}*/
 }

@@ -11,6 +11,7 @@ import com.hongte.alms.base.mapper.*;
 import com.hongte.alms.base.process.mapper.ProcessMapper;
 import com.hongte.alms.base.service.*;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
+import com.hongte.alms.base.vo.finance.SettleFeesVO;
 import com.hongte.alms.base.vo.finance.SettleInfoVO;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.DateUtil;
@@ -1928,7 +1929,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 		infoVO.setDerates(repaymentBizPlanListDetailMapper.selectLastPlanListDerateFees(req.getBusinessId(),cur.getDueDate(), req.getPlanId()));
 		infoVO.setLackFees(repaymentBizPlanListDetailMapper.selectLastPlanListLackFees(req.getBusinessId(),cur.getDueDate(), req.getPlanId()));
 
-		infoVO.setPenalty(calcPenalty(cur, req.getPlanId()).setScale(2, RoundingMode.HALF_UP));
+		infoVO.setPenaltyFees(calcPenalty(cur, req.getPlanId()));
 		
 		infoVO.setSubtotal(infoVO.getSubtotal().add(infoVO.getItem10()).add(infoVO.getItem20()).add(infoVO.getItem30()).add(infoVO.getItem50()));
 		infoVO.setTotal(infoVO.getTotal().add(infoVO.getSubtotal()).add(infoVO.getOfflineOverDue()).add(infoVO.getOnlineOverDue()).add(infoVO.getDerate()).add(infoVO.getPlanRepayBalance()));
@@ -1944,33 +1945,84 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 	 * @param planId
 	 * @return
 	 */
-	private BigDecimal calcPenalty(RepaymentBizPlanList bizPlanList,String planId) {
+	private List<SettleFeesVO> calcPenalty(RepaymentBizPlanList bizPlanList,final String planId) {
+		EntityWrapper<RepaymentProjPlanList> eWrapper = new EntityWrapper<RepaymentProjPlanList>();
+		eWrapper.eq("plan_list_id", bizPlanList.getPlanListId()) ;
+		if (!StringUtil.isEmpty(planId)) {
+			eWrapper.eq("plan_id", planId);
+		}
+		List<RepaymentProjPlanList> projPlanLists = repaymentProjPlanListMapper.selectList(eWrapper);
+		Set<String> projPlanStrs = new HashSet<>();
+		for (RepaymentProjPlanList projPlanList : projPlanLists) {
+			projPlanStrs.add(projPlanList.getProjPlanId());
+		}
+		List<RepaymentProjPlan> projPlans = repaymentProjPlanMapper.selectList(new EntityWrapper<RepaymentProjPlan>().in("proj_plan_id", projPlanStrs)) ;
+		Set<String> projectIds = new HashSet<>() ;
+		for (RepaymentProjPlan projPlan : projPlans) {
+			projectIds.add(projPlan.getProjectId());
+		}
 		List<ProjExtRate> extRates = projExtRateMapper
-				.selectList(new EntityWrapper<ProjExtRate>().eq("business_id", bizPlanList.getOrigBusinessId()).eq("rate_type", RepayPlanFeeTypeEnum.PENALTY_AMONT.getValue())
-						.le("begin_peroid", bizPlanList.getPeriod()).ge("end_peroid", bizPlanList.getPeriod()));
-		BigDecimal penalty = BigDecimal.ZERO;
+				.selectList(new EntityWrapper<ProjExtRate>()
+						.eq("business_id", bizPlanList.getOrigBusinessId())
+						.in("project_id", projectIds)
+						.eq("rate_type", RepayPlanFeeTypeEnum.PENALTY_AMONT.getValue())
+						.le("begin_peroid", bizPlanList.getPeriod())
+						.ge("end_peroid", bizPlanList.getPeriod()));
+		
+		List<SettleFeesVO> fees = new ArrayList<>() ;
 		for (ProjExtRate projExtRate : extRates) {
-			switch (projExtRate.getCalcWay()) {
-			//根据计算方式不同分别计算
-			case 1:
+			BigDecimal penalty = BigDecimal.ZERO ;
+			SettleFeesVO fee = new SettleFeesVO() ;
+			if (RepayPlanExtRateCalcWayEnum.BY_BORROW_MONEY.getKey() == projExtRate.getCalcWay()) {
 				//1.借款金额*费率值
-				RepaymentProjPlan projPlan = repaymentProjPlanService.selectOne(new EntityWrapper<RepaymentProjPlan>().eq("project_id", projExtRate.getProjectId()));
-				penalty = penalty.add(projPlan.getBorrowMoney().multiply(projExtRate.getRateValue())) ;
-				break;
-			case 2:
+				TuandaiProjectInfo projectInfo = tuandaiProjectInfoMapper.selectById(projExtRate.getProjectId());
+				penalty = projectInfo.getBorrowAmount().multiply(projExtRate.getRateValue()) ;
+				
+			}else if (RepayPlanExtRateCalcWayEnum.BY_REMIND_MONEY.getKey() == projExtRate.getCalcWay()) {
 				//2剩余本金*费率值
 				BigDecimal upaid = repaymentProjPlanMapper.sumProjectItem10Unpaid(projExtRate.getProjectId(), planId);
 				penalty = penalty.add(upaid.multiply(projExtRate.getRateValue())) ;
-				break;
-			case 3:
+			}else if (RepayPlanExtRateCalcWayEnum.RATE_VALUE.getKey() == projExtRate.getCalcWay() ) {
 				//3.1*费率值'
 				penalty = penalty.add(projExtRate.getRateValue());
-				break;
-			default:
-				break;
+			}else if (RepayPlanExtRateCalcWayEnum.REMIND_PLAT_FEE.getKey() == projExtRate.getCalcWay()) {
+				//4 剩余的平台服务费合计
+				penalty = penalty.add(projExtRate.getRateValue());
+			}else if (RepayPlanExtRateCalcWayEnum.BY_MONTH_COM_FEE.getKey() == projExtRate.getCalcWay()) {
+				//5 费率值*月收分公司服务费
+				BigDecimal serviceFee = repaymentProjPlanListDetailMapper.calcProjectPlanAmount(
+						projExtRate.getProjectId(),planId,RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getValue().toString(),null) ;
+				penalty = penalty.add(projExtRate.getRateValue().multiply(serviceFee)) ;
+			}else if (RepayPlanExtRateCalcWayEnum.BY_MONTH_PLAT_FEE.getKey() == projExtRate.getCalcWay()) {
+				//6 费率值*月收平台服务费
+				BigDecimal platformFee = repaymentProjPlanListDetailMapper.calcProjectPlanAmount(
+						projExtRate.getProjectId(),planId,RepayPlanFeeTypeEnum.PLAT_CHARGE.getValue().toString(),null) ;
+				penalty = penalty.add(projExtRate.getRateValue().multiply(platformFee)) ;
+			}else if (RepayPlanExtRateCalcWayEnum.BY_REM_MONEY_AND_FEE.getKey() == projExtRate.getCalcWay()) {
+				//(剩余本金*费率值) - 分公司服务费违约金 - 平台服务费违约金
+				
+				BigDecimal upaid = repaymentProjPlanMapper.sumProjectItem10Unpaid(projExtRate.getProjectId(), planId);
+				BigDecimal servicePenalty = projExtRateMapper.calcProjextRate(
+						projExtRate.getProjectId(), RepayPlanFeeTypeEnum.PENALTY_AMONT.getValue().toString(), RepayPlanFeeTypeEnum.SUB_COMPANY_PENALTY.getUuid());
+				
+				BigDecimal platformPenalty = projExtRateMapper.calcProjextRate(
+						projExtRate.getProjectId(), RepayPlanFeeTypeEnum.PENALTY_AMONT.getValue().toString(), RepayPlanFeeTypeEnum.PLAT_PENALTY.getUuid());
+				penalty = (upaid.multiply(projExtRate.getRateValue())).subtract(servicePenalty).subtract(platformPenalty);
+				
+			}else {
+				logger.error("错误： projExtRate.CalcWay[{}]尚未有对应算法",projExtRate.getCalcWay());
+				throw new ServiceRuntimeException("错误： projExtRate.CalcWay["+projExtRate.getCalcWay()+"]尚未有对应算法");
 			}
+			
+			fee.setAmount(penalty);
+			fee.setFeeId(projExtRate.getFeeId());
+			fee.setFeeName(projExtRate.getFeeName());
+			fee.setPlanItemName(projExtRate.getRateName());
+			fee.setPlanItemType(projExtRate.getRateType().toString());
+			fee.setProjectId(projExtRate.getProjectId());
+			fees.add(fee) ;
 		}
-		return penalty;
+		return fees;
 	}
 	
 	/**

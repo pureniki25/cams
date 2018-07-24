@@ -83,4 +83,23 @@
 	ORDER BY
 		rpld.due_date
 	</select>
+		public BigDecimal calcProjectPlanAmount(@Param("projectId")String projectId,@Param("planId")String planId,@Param("planItemType")String planItemType,@Param("feeId")String feeId);
+	
+	<select id="calcProjectPlanAmount" resultType="java.math.BigDecimal">
+		SELECT
+			sum(rppld.proj_plan_amount)
+		FROM
+			tb_repayment_proj_plan_list_detail rppld
+			LEFT JOIN tb_repayment_proj_plan_list rppl ON rppl.proj_plan_list_id = rppld.proj_plan_list_id
+			LEFT JOIN tb_repayment_proj_plan rpp ON rpp.proj_plan_id = rppl.proj_plan_id
+		WHERE
+			rpp.project_id = #{projectId}
+			and rppld.plan_item_type = #{planItemType}
+			<if test="feeId != null">
+				and rppld.fee_id = #{feeId}
+			</if>
+			<if test="planId != null">
+				and rpp.plan_id = #{planId} 
+			</if>
+	</select>
 </mapper>
