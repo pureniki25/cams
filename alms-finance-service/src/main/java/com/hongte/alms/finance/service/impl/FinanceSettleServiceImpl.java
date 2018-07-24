@@ -1973,32 +1973,32 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 		for (ProjExtRate projExtRate : extRates) {
 			BigDecimal penalty = BigDecimal.ZERO ;
 			SettleFeesVO fee = new SettleFeesVO() ;
-			if (RepayPlanExtRateCalcWayEnum.BY_BORROW_MONEY.getKey() == projExtRate.getCalcWay()) {
+			if (PepayPlanProjExtRatCalEnum.BY_BORROW_MONEY.getValue() == projExtRate.getCalcWay()) {
 				//1.借款金额*费率值
 				TuandaiProjectInfo projectInfo = tuandaiProjectInfoMapper.selectById(projExtRate.getProjectId());
 				penalty = projectInfo.getBorrowAmount().multiply(projExtRate.getRateValue()) ;
 				
-			}else if (RepayPlanExtRateCalcWayEnum.BY_REMIND_MONEY.getKey() == projExtRate.getCalcWay()) {
+			}else if (PepayPlanProjExtRatCalEnum.BY_REMIND_MONEY.getValue() == projExtRate.getCalcWay()) {
 				//2剩余本金*费率值
 				BigDecimal upaid = repaymentProjPlanMapper.sumProjectItem10Unpaid(projExtRate.getProjectId(), planId);
 				penalty = penalty.add(upaid.multiply(projExtRate.getRateValue())) ;
-			}else if (RepayPlanExtRateCalcWayEnum.RATE_VALUE.getKey() == projExtRate.getCalcWay() ) {
+			}else if (PepayPlanProjExtRatCalEnum.RATE_VALUE.getValue() == projExtRate.getCalcWay() ) {
 				//3.1*费率值'
 				penalty = penalty.add(projExtRate.getRateValue());
-			}else if (RepayPlanExtRateCalcWayEnum.REMIND_PLAT_FEE.getKey() == projExtRate.getCalcWay()) {
+			}else if (PepayPlanProjExtRatCalEnum.REMIND_PLAT_FEE.getValue() == projExtRate.getCalcWay()) {
 				//4 剩余的平台服务费合计
 				penalty = penalty.add(projExtRate.getRateValue());
-			}else if (RepayPlanExtRateCalcWayEnum.BY_MONTH_COM_FEE.getKey() == projExtRate.getCalcWay()) {
+			}else if (PepayPlanProjExtRatCalEnum.BY_MONTH_COM_FEE.getValue() == projExtRate.getCalcWay()) {
 				//5 费率值*月收分公司服务费
 				BigDecimal serviceFee = repaymentProjPlanListDetailMapper.calcProjectPlanAmount(
 						projExtRate.getProjectId(),planId,RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getValue().toString(),null) ;
 				penalty = penalty.add(projExtRate.getRateValue().multiply(serviceFee)) ;
-			}else if (RepayPlanExtRateCalcWayEnum.BY_MONTH_PLAT_FEE.getKey() == projExtRate.getCalcWay()) {
+			}else if (PepayPlanProjExtRatCalEnum.BY_MONTH_PLAT_FEE.getValue() == projExtRate.getCalcWay()) {
 				//6 费率值*月收平台服务费
 				BigDecimal platformFee = repaymentProjPlanListDetailMapper.calcProjectPlanAmount(
 						projExtRate.getProjectId(),planId,RepayPlanFeeTypeEnum.PLAT_CHARGE.getValue().toString(),null) ;
 				penalty = penalty.add(projExtRate.getRateValue().multiply(platformFee)) ;
-			}else if (RepayPlanExtRateCalcWayEnum.BY_REM_MONEY_AND_FEE.getKey() == projExtRate.getCalcWay()) {
+			}else if (PepayPlanProjExtRatCalEnum.BY_REM_MONEY_AND_FEE.getValue() == projExtRate.getCalcWay()) {
 				//(剩余本金*费率值) - 分公司服务费违约金 - 平台服务费违约金
 				
 				BigDecimal upaid = repaymentProjPlanMapper.sumProjectItem10Unpaid(projExtRate.getProjectId(), planId);
