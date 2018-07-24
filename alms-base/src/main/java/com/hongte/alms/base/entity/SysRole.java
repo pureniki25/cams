@@ -40,7 +40,7 @@ public class SysRole extends Model<SysRole> {
     @TableField("page_type")
     @ApiModelProperty(required = true, value = "页面类型")
     private Integer pageType;
-    @TableId("id")
+    @TableField("id")
     @ApiModelProperty(required = true, value = "页面类型")
     private Integer id;
 
