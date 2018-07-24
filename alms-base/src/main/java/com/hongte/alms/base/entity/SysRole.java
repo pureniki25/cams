@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.baomidou.mybatisplus.enums.IdType;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -40,7 +42,7 @@ public class SysRole extends Model<SysRole> {
     @TableField("page_type")
     @ApiModelProperty(required = true, value = "页面类型")
     private Integer pageType;
-    @TableField("id")
+    @TableId(value = "id", type = IdType.INPUT)
     @ApiModelProperty(required = true, value = "页面类型")
     private Integer id;
 
