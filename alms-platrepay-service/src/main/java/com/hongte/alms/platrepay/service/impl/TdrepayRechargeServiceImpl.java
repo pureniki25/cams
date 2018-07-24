@@ -327,7 +327,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		DistributeFundDTO dto = new DistributeFundDTO();
 		String batchId = UUID.randomUUID().toString();
 		dto.setBatchId(batchId);
-		String rechargeAccountType = BusinessTypeEnum.getName(businessType);
+		String rechargeAccountType = BusinessTypeEnum.getRechargeAccountName(businessType);
 		
 		SysParameter sysParameter = this.queryRechargeAccountSysParams(rechargeAccountType);
 		if (sysParameter == null) {
