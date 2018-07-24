@@ -26,8 +26,8 @@ public enum BusinessTypeEnum implements IEnum {
     CREDIT_TYPE(25, "信用贷", -1, Constant.CREDIT_LOAN),	// 没有对应的充值账户，充值账户ID设置-1，充值账户名称设置"
     PROPRIETOR_TYPE(26, "业主贷", 8, Constant.PROPRIETOR_LOAN),
     INSTALMENT_CREDIT_TYPE(27, "家装分期", 9, Constant.INSTALMENT_CREDIT_LOAN),
-    COMMERCE_COMPANY_TYPE(28, "商贸共借", 10, Constant.COMMERCE_COMPANY_LOAN),
-    PROPRIETOR_COMPANY_TYPE(29, "业主共借", 11, Constant.PROPRIETOR_COMPANY_LOAN),
+    COMMERCE_COMPANY_TYPE(28, "商贸贷共借", 10, Constant.COMMERCE_COMPANY_LOAN),
+    PROPRIETOR_COMPANY_TYPE(29, "业主贷共借", 11, Constant.PROPRIETOR_COMPANY_LOAN),
 	COMMERCE_TYPE(30, "商贸贷", 7, Constant.COMMERCE_LOAN),
 	YOU_FANG_TYPE(35, "优房贷", 2, Constant.HOUSE_LOAN);
 
