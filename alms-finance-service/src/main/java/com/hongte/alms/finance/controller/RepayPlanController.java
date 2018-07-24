@@ -504,7 +504,15 @@ public class RepayPlanController {
     @ResponseBody
    public Result<List<BizDto>> getRepayList(@RequestBody @Validated  AppRepayListReq req){
     	List<String> needBusinessTypes=req.getBusinessTypes();
-    	List<BasicBusiness> basicBusinessList=basicBusinessService.selectList(new EntityWrapper<BasicBusiness>().eq("customer_identify_card", req.getIdentifyCard()));
+    	List<TuandaiProjectInfo> infos=tuandaiProjectInfoService.selectList(new EntityWrapper<TuandaiProjectInfo>().eq("identity_card", req.getIdentifyCard()));
+    	
+    	List<BasicBusiness> basicBusinessList=new ArrayList();
+    	for(TuandaiProjectInfo info:infos) {
+    		BasicBusiness business=basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", info.getBusinessId()));
+    		if(business!=null) {
+    			basicBusinessList.add(business);
+    		}
+    	}
     	for(Iterator<BasicBusiness> it=basicBusinessList.iterator();it.hasNext();) {
     		BasicBusiness business=it.next();
     		BasicBusinessType businessType=basicBusinessTypeService.selectOne(new EntityWrapper<BasicBusinessType>().eq("business_type_id", business.getBusinessType()));
