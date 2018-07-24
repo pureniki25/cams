@@ -51,6 +51,14 @@ public class AppRepayListReq {
      */ 
     @ApiModelProperty(value = "是否过滤结清数据")
     private Integer isSettle;
+    
+    
+    /**
+     * 是否主借款人 1：是  0：否
+     */ 
+    @ApiModelProperty(value = "是否主借款人")
+    private Integer isMainCustomer;
+
 
 
 }
