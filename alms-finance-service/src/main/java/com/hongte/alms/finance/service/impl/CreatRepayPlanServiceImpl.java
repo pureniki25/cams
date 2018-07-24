@@ -1521,7 +1521,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     List<RepaymentProjPlanListDetail>  priodListDetails = new LinkedList<>();
                     //创建还款计划list
                     RepaymentProjPlanList  projPlanList =  creatRepaymentProjPlanList(repaymentProjPlan,i,planIndex);// new RepaymentProjPlanList();
-                    Date date = DateUtil.addMonth2Date(i,projInfoReq.getQueryFullsuccessDate());
+                    Date date = DateUtil.addMonth2Date(i,projInfoReq.getBeginTime());
                     date = DateUtil.addDay2Date(-1,date);
                     projPlanList.setDueDate(DateUtil.getDayStart(date));
                     //将标的第i期写入还款计划map
