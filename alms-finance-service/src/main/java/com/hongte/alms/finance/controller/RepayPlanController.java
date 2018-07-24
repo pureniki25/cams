@@ -844,7 +844,7 @@ public class RepayPlanController {
         List<RepaymentProjPlan> projPlans=null;
         List<RepaymentBizPlan> bizPlans=null;
         if(isNiwoFlag) {
-        	  if(req.getIsSettle()!=null&&req.getIsSettle()==1) {//过滤结清数据
+        	  if(req!=null&&req.getIsSettle()!=null&&req.getIsSettle()==1) {//过滤结清数据
         		  if(req.getIsMainCustomer()!=null&&req.getIsMainCustomer()!=1) {//是共借人的话只能看自己的还款计划
         		        TuandaiProjectInfo info= tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("identity_card",req.getIdentifyCard()));
         	       	    projPlans = repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("business_id",businessId).eq("project_id", info.getProjectId()).ne("plan_status", 10).ne("plan_status", 20).ne("plan_status", 30).orderBy("query_full_success_date"));
@@ -852,7 +852,7 @@ public class RepayPlanController {
         	            projPlans = repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("business_id",businessId).ne("plan_status", 10).ne("plan_status", 20).ne("plan_status", 30).orderBy("query_full_success_date"));
         		  }
         	  }else {
-        		  if(req.getIsMainCustomer()!=null&&req.getIsMainCustomer()!=1) {//是共借人的话只能看自己的还款计划
+        		  if(req!=null&&req.getIsMainCustomer()!=null&&req.getIsMainCustomer()!=1) {//是共借人的话只能看自己的还款计划
 	      		        TuandaiProjectInfo info= tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("identity_card",req.getIdentifyCard()));
 	      	            projPlans = repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("business_id",businessId).eq("project_id", info.getProjectId()).orderBy("query_full_success_date"));
 	      		  }else {
@@ -860,7 +860,7 @@ public class RepayPlanController {
                   }
           }
         }else {
-        	 if(req.getIsSettle()!=null&&req.getIsSettle()==1) {//过滤结清数据
+        	 if(req!=null&&req.getIsSettle()!=null&&req.getIsSettle()==1) {//过滤结清数据
         	     bizPlans = repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",businessId).ne("plan_status", 10).ne("plan_status", 20).ne("plan_status", 30).orderBy("create_time"));
          	  }else {
          	     bizPlans = repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",businessId).orderBy("create_time"));
