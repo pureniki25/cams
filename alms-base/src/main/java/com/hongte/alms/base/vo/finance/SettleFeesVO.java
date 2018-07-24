@@ -19,4 +19,5 @@ public class SettleFeesVO {
 	private String feeId ;
 	private String feeName ;
 	private BigDecimal amount ;
+	private Integer shareProfitIndex ;
 }
