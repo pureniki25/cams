@@ -1819,7 +1819,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 	 */
 	private BigDecimal calcPenalty(RepaymentBizPlanList bizPlanList,String planId) {
 		List<ProjExtRate> extRates = projExtRateMapper
-				.selectList(new EntityWrapper<ProjExtRate>().eq("business_id", bizPlanList.getOrigBusinessId())
+				.selectList(new EntityWrapper<ProjExtRate>().eq("business_id", bizPlanList.getOrigBusinessId()).eq("rate_type", RepayPlanFeeTypeEnum.PENALTY_AMONT.getValue())
 						.le("begin_peroid", bizPlanList.getPeriod()).ge("end_peroid", bizPlanList.getPeriod()));
 		BigDecimal penalty = BigDecimal.ZERO;
 		for (ProjExtRate projExtRate : extRates) {
