@@ -327,10 +327,11 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
             if(StringUtils.isBlank(ucRoleCode.getRoleName())) {
             	if(StringUtils.isBlank(ucRoleCode.getRoleNameCn())) {
             		ucRoleCode.setRoleName(ucRoleCode.getRoleCode());
-            	}else {
+            	} else {
             		ucRoleCode.setRoleName(ucRoleCode.getRoleNameCn());
             	}
             }
+            role.setId(null);
             role.setRoleName(ucRoleCode.getRoleName());
             role.setRoleCode(ucRoleCode.getRoleCode());
             role.setRoleAreaType(2);//将角色初始设置为区域性的
@@ -345,7 +346,7 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
              sysUserRoleService.insertOrUpdateBatch(sysUserRoleList);
         }
         if(!sysRoleList.isEmpty()){
-            sysRoleService.insertOrUpdateBatch(sysRoleList);
+            sysRoleService.insertBatch(sysRoleList);
         }
 
         for (SysUserRole role:userRoles) {

@@ -35,7 +35,7 @@ import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.entity.TdrepayAdvanceLog;
 import com.hongte.alms.base.entity.TdrepayRechargeDetail;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
-import com.hongte.alms.base.enums.RechargeBusinessTypeEnums;
+import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.mapper.AgencyRechargeLogMapper;
@@ -231,7 +231,8 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 					for (List<TdrepayRechargeInfoVO> rechargeInfoVOs : infoVOs) {
 						// 调用 eip 平台资金分发接口
 						Result result = sendDistributeFund(rechargeInfoVOs, entry.getKey(), userId);
-						handleSendDistributeFundResult(vos, userId, result);
+						handleSendDistributeFundResult(rechargeInfoVOs, userId, result);
+						vos.removeAll(rechargeInfoVOs);
 					}
 
 				}
@@ -326,7 +327,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		DistributeFundDTO dto = new DistributeFundDTO();
 		String batchId = UUID.randomUUID().toString();
 		dto.setBatchId(batchId);
-		String rechargeAccountType = RechargeBusinessTypeEnums.getName(businessType);
+		String rechargeAccountType = BusinessTypeEnum.getName(businessType);
 		
 		SysParameter sysParameter = this.queryRechargeAccountSysParams(rechargeAccountType);
 		if (sysParameter == null) {
@@ -1350,7 +1351,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		// 还垫付日志记录
 		TdrepayAdvanceLog tdrepayAdvanceLog = new TdrepayAdvanceLog();
 
-		paramDTO.setOrgType(handleTdUserName(tdrepayRechargeLog.getBusinessType()));
+//		paramDTO.setOrgType(handleTdUserName(tdrepayRechargeLog.getBusinessType())); // EIP已做优化，OrgType字段不用再传
 
 		// 期次
 		Integer period = tdrepayRechargeLog.getPeriod();

@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.hongte.alms.base.dto.compliance.TdProjectPaymentInfoResult;
 import com.hongte.alms.base.dto.compliance.TdRefundMonthInfoDTO;
 import com.hongte.alms.base.entity.AgencyRechargeLog;
@@ -33,6 +34,7 @@ import com.hongte.alms.base.entity.BasicCompany;
 import com.hongte.alms.base.entity.IssueSendOutsideLog;
 import com.hongte.alms.base.entity.RepaymentProjPlan;
 import com.hongte.alms.base.entity.SysParameter;
+import com.hongte.alms.base.entity.SysUserRole;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.base.enums.BankEnum;
@@ -43,6 +45,7 @@ import com.hongte.alms.base.service.AgencyRechargeLogService;
 import com.hongte.alms.base.service.BasicCompanyService;
 import com.hongte.alms.base.service.IssueSendOutsideLogService;
 import com.hongte.alms.base.service.RepaymentProjPlanService;
+import com.hongte.alms.base.service.SysUserRoleService;
 import com.hongte.alms.base.service.TdrepayRechargeLogService;
 import com.hongte.alms.base.service.TdrepayRechargeService;
 import com.hongte.alms.base.service.TuandaiProjectInfoService;
@@ -109,6 +112,10 @@ public class TdrepayRechargeController {
 	@Autowired
 	@Qualifier("AgencyRechargeLogService")
 	private AgencyRechargeLogService agencyRechargeLogService;
+	
+    @Autowired
+    @Qualifier("SysUserRoleService")
+    SysUserRoleService sysUserRoleService;
 
 	@Autowired
 	private EipRemote eipRemote;
@@ -415,6 +422,14 @@ public class TdrepayRechargeController {
 	public PageResult<List<TdrepayRechargeInfoVO>> queryComplianceRepaymentData(
 			@ModelAttribute ComplianceRepaymentVO vo) {
 		try {
+			Wrapper<SysUserRole> wrapperSysUserRole = new EntityWrapper<>();
+            wrapperSysUserRole.eq("user_id",loginUserInfoHelper.getUserId());
+            wrapperSysUserRole.and(" role_code in (SELECT role_code FROM tb_sys_role WHERE role_area_type = 1 AND page_type = 0 ) ");
+            List<SysUserRole> userRoles = sysUserRoleService.selectList(wrapperSysUserRole);
+            if(null != userRoles && !userRoles.isEmpty()) {
+            	vo.setNeedPermission(0);//全局用户 不需要验证权限
+            }
+			
 			if (vo != null && vo.getConfirmTimeEnd() != null) {
 				vo.setConfirmTimeEnd(DateUtil.addDay2Date(1, vo.getConfirmTimeEnd()));
 			}

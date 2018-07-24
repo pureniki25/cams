@@ -46,4 +46,13 @@ public interface RepaymentProjPlanListDetailMapper extends SuperMapper<Repayment
 	 * @return
 	 */
 	public BigDecimal calcUnpaidPrincipal(@Param("businessId")String businessId,@Param("planId")String planId) ;
+	
+	/**
+	 * 根据projectId和planId计算应还
+	 * @author 王继光
+	 * 2018年7月24日 下午3:55:17
+	 * @param projectId
+	 * @return
+	 */
+	public BigDecimal calcProjectPlanAmount(@Param("projectId")String projectId,@Param("planId")String planId,@Param("planItemType")String planItemType,@Param("feeId")String feeId);
 }
