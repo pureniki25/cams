@@ -153,9 +153,9 @@
 
                     </form-item>
 
-                    <form-item label="备注："  prop="collectionNote">
-                        <i-input v-model="editCompanyCollectionTime.editCompanyCollectionForm.note" type="textarea" :rows="4" maxlength="500" placeholder="Enter something..."></i-input>
-                    </form-item>
+                    <!--<form-item label="备注："  prop="collectionNote">-->
+                        <!--<i-input v-model="editCompanyCollectionTime.editCompanyCollectionForm.note" type="textarea" :rows="4" maxlength="500" placeholder="Enter something..."></i-input>-->
+                    <!--</form-item>-->
 
                     <form-item label="序号："  prop="colTimeId" style="display: none">
                         <i-input v-model="editCompanyCollectionTime.editCompanyCollectionForm.colTimeId" ></i-input>
@@ -542,6 +542,9 @@
                             if (obj.event === 'timeSet') {
                                 self.editSingleCompanyCollectionTimeSettingModal = true;
                                 self.editCompanyCollectionTime.editCompanyCollectionForm.colTimeId = obj.data.colTimeId;
+//                                self.editCompanyCollectionTime.editCompanyCollectionForm.overDueDays = obj.data.overDueDays;
+                                self.editCompanyCollectionTime.editCompanyCollectionForm.startTime = obj.data.startTime;
+
                             }
                         });
 
@@ -1025,18 +1028,19 @@
     //表单验证配置参数
     var validateOpt = {
         overDueDays: [
-            {required: true, message: '请输入逾期天数', trigger: 'blur'},
-            {
-                validator: function (rule, value, callback, source, options) {
-                    var reg = /^\+?[1-9]\d*$/;
-                    if (!reg.test(vm.editCompanyCollectionTime.editCompanyCollectionForm.overDueDays)) {
-                        callback(new Error('逾期天数只能输入正整数'));
-                    } else {
-                        callback();//校验通过
-                    }
-
-                }, trigger: 'blur'
-            }
+//            {required: true, message: '请输入逾期天数', trigger: 'change'}
+//            ,
+//            {
+//                validator: function (rule, value, callback, source, options) {
+//                    var reg = /^\+?[1-9]\d*$/;
+//                    if (!reg.test(vm.editCompanyCollectionTime.editCompanyCollectionForm.overDueDays)) {
+//                        callback(new Error('逾期天数只能输入正整数'));
+//                    } else {
+//                        callback();//校验通过
+//                    }
+//
+//                }, trigger: 'change'
+//            }
         ],
         startTime: [
             { required: true, type: 'date', message: '请选择开始时间', trigger: 'change' }

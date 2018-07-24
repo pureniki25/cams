@@ -12,8 +12,12 @@ public enum PepayPlanProjExtRatCalEnum implements IEnum {
   //  费用计算方式:1.借款金额*费率值；2剩余本金*费率值;3,1*费率值
 
     BY_BORROW_MONEY(1,"借款金额*费率值"),
-    BY_REMIND_PRICIPAL(2,"剩余本金*费率值"),
-    RATE(3,"1*费率值");
+    BY_REMIND_MONEY(2,"剩余本金*费率值")
+    ,RATE_VALUE(3,"1*费率值")
+    ,REMIND_PLAT_FEE(4,"剩余的平台服务费合计")
+    ,BY_MONTH_COM_FEE(5,"费率值*月收分公司服务费")
+    ,BY_MONTH_PLAT_FEE(6,"费率值*月收平台服务费")
+    ,BY_REM_MONEY_AND_FEE(7,"(剩余本金*费率值) - 分公司服务费违约金 - 平台服务费违约金");
 
     private Integer value;
     private String desc;
