@@ -1350,7 +1350,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		// 还垫付日志记录
 		TdrepayAdvanceLog tdrepayAdvanceLog = new TdrepayAdvanceLog();
 
-		paramDTO.setOrgType(handleTdUserName(tdrepayRechargeLog.getBusinessType()));
+//		paramDTO.setOrgType(handleTdUserName(tdrepayRechargeLog.getBusinessType())); // EIP已做优化，OrgType字段不用再传
 
 		// 期次
 		Integer period = tdrepayRechargeLog.getPeriod();
