@@ -57,7 +57,7 @@
         <if test=" planId !=null">
             AND t1.plan_id = #{planId}
         </if>
-        ORDER BY t3.due_date
+        ORDER BY t3.due_date,t4.plan_item_type
     </select>
 
 
