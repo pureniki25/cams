@@ -75,9 +75,9 @@
         <if test="loanExtReq.extensionId !=null and loanExtReq.extensionId !=''">
               	AND trb.renewal_business_id like '%${loanExtReq.extensionId}%'
         </if>
-        <if test="userId !=null  and userId != '' and needPermission == 1">
+        <if test="loanExtReq.userId !=null  and loanExtReq.userId != '' and loanExtReq.needPermission == 1">
                and trb.original_business_id in (
-				select business_id from tb_sys_user_permission where page_type = 7 and user_id = #{loanExtReq.userId}    	
+				select business_id from tb_sys_user_permission where page_type = 7 and user_id = #{loanExtReq.userId}
                )
          </if>
     </where>
@@ -123,9 +123,9 @@
         <if test="loanExtReq.extensionId !=null and loanExtReq.extensionId !=''">
               	AND trb.renewal_business_id like '%${loanExtReq.extensionId}%'
         </if>
-        <if test="userId !=null  and userId != '' and needPermission == 1">
+        <if test="loanExtReq.userId !=null  and loanExtReq.userId != '' and loanExtReq.needPermission == 1">
                and trb.original_business_id in (
-				select business_id from tb_sys_user_permission where page_type = 7 and user_id = #{loanExtReq.userId}    	
+				select business_id from tb_sys_user_permission where page_type = 7 and user_id = #{loanExtReq.userId}
                )
          </if>
     </where>

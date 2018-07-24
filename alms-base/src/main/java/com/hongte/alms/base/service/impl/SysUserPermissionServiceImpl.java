@@ -60,7 +60,7 @@ import com.ht.ussp.client.dto.LoginInfoDto;
 public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermissionMapper, SysUserPermission> implements SysUserPermissionService {
 
 	//@Value("${ht.alms.default.pagePermission}")
-	private String pagePermission = "{\"hasOverAllRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeHourseBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasAreaRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeCarBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasMyFollowUp \":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasFinanceOrderSetAreaRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false}}";
+	private String pagePermission = "{\"hasOverAllRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeHourseBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasAreaRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeCarBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasMyFollowUp\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasFinanceOrderSetAreaRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false}}";
 	
 	//@Value("${ht.appCode}")
 	private String appCode = "ALMS";
@@ -327,10 +327,11 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
             if(StringUtils.isBlank(ucRoleCode.getRoleName())) {
             	if(StringUtils.isBlank(ucRoleCode.getRoleNameCn())) {
             		ucRoleCode.setRoleName(ucRoleCode.getRoleCode());
-            	}else {
+            	} else {
             		ucRoleCode.setRoleName(ucRoleCode.getRoleNameCn());
             	}
             }
+            role.setId(null);
             role.setRoleName(ucRoleCode.getRoleName());
             role.setRoleCode(ucRoleCode.getRoleCode());
             role.setRoleAreaType(2);//将角色初始设置为区域性的
@@ -345,7 +346,7 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
              sysUserRoleService.insertOrUpdateBatch(sysUserRoleList);
         }
         if(!sysRoleList.isEmpty()){
-            sysRoleService.insertOrUpdateBatch(sysRoleList);
+            sysRoleService.insertBatch(sysRoleList);
         }
 
         for (SysUserRole role:userRoles) {

@@ -1,6 +1,7 @@
 package com.hongte.alms.base.mapper;
 
 import com.hongte.alms.base.RepayPlan.dto.RepaymentSettleMoneyDto;
+import com.hongte.alms.base.RepayPlan.dto.RepaymentSettleProjDto;
 import com.hongte.alms.base.entity.RepaymentSettleLog;
 import com.hongte.alms.common.mapper.SuperMapper;
 import org.apache.ibatis.annotations.Param;
@@ -23,5 +24,5 @@ public interface RepaymentSettleLogMapper extends SuperMapper<RepaymentSettleLog
      */
     List<RepaymentSettleMoneyDto> selectProjPlanMoney(@Param("businessId")  String businessId, @Param("planId") String planId);
 
-    List<RepaymentSettleMoneyDto> orderSettleProj(@Param("planId") String planId);
+    List<RepaymentSettleProjDto> orderSettleProj(@Param("planId") String planId);
 }
