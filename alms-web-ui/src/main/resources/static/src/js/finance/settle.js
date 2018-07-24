@@ -695,6 +695,7 @@ window.layinit(function (htConfig) {
                             app.thisTimeRepaymentInfo.derate = data.derate
                             app.thisTimeRepaymentInfo.planRepayBalance = data.planRepayBalance
                             app.thisTimeRepaymentInfo.total = data.total
+                            app.thisTimeRepaymentInfo.penaltyFeesBiz = data.penaltyFeesBiz
 
                             console.log(res.data);
                         } else {
