@@ -1,13 +1,16 @@
 package com.hongte.alms.base.service.impl;
 
+import com.hongte.alms.base.RepayPlan.dto.RepaymentSettleMoneyDto;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentProjPlan;
 import com.hongte.alms.base.entity.RepaymentProjPlanList;
 import com.hongte.alms.base.mapper.RepaymentProjPlanMapper;
+import com.hongte.alms.base.mapper.RepaymentSettleLogMapper;
 import com.hongte.alms.base.service.RepaymentProjPlanService;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.DateUtil;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -24,6 +27,9 @@ import java.util.List;
  */
 @Service("RepaymentProjPlanService")
 public class RepaymentProjPlanServiceImpl extends BaseServiceImpl<RepaymentProjPlanMapper, RepaymentProjPlan> implements RepaymentProjPlanService {
+
+	@Autowired
+	private  RepaymentProjPlanMapper repaymentProjPlanMapper;
 
 	@Override
 	public RepaymentProjPlanList findCurrentPeriod(Date settleDate, List<RepaymentProjPlanList> projPlanLists) {
@@ -61,6 +67,11 @@ public class RepaymentProjPlanServiceImpl extends BaseServiceImpl<RepaymentProjP
 
 
 	        return currentPeriod;
+	}
+
+	@Override
+	public List<RepaymentSettleMoneyDto> selectProjPlanMoney(String businessId, String planId) {
+		return repaymentProjPlanMapper.selectProjPlanMoney(businessId,planId);
 	}
 
 

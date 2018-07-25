@@ -2422,6 +2422,24 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 
 
         String businessId = financeBaseDto.getBusinessId();
+
+        tdrepayRechargeThread( ptojPlanList, confirmLogId);
+
+        //下面要触发往信贷更新还未计划数据，直接调用open中的接口方法。 张贵宏 2018.06.28
+        executor.execute(() -> {
+            logger.info("触发往信贷更新还未计划数据开始，businessId:[{}]", businessId);
+            //睡一下，让还款的信息先存完。
+            try{
+                Thread.sleep(1000);
+            }catch (Exception e){
+                logger.error(e.getMessage(), e);
+            }
+            updateRepayPlanToLMS(businessId);
+            logger.info("触发往信贷更新还未计划数据结束，businessId:[{}]", businessId);
+        });
+    }
+
+    public void tdrepayRechargeThread(List<RepaymentProjPlanList> ptojPlanList,String confirmLogId){
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -2440,20 +2458,6 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                 }
                 logger.info("调用平台合规化还款接口结束");
             }
-        });
-
-
-        //下面要触发往信贷更新还未计划数据，直接调用open中的接口方法。 张贵宏 2018.06.28
-        executor.execute(() -> {
-            logger.info("触发往信贷更新还未计划数据开始，businessId:[{}]", businessId);
-            //睡一下，让还款的信息先存完。
-            try{
-                Thread.sleep(1000);
-            }catch (Exception e){
-                logger.error(e.getMessage(), e);
-            }
-            updateRepayPlanToLMS(businessId);
-            logger.info("触发往信贷更新还未计划数据结束，businessId:[{}]", businessId);
         });
     }
 

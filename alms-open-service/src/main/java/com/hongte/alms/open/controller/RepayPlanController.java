@@ -284,7 +284,7 @@ public class RepayPlanController {
                                 //paramMap.put("factSubCompanyServiceFee", planListDetail.getFactAmount());
                                 //可能有多个分公司服务费，要循环累加
                                 subCompanyServiceFeeTotal = subCompanyServiceFeeTotal.add(planListDetail.getPlanAmount());
-                                factSubCompanyServiceFeeTotal = factSubCompanyServiceFeeTotal.add(planListDetail.getFactAmount());
+                                factSubCompanyServiceFeeTotal = factSubCompanyServiceFeeTotal.add(planListDetail.getFactAmount()==null?BigDecimal.valueOf(0):planListDetail.getFactAmount());
                                 break;
                             //其它费用
                             default:

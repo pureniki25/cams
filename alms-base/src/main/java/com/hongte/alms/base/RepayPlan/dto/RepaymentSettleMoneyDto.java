@@ -10,7 +10,10 @@ public class RepaymentSettleMoneyDto {
     private String projPlanListId;
     private String projPlanId;
     private String businessId;
+    private String projectId;
+    private String origBusinessId;
     private String planId;
+    private Integer period;
     private String afterId;
     private Integer repayStatus; //部分还款状态子状态,null:未还款,1:部分还款,2:线上已还款,3:全部已还款
     private String projPlanDetailId;//
