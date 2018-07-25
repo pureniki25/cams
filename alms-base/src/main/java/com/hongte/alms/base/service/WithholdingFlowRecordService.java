@@ -28,6 +28,11 @@ public interface WithholdingFlowRecordService extends BaseService<WithholdingFlo
      */
     void importWidthholdingFlowFromYiBao(String settleDate);
 
+    /**
+     * 导入快钱流水
+     * @param settleDate 清算日期YYYY-MM-DD
+     */
+    void importWidthholdingFlowFromKuaiQian(String settleDate);
 
     /**
      * 查询汇总数据
