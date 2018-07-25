@@ -231,17 +231,17 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
 	            }
 	            
 	            //查看车贷业务
-	            if(role.getPageType().equals(SysRoleAreaTypeEnums.SEE_CAR_BUSINESS.getKey())){
+	            if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.SEE_CAR_BUSINESS.getKey())){
 	            	pagePermissionJSONObject.getJSONObject("hasSeeCarBizRole").put(jsonKey, true);
 	            }
 	
 	            //查看房贷业务
-	            if(role.getPageType().equals(SysRoleAreaTypeEnums.SEE_HOURSE_BUSINESS.getKey())){
+	            if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.SEE_HOURSE_BUSINESS.getKey())){
 	            	pagePermissionJSONObject.getJSONObject("hasSeeHourseBizRole").put(jsonKey, true);
 	            }
 	            
 	            //查看自己跟进
-	            if(role.getPageType().equals(SysRoleAreaTypeEnums.ONLY_SELF.getKey())){
+	            if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.ONLY_SELF.getKey())){
 	            	pagePermissionJSONObject.getJSONObject("hasMyFollowUp").put(jsonKey, true);
 	            }
             }
