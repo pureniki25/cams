@@ -13,11 +13,32 @@ import lombok.Data;
  */
 @Data
 public class SettleFeesVO {
+	/**
+	 * 标ID
+	 */
 	private String projectId ;
+	/**
+	 * 明细项名称,feeName无值时取此值
+	 */
 	private String planItemName ;
+	/**
+	 * 明细项类型
+	 */
 	private String planItemType ;
+	/**
+	 * 明细项费用id
+	 */
 	private String feeId ;
+	/**
+	 * 明细项费用名称,planItemName无值时取此值
+	 */
 	private String feeName ;
+	/**
+	 * 明细项金额
+	 */
 	private BigDecimal amount ;
+	/**
+	 * 核销顺序,不一定有值
+	 */
 	private Integer shareProfitIndex ;
 }
