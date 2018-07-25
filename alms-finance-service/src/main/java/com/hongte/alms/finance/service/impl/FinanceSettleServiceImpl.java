@@ -2184,7 +2184,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
             infoVO.setOverDueDays(diff);
         }
         infoVO.setItem10(repaymentProjPlanListDetailMapper.calcUnpaidPrincipal(req.getBusinessId(), req.getPlanId()));
-        calcCurPeriod(cur, infoVO, settleDate);
+        calcCurPeriod(cur, infoVO, settleDate,req.getPlanId());
 
 
         infoVO.setRepayPlanDate(cur.getDueDate());
@@ -2303,21 +2303,48 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
      * @author 王继光
      * 2018年7月7日 下午4:33:49
      */
-    private void calcCurPeriod(RepaymentBizPlanList repaymentBizPlanList, SettleInfoVO infoVO, Date factRepayDate) {
-        BigDecimal item20 = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList.getPlanListId(), "20", null);
-        BigDecimal item30 = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList.getPlanListId(), "30", null);
-        BigDecimal item50 = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList.getPlanListId(), "50", null);
+    private void calcCurPeriod(RepaymentBizPlanList repaymentBizPlanList, SettleInfoVO infoVO, Date factRepayDate,String planId) {
+    	
+    	if (StringUtil.isEmpty(planId)) {
+    		List<String> planLists = curPeriod(repaymentBizPlanList) ;
+        	List<RepaymentBizPlanList> list = repaymentBizPlanListMapper.selectBatchIds(planLists);
+        	
+        	for (RepaymentBizPlanList repaymentBizPlanList2 : list) {
+        		BigDecimal item20 = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList2.getPlanListId(), "20", null);
+                BigDecimal item30 = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList2.getPlanListId(), "30", null);
+                BigDecimal item50 = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList2.getPlanListId(), "50", null);
 
-        infoVO.setItem20(item20);
-        infoVO.setItem30(item30);
-        infoVO.setItem50(item50);
+                infoVO.setItem20(infoVO.getItem20().add(item20));
+                infoVO.setItem30(infoVO.getItem30().add(item30));
+                infoVO.setItem50(infoVO.getItem50().add(item50));
 
-        repaymentBizPlanList = repaymentProjPlanListService.calLateFeeForPerPList(repaymentBizPlanList, 1);
-        BigDecimal item60offline = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList.getPlanListId(), "60", RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid());
-        BigDecimal item60online = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList.getPlanListId(), "60", RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid());
-        //TODO 要调用滞纳金计算
-        infoVO.setOfflineOverDue(infoVO.getOfflineOverDue().add(item60offline));
-        infoVO.setOnlineOverDue(infoVO.getOnlineOverDue().add(item60online));
+                repaymentBizPlanList2.setFactRepayDate(factRepayDate);
+                repaymentBizPlanList = repaymentProjPlanListService.calLateFeeForPerPList(repaymentBizPlanList2, 1);
+                BigDecimal item60offline = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList2.getPlanListId(), "60", RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid());
+                BigDecimal item60online = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList2.getPlanListId(), "60", RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid());
+                //TODO 要调用滞纳金计算
+                infoVO.setOfflineOverDue(infoVO.getOfflineOverDue().add(item60offline));
+                infoVO.setOnlineOverDue(infoVO.getOnlineOverDue().add(item60online));
+    		}
+		}else {
+			BigDecimal item20 = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList.getPlanListId(), "20", null);
+	        BigDecimal item30 = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList.getPlanListId(), "30", null);
+	        BigDecimal item50 = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList.getPlanListId(), "50", null);
+
+	        infoVO.setItem20(item20);
+	        infoVO.setItem30(item30);
+	        infoVO.setItem50(item50);
+
+	        repaymentBizPlanList.setFactRepayDate(factRepayDate);
+	        repaymentBizPlanList = repaymentProjPlanListService.calLateFeeForPerPList(repaymentBizPlanList, 1);
+	        BigDecimal item60offline = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList.getPlanListId(), "60", RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid());
+	        BigDecimal item60online = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList.getPlanListId(), "60", RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid());
+	        //TODO 要调用滞纳金计算
+	        infoVO.setOfflineOverDue(infoVO.getOfflineOverDue().add(item60offline));
+	        infoVO.setOnlineOverDue(infoVO.getOnlineOverDue().add(item60online));
+		}
+    	
+        
     }
 
     /**
