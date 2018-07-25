@@ -160,8 +160,11 @@
 		INNER JOIN tb_tuandai_project_info t2 ON t1.project_id = t2.project_id
 		WHERE 1=1
 		AND IFNull(t2.org_issue_id,0) <![CDATA[ <> ]]> t2.project_id
-		<if test=" planId !=null">
-			AND t1.plan_id = #{planId}
+		<if test=" businessId !=null">
+			AND t1.business_id = #{businessId}
+		</if>
+		<if test="planId !=null">
+			AND t1.plan_id=#{planId}
 		</if>
 		ORDER BY t2.amount,t2.queryFullsuccessDate)
 		UNION ALL
@@ -177,8 +180,11 @@
 		INNER JOIN tb_tuandai_project_info t2 ON t1.project_id = t2.project_id
 		WHERE 1=1
 		AND IFNull(t2.org_issue_id,0)= t2.project_id
-		<if test=" planId !=null">
-			AND t1.plan_id = #{planId}
+		<if test=" businessId !=null">
+			AND t1.business_id = #{businessId}
+		</if>
+		<if test="planId !=null">
+			AND t1.plan_id=#{planId}
 		</if>
 		ORDER BY t2.amount,t2.queryFullsuccessDate)
 	</select>
