@@ -32,9 +32,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.SpringApplication;
 import org.springframework.stereotype.Service;
 
-
+import javax.enterprise.inject.New;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -2359,5 +2360,33 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         return repaymentBizPlanListMapper.selectList(planListEW);
     }
 
+
+    /**
+     * 全部业务结清的场景下,查找当前期的planListId
+     * @author 王继光
+     * 2018年7月25日 下午5:19:58
+     * @param now
+     * @return
+     */
+    @Override
+    public List<String> curPeriod(RepaymentBizPlanList now){
+    	List<RepaymentBizPlan> plan = repaymentBizPlanMapper.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id", now.getBusinessId()));
+    	List<String> res = new ArrayList<>() ;
+    	for (RepaymentBizPlan repaymentBizPlan : plan) {
+			List<RepaymentBizPlanList> selectList = repaymentBizPlanListMapper.selectList(
+					new EntityWrapper<RepaymentBizPlanList>()
+					.eq("business_id", now.getBusinessId())
+					.eq("plan_id", repaymentBizPlan.getPlanId())
+					.gt("due_date", new Date())
+					.eq("current_status", RepayCurrentStatusEnums.还款中.toString())
+					.orderBy("due_date"));
+			if (CollectionUtils.isEmpty(selectList)) {
+				continue;
+			}
+			res.add(selectList.get(0).getPlanListId());
+		}
+    	return res ;
+    }
+    
 
 }
