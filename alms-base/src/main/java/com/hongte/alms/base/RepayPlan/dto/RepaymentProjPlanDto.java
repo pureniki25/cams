@@ -5,7 +5,10 @@ import com.hongte.alms.base.entity.TuandaiProjectInfo;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
 
 /**
  * @author zengkun
@@ -56,6 +59,13 @@ public class RepaymentProjPlanDto implements Serializable {
 
     public void setProjPlanListDtos(List<RepaymentProjPlanListDto> projPlanListDtos) {
         this.projPlanListDtos = projPlanListDtos;
+    }
+    
+    public void setProjPlanListDtos(RepaymentProjPlanListDto projPlanListDto) {
+    	if (CollectionUtils.isEmpty(projPlanListDtos)) {
+			projPlanListDtos = new ArrayList<>() ;
+		}
+        this.projPlanListDtos.add(projPlanListDto);
     }
 
 	/**

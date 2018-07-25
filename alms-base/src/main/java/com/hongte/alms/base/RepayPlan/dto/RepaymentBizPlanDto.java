@@ -3,7 +3,10 @@ package com.hongte.alms.base.RepayPlan.dto;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
 
 /**
  * @author zengkun
@@ -12,7 +15,10 @@ import java.util.List;
  */
 public class RepaymentBizPlanDto  implements Serializable {
 
-    /**
+    private static final RepaymentBizPlanListDto bizPlanListDto = null;
+
+
+	/**
      * 业务还款计划
      */
     private RepaymentBizPlan repaymentBizPlan;
@@ -47,11 +53,25 @@ public class RepaymentBizPlanDto  implements Serializable {
         this.bizPlanListDtos = bizPlanListDtos;
     }
 
+    public void setBizPlanListDtos(RepaymentBizPlanListDto bizPlanListDto) {
+    	if (CollectionUtils.isEmpty(bizPlanListDtos)) {
+			bizPlanListDtos = new ArrayList<>() ;
+		}
+        this.bizPlanListDtos.add(bizPlanListDto);
+    }
+    
     public List<RepaymentProjPlanDto> getProjPlanDtos() {
         return projPlanDtos;
     }
 
     public void setProjPlanDtos(List<RepaymentProjPlanDto> projPlanDtos) {
-        this.projPlanDtos = projPlanDtos;
+        this.projPlanDtos=projPlanDtos;
+    }
+    
+    public void setProjPlanDtos(RepaymentProjPlanDto projPlanDto) {
+        if (CollectionUtils.isEmpty(projPlanDtos)) {
+        	projPlanDtos = new ArrayList<>() ;
+		}
+        this.projPlanDtos.add(projPlanDto);
     }
 }

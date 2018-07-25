@@ -1,16 +1,21 @@
 package com.hongte.alms.finance.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.hongte.alms.base.RepayPlan.dto.RepaymentBizPlanDto;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.finance.req.FinanceSettleReq;
 import com.hongte.alms.finance.service.FinanceSettleService;
+
+import cn.hutool.json.JSONObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,5 +50,15 @@ public class FinanceSettleController {
 
         logger.info("@financeSettle@资金结清结束{}", result);
         return result;
+    }
+    
+    @GetMapping(value="/test")
+    public void test(String businessId,String afterId,String planId) {
+    	FinanceSettleReq req = new FinanceSettleReq() ;
+    	req.setBusinessId(businessId);
+    	req.setAfterId(afterId);
+    	req.setPlanId(planId);
+    	List<RepaymentBizPlanDto> currentPeriod = financeSettleService.getCurrentPeriod(req);
+    	System.out.println(JSON.toJSONString(currentPeriod));
     }
 }
