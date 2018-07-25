@@ -110,7 +110,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			TdrepayRechargeLog rechargeLog = handleTdrepayRechargeLog(vo);
 
 			Map<String, Object> paramMap = new HashMap<>();
-			paramMap.put("orgType", 1); // 机构类型 传输任意值
+//			paramMap.put("orgType", BusinessTypeEnum.getOrgTypeByValue(vo.getBusinessType())); // 机构类型 传输任意值
 			paramMap.put("projectId", vo.getProjectId());
 
 			Result result = eipRemote.getProjectPayment(paramMap);
@@ -472,32 +472,6 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			return null;
 		}
 		return sysParameterService.queryRechargeAccountSysParams(rechargeAccountType);
-	}
-
-	@Override
-	public int handleTdUserName(int businessType) {
-		int orgType = -1;
-
-		switch (businessType) {
-		case 30:
-			orgType = 0;
-			break;
-		case 26:
-			orgType = 1;
-			break;
-		case 27:
-			orgType = 2;
-			break;
-		case 28:
-			orgType = 3;
-			break;
-		case 29:
-			orgType = 4;
-			break;
-		default:
-			break;
-		}
-		return orgType;
 	}
 
 	@Override
@@ -1112,7 +1086,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 						dto.setPrincipalAndInterest(BigDecimal.valueOf(principalAndInterest3));
 						dto.setStatus(1);
 						dto.setTuandaiAmount(BigDecimal.valueOf(tuandaiAmount3));
-//						dto.setOrgType(handleTdUserName(businessType));
+						dto.setOrgType(BusinessTypeEnum.getOrgTypeByValue((businessType)));
 						dto.setOrgAmount(BigDecimal.valueOf(orgAmount3));
 						dto.setGuaranteeAmount(BigDecimal.valueOf(guaranteeAmount3));
 						dto.setArbitrationAmount(BigDecimal.valueOf(arbitrationAmount3));
@@ -1351,7 +1325,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		// 还垫付日志记录
 		TdrepayAdvanceLog tdrepayAdvanceLog = new TdrepayAdvanceLog();
 
-//		paramDTO.setOrgType(handleTdUserName(tdrepayRechargeLog.getBusinessType())); // EIP已做优化，OrgType字段不用再传
+		paramDTO.setOrgType(BusinessTypeEnum.getOrgTypeByValue((tdrepayRechargeLog.getBusinessType()))); 
 
 		// 期次
 		Integer period = tdrepayRechargeLog.getPeriod();
