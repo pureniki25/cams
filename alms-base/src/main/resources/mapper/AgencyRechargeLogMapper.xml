@@ -58,7 +58,7 @@
 		  `tb_agency_recharge_log` t 
 		WHERE
 			<include refid="queryRechargeRecordCondition"/>
-		ORDER BY t.`create_time`
+		ORDER BY t.`create_time` DESC
 		LIMIT ${(page-1) * limit}, ${limit}
 	</select>
 	
