@@ -17,7 +17,7 @@ public enum PepayPlanProjExtRatCalEnum implements IEnum {
     ,REMIND_PLAT_FEE(4,"剩余的平台服务费合计")
     ,BY_MONTH_COM_FEE(5,"费率值*月收分公司服务费")
     ,BY_MONTH_PLAT_FEE(6,"费率值*月收平台服务费")
-    ,BY_REM_MONEY_AND_FEE(7,"(剩余本金*费率值) - 分公司服务费违约金 - 平台服务费违约金");
+    ,BY_REM_MONEY_AND_FEE(7,"(剩余本金*费率值*剩余借款期数) - 分公司服务费违约金 - 平台服务费违约金");  //剩余本金*费率值*剩余借款期数   得出的结果需与  剩余本金*6%  比较  取肖值
 
     private Integer value;
     private String desc;
