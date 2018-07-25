@@ -217,7 +217,21 @@ public class RepaymentBizPlanListVo extends Model<RepaymentBizPlanListVo> {
 	 * 本还款计划的借款金额
 	 */
 	private BigDecimal borrowAmount;
+	
+	
+	/**
+	 * 短信多笔序号
+	 */
+	private Integer index;
 
+
+	public Integer getIndex() {
+		return index;
+	}
+
+	public void setIndex(Integer index) {
+		this.index = index;
+	}
 
 	public BigDecimal getBorrowAmount() {
 		return borrowAmount;
