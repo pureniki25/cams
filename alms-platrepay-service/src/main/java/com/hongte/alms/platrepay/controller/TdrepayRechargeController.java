@@ -571,7 +571,7 @@ public class TdrepayRechargeController {
 			paramMap2.put("userId", info.getTdUserId());
 			com.ht.ussp.core.Result resultActual = eipRemote.queryProjectPayment(paramMap);
 			com.ht.ussp.core.Result resultEarlier = eipRemote.queryRepaymentEarlier(paramMap);
-			com.ht.ussp.core.Result resultUserAviMoney = eipRemote.queryUserAviMoney(paramMap2);
+			com.ht.ussp.core.Result resultUserAviMoney = eipRemote.queryUserAviMoney(paramMap2);	// 查询用户余额
 
 			List<TdProjectPaymentDTO> tdProjectPaymentDTOs = null;
 
@@ -937,7 +937,7 @@ public class TdrepayRechargeController {
 				
 				paramMap.put("userId", userId);
 
-				com.ht.ussp.core.Result result = eipRemote.queryUserAviMoney(paramMap);
+				com.ht.ussp.core.Result result = eipRemote.queryUserAviMoneyForNet(paramMap);
 
 				resultMap.put("rechargeAccountType", rechargeAccountType);
 				resultMap.put("num", num++);
