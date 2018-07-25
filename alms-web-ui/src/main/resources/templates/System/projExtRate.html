@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+        <title>标的额外信息管理</title>
+        <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css" />
+        <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css" />
+        <link rel="stylesheet" type="text/css" href="/plugins/layui/css/layui.css" media="all" />
+    </head>
+    <body>
+        <div id="app" v-cloak>
+            <Row  style="padding:10px">
+                <i-col span="24">
+                    <Card>
+                        <p slot="title"><Icon type="ios-search" />搜索条件</p>
+
+                        <div class="layui-btn-group" slot="extra">
+                            <button class="layui-btn layui-btn-sm" v-if="authValid('search')" @click="search" ht-auth="search">
+                                <span v-if="!loading">  <i class="layui-icon">&#xe615;</i>查询</span>
+                                <span v-else><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
+                            </button>
+
+                            <button class="layui-btn layui-btn-sm" @click="editModal=true" v-if="authValid('add')">新增</button>
+                        </div>
+
+                        <Row :gutter="0">
+                            <i-form ref="searchForm" :model="searchForm" rules="ruleValidate" label-position="right" label-width="100">
+                                <i-col span="6">
+                                    <Form-item label="业务ID:" >
+                                        <i-input v-model="searchForm.condition.EQ_business_id"></i-input>
+                                    </Form-item>
+                                </i-col>
+                                <i-col span="6">
+                                    <Form-item label="标的ID:" >
+                                        <i-input v-model="searchForm.condition.EQ_project_id"></i-input>
+                                    </Form-item>
+                                </i-col>
+                               <!-- <i-co span="12"></i-co>-->
+                            </i-form>
+                        </Row>
+                    </Card>
+                </i-col>
+            </Row>
+
+            <Row style="padding:10px">
+                <i-col span="24">
+                    <!--<table id="main_table" lay-filter="main_table"></table>
+                    <script type="text/html" id="bar_tools">
+                        &lt;!&ndash;<a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="detail">查看</a>
+                        <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="edit">编辑</a>&ndash;&gt;
+                        <a class="layui-btn layui-btn-xs layui-btn-danger " lay-event="del" v-if="authValid('del')">删除</a>
+                    </script>-->
+                    <i-table :columns="table.col" :data="table.data" :loading="table.loading" stripe></i-table>
+                    <p style="text-align: center; margin-top: 20px;"><Page :total="table.total" :page-size="searchForm.size" @on-change="paging" :current="searchForm.current" show-total></Page></p>
+                </i-col>
+            </Row>
+
+
+            <Modal :title="editModalTitle" v-model="editModal" :loading="editModalLoading" @on-ok="submitEditForm"
+                   @on-cancel="hideEditModal" :styles="{top: '5px'}">
+                        <i-form ref="editForm" :model="editForm" :rules="ruleValidate" label-position="right" label-width="150">
+                            <!--<input type="hidden" v-model="editForm.accountId"/>-->
+                            <Form-item label="业务ID：" prop="businessId">
+                                <i-input v-model="editForm.businessId" ></i-input>
+                            </Form-item>
+                            <Form-item label="标的ID：" prop="projectId">
+                                <i-input v-model="editForm.projectId" ></i-input>
+                            </Form-item>
+                            <Form-item label="费率类型"  prop="rateType">
+                                <i-input v-model="editForm.rateType" ></i-input>
+                            </Form-item>
+                            <Form-item label="费率类型名称：" prop="rateName">
+                                <i-input v-model="editForm.rateName" ></i-input>
+                            </Form-item>
+                            <Form-item label="费率值：" prop="rateValue">
+                                <i-input v-model="editForm.rateValue" ></i-input>
+                            </Form-item>
+                            <Form-item label="计算方式："  prop="calcWay">
+                                <i-select v-model="editForm.calcWay" clearable filterable>
+                                    <i-option v-for="way in findProjExtRateCalWay" :value="way.value" :key="way.value">{{way.desc}}</i-option>
+                                </i-select>
+                            </Form-item>
+                            <Form-item label="费率UUID：" prop="feeId">
+                                <i-input v-model="editForm.feeId" ></i-input>
+                            </Form-item>
+                            <Form-item label="费率名称：" prop="feeName">
+                                <i-input v-model="editForm.feeName" ></i-input>
+                            </Form-item>
+                            <Form-item label="开始期数：" prop="beginPeroid">
+                                <i-input v-model="editForm.beginPeroid" ></i-input>
+                            </Form-item>
+                            <Form-item label="结束期数：" prop="endPeroid">
+                                <i-input v-model="editForm.endPeroid" ></i-input>
+                            </Form-item>
+                        </i-form>
+                    </Modal>
+        </div>
+        <script src="/plugins/vue/vue.min.js"></script>
+        <script src="/plugins/iview/js/iview.js"></script>
+        <script src="/plugins/layui/layui.js"></script>
+        <script src="/plugins/axios/axios.min.js"></script>
+        <script src="/build/js/jquery-3.3.1.min.js"></script>
+        <script src="/properties/config.js"></script>
+        <script src="/build/js/appToken.js"></script>
+        <script src="/src/js/comm.js"></script>
+        <script src="/src/js/System/projExtRate.js"></script>
+    </body>
+</html>

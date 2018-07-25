@@ -27,6 +27,7 @@ public class CurrPeriodProjDetailVO {
 	private BigDecimal onlineOverDue = new BigDecimal("0");
 	private BigDecimal subTotal = new BigDecimal("0");
 	private BigDecimal total = new BigDecimal("0");
+	//结余
 	private BigDecimal surplus = new BigDecimal("0");
 	private String project ;
 	private Date queryFullSuccessDate ;

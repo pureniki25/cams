@@ -13,8 +13,11 @@ import lombok.Data;
  */
 @Data
 public class SettleFeesVO {
+	private String projectId ;
 	private String planItemName ;
 	private String planItemType ;
 	private String feeId ;
+	private String feeName ;
 	private BigDecimal amount ;
+	private Integer shareProfitIndex ;
 }
