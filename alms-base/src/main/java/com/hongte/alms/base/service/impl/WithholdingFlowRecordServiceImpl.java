@@ -249,4 +249,9 @@ public class WithholdingFlowRecordServiceImpl extends BaseServiceImpl<Withholdin
 	public WithholdingFlowRecordSummaryVo querySummary(WithholdFlowReq withholdFlowReq) {
 		return withholdingFlowRecordMapper.querySummary(withholdFlowReq);
 	}
+
+	@Override
+	public void importWidthholdingFlowFromKuaiQian(String settleDate) {
+		
+	}
 }

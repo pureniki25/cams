@@ -17,12 +17,5 @@ import java.util.List;
  * @since 2018-07-11
  */
 public interface RepaymentSettleLogMapper extends SuperMapper<RepaymentSettleLog> {
-    /**
-     * 整个业务表的还款详情
-     * @param businessId
-     * @return
-     */
-    List<RepaymentSettleMoneyDto> selectProjPlanMoney(@Param("businessId")  String businessId, @Param("planId") String planId);
 
-    List<RepaymentSettleProjDto> orderSettleProj(@Param("planId") String planId);
 }

@@ -17,5 +17,5 @@ import java.util.List;
 public interface RepaymentSettleLogService extends BaseService<RepaymentSettleLog> {
 
 
-    List<RepaymentSettleMoneyDto> selectProjPlanMoney(String businessId, String planId);
+
 }

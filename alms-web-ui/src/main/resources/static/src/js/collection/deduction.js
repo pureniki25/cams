@@ -133,10 +133,18 @@ var layer;
 		}else if(vm.ajax_data.repayAmount==vm.ajax_data.restAmount){
 			isAmountWithheld="false";//全部代扣
 		}
+		
+		
+		 if(vm.ajax_data.haveUnderRepay==true&&vm.platformId=='5'){debugger
+			   vm.$Modal.error({content:"含有线下转账不能使用银行代扣"});
+			   vm.loading = false;
+			   return;
+		   }
+			   
 	   if(vm.ajax_data.repayAmount>vm.ajax_data.restAmount){debugger
 		   vm.$Modal.error({content:"代扣金额不能大于本次最大可代扣金额"});
-	   vm.loading = false;
-	   return;
+		   vm.loading = false;
+		   return;
 	   }
 		   
 	   if(vm.ajax_data.underLineFactOverDueMoney>vm.ajax_data.planOverDueMoney){

@@ -241,6 +241,25 @@
                         </table>
                         <br>
                         <p style="font-size: 14px;color: #1c2438;font-weight: 700;">
+                            提前违约金明细
+                        </p>
+                        <table>
+                            <tr>
+                                <td style="border-top-width: 6px;border-top-style: solid;"></td>
+                                <td style="border-top-width: 6px;border-top-style: solid;"></td>
+                                <td style="border-top-width: 6px;border-top-style: solid;"></td>
+                                <td style="border-top-width: 6px;border-top-style: solid;"></td>
+                            </tr>
+                            <tr v-if="thisTimeRepaymentInfo.penaltyFeesBiz&&thisTimeRepaymentInfo.penaltyFeesBiz.length>0" v-for="item in thisTimeRepaymentInfo.penaltyFeesBiz">
+                                <td>{{item.feeName}}</td>
+                                <td>{{item.amount}}</td>
+                            </tr>
+                            <tr v-else>
+                                <td>无</td>
+                            </tr>
+                        </table>
+                        <br>
+                        <p style="font-size: 14px;color: #1c2438;font-weight: 700;">
                                 减免明细
                             </p>
                         <table>
@@ -250,8 +269,8 @@
                                 <td style="border-top-width: 6px;border-top-style: solid;"></td>
                                 <td style="border-top-width: 6px;border-top-style: solid;"></td>
                             </tr>
-                            <tr v-if="thisTimeRepaymentInfo.derateDetails&&thisTimeRepaymentInfo.derateDetails.length>0" v-for="item in thisTimeRepaymentInfo.derateDetails">
-                                <td>{{item.name}}</td>
+                            <tr v-if="thisTimeRepaymentInfo.derates&&thisTimeRepaymentInfo.derates.length>0" v-for="item in thisTimeRepaymentInfo.derates">
+                                <td>{{item.feeName}}</td>
                                 <td>{{item.amount}}</td>
                             </tr>
                             <tr v-else>

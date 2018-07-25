@@ -150,11 +150,16 @@ public class SendMessageServiceImpl implements SendMessageService {
 		List<RepaymentBizPlanListVo> pListVos = new ArrayList();
 		BigDecimal totalAmount = BigDecimal.valueOf(0);// 合计应还金额
 		Date dueDate = new Date();
-		for (RepaymentBizPlanList pList : pLists) {
-			vo = new RepaymentBizPlanListVo(pList);
+		for (int i=0;i<pLists.size();i++) {
+			vo = new RepaymentBizPlanListVo(pLists.get(i));
+			RepaymentBizPlan plan=repaymentBizPlanService.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("plan_id", pLists.get(i).getPlanId()));
+			vo.setIndex(i+1);
+			vo.setDate(DateUtil.getChinaDay(borrowDate));
+			vo.setBorrowAmount(plan.getBorrowMoney());
 			vo.setRepayAmount(vo.getTotalBorrowAmount()
 					.add(vo.getOverdueAmount() == null ? BigDecimal.valueOf(0) : vo.getOverdueAmount()));
-			totalAmount.add(vo.getRepayAmount());
+			totalAmount=totalAmount.add(vo.getRepayAmount());
+			pListVos.add(vo);
 		}
 		Long msgModeId = Long.valueOf(sysMsgTemplate.getTemplateId());
 		MsgRequestDto dto = new MsgRequestDto();
@@ -167,7 +172,7 @@ public class SendMessageServiceImpl implements SendMessageService {
 		data.put("name", name);
 		data.put("list", pListVos);
 		data.put("totalAmount", totalAmount);
-		data.put("dueDate", DateUtil.getChinaDay(dueDate));
+		data.put("dueDate", DateUtil.getChinaDay(pLists.get(0).getDueDate()));
 		dto.setMsgBody(data);
 		String jason = JSON.toJSONString(dto);
 		msgRemote.sendRequest(jason);
@@ -196,9 +201,9 @@ public class SendMessageServiceImpl implements SendMessageService {
 		BigDecimal totalAmount = BigDecimal.valueOf(0);// 合计应还金额
 		Date dueDate = new Date();
 		for (int i=0;i<pLists.size();i++) {
-			vo = new RepaymentBizPlanListVo(pLists.get(0));
-			RepaymentBizPlan plan=repaymentBizPlanService.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("plan_id", pLists.get(0).getPlanId()));
-			vo.setPeriod(i+1);
+			vo = new RepaymentBizPlanListVo(pLists.get(i));
+			RepaymentBizPlan plan=repaymentBizPlanService.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("plan_id", pLists.get(i).getPlanId()));
+			vo.setIndex(i+1);
 			vo.setDate(DateUtil.getChinaDay(borrowDate));
 			vo.setBorrowAmount(plan.getBorrowMoney());
 			vo.setRepayAmount(vo.getTotalBorrowAmount()
@@ -209,7 +214,7 @@ public class SendMessageServiceImpl implements SendMessageService {
 		Long msgModeId = Long.valueOf(sysMsgTemplate.getTemplateId());
 		MsgRequestDto dto = new MsgRequestDto();
 		dto.setApp("alms");
-		dto.setMsgTitle("多笔还款提醒（未绑卡用户)");
+		dto.setMsgTitle("多笔还款提醒（已绑卡用户)");
 		dto.setMsgModelId(msgModeId);
 		dto.setMsgTo(phone);
 		// 组装发送短信内容的Json数据
