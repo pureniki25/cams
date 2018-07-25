@@ -505,7 +505,6 @@ public class RechargeServiceImpl implements RechargeService {
 						}else {
 							resultMsg="代扣失败";
 							remoteResult.setReturnCode("9999");
-							continue;
 						}
 					}
 					if (remoteResult.getReturnCode().equals("0000") && resultMsg.equals("充值成功")) {
