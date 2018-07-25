@@ -13,14 +13,8 @@
     <artifactId>alms-base</artifactId>
     <name>alms-base</name>
 
-
-
-
-
     <dependencies>
-
         <!--  导出报表 开始 -->
-
         <dependency>
             <groupId>org.jeecg</groupId>
             <artifactId>easypoi-annotation</artifactId>

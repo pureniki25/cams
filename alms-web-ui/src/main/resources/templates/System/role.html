@@ -82,7 +82,7 @@
                     </i-form>
                     	<button class="layui-btn layui-btn-sm"   @click="search">查询</button>
                         <button class="layui-btn " @click="openModal(true)" >新增</button>    
-                </i-col>
+                	</i-col>
             </row>
             <table id="role" lay-filter="role"></table>
             <div style="display: none; " id="barTools">
@@ -111,7 +111,7 @@
                         </form-item>
                         <form-item label="角色区域控制类型" prop="pageType">
                             <i-select :model.sync="editForm.pageType"  v-model="editForm.pageType">
-                                <i-option value="0">合规哈还款</i-option>
+                                <i-option value="0">合规化还款</i-option>
                                 <i-option value="1">贷后管理列表</i-option>
                                 <i-option value="2">车辆管理列表</i-option>
                                 <i-option value="3">减免管理列表</i-option>

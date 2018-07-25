@@ -50,5 +50,5 @@ public interface RepaymentProjPlanMapper extends SuperMapper<RepaymentProjPlan> 
 	 */
 	List<RepaymentSettleMoneyDto> selectProjPlanMoney(@Param("businessId")  String businessId, @Param("planId") String planId);
 
-	List<RepaymentSettleProjDto> orderSettleProj(@Param("planId") String planId);
+	List<RepaymentSettleProjDto> orderSettleProj(@Param("businessId") String businessId,@Param("planId")String planId);
 }

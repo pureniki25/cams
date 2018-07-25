@@ -13,7 +13,9 @@ public enum RepayPlanRepayIniCalcWayEnum {
 	PRINCIPAL_LAST(2,"先息后本"),
 	INT_AND_PRIN_EQUAL(5,"等额本息"),
 	INT_AND_PRIN_EVERYTIME(9,"分期还本付息"),
-	INT_AND_PRIN_AVERAGE(11,"等本等息")
+	INT_AND_PRIN_AVERAGE(11,"等本等息"),
+	INT_AND_PRIN_EVERYTIME_FIVE(500,"分期还本付息5年"),
+	INT_AND_PRIN_EVERYTIME_TEN(1000,"分期还本付息10年")
 	;
 
 	private Integer key; // 数据保存的值
