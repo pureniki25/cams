@@ -172,6 +172,7 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
 			}
     	}
     	
+    	logger.info("权限明细");
     	logger.info("userId={},权限明细={}",userId,pagePermissionJSONObject);
     	
         //删除原来用户的可看业务信息
