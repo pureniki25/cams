@@ -4,6 +4,8 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 
+import com.hongte.alms.base.vo.finance.SettleFeesVO;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -36,4 +38,9 @@ public class FinanceSettleReq {
      * 是否愿意亏损结清(本次应还本金大于实还本金即为亏损结清)
      */
     private Boolean deficit ;
+    
+    /**
+     * 其他费用项,从前端传入,最终流转到SettleInfoVo中
+     */
+    private List<SettleFeesVO> otherFees ;
 }
