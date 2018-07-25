@@ -79,6 +79,7 @@ public class SysRoleController {
 	@ResponseBody
 	@ApiOperation(value = "新增role")
 	public Result add(@RequestBody SysRole sysRole) {
+		sysRole.setId(null);
 		boolean res = sysRole.insert();
 		if (res) {
 			return Result.success();
