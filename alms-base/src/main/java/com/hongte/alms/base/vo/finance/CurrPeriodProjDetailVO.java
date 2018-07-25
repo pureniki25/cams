@@ -25,6 +25,10 @@ public class CurrPeriodProjDetailVO {
 	private BigDecimal offlineOverDue = new BigDecimal("0");
 	//线上滞纳金
 	private BigDecimal onlineOverDue = new BigDecimal("0");
+
+	//违约金
+	private BigDecimal item70 = new BigDecimal("0");
+
 	private BigDecimal subTotal = new BigDecimal("0");
 	private BigDecimal total = new BigDecimal("0");
 	//结余
@@ -94,6 +98,14 @@ public class CurrPeriodProjDetailVO {
 
 	public void setOnlineOverDue(BigDecimal onlineOverDue) {
 		this.onlineOverDue = onlineOverDue;
+	}
+
+	public BigDecimal getItem70() {
+		return item70;
+	}
+
+	public void setItem70(BigDecimal item70) {
+		this.item70 = item70;
 	}
 
 	public BigDecimal getSubTotal() {

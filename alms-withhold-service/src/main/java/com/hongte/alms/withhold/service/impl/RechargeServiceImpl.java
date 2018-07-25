@@ -493,15 +493,19 @@ public class RechargeServiceImpl implements RechargeService {
 						if(bankRepayTestResult.getParamValue().equals("0000")) {
 							resultMsg="充值成功";
 							remoteResult.setReturnCode("0000");
+							break;
 						}else if(bankRepayTestResult.getParamValue().equals("1111")){
 							resultMsg="银行卡余额不足";
 							remoteResult.setReturnCode("1111");
+							break;
 						}else if(bankRepayTestResult.getParamValue().equals("2222")){
 							resultMsg="处理中";
 							remoteResult.setReturnCode("EIP_TD_HANDLER_EXECEPTION");
+							break;
 						}else {
 							resultMsg="代扣失败";
 							remoteResult.setReturnCode("9999");
+							continue;
 						}
 					}
 					if (remoteResult.getReturnCode().equals("0000") && resultMsg.equals("充值成功")) {

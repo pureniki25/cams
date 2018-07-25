@@ -110,10 +110,11 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			TdrepayRechargeLog rechargeLog = handleTdrepayRechargeLog(vo);
 
 			Map<String, Object> paramMap = new HashMap<>();
-			paramMap.put("orgType", 1); // 机构类型 传输任意值
+//			paramMap.put("orgType", BusinessTypeEnum.getOrgTypeByValue(vo.getBusinessType())); // 机构类型 传输任意值
 			paramMap.put("projectId", vo.getProjectId());
 
 			Result result = eipRemote.getProjectPayment(paramMap);
+			LOG.info("标的还款信息查询接口/eip/td/assetside/getProjectPayment返回信息，{}", JSONObject.toJSONString(result));
 
 			if (result != null && result.getData() != null
 					&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
@@ -407,6 +408,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		try {
 			// 调用 eip 平台资金分发接口
 			result = eipRemote.userDistributeFund(dto);
+			LOG.info("资金分发接口/eip/td/assetside/userDistributeFund返回信息，{}", JSONObject.toJSONString(result));
 		} catch (Exception e) {
 			LOG.error("批次号:" + batchId + "，调用eip平台资金分发接口失败！DTO 数据：" + dto.toString(), e);
 			outsideLog.setReturnJson(e.getMessage());
@@ -472,32 +474,6 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			return null;
 		}
 		return sysParameterService.queryRechargeAccountSysParams(rechargeAccountType);
-	}
-
-	@Override
-	public int handleTdUserName(int businessType) {
-		int orgType = -1;
-
-		switch (businessType) {
-		case 30:
-			orgType = 0;
-			break;
-		case 26:
-			orgType = 1;
-			break;
-		case 27:
-			orgType = 2;
-			break;
-		case 28:
-			orgType = 3;
-			break;
-		case 29:
-			orgType = 4;
-			break;
-		default:
-			break;
-		}
-		return orgType;
 	}
 
 	@Override
@@ -876,6 +852,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		try {
 			// 调用提前结清接口
 			repaymentEarlierResult = eipRemote.repaymentEarlier(tdDepaymentEarlierDTO);
+			LOG.info("提前结清接口/eip/td/repayment/repaymentEarlier返回信息，{}", JSONObject.toJSONString(repaymentEarlierResult));
 		} catch (Exception e) {
 			issueSendOutsideLog.setReturnJson(e.getMessage());
 			LOG.error(e.getMessage(), e);
@@ -1112,7 +1089,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 						dto.setPrincipalAndInterest(BigDecimal.valueOf(principalAndInterest3));
 						dto.setStatus(1);
 						dto.setTuandaiAmount(BigDecimal.valueOf(tuandaiAmount3));
-//						dto.setOrgType(handleTdUserName(businessType));
+						dto.setOrgType(BusinessTypeEnum.getOrgTypeByValue((businessType)));
 						dto.setOrgAmount(BigDecimal.valueOf(orgAmount3));
 						dto.setGuaranteeAmount(BigDecimal.valueOf(guaranteeAmount3));
 						dto.setArbitrationAmount(BigDecimal.valueOf(arbitrationAmount3));
@@ -1128,6 +1105,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 						try {
 							// 调用偿还垫付接口
 							result = eipRemote.advanceShareProfit(dto);
+							LOG.info("偿还垫付接口/eip/td/repayment/advanceShareProfit返回信息，{}", JSONObject.toJSONString(result));
 						} catch (Exception e) {
 							issueSendOutsideLog.setReturnJson(e.getMessage());
 							LOG.error(e.getMessage(), e);
@@ -1261,6 +1239,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		Result result = null;
 		try {
 			result = eipRemote.getProjectPayment(paramMap);
+			LOG.info("标的还款信息查询接口/eip/td/assetside/getProjectPayment返回信息，{}", JSONObject.toJSONString(result));
 		} catch (Exception e) {
 			issueSendOutsideLog.setReturnJson(e.getMessage());
 			LOG.error(e.getMessage(), e);
@@ -1351,7 +1330,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		// 还垫付日志记录
 		TdrepayAdvanceLog tdrepayAdvanceLog = new TdrepayAdvanceLog();
 
-//		paramDTO.setOrgType(handleTdUserName(tdrepayRechargeLog.getBusinessType())); // EIP已做优化，OrgType字段不用再传
+		paramDTO.setOrgType(BusinessTypeEnum.getOrgTypeByValue((tdrepayRechargeLog.getBusinessType()))); 
 
 		// 期次
 		Integer period = tdrepayRechargeLog.getPeriod();
@@ -1446,6 +1425,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		try {
 			// 调用偿还垫付接口
 			result = eipRemote.advanceShareProfit(paramDTO);
+			LOG.info("偿还垫付接口/eip/td/repayment/advanceShareProfit返回信息，{}", JSONObject.toJSONString(result));
 		} catch (Exception e) {
 			// 还垫付记录表标记为处理失败
 			tdrepayAdvanceLog.setAdvanceStatus(2);
@@ -1523,7 +1503,9 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		Result advanceShareProfitResult = null;
 		try {
 			queryProjectPaymentResult = eipRemote.queryProjectPayment(paramMap); // 标的还款信息
+			LOG.info("标的还款信息查询接口/eip/td/repayment/queryProjectPayment返回信息，{}", JSONObject.toJSONString(queryProjectPaymentResult));
 			advanceShareProfitResult = eipRemote.returnAdvanceShareProfit(paramMap); // 还垫付信息
+			LOG.info("还垫付信息查询接口/eip/td/repayment/returnAdvanceShareProfit返回信息，{}", JSONObject.toJSONString(advanceShareProfitResult));
 		} catch (Exception e) {
 			queryProjectPaymentLog.setReturnJson(e.getMessage());
 			advanceShareProfitLog.setReturnJson(e.getMessage());

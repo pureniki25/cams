@@ -570,8 +570,11 @@ public class TdrepayRechargeController {
 
 			paramMap2.put("userId", info.getTdUserId());
 			com.ht.ussp.core.Result resultActual = eipRemote.queryProjectPayment(paramMap);
+			LOG.info("标的还款信息查询接口/eip/td/repayment/queryProjectPayment返回信息，{}", JSONObject.toJSONString(resultActual));
 			com.ht.ussp.core.Result resultEarlier = eipRemote.queryRepaymentEarlier(paramMap);
-			com.ht.ussp.core.Result resultUserAviMoney = eipRemote.queryUserAviMoney(paramMap2);
+			LOG.info("提前结清平台费用查询/eip/td/repayment/queryRepaymentEarlier返回信息，{}", JSONObject.toJSONString(resultEarlier));
+			com.ht.ussp.core.Result resultUserAviMoney = eipRemote.queryUserAviMoney(paramMap2);	// 查询用户余额
+			LOG.info("查询用户账户余额/eip/xiaodai/QueryUserAviMoney返回信息，{}", JSONObject.toJSONString(resultUserAviMoney));
 
 			List<TdProjectPaymentDTO> tdProjectPaymentDTOs = null;
 
@@ -694,7 +697,9 @@ public class TdrepayRechargeController {
 			Map<String, Object> resultMap = new HashMap<>();
 
 			com.ht.ussp.core.Result result = eipRemote.returnAdvanceShareProfit(paramMap);
+			LOG.info("还垫付信息查询接口/eip/td/repayment/returnAdvanceShareProfit返回信息，{}", JSONObject.toJSONString(result));
 			com.ht.ussp.core.Result queryProjectPaymentResult = eipRemote.queryProjectPayment(paramMap);
+			LOG.info("标的还款信息查询接口/eip/td/repayment/queryProjectPayment返回信息，{}", JSONObject.toJSONString(queryProjectPaymentResult));
 
 			if (result != null && result.getData() != null
 					&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())
@@ -937,7 +942,8 @@ public class TdrepayRechargeController {
 				
 				paramMap.put("userId", userId);
 
-				com.ht.ussp.core.Result result = eipRemote.queryUserAviMoney(paramMap);
+				com.ht.ussp.core.Result result = eipRemote.queryUserAviMoneyForNet(paramMap);
+				LOG.info("查询代充值账户余额/eip/td/queryUserAviMoneyForNet返回信息，{}", JSONObject.toJSONString(result));
 
 				resultMap.put("rechargeAccountType", rechargeAccountType);
 				resultMap.put("num", num++);
@@ -945,7 +951,7 @@ public class TdrepayRechargeController {
 				if (result != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())
 						&& result.getData() != null) {
 					JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(result.getData()));
-					resultMap.put("balance", jsonObject.get("aviMoney"));
+					resultMap.put("balance", jsonObject.get("AviMoney"));
 				} else {
 					resultMap.put("balance", "查询" + rechargeAccountType + "账户余额失败");
 				}
