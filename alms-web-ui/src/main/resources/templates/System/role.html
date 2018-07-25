@@ -64,11 +64,12 @@
                         <form-item label="页面权限类型">
                             <i-select v-model="schForm.pageType" style="width:200px">
                                 <i-option value="">-请选择-</i-option>
+                                <i-option value="0">合规化还款</i-option>
                                 <i-option value="1">贷后管理列表</i-option>
                                 <i-option value="2">车辆管理列表</i-option>
                                 <i-option value="3">减免管理列表</i-option>
                                 <i-option value="4">代扣管理列表</i-option>
-                                <i-option value="5">代扣管理列表</i-option>
+                                <i-option value="5">代扣查询列表</i-option>
                                 <i-option value="6">审批查询列表</i-option>
                                 <i-option value="7">展期管理列表</i-option>
                                 <i-option value="8">消息管理列表</i-option>
@@ -110,12 +111,12 @@
                         </form-item>
                         <form-item label="角色区域控制类型" prop="pageType">
                             <i-select :model.sync="editForm.pageType"  v-model="editForm.pageType">
-                                <i-option value="0">所有页面</i-option>
+                                <i-option value="0">合规化还款</i-option>
                                 <i-option value="1">贷后管理列表</i-option>
                                 <i-option value="2">车辆管理列表</i-option>
                                 <i-option value="3">减免管理列表</i-option>
                                 <i-option value="4">代扣管理列表</i-option>
-                                <i-option value="5">代扣管理列表</i-option>
+                                <i-option value="5">代扣查询列表</i-option>
                                 <i-option value="6">审批查询列表</i-option>
                                 <i-option value="7">展期管理列表</i-option>
                                 <i-option value="8">消息管理列表</i-option>

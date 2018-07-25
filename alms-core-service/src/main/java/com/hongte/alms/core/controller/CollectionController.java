@@ -249,10 +249,10 @@ public class CollectionController {
 	         }
         	
             long startTime = System.currentTimeMillis();
-            List<String> companyIds= sysUserAreaService.selectUserAreas(loginUserInfoHelper.getUserId());
-            if(companyIds.size()>0) {
-                req.setCommIds(companyIds);
-            }
+//            List<String> companyIds= sysUserAreaService.selectUserAreas(loginUserInfoHelper.getUserId());
+//            if(companyIds.size()>0) {
+//                req.setCommIds(companyIds);
+//            }
             Page<AfterLoanStandingBookVo> pages = phoneUrgeService.selectRepayManage(req);
             long end = System.currentTimeMillis();
             System.out.println(end - startTime);
