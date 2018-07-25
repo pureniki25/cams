@@ -98,8 +98,11 @@ public class SettleInfoVO {
 	private List<SettleFeesVO> otherFees ;
 	
 	public void setOtherFees(List<SettleFeesVO> list) {
-		this.otherFees = list ;
+		this.otherFees = list;
 		for (SettleFeesVO settleFeesVO : list) {
+			if (settleFeesVO.getAmount()==null||settleFeesVO.getFeeName()==null) {
+				continue;
+			}
 			this.other = this.other.add(settleFeesVO.getAmount());
 		}
 	}
