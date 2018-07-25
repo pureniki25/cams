@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import com.hongte.alms.base.RepayPlan.dto.RepaymentSettleMoneyDto;
+import com.hongte.alms.base.RepayPlan.dto.RepaymentSettleProjDto;
 import com.hongte.alms.base.entity.RepaymentProjPlan;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.common.mapper.SuperMapper;
@@ -40,4 +42,13 @@ public interface RepaymentProjPlanMapper extends SuperMapper<RepaymentProjPlan> 
 	public BigDecimal sumProjectItem10Unpaid(@Param("projectId")String projectId,@Param("planId") String planId);
 
 	public  BigDecimal countRepayPlanAmount(@Param("businessId") String businessId,@Param("planId") String planId);
+
+	/**
+	 * 整个业务表的还款详情
+	 * @param businessId
+	 * @return
+	 */
+	List<RepaymentSettleMoneyDto> selectProjPlanMoney(@Param("businessId")  String businessId, @Param("planId") String planId);
+
+	List<RepaymentSettleProjDto> orderSettleProj(@Param("planId") String planId);
 }

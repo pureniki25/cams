@@ -20,9 +20,5 @@ import java.util.List;
 @Service
 public class RepaymentSettleLogServiceImpl extends BaseServiceImpl<RepaymentSettleLogMapper, RepaymentSettleLog> implements RepaymentSettleLogService {
 
-    private RepaymentSettleLogMapper repaymentSettleLogMapper;
-    @Override
-    public List<RepaymentSettleMoneyDto> selectProjPlanMoney(String businessId, String planId) {
-        return repaymentSettleLogMapper.selectProjPlanMoney(businessId,planId);
-    }
+
 }
