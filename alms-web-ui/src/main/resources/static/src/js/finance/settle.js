@@ -676,10 +676,12 @@ window.layinit(function (htConfig) {
             },
             reGetSttleInfo(){
                 let param = {}
-                param.otherFees = app.thisTimeRepaymentInfo.otherFees
+                if(app.thisTimeRepaymentInfo.otherFees){
+                    param.otherFees = app.thisTimeRepaymentInfo.otherFees
+                }
                 app.getSettleInfo(param)
                 if(app.factRepaymentInfo.repayAccount&&app.factRepaymentInfo.repayAccount>0){
-                    app.previewSettle(param)
+                    app.previewSettle()
                 }
             },
             getSettleInfo(p) {
@@ -726,6 +728,9 @@ window.layinit(function (htConfig) {
                     })
             },
             settle(params,cb){
+                if(app.thisTimeRepaymentInfo.otherFees){
+                    params.otherFees = app.thisTimeRepaymentInfo.otherFees
+                }
                 axios.post(fpath+'finance/financeSettle',params)
                 .then(function(res){
                     cb(res)
@@ -759,8 +764,8 @@ window.layinit(function (htConfig) {
                 })
                 app.factRepayPreview.total = accAdd(accAdd(app.factRepayPreview.subTotal,app.factRepayPreview.offlineOverDue),accAdd(app.factRepayPreview.onlineOverDue,app.factRepayPreview.surplus))
             },
-            previewSettle(p){
-                let params = p||{}
+            previewSettle(){
+                let params = {}
                 params.businessId = businessId
                 params.afterId = afterId
                 if(planId){
