@@ -36,6 +36,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -350,6 +351,30 @@ public class RepaymentBizPlanServiceImpl extends BaseServiceImpl<RepaymentBizPla
 				if (repaymentSettleListVO.samePeriod(curr)) {
 					currents.add(curr);
 				}
+			}
+		}
+	}
+
+
+	/* (non-Javadoc)
+	 * @see com.hongte.alms.base.service.RepaymentBizPlanService#isFinalRepayPlanSettle(java.lang.String, java.lang.String, java.lang.String)
+	 */
+	@Override
+	public boolean isFinalRepayPlanSettle(String businessId, String planId) {
+		if (planId==null) {
+			/*planId为空,为全部业务结清,也算是最后一次结清*/
+			return true ;
+		}
+		List<RepaymentBizPlan> selectList = repaymentBizPlanMapper.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id", businessId).eq("plan_status", 0));
+		if (CollectionUtils.isEmpty(selectList)) {
+			/*业务全都结清,那就不是最后一次结清*/
+			return false ;
+		}else {
+			if (selectList.size()==1 && selectList.get(0).getPlanId().equals(planId)) {
+				return true ;
+			}else {
+				/*还有其他还款计划,也不算最后一次结清*/
+				return false ;
 			}
 		}
 	}

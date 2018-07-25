@@ -76,6 +76,11 @@ public class SettleInfoVO {
 	private Date repayPlanDate ;
 
 	/**
+	 * 其他费用项总额
+	 */
+	private BigDecimal other = BigDecimal.ZERO ;
+	
+	/**
 	 * 减免项目
 	 */
 	private List<SettleFeesVO> derates ;
@@ -87,6 +92,17 @@ public class SettleInfoVO {
 		}
 	}
 	
+	/**
+	 * 其他费用项明细
+	 */
+	private List<SettleFeesVO> otherFees ;
+	
+	public void setOtherFees(List<SettleFeesVO> list) {
+		this.otherFees = list ;
+		for (SettleFeesVO settleFeesVO : list) {
+			this.other = this.other.add(settleFeesVO.getAmount());
+		}
+	}
 	
 	/**
 	 * 往期少缴费用
