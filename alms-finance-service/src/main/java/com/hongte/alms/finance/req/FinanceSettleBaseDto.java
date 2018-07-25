@@ -105,4 +105,6 @@ public class FinanceSettleBaseDto {
 
    private List<RepaymentSettleLogDetail> repaymentSettleLogDetailList=new ArrayList<>();
 
+   private List<RepaymentProjPlanList> ptojPlanList = new ArrayList<>();
+
 }

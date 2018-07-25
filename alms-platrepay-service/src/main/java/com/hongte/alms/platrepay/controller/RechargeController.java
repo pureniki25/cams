@@ -142,7 +142,8 @@ public class RechargeController {
 
 		com.ht.ussp.core.Result result = null;
 		try {
-			result = eipRemote.queryUserAviMoney(paramMap);
+			result = eipRemote.queryUserAviMoneyForNet(paramMap);
+			LOG.info("查询代充值账户余额/eip/xiaodai/queryUserAviMoneyForNet接口返回信息：{}", JSONObject.toJSONString(result));
 		} catch (Exception e) {
 			return Result.error("500", "调用外联平台查询代充值账户余额接口失败！");
 		}
@@ -215,6 +216,7 @@ public class RechargeController {
 		try {
 
 			result = eipRemote.agencyRecharge(dto);
+			LOG.info("代充值接口/eip/td/assetside/agencyRecharge返回信息，{}", JSONObject.toJSONString(result));
 
 			if (result == null) {
 				return Result.error("500", "接口调用失败！");

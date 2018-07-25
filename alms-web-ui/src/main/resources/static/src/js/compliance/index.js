@@ -496,7 +496,7 @@ window.layinit(function(htConfig) {
 				.then(function(result){
 					if (result.data.code == "1" && result.data.data.data != null) {
 						vm.rechargeModalForm.rechargeAccountBalance = result.data.data.data.aviMoney;
-						vm.rechargeAccountBalance = result.data.data.data.aviMoney;
+						vm.rechargeAccountBalance = result.data.data.data.AviMoney;
 					} else {
 						vm.rechargeModalForm.rechargeAccountBalance = '';
 						vm.rechargeAccountBalance = '';
