@@ -125,6 +125,11 @@ public class RepaymentConfirmLog extends Model<RepaymentConfirmLog> {
 	@ApiModelProperty(required= true,value = "更新人")
 	private String updateUser;
 
+	/**
+	 * 还款日志类型，1=还款日志，2=结清日志
+	 */
+	@TableField("type")
+	private Integer type ;
 
 	public String getConfirmLogId() {
 		return confirmLogId;
@@ -353,5 +358,19 @@ public class RepaymentConfirmLog extends Model<RepaymentConfirmLog> {
 	 */
 	public void setIdx(Integer idx) {
 		this.idx = idx;
+	}
+
+	/**
+	 * 还款日志类型，1=还款日志，2=结清日志
+	 */
+	public Integer getType() {
+		return type;
+	}
+
+	/**
+	 * 还款日志类型，1=还款日志，2=结清日志
+	 */
+	public void setType(Integer type) {
+		this.type = type;
 	}
 }
