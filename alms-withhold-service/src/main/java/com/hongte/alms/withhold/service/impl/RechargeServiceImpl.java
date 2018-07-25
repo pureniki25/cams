@@ -453,7 +453,7 @@ public class RechargeServiceImpl implements RechargeService {
 					return result;
 				}
 				WithholdingRepaymentLog log = recordRepaymentLog("", status, pList, business, bankCardInfo,
-						channel.getPlatformId(), boolLastRepay, boolPartRepay, merchOrderId,bankCardInfo.getPlatformUserID(), 0,
+						channel.getPlatformId(), boolLastRepay, boolPartRepay, merchOrderId,oIdPartner, 0,
 						BigDecimal.valueOf(amount),appType);
 
 				BankRechargeReqDto dto = new BankRechargeReqDto();
@@ -1098,18 +1098,7 @@ public class RechargeServiceImpl implements RechargeService {
 		for (WithholdingRepaymentLog log : losgs) {
 			try {
 				if (log.getBindPlatformId() == PlatformEnum.YH_FORM.getValue()) {
-					BasicBusiness business=basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", log.getOriginalBusinessId()));
-					com.hongte.alms.common.result.Result merchAccountResult=platformRepaymentFeignClient.getOIdPartner(business.getBusinessType());
-					String oIdPartner="";
-					if(merchAccountResult.getCode().equals("1")) {
-						Map map= (Map) merchAccountResult.getData();
-						oIdPartner=map.get("oIdPartner").toString();
-						
-					}else {
-						logger.error("获取资产端唯一编号失败,logId:{0}",log.getLogId());
-						continue;
-					}
-					getBankResult(log,oIdPartner);
+					getBankResult(log,log.getMerchantAccount());
 				}
 				if (log.getBindPlatformId() == PlatformEnum.BF_FORM.getValue()) {
 					getBFResult(log);

@@ -2194,8 +2194,13 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
         infoVO.setPenaltyFees(calcPenalty(cur, req.getPlanId()));
 
+        if (req.getOtherFees()==null) {
+			infoVO.setOtherFees(new ArrayList<>());
+		}else {
+			infoVO.setOtherFees(req.getOtherFees());
+		}
         infoVO.setSubtotal(infoVO.getSubtotal().add(infoVO.getItem10()).add(infoVO.getItem20()).add(infoVO.getItem30()).add(infoVO.getItem50()));
-        infoVO.setTotal(infoVO.getTotal().add(infoVO.getSubtotal()).add(infoVO.getOfflineOverDue()).add(infoVO.getOnlineOverDue()).add(infoVO.getDerate()).add(infoVO.getPlanRepayBalance()));
+        infoVO.setTotal(infoVO.getTotal().add(infoVO.getSubtotal()).add(infoVO.getOfflineOverDue()).add(infoVO.getOnlineOverDue()).subtract(infoVO.getDerate()).add(infoVO.getPlanRepayBalance()).add(infoVO.getPenalty()).add(infoVO.getOther()));
 
         return infoVO;
     }

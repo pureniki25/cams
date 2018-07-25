@@ -396,6 +396,10 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
 	@Override
 	public void updateUserOrg(String userId) {
 		SysUser sysUser = sysUserService.selectOne(new EntityWrapper<SysUser>().eq("user_id",userId));
+		if(null == sysUser) {
+			addAppUser(userId);
+			sysUser = sysUserService.selectOne(new EntityWrapper<SysUser>().eq("user_id",userId));
+		}
 		LoginInfoDto loginInfoDto = loginUserInfoHelper.getUserInfoByUserId(userId, "");
 		sysUser.setOrgCode(loginInfoDto.getOrgCode());
 		sysUserService.updateById(sysUser);
@@ -420,6 +424,10 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
 	@Override
 	public void addUserRole(String userId) {
 		SysUser sysUser = sysUserService.selectOne(new EntityWrapper<SysUser>().eq("user_id",userId));
+		if(null == sysUser) {
+			addAppUser(userId);
+			sysUser = sysUserService.selectOne(new EntityWrapper<SysUser>().eq("user_id",userId));
+		}
 		SelfBoaInUserInfo userInfo = new SelfBoaInUserInfo();
 		userInfo.setUserId(userId);
 		userInfo.setUserName(sysUser.getUserName());
@@ -432,6 +440,10 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
 	@Override
 	public void delUserRole(String userId) {
 		SysUser sysUser = sysUserService.selectOne(new EntityWrapper<SysUser>().eq("user_id",userId));
+		if(null == sysUser) {
+			addAppUser(userId);
+			sysUser = sysUserService.selectOne(new EntityWrapper<SysUser>().eq("user_id",userId));
+		}
 		SelfBoaInUserInfo userInfo = new SelfBoaInUserInfo();
 		userInfo.setUserId(userId);
 		userInfo.setUserName(sysUser.getUserName());

@@ -45,6 +45,7 @@ window.layinit(function (htConfig) {
                 derate: '',
                 planRepayBalance: '',
                 total: '',
+                otherFees:[]
             },
             table: {
                 reg: {
@@ -673,11 +674,24 @@ window.layinit(function (htConfig) {
                         })
                     })
             },
-            getSettleInfo() {
-                axios.get(fpath + 'settle/settleInfo?businessId=' 
-                + businessId + "&afterId=" 
-                + afterId 
-                +(planId?('&planId='+planId):''))
+            reGetSttleInfo(){
+                let param = {}
+                if(app.thisTimeRepaymentInfo.otherFees){
+                    param.otherFees = app.thisTimeRepaymentInfo.otherFees
+                }
+                app.getSettleInfo(param)
+                if(app.factRepaymentInfo.repayAccount&&app.factRepaymentInfo.repayAccount>0){
+                    app.previewSettle()
+                }
+            },
+            getSettleInfo(p) {
+                let param = p||{}
+                param.businessId = businessId ;
+                param.afterId = afterId ;
+                if(planId){
+                    param.planId = planId
+                }
+                axios.post(fpath + 'settle/settleInfo',param)
                     .then(function (res) {
                         if (res.data.code == '1') {
                             let data = res.data.data;
@@ -696,7 +710,10 @@ window.layinit(function (htConfig) {
                             app.thisTimeRepaymentInfo.planRepayBalance = data.planRepayBalance
                             app.thisTimeRepaymentInfo.total = data.total
                             app.thisTimeRepaymentInfo.penaltyFeesBiz = data.penaltyFeesBiz
-
+                            app.thisTimeRepaymentInfo.other = data.other
+                            if(param.otherFees){
+                                app.thisTimeRepaymentInfo.otherFees = data.otherFees
+                            }
                             console.log(res.data);
                         } else {
                             app.$Message.error({
@@ -711,6 +728,9 @@ window.layinit(function (htConfig) {
                     })
             },
             settle(params,cb){
+                if(app.thisTimeRepaymentInfo.otherFees){
+                    params.otherFees = app.thisTimeRepaymentInfo.otherFees
+                }
                 axios.post(fpath+'finance/financeSettle',params)
                 .then(function(res){
                     cb(res)
@@ -784,6 +804,28 @@ window.layinit(function (htConfig) {
                 }
                 
 
+            },
+            listOtherFee(){
+                axios.get(fpath+'settle/listOtherFee?businessId=' 
+                + businessId 
+                +(planId?('&planId='+planId):''))
+                .then(function(res){
+                    console.log(res);
+                    if(res.data.code=='1'){
+                        app.thisTimeRepaymentInfo.otherFees = res.data.data 
+                    }else{
+                        app.$Message.error({
+                            content:res.data.msg
+                        })
+                    }
+                })
+                .catch(function(err){
+                    console.error(err)
+                })
+            },
+            recalcSettleInfo(){
+                /* 重新计算应还信息 */
+
             }
             
         },
@@ -793,6 +835,7 @@ window.layinit(function (htConfig) {
             this.getMatched()
             this.listRepayment()
             this.getSettleInfo()
+            this.listOtherFee()
         }
     })
 })
