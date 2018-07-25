@@ -498,8 +498,10 @@
                                             self.editCompanyCollectionUser.editCompanyCollectionForm.areaId = obj.data.areaId;
                                             self.editCompanyCollectionUser.editCompanyCollectionForm.companyId[0] = obj.data.companyId;
                                         	
-                                            self.editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup1Users=obj.data.col1Pids==null?[]:obj.data.col1Pids.split(",");
-                                            self.editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup2Users=obj.data.col2Pids==null?[]:obj.data.col2Pids.split(",");
+                                            /* self.editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup1Users=obj.data.col1Pids==null?[]:obj.data.col1Pids.split(",");
+                                            self.editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup2Users=obj.data.col2Pids==null?[]:obj.data.col2Pids.split(","); */
+                                            self.editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup1Users=!obj.data.col1Pids?[]:obj.data.col1Pids.split(",");
+                                            self.editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup2Users=!obj.data.col2Pids?[]:obj.data.col2Pids.split(",");
                                         }
                                     })
                             }
