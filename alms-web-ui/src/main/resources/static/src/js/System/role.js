@@ -51,7 +51,7 @@ window.layinit(function (htConfig) {
                 field: 'pageType',
                 title: '页面名称',
                 templet: function (d) {
-                	var pageTypeName = ["所有页面",
+                	var pageTypeName = ["合规化还款",
                 		"贷后管理列表",
                 		"车辆管理列表",
                 		"减免管理列表",
