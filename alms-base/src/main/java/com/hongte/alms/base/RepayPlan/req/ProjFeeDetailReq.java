@@ -20,7 +20,7 @@ public class ProjFeeDetailReq {
 
     @ApiModelProperty(required= true,value = "期数")
     @NotNull(message = "期数(period)不能为空")
-    private Integer peroid;
+    private Integer period;
 
     /**
      * 本期金额
@@ -38,11 +38,11 @@ public class ProjFeeDetailReq {
         this.feeValue = feeValue;
     }
 
-    public Integer getPeroid() {
-        return peroid;
+    public Integer getPeriod() {
+        return period;
     }
 
-    public void setPeroid(Integer peroid) {
-        this.peroid = peroid;
+    public void setPeriod(Integer period) {
+        this.period = period;
     }
 }

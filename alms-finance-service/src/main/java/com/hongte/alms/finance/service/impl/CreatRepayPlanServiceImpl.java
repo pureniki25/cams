@@ -759,8 +759,8 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                             List<ProjFeeDetailReq>  comPenaltyDetailReqs = comPenalty.getFeeDetailReqList();
                             for(ProjFeeDetailReq projFeeDetailReq: comPenaltyDetailReqs){
                                 ProjExtRate projExtRate1 = ClassCopyUtil.copyObject(projExtRate,ProjExtRate.class);
-                                projExtRate1.setBeginPeroid(projFeeDetailReq.getPeroid());
-                                projExtRate1.setEndPeroid(projFeeDetailReq.getPeroid());
+                                projExtRate1.setBeginPeroid(projFeeDetailReq.getPeriod());
+                                projExtRate1.setEndPeroid(projFeeDetailReq.getPeriod());
                                 //2倍的月收分公司服务费
                                 projExtRate1.setRateValue(projFeeDetailReq.getFeeValue().multiply(new BigDecimal("2")));
                                 projExtRates.add(projExtRate1);
@@ -810,8 +810,8 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                             List<ProjFeeDetailReq>  comPenaltyDetailReqs = platPenalty.getFeeDetailReqList();
                             for(ProjFeeDetailReq projFeeDetailReq: comPenaltyDetailReqs){
                                 ProjExtRate projExtRate1 = ClassCopyUtil.copyObject(projExtRate,ProjExtRate.class);
-                                projExtRate1.setBeginPeroid(projFeeDetailReq.getPeroid());
-                                projExtRate1.setEndPeroid(projFeeDetailReq.getPeroid());
+                                projExtRate1.setBeginPeroid(projFeeDetailReq.getPeriod());
+                                projExtRate1.setEndPeroid(projFeeDetailReq.getPeriod());
                                 //2倍的月收平台服务费
                                 projExtRate1.setRateValue(projFeeDetailReq.getFeeValue().multiply(new BigDecimal("2")));
                                 projExtRates.add(projExtRate1);
@@ -846,8 +846,8 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                         List<ProjFeeDetailReq>  projFeeDetailReqs = projFeeReq.getFeeDetailReqList();
                         for(ProjFeeDetailReq projFeeDetailReq: projFeeDetailReqs){
                             ProjExtRate projExtRate1 = ClassCopyUtil.copyObject(projExtRate,ProjExtRate.class);
-                            projExtRate1.setBeginPeroid(projFeeDetailReq.getPeroid());
-                            projExtRate1.setEndPeroid(projFeeDetailReq.getPeroid());
+                            projExtRate1.setBeginPeroid(projFeeDetailReq.getPeriod());
+                            projExtRate1.setEndPeroid(projFeeDetailReq.getPeriod());
                             projExtRate1.setRateValue(projFeeDetailReq.getFeeValue());
                             projExtRates.add(projExtRate1);
                         }
@@ -1633,7 +1633,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                                     }
                                     ProjFeeDetailReq feeDetail = null;
                                     for(ProjFeeDetailReq feeDetailReq: feeDetailReqMap) {
-                                        if (feeDetailReq.getPeroid().equals(i)) {
+                                        if (feeDetailReq.getPeriod().equals(i)) {
                                             feeDetail = feeDetailReq;
                                         }
                                     }
