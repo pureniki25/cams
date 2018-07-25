@@ -1112,7 +1112,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 						dto.setPrincipalAndInterest(BigDecimal.valueOf(principalAndInterest3));
 						dto.setStatus(1);
 						dto.setTuandaiAmount(BigDecimal.valueOf(tuandaiAmount3));
-						dto.setOrgType(handleTdUserName(businessType));
+//						dto.setOrgType(handleTdUserName(businessType));
 						dto.setOrgAmount(BigDecimal.valueOf(orgAmount3));
 						dto.setGuaranteeAmount(BigDecimal.valueOf(guaranteeAmount3));
 						dto.setArbitrationAmount(BigDecimal.valueOf(arbitrationAmount3));
@@ -1251,7 +1251,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	@Override
 	public Result remoteGetProjectPayment(String projectId) {
 		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("orgType", 1); // 机构类型 传输任意值
+//		paramMap.put("orgType", 1); // 机构类型 传输任意值
 		paramMap.put("projectId", projectId);
 
 		IssueSendOutsideLog issueSendOutsideLog = issueSendOutsideLog(loginUserInfoHelper.getUserId(), paramMap,
