@@ -11,9 +11,10 @@ import java.util.TreeSet;
 import java.util.concurrent.Executor;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONObject;
@@ -27,7 +28,6 @@ import com.hongte.alms.base.entity.SysUser;
 import com.hongte.alms.base.entity.SysUserArea;
 import com.hongte.alms.base.entity.SysUserPermission;
 import com.hongte.alms.base.entity.SysUserRole;
-import com.hongte.alms.base.enums.RoleAreaMethodEnum;
 import com.hongte.alms.base.enums.SysRoleAreaTypeEnums;
 import com.hongte.alms.base.feignClient.UcAppRemote;
 import com.hongte.alms.base.mapper.SysUserPermissionMapper;
@@ -58,9 +58,11 @@ import com.ht.ussp.client.dto.LoginInfoDto;
  */
 @Service("SysUserPermissionService")
 public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermissionMapper, SysUserPermission> implements SysUserPermissionService {
-
+	
+	private static final Logger logger = LoggerFactory.getLogger(SysUserPermissionServiceImpl.class);
+	
 	//@Value("${ht.alms.default.pagePermission}")
-	private String pagePermission = "{\"hasOverAllRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeHourseBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasAreaRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeCarBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasMyFollowUp\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasFinanceOrderSetAreaRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false}}";
+//	private String pagePermission = "{\"hasOverAllRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeHourseBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasAreaRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeCarBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasMyFollowUp\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasFinanceOrderSetAreaRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false}}";
 	
 	//@Value("${ht.appCode}")
 	private String appCode = "ALMS";
@@ -120,8 +122,8 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
      */
     @Transient
     public void setUserPermissons(String userId){
-    	
-    	JSONObject pagePermissionJSONObject = JSONObject.parseObject(pagePermission);
+    	String pagePermissionJson = "{\"hasOverAllRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeHourseBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasAreaRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeCarBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasMyFollowUp\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasFinanceOrderSetAreaRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false}}";
+    	JSONObject pagePermissionJSONObject = JSONObject.parseObject(pagePermissionJson);
     	
     	updatePagePermission(pagePermissionJSONObject,userId);
     	MyPermissionIdsInfo myPermissionIdsInfo = new MyPermissionIdsInfo();
@@ -169,7 +171,9 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
 				break;
 			}
     	}
-
+    	
+    	logger.info("userId={},权限明细={}",userId,pagePermissionJSONObject);
+    	
         //删除原来用户的可看业务信息
         sysUserPermissionService.delete(new EntityWrapper<SysUserPermission>().eq("user_id",userId));
 
