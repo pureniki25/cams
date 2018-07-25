@@ -556,7 +556,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
             if (flag) {
                 //单个线下
-                flag = canceAfterMoney(afterSettleMoneyDto, nowSettleMoneyDto, repaymentSettleProjDtos, financeSettleBaseDto);
+                flag = canceAfterMoney(nowSettleMoneyDto ,afterSettleMoneyDto , repaymentSettleProjDtos, financeSettleBaseDto);
             }
 
             if (flag) {
