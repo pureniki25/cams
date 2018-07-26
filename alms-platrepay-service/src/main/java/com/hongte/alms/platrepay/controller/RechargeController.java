@@ -115,6 +115,7 @@ public class RechargeController {
 	@ResponseBody
 	public Result<String> queryRechargeAccountTypeByBusinessType(@RequestParam("businessType") Integer businessType) {
 		try {
+			LOG.info("queryRechargeAccountTypeByBusinessType业务类型：{}", businessType);
 			return Result.success(BusinessTypeEnum.getRechargeAccountName(businessType));
 		} catch (Exception e) {
 			LOG.error("获取所有的线下还款账户失败", e);
@@ -141,6 +142,7 @@ public class RechargeController {
 		paramMap.put("userId", userId);
 
 		com.ht.ussp.core.Result result = null;
+		LOG.info("查询代充值账户余额/eip/xiaodai/queryUserAviMoneyForNet参数信息，{}", JSONObject.toJSONString(paramMap));
 		try {
 			result = eipRemote.queryUserAviMoneyForNet(paramMap);
 			LOG.info("查询代充值账户余额/eip/xiaodai/queryUserAviMoneyForNet接口返回信息：{}", JSONObject.toJSONString(result));
@@ -212,7 +214,7 @@ public class RechargeController {
 		agencyRechargeLogService.insert(agencyRechargeLog);
 
 		com.ht.ussp.core.Result result = null;
-
+		LOG.info("代充值接口/eip/td/assetside/agencyRecharge参数信息，{}", JSONObject.toJSONString(dto));
 		try {
 
 			result = eipRemote.agencyRecharge(dto);
