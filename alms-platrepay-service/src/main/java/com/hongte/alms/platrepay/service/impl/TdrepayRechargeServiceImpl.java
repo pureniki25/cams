@@ -113,6 +113,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 //			paramMap.put("orgType", BusinessTypeEnum.getOrgTypeByValue(vo.getBusinessType())); // 机构类型 传输任意值
 			paramMap.put("projectId", vo.getProjectId());
 
+			LOG.info("标的还款信息查询接口/eip/td/assetside/getProjectPayment参数信息，{}", JSONObject.toJSONString(paramMap));
 			Result result = eipRemote.getProjectPayment(paramMap);
 			LOG.info("标的还款信息查询接口/eip/td/assetside/getProjectPayment返回信息，{}", JSONObject.toJSONString(result));
 
@@ -404,7 +405,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		outsideLog.setCreateUserId(userId);
 
 		Result result = null;
-
+		LOG.info("资金分发接口/eip/td/assetside/userDistributeFund参数信息，{}", JSONObject.toJSONString(dto));
 		try {
 			// 调用 eip 平台资金分发接口
 			result = eipRemote.userDistributeFund(dto);
@@ -848,7 +849,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 				Constant.INTERFACE_NAME_REPAYMENT_EARLIER, Constant.SYSTEM_CODE_EIP, tdrepayRechargeLog.getProjectId());
 
 		Result repaymentEarlierResult = null;
-
+		LOG.info("提前结清接口/eip/td/repayment/repaymentEarlier参数信息，{}", JSONObject.toJSONString(tdDepaymentEarlierDTO));
 		try {
 			// 调用提前结清接口
 			repaymentEarlierResult = eipRemote.repaymentEarlier(tdDepaymentEarlierDTO);
@@ -1101,7 +1102,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 								Constant.INTERFACE_NAME_ADVANCE_SHARE_PROFIT, Constant.SYSTEM_CODE_EIP, projectId);
 
 						Result result = null;
-
+						LOG.info("偿还垫付接口/eip/td/repayment/advanceShareProfit参数信息，{}", JSONObject.toJSONString(dto));
 						try {
 							// 调用偿还垫付接口
 							result = eipRemote.advanceShareProfit(dto);
@@ -1236,6 +1237,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 				Constant.INTERFACE_CODE_GET_PROJECT_PAYMENT, Constant.INTERFACE_NAME_GET_PROJECT_PAYMENT,
 				Constant.SYSTEM_CODE_EIP, projectId);
 
+		LOG.info("标的还款信息查询接口/eip/td/assetside/getProjectPayment参数信息，{}", JSONObject.toJSONString(paramMap));
 		Result result = null;
 		try {
 			result = eipRemote.getProjectPayment(paramMap);
@@ -1421,7 +1423,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 		tdrepayAdvanceLog.setCreateTime(new Date());
 		tdrepayAdvanceLog.setCreateUser(userId);
-
+		LOG.info("偿还垫付接口/eip/td/repayment/advanceShareProfit参数信息，{}", JSONObject.toJSONString(paramDTO));
 		try {
 			// 调用偿还垫付接口
 			result = eipRemote.advanceShareProfit(paramDTO);
@@ -1502,8 +1504,11 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		Result queryProjectPaymentResult = null;
 		Result advanceShareProfitResult = null;
 		try {
+			LOG.info("标的还款信息查询接口/eip/td/repayment/queryProjectPayment参数信息，{}", JSONObject.toJSONString(paramMap));
 			queryProjectPaymentResult = eipRemote.queryProjectPayment(paramMap); // 标的还款信息
 			LOG.info("标的还款信息查询接口/eip/td/repayment/queryProjectPayment返回信息，{}", JSONObject.toJSONString(queryProjectPaymentResult));
+			
+			LOG.info("还垫付信息查询接口/eip/td/repayment/returnAdvanceShareProfit参数信息，{}", JSONObject.toJSONString(paramMap));
 			advanceShareProfitResult = eipRemote.returnAdvanceShareProfit(paramMap); // 还垫付信息
 			LOG.info("还垫付信息查询接口/eip/td/repayment/returnAdvanceShareProfit返回信息，{}", JSONObject.toJSONString(advanceShareProfitResult));
 		} catch (Exception e) {

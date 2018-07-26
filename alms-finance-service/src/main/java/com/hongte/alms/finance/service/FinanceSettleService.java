@@ -22,8 +22,10 @@ public interface FinanceSettleService {
      * @return
      */
     List<String> curPeriod(RepaymentBizPlanList now) ;
+
+    void financeSettleRecall(String confirmLogId);
     /**
-     * 
+     *
      * 财务结清,获取当前期
      * @author 王继光
      * 2018年7月25日 下午9:52:16

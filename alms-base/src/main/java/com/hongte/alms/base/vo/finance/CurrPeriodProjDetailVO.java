@@ -36,6 +36,8 @@ public class CurrPeriodProjDetailVO {
 	private String project ;
 	private Date queryFullSuccessDate ;
 
+	private BigDecimal otherMoney=new BigDecimal("0");
+
 	public String getUserName() {
 		return userName;
 	}
@@ -108,6 +110,14 @@ public class CurrPeriodProjDetailVO {
 		this.item70 = item70;
 	}
 
+	public BigDecimal getOtherMoney() {
+		return otherMoney;
+	}
+
+	public void setOtherMoney(BigDecimal otherMoney) {
+		this.otherMoney = otherMoney;
+	}
+
 	public BigDecimal getSubTotal() {
 		subTotal = new BigDecimal("0");
 		subTotal = subTotal.add(getItem10() == null ? new BigDecimal("0") : getItem10())
@@ -129,7 +139,9 @@ public class CurrPeriodProjDetailVO {
 				.add(getItem50() == null ? new BigDecimal("0") : getItem50())
 				.add(getOfflineOverDue() == null ? new BigDecimal("0") : getOfflineOverDue())
 				.add(getOnlineOverDue() == null ? new BigDecimal("0") : getOnlineOverDue())
-				.add(getSurplus() == null ? new BigDecimal("0") : getSurplus());
+				.add(getSurplus() == null ? new BigDecimal("0") : getSurplus())
+				.add(getItem70() == null ? new BigDecimal("0") : getItem70())
+				.add(getOtherMoney() == null ? new BigDecimal("0") : getOtherMoney());
 		return total;
 	}
 

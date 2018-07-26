@@ -495,7 +495,7 @@ window.layinit(function(htConfig) {
 				axios.get(basePath + 'recharge/queryUserAviMoney?rechargeAccountType=' + rechargeAccountType, {timeout: 0})
 				.then(function(result){
 					if (result.data.code == "1" && result.data.data.data != null) {
-						vm.rechargeModalForm.rechargeAccountBalance = result.data.data.data.aviMoney;
+						vm.rechargeModalForm.rechargeAccountBalance = result.data.data.data.AviMoney;
 						vm.rechargeAccountBalance = result.data.data.data.AviMoney;
 					} else {
 						vm.rechargeModalForm.rechargeAccountBalance = '';

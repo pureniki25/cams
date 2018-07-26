@@ -569,10 +569,15 @@ public class TdrepayRechargeController {
 			TuandaiProjectInfo info = tuandaiProjectInfoService.selectById(projectId);
 
 			paramMap2.put("userId", info.getTdUserId());
+			LOG.info("标的还款信息查询接口/eip/td/repayment/queryProjectPayment参数信息，{}", JSONObject.toJSONString(paramMap));
 			com.ht.ussp.core.Result resultActual = eipRemote.queryProjectPayment(paramMap);
 			LOG.info("标的还款信息查询接口/eip/td/repayment/queryProjectPayment返回信息，{}", JSONObject.toJSONString(resultActual));
+			
+			LOG.info("提前结清平台费用查询/eip/td/repayment/queryRepaymentEarlier参数信息，{}", JSONObject.toJSONString(paramMap));
 			com.ht.ussp.core.Result resultEarlier = eipRemote.queryRepaymentEarlier(paramMap);
 			LOG.info("提前结清平台费用查询/eip/td/repayment/queryRepaymentEarlier返回信息，{}", JSONObject.toJSONString(resultEarlier));
+			
+			LOG.info("查询用户账户余额/eip/xiaodai/QueryUserAviMoney参数信息，{}", JSONObject.toJSONString(paramMap2));
 			com.ht.ussp.core.Result resultUserAviMoney = eipRemote.queryUserAviMoney(paramMap2);	// 查询用户余额
 			LOG.info("查询用户账户余额/eip/xiaodai/QueryUserAviMoney返回信息，{}", JSONObject.toJSONString(resultUserAviMoney));
 
@@ -695,9 +700,11 @@ public class TdrepayRechargeController {
 			paramMap.put("projectId", projectId);
 
 			Map<String, Object> resultMap = new HashMap<>();
-
+			LOG.info("还垫付信息查询接口/eip/td/repayment/returnAdvanceShareProfit参数信息，{}", JSONObject.toJSONString(paramMap));
 			com.ht.ussp.core.Result result = eipRemote.returnAdvanceShareProfit(paramMap);
 			LOG.info("还垫付信息查询接口/eip/td/repayment/returnAdvanceShareProfit返回信息，{}", JSONObject.toJSONString(result));
+			
+			LOG.info("标的还款信息查询接口/eip/td/repayment/returnAdvanceShareProfit参数信息，{}", JSONObject.toJSONString(paramMap));
 			com.ht.ussp.core.Result queryProjectPaymentResult = eipRemote.queryProjectPayment(paramMap);
 			LOG.info("标的还款信息查询接口/eip/td/repayment/queryProjectPayment返回信息，{}", JSONObject.toJSONString(queryProjectPaymentResult));
 
@@ -942,6 +949,7 @@ public class TdrepayRechargeController {
 				
 				paramMap.put("userId", userId);
 
+				LOG.info("查询代充值账户余额/eip/td/queryUserAviMoneyForNet参数信息，{}", JSONObject.toJSONString(paramMap));
 				com.ht.ussp.core.Result result = eipRemote.queryUserAviMoneyForNet(paramMap);
 				LOG.info("查询代充值账户余额/eip/td/queryUserAviMoneyForNet返回信息，{}", JSONObject.toJSONString(result));
 

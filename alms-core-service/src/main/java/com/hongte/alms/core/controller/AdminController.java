@@ -213,7 +213,7 @@ public class AdminController {
 		try {
 
 
-			List<SysUser> ll = sysUserService.selectList(new EntityWrapper<SysUser>().eq("user_id",userId).or("user_name",userId));
+			List<SysUser> ll = sysUserService.selectList(new EntityWrapper<SysUser>().eq("user_id",userId).or().eq("user_name", userId));
 
 			if(ll!=null && ll.size()>0){
 				for(SysUser su:ll){
