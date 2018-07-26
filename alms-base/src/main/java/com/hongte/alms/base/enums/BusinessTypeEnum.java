@@ -12,24 +12,24 @@ import com.hongte.alms.common.util.Constant;
  */
 public enum BusinessTypeEnum implements IEnum {
 
-    CYDZQ_TYPE(1, "车易贷展期", 1, Constant.CAR_LOAN, 6),
-    FSDZQ_TYPE(2, "房速贷展期", 2, Constant.HOUSE_LOAN, 5),
+    CYDZQ_TYPE(1, "车易贷展期", 1001, Constant.CAR_LOAN, 6),
+    FSDZQ_TYPE(2, "房速贷展期", 1002, Constant.HOUSE_LOAN, 5),
     JRCC_TYPE(3, "金融仓储", -1, Constant.BLANK_STR, -1),	// 没有对应的充值账户，充值账户ID设置-1，充值账户名称设置""
     SN_TYPE(4, "三农金融", -1, Constant.BLANK_STR, -1),		// 没有对应的充值账户，充值账户ID设置-1，充值账户名称设置"
-    CYD_TYPE(9, "车易贷", 1, Constant.CAR_LOAN, 6),
-    FSD_TYPE(11, "房速贷", 2, Constant.HOUSE_LOAN, 5),
-    CQSZDC_TYPE(12, "车全垫资代采", 4, Constant.CHE_QUAN_LOAN, 9),
-    FPD_TYPE(13, "扶贫贷", 3, Constant.POVERTY_ALLEVIATION_LOAN, 7),
+    CYD_TYPE(9, "车易贷", 1001, Constant.CAR_LOAN, 6),
+    FSD_TYPE(11, "房速贷", 1002, Constant.HOUSE_LOAN, 5),
+    CQSZDC_TYPE(12, "车全垫资代采", 1004, Constant.CHE_QUAN_LOAN, 9),
+    FPD_TYPE(13, "扶贫贷", 1003, Constant.POVERTY_ALLEVIATION_LOAN, 7),
     QCRZZL_TYPE(14, "汽车融资租赁", -1, Constant.BLANK_STR, -1),	// 没有对应的充值账户，充值账户ID设置-1，充值账户名称设置"
-    ESC_TYPE(15, "二手车商贷", 5, Constant.ER_SHOU_CHE_LOAN, 8),
-    YD_CAR_TYPE(20, "一点车贷", 6, Constant.YI_DIAN_LOAN, 10),
+    ESC_TYPE(15, "二手车商贷", 1005, Constant.ER_SHOU_CHE_LOAN, 8),
+    YD_CAR_TYPE(20, "一点车贷", 1006, Constant.YI_DIAN_LOAN, 10),
     CREDIT_TYPE(25, "信用贷", -1, Constant.CREDIT_LOAN, -1),	// 没有对应的充值账户，充值账户ID设置-1，充值账户名称设置"
-    PROPRIETOR_TYPE(26, "业主贷", 8, Constant.PROPRIETOR_LOAN, 1),
-    INSTALMENT_CREDIT_TYPE(27, "家装分期", 9, Constant.INSTALMENT_CREDIT_LOAN, 2),
-    COMMERCE_COMPANY_TYPE(28, "商贸贷共借", 10, Constant.COMMERCE_COMPANY_LOAN, 3),
-    PROPRIETOR_COMPANY_TYPE(29, "业主贷共借", 11, Constant.PROPRIETOR_COMPANY_LOAN, 4),
-	COMMERCE_TYPE(30, "商贸贷", 7, Constant.COMMERCE_LOAN, 0),
-	YOU_FANG_TYPE(35, "优房贷", 2, Constant.HOUSE_LOAN, 5);
+    PROPRIETOR_TYPE(26, "业主贷", 1008, Constant.PROPRIETOR_LOAN, 1),
+    INSTALMENT_CREDIT_TYPE(27, "家装分期", 1009, Constant.INSTALMENT_CREDIT_LOAN, 2),
+    COMMERCE_COMPANY_TYPE(28, "商贸贷共借", 1010, Constant.COMMERCE_COMPANY_LOAN, 3),
+    PROPRIETOR_COMPANY_TYPE(29, "业主贷共借", 1011, Constant.PROPRIETOR_COMPANY_LOAN, 4),
+	COMMERCE_TYPE(30, "商贸贷", 1007, Constant.COMMERCE_LOAN, 0),
+	YOU_FANG_TYPE(35, "优房贷", 1002, Constant.HOUSE_LOAN, 5);
 
 
     private int value;

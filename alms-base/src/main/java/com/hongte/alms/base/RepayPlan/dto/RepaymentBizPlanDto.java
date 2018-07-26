@@ -15,8 +15,6 @@ import org.apache.commons.collections.CollectionUtils;
  */
 public class RepaymentBizPlanDto  implements Serializable {
 
-    private static final RepaymentBizPlanListDto bizPlanListDto = null;
-
 
 	/**
      * 业务还款计划
