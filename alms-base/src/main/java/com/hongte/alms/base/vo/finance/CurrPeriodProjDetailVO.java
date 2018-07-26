@@ -4,7 +4,10 @@
 package com.hongte.alms.base.vo.finance;
 
 import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author 王继光 2018年5月14日 下午8:42:42
@@ -197,5 +200,41 @@ public class CurrPeriodProjDetailVO {
 	 */
 	public void setQueryFullSuccessDate(Date queryFullSuccessDate) {
 		this.queryFullSuccessDate = queryFullSuccessDate;
+	}
+	
+	/**
+	 * 将核销完的标的实还信息排序
+	 * @author 王继光
+	 * 2018年7月26日 下午3:54:25
+	 * @param detailVOs
+	 */
+	public static void sort(List<CurrPeriodProjDetailVO> detailVOs) {
+		Collections.sort(detailVOs, new Comparator<CurrPeriodProjDetailVO>() {
+            // 排序规则说明 需补充 从小标到大标，再到主借标
+            //同等
+            @Override
+            public int compare(CurrPeriodProjDetailVO arg0, CurrPeriodProjDetailVO arg1) {
+                if (arg0.isMaster()) {
+                    return 1;
+                }else if (arg1.isMaster()) {
+                    return -1;
+				}
+                if (arg0.getProjAmount()
+                        .compareTo(arg1.getProjAmount()) < 0) {
+                    return -1;
+                }else if (arg0.getProjAmount().compareTo(arg1.getProjAmount())>0) {
+					return 1;
+				}
+                if (arg0.getQueryFullSuccessDate()
+                        .before(arg1.getQueryFullSuccessDate())) {
+                    return -1;
+                }else if (arg0.getQueryFullSuccessDate()
+                        .after(arg1.getQueryFullSuccessDate())) {
+					return 1;
+				}
+                return 0;
+            }
+
+        });
 	}
 }
