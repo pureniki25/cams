@@ -1,8 +1,10 @@
 package com.hongte.alms.finance.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.RepayPlan.dto.*;
+import com.hongte.alms.base.baseException.SettleRepaymentExcepiton;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.AlmsServiceNameEnums;
 import com.hongte.alms.base.enums.RepayCurrentStatusEnums;
@@ -15,6 +17,7 @@ import com.hongte.alms.base.service.*;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.base.vo.finance.SettleFeesVO;
 import com.hongte.alms.base.vo.finance.SettleInfoVO;
+import com.hongte.alms.common.exception.ExceptionCodeEnum;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.DateUtil;
@@ -34,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.enterprise.inject.New;
 import javax.validation.constraints.NotNull;
@@ -103,6 +107,17 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
     @Autowired
     Executor executor;
+
+    @Autowired
+    RepaymentBizPlanBakMapper repaymentBizPlanBakMapper;
+
+    @Autowired
+    RepaymentBizPlanListBakMapper repaymentBizPlanListBakMapper;
+
+    @Autowired
+    RepaymentBizPlanListDetailBakMapper repaymentBizPlanListDetailBakMapper;
+    @Autowired
+    RepaymentConfirmLogMapper repaymentConfirmLogMapper;
 
     @Autowired
     @Qualifier("RepaymentConfirmPlatRepayLogService")
@@ -2916,31 +2931,31 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
 
 
-	private  RepaymentProjPlanListDto   creatProjPlanListDto(RepaymentProjPlanList repaymentProjPlanList){
+    private  RepaymentProjPlanListDto   creatProjPlanListDto(RepaymentProjPlanList repaymentProjPlanList){
         RepaymentProjPlanListDto projPlanListDto = new RepaymentProjPlanListDto() ;
         projPlanListDto.setRepaymentProjPlanList(repaymentProjPlanList);
 
-					List<RepaymentProjPlanListDetail> projPlanListDetails = repaymentProjPlanListDetailMapper.selectList(
-							new EntityWrapper<RepaymentProjPlanListDetail>().eq("proj_plan_list_id", repaymentProjPlanList.getProjPlanListId()));
-					
-					projPlanListDto.setProjPlanListDetails(projPlanListDetails);
-					
-					projPlanDto.setProjPlanListDtos(projPlanListDto);
-				}
-				
-				planDto.setProjPlanDtos(projPlanDto);
-				
-			}
-			
-			
-			
-			res.add(planDto);
-		}
-    	
-    	
-    	
-		return res;
-	}
+        List<RepaymentProjPlanListDetail> projPlanListDetails = repaymentProjPlanListDetailMapper.selectList(
+                new EntityWrapper<RepaymentProjPlanListDetail>().eq("proj_plan_list_id", repaymentProjPlanList.getProjPlanListId()));
+
+        projPlanListDto.setProjPlanListDetails(projPlanListDetails);
+
+
+        List<RepaymentProjPlanListDetailDto>  repaymentProjPlanListDetailDtos = new LinkedList<>();
+        for(RepaymentProjPlanListDetail projPlanListDetail:  projPlanListDetails ){
+            RepaymentProjPlanListDetailDto  projPlanListDetailDto = new RepaymentProjPlanListDetailDto();
+            repaymentProjPlanListDetailDtos.add(projPlanListDetailDto);
+            projPlanListDetailDto.setRepaymentProjPlanListDetail(projPlanListDetail);
+
+            List<RepaymentProjFactRepay>  factRepayList = repaymentProjFactRepayMapper.selectList(
+                    new EntityWrapper<RepaymentProjFactRepay>().eq("proj_plan_detail_id",projPlanListDetail.getProjPlanDetailId())
+            );
+            projPlanListDetailDto.setRepaymentProjFactRepays(factRepayList);
+        }
+        projPlanListDto.setRepaymentProjPlanListDetailDtos(repaymentProjPlanListDetailDtos);
+
+        return projPlanListDto;
+    }
     
 
     @Override
