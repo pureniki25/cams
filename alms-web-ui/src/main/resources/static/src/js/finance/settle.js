@@ -751,6 +751,7 @@ window.layinit(function (htConfig) {
                 app.factRepayPreview.subTotal = 0
                 app.factRepayPreview.total = 0
                 app.factRepayPreview.surplus = 0
+                app.factRepayPreview.item70 = 0 
                 app.table.projRepayment.data.forEach(e => {
                     app.factRepayPreview.surplus = accAdd(app.factRepayPreview.surplus,e.surplus)
                     app.factRepayPreview.item10 = accAdd(app.factRepayPreview.item10,e.item10)
@@ -760,9 +761,17 @@ window.layinit(function (htConfig) {
                     app.factRepayPreview.offlineOverDue = accAdd(app.factRepayPreview.offlineOverDue,e.offlineOverDue)
                     app.factRepayPreview.onlineOverDue = accAdd(app.factRepayPreview.onlineOverDue,e.onlineOverDue)
                     app.factRepayPreview.subTotal = accAdd(app.factRepayPreview.subTotal,e.subTotal)
+                    app.factRepayPreview.item70 = accAdd(app.factRepayPreview.item70,e.item70)
                     app.factRepayPreview.total = accAdd(app.factRepayPreview.total,e.total)
                 })
-                app.factRepayPreview.total = accAdd(accAdd(app.factRepayPreview.subTotal,app.factRepayPreview.offlineOverDue),accAdd(app.factRepayPreview.onlineOverDue,app.factRepayPreview.surplus))
+                app.factRepayPreview.total = accAdd(
+                    accAdd(
+                        accAdd(
+                            app.factRepayPreview.subTotal
+                            ,app.factRepayPreview.offlineOverDue)
+                        ,accAdd(app.factRepayPreview.onlineOverDue
+                            ,app.factRepayPreview.surplus))
+                    ,app.factRepayPreview.item70)
             },
             previewSettle(){
                 let params = {}
@@ -804,6 +813,32 @@ window.layinit(function (htConfig) {
                 }
                 
 
+            },
+            deleteMoneyPool(p) {
+                app.$Modal.confirm({
+                    content: '确认删除此条流水?',
+                    onOk() {
+                        axios.get(fpath + 'finance/deleteMoneyPool', {
+                            params: {
+                                mprId: p.row.mprId
+                            }
+                        })
+                            .then(function (r) {
+                                if (r.data.code == "1") {
+                                    window.location.reload()
+                                } else {
+                                    app.$Message.error({
+                                        content: r.data.msg
+                                    })
+                                }
+                            })
+                            .catch(function (e) {
+                                app.$Message.error({
+                                    content: '删除此条流水失败'
+                                })
+                            })
+                    }
+                })
             },
             listOtherFee(){
                 axios.get(fpath+'settle/listOtherFee?businessId=' 
