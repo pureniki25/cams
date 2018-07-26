@@ -603,7 +603,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
 
                 //调用标的合规和还款接口 标的list
-                repayLog(financeSettleBaseDto);
+//                repayLog(financeSettleBaseDto);
 
             }
         }
@@ -950,7 +950,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                     RepaymentProjPlanList repaymentProjPlanList = repaymentProjPlanListService.selectOne(new EntityWrapper<RepaymentProjPlanList>().eq("proj_plan_id", projId).eq("after_id", afterIdNow));
 
                     RepaymentProjPlanListBak repaymentProjPlanListBak = new RepaymentProjPlanListBak();
-                    repaymentProjPlanListBak.setSettleLogId(financeSettleBaseDto.getUuid());
+                    repaymentProjPlanListBak.setConfirmLogId(financeSettleBaseDto.getUuid());
                     BeanUtils.copyProperties(repaymentProjPlanList, repaymentProjPlanListBak);
                     repaymentProjPlanListBakMapper.insert(repaymentProjPlanListBak);
 
@@ -960,7 +960,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                         RepaymentProjPlan repaymentProjPlan = repaymentProjPlanService.selectById(projId);
 
                         RepaymentProjPlanBak repaymentProjPlanBak = new RepaymentProjPlanBak();
-                        repaymentProjPlanBak.setSettleLogId(financeSettleBaseDto.getUuid());
+                        repaymentProjPlanBak.setConfirmLogId(financeSettleBaseDto.getUuid());
                         BeanUtils.copyProperties(repaymentProjPlan, repaymentProjPlanBak);
                         repaymentProjPlanBakMapper.insert(repaymentProjPlanBak);
 
@@ -970,7 +970,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                             for (RepaymentProjPlanListDetail repaymentProjPlanListDetail : repaymentProjPlanListDetails) {
 
                                 RepaymentProjPlanListDetailBak repaymentProjPlanListDetailBak = new RepaymentProjPlanListDetailBak();
-                                repaymentProjPlanListDetailBak.setSettleLogId(financeSettleBaseDto.getUuid());
+                                repaymentProjPlanListDetailBak.setConfirmLogId(financeSettleBaseDto.getUuid());
                                 BeanUtils.copyProperties(repaymentProjPlanListDetail, repaymentProjPlanListDetailBak);
                                 repaymentProjPlanListDetailBakMapper.insert(repaymentProjPlanListDetailBak);
 
@@ -1678,7 +1678,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                                 RepaymentProjPlanListDetailBak repaymentProjPlanListDetailBak = new RepaymentProjPlanListDetailBak();
                                 BeanUtils.copyProperties(repaymentProjPlanListDetail, repaymentProjPlanListDetailBak);
                                 repaymentProjPlanListDetailBak.setSettleLogId(uuid);
-//                                    repaymentProjPlanListDetailBakMapper.insert(repaymentProjPlanListDetailBak);
+                                repaymentProjPlanListDetailBakMapper.insert(repaymentProjPlanListDetailBak);
 
                                 repaymentProjPlanListDetailBaks.add(repaymentProjPlanListDetailBak);
 
