@@ -1,13 +1,12 @@
 package com.hongte.alms.finance.service;
 
-import com.hongte.alms.base.RepayPlan.dto.RepaymentBizPlanDto;
+import com.hongte.alms.base.RepayPlan.dto.RepaymentBizPlanSettleDto;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.base.vo.finance.SettleInfoVO;
 import com.hongte.alms.finance.req.FinanceSettleBaseDto;
 import com.hongte.alms.finance.req.FinanceSettleReq;
 
-import java.util.Date;
 import java.util.List;
 
 public interface FinanceSettleService {
@@ -32,5 +31,5 @@ public interface FinanceSettleService {
      * @param req
      * @return
      */
-    List<RepaymentBizPlanDto> getCurrentPeriod(FinanceSettleReq req);
+    List<RepaymentBizPlanSettleDto> getCurrentPeriod(FinanceSettleReq req);
 }

@@ -66,10 +66,11 @@ public class RepaymentBizPlanDto  implements Serializable {
         this.projPlanDtos=projPlanDtos;
     }
     
-    public void setProjPlanDtos(RepaymentProjPlanDto projPlanDto) {
-        if (CollectionUtils.isEmpty(projPlanDtos)) {
-        	projPlanDtos = new ArrayList<>() ;
-		}
-        this.projPlanDtos.add(projPlanDto);
-    }
+//    public void setProjPlanDtos(RepaymentProjPlanDto projPlanDto) {
+//        if (CollectionUtils.isEmpty(projPlanDtos)) {
+//        	projPlanDtos = new ArrayList<>() ;
+//		}
+//        this.projPlanDtos.add(projPlanDto);
+//    }
+
 }
