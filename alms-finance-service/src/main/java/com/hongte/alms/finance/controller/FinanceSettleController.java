@@ -2,6 +2,7 @@ package com.hongte.alms.finance.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.hongte.alms.base.RepayPlan.dto.RepaymentBizPlanDto;
+import com.hongte.alms.base.RepayPlan.dto.RepaymentBizPlanSettleDto;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.common.result.Result;
@@ -58,7 +59,7 @@ public class FinanceSettleController {
     	req.setBusinessId(businessId);
     	req.setAfterId(afterId);
     	req.setPlanId(planId);
-    	List<RepaymentBizPlanDto> currentPeriod = financeSettleService.getCurrentPeriod(req);
+    	List<RepaymentBizPlanSettleDto> currentPeriod = financeSettleService.getCurrentPeriod(req);
     	System.out.println(JSON.toJSONString(currentPeriod));
     }
 }

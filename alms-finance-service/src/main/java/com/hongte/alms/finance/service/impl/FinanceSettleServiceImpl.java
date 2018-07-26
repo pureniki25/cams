@@ -1,10 +1,9 @@
 package com.hongte.alms.finance.service.impl;
 
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.RepayPlan.dto.*;
+import com.hongte.alms.base.baseException.SettleRepaymentExcepiton;
 import com.hongte.alms.base.entity.*;
-import com.hongte.alms.base.enums.AlmsServiceNameEnums;
 import com.hongte.alms.base.enums.RepayCurrentStatusEnums;
 import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.enums.repayPlan.*;
@@ -15,7 +14,7 @@ import com.hongte.alms.base.service.*;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.base.vo.finance.SettleFeesVO;
 import com.hongte.alms.base.vo.finance.SettleInfoVO;
-import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.exception.ExceptionCodeEnum;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
@@ -26,19 +25,14 @@ import com.hongte.alms.finance.service.ShareProfitService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.SpringApplication;
 import org.springframework.stereotype.Service;
 
-import javax.enterprise.inject.New;
-import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.Executor;
 
@@ -167,7 +161,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         calcSurplus(financeSettleBaseDto, financeSettleReq);
         //生成流水消费记录
 
-        //数据填充及bak
+        //数据填充及bak（李湘权  代码 入口）
         makeRepaymentPlanAllPlan(financeSettleBaseDto, financeSettleReq);
 
         //开始标的结清
@@ -370,6 +364,9 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
 
     @Override
+    /**
+     * 结清入口 李湘权 代码
+     */
     public void makeRepaymentPlanAllPlan(FinanceSettleBaseDto financeSettleBaseDto, FinanceSettleReq financeSettleReq) {
 
         String planId = financeSettleReq.getPlanId();
@@ -377,7 +374,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         String afterId = financeSettleReq.getAfterId();
 
 
-        //查出当前期数的应还日期
+        //查出当前还款计划的当前期
         RepaymentBizPlanList repaymentBizPlanList = bizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId));
 
 //        List<RepaymentBizPlanList> repaymentBizPlanLists = repaymentBizPlanListMapper.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).orderBy("due_date", true));
@@ -386,7 +383,8 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         if (repaymentBizPlanList != null) {
             Date dueDate = repaymentBizPlanList.getDueDate();
 
-            if (StringUtil.isEmpty(planId)) {// 全部业务结清
+            if (StringUtil.isEmpty(planId)) {// 未传全部业务结清
+                //根据业务id找出这个业务的所有还款计划列表
                 List<RepaymentBizPlan> repaymentBizPlans = repaymentBizPlanMapper.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id", businessId));
 
                 if (CollectionUtils.isNotEmpty(repaymentBizPlans)) {
@@ -394,7 +392,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                     for (RepaymentBizPlan repaymentBizPlan : repaymentBizPlans) { //多个还款计划
                         String planIdInner = repaymentBizPlan.getPlanId();
 
-                        //查出所有标的业务还款计划 按应还日期进行排序
+                        //查出此业务还款计划的每一期 按应还日期进行升序排序
                         List<RepaymentBizPlanList> repaymentBizPlanLists = repaymentBizPlanListMapper.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("plan_id", planIdInner).orderBy("due_date", true));
                         if (CollectionUtils.isNotEmpty(repaymentBizPlanLists)) {
                             Boolean flag = false;
@@ -423,20 +421,29 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
                                 makeRepaymentPlanOnePlan(financeSettleBaseDto, repaymentBizPlanListNow, financeSettleReq);
                             }
+                        }else{
+
+                            logger.error("找业务还款计划的期数信息 RepaymentBizPlanList  businessId:"+businessId+"     planId:"+planIdInner);
+                            throw new SettleRepaymentExcepiton("找业务还款计划的期数信息", ExceptionCodeEnum.NO_BIZ_PLAN.getValue().toString());
                         }
 
 
                     }
-
-
+                }else{
+                    logger.error("找不到业务的还款计划 repaymentBizPlan  businessId:"+businessId);
+                    throw new SettleRepaymentExcepiton("找不到业务的还款计划", ExceptionCodeEnum.NO_BIZ_PLAN.getValue().toString());
                 }
 
             } else {
+                //单个还款计划结清
 //                RepaymentBizPlan repaymentBizPlan = bizPlanService.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("business_id", businessId).eq("plan_id", planId));
 
                 makeRepaymentPlanOnePlan(financeSettleBaseDto, repaymentBizPlanList, financeSettleReq);
             }
 
+        }else{
+            logger.error("找不到对应的还款计划列表repaymentBizPlanList  businessId:"+businessId+"     after_id:"+afterId);
+            throw new SettleRepaymentExcepiton("找不到对应的还款计划列表", ExceptionCodeEnum.NO_BIZ_PLAN_LIST.getValue().toString());
         }
 
     }
@@ -2555,80 +2562,273 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 	/* (non-Javadoc)
 	 * @see com.hongte.alms.finance.service.FinanceSettleService#getCurrentPeriod(com.hongte.alms.finance.req.FinanceSettleReq)
 	 */
+
+    /**
+     * 取还款计划的当前期
+     * @param req
+     * @return
+     */
 	@Override
-	public List<RepaymentBizPlanDto> getCurrentPeriod(FinanceSettleReq req) {
+	public List<RepaymentBizPlanSettleDto> getCurrentPeriod(FinanceSettleReq req) {
 		EntityWrapper<RepaymentBizPlan> ew = new EntityWrapper<RepaymentBizPlan>();
 		ew.eq("business_id", req.getBusinessId());
+		//如果传了还款计划Id，则使用还款计划Id来查业务的还款计划
 		if (!StringUtil.isEmpty(req.getPlanId())) {
 			ew.eq("plan_id", req.getPlanId());
 		}
 		
 		List<RepaymentBizPlan> plan = repaymentBizPlanMapper.selectList(ew);
-		List<RepaymentBizPlanDto> res = new ArrayList<>() ;
+		List<RepaymentBizPlanSettleDto> res = new ArrayList<>() ;
+		//结清日期
+        Date  settleDate = new Date();
+		//根据查出的还款计划列表找业务还款计划的当前期
     	for (RepaymentBizPlan repaymentBizPlan : plan) {
-    		
+            //找出这个还款计划的期数列表
+            List<RepaymentBizPlanList> BizPlanLists = repaymentBizPlanListMapper.selectList(
+                    new EntityWrapper<RepaymentBizPlanList>()
+                            .eq("business_id", req.getBusinessId())
+                            .eq("plan_id", repaymentBizPlan.getPlanId())
+                            .orderBy("due_date",false));
+
+    	    //找应还日期离当前日期最近且为还款中的期数作为当前期
     		List<RepaymentBizPlanList> selectList = repaymentBizPlanListMapper.selectList(
 					new EntityWrapper<RepaymentBizPlanList>()
 					.eq("business_id", req.getBusinessId())
 					.eq("plan_id", repaymentBizPlan.getPlanId())
-					.gt("due_date", new Date())
+					.gt("due_date", settleDate)
 					.eq("current_status", RepayCurrentStatusEnums.还款中.toString())
 					.orderBy("due_date"));
+    		//判断当前期列表是否为空
 			if (CollectionUtils.isEmpty(selectList)) {
-				continue;
+			    //找不到还款中的当前期则判断结清日期是否大过还款计划最后一次还款的期限
+
+                RepaymentBizPlanList  lastBizPlanList =  BizPlanLists.get(0);
+                //如果最后一期的应还时间小于当前的结清时间
+                if(DateUtil.getDiff(lastBizPlanList.getDueDate(),settleDate) <=0){
+                    //且为未还款
+                    if(!lastBizPlanList.getCurrentStatus().equals(RepayCurrentStatusEnums.已还款.toString())){
+                        selectList = new LinkedList<RepaymentBizPlanList>();
+                        selectList.add(lastBizPlanList);
+                    }
+                }
 			}
+			//再次判断当前期列表是否为空
+            if (CollectionUtils.isEmpty(selectList)) {
+                if (!StringUtil.isEmpty(req.getPlanId())) {
+                    logger.error("找此业务还款计划的当前期 RepaymentBizPlanList  businessId:"+req.getBusinessId()+"     planId:"+repaymentBizPlan.getPlanId());
+                    throw new SettleRepaymentExcepiton("找此业务还款计划的当前期", ExceptionCodeEnum.NO_BIZ_PLAN_LIST.getValue().toString());
+                }else{
+                    continue;
+                }
+            }
+
+			//业务还款计划当前期列表
 			List<RepaymentBizPlanList> cuRepaymentBizPlanLists = new ArrayList<>() ;
 			cuRepaymentBizPlanLists.add(selectList.get(0)) ;
-			
-    		RepaymentBizPlanDto planDto = new RepaymentBizPlanDto() ;
+
+			//业务还款计划Dto
+    		RepaymentBizPlanSettleDto planDto = new RepaymentBizPlanSettleDto() ;
 			planDto.setRepaymentBizPlan(repaymentBizPlan);
-			
-			for (RepaymentBizPlanList repaymentBizPlanList : cuRepaymentBizPlanLists) {
+
+
+
+
+			for (RepaymentBizPlanList curRepaymentBizPlanList : cuRepaymentBizPlanLists) {
 				RepaymentBizPlanListDto planListDto = new RepaymentBizPlanListDto() ;
-				planListDto.setRepaymentBizPlanList(repaymentBizPlanList);
-				List<RepaymentBizPlanListDetail> planListDetails = repaymentBizPlanListDetailMapper.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", repaymentBizPlanList.getPlanListId())) ;
+				planListDto.setRepaymentBizPlanList(curRepaymentBizPlanList);
+				List<RepaymentBizPlanListDetail> planListDetails = repaymentBizPlanListDetailMapper.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", curRepaymentBizPlanList.getPlanListId())) ;
 				
 				planListDto.setBizPlanListDetails(planListDetails);
-				
-				planDto.setBizPlanListDtos(planListDto);
+
+				//业务还款计划，当前期设置业务还款计划列表（应该有一个字段专门存储业务还款计划的当前期）
+                planDto.setCurrBizPlanListDto(planListDto);
+
+
+                List<RepaymentBizPlanListDto>  planListDtos = new LinkedList<>();
+
+                List<RepaymentBizPlanListDto> beforePlanListDtos = new LinkedList<>();
+
+                List<RepaymentBizPlanListDto> afterPlanListDtos = new LinkedList<>();
+
+
+                for(RepaymentBizPlanList  bizPlanList:BizPlanLists){
+
+
+                    RepaymentBizPlanListDto dto = new RepaymentBizPlanListDto() ;
+                    dto.setRepaymentBizPlanList(curRepaymentBizPlanList);
+                    List<RepaymentBizPlanListDetail> details = repaymentBizPlanListDetailMapper.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", curRepaymentBizPlanList.getPlanListId())) ;
+
+                    dto.setBizPlanListDetails(details);
+
+                    planDto.setBizPlanListDtos(dto);
+                    //如果是当前期，则不存储
+                    if(bizPlanList.getPeriod() == curRepaymentBizPlanList.getPeriod()){
+                        continue;
+                    }
+                    if(bizPlanList.getPeriod()<curRepaymentBizPlanList.getPeriod()){
+                        beforePlanListDtos.add(dto);
+                    }else if(bizPlanList.getPeriod()>curRepaymentBizPlanList.getPeriod()){
+                        afterPlanListDtos.add(dto);
+                    }
+                }
+
+                //当前期之前的还款计划列表
+				planDto.setBeforeBizPlanListDtos(beforePlanListDtos);
+
+                //当前期之后的还款计划列表
+                planDto.setAfterBizPlanListDtos(afterPlanListDtos);
 			}
 			
 			
-			
+			//根据还款计划id，查找出标的还款计划列表
 			List<RepaymentProjPlan> projPlans = repaymentProjPlanMapper.selectList(new EntityWrapper<RepaymentProjPlan>().eq("plan_id", repaymentBizPlan.getPlanId()));
 			for (RepaymentProjPlan repaymentProjPlan : projPlans) {
-				RepaymentProjPlanDto projPlanDto = new RepaymentProjPlanDto() ;
+				RepaymentProjPlanSettleDto projPlanDto = new RepaymentProjPlanSettleDto() ;
 				projPlanDto.setRepaymentProjPlan(repaymentProjPlan);
 				TuandaiProjectInfo projectInfo = tuandaiProjectInfoMapper.selectById(repaymentProjPlan.getProjectId());
 				projPlanDto.setTuandaiProjectInfo(projectInfo);
-				
-				List<RepaymentProjPlanList> projPlanLists = repaymentProjPlanListMapper.selectList(
-						new EntityWrapper<RepaymentProjPlanList>().eq("proj_plan_id", repaymentProjPlan.getProjPlanId()).eq("plan_list_id", cuRepaymentBizPlanLists.get(0).getPlanListId()));
-				for (RepaymentProjPlanList repaymentProjPlanList : projPlanLists) {
-					RepaymentProjPlanListDto projPlanListDto = new RepaymentProjPlanListDto() ;
-					projPlanListDto.setRepaymentProjPlanList(repaymentProjPlanList);
 
-					List<RepaymentProjPlanListDetail> projPlanListDetails = repaymentProjPlanListDetailMapper.selectList(
-							new EntityWrapper<RepaymentProjPlanListDetail>().eq("proj_plan_list_id", repaymentProjPlanList.getProjPlanListId()));
-					
-					projPlanListDto.setProjPlanListDetails(projPlanListDetails);
-					
-					projPlanDto.setProjPlanListDtos(projPlanListDto);
+				//取标的还款计划当前期
+				List<RepaymentProjPlanList> curprojPlanLists = repaymentProjPlanListMapper.selectList(
+						new EntityWrapper<RepaymentProjPlanList>().eq("proj_plan_id", repaymentProjPlan.getProjPlanId()).eq("plan_list_id", cuRepaymentBizPlanLists.get(0).getPlanListId()));
+
+				//如果找不到这个标的还款计划当前期
+				if(CollectionUtils.isEmpty(selectList)){
+                    logger.error("找不到这个标的还款计划当前期 RepaymentProjPlanList  proj_plan_id:"+repaymentProjPlan.getProjPlanId()+"     plan_list_id:"+cuRepaymentBizPlanLists.get(0).getPlanListId());
+                    throw new SettleRepaymentExcepiton("找不到这个标的还款计划当前期", ExceptionCodeEnum.NO_BIZ_PLAN_LIST.getValue().toString());
+                }else if(selectList.size()>1){
+                    logger.error("这个标有两个以上当前期 RepaymentProjPlanList  proj_plan_id:"+repaymentProjPlan.getProjPlanId()+"     plan_list_id:"+cuRepaymentBizPlanLists.get(0).getPlanListId());
+                    throw new SettleRepaymentExcepiton("这个标有两个以上当前期", ExceptionCodeEnum.NO_BIZ_PLAN_LIST.getValue().toString());
+                }
+
+                RepaymentProjPlanList curRepayProjPlanList = curprojPlanLists.get(0);
+                RepaymentProjPlanListDto curProjPlanListDto = creatProjPlanListDto(curRepayProjPlanList);
+                projPlanDto.setCurrProjPlanListDto(curProjPlanListDto);
+
+                //取标的还款计划所有期
+                List<RepaymentProjPlanList> projPlanLists = repaymentProjPlanListMapper.selectList(
+                        new EntityWrapper<RepaymentProjPlanList>().eq("proj_plan_id", repaymentProjPlan.getProjPlanId())
+                        .orderBy("due_date"));
+
+
+                List<RepaymentProjPlanListDto>  beforeProjPlanListDtos = new LinkedList<>();
+                List<RepaymentProjPlanListDto> afterProjPlanListDtos = new LinkedList<>();
+
+				for (RepaymentProjPlanList repaymentProjPlanList : projPlanLists) {
+                    RepaymentProjPlanListDto projPlanListDto = creatProjPlanListDto(repaymentProjPlanList);
+                    projPlanDto.setProjPlanListDtos(projPlanListDto);
+                    if(repaymentProjPlanList.getPeriod()>curRepayProjPlanList.getPeriod()){
+                        afterProjPlanListDtos.add(projPlanListDto);
+                    }else if(repaymentProjPlanList.getPeriod()<curRepayProjPlanList.getPeriod()){
+                        beforeProjPlanListDtos.add(projPlanListDto);
+                    }
+
 				}
-				
-				planDto.setProjPlanDtos(projPlanDto);
-				
+
+                projPlanDto.setBeforeProjPlanListDtos(beforeProjPlanListDtos);
+                projPlanDto.setAfterProjPlanListDtos(afterProjPlanListDtos);
+
+
+				//planDto.setProjPlanDtos(projPlanDto);
+                planDto.setProjPlanStteleDtos(projPlanDto);
 			}
-			
-			
+
 			
 			res.add(planDto);
 		}
-    	
-    	
-    	
+
+		//将当前期之前的和当前期之后的费用项累加到当前期
+        for(RepaymentBizPlanSettleDto  bizPlanDto:res){
+
+            List<RepaymentProjPlanSettleDto> projPlanDtos = bizPlanDto.getProjPlanStteleDtos();
+
+            for(RepaymentProjPlanSettleDto repaymentProjPlanDto:projPlanDtos){
+
+                //当前期之前期数费用的统计
+                Map<String,PlanListDetailShowPayDto> beforeFeels = calcShowPayFeels(repaymentProjPlanDto.getBeforeProjPlanListDtos(),null);
+                repaymentProjPlanDto.setBeforeFeels(beforeFeels);
+
+                //当前期之后期数费用的统计(只累加本金)
+                Map<String,PlanListDetailShowPayDto> afterFeels =  calcShowPayFeels(repaymentProjPlanDto.getAfterProjPlanListDtos(),RepayPlanFeeTypeEnum.PRINCIPAL.getUuid());
+                repaymentProjPlanDto.setAfterFeels(afterFeels);
+
+            }
+
+        }
+
 		return res;
 	}
-    
+
+
+	private  Map<String,PlanListDetailShowPayDto>  calcShowPayFeels(List<RepaymentProjPlanListDto> projPlanLists,String feelId){
+        //当前期之前期数费用的统计
+        Map<String,PlanListDetailShowPayDto> beforeFeels = new HashMap<>();
+        for(RepaymentProjPlanListDto bforePlanDto: projPlanLists){
+            List<RepaymentProjPlanListDetailDto> repaymentProjPlanListDetailDtos =bforePlanDto.getRepaymentProjPlanListDetailDtos();
+            for(RepaymentProjPlanListDetailDto projPlanListDetailDto: repaymentProjPlanListDetailDtos){
+                RepaymentProjPlanListDetail  detail1 =projPlanListDetailDto.getRepaymentProjPlanListDetail();
+                //如果指定了需累加的费用项，则其他费用项都跳过
+                if(feelId!=null && !feelId.equals(detail1.getFeeId())){
+                    continue;
+                }
+
+                List<RepaymentProjFactRepay> factRepayList = projPlanListDetailDto.getRepaymentProjFactRepays();
+                if(!CollectionUtils.isEmpty(factRepayList)){
+                    BigDecimal  payedMoney = new BigDecimal("0");
+                    for(RepaymentProjFactRepay repaymentProjFactRepay: factRepayList){
+                        payedMoney =payedMoney.add(repaymentProjFactRepay.getFactAmount());
+                    }
+
+                    BigDecimal  showPayMoney = detail1.getProjPlanAmount().subtract(payedMoney);
+                    if(showPayMoney.compareTo(new BigDecimal("0"))>0){
+                        PlanListDetailShowPayDto  planListDetailShowPayDto = beforeFeels.get(detail1.getFeeId());
+                        if(planListDetailShowPayDto == null){
+                            planListDetailShowPayDto = new PlanListDetailShowPayDto();
+                            planListDetailShowPayDto.setFeelId(detail1.getFeeId());
+                            planListDetailShowPayDto.setShareProfitIndex(detail1.getShareProfitIndex());
+                            planListDetailShowPayDto.setShowPayMoney(new BigDecimal("0"));
+                            beforeFeels.put(detail1.getFeeId(),planListDetailShowPayDto);
+                        }
+                        planListDetailShowPayDto.setShowPayMoney(planListDetailShowPayDto.getShowPayMoney().add(showPayMoney));
+                    }
+                }
+
+            }
+        }
+
+
+	    return beforeFeels;
+    }
+
+	//showPayFeels =
+
+
+
+	private  RepaymentProjPlanListDto   creatProjPlanListDto(RepaymentProjPlanList repaymentProjPlanList){
+        RepaymentProjPlanListDto projPlanListDto = new RepaymentProjPlanListDto() ;
+        projPlanListDto.setRepaymentProjPlanList(repaymentProjPlanList);
+
+        List<RepaymentProjPlanListDetail> projPlanListDetails = repaymentProjPlanListDetailMapper.selectList(
+                new EntityWrapper<RepaymentProjPlanListDetail>().eq("proj_plan_list_id", repaymentProjPlanList.getProjPlanListId()));
+
+        projPlanListDto.setProjPlanListDetails(projPlanListDetails);
+
+
+        List<RepaymentProjPlanListDetailDto>  repaymentProjPlanListDetailDtos = new LinkedList<>();
+        for(RepaymentProjPlanListDetail projPlanListDetail:  projPlanListDetails ){
+            RepaymentProjPlanListDetailDto  projPlanListDetailDto = new RepaymentProjPlanListDetailDto();
+            repaymentProjPlanListDetailDtos.add(projPlanListDetailDto);
+            projPlanListDetailDto.setRepaymentProjPlanListDetail(projPlanListDetail);
+
+            List<RepaymentProjFactRepay>  factRepayList = repaymentProjFactRepayMapper.selectList(
+                    new EntityWrapper<RepaymentProjFactRepay>().eq("proj_plan_detail_id",projPlanListDetail.getProjPlanDetailId())
+            );
+            projPlanListDetailDto.setRepaymentProjFactRepays(factRepayList);
+        }
+        projPlanListDto.setRepaymentProjPlanListDetailDtos(repaymentProjPlanListDetailDtos);
+
+        return projPlanListDto;
+    }
+
 
 }
