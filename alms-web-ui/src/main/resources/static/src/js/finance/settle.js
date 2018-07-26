@@ -20,6 +20,7 @@ window.layinit(function (htConfig) {
             curIndex: {},
             matchedBankStatement: [],
             factRepayPreview: {},
+            submitLoding:false,
             factRepaymentInfo: {
                 repayDate: '',
                 surplusFund: 0,
@@ -731,8 +732,15 @@ window.layinit(function (htConfig) {
                 if(app.thisTimeRepaymentInfo.otherFees){
                     params.otherFees = app.thisTimeRepaymentInfo.otherFees
                 }
+                app.$Message.loading({
+                    content:'请稍后...',
+                    duration:0
+                })
+                app.submitLoding = true
                 axios.post(fpath+'finance/financeSettle',params)
                 .then(function(res){
+                    app.$Message.destroy()
+                    app.submitLoding = false
                     cb(res)
                 })
                 .catch(function(err){
