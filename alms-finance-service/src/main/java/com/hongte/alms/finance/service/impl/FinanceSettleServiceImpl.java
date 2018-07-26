@@ -14,6 +14,7 @@ import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.mapper.*;
 import com.hongte.alms.base.process.mapper.ProcessMapper;
 import com.hongte.alms.base.service.*;
+import com.hongte.alms.base.util.ProjPlanDtoUtil;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.base.vo.finance.SettleFeesVO;
 import com.hongte.alms.base.vo.finance.SettleInfoVO;
@@ -386,56 +387,81 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         if (repaymentBizPlanList != null) {
             Date dueDate = repaymentBizPlanList.getDueDate();
 
-            if (StringUtil.isEmpty(planId)) {// 未传全部业务结清
-                //根据业务id找出这个业务的所有还款计划列表
-                List<RepaymentBizPlan> repaymentBizPlans = repaymentBizPlanMapper.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id", businessId));
+            if (StringUtil.isEmpty(planId)) {// 整个业务结清
 
-                if (CollectionUtils.isNotEmpty(repaymentBizPlans)) {
 
-                    for (RepaymentBizPlan repaymentBizPlan : repaymentBizPlans) { //多个还款计划
-                        String planIdInner = repaymentBizPlan.getPlanId();
+                List<RepaymentBizPlanSettleDto> bizPlanSettleDtos = getCurrentPeriod(financeSettleReq);
 
-                        //查出此业务还款计划的每一期 按应还日期进行升序排序
-                        List<RepaymentBizPlanList> repaymentBizPlanLists = repaymentBizPlanListMapper.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("plan_id", planIdInner).orderBy("due_date", true));
-                        if (CollectionUtils.isNotEmpty(repaymentBizPlanLists)) {
-                            Boolean flag = false;
-                            Set<Integer> repayStatusSet = new HashSet<>();
-                            List<RepaymentBizPlanList> list = new ArrayList<>();//保存本次还款计划的当前期
-                            for (RepaymentBizPlanList repaymentBizPlanListInner : repaymentBizPlanLists) {
-                                Date dueDateInner = repaymentBizPlanListInner.getDueDate();
-                                if (!flag && !afterId.equals(repaymentBizPlanListInner.getAfterId())) { //当前期之前 并且不为当前期
-                                    repayStatusSet.add(repaymentBizPlanListInner.getRepayStatus() == null ? 0 : repaymentBizPlanListInner.getRepayStatus());
-                                }
+                Map<String,RepaymentProjPlanSettleDto>  projPlanSettleDtoMap = new HashMap<>();
 
-                                if (dueDateInner.getTime() - dueDate.getTime() >= 0) { //业务期数 应还日期大于当期日期
-                                    if (CollectionUtils.isEmpty(list)) {
-                                        list.add(repaymentBizPlanListInner);
-                                    }
-                                    flag = true;
-                                }
-                                if (flag && (repayStatusSet.contains(0) || repayStatusSet.contains(1))) { // 找到当前期以后开始检查 0代表未还款 1代表部分还款
-                                    throw new ServiceRuntimeException("500", "当前期数不能进行结清");
-                                }
-                            }
+                for(RepaymentBizPlanSettleDto repaymentBizPlanSettleDto:bizPlanSettleDtos){
+                    List<RepaymentProjPlanSettleDto> repaymentProjPlanSettleDtos = repaymentBizPlanSettleDto.getProjPlanStteleDtos();
 
-                            //通过当期期数查出当前期前面 及后面部分
-                            if (CollectionUtils.isNotEmpty(list) && list.size() == 1) {
-                                RepaymentBizPlanList repaymentBizPlanListNow = list.get(0);
-
-                                makeRepaymentPlanOnePlan(financeSettleBaseDto, repaymentBizPlanListNow, financeSettleReq);
-                            }
-                        }else{
-
-                            logger.error("找业务还款计划的期数信息 RepaymentBizPlanList  businessId:"+businessId+"     planId:"+planIdInner);
-                            throw new SettleRepaymentExcepiton("找业务还款计划的期数信息", ExceptionCodeEnum.NO_BIZ_PLAN.getValue().toString());
+                    for(RepaymentProjPlanSettleDto repaymentProjPlanSettleDto:repaymentProjPlanSettleDtos){
+                        RepaymentProjPlanSettleDto projPlanSettleDto = projPlanSettleDtoMap.get(repaymentProjPlanSettleDto.getTuandaiProjectInfo().getProjectId());
+                        if(projPlanSettleDto!=null){
+                            logger.error("此业务有两个以上相同的标的还款计划 projPlanSettleDto"+ JSON.toJSONString(projPlanSettleDto));
+                            throw new SettleRepaymentExcepiton("此业务有两个以上相同的标的还款计划", ExceptionCodeEnum.TOW_PROJ_PLAN.getValue().toString());
                         }
-
-
+                        projPlanSettleDtoMap.put(repaymentProjPlanSettleDto.getTuandaiProjectInfo().getProjectId(),repaymentProjPlanSettleDto);
                     }
-                }else{
-                    logger.error("找不到业务的还款计划 repaymentBizPlan  businessId:"+businessId);
-                    throw new SettleRepaymentExcepiton("找不到业务的还款计划", ExceptionCodeEnum.NO_BIZ_PLAN.getValue().toString());
                 }
+
+
+
+//                ProjPlanDtoUtil.sort();
+
+
+
+//                //根据业务id找出这个业务的所有还款计划列表
+//                List<RepaymentBizPlan> repaymentBizPlans = repaymentBizPlanMapper.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id", businessId));
+//
+//                if (CollectionUtils.isNotEmpty(repaymentBizPlans)) {
+//
+//                    for (RepaymentBizPlan repaymentBizPlan : repaymentBizPlans) { //多个还款计划
+//                        String planIdInner = repaymentBizPlan.getPlanId();
+//
+//                        //查出此业务还款计划的每一期 按应还日期进行升序排序
+//                        List<RepaymentBizPlanList> repaymentBizPlanLists = repaymentBizPlanListMapper.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("plan_id", planIdInner).orderBy("due_date", true));
+//                        if (CollectionUtils.isNotEmpty(repaymentBizPlanLists)) {
+//                            Boolean flag = false;
+//                            Set<Integer> repayStatusSet = new HashSet<>();
+//                            List<RepaymentBizPlanList> list = new ArrayList<>();//保存本次还款计划的当前期
+//                            for (RepaymentBizPlanList repaymentBizPlanListInner : repaymentBizPlanLists) {
+//                                Date dueDateInner = repaymentBizPlanListInner.getDueDate();
+//                                if (!flag && !afterId.equals(repaymentBizPlanListInner.getAfterId())) { //当前期之前 并且不为当前期
+//                                    repayStatusSet.add(repaymentBizPlanListInner.getRepayStatus() == null ? 0 : repaymentBizPlanListInner.getRepayStatus());
+//                                }
+//
+//                                if (dueDateInner.getTime() - dueDate.getTime() >= 0) { //业务期数 应还日期大于当期日期
+//                                    if (CollectionUtils.isEmpty(list)) {
+//                                        list.add(repaymentBizPlanListInner);
+//                                    }
+//                                    flag = true;
+//                                }
+//                                if (flag && (repayStatusSet.contains(0) || repayStatusSet.contains(1))) { // 找到当前期以后开始检查 0代表未还款 1代表部分还款
+//                                    throw new ServiceRuntimeException("500", "当前期数不能进行结清");
+//                                }
+//                            }
+//
+//                            //通过当期期数查出当前期前面 及后面部分
+//                            if (CollectionUtils.isNotEmpty(list) && list.size() == 1) {
+//                                RepaymentBizPlanList repaymentBizPlanListNow = list.get(0);
+//
+//                                makeRepaymentPlanOnePlan(financeSettleBaseDto, repaymentBizPlanListNow, financeSettleReq);
+//                            }
+//                        }else{
+//
+//                            logger.error("找业务还款计划的期数信息 RepaymentBizPlanList  businessId:"+businessId+"     planId:"+planIdInner);
+//                            throw new SettleRepaymentExcepiton("找业务还款计划的期数信息", ExceptionCodeEnum.NO_BIZ_PLAN.getValue().toString());
+//                        }
+//
+//
+//                    }
+//                }else{
+//                    logger.error("找不到业务的还款计划 repaymentBizPlan  businessId:"+businessId);
+//                    throw new SettleRepaymentExcepiton("找不到业务的还款计划", ExceptionCodeEnum.NO_BIZ_PLAN.getValue().toString());
+//                }
 
             } else {
                 //单个还款计划结清
@@ -2787,7 +2813,6 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
                     dto.setBizPlanListDetails(details);
 
-                    planDto.setBizPlanListDtos(dto);
                     //如果是当前期，则不存储
                     if(bizPlanList.getPeriod() == curRepaymentBizPlanList.getPeriod()){
                         continue;
@@ -2880,8 +2905,8 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                 repaymentProjPlanDto.setAfterFeels(afterFeels);
 
             }
-
         }
+
 
 		return res;
 	}
