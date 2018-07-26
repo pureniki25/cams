@@ -752,6 +752,8 @@ window.layinit(function (htConfig) {
                 app.factRepayPreview.total = 0
                 app.factRepayPreview.surplus = 0
                 app.factRepayPreview.item70 = 0 
+                app.factRepayPreview.otherMoney = 0 
+
                 app.table.projRepayment.data.forEach(e => {
                     app.factRepayPreview.surplus = accAdd(app.factRepayPreview.surplus,e.surplus)
                     app.factRepayPreview.item10 = accAdd(app.factRepayPreview.item10,e.item10)
@@ -763,15 +765,17 @@ window.layinit(function (htConfig) {
                     app.factRepayPreview.subTotal = accAdd(app.factRepayPreview.subTotal,e.subTotal)
                     app.factRepayPreview.item70 = accAdd(app.factRepayPreview.item70,e.item70)
                     app.factRepayPreview.total = accAdd(app.factRepayPreview.total,e.total)
+                    app.factRepayPreview.otherMoney = accAdd(app.factRepayPreview.otherMoney,e.otherMoney)
                 })
                 app.factRepayPreview.total = accAdd(
+                accAdd(
                     accAdd(
                         accAdd(
                             app.factRepayPreview.subTotal
                             ,app.factRepayPreview.offlineOverDue)
                         ,accAdd(app.factRepayPreview.onlineOverDue
                             ,app.factRepayPreview.surplus))
-                    ,app.factRepayPreview.item70)
+                    ,app.factRepayPreview.item70),app.factRepayPreview.otherMoney)
             },
             previewSettle(){
                 let params = {}
