@@ -36,6 +36,8 @@ public class CurrPeriodProjDetailVO {
 	private String project ;
 	private Date queryFullSuccessDate ;
 
+	private BigDecimal otherMoney=new BigDecimal("0");
+
 	public String getUserName() {
 		return userName;
 	}
@@ -106,6 +108,14 @@ public class CurrPeriodProjDetailVO {
 
 	public void setItem70(BigDecimal item70) {
 		this.item70 = item70;
+	}
+
+	public BigDecimal getOtherMoney() {
+		return otherMoney;
+	}
+
+	public void setOtherMoney(BigDecimal otherMoney) {
+		this.otherMoney = otherMoney;
 	}
 
 	public BigDecimal getSubTotal() {

@@ -21,4 +21,6 @@ public interface FinanceSettleService {
      * @return
      */
     List<String> curPeriod(RepaymentBizPlanList now) ;
+
+    void financeSettleRecall(String confirmLogId);
 }

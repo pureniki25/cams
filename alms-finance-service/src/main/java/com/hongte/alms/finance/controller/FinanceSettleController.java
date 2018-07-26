@@ -46,4 +46,24 @@ public class FinanceSettleController {
         logger.info("@financeSettle@资金结清结束{}", result);
         return result;
     }
+
+    @RequestMapping("/financeSettleRecall")
+    @ApiOperation(value="资金结清撤回")
+    public Result financeSettleRecall( String confirmLogId){
+        logger.info("@financeSettle@资金结清撤回开始[{}]");
+        Result result = null;
+        try {
+            financeSettleService.financeSettleRecall(confirmLogId);
+            result = Result.success();
+        } catch (ServiceRuntimeException se) {
+            result = Result.error(se.getErrorCode(), se.getMessage());
+            logger.error("@financeSettle@资金结清出错{}", se.getMessage());
+        } catch (Exception e) {
+            result = Result.error("500", "资金结清撤回出错");
+            logger.error("@financeSettle@资金结清撤回出错{}", e);
+        }
+
+        logger.info("@financeSettle@资金结清撤回结束{}", result);
+        return result;
+    }
 }

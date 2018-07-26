@@ -1,5 +1,6 @@
 package com.hongte.alms.finance.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.RepayPlan.dto.*;
@@ -76,7 +77,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     @Autowired
     AccountantOverRepayLogMapper accountantOverRepayLogMapper;
     @Autowired
-    RepaymentConfirmLogMapper confirmLogMapper;
+    RepaymentConfirmLogMapper repaymentConfirmLogMapper;
 
     @Autowired
     MoneyPoolRepaymentMapper moneyPoolRepaymentMapper;
@@ -85,6 +86,9 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
     @Autowired
     RepaymentSettleLogMapper repaymentSettleLogMapper;
+
+//    @Autowired
+//    RepaymentConfirmLog repaymentConfirmLog;
 
     @Autowired
     RepaymentSettleLogDetailMapper repaymentSettleLogDetailMapper;
@@ -162,7 +166,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
         makeMonePoolRepayment(financeSettleBaseDto, financeSettleReq);
         /*创建结清记录*/
-        createSettleLog(financeSettleBaseDto, financeSettleReq);
+//        createSettleLog(financeSettleBaseDto, financeSettleReq);
         /*计算结余金额*/
         calcSurplus(financeSettleBaseDto, financeSettleReq);
         //生成流水消费记录
@@ -556,7 +560,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
             if (flag) {
                 //单个线下
-                flag = canceAfterMoney(nowSettleMoneyDto ,afterSettleMoneyDto , repaymentSettleProjDtos, financeSettleBaseDto);
+                flag = canceAfterMoney(nowSettleMoneyDto, afterSettleMoneyDto, repaymentSettleProjDtos, financeSettleBaseDto);
             }
 
             if (flag) {
@@ -571,10 +575,12 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         if (!preview) { //保存操作
             if (MapUtils.isNotEmpty(projMoneyMap)) {
 
+
                 //更新标的状态
                 BigDecimal allMoney = updateProjPlan(projMoneyMap, financeSettleBaseDto, afterIdNow);
-                //更新业务的状态
+                //更新业务的状态 及保存结清操作记录
                 updateBizPlan(projMoneyMap, financeSettleBaseDto, allMoney, planIdNow, afterIdNow);
+
 
                 //调用标的合规和还款接口 标的list
                 repayLog(financeSettleBaseDto);
@@ -718,10 +724,14 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                     newVo.setItem20(newVo.getItem10().add(vo.getItem20()));
                     newVo.setItem30(newVo.getItem10().add(vo.getItem30()));
                     newVo.setItem50(newVo.getItem10().add(vo.getItem50()));
+                    newVo.setItem70(newVo.getItem70().add(vo.getItem70()));
+                    newVo.setOtherMoney(newVo.getOtherMoney().add(vo.getOtherMoney()));
+
                     newVo.setOfflineOverDue(newVo.getOfflineOverDue().add(vo.getOfflineOverDue()));
                     newVo.setOnlineOverDue(newVo.getOnlineOverDue().add(vo.getOnlineOverDue()));
-                    newVo.setTotal(newVo.getItem10().add(newVo.getItem20()).add(newVo.getItem30()).add(newVo.getItem50()).add(newVo.getOfflineOverDue()).add(newVo.getOnlineOverDue()));
                 }
+                newVo.setTotal(newVo.getItem10().add(newVo.getItem20()).add(newVo.getItem30()).add(newVo.getItem50())
+                        .add(newVo.getOfflineOverDue()).add(newVo.getOnlineOverDue()));
 
                 //累加所有应还
                 CurrPeriodProjDetailVO sourceVo = new CurrPeriodProjDetailVO();
@@ -732,10 +742,13 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                     sourceVo.setItem20(sourceVo.getItem10().add(vo.getItem20()));
                     sourceVo.setItem30(sourceVo.getItem10().add(vo.getItem30()));
                     sourceVo.setItem50(sourceVo.getItem10().add(vo.getItem50()));
+                    sourceVo.setItem70(sourceVo.getItem70().add(vo.getItem70()));
+                    sourceVo.setOtherMoney(sourceVo.getOtherMoney().add(vo.getOtherMoney()));
                     sourceVo.setOfflineOverDue(sourceVo.getOfflineOverDue().add(vo.getOfflineOverDue()));
                     sourceVo.setOnlineOverDue(sourceVo.getOnlineOverDue().add(vo.getOnlineOverDue()));
-                    sourceVo.setTotal(sourceVo.getItem10().add(sourceVo.getItem20()).add(sourceVo.getItem30()).add(sourceVo.getItem50()).add(sourceVo.getOfflineOverDue()).add(sourceVo.getOnlineOverDue()));
                 }
+                sourceVo.setTotal(sourceVo.getItem10().add(sourceVo.getItem20()).add(sourceVo.getItem30()).add(sourceVo.getItem50())
+                        .add(sourceVo.getOfflineOverDue()).add(sourceVo.getOnlineOverDue()));
 
 
                 if (newVo != null) {
@@ -780,6 +793,19 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                                 repaymentBizPlanListDetailMapper.updateById(repaymentBizPlanListDetail);
                             }
 
+                            //保存结清操作记录
+                            BigDecimal factMoney = sourceVo.getTotal().add(sourceVo.getItem70()).add(sourceVo.getOtherMoney());
+                            if (factMoney.compareTo(BigDecimal.ZERO) > 0) {
+                                RepaymentConfirmLog repaymentConfirmLog = new RepaymentConfirmLog();
+                                repaymentConfirmLog.setConfirmLogId(financeSettleBaseDto.getUuid());
+                                repaymentConfirmLog.setRepayDate(new Date());
+                                repaymentConfirmLog.setBusinessId(repaymentBizPlanList.getBusinessId());
+                                repaymentConfirmLog.setOrgBusinessId(repaymentBizPlanList.getOrigBusinessId());
+                                repaymentConfirmLog.setFactAmount(factMoney);
+                                repaymentConfirmLog.setProjPlanJson(JSON.toJSONString(sourceVo));
+                                repaymentConfirmLogMapper.insert(repaymentConfirmLog);
+                            }
+
                         }
                         if (newVo.getTotal().compareTo(sourceVo.getTotal()) == 0) { //实还和应还相等 已还完
                             repaymentBizPlan.setPlanStatus(RepayPlanSettleStatusEnum.PAYED.getValue());
@@ -811,10 +837,10 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                         }
                         logger.info("=====>>>repaymentBizPlanList{}", repaymentBizPlanList);
 
-                            repaymentBizPlanListMapper.updateById(repaymentBizPlanList);
+                        repaymentBizPlanListMapper.updateById(repaymentBizPlanList);
                         logger.info("=====>>>repaymentBizPlan{}", repaymentBizPlan);
                         //更新标的状态
-                            repaymentBizPlanMapper.updateById(repaymentBizPlan);
+                        repaymentBizPlanMapper.updateById(repaymentBizPlan);
                     }
                 }
 
@@ -879,7 +905,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                                 }
                                 repaymentProjPlanListDetail.setFactRepayDate(new Date());
                                 logger.info("=====>>>repaymentProjPlanListDetail{}", repaymentProjPlanListDetail);
-//                                        repaymentProjPlanListDetailMapper.updateById(repaymentProjPlanListDetail);
+                                repaymentProjPlanListDetailMapper.updateById(repaymentProjPlanListDetail);
                             }
 
                         }
@@ -915,10 +941,10 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                         logger.info("=====>>>repaymentProjPlanList{}", repaymentProjPlanList);
                         //添加合规化list
                         ptojPlanList.add(repaymentProjPlanList);
-                            repaymentProjPlanListMapper.updateById(repaymentProjPlanList);
+                        repaymentProjPlanListMapper.updateById(repaymentProjPlanList);
                         logger.info("=====>>>repaymentProjPlan{}", repaymentProjPlan);
                         //更新标的状态
-                            repaymentProjPlanMapper.updateById(repaymentProjPlan);
+                        repaymentProjPlanMapper.updateById(repaymentProjPlan);
 
                     }
                 }
@@ -1308,7 +1334,9 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         fact.setRepayRefId(resource.getRepaySourceRefId());// 还款来源id
         fact.setRepaySourceId(resource.getResourceId());
         fact.setRepaySource(Integer.valueOf(resource.getRepaySource()));// 还款来源类别
-//        fact.setConfirmLogId(financeBaseDto.getConfirmLog().getConfirmLogId());
+
+        fact.setProjPlanDetailRepayId(UUID.randomUUID().toString());
+        fact.setConfirmLogId(financeSettleBaseDto.getUuid());
         fact.setFactAmount(amount);
 
 
@@ -1333,6 +1361,9 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
             case 50:
                 vo.setItem50(vo.getItem50().add(amount));
                 break;
+            case 70:
+                vo.setItem70(vo.getItem70().add(amount));
+                break;
             case 60:
                 if (moneyDto.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
                     vo.setOnlineOverDue(vo.getOnlineOverDue().add(amount));
@@ -1342,6 +1373,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                 }
                 break;
             default:
+                vo.setOtherMoney(vo.getOtherMoney().add(amount));
                 logger.info("未定义的类型!!!{}||{}||{}", moneyDto.getPlanItemName(), moneyDto.getPlanItemType(), amount);
                 break;
         }
@@ -2425,11 +2457,11 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
         infoVO.setPenaltyFees(calcPenalty(cur, req.getPlanId()));
 
-        if (req.getOtherFees()==null) {
-			infoVO.setOtherFees(new ArrayList<>());
-		}else {
-			infoVO.setOtherFees(req.getOtherFees());
-		}
+        if (req.getOtherFees() == null) {
+            infoVO.setOtherFees(new ArrayList<>());
+        } else {
+            infoVO.setOtherFees(req.getOtherFees());
+        }
         infoVO.setSubtotal(infoVO.getSubtotal().add(infoVO.getItem10()).add(infoVO.getItem20()).add(infoVO.getItem30()).add(infoVO.getItem50()));
         infoVO.setTotal(infoVO.getTotal().add(infoVO.getSubtotal()).add(infoVO.getOfflineOverDue()).add(infoVO.getOnlineOverDue()).subtract(infoVO.getDerate()).add(infoVO.getPlanRepayBalance()).add(infoVO.getPenalty()).add(infoVO.getOther()));
 
@@ -2593,30 +2625,56 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
     /**
      * 全部业务结清的场景下,查找当前期的planListId
-     * @author 王继光
-     * 2018年7月25日 下午5:19:58
+     *
      * @param now
      * @return
+     * @author 王继光
+     * 2018年7月25日 下午5:19:58
      */
     @Override
-    public List<String> curPeriod(RepaymentBizPlanList now){
-    	List<RepaymentBizPlan> plan = repaymentBizPlanMapper.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id", now.getBusinessId()));
-    	List<String> res = new ArrayList<>() ;
-    	for (RepaymentBizPlan repaymentBizPlan : plan) {
-			List<RepaymentBizPlanList> selectList = repaymentBizPlanListMapper.selectList(
-					new EntityWrapper<RepaymentBizPlanList>()
-					.eq("business_id", now.getBusinessId())
-					.eq("plan_id", repaymentBizPlan.getPlanId())
-					.gt("due_date", new Date())
-					.eq("current_status", RepayCurrentStatusEnums.还款中.toString())
-					.orderBy("due_date"));
-			if (CollectionUtils.isEmpty(selectList)) {
-				continue;
-			}
-			res.add(selectList.get(0).getPlanListId());
-		}
-    	return res ;
+    public List<String> curPeriod(RepaymentBizPlanList now) {
+        List<RepaymentBizPlan> plan = repaymentBizPlanMapper.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id", now.getBusinessId()));
+        List<String> res = new ArrayList<>();
+        for (RepaymentBizPlan repaymentBizPlan : plan) {
+            List<RepaymentBizPlanList> selectList = repaymentBizPlanListMapper.selectList(
+                    new EntityWrapper<RepaymentBizPlanList>()
+                            .eq("business_id", now.getBusinessId())
+                            .eq("plan_id", repaymentBizPlan.getPlanId())
+                            .gt("due_date", new Date())
+                            .eq("current_status", RepayCurrentStatusEnums.还款中.toString())
+                            .orderBy("due_date"));
+            if (CollectionUtils.isEmpty(selectList)) {
+                continue;
+            }
+            res.add(selectList.get(0).getPlanListId());
+        }
+        return res;
     }
-    
+
+    @Override
+    public void financeSettleRecall(String confirmLogId) {
+
+        List<RepaymentProjFactRepay> repaymentProjFactRepays = repaymentProjFactRepayMapper.selectList(new EntityWrapper<RepaymentProjFactRepay>().eq("confirm_log_id", confirmLogId));
+        if (CollectionUtils.isNotEmpty(repaymentProjFactRepays)) {
+            for (RepaymentProjFactRepay repaymentProjFactRepay : repaymentProjFactRepays) {
+                String projPlanDetailId = repaymentProjFactRepay.getProjPlanDetailId();
+                BigDecimal factAmount = repaymentProjFactRepay.getFactAmount();
+                if (projPlanDetailId != null) {
+
+                    RepaymentProjPlanListDetail repaymentProjPlanListDetail = repaymentProjPlanListDetailMapper.selectById(projPlanDetailId);
+                    BigDecimal projFactAmount = repaymentProjPlanListDetail.getProjFactAmount();
+                    if(projFactAmount.subtract(factAmount).compareTo(BigDecimal.ZERO)>=0){
+                        repaymentProjPlanListDetail.setProjFactAmount(projFactAmount.subtract(factAmount));
+                        repaymentProjPlanListDetailMapper.updateById(repaymentProjPlanListDetail);
+                    }
+                }
+
+            }
+
+        }
+
+
+    }
+
 
 }
