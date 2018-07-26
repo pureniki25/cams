@@ -225,7 +225,7 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
                 	pagePermissionJSONObject.getJSONObject("hasAreaRole").put(jsonKey, true);
 	            }
             
-	            if(role.getRoleAreaMethod().equals(SysRoleAreaTypeEnums.SEE_FINANCE_BUSINESS.getKey())){
+	            if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.SEE_FINANCE_BUSINESS.getKey())){
 	                //拥有财务跟单设置区域性角色标
 	            	pagePermissionJSONObject.getJSONObject("hasFinanceOrderSetAreaRole").put(jsonKey, true);
 	            }

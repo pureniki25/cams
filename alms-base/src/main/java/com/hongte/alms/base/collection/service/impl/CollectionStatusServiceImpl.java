@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.Executor;
 
 /**
  * <p>
@@ -101,6 +102,9 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
     @Autowired
     @Qualifier("SysUserRoleService")
     SysUserRoleService sysUserRoleService;
+    
+    @Autowired
+    private Executor msgThreadAsync;
 
     /**
      * 设置电催/人员(界面手动设置)
@@ -287,16 +291,15 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                 //2.新的那个跟单人的permission刷新
                 if(staffType.equals(CollectionStatusEnum.PHONE_STAFF.getPageStr())
                         || staffType.equals(CollectionStatusEnum.COLLECTING.getPageStr())) {
-//                    sysUserPermissionService.setUserPermissons(staffUserId);
-
-                    List<SysUserPermission>  lsys = sysUserPermissionService.selectList(new EntityWrapper<SysUserPermission>().eq("business_id",status.getBusinessId()).eq("user_id",staffUserId));
+                    sysUserPermissionService.setUserPermissons(staffUserId);
+                    /*List<SysUserPermission>  lsys = sysUserPermissionService.selectList(new EntityWrapper<SysUserPermission>().eq("business_id",status.getBusinessId()).eq("user_id",staffUserId));
                     if(lsys == null || lsys.size()==0){
                         SysUserPermission temp = new SysUserPermission();
                         temp.setUserId(staffUserId);
                         temp.setBusinessId(status.getBusinessId());
                         sysUserPermissionService.insert(temp);
 
-                    }
+                    }*/
                 }
             }
 
@@ -1135,8 +1138,6 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
             status.setCollectionStatus(log.getBeforeStatus());
             update(status, new EntityWrapper<CollectionStatus>().eq("business_id", status.getBusinessId()).eq("crp_id", status.getCrpId()));
         }
-
-
 
         return retBoolean;
     }

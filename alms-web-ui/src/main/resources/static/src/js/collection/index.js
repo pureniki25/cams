@@ -852,9 +852,13 @@ var canOpenLayer = function () {
         if(checkStatus.data[i].afterColStatusName=='已拖车登记'){
             return "已拖车登记的业务不能设置电催/催收！"
         }
-        if(checkStatus.data[i].statusName=='已还款'){
+        if(checkStatus.data[i].statusName=='已还款' ){
             return "已还款的业务不能设置电催/催收！"
         }
+        if(checkStatus.data[i].statusName=='已结清'){
+            return "已结清的业务不能设置电催/催收！"
+        }
+
 
     }
     return null;
