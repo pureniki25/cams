@@ -103,7 +103,8 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     @Autowired
     RepaymentProjPlanListDetailBakMapper repaymentProjPlanListDetailBakMapper;
 
-
+    @Autowired
+    RepaymentBizPlanListSynchMapper repaymentBizPlanListSynchMapper;
     @Autowired
     RepaymentBizPlanBakMapper repaymentBizPlanBakMapper;
 
@@ -122,6 +123,9 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     @Autowired
     @Qualifier("RepaymentConfirmPlatRepayLogService")
     RepaymentConfirmPlatRepayLogService repaymentConfirmPlatRepayLogService;
+
+    @Autowired
+    RepaymentBizPlanListSynchService repaymentBizPlanListSynchService;
 
     @Autowired
     @Qualifier("RepaymentConfirmLogService")
@@ -771,12 +775,35 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                 if (newVo != null) {
                     RepaymentBizPlanList repaymentBizPlanList = bizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", planIdNow).eq("after_id", afterIdNow));
 
-                    RepaymentBizPlanListBak repaymentBizPlanListBak = new RepaymentBizPlanListBak();
-                    repaymentBizPlanListBak.setConfirmLogId(financeSettleBaseDto.getUuid());
-                    BeanUtils.copyProperties(repaymentBizPlanList, repaymentBizPlanListBak);
 
-                    repaymentBizPlanListBakMapper.insert(repaymentBizPlanListBak);
 
+
+                    //财务列表优化表更新
+                    RepaymentBizPlanListSynch repaymentBizPlanListSynch = repaymentBizPlanListSynchService.selectOne(new EntityWrapper<RepaymentBizPlanListSynch>().eq("plan_id", planIdNow).eq("after_id", afterIdNow));
+
+                    //整个还款计划其它期 都为已还款
+                    List<RepaymentBizPlanList> repaymentBizPlanLists = repaymentBizPlanListMapper.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", planIdNow));
+                    if(CollectionUtils.isNotEmpty(repaymentBizPlanLists)){
+                        for(RepaymentBizPlanList repaymentBizPlanListN : repaymentBizPlanLists){
+                            RepaymentBizPlanListBak repaymentBizPlanListBak = new RepaymentBizPlanListBak();
+                            repaymentBizPlanListBak.setConfirmLogId(financeSettleBaseDto.getUuid());
+                            BeanUtils.copyProperties(repaymentBizPlanListN, repaymentBizPlanListBak);
+                            repaymentBizPlanListBakMapper.insert(repaymentBizPlanListBak);
+
+
+                            repaymentBizPlanListN.setCurrentStatus(RepayCurrentStatusEnums.已还款.toString());
+                            repaymentBizPlanListN.setFactRepayDate(new Date());
+                            repaymentBizPlanListN.setFinanceComfirmDate(new Date());
+                            repaymentBizPlanListN.setFinanceConfirmUser(financeSettleBaseDto.getUserId());
+                            repaymentBizPlanListN.setFinanceConfirmUserName(financeSettleBaseDto.getUserName());
+                            repaymentBizPlanListMapper.updateById(repaymentBizPlanListN);
+
+                        }
+
+
+
+
+                    }
 
                     RepaymentBizPlan repaymentBizPlan = bizPlanService.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("plan_id", planIdNow));
 
@@ -866,6 +893,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                                 repaymentConfirmLog.setSurplusAmount(endMoney);
                                 repaymentConfirmLog.setAfterId(repaymentBizPlanList.getAfterId());
                                 repaymentConfirmLog.setPeriod(repaymentBizPlanList.getPeriod());
+                                repaymentConfirmLog.setCreateTime(new Date());
                                 repaymentConfirmLog.setRepaySource(10);
 
                                 repaymentConfirmLogMapper.insert(repaymentConfirmLog);
@@ -873,6 +901,8 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
 
                         }
+
+
                         BigDecimal moneySource=sourceVo.getItem10().add(sourceVo.getItem20()).add(sourceVo.getItem30()).add(sourceVo.getItem50()).add(sourceVo.getOnlineOverDue()).add(sourceVo.getOfflineOverDue());
                         BigDecimal moneyNew=newVo.getItem10().add(newVo.getItem20()).add(newVo.getItem30()).add(newVo.getItem50()).add(newVo.getOnlineOverDue()).add(newVo.getOfflineOverDue());
 
@@ -904,9 +934,8 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                                 repaymentBizPlanList.setRepayStatus(SectionRepayStatusEnum.ONLINE_REPAID.getKey());
                             }
                         }
-                        logger.info("=====>>>repaymentBizPlanList{}", repaymentBizPlanList);
-
-                        repaymentBizPlanListMapper.updateById(repaymentBizPlanList);
+//                        logger.info("=====>>>repaymentBizPlanList{}", repaymentBizPlanList);
+//                        repaymentBizPlanListMapper.updateById(repaymentBizPlanList);
                         logger.info("=====>>>repaymentBizPlan{}", repaymentBizPlan);
                         //更新标的状态
                         repaymentBizPlanMapper.updateById(repaymentBizPlan);
