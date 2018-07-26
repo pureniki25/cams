@@ -21,6 +21,7 @@ public enum ExceptionCodeEnum  implements IEnum {
 
     ,NO_BIZ_PLAN_LIST(501,"没有找到业务还款计划列表当前期")
     ,NO_BIZ_PLAN(502,"找不到业务的还款计划")
+    ,TOW_PROJ_PLAN(503,"此业务有两个以上相同的标的还款计划")
    ;
 
     private Integer value;
