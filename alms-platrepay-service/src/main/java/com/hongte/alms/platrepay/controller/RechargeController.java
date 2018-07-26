@@ -141,6 +141,7 @@ public class RechargeController {
 		paramMap.put("userId", userId);
 
 		com.ht.ussp.core.Result result = null;
+		LOG.info("查询代充值账户余额/eip/xiaodai/queryUserAviMoneyForNet参数信息，{}", JSONObject.toJSONString(paramMap));
 		try {
 			result = eipRemote.queryUserAviMoneyForNet(paramMap);
 			LOG.info("查询代充值账户余额/eip/xiaodai/queryUserAviMoneyForNet接口返回信息：{}", JSONObject.toJSONString(result));
@@ -212,7 +213,7 @@ public class RechargeController {
 		agencyRechargeLogService.insert(agencyRechargeLog);
 
 		com.ht.ussp.core.Result result = null;
-
+		LOG.info("代充值接口/eip/td/assetside/agencyRecharge参数信息，{}", JSONObject.toJSONString(dto));
 		try {
 
 			result = eipRemote.agencyRecharge(dto);
