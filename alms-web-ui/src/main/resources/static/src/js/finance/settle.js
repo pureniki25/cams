@@ -330,7 +330,7 @@ window.layinit(function (htConfig) {
                             key:'surplus'
                         },{
                             title:'提前结清违约金',
-                            key:'penalty'
+                            key:'item70'
                         },
                         {
                             title:'合计',
