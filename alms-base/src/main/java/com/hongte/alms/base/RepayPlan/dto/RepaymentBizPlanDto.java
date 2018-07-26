@@ -19,19 +19,19 @@ public class RepaymentBizPlanDto  implements Serializable {
 	/**
      * 业务还款计划
      */
-    private RepaymentBizPlan repaymentBizPlan;
+    protected RepaymentBizPlan repaymentBizPlan;
 
 
     /**
      * 业务还款计划列表DTO
      */
-    private List<RepaymentBizPlanListDto>  bizPlanListDtos;
+    protected List<RepaymentBizPlanListDto>  bizPlanListDtos;
 
 
     /**
      * 标的还款计划主表DTO
      */
-    private  List<RepaymentProjPlanDto> projPlanDtos;
+    protected  List<RepaymentProjPlanDto> projPlanDtos;
 
 
 
@@ -51,13 +51,6 @@ public class RepaymentBizPlanDto  implements Serializable {
         this.bizPlanListDtos = bizPlanListDtos;
     }
 
-    public void setBizPlanListDtos(RepaymentBizPlanListDto bizPlanListDto) {
-    	if (CollectionUtils.isEmpty(bizPlanListDtos)) {
-			bizPlanListDtos = new ArrayList<>() ;
-		}
-        this.bizPlanListDtos.add(bizPlanListDto);
-    }
-    
     public List<RepaymentProjPlanDto> getProjPlanDtos() {
         return projPlanDtos;
     }
@@ -66,11 +59,5 @@ public class RepaymentBizPlanDto  implements Serializable {
         this.projPlanDtos=projPlanDtos;
     }
     
-//    public void setProjPlanDtos(RepaymentProjPlanDto projPlanDto) {
-//        if (CollectionUtils.isEmpty(projPlanDtos)) {
-//        	projPlanDtos = new ArrayList<>() ;
-//		}
-//        this.projPlanDtos.add(projPlanDto);
-//    }
 
 }
