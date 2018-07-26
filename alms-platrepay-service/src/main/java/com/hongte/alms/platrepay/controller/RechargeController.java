@@ -115,6 +115,7 @@ public class RechargeController {
 	@ResponseBody
 	public Result<String> queryRechargeAccountTypeByBusinessType(@RequestParam("businessType") Integer businessType) {
 		try {
+			LOG.info("queryRechargeAccountTypeByBusinessType业务类型：{}", businessType);
 			return Result.success(BusinessTypeEnum.getRechargeAccountName(businessType));
 		} catch (Exception e) {
 			LOG.error("获取所有的线下还款账户失败", e);
