@@ -20,7 +20,12 @@ public class RepaymentProjPlanDto implements Serializable {
     private RepaymentProjPlan repaymentProjPlan;
 
 
-    private List<RepaymentProjPlanListDto>  projPlanListDtos;
+    protected List<RepaymentProjPlanListDto>  projPlanListDtos;
+
+
+
+
+
 
     /**
      * 标的占比
@@ -61,12 +66,7 @@ public class RepaymentProjPlanDto implements Serializable {
         this.projPlanListDtos = projPlanListDtos;
     }
     
-    public void setProjPlanListDtos(RepaymentProjPlanListDto projPlanListDto) {
-    	if (CollectionUtils.isEmpty(projPlanListDtos)) {
-			projPlanListDtos = new ArrayList<>() ;
-		}
-        this.projPlanListDtos.add(projPlanListDto);
-    }
+
 
 	/**
 	 * @return the proportion
