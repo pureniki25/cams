@@ -3,6 +3,7 @@ package com.hongte.alms.finance.req;
 import com.hongte.alms.base.RepayPlan.dto.RepaymentBizPlanDto;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
+import com.hongte.alms.base.vo.finance.SettleFeesVO;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -106,5 +107,7 @@ public class FinanceSettleBaseDto {
    private List<RepaymentSettleLogDetail> repaymentSettleLogDetailList=new ArrayList<>();
 
    private List<RepaymentProjPlanList> ptojPlanList = new ArrayList<>();
+
+    private List<SettleFeesVO> otherFees =new ArrayList<>();
 
 }
