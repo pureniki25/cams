@@ -1193,7 +1193,8 @@ public class FinanceController {
 								JSONObject.toJSONString(parseObject.get("projectPayments")), TdProjectPaymentDTO.class);
 						
 						for (TdProjectPaymentDTO tdProjectPaymentDTO : tdProjectPaymentDTOs) {
-							if (tdProjectPaymentDTO.getStatus()==0 && tdProjectPaymentDTO.getPeriod() != cur.getPeriod()) {
+							if (tdProjectPaymentDTO.getStatus()==0 && tdProjectPaymentDTO.getPeriod() != cur.getPeriod() 
+									&& tdProjectPaymentDTO.getPeriod()<cur.getPeriod()) {
 								
 								return Result.error("0", "往期存在垫付未结清记录");
 							}
