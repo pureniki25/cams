@@ -25,7 +25,7 @@
             module_id AS moduleId, module_name AS moduleName, module_url AS moduleUrl, module_pid AS modulePid, module_level AS moduleLevel, module_desc AS moduleDesc, module_status AS moduleStatus, device_type AS deviceType, module_order AS moduleOrder, module_icon AS moduleIcon, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
         </sql>-->
 
-    <select id="selectAfterLoadStanding" resultType="com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo"
+    <select id="selectAfterLoadStandingBak" resultType="com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo"
             parameterType="com.hongte.alms.base.collection.vo.AfterLoanStandingBookReq">
 
         select
@@ -297,7 +297,7 @@
     </select>
     
 	   
-	<select id="selectAfterLoadStandingBak" resultType="com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo"
+	<select id="selectAfterLoadStanding" resultType="com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo"
             parameterType="com.hongte.alms.base.collection.vo.AfterLoanStandingBookReq">
         select
         pList.orig_business_id AS businessId,
@@ -424,7 +424,7 @@
                 and pList.current_status = #{repayStatus}
             </if>
             <if test="repayStatus !=null and repayStatus =='已结清' ">
-                and (pList.plan_status = 10 or pList.plan_status = 20 OR  pList.plan_status =30)
+                and (pList.plan_status_ext = 10 or pList.plan_status_ext = 20 OR  pList.plan_status_ext =30)
             </if>
             <!--   /*//清算一用户ID列表*/ -->
             <if test="liquidationOneUIds !=null ">
