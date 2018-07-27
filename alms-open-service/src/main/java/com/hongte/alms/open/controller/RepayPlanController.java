@@ -99,7 +99,6 @@ public class RepayPlanController {
     @ApiOperation(value = "创建还款计划并将还款计划及业务和上标信息存储到数据库 接口")
     @PostMapping("/creatAndSaveRepayPlan")
     @ResponseBody
-    @TripleDESDecrypt
     public Result<PlanReturnInfoDto> creatAndSaveRepayPlan(@RequestBody CreatRepayPlanReq creatRepayPlanReq){
         logger.info("创建还款计划并将还款计划及业务和上标信息存储到数据库 接口--开始[{}]" , JSON.toJSONString(creatRepayPlanReq));
         Result<PlanReturnInfoDto> ret= creatRepayPlanRemoteService.creatAndSaveRepayPlan(creatRepayPlanReq);
@@ -268,10 +267,12 @@ public class RepayPlanController {
                             //本金
                             case 10:
                                 paramMap.put("factPrincipa", planListDetail.getFactAmount());
+                                paramMap.put("currentPrincipa", planListDetail.getPlanAmount());
                                 break;
                             //利息
                             case 20:
                                 paramMap.put("factAccrual", planListDetail.getFactAmount());
+                                paramMap.put("currentAccrual", planListDetail.getPlanAmount());
                                 break;
                             //滞纳金
                             case 60:
@@ -363,6 +364,7 @@ public class RepayPlanController {
                     paramMap.put("accountantConfirmDate", bizPlanList.getAccountantConfirmDate());
                     paramMap.put("createTime", bizPlanList.getCreateTime());
                     paramMap.put("dueDate", bizPlanList.getDueDate());
+                    paramMap.put("borrowMoney", bizPlanList.getTotalBorrowAmount());
                     paramMap.put("updateTime", bizPlanList.getUpdateTime());
                     paramMap.put("updateUser", bizPlanList.getUpdateUser());
                     paramMap.put("carBizDetailDtos", afterDetailDtos);
