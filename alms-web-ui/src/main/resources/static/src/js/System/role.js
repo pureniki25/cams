@@ -42,6 +42,8 @@ window.layinit(function (htConfig) {
                         return "只查看车贷业务";
                     }else  if(d.roleAreaType == 5){
                         return "只查看房贷业务";
+                    }else  if(d.roleAreaType == 6){
+                        return "根据财务跟单方式控制";
                     }else{
                         return "未定义的类型";
                     }
