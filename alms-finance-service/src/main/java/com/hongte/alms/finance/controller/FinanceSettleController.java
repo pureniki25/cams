@@ -65,11 +65,11 @@ public class FinanceSettleController {
 
     @RequestMapping("/financeSettleRecall")
     @ApiOperation(value="资金结清撤回")
-    public Result financeSettleRecall( String confirmLogId){
+    public Result financeSettleRecall( String businessId,String afterId){
         logger.info("@financeSettle@资金结清撤回开始[{}]");
         Result result = null;
         try {
-            financeSettleService.financeSettleRecall(confirmLogId);
+            financeSettleService.financeSettleRecall(businessId,afterId);
             result = Result.success();
         } catch (ServiceRuntimeException se) {
             result = Result.error(se.getErrorCode(), se.getMessage());

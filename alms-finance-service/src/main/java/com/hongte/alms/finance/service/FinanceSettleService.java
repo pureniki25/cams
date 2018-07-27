@@ -22,7 +22,7 @@ public interface FinanceSettleService {
      */
     List<String> curPeriod(RepaymentBizPlanList now) ;
 
-    void financeSettleRecall(String confirmLogId);
+    void financeSettleRecall(String businessId,String afterId);
     /**
      *
      * 财务结清,获取当前期
@@ -32,4 +32,12 @@ public interface FinanceSettleService {
      * @return
      */
     List<RepaymentBizPlanSettleDto> getCurrentPeriod(FinanceSettleReq req);
+    
+    /**
+     * 备份记录
+     * @author 王继光
+     * 2018年7月26日 下午5:25:04
+     * @param dtos
+     */
+    void bak(FinanceSettleBaseDto base, List<RepaymentBizPlanSettleDto> dtos);
 }
