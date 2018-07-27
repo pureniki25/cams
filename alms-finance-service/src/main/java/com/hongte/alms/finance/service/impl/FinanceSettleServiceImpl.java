@@ -39,6 +39,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import scala.Unit;
 
 import javax.enterprise.inject.New;
 import javax.validation.constraints.NotNull;
@@ -394,6 +395,8 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
                 Map<String,RepaymentProjPlanSettleDto>  projPlanSettleDtoMap = new HashMap<>();
 
+                List<RepaymentProjPlanSettleDto> projPlanSettleDtoList = new LinkedList<>();
+
                 for(RepaymentBizPlanSettleDto repaymentBizPlanSettleDto:bizPlanSettleDtos){
                     List<RepaymentProjPlanSettleDto> repaymentProjPlanSettleDtos = repaymentBizPlanSettleDto.getProjPlanStteleDtos();
 
@@ -404,12 +407,17 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                             throw new SettleRepaymentExcepiton("此业务有两个以上相同的标的还款计划", ExceptionCodeEnum.TOW_PROJ_PLAN.getValue().toString());
                         }
                         projPlanSettleDtoMap.put(repaymentProjPlanSettleDto.getTuandaiProjectInfo().getProjectId(),repaymentProjPlanSettleDto);
+                        projPlanSettleDtoList.add(repaymentProjPlanSettleDto);
                     }
                 }
 
+                ProjPlanDtoUtil.sortSettleDtos(projPlanSettleDtoList);
 
 
-//                ProjPlanDtoUtil.sort();
+                for(RepaymentProjPlanSettleDto repaymentProjPlanSettleDto:projPlanSettleDtoList){
+                    //按标分销
+
+                }
 
 
 
@@ -2896,6 +2904,13 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
             for(RepaymentProjPlanSettleDto repaymentProjPlanDto:projPlanDtos){
 
+                RepaymentProjPlanListDto repaymentProjPlanListDto = repaymentProjPlanDto.getCurrProjPlanListDto();
+                List<RepaymentProjPlanListDto> curRepaymentProjPlanListDtos = new LinkedList<>();
+                curRepaymentProjPlanListDtos.add(repaymentProjPlanListDto);
+                //当期结清，应支付的费用明细
+                Map<String,PlanListDetailShowPayDto> curShowPayMoney = calcShowPayFeels(curRepaymentProjPlanListDtos,null);
+                repaymentProjPlanDto.setCurShowPayFeels(curShowPayMoney);
+
                 //当前期之前期数费用的统计
                 Map<String,PlanListDetailShowPayDto> beforeFeels = calcShowPayFeels(repaymentProjPlanDto.getBeforeProjPlanListDtos(),null);
                 repaymentProjPlanDto.setBeforeFeels(beforeFeels);
@@ -2903,6 +2918,19 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                 //当前期之后期数费用的统计(只累加本金)
                 Map<String,PlanListDetailShowPayDto> afterFeels =  calcShowPayFeels(repaymentProjPlanDto.getAfterProjPlanListDtos(),RepayPlanFeeTypeEnum.PRINCIPAL.getUuid());
                 repaymentProjPlanDto.setAfterFeels(afterFeels);
+
+                //之前期应还费用累加
+                for(PlanListDetailShowPayDto planListDetailShowPayDto:beforeFeels.values()){
+                    PlanListDetailShowPayDto showPayDto =  curShowPayMoney.get(planListDetailShowPayDto.getFeelId());
+                    addToCurShowPay(showPayDto,curShowPayMoney);
+                }
+
+                //之后期应还费用累加
+                for(PlanListDetailShowPayDto planListDetailShowPayDto:afterFeels.values()){
+                    PlanListDetailShowPayDto showPayDto =  curShowPayMoney.get(planListDetailShowPayDto.getFeelId());
+                    addToCurShowPay(showPayDto,curShowPayMoney);
+                }
+
 
             }
         }
@@ -2912,44 +2940,60 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 	}
 
 
+	private  void  addToCurShowPay(PlanListDetailShowPayDto showPayDto,Map<String,PlanListDetailShowPayDto> curShowPayMoney){
+        if(showPayDto == null){
+            showPayDto = new PlanListDetailShowPayDto();
+            BeanUtils.copyProperties(showPayDto,showPayDto);
+            curShowPayMoney.put(showPayDto.getFeelId(),showPayDto);
+        }else{
+            showPayDto.setShowPayMoney(showPayDto.getShowPayMoney().add(showPayDto.getShowPayMoney()));
+        }
+    }
+
+
+
+
 	private  Map<String,PlanListDetailShowPayDto>  calcShowPayFeels(List<RepaymentProjPlanListDto> projPlanLists,String feelId){
         //当前期之前期数费用的统计
         Map<String,PlanListDetailShowPayDto> beforeFeels = new HashMap<>();
         for(RepaymentProjPlanListDto bforePlanDto: projPlanLists){
-            List<RepaymentProjPlanListDetailDto> repaymentProjPlanListDetailDtos =bforePlanDto.getRepaymentProjPlanListDetailDtos();
-            for(RepaymentProjPlanListDetailDto projPlanListDetailDto: repaymentProjPlanListDetailDtos){
-                RepaymentProjPlanListDetail  detail1 =projPlanListDetailDto.getRepaymentProjPlanListDetail();
-                //如果指定了需累加的费用项，则其他费用项都跳过
-                if(feelId!=null && !feelId.equals(detail1.getFeeId())){
-                    continue;
-                }
-
-                List<RepaymentProjFactRepay> factRepayList = projPlanListDetailDto.getRepaymentProjFactRepays();
-                if(!CollectionUtils.isEmpty(factRepayList)){
-                    BigDecimal  payedMoney = new BigDecimal("0");
-                    for(RepaymentProjFactRepay repaymentProjFactRepay: factRepayList){
-                        payedMoney =payedMoney.add(repaymentProjFactRepay.getFactAmount());
-                    }
-
-                    BigDecimal  showPayMoney = detail1.getProjPlanAmount().subtract(payedMoney);
-                    if(showPayMoney.compareTo(new BigDecimal("0"))>0){
-                        PlanListDetailShowPayDto  planListDetailShowPayDto = beforeFeels.get(detail1.getFeeId());
-                        if(planListDetailShowPayDto == null){
-                            planListDetailShowPayDto = new PlanListDetailShowPayDto();
-                            planListDetailShowPayDto.setFeelId(detail1.getFeeId());
-                            planListDetailShowPayDto.setShareProfitIndex(detail1.getShareProfitIndex());
-                            planListDetailShowPayDto.setShowPayMoney(new BigDecimal("0"));
-                            beforeFeels.put(detail1.getFeeId(),planListDetailShowPayDto);
-                        }
-                        planListDetailShowPayDto.setShowPayMoney(planListDetailShowPayDto.getShowPayMoney().add(showPayMoney));
-                    }
-                }
-
-            }
+             calcShowPayFeel(bforePlanDto,feelId,beforeFeels);
         }
 
 
 	    return beforeFeels;
+    }
+
+    private void calcShowPayFeel(RepaymentProjPlanListDto bforePlanDto,String feelId,Map<String,PlanListDetailShowPayDto> beforeFeels){
+        List<RepaymentProjPlanListDetailDto> repaymentProjPlanListDetailDtos =bforePlanDto.getRepaymentProjPlanListDetailDtos();
+        for(RepaymentProjPlanListDetailDto projPlanListDetailDto: repaymentProjPlanListDetailDtos){
+            RepaymentProjPlanListDetail  detail1 =projPlanListDetailDto.getRepaymentProjPlanListDetail();
+            //如果指定了需累加的费用项，则其他费用项都跳过
+            if(feelId!=null && !feelId.equals(detail1.getFeeId())){
+                continue;
+            }
+
+            List<RepaymentProjFactRepay> factRepayList = projPlanListDetailDto.getRepaymentProjFactRepays();
+            if(!CollectionUtils.isEmpty(factRepayList)){
+                BigDecimal  payedMoney = new BigDecimal("0");
+                for(RepaymentProjFactRepay repaymentProjFactRepay: factRepayList){
+                    payedMoney =payedMoney.add(repaymentProjFactRepay.getFactAmount());
+                }
+
+                BigDecimal  showPayMoney = detail1.getProjPlanAmount().subtract(payedMoney);
+                if(showPayMoney.compareTo(new BigDecimal("0"))>0){
+                    PlanListDetailShowPayDto  planListDetailShowPayDto = beforeFeels.get(detail1.getFeeId());
+                    if(planListDetailShowPayDto == null){
+                        planListDetailShowPayDto = new PlanListDetailShowPayDto();
+                        planListDetailShowPayDto.setFeelId(detail1.getFeeId());
+                        planListDetailShowPayDto.setShareProfitIndex(detail1.getShareProfitIndex());
+                        planListDetailShowPayDto.setShowPayMoney(new BigDecimal("0"));
+                        beforeFeels.put(detail1.getFeeId(),planListDetailShowPayDto);
+                    }
+                    planListDetailShowPayDto.setShowPayMoney(planListDetailShowPayDto.getShowPayMoney().add(showPayMoney));
+                }
+            }
+        }
     }
 
 	//showPayFeels =
