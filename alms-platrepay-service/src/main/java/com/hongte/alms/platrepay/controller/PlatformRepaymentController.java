@@ -459,14 +459,28 @@ public class PlatformRepaymentController {
             List<RepaymentProjFactRepay> projFactRepays = repaymentProjFactRepayService.selectList(
                     new EntityWrapper<RepaymentProjFactRepay>().eq("proj_plan_list_id", projPlanList.getProjPlanListId())
             );
+            Map<Integer,RepaymentProjFactRepay> projFactRepayMap = Maps.newHashMap();
+            //按费用项大类plan_item_type把重复的费用项进行合并累加
             if (projFactRepays != null && projFactRepays.size() > 0) {
+                for (RepaymentProjFactRepay fr : projFactRepays) {
+                    if(projFactRepayMap.containsKey(fr.getPlanItemType())){
+                        RepaymentProjFactRepay tempFactRepay = projFactRepayMap.get(fr.getPlanItemType());
+                        tempFactRepay.setFactAmount(tempFactRepay.getFactAmount().add(fr.getFactAmount()));
+                    }else{
+                        projFactRepayMap.put(fr.getPlanItemType(), fr);
+                    }
+                }
+            }
+
+            if (projFactRepayMap.size() > 0 ) {
                 //实收总金额
                 BigDecimal factRepayAmount = BigDecimal.ZERO;
                 //充值金额
                 BigDecimal rechargeAmount = BigDecimal.ZERO;
 
                 List<TdrepayRechargeDetail> detailFeeList = Lists.newArrayList();
-                for (RepaymentProjFactRepay r : projFactRepays) {
+                //for (RepaymentProjFactRepay r : projFactRepays) {
+                for(RepaymentProjFactRepay r: projFactRepayMap.values()){
                     //实还金额应该包含滞纳金
                     factRepayAmount = factRepayAmount.add(r.getFactAmount());
                     //累计费用，线下（资产公司）的滞纳金排除在外，注意用value和uuid去区分.  OVER_DUE_AMONT_UNDERLINE(60,"线下滞纳金","3131c075-5721-11e8-8a00-0242ac110002",5)

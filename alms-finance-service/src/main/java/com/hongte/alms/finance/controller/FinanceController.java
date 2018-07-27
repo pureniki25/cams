@@ -1193,8 +1193,18 @@ public class FinanceController {
 								JSONObject.toJSONString(parseObject.get("projectPayments")), TdProjectPaymentDTO.class);
 						
 						for (TdProjectPaymentDTO tdProjectPaymentDTO : tdProjectPaymentDTOs) {
-							if (tdProjectPaymentDTO.getStatus()==0 && tdProjectPaymentDTO.getPeriod() != cur.getPeriod() 
-									&& tdProjectPaymentDTO.getPeriod()<cur.getPeriod()) {
+							if (tdProjectPaymentDTO.getStatus()==0 
+									&& tdProjectPaymentDTO.getPeriod() != cur.getPeriod() 
+									&& tdProjectPaymentDTO.getPeriod()<cur.getPeriod() 
+									&& 
+									/*防止出现垫付金额0的情况*/
+									(tdProjectPaymentDTO.getGuaranteePayment().getAgencyAmount().compareTo(BigDecimal.ZERO)>0
+											||tdProjectPaymentDTO.getGuaranteePayment().getArbitrationAmount().compareTo(BigDecimal.ZERO)>0
+											||tdProjectPaymentDTO.getGuaranteePayment().getGuaranteeAmount().compareTo(BigDecimal.ZERO)>0
+											||tdProjectPaymentDTO.getGuaranteePayment().getOrgAmount().compareTo(BigDecimal.ZERO)>0
+											||tdProjectPaymentDTO.getGuaranteePayment().getPenaltyAmount().compareTo(BigDecimal.ZERO)>0
+											||tdProjectPaymentDTO.getGuaranteePayment().getPrincipalAndInterest().compareTo(BigDecimal.ZERO)>0
+											||tdProjectPaymentDTO.getGuaranteePayment().getTuandaiAmount().compareTo(BigDecimal.ZERO)>0)) {
 								
 								return Result.error("0", "往期存在垫付未结清记录");
 							}
