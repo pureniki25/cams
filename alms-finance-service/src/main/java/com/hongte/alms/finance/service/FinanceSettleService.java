@@ -22,7 +22,7 @@ public interface FinanceSettleService {
      */
     List<String> curPeriod(RepaymentBizPlanList now) ;
 
-    void financeSettleRecall(String confirmLogId);
+    void financeSettleRecall(String businessId,String afterId);
     /**
      *
      * 财务结清,获取当前期

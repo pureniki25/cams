@@ -1894,6 +1894,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         repaymentConfirmLog.setBusinessId(businessId);
         repaymentConfirmLog.setCanRevoke(1);
         repaymentConfirmLog.setConfirmLogId(UUID.randomUUID().toString());
+        /*增加还款类型区分,1=还款日志,2=结清日志*/
+        repaymentConfirmLog.setType(1);
         repaymentConfirmLog.setCreateTime(new Date());
         repaymentConfirmLog.setCreateUser(loginUserInfoHelper.getUserId());
         List<RepaymentConfirmLog> repaymentConfirmLogs = repaymentConfirmLog.selectList(new EntityWrapper<>()

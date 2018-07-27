@@ -144,6 +144,9 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
             return Result.error("500", "找不到任何一条相关的确认还款记录");
         }
         RepaymentConfirmLog log = logs.get(0);
+        if (log.getType().equals(2)) {
+			return Result.error("500","请先撤销"+log.getAfterId()+"的结清");
+		}
         if(log.getRepaySource()!=10) {//如果不是线下转账的不能撤销
             return Result.error("500", "最后一次还款不是线下转账不能被撤销");
         }
