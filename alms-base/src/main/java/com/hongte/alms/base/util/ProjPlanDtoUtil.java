@@ -50,6 +50,12 @@ public class ProjPlanDtoUtil {
         });
 	}
 
+	/**
+	 * 将标的排序
+	 * @author 王继光
+	 * 2018年7月26日 下午3:51:33
+	 * @param repaymentProjPlanDtos
+	 */
     public static void sortSettleDtos(List<RepaymentProjPlanSettleDto> repaymentProjPlanDtos) {
         Collections.sort(repaymentProjPlanDtos, new Comparator<RepaymentProjPlanSettleDto>() {
             // 排序规则说明 需补充 从小标到大标，再到主借标
