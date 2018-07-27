@@ -260,6 +260,8 @@ public class RepayPlanController {
                     List<CarBusinessAfterDetailDto> afterDetailDtos = Lists.newArrayList();
                     BigDecimal subCompanyServiceFeeTotal = BigDecimal.ZERO;
                     BigDecimal factSubCompanyServiceFeeTotal = BigDecimal.ZERO;
+                    BigDecimal subGuaranteeFeeTotal = BigDecimal.ZERO;
+                    BigDecimal factGuaranteeFeeTotal = BigDecimal.ZERO;
                     BigDecimal planOtherExpenses = BigDecimal.ZERO;
                     BigDecimal actualOtherExpernses = BigDecimal.ZERO;
                     for (RepaymentBizPlanListDetail planListDetail : bizPlanListDto.getBizPlanListDetails()) {
@@ -287,6 +289,14 @@ public class RepayPlanController {
                                 subCompanyServiceFeeTotal = subCompanyServiceFeeTotal.add(planListDetail.getPlanAmount());
                                 factSubCompanyServiceFeeTotal = factSubCompanyServiceFeeTotal.add(planListDetail.getFactAmount()==null?BigDecimal.valueOf(0):planListDetail.getFactAmount());
                                 break;
+                            //担保费    
+                            case 40:
+                                //paramMap.put("subCompanyServiceFee", planListDetail.getPlanAmount());
+                                //paramMap.put("factSubCompanyServiceFee", planListDetail.getFactAmount());
+                                //可能有多个分公司服务费，要循环累加
+                            	subGuaranteeFeeTotal = subGuaranteeFeeTotal.add(planListDetail.getPlanAmount());
+                            	factGuaranteeFeeTotal = factGuaranteeFeeTotal.add(planListDetail.getFactAmount()==null?BigDecimal.valueOf(0):planListDetail.getFactAmount());
+                                break;     
                             //其它费用
                             default:
                                 if (planListDetail.getPlanAmount() != null) {
@@ -352,6 +362,8 @@ public class RepayPlanController {
                     paramMap.put("remark", bizPlanList.getRemark());
                     paramMap.put("subCompanyServiceFee", subCompanyServiceFeeTotal);
                     paramMap.put("factSubCompanyServiceFee", factSubCompanyServiceFeeTotal);
+                    paramMap.put("subGuaranteeFee", subGuaranteeFeeTotal);
+                    paramMap.put("factGuaranteeFee", factGuaranteeFeeTotal);
                     paramMap.put("currentOtherMoney", planOtherExpenses);
                     paramMap.put("otherMoney", actualOtherExpernses);
                     paramMap.put("confirmFlag", bizPlanList.getConfirmFlag());
