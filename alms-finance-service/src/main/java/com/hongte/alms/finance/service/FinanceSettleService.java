@@ -32,4 +32,12 @@ public interface FinanceSettleService {
      * @return
      */
     List<RepaymentBizPlanSettleDto> getCurrentPeriod(FinanceSettleReq req);
+    
+    /**
+     * 备份记录
+     * @author 王继光
+     * 2018年7月26日 下午5:25:04
+     * @param dtos
+     */
+    void bak(FinanceSettleBaseDto base, List<RepaymentBizPlanSettleDto> dtos);
 }
