@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import com.hongte.alms.base.RepayPlan.dto.PlanListDetailShowPayDto;
 import com.hongte.alms.base.RepayPlan.dto.RepaymentProjPlanDto;
 import com.hongte.alms.base.RepayPlan.dto.RepaymentProjPlanSettleDto;
 
@@ -82,5 +83,28 @@ public class ProjPlanDtoUtil {
             }
 
         });
+    }
+    
+    /**
+     * 应还项根据shareProfitIndex
+     * @author 王继光
+     * 2018年7月27日 下午9:46:12
+     * @param list
+     */
+    public static void sortFeeByShareProfitIndex(List<PlanListDetailShowPayDto> list) {
+    	Collections.sort(list, new Comparator<PlanListDetailShowPayDto>() {
+
+			@Override
+			public int compare(PlanListDetailShowPayDto o1, PlanListDetailShowPayDto o2) {
+				if (o1.getShareProfitIndex()<o2.getShareProfitIndex()) {
+					return -1;
+				}
+				if (o1.getShareProfitIndex()>o2.getShareProfitIndex()) {
+					return 1;
+				}
+				return 0;
+			}
+    		
+    	});
     }
 }
