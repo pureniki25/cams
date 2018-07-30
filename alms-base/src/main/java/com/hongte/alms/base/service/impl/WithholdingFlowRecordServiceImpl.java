@@ -12,8 +12,11 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -319,39 +322,40 @@ public class WithholdingFlowRecordServiceImpl extends
                     log.error("@WithholdingFlowRecordServiceImpl@导入快钱代扣流水失败 调用eip下载快钱流水文件失败.msg:[{}]", rslt.getMsg());
                     throw new RuntimeException("调用eip下载快钱流水文件失败");
                 }
-                String retstr = rslt.getData().toString();
-                JSONObject jsonObject = JSONObject.parseObject(retstr);
-                if (jsonObject != null) {
+                Map<String,String> retMap = (Map<String,String>)rslt.getData();
+                if (retMap != null && !retMap.isEmpty()) {
                     WithholdingFlowRecord flow = new WithholdingFlowRecord();
                     flow.setWithholdingPlatform((Integer) PlatformEnum.KQ_FORM.getValue());
-                    flow.setMerchantNo(jsonObject.getString("merchantId"));
-                    try {
-                        flow.setLiquidationDate(
-                                new SimpleDateFormat("yyyy-MM-dd").parse(jsonObject.getString("transTime")));
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        flow.setTradeDate(
-                                new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(jsonObject.getString("entryTime")));
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                    flow.setMerchantOrderNo(jsonObject.getString("externalRefNumber"));
+                    flow.setMerchantNo(retMap.get("merchantId"));
+                    String transTime = retMap.get("transTime");
+                    String formatedTransTime = transTime.substring(0, 4) + "-"+
+                                               transTime.substring(4, 6)+"-"+
+                                               transTime.substring(6, 8);
+
+                    flow.setLiquidationDate( new SimpleDateFormat("yyyy-MM-dd", Locale.SIMPLIFIED_CHINESE).parse(formatedTransTime));
+                    String entryTime = retMap.get("entryTime");
+                    String formattedEntryTime = entryTime.substring(0, 4) + "-" +
+                                                entryTime.substring(4, 6) + "-"+
+                                                entryTime.substring(6, 8)+ " "+
+                                                entryTime.substring(8, 10)+ ":"+
+                                                entryTime.substring(10, 12)+ ":"+
+                                                entryTime.substring(12, 14);
+                    flow.setTradeDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",Locale.SIMPLIFIED_CHINESE).parse(formattedEntryTime));
+                    flow.setMerchantOrderNo(retMap.get("externalRefNumber"));
                     // flow.setTradeWaterNo(cols[5]);
-                    flow.setAmount(new BigDecimal(jsonObject.getString("amount")));
-                    flow.setTradeType(jsonObject.getString("txnType"));
+                    flow.setAmount(new BigDecimal(retMap.get("amount")));
+                    flow.setTradeType(retMap.get("txnType"));
                     // 接口没有状态，默认为成功
-                    String txnStatus = jsonObject.getString("txnStatus");
+                    String txnStatus = retMap.get("txnStatus");
                     if (Constant.TRADE_TYPE_MAP_KUAIQIAN.containsKey(txnStatus)) {
                         flow.setWithholdingStatus(Constant.TRADE_TYPE_MAP_KUAIQIAN.get(txnStatus));
                     }
-                    flow.setTerminalNo(jsonObject.getString("terminalId"));
-                    /*
-                     * flow.setServiceCharge(new BigDecimal(cols[9]));
-                     * flow.setProductName(cols[12]); flow.setPaymentCardType(cols[13]);
-                     * flow.setPaymentCardNo(cols[14]);
-                     */
+                    flow.setTerminalNo(retMap.get("terminalId"));
+                    
+                     /* flow.setServiceCharge(new BigDecimal(cols[9]));
+                      flow.setProductName(cols[12]); flow.setPaymentCardType(cols[13]);
+                      flow.setPaymentCardNo(cols[14]);*/
+                     
                     flow.setImportTime(new Date());
                     flow.setImportSystem(this.getClass().getSimpleName());
                     flow.insert();
