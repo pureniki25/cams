@@ -1,14 +1,15 @@
 package com.hongte.alms.base.service;
 
+import java.util.Date;
 import java.util.List;
 
+import com.baomidou.mybatisplus.plugins.Page;
+import com.hongte.alms.base.customer.vo.BankWithholdFlowVo;
 import com.hongte.alms.base.customer.vo.BfWithholdFlowVo;
 import com.hongte.alms.base.customer.vo.WithholdFlowReq;
-import com.hongte.alms.base.customer.vo.BankWithholdFlowVo;
-
-import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.customer.vo.YbWithholdFlowVo;
 import com.hongte.alms.base.entity.WithholdingRepaymentLog;
+import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.vo.module.RepaymentLogReq;
 import com.hongte.alms.base.vo.module.RepaymentLogVO;
 import com.hongte.alms.common.service.BaseService;
@@ -22,6 +23,11 @@ import com.hongte.alms.common.service.BaseService;
  * @since 2018-03-08
  */
 public interface WithholdingRepaymentLogService extends BaseService<WithholdingRepaymentLog> {
+
+    /**
+     * 查询指定清算日期范围内的代扣记录
+     */
+    List<WithholdingRepaymentLog> findByLiquidationDate(PlatformEnum pe, String beginTime, String endTime);
 
     /**
      * 分页查询
