@@ -25,7 +25,7 @@
             module_id AS moduleId, module_name AS moduleName, module_url AS moduleUrl, module_pid AS modulePid, module_level AS moduleLevel, module_desc AS moduleDesc, module_status AS moduleStatus, device_type AS deviceType, module_order AS moduleOrder, module_icon AS moduleIcon, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
         </sql>-->
 
-    <select id="selectAfterLoadStanding" resultType="com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo"
+    <select id="selectAfterLoadStandingBak" resultType="com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo"
             parameterType="com.hongte.alms.base.collection.vo.AfterLoanStandingBookReq">
 
         select
@@ -320,9 +320,8 @@
         </where>
         order BY  pList.due_date 
     </select>
-    
 	   
-	<select id="selectAfterLoadStandingBak" resultType="com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo"
+	<select id="selectAfterLoadStanding" resultType="com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo"
             parameterType="com.hongte.alms.base.collection.vo.AfterLoanStandingBookReq">
         select
         pList.orig_business_id AS businessId,
@@ -347,7 +346,7 @@
          AS businessTypeName,
         pList.borrow_money_ext AS borrowMoney,
         pList.total_borrow_amount as totalBorrowAmount,
-        (
+        <!-- (
         <![CDATA[
               case
                 WHEN pList.due_date is null then 0
@@ -357,8 +356,9 @@
                 ELSE  to_days(pList.fact_repay_date)- to_days(pList.due_date)
                 end
             ]]>
-        )as delayDays,
-
+        )as delayDays, -->
+        pList.delay_days_ext as delayDays,
+		pList.overdue_days,
         pList.due_date as dueDate,
         pList.fact_repay_date AS repaymentDate,
         col_status.phone_staff AS phoneStaffId,
@@ -373,7 +373,6 @@
 		pList.repayment_type_id_ext as repaymentTypeId ,
 		pList.class_name_ext className
         from tb_repayment_biz_plan_list_synch  as pList
-        LEFT JOIN (select * from  tb_basic_biz_customer as customer where customer.ismain_customer=1 group by customer.business_id ) as customer ON customer.business_id = pList.business_id_ext
         <choose>
             <!--  为电催专员  限制只查看分配给自己的期数-->
             <when test="userType!=null">
@@ -410,11 +409,13 @@
             </if>
             <!--             /*逾期天数 开始*/-->
             <if test="delayDaysBegin !=null ">
-                <![CDATA[ and pList.overdue_days >= #{delayDaysBegin}]]>
+           <!--      <![CDATA[ and pList.overdue_days >= #{delayDaysBegin}]]> -->
+                <![CDATA[ and pList.delay_days_ext >= #{delayDaysBegin}]]>
             </if>
             <!--       /*逾期天数 结束*/ -->
             <if test="delayDaysEnd !=null ">
-                <![CDATA[ and pList.overdue_days < #{delayDaysEnd}]]>
+             	<!-- <![CDATA[ and pList.overdue_days < #{delayDaysEnd}]]> -->
+                <![CDATA[ and pList.delay_days_ext < #{delayDaysEnd}]]>
             </if>
             <!--          /*//业务获取*/ -->
             <if test="operatorName !=null and operatorName !='' ">
@@ -449,7 +450,7 @@
                 and pList.current_status = #{repayStatus}
             </if>
             <if test="repayStatus !=null and repayStatus =='已结清' ">
-                and (pList.plan_status = 10 or pList.plan_status = 20 OR  pList.plan_status =30)
+                and (pList.plan_status_ext = 10 or pList.plan_status_ext = 20 OR  pList.plan_status_ext =30)
             </if>
             <!--   /*//清算一用户ID列表*/ -->
             <if test="liquidationOneUIds !=null ">
@@ -489,11 +490,11 @@
             </if>
             <!--   /*//身份证号*/ -->
             <if test="identifyCard !=null  and identifyCard !=''  ">
-                and customer.identify_card  LIKE '%${identifyCard}%'
+                and pList.identify_card_ext  LIKE '%${identifyCard}%'
             </if>
             <!--   /*//手机号*/ -->
             <if test="phoneNumber !=null  and phoneNumber !=''  ">
-                and customer.phone_number  LIKE '%${phoneNumber}%'
+                and pList.phone_number_ext  LIKE '%${phoneNumber}%'
             </if>
             <!--   /*//还款计划ID数组*/ -->
             <if test="crpIdsArray !=null">
