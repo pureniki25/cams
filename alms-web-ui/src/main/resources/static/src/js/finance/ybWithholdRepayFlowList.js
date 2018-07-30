@@ -94,6 +94,12 @@ window.layinit(function (htConfig) {
                                 // field: 'currentAmount',
                                 field: 'amount',
                                 title: '代扣金额',
+                            },
+                            {
+                                // field: 'createTime',
+                                field: 'liquidationDate',
+                                title: '清算日期',
+
                             }
                         ]], //设置表头
                         url: financePath + 'customer/getYbWithholdFlowPageList',

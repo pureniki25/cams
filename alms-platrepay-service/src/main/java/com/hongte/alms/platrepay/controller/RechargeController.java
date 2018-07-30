@@ -36,6 +36,7 @@ import com.hongte.alms.base.service.DepartmentBankService;
 import com.hongte.alms.base.service.TdrepayRechargeService;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.CommonUtil;
+import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.platrepay.vo.RechargeModalVO;
 import com.ht.ussp.bean.LoginUserInfoHelper;
@@ -52,7 +53,7 @@ public class RechargeController {
 	private static final String INVALID_PARAM_DESC = " Parameters cannot be null";
 
 	@Autowired
-	private EipRemote eipRemote; 
+	private EipRemote eipRemote;
 
 	@Autowired
 	private LoginUserInfoHelper loginUserInfoHelper;
@@ -109,7 +110,7 @@ public class RechargeController {
 			return Result.error("500", "获取所有的线下还款账户失败！");
 		}
 	}
-	
+
 	@ApiOperation(value = "根据业务类型ID获取所有代充值账户类型")
 	@GetMapping("/queryRechargeAccountTypeByBusinessType")
 	@ResponseBody
@@ -131,7 +132,6 @@ public class RechargeController {
 
 		Map<String, Object> paramMap = new HashMap<>();
 
-		
 		SysParameter sysParameter = tdrepayRechargeService.queryRechargeAccountSysParams(rechargeAccountType);
 		if (sysParameter == null) {
 			return Result.error("没有找到代充值账户的参数配置");
@@ -231,7 +231,7 @@ public class RechargeController {
 		}
 
 		try {
-			if ("0000".equals(result.getReturnCode())) {
+			if (Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
 
 				agencyRechargeLog.setResultJson(JSONObject.toJSONString(result));
 				agencyRechargeLog.setUpdateTime(new Date());
@@ -351,7 +351,8 @@ public class RechargeController {
 				return Result.error(INVALID_PARAM_CODE, "operator" + INVALID_PARAM_DESC);
 			}
 
-			SysParameter sysParameter = tdrepayRechargeService.queryRechargeAccountSysParams(vo.getRechargeAccountType());
+			SysParameter sysParameter = tdrepayRechargeService.queryRechargeAccountSysParams(BusinessTypeEnum
+					.getRechargeAccountNameByRechargeAccountId(Integer.parseInt(vo.getRechargeAccountType())));
 			if (sysParameter == null) {
 				return Result.error("没有找到代充值账户的参数配置，请检查充值账户类型是否正确");
 			}
