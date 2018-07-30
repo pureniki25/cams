@@ -408,7 +408,6 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
             if (StringUtil.isEmpty(planId)) {// 整个业务结清
             	BigDecimal factRepay = financeSettleBaseDto.getRepayFactAmount() ;
                 List<RepaymentBizPlanSettleDto> bizPlanSettleDtos = getCurrentPeriod(financeSettleReq);
-                financeSettleBaseDto.setS
                 Map<String,RepaymentProjPlanSettleDto>  projPlanSettleDtoMap = new HashMap<>();
 
                 //业务结清,整个业务的标的还款计划信息
@@ -434,7 +433,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
 
                 /*循环标的*/
-                financeSettleBaseDto.getRepaymentResources()
+                financeSettleBaseDto.getRepaymentResources();
                 /*financeSettleBaseDto.getRepaymentResources().
                 for(RepaymentProjPlanSettleDto repaymentProjPlanSettleDto:projPlanSettleDtoList){
                 	if (factRepay.compareTo(BigDecimal.ZERO)==0) {
@@ -503,7 +502,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     /**
      * 分配规则变更，重新写
      */
-    private void fillNew(FinanceBaseDto financeBaseDto) {
+   /* private void fillNew(FinanceBaseDto financeBaseDto) {
         RepaymentBizPlanDto dto = financeBaseDto.getPlanDto();
 
         // 上一次还款是否成功的标志位
@@ -593,6 +592,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         }
 
     }
+    */
 
     public void makeRepaymentPlanOnePlan(FinanceSettleBaseDto financeSettleBaseDto, RepaymentBizPlanList repaymentBizPlanListNow, FinanceSettleReq financeSettleReq) {
 
