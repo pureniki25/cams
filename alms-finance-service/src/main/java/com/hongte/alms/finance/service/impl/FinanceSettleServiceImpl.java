@@ -740,10 +740,10 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                 //更新业务的状态 及保存结清操作记录 更新流水状态
                 updateBizPlan(projMoneyMap, financeSettleBaseDto, allMoney, planIdNow, afterIdNow);
 
-//                updateMoneyPoolRepayment(financeSettleReq);
+                updateMoneyPoolRepayment(financeSettleReq);
 
                 //调用标的合规和还款接口 标的list
-//                repayLog(financeSettleBaseDto);
+                repayLog(financeSettleBaseDto);
 
             }
         }
@@ -781,10 +781,19 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         List<String> mprIds = financeSettleReq.getMprIds();
         if (CollectionUtils.isNotEmpty(mprIds)) {
             for (String id : mprIds) {
-                MoneyPoolRepayment moneyPoolRepayment = new MoneyPoolRepayment();
+                MoneyPoolRepayment moneyPoolRepayment = moneyPoolRepaymentMapper.selectById(id);
+
+                String moneyPoolId = moneyPoolRepayment.getMoneyPoolId();
+
+                moneyPoolRepayment.setLastState(moneyPoolRepayment.getState());
                 moneyPoolRepayment.setState(RepayRegisterFinanceStatus.财务确认已还款.toString());
-                moneyPoolRepayment.setId(Integer.parseInt(id));
                 moneyPoolRepaymentMapper.updateById(moneyPoolRepayment);
+
+                MoneyPool moneyPool = moneyPoolMapper.selectById(moneyPoolId);
+                moneyPool.setLastFinanceStatus(moneyPool.getFinanceStatus());
+                moneyPool.setFinanceStatus(RepayRegisterFinanceStatus.财务确认已还款.toString());
+                moneyPoolMapper.updateById(moneyPool);
+
             }
         }
     }

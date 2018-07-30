@@ -153,14 +153,39 @@
             <if test="realRepayDateEnd !=null ">
                 <![CDATA[ and pList.fact_repay_date <= #{realRepayDateEnd,jdbcType=TIMESTAMP}]]>
             </if>
+            <if test="delayDaysBegin != null">
+            	<![CDATA[ and (case
+                WHEN pList.due_date is null then 0
+                WHEN pList.due_date>now() THEN 0
+                WHEN pList.fact_repay_date is null then to_days(now())- to_days(pList.due_date)
+                WHEN pList.fact_repay_date<pList.due_date THEN 0
+                ELSE  to_days(pList.fact_repay_date)- to_days(pList.due_date)
+                end) >= #{delayDaysBegin}]]>
+            </if>
+            <if test="delayDaysEnd != null">
+            	<![CDATA[and (case
+                WHEN pList.due_date is null then 0
+                WHEN pList.due_date>now() THEN 0
+                WHEN pList.fact_repay_date is null then to_days(now())- to_days(pList.due_date)
+                WHEN pList.fact_repay_date<pList.due_date THEN 0
+                ELSE  to_days(pList.fact_repay_date)- to_days(pList.due_date)
+                end) < #{delayDaysEnd}]]>
+            </if> 
+            <!-- /*通过实还日期-应还日期来算逾期天数*/ -->
+            <!-- <if test="delayDaysBegin != null">
+            	<![CDATA[ and datediff(pList.fact_repay_date, pList.due_date) >= #{delayDaysBegin}]]>
+            </if>
+            <if test="delayDaysEnd != null">
+            	<![CDATA[and datediff(pList.fact_repay_date, pList.due_date) < #{delayDaysEnd}]]>
+            </if>  -->
             <!--             /*逾期天数 开始*/-->
-            <if test="delayDaysBegin !=null ">
+            <!-- <if test="delayDaysBegin !=null ">
                 <![CDATA[ and pList.overdue_days >= #{delayDaysBegin}]]>
-            </if>
+            </if> -->
             <!--       /*逾期天数 结束*/ -->
-            <if test="delayDaysEnd !=null ">
+            <!-- <if test="delayDaysEnd !=null ">
                 <![CDATA[ and pList.overdue_days < #{delayDaysEnd}]]>
-            </if>
+            </if> -->
             <!--          /*//业务获取*/ -->
             <if test="operatorName !=null and operatorName !='' ">
                 and business.operator_name LIKE '%${operatorName}%'

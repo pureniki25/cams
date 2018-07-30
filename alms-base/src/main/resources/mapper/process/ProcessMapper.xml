@@ -311,7 +311,7 @@
                 (business.business_id  LIKE '%${keyWord}%')
                 or (business.customer_name  LIKE '%${keyWord}%')
                 or (process.process_name LIKE '%${keyWord}%')
-                or (process.create_user LIKE	 '%${keyWord}%'))
+                or (process.create_user LIKE	 '%${keyWord}%')
                 <!--  发起人列表 -->
                 <if test="startUserIds !=null">
                     OR process.create_user  IN
@@ -320,6 +320,7 @@
                         #{userId}
                     </foreach>
                 </if>
+                )
             </if>
 
             <!--          /*发起时间 开始*/ -->
