@@ -14,12 +14,12 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 /**
- * 导入代扣流水-易宝
- * Created by 张贵宏 on 2018/7/16 9:50
+ * 导入代扣流水-快钱
+ * Created by 张贵宏 on 2018/7/30 9:50
  */
-@JobHandler("ImportWidthholdingFlowFromYiBaoJob")
+@JobHandler("ImportWidthholdingFlowFromKuaiQianJob")
 @Component
-public class ImportWidthholdingFlowFromYiBaoJob extends IJobHandler {
+public class ImportWidthholdingFlowFromKuaiQianJob extends IJobHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportWidthholdingFlowFromYiBaoJob.class);
     @Autowired
     @Qualifier("WithholdingFlowRecordService")
@@ -28,18 +28,18 @@ public class ImportWidthholdingFlowFromYiBaoJob extends IJobHandler {
     @Override
     public ReturnT<String> execute(String s) throws Exception {
         try {
-            LOGGER.info("@ImportWidthholdingFlowFromYiBaoJob@导入代扣流水-易宝 开始.");
+            LOGGER.info("@ImportWidthholdingFlowFromKuaiQianJob@导入代扣流水-快钱 开始.");
             long start = System.currentTimeMillis();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             String settleDate = formatter.format(LocalDate.now().minusDays(1));
             //默认取前一天的数据
-            LOGGER.info("@ImportWidthholdingFlowFromYiBaoJob@导入代扣流水-易宝 正在处理[{}]的结清数据.", settleDate);
-            withholdingFlowRecordService.importWidthholdingFlowFromYiBao(settleDate);
+            LOGGER.info("@ImportWidthholdingFlowFromKuaiQianJob@导入代扣流水-快钱 正在处理[{}]的结清数据.", settleDate);
+            withholdingFlowRecordService.importWidthholdingFlowFromKuaiQian(settleDate);
             long end = System.currentTimeMillis();
-            LOGGER.info("@ImportWidthholdingFlowFromYiBaoJob@导入代扣流水-易宝 结束.耗时:[{}]ms", end-start);
+            LOGGER.info("@ImportWidthholdingFlowFromKuaiQianJob@导入代扣流水-快钱 结束.耗时:[{}]ms", end-start);
             return SUCCESS;
         } catch (Exception e) {
-            LOGGER.error("@ImportWidthholdingFlowFromYiBaoJob@导入代扣流水-易宝 异常.", e);
+            LOGGER.error("@ImportWidthholdingFlowFromKuaiQianJob@导入代扣流水-快钱 异常.", e);
             return FAIL;
         }
     }

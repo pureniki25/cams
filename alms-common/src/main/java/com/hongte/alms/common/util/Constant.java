@@ -1,5 +1,6 @@
 package com.hongte.alms.common.util;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -283,4 +284,14 @@ public class Constant {
         TRADE_SUB_TYPE_MAP_BAOFU.put("02", "撤销");
     }
 
+	/**
+	 * 快钱交易状态
+	 */
+	public static Map<String,String> TRADE_TYPE_MAP_KUAIQIAN=null;
+	static{
+		TRADE_TYPE_MAP_KUAIQIAN = new HashMap<String,String>();
+		TRADE_TYPE_MAP_KUAIQIAN.put("S", "成功");
+		TRADE_TYPE_MAP_KUAIQIAN.put("F", "失败");
+		TRADE_TYPE_MAP_KUAIQIAN.put("P", "挂起");
+	}
 }
