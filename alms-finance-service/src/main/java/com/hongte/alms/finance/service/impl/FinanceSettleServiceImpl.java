@@ -3290,6 +3290,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     
 
     @Override
+    @Transactional(rollbackFor = {ServiceRuntimeException.class, Exception.class})
     public void financeSettleRecall(String businessId, String afterId) {
 
         List<RepaymentConfirmLog> logs = confirmLogMapper.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("business_id", businessId).eq("after_id", afterId).orderBy("create_time", false));
