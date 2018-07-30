@@ -399,7 +399,6 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         //查出当前还款计划的当前期
         RepaymentBizPlanList repaymentBizPlanList = bizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId));
 
-//        List<RepaymentBizPlanList> repaymentBizPlanLists = repaymentBizPlanListMapper.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).orderBy("due_date", true));
 
 
         if (repaymentBizPlanList != null) {
@@ -508,6 +507,13 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
 
             } else {
+                List<RepaymentBizPlanList> repaymentBizPlanLists = repaymentBizPlanListMapper.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", planId).orderBy("period", true));
+
+                Integer period = repaymentBizPlanList.getPeriod();
+                String currentStatus = repaymentBizPlanList.getCurrentStatus();
+                if( RepayCurrentStatusEnums.逾期.toString().equals(currentStatus) && period.intValue() !=repaymentBizPlanLists.size()-1){
+                    throw new ServiceRuntimeException("当前逾期不能进行还款计划结清!");
+                }
                 //单个还款计划结清
 //                RepaymentBizPlan repaymentBizPlan = bizPlanService.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("business_id", businessId).eq("plan_id", planId));
 
