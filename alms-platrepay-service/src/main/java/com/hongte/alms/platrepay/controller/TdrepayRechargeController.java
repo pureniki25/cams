@@ -843,7 +843,7 @@ public class TdrepayRechargeController {
 			List<RepaymentProjPlan> repaymentProjPlans = repaymentProjPlanService
 					.selectList(new EntityWrapper<RepaymentProjPlan>().eq("project_id", projectId));
 			if (CollectionUtils.isEmpty(repaymentProjPlans)) {
-				return null;
+				return Result.success();
 			}
 			return Result.success(repaymentProjPlans.get(0));
 		} catch (Exception e) {
