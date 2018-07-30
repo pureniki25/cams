@@ -241,6 +241,13 @@ public class TdrepayRechargeController {
 					}
 				}
 			}*/
+			
+			int count = tdrepayRechargeLogService
+					.selectCount(new EntityWrapper<TdrepayRechargeLog>().eq("project_id", vo.getProjectId())
+							.eq("confirm_log_id", vo.getConfirmLogId()).eq("is_valid", 1).eq("after_id", vo.getAfterId()));
+			if (count > 0) {
+				return Result.error("-99", "异常：数据重复推送");
+			}
 
 			// 根据projectId查询平台还垫付信息
 			Map<String, com.ht.ussp.core.Result> resultMap = tdrepayRechargeService
