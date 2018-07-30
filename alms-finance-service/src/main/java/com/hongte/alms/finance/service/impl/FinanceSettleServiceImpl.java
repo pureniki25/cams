@@ -408,31 +408,29 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
                 List<RepaymentBizPlanSettleDto> bizPlanSettleDtos = getCurrentPeriod(financeSettleReq);
 
-                Map<String,RepaymentProjPlanSettleDto>  projPlanSettleDtoMap = new HashMap<>();
+                Map<String, RepaymentProjPlanSettleDto> projPlanSettleDtoMap = new HashMap<>();
 
                 List<RepaymentProjPlanSettleDto> projPlanSettleDtoList = new LinkedList<>();
 
-                for(RepaymentBizPlanSettleDto repaymentBizPlanSettleDto:bizPlanSettleDtos){
+                for (RepaymentBizPlanSettleDto repaymentBizPlanSettleDto : bizPlanSettleDtos) {
                     List<RepaymentProjPlanSettleDto> repaymentProjPlanSettleDtos = repaymentBizPlanSettleDto.getProjPlanStteleDtos();
 
-                    for(RepaymentProjPlanSettleDto repaymentProjPlanSettleDto:repaymentProjPlanSettleDtos){
+                    for (RepaymentProjPlanSettleDto repaymentProjPlanSettleDto : repaymentProjPlanSettleDtos) {
                         RepaymentProjPlanSettleDto projPlanSettleDto = projPlanSettleDtoMap.get(repaymentProjPlanSettleDto.getTuandaiProjectInfo().getProjectId());
-                        if(projPlanSettleDto!=null){
-                            logger.error("此业务有两个以上相同的标的还款计划 projPlanSettleDto"+ JSON.toJSONString(projPlanSettleDto));
+                        if (projPlanSettleDto != null) {
+                            logger.error("此业务有两个以上相同的标的还款计划 projPlanSettleDto" + JSON.toJSONString(projPlanSettleDto));
                             throw new SettleRepaymentExcepiton("此业务有两个以上相同的标的还款计划", ExceptionCodeEnum.TOW_PROJ_PLAN.getValue().toString());
                         }
-                        projPlanSettleDtoMap.put(repaymentProjPlanSettleDto.getTuandaiProjectInfo().getProjectId(),repaymentProjPlanSettleDto);
+                        projPlanSettleDtoMap.put(repaymentProjPlanSettleDto.getTuandaiProjectInfo().getProjectId(), repaymentProjPlanSettleDto);
                         projPlanSettleDtoList.add(repaymentProjPlanSettleDto);
                     }
                 }
 
 
-
-                for(RepaymentProjPlanSettleDto repaymentProjPlanSettleDto:projPlanSettleDtoList){
+                for (RepaymentProjPlanSettleDto repaymentProjPlanSettleDto : projPlanSettleDtoList) {
                     //按标分销
 
                 }
-
 
 
 //                //根据业务id找出这个业务的所有还款计划列表
@@ -847,44 +845,47 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                 if (newVo != null) {
                     RepaymentBizPlanList repaymentBizPlanList = bizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", planIdNow).eq("after_id", afterIdNow));
                     String planListIdNow = repaymentBizPlanList.getPlanListId();//当期
+                    Integer periodNow = repaymentBizPlanList.getPeriod();
 
 
                     //整个还款计划其它期 都为已还款
                     List<RepaymentBizPlanList> repaymentBizPlanLists = repaymentBizPlanListMapper.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", planIdNow));
                     if (CollectionUtils.isNotEmpty(repaymentBizPlanLists)) {
                         for (RepaymentBizPlanList repaymentBizPlanListN : repaymentBizPlanLists) {
-                            RepaymentBizPlanListBak repaymentBizPlanListBak = new RepaymentBizPlanListBak();
-                            repaymentBizPlanListBak.setConfirmLogId(financeSettleBaseDto.getUuid());
-                            BeanUtils.copyProperties(repaymentBizPlanListN, repaymentBizPlanListBak);
-                            repaymentBizPlanListBakMapper.insert(repaymentBizPlanListBak);
+                            Integer periodInner = repaymentBizPlanListN.getPeriod();
+                            if (periodInner.intValue() >= periodNow.intValue()) { //当前期 后面的期的修改
+                                RepaymentBizPlanListBak repaymentBizPlanListBak = new RepaymentBizPlanListBak();
+                                repaymentBizPlanListBak.setConfirmLogId(financeSettleBaseDto.getUuid());
+                                BeanUtils.copyProperties(repaymentBizPlanListN, repaymentBizPlanListBak);
+                                repaymentBizPlanListBakMapper.insert(repaymentBizPlanListBak);
 
 
-                            repaymentBizPlanListN.setCurrentStatus(RepayCurrentStatusEnums.已还款.toString());
-                            repaymentBizPlanListN.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
-                            repaymentBizPlanListN.setRepayFlag(PepayPlanRepayFlagStatusEnum.UNDERLINE_ALL_SETTLE.getValue());
-                            repaymentBizPlanListN.setFactRepayDate(new Date());
-                            repaymentBizPlanListN.setFinanceComfirmDate(new Date());
-                            repaymentBizPlanListN.setFinanceConfirmUser(financeSettleBaseDto.getUserId());
-                            repaymentBizPlanListN.setFinanceConfirmUserName(financeSettleBaseDto.getUserName());
-                            repaymentBizPlanListMapper.updateById(repaymentBizPlanListN);
+                                repaymentBizPlanListN.setCurrentStatus(RepayCurrentStatusEnums.已还款.toString());
+                                repaymentBizPlanListN.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
+                                repaymentBizPlanListN.setRepayFlag(PepayPlanRepayFlagStatusEnum.UNDERLINE_ALL_SETTLE.getValue());
+                                repaymentBizPlanListN.setFactRepayDate(new Date());
+                                repaymentBizPlanListN.setFinanceComfirmDate(new Date());
+                                repaymentBizPlanListN.setFinanceConfirmUser(financeSettleBaseDto.getUserId());
+                                repaymentBizPlanListN.setFinanceConfirmUserName(financeSettleBaseDto.getUserName());
+                                repaymentBizPlanListMapper.updateById(repaymentBizPlanListN);
 
-                            RepaymentBizPlanListSynch synch = new RepaymentBizPlanListSynch();
-                            synch.setPlanListId(repaymentBizPlanListN.getPlanListId());
-                            synch = repaymentBizPlanListSynchMapper.selectOne(synch);
-                            synch.setCurrentStatus(repaymentBizPlanListN.getCurrentStatus());
-                            synch.setCurrentSubStatus(repaymentBizPlanListN.getCurrentSubStatus());
-                            synch.setRepayStatus(repaymentBizPlanListN.getRepayStatus());
-                            synch.setRepayFlag(repaymentBizPlanListN.getRepayFlag());
-                            synch.setFinanceConfirmUser(repaymentBizPlanListN.getFinanceConfirmUser());
-                            synch.setFinanceConfirmUserName(repaymentBizPlanListN.getFinanceConfirmUserName());
+                                RepaymentBizPlanListSynch synch = new RepaymentBizPlanListSynch();
+                                synch.setPlanListId(repaymentBizPlanListN.getPlanListId());
+                                synch = repaymentBizPlanListSynchMapper.selectOne(synch);
+                                synch.setCurrentStatus(repaymentBizPlanListN.getCurrentStatus());
+                                synch.setCurrentSubStatus(repaymentBizPlanListN.getCurrentSubStatus());
+                                synch.setRepayStatus(repaymentBizPlanListN.getRepayStatus());
+                                synch.setRepayFlag(repaymentBizPlanListN.getRepayFlag());
+                                synch.setFinanceConfirmUser(repaymentBizPlanListN.getFinanceConfirmUser());
+                                synch.setFinanceConfirmUserName(repaymentBizPlanListN.getFinanceConfirmUserName());
 
-                            if (planListIdNow.equals(repaymentBizPlanListN.getPlanListId())) {
-                                synch.setFactAmountExt(allFactMoney);
+                                if (planListIdNow.equals(repaymentBizPlanListN.getPlanListId())) {
+                                    synch.setFactAmountExt(allFactMoney);
+                                }
+                                repaymentBizPlanListSynchMapper.updateAllColumnById(synch);
                             }
-                            repaymentBizPlanListSynchMapper.updateAllColumnById(synch);
 
                         }
-
 
                     }
 
@@ -1585,9 +1586,9 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 //        repaymentSettleLogDetailLists.add(repaymentSettleLogDetail);
 
             webFactRepays.put(projPlanId, vo);
-        }else {
+        } else {
             List<SettleFeesVO> otherFees = financeSettleBaseDto.getOtherFees();
-            SettleFeesVO settleFeesVO=new SettleFeesVO();
+            SettleFeesVO settleFeesVO = new SettleFeesVO();
             settleFeesVO.setFeeId(moneyDto.getFeeId());
             settleFeesVO.setFeeName(moneyDto.getFeeName());
             settleFeesVO.setAmount(amount);
@@ -2790,143 +2791,142 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
 
 	/* (non-Javadoc)
-	 * @see com.hongte.alms.finance.service.FinanceSettleService#getCurrentPeriod(com.hongte.alms.finance.req.FinanceSettleReq)
+     * @see com.hongte.alms.finance.service.FinanceSettleService#getCurrentPeriod(com.hongte.alms.finance.req.FinanceSettleReq)
 	 */
 
     /**
      * 取还款计划的当前期
+     *
      * @param req
      * @return
      */
-	@Override
-	public List<RepaymentBizPlanSettleDto> getCurrentPeriod(FinanceSettleReq req) {
-		EntityWrapper<RepaymentBizPlan> ew = new EntityWrapper<RepaymentBizPlan>();
-		ew.eq("business_id", req.getBusinessId());
-		//如果传了还款计划Id，则使用还款计划Id来查业务的还款计划
-		if (!StringUtil.isEmpty(req.getPlanId())) {
-			ew.eq("plan_id", req.getPlanId());
-		}
+    @Override
+    public List<RepaymentBizPlanSettleDto> getCurrentPeriod(FinanceSettleReq req) {
+        EntityWrapper<RepaymentBizPlan> ew = new EntityWrapper<RepaymentBizPlan>();
+        ew.eq("business_id", req.getBusinessId());
+        //如果传了还款计划Id，则使用还款计划Id来查业务的还款计划
+        if (!StringUtil.isEmpty(req.getPlanId())) {
+            ew.eq("plan_id", req.getPlanId());
+        }
 
-		List<RepaymentBizPlan> plan = repaymentBizPlanMapper.selectList(ew);
-		List<RepaymentBizPlanSettleDto> res = new ArrayList<>() ;
-		//结清日期
-        Date  settleDate = new Date();
-		//根据查出的还款计划列表找业务还款计划的当前期
-    	for (RepaymentBizPlan repaymentBizPlan : plan) {
+        List<RepaymentBizPlan> plan = repaymentBizPlanMapper.selectList(ew);
+        List<RepaymentBizPlanSettleDto> res = new ArrayList<>();
+        //结清日期
+        Date settleDate = new Date();
+        //根据查出的还款计划列表找业务还款计划的当前期
+        for (RepaymentBizPlan repaymentBizPlan : plan) {
             //找出这个还款计划的期数列表
             List<RepaymentBizPlanList> BizPlanLists = repaymentBizPlanListMapper.selectList(
                     new EntityWrapper<RepaymentBizPlanList>()
                             .eq("business_id", req.getBusinessId())
                             .eq("plan_id", repaymentBizPlan.getPlanId())
-                            .orderBy("due_date",false));
+                            .orderBy("due_date", false));
 
-    	    //找应还日期离当前日期最近且为还款中的期数作为当前期
-    		List<RepaymentBizPlanList> selectList = repaymentBizPlanListMapper.selectList(
-					new EntityWrapper<RepaymentBizPlanList>()
-					.eq("business_id", req.getBusinessId())
-					.eq("plan_id", repaymentBizPlan.getPlanId())
-					.gt("due_date", settleDate)
-					.eq("current_status", RepayCurrentStatusEnums.还款中.toString())
-					.orderBy("due_date"));
-    		//判断当前期列表是否为空
-			if (CollectionUtils.isEmpty(selectList)) {
-			    //找不到还款中的当前期则判断结清日期是否大过还款计划最后一次还款的期限
+            //找应还日期离当前日期最近且为还款中的期数作为当前期
+            List<RepaymentBizPlanList> selectList = repaymentBizPlanListMapper.selectList(
+                    new EntityWrapper<RepaymentBizPlanList>()
+                            .eq("business_id", req.getBusinessId())
+                            .eq("plan_id", repaymentBizPlan.getPlanId())
+                            .gt("due_date", settleDate)
+                            .eq("current_status", RepayCurrentStatusEnums.还款中.toString())
+                            .orderBy("due_date"));
+            //判断当前期列表是否为空
+            if (CollectionUtils.isEmpty(selectList)) {
+                //找不到还款中的当前期则判断结清日期是否大过还款计划最后一次还款的期限
 
-                RepaymentBizPlanList  lastBizPlanList =  BizPlanLists.get(0);
+                RepaymentBizPlanList lastBizPlanList = BizPlanLists.get(0);
                 //如果最后一期的应还时间小于当前的结清时间
-                if(DateUtil.getDiff(lastBizPlanList.getDueDate(),settleDate) <=0){
+                if (DateUtil.getDiff(lastBizPlanList.getDueDate(), settleDate) <= 0) {
                     //且为未还款
-                    if(!lastBizPlanList.getCurrentStatus().equals(RepayCurrentStatusEnums.已还款.toString())){
+                    if (!lastBizPlanList.getCurrentStatus().equals(RepayCurrentStatusEnums.已还款.toString())) {
                         selectList = new LinkedList<RepaymentBizPlanList>();
                         selectList.add(lastBizPlanList);
                     }
                 }
-			}
-			//再次判断当前期列表是否为空
+            }
+            //再次判断当前期列表是否为空
             if (CollectionUtils.isEmpty(selectList)) {
                 if (!StringUtil.isEmpty(req.getPlanId())) {
-                    logger.error("找此业务还款计划的当前期 RepaymentBizPlanList  businessId:"+req.getBusinessId()+"     planId:"+repaymentBizPlan.getPlanId());
+                    logger.error("找此业务还款计划的当前期 RepaymentBizPlanList  businessId:" + req.getBusinessId() + "     planId:" + repaymentBizPlan.getPlanId());
                     throw new SettleRepaymentExcepiton("找此业务还款计划的当前期", ExceptionCodeEnum.NO_BIZ_PLAN_LIST.getValue().toString());
-                }else{
+                } else {
                     continue;
                 }
             }
 
-			//业务还款计划当前期列表
-			List<RepaymentBizPlanList> cuRepaymentBizPlanLists = new ArrayList<>() ;
-			cuRepaymentBizPlanLists.add(selectList.get(0)) ;
+            //业务还款计划当前期列表
+            List<RepaymentBizPlanList> cuRepaymentBizPlanLists = new ArrayList<>();
+            cuRepaymentBizPlanLists.add(selectList.get(0));
 
-			//业务还款计划Dto
-    		RepaymentBizPlanSettleDto planDto = new RepaymentBizPlanSettleDto() ;
-			planDto.setRepaymentBizPlan(repaymentBizPlan);
-
-
+            //业务还款计划Dto
+            RepaymentBizPlanSettleDto planDto = new RepaymentBizPlanSettleDto();
+            planDto.setRepaymentBizPlan(repaymentBizPlan);
 
 
-			for (RepaymentBizPlanList curRepaymentBizPlanList : cuRepaymentBizPlanLists) {
-				RepaymentBizPlanListDto planListDto = new RepaymentBizPlanListDto() ;
-				planListDto.setRepaymentBizPlanList(curRepaymentBizPlanList);
-				List<RepaymentBizPlanListDetail> planListDetails = repaymentBizPlanListDetailMapper.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", curRepaymentBizPlanList.getPlanListId())) ;
+            for (RepaymentBizPlanList curRepaymentBizPlanList : cuRepaymentBizPlanLists) {
+                RepaymentBizPlanListDto planListDto = new RepaymentBizPlanListDto();
+                planListDto.setRepaymentBizPlanList(curRepaymentBizPlanList);
+                List<RepaymentBizPlanListDetail> planListDetails = repaymentBizPlanListDetailMapper.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", curRepaymentBizPlanList.getPlanListId()));
 
-				planListDto.setBizPlanListDetails(planListDetails);
+                planListDto.setBizPlanListDetails(planListDetails);
 
-				//业务还款计划，当前期设置业务还款计划列表（应该有一个字段专门存储业务还款计划的当前期）
+                //业务还款计划，当前期设置业务还款计划列表（应该有一个字段专门存储业务还款计划的当前期）
                 planDto.setCurrBizPlanListDto(planListDto);
 
 
-                List<RepaymentBizPlanListDto>  planListDtos = new LinkedList<>();
+                List<RepaymentBizPlanListDto> planListDtos = new LinkedList<>();
 
                 List<RepaymentBizPlanListDto> beforePlanListDtos = new LinkedList<>();
 
                 List<RepaymentBizPlanListDto> afterPlanListDtos = new LinkedList<>();
 
 
-                for(RepaymentBizPlanList  bizPlanList:BizPlanLists){
+                for (RepaymentBizPlanList bizPlanList : BizPlanLists) {
 
 
-                    RepaymentBizPlanListDto dto = new RepaymentBizPlanListDto() ;
+                    RepaymentBizPlanListDto dto = new RepaymentBizPlanListDto();
                     dto.setRepaymentBizPlanList(curRepaymentBizPlanList);
-                    List<RepaymentBizPlanListDetail> details = repaymentBizPlanListDetailMapper.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", curRepaymentBizPlanList.getPlanListId())) ;
+                    List<RepaymentBizPlanListDetail> details = repaymentBizPlanListDetailMapper.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", curRepaymentBizPlanList.getPlanListId()));
 
                     dto.setBizPlanListDetails(details);
 
                     //如果是当前期，则不存储
-                    if(bizPlanList.getPeriod() == curRepaymentBizPlanList.getPeriod()){
+                    if (bizPlanList.getPeriod() == curRepaymentBizPlanList.getPeriod()) {
                         continue;
                     }
-                    if(bizPlanList.getPeriod()<curRepaymentBizPlanList.getPeriod()){
+                    if (bizPlanList.getPeriod() < curRepaymentBizPlanList.getPeriod()) {
                         beforePlanListDtos.add(dto);
-                    }else if(bizPlanList.getPeriod()>curRepaymentBizPlanList.getPeriod()){
+                    } else if (bizPlanList.getPeriod() > curRepaymentBizPlanList.getPeriod()) {
                         afterPlanListDtos.add(dto);
                     }
                 }
 
                 //当前期之前的还款计划列表
-				planDto.setBeforeBizPlanListDtos(beforePlanListDtos);
+                planDto.setBeforeBizPlanListDtos(beforePlanListDtos);
 
                 //当前期之后的还款计划列表
                 planDto.setAfterBizPlanListDtos(afterPlanListDtos);
-			}
+            }
 
 
-			//根据还款计划id，查找出标的还款计划列表
-			List<RepaymentProjPlan> projPlans = repaymentProjPlanMapper.selectList(new EntityWrapper<RepaymentProjPlan>().eq("plan_id", repaymentBizPlan.getPlanId()));
-			for (RepaymentProjPlan repaymentProjPlan : projPlans) {
-				RepaymentProjPlanSettleDto projPlanDto = new RepaymentProjPlanSettleDto() ;
-				projPlanDto.setRepaymentProjPlan(repaymentProjPlan);
-				TuandaiProjectInfo projectInfo = tuandaiProjectInfoMapper.selectById(repaymentProjPlan.getProjectId());
-				projPlanDto.setTuandaiProjectInfo(projectInfo);
+            //根据还款计划id，查找出标的还款计划列表
+            List<RepaymentProjPlan> projPlans = repaymentProjPlanMapper.selectList(new EntityWrapper<RepaymentProjPlan>().eq("plan_id", repaymentBizPlan.getPlanId()));
+            for (RepaymentProjPlan repaymentProjPlan : projPlans) {
+                RepaymentProjPlanSettleDto projPlanDto = new RepaymentProjPlanSettleDto();
+                projPlanDto.setRepaymentProjPlan(repaymentProjPlan);
+                TuandaiProjectInfo projectInfo = tuandaiProjectInfoMapper.selectById(repaymentProjPlan.getProjectId());
+                projPlanDto.setTuandaiProjectInfo(projectInfo);
 
-				//取标的还款计划当前期
-				List<RepaymentProjPlanList> curprojPlanLists = repaymentProjPlanListMapper.selectList(
-						new EntityWrapper<RepaymentProjPlanList>().eq("proj_plan_id", repaymentProjPlan.getProjPlanId()).eq("plan_list_id", cuRepaymentBizPlanLists.get(0).getPlanListId()));
+                //取标的还款计划当前期
+                List<RepaymentProjPlanList> curprojPlanLists = repaymentProjPlanListMapper.selectList(
+                        new EntityWrapper<RepaymentProjPlanList>().eq("proj_plan_id", repaymentProjPlan.getProjPlanId()).eq("plan_list_id", cuRepaymentBizPlanLists.get(0).getPlanListId()));
 
-				//如果找不到这个标的还款计划当前期
-				if(CollectionUtils.isEmpty(selectList)){
-                    logger.error("找不到这个标的还款计划当前期 RepaymentProjPlanList  proj_plan_id:"+repaymentProjPlan.getProjPlanId()+"     plan_list_id:"+cuRepaymentBizPlanLists.get(0).getPlanListId());
+                //如果找不到这个标的还款计划当前期
+                if (CollectionUtils.isEmpty(selectList)) {
+                    logger.error("找不到这个标的还款计划当前期 RepaymentProjPlanList  proj_plan_id:" + repaymentProjPlan.getProjPlanId() + "     plan_list_id:" + cuRepaymentBizPlanLists.get(0).getPlanListId());
                     throw new SettleRepaymentExcepiton("找不到这个标的还款计划当前期", ExceptionCodeEnum.NO_BIZ_PLAN_LIST.getValue().toString());
-                }else if(selectList.size()>1){
-                    logger.error("这个标有两个以上当前期 RepaymentProjPlanList  proj_plan_id:"+repaymentProjPlan.getProjPlanId()+"     plan_list_id:"+cuRepaymentBizPlanLists.get(0).getPlanListId());
+                } else if (selectList.size() > 1) {
+                    logger.error("这个标有两个以上当前期 RepaymentProjPlanList  proj_plan_id:" + repaymentProjPlan.getProjPlanId() + "     plan_list_id:" + cuRepaymentBizPlanLists.get(0).getPlanListId());
                     throw new SettleRepaymentExcepiton("这个标有两个以上当前期", ExceptionCodeEnum.NO_BIZ_PLAN_LIST.getValue().toString());
                 }
 
@@ -2937,67 +2937,67 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                 //取标的还款计划所有期
                 List<RepaymentProjPlanList> projPlanLists = repaymentProjPlanListMapper.selectList(
                         new EntityWrapper<RepaymentProjPlanList>().eq("proj_plan_id", repaymentProjPlan.getProjPlanId())
-                        .orderBy("due_date"));
+                                .orderBy("due_date"));
 
 
-                List<RepaymentProjPlanListDto>  beforeProjPlanListDtos = new LinkedList<>();
+                List<RepaymentProjPlanListDto> beforeProjPlanListDtos = new LinkedList<>();
                 List<RepaymentProjPlanListDto> afterProjPlanListDtos = new LinkedList<>();
 
-				for (RepaymentProjPlanList repaymentProjPlanList : projPlanLists) {
+                for (RepaymentProjPlanList repaymentProjPlanList : projPlanLists) {
                     RepaymentProjPlanListDto projPlanListDto = creatProjPlanListDto(repaymentProjPlanList);
                     projPlanDto.setProjPlanListDtos(projPlanListDto);
-                    if(repaymentProjPlanList.getPeriod()>curRepayProjPlanList.getPeriod()){
+                    if (repaymentProjPlanList.getPeriod() > curRepayProjPlanList.getPeriod()) {
                         afterProjPlanListDtos.add(projPlanListDto);
-                    }else if(repaymentProjPlanList.getPeriod()<curRepayProjPlanList.getPeriod()){
+                    } else if (repaymentProjPlanList.getPeriod() < curRepayProjPlanList.getPeriod()) {
                         beforeProjPlanListDtos.add(projPlanListDto);
                     }
 
-				}
+                }
 
                 projPlanDto.setBeforeProjPlanListDtos(beforeProjPlanListDtos);
                 projPlanDto.setAfterProjPlanListDtos(afterProjPlanListDtos);
 
 
-				//planDto.setProjPlanDtos(projPlanDto);
+                //planDto.setProjPlanDtos(projPlanDto);
                 planDto.setProjPlanStteleDtos(projPlanDto);
-			}
+            }
 
 
-			res.add(planDto);
-		}
+            res.add(planDto);
+        }
 
-		//将当前期之前的和当前期之后的费用项累加到当前期
-        for(RepaymentBizPlanSettleDto  bizPlanDto:res){
+        //将当前期之前的和当前期之后的费用项累加到当前期
+        for (RepaymentBizPlanSettleDto bizPlanDto : res) {
 
             List<RepaymentProjPlanSettleDto> projPlanDtos = bizPlanDto.getProjPlanStteleDtos();
 
-            for(RepaymentProjPlanSettleDto repaymentProjPlanDto:projPlanDtos){
+            for (RepaymentProjPlanSettleDto repaymentProjPlanDto : projPlanDtos) {
 
                 RepaymentProjPlanListDto repaymentProjPlanListDto = repaymentProjPlanDto.getCurrProjPlanListDto();
                 List<RepaymentProjPlanListDto> curRepaymentProjPlanListDtos = new LinkedList<>();
                 curRepaymentProjPlanListDtos.add(repaymentProjPlanListDto);
                 //当期结清，应支付的费用明细
-                Map<String,PlanListDetailShowPayDto> curShowPayMoney = calcShowPayFeels(curRepaymentProjPlanListDtos,null);
+                Map<String, PlanListDetailShowPayDto> curShowPayMoney = calcShowPayFeels(curRepaymentProjPlanListDtos, null);
                 repaymentProjPlanDto.setCurShowPayFeels(curShowPayMoney);
 
                 //当前期之前期数费用的统计
-                Map<String,PlanListDetailShowPayDto> beforeFeels = calcShowPayFeels(repaymentProjPlanDto.getBeforeProjPlanListDtos(),null);
+                Map<String, PlanListDetailShowPayDto> beforeFeels = calcShowPayFeels(repaymentProjPlanDto.getBeforeProjPlanListDtos(), null);
                 repaymentProjPlanDto.setBeforeFeels(beforeFeels);
 
                 //当前期之后期数费用的统计(只累加本金)
-                Map<String,PlanListDetailShowPayDto> afterFeels =  calcShowPayFeels(repaymentProjPlanDto.getAfterProjPlanListDtos(),RepayPlanFeeTypeEnum.PRINCIPAL.getUuid());
+                Map<String, PlanListDetailShowPayDto> afterFeels = calcShowPayFeels(repaymentProjPlanDto.getAfterProjPlanListDtos(), RepayPlanFeeTypeEnum.PRINCIPAL.getUuid());
                 repaymentProjPlanDto.setAfterFeels(afterFeels);
 
                 //之前期应还费用累加
-                for(PlanListDetailShowPayDto planListDetailShowPayDto:beforeFeels.values()){
-                    PlanListDetailShowPayDto showPayDto =  curShowPayMoney.get(planListDetailShowPayDto.getFeelId());
-                    addToCurShowPay(showPayDto,curShowPayMoney);
+                for (PlanListDetailShowPayDto planListDetailShowPayDto : beforeFeels.values()) {
+                    PlanListDetailShowPayDto showPayDto = curShowPayMoney.get(planListDetailShowPayDto.getFeelId());
+                    addToCurShowPay(showPayDto, curShowPayMoney);
                 }
 
                 //之后期应还费用累加
-                for(PlanListDetailShowPayDto planListDetailShowPayDto:afterFeels.values()){
-                    PlanListDetailShowPayDto showPayDto =  curShowPayMoney.get(planListDetailShowPayDto.getFeelId());
-                    addToCurShowPay(showPayDto,curShowPayMoney);
+                for (PlanListDetailShowPayDto planListDetailShowPayDto : afterFeels.values()) {
+                    PlanListDetailShowPayDto showPayDto = curShowPayMoney.get(planListDetailShowPayDto.getFeelId());
+                    addToCurShowPay(showPayDto, curShowPayMoney);
                 }
 
 
@@ -3005,59 +3005,57 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         }
 
 
-		return res;
-	}
+        return res;
+    }
 
 
-	private  void  addToCurShowPay(PlanListDetailShowPayDto showPayDto,Map<String,PlanListDetailShowPayDto> curShowPayMoney){
-        if(showPayDto == null){
+    private void addToCurShowPay(PlanListDetailShowPayDto showPayDto, Map<String, PlanListDetailShowPayDto> curShowPayMoney) {
+        if (showPayDto == null) {
             showPayDto = new PlanListDetailShowPayDto();
-            BeanUtils.copyProperties(showPayDto,showPayDto);
-            curShowPayMoney.put(showPayDto.getFeelId(),showPayDto);
-        }else{
+            BeanUtils.copyProperties(showPayDto, showPayDto);
+            curShowPayMoney.put(showPayDto.getFeelId(), showPayDto);
+        } else {
             showPayDto.setShowPayMoney(showPayDto.getShowPayMoney().add(showPayDto.getShowPayMoney()));
         }
     }
 
 
-
-
-	private  Map<String,PlanListDetailShowPayDto>  calcShowPayFeels(List<RepaymentProjPlanListDto> projPlanLists,String feelId){
+    private Map<String, PlanListDetailShowPayDto> calcShowPayFeels(List<RepaymentProjPlanListDto> projPlanLists, String feelId) {
         //当前期之前期数费用的统计
-        Map<String,PlanListDetailShowPayDto> beforeFeels = new HashMap<>();
-        for(RepaymentProjPlanListDto bforePlanDto: projPlanLists){
-             calcShowPayFeel(bforePlanDto,feelId,beforeFeels);
+        Map<String, PlanListDetailShowPayDto> beforeFeels = new HashMap<>();
+        for (RepaymentProjPlanListDto bforePlanDto : projPlanLists) {
+            calcShowPayFeel(bforePlanDto, feelId, beforeFeels);
         }
 
 
-	    return beforeFeels;
+        return beforeFeels;
     }
 
-    private void calcShowPayFeel(RepaymentProjPlanListDto bforePlanDto,String feelId,Map<String,PlanListDetailShowPayDto> beforeFeels){
-        List<RepaymentProjPlanListDetailDto> repaymentProjPlanListDetailDtos =bforePlanDto.getRepaymentProjPlanListDetailDtos();
-        for(RepaymentProjPlanListDetailDto projPlanListDetailDto: repaymentProjPlanListDetailDtos){
-            RepaymentProjPlanListDetail  detail1 =projPlanListDetailDto.getRepaymentProjPlanListDetail();
+    private void calcShowPayFeel(RepaymentProjPlanListDto bforePlanDto, String feelId, Map<String, PlanListDetailShowPayDto> beforeFeels) {
+        List<RepaymentProjPlanListDetailDto> repaymentProjPlanListDetailDtos = bforePlanDto.getRepaymentProjPlanListDetailDtos();
+        for (RepaymentProjPlanListDetailDto projPlanListDetailDto : repaymentProjPlanListDetailDtos) {
+            RepaymentProjPlanListDetail detail1 = projPlanListDetailDto.getRepaymentProjPlanListDetail();
             //如果指定了需累加的费用项，则其他费用项都跳过
-            if(feelId!=null && !feelId.equals(detail1.getFeeId())){
+            if (feelId != null && !feelId.equals(detail1.getFeeId())) {
                 continue;
             }
 
             List<RepaymentProjFactRepay> factRepayList = projPlanListDetailDto.getRepaymentProjFactRepays();
-            if(!CollectionUtils.isEmpty(factRepayList)){
-                BigDecimal  payedMoney = new BigDecimal("0");
-                for(RepaymentProjFactRepay repaymentProjFactRepay: factRepayList){
-                    payedMoney =payedMoney.add(repaymentProjFactRepay.getFactAmount());
+            if (!CollectionUtils.isEmpty(factRepayList)) {
+                BigDecimal payedMoney = new BigDecimal("0");
+                for (RepaymentProjFactRepay repaymentProjFactRepay : factRepayList) {
+                    payedMoney = payedMoney.add(repaymentProjFactRepay.getFactAmount());
                 }
 
-                BigDecimal  showPayMoney = detail1.getProjPlanAmount().subtract(payedMoney);
-                if(showPayMoney.compareTo(new BigDecimal("0"))>0){
-                    PlanListDetailShowPayDto  planListDetailShowPayDto = beforeFeels.get(detail1.getFeeId());
-                    if(planListDetailShowPayDto == null){
+                BigDecimal showPayMoney = detail1.getProjPlanAmount().subtract(payedMoney);
+                if (showPayMoney.compareTo(new BigDecimal("0")) > 0) {
+                    PlanListDetailShowPayDto planListDetailShowPayDto = beforeFeels.get(detail1.getFeeId());
+                    if (planListDetailShowPayDto == null) {
                         planListDetailShowPayDto = new PlanListDetailShowPayDto();
                         planListDetailShowPayDto.setFeelId(detail1.getFeeId());
                         planListDetailShowPayDto.setShareProfitIndex(detail1.getShareProfitIndex());
                         planListDetailShowPayDto.setShowPayMoney(new BigDecimal("0"));
-                        beforeFeels.put(detail1.getFeeId(),planListDetailShowPayDto);
+                        beforeFeels.put(detail1.getFeeId(), planListDetailShowPayDto);
                     }
                     planListDetailShowPayDto.setShowPayMoney(planListDetailShowPayDto.getShowPayMoney().add(showPayMoney));
                 }
@@ -3065,12 +3063,11 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         }
     }
 
-	//showPayFeels =
+    //showPayFeels =
 
 
-
-    private  RepaymentProjPlanListDto   creatProjPlanListDto(RepaymentProjPlanList repaymentProjPlanList){
-        RepaymentProjPlanListDto projPlanListDto = new RepaymentProjPlanListDto() ;
+    private RepaymentProjPlanListDto creatProjPlanListDto(RepaymentProjPlanList repaymentProjPlanList) {
+        RepaymentProjPlanListDto projPlanListDto = new RepaymentProjPlanListDto();
         projPlanListDto.setRepaymentProjPlanList(repaymentProjPlanList);
 
         List<RepaymentProjPlanListDetail> projPlanListDetails = repaymentProjPlanListDetailMapper.selectList(
@@ -3079,14 +3076,14 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         projPlanListDto.setProjPlanListDetails(projPlanListDetails);
 
 
-        List<RepaymentProjPlanListDetailDto>  repaymentProjPlanListDetailDtos = new LinkedList<>();
-        for(RepaymentProjPlanListDetail projPlanListDetail:  projPlanListDetails ){
-            RepaymentProjPlanListDetailDto  projPlanListDetailDto = new RepaymentProjPlanListDetailDto();
+        List<RepaymentProjPlanListDetailDto> repaymentProjPlanListDetailDtos = new LinkedList<>();
+        for (RepaymentProjPlanListDetail projPlanListDetail : projPlanListDetails) {
+            RepaymentProjPlanListDetailDto projPlanListDetailDto = new RepaymentProjPlanListDetailDto();
             repaymentProjPlanListDetailDtos.add(projPlanListDetailDto);
             projPlanListDetailDto.setRepaymentProjPlanListDetail(projPlanListDetail);
 
-            List<RepaymentProjFactRepay>  factRepayList = repaymentProjFactRepayMapper.selectList(
-                    new EntityWrapper<RepaymentProjFactRepay>().eq("proj_plan_detail_id",projPlanListDetail.getProjPlanDetailId())
+            List<RepaymentProjFactRepay> factRepayList = repaymentProjFactRepayMapper.selectList(
+                    new EntityWrapper<RepaymentProjFactRepay>().eq("proj_plan_detail_id", projPlanListDetail.getProjPlanDetailId())
             );
             projPlanListDetailDto.setRepaymentProjFactRepays(factRepayList);
         }
@@ -3094,7 +3091,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
         return projPlanListDto;
     }
-    
+
 
     @Override
     public void financeSettleRecall(String businessId, String afterId) {
@@ -3220,150 +3217,150 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     }
 
 
-	@Override
-	@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
-	public void bak(FinanceSettleBaseDto base, List<RepaymentBizPlanSettleDto> dtos) {
-		if (base.getPreview()) {
-			return;
-		}
-		String confirmLogId = base.getUuid();
-		for (RepaymentBizPlanSettleDto repaymentBizPlanSettleDto : dtos) {
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
+    public void bak(FinanceSettleBaseDto base, List<RepaymentBizPlanSettleDto> dtos) {
+        if (base.getPreview()) {
+            return;
+        }
+        String confirmLogId = base.getUuid();
+        for (RepaymentBizPlanSettleDto repaymentBizPlanSettleDto : dtos) {
 			/*备份bizPlan*/
-			RepaymentBizPlanBak repaymentBizPlanBak = new RepaymentBizPlanBak();
-			BeanUtils.copyProperties(repaymentBizPlanSettleDto.getRepaymentBizPlan(), repaymentBizPlanBak);
-			repaymentBizPlanBak.setConfirmLogId(confirmLogId);
-			repaymentBizPlanBak.insert();
+            RepaymentBizPlanBak repaymentBizPlanBak = new RepaymentBizPlanBak();
+            BeanUtils.copyProperties(repaymentBizPlanSettleDto.getRepaymentBizPlan(), repaymentBizPlanBak);
+            repaymentBizPlanBak.setConfirmLogId(confirmLogId);
+            repaymentBizPlanBak.insert();
 
-			List<RepaymentBizPlanListDto> afterBizPlanListDtos = repaymentBizPlanSettleDto.getAfterBizPlanListDtos();
-			List<RepaymentBizPlanListDto> beforeBizPlanListDtos = repaymentBizPlanSettleDto.getBeforeBizPlanListDtos();
-			RepaymentBizPlanListDto currBizPlanListDto = repaymentBizPlanSettleDto.getCurrBizPlanListDto();
-			List<RepaymentProjPlanSettleDto> projPlanStteleDtos = repaymentBizPlanSettleDto.getProjPlanStteleDtos();
+            List<RepaymentBizPlanListDto> afterBizPlanListDtos = repaymentBizPlanSettleDto.getAfterBizPlanListDtos();
+            List<RepaymentBizPlanListDto> beforeBizPlanListDtos = repaymentBizPlanSettleDto.getBeforeBizPlanListDtos();
+            RepaymentBizPlanListDto currBizPlanListDto = repaymentBizPlanSettleDto.getCurrBizPlanListDto();
+            List<RepaymentProjPlanSettleDto> projPlanStteleDtos = repaymentBizPlanSettleDto.getProjPlanStteleDtos();
 
 			/*备份当前期以后的*/
-			for (RepaymentBizPlanListDto afterBizPlanListDto : afterBizPlanListDtos) {
+            for (RepaymentBizPlanListDto afterBizPlanListDto : afterBizPlanListDtos) {
 				/*备份当前期以后的bizPlanList*/
-				RepaymentBizPlanListBak repaymentBizPlanListBak = new RepaymentBizPlanListBak();
-				BeanUtils.copyProperties(afterBizPlanListDto.getRepaymentBizPlanList(), repaymentBizPlanListBak);
-				repaymentBizPlanListBak.setConfirmLogId(confirmLogId);
-				repaymentBizPlanListBak.insert();
+                RepaymentBizPlanListBak repaymentBizPlanListBak = new RepaymentBizPlanListBak();
+                BeanUtils.copyProperties(afterBizPlanListDto.getRepaymentBizPlanList(), repaymentBizPlanListBak);
+                repaymentBizPlanListBak.setConfirmLogId(confirmLogId);
+                repaymentBizPlanListBak.insert();
 
 				/*备份当前期以后的bizPlanListDetail*/
-				for (RepaymentBizPlanListDetail bizPlanListDetail : afterBizPlanListDto.getBizPlanListDetails()) {
-					RepaymentBizPlanListDetailBak bizPlanListDetailBak = new RepaymentBizPlanListDetailBak();
-					BeanUtils.copyProperties(bizPlanListDetail, bizPlanListDetailBak);
-					bizPlanListDetailBak.setConfirmLogId(confirmLogId);
-					bizPlanListDetailBak.insert();
-				}
-			}
+                for (RepaymentBizPlanListDetail bizPlanListDetail : afterBizPlanListDto.getBizPlanListDetails()) {
+                    RepaymentBizPlanListDetailBak bizPlanListDetailBak = new RepaymentBizPlanListDetailBak();
+                    BeanUtils.copyProperties(bizPlanListDetail, bizPlanListDetailBak);
+                    bizPlanListDetailBak.setConfirmLogId(confirmLogId);
+                    bizPlanListDetailBak.insert();
+                }
+            }
 			/*备份当前期以前的*/
-			for (RepaymentBizPlanListDto beforeBizPlanListDto : beforeBizPlanListDtos) {
+            for (RepaymentBizPlanListDto beforeBizPlanListDto : beforeBizPlanListDtos) {
 				/*备份当前期以前的bizPlanList*/
-				RepaymentBizPlanListBak repaymentBizPlanListBak = new RepaymentBizPlanListBak();
-				BeanUtils.copyProperties(beforeBizPlanListDto.getRepaymentBizPlanList(), repaymentBizPlanListBak);
-				repaymentBizPlanListBak.setConfirmLogId(confirmLogId);
-				repaymentBizPlanListBak.insert();
+                RepaymentBizPlanListBak repaymentBizPlanListBak = new RepaymentBizPlanListBak();
+                BeanUtils.copyProperties(beforeBizPlanListDto.getRepaymentBizPlanList(), repaymentBizPlanListBak);
+                repaymentBizPlanListBak.setConfirmLogId(confirmLogId);
+                repaymentBizPlanListBak.insert();
 
 				/*备份当前期以前的bizPlanListDetail*/
-				for (RepaymentBizPlanListDetail bizPlanListDetail : beforeBizPlanListDto.getBizPlanListDetails()) {
-					RepaymentBizPlanListDetailBak bizPlanListDetailBak = new RepaymentBizPlanListDetailBak();
-					BeanUtils.copyProperties(bizPlanListDetail, bizPlanListDetailBak);
-					bizPlanListDetailBak.setConfirmLogId(confirmLogId);
-					bizPlanListDetailBak.insert();
-				}
-			}
+                for (RepaymentBizPlanListDetail bizPlanListDetail : beforeBizPlanListDto.getBizPlanListDetails()) {
+                    RepaymentBizPlanListDetailBak bizPlanListDetailBak = new RepaymentBizPlanListDetailBak();
+                    BeanUtils.copyProperties(bizPlanListDetail, bizPlanListDetailBak);
+                    bizPlanListDetailBak.setConfirmLogId(confirmLogId);
+                    bizPlanListDetailBak.insert();
+                }
+            }
 
 			/*备份当前期当前期的BizPlanLis*/
-			RepaymentBizPlanListBak currBizPlanListBak = new RepaymentBizPlanListBak();
-			BeanUtils.copyProperties(currBizPlanListDto.getRepaymentBizPlanList(), currBizPlanListBak);
-			currBizPlanListBak.setConfirmLogId(confirmLogId);
-			currBizPlanListBak.insert();
+            RepaymentBizPlanListBak currBizPlanListBak = new RepaymentBizPlanListBak();
+            BeanUtils.copyProperties(currBizPlanListDto.getRepaymentBizPlanList(), currBizPlanListBak);
+            currBizPlanListBak.setConfirmLogId(confirmLogId);
+            currBizPlanListBak.insert();
 			/*备份当前期当前期的BizPlanListDetail*/
-			for (RepaymentBizPlanListDetail cuRepaymentBizPlanListDetail : currBizPlanListDto.getBizPlanListDetails()) {
-				RepaymentBizPlanListDetailBak bizPlanListDetailBak = new RepaymentBizPlanListDetailBak();
-				BeanUtils.copyProperties(cuRepaymentBizPlanListDetail, bizPlanListDetailBak);
-				bizPlanListDetailBak.setConfirmLogId(confirmLogId);
-				bizPlanListDetailBak.insert();
-			}
+            for (RepaymentBizPlanListDetail cuRepaymentBizPlanListDetail : currBizPlanListDto.getBizPlanListDetails()) {
+                RepaymentBizPlanListDetailBak bizPlanListDetailBak = new RepaymentBizPlanListDetailBak();
+                BeanUtils.copyProperties(cuRepaymentBizPlanListDetail, bizPlanListDetailBak);
+                bizPlanListDetailBak.setConfirmLogId(confirmLogId);
+                bizPlanListDetailBak.insert();
+            }
 
 			/*备份标的*/
-			for (RepaymentProjPlanSettleDto repaymentProjPlanSettleDto : projPlanStteleDtos) {
+            for (RepaymentProjPlanSettleDto repaymentProjPlanSettleDto : projPlanStteleDtos) {
 				/*备份projPlan*/
-				RepaymentProjPlanBak projPlanBak = new RepaymentProjPlanBak();
-				BeanUtils.copyProperties(repaymentProjPlanSettleDto.getRepaymentProjPlan(), projPlanBak);
-				projPlanBak.setConfirmLogId(confirmLogId);
-				projPlanBak.insert();
+                RepaymentProjPlanBak projPlanBak = new RepaymentProjPlanBak();
+                BeanUtils.copyProperties(repaymentProjPlanSettleDto.getRepaymentProjPlan(), projPlanBak);
+                projPlanBak.setConfirmLogId(confirmLogId);
+                projPlanBak.insert();
 
-				List<RepaymentProjPlanListDto> afterProjPlanListDtos = repaymentProjPlanSettleDto
-						.getAfterProjPlanListDtos();
-				List<RepaymentProjPlanListDto> beforeProjPlanListDtos = repaymentProjPlanSettleDto
-						.getBeforeProjPlanListDtos();
-				RepaymentProjPlanListDto currProjPlanListDto = repaymentProjPlanSettleDto.getCurrProjPlanListDto();
+                List<RepaymentProjPlanListDto> afterProjPlanListDtos = repaymentProjPlanSettleDto
+                        .getAfterProjPlanListDtos();
+                List<RepaymentProjPlanListDto> beforeProjPlanListDtos = repaymentProjPlanSettleDto
+                        .getBeforeProjPlanListDtos();
+                RepaymentProjPlanListDto currProjPlanListDto = repaymentProjPlanSettleDto.getCurrProjPlanListDto();
 
 				/*备份当前期之后的*/
-				for (RepaymentProjPlanListDto afterProjPlanListDto : afterProjPlanListDtos) {
+                for (RepaymentProjPlanListDto afterProjPlanListDto : afterProjPlanListDtos) {
 
-					RepaymentProjPlanList repaymentProjPlanList = afterProjPlanListDto.getRepaymentProjPlanList();
-					List<RepaymentProjPlanListDetail> projPlanListDetails = afterProjPlanListDto
-							.getProjPlanListDetails();
+                    RepaymentProjPlanList repaymentProjPlanList = afterProjPlanListDto.getRepaymentProjPlanList();
+                    List<RepaymentProjPlanListDetail> projPlanListDetails = afterProjPlanListDto
+                            .getProjPlanListDetails();
 
 					/*备份当前期之后的projPlanList*/
-					RepaymentProjPlanListBak projPlanListBak = new RepaymentProjPlanListBak();
-					BeanUtils.copyProperties(repaymentProjPlanList, projPlanListBak);
-					projPlanListBak.setConfirmLogId(confirmLogId);
-					projPlanListBak.insert();
+                    RepaymentProjPlanListBak projPlanListBak = new RepaymentProjPlanListBak();
+                    BeanUtils.copyProperties(repaymentProjPlanList, projPlanListBak);
+                    projPlanListBak.setConfirmLogId(confirmLogId);
+                    projPlanListBak.insert();
 
 					/*备份当前期之后的projPlanListDetail*/
-					for (RepaymentProjPlanListDetail repaymentProjPlanListDetail : projPlanListDetails) {
-						RepaymentProjPlanListDetailBak projPlanListDetailBak = new RepaymentProjPlanListDetailBak();
-						BeanUtils.copyProperties(repaymentProjPlanListDetail, projPlanListDetailBak);
-						projPlanListDetailBak.setConfirmLogId(confirmLogId);
-						projPlanListDetailBak.insert();
-					}
+                    for (RepaymentProjPlanListDetail repaymentProjPlanListDetail : projPlanListDetails) {
+                        RepaymentProjPlanListDetailBak projPlanListDetailBak = new RepaymentProjPlanListDetailBak();
+                        BeanUtils.copyProperties(repaymentProjPlanListDetail, projPlanListDetailBak);
+                        projPlanListDetailBak.setConfirmLogId(confirmLogId);
+                        projPlanListDetailBak.insert();
+                    }
 
-				}
+                }
 
 				/*备份当前期之前的*/
-				for (RepaymentProjPlanListDto beforeProjPlanListDto : beforeProjPlanListDtos) {
-					RepaymentProjPlanList repaymentProjPlanList = beforeProjPlanListDto.getRepaymentProjPlanList();
-					List<RepaymentProjPlanListDetail> projPlanListDetails = beforeProjPlanListDto
-							.getProjPlanListDetails();
+                for (RepaymentProjPlanListDto beforeProjPlanListDto : beforeProjPlanListDtos) {
+                    RepaymentProjPlanList repaymentProjPlanList = beforeProjPlanListDto.getRepaymentProjPlanList();
+                    List<RepaymentProjPlanListDetail> projPlanListDetails = beforeProjPlanListDto
+                            .getProjPlanListDetails();
 
 					/*备份当前期之前的projPlanList*/
-					RepaymentProjPlanListBak projPlanListBak = new RepaymentProjPlanListBak();
-					BeanUtils.copyProperties(repaymentProjPlanList, projPlanListBak);
-					projPlanListBak.setConfirmLogId(confirmLogId);
-					projPlanListBak.insert();
+                    RepaymentProjPlanListBak projPlanListBak = new RepaymentProjPlanListBak();
+                    BeanUtils.copyProperties(repaymentProjPlanList, projPlanListBak);
+                    projPlanListBak.setConfirmLogId(confirmLogId);
+                    projPlanListBak.insert();
 
 					/*备份当前期之前的projPlanListDetail*/
-					for (RepaymentProjPlanListDetail repaymentProjPlanListDetail : projPlanListDetails) {
-						RepaymentProjPlanListDetailBak projPlanListDetailBak = new RepaymentProjPlanListDetailBak();
-						BeanUtils.copyProperties(repaymentProjPlanListDetail, projPlanListDetailBak);
-						projPlanListDetailBak.setConfirmLogId(confirmLogId);
-						projPlanListDetailBak.insert();
-					}
+                    for (RepaymentProjPlanListDetail repaymentProjPlanListDetail : projPlanListDetails) {
+                        RepaymentProjPlanListDetailBak projPlanListDetailBak = new RepaymentProjPlanListDetailBak();
+                        BeanUtils.copyProperties(repaymentProjPlanListDetail, projPlanListDetailBak);
+                        projPlanListDetailBak.setConfirmLogId(confirmLogId);
+                        projPlanListDetailBak.insert();
+                    }
 
-				}
+                }
 
-				RepaymentProjPlanList repaymentProjPlanList = currProjPlanListDto.getRepaymentProjPlanList();
-				List<RepaymentProjPlanListDetail> projPlanListDetails = currProjPlanListDto.getProjPlanListDetails();
+                RepaymentProjPlanList repaymentProjPlanList = currProjPlanListDto.getRepaymentProjPlanList();
+                List<RepaymentProjPlanListDetail> projPlanListDetails = currProjPlanListDto.getProjPlanListDetails();
 
 				/*备份当前期的ProjPlanList*/
-				RepaymentProjPlanListBak projPlanListBak = new RepaymentProjPlanListBak();
-				BeanUtils.copyProperties(repaymentProjPlanList, projPlanListBak);
-				projPlanListBak.setConfirmLogId(confirmLogId);
-				projPlanListBak.insert();
+                RepaymentProjPlanListBak projPlanListBak = new RepaymentProjPlanListBak();
+                BeanUtils.copyProperties(repaymentProjPlanList, projPlanListBak);
+                projPlanListBak.setConfirmLogId(confirmLogId);
+                projPlanListBak.insert();
 
 				/*备份当前期的projPlanListDetail*/
-				for (RepaymentProjPlanListDetail repaymentProjPlanListDetail : projPlanListDetails) {
-					RepaymentProjPlanListDetailBak projPlanListDetailBak = new RepaymentProjPlanListDetailBak();
-					BeanUtils.copyProperties(repaymentProjPlanListDetail, projPlanListDetailBak);
-					projPlanListDetailBak.setConfirmLogId(confirmLogId);
-					projPlanListDetailBak.insert();
-				}
-			}
-		}
+                for (RepaymentProjPlanListDetail repaymentProjPlanListDetail : projPlanListDetails) {
+                    RepaymentProjPlanListDetailBak projPlanListDetailBak = new RepaymentProjPlanListDetailBak();
+                    BeanUtils.copyProperties(repaymentProjPlanListDetail, projPlanListDetailBak);
+                    projPlanListDetailBak.setConfirmLogId(confirmLogId);
+                    projPlanListDetailBak.insert();
+                }
+            }
+        }
 
-	}
+    }
 
 
 }
