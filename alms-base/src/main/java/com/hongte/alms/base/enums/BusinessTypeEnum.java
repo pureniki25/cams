@@ -32,11 +32,11 @@ public enum BusinessTypeEnum implements IEnum {
 	YOU_FANG_TYPE(35, "优房贷", 1002, Constant.HOUSE_LOAN, 5);
 
 
-    private int value;
-    private String name;
-    private int rechargeAccountId;
-    private String rechargeAccountName;
-    private int orgType;
+    private int value;	// 业务类型ID
+    private String name;	// 业务类型名称
+    private int rechargeAccountId;	// 代充值账户编号
+    private String rechargeAccountName;	// 代充值账户名称
+    private int orgType;	// 对应团代网tdUserName
 
     /**
      * 结构：（businessType, businessTypeName, rechargeAccountId, rechargeAccountName）
