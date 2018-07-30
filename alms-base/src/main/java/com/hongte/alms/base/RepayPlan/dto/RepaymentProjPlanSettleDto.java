@@ -1,5 +1,6 @@
 package com.hongte.alms.base.RepayPlan.dto;
 
+import com.hongte.alms.base.entity.RepaymentProjPlanListDetail;
 import lombok.Data;
 import org.apache.commons.collections.CollectionUtils;
 
@@ -20,6 +21,16 @@ public class RepaymentProjPlanSettleDto extends  RepaymentProjPlanDto {
      * 当前期业务还款计划
      */
     private RepaymentProjPlanListDto  currProjPlanListDto;
+
+    /**
+     * 当前期应还费用项Map  Map<feeId,PlanListDetailShowPayDto>
+     */
+    private Map<String,RepaymentProjPlanListDetail>  curProjListDetailMap;
+
+    /**
+     * 当前期结清应还费用项Map  Map<feeId,PlanListDetailShowPayDto>
+     */
+    private Map<String,PlanListDetailShowPayDto> curShowPayFeels;
 
     /**
      * 当前期之前的业务还款计划列表

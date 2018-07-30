@@ -1,8 +1,11 @@
 package com.hongte.alms.finance.req;
 
 import com.hongte.alms.base.RepayPlan.dto.RepaymentBizPlanDto;
+import com.hongte.alms.base.RepayPlan.dto.RepaymentBizPlanSettleDto;
+import com.hongte.alms.base.RepayPlan.dto.RepaymentProjPlanSettleDto;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
+import com.hongte.alms.base.vo.finance.SettleFeesVO;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -106,5 +109,14 @@ public class FinanceSettleBaseDto {
    private List<RepaymentSettleLogDetail> repaymentSettleLogDetailList=new ArrayList<>();
 
    private List<RepaymentProjPlanList> ptojPlanList = new ArrayList<>();
+
+    private List<SettleFeesVO> otherFees =new ArrayList<>();
+    
+    
+    
+    //整个业务结清还款计划列表
+    List<RepaymentBizPlanSettleDto>  bizSettleBizPlanDtos;
+    //整个业务结清标的还款计划列表
+    List<RepaymentProjPlanSettleDto> bizSettleProjPlanDtos;
 
 }
