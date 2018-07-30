@@ -510,53 +510,59 @@ public class RepayPlanController {
     	List<String> needBusinessTypes=req.getBusinessTypes();
     	
     	 BasicBizCustomer customer=basicBizCustomerService.selectOne(new EntityWrapper<BasicBizCustomer>().eq("identify_card", req.getIdentifyCard()));
+    	 if(customer==null) {
+    		 Result.error("9889", "找不到客户信息");
+    	 }
     	 Integer isMainCustomer=customer.getIsmainCustomer();//是否主借款人
     	 req.setIsMainCustomer(isMainCustomer);
-    	 
-    	List<TuandaiProjectInfo> infos=tuandaiProjectInfoService.selectList(new EntityWrapper<TuandaiProjectInfo>().eq("identity_card", req.getIdentifyCard()));
-    	List<BasicBusiness> basicBusinessList=new ArrayList();
-    	for(TuandaiProjectInfo info:infos) {
-    		BasicBusiness business=basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", info.getBusinessId()));
-    		if(business!=null) {
-    			basicBusinessList.add(business);
-    		}
-    	}
-    	for(Iterator<BasicBusiness> it=basicBusinessList.iterator();it.hasNext();) {
-    		BasicBusiness business=it.next();
-    		BasicBusinessType businessType=basicBusinessTypeService.selectOne(new EntityWrapper<BasicBusinessType>().eq("business_type_id", business.getBusinessType()));
-    		boolean isContainsBusinessType=false;
-    		for(String needBusinessType:needBusinessTypes) {
-    			if(businessType.getXdBusinessTypeId().contains(needBusinessType)) {
-    				isContainsBusinessType=true;
-    				break;
-	       		}else {
-	       			isContainsBusinessType=false;
-	       		}
-    		}
-    		if(!isContainsBusinessType) {
-    			it.remove();//过滤APP不需要的业务类型
-    		}
-    		
-    	}
-    	List<String> businessIds=new ArrayList();
-    	for(BasicBusiness business:basicBusinessList) {
-    		businessIds.add(business.getBusinessId());
-    	}
-        logger.info("根据业务ID列表查找出业务账单列表 开始，业务ID列表：[{}]", JSON.toJSONString(businessIds));
-
-       List<BizDto> bizDtos = new LinkedList<>();
-
-       for(String businessId:businessIds){
-           BizDto bizDto =getBizDtoByBizId(businessId,req);
-           if(bizDto.getPlanDtoList()==null) {
-        	   continue;
-           }
-           bizDtos.add(bizDto);
-       }
-        bizDtos=getPageList(bizDtos, req.getPageSize(), req.getCurPageNo());
-        logger.info("根据业务ID列表查找出业务账单列表 结束，返回数据：[{}]", JSON.toJSONString(bizDtos));
-
-       return Result.success(bizDtos);
+    	 try {
+		    	List<TuandaiProjectInfo> infos=tuandaiProjectInfoService.selectList(new EntityWrapper<TuandaiProjectInfo>().eq("identity_card", req.getIdentifyCard()));
+		    	List<BasicBusiness> basicBusinessList=new ArrayList();
+		    	for(TuandaiProjectInfo info:infos) {
+		    		BasicBusiness business=basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", info.getBusinessId()));
+		    		if(business!=null) {
+		    			basicBusinessList.add(business);
+		    		}
+		    	}
+		    	for(Iterator<BasicBusiness> it=basicBusinessList.iterator();it.hasNext();) {
+		    		BasicBusiness business=it.next();
+		    		BasicBusinessType businessType=basicBusinessTypeService.selectOne(new EntityWrapper<BasicBusinessType>().eq("business_type_id", business.getBusinessType()));
+		    		boolean isContainsBusinessType=false;
+		    		for(String needBusinessType:needBusinessTypes) {
+		    			if(businessType.getXdBusinessTypeId().contains(needBusinessType)) {
+		    				isContainsBusinessType=true;
+		    				break;
+			       		}else {
+			       			isContainsBusinessType=false;
+			       		}
+		    		}
+		    		if(!isContainsBusinessType) {
+		    			it.remove();//过滤APP不需要的业务类型
+		    		}
+		    		
+		    	}
+		    	List<String> businessIds=new ArrayList();
+		    	for(BasicBusiness business:basicBusinessList) {
+		    		businessIds.add(business.getBusinessId());
+		    	}
+		        logger.info("根据业务ID列表查找出业务账单列表 开始，业务ID列表：[{}]", JSON.toJSONString(businessIds));
+		
+		       List<BizDto> bizDtos = new LinkedList<>();
+		
+		       for(String businessId:businessIds){
+		           BizDto bizDto =getBizDtoByBizId(businessId,req);
+		           if(bizDto.getPlanDtoList()==null) {
+		        	   continue;
+		           }
+		           bizDtos.add(bizDto);
+		       }
+		        bizDtos=getPageList(bizDtos, req.getPageSize(), req.getCurPageNo());
+		        logger.info("根据业务ID列表查找出业务账单列表 结束，返回数据：[{}]", JSON.toJSONString(bizDtos));
+		
+		       return Result.success(bizDtos);
+    	 }catch(Exception e) {
+    		  return Result.error("找出业务账单列表出错"+e);
+    	 }
    }
     
     
