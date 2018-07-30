@@ -1,11 +1,16 @@
 package com.hongte.alms.base.service.impl;
 
+import java.util.Date;
+import java.util.List;
+
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
+import com.hongte.alms.base.customer.vo.BankWithholdFlowVo;
 import com.hongte.alms.base.customer.vo.BfWithholdFlowVo;
 import com.hongte.alms.base.customer.vo.WithholdFlowReq;
-import com.hongte.alms.base.customer.vo.BankWithholdFlowVo;
 import com.hongte.alms.base.customer.vo.YbWithholdFlowVo;
 import com.hongte.alms.base.entity.WithholdingRepaymentLog;
+import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.mapper.WithholdingRepaymentLogMapper;
 import com.hongte.alms.base.service.WithholdingRepaymentLogService;
 import com.hongte.alms.base.vo.module.RepaymentLogReq;
@@ -13,11 +18,10 @@ import com.hongte.alms.base.vo.module.RepaymentLogVO;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.LoginInfoDto;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 /**
  * <p>
@@ -35,6 +39,15 @@ public class WithholdingRepaymentLogServiceImpl extends BaseServiceImpl<Withhold
 
     @Autowired
     LoginUserInfoHelper loginUserInfoHelper;
+
+    @Override
+    public List<WithholdingRepaymentLog> findByLiquidationDate(PlatformEnum pe, String beginTime, String endTime){
+        EntityWrapper<WithholdingRepaymentLog> ew = new EntityWrapper<WithholdingRepaymentLog>();
+        ew.eq("bind_platform_id", pe.getValue());
+        ew.between("create_time", beginTime, endTime);
+        ew.eq("repay_status", 1);
+        return super.selectList(ew);
+    }
 
     @Override
     public Page<RepaymentLogVO> selectRepaymentLogPage(RepaymentLogReq key) {
