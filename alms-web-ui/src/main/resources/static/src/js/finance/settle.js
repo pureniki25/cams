@@ -736,7 +736,7 @@ window.layinit(function (htConfig) {
                     content:'请稍后...',
                     duration:0
                 })
-                app.submitLoding = true
+
                 axios.post(fpath+'finance/financeSettle',params)
                 .then(function(res){
                     app.$Message.destroy()
@@ -746,6 +746,10 @@ window.layinit(function (htConfig) {
                 .catch(function(err){
                     app.$Message.error({content:'结清功能异常'})
                 })
+
+
+
+
             },
             handleSettleResult(res){
                 app.table.projRepayment.data = res.data.data
@@ -809,21 +813,42 @@ window.layinit(function (htConfig) {
 
                 params = Object.assign(app.factRepaymentInfo, params);
 
-                if(app.thisTimeRepaymentInfo.item10>app.factRepayPreview.item10){
-                    app.$Modal.confirm({
-                        content:'确认 亏损结清 ?',
-                        onOk:function(){
-                            params.deficit = true ;
-                            app.settle(params,app.handleSettleResult)
-                        },
-                        onCancel:function(){
-                            location.reload()
-                        }
-                    })
-                }else{
-                    app.settle(params,app.handleSettleResult)
-                }
-                
+                // if(app.thisTimeRepaymentInfo.item10>app.factRepayPreview.item10){
+                //     app.$Modal.confirm({
+                //         content:'确认 亏损结清 ?',
+                //         onOk:function(){
+                //             params.deficit = true ;
+                //             app.settle(params,app.handleSettleResult)
+                //         },
+                //         onCancel:function(){
+                //             location.reload()
+                //         }
+                //     })
+                // }else{
+                //     app.settle(params,app.handleSettleResult)
+                // }
+                layer.confirm('确认还款计划结清?', {icon: 3, title: '提示'}, function (index) {
+                    app.submitLoding = true;
+                    axios.post(fpath + 'finance/financeSettle', params)
+                        .then(function (res) {
+                            if (res.data.code == '1') {
+                                app.submitLoding = false;
+                                app.$Modal.success({
+                                    content: '还款计划结清成功!', onOk() {
+                                        var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                                        parent.layer.close(index);
+                                        parent.app.search()
+                                    }
+                                })
+                            } else {
+                                app.$Message.error({content: res.data.msg})
+                            }
+                        })
+                        .catch(function (err) {
+                            console.log(err);
+                        })
+                    layer.close(index);
+                })
 
             },
             deleteMoneyPool(p) {

@@ -36,7 +36,7 @@ public class FinanceSettleController {
     @RequestMapping("/financeSettle")
     @ApiOperation(value="资金结清")
     public Result financeSettle(@RequestBody FinanceSettleReq financeSettleReq){
-        logger.info("@financeSettle@资金结算开始[{}]");
+        logger.info("@financeSettle@资金结算开始[{}]",financeSettleReq);
         Result result = null;
         try {
             List<CurrPeriodProjDetailVO> currVo = financeSettleService.financeSettle(financeSettleReq);
