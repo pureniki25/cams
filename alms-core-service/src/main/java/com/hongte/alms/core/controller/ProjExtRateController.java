@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -95,6 +96,15 @@ public class ProjExtRateController extends BaseController {
             // }
 
             if(projExtRateVo.getId()==null || projExtRateVo.getId() == 0){
+            	//验证
+            	EntityWrapper<ProjExtRate> ew = new EntityWrapper<ProjExtRate>();
+            	ew.eq("business_id", projExtRateVo.getBusinessId());
+            	ew.eq("project_id", projExtRateVo.getProjectId());
+            	ew.eq("rate_type", projExtRateVo.getRateType());
+            	int count = projExtRateService.selectCount(ew);
+            	if(count > 0) {
+            		return Result.error("已经存在相同的业务、标ID、费率类型记录.");
+            	}
                 //新增
                 ProjExtRate projExtRate = new ProjExtRate();
                 BeanUtil.copyProperties(projExtRateVo, projExtRate);
