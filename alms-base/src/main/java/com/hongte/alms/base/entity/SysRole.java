@@ -42,6 +42,11 @@ public class SysRole extends Model<SysRole> {
     @TableField("page_type")
     @ApiModelProperty(required = true, value = "页面类型")
     private Integer pageType;
+    
+    @TableField("data_type")
+    @ApiModelProperty(required = true, value = "数据权限类型:0所有1正在逾期中")
+    private Integer dataType;
+    
     @TableId(value = "id", type = IdType.INPUT)
     @ApiModelProperty(required = true, value = "页面类型")
     private Integer id;
@@ -93,6 +98,14 @@ public class SysRole extends Model<SysRole> {
     public void setRoleAreaMethod(Integer roleAreaMethod) {
         this.roleAreaMethod = roleAreaMethod;
     }
+
+	public Integer getDataType() {
+		return dataType;
+	}
+
+	public void setDataType(Integer dataType) {
+		this.dataType = dataType;
+	}
 
 	@Override
 	protected Serializable pkVal() {

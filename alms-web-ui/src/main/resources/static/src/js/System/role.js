@@ -149,6 +149,7 @@ let methods = {
             console.log(data);
             app.editForm.pageType = data.pageType + ''
             app.editForm.roleAreaType = data.roleAreaType + ''
+            app.editForm.dataType = data.dataType + ''
         }
     },closeModal:function(){
         app.editModal.show = false
