@@ -43,7 +43,7 @@
         <card dis-hover :bordered="false">
             <span slot="title">通知公告</span>
             <row>
-                <i-col span="24" style="text-align:right">
+                <i-col span="23" style="text-align:right">
                     <i-form ref="schForm" :model="schForm" label-position="right" autocomplete="off" label-width="100" inline>
                         <form-item label="标题">
                             <i-input :value.sync="schForm.title" v-model="schForm.title"></i-input>
@@ -51,9 +51,11 @@
                         <form-item label="发布时间">
                             <Date-picker type="daterange" placeholder="时间范围" :value.sync="schForm.date" v-model="schForm.date"></Date-picker>
                         </form-item>
-                        <!-- <i-button @click="search">查询</i-button> -->
-                        <button class="layui-btn layui-btn-sm" @click="search">查询</button>
+                        <!-- <i-button type="success" @click="search">查询</i-button> -->
                     </i-form>
+                </i-col>
+                <i-col>
+                    <button class="layui-btn layui-btn-sm" @click="search">查询</button>
                 </i-col>
             </row>
             <row>
