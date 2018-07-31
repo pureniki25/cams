@@ -3,6 +3,7 @@ package com.hongte.alms.core.controller;
 
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -155,6 +156,14 @@ public class CollectionController {
         retMap.put("businessStatusList",(JSONArray) JSON.toJSON(businessStatusList, JsonUtil.getMapping()));
         //还款状态
         List<SysParameter> repayStatusList =  sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterTypeEnums.REPAY_STATUS.getKey()).eq("status",1).orderBy("row_Index"));
+        //判断角色的区域类型
+        Wrapper<SysUserRole> wrapperDataType = new EntityWrapper<>();
+        wrapperDataType.eq("user_id",loginUserInfoHelper.getUserId());
+        wrapperDataType.and(" role_code in (SELECT role_code FROM tb_sys_role WHERE data_type = 1 AND page_type = 1 ) ");
+        List<SysUserRole> sysUserRoleDataRight = sysUserRoleService.selectList(wrapperDataType);
+        if(null != sysUserRoleDataRight && !sysUserRoleDataRight.isEmpty()) {
+        	repayStatusList = repayStatusList.stream().filter(e->e.getParamName().equals("逾期")).collect(Collectors.toList());
+        }
         retMap.put("repayStatusList",(JSONArray) JSON.toJSON(repayStatusList, JsonUtil.getMapping()));
         //催收级别
         List<SysParameter> collectLevelList = sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterTypeEnums.COLLECTION_LEVERS.getKey()).orderBy("row_Index"));
@@ -205,12 +214,22 @@ public class CollectionController {
             if(req.getRepayStatus()!=null&&req.getRepayStatus().equals(""))req.setRepayStatus(null);
             long startTime = System.currentTimeMillis();
             
-            Wrapper<SysUserRole> wrapperSysUserRole = new EntityWrapper<SysUserRole>();
+            //判断角色的区域类型
+            Wrapper<SysUserRole> wrapperSysUserRole = new EntityWrapper<>();
             wrapperSysUserRole.eq("user_id",loginUserInfoHelper.getUserId());
             wrapperSysUserRole.and(" role_code in (SELECT role_code FROM tb_sys_role WHERE role_area_type = 1 AND page_type = 1 ) ");
             List<SysUserRole> userRoles = sysUserRoleService.selectList(wrapperSysUserRole);
             if(null != userRoles && !userRoles.isEmpty()) {
             	req.setNeedPermission(0);//全局用户 不需要验证权限
+            }
+            
+            //判断角色的区域类型
+            Wrapper<SysUserRole> wrapperDataType = new EntityWrapper<>();
+            wrapperDataType.eq("user_id",loginUserInfoHelper.getUserId());
+            wrapperDataType.and(" role_code in (SELECT role_code FROM tb_sys_role WHERE data_type = 1 AND page_type = 1 ) ");
+            List<SysUserRole> sysUserRoleDataRight = sysUserRoleService.selectList(wrapperDataType);
+            if(null != sysUserRoleDataRight && !sysUserRoleDataRight.isEmpty()) {
+            	req.setRepayStatus("逾期");
             }
             
             Page<AfterLoanStandingBookVo> pages = phoneUrgeService.selectAfterLoanStandingBookPage(req);
