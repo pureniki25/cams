@@ -64,7 +64,7 @@ public class FinanceSettleBaseDto {
 
     /**
      * 新增还款金额list  按planId
-     * Map<plan_list_detail_id, List<RepaymentProjFactRepay>>
+     * Map<planId,Map<plan_list_detail_id, List<RepaymentProjFactRepay>>
      */
     private Map<String,Map<String, List<RepaymentProjFactRepay>>> projFactRepays =new HashMap<>();
 
