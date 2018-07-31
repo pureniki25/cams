@@ -6,11 +6,11 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
-    <title>银行代扣流水</title>
+    <title>快钱代扣流水</title>
     <script src="/properties/config.js"></script>
     <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
     <!-- iview样式 -->
-    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/2.13.1/css/iview.css" />
     <!--@import url("//unpkg.com/iview/dist/styles/iview.css");-->
     <!--<link rel="stylesheet" type="text/css" href="//unpkg.com/iview/dist/styles/iview.css"/>-->
     <!-- 引入layui样式 -->
@@ -21,7 +21,7 @@
     <!-- 引入vue -->
     <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
     <!-- iview js -->
-    <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+    <script type="text/javascript" src="/plugins/iview/2.13.1/js/iview.min.js"></script>
     <!--引入layui.js-->
     <script src="/plugins/layui/layui.js"></script>
     <!--引入axios.js 用于ajax调用-->
@@ -51,11 +51,12 @@
                 </p>
 
                 <div class="layui-btn-group" slot="extra">
-                    <i-button type="primary" slot="extra" @click="toLoading" v-if="authValid('search')" style="margin-right:10px">
-                        <span v-if="!loading">查询</span>
-                        <span v-else>查询中...</span>
+                    <i-button class="layui-btn layui-btn-sm" slot="extra" @click="toLoading" v-if="authValid('search')">
+                        <span v-if="!loading"><i class="layui-icon">&#xe615;</i>查询</span>
+                        <span v-else><i
+                                class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
                     </i-button>
-                    <i-button type="primary" slot="extra" v-if="authValid('reset')" @click="handleReset('searchForm')" style="margin-right:10px">
+                    <i-button class="layui-btn layui-btn-sm"  v-if="authValid('reset')" @click="handleReset('searchForm')">
                         <span>重置</span>
                     </i-button>
                 </div>
@@ -65,13 +66,13 @@
                     <i-form ref="searchForm" :model="searchForm" label-position="right"
                             :label-width="100">
                         <i-col span="16">
-                            <form-item label="查询日期：" prop="startTime">
-                                <date-picker type="date" v-model="searchForm.startTimeV" @on-change="startTime"
+                            <form-item label="清算日期：" prop="startTime">
+                                <date-picker type="date" v-model="searchForm.startTime" @on-change="startTime"
                                              placeholder="选择日期"
                                              format="yyyy-MM-dd"
                                              style="width: 200px"></date-picker>
                                 <span>至</span>
-                                <date-picker type="date" v-model="searchForm.endTimeV"  @on-change="endTime"
+                                <date-picker type="date" v-model="searchForm.endTime"  @on-change="endTime"
                                              placeholder="选择日期"
                                              format="yyyy-MM-dd"
                                              style="width: 200px"></date-picker>
@@ -104,7 +105,7 @@
 
 </div>
 
-<script src="/src/js/finance/bankWithholdRepayFlowList.js"></script>
+<script src="/src/js/finance/kqWithholdRepayFlowList.js"></script>
 <script>
 
 </script>
