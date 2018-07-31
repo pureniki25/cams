@@ -1068,18 +1068,18 @@ public class RechargeServiceImpl implements RechargeService {
 	 * 如果是线上已还款，判断是否在宽限期外，如果是，就可以自动代扣，否则不能
 	 */
 	
-	private boolean isForgiveDayOutside(RepaymentBizPlanList list) {
-		boolean isForgiveDayOutside = false;
-		SysParameter  forgiveDayParam = sysParameterService.selectOne(
-				new EntityWrapper<SysParameter>().eq("param_type", SysParameterEnums.FORGIVE_DAYS)
-						.eq("status", 1).orderBy("param_value"));
-		BigDecimal overDays=list.getOverdueDays();
-		BigDecimal  forgiveDay=BigDecimal.valueOf(Double.valueOf(forgiveDayParam.getParamValue()));
-		if(overDays.compareTo(forgiveDay)>0) {//在宽限期外
-			 isForgiveDayOutside=true;
-		}
-		return isForgiveDayOutside;
-	}
+//	private boolean isForgiveDayOutside(RepaymentBizPlanList list) {
+//		boolean isForgiveDayOutside = false;
+//		SysParameter  forgiveDayParam = sysParameterService.selectOne(
+//				new EntityWrapper<SysParameter>().eq("param_type", SysParameterEnums.FORGIVE_DAYS)
+//						.eq("status", 1).orderBy("param_value"));
+//		BigDecimal overDays=list.getOverdueDays();
+//		BigDecimal  forgiveDay=BigDecimal.valueOf(Double.valueOf(forgiveDayParam.getParamValue()));
+//		if(overDays.compareTo(forgiveDay)>0) {//在宽限期外
+//			 isForgiveDayOutside=true;
+//		}
+//		return isForgiveDayOutside;
+//	}
 	
 	/**
 	 * 判断是否含有线下转账，如果有，不能自动代扣
