@@ -112,11 +112,11 @@ let data = {
         feeId: [{ required: true, message: '请输入费率UUID', trigger: 'blur' }],
         feeName: [{ required: true, message: '请输入费率名称', trigger: 'blur' }],
         beginPeroid: [
-            { type: 'number', required: true, message: '请输入正确的开始期数', trigger: 'blur' }, 
+            //{ type: 'number', required: true, message: '请输入正确的开始期数', trigger: 'blur' }, 
             { pattern: /^[0-9]+$/, required: true, message: '请输入整数', trigger: 'blur' }
         ],
         endPeroid: [
-            { type: 'number', required: true, message: '请输入正确的结束期数', trigger: 'blur' },
+            //{ type: 'number', required: true, message: '请输入正确的结束期数', trigger: 'blur' },
             { pattern: /^[0-9]+$/, required: true, message: '请输入整数', trigger: 'blur' }
         ],
         // deptIds:[{
