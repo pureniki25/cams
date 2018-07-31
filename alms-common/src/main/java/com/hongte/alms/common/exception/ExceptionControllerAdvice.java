@@ -42,7 +42,7 @@ public class ExceptionControllerAdvice {
         map.put("msg", "系统异常");
         map.put("data", null);
         logger.error("=========打印日志开始============");
-        logger.error(ex.getMessage());
+        logger.error(ex.getMessage(),ex);
         ex.printStackTrace();
         logger.error("=========打印日志结束============");
         return map;
