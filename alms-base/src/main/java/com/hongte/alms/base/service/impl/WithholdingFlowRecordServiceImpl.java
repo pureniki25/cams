@@ -327,12 +327,14 @@ public class WithholdingFlowRecordServiceImpl extends
                     WithholdingFlowRecord flow = new WithholdingFlowRecord();
                     flow.setWithholdingPlatform((Integer) PlatformEnum.KQ_FORM.getValue());
                     flow.setMerchantNo(retMap.get("merchantId"));
+                    //transTime: 快钱MAS系统处理本笔交易请求时的系统时间
                     String transTime = retMap.get("transTime");
                     String formatedTransTime = transTime.substring(0, 4) + "-"+
                                                transTime.substring(4, 6)+"-"+
                                                transTime.substring(6, 8);
 
                     flow.setLiquidationDate( new SimpleDateFormat("yyyy-MM-dd", Locale.SIMPLIFIED_CHINESE).parse(formatedTransTime));
+                    //entryTime: 商户发起交易请求时的系统时间
                     String entryTime = retMap.get("entryTime");
                     String formattedEntryTime = entryTime.substring(0, 4) + "-" +
                                                 entryTime.substring(4, 6) + "-"+
@@ -344,7 +346,9 @@ public class WithholdingFlowRecordServiceImpl extends
                     flow.setMerchantOrderNo(retMap.get("externalRefNumber"));
                     // flow.setTradeWaterNo(cols[5]);
                     flow.setAmount(new BigDecimal(retMap.get("amount")));
-                    flow.setTradeType(retMap.get("txnType"));
+                    //flow.setTradeType(retMap.get("txnType"));
+                    //PUR:消费交易, RFD:退货交易
+                    flow.setTradeType("消费交易");
                     // 接口没有状态，默认为成功
                     String txnStatus = retMap.get("txnStatus");
                     if (Constant.TRADE_TYPE_MAP_KUAIQIAN.containsKey(txnStatus)) {
