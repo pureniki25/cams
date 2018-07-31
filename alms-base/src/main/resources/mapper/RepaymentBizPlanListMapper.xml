@@ -210,10 +210,10 @@
 				AND DATE_FORMAT(pl.due_date,'%Y-%m-%d') = #{repayDate}
 			</if>
 			<if test="regDateStart != null ">
-				AND pl.trade_date &gt;= #{regDateStart}
+				AND pl.trade_date_ext &gt;= #{regDateStart}
 			</if>
 			<if test="regDateEnd != null ">
-				AND pl.trade_date &lt;= #{regDateEnd}
+				AND pl.trade_date_ext &lt;= #{regDateEnd}
 			</if>
 			<if test="status != null ">
 				AND pl.current_status = #{status}
@@ -384,10 +384,10 @@
 				AND DATE_FORMAT(pl.due_date,'%Y-%m-%d') = #{repayDate}
 			</if>
 			<if test="regDateStart != null ">
-				AND pl.trade_date &gt;= #{regDateStart}
+				AND pl.trade_date_ext &gt;= #{regDateStart}
 			</if>
 			<if test="regDateEnd != null ">
-				AND pl.trade_date &lt;= #{regDateEnd}
+				AND pl.trade_date_ext &lt;= #{regDateEnd}
 			</if>
 			<if test="status != null ">
 				AND pl.current_status = #{status}

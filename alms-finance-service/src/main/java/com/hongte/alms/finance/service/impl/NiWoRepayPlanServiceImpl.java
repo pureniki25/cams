@@ -110,7 +110,6 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 	AlmsOpenServiceFeignClient almsOpenServiceFeignClient;
 	
 	
-	@Transactional(rollbackFor = Exception.class)
 	@Override
 	public void sycNiWoRepayPlan(String orderNo,HashMap<String,Object> niwoMap) {
 		    NiWoProjPlanDto dto=new NiWoProjPlanDto();
@@ -641,10 +640,9 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 									repaymentProjPlanListService.updateById(projPlanList);
 									repaymentBizPlanListService.updateById(pList);
 									/*	
-									 * 同步完你我金融的当前期还款计划之后，如果当前期已还总金额等于当前期计划要还的总金额，并且同步之后的当前期已还总金额大于同步之前的当前期已还总金额
-								     *说明需要发成功代扣的短信
+									 * 同步完你我金融的当前期还款计划之后，如果当前期已还总金额等于当前期计划要还的总金额
 									 */
-									if(afterRepayAmountSum.compareTo(planAmountSum)==0&&afterRepayAmountSum.compareTo(beforeRepayAmountSum)>0&&(!pList.getCurrentStatus().equals("已还款"))) {
+									if(afterRepayAmountSum.compareTo(planAmountSum)==0) {
 										BigDecimal repayMoney=afterRepayAmountSum.subtract(beforeRepayAmountSum);
 										if(afterRepayAmountSum.compareTo(planAmountSum)==0) {//当期已还款
 											if(getPlanAllFactRepayAmount(pList).compareTo(pList.getTotalBorrowAmount().add(pList.getOverdueAmount()==null?BigDecimal.valueOf(0):pList.getOverdueAmount()))>=0) {
@@ -668,6 +666,8 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 											repaymentProjPlanListService.updateById(projPlanList);
 										
 										}
+										//同步之后的当前期已还总金额大于同步之前的当前期已还总金额 说明需要发成功代扣的短信
+										if(afterRepayAmountSum.compareTo(beforeRepayAmountSum)>0&&(!pList.getCurrentStatus().equals("已还款"))) {
 									           try {
 												logger.info("你我金融-发送短信开始==================");
 												sendSuccessSms(projPlanList.getProjPlanId(), planAmountSum, repayMoney);
@@ -675,6 +675,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 									           }catch(Exception e) {
 									        	   logger.error("你我金融-发送短信出错"+e);  
 									           }
+										}      
 										
 									}
 								
@@ -818,7 +819,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 			dto.setWithdrawSuccessTime(
 					map.get("withdrawSuccessTime") == null ? 0 : Long.valueOf(map.get("withdrawSuccessTime").toString()));
 			dto.setWithdrawTime(map.get("withdrawTime") == null ? 0 : Long.valueOf(map.get("withdrawTime").toString()));
-			Object array=map.get("repaymentPlan")==null?"":map.get("repaymentPlan"); 
+			Object array=map.get("repaymentPlans")==null?"":map.get("repaymentPlans"); 
 			if(array!=null&&!array.equals("")) {
 				List<NiWoProjPlanListDetailDto>  repaymentPlans=new ArrayList();
 				List<HashMap<String,Object>>  repaymentPlanMaps=(List<HashMap<String,Object>>) array;
