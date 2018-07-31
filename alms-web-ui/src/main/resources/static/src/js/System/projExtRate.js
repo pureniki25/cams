@@ -98,23 +98,25 @@ let data = {
         businessId: [{ required: true, message: '请输入业务ID', trigger: 'blur' }],
         projectId: [{ required: true, message: '请输入标的ID', trigger: 'blur' }],
         rateType: [
-            { type: 'number', required: true, message: '请输入费正确的率类型', trigger: 'blur' },
-            { pattern: /^[0-9]+$/, message: '请输入整数', trigger: 'blur' }
+//            { type: 'number', required: true, message: '请输入费正确的率类型', trigger: 'blur' },
+//            { pattern: /^\\d+(\\.\\d+)?$/, message: '请输入整数', trigger: 'blur' }
+            { pattern: /^[0-9]+$/, required:true, message: '请输入整数', trigger: 'blur' }
         ],
         rateName: [{ required: true, message: '请输入费率类型名称', trigger: 'blur' }],
-        rateValue: [
-            { type: 'number', required: true, message: '请输入正确的费率值', trigger: 'blur' }, 
-            { pattern: /^[0-9]+(.[0-9]*)$/, message: '请输入数字', trigger: 'blur' }
+        rateValue: [ 
+            //{ type: 'number', required: true, message: '请输入正确的费率值', trigger: 'blur' }, 
+//            { pattern: /^[0-9]+(.[0-9]*)$/, message: '请输入数字', trigger: 'blur' }
+            { pattern: /^[0-9]+(.[0-9]*)?$/, required: true,message: '请输入数字', trigger: 'blur' }
         ],
         calcWay: [{ type: 'number', required: true, message: '请选择计算方式', trigger: 'blur' }],
         feeId: [{ required: true, message: '请输入费率UUID', trigger: 'blur' }],
         feeName: [{ required: true, message: '请输入费率名称', trigger: 'blur' }],
         beginPeroid: [
-            { type: 'number', required: true, message: '请输入正确的开始期数', trigger: 'blur' }, 
+            //{ type: 'number', required: true, message: '请输入正确的开始期数', trigger: 'blur' }, 
             { pattern: /^[0-9]+$/, required: true, message: '请输入整数', trigger: 'blur' }
         ],
         endPeroid: [
-            { type: 'number', required: true, message: '请输入正确的结束期数', trigger: 'blur' },
+            //{ type: 'number', required: true, message: '请输入正确的结束期数', trigger: 'blur' },
             { pattern: /^[0-9]+$/, required: true, message: '请输入整数', trigger: 'blur' }
         ],
         // deptIds:[{
@@ -286,9 +288,14 @@ let methods = {
                         if (!!res.data && res.data.code == '1') {
                             self.search();
                             self.hideEditModal();
-                            this.editModalLoading = true;
                         } else {
                             self.$Modal.error({ content: '请求接口失败,消息:' + res.data.msg })
+                            setTimeout(() => {
+                                this.editModalLoading = false;
+                                this.$nextTick(() => {
+                                    this.editModalLoading = true;
+                                });
+                            }, 1000);
                         }
                     })
                     .catch(err => {
