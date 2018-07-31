@@ -176,7 +176,7 @@ let methods = {
     },
     tableReload: function (where, page) {
         let playload = {}
-        if(where&&where.length>0){
+        if(where){
             playload.where = where
         }
         playload.page = page 
