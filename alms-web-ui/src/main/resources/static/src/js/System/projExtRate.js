@@ -288,9 +288,14 @@ let methods = {
                         if (!!res.data && res.data.code == '1') {
                             self.search();
                             self.hideEditModal();
-                            this.editModalLoading = true;
                         } else {
                             self.$Modal.error({ content: '请求接口失败,消息:' + res.data.msg })
+                            setTimeout(() => {
+                                this.editModalLoading = false;
+                                this.$nextTick(() => {
+                                    this.editModalLoading = true;
+                                });
+                            }, 1000);
                         }
                     })
                     .catch(err => {
