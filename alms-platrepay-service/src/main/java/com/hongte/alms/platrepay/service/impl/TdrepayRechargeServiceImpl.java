@@ -383,7 +383,6 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			tdrepayRechargeLog.setLogId(vo.getLogId());
 			tdrepayRechargeLog.setBatchId(batchId);
 			tdrepayRechargeLog.setRequestNo(requestNo);
-			tdrepayRechargeLog.setTotalAmount(BigDecimal.valueOf(totalAmount));
 			tdrepayRechargeLog.setTdUserId(tdUserId);
 			tdrepayRechargeLog.setUserId(logUserId);
 			tdrepayRechargeLog.setUserIp(clientIp);
@@ -393,9 +392,15 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			tdrepayRechargeLog.setUpdateUser(userId);
 			tdrepayRechargeLogs.add(tdrepayRechargeLog);
 		}
+		
+		if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
+			for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
+				tdrepayRechargeLog.setTotalAmount(BigDecimal.valueOf(totalAmount).setScale(2, BigDecimal.ROUND_HALF_UP));
+			}
+		}
 		tdrepayRechargeLogService.updateBatchById(tdrepayRechargeLogs);
 
-		dto.setTotalAmount(totalAmount);
+		dto.setTotalAmount(BigDecimal.valueOf(totalAmount).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
 		dto.setDetailList(detailList);
 
 		outsideLog.setSendJson(JSONObject.toJSONString(dto));

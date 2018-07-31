@@ -51,12 +51,11 @@
                 </p>
 
                 <div class="layui-btn-group" slot="extra">
-                    <i-button class="layui-btn layui-btn-sm" slot="extra" @click="toLoading" v-if="authValid('search')">
-                        <span v-if="!loading"><i class="layui-icon">&#xe615;</i>查询</span>
-                        <span v-else><i
-                                class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
+                    <i-button type="primary" slot="extra" @click="toLoading" v-if="authValid('search')" style="margin-right:10px">
+                        <span v-if="!loading">查询</span>
+                        <span v-else>查询中...</span>
                     </i-button>
-                    <i-button class="layui-btn layui-btn-sm"  v-if="authValid('reset')" @click="handleReset('searchForm')">
+                    <i-button type="primary" slot="extra" v-if="authValid('reset')" @click="handleReset('searchForm')" style="margin-right:10px">
                         <span>重置</span>
                     </i-button>
                 </div>
@@ -66,7 +65,7 @@
                     <i-form ref="searchForm" :model="searchForm" label-position="right"
                             :label-width="100">
                         <i-col span="16">
-                            <form-item label="查询日期：" prop="startTime">
+                            <form-item label="清算日期：" prop="startTime">
                                 <date-picker type="date" v-model="searchForm.startTime" @on-change="startTime"
                                              placeholder="选择日期"
                                              format="yyyy-MM-dd"

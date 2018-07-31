@@ -59,7 +59,7 @@ window.layinit(function (htConfig) {
                             {
                                 // field: 'merchantAccount',
                                 field: 'merchantNo',
-                                title: '易宝商户号',
+                                title: '快钱商户号',
                             },
                             {
                                 // field: 'merchOrderId',
@@ -67,10 +67,15 @@ window.layinit(function (htConfig) {
                                 title: '商户订单号'
                             },
                             {
-                                // field: 'thirdOrderId',
-                                field: 'tradeWaterNo',
-                                title: '易宝付交易流水号'
+                                // field: 'bankCode',
+                                field: 'terminalNo',
+                                title: '终端号',
                             },
+                            // {
+                            //     // field: 'thirdOrderId',
+                            //     field: 'tradeWaterNo',
+                            //     title: '快钱交易流水号'
+                            // },
 
                             {
                                 // field: 'repayStatus',
@@ -96,13 +101,17 @@ window.layinit(function (htConfig) {
                                 title: '代扣金额',
                             },
                             {
+                                field: 'tradeDate',
+                                title: '交易日期'
+                            },
+                            {
                                 // field: 'createTime',
                                 field: 'liquidationDate',
                                 title: '清算日期',
 
                             }
                         ]], //设置表头
-                        url: financePath + 'customer/getYbWithholdFlowPageList',
+                        url: financePath + 'customer/getKqWithholdFlowPageList',
                         page: true,
                         done: function (res, curr, count) {
                             //数据渲染完的回调。你可以借此做一些其它的操作
