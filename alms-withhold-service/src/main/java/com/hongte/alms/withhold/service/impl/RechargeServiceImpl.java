@@ -514,7 +514,7 @@ public class RechargeServiceImpl implements RechargeService {
 							remoteResult.setReturnCode("9999");
 						}
 					}
-					if (remoteResult.getReturnCode().equals("0000") && resultData.getResultMsg().equals("充值成功")&&resultData.getStatus().equals("2")) {
+					if (remoteResult.getReturnCode().equals("0000") && resultData.getResultMsg().equals("充值成功")) {
 						result.setCode("1");
 						result.setMsg(resultData.getResultMsg());
 						log.setRepayStatus(1);
@@ -541,8 +541,8 @@ public class RechargeServiceImpl implements RechargeService {
 
 						break;
 						
-					} if (remoteResult.getReturnCode().equals("0000")&&resultData.getStatus().equals("1")) {
-						result.setCode("-1");
+					} if (!remoteResult.getReturnCode().equals("0000")&&(!remoteResult.getReturnCode().equals(RepayResultCodeEnum.YH_HANDLER_EXCEPTION.getValue()))&&(!remoteResult.getReturnCode().equals("INTERNAL_ERROR"))) {
+							result.setCode("-1");
 						result.setMsg(resultData.getResultMsg());
 						log.setRepayStatus(0);
 						log.setRemark(resultData.getResultMsg());
