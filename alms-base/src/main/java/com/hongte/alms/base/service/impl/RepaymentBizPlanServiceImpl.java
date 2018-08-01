@@ -300,7 +300,7 @@ public class RepaymentBizPlanServiceImpl extends BaseServiceImpl<RepaymentBizPla
 		if (list==null||list.size()==0) {
 			throw new ServiceRuntimeException("找不到还款计划");
 		}
-		RepaymentSettleListVO finalOne = new RepaymentSettleListVO();
+		/*RepaymentSettleListVO finalOne = new RepaymentSettleListVO();
 		finalOne.setAfterId("结清应还");
 		finalOne.setItem10(new BigDecimal("0"));
 		finalOne.setItem20(new BigDecimal("0"));
@@ -323,7 +323,7 @@ public class RepaymentBizPlanServiceImpl extends BaseServiceImpl<RepaymentBizPla
 			finalOne.setLack(finalOne.getLack().add(repaymentSettleListVO.getLack()));
 			finalOne.setFactAmount(finalOne.getFactAmount().add(repaymentSettleListVO.getFactAmount()));
 		}
-		list.add(finalOne);
+		list.add(finalOne);*/
 		return list;
 	}
 	

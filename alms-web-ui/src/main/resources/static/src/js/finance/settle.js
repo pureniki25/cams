@@ -406,7 +406,17 @@ window.layinit(function (htConfig) {
                         key: 'penalty'
                     }, */ {
                         title: '备注',
-                        key: 'remark'
+                        key: 'remark',
+                        render:(h,p)=>{
+                            return h('pre',{
+                                style:{
+                                    overflow:'hidden',
+                                },
+                                attrs:{
+                                    title:p.row.remark,
+                                }
+                            },p.row.remark)
+                        }
                     }, {
                         title: '状态',
                         key: 'status',
@@ -752,6 +762,12 @@ window.layinit(function (htConfig) {
 
             },
             handleSettleResult(res){
+                if(res.data.code!='1'){
+                    app.$Modal.error({
+                        content:res.data.msg
+                    })
+                    return ;
+                }
                 app.table.projRepayment.data = res.data.data
                 app.factRepayPreview.flag = true
                 app.factRepayPreview.item10 = 0

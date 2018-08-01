@@ -31,7 +31,7 @@ public interface FinanceSettleService {
      * @param req
      * @return
      */
-    List<RepaymentBizPlanSettleDto> getCurrentPeriod(FinanceSettleReq req);
+    List<RepaymentBizPlanSettleDto> getCurrentPeriod(FinanceSettleReq req,FinanceSettleBaseDto financeSettleBaseDto);
     
     /**
      * 备份记录
