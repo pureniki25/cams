@@ -1130,7 +1130,7 @@ public class RechargeServiceImpl implements RechargeService {
 	@Override
 	public BankCardInfo getBankCardInfo(List<BankCardInfo> list) {
 		for (BankCardInfo card : list) {
-			if (card.getPlatformType() != 0 && card.getWithholdingType() == 1) {// 不等于第三方代扣银行卡并且是代扣主卡
+			if (card.getPlatformType() == 1 && card.getWithholdingType() == 1) {// 团贷网平台注册的银行卡并且是代扣主卡
 				return card;
 			} else {
 				return null;

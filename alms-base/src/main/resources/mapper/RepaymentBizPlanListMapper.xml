@@ -332,7 +332,13 @@
 				pl.operator_name_ext AS operator, 
 				pl.customer_name_ext AS customer
 				, pl.phone_number_ext AS phoneNumber, pl.business_ctype_ext AS businessType, pl.due_date AS planRepayDate, pl.borrow_money_ext AS borrowMoney
-				, CASE repayment_type_id_ext
+				, (SELECT 
+			    IFNULL(tpi.plate_type, 1) 
+			  FROM
+			    `tb_tuandai_project_info` tpi 
+			  WHERE tpi.business_id = pl.business_id 
+			  LIMIT 1) plateType,
+			  CASE repayment_type_id_ext
 					WHEN 1 THEN '先息后本'
 					WHEN 2 THEN '先息后本'
 					WHEN 4 THEN '等本等息'

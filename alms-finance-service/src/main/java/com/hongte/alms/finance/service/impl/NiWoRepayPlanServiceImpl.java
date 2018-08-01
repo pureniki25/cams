@@ -171,10 +171,13 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 					}
 					 
 					projPlanList.setCurrentStatus("已还款");
+					projPlanList.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
 					projPlanList.setOverdueAmount(getProjListDetaiPlanRepayAmount(projPlanList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT));
 					projPlanList.setRepayFlag(1);// 1：已还款 你我金融的单，还款后标志为1
 					projPlanList.setUpdateTime(new Date());
-					projPlanList.setFactRepayDate(new Date());
+					if(projPlanList.getFactRepayDate()!=null) {
+						projPlanList.setFactRepayDate(new Date());
+					}
 					projPlanList.setCreatSysType(3);
 					repaymentProjPlanListService.updateById(projPlanList);
 				}
@@ -203,7 +206,11 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 					if(factRepayAmountSum.compareTo(pList.getTotalBorrowAmount().add(pList.getOverdueAmount()==null?BigDecimal.valueOf(0):pList.getOverdueAmount()))>=0) {
 						pList.setCurrentStatus("已还款");
 						pList.setRepayFlag(1);// 1：已还款 你我金融的单，还款后标志为1
-						pList.setFactRepayDate(new Date());
+						pList.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
+						if(pList.getFactRepayDate()!=null) {
+							pList.setFactRepayDate(new Date());
+						}
+					
 					}
 					
 					if(!pList.getCurrentStatus().equals("已还款")) {
@@ -647,7 +654,10 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 										if(afterRepayAmountSum.compareTo(planAmountSum)==0) {//当期已还款
 											if(getPlanAllFactRepayAmount(pList).compareTo(pList.getTotalBorrowAmount().add(pList.getOverdueAmount()==null?BigDecimal.valueOf(0):pList.getOverdueAmount()))>=0) {
 												pList.setCurrentStatus("已还款");
-												pList.setFactRepayDate(new Date());
+												pList.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
+												if(pList.getFactRepayDate()!=null) {
+													pList.setFactRepayDate(new Date());
+												}
 												repaymentBizPlanListService.updateById(pList);
 												for(RepaymentBizPlanListDetail planDetail : planDetails) {
 													planDetail.setFactRepayDate(new Date());
@@ -656,7 +666,10 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 											}
 											
 											projPlanList.setCurrentStatus("已还款");
-											projPlanList.setFactRepayDate(new Date());
+											projPlanList.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
+											if(projPlanList.getFactRepayDate()!=null) {
+												projPlanList.setFactRepayDate(new Date());
+											}
 											for(RepaymentProjPlanListDetail projDetail : projDetails) {
 												projDetail.setFactRepayDate(new Date());
 												repaymentProjPlanListDetailService.updateById(projDetail);
