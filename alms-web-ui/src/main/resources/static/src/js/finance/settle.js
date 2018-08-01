@@ -752,6 +752,12 @@ window.layinit(function (htConfig) {
 
             },
             handleSettleResult(res){
+                if(res.data.code!='1'){
+                    app.$Modal.error({
+                        content:res.data.msg
+                    })
+                    return ;
+                }
                 app.table.projRepayment.data = res.data.data
                 app.factRepayPreview.flag = true
                 app.factRepayPreview.item10 = 0
