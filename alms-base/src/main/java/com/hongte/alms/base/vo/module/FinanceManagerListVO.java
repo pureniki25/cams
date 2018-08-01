@@ -69,6 +69,11 @@ public class FinanceManagerListVO {
 	 * 手机号码
 	 */
 	private String phoneNumber;
+	
+	/**
+	 * 平台标志位：1，团贷网； 2，你我金融
+	 */
+	private Integer plateType;
 
 	/**
 	 * 还款日期

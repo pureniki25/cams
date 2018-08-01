@@ -9,6 +9,7 @@ window.layinit(function (htConfig) {
     let repaymentType = decodeURI(getQueryStr('repaymentType'));	// 还款方式
     let borrowMoney = getQueryStr('borrowMoney');	// 借款金额
     let borrowLimit = getQueryStr('borrowLimit');	// 借款期限
+    let plateType = getQueryStr('plateType');	// 业务来源
     
     app = new Vue({
         el: "#app",
@@ -23,6 +24,7 @@ window.layinit(function (htConfig) {
         	repayOtherFeeFlag: false, // 其他费用弹窗控制标识(业务维度)
         	repayProjOtherFeeFlag: false, // 其他费用弹窗控制标识（标维度）
         	businessSurplus:0, // 用户账户结余
+        	plateTypeFlag: '', // 数据来源：1、团贷网；2、你我金融
         	
         	// -- 实还流水 --
         	actualPaymentRecordList: [],
@@ -573,6 +575,7 @@ window.layinit(function (htConfig) {
              * 根据业务编号获取业务维度的还款计划信息
              */
             queryRepaymentPlanInfoByBusinessId: function(){
+            	this.plateTypeFlag = plateType;
             	if (this.bizRepaymentPlanList == null || this.bizRepaymentPlanList.length == 0) {
             		axios.get(financeBasePath +"finance/queryRepaymentPlanInfoByBusinessId?businessId=" + businessId)
         	        .then(function (res) {

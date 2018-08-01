@@ -414,7 +414,7 @@ window.layinit(function (htConfig) {
                                     click: function () {
                                         console.log(p)
                                         let url = '/finance/repaymentPlanInfo?businessId=' + p.row.businessId + '&customer=' + p.row.customer + '&phoneNumber=' + p.row.phoneNumber +
-                                            '&repaymentType=' + p.row.repaymentType + '&borrowMoney=' + p.row.borrowMoney + '&borrowLimit=' + p.row.borrowLimit;
+                                            '&repaymentType=' + p.row.repaymentType + '&borrowMoney=' + p.row.borrowMoney + '&borrowLimit=' + p.row.borrowLimit + '&plateType=' + p.row.plateType;
                                         layer.open({
                                             type: 2,
                                             title: '计划详情',
