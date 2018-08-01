@@ -266,7 +266,7 @@
 		IFNULL(t1.overdue_days,0) != IFNULL(t2.overdue_days,0) or
 		IFNULL(t1.current_status,0) != IFNULL(t2.current_status,0) or
 		IFNULL(t1.repay_flag,0) != IFNULL(t2.repay_flag,0) or
-		IFNULL(t1.fact_repay_date,0) != IFNULL(t2.fact_repay_date,0) or
+		IFNULL(t1.fact_repay_date,1) != IFNULL(t2.fact_repay_date,0) or
 		IFNULL(t1.finance_comfirm_date,0) != IFNULL(t2.finance_comfirm_date,0) or
 		IFNULL(t1.finance_confirm_user,0) != IFNULL(t2.finance_confirm_user,0) or
 		IFNULL(t1.finance_confirm_user_name,0) != IFNULL(t2.finance_confirm_user_name,0) or
