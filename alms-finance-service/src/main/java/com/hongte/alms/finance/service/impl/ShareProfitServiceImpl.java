@@ -1632,7 +1632,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			            } else {
 
 //							bizPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
-							bizPlanList.setCurrentSubStatus(RepayPlanStatus.PARTAIL.getName());
+			            	bizPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
+							bizPlanList.setCurrentSubStatus(RepayPlanStatus.REPAYING.getName());
 							bizPlanList.setRepayFlag(null);
 			                if (bplFactAmount.compareTo(bplOnlineAmount) >= 0) {
 			                    bizPlanList.setRepayStatus(SectionRepayStatusEnum.ONLINE_REPAID.getKey());
