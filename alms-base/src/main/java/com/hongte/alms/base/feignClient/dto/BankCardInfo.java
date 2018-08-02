@@ -23,6 +23,8 @@ public class BankCardInfo implements Serializable {
      private String bankCode;//见资产端银行编码对照表
      private String bankProvince;//银行卡开户行所在省
      private String bankCity;//银行卡开户行名称
+     private String bindId;//易宝代扣的绑定ID
+     
      private List<ThirdPlatform> thirdPlatformList;//第三方代扣绑卡平台列表信息, 注1：只要列表内返回，则表示已绑定该平台,注2：存管注册银行卡也可以同时绑定其他第三方代扣平台
      private List<SignedProtocol> signedProtocolList;//只返回签约成功的协议代扣渠道
 	
@@ -115,6 +117,12 @@ public class BankCardInfo implements Serializable {
 	}
 	public void setThirdPlatformList(List<ThirdPlatform> thirdPlatformList) {
 		this.thirdPlatformList = thirdPlatformList;
+	}
+	public String getBindId() {
+		return bindId;
+	}
+	public void setBindId(String bindId) {
+		this.bindId = bindId;
 	}
 
 

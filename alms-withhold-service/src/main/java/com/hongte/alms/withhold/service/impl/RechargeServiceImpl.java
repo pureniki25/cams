@@ -224,7 +224,7 @@ public class RechargeServiceImpl implements RechargeService {
 				dto.setTranstime((int) (System.currentTimeMillis()));
 				dto.setAmount((int)(amount * 100));// 易宝代扣要转换单位:分
 				dto.setProductname("");
-				dto.setIdentityid(bankCardInfo.getIdentityNo());
+				dto.setIdentityid(bankCardInfo.getBindId());
 				dto.setIdentitytype("5");
 				dto.setCard_top(bankCardInfo.getBankCardNumber().substring(0, 6));
 				dto.setCard_last(bankCardInfo.getBankCardNumber().substring(
