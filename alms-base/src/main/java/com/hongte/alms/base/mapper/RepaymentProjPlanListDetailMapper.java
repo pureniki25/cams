@@ -67,4 +67,16 @@ public interface RepaymentProjPlanListDetailMapper extends SuperMapper<Repayment
 	 * @return
 	 */
 	BigDecimal calcSurplusService(@Param("businessId")String businessId,@Param("projectId")String projectId,@Param("planId")String planId,@Param("period")Integer period);
+	
+	/**
+	 * 结清计算某期月收服务费金额
+	 * @author 王继光
+	 * 2018年8月2日 下午4:22:05
+	 * @param businessId
+	 * @param projectId
+	 * @param planId
+	 * @param period
+	 * @return
+	 */
+	BigDecimal calcService(@Param("businessId")String businessId,@Param("projectId")String projectId,@Param("planId")String planId,@Param("period")Integer period);
 }

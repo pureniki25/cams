@@ -3040,8 +3040,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                 penalty = penalty.add(repaymentProjPlanListDetailMapper.calcSurplusService(bizPlanList.getBusinessId(), projExtRate.getProjectId(), planId, bizPlanList.getPeriod()));
             } else if (PepayPlanProjExtRatCalEnum.BY_MONTH_COM_FEE.getValue() == projExtRate.getCalcWay()) {
                 //5 费率值*月收分公司服务费
-                BigDecimal serviceFee = repaymentProjPlanListDetailMapper.calcProjectPlanAmount(
-                        projExtRate.getProjectId(), planId, RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getValue().toString(), null);
+                BigDecimal serviceFee = repaymentProjPlanListDetailMapper.calcService(bizPlanList.getBusinessId(), projExtRate.getProjectId(), planId, bizPlanList.getPeriod());
                 penalty = penalty.add(projExtRate.getRateValue().multiply(serviceFee));
             } else if (PepayPlanProjExtRatCalEnum.BY_MONTH_PLAT_FEE.getValue() == projExtRate.getCalcWay()) {
                 //6 费率值*月收平台服务费
