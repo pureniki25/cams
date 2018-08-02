@@ -920,6 +920,7 @@ window.layinit(function (htConfig) {
         created: function () {
             this.getBaseInfo()
             this.getRepayRegList()
+            this.getSurplusFund()
             this.getMatched()
             this.listRepayment()
             this.getSettleInfo()
