@@ -1510,8 +1510,24 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 				for (RepaymentBizPlanListDetail planListDetail : planListDto.getBizPlanListDetails()) {
 					List<RepaymentProjFactRepay> list = financeBaseDto.getProjFactRepays().get(planListDetail.getPlanDetailId());
 					if (list != null && !list.isEmpty()) {
-						BigDecimal factAmount = BigDecimal.ZERO;
+						/*优化同一个费用项在备注里出现2次*/
+						List<RepaymentProjFactRepay> newList = new ArrayList<>() ;
 						for (RepaymentProjFactRepay repaymentProjFactRepay : list) {
+							boolean existSameFee = false ;
+							for (RepaymentProjFactRepay repaymentProjFactRepay2 : newList) {
+								if (repaymentProjFactRepay2.getFeeId().equals(repaymentProjFactRepay.getFeeId())) {
+									existSameFee = true ;
+									repaymentProjFactRepay2.setFactAmount(repaymentProjFactRepay2.getFactAmount().add(repaymentProjFactRepay.getFactAmount()));
+								}
+							}
+							if (!existSameFee) {
+								newList.add(repaymentProjFactRepay);
+							}
+						}
+						/*优化同一个费用项在备注里出现2次*/
+						
+						BigDecimal factAmount = BigDecimal.ZERO;
+						for (RepaymentProjFactRepay repaymentProjFactRepay : newList) {
 							factAmount = repaymentProjFactRepay.getFactAmount().add(factAmount);
 						}
 						feeDetails.append(factAmount.setScale(2, RoundingMode.HALF_UP));
