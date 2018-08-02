@@ -9,7 +9,7 @@ layui.define(function (exports) {
     exports('ht_config', {
         app: "ALMS"
         , basePath: base + "alms/"
-        , basePath1: base + "xxx/"
+        , basePath1: base + "rp-app-service/"
         , gatewayUrl:base
         , loginPath: "/login"
         , indexPath: "/index"
