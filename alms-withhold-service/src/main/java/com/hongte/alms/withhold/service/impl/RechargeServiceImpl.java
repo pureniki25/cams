@@ -501,15 +501,12 @@ public class RechargeServiceImpl implements RechargeService {
 						if(bankRepayTestResult.getParamValue().equals("0000")) {
 							resultData.setResultMsg("充值成功");
 							remoteResult.setReturnCode("0000");
-							break;
 						}else if(bankRepayTestResult.getParamValue().equals("1111")){
 							resultData.setResultMsg("银行卡余额不足");
 							remoteResult.setReturnCode("1111");
-							break;
 						}else if(bankRepayTestResult.getParamValue().equals("2222")){
 							resultData.setResultMsg("处理中");
 							remoteResult.setReturnCode("EIP_TD_HANDLER_EXECEPTION");
-							break;
 						}else {
 							resultData.setResultMsg("代扣失败");
 							remoteResult.setReturnCode("9999");
@@ -1199,6 +1196,11 @@ public class RechargeServiceImpl implements RechargeService {
 				String resultMsg="充值成功";
 				result.setReturnCode("0000");
 				result.msg(resultMsg);
+				log.setRepayStatus(1);
+				log.setRemark(getBankSearchResultMsg(result).getResultMsg());
+				log.setUpdateTime(new Date());
+				withholdingRepaymentLogService.updateById(log);
+				shareProfit(pList, log);
 			}else if(bankRepayTestResult.getParamValue().equals("1111")){
 				String resultMsg="银行卡余额不足";
 				result.setReturnCode("1111");

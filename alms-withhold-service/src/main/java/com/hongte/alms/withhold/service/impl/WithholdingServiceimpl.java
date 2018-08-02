@@ -85,7 +85,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		Integer days = Integer.valueOf(repayStatusList.get(0).getParamValue());
 		List<RepaymentBizPlanList> pLists = repaymentBizPlanListService.selectAutoRepayList(days);// 查询一个周期内(30天)要代扣的记录
 //		for (RepaymentBizPlanList pList : pLists) {
-//			if(pList.getPlanListId().equals("ceac78d1-52e8-4373-a98b-08b9c6e6d998")) {
+//			if(pList.getPlanListId().equals("d7167b3d-1421-477d-ba13-f54a8d470db9")) {
 //				System.out.println("STOP");
 //			}
 //			//获取该还款计划最早一期没有还的代扣
