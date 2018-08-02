@@ -85,7 +85,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		Integer days = Integer.valueOf(repayStatusList.get(0).getParamValue());
 		List<RepaymentBizPlanList> pLists = repaymentBizPlanListService.selectAutoRepayList(days);// 查询一个周期内(30天)要代扣的记录
 //		for (RepaymentBizPlanList pList : pLists) {
-//			if(pList.getPlanListId().equals("af996e99-bb65-427d-ad91-cc5d36f2d509")) {
+//			if(pList.getPlanListId().equals("ceac78d1-52e8-4373-a98b-08b9c6e6d998")) {
 //				System.out.println("STOP");
 //			}
 //			//获取该还款计划最早一期没有还的代扣
@@ -193,9 +193,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		Result result=new Result();
 		BigDecimal onlineAmount = rechargeService.getOnlineAmount(pList);
 		BigDecimal underAmount = rechargeService.getUnderlineAmount(pList);
-		if(rechargeService.isForgiveDayOutside(pList)) {//判断是否在宽限期内，如果是则不代扣线下滞纳金,
-			underAmount=BigDecimal.valueOf(0);
-		}
+	
 		
 		Integer platformId = (Integer) PlatformEnum.YH_FORM.getValue();
 		boolean isUseThirdRepay = false;// 是否调用第三方代扣
@@ -343,8 +341,16 @@ public class WithholdingServiceimpl implements WithholdingService {
 		} else {
 
 			if (thirtyCardInfo != null) {// 绑定了第三方平台
-				if (underAmount.compareTo(BigDecimal.valueOf(0)) > 0) {
-					ThirdRepaymentCharge(basic, thirtyCardInfo, pList, underAmount,appType);
+				if(rechargeService.isForgiveDayOutside(pList)) {//判断是否在宽限期内，如果是则不代扣线下滞纳金,
+					underAmount=BigDecimal.valueOf(0);
+					result.setCode("-1");
+					result.setMsg("在宽限期内,不代扣线下滞纳金");
+					rechargeService.RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
+					return result;
+				}else {
+					if (underAmount.compareTo(BigDecimal.valueOf(0)) > 0) {
+						ThirdRepaymentCharge(basic, thirtyCardInfo, pList, underAmount,appType);
+					}
 				}
 			} else { // 没有绑定第三方平台直接跳出
 				result.setCode("-1");
@@ -400,9 +406,10 @@ public class WithholdingServiceimpl implements WithholdingService {
 				BigDecimal repayMoney = rechargeService.getRestAmount(pList);
 
 				if(rechargeService.isForgiveDayOutside(pList)) {//判断是否在宽限期内，如果是则不代扣线下滞纳金,
-					underAmount=BigDecimal.valueOf(0);
+					BigDecimal amount = rechargeService.getUnderlineAmount(pList);
+					repayMoney=repayMoney.subtract(amount);
 				}
-				if (underAmount != null && underAmount.compareTo(BigDecimal.valueOf(0)) > 0) {
+				if (underAmount != null && underAmount.compareTo(BigDecimal.valueOf(0)) > 0) {//如果UnderAmount不等于NULL,说明是银行代扣完之后完过来代扣线下滞纳金的
 					repayMoney = underAmount;
 				}
 				
