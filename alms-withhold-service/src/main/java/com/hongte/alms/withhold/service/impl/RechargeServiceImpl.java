@@ -23,6 +23,7 @@ import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.enums.SysParameterEnums;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayResultCodeEnum;
+import com.hongte.alms.base.enums.repayPlan.SectionRepayStatusEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.CustomerInfoXindaiRemoteApi;
 import com.hongte.alms.base.feignClient.EipRemote;
@@ -988,6 +989,13 @@ public class RechargeServiceImpl implements RechargeService {
 			RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
 			return result;
        }
+       if(pList.getRepayStatus()==SectionRepayStatusEnum.ONLINE_REPAID.getKey()) {
+   		//判断线上已还款
+			result.setCode("-1");
+			result.setMsg("线上已还款,不能自动代扣");
+			RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
+			return result;
+      }
        
        
        
