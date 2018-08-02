@@ -193,6 +193,10 @@ public class WithholdingServiceimpl implements WithholdingService {
 		Result result=new Result();
 		BigDecimal onlineAmount = rechargeService.getOnlineAmount(pList);
 		BigDecimal underAmount = rechargeService.getUnderlineAmount(pList);
+		if(rechargeService.isForgiveDayOutside(pList)) {//判断是否在宽限期内，如果是则不代扣线下滞纳金,
+			underAmount=BigDecimal.valueOf(0);
+		}
+		
 		Integer platformId = (Integer) PlatformEnum.YH_FORM.getValue();
 		boolean isUseThirdRepay = false;// 是否调用第三方代扣
 		// 获取所有银行代扣渠道,先扣线上费用
@@ -359,6 +363,8 @@ public class WithholdingServiceimpl implements WithholdingService {
 	 */
 	private Result ThirdRepaymentCharge(BasicBusiness basic, BankCardInfo thirtyCardInfo, RepaymentBizPlanList pList,
 			BigDecimal underAmount,String appType) {
+		
+		
 		Result result=new Result();
 		// 获取所有第三方代扣渠道
 		List<WithholdingChannel> channels = withholdingChannelService
@@ -393,6 +399,9 @@ public class WithholdingServiceimpl implements WithholdingService {
 				// 本期剩余应还金额
 				BigDecimal repayMoney = rechargeService.getRestAmount(pList);
 
+				if(rechargeService.isForgiveDayOutside(pList)) {//判断是否在宽限期内，如果是则不代扣线下滞纳金,
+					underAmount=BigDecimal.valueOf(0);
+				}
 				if (underAmount != null && underAmount.compareTo(BigDecimal.valueOf(0)) > 0) {
 					repayMoney = underAmount;
 				}
