@@ -9,6 +9,7 @@ public enum SysParameterEnums {
 
 	
 	REPAY_DAYS("autoRepayDays","筛选自动代扣记录天数范围"),
+	FORGIVE_DAYS("forgiveDay","代扣线下滞纳金宽限期"),
 	BANK_CHANNEL("bankChannel","银行代扣子渠道");
 	
 
