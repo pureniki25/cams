@@ -317,24 +317,6 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
         }
         
         /*删除合规化还款调用记录 开始*/
-//        for (String projectId : projectIds) {
-//        	//撤销成功 通知分发中心
-//            try{
-//            	platformRepaymentReq.setProjectId(projectId);
-//            	platformRepaymentReq.setConfirmLogId(log.getConfirmLogId());
-//                Result revokeListResult = platformRepaymentFeignClient.revokeTdrepayRecharge(platformRepaymentReq);
-//                if (!"1".equals(revokeListResult.getCode())) {
-//					throw new ServiceRuntimeException("通知分发中心撤销失败："+revokeListResult.getMsg());
-//				}
-//                logger.info("=========通知分发中心已经撤销{}",JSON.toJSONString(revokeListResult));
-//            }catch (Exception e){
-//                logger.error("=========通知分发中心已经撤销出错{}",e);
-//                throw new ServiceRuntimeException("通知分发中心已经撤销出错");
-//            }
-//		}
-        
-        
-        
         List<RepaymentConfirmPlatRepayLog> repaymentConfirmPlatRepayLogs = repaymentConfirmPlatRepayLogMapper.selectList(new EntityWrapper<RepaymentConfirmPlatRepayLog>().eq("confirm_log_id", log.getConfirmLogId()));
         for (RepaymentConfirmPlatRepayLog repaymentConfirmPlatRepayLog : repaymentConfirmPlatRepayLogs) {
         	String projPlanListId = repaymentConfirmPlatRepayLog.getProjPlanListId() ;
@@ -365,9 +347,6 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 		}
         /*删除合规化还款调用记录 结束*/
         log.deleteById();
-
-       
-
         return Result.success();
     }
 

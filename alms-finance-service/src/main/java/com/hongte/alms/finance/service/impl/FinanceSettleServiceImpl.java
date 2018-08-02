@@ -12,6 +12,7 @@ import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.enums.RepayRegisterState;
 import com.hongte.alms.base.enums.repayPlan.*;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
+import com.hongte.alms.base.feignClient.PlatformRepaymentFeignClient;
 import com.hongte.alms.base.mapper.*;
 import com.hongte.alms.base.process.mapper.ProcessMapper;
 import com.hongte.alms.base.service.*;
@@ -178,6 +179,13 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     @Qualifier("AccountantOverRepayLogService")
     private AccountantOverRepayLogService accountantOverRepayLogService;
 
+    @Autowired
+    private PlatformRepaymentFeignClient platformRepaymentFeignClient;
+    
+    @Autowired
+    @Qualifier("SysApiCallFailureRecordService")
+    private SysApiCallFailureRecordService sysApiCallFailureRecordService;
+    
     @Override
     @Transactional(rollbackFor = {ServiceRuntimeException.class, Exception.class})
     public List<CurrPeriodProjDetailVO> financeSettle(FinanceSettleReq financeSettleReq) {
@@ -415,6 +423,12 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     }
 
 
+    /* (non-Javadoc)
+     * @see com.hongte.alms.finance.service.FinanceSettleService#makeRepaymentPlanAllPlan(com.hongte.alms.finance.req.FinanceSettleBaseDto, com.hongte.alms.finance.req.FinanceSettleReq)
+     */
+    /* (non-Javadoc)
+     * @see com.hongte.alms.finance.service.FinanceSettleService#makeRepaymentPlanAllPlan(com.hongte.alms.finance.req.FinanceSettleBaseDto, com.hongte.alms.finance.req.FinanceSettleReq)
+     */
     /* (non-Javadoc)
      * @see com.hongte.alms.finance.service.FinanceSettleService#makeRepaymentPlanAllPlan(com.hongte.alms.finance.req.FinanceSettleBaseDto, com.hongte.alms.finance.req.FinanceSettleReq)
      */
@@ -663,12 +677,6 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 					
 				}
                 
-				/*更新业务的detail*/
-				
-				
-				
-				
-				
 				/*将数据入库*/
 
 				if (!financeSettleBaseDto.getPreview()) {
@@ -724,15 +732,33 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 						}
 					}
 	                
+	                List<RepaymentProjPlanList> projPlanList = new ArrayList<>() ;
+	                
 	                for (RepaymentBizPlanSettleDto bizPlanSettleDto : bizPlanSettleDtos) {
 	                	/*更新业务plan*/
 	                	bizPlanSettleDto.getRepaymentBizPlan().setPlanStatus(e.getValue());
 	                	bizPlanSettleDto.getRepaymentBizPlan().updateAllColumnById();
 	                	
+	                	/*更新财务管理列表*/
+	                	RepaymentBizPlanListSynch synch = new RepaymentBizPlanListSynch() ;
+		                synch.setPlanListId(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getPlanListId());
+		                synch = repaymentBizPlanListSynchMapper.selectOne(synch) ;
+		                synch.setCurrentStatus(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getCurrentStatus());
+		                synch.setCurrentSubStatus(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getCurrentSubStatus());
+		                synch.setRepayStatus(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getRepayStatus());
+		                synch.setRepayFlag(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getRepayFlag());
+		                synch.setFinanceConfirmUser(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getFinanceConfirmUser());
+		                synch.setFinanceConfirmUserName(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getFinanceConfirmUserName());
+		                synch.setFactAmountExt(financeSettleBaseDto.getRepayFactAmount());
+		                repaymentBizPlanListSynchMapper.updateAllColumnById(synch);
+		                
 	                	for (RepaymentProjPlanSettleDto repaymentProjPlanSettleDto : bizPlanSettleDto.getProjPlanStteleDtos()) {
 							/*更新标PLAN*/
 	                		repaymentProjPlanSettleDto.getRepaymentProjPlan().setPlanStatus(e.getValue());
 							repaymentProjPlanSettleDto.getRepaymentProjPlan().updateAllColumnById();
+							
+							/*将本期调用合规化还款接口的projPlanList存入内存*/
+							projPlanList.add(repaymentProjPlanSettleDto.getCurrProjPlanListDto().getRepaymentProjPlanList());
 						}
 	                	
 	                	for (RepaymentBizPlanListDetail bizPlanListDetail : bizPlanSettleDto.getCurrBizPlanListDto().getBizPlanListDetails()) {
@@ -751,6 +777,35 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 						}
 					}
 	                
+	                /*将调用合规化还款的projPlanList保存到数据库*/
+	                for(RepaymentProjPlanList repaymentProjPlanList: projPlanList){
+	                    RepaymentConfirmPlatRepayLog log = new RepaymentConfirmPlatRepayLog();
+	                    log.setConfirmLogId(financeSettleBaseDto.getUuid());
+	                    log.setProjPlanListId(repaymentProjPlanList.getProjPlanListId());
+	                    log.setCreateTime(new Date());
+	                    log.setCreateUser(loginUserInfoHelper.getUserId()==null?Constant.ADMIN_ID:loginUserInfoHelper.getUserId());
+	                    repaymentConfirmPlatRepayLogService.insert(log);
+	                }
+	                
+	                executor.execute(new Runnable() {
+	                    @Override
+	                    public void run() {
+	                        logger.info("调用平台合规化还款接口开始，confirmLogId：{}", financeSettleBaseDto.getUuid());
+	                        try {
+	                            //睡一下，让还款的信息先存完。
+	                            try{
+	                                Thread.sleep(3000);
+	                            }catch (InterruptedException e){
+	                                logger.error(e.getMessage(), e);
+	                            }
+	                            tdrepayRecharge(projPlanList);
+	                        } catch (Exception e) {
+	                            logger.error(e.getMessage(), e);
+	                            Thread.currentThread().interrupt();
+	                        }
+	                        logger.info("调用平台合规化还款接口结束");
+	                    }
+	                });
 	                
 				}
 				
@@ -777,6 +832,64 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
     }
 
+    private void tdrepayRecharge(List<RepaymentProjPlanList> projPlanLists) {
+
+        if(projPlanLists==null||projPlanLists.size()==0){
+        	logger.info("开始调用平台合规化还款接口，参数：{}", projPlanLists);
+            return;
+        }
+//        //睡一下，让还款的信息先存完。
+//        try {
+//            Thread.sleep(500);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+        for(RepaymentProjPlanList repaymentProjPlanList : projPlanLists){
+            SysApiCallFailureRecord record = new SysApiCallFailureRecord();
+            Result result = null;
+            try {
+                record.setModuleName(AlmsServiceNameEnums.FINANCE.getName());
+                record.setApiCode(Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT);
+                record.setApiName(Constant.INTERFACE_NAME_PLATREPAY_REPAYMENT);
+                record.setRefId(repaymentProjPlanList.getProjPlanListId());
+                record.setCreateUser(
+                        StringUtil.isEmpty(loginUserInfoHelper.getUserId()) ? "null" : loginUserInfoHelper.getUserId());
+                record.setCraeteTime(new Date());
+                record.setTargetUrl(Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT);
+
+                RepaymentProjPlan plan = null;
+
+                if (repaymentProjPlanList != null) {
+                    plan = repaymentProjPlanService.selectById(repaymentProjPlanList.getProjPlanId());
+                }
+
+                if (plan != null) {
+
+                    Map<String, Object> paramMap = new HashMap<>();
+                    paramMap.put("projPlanListId",repaymentProjPlanList.getProjPlanListId());
+
+
+                    record.setApiParamPlaintext(JSONObject.toJSONString(paramMap));
+//                    sysApiCallFailureRecordService.insert(record);
+
+                    // 平台合规化还款接口
+                    result = platformRepaymentFeignClient.repayment(paramMap);
+                    if (result != null) {
+                        record.setApiReturnInfo(JSONObject.toJSONString(result));
+                    }
+                }
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                record.setApiReturnInfo(e.getMessage());
+            }
+            logger.info("平台合规化还款接口返回结果：{}", JSONObject.toJSONString(result));
+            if (result == null || !"1".equals(result.getCode())) {
+                sysApiCallFailureRecordService.insert(record);
+            }
+        }
+
+    }
+    
     /**
      * 计算业务层面的实还
      * @author 王继光
