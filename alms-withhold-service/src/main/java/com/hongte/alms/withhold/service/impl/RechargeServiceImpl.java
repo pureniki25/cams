@@ -1076,7 +1076,7 @@ public class RechargeServiceImpl implements RechargeService {
 	public boolean isForgiveDayOutside(RepaymentBizPlanList list) {
 		boolean isForgiveDayOutside = false;
 		SysParameter  forgiveDayParam = sysParameterService.selectOne(
-				new EntityWrapper<SysParameter>().eq("param_type", SysParameterEnums.FORGIVE_DAYS)
+				new EntityWrapper<SysParameter>().eq("param_type", SysParameterEnums.FORGIVE_DAYS.getKey())
 						.eq("status", 1).orderBy("param_value"));
 		BigDecimal overDays=list.getOverdueDays();
 		BigDecimal  forgiveDay=BigDecimal.valueOf(Double.valueOf(forgiveDayParam.getParamValue()));
