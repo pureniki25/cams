@@ -256,7 +256,34 @@ window.layinit(function(htConfig){
                 },{
                     field: 'businessId',
                     width:140,
-                    title: '业务编号'
+                    title: '业务编号',
+                    templet:function(d){
+                    	
+                    	let color = '';
+                    	let content = '';
+                    	
+                      
+                        
+                        if (d.plateType == 1) {
+                        	color = '#CC9933'
+                        	content = '团'
+                        }else if (d.plateType == 2) {
+                        	color = '#669933'
+                        	content = '你'
+                        }else if (d.plateType == 3) {
+                        	color = '#666699'
+                        	content = '粤'
+                        }else if (d.plateType == 4) {
+                        	color = '#993300'
+                        	content = '线'
+                        }
+                        
+                        let styel = 'background-color: '+ color +';background-image: none !important;text-shadow: none !important;display: inline-block;padding: 2px 4px;font-size: 11.844px;font-weight: bold;line-height: 14px;color: #fff;text-shadow: 0 -1px 0 rgba(0,0,0,0.25);white-space: nowrap;vertical-align: baseline;'
+                    	 let res = '<span style="'+styel+'">'+content+'</span>'
+                    	  
+                        res += d.businessId
+                        return res
+                    }
                 }, {
                     field: 'afterId',
                     width:90,

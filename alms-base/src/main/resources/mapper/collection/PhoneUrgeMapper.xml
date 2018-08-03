@@ -371,7 +371,12 @@
 
 		pList.borrow_limit_ext as borrowLimit ,
 		pList.repayment_type_id_ext as repaymentTypeId ,
-		pList.class_name_ext className
+		pList.class_name_ext className,
+		(SELECT tpi.plate_type 
+			  FROM
+			    `tb_tuandai_project_info` tpi 
+			  WHERE tpi.business_id = pList.business_id 
+			  LIMIT 1) plateType
         from tb_repayment_biz_plan_list_synch  as pList
         <choose>
             <!--  为电催专员  限制只查看分配给自己的期数-->

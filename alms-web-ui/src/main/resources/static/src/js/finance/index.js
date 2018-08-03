@@ -37,9 +37,36 @@ window.layinit(function (htConfig) {
                 planListId:''
             },
             table: {
-                col: [{
+                col: [
+                	{
                         title: '业务编号',
                         key: 'businessId',
+                        width:150,
+                        render: (h, p) => {
+                        	let color = '';
+                        	let platform = '';
+                            if (p.row.plateType == 1) {
+                                color = 'yellow';
+                                platform = '团';
+                            }else if (p.row.plateType == 2) {
+                                color = 'green';
+                                platform = '你';
+                            }else if (p.row.plateType == 3) {
+                                color = 'blue';
+                                platform = '粤';
+                            }else if (p.row.plateType == 4) {
+                                color = 'red';
+                                platform = '线';
+                            }
+                            return h('div',[
+                            	h('Tag',{
+                            		props:{
+                            			color:color
+                            		}
+                            	},platform),
+                            	h('span',p.row.businessId)
+                            ])
+                        }
                     },
                     {
                         title: '期数',
