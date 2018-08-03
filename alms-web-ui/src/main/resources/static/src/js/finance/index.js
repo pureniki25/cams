@@ -302,6 +302,11 @@ window.layinit(function (htConfig) {
                                                         })
                                                     }
                                                     if (call == 'settle') {
+                                                        if(p.row.repayStatus != '未还款' && p.row.repayStatus != '部分还款'){
+                                                            app.$Message.warning({
+                                                                content : '当前期已还款或线上部分已还款的不能结清'
+                                                            })
+                                                        }
                                                         app.checkLastRepay(p.row.businessId,p.row.afterId);
                                                         if(app.lastRepayDianfuweijieqing){
                                                             app.$Message.warning({content:'往期存在垫付未结清记录'})
@@ -319,6 +324,11 @@ window.layinit(function (htConfig) {
                                                         })
                                                     }
                                                     if (call == 'planSettle') {
+                                                        if(p.row.repayStatus != '未还款' && p.row.repayStatus != '部分还款'){
+                                                            app.$Message.warning({
+                                                                content : '当前期已还款或线上部分已还款的不能结清'
+                                                            })
+                                                        }
                                                         app.checkLastRepay(p.row.businessId,p.row.afterId);
                                                         if(app.lastRepayDianfuweijieqing){
                                                             app.$Message.warning({content:'往期存在垫付未结清记录'})

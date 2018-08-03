@@ -126,8 +126,10 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void queryDistributeFund() {
+		Integer[] arrProcessStatus = {1, 3};
+		// 查询分发失败和分发处理中的数据
 		List<TdrepayRechargeLog> tdrepayRechargeLogs = tdrepayRechargeLogService
-				.selectList(new EntityWrapper<TdrepayRechargeLog>().eq("process_status", 1).eq("is_valid", 1));
+				.selectList(new EntityWrapper<TdrepayRechargeLog>().in("process_status", arrProcessStatus).eq("is_valid", 1));
 		if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
 
 			Map<String, Object> paramMap = new HashMap<>();
