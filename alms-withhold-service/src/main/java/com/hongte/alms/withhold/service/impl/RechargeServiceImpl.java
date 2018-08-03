@@ -221,11 +221,11 @@ public class RechargeServiceImpl implements RechargeService {
 				YiBaoRechargeReqDto dto = new YiBaoRechargeReqDto();
 				dto.setMerchantaccount(merchantaccount);
 				dto.setOrderid(merchOrderId);
-				dto.setTranstime((int) (System.currentTimeMillis()));
+				dto.setTranstime((int) (System.currentTimeMillis()/1000));
 				dto.setAmount((int)(amount * 100));// 易宝代扣要转换单位:分
 				dto.setProductname("");
-				dto.setIdentityid(bankCardInfo.getBindId());
-				dto.setIdentitytype("5");
+				dto.setIdentityid(bankCardInfo.getIdentityNo());
+				dto.setIdentitytype("2");
 				dto.setCard_top(bankCardInfo.getBankCardNumber().substring(0, 6));
 				dto.setCard_last(bankCardInfo.getBankCardNumber().substring(
 						bankCardInfo.getBankCardNumber().length() - 4, bankCardInfo.getBankCardNumber().length()));
@@ -986,12 +986,13 @@ public class RechargeServiceImpl implements RechargeService {
 			RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
 			return result;
        }
-       if(pList.getRepayStatus()==SectionRepayStatusEnum.ONLINE_REPAID.getKey()) {
-   		//判断线上已还款
-			result.setCode("-1");
-			result.setMsg("线上已还款,不能自动代扣");
-			RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
-			return result;
+       if(pList.getRepayStatus()==SectionRepayStatusEnum.ONLINE_REPAID.getKey()) {	//判断是否在宽限期内线上已还款
+    	   if(isInForgiveDayRepay(pList)) {
+    		    result.setCode("-1");
+	   			result.setMsg("在宽限期内线上已还款,不能自动代扣");
+	   			RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
+	   			return result;
+    	   }
       }
        
        
@@ -1038,6 +1039,9 @@ public class RechargeServiceImpl implements RechargeService {
 		List<RepaymentBizPlanList> dueDateLists=repaymentBizPlanLists.stream().filter(a->a.getDueDate().compareTo(new Date())<=1).collect(Collectors.toList());
 		//还没有还款的到了应该还日期的期数集合
 		List<RepaymentBizPlanList> notRepayLists=repaymentBizPlanLists.stream().filter(a->(!a.getCurrentStatus().equals("已还款"))).collect(Collectors.toList());
+		notRepayLists=repaymentBizPlanLists.stream().filter(a->(a.getRepayStatus()!=SectionRepayStatusEnum.ONLINE_REPAID.getKey())).collect(Collectors.toList());
+		notRepayLists=repaymentBizPlanLists.stream().filter(a->(a.getRepayStatus()!=SectionRepayStatusEnum.ALL_REPAID.getKey())).collect(Collectors.toList());
+		
 		//期数从小到大排序
 		Optional<RepaymentBizPlanList> min=notRepayLists.stream().min((a1,a2)->a1.getPeriod().compareTo(a2.getPeriod()));
 		RepaymentBizPlanList minRepayBizPlanList=min.get();
@@ -1070,20 +1074,21 @@ public class RechargeServiceImpl implements RechargeService {
 	
 	
 	/**
-	 * 如果是线上已还款，判断是否在宽限期外，如果是，就可以自动代扣，否则不能
+	 * 如果是线上已还款，判断是否在宽限期内还款，如果是，就不可以自动代扣，否则可以自动代扣
 	 */
 	@Override
-	public boolean isForgiveDayOutside(RepaymentBizPlanList list) {
-		boolean isForgiveDayOutside = false;
+	public boolean isInForgiveDayRepay(RepaymentBizPlanList list) {
+		boolean isInForgiveDayRepay = false;
 		SysParameter  forgiveDayParam = sysParameterService.selectOne(
 				new EntityWrapper<SysParameter>().eq("param_type", SysParameterEnums.FORGIVE_DAYS.getKey())
 						.eq("status", 1).orderBy("param_value"));
-		BigDecimal overDays=list.getOverdueDays();
+		BigDecimal overDays=list.getOverdueDays()==null?BigDecimal.valueOf(0):list.getOverdueDays();
 		BigDecimal  forgiveDay=BigDecimal.valueOf(Double.valueOf(forgiveDayParam.getParamValue()));
-		if(overDays.compareTo(forgiveDay)>0) {//在宽限期外
-			 isForgiveDayOutside=true;
+		Date forgiveDateEnd=DateUtil.addDay2Date(forgiveDay.intValue(),list.getDueDate());
+		if(list.getFactRepayDate().compareTo(forgiveDateEnd)<=0) {//在宽限期内还款的
+			isInForgiveDayRepay=true;
 		}
-		return isForgiveDayOutside;
+		return isInForgiveDayRepay;
 	}
 	
 	/**
@@ -1237,13 +1242,13 @@ public class RechargeServiceImpl implements RechargeService {
 			}
 		} else if (result.getReturnCode().equals(RepayResultCodeEnum.YH_HANDLER_EXCEPTION.getValue())||result.getReturnCode().equals("INTERNAL_ERROR")||result.getReturnCode().equals(RepayResultCodeEnum.YH_HANDLER_TIMEOU.getValue())) {
 			log.setRepayStatus(2);
-			log.setRemark(result.getReturnCode()+"："+result.getMsg());
+			log.setRemark(getBankSearchResultMsg(result).getResultMsg());
 			log.setUpdateTime(new Date());
 			withholdingRepaymentLogService.updateById(log);
 
 		} else if(result.getMsg()!=null&&result.getMsg().contains("服务调用异常")){
 			log.setRepayStatus(2);
-			log.setRemark(result.getMsg());
+			log.setRemark(getBankSearchResultMsg(result).getResultMsg());
 			log.setUpdateTime(new Date());
 			withholdingRepaymentLogService.updateById(log);
 
