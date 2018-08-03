@@ -124,7 +124,7 @@ public class RepaymentProjPlanListServiceImpl extends
 						BigDecimal underLateFeeSum=BigDecimal.valueOf(0);//每个业务每期还款计划的线下收费
 						BigDecimal onlineLateFeeSum=BigDecimal.valueOf(0);//每个业务每期还款计划的线上收费
 						
-						if(pList.getPlanListId().equals("b1422cee-b579-479e-8f80-c2b1c5f24f43")) {
+						if(pList.getPlanListId().equals("aea29a0a-237d-485b-b6ba-a2ea72e503c1")) {
 							System.out.println("stop");
 						}
 						
@@ -603,7 +603,7 @@ public class RepaymentProjPlanListServiceImpl extends
 	@Override
 	public RepaymentBizPlanList calLateFeeForPerPList(RepaymentBizPlanList pList,Integer type) {
 		Date nowDate=new Date();
-		if(pList.getFactRepayDate()!=null&&type!=null&&type==1) {
+		if(pList.getFactRepayDate()!=null&&type!=null&&type==1) {//说明是结清重算使用的，取实际还款的日期重算滞纳金
 			nowDate=pList.getFactRepayDate();
 		}
 		
@@ -633,6 +633,10 @@ public class RepaymentProjPlanListServiceImpl extends
 				}
 				// 没有逾期,且不是你我金融生成
 				if (isOverDue(nowDate, projPList.getDueDate()) >=0&&projPList.getCreatSysType()!=3) {
+					projPList.setOverdueAmount(BigDecimal.valueOf(0));
+					pList.setOverdueAmount(BigDecimal.valueOf(0));
+					repaymentBizPlanListService.updateById(pList);
+					this.updateById(projPList);
 					continue;
 					// 逾期的当前期
 				} else {

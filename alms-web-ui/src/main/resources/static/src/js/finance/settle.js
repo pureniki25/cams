@@ -492,16 +492,16 @@ window.layinit(function (htConfig) {
                 }
                 app.factRepaymentInfo.surplusFund = 0
             },
-            'factRepaymentInfo.surplusFund': function (n) {
-                if ((n||n==0 )&& !isNaN(n)) {
-                    if(n>app.factRepaymentInfo.canUseSurplus){
-                        app.$Modal.warning({content:'可使用结余金额不能大于'+app.factRepaymentInfo.canUseSurplus})
-                        app.factRepaymentInfo.surplusFund = 0
-                        return;
-                    }
-                    app.factRepaymentInfo.repayAccount = accAdd(app.factRepaymentInfo.moneyPoolAccount,(app.factRepaymentInfo.surplusFund||0))
-                }
-            },
+            // 'factRepaymentInfo.surplusFund': function (n) {
+            //     if ((n||n==0 )&& !isNaN(n)) {
+            //         if(n>app.factRepaymentInfo.canUseSurplus){
+            //             app.$Modal.warning({content:'可使用结余金额不能大于'+app.factRepaymentInfo.canUseSurplus})
+            //             app.factRepaymentInfo.surplusFund = 0
+            //             return;
+            //         }
+            //         app.factRepaymentInfo.repayAccount = accAdd(app.factRepaymentInfo.moneyPoolAccount,(app.factRepaymentInfo.surplusFund||0))
+            //     }
+            // },
             'factRepaymentInfo.repayAccount': function (n) {
                 app.previewSettle()
             }
