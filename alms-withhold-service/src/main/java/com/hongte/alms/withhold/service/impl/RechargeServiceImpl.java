@@ -1082,7 +1082,7 @@ public class RechargeServiceImpl implements RechargeService {
 		SysParameter  forgiveDayParam = sysParameterService.selectOne(
 				new EntityWrapper<SysParameter>().eq("param_type", SysParameterEnums.FORGIVE_DAYS.getKey())
 						.eq("status", 1).orderBy("param_value"));
-		BigDecimal overDays=list.getOverdueDays();
+		BigDecimal overDays=list.getOverdueDays()==null?BigDecimal.valueOf(0):list.getOverdueDays();
 		BigDecimal  forgiveDay=BigDecimal.valueOf(Double.valueOf(forgiveDayParam.getParamValue()));
 		Date forgiveDateEnd=DateUtil.addDay2Date(forgiveDay.intValue(),list.getDueDate());
 		if(list.getFactRepayDate().compareTo(forgiveDateEnd)<=0) {//在宽限期内还款的
