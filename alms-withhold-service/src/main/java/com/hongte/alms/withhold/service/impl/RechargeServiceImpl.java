@@ -1078,6 +1078,7 @@ public class RechargeServiceImpl implements RechargeService {
 	 */
 	@Override
 	public boolean isInForgiveDayRepay(RepaymentBizPlanList list) {
+		list=repaymentBizPlanListService.selectById(list.getPlanListId());//获取最新的
 		boolean isInForgiveDayRepay = false;
 		SysParameter  forgiveDayParam = sysParameterService.selectOne(
 				new EntityWrapper<SysParameter>().eq("param_type", SysParameterEnums.FORGIVE_DAYS.getKey())
