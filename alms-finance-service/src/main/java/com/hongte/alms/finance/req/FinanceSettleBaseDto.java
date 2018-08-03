@@ -7,6 +7,8 @@ import com.hongte.alms.base.RepayPlan.dto.RepaymentProjPlanSettleDto;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.base.vo.finance.SettleFeesVO;
+import com.hongte.alms.base.vo.finance.SettleInfoVO;
+
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -31,6 +33,10 @@ public class FinanceSettleBaseDto {
 	private String afterId;
 	private String projectId;
 
+	/**
+	 * 业务结清应还VO
+	 */
+	private SettleInfoVO settleInfoVO ;
 	/**
 	 * 总应还金额（减去实还后的金额）
 	 */
