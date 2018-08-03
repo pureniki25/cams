@@ -16,5 +16,5 @@ import com.hongte.alms.common.mapper.SuperMapper;
  * @since 2018-05-26
  */
 public interface ProjExtRateMapper extends SuperMapper<ProjExtRate> {
-	BigDecimal calcProjextRate(@Param("projectId")String projectId ,@Param("rateType")String rateType,@Param("feeId")String feeId) ;
+	BigDecimal calcProjextRate(@Param("projectId")String projectId ,@Param("rateType")String rateType,@Param("feeId")String feeId,@Param("peroid")String peroid) ;
 }

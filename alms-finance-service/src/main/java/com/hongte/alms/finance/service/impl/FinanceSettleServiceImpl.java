@@ -447,7 +447,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
         if (repaymentBizPlanList != null) {
             SettleInfoVO settleInfoVO = settleInfoVO(financeSettleReq);
-            if (StringUtil.isEmpty(planId)) {// 整个业务结清
+//            if (StringUtil.isEmpty(planId)) {// 整个业务结清
                 List<RepaymentBizPlanSettleDto> bizPlanSettleDtos = financeSettleBaseDto.getCurrentPeriods();
                 Map<String,RepaymentProjPlanSettleDto>  projPlanSettleDtoMap = new HashMap<>();
 
@@ -815,19 +815,21 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 				
                 logger.info(JSON.toJSONString(financeSettleBaseDto.getUnderfillFees()));
 
-            } else {
-                List<RepaymentBizPlanList> repaymentBizPlanLists = repaymentBizPlanListMapper.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", planId).orderBy("period", true));
-
-                Integer period = repaymentBizPlanList.getPeriod();
-                String currentStatus = repaymentBizPlanList.getCurrentStatus();
-                if( RepayCurrentStatusEnums.逾期.toString().equals(currentStatus) && period.intValue() !=repaymentBizPlanLists.size()-1){
-                    throw new ServiceRuntimeException("当前逾期不能进行还款计划结清!");
-                }
-                //单个还款计划结清
-//                RepaymentBizPlan repaymentBizPlan = bizPlanService.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("business_id", businessId).eq("plan_id", planId));
-
-                makeRepaymentPlanOnePlan(financeSettleBaseDto, repaymentBizPlanList, financeSettleReq);
-            }
+//            } 
+            
+//            else {
+//                List<RepaymentBizPlanList> repaymentBizPlanLists = repaymentBizPlanListMapper.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", planId).orderBy("period", true));
+//
+//                Integer period = repaymentBizPlanList.getPeriod();
+//                String currentStatus = repaymentBizPlanList.getCurrentStatus();
+//                if( RepayCurrentStatusEnums.逾期.toString().equals(currentStatus) && period.intValue() !=repaymentBizPlanLists.size()-1){
+//                    throw new ServiceRuntimeException("当前逾期不能进行还款计划结清!");
+//                }
+//                //单个还款计划结清
+////                RepaymentBizPlan repaymentBizPlan = bizPlanService.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("business_id", businessId).eq("plan_id", planId));
+//
+//                makeRepaymentPlanOnePlan(financeSettleBaseDto, repaymentBizPlanList, financeSettleReq);
+//            }
 
         } else {
             logger.error("找不到对应的还款计划列表repaymentBizPlanList  businessId:" + businessId + "     after_id:" + afterId);
@@ -3062,12 +3064,23 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                 //(剩余本金*费率值) - 分公司服务费违约金 - 平台服务费违约金
 
                 BigDecimal upaid = repaymentProjPlanMapper.sumProjectItem10Unpaid(projExtRate.getProjectId(), planId);
+                
                 BigDecimal servicePenalty = projExtRateMapper.calcProjextRate(
-                        projExtRate.getProjectId(), RepayPlanFeeTypeEnum.PENALTY_AMONT.getValue().toString(), RepayPlanFeeTypeEnum.SUB_COMPANY_PENALTY.getUuid());
-
+                        projExtRate.getProjectId(), RepayPlanFeeTypeEnum.PENALTY_AMONT.getValue().toString(), RepayPlanFeeTypeEnum.SUB_COMPANY_PENALTY.getUuid(),bizPlanList.getPeriod().toString());
+                BigDecimal serviceFee = repaymentProjPlanListDetailMapper.calcService(bizPlanList.getBusinessId(), projExtRate.getProjectId(), planId, bizPlanList.getPeriod());
+                BigDecimal service = servicePenalty.multiply(serviceFee);
+                
+                
                 BigDecimal platformPenalty = projExtRateMapper.calcProjextRate(
-                        projExtRate.getProjectId(), RepayPlanFeeTypeEnum.PENALTY_AMONT.getValue().toString(), RepayPlanFeeTypeEnum.PLAT_PENALTY.getUuid());
-                penalty = (upaid.multiply(projExtRate.getRateValue())).subtract(servicePenalty).subtract(platformPenalty);
+                        projExtRate.getProjectId(), RepayPlanFeeTypeEnum.PENALTY_AMONT.getValue().toString(), RepayPlanFeeTypeEnum.PLAT_PENALTY.getUuid(),bizPlanList.getPeriod().toString());
+                BigDecimal platformFee = repaymentProjPlanListDetailMapper.calcPlatFee(bizPlanList.getBusinessId(), projExtRate.getProjectId(), planId, bizPlanList.getPeriod());
+                BigDecimal platform = platformPenalty.multiply(platformFee);
+                
+                penalty = (upaid.multiply(projExtRate.getRateValue())).subtract(service).subtract(platform);
+                
+                if (penalty.compareTo(BigDecimal.ZERO) < 0) {
+					penalty = BigDecimal.ZERO ;
+				}
 
             } else {
                 logger.error("错误： projExtRate.CalcWay[{}]尚未有对应算法", projExtRate.getCalcWay());
