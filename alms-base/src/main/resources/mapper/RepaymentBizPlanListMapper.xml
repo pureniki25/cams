@@ -332,8 +332,7 @@
 				pl.operator_name_ext AS operator, 
 				pl.customer_name_ext AS customer
 				, pl.phone_number_ext AS phoneNumber, pl.business_ctype_ext AS businessType, pl.due_date AS planRepayDate, pl.borrow_money_ext AS borrowMoney
-				, (SELECT 
-			    IFNULL(tpi.plate_type, 1) 
+				, (SELECT tpi.plate_type 
 			  FROM
 			    `tb_tuandai_project_info` tpi 
 			  WHERE tpi.business_id = pl.business_id 
