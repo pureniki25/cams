@@ -21,8 +21,9 @@ public class FinanceSettleBaseDto {
 	private String businessId;
 	private String orgBusinessId;
 	private String userId;
-
 	private String userName;
+	private String remark ;
+	
 	private String uuid;
 	// 临时变量
 	private String projPlanId;
