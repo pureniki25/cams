@@ -1092,6 +1092,20 @@ public class RechargeServiceImpl implements RechargeService {
 		return isInForgiveDayRepay;
 	}
 	
+	@Override
+	public boolean isForgiveDayOutside(RepaymentBizPlanList list) {
+		boolean isForgiveDayOutside = false;
+		SysParameter  forgiveDayParam = sysParameterService.selectOne(
+				new EntityWrapper<SysParameter>().eq("param_type", SysParameterEnums.FORGIVE_DAYS.getKey())
+						.eq("status", 1).orderBy("param_value"));
+		BigDecimal overDays=list.getOverdueDays()==null?BigDecimal.valueOf(0):list.getOverdueDays();
+		BigDecimal  forgiveDay=BigDecimal.valueOf(Double.valueOf(forgiveDayParam.getParamValue()));
+		if(overDays.compareTo(forgiveDay)>0) {//在宽限期外
+			 isForgiveDayOutside=true;
+		}
+		return isForgiveDayOutside;
+	}
+	
 	/**
 	 * 判断是否含有线下转账，如果有，不能自动代扣
 	 * 

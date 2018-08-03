@@ -85,7 +85,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		Integer days = Integer.valueOf(repayStatusList.get(0).getParamValue());
 		List<RepaymentBizPlanList> pLists = repaymentBizPlanListService.selectAutoRepayList(days);// 查询一个周期内(30天)要代扣的记录
 //		for (RepaymentBizPlanList pList : pLists) {
-//			if(pList.getPlanListId().equals("c6bb715e-8bde-4c23-a164-5b27e753bddc")) {
+//			if(pList.getPlanListId().equals("59857f38-e50b-4bc6-8f73-81c7677550be")) {
 //				System.out.println("STOP");
 //			}
 //			//获取该还款计划最早一期没有还的代扣
@@ -341,7 +341,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		} else {
 
 			if (thirtyCardInfo != null) {// 绑定了第三方平台
-				if(rechargeService.isInForgiveDayRepay(pList)) {//判断是否在宽限期内，如果是则不代扣线下滞纳金,
+				if(!rechargeService.isForgiveDayOutside(pList)) {//判断是否在宽限期内，如果是则不代扣线下滞纳金,
 					underAmount=BigDecimal.valueOf(0);
 					result.setCode("-1");
 					result.setMsg("在宽限期内,不代扣线下滞纳金");
@@ -405,7 +405,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 				// 本期剩余应还金额
 				BigDecimal repayMoney = rechargeService.getRestAmount(pList);
 
-				if(rechargeService.isInForgiveDayRepay(pList)) {//判断是否在宽限期内，如果是则不代扣线下滞纳金,
+				if(!rechargeService.isForgiveDayOutside(pList)) {//判断是否在宽限期外，如果是,要扣线下滞纳金,否则不扣
 					BigDecimal amount = rechargeService.getUnderlineAmount(pList);
 					repayMoney=repayMoney.subtract(amount);
 				}
