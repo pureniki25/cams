@@ -44,18 +44,34 @@ public enum PaymentPlatformEnums implements IEnum {
     }
     
     /**
-     * 根据业务类型ID获取对应的业务类型名称
+     * 根据资金端编号获取对应的资金端名称
      * @param value
      * @return
      * @author huweiqian
      */
     public static String getName(int value) {  
-		PaymentPlatformEnums[] businessTypeEnums = values();  
-        for (PaymentPlatformEnums businessTypeEnum : businessTypeEnums) {  
-            if (businessTypeEnum.value() == value) {  
-                return businessTypeEnum.getName();  
+		PaymentPlatformEnums[] paymentPlatformEnums = values();  
+        for (PaymentPlatformEnums platformEnums : paymentPlatformEnums) {  
+            if (platformEnums.value() == value) {  
+                return platformEnums.getName();  
             }  
         }  
         return null;  
     } 
+    
+    /**
+     * 根据资金端名称获取获取资金端编号
+     * @param name
+     * @return
+     * @author huweiqian
+     */
+    public static int getValueByName(String name) {  
+    	PaymentPlatformEnums[] paymentPlatformEnums = values();  
+    	for (PaymentPlatformEnums enums : paymentPlatformEnums) {  
+    		if (enums.getName().equals(name)) {  
+    			return enums.value();  
+    		}  
+    	}  
+    	return -1;  
+    }
 }

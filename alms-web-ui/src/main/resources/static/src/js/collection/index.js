@@ -74,7 +74,8 @@ window.layinit(function(htConfig){
                 customerName:'',  //客户名称
                 identifyCard:'', //身份证号
                 phoneNumber:'', //手机号
-                peroidStatus:'' //期数状态,首期/本金期/末期
+                peroidStatus:'', //期数状态,首期/本金期/末期
+                paymentPlatform: '', // 所属投资端
 
             },
             areaList:'',//area_array,   //区域列表
@@ -88,7 +89,8 @@ window.layinit(function(htConfig){
             selectedRowInfo:'',//存储当前选中行信息
             edit_modal:false,//控制编辑项选择modal显示的标志位
             menu_modal:false,
-            ruleValidate:setSearchFormValidate //表单验证
+            ruleValidate:setSearchFormValidate, //表单验证
+            paymentPlatformList:[], // 投资端集合
 
         },
         methods: {
@@ -130,6 +132,7 @@ window.layinit(function(htConfig){
                                 identifyCard:vm.searchForm.identifyCard, //身份证号
                                 phoneNumber:vm.searchForm.phoneNumber, //手机号
                                 peroidStatus:vm.searchForm.peroidStatus,  //期数状态
+                                paymentPlatform:vm.searchForm.paymentPlatform,  //所属投资端
                             }
                             , page: {
                                 curr: page || 1 //重新从第 1 页开始
@@ -141,6 +144,21 @@ window.layinit(function(htConfig){
                     // this.loading = false;
                 })
             },
+            /**
+             * 获取所有投资端名称
+             */
+            queryPaymentPlatform: function(){
+				axios.get(basePath + 'collection/queryPaymentPlatform', {timeout: 0})
+				.then(function(result){
+					if (result.data.code == "1") {
+						vm.paymentPlatformList = result.data.data;
+					} else {
+						vm.$Modal.error({ content: result.data.msg });
+					}
+				}).catch(function (error) {
+					vm.$Modal.error({content: '接口调用异常!'});
+            	});
+			},
             handleReset (name) { // 重置表单
                 var tt = this.$refs[name];
                 tt.resetFields();
@@ -199,7 +217,7 @@ window.layinit(function(htConfig){
         },
         mounted:function(){
 //使用layerUI的表格组件
-
+        	this.queryPaymentPlatform();
         }
     });
     //为表单添加输入
@@ -414,6 +432,7 @@ window.layinit(function(htConfig){
                 repayStatus:vm.searchForm.repayStatus,      //还款状态
                 customerName:vm.searchForm.customerName,  //客户名称
                 peroidStatus:vm.searchForm.peroidStatus,  //期数状态
+                paymentPlatform:vm.searchForm.paymentPlatform,  //所属投资端
             },
             page: true,
             done: function (res, curr, count) {

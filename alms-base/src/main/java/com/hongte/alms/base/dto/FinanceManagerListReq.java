@@ -67,6 +67,16 @@ public class FinanceManagerListReq {
 	 */
 	private String phoneNumber;
 	
+	/**
+	 * 所属投资端
+	 */
+	private String paymentPlatform;
+
+	/**
+	 * 所属投资端编码
+	 */
+	private Integer paymentPlatformCode;
+	
 	private Integer needPermission = 1;
 	
 	public String getCustomer() {
@@ -195,4 +205,17 @@ public class FinanceManagerListReq {
 	public void setNeedPermission(Integer needPermission) {
 		this.needPermission = needPermission;
 	}
+	public String getPaymentPlatform() {
+		return paymentPlatform;
+	}
+	public void setPaymentPlatform(String paymentPlatform) {
+		this.paymentPlatform = paymentPlatform;
+	}
+	public Integer getPaymentPlatformCode() {
+		return paymentPlatformCode;
+	}
+	public void setPaymentPlatformCode(Integer paymentPlatformCode) {
+		this.paymentPlatformCode = paymentPlatformCode;
+	}
+	
 }
