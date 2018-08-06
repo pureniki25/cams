@@ -24,8 +24,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 还款账号管理
- * Created by 张贵宏 on 2018/7/6 11:16
+ * 还款账号管理 Created by 张贵宏 on 2018/7/6 11:16
  */
 @RestController
 @RequestMapping("/departmentBank")
@@ -54,9 +53,11 @@ public class DepartmentBankController {
     @ApiOperation(value = "搜索查询银行账号")
     @RequestMapping("/search")
     public PageResult search(@RequestBody Page<DepartmentBank> page) {
-        //Map<String,Object> searchParams  = Servlets.getParametersStartingWith(request, "search_");
-        //page = new Page<>(layTableQuery.getPage(), layTableQuery.getLimit());
-        //departmentBankService.selectPage()
+        // Map<String,Object> searchParams = Servlets.getParametersStartingWith(request,
+        // "search_");
+        // page = new Page<>(layTableQuery.getPage(), layTableQuery.getLimit());
+        // departmentBankService.selectPage()
+        page.setOrderByField("updateTime").setAsc(false);
         departmentBankService.selectByPage(page);
         return PageResult.success(page.getRecords(), page.getTotal());
     }
@@ -66,17 +67,18 @@ public class DepartmentBankController {
     public Result edit(@RequestBody DepartmentBankVO departmentBankVO) {
         try {
             if (StringUtils.isBlank(departmentBankVO.getAccountId())) {
-                //新增
-                /*DepartmentBank departmentBank = new DepartmentBank();
-                BeanUtil.copyProperties(departmentBankVO, departmentBank);
-                if (departmentBankVO.getDeptIds() != null && departmentBankVO.getDeptIds().size() > 0) {
-                    departmentBank.setDeptId(StringUtils.join(departmentBankVO.getDeptIds(),","));
-                }
-                departmentBank.setCreateUser(loginUserInfoHelper.getUserId());
-                departmentBank.setCreateTime(new Date());
-                departmentBank.insert();*/
+                // 新增
+                /*
+                 * DepartmentBank departmentBank = new DepartmentBank();
+                 * BeanUtil.copyProperties(departmentBankVO, departmentBank); if
+                 * (departmentBankVO.getDeptIds() != null &&
+                 * departmentBankVO.getDeptIds().size() > 0) {
+                 * departmentBank.setDeptId(StringUtils.join(departmentBankVO.getDeptIds(),","))
+                 * ; } departmentBank.setCreateUser(loginUserInfoHelper.getUserId());
+                 * departmentBank.setCreateTime(new Date()); departmentBank.insert();
+                 */
 
-                //新增
+                // 新增
                 if (departmentBankVO.getDeptIds() != null && departmentBankVO.getDeptIds().size() > 0) {
                     departmentBankVO.getDeptIds().forEach(deptId -> {
                         DepartmentBank departmentBank = new DepartmentBank();
@@ -90,42 +92,56 @@ public class DepartmentBankController {
                 }
 
             } else {
-                //更新
-                /*DepartmentBank departmentBank = departmentBankService.selectById(departmentBankVO.getAccountId());
+                // 更新
+                /*
+                 * DepartmentBank departmentBank =
+                 * departmentBankService.selectById(departmentBankVO.getAccountId());
+                 * 
+                 * BeanUtil.copyProperties(departmentBankVO, departmentBank, new CopyOptions()
+                 * {{ setIgnoreNullValue(true); }}); if (departmentBankVO.getDeptIds() != null
+                 * && departmentBankVO.getDeptIds().size() > 0) {
+                 * departmentBank.setDeptId(StringUtils.join(departmentBankVO.getDeptIds(),","))
+                 * ; } departmentBank.setUpdateUser(loginUserInfoHelper.getUserId());
+                 * departmentBank.setUpdateTime(new Date()); departmentBank.updateById();
+                 */
 
-                BeanUtil.copyProperties(departmentBankVO, departmentBank, new CopyOptions() {{
-                    setIgnoreNullValue(true);
-                }});
+                DepartmentBank oldDeptBank = departmentBankService.selectById(departmentBankVO.getAccountId());
                 if (departmentBankVO.getDeptIds() != null && departmentBankVO.getDeptIds().size() > 0) {
-                    departmentBank.setDeptId(StringUtils.join(departmentBankVO.getDeptIds(),","));
-                }
-                departmentBank.setUpdateUser(loginUserInfoHelper.getUserId());
-                departmentBank.setUpdateTime(new Date());
-                departmentBank.updateById();*/
-
-                DepartmentBank departmentBank = departmentBankService.selectById(departmentBankVO.getAccountId());
-                if (departmentBankVO.getDeptIds() != null && departmentBankVO.getDeptIds().size() > 0) {
-                    departmentBankVO.getDeptIds().forEach(deptId -> {
-                        if (deptId.equals(departmentBank.getDeptId())) {
-                            //更新本次
-                            BeanUtil.copyProperties(departmentBankVO, departmentBank, new CopyOptions() {{
-                                setIgnoreNullValue(true);
-                            }});
-                            departmentBank.setDeptId(deptId);
-                            departmentBank.setUpdateUser(loginUserInfoHelper.getUserId());
-                            departmentBank.setUpdateTime(new Date());
-                            departmentBank.updateById();
+                    //如果删除了原来的并新选择多个，则更新第一个新增第二个
+                    boolean delOld = true;
+                    for (String deptId : departmentBankVO.getDeptIds()) {
+                        if(deptId.equals(oldDeptBank.getDeptId())){
+                            delOld = false;
+                            break;
+                        }
+                    }
+                    for (String deptId : departmentBankVO.getDeptIds()) {
+                        if (deptId.equals(oldDeptBank.getDeptId()) || departmentBankVO.getDeptIds().size() == 1) {
+                            // 更新本次
+                            BeanUtil.copyProperties(departmentBankVO, oldDeptBank, new CopyOptions() {
+                                {
+                                    setIgnoreNullValue(true);
+                                }
+                            });
+                            oldDeptBank.setDeptId(deptId);
+                            oldDeptBank.setUpdateUser(loginUserInfoHelper.getUserId());
+                            oldDeptBank.setUpdateTime(new Date());
+                            oldDeptBank.updateById();
                         } else {
-                            //新增另外的
+                            // 新增另外的
                             DepartmentBank newDeptBank = new DepartmentBank();
-                            BeanUtil.copyProperties(departmentBank, newDeptBank);
+                            BeanUtil.copyProperties(oldDeptBank, newDeptBank);
                             newDeptBank.setAccountId(null);
                             newDeptBank.setDeptId(deptId);
                             newDeptBank.setCreateUser(loginUserInfoHelper.getUserId());
                             newDeptBank.setCreateTime(new Date());
                             newDeptBank.insert();
                         }
-                    });
+                    }
+                    if(delOld  && departmentBankVO.getDeptIds().size()>1 ){
+                        oldDeptBank.deleteById();
+
+                    }
                 }
             }
             return Result.success();

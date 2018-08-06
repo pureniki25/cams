@@ -41,7 +41,7 @@ public interface EipRemote {
 	public Result sendSms(@RequestBody SmsVo smsVo);
 
 	/**
-	 * 查询代充值账户余额
+	 * 查询用户账户余额
 	 * 
 	 * @param paramMap
 	 * @return
@@ -49,6 +49,16 @@ public interface EipRemote {
 	@RequestMapping(value = "/eip/xiaodai/QueryUserAviMoney", headers = { "app=ALMS",
 			"content-type=application/json" }, method = RequestMethod.POST)
 	public Result queryUserAviMoney(@RequestBody Map<String, Object> paramMap);
+	
+	/**
+	 * 查询代充值账户余额
+	 * 
+	 * @param paramMap
+	 * @return
+	 */
+	@RequestMapping(value = "/eip/td/queryUserAviMoneyForNet", headers = { "app=ALMS",
+	"content-type=application/json" }, method = RequestMethod.POST)
+	public Result queryUserAviMoneyForNet(@RequestBody Map<String, Object> paramMap);
 
 	/**
 	 * 代充值
@@ -295,5 +305,11 @@ public interface EipRemote {
 	 */
 	@RequestMapping(value = "/eip/yepay/query/payClearData", headers = {"app=ALMS","content-type=application/json"})
 	Result yiBaoPayClearData(@RequestBody Map<String,Object> paramMap);
+
+	/**
+	 * 通过流水号获取快钱流水记录
+	 */
+	@RequestMapping(value="/eip/kq/queryPayAndRefund", headers={"app=ALMS", "content-type=application/json"})
+	Result kuaiQianQueryPayAndRefund(@RequestBody Map<String,Object> paramMap);
 
 }

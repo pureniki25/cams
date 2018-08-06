@@ -85,7 +85,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		Integer days = Integer.valueOf(repayStatusList.get(0).getParamValue());
 		List<RepaymentBizPlanList> pLists = repaymentBizPlanListService.selectAutoRepayList(days);// 查询一个周期内(30天)要代扣的记录
 //		for (RepaymentBizPlanList pList : pLists) {
-//			if(pList.getPlanListId().equals("af996e99-bb65-427d-ad91-cc5d36f2d509")) {
+//			if(pList.getPlanListId().equals("59857f38-e50b-4bc6-8f73-81c7677550be")) {
 //				System.out.println("STOP");
 //			}
 //			//获取该还款计划最早一期没有还的代扣
@@ -193,6 +193,8 @@ public class WithholdingServiceimpl implements WithholdingService {
 		Result result=new Result();
 		BigDecimal onlineAmount = rechargeService.getOnlineAmount(pList);
 		BigDecimal underAmount = rechargeService.getUnderlineAmount(pList);
+	
+		
 		Integer platformId = (Integer) PlatformEnum.YH_FORM.getValue();
 		boolean isUseThirdRepay = false;// 是否调用第三方代扣
 		// 获取所有银行代扣渠道,先扣线上费用
@@ -264,7 +266,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 					if(remainder.compareTo(BigDecimal.valueOf(0)) > 0) {
 						repayCount=repayCount+1;
 					}
-					logger.info("本次代扣每笔限额:{0},代扣次数:{1},余数:{2}" ,eachMax,repayCount,remainder);					
+					logger.info("本次代扣每笔限额:{0}代扣次数:{1}余数:{2}" ,eachMax,repayCount,remainder);					
 					int last = repayCount - 1;
 					Integer boolPartRepay = 1;// 表示本期是否分多笔代扣,0:一次性代扣，1:分多笔代扣
 					Integer boolLastRepay = 0;// 表示本期是否分多笔代扣中的最后一笔代扣，若非多笔代扣，本字段存1。 0:非最后一笔代扣，1:最后一笔代扣
@@ -339,8 +341,16 @@ public class WithholdingServiceimpl implements WithholdingService {
 		} else {
 
 			if (thirtyCardInfo != null) {// 绑定了第三方平台
-				if (underAmount.compareTo(BigDecimal.valueOf(0)) > 0) {
-					ThirdRepaymentCharge(basic, thirtyCardInfo, pList, underAmount,appType);
+				if(!rechargeService.isForgiveDayOutside(pList)) {//判断是否在宽限期内，如果是则不代扣线下滞纳金,
+					underAmount=BigDecimal.valueOf(0);
+					result.setCode("-1");
+					result.setMsg("在宽限期内,不代扣线下滞纳金");
+					rechargeService.RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
+					return result;
+				}else {
+					if (underAmount.compareTo(BigDecimal.valueOf(0)) > 0) {
+						ThirdRepaymentCharge(basic, thirtyCardInfo, pList, underAmount,appType);
+					}
 				}
 			} else { // 没有绑定第三方平台直接跳出
 				result.setCode("-1");
@@ -359,6 +369,8 @@ public class WithholdingServiceimpl implements WithholdingService {
 	 */
 	private Result ThirdRepaymentCharge(BasicBusiness basic, BankCardInfo thirtyCardInfo, RepaymentBizPlanList pList,
 			BigDecimal underAmount,String appType) {
+		
+		
 		Result result=new Result();
 		// 获取所有第三方代扣渠道
 		List<WithholdingChannel> channels = withholdingChannelService
@@ -393,7 +405,11 @@ public class WithholdingServiceimpl implements WithholdingService {
 				// 本期剩余应还金额
 				BigDecimal repayMoney = rechargeService.getRestAmount(pList);
 
-				if (underAmount != null && underAmount.compareTo(BigDecimal.valueOf(0)) > 0) {
+				if(!rechargeService.isForgiveDayOutside(pList)) {//判断是否在宽限期外，如果是,要扣线下滞纳金,否则不扣
+					BigDecimal amount = rechargeService.getUnderlineAmount(pList);
+					repayMoney=repayMoney.subtract(amount);
+				}
+				if (underAmount != null && underAmount.compareTo(BigDecimal.valueOf(0)) > 0) {//如果UnderAmount不等于NULL,说明是银行代扣完之后完过来代扣线下滞纳金的
 					repayMoney = underAmount;
 				}
 				
@@ -438,7 +454,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 						// 余数
 						
 						BigDecimal remainder = repayMoney.divideAndRemainder(eachMax)[1];
-						logger.info("本次代扣每笔限额:{0},代扣次数:{1},余数:{2}" ,eachMax,repayCount,remainder);	
+						logger.info("本次代扣每笔限额:{0}代扣次数:{1}余数:{2}" ,eachMax,repayCount,remainder);	
 						if(remainder.compareTo(BigDecimal.valueOf(0)) > 0) {
 							repayCount=repayCount+1;
 						}
@@ -743,7 +759,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 
    private BigDecimal getThirtyRepayAmount(RepaymentBizPlanList pList) {
 	   BigDecimal repayAmount=BigDecimal.valueOf(0);
-	   List<WithholdingRepaymentLog> logs=withholdingRepaymentLogService.selectList(new EntityWrapper<WithholdingRepaymentLog>().eq("original_business_id", pList.getOrigBusinessId()).ne("bind_platform_id",PlatformEnum.YH_FORM).eq("after_id", pList.getAfterId()));
+	   List<WithholdingRepaymentLog> logs=withholdingRepaymentLogService.selectList(new EntityWrapper<WithholdingRepaymentLog>().eq("original_business_id", pList.getOrigBusinessId()).ne("bind_platform_id",PlatformEnum.YH_FORM).ne("repay_status", 0).eq("after_id", pList.getAfterId()));
 	   for(WithholdingRepaymentLog log:logs) {
 		   repayAmount=repayAmount.add(log.getCurrentAmount()==null?BigDecimal.valueOf(0):log.getCurrentAmount());
 	   }

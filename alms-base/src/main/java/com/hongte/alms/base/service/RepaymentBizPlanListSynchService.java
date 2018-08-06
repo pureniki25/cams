@@ -43,4 +43,6 @@ public interface RepaymentBizPlanListSynchService extends BaseService<RepaymentB
 
 	public void updateMoneyPoolRepayment();
 
+	public void updateBasicBusinessType();
+
 }

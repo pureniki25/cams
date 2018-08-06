@@ -164,7 +164,7 @@
 				{{ rechargeAccountType }}：代充值存管账号余额为：
 				{{ rechargeAccountBalance?numeral(rechargeAccountBalance).format('0,0.00'):0 }}元
 			</i-col>
-			<i-col span='6'>已勾选待分发金额为：{{ selectAmount }} 元</i-col>
+			<i-col span='6'>已勾选待分发金额为：{{ selectAmount?numeral(selectAmount).format('0,0.00'):0 }}元</i-col>
 		</row>
 	</Card>
 	
@@ -182,14 +182,8 @@
 					<i-col>
 						<i-select v-model="rechargeModalForm.rechargeAccountType" clearable filterable style="width:200px" 
 									@on-change="rechargeModalForm.rechargeAccountType == '' ? '' : queryUserAviMoney()">
-                            <i-option value="车贷">车贷代充值账户</i-option>
-                            <i-option value="房贷">房贷代充值账户</i-option>
-                            <i-option value="扶贫贷">扶贫贷代充值账户</i-option>
-                            <i-option value="闪贷业务">闪贷业务代充值账户</i-option>
-                            <i-option value="车全业务">车全业务代充值账户</i-option>
-                            <i-option value="二手车业务">二手车业务代充值账户</i-option>
-                            <i-option value="一点车贷">一点车贷代充值账户</i-option>
-                            <i-option value="信用贷">信用贷代充值账户</i-option>
+							<i-option v-for="(item, index) in rechargeAccountTypeList" 
+							:value="item.rechargeAccountName" :key="item.rechargeAccountId">{{item.rechargeAccountName}}代充值账户</i-option>
 		  				</i-select>
 		  				<span style="color: red">
 		  					{{rechargeModalForm.rechargeAccountBalance && 
@@ -299,6 +293,11 @@
 				</tab-pane>
 				
 				<tab-pane label="平台实还" name="platformRealRepayment">
+					<row style="margin-top:0.5rem">
+						<p slot="title">
+				            <h3 style="color:red">Tips：数据均来源于团贷网后台接口，非鸿特本地数据</h3>
+				        </p>
+				    </row>
 					<row style="margin-top:1rem">
 						<p slot="title">
 				            <h3>标的应还计划</h3>
@@ -315,6 +314,11 @@
 				</tab-pane>
 				
 				<tab-pane label="垫付记录" name="advancesRecord">
+					<row style="margin-top:0.5rem">
+						<p slot="title">
+				            <h3 style="color:red">Tips：数据均来源于团贷网后台接口，非鸿特本地数据</h3>
+				        </p>
+				    </row>
 					<row style="margin-top:1rem">
 						<p slot="title">
 				            <h3>还垫付记录</h3>

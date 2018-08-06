@@ -45,4 +45,6 @@ public interface RepaymentBizPlanListSynchMapper extends SuperMapper<RepaymentBi
 
 	void updateMoneyPoolRepayment();
 
+	void updateBasicBusinessType();
+
 }

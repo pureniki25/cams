@@ -126,7 +126,7 @@
                 </i-col>
                 <i-col span="6">
                     <div style="width: 49%;display:inline-block;text-align: right">
-                        线下出款费率：
+                        线上出款费率：
                     </div>
                     <div style="width: 49%;display:inline-block;text-align: left">
                         {{info.borrowRate}}%
@@ -233,10 +233,35 @@
                                 </td>
                             </tr>
                             <tr>
+                                <td >其他费用项</td>
+                                <td>{{thisTimeRepaymentInfo.other}}
+                                    <!-- <i-input disabled :value="factRepayPreview.total+factRepayPreview.surplus"></i-input> -->
+                                </td>
+                            </tr>
+                            <tr>
                                 <td >合计(含滞纳金)</td>
                                 <td>{{thisTimeRepaymentInfo.total}}
                                     <!-- <i-input disabled :value="factRepayPreview.total+factRepayPreview.surplus"></i-input> -->
                                 </td>
+                            </tr>
+                        </table>
+                        <br>
+                        <p style="font-size: 14px;color: #1c2438;font-weight: 700;">
+                            提前违约金明细
+                        </p>
+                        <table>
+                            <tr>
+                                <td style="border-top-width: 6px;border-top-style: solid;"></td>
+                                <td style="border-top-width: 6px;border-top-style: solid;"></td>
+                                <td style="border-top-width: 6px;border-top-style: solid;"></td>
+                                <td style="border-top-width: 6px;border-top-style: solid;"></td>
+                            </tr>
+                            <tr v-if="thisTimeRepaymentInfo.penaltyFeesBiz&&thisTimeRepaymentInfo.penaltyFeesBiz.length>0" v-for="item in thisTimeRepaymentInfo.penaltyFeesBiz">
+                                <td>{{item.feeName}}</td>
+                                <td>{{item.amount}}</td>
+                            </tr>
+                            <tr v-else>
+                                <td>无</td>
                             </tr>
                         </table>
                         <br>
@@ -250,14 +275,35 @@
                                 <td style="border-top-width: 6px;border-top-style: solid;"></td>
                                 <td style="border-top-width: 6px;border-top-style: solid;"></td>
                             </tr>
-                            <tr v-if="thisTimeRepaymentInfo.derateDetails&&thisTimeRepaymentInfo.derateDetails.length>0" v-for="item in thisTimeRepaymentInfo.derateDetails">
-                                <td>{{item.name}}</td>
+                            <tr v-if="thisTimeRepaymentInfo.derates&&thisTimeRepaymentInfo.derates.length>0" v-for="item in thisTimeRepaymentInfo.derates">
+                                <td>{{item.feeName}}</td>
                                 <td>{{item.amount}}</td>
                             </tr>
                             <tr v-else>
                                 <td >无</td>
                             </tr>
                         </table>
+                        <br>
+                        <p style="font-size: 14px;color: #1c2438;font-weight: 700;">
+                                <span>其他费用明细</span>
+                            </p>
+                        <table>
+                            <tr>
+                                <td style="border-top-width: 6px;border-top-style: solid;"></td>
+                                <td style="border-top-width: 6px;border-top-style: solid;"></td>
+                                <td style="border-top-width: 6px;border-top-style: solid;"></td>
+                                <td style="border-top-width: 6px;border-top-style: solid;"></td>
+                            </tr>
+                            <tr v-if="thisTimeRepaymentInfo.otherFees&&thisTimeRepaymentInfo.otherFees.length>0" v-for="item in thisTimeRepaymentInfo.otherFees">
+                                <td>{{item.feeName}}</td>
+                                <td><i-input v-model="item.amount" number=true></td>
+                            </tr>
+                            <tr v-else>
+                                <td >无</td>
+                            </tr>
+                        </table>
+                        <br>
+                        <i-button @click="reGetSttleInfo" long type="primary">重新计算</i-button>
                     </card>
                 </i-col>
                 <i-col span="12">
@@ -278,7 +324,7 @@
                                     结余暂收:
                                 </td>
                                 <td>
-                                    <i-input number=true v-model="factRepaymentInfo.surplusFund" :disabled="!factRepaymentInfo.useSurplusflag" style="text-align: right"></i-input>
+                                    <i-input number=true v-model="factRepaymentInfo.surplusFund" @on-enter="surplusFundEnter($event)" @on-blur="surplusFundEnter($event)" :disabled="!factRepaymentInfo.useSurplusflag" style="text-align: right"></i-input>
                                 </td>
                                 <td style="width: 200px">
                                     <span>结余暂收可用金额{{factRepaymentInfo.canUseSurplus}}元</span>
@@ -349,6 +395,10 @@
                                 </td>
                             </tr>
                             <tr>
+                                <td>提前结清违约金</td>
+                                <td>{{factRepayPreview.item70}}
+                                    <!-- <i-input disabled v-model="factRepayPreview.surplus"></i-input> -->
+                                </td>
                                 <td>结余</td>
                                 <td>{{factRepayPreview.surplus}}
                                     <!-- <i-input disabled v-model="factRepayPreview.surplus"></i-input> -->
@@ -376,7 +426,7 @@
             <row>
                 <i-col span="22">&nbsp;</i-col>
                 <i-col span="2">
-                    <i-button @click="submitSettle()">提交</i-button>
+                    <i-button @click="submitSettle()" :loading="submitLoding">提交</i-button>
                     <i-button @click="closePage()">关闭</i-button>
                 </i-col>
             </row>

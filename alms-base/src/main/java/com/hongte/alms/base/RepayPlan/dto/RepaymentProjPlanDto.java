@@ -5,7 +5,10 @@ import com.hongte.alms.base.entity.TuandaiProjectInfo;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
 
 /**
  * @author zengkun
@@ -14,34 +17,39 @@ import java.util.List;
  */
 public class RepaymentProjPlanDto implements Serializable {
 
-    private RepaymentProjPlan repaymentProjPlan;
+	protected RepaymentProjPlan repaymentProjPlan;
 
 
-    private List<RepaymentProjPlanListDto>  projPlanListDtos;
+    protected List<RepaymentProjPlanListDto>  projPlanListDtos;
+
+
+
+
+
 
     /**
      * 标的占比
      */
-    private BigDecimal proportion = new BigDecimal("0") ;
+	protected BigDecimal proportion = new BigDecimal("0") ;
     /**
      * 标的分配到的金额
      */
-    private BigDecimal divideAmount = new BigDecimal("0");
+	protected BigDecimal divideAmount = new BigDecimal("0");
     
     /**
      * 标的分配到的线上滞纳金
      */
-    private BigDecimal onlineOverDue = new BigDecimal("0");
+	protected BigDecimal onlineOverDue = new BigDecimal("0");
     
     /**
      * 标的分配到的线下滞纳金
      */
-    private BigDecimal offlineOverDue = new BigDecimal("0");
+	protected BigDecimal offlineOverDue = new BigDecimal("0");
     
     /**
      * 标的信息
      */
-    private TuandaiProjectInfo tuandaiProjectInfo ;
+	protected TuandaiProjectInfo tuandaiProjectInfo ;
     public RepaymentProjPlan getRepaymentProjPlan() {
         return repaymentProjPlan;
     }
@@ -57,6 +65,8 @@ public class RepaymentProjPlanDto implements Serializable {
     public void setProjPlanListDtos(List<RepaymentProjPlanListDto> projPlanListDtos) {
         this.projPlanListDtos = projPlanListDtos;
     }
+    
+
 
 	/**
 	 * @return the proportion

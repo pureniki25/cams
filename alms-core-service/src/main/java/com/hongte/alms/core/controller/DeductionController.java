@@ -113,8 +113,14 @@ public class DeductionController {
 				if(result.getCode().equals("1")) {
 					 bankCardInfos=JSON.parseArray(result.getData().toString(), BankCardInfo.class);
 					if(bankCardInfos!=null&&bankCardInfos.size()>0) {
-	        			bankCardInfo=bankCardInfos.get(0);
-
+						for (BankCardInfo card : bankCardInfos) {
+							if (card.getPlatformType() == 1 && card.getWithholdingType() == 1) {// 团贷网平台注册的银行卡并且是代扣主卡
+								bankCardInfo=card;
+							}
+						}
+                        if(bankCardInfo==null) {
+                    	  return Result.error("-1", "该客户找不到对应团贷网平台银行卡信息");
+					    }
 	        		}else {
 	        			return Result.error("-1", "该客户找不到对应银行卡信息");
 	        		}

@@ -36,6 +36,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -299,7 +300,7 @@ public class RepaymentBizPlanServiceImpl extends BaseServiceImpl<RepaymentBizPla
 		if (list==null||list.size()==0) {
 			throw new ServiceRuntimeException("找不到还款计划");
 		}
-		RepaymentSettleListVO finalOne = new RepaymentSettleListVO();
+		/*RepaymentSettleListVO finalOne = new RepaymentSettleListVO();
 		finalOne.setAfterId("结清应还");
 		finalOne.setItem10(new BigDecimal("0"));
 		finalOne.setItem20(new BigDecimal("0"));
@@ -322,7 +323,7 @@ public class RepaymentBizPlanServiceImpl extends BaseServiceImpl<RepaymentBizPla
 			finalOne.setLack(finalOne.getLack().add(repaymentSettleListVO.getLack()));
 			finalOne.setFactAmount(finalOne.getFactAmount().add(repaymentSettleListVO.getFactAmount()));
 		}
-		list.add(finalOne);
+		list.add(finalOne);*/
 		return list;
 	}
 	
@@ -350,6 +351,30 @@ public class RepaymentBizPlanServiceImpl extends BaseServiceImpl<RepaymentBizPla
 				if (repaymentSettleListVO.samePeriod(curr)) {
 					currents.add(curr);
 				}
+			}
+		}
+	}
+
+
+	/* (non-Javadoc)
+	 * @see com.hongte.alms.base.service.RepaymentBizPlanService#isFinalRepayPlanSettle(java.lang.String, java.lang.String, java.lang.String)
+	 */
+	@Override
+	public boolean isFinalRepayPlanSettle(String businessId, String planId) {
+		if (planId==null) {
+			/*planId为空,为全部业务结清,也算是最后一次结清*/
+			return true ;
+		}
+		List<RepaymentBizPlan> selectList = repaymentBizPlanMapper.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id", businessId).eq("plan_status", 0));
+		if (CollectionUtils.isEmpty(selectList)) {
+			/*业务全都结清,那就不是最后一次结清*/
+			return false ;
+		}else {
+			if (selectList.size()==1 && selectList.get(0).getPlanId().equals(planId)) {
+				return true ;
+			}else {
+				/*还有其他还款计划,也不算最后一次结清*/
+				return false ;
 			}
 		}
 	}

@@ -22,6 +22,10 @@ public class BizPlanDto  implements Serializable {
     private Boolean hasDeffer; //是否已经展期
 
     private Boolean isOver;//是否已经结清
+    
+    private String identifyCard;//借款人身份证号码
+    
+    private Integer plateType;//平台类型 1:团代网 2：你我金融
 
 
     private List<BizPlanListDto> payedPeroids;//已支付的还款计划列表
@@ -42,7 +46,23 @@ public class BizPlanDto  implements Serializable {
     private Date inputTime;//进件日期
 
 
-    public String getPlanId() {
+    public String getIdentifyCard() {
+		return identifyCard;
+	}
+
+	public void setIdentifyCard(String identifyCard) {
+		this.identifyCard = identifyCard;
+	}
+
+	public Integer getPlateType() {
+		return plateType;
+	}
+
+	public void setPlateType(Integer plateType) {
+		this.plateType = plateType;
+	}
+
+	public String getPlanId() {
         return planId;
     }
 

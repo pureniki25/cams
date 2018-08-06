@@ -6,6 +6,7 @@ package com.hongte.alms.finance.service;
 import java.util.List;
 
 import com.hongte.alms.base.dto.ConfirmRepaymentReq;
+import com.hongte.alms.base.entity.RepaymentProjPlanList;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 
 /**
@@ -29,4 +30,7 @@ public interface ShareProfitService {
 	 * @param businessId
 	 */
 	public void updateRepayPlanToLMS(String businessId);
+
+
+	public void tdrepayRechargeThread(List<RepaymentProjPlanList> ptojPlanList, String confirmLogId);
 }

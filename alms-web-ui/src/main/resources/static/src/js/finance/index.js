@@ -37,9 +37,36 @@ window.layinit(function (htConfig) {
                 planListId:''
             },
             table: {
-                col: [{
+                col: [
+                	{
                         title: '业务编号',
                         key: 'businessId',
+                        width:150,
+                        render: (h, p) => {
+                        	let color = '';
+                        	let platform = '';
+                            if (p.row.plateType == 1) {
+                                color = 'yellow';
+                                platform = '团';
+                            }else if (p.row.plateType == 2) {
+                                color = 'green';
+                                platform = '你';
+                            }else if (p.row.plateType == 3) {
+                                color = 'blue';
+                                platform = '粤';
+                            }else if (p.row.plateType == 4) {
+                                color = 'red';
+                                platform = '线';
+                            }
+                            return h('div',[
+                            	h('Tag',{
+                            		props:{
+                            			color:color
+                            		}
+                            	},platform),
+                            	h('span',p.row.businessId)
+                            ])
+                        }
                     },
                     {
                         title: '期数',
@@ -302,6 +329,11 @@ window.layinit(function (htConfig) {
                                                         })
                                                     }
                                                     if (call == 'settle') {
+                                                        if(p.row.repayStatus != '未还款' && p.row.repayStatus != '部分还款'){
+                                                            app.$Message.warning({
+                                                                content : '当前期已还款或线上部分已还款的不能结清'
+                                                            })
+                                                        }
                                                         app.checkLastRepay(p.row.businessId,p.row.afterId);
                                                         if(app.lastRepayDianfuweijieqing){
                                                             app.$Message.warning({content:'往期存在垫付未结清记录'})
@@ -319,6 +351,11 @@ window.layinit(function (htConfig) {
                                                         })
                                                     }
                                                     if (call == 'planSettle') {
+                                                        if(p.row.repayStatus != '未还款' && p.row.repayStatus != '部分还款'){
+                                                            app.$Message.warning({
+                                                                content : '当前期已还款或线上部分已还款的不能结清'
+                                                            })
+                                                        }
                                                         app.checkLastRepay(p.row.businessId,p.row.afterId);
                                                         if(app.lastRepayDianfuweijieqing){
                                                             app.$Message.warning({content:'往期存在垫付未结清记录'})
@@ -382,8 +419,8 @@ window.layinit(function (htConfig) {
                                 menu.push(repayConfirm)
                                 menu.push(revokeConfirm)
                                 menu.push(confirmWithhold)
-                                /* menu.push(planSettle)
-                                menu.push(settle) */
+                                menu.push(planSettle)
+                                menu.push(settle)
                                    menu.push(withhold)
                             }
                             let poptipContent;
@@ -414,7 +451,7 @@ window.layinit(function (htConfig) {
                                     click: function () {
                                         console.log(p)
                                         let url = '/finance/repaymentPlanInfo?businessId=' + p.row.businessId + '&customer=' + p.row.customer + '&phoneNumber=' + p.row.phoneNumber +
-                                            '&repaymentType=' + p.row.repaymentType + '&borrowMoney=' + p.row.borrowMoney + '&borrowLimit=' + p.row.borrowLimit;
+                                            '&repaymentType=' + p.row.repaymentType + '&borrowMoney=' + p.row.borrowMoney + '&borrowLimit=' + p.row.borrowLimit + '&plateType=' + p.row.plateType;
                                         layer.open({
                                             type: 2,
                                             title: '计划详情',

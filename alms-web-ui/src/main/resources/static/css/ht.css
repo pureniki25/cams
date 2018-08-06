@@ -67,13 +67,13 @@ a, a:hover {
 
 /*弹出框样式*/
 .layui-layer-content {
-    padding: 10px;
+    padding: 10px 0px 10px 0px;
 }
 
 /*功能页面内部tab*/
-.view_tab {
+/* .view_tab {
     margin: 0 -15px;
-}
+} */
 
 .view_tab .layui-tab-title {
     left: auto;

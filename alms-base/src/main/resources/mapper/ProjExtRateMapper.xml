@@ -25,5 +25,24 @@
     <sql id="Base_Column_List">
         id, business_id AS businessId, project_id AS projectId, rate_type AS rateType, rate_name AS rateName, rate_value AS rateValue, calc_way AS calcWay, fee_id AS feeId, fee_name AS feeName, begin_peroid AS beginPeroid, end_peroid AS endPeroid, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser
     </sql>
+    
+    <select id="calcProjextRate" resultType="java.math.BigDecimal">
+    	SELECT
+			sum(IFNULL(rate_value,0))
+		FROM
+			tb_proj_ext_rate per 
+		WHERE
+			project_id = #{projectId}
+			<if test="rateType">
+				and rate_type = #{rateType}
+			</if>
+			<if test="feeId">
+				and fee_id = #{feeId}
+			</if>
+			<if test="peroid != null ">
+				and begin_peroid &gt;= #{peroid}
+				and end_peroid &lt;= #{peroid}
+			</if>
+    </select>
 
 </mapper>

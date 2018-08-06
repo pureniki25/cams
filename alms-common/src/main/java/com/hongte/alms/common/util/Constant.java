@@ -1,5 +1,6 @@
 package com.hongte.alms.common.util;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -178,7 +179,11 @@ public class Constant {
 	 * 调用LMS信贷系统接口成功状态码
 	 */
 	public static final String LMS_SUCCESS_CODE = "1";
-
+	
+	/**
+	 * 空字符串
+	 */
+	public static final String BLANK_STR = "";
 
 	//*********调用api接口失败记录相关 OPEN模块  zgh *********//
 	public static final String INTERFACE_CODE_OPEN_REPAYPLAN_UPDATEREPAYPLANTOLMS = "/RepayPlan/updateRepayPlanToLMS";
@@ -201,11 +206,15 @@ public class Constant {
 	public static final String CAR_LOAN = "车贷";
 	public static final String HOUSE_LOAN = "房贷";
 	public static final String POVERTY_ALLEVIATION_LOAN = "扶贫贷";
-	public static final String QUICK_LOAN = "闪贷业务";
 	public static final String CHE_QUAN_LOAN = "车全业务";
 	public static final String ER_SHOU_CHE_LOAN = "二手车业务";
 	public static final String YI_DIAN_LOAN = "一点车贷";
 	public static final String CREDIT_LOAN = "信用贷";
+	public static final String COMMERCE_LOAN = "商贸贷";
+	public static final String PROPRIETOR_LOAN = "业主贷";
+	public static final String INSTALMENT_CREDIT_LOAN = "家装分期";
+	public static final String COMMERCE_COMPANY_LOAN = "商贸贷共借";
+	public static final String PROPRIETOR_COMPANY_LOAN = "业主贷共借";
 	
 	/**
 	 * 线上线下部分分界线,参考tb_repayment_biz_plan_list_detail.share_profit_index和tb_repayment_proj_plan_list_detail.share_profit_index <br/>
@@ -275,4 +284,14 @@ public class Constant {
         TRADE_SUB_TYPE_MAP_BAOFU.put("02", "撤销");
     }
 
+	/**
+	 * 快钱交易状态
+	 */
+	public static Map<String,String> TRADE_TYPE_MAP_KUAIQIAN=null;
+	static{
+		TRADE_TYPE_MAP_KUAIQIAN = new HashMap<String,String>();
+		TRADE_TYPE_MAP_KUAIQIAN.put("S", "成功");
+		TRADE_TYPE_MAP_KUAIQIAN.put("F", "失败");
+		TRADE_TYPE_MAP_KUAIQIAN.put("P", "挂起");
+	}
 }

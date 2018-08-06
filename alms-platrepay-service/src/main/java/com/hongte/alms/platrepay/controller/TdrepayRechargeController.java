@@ -3,9 +3,11 @@ package com.hongte.alms.platrepay.controller;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -24,24 +26,26 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.hongte.alms.base.dto.compliance.TdPlatformPlanRepaymentDTO;
+import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.hongte.alms.base.dto.compliance.TdProjectPaymentInfoResult;
 import com.hongte.alms.base.dto.compliance.TdRefundMonthInfoDTO;
 import com.hongte.alms.base.entity.AgencyRechargeLog;
 import com.hongte.alms.base.entity.BasicCompany;
 import com.hongte.alms.base.entity.IssueSendOutsideLog;
 import com.hongte.alms.base.entity.RepaymentProjPlan;
+import com.hongte.alms.base.entity.SysParameter;
+import com.hongte.alms.base.entity.SysUserRole;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.base.enums.BankEnum;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
-import com.hongte.alms.base.enums.RechargeAccountTypeEnums;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.service.AgencyRechargeLogService;
 import com.hongte.alms.base.service.BasicCompanyService;
 import com.hongte.alms.base.service.IssueSendOutsideLogService;
 import com.hongte.alms.base.service.RepaymentProjPlanService;
+import com.hongte.alms.base.service.SysUserRoleService;
 import com.hongte.alms.base.service.TdrepayRechargeLogService;
 import com.hongte.alms.base.service.TdrepayRechargeService;
 import com.hongte.alms.base.service.TuandaiProjectInfoService;
@@ -108,6 +112,10 @@ public class TdrepayRechargeController {
 	@Autowired
 	@Qualifier("AgencyRechargeLogService")
 	private AgencyRechargeLogService agencyRechargeLogService;
+	
+    @Autowired
+    @Qualifier("SysUserRoleService")
+    SysUserRoleService sysUserRoleService;
 
 	@Autowired
 	private EipRemote eipRemote;
@@ -233,6 +241,13 @@ public class TdrepayRechargeController {
 					}
 				}
 			}*/
+			
+			int count = tdrepayRechargeLogService
+					.selectCount(new EntityWrapper<TdrepayRechargeLog>().eq("project_id", vo.getProjectId())
+							.eq("confirm_log_id", vo.getConfirmLogId()).eq("is_valid", 1).eq("after_id", vo.getAfterId()));
+			if (count > 0) {
+				return Result.error("-99", "异常：数据重复推送");
+			}
 
 			// 根据projectId查询平台还垫付信息
 			Map<String, com.ht.ussp.core.Result> resultMap = tdrepayRechargeService
@@ -414,6 +429,14 @@ public class TdrepayRechargeController {
 	public PageResult<List<TdrepayRechargeInfoVO>> queryComplianceRepaymentData(
 			@ModelAttribute ComplianceRepaymentVO vo) {
 		try {
+			Wrapper<SysUserRole> wrapperSysUserRole = new EntityWrapper<>();
+            wrapperSysUserRole.eq("user_id",loginUserInfoHelper.getUserId());
+            wrapperSysUserRole.and(" role_code in (SELECT role_code FROM tb_sys_role WHERE role_area_type = 1 AND page_type = 0 ) ");
+            List<SysUserRole> userRoles = sysUserRoleService.selectList(wrapperSysUserRole);
+            if(null != userRoles && !userRoles.isEmpty()) {
+            	vo.setNeedPermission(0);//全局用户 不需要验证权限
+            }
+			
 			if (vo != null && vo.getConfirmTimeEnd() != null) {
 				vo.setConfirmTimeEnd(DateUtil.addDay2Date(1, vo.getConfirmTimeEnd()));
 			}
@@ -553,9 +576,17 @@ public class TdrepayRechargeController {
 			TuandaiProjectInfo info = tuandaiProjectInfoService.selectById(projectId);
 
 			paramMap2.put("userId", info.getTdUserId());
+			LOG.info("标的还款信息查询接口/eip/td/repayment/queryProjectPayment参数信息，{}", JSONObject.toJSONString(paramMap));
 			com.ht.ussp.core.Result resultActual = eipRemote.queryProjectPayment(paramMap);
+			LOG.info("标的还款信息查询接口/eip/td/repayment/queryProjectPayment返回信息，{}", JSONObject.toJSONString(resultActual));
+			
+			LOG.info("提前结清平台费用查询/eip/td/repayment/queryRepaymentEarlier参数信息，{}", JSONObject.toJSONString(paramMap));
 			com.ht.ussp.core.Result resultEarlier = eipRemote.queryRepaymentEarlier(paramMap);
-			com.ht.ussp.core.Result resultUserAviMoney = eipRemote.queryUserAviMoney(paramMap2);
+			LOG.info("提前结清平台费用查询/eip/td/repayment/queryRepaymentEarlier返回信息，{}", JSONObject.toJSONString(resultEarlier));
+			
+			LOG.info("查询用户账户余额/eip/xiaodai/QueryUserAviMoney参数信息，{}", JSONObject.toJSONString(paramMap2));
+			com.ht.ussp.core.Result resultUserAviMoney = eipRemote.queryUserAviMoney(paramMap2);	// 查询用户余额
+			LOG.info("查询用户账户余额/eip/xiaodai/QueryUserAviMoney返回信息，{}", JSONObject.toJSONString(resultUserAviMoney));
 
 			List<TdProjectPaymentDTO> tdProjectPaymentDTOs = null;
 
@@ -676,9 +707,13 @@ public class TdrepayRechargeController {
 			paramMap.put("projectId", projectId);
 
 			Map<String, Object> resultMap = new HashMap<>();
-
+			LOG.info("还垫付信息查询接口/eip/td/repayment/returnAdvanceShareProfit参数信息，{}", JSONObject.toJSONString(paramMap));
 			com.ht.ussp.core.Result result = eipRemote.returnAdvanceShareProfit(paramMap);
+			LOG.info("还垫付信息查询接口/eip/td/repayment/returnAdvanceShareProfit返回信息，{}", JSONObject.toJSONString(result));
+			
+			LOG.info("标的还款信息查询接口/eip/td/repayment/returnAdvanceShareProfit参数信息，{}", JSONObject.toJSONString(paramMap));
 			com.ht.ussp.core.Result queryProjectPaymentResult = eipRemote.queryProjectPayment(paramMap);
+			LOG.info("标的还款信息查询接口/eip/td/repayment/queryProjectPayment返回信息，{}", JSONObject.toJSONString(queryProjectPaymentResult));
 
 			if (result != null && result.getData() != null
 					&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())
@@ -815,7 +850,7 @@ public class TdrepayRechargeController {
 			List<RepaymentProjPlan> repaymentProjPlans = repaymentProjPlanService
 					.selectList(new EntityWrapper<RepaymentProjPlan>().eq("project_id", projectId));
 			if (CollectionUtils.isEmpty(repaymentProjPlans)) {
-				return null;
+				return Result.success();
 			}
 			return Result.success(repaymentProjPlans.get(0));
 		} catch (Exception e) {
@@ -900,17 +935,30 @@ public class TdrepayRechargeController {
 
 			List<Map<String, Object>> resultList = new ArrayList<>();
 
-			List<String> listName = RechargeAccountTypeEnums.listName();
+			Set<String> nameSet = new HashSet<>();
+			BusinessTypeEnum[] businessTypeEnums = BusinessTypeEnum.values(); 
+			for (BusinessTypeEnum businessTypeEnum : businessTypeEnums) {
+				nameSet.add(businessTypeEnum.rechargeAccountName());
+			}
 
 			int num = 1;
 
-			for (String rechargeAccountType : listName) {
+			for (String rechargeAccountType : nameSet) {
 
 				Map<String, Object> resultMap = new HashMap<>();
 
-				paramMap.put("userId", tdrepayRechargeService.handleAccountType(rechargeAccountType));
+				SysParameter sysParameter = tdrepayRechargeService.queryRechargeAccountSysParams(rechargeAccountType);
+				if (sysParameter == null) {
+					continue;
+				}
 
-				com.ht.ussp.core.Result result = eipRemote.queryUserAviMoney(paramMap);
+				String userId = sysParameter.getParamValue();
+				
+				paramMap.put("userId", userId);
+
+				LOG.info("查询代充值账户余额/eip/td/queryUserAviMoneyForNet参数信息，{}", JSONObject.toJSONString(paramMap));
+				com.ht.ussp.core.Result result = eipRemote.queryUserAviMoneyForNet(paramMap);
+				LOG.info("查询代充值账户余额/eip/td/queryUserAviMoneyForNet返回信息，{}", JSONObject.toJSONString(result));
 
 				resultMap.put("rechargeAccountType", rechargeAccountType);
 				resultMap.put("num", num++);
@@ -918,7 +966,7 @@ public class TdrepayRechargeController {
 				if (result != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())
 						&& result.getData() != null) {
 					JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(result.getData()));
-					resultMap.put("balance", jsonObject.get("aviMoney"));
+					resultMap.put("balance", jsonObject.get("AviMoney"));
 				} else {
 					resultMap.put("balance", "查询" + rechargeAccountType + "账户余额失败");
 				}

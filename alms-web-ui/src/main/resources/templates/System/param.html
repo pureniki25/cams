@@ -45,8 +45,8 @@
             <Row>
                 <i-col span="24" style="line-height:2rem">
                     <!-- <i-button style="float: right;">查询</i-button> -->
-                    <button class="layui-btn layui-btn-sm" style="float: right;" @click="tableReload">查询</button>
-                    <i-input id="key" style="width:15%;float: right;" placeholder="请输入参数名称或参数编号"></i-input>
+                    <button class="layui-btn layui-btn-sm" style="float: right;" @click="tableReload({key:key},1)">查询</button>
+                    <i-input id="key" v-model="key" style="width:15%;float: right;" placeholder="请输入参数名称或参数编号"></i-input>
                     <label for="key" style="float: right;">关键字:</label>
                 </i-col>
             </Row>

@@ -3,8 +3,10 @@ package com.hongte.alms.core.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.entity.BasicCompany;
+import com.hongte.alms.base.entity.SysUserRole;
 import com.hongte.alms.base.enums.AreaLevel;
 import com.hongte.alms.base.process.entity.ProcessType;
 import com.hongte.alms.base.process.enums.ProcessStatusEnums;
@@ -14,6 +16,7 @@ import com.hongte.alms.base.process.vo.ProcessReq;
 import com.hongte.alms.base.process.vo.ProcessStatusVo;
 import com.hongte.alms.base.process.vo.ProcessVo;
 import com.hongte.alms.base.service.BasicCompanyService;
+import com.hongte.alms.base.service.SysUserRoleService;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.JsonUtil;
@@ -55,6 +58,9 @@ public class ProcessController {
     @Autowired
     LoginUserInfoHelper loginUserInfoHelper;
 
+    @Autowired
+    @Qualifier("SysUserRoleService")
+    SysUserRoleService sysUserRoleService;
 
     @Autowired
     @Qualifier("BasicCompanyService")
@@ -68,6 +74,15 @@ public class ProcessController {
             @ModelAttribute ProcessReq req){
 
         try {
+        	
+        	 Wrapper<SysUserRole> wrapperSysUserRole = new EntityWrapper<>();
+             wrapperSysUserRole.eq("user_id",loginUserInfoHelper.getUserId());
+             wrapperSysUserRole.and(" role_code in (SELECT role_code FROM tb_sys_role WHERE role_area_type = 1 AND page_type = 6 ) ");
+             List<SysUserRole> userRoles = sysUserRoleService.selectList(wrapperSysUserRole);
+             if(null != userRoles && !userRoles.isEmpty()) {
+             	req.setNeedPermission(0);//全局用户 不需要验证权限
+             }
+        	
             req.setReqPageeType(reqPageeType);
 //            req.setWaitTpApproveFlage(true);
 

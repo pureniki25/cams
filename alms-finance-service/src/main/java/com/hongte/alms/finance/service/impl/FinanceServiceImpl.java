@@ -80,6 +80,7 @@ import com.hongte.alms.base.process.mapper.ProcessMapper;
 import com.hongte.alms.base.service.RepaymentBizPlanListDetailService;
 import com.hongte.alms.base.service.RepaymentConfirmLogService;
 import com.hongte.alms.base.service.RepaymentProjPlanListDetailService;
+import com.hongte.alms.base.service.RepaymentProjPlanListService;
 import com.hongte.alms.base.vo.finance.CurrPeriodDerateInfoVO;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.base.vo.finance.CurrPeriodRepaymentInfoVO;
@@ -147,6 +148,10 @@ public class FinanceServiceImpl implements FinanceService {
 	@Autowired
 	@Qualifier("RepaymentProjPlanListDetailService")
 	private RepaymentProjPlanListDetailService repaymentProjPlanListDetailService;
+	
+	@Autowired
+	@Qualifier("RepaymentProjPlanListService")
+	private RepaymentProjPlanListService repaymentProjPlanListService ;
 	
 	@Autowired
 	private TransferOfLitigationMapper transferOfLitigationMapper;
@@ -369,13 +374,13 @@ public class FinanceServiceImpl implements FinanceService {
 			moneyPoolRepayment.setMoneyPoolId(null);
 			moneyPoolRepayment.setUpdateTime(now);
 			moneyPoolRepayment.setUpdateUser(loginUserInfoHelper.getUserId());
-			boolean mprUpdateRes = moneyPoolRepayment.updateById();
+			boolean mprUpdateRes = moneyPoolRepayment.updateAllColumnById();
 			if (!mprUpdateRes) {
 				return Result.error("500", "更新还款登记数据失败");
 			}
 			moneyPool.setFinanceStatus(RepayRegisterFinanceStatus.未关联银行流水.toString());
 			moneyPool.setStatus(RepayRegisterState.待领取.toString());
-			boolean mpUpdateRes = moneyPool.updateById();
+			boolean mpUpdateRes = moneyPool.updateAllColumnById();
 			if (!mpUpdateRes) {
 				return Result.error("500", "更新银行流水数据失败");
 			}
@@ -540,10 +545,23 @@ public class FinanceServiceImpl implements FinanceService {
 	@Override
 	public CurrPeriodRepaymentInfoVO getCurrPeriodRepaymentInfoVO(String businessId, String afterId) {
 		CurrPeriodRepaymentInfoVO c = new CurrPeriodRepaymentInfoVO();
+		
 		RepaymentBizPlanList rpl = new RepaymentBizPlanList();
 		rpl.setBusinessId(businessId);
 		rpl.setAfterId(afterId);
 		rpl = repaymentBizPlanListMapper.selectOne(rpl);
+		
+		/*根据最后一条实还流水的时间重新计算滞纳金*/
+		List<MoneyPoolRepayment> moneyPoolRepayments = moneyPoolRepaymentMapper.selectList(
+				new EntityWrapper<MoneyPoolRepayment>().eq("plan_list_id", rpl.getPlanListId()).isNotNull("money_pool_id").andNew("state",RepayRegisterFinanceStatus.未关联银行流水.toString()).or().eq("state", RepayRegisterFinanceStatus.财务指定银行流水.toString()).orderBy("trade_date",false));
+		Date factRepayDate = new Date() ;
+		if (!CollectionUtils.isEmpty(moneyPoolRepayments)) {
+			factRepayDate = moneyPoolRepayments.get(0).getTradeDate() ;
+		}
+		rpl.setFactRepayDate(factRepayDate);
+		rpl = repaymentProjPlanListService.calLateFeeForPerPList(rpl, 1);
+		/*根据最后一条实还流水的时间重新计算滞纳金*/
+		
 		c.setRepayDate(rpl.getDueDate());
 		if (rpl.getOverdueDays() != null) {
 			c.setOverDays(rpl.getOverdueDays().intValue());
@@ -560,11 +578,11 @@ public class FinanceServiceImpl implements FinanceService {
 				continue;
 			}
 			if (rd.getPlanItemType().equals(30)) {
-				c.setItem30(rd.getPlanAmount().subtract(calFactRepay(30, null, businessId, afterId)));
+				c.setItem30(rd.getPlanAmount().subtract(calFactRepay(30, rd.getFeeId(), businessId, afterId)).add(c.getItem30()));
 				continue;
 			}
 			if (rd.getPlanItemType().equals(50)) {
-				c.setItem50(rd.getPlanAmount().subtract(calFactRepay(50, null, businessId, afterId)));
+				c.setItem50(rd.getPlanAmount().subtract(calFactRepay(50, rd.getFeeId(), businessId, afterId)).add(c.getItem50()));
 				continue;
 			}
 			if (rd.getPlanItemType().equals(60)

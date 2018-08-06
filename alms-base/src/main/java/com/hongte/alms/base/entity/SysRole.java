@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.baomidou.mybatisplus.enums.IdType;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -22,7 +24,7 @@ public class SysRole extends Model<SysRole> {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId("role_code")
+    @TableField("role_code")
 	@ApiModelProperty(required= true,value = "")
 	private String roleCode;
 	@TableField("role_name")
@@ -37,14 +39,40 @@ public class SysRole extends Model<SysRole> {
     @TableField("role_area_method")
     @ApiModelProperty(required = true, value = "区域性取值方式")
     private Integer roleAreaMethod;
-
+    @TableField("page_type")
+    @ApiModelProperty(required = true, value = "页面类型")
+    private Integer pageType;
+    
+    @TableField("data_type")
+    @ApiModelProperty(required = true, value = "数据权限类型:0所有1正在逾期中")
+    private Integer dataType;
+    
+    @TableId(value = "id", type = IdType.INPUT)
+    @ApiModelProperty(required = true, value = "页面类型")
+    private Integer id;
 
 	public String getRoleCode() {
 		return roleCode;
 	}
 
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
 	public void setRoleCode(String roleCode) {
 		this.roleCode = roleCode;
+	}
+
+	public Integer getPageType() {
+		return pageType;
+	}
+
+	public void setPageType(Integer pageType) {
+		this.pageType = pageType;
 	}
 
 	public String getRoleName() {
@@ -71,9 +99,17 @@ public class SysRole extends Model<SysRole> {
         this.roleAreaMethod = roleAreaMethod;
     }
 
+	public Integer getDataType() {
+		return dataType;
+	}
+
+	public void setDataType(Integer dataType) {
+		this.dataType = dataType;
+	}
+
 	@Override
 	protected Serializable pkVal() {
-		return this.roleCode;
+		return this.id;
 	}
 
 	@Override

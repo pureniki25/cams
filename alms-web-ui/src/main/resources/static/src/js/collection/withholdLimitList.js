@@ -62,12 +62,39 @@ window.layinit(function (htConfig) {
                     ],
                     dayLimit: [
                         {required: true, type: 'number', message: '单日限额不为空且必须为数字', trigger: 'blur'},
+                        {validator(rule, value, callback, source, options) {
+                            var errors = [];
+                            if (value < 0 ) {
+
+                                callback('单日限额不能小于0');
+                            }
+                            callback(errors);
+
+                        }}
                     ],
                     onceLimit: [
                         {required: true, type: 'number', message: '单笔限额不为空且必须为数字', trigger: 'blur'},
+                        {validator(rule, value, callback, source, options) {
+                            var errors = [];
+                            if (value < 0 ) {
+
+                                callback('单笔限额不能小于0');
+                            }
+                            callback(errors);
+
+                        }}
                     ],
                     monthLimit: [
                         {required: true, type: 'number', message: '单月限额不为空且必须为数字', trigger: 'blur'},
+                        {validator(rule, value, callback, source, options) {
+                            var errors = [];
+                            if (value < 0 ) {
+
+                                callback('单月限额不能小于0');
+                            }
+                            callback(errors);
+
+                        }}
                     ],
                     status: [
                         {required: true, type: 'string', message: '状态不能为空', trigger: 'blur'},
@@ -145,7 +172,7 @@ window.layinit(function (htConfig) {
                                 }
                             },
                             {
-                                fixed: 'right',
+                                // fixed: 'right',
                                 title: '操作',
                                 width: 178,
                                 align: 'left',
@@ -188,13 +215,24 @@ window.layinit(function (htConfig) {
                     });
 
 
+                    table.on('renderComplete(listTable)', function (obj) {
+                        layui.ht_auth.render("auth_scope");
+                    });
+
+                    layui.ht_auth.render('auth_scope');
                 })
             },
             shutdownLimit(id,status){
+                var msg;
+                if(status ==0){
+                    msg="停用成功!";
+                }else if(status ==1){
+                    msg="启用成功!";
+                }
                 axios.get(basePath + 'withholdManage/updateWithholdLimitStatus?limitId=' + id+"&status="+status)
                     .then(function (res) {
                         if (res.data.code == "1") {
-                            vm.$Modal.success({content: '停用成功!'});
+                            vm.$Modal.success({content: msg});
                             vm.toLoading();
                         }
                     })

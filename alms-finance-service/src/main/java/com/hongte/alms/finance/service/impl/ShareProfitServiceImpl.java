@@ -22,6 +22,7 @@ import com.hongte.alms.base.feignClient.PlatformRepaymentFeignClient;
 import com.hongte.alms.base.mapper.*;
 import com.hongte.alms.base.process.mapper.ProcessMapper;
 import com.hongte.alms.base.service.*;
+import com.hongte.alms.base.util.ProjPlanDtoUtil;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.Constant;
@@ -737,59 +738,10 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             repaymentProjPlanDtos.add(repaymentProjPlanDto);
         }
 
-        Collections.sort(repaymentProjPlanDtos, new Comparator<RepaymentProjPlanDto>() {
-            // 排序规则说明 需补充 从小标到大标，再到主借标
-            //同等
-            @Override
-            public int compare(RepaymentProjPlanDto arg0, RepaymentProjPlanDto arg1) {
-                if (arg0.getTuandaiProjectInfo().getMasterIssueId().equals(arg0.getTuandaiProjectInfo().getProjectId())) {
-                    return 1;
-                }else if (arg1.getTuandaiProjectInfo().getMasterIssueId().equals(arg1.getTuandaiProjectInfo().getProjectId())) {
-                    return -1;
-				}
-                if (arg0.getRepaymentProjPlan().getBorrowMoney()
-                        .compareTo(arg1.getRepaymentProjPlan().getBorrowMoney()) < 0) {
-                    return -1;
-                }
-                if (arg0.getTuandaiProjectInfo().getQueryFullSuccessDate()
-                        .before(arg1.getTuandaiProjectInfo().getQueryFullSuccessDate())) {
-                    return -1;
-                }else if (arg0.getTuandaiProjectInfo().getQueryFullSuccessDate()
-                        .after(arg1.getTuandaiProjectInfo().getQueryFullSuccessDate())) {
-					return 1;
-				}
-                return 0;
-            }
-
-        });
-
-        Collections.sort(financeBaseDto.getProjListDetails(), new Comparator<CurrPeriodProjDetailVO>() {
-            // 排序规则说明 需补充 从小标到大标，再到主借标
-            //同等
-            @Override
-            public int compare(CurrPeriodProjDetailVO arg0, CurrPeriodProjDetailVO arg1) {
-                if (arg0.isMaster()) {
-                    return 1;
-                }else if (arg1.isMaster()) {
-                    return -1;
-				}
-                if (arg0.getProjAmount()
-                        .compareTo(arg1.getProjAmount()) < 0) {
-                    return -1;
-                }else if (arg0.getProjAmount().compareTo(arg1.getProjAmount())>0) {
-					return 1;
-				}
-                if (arg0.getQueryFullSuccessDate()
-                        .before(arg1.getQueryFullSuccessDate())) {
-                    return -1;
-                }else if (arg0.getQueryFullSuccessDate()
-                        .after(arg1.getQueryFullSuccessDate())) {
-					return 1;
-				}
-                return 0;
-            }
-
-        });
+        ProjPlanDtoUtil.sort(repaymentProjPlanDtos);
+        
+        CurrPeriodProjDetailVO.sort(financeBaseDto.getProjListDetails());
+        
         for (RepaymentProjPlanDto repaymentProjPlanDto2 : repaymentProjPlanDtos) {
             logger.info("满标时间{}"
                     + DateUtil.formatDate("yyyy-MM-dd HH:mm:ss",repaymentProjPlanDto2.getTuandaiProjectInfo().getQueryFullSuccessDate()));
@@ -1558,8 +1510,24 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 				for (RepaymentBizPlanListDetail planListDetail : planListDto.getBizPlanListDetails()) {
 					List<RepaymentProjFactRepay> list = financeBaseDto.getProjFactRepays().get(planListDetail.getPlanDetailId());
 					if (list != null && !list.isEmpty()) {
-						BigDecimal factAmount = BigDecimal.ZERO;
+						/*优化同一个费用项在备注里出现2次*/
+						List<RepaymentProjFactRepay> newList = new ArrayList<>() ;
 						for (RepaymentProjFactRepay repaymentProjFactRepay : list) {
+							boolean existSameFee = false ;
+							for (RepaymentProjFactRepay repaymentProjFactRepay2 : newList) {
+								if (repaymentProjFactRepay2.getFeeId().equals(repaymentProjFactRepay.getFeeId())) {
+									existSameFee = true ;
+									repaymentProjFactRepay2.setFactAmount(repaymentProjFactRepay2.getFactAmount().add(repaymentProjFactRepay.getFactAmount()));
+								}
+							}
+							if (!existSameFee) {
+								newList.add(repaymentProjFactRepay);
+							}
+						}
+						/*优化同一个费用项在备注里出现2次*/
+						
+						BigDecimal factAmount = BigDecimal.ZERO;
+						for (RepaymentProjFactRepay repaymentProjFactRepay : newList) {
 							factAmount = repaymentProjFactRepay.getFactAmount().add(factAmount);
 						}
 						feeDetails.append(factAmount.setScale(2, RoundingMode.HALF_UP));
@@ -1680,7 +1648,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			            } else {
 
 //							bizPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
-							bizPlanList.setCurrentSubStatus(RepayPlanStatus.PARTAIL.getName());
+			            	bizPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
+							bizPlanList.setCurrentSubStatus(RepayPlanStatus.REPAYING.getName());
 							bizPlanList.setRepayFlag(null);
 			                if (bplFactAmount.compareTo(bplOnlineAmount) >= 0) {
 			                    bizPlanList.setRepayStatus(SectionRepayStatusEnum.ONLINE_REPAID.getKey());
@@ -1942,6 +1911,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         repaymentConfirmLog.setBusinessId(businessId);
         repaymentConfirmLog.setCanRevoke(1);
         repaymentConfirmLog.setConfirmLogId(UUID.randomUUID().toString());
+        /*增加还款类型区分,1=还款日志,2=结清日志*/
+        repaymentConfirmLog.setType(1);
         repaymentConfirmLog.setCreateTime(new Date());
         repaymentConfirmLog.setCreateUser(loginUserInfoHelper.getUserId());
         List<RepaymentConfirmLog> repaymentConfirmLogs = repaymentConfirmLog.selectList(new EntityWrapper<>()
@@ -2422,6 +2393,24 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 
 
         String businessId = financeBaseDto.getBusinessId();
+
+        tdrepayRechargeThread( ptojPlanList, confirmLogId);
+
+        //下面要触发往信贷更新还未计划数据，直接调用open中的接口方法。 张贵宏 2018.06.28
+        executor.execute(() -> {
+            logger.info("触发往信贷更新还未计划数据开始，businessId:[{}]", businessId);
+            //睡一下，让还款的信息先存完。
+            try{
+                Thread.sleep(1000);
+            }catch (Exception e){
+                logger.error(e.getMessage(), e);
+            }
+            updateRepayPlanToLMS(businessId);
+            logger.info("触发往信贷更新还未计划数据结束，businessId:[{}]", businessId);
+        });
+    }
+
+    public void tdrepayRechargeThread(List<RepaymentProjPlanList> ptojPlanList,String confirmLogId){
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -2440,20 +2429,6 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                 }
                 logger.info("调用平台合规化还款接口结束");
             }
-        });
-
-
-        //下面要触发往信贷更新还未计划数据，直接调用open中的接口方法。 张贵宏 2018.06.28
-        executor.execute(() -> {
-            logger.info("触发往信贷更新还未计划数据开始，businessId:[{}]", businessId);
-            //睡一下，让还款的信息先存完。
-            try{
-                Thread.sleep(1000);
-            }catch (Exception e){
-                logger.error(e.getMessage(), e);
-            }
-            updateRepayPlanToLMS(businessId);
-            logger.info("触发往信贷更新还未计划数据结束，businessId:[{}]", businessId);
         });
     }
 
@@ -2600,26 +2575,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         repaymentProjPlanDto2.setRepaymentProjPlan(repaymentProjPlan2);
         repaymentProjPlanDtos.add(repaymentProjPlanDto2);
 
-        Collections.sort(repaymentProjPlanDtos, new Comparator<RepaymentProjPlanDto>() {
-            // 排序规则说明 需补充
-            @Override
-            public int compare(RepaymentProjPlanDto arg0, RepaymentProjPlanDto arg1) {
-                if (arg0.getTuandaiProjectInfo().getMasterIssueId()
-                        .equals(arg0.getTuandaiProjectInfo().getProjectId())) {
-                    return 1;
-                }
-                if (arg0.getRepaymentProjPlan().getBorrowMoney()
-                        .compareTo(arg1.getRepaymentProjPlan().getBorrowMoney()) < 0) {
-                    return -1;
-                }
-                if (arg0.getTuandaiProjectInfo().getQueryFullSuccessDate()
-                        .before(arg1.getTuandaiProjectInfo().getQueryFullSuccessDate())) {
-                    return -1;
-                }
-
-                return 0;
-            }
-        });
+        ProjPlanDtoUtil.sort(repaymentProjPlanDtos);
+        
         logger.info(JSON.toJSONString(repaymentProjPlanDtos));
         for (RepaymentProjPlanDto repaymentProjPlanDto : repaymentProjPlanDtos) {
 

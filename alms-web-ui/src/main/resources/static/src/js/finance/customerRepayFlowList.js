@@ -336,7 +336,7 @@ window.layinit(function (htConfig) {
                         }
                     }
                     if (flag) {
-                        vm.$Modal.error({content: "只能对未审核的数据进行拒绝"});
+                        vm.$Modal.error({content: "只能对未审核的数据进行审核"});
                         return;
                     }
                     console.log("else ids=", ids);

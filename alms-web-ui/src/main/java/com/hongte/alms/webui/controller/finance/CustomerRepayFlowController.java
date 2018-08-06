@@ -1,14 +1,8 @@
 package com.hongte.alms.webui.controller.finance;
 
-import com.hongte.alms.common.util.ExportFileUtil;
 import io.swagger.annotations.Api;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.io.IOException;
-import java.io.InputStream;
 
 
 @Controller
@@ -52,7 +46,11 @@ public class CustomerRepayFlowController {
         return "/finance/ybWithholdRepayFlowList";
     }
 
-
-
+    /**
+     * 快钱流水
+     * @return
+     */
+    @RequestMapping("/kqFlow")
+    public String kqFlow(){ return "/finance/kqWithholdRepayFlowList"; }
 
 }

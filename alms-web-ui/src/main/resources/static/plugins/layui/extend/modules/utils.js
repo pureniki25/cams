@@ -46,10 +46,10 @@ layui.define(['layer'], function (exports) {
                 },
                 success: function (res) {
                     result = res;
-
+                    if (typeof callback == 'function')
+                        callback.call(this);
                 },
                 complete: function () {
-                    typeof callback === 'function' && callback();
                 }
             });
             return result;
@@ -253,6 +253,66 @@ layui.define(['layer'], function (exports) {
                     return temp = (temp += str).substr(temp.length - len);
                 }
             }
+        },
+        getUrlParam: function (url, name) {
+            var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+            var idx = url.indexOf('?');
+            if (idx < 0) return null;
+
+            url = url.substr(idx + 1);
+            var r = url.match(reg);
+            if (r != null) {
+                return unescape(r[2]);
+            }
+            return null;
+        },
+        getToday: function () {
+            var now = new Date();
+            var year = now.getFullYear();//getYear()+1900=getFullYear()
+            var month = now.getMonth() + 1;//0-11表示1-12月
+            var day = now.getDate();
+            if (parseInt(month) < 10) {
+                month = "0" + month;
+            }
+            if (parseInt(day) < 10) {
+                day = "0" + day;
+            }
+            return year + '-' + month + '-' + day;
+        },
+        getPreMonthToday: function (pre) {
+            if (!pre)
+                pre = 1;
+            var now = new Date();
+            var year = now.getFullYear();//getYear()+1900=getFullYear()
+            var month = now.getMonth() + 1;//0-11表示1-12月
+            var day = now.getDate();
+            if (parseInt(month) < 10) {
+                month = "0" + month;
+            }
+            if (parseInt(day) < 10) {
+                day = "0" + day;
+            }
+            now = year + '-' + month + '-' + day;
+            if (parseInt(month) == 1) {//如果是1月份，则取上一年的12月份
+                var xmonth = 13 - pre;
+                if (parseInt(xmonth) < 10) {
+                    xmonth = "0" + xmonth;
+                }
+                return (parseInt(year) - 1) + '-' + xmonth + '-' + day;
+            }
+            var preSize = new Date(year, parseInt(month) - pre, 0).getDate();//上月总天数
+            if (preSize < parseInt(day)) {//上月总天数<本月日期，比如3月的30日，在2月中没有30
+                var xmonth = parseInt(month) + 1 - pre;
+                if (parseInt(xmonth) < 10) {
+                    xmonth = "0" + xmonth;
+                }
+                return year + '-' + xmonth + '-01';
+            }
+            var xmonth = parseInt(month) - pre;
+            if (parseInt(xmonth) < 10) {
+                xmonth = "0" + xmonth;
+            }
+            return year + '-' + xmonth + '-' + day;
         }
     };
 

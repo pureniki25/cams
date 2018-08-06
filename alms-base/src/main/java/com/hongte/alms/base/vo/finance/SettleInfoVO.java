@@ -4,8 +4,12 @@
 package com.hongte.alms.base.vo.finance;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -72,6 +76,11 @@ public class SettleInfoVO {
 	private Date repayPlanDate ;
 
 	/**
+	 * 其他费用项总额
+	 */
+	private BigDecimal other = BigDecimal.ZERO ;
+	
+	/**
 	 * 减免项目
 	 */
 	private List<SettleFeesVO> derates ;
@@ -83,6 +92,20 @@ public class SettleInfoVO {
 		}
 	}
 	
+	/**
+	 * 其他费用项明细
+	 */
+	private List<SettleFeesVO> otherFees ;
+	
+	public void setOtherFees(List<SettleFeesVO> list) {
+		this.otherFees = list;
+		for (SettleFeesVO settleFeesVO : list) {
+			if (settleFeesVO.getAmount()==null||settleFeesVO.getFeeName()==null) {
+				continue;
+			}
+			this.other = this.other.add(settleFeesVO.getAmount());
+		}
+	}
 	
 	/**
 	 * 往期少缴费用
@@ -95,4 +118,48 @@ public class SettleInfoVO {
 			this.planRepayBalance = this.planRepayBalance.add(settleFeesVO.getAmount());
 		}
 	}
+	
+	/**
+	 * 提前结清违约金
+	 */
+	private List<SettleFeesVO> penaltyFees ;
+	
+	private List<SettleFeesVO> penaltyFeesBiz ;
+	
+	public void setPenaltyFees(List<SettleFeesVO> list) {
+		this.penaltyFees = list ;
+		Set<String> feeNames = new HashSet<>() ;
+		for (SettleFeesVO settleFeesVO : list) {
+			feeNames.add(settleFeesVO.getFeeName());
+			this.penalty = this.penalty.add(settleFeesVO.getAmount()).setScale(2, RoundingMode.HALF_UP);
+		}
+		penaltyFeesBiz = new ArrayList<>() ;
+		for (String string : feeNames) {
+			SettleFeesVO vo = new SettleFeesVO() ;
+			vo.setFeeName(string);
+			BigDecimal amount = BigDecimal.ZERO ;
+			for (SettleFeesVO fee : penaltyFees) {
+				if (fee.getFeeName().equals(string)) {
+					amount = amount.add(fee.getAmount());
+				}
+			}
+			vo.setAmount(amount);
+			penaltyFeesBiz.add(vo);
+		}
+		
+	}
+	
+	/*public SettleInfoVO() {
+		this.item10.setScale(2, RoundingMode.HALF_UP);
+		this.item20.setScale(2, RoundingMode.HALF_UP);
+		this.item30.setScale(2, RoundingMode.HALF_UP);
+		this.item50.setScale(2, RoundingMode.HALF_UP);
+		this.subtotal.setScale(2, RoundingMode.HALF_UP);
+		this.offlineOverDue.setScale(2, RoundingMode.HALF_UP);
+		this.onlineOverDue.setScale(2, RoundingMode.HALF_UP);
+		this.penalty.setScale(2, RoundingMode.HALF_UP);
+		this.derate.setScale(2, RoundingMode.HALF_UP);
+		this.planRepayBalance.setScale(2, RoundingMode.HALF_UP);
+		this.total.setScale(2, RoundingMode.HALF_UP);
+	}*/
 }

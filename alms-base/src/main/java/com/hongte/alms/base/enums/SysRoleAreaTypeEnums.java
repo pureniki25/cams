@@ -12,6 +12,7 @@ public enum SysRoleAreaTypeEnums {
 	,ONLY_SELF(3,"只查看自己跟进的")  //根据电催、催收设置
 	,SEE_CAR_BUSINESS(4,"只查看车贷业务")
 	,SEE_HOURSE_BUSINESS(5,"只查看房贷业务")
+	,SEE_FINANCE_BUSINESS(6,"财务跟单方式控制")
 	;
 
 

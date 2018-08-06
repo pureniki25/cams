@@ -20,6 +20,7 @@ window.layinit(function (htConfig) {
             curIndex: {},
             matchedBankStatement: [],
             factRepayPreview: {},
+            submitLoding:false,
             factRepaymentInfo: {
                 repayDate: '',
                 surplusFund: 0,
@@ -45,6 +46,7 @@ window.layinit(function (htConfig) {
                 derate: '',
                 planRepayBalance: '',
                 total: '',
+                otherFees:[]
             },
             table: {
                 reg: {
@@ -237,7 +239,7 @@ window.layinit(function (htConfig) {
                         width:150,
                         render: (h, p) => {
 
-                            if (p.row.moneyPoolId != '合计' && !p.row.status == '完成') {
+                            if (p.row.moneyPoolId != '合计' && p.row.status == '待领取') {
                                 return h('i-button', {
                                         on: {
                                             click: function () {
@@ -295,7 +297,49 @@ window.layinit(function (htConfig) {
                     }],
                     data: []
                 },
-                projRepayment: projRepayment,
+                projRepayment: {
+                    col:[
+                        {
+                            title:'借款人',
+                            key:'userName',
+                            render:(h,p)=>{
+                                return h('span',p.row.master?p.row.userName+'(主借)':p.row.userName)
+                            }
+                        },{
+                            title:'上标金额',
+                            key:'projAmount'
+                        },{
+                            title:'本金',
+                            key:'item10'
+                        },{
+                            title:'利息',
+                            key:'item20'
+                        },{
+                            title:'月收分公司服务费',
+                            key:'item30'
+                        },{
+                            title:'月收平台费',
+                            key:'item50'
+                        },{
+                            title:'线下逾期费',
+                            key:'offlineOverDue'
+                        },{
+                            title:'线上逾期费',
+                            key:'onlineOverDue'
+                        },{
+                            title:'结余',
+                            key:'surplus'
+                        },{
+                            title:'提前结清违约金',
+                            key:'item70'
+                        },
+                        {
+                            title:'合计',
+                            key:'total'
+                        }
+                    ],
+                    data:[]
+                },
                 plan: {
                     col: [{
                         title: '期数',
@@ -362,7 +406,17 @@ window.layinit(function (htConfig) {
                         key: 'penalty'
                     }, */ {
                         title: '备注',
-                        key: 'remark'
+                        key: 'remark',
+                        render:(h,p)=>{
+                            return h('pre',{
+                                style:{
+                                    overflow:'hidden',
+                                },
+                                attrs:{
+                                    title:p.row.remark,
+                                }
+                            },p.row.remark)
+                        }
                     }, {
                         title: '状态',
                         key: 'status',
@@ -414,7 +468,8 @@ window.layinit(function (htConfig) {
                 onlineOverDue: 0,
                 subTotal: 0,
                 total: 0,
-                surplus: 0
+                surplus: 0,
+                penalty:0
             }
         },
         watch: {
@@ -437,16 +492,16 @@ window.layinit(function (htConfig) {
                 }
                 app.factRepaymentInfo.surplusFund = 0
             },
-            'factRepaymentInfo.surplusFund': function (n) {
-                if ((n||n==0 )&& !isNaN(n)) {
-                    if(n>app.factRepaymentInfo.canUseSurplus){
-                        app.$Modal.warning({content:'可使用结余金额不能大于'+app.factRepaymentInfo.canUseSurplus})
-                        app.factRepaymentInfo.surplusFund = 0
-                        return;
-                    }
-                    app.factRepaymentInfo.repayAccount = accAdd(app.factRepaymentInfo.moneyPoolAccount,(app.factRepaymentInfo.surplusFund||0))
-                }
-            },
+            // 'factRepaymentInfo.surplusFund': function (n) {
+            //     if ((n||n==0 )&& !isNaN(n)) {
+            //         if(n>app.factRepaymentInfo.canUseSurplus){
+            //             app.$Modal.warning({content:'可使用结余金额不能大于'+app.factRepaymentInfo.canUseSurplus})
+            //             app.factRepaymentInfo.surplusFund = 0
+            //             return;
+            //         }
+            //         app.factRepaymentInfo.repayAccount = accAdd(app.factRepaymentInfo.moneyPoolAccount,(app.factRepaymentInfo.surplusFund||0))
+            //     }
+            // },
             'factRepaymentInfo.repayAccount': function (n) {
                 app.previewSettle()
             }
@@ -630,11 +685,28 @@ window.layinit(function (htConfig) {
                         })
                     })
             },
-            getSettleInfo() {
-                axios.get(fpath + 'settle/settleInfo?businessId=' + businessId + "&afterId=" + afterId +(planId?('&planId='+planId):''))
+            reGetSttleInfo(){
+                let param = {}
+                if(app.thisTimeRepaymentInfo.otherFees){
+                    param.otherFees = app.thisTimeRepaymentInfo.otherFees
+                }
+                app.getSettleInfo(param)
+                if(app.factRepaymentInfo.repayAccount&&app.factRepaymentInfo.repayAccount>0){
+                    app.previewSettle()
+                }
+            },
+            getSettleInfo(p) {
+                let param = p||{}
+                param.businessId = businessId ;
+                param.afterId = afterId ;
+                if(planId){
+                    param.planId = planId
+                }
+                axios.post(fpath + 'settle/settleInfo',param)
                     .then(function (res) {
                         if (res.data.code == '1') {
                             let data = res.data.data;
+                            
                             app.thisTimeRepaymentInfo.repayDate = data.repayPlanDate
                             app.thisTimeRepaymentInfo.item10 = data.item10
                             app.thisTimeRepaymentInfo.item20 = data.item20
@@ -648,7 +720,11 @@ window.layinit(function (htConfig) {
                             app.thisTimeRepaymentInfo.derate = data.derate
                             app.thisTimeRepaymentInfo.planRepayBalance = data.planRepayBalance
                             app.thisTimeRepaymentInfo.total = data.total
-
+                            app.thisTimeRepaymentInfo.penaltyFeesBiz = data.penaltyFeesBiz
+                            app.thisTimeRepaymentInfo.other = data.other
+                            if(param.otherFees){
+                                app.thisTimeRepaymentInfo.otherFees = data.otherFees
+                            }
                             console.log(res.data);
                         } else {
                             app.$Message.error({
@@ -663,15 +739,35 @@ window.layinit(function (htConfig) {
                     })
             },
             settle(params,cb){
+                if(app.thisTimeRepaymentInfo.otherFees){
+                    params.otherFees = app.thisTimeRepaymentInfo.otherFees
+                }
+                app.$Message.loading({
+                    content:'请稍后...',
+                    duration:0
+                })
+
                 axios.post(fpath+'finance/financeSettle',params)
                 .then(function(res){
+                    app.$Message.destroy()
+                    app.submitLoding = false
                     cb(res)
                 })
                 .catch(function(err){
                     app.$Message.error({content:'结清功能异常'})
                 })
+
+
+
+
             },
             handleSettleResult(res){
+                if(res.data.code!='1'){
+                    app.$Modal.error({
+                        content:res.data.msg
+                    })
+                    return ;
+                }
                 app.table.projRepayment.data = res.data.data
                 app.factRepayPreview.flag = true
                 app.factRepayPreview.item10 = 0
@@ -683,6 +779,9 @@ window.layinit(function (htConfig) {
                 app.factRepayPreview.subTotal = 0
                 app.factRepayPreview.total = 0
                 app.factRepayPreview.surplus = 0
+                app.factRepayPreview.item70 = 0 
+                app.factRepayPreview.otherMoney = 0 
+
                 app.table.projRepayment.data.forEach(e => {
                     app.factRepayPreview.surplus = accAdd(app.factRepayPreview.surplus,e.surplus)
                     app.factRepayPreview.item10 = accAdd(app.factRepayPreview.item10,e.item10)
@@ -692,9 +791,19 @@ window.layinit(function (htConfig) {
                     app.factRepayPreview.offlineOverDue = accAdd(app.factRepayPreview.offlineOverDue,e.offlineOverDue)
                     app.factRepayPreview.onlineOverDue = accAdd(app.factRepayPreview.onlineOverDue,e.onlineOverDue)
                     app.factRepayPreview.subTotal = accAdd(app.factRepayPreview.subTotal,e.subTotal)
+                    app.factRepayPreview.item70 = accAdd(app.factRepayPreview.item70,e.item70)
                     app.factRepayPreview.total = accAdd(app.factRepayPreview.total,e.total)
+                    app.factRepayPreview.otherMoney = accAdd(app.factRepayPreview.otherMoney,e.otherMoney)
                 })
-                app.factRepayPreview.total = accAdd(accAdd(app.factRepayPreview.subTotal,app.factRepayPreview.offlineOverDue),accAdd(app.factRepayPreview.onlineOverDue,app.factRepayPreview.surplus))
+                app.factRepayPreview.total = accAdd(
+                accAdd(
+                    accAdd(
+                        accAdd(
+                            app.factRepayPreview.subTotal
+                            ,app.factRepayPreview.offlineOverDue)
+                        ,accAdd(app.factRepayPreview.onlineOverDue
+                            ,app.factRepayPreview.surplus))
+                    ,app.factRepayPreview.item70),app.factRepayPreview.otherMoney)
             },
             previewSettle(){
                 let params = {}
@@ -709,6 +818,7 @@ window.layinit(function (htConfig) {
                 app.settle(params,app.handleSettleResult)
             },
             submitSettle(){
+                
                 let params = {}
                 params.businessId = businessId
                 params.afterId = afterId
@@ -718,16 +828,103 @@ window.layinit(function (htConfig) {
                 params.preview=false
 
                 params = Object.assign(app.factRepaymentInfo, params);
-                app.settle(params,app.handleSettleResult)
+
+                // if(app.thisTimeRepaymentInfo.item10>app.factRepayPreview.item10){
+                //     app.$Modal.confirm({
+                //         content:'确认 亏损结清 ?',
+                //         onOk:function(){
+                //             params.deficit = true ;
+                //             app.settle(params,app.handleSettleResult)
+                //         },
+                //         onCancel:function(){
+                //             location.reload()
+                //         }
+                //     })
+                // }else{
+                //     app.settle(params,app.handleSettleResult)
+                // }
+                layer.confirm('确认还款计划结清?', {icon: 3, title: '提示'}, function (index) {
+                    app.submitLoding = true;
+                    axios.post(fpath + 'finance/financeSettle', params)
+                        .then(function (res) {
+                            if (res.data.code == '1') {
+                                app.submitLoding = false;
+                                app.$Modal.success({
+                                    content: '还款计划结清成功!', onOk() {
+                                        var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                                        parent.layer.close(index);
+                                        parent.app.search()
+                                    }
+                                })
+                            } else {
+                                app.$Message.error({content: res.data.msg})
+                            }
+                        })
+                        .catch(function (err) {
+                            console.log(err);
+                        })
+                    layer.close(index);
+                })
+
+            },
+            deleteMoneyPool(p) {
+                app.$Modal.confirm({
+                    content: '确认删除此条流水?',
+                    onOk() {
+                        axios.get(fpath + 'finance/deleteMoneyPool', {
+                            params: {
+                                mprId: p.row.mprId
+                            }
+                        })
+                            .then(function (r) {
+                                if (r.data.code == "1") {
+                                    window.location.reload()
+                                } else {
+                                    app.$Message.error({
+                                        content: r.data.msg
+                                    })
+                                }
+                            })
+                            .catch(function (e) {
+                                app.$Message.error({
+                                    content: '删除此条流水失败'
+                                })
+                            })
+                    }
+                })
+            },
+            listOtherFee(){
+                axios.get(fpath+'settle/listOtherFee?businessId=' 
+                + businessId 
+                +(planId?('&planId='+planId):''))
+                .then(function(res){
+                    console.log(res);
+                    if(res.data.code=='1'){
+                        app.thisTimeRepaymentInfo.otherFees = res.data.data 
+                    }else{
+                        app.$Message.error({
+                            content:res.data.msg
+                        })
+                    }
+                })
+                .catch(function(err){
+                    console.error(err)
+                })
+            },
+            recalcSettleInfo(){
+                /* 重新计算应还信息 */
+
             }
             
         },
         created: function () {
             this.getBaseInfo()
             this.getRepayRegList()
+            this.getSurplusFund()
             this.getMatched()
             this.listRepayment()
             this.getSettleInfo()
+            this.listOtherFee()
         }
     })
 })

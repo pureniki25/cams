@@ -15,6 +15,7 @@ window.layinit(function (htConfig) {
         el: "#app",
         data: {
             info: {},
+            submitloading:false,
             repayInfo: {
                 url: '/finance/repayBaseInfo?businessId=' + businessId + "&afterId=" + afterId,
             },
@@ -739,8 +740,15 @@ window.layinit(function (htConfig) {
                 }
 
                 layer.confirm('确认本次还款?', {icon: 3, title: '提示'}, function (index) {
+                    app.submitloading=true
+                    app.$Message.loading({
+                        content:'处理中...',
+                        duration:0
+                    })
                     axios.post(fpath + 'finance/confirmRepayment', param)
                         .then(function (res) {
+                            app.submitloading=false
+                            app.$Message.destroy()
                             if (res.data.code == '1') {
                                 app.handleConfirmRepaymentResult(res);
 

@@ -168,6 +168,26 @@
 			</i-button>
 		</div>
 		<div style="margin-top:10px; margin-left:10px">
+			    <i-lable>手动核销：</i-lable>
+                        原业务ID：
+            <div class="layui-inline">
+                <input v-model="originalBusinessId" class="layui-input" name="id" id="originalBusinessId">
+            </div>
+            after_id：
+            <div class="layui-inline">
+                <input v-model="afterId" class="layui-input" name="id" id="afterId">
+            </div>
+             logId：
+            <div class="layui-inline">
+                <input v-model="logId" class="layui-input" name="id" id="logId">
+            </div>
+			<i-button :loading="shareProfitLoading" @click="shareProfit">
+				<i-span v-if="!shareProfitLoading">执行</i-span>
+				<i-span v-else>执行中...</i-span>
+			</i-button>
+		</div>
+	
+		<div style="margin-top:10px; margin-left:10px">
 			<i-lable>同步指定业务的还款计划到信贷系统：</i-lable>
 			业务ID：
 			<div class="layui-inline">

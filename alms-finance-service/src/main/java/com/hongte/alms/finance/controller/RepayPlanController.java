@@ -16,6 +16,7 @@ import com.hongte.alms.base.RepayPlan.req.trial.TrailProjInfoReq;
 import com.hongte.alms.base.RepayPlan.req.trial.TrailRepayPlanReq;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
+import com.hongte.alms.base.enums.ProjPlatTypeEnum;
 import com.hongte.alms.base.enums.RepayTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanBorrowLimitUnitEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanCreateSysEnum;
@@ -99,6 +100,10 @@ public class RepayPlanController {
     @Autowired
     @Qualifier("BasicBusinessTypeService")
     BasicBusinessTypeService basicBusinessTypeService;
+    
+    @Autowired
+    @Qualifier("BasicBizCustomerService")
+    BasicBizCustomerService basicBizCustomerService;
     
     
     @Autowired
@@ -503,40 +508,61 @@ public class RepayPlanController {
     @ResponseBody
    public Result<List<BizDto>> getRepayList(@RequestBody @Validated  AppRepayListReq req){
     	List<String> needBusinessTypes=req.getBusinessTypes();
-    	List<BasicBusiness> basicBusinessList=basicBusinessService.selectList(new EntityWrapper<BasicBusiness>().eq("customer_identify_card", req.getIdentifyCard()));
-    	for(Iterator<BasicBusiness> it=basicBusinessList.iterator();it.hasNext();) {
-    		BasicBusiness business=it.next();
-    		BasicBusinessType businessType=basicBusinessTypeService.selectOne(new EntityWrapper<BasicBusinessType>().eq("business_type_id", business.getBusinessType()));
-    		boolean isContainsBusinessType=false;
-    		for(String needBusinessType:needBusinessTypes) {
-    			if(businessType.getXdBusinessTypeId().contains(needBusinessType)) {
-    				isContainsBusinessType=true;
-    				break;
-	       		}else {
-	       			isContainsBusinessType=false;
-	       		}
-    		}
-    		if(!isContainsBusinessType) {
-    			it.remove();//过滤APP不需要的业务类型
-    		}
-    		
-    	}
-    	List<String> businessIds=new ArrayList();
-    	for(BasicBusiness business:basicBusinessList) {
-    		businessIds.add(business.getBusinessId());
-    	}
-        logger.info("根据业务ID列表查找出业务账单列表 开始，业务ID列表：[{}]", JSON.toJSONString(businessIds));
-
-       List<BizDto> bizDtos = new LinkedList<>();
-
-       for(String businessId:businessIds){
-           BizDto bizDto =getBizDtoByBizId(businessId);
-           bizDtos.add(bizDto);
-       }
-        bizDtos=getPageList(bizDtos, req.getPageSize(), req.getCurPageNo());
-        logger.info("根据业务ID列表查找出业务账单列表 结束，返回数据：[{}]", JSON.toJSONString(bizDtos));
-
-       return Result.success(bizDtos);
+    	
+    	 BasicBizCustomer customer=basicBizCustomerService.selectOne(new EntityWrapper<BasicBizCustomer>().eq("identify_card", req.getIdentifyCard()));
+    	 if(customer==null) {
+    		 Result.error("9889", "找不到客户信息");
+    	 }
+    	 Integer isMainCustomer=customer.getIsmainCustomer();//是否主借款人
+    	 req.setIsMainCustomer(isMainCustomer);
+    	 try {
+		    	List<TuandaiProjectInfo> infos=tuandaiProjectInfoService.selectList(new EntityWrapper<TuandaiProjectInfo>().eq("identity_card", req.getIdentifyCard()));
+		    	List<BasicBusiness> basicBusinessList=new ArrayList();
+		    	for(TuandaiProjectInfo info:infos) {
+		    		BasicBusiness business=basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", info.getBusinessId()));
+		    		if(business!=null) {
+		    			basicBusinessList.add(business);
+		    		}
+		    	}
+		    	for(Iterator<BasicBusiness> it=basicBusinessList.iterator();it.hasNext();) {
+		    		BasicBusiness business=it.next();
+		    		BasicBusinessType businessType=basicBusinessTypeService.selectOne(new EntityWrapper<BasicBusinessType>().eq("business_type_id", business.getBusinessType()));
+		    		boolean isContainsBusinessType=false;
+		    		for(String needBusinessType:needBusinessTypes) {
+		    			if(businessType.getXdBusinessTypeId().contains(needBusinessType)) {
+		    				isContainsBusinessType=true;
+		    				break;
+			       		}else {
+			       			isContainsBusinessType=false;
+			       		}
+		    		}
+		    		if(!isContainsBusinessType) {
+		    			it.remove();//过滤APP不需要的业务类型
+		    		}
+		    		
+		    	}
+		    	List<String> businessIds=new ArrayList();
+		    	for(BasicBusiness business:basicBusinessList) {
+		    		businessIds.add(business.getBusinessId());
+		    	}
+		        logger.info("根据业务ID列表查找出业务账单列表 开始，业务ID列表：[{}]", JSON.toJSONString(businessIds));
+		
+		       List<BizDto> bizDtos = new LinkedList<>();
+		
+		       for(String businessId:businessIds){
+		           BizDto bizDto =getBizDtoByBizId(businessId,req);
+		           if(bizDto.getPlanDtoList()==null) {
+		        	   continue;
+		           }
+		           bizDtos.add(bizDto);
+		       }
+		        bizDtos=getPageList(bizDtos, req.getPageSize(), req.getCurPageNo());
+		        logger.info("根据业务ID列表查找出业务账单列表 结束，返回数据：[{}]", JSON.toJSONString(bizDtos));
+		
+		       return Result.success(bizDtos);
+    	 }catch(Exception e) {
+    		  return Result.error("找出业务账单列表出错"+e);
+    	 }
    }
     
     
@@ -594,7 +620,7 @@ public class RepayPlanController {
 
 
         //业务基本的还款计划信息
-        BizDto bizDto =getBizDtoByBizId(businessId);
+        BizDto bizDto =getBizDtoByBizId(businessId,null);
 
         List<RepaymentBizPlan> bizPlans = repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("original_business_id",businessId));
 
@@ -617,7 +643,7 @@ public class RepayPlanController {
         List<BizDto> renewBizDtos = new LinkedList<>();
         bizDto.setRenewBizs(renewBizDtos);
         for(String renewBizId:bizPlanMap.keySet()){
-            BizDto renewBizDto =getBizDtoByBizId(renewBizId);
+            BizDto renewBizDto =getBizDtoByBizId(renewBizId,null);
             renewBizDtos.add(renewBizDto);
         }
 
@@ -636,22 +662,41 @@ public class RepayPlanController {
         logger.info("根据还款计划ID查找出此还款计划的详情账单信息 开始，还款计划ID：[{}]", JSON.toJSONString(planId));
 
 
-
        RepaymentBizPlan bizPlan =  repaymentBizPlanService.selectById(planId);
+       RepaymentProjPlan projPlan=null;
+       TuandaiProjectInfo tuandaiProjectInfo =null;
+       boolean isNiwoPlatfrom=false;//是否你我金融平台
+       if(bizPlan==null) {//如果为null，可能是你我金融的projPlanId
+    	   projPlan=repaymentProjPlanService.selectById(planId);
+    	   if(projPlan==null) {
+    		   return Result.error("9889","未找到对应的还款计划");
+    	   }else {
+    		   isNiwoPlatfrom=true;
+        	    tuandaiProjectInfo = tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("project_id",projPlan.getProjectId()));
+        	   if(tuandaiProjectInfo == null){
+                   return Result.error("9889","未找到对应的标信息");
+               }
+    	   }
+       }else {
+    	    tuandaiProjectInfo = tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("business_after_guid",bizPlan.getRepaymentBatchId()));
+           if(tuandaiProjectInfo == null){
+               return Result.error("9889","未找到对应的标信息");
+           }
 
-        TuandaiProjectInfo tuandaiProjectInfo = tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("business_after_guid",bizPlan.getRepaymentBatchId()));
-       if(tuandaiProjectInfo == null){
-           return Result.error("9889","未找到对应的标信息");
        }
 
+       
 
-       if(bizPlan ==null){
-           return Result.error("9889","未找到对应的还款计划");
-       }
+      
 
-        BizDto bizDto =  getBizDtoByBizId(bizPlan.getBusinessId());
-
-        BizPlanDto  bizPlanDto  = getBizPlanDtoByBizPlan(bizPlan);
+        BizDto bizDto =  getBizDtoByBizId(tuandaiProjectInfo.getBusinessId(),null);
+        BizPlanDto  bizPlanDto  = null;
+        if(isNiwoPlatfrom) {
+        	     bizPlanDto  = getProjPlanDtoByBizPlan(projPlan);
+        }else {
+        	     bizPlanDto  = getBizPlanDtoByBizPlan(bizPlan);
+        }
+     
         bizPlanDto.setBusinessType(bizDto.getBusinessType());
         bizPlanDto.setRepayWay(bizDto.getRepayWay());
         bizPlanDto.setBorrowMoney(tuandaiProjectInfo.getFullBorrowMoney());
@@ -749,7 +794,7 @@ public class RepayPlanController {
      * @param businessId
      * @return
      */
-    private BizDto getBizDtoByBizId(String businessId){
+    private BizDto getBizDtoByBizId(String businessId,AppRepayListReq req){
         BizDto bizDto = new BizDto();
 
         BasicBusiness business = basicBusinessService.selectById(businessId);
@@ -802,12 +847,34 @@ public class RepayPlanController {
         }else{
             bizDto.setInputTime(business.getInputTime());
         }
-
-
-
-        List<RepaymentBizPlan> bizPlans = repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",businessId));
-        List<RepaymentProjPlan> projPlans = repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("business_id",businessId));
-        if(bizPlans!=null && bizPlans.size()>0){
+        List<RepaymentProjPlan> projPlans=null;
+        List<RepaymentBizPlan> bizPlans=null;
+        if(isNiwoFlag) {
+        	  if(req!=null&&req.getIsSettle()!=null&&req.getIsSettle()==1) {//过滤结清数据
+        		  if(req.getIsMainCustomer()!=null&&req.getIsMainCustomer()!=1) {//是共借人的话只能看自己的还款计划
+        		        TuandaiProjectInfo info= tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("identity_card",req.getIdentifyCard()));
+        	       	    projPlans = repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("business_id",businessId).eq("project_id", info.getProjectId()).ne("plan_status", 10).ne("plan_status", 20).ne("plan_status", 30).orderBy("query_full_success_date"));
+        		  }else {
+        	            projPlans = repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("business_id",businessId).ne("plan_status", 10).ne("plan_status", 20).ne("plan_status", 30).orderBy("query_full_success_date"));
+        		  }
+        	  }else {
+        		  if(req!=null&&req.getIsMainCustomer()!=null&&req.getIsMainCustomer()!=1) {//是共借人的话只能看自己的还款计划
+	      		        TuandaiProjectInfo info= tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("identity_card",req.getIdentifyCard()));
+	      	            projPlans = repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("business_id",businessId).eq("project_id", info.getProjectId()).orderBy("query_full_success_date"));
+	      		  }else {
+     	 	            projPlans = repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("business_id",businessId).orderBy("query_full_success_date"));
+                  }
+          }
+        }else {
+        	 if(req!=null&&req.getIsSettle()!=null&&req.getIsSettle()==1) {//过滤结清数据
+        	     bizPlans = repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",businessId).ne("plan_status", 10).ne("plan_status", 20).ne("plan_status", 30).orderBy("create_time"));
+         	  }else {
+         	     bizPlans = repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",businessId).orderBy("create_time"));
+         	  }
+      	
+        }
+        
+        if((bizPlans!=null && bizPlans.size()>0)||(projPlans!=null&&projPlans.size()>0)){
             List<BizPlanDto> bizPlanDtos = new LinkedList<>();
             bizDto.setPlanDtoList(bizPlanDtos);
      
@@ -831,16 +898,19 @@ public class RepayPlanController {
         //根据标的结清和展期情况，设置业务的结清和展期情况
         Boolean isOver = true;
         Boolean hasDeffer =false;
-        for(BizPlanDto bizPlanDto :bizDto.getPlanDtoList()){
-            if(!bizPlanDto.getIsOver()){
-                //其中一个还款计划未结清，则整个业务未结清
-                isOver =false;
-            }
-            if(bizPlanDto.getHasDeffer()){
-                //其中一个还款计划申请展期，则整个业务标志为申请展期
-                hasDeffer = true;
+        if(bizDto.getPlanDtoList()!=null) {
+            for(BizPlanDto bizPlanDto :bizDto.getPlanDtoList()){
+                if(!bizPlanDto.getIsOver()){
+                    //其中一个还款计划未结清，则整个业务未结清
+                    isOver =false;
+                }
+                if(bizPlanDto.getHasDeffer()){
+                    //其中一个还款计划申请展期，则整个业务标志为申请展期
+                    hasDeffer = true;
+                }
             }
         }
+
         bizDto.setOver(isOver);
         bizDto.setHasDeffer(hasDeffer);
 
@@ -856,6 +926,9 @@ public class RepayPlanController {
     private   BizPlanDto getBizPlanDtoByBizPlan(RepaymentBizPlan bizPlan){
         BizPlanDto bizPlanDto = new BizPlanDto();
         bizPlanDto.setPlanId(bizPlan.getPlanId());
+        BasicBusiness business=basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", bizPlan.getBusinessId()));
+        bizPlanDto.setPlateType(ProjPlatTypeEnum.TUANDAI.getKey());//团贷网
+        bizPlanDto.setIdentifyCard(business.getCustomerIdentifyCard());//主借款人身份证号码
         //判断是否已结清
         if (RepayPlanSettleStatusEnum.payed(bizPlan.getPlanStatus())) {
             bizPlanDto.setIsOver(true);
@@ -924,6 +997,11 @@ public class RepayPlanController {
     private   BizPlanDto getProjPlanDtoByBizPlan(RepaymentProjPlan projPlan){
         BizPlanDto bizPlanDto = new BizPlanDto();
         bizPlanDto.setPlanId(projPlan.getProjPlanId());
+        TuandaiProjectInfo tuandaiProjectInfo = tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("project_id",projPlan.getProjectId()));
+        
+        bizPlanDto.setPlateType(ProjPlatTypeEnum.NIWO_JR.getKey());//你我金融
+        bizPlanDto.setIdentifyCard(tuandaiProjectInfo.getIdentityCard());
+        
         //判断是否已结清
         if (RepayPlanSettleStatusEnum.payed(projPlan.getPlanStatus())) {
             bizPlanDto.setIsOver(true);

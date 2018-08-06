@@ -53,4 +53,15 @@ public interface RepaymentBizPlanService extends BaseService<RepaymentBizPlan> {
 	 */
 	public List<RepaymentSettleListVO> listRepaymentSettleListVOs(String businessId,String afterId,String planId);
 	
+	/**
+	 * 是否最后一个还款计划结清
+	 * @author 王继光
+	 * 2018年7月24日 下午8:33:57
+	 * @param businessId
+	 * @param afterId
+	 * @param planId
+	 * @return
+	 */
+	boolean isFinalRepayPlanSettle(String businessId,String planId);
+	
 	}

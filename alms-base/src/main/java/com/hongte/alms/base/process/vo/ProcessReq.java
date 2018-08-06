@@ -41,7 +41,8 @@ public class ProcessReq  extends PageRequest {
 
     //当前登录的用户ID
     private String userId;
-
+    
+    private Integer needPermission = 1; 
 
     public String getKeyWord() {
         return keyWord;
@@ -166,4 +167,13 @@ public class ProcessReq  extends PageRequest {
     public void setUserId(String userId) {
         this.userId = userId;
     }
+
+	public Integer getNeedPermission() {
+		return needPermission;
+	}
+
+	public void setNeedPermission(Integer needPermission) {
+		this.needPermission = needPermission;
+	}
+    
 }

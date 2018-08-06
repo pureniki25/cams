@@ -26,6 +26,7 @@ public class RepaymentProjPlanListDto implements Serializable {
     
     private List<RepaymentProjPlanListDetailDto> repaymentProjPlanListDetailDtos ;
 
+
     public RepaymentProjPlanList getRepaymentProjPlanList() {
         return repaymentProjPlanList;
     }

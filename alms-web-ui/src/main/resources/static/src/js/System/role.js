@@ -2,6 +2,7 @@ let app
 let dateStart
 let dateEnd
 let table
+let tableIns
 window.layinit(function (htConfig) {
     let _htConfig = htConfig
     basePath = htConfig.coreBasePath
@@ -16,7 +17,7 @@ window.layinit(function (htConfig) {
 
     })
 
-    table.render({
+  tableIns = table.render({
         elem: "#role",
         height: 600 //容器高度
         ,
@@ -41,9 +42,28 @@ window.layinit(function (htConfig) {
                         return "只查看车贷业务";
                     }else  if(d.roleAreaType == 5){
                         return "只查看房贷业务";
+                    }else  if(d.roleAreaType == 6){
+                        return "根据财务跟单方式控制";
                     }else{
                         return "未定义的类型";
                     }
+                }
+            },
+            {
+                field: 'pageType',
+                title: '页面名称',
+                templet: function (d) {
+                	var pageTypeName = ["合规化还款",
+                		"贷后管理列表",
+                		"车辆管理列表",
+                		"减免管理列表",
+                		"代扣管理列表",
+                		"代扣查询列表",
+                		"审批查询列表",
+                		"展期管理列表",
+                		"消息管理列表",
+                		"财务管理列表"];
+                	return pageTypeName[d.pageType]
                 }
             },
             {
@@ -51,8 +71,8 @@ window.layinit(function (htConfig) {
                 toolbar: "#barTools"
             }]
         ], //设置表头
-        url: basePath + 'sys/role/list',
-        page: false,
+        url: basePath + 'sys/role/page',
+        page: true,
         done: (res, curr, count) => { }
     })
 
@@ -69,6 +89,12 @@ window.layinit(function (htConfig) {
 })
 
 let data = {
+	schForm:{
+        userId:'',
+        userName:'',
+        areaId:'',
+        areaLevel:'',
+    },
     editModal: {
         show: false,
         type: ''
@@ -77,12 +103,28 @@ let data = {
         roleCode: '',
         roleName: '',
         roleAreaType: '',
+        pageType:''
     },
 }
 
 let methods = {
     tableReload: function () {
-        table.reload('role')
+        //table.reload('role')
+    	let p = {}
+        Object.keys(app.schForm).forEach(function(val,i){
+            console.log(val)
+            if(app.schForm[val]!=''){
+                p[val]=app.schForm[val]
+            }
+        });
+        tableIns.reload({
+            where:p,
+            page:{curr:1}
+        })
+    	
+    },
+    search:function(){
+        app.tableReload()
     },
     delete: function (data) {
         axios.post(basePath + 'sys/role/delete', data)
@@ -104,7 +146,10 @@ let methods = {
             app.editModal.show = true
             app.editModal.type = 'update'
             app.editForm = data
+            console.log(data);
+            app.editForm.pageType = data.pageType + ''
             app.editForm.roleAreaType = data.roleAreaType + ''
+            app.editForm.dataType = data.dataType + ''
         }
     },closeModal:function(){
         app.editModal.show = false

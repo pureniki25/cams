@@ -155,51 +155,17 @@ public class PlatformRepaymentController {
             return Result.error("参数不能为空");
         }
         String projPlanListId = (String) paramMap.get("projPlanListId");
-//        String projectId = (String) paramMap.get("projectId");
-//        String afterId = (String) paramMap.get("afterId");
-        //String confirmLogId = (String) paramMap.get("confirmLogId");
-
         LOGGER.info("@对接合规还款接口 开始 @输入参数 projPlanListId:[{}] ", projPlanListId);
         //参数验证
         if (StringUtils.isBlank(projPlanListId)) {
             return Result.error("标的还款计划列表Id不能为空");
         }
-//        if (StringUtils.isBlank(afterId)) {
-//            return Result.error("总批次期数不能为空");
-//        }
-//        if (StringUtils.isBlank(confirmLogId)) {
-//            return Result.error("还款确认日志记录Id不能为空");
-//        }
         try {
-//            //****************************************************
-//            //验证这块以后要移除,通用功能不能只针对某一个平台，目前只针对团贷平台. zgh 20180614
-//            TuandaiProjectInfo tuandaiProjectInfo = tuandaiProjectInfoService.selectById(projectId);
-//            if (tuandaiProjectInfo == null) {
-//                LOGGER.error("@对接合规还款接口@  查不到平台的上标信息 输入参数 projectId:[{}]  ", projectId);
-//                return Result.error("查不到平台的上标信息");
-//            }
-//            //****************************************************
-//
-//            //查业务信息
-//            BasicBusiness basicBusiness = basicBusinessService.selectById(tuandaiProjectInfo.getBusinessId());
-//
-//            //查标的还款计划
-//            RepaymentProjPlan repaymentProjPlan = repaymentProjPlanService.selectOne(
-//                    new EntityWrapper<RepaymentProjPlan>()
-//                            .eq("project_id", projectId)
-//            );
-//            //RepaymentProjPlan projectPlan = repaymentProjPlanService.selectById(repaymentProjPlanList.getProjPlanId());
-//            if (repaymentProjPlan == null) {
-//                LOGGER.error("@对接合规还款接口@  查不到标的还款计划信息 输入参数 projectId:[{}]  ", projectId);
-//                return Result.error("查不到标的还款计划信息");
-//            }
-
             //查标的还款期数信息并验证
             List<RepaymentProjPlanList> projPlanLists = repaymentProjPlanListService.selectList(
                     new EntityWrapper<RepaymentProjPlanList>()
                             .eq("proj_plan_list_id", projPlanListId)
             );
-
             if (projPlanLists == null || projPlanLists.size() == 0) {
                 LOGGER.error("@对接合规还款接口@  查不到标的还款计划列表信息 输入参数 projPlanListId:[{}]  ", projPlanListId);
                 return Result.error("500", "查不到标的还款计划列表信息");
@@ -228,52 +194,13 @@ public class PlatformRepaymentController {
                 return Result.error("查不到平台的上标信息");
             }
             //****************************************************
-
-/*            RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService.selectOne(
-                    new EntityWrapper<RepaymentBizPlanList>()
-                            .eq("business_id", repaymentConfirmLog.getBusinessId())
-//                            .eq("orig_business_id", repaymentConfirmLog.getOrgBusinessId())
-                            .eq("after_id", repaymentConfirmLog.getAfterId())
-            );*/
-
-          /*  RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService.selectOne(
-                    new EntityWrapper<RepaymentBizPlanList>()
-                            .eq("business_id", repaymentProjPlanList.getBusinessId())
-                            .eq("after_id", repaymentProjPlanList.getAfterId())
-            );*/
-
-
             RepaymentBizPlanList bizPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("plan_list_id", projPlanList.getPlanListId()));
-
             //部分还款状态子状态,null:未还款,1:部分还款,2:线上已还款,3:全部已还款
             //资产端内部在分润后将先还完线上部分之后再进行合规化还款，即部分还款子状态为2或者3时
             if (projPlanList.getRepayStatus() == null || projPlanList.getRepayStatus() == 1) {
                 LOGGER.error("@对接合规还款接口@  应该在还完线上部分后再调用合规化还款接口 输入参数 projPlanListId:[{}]  ", projPlanListId);
                 return Result.error("500", "应该在还完线上部分后再调用合规化还款接口");
             }
-
-            //判断是否已经到款，到款后再还款到平台
-//            if (repaymentProjPlanList.getRepayFlag().equals(RepayPlanPayedTypeEnum.PAYING.getValue())
-//                    || repaymentProjPlanList.getRepayFlag().equals(RepayPlanPayedTypeEnum.RENEW_PAY.getValue())) {
-//            if (repaymentProjPlanList.getRepayFlag() == null || repaymentProjPlanList.getRepayFlag().equals(RepayPlanPayedTypeEnum.PAYING.getValue())) {
-//                LOGGER.error("@对接合规还款接口@  此还款标的计划列表未还款 输入参数 projectId:[{}]  afterId{[]}  ", projectId, afterId);
-//                return Result.error("500", "此还款标的计划列表未还款");
-//            }
-
-            //临时取消已还款状态验证
-
-//            if (!"已还款".equals(repaymentProjPlanList.getCurrentStatus())) {
-//                LOGGER.error("@对接合规还款接口@  此还款标的计划列表未还款 输入参数 projectId:[{}]  afterId{[]}  ", projectId, afterId);
-//                return Result.error("500", "此还款标的计划列表未还款");
-//            }
-
-          /*  RepaymentConfirmLog repaymentConfirmLog = repaymentConfirmLogService.selectById(confirmLogId);
-            if (repaymentConfirmLog == null) {
-                LOGGER.error("@对接合规还款接口@ 查不到指定的还款日志记录 输入参数confirmLogId:[{}]", confirmLogId);
-                return Result.error("查不到指定的还款日志记录");
-            }*/
-
-
             TdrepayRechargeInfoVO vo = new TdrepayRechargeInfoVO();
             vo.setProjectId(projPlan.getProjectId());
             //业务所属资产端，1、鸿特信息，2、 一点车贷
@@ -306,26 +233,11 @@ public class PlatformRepaymentController {
             vo.setBusinessType(businessType);
 
             //实还日期
-            //vo.setFactRepayDate(repaymentConfirmLog.getRepayDate());
             vo.setFactRepayDate(projPlanList.getFactRepayDate());
             //借款人,平台只关心标的的每个共借款人姓名
-            //vo.setCustomerName(basicBusiness.getCustomerName());
             vo.setCustomerName(tuandaiProjectInfo.getRealName());
             //分公司
             vo.setCompanyName(basicBusiness.getCompanyName());
-            //还款来源
-            //处理转换 还款来源，10：线下转账，11:用往期结余还款(归类到线下转账吧),20：线下代扣，30：银行代扣
-            //到接口 还款来源，1:线下转账,2:第三方代扣,3:银行代扣,4:APP网关充值,5:协议代扣
-//            if (repaymentProjPlanList.getRepayFlag() == null) {
-//                LOGGER.error("@对接合规还款接口@ 指定的标期数的已还款类型标记为null 输入参数projPlanListId:[{}]", projPlanListId);
-//                return Result.error("指定的标期数的已还款类型标记为null");
-//            } else {
-//                vo.setRepaySource(RepayPlanPayedTypeEnum.getByValue(repaymentProjPlanList.getRepayFlag()).getClassifyId());
-//            }
-
-
-
-
             //部分还款状态子状态,null:未还款,1:部分还款,2:线上已还款,3:全部已还款
             //新需求： 资产端内部在分润后将还款状态改为线上已还款之后，再调用合规化还款接口去给资金端还款，如果 repay_status为2线上已还款时repayFlog是没有值的
             //所以要从实还流水中查还款来源
@@ -338,31 +250,7 @@ public class PlatformRepaymentController {
                 LOGGER.error("@对接合规还款接口@ 查询实还流水为空 输入参数projPlanListId:[{}]", projPlanListId);
                 return Result.error("查询实还流水为空");
             }
-
             vo.setRepaySource(RepayPlanRepaySrcEnum.getByValue(projFactRepayList.get(0).getRepaySource()).getPlatRepayVal());
-
-
-            //取还款确认日志的最后一次的来源做为整个业务的还款来源
-            //处理转换 还款来源，10：线下转账，11:用往期结余还款(归类到线下转账吧),20：线下代扣，30：银行代扣
-            //到接口 还款来源，1:线下转账,2:第三方代扣,3:银行代扣,4:APP网关充值,5:协议代扣
-//            RepaymentConfirmLog lastRepaymentConfirmLog = repaymentConfirmLogService.selectOne(
-//                    new EntityWrapper<RepaymentConfirmLog>().eq("business_id", repaymentProjPlanList.getBusinessId()).eq("after_id", afterId).orderBy("repay_date", false)
-//            );
-            /*if (repaymentConfirmLog.getRepaySource() == null) {
-                LOGGER.error("@对接合规还款接口@ 指定的还款日志记录的还款来源为空 输入参数confirmLogId:[{}]", confirmLogId);
-                return Result.error("指定的还款日志记录的还款来源为空");
-            } else {
-                vo.setRepaySource(RepayPlanPayedTypeEnum.getByValue(repaymentConfirmLog.getRepaySource()).getClassifyId());
-            }*/
-
-//            if (lastRepaymentConfirmLog != null && lastRepaymentConfirmLog.getRepaySource() == null) {
-//                LOGGER.error("@对接合规还款接口@ 获取最后一次还款日志为空");
-//                return Result.error("获取最后一次还款日志为空");
-//            } else {
-//                vo.setRepaySource(RepayPlanPayedTypeEnum.getByValue(repaymentProjPlanList.getRepayFlag()).getClassifyId());
-//            }
-
-
             if (bizPlanList.getFinanceComfirmDate() == null) {
                 LOGGER.error("@对接合规还款接口@ 财务确认还款操作日期为空 输入参数plan_list_id:[{}]", bizPlanList.getPlanListId());
                 return Result.error("财务确认还款操作日期为空");
@@ -370,7 +258,6 @@ public class PlatformRepaymentController {
                 vo.setConfirmTime(bizPlanList.getFinanceComfirmDate());
             }
             vo.setAfterId(projPlanList.getAfterId());
-//            vo.setPeriod(repaymentConfirmLog.getPeriod());
             vo.setPeriod(projPlanList.getPeriod());
 
             //处理标的计划结清状态
@@ -394,34 +281,13 @@ public class PlatformRepaymentController {
                 default:
                     LOGGER.error("@对接合规还款接口@  标的计划结清状态值plan_status:[{}]错误 输入参数 projPlanListId:[{}] ", projPlan.getPlanStatus(), projPlanListId);
                     return Result.error("500", "标的计划结清状态值错误");
-//                default:
-//                    //查标的还款期数信息并验证
-//                    RepaymentProjPlanList lastRepaymentProjPlanList = repaymentProjPlanListService.selectOne(
-//                            new EntityWrapper<RepaymentProjPlanList>()
-//                                    .eq("proj_plan_id", repaymentProjPlan.getProjPlanId())
-//                                    .orderBy("period", false)
-//                    );
-//                    if (lastRepaymentProjPlanList != null && lastRepaymentProjPlanList.getDueDate() != null && repaymentConfirmLog.getRepayDate() != null) {
-//                        if (lastRepaymentProjPlanList.getDueDate().before(repaymentConfirmLog.getRepayDate())) {
-//                            projPlanStatus = 11;
-//                        }
-//                    }*//*
-//                    if (repaymentProjPlanList.getDueDate().before(repaymentBizPlanList.getFactRepayDate())) {
-//                        projPlanStatus = 11;
-//                    } else {
-//                        LOGGER.error("@对接合规还款接口@  标的计划结清状态值错误 输入参数 projectId:[{}]  afterId[{}] ", projectId, afterId);
-//                        return Result.error("500", "标的计划结清状态值错误");
-//                    }
-//                    break;
             }
             //标的还款计划结清状态
             vo.setSettleType(tempProjPlanStatus);
 
-
             //一, 有垫付则按垫付传费用项，否则按查询的标的还未计划信息传费用项
             Map<String, Object> params = Maps.newHashMap();
             params.put("projectId", projPlan.getProjectId());
-
 
             //二, 通过外联平台eip调用团贷查询标的还款计划信息：/repayment/queryRepaymentSchedule
             BigDecimal planRepaymentRechargeAmount = BigDecimal.ZERO;
@@ -570,10 +436,6 @@ public class PlatformRepaymentController {
                 //循环如果没有查询到本期的垫付记录按标还款计划来填值
             }
 
-
-
-
-
             /*//流水合计
             BigDecimal resourceAmount = BigDecimal.ZERO;
             //List<RepaymentResource> repaymentResources = repaymentResourceService.selectList(new EntityWrapper<RepaymentResource>().eq("confirm_log_id", confirmLogId));
@@ -597,18 +459,30 @@ public class PlatformRepaymentController {
             List<RepaymentProjFactRepay> projFactRepays = repaymentProjFactRepayService.selectList(
                     new EntityWrapper<RepaymentProjFactRepay>().eq("proj_plan_list_id", projPlanList.getProjPlanListId())
             );
+            Map<Integer,RepaymentProjFactRepay> projFactRepayMap = Maps.newHashMap();
+            //按费用项大类plan_item_type把重复的费用项进行合并累加
             if (projFactRepays != null && projFactRepays.size() > 0) {
+                for (RepaymentProjFactRepay fr : projFactRepays) {
+                    if(projFactRepayMap.containsKey(fr.getPlanItemType())){
+                        RepaymentProjFactRepay tempFactRepay = projFactRepayMap.get(fr.getPlanItemType());
+                        tempFactRepay.setFactAmount(tempFactRepay.getFactAmount().add(fr.getFactAmount()));
+                    }else{
+                        projFactRepayMap.put(fr.getPlanItemType(), fr);
+                    }
+                }
+            }
 
+            if (projFactRepayMap.size() > 0 ) {
                 //实收总金额
                 BigDecimal factRepayAmount = BigDecimal.ZERO;
                 //充值金额
                 BigDecimal rechargeAmount = BigDecimal.ZERO;
 
                 List<TdrepayRechargeDetail> detailFeeList = Lists.newArrayList();
-                for (RepaymentProjFactRepay r : projFactRepays) {
+                //for (RepaymentProjFactRepay r : projFactRepays) {
+                for(RepaymentProjFactRepay r: projFactRepayMap.values()){
                     //实还金额应该包含滞纳金
                     factRepayAmount = factRepayAmount.add(r.getFactAmount());
-
                     //累计费用，线下（资产公司）的滞纳金排除在外，注意用value和uuid去区分.  OVER_DUE_AMONT_UNDERLINE(60,"线下滞纳金","3131c075-5721-11e8-8a00-0242ac110002",5)
                     /*if (RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getValue().equals(r.getPlanItemType())
                             || RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid().equals(r.getFeeId())) {
@@ -619,8 +493,6 @@ public class PlatformRepaymentController {
                     }
                     //resourceAmount = resourceAmount.add(r.getFactAmount());
                     rechargeAmount = rechargeAmount.add(r.getFactAmount());
-
-
                     TdrepayRechargeDetail detailFee = new TdrepayRechargeDetail();
                     //要对费类型进行转换：
                     //从 应还项目所属分类，10：本金，20：利息，30：资产端分公司服务费，40：担保公司费用，50：资金端平台服务费，60：滞纳金，70：违约金，80：中介费，90：押金类费用，100：冲应收
@@ -684,15 +556,11 @@ public class PlatformRepaymentController {
                 } else {
                     vo.setRechargeAmount(planRepaymentRechargeAmount);
                 }
-
-
                 //用实还赋值流水金额
                 vo.setResourceAmount(factRepayAmount);
-
                 //vo.setResourceAmount(resourceAmount);
                 vo.setDetailList(detailFeeList);
             }
-
 
             //当期还款状态，目前只有三种，分别为 还款中，逾期，已还款 => 当期结清状态 0：未结清,1：已结清
             //如果 current_status为 还款中，逾期则继续判断repay_status==> 2:线上已还款,3:全部已还款 则为结清
@@ -731,8 +599,6 @@ public class PlatformRepaymentController {
                 return Result.error("合规还款失败:" + result.getMsg());
             }
             LOGGER.info("@对接合规还款接口@ 调用代充值资金分发成功 vo:[{}]", JSON.toJSONString(vo));
-            
-            //return Result.success(departmentBankService.listDepartmentBank());
             return Result.success(JSON.toJSONString(vo));
         } catch (Exception e) {
             LOGGER.error("通过合化还款接口还款失败.", e);

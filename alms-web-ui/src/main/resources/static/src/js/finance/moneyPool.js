@@ -142,13 +142,13 @@ window.layinit(function (htConfig) {
                         app.table.data = res.data.data
                         app.table.total = res.data.count
                     }else{
-                        app.$Message.error({content:res.data.msg})
+                        app.$Modal.error({content:res.data.msg})
                     }
                     console.log(res);
                 })
                 .catch(function(err){
                     app.table.loading = false
-                    app.$Message.error({content:err})
+                    app.$Modal.error({content:err})
                 })
             },
             deleteMoneyPool(mpid){
@@ -162,7 +162,7 @@ window.layinit(function (htConfig) {
                 }
 
                 if(mpids.length==0){
-                    app.$Message.warning({content:'请选择要删除的流水'})
+                    app.$Modal.warning({content:'请选择要删除的流水'})
                     return ;
                 }
                 app.$Message.loading({
@@ -180,12 +180,12 @@ window.layinit(function (htConfig) {
                         app.$Message.success({content:'删除成功!'})
                         app.getMoneyPoolManager()
                     }else{
-                        app.$Message.error({content:res.data.msg})
+                        app.$Modal.error({content:res.data.msg})
                     }
                 })
                 .catch(function(err){
-                    app.$Message.destroy()
-                    app.$Message.error({content:err})
+                    app.$Modal.destroy()
+                    app.$Modal.error({content:err})
                 })
             },
             uploadSuccess(response, file, fileList){
@@ -193,7 +193,7 @@ window.layinit(function (htConfig) {
                     app.$Message.success({content:"导入成功"})
                     app.search()
                 }else{
-                    app.$Message.error({content:"导入失败:"+response.msg})
+                    app.$Modal.error({content:"导入失败:"+response.msg})
                 }
             },
             getMoneyPool(mpid){
@@ -207,11 +207,11 @@ window.layinit(function (htConfig) {
                         app.detail = res.data.data ; 
                         app.detailShow = true
                     }else{
-                        app.$Message.error({content:'获取详情失败'})
+                        app.$Modal.error({content:'获取详情失败'})
                     }
                 })
                 .catch(function(err){
-                    app.$Message.error({content:'获取详情失败'})
+                    app.$Modal.error({content:'获取详情失败'})
                 })
             }
         },

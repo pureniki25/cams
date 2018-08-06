@@ -52,7 +52,7 @@
 		tb_car_drag drag on drag.business_id=bus.business_id
 		left
 		join tb_car_detection det on IFNULL(car.last_detection_id,0)=det.id
-		JOIN tb_sys_user_permission as permission  ON  permission.business_id = bus.business_id
+		<!-- JOIN tb_sys_user_permission as permission  ON  permission.business_id = bus.business_id -->
 
 		<where>
 			not EXISTS (select * from tb_car_return_reg reg where drag.id=reg.drag_id)
@@ -84,9 +84,14 @@
 			<if test="trailerEndDate != null ">
             and drag.drag_date &lt;=#{trailerEndDate}
 			</if>
-			<if test="userId !=null and userId !=''">
+<!-- 			<if test="userId !=null and userId !=''">
 				and permission.user_id = #{userId}
-			</if>
+			</if> -->
+			<if test="userId !=null and userId !='' and needPermission == 1">
+                and bus.business_id in (
+					select business_id from tb_sys_user_permission where user_id = #{userId} and page_type = 2   	
+                )
+            </if>
 		</where>
 		order by bus.update_time desc
 		limit ${(page-1) * limit},
@@ -106,7 +111,7 @@
 		join tb_car_detection det on det.business_id=bus.business_id
 		 join
 		tb_car_drag drag on drag.business_id=bus.business_id
-		JOIN tb_sys_user_permission as permission  ON  permission.business_id = bus.business_id
+		<!-- JOIN tb_sys_user_permission as permission  ON  permission.business_id = bus.business_id -->
 		<where>
 			<if test="businessId !=null and businessId !=''">
 				and bus.business_id LIKE "%"#{businessId}"%"
@@ -135,8 +140,10 @@
 			<if test="trailerEndDate != null ">
             and drag.drag_date &lt;=#{trailerEndDate}
 			</if>
-			<if test="userId !=null and userId !=''">
-				and permission.user_id = #{userId}
+			<if test="userId !=null and userId !='' and needPermission == 1 ">
+				and bus.business_id in (
+					select business_id from tb_sys_user_permission where user_id = #{userId} and page_type = 2	
+                )
 			</if>
 		</where>
 	</select>

@@ -4,7 +4,10 @@
 package com.hongte.alms.base.vo.finance;
 
 import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author 王继光 2018年5月14日 下午8:42:42
@@ -13,17 +16,30 @@ public class CurrPeriodProjDetailVO {
 	private boolean master;
 	private String userName;
 	private BigDecimal projAmount = new BigDecimal("0");
+	//本金
 	private BigDecimal item10 = new BigDecimal("0");
+	//利息
 	private BigDecimal item20 = new BigDecimal("0");
+	//分公司服务费
 	private BigDecimal item30 = new BigDecimal("0");
+	//月收平台费
 	private BigDecimal item50 = new BigDecimal("0");
+	//线下滞纳金
 	private BigDecimal offlineOverDue = new BigDecimal("0");
+	//线上滞纳金
 	private BigDecimal onlineOverDue = new BigDecimal("0");
+
+	//违约金
+	private BigDecimal item70 = new BigDecimal("0");
+
 	private BigDecimal subTotal = new BigDecimal("0");
 	private BigDecimal total = new BigDecimal("0");
+	//结余
 	private BigDecimal surplus = new BigDecimal("0");
 	private String project ;
 	private Date queryFullSuccessDate ;
+
+	private BigDecimal otherMoney=new BigDecimal("0");
 
 	public String getUserName() {
 		return userName;
@@ -89,6 +105,22 @@ public class CurrPeriodProjDetailVO {
 		this.onlineOverDue = onlineOverDue;
 	}
 
+	public BigDecimal getItem70() {
+		return item70;
+	}
+
+	public void setItem70(BigDecimal item70) {
+		this.item70 = item70;
+	}
+
+	public BigDecimal getOtherMoney() {
+		return otherMoney;
+	}
+
+	public void setOtherMoney(BigDecimal otherMoney) {
+		this.otherMoney = otherMoney;
+	}
+
 	public BigDecimal getSubTotal() {
 		subTotal = new BigDecimal("0");
 		subTotal = subTotal.add(getItem10() == null ? new BigDecimal("0") : getItem10())
@@ -110,7 +142,9 @@ public class CurrPeriodProjDetailVO {
 				.add(getItem50() == null ? new BigDecimal("0") : getItem50())
 				.add(getOfflineOverDue() == null ? new BigDecimal("0") : getOfflineOverDue())
 				.add(getOnlineOverDue() == null ? new BigDecimal("0") : getOnlineOverDue())
-				.add(getSurplus() == null ? new BigDecimal("0") : getSurplus());
+				.add(getSurplus() == null ? new BigDecimal("0") : getSurplus())
+				.add(getItem70() == null ? new BigDecimal("0") : getItem70())
+				.add(getOtherMoney() == null ? new BigDecimal("0") : getOtherMoney());
 		return total;
 	}
 
@@ -166,5 +200,41 @@ public class CurrPeriodProjDetailVO {
 	 */
 	public void setQueryFullSuccessDate(Date queryFullSuccessDate) {
 		this.queryFullSuccessDate = queryFullSuccessDate;
+	}
+	
+	/**
+	 * 将核销完的标的实还信息排序
+	 * @author 王继光
+	 * 2018年7月26日 下午3:54:25
+	 * @param detailVOs
+	 */
+	public static void sort(List<CurrPeriodProjDetailVO> detailVOs) {
+		Collections.sort(detailVOs, new Comparator<CurrPeriodProjDetailVO>() {
+            // 排序规则说明 需补充 从小标到大标，再到主借标
+            //同等
+            @Override
+            public int compare(CurrPeriodProjDetailVO arg0, CurrPeriodProjDetailVO arg1) {
+                if (arg0.isMaster()) {
+                    return 1;
+                }else if (arg1.isMaster()) {
+                    return -1;
+				}
+                if (arg0.getProjAmount()
+                        .compareTo(arg1.getProjAmount()) < 0) {
+                    return -1;
+                }else if (arg0.getProjAmount().compareTo(arg1.getProjAmount())>0) {
+					return 1;
+				}
+                if (arg0.getQueryFullSuccessDate()
+                        .before(arg1.getQueryFullSuccessDate())) {
+                    return -1;
+                }else if (arg0.getQueryFullSuccessDate()
+                        .after(arg1.getQueryFullSuccessDate())) {
+					return 1;
+				}
+                return 0;
+            }
+
+        });
 	}
 }

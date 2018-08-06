@@ -67,10 +67,10 @@
                 </i-col>
             </Row>
             <table id="financialOrder" lay-filter="financialOrder"></table>
-            <script type="text/html" id="barTools">
+            <div style="display: none; " id="barTools">
                 <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="set">设置</a>
                 <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</a>
-            </script>
+            </div>
         </Card>
         <Modal title="分配设置" v-model="addFinancialOrderModal.show">
             <Row>

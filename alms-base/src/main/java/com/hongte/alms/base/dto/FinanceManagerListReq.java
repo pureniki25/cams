@@ -66,6 +66,9 @@ public class FinanceManagerListReq {
 	 * 电话号码
 	 */
 	private String phoneNumber;
+	
+	private Integer needPermission = 1;
+	
 	public String getCustomer() {
 		return customer;
 	}
@@ -186,6 +189,10 @@ public class FinanceManagerListReq {
 	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;
 	}
-	
-	
+	public Integer getNeedPermission() {
+		return needPermission;
+	}
+	public void setNeedPermission(Integer needPermission) {
+		this.needPermission = needPermission;
+	}
 }

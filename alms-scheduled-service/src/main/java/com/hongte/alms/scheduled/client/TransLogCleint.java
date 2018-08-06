@@ -16,7 +16,6 @@ public interface TransLogCleint {
     @RequestMapping(value = "/collectionTrackLog/transfer",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
     Result transferCollectionTransfer();
 
-
     @RequestMapping(value = "/alms/transfer",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
     Result transferCollection();
 

@@ -13,14 +13,8 @@
     <artifactId>alms-base</artifactId>
     <name>alms-base</name>
 
-
-
-
-
     <dependencies>
-
         <!--  导出报表 开始 -->
-
         <dependency>
             <groupId>org.jeecg</groupId>
             <artifactId>easypoi-annotation</artifactId>
@@ -39,7 +33,7 @@
         <dependency>
             <artifactId>ussp-common</artifactId>
             <groupId>com.ht.ussp</groupId>
-            <version>0.0.15</version>
+            <version>0.0.31</version>
         </dependency>
 		<dependency>
 			<groupId>cn.afterturn</groupId>
@@ -62,7 +56,6 @@
             <version>1.16.18</version>
             <scope>provided</scope>
         </dependency>
-
     </dependencies>
 
     <build>
