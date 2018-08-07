@@ -371,8 +371,17 @@
 
 		pList.borrow_limit_ext as borrowLimit ,
 		pList.repayment_type_id_ext as repaymentTypeId ,
-		pList.class_name_ext className
+		pList.class_name_ext className,
+		(SELECT tpi.plate_type 
+			  FROM
+			    `tb_tuandai_project_info` tpi 
+			  WHERE tpi.business_id = pList.business_id 
+			  LIMIT 1) plateType
         from tb_repayment_biz_plan_list_synch  as pList
+        <if test="paymentPlatformCode!=null">
+        JOIN tb_tuandai_project_info as ttpi ON pList.business_id = ttpi.business_id
+        and ttpi.plate_type = #{paymentPlatformCode,jdbcType=INTEGER}
+        </if>
         <choose>
             <!--  为电催专员  限制只查看分配给自己的期数-->
             <when test="userType!=null">
@@ -389,7 +398,6 @@
             <if test="userType!=null">
                 <![CDATA[ and col_status.phone_staff = #{userId}]]>
             </if>
-
             <!--          /*应还日期 开始*/ -->
             <if test="showRepayDateBegin !=null ">
                 <![CDATA[ and pList.due_date >= #{showRepayDateBegin,jdbcType=TIMESTAMP}]]>
@@ -521,7 +529,7 @@
             </if>
 			<!-- 期数状态 -->
 			<if test="peroidStatus != null and peroidStatus == '首期' " >
-				and pList.is_defer != 1 and pList.period = 1
+				and pList.is_defer_ext != 1 and pList.period = 1
 			</if>
 			
 			<!-- 期数状态 -->

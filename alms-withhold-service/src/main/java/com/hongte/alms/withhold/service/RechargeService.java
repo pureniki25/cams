@@ -61,10 +61,16 @@ public interface RechargeService {
 	boolean isRepaying(RepaymentBizPlanList pList);
 	
 	/**
-	 * 如果是线上已还款，判断是否在宽限期外，如果是，就可以自动代扣，否则不能
+	 * 判断是否在宽限期内线上已还款
 	 */
 	
 	boolean isInForgiveDayRepay(RepaymentBizPlanList list);
+	
+	/**
+	 * 判断是否在宽限期外，如果是，就可以自动代扣，否则不能
+	 */
+	
+	boolean isForgiveDayOutside(RepaymentBizPlanList list);
 	  /**
 	   * 是否可以执行自动代扣
 	   * @param days 周期天数

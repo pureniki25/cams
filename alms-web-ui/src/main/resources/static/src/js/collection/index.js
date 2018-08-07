@@ -74,7 +74,8 @@ window.layinit(function(htConfig){
                 customerName:'',  //客户名称
                 identifyCard:'', //身份证号
                 phoneNumber:'', //手机号
-                peroidStatus:'' //期数状态,首期/本金期/末期
+                peroidStatus:'', //期数状态,首期/本金期/末期
+                paymentPlatform: '', // 所属投资端
 
             },
             areaList:'',//area_array,   //区域列表
@@ -88,7 +89,8 @@ window.layinit(function(htConfig){
             selectedRowInfo:'',//存储当前选中行信息
             edit_modal:false,//控制编辑项选择modal显示的标志位
             menu_modal:false,
-            ruleValidate:setSearchFormValidate //表单验证
+            ruleValidate:setSearchFormValidate, //表单验证
+            paymentPlatformList:[], // 投资端集合
 
         },
         methods: {
@@ -130,6 +132,7 @@ window.layinit(function(htConfig){
                                 identifyCard:vm.searchForm.identifyCard, //身份证号
                                 phoneNumber:vm.searchForm.phoneNumber, //手机号
                                 peroidStatus:vm.searchForm.peroidStatus,  //期数状态
+                                paymentPlatform:vm.searchForm.paymentPlatform,  //所属投资端
                             }
                             , page: {
                                 curr: page || 1 //重新从第 1 页开始
@@ -141,6 +144,21 @@ window.layinit(function(htConfig){
                     // this.loading = false;
                 })
             },
+            /**
+             * 获取所有投资端名称
+             */
+            queryPaymentPlatform: function(){
+				axios.get(basePath + 'collection/queryPaymentPlatform', {timeout: 0})
+				.then(function(result){
+					if (result.data.code == "1") {
+						vm.paymentPlatformList = result.data.data;
+					} else {
+						vm.$Modal.error({ content: result.data.msg });
+					}
+				}).catch(function (error) {
+					vm.$Modal.error({content: '接口调用异常!'});
+            	});
+			},
             handleReset (name) { // 重置表单
                 var tt = this.$refs[name];
                 tt.resetFields();
@@ -199,7 +217,7 @@ window.layinit(function(htConfig){
         },
         mounted:function(){
 //使用layerUI的表格组件
-
+        	this.queryPaymentPlatform();
         }
     });
     //为表单添加输入
@@ -256,7 +274,34 @@ window.layinit(function(htConfig){
                 },{
                     field: 'businessId',
                     width:140,
-                    title: '业务编号'
+                    title: '业务编号',
+                    templet:function(d){
+                    	
+                    	let color = '';
+                    	let content = '';
+                    	
+                      
+                        
+                        if (d.plateType == 1) {
+                        	color = '#CC9933'
+                        	content = '团'
+                        }else if (d.plateType == 2) {
+                        	color = '#669933'
+                        	content = '你'
+                        }else if (d.plateType == 3) {
+                        	color = '#666699'
+                        	content = '粤'
+                        }else if (d.plateType == 4) {
+                        	color = '#993300'
+                        	content = '线'
+                        }
+                        
+                        let styel = 'background-color: '+ color +';background-image: none !important;text-shadow: none !important;display: inline-block;padding: 2px 4px;font-size: 11.844px;font-weight: bold;line-height: 14px;color: #fff;text-shadow: 0 -1px 0 rgba(0,0,0,0.25);white-space: nowrap;vertical-align: baseline;'
+                    	 let res = '<span style="'+styel+'">'+content+'</span>'
+                    	  
+                        res += d.businessId
+                        return res
+                    }
                 }, {
                     field: 'afterId',
                     width:90,
@@ -387,6 +432,7 @@ window.layinit(function(htConfig){
                 repayStatus:vm.searchForm.repayStatus,      //还款状态
                 customerName:vm.searchForm.customerName,  //客户名称
                 peroidStatus:vm.searchForm.peroidStatus,  //期数状态
+                paymentPlatform:vm.searchForm.paymentPlatform,  //所属投资端
             },
             page: true,
             done: function (res, curr, count) {

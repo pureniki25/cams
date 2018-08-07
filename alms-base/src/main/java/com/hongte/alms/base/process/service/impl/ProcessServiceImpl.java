@@ -927,7 +927,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
             return sb.toString();
         }else if(step.getApproveUserType()== ProcessApproveUserType.BY_ROLE.getKey()){
             String roleCode = step.getApproveUserRole();
-            SysRole role =  sysRoleService.selectById(roleCode.trim());
+            SysRole role =  sysRoleService.selectOne(new EntityWrapper<SysRole>().eq("role_code", roleCode.trim()).eq("page_type", 1));//贷后管理页面权限的
             if(role==null) {
             	logger.error("找不到该角色,role="+roleCode.trim());
             	 throw new RuntimeException("该角色在系统中不存在");

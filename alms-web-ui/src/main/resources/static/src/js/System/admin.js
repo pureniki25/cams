@@ -22,7 +22,7 @@ window.layinit(function (htConfig) {
            synXindaiFailPhoneSetLoading:false, //同步信贷调用失败的电催设置加载标志位
            setSuserPByUidloanding:false,  //根据用户Id设置单个用户可访问的业务加载标志位
            oneRepayPlanPushing:false,//根据业务id推送贷后的还款计划信息到信贷加载标志位
-
+           shareProfitLoading:false,
            synOneListColLoading:false,
            setUserPermissonsLoading:false,
            fiveLevelClassifyLoading:false,
@@ -53,9 +53,15 @@ window.layinit(function (htConfig) {
            oneRepayPlanBId:"",
         	   
     	   //重试平台还款接口projPlanListId
-           retryRepaymentProjPlanListId:"" 
+           retryRepaymentProjPlanListId:"" ,
+           //手动核销的originalBusinessId
+           originalBusinessId:"",
+           //手动核销的afterId
+           afterId:"",
+           //手动核销的logId
+           logId:""
 
-
+           
 
 	   },
 	   methods: {
@@ -328,18 +334,30 @@ window.layinit(function (htConfig) {
                axios.get(withholdBasePath +"repay/autoRepay",{timeout: 0})
                    .then(function (res) {
                        vm.autoRepayLoading = false;
-                       if (res.data.data != null && res.data.code == 1) {
                            vm.$Modal.success({
                                content: res.data.msg
                            });
-                       } else {
-                           vm.$Modal.error({content: res.data.msg });
-                       }
+                    
                    })
                    .catch(function (error) {
                        vm.autoRepayLoading = false;
                        vm.$Modal.error({content: '接口调用异常!'});
                    });
+           },
+           // 代扣核销
+           shareProfit:function(){
+        	   this.shareProfitLoading = true;
+        	   axios.post(financeBasePath +"finance/shareProfit?businessId="+vm.originalBusinessId+"&afterId="+vm.afterId+"&logId="+vm.logId,{timeout: 0})
+        	   .then(function (res) {
+        		   vm.shareProfitLoading = false;
+    			   vm.$Modal.success({
+    				   content: res.data.msg
+    			   });
+        	   })
+        	   .catch(function (error) {
+        		   vm.shareProfitLoading = false;
+        		   vm.$Modal.error({content: '接口调用异常!'});
+        	   });
            },
            // 合规化还款
            tdrepyCharge:function(){

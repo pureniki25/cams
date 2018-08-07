@@ -19,6 +19,7 @@ window.layinit(function (htConfig) {
             businessTypes: [],
             collectionStatus: [],
             lastRepayDianfuweijieqing:false,
+            paymentPlatformList:[],//投资端集合
             form: {
                 curPage: 1,
                 pageSize: 10,
@@ -34,12 +35,40 @@ window.layinit(function (htConfig) {
                 regDateStart: '',
                 regDateEnd: '',
                 status: '',
-                planListId:''
+                planListId:'',
+                paymentPlatform:'' // 所属投资端
             },
             table: {
-                col: [{
+                col: [
+                	{
                         title: '业务编号',
                         key: 'businessId',
+                        width:150,
+                        render: (h, p) => {
+                        	let color = '';
+                        	let platform = '';
+                            if (p.row.plateType == 1) {
+                                color = 'yellow';
+                                platform = '团';
+                            }else if (p.row.plateType == 2) {
+                                color = 'green';
+                                platform = '你';
+                            }else if (p.row.plateType == 3) {
+                                color = 'blue';
+                                platform = '粤';
+                            }else if (p.row.plateType == 4) {
+                                color = 'red';
+                                platform = '线';
+                            }
+                            return h('div',[
+                            	h('Tag',{
+                            		props:{
+                            			color:color
+                            		}
+                            	},platform),
+                            	h('span',p.row.businessId)
+                            ])
+                        }
                     },
                     {
                         title: '期数',
@@ -568,11 +597,24 @@ window.layinit(function (htConfig) {
                         console.log(data);
                     }
                 });
-            }
+            },
+            /**
+             * 获取所有投资端名称
+             */
+            queryPaymentPlatform: function(){
+				axios.get(cpath + 'collection/queryPaymentPlatform', {timeout: 0})
+				.then(function(result){
+					if (result.data.code == "1") {
+						app.paymentPlatformList = result.data.data;
+					} else {
+						app.$Modal.error({ content: result.data.msg });
+					}
+				}).catch(function (error) {
+					app.$Modal.error({content: '接口调用异常!'});
+            	});
+			},
         },
         created: function () {
-
-
             //取区域列表
             axios.get(fpath + 'finance/getAreaCompany')
                 .then(function (res) {
@@ -659,6 +701,7 @@ window.layinit(function (htConfig) {
                 })
  */
             this.search()
+            this.queryPaymentPlatform();
         }
     })
     
