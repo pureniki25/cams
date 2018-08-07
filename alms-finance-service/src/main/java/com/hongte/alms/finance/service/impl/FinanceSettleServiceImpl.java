@@ -2676,15 +2676,19 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                 BigDecimal platformFee = repaymentProjPlanListDetailMapper.calcPlatFee(bizPlanList.getBusinessId(), projExtRate.getProjectId(), planId, bizPlanList.getPeriod());
                 BigDecimal platform = platformPenalty.multiply(platformFee);
                 
-                penalty = (upaid.multiply(projExtRate.getRateValue()).multiply(new BigDecimal(surplusPeriod))).subtract(service).subtract(platform);
+                penalty = (upaid.multiply(projExtRate.getRateValue()).multiply(new BigDecimal(surplusPeriod))) ;
+                		
+                if (penalty.compareTo(p6)>0) {
+					penalty = p6 ;
+				}
+                
+                penalty = (penalty).subtract(service).subtract(platform);
                 
                 if (penalty.compareTo(BigDecimal.ZERO) < 0) {
 					penalty = BigDecimal.ZERO ;
 				}
                 
-                if (penalty.compareTo(p6)>0) {
-					penalty = p6 ;
-				}
+                
 
             } else {
                 logger.error("错误： projExtRate.CalcWay[{}]尚未有对应算法", projExtRate.getCalcWay());
