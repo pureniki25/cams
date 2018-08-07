@@ -2657,11 +2657,13 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                 penalty = penalty.add(projExtRate.getRateValue().multiply(platformFee));
             } else if (PepayPlanProjExtRatCalEnum.BY_REM_MONEY_AND_FEE.getValue() == projExtRate.getCalcWay()) {
                 //(剩余本金*费率值*剩余期数) - 分公司服务费违约金 - 平台服务费违约金
-
+            	//剩余本金*费率值*剩余借款期数   得出的结果需与  剩余本金*6%  比较  取小值
+            	
             	BasicBusiness business = basicBusinessMapper.selectById(bizPlanList.getBusinessId());
             	int surplusPeriod = business.getBorrowLimit() - bizPlanList.getPeriod() ;
             	
                 BigDecimal upaid = repaymentProjPlanMapper.sumProjectItem10Unpaid(projExtRate.getProjectId(), planId);
+                BigDecimal p6 = upaid.multiply(new BigDecimal("0.06")) ;
                 
                 BigDecimal servicePenalty = projExtRateMapper.calcProjextRate(
                         projExtRate.getProjectId(), RepayPlanFeeTypeEnum.PENALTY_AMONT.getValue().toString(), RepayPlanFeeTypeEnum.SUB_COMPANY_PENALTY.getUuid(),bizPlanList.getPeriod().toString());
@@ -2674,11 +2676,19 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                 BigDecimal platformFee = repaymentProjPlanListDetailMapper.calcPlatFee(bizPlanList.getBusinessId(), projExtRate.getProjectId(), planId, bizPlanList.getPeriod());
                 BigDecimal platform = platformPenalty.multiply(platformFee);
                 
-                penalty = (upaid.multiply(projExtRate.getRateValue()).multiply(new BigDecimal(surplusPeriod))).subtract(service).subtract(platform);
+                penalty = (upaid.multiply(projExtRate.getRateValue()).multiply(new BigDecimal(surplusPeriod))) ;
+                		
+                if (penalty.compareTo(p6)>0) {
+					penalty = p6 ;
+				}
+                
+                penalty = (penalty).subtract(service).subtract(platform);
                 
                 if (penalty.compareTo(BigDecimal.ZERO) < 0) {
 					penalty = BigDecimal.ZERO ;
 				}
+                
+                
 
             } else {
                 logger.error("错误： projExtRate.CalcWay[{}]尚未有对应算法", projExtRate.getCalcWay());
