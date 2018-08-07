@@ -316,6 +316,15 @@ public class CollectionController {
         logger.info("@贷后管理首页@贷后首页台账--存储Excel--开始[{}]" , req);
         req.setUserId(loginUserInfoHelper.getUserId());
         EasyPoiExcelExportUtil.setResponseHead(response,"AfterLoanStandingBook.xls");
+        
+        Wrapper<SysUserRole> wrapperSysUserRole = new EntityWrapper<SysUserRole>();
+        wrapperSysUserRole.eq("user_id",loginUserInfoHelper.getUserId());
+        wrapperSysUserRole.and(" role_code in (SELECT role_code FROM tb_sys_role WHERE role_area_type = 1 AND page_type = 1 ) ");
+        List<SysUserRole> userRoles = sysUserRoleService.selectList(wrapperSysUserRole);
+        if(null != userRoles && !userRoles.isEmpty()) {
+        	req.setNeedPermission(0);//全局用户 不需要验证权限
+        }
+        
         List<AfterLoanStandingBookVo> list = phoneUrgeService.selectAfterLoanStandingBookList(req);
 
         Workbook workbook = ExcelExportUtil.exportExcel(new ExportParams(), AfterLoanStandingBookVo.class, list);

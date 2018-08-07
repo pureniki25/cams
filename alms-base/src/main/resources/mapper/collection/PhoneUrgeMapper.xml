@@ -529,7 +529,7 @@
             </if>
 			<!-- 期数状态 -->
 			<if test="peroidStatus != null and peroidStatus == '首期' " >
-				and pList.is_defer != 1 and pList.period = 1
+				and pList.is_defer_ext != 1 and pList.period = 1
 			</if>
 			
 			<!-- 期数状态 -->
