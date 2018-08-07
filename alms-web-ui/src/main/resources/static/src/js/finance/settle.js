@@ -467,6 +467,7 @@ window.layinit(function (htConfig) {
                 offlineOverDue: 0,
                 onlineOverDue: 0,
                 subTotal: 0,
+                otherMoney:0,
                 total: 0,
                 surplus: 0,
                 penalty:0

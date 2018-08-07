@@ -1479,20 +1479,20 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			case "20":
 				repayWay.append("自动线下代扣");
 				WithholdingRepaymentLog log = withholdingRepaymentLogService.selectById(lastOne.getRepaySourceRefId());
-				if (log.getBindPlatformId().equals(0)) {
+				if (log.getBindPlatformId().equals(PlatformEnum.YB_FORM.getValue())) {
 					repayWay.append("(易宝代扣)");
 				}
-				if (log.getBindPlatformId().equals(0)) {
+				if (log.getBindPlatformId().equals(PlatformEnum.BF_FORM.getValue())) {
 					repayWay.append("(宝付代扣)");
 				}
 				break;
 			case "21":
 				repayWay.append("人工线下代扣");
 				WithholdingRepaymentLog log1 = withholdingRepaymentLogService.selectById(lastOne.getRepaySourceRefId());
-				if (log1.getBindPlatformId().equals(0)) {
+				if (log1.getBindPlatformId().equals(PlatformEnum.YB_FORM.getValue())) {
 					repayWay.append("(易宝代扣)");
 				}
-				if (log1.getBindPlatformId().equals(0)) {
+				if (log1.getBindPlatformId().equals(PlatformEnum.BF_FORM.getValue())) {
 					repayWay.append("(宝付代扣)");
 				}
 				break;

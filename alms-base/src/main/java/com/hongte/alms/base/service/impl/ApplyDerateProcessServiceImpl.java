@@ -557,6 +557,14 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
 
         List<ApplyDerateVo> list = applyDerateProcessMap.selectApplyDerateList(key);
 
+        //add by liuzq for 计算减免总额计算
+        list.forEach(e->{
+        	String origBusinessId = e.getOrigBusinessId();
+        	Map<String,Object> map = pepaymentBizPlanListDetailMapper.totalRepaymentFactAmount(origBusinessId);
+        	String realPayMoney = map == null?"0":map.get("realPay")+"";
+        	e.setRealPayMoney(realPayMoney);
+        });
+
         setApplyDerateVoListInfo(list);
 
         return list;

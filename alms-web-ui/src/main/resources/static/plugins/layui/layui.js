@@ -50,7 +50,6 @@
     ,
     error = function (msg) {
       win.console && console.error && console.error('Layui hint: ' + msg);
-      top.location.href = '/login.html';
     }
 
     ,

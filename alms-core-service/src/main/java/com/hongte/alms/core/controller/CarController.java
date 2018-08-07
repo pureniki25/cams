@@ -365,6 +365,15 @@ public class CarController {
     	EasyPoiExcelExportUtil.setResponseHead(response,"car.xls");
       req.setPage(1);
       req.setLimit(5000);
+      
+      Wrapper<SysUserRole> wrapperSysUserRole = new EntityWrapper<SysUserRole>();
+      wrapperSysUserRole.eq("user_id",req.getUserId());
+      wrapperSysUserRole.and(" role_code in (SELECT role_code FROM tb_sys_role WHERE role_area_type = 1 AND page_type = 2 ) ");
+      List<SysUserRole> userRoles = sysUserRoleService.selectList(wrapperSysUserRole);
+      if(null != userRoles && !userRoles.isEmpty()) {
+      	req.setNeedPermission(0);//全局用户 不需要验证权限
+      }
+      
       List<CarVo> list = carService.selectCarList(req);
       Workbook workbook = ExcelExportUtil.exportExcel(new ExportParams("车辆信息报表","车辆信息"), CarVo.class, list);
 
