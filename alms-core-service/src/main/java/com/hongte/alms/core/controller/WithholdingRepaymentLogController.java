@@ -314,6 +314,14 @@ public class WithholdingRepaymentLogController {
                 calendar.set(Calendar.SECOND, 0);
                 req.setDateEnd(calendar.getTime());
         	}
+        	
+        	Wrapper<SysUserRole> wrapperSysUserRole = new EntityWrapper<>();
+            wrapperSysUserRole.eq("user_id",loginUserInfoHelper.getUserId());
+            wrapperSysUserRole.and(" role_code in (SELECT role_code FROM tb_sys_role WHERE role_area_type = 1 AND page_type = 5 ) ");
+            List<SysUserRole> userRoles = sysUserRoleService.selectList(wrapperSysUserRole);
+            if(null != userRoles && !userRoles.isEmpty()) {
+            	req.setNeedPermission(0);//全局用户 不需要验证权限
+            }
 
 	        EasyPoiExcelExportUtil.setResponseHead(response,"repaylogmengt.xls");
 	        List<RepaymentLogVO> list = withholdingRepaymentlogService.selectRepaymentLogExcel(req);
