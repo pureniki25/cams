@@ -340,7 +340,7 @@
   		UPDATE tb_repayment_biz_plan_list_synch t1,tb_repayment_biz_plan t2 SET 
 		t1.plan_status_ext = t2.plan_status,
 		t1.borrow_limit_ext = t2.borrow_limit,
-		t1.is_defer_ext = t2.is_defer
+		t1.is_defer_ext = t2.is_defer,
 		t1.original_business_id_ext = t2.original_business_id
 		WHERE 
 		t1.plan_id = t2.plan_id AND(
