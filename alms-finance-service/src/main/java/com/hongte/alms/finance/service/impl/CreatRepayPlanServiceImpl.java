@@ -1427,7 +1427,18 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                                      Map<String,Map<String,Map<String,List<RepaymentProjPlanListDetail>>>> projPlanDetailTotalMap,
                                      Map<String,Map<String,List<RepaymentProjPlanList>>> projPlanListTotalMap,CreatRepayPlanReq creatRepayPlanReq) throws IllegalAccessException, InstantiationException {
         Integer planIndex = 0;
-        for(String beginDay:projInfoReqMap.keySet()){
+        //****************根据启标时间排序*******************//  add by chenzs
+        List<String> beginDays=new ArrayList<String>();
+        beginDays.addAll(projInfoReqMap.keySet());
+		Collections.sort(beginDays, new Comparator<String>() {
+			@Override
+			public int compare(String f1, String f2) {
+				return f1.compareTo(f2); 
+			}
+
+		});
+		 //****************根据启标时间排序*******************//
+        for(String beginDay:beginDays){
             planIndex++;
             List<ProjInfoReq> reqList = projInfoReqMap.get(beginDay);
             //批次Id
@@ -1453,7 +1464,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             List<RepaymentProjPlan> projPlans = new LinkedList<>();
             repaymentProjPlanMap.put(batchId,projPlans);
 
-
+        
 
             for(ProjInfoReq projInfoReq:reqList){
 
