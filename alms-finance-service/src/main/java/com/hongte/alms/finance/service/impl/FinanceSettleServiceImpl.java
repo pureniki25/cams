@@ -2646,7 +2646,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                 penalty = penalty.add(projExtRate.getRateValue());
             } else if (PepayPlanProjExtRatCalEnum.REMIND_PLAT_FEE.getValue() == projExtRate.getCalcWay()) {
                 //4 剩余的平台服务费合计
-                penalty = penalty.add(repaymentProjPlanListDetailMapper.calcSurplusService(bizPlanList.getBusinessId(), projExtRate.getProjectId(), planId, bizPlanList.getPeriod()));
+                penalty = penalty.add(repaymentProjPlanListDetailMapper.calcSurplusPlatformFees(bizPlanList.getBusinessId(), projExtRate.getProjectId(), planId, bizPlanList.getPeriod()));
             } else if (PepayPlanProjExtRatCalEnum.BY_MONTH_COM_FEE.getValue() == projExtRate.getCalcWay()) {
                 //5 费率值*月收分公司服务费
                 BigDecimal serviceFee = repaymentProjPlanListDetailMapper.calcService(bizPlanList.getBusinessId(), projExtRate.getProjectId(), planId, bizPlanList.getPeriod());
