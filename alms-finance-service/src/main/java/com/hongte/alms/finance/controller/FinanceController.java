@@ -360,6 +360,10 @@ public class FinanceController {
          if(null != userRoles && !userRoles.isEmpty()) {
          	req.setNeedPermission(0);//全局用户 不需要验证权限
          }
+         
+		if (StringUtil.notEmpty(req.getPaymentPlatform())) {
+			req.setPaymentPlatformCode(PaymentPlatformEnums.getValueByName(req.getPaymentPlatform()));
+		}
 		
 		PageResult pageResult = repaymentBizPlanListService.selectByFinanceManagerListReq(req);
 		logger.info("@getFinanceMangerList@获取财务管理列表数据--结束[{}]", pageResult);

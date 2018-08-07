@@ -44,12 +44,14 @@ import com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo;
 import com.hongte.alms.base.collection.vo.StaffBusinessReq;
 import com.hongte.alms.base.collection.vo.StaffBusinessVo;
 import com.hongte.alms.base.enums.AreaLevel;
+import com.hongte.alms.base.enums.PaymentPlatformEnums;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
 import com.hongte.alms.base.enums.SysRoleEnums;
 import com.hongte.alms.base.util.CompanySortByPINYINUtil;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.EasyPoiExcelExportUtil;
 import com.hongte.alms.common.util.JsonUtil;
+import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.core.storage.StorageService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
@@ -232,6 +234,10 @@ public class CollectionController {
             	req.setRepayStatus("逾期");
             }
             
+            if (StringUtil.notEmpty(req.getPaymentPlatform())) {
+            	req.setPaymentPlatformCode(PaymentPlatformEnums.getValueByName(req.getPaymentPlatform()));
+			}
+            
             Page<AfterLoanStandingBookVo> pages = phoneUrgeService.selectAfterLoanStandingBookPage(req);
 //            System.out.println(JSON.toJSONString(pages));
             long end = System.currentTimeMillis();
@@ -310,6 +316,15 @@ public class CollectionController {
         logger.info("@贷后管理首页@贷后首页台账--存储Excel--开始[{}]" , req);
         req.setUserId(loginUserInfoHelper.getUserId());
         EasyPoiExcelExportUtil.setResponseHead(response,"AfterLoanStandingBook.xls");
+        
+        Wrapper<SysUserRole> wrapperSysUserRole = new EntityWrapper<SysUserRole>();
+        wrapperSysUserRole.eq("user_id",loginUserInfoHelper.getUserId());
+        wrapperSysUserRole.and(" role_code in (SELECT role_code FROM tb_sys_role WHERE role_area_type = 1 AND page_type = 1 ) ");
+        List<SysUserRole> userRoles = sysUserRoleService.selectList(wrapperSysUserRole);
+        if(null != userRoles && !userRoles.isEmpty()) {
+        	req.setNeedPermission(0);//全局用户 不需要验证权限
+        }
+        
         List<AfterLoanStandingBookVo> list = phoneUrgeService.selectAfterLoanStandingBookList(req);
 
         Workbook workbook = ExcelExportUtil.exportExcel(new ExportParams(), AfterLoanStandingBookVo.class, list);
@@ -522,7 +537,25 @@ public class CollectionController {
         }
     }*/
     
-    
+    /**
+     * @author huweiqian
+     * @return
+     */
+    @ApiOperation(value = "获取所有投资端名称")
+    @GetMapping("/queryPaymentPlatform")
+    public Result<List<String>> queryPaymentPlatform(){
+        try{
+        	List<String> resultList = new ArrayList<>();
+            PaymentPlatformEnums[] paymentPlatformEnums = PaymentPlatformEnums.values();
+            for (PaymentPlatformEnums enums : paymentPlatformEnums) {
+            	resultList.add(enums.getName());
+			}
+            return Result.success(resultList);
+        }catch (Exception ex){
+            logger.error(ex.getMessage(), ex);
+            return Result.error("-99", ex.getMessage());
+        }
+    }
  
 
 }

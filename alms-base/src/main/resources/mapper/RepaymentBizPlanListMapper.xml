@@ -179,6 +179,10 @@
 			count(distinct pl.plan_list_id)
 		FROM
 			tb_repayment_biz_plan_list_synch pl
+		<if test="paymentPlatformCode!=null">
+	        JOIN tb_tuandai_project_info as ttpi ON pl.business_id = ttpi.business_id
+	        and ttpi.plate_type = #{paymentPlatformCode,jdbcType=INTEGER}
+        </if>	
 		<where>
 			1 = 1
 			<if test="userId !=null  and userId != '' and needPermission == 1">
@@ -358,6 +362,10 @@
 			END AS repayStatus, pl.accountant_confirm_status AS financeConfirmStatus
 				,pl.fact_amount_ext AS repaidAmount, pl.src_type AS srcType
 			FROM tb_repayment_biz_plan_list_synch pl
+			<if test="paymentPlatformCode!=null">
+	        JOIN tb_tuandai_project_info as ttpi ON pl.business_id = ttpi.business_id
+	        and ttpi.plate_type = #{paymentPlatformCode,jdbcType=INTEGER}
+	        </if>	
 		<where>
 			1 = 1
 			<if test="userId !=null  and userId != '' and needPermission == 1">
@@ -398,7 +406,7 @@
 				AND pl.current_status = #{status}
 			</if>
 		</where>
-		order by pl.due_date
+		order by pl.due_date,pl.period
 		limit ${(curPage-1)*pageSize} , ${pageSize}
 	</select>
 

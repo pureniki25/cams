@@ -69,6 +69,13 @@
                             <!-- <i-option value="已结清">已结清</i-option> -->
                         </i-select>
                     </form-item>
+                    <form-item label="所属投资端：" prop="paymentPlatform" style="width: 180px;text-align: left">
+                        <i-select v-model="form.paymentPlatform" clearable filterable>
+                            <i-option v-for="item in paymentPlatformList" :value="item"
+                                      :key="item">{{ item }}
+                            </i-option>
+                        </i-select>
+                    </form-item>
                     <form-item>
                         <i-button type="primary" @click="paging(1)
                         ">
