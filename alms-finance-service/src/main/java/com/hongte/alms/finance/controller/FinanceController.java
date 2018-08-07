@@ -640,9 +640,9 @@ public class FinanceController {
 	
 	@GetMapping(value = "/queryProjOtherFee")
 	@ApiOperation(value = "获取标维度的其他费用")
-	public Result<List<String>> queryProjOtherFee(@RequestParam("projPlanListId") String projPlanListId) {
+	public Result<Map<String, List<String>>> queryProjOtherFee(@RequestParam("projPlanListId") String projPlanListId) {
 		try {
-			Result<List<String>> result;
+			Result<Map<String, List<String>>> result;
 			
 			logger.info("@queryProjOtherFee@获取标维度的其他费用--开始[{}]", projPlanListId);
 			
@@ -659,9 +659,9 @@ public class FinanceController {
 	
 	@GetMapping(value = "/queryBizOtherFee")
 	@ApiOperation(value = "获取业务维度的其他费用")
-	public Result<List<String>> queryBizOtherFee(@RequestParam("planListId") String planListId) {
+	public Result<Map<String, List<String>>> queryBizOtherFee(@RequestParam("planListId") String planListId) {
 		try {
-			Result<List<String>> result;
+			Result<Map<String, List<String>>> result;
 			
 			logger.info("@queryBizOtherFee@获取业务维度的其他费用--开始[{}]", planListId);
 			
