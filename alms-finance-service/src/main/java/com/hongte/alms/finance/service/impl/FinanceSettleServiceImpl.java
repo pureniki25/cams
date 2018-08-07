@@ -2685,7 +2685,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                 throw new ServiceRuntimeException("错误： projExtRate.CalcWay[" + projExtRate.getCalcWay() + "]尚未有对应算法");
             }
 
-            fee.setAmount(penalty);
+            fee.setAmount(penalty.setScale(2, RoundingMode.HALF_UP));
             fee.setFeeId(projExtRate.getFeeId());
             fee.setFeeName(projExtRate.getFeeName());
             fee.setPlanItemName(projExtRate.getRateName());

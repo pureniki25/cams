@@ -90,7 +90,7 @@ on process.apply_derate_process_id=type.apply_derate_process_id
 		adp.crp_id = #{planListId}
 	AND p.process_result = 1
 	AND adp.is_settle = 0
-	AND ( rr.resource_id IS NULL OR rr.repay_amount < adt.derate_money );
+	AND ( rr.resource_id IS NULL OR rr.repay_amount &lt; adt.derate_money );
     </select>
  
 </mapper>
