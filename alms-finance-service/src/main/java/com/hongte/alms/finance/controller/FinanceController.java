@@ -1236,7 +1236,7 @@ public class FinanceController {
 			}
 			/*判断结清期是否逾期,最后一期不在判断范围以内*/
 			/*检查往期还款状态*/
-			List<RepaymentBizPlanList> lastPeriods = repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", business).lt("period", bizPlanList.getPeriod()));
+			List<RepaymentBizPlanList> lastPeriods = repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", business.getBusinessId()).lt("period", bizPlanList.getPeriod()));
 			for (RepaymentBizPlanList repaymentBizPlanList : lastPeriods) {
 				if (repaymentBizPlanList.getRepayStatus()==null) {
 					return Result.error(repaymentBizPlanList.getAfterId()+"未还款不能结清");
