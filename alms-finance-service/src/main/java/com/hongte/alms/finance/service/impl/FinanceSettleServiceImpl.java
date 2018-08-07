@@ -2556,8 +2556,8 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
         infoVO.setRepayPlanDate(cur.getDueDate());
 
-
-        infoVO.setDerates(repaymentBizPlanListDetailMapper.selectLastPlanListDerateFees(req.getBusinessId(), cur.getDueDate(), req.getPlanId()));
+        /*repaymentBizPlanListDetailMapper.selectLastPlanListDerateFees(req.getBusinessId(), cur.getDueDate(), req.getPlanId())*/
+        infoVO.setDerates(listDerate(cur.getPlanListId()));
         infoVO.setLackFees(repaymentBizPlanListDetailMapper.selectLastPlanListLackFees(req.getBusinessId(), cur.getDueDate(), req.getPlanId()));
 
         infoVO.setPenaltyFees(calcPenalty(cur, req.getPlanId()));
@@ -2573,6 +2573,28 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         return infoVO;
     }
 
+    /**
+     * 查询减免项,转化为SettleFeesVO
+     * @author 王继光
+     * 2018年8月7日 上午10:50:23
+     * @param planListId
+     * @return
+     */
+    private List<SettleFeesVO> listDerate(String planListId) {
+		List<ApplyDerateType> listDerate = applyDerateTypeMapper.listDerate(planListId);
+		List<SettleFeesVO> derate = new ArrayList<>();
+		for (ApplyDerateType d : listDerate) {
+			SettleFeesVO settleFeesVO = new SettleFeesVO();
+			settleFeesVO.setAmount(d.getDerateMoney());
+			settleFeesVO.setFeeId(d.getFeeId());
+			settleFeesVO.setFeeName(d.getDerateTypeName());
+			settleFeesVO.setPlanItemName(d.getDerateTypeName());
+			settleFeesVO.setPlanItemType(d.getDerateType());
+			settleFeesVO.setShareProfitIndex(1);
+		}
+		return derate ;
+	}
+    
     /**
      * 计算提前还款违约金
      *
@@ -2634,8 +2656,11 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                 BigDecimal platformFee = repaymentProjPlanListDetailMapper.calcPlatFee(bizPlanList.getBusinessId(), projExtRate.getProjectId(), planId, bizPlanList.getPeriod());
                 penalty = penalty.add(projExtRate.getRateValue().multiply(platformFee));
             } else if (PepayPlanProjExtRatCalEnum.BY_REM_MONEY_AND_FEE.getValue() == projExtRate.getCalcWay()) {
-                //(剩余本金*费率值) - 分公司服务费违约金 - 平台服务费违约金
+                //(剩余本金*费率值*剩余期数) - 分公司服务费违约金 - 平台服务费违约金
 
+            	BasicBusiness business = basicBusinessMapper.selectById(bizPlanList.getBusinessId());
+            	int surplusPeriod = business.getBorrowLimit() - bizPlanList.getPeriod() ;
+            	
                 BigDecimal upaid = repaymentProjPlanMapper.sumProjectItem10Unpaid(projExtRate.getProjectId(), planId);
                 
                 BigDecimal servicePenalty = projExtRateMapper.calcProjextRate(
@@ -2649,7 +2674,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                 BigDecimal platformFee = repaymentProjPlanListDetailMapper.calcPlatFee(bizPlanList.getBusinessId(), projExtRate.getProjectId(), planId, bizPlanList.getPeriod());
                 BigDecimal platform = platformPenalty.multiply(platformFee);
                 
-                penalty = (upaid.multiply(projExtRate.getRateValue())).subtract(service).subtract(platform);
+                penalty = (upaid.multiply(projExtRate.getRateValue()).multiply(new BigDecimal(surplusPeriod))).subtract(service).subtract(platform);
                 
                 if (penalty.compareTo(BigDecimal.ZERO) < 0) {
 					penalty = BigDecimal.ZERO ;

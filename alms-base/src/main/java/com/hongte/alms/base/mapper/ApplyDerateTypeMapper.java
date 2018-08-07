@@ -23,11 +23,11 @@ public interface ApplyDerateTypeMapper extends SuperMapper<ApplyDerateType> {
 			@Param(value = "planListId") String planListId);
 
 	/**
-	 * 根据planlistid查找未使用过,且减免流程审批通过,且不用于结清的减免项
-	 * 
-	 * @author 王继光 2018年7月13日 下午9:22:38
+	 * 查询未用过或者用不完的减免项(会与 tb_repayment_resource 比较)
+	 * @author 王继光
+	 * 2018年8月7日 上午9:10:06
 	 * @param planListId
 	 * @return
 	 */
-	List<ApplyDerateType> listBizPlanListUnusedDerate(String planListId);
+	List<ApplyDerateType> listDerate(String planListId);
 }
