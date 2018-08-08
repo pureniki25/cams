@@ -243,13 +243,13 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         
         //处理还款来源,整合成RepaymentResource
         handleRepaymentResource(financeSettleBaseDto, financeSettleReq);
-        /*计算结余金额*/
-        calcSurplus(financeSettleBaseDto);
         
         /*创建还款日志*/
         createConfirmLog(financeSettleBaseDto);
         //数据填充及bak及入库
         makeRepaymentPlanAllPlan(financeSettleBaseDto, financeSettleReq);
+        /*计算结余金额*/
+        calcSurplus(financeSettleBaseDto);
 
         return financeSettleBaseDto.getCurrPeriodProjDetailVOList();
 
@@ -269,7 +269,9 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     	BigDecimal plan = dto.getSettleInfoVO().getTotal();
     	if (fact.compareTo(plan) > 0) {
 			dto.setSurplusAmount(fact.subtract(plan));
+			dto.getCurrPeriodProjDetailVOList().get(0).setSurplus(dto.getSurplusAmount());
 		}
+    	
     }
     
     
@@ -475,7 +477,6 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     @Override
     public void makeRepaymentPlanAllPlan(FinanceSettleBaseDto financeSettleBaseDto, FinanceSettleReq financeSettleReq) {
 
-        String planId = financeSettleReq.getPlanId();
         String businessId = financeSettleReq.getBusinessId();
         String afterId = financeSettleReq.getAfterId();
 
