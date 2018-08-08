@@ -486,6 +486,7 @@ public class PlatformRepaymentController {
                             || RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid().equals(r.getFeeId())) {
                         continue;
                     } */
+                	LOGGER.info("r.getFeeId(): {}" , r.getFeeId());
                     if (RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid().equals(r.getFeeId())) {
                         continue;
                     }
