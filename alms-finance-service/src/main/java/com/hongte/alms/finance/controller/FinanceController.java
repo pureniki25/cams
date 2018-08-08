@@ -146,6 +146,7 @@ public class FinanceController {
     @Qualifier("SysUserRoleService")
     SysUserRoleService sysUserRoleService;
 
+    
 	@Value("${oss.readUrl}")
 	private String ossReadUrl ;
 	@GetMapping(value = "/repayBaseInfo")
@@ -170,6 +171,11 @@ public class FinanceController {
 		for (BizOutputRecord bizOutputRecord : outputRecords) {
 			outPutMoney = outPutMoney.add(bizOutputRecord.getFactOutputMoney());
 		}
+		List<TuandaiProjectInfo> tuandaiProjectInfos = tuandaiProjectInfoService.selectList(new EntityWrapper<TuandaiProjectInfo>().eq("business_id", businessId));
+		BigDecimal borrowAmount = BigDecimal.ZERO;
+		for (TuandaiProjectInfo tuandaiProjectInfo : tuandaiProjectInfos) {
+			borrowAmount = borrowAmount.add(tuandaiProjectInfo.getFullBorrowMoney());
+		}
 		JSONObject r = new JSONObject();
 		r.put("businessId", businessId);
 		r.put("afterId", afterId);
@@ -181,7 +187,7 @@ public class FinanceController {
 		r.put("repaymentType", basicRepaymentType.getRepaymentTypeName());
 		r.put("repayDate", DateUtil.formatDate(repaymentBizPlanList.getDueDate()));
 		r.put("repayAmount", repaymentBizPlanList.getTotalBorrowAmount());
-		r.put("borrowAmount", basicBusiness.getBorrowMoney());
+		r.put("borrowAmount", borrowAmount);
 		r.put("borrowLimit", basicBusiness.getBorrowLimit());
 		r.put("borrowLimitUnit", basicBusiness.getBorrowLimitUnit());
 		r.put("borrowRate", basicBusiness.getBorrowRate());
