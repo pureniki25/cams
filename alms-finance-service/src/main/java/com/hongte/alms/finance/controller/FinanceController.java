@@ -1229,6 +1229,14 @@ public class FinanceController {
 			/*判断结清期是否逾期,最后一期不在判断范围以内*/
 			BasicBusiness business = basicBusinessService.selectById(businessId);
 			RepaymentBizPlanList bizPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", business.getBusinessId()).eq("after_id", afterId));
+			if (bizPlanList.getCurrentStatus().equals(RepayPlanStatus.REPAYED.getName())) {
+				return Result.error("已还款不能结清");
+			}
+			if (bizPlanList.getRepayStatus()!=null) {
+				if (bizPlanList.getRepayStatus().equals(SectionRepayStatusEnum.ONLINE_REPAID)) {
+					return Result.error("线上部分已还款不能结清");
+				}
+			}
 			if (bizPlanList.getPeriod() < business.getBorrowLimit()) {
 				if (bizPlanList.getCurrentStatus().equals(RepayPlanStatus.OVERDUE.getName())) {
 					return Result.error("逾期不能结清");
