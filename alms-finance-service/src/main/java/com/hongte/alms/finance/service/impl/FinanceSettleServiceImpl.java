@@ -2586,12 +2586,24 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 		for (ApplyDerateType d : listDerate) {
 			SettleFeesVO settleFeesVO = new SettleFeesVO();
 			settleFeesVO.setAmount(d.getDerateMoney());
-			settleFeesVO.setFeeId(d.getFeeId());
 			settleFeesVO.setFeeName(d.getDerateTypeName());
-			settleFeesVO.setPlanItemName(d.getDerateTypeName());
+			
+			if (d.getDerateType().equals("60")) {
+				if (d.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
+					settleFeesVO.setFeeName(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getDesc());
+				}
+				if (d.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
+					settleFeesVO.setFeeName(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getDesc());
+				}
+			}
+			
+			settleFeesVO.setFeeId(d.getFeeId());
 			settleFeesVO.setPlanItemType(d.getDerateType());
+			settleFeesVO.setPlanItemName(d.getDerateTypeName());
 			settleFeesVO.setShareProfitIndex(1);
+			derate.add(settleFeesVO);
 		}
+		//TODO 还有减免 其他费用项 还没做好,但是当前并不需要
 		return derate ;
 	}
     

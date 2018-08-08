@@ -720,6 +720,7 @@ window.layinit(function (htConfig) {
                             app.thisTimeRepaymentInfo.onlineOverDue = data.onlineOverDue
                             app.thisTimeRepaymentInfo.penalty = data.penalty
                             app.thisTimeRepaymentInfo.derate = data.derate
+                            app.thisTimeRepaymentInfo.derates = data.derates
                             app.thisTimeRepaymentInfo.planRepayBalance = data.planRepayBalance
                             app.thisTimeRepaymentInfo.total = data.total
                             app.thisTimeRepaymentInfo.penaltyFeesBiz = data.penaltyFeesBiz
