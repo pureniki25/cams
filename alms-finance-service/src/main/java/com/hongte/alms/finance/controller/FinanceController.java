@@ -1228,7 +1228,11 @@ public class FinanceController {
 			/*判断当前期或业务是否已结清*/
 			/*判断结清期是否逾期,最后一期不在判断范围以内*/
 			BasicBusiness business = basicBusinessService.selectById(businessId);
-			RepaymentBizPlanList bizPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", business.getBusinessId()).eq("after_id", afterId));
+			Wrapper<RepaymentBizPlanList> eq = new EntityWrapper<RepaymentBizPlanList>().eq("business_id", business.getBusinessId()).eq("after_id", afterId);
+			if (!StringUtil.isEmpty(planId)) {
+				eq.eq("plan_id", planId);
+			}
+			RepaymentBizPlanList bizPlanList = repaymentBizPlanListService.selectOne(eq);
 			if (bizPlanList.getCurrentStatus().equals(RepayPlanStatus.REPAYED.getName())) {
 				return Result.error("已还款不能结清");
 			}
@@ -1244,7 +1248,11 @@ public class FinanceController {
 			}
 			/*判断结清期是否逾期,最后一期不在判断范围以内*/
 			/*检查往期还款状态*/
-			List<RepaymentBizPlanList> lastPeriods = repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", business.getBusinessId()).lt("period", bizPlanList.getPeriod()));
+			Wrapper<RepaymentBizPlanList> lt = new EntityWrapper<RepaymentBizPlanList>().eq("business_id", business.getBusinessId()).lt("period", bizPlanList.getPeriod());
+			if (!StringUtil.isEmpty(planId)) {
+				lt.eq("plan_id", planId);
+			}
+			List<RepaymentBizPlanList> lastPeriods = repaymentBizPlanListService.selectList(lt);
 			for (RepaymentBizPlanList repaymentBizPlanList : lastPeriods) {
 				if (repaymentBizPlanList.getRepayStatus()==null) {
 					return Result.error(repaymentBizPlanList.getAfterId()+"未还款不能结清");
