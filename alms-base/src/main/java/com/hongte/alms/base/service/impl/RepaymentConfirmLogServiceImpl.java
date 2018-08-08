@@ -145,14 +145,15 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
     @Transactional(rollbackFor = Exception.class)
     public Result revokeConfirm(String businessId, String afterId) throws Exception{
         /*找还款确认记录*/
-        List<RepaymentConfirmLog> logs = confirmLogMapper.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("business_id", businessId).eq("after_id", afterId).orderBy("`idx`", false));
+        List<RepaymentConfirmLog> logs = confirmLogMapper.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("business_id", businessId).orderBy("create_time", false));
         if (logs == null || logs.size() == 0) {
             return Result.error("500", "找不到任何一条相关的确认还款记录");
         }
         RepaymentConfirmLog log = logs.get(0);
-        if (log.getType().equals(2)) {
-			return Result.error("500","请先撤销"+log.getAfterId()+"的结清");
-		}
+        
+//        if (log.getType().equals(2)) {
+//			return Result.error("500","请先撤销"+log.getAfterId()+"的结清");
+//		}
         if(!loginUserInfoHelper.getUserId().equals("0111130000")) {
         	   if(log.getRepaySource()!=10) {//如果不是线下转账的不能撤销
                    return Result.error("500", "最后一次还款不是线下转账不能被撤销");

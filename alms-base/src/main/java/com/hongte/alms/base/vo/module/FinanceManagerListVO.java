@@ -108,6 +108,12 @@ public class FinanceManagerListVO {
 	 * 部分还款状态子状态,null:未还款,1:部分还款,2:线上已还款,3:全部已还款
 	 */
 	private String repayStatus ;
+	
+	/**
+	 * tb_repayment_biz_plan表还款计划状态 0:还款中，10:提前结清，20:已结清，30:亏损结清，50:已申请展期
+	 */
+	private String planStatusExt ;
+	
 	/**
 	 * 是否支持代扣
 	 */
