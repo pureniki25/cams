@@ -464,6 +464,7 @@ window.layinit(function (htConfig) {
                 item20: 0,
                 item30: 0,
                 item50: 0,
+                item70: 0,
                 offlineOverDue: 0,
                 onlineOverDue: 0,
                 subTotal: 0,
@@ -723,6 +724,8 @@ window.layinit(function (htConfig) {
                             app.thisTimeRepaymentInfo.total = data.total
                             app.thisTimeRepaymentInfo.penaltyFeesBiz = data.penaltyFeesBiz
                             app.thisTimeRepaymentInfo.other = data.other
+                            app.thisTimeRepaymentInfo.lackFees = data.lackFees 
+
                             if(param.otherFees){
                                 app.thisTimeRepaymentInfo.otherFees = data.otherFees
                             }

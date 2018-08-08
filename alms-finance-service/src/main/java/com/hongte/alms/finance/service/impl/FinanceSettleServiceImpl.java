@@ -2635,8 +2635,8 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
             if (PepayPlanProjExtRatCalEnum.BY_BORROW_MONEY.getValue() == projExtRate.getCalcWay()) {
                 //1.借款金额*费率值
                 TuandaiProjectInfo projectInfo = tuandaiProjectInfoMapper.selectById(projExtRate.getProjectId());
-                penalty = projectInfo.getBorrowAmount().multiply(projExtRate.getRateValue());
-
+                penalty = projectInfo.getFullBorrowMoney().multiply(projExtRate.getRateValue());
+                
             } else if (PepayPlanProjExtRatCalEnum.BY_REMIND_MONEY.getValue() == projExtRate.getCalcWay()) {
                 //2剩余本金*费率值
                 BigDecimal upaid = repaymentProjPlanMapper.sumProjectItem10Unpaid(projExtRate.getProjectId(), planId);
