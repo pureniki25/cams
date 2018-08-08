@@ -197,7 +197,7 @@ public class PlatformRepaymentController {
             RepaymentBizPlanList bizPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("plan_list_id", projPlanList.getPlanListId()));
             //部分还款状态子状态,null:未还款,1:部分还款,2:线上已还款,3:全部已还款
             //资产端内部在分润后将先还完线上部分之后再进行合规化还款，即部分还款子状态为2或者3时
-            if (projPlanList.getRepayStatus() == null || projPlanList.getRepayStatus() == 1) {
+            if (projPlanList.getRepayStatus() == null || projPlanList.getRepayStatus().intValue() == 1) {
                 LOGGER.error("@对接合规还款接口@  应该在还完线上部分后再调用合规化还款接口 输入参数 projPlanListId:[{}]  ", projPlanListId);
                 return Result.error("500", "应该在还完线上部分后再调用合规化还款接口");
             }
@@ -481,16 +481,18 @@ public class PlatformRepaymentController {
                 List<TdrepayRechargeDetail> detailFeeList = Lists.newArrayList();
                 //for (RepaymentProjFactRepay r : projFactRepays) {
                 for(RepaymentProjFactRepay r: projFactRepayMap.values()){
-                    //实还金额应该包含滞纳金
-                    factRepayAmount = factRepayAmount.add(r.getFactAmount());
                     //累计费用，线下（资产公司）的滞纳金排除在外，注意用value和uuid去区分.  OVER_DUE_AMONT_UNDERLINE(60,"线下滞纳金","3131c075-5721-11e8-8a00-0242ac110002",5)
                     /*if (RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getValue().equals(r.getPlanItemType())
                             || RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid().equals(r.getFeeId())) {
                         continue;
                     } */
+                	LOGGER.info("--1--r.getFeeId(): {}" , r.getFeeId());
                     if (RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid().equals(r.getFeeId())) {
                         continue;
                     }
+                    LOGGER.info("--2--r.getFeeId(): {}" , r.getFeeId());
+                    //实还金额应该包含滞纳金
+                    factRepayAmount = factRepayAmount.add(r.getFactAmount());
                     //resourceAmount = resourceAmount.add(r.getFactAmount());
                     rechargeAmount = rechargeAmount.add(r.getFactAmount());
                     TdrepayRechargeDetail detailFee = new TdrepayRechargeDetail();
