@@ -2606,7 +2606,8 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
      */
     private List<SettleFeesVO> calcPenalty(RepaymentBizPlanList bizPlanList, final String planId) {
         EntityWrapper<RepaymentProjPlanList> eWrapper = new EntityWrapper<RepaymentProjPlanList>();
-        eWrapper.eq("plan_list_id", bizPlanList.getPlanListId());
+        eWrapper.eq("period", bizPlanList.getPeriod());
+        eWrapper.eq("business_id", bizPlanList.getBusinessId());
         if (!StringUtil.isEmpty(planId)) {
             eWrapper.eq("plan_id", planId);
         }
