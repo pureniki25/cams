@@ -2547,7 +2547,8 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         }
 
         int diff = DateUtil.getDiffDays(cur.getDueDate(), settleDate);
-        if (diff > 0 && cur.getCurrentStatus().equals(RepayPlanStatus.OVERDUE.getName())) {
+        if (diff > 0 ) {
+        	//&& cur.getCurrentStatus().equals(RepayPlanStatus.OVERDUE.getName())
             infoVO.setOverDueDays(diff);
         }
         infoVO.setItem10(repaymentProjPlanListDetailMapper.calcUnpaidPrincipal(req.getBusinessId(), req.getPlanId()));

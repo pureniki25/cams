@@ -1237,7 +1237,7 @@ public class FinanceController {
 				return Result.error("已还款不能结清");
 			}
 			if (bizPlanList.getRepayStatus()!=null) {
-				if (bizPlanList.getRepayStatus().equals(SectionRepayStatusEnum.ONLINE_REPAID)) {
+				if (bizPlanList.getRepayStatus().equals(SectionRepayStatusEnum.ONLINE_REPAID.getKey())) {
 					return Result.error("线上部分已还款不能结清");
 				}
 			}
