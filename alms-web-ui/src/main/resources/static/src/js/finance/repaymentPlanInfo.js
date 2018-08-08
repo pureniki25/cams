@@ -9,6 +9,7 @@ window.layinit(function (htConfig) {
     let repaymentType = decodeURI(getQueryStr('repaymentType'));	// 还款方式
     let borrowMoney = getQueryStr('borrowMoney');	// 借款金额
     let borrowLimit = getQueryStr('borrowLimit');	// 借款期限
+    let plateType = getQueryStr('plateType');	// 业务来源
     
     app = new Vue({
         el: "#app",
@@ -23,6 +24,7 @@ window.layinit(function (htConfig) {
         	repayOtherFeeFlag: false, // 其他费用弹窗控制标识(业务维度)
         	repayProjOtherFeeFlag: false, // 其他费用弹窗控制标识（标维度）
         	businessSurplus:0, // 用户账户结余
+        	plateTypeFlag: '', // 数据来源：1、团贷网；2、你我金融
         	
         	// -- 实还流水 --
         	actualPaymentRecordList: [],
@@ -73,7 +75,7 @@ window.layinit(function (htConfig) {
                     key: 'otherFee',
                     align: 'center',
                     render:(h,p)=>{
-                    	if(p.row.repayment=='实际还款'){
+                    	if(p.row.repayment=='实际还款' || p.row.repayment=='计划还款'){
                     		return h('a',{
                         		style:{
                         			textDecoration:'underline'
@@ -81,9 +83,9 @@ window.layinit(function (htConfig) {
                         		on:{
                         			click:function(){
                         				if (p.row.projPlanListId  != null) {
-											app.openProjRepayOtherFee(p.row.projPlanListId)
+											app.openProjRepayOtherFee(p.row)
 										}else {
-											app.openRepayOtherFee(p.row.planListId)
+											app.openRepayOtherFee(p.row)
 										}
                         			}
                         		}
@@ -209,14 +211,14 @@ window.layinit(function (htConfig) {
         			align: 'center',
         			width: 100,
         			render:(h,p)=>{
-        				if(p.row.repayment=='实际还款'){
+        				if(p.row.repayment=='实际还款' || p.row.repayment=='计划还款'){
         					return h('a',{
         						style:{
         							textDecoration:'underline'
         						},
         						on:{
         							click:function(){
-    									app.openRepayOtherFee(p.row.planListId)
+    									app.openRepayOtherFee(p.row)
         							}
         						}
         					},p.row.otherFee)
@@ -573,6 +575,7 @@ window.layinit(function (htConfig) {
              * 根据业务编号获取业务维度的还款计划信息
              */
             queryRepaymentPlanInfoByBusinessId: function(){
+            	this.plateTypeFlag = plateType;
             	if (this.bizRepaymentPlanList == null || this.bizRepaymentPlanList.length == 0) {
             		axios.get(financeBasePath +"finance/queryRepaymentPlanInfoByBusinessId?businessId=" + businessId)
         	        .then(function (res) {
@@ -639,11 +642,16 @@ window.layinit(function (htConfig) {
             /*
              * 获取标还款计划其他费用
              */
-            queryProjOtherFee: function(projPlanListId){
-            	axios.get(financeBasePath +"finance/queryProjOtherFee?projPlanListId=" + projPlanListId)
+            queryProjOtherFee: function(obj){
+            	axios.get(financeBasePath +"finance/queryProjOtherFee?projPlanListId=" + obj.projPlanListId)
             	.then(function (res) {
             		if (res.data.data != null && res.data.code == 1) {
-            			app.projOtherFeeList = res.data.data;
+            			if (obj.repayment == '实际还款') {
+            				app.projOtherFeeList = res.data.data.factAmountResultList;
+						}
+            			if (obj.repayment == '计划还款') {
+            				app.projOtherFeeList = res.data.data.planAmountResultList;
+						}
             		} else {
             			app.$Modal.error({content: res.data.msg });
             		}
@@ -655,11 +663,16 @@ window.layinit(function (htConfig) {
             /*
              * 获取业务还款计划其他费用
              */
-            queryBizOtherFee: function(planListId){
-            	axios.get(financeBasePath +"finance/queryBizOtherFee?planListId=" + planListId)
+            queryBizOtherFee: function(obj){
+            	axios.get(financeBasePath +"finance/queryBizOtherFee?planListId=" + obj.planListId)
             	.then(function (res) {
             		if (res.data.data != null && res.data.code == 1) {
-            			app.bizOtherFeeList = res.data.data;
+            			if (obj.repayment == '实际还款') {
+            				app.bizOtherFeeList = res.data.data.factAmountResultList;
+						}
+            			if (obj.repayment == '计划还款') {
+            				app.bizOtherFeeList = res.data.data.planAmountResultList;
+						}
             		} else {
             			app.$Modal.error({content: res.data.msg });
             		}
@@ -715,7 +728,7 @@ window.layinit(function (htConfig) {
              */
             addEventForOtherFee: function(item){
             	var planListId = item.planListId;
-        		return '<a href="#" onclick="app.openRepayOtherFee(`'+planListId+'`)" style="text-decoration:underline ">' + item.otherFee + '</a>';
+        		return '<a href="#" onclick="app.openRepayOtherFee(`'+item+'`)" style="text-decoration:underline ">' + item.otherFee + '</a>';
             },
             /*
              * 打开计划还款，查看本期还款计划所属的标的计划
@@ -741,16 +754,16 @@ window.layinit(function (htConfig) {
             /*
              * 打开其他费用，查看其他费用明细项，相应的点击标的中的其他费用也看查看相应的其他费用项（业务维度）
              */
-            openRepayOtherFee: function(planListId){
+            openRepayOtherFee: function(obj){
             	this.repayOtherFeeFlag = true;
-            	this.queryBizOtherFee(planListId);
+            	this.queryBizOtherFee(obj);
             },
             /*
              * 打开其他费用，查看其他费用明细项，相应的点击标的中的其他费用也看查看相应的其他费用项（标维度）
              */
-            openProjRepayOtherFee: function(projPlanListId){
+            openProjRepayOtherFee: function(obj){
             	this.repayProjOtherFeeFlag = true;
-            	this.queryProjOtherFee(projPlanListId);
+            	this.queryProjOtherFee(obj);
             },
             
             /*

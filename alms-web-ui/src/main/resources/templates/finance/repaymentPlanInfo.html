@@ -70,7 +70,7 @@
 					</Modal>
 				</tab-pane>
 				
-		        <tab-pane label="实还流水" name="realRepaymentRecord">
+		        <tab-pane label="实还流水" name="realRepaymentRecord" v-if="plateTypeFlag != 2">
 		        	<table class="layui-table">
 				        <thead>
 				            <tr>
@@ -126,7 +126,7 @@
 				    </table>
 		        </tab-pane>
 		        
-		        <tab-pane label="平台实还" name="platformRealRepayment">
+		        <tab-pane label="平台实还" name="platformRealRepayment" v-if="plateTypeFlag != 2">
 		        	<row style="margin-top:0.5rem">
 						<p slot="title">
 				            <h3 style="color:red">Tips：数据均来源于团贷网后台接口，非鸿特本地数据</h3>
@@ -162,7 +162,7 @@
 					</tabs>
 		        </tab-pane>
 		        
-		        <tab-pane label="垫付记录" name="advancesRecord">
+		        <tab-pane label="垫付记录" name="advancesRecord" v-if="plateTypeFlag != 2">
 		        	<row style="margin-top:0.5rem">
 						<p slot="title">
 				            <h3 style="color:red">Tips：数据均来源于团贷网后台接口，非鸿特本地数据</h3>
@@ -195,7 +195,7 @@
 					</tabs>
 		        </tab-pane>
 		        
-		        <tab-pane label="资金分发记录" name="fundDistributionRecord">
+		        <tab-pane label="资金分发记录" name="fundDistributionRecord" v-if="plateTypeFlag != 2">
 		        	<tabs :animated="true" @on-click="initDistributeFundRecordFunction">
 						<tab-pane v-for="item in projectInfoList" :key="item.projectId" :label="item.realName" :name="item.projectId">
 							<row>

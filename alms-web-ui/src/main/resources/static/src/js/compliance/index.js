@@ -801,11 +801,9 @@ window.layinit(function(htConfig) {
 				 */
 				axios.get(basePath + 'tdrepayRecharge/queryRepaymentProjPlan?projectId=' + data.projectId)
 				.then(function(result){
-					if (result.data.code == "1") {
+					if (result.data.code == "1" && result.data.data != null) {
 						vm.repaymentProjPlan = result.data.data;
 						vm.infoBasicData.amount = result.data.data.borrowMoney;
-					} else {
-						vm.$Modal.error({ content: result.data.msg });
 					}
 				}).catch(function (error) {
 					vm.$Modal.error({content: '接口调用异常!'});

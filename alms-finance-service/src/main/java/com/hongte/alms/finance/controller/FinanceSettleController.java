@@ -36,16 +36,16 @@ public class FinanceSettleController {
     @RequestMapping("/financeSettle")
     @ApiOperation(value="资金结清")
     public Result financeSettle(@RequestBody FinanceSettleReq financeSettleReq){
-        logger.info("@financeSettle@资金结算开始[{}]");
+        logger.info("@financeSettle@资金结算开始[{}]",financeSettleReq);
         Result result = null;
         try {
             List<CurrPeriodProjDetailVO> currVo = financeSettleService.financeSettle(financeSettleReq);
             result = Result.success(currVo);
         } catch (ServiceRuntimeException se) {
-            result = Result.error(se.getErrorCode(), se.getMessage());
+            result = Result.error("500", se.getMessage());
             logger.error("@financeSettle@资金结清出错{}", se.getMessage());
         } catch (Exception e) {
-            result = Result.error("500", "资金结清出错");
+            result = Result.error("500", e.getMessage());
             logger.error("@financeSettle@资金结清出错{}", e);
         }
 
@@ -53,15 +53,6 @@ public class FinanceSettleController {
         return result;
     }
 
-    @GetMapping(value="/test")
-    public void test(String businessId,String afterId,String planId) {
-    	FinanceSettleReq req = new FinanceSettleReq() ;
-    	req.setBusinessId(businessId);
-    	req.setAfterId(afterId);
-    	req.setPlanId(planId);
-    	List<RepaymentBizPlanSettleDto> currentPeriod = financeSettleService.getCurrentPeriod(req);
-    	System.out.println(JSON.toJSONString(currentPeriod));
-    }
 
     @RequestMapping("/financeSettleRecall")
     @ApiOperation(value="资金结清撤回")

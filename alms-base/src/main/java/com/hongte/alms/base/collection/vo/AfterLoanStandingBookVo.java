@@ -96,7 +96,20 @@ public class AfterLoanStandingBookVo implements java.io.Serializable  {
     @Excel(name = "期数状态", orderNum = "18",   isImportField = "true_st")
     private String peroidStatus ;//期数状态,首期/本金期/末期
     
-    public String getBusinessId() {
+    /**
+     * 平台标志位：1.团贷网;2.你我金融;3.粤财;4.线下出款
+     */
+    private Integer plateType;
+    
+    public Integer getPlateType() {
+		return plateType;
+	}
+
+	public void setPlateType(Integer plateType) {
+		this.plateType = plateType;
+	}
+
+	public String getBusinessId() {
         return businessId;
     }
 

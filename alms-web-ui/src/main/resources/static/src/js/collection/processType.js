@@ -5,7 +5,7 @@ var getSelectData = function () {
     //取区域列表
     axios.get(basePath +'ProcessSetUpController/getSelectData')
         .then(function (res) {
-            if (res.data.code == "1") {debugger
+            if (res.data.code == "1") {
             	app.roleList = res.data.data.roleList;
                 app.processTypeList = res.data.data.processTypeList;
                 app.userList=res.data.data.userList;
@@ -123,7 +123,7 @@ window.layinit(function (htConfig) {
             openEditModal:function(typeId){
                 let _this = this 
                 axios.get(basePath+'ProcessSetUpController/getProcessType', {params: {typeId: typeId}})
-                .then(function (res) {debugger
+                .then(function (res) {
                     if (res.data.code == "1") {
                         console.log(res)
                         data = res.data.data 
@@ -147,7 +147,7 @@ window.layinit(function (htConfig) {
             	getSelectData();
                 let _this = this 
                 axios.get(basePath+'ProcessSetUpController/getProcessTypeStep', {params: {typeStepId: typeStepId}})
-                .then(function (res) {debugger
+                .then(function (res) {
                     if (res.data.code == "1") {
                         console.log(res)
                         data = res.data.data, 
@@ -208,7 +208,7 @@ window.layinit(function (htConfig) {
                 o.canItemTotalCount = ef.canItemTotalCount
                 return o
             },
-            stepParams:function(){debugger
+            stepParams:function(){
                 let o = {}
                 let ef = this.editStepForm 
                 o.typeStepId = ef.typeStepId
@@ -229,7 +229,7 @@ window.layinit(function (htConfig) {
                 let _this = this 
                         _this.submitLoading = true
                         axios.get(basePath+'ProcessSetUpController/save',{params:_this.handleParams()})
-                        .then(function (res) {debugger
+                        .then(function (res) {
                             if (res.data.code == "1") {
                                 console.log(res)
                                 _this.add_modal = false 
@@ -261,7 +261,7 @@ window.layinit(function (htConfig) {
                     if(valid){
                         _this.submitLoading = true
                         axios.get(basePath+'ProcessSetUpController/saveStep',{params:_this.stepParams()})
-                        .then(function (res) {debugger
+                        .then(function (res) {
                             if (res.data.code == "1") {
                                 console.log(res)
                                 _this.add_modal_step = false 
@@ -318,7 +318,7 @@ window.layinit(function (htConfig) {
                 }});
             },
             
-            deleteStep:function(stepId){debugger
+            deleteStep:function(stepId){
                 this.$Modal.confirm({content: '是否确认删除本条还款记录',loading:true,onOk:function(){
                     let _this = this 
                     axios.get(basePath+'ProcessSetUpController/delStep',{params:{stepId:stepId}})
@@ -481,9 +481,9 @@ window.layinit(function (htConfig) {
 
       table.on('tool(processTypeStep)',function(data){
           console.log(data)
-          if(data.event=='del'){debugger
+          if(data.event=='del'){
               app.deleteStep(data.data.typeStepId)
-          }else if(data.event=='edit'){
+          }else if(data.event=='edit' && data.data.isCanEditName=='允许'){
               app.openEditStepModal(data.data.typeStepId);
           }
     });

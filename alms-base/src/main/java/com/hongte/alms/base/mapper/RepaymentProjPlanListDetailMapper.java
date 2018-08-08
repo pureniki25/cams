@@ -55,4 +55,39 @@ public interface RepaymentProjPlanListDetailMapper extends SuperMapper<Repayment
 	 * @return
 	 */
 	public BigDecimal calcProjectPlanAmount(@Param("projectId")String projectId,@Param("planId")String planId,@Param("planItemType")String planItemType,@Param("feeId")String feeId);
+	
+	
+	/**
+	 * 结清结算剩余服务费金额
+	 * @author 王继光
+	 * 2018年8月2日 下午3:28:07
+	 * @param businessId
+	 * @param planId
+	 * @param period
+	 * @return
+	 */
+	BigDecimal calcSurplusPlatformFees(@Param("businessId")String businessId,@Param("projectId")String projectId,@Param("planId")String planId,@Param("period")Integer period);
+	
+	/**
+	 * 结清计算某期月收服务费金额
+	 * @author 王继光
+	 * 2018年8月2日 下午4:22:05
+	 * @param businessId
+	 * @param projectId
+	 * @param planId
+	 * @param period
+	 * @return
+	 */
+	BigDecimal calcService(@Param("businessId")String businessId,@Param("projectId")String projectId,@Param("planId")String planId,@Param("period")Integer period);
+	/**
+	 * 结清计算某期月收平台费金额
+	 * @author 王继光
+	 * 2018年8月3日 上午9:37:00
+	 * @param businessId
+	 * @param projectId
+	 * @param planId
+	 * @param period
+	 * @return
+	 */
+	BigDecimal calcPlatFee(@Param("businessId")String businessId,@Param("projectId")String projectId,@Param("planId")String planId,@Param("period")Integer period);
 }

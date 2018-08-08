@@ -185,14 +185,16 @@ public class BasicCompanyServiceImpl extends BaseServiceImpl<BasicCompanyMapper,
             searchMap = selectCompanysMapByAreaId(areas);
         }
         if(comIds!=null&&comIds.size()>0){
-            if(searchMap == null){
-                searchMap = new HashMap<>();
-                for(String comId:comIds){
-                    BasicCompany c =  searchMap.get(comId);
+            
+            for(String comId:comIds){
+            	if(searchMap == null){
+                    searchMap = new HashMap<>();
+            	}else {
+            		BasicCompany c =  searchMap.get(comId);
                     if(c==null){
                         searchMap.put(comId,null);
                     }
-                }
+				}
             }
 /*            else {//同时搜索公司和区域，取交集
                 Map<String, BasicCompany> s1Map = new HashMap<>();

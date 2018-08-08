@@ -716,6 +716,15 @@ public class ApplyDerateController {
 		logger.info("@减免管理@减免管理台账--存储Excel--开始[{}]", req);
 		EasyPoiExcelExportUtil.setResponseHead(response, "AfterLoanStandingBook.xls");
 		req.setUserId(loginUserInfoHelper.getUserId());
+		
+		Wrapper<SysUserRole> wrapperSysUserRole = new EntityWrapper<SysUserRole>();
+        wrapperSysUserRole.eq("user_id",loginUserInfoHelper.getUserId());
+        wrapperSysUserRole.and(" role_code in (SELECT role_code FROM tb_sys_role WHERE role_area_type = 1 AND page_type = 3 ) ");
+        List<SysUserRole> userRoles = sysUserRoleService.selectList(wrapperSysUserRole);
+        if(null != userRoles && !userRoles.isEmpty()) {
+        	req.setNeedPermission(0);//全局用户 不需要验证权限
+        }
+		
 		List<ApplyDerateVo> list = applyDerateProcessService.selectApplyDerateList(req);
 
 		Workbook workbook = ExcelExportUtil.exportExcel(new ExportParams(), ApplyDerateVo.class, list);

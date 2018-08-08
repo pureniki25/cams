@@ -1479,20 +1479,20 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			case "20":
 				repayWay.append("自动线下代扣");
 				WithholdingRepaymentLog log = withholdingRepaymentLogService.selectById(lastOne.getRepaySourceRefId());
-				if (log.getBindPlatformId().equals(0)) {
+				if (log.getBindPlatformId().equals(PlatformEnum.YB_FORM.getValue())) {
 					repayWay.append("(易宝代扣)");
 				}
-				if (log.getBindPlatformId().equals(0)) {
+				if (log.getBindPlatformId().equals(PlatformEnum.BF_FORM.getValue())) {
 					repayWay.append("(宝付代扣)");
 				}
 				break;
 			case "21":
 				repayWay.append("人工线下代扣");
 				WithholdingRepaymentLog log1 = withholdingRepaymentLogService.selectById(lastOne.getRepaySourceRefId());
-				if (log1.getBindPlatformId().equals(0)) {
+				if (log1.getBindPlatformId().equals(PlatformEnum.YB_FORM.getValue())) {
 					repayWay.append("(易宝代扣)");
 				}
-				if (log1.getBindPlatformId().equals(0)) {
+				if (log1.getBindPlatformId().equals(PlatformEnum.BF_FORM.getValue())) {
 					repayWay.append("(宝付代扣)");
 				}
 				break;
@@ -1510,8 +1510,24 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 				for (RepaymentBizPlanListDetail planListDetail : planListDto.getBizPlanListDetails()) {
 					List<RepaymentProjFactRepay> list = financeBaseDto.getProjFactRepays().get(planListDetail.getPlanDetailId());
 					if (list != null && !list.isEmpty()) {
-						BigDecimal factAmount = BigDecimal.ZERO;
+						/*优化同一个费用项在备注里出现2次*/
+						List<RepaymentProjFactRepay> newList = new ArrayList<>() ;
 						for (RepaymentProjFactRepay repaymentProjFactRepay : list) {
+							boolean existSameFee = false ;
+							for (RepaymentProjFactRepay repaymentProjFactRepay2 : newList) {
+								if (repaymentProjFactRepay2.getFeeId().equals(repaymentProjFactRepay.getFeeId())) {
+									existSameFee = true ;
+									repaymentProjFactRepay2.setFactAmount(repaymentProjFactRepay2.getFactAmount().add(repaymentProjFactRepay.getFactAmount()));
+								}
+							}
+							if (!existSameFee) {
+								newList.add(repaymentProjFactRepay);
+							}
+						}
+						/*优化同一个费用项在备注里出现2次*/
+						
+						BigDecimal factAmount = BigDecimal.ZERO;
+						for (RepaymentProjFactRepay repaymentProjFactRepay : newList) {
 							factAmount = repaymentProjFactRepay.getFactAmount().add(factAmount);
 						}
 						feeDetails.append(factAmount.setScale(2, RoundingMode.HALF_UP));
@@ -1632,7 +1648,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			            } else {
 
 //							bizPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
-							bizPlanList.setCurrentSubStatus(RepayPlanStatus.PARTAIL.getName());
+			            	bizPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
+							bizPlanList.setCurrentSubStatus(RepayPlanStatus.REPAYING.getName());
 							bizPlanList.setRepayFlag(null);
 			                if (bplFactAmount.compareTo(bplOnlineAmount) >= 0) {
 			                    bizPlanList.setRepayStatus(SectionRepayStatusEnum.ONLINE_REPAID.getKey());

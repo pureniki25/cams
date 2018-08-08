@@ -18,7 +18,9 @@ import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.dto.core.LayTableQuery;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.*;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanSettleStatusEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
+import com.hongte.alms.base.enums.repayPlan.SectionRepayStatusEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.feignClient.dto.TdProjectPaymentDTO;
@@ -360,6 +362,10 @@ public class FinanceController {
          if(null != userRoles && !userRoles.isEmpty()) {
          	req.setNeedPermission(0);//全局用户 不需要验证权限
          }
+         
+		if (StringUtil.notEmpty(req.getPaymentPlatform())) {
+			req.setPaymentPlatformCode(PaymentPlatformEnums.getValueByName(req.getPaymentPlatform()));
+		}
 		
 		PageResult pageResult = repaymentBizPlanListService.selectByFinanceManagerListReq(req);
 		logger.info("@getFinanceMangerList@获取财务管理列表数据--结束[{}]", pageResult);
@@ -634,9 +640,9 @@ public class FinanceController {
 	
 	@GetMapping(value = "/queryProjOtherFee")
 	@ApiOperation(value = "获取标维度的其他费用")
-	public Result<List<String>> queryProjOtherFee(@RequestParam("projPlanListId") String projPlanListId) {
+	public Result<Map<String, List<String>>> queryProjOtherFee(@RequestParam("projPlanListId") String projPlanListId) {
 		try {
-			Result<List<String>> result;
+			Result<Map<String, List<String>>> result;
 			
 			logger.info("@queryProjOtherFee@获取标维度的其他费用--开始[{}]", projPlanListId);
 			
@@ -653,9 +659,9 @@ public class FinanceController {
 	
 	@GetMapping(value = "/queryBizOtherFee")
 	@ApiOperation(value = "获取业务维度的其他费用")
-	public Result<List<String>> queryBizOtherFee(@RequestParam("planListId") String planListId) {
+	public Result<Map<String, List<String>>> queryBizOtherFee(@RequestParam("planListId") String planListId) {
 		try {
-			Result<List<String>> result;
+			Result<Map<String, List<String>>> result;
 			
 			logger.info("@queryBizOtherFee@获取业务维度的其他费用--开始[{}]", planListId);
 			
@@ -1168,7 +1174,100 @@ public class FinanceController {
 		}
 	}
 
-
+	/**
+	 * 主要用于检测:
+	 * action=还款时,是否存在未还垫付记录;
+	 * action=结清时,是否存在为还垫付记录;结清期往期是否未还款/逾期/部分还款/;除最后一期以外,结清期是否逾期;已结清的还款计划 或者 业务不能再结清
+	 * @author 王继光
+	 * 2018年8月7日 下午3:45:16
+	 * @param businessId
+	 * @param afterId
+	 * @param action
+	 * @return
+	 */
+	@RequestMapping("/check")
+	@ApiOperation(value = "检查还款计划能进行action操作")
+	public Result check(String businessId,String afterId,String planId,String action) {
+		
+		if (action.equals("repay")) {
+			
+			List<RepaymentConfirmLog> list = confrimLogService.selectList(
+					new EntityWrapper<RepaymentConfirmLog>()
+					.eq("org_business_id", businessId)
+					.eq("after_id",afterId)
+					.notIn("repay_source", 0,10,11,21,31).orderBy("idx",false));
+			if (!CollectionUtils.isEmpty(list)) {
+				return Result.error("上次自动代扣的业务此次不能线下还款");
+			}
+			
+			return checkLastRepay(businessId, afterId);
+		}
+		
+		if (action.equals("settle")) {
+			Result checkLastRepay = checkLastRepay(businessId, afterId);
+			if (!checkLastRepay.getCode().equals("1")) {
+				return checkLastRepay;
+			}
+			
+			/*判断当前期或业务是否已结清*/
+			EntityWrapper<RepaymentBizPlan> ew = new EntityWrapper<>() ;
+			ew.eq("business_id", businessId);
+			if (!StringUtil.isEmpty(planId)) {
+				ew.eq("plan_id", planId);
+			}
+			boolean allSettle = true ;
+			List<RepaymentBizPlan> list = repaymentBizPlanService.selectList(ew);
+			for (RepaymentBizPlan repaymentBizPlan : list) {
+				if (repaymentBizPlan.getPlanStatus().equals(RepayPlanSettleStatusEnum.REPAYINF.getValue())) {
+					allSettle = false ;
+				}
+			}
+			if (allSettle) {
+				return Result.error("已结清的还款计划不能再结清");
+			}
+			/*判断当前期或业务是否已结清*/
+			/*判断结清期是否逾期,最后一期不在判断范围以内*/
+			BasicBusiness business = basicBusinessService.selectById(businessId);
+			Wrapper<RepaymentBizPlanList> eq = new EntityWrapper<RepaymentBizPlanList>().eq("business_id", business.getBusinessId()).eq("after_id", afterId);
+			if (!StringUtil.isEmpty(planId)) {
+				eq.eq("plan_id", planId);
+			}
+			RepaymentBizPlanList bizPlanList = repaymentBizPlanListService.selectOne(eq);
+			if (bizPlanList.getCurrentStatus().equals(RepayPlanStatus.REPAYED.getName())) {
+				return Result.error("已还款不能结清");
+			}
+			if (bizPlanList.getRepayStatus()!=null) {
+				if (bizPlanList.getRepayStatus().equals(SectionRepayStatusEnum.ONLINE_REPAID.getKey())) {
+					return Result.error("线上部分已还款不能结清");
+				}
+			}
+			if (bizPlanList.getPeriod() < business.getBorrowLimit()) {
+				if (bizPlanList.getCurrentStatus().equals(RepayPlanStatus.OVERDUE.getName())) {
+					return Result.error("逾期不能结清");
+				}
+			}
+			/*判断结清期是否逾期,最后一期不在判断范围以内*/
+			/*检查往期还款状态*/
+			Wrapper<RepaymentBizPlanList> lt = new EntityWrapper<RepaymentBizPlanList>().eq("business_id", business.getBusinessId()).lt("period", bizPlanList.getPeriod());
+			if (!StringUtil.isEmpty(planId)) {
+				lt.eq("plan_id", planId);
+			}
+			List<RepaymentBizPlanList> lastPeriods = repaymentBizPlanListService.selectList(lt);
+			for (RepaymentBizPlanList repaymentBizPlanList : lastPeriods) {
+				if (repaymentBizPlanList.getRepayStatus()==null) {
+					return Result.error(repaymentBizPlanList.getAfterId()+"未还款不能结清");
+				}
+				if (repaymentBizPlanList.getRepayStatus().equals(SectionRepayStatusEnum.SECTION_REPAID.getKey())) {
+					return Result.error(repaymentBizPlanList.getAfterId()+"部分还款不能结清");
+				}
+			}
+			/*检查往期还款状态*/
+			return Result.success();
+		}
+		
+		return Result.error("action不能为空");
+	}
+	
 	@RequestMapping("/checkLastRepay")
 	@ApiOperation(value = "检查前面的还款计划是否有未还垫付")
 	public Result checkLastRepay(String businessId, String afterId) {

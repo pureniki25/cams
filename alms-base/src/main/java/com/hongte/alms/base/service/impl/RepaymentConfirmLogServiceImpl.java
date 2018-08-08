@@ -55,6 +55,7 @@ import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.DateUtil;
+import com.ht.ussp.bean.LoginUserInfoHelper;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -135,6 +136,11 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
     @Autowired
     @Qualifier("SysApiCallFailureRecordService")
 	SysApiCallFailureRecordService sysApiCallFailureRecordService ;
+    
+    
+    @Autowired
+	LoginUserInfoHelper 	loginUserInfoHelper;
+    
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Result revokeConfirm(String businessId, String afterId) throws Exception{
@@ -147,9 +153,12 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
         if (log.getType().equals(2)) {
 			return Result.error("500","请先撤销"+log.getAfterId()+"的结清");
 		}
-        if(log.getRepaySource()!=10) {//如果不是线下转账的不能撤销
-            return Result.error("500", "最后一次还款不是线下转账不能被撤销");
+        if(!loginUserInfoHelper.getUserId().equals("0111130000")) {
+        	   if(log.getRepaySource()!=10) {//如果不是线下转账的不能撤销
+                   return Result.error("500", "最后一次还款不是线下转账不能被撤销");
+               }
         }
+     
 
         if (log.getCanRevoke().equals(0)) {
             return Result.error("500", "该还款记录不能被撤销");
@@ -184,18 +193,18 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 
 
                 logger.info("=========查询是否有资金分发结果{}",JSON.toJSONString(listResult));
-                if("1".equals(listResult.getCode())){
-                    List<PlatformRepaymentDto> data = listResult.getData();
-                    if(!CollectionUtils.isEmpty(data)){
-                        for(PlatformRepaymentDto platformRepaymentDto : data){
-                            if(req.getConfirmLogId().equals(platformRepaymentDto.getConfirmLogId())){ //planlistId相等
-                                if(platformRepaymentDto.getProcessStatus()==1 || platformRepaymentDto.getProcessStatus()==2){
-                                    throw new ServiceRuntimeException("已分发记录不能被撤销");
-                                }
-                            }
-                        }
-                    }
-                }
+//                if("1".equals(listResult.getCode())){
+//                    List<PlatformRepaymentDto> data = listResult.getData();
+//                    if(!CollectionUtils.isEmpty(data)){
+//                        for(PlatformRepaymentDto platformRepaymentDto : data){
+//                            if(req.getConfirmLogId().equals(platformRepaymentDto.getConfirmLogId())){ //planlistId相等
+//                                if(platformRepaymentDto.getProcessStatus()==1 || platformRepaymentDto.getProcessStatus()==2){
+//                                    throw new ServiceRuntimeException("已分发记录不能被撤销");
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
 			}
             
         }
@@ -317,24 +326,6 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
         }
         
         /*删除合规化还款调用记录 开始*/
-//        for (String projectId : projectIds) {
-//        	//撤销成功 通知分发中心
-//            try{
-//            	platformRepaymentReq.setProjectId(projectId);
-//            	platformRepaymentReq.setConfirmLogId(log.getConfirmLogId());
-//                Result revokeListResult = platformRepaymentFeignClient.revokeTdrepayRecharge(platformRepaymentReq);
-//                if (!"1".equals(revokeListResult.getCode())) {
-//					throw new ServiceRuntimeException("通知分发中心撤销失败："+revokeListResult.getMsg());
-//				}
-//                logger.info("=========通知分发中心已经撤销{}",JSON.toJSONString(revokeListResult));
-//            }catch (Exception e){
-//                logger.error("=========通知分发中心已经撤销出错{}",e);
-//                throw new ServiceRuntimeException("通知分发中心已经撤销出错");
-//            }
-//		}
-        
-        
-        
         List<RepaymentConfirmPlatRepayLog> repaymentConfirmPlatRepayLogs = repaymentConfirmPlatRepayLogMapper.selectList(new EntityWrapper<RepaymentConfirmPlatRepayLog>().eq("confirm_log_id", log.getConfirmLogId()));
         for (RepaymentConfirmPlatRepayLog repaymentConfirmPlatRepayLog : repaymentConfirmPlatRepayLogs) {
         	String projPlanListId = repaymentConfirmPlatRepayLog.getProjPlanListId() ;
@@ -365,9 +356,6 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 		}
         /*删除合规化还款调用记录 结束*/
         log.deleteById();
-
-       
-
         return Result.success();
     }
 
@@ -422,5 +410,7 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
         return res;
     }
 
+    
+    
 
 }

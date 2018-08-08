@@ -28,18 +28,18 @@ public class ImportWidthholdingFlowFromYiBaoJob extends IJobHandler {
     @Override
     public ReturnT<String> execute(String s) throws Exception {
         try {
-            LOGGER.info("@ImportWidthholdingFlowFromBaoFuJob@导入代扣流水-易宝 开始.");
+            LOGGER.info("@ImportWidthholdingFlowFromYiBaoJob@导入代扣流水-易宝 开始.");
             long start = System.currentTimeMillis();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             String settleDate = formatter.format(LocalDate.now().minusDays(1));
             //默认取前一天的数据
-            LOGGER.info("@ImportWidthholdingFlowFromBaoFuJob@导入代扣流水-易宝 正在处理[{}]的结清数据.", settleDate);
+            LOGGER.info("@ImportWidthholdingFlowFromYiBaoJob@导入代扣流水-易宝 正在处理[{}]的结清数据.", settleDate);
             withholdingFlowRecordService.importWidthholdingFlowFromYiBao(settleDate);
             long end = System.currentTimeMillis();
-            LOGGER.info("@ImportWidthholdingFlowFromBaoFuJob@导入代扣流水-易宝 结束.耗时:[{}]ms", end-start);
+            LOGGER.info("@ImportWidthholdingFlowFromYiBaoJob@导入代扣流水-易宝 结束.耗时:[{}]ms", end-start);
             return SUCCESS;
         } catch (Exception e) {
-            LOGGER.error("@ImportWidthholdingFlowFromBaoFuJob@导入代扣流水-易宝 异常.", e);
+            LOGGER.error("@ImportWidthholdingFlowFromYiBaoJob@导入代扣流水-易宝 异常.", e);
             return FAIL;
         }
     }

@@ -109,7 +109,7 @@
                                 <i-option value="6">根据财务跟单方式控制</i-option>
                             </i-select>
                         </form-item>
-                        <form-item label="角色区域控制类型" prop="pageType">
+                        <form-item label="角色页面控制类型" prop="pageType">
                             <i-select :model.sync="editForm.pageType"  v-model="editForm.pageType">
                                 <i-option value="0">合规化还款</i-option>
                                 <i-option value="1">贷后管理列表</i-option>
@@ -121,6 +121,12 @@
                                 <i-option value="7">展期管理列表</i-option>
                                 <i-option value="8">消息管理列表</i-option>
                                 <i-option value="9">财务管理列表</i-option>
+                            </i-select>
+                        </form-item>
+                        <form-item label="角色数据权限类型" prop="dataType">
+                            <i-select :model.sync="editForm.dataType"  v-model="editForm.dataType">
+                                <i-option value="0">所有权限</i-option>
+                                <i-option value="1">正在逾期中(贷后管理)</i-option>
                             </i-select>
                         </form-item>
                     </i-form>

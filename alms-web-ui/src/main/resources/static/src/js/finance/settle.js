@@ -406,7 +406,17 @@ window.layinit(function (htConfig) {
                         key: 'penalty'
                     }, */ {
                         title: '备注',
-                        key: 'remark'
+                        key: 'remark',
+                        render:(h,p)=>{
+                            return h('pre',{
+                                style:{
+                                    overflow:'hidden',
+                                },
+                                attrs:{
+                                    title:p.row.remark,
+                                }
+                            },p.row.remark)
+                        }
                     }, {
                         title: '状态',
                         key: 'status',
@@ -454,9 +464,11 @@ window.layinit(function (htConfig) {
                 item20: 0,
                 item30: 0,
                 item50: 0,
+                item70: 0,
                 offlineOverDue: 0,
                 onlineOverDue: 0,
                 subTotal: 0,
+                otherMoney:0,
                 total: 0,
                 surplus: 0,
                 penalty:0
@@ -482,16 +494,16 @@ window.layinit(function (htConfig) {
                 }
                 app.factRepaymentInfo.surplusFund = 0
             },
-            'factRepaymentInfo.surplusFund': function (n) {
-                if ((n||n==0 )&& !isNaN(n)) {
-                    if(n>app.factRepaymentInfo.canUseSurplus){
-                        app.$Modal.warning({content:'可使用结余金额不能大于'+app.factRepaymentInfo.canUseSurplus})
-                        app.factRepaymentInfo.surplusFund = 0
-                        return;
-                    }
-                    app.factRepaymentInfo.repayAccount = accAdd(app.factRepaymentInfo.moneyPoolAccount,(app.factRepaymentInfo.surplusFund||0))
-                }
-            },
+            // 'factRepaymentInfo.surplusFund': function (n) {
+            //     if ((n||n==0 )&& !isNaN(n)) {
+            //         if(n>app.factRepaymentInfo.canUseSurplus){
+            //             app.$Modal.warning({content:'可使用结余金额不能大于'+app.factRepaymentInfo.canUseSurplus})
+            //             app.factRepaymentInfo.surplusFund = 0
+            //             return;
+            //         }
+            //         app.factRepaymentInfo.repayAccount = accAdd(app.factRepaymentInfo.moneyPoolAccount,(app.factRepaymentInfo.surplusFund||0))
+            //     }
+            // },
             'factRepaymentInfo.repayAccount': function (n) {
                 app.previewSettle()
             }
@@ -708,10 +720,13 @@ window.layinit(function (htConfig) {
                             app.thisTimeRepaymentInfo.onlineOverDue = data.onlineOverDue
                             app.thisTimeRepaymentInfo.penalty = data.penalty
                             app.thisTimeRepaymentInfo.derate = data.derate
+                            app.thisTimeRepaymentInfo.derates = data.derates
                             app.thisTimeRepaymentInfo.planRepayBalance = data.planRepayBalance
                             app.thisTimeRepaymentInfo.total = data.total
                             app.thisTimeRepaymentInfo.penaltyFeesBiz = data.penaltyFeesBiz
                             app.thisTimeRepaymentInfo.other = data.other
+                            app.thisTimeRepaymentInfo.lackFees = data.lackFees 
+
                             if(param.otherFees){
                                 app.thisTimeRepaymentInfo.otherFees = data.otherFees
                             }
@@ -736,7 +751,7 @@ window.layinit(function (htConfig) {
                     content:'请稍后...',
                     duration:0
                 })
-                app.submitLoding = true
+
                 axios.post(fpath+'finance/financeSettle',params)
                 .then(function(res){
                     app.$Message.destroy()
@@ -746,8 +761,18 @@ window.layinit(function (htConfig) {
                 .catch(function(err){
                     app.$Message.error({content:'结清功能异常'})
                 })
+
+
+
+
             },
             handleSettleResult(res){
+                if(res.data.code!='1'){
+                    app.$Modal.error({
+                        content:res.data.msg
+                    })
+                    return ;
+                }
                 app.table.projRepayment.data = res.data.data
                 app.factRepayPreview.flag = true
                 app.factRepayPreview.item10 = 0
@@ -809,21 +834,42 @@ window.layinit(function (htConfig) {
 
                 params = Object.assign(app.factRepaymentInfo, params);
 
-                if(app.thisTimeRepaymentInfo.item10>app.factRepayPreview.item10){
-                    app.$Modal.confirm({
-                        content:'确认 亏损结清 ?',
-                        onOk:function(){
-                            params.deficit = true ;
-                            app.settle(params,app.handleSettleResult)
-                        },
-                        onCancel:function(){
-                            location.reload()
-                        }
-                    })
-                }else{
-                    app.settle(params,app.handleSettleResult)
-                }
-                
+                // if(app.thisTimeRepaymentInfo.item10>app.factRepayPreview.item10){
+                //     app.$Modal.confirm({
+                //         content:'确认 亏损结清 ?',
+                //         onOk:function(){
+                //             params.deficit = true ;
+                //             app.settle(params,app.handleSettleResult)
+                //         },
+                //         onCancel:function(){
+                //             location.reload()
+                //         }
+                //     })
+                // }else{
+                //     app.settle(params,app.handleSettleResult)
+                // }
+                layer.confirm('确认还款计划结清?', {icon: 3, title: '提示'}, function (index) {
+                    app.submitLoding = true;
+                    axios.post(fpath + 'finance/financeSettle', params)
+                        .then(function (res) {
+                            if (res.data.code == '1') {
+                                app.submitLoding = false;
+                                app.$Modal.success({
+                                    content: '还款计划结清成功!', onOk() {
+                                        var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                                        parent.layer.close(index);
+                                        parent.app.search()
+                                    }
+                                })
+                            } else {
+                                app.$Message.error({content: res.data.msg})
+                            }
+                        })
+                        .catch(function (err) {
+                            console.log(err);
+                        })
+                    layer.close(index);
+                })
 
             },
             deleteMoneyPool(p) {
@@ -879,6 +925,7 @@ window.layinit(function (htConfig) {
         created: function () {
             this.getBaseInfo()
             this.getRepayRegList()
+            this.getSurplusFund()
             this.getMatched()
             this.listRepayment()
             this.getSettleInfo()

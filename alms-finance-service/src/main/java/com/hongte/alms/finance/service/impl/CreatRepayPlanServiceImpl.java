@@ -1278,11 +1278,11 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             for (RepaymentProjPlan projPlan:projPlans ){
                 projPlan.setPlanId(bizPlan.getPlanId());
                 BigDecimal projBorrowMoney =projPlan.getBorrowMoney();
-                bizPlanBorrowMoney = bizPlanBorrowMoney.add(projBorrowMoney);
                 projBorrowMoney = projBorrowMoney.setScale(smallNum,roundingMode);
+                bizPlanBorrowMoney = bizPlanBorrowMoney.add(projBorrowMoney);
                 projPlan.setBorrowMoney(projBorrowMoney);
             }
-            bizPlanBorrowMoney = bizPlanBorrowMoney.setScale(smallNum,roundingMode);
+            //bizPlanBorrowMoney = bizPlanBorrowMoney.setScale(smallNum,roundingMode);
             bizPlan.setBorrowMoney(bizPlanBorrowMoney);// 生成还款计划对应的借款总额(元)
 
             for(Integer period : planListPeroidMap.keySet()){
@@ -1305,11 +1305,11 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 BigDecimal  totalBorrowAmount = new BigDecimal(0);
                 for(RepaymentProjPlanList  projPList:planLists){
                     BigDecimal projTBAmount = projPList.getTotalBorrowAmount();
-                    totalBorrowAmount = totalBorrowAmount.add(projTBAmount);
                     projTBAmount = projTBAmount.setScale(smallNum,roundingMode);
+                    totalBorrowAmount = totalBorrowAmount.add(projTBAmount);
                     projPList.setTotalBorrowAmount(projTBAmount);
                 }
-                totalBorrowAmount = totalBorrowAmount.setScale(smallNum,roundingMode);
+               // totalBorrowAmount = totalBorrowAmount.setScale(smallNum,roundingMode);
                 bizPlanList.setTotalBorrowAmount(totalBorrowAmount);   //应还金额
                 bizPlanList.setOverdueAmount(null);   //总应还滞纳金(元)
                 bizPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());   //当前还款状态
@@ -1353,7 +1353,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                             planAmount = planAmount.add(pPAmount);
                             pDetail.setProjPlanAmount(pPAmount);
                         }
-                        planAmount = planAmount.setScale(smallNum,roundingMode);
+                       // planAmount = planAmount.setScale(smallNum,roundingMode);
                         bizpDetial.setPlanAmount(planAmount);  //项目计划应还总金额(元)
 
                         bizpDetial.setPlanRate(null);  //项目计划应还比例(%)，如0.5%则存0.5，可空
@@ -1427,7 +1427,18 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                                      Map<String,Map<String,Map<String,List<RepaymentProjPlanListDetail>>>> projPlanDetailTotalMap,
                                      Map<String,Map<String,List<RepaymentProjPlanList>>> projPlanListTotalMap,CreatRepayPlanReq creatRepayPlanReq) throws IllegalAccessException, InstantiationException {
         Integer planIndex = 0;
-        for(String beginDay:projInfoReqMap.keySet()){
+        //****************根据启标时间排序*******************//  add by chenzs
+        List<String> beginDays=new ArrayList<String>();
+        beginDays.addAll(projInfoReqMap.keySet());
+		Collections.sort(beginDays, new Comparator<String>() {
+			@Override
+			public int compare(String f1, String f2) {
+				return f1.compareTo(f2); 
+			}
+
+		});
+		 //****************根据启标时间排序*******************//
+        for(String beginDay:beginDays){
             planIndex++;
             List<ProjInfoReq> reqList = projInfoReqMap.get(beginDay);
             //批次Id
@@ -1453,7 +1464,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             List<RepaymentProjPlan> projPlans = new LinkedList<>();
             repaymentProjPlanMap.put(batchId,projPlans);
 
-
+        
 
             for(ProjInfoReq projInfoReq:reqList){
 

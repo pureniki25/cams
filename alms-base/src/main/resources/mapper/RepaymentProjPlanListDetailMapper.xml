@@ -101,4 +101,55 @@
 				and rpp.plan_id = #{planId} 
 			</if>
 	</select>
+	
+	<select id="calcSurplusPlatformFees" resultType="java.math.BigDecimal">
+		SELECT DISTINCT
+			sum(ppld.proj_plan_amount)
+		FROM
+			tb_repayment_proj_plan_list_detail ppld
+			LEFT JOIN tb_repayment_proj_plan_list ppl ON ppld.proj_plan_list_id = ppl.proj_plan_list_id
+			LEFT JOIN tb_repayment_proj_plan pp ON ppl.proj_plan_id = pp.proj_plan_id 
+		WHERE
+			ppl.business_id = #{businessId}
+			AND pp.project_id = #{projectId}
+			AND ppld.plan_item_type = 50
+			AND ppl.period > #{period}
+			<if test="planId != null">
+				AND pp.plan_id = #{planId}
+			</if>
+	</select>
+	
+	<select id="calcService" resultType="java.math.BigDecimal" >
+		SELECT DISTINCT
+			sum(ppld.proj_plan_amount)
+		FROM
+			tb_repayment_proj_plan_list_detail ppld
+			LEFT JOIN tb_repayment_proj_plan_list ppl ON ppld.proj_plan_list_id = ppl.proj_plan_list_id
+			LEFT JOIN tb_repayment_proj_plan pp ON ppl.proj_plan_id = pp.proj_plan_id 
+		WHERE
+			ppl.business_id = #{businessId}
+			AND pp.project_id = #{projectId}
+			AND ppld.plan_item_type = 30
+			AND ppl.period = #{period}
+			<if test="planId != null">
+				AND pp.plan_id = #{planId}
+			</if>
+	</select>
+	
+	<select id="calcPlatFee" resultType="java.math.BigDecimal" >
+		SELECT DISTINCT
+			sum(ppld.proj_plan_amount)
+		FROM
+			tb_repayment_proj_plan_list_detail ppld
+			LEFT JOIN tb_repayment_proj_plan_list ppl ON ppld.proj_plan_list_id = ppl.proj_plan_list_id
+			LEFT JOIN tb_repayment_proj_plan pp ON ppl.proj_plan_id = pp.proj_plan_id 
+		WHERE
+			ppl.business_id = #{businessId}
+			AND pp.project_id = #{projectId}
+			AND ppld.plan_item_type = 50
+			AND ppl.period = #{period}
+			<if test="planId != null">
+				AND pp.plan_id = #{planId}
+			</if>
+	</select>
 </mapper>
